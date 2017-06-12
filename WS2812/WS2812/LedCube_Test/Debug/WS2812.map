@@ -1,0 +1,666 @@
+Archive member included to satisfy reference by file (symbol)
+
+C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(main.o)
+                              C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.0.106/gcc/dev/atmega328p/avr5/crtatmega328p.o (main)
+C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(wiring.o)
+                              src/WS2812.o (micros)
+C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(wiring_digital.o)
+                              src/WS2812.o (pinMode)
+C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(hooks.o)
+                              C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(wiring.o) (yield)
+c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_exit.o)
+                              C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.0.106/gcc/dev/atmega328p/avr5/crtatmega328p.o (exit)
+c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_clear_bss.o)
+                              Sketch.o (__do_clear_bss)
+c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_ctors.o)
+                              Sketch.o (__do_global_ctors)
+c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_dtors.o)
+                              Sketch.o (__do_global_dtors)
+c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_tablejump2.o)
+                              c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_ctors.o) (__tablejump2__)
+
+Discarded input sections
+
+ .data          0x00000000        0x0 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.0.106/gcc/dev/atmega328p/avr5/crtatmega328p.o
+ .bss           0x00000000        0x0 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.0.106/gcc/dev/atmega328p/avr5/crtatmega328p.o
+ .text          0x00000000        0x0 Sketch.o
+ .data          0x00000000        0x0 Sketch.o
+ .bss           0x00000000        0x0 Sketch.o
+ .text          0x00000000        0x0 src/WS2812.o
+ .data          0x00000000        0x0 src/WS2812.o
+ .bss           0x00000000        0x0 src/WS2812.o
+ .text._ZN6WS28124initEv
+                0x00000000        0x2 src/WS2812.o
+ .text._ZN6WS28128getPixelEhP15WS2812PixelType
+                0x00000000       0x48 src/WS2812.o
+ .text._ZN6WS28128setPixelEh15WS2812PixelType
+                0x00000000       0x36 src/WS2812.o
+ .text._ZN6WS281213setColorOrderE20WS2812ColorOrderType
+                0x00000000       0x2e src/WS2812.o
+ .text          0x00000000        0x0 C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(main.o)
+ .data          0x00000000        0x0 C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(main.o)
+ .bss           0x00000000        0x0 C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(main.o)
+ .text.atexit   0x00000000        0x6 C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(main.o)
+ .text          0x00000000        0x0 C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(wiring.o)
+ .data          0x00000000        0x0 C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(wiring.o)
+ .bss           0x00000000        0x0 C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(wiring.o)
+ .text.millis   0x00000000       0x18 C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(wiring.o)
+ .text.delay    0x00000000       0x50 C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(wiring.o)
+ .text.delayMicroseconds
+                0x00000000       0x14 C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(wiring.o)
+ .text          0x00000000        0x0 C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(wiring_digital.o)
+ .data          0x00000000        0x0 C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(wiring_digital.o)
+ .bss           0x00000000        0x0 C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(wiring_digital.o)
+ .text.turnOffPWM
+                0x00000000       0x52 C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(wiring_digital.o)
+ .text.digitalWrite
+                0x00000000       0x5e C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(wiring_digital.o)
+ .text.digitalRead
+                0x00000000       0x52 C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(wiring_digital.o)
+ .progmem.data.digital_pin_to_timer_PGM
+                0x00000000       0x14 C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(wiring_digital.o)
+ .progmem.data.port_to_input_PGM
+                0x00000000        0xa C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(wiring_digital.o)
+ .text          0x00000000        0x0 C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(hooks.o)
+ .data          0x00000000        0x0 C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(hooks.o)
+ .bss           0x00000000        0x0 C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(hooks.o)
+ .text.__empty  0x00000000        0x2 C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(hooks.o)
+ .debug_info    0x00000000       0x3e C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(hooks.o)
+ .debug_abbrev  0x00000000       0x2a C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(hooks.o)
+ .debug_aranges
+                0x00000000       0x20 C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(hooks.o)
+ .debug_ranges  0x00000000       0x10 C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(hooks.o)
+ .debug_line    0x00000000       0x41 C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(hooks.o)
+ .debug_str     0x00000000      0x115 C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(hooks.o)
+ .comment       0x00000000       0x31 C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(hooks.o)
+ .debug_frame   0x00000000       0x24 C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(hooks.o)
+ .text          0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_exit.o)
+ .data          0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_exit.o)
+ .bss           0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_exit.o)
+ .text.libgcc.mul
+                0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_exit.o)
+ .text.libgcc.div
+                0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_exit.o)
+ .text.libgcc   0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_exit.o)
+ .text.libgcc.prologue
+                0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_exit.o)
+ .text.libgcc.builtins
+                0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_exit.o)
+ .text.libgcc.fmul
+                0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_exit.o)
+ .text.libgcc.fixed
+                0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_exit.o)
+ .text          0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_clear_bss.o)
+ .data          0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_clear_bss.o)
+ .bss           0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_clear_bss.o)
+ .text.libgcc.mul
+                0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_clear_bss.o)
+ .text.libgcc.div
+                0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_clear_bss.o)
+ .text.libgcc   0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_clear_bss.o)
+ .text.libgcc.prologue
+                0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_clear_bss.o)
+ .text.libgcc.builtins
+                0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_clear_bss.o)
+ .text.libgcc.fmul
+                0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_clear_bss.o)
+ .text.libgcc.fixed
+                0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_clear_bss.o)
+ .text          0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_ctors.o)
+ .data          0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_ctors.o)
+ .bss           0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_ctors.o)
+ .text.libgcc.mul
+                0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_ctors.o)
+ .text.libgcc.div
+                0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_ctors.o)
+ .text.libgcc   0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_ctors.o)
+ .text.libgcc.prologue
+                0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_ctors.o)
+ .text.libgcc.builtins
+                0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_ctors.o)
+ .text.libgcc.fmul
+                0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_ctors.o)
+ .text.libgcc.fixed
+                0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_ctors.o)
+ .text          0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_dtors.o)
+ .data          0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_dtors.o)
+ .bss           0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_dtors.o)
+ .text.libgcc.mul
+                0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_dtors.o)
+ .text.libgcc.div
+                0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_dtors.o)
+ .text.libgcc   0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_dtors.o)
+ .text.libgcc.prologue
+                0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_dtors.o)
+ .text.libgcc.builtins
+                0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_dtors.o)
+ .text.libgcc.fmul
+                0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_dtors.o)
+ .text.libgcc.fixed
+                0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_dtors.o)
+ .text          0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_tablejump2.o)
+ .data          0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_tablejump2.o)
+ .bss           0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_tablejump2.o)
+ .text.libgcc.mul
+                0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_tablejump2.o)
+ .text.libgcc.div
+                0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_tablejump2.o)
+ .text.libgcc.prologue
+                0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_tablejump2.o)
+ .text.libgcc.builtins
+                0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_tablejump2.o)
+ .text.libgcc.fmul
+                0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_tablejump2.o)
+ .text.libgcc.fixed
+                0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_tablejump2.o)
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+text             0x00000000         0x00020000         xr
+data             0x00800060         0x0000ffa0         rw !x
+eeprom           0x00810000         0x00010000         rw !x
+fuse             0x00820000         0x00000400         rw !x
+lock             0x00830000         0x00000400         rw !x
+signature        0x00840000         0x00000400         rw !x
+user_signatures  0x00850000         0x00000400         rw !x
+*default*        0x00000000         0xffffffff
+
+Linker script and memory map
+
+Address of section .data set to 0x800100
+LOAD C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.0.106/gcc/dev/atmega328p/avr5/crtatmega328p.o
+LOAD Sketch.o
+LOAD src/WS2812.o
+START GROUP
+LOAD c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr5\libm.a
+LOAD C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a
+END GROUP
+LOAD c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a
+LOAD c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr5\libm.a
+START GROUP
+LOAD c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a
+LOAD c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr5\libm.a
+LOAD c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr5\libc.a
+LOAD C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.0.106/gcc/dev/atmega328p/avr5\libatmega328p.a
+END GROUP
+                0x00020000                __TEXT_REGION_LENGTH__ = DEFINED (__TEXT_REGION_LENGTH__)?__TEXT_REGION_LENGTH__:0x20000
+                0x0000ffa0                __DATA_REGION_LENGTH__ = DEFINED (__DATA_REGION_LENGTH__)?__DATA_REGION_LENGTH__:0xffa0
+                0x00010000                __EEPROM_REGION_LENGTH__ = DEFINED (__EEPROM_REGION_LENGTH__)?__EEPROM_REGION_LENGTH__:0x10000
+                0x00000400                __FUSE_REGION_LENGTH__ = DEFINED (__FUSE_REGION_LENGTH__)?__FUSE_REGION_LENGTH__:0x400
+                0x00000400                __LOCK_REGION_LENGTH__ = DEFINED (__LOCK_REGION_LENGTH__)?__LOCK_REGION_LENGTH__:0x400
+                0x00000400                __SIGNATURE_REGION_LENGTH__ = DEFINED (__SIGNATURE_REGION_LENGTH__)?__SIGNATURE_REGION_LENGTH__:0x400
+                0x00000400                __USER_SIGNATURE_REGION_LENGTH__ = DEFINED (__USER_SIGNATURE_REGION_LENGTH__)?__USER_SIGNATURE_REGION_LENGTH__:0x400
+
+.hash
+ *(.hash)
+
+.dynsym
+ *(.dynsym)
+
+.dynstr
+ *(.dynstr)
+
+.gnu.version
+ *(.gnu.version)
+
+.gnu.version_d
+ *(.gnu.version_d)
+
+.gnu.version_r
+ *(.gnu.version_r)
+
+.rel.init
+ *(.rel.init)
+
+.rela.init
+ *(.rela.init)
+
+.rel.text
+ *(.rel.text)
+ *(.rel.text.*)
+ *(.rel.gnu.linkonce.t*)
+
+.rela.text
+ *(.rela.text)
+ *(.rela.text.*)
+ *(.rela.gnu.linkonce.t*)
+
+.rel.fini
+ *(.rel.fini)
+
+.rela.fini
+ *(.rela.fini)
+
+.rel.rodata
+ *(.rel.rodata)
+ *(.rel.rodata.*)
+ *(.rel.gnu.linkonce.r*)
+
+.rela.rodata
+ *(.rela.rodata)
+ *(.rela.rodata.*)
+ *(.rela.gnu.linkonce.r*)
+
+.rel.data
+ *(.rel.data)
+ *(.rel.data.*)
+ *(.rel.gnu.linkonce.d*)
+
+.rela.data
+ *(.rela.data)
+ *(.rela.data.*)
+ *(.rela.gnu.linkonce.d*)
+
+.rel.ctors
+ *(.rel.ctors)
+
+.rela.ctors
+ *(.rela.ctors)
+
+.rel.dtors
+ *(.rel.dtors)
+
+.rela.dtors
+ *(.rela.dtors)
+
+.rel.got
+ *(.rel.got)
+
+.rela.got
+ *(.rela.got)
+
+.rel.bss
+ *(.rel.bss)
+
+.rela.bss
+ *(.rela.bss)
+
+.rel.plt
+ *(.rel.plt)
+
+.rela.plt
+ *(.rela.plt)
+
+.text           0x00000000      0x58a
+ *(.vectors)
+ .vectors       0x00000000       0x68 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.0.106/gcc/dev/atmega328p/avr5/crtatmega328p.o
+                0x00000000                __vector_default
+                0x00000000                __vectors
+ *(.vectors)
+ *(.progmem.gcc*)
+                0x00000068                . = ALIGN (0x2)
+                0x00000068                __trampolines_start = .
+ *(.trampolines)
+ .trampolines   0x00000068        0x0 linker stubs
+ *(.trampolines*)
+                0x00000068                __trampolines_end = .
+ *libprintf_flt.a:*(.progmem.data)
+ *libc.a:*(.progmem.data)
+ *(.progmem*)
+ .progmem.data.digital_pin_to_bit_mask_PGM
+                0x00000068       0x14 C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(wiring_digital.o)
+                0x00000068                digital_pin_to_bit_mask_PGM
+ .progmem.data.digital_pin_to_port_PGM
+                0x0000007c       0x14 C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(wiring_digital.o)
+                0x0000007c                digital_pin_to_port_PGM
+ .progmem.data.port_to_output_PGM
+                0x00000090        0xa C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(wiring_digital.o)
+                0x00000090                port_to_output_PGM
+ .progmem.data.port_to_mode_PGM
+                0x0000009a        0xa C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(wiring_digital.o)
+                0x0000009a                port_to_mode_PGM
+                0x000000a4                . = ALIGN (0x2)
+ *(.jumptables)
+ *(.jumptables*)
+ *(.lowtext)
+ *(.lowtext*)
+                0x000000a4                __ctors_start = .
+ *(.ctors)
+ .ctors         0x000000a4        0x2 Sketch.o
+                0x000000a6                __ctors_end = .
+                0x000000a6                __dtors_start = .
+ *(.dtors)
+ .dtors         0x000000a6        0x2 Sketch.o
+                0x000000a8                __dtors_end = .
+ SORT(*)(.ctors)
+ SORT(*)(.dtors)
+ *(.init0)
+ .init0         0x000000a8        0x0 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.0.106/gcc/dev/atmega328p/avr5/crtatmega328p.o
+                0x000000a8                __init
+ *(.init0)
+ *(.init1)
+ *(.init1)
+ *(.init2)
+ .init2         0x000000a8        0xc C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.0.106/gcc/dev/atmega328p/avr5/crtatmega328p.o
+ *(.init2)
+ *(.init3)
+ *(.init3)
+ *(.init4)
+ .init4         0x000000b4       0x10 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_clear_bss.o)
+                0x000000b4                __do_clear_bss
+ *(.init4)
+ *(.init5)
+ *(.init5)
+ *(.init6)
+ .init6         0x000000c4       0x16 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_ctors.o)
+                0x000000c4                __do_global_ctors
+ *(.init6)
+ *(.init7)
+ *(.init7)
+ *(.init8)
+ *(.init8)
+ *(.init9)
+ .init9         0x000000da        0x8 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.0.106/gcc/dev/atmega328p/avr5/crtatmega328p.o
+ *(.init9)
+ *(.text)
+ .text          0x000000e2        0x4 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.0.106/gcc/dev/atmega328p/avr5/crtatmega328p.o
+                0x000000e2                __vector_22
+                0x000000e2                __vector_1
+                0x000000e2                __vector_24
+                0x000000e2                __vector_12
+                0x000000e2                __bad_interrupt
+                0x000000e2                __vector_6
+                0x000000e2                __vector_3
+                0x000000e2                __vector_23
+                0x000000e2                __vector_25
+                0x000000e2                __vector_11
+                0x000000e2                __vector_13
+                0x000000e2                __vector_17
+                0x000000e2                __vector_19
+                0x000000e2                __vector_7
+                0x000000e2                __vector_5
+                0x000000e2                __vector_4
+                0x000000e2                __vector_9
+                0x000000e2                __vector_2
+                0x000000e2                __vector_21
+                0x000000e2                __vector_15
+                0x000000e2                __vector_8
+                0x000000e2                __vector_14
+                0x000000e2                __vector_10
+                0x000000e2                __vector_18
+                0x000000e2                __vector_20
+                0x000000e6                . = ALIGN (0x2)
+ *(.text.*)
+ .text.setup    0x000000e6        0x2 Sketch.o
+                0x000000e6                setup
+ .text.loop     0x000000e8       0x26 Sketch.o
+                0x000000e8                loop
+ .text.startup._GLOBAL__sub_I_LED
+                0x0000010e        0xa Sketch.o
+ .text.exit._GLOBAL__sub_D_LED
+                0x00000118        0x8 Sketch.o
+ .text._ZN6WS2812D2Ev
+                0x00000120        0x2 src/WS2812.o
+                0x00000120                _ZN6WS2812D2Ev
+                0x00000120                _ZN6WS2812D1Ev
+ .text._ZN6WS28126setPinEh
+                0x00000122       0x60 src/WS2812.o
+                0x00000122                _ZN6WS28126setPinEh
+ .text._ZN6WS2812C2Eh
+                0x00000182       0x34 src/WS2812.o
+                0x00000182                _ZN6WS2812C2Eh
+                0x00000182                _ZN6WS2812C1Eh
+ .text._ZN6WS28128setPixelEhhhh
+                0x000001b6       0x3a src/WS2812.o
+                0x000001b6                _ZN6WS28128setPixelEhhhh
+ .text._ZN6WS281213setBrightnessEh
+                0x000001f0        0x8 src/WS2812.o
+                0x000001f0                _ZN6WS281213setBrightnessEh
+ .text._ZN6WS281210dimmPixelsEPhj
+                0x000001f8       0x86 src/WS2812.o
+                0x000001f8                _ZN6WS281210dimmPixelsEPhj
+ .text._ZN6WS28128sendDataEPhj
+                0x0000027e       0x48 src/WS2812.o
+                0x0000027e                _ZN6WS28128sendDataEPhj
+ .text._ZN6WS28124showEv
+                0x000002c6       0xb2 src/WS2812.o
+                0x000002c6                _ZN6WS28124showEv
+ .text.initVariant
+                0x00000378        0x2 C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(main.o)
+                0x00000378                initVariant
+ .text.startup.main
+                0x0000037a       0x1e C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(main.o)
+                0x0000037a                main
+ .text.__vector_16
+                0x00000398       0x94 C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(wiring.o)
+                0x00000398                __vector_16
+ .text.micros   0x0000042c       0x4a C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(wiring.o)
+                0x0000042c                micros
+ .text.init     0x00000476       0x76 C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(wiring.o)
+                0x00000476                init
+ .text.pinMode  0x000004ec       0x78 C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(wiring_digital.o)
+                0x000004ec                pinMode
+ .text.libgcc   0x00000564        0xc c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_tablejump2.o)
+                0x00000564                __tablejump2__
+                0x00000570                . = ALIGN (0x2)
+ *(.fini9)
+ .fini9         0x00000570        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_exit.o)
+                0x00000570                _exit
+                0x00000570                exit
+ *(.fini9)
+ *(.fini8)
+ *(.fini8)
+ *(.fini7)
+ *(.fini7)
+ *(.fini6)
+ .fini6         0x00000570       0x16 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_dtors.o)
+                0x00000570                __do_global_dtors
+ *(.fini6)
+ *(.fini5)
+ *(.fini5)
+ *(.fini4)
+ *(.fini4)
+ *(.fini3)
+ *(.fini3)
+ *(.fini2)
+ *(.fini2)
+ *(.fini1)
+ *(.fini1)
+ *(.fini0)
+ .fini0         0x00000586        0x4 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_exit.o)
+ *(.fini0)
+                0x0000058a                _etext = .
+
+.data           0x00800100        0x0 load address 0x0000058a
+                [!provide]                PROVIDE (__data_start, .)
+ *(.data)
+ *(.data*)
+ *(.rodata)
+ *(.rodata*)
+ *(.gnu.linkonce.d*)
+                0x00800100                . = ALIGN (0x2)
+                0x00800100                _edata = .
+                [!provide]                PROVIDE (__data_end, .)
+
+.bss            0x00800100       0x1f
+                0x00800100                PROVIDE (__bss_start, .)
+ *(.bss)
+ *(.bss*)
+ .bss.LED       0x00800100       0x16 Sketch.o
+                0x00800100                LED
+ .bss.timer0_fract
+                0x00800116        0x1 C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(wiring.o)
+ .bss.timer0_millis
+                0x00800117        0x4 C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(wiring.o)
+                0x00800117                timer0_millis
+ .bss.timer0_overflow_count
+                0x0080011b        0x4 C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(wiring.o)
+                0x0080011b                timer0_overflow_count
+ *(COMMON)
+                0x0080011f                PROVIDE (__bss_end, .)
+                0x0000058a                __data_load_start = LOADADDR (.data)
+                0x0000058a                __data_load_end = (__data_load_start + SIZEOF (.data))
+
+.noinit         0x0080011f        0x0
+                [!provide]                PROVIDE (__noinit_start, .)
+ *(.noinit*)
+                [!provide]                PROVIDE (__noinit_end, .)
+                0x0080011f                _end = .
+                [!provide]                PROVIDE (__heap_start, .)
+
+.eeprom         0x00810000        0x0
+ *(.eeprom*)
+                0x00810000                __eeprom_end = .
+
+.fuse
+ *(.fuse)
+ *(.lfuse)
+ *(.hfuse)
+ *(.efuse)
+
+.lock
+ *(.lock*)
+
+.signature
+ *(.signature*)
+
+.user_signatures
+ *(.user_signatures*)
+
+.stab
+ *(.stab)
+
+.stabstr
+ *(.stabstr)
+
+.stab.excl
+ *(.stab.excl)
+
+.stab.exclstr
+ *(.stab.exclstr)
+
+.stab.index
+ *(.stab.index)
+
+.stab.indexstr
+ *(.stab.indexstr)
+
+.comment        0x00000000       0x30
+ *(.comment)
+ .comment       0x00000000       0x30 Sketch.o
+                                 0x31 (size before relaxing)
+ .comment       0x00000030       0x31 src/WS2812.o
+ .comment       0x00000030       0x31 C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(main.o)
+ .comment       0x00000030       0x31 C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(wiring.o)
+ .comment       0x00000030       0x31 C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(wiring_digital.o)
+
+.note.gnu.avr.deviceinfo
+                0x00000000       0x40
+ .note.gnu.avr.deviceinfo
+                0x00000000       0x40 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.0.106/gcc/dev/atmega328p/avr5/crtatmega328p.o
+
+.note.gnu.build-id
+ *(.note.gnu.build-id)
+
+.debug
+ *(.debug)
+
+.line
+ *(.line)
+
+.debug_srcinfo
+ *(.debug_srcinfo)
+
+.debug_sfnames
+ *(.debug_sfnames)
+
+.debug_aranges  0x00000000      0x160
+ *(.debug_aranges)
+ .debug_aranges
+                0x00000000       0x38 Sketch.o
+ .debug_aranges
+                0x00000038       0x78 src/WS2812.o
+ .debug_aranges
+                0x000000b0       0x30 C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(main.o)
+ .debug_aranges
+                0x000000e0       0x48 C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(wiring.o)
+ .debug_aranges
+                0x00000128       0x38 C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(wiring_digital.o)
+
+.debug_pubnames
+ *(.debug_pubnames)
+
+.debug_info     0x00000000     0x1c0f
+ *(.debug_info .gnu.linkonce.wi.*)
+ .debug_info    0x00000000      0x603 Sketch.o
+ .debug_info    0x00000603      0xb4d src/WS2812.o
+ .debug_info    0x00001150      0x201 C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(main.o)
+ .debug_info    0x00001351      0x2c0 C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(wiring.o)
+ .debug_info    0x00001611      0x5fe C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(wiring_digital.o)
+
+.debug_abbrev   0x00000000      0x97a
+ *(.debug_abbrev)
+ .debug_abbrev  0x00000000      0x21d Sketch.o
+ .debug_abbrev  0x0000021d      0x3c2 src/WS2812.o
+ .debug_abbrev  0x000005df       0xfa C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(main.o)
+ .debug_abbrev  0x000006d9      0x146 C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(wiring.o)
+ .debug_abbrev  0x0000081f      0x15b C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(wiring_digital.o)
+
+.debug_line     0x00000000      0xc34
+ *(.debug_line .debug_line.* .debug_line_end)
+ .debug_line    0x00000000      0x18f Sketch.o
+ .debug_line    0x0000018f      0x46b src/WS2812.o
+ .debug_line    0x000005fa      0x159 C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(main.o)
+ .debug_line    0x00000753      0x28f C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(wiring.o)
+ .debug_line    0x000009e2      0x252 C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(wiring_digital.o)
+
+.debug_frame    0x00000000      0x308
+ *(.debug_frame)
+ .debug_frame   0x00000000       0x5c Sketch.o
+ .debug_frame   0x0000005c      0x130 src/WS2812.o
+ .debug_frame   0x0000018c       0x44 C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(main.o)
+ .debug_frame   0x000001d0       0xbc C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(wiring.o)
+ .debug_frame   0x0000028c       0x7c C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(wiring_digital.o)
+
+.debug_str      0x00000000      0x83e
+ *(.debug_str)
+ .debug_str     0x00000000      0x4b2 Sketch.o
+                                0x56b (size before relaxing)
+ .debug_str     0x000004b2      0x13b src/WS2812.o
+                                0x637 (size before relaxing)
+ .debug_str     0x000005ed       0x8e C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(main.o)
+                                0x235 (size before relaxing)
+ .debug_str     0x0000067b      0x147 C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(wiring.o)
+                                0x21a (size before relaxing)
+ .debug_str     0x000007c2       0x7c C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(wiring_digital.o)
+                                0x288 (size before relaxing)
+
+.debug_loc      0x00000000      0xfd5
+ *(.debug_loc)
+ .debug_loc     0x00000000       0x22 Sketch.o
+ .debug_loc     0x00000022      0x748 src/WS2812.o
+ .debug_loc     0x0000076a       0x26 C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(main.o)
+ .debug_loc     0x00000790      0x249 C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(wiring.o)
+ .debug_loc     0x000009d9      0x5fc C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(wiring_digital.o)
+
+.debug_macinfo
+ *(.debug_macinfo)
+
+.debug_weaknames
+ *(.debug_weaknames)
+
+.debug_funcnames
+ *(.debug_funcnames)
+
+.debug_typenames
+ *(.debug_typenames)
+
+.debug_varnames
+ *(.debug_varnames)
+
+.debug_pubtypes
+ *(.debug_pubtypes)
+
+.debug_ranges   0x00000000      0x110
+ *(.debug_ranges)
+ .debug_ranges  0x00000000       0x28 Sketch.o
+ .debug_ranges  0x00000028       0x68 src/WS2812.o
+ .debug_ranges  0x00000090       0x20 C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(main.o)
+ .debug_ranges  0x000000b0       0x38 C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(wiring.o)
+ .debug_ranges  0x000000e8       0x28 C:\Users\Andreas\Desktop\WS2812\WS2812\ArduinoCore\Debug\libArduinoCore.a(wiring_digital.o)
+
+.debug_macro
+ *(.debug_macro)
+OUTPUT(WS2812.elf elf32-avr)
+LOAD linker stubs
