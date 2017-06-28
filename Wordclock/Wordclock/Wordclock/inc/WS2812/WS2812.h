@@ -30,7 +30,7 @@
 /* WS2812 configuration parameter */
 #define WS2812_RESET_TIMER					STD_ON
 #define	WS2812_RGB_ORDER_ON_RUNTIME			STD_ON
-#define WS2812_NUMBER_OF_LEDS				3
+#define WS2812_NUMBER_OF_LEDS				110
 
 /* WS2812 parameter */
 #define WS2812_NUMBER_OF_COLORS				3
