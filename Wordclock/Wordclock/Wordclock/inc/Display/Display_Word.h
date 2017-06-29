@@ -37,8 +37,7 @@
 /******************************************************************************************************************************************************
  *  GLOBAL DATA TYPES AND STRUCTURES
 ******************************************************************************************************************************************************/
-typedef enum 
-{
+typedef enum {
 	DISPLAY_WORD_NONE,
 	DISPLAY_WORD_ES,
 	DISPLAY_WORD_IST,
@@ -83,7 +82,7 @@ typedef struct {
 class DisplayWord
 {
   private:
-  static const DisplayWordIlluminationType WordIlluminationTable[DISPLAY_WORD_NUMBER_OF_WORDS];
+  static const DisplayWordIlluminationType WordIlluminationTable[];
 
   public:
 	DisplayWord();

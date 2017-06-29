@@ -39,16 +39,16 @@
 ******************************************************************************************************************************************************/
 const char DisplayCharacter::DisplayCharacters[][DISPLAY_NUMBER_OF_COLUMNS + 1] PROGMEM =
 {
-	"ESKISTLFÜNF",
-	"ZEHNZWANZIG",
-	"DREIVIERTEL",
-	"TGNACHVORJM",
-	"HALBQZWÖLFP",
-	"ZWEINSIEBEN",
-	"KDREIRHFÜNF",
-	"ELFNEUNVIER",
-	"WACHTZEHNRS",
-	"BSECHSFMUHR"
+    "ESKISTLFÜNF",
+    "ZEHNZWANZIG",
+    "DREIVIERTEL",
+    "TGNACHVORJM",
+    "HALBQZWÖLFP",
+    "ZWEINSIEBEN",
+    "KDREIRHFÜNF",
+    "ELFNEUNVIER",
+    "WACHTZEHNRS",
+    "BSECHSFMUHR"
 };
 
 
@@ -81,12 +81,12 @@ const char DisplayCharacter::DisplayCharacters[][DISPLAY_NUMBER_OF_COLUMNS + 1] 
 ******************************************************************************************************************************************************/
 stdReturnType DisplayCharacter::getChar(byte Row, byte Column, char* Char)
 {
-	if(Row < DISPLAY_NUMBER_OF_ROWS && Column < DISPLAY_NUMBER_OF_COLUMNS) {
-		*Char =  pgm_read_byte_near(&DisplayCharacters[Row][Column]);
-		return E_OK;
-	} else {
-		return E_NOT_OK;
-	}
+    if(Row < DISPLAY_NUMBER_OF_ROWS && Column < DISPLAY_NUMBER_OF_COLUMNS) {
+        *Char =  pgm_read_byte_near(&DisplayCharacters[Row][Column]);
+        return E_OK;
+    } else {
+        return E_NOT_OK;
+    }
 } /* getChar */
 
 
@@ -100,15 +100,15 @@ stdReturnType DisplayCharacter::getChar(byte Row, byte Column, char* Char)
 ******************************************************************************************************************************************************/
 stdReturnType DisplayCharacter::getChar(byte Index, char* Char)
 {
-	byte Row = Index / DISPLAY_NUMBER_OF_COLUMNS;
-	byte Column = Index % DISPLAY_NUMBER_OF_COLUMNS;
+    byte Row = Index / DISPLAY_NUMBER_OF_COLUMNS;
+    byte Column = Index % DISPLAY_NUMBER_OF_COLUMNS;
 
-	if(Index < DISPLAY_NUMBER_OF_LEDS) {
-		*Char =  pgm_read_byte_near(&DisplayCharacters[Row][Column]);
-		return E_OK;
-	} else {
-		return E_NOT_OK;
-	}
+    if(Index < DISPLAY_NUMBER_OF_LEDS) {
+        *Char =  pgm_read_byte_near(&DisplayCharacters[Row][Column]);
+        return E_OK;
+    } else {
+        return E_NOT_OK;
+    }
 } /* getChar */
 
 

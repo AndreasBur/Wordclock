@@ -53,7 +53,7 @@
 ******************************************************************************************************************************************************/
 Display::Display() : WS2812Display(DISPLAY_DATA_PIN)
 {
-	
+    
 } /* Template */
 
 
@@ -90,17 +90,17 @@ void Display::init()
 ******************************************************************************************************************************************************/
 stdReturnType Display::setChar(byte Row, byte Column, byte Red, byte Green, byte Blue)
 {
-	if(Row < DISPLAY_NUMBER_OF_ROWS && Column < DISPLAY_NUMBER_OF_COLUMNS) {
+    if(Row < DISPLAY_NUMBER_OF_ROWS && Column < DISPLAY_NUMBER_OF_COLUMNS) {
 #if (DISPLAY_LED_STRIPE_SERPENTINE == STD_ON)
-		/* if led stripe is snake or serpentine the odd row: count from right to left */
-		WS2812Display.setPixel(transformToSerpentine(Row, Column), Red, Green, Blue);
+        /* if led stripe is snake or serpentine the odd row: count from right to left */
+        WS2812Display.setPixel(transformToSerpentine(Row, Column), Red, Green, Blue);
 #else
-		WS2812Display.setPixel((Row * DISPLAY_NUMBER_OF_COLUMNS) + Column, Red, Green, Blue);
+        WS2812Display.setPixel((Row * DISPLAY_NUMBER_OF_COLUMNS) + Column, Red, Green, Blue);
 #endif
-		return E_OK;
-	} else {
-		return E_NOT_OK;
-	}
+        return E_OK;
+    } else {
+        return E_NOT_OK;
+    }
 } /* setChar */
 
 
@@ -114,10 +114,10 @@ stdReturnType Display::setChar(byte Row, byte Column, byte Red, byte Green, byte
 ******************************************************************************************************************************************************/
 stdReturnType Display::setChar(byte Index, byte Red, byte Green, byte Blue)
 {
-	byte Row = Index / DISPLAY_NUMBER_OF_COLUMNS;
-	byte Column = Index % DISPLAY_NUMBER_OF_COLUMNS;
+    byte Row = Index / DISPLAY_NUMBER_OF_COLUMNS;
+    byte Column = Index % DISPLAY_NUMBER_OF_COLUMNS;
 
-	return setChar(Row, Column, Red, Green, Blue);
+    return setChar(Row, Column, Red, Green, Blue);
 } /* setChar */
 
 
@@ -135,12 +135,12 @@ stdReturnType Display::setChar(byte Index, byte Red, byte Green, byte Blue)
 ******************************************************************************************************************************************************/
 byte Display::transformToSerpentine(byte Row, byte Column)
 {
-	byte Index;
+    byte Index;
 
-	if(isBitCleared(Row, 0)) Index = (Row * DISPLAY_NUMBER_OF_COLUMNS) + Column;
-	else Index = (Row * DISPLAY_NUMBER_OF_COLUMNS) + (DISPLAY_NUMBER_OF_COLUMNS - Column - 1);
-	
-	return Index;
+    if(isBitCleared(Row, 0)) Index = (Row * DISPLAY_NUMBER_OF_COLUMNS) + Column;
+    else Index = (Row * DISPLAY_NUMBER_OF_COLUMNS) + (DISPLAY_NUMBER_OF_COLUMNS - Column - 1);
+    
+    return Index;
 } /* transformToSerpentine */
 
 
