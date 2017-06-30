@@ -22,7 +22,7 @@
 ******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Arduino.h"
-
+#include "Display.h"
 
 /******************************************************************************************************************************************************
  *  GLOBAL CONSTANT MACROS
@@ -82,11 +82,13 @@ typedef struct {
 class DisplayWord
 {
   private:
+  Display* pDisplay;
   static const DisplayWordIlluminationType WordIlluminationTable[];
+  //boolean WordStates[DISPLAY_WORD_NUMBER_OF_WORDS];
 
   public:
-	DisplayWord();
-	~DisplayWord();
+	DisplayWord() {};
+	~DisplayWord() {};
 
 	// get methods
 
@@ -95,6 +97,8 @@ class DisplayWord
 
 	// methods
 	void setWord(DisplayWordWordsType);
+	void clearWord(DisplayWordWordsType);
+	void clearAll();
 	void init();
 	void show();
 	void test();

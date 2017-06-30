@@ -88,14 +88,14 @@ void Display::init()
  *                  
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType Display::setChar(byte Row, byte Column, byte Red, byte Green, byte Blue)
+stdReturnType Display::setLed(byte Row, byte Column)
 {
     if(Row < DISPLAY_NUMBER_OF_ROWS && Column < DISPLAY_NUMBER_OF_COLUMNS) {
 #if (DISPLAY_LED_STRIPE_SERPENTINE == STD_ON)
         /* if led stripe is snake or serpentine the odd row: count from right to left */
-        WS2812Display.setPixel(transformToSerpentine(Row, Column), Red, Green, Blue);
+        WS2812Display.setPixel(transformToSerpentine(Row, Column), DisplayColor);
 #else
-        WS2812Display.setPixel((Row * DISPLAY_NUMBER_OF_COLUMNS) + Column, Red, Green, Blue);
+        WS2812Display.setPixel((Row * DISPLAY_NUMBER_OF_COLUMNS) + Column, DisplayColor);
 #endif
         return E_OK;
     } else {
@@ -112,12 +112,12 @@ stdReturnType Display::setChar(byte Row, byte Column, byte Red, byte Green, byte
  *                  
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType Display::setChar(byte Index, byte Red, byte Green, byte Blue)
+stdReturnType Display::setLed(byte Index)
 {
     byte Row = Index / DISPLAY_NUMBER_OF_COLUMNS;
     byte Column = Index % DISPLAY_NUMBER_OF_COLUMNS;
 
-    return setChar(Row, Column, Red, Green, Blue);
+    return setLed(Row, Column);
 } /* setChar */
 
 

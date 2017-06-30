@@ -27,11 +27,16 @@
 /******************************************************************************************************************************************************
  *  GLOBAL CONSTANT MACROS
 ******************************************************************************************************************************************************/
+/* DisplayClock configuration parameter */
+#define DISPLAY_CLOCK_SHOW_IT_IS_PERMANENTLY			STD_ON
+
 #define DISPLAY_CLOCK_NUMBER_OF_HOUR_MODES				2
 #define DISPLAY_CLOCK_NUMBER_OF_HOURS					12
 #define DISPLAY_CLOCK_MAX_NUMBER_OF_HOUR_WORDS			2
 
+#define DISPLAY_CLOCK_MINUTE_STEP_IN_MINUTES			5
 #define DISPLAY_CLOCK_NUMBER_OF_MINUTE_STEPS			12
+
 /* evtl. ändern */
 #define DISPLAY_CLOCK_MAX_NUMBER_OF_MINUTE_WORDS		3
  
@@ -55,7 +60,7 @@ typedef enum {
 typedef struct {
 	byte HourMode;
 	byte HourOffset;
-	byte WordIndex[DISPLAY_CLOCK_MAX_NUMBER_OF_MINUTE_WORDS];
+	DisplayWordWordsType Words[DISPLAY_CLOCK_MAX_NUMBER_OF_MINUTE_WORDS];
 } DisplayClockMinutesType;
 
 
@@ -65,14 +70,16 @@ typedef struct {
 class DisplayClock
 {
   private:
+    DisplayClockModesType ClockMode;
+	DisplayWord WcDisplayWord;
 	static const DisplayWordWordsType ClockHoursTable[][DISPLAY_CLOCK_NUMBER_OF_HOURS][DISPLAY_CLOCK_MAX_NUMBER_OF_HOUR_WORDS];
 	static const DisplayClockMinutesType ClockMinutesTable[][DISPLAY_CLOCK_NUMBER_OF_MINUTE_STEPS];
 	// functions
 
 
   public:
-	DisplayClock();
-	~DisplayClock();
+	DisplayClock() {};
+	~DisplayClock() {};
 
 	// get methods
 
@@ -80,7 +87,8 @@ class DisplayClock
 	// set methods
 
 	// methods
-
+	stdReturnType showClock(byte, byte);
+	//show();
 };
 
 #endif

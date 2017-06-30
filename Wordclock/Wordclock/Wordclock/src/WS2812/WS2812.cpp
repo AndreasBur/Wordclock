@@ -33,8 +33,8 @@
 
 /* calculate cycles to match the timing, if possible */
 #define WS2812_ZERO_CYCLES					(((F_CPU / 1000) * WS2812_ZERO_PULSE_DURATION_NS	   ) / 1000000)
-#define WS2812_ONE_CYCLES					(((F_CPU / 1000) * WS2812_ONE_PULSE_DURATION_NS	+500000) / 1000000)
-#define WS2812_TOTAL_CYCLES					(((F_CPU / 1000) * WS2812_PERIOD_DURATION_NS	+500000) / 1000000)
+#define WS2812_ONE_CYCLES					(((F_CPU / 1000) * WS2812_ONE_PULSE_DURATION_NS	+500000) / 1000000) /* +500000 überdenken */
+#define WS2812_TOTAL_CYCLES					(((F_CPU / 1000) * WS2812_PERIOD_DURATION_NS	+500000) / 1000000) /* +500000 überdenken */
 
 /* W1 NOPs between start (rising edge) and falling edge low */
 #define WS2812_ASM_W1_SIGNED				(WS2812_ZERO_CYCLES - WS2812_ASM_FIXED_CYCLES_LOW)
@@ -132,6 +132,25 @@ WS2812::~WS2812()
 void WS2812::init()
 {
 
+} /* init */
+
+
+/******************************************************************************************************************************************************
+  clearPixel()
+******************************************************************************************************************************************************/
+/*! \brief          
+ *  \details        
+ *                  
+ *  \return         -
+ *****************************************************************************************************************************************************/
+stdReturnType WS2812::clearPixel(byte Index)
+{
+	if(Index < WS2812_NUMBER_OF_LEDS) {
+		setPixel(Index, 0, 0, 0);
+		return E_OK;
+	} else {
+		return E_NOT_OK;
+	}
 } /* init */
 
 
@@ -306,7 +325,39 @@ void WS2812::setColorOrder(WS2812ColorOrderType ColorOrder)
 
 /******************************************************************************************************************************************************
  * P R I V A T E   F U N C T I O N S
+******************************************************************************************************************************************************/
+
+ /******************************************************************************************************************************************************
+  dimmPixel()
+******************************************************************************************************************************************************/
+/*! \brief          
+ *  \details        
+ *                  
+ *  \return         -
  *****************************************************************************************************************************************************/
+inline void WS2812::dimmPixel(WS2812PixelType* PixelDimmed, WS2812PixelType Pixel)
+{
+	dimmColor(&PixelDimmed->Red, Pixel.Red);
+	dimmColor(&PixelDimmed->Green, Pixel.Green);
+	dimmColor(&PixelDimmed->Blue, Pixel.Blue);
+} /* dimmPixel */
+
+
+/******************************************************************************************************************************************************
+  dimmPixel()
+******************************************************************************************************************************************************/
+/*! \brief          
+ *  \details        
+ *                  
+ *  \return         -
+ *****************************************************************************************************************************************************/
+inline void WS2812::dimmPixel(WS2812PixelType* PixelDimmed, byte Red, byte Green, byte Blue)
+{
+	dimmColor(&PixelDimmed->Red, Red);
+	dimmColor(&PixelDimmed->Green, Green);
+	dimmColor(&PixelDimmed->Blue, Blue);
+} /* dimmPixel */
+
 
 /******************************************************************************************************************************************************
   dimmPixels()
@@ -316,13 +367,13 @@ void WS2812::setColorOrder(WS2812ColorOrderType ColorOrder)
  *                  
  *  \return         -
  *****************************************************************************************************************************************************/
-void WS2812::dimmPixels(byte* PixelsDimmed, uint16_t DataLength)
+inline void WS2812::dimmPixels(byte* PixelsDimmed, uint16_t DataLength)
 {
 	for(uint16_t i = 0; i < DataLength; i = i + WS2812_NUMBER_OF_COLORS)
 	{
-		PixelsDimmed[WS2812_POS_ABS_RED(i)] = (Pixels[WS2812_POS_ABS_RED(i)] * Brightness) >> 8;
-		PixelsDimmed[WS2812_POS_ABS_GREEN(i)] = (Pixels[WS2812_POS_ABS_GREEN(i)] * Brightness) >> 8;
-		PixelsDimmed[WS2812_POS_ABS_BLUE(i)] = (Pixels[WS2812_POS_ABS_BLUE(i)] * Brightness) >> 8;
+		dimmColor(&PixelsDimmed[WS2812_POS_ABS_RED(i)], Pixels[WS2812_POS_ABS_RED(i)]);
+		dimmColor(&PixelsDimmed[WS2812_POS_ABS_GREEN(i)], Pixels[WS2812_POS_ABS_GREEN(i)]);
+		dimmColor(&PixelsDimmed[WS2812_POS_ABS_BLUE(i)], Pixels[WS2812_POS_ABS_BLUE(i)]);
 	}
 } /* dimmPixels */
  

@@ -36,7 +36,8 @@ src/Display/Display_Clock.d src/Display/Display_Clock.o: \
  c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\util\delay_basic.h \
  ..\\..\ArduinoCore\include\core/Arduino.h \
  ..\\..\ArduinoCore\include\variants\standard/pins_arduino.h \
- ../inc/Display/Display_Word.h
+ ../inc/Display/Display_Word.h ../inc/Display/Display.h \
+ ../inc/WS2812/WS2812.h
 
 ../inc/Display/Display_Clock.h:
 
@@ -113,3 +114,7 @@ c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\
 ..\\..\ArduinoCore\include\variants\standard/pins_arduino.h:
 
 ../inc/Display/Display_Word.h:
+
+../inc/Display/Display.h:
+
+../inc/WS2812/WS2812.h:

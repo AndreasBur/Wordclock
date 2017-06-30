@@ -50,6 +50,7 @@
 class DisplayCharacter
 {
   private:
+	Display* pDisplay;
 	static const char DisplayCharacters[][DISPLAY_NUMBER_OF_COLUMNS + 1];
 
   public:
@@ -64,6 +65,7 @@ class DisplayCharacter
 	// methods
 	stdReturnType getChar(byte Row, byte Column, char* Char);
 	stdReturnType getChar(byte Index, char* Char);
+	//stdReturnType setChar(byte Index) { return pDisplay->setLed(Index); }
 };
 
 #endif

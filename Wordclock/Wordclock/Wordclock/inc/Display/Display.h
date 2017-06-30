@@ -62,6 +62,7 @@ class Display
 {
   private:
 	WS2812 WS2812Display;
+	WS2812PixelType DisplayColor;
 	
 	// functions
 	byte transformToSerpentine(byte, byte);
@@ -79,9 +80,8 @@ class Display
 	void init();
 	void show() { WS2812Display.show(); }
 	void test();
-	stdReturnType setChar(byte Row, byte Column, byte Red, byte Green, byte Blue);
-	stdReturnType setChar(byte Index, byte Red, byte Green, byte Blue);
-	//stdReturnType setChar(byte Row, byte Column, DisplayLedRgbType);
+	stdReturnType setLed(byte Row, byte Column);
+	stdReturnType setLed(byte Index);
 };
 
 #endif

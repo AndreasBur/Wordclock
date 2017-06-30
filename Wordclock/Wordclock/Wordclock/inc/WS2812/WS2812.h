@@ -106,6 +106,9 @@ class WS2812
 	// functions
 	void sendData(byte*, uint16_t);
 	void dimmPixels(byte*, uint16_t);
+	void dimmPixel(WS2812PixelType*, WS2812PixelType);
+	void dimmPixel(WS2812PixelType*, byte, byte, byte);
+	void dimmColor(byte* ColorDimmed, byte Color) { *ColorDimmed = (Color * Brightness) >> 8; }
 
   public:
     WS2812(byte);
@@ -123,6 +126,9 @@ class WS2812
 
 	// methods
 	void init();
+	void clearAllPixels() { memset(Pixels, 0, sizeof(Pixels)); }
+	stdReturnType clearPixel(byte Index);
+
 #if (WS2812_RESET_TIMER == STD_ON)
 	stdReturnType show();
 #elif (WS2812_RESET_TIMER == STD_OFF)
