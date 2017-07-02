@@ -117,6 +117,7 @@ class WS2812
 	// get methods
 	byte getBrightness() { return Brightness; }
 	stdReturnType getPixel(byte, WS2812PixelType*);
+	stdReturnType getPixelDimmed(byte, WS2812PixelType*);
 
 	// set methods
 	stdReturnType setBrightness(byte);
