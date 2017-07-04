@@ -8,42 +8,23 @@
  *  ---------------------------------------------------------------------------------------------------------------------------------------------------
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       Display.h
+/**     \file       DisplayCharacter.h
  *      \brief      
  *
  *      \details    
  *                  
 ******************************************************************************************************************************************************/
-#ifndef _DISPLAY_H_
-#define _DISPLAY_H_
+#ifndef _DISPLAY_WORDS_H_
+#define _DISPLAY_WORDS_H_
 
 /******************************************************************************************************************************************************
  * INCLUDES
 ******************************************************************************************************************************************************/
-#include "StandardTypes.h"
-#include "Arduino.h"
-#include "DisplayCharacters.h"
-#include "DisplayWords.h"
-#include "WS2812.h"
 
 
 /******************************************************************************************************************************************************
  *  GLOBAL CONSTANT MACROS
 ******************************************************************************************************************************************************/
-/* Display configuration parameter */
-#define DISPLAY_DATA_PIN						10
-#define DISPLAY_LED_STRIPE_SERPENTINE			STD_ON
-
-/* Display parameter */
-#define DISPLAY_NUMBER_OF_ROWS					10
-#define DISPLAY_NUMBER_OF_COLUMNS				11
-#define DISPLAY_NUMBER_OF_LEDS					WS2812_NUMBER_OF_LEDS
-
-#if((DISPLAY_NUMBER_OF_ROWS * DISPLAY_NUMBER_OF_COLUMNS) != DISPLAY_NUMBER_OF_LEDS)
-	#error "Display: LED number missmatch"
-#endif
-
-//#define DisplayLedRgbType						WS2812PixelType
 
 
 /******************************************************************************************************************************************************
@@ -51,62 +32,40 @@
 ******************************************************************************************************************************************************/
 
 
-
 /******************************************************************************************************************************************************
  *  GLOBAL DATA TYPES AND STRUCTURES
 ******************************************************************************************************************************************************/
-typedef struct {
-	byte Row;
-	byte Column;
-	byte Length;
-} DisplayWordIlluminationType;
+typedef enum {
+	DISPLAY_WORD_NONE,
+	DISPLAY_WORD_ES,
+	DISPLAY_WORD_IST,
+	DISPLAY_WORD_FUENF_1,
+	DISPLAY_WORD_ZEHN_1,
+	DISPLAY_WORD_ZWANZIG,
+	DISPLAY_WORD_DREI_1,
+	DISPLAY_WORD_VIER,
+	DISPLAY_WORD_VIERTEL,
+	DISPLAY_WORD_DREIVIERTEL,
+	DISPLAY_WORD_NACH,
+	DISPLAY_WORD_VOR,
+	DISPLAY_WORD_HALB,
+	DISPLAY_WORD_ZWOELF,
+	DISPLAY_WORD_ZWEI,
+	DISPLAY_WORD_EIN,
+	DISPLAY_WORD_EINS,
+	DISPLAY_WORD_SIEBEN,
+	DISPLAY_WORD_DREI_2,
+	DISPLAY_WORD_FUENF_2,
+	DISPLAY_WORD_ELF,
+	DISPLAY_WORD_NEUN,
+	DISPLAY_WORD_VIER_2,
+	DISPLAY_WORD_ACHT,
+	DISPLAY_WORD_ZEHN_2,
+	DISPLAY_WORD_SECHS,
+	DISPLAY_WORD_UHR,
+	DISPLAY_WORD_NUMBER_OF_WORDS
+} DisplayWordsType;
 
-
-/******************************************************************************************************************************************************
- *  CLASS  Display
-******************************************************************************************************************************************************/
-class Display
-{
-  private:
-	WS2812 Pixels;
-	WS2812PixelType DisplayColor;
-
-	static const char DisplayCharacters[][DISPLAY_NUMBER_OF_COLUMNS + 1];
-	static const DisplayWordIlluminationType WordIlluminationTable[];
-	
-	// functions
-	byte transformToSerpentine(byte, byte);
-	stdReturnType setLed(byte Row, byte Column);
-	stdReturnType setLed(byte Index);
-
-  public:
-	Display();
-	~Display();
-
-	// get methods
-
-
-	// set methods
-
-	
-	// methods
-
-	// char methods
-	void setCharacter(DisplayCharactersType Character);
-	void clearCharacter(DisplayCharactersType Character);
-	stdReturnType getCharacter(byte Row, byte Column, char* Character);
-	stdReturnType getCharacter(byte Index, char* Character);
-
-	// word methods
-	void setWord(DisplayWordsType);
-	void clearWord(DisplayWordsType);
-	void clearAllWords();
-
-	void init();
-	void show() { Pixels.show(); }
-	void test();
-	
-};
 
 #endif
 
