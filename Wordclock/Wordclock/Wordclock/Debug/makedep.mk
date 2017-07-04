@@ -4,15 +4,9 @@
 
 Sketch.cpp
 
+src\Clock\Clock.cpp
+
 src\Display\Display.cpp
-
-src\Display\Display_Character.cpp
-
-src\Display\Display_Clock.cpp
-
-src\Display\Display_Font.cpp
-
-src\Display\Display_Word.cpp
 
 src\WS2812\WS2812.cpp
 

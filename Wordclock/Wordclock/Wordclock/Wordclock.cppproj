@@ -166,6 +166,7 @@
       <Value>%24(ProjectDir)\..\ArduinoCore\include\variants\standard</Value>
       <Value>../inc/Display</Value>
       <Value>../inc/WS2812</Value>
+      <Value>../inc/Clock</Value>
     </ListValues>
   </avrgcc.compiler.directories.IncludePaths>
   <avrgcc.compiler.optimization.level>Optimize for size (-Os)</avrgcc.compiler.optimization.level>
@@ -199,6 +200,7 @@
       <Value>../inc/Display</Value>
       <Value>../inc/StandardTypes</Value>
       <Value>../inc/WS2812</Value>
+      <Value>../inc/Clock</Value>
     </ListValues>
   </avrgcccpp.compiler.directories.IncludePaths>
   <avrgcccpp.compiler.optimization.level>Optimize for size (-Os)</avrgcccpp.compiler.optimization.level>
@@ -225,19 +227,10 @@
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="inc\Clock\Clock.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="inc\Display\Display.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="inc\Display\Display_Character.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="inc\Display\Display_Clock.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="inc\Display\Display_Font.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="inc\Display\Display_Word.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="inc\StandardTypes\StandardTypes.h">
@@ -249,19 +242,10 @@
     <Compile Include="Sketch.cpp">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="src\Clock\Clock.cpp">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="src\Display\Display.cpp">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="src\Display\Display_Character.cpp">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="src\Display\Display_Clock.cpp">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="src\Display\Display_Font.cpp">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="src\Display\Display_Word.cpp">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="src\WS2812\WS2812.cpp">
@@ -280,10 +264,12 @@
   <ItemGroup>
     <Folder Include="inc" />
     <Folder Include="inc\Display" />
+    <Folder Include="inc\Clock" />
     <Folder Include="inc\WS2812" />
     <Folder Include="inc\StandardTypes" />
     <Folder Include="src" />
     <Folder Include="src\Display" />
+    <Folder Include="src\Clock" />
     <Folder Include="src\WS2812" />
   </ItemGroup>
   <Import Project="$(AVRSTUDIO_EXE_PATH)\\Vs\\Compiler.targets" />
