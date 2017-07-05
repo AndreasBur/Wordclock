@@ -186,14 +186,32 @@ stdReturnType Display::getCharacter(byte Index, char* Character)
  *  \details        
  *                  
  *  \return         -
- *****************************************************************************************************************************************************/
+******************************************************************************************************************************************************/
 void Display::setWord(DisplayWordsType Word)
 {
     byte Row = (byte) pgm_read_byte(&WordIlluminationTable[Word].Row);
     byte Column = (byte) pgm_read_byte(&WordIlluminationTable[Word].Column);
     byte Length = (byte) pgm_read_byte(&WordIlluminationTable[Word].Length);
 
-	for(byte Index = 0; Index < Length; Index++)  setLed(Row + Index, Column);
+	for(byte Index = 0; Index < Length; Index++) setLed(Row + Index, Column);
+} /* setWord */
+
+
+/******************************************************************************************************************************************************
+  clearWord()
+******************************************************************************************************************************************************/
+/*! \brief          
+ *  \details        
+ *                  
+ *  \return         -
+******************************************************************************************************************************************************/
+void Display::clearWord(DisplayWordsType Word)
+{
+    byte Row = (byte) pgm_read_byte(&WordIlluminationTable[Word].Row);
+    byte Column = (byte) pgm_read_byte(&WordIlluminationTable[Word].Column);
+    byte Length = (byte) pgm_read_byte(&WordIlluminationTable[Word].Length);
+
+	for(byte Index = 0; Index < Length; Index++) clearLed(Row + Index, Column);
 } /* setWord */
 
 

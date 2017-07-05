@@ -78,6 +78,8 @@ class Display
 	byte transformToSerpentine(byte, byte);
 	stdReturnType setLed(byte Row, byte Column);
 	stdReturnType setLed(byte Index);
+	stdReturnType clearLed(byte Row, byte Column);
+	stdReturnType clearLed(byte Index);
 
   public:
 	Display();
@@ -89,23 +91,24 @@ class Display
 	// set methods
 
 	
-	// methods
+	
 
 	// char methods
 	void setCharacter(DisplayCharactersType Character);
 	void clearCharacter(DisplayCharactersType Character);
-	stdReturnType getCharacter(byte Row, byte Column, char* Character);
-	stdReturnType getCharacter(byte Index, char* Character);
+	//stdReturnType getCharacter(byte Row, byte Column, char* Character);
+	//stdReturnType getCharacter(byte Index, char* Character);
 
 	// word methods
 	void setWord(DisplayWordsType);
 	void clearWord(DisplayWordsType);
 	void clearAllWords();
 
+	// methods
 	void init();
 	void show() { Pixels.show(); }
 	void test();
-	
+	void clear() { Pixels.clearAllPixels(); }
 };
 
 #endif
