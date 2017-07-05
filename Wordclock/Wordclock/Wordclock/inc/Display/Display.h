@@ -76,10 +76,12 @@ class Display
 	
 	// functions
 	byte transformToSerpentine(byte, byte);
-	stdReturnType setLed(byte Row, byte Column);
-	stdReturnType setLed(byte Index);
-	stdReturnType clearLed(byte Row, byte Column);
-	stdReturnType clearLed(byte Index);
+	stdReturnType setPixel(byte Row, byte Column);
+	stdReturnType setPixel(byte Index);
+	stdReturnType clearPixel(byte Row, byte Column);
+	stdReturnType clearPixel(byte Index);
+	stdReturnType getPixel(byte, byte, boolean*);
+	stdReturnType getPixel(byte, boolean*);
 
   public:
 	Display();
@@ -89,20 +91,19 @@ class Display
 
 
 	// set methods
-
-	
 	
 
 	// char methods
-	void setCharacter(DisplayCharactersType Character);
-	void clearCharacter(DisplayCharactersType Character);
-	//stdReturnType getCharacter(byte Row, byte Column, char* Character);
-	//stdReturnType getCharacter(byte Index, char* Character);
+	stdReturnType setCharacter(DisplayCharactersType Character) { return Pixels.setPixel(Character, DisplayColor); }
+	stdReturnType clearCharacter(DisplayCharactersType Character) { return Pixels.setPixel(Character, 0, 0, 0); }
+	stdReturnType getCharacter(DisplayCharactersType Character, boolean* Value);
+	stdReturnType getCharacter(byte Row, byte Column, char* Character);
+	stdReturnType getCharacter(byte Index, char* Character);
 
 	// word methods
-	void setWord(DisplayWordsType);
-	void clearWord(DisplayWordsType);
-	void clearAllWords();
+	stdReturnType setWord(DisplayWordsType);
+	stdReturnType clearWord(DisplayWordsType);
+	stdReturnType clearAllWords();
 
 	// methods
 	void init();

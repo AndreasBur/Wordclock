@@ -83,6 +83,7 @@ const DisplayWordIlluminationType Display::WordIlluminationTable[] PROGMEM =
 	{9,8,3},                                // 26 = DISPLAY_WORD_UHR         = "UHR"
 };
 
+
 /******************************************************************************************************************************************************
  * P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
@@ -125,21 +126,31 @@ void Display::init()
 
 
 /******************************************************************************************************************************************************
-  setCharacter()
+  getCharacter()
 ******************************************************************************************************************************************************/
 /*! \brief          
  *  \details        
  *                  
  *  \return         -
 ******************************************************************************************************************************************************/
-void Display::setCharacter(DisplayCharactersType Character)
+stdReturnType Display::getCharacter(DisplayCharactersType Character, boolean* Value)
 {
-	if(Character < DISPLAY_CHARACTER_NUMBER_OF_CHARACTERS) setLed(Character);
-} /* getChar */
+	WS2812PixelType Pixel;
+	
+	if(Character < DISPLAY_CHARACTER_NUMBER_OF_CHARACTERS) {
+		Pixels.getPixel(Character, &Pixel);
+		/* Pixel is only off when all colors are zero */
+		if(Pixel.Red == 0 && Pixel.Green == 0 && Pixel.Blue == 0) *Value = true;
+		else *Value = false;
+		return E_OK;
+	} else {
+		return E_NOT_OK;
+	}	
+} /* getCharacter */
 
 
 /******************************************************************************************************************************************************
-  getChar()
+  getCharacter()
 ******************************************************************************************************************************************************/
 /*! \brief          
  *  \details        
@@ -154,12 +165,12 @@ stdReturnType Display::getCharacter(byte Row, byte Column, char* Character)
     } else {
         return E_NOT_OK;
     }
-} /* getChar */
+} /* getCharacter */
 
 
 /******************************************************************************************************************************************************
-  getChar()
-******************************************************************************************************************************************************/
+  getCharacter()
+  ******************************************************************************************************************************************************/
 /*! \brief          
  *  \details        
  *                  
@@ -187,13 +198,20 @@ stdReturnType Display::getCharacter(byte Index, char* Character)
  *                  
  *  \return         -
 ******************************************************************************************************************************************************/
-void Display::setWord(DisplayWordsType Word)
+stdReturnType Display::setWord(DisplayWordsType Word)
 {
-    byte Row = (byte) pgm_read_byte(&WordIlluminationTable[Word].Row);
-    byte Column = (byte) pgm_read_byte(&WordIlluminationTable[Word].Column);
-    byte Length = (byte) pgm_read_byte(&WordIlluminationTable[Word].Length);
+    stdReturnType ReturnValue = E_OK;
 
-	for(byte Index = 0; Index < Length; Index++) setLed(Row + Index, Column);
+	if(Word < DISPLAY_WORD_NUMBER_OF_WORDS) {
+		byte Row = (byte) pgm_read_byte(&WordIlluminationTable[Word].Row);
+		byte Column = (byte) pgm_read_byte(&WordIlluminationTable[Word].Column);
+		byte Length = (byte) pgm_read_byte(&WordIlluminationTable[Word].Length);
+
+		for(byte Index = 0; Index < Length; Index++) if(setPixel(Row + Index, Column) == E_NOT_OK) ReturnValue = E_NOT_OK;
+	} else {
+		ReturnValue = E_NOT_OK;
+	}
+	return ReturnValue;
 } /* setWord */
 
 
@@ -205,14 +223,38 @@ void Display::setWord(DisplayWordsType Word)
  *                  
  *  \return         -
 ******************************************************************************************************************************************************/
-void Display::clearWord(DisplayWordsType Word)
+stdReturnType Display::clearWord(DisplayWordsType Word)
 {
-    byte Row = (byte) pgm_read_byte(&WordIlluminationTable[Word].Row);
-    byte Column = (byte) pgm_read_byte(&WordIlluminationTable[Word].Column);
-    byte Length = (byte) pgm_read_byte(&WordIlluminationTable[Word].Length);
+    stdReturnType ReturnValue = E_OK;
 
-	for(byte Index = 0; Index < Length; Index++) clearLed(Row + Index, Column);
-} /* setWord */
+    if(Word < DISPLAY_WORD_NUMBER_OF_WORDS) {
+		byte Row = (byte) pgm_read_byte(&WordIlluminationTable[Word].Row);
+		byte Column = (byte) pgm_read_byte(&WordIlluminationTable[Word].Column);
+		byte Length = (byte) pgm_read_byte(&WordIlluminationTable[Word].Length);
+
+		for(byte Index = 0; Index < Length; Index++) if(clearPixel(Row, Column + Index) == E_NOT_OK) ReturnValue = E_NOT_OK;
+	} else {
+		ReturnValue = E_NOT_OK;
+	}
+	return ReturnValue;
+} /* clearWord */
+
+
+/******************************************************************************************************************************************************
+  clearAllWords()
+******************************************************************************************************************************************************/
+/*! \brief          
+ *  \details        
+ *                  
+ *  \return         -
+******************************************************************************************************************************************************/
+stdReturnType Display::clearAllWords()
+{
+    stdReturnType ReturnValue = E_OK;
+
+	for(byte i = DISPLAY_WORD_ES; i < DISPLAY_WORD_NUMBER_OF_WORDS; i++) if(clearWord((DisplayWordsType) i) == E_NOT_OK) ReturnValue = E_NOT_OK;
+	return ReturnValue;
+} /* clearWord */
 
 
 /******************************************************************************************************************************************************
@@ -220,31 +262,31 @@ void Display::clearWord(DisplayWordsType Word)
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  setLed()
+  setPixel()
 ******************************************************************************************************************************************************/
 /*! \brief          
  *  \details        
  *                  
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType Display::setLed(byte Index)
+stdReturnType Display::setPixel(byte Index)
 {
     byte Row = Index / DISPLAY_NUMBER_OF_COLUMNS;
     byte Column = Index % DISPLAY_NUMBER_OF_COLUMNS;
 
-    return setLed(Row, Column);
-} /* setLed */
+    return setPixel(Row, Column);
+} /* setPixel */
 
 
 /******************************************************************************************************************************************************
-  setLed()
+  setPixel()
 ******************************************************************************************************************************************************/
 /*! \brief          
  *  \details        
  *                  
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType Display::setLed(byte Row, byte Column)
+stdReturnType Display::setPixel(byte Row, byte Column)
 {
     if(Row < DISPLAY_NUMBER_OF_ROWS && Column < DISPLAY_NUMBER_OF_COLUMNS) {
 #if (DISPLAY_LED_STRIPE_SERPENTINE == STD_ON)
@@ -257,7 +299,48 @@ stdReturnType Display::setLed(byte Row, byte Column)
     } else {
         return E_NOT_OK;
     }
-} /* setLed */
+} /* setPixel */
+
+
+/******************************************************************************************************************************************************
+  clearPixel()
+******************************************************************************************************************************************************/
+/*! \brief          
+ *  \details        
+ *                  
+ *  \return         -
+******************************************************************************************************************************************************/
+stdReturnType Display::clearPixel(byte Row, byte Column)
+{
+    if(Row < DISPLAY_NUMBER_OF_ROWS && Column < DISPLAY_NUMBER_OF_COLUMNS) {
+#if (DISPLAY_LED_STRIPE_SERPENTINE == STD_ON)
+        /* if led stripe is snake or serpentine then odd row: count from right to left */
+        Pixels.setPixel(transformToSerpentine(Row, Column), 0, 0, 0);
+#else
+        Pixels.setPixel((Row * DISPLAY_NUMBER_OF_COLUMNS) + Column, 0, 0, 0);
+#endif
+        return E_OK;
+    } else {
+        return E_NOT_OK;
+    }
+} /* clearPixel */
+
+
+/******************************************************************************************************************************************************
+  clearPixel()
+******************************************************************************************************************************************************/
+/*! \brief          
+ *  \details        
+ *                  
+ *  \return         -
+******************************************************************************************************************************************************/
+stdReturnType Display::clearPixel(byte Index)
+{
+    byte Row = Index / DISPLAY_NUMBER_OF_COLUMNS;
+    byte Column = Index % DISPLAY_NUMBER_OF_COLUMNS;
+
+    return clearPixel(Row, Column);
+} /* clearPixel */
 
 
 /******************************************************************************************************************************************************

@@ -2,7 +2,7 @@
 #include <Arduino.h>
 #include "Display.h"
 /*End of auto generated code by Atmel studio */
-
+int flag;
 Display WordClockDisplay;
 //DisplayCharacter WcDisplayCharacter;
 
@@ -15,6 +15,13 @@ void setup() {
   //WcDisplayCharacter.getChar(1,1, &Char);
   WordClockDisplay.setCharacter(DISPLAY_CHARACTER_A_1);
   WordClockDisplay.setWord(DISPLAY_WORD_DREIVIERTEL);
+  if (WordClockDisplay.clearAllWords() == E_OK) {
+		flag = 1;
+  } else {
+		flag = 0;
+  }
+
+
  
 }
 
