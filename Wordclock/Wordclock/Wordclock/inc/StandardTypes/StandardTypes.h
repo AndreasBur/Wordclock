@@ -27,17 +27,17 @@
  *  LOCAL CONSTANT MACROS
  *****************************************************************************************************************************************************/
  /* standard type for configuration */
-#define STD_ON					1u
-#define STD_OFF					0u
+#define STD_ON                  1u
+#define STD_OFF                 0u
 
-#define STD_NULL_CHARACTER		'\0'
+#define STD_NULL_CHARACTER      '\0'
 
 /* assembler NOPs */
-#define STD_NOP_1				"nop      \n\t"
-#define STD_NOP_2				"rjmp .+0 \n\t"
-#define STD_NOP_4				STD_NOP_2 STD_NOP_2
-#define STD_NOP_8				STD_NOP_4 STD_NOP_4
-#define STD_NOP_16				STD_NOP_8 STD_NOP_8
+#define STD_NOP_1               "nop      \n\t"
+#define STD_NOP_2               "rjmp .+0 \n\t"
+#define STD_NOP_4               STD_NOP_2 STD_NOP_2
+#define STD_NOP_8               STD_NOP_4 STD_NOP_4
+#define STD_NOP_16              STD_NOP_8 STD_NOP_8
 
 
 /******************************************************************************************************************************************************
@@ -57,11 +57,11 @@
     
 /* read bit */
 #define readBit(Var, Bit) \
-	(((Var) & (1 << (Bit))) >> Bit)
+    (((Var) & (1 << (Bit))) >> Bit)
 
 /* write bit */
 #define writeBit(Var, Bit, Value) \
-	((Var) = ((Var & (unsigned)~(1 << Bit)) | (Value << Bit)))
+    ((Var) = ((Var & (unsigned)~(1 << Bit)) | (Value << Bit)))
 
 /* is bit set */
 #define isBitSet(Var, Bit) ((Var) & (1 << (Bit)))

@@ -28,17 +28,17 @@
  *  GLOBAL CONSTANT MACROS
 ******************************************************************************************************************************************************/
 /* Clock configuration parameter */
-#define CLOCK_SHOW_IT_IS_PERMANENTLY			STD_ON
+#define CLOCK_SHOW_IT_IS_PERMANENTLY            STD_ON
 
-#define CLOCK_NUMBER_OF_HOUR_MODES				2
-#define CLOCK_NUMBER_OF_HOURS					12
-#define CLOCK_MAX_NUMBER_OF_HOUR_WORDS			2
+#define CLOCK_NUMBER_OF_HOUR_MODES              2
+#define CLOCK_NUMBER_OF_HOURS                   12
+#define CLOCK_MAX_NUMBER_OF_HOUR_WORDS          2
 
-#define CLOCK_MINUTE_STEP_IN_MINUTES			5
-#define CLOCK_NUMBER_OF_MINUTE_STEPS			12
+#define CLOCK_MINUTE_STEP_IN_MINUTES            5
+#define CLOCK_NUMBER_OF_MINUTE_STEPS            12
 
 /* evtl. ändern */
-#define CLOCK_MAX_NUMBER_OF_MINUTE_WORDS		3
+#define CLOCK_MAX_NUMBER_OF_MINUTE_WORDS        3
  
 /******************************************************************************************************************************************************
  *  GLOBAL FUNCTION MACROS
@@ -58,9 +58,9 @@ typedef enum {
 
 
 typedef struct {
-	byte HourMode;
-	byte HourOffset;
-	DisplayWordsType Words[CLOCK_MAX_NUMBER_OF_MINUTE_WORDS];
+    byte HourMode;
+    byte HourOffset;
+    DisplayWordsType Words[CLOCK_MAX_NUMBER_OF_MINUTE_WORDS];
 } ClockMinutesType;
 
 
@@ -70,25 +70,25 @@ typedef struct {
 class Clock
 {
   private:
-	Display* pDisplay;
-	ClockModesType ClockMode;
-	static const DisplayWordsType ClockHoursTable[][CLOCK_NUMBER_OF_HOURS][CLOCK_MAX_NUMBER_OF_HOUR_WORDS];
-	static const ClockMinutesType ClockMinutesTable[][CLOCK_NUMBER_OF_MINUTE_STEPS];
-	// functions
+    Display* pDisplay;
+    ClockModesType ClockMode;
+    static const DisplayWordsType ClockHoursTable[][CLOCK_NUMBER_OF_HOURS][CLOCK_MAX_NUMBER_OF_HOUR_WORDS];
+    static const ClockMinutesType ClockMinutesTable[][CLOCK_NUMBER_OF_MINUTE_STEPS];
+    // functions
 
 
   public:
-	Clock();
-	~Clock();
+    Clock();
+    ~Clock();
 
-	// get methods
+    // get methods
 
 
-	// set methods
+    // set methods
 
-	// methods
-	stdReturnType show(byte, byte);
-	//show();
+    // methods
+    stdReturnType show(byte, byte);
+    //show();
 };
 
 #endif
