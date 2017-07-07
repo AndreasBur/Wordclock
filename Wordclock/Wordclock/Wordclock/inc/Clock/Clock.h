@@ -24,6 +24,7 @@
 #include "Arduino.h"
 #include "Display.h"
 
+
 /******************************************************************************************************************************************************
  *  GLOBAL CONSTANT MACROS
 ******************************************************************************************************************************************************/
@@ -40,6 +41,7 @@
 /* evtl. ändern */
 #define CLOCK_MAX_NUMBER_OF_MINUTE_WORDS        3
  
+
 /******************************************************************************************************************************************************
  *  GLOBAL FUNCTION MACROS
 ******************************************************************************************************************************************************/
@@ -71,24 +73,25 @@ class Clock
 {
   private:
     Display* pDisplay;
-    ClockModesType ClockMode;
+    ClockModesType Mode;
+
     static const DisplayWordsType ClockHoursTable[][CLOCK_NUMBER_OF_HOURS][CLOCK_MAX_NUMBER_OF_HOUR_WORDS];
     static const ClockMinutesType ClockMinutesTable[][CLOCK_NUMBER_OF_MINUTE_STEPS];
     // functions
 
 
   public:
-    Clock();
+    Clock(Display*, ClockModesType);
     ~Clock();
 
     // get methods
-
+	ClockModesType getMode() { return Mode; }
 
     // set methods
+	void setMode(ClockModesType sMode) { Mode = sMode; }
 
     // methods
     stdReturnType show(byte, byte);
-    //show();
 };
 
 #endif

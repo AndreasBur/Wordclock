@@ -43,8 +43,6 @@
     #error "Display: LED number missmatch"
 #endif
 
-//#define DisplayLedRgbType                     WS2812PixelType
-
 
 /******************************************************************************************************************************************************
  *  GLOBAL FUNCTION MACROS
@@ -55,12 +53,24 @@
 /******************************************************************************************************************************************************
  *  GLOBAL DATA TYPES AND STRUCTURES
 ******************************************************************************************************************************************************/
+/* type which describes the  */
 typedef struct {
     byte Row;
     byte Column;
     byte Length;
 } DisplayWordIlluminationType;
 
+/* type which describes the internal state of the Display */
+typedef enum {
+	DISPLAY_STATE_NONE,
+	DISPLAY_STATE_UINIT,
+	DISPLAY_STATE_INIT,
+	DISPLAY_STATE_READY
+} DisplayStateType;
+
+/* mapping to underlying hardware */
+typedef WS2812PixelType PixelType;
+typedef WS2812 Stripe;
 
 /******************************************************************************************************************************************************
  *  CLASS  Display
@@ -68,34 +78,33 @@ typedef struct {
 class Display
 {
   private:
-    WS2812 Pixels;
-    WS2812PixelType DisplayColor;
+	DisplayStateType State;
+    Stripe Pixels;
+    PixelType Color;
 
     static const char DisplayCharacters[][DISPLAY_NUMBER_OF_COLUMNS + 1];
     static const DisplayWordIlluminationType WordIlluminationTable[];
     
     // functions
     byte transformToSerpentine(byte, byte);
-    stdReturnType setPixel(byte Row, byte Column);
-    stdReturnType setPixel(byte Index);
-    stdReturnType clearPixel(byte Row, byte Column);
-    stdReturnType clearPixel(byte Index);
-    stdReturnType getPixel(byte, byte, boolean*);
-    stdReturnType getPixel(byte, boolean*);
+
 
   public:
-    Display();
+    Display(PixelType);
+	Display(byte, byte, byte);
     ~Display();
 
     // get methods
-	WS2812PixelType getDisplayColor() { return DisplayColor; }
+	PixelType getColor() { return Color; }
+	DisplayStateType getState() { return State; }
 
 
     // set methods
-    
+    void setColor(PixelType sColor) { Color = sColor; }
+
 
     // char methods
-    stdReturnType setCharacter(DisplayCharactersType Character) { return Pixels.setPixel(Character, DisplayColor); }
+    stdReturnType setCharacter(DisplayCharactersType Character) { return Pixels.setPixel(Character, Color); }
     stdReturnType clearCharacter(DisplayCharactersType Character) { return Pixels.setPixel(Character, 0, 0, 0); }
     stdReturnType getCharacter(DisplayCharactersType Character, boolean* Value);
     stdReturnType getCharacter(byte Row, byte Column, char* Character);
@@ -105,6 +114,14 @@ class Display
     stdReturnType setWord(DisplayWordsType);
     stdReturnType clearWord(DisplayWordsType);
     stdReturnType clearAllWords();
+
+	// pixel methods
+    stdReturnType setPixel(byte Row, byte Column);
+    stdReturnType setPixel(byte Index);
+    stdReturnType clearPixel(byte Row, byte Column);
+    stdReturnType clearPixel(byte Index);
+    stdReturnType getPixel(byte, byte, boolean*);
+    stdReturnType getPixel(byte, boolean*);
 
     // methods
     void init();

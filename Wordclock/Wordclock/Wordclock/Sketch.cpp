@@ -3,7 +3,7 @@
 #include "Display.h"
 /*End of auto generated code by Atmel studio */
 int flag;
-Display WordClockDisplay;
+Display WordClockDisplay(20, 20, 20);
 //DisplayCharacter WcDisplayCharacter;
 
 //Beginning of Auto generated function prototypes by Atmel Studio
@@ -20,9 +20,6 @@ void setup() {
   } else {
 		flag = 0;
   }
-
-
- 
 }
 
 void loop() {

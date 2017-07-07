@@ -8,14 +8,14 @@
  *  ---------------------------------------------------------------------------------------------------------------------------------------------------
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       Template.cpp
+/**     \file       Clock.cpp
  *      \brief      
  *
  *      \details    
  *                  
  *
  *****************************************************************************************************************************************************/
-#define _TEMPLATE_SOURCE_
+#define _CLOCK_SOURCE_
 
 /******************************************************************************************************************************************************
  * INCLUDES
@@ -138,19 +138,30 @@ const ClockMinutesType Clock::ClockMinutesTable[][CLOCK_NUMBER_OF_MINUTE_STEPS] 
  * P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
 
-
 /******************************************************************************************************************************************************
-  init()
+  CONSTRUCTOR OF Clock
 ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
+/*! \brief          Template Constructor
+ *  \details        Instantiation of the Template library
+ *
  *  \return         -
 ******************************************************************************************************************************************************/
-//void init()
-//{
+Clock::Clock(Display* Display, ClockModesType sMode)
+{
+	if(Display != NULL) {
+		pDisplay = Display;
+	}
+	Mode = sMode;
+} /* Clock */
 
-//} /* init */
+
+/******************************************************************************************************************************************************
+  DESTRUCTOR OF Clock
+******************************************************************************************************************************************************/
+Clock::~Clock()
+{
+
+} /* ~Clock */
 
 
 /******************************************************************************************************************************************************
@@ -169,7 +180,7 @@ stdReturnType Clock::show(byte Hour, byte Minute)
     ClockMinutesType MinutesTableEntry;
     DisplayWordsType HoursTableEntry[CLOCK_MAX_NUMBER_OF_HOUR_WORDS];
 
-    memcpy_P(&MinutesTableEntry, &ClockMinutesTable[ClockMode][Minute / CLOCK_MINUTE_STEP_IN_MINUTES], sizeof(ClockMinutesType));
+    memcpy_P(&MinutesTableEntry, &ClockMinutesTable[Mode][Minute / CLOCK_MINUTE_STEP_IN_MINUTES], sizeof(ClockMinutesType));
     memcpy_P(&HoursTableEntry, &ClockHoursTable[MinutesTableEntry.HourMode][Hour], CLOCK_MAX_NUMBER_OF_HOUR_WORDS);
     //const DisplayWordWordsType HoursTableEntry;
 
