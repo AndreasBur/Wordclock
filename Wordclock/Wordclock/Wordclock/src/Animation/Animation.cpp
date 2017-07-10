@@ -121,6 +121,7 @@ stdReturnType Animation::setChar(byte Column, byte Row, char Char, AnimationFont
 /******************************************************************************************************************************************************
  * P R I V A T E   F U N C T I O N S
 ******************************************************************************************************************************************************/
+
 /******************************************************************************************************************************************************
   convertCharToSprite()
 ******************************************************************************************************************************************************/
@@ -144,8 +145,7 @@ stdReturnType Animation::convertCharToFontIndex(char Char, byte* Index)
     else if('ö' == Char) { *Index = 148; ReturnValue = E_OK; }
     else if('ü' == Char) { *Index = 129; ReturnValue = E_OK; }
     /* for all others only add offset */
-    else if(Char >= 0 && Char <= 255)
-        { *Index = Char + 0; ReturnValue = E_OK; }
+    else if(Char >= 0 && Char <= 255) { *Index = Char + 0; ReturnValue = E_OK; }
 
     return ReturnValue;
 } /* convertCharToSprite */
