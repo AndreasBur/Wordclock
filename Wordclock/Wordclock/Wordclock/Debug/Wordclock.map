@@ -35,22 +35,24 @@ Discarded input sections
  .bss           0x00000000        0x0 src/Clock/Clock.o
  .text._ZN5ClockC2EP7Display14ClockModesType
                 0x00000000       0x12 src/Clock/Clock.o
+ .text._ZN5ClockD2Ev
+                0x00000000        0x2 src/Clock/Clock.o
  .text._ZN5Clock4showEhh
                 0x00000000      0x10a src/Clock/Clock.o
  .progmem.data._ZN5Clock17ClockMinutesTableE
                 0x00000000       0xf0 src/Clock/Clock.o
  .progmem.data._ZN5Clock15ClockHoursTableE
                 0x00000000       0x30 src/Clock/Clock.o
- .debug_info    0x00000000     0x1172 src/Clock/Clock.o
+ .debug_info    0x00000000     0x11c7 src/Clock/Clock.o
  .debug_abbrev  0x00000000      0x2ee src/Clock/Clock.o
  .debug_loc     0x00000000      0x17c src/Clock/Clock.o
  .debug_aranges
-                0x00000000       0x28 src/Clock/Clock.o
- .debug_ranges  0x00000000       0x30 src/Clock/Clock.o
- .debug_line    0x00000000      0x32b src/Clock/Clock.o
- .debug_str     0x00000000     0x18d6 src/Clock/Clock.o
+                0x00000000       0x30 src/Clock/Clock.o
+ .debug_ranges  0x00000000       0x38 src/Clock/Clock.o
+ .debug_line    0x00000000      0x342 src/Clock/Clock.o
+ .debug_str     0x00000000     0x18ee src/Clock/Clock.o
  .comment       0x00000000       0x31 src/Clock/Clock.o
- .debug_frame   0x00000000       0x64 src/Clock/Clock.o
+ .debug_frame   0x00000000       0x74 src/Clock/Clock.o
  .text          0x00000000        0x0 src/Display/Display.o
  .data          0x00000000        0x0 src/Display/Display.o
  .bss           0x00000000        0x0 src/Display/Display.o

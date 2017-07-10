@@ -227,6 +227,9 @@
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="inc\Animation\Animation.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="inc\Clock\Clock.h">
       <SubType>compile</SubType>
     </Compile>
@@ -246,6 +249,9 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="Sketch.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\Animation\Animation.cpp">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="src\Clock\Clock.cpp">
@@ -271,11 +277,13 @@
     <Folder Include="inc" />
     <Folder Include="inc\Display" />
     <Folder Include="inc\Clock" />
+    <Folder Include="inc\Animation" />
     <Folder Include="inc\WS2812" />
     <Folder Include="inc\StandardTypes" />
     <Folder Include="src" />
     <Folder Include="src\Display" />
     <Folder Include="src\Clock" />
+    <Folder Include="src\Animation" />
     <Folder Include="src\WS2812" />
   </ItemGroup>
   <Import Project="$(AVRSTUDIO_EXE_PATH)\\Vs\\Compiler.targets" />

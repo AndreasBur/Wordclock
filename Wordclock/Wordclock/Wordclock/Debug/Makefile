@@ -36,11 +36,13 @@ SUBDIRS :=  \
 ../inc \
 ../inc/Display \
 ../inc/Clock \
+../inc/Animation \
 ../inc/WS2812 \
 ../inc/StandardTypes \
 ../src \
 ../src/Display \
 ../src/Clock \
+../src/Animation \
 ../src/WS2812
 
 
