@@ -63,7 +63,7 @@ typedef struct {
 /* type which describes the internal state of the Display */
 typedef enum {
 	DISPLAY_STATE_NONE,
-	DISPLAY_STATE_UINIT,
+	DISPLAY_STATE_UNINIT,
 	DISPLAY_STATE_INIT,
 	DISPLAY_STATE_READY
 } DisplayStateType;
@@ -107,8 +107,8 @@ class Display
     stdReturnType setCharacter(DisplayCharactersType Character) { return Pixels.setPixel(Character, Color); }
     stdReturnType clearCharacter(DisplayCharactersType Character) { return Pixels.setPixel(Character, 0, 0, 0); }
     stdReturnType getCharacter(DisplayCharactersType Character, boolean* Value);
-    stdReturnType getCharacter(byte Row, byte Column, char* Character);
-    stdReturnType getCharacter(byte Index, char* Character);
+    stdReturnType getCharacter(byte, byte, char*);
+    stdReturnType getCharacter(byte, char*);
 
     // word methods
     stdReturnType setWord(DisplayWordsType);
@@ -116,10 +116,12 @@ class Display
     stdReturnType clearAllWords();
 
 	// pixel methods
-    stdReturnType setPixel(byte Row, byte Column);
-    stdReturnType setPixel(byte Index);
-    stdReturnType clearPixel(byte Row, byte Column);
-    stdReturnType clearPixel(byte Index);
+	stdReturnType writePixel(byte Column, byte Row, boolean Value) { if(Value) return setPixel(Column, Row); else return clearPixel(Column, Row); }
+	stdReturnType WritePixel(byte Index, boolean Value) { if(Value) return setPixel(Index); else return clearPixel(Index); }
+    stdReturnType setPixel(byte, byte);
+    stdReturnType setPixel(byte);
+    stdReturnType clearPixel(byte, byte);
+    stdReturnType clearPixel(byte);
     stdReturnType getPixel(byte, byte, boolean*);
     stdReturnType getPixel(byte, boolean*);
 

@@ -1,4 +1,6 @@
-Sketch.d Sketch.o: .././Sketch.cpp \
+src/Animation/Animation.d src/Animation/Animation.o: \
+ ../src/Animation/Animation.cpp ../inc/Animation/Animation.h \
+ ../inc/StandardTypes/StandardTypes.h \
  ..\\..\ArduinoCore\include\core/Arduino.h \
  c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\stdlib.h \
  c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\lib\gcc\avr\4.9.2\include\stddef.h \
@@ -34,9 +36,12 @@ Sketch.d Sketch.o: .././Sketch.cpp \
  c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\util\delay_basic.h \
  ..\\..\ArduinoCore\include\core/Arduino.h \
  ..\\..\ArduinoCore\include\variants\standard/pins_arduino.h \
- ../inc/Display/Display.h ../inc/StandardTypes/StandardTypes.h \
- ../inc/Display/DisplayCharacters.h ../inc/Display/DisplayWords.h \
- ../inc/WS2812/WS2812.h ../inc/Animation/Animation.h
+ ../inc/Display/Display.h ../inc/Display/DisplayCharacters.h \
+ ../inc/Display/DisplayWords.h ../inc/WS2812/WS2812.h
+
+../inc/Animation/Animation.h:
+
+../inc/StandardTypes/StandardTypes.h:
 
 ..\\..\ArduinoCore\include\core/Arduino.h:
 
@@ -110,12 +115,8 @@ c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\
 
 ../inc/Display/Display.h:
 
-../inc/StandardTypes/StandardTypes.h:
-
 ../inc/Display/DisplayCharacters.h:
 
 ../inc/Display/DisplayWords.h:
 
 ../inc/WS2812/WS2812.h:
-
-../inc/Animation/Animation.h:

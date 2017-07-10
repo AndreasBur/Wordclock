@@ -4,6 +4,10 @@
 
 Sketch.cpp
 
+src\Animation\Animation.cpp
+
+src\Animation\Font.cpp
+
 src\Clock\Clock.cpp
 
 src\Display\Display.cpp

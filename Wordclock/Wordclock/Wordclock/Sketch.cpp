@@ -1,11 +1,12 @@
 ﻿/*Begining of Auto generated code by Atmel studio */
 #include <Arduino.h>
 #include "Display.h"
+#include "Animation.h"
 /*End of auto generated code by Atmel studio */
 int flag;
 Display WordClockDisplay(20, 20, 20);
 //DisplayCharacter WcDisplayCharacter;
-
+Animation wcAnimation;
 //Beginning of Auto generated function prototypes by Atmel Studio
 //End of Auto generated function prototypes by Atmel Studio
 
@@ -20,6 +21,7 @@ void setup() {
   } else {
 		flag = 0;
   }
+  wcAnimation.setChar(0,0, 'T', ANIMATION_FONT_4X6);
 }
 
 void loop() {
