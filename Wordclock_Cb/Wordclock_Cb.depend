@@ -2987,3 +2987,24 @@
 	"wx_pch.h"
 	"Wordclock_CbMain.h"
 
+1446671340 source:c:\users\virskl\documents\github\wordclock\wordclock_cb\resource.rc
+	"wx/msw/wx.rc"
+
+1499778319 source:c:\users\virskl\documents\github\wordclock\wordclock_cb\wordclock_cbapp.cpp
+	"wx_pch.h"
+	"Wordclock_CbApp.h"
+	"Wordclock_CbMain.h"
+
+1499753805 c:\users\virskl\documents\github\wordclock\wordclock_cb\wordclock_cbapp.h
+	<wx/app.h>
+
+1499771945 c:\users\virskl\documents\github\wordclock\wordclock_cb\wordclock_cbmain.h
+	<wx/wx.h>
+	"Wordclock_CbApp.h"
+	<wx/button.h>
+	<wx/statline.h>
+
+1499779022 source:c:\users\virskl\documents\github\wordclock\wordclock_cb\wordclock_cbmain.cpp
+	"wx_pch.h"
+	"Wordclock_CbMain.h"
+

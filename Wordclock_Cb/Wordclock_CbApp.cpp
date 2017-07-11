@@ -22,7 +22,7 @@ IMPLEMENT_APP(Wordclock_CbApp);
 
 bool Wordclock_CbApp::OnInit()
 {
-    
+
     Wordclock_CbDialog* dlg = new Wordclock_CbDialog(0L, _("wxWidgets Application Template"));
     dlg->SetIcon(wxICON(aaaa)); // To Set App Icon
     dlg->Show();
