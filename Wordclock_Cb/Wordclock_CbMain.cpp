@@ -82,6 +82,7 @@ Wordclock_CbDialog::Wordclock_CbDialog(wxDialog *dlg, const wxString &title)
             Characters[Row][Column] = new wxStaticText(this, wxID_ANY, DisplayCharacters[Row][Column], wxDefaultPosition, wxDefaultSize, 0);
             //Characters[Row][Column]->SetFont(wxFont(40, wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false));
             Characters[Row][Column]->SetFont(wxFont(wxSize(40,40), wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false));
+            Characters[Row][Column]->SetForegroundColour(wxColour(*wxLIGHT_GREY));
             SizerCharacters[Row]->Add(Characters[Row][Column], 0, wxALL|wxEXPAND, 5);
         }
         SizerAll->Add(SizerCharacters[Row], 1, wxEXPAND, 5);
@@ -90,11 +91,11 @@ Wordclock_CbDialog::Wordclock_CbDialog(wxDialog *dlg, const wxString &title)
     wxBoxSizer* SizerButton = new wxBoxSizer(wxHORIZONTAL);
     BtnAbout = new wxButton(this, idBtnAbout, wxT("&About"), wxDefaultPosition, wxDefaultSize, 0);
     BtnQuit = new wxButton(this, idBtnQuit, wxT("&Quit"), wxDefaultPosition, wxDefaultSize, 0);
-    m_staticline1 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL);
+    //m_staticline1 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_VERTICAL);
 
-    SizerButton->Add(BtnAbout, 1, wxEXPAND, 5);
-    SizerButton->Add(m_staticline1, 1, wxEXPAND, 5);
-    SizerButton->Add(BtnQuit, 1, wxEXPAND, 5);
+    SizerButton->Add(BtnAbout, 1, wxALL, 10);
+    SizerButton->AddSpacer(250);
+    SizerButton->Add(BtnQuit, 1, wxALL, 10);
 
     SizerAll->Add(SizerButton, 1, wxEXPAND, 5);
 
@@ -126,9 +127,9 @@ void Wordclock_CbDialog::OnAbout(wxCommandEvent &event)
 //        }
 //    }
     wxDateTime Time = wxDateTime::Now();
-    int Hour = Time.GetHour();
-    int Minute = Time.GetMinute();
-    wxMessageBox(wxString::Format("%d:%d", Time.GetHour(), Time.GetMinute()));
-    Characters[1][5]->SetForegroundColour(wxColour(*wxRED));
+    //int Hour = Time.GetHour();
+    //int Minute = Time.GetMinute();
+    //wxMessageBox(wxString::Format("%d:%d", Time.GetHour(), Time.GetMinute()));
+    Characters[1][5]->SetForegroundColour(wxColour(*wxBLACK));
     Refresh();
 }
