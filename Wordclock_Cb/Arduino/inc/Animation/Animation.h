@@ -9,10 +9,10 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       Animation.h
- *      \brief      
+ *      \brief
  *
- *      \details    
- *                  
+ *      \details
+ *
 ******************************************************************************************************************************************************/
 #ifndef _ANIMATION_H_
 #define _ANIMATION_H_
@@ -109,7 +109,7 @@ class Animation
 	AnimationType CurrentAnimation;
 
 #if(ANIMATION_SUPPORT_FONT_4X6 == STD_ON)
-	static const char Font_4x6[][6];
+	static const char Font_4x6[][4];
 #endif
 #if(ANIMATION_SUPPORT_FONT_5X8 == STD_ON)
 	static const char Font_5x8[][8];
@@ -128,7 +128,7 @@ class Animation
 	stdReturnType convertCharToFontIndex(char, byte*);
 
   public:
-	Animation();
+	Animation(Display*);
 	~Animation();
 
 	// get methods

@@ -20,6 +20,7 @@
 
 #include "Clock.h"
 #include "Display.h"
+#include "Animation.h"
 
 IMPLEMENT_APP(Wordclock_CbApp);
 
@@ -33,8 +34,14 @@ bool Wordclock_CbApp::OnInit()
     int Hour = Time.GetHour();
     int Minute = Time.GetMinute();
 
-    WcClock->show(Hour, Minute);
+    //WcClock->show(Hour, Minute);
     //WcDisplay->clear();
+
+    Animation* WcAnimation = new Animation(WcDisplay);
+
+    WcAnimation->setChar(0,0,'2', ANIMATION_FONT_4X6);
+
+    WcDisplay->show();
 
     //Wordclock_CbDialog* dlg = new Wordclock_CbDialog(0L, _("wxWidgets Application Template"));
     //dlg->SetIcon(wxICON(aaaa)); // To Set App Icon

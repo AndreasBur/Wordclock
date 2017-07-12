@@ -52,7 +52,7 @@
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-Animation::Animation()
+Animation::~Animation()
 {
 
 } /* Template */
@@ -61,9 +61,9 @@ Animation::Animation()
 /******************************************************************************************************************************************************
   DESTRUCTOR OF Animation
 ******************************************************************************************************************************************************/
-Animation::~Animation()
+Animation::Animation(Display* Display)
 {
-
+    pDisplay = Display;
 } /* ~Template */
 
 
@@ -102,12 +102,12 @@ stdReturnType Animation::setChar(byte Column, byte Row, char Char, AnimationFont
         for(byte FontColumn = 0; FontColumn < ANIMATION_FONT_4X6_WIDTH; FontColumn++)
         {
 			byte Font_4x6_EntryItem = Font_4x6[FontIndex][FontColumn];
-	        for(byte FontRow = 0; FontRow < ANIMATION_FONT_4X6_HEIGHT; FontRow++)
+	        for(byte FontRow = 0; FontRow < ANIMATION_FONT_4X6_HEIGHT+2; FontRow++)
 	        {
 		        ColumnAbs = Column + FontColumn;
 		        RowAbs = Row + FontRow;
 		        if(ColumnAbs < DISPLAY_NUMBER_OF_COLUMNS && RowAbs < DISPLAY_NUMBER_OF_ROWS)
-					pDisplay->writePixel(ColumnAbs, RowAbs, readBit(Font_4x6_EntryItem, FontRow));
+					pDisplay->writePixel(ColumnAbs, RowAbs, bitRead(Font_4x6_EntryItem, FontRow));
 	        }
 		}
 		ReturnValue = E_OK;
