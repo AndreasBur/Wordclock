@@ -99,13 +99,13 @@ stdReturnType Animation::setChar(byte Column, byte Row, char Char, AnimationFont
 #if(ANIMATION_SUPPORT_FONT_4X6 == STD_ON)
 	if(Font == ANIMATION_FONT_4X6)
 	{
-        for(byte FontColumn = 0; FontColumn < ANIMATION_FONT_4X6_WIDTH; FontColumn++)
+        for(byte FontColumn = 1; FontColumn < ANIMATION_FONT_4X6_WIDTH; FontColumn++)
         {
 			byte Font_4x6_EntryItem = Font_4x6[FontIndex][FontColumn];
-	        for(byte FontRow = 0; FontRow < ANIMATION_FONT_4X6_HEIGHT+2; FontRow++)
+	        for(byte FontRow = 1; FontRow < ANIMATION_FONT_4X6_HEIGHT; FontRow++)
 	        {
-		        ColumnAbs = Column + FontColumn;
-		        RowAbs = Row + FontRow;
+		        ColumnAbs = Column + FontColumn-1;
+		        RowAbs = Row + FontRow-1;
 		        if(ColumnAbs < DISPLAY_NUMBER_OF_COLUMNS && RowAbs < DISPLAY_NUMBER_OF_ROWS)
 					pDisplay->writePixel(ColumnAbs, RowAbs, bitRead(Font_4x6_EntryItem, FontRow));
 	        }

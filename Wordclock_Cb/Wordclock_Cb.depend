@@ -3085,7 +3085,7 @@
 
 1493470838 c:\wxwidgets-3.0.3\include\wx\msw\rcdefs.h
 
-1499894657 source:c:\users\andreas\documents\github\wordclock\wordclock_cb\wordclock_cbapp.cpp
+1499897124 source:c:\users\andreas\documents\github\wordclock\wordclock_cb\wordclock_cbapp.cpp
 	"wx_pch.h"
 	"Wordclock_CbApp.h"
 	"Wordclock_CbMain.h"
@@ -6058,7 +6058,7 @@
 	"Wordclock_CbMain.h"
 	"WS2812.h"
 
-1499894475 source:c:\users\andreas\documents\github\wordclock\wordclock_cb\arduino\src\animation\animation.cpp
+1499897376 source:c:\users\andreas\documents\github\wordclock\wordclock_cb\arduino\src\animation\animation.cpp
 	"Animation.h"
 
 1499894274 c:\users\andreas\documents\github\wordclock\wordclock_cb\arduino\inc\animation\animation.h
@@ -6079,7 +6079,7 @@
 
 1499884141 c:\users\andreas\documents\github\wordclock\wordclock_cb\arduino\inc\display\displaywords.h
 
-1499894247 source:c:\users\andreas\documents\github\wordclock\wordclock_cb\arduino\src\animation\font.cpp
+1499897021 source:c:\users\andreas\documents\github\wordclock\wordclock_cb\arduino\src\animation\font.cpp
 	"Animation.h"
 
 1499887217 source:c:\users\andreas\documents\github\wordclock\wordclock_cb\arduino\src\clock\clock.cpp
@@ -6090,7 +6090,7 @@
 	"Arduino.h"
 	"Display.h"
 
-1499884141 source:c:\users\andreas\documents\github\wordclock\wordclock_cb\arduino\src\display\display.cpp
+1499895758 source:c:\users\andreas\documents\github\wordclock\wordclock_cb\arduino\src\display\display.cpp
 	"Display.h"
 
 1499884141 c:\users\andreas\documents\github\wordclock\wordclock_cb\ws2812.h

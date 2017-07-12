@@ -175,7 +175,7 @@ stdReturnType Display::getCharacter(DisplayCharactersType Character, boolean* Va
  *                  
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType Display::getCharacter(byte Row, byte Column, char* Character)
+stdReturnType Display::getCharacter(byte Column, byte Row, char* Character)
 {
     if(Row < DISPLAY_NUMBER_OF_ROWS && Column < DISPLAY_NUMBER_OF_COLUMNS) {
         *Character =  pgm_read_byte_near(&DisplayCharacters[Row][Column]);
@@ -225,7 +225,7 @@ stdReturnType Display::setWord(DisplayWordsType Word)
         byte Column = (byte) pgm_read_byte(&WordIlluminationTable[Word].Column);
         byte Length = (byte) pgm_read_byte(&WordIlluminationTable[Word].Length);
 
-        for(byte Index = 0; Index < Length; Index++) if(setPixel(Row, Column + Index) == E_NOT_OK) ReturnValue = E_NOT_OK;
+        for(byte Index = 0; Index < Length; Index++) if(setPixel(Column + Index,  Row) == E_NOT_OK) ReturnValue = E_NOT_OK;
     } else {
         ReturnValue = E_NOT_OK;
     }
@@ -250,7 +250,7 @@ stdReturnType Display::clearWord(DisplayWordsType Word)
         byte Column = (byte) pgm_read_byte(&WordIlluminationTable[Word].Column);
         byte Length = (byte) pgm_read_byte(&WordIlluminationTable[Word].Length);
 
-        for(byte Index = 0; Index < Length; Index++) if(clearPixel(Row, Column + Index) == E_NOT_OK) ReturnValue = E_NOT_OK;
+        for(byte Index = 0; Index < Length; Index++) if(clearPixel(Column + Index,  Row) == E_NOT_OK) ReturnValue = E_NOT_OK;
     } else {
         ReturnValue = E_NOT_OK;
     }
@@ -288,7 +288,7 @@ stdReturnType Display::setPixel(byte Index)
     byte Row = Index / DISPLAY_NUMBER_OF_COLUMNS;
     byte Column = Index % DISPLAY_NUMBER_OF_COLUMNS;
 
-    return setPixel(Row, Column);
+    return setPixel(Column,  Row);
 } /* setPixel */
 
 
@@ -300,12 +300,12 @@ stdReturnType Display::setPixel(byte Index)
  *                  
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType Display::setPixel(byte Row, byte Column)
+stdReturnType Display::setPixel(byte Column, byte Row)
 {
     if(Row < DISPLAY_NUMBER_OF_ROWS && Column < DISPLAY_NUMBER_OF_COLUMNS) {
 #if (DISPLAY_LED_STRIPE_SERPENTINE == STD_ON)
         /* if led stripe is snake or serpentine the odd row: count from right to left */
-        Pixels.setPixel(transformToSerpentine(Row, Column), Color);
+        Pixels.setPixel(transformToSerpentine(Column,  Row), Color);
 #else
         Pixels.setPixel((Row * DISPLAY_NUMBER_OF_COLUMNS) + Column, Color);
 #endif
@@ -324,12 +324,12 @@ stdReturnType Display::setPixel(byte Row, byte Column)
  *                  
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType Display::clearPixel(byte Row, byte Column)
+stdReturnType Display::clearPixel(byte Column, byte Row)
 {
     if(Row < DISPLAY_NUMBER_OF_ROWS && Column < DISPLAY_NUMBER_OF_COLUMNS) {
 #if (DISPLAY_LED_STRIPE_SERPENTINE == STD_ON)
         /* if led stripe is snake or serpentine then odd row: count from right to left */
-        Pixels.setPixel(transformToSerpentine(Row, Column), 0, 0, 0);
+        Pixels.setPixel(transformToSerpentine(Column,  Row), 0, 0, 0);
 #else
         Pixels.setPixel((Row * DISPLAY_NUMBER_OF_COLUMNS) + Column, 0, 0, 0);
 #endif
@@ -353,7 +353,7 @@ stdReturnType Display::clearPixel(byte Index)
     byte Row = Index / DISPLAY_NUMBER_OF_COLUMNS;
     byte Column = Index % DISPLAY_NUMBER_OF_COLUMNS;
 
-    return clearPixel(Row, Column);
+    return clearPixel(Column,  Row);
 } /* clearPixel */
 
 
@@ -370,7 +370,7 @@ stdReturnType Display::clearPixel(byte Index)
  *                  
  *  \return         -
 ******************************************************************************************************************************************************/
-byte Display::transformToSerpentine(byte Row, byte Column)
+byte Display::transformToSerpentine(byte Column, byte Row)
 {
     byte Index;
 

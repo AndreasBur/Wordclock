@@ -39,9 +39,13 @@ bool Wordclock_CbApp::OnInit()
 
     Animation* WcAnimation = new Animation(WcDisplay);
 
-    WcAnimation->setChar(0,0,'2', ANIMATION_FONT_4X6);
+
+    WcAnimation->setChar(0, 0, 'A', ANIMATION_FONT_4X6);
 
     WcDisplay->show();
+
+
+
 
     //Wordclock_CbDialog* dlg = new Wordclock_CbDialog(0L, _("wxWidgets Application Template"));
     //dlg->SetIcon(wxICON(aaaa)); // To Set App Icon
