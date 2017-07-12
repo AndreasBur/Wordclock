@@ -126,7 +126,7 @@ void Wordclock_CbDialog::OnAbout(wxCommandEvent &event)
 //            Characters[Row][Column]->SetForegroundColour(wxColour(*wxRED));
 //        }
 //    }
-    wxDateTime Time = wxDateTime::Now();
+    //wxDateTime Time = wxDateTime::Now();
     //int Hour = Time.GetHour();
     //int Minute = Time.GetMinute();
     //wxMessageBox(wxString::Format("%d:%d", Time.GetHour(), Time.GetMinute()));
