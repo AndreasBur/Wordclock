@@ -59,8 +59,14 @@ typedef enum {
 } ClockModesType;
 
 
+typedef enum {
+	CLOCK_HOUR_MODE_FULL_HOUR,
+	CLOCK_HOUR_MODE_NO_FULL_HOUR
+} ClockHourModesType;
+
+
 typedef struct {
-    byte HourMode;
+    ClockHourModesType HourMode;
     byte HourOffset;
     DisplayWordsType Words[CLOCK_MAX_NUMBER_OF_MINUTE_WORDS];
 } ClockMinutesType;

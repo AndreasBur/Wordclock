@@ -51,7 +51,7 @@ class Wordclock_CbDialog: public wxDialog
 
         // methods
         //void init();
-        void clearAllPixels() {};
+        void clearAllPixels();
         //stdReturnType clearPixel(byte Index) { return setPixel(Index, 0, 0, 0); }
         void show() { Refresh(); }
 

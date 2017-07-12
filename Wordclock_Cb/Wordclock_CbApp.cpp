@@ -33,7 +33,8 @@ bool Wordclock_CbApp::OnInit()
     int Hour = Time.GetHour();
     int Minute = Time.GetMinute();
 
-    WcClock->show(17, 30);
+    WcClock->show(Hour, Minute);
+    //WcDisplay->clear();
 
     //Wordclock_CbDialog* dlg = new Wordclock_CbDialog(0L, _("wxWidgets Application Template"));
     //dlg->SetIcon(wxICON(aaaa)); // To Set App Icon

@@ -20,7 +20,7 @@
 					<Add directory="Arduino/inc/StandardTypes" />
 					<Add directory="Arduino/inc/Clock" />
 					<Add directory="Arduino/inc/Display" />
-					<Add directory="C:/Users/virskl/Documents/GitHub/Wordclock/Wordclock_Cb/" />
+					<Add directory="../Wordclock_Cb" />
 				</Compiler>
 				<ResourceCompiler>
 					<Add directory="$(#wx30)/lib/gcc_dll/mswud" />

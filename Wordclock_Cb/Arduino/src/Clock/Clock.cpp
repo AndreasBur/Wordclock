@@ -180,7 +180,7 @@ stdReturnType Clock::show(byte Hour, byte Minute)
     ClockMinutesType MinutesTableEntry;
     DisplayWordsType HoursTableEntry[CLOCK_MAX_NUMBER_OF_HOUR_WORDS];
 
-    memcpy(&MinutesTableEntry, &ClockMinutesTable[Mode][Minute / CLOCK_MINUTE_STEP_IN_MINUTES], sizeof(ClockMinutesType));
+
 
     //const DisplayWordWordsType HoursTableEntry;
 
@@ -193,6 +193,8 @@ stdReturnType Clock::show(byte Hour, byte Minute)
             pDisplay->setWord(DISPLAY_WORD_IST);
         }
 
+        memcpy(&MinutesTableEntry, &ClockMinutesTable[Mode][Minute / CLOCK_MINUTE_STEP_IN_MINUTES], sizeof(ClockMinutesType));
+
         for(byte Index = 0; Index < CLOCK_MAX_NUMBER_OF_MINUTE_WORDS && MinutesTableEntry.Words[Index] != DISPLAY_WORD_NONE; Index++) {
             pDisplay->setWord(MinutesTableEntry.Words[Index]);
         }
@@ -201,7 +203,8 @@ stdReturnType Clock::show(byte Hour, byte Minute)
         Hour += MinutesTableEntry.HourOffset;                             // correct the hour offset from the minutes
         if(Hour >= CLOCK_NUMBER_OF_HOURS) Hour -= CLOCK_NUMBER_OF_HOURS;
 
-        memcpy(&HoursTableEntry, &ClockHoursTable[MinutesTableEntry.HourMode][Hour], CLOCK_MAX_NUMBER_OF_HOUR_WORDS);
+        memcpy(&HoursTableEntry, &ClockHoursTable[MinutesTableEntry.HourMode][Hour], sizeof(DisplayWordsType) * CLOCK_MAX_NUMBER_OF_HOUR_WORDS);
+        //HoursTableEntry[0] = ClockHoursTable[MinutesTableEntry.HourMode][Hour]
 
         for(byte Index = 0; Index < CLOCK_MAX_NUMBER_OF_HOUR_WORDS && HoursTableEntry[Index] != DISPLAY_WORD_NONE; Index++) {
             pDisplay->setWord(HoursTableEntry[Index]);
