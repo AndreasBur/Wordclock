@@ -2,19 +2,74 @@
 <CodeBlocks_layout_file>
 	<FileVersion major="1" minor="0" />
 	<ActiveTarget name="Debug" />
-	<File name="Wordclock_CbApp.cpp" open="1" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="Wordclock_CbMain.h" open="0" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="534" topLine="1" />
+			<Cursor1 position="426" topLine="5" />
 		</Cursor>
 	</File>
-	<File name="Wordclock_CbMain.h" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="Arduino\inc\StandardTypes\StandardTypes.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="631" topLine="23" />
+			<Cursor1 position="1198" topLine="39" />
 		</Cursor>
 	</File>
-	<File name="Wordclock_CbMain.cpp" open="1" top="1" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="Wordclock_CbMain.cpp" open="1" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="3691" topLine="76" />
+			<Cursor1 position="3846" topLine="111" />
+		</Cursor>
+	</File>
+	<File name="Arduino\src\Clock\Clock.cpp" open="1" top="1" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="12819" topLine="135" />
+		</Cursor>
+	</File>
+	<File name="Arduino.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="29" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="Wordclock_CbApp.cpp" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="832" topLine="3" />
+		</Cursor>
+	</File>
+	<File name="Wordclock_CbApp.h" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="380" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="Arduino\inc\Display\Display.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2042" topLine="100" />
+		</Cursor>
+	</File>
+	<File name="WS2812.h" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="62" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="Arduino\src\Display\Display.cpp" open="0" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="16577" topLine="349" />
+		</Cursor>
+	</File>
+	<File name="Arduino\inc\Animation\Animation.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1510" topLine="9" />
+		</Cursor>
+	</File>
+	<File name="Arduino\inc\Clock\Clock.h" open="1" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2249" topLine="20" />
+		</Cursor>
+	</File>
+	<File name="Arduino\src\Animation\Animation.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="5423" topLine="83" />
+		</Cursor>
+	</File>
+	<File name="Arduino\src\Animation\Font.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="57292" topLine="1080" />
 		</Cursor>
 	</File>
 </CodeBlocks_layout_file>

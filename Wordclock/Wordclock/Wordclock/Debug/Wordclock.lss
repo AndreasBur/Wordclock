@@ -13,21 +13,21 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY
   4 .note.gnu.avr.deviceinfo 00000040  00000000  00000000  00000e40  2**2
                   CONTENTS, READONLY
-  5 .debug_aranges 00000258  00000000  00000000  00000e80  2**0
+  5 .debug_aranges 00000250  00000000  00000000  00000e80  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_info   0000685b  00000000  00000000  000010d8  2**0
+  6 .debug_info   0000678c  00000000  00000000  000010d0  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_abbrev 000013dc  00000000  00000000  00007933  2**0
+  7 .debug_abbrev 000013f6  00000000  00000000  0000785c  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_line   000016dc  00000000  00000000  00008d0f  2**0
+  8 .debug_line   000016b3  00000000  00000000  00008c52  2**0
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_frame  000005c4  00000000  00000000  0000a3ec  2**2
+  9 .debug_frame  000005ac  00000000  00000000  0000a308  2**2
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_str    00001d83  00000000  00000000  0000a9b0  2**0
+ 10 .debug_str    00001d83  00000000  00000000  0000a8b4  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_loc    000027e1  00000000  00000000  0000c733  2**0
+ 11 .debug_loc    000026b3  00000000  00000000  0000c637  2**0
                   CONTENTS, READONLY, DEBUGGING
- 12 .debug_ranges 00000278  00000000  00000000  0000ef14  2**0
+ 12 .debug_ranges 00000270  00000000  00000000  0000ecea  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -377,8 +377,7 @@ stdReturnType Animation::convertCharToFontIndex(char Char, byte* Index)
  7ec:	81 e8       	ldi	r24, 0x81	; 129
  7ee:	ee cf       	rjmp	.-36     	; 0x7cc <_ZN9Animation22convertCharToFontIndexEcPh+0x10>
     /* for all others only add offset */
-    else if(Char >= 0 && Char <= 255)
-        { *Index = Char + 0; ReturnValue = E_OK; }
+    else if(Char >= 0 && Char <= 255) { *Index = Char + 0; ReturnValue = E_OK; }
  7f0:	60 83       	st	Z, r22
 
     return ReturnValue;
@@ -1058,9 +1057,9 @@ stdReturnType WS2812::setPixel(byte Index, byte Red, byte Green, byte Blue)
  bc2:	e8 0f       	add	r30, r24
  bc4:	f1 1d       	adc	r31, r1
  bc6:	05 83       	std	Z+5, r16	; 0x05
+        return E_OK;
  bc8:	80 e0       	ldi	r24, 0x00	; 0
  bca:	01 c0       	rjmp	.+2      	; 0xbce <_ZN6WS28128setPixelEhhhh+0x42>
-        return E_OK;
     } else {
         return E_NOT_OK;
  bcc:	81 e0       	ldi	r24, 0x01	; 1

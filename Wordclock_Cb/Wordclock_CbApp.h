@@ -12,8 +12,16 @@
 
 #include <wx/app.h>
 
+//class Display;
+//class Clock;
+
 class Wordclock_CbApp : public wxApp
 {
+    private:
+        //Display* WcDisplay;
+        //Clock* WcClock;
+
+
     public:
         virtual bool OnInit();
 };

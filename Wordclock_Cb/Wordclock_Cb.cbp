@@ -16,6 +16,11 @@
 					<Add option="-g" />
 					<Add option="-D__WXDEBUG__" />
 					<Add directory="$(#wx30)/lib/gcc_dll/mswud" />
+					<Add directory="Arduino/inc/Animation" />
+					<Add directory="Arduino/inc/StandardTypes" />
+					<Add directory="Arduino/inc/Clock" />
+					<Add directory="Arduino/inc/Display" />
+					<Add directory="C:/Users/virskl/Documents/GitHub/Wordclock/Wordclock_Cb/" />
 				</Compiler>
 				<ResourceCompiler>
 					<Add directory="$(#wx30)/lib/gcc_dll/mswud" />
@@ -61,6 +66,18 @@
 		<Linker>
 			<Add option="-mthreads" />
 		</Linker>
+		<Unit filename="Arduino.h" />
+		<Unit filename="Arduino/inc/Animation/Animation.h" />
+		<Unit filename="Arduino/inc/Clock/Clock.h" />
+		<Unit filename="Arduino/inc/Display/Display.h" />
+		<Unit filename="Arduino/inc/Display/DisplayCharacters.h" />
+		<Unit filename="Arduino/inc/Display/DisplayWords.h" />
+		<Unit filename="Arduino/inc/StandardTypes/StandardTypes.h" />
+		<Unit filename="Arduino/src/Animation/Animation.cpp" />
+		<Unit filename="Arduino/src/Animation/Font.cpp" />
+		<Unit filename="Arduino/src/Clock/Clock.cpp" />
+		<Unit filename="Arduino/src/Display/Display.cpp" />
+		<Unit filename="WS2812.h" />
 		<Unit filename="Wordclock_CbApp.cpp" />
 		<Unit filename="Wordclock_CbApp.h" />
 		<Unit filename="Wordclock_CbMain.cpp" />

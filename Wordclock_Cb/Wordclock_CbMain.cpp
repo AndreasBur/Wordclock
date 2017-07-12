@@ -16,6 +16,7 @@
 #endif //__BORLANDC__
 
 #include "Wordclock_CbMain.h"
+#include "WS2812.h"
 
 //helper functions
 enum wxbuildinfoformat {
@@ -68,8 +69,7 @@ END_EVENT_TABLE()
 
 Wordclock_CbDialog::Wordclock_CbDialog(wxDialog *dlg, const wxString &title)
     : wxDialog(dlg, -1, title)
-{
-    this->SetSizeHints(wxDefaultSize, wxDefaultSize);
+{    this->SetSizeHints(wxDefaultSize, wxDefaultSize);
     wxBoxSizer* SizerCharacters[DISPLAY_NUMBER_OF_ROWS];
     wxBoxSizer* SizerAll;
     SizerAll = new wxBoxSizer(wxVERTICAL);
@@ -93,9 +93,9 @@ Wordclock_CbDialog::Wordclock_CbDialog(wxDialog *dlg, const wxString &title)
     BtnQuit = new wxButton(this, idBtnQuit, wxT("&Quit"), wxDefaultPosition, wxDefaultSize, 0);
     //m_staticline1 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_VERTICAL);
 
-    SizerButton->Add(BtnAbout, 1, wxALL, 10);
+    SizerButton->Add(BtnAbout, 1, wxALL|wxEXPAND, 10);
     SizerButton->AddSpacer(250);
-    SizerButton->Add(BtnQuit, 1, wxALL, 10);
+    SizerButton->Add(BtnQuit, 1, wxALL|wxEXPAND, 10);
 
     SizerAll->Add(SizerButton, 1, wxEXPAND, 5);
 
@@ -132,4 +132,54 @@ void Wordclock_CbDialog::OnAbout(wxCommandEvent &event)
     //wxMessageBox(wxString::Format("%d:%d", Time.GetHour(), Time.GetMinute()));
     Characters[1][5]->SetForegroundColour(wxColour(*wxBLACK));
     Refresh();
+}
+
+stdReturnType Wordclock_CbDialog::getPixel(byte Index, WS2812PixelType* Pixel)
+{
+    byte Row = Index / DISPLAY_NUMBER_OF_COLUMNS;
+    byte Column = Index % DISPLAY_NUMBER_OF_COLUMNS;
+
+    if(Characters[Row][Column]->GetForegroundColour() == wxColor(*wxBLACK)) {
+        Pixel->Blue = 255;
+        Pixel->Green = 255;
+        Pixel->Red = 255;
+    } else {
+        Pixel->Blue = 0;
+        Pixel->Green = 0;
+        Pixel->Red = 0;
+    }
+}
+
+stdReturnType Wordclock_CbDialog::setPixel(byte Index, WS2812PixelType Pixel)
+{
+    byte Row = Index / DISPLAY_NUMBER_OF_COLUMNS;
+    byte Column = Index % DISPLAY_NUMBER_OF_COLUMNS;
+
+    if (Index < WS2812_NUMBER_OF_LEDS) {
+        if(Pixel.Red != 0 || Pixel.Green != 0 || Pixel.Blue != 0) {
+            Characters[Row][Column]->SetForegroundColour(wxColour(*wxBLACK));
+        } else {
+            Characters[Row][Column]->SetForegroundColour(wxColour(*wxLIGHT_GREY));
+        }
+        return E_OK;
+    } else {
+        return E_NOT_OK;
+    }
+}
+
+stdReturnType Wordclock_CbDialog::setPixel(byte Index, byte Red, byte Green, byte Blue)
+{
+    byte Row = Index / DISPLAY_NUMBER_OF_COLUMNS;
+    byte Column = Index % DISPLAY_NUMBER_OF_COLUMNS;
+
+    if (Index < WS2812_NUMBER_OF_LEDS) {
+        if(Red != 0 || Green != 0 || Blue != 0) {
+            Characters[Row][Column]->SetForegroundColour(wxColour(*wxBLACK));
+        } else {
+            Characters[Row][Column]->SetForegroundColour(wxColour(*wxLIGHT_GREY));
+        }
+        return E_OK;
+    } else {
+        return E_NOT_OK;
+    }
 }

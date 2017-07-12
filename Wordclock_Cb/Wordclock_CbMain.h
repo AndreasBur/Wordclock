@@ -20,8 +20,17 @@
 #include <wx/button.h>
 #include <wx/statline.h>
 
+#include "StandardTypes.h"
+
 #define DISPLAY_NUMBER_OF_ROWS                  10
 #define DISPLAY_NUMBER_OF_COLUMNS               11
+
+/* type which describes the structure of a pixel */
+typedef struct {
+    byte Red;
+    byte Green;
+    byte Blue;
+} WS2812PixelType;
 
 class Wordclock_CbDialog: public wxDialog
 {
@@ -29,17 +38,33 @@ class Wordclock_CbDialog: public wxDialog
         Wordclock_CbDialog(wxDialog *dlg, const wxString& title);
         ~Wordclock_CbDialog();
 
+        // get methods
+        //byte getBrightness() { return Brightness; }
+        stdReturnType getPixel(byte, WS2812PixelType*);
+        //stdReturnType getPixelDimmed(byte, WS2812PixelType*);
+
+        // set methods
+        //stdReturnType setBrightness(byte);
+        //stdReturnType setPin(byte);
+        stdReturnType setPixel(byte, WS2812PixelType);
+        stdReturnType setPixel(byte, byte, byte, byte);
+
+        // methods
+        //void init();
+        void clearAllPixels() {};
+        //stdReturnType clearPixel(byte Index) { return setPixel(Index, 0, 0, 0); }
+        void show() { Refresh(); }
+
     protected:
         enum
         {
             idBtnQuit = 1000,
             idBtnAbout
         };
-        wxStaticText* Characters[10][11];
-        wxStaticText* m_staticText1;
+
+        wxStaticText* Characters[DISPLAY_NUMBER_OF_ROWS][DISPLAY_NUMBER_OF_COLUMNS];
 
         wxButton* BtnAbout;
-        wxStaticLine* m_staticline1;
         wxButton* BtnQuit;
 
     private:

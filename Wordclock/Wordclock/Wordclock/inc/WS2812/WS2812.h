@@ -128,7 +128,7 @@ class WS2812
     // methods
     void init();
     void clearAllPixels() { memset(Pixels, 0, sizeof(Pixels)); }
-    stdReturnType clearPixel(byte Index);
+    stdReturnType clearPixel(byte Index) { return setPixel(Index, 0, 0, 0); }
 
 #if (WS2812_RESET_TIMER == STD_ON)
     stdReturnType show();

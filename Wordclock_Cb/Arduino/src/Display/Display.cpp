@@ -9,10 +9,10 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       Template.cpp
- *      \brief      
+ *      \brief
  *
- *      \details    
- *                  
+ *      \details
+ *
  *
 ******************************************************************************************************************************************************/
 #define _DISPLAY_SOURCE_
@@ -37,7 +37,7 @@
 /******************************************************************************************************************************************************
  *  LOCAL DATA TYPES AND STRUCTURES
 ******************************************************************************************************************************************************/
-const char Display::DisplayCharacters[][DISPLAY_NUMBER_OF_COLUMNS + 1] PROGMEM =
+const char Display::DisplayCharacters[][DISPLAY_NUMBER_OF_COLUMNS + 1] =
 {
     "ESKISTLFÜNF",
     "ZEHNZWANZIG",
@@ -52,7 +52,7 @@ const char Display::DisplayCharacters[][DISPLAY_NUMBER_OF_COLUMNS + 1] PROGMEM =
 };
 
 
-const DisplayWordIlluminationType Display::WordIlluminationTable[] PROGMEM =
+const DisplayWordIlluminationType Display::WordIlluminationTable[] =
 {
     {0,0,0},                                //  0 = DISPLAY_WORD_NONE           = ""
     {0,0,2},                                //  1 = DISPLAY_WORD_ES             = "ES"
@@ -96,10 +96,11 @@ const DisplayWordIlluminationType Display::WordIlluminationTable[] PROGMEM =
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-Display::Display(PixelType sColor) : Pixels(DISPLAY_DATA_PIN)
+Display::Display(PixelType sColor) : Pixels(0L, _("wxWidgets Application Template")) //: Pixels(DISPLAY_DATA_PIN)
 {
     Color = sColor;
 	State = DISPLAY_STATE_UNINIT;
+	Pixels.Show();
 } /* Template */
 
 
@@ -111,11 +112,12 @@ Display::Display(PixelType sColor) : Pixels(DISPLAY_DATA_PIN)
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-Display::Display(byte Red, byte Green, byte Blue) : Pixels(DISPLAY_DATA_PIN)
+Display::Display(byte Red, byte Green, byte Blue) : Pixels(0L, _("wxWidgets Application Template"))
 {
     Color.Red = Red;
 	Color.Green = Green;
 	Color.Blue = Blue;
+	Pixels.Show();
 } /* Template */
 
 
@@ -131,9 +133,9 @@ Display::~Display()
 /******************************************************************************************************************************************************
   init()
 ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
+/*! \brief
+ *  \details
+ *
  *  \return         -
 ******************************************************************************************************************************************************/
 void Display::init()
@@ -146,15 +148,15 @@ void Display::init()
 /******************************************************************************************************************************************************
   getCharacter()
 ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
+/*! \brief
+ *  \details
+ *
  *  \return         -
 ******************************************************************************************************************************************************/
 stdReturnType Display::getCharacter(DisplayCharactersType Character, boolean* Value)
 {
     PixelType Pixel;
-    
+
     if(Character < DISPLAY_CHARACTER_NUMBER_OF_CHARACTERS) {
         Pixels.getPixel(Character, &Pixel);
         /* Pixel is only off when all colors are zero */
@@ -163,22 +165,22 @@ stdReturnType Display::getCharacter(DisplayCharactersType Character, boolean* Va
         return E_OK;
     } else {
         return E_NOT_OK;
-    }   
+    }
 } /* getCharacter */
 
 
 /******************************************************************************************************************************************************
   getCharacter()
 ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
+/*! \brief
+ *  \details
+ *
  *  \return         -
 ******************************************************************************************************************************************************/
 stdReturnType Display::getCharacter(byte Row, byte Column, char* Character)
 {
     if(Row < DISPLAY_NUMBER_OF_ROWS && Column < DISPLAY_NUMBER_OF_COLUMNS) {
-        *Character =  pgm_read_byte_near(&DisplayCharacters[Row][Column]);
+        *Character =  DisplayCharacters[Row][Column];
         return E_OK;
     } else {
         return E_NOT_OK;
@@ -189,9 +191,9 @@ stdReturnType Display::getCharacter(byte Row, byte Column, char* Character)
 /******************************************************************************************************************************************************
   getCharacter()
   ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
+/*! \brief
+ *  \details
+ *
  *  \return         -
 ******************************************************************************************************************************************************/
 stdReturnType Display::getCharacter(byte Index, char* Character)
@@ -200,7 +202,7 @@ stdReturnType Display::getCharacter(byte Index, char* Character)
     byte Column = Index % DISPLAY_NUMBER_OF_COLUMNS;
 
     if(Index < DISPLAY_NUMBER_OF_LEDS) {
-        *Character =  pgm_read_byte_near(&DisplayCharacters[Row][Column]);
+        *Character =  DisplayCharacters[Row][Column];
         return E_OK;
     } else {
         return E_NOT_OK;
@@ -211,9 +213,9 @@ stdReturnType Display::getCharacter(byte Index, char* Character)
 /******************************************************************************************************************************************************
   setWord()
 ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
+/*! \brief
+ *  \details
+ *
  *  \return         -
 ******************************************************************************************************************************************************/
 stdReturnType Display::setWord(DisplayWordsType Word)
@@ -221,9 +223,9 @@ stdReturnType Display::setWord(DisplayWordsType Word)
     stdReturnType ReturnValue = E_OK;
 
     if(Word < DISPLAY_WORD_NUMBER_OF_WORDS) {
-        byte Row = (byte) pgm_read_byte(&WordIlluminationTable[Word].Row);
-        byte Column = (byte) pgm_read_byte(&WordIlluminationTable[Word].Column);
-        byte Length = (byte) pgm_read_byte(&WordIlluminationTable[Word].Length);
+        byte Row = WordIlluminationTable[Word].Row;
+        byte Column = WordIlluminationTable[Word].Column;
+        byte Length = WordIlluminationTable[Word].Length;
 
         for(byte Index = 0; Index < Length; Index++) if(setPixel(Row, Column + Index) == E_NOT_OK) ReturnValue = E_NOT_OK;
     } else {
@@ -236,9 +238,9 @@ stdReturnType Display::setWord(DisplayWordsType Word)
 /******************************************************************************************************************************************************
   clearWord()
 ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
+/*! \brief
+ *  \details
+ *
  *  \return         -
 ******************************************************************************************************************************************************/
 stdReturnType Display::clearWord(DisplayWordsType Word)
@@ -246,9 +248,9 @@ stdReturnType Display::clearWord(DisplayWordsType Word)
     stdReturnType ReturnValue = E_OK;
 
     if(Word < DISPLAY_WORD_NUMBER_OF_WORDS) {
-        byte Row = (byte) pgm_read_byte(&WordIlluminationTable[Word].Row);
-        byte Column = (byte) pgm_read_byte(&WordIlluminationTable[Word].Column);
-        byte Length = (byte) pgm_read_byte(&WordIlluminationTable[Word].Length);
+        byte Row = WordIlluminationTable[Word].Row;
+        byte Column = WordIlluminationTable[Word].Column;
+        byte Length = WordIlluminationTable[Word].Length;
 
         for(byte Index = 0; Index < Length; Index++) if(clearPixel(Row, Column + Index) == E_NOT_OK) ReturnValue = E_NOT_OK;
     } else {
@@ -261,9 +263,9 @@ stdReturnType Display::clearWord(DisplayWordsType Word)
 /******************************************************************************************************************************************************
   clearAllWords()
 ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
+/*! \brief
+ *  \details
+ *
  *  \return         -
 ******************************************************************************************************************************************************/
 stdReturnType Display::clearAllWords()
@@ -278,9 +280,9 @@ stdReturnType Display::clearAllWords()
 /******************************************************************************************************************************************************
   setPixel()
 ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
+/*! \brief
+ *  \details
+ *
  *  \return         -
 ******************************************************************************************************************************************************/
 stdReturnType Display::setPixel(byte Index)
@@ -295,9 +297,9 @@ stdReturnType Display::setPixel(byte Index)
 /******************************************************************************************************************************************************
   setPixel()
 ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
+/*! \brief
+ *  \details
+ *
  *  \return         -
 ******************************************************************************************************************************************************/
 stdReturnType Display::setPixel(byte Row, byte Column)
@@ -319,9 +321,9 @@ stdReturnType Display::setPixel(byte Row, byte Column)
 /******************************************************************************************************************************************************
   clearPixel()
 ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
+/*! \brief
+ *  \details
+ *
  *  \return         -
 ******************************************************************************************************************************************************/
 stdReturnType Display::clearPixel(byte Row, byte Column)
@@ -343,9 +345,9 @@ stdReturnType Display::clearPixel(byte Row, byte Column)
 /******************************************************************************************************************************************************
   clearPixel()
 ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
+/*! \brief
+ *  \details
+ *
  *  \return         -
 ******************************************************************************************************************************************************/
 stdReturnType Display::clearPixel(byte Index)
@@ -365,9 +367,9 @@ stdReturnType Display::clearPixel(byte Index)
 /******************************************************************************************************************************************************
   transformToSerpentine()
 ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
+/*! \brief
+ *  \details
+ *
  *  \return         -
 ******************************************************************************************************************************************************/
 byte Display::transformToSerpentine(byte Row, byte Column)
@@ -376,7 +378,7 @@ byte Display::transformToSerpentine(byte Row, byte Column)
 
     if(isBitCleared(Row, 0)) Index = (Row * DISPLAY_NUMBER_OF_COLUMNS) + Column;
     else Index = (Row * DISPLAY_NUMBER_OF_COLUMNS) + (DISPLAY_NUMBER_OF_COLUMNS - Column - 1);
-    
+
     return Index;
 } /* transformToSerpentine */
 
@@ -384,4 +386,3 @@ byte Display::transformToSerpentine(byte Row, byte Column)
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E
 ******************************************************************************************************************************************************/
- 
