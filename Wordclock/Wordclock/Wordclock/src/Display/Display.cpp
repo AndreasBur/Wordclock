@@ -153,17 +153,19 @@ void Display::init()
 ******************************************************************************************************************************************************/
 stdReturnType Display::getCharacter(DisplayCharactersType Character, boolean* Value)
 {
+	stdReturnType ReturnValue = E_NOT_OK;
     PixelType Pixel;
     
     if(Character < DISPLAY_CHARACTER_NUMBER_OF_CHARACTERS) {
-        Pixels.getPixel(Character, &Pixel);
+		ReturnValue = E_OK;
+        if(Pixels.getPixel(Character, &Pixel) == E_NOT_OK) ReturnValue = E_NOT_OK;
         /* Pixel is only off when all colors are zero */
         if(Pixel.Red == 0 && Pixel.Green == 0 && Pixel.Blue == 0) *Value = true;
         else *Value = false;
-        return E_OK;
     } else {
-        return E_NOT_OK;
-    }   
+        ReturnValue = E_NOT_OK;
+    }
+	return ReturnValue;
 } /* getCharacter */
 
 
@@ -218,9 +220,10 @@ stdReturnType Display::getCharacter(byte Index, char* Character)
 ******************************************************************************************************************************************************/
 stdReturnType Display::setWord(DisplayWordsType Word)
 {
-    stdReturnType ReturnValue = E_OK;
+    stdReturnType ReturnValue = E_NOT_OK;
 
     if(Word < DISPLAY_WORD_NUMBER_OF_WORDS) {
+		ReturnValue = E_OK;
         byte Row = (byte) pgm_read_byte(&WordIlluminationTable[Word].Row);
         byte Column = (byte) pgm_read_byte(&WordIlluminationTable[Word].Column);
         byte Length = (byte) pgm_read_byte(&WordIlluminationTable[Word].Length);
@@ -243,9 +246,10 @@ stdReturnType Display::setWord(DisplayWordsType Word)
 ******************************************************************************************************************************************************/
 stdReturnType Display::clearWord(DisplayWordsType Word)
 {
-    stdReturnType ReturnValue = E_OK;
+    stdReturnType ReturnValue = E_NOT_OK;
 
     if(Word < DISPLAY_WORD_NUMBER_OF_WORDS) {
+		ReturnValue = E_OK;
         byte Row = (byte) pgm_read_byte(&WordIlluminationTable[Word].Row);
         byte Column = (byte) pgm_read_byte(&WordIlluminationTable[Word].Column);
         byte Length = (byte) pgm_read_byte(&WordIlluminationTable[Word].Length);
@@ -305,9 +309,9 @@ stdReturnType Display::setPixel(byte Column, byte Row)
     if(Row < DISPLAY_NUMBER_OF_ROWS && Column < DISPLAY_NUMBER_OF_COLUMNS) {
 #if (DISPLAY_LED_STRIPE_SERPENTINE == STD_ON)
         /* if led stripe is snake or serpentine the odd row: count from right to left */
-        Pixels.setPixel(transformToSerpentine(Column,  Row), Color);
+        return Pixels.setPixel(transformToSerpentine(Column,  Row), Color);
 #else
-        Pixels.setPixel((Row * DISPLAY_NUMBER_OF_COLUMNS) + Column, Color);
+        return Pixels.setPixel((Row * DISPLAY_NUMBER_OF_COLUMNS) + Column, Color);
 #endif
         return E_OK;
     } else {
@@ -329,9 +333,9 @@ stdReturnType Display::clearPixel(byte Column, byte Row)
     if(Row < DISPLAY_NUMBER_OF_ROWS && Column < DISPLAY_NUMBER_OF_COLUMNS) {
 #if (DISPLAY_LED_STRIPE_SERPENTINE == STD_ON)
         /* if led stripe is snake or serpentine then odd row: count from right to left */
-        Pixels.setPixel(transformToSerpentine(Column,  Row), 0, 0, 0);
+        return Pixels.setPixel(transformToSerpentine(Column,  Row), 0, 0, 0);
 #else
-        Pixels.setPixel((Row * DISPLAY_NUMBER_OF_COLUMNS) + Column, 0, 0, 0);
+        return Pixels.setPixel((Row * DISPLAY_NUMBER_OF_COLUMNS) + Column, 0, 0, 0);
 #endif
         return E_OK;
     } else {

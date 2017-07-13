@@ -89,8 +89,8 @@ class WS2812
 {
   private:
     byte PinMask;
-    volatile byte* PortOutputRegister;
-    volatile byte* PortModeRegister;
+    const volatile byte* PortOutputRegister;
+    //volatile byte* PortModeRegister; /* wird im Original DDR enabled, wirklich  notwendig? */
     byte Pixels[WS2812_NUMBER_OF_LEDS * WS2812_NUMBER_OF_COLORS];
     byte Brightness;
 
@@ -104,7 +104,7 @@ class WS2812
     byte OffsetBlue;
 #endif
     // functions
-    void sendData(byte*, uint16_t);
+    void sendData(const byte*, uint16_t);
     void dimmPixels(byte*, uint16_t);
     void dimmPixel(WS2812PixelType*, WS2812PixelType);
     void dimmPixel(WS2812PixelType*, byte, byte, byte);

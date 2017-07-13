@@ -183,7 +183,7 @@ stdReturnType WS2812::setPin(byte Pin)
     if(Pin < NUM_DIGITAL_PINS) {
         PinMask = digitalPinToBitMask(Pin);
         PortOutputRegister = portOutputRegister(digitalPinToPort(Pin));
-        PortModeRegister = portModeRegister(digitalPinToPort(Pin));
+        //PortModeRegister = portModeRegister(digitalPinToPort(Pin));
         pinMode(Pin, OUTPUT);
         return E_OK;
     } else {
@@ -214,7 +214,7 @@ stdReturnType WS2812::getPixel(byte Index, WS2812PixelType* Pixel)
 
 
 /******************************************************************************************************************************************************
-  getPixel()
+  getPixelDimmed()
 ******************************************************************************************************************************************************/
 /*! \brief          
  *  \details        
@@ -235,7 +235,7 @@ stdReturnType WS2812::getPixelDimmed(byte Index, WS2812PixelType* Pixel)
     } else {
         return E_NOT_OK;
     }
-} /* getPixel */
+} /* getPixelDimmed */
 
 
 /******************************************************************************************************************************************************
@@ -299,7 +299,7 @@ stdReturnType WS2812::setBrightness(byte sBrightness)
 } /* init */
 
 
-#if (WS2812_RGB_ORDER_ON_RUNTIME == STD_ON)
+
 /******************************************************************************************************************************************************
   setColorOrder()
 ******************************************************************************************************************************************************/
@@ -308,6 +308,7 @@ stdReturnType WS2812::setBrightness(byte sBrightness)
  *                  
  *  \return         -
  *****************************************************************************************************************************************************/
+#if (WS2812_RGB_ORDER_ON_RUNTIME == STD_ON)
 void WS2812::setColorOrder(WS2812ColorOrderType ColorOrder)
 {
     if(ColorOrder == WS2812_COLOR_ORDER_BRG) {
@@ -392,7 +393,7 @@ inline void WS2812::dimmPixels(byte* PixelsDimmed, uint16_t DataLength)
  *                  
  *  \return         -
  *****************************************************************************************************************************************************/
-void  WS2812::sendData(byte* Data, uint16_t DataLength)
+void  WS2812::sendData(const byte* Data, uint16_t DataLength)
 {
     uint8_t BitCounter;
     uint8_t PortMaskLow;

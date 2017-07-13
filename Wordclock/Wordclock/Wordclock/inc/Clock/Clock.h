@@ -31,17 +31,20 @@
 /* Clock configuration parameter */
 #define CLOCK_SHOW_IT_IS_PERMANENTLY            STD_ON
 
+/* Clock  parameter */
+/* Hour */
 #define CLOCK_NUMBER_OF_HOUR_MODES              2
 #define CLOCK_NUMBER_OF_HOURS                   12
 #define CLOCK_MAX_NUMBER_OF_HOUR_WORDS          2
 
+#define CLOCK_NUMBER_OF_HOURS_PER_DAY			24
+#define CLOCK_NUMBER_OF_MINUTES_PER_HOUR		60
+
+/* Minute */
 #define CLOCK_MINUTE_STEP_IN_MINUTES            5
 #define CLOCK_NUMBER_OF_MINUTE_STEPS            12
-
-/* evtl. ändern */
 #define CLOCK_MAX_NUMBER_OF_MINUTE_WORDS        3
  
-
 /******************************************************************************************************************************************************
  *  GLOBAL FUNCTION MACROS
 ******************************************************************************************************************************************************/

@@ -39,7 +39,7 @@
 ******************************************************************************************************************************************************/
 const DisplayWordsType Clock::ClockHoursTable[][CLOCK_NUMBER_OF_HOURS][CLOCK_MAX_NUMBER_OF_HOUR_WORDS] PROGMEM =
 {
-    {                                                                   // ClockHoursTable[CLOCK_HOUR_MODE_FULL_HOUR][] = hh:00 
+    {                                                                   // ClockHoursTable[0][] = hh:00 CLOCK_HOUR_MODE_FULL_HOUR
         {DISPLAY_WORD_HOUR_ZWOELF, DISPLAY_WORD_UHR },                  // 00:00
         {DISPLAY_WORD_HOUR_EIN,    DISPLAY_WORD_UHR },                  // 01:00
         {DISPLAY_WORD_HOUR_ZWEI,   DISPLAY_WORD_UHR },                  // 02:00
@@ -53,7 +53,7 @@ const DisplayWordsType Clock::ClockHoursTable[][CLOCK_NUMBER_OF_HOURS][CLOCK_MAX
         {DISPLAY_WORD_HOUR_ZEHN,   DISPLAY_WORD_UHR },                  // 10:00
         {DISPLAY_WORD_HOUR_ELF,    DISPLAY_WORD_UHR }                   // 11:00
     },
-    {                                                                   // ClockHoursTable[CLOCK_HOUR_MODE_NO_FULL_HOUR][] = hh:mm 
+    {                                                                   // ClockHoursTable[1][] = hh:mm CLOCK_HOUR_MODE_NO_FULL_HOUR
         {DISPLAY_WORD_HOUR_ZWOELF, DISPLAY_WORD_NONE },                 // 00:mm
         {DISPLAY_WORD_HOUR_EINS,   DISPLAY_WORD_NONE },                 // 01:mm
         {DISPLAY_WORD_HOUR_ZWEI,   DISPLAY_WORD_NONE },                 // 02:mm
@@ -175,26 +175,26 @@ Clock::~Clock()
 stdReturnType Clock::show(byte Hour, byte Minute)
 {
     /* ----- Local Variables ---------------------------------------------- */
-    //DisplayWordWordsType Words[WORD_NUMBER_OF_WORDS];
-    //const ClockMinutesType* pMinutesTableEntry = (ClockMinutesType*) pgm_read_word(&ClockMinutesTable[ClockMode][Minute / 5]);
+	stdReturnType ReturnValue = E_NOT_OK;
     ClockMinutesType MinutesTableEntry;
     DisplayWordsType HoursTableEntry[CLOCK_MAX_NUMBER_OF_HOUR_WORDS];
 
-    //const DisplayWordWordsType HoursTableEntry;
-
-
     /* ----- Implementation ----------------------------------------------- */
-    if(Hour < 24 && Minute < 60) {
-        /*  */
-        if (CLOCK_SHOW_IT_IS_PERMANENTLY == STD_ON || Minute <= 4 || (Minute >= 30 && Minute <= 34)) {
-            pDisplay->setWord(DISPLAY_WORD_ES);
-            pDisplay->setWord(DISPLAY_WORD_IST);
+    if(Hour < CLOCK_NUMBER_OF_HOURS_PER_DAY && Minute < CLOCK_NUMBER_OF_MINUTES_PER_HOUR) {
+		ReturnValue = E_OK;
+        /* show IT IS permanently or only to full and half hour */
+        if (CLOCK_SHOW_IT_IS_PERMANENTLY == STD_ON	||
+			Minute < CLOCK_MINUTE_STEP_IN_MINUTES	||
+			(Minute >= (CLOCK_NUMBER_OF_MINUTES_PER_HOUR/2) && Minute < (CLOCK_NUMBER_OF_MINUTES_PER_HOUR/2) + CLOCK_MINUTE_STEP_IN_MINUTES)) 
+		{
+            if(pDisplay->setWord(DISPLAY_WORD_ES) == E_NOT_OK) ReturnValue = E_NOT_OK;
+            if(pDisplay->setWord(DISPLAY_WORD_IST) == E_NOT_OK) ReturnValue = E_NOT_OK;
         }
 
 		memcpy_P(&MinutesTableEntry, &ClockMinutesTable[Mode][Minute / CLOCK_MINUTE_STEP_IN_MINUTES], sizeof(ClockMinutesType));
 
         for(byte Index = 0; Index < CLOCK_MAX_NUMBER_OF_MINUTE_WORDS && MinutesTableEntry.Words[Index] != DISPLAY_WORD_NONE; Index++) {
-            pDisplay->setWord(MinutesTableEntry.Words[Index]);
+            if(pDisplay->setWord(MinutesTableEntry.Words[Index]) == E_NOT_OK) ReturnValue = E_NOT_OK;
         }
         
         if(Hour >= CLOCK_NUMBER_OF_HOURS) Hour -= CLOCK_NUMBER_OF_HOURS;
@@ -204,13 +204,12 @@ stdReturnType Clock::show(byte Hour, byte Minute)
 		memcpy_P(&HoursTableEntry, &ClockHoursTable[MinutesTableEntry.HourMode][Hour], sizeof(DisplayWordsType) * CLOCK_MAX_NUMBER_OF_HOUR_WORDS);
 
         for(byte Index = 0; Index < CLOCK_MAX_NUMBER_OF_HOUR_WORDS && HoursTableEntry[Index] != DISPLAY_WORD_NONE; Index++) {
-            pDisplay->setWord(HoursTableEntry[Index]);
-        }
-
-        return E_OK;
+            if(pDisplay->setWord(HoursTableEntry[Index]) == E_NOT_OK) ReturnValue = E_NOT_OK;
+        }        
     } else {
-        return E_NOT_OK;
+        ReturnValue = E_NOT_OK;
     }
+	return ReturnValue;
 } /* show */
 
 

@@ -40,7 +40,8 @@ bool Wordclock_CbApp::OnInit()
     Animation* WcAnimation = new Animation(WcDisplay);
 
 
-    WcAnimation->setChar(0, 0, 'A', ANIMATION_FONT_4X6);
+    WcAnimation->setChar(0, 0, 219, ANIMATION_FONT_6X8);
+    //WcAnimation->setChar(0, 0, '2', ANIMATION_FONT_6X10);
 
     WcDisplay->show();
 

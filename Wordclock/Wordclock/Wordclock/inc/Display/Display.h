@@ -53,13 +53,6 @@
 /******************************************************************************************************************************************************
  *  GLOBAL DATA TYPES AND STRUCTURES
 ******************************************************************************************************************************************************/
-/* type which describes the  */
-typedef struct {
-    byte Row;
-    byte Column;
-    byte Length;
-} DisplayWordIlluminationType;
-
 /* type which describes the internal state of the Display */
 typedef enum {
 	DISPLAY_STATE_NONE,
@@ -67,6 +60,13 @@ typedef enum {
 	DISPLAY_STATE_INIT,
 	DISPLAY_STATE_READY
 } DisplayStateType;
+
+/* type which describes the  */
+typedef struct {
+	byte Row;
+	byte Column;
+	byte Length;
+} DisplayWordIlluminationType;
 
 /* mapping to underlying hardware */
 typedef WS2812PixelType PixelType;
@@ -106,7 +106,7 @@ class Display
     // char methods
     stdReturnType setCharacter(DisplayCharactersType Character) { return Pixels.setPixel(Character, Color); }
     stdReturnType clearCharacter(DisplayCharactersType Character) { return Pixels.setPixel(Character, 0, 0, 0); }
-    stdReturnType getCharacter(DisplayCharactersType Character, boolean* Value);
+    stdReturnType getCharacter(DisplayCharactersType, boolean*);
     stdReturnType getCharacter(byte, byte, char*);
     stdReturnType getCharacter(byte, char*);
 
