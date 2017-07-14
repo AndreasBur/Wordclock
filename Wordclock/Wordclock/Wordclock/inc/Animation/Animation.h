@@ -128,7 +128,7 @@ class Animation
 	stdReturnType convertCharToFontIndex(char, byte*);
 
   public:
-	Animation();
+	Animation(Display*);
 	~Animation();
 
 	// get methods
