@@ -140,7 +140,7 @@ stdReturnType Animation::setChar(byte Column, byte Row, char Char, AnimationFont
 			byte Font_6x8_EntryItem = Font_6x8[FontIndex][FontColumn];
 	        for(byte FontRow = 0; FontRow < ANIMATION_FONT_6X8_HEIGHT; FontRow++)
 	        {
-		        ColumnAbs = Column + FontColumn + 20;
+		        ColumnAbs = Column + FontColumn;
 		        RowAbs = Row + ANIMATION_FONT_6X8_HEIGHT - 1 - FontRow;
                 if(pDisplay->writePixel(ColumnAbs, RowAbs, bitRead(Font_6x8_EntryItem, FontRow)) == E_NOT_OK) ReturnValue = E_NOT_OK;
 	        }
