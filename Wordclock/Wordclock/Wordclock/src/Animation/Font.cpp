@@ -37,9 +37,9 @@
 /******************************************************************************************************************************************************
  *  LOCAL DATA TYPES AND STRUCTURES
 ******************************************************************************************************************************************************/
-/* font 4x6 */
+/* font 4x6 vertical MSB 1 */
 #if(ANIMATION_SUPPORT_FONT_4X6 == STD_ON)
-const char Animation::Font_4x6[][6] PROGMEM =
+const char Animation::Font_4x6[][ANIMATION_FONT_4X6_WIDTH] PROGMEM =
 {
 	{0x00,0x00,0x00,0x00,0x00,0x00},	// 0x00
 	{0x40,0xA0,0xE0,0xA0,0x40,0x00},	// 0x01
@@ -300,9 +300,9 @@ const char Animation::Font_4x6[][6] PROGMEM =
 };
 #endif
 
-/* font 5x8 */
+/* font 5x8 vertical MSB 1 */
 #if(ANIMATION_SUPPORT_FONT_5X8 == STD_ON)
-const char Animation::Font_5x8[][8] PROGMEM =
+const char Animation::Font_5x8[][ANIMATION_FONT_5X8_WIDTH] PROGMEM =
 {
 	{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00},	// 0x00
 	{0x70,0x88,0xD8,0x88,0xF8,0x70,0x00,0x00},	// 0x01
@@ -563,9 +563,9 @@ const char Animation::Font_5x8[][8] PROGMEM =
 };
 #endif
 
-/* font 6x8 */
+/* font 6x8 vertical MSB 1 */
 #if(ANIMATION_SUPPORT_FONT_6X8 == STD_ON)
-const char Animation::Font_6x8[][8] PROGMEM =
+const char Animation::Font_6x8[][ANIMATION_FONT_6X8_WIDTH] PROGMEM =
 {
 	{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00},	// 0x00
 	{0x70,0x88,0xD8,0x88,0xA8,0x88,0x70,0x00},	// 0x01
@@ -827,9 +827,9 @@ const char Animation::Font_6x8[][8] PROGMEM =
 #endif
 
 
-/* font 6x10 */
+/* font 6x10 LSB 2 horizontal */
 #if(ANIMATION_SUPPORT_FONT_6X10 == STD_ON)
-const char Animation::Font_6x10[][10] PROGMEM =
+const char Animation::Font_6x10[][ANIMATION_FONT_6X10_HEIGHT] PROGMEM =
 {
 	{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00},	// 0x00
 	{0x00,0x00,0x00,0x78,0x8C,0xB4,0xFC,0x78,0x00,0x00},	// 0x01
@@ -1090,9 +1090,9 @@ const char Animation::Font_6x10[][10] PROGMEM =
 };
 #endif
 
-/* font 6x8 */
+/* font 6x8 vertical MSB 1 */
 #if(ANIMATION_SUPPORT_FONT_8X8 == STD_ON)
-const char Animation::Font_8x8[][8] PROGMEM =
+const char Animation::Font_8x8[][ANIMATION_FONT_8X8_WIDTH] PROGMEM =
 {
 	{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00},	// 0x00
 	{0x7E,0x81,0xA5,0x81,0xBD,0x99,0x81,0x7E},	// 0x01

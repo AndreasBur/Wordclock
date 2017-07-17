@@ -109,19 +109,19 @@ class Animation
 	AnimationType CurrentAnimation;
 
 #if(ANIMATION_SUPPORT_FONT_4X6 == STD_ON)
-	static const char Font_4x6[][6];
+	static const char Font_4x6[][ANIMATION_FONT_4X6_WIDTH];
 #endif
 #if(ANIMATION_SUPPORT_FONT_5X8 == STD_ON)
-	static const char Font_5x8[][8];
+	static const char Font_5x8[][ANIMATION_FONT_5X8_WIDTH];
 #endif
 #if(ANIMATION_SUPPORT_FONT_6X8 == STD_ON)
-	static const char Font_6x8[][8];
+	static const char Font_6x8[][ANIMATION_FONT_6X8_WIDTH];
 #endif
 #if(ANIMATION_SUPPORT_FONT_6X10 == STD_ON)
-	static const char Font_6x10[][10];
+	static const char Font_6x10[][ANIMATION_FONT_6X10_HEIGHT];
 #endif
 #if(ANIMATION_SUPPORT_FONT_8X8 == STD_ON)
-	static const char Font_8x8[][8];
+	static const char Font_8x8[][ANIMATION_FONT_8X8_WIDTH];
 #endif
 
 	// functions
