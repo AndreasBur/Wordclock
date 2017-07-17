@@ -32,11 +32,11 @@ class WordclockDialog : public wxDialog
     protected:
 
     private:
-        wxTimer Timer;
         Display WcDisplay;
         Clock WcClock;
         Animation WcAnimation;
         wxDateTime Time;
+        wxTimer Timer;
         enum {
             TIMER_ID = 1500
         };

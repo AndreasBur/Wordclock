@@ -37,7 +37,7 @@
 /******************************************************************************************************************************************************
  *  LOCAL DATA TYPES AND STRUCTURES
 ******************************************************************************************************************************************************/
-const char Display::DisplayCharacters[][DISPLAY_NUMBER_OF_COLUMNS + 1] =
+const char Display::DisplayCharacters[][DISPLAY_NUMBER_OF_COLUMNS + 1] PROGMEM =
 {
     "ESKISTLFÜNF",
     "ZEHNZWANZIG",
@@ -52,7 +52,7 @@ const char Display::DisplayCharacters[][DISPLAY_NUMBER_OF_COLUMNS + 1] =
 };
 
 
-const DisplayWordIlluminationType Display::WordIlluminationTable[] =
+const DisplayWordIlluminationType Display::WordIlluminationTable[] PROGMEM =
 {
     {0,0,0},                                //  0 = DISPLAY_WORD_NONE           = ""
     {0,0,2},                                //  1 = DISPLAY_WORD_ES             = "ES"
@@ -89,36 +89,52 @@ const DisplayWordIlluminationType Display::WordIlluminationTable[] =
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  CONSTRUCTOR OF TEMPLATE
+  CONSTRUCTOR OF Display
 ******************************************************************************************************************************************************/
-/*! \brief          Template Constructor
- *  \details        Instantiation of the Template library
+/*! \brief          Display Constructor
+ *  \details        Instantiation of the Display library
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-Display::Display(PixelType sColor) : Pixels(0L, _("wxWidgets Application Template")) //: Pixels(DISPLAY_DATA_PIN)
+Display::Display(PixelType sColor)
+#ifdef SIMULATOR
+	: Pixels(0L, _("Wordclock Simulator"))
+#else
+	: Pixels(DISPLAY_DATA_PIN)
+#endif
 {
     Color = sColor;
 	State = DISPLAY_STATE_UNINIT;
+
+#ifdef SIMULATOR
 	Pixels.Show();
-} /* Template */
+#endif
+} /* Display */
 
 
 /******************************************************************************************************************************************************
-  CONSTRUCTOR OF TEMPLATE
+  CONSTRUCTOR OF Display
 ******************************************************************************************************************************************************/
-/*! \brief          Template Constructor
- *  \details        Instantiation of the Template library
+/*! \brief          Display Constructor
+ *  \details        Instantiation of the Display library
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-Display::Display(byte Red, byte Green, byte Blue) : Pixels(0L, _("Wordclock Simulator"))
+Display::Display(byte Red, byte Green, byte Blue)
+#ifdef SIMULATOR
+: Pixels(0L, _("Wordclock Simulator"))
+#else
+: Pixels(DISPLAY_DATA_PIN)
+#endif
 {
     Color.Red = Red;
 	Color.Green = Green;
 	Color.Blue = Blue;
-	Pixels.Show();
-} /* Template */
+
+#ifdef SIMULATOR
+Pixels.Show();
+#endif
+} /* Display */
 
 
 /******************************************************************************************************************************************************
@@ -155,17 +171,19 @@ void Display::init()
 ******************************************************************************************************************************************************/
 stdReturnType Display::getCharacter(DisplayCharactersType Character, boolean* Value)
 {
+	stdReturnType ReturnValue = E_NOT_OK;
     PixelType Pixel;
 
     if(Character < DISPLAY_CHARACTER_NUMBER_OF_CHARACTERS) {
-        Pixels.getPixel(Character, &Pixel);
+		ReturnValue = E_OK;
+        if(Pixels.getPixel(Character, &Pixel) == E_NOT_OK) ReturnValue = E_NOT_OK;
         /* Pixel is only off when all colors are zero */
         if(Pixel.Red == 0 && Pixel.Green == 0 && Pixel.Blue == 0) *Value = true;
         else *Value = false;
-        return E_OK;
     } else {
-        return E_NOT_OK;
+        ReturnValue = E_NOT_OK;
     }
+	return ReturnValue;
 } /* getCharacter */
 
 
@@ -180,7 +198,7 @@ stdReturnType Display::getCharacter(DisplayCharactersType Character, boolean* Va
 stdReturnType Display::getCharacter(byte Column, byte Row, char* Character)
 {
     if(Row < DISPLAY_NUMBER_OF_ROWS && Column < DISPLAY_NUMBER_OF_COLUMNS) {
-        *Character =  DisplayCharacters[Row][Column];
+        *Character =  pgm_read_byte(&DisplayCharacters[Row][Column]);
         return E_OK;
     } else {
         return E_NOT_OK;
@@ -202,7 +220,7 @@ stdReturnType Display::getCharacter(byte Index, char* Character)
     byte Column = Index % DISPLAY_NUMBER_OF_COLUMNS;
 
     if(Index < DISPLAY_NUMBER_OF_LEDS) {
-        *Character =  DisplayCharacters[Row][Column];
+        *Character =  pgm_read_byte(&DisplayCharacters[Row][Column]);
         return E_OK;
     } else {
         return E_NOT_OK;
@@ -220,14 +238,15 @@ stdReturnType Display::getCharacter(byte Index, char* Character)
 ******************************************************************************************************************************************************/
 stdReturnType Display::setWord(DisplayWordsType Word)
 {
-    stdReturnType ReturnValue = E_OK;
+    stdReturnType ReturnValue = E_NOT_OK;
 
     if(Word < DISPLAY_WORD_NUMBER_OF_WORDS) {
-        byte Row = WordIlluminationTable[Word].Row;
-        byte Column = WordIlluminationTable[Word].Column;
-        byte Length = WordIlluminationTable[Word].Length;
+		ReturnValue = E_OK;
+        byte Row = (byte) pgm_read_byte(&WordIlluminationTable[Word].Row);
+        byte Column = (byte) pgm_read_byte(&WordIlluminationTable[Word].Column);
+        byte Length = (byte) pgm_read_byte(&WordIlluminationTable[Word].Length);
 
-        for(byte Index = 0; Index < Length; Index++) if(setPixel(Column + Index, Row) == E_NOT_OK) ReturnValue = E_NOT_OK;
+        for(byte Index = 0; Index < Length; Index++) if(setPixel(Column + Index,  Row) == E_NOT_OK) ReturnValue = E_NOT_OK;
     } else {
         ReturnValue = E_NOT_OK;
     }
@@ -245,14 +264,15 @@ stdReturnType Display::setWord(DisplayWordsType Word)
 ******************************************************************************************************************************************************/
 stdReturnType Display::clearWord(DisplayWordsType Word)
 {
-    stdReturnType ReturnValue = E_OK;
+    stdReturnType ReturnValue = E_NOT_OK;
 
     if(Word < DISPLAY_WORD_NUMBER_OF_WORDS) {
-        byte Row = WordIlluminationTable[Word].Row;
-        byte Column = WordIlluminationTable[Word].Column;
-        byte Length = WordIlluminationTable[Word].Length;
+		ReturnValue = E_OK;
+        byte Row = (byte) pgm_read_byte(&WordIlluminationTable[Word].Row);
+        byte Column = (byte) pgm_read_byte(&WordIlluminationTable[Word].Column);
+        byte Length = (byte) pgm_read_byte(&WordIlluminationTable[Word].Length);
 
-        for(byte Index = 0; Index < Length; Index++) if(clearPixel(Column + Index, Row) == E_NOT_OK) ReturnValue = E_NOT_OK;
+        for(byte Index = 0; Index < Length; Index++) if(clearPixel(Column + Index,  Row) == E_NOT_OK) ReturnValue = E_NOT_OK;
     } else {
         ReturnValue = E_NOT_OK;
     }
@@ -290,7 +310,7 @@ stdReturnType Display::setPixel(byte Index)
     byte Row = Index / DISPLAY_NUMBER_OF_COLUMNS;
     byte Column = Index % DISPLAY_NUMBER_OF_COLUMNS;
 
-    return setPixel(Column, Row);
+    return setPixel(Column,  Row);
 } /* setPixel */
 
 
@@ -307,9 +327,9 @@ stdReturnType Display::setPixel(byte Column, byte Row)
     if(Row < DISPLAY_NUMBER_OF_ROWS && Column < DISPLAY_NUMBER_OF_COLUMNS) {
 #if (DISPLAY_LED_STRIPE_SERPENTINE == STD_ON)
         /* if led stripe is snake or serpentine the odd row: count from right to left */
-        Pixels.setPixel(transformToSerpentine(Column, Row), Color);
+        return Pixels.setPixel(transformToSerpentine(Column,  Row), Color);
 #else
-        Pixels.setPixel((Row * DISPLAY_NUMBER_OF_COLUMNS) + Column, Color);
+        return Pixels.setPixel((Row * DISPLAY_NUMBER_OF_COLUMNS) + Column, Color);
 #endif
         return E_OK;
     } else {
@@ -331,9 +351,9 @@ stdReturnType Display::clearPixel(byte Column, byte Row)
     if(Row < DISPLAY_NUMBER_OF_ROWS && Column < DISPLAY_NUMBER_OF_COLUMNS) {
 #if (DISPLAY_LED_STRIPE_SERPENTINE == STD_ON)
         /* if led stripe is snake or serpentine then odd row: count from right to left */
-        Pixels.setPixel(transformToSerpentine(Column, Row), 0, 0, 0);
+        return Pixels.setPixel(transformToSerpentine(Column,  Row), 0, 0, 0);
 #else
-        Pixels.setPixel((Row * DISPLAY_NUMBER_OF_COLUMNS) + Column, 0, 0, 0);
+        return Pixels.setPixel((Row * DISPLAY_NUMBER_OF_COLUMNS) + Column, 0, 0, 0);
 #endif
         return E_OK;
     } else {
@@ -355,7 +375,7 @@ stdReturnType Display::clearPixel(byte Index)
     byte Row = Index / DISPLAY_NUMBER_OF_COLUMNS;
     byte Column = Index % DISPLAY_NUMBER_OF_COLUMNS;
 
-    return clearPixel(Column, Row);
+    return clearPixel(Column,  Row);
 } /* clearPixel */
 
 

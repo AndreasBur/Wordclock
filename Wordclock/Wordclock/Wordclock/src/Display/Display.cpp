@@ -89,34 +89,52 @@ const DisplayWordIlluminationType Display::WordIlluminationTable[] PROGMEM =
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  CONSTRUCTOR OF TEMPLATE
+  CONSTRUCTOR OF Display
 ******************************************************************************************************************************************************/
-/*! \brief          Template Constructor
- *  \details        Instantiation of the Template library
+/*! \brief          Display Constructor
+ *  \details        Instantiation of the Display library
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-Display::Display(PixelType sColor) : Pixels(DISPLAY_DATA_PIN)
+Display::Display(PixelType sColor)
+#ifdef SIMULATOR
+	: Pixels(0L, _("Wordclock Simulator"))
+#else
+	: Pixels(DISPLAY_DATA_PIN)
+#endif
 {
     Color = sColor;
 	State = DISPLAY_STATE_UNINIT;
-} /* Template */
+
+#ifdef SIMULATOR
+	Pixels.Show();
+#endif
+} /* Display */
 
 
 /******************************************************************************************************************************************************
-  CONSTRUCTOR OF TEMPLATE
+  CONSTRUCTOR OF Display
 ******************************************************************************************************************************************************/
-/*! \brief          Template Constructor
- *  \details        Instantiation of the Template library
+/*! \brief          Display Constructor
+ *  \details        Instantiation of the Display library
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-Display::Display(byte Red, byte Green, byte Blue) : Pixels(DISPLAY_DATA_PIN)
+Display::Display(byte Red, byte Green, byte Blue)
+#ifdef SIMULATOR
+: Pixels(0L, _("Wordclock Simulator"))
+#else
+: Pixels(DISPLAY_DATA_PIN)
+#endif
 {
     Color.Red = Red;
 	Color.Green = Green;
 	Color.Blue = Blue;
-} /* Template */
+
+#ifdef SIMULATOR
+Pixels.Show();
+#endif
+} /* Display */
 
 
 /******************************************************************************************************************************************************
@@ -180,7 +198,7 @@ stdReturnType Display::getCharacter(DisplayCharactersType Character, boolean* Va
 stdReturnType Display::getCharacter(byte Column, byte Row, char* Character)
 {
     if(Row < DISPLAY_NUMBER_OF_ROWS && Column < DISPLAY_NUMBER_OF_COLUMNS) {
-        *Character =  pgm_read_byte_near(&DisplayCharacters[Row][Column]);
+        *Character =  pgm_read_byte(&DisplayCharacters[Row][Column]);
         return E_OK;
     } else {
         return E_NOT_OK;
@@ -202,7 +220,7 @@ stdReturnType Display::getCharacter(byte Index, char* Character)
     byte Column = Index % DISPLAY_NUMBER_OF_COLUMNS;
 
     if(Index < DISPLAY_NUMBER_OF_LEDS) {
-        *Character =  pgm_read_byte_near(&DisplayCharacters[Row][Column]);
+        *Character =  pgm_read_byte(&DisplayCharacters[Row][Column]);
         return E_OK;
     } else {
         return E_NOT_OK;

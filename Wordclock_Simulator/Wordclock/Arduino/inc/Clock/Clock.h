@@ -9,10 +9,10 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       Clock.h
- *      \brief
+ *      \brief      
  *
- *      \details
- *
+ *      \details    
+ *                  
  *****************************************************************************************************************************************************/
 #ifndef _CLOCK_H_
 #define _CLOCK_H_
@@ -31,17 +31,20 @@
 /* Clock configuration parameter */
 #define CLOCK_SHOW_IT_IS_PERMANENTLY            STD_ON
 
+/* Clock  parameter */
+/* Hour */
 #define CLOCK_NUMBER_OF_HOUR_MODES              2
 #define CLOCK_NUMBER_OF_HOURS                   12
 #define CLOCK_MAX_NUMBER_OF_HOUR_WORDS          2
 
+#define CLOCK_NUMBER_OF_HOURS_PER_DAY			24
+#define CLOCK_NUMBER_OF_MINUTES_PER_HOUR		60
+
+/* Minute */
 #define CLOCK_MINUTE_STEP_IN_MINUTES            5
 #define CLOCK_NUMBER_OF_MINUTE_STEPS            12
-
-/* evtl. ändern */
 #define CLOCK_MAX_NUMBER_OF_MINUTE_WORDS        3
-
-
+ 
 /******************************************************************************************************************************************************
  *  GLOBAL FUNCTION MACROS
 ******************************************************************************************************************************************************/
@@ -59,8 +62,14 @@ typedef enum {
 } ClockModesType;
 
 
+typedef enum {
+	CLOCK_HOUR_MODE_FULL_HOUR,
+	CLOCK_HOUR_MODE_NO_FULL_HOUR
+} ClockHourModesType;
+
+
 typedef struct {
-    byte HourMode;
+    ClockHourModesType HourMode;
     byte HourOffset;
     DisplayWordsType Words[CLOCK_MAX_NUMBER_OF_MINUTE_WORDS];
 } ClockMinutesType;

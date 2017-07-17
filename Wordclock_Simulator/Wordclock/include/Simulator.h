@@ -10,6 +10,7 @@
 
 #define DISPLAY_NUMBER_OF_ROWS                  10
 #define DISPLAY_NUMBER_OF_COLUMNS               11
+#define SIMULATOR
 
 
 /* type which describes the structure of a pixel */

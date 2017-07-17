@@ -53,13 +53,6 @@
 /******************************************************************************************************************************************************
  *  GLOBAL DATA TYPES AND STRUCTURES
 ******************************************************************************************************************************************************/
-/* type which describes the  */
-typedef struct {
-    byte Row;
-    byte Column;
-    byte Length;
-} DisplayWordIlluminationType;
-
 /* type which describes the internal state of the Display */
 typedef enum {
 	DISPLAY_STATE_NONE,
@@ -68,9 +61,16 @@ typedef enum {
 	DISPLAY_STATE_READY
 } DisplayStateType;
 
+/* type which describes the  */
+typedef struct {
+	byte Row;
+	byte Column;
+	byte Length;
+} DisplayWordIlluminationType;
+
 /* mapping to underlying hardware */
 typedef WS2812PixelType PixelType;
-//typedef WS2812 Stripe;
+typedef WS2812 Stripe;
 
 /******************************************************************************************************************************************************
  *  CLASS  Display
@@ -79,7 +79,7 @@ class Display
 {
   private:
 	DisplayStateType State;
-    Simulator Pixels;
+    Stripe Pixels;
     PixelType Color;
 
     static const char DisplayCharacters[][DISPLAY_NUMBER_OF_COLUMNS + 1];
@@ -106,7 +106,7 @@ class Display
     // char methods
     stdReturnType setCharacter(DisplayCharactersType Character) { return Pixels.setPixel(Character, Color); }
     stdReturnType clearCharacter(DisplayCharactersType Character) { return Pixels.setPixel(Character, 0, 0, 0); }
-    stdReturnType getCharacter(DisplayCharactersType Character, boolean* Value);
+    stdReturnType getCharacter(DisplayCharactersType, boolean*);
     stdReturnType getCharacter(byte, byte, char*);
     stdReturnType getCharacter(byte, char*);
 

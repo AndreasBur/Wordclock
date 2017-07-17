@@ -8,7 +8,7 @@ int flag;
 Display WordClockDisplay(20, 20, 20);
 Clock wcClock(&WordClockDisplay, CLOCK_MODE_WESSI);
 //DisplayCharacter WcDisplayCharacter;
-Animation wcAnimation;
+//Animation wcAnimation;
 //Beginning of Auto generated function prototypes by Atmel Studio
 //End of Auto generated function prototypes by Atmel Studio
 

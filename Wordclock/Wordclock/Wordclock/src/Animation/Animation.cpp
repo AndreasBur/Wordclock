@@ -84,33 +84,101 @@ void Animation::init()
 /******************************************************************************************************************************************************
   setChar()
 ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
+/*! \brief
+ *  \details
+ *
  *  \return         -
 ******************************************************************************************************************************************************/
 stdReturnType Animation::setChar(byte Column, byte Row, char Char, AnimationFontType Font)
 {
 	stdReturnType ReturnValue = E_NOT_OK;
 	byte FontIndex, ColumnAbs, RowAbs;
-	
-	convertCharToFontIndex(Char, &FontIndex);
+
+	//convertCharToFontIndex(Char, &FontIndex);
+	FontIndex = Char;
 
 #if(ANIMATION_SUPPORT_FONT_4X6 == STD_ON)
 	if(Font == ANIMATION_FONT_4X6)
 	{
+	    ReturnValue = E_OK;
         for(byte FontColumn = 0; FontColumn < ANIMATION_FONT_4X6_WIDTH; FontColumn++)
         {
-			byte Font_4x6_EntryItem = pgm_read_byte_near(&Font_4x6[FontIndex][FontColumn]);
+			byte Font_4x6_EntryItem = pgm_read_byte(&Font_4x6[FontIndex][FontColumn]);
 	        for(byte FontRow = 0; FontRow < ANIMATION_FONT_4X6_HEIGHT; FontRow++)
 	        {
 		        ColumnAbs = Column + FontColumn;
-		        RowAbs = Row + FontRow;
-		        if(ColumnAbs < DISPLAY_NUMBER_OF_COLUMNS && RowAbs < DISPLAY_NUMBER_OF_ROWS)
-					pDisplay->writePixel(ColumnAbs, RowAbs, bitRead(Font_4x6_EntryItem, FontRow));
+		        RowAbs = Row + ANIMATION_FONT_4X6_HEIGHT - 1 - FontRow;
+                if(pDisplay->writePixel(ColumnAbs, RowAbs, bitRead(Font_4x6_EntryItem, FontRow)) == E_NOT_OK) ReturnValue = E_NOT_OK;
 	        }
 		}
-		ReturnValue = E_OK;
+	}
+#endif
+
+#if(ANIMATION_SUPPORT_FONT_5X8 == STD_ON)
+	if(Font == ANIMATION_FONT_5X8)
+	{
+	    ReturnValue = E_OK;
+        for(byte FontColumn = 0; FontColumn < ANIMATION_FONT_5X8_WIDTH; FontColumn++)
+        {
+			byte Font_5x8_EntryItem = pgm_read_byte(&Font_5x8[FontIndex][FontColumn]);
+	        for(byte FontRow = 0; FontRow < ANIMATION_FONT_5X8_HEIGHT; FontRow++)
+	        {
+		        ColumnAbs = Column + FontColumn;
+		        RowAbs = Row + ANIMATION_FONT_5X8_HEIGHT - 1 - FontRow;
+                if(pDisplay->writePixel(ColumnAbs, RowAbs, bitRead(Font_5x8_EntryItem, FontRow)) == E_NOT_OK) ReturnValue = E_NOT_OK;
+	        }
+		}
+	}
+#endif
+
+#if(ANIMATION_SUPPORT_FONT_6X8 == STD_ON)
+	if(Font == ANIMATION_FONT_6X8)
+	{
+	    ReturnValue = E_OK;
+        for(byte FontColumn = 0; FontColumn < ANIMATION_FONT_6X8_WIDTH; FontColumn++)
+        {
+			byte Font_6x8_EntryItem = pgm_read_byte(&Font_6x8[FontIndex][FontColumn]);
+	        for(byte FontRow = 0; FontRow < ANIMATION_FONT_6X8_HEIGHT; FontRow++)
+	        {
+		        ColumnAbs = Column + FontColumn;
+		        RowAbs = Row + ANIMATION_FONT_6X8_HEIGHT - 1 - FontRow;
+                if(pDisplay->writePixel(ColumnAbs, RowAbs, bitRead(Font_6x8_EntryItem, FontRow)) == E_NOT_OK) ReturnValue = E_NOT_OK;
+	        }
+		}
+	}
+#endif
+
+#if(ANIMATION_SUPPORT_FONT_8X8 == STD_ON)
+	if(Font == ANIMATION_FONT_8X8)
+	{
+	    ReturnValue = E_OK;
+        for(byte FontColumn = 0; FontColumn < ANIMATION_FONT_8X8_WIDTH; FontColumn++)
+        {
+			byte Font_8x8_EntryItem = pgm_read_byte(&Font_8x8[FontIndex][FontColumn]);
+	        for(byte FontRow = 0; FontRow < ANIMATION_FONT_8X8_HEIGHT; FontRow++)
+	        {
+		        ColumnAbs = Column + FontColumn;
+		        RowAbs = Row + ANIMATION_FONT_8X8_HEIGHT - 1 - FontRow;
+                if(pDisplay->writePixel(ColumnAbs, RowAbs, bitRead(Font_8x8_EntryItem, FontRow)) == E_NOT_OK) ReturnValue = E_NOT_OK;
+	        }
+		}
+	}
+#endif
+
+#if(ANIMATION_SUPPORT_FONT_6X10 == STD_ON)
+	if(Font == ANIMATION_FONT_6X10)
+	{
+	    ReturnValue = E_OK;
+	    for(byte FontRow = 0; FontRow < ANIMATION_FONT_6X10_HEIGHT; FontRow++)
+        {
+			byte Font_6x10_EntryItem = pgm_read_byte(&Font_6x10[FontIndex][FontRow]);
+	        for(byte FontColumn = 0; FontColumn < ANIMATION_FONT_6X10_WIDTH; FontColumn++)
+	        {
+		        ColumnAbs = Column + FontColumn;
+		        RowAbs = Row + FontRow;
+                if(pDisplay->writePixel(ColumnAbs, RowAbs, bitRead(Font_6x10_EntryItem, FontColumn)) == E_NOT_OK) ReturnValue = E_NOT_OK;
+	        }
+		}
 	}
 #endif
 

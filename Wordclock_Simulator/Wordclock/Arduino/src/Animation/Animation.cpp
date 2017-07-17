@@ -52,18 +52,18 @@
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-Animation::~Animation()
+Animation::Animation(Display* Display)
 {
-
+	pDisplay = Display;
 } /* Template */
 
 
 /******************************************************************************************************************************************************
   DESTRUCTOR OF Animation
 ******************************************************************************************************************************************************/
-Animation::Animation(Display* Display)
+Animation::~Animation()
 {
-    pDisplay = Display;
+
 } /* ~Template */
 
 
@@ -103,7 +103,7 @@ stdReturnType Animation::setChar(byte Column, byte Row, char Char, AnimationFont
 	    ReturnValue = E_OK;
         for(byte FontColumn = 0; FontColumn < ANIMATION_FONT_4X6_WIDTH; FontColumn++)
         {
-			byte Font_4x6_EntryItem = Font_4x6[FontIndex][FontColumn];
+			byte Font_4x6_EntryItem = pgm_read_byte(&Font_4x6[FontIndex][FontColumn]);
 	        for(byte FontRow = 0; FontRow < ANIMATION_FONT_4X6_HEIGHT; FontRow++)
 	        {
 		        ColumnAbs = Column + FontColumn;
@@ -120,7 +120,7 @@ stdReturnType Animation::setChar(byte Column, byte Row, char Char, AnimationFont
 	    ReturnValue = E_OK;
         for(byte FontColumn = 0; FontColumn < ANIMATION_FONT_5X8_WIDTH; FontColumn++)
         {
-			byte Font_5x8_EntryItem = Font_5x8[FontIndex][FontColumn];
+			byte Font_5x8_EntryItem = pgm_read_byte(&Font_5x8[FontIndex][FontColumn]);
 	        for(byte FontRow = 0; FontRow < ANIMATION_FONT_5X8_HEIGHT; FontRow++)
 	        {
 		        ColumnAbs = Column + FontColumn;
@@ -137,7 +137,7 @@ stdReturnType Animation::setChar(byte Column, byte Row, char Char, AnimationFont
 	    ReturnValue = E_OK;
         for(byte FontColumn = 0; FontColumn < ANIMATION_FONT_6X8_WIDTH; FontColumn++)
         {
-			byte Font_6x8_EntryItem = Font_6x8[FontIndex][FontColumn];
+			byte Font_6x8_EntryItem = pgm_read_byte(&Font_6x8[FontIndex][FontColumn]);
 	        for(byte FontRow = 0; FontRow < ANIMATION_FONT_6X8_HEIGHT; FontRow++)
 	        {
 		        ColumnAbs = Column + FontColumn;
@@ -154,7 +154,7 @@ stdReturnType Animation::setChar(byte Column, byte Row, char Char, AnimationFont
 	    ReturnValue = E_OK;
         for(byte FontColumn = 0; FontColumn < ANIMATION_FONT_8X8_WIDTH; FontColumn++)
         {
-			byte Font_8x8_EntryItem = Font_8x8[FontIndex][FontColumn];
+			byte Font_8x8_EntryItem = pgm_read_byte(&Font_8x8[FontIndex][FontColumn]);
 	        for(byte FontRow = 0; FontRow < ANIMATION_FONT_8X8_HEIGHT; FontRow++)
 	        {
 		        ColumnAbs = Column + FontColumn;
@@ -171,7 +171,7 @@ stdReturnType Animation::setChar(byte Column, byte Row, char Char, AnimationFont
 	    ReturnValue = E_OK;
 	    for(byte FontRow = 0; FontRow < ANIMATION_FONT_6X10_HEIGHT; FontRow++)
         {
-			byte Font_6x10_EntryItem = Font_6x10[FontIndex][FontRow];
+			byte Font_6x10_EntryItem = pgm_read_byte(&Font_6x10[FontIndex][FontRow]);
 	        for(byte FontColumn = 0; FontColumn < ANIMATION_FONT_6X10_WIDTH; FontColumn++)
 	        {
 		        ColumnAbs = Column + FontColumn;
