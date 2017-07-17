@@ -109,8 +109,11 @@ class Display
     stdReturnType getCharacter(DisplayCharactersType, boolean*);
     stdReturnType getCharacter(byte, byte, char*);
     stdReturnType getCharacter(byte, char*);
+	inline char getCharacterFast(byte Column, byte Row) { return pgm_read_byte(&DisplayCharacters[Row][Column]); }
+	inline char getCharacterFast(byte Index) { return pgm_read_byte(&DisplayCharacters[Index / DISPLAY_NUMBER_OF_COLUMNS][Index % DISPLAY_NUMBER_OF_COLUMNS]); }
 
     // word methods
+	DisplayWordIlluminationType getWord(DisplayWordsType);
     stdReturnType setWord(DisplayWordsType);
     stdReturnType clearWord(DisplayWordsType);
     stdReturnType clearAllWords();
