@@ -169,7 +169,7 @@ void Display::init()
  *                  
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType Display::getCharacter(DisplayCharactersType Character, boolean* Value)
+stdReturnType Display::getCharacter(DisplayCharacterType Character, boolean* Value)
 {
 	stdReturnType ReturnValue = E_NOT_OK;
     PixelType Pixel;
@@ -236,23 +236,18 @@ stdReturnType Display::getCharacter(byte Index, char* Character)
  *                  
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType Display::getWord(DisplayWordsType Word)
+stdReturnType Display::getWordIllumination(DisplayWordType Word, DisplayWordIlluminationType* WordIllu)
 {
     stdReturnType ReturnValue = E_NOT_OK;
-	DisplayWordIlluminationType WordIllu;
 
     if(Word < DISPLAY_WORD_NUMBER_OF_WORDS) {
+		*WordIllu = getWordIlluminationFast(Word);
 		ReturnValue = E_OK;
-		memcpy_P(&Word, &WordIlluminationTable[Word], sizeof(WordIllu));
-
-        for(byte Index = 0; Index < WordIllu.Length; Index++) {
-			if(setPixel(WordIllu.Column + Index,  WordIllu.Row) == E_NOT_OK) ReturnValue = E_NOT_OK;
-		}
     } else {
         ReturnValue = E_NOT_OK;
     }
     return ReturnValue;
-} /* setWord */
+} /* getWordIllumination */
 
 
 /******************************************************************************************************************************************************
@@ -263,16 +258,20 @@ stdReturnType Display::getWord(DisplayWordsType Word)
  *                  
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType Display::setWord(DisplayWordsType Word)
+stdReturnType Display::setWord(DisplayWordType Word, byte MaxLength)
 {
     stdReturnType ReturnValue = E_NOT_OK;
 	DisplayWordIlluminationType WordIllu;
+	byte Length;
 
     if(Word < DISPLAY_WORD_NUMBER_OF_WORDS) {
 		ReturnValue = E_OK;
-		memcpy_P(&Word, &WordIlluminationTable[Word], sizeof(WordIllu));
+		WordIllu = getWordIlluminationFast(Word);
 
-        for(byte Index = 0; Index < WordIllu.Length; Index++) {
+		if(MaxLength == DISPLAY_WORD_LENGTH_UNLIMITED) Length = WordIllu.Length;
+		else Length = MaxLength;
+
+        for(byte Index = 0; Index < Length; Index++) {
 			if(setPixel(WordIllu.Column + Index,  WordIllu.Row) == E_NOT_OK) ReturnValue = E_NOT_OK;
 		}
     } else {
@@ -290,14 +289,14 @@ stdReturnType Display::setWord(DisplayWordsType Word)
  *                  
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType Display::clearWord(DisplayWordsType Word)
+stdReturnType Display::clearWord(DisplayWordType Word)
 {
     stdReturnType ReturnValue = E_NOT_OK;
 	DisplayWordIlluminationType WordIllu;
 
     if(Word < DISPLAY_WORD_NUMBER_OF_WORDS) {
 		ReturnValue = E_OK;
-		memcpy_P(&Word, &WordIlluminationTable[Word], sizeof(WordIllu));
+		WordIllu = getWordIlluminationFast(Word);
 
         for(byte Index = 0; Index < WordIllu.Length; Index++) {
 			if(clearPixel(WordIllu.Column + Index,  WordIllu.Row) == E_NOT_OK) ReturnValue = E_NOT_OK;
@@ -321,7 +320,7 @@ stdReturnType Display::clearAllWords()
 {
     stdReturnType ReturnValue = E_OK;
 
-    for(byte i = DISPLAY_WORD_ES; i < DISPLAY_WORD_NUMBER_OF_WORDS; i++) if(clearWord((DisplayWordsType) i) == E_NOT_OK) ReturnValue = E_NOT_OK;
+    for(byte i = DISPLAY_WORD_ES; i < DISPLAY_WORD_NUMBER_OF_WORDS; i++) if(clearWord((DisplayWordType) i) == E_NOT_OK) ReturnValue = E_NOT_OK;
     return ReturnValue;
 } /* clearAllWords */
 

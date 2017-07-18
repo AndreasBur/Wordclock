@@ -9,10 +9,10 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       Clock.h
- *      \brief      
+ *      \brief
  *
- *      \details    
- *                  
+ *      \details
+ *
  *****************************************************************************************************************************************************/
 #ifndef _CLOCK_H_
 #define _CLOCK_H_
@@ -44,7 +44,9 @@
 #define CLOCK_MINUTE_STEP_IN_MINUTES            5
 #define CLOCK_NUMBER_OF_MINUTE_STEPS            12
 #define CLOCK_MAX_NUMBER_OF_MINUTE_WORDS        3
- 
+
+
+
 /******************************************************************************************************************************************************
  *  GLOBAL FUNCTION MACROS
 ******************************************************************************************************************************************************/
@@ -71,8 +73,22 @@ typedef enum {
 typedef struct {
     ClockHourModesType HourMode;
     byte HourOffset;
-    DisplayWordsType Words[CLOCK_MAX_NUMBER_OF_MINUTE_WORDS];
+    DisplayWordType Words[CLOCK_MAX_NUMBER_OF_MINUTE_WORDS];
 } ClockMinutesType;
+
+typedef struct {
+    DisplayWordType Words[CLOCK_MAX_NUMBER_OF_HOUR_WORDS];
+} ClockHoursType;
+
+
+typedef struct {
+	boolean ShowItIs;
+	DisplayWordType HourWords[CLOCK_MAX_NUMBER_OF_HOUR_WORDS];
+	DisplayWordType MinuteWords[CLOCK_MAX_NUMBER_OF_MINUTE_WORDS];
+} ClockWordsType;
+
+typedef ClockHoursType HoursTableEntryType;
+typedef ClockMinutesType MinutesTableEntryType;
 
 
 /******************************************************************************************************************************************************
@@ -84,10 +100,19 @@ class Clock
     Display* pDisplay;
     ClockModesType Mode;
 
-    static const DisplayWordsType ClockHoursTable[][CLOCK_NUMBER_OF_HOURS][CLOCK_MAX_NUMBER_OF_HOUR_WORDS];
+    static const ClockHoursType ClockHoursTable[][CLOCK_NUMBER_OF_HOURS];
     static const ClockMinutesType ClockMinutesTable[][CLOCK_NUMBER_OF_MINUTE_STEPS];
     // functions
-
+    inline MinutesTableEntryType getMinutesTableEntry(ClockModesType Mode, byte Minute) {
+        MinutesTableEntryType MinutesTableEntry;
+        memcpy_P(&MinutesTableEntry, &ClockMinutesTable[Mode][Minute / CLOCK_MINUTE_STEP_IN_MINUTES], sizeof(ClockMinutesType));
+        return MinutesTableEntry;
+    }
+    inline HoursTableEntryType getHoursTableEntry(ClockModesType Mode, ClockHourModesType HourMode, byte Hour) {
+        HoursTableEntryType HoursTableEntry;
+        memcpy_P(&HoursTableEntry, &ClockHoursTable[HourMode][Hour], sizeof(ClockHoursType));
+        return HoursTableEntry;
+    }
 
   public:
     Clock(Display*, ClockModesType);
@@ -95,6 +120,8 @@ class Clock
 
     // get methods
 	ClockModesType getMode() { return Mode; }
+	stdReturnType getClockWords(byte, byte, ClockWordsType*);
+
 
     // set methods
 	void setMode(ClockModesType sMode) { Mode = sMode; }

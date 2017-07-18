@@ -43,6 +43,8 @@
     #error "Display: LED number missmatch"
 #endif
 
+#define DISPLAY_WORD_LENGTH_UNLIMITED			0
+
 
 /******************************************************************************************************************************************************
  *  GLOBAL FUNCTION MACROS
@@ -71,6 +73,7 @@ typedef struct {
 /* mapping to underlying hardware */
 typedef WS2812PixelType PixelType;
 typedef WS2812 Stripe;
+
 
 /******************************************************************************************************************************************************
  *  CLASS  Display
@@ -104,18 +107,19 @@ class Display
 
 
     // char methods
-    stdReturnType setCharacter(DisplayCharactersType Character) { return Pixels.setPixel(Character, Color); }
-    stdReturnType clearCharacter(DisplayCharactersType Character) { return Pixels.setPixel(Character, 0, 0, 0); }
-    stdReturnType getCharacter(DisplayCharactersType, boolean*);
+    stdReturnType setCharacter(DisplayCharacterType Character) { return Pixels.setPixel(Character, Color); }
+    stdReturnType clearCharacter(DisplayCharacterType Character) { return Pixels.setPixel(Character, 0, 0, 0); }
+    stdReturnType getCharacter(DisplayCharacterType, boolean*);
     stdReturnType getCharacter(byte, byte, char*);
     stdReturnType getCharacter(byte, char*);
 	inline char getCharacterFast(byte Column, byte Row) { return pgm_read_byte(&DisplayCharacters[Row][Column]); }
 	inline char getCharacterFast(byte Index) { return pgm_read_byte(&DisplayCharacters[Index / DISPLAY_NUMBER_OF_COLUMNS][Index % DISPLAY_NUMBER_OF_COLUMNS]); }
 
     // word methods
-	DisplayWordIlluminationType getWord(DisplayWordsType);
-    stdReturnType setWord(DisplayWordsType);
-    stdReturnType clearWord(DisplayWordsType);
+	stdReturnType getWordIllumination(DisplayWordType, DisplayWordIlluminationType*);
+	inline DisplayWordIlluminationType getWordIlluminationFast(DisplayWordType Word) { DisplayWordIlluminationType WordIllu; memcpy_P(&WordIllu, &WordIlluminationTable[Word], sizeof(WordIllu)); return WordIllu; }
+    stdReturnType setWord(DisplayWordType, byte MaxLength = DISPLAY_WORD_LENGTH_UNLIMITED);
+    stdReturnType clearWord(DisplayWordType);
     stdReturnType clearAllWords();
 
 	// pixel methods

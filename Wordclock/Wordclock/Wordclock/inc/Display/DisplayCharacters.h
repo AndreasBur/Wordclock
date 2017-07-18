@@ -147,7 +147,7 @@ typedef enum {
     DISPLAY_CHARACTER_H_8,
     DISPLAY_CHARACTER_R_8,
     DISPLAY_CHARACTER_NUMBER_OF_CHARACTERS
-} DisplayCharactersType;
+} DisplayCharacterType;
 
 
 #endif

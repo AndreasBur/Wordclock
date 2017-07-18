@@ -9,10 +9,10 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       Clock.cpp
- *      \brief      
+ *      \brief
  *
- *      \details    
- *                  
+ *      \details
+ *
  *
  *****************************************************************************************************************************************************/
 #define _CLOCK_SOURCE_
@@ -37,7 +37,7 @@
 /******************************************************************************************************************************************************
  *  LOCAL DATA TYPES AND STRUCTURES
 ******************************************************************************************************************************************************/
-const DisplayWordsType Clock::ClockHoursTable[][CLOCK_NUMBER_OF_HOURS][CLOCK_MAX_NUMBER_OF_HOUR_WORDS] PROGMEM =
+const ClockHoursType Clock::ClockHoursTable[][CLOCK_NUMBER_OF_HOURS] PROGMEM =
 {
     {                                                                   // ClockHoursTable[0][] = hh:00 CLOCK_HOUR_MODE_FULL_HOUR
         {DISPLAY_WORD_HOUR_ZWOELF, DISPLAY_WORD_UHR },                  // 00:00
@@ -165,19 +165,19 @@ Clock::~Clock()
 
 
 /******************************************************************************************************************************************************
-  show()
+  getClockWords()
 ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
+/*! \brief
+ *  \details
+ *
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType Clock::show(byte Hour, byte Minute)
+stdReturnType Clock::getClockWords(byte Hour, byte Minute, ClockWordsType* ClockWords)
 {
     /* ----- Local Variables ---------------------------------------------- */
 	stdReturnType ReturnValue = E_NOT_OK;
-    ClockMinutesType MinutesTableEntry;
-    DisplayWordsType HoursTableEntry[CLOCK_MAX_NUMBER_OF_HOUR_WORDS];
+    MinutesTableEntryType MinutesTableEntry;
+    HoursTableEntryType HoursTableEntry;
 
     /* ----- Implementation ----------------------------------------------- */
     if(Hour < CLOCK_NUMBER_OF_HOURS_PER_DAY && Minute < CLOCK_NUMBER_OF_MINUTES_PER_HOUR) {
@@ -185,29 +185,64 @@ stdReturnType Clock::show(byte Hour, byte Minute)
         /* show IT IS permanently or only to full and half hour */
         if (CLOCK_SHOW_IT_IS_PERMANENTLY == STD_ON	||
 			Minute < CLOCK_MINUTE_STEP_IN_MINUTES	||
-			(Minute >= (CLOCK_NUMBER_OF_MINUTES_PER_HOUR/2) && Minute < (CLOCK_NUMBER_OF_MINUTES_PER_HOUR/2) + CLOCK_MINUTE_STEP_IN_MINUTES)) 
+			(Minute >= (CLOCK_NUMBER_OF_MINUTES_PER_HOUR/2) && Minute < (CLOCK_NUMBER_OF_MINUTES_PER_HOUR/2) + CLOCK_MINUTE_STEP_IN_MINUTES))
 		{
-            if(pDisplay->setWord(DISPLAY_WORD_ES) == E_NOT_OK) ReturnValue = E_NOT_OK;
-            if(pDisplay->setWord(DISPLAY_WORD_IST) == E_NOT_OK) ReturnValue = E_NOT_OK;
+            ClockWords->ShowItIs = true;
+        } else {
+			ClockWords->ShowItIs = false;
+		}
+
+		MinutesTableEntry = getMinutesTableEntry(Mode, Minute);
+
+        for(byte Index = 0; Index < CLOCK_MAX_NUMBER_OF_MINUTE_WORDS; Index++) {
+            ClockWords->MinuteWords[Index] = MinutesTableEntry.Words[Index];
         }
 
-		memcpy_P(&MinutesTableEntry, &ClockMinutesTable[Mode][Minute / CLOCK_MINUTE_STEP_IN_MINUTES], sizeof(ClockMinutesType));
-
-        for(byte Index = 0; Index < CLOCK_MAX_NUMBER_OF_MINUTE_WORDS && MinutesTableEntry.Words[Index] != DISPLAY_WORD_NONE; Index++) {
-            if(pDisplay->setWord(MinutesTableEntry.Words[Index]) == E_NOT_OK) ReturnValue = E_NOT_OK;
-        }
-        
         if(Hour >= CLOCK_NUMBER_OF_HOURS) Hour -= CLOCK_NUMBER_OF_HOURS;
         Hour += MinutesTableEntry.HourOffset;                             // correct the hour offset from the minutes
         if(Hour >= CLOCK_NUMBER_OF_HOURS) Hour -= CLOCK_NUMBER_OF_HOURS;
 
-		memcpy_P(&HoursTableEntry, &ClockHoursTable[MinutesTableEntry.HourMode][Hour], sizeof(DisplayWordsType) * CLOCK_MAX_NUMBER_OF_HOUR_WORDS);
+		HoursTableEntry = getHoursTableEntry(Mode, MinutesTableEntry.HourMode, Hour);
 
-        for(byte Index = 0; Index < CLOCK_MAX_NUMBER_OF_HOUR_WORDS && HoursTableEntry[Index] != DISPLAY_WORD_NONE; Index++) {
-            if(pDisplay->setWord(HoursTableEntry[Index]) == E_NOT_OK) ReturnValue = E_NOT_OK;
-        }        
+        for(byte Index = 0; Index < CLOCK_MAX_NUMBER_OF_HOUR_WORDS; Index++) {
+            ClockWords->HourWords[Index] = HoursTableEntry.Words[Index];
+        }
     } else {
         ReturnValue = E_NOT_OK;
+    }
+	return ReturnValue;
+} /* getClockWords */
+
+
+/******************************************************************************************************************************************************
+  show()
+******************************************************************************************************************************************************/
+/*! \brief
+ *  \details
+ *
+ *  \return         -
+******************************************************************************************************************************************************/
+stdReturnType Clock::show(byte Hour, byte Minute)
+{
+    /* ----- Local Variables ---------------------------------------------- */
+	stdReturnType ReturnValue = E_NOT_OK;
+	ClockWordsType ClockWords;
+
+    /* ----- Implementation ----------------------------------------------- */
+	ReturnValue = E_OK;
+	if(getClockWords(Hour, Minute, &ClockWords) == E_NOT_OK) ReturnValue = E_NOT_OK;
+
+	if(ClockWords.ShowItIs) {
+		if(pDisplay->setWord(DISPLAY_WORD_ES) == E_NOT_OK) ReturnValue = E_NOT_OK;
+		if(pDisplay->setWord(DISPLAY_WORD_IST) == E_NOT_OK) ReturnValue = E_NOT_OK;
+    }
+
+    for(byte Index = 0; Index < CLOCK_MAX_NUMBER_OF_HOUR_WORDS && ClockWords.HourWords[Index] != DISPLAY_WORD_NONE; Index++) {
+        if(pDisplay->setWord(ClockWords.HourWords[Index]) == E_NOT_OK) ReturnValue = E_NOT_OK;
+    }
+
+    for(byte Index = 0; Index < CLOCK_MAX_NUMBER_OF_MINUTE_WORDS && ClockWords.MinuteWords[Index] != DISPLAY_WORD_NONE; Index++) {
+        if(pDisplay->setWord(ClockWords.MinuteWords[Index]) == E_NOT_OK) ReturnValue = E_NOT_OK;
     }
 	return ReturnValue;
 } /* show */
@@ -222,4 +257,3 @@ stdReturnType Clock::show(byte Hour, byte Minute)
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E
  *****************************************************************************************************************************************************/
- 

@@ -64,7 +64,7 @@ typedef enum {
     DISPLAY_WORD_HOUR_SECHS,
     DISPLAY_WORD_UHR,
     DISPLAY_WORD_NUMBER_OF_WORDS
-} DisplayWordsType;
+} DisplayWordType;
 
 
 #endif
