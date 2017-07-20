@@ -70,6 +70,9 @@ typedef struct {
 	byte Length;
 } DisplayWordIlluminationType;
 
+typedef uint16_t PixelRowType;
+typedef uint16_t PixelColumnType;
+
 /* mapping to underlying hardware */
 typedef WS2812PixelType PixelType;
 typedef WS2812 Stripe;
@@ -124,13 +127,28 @@ class Display
 
 	// pixel methods
 	stdReturnType writePixel(byte Column, byte Row, boolean Value) { if(Value) return setPixel(Column, Row); else return clearPixel(Column, Row); }
-	stdReturnType WritePixel(byte Index, boolean Value) { if(Value) return setPixel(Index); else return clearPixel(Index); }
+	stdReturnType writePixel(byte Index, boolean Value) { if(Value) return setPixel(Index); else return clearPixel(Index); }
     stdReturnType setPixel(byte, byte);
     stdReturnType setPixel(byte);
     stdReturnType clearPixel(byte, byte);
     stdReturnType clearPixel(byte);
     stdReturnType getPixel(byte, byte, boolean*);
     stdReturnType getPixel(byte, boolean*);
+
+    stdReturnType getPixelRow(byte, PixelRowType PixelRow);
+    stdReturnType getPixelRow(byte, byte, PixelRowType PixelRow);
+
+    stdReturnType getPixelColumn(byte, PixelColumnType PixelColumn);
+    stdReturnType getPixelColumn(byte, byte, PixelColumnType PixelColumn);
+
+	void writePixelFast(byte Column, byte Row, boolean Value) { if(Value) setPixelFast(Column, Row); else clearPixelFast(Column, Row); }
+	void writePixelFast(byte Index, boolean Value) { if(Value) setPixelFast(Index); else clearPixelFast(Index); }
+	void setPixelFast(byte, byte);
+	void setPixelFast(byte);
+	void clearPixelFast(byte, byte);
+	void clearPixelFast(byte);
+	boolean getPixelFast(byte, byte);
+	boolean getPixelFast(byte);
 
     // methods
     void init();

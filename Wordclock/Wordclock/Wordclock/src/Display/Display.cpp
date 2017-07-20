@@ -138,7 +138,7 @@ Pixels.Show();
 
 
 /******************************************************************************************************************************************************
-  DESTRUCTOR OF TEMPLATE
+  DESTRUCTOR OF Template
 ******************************************************************************************************************************************************/
 Display::~Display()
 {
@@ -326,6 +326,70 @@ stdReturnType Display::clearAllWords()
 
 
 /******************************************************************************************************************************************************
+  getPixel()
+******************************************************************************************************************************************************/
+/*! \brief
+ *  \details
+ *
+ *  \return         -
+******************************************************************************************************************************************************/
+stdReturnType Display::getPixel(byte Index, boolean* Value)
+{
+    byte Row = Index / DISPLAY_NUMBER_OF_COLUMNS;
+    byte Column = Index % DISPLAY_NUMBER_OF_COLUMNS;
+
+    return getPixel(Row, Column, Value);
+} /* getPixel */
+
+
+/******************************************************************************************************************************************************
+  getPixel()
+******************************************************************************************************************************************************/
+/*! \brief
+ *  \details
+ *
+ *  \return         -
+******************************************************************************************************************************************************/
+stdReturnType Display::getPixel(byte Column, byte Row, boolean* Value)
+{
+	stdReturnType ReturnValue = E_NOT_OK;
+    PixelType Pixel;
+
+#if (DISPLAY_LED_STRIPE_SERPENTINE == STD_ON)
+    /* if led stripe is snake or serpentine then odd row: count from right to left */
+    ReturnValue = Pixels.getPixel(transformToSerpentine(Column,  Row), &Pixel);
+#else
+    ReturnValue = Pixels.getPixel((Row * DISPLAY_NUMBER_OF_COLUMNS) + Column, &Pixel);
+#endif
+    if(ReturnValue == E_OK) {
+        /* Pixel is only off when all colors are zero */
+        if(Pixel.Red == 0 && Pixel.Green == 0 && Pixel.Blue == 0) *Value = false;
+        else *Value = true;
+    }
+	return ReturnValue;
+} /* getPixel */
+
+
+/******************************************************************************************************************************************************
+  setPixel()
+******************************************************************************************************************************************************/
+/*! \brief          
+ *  \details        
+ *                  
+ *  \return         -
+******************************************************************************************************************************************************/
+stdReturnType Display::setPixel(byte Column, byte Row)
+{
+#if (DISPLAY_LED_STRIPE_SERPENTINE == STD_ON)
+    /* if led stripe is snake or serpentine the odd row: count from right to left */
+    return Pixels.setPixel(transformToSerpentine(Column,  Row), Color);
+#else
+    return Pixels.setPixel((Row * DISPLAY_NUMBER_OF_COLUMNS) + Column, Color);
+#endif
+} /* setPixel */
+
+
+/******************************************************************************************************************************************************
   setPixel()
 ******************************************************************************************************************************************************/
 /*! \brief          
@@ -343,50 +407,21 @@ stdReturnType Display::setPixel(byte Index)
 
 
 /******************************************************************************************************************************************************
-  setPixel()
-******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
- *  \return         -
-******************************************************************************************************************************************************/
-stdReturnType Display::setPixel(byte Column, byte Row)
-{
-    if(Row < DISPLAY_NUMBER_OF_ROWS && Column < DISPLAY_NUMBER_OF_COLUMNS) {
-#if (DISPLAY_LED_STRIPE_SERPENTINE == STD_ON)
-        /* if led stripe is snake or serpentine the odd row: count from right to left */
-        return Pixels.setPixel(transformToSerpentine(Column,  Row), Color);
-#else
-        return Pixels.setPixel((Row * DISPLAY_NUMBER_OF_COLUMNS) + Column, Color);
-#endif
-        return E_OK;
-    } else {
-        return E_NOT_OK;
-    }
-} /* setPixel */
-
-
-/******************************************************************************************************************************************************
   clearPixel()
 ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
+/*! \brief
+ *  \details
+ *
  *  \return         -
 ******************************************************************************************************************************************************/
 stdReturnType Display::clearPixel(byte Column, byte Row)
 {
-    if(Row < DISPLAY_NUMBER_OF_ROWS && Column < DISPLAY_NUMBER_OF_COLUMNS) {
 #if (DISPLAY_LED_STRIPE_SERPENTINE == STD_ON)
-        /* if led stripe is snake or serpentine then odd row: count from right to left */
-        return Pixels.setPixel(transformToSerpentine(Column,  Row), 0, 0, 0);
+    /* if led stripe is snake or serpentine then odd row: count from right to left */
+    return Pixels.setPixel(transformToSerpentine(Column,  Row), 0, 0, 0);
 #else
-        return Pixels.setPixel((Row * DISPLAY_NUMBER_OF_COLUMNS) + Column, 0, 0, 0);
+    return Pixels.setPixel((Row * DISPLAY_NUMBER_OF_COLUMNS) + Column, 0, 0, 0);
 #endif
-        return E_OK;
-    } else {
-        return E_NOT_OK;
-    }
 } /* clearPixel */
 
 
@@ -406,6 +441,100 @@ stdReturnType Display::clearPixel(byte Index)
     return clearPixel(Column,  Row);
 } /* clearPixel */
 
+
+/******************************************************************************************************************************************************
+  getPixelFast()
+******************************************************************************************************************************************************/
+/*! \brief
+ *  \details
+ *
+ *  \return         -
+******************************************************************************************************************************************************/
+boolean Display::getPixelFast(byte Column, byte Row)
+{
+	PixelType Pixel;
+
+#if (DISPLAY_LED_STRIPE_SERPENTINE == STD_ON)
+	/* if led stripe is snake or serpentine then odd row: count from right to left */
+	Pixel = Pixels.getPixelFast(transformToSerpentine(Column,  Row));
+#else
+	Pixel = Pixels.getPixelFast((Row * DISPLAY_NUMBER_OF_COLUMNS) + Column);
+#endif
+	if(Pixel.Red == 0 && Pixel.Green == 0 && Pixel.Blue == 0) return false;
+	else return true;
+} /* getPixelFast */
+
+
+/******************************************************************************************************************************************************
+  setPixelFast()
+******************************************************************************************************************************************************/
+/*! \brief          
+ *  \details        
+ *                  
+ *  \return         -
+******************************************************************************************************************************************************/
+void Display::setPixelFast(byte Column, byte Row)
+{
+#if (DISPLAY_LED_STRIPE_SERPENTINE == STD_ON)
+    /* if led stripe is snake or serpentine the odd row: count from right to left */
+    Pixels.setPixelFast(transformToSerpentine(Column,  Row), Color);
+#else
+    Pixels.setPixelFast((Row * DISPLAY_NUMBER_OF_COLUMNS) + Column, Color);
+#endif
+} /* setPixelFast */
+
+
+/******************************************************************************************************************************************************
+  setPixelFast()
+******************************************************************************************************************************************************/
+/*! \brief          
+ *  \details        
+ *                  
+ *  \return         -
+******************************************************************************************************************************************************/
+void Display::setPixelFast(byte Index)
+{
+    byte Row = Index / DISPLAY_NUMBER_OF_COLUMNS;
+    byte Column = Index % DISPLAY_NUMBER_OF_COLUMNS;
+
+    setPixelFast(Column,  Row);
+} /* setPixelFast */
+
+
+/******************************************************************************************************************************************************
+  clearPixelFast()
+******************************************************************************************************************************************************/
+/*! \brief
+ *  \details
+ *
+ *  \return         -
+******************************************************************************************************************************************************/
+void Display::clearPixelFast(byte Column, byte Row)
+{
+#if (DISPLAY_LED_STRIPE_SERPENTINE == STD_ON)
+    /* if led stripe is snake or serpentine then odd row: count from right to left */
+    Pixels.setPixelFast(transformToSerpentine(Column,  Row), 0, 0, 0);
+#else
+    Pixels.setPixelFast((Row * DISPLAY_NUMBER_OF_COLUMNS) + Column, 0, 0, 0);
+#endif
+} /* clearPixelFast */
+
+
+/******************************************************************************************************************************************************
+  clearPixelFast()
+******************************************************************************************************************************************************/
+/*! \brief          
+ *  \details        
+ *                  
+ *  \return         -
+******************************************************************************************************************************************************/
+void Display::clearPixelFast(byte Index)
+{
+    byte Row = Index / DISPLAY_NUMBER_OF_COLUMNS;
+    byte Column = Index % DISPLAY_NUMBER_OF_COLUMNS;
+
+    clearPixelFast(Column,  Row);
+} /* clearPixelFast */
 
 
 /******************************************************************************************************************************************************

@@ -22,14 +22,19 @@ wxBEGIN_EVENT_TABLE(WordclockDialog, wxDialog)
 wxEND_EVENT_TABLE()
 
 
-WordclockDialog::WordclockDialog() : WcDisplay(255, 255, 255), WcClock(&WcDisplay, CLOCK_MODE_WESSI), WcAnimation(&WcDisplay), Timer(this, TIMER_ID)
+WordclockDialog::WordclockDialog() : WcDisplay(255, 255, 255), WcClock(&WcDisplay, CLOCK_MODE_WESSI), WcAnimation(&WcDisplay), WcTransformation(&WcDisplay), Timer(this, TIMER_ID)
 {
-    Timer.Start(1000 * 60);
+    Timer.Start(1000 * 10);
     Time = wxDateTime::Now();
     int Hour = Time.GetHour();
     int Minute = Time.GetMinute();
     WcClock.show(Hour, Minute);
     WcDisplay.show();
+
+    //WcAnimation.setChar(0,0,219, ANIMATION_FONT_6X10);
+    //WcDisplay.show();
+    WcTransformation.shiftLeft();
+    //WcDisplay.show();
 }
 
 
@@ -44,6 +49,7 @@ void WordclockDialog::OnTimer(wxTimerEvent& event)
     int Hour = Time.GetHour();
     int Minute = Time.GetMinute();
     WcDisplay.clearAllWords();
+    //WcDisplay.clear();
     WcClock.show(Hour, Minute);
     WcDisplay.show();
 }

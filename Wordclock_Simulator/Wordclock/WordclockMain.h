@@ -19,7 +19,7 @@
 #include "Clock.h"
 #include "Display.h"
 #include "Animation.h"
-
+#include "Transformation.h"
 
 class WordclockDialog : public wxDialog
 {
@@ -35,6 +35,7 @@ class WordclockDialog : public wxDialog
         Display WcDisplay;
         Clock WcClock;
         Animation WcAnimation;
+        Transformation WcTransformation;
         wxDateTime Time;
         wxTimer Timer;
         enum {

@@ -9,10 +9,10 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       Animation.cpp
- *      \brief      
+ *      \brief
  *
- *      \details    
- *                  
+ *      \details
+ *
  *
 ******************************************************************************************************************************************************/
 #define _ANIMATION_SOURCE_
@@ -63,16 +63,16 @@ Animation::Animation(Display* Display)
 ******************************************************************************************************************************************************/
 Animation::~Animation()
 {
-    
+
 } /* ~Animation */
 
 
 /******************************************************************************************************************************************************
   init()
 ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
+/*! \brief
+ *  \details
+ *
  *  \return         -
 ******************************************************************************************************************************************************/
 void Animation::init()
@@ -91,98 +91,26 @@ void Animation::init()
 ******************************************************************************************************************************************************/
 stdReturnType Animation::setChar(byte Column, byte Row, char Char, AnimationFontType Font)
 {
-	stdReturnType ReturnValue = E_NOT_OK;
-	byte FontIndex, ColumnAbs, RowAbs;
-
-	//convertCharToFontIndex(Char, &FontIndex);
-	FontIndex = Char;
-
 #if(ANIMATION_SUPPORT_FONT_4X6 == STD_ON)
-	if(Font == ANIMATION_FONT_4X6)
-	{
-	    ReturnValue = E_OK;
-        for(byte FontColumn = 0; FontColumn < ANIMATION_FONT_4X6_WIDTH; FontColumn++)
-        {
-			byte Font_4x6_EntryItem = pgm_read_byte(&Font_4x6[FontIndex][FontColumn]);
-	        for(byte FontRow = 0; FontRow < ANIMATION_FONT_4X6_HEIGHT; FontRow++)
-	        {
-		        ColumnAbs = Column + FontColumn;
-		        RowAbs = Row + ANIMATION_FONT_4X6_HEIGHT - 1 - FontRow;
-                if(pDisplay->writePixel(ColumnAbs, RowAbs, bitRead(Font_4x6_EntryItem, FontRow)) == E_NOT_OK) ReturnValue = E_NOT_OK;
-	        }
-		}
-	}
+	if(Font == ANIMATION_FONT_4X6) return setCharFontHorizontal(Column, Row, Char, &Font_4x6[0][0], ANIMATION_FONT_4X6_WIDTH, ANIMATION_FONT_4X6_HEIGHT);
 #endif
 
 #if(ANIMATION_SUPPORT_FONT_5X8 == STD_ON)
-	if(Font == ANIMATION_FONT_5X8)
-	{
-	    ReturnValue = E_OK;
-        for(byte FontColumn = 0; FontColumn < ANIMATION_FONT_5X8_WIDTH; FontColumn++)
-        {
-			byte Font_5x8_EntryItem = pgm_read_byte(&Font_5x8[FontIndex][FontColumn]);
-	        for(byte FontRow = 0; FontRow < ANIMATION_FONT_5X8_HEIGHT; FontRow++)
-	        {
-		        ColumnAbs = Column + FontColumn;
-		        RowAbs = Row + ANIMATION_FONT_5X8_HEIGHT - 1 - FontRow;
-                if(pDisplay->writePixel(ColumnAbs, RowAbs, bitRead(Font_5x8_EntryItem, FontRow)) == E_NOT_OK) ReturnValue = E_NOT_OK;
-	        }
-		}
-	}
+    if(Font == ANIMATION_FONT_5X8) return setCharFontHorizontal(Column, Row, Char, &Font_5x8[0][0], ANIMATION_FONT_5X8_WIDTH, ANIMATION_FONT_5X8_HEIGHT);
 #endif
 
 #if(ANIMATION_SUPPORT_FONT_6X8 == STD_ON)
-	if(Font == ANIMATION_FONT_6X8)
-	{
-	    ReturnValue = E_OK;
-        for(byte FontColumn = 0; FontColumn < ANIMATION_FONT_6X8_WIDTH; FontColumn++)
-        {
-			byte Font_6x8_EntryItem = pgm_read_byte(&Font_6x8[FontIndex][FontColumn]);
-	        for(byte FontRow = 0; FontRow < ANIMATION_FONT_6X8_HEIGHT; FontRow++)
-	        {
-		        ColumnAbs = Column + FontColumn;
-		        RowAbs = Row + ANIMATION_FONT_6X8_HEIGHT - 1 - FontRow;
-                if(pDisplay->writePixel(ColumnAbs, RowAbs, bitRead(Font_6x8_EntryItem, FontRow)) == E_NOT_OK) ReturnValue = E_NOT_OK;
-	        }
-		}
-	}
+    if(Font == ANIMATION_FONT_6X8) return setCharFontHorizontal(Column, Row, Char, &Font_6x8[0][0], ANIMATION_FONT_6X8_WIDTH, ANIMATION_FONT_6X8_HEIGHT);
 #endif
 
 #if(ANIMATION_SUPPORT_FONT_8X8 == STD_ON)
-	if(Font == ANIMATION_FONT_8X8)
-	{
-	    ReturnValue = E_OK;
-        for(byte FontColumn = 0; FontColumn < ANIMATION_FONT_8X8_WIDTH; FontColumn++)
-        {
-			byte Font_8x8_EntryItem = pgm_read_byte(&Font_8x8[FontIndex][FontColumn]);
-	        for(byte FontRow = 0; FontRow < ANIMATION_FONT_8X8_HEIGHT; FontRow++)
-	        {
-		        ColumnAbs = Column + FontColumn;
-		        RowAbs = Row + ANIMATION_FONT_8X8_HEIGHT - 1 - FontRow;
-                if(pDisplay->writePixel(ColumnAbs, RowAbs, bitRead(Font_8x8_EntryItem, FontRow)) == E_NOT_OK) ReturnValue = E_NOT_OK;
-	        }
-		}
-	}
+    if(Font == ANIMATION_FONT_8X8) return setCharFontHorizontal(Column, Row, Char, &Font_8x8[0][0], ANIMATION_FONT_8X8_WIDTH, ANIMATION_FONT_8X8_HEIGHT);
 #endif
 
 #if(ANIMATION_SUPPORT_FONT_6X10 == STD_ON)
-	if(Font == ANIMATION_FONT_6X10)
-	{
-	    ReturnValue = E_OK;
-	    for(byte FontRow = 0; FontRow < ANIMATION_FONT_6X10_HEIGHT; FontRow++)
-        {
-			byte Font_6x10_EntryItem = pgm_read_byte(&Font_6x10[FontIndex][FontRow]);
-	        for(byte FontColumn = 0; FontColumn < ANIMATION_FONT_6X10_WIDTH; FontColumn++)
-	        {
-		        ColumnAbs = Column + FontColumn;
-		        RowAbs = Row + FontRow;
-                if(pDisplay->writePixel(ColumnAbs, RowAbs, bitRead(Font_6x10_EntryItem, FontColumn)) == E_NOT_OK) ReturnValue = E_NOT_OK;
-	        }
-		}
-	}
+    if(Font == ANIMATION_FONT_6X10) return setCharFontVertical(Column, Row, Char, &Font_6x10[0][0], ANIMATION_FONT_6X10_WIDTH, ANIMATION_FONT_6X10_HEIGHT);
 #endif
-
-	return ReturnValue;
+    return E_NOT_OK;
 } /* setChar */
 
 
@@ -191,11 +119,69 @@ stdReturnType Animation::setChar(byte Column, byte Row, char Char, AnimationFont
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
+  setCharFontHorizontal()
+******************************************************************************************************************************************************/
+/*! \brief
+ *  \details
+ *
+ *  \return         -
+******************************************************************************************************************************************************/
+stdReturnType Animation::setCharFontHorizontal(byte Column, byte Row, char Char, const char* FontTable, byte FontWidth, byte FontHeight)
+{
+    stdReturnType ReturnValue = E_OK;
+    byte FontIndex, ColumnAbs, RowAbs;
+
+    FontIndex = Char;
+
+    for(byte FontColumn = 0; FontColumn < FontWidth; FontColumn++)
+    {
+        byte Font_EntryItem = pgm_read_byte(&FontTable[(FontIndex * FontWidth) + FontColumn]);
+        for(byte FontRow = 0; FontRow < FontHeight; FontRow++)
+        {
+            ColumnAbs = Column + FontColumn;
+            RowAbs = Row + FontHeight - 1 - FontRow;
+            if(pDisplay->writePixel(ColumnAbs, RowAbs, bitRead(Font_EntryItem, FontRow)) == E_NOT_OK) ReturnValue = E_NOT_OK;
+        }
+    }
+    return ReturnValue;
+} /* setCharFontHorizontal */
+
+
+/******************************************************************************************************************************************************
+  setCharFontVertical()
+******************************************************************************************************************************************************/
+/*! \brief
+ *  \details
+ *
+ *  \return         -
+******************************************************************************************************************************************************/
+stdReturnType Animation::setCharFontVertical(byte Column, byte Row, char Char, const char* FontTable, byte FontWidth, byte FontHeight)
+{
+    stdReturnType ReturnValue = E_OK;
+    byte FontIndex, ColumnAbs, RowAbs;
+
+    FontIndex = Char;
+
+    for(byte FontRow = 0; FontRow < FontHeight; FontRow++)
+    {
+        byte Font_EntryItem = pgm_read_byte(&FontTable[(FontIndex * FontHeight) + FontRow]);
+	    for(byte FontColumn = 0; FontColumn < FontWidth; FontColumn++)
+	    {
+            ColumnAbs = Column + FontColumn;
+		    RowAbs = Row + FontRow;
+            if(pDisplay->writePixel(ColumnAbs, RowAbs, bitRead(Font_EntryItem, FontColumn)) == E_NOT_OK) ReturnValue = E_NOT_OK;
+        }
+    }
+    return ReturnValue;
+} /* setCharVertical */
+
+
+/******************************************************************************************************************************************************
   convertCharToSprite()
 ******************************************************************************************************************************************************/
 /*! \brief          converts char to sprite
  *  \details        this function converts the ASCII char to sprite index
- *                  
+ *
  *  \param[in]      Char            char to convert to sprite
  *  \param[out]     SpriteIndex     appropriate sprite
  *  \return         E_OK
@@ -222,4 +208,3 @@ stdReturnType Animation::convertCharToFontIndex(char Char, byte* Index)
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E
 ******************************************************************************************************************************************************/
- 

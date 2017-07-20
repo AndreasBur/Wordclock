@@ -62,7 +62,7 @@ Simulator::Simulator(wxDialog *dlg, const wxString &title) : wxDialog(dlg, -1, t
 
 Simulator::~Simulator()
 {
-    //dtor
+    Destroy();
 }
 
 void Simulator::OnClose(wxCloseEvent &event)
@@ -101,6 +101,24 @@ stdReturnType Simulator::getPixel(byte Index, WS2812PixelType* Pixel)
     }
 }
 
+WS2812PixelType Simulator::getPixelFast(byte Index)
+{
+    WS2812PixelType Pixel;
+    byte Row = Index / DISPLAY_NUMBER_OF_COLUMNS;
+    byte Column = Index % DISPLAY_NUMBER_OF_COLUMNS;
+
+    if(Characters[Row][Column]->GetForegroundColour() == wxColor(*wxBLACK)) {
+        Pixel.Blue = 255;
+        Pixel.Green = 255;
+        Pixel.Red = 255;
+    } else {
+        Pixel.Blue = 0;
+        Pixel.Green = 0;
+        Pixel.Red = 0;
+    }
+    return Pixel;
+}
+
 stdReturnType Simulator::setPixel(byte Index, WS2812PixelType Pixel)
 {
     byte Row = Index / DISPLAY_NUMBER_OF_COLUMNS;
@@ -132,6 +150,31 @@ stdReturnType Simulator::setPixel(byte Index, byte Red, byte Green, byte Blue)
         return E_OK;
     } else {
         return E_NOT_OK;
+    }
+}
+
+void Simulator::setPixelFast(byte Index, WS2812PixelType Pixel)
+{
+    byte Row = Index / DISPLAY_NUMBER_OF_COLUMNS;
+    byte Column = Index % DISPLAY_NUMBER_OF_COLUMNS;
+
+    if(Pixel.Red != 0 || Pixel.Green != 0 || Pixel.Blue != 0) {
+        Characters[Row][Column]->SetForegroundColour(wxColour(*wxBLACK));
+    } else {
+        Characters[Row][Column]->SetForegroundColour(wxColour(*wxLIGHT_GREY));
+    }
+}
+
+void Simulator::setPixelFast(byte Index, byte Red, byte Green, byte Blue)
+{
+    byte Row = Index / DISPLAY_NUMBER_OF_COLUMNS;
+    byte Column = Index % DISPLAY_NUMBER_OF_COLUMNS;
+
+
+    if(Red != 0 || Green != 0 || Blue != 0) {
+        Characters[Row][Column]->SetForegroundColour(wxColour(*wxBLACK));
+    } else {
+        Characters[Row][Column]->SetForegroundColour(wxColour(*wxLIGHT_GREY));
     }
 }
 

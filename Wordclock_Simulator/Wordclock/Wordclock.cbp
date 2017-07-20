@@ -21,6 +21,7 @@
 					<Add directory="Arduino/inc/Clock" />
 					<Add directory="Arduino/inc/Display" />
 					<Add directory="Arduino/inc/StandardTypes" />
+					<Add directory="Arduino/inc/Transformation" />
 				</Compiler>
 				<ResourceCompiler>
 					<Add directory="$(#wx30)/lib/gcc_dll/mswud" />
@@ -73,10 +74,12 @@
 		<Unit filename="Arduino/inc/Display/DisplayCharacters.h" />
 		<Unit filename="Arduino/inc/Display/DisplayWords.h" />
 		<Unit filename="Arduino/inc/StandardTypes/StandardTypes.h" />
+		<Unit filename="Arduino/inc/Transformation/Transformation.h" />
 		<Unit filename="Arduino/src/Animation/Animation.cpp" />
 		<Unit filename="Arduino/src/Animation/Font.cpp" />
 		<Unit filename="Arduino/src/Clock/Clock.cpp" />
 		<Unit filename="Arduino/src/Display/Display.cpp" />
+		<Unit filename="Arduino/src/Transformation/Transformation.cpp" />
 		<Unit filename="WordclockApp.cpp" />
 		<Unit filename="WordclockApp.h" />
 		<Unit filename="WordclockMain.cpp" />

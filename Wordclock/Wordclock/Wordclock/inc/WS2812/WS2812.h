@@ -118,17 +118,22 @@ class WS2812
     byte getBrightness() { return Brightness; }
     stdReturnType getPixel(byte, WS2812PixelType*);
     stdReturnType getPixelDimmed(byte, WS2812PixelType*);
+	WS2812PixelType getPixelFast(byte);
+	WS2812PixelType getPixelDimmedFast(byte);
 
     // set methods
     stdReturnType setBrightness(byte);
     stdReturnType setPin(byte);
     stdReturnType setPixel(byte, WS2812PixelType);
     stdReturnType setPixel(byte, byte, byte, byte);
+	void setPixelFast(byte, WS2812PixelType);
+	void setPixelFast(byte, byte, byte, byte);
 
     // methods
     void init();
     void clearAllPixels() { memset(Pixels, 0, sizeof(Pixels)); }
     stdReturnType clearPixel(byte Index) { return setPixel(Index, 0, 0, 0); }
+	void clearPixelFast(byte Index) { setPixelFast(Index, 0, 0, 0); }
 
 #if (WS2812_RESET_TIMER == STD_ON)
     stdReturnType show();

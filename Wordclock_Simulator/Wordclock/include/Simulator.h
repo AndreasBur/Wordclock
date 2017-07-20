@@ -31,6 +31,7 @@ class Simulator : public wxDialog
         // get methods
         //byte getBrightness() { return Brightness; }
         stdReturnType getPixel(byte, WS2812PixelType*);
+        WS2812PixelType getPixelFast(byte);
         //stdReturnType getPixelDimmed(byte, WS2812PixelType*);
 
         // set methods
@@ -38,6 +39,8 @@ class Simulator : public wxDialog
         //stdReturnType setPin(byte);
         stdReturnType setPixel(byte, WS2812PixelType);
         stdReturnType setPixel(byte, byte, byte, byte);
+        void setPixelFast(byte, WS2812PixelType);
+        void setPixelFast(byte, byte, byte, byte);
 
         // methods
         //void init();

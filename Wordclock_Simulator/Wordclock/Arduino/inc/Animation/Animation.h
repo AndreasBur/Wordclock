@@ -9,10 +9,10 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       Animation.h
- *      \brief      
+ *      \brief
  *
- *      \details    
- *                  
+ *      \details
+ *
 ******************************************************************************************************************************************************/
 #ifndef _ANIMATION_H_
 #define _ANIMATION_H_
@@ -53,6 +53,7 @@
 /* Font 8x8 */
 #define ANIMATION_FONT_8X8_WIDTH				8
 #define ANIMATION_FONT_8X8_HEIGHT				8
+
 
 /******************************************************************************************************************************************************
  *  GLOBAL FUNCTION MACROS
@@ -126,6 +127,8 @@ class Animation
 
 	// functions
 	stdReturnType convertCharToFontIndex(char, byte*);
+	stdReturnType setCharFontHorizontal(byte, byte, char, const char*, byte, byte);
+	stdReturnType setCharFontVertical(byte, byte, char, const char*, byte, byte);
 
   public:
 	Animation(Display*);

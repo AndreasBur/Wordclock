@@ -9,10 +9,10 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       Display.cpp
- *      \brief      
+ *      \brief
  *
- *      \details    
- *                  
+ *      \details
+ *
  *
 ******************************************************************************************************************************************************/
 #define _DISPLAY_SOURCE_
@@ -138,7 +138,7 @@ Pixels.Show();
 
 
 /******************************************************************************************************************************************************
-  DESTRUCTOR OF TEMPLATE
+  DESTRUCTOR OF Template
 ******************************************************************************************************************************************************/
 Display::~Display()
 {
@@ -149,9 +149,9 @@ Display::~Display()
 /******************************************************************************************************************************************************
   init()
 ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
+/*! \brief
+ *  \details
+ *
  *  \return         -
 ******************************************************************************************************************************************************/
 void Display::init()
@@ -164,16 +164,16 @@ void Display::init()
 /******************************************************************************************************************************************************
   getCharacter()
 ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
+/*! \brief
+ *  \details
+ *
  *  \return         -
 ******************************************************************************************************************************************************/
 stdReturnType Display::getCharacter(DisplayCharacterType Character, boolean* Value)
 {
 	stdReturnType ReturnValue = E_NOT_OK;
     PixelType Pixel;
-    
+
     if(Character < DISPLAY_CHARACTER_NUMBER_OF_CHARACTERS) {
 		ReturnValue = E_OK;
         if(Pixels.getPixel(Character, &Pixel) == E_NOT_OK) ReturnValue = E_NOT_OK;
@@ -190,9 +190,9 @@ stdReturnType Display::getCharacter(DisplayCharacterType Character, boolean* Val
 /******************************************************************************************************************************************************
   getCharacter()
 ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
+/*! \brief
+ *  \details
+ *
  *  \return         -
 ******************************************************************************************************************************************************/
 stdReturnType Display::getCharacter(byte Column, byte Row, char* Character)
@@ -209,9 +209,9 @@ stdReturnType Display::getCharacter(byte Column, byte Row, char* Character)
 /******************************************************************************************************************************************************
   getCharacter()
   ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
+/*! \brief
+ *  \details
+ *
  *  \return         -
 ******************************************************************************************************************************************************/
 stdReturnType Display::getCharacter(byte Index, char* Character)
@@ -231,9 +231,9 @@ stdReturnType Display::getCharacter(byte Index, char* Character)
 /******************************************************************************************************************************************************
   getWord()
 ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
+/*! \brief
+ *  \details
+ *
  *  \return         -
 ******************************************************************************************************************************************************/
 stdReturnType Display::getWordIllumination(DisplayWordType Word, DisplayWordIlluminationType* WordIllu)
@@ -253,9 +253,9 @@ stdReturnType Display::getWordIllumination(DisplayWordType Word, DisplayWordIllu
 /******************************************************************************************************************************************************
   setWord()
 ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
+/*! \brief
+ *  \details
+ *
  *  \return         -
 ******************************************************************************************************************************************************/
 stdReturnType Display::setWord(DisplayWordType Word, byte MaxLength)
@@ -284,9 +284,9 @@ stdReturnType Display::setWord(DisplayWordType Word, byte MaxLength)
 /******************************************************************************************************************************************************
   clearWord()
 ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
+/*! \brief
+ *  \details
+ *
  *  \return         -
 ******************************************************************************************************************************************************/
 stdReturnType Display::clearWord(DisplayWordType Word)
@@ -311,9 +311,9 @@ stdReturnType Display::clearWord(DisplayWordType Word)
 /******************************************************************************************************************************************************
   clearAllWords()
 ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
+/*! \brief
+ *  \details
+ *
  *  \return         -
 ******************************************************************************************************************************************************/
 stdReturnType Display::clearAllWords()
@@ -326,11 +326,75 @@ stdReturnType Display::clearAllWords()
 
 
 /******************************************************************************************************************************************************
+  getPixel()
+******************************************************************************************************************************************************/
+/*! \brief
+ *  \details
+ *
+ *  \return         -
+******************************************************************************************************************************************************/
+stdReturnType Display::getPixel(byte Index, boolean* Value)
+{
+    byte Row = Index / DISPLAY_NUMBER_OF_COLUMNS;
+    byte Column = Index % DISPLAY_NUMBER_OF_COLUMNS;
+
+    return getPixel(Row, Column, Value);
+} /* getPixel */
+
+
+/******************************************************************************************************************************************************
+  getPixel()
+******************************************************************************************************************************************************/
+/*! \brief
+ *  \details
+ *
+ *  \return         -
+******************************************************************************************************************************************************/
+stdReturnType Display::getPixel(byte Column, byte Row, boolean* Value)
+{
+	stdReturnType ReturnValue = E_NOT_OK;
+    PixelType Pixel;
+
+#if (DISPLAY_LED_STRIPE_SERPENTINE == STD_ON)
+    /* if led stripe is snake or serpentine then odd row: count from right to left */
+    ReturnValue = Pixels.getPixel(transformToSerpentine(Column,  Row), &Pixel);
+#else
+    ReturnValue = Pixels.getPixel((Row * DISPLAY_NUMBER_OF_COLUMNS) + Column, &Pixel);
+#endif
+    if(ReturnValue == E_OK) {
+        /* Pixel is only off when all colors are zero */
+        if(Pixel.Red == 0 && Pixel.Green == 0 && Pixel.Blue == 0) *Value = false;
+        else *Value = true;
+    }
+	return ReturnValue;
+} /* getPixel */
+
+
+/******************************************************************************************************************************************************
   setPixel()
 ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
+/*! \brief
+ *  \details
+ *
+ *  \return         -
+******************************************************************************************************************************************************/
+stdReturnType Display::setPixel(byte Column, byte Row)
+{
+#if (DISPLAY_LED_STRIPE_SERPENTINE == STD_ON)
+    /* if led stripe is snake or serpentine the odd row: count from right to left */
+    return Pixels.setPixel(transformToSerpentine(Column,  Row), Color);
+#else
+    return Pixels.setPixel((Row * DISPLAY_NUMBER_OF_COLUMNS) + Column, Color);
+#endif
+} /* setPixel */
+
+
+/******************************************************************************************************************************************************
+  setPixel()
+******************************************************************************************************************************************************/
+/*! \brief
+ *  \details
+ *
  *  \return         -
 ******************************************************************************************************************************************************/
 stdReturnType Display::setPixel(byte Index)
@@ -343,59 +407,30 @@ stdReturnType Display::setPixel(byte Index)
 
 
 /******************************************************************************************************************************************************
-  setPixel()
-******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
- *  \return         -
-******************************************************************************************************************************************************/
-stdReturnType Display::setPixel(byte Column, byte Row)
-{
-    if(Row < DISPLAY_NUMBER_OF_ROWS && Column < DISPLAY_NUMBER_OF_COLUMNS) {
-#if (DISPLAY_LED_STRIPE_SERPENTINE == STD_ON)
-        /* if led stripe is snake or serpentine the odd row: count from right to left */
-        return Pixels.setPixel(transformToSerpentine(Column,  Row), Color);
-#else
-        return Pixels.setPixel((Row * DISPLAY_NUMBER_OF_COLUMNS) + Column, Color);
-#endif
-        return E_OK;
-    } else {
-        return E_NOT_OK;
-    }
-} /* setPixel */
-
-
-/******************************************************************************************************************************************************
   clearPixel()
 ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
+/*! \brief
+ *  \details
+ *
  *  \return         -
 ******************************************************************************************************************************************************/
 stdReturnType Display::clearPixel(byte Column, byte Row)
 {
-    if(Row < DISPLAY_NUMBER_OF_ROWS && Column < DISPLAY_NUMBER_OF_COLUMNS) {
 #if (DISPLAY_LED_STRIPE_SERPENTINE == STD_ON)
-        /* if led stripe is snake or serpentine then odd row: count from right to left */
-        return Pixels.setPixel(transformToSerpentine(Column,  Row), 0, 0, 0);
+    /* if led stripe is snake or serpentine then odd row: count from right to left */
+    return Pixels.setPixel(transformToSerpentine(Column,  Row), 0, 0, 0);
 #else
-        return Pixels.setPixel((Row * DISPLAY_NUMBER_OF_COLUMNS) + Column, 0, 0, 0);
+    return Pixels.setPixel((Row * DISPLAY_NUMBER_OF_COLUMNS) + Column, 0, 0, 0);
 #endif
-        return E_OK;
-    } else {
-        return E_NOT_OK;
-    }
 } /* clearPixel */
 
 
 /******************************************************************************************************************************************************
   clearPixel()
 ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
+/*! \brief
+ *  \details
+ *
  *  \return         -
 ******************************************************************************************************************************************************/
 stdReturnType Display::clearPixel(byte Index)
@@ -407,6 +442,100 @@ stdReturnType Display::clearPixel(byte Index)
 } /* clearPixel */
 
 
+/******************************************************************************************************************************************************
+  getPixelFast()
+******************************************************************************************************************************************************/
+/*! \brief
+ *  \details
+ *
+ *  \return         -
+******************************************************************************************************************************************************/
+boolean Display::getPixelFast(byte Column, byte Row)
+{
+	PixelType Pixel;
+
+#if (DISPLAY_LED_STRIPE_SERPENTINE == STD_ON)
+	/* if led stripe is snake or serpentine then odd row: count from right to left */
+	Pixel = Pixels.getPixelFast(transformToSerpentine(Column,  Row));
+#else
+	Pixel = Pixels.getPixelFast((Row * DISPLAY_NUMBER_OF_COLUMNS) + Column);
+#endif
+	if(Pixel.Red == 0 && Pixel.Green == 0 && Pixel.Blue == 0) return false;
+	else return true;
+} /* getPixelFast */
+
+
+/******************************************************************************************************************************************************
+  setPixelFast()
+******************************************************************************************************************************************************/
+/*! \brief
+ *  \details
+ *
+ *  \return         -
+******************************************************************************************************************************************************/
+void Display::setPixelFast(byte Column, byte Row)
+{
+#if (DISPLAY_LED_STRIPE_SERPENTINE == STD_ON)
+    /* if led stripe is snake or serpentine the odd row: count from right to left */
+    Pixels.setPixelFast(transformToSerpentine(Column,  Row), Color);
+#else
+    Pixels.setPixelFast((Row * DISPLAY_NUMBER_OF_COLUMNS) + Column, Color);
+#endif
+} /* setPixelFast */
+
+
+/******************************************************************************************************************************************************
+  setPixelFast()
+******************************************************************************************************************************************************/
+/*! \brief
+ *  \details
+ *
+ *  \return         -
+******************************************************************************************************************************************************/
+void Display::setPixelFast(byte Index)
+{
+    byte Row = Index / DISPLAY_NUMBER_OF_COLUMNS;
+    byte Column = Index % DISPLAY_NUMBER_OF_COLUMNS;
+
+    setPixelFast(Column,  Row);
+} /* setPixelFast */
+
+
+/******************************************************************************************************************************************************
+  clearPixelFast()
+******************************************************************************************************************************************************/
+/*! \brief
+ *  \details
+ *
+ *  \return         -
+******************************************************************************************************************************************************/
+void Display::clearPixelFast(byte Column, byte Row)
+{
+#if (DISPLAY_LED_STRIPE_SERPENTINE == STD_ON)
+    /* if led stripe is snake or serpentine then odd row: count from right to left */
+    Pixels.setPixelFast(transformToSerpentine(Column,  Row), 0, 0, 0);
+#else
+    Pixels.setPixelFast((Row * DISPLAY_NUMBER_OF_COLUMNS) + Column, 0, 0, 0);
+#endif
+} /* clearPixelFast */
+
+
+/******************************************************************************************************************************************************
+  clearPixelFast()
+******************************************************************************************************************************************************/
+/*! \brief
+ *  \details
+ *
+ *  \return         -
+******************************************************************************************************************************************************/
+void Display::clearPixelFast(byte Index)
+{
+    byte Row = Index / DISPLAY_NUMBER_OF_COLUMNS;
+    byte Column = Index % DISPLAY_NUMBER_OF_COLUMNS;
+
+    clearPixelFast(Column,  Row);
+} /* clearPixelFast */
+
 
 /******************************************************************************************************************************************************
  * P R I V A T E   F U N C T I O N S
@@ -415,9 +544,9 @@ stdReturnType Display::clearPixel(byte Index)
 /******************************************************************************************************************************************************
   transformToSerpentine()
 ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
+/*! \brief
+ *  \details
+ *
  *  \return         -
 ******************************************************************************************************************************************************/
 byte Display::transformToSerpentine(byte Column, byte Row)
@@ -426,7 +555,7 @@ byte Display::transformToSerpentine(byte Column, byte Row)
 
     if(isBitCleared(Row, 0)) Index = (Row * DISPLAY_NUMBER_OF_COLUMNS) + Column;
     else Index = (Row * DISPLAY_NUMBER_OF_COLUMNS) + (DISPLAY_NUMBER_OF_COLUMNS - Column - 1);
-    
+
     return Index;
 } /* transformToSerpentine */
 
@@ -434,4 +563,3 @@ byte Display::transformToSerpentine(byte Column, byte Row)
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E
 ******************************************************************************************************************************************************/
- 

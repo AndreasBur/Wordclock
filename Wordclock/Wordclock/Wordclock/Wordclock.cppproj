@@ -168,6 +168,7 @@
       <Value>../inc/WS2812</Value>
       <Value>../inc/Clock</Value>
       <Value>../inc/Animation</Value>
+      <Value>../inc/Transformation</Value>
     </ListValues>
   </avrgcc.compiler.directories.IncludePaths>
   <avrgcc.compiler.optimization.level>Optimize for size (-Os)</avrgcc.compiler.optimization.level>
@@ -203,6 +204,7 @@
       <Value>../inc/WS2812</Value>
       <Value>../inc/Clock</Value>
       <Value>../inc/Animation</Value>
+      <Value>../inc/Transformation</Value>
     </ListValues>
   </avrgcccpp.compiler.directories.IncludePaths>
   <avrgcccpp.compiler.optimization.level>Optimize for size (-Os)</avrgcccpp.compiler.optimization.level>
@@ -247,6 +249,9 @@
     <Compile Include="inc\StandardTypes\StandardTypes.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="inc\Transformation\Transformation.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="inc\WS2812\WS2812.h">
       <SubType>compile</SubType>
     </Compile>
@@ -263,6 +268,9 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="src\Display\Display.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\Transformation\Transformation.cpp">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="src\WS2812\WS2812.cpp">
@@ -283,12 +291,14 @@
     <Folder Include="inc\Display" />
     <Folder Include="inc\Clock" />
     <Folder Include="inc\Animation" />
+    <Folder Include="inc\Transformation" />
     <Folder Include="inc\WS2812" />
     <Folder Include="inc\StandardTypes" />
     <Folder Include="src" />
     <Folder Include="src\Display" />
     <Folder Include="src\Clock" />
     <Folder Include="src\Animation" />
+    <Folder Include="src\Transformation" />
     <Folder Include="src\WS2812" />
   </ItemGroup>
   <Import Project="$(AVRSTUDIO_EXE_PATH)\\Vs\\Compiler.targets" />
