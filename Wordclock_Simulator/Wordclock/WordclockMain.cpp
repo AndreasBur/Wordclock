@@ -24,17 +24,21 @@ wxEND_EVENT_TABLE()
 
 WordclockDialog::WordclockDialog() : WcDisplay(255, 255, 255), WcClock(&WcDisplay, CLOCK_MODE_WESSI), WcAnimation(&WcDisplay), WcTransformation(&WcDisplay), Timer(this, TIMER_ID)
 {
-    Timer.Start(1000 * 10);
+    //Timer.Start(1000 * 10);
     Time = wxDateTime::Now();
     int Hour = Time.GetHour();
     int Minute = Time.GetMinute();
     WcClock.show(Hour, Minute);
-    WcDisplay.show();
+    //WcDisplay.setPixelRowFast(5, 0xFFFF);
+    //WcDisplay.show();
 
     //WcAnimation.setChar(0,0,219, ANIMATION_FONT_6X10);
     //WcDisplay.show();
-    WcTransformation.shiftLeft();
-    //WcDisplay.show();
+    WcTransformation.shiftLeft(true);
+    WcTransformation.shiftRight(true);
+    WcTransformation.shiftUp(true);
+    WcTransformation.shiftDown(true);
+    WcDisplay.show();
 }
 
 

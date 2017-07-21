@@ -96,7 +96,7 @@ const DisplayWordIlluminationType Display::WordIlluminationTable[] PROGMEM =
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-Display::Display(PixelType sColor)
+Display::Display(PixelColorType sColor)
 #ifdef SIMULATOR
  : Pixels(0L, _("Wordclock Simulator"))
 #else
@@ -169,32 +169,6 @@ void Display::init()
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType Display::getCharacter(DisplayCharacterType Character, boolean* Value)
-{
-	stdReturnType ReturnValue = E_NOT_OK;
-    PixelType Pixel;
-
-    if(Character < DISPLAY_CHARACTER_NUMBER_OF_CHARACTERS) {
-		ReturnValue = E_OK;
-        if(Pixels.getPixel(Character, &Pixel) == E_NOT_OK) ReturnValue = E_NOT_OK;
-        /* Pixel is only off when all colors are zero */
-        if(Pixel.Red == 0 && Pixel.Green == 0 && Pixel.Blue == 0) *Value = true;
-        else *Value = false;
-    } else {
-        ReturnValue = E_NOT_OK;
-    }
-	return ReturnValue;
-} /* getCharacter */
-
-
-/******************************************************************************************************************************************************
-  getCharacter()
-******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
-******************************************************************************************************************************************************/
 stdReturnType Display::getCharacter(byte Column, byte Row, char* Character)
 {
     if(Row < DISPLAY_NUMBER_OF_ROWS && Column < DISPLAY_NUMBER_OF_COLUMNS) {
@@ -229,7 +203,7 @@ stdReturnType Display::getCharacter(byte Index, char* Character)
 
 
 /******************************************************************************************************************************************************
-  getWord()
+  getWordIllumination()
 ******************************************************************************************************************************************************/
 /*! \brief
  *  \details
@@ -282,6 +256,27 @@ stdReturnType Display::setWord(DisplayWordType Word, byte MaxLength)
 
 
 /******************************************************************************************************************************************************
+  setWordFast()
+******************************************************************************************************************************************************/
+/*! \brief
+ *  \details
+ *
+ *  \return         -
+******************************************************************************************************************************************************/
+void Display::setWordFast(DisplayWordType Word, byte MaxLength)
+{
+	byte Length;
+
+	DisplayWordIlluminationType WordIllu = getWordIlluminationFast(Word);
+
+	if(MaxLength == DISPLAY_WORD_LENGTH_UNLIMITED) Length = WordIllu.Length;
+	else Length = MaxLength;
+
+    for(byte Index = 0; Index < Length; Index++) { setPixelFast(WordIllu.Column + Index,  WordIllu.Row); }
+} /* setWordFast */
+
+
+/******************************************************************************************************************************************************
   clearWord()
 ******************************************************************************************************************************************************/
 /*! \brief
@@ -309,6 +304,22 @@ stdReturnType Display::clearWord(DisplayWordType Word)
 
 
 /******************************************************************************************************************************************************
+  clearWordFast()
+******************************************************************************************************************************************************/
+/*! \brief
+ *  \details
+ *
+ *  \return         -
+******************************************************************************************************************************************************/
+void Display::clearWordFast(DisplayWordType Word)
+{
+	DisplayWordIlluminationType WordIllu = getWordIlluminationFast(Word);
+
+    for(byte Index = 0; Index < WordIllu.Length; Index++) { clearPixelFast(WordIllu.Column + Index,  WordIllu.Row); }
+} /* clearWordFast */
+
+
+/******************************************************************************************************************************************************
   clearAllWords()
 ******************************************************************************************************************************************************/
 /*! \brief
@@ -323,6 +334,20 @@ stdReturnType Display::clearAllWords()
     for(byte i = DISPLAY_WORD_ES; i < DISPLAY_WORD_NUMBER_OF_WORDS; i++) if(clearWord((DisplayWordType) i) == E_NOT_OK) ReturnValue = E_NOT_OK;
     return ReturnValue;
 } /* clearAllWords */
+
+
+/******************************************************************************************************************************************************
+  clearAllWordsFast()
+******************************************************************************************************************************************************/
+/*! \brief
+ *  \details
+ *
+ *  \return         -
+******************************************************************************************************************************************************/
+void Display::clearAllWordsFast()
+{
+    for(byte i = DISPLAY_WORD_ES; i < DISPLAY_WORD_NUMBER_OF_WORDS; i++) clearWordFast((DisplayWordType) i);
+} /* clearAllWordsFast */
 
 
 /******************************************************************************************************************************************************
@@ -343,6 +368,23 @@ stdReturnType Display::getPixel(byte Index, boolean* Value)
 
 
 /******************************************************************************************************************************************************
+  getPixelFast()
+******************************************************************************************************************************************************/
+/*! \brief
+ *  \details
+ *
+ *  \return         -
+******************************************************************************************************************************************************/
+boolean Display::getPixelFast(byte Index)
+{
+    byte Row = Index / DISPLAY_NUMBER_OF_COLUMNS;
+    byte Column = Index % DISPLAY_NUMBER_OF_COLUMNS;
+
+    return getPixelFast(Row, Column);
+} /* getPixelFast */
+
+
+/******************************************************************************************************************************************************
   getPixel()
 ******************************************************************************************************************************************************/
 /*! \brief
@@ -353,7 +395,7 @@ stdReturnType Display::getPixel(byte Index, boolean* Value)
 stdReturnType Display::getPixel(byte Column, byte Row, boolean* Value)
 {
 	stdReturnType ReturnValue = E_NOT_OK;
-    PixelType Pixel;
+    PixelColorType Pixel;
 
 #if (DISPLAY_LED_STRIPE_SERPENTINE == STD_ON)
     /* if led stripe is snake or serpentine then odd row: count from right to left */
@@ -368,6 +410,29 @@ stdReturnType Display::getPixel(byte Column, byte Row, boolean* Value)
     }
 	return ReturnValue;
 } /* getPixel */
+
+
+/******************************************************************************************************************************************************
+  getPixelFast()
+******************************************************************************************************************************************************/
+/*! \brief
+ *  \details
+ *
+ *  \return         -
+******************************************************************************************************************************************************/
+boolean Display::getPixelFast(byte Column, byte Row)
+{
+	PixelColorType Pixel;
+
+#if (DISPLAY_LED_STRIPE_SERPENTINE == STD_ON)
+	/* if led stripe is snake or serpentine then odd row: count from right to left */
+	Pixel = Pixels.getPixelFast(transformToSerpentine(Column,  Row));
+#else
+	Pixel = Pixels.getPixelFast((Row * DISPLAY_NUMBER_OF_COLUMNS) + Column);
+#endif
+	if(Pixel.Red == 0 && Pixel.Green == 0 && Pixel.Blue == 0) return false;
+	else return true;
+} /* getPixelFast */
 
 
 /******************************************************************************************************************************************************
@@ -390,6 +455,25 @@ stdReturnType Display::setPixel(byte Column, byte Row)
 
 
 /******************************************************************************************************************************************************
+  setPixelFast()
+******************************************************************************************************************************************************/
+/*! \brief
+ *  \details
+ *
+ *  \return         -
+******************************************************************************************************************************************************/
+void Display::setPixelFast(byte Column, byte Row)
+{
+#if (DISPLAY_LED_STRIPE_SERPENTINE == STD_ON)
+    /* if led stripe is snake or serpentine the odd row: count from right to left */
+    Pixels.setPixelFast(transformToSerpentine(Column,  Row), Color);
+#else
+    Pixels.setPixelFast((Row * DISPLAY_NUMBER_OF_COLUMNS) + Column, Color);
+#endif
+} /* setPixelFast */
+
+
+/******************************************************************************************************************************************************
   setPixel()
 ******************************************************************************************************************************************************/
 /*! \brief
@@ -404,6 +488,23 @@ stdReturnType Display::setPixel(byte Index)
 
     return setPixel(Column,  Row);
 } /* setPixel */
+
+
+/******************************************************************************************************************************************************
+  setPixelFast()
+******************************************************************************************************************************************************/
+/*! \brief
+ *  \details
+ *
+ *  \return         -
+******************************************************************************************************************************************************/
+void Display::setPixelFast(byte Index)
+{
+    byte Row = Index / DISPLAY_NUMBER_OF_COLUMNS;
+    byte Column = Index % DISPLAY_NUMBER_OF_COLUMNS;
+
+    setPixelFast(Column,  Row);
+} /* setPixelFast */
 
 
 /******************************************************************************************************************************************************
@@ -426,82 +527,6 @@ stdReturnType Display::clearPixel(byte Column, byte Row)
 
 
 /******************************************************************************************************************************************************
-  clearPixel()
-******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
-******************************************************************************************************************************************************/
-stdReturnType Display::clearPixel(byte Index)
-{
-    byte Row = Index / DISPLAY_NUMBER_OF_COLUMNS;
-    byte Column = Index % DISPLAY_NUMBER_OF_COLUMNS;
-
-    return clearPixel(Column,  Row);
-} /* clearPixel */
-
-
-/******************************************************************************************************************************************************
-  getPixelFast()
-******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
-******************************************************************************************************************************************************/
-boolean Display::getPixelFast(byte Column, byte Row)
-{
-	PixelType Pixel;
-
-#if (DISPLAY_LED_STRIPE_SERPENTINE == STD_ON)
-	/* if led stripe is snake or serpentine then odd row: count from right to left */
-	Pixel = Pixels.getPixelFast(transformToSerpentine(Column,  Row));
-#else
-	Pixel = Pixels.getPixelFast((Row * DISPLAY_NUMBER_OF_COLUMNS) + Column);
-#endif
-	if(Pixel.Red == 0 && Pixel.Green == 0 && Pixel.Blue == 0) return false;
-	else return true;
-} /* getPixelFast */
-
-
-/******************************************************************************************************************************************************
-  setPixelFast()
-******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
-******************************************************************************************************************************************************/
-void Display::setPixelFast(byte Column, byte Row)
-{
-#if (DISPLAY_LED_STRIPE_SERPENTINE == STD_ON)
-    /* if led stripe is snake or serpentine the odd row: count from right to left */
-    Pixels.setPixelFast(transformToSerpentine(Column,  Row), Color);
-#else
-    Pixels.setPixelFast((Row * DISPLAY_NUMBER_OF_COLUMNS) + Column, Color);
-#endif
-} /* setPixelFast */
-
-
-/******************************************************************************************************************************************************
-  setPixelFast()
-******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
-******************************************************************************************************************************************************/
-void Display::setPixelFast(byte Index)
-{
-    byte Row = Index / DISPLAY_NUMBER_OF_COLUMNS;
-    byte Column = Index % DISPLAY_NUMBER_OF_COLUMNS;
-
-    setPixelFast(Column,  Row);
-} /* setPixelFast */
-
-
-/******************************************************************************************************************************************************
   clearPixelFast()
 ******************************************************************************************************************************************************/
 /*! \brief
@@ -521,6 +546,23 @@ void Display::clearPixelFast(byte Column, byte Row)
 
 
 /******************************************************************************************************************************************************
+  clearPixel()
+******************************************************************************************************************************************************/
+/*! \brief
+ *  \details
+ *
+ *  \return         -
+******************************************************************************************************************************************************/
+stdReturnType Display::clearPixel(byte Index)
+{
+    byte Row = Index / DISPLAY_NUMBER_OF_COLUMNS;
+    byte Column = Index % DISPLAY_NUMBER_OF_COLUMNS;
+
+    return clearPixel(Column,  Row);
+} /* clearPixel */
+
+
+/******************************************************************************************************************************************************
   clearPixelFast()
 ******************************************************************************************************************************************************/
 /*! \brief
@@ -535,6 +577,161 @@ void Display::clearPixelFast(byte Index)
 
     clearPixelFast(Column,  Row);
 } /* clearPixelFast */
+
+
+/******************************************************************************************************************************************************
+  getPixelRow()
+******************************************************************************************************************************************************/
+/*! \brief
+ *  \details
+ *
+ *  \return         -
+******************************************************************************************************************************************************/
+stdReturnType Display::getPixelRow(byte Row, DisplayPixelRowType* PixelRow)
+{
+    stdReturnType ReturnValue = E_OK;
+    DisplayPixelType Pixel;
+
+	for(byte Column = 0; Column < DISPLAY_NUMBER_OF_COLUMNS; Column++) {
+        if(getPixel(Column, Row, &Pixel) == E_OK) {
+            writeBit(*PixelRow, Column, Pixel);
+        } else {
+            ReturnValue = E_NOT_OK;
+        }
+	}
+	return ReturnValue;
+} /* getPixelRow */
+
+
+/******************************************************************************************************************************************************
+  getPixelRowFast()
+******************************************************************************************************************************************************/
+/*! \brief
+ *  \details
+ *
+ *  \return         -
+******************************************************************************************************************************************************/
+DisplayPixelRowType Display::getPixelRowFast(byte Row)
+{
+	DisplayPixelRowType PixelRow = 0;
+
+	for(byte Column = 0; Column < DISPLAY_NUMBER_OF_COLUMNS; Column++) {
+		writeBit(PixelRow, Column, getPixelFast(Column, Row));
+	}
+	return PixelRow;
+} /* getPixelRowFast */
+
+
+/******************************************************************************************************************************************************
+  getPixelColumn()
+******************************************************************************************************************************************************/
+/*! \brief
+ *  \details
+ *
+ *  \return         -
+******************************************************************************************************************************************************/
+stdReturnType Display::getPixelColumn(byte Column, DisplayPixelRowType* PixelColumn)
+{
+    stdReturnType ReturnValue = E_OK;
+    DisplayPixelType Pixel;
+
+	for(byte Row = 0; Row < DISPLAY_NUMBER_OF_ROWS; Row++) {
+        if(getPixel(Column, Row, &Pixel) == E_OK) {
+            writeBit(*PixelColumn, Row, Pixel);
+        } else {
+            ReturnValue = E_NOT_OK;
+        }
+	}
+    return ReturnValue;
+} /* getPixelColumn */
+
+
+/******************************************************************************************************************************************************
+  getPixelColumnFast()
+******************************************************************************************************************************************************/
+/*! \brief
+ *  \details
+ *
+ *  \return         -
+******************************************************************************************************************************************************/
+DisplayPixelColumnType Display::getPixelColumnFast(byte Column)
+{
+	DisplayPixelColumnType PixelColumn = 0;
+
+	for(byte Row = 0; Row < DISPLAY_NUMBER_OF_ROWS; Row++) {
+		writeBit(PixelColumn, Row, getPixelFast(Column, Row));
+	}
+	return PixelColumn;
+} /* getPixelColumnFast */
+
+
+/******************************************************************************************************************************************************
+  setPixelRow()
+******************************************************************************************************************************************************/
+/*! \brief
+ *  \details
+ *
+ *  \return         -
+******************************************************************************************************************************************************/
+stdReturnType Display::setPixelRow(byte Row, DisplayPixelRowType PixelRow)
+{
+    stdReturnType ReturnValue = E_OK;
+
+    for(byte Column = 0; Column < DISPLAY_NUMBER_OF_COLUMNS; Column++) {
+        if(writePixel(Column, Row, readBit(PixelRow, Column)) == E_NOT_OK) ReturnValue = E_NOT_OK;
+    }
+    return ReturnValue;
+} /* setPixelRow */
+
+
+/******************************************************************************************************************************************************
+  setPixelRowFast()
+******************************************************************************************************************************************************/
+/*! \brief
+ *  \details
+ *
+ *  \return         -
+******************************************************************************************************************************************************/
+void Display::setPixelRowFast(byte Row, DisplayPixelRowType PixelRow)
+{
+	for(byte Column = 0; Column < DISPLAY_NUMBER_OF_COLUMNS; Column++) {
+        writePixelFast(Column, Row, readBit(PixelRow, Column));
+    }
+} /* setPixelRowFast */
+
+
+/******************************************************************************************************************************************************
+  setPixelColumn()
+******************************************************************************************************************************************************/
+/*! \brief
+ *  \details
+ *
+ *  \return         -
+******************************************************************************************************************************************************/
+stdReturnType Display::setPixelColumn(byte Column, DisplayPixelRowType PixelColumn)
+{
+    stdReturnType ReturnValue = E_OK;
+    for(byte Row = 0; Row < DISPLAY_NUMBER_OF_ROWS; Row++) {
+        if(writePixel(Column, Row, readBit(PixelColumn, Row)) == E_NOT_OK) ReturnValue = E_NOT_OK;
+    }
+    return ReturnValue;
+} /* setPixelColumn */
+
+
+/******************************************************************************************************************************************************
+  setPixelColumnFast()
+******************************************************************************************************************************************************/
+/*! \brief
+ *  \details
+ *
+ *  \return         -
+******************************************************************************************************************************************************/
+void Display::setPixelColumnFast(byte Column, DisplayPixelRowType PixelColumn)
+{
+	for(byte Row = 0; Row < DISPLAY_NUMBER_OF_ROWS; Row++) {
+        writePixelFast(Column, Row, readBit(PixelColumn, Row));
+    }
+} /* setPixelColumnFast */
 
 
 /******************************************************************************************************************************************************

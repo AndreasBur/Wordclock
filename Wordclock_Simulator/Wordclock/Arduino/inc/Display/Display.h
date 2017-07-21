@@ -70,11 +70,12 @@ typedef struct {
 	byte Length;
 } DisplayWordIlluminationType;
 
-typedef uint16_t PixelRowType;
-typedef uint16_t PixelColumnType;
+typedef boolean DisplayPixelType;
+typedef uint16_t DisplayPixelRowType;
+typedef uint16_t DisplayPixelColumnType;
 
 /* mapping to underlying hardware */
-typedef WS2812PixelType PixelType;
+typedef WS2812PixelType PixelColorType;
 typedef WS2812 Stripe;
 
 
@@ -86,7 +87,7 @@ class Display
   private:
 	DisplayStateType State;
     Stripe Pixels;
-    PixelType Color;
+    PixelColorType Color;
 
     static const char DisplayCharacters[][DISPLAY_NUMBER_OF_COLUMNS + 1];
     static const DisplayWordIlluminationType WordIlluminationTable[];
@@ -96,34 +97,42 @@ class Display
 
 
   public:
-    Display(PixelType);
+    Display(PixelColorType);
 	Display(byte, byte, byte);
     ~Display();
 
     // get methods
-	PixelType getColor() { return Color; }
+	PixelColorType getColor() { return Color; }
 	DisplayStateType getState() { return State; }
 
-
     // set methods
-    void setColor(PixelType sColor) { Color = sColor; }
-
+    void setColor(PixelColorType sColor) { Color = sColor; }
 
     // char methods
-    stdReturnType setCharacter(DisplayCharacterType Character) { return Pixels.setPixel(Character, Color); }
-    stdReturnType clearCharacter(DisplayCharacterType Character) { return Pixels.setPixel(Character, 0, 0, 0); }
-    stdReturnType getCharacter(DisplayCharacterType, boolean*);
+    stdReturnType setCharacter(DisplayCharacterType Character) { return setPixel(Character); }
+    stdReturnType clearCharacter(DisplayCharacterType Character) { return clearPixel(Character); }
+    stdReturnType getCharacter(DisplayCharacterType Character, boolean* Value) { return getPixel(Character, Value); }
     stdReturnType getCharacter(byte, byte, char*);
     stdReturnType getCharacter(byte, char*);
+
+	// char methods fast
+    void setCharacterFast(DisplayCharacterType Character) { setPixelFast(Character); }
+    void clearCharacterFast(DisplayCharacterType Character) { clearPixelFast(Character); }
+    boolean getCharacterFast(DisplayCharacterType Character) { return getPixelFast(Character); }
 	inline char getCharacterFast(byte Column, byte Row) { return pgm_read_byte(&DisplayCharacters[Row][Column]); }
 	inline char getCharacterFast(byte Index) { return pgm_read_byte(&DisplayCharacters[Index / DISPLAY_NUMBER_OF_COLUMNS][Index % DISPLAY_NUMBER_OF_COLUMNS]); }
 
     // word methods
 	stdReturnType getWordIllumination(DisplayWordType, DisplayWordIlluminationType*);
-	inline DisplayWordIlluminationType getWordIlluminationFast(DisplayWordType Word) { DisplayWordIlluminationType WordIllu; memcpy_P(&WordIllu, &WordIlluminationTable[Word], sizeof(WordIllu)); return WordIllu; }
     stdReturnType setWord(DisplayWordType, byte MaxLength = DISPLAY_WORD_LENGTH_UNLIMITED);
     stdReturnType clearWord(DisplayWordType);
     stdReturnType clearAllWords();
+
+	// word methods fast
+	inline DisplayWordIlluminationType getWordIlluminationFast(DisplayWordType Word) { DisplayWordIlluminationType WordIllu; memcpy_P(&WordIllu, &WordIlluminationTable[Word], sizeof(WordIllu)); return WordIllu; }
+    void setWordFast(DisplayWordType, byte MaxLength = DISPLAY_WORD_LENGTH_UNLIMITED);
+    void clearWordFast(DisplayWordType);
+    void clearAllWordsFast();
 
 	// pixel methods
 	stdReturnType writePixel(byte Column, byte Row, boolean Value) { if(Value) return setPixel(Column, Row); else return clearPixel(Column, Row); }
@@ -134,13 +143,12 @@ class Display
     stdReturnType clearPixel(byte);
     stdReturnType getPixel(byte, byte, boolean*);
     stdReturnType getPixel(byte, boolean*);
+    stdReturnType getPixelRow(byte, DisplayPixelRowType*);
+    stdReturnType getPixelColumn(byte, DisplayPixelColumnType*);
+    stdReturnType setPixelRow(byte, DisplayPixelRowType);
+    stdReturnType setPixelColumn(byte, DisplayPixelColumnType);
 
-    stdReturnType getPixelRow(byte, PixelRowType PixelRow);
-    stdReturnType getPixelRow(byte, byte, PixelRowType PixelRow);
-
-    stdReturnType getPixelColumn(byte, PixelColumnType PixelColumn);
-    stdReturnType getPixelColumn(byte, byte, PixelColumnType PixelColumn);
-
+	// pixel methods fast
 	void writePixelFast(byte Column, byte Row, boolean Value) { if(Value) setPixelFast(Column, Row); else clearPixelFast(Column, Row); }
 	void writePixelFast(byte Index, boolean Value) { if(Value) setPixelFast(Index); else clearPixelFast(Index); }
 	void setPixelFast(byte, byte);
@@ -149,6 +157,10 @@ class Display
 	void clearPixelFast(byte);
 	boolean getPixelFast(byte, byte);
 	boolean getPixelFast(byte);
+    DisplayPixelRowType getPixelRowFast(byte);
+    DisplayPixelColumnType getPixelColumnFast(byte);
+    void setPixelRowFast(byte, DisplayPixelRowType);
+    void setPixelColumnFast(byte, DisplayPixelColumnType);
 
     // methods
     void init();
