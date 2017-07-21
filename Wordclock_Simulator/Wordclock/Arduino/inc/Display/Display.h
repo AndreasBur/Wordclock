@@ -119,8 +119,8 @@ class Display
     void setCharacterFast(DisplayCharacterType Character) { setPixelFast(Character); }
     void clearCharacterFast(DisplayCharacterType Character) { clearPixelFast(Character); }
     boolean getCharacterFast(DisplayCharacterType Character) { return getPixelFast(Character); }
-	inline char getCharacterFast(byte Column, byte Row) { return pgm_read_byte(&DisplayCharacters[Row][Column]); }
-	inline char getCharacterFast(byte Index) { return pgm_read_byte(&DisplayCharacters[Index / DISPLAY_NUMBER_OF_COLUMNS][Index % DISPLAY_NUMBER_OF_COLUMNS]); }
+	char getCharacterFast(byte Column, byte Row) { return pgm_read_byte(&DisplayCharacters[Row][Column]); }
+	char getCharacterFast(byte Index) { return pgm_read_byte(&DisplayCharacters[Index / DISPLAY_NUMBER_OF_COLUMNS][Index % DISPLAY_NUMBER_OF_COLUMNS]); }
 
     // word methods
 	stdReturnType getWordIllumination(DisplayWordType, DisplayWordIlluminationType*);
@@ -129,7 +129,7 @@ class Display
     stdReturnType clearAllWords();
 
 	// word methods fast
-	inline DisplayWordIlluminationType getWordIlluminationFast(DisplayWordType Word) { DisplayWordIlluminationType WordIllu; memcpy_P(&WordIllu, &WordIlluminationTable[Word], sizeof(WordIllu)); return WordIllu; }
+	DisplayWordIlluminationType getWordIlluminationFast(DisplayWordType Word) { DisplayWordIlluminationType WordIllu; memcpy_P(&WordIllu, &WordIlluminationTable[Word], sizeof(WordIllu)); return WordIllu; }
     void setWordFast(DisplayWordType, byte MaxLength = DISPLAY_WORD_LENGTH_UNLIMITED);
     void clearWordFast(DisplayWordType);
     void clearAllWordsFast();

@@ -28,16 +28,17 @@ WordclockDialog::WordclockDialog() : WcDisplay(255, 255, 255), WcClock(&WcDispla
     Time = wxDateTime::Now();
     int Hour = Time.GetHour();
     int Minute = Time.GetMinute();
-    WcClock.show(Hour, Minute);
+    //WcClock.show(Hour, Minute);
     //WcDisplay.setPixelRowFast(5, 0xFFFF);
     //WcDisplay.show();
 
     //WcAnimation.setChar(0,0,219, ANIMATION_FONT_6X10);
+    WcAnimation.setChar(0,0,'A', ANIMATION_FONT_6X10);
     //WcDisplay.show();
-    WcTransformation.shiftLeft(true);
-    WcTransformation.shiftRight(true);
-    WcTransformation.shiftUp(true);
-    WcTransformation.shiftDown(true);
+    //WcTransformation.shiftLeft(true);
+    //WcTransformation.shiftRight(true);
+    //WcTransformation.shiftUp(false);
+    //WcTransformation.shiftDown(true);
     WcDisplay.show();
 }
 

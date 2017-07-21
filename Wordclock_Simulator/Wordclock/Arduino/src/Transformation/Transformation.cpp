@@ -9,10 +9,10 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       Transformation.cpp
- *      \brief      
+ *      \brief
  *
- *      \details    
- *                  
+ *      \details
+ *
  *
 ******************************************************************************************************************************************************/
 #define _TRANSFORMATION_SOURCE_
@@ -70,9 +70,9 @@ Transformation::~Transformation()
 /******************************************************************************************************************************************************
   init()
 ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
+/*! \brief
+ *  \details
+ *
  *  \return         -
 ******************************************************************************************************************************************************/
 //void Transformation::init()
@@ -84,9 +84,9 @@ Transformation::~Transformation()
 /******************************************************************************************************************************************************
   shiftLeftFast()
 ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
+/*! \brief
+ *  \details
+ *
  *  \return         -
 ******************************************************************************************************************************************************/
 void Transformation::shiftLeftFast(boolean Rotate)
@@ -101,15 +101,16 @@ void Transformation::shiftLeftFast(boolean Rotate)
 		}
 	}
 	if(Rotate) pDisplay->setPixelColumnFast(DISPLAY_NUMBER_OF_COLUMNS - 1, PixelColumn);
+	else pDisplay->setPixelColumnFast(DISPLAY_NUMBER_OF_COLUMNS - 1, 0);
 } /* shiftLeftFast */
 
 
 /******************************************************************************************************************************************************
   shiftLeft()
 ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
+/*! \brief
+ *  \details
+ *
  *  \return         -
 ******************************************************************************************************************************************************/
 stdReturnType Transformation::shiftLeft(boolean Rotate)
@@ -126,8 +127,9 @@ stdReturnType Transformation::shiftLeft(boolean Rotate)
 			if(pDisplay->writePixel(Column, Row, Pixel) == E_NOT_OK) ReturnValue = E_NOT_OK;
 		}
 	}
-	if(Rotate) if(pDisplay->setPixelColumn(DISPLAY_NUMBER_OF_COLUMNS - 1, PixelColumn) == E_NOT_OK) ReturnValue = E_NOT_OK;
-	
+	if(Rotate){ if(pDisplay->setPixelColumn(DISPLAY_NUMBER_OF_COLUMNS - 1, PixelColumn) == E_NOT_OK) ReturnValue = E_NOT_OK; }
+    else{ if(pDisplay->setPixelColumn(DISPLAY_NUMBER_OF_COLUMNS - 1, 0) == E_NOT_OK) ReturnValue = E_NOT_OK; }
+
 	return ReturnValue;
 } /* shiftLeft */
 
@@ -152,6 +154,7 @@ void Transformation::shiftRightFast(boolean Rotate)
 		}
 	}
 	if(Rotate) pDisplay->setPixelColumnFast(0, PixelColumn);
+	else pDisplay->setPixelColumnFast(0, 0);
 } /* shiftRightFast */
 
 
@@ -177,7 +180,8 @@ stdReturnType Transformation::shiftRight(boolean Rotate)
 			if(pDisplay->writePixel(Column, Row, Pixel) == E_NOT_OK) ReturnValue = E_NOT_OK;
 		}
 	}
-	if(Rotate) if(pDisplay->setPixelColumn(0, PixelColumn) == E_NOT_OK) ReturnValue = E_NOT_OK;
+	if(Rotate){ if(pDisplay->setPixelColumn(0, PixelColumn) == E_NOT_OK) ReturnValue = E_NOT_OK; }
+    else{ if(pDisplay->setPixelColumn(0, 0) == E_NOT_OK) ReturnValue = E_NOT_OK; }
 
 	return ReturnValue;
 } /* shiftRight */
@@ -203,6 +207,7 @@ void Transformation::shiftUpFast(boolean Rotate)
 		}
 	}
 	if(Rotate) pDisplay->setPixelRowFast(DISPLAY_NUMBER_OF_ROWS - 1, PixelRow);
+	else pDisplay->setPixelRowFast(DISPLAY_NUMBER_OF_ROWS - 1, 0);
 } /* shiftUpFast */
 
 
@@ -228,7 +233,8 @@ stdReturnType Transformation::shiftUp(boolean Rotate)
 			if(pDisplay->writePixel(Column, Row, Pixel) == E_NOT_OK) ReturnValue = E_NOT_OK;
 		}
 	}
-	if(Rotate) if(pDisplay->setPixelRow(DISPLAY_NUMBER_OF_ROWS - 1, PixelRow) == E_NOT_OK) ReturnValue = E_NOT_OK;
+	if(Rotate){ if(pDisplay->setPixelRow(DISPLAY_NUMBER_OF_ROWS - 1, PixelRow) == E_NOT_OK) ReturnValue = E_NOT_OK; }
+    else{ if(pDisplay->setPixelRow(DISPLAY_NUMBER_OF_ROWS - 1, 0) == E_NOT_OK) ReturnValue = E_NOT_OK; }
 
 	return ReturnValue;
 } /* shiftUp */
@@ -254,6 +260,7 @@ void Transformation::shiftDownFast(boolean Rotate)
 		}
 	}
 	if(Rotate) pDisplay->setPixelRowFast(0, PixelRow);
+	else pDisplay->setPixelRowFast(0, 0);
 } /* shiftDownFast */
 
 
@@ -279,7 +286,8 @@ stdReturnType Transformation::shiftDown(boolean Rotate)
 			if(pDisplay->writePixel(Column, Row, Pixel) == E_NOT_OK) ReturnValue = E_NOT_OK;
 		}
 	}
-	if(Rotate) if(pDisplay->setPixelRow(0, PixelRow) == E_NOT_OK) ReturnValue = E_NOT_OK;
+	if(Rotate){ if(pDisplay->setPixelRow(0, PixelRow) == E_NOT_OK) ReturnValue = E_NOT_OK; }
+    else{ if(pDisplay->setPixelRow(0, 0) == E_NOT_OK) ReturnValue = E_NOT_OK; }
 
 	return ReturnValue;
 } /* shiftDown */
@@ -294,4 +302,3 @@ stdReturnType Transformation::shiftDown(boolean Rotate)
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E
 ******************************************************************************************************************************************************/
- 
