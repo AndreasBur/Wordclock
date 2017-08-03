@@ -1,18 +1,18 @@
 #include "Simulator.h"
 #include "WS2812.h"
 
-const char DisplayCharacters[][DISPLAY_NUMBER_OF_COLUMNS + 1] =
+const wxString DisplayCharacters[][DISPLAY_NUMBER_OF_COLUMNS] =
 {
-    "ESKISTLFÜNF",
-    "ZEHNZWANZIG",
-    "DREIVIERTEL",
-    "TGNACHVORJM",
-    "HALBQZWÖLFP",
-    "ZWEINSIEBEN",
-    "KDREIRHFÜNF",
-    "ELFNEUNVIER",
-    "WACHTZEHNRS",
-    "BSECHSFMUHR"
+    _("E"),_("S"),_("K"),_("I"),_("S"),_("T"),_("L"),_("F"),_("Ü"),_("N"),_("F"),
+    _("Z"),_("E"),_("H"),_("N"),_("Z"),_("W"),_("A"),_("N"),_("Z"),_("I"),_("G"),
+    _("D"),_("R"),_("E"),_("I"),_("V"),_("I"),_("E"),_("R"),_("T"),_("E"),_("L"),
+    _("T"),_("G"),_("N"),_("A"),_("C"),_("H"),_("V"),_("O"),_("R"),_("J"),_("M"),
+    _("H"),_("A"),_("L"),_("B"),_("Q"),_("Z"),_("W"),_("Ö"),_("L"),_("F"),_("P"),
+    _("Z"),_("W"),_("E"),_("I"),_("N"),_("S"),_("I"),_("E"),_("B"),_("E"),_("N"),
+    _("K"),_("D"),_("R"),_("E"),_("I"),_("R"),_("H"),_("F"),_("Ü"),_("N"),_("F"),
+    _("E"),_("L"),_("F"),_("N"),_("E"),_("U"),_("N"),_("V"),_("I"),_("E"),_("R"),
+    _("W"),_("A"),_("C"),_("H"),_("T"),_("Z"),_("E"),_("H"),_("N"),_("R"),_("S"),
+    _("B"),_("S"),_("E"),_("C"),_("H"),_("S"),_("F"),_("M"),_("U"),_("H"),_("R")
 };
 
 
@@ -45,8 +45,8 @@ Simulator::Simulator(wxDialog *dlg, const wxString &title) : wxDialog(dlg, -1, t
     }
 
     wxBoxSizer* SizerButton = new wxBoxSizer(wxHORIZONTAL);
-    BtnAbout = new wxButton(this, idBtnAbout, wxT("&About"), wxDefaultPosition, wxDefaultSize, 0);
-    BtnQuit = new wxButton(this, idBtnQuit, wxT("&Quit"), wxDefaultPosition, wxDefaultSize, 0);
+    BtnAbout = new wxButton(this, idBtnAbout, _("&About"), wxDefaultPosition, wxDefaultSize, 0);
+    BtnQuit = new wxButton(this, idBtnQuit, _("&Quit"), wxDefaultPosition, wxDefaultSize, 0);
     //m_staticline1 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_VERTICAL);
 
     SizerButton->Add(BtnAbout, 1, wxALL|wxEXPAND, 10);
