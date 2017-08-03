@@ -3,16 +3,16 @@
 
 const wxString DisplayCharacters[][DISPLAY_NUMBER_OF_COLUMNS] =
 {
-    _("E"),_("S"),_("K"),_("I"),_("S"),_("T"),_("L"),_("F"),_("Ü"),_("N"),_("F"),
-    _("Z"),_("E"),_("H"),_("N"),_("Z"),_("W"),_("A"),_("N"),_("Z"),_("I"),_("G"),
-    _("D"),_("R"),_("E"),_("I"),_("V"),_("I"),_("E"),_("R"),_("T"),_("E"),_("L"),
-    _("T"),_("G"),_("N"),_("A"),_("C"),_("H"),_("V"),_("O"),_("R"),_("J"),_("M"),
-    _("H"),_("A"),_("L"),_("B"),_("Q"),_("Z"),_("W"),_("Ö"),_("L"),_("F"),_("P"),
-    _("Z"),_("W"),_("E"),_("I"),_("N"),_("S"),_("I"),_("E"),_("B"),_("E"),_("N"),
-    _("K"),_("D"),_("R"),_("E"),_("I"),_("R"),_("H"),_("F"),_("Ü"),_("N"),_("F"),
-    _("E"),_("L"),_("F"),_("N"),_("E"),_("U"),_("N"),_("V"),_("I"),_("E"),_("R"),
-    _("W"),_("A"),_("C"),_("H"),_("T"),_("Z"),_("E"),_("H"),_("N"),_("R"),_("S"),
-    _("B"),_("S"),_("E"),_("C"),_("H"),_("S"),_("F"),_("M"),_("U"),_("H"),_("R")
+    wxT("E"),wxT("S"),wxT("K"),wxT("I"),wxT("S"),wxT("T"),wxT("L"),wxT("F"),wxT("Ãœ"),wxT("N"),wxT("F"),
+    wxT("Z"),wxT("E"),wxT("H"),wxT("N"),wxT("Z"),wxT("W"),wxT("A"),wxT("N"),wxT("Z"),wxT("I"),wxT("G"),
+    wxT("D"),wxT("R"),wxT("E"),wxT("I"),wxT("V"),wxT("I"),wxT("E"),wxT("R"),wxT("T"),wxT("E"),wxT("L"),
+    wxT("T"),wxT("G"),wxT("N"),wxT("A"),wxT("C"),wxT("H"),wxT("V"),wxT("O"),wxT("R"),wxT("J"),wxT("M"),
+    wxT("H"),wxT("A"),wxT("L"),wxT("B"),wxT("Q"),wxT("Z"),wxT("W"),wxT("Ã–"),wxT("L"),wxT("F"),wxT("P"),
+    wxT("Z"),wxT("W"),wxT("E"),wxT("I"),wxT("N"),wxT("S"),wxT("I"),wxT("E"),wxT("B"),wxT("E"),wxT("N"),
+    wxT("K"),wxT("D"),wxT("R"),wxT("E"),wxT("I"),wxT("R"),wxT("H"),wxT("F"),wxT("Ãœ"),wxT("N"),wxT("F"),
+    wxT("E"),wxT("L"),wxT("F"),wxT("N"),wxT("E"),wxT("U"),wxT("N"),wxT("V"),wxT("I"),wxT("E"),wxT("R"),
+    wxT("W"),wxT("A"),wxT("C"),wxT("H"),wxT("T"),wxT("Z"),wxT("E"),wxT("H"),wxT("N"),wxT("R"),wxT("S"),
+    wxT("B"),wxT("S"),wxT("E"),wxT("C"),wxT("H"),wxT("S"),wxT("F"),wxT("M"),wxT("U"),wxT("H"),wxT("R")
 };
 
 
@@ -45,8 +45,8 @@ Simulator::Simulator(wxDialog *dlg, const wxString &title) : wxDialog(dlg, -1, t
     }
 
     wxBoxSizer* SizerButton = new wxBoxSizer(wxHORIZONTAL);
-    BtnAbout = new wxButton(this, idBtnAbout, _("&About"), wxDefaultPosition, wxDefaultSize, 0);
-    BtnQuit = new wxButton(this, idBtnQuit, _("&Quit"), wxDefaultPosition, wxDefaultSize, 0);
+    BtnAbout = new wxButton(this, idBtnAbout, wxT("&About"), wxDefaultPosition, wxDefaultSize, 0);
+    BtnQuit = new wxButton(this, idBtnQuit, wxT("&Quit"), wxDefaultPosition, wxDefaultSize, 0);
     //m_staticline1 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_VERTICAL);
 
     SizerButton->Add(BtnAbout, 1, wxALL|wxEXPAND, 10);
