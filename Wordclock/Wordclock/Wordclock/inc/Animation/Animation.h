@@ -60,7 +60,6 @@
 ******************************************************************************************************************************************************/
 
 
-
 /******************************************************************************************************************************************************
  *  GLOBAL DATA TYPES AND STRUCTURES
 ******************************************************************************************************************************************************/
@@ -110,25 +109,25 @@ class Animation
 	AnimationType CurrentAnimation;
 
 #if(ANIMATION_SUPPORT_FONT_4X6 == STD_ON)
-	static const char Font_4x6[][ANIMATION_FONT_4X6_WIDTH];
+	static const unsigned char Font_4x6[][ANIMATION_FONT_4X6_WIDTH];
 #endif
 #if(ANIMATION_SUPPORT_FONT_5X8 == STD_ON)
-	static const char Font_5x8[][ANIMATION_FONT_5X8_WIDTH];
+	static const unsigned char Font_5x8[][ANIMATION_FONT_5X8_WIDTH];
 #endif
 #if(ANIMATION_SUPPORT_FONT_6X8 == STD_ON)
-	static const char Font_6x8[][ANIMATION_FONT_6X8_WIDTH];
+	static const unsigned char Font_6x8[][ANIMATION_FONT_6X8_WIDTH];
 #endif
 #if(ANIMATION_SUPPORT_FONT_6X10 == STD_ON)
-	static const char Font_6x10[][ANIMATION_FONT_6X10_HEIGHT];
+	static const unsigned char Font_6x10[][ANIMATION_FONT_6X10_HEIGHT];
 #endif
 #if(ANIMATION_SUPPORT_FONT_8X8 == STD_ON)
-	static const char Font_8x8[][ANIMATION_FONT_8X8_WIDTH];
+	static const unsigned char Font_8x8[][ANIMATION_FONT_8X8_WIDTH];
 #endif
 
 	// functions
-	stdReturnType convertCharToFontIndex(char, byte*);
-	stdReturnType setCharFontHorizontal(byte, byte, char, const char*, byte, byte);
-	stdReturnType setCharFontVertical(byte, byte, char, const char*, byte, byte);
+	stdReturnType convertCharToFontIndex(unsigned char, byte*);
+	stdReturnType setCharFontHorizontal(byte, byte, unsigned char, const unsigned char*, byte, byte);
+	stdReturnType setCharFontVertical(byte, byte, unsigned char, const unsigned char*, byte, byte);
 
   public:
 	Animation(Display*);
@@ -138,7 +137,7 @@ class Animation
 
 
 	// set methods
-	stdReturnType setChar(byte, byte, char, AnimationFontType);
+	stdReturnType setChar(byte, byte, unsigned char, AnimationFontType);
 
 	// methods
 	void init();

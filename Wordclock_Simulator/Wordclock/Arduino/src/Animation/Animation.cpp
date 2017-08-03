@@ -89,7 +89,7 @@ void Animation::init()
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType Animation::setChar(byte Column, byte Row, char Char, AnimationFontType Font)
+stdReturnType Animation::setChar(byte Column, byte Row, unsigned char Char, AnimationFontType Font)
 {
 #if(ANIMATION_SUPPORT_FONT_4X6 == STD_ON)
 	if(Font == ANIMATION_FONT_4X6) return setCharFontHorizontal(Column, Row, Char, &Font_4x6[0][0], ANIMATION_FONT_4X6_WIDTH, ANIMATION_FONT_4X6_HEIGHT);
@@ -126,7 +126,7 @@ stdReturnType Animation::setChar(byte Column, byte Row, char Char, AnimationFont
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType Animation::setCharFontHorizontal(byte Column, byte Row, char Char, const char* FontTable, byte FontWidth, byte FontHeight)
+stdReturnType Animation::setCharFontHorizontal(byte Column, byte Row, unsigned char Char, const unsigned char* FontTable, byte FontWidth, byte FontHeight)
 {
     stdReturnType ReturnValue = E_OK;
     byte FontIndex, ColumnAbs, RowAbs;
@@ -155,7 +155,7 @@ stdReturnType Animation::setCharFontHorizontal(byte Column, byte Row, char Char,
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType Animation::setCharFontVertical(byte Column, byte Row, char Char, const char* FontTable, byte FontWidth, byte FontHeight)
+stdReturnType Animation::setCharFontVertical(byte Column, byte Row, unsigned char Char, const unsigned char* FontTable, byte FontWidth, byte FontHeight)
 {
     stdReturnType ReturnValue = E_OK;
     byte FontIndex, ColumnAbs, RowAbs;
@@ -187,7 +187,7 @@ stdReturnType Animation::setCharFontVertical(byte Column, byte Row, char Char, c
  *  \return         E_OK
  *                  E_NOT_OK
  *****************************************************************************************************************************************************/
-stdReturnType Animation::convertCharToFontIndex(char Char, byte* Index)
+stdReturnType Animation::convertCharToFontIndex(unsigned char Char, byte* Index)
 {
     stdReturnType ReturnValue = E_NOT_OK;
 
