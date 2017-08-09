@@ -73,7 +73,7 @@ const ClockHoursType Clock::ClockHoursTable[][CLOCK_NUMBER_OF_HOURS] PROGMEM =
 const ClockMinutesType Clock::ClockMinutesTable[][CLOCK_NUMBER_OF_MINUTE_STEPS] PROGMEM =
 {
     {																												   // ClockMinutesTable[0][] = WESSI
-        {CLOCK_HOUR_MODE_FULL_HOUR},																				   // 00
+        {CLOCK_HOUR_MODE_FULL_HOUR,    0, {DISPLAY_WORD_NONE,        DISPLAY_WORD_NONE, DISPLAY_WORD_NONE }},		   // 00
         {CLOCK_HOUR_MODE_NO_FULL_HOUR, 0, {DISPLAY_WORD_FUENF,       DISPLAY_WORD_NACH, DISPLAY_WORD_NONE }},          // 05
         {CLOCK_HOUR_MODE_NO_FULL_HOUR, 0, {DISPLAY_WORD_ZEHN,        DISPLAY_WORD_NACH, DISPLAY_WORD_NONE }},          // 10
         {CLOCK_HOUR_MODE_NO_FULL_HOUR, 0, {DISPLAY_WORD_VIERTEL,     DISPLAY_WORD_NACH, DISPLAY_WORD_NONE }},          // 15
@@ -88,7 +88,7 @@ const ClockMinutesType Clock::ClockMinutesTable[][CLOCK_NUMBER_OF_MINUTE_STEPS] 
     },
 
     {																												   // ClockMinutesTable[1][] = OSSI
-        {CLOCK_HOUR_MODE_FULL_HOUR},																				   // 00
+        {CLOCK_HOUR_MODE_FULL_HOUR,    0, {DISPLAY_WORD_NONE,        DISPLAY_WORD_NONE, DISPLAY_WORD_NONE }},		   // 00
         {CLOCK_HOUR_MODE_NO_FULL_HOUR, 0, {DISPLAY_WORD_FUENF,       DISPLAY_WORD_NACH, DISPLAY_WORD_NONE }},          // 05
         {CLOCK_HOUR_MODE_NO_FULL_HOUR, 0, {DISPLAY_WORD_ZEHN,        DISPLAY_WORD_NACH, DISPLAY_WORD_NONE }},          // 10
         {CLOCK_HOUR_MODE_NO_FULL_HOUR, 1, {DISPLAY_WORD_VIERTEL,     DISPLAY_WORD_NONE, DISPLAY_WORD_NONE }},          // 45
@@ -103,7 +103,7 @@ const ClockMinutesType Clock::ClockMinutesTable[][CLOCK_NUMBER_OF_MINUTE_STEPS] 
     },
 
     {																												   // ClockMinutesTable[2][] = RHEIN-RUHR
-        {CLOCK_HOUR_MODE_FULL_HOUR},																				   // 00
+        {CLOCK_HOUR_MODE_FULL_HOUR,    0, {DISPLAY_WORD_NONE,        DISPLAY_WORD_NONE, DISPLAY_WORD_NONE }},		   // 00
         {CLOCK_HOUR_MODE_NO_FULL_HOUR, 0, {DISPLAY_WORD_FUENF,       DISPLAY_WORD_NACH, DISPLAY_WORD_NONE }},          // 05
         {CLOCK_HOUR_MODE_NO_FULL_HOUR, 0, {DISPLAY_WORD_ZEHN,        DISPLAY_WORD_NACH, DISPLAY_WORD_NONE }},          // 10
         {CLOCK_HOUR_MODE_NO_FULL_HOUR, 0, {DISPLAY_WORD_VIERTEL,     DISPLAY_WORD_NACH, DISPLAY_WORD_NONE }},          // 15
@@ -118,7 +118,7 @@ const ClockMinutesType Clock::ClockMinutesTable[][CLOCK_NUMBER_OF_MINUTE_STEPS] 
     },
 
     {																												   // ClockMinutesTable[3][] = SCHWABEN
-        {CLOCK_HOUR_MODE_FULL_HOUR},																				   // 00
+        {CLOCK_HOUR_MODE_FULL_HOUR,    0, {DISPLAY_WORD_NONE,        DISPLAY_WORD_NONE, DISPLAY_WORD_NONE }},		   // 00
         {CLOCK_HOUR_MODE_NO_FULL_HOUR, 0, {DISPLAY_WORD_FUENF,       DISPLAY_WORD_NACH, DISPLAY_WORD_NONE }},          // 05
         {CLOCK_HOUR_MODE_NO_FULL_HOUR, 0, {DISPLAY_WORD_ZEHN,        DISPLAY_WORD_NACH, DISPLAY_WORD_NONE }},          // 10
         {CLOCK_HOUR_MODE_NO_FULL_HOUR, 1, {DISPLAY_WORD_VIERTEL,     DISPLAY_WORD_NONE, DISPLAY_WORD_NONE }},          // 45
@@ -202,7 +202,7 @@ stdReturnType Clock::getClockWords(byte Hour, byte Minute, ClockWordsType* Clock
         Hour += MinutesTableEntry.HourOffset;                             // correct the hour offset from the minutes
         if(Hour >= CLOCK_NUMBER_OF_HOURS) Hour -= CLOCK_NUMBER_OF_HOURS;
 
-		HoursTableEntry = getHoursTableEntry(Mode, MinutesTableEntry.HourMode, Hour);
+		HoursTableEntry = getHoursTableEntry(MinutesTableEntry.HourMode, Hour);
 
         for(byte Index = 0; Index < CLOCK_MAX_NUMBER_OF_HOUR_WORDS; Index++) {
             ClockWords->HourWords[Index] = HoursTableEntry.Words[Index];
