@@ -47,15 +47,15 @@ Discarded input sections
  .text._ZN9Animation7setCharEhhh17AnimationFontType
                 0x00000000       0x76 src/Animation/Animation.o
  .text._ZN9Animation22convertCharToFontIndexEhPh
-                0x00000000       0x3a src/Animation/Animation.o
+                0x00000000        0x8 src/Animation/Animation.o
  .debug_info    0x00000000     0x1a87 src/Animation/Animation.o
  .debug_abbrev  0x00000000      0x339 src/Animation/Animation.o
- .debug_loc     0x00000000      0xbe5 src/Animation/Animation.o
+ .debug_loc     0x00000000      0xb19 src/Animation/Animation.o
  .debug_aranges
                 0x00000000       0x50 src/Animation/Animation.o
  .debug_ranges  0x00000000       0x70 src/Animation/Animation.o
- .debug_line    0x00000000      0x3b8 src/Animation/Animation.o
- .debug_str     0x00000000     0x202e src/Animation/Animation.o
+ .debug_line    0x00000000      0x34c src/Animation/Animation.o
+ .debug_str     0x00000000     0x201e src/Animation/Animation.o
  .comment       0x00000000       0x31 src/Animation/Animation.o
  .debug_frame   0x00000000      0x128 src/Animation/Animation.o
  .text          0x00000000        0x0 src/Animation/Font.o
@@ -76,7 +76,7 @@ Discarded input sections
  .debug_aranges
                 0x00000000       0x18 src/Animation/Font.o
  .debug_line    0x00000000      0x1b8 src/Animation/Font.o
- .debug_str     0x00000000     0x1fd7 src/Animation/Font.o
+ .debug_str     0x00000000     0x1fc7 src/Animation/Font.o
  .comment       0x00000000       0x31 src/Animation/Font.o
  .text          0x00000000        0x0 src/Clock/Clock.o
  .data          0x00000000        0x0 src/Clock/Clock.o
@@ -180,7 +180,7 @@ Discarded input sections
                 0x00000000       0x78 src/Transformation/Transformation.o
  .debug_ranges  0x00000000      0x208 src/Transformation/Transformation.o
  .debug_line    0x00000000      0x631 src/Transformation/Transformation.o
- .debug_str     0x00000000     0x1f46 src/Transformation/Transformation.o
+ .debug_str     0x00000000     0x1f36 src/Transformation/Transformation.o
  .comment       0x00000000       0x31 src/Transformation/Transformation.o
  .debug_frame   0x00000000      0x244 src/Transformation/Transformation.o
  .text          0x00000000        0x0 src/WS2812/WS2812.o
@@ -863,21 +863,21 @@ END GROUP
  .debug_frame   0x0000085c       0xc4 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(wiring.o)
  .debug_frame   0x00000920       0x7c C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(wiring_digital.o)
 
-.debug_str      0x00000000     0x23eb
+.debug_str      0x00000000     0x24dc
  *(.debug_str)
- .debug_str     0x00000000     0x1e92 Sketch.o
-                               0x2096 (size before relaxing)
- .debug_str     0x00001e92       0xc8 src/Clock/Clock.o
-                               0x20e6 (size before relaxing)
- .debug_str     0x00001f5a       0xde src/Display/Display.o
-                               0x1e30 (size before relaxing)
- .debug_str     0x00002038      0x116 src/WS2812/WS2812.o
-                                0x872 (size before relaxing)
- .debug_str     0x0000214e       0xb7 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(main.o)
+ .debug_str     0x00000000     0x1e82 Sketch.o
+                               0x2086 (size before relaxing)
+ .debug_str     0x00001e82       0xc8 src/Clock/Clock.o
+                               0x20d6 (size before relaxing)
+ .debug_str     0x00001f4a       0xde src/Display/Display.o
+                               0x1e20 (size before relaxing)
+ .debug_str     0x00002028      0x116 src/WS2812/WS2812.o
+                                0x862 (size before relaxing)
+ .debug_str     0x0000213e      0x1b8 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(main.o)
                                 0x2ba (size before relaxing)
- .debug_str     0x00002205      0x159 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(wiring.o)
+ .debug_str     0x000022f6      0x159 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(wiring.o)
                                 0x244 (size before relaxing)
- .debug_str     0x0000235e       0x8d C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(wiring_digital.o)
+ .debug_str     0x0000244f       0x8d C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(wiring_digital.o)
                                 0x2a9 (size before relaxing)
 
 .debug_loc      0x00000000     0x42d2
