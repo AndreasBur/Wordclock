@@ -29,7 +29,7 @@
  *  GLOBAL CONSTANT MACROS
 ******************************************************************************************************************************************************/
 /* Clock configuration parameter */
-#define CLOCK_SHOW_IT_IS_PERMANENTLY            STD_ON
+#define CLOCK_SHOW_IT_IS_PERMANENTLY            STD_OFF
 
 /* Clock  parameter */
 /* Hour */

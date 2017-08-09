@@ -71,7 +71,17 @@ typedef struct {
 } DisplayWordIlluminationType;
 
 typedef boolean DisplayPixelType;
+
+#if(DISPLAY_NUMBER_OF_ROWS > 16)
+#error "Display: too many Rows, please extend DisplayPixelRowType"
+#endif
+
 typedef uint16_t DisplayPixelRowType;
+
+#if(DISPLAY_NUMBER_OF_COLUMNS > 16)
+#error "Display: too many Columns, please extend DisplayPixelColumnType"
+#endif
+
 typedef uint16_t DisplayPixelColumnType;
 
 /* mapping to underlying hardware */

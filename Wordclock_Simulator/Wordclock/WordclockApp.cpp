@@ -22,7 +22,7 @@ IMPLEMENT_APP(WordclockApp);
 
 bool WordclockApp::OnInit()
 {
-    WordclockDialog* dlg = new WordclockDialog();
+    WordclockDialog* dlg = new WordclockDialog(0L, wxT(""));
 
     return true;
 }

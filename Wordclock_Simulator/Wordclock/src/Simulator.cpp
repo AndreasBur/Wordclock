@@ -62,17 +62,21 @@ Simulator::Simulator(wxDialog *dlg, const wxString &title) : wxDialog(dlg, -1, t
 
 Simulator::~Simulator()
 {
-    Destroy();
+
 }
 
 void Simulator::OnClose(wxCloseEvent &event)
 {
-    Destroy();
+    //wxTheApp->Exit();
+    //wxTheApp->AddPendingEvent(wxCloseEvent());
+    wxTheApp->GetTopWindow()->Destroy();
 }
 
 void Simulator::OnQuit(wxCommandEvent &event)
 {
-    Destroy();
+    //wxTheApp->Exit();
+    //wxTheApp->AddPendingEvent(wxCloseEvent());
+    wxTheApp->GetTopWindow()->Destroy();
 }
 
 void Simulator::OnAbout(wxCommandEvent &event)
@@ -186,3 +190,4 @@ void Simulator::clearAllPixels()
         }
     }
 }
+

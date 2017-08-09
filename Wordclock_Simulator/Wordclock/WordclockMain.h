@@ -24,7 +24,7 @@
 class WordclockDialog : public wxDialog
 {
     public:
-        WordclockDialog();
+        WordclockDialog(wxDialog *dlg, const wxString& title);
         ~WordclockDialog();
 
         void OnTimer(wxTimerEvent& event);
