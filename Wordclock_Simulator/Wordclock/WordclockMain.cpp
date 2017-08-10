@@ -24,6 +24,7 @@ wxEND_EVENT_TABLE()
 
 WordclockDialog::WordclockDialog(wxDialog *dlg, const wxString &title) : wxDialog(dlg, -1, title), WcDisplay(255, 255, 255), WcClock(&WcDisplay, CLOCK_MODE_WESSI), WcAnimation(&WcDisplay), WcTransformation(&WcDisplay), Timer(this, TIMER_ID)
 {
+
     Timer.Start(1000 * 5);
     Time = wxDateTime::Now();
     int Hour = Time.GetHour();
