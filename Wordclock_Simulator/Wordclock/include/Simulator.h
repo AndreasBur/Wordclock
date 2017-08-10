@@ -6,6 +6,7 @@
 #include <wx/statline.h>
 
 #include "StandardTypes.h"
+#include "Arduino.h"
 
 
 #define DISPLAY_NUMBER_OF_ROWS                  10
