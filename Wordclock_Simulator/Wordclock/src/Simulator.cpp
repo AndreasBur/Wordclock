@@ -36,10 +36,9 @@ Simulator::Simulator(wxDialog *dlg, const wxString &title) : wxDialog(dlg, -1, t
 
         for(int Column = 0; Column < DISPLAY_NUMBER_OF_COLUMNS; Column++) {
             Characters[Row][Column] = new wxStaticText(this, wxID_ANY, DisplayCharacters[Row][Column], wxDefaultPosition, wxDefaultSize, 0);
-            //Characters[Row][Column]->SetFont(wxFont(40, wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false));
             Characters[Row][Column]->SetFont(wxFont(wxSize(40,40), wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false));
             Characters[Row][Column]->SetForegroundColour(wxColour(*wxLIGHT_GREY));
-            SizerCharacters[Row]->Add(Characters[Row][Column], 0, wxALL|wxEXPAND, 5);
+            SizerCharacters[Row]->Add(Characters[Row][Column], 1, wxALL|wxEXPAND, 5);
         }
         SizerAll->Add(SizerCharacters[Row], 1, wxEXPAND, 5);
     }
@@ -47,10 +46,8 @@ Simulator::Simulator(wxDialog *dlg, const wxString &title) : wxDialog(dlg, -1, t
     wxBoxSizer* SizerButton = new wxBoxSizer(wxHORIZONTAL);
     BtnAbout = new wxButton(this, idBtnAbout, wxT("&About"), wxDefaultPosition, wxDefaultSize, 0);
     BtnQuit = new wxButton(this, idBtnQuit, wxT("&Quit"), wxDefaultPosition, wxDefaultSize, 0);
-    //m_staticline1 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_VERTICAL);
 
     SizerButton->Add(BtnAbout, 1, wxALL|wxEXPAND, 10);
-    SizerButton->AddSpacer(250);
     SizerButton->Add(BtnQuit, 1, wxALL|wxEXPAND, 10);
 
     SizerAll->Add(SizerButton, 1, wxEXPAND, 5);
