@@ -3147,11 +3147,12 @@
 1500572174 c:\users\andreas\documents\github\wordclock\wordclock_simulator\wordclock\include\ws2812.h
 	"Simulator.h"
 
-1500572174 c:\users\andreas\documents\github\wordclock\wordclock_simulator\wordclock\include\simulator.h
+1502390857 c:\users\andreas\documents\github\wordclock\wordclock_simulator\wordclock\include\simulator.h
 	<wx/wx.h>
 	<wx/button.h>
 	<wx/statline.h>
 	"StandardTypes.h"
+	"Arduino.h"
 
 1493470838 c:\wxwidgets-3.0.3\include\wx\wx.h
 	"wx/defs.h"
@@ -6114,7 +6115,7 @@
 	"Arduino.h"
 	"Display.h"
 
-1502385961 source:c:\users\andreas\documents\github\wordclock\wordclock_simulator\wordclock\arduino\src\display\display.cpp
+1502390857 source:c:\users\andreas\documents\github\wordclock\wordclock_simulator\wordclock\arduino\src\display\display.cpp
 	"Display.h"
 
 1501752629 source:c:\users\andreas\documents\github\wordclock\wordclock_simulator\wordclock\arduino\src\transformation\transformation.cpp
@@ -6145,7 +6146,7 @@
 
 1493470838 c:\wxwidgets-3.0.3\include\wx\msw\rcdefs.h
 
-1502385961 source:c:\users\andreas\documents\github\wordclock\wordclock_simulator\wordclock\src\simulator.cpp
+1502828745 source:c:\users\andreas\documents\github\wordclock\wordclock_simulator\wordclock\src\simulator.cpp
 	"Simulator.h"
 	"WS2812.h"
 
@@ -6165,7 +6166,7 @@
 	"Animation.h"
 	"Transformation.h"
 
-1502135752 source:c:\users\andreas\documents\github\wordclock\wordclock_simulator\wordclock\wordclockmain.cpp
+1502390859 source:c:\users\andreas\documents\github\wordclock\wordclock_simulator\wordclock\wordclockmain.cpp
 	"wx_pch.h"
 	"WordclockMain.h"
 

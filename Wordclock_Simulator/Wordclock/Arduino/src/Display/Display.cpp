@@ -107,7 +107,7 @@ Display::Display(PixelColorType sColor)
 	State = DISPLAY_STATE_UNINIT;
 
 #ifdef SIMULATOR
-    //Pixels.SetIcon(wxICON(WordclockIcon));
+    Pixels.SetIcon(wxICON(WordclockIcon));
 	Pixels.Show();
 #endif
 } /* Display */
@@ -133,7 +133,7 @@ Display::Display(byte Red, byte Green, byte Blue)
 	Color.Blue = Blue;
 
 #ifdef SIMULATOR
-    //Pixels.SetIcon(wxICON(WordclockIcon));
+    Pixels.SetIcon(wxICON(WordclockIcon));
     Pixels.Show();
 #endif
 } /* Display */
