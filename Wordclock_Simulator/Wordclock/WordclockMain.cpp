@@ -31,6 +31,7 @@ WordclockDialog::WordclockDialog(wxDialog *dlg, const wxString &title) : wxDialo
     int Hour = Time.GetHour();
     int Minute = Time.GetMinute();
     WcClock.setClock(Hour, Minute);
+
     //WcDisplay.setPixelRowFast(5, 0xFFFF);
     //WcDisplay.show();
 
