@@ -28,6 +28,7 @@ class WordclockDialog : public wxDialog
         ~WordclockDialog();
 
         void OnTimer(wxTimerEvent& event);
+        void OnClose(wxCloseEvent& event);
 
     protected:
 
@@ -38,6 +39,7 @@ class WordclockDialog : public wxDialog
         Transformation WcTransformation;
         wxDateTime Time;
         wxTimer Timer;
+        ClockWordsType CurrentTimeWords;
         enum {
             TIMER_ID = 1500
         };

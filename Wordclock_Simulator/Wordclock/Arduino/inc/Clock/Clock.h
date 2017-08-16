@@ -29,7 +29,7 @@
  *  GLOBAL CONSTANT MACROS
 ******************************************************************************************************************************************************/
 /* Clock configuration parameter */
-#define CLOCK_SHOW_IT_IS_PERMANENTLY            STD_OFF
+#define CLOCK_SHOW_IT_IS_PERMANENTLY            STD_ON
 
 /* Clock  parameter */
 /* Hour */
@@ -108,7 +108,7 @@ class Clock
         memcpy_P(&MinutesTableEntry, &ClockMinutesTable[Mode][Minute / CLOCK_MINUTE_STEP_IN_MINUTES], sizeof(ClockMinutesType));
         return MinutesTableEntry;
     }
-    inline HoursTableEntryType getHoursTableEntry(ClockModesType Mode, ClockHourModesType HourMode, byte Hour) {
+    inline HoursTableEntryType getHoursTableEntry(ClockHourModesType HourMode, byte Hour) {
         HoursTableEntryType HoursTableEntry;
         memcpy_P(&HoursTableEntry, &ClockHoursTable[HourMode][Hour], sizeof(ClockHoursType));
         return HoursTableEntry;

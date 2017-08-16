@@ -26,7 +26,7 @@ END_EVENT_TABLE()
 Simulator::Simulator(wxFrame *dlg, const wxString &title) : wxFrame(dlg, -1, title)
 {
     SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DFACE));
-    this->SetSizeHints(wxDefaultSize, wxDefaultSize);
+    //this->SetSizeHints(wxDefaultSize, wxDefaultSize);
     wxBoxSizer* SizerCharacters[DISPLAY_NUMBER_OF_ROWS];
     wxBoxSizer* SizerAll;
     SizerAll = new wxBoxSizer(wxVERTICAL);

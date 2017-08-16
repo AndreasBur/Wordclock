@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1502177237 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\wordclock\arduino\src\animation\animation.cpp
+1502881499 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\wordclock\arduino\src\animation\animation.cpp
 	"Animation.h"
 
 1502177237 c:\users\virskl\documents\github\wordclock\wordclock_simulator\wordclock\arduino\inc\animation\animation.h
@@ -2985,10 +2985,10 @@
 1502177237 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\wordclock\arduino\src\animation\font.cpp
 	"Animation.h"
 
-1500386486 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\wordclock\arduino\src\clock\clock.cpp
+1502881531 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\wordclock\arduino\src\clock\clock.cpp
 	"Clock.h"
 
-1502182621 c:\users\virskl\documents\github\wordclock\wordclock_simulator\wordclock\arduino\inc\clock\clock.h
+1502881424 c:\users\virskl\documents\github\wordclock\wordclock_simulator\wordclock\arduino\inc\clock\clock.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"Display.h"
@@ -3032,7 +3032,7 @@
 1500038063 c:\users\virskl\documents\github\wordclock\wordclock_simulator\wordclock\wordclockapp.h
 	<wx/app.h>
 
-1502257366 c:\users\virskl\documents\github\wordclock\wordclock_simulator\wordclock\wordclockmain.h
+1502871504 c:\users\virskl\documents\github\wordclock\wordclock_simulator\wordclock\wordclockmain.h
 	<wx/wx.h>
 	"WordclockApp.h"
 	"Clock.h"
@@ -3040,7 +3040,7 @@
 	"Animation.h"
 	"Transformation.h"
 
-1502867030 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\wordclock\wordclockmain.cpp
+1502872557 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\wordclock\wordclockmain.cpp
 	"wx_pch.h"
 	"WordclockMain.h"
 

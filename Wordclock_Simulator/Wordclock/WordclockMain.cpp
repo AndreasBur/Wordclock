@@ -18,6 +18,7 @@
 #include "WordclockMain.h"
 
 wxBEGIN_EVENT_TABLE(WordclockDialog, wxDialog)
+    EVT_CLOSE(WordclockDialog::OnClose)
     EVT_TIMER(TIMER_ID, WordclockDialog::OnTimer)
 wxEND_EVENT_TABLE()
 
@@ -49,13 +50,31 @@ WordclockDialog::~WordclockDialog()
 
 }
 
+void WordclockDialog::OnClose(wxCloseEvent &event)
+{
+    Timer.Stop();
+    Destroy();
+}
+
 void WordclockDialog::OnTimer(wxTimerEvent& event)
 {
+    ClockWordsType NewTimeWords;
     Time = wxDateTime::Now();
     int Hour = Time.GetHour();
     int Minute = Time.GetMinute();
-    WcDisplay.clearAllWords();
-    //WcDisplay.clear();
-    WcClock.show(Hour, Minute);
-    WcDisplay.show();
+
+    WcClock.getClockWords(Hour, Minute, &NewTimeWords);
+
+    if( NewTimeWords.HourWords[0] != CurrentTimeWords.HourWords[0]      ||
+        NewTimeWords.HourWords[1] != CurrentTimeWords.HourWords[1]      ||
+        NewTimeWords.MinuteWords[0] != CurrentTimeWords.MinuteWords[0]  ||
+        NewTimeWords.MinuteWords[1] != CurrentTimeWords.MinuteWords[1]  ||
+        NewTimeWords.MinuteWords[2] != CurrentTimeWords.MinuteWords[2]  )
+    {
+        CurrentTimeWords = NewTimeWords;
+        WcDisplay.clearAllWords();
+        //WcDisplay.clear();
+        WcClock.show(Hour, Minute);
+        WcDisplay.show();
+    }
 }

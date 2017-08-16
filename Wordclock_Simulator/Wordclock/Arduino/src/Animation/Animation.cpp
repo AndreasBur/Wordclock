@@ -190,16 +190,16 @@ stdReturnType Animation::setCharFontVertical(byte Column, byte Row, unsigned cha
 stdReturnType Animation::convertCharToFontIndex(unsigned char Char, byte* Index)
 {
     stdReturnType ReturnValue = E_NOT_OK;
-
+	*Index = Char + 0;
     /* for umlauts we need a special treatment */
-    if('Ä' == Char) { *Index = 95; ReturnValue = E_OK; }
-    else if('Ö' == Char) { *Index = 153; ReturnValue = E_OK; }
-    else if('Ü' == Char) { *Index = 154; ReturnValue = E_OK; }
-    else if('ä' == Char) { *Index = 132; ReturnValue = E_OK; }
-    else if('ö' == Char) { *Index = 148; ReturnValue = E_OK; }
-    else if('ü' == Char) { *Index = 129; ReturnValue = E_OK; }
+    //if('Ä' == Char) { *Index = 95; ReturnValue = E_OK; }
+    //else if('Ö' == Char) { *Index = 153; ReturnValue = E_OK; }
+    //else if('Ü' == Char) { *Index = 154; ReturnValue = E_OK; }
+    //else if('ä' == Char) { *Index = 132; ReturnValue = E_OK; }
+    //else if('ö' == Char) { *Index = 148; ReturnValue = E_OK; }
+    //else if('ü' == Char) { *Index = 129; ReturnValue = E_OK; }
     /* for all others only add offset */
-    else if(Char >= 0 && Char <= 255) { *Index = Char + 0; ReturnValue = E_OK; }
+    //else if(Char >= 0 && Char <= 255) { *Index = Char + 0; ReturnValue = E_OK; }
 
     return ReturnValue;
 } /* convertCharToSprite */
