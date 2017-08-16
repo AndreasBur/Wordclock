@@ -51,6 +51,10 @@ class Simulator : public wxDialog
 
 
     protected:
+
+
+    private:
+    
         enum
         {
             idBtnQuit = 1000,
@@ -61,8 +65,7 @@ class Simulator : public wxDialog
 
         wxButton* BtnAbout;
         wxButton* BtnQuit;
-
-    private:
+    
         void OnClose(wxCloseEvent& event);
         void OnQuit(wxCommandEvent& event);
         void OnAbout(wxCommandEvent& event);

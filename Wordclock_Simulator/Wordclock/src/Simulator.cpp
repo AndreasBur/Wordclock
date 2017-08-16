@@ -40,7 +40,7 @@ Simulator::Simulator(wxDialog *dlg, const wxString &title) : wxDialog(dlg, -1, t
             Characters[Row][Column]->SetForegroundColour(wxColour(*wxLIGHT_GREY));
             SizerCharacters[Row]->Add(Characters[Row][Column], 1, wxALL|wxEXPAND, 5);
         }
-        SizerAll->Add(SizerCharacters[Row], 1, wxEXPAND, 5);
+        SizerAll->Add(SizerCharacters[Row], 1, wxTOP|wxBOTTOM|wxEXPAND, 5);
     }
 
     wxBoxSizer* SizerButton = new wxBoxSizer(wxHORIZONTAL);
