@@ -127,7 +127,8 @@ class Clock
 	void setMode(ClockModesType sMode) { Mode = sMode; }
 
     // methods
-    stdReturnType show(byte, byte);
+    stdReturnType setClock(byte, byte);
+    void show() { pDisplay->show(); }
 };
 
 #endif
