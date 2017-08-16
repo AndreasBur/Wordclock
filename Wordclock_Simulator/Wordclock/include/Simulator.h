@@ -22,10 +22,10 @@ typedef struct {
 } WS2812PixelType;
 
 
-class Simulator : public wxDialog
+class Simulator : public wxFrame
 {
     public:
-        Simulator(wxDialog *dlg, const wxString& title);
+        Simulator(wxFrame *dlg, const wxString& title);
         virtual ~Simulator();
 
 
@@ -54,7 +54,7 @@ class Simulator : public wxDialog
 
 
     private:
-    
+
         enum
         {
             idBtnQuit = 1000,
@@ -65,7 +65,7 @@ class Simulator : public wxDialog
 
         wxButton* BtnAbout;
         wxButton* BtnQuit;
-    
+
         void OnClose(wxCloseEvent& event);
         void OnQuit(wxCommandEvent& event);
         void OnAbout(wxCommandEvent& event);

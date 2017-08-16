@@ -16,15 +16,16 @@ const wxString DisplayCharacters[][DISPLAY_NUMBER_OF_COLUMNS] =
 };
 
 
-BEGIN_EVENT_TABLE(Simulator, wxDialog)
+BEGIN_EVENT_TABLE(Simulator, wxFrame)
     EVT_CLOSE(Simulator::OnClose)
     EVT_BUTTON(idBtnQuit, Simulator::OnQuit)
     EVT_BUTTON(idBtnAbout, Simulator::OnAbout)
 END_EVENT_TABLE()
 
 
-Simulator::Simulator(wxDialog *dlg, const wxString &title) : wxDialog(dlg, -1, title)
+Simulator::Simulator(wxFrame *dlg, const wxString &title) : wxFrame(dlg, -1, title)
 {
+    SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DFACE));
     this->SetSizeHints(wxDefaultSize, wxDefaultSize);
     wxBoxSizer* SizerCharacters[DISPLAY_NUMBER_OF_ROWS];
     wxBoxSizer* SizerAll;
@@ -40,7 +41,8 @@ Simulator::Simulator(wxDialog *dlg, const wxString &title) : wxDialog(dlg, -1, t
             Characters[Row][Column]->SetForegroundColour(wxColour(*wxLIGHT_GREY));
             SizerCharacters[Row]->Add(Characters[Row][Column], 1, wxALL|wxEXPAND, 5);
         }
-        SizerAll->Add(SizerCharacters[Row], 1, wxTOP|wxBOTTOM|wxEXPAND, 5);
+        //SizerAll->Add(SizerCharacters[Row], 1, wxTOP|wxBOTTOM|wxEXPAND, 5);
+        SizerAll->Add(SizerCharacters[Row], 1, wxEXPAND, 5);
     }
 
     wxBoxSizer* SizerButton = new wxBoxSizer(wxHORIZONTAL);
