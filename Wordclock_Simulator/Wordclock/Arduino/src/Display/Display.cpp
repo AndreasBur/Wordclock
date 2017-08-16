@@ -21,7 +21,7 @@
  * INCLUDES
 ******************************************************************************************************************************************************/
 #include "Display.h"
-#ifdef SIMULATOR && (defined(__WXGTK__) || defined(__WXMOTIF__))
+#if defined(SIMULATOR) && (defined(__WXGTK__) || defined(__WXMOTIF__))
 #include "WordclockIcon.xpm"
 #endif
 
