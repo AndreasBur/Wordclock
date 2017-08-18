@@ -58,6 +58,7 @@
 		<Unit filename="Arduino/src/Transformation/Transformation.cpp" />
 		<Unit filename="WordclockApp.cpp" />
 		<Unit filename="WordclockApp.h" />
+		<Unit filename="WordclockIcon.xpm" />
 		<Unit filename="WordclockMain.cpp" />
 		<Unit filename="WordclockMain.h" />
 		<Unit filename="include/Arduino.h" />

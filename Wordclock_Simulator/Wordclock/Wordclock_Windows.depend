@@ -6091,11 +6091,19 @@
 	"Animation.h"
 	"Transformation.h"
 
-1502918135 source:c:\users\andreas\documents\github\wordclock\wordclock_simulator\wordclock\wordclockmain.cpp
+1503091455 source:c:\users\andreas\documents\github\wordclock\wordclock_simulator\wordclock\wordclockmain.cpp
 	"wx_pch.h"
 	"WordclockMain.h"
 
 1502952242 c:\users\virskl\documents\github\wordclock\wordclock_simulator\wordclock\wordclockicon.xpm
 
 1493467238 d:\wxwidgets-3.0.3\lib\gcc_dll\mswu\wx\setup.h
+
+1493470838 c:\wxwidgets-3.0.3\lib\gcc_dll\mswu\wx\setup.h
+
+1502918822 source:c:\users\andreas\documents\github\wordclock\wordclock_simulator\wordclock\arduino\src\display\display.cpp
+	"Display.h"
+	"WordclockIcon.xpm"
+
+1502918135 c:\users\andreas\documents\github\wordclock\wordclock_simulator\wordclock\wordclockicon.xpm
 
