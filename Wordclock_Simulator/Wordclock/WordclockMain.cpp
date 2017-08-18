@@ -65,14 +65,14 @@ void WordclockDialog::OnTimer(wxTimerEvent& event)
     int Minute = Time.GetMinute();
 
     WcClock.getClockWords(Hour, Minute, &NewTimeWords);
-/*
+
     if( NewTimeWords.HourWords[0] != CurrentTimeWords.HourWords[0]      ||
         NewTimeWords.HourWords[1] != CurrentTimeWords.HourWords[1]      ||
         NewTimeWords.MinuteWords[0] != CurrentTimeWords.MinuteWords[0]  ||
         NewTimeWords.MinuteWords[1] != CurrentTimeWords.MinuteWords[1]  ||
         NewTimeWords.MinuteWords[2] != CurrentTimeWords.MinuteWords[2]  )
-*/
-    if(memcmp(&NewTimeWords, &CurrentTimeWords, sizeof(NewTimeWords)))
+
+    //if(memcmp(&NewTimeWords, &CurrentTimeWords, sizeof(NewTimeWords)))
     {
         CurrentTimeWords = NewTimeWords;
         WcDisplay.clearAllWords();
