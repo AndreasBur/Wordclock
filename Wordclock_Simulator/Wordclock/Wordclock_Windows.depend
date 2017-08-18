@@ -3041,7 +3041,7 @@
 	"Animation.h"
 	"Transformation.h"
 
-1502896745 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\wordclock\wordclockmain.cpp
+1503061076 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\wordclock\wordclockmain.cpp
 	"wx_pch.h"
 	"WordclockMain.h"
 
@@ -6096,4 +6096,6 @@
 	"WordclockMain.h"
 
 1502952242 c:\users\virskl\documents\github\wordclock\wordclock_simulator\wordclock\wordclockicon.xpm
+
+1493467238 d:\wxwidgets-3.0.3\lib\gcc_dll\mswu\wx\setup.h
 
