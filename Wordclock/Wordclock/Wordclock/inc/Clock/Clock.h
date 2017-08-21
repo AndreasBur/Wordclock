@@ -121,7 +121,7 @@ class Clock
     // get methods
 	ClockModesType getMode() { return Mode; }
 	stdReturnType getClockWords(byte, byte, ClockWordsType*);
-
+	boolean compareClockWords(ClockWordsType*, ClockWordsType*);
 
     // set methods
 	void setMode(ClockModesType sMode) { Mode = sMode; }

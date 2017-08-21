@@ -13,21 +13,21 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY
   4 .note.gnu.avr.deviceinfo 00000040  00000000  00000000  000008fc  2**2
                   CONTENTS, READONLY
-  5 .debug_aranges 000002e8  00000000  00000000  0000093c  2**0
+  5 .debug_aranges 000002f0  00000000  00000000  0000093c  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_info   000077a5  00000000  00000000  00000c24  2**0
+  6 .debug_info   0000783e  00000000  00000000  00000c2c  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_abbrev 00001242  00000000  00000000  000083c9  2**0
+  7 .debug_abbrev 0000127d  00000000  00000000  0000846a  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_line   00001b55  00000000  00000000  0000960b  2**0
+  8 .debug_line   00001b96  00000000  00000000  000096e7  2**0
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_frame  0000098c  00000000  00000000  0000b160  2**2
+  9 .debug_frame  0000099c  00000000  00000000  0000b280  2**2
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_str    000024cf  00000000  00000000  0000baec  2**0
+ 10 .debug_str    00002555  00000000  00000000  0000bc1c  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_loc    00004295  00000000  00000000  0000dfbb  2**0
+ 11 .debug_loc    000042bd  00000000  00000000  0000e171  2**0
                   CONTENTS, READONLY, DEBUGGING
- 12 .debug_ranges 00000308  00000000  00000000  00012250  2**0
+ 12 .debug_ranges 00000310  00000000  00000000  0001242e  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -204,41 +204,26 @@ Display WordClockDisplay(20, 20, 20);
  28e:	0c 94 75 02 	jmp	0x4ea	; 0x4ea <_ZN7DisplayD1Ev>
 
 00000292 <_ZN5ClockC1EP7Display14ClockModesType>:
- *
- *  \return         -
-******************************************************************************************************************************************************/
-Clock::Clock(Display* Display, ClockModesType sMode)
-{
-	if(Display != NULL) {
+		return true;
+	} else {
+		return false;
+	}
+
+} /* compareClockWords */
  292:	61 15       	cp	r22, r1
  294:	71 05       	cpc	r23, r1
  296:	19 f0       	breq	.+6      	; 0x29e <_ZN5ClockC1EP7Display14ClockModesType+0xc>
-		pDisplay = Display;
  298:	fc 01       	movw	r30, r24
  29a:	71 83       	std	Z+1, r23	; 0x01
  29c:	60 83       	st	Z, r22
-	}
-	Mode = sMode;
  29e:	fc 01       	movw	r30, r24
  2a0:	42 83       	std	Z+2, r20	; 0x02
  2a2:	08 95       	ret
 
 000002a4 <_ZN5ClockD1Ev>:
-
-
-/******************************************************************************************************************************************************
-  DESTRUCTOR OF Clock
-******************************************************************************************************************************************************/
-Clock::~Clock()
  2a4:	08 95       	ret
 
 000002a6 <_ZN5Clock13getClockWordsEhhP14ClockWordsType>:
- *  \details
- *
- *  \return         -
-******************************************************************************************************************************************************/
-stdReturnType Clock::getClockWords(byte Hour, byte Minute, ClockWordsType* ClockWords)
-{
  2a6:	ef 92       	push	r14
  2a8:	ff 92       	push	r15
  2aa:	0f 93       	push	r16
@@ -256,46 +241,16 @@ stdReturnType Clock::getClockWords(byte Hour, byte Minute, ClockWordsType* Clock
  2c2:	fc 01       	movw	r30, r24
  2c4:	f6 2e       	mov	r15, r22
  2c6:	89 01       	movw	r16, r18
-	stdReturnType ReturnValue = E_NOT_OK;
-    MinutesTableEntryType MinutesTableEntry;
-    HoursTableEntryType HoursTableEntry;
-
-    /* ----- Implementation ----------------------------------------------- */
-    if(Hour < CLOCK_NUMBER_OF_HOURS_PER_DAY && Minute < CLOCK_NUMBER_OF_MINUTES_PER_HOUR) {
  2c8:	27 e1       	ldi	r18, 0x17	; 23
-        /* show IT IS permanently or only to full and half hour */
-        if (CLOCK_SHOW_IT_IS_PERMANENTLY == STD_ON	||
-			Minute < CLOCK_MINUTE_STEP_IN_MINUTES	||
-			(Minute >= (CLOCK_NUMBER_OF_MINUTES_PER_HOUR/2) && Minute < (CLOCK_NUMBER_OF_MINUTES_PER_HOUR/2) + CLOCK_MINUTE_STEP_IN_MINUTES))
-		{
-            ClockWords->ShowItIs = true;
  2ca:	81 e0       	ldi	r24, 0x01	; 1
-	stdReturnType ReturnValue = E_NOT_OK;
-    MinutesTableEntryType MinutesTableEntry;
-    HoursTableEntryType HoursTableEntry;
-
-    /* ----- Implementation ----------------------------------------------- */
-    if(Hour < CLOCK_NUMBER_OF_HOURS_PER_DAY && Minute < CLOCK_NUMBER_OF_MINUTES_PER_HOUR) {
  2cc:	26 17       	cp	r18, r22
  2ce:	08 f4       	brcc	.+2      	; 0x2d2 <_ZN5Clock13getClockWordsEhhP14ClockWordsType+0x2c>
  2d0:	51 c0       	rjmp	.+162    	; 0x374 <_ZN5Clock13getClockWordsEhhP14ClockWordsType+0xce>
  2d2:	4c 33       	cpi	r20, 0x3C	; 60
  2d4:	08 f0       	brcs	.+2      	; 0x2d8 <_ZN5Clock13getClockWordsEhhP14ClockWordsType+0x32>
  2d6:	4e c0       	rjmp	.+156    	; 0x374 <_ZN5Clock13getClockWordsEhhP14ClockWordsType+0xce>
-        /* show IT IS permanently or only to full and half hour */
-        if (CLOCK_SHOW_IT_IS_PERMANENTLY == STD_ON	||
-			Minute < CLOCK_MINUTE_STEP_IN_MINUTES	||
-			(Minute >= (CLOCK_NUMBER_OF_MINUTES_PER_HOUR/2) && Minute < (CLOCK_NUMBER_OF_MINUTES_PER_HOUR/2) + CLOCK_MINUTE_STEP_IN_MINUTES))
-		{
-            ClockWords->ShowItIs = true;
  2d8:	d8 01       	movw	r26, r16
  2da:	8c 93       	st	X, r24
-    static const ClockHoursType ClockHoursTable[][CLOCK_NUMBER_OF_HOURS];
-    static const ClockMinutesType ClockMinutesTable[][CLOCK_NUMBER_OF_MINUTE_STEPS];
-    // functions
-    inline MinutesTableEntryType getMinutesTableEntry(ClockModesType Mode, byte Minute) {
-        MinutesTableEntryType MinutesTableEntry;
-        memcpy_P(&MinutesTableEntry, &ClockMinutesTable[Mode][Minute / CLOCK_MINUTE_STEP_IN_MINUTES], sizeof(ClockMinutesType));
  2dc:	95 e0       	ldi	r25, 0x05	; 5
  2de:	e9 2e       	mov	r14, r25
  2e0:	84 2f       	mov	r24, r20
@@ -319,7 +274,6 @@ stdReturnType Clock::getClockWords(byte Hour, byte Minute, ClockWordsType* Clock
  306:	ce 01       	movw	r24, r28
  308:	06 96       	adiw	r24, 0x06	; 6
  30a:	0e 94 15 04 	call	0x82a	; 0x82a <memcpy_P>
-        return MinutesTableEntry;
  30e:	fe 01       	movw	r30, r28
  310:	36 96       	adiw	r30, 0x06	; 6
  312:	de 01       	movw	r26, r28
@@ -332,35 +286,20 @@ stdReturnType Clock::getClockWords(byte Hour, byte Minute, ClockWordsType* Clock
  320:	9a 81       	ldd	r25, Y+2	; 0x02
  322:	3c 81       	ldd	r19, Y+4	; 0x04
  324:	2d 81       	ldd	r18, Y+5	; 0x05
-		}
-
-		MinutesTableEntry = getMinutesTableEntry(Mode, Minute);
-
-        for(byte Index = 0; Index < CLOCK_MAX_NUMBER_OF_MINUTE_WORDS; Index++) {
-            ClockWords->MinuteWords[Index] = MinutesTableEntry.Words[Index];
  326:	4b 81       	ldd	r20, Y+3	; 0x03
  328:	f8 01       	movw	r30, r16
  32a:	43 83       	std	Z+3, r20	; 0x03
  32c:	34 83       	std	Z+4, r19	; 0x04
  32e:	25 83       	std	Z+5, r18	; 0x05
-        }
-
-        if(Hour >= CLOCK_NUMBER_OF_HOURS) Hour -= CLOCK_NUMBER_OF_HOURS;
  330:	fb e0       	ldi	r31, 0x0B	; 11
  332:	ff 15       	cp	r31, r15
  334:	10 f4       	brcc	.+4      	; 0x33a <_ZN5Clock13getClockWordsEhhP14ClockWordsType+0x94>
  336:	24 ef       	ldi	r18, 0xF4	; 244
  338:	f2 0e       	add	r15, r18
-        Hour += MinutesTableEntry.HourOffset;                             // correct the hour offset from the minutes
  33a:	9f 0d       	add	r25, r15
-        if(Hour >= CLOCK_NUMBER_OF_HOURS) Hour -= CLOCK_NUMBER_OF_HOURS;
  33c:	9c 30       	cpi	r25, 0x0C	; 12
  33e:	08 f0       	brcs	.+2      	; 0x342 <_ZN5Clock13getClockWordsEhhP14ClockWordsType+0x9c>
  340:	9c 50       	subi	r25, 0x0C	; 12
-    }
-    inline HoursTableEntryType getHoursTableEntry(ClockHourModesType HourMode, byte Hour) {
-        HoursTableEntryType HoursTableEntry;
-        memcpy_P(&HoursTableEntry, &ClockHoursTable[HourMode][Hour], sizeof(ClockHoursType));
  342:	3c e0       	ldi	r19, 0x0C	; 12
  344:	83 9f       	mul	r24, r19
  346:	b0 01       	movw	r22, r0
@@ -376,14 +315,8 @@ stdReturnType Clock::getClockWords(byte Hour, byte Minute, ClockWordsType* Clock
  35a:	ce 01       	movw	r24, r28
  35c:	06 96       	adiw	r24, 0x06	; 6
  35e:	0e 94 15 04 	call	0x82a	; 0x82a <memcpy_P>
-        return HoursTableEntry;
  362:	9e 81       	ldd	r25, Y+6	; 0x06
  364:	8f 81       	ldd	r24, Y+7	; 0x07
-
-		HoursTableEntry = getHoursTableEntry(MinutesTableEntry.HourMode, Hour);
-
-        for(byte Index = 0; Index < CLOCK_MAX_NUMBER_OF_HOUR_WORDS; Index++) {
-            ClockWords->HourWords[Index] = HoursTableEntry.Words[Index];
  366:	d8 01       	movw	r26, r16
  368:	11 96       	adiw	r26, 0x01	; 1
  36a:	9c 93       	st	X, r25
@@ -391,12 +324,6 @@ stdReturnType Clock::getClockWords(byte Hour, byte Minute, ClockWordsType* Clock
  36e:	12 96       	adiw	r26, 0x02	; 2
  370:	8c 93       	st	X, r24
  372:	80 e0       	ldi	r24, 0x00	; 0
-        }
-    } else {
-        ReturnValue = E_NOT_OK;
-    }
-	return ReturnValue;
-} /* getClockWords */
  374:	2a 96       	adiw	r28, 0x0a	; 10
  376:	0f b6       	in	r0, 0x3f	; 63
  378:	f8 94       	cli

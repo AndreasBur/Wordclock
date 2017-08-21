@@ -215,6 +215,29 @@ stdReturnType Clock::getClockWords(byte Hour, byte Minute, ClockWordsType* Clock
 
 
 /******************************************************************************************************************************************************
+  compareClockWords()
+******************************************************************************************************************************************************/
+/*! \brief
+ *  \details
+ *
+ *  \return         -
+******************************************************************************************************************************************************/
+boolean compareClockWords(ClockWordsType* ClockWords1, ClockWordsType* ClockWords2)
+{
+    if( ClockWords1->HourWords[0] == ClockWords2->HourWords[0]      &&
+		ClockWords1->HourWords[1] == ClockWords2->HourWords[1]      &&
+		ClockWords1->MinuteWords[0] == ClockWords2->MinuteWords[0]  &&
+		ClockWords1->MinuteWords[1] == ClockWords2->MinuteWords[1]  &&
+		ClockWords1->MinuteWords[2] == ClockWords2->MinuteWords[2]  )
+	{
+		return true;
+	} else {
+		return false;
+	}
+
+} /* compareClockWords */
+
+/******************************************************************************************************************************************************
   show()
 ******************************************************************************************************************************************************/
 /*! \brief

@@ -81,6 +81,8 @@ Discarded input sections
  .text          0x00000000        0x0 src/Clock/Clock.o
  .data          0x00000000        0x0 src/Clock/Clock.o
  .bss           0x00000000        0x0 src/Clock/Clock.o
+ .text._Z17compareClockWordsP14ClockWordsTypeS0_
+                0x00000000       0x42 src/Clock/Clock.o
  .text          0x00000000        0x0 src/Display/Display.o
  .data          0x00000000        0x0 src/Display/Display.o
  .bss           0x00000000        0x0 src/Display/Display.o
@@ -801,90 +803,90 @@ END GROUP
 .debug_sfnames
  *(.debug_sfnames)
 
-.debug_aranges  0x00000000      0x2e8
+.debug_aranges  0x00000000      0x2f0
  *(.debug_aranges)
  .debug_aranges
                 0x00000000       0x38 Sketch.o
  .debug_aranges
-                0x00000038       0x38 src/Clock/Clock.o
+                0x00000038       0x40 src/Clock/Clock.o
  .debug_aranges
-                0x00000070      0x130 src/Display/Display.o
+                0x00000078      0x130 src/Display/Display.o
  .debug_aranges
-                0x000001a0       0x90 src/WS2812/WS2812.o
+                0x000001a8       0x90 src/WS2812/WS2812.o
  .debug_aranges
-                0x00000230       0x38 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(main.o)
+                0x00000238       0x38 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(main.o)
  .debug_aranges
-                0x00000268       0x48 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(wiring.o)
+                0x00000270       0x48 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(wiring.o)
  .debug_aranges
-                0x000002b0       0x38 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(wiring_digital.o)
+                0x000002b8       0x38 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(wiring_digital.o)
 
 .debug_pubnames
  *(.debug_pubnames)
 
-.debug_info     0x00000000     0x77a5
+.debug_info     0x00000000     0x783e
  *(.debug_info .gnu.linkonce.wi.*)
- .debug_info    0x00000000     0x177c Sketch.o
- .debug_info    0x0000177c     0x1aa5 src/Clock/Clock.o
- .debug_info    0x00003221     0x2a7d src/Display/Display.o
- .debug_info    0x00005c9e     0x1015 src/WS2812/WS2812.o
- .debug_info    0x00006cb3      0x231 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(main.o)
- .debug_info    0x00006ee4      0x2c8 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(wiring.o)
- .debug_info    0x000071ac      0x5f9 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(wiring_digital.o)
+ .debug_info    0x00000000     0x17a6 Sketch.o
+ .debug_info    0x000017a6     0x1b14 src/Clock/Clock.o
+ .debug_info    0x000032ba     0x2a7d src/Display/Display.o
+ .debug_info    0x00005d37     0x1015 src/WS2812/WS2812.o
+ .debug_info    0x00006d4c      0x231 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(main.o)
+ .debug_info    0x00006f7d      0x2c8 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(wiring.o)
+ .debug_info    0x00007245      0x5f9 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(wiring_digital.o)
 
-.debug_abbrev   0x00000000     0x1242
+.debug_abbrev   0x00000000     0x127d
  *(.debug_abbrev)
  .debug_abbrev  0x00000000      0x28c Sketch.o
- .debug_abbrev  0x0000028c      0x344 src/Clock/Clock.o
- .debug_abbrev  0x000005d0      0x497 src/Display/Display.o
- .debug_abbrev  0x00000a67      0x432 src/WS2812/WS2812.o
- .debug_abbrev  0x00000e99      0x109 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(main.o)
- .debug_abbrev  0x00000fa2      0x145 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(wiring.o)
- .debug_abbrev  0x000010e7      0x15b C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(wiring_digital.o)
+ .debug_abbrev  0x0000028c      0x37f src/Clock/Clock.o
+ .debug_abbrev  0x0000060b      0x497 src/Display/Display.o
+ .debug_abbrev  0x00000aa2      0x432 src/WS2812/WS2812.o
+ .debug_abbrev  0x00000ed4      0x109 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(main.o)
+ .debug_abbrev  0x00000fdd      0x145 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(wiring.o)
+ .debug_abbrev  0x00001122      0x15b C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(wiring_digital.o)
 
-.debug_line     0x00000000     0x1b55
+.debug_line     0x00000000     0x1b96
  *(.debug_line .debug_line.* .debug_line_end)
  .debug_line    0x00000000      0x204 Sketch.o
- .debug_line    0x00000204      0x39f src/Clock/Clock.o
- .debug_line    0x000005a3      0x9be src/Display/Display.o
- .debug_line    0x00000f61      0x594 src/WS2812/WS2812.o
- .debug_line    0x000014f5      0x175 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(main.o)
- .debug_line    0x0000166a      0x299 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(wiring.o)
- .debug_line    0x00001903      0x252 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(wiring_digital.o)
+ .debug_line    0x00000204      0x3e0 src/Clock/Clock.o
+ .debug_line    0x000005e4      0x9be src/Display/Display.o
+ .debug_line    0x00000fa2      0x594 src/WS2812/WS2812.o
+ .debug_line    0x00001536      0x175 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(main.o)
+ .debug_line    0x000016ab      0x299 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(wiring.o)
+ .debug_line    0x00001944      0x252 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(wiring_digital.o)
 
-.debug_frame    0x00000000      0x98c
+.debug_frame    0x00000000      0x99c
  *(.debug_frame)
  .debug_frame   0x00000000       0x54 Sketch.o
- .debug_frame   0x00000054       0xac src/Clock/Clock.o
- .debug_frame   0x00000100      0x588 src/Display/Display.o
- .debug_frame   0x00000688      0x170 src/WS2812/WS2812.o
- .debug_frame   0x000007f8       0x54 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(main.o)
- .debug_frame   0x0000084c       0xc4 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(wiring.o)
- .debug_frame   0x00000910       0x7c C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(wiring_digital.o)
+ .debug_frame   0x00000054       0xbc src/Clock/Clock.o
+ .debug_frame   0x00000110      0x588 src/Display/Display.o
+ .debug_frame   0x00000698      0x170 src/WS2812/WS2812.o
+ .debug_frame   0x00000808       0x54 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(main.o)
+ .debug_frame   0x0000085c       0xc4 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(wiring.o)
+ .debug_frame   0x00000920       0x7c C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(wiring_digital.o)
 
-.debug_str      0x00000000     0x24cf
+.debug_str      0x00000000     0x2555
  *(.debug_str)
- .debug_str     0x00000000     0x1e81 Sketch.o
-                               0x2092 (size before relaxing)
- .debug_str     0x00001e81       0xc8 src/Clock/Clock.o
-                               0x20e2 (size before relaxing)
- .debug_str     0x00001f49       0xde src/Display/Display.o
+ .debug_str     0x00000000     0x1ec5 Sketch.o
+                               0x20d6 (size before relaxing)
+ .debug_str     0x00001ec5      0x10a src/Clock/Clock.o
+                               0x2168 (size before relaxing)
+ .debug_str     0x00001fcf       0xde src/Display/Display.o
                                0x1e1e (size before relaxing)
- .debug_str     0x00002027      0x10a src/WS2812/WS2812.o
+ .debug_str     0x000020ad      0x10a src/WS2812/WS2812.o
                                 0x854 (size before relaxing)
- .debug_str     0x00002131      0x1b8 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(main.o)
+ .debug_str     0x000021b7      0x1b8 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(main.o)
                                 0x2ba (size before relaxing)
- .debug_str     0x000022e9      0x159 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(wiring.o)
+ .debug_str     0x0000236f      0x159 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(wiring.o)
                                 0x244 (size before relaxing)
- .debug_str     0x00002442       0x8d C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(wiring_digital.o)
+ .debug_str     0x000024c8       0x8d C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(wiring_digital.o)
                                 0x2a9 (size before relaxing)
 
-.debug_loc      0x00000000     0x4295
+.debug_loc      0x00000000     0x42bd
  *(.debug_loc)
- .debug_loc     0x00000000      0x54d src/Clock/Clock.o
- .debug_loc     0x0000054d     0x2701 src/Display/Display.o
- .debug_loc     0x00002c4e      0xdfb src/WS2812/WS2812.o
- .debug_loc     0x00003a49      0x269 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(wiring.o)
- .debug_loc     0x00003cb2      0x5e3 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(wiring_digital.o)
+ .debug_loc     0x00000000      0x575 src/Clock/Clock.o
+ .debug_loc     0x00000575     0x2701 src/Display/Display.o
+ .debug_loc     0x00002c76      0xdfb src/WS2812/WS2812.o
+ .debug_loc     0x00003a71      0x269 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(wiring.o)
+ .debug_loc     0x00003cda      0x5e3 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(wiring_digital.o)
 
 .debug_macinfo
  *(.debug_macinfo)
@@ -904,15 +906,15 @@ END GROUP
 .debug_pubtypes
  *(.debug_pubtypes)
 
-.debug_ranges   0x00000000      0x308
+.debug_ranges   0x00000000      0x310
  *(.debug_ranges)
  .debug_ranges  0x00000000       0x28 Sketch.o
- .debug_ranges  0x00000028       0x58 src/Clock/Clock.o
- .debug_ranges  0x00000080      0x180 src/Display/Display.o
- .debug_ranges  0x00000200       0x80 src/WS2812/WS2812.o
- .debug_ranges  0x00000280       0x28 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(main.o)
- .debug_ranges  0x000002a8       0x38 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(wiring.o)
- .debug_ranges  0x000002e0       0x28 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(wiring_digital.o)
+ .debug_ranges  0x00000028       0x60 src/Clock/Clock.o
+ .debug_ranges  0x00000088      0x180 src/Display/Display.o
+ .debug_ranges  0x00000208       0x80 src/WS2812/WS2812.o
+ .debug_ranges  0x00000288       0x28 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(main.o)
+ .debug_ranges  0x000002b0       0x38 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(wiring.o)
+ .debug_ranges  0x000002e8       0x28 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(wiring_digital.o)
 
 .debug_macro
  *(.debug_macro)
