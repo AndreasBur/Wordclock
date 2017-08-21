@@ -24,7 +24,7 @@ void setup() {
 //		flag = 0;
   //}
   //wcAnimation.setChar(0,0, 'T', ANIMATION_FONT_4X6);
-  wcClock.show(17,30);
+  wcClock.setClock(17,30);
 }
 
 void loop() {

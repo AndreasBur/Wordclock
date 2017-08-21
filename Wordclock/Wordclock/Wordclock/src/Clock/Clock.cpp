@@ -222,7 +222,7 @@ stdReturnType Clock::getClockWords(byte Hour, byte Minute, ClockWordsType* Clock
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType Clock::show(byte Hour, byte Minute)
+stdReturnType Clock::setClock(byte Hour, byte Minute)
 {
     /* ----- Local Variables ---------------------------------------------- */
 	stdReturnType ReturnValue = E_NOT_OK;

@@ -15,19 +15,19 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY
   5 .debug_aranges 000002e8  00000000  00000000  0000093c  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_info   0000776d  00000000  00000000  00000c24  2**0
+  6 .debug_info   000077a5  00000000  00000000  00000c24  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_abbrev 0000126e  00000000  00000000  00008391  2**0
+  7 .debug_abbrev 00001242  00000000  00000000  000083c9  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_line   00001b54  00000000  00000000  000095ff  2**0
+  8 .debug_line   00001b55  00000000  00000000  0000960b  2**0
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_frame  0000098c  00000000  00000000  0000b154  2**2
+  9 .debug_frame  0000098c  00000000  00000000  0000b160  2**2
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_str    000024b1  00000000  00000000  0000bae0  2**0
+ 10 .debug_str    000024cf  00000000  00000000  0000baec  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_loc    00004295  00000000  00000000  0000df91  2**0
+ 11 .debug_loc    00004295  00000000  00000000  0000dfbb  2**0
                   CONTENTS, READONLY, DEBUGGING
- 12 .debug_ranges 00000308  00000000  00000000  00012226  2**0
+ 12 .debug_ranges 00000308  00000000  00000000  00012250  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -155,12 +155,12 @@ Disassembly of section .text:
 //		flag = 0;
   //}
   //wcAnimation.setChar(0,0, 'T', ANIMATION_FONT_4X6);
-  wcClock.show(17,30);
+  wcClock.setClock(17,30);
  258:	4e e1       	ldi	r20, 0x1E	; 30
  25a:	61 e1       	ldi	r22, 0x11	; 17
  25c:	80 e0       	ldi	r24, 0x00	; 0
  25e:	91 e0       	ldi	r25, 0x01	; 1
- 260:	0c 94 c7 01 	jmp	0x38e	; 0x38e <_ZN5Clock4showEhh>
+ 260:	0c 94 c7 01 	jmp	0x38e	; 0x38e <_ZN5Clock8setClockEhh>
 
 00000264 <loop>:
 }
@@ -411,12 +411,12 @@ stdReturnType Clock::getClockWords(byte Hour, byte Minute, ClockWordsType* Clock
  38a:	ef 90       	pop	r14
  38c:	08 95       	ret
 
-0000038e <_ZN5Clock4showEhh>:
+0000038e <_ZN5Clock8setClockEhh>:
  *  \details
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType Clock::show(byte Hour, byte Minute)
+stdReturnType Clock::setClock(byte Hour, byte Minute)
 {
  38e:	af 92       	push	r10
  390:	bf 92       	push	r11
@@ -427,9 +427,9 @@ stdReturnType Clock::show(byte Hour, byte Minute)
  39a:	1f 93       	push	r17
  39c:	cf 93       	push	r28
  39e:	df 93       	push	r29
- 3a0:	00 d0       	rcall	.+0      	; 0x3a2 <_ZN5Clock4showEhh+0x14>
- 3a2:	00 d0       	rcall	.+0      	; 0x3a4 <_ZN5Clock4showEhh+0x16>
- 3a4:	00 d0       	rcall	.+0      	; 0x3a6 <_ZN5Clock4showEhh+0x18>
+ 3a0:	00 d0       	rcall	.+0      	; 0x3a2 <_ZN5Clock8setClockEhh+0x14>
+ 3a2:	00 d0       	rcall	.+0      	; 0x3a4 <_ZN5Clock8setClockEhh+0x16>
+ 3a4:	00 d0       	rcall	.+0      	; 0x3a6 <_ZN5Clock8setClockEhh+0x18>
  3a6:	cd b7       	in	r28, 0x3d	; 61
  3a8:	de b7       	in	r29, 0x3e	; 62
  3aa:	6c 01       	movw	r12, r24
@@ -445,13 +445,13 @@ stdReturnType Clock::show(byte Hour, byte Minute)
  3b2:	0e 94 53 01 	call	0x2a6	; 0x2a6 <_ZN5Clock13getClockWordsEhhP14ClockWordsType>
  3b6:	11 e0       	ldi	r17, 0x01	; 1
  3b8:	81 30       	cpi	r24, 0x01	; 1
- 3ba:	09 f0       	breq	.+2      	; 0x3be <_ZN5Clock4showEhh+0x30>
+ 3ba:	09 f0       	breq	.+2      	; 0x3be <_ZN5Clock8setClockEhh+0x30>
  3bc:	10 e0       	ldi	r17, 0x00	; 0
 
 	if(ClockWords.ShowItIs) {
  3be:	89 81       	ldd	r24, Y+1	; 0x01
  3c0:	88 23       	and	r24, r24
- 3c2:	a1 f0       	breq	.+40     	; 0x3ec <_ZN5Clock4showEhh+0x5e>
+ 3c2:	a1 f0       	breq	.+40     	; 0x3ec <_ZN5Clock8setClockEhh+0x5e>
 		if(pDisplay->setWord(DISPLAY_WORD_ES) == E_NOT_OK) ReturnValue = E_NOT_OK;
  3c4:	40 e0       	ldi	r20, 0x00	; 0
  3c6:	61 e0       	ldi	r22, 0x01	; 1
@@ -460,7 +460,7 @@ stdReturnType Clock::show(byte Hour, byte Minute)
  3cc:	91 81       	ldd	r25, Z+1	; 0x01
  3ce:	0e 94 95 02 	call	0x52a	; 0x52a <_ZN7Display7setWordE15DisplayWordTypeh>
  3d2:	81 30       	cpi	r24, 0x01	; 1
- 3d4:	09 f4       	brne	.+2      	; 0x3d8 <_ZN5Clock4showEhh+0x4a>
+ 3d4:	09 f4       	brne	.+2      	; 0x3d8 <_ZN5Clock8setClockEhh+0x4a>
  3d6:	11 e0       	ldi	r17, 0x01	; 1
 		if(pDisplay->setWord(DISPLAY_WORD_IST) == E_NOT_OK) ReturnValue = E_NOT_OK;
  3d8:	40 e0       	ldi	r20, 0x00	; 0
@@ -470,7 +470,7 @@ stdReturnType Clock::show(byte Hour, byte Minute)
  3e0:	91 81       	ldd	r25, Z+1	; 0x01
  3e2:	0e 94 95 02 	call	0x52a	; 0x52a <_ZN7Display7setWordE15DisplayWordTypeh>
  3e6:	81 30       	cpi	r24, 0x01	; 1
- 3e8:	09 f4       	brne	.+2      	; 0x3ec <_ZN5Clock4showEhh+0x5e>
+ 3e8:	09 f4       	brne	.+2      	; 0x3ec <_ZN5Clock8setClockEhh+0x5e>
  3ea:	11 e0       	ldi	r17, 0x01	; 1
  3ec:	5e 01       	movw	r10, r28
  3ee:	f2 e0       	ldi	r31, 0x02	; 2
@@ -505,7 +505,7 @@ stdReturnType Clock::show(byte Hour, byte Minute)
     for(byte Index = 0; Index < CLOCK_MAX_NUMBER_OF_HOUR_WORDS && ClockWords.HourWords[Index] != DISPLAY_WORD_NONE; Index++) {
  418:	ae 14       	cp	r10, r14
  41a:	bf 04       	cpc	r11, r15
- 41c:	79 f7       	brne	.-34     	; 0x3fc <_ZN5Clock4showEhh+0x6e>
+ 41c:	79 f7       	brne	.-34     	; 0x3fc <_ZN5Clock8setClockEhh+0x6e>
  41e:	5e 01       	movw	r10, r28
  420:	f7 e0       	ldi	r31, 0x07	; 7
  422:	af 0e       	add	r10, r31

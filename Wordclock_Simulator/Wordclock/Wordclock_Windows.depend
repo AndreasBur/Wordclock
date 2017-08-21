@@ -2993,7 +2993,7 @@
 	"Arduino.h"
 	"Display.h"
 
-1502952242 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\wordclock\arduino\src\display\display.cpp
+1503305200 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\wordclock\arduino\src\display\display.cpp
 	"Display.h"
 	"WordclockIcon.xpm"
 
@@ -3041,7 +3041,7 @@
 	"Animation.h"
 	"Transformation.h"
 
-1503061076 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\wordclock\wordclockmain.cpp
+1503061287 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\wordclock\wordclockmain.cpp
 	"wx_pch.h"
 	"WordclockMain.h"
 
