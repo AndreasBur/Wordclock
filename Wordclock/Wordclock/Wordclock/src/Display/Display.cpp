@@ -133,6 +133,7 @@ Display::Display(byte Red, byte Green, byte Blue)
     Color.Red = Red;
 	Color.Green = Green;
 	Color.Blue = Blue;
+	State = DISPLAY_STATE_UNINIT;
 
 #ifdef SIMULATOR
     Pixels.SetIcon(wxICON(WordclockIcon));
