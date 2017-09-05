@@ -98,12 +98,7 @@ const DisplayWordIlluminationType Display::WordIlluminationTable[] PROGMEM =
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-Display::Display(PixelColorType sColor)
-#ifdef SIMULATOR
- : Pixels(0L, _("Wordclock Simulator"))
-#else
- : Pixels(DISPLAY_DATA_PIN)
-#endif
+Display::Display(PixelColorType sColor) : Pixels(DISPLAY_DATA_PIN)
 {
     Color = sColor;
 	State = DISPLAY_STATE_UNINIT;
@@ -123,12 +118,7 @@ Display::Display(PixelColorType sColor)
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-Display::Display(byte Red, byte Green, byte Blue)
-#ifdef SIMULATOR
- : Pixels(0L, _("Wordclock Simulator"))
-#else
-: Pixels(DISPLAY_DATA_PIN)
-#endif
+Display::Display(byte Red, byte Green, byte Blue) : Pixels(DISPLAY_DATA_PIN)
 {
     Color.Red = Red;
 	Color.Green = Green;

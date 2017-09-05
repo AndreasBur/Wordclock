@@ -189,7 +189,7 @@ stdReturnType Animation::setCharFontVertical(byte Column, byte Row, unsigned cha
  *****************************************************************************************************************************************************/
 stdReturnType Animation::convertCharToFontIndex(unsigned char Char, byte* Index)
 {
-    stdReturnType ReturnValue = E_NOT_OK;
+    stdReturnType ReturnValue = E_OK;
 	*Index = Char + 0;
     /* for umlauts we need a special treatment */
     //if('Ä' == Char) { *Index = 95; ReturnValue = E_OK; }
