@@ -51,27 +51,27 @@
 class Transformation
 {
   private:
-	Display* pDisplay;
+    Display* pDisplay;
 
   public:
-	Transformation(Display*);
-	~Transformation();
+    Transformation(Display*);
+    ~Transformation();
 
-	// get methods
+    // get methods
 
 
-	// set methods
+    // set methods
 
-	stdReturnType shiftLeft(boolean = 0);
-	stdReturnType shiftRight(boolean);
-	stdReturnType shiftUp(boolean);
-	stdReturnType shiftDown(boolean);
+    stdReturnType shiftLeft(boolean = 0);
+    stdReturnType shiftRight(boolean);
+    stdReturnType shiftUp(boolean);
+    stdReturnType shiftDown(boolean);
 
-	// methods
-	void shiftLeftFast(boolean = 0);
-	void shiftRightFast(boolean);
-	void shiftUpFast(boolean);
-	void shiftDownFast(boolean);
+    // methods
+    void shiftLeftFast(boolean = 0);
+    void shiftRightFast(boolean);
+    void shiftUpFast(boolean);
+    void shiftDownFast(boolean);
 };
 
 #endif

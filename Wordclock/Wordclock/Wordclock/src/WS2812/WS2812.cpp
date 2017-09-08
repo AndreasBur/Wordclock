@@ -223,13 +223,13 @@ stdReturnType WS2812::getPixel(byte Index, WS2812PixelType* Pixel)
  *****************************************************************************************************************************************************/
 WS2812PixelType WS2812::getPixelFast(byte Index)
 {
-	WS2812PixelType Pixel;
+    WS2812PixelType Pixel;
     
-	Pixel.Red = Pixels[WS2812_POS_ABS_RED(Index)];
+    Pixel.Red = Pixels[WS2812_POS_ABS_RED(Index)];
     Pixel.Green = Pixels[WS2812_POS_ABS_GREEN(Index)];
     Pixel.Blue = Pixels[WS2812_POS_ABS_BLUE(Index)];
-	
-	return Pixel;
+    
+    return Pixel;
 } /* getPixelFast */
 
 
@@ -268,16 +268,16 @@ stdReturnType WS2812::getPixelDimmed(byte Index, WS2812PixelType* Pixel)
  *****************************************************************************************************************************************************/
 WS2812PixelType WS2812::getPixelDimmedFast(byte Index)
 {
-	WS2812PixelType Pixel;
+    WS2812PixelType Pixel;
 
     if(Brightness != 255) {
-		dimmColor(&Pixel.Red, Pixels[WS2812_POS_ABS_RED(Index)]);
+        dimmColor(&Pixel.Red, Pixels[WS2812_POS_ABS_RED(Index)]);
         dimmColor(&Pixel.Green, Pixels[WS2812_POS_ABS_GREEN(Index)]);
         dimmColor(&Pixel.Blue, Pixels[WS2812_POS_ABS_BLUE(Index)]);
     } else {
         return getPixelFast(Index);
     }
-	return Pixel;
+    return Pixel;
 } /* getPixelDimmed */
 
 
@@ -312,7 +312,7 @@ stdReturnType WS2812::setPixel(byte Index, WS2812PixelType Pixel)
  *****************************************************************************************************************************************************/
 void WS2812::setPixelFast(byte Index, WS2812PixelType Pixel)
 {
-	Pixels[WS2812_POS_ABS_RED(Index)] = Pixel.Red;
+    Pixels[WS2812_POS_ABS_RED(Index)] = Pixel.Red;
     Pixels[WS2812_POS_ABS_GREEN(Index)] = Pixel.Green;
     Pixels[WS2812_POS_ABS_BLUE(Index)] = Pixel.Blue;
 } /* setPixel */
@@ -349,7 +349,7 @@ stdReturnType WS2812::setPixel(byte Index, byte Red, byte Green, byte Blue)
  *****************************************************************************************************************************************************/
 void WS2812::setPixelFast(byte Index, byte Red, byte Green, byte Blue)
 {
-	Pixels[WS2812_POS_ABS_RED(Index)] = Red;
+    Pixels[WS2812_POS_ABS_RED(Index)] = Red;
     Pixels[WS2812_POS_ABS_GREEN(Index)] = Green;
     Pixels[WS2812_POS_ABS_BLUE(Index)] = Blue;
 } /* setPixelFast */

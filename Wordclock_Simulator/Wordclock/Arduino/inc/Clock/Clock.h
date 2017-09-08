@@ -37,8 +37,8 @@
 #define CLOCK_NUMBER_OF_HOURS                   12
 #define CLOCK_MAX_NUMBER_OF_HOUR_WORDS          2
 
-#define CLOCK_NUMBER_OF_HOURS_PER_DAY			24
-#define CLOCK_NUMBER_OF_MINUTES_PER_HOUR		60
+#define CLOCK_NUMBER_OF_HOURS_PER_DAY           24
+#define CLOCK_NUMBER_OF_MINUTES_PER_HOUR        60
 
 /* Minute */
 #define CLOCK_MINUTE_STEP_IN_MINUTES            5
@@ -65,8 +65,8 @@ typedef enum {
 
 
 typedef enum {
-	CLOCK_HOUR_MODE_FULL_HOUR,
-	CLOCK_HOUR_MODE_NO_FULL_HOUR
+    CLOCK_HOUR_MODE_FULL_HOUR,
+    CLOCK_HOUR_MODE_NO_FULL_HOUR
 } ClockHourModesType;
 
 
@@ -82,9 +82,9 @@ typedef struct {
 
 
 typedef struct {
-	boolean ShowItIs;
-	DisplayWordType HourWords[CLOCK_MAX_NUMBER_OF_HOUR_WORDS];
-	DisplayWordType MinuteWords[CLOCK_MAX_NUMBER_OF_MINUTE_WORDS];
+    boolean ShowItIs;
+    DisplayWordType HourWords[CLOCK_MAX_NUMBER_OF_HOUR_WORDS];
+    DisplayWordType MinuteWords[CLOCK_MAX_NUMBER_OF_MINUTE_WORDS];
 } ClockWordsType;
 
 typedef ClockHoursType HoursTableEntryType;
@@ -119,12 +119,12 @@ class Clock
     ~Clock();
 
     // get methods
-	ClockModesType getMode() { return Mode; }
-	stdReturnType getClockWords(byte, byte, ClockWordsType*);
-
+    ClockModesType getMode() { return Mode; }
+    stdReturnType getClockWords(byte, byte, ClockWordsType*);
+    boolean compareClockWords(ClockWordsType*, ClockWordsType*);
 
     // set methods
-	void setMode(ClockModesType sMode) { Mode = sMode; }
+    void setMode(ClockModesType sMode) { Mode = sMode; }
 
     // methods
     stdReturnType setClock(byte, byte);

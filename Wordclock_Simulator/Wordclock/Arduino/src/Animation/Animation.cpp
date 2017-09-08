@@ -54,7 +54,7 @@
 ******************************************************************************************************************************************************/
 Animation::Animation(Display* Display)
 {
-	pDisplay = Display;
+    pDisplay = Display;
 } /* Animation */
 
 
@@ -92,7 +92,7 @@ void Animation::init()
 stdReturnType Animation::setChar(byte Column, byte Row, unsigned char Char, AnimationFontType Font)
 {
 #if(ANIMATION_SUPPORT_FONT_4X6 == STD_ON)
-	if(Font == ANIMATION_FONT_4X6) return setCharFontHorizontal(Column, Row, Char, &Font_4x6[0][0], ANIMATION_FONT_4X6_WIDTH, ANIMATION_FONT_4X6_HEIGHT);
+    if(Font == ANIMATION_FONT_4X6) return setCharFontHorizontal(Column, Row, Char, &Font_4x6[0][0], ANIMATION_FONT_4X6_WIDTH, ANIMATION_FONT_4X6_HEIGHT);
 #endif
 
 #if(ANIMATION_SUPPORT_FONT_5X8 == STD_ON)
@@ -165,10 +165,10 @@ stdReturnType Animation::setCharFontVertical(byte Column, byte Row, unsigned cha
     for(byte FontRow = 0; FontRow < FontHeight; FontRow++)
     {
         byte Font_EntryItem = pgm_read_byte(&FontTable[(FontIndex * FontHeight) + FontRow]);
-	    for(byte FontColumn = 0; FontColumn < FontWidth; FontColumn++)
-	    {
+        for(byte FontColumn = 0; FontColumn < FontWidth; FontColumn++)
+        {
             ColumnAbs = Column + FontColumn;
-		    RowAbs = Row + FontRow;
+            RowAbs = Row + FontRow;
             if(pDisplay->writePixel(ColumnAbs, RowAbs, bitRead(Font_EntryItem, FontColumn)) == E_NOT_OK) ReturnValue = E_NOT_OK;
         }
     }
@@ -190,7 +190,7 @@ stdReturnType Animation::setCharFontVertical(byte Column, byte Row, unsigned cha
 stdReturnType Animation::convertCharToFontIndex(unsigned char Char, byte* Index)
 {
     stdReturnType ReturnValue = E_NOT_OK;
-	*Index = Char + 0;
+    *Index = Char + 0;
     /* for umlauts we need a special treatment */
     //if('Ä' == Char) { *Index = 95; ReturnValue = E_OK; }
     //else if('Ö' == Char) { *Index = 153; ReturnValue = E_OK; }
