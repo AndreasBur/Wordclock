@@ -105,7 +105,7 @@ WS2812::WS2812(byte Pin)
 #if (WS2812_RESET_TIMER == STD_ON)
     ResetTimer = 0;
 #endif
-    memset(Pixels, 0, sizeof(Pixels));
+    clearAllPixels();
 #if (WS2812_RGB_ORDER_ON_RUNTIME == STD_ON)
     setColorOrder(WS2812_COLOR_ORDER_BRG);
 #endif
@@ -131,7 +131,7 @@ WS2812::~WS2812()
  *****************************************************************************************************************************************************/
 void WS2812::init()
 {
-
+    show();
 } /* init */
 
 
