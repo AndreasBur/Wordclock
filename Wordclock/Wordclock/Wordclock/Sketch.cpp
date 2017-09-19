@@ -24,9 +24,13 @@ void setup() {
 //		flag = 0;
   //}
   //wcAnimation.setChar(0,0, 'T', ANIMATION_FONT_4X6);
-  wcClock.setClock(17,30);
+  
+  
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
+  wcClock.setClock(17,30);
+  WordClockDisplay.show();
+  WordClockDisplay.clearAllWords();
 }

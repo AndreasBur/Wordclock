@@ -37,7 +37,7 @@
 /******************************************************************************************************************************************************
  *  LOCAL DATA TYPES AND STRUCTURES
 ******************************************************************************************************************************************************/
-const ClockHoursType Clock::ClockHoursTable[][CLOCK_NUMBER_OF_HOURS] PROGMEM =
+const ClockHoursType Clock::ClockHoursTable[][CLOCK_NUMBER_OF_HOURS] PROGMEM
 {
     {                                                                   // ClockHoursTable[0][] = hh:00 CLOCK_HOUR_MODE_FULL_HOUR
         {DISPLAY_WORD_HOUR_ZWOELF, DISPLAY_WORD_UHR },                  // 00:00
@@ -70,7 +70,7 @@ const ClockHoursType Clock::ClockHoursTable[][CLOCK_NUMBER_OF_HOURS] PROGMEM =
 };
 
 
-const ClockMinutesType Clock::ClockMinutesTable[][CLOCK_NUMBER_OF_MINUTE_STEPS] PROGMEM =
+const ClockMinutesType Clock::ClockMinutesTable[][CLOCK_NUMBER_OF_MINUTE_STEPS] PROGMEM
 {
     {                                                                                                                  // ClockMinutesTable[0][] = WESSI
         {CLOCK_HOUR_MODE_FULL_HOUR,    0, {DISPLAY_WORD_NONE,        DISPLAY_WORD_NONE, DISPLAY_WORD_NONE }},          // 00

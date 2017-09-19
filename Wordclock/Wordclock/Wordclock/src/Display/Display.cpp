@@ -39,7 +39,7 @@
 /******************************************************************************************************************************************************
  *  LOCAL DATA TYPES AND STRUCTURES
 ******************************************************************************************************************************************************/
-const char Display::DisplayCharacters[][DISPLAY_NUMBER_OF_COLUMNS + 1] PROGMEM =
+const char Display::DisplayCharacters[][DISPLAY_NUMBER_OF_COLUMNS + 1] PROGMEM
 {
     "ESKISTLFÜNF",
     "ZEHNZWANZIG",
@@ -54,7 +54,7 @@ const char Display::DisplayCharacters[][DISPLAY_NUMBER_OF_COLUMNS + 1] PROGMEM =
 };
 
 
-const DisplayWordIlluminationType Display::WordIlluminationTable[] PROGMEM =
+const DisplayWordIlluminationType Display::WordIlluminationTable[] PROGMEM
 {
     {0,0,0},                                //  0 = DISPLAY_WORD_NONE           = ""
     {0,0,2},                                //  1 = DISPLAY_WORD_ES             = "ES"

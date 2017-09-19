@@ -56,19 +56,19 @@
  *  GLOBAL DATA TYPES AND STRUCTURES
 ******************************************************************************************************************************************************/
 /* type which describes the internal state of the Display */
-typedef enum {
+enum DisplayStateType {
     DISPLAY_STATE_NONE,
     DISPLAY_STATE_UNINIT,
     DISPLAY_STATE_INIT,
     DISPLAY_STATE_READY
-} DisplayStateType;
+};
 
 /* type which describes the  */
-typedef struct {
+struct DisplayWordIlluminationType {
     byte Row;
     byte Column;
     byte Length;
-} DisplayWordIlluminationType;
+};
 
 typedef boolean DisplayPixelType;
 

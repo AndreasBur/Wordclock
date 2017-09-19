@@ -67,19 +67,19 @@
  *****************************************************************************************************************************************************/
 /* type which describes the color order of the protocol */
 #if (WS2812_RGB_ORDER_ON_RUNTIME == STD_ON)
-typedef enum {
+enum WS2812ColorOrderType {
     WS2812_COLOR_ORDER_RGB,
     WS2812_COLOR_ORDER_BRG,
     WS2812_COLOR_ORDER_GBR
-} WS2812ColorOrderType;
+};
 #endif
 
 /* type which describes the structure of a pixel */
-typedef struct {
+struct WS2812PixelType {
     byte Red;
     byte Green;
     byte Blue;
-} WS2812PixelType;
+};
 
 
 /******************************************************************************************************************************************************
