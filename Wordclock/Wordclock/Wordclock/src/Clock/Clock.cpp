@@ -148,9 +148,7 @@ const ClockMinutesType Clock::ClockMinutesTable[][CLOCK_NUMBER_OF_MINUTE_STEPS] 
 ******************************************************************************************************************************************************/
 Clock::Clock(Display* Display, ClockModesType sMode)
 {
-    if(Display != NULL) {
-        pDisplay = Display;
-    }
+    pDisplay = Display;
     Mode = sMode;
 } /* Clock */
 
@@ -222,7 +220,7 @@ stdReturnType Clock::getClockWords(byte Hour, byte Minute, ClockWordsType* Clock
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-boolean compareClockWords(ClockWordsType* ClockWords1, ClockWordsType* ClockWords2)
+boolean Clock::compareClockWords(ClockWordsType* ClockWords1, ClockWordsType* ClockWords2) const
 {
     if( ClockWords1->HourWords[0] == ClockWords2->HourWords[0]      &&
         ClockWords1->HourWords[1] == ClockWords2->HourWords[1]      &&

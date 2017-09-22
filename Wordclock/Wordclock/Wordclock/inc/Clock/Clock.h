@@ -63,12 +63,10 @@ enum ClockModesType {
     CLOCK_MODE_SCHWABEN
 };
 
-
 enum ClockHourModesType {
     CLOCK_HOUR_MODE_FULL_HOUR,
     CLOCK_HOUR_MODE_NO_FULL_HOUR
 };
-
 
 struct ClockMinutesType {
     ClockHourModesType HourMode;
@@ -79,7 +77,6 @@ struct ClockMinutesType {
 struct ClockHoursType {
     DisplayWordType Words[CLOCK_MAX_NUMBER_OF_HOUR_WORDS];
 };
-
 
 struct ClockWordsType {
     boolean ShowItIs;
@@ -120,9 +117,9 @@ class Clock
     ~Clock();
 
     // get methods
-    ClockModesType getMode() { return Mode; }
+    ClockModesType getMode() const { return Mode; }
     stdReturnType getClockWords(byte, byte, ClockWordsType*);
-    boolean compareClockWords(ClockWordsType*, ClockWordsType*);
+    boolean compareClockWords(ClockWordsType*, ClockWordsType*) const;
 
     // set methods
     void setMode(ClockModesType sMode) { Mode = sMode; }

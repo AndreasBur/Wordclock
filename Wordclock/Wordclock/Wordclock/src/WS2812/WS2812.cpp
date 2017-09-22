@@ -200,7 +200,7 @@ stdReturnType WS2812::setPin(byte Pin)
  *                  
  *  \return         -
  *****************************************************************************************************************************************************/
-stdReturnType WS2812::getPixel(byte Index, WS2812PixelType* Pixel)
+stdReturnType WS2812::getPixel(byte Index, WS2812PixelType* Pixel) const
 {
     if(Index < WS2812_NUMBER_OF_LEDS) {
         Pixel->Red = Pixels[WS2812_POS_ABS_RED(Index)];
@@ -221,7 +221,7 @@ stdReturnType WS2812::getPixel(byte Index, WS2812PixelType* Pixel)
  *                  
  *  \return         -
  *****************************************************************************************************************************************************/
-WS2812PixelType WS2812::getPixelFast(byte Index)
+WS2812PixelType WS2812::getPixelFast(byte Index) const
 {
     WS2812PixelType Pixel;
     
@@ -241,7 +241,7 @@ WS2812PixelType WS2812::getPixelFast(byte Index)
  *                  
  *  \return         -
  *****************************************************************************************************************************************************/
-stdReturnType WS2812::getPixelDimmed(byte Index, WS2812PixelType* Pixel)
+stdReturnType WS2812::getPixelDimmed(byte Index, WS2812PixelType* Pixel) const
 {
     if(Index < WS2812_NUMBER_OF_LEDS) {
         if(Brightness != 255) {
@@ -266,7 +266,7 @@ stdReturnType WS2812::getPixelDimmed(byte Index, WS2812PixelType* Pixel)
  *                  
  *  \return         -
  *****************************************************************************************************************************************************/
-WS2812PixelType WS2812::getPixelDimmedFast(byte Index)
+WS2812PixelType WS2812::getPixelDimmedFast(byte Index) const
 {
     WS2812PixelType Pixel;
 

@@ -35,7 +35,7 @@
 /******************************************************************************************************************************************************
  *  GLOBAL DATA TYPES AND STRUCTURES
 ******************************************************************************************************************************************************/
-typedef enum {
+enum DisplayWordType {
     DISPLAY_WORD_NONE,
     DISPLAY_WORD_ES,
     DISPLAY_WORD_IST,
@@ -64,7 +64,7 @@ typedef enum {
     DISPLAY_WORD_HOUR_SECHS,
     DISPLAY_WORD_UHR,
     DISPLAY_WORD_NUMBER_OF_WORDS
-} DisplayWordType;
+};
 
 
 #endif

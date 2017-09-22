@@ -103,7 +103,7 @@ class Display
     static const DisplayWordIlluminationType WordIlluminationTable[];
     
     // functions
-    byte transformToSerpentine(byte, byte);
+    byte transformToSerpentine(byte, byte) const;
 
 
   public:
@@ -112,8 +112,8 @@ class Display
     ~Display();
 
     // get methods
-    PixelColorType getColor() { return Color; }
-    DisplayStateType getState() { return State; }
+    PixelColorType getColor() const { return Color; }
+    DisplayStateType getState() const { return State; }
 
     // set methods
     void setColor(PixelColorType sColor) { Color = sColor; }
@@ -121,25 +121,25 @@ class Display
     // char methods
     stdReturnType setCharacter(DisplayCharacterType Character) { return setPixel(Character); }
     stdReturnType clearCharacter(DisplayCharacterType Character) { return clearPixel(Character); }
-    stdReturnType getCharacter(DisplayCharacterType Character, boolean* Value) { return getPixel(Character, Value); }
-    stdReturnType getCharacter(byte, byte, char*);
-    stdReturnType getCharacter(byte, char*);
+    stdReturnType getCharacter(DisplayCharacterType Character, boolean* Value) const { return getPixel(Character, Value); }
+    stdReturnType getCharacter(byte, byte, char*) const;
+    stdReturnType getCharacter(byte, char*) const;
 
     // char methods fast
     void setCharacterFast(DisplayCharacterType Character) { setPixelFast(Character); }
     void clearCharacterFast(DisplayCharacterType Character) { clearPixelFast(Character); }
-    boolean getCharacterFast(DisplayCharacterType Character) { return getPixelFast(Character); }
-    char getCharacterFast(byte Column, byte Row) { return pgm_read_byte(&DisplayCharacters[Row][Column]); }
-    char getCharacterFast(byte Index) { return pgm_read_byte(&DisplayCharacters[Index / DISPLAY_NUMBER_OF_COLUMNS][Index % DISPLAY_NUMBER_OF_COLUMNS]); }
+    boolean getCharacterFast(DisplayCharacterType Character) const { return getPixelFast(Character); }
+    char getCharacterFast(byte Column, byte Row) const { return pgm_read_byte(&DisplayCharacters[Row][Column]); }
+    char getCharacterFast(byte Index) const { return pgm_read_byte(&DisplayCharacters[Index / DISPLAY_NUMBER_OF_COLUMNS][Index % DISPLAY_NUMBER_OF_COLUMNS]); }
 
     // word methods
-    stdReturnType getWordIllumination(DisplayWordType, DisplayWordIlluminationType*);
+    stdReturnType getWordIllumination(DisplayWordType, DisplayWordIlluminationType*) const;
     stdReturnType setWord(DisplayWordType, byte MaxLength = DISPLAY_WORD_LENGTH_UNLIMITED);
     stdReturnType clearWord(DisplayWordType);
     stdReturnType clearAllWords();
 
     // word methods fast
-    DisplayWordIlluminationType getWordIlluminationFast(DisplayWordType Word) { DisplayWordIlluminationType WordIllu; memcpy_P(&WordIllu, &WordIlluminationTable[Word], sizeof(WordIllu)); return WordIllu; }
+    DisplayWordIlluminationType getWordIlluminationFast(DisplayWordType Word) const { DisplayWordIlluminationType WordIllu; memcpy_P(&WordIllu, &WordIlluminationTable[Word], sizeof(WordIllu)); return WordIllu; }
     void setWordFast(DisplayWordType, byte MaxLength = DISPLAY_WORD_LENGTH_UNLIMITED);
     void clearWordFast(DisplayWordType);
     void clearAllWordsFast();
@@ -151,10 +151,10 @@ class Display
     stdReturnType setPixel(byte);
     stdReturnType clearPixel(byte, byte);
     stdReturnType clearPixel(byte);
-    stdReturnType getPixel(byte, byte, boolean*);
-    stdReturnType getPixel(byte, boolean*);
-    stdReturnType getPixelRow(byte, DisplayPixelRowType*);
-    stdReturnType getPixelColumn(byte, DisplayPixelColumnType*);
+    stdReturnType getPixel(byte, byte, boolean*) const;
+    stdReturnType getPixel(byte, boolean*) const;
+    stdReturnType getPixelRow(byte, DisplayPixelRowType*) const;
+    stdReturnType getPixelColumn(byte, DisplayPixelColumnType*) const;
     stdReturnType setPixelRow(byte, DisplayPixelRowType);
     stdReturnType setPixelColumn(byte, DisplayPixelColumnType);
 
@@ -165,10 +165,10 @@ class Display
     void setPixelFast(byte);
     void clearPixelFast(byte, byte);
     void clearPixelFast(byte);
-    boolean getPixelFast(byte, byte);
-    boolean getPixelFast(byte);
-    DisplayPixelRowType getPixelRowFast(byte);
-    DisplayPixelColumnType getPixelColumnFast(byte);
+    boolean getPixelFast(byte, byte) const;
+    boolean getPixelFast(byte) const;
+    DisplayPixelRowType getPixelRowFast(byte) const;
+    DisplayPixelColumnType getPixelColumnFast(byte) const;
     void setPixelRowFast(byte, DisplayPixelRowType);
     void setPixelColumnFast(byte, DisplayPixelColumnType);
 

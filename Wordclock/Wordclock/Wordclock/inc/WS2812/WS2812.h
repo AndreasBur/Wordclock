@@ -108,18 +108,18 @@ class WS2812
     void dimmPixels(byte*, uint16_t);
     void dimmPixel(WS2812PixelType*, WS2812PixelType);
     void dimmPixel(WS2812PixelType*, byte, byte, byte);
-    void dimmColor(byte* ColorDimmed, byte Color) { *ColorDimmed = (Color * Brightness) >> 8; }
+    void dimmColor(byte* ColorDimmed, byte Color) const { *ColorDimmed = (Color * Brightness) >> 8; }
 
   public:
     WS2812(byte);
     ~WS2812();
 
     // get methods
-    byte getBrightness() { return Brightness; }
-    stdReturnType getPixel(byte, WS2812PixelType*);
-    stdReturnType getPixelDimmed(byte, WS2812PixelType*);
-    WS2812PixelType getPixelFast(byte);
-    WS2812PixelType getPixelDimmedFast(byte);
+    byte getBrightness() const { return Brightness; }
+    stdReturnType getPixel(byte, WS2812PixelType*) const;
+    stdReturnType getPixelDimmed(byte, WS2812PixelType*) const;
+    WS2812PixelType getPixelFast(byte) const;
+    WS2812PixelType getPixelDimmedFast(byte) const;
 
     // set methods
     void etBrightness(byte sBrightness) { Brightness = sBrightness; }

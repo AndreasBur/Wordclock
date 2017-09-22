@@ -93,10 +93,10 @@
  *  GLOBAL DATA TYPES AND STRUCTURES
  *****************************************************************************************************************************************************/
   /* standard return type for functions */
-typedef enum {
+enum stdReturnType {
     E_OK = 0,
     E_NOT_OK = 1
-} stdReturnType;
+};
 
 #endif
 

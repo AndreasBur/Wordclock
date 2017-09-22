@@ -64,15 +64,15 @@
  *  GLOBAL DATA TYPES AND STRUCTURES
 ******************************************************************************************************************************************************/
 /* type which describes the internal state of the Animation */
-typedef enum {
+enum AnimationStateType {
     ANIMATION_STATE_NONE,
     ANIMATION_STATE_UNINIT,
     ANIMATION_STATE_INIT,
     ANIMATION_STATE_READY
-} AnimationStateType;
+};
 
 
-typedef enum {
+enum AnimationFontType {
 #if(ANIMATION_SUPPORT_FONT_4X6 == STD_ON)
     ANIMATION_FONT_4X6,
 #endif
@@ -88,15 +88,15 @@ typedef enum {
 #if(ANIMATION_SUPPORT_FONT_8X8 == STD_ON)
     ANIMATION_FONT_8X8,
 #endif
-} AnimationFontType;
+};
 
 
-typedef enum {
+enum AnimationType {
     ANIMATION_SNAKE,
     ANIMATION_EXPLODE,
     ANIMATION_IMPLODE,
     ANIMATION_CUBE
-} AnimationType;
+};
 
 
 /******************************************************************************************************************************************************
