@@ -84,8 +84,8 @@ struct ClockWordsType {
     DisplayWordType MinuteWords[CLOCK_MAX_NUMBER_OF_MINUTE_WORDS];
 };
 
-typedef ClockHoursType HoursTableEntryType;
-typedef ClockMinutesType MinutesTableEntryType;
+using HoursTableEntryType = ClockHoursType;
+using MinutesTableEntryType = ClockMinutesType;
 
 
 /******************************************************************************************************************************************************

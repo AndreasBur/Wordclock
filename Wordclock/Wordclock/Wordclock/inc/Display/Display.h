@@ -70,23 +70,23 @@ struct DisplayWordIlluminationType {
     byte Length;
 };
 
-typedef boolean DisplayPixelType;
+using DisplayPixelType = boolean;
 
 #if(DISPLAY_NUMBER_OF_ROWS > 16)
 #error "Display: too many Rows, please extend DisplayPixelRowType"
 #endif
 
-typedef uint16_t DisplayPixelRowType;
+using DisplayPixelRowType = uint16_t;
 
 #if(DISPLAY_NUMBER_OF_COLUMNS > 16)
 #error "Display: too many Columns, please extend DisplayPixelColumnType"
 #endif
 
-typedef uint16_t DisplayPixelColumnType;
+using DisplayPixelColumnType = uint16_t;
 
 /* mapping to underlying hardware */
-typedef WS2812PixelType PixelColorType;
-typedef WS2812 Stripe;
+using PixelColorType = WS2812PixelType;
+using Stripe = WS2812;
 
 
 /******************************************************************************************************************************************************
