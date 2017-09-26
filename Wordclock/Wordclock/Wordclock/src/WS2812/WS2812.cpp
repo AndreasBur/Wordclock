@@ -278,7 +278,7 @@ WS2812PixelType WS2812::getPixelDimmedFast(byte Index) const
         return getPixelFast(Index);
     }
     return Pixel;
-} /* getPixelDimmed */
+} /* getPixelDimmedFast */
 
 
 /******************************************************************************************************************************************************
@@ -315,7 +315,7 @@ void WS2812::setPixelFast(byte Index, WS2812PixelType Pixel)
     Pixels[WS2812_POS_ABS_RED(Index)] = Pixel.Red;
     Pixels[WS2812_POS_ABS_GREEN(Index)] = Pixel.Green;
     Pixels[WS2812_POS_ABS_BLUE(Index)] = Pixel.Blue;
-} /* setPixel */
+} /* setPixelFast */
 
 
 /******************************************************************************************************************************************************
@@ -533,7 +533,7 @@ void  WS2812::sendData(const byte* Data, uint16_t DataLength)
             );
         }
     }
-}
+} /* sendData */
 
 
 /******************************************************************************************************************************************************
