@@ -39,7 +39,7 @@
 /******************************************************************************************************************************************************
  *  LOCAL DATA TYPES AND STRUCTURES
 ******************************************************************************************************************************************************/
-const char Display::DisplayCharacters[][DISPLAY_NUMBER_OF_COLUMNS + 1] PROGMEM =
+const char Display::DisplayCharacters[][DISPLAY_NUMBER_OF_COLUMNS + 1] PROGMEM
 {
     "ESKISTLFÜNF",
     "ZEHNZWANZIG",
@@ -54,7 +54,7 @@ const char Display::DisplayCharacters[][DISPLAY_NUMBER_OF_COLUMNS + 1] PROGMEM =
 };
 
 
-const DisplayWordIlluminationType Display::WordIlluminationTable[] PROGMEM =
+const DisplayWordIlluminationType Display::WordIlluminationTable[] PROGMEM
 {
     {0,0,0},                                //  0 = DISPLAY_WORD_NONE           = ""
     {0,0,2},                                //  1 = DISPLAY_WORD_ES             = "ES"
@@ -164,7 +164,7 @@ void Display::init()
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType Display::getCharacter(byte Column, byte Row, char* Character)
+stdReturnType Display::getCharacter(byte Column, byte Row, char* Character) const
 {
     if(Row < DISPLAY_NUMBER_OF_ROWS && Column < DISPLAY_NUMBER_OF_COLUMNS) {
         *Character =  getCharacterFast(Row, Column);
@@ -183,7 +183,7 @@ stdReturnType Display::getCharacter(byte Column, byte Row, char* Character)
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType Display::getCharacter(byte Index, char* Character)
+stdReturnType Display::getCharacter(byte Index, char* Character) const
 {
     byte Row = Index / DISPLAY_NUMBER_OF_COLUMNS;
     byte Column = Index % DISPLAY_NUMBER_OF_COLUMNS;
@@ -205,7 +205,7 @@ stdReturnType Display::getCharacter(byte Index, char* Character)
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType Display::getWordIllumination(DisplayWordType Word, DisplayWordIlluminationType* WordIllu)
+stdReturnType Display::getWordIllumination(DisplayWordType Word, DisplayWordIlluminationType* WordIllu) const
 {
     stdReturnType ReturnValue = E_NOT_OK;
 
@@ -230,12 +230,11 @@ stdReturnType Display::getWordIllumination(DisplayWordType Word, DisplayWordIllu
 stdReturnType Display::setWord(DisplayWordType Word, byte MaxLength)
 {
     stdReturnType ReturnValue = E_NOT_OK;
-    DisplayWordIlluminationType WordIllu;
     byte Length;
 
     if(Word < DISPLAY_WORD_NUMBER_OF_WORDS) {
         ReturnValue = E_OK;
-        WordIllu = getWordIlluminationFast(Word);
+        DisplayWordIlluminationType WordIllu = getWordIlluminationFast(Word);
 
         if(MaxLength == DISPLAY_WORD_LENGTH_UNLIMITED) Length = WordIllu.Length;
         else Length = MaxLength;
@@ -282,11 +281,10 @@ void Display::setWordFast(DisplayWordType Word, byte MaxLength)
 stdReturnType Display::clearWord(DisplayWordType Word)
 {
     stdReturnType ReturnValue = E_NOT_OK;
-    DisplayWordIlluminationType WordIllu;
 
     if(Word < DISPLAY_WORD_NUMBER_OF_WORDS) {
         ReturnValue = E_OK;
-        WordIllu = getWordIlluminationFast(Word);
+        DisplayWordIlluminationType WordIllu = getWordIlluminationFast(Word);
 
         for(byte Index = 0; Index < WordIllu.Length; Index++) {
             if(clearPixel(WordIllu.Column + Index,  WordIllu.Row) == E_NOT_OK) ReturnValue = E_NOT_OK;
@@ -353,7 +351,7 @@ void Display::clearAllWordsFast()
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType Display::getPixel(byte Index, boolean* Value)
+stdReturnType Display::getPixel(byte Index, boolean* Value) const
 {
     byte Row = Index / DISPLAY_NUMBER_OF_COLUMNS;
     byte Column = Index % DISPLAY_NUMBER_OF_COLUMNS;
@@ -370,7 +368,7 @@ stdReturnType Display::getPixel(byte Index, boolean* Value)
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-boolean Display::getPixelFast(byte Index)
+boolean Display::getPixelFast(byte Index) const
 {
     byte Row = Index / DISPLAY_NUMBER_OF_COLUMNS;
     byte Column = Index % DISPLAY_NUMBER_OF_COLUMNS;
@@ -387,7 +385,7 @@ boolean Display::getPixelFast(byte Index)
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType Display::getPixel(byte Column, byte Row, boolean* Value)
+stdReturnType Display::getPixel(byte Column, byte Row, boolean* Value)  const
 {
     stdReturnType ReturnValue = E_NOT_OK;
     PixelColorType Pixel;
@@ -415,7 +413,7 @@ stdReturnType Display::getPixel(byte Column, byte Row, boolean* Value)
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-boolean Display::getPixelFast(byte Column, byte Row)
+boolean Display::getPixelFast(byte Column, byte Row)  const
 {
     PixelColorType Pixel;
 
@@ -582,7 +580,7 @@ void Display::clearPixelFast(byte Index)
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType Display::getPixelRow(byte Row, DisplayPixelRowType* PixelRow)
+stdReturnType Display::getPixelRow(byte Row, DisplayPixelRowType* PixelRow) const
 {
     stdReturnType ReturnValue = E_OK;
     DisplayPixelType Pixel;
@@ -606,7 +604,7 @@ stdReturnType Display::getPixelRow(byte Row, DisplayPixelRowType* PixelRow)
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-DisplayPixelRowType Display::getPixelRowFast(byte Row)
+DisplayPixelRowType Display::getPixelRowFast(byte Row)  const
 {
     DisplayPixelRowType PixelRow = 0;
 
@@ -625,7 +623,7 @@ DisplayPixelRowType Display::getPixelRowFast(byte Row)
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType Display::getPixelColumn(byte Column, DisplayPixelRowType* PixelColumn)
+stdReturnType Display::getPixelColumn(byte Column, DisplayPixelRowType* PixelColumn)  const
 {
     stdReturnType ReturnValue = E_OK;
     DisplayPixelType Pixel;
@@ -649,7 +647,7 @@ stdReturnType Display::getPixelColumn(byte Column, DisplayPixelRowType* PixelCol
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-DisplayPixelColumnType Display::getPixelColumnFast(byte Column)
+DisplayPixelColumnType Display::getPixelColumnFast(byte Column)  const
 {
     DisplayPixelColumnType PixelColumn = 0;
 
@@ -741,7 +739,7 @@ void Display::setPixelColumnFast(byte Column, DisplayPixelRowType PixelColumn)
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-byte Display::transformToSerpentine(byte Column, byte Row)
+byte Display::transformToSerpentine(byte Column, byte Row) const
 {
     byte Index;
 

@@ -35,7 +35,7 @@
 /******************************************************************************************************************************************************
  *  GLOBAL DATA TYPES AND STRUCTURES
 ******************************************************************************************************************************************************/
-typedef enum {
+enum DisplayCharacterType {
     DISPLAY_CHARACTER_E_1,
     DISPLAY_CHARACTER_S_1,
     DISPLAY_CHARACTER_K_1,
@@ -147,7 +147,7 @@ typedef enum {
     DISPLAY_CHARACTER_H_8,
     DISPLAY_CHARACTER_R_8,
     DISPLAY_CHARACTER_NUMBER_OF_CHARACTERS
-} DisplayCharacterType;
+};
 
 
 #endif

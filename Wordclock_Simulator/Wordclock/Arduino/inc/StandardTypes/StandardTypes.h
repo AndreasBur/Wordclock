@@ -71,11 +71,11 @@
 
 /* read Bit Group */
 #define readBitGroup(Var, BitGroupMask, BitGroupPosition) \
-    (Var = ((Var & ((uint8_t)BitGroupMask)) >> BitGroupPosition))
+((Var & (BitGroupMask << BitGroupPosition)) >> BitGroupPosition)
 
 /* write Bit Group */
 #define writeBitGroup(Var, BitGroupMask, BitGroupPosition, Value) \
-    (Var = ((Var & ~((uint8_t)BitGroupMask)) | ((Value << BitGroupPosition) & ((uint8_t)BitGroupMask))))
+(Var = ((Var & ~(BitGroupMask << BitGroupPosition)) | ((Value & BitGroupMask) << BitGroupPosition)))
 
 /* binary to decimal */
 #define B(x) ( \
@@ -93,10 +93,10 @@
  *  GLOBAL DATA TYPES AND STRUCTURES
  *****************************************************************************************************************************************************/
   /* standard return type for functions */
-typedef enum {
+enum stdReturnType {
     E_OK = 0,
     E_NOT_OK = 1
-} stdReturnType;
+};
 
 #endif
 

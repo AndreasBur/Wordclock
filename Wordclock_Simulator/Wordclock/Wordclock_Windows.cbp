@@ -50,13 +50,14 @@
 			</Target>
 		</Build>
 		<Compiler>
+			<Add option="-Wall" />
+			<Add option="-std=c++11" />
 			<Add option="-pipe" />
 			<Add option="-mthreads" />
 			<Add option="-D__GNUWIN32__" />
 			<Add option="-D__WXMSW__" />
 			<Add option="-DWXUSINGDLL" />
 			<Add option="-DwxUSE_UNICODE" />
-			<Add option="-Wall" />
 			<Add directory="$(#wx30)/include" />
 			<Add directory="Arduino/inc/Animation" />
 			<Add directory="Arduino/inc/Clock" />

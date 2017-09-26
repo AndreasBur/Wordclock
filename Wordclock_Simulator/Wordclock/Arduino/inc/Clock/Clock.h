@@ -56,39 +56,36 @@
  *  GLOBAL DATA TYPES AND STRUCTURES
 ******************************************************************************************************************************************************/
 /*  */
-typedef enum {
+enum ClockModesType {
     CLOCK_MODE_WESSI,
     CLOCK_MODE_OSSI,
     CLOCK_MODE_RHEIN_RUHR,
     CLOCK_MODE_SCHWABEN
-} ClockModesType;
+};
 
-
-typedef enum {
+enum ClockHourModesType {
     CLOCK_HOUR_MODE_FULL_HOUR,
     CLOCK_HOUR_MODE_NO_FULL_HOUR
-} ClockHourModesType;
+};
 
-
-typedef struct {
+struct ClockMinutesType {
     ClockHourModesType HourMode;
     byte HourOffset;
     DisplayWordType Words[CLOCK_MAX_NUMBER_OF_MINUTE_WORDS];
-} ClockMinutesType;
+};
 
-typedef struct {
+struct ClockHoursType {
     DisplayWordType Words[CLOCK_MAX_NUMBER_OF_HOUR_WORDS];
-} ClockHoursType;
+};
 
-
-typedef struct {
+struct ClockWordsType {
     boolean ShowItIs;
     DisplayWordType HourWords[CLOCK_MAX_NUMBER_OF_HOUR_WORDS];
     DisplayWordType MinuteWords[CLOCK_MAX_NUMBER_OF_MINUTE_WORDS];
-} ClockWordsType;
+};
 
-typedef ClockHoursType HoursTableEntryType;
-typedef ClockMinutesType MinutesTableEntryType;
+using HoursTableEntryType = ClockHoursType;
+using MinutesTableEntryType = ClockMinutesType;
 
 
 /******************************************************************************************************************************************************
@@ -102,6 +99,7 @@ class Clock
 
     static const ClockHoursType ClockHoursTable[][CLOCK_NUMBER_OF_HOURS];
     static const ClockMinutesType ClockMinutesTable[][CLOCK_NUMBER_OF_MINUTE_STEPS];
+    
     // functions
     inline MinutesTableEntryType getMinutesTableEntry(ClockModesType Mode, byte Minute) {
         MinutesTableEntryType MinutesTableEntry;
@@ -119,9 +117,9 @@ class Clock
     ~Clock();
 
     // get methods
-    ClockModesType getMode() { return Mode; }
+    ClockModesType getMode() const { return Mode; }
     stdReturnType getClockWords(byte, byte, ClockWordsType*);
-    boolean compareClockWords(ClockWordsType*, ClockWordsType*);
+    boolean compareClockWords(ClockWordsType*, ClockWordsType*) const;
 
     // set methods
     void setMode(ClockModesType sMode) { Mode = sMode; }

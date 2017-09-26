@@ -37,7 +37,7 @@
 /******************************************************************************************************************************************************
  *  LOCAL DATA TYPES AND STRUCTURES
 ******************************************************************************************************************************************************/
-const ClockHoursType Clock::ClockHoursTable[][CLOCK_NUMBER_OF_HOURS] PROGMEM =
+const ClockHoursType Clock::ClockHoursTable[][CLOCK_NUMBER_OF_HOURS] PROGMEM
 {
     {                                                                   // ClockHoursTable[0][] = hh:00 CLOCK_HOUR_MODE_FULL_HOUR
         {DISPLAY_WORD_HOUR_ZWOELF, DISPLAY_WORD_UHR },                  // 00:00
@@ -70,7 +70,7 @@ const ClockHoursType Clock::ClockHoursTable[][CLOCK_NUMBER_OF_HOURS] PROGMEM =
 };
 
 
-const ClockMinutesType Clock::ClockMinutesTable[][CLOCK_NUMBER_OF_MINUTE_STEPS] PROGMEM =
+const ClockMinutesType Clock::ClockMinutesTable[][CLOCK_NUMBER_OF_MINUTE_STEPS] PROGMEM
 {
     {                                                                                                                  // ClockMinutesTable[0][] = WESSI
         {CLOCK_HOUR_MODE_FULL_HOUR,    0, {DISPLAY_WORD_NONE,        DISPLAY_WORD_NONE, DISPLAY_WORD_NONE }},          // 00
@@ -148,9 +148,7 @@ const ClockMinutesType Clock::ClockMinutesTable[][CLOCK_NUMBER_OF_MINUTE_STEPS] 
 ******************************************************************************************************************************************************/
 Clock::Clock(Display* Display, ClockModesType sMode)
 {
-    if(Display != NULL) {
-        pDisplay = Display;
-    }
+    pDisplay = Display;
     Mode = sMode;
 } /* Clock */
 
@@ -176,8 +174,6 @@ stdReturnType Clock::getClockWords(byte Hour, byte Minute, ClockWordsType* Clock
 {
     /* ----- Local Variables ---------------------------------------------- */
     stdReturnType ReturnValue = E_NOT_OK;
-    MinutesTableEntryType MinutesTableEntry;
-    HoursTableEntryType HoursTableEntry;
 
     /* ----- Implementation ----------------------------------------------- */
     if(Hour < CLOCK_NUMBER_OF_HOURS_PER_DAY && Minute < CLOCK_NUMBER_OF_MINUTES_PER_HOUR) {
@@ -192,7 +188,7 @@ stdReturnType Clock::getClockWords(byte Hour, byte Minute, ClockWordsType* Clock
             ClockWords->ShowItIs = false;
         }
 
-        MinutesTableEntry = getMinutesTableEntry(Mode, Minute);
+        MinutesTableEntryType MinutesTableEntry = getMinutesTableEntry(Mode, Minute);
 
         for(byte Index = 0; Index < CLOCK_MAX_NUMBER_OF_MINUTE_WORDS; Index++) {
             ClockWords->MinuteWords[Index] = MinutesTableEntry.Words[Index];
@@ -202,7 +198,7 @@ stdReturnType Clock::getClockWords(byte Hour, byte Minute, ClockWordsType* Clock
         Hour += MinutesTableEntry.HourOffset;                             // correct the hour offset from the minutes
         if(Hour >= CLOCK_NUMBER_OF_HOURS) Hour -= CLOCK_NUMBER_OF_HOURS;
 
-        HoursTableEntry = getHoursTableEntry(MinutesTableEntry.HourMode, Hour);
+        HoursTableEntryType HoursTableEntry = getHoursTableEntry(MinutesTableEntry.HourMode, Hour);
 
         for(byte Index = 0; Index < CLOCK_MAX_NUMBER_OF_HOUR_WORDS; Index++) {
             ClockWords->HourWords[Index] = HoursTableEntry.Words[Index];
@@ -222,7 +218,7 @@ stdReturnType Clock::getClockWords(byte Hour, byte Minute, ClockWordsType* Clock
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-boolean compareClockWords(ClockWordsType* ClockWords1, ClockWordsType* ClockWords2)
+boolean Clock::compareClockWords(ClockWordsType* ClockWords1, ClockWordsType* ClockWords2) const
 {
     if( ClockWords1->HourWords[0] == ClockWords2->HourWords[0]      &&
         ClockWords1->HourWords[1] == ClockWords2->HourWords[1]      &&
