@@ -73,13 +73,13 @@ struct DisplayWordIlluminationType {
 using DisplayPixelType = boolean;
 
 #if(DISPLAY_NUMBER_OF_ROWS > 16)
-#error "Display: too many Rows, please extend DisplayPixelRowType"
+    #error "Display: too many Rows, please extend DisplayPixelRowType"
 #endif
 
 using DisplayPixelRowType = uint16_t;
 
 #if(DISPLAY_NUMBER_OF_COLUMNS > 16)
-#error "Display: too many Columns, please extend DisplayPixelColumnType"
+    #error "Display: too many Columns, please extend DisplayPixelColumnType"
 #endif
 
 using DisplayPixelColumnType = uint16_t;

@@ -174,8 +174,6 @@ stdReturnType Clock::getClockWords(byte Hour, byte Minute, ClockWordsType* Clock
 {
     /* ----- Local Variables ---------------------------------------------- */
     stdReturnType ReturnValue = E_NOT_OK;
-    MinutesTableEntryType MinutesTableEntry;
-    HoursTableEntryType HoursTableEntry;
 
     /* ----- Implementation ----------------------------------------------- */
     if(Hour < CLOCK_NUMBER_OF_HOURS_PER_DAY && Minute < CLOCK_NUMBER_OF_MINUTES_PER_HOUR) {
@@ -190,7 +188,7 @@ stdReturnType Clock::getClockWords(byte Hour, byte Minute, ClockWordsType* Clock
             ClockWords->ShowItIs = false;
         }
 
-        MinutesTableEntry = getMinutesTableEntry(Mode, Minute);
+        MinutesTableEntryType MinutesTableEntry = getMinutesTableEntry(Mode, Minute);
 
         for(byte Index = 0; Index < CLOCK_MAX_NUMBER_OF_MINUTE_WORDS; Index++) {
             ClockWords->MinuteWords[Index] = MinutesTableEntry.Words[Index];
@@ -200,7 +198,7 @@ stdReturnType Clock::getClockWords(byte Hour, byte Minute, ClockWordsType* Clock
         Hour += MinutesTableEntry.HourOffset;                             // correct the hour offset from the minutes
         if(Hour >= CLOCK_NUMBER_OF_HOURS) Hour -= CLOCK_NUMBER_OF_HOURS;
 
-        HoursTableEntry = getHoursTableEntry(MinutesTableEntry.HourMode, Hour);
+        HoursTableEntryType HoursTableEntry = getHoursTableEntry(MinutesTableEntry.HourMode, Hour);
 
         for(byte Index = 0; Index < CLOCK_MAX_NUMBER_OF_HOUR_WORDS; Index++) {
             ClockWords->HourWords[Index] = HoursTableEntry.Words[Index];

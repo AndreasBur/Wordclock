@@ -230,12 +230,11 @@ stdReturnType Display::getWordIllumination(DisplayWordType Word, DisplayWordIllu
 stdReturnType Display::setWord(DisplayWordType Word, byte MaxLength)
 {
     stdReturnType ReturnValue = E_NOT_OK;
-    DisplayWordIlluminationType WordIllu;
     byte Length;
 
     if(Word < DISPLAY_WORD_NUMBER_OF_WORDS) {
         ReturnValue = E_OK;
-        WordIllu = getWordIlluminationFast(Word);
+        DisplayWordIlluminationType WordIllu = getWordIlluminationFast(Word);
 
         if(MaxLength == DISPLAY_WORD_LENGTH_UNLIMITED) Length = WordIllu.Length;
         else Length = MaxLength;
@@ -282,11 +281,10 @@ void Display::setWordFast(DisplayWordType Word, byte MaxLength)
 stdReturnType Display::clearWord(DisplayWordType Word)
 {
     stdReturnType ReturnValue = E_NOT_OK;
-    DisplayWordIlluminationType WordIllu;
 
     if(Word < DISPLAY_WORD_NUMBER_OF_WORDS) {
         ReturnValue = E_OK;
-        WordIllu = getWordIlluminationFast(Word);
+        DisplayWordIlluminationType WordIllu = getWordIlluminationFast(Word);
 
         for(byte Index = 0; Index < WordIllu.Length; Index++) {
             if(clearPixel(WordIllu.Column + Index,  WordIllu.Row) == E_NOT_OK) ReturnValue = E_NOT_OK;
@@ -755,4 +753,3 @@ byte Display::transformToSerpentine(byte Column, byte Row) const
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E
 ******************************************************************************************************************************************************/
- 

@@ -15,11 +15,11 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY
   5 .debug_aranges 000002f8  00000000  00000000  00000c40  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_info   0000786f  00000000  00000000  00000f38  2**0
+  6 .debug_info   0000787e  00000000  00000000  00000f38  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_abbrev 00001294  00000000  00000000  000087a7  2**0
+  7 .debug_abbrev 00001286  00000000  00000000  000087b6  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_line   00001bbb  00000000  00000000  00009a3b  2**0
+  8 .debug_line   00001bbb  00000000  00000000  00009a3c  2**0
                   CONTENTS, READONLY, DEBUGGING
   9 .debug_frame  000009ac  00000000  00000000  0000b5f8  2**2
                   CONTENTS, READONLY, DEBUGGING
@@ -710,14 +710,13 @@ stdReturnType Display::clearWord(DisplayWordType Word)
  5d4:	cd b7       	in	r28, 0x3d	; 61
  5d6:	de b7       	in	r29, 0x3e	; 62
     stdReturnType ReturnValue = E_NOT_OK;
-    DisplayWordIlluminationType WordIllu;
 
     if(Word < DISPLAY_WORD_NUMBER_OF_WORDS) {
  5d8:	6b 31       	cpi	r22, 0x1B	; 27
  5da:	c8 f4       	brcc	.+50     	; 0x60e <_ZN7Display9clearWordE15DisplayWordType+0x4a>
  5dc:	8c 01       	movw	r16, r24
         ReturnValue = E_OK;
-        WordIllu = getWordIlluminationFast(Word);
+        DisplayWordIlluminationType WordIllu = getWordIlluminationFast(Word);
  5de:	86 2f       	mov	r24, r22
  5e0:	0e 94 39 02 	call	0x472	; 0x472 <_ZNK7Display23getWordIlluminationFastE15DisplayWordType.isra.1>
  5e4:	e6 2e       	mov	r14, r22
@@ -725,14 +724,14 @@ stdReturnType Display::clearWord(DisplayWordType Word)
 
         for(byte Index = 0; Index < WordIllu.Length; Index++) {
  5e8:	d1 2c       	mov	r13, r1
+stdReturnType Display::clearWord(DisplayWordType Word)
 {
     stdReturnType ReturnValue = E_NOT_OK;
-    DisplayWordIlluminationType WordIllu;
 
     if(Word < DISPLAY_WORD_NUMBER_OF_WORDS) {
         ReturnValue = E_OK;
  5ea:	20 e0       	ldi	r18, 0x00	; 0
-        WordIllu = getWordIlluminationFast(Word);
+        DisplayWordIlluminationType WordIllu = getWordIlluminationFast(Word);
 
         for(byte Index = 0; Index < WordIllu.Length; Index++) {
  5ec:	df 14       	cp	r13, r15
@@ -753,7 +752,7 @@ stdReturnType Display::clearWord(DisplayWordType Word)
 
     if(Word < DISPLAY_WORD_NUMBER_OF_WORDS) {
         ReturnValue = E_OK;
-        WordIllu = getWordIlluminationFast(Word);
+        DisplayWordIlluminationType WordIllu = getWordIlluminationFast(Word);
 
         for(byte Index = 0; Index < WordIllu.Length; Index++) {
  60a:	d3 94       	inc	r13
