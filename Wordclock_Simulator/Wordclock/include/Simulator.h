@@ -31,8 +31,8 @@ class Simulator : public wxFrame
 
         // get methods
         //byte getBrightness() { return Brightness; }
-        stdReturnType getPixel(byte, WS2812PixelType*);
-        WS2812PixelType getPixelFast(byte);
+        stdReturnType getPixel(byte, WS2812PixelType*) const;
+        WS2812PixelType getPixelFast(byte) const;
         //stdReturnType getPixelDimmed(byte, WS2812PixelType*);
 
         // set methods

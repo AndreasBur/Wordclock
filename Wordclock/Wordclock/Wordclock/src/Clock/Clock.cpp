@@ -173,7 +173,7 @@ Clock::~Clock()
 stdReturnType Clock::getClockWords(byte Hour, byte Minute, ClockWordsType* ClockWords)
 {
     /* ----- Local Variables ---------------------------------------------- */
-    stdReturnType ReturnValue = E_NOT_OK;
+    stdReturnType ReturnValue{E_NOT_OK};
 
     /* ----- Implementation ----------------------------------------------- */
     if(Hour < CLOCK_NUMBER_OF_HOURS_PER_DAY && Minute < CLOCK_NUMBER_OF_MINUTES_PER_HOUR) {
@@ -244,7 +244,7 @@ boolean Clock::compareClockWords(ClockWordsType* ClockWords1, ClockWordsType* Cl
 stdReturnType Clock::setClock(byte Hour, byte Minute)
 {
     /* ----- Local Variables ---------------------------------------------- */
-    stdReturnType ReturnValue = E_NOT_OK;
+    stdReturnType ReturnValue{E_NOT_OK};
     ClockWordsType ClockWords;
 
     /* ----- Implementation ----------------------------------------------- */

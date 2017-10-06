@@ -207,7 +207,7 @@ stdReturnType Display::getCharacter(byte Index, char* Character) const
 ******************************************************************************************************************************************************/
 stdReturnType Display::getWordIllumination(WordType Word, WordIlluminationType* WordIllu) const
 {
-    stdReturnType ReturnValue = E_NOT_OK;
+    stdReturnType ReturnValue{E_NOT_OK};
 
     if(Word < Display::WORD_NUMBER_OF_WORDS) {
         *WordIllu = getWordIlluminationFast(Word);
@@ -229,7 +229,7 @@ stdReturnType Display::getWordIllumination(WordType Word, WordIlluminationType* 
 ******************************************************************************************************************************************************/
 stdReturnType Display::setWord(WordType Word, byte MaxLength)
 {
-    stdReturnType ReturnValue = E_NOT_OK;
+    stdReturnType ReturnValue{E_NOT_OK};
     byte Length;
 
     if(Word < Display::WORD_NUMBER_OF_WORDS) {
@@ -280,7 +280,7 @@ void Display::setWordFast(WordType Word, byte MaxLength)
 ******************************************************************************************************************************************************/
 stdReturnType Display::clearWord(WordType Word)
 {
-    stdReturnType ReturnValue = E_NOT_OK;
+    stdReturnType ReturnValue{E_NOT_OK};
 
     if(Word < Display::WORD_NUMBER_OF_WORDS) {
         ReturnValue = E_OK;
@@ -322,7 +322,7 @@ void Display::clearWordFast(WordType Word)
 ******************************************************************************************************************************************************/
 stdReturnType Display::clearAllWords()
 {
-    stdReturnType ReturnValue = E_OK;
+    stdReturnType ReturnValue{E_OK};
 
     for(byte i = Display::WORD_ES; i < Display::WORD_NUMBER_OF_WORDS; i++) if(clearWord((WordType) i) == E_NOT_OK) ReturnValue = E_NOT_OK;
     return ReturnValue;
@@ -387,7 +387,7 @@ boolean Display::getPixelFast(byte Index) const
 ******************************************************************************************************************************************************/
 stdReturnType Display::getPixel(byte Column, byte Row, boolean* Value)  const
 {
-    stdReturnType ReturnValue = E_NOT_OK;
+    stdReturnType ReturnValue{E_NOT_OK};
     PixelColorType Pixel;
 
 #if (DISPLAY_LED_STRIPE_SERPENTINE == STD_ON)
@@ -582,8 +582,13 @@ void Display::clearPixelFast(byte Index)
 ******************************************************************************************************************************************************/
 stdReturnType Display::getPixelRow(byte Row, PixelRowType* PixelRow) const
 {
+<<<<<<< Updated upstream
     stdReturnType ReturnValue = E_OK;
     PixelType Pixel;
+=======
+    stdReturnType ReturnValue{E_OK};
+    DisplayPixelType Pixel;
+>>>>>>> Stashed changes
 
     for(byte Column = 0; Column < DISPLAY_NUMBER_OF_COLUMNS; Column++) {
         if(getPixel(Column, Row, &Pixel) == E_OK) {
@@ -606,7 +611,11 @@ stdReturnType Display::getPixelRow(byte Row, PixelRowType* PixelRow) const
 ******************************************************************************************************************************************************/
 Display::PixelRowType Display::getPixelRowFast(byte Row)  const
 {
+<<<<<<< Updated upstream
     PixelRowType PixelRow = 0;
+=======
+    DisplayPixelRowType PixelRow{0};
+>>>>>>> Stashed changes
     
     for(byte Column = 0; Column < DISPLAY_NUMBER_OF_COLUMNS; Column++) {
         WRITE_BIT(PixelRow, Column, getPixelFast(Column, Row));
@@ -625,8 +634,13 @@ Display::PixelRowType Display::getPixelRowFast(byte Row)  const
 ******************************************************************************************************************************************************/
 stdReturnType Display::getPixelColumn(byte Column, PixelRowType* PixelColumn)  const
 {
+<<<<<<< Updated upstream
     stdReturnType ReturnValue = E_OK;
     PixelType Pixel;
+=======
+    stdReturnType ReturnValue{E_OK};
+    DisplayPixelType Pixel;
+>>>>>>> Stashed changes
 
     for(byte Row = 0; Row < DISPLAY_NUMBER_OF_ROWS; Row++) {
         if(getPixel(Column, Row, &Pixel) == E_OK) {
@@ -649,7 +663,11 @@ stdReturnType Display::getPixelColumn(byte Column, PixelRowType* PixelColumn)  c
 ******************************************************************************************************************************************************/
 Display::PixelColumnType Display::getPixelColumnFast(byte Column)  const
 {
+<<<<<<< Updated upstream
     Display::PixelColumnType PixelColumn = 0;
+=======
+    DisplayPixelColumnType PixelColumn{0};
+>>>>>>> Stashed changes
     
     for(byte Row = 0; Row < DISPLAY_NUMBER_OF_ROWS; Row++) {
         WRITE_BIT(PixelColumn, Row, getPixelFast(Column, Row));
@@ -703,7 +721,8 @@ void Display::setPixelRowFast(byte Row, PixelRowType PixelRow)
 ******************************************************************************************************************************************************/
 stdReturnType Display::setPixelColumn(byte Column, PixelRowType PixelColumn)
 {
-    stdReturnType ReturnValue = E_OK;
+    stdReturnType ReturnValue{E_OK};
+
     for(byte Row = 0; Row < DISPLAY_NUMBER_OF_ROWS; Row++) {
         if(writePixel(Column, Row, READ_BIT(PixelColumn, Row)) == E_NOT_OK) ReturnValue = E_NOT_OK;
     }

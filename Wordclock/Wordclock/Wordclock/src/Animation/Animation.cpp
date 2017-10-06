@@ -128,7 +128,7 @@ stdReturnType Animation::setChar(byte Column, byte Row, unsigned char Char, Anim
 ******************************************************************************************************************************************************/
 stdReturnType Animation::setCharFontHorizontal(byte Column, byte Row, unsigned char Char, const unsigned char* FontTable, byte FontWidth, byte FontHeight)
 {
-    stdReturnType ReturnValue = E_OK;
+    stdReturnType ReturnValue{E_OK};
     byte FontIndex, ColumnAbs, RowAbs;
 
     FontIndex = Char;
@@ -157,7 +157,7 @@ stdReturnType Animation::setCharFontHorizontal(byte Column, byte Row, unsigned c
 ******************************************************************************************************************************************************/
 stdReturnType Animation::setCharFontVertical(byte Column, byte Row, unsigned char Char, const unsigned char* FontTable, byte FontWidth, byte FontHeight)
 {
-    stdReturnType ReturnValue = E_OK;
+    stdReturnType ReturnValue{E_OK};
     byte FontIndex, ColumnAbs, RowAbs;
 
     FontIndex = Char;
