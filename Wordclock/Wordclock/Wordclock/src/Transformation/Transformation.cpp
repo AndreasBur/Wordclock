@@ -91,7 +91,7 @@ Transformation::~Transformation()
 ******************************************************************************************************************************************************/
 void Transformation::shiftLeftFast(boolean Rotate)
 {
-    DisplayPixelColumnType PixelColumn;
+    Display::PixelColumnType PixelColumn;
 
     if(Rotate) PixelColumn = pDisplay->getPixelColumnFast(0);
 
@@ -115,8 +115,8 @@ void Transformation::shiftLeftFast(boolean Rotate)
 ******************************************************************************************************************************************************/
 stdReturnType Transformation::shiftLeft(boolean Rotate)
 {
-    DisplayPixelColumnType PixelColumn;
-    DisplayPixelType Pixel;
+    Display::PixelColumnType PixelColumn;
+    Display::PixelType Pixel;
     stdReturnType ReturnValue = E_OK;
 
     if(Rotate) if(pDisplay->getPixelColumn(0, &PixelColumn) == E_NOT_OK) ReturnValue = E_NOT_OK;
@@ -144,7 +144,7 @@ stdReturnType Transformation::shiftLeft(boolean Rotate)
 ******************************************************************************************************************************************************/
 void Transformation::shiftRightFast(boolean Rotate)
 {
-    DisplayPixelColumnType PixelColumn;
+    Display::PixelColumnType PixelColumn;
 
     if(Rotate) PixelColumn = pDisplay->getPixelColumnFast(DISPLAY_NUMBER_OF_COLUMNS - 1);
 
@@ -168,8 +168,8 @@ void Transformation::shiftRightFast(boolean Rotate)
 ******************************************************************************************************************************************************/
 stdReturnType Transformation::shiftRight(boolean Rotate)
 {
-    DisplayPixelColumnType PixelColumn;
-    DisplayPixelType Pixel;
+    Display::PixelColumnType PixelColumn;
+    Display::PixelType Pixel;
     stdReturnType ReturnValue = E_OK;
 
     if(Rotate) if(pDisplay->getPixelColumn(DISPLAY_NUMBER_OF_COLUMNS - 1, &PixelColumn) == E_NOT_OK) ReturnValue = E_NOT_OK;
@@ -197,7 +197,7 @@ stdReturnType Transformation::shiftRight(boolean Rotate)
 ******************************************************************************************************************************************************/
 void Transformation::shiftUpFast(boolean Rotate)
 {
-    DisplayPixelRowType PixelRow;
+    Display::PixelRowType PixelRow;
 
     if(Rotate) PixelRow = pDisplay->getPixelRowFast(0);
 
@@ -221,8 +221,8 @@ void Transformation::shiftUpFast(boolean Rotate)
 ******************************************************************************************************************************************************/
 stdReturnType Transformation::shiftUp(boolean Rotate)
 {
-    DisplayPixelRowType PixelRow;
-    DisplayPixelType Pixel;
+    Display::PixelRowType PixelRow;
+    Display::PixelType Pixel;
     stdReturnType ReturnValue = E_OK;
 
     if(Rotate) if(pDisplay->getPixelRow(0, &PixelRow) == E_NOT_OK) ReturnValue = E_NOT_OK;
@@ -250,7 +250,7 @@ stdReturnType Transformation::shiftUp(boolean Rotate)
 ******************************************************************************************************************************************************/
 void Transformation::shiftDownFast(boolean Rotate)
 {
-    DisplayPixelRowType PixelRow;
+    Display::PixelRowType PixelRow;
 
     if(Rotate) PixelRow = pDisplay->getPixelRowFast(DISPLAY_NUMBER_OF_ROWS - 1);
 
@@ -274,8 +274,8 @@ void Transformation::shiftDownFast(boolean Rotate)
 ******************************************************************************************************************************************************/
 stdReturnType Transformation::shiftDown(boolean Rotate)
 {
-    DisplayPixelRowType PixelRow;
-    DisplayPixelType Pixel;
+    Display::PixelRowType PixelRow;
+    Display::PixelType Pixel;
     stdReturnType ReturnValue = E_OK;
 
     if(Rotate) if(pDisplay->getPixelRow(DISPLAY_NUMBER_OF_ROWS - 1, &PixelRow) == E_NOT_OK) ReturnValue = E_NOT_OK;

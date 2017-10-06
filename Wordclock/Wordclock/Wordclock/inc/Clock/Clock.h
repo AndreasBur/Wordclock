@@ -71,17 +71,17 @@ enum ClockHourModesType {
 struct ClockMinutesType {
     ClockHourModesType HourMode;
     byte HourOffset;
-    DisplayWordType Words[CLOCK_MAX_NUMBER_OF_MINUTE_WORDS];
+    Display::WordType Words[CLOCK_MAX_NUMBER_OF_MINUTE_WORDS];
 };
 
 struct ClockHoursType {
-    DisplayWordType Words[CLOCK_MAX_NUMBER_OF_HOUR_WORDS];
+    Display::WordType Words[CLOCK_MAX_NUMBER_OF_HOUR_WORDS];
 };
 
 struct ClockWordsType {
     boolean ShowItIs;
-    DisplayWordType HourWords[CLOCK_MAX_NUMBER_OF_HOUR_WORDS];
-    DisplayWordType MinuteWords[CLOCK_MAX_NUMBER_OF_MINUTE_WORDS];
+    Display::WordType HourWords[CLOCK_MAX_NUMBER_OF_HOUR_WORDS];
+    Display::WordType MinuteWords[CLOCK_MAX_NUMBER_OF_MINUTE_WORDS];
 };
 
 using HoursTableEntryType = ClockHoursType;

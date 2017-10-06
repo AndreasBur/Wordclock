@@ -55,7 +55,7 @@ Discarded input sections
                 0x00000000       0x50 src/Animation/Animation.o
  .debug_ranges  0x00000000       0x70 src/Animation/Animation.o
  .debug_line    0x00000000      0x34c src/Animation/Animation.o
- .debug_str     0x00000000     0x1f7e src/Animation/Animation.o
+ .debug_str     0x00000000     0x1aaf src/Animation/Animation.o
  .comment       0x00000000       0x31 src/Animation/Animation.o
  .debug_frame   0x00000000      0x128 src/Animation/Animation.o
  .text          0x00000000        0x0 src/Animation/Font.o
@@ -76,7 +76,7 @@ Discarded input sections
  .debug_aranges
                 0x00000000       0x18 src/Animation/Font.o
  .debug_line    0x00000000      0x1b8 src/Animation/Font.o
- .debug_str     0x00000000     0x1f27 src/Animation/Font.o
+ .debug_str     0x00000000     0x1a58 src/Animation/Font.o
  .comment       0x00000000       0x31 src/Animation/Font.o
  .text          0x00000000        0x0 src/Clock/Clock.o
  .data          0x00000000        0x0 src/Clock/Clock.o
@@ -94,50 +94,50 @@ Discarded input sections
                 0x00000000       0x26 src/Display/Display.o
  .text._ZNK7Display12getCharacterEhPc
                 0x00000000       0x2a src/Display/Display.o
- .text._ZNK7Display19getWordIlluminationE15DisplayWordTypeP27DisplayWordIlluminationType
+ .text._ZNK7Display19getWordIlluminationENS_8WordTypeEPNS_20WordIlluminationTypeE
                 0x00000000       0x22 src/Display/Display.o
  .text._ZNK7Display8getPixelEhhPb
                 0x00000000       0x62 src/Display/Display.o
  .text._ZNK7Display8getPixelEhPb
                 0x00000000       0x16 src/Display/Display.o
  .text._ZNK7Display11getPixelRowEhPj
-                0x00000000       0xa8 src/Display/Display.o
+                0x00000000       0xba src/Display/Display.o
  .text._ZNK7Display14getPixelColumnEhPj
-                0x00000000       0xa8 src/Display/Display.o
+                0x00000000       0xba src/Display/Display.o
  .text._ZNK7Display12getPixelFastEhh
                 0x00000000       0x2c src/Display/Display.o
  .text._ZNK7Display12getPixelFastEh
                 0x00000000       0x14 src/Display/Display.o
  .text._ZNK7Display15getPixelRowFastEh
-                0x00000000       0x76 src/Display/Display.o
+                0x00000000       0x88 src/Display/Display.o
  .text._ZNK7Display18getPixelColumnFastEh
-                0x00000000       0x76 src/Display/Display.o
+                0x00000000       0x88 src/Display/Display.o
  .text._ZN7Display8setPixelEh
                 0x00000000       0x14 src/Display/Display.o
  .text._ZN7Display12setPixelFastEhh
                 0x00000000       0x24 src/Display/Display.o
- .text._ZN7Display11setWordFastE15DisplayWordTypeh
+ .text._ZN7Display11setWordFastENS_8WordTypeEh
                 0x00000000       0x52 src/Display/Display.o
  .text._ZN7Display12setPixelFastEh
                 0x00000000       0x14 src/Display/Display.o
  .text._ZN7Display10clearPixelEh
                 0x00000000       0x14 src/Display/Display.o
  .text._ZN7Display11setPixelRowEhj
-                0x00000000       0x84 src/Display/Display.o
+                0x00000000       0xb0 src/Display/Display.o
  .text._ZN7Display14setPixelColumnEhj
-                0x00000000       0x86 src/Display/Display.o
+                0x00000000       0xb0 src/Display/Display.o
  .text._ZN7Display14clearPixelFastEhh
                 0x00000000       0x24 src/Display/Display.o
- .text._ZN7Display13clearWordFastE15DisplayWordType
+ .text._ZN7Display13clearWordFastENS_8WordTypeE
                 0x00000000       0x4c src/Display/Display.o
  .text._ZN7Display17clearAllWordsFastEv
                 0x00000000       0x20 src/Display/Display.o
  .text._ZN7Display14clearPixelFastEh
                 0x00000000       0x14 src/Display/Display.o
  .text._ZN7Display15setPixelRowFastEhj
-                0x00000000       0x74 src/Display/Display.o
+                0x00000000       0xa0 src/Display/Display.o
  .text._ZN7Display18setPixelColumnFastEhj
-                0x00000000       0x76 src/Display/Display.o
+                0x00000000       0xa0 src/Display/Display.o
  .progmem.data._ZN7Display17DisplayCharactersE
                 0x00000000       0x78 src/Display/Display.o
  .group         0x00000000        0x8 src/Transformation/Transformation.o
@@ -176,7 +176,7 @@ Discarded input sections
                 0x00000000       0x78 src/Transformation/Transformation.o
  .debug_ranges  0x00000000      0x208 src/Transformation/Transformation.o
  .debug_line    0x00000000      0x631 src/Transformation/Transformation.o
- .debug_str     0x00000000     0x1eba src/Transformation/Transformation.o
+ .debug_str     0x00000000     0x19e4 src/Transformation/Transformation.o
  .comment       0x00000000       0x31 src/Transformation/Transformation.o
  .debug_frame   0x00000000      0x244 src/Transformation/Transformation.o
  .text          0x00000000        0x0 src/WS2812/WS2812.o
@@ -467,7 +467,7 @@ END GROUP
 .rela.plt
  *(.rela.plt)
 
-.text           0x00000000      0xb5c
+.text           0x00000000      0xb66
  *(.vectors)
  .vectors       0x00000000       0x68 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.0.106/gcc/dev/atmega328p/avr5/crtatmega328p.o
                 0x00000000                __vector_default
@@ -599,7 +599,7 @@ END GROUP
  .text._ZN5Clock8setClockEhh
                 0x00000396       0xdc src/Clock/Clock.o
                 0x00000396                _ZN5Clock8setClockEhh
- .text._ZNK7Display23getWordIlluminationFastE15DisplayWordType.isra.1
+ .text._ZNK7Display23getWordIlluminationFastENS_8WordTypeE.isra.1
                 0x00000472       0x3c src/Display/Display.o
  .text._ZN7DisplayC2Ehhh
                 0x000004ae       0x4a src/Display/Display.o
@@ -610,84 +610,84 @@ END GROUP
                 0x000004f8                _ZN7DisplayD2Ev
                 0x000004f8                _ZN7DisplayD1Ev
  .text._ZNK7Display21transformToSerpentineEhh
-                0x000004fe       0x16 src/Display/Display.o
+                0x000004fe       0x20 src/Display/Display.o
                 0x000004fe                _ZNK7Display21transformToSerpentineEhh
  .text._ZN7Display8setPixelEhh
-                0x00000514       0x24 src/Display/Display.o
-                0x00000514                _ZN7Display8setPixelEhh
- .text._ZN7Display7setWordE15DisplayWordTypeh
-                0x00000538       0x68 src/Display/Display.o
-                0x00000538                _ZN7Display7setWordE15DisplayWordTypeh
+                0x0000051e       0x24 src/Display/Display.o
+                0x0000051e                _ZN7Display8setPixelEhh
+ .text._ZN7Display7setWordENS_8WordTypeEh
+                0x00000542       0x68 src/Display/Display.o
+                0x00000542                _ZN7Display7setWordENS_8WordTypeEh
  .text._ZN7Display10clearPixelEhh
-                0x000005a0       0x24 src/Display/Display.o
-                0x000005a0                _ZN7Display10clearPixelEhh
- .text._ZN7Display9clearWordE15DisplayWordType
-                0x000005c4       0x62 src/Display/Display.o
-                0x000005c4                _ZN7Display9clearWordE15DisplayWordType
+                0x000005aa       0x24 src/Display/Display.o
+                0x000005aa                _ZN7Display10clearPixelEhh
+ .text._ZN7Display9clearWordENS_8WordTypeE
+                0x000005ce       0x62 src/Display/Display.o
+                0x000005ce                _ZN7Display9clearWordENS_8WordTypeE
  .text._ZN7Display13clearAllWordsEv
-                0x00000626       0x2e src/Display/Display.o
-                0x00000626                _ZN7Display13clearAllWordsEv
+                0x00000630       0x2e src/Display/Display.o
+                0x00000630                _ZN7Display13clearAllWordsEv
  .text._ZN6WS2812D2Ev
-                0x00000654        0x2 src/WS2812/WS2812.o
-                0x00000654                _ZN6WS2812D2Ev
-                0x00000654                _ZN6WS2812D1Ev
+                0x0000065e        0x2 src/WS2812/WS2812.o
+                0x0000065e                _ZN6WS2812D2Ev
+                0x0000065e                _ZN6WS2812D1Ev
  .text._ZN6WS28126setPinEh
-                0x00000656       0x42 src/WS2812/WS2812.o
-                0x00000656                _ZN6WS28126setPinEh
+                0x00000660       0x42 src/WS2812/WS2812.o
+                0x00000660                _ZN6WS28126setPinEh
  .text._ZN6WS2812C2Eh
-                0x00000698       0x4c src/WS2812/WS2812.o
-                0x00000698                _ZN6WS2812C2Eh
-                0x00000698                _ZN6WS2812C1Eh
+                0x000006a2       0x4c src/WS2812/WS2812.o
+                0x000006a2                _ZN6WS2812C2Eh
+                0x000006a2                _ZN6WS2812C1Eh
  .text._ZN6WS28128setPixelEh15WS2812PixelType
-                0x000006e4       0x42 src/WS2812/WS2812.o
-                0x000006e4                _ZN6WS28128setPixelEh15WS2812PixelType
+                0x000006ee       0x42 src/WS2812/WS2812.o
+                0x000006ee                _ZN6WS28128setPixelEh15WS2812PixelType
  .text._ZN6WS28128setPixelEhhhh
-                0x00000726       0x46 src/WS2812/WS2812.o
-                0x00000726                _ZN6WS28128setPixelEhhhh
+                0x00000730       0x46 src/WS2812/WS2812.o
+                0x00000730                _ZN6WS28128setPixelEhhhh
  .text._ZN6WS28128sendDataEPKhj
-                0x0000076c       0x48 src/WS2812/WS2812.o
-                0x0000076c                _ZN6WS28128sendDataEPKhj
+                0x00000776       0x48 src/WS2812/WS2812.o
+                0x00000776                _ZN6WS28128sendDataEPKhj
  .text._ZN6WS28124showEv.part.4
-                0x000007b4      0x11a src/WS2812/WS2812.o
+                0x000007be      0x11a src/WS2812/WS2812.o
  .text._ZN6WS28124showEv
-                0x000008ce       0x52 src/WS2812/WS2812.o
-                0x000008ce                _ZN6WS28124showEv
+                0x000008d8       0x52 src/WS2812/WS2812.o
+                0x000008d8                _ZN6WS28124showEv
  .text.initVariant
-                0x00000920        0x2 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(main.o)
-                0x00000920                initVariant
+                0x0000092a        0x2 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(main.o)
+                0x0000092a                initVariant
  .text.startup.main
-                0x00000922       0x1e C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(main.o)
-                0x00000922                main
+                0x0000092c       0x1e C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(main.o)
+                0x0000092c                main
  .text.__vector_16
-                0x00000940       0x94 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(wiring.o)
-                0x00000940                __vector_16
- .text.micros   0x000009d4       0x4a C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(wiring.o)
-                0x000009d4                micros
- .text.init     0x00000a1e       0x76 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(wiring.o)
-                0x00000a1e                init
- .text.pinMode  0x00000a94       0x78 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(wiring_digital.o)
-                0x00000a94                pinMode
+                0x0000094a       0x94 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(wiring.o)
+                0x0000094a                __vector_16
+ .text.micros   0x000009de       0x4a C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(wiring.o)
+                0x000009de                micros
+ .text.init     0x00000a28       0x76 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(wiring.o)
+                0x00000a28                init
+ .text.pinMode  0x00000a9e       0x78 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(wiring_digital.o)
+                0x00000a9e                pinMode
  .text.libgcc.div
-                0x00000b0c       0x18 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_udivmodqi4.o)
-                0x00000b0c                __udivmodqi4
- .text.libgcc   0x00000b24        0xc c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_tablejump2.o)
-                0x00000b24                __tablejump2__
+                0x00000b16       0x18 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_udivmodqi4.o)
+                0x00000b16                __udivmodqi4
+ .text.libgcc   0x00000b2e        0xc c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_tablejump2.o)
+                0x00000b2e                __tablejump2__
  .text.avr-libc
-                0x00000b30       0x12 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5\libc.a(memcpy_P.o)
-                0x00000b30                memcpy_P
-                0x00000b42                . = ALIGN (0x2)
+                0x00000b3a       0x12 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5\libc.a(memcpy_P.o)
+                0x00000b3a                memcpy_P
+                0x00000b4c                . = ALIGN (0x2)
  *(.fini9)
- .fini9         0x00000b42        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_exit.o)
-                0x00000b42                _exit
-                0x00000b42                exit
+ .fini9         0x00000b4c        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_exit.o)
+                0x00000b4c                _exit
+                0x00000b4c                exit
  *(.fini9)
  *(.fini8)
  *(.fini8)
  *(.fini7)
  *(.fini7)
  *(.fini6)
- .fini6         0x00000b42       0x16 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_dtors.o)
-                0x00000b42                __do_global_dtors
+ .fini6         0x00000b4c       0x16 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_dtors.o)
+                0x00000b4c                __do_global_dtors
  *(.fini6)
  *(.fini5)
  *(.fini5)
@@ -700,11 +700,11 @@ END GROUP
  *(.fini1)
  *(.fini1)
  *(.fini0)
- .fini0         0x00000b58        0x4 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_exit.o)
+ .fini0         0x00000b62        0x4 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_exit.o)
  *(.fini0)
-                0x00000b5c                _etext = .
+                0x00000b66                _etext = .
 
-.data           0x00800100        0x0 load address 0x00000b5c
+.data           0x00800100        0x0 load address 0x00000b66
                 [!provide]                PROVIDE (__data_start, .)
  *(.data)
  *(.data*)
@@ -734,8 +734,8 @@ END GROUP
                 0x00800261                timer0_overflow_count
  *(COMMON)
                 0x00800265                PROVIDE (__bss_end, .)
-                0x00000b5c                __data_load_start = LOADADDR (.data)
-                0x00000b5c                __data_load_end = (__data_load_start + SIZEOF (.data))
+                0x00000b66                __data_load_start = LOADADDR (.data)
+                0x00000b66                __data_load_end = (__data_load_start + SIZEOF (.data))
 
 .noinit         0x00800265        0x0
                 [!provide]                PROVIDE (__noinit_start, .)
@@ -832,25 +832,25 @@ END GROUP
 .debug_pubnames
  *(.debug_pubnames)
 
-.debug_info     0x00000000     0x787e
+.debug_info     0x00000000     0x782e
  *(.debug_info .gnu.linkonce.wi.*)
  .debug_info    0x00000000     0x17b5 Sketch.o
  .debug_info    0x000017b5     0x1ac0 src/Clock/Clock.o
- .debug_info    0x00003275     0x2a5c src/Display/Display.o
- .debug_info    0x00005cd1     0x10bb src/WS2812/WS2812.o
- .debug_info    0x00006d8c      0x231 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(main.o)
- .debug_info    0x00006fbd      0x2c8 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(wiring.o)
- .debug_info    0x00007285      0x5f9 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(wiring_digital.o)
+ .debug_info    0x00003275     0x2a0c src/Display/Display.o
+ .debug_info    0x00005c81     0x10bb src/WS2812/WS2812.o
+ .debug_info    0x00006d3c      0x231 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(main.o)
+ .debug_info    0x00006f6d      0x2c8 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(wiring.o)
+ .debug_info    0x00007235      0x5f9 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(wiring_digital.o)
 
-.debug_abbrev   0x00000000     0x1286
+.debug_abbrev   0x00000000     0x1282
  *(.debug_abbrev)
  .debug_abbrev  0x00000000      0x2c5 Sketch.o
  .debug_abbrev  0x000002c5      0x362 src/Clock/Clock.o
- .debug_abbrev  0x00000627      0x47f src/Display/Display.o
- .debug_abbrev  0x00000aa6      0x437 src/WS2812/WS2812.o
- .debug_abbrev  0x00000edd      0x109 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(main.o)
- .debug_abbrev  0x00000fe6      0x145 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(wiring.o)
- .debug_abbrev  0x0000112b      0x15b C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(wiring_digital.o)
+ .debug_abbrev  0x00000627      0x47b src/Display/Display.o
+ .debug_abbrev  0x00000aa2      0x437 src/WS2812/WS2812.o
+ .debug_abbrev  0x00000ed9      0x109 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(main.o)
+ .debug_abbrev  0x00000fe2      0x145 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(wiring.o)
+ .debug_abbrev  0x00001127      0x15b C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(wiring_digital.o)
 
 .debug_line     0x00000000     0x1bbb
  *(.debug_line .debug_line.* .debug_line_end)
@@ -862,40 +862,40 @@ END GROUP
  .debug_line    0x000016d0      0x299 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(wiring.o)
  .debug_line    0x00001969      0x252 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(wiring_digital.o)
 
-.debug_frame    0x00000000      0x9ac
+.debug_frame    0x00000000      0xa3c
  *(.debug_frame)
  .debug_frame   0x00000000       0x54 Sketch.o
  .debug_frame   0x00000054       0xbc src/Clock/Clock.o
- .debug_frame   0x00000110      0x588 src/Display/Display.o
- .debug_frame   0x00000698      0x180 src/WS2812/WS2812.o
- .debug_frame   0x00000818       0x54 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(main.o)
- .debug_frame   0x0000086c       0xc4 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(wiring.o)
- .debug_frame   0x00000930       0x7c C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(wiring_digital.o)
+ .debug_frame   0x00000110      0x618 src/Display/Display.o
+ .debug_frame   0x00000728      0x180 src/WS2812/WS2812.o
+ .debug_frame   0x000008a8       0x54 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(main.o)
+ .debug_frame   0x000008fc       0xc4 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(wiring.o)
+ .debug_frame   0x000009c0       0x7c C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(wiring_digital.o)
 
-.debug_str      0x00000000     0x253c
+.debug_str      0x00000000     0x209d
  *(.debug_str)
- .debug_str     0x00000000     0x1edb Sketch.o
-                               0x2008 (size before relaxing)
- .debug_str     0x00001edb       0xdb src/Clock/Clock.o
-                               0x206b (size before relaxing)
- .debug_str     0x00001fb6       0xde src/Display/Display.o
-                               0x1da4 (size before relaxing)
- .debug_str     0x00002094      0x10a src/WS2812/WS2812.o
+ .debug_str     0x00000000     0x1a4d Sketch.o
+                               0x1b39 (size before relaxing)
+ .debug_str     0x00001a4d       0xdb src/Clock/Clock.o
+                               0x1b9c (size before relaxing)
+ .debug_str     0x00001b28       0xcd src/Display/Display.o
+                               0x18ce (size before relaxing)
+ .debug_str     0x00001bf5      0x10a src/WS2812/WS2812.o
                                 0x821 (size before relaxing)
- .debug_str     0x0000219e      0x1b8 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(main.o)
+ .debug_str     0x00001cff      0x1b8 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(main.o)
                                 0x2ba (size before relaxing)
- .debug_str     0x00002356      0x159 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(wiring.o)
+ .debug_str     0x00001eb7      0x159 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(wiring.o)
                                 0x244 (size before relaxing)
- .debug_str     0x000024af       0x8d C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(wiring_digital.o)
+ .debug_str     0x00002010       0x8d C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(wiring_digital.o)
                                 0x2a9 (size before relaxing)
 
-.debug_loc      0x00000000     0x4390
+.debug_loc      0x00000000     0x456f
  *(.debug_loc)
  .debug_loc     0x00000000      0x573 src/Clock/Clock.o
- .debug_loc     0x00000573     0x2711 src/Display/Display.o
- .debug_loc     0x00002c84      0xec0 src/WS2812/WS2812.o
- .debug_loc     0x00003b44      0x269 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(wiring.o)
- .debug_loc     0x00003dad      0x5e3 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(wiring_digital.o)
+ .debug_loc     0x00000573     0x28f0 src/Display/Display.o
+ .debug_loc     0x00002e63      0xec0 src/WS2812/WS2812.o
+ .debug_loc     0x00003d23      0x269 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(wiring.o)
+ .debug_loc     0x00003f8c      0x5e3 C:\Users\virskl\Documents\GitHub\Wordclock\Wordclock\Wordclock\ArduinoCore\Debug\libArduinoCore.a(wiring_digital.o)
 
 .debug_macinfo
  *(.debug_macinfo)

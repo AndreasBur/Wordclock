@@ -467,19 +467,19 @@ void  WS2812::sendData(const byte* Data, uint16_t DataLength)
                 "loop%=:                            \n\t"
                 "st    X, %[PortMaskHigh]           \n\t"    //  '1' [02] '0' [02] - re
 
-#if isBitSet(WS2812_ASM_W1_NOPs, 0)
+#if IS_BIT_SET(WS2812_ASM_W1_NOPs, 0)
                 STD_NOP_1
 #endif
-#if isBitSet(WS2812_ASM_W1_NOPs, 1)
+#if IS_BIT_SET(WS2812_ASM_W1_NOPs, 1)
                 STD_NOP_2
 #endif
-#if isBitSet(WS2812_ASM_W1_NOPs, 2)
+#if IS_BIT_SET(WS2812_ASM_W1_NOPs, 2)
                 STD_NOP_4
 #endif
-#if isBitSet(WS2812_ASM_W1_NOPs, 3)
+#if IS_BIT_SET(WS2812_ASM_W1_NOPs, 3)
                 STD_NOP_8
 #endif
-#if isBitSet(WS2812_ASM_W1_NOPs, 4)
+#if IS_BIT_SET(WS2812_ASM_W1_NOPs, 4)
                 STD_NOP_16
 #endif
 
@@ -487,19 +487,19 @@ void  WS2812::sendData(const byte* Data, uint16_t DataLength)
                 "st    X, %[PortMaskLow]            \n\t"    //  '1' [--] '0' [05] - fe-low
                 "lsl   %[CurrentByte]               \n\t"    //  '1' [05] '0' [06]
 
-#if isBitSet(WS2812_ASM_W2_NOPs, 0)
+#if IS_BIT_SET(WS2812_ASM_W2_NOPs, 0)
                 STD_NOP_1
 #endif
-#if isBitSet(WS2812_ASM_W2_NOPs, 1)
+#if IS_BIT_SET(WS2812_ASM_W2_NOPs, 1)
                 STD_NOP_2
 #endif
-#if isBitSet(WS2812_ASM_W2_NOPs, 2)
+#if IS_BIT_SET(WS2812_ASM_W2_NOPs, 2)
                 STD_NOP_4
 #endif
-#if isBitSet(WS2812_ASM_W2_NOPs, 3)
+#if IS_BIT_SET(WS2812_ASM_W2_NOPs, 3)
                 STD_NOP_8
 #endif
-#if isBitSet(WS2812_ASM_W2_NOPs, 4)
+#if IS_BIT_SET(WS2812_ASM_W2_NOPs, 4)
                 STD_NOP_16
 #endif
 
@@ -507,19 +507,19 @@ void  WS2812::sendData(const byte* Data, uint16_t DataLength)
                 "st   X, %[PortMaskLow]             \n\t"    //  '1' [+3] '0' [--] - fe-high
                 "skipone%=:                         \n\t"    //  '1' [+3] '0' [+2] -
 
-#if isBitSet(WS2812_ASM_W3_NOPs, 0)
+#if IS_BIT_SET(WS2812_ASM_W3_NOPs, 0)
                 STD_NOP_1
 #endif
-#if isBitSet(WS2812_ASM_W3_NOPs, 1)
+#if IS_BIT_SET(WS2812_ASM_W3_NOPs, 1)
                 STD_NOP_2
 #endif
-#if isBitSet(WS2812_ASM_W3_NOPs, 2)
+#if IS_BIT_SET(WS2812_ASM_W3_NOPs, 2)
                 STD_NOP_4
 #endif
-#if isBitSet(WS2812_ASM_W3_NOPs, 3)
+#if IS_BIT_SET(WS2812_ASM_W3_NOPs, 3)
                 STD_NOP_8
 #endif
-#if isBitSet(WS2812_ASM_W3_NOPs, 4)
+#if IS_BIT_SET(WS2812_ASM_W3_NOPs, 4)
                 STD_NOP_16
 #endif
 

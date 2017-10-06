@@ -54,10 +54,10 @@ const char Display::DisplayCharacters[][DISPLAY_NUMBER_OF_COLUMNS + 1] PROGMEM
 };
 
 
-const DisplayWordIlluminationType Display::WordIlluminationTable[] PROGMEM
+const Display::WordIlluminationType Display::WordIlluminationTable[] PROGMEM
 {
     {0,0,0},                                //  0 = DISPLAY_WORD_NONE           = ""
-    {0,0,2},                                //  1 = DISPLAY_WORD_ES             = "ES"
+    {0,0,2},                                //  1 = Display::WORD_ES             = "ES"
     {0,3,3},                                //  2 = DISPLAY_WORD_IST            = "IST"
     {0,7,4},                                //  3 = DISPLAY_WORD_FUENF          = "FÜNF"
     {1,0,4},                                //  4 = DISPLAY_WORD_ZEHN           = "ZEHN"
@@ -101,7 +101,7 @@ const DisplayWordIlluminationType Display::WordIlluminationTable[] PROGMEM
 Display::Display(PixelColorType sColor) : Pixels(DISPLAY_DATA_PIN)
 {
     Color = sColor;
-    State = DISPLAY_STATE_UNINIT;
+    State = STATE_UNINIT;
 
 #ifdef SIMULATOR
     Pixels.SetIcon(wxICON(WordclockIcon));
@@ -123,7 +123,7 @@ Display::Display(byte Red, byte Green, byte Blue) : Pixels(DISPLAY_DATA_PIN)
     Color.Red = Red;
     Color.Green = Green;
     Color.Blue = Blue;
-    State = DISPLAY_STATE_UNINIT;
+    State = STATE_UNINIT;
 
 #ifdef SIMULATOR
     Pixels.SetIcon(wxICON(WordclockIcon));
@@ -152,7 +152,7 @@ Display::~Display()
 void Display::init()
 {
     clear();
-    State = DISPLAY_STATE_INIT;
+    State = STATE_INIT;
 } /* init */
 
 
@@ -205,11 +205,11 @@ stdReturnType Display::getCharacter(byte Index, char* Character) const
  *                  
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType Display::getWordIllumination(DisplayWordType Word, DisplayWordIlluminationType* WordIllu) const
+stdReturnType Display::getWordIllumination(WordType Word, WordIlluminationType* WordIllu) const
 {
     stdReturnType ReturnValue = E_NOT_OK;
 
-    if(Word < DISPLAY_WORD_NUMBER_OF_WORDS) {
+    if(Word < Display::WORD_NUMBER_OF_WORDS) {
         *WordIllu = getWordIlluminationFast(Word);
         ReturnValue = E_OK;
     } else {
@@ -227,14 +227,14 @@ stdReturnType Display::getWordIllumination(DisplayWordType Word, DisplayWordIllu
  *                  
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType Display::setWord(DisplayWordType Word, byte MaxLength)
+stdReturnType Display::setWord(WordType Word, byte MaxLength)
 {
     stdReturnType ReturnValue = E_NOT_OK;
     byte Length;
 
-    if(Word < DISPLAY_WORD_NUMBER_OF_WORDS) {
+    if(Word < Display::WORD_NUMBER_OF_WORDS) {
         ReturnValue = E_OK;
-        DisplayWordIlluminationType WordIllu = getWordIlluminationFast(Word);
+        WordIlluminationType WordIllu = getWordIlluminationFast(Word);
 
         if(MaxLength == DISPLAY_WORD_LENGTH_UNLIMITED) Length = WordIllu.Length;
         else Length = MaxLength;
@@ -257,11 +257,11 @@ stdReturnType Display::setWord(DisplayWordType Word, byte MaxLength)
  *                  
  *  \return         -
 ******************************************************************************************************************************************************/
-void Display::setWordFast(DisplayWordType Word, byte MaxLength)
+void Display::setWordFast(WordType Word, byte MaxLength)
 {
     byte Length;
 
-    DisplayWordIlluminationType WordIllu = getWordIlluminationFast(Word);
+    WordIlluminationType WordIllu = getWordIlluminationFast(Word);
 
     if(MaxLength == DISPLAY_WORD_LENGTH_UNLIMITED) Length = WordIllu.Length;
     else Length = MaxLength;
@@ -278,13 +278,13 @@ void Display::setWordFast(DisplayWordType Word, byte MaxLength)
  *                  
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType Display::clearWord(DisplayWordType Word)
+stdReturnType Display::clearWord(WordType Word)
 {
     stdReturnType ReturnValue = E_NOT_OK;
 
-    if(Word < DISPLAY_WORD_NUMBER_OF_WORDS) {
+    if(Word < Display::WORD_NUMBER_OF_WORDS) {
         ReturnValue = E_OK;
-        DisplayWordIlluminationType WordIllu = getWordIlluminationFast(Word);
+        WordIlluminationType WordIllu = getWordIlluminationFast(Word);
 
         for(byte Index = 0; Index < WordIllu.Length; Index++) {
             if(clearPixel(WordIllu.Column + Index,  WordIllu.Row) == E_NOT_OK) ReturnValue = E_NOT_OK;
@@ -304,9 +304,9 @@ stdReturnType Display::clearWord(DisplayWordType Word)
  *                  
  *  \return         -
 ******************************************************************************************************************************************************/
-void Display::clearWordFast(DisplayWordType Word)
+void Display::clearWordFast(WordType Word)
 {
-    DisplayWordIlluminationType WordIllu = getWordIlluminationFast(Word);
+    WordIlluminationType WordIllu = getWordIlluminationFast(Word);
 
     for(byte Index = 0; Index < WordIllu.Length; Index++) { clearPixelFast(WordIllu.Column + Index,  WordIllu.Row); }
 } /* clearWordFast */
@@ -324,7 +324,7 @@ stdReturnType Display::clearAllWords()
 {
     stdReturnType ReturnValue = E_OK;
 
-    for(byte i = DISPLAY_WORD_ES; i < DISPLAY_WORD_NUMBER_OF_WORDS; i++) if(clearWord((DisplayWordType) i) == E_NOT_OK) ReturnValue = E_NOT_OK;
+    for(byte i = Display::WORD_ES; i < Display::WORD_NUMBER_OF_WORDS; i++) if(clearWord((WordType) i) == E_NOT_OK) ReturnValue = E_NOT_OK;
     return ReturnValue;
 } /* clearAllWords */
 
@@ -339,7 +339,7 @@ stdReturnType Display::clearAllWords()
 ******************************************************************************************************************************************************/
 void Display::clearAllWordsFast()
 {
-    for(byte i = DISPLAY_WORD_ES; i < DISPLAY_WORD_NUMBER_OF_WORDS; i++) clearWordFast((DisplayWordType) i);
+    for(byte i = Display::WORD_ES; i < Display::WORD_NUMBER_OF_WORDS; i++) clearWordFast((WordType) i);
 } /* clearAllWordsFast */
 
 
@@ -580,14 +580,14 @@ void Display::clearPixelFast(byte Index)
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType Display::getPixelRow(byte Row, DisplayPixelRowType* PixelRow) const
+stdReturnType Display::getPixelRow(byte Row, PixelRowType* PixelRow) const
 {
     stdReturnType ReturnValue = E_OK;
-    DisplayPixelType Pixel;
+    PixelType Pixel;
 
     for(byte Column = 0; Column < DISPLAY_NUMBER_OF_COLUMNS; Column++) {
         if(getPixel(Column, Row, &Pixel) == E_OK) {
-            writeBit(*PixelRow, Column, Pixel);
+            WRITE_BIT(*PixelRow, Column, Pixel);
         } else {
             ReturnValue = E_NOT_OK;
         }
@@ -604,12 +604,12 @@ stdReturnType Display::getPixelRow(byte Row, DisplayPixelRowType* PixelRow) cons
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-DisplayPixelRowType Display::getPixelRowFast(byte Row)  const
+Display::PixelRowType Display::getPixelRowFast(byte Row)  const
 {
-    DisplayPixelRowType PixelRow = 0;
+    PixelRowType PixelRow = 0;
     
     for(byte Column = 0; Column < DISPLAY_NUMBER_OF_COLUMNS; Column++) {
-        writeBit(PixelRow, Column, getPixelFast(Column, Row));
+        WRITE_BIT(PixelRow, Column, getPixelFast(Column, Row));
     }
     return PixelRow;
 } /* getPixelRowFast */
@@ -623,14 +623,14 @@ DisplayPixelRowType Display::getPixelRowFast(byte Row)  const
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType Display::getPixelColumn(byte Column, DisplayPixelRowType* PixelColumn)  const
+stdReturnType Display::getPixelColumn(byte Column, PixelRowType* PixelColumn)  const
 {
     stdReturnType ReturnValue = E_OK;
-    DisplayPixelType Pixel;
+    PixelType Pixel;
 
     for(byte Row = 0; Row < DISPLAY_NUMBER_OF_ROWS; Row++) {
         if(getPixel(Column, Row, &Pixel) == E_OK) {
-            writeBit(*PixelColumn, Row, Pixel);
+            WRITE_BIT(*PixelColumn, Row, Pixel);
         } else {
             ReturnValue = E_NOT_OK;
         }
@@ -647,12 +647,12 @@ stdReturnType Display::getPixelColumn(byte Column, DisplayPixelRowType* PixelCol
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-DisplayPixelColumnType Display::getPixelColumnFast(byte Column)  const
+Display::PixelColumnType Display::getPixelColumnFast(byte Column)  const
 {
-    DisplayPixelColumnType PixelColumn = 0;
+    Display::PixelColumnType PixelColumn = 0;
     
     for(byte Row = 0; Row < DISPLAY_NUMBER_OF_ROWS; Row++) {
-        writeBit(PixelColumn, Row, getPixelFast(Column, Row));
+        WRITE_BIT(PixelColumn, Row, getPixelFast(Column, Row));
     }
     return PixelColumn;
 } /* getPixelColumnFast */
@@ -666,12 +666,12 @@ DisplayPixelColumnType Display::getPixelColumnFast(byte Column)  const
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType Display::setPixelRow(byte Row, DisplayPixelRowType PixelRow)
+stdReturnType Display::setPixelRow(byte Row, PixelRowType PixelRow)
 {
     stdReturnType ReturnValue = E_OK;
 
     for(byte Column = 0; Column < DISPLAY_NUMBER_OF_COLUMNS; Column++) {
-        if(writePixel(Column, Row, readBit(PixelRow, Column)) == E_NOT_OK) ReturnValue = E_NOT_OK;
+        if(writePixel(Column, Row, READ_BIT(PixelRow, Column)) == E_NOT_OK) ReturnValue = E_NOT_OK;
     }
     return ReturnValue;
 } /* setPixelRow */
@@ -685,10 +685,10 @@ stdReturnType Display::setPixelRow(byte Row, DisplayPixelRowType PixelRow)
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-void Display::setPixelRowFast(byte Row, DisplayPixelRowType PixelRow)
+void Display::setPixelRowFast(byte Row, PixelRowType PixelRow)
 {
     for(byte Column = 0; Column < DISPLAY_NUMBER_OF_COLUMNS; Column++) {
-        writePixelFast(Column, Row, readBit(PixelRow, Column));
+        writePixelFast(Column, Row, READ_BIT(PixelRow, Column));
     }
 } /* setPixelRowFast */
 
@@ -701,11 +701,11 @@ void Display::setPixelRowFast(byte Row, DisplayPixelRowType PixelRow)
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType Display::setPixelColumn(byte Column, DisplayPixelRowType PixelColumn)
+stdReturnType Display::setPixelColumn(byte Column, PixelRowType PixelColumn)
 {
     stdReturnType ReturnValue = E_OK;
     for(byte Row = 0; Row < DISPLAY_NUMBER_OF_ROWS; Row++) {
-        if(writePixel(Column, Row, readBit(PixelColumn, Row)) == E_NOT_OK) ReturnValue = E_NOT_OK;
+        if(writePixel(Column, Row, READ_BIT(PixelColumn, Row)) == E_NOT_OK) ReturnValue = E_NOT_OK;
     }
     return ReturnValue;
 } /* setPixelColumn */
@@ -719,10 +719,10 @@ stdReturnType Display::setPixelColumn(byte Column, DisplayPixelRowType PixelColu
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-void Display::setPixelColumnFast(byte Column, DisplayPixelRowType PixelColumn)
+void Display::setPixelColumnFast(byte Column, PixelRowType PixelColumn)
 {
     for(byte Row = 0; Row < DISPLAY_NUMBER_OF_ROWS; Row++) {
-        writePixelFast(Column, Row, readBit(PixelColumn, Row));
+        writePixelFast(Column, Row, READ_BIT(PixelColumn, Row));
     }
 } /* setPixelColumnFast */
 
@@ -743,7 +743,7 @@ byte Display::transformToSerpentine(byte Column, byte Row) const
 {
     byte Index;
 
-    if(isBitCleared(Row, 0)) Index = (Row * DISPLAY_NUMBER_OF_COLUMNS) + Column;
+    if(IS_BIT_CLEARED(Row, 0)) Index = (Row * DISPLAY_NUMBER_OF_COLUMNS) + Column;
     else Index = (Row * DISPLAY_NUMBER_OF_COLUMNS) + (DISPLAY_NUMBER_OF_COLUMNS - Column - 1);
     
     return Index;
