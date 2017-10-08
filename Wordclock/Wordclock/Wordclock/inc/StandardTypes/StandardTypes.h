@@ -111,15 +111,15 @@ enum stdReturnType {
  *  GLOBAL INLINE FUNCTIONS
  *****************************************************************************************************************************************************/
 /* bit */
-template <typename BitType>
-inline auto bitValue(BitType Bit)
+template <typename ReturnValue, typename BitType>
+inline ReturnValue bitValue(BitType Bit)
 {
     return ((Bit < 32) ? ((Bit < 16) ? (UINT16_C(1) << Bit) : (UINT32_C(1) << Bit)) : (UINT64_C(1) << Bit));
 }
 
 /* bit mask */
-template <typename LengthType>
-inline auto bitMask(LengthType Length)
+template <typename ReturnValue, typename LengthType>
+inline ReturnValue bitMask(LengthType Length)
 {
     return (bitValue(Length) - 1);
 }

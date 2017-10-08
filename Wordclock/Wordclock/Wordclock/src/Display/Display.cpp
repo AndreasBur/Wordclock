@@ -41,13 +41,13 @@
 ******************************************************************************************************************************************************/
 const char Display::DisplayCharacters[][DISPLAY_NUMBER_OF_COLUMNS + 1] PROGMEM
 {
-    "ESKISTLFÜNF",
+    "ESKISTLF?NF",
     "ZEHNZWANZIG",
     "DREIVIERTEL",
     "TGNACHVORJM",
-    "HALBQZWÖLFP",
+    "HALBQZW?LFP",
     "ZWEINSIEBEN",
-    "KDREIRHFÜNF",
+    "KDREIRHF?NF",
     "ELFNEUNVIER",
     "WACHTZEHNRS",
     "BSECHSFMUHR"
@@ -59,7 +59,7 @@ const Display::WordIlluminationType Display::WordIlluminationTable[] PROGMEM
     {0,0,0},                                //  0 = DISPLAY_WORD_NONE           = ""
     {0,0,2},                                //  1 = Display::WORD_ES             = "ES"
     {0,3,3},                                //  2 = DISPLAY_WORD_IST            = "IST"
-    {0,7,4},                                //  3 = DISPLAY_WORD_FUENF          = "FÜNF"
+    {0,7,4},                                //  3 = DISPLAY_WORD_FUENF          = "F?NF"
     {1,0,4},                                //  4 = DISPLAY_WORD_ZEHN           = "ZEHN"
     {1,4,7},                                //  5 = DISPLAY_WORD_ZWANZIG        = "ZWANZIG"
     {2,0,4},                                //  6 = DISPLAY_WORD_DREI           = "DREI"
@@ -69,13 +69,13 @@ const Display::WordIlluminationType Display::WordIlluminationTable[] PROGMEM
     {3,2,4},                                // 10 = DISPLAY_WORD_NACH           = "NACH"
     {3,6,3},                                // 11 = DISPLAY_WORD_VOR            = "VOR"
     {4,0,4},                                // 12 = DISPLAY_WORD_HALB           = "HALB"
-    {4,5,5},                                // 13 = DISPLAY_WORD_HOUR_ZWOELF    = "ZWÖLF"
+    {4,5,5},                                // 13 = DISPLAY_WORD_HOUR_ZWOELF    = "ZW?LF"
     {5,0,4},                                // 14 = DISPLAY_WORD_HOUR_ZWEI      = "ZWEI"
     {5,2,3},                                // 15 = DISPLAY_WORD_HOUR_EIN       = "EIN"
     {5,2,4},                                // 16 = DISPLAY_WORD_HOUR_EINS      = "EINS"
     {5,5,6},                                // 17 = DISPLAY_WORD_HOUR_SIEBEN    = "SIEBEN"
     {6,1,4},                                // 18 = DISPLAY_WORD_HOUR_DREI      = "DREI"
-    {6,7,4},                                // 19 = DISPLAY_WORD_HOUR_FUENF     = "FÜNF"
+    {6,7,4},                                // 19 = DISPLAY_WORD_HOUR_FUENF     = "F?NF"
     {7,0,3},                                // 20 = DISPLAY_WORD_HOUR_ELF       = "ELF"
     {7,3,4},                                // 21 = DISPLAY_WORD_HOUR_NEUN      = "NEUN"
     {7,7,4},                                // 22 = DISPLAY_WORD_HOUR_VIER      = "VIER"
@@ -207,7 +207,7 @@ stdReturnType Display::getCharacter(byte Index, char* Character) const
 ******************************************************************************************************************************************************/
 stdReturnType Display::getWordIllumination(WordType Word, WordIlluminationType* WordIllu) const
 {
-    stdReturnType ReturnValue{E_NOT_OK};
+    stdReturnType ReturnValue = E_NOT_OK;
 
     if(Word < Display::WORD_NUMBER_OF_WORDS) {
         *WordIllu = getWordIlluminationFast(Word);
@@ -229,7 +229,7 @@ stdReturnType Display::getWordIllumination(WordType Word, WordIlluminationType* 
 ******************************************************************************************************************************************************/
 stdReturnType Display::setWord(WordType Word, byte MaxLength)
 {
-    stdReturnType ReturnValue{E_NOT_OK};
+    stdReturnType ReturnValue = E_NOT_OK;
     byte Length;
 
     if(Word < Display::WORD_NUMBER_OF_WORDS) {
@@ -280,7 +280,7 @@ void Display::setWordFast(WordType Word, byte MaxLength)
 ******************************************************************************************************************************************************/
 stdReturnType Display::clearWord(WordType Word)
 {
-    stdReturnType ReturnValue{E_NOT_OK};
+    stdReturnType ReturnValue = E_NOT_OK;
 
     if(Word < Display::WORD_NUMBER_OF_WORDS) {
         ReturnValue = E_OK;
@@ -322,7 +322,7 @@ void Display::clearWordFast(WordType Word)
 ******************************************************************************************************************************************************/
 stdReturnType Display::clearAllWords()
 {
-    stdReturnType ReturnValue{E_OK};
+    stdReturnType ReturnValue = E_OK;
 
     for(byte i = Display::WORD_ES; i < Display::WORD_NUMBER_OF_WORDS; i++) if(clearWord((WordType) i) == E_NOT_OK) ReturnValue = E_NOT_OK;
     return ReturnValue;
@@ -387,7 +387,7 @@ boolean Display::getPixelFast(byte Index) const
 ******************************************************************************************************************************************************/
 stdReturnType Display::getPixel(byte Column, byte Row, boolean* Value)  const
 {
-    stdReturnType ReturnValue{E_NOT_OK};
+    stdReturnType ReturnValue = E_NOT_OK;
     PixelColorType Pixel;
 
 #if (DISPLAY_LED_STRIPE_SERPENTINE == STD_ON)
@@ -582,13 +582,8 @@ void Display::clearPixelFast(byte Index)
 ******************************************************************************************************************************************************/
 stdReturnType Display::getPixelRow(byte Row, PixelRowType* PixelRow) const
 {
-<<<<<<< Updated upstream
     stdReturnType ReturnValue = E_OK;
     PixelType Pixel;
-=======
-    stdReturnType ReturnValue{E_OK};
-    DisplayPixelType Pixel;
->>>>>>> Stashed changes
 
     for(byte Column = 0; Column < DISPLAY_NUMBER_OF_COLUMNS; Column++) {
         if(getPixel(Column, Row, &Pixel) == E_OK) {
@@ -611,11 +606,7 @@ stdReturnType Display::getPixelRow(byte Row, PixelRowType* PixelRow) const
 ******************************************************************************************************************************************************/
 Display::PixelRowType Display::getPixelRowFast(byte Row)  const
 {
-<<<<<<< Updated upstream
     PixelRowType PixelRow = 0;
-=======
-    DisplayPixelRowType PixelRow{0};
->>>>>>> Stashed changes
     
     for(byte Column = 0; Column < DISPLAY_NUMBER_OF_COLUMNS; Column++) {
         WRITE_BIT(PixelRow, Column, getPixelFast(Column, Row));
@@ -634,13 +625,8 @@ Display::PixelRowType Display::getPixelRowFast(byte Row)  const
 ******************************************************************************************************************************************************/
 stdReturnType Display::getPixelColumn(byte Column, PixelRowType* PixelColumn)  const
 {
-<<<<<<< Updated upstream
     stdReturnType ReturnValue = E_OK;
     PixelType Pixel;
-=======
-    stdReturnType ReturnValue{E_OK};
-    DisplayPixelType Pixel;
->>>>>>> Stashed changes
 
     for(byte Row = 0; Row < DISPLAY_NUMBER_OF_ROWS; Row++) {
         if(getPixel(Column, Row, &Pixel) == E_OK) {
@@ -663,11 +649,7 @@ stdReturnType Display::getPixelColumn(byte Column, PixelRowType* PixelColumn)  c
 ******************************************************************************************************************************************************/
 Display::PixelColumnType Display::getPixelColumnFast(byte Column)  const
 {
-<<<<<<< Updated upstream
     Display::PixelColumnType PixelColumn = 0;
-=======
-    DisplayPixelColumnType PixelColumn{0};
->>>>>>> Stashed changes
     
     for(byte Row = 0; Row < DISPLAY_NUMBER_OF_ROWS; Row++) {
         WRITE_BIT(PixelColumn, Row, getPixelFast(Column, Row));
@@ -721,8 +703,7 @@ void Display::setPixelRowFast(byte Row, PixelRowType PixelRow)
 ******************************************************************************************************************************************************/
 stdReturnType Display::setPixelColumn(byte Column, PixelRowType PixelColumn)
 {
-    stdReturnType ReturnValue{E_OK};
-
+    stdReturnType ReturnValue = E_OK;
     for(byte Row = 0; Row < DISPLAY_NUMBER_OF_ROWS; Row++) {
         if(writePixel(Column, Row, READ_BIT(PixelColumn, Row)) == E_NOT_OK) ReturnValue = E_NOT_OK;
     }
