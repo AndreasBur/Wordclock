@@ -45,7 +45,7 @@
 ******************************************************************************************************************************************************/
 /* bit */
 #define BIT_VALUE(Bit) \
-    (((Bit) < 32) ? (((Bit) < 16) ? (UINT16_C(1) << (Bit)) : (UINT32_C(1) << (Bit))) : (UINT64_C(1) << (Bit)))
+    ((UINT64_C(1) << (Bit))
 
 /* bit mask */
 #define BIT_MASK(Len) \
@@ -53,15 +53,15 @@
 
 /* set bit */
 #define SET_BIT(Var, Bit) \
-    ((Var) |= (1UL << (Bit)))
+    ((Var) |= (UINT64_C(1) << (Bit)))
 
 /* clear bit */
 #define CLEAR_BIT(Var, Bit) \
-    ((Var) &= ~(1UL << (Bit)))
+    ((Var) &= ~(UINT64_C(1) << (Bit)))
 
 /* toggle bit */
 #define TOGGLE_BIT(Var, Bit) \
-    ((Var) ^= (1UL << (Bit)))
+    ((Var) ^= (UINT64_C(1) << (Bit)))
     
 /* read bit */
 #define READ_BIT(Var, Bit) \
@@ -69,7 +69,7 @@
 
 /* write bit */
 #define WRITE_BIT(Var, Bit, Value) \
-    ((Var) = ((Var) & ~(1UL << (Bit))) | ((Value) << (Bit)))
+    ((Var) = ((Var) & ~(UINT64_C(1) << (Bit))) | ((Value) << (Bit)))
 
 /* is bit set */
 #define IS_BIT_SET(Var, Bit) ((Var) & (1UL << (Bit)))
@@ -111,10 +111,10 @@ enum stdReturnType {
  *  GLOBAL INLINE FUNCTIONS
 ******************************************************************************************************************************************************/
 /* bit */
-template <typename ReturnValue, typename BitType>
-inline ReturnValue bitValue(BitType Bit)
+template <typename ReturnType, typename BitType>
+inline ReturnType bitValue(BitType Bit)
 {
-    return ((Bit < 32) ? ((Bit < 16) ? (UINT16_C(1) << Bit) : (UINT32_C(1) << Bit)) : (UINT64_C(1) << Bit));
+    return UINT64_C(1) << Bit;
 }
 
 /* bit mask */
