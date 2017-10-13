@@ -108,38 +108,47 @@ enum stdReturnType {
 
 
 /******************************************************************************************************************************************************
+ *  GLOBAL INLINE FUNCTION PROTOTYPES
+******************************************************************************************************************************************************/
+template <typename ReturnType, typename BitType> static inline ReturnType bitValue(BitType);
+template <typename ReturnValue, typename LengthType> static inline ReturnValue bitMask(LengthType);
+template <typename VarType, typename MaskType, typename ValType> static inline void writeBitGroup(VarType&, MaskType, MaskType, ValType);
+template <typename VarType, typename MaskType> static inline VarType readBitGroup(VarType, MaskType, MaskType);
+
+
+/******************************************************************************************************************************************************
  *  GLOBAL INLINE FUNCTIONS
 ******************************************************************************************************************************************************/
 /* bit */
 template <typename ReturnType, typename BitType>
-inline ReturnType bitValue(BitType Bit)
+static inline ReturnType bitValue(BitType Bit)
 {
     return UINT64_C(1) << Bit;
 }
 
 /* bit mask */
 template <typename ReturnValue, typename LengthType>
-inline ReturnValue bitMask(LengthType Length)
+static inline ReturnValue bitMask(LengthType Length)
 {
     return (bitValue(Length) - 1);
 }
 
 /* read Bit Group */
 template <typename VarType, typename MaskType>
-inline VarType readBitGroup(VarType Var, MaskType BitGroupMask, MaskType BitGroupPosition)
+static inline VarType readBitGroup(VarType Var, MaskType BitGroupMask, MaskType BitGroupPosition)
 {
     return ((Var & (static_cast<VarType>(BitGroupMask) << BitGroupPosition)) >> BitGroupPosition);
 }
 
 /* write Bit Group */
 template <typename VarType, typename MaskType, typename ValType>
-inline void writeBitGroup(VarType& Var, MaskType BitGroupMask, MaskType BitGroupPosition, ValType Value)
+static inline void writeBitGroup(VarType& Var, MaskType BitGroupMask, MaskType BitGroupPosition, ValType Value)
 {
     Var = ((Var & ~(static_cast<VarType>(BitGroupMask) << BitGroupPosition)) | ((VarType)(Value & BitGroupMask) << BitGroupPosition));
 }
 
-#endif
 
+#endif
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E
 ******************************************************************************************************************************************************/

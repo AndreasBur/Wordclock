@@ -89,26 +89,26 @@ void Animation::init()
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType Animation::setChar(byte Column, byte Row, unsigned char Char, AnimationFontType Font)
+stdReturnType Animation::setChar(byte Column, byte Row, unsigned char Char, FontType Font)
 {
 #if(ANIMATION_SUPPORT_FONT_4X6 == STD_ON)
-    if(Font == ANIMATION_FONT_4X6) return setCharFontHorizontal(Column, Row, Char, &Font_4x6[0][0], ANIMATION_FONT_4X6_WIDTH, ANIMATION_FONT_4X6_HEIGHT);
+    if(Font == FONT_4X6) return setCharFontHorizontal(Column, Row, Char, &Font_4x6[0][0], ANIMATION_FONT_4X6_WIDTH, ANIMATION_FONT_4X6_HEIGHT);
 #endif
 
 #if(ANIMATION_SUPPORT_FONT_5X8 == STD_ON)
-    if(Font == ANIMATION_FONT_5X8) return setCharFontHorizontal(Column, Row, Char, &Font_5x8[0][0], ANIMATION_FONT_5X8_WIDTH, ANIMATION_FONT_5X8_HEIGHT);
+    if(Font == FONT_5X8) return setCharFontHorizontal(Column, Row, Char, &Font_5x8[0][0], ANIMATION_FONT_5X8_WIDTH, ANIMATION_FONT_5X8_HEIGHT);
 #endif
 
 #if(ANIMATION_SUPPORT_FONT_6X8 == STD_ON)
-    if(Font == ANIMATION_FONT_6X8) return setCharFontHorizontal(Column, Row, Char, &Font_6x8[0][0], ANIMATION_FONT_6X8_WIDTH, ANIMATION_FONT_6X8_HEIGHT);
+    if(Font == FONT_6X8) return setCharFontHorizontal(Column, Row, Char, &Font_6x8[0][0], ANIMATION_FONT_6X8_WIDTH, ANIMATION_FONT_6X8_HEIGHT);
 #endif
 
 #if(ANIMATION_SUPPORT_FONT_8X8 == STD_ON)
-    if(Font == ANIMATION_FONT_8X8) return setCharFontHorizontal(Column, Row, Char, &Font_8x8[0][0], ANIMATION_FONT_8X8_WIDTH, ANIMATION_FONT_8X8_HEIGHT);
+    if(Font == FONT_8X8) return setCharFontHorizontal(Column, Row, Char, &Font_8x8[0][0], ANIMATION_FONT_8X8_WIDTH, ANIMATION_FONT_8X8_HEIGHT);
 #endif
 
 #if(ANIMATION_SUPPORT_FONT_6X10 == STD_ON)
-    if(Font == ANIMATION_FONT_6X10) return setCharFontVertical(Column, Row, Char, &Font_6x10[0][0], ANIMATION_FONT_6X10_WIDTH, ANIMATION_FONT_6X10_HEIGHT);
+    if(Font == FONT_6X10) return setCharFontVertical(Column, Row, Char, &Font_6x10[0][0], ANIMATION_FONT_6X10_WIDTH, ANIMATION_FONT_6X10_HEIGHT);
 #endif
     return E_NOT_OK;
 } /* setChar */

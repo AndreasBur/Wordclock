@@ -6,7 +6,7 @@
 /*End of auto generated code by Atmel studio */
 int flag;
 Display WordClockDisplay(20, 20, 20);
-Clock wcClock(&WordClockDisplay, CLOCK_MODE_WESSI);
+Clock wcClock(&WordClockDisplay, Clock::MODE_WESSI);
 //DisplayCharacter WcDisplayCharacter;
 //Animation wcAnimation;
 //Beginning of Auto generated function prototypes by Atmel Studio

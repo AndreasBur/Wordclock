@@ -54,12 +54,12 @@
 ******************************************************************************************************************************************************/
 class Display
 {
-  public:
 /******************************************************************************************************************************************************
  *  GLOBAL DATA TYPES AND STRUCTURES
 ******************************************************************************************************************************************************/
-    #include "DisplayCharacters.h"
-    #include "DisplayWords.h"
+  public:
+#include "DisplayCharacters.h"
+#include "DisplayWords.h"
     /* type which describes the internal state of the Display */
     enum StateType {
         STATE_NONE,
@@ -77,15 +77,15 @@ class Display
 
     using PixelType = boolean;
 
-    #if(DISPLAY_NUMBER_OF_ROWS > 16)
+#if(DISPLAY_NUMBER_OF_ROWS > 16)
     #error "Display: too many Rows, please extend PixelRowType"
-    #endif
+#endif
 
     using PixelRowType = uint16_t;
 
-    #if(DISPLAY_NUMBER_OF_COLUMNS > 16)
+#if(DISPLAY_NUMBER_OF_COLUMNS > 16)
     #error "Display: too many Columns, please extend PixelColumnType"
-    #endif
+#endif
 
     using PixelColumnType = uint16_t;
 
@@ -94,10 +94,10 @@ class Display
     using Stripe = WS2812;
 
 /******************************************************************************************************************************************************
- *  P R I V A T E   V A R I A B L E S
+ *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
-
   private:
+
     StateType State;
     Stripe Pixels;
     PixelColorType Color;
@@ -108,7 +108,9 @@ class Display
     // functions
     byte transformToSerpentine(byte, byte) const;
 
-
+/******************************************************************************************************************************************************
+ *  P U B L I C   F U N C T I O N S
+******************************************************************************************************************************************************/
   public:
     Display(PixelColorType);
     Display(byte, byte, byte);

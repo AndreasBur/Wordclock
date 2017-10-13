@@ -53,84 +53,95 @@
 
 
 /******************************************************************************************************************************************************
- *  GLOBAL DATA TYPES AND STRUCTURES
-******************************************************************************************************************************************************/
-/*  */
-enum ClockModesType {
-    CLOCK_MODE_WESSI,
-    CLOCK_MODE_OSSI,
-    CLOCK_MODE_RHEIN_RUHR,
-    CLOCK_MODE_SCHWABEN
-};
-
-enum ClockHourModesType {
-    CLOCK_HOUR_MODE_FULL_HOUR,
-    CLOCK_HOUR_MODE_NO_FULL_HOUR
-};
-
-struct ClockMinutesType {
-    ClockHourModesType HourMode;
-    byte HourOffset;
-    Display::WordType Words[CLOCK_MAX_NUMBER_OF_MINUTE_WORDS];
-};
-
-struct ClockHoursType {
-    Display::WordType Words[CLOCK_MAX_NUMBER_OF_HOUR_WORDS];
-};
-
-struct ClockWordsType {
-    boolean ShowItIs;
-    Display::WordType HourWords[CLOCK_MAX_NUMBER_OF_HOUR_WORDS];
-    Display::WordType MinuteWords[CLOCK_MAX_NUMBER_OF_MINUTE_WORDS];
-};
-
-using HoursTableEntryType = ClockHoursType;
-using MinutesTableEntryType = ClockMinutesType;
-
-
-/******************************************************************************************************************************************************
  *  CLASS  Clock
 ******************************************************************************************************************************************************/
 class Clock
 {
+
+
+/******************************************************************************************************************************************************
+ *  GLOBAL DATA TYPES AND STRUCTURES
+******************************************************************************************************************************************************/
+  public:
+    /*  */
+    enum ModesType {
+        MODE_WESSI,
+        MODE_OSSI,
+        MODE_RHEIN_RUHR,
+        MODE_SCHWABEN
+    };
+
+    enum HourModesType {
+        HOUR_MODE_FULL_HOUR,
+        HOUR_MODE_NO_FULL_HOUR
+    };
+
+    struct MinutesType {
+        HourModesType HourMode;
+        byte HourOffset;
+        Display::WordType Words[CLOCK_MAX_NUMBER_OF_MINUTE_WORDS];
+    };
+
+    struct HoursType {
+        Display::WordType Words[CLOCK_MAX_NUMBER_OF_HOUR_WORDS];
+    };
+
+    struct ClockWordsType {
+        boolean ShowItIs;
+        Display::WordType HourWords[CLOCK_MAX_NUMBER_OF_HOUR_WORDS];
+        Display::WordType MinuteWords[CLOCK_MAX_NUMBER_OF_MINUTE_WORDS];
+    };
+
+    using HoursTableEntryType = HoursType;
+    using MinutesTableEntryType = MinutesType;
+
+
+
+/******************************************************************************************************************************************************
+ *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
+******************************************************************************************************************************************************/
   private:
     Display* pDisplay;
-    ClockModesType Mode;
+    ModesType Mode;
 
-    static const ClockHoursType ClockHoursTable[][CLOCK_NUMBER_OF_HOURS];
-    static const ClockMinutesType ClockMinutesTable[][CLOCK_NUMBER_OF_MINUTE_STEPS];
+    static const HoursType HoursTable[][CLOCK_NUMBER_OF_HOURS];
+    static const MinutesType MinutesTable[][CLOCK_NUMBER_OF_MINUTE_STEPS];
     
     // functions
-    inline MinutesTableEntryType getMinutesTableEntry(ClockModesType Mode, byte Minute) {
+    inline MinutesTableEntryType getMinutesTableEntry(ModesType Mode, byte Minute) {
         MinutesTableEntryType MinutesTableEntry;
-        memcpy_P(&MinutesTableEntry, &ClockMinutesTable[Mode][Minute / CLOCK_MINUTE_STEP_IN_MINUTES], sizeof(ClockMinutesType));
+        memcpy_P(&MinutesTableEntry, &MinutesTable[Mode][Minute / CLOCK_MINUTE_STEP_IN_MINUTES], sizeof(MinutesType));
         return MinutesTableEntry;
     }
-    inline HoursTableEntryType getHoursTableEntry(ClockHourModesType HourMode, byte Hour) {
+    inline HoursTableEntryType getHoursTableEntry(HourModesType HourMode, byte Hour) {
         HoursTableEntryType HoursTableEntry;
-        memcpy_P(&HoursTableEntry, &ClockHoursTable[HourMode][Hour], sizeof(ClockHoursType));
+        memcpy_P(&HoursTableEntry, &HoursTable[HourMode][Hour], sizeof(HoursType));
         return HoursTableEntry;
     }
 
+
+/******************************************************************************************************************************************************
+ *  P U B L I C   F U N C T I O N S
+******************************************************************************************************************************************************/
   public:
-    Clock(Display*, ClockModesType);
+    Clock(Display*, ModesType);
     ~Clock();
 
     // get methods
-    ClockModesType getMode() const { return Mode; }
+    ModesType getMode() const { return Mode; }
     stdReturnType getClockWords(byte, byte, ClockWordsType*);
     boolean compareClockWords(ClockWordsType*, ClockWordsType*) const;
 
     // set methods
-    void setMode(ClockModesType sMode) { Mode = sMode; }
+    void setMode(ModesType sMode) { Mode = sMode; }
 
     // methods
     stdReturnType setClock(byte, byte);
     void show() { pDisplay->show(); }
 };
 
-#endif
 
+#endif
 /******************************************************************************************************************************************************
- *  E N D   O F   F I L E
+ *  END OF FILE
 ******************************************************************************************************************************************************/

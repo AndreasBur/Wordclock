@@ -61,49 +61,50 @@
 
 
 /******************************************************************************************************************************************************
- *  GLOBAL DATA TYPES AND STRUCTURES
-******************************************************************************************************************************************************/
-/* type which describes the internal state of the Animation */
-enum AnimationStateType {
-    ANIMATION_STATE_NONE,
-    ANIMATION_STATE_UNINIT,
-    ANIMATION_STATE_INIT,
-    ANIMATION_STATE_READY
-};
-
-
-enum AnimationFontType {
-#if(ANIMATION_SUPPORT_FONT_4X6 == STD_ON)
-    ANIMATION_FONT_4X6,
-#endif
-#if(ANIMATION_SUPPORT_FONT_5X8 == STD_ON)
-    ANIMATION_FONT_5X8,
-#endif
-#if(ANIMATION_SUPPORT_FONT_6X8 == STD_ON)
-    ANIMATION_FONT_6X8,
-#endif
-#if(ANIMATION_SUPPORT_FONT_6X10 == STD_ON)
-    ANIMATION_FONT_6X10,
-#endif
-#if(ANIMATION_SUPPORT_FONT_8X8 == STD_ON)
-    ANIMATION_FONT_8X8,
-#endif
-};
-
-
-enum AnimationType {
-    ANIMATION_SNAKE,
-    ANIMATION_EXPLODE,
-    ANIMATION_IMPLODE,
-    ANIMATION_CUBE
-};
-
-
-/******************************************************************************************************************************************************
  *  CLASS  Animation
 ******************************************************************************************************************************************************/
 class Animation
 {
+/******************************************************************************************************************************************************
+ *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
+******************************************************************************************************************************************************/
+  public:
+    /* type which describes the internal state of the Animation */
+    enum StateType {
+        STATE_NONE,
+        STATE_UNINIT,
+        STATE_INIT,
+        STATE_READY
+    };
+
+    enum FontType {
+    #if(ANIMATION_SUPPORT_FONT_4X6 == STD_ON)
+        FONT_4X6,
+    #endif
+    #if(ANIMATION_SUPPORT_FONT_5X8 == STD_ON)
+        FONT_5X8,
+    #endif
+    #if(ANIMATION_SUPPORT_FONT_6X8 == STD_ON)
+        FONT_6X8,
+    #endif
+    #if(ANIMATION_SUPPORT_FONT_6X10 == STD_ON)
+        FONT_6X10,
+    #endif
+    #if(ANIMATION_SUPPORT_FONT_8X8 == STD_ON)
+        FONT_8X8,
+    #endif
+    };
+
+    enum AnimationType {
+        ANIMATION_SNAKE,
+        ANIMATION_EXPLODE,
+        ANIMATION_IMPLODE,
+        ANIMATION_CUBE
+    };
+
+/******************************************************************************************************************************************************
+ *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
+******************************************************************************************************************************************************/
   private:
     Display* pDisplay;
     AnimationType CurrentAnimation;
@@ -129,6 +130,9 @@ class Animation
     stdReturnType setCharFontHorizontal(byte, byte, unsigned char, const unsigned char*, byte, byte);
     stdReturnType setCharFontVertical(byte, byte, unsigned char, const unsigned char*, byte, byte);
 
+/******************************************************************************************************************************************************
+ *  P U B L I C   F U N C T I O N S
+******************************************************************************************************************************************************/
   public:
     Animation(Display*);
     ~Animation();
@@ -137,15 +141,15 @@ class Animation
 
 
     // set methods
-    stdReturnType setChar(byte, byte, unsigned char, AnimationFontType);
+    stdReturnType setChar(byte, byte, unsigned char, FontType);
 
     // methods
     void init();
 
 };
 
-#endif
 
+#endif
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E
 ******************************************************************************************************************************************************/
