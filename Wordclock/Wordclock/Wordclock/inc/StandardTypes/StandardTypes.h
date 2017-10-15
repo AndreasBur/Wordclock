@@ -65,14 +65,14 @@
     
 /* read bit */
 #define READ_BIT(Var, Bit) \
-    (((Var) & (1UL << (Bit))) >> (Bit))
+    (((Var) & (UINT64_C(1) << (Bit))) >> (Bit))
 
 /* write bit */
 #define WRITE_BIT(Var, Bit, Value) \
     ((Var) = ((Var) & ~(UINT64_C(1) << (Bit))) | ((Value) << (Bit)))
 
 /* is bit set */
-#define IS_BIT_SET(Var, Bit) ((Var) & (1UL << (Bit)))
+#define IS_BIT_SET(Var, Bit) ((Var) & (UINT64_C(1) << (Bit)))
 
 /* is bit cleared */
 #define IS_BIT_CLEARED(Var, Bit) !IS_BIT_SET(Var, Bit)
@@ -85,7 +85,9 @@
 #define WRITE_BIT_GROUP(Var, BitGroupMask, BitGroupPosition, Value) \
     ((Var) = (((Var) & ~((BitGroupMask) << (BitGroupPosition))) | (((Value) & (BitGroupMask)) << (BitGroupPosition))))
 
+
 /* binary to decimal */
+/*
 #define B(x) ( \
 (0##x >>  0 & 0001) | \
 (0##x >>  2 & 0002) | \
@@ -95,7 +97,7 @@
 (0##x >> 10 & 0040) | \
 (0##x >> 12 & 0100) | \
 (0##x >> 14 & 0200) )
-
+*/
 
 /******************************************************************************************************************************************************
  *  GLOBAL DATA TYPES AND STRUCTURES
@@ -127,22 +129,23 @@ static inline ReturnType bitValue(BitType Bit)
 }
 
 /* bit mask */
-template <typename ReturnValue, typename LengthType>
-static inline ReturnValue bitMask(LengthType Length)
+template <typename ReturnType, typename LengthType>
+inline ReturnType bitMask(LengthType Length)
 {
     return (bitValue(Length) - 1);
 }
 
 /* read Bit Group */
-template <typename VarType, typename MaskType>
-static inline VarType readBitGroup(VarType Var, MaskType BitGroupMask, MaskType BitGroupPosition)
+
+template <typename VarType, typename MaskType, typename GroupType>
+inline VarType readBitGroup(VarType Var, MaskType BitGroupMask, GroupType BitGroupPosition)
 {
     return ((Var & (static_cast<VarType>(BitGroupMask) << BitGroupPosition)) >> BitGroupPosition);
 }
 
 /* write Bit Group */
-template <typename VarType, typename MaskType, typename ValType>
-static inline void writeBitGroup(VarType& Var, MaskType BitGroupMask, MaskType BitGroupPosition, ValType Value)
+template <typename VarType, typename MaskType, typename GroupType, typename ValType>
+inline void writeBitGroup(VarType& Var, MaskType BitGroupMask, GroupType BitGroupPosition, ValType Value)
 {
     Var = ((Var & ~(static_cast<VarType>(BitGroupMask) << BitGroupPosition)) | ((VarType)(Value & BitGroupMask) << BitGroupPosition));
 }
