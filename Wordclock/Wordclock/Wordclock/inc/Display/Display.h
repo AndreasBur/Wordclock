@@ -37,7 +37,7 @@
 #define DISPLAY_NUMBER_OF_COLUMNS               11
 #define DISPLAY_NUMBER_OF_LEDS                  WS2812_NUMBER_OF_LEDS
 
-#if((DISPLAY_NUMBER_OF_ROWS * DISPLAY_NUMBER_OF_COLUMNS) != DISPLAY_NUMBER_OF_LEDS)
+#if ((DISPLAY_NUMBER_OF_ROWS * DISPLAY_NUMBER_OF_COLUMNS) != DISPLAY_NUMBER_OF_LEDS)
     #error "Display: LED number missmatch"
 #endif
 
@@ -58,6 +58,7 @@ class Display
  *  GLOBAL DATA TYPES AND STRUCTURES
 ******************************************************************************************************************************************************/
   public:
+
 #include "DisplayCharacters.h"
 #include "DisplayWords.h"
     /* type which describes the internal state of the Display */
@@ -77,13 +78,13 @@ class Display
 
     using PixelType = boolean;
 
-#if(DISPLAY_NUMBER_OF_ROWS > 16)
+#if (DISPLAY_NUMBER_OF_ROWS > 16)
     #error "Display: too many Rows, please extend PixelRowType"
 #endif
 
     using PixelRowType = uint16_t;
 
-#if(DISPLAY_NUMBER_OF_COLUMNS > 16)
+#if (DISPLAY_NUMBER_OF_COLUMNS > 16)
     #error "Display: too many Columns, please extend PixelColumnType"
 #endif
 
