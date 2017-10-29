@@ -136,7 +136,6 @@ inline ReturnType bitMask(LengthType Length)
 }
 
 /* read Bit Group */
-
 template <typename VarType, typename MaskType, typename GroupType>
 inline VarType readBitGroup(VarType Var, MaskType BitGroupMask, GroupType BitGroupPosition)
 {

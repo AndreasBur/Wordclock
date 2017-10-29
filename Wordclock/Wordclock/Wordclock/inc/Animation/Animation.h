@@ -145,7 +145,6 @@ class Animation
 
     // methods
     void init();
-
 };
 
 
