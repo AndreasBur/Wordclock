@@ -179,15 +179,16 @@ stdReturnType Clock::getClockWords(byte Hour, byte Minute, ClockWordsType* Clock
     if(Hour < CLOCK_NUMBER_OF_HOURS_PER_DAY && Minute < CLOCK_NUMBER_OF_MINUTES_PER_HOUR) {
         ReturnValue = E_OK;
         /* show IT IS permanently or only to full and half hour */
-        if (CLOCK_SHOW_IT_IS_PERMANENTLY == STD_ON  ||
-            Minute < CLOCK_MINUTE_STEP_IN_MINUTES   ||
-            (Minute >= (CLOCK_NUMBER_OF_MINUTES_PER_HOUR/2) && Minute < (CLOCK_NUMBER_OF_MINUTES_PER_HOUR/2) + CLOCK_MINUTE_STEP_IN_MINUTES))
+#if (CLOCK_SHOW_IT_IS_PERMANENTLY == STD_ON)
+        ClockWords->ShowItIs = true;
+#else
+        if (Minute < CLOCK_MINUTE_STEP_IN_MINUTES || (Minute >= (CLOCK_NUMBER_OF_MINUTES_PER_HOUR/2) && Minute < (CLOCK_NUMBER_OF_MINUTES_PER_HOUR/2) + CLOCK_MINUTE_STEP_IN_MINUTES))
         {
             ClockWords->ShowItIs = true;
         } else {
             ClockWords->ShowItIs = false;
         }
-
+#endif
         MinutesTableEntryType MinutesTableEntry = getMinutesTableEntry(Mode, Minute);
 
         for(byte Index = 0; Index < CLOCK_MAX_NUMBER_OF_MINUTE_WORDS; Index++) {
