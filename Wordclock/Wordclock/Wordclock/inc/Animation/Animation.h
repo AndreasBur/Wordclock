@@ -23,7 +23,7 @@
 #include "StandardTypes.h"
 #include "Arduino.h"
 #include "Display.h"
-
+#include "AnimationTeletype.h"
 
 /******************************************************************************************************************************************************
  *  GLOBAL CONSTANT MACROS
@@ -104,12 +104,20 @@ class Animation
         ANIMATION_CUBE
     };
 
+    union AnimationsType {
+        AnimationTeletype Teletype;
+        AnimationsType() { }
+        ~AnimationsType() {}
+    };
+
+
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
     Display* pDisplay;
     AnimationType CurrentAnimation;
+    AnimationsType Animations;
 
 #if(ANIMATION_SUPPORT_FONT_4X6 == STD_ON)
     static const unsigned char Font_4x6[][ANIMATION_FONT_4X6_WIDTH];
@@ -136,6 +144,7 @@ class Animation
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
+    //Animation() {}
     Animation(Display*);
     ~Animation();
 

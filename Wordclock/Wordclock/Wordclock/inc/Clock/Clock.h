@@ -46,7 +46,7 @@
 #define CLOCK_MAX_NUMBER_OF_MINUTE_WORDS        3
 
 #define CLOCK_IT_IS_NUMBER_OF_WORDS             2
-
+#define CLOCK_WORDS_TABLE_TYPE_SIZE             (CLOCK_MAX_NUMBER_OF_HOUR_WORDS + CLOCK_MAX_NUMBER_OF_MINUTE_WORDS + CLOCK_IT_IS_NUMBER_OF_WORDS)
 
 
 /******************************************************************************************************************************************************
@@ -92,7 +92,7 @@ class Clock
         Display::WordType MinuteWords[CLOCK_MAX_NUMBER_OF_MINUTE_WORDS];
     };
 
-    using ClockWordsTableType = Display::WordType[CLOCK_MAX_NUMBER_OF_HOUR_WORDS + CLOCK_MAX_NUMBER_OF_MINUTE_WORDS + CLOCK_IT_IS_NUMBER_OF_WORDS];
+    using ClockWordsTableType = Display::WordType[CLOCK_WORDS_TABLE_TYPE_SIZE];
 
     using HoursTableEntryType = HoursType;
     using MinutesTableEntryType = MinutesType;

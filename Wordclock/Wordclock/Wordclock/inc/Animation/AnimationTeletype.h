@@ -38,6 +38,7 @@
  *  GLOBAL FUNCTION MACROS
 ******************************************************************************************************************************************************/
 
+
 /******************************************************************************************************************************************************
  *  CLASS  AnimationTeletype
 ******************************************************************************************************************************************************/
@@ -50,7 +51,7 @@ class AnimationTeletype
     enum StateType {
         STATE_NONE,
         STATE_IDLE,
-        STATE_READY,
+        //STATE_READY,
         STATE_WORKING
     };
 
@@ -62,7 +63,6 @@ class AnimationTeletype
     byte CurrentWordIndex;
     byte CurrentWordLength;
     byte CurrentCharIndex;
-
     boolean UseCursor;
 
   public:
@@ -74,9 +74,9 @@ class AnimationTeletype
 	// set methods
 
 	// methods
-    void init();
     stdReturnType setClock(byte, byte);
     void task();
+
 };
 
 #endif

@@ -36,7 +36,8 @@ src/Animation/Font.d src/Animation/Font.o: ../src/Animation/Font.cpp \
  ..\\..\ArduinoCore\include\core/Arduino.h \
  ..\\..\ArduinoCore\include\variants\standard/pins_arduino.h \
  ../inc/Display/Display.h ../inc/WS2812/WS2812.h \
- ../inc/Display/DisplayCharacters.h ../inc/Display/DisplayWords.h
+ ../inc/Display/DisplayCharacters.h ../inc/Display/DisplayWords.h \
+ ../inc/Animation/AnimationTeletype.h ../inc/Clock/Clock.h
 
 ../inc/Animation/Animation.h:
 
@@ -119,3 +120,7 @@ c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\
 ../inc/Display/DisplayCharacters.h:
 
 ../inc/Display/DisplayWords.h:
+
+../inc/Animation/AnimationTeletype.h:
+
+../inc/Clock/Clock.h:

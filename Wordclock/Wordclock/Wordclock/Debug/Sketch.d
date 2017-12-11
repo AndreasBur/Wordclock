@@ -37,7 +37,7 @@ Sketch.d Sketch.o: .././Sketch.cpp \
  ../inc/Display/Display.h ../inc/StandardTypes/StandardTypes.h \
  ../inc/WS2812/WS2812.h ../inc/Display/DisplayCharacters.h \
  ../inc/Display/DisplayWords.h ../inc/Animation/Animation.h \
- ../inc/Clock/Clock.h
+ ../inc/Animation/AnimationTeletype.h ../inc/Clock/Clock.h
 
 ..\\..\ArduinoCore\include\core/Arduino.h:
 
@@ -120,5 +120,7 @@ c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\
 ../inc/Display/DisplayWords.h:
 
 ../inc/Animation/Animation.h:
+
+../inc/Animation/AnimationTeletype.h:
 
 ../inc/Clock/Clock.h:

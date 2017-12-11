@@ -19,17 +19,17 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING
   7 .debug_abbrev 00001854  00000000  00000000  0000920d  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_line   000026d3  00000000  00000000  0000aa61  2**0
+  8 .debug_line   000026ea  00000000  00000000  0000aa61  2**0
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_frame  00000ac4  00000000  00000000  0000d134  2**2
+  9 .debug_frame  00000ac4  00000000  00000000  0000d14c  2**2
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_str    0000e93e  00000000  00000000  0000dbf8  2**0
+ 10 .debug_str    0000ea2d  00000000  00000000  0000dc10  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_loc    0000488f  00000000  00000000  0001c536  2**0
+ 11 .debug_loc    0000488f  00000000  00000000  0001c63d  2**0
                   CONTENTS, READONLY, DEBUGGING
- 12 .debug_ranges 000002e0  00000000  00000000  00020dc5  2**0
+ 12 .debug_ranges 000002e0  00000000  00000000  00020ecc  2**0
                   CONTENTS, READONLY, DEBUGGING
- 13 .debug_macro  00006fac  00000000  00000000  000210a5  2**0
+ 13 .debug_macro  00006fbc  00000000  00000000  000211ac  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -808,12 +808,6 @@ stdReturnType Display::clearAllWords()
  620:	08 95       	ret
 
 00000622 <_ZN6WS2812D1Ev>:
-        Brightness = calcGamma7CorrectionValue(sBrightness / 2);
-    } else {
-        Brightness = sBrightness;
-    }
-
-} /* setBrightness */
  622:	08 95       	ret
 
 00000624 <_ZN6WS28126setPinEh>:
@@ -962,12 +956,6 @@ stdReturnType Display::clearAllWords()
  738:	08 95       	ret
 
 0000073a <_ZN6WS28128sendDataEPKhj>:
-{
-    uint8_t BitCounter;
-    uint8_t PortMaskLow;
-    uint8_t PortMaskHigh;
-
-    ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
  73a:	3f b7       	in	r19, 0x3f	; 63
     return 1;
 }
@@ -976,8 +964,6 @@ static __inline__ uint8_t __iCliRetVal(void)
 {
     cli();
  73c:	f8 94       	cli
-    {
-        PortMaskLow = ~PinMask & *PortOutputRegister;
  73e:	fc 01       	movw	r30, r24
  740:	20 81       	ld	r18, Z
  742:	a1 81       	ldd	r26, Z+1	; 0x01
@@ -986,23 +972,14 @@ static __inline__ uint8_t __iCliRetVal(void)
  748:	82 2f       	mov	r24, r18
  74a:	80 95       	com	r24
  74c:	98 23       	and	r25, r24
-        PortMaskHigh = PinMask | *PortOutputRegister;
  74e:	8c 91       	ld	r24, X
  750:	82 2b       	or	r24, r18
  752:	fb 01       	movw	r30, r22
  754:	46 0f       	add	r20, r22
  756:	57 1f       	adc	r21, r23
-
-        for(uint16_t ByteCounter = 0; ByteCounter < DataLength; ByteCounter++)
  758:	e4 17       	cp	r30, r20
  75a:	f5 07       	cpc	r31, r21
  75c:	81 f0       	breq	.+32     	; 0x77e <skipone885+0x8>
-                : [BitCounter]      "=&d" (BitCounter)
-                : [CurrentByte]     "r"   (Data[ByteCounter]),
-                  [Port]            "x"   (PortOutputRegister),
-                  [PortMaskHigh]    "r"   (PortMaskHigh),
-                  [PortMaskLow]     "r"   (PortMaskLow)
-            );
  75e:	21 91       	ld	r18, Z+
  760:	68 e0       	ldi	r22, 0x08	; 8
 
@@ -1022,12 +999,6 @@ static __inline__ uint8_t __iCliRetVal(void)
  776:	00 c0       	rjmp	.+0      	; 0x778 <skipone885+0x2>
  778:	6a 95       	dec	r22
  77a:	99 f7       	brne	.-26     	; 0x762 <loop885>
-    ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
-    {
-        PortMaskLow = ~PinMask & *PortOutputRegister;
-        PortMaskHigh = PinMask | *PortOutputRegister;
-
-        for(uint16_t ByteCounter = 0; ByteCounter < DataLength; ByteCounter++)
  77c:	ed cf       	rjmp	.-38     	; 0x758 <_ZN6WS28128sendDataEPKhj+0x1e>
     (void)__s;
 }
@@ -1040,12 +1011,6 @@ static __inline__ void __iRestore(const  uint8_t *__s)
  780:	08 95       	ret
 
 00000782 <_ZN6WS28124showEv.part.4>:
- *  \details        
- *                  
- *  \return         -
- *****************************************************************************************************************************************************/
-#if (WS2812_RESET_TIMER == STD_ON)
-stdReturnType WS2812::show()
  782:	8f 92       	push	r8
  784:	9f 92       	push	r9
  786:	af 92       	push	r10
@@ -1068,12 +1033,6 @@ stdReturnType WS2812::show()
  7a8:	0f be       	out	0x3f, r0	; 63
  7aa:	cd bf       	out	0x3d, r28	; 61
  7ac:	8c 01       	movw	r16, r24
-    byte PixelsDimmed[WS2812_NUMBER_OF_LEDS * WS2812_NUMBER_OF_COLORS];
-
-#if (WS2812_RESET_TIMER == STD_ON)
-    if((micros() - ResetTimer) > (WS2812_RESET_DURATION_NS / 1000) || ResetTimer == 0) {
-#endif
-        if(Brightness != 255) {
  7ae:	fc 01       	movw	r30, r24
  7b0:	e3 5b       	subi	r30, 0xB3	; 179
  7b2:	fe 4f       	sbci	r31, 0xFE	; 254
@@ -1081,20 +1040,12 @@ stdReturnType WS2812::show()
  7b6:	6f 3f       	cpi	r22, 0xFF	; 255
  7b8:	09 f4       	brne	.+2      	; 0x7bc <_ZN6WS28124showEv.part.4+0x3a>
  7ba:	49 c0       	rjmp	.+146    	; 0x84e <_ZN6WS28124showEv.part.4+0xcc>
- *****************************************************************************************************************************************************/
-inline void WS2812::dimmPixels(byte* PixelsDimmed, uint16_t DataLength)
-{
-    for(uint16_t i = 0; i < DataLength; i = i + WS2812_NUMBER_OF_COLORS)
-    {
-        dimmColor(&PixelsDimmed[WS2812_POS_ABS_RED(i)], Pixels[WS2812_POS_ABS_RED(i)]);
  7bc:	35 96       	adiw	r30, 0x05	; 5
  7be:	20 81       	ld	r18, Z
  7c0:	30 e0       	ldi	r19, 0x00	; 0
-        dimmColor(&PixelsDimmed[WS2812_POS_ABS_GREEN(i)], Pixels[WS2812_POS_ABS_GREEN(i)]);
  7c2:	31 96       	adiw	r30, 0x01	; 1
  7c4:	e0 80       	ld	r14, Z
  7c6:	f1 2c       	mov	r15, r1
-        dimmColor(&PixelsDimmed[WS2812_POS_ABS_BLUE(i)], Pixels[WS2812_POS_ABS_BLUE(i)]);
  7c8:	31 96       	adiw	r30, 0x01	; 1
  7ca:	a0 81       	ld	r26, Z
  7cc:	8a 2e       	mov	r8, r26
@@ -1107,12 +1058,6 @@ inline void WS2812::dimmPixels(byte* PixelsDimmed, uint16_t DataLength)
  7da:	f3 1f       	adc	r31, r19
  7dc:	83 e0       	ldi	r24, 0x03	; 3
  7de:	90 e0       	ldi	r25, 0x00	; 0
- *****************************************************************************************************************************************************/
-inline void WS2812::dimmPixels(byte* PixelsDimmed, uint16_t DataLength)
-{
-    for(uint16_t i = 0; i < DataLength; i = i + WS2812_NUMBER_OF_COLORS)
-    {
-        dimmColor(&PixelsDimmed[WS2812_POS_ABS_RED(i)], Pixels[WS2812_POS_ABS_RED(i)]);
  7e0:	a9 01       	movw	r20, r18
  7e2:	48 0f       	add	r20, r24
  7e4:	59 1f       	adc	r21, r25
@@ -1120,17 +1065,10 @@ inline void WS2812::dimmPixels(byte* PixelsDimmed, uint16_t DataLength)
  7e8:	51 1f       	adc	r21, r17
  7ea:	da 01       	movw	r26, r20
  7ec:	4c 91       	ld	r20, X
-    void sendData(const byte*, uint16_t);
-    void dimmPixels(byte*, uint16_t);
-    void dimmPixel(WS2812PixelType*, WS2812PixelType);
-    void dimmPixel(WS2812PixelType*, byte, byte, byte);
-
-    void dimmColor(byte* ColorDimmed, byte Color) const { *ColorDimmed = (Color * Brightness) >> 8; }
  7ee:	46 9f       	mul	r20, r22
  7f0:	a0 01       	movw	r20, r0
  7f2:	11 24       	eor	r1, r1
  7f4:	50 83       	st	Z, r21
-        dimmColor(&PixelsDimmed[WS2812_POS_ABS_GREEN(i)], Pixels[WS2812_POS_ABS_GREEN(i)]);
  7f6:	a7 01       	movw	r20, r14
  7f8:	48 0f       	add	r20, r24
  7fa:	59 1f       	adc	r21, r25
@@ -1149,7 +1087,6 @@ inline void WS2812::dimmPixels(byte* PixelsDimmed, uint16_t DataLength)
  814:	11 24       	eor	r1, r1
  816:	d5 01       	movw	r26, r10
  818:	dc 92       	st	X, r13
-        dimmColor(&PixelsDimmed[WS2812_POS_ABS_BLUE(i)], Pixels[WS2812_POS_ABS_BLUE(i)]);
  81a:	64 01       	movw	r12, r8
  81c:	c8 0e       	add	r12, r24
  81e:	d9 1e       	adc	r13, r25
@@ -1166,30 +1103,16 @@ inline void WS2812::dimmPixels(byte* PixelsDimmed, uint16_t DataLength)
  834:	dc 92       	st	X, r13
  836:	03 96       	adiw	r24, 0x03	; 3
  838:	33 96       	adiw	r30, 0x03	; 3
- *                  
- *  \return         -
- *****************************************************************************************************************************************************/
-inline void WS2812::dimmPixels(byte* PixelsDimmed, uint16_t DataLength)
-{
-    for(uint16_t i = 0; i < DataLength; i = i + WS2812_NUMBER_OF_COLORS)
  83a:	8d 34       	cpi	r24, 0x4D	; 77
  83c:	b1 e0       	ldi	r27, 0x01	; 1
  83e:	9b 07       	cpc	r25, r27
  840:	79 f6       	brne	.-98     	; 0x7e0 <_ZN6WS28124showEv.part.4+0x5e>
-#if (WS2812_RESET_TIMER == STD_ON)
-    if((micros() - ResetTimer) > (WS2812_RESET_DURATION_NS / 1000) || ResetTimer == 0) {
-#endif
-        if(Brightness != 255) {
-            dimmPixels(PixelsDimmed, WS2812_NUMBER_OF_LEDS * WS2812_NUMBER_OF_COLORS);
-            sendData(PixelsDimmed, WS2812_NUMBER_OF_LEDS * WS2812_NUMBER_OF_COLORS);
  842:	4a e4       	ldi	r20, 0x4A	; 74
  844:	51 e0       	ldi	r21, 0x01	; 1
  846:	be 01       	movw	r22, r28
  848:	6f 5f       	subi	r22, 0xFF	; 255
  84a:	7f 4f       	sbci	r23, 0xFF	; 255
  84c:	05 c0       	rjmp	.+10     	; 0x858 <_ZN6WS28124showEv.part.4+0xd6>
-        } else {
-            sendData(Pixels, WS2812_NUMBER_OF_LEDS * WS2812_NUMBER_OF_COLORS);
  84e:	4a e4       	ldi	r20, 0x4A	; 74
  850:	51 e0       	ldi	r21, 0x01	; 1
  852:	bc 01       	movw	r22, r24
@@ -1197,9 +1120,6 @@ inline void WS2812::dimmPixels(byte* PixelsDimmed, uint16_t DataLength)
  856:	7f 4f       	sbci	r23, 0xFF	; 255
  858:	c8 01       	movw	r24, r16
  85a:	0e 94 9d 03 	call	0x73a	; 0x73a <_ZN6WS28128sendDataEPKhj>
-        }
-#if (WS2812_RESET_TIMER == STD_ON)
-        ResetTimer = micros();
  85e:	0e 94 d0 04 	call	0x9a0	; 0x9a0 <micros>
  862:	f8 01       	movw	r30, r16
  864:	e2 5b       	subi	r30, 0xB2	; 178
@@ -1208,12 +1128,6 @@ inline void WS2812::dimmPixels(byte* PixelsDimmed, uint16_t DataLength)
  86a:	71 83       	std	Z+1, r23	; 0x01
  86c:	82 83       	std	Z+2, r24	; 0x02
  86e:	93 83       	std	Z+3, r25	; 0x03
-        return E_OK;
-    } else {
-        return E_NOT_OK;
-    }
-#endif
-} /* show */
  870:	80 e0       	ldi	r24, 0x00	; 0
  872:	c6 5b       	subi	r28, 0xB6	; 182
  874:	de 4f       	sbci	r29, 0xFE	; 254
@@ -1237,21 +1151,11 @@ inline void WS2812::dimmPixels(byte* PixelsDimmed, uint16_t DataLength)
  898:	08 95       	ret
 
 0000089a <_ZN6WS28124showEv>:
-#if (WS2812_RESET_TIMER == STD_ON)
-stdReturnType WS2812::show()
-#elif (WS2812_RESET_TIMER == STD_OFF)
-void WS2812::show()
-#endif
-{
  89a:	0f 93       	push	r16
  89c:	1f 93       	push	r17
  89e:	cf 93       	push	r28
  8a0:	df 93       	push	r29
  8a2:	ec 01       	movw	r28, r24
-    byte PixelsDimmed[WS2812_NUMBER_OF_LEDS * WS2812_NUMBER_OF_COLORS];
-
-#if (WS2812_RESET_TIMER == STD_ON)
-    if((micros() - ResetTimer) > (WS2812_RESET_DURATION_NS / 1000) || ResetTimer == 0) {
  8a4:	0e 94 d0 04 	call	0x9a0	; 0x9a0 <micros>
  8a8:	fe 01       	movw	r30, r28
  8aa:	e2 5b       	subi	r30, 0xB2	; 178
@@ -1275,12 +1179,6 @@ void WS2812::show()
  8ce:	03 2b       	or	r16, r19
  8d0:	39 f4       	brne	.+14     	; 0x8e0 <_ZN6WS28124showEv+0x46>
  8d2:	ce 01       	movw	r24, r28
-        return E_OK;
-    } else {
-        return E_NOT_OK;
-    }
-#endif
-} /* show */
  8d4:	df 91       	pop	r29
  8d6:	cf 91       	pop	r28
  8d8:	1f 91       	pop	r17
@@ -1297,49 +1195,18 @@ void WS2812::show()
  8ec:	08 95       	ret
 
 000008ee <main>:
-void setupUSB() __attribute__((weak));
-void setupUSB() { }
-
-int main(void)
-{
-	init();
  8ee:	0e 94 f5 04 	call	0x9ea	; 0x9ea <init>
-
-	initVariant();
  8f2:	0e 94 76 04 	call	0x8ec	; 0x8ec <initVariant>
-
-#if defined(USBCON)
-	USBDevice.attach();
-#endif
-	
-	setup();
  8f6:	0e 94 2c 01 	call	0x258	; 0x258 <setup>
-    
-	for (;;) {
-		loop();
-		if (serialEventRun) serialEventRun();
  8fa:	c0 e0       	ldi	r28, 0x00	; 0
  8fc:	d0 e0       	ldi	r29, 0x00	; 0
-#endif
-	
-	setup();
-    
-	for (;;) {
-		loop();
  8fe:	0e 94 2d 01 	call	0x25a	; 0x25a <loop>
-		if (serialEventRun) serialEventRun();
  902:	20 97       	sbiw	r28, 0x00	; 0
  904:	e1 f3       	breq	.-8      	; 0x8fe <main+0x10>
  906:	0e 94 00 00 	call	0	; 0x0 <__vectors>
  90a:	f9 cf       	rjmp	.-14     	; 0x8fe <main+0x10>
 
 0000090c <__vector_16>:
-	
-
-#endif
-
-	// busy wait
-	__asm__ __volatile__ (
  90c:	1f 92       	push	r1
  90e:	0f 92       	push	r0
  910:	0f b6       	in	r0, 0x3f	; 63
@@ -1433,168 +1300,79 @@ int main(void)
  9e8:	08 95       	ret
 
 000009ea <init>:
-
-void init()
-{
-	// this needs to be called before setup() or some functions won't
-	// work there
-	sei();
  9ea:	78 94       	sei
-	
-	// on the ATmega168, timer 0 is also used for fast hardware pwm
-	// (using phase-correct PWM would mean that timer 0 overflowed half as often
-	// resulting in different millis() behavior on the ATmega8 and ATmega168)
-#if defined(TCCR0A) && defined(WGM01)
-	sbi(TCCR0A, WGM01);
  9ec:	84 b5       	in	r24, 0x24	; 36
  9ee:	82 60       	ori	r24, 0x02	; 2
  9f0:	84 bd       	out	0x24, r24	; 36
-	sbi(TCCR0A, WGM00);
  9f2:	84 b5       	in	r24, 0x24	; 36
  9f4:	81 60       	ori	r24, 0x01	; 1
  9f6:	84 bd       	out	0x24, r24	; 36
-	// this combination is for the standard atmega8
-	sbi(TCCR0, CS01);
-	sbi(TCCR0, CS00);
-#elif defined(TCCR0B) && defined(CS01) && defined(CS00)
-	// this combination is for the standard 168/328/1280/2560
-	sbi(TCCR0B, CS01);
  9f8:	85 b5       	in	r24, 0x25	; 37
  9fa:	82 60       	ori	r24, 0x02	; 2
  9fc:	85 bd       	out	0x25, r24	; 37
-	sbi(TCCR0B, CS00);
  9fe:	85 b5       	in	r24, 0x25	; 37
  a00:	81 60       	ori	r24, 0x01	; 1
  a02:	85 bd       	out	0x25, r24	; 37
-
-	// enable timer 0 overflow interrupt
-#if defined(TIMSK) && defined(TOIE0)
-	sbi(TIMSK, TOIE0);
-#elif defined(TIMSK0) && defined(TOIE0)
-	sbi(TIMSK0, TOIE0);
  a04:	ee e6       	ldi	r30, 0x6E	; 110
  a06:	f0 e0       	ldi	r31, 0x00	; 0
  a08:	80 81       	ld	r24, Z
  a0a:	81 60       	ori	r24, 0x01	; 1
  a0c:	80 83       	st	Z, r24
-	// this is better for motors as it ensures an even waveform
-	// note, however, that fast pwm mode can achieve a frequency of up
-	// 8 MHz (with a 16 MHz clock) at 50% duty cycle
-
-#if defined(TCCR1B) && defined(CS11) && defined(CS10)
-	TCCR1B = 0;
  a0e:	e1 e8       	ldi	r30, 0x81	; 129
  a10:	f0 e0       	ldi	r31, 0x00	; 0
  a12:	10 82       	st	Z, r1
-
-	// set timer 1 prescale factor to 64
-	sbi(TCCR1B, CS11);
  a14:	80 81       	ld	r24, Z
  a16:	82 60       	ori	r24, 0x02	; 2
  a18:	80 83       	st	Z, r24
-#if F_CPU >= 8000000L
-	sbi(TCCR1B, CS10);
  a1a:	80 81       	ld	r24, Z
  a1c:	81 60       	ori	r24, 0x01	; 1
  a1e:	80 83       	st	Z, r24
-	sbi(TCCR1, CS10);
-#endif
-#endif
-	// put timer 1 in 8-bit phase correct pwm mode
-#if defined(TCCR1A) && defined(WGM10)
-	sbi(TCCR1A, WGM10);
  a20:	e0 e8       	ldi	r30, 0x80	; 128
  a22:	f0 e0       	ldi	r31, 0x00	; 0
  a24:	80 81       	ld	r24, Z
  a26:	81 60       	ori	r24, 0x01	; 1
  a28:	80 83       	st	Z, r24
-
-	// set timer 2 prescale factor to 64
-#if defined(TCCR2) && defined(CS22)
-	sbi(TCCR2, CS22);
-#elif defined(TCCR2B) && defined(CS22)
-	sbi(TCCR2B, CS22);
  a2a:	e1 eb       	ldi	r30, 0xB1	; 177
  a2c:	f0 e0       	ldi	r31, 0x00	; 0
  a2e:	80 81       	ld	r24, Z
  a30:	84 60       	ori	r24, 0x04	; 4
  a32:	80 83       	st	Z, r24
-
-	// configure timer 2 for phase correct pwm (8-bit)
-#if defined(TCCR2) && defined(WGM20)
-	sbi(TCCR2, WGM20);
-#elif defined(TCCR2A) && defined(WGM20)
-	sbi(TCCR2A, WGM20);
  a34:	e0 eb       	ldi	r30, 0xB0	; 176
  a36:	f0 e0       	ldi	r31, 0x00	; 0
  a38:	80 81       	ld	r24, Z
  a3a:	81 60       	ori	r24, 0x01	; 1
  a3c:	80 83       	st	Z, r24
-#endif
-
-#if defined(ADCSRA)
-	// set a2d prescaler so we are inside the desired 50-200 KHz range.
-	#if F_CPU >= 16000000 // 16 MHz / 128 = 125 KHz
-		sbi(ADCSRA, ADPS2);
  a3e:	ea e7       	ldi	r30, 0x7A	; 122
  a40:	f0 e0       	ldi	r31, 0x00	; 0
  a42:	80 81       	ld	r24, Z
  a44:	84 60       	ori	r24, 0x04	; 4
  a46:	80 83       	st	Z, r24
-		sbi(ADCSRA, ADPS1);
  a48:	80 81       	ld	r24, Z
  a4a:	82 60       	ori	r24, 0x02	; 2
  a4c:	80 83       	st	Z, r24
-		sbi(ADCSRA, ADPS0);
  a4e:	80 81       	ld	r24, Z
  a50:	81 60       	ori	r24, 0x01	; 1
  a52:	80 83       	st	Z, r24
-		cbi(ADCSRA, ADPS2);
-		cbi(ADCSRA, ADPS1);
-		sbi(ADCSRA, ADPS0);
-	#endif
-	// enable a2d conversions
-	sbi(ADCSRA, ADEN);
  a54:	80 81       	ld	r24, Z
  a56:	80 68       	ori	r24, 0x80	; 128
  a58:	80 83       	st	Z, r24
-	// here so they can be used as normal digital i/o; they will be
-	// reconnected in Serial.begin()
-#if defined(UCSRB)
-	UCSRB = 0;
-#elif defined(UCSR0B)
-	UCSR0B = 0;
  a5a:	10 92 c1 00 	sts	0x00C1, r1	; 0x8000c1 <__TEXT_REGION_LENGTH__+0x7e00c1>
  a5e:	08 95       	ret
 
 00000a60 <pinMode>:
-#define ARDUINO_MAIN
-#include "wiring_private.h"
-#include "pins_arduino.h"
-
-void pinMode(uint8_t pin, uint8_t mode)
-{
  a60:	cf 93       	push	r28
  a62:	df 93       	push	r29
-	uint8_t bit = digitalPinToBitMask(pin);
  a64:	90 e0       	ldi	r25, 0x00	; 0
  a66:	fc 01       	movw	r30, r24
  a68:	e7 52       	subi	r30, 0x27	; 39
  a6a:	fe 4f       	sbci	r31, 0xFE	; 254
  a6c:	24 91       	lpm	r18, Z
-	uint8_t port = digitalPinToPort(pin);
  a6e:	fc 01       	movw	r30, r24
  a70:	e3 51       	subi	r30, 0x13	; 19
  a72:	fe 4f       	sbci	r31, 0xFE	; 254
  a74:	84 91       	lpm	r24, Z
-	volatile uint8_t *reg, *out;
-
-	if (port == NOT_A_PIN) return;
  a76:	88 23       	and	r24, r24
  a78:	61 f1       	breq	.+88     	; 0xad2 <pinMode+0x72>
-
-	// JWS: can I let the optimizer do this?
-	reg = portModeRegister(port);
  a7a:	90 e0       	ldi	r25, 0x00	; 0
  a7c:	88 0f       	add	r24, r24
  a7e:	99 1f       	adc	r25, r25
@@ -1603,63 +1381,42 @@ void pinMode(uint8_t pin, uint8_t mode)
  a84:	fd 4f       	sbci	r31, 0xFD	; 253
  a86:	c5 91       	lpm	r28, Z+
  a88:	d4 91       	lpm	r29, Z
-	out = portOutputRegister(port);
  a8a:	fc 01       	movw	r30, r24
  a8c:	ef 5f       	subi	r30, 0xFF	; 255
  a8e:	fd 4f       	sbci	r31, 0xFD	; 253
  a90:	a5 91       	lpm	r26, Z+
  a92:	b4 91       	lpm	r27, Z
-
-	if (mode == INPUT) { 
  a94:	61 11       	cpse	r22, r1
  a96:	09 c0       	rjmp	.+18     	; 0xaaa <pinMode+0x4a>
-		uint8_t oldSREG = SREG;
  a98:	9f b7       	in	r25, 0x3f	; 63
-                cli();
  a9a:	f8 94       	cli
-		*reg &= ~bit;
  a9c:	88 81       	ld	r24, Y
  a9e:	20 95       	com	r18
  aa0:	82 23       	and	r24, r18
  aa2:	88 83       	st	Y, r24
-		*out &= ~bit;
  aa4:	ec 91       	ld	r30, X
  aa6:	2e 23       	and	r18, r30
  aa8:	0b c0       	rjmp	.+22     	; 0xac0 <pinMode+0x60>
-		SREG = oldSREG;
-	} else if (mode == INPUT_PULLUP) {
  aaa:	62 30       	cpi	r22, 0x02	; 2
  aac:	61 f4       	brne	.+24     	; 0xac6 <pinMode+0x66>
-		uint8_t oldSREG = SREG;
  aae:	9f b7       	in	r25, 0x3f	; 63
-                cli();
  ab0:	f8 94       	cli
-		*reg &= ~bit;
  ab2:	88 81       	ld	r24, Y
  ab4:	32 2f       	mov	r19, r18
  ab6:	30 95       	com	r19
  ab8:	83 23       	and	r24, r19
  aba:	88 83       	st	Y, r24
-		*out |= bit;
  abc:	ec 91       	ld	r30, X
  abe:	2e 2b       	or	r18, r30
  ac0:	2c 93       	st	X, r18
-		SREG = oldSREG;
  ac2:	9f bf       	out	0x3f, r25	; 63
  ac4:	06 c0       	rjmp	.+12     	; 0xad2 <pinMode+0x72>
-	} else {
-		uint8_t oldSREG = SREG;
  ac6:	8f b7       	in	r24, 0x3f	; 63
-                cli();
  ac8:	f8 94       	cli
-		*reg |= bit;
  aca:	e8 81       	ld	r30, Y
  acc:	2e 2b       	or	r18, r30
  ace:	28 83       	st	Y, r18
-		SREG = oldSREG;
  ad0:	8f bf       	out	0x3f, r24	; 63
-	}
-}
  ad2:	df 91       	pop	r29
  ad4:	cf 91       	pop	r28
  ad6:	08 95       	ret
