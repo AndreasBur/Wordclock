@@ -32,9 +32,9 @@
 #define WS2812_ASM_FIXED_CYCLES_TOTAL       10
 
 /* calculate cycles to match the timing, if possible */
-#define WS2812_ZERO_CYCLES                  (((F_CPU / 1000) * WS2812_ZERO_PULSE_DURATION_NS       ) / 1000000)
-#define WS2812_ONE_CYCLES                   (((F_CPU / 1000) * WS2812_ONE_PULSE_DURATION_NS +500000) / 1000000) /* +500000 überdenken */
-#define WS2812_TOTAL_CYCLES                 (((F_CPU / 1000) * WS2812_PERIOD_DURATION_NS    +500000) / 1000000) /* +500000 überdenken */
+#define WS2812_ZERO_CYCLES                  (((F_CPU / 1000) * WS2812_ZERO_PULSE_DURATION_NS) / 1000000)
+#define WS2812_ONE_CYCLES                   (((F_CPU / 1000) * WS2812_ONE_PULSE_DURATION_NS)  / 1000000) /* +500000 überdenken */
+#define WS2812_TOTAL_CYCLES                 (((F_CPU / 1000) * WS2812_PERIOD_DURATION_NS)     / 1000000) /* +500000 überdenken */
 
 /* W1 NOPs between start (rising edge) and falling edge low */
 #define WS2812_ASM_W1_SIGNED                (WS2812_ZERO_CYCLES - WS2812_ASM_FIXED_CYCLES_LOW)
@@ -83,7 +83,7 @@
 /******************************************************************************************************************************************************
  *  LOCAL DATA TYPES AND STRUCTURES
 ******************************************************************************************************************************************************/
-
+const uint8_t Gamma7Table[] PROGMEM {133, 139, 145, 151, 158, 165, 172, 180, 188, 196, 205, 214, 224, 234, 244, 255};
 
 
 /******************************************************************************************************************************************************
@@ -171,28 +171,6 @@ void WS2812::show()
 
 
 /******************************************************************************************************************************************************
-  setPin()
-******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
- *  \return         -
- *****************************************************************************************************************************************************/
-stdReturnType WS2812::setPin(byte Pin)
-{
-    if(Pin < NUM_DIGITAL_PINS) {
-        PinMask = digitalPinToBitMask(Pin);
-        PortOutputRegister = portOutputRegister(digitalPinToPort(Pin));
-        //PortModeRegister = portModeRegister(digitalPinToPort(Pin));
-        pinMode(Pin, OUTPUT);
-        return E_OK;
-    } else {
-         return E_NOT_OK;
-    }
-} /* setPin */
-
-
-/******************************************************************************************************************************************************
   getPixel()
 ******************************************************************************************************************************************************/
 /*! \brief          
@@ -270,15 +248,56 @@ WS2812PixelType WS2812::getPixelDimmedFast(byte Index) const
 {
     WS2812PixelType Pixel;
 
-    if(Brightness != 255) {
+    if(Brightness == 255) {
+        return getPixelFast(Index);
+    } else {
         dimmColor(&Pixel.Red, Pixels[WS2812_POS_ABS_RED(Index)]);
         dimmColor(&Pixel.Green, Pixels[WS2812_POS_ABS_GREEN(Index)]);
         dimmColor(&Pixel.Blue, Pixels[WS2812_POS_ABS_BLUE(Index)]);
-    } else {
-        return getPixelFast(Index);
     }
     return Pixel;
 } /* getPixelDimmedFast */
+
+
+/******************************************************************************************************************************************************
+  setBrightness()
+******************************************************************************************************************************************************/
+/*! \brief          
+ *  \details        
+ *                  
+ *  \return         -
+ *****************************************************************************************************************************************************/
+void WS2812::setBrightness(byte sBrightness, boolean GammaCorrection)
+{
+    if(GammaCorrection) {
+        Brightness = calcGamma7CorrectionValue(sBrightness / 2);
+    } else {
+        Brightness = sBrightness;
+    }
+
+} /* setBrightness */
+
+
+/******************************************************************************************************************************************************
+  setPin()
+******************************************************************************************************************************************************/
+/*! \brief          
+ *  \details        
+ *                  
+ *  \return         -
+ *****************************************************************************************************************************************************/
+stdReturnType WS2812::setPin(byte Pin)
+{
+    if(Pin < NUM_DIGITAL_PINS) {
+        PinMask = digitalPinToBitMask(Pin);
+        PortOutputRegister = portOutputRegister(digitalPinToPort(Pin));
+        //PortModeRegister = portModeRegister(digitalPinToPort(Pin));
+        pinMode(Pin, OUTPUT);
+        return E_OK;
+    } else {
+         return E_NOT_OK;
+    }
+} /* setPin */
 
 
 /******************************************************************************************************************************************************
@@ -389,7 +408,23 @@ void WS2812::setColorOrder(WS2812ColorOrderType ColorOrder)
  * P R I V A T E   F U N C T I O N S
 ******************************************************************************************************************************************************/
 
- /******************************************************************************************************************************************************
+/******************************************************************************************************************************************************
+  calcGammaCorrectionValue()
+******************************************************************************************************************************************************/
+/*! \brief          
+ *  \details        calculates the gamma correction value with the help of a small table
+ *                  and very efficient shift calculation
+ *  param[in]       ValueLinear    7 bit unsigned (0..127)  
+ *  \return         exponential value (approx. 1.0443^x) (1..255)
+ *****************************************************************************************************************************************************/
+uint8_t WS2812::calcGamma7CorrectionValue(uint8_t ValueLinear)
+{
+    uint8_t Exponent = pgm_read_byte(&Gamma7Table[ValueLinear % WS2812_GAMMA7_TABLE_NUMBER_OF_VALUES]);
+    return Exponent >> (7 - ValueLinear / WS2812_GAMMA7_TABLE_NUMBER_OF_VALUES);
+} /* calcGamma7CorrectionValue */
+
+
+/******************************************************************************************************************************************************
   dimmPixel()
 ******************************************************************************************************************************************************/
 /*! \brief          

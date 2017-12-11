@@ -22,6 +22,7 @@
  * INCLUDES
 ******************************************************************************************************************************************************/
 #include <stdint.h>
+#include "Arduino.h"
 
 /******************************************************************************************************************************************************
  *  GLOBAL CONSTANT MACROS
@@ -133,6 +134,30 @@ template <typename ReturnType, typename LengthType>
 inline ReturnType bitMask(LengthType Length)
 {
     return (bitValue(Length) - 1);
+}
+
+template <typename VarType>
+inline boolean readBit(VarType Var, boolean Bit)
+{
+    return ((Var & (UINT64_C(1) << Bit)) >> Bit);
+}
+
+template <typename VarType>
+inline VarType writeBit(VarType Var, uint8_t Bit)
+{
+    return (Var & (unsigned)~(UINT64_C(1) << Bit));
+}
+
+template <typename VarType, typename PositionType>
+inline void shiftLeft(VarType& Var, PositionType Position)
+{
+    Var = Var << Position;
+}
+
+template <typename VarType, typename PositionType>
+inline void shiftRight(VarType Var, PositionType Position)
+{
+    Var = Var >> Position;
 }
 
 /* read Bit Group */
