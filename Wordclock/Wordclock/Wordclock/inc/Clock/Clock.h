@@ -45,6 +45,8 @@
 #define CLOCK_NUMBER_OF_MINUTE_STEPS            12
 #define CLOCK_MAX_NUMBER_OF_MINUTE_WORDS        3
 
+#define CLOCK_IT_IS_NUMBER_OF_WORDS             2
+
 
 
 /******************************************************************************************************************************************************
@@ -90,6 +92,8 @@ class Clock
         Display::WordType MinuteWords[CLOCK_MAX_NUMBER_OF_MINUTE_WORDS];
     };
 
+    using ClockWordsTableType = Display::WordType[CLOCK_MAX_NUMBER_OF_HOUR_WORDS + CLOCK_MAX_NUMBER_OF_MINUTE_WORDS + CLOCK_IT_IS_NUMBER_OF_WORDS];
+
     using HoursTableEntryType = HoursType;
     using MinutesTableEntryType = MinutesType;
 
@@ -127,6 +131,7 @@ class Clock
     // get methods
     ModesType getMode() const { return Mode; }
     stdReturnType getClockWords(byte, byte, ClockWordsType*);
+    stdReturnType getClockWords(byte, byte, ClockWordsTableType);
     boolean compareClockWords(ClockWordsType*, ClockWordsType*) const;
 
     // set methods

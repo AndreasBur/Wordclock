@@ -6,6 +6,8 @@ Sketch.cpp
 
 src\Animation\Animation.cpp
 
+src\Animation\AnimationTeletype.cpp
+
 src\Animation\Font.cpp
 
 src\Clock\Clock.cpp

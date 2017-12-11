@@ -52,6 +52,7 @@ SUBDIRS :=  \
 C_SRCS +=  \
 ../Sketch.cpp \
 ../src/Animation/Animation.cpp \
+../src/Animation/AnimationTeletype.cpp \
 ../src/Animation/Font.cpp \
 ../src/Clock/Clock.cpp \
 ../src/Display/Display.cpp \
@@ -68,6 +69,7 @@ ASM_SRCS +=
 OBJS +=  \
 Sketch.o \
 src/Animation/Animation.o \
+src/Animation/AnimationTeletype.o \
 src/Animation/Font.o \
 src/Clock/Clock.o \
 src/Display/Display.o \
@@ -77,6 +79,7 @@ src/WS2812/WS2812.o
 OBJS_AS_ARGS +=  \
 Sketch.o \
 src/Animation/Animation.o \
+src/Animation/AnimationTeletype.o \
 src/Animation/Font.o \
 src/Clock/Clock.o \
 src/Display/Display.o \
@@ -86,6 +89,7 @@ src/WS2812/WS2812.o
 C_DEPS +=  \
 Sketch.d \
 src/Animation/Animation.d \
+src/Animation/AnimationTeletype.d \
 src/Animation/Font.d \
 src/Clock/Clock.d \
 src/Display/Display.d \
@@ -95,6 +99,7 @@ src/WS2812/WS2812.d
 C_DEPS_AS_ARGS +=  \
 Sketch.d \
 src/Animation/Animation.d \
+src/Animation/AnimationTeletype.d \
 src/Animation/Font.d \
 src/Clock/Clock.d \
 src/Display/Display.d \
@@ -116,6 +121,8 @@ LINKER_SCRIPT_DEP+=
 
 
 # AVR32/GNU C Compiler
+
+
 
 
 

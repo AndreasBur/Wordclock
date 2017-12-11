@@ -182,7 +182,8 @@ stdReturnType Clock::getClockWords(byte Hour, byte Minute, ClockWordsType* Clock
 #if (CLOCK_SHOW_IT_IS_PERMANENTLY == STD_ON)
         ClockWords->ShowItIs = true;
 #else
-        if (Minute < CLOCK_MINUTE_STEP_IN_MINUTES || (Minute >= (CLOCK_NUMBER_OF_MINUTES_PER_HOUR/2) && Minute < (CLOCK_NUMBER_OF_MINUTES_PER_HOUR/2) + CLOCK_MINUTE_STEP_IN_MINUTES))
+        if (Minute < CLOCK_MINUTE_STEP_IN_MINUTES || (Minute >= (CLOCK_NUMBER_OF_MINUTES_PER_HOUR/2) && 
+            Minute < (CLOCK_NUMBER_OF_MINUTES_PER_HOUR/2) + CLOCK_MINUTE_STEP_IN_MINUTES)) 
         {
             ClockWords->ShowItIs = true;
         } else {
@@ -208,6 +209,40 @@ stdReturnType Clock::getClockWords(byte Hour, byte Minute, ClockWordsType* Clock
         ReturnValue = E_NOT_OK;
     }
     return ReturnValue;
+} /* getClockWords */
+
+
+/******************************************************************************************************************************************************
+  getClockWords()
+******************************************************************************************************************************************************/
+/*! \brief
+ *  \details
+ *
+ *  \return         -
+******************************************************************************************************************************************************/
+stdReturnType Clock::getClockWords(byte Hour, byte Minute, ClockWordsTableType ClockWordsTable)
+{
+    ClockWordsType ClockWords;
+    stdReturnType ReturnValue;
+
+    if(getClockWords(Hour, Minute, &ClockWords) == E_NOT_OK) ReturnValue = E_NOT_OK;
+
+    if(ClockWords.ShowItIs) {
+        ClockWordsTable[0] = Display::WORD_ES;
+        ClockWordsTable[1] = Display::WORD_IST;
+    } else {
+        ClockWordsTable[0] = Display::WORD_NONE;
+        ClockWordsTable[1] = Display::WORD_NONE;
+    }
+
+    ClockWordsTable[2] = ClockWords.HourWords[0];
+    ClockWordsTable[3] = ClockWords.HourWords[1];
+    ClockWordsTable[4] = ClockWords.MinuteWords[0];
+    ClockWordsTable[5] = ClockWords.MinuteWords[1];
+    ClockWordsTable[6] = ClockWords.MinuteWords[2];
+
+    return ReturnValue;
+
 } /* getClockWords */
 
 
@@ -245,11 +280,10 @@ boolean Clock::compareClockWords(ClockWordsType* ClockWords1, ClockWordsType* Cl
 stdReturnType Clock::setClock(byte Hour, byte Minute)
 {
     /* ----- Local Variables ---------------------------------------------- */
-    stdReturnType ReturnValue{E_NOT_OK};
+    stdReturnType ReturnValue{E_OK};
     ClockWordsType ClockWords;
 
     /* ----- Implementation ----------------------------------------------- */
-    ReturnValue = E_OK;
     if(getClockWords(Hour, Minute, &ClockWords) == E_NOT_OK) ReturnValue = E_NOT_OK;
 
     if(ClockWords.ShowItIs) {

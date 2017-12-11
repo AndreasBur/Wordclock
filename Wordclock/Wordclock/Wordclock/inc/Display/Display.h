@@ -140,12 +140,18 @@ class Display
 
     // word methods
     stdReturnType getWordIllumination(WordType, WordIlluminationType*) const;
+    stdReturnType getWordLength(byte*) const;
+    stdReturnType getWordColumn(byte*) const;
+    stdReturnType getWordRow(byte*) const;
     stdReturnType setWord(WordType, byte MaxLength = DISPLAY_WORD_LENGTH_UNLIMITED);
     stdReturnType clearWord(WordType);
     stdReturnType clearAllWords();
 
     // word methods fast
     WordIlluminationType getWordIlluminationFast(WordType Word) const { WordIlluminationType WordIllu; memcpy_P(&WordIllu, &WordIlluminationTable[Word], sizeof(WordIllu)); return WordIllu; }
+    byte getWordLengthFast(WordType Word) const { WordIlluminationType WordIllu = getWordIlluminationFast(Word); return WordIllu.Length; }
+    byte getWordRowFast(WordType Word) const { WordIlluminationType WordIllu = getWordIlluminationFast(Word); return WordIllu.Row; }
+    byte getWordColumnFast(WordType Word) const { WordIlluminationType WordIllu = getWordIlluminationFast(Word); return WordIllu.Column; }
     void setWordFast(WordType, byte MaxLength = DISPLAY_WORD_LENGTH_UNLIMITED);
     void clearWordFast(WordType);
     void clearAllWordsFast();

@@ -96,6 +96,7 @@ class Animation
     };
 
     enum AnimationType {
+        ANIMATION_TELETYPE,
         ANIMATION_FADE, // langsam verdunkeln
         ANIMATION_SNAKE,
         ANIMATION_EXPLODE,
