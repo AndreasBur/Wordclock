@@ -12,7 +12,7 @@
  *      \brief      Main header file of standard types library
  *
  *      \details    Library with standard types
- *                  
+ *
  *
  *****************************************************************************************************************************************************/
 #ifndef _STANDARD_TYPES_H_
@@ -22,6 +22,7 @@
  * INCLUDES
 ******************************************************************************************************************************************************/
 #include <stdint.h>
+#include "Arduino.h"
 
 /******************************************************************************************************************************************************
  *  GLOBAL CONSTANT MACROS
@@ -62,7 +63,7 @@
 /* toggle bit */
 #define TOGGLE_BIT(Var, Bit) \
     ((Var) ^= (UINT64_C(1) << (Bit)))
-    
+
 /* read bit */
 #define READ_BIT(Var, Bit) \
     (((Var) & (UINT64_C(1) << (Bit))) >> (Bit))
@@ -135,8 +136,31 @@ inline ReturnType bitMask(LengthType Length)
     return (bitValue(Length) - 1);
 }
 
-/* read Bit Group */
+template <typename VarType>
+inline bool readBit(VarType Var, bool Bit)
+{
+    return ((Var & (UINT64_C(1) << Bit)) >> Bit);
+}
 
+template <typename VarType>
+inline VarType writeBit(VarType Var, uint8_t Bit)
+{
+    return (Var & (unsigned)~(UINT64_C(1) << Bit));
+}
+
+template <typename VarType, typename PositionType>
+inline void shiftLeft(VarType& Var, PositionType Position)
+{
+    Var = Var << Position;
+}
+
+template <typename VarType, typename PositionType>
+inline void shiftRight(VarType Var, PositionType Position)
+{
+    Var = Var >> Position;
+}
+
+/* read Bit Group */
 template <typename VarType, typename MaskType, typename GroupType>
 inline VarType readBitGroup(VarType Var, MaskType BitGroupMask, GroupType BitGroupPosition)
 {

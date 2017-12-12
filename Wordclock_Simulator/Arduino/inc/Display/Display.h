@@ -9,10 +9,10 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       Display.h
- *      \brief
+ *      \brief      
  *
- *      \details
- *
+ *      \details    
+ *                  
 ******************************************************************************************************************************************************/
 #ifndef _DISPLAY_H_
 #define _DISPLAY_H_
@@ -105,7 +105,7 @@ class Display
 
     static const char DisplayCharacters[][DISPLAY_NUMBER_OF_COLUMNS + 1];
     static const WordIlluminationType WordIlluminationTable[];
-
+    
     // functions
     byte transformToSerpentine(byte, byte) const;
 
@@ -140,16 +140,22 @@ class Display
 
     // word methods
     stdReturnType getWordIllumination(WordType, WordIlluminationType*) const;
+    stdReturnType getWordLength(byte*) const;
+    stdReturnType getWordColumn(byte*) const;
+    stdReturnType getWordRow(byte*) const;
     stdReturnType setWord(WordType, byte MaxLength = DISPLAY_WORD_LENGTH_UNLIMITED);
     stdReturnType clearWord(WordType);
     stdReturnType clearAllWords();
 
     // word methods fast
     WordIlluminationType getWordIlluminationFast(WordType Word) const { WordIlluminationType WordIllu; memcpy_P(&WordIllu, &WordIlluminationTable[Word], sizeof(WordIllu)); return WordIllu; }
+    byte getWordLengthFast(WordType Word) const { WordIlluminationType WordIllu = getWordIlluminationFast(Word); return WordIllu.Length; }
+    byte getWordRowFast(WordType Word) const { WordIlluminationType WordIllu = getWordIlluminationFast(Word); return WordIllu.Row; }
+    byte getWordColumnFast(WordType Word) const { WordIlluminationType WordIllu = getWordIlluminationFast(Word); return WordIllu.Column; }
     void setWordFast(WordType, byte MaxLength = DISPLAY_WORD_LENGTH_UNLIMITED);
     void clearWordFast(WordType);
     void clearAllWordsFast();
-
+    
     // pixel methods
     stdReturnType writePixel(byte Column, byte Row, boolean Value) { if(Value) return setPixel(Column, Row); else return clearPixel(Column, Row); }
     stdReturnType writePixel(byte Index, boolean Value) { if(Value) return setPixel(Index); else return clearPixel(Index); }
@@ -185,8 +191,8 @@ class Display
     void clear() { Pixels.clearAllPixels(); }
 };
 
-#endif
 
+#endif
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E
 ******************************************************************************************************************************************************/

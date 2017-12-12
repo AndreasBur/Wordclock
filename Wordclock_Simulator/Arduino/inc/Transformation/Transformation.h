@@ -63,15 +63,15 @@ class Transformation
     // set methods
 
     // methods
-    stdReturnType shiftLeft(boolean = 0);
-    stdReturnType shiftRight(boolean = 0);
-    stdReturnType shiftUp(boolean = 0);
+    stdReturnType shiftLeft(boolean = false);
+    stdReturnType shiftRight(boolean = false);
+    stdReturnType shiftUp(boolean = false);
     stdReturnType shiftDown(boolean);
 
-    void shiftLeftFast(boolean = 0);
-    void shiftRightFast(boolean = 0);
-    void shiftUpFast(boolean = 0);
-    void shiftDownFast(boolean = 0);
+    void shiftLeftFast(boolean = false);
+    void shiftRightFast(boolean = false);
+    void shiftUpFast(boolean = false);
+    void shiftDownFast(boolean = false);
 };
 
 #endif

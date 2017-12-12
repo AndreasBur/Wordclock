@@ -5,8 +5,9 @@
 #include "Clock.h"
 /*End of auto generated code by Atmel studio */
 int flag;
-Display WordClockDisplay(20, 20, 20);
-Clock wcClock(&WordClockDisplay, Clock::MODE_WESSI);
+Display wcDisplay(20, 20, 20);
+Clock wcClock(&wcDisplay, Clock::MODE_WESSI);
+Animation wcAnimation(&wcDisplay, &wcClock);
 //DisplayCharacter WcDisplayCharacter;
 //Animation wcAnimation;
 //Beginning of Auto generated function prototypes by Atmel Studio
@@ -25,12 +26,15 @@ void setup() {
   //}
   //wcAnimation.setChar(0,0, 'T', ANIMATION_FONT_4X6);
   
-  
+  wcAnimation.setAnimation(Animation::ANIMATION_TELETYPE);
+  wcAnimation.setClock(12, 10);
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
-  wcClock.setClock(17,30);
-  WordClockDisplay.show();
-  WordClockDisplay.clearAllWords();
+  //wcClock.setClock(17,30);
+  //wcDisplay.show();
+  //wcDisplay.clearAllWords();
+  wcAnimation.task();
+  wcAnimation.show();
 }

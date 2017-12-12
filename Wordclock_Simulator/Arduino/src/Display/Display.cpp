@@ -41,13 +41,13 @@
 ******************************************************************************************************************************************************/
 const char Display::DisplayCharacters[][DISPLAY_NUMBER_OF_COLUMNS + 1] PROGMEM
 {
-    "ESKISTLF?NF",
+    "ESKISTLFÜNF",
     "ZEHNZWANZIG",
     "DREIVIERTEL",
     "TGNACHVORJM",
-    "HALBQZW?LFP",
+    "HALBQZWÖLFP",
     "ZWEINSIEBEN",
-    "KDREIRHF?NF",
+    "KDREIRHFÜNF",
     "ELFNEUNVIER",
     "WACHTZEHNRS",
     "BSECHSFMUHR"
@@ -59,7 +59,7 @@ const Display::WordIlluminationType Display::WordIlluminationTable[] PROGMEM
     {0,0,0},                                //  0 = DISPLAY_WORD_NONE           = ""
     {0,0,2},                                //  1 = Display::WORD_ES             = "ES"
     {0,3,3},                                //  2 = DISPLAY_WORD_IST            = "IST"
-    {0,7,4},                                //  3 = DISPLAY_WORD_FUENF          = "F?NF"
+    {0,7,4},                                //  3 = DISPLAY_WORD_FUENF          = "FÜNF"
     {1,0,4},                                //  4 = DISPLAY_WORD_ZEHN           = "ZEHN"
     {1,4,7},                                //  5 = DISPLAY_WORD_ZWANZIG        = "ZWANZIG"
     {2,0,4},                                //  6 = DISPLAY_WORD_DREI           = "DREI"
@@ -69,13 +69,13 @@ const Display::WordIlluminationType Display::WordIlluminationTable[] PROGMEM
     {3,2,4},                                // 10 = DISPLAY_WORD_NACH           = "NACH"
     {3,6,3},                                // 11 = DISPLAY_WORD_VOR            = "VOR"
     {4,0,4},                                // 12 = DISPLAY_WORD_HALB           = "HALB"
-    {4,5,5},                                // 13 = DISPLAY_WORD_HOUR_ZWOELF    = "ZW?LF"
+    {4,5,5},                                // 13 = DISPLAY_WORD_HOUR_ZWOELF    = "ZWÖLF"
     {5,0,4},                                // 14 = DISPLAY_WORD_HOUR_ZWEI      = "ZWEI"
     {5,2,3},                                // 15 = DISPLAY_WORD_HOUR_EIN       = "EIN"
     {5,2,4},                                // 16 = DISPLAY_WORD_HOUR_EINS      = "EINS"
     {5,5,6},                                // 17 = DISPLAY_WORD_HOUR_SIEBEN    = "SIEBEN"
     {6,1,4},                                // 18 = DISPLAY_WORD_HOUR_DREI      = "DREI"
-    {6,7,4},                                // 19 = DISPLAY_WORD_HOUR_FUENF     = "F?NF"
+    {6,7,4},                                // 19 = DISPLAY_WORD_HOUR_FUENF     = "FÜNF"
     {7,0,3},                                // 20 = DISPLAY_WORD_HOUR_ELF       = "ELF"
     {7,3,4},                                // 21 = DISPLAY_WORD_HOUR_NEUN      = "NEUN"
     {7,7,4},                                // 22 = DISPLAY_WORD_HOUR_VIER      = "VIER"

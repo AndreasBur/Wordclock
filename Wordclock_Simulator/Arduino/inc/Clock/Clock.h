@@ -24,6 +24,7 @@
 #include "Arduino.h"
 #include "Display.h"
 
+
 /******************************************************************************************************************************************************
  *  GLOBAL CONSTANT MACROS
 ******************************************************************************************************************************************************/
@@ -44,6 +45,8 @@
 #define CLOCK_NUMBER_OF_MINUTE_STEPS            12
 #define CLOCK_MAX_NUMBER_OF_MINUTE_WORDS        3
 
+#define CLOCK_IT_IS_NUMBER_OF_WORDS             2
+#define CLOCK_WORDS_TABLE_TYPE_SIZE             (CLOCK_MAX_NUMBER_OF_HOUR_WORDS + CLOCK_MAX_NUMBER_OF_MINUTE_WORDS + CLOCK_IT_IS_NUMBER_OF_WORDS)
 
 
 /******************************************************************************************************************************************************
@@ -56,8 +59,6 @@
 ******************************************************************************************************************************************************/
 class Clock
 {
-
-
 /******************************************************************************************************************************************************
  *  GLOBAL DATA TYPES AND STRUCTURES
 ******************************************************************************************************************************************************/
@@ -91,9 +92,10 @@ class Clock
         Display::WordType MinuteWords[CLOCK_MAX_NUMBER_OF_MINUTE_WORDS];
     };
 
+    using ClockWordsTableType = Display::WordType[CLOCK_WORDS_TABLE_TYPE_SIZE];
+
     using HoursTableEntryType = HoursType;
     using MinutesTableEntryType = MinutesType;
-
 
 
 /******************************************************************************************************************************************************
@@ -105,7 +107,7 @@ class Clock
 
     static const HoursType HoursTable[][CLOCK_NUMBER_OF_HOURS];
     static const MinutesType MinutesTable[][CLOCK_NUMBER_OF_MINUTE_STEPS];
-
+    
     // functions
     inline MinutesTableEntryType getMinutesTableEntry(ModesType Mode, byte Minute) {
         MinutesTableEntryType MinutesTableEntry;
@@ -129,6 +131,7 @@ class Clock
     // get methods
     ModesType getMode() const { return Mode; }
     stdReturnType getClockWords(byte, byte, ClockWordsType*);
+    stdReturnType getClockWords(byte, byte, ClockWordsTableType);
     boolean compareClockWords(ClockWordsType*, ClockWordsType*) const;
 
     // set methods

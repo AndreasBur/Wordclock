@@ -223,7 +223,7 @@ stdReturnType Clock::getClockWords(byte Hour, byte Minute, ClockWordsType* Clock
 stdReturnType Clock::getClockWords(byte Hour, byte Minute, ClockWordsTableType ClockWordsTable)
 {
     ClockWordsType ClockWords;
-    stdReturnType ReturnValue;
+    stdReturnType ReturnValue{E_OK};
 
     if(getClockWords(Hour, Minute, &ClockWords) == E_NOT_OK) ReturnValue = E_NOT_OK;
 
@@ -235,11 +235,11 @@ stdReturnType Clock::getClockWords(byte Hour, byte Minute, ClockWordsTableType C
         ClockWordsTable[1] = Display::WORD_NONE;
     }
 
-    ClockWordsTable[2] = ClockWords.HourWords[0];
-    ClockWordsTable[3] = ClockWords.HourWords[1];
-    ClockWordsTable[4] = ClockWords.MinuteWords[0];
-    ClockWordsTable[5] = ClockWords.MinuteWords[1];
-    ClockWordsTable[6] = ClockWords.MinuteWords[2];
+    ClockWordsTable[2] = ClockWords.MinuteWords[0];
+    ClockWordsTable[3] = ClockWords.MinuteWords[1];
+    ClockWordsTable[4] = ClockWords.MinuteWords[2];
+    ClockWordsTable[5] = ClockWords.HourWords[0];
+    ClockWordsTable[6] = ClockWords.HourWords[1];
 
     return ReturnValue;
 

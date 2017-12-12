@@ -52,9 +52,10 @@
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-Animation::Animation(Display* Display)
+Animation::Animation(Display* Display, Clock* Clock)
 {
     pDisplay = Display;
+    pClock = Clock;
 } /* Animation */
 
 
@@ -112,6 +113,102 @@ stdReturnType Animation::setChar(byte Column, byte Row, unsigned char Char, Font
 #endif
     return E_NOT_OK;
 } /* setChar */
+
+
+/******************************************************************************************************************************************************
+  setAnimation()
+******************************************************************************************************************************************************/
+/*! \brief
+ *  \details
+ *
+ *  \return         -
+******************************************************************************************************************************************************/
+void Animation::setAnimation(AnimationType Animation)
+{
+    CurrentAnimation = Animation;
+
+    switch(Animation)
+    {
+        case ANIMATION_TELETYPE :
+            Animations.Teletype.init(pDisplay, pClock);
+            break;
+        case ANIMATION_CUBE :
+            break;
+        case ANIMATION_FADE :
+            break;
+        case ANIMATION_SNAKE :
+            break;
+        case ANIMATION_EXPLODE :
+            break;
+        case ANIMATION_IMPLODE :
+            break;
+        default :
+            break;
+    }
+} /* setAnimation */
+
+
+/******************************************************************************************************************************************************
+  setClock()
+******************************************************************************************************************************************************/
+/*! \brief
+ *  \details
+ *
+ *  \return         -
+******************************************************************************************************************************************************/
+stdReturnType Animation::setClock(byte Hour, byte Minute)
+{
+    switch(CurrentAnimation)
+    {
+        case ANIMATION_TELETYPE :
+            return Animations.Teletype.setClock(Hour, Minute);
+            break;
+        case ANIMATION_CUBE :
+            break;
+        case ANIMATION_FADE :
+            break;
+        case ANIMATION_SNAKE :
+            break;
+        case ANIMATION_EXPLODE :
+            break;
+        case ANIMATION_IMPLODE :
+            break;
+        default :
+            break;
+    }
+    return E_NOT_OK;
+} /* setClock */
+
+
+/******************************************************************************************************************************************************
+  task()
+******************************************************************************************************************************************************/
+/*! \brief
+ *  \details
+ *
+ *  \return         -
+******************************************************************************************************************************************************/
+void Animation::task()
+{
+    switch(CurrentAnimation)
+    {
+        case ANIMATION_TELETYPE :
+            return Animations.Teletype.task();
+            break;
+        case ANIMATION_CUBE :
+            break;
+        case ANIMATION_FADE :
+            break;
+        case ANIMATION_SNAKE :
+            break;
+        case ANIMATION_EXPLODE :
+            break;
+        case ANIMATION_IMPLODE :
+            break;
+        default :
+            break;
+    }
+} /* task */
 
 
 /******************************************************************************************************************************************************

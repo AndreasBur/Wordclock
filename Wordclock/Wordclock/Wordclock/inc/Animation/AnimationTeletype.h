@@ -50,6 +50,7 @@ class AnimationTeletype
 ******************************************************************************************************************************************************/
     enum StateType {
         STATE_NONE,
+        STATE_UNINIT,
         STATE_IDLE,
         //STATE_READY,
         STATE_WORKING
@@ -63,7 +64,10 @@ class AnimationTeletype
     byte CurrentWordIndex;
     byte CurrentWordLength;
     byte CurrentCharIndex;
-    boolean UseCursor;
+
+    // functions
+    void reset();
+    stdReturnType setNextWordIndex();
 
   public:
     AnimationTeletype();
@@ -74,6 +78,7 @@ class AnimationTeletype
 	// set methods
 
 	// methods
+    void init(Display*, Clock*);
     stdReturnType setClock(byte, byte);
     void task();
 

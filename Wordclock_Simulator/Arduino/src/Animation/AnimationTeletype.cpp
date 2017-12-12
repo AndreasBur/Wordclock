@@ -121,7 +121,7 @@ void AnimationTeletype::task()
 {
     if(State == STATE_WORKING) {
         if(CurrentCharIndex >= CurrentWordLength) {
-            if(setNextWordIndex() == E_NOT_OK) {
+            if(setNextWordIndex() == E_NOT_OK) { 
                 State = STATE_IDLE;
                 return;
             }
@@ -152,8 +152,8 @@ void AnimationTeletype::reset()
     CurrentWordIndex = 0;
     CurrentWordLength = 0;
     CurrentCharIndex = 0;
+    UseCursor = false;
 } /* reset */
-
 
 /******************************************************************************************************************************************************
   setNextWordIndex()

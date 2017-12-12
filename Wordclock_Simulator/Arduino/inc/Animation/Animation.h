@@ -23,7 +23,7 @@
 #include "StandardTypes.h"
 #include "Arduino.h"
 #include "Display.h"
-
+#include "AnimationTeletype.h"
 
 /******************************************************************************************************************************************************
  *  GLOBAL CONSTANT MACROS
@@ -96,18 +96,30 @@ class Animation
     };
 
     enum AnimationType {
+        ANIMATION_TELETYPE,
+        ANIMATION_FADE, // langsam verdunkeln
         ANIMATION_SNAKE,
         ANIMATION_EXPLODE,
         ANIMATION_IMPLODE,
-        ANIMATION_CUBE
+        ANIMATION_CUBE,
+        ANIMATION_NONE
     };
+
+    union AnimationsType {
+        AnimationTeletype Teletype;
+        AnimationsType() { AnimationTeletype(); }
+        ~AnimationsType() {}
+    };
+
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
     Display* pDisplay;
+    Clock* pClock;
     AnimationType CurrentAnimation;
+    AnimationsType Animations;
 
 #if(ANIMATION_SUPPORT_FONT_4X6 == STD_ON)
     static const unsigned char Font_4x6[][ANIMATION_FONT_4X6_WIDTH];
@@ -134,18 +146,21 @@ class Animation
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    Animation(Display*);
+    //Animation() {}
+    Animation(Display*, Clock*);
     ~Animation();
 
     // get methods
-
+    AnimationType getAnimation() const { return CurrentAnimation; }
 
     // set methods
+    void setAnimation(AnimationType);
     stdReturnType setChar(byte, byte, unsigned char, FontType);
-
+    stdReturnType setClock(byte, byte);
     // methods
     void init();
-
+    void task();
+    void show() { pDisplay->show(); }
 };
 
 

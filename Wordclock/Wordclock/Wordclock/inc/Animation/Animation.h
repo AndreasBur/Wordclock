@@ -101,12 +101,13 @@ class Animation
         ANIMATION_SNAKE,
         ANIMATION_EXPLODE,
         ANIMATION_IMPLODE,
-        ANIMATION_CUBE
+        ANIMATION_CUBE,
+        ANIMATION_NONE
     };
 
     union AnimationsType {
         AnimationTeletype Teletype;
-        AnimationsType() { }
+        AnimationsType() { AnimationTeletype(); }
         ~AnimationsType() {}
     };
 
@@ -116,6 +117,7 @@ class Animation
 ******************************************************************************************************************************************************/
   private:
     Display* pDisplay;
+    Clock* pClock;
     AnimationType CurrentAnimation;
     AnimationsType Animations;
 
@@ -145,17 +147,20 @@ class Animation
 ******************************************************************************************************************************************************/
   public:
     //Animation() {}
-    Animation(Display*);
+    Animation(Display*, Clock*);
     ~Animation();
 
     // get methods
-
+    AnimationType getAnimation() const { return CurrentAnimation; }
 
     // set methods
+    void setAnimation(AnimationType);
     stdReturnType setChar(byte, byte, unsigned char, FontType);
-
+    stdReturnType setClock(byte, byte);
     // methods
     void init();
+    void task();
+    void show() { pDisplay->show(); }
 };
 
 
