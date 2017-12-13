@@ -129,10 +129,14 @@ void Animation::setAnimation(AnimationType Animation)
 
     switch(Animation)
     {
+        case ANIMATION_CURSOR :
+            Animations.Cursor.init(pDisplay, pClock);
+            break;
         case ANIMATION_TELETYPE :
             Animations.Teletype.init(pDisplay, pClock);
             break;
-        case ANIMATION_CUBE :
+        case ANIMATION_DROP :
+            Animations.Drop.init(pDisplay, pClock);
             break;
         case ANIMATION_FADE :
             break;
@@ -160,10 +164,14 @@ stdReturnType Animation::setClock(byte Hour, byte Minute)
 {
     switch(CurrentAnimation)
     {
+        case ANIMATION_CURSOR :
+            return Animations.Cursor.setClock(Hour, Minute);
+            break;
         case ANIMATION_TELETYPE :
             return Animations.Teletype.setClock(Hour, Minute);
             break;
-        case ANIMATION_CUBE :
+        case ANIMATION_DROP :
+            return Animations.Drop.setClock(Hour, Minute);
             break;
         case ANIMATION_FADE :
             break;
@@ -192,10 +200,14 @@ void Animation::task()
 {
     switch(CurrentAnimation)
     {
+        case ANIMATION_CURSOR :
+            return Animations.Cursor.task();
+            break;
         case ANIMATION_TELETYPE :
             return Animations.Teletype.task();
             break;
-        case ANIMATION_CUBE :
+        case ANIMATION_DROP :
+            return Animations.Drop.task();
             break;
         case ANIMATION_FADE :
             break;

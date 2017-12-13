@@ -57,6 +57,7 @@ AnimationTeletype::AnimationTeletype()
     pDisplay = nullptr;
     pClock = nullptr;
     State = STATE_UNINIT;
+    reset();
 } /* AnimationTeletype */
 
 
@@ -82,6 +83,7 @@ void AnimationTeletype::init(Display* Display, Clock* Clock)
     pDisplay = Display;
     pClock = Clock;
     State = STATE_IDLE;
+    reset();
 } /* init */
 
 
@@ -104,7 +106,6 @@ stdReturnType AnimationTeletype::setClock(byte Hour, byte Minute)
         CurrentWordLength = pDisplay->getWordLengthFast(ClockWordsTable[CurrentWordIndex]);
         State = STATE_WORKING;
     }
-
     return ReturnValue;
 } /* setClock */
 

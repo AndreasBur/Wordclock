@@ -185,8 +185,8 @@ stdReturnType Display::getCharacter(byte Column, byte Row, char* Character) cons
 ******************************************************************************************************************************************************/
 stdReturnType Display::getCharacter(byte Index, char* Character) const
 {
-    byte Row = Index / DISPLAY_NUMBER_OF_COLUMNS;
-    byte Column = Index % DISPLAY_NUMBER_OF_COLUMNS;
+    byte Row, Column;
+    indexToColumnAndRowFast(Index, Row, Column);
 
     if(Index < DISPLAY_NUMBER_OF_LEDS) {
         *Character =  getCharacterFast(Row, Column);
@@ -353,9 +353,8 @@ void Display::clearAllWordsFast()
 ******************************************************************************************************************************************************/
 stdReturnType Display::getPixel(byte Index, boolean* Value) const
 {
-    byte Row = Index / DISPLAY_NUMBER_OF_COLUMNS;
-    byte Column = Index % DISPLAY_NUMBER_OF_COLUMNS;
-
+    byte Row, Column;
+    indexToColumnAndRowFast(Index, Row, Column);
     return getPixel(Row, Column, Value);
 } /* getPixel */
 
@@ -370,9 +369,8 @@ stdReturnType Display::getPixel(byte Index, boolean* Value) const
 ******************************************************************************************************************************************************/
 boolean Display::getPixelFast(byte Index) const
 {
-    byte Row = Index / DISPLAY_NUMBER_OF_COLUMNS;
-    byte Column = Index % DISPLAY_NUMBER_OF_COLUMNS;
-
+    byte Row, Column;
+    indexToColumnAndRowFast(Index, Row, Column);
     return getPixelFast(Row, Column);
 } /* getPixelFast */
 
@@ -476,9 +474,8 @@ void Display::setPixelFast(byte Column, byte Row)
 ******************************************************************************************************************************************************/
 stdReturnType Display::setPixel(byte Index)
 {
-    byte Row = Index / DISPLAY_NUMBER_OF_COLUMNS;
-    byte Column = Index % DISPLAY_NUMBER_OF_COLUMNS;
-
+    byte Row, Column;
+    indexToColumnAndRowFast(Index, Row, Column);
     return setPixel(Column,  Row);
 } /* setPixel */
 
@@ -493,9 +490,8 @@ stdReturnType Display::setPixel(byte Index)
 ******************************************************************************************************************************************************/
 void Display::setPixelFast(byte Index)
 {
-    byte Row = Index / DISPLAY_NUMBER_OF_COLUMNS;
-    byte Column = Index % DISPLAY_NUMBER_OF_COLUMNS;
-
+    byte Row, Column;
+    indexToColumnAndRowFast(Index, Row, Column);
     setPixelFast(Column,  Row);
 } /* setPixelFast */
 
@@ -548,9 +544,8 @@ void Display::clearPixelFast(byte Column, byte Row)
 ******************************************************************************************************************************************************/
 stdReturnType Display::clearPixel(byte Index)
 {
-    byte Row = Index / DISPLAY_NUMBER_OF_COLUMNS;
-    byte Column = Index % DISPLAY_NUMBER_OF_COLUMNS;
-
+    byte Row, Column;
+    indexToColumnAndRowFast(Index, Row, Column);
     return clearPixel(Column,  Row);
 } /* clearPixel */
 
@@ -565,9 +560,8 @@ stdReturnType Display::clearPixel(byte Index)
 ******************************************************************************************************************************************************/
 void Display::clearPixelFast(byte Index)
 {
-    byte Row = Index / DISPLAY_NUMBER_OF_COLUMNS;
-    byte Column = Index % DISPLAY_NUMBER_OF_COLUMNS;
-
+    byte Row, Column;
+    indexToColumnAndRowFast(Index, Row, Column);
     clearPixelFast(Column,  Row);
 } /* clearPixelFast */
 

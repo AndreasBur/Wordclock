@@ -36,6 +36,7 @@
 #define DISPLAY_NUMBER_OF_ROWS                  10
 #define DISPLAY_NUMBER_OF_COLUMNS               11
 #define DISPLAY_NUMBER_OF_LEDS                  WS2812_NUMBER_OF_LEDS
+#define DISPLAY_NUMBER_OF_PIXELS                DISPLAY_NUMBER_OF_LEDS
 
 #if ((DISPLAY_NUMBER_OF_ROWS * DISPLAY_NUMBER_OF_COLUMNS) != DISPLAY_NUMBER_OF_LEDS)
     #error "Display: LED number missmatch"
@@ -183,6 +184,14 @@ class Display
     PixelColumnType getPixelColumnFast(byte) const;
     void setPixelRowFast(byte, PixelRowType);
     void setPixelColumnFast(byte, PixelColumnType);
+
+    void indexToColumnAndRowFast(byte Index, byte& Row, byte& Column) const {
+        Row = Index / DISPLAY_NUMBER_OF_COLUMNS;
+        Column = Index % DISPLAY_NUMBER_OF_COLUMNS;
+    }
+    byte columnAndRowToIndexFast(byte Column, byte Row) const {
+        return (Row * DISPLAY_NUMBER_OF_COLUMNS) + Column;
+    }
 
     // methods
     void init();

@@ -64,7 +64,6 @@ class AnimationTeletype
     byte CurrentWordIndex;
     byte CurrentWordLength;
     byte CurrentCharIndex;
-    boolean UseCursor;
 
     // functions
     void reset();

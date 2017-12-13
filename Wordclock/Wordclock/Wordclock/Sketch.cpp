@@ -26,7 +26,7 @@ void setup() {
   //}
   //wcAnimation.setChar(0,0, 'T', ANIMATION_FONT_4X6);
   
-  wcAnimation.setAnimation(Animation::ANIMATION_TELETYPE);
+  wcAnimation.setAnimation(Animation::ANIMATION_CURSOR);
   wcAnimation.setClock(12, 10);
 }
 

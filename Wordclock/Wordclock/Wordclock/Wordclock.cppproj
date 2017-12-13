@@ -236,6 +236,12 @@
     <Compile Include="inc\Animation\Animation.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="inc\Animation\AnimationCursor.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="inc\Animation\AnimationDrop.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="inc\Animation\AnimationTeletype.h">
       <SubType>compile</SubType>
     </Compile>
@@ -264,6 +270,12 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="src\Animation\Animation.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\Animation\AnimationCursor.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\Animation\AnimationDrop.cpp">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="src\Animation\AnimationTeletype.cpp">

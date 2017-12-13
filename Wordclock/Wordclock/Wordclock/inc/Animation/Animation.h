@@ -24,6 +24,8 @@
 #include "Arduino.h"
 #include "Display.h"
 #include "AnimationTeletype.h"
+#include "AnimationCursor.h"
+#include "AnimationDrop.h"
 
 /******************************************************************************************************************************************************
  *  GLOBAL CONSTANT MACROS
@@ -96,18 +98,21 @@ class Animation
     };
 
     enum AnimationType {
+        ANIMATION_CURSOR,
         ANIMATION_TELETYPE,
         ANIMATION_FADE, // langsam verdunkeln
         ANIMATION_SNAKE,
         ANIMATION_EXPLODE,
         ANIMATION_IMPLODE,
-        ANIMATION_CUBE,
+        ANIMATION_DROP,
         ANIMATION_NONE
     };
 
     union AnimationsType {
+        AnimationCursor Cursor;
         AnimationTeletype Teletype;
-        AnimationsType() { AnimationTeletype(); }
+        AnimationDrop Drop;
+        AnimationsType() { }
         ~AnimationsType() {}
     };
 
