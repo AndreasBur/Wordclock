@@ -25,6 +25,8 @@
 #include "Display.h"
 #include "AnimationTeletype.h"
 #include "AnimationCursor.h"
+#include "AnimationDrop.h"
+
 
 /******************************************************************************************************************************************************
  *  GLOBAL CONSTANT MACROS
@@ -103,14 +105,15 @@ class Animation
         ANIMATION_SNAKE,
         ANIMATION_EXPLODE,
         ANIMATION_IMPLODE,
-        ANIMATION_CUBE,
+        ANIMATION_DROP,
         ANIMATION_NONE
     };
 
     union AnimationsType {
         AnimationCursor Cursor;
         AnimationTeletype Teletype;
-        AnimationsType() { }
+        AnimationDrop Drop;
+        AnimationsType() {}
         ~AnimationsType() {}
     };
 
@@ -144,6 +147,7 @@ class Animation
     stdReturnType convertCharToFontIndex(unsigned char, byte*);
     stdReturnType setCharFontHorizontal(byte, byte, unsigned char, const unsigned char*, byte, byte);
     stdReturnType setCharFontVertical(byte, byte, unsigned char, const unsigned char*, byte, byte);
+
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S

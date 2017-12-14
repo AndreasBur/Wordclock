@@ -74,6 +74,7 @@
 		</Linker>
 		<Unit filename="Arduino/inc/Animation/Animation.h" />
 		<Unit filename="Arduino/inc/Animation/AnimationCursor.h" />
+		<Unit filename="Arduino/inc/Animation/AnimationDrop.h" />
 		<Unit filename="Arduino/inc/Animation/AnimationTeletype.h" />
 		<Unit filename="Arduino/inc/Clock/Clock.h" />
 		<Unit filename="Arduino/inc/Display/Display.h" />
@@ -83,6 +84,7 @@
 		<Unit filename="Arduino/inc/Transformation/Transformation.h" />
 		<Unit filename="Arduino/src/Animation/Animation.cpp" />
 		<Unit filename="Arduino/src/Animation/AnimationCursor.cpp" />
+		<Unit filename="Arduino/src/Animation/AnimationDrop.cpp" />
 		<Unit filename="Arduino/src/Animation/AnimationTeletype.cpp" />
 		<Unit filename="Arduino/src/Animation/Font.cpp" />
 		<Unit filename="Arduino/src/Clock/Clock.cpp" />

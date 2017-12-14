@@ -30,7 +30,7 @@
 ******************************************************************************************************************************************************/
 /* Display configuration parameter */
 #define DISPLAY_DATA_PIN                        10
-#define DISPLAY_LED_STRIPE_SERPENTINE           STD_ON
+#define DISPLAY_LED_STRIPE_SERPENTINE           STD_OFF
 
 /* Display parameter */
 #define DISPLAY_NUMBER_OF_ROWS                  10
@@ -164,6 +164,8 @@ class Display
     stdReturnType setPixel(byte);
     stdReturnType clearPixel(byte, byte);
     stdReturnType clearPixel(byte);
+    stdReturnType togglePixel(byte, byte);
+    stdReturnType togglePixel(byte);
     stdReturnType getPixel(byte, byte, boolean*) const;
     stdReturnType getPixel(byte, boolean*) const;
     stdReturnType getPixelRow(byte, PixelRowType*) const;
@@ -178,6 +180,8 @@ class Display
     void setPixelFast(byte);
     void clearPixelFast(byte, byte);
     void clearPixelFast(byte);
+    void togglePixelFast(byte, byte);
+    void togglePixelFast(byte);
     boolean getPixelFast(byte, byte) const;
     boolean getPixelFast(byte) const;
     PixelRowType getPixelRowFast(byte) const;

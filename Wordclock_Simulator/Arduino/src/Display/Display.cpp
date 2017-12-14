@@ -355,7 +355,7 @@ stdReturnType Display::getPixel(byte Index, boolean* Value) const
 {
     byte Row, Column;
     indexToColumnAndRowFast(Index, Row, Column);
-    return getPixel(Row, Column, Value);
+    return getPixel(Column, Row, Value);
 } /* getPixel */
 
 
@@ -371,7 +371,7 @@ boolean Display::getPixelFast(byte Index) const
 {
     byte Row, Column;
     indexToColumnAndRowFast(Index, Row, Column);
-    return getPixelFast(Row, Column);
+    return getPixelFast(Column, Row);
 } /* getPixelFast */
 
 
@@ -385,7 +385,7 @@ boolean Display::getPixelFast(byte Index) const
 ******************************************************************************************************************************************************/
 stdReturnType Display::getPixel(byte Column, byte Row, boolean* Value)  const
 {
-    stdReturnType ReturnValue = E_NOT_OK;
+    stdReturnType ReturnValue{E_NOT_OK};
     PixelColorType Pixel;
 
 #if (DISPLAY_LED_STRIPE_SERPENTINE == STD_ON)
@@ -508,9 +508,9 @@ stdReturnType Display::clearPixel(byte Column, byte Row)
 {
 #if (DISPLAY_LED_STRIPE_SERPENTINE == STD_ON)
     /* if led stripe is snake or serpentine then odd row: count from right to left */
-    return Pixels.setPixel(transformToSerpentine(Column,  Row), 0, 0, 0);
+    return Pixels.clearPixel(transformToSerpentine(Column,  Row));
 #else
-    return Pixels.setPixel((Row * DISPLAY_NUMBER_OF_COLUMNS) + Column, 0, 0, 0);
+    return Pixels.clearPixel((Row * DISPLAY_NUMBER_OF_COLUMNS) + Column);
 #endif
 } /* clearPixel */
 
@@ -527,9 +527,9 @@ void Display::clearPixelFast(byte Column, byte Row)
 {
 #if (DISPLAY_LED_STRIPE_SERPENTINE == STD_ON)
     /* if led stripe is snake or serpentine then odd row: count from right to left */
-    Pixels.setPixelFast(transformToSerpentine(Column,  Row), 0, 0, 0);
+    Pixels.clearPixelFast(transformToSerpentine(Column,  Row));
 #else
-    Pixels.setPixelFast((Row * DISPLAY_NUMBER_OF_COLUMNS) + Column, 0, 0, 0);
+    Pixels.clearPixelFast((Row * DISPLAY_NUMBER_OF_COLUMNS) + Column);
 #endif
 } /* clearPixelFast */
 
@@ -564,6 +564,88 @@ void Display::clearPixelFast(byte Index)
     indexToColumnAndRowFast(Index, Row, Column);
     clearPixelFast(Column,  Row);
 } /* clearPixelFast */
+
+
+/******************************************************************************************************************************************************
+  togglePixel()
+******************************************************************************************************************************************************/
+/*! \brief
+ *  \details
+ *
+ *  \return         -
+******************************************************************************************************************************************************/
+stdReturnType Display::togglePixel(byte Column, byte Row)
+{
+    boolean Pixel;
+
+#if (DISPLAY_LED_STRIPE_SERPENTINE == STD_ON)
+    /* if led stripe is snake or serpentine then odd row: count from right to left */
+    byte Index = transformToSerpentine(Column,  Row);
+    getPixel(Index, &Pixel);
+    if(Pixel) { return Pixels.clearPixel(Index); }
+    else { return Pixels.setPixel(Index, Color); }
+#else
+    byte Index = (Row * DISPLAY_NUMBER_OF_COLUMNS) + Column;
+    getPixel(Index, &Pixel);
+    if(Pixel) { return Pixels.clearPixel(Index); }
+    else { return Pixels.setPixel(Index, Color); }
+#endif
+} /* togglePixel */
+
+
+/******************************************************************************************************************************************************
+  togglePixelFast()
+******************************************************************************************************************************************************/
+/*! \brief
+ *  \details
+ *
+ *  \return         -
+******************************************************************************************************************************************************/
+void Display::togglePixelFast(byte Column, byte Row)
+{
+#if (DISPLAY_LED_STRIPE_SERPENTINE == STD_ON)
+    /* if led stripe is snake or serpentine then odd row: count from right to left */
+    byte Index = transformToSerpentine(Column,  Row);
+    if(getPixelFast(Index)) Pixels.clearPixelFast(Index);
+    else Pixels.setPixelFast(Index, Color);
+#else
+    byte Index = (Row * DISPLAY_NUMBER_OF_COLUMNS) + Column;
+    if(getPixelFast(Index)) Pixels.clearPixelFast(Index);
+    else Pixels.setPixelFast(Index, Color);
+#endif
+} /* togglePixelFast */
+
+
+/******************************************************************************************************************************************************
+  togglePixel()
+******************************************************************************************************************************************************/
+/*! \brief          
+ *  \details        
+ *                  
+ *  \return         -
+******************************************************************************************************************************************************/
+stdReturnType Display::togglePixel(byte Index)
+{
+    byte Row, Column;
+    indexToColumnAndRowFast(Index, Row, Column);
+    return togglePixel(Column,  Row);
+} /* togglePixel */
+
+
+/******************************************************************************************************************************************************
+  togglePixelFast()
+******************************************************************************************************************************************************/
+/*! \brief          
+ *  \details        
+ *                  
+ *  \return         -
+******************************************************************************************************************************************************/
+void Display::togglePixelFast(byte Index)
+{
+    byte Row, Column;
+    indexToColumnAndRowFast(Index, Row, Column);
+    togglePixelFast(Column,  Row);
+} /* togglePixelFast */
 
 
 /******************************************************************************************************************************************************

@@ -56,6 +56,7 @@ Animation::Animation(Display* Display, Clock* Clock)
 {
     pDisplay = Display;
     pClock = Clock;
+    CurrentAnimation = ANIMATION_NONE;
 } /* Animation */
 
 

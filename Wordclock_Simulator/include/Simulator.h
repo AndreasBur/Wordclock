@@ -40,8 +40,10 @@ class Simulator : public wxFrame
         //stdReturnType setPin(byte);
         stdReturnType setPixel(byte, WS2812PixelType);
         stdReturnType setPixel(byte, byte, byte, byte);
+        stdReturnType clearPixel(byte Index) { return setPixel(Index, 0, 0, 0); }
         void setPixelFast(byte, WS2812PixelType);
         void setPixelFast(byte, byte, byte, byte);
+        void clearPixelFast(byte Index) { setPixelFast(Index, 0, 0, 0); }
 
         // methods
         //void init();

@@ -56,6 +56,7 @@ Animation::Animation(Display* Display, Clock* Clock)
 {
     pDisplay = Display;
     pClock = Clock;
+    CurrentAnimation = ANIMATION_NONE;
 } /* Animation */
 
 
@@ -135,7 +136,8 @@ void Animation::setAnimation(AnimationType Animation)
         case ANIMATION_TELETYPE :
             Animations.Teletype.init(pDisplay, pClock);
             break;
-        case ANIMATION_CUBE :
+        case ANIMATION_DROP :
+            Animations.Drop.init(pDisplay, pClock);
             break;
         case ANIMATION_FADE :
             break;
@@ -169,7 +171,8 @@ stdReturnType Animation::setClock(byte Hour, byte Minute)
         case ANIMATION_TELETYPE :
             return Animations.Teletype.setClock(Hour, Minute);
             break;
-        case ANIMATION_CUBE :
+        case ANIMATION_DROP :
+            return Animations.Drop.setClock(Hour, Minute);
             break;
         case ANIMATION_FADE :
             break;
@@ -204,7 +207,8 @@ void Animation::task()
         case ANIMATION_TELETYPE :
             return Animations.Teletype.task();
             break;
-        case ANIMATION_CUBE :
+        case ANIMATION_DROP :
+            return Animations.Drop.task();
             break;
         case ANIMATION_FADE :
             break;
