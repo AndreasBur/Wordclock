@@ -79,20 +79,20 @@ class Clock
     struct MinutesType {
         HourModesType HourMode;
         byte HourOffset;
-        Display::WordType Words[CLOCK_MAX_NUMBER_OF_MINUTE_WORDS];
+        DisplayWords::WordType Words[CLOCK_MAX_NUMBER_OF_MINUTE_WORDS];
     };
 
     struct HoursType {
-        Display::WordType Words[CLOCK_MAX_NUMBER_OF_HOUR_WORDS];
+        DisplayWords::WordType Words[CLOCK_MAX_NUMBER_OF_HOUR_WORDS];
     };
 
     struct ClockWordsType {
         boolean ShowItIs;
-        Display::WordType HourWords[CLOCK_MAX_NUMBER_OF_HOUR_WORDS];
-        Display::WordType MinuteWords[CLOCK_MAX_NUMBER_OF_MINUTE_WORDS];
+        DisplayWords::WordType HourWords[CLOCK_MAX_NUMBER_OF_HOUR_WORDS];
+        DisplayWords::WordType MinuteWords[CLOCK_MAX_NUMBER_OF_MINUTE_WORDS];
     };
 
-    using ClockWordsTableType = Display::WordType[CLOCK_WORDS_TABLE_TYPE_SIZE];
+    using ClockWordsTableType = DisplayWords::WordType[CLOCK_WORDS_TABLE_TYPE_SIZE];
 
     using HoursTableEntryType = HoursType;
     using MinutesTableEntryType = MinutesType;

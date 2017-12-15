@@ -149,7 +149,7 @@ void AnimationTeletype::task()
 ******************************************************************************************************************************************************/
 void AnimationTeletype::reset()
 {
-    for(auto& Word : ClockWordsTable) { Word = Display::WORD_NONE; }
+    for(auto& Word : ClockWordsTable) { Word = DisplayWords::WORD_NONE; }
     CurrentWordIndex = 0;
     CurrentWordLength = 0;
     CurrentCharIndex = 0;
@@ -168,7 +168,7 @@ stdReturnType AnimationTeletype::setNextWordIndex()
 {
     for(uint8_t Index = CurrentWordIndex + 1; Index < CLOCK_WORDS_TABLE_TYPE_SIZE; Index++)
     {
-        if(ClockWordsTable[Index] != Display::WORD_NONE) {
+        if(ClockWordsTable[Index] != DisplayWords::WORD_NONE) {
             CurrentWordIndex = Index;
             return E_OK;
         }

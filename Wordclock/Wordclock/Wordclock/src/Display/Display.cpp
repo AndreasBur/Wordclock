@@ -57,7 +57,7 @@ const char Display::DisplayCharacters[][DISPLAY_NUMBER_OF_COLUMNS + 1] PROGMEM
 const Display::WordIlluminationType Display::WordIlluminationTable[] PROGMEM
 {
     {0,0,0},                                //  0 = DISPLAY_WORD_NONE           = ""
-    {0,0,2},                                //  1 = Display::WORD_ES             = "ES"
+    {0,0,2},                                //  1 = DisplayWords::WORD_ES       = "ES"
     {0,3,3},                                //  2 = DISPLAY_WORD_IST            = "IST"
     {0,7,4},                                //  3 = DISPLAY_WORD_FUENF          = "FÜNF"
     {1,0,4},                                //  4 = DISPLAY_WORD_ZEHN           = "ZEHN"
@@ -209,7 +209,7 @@ stdReturnType Display::getWordIllumination(WordType Word, WordIlluminationType* 
 {
     stdReturnType ReturnValue = E_NOT_OK;
 
-    if(Word < Display::WORD_NUMBER_OF_WORDS) {
+    if(Word < DisplayWords::WORD_NUMBER_OF_WORDS) {
         *WordIllu = getWordIlluminationFast(Word);
         ReturnValue = E_OK;
     } else {
@@ -232,7 +232,7 @@ stdReturnType Display::setWord(WordType Word, byte MaxLength)
     stdReturnType ReturnValue = E_NOT_OK;
     byte Length;
 
-    if(Word < Display::WORD_NUMBER_OF_WORDS) {
+    if(Word < DisplayWords::WORD_NUMBER_OF_WORDS) {
         ReturnValue = E_OK;
         WordIlluminationType WordIllu = getWordIlluminationFast(Word);
 
@@ -282,7 +282,7 @@ stdReturnType Display::clearWord(WordType Word)
 {
     stdReturnType ReturnValue = E_NOT_OK;
 
-    if(Word < Display::WORD_NUMBER_OF_WORDS) {
+    if(Word < DisplayWords::WORD_NUMBER_OF_WORDS) {
         ReturnValue = E_OK;
         WordIlluminationType WordIllu = getWordIlluminationFast(Word);
 
@@ -324,7 +324,7 @@ stdReturnType Display::clearAllWords()
 {
     stdReturnType ReturnValue = E_OK;
 
-    for(byte i = Display::WORD_ES; i < Display::WORD_NUMBER_OF_WORDS; i++) if(clearWord((WordType) i) == E_NOT_OK) ReturnValue = E_NOT_OK;
+    for(byte i = DisplayWords::WORD_ES; i < DisplayWords::WORD_NUMBER_OF_WORDS; i++) if(clearWord((WordType) i) == E_NOT_OK) ReturnValue = E_NOT_OK;
     return ReturnValue;
 } /* clearAllWords */
 
@@ -339,7 +339,7 @@ stdReturnType Display::clearAllWords()
 ******************************************************************************************************************************************************/
 void Display::clearAllWordsFast()
 {
-    for(byte i = Display::WORD_ES; i < Display::WORD_NUMBER_OF_WORDS; i++) clearWordFast((WordType) i);
+    for(byte i = DisplayWords::WORD_ES; i < DisplayWords::WORD_NUMBER_OF_WORDS; i++) clearWordFast((WordType) i);
 } /* clearAllWordsFast */
 
 

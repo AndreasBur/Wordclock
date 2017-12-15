@@ -62,6 +62,10 @@ class AnimationDrop
     Display* pDisplay;
     StateType State;
     byte CurrentPixelIndex;
+    Clock::ClockWordsTableType ClockWordsTable;
+    Display::WordIlluminationType CurrenWordIllumination;
+    byte CurrenWordIndex;
+    byte CurrentCharIndex;
 
     // functions
     void reset();

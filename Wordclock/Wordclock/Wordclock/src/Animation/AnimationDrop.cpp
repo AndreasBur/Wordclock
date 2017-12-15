@@ -98,9 +98,11 @@ void AnimationDrop::init(Display* Display, Clock* Clock)
 stdReturnType AnimationDrop::setClock(byte Hour, byte Minute)
 {
     stdReturnType ReturnValue{E_NOT_OK};
-    if(State == STATE_IDLE) {
+
+    if(pClock->getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
         if(setNextActivePixelIndex() == E_NOT_OK) { State = STATE_SET_TIME; }
         else { State = STATE_CLEAR_TIME; }
+        CurrenWordIndex = CLOCK_WORDS_TABLE_TYPE_SIZE - 1;
     }
     return ReturnValue;
 } /* setClock */
@@ -136,6 +138,8 @@ void AnimationDrop::task()
 void AnimationDrop::reset()
 {
     CurrentPixelIndex = 0;
+    CurrentCharIndex = 0;
+    CurrenWordIndex = 0;
 } /* reset */
 
 

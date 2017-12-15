@@ -23,7 +23,8 @@
 #include "StandardTypes.h"
 #include "Arduino.h"
 #include "WS2812.h"
-
+#include "DisplayCharacters.h"
+#include "DisplayWords.h"
 
 /******************************************************************************************************************************************************
  *  GLOBAL CONSTANT MACROS
@@ -59,9 +60,6 @@ class Display
  *  GLOBAL DATA TYPES AND STRUCTURES
 ******************************************************************************************************************************************************/
   public:
-
-#include "DisplayCharacters.h"
-#include "DisplayWords.h"
     /* type which describes the internal state of the Display */
     enum StateType {
         STATE_NONE,
@@ -94,6 +92,7 @@ class Display
     /* mapping to underlying hardware */
     using PixelColorType = WS2812PixelType;
     using Stripe = WS2812;
+    using WordType = DisplayWords::WordType;
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
@@ -126,16 +125,16 @@ class Display
     void setColor(PixelColorType sColor) { Color = sColor; }
 
     // char methods
-    stdReturnType setCharacter(CharacterType Character) { return setPixel(Character); }
-    stdReturnType clearCharacter(CharacterType Character) { return clearPixel(Character); }
-    stdReturnType getCharacter(CharacterType Character, boolean* Value) const { return getPixel(Character, Value); }
+    stdReturnType setCharacter(DisplayCharacters::CharacterType Character) { return setPixel(Character); }
+    stdReturnType clearCharacter(DisplayCharacters::CharacterType Character) { return clearPixel(Character); }
+    stdReturnType getCharacter(DisplayCharacters::CharacterType Character, boolean* Value) const { return getPixel(Character, Value); }
     stdReturnType getCharacter(byte, byte, char*) const;
     stdReturnType getCharacter(byte, char*) const;
 
     // char methods fast
-    void setCharacterFast(CharacterType Character) { setPixelFast(Character); }
-    void clearCharacterFast(CharacterType Character) { clearPixelFast(Character); }
-    boolean getCharacterFast(CharacterType Character) const { return getPixelFast(Character); }
+    void setCharacterFast(DisplayCharacters::CharacterType Character) { setPixelFast(Character); }
+    void clearCharacterFast(DisplayCharacters::CharacterType Character) { clearPixelFast(Character); }
+    boolean getCharacterFast(DisplayCharacters::CharacterType Character) const { return getPixelFast(Character); }
     char getCharacterFast(byte Column, byte Row) const { return pgm_read_byte(&DisplayCharacters[Row][Column]); }
     char getCharacterFast(byte Index) const { return pgm_read_byte(&DisplayCharacters[Index / DISPLAY_NUMBER_OF_COLUMNS][Index % DISPLAY_NUMBER_OF_COLUMNS]); }
 
