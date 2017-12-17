@@ -34,7 +34,7 @@
 #define DISPLAY_LED_STRIPE_SERPENTINE           STD_OFF
 
 /* Display parameter */
-#define DISPLAY_NUMBER_OF_ROWS                  10
+#define DISPLAY_NUMBER_OF_ROWS                  DISPLAY_CHARACTERS_NUMBER_OF_ROWS
 #define DISPLAY_NUMBER_OF_COLUMNS               DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS
 #define DISPLAY_NUMBER_OF_LEDS                  WS2812_NUMBER_OF_LEDS
 #define DISPLAY_NUMBER_OF_PIXELS                DISPLAY_NUMBER_OF_LEDS
@@ -127,30 +127,30 @@ class Display
     stdReturnType setCharacter(DisplayCharacters::CharacterIdType CharacterId) { return setPixel(CharacterId); }
     stdReturnType clearCharacter(DisplayCharacters::CharacterIdType CharacterId) { return clearPixel(CharacterId); }
     stdReturnType getCharacter(DisplayCharacters::CharacterIdType CharacterId, boolean* Value) const { return getPixel(CharacterId, Value); }
-    stdReturnType getCharacter(byte, byte, char*) const;
-    stdReturnType getCharacter(byte, char*) const;
+    //stdReturnType getCharacter(byte, byte, char*) const;
+    //stdReturnType getCharacter(byte, char*) const;
 
     // char methods fast
     void setCharacterFast(DisplayCharacters::CharacterIdType CharacterId) { setPixelFast(CharacterId); }
     void clearCharacterFast(DisplayCharacters::CharacterIdType CharacterId) { clearPixelFast(CharacterId); }
     boolean getCharacterFast(DisplayCharacters::CharacterIdType CharacterId) const { return getPixelFast(CharacterId); }
-    char getCharacterFast(byte Column, byte Row) const { return pgm_read_byte(&DisplayCharacters[Row][Column]); }
-    char getCharacterFast(byte Index) const { return pgm_read_byte(&DisplayCharacters[Index / DISPLAY_NUMBER_OF_COLUMNS][Index % DISPLAY_NUMBER_OF_COLUMNS]); }
+    //char getCharacterFast(byte Column, byte Row) const { return pgm_read_byte(&DisplayCharacters[Row][Column]); }
+    //char getCharacterFast(byte Index) const { return pgm_read_byte(&DisplayCharacters[Index / DISPLAY_NUMBER_OF_COLUMNS][Index % DISPLAY_NUMBER_OF_COLUMNS]); }
 
     // word methods
-    stdReturnType getWordIllumination(WordIdType, WordIlluminationType*) const;
-    stdReturnType getWordLength(byte*) const;
-    stdReturnType getWordColumn(byte*) const;
-    stdReturnType getWordRow(byte*) const;
+    //stdReturnType getWordIllumination(WordIdType, WordIlluminationType*) const;
+    //stdReturnType getWordLength(byte*) const;
+    //stdReturnType getWordColumn(byte*) const;
+    //stdReturnType getWordRow(byte*) const;
     stdReturnType setWord(WordIdType, byte MaxLength = DISPLAY_WORD_LENGTH_UNLIMITED);
     stdReturnType clearWord(WordIdType);
     stdReturnType clearAllWords();
 
     // word methods fast
-    WordIlluminationType getWordIlluminationFast(WordIdType Word) const { WordIlluminationType WordIllu; memcpy_P(&WordIllu, &WordIlluminationTable[Word], sizeof(WordIllu)); return WordIllu; }
-    byte getWordLengthFast(WordIdType Word) const { WordIlluminationType WordIllu = getWordIlluminationFast(Word); return WordIllu.Length; }
-    byte getWordRowFast(WordIdType Word) const { WordIlluminationType WordIllu = getWordIlluminationFast(Word); return WordIllu.Row; }
-    byte getWordColumnFast(WordIdType Word) const { WordIlluminationType WordIllu = getWordIlluminationFast(Word); return WordIllu.Column; }
+    //WordIlluminationType getWordIlluminationFast(WordIdType Word) const { WordIlluminationType WordIllu; memcpy_P(&WordIllu, &WordIlluminationTable[Word], sizeof(WordIllu)); return WordIllu; }
+    //byte getWordLengthFast(WordIdType Word) const { WordIlluminationType WordIllu = getWordIlluminationFast(Word); return WordIllu.Length; }
+    //byte getWordRowFast(WordIdType Word) const { WordIlluminationType WordIllu = getWordIlluminationFast(Word); return WordIllu.Row; }
+    //byte getWordColumnFast(WordIdType Word) const { WordIlluminationType WordIllu = getWordIlluminationFast(Word); return WordIllu.Column; }
     void setWordFast(WordIdType, byte MaxLength = DISPLAY_WORD_LENGTH_UNLIMITED);
     void clearWordFast(WordIdType);
     void clearAllWordsFast();

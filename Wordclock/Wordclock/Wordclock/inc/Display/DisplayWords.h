@@ -92,6 +92,11 @@ class DisplayWords
     byte getDisplayWordColumnFast(WordIdType WordId) const { DisplayWord Word; memcpy_P(&Word, &DisplayWordsTable[WordId], sizeof(DisplayWord)); return Word.getColumn(); }
     byte getDisplayWordLengthFast(WordIdType WordId) const { DisplayWord Word; memcpy_P(&Word, &DisplayWordsTable[WordId], sizeof(DisplayWord)); return Word.getLength(); }
 
+    stdReturnType getDisplayWord(WordIdType, DisplayWord&) const;
+    stdReturnType getDisplayWordLength(WordIdType, byte*) const;
+    stdReturnType getDisplayWordColumn(WordIdType, byte*) const;
+    stdReturnType getDisplayWordRow(WordIdType, byte*) const;
+
 	// set methods
 
 	// methods

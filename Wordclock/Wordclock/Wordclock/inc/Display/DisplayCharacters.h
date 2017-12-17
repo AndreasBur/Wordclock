@@ -31,8 +31,9 @@
 
 
 /* DisplayCharacters parameter */
-#define DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS        11
-
+#define DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS                11
+#define DISPLAY_CHARACTERS_NUMBER_OF_ROWS                   10
+#define DISPLAY_CHARACTERS_NUMBER_OF_CHARACTERS             (DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS * DISPLAY_CHARACTERS_NUMBER_OF_ROWS)
 
 /******************************************************************************************************************************************************
  *  GLOBAL FUNCTION MACROS
@@ -169,12 +170,24 @@ class DisplayCharacters
     DisplayCharacters();
     ~DisplayCharacters();
 
-	// get methods
-
+	// get methods fast
+    char getCharacterFast(byte Column, byte Row) const { return pgm_read_byte(&DisplayCharactersTable[Row][Column]); }
+    char getCharacterFast(byte Index) const { return pgm_read_byte(&DisplayCharactersTable[Index / DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS][Index % DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS]); }
+    
+    // get methods
+    stdReturnType getCharacter(byte, byte, char*) const;
+    stdReturnType getCharacter(byte, char*) const;
 
 	// set methods
 
 	// methods
+    void indexToColumnAndRow(byte Index, byte& Row, byte& Column) const {
+        Row = Index / DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS;
+        Column = Index % DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS;
+    }
+    byte columnAndRowToIndex(byte Column, byte Row) const {
+        return (Row * DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS) + Column;
+    }
 
 };
 
