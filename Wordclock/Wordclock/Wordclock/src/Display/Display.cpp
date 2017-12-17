@@ -186,7 +186,7 @@ stdReturnType Display::getCharacter(byte Column, byte Row, char* Character) cons
 stdReturnType Display::getCharacter(byte Index, char* Character) const
 {
     byte Row, Column;
-    indexToColumnAndRowFast(Index, Row, Column);
+    indexToColumnAndRow(Index, Row, Column);
 
     if(Index < DISPLAY_NUMBER_OF_LEDS) {
         *Character =  getCharacterFast(Row, Column);
@@ -205,7 +205,7 @@ stdReturnType Display::getCharacter(byte Index, char* Character) const
  *                  
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType Display::getWordIllumination(WordType Word, WordIlluminationType* WordIllu) const
+stdReturnType Display::getWordIllumination(WordIdType Word, WordIlluminationType* WordIllu) const
 {
     stdReturnType ReturnValue = E_NOT_OK;
 
@@ -227,14 +227,14 @@ stdReturnType Display::getWordIllumination(WordType Word, WordIlluminationType* 
  *                  
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType Display::setWord(WordType Word, byte MaxLength)
+stdReturnType Display::setWord(WordIdType WordId, byte MaxLength)
 {
     stdReturnType ReturnValue = E_NOT_OK;
     byte Length;
 
-    if(Word < DisplayWords::WORD_NUMBER_OF_WORDS) {
+    if(WordId < DisplayWords::WORD_NUMBER_OF_WORDS) {
         ReturnValue = E_OK;
-        WordIlluminationType WordIllu = getWordIlluminationFast(Word);
+        WordIlluminationType WordIllu = getWordIlluminationFast(WordId);
 
         if(MaxLength == DISPLAY_WORD_LENGTH_UNLIMITED) Length = WordIllu.Length;
         else Length = MaxLength;
@@ -257,11 +257,11 @@ stdReturnType Display::setWord(WordType Word, byte MaxLength)
  *                  
  *  \return         -
 ******************************************************************************************************************************************************/
-void Display::setWordFast(WordType Word, byte MaxLength)
+void Display::setWordFast(WordIdType WordId, byte MaxLength)
 {
     byte Length;
 
-    WordIlluminationType WordIllu = getWordIlluminationFast(Word);
+    WordIlluminationType WordIllu = getWordIlluminationFast(WordId);
 
     if(MaxLength == DISPLAY_WORD_LENGTH_UNLIMITED) Length = WordIllu.Length;
     else Length = MaxLength;
@@ -278,13 +278,13 @@ void Display::setWordFast(WordType Word, byte MaxLength)
  *                  
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType Display::clearWord(WordType Word)
+stdReturnType Display::clearWord(WordIdType WordId)
 {
     stdReturnType ReturnValue = E_NOT_OK;
 
-    if(Word < DisplayWords::WORD_NUMBER_OF_WORDS) {
+    if(WordId < DisplayWords::WORD_NUMBER_OF_WORDS) {
         ReturnValue = E_OK;
-        WordIlluminationType WordIllu = getWordIlluminationFast(Word);
+        WordIlluminationType WordIllu = getWordIlluminationFast(WordId);
 
         for(byte Index = 0; Index < WordIllu.Length; Index++) {
             if(clearPixel(WordIllu.Column + Index,  WordIllu.Row) == E_NOT_OK) ReturnValue = E_NOT_OK;
@@ -304,9 +304,9 @@ stdReturnType Display::clearWord(WordType Word)
  *                  
  *  \return         -
 ******************************************************************************************************************************************************/
-void Display::clearWordFast(WordType Word)
+void Display::clearWordFast(WordIdType WordId)
 {
-    WordIlluminationType WordIllu = getWordIlluminationFast(Word);
+    WordIlluminationType WordIllu = getWordIlluminationFast(WordId);
 
     for(byte Index = 0; Index < WordIllu.Length; Index++) { clearPixelFast(WordIllu.Column + Index,  WordIllu.Row); }
 } /* clearWordFast */
@@ -324,7 +324,7 @@ stdReturnType Display::clearAllWords()
 {
     stdReturnType ReturnValue = E_OK;
 
-    for(byte i = DisplayWords::WORD_ES; i < DisplayWords::WORD_NUMBER_OF_WORDS; i++) if(clearWord((WordType) i) == E_NOT_OK) ReturnValue = E_NOT_OK;
+    for(byte i = DisplayWords::WORD_ES; i < DisplayWords::WORD_NUMBER_OF_WORDS; i++) if(clearWord((WordIdType) i) == E_NOT_OK) ReturnValue = E_NOT_OK;
     return ReturnValue;
 } /* clearAllWords */
 
@@ -339,7 +339,7 @@ stdReturnType Display::clearAllWords()
 ******************************************************************************************************************************************************/
 void Display::clearAllWordsFast()
 {
-    for(byte i = DisplayWords::WORD_ES; i < DisplayWords::WORD_NUMBER_OF_WORDS; i++) clearWordFast((WordType) i);
+    for(byte i = DisplayWords::WORD_ES; i < DisplayWords::WORD_NUMBER_OF_WORDS; i++) clearWordFast((WordIdType) i);
 } /* clearAllWordsFast */
 
 
@@ -354,7 +354,7 @@ void Display::clearAllWordsFast()
 stdReturnType Display::getPixel(byte Index, boolean* Value) const
 {
     byte Row, Column;
-    indexToColumnAndRowFast(Index, Row, Column);
+    indexToColumnAndRow(Index, Row, Column);
     return getPixel(Column, Row, Value);
 } /* getPixel */
 
@@ -370,7 +370,7 @@ stdReturnType Display::getPixel(byte Index, boolean* Value) const
 boolean Display::getPixelFast(byte Index) const
 {
     byte Row, Column;
-    indexToColumnAndRowFast(Index, Row, Column);
+    indexToColumnAndRow(Index, Row, Column);
     return getPixelFast(Column, Row);
 } /* getPixelFast */
 
@@ -475,7 +475,7 @@ void Display::setPixelFast(byte Column, byte Row)
 stdReturnType Display::setPixel(byte Index)
 {
     byte Row, Column;
-    indexToColumnAndRowFast(Index, Row, Column);
+    indexToColumnAndRow(Index, Row, Column);
     return setPixel(Column,  Row);
 } /* setPixel */
 
@@ -491,7 +491,7 @@ stdReturnType Display::setPixel(byte Index)
 void Display::setPixelFast(byte Index)
 {
     byte Row, Column;
-    indexToColumnAndRowFast(Index, Row, Column);
+    indexToColumnAndRow(Index, Row, Column);
     setPixelFast(Column,  Row);
 } /* setPixelFast */
 
@@ -545,7 +545,7 @@ void Display::clearPixelFast(byte Column, byte Row)
 stdReturnType Display::clearPixel(byte Index)
 {
     byte Row, Column;
-    indexToColumnAndRowFast(Index, Row, Column);
+    indexToColumnAndRow(Index, Row, Column);
     return clearPixel(Column,  Row);
 } /* clearPixel */
 
@@ -561,7 +561,7 @@ stdReturnType Display::clearPixel(byte Index)
 void Display::clearPixelFast(byte Index)
 {
     byte Row, Column;
-    indexToColumnAndRowFast(Index, Row, Column);
+    indexToColumnAndRow(Index, Row, Column);
     clearPixelFast(Column,  Row);
 } /* clearPixelFast */
 
@@ -627,7 +627,7 @@ void Display::togglePixelFast(byte Column, byte Row)
 stdReturnType Display::togglePixel(byte Index)
 {
     byte Row, Column;
-    indexToColumnAndRowFast(Index, Row, Column);
+    indexToColumnAndRow(Index, Row, Column);
     return togglePixel(Column,  Row);
 } /* togglePixel */
 
@@ -643,7 +643,7 @@ stdReturnType Display::togglePixel(byte Index)
 void Display::togglePixelFast(byte Index)
 {
     byte Row, Column;
-    indexToColumnAndRowFast(Index, Row, Column);
+    indexToColumnAndRow(Index, Row, Column);
     togglePixelFast(Column,  Row);
 } /* togglePixelFast */
 

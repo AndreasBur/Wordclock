@@ -154,13 +154,13 @@ void AnimationDrop::reset()
 void AnimationDrop::clearTimeTask()
 {
     byte Column, Row;
-    pDisplay->indexToColumnAndRowFast(CurrentPixelIndex, Row, Column);
+    pDisplay->indexToColumnAndRow(CurrentPixelIndex, Row, Column);
     // toggle current Pixel
     if(CurrentPixelIndex < DISPLAY_NUMBER_OF_PIXELS) { pDisplay->togglePixelFast(CurrentPixelIndex); }
     // increment row and check for out of bounds
     if(Row + 1 < DISPLAY_NUMBER_OF_ROWS) {
         // toggle Pixel in next row
-        CurrentPixelIndex = pDisplay->columnAndRowToIndexFast(Column, Row + 1);
+        CurrentPixelIndex = pDisplay->columnAndRowToIndex(Column, Row + 1);
         pDisplay->togglePixelFast(CurrentPixelIndex);
     } else {
         // no more active pixels available

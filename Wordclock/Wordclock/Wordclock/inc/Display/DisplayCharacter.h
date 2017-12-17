@@ -62,7 +62,7 @@ class DisplayCharacter
 	// set methods
 
 	// methods
-    void init();
+
 };
 
 #endif

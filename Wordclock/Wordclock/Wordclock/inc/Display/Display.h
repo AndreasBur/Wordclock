@@ -92,7 +92,7 @@ class Display
     /* mapping to underlying hardware */
     using PixelColorType = WS2812PixelType;
     using Stripe = WS2812;
-    using WordType = DisplayWords::WordIdType;
+    using WordIdType = DisplayWords::WordIdType;
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
@@ -138,21 +138,21 @@ class Display
     char getCharacterFast(byte Index) const { return pgm_read_byte(&DisplayCharacters[Index / DISPLAY_NUMBER_OF_COLUMNS][Index % DISPLAY_NUMBER_OF_COLUMNS]); }
 
     // word methods
-    stdReturnType getWordIllumination(WordType, WordIlluminationType*) const;
+    stdReturnType getWordIllumination(WordIdType, WordIlluminationType*) const;
     stdReturnType getWordLength(byte*) const;
     stdReturnType getWordColumn(byte*) const;
     stdReturnType getWordRow(byte*) const;
-    stdReturnType setWord(WordType, byte MaxLength = DISPLAY_WORD_LENGTH_UNLIMITED);
-    stdReturnType clearWord(WordType);
+    stdReturnType setWord(WordIdType, byte MaxLength = DISPLAY_WORD_LENGTH_UNLIMITED);
+    stdReturnType clearWord(WordIdType);
     stdReturnType clearAllWords();
 
     // word methods fast
-    WordIlluminationType getWordIlluminationFast(WordType Word) const { WordIlluminationType WordIllu; memcpy_P(&WordIllu, &WordIlluminationTable[Word], sizeof(WordIllu)); return WordIllu; }
-    byte getWordLengthFast(WordType Word) const { WordIlluminationType WordIllu = getWordIlluminationFast(Word); return WordIllu.Length; }
-    byte getWordRowFast(WordType Word) const { WordIlluminationType WordIllu = getWordIlluminationFast(Word); return WordIllu.Row; }
-    byte getWordColumnFast(WordType Word) const { WordIlluminationType WordIllu = getWordIlluminationFast(Word); return WordIllu.Column; }
-    void setWordFast(WordType, byte MaxLength = DISPLAY_WORD_LENGTH_UNLIMITED);
-    void clearWordFast(WordType);
+    WordIlluminationType getWordIlluminationFast(WordIdType Word) const { WordIlluminationType WordIllu; memcpy_P(&WordIllu, &WordIlluminationTable[Word], sizeof(WordIllu)); return WordIllu; }
+    byte getWordLengthFast(WordIdType Word) const { WordIlluminationType WordIllu = getWordIlluminationFast(Word); return WordIllu.Length; }
+    byte getWordRowFast(WordIdType Word) const { WordIlluminationType WordIllu = getWordIlluminationFast(Word); return WordIllu.Row; }
+    byte getWordColumnFast(WordIdType Word) const { WordIlluminationType WordIllu = getWordIlluminationFast(Word); return WordIllu.Column; }
+    void setWordFast(WordIdType, byte MaxLength = DISPLAY_WORD_LENGTH_UNLIMITED);
+    void clearWordFast(WordIdType);
     void clearAllWordsFast();
     
     // pixel methods
@@ -187,19 +187,20 @@ class Display
     void setPixelRowFast(byte, PixelRowType);
     void setPixelColumnFast(byte, PixelColumnType);
 
-    void indexToColumnAndRowFast(byte Index, byte& Row, byte& Column) const {
-        Row = Index / DISPLAY_NUMBER_OF_COLUMNS;
-        Column = Index % DISPLAY_NUMBER_OF_COLUMNS;
-    }
-    byte columnAndRowToIndexFast(byte Column, byte Row) const {
-        return (Row * DISPLAY_NUMBER_OF_COLUMNS) + Column;
-    }
-
     // methods
     void init();
     void show() { Pixels.show(); }
     void test();
     void clear() { Pixels.clearAllPixels(); }
+
+    void indexToColumnAndRow(byte Index, byte& Row, byte& Column) const {
+        Row = Index / DISPLAY_NUMBER_OF_COLUMNS;
+        Column = Index % DISPLAY_NUMBER_OF_COLUMNS;
+    }
+    byte columnAndRowToIndex(byte Column, byte Row) const {
+        return (Row * DISPLAY_NUMBER_OF_COLUMNS) + Column;
+    }
+
 };
 
 
