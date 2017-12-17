@@ -22,7 +22,7 @@
 ******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Arduino.h"
-
+#include "DisplayWord.h"
 
 /******************************************************************************************************************************************************
  *  GLOBAL CONSTANT MACROS
@@ -44,11 +44,11 @@
 ******************************************************************************************************************************************************/
 class DisplayWords
 {
-  public:
 /******************************************************************************************************************************************************
  *  GLOBAL DATA TYPES AND STRUCTURES
 ******************************************************************************************************************************************************/
-    enum WordType {
+  public:
+    enum WordIdType {
         WORD_NONE,
         WORD_ES,
         WORD_IST,
@@ -80,19 +80,22 @@ class DisplayWords
     };
 
   private:
-
+    static const DisplayWord DisplayWordsTable[];
 
   public:
     DisplayWords();
     ~DisplayWords();
 
 	// get methods
-
+    DisplayWord getDisplayWordFast(WordIdType WordId) const { DisplayWord Word; memcpy_P(&Word, &DisplayWordsTable[WordId], sizeof(DisplayWord)); return Word; }
+    byte getDisplayWordRowFast(WordIdType WordId) const { DisplayWord Word; memcpy_P(&Word, &DisplayWordsTable[WordId], sizeof(DisplayWord)); return Word.getRow(); }
+    byte getDisplayWordColumnFast(WordIdType WordId) const { DisplayWord Word; memcpy_P(&Word, &DisplayWordsTable[WordId], sizeof(DisplayWord)); return Word.getColumn(); }
+    byte getDisplayWordLengthFast(WordIdType WordId) const { DisplayWord Word; memcpy_P(&Word, &DisplayWordsTable[WordId], sizeof(DisplayWord)); return Word.getLength(); }
 
 	// set methods
 
 	// methods
-    void init();
+
 };
 
 #endif

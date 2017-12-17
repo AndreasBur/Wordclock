@@ -31,7 +31,7 @@
 
 
 /* DisplayCharacters parameter */
-
+#define DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS        11
 
 
 /******************************************************************************************************************************************************
@@ -48,7 +48,7 @@ class DisplayCharacters
 /******************************************************************************************************************************************************
  *  GLOBAL DATA TYPES AND STRUCTURES
 ******************************************************************************************************************************************************/
-    enum CharacterType {
+    enum CharacterIdType {
         CHARACTER_E_1,
         CHARACTER_S_1,
         CHARACTER_K_1,
@@ -163,7 +163,7 @@ class DisplayCharacters
     };
 
   private:
-
+    static const char DisplayCharactersTable[][DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS + 1];
 
   public:
     DisplayCharacters();
@@ -175,7 +175,7 @@ class DisplayCharacters
 	// set methods
 
 	// methods
-    void init();
+
 };
 
 #endif

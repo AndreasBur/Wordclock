@@ -55,16 +55,22 @@ class DisplayWord
     byte Length;
 
   public:
-    DisplayWord();
+    DisplayWord() { Row = 0; Column = 0; Length = 0; }
+    DisplayWord(byte, byte, byte);
     ~DisplayWord();
 
 	// get methods
-
+    byte getRow() const { return Row; }
+    byte getColumn() const { return Column; }
+    byte getLength() const { return Length; }
 
 	// set methods
+    void setRow(byte sRow) { Row = sRow; }
+    void setColumn(byte sColumn) { Column = sColumn; }
+    void setLength(byte sLength) { Length = sLength; }
 
 	// methods
-    void init();
+
 };
 
 #endif

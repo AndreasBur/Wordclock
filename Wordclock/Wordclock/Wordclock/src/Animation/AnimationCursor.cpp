@@ -168,7 +168,7 @@ boolean AnimationCursor::isPixelPartOfClockWords(byte Index)
             Display::WordIlluminationType WordIllumination = pDisplay->getWordIlluminationFast(ClockWordsTable[WordIndex]);
             if(WordIllumination.Row == Row) {
                 if(Column >= WordIllumination.Column && Column < WordIllumination.Column + WordIllumination.Length) { 
-                    return true; 
+                    return true;
                 }
             }
         }

@@ -37,7 +37,36 @@
 /******************************************************************************************************************************************************
  *  LOCAL DATA TYPES AND STRUCTURES
 ******************************************************************************************************************************************************/
-
+const DisplayWord DisplayWords::DisplayWordsTable[] PROGMEM
+{
+    DisplayWord(0,0,0),                                //  0 = DISPLAY_WORD_NONE           = ""
+    DisplayWord(0,0,2),                                //  1 = DisplayWords::WORD_ES       = "ES"
+    DisplayWord(0,3,3),                                //  2 = DISPLAY_WORD_IST            = "IST"
+    DisplayWord(0,7,4),                                //  3 = DISPLAY_WORD_FUENF          = "FÜNF"
+    DisplayWord(1,0,4),                                //  4 = DISPLAY_WORD_ZEHN           = "ZEHN"
+    DisplayWord(1,4,7),                                //  5 = DISPLAY_WORD_ZWANZIG        = "ZWANZIG"
+    DisplayWord(2,0,4),                                //  6 = DISPLAY_WORD_DREI           = "DREI"
+    DisplayWord(2,4,4),                                //  7 = DISPLAY_WORD_VIER           = "VIER"
+    DisplayWord(2,4,7),                                //  8 = DISPLAY_WORD_VIERTEL        = "VIERTEL"
+    DisplayWord(2,0,11),                               //  9 = DISPLAY_WORD_DREIVIERTEL    = "DREIVIERTEL"
+    DisplayWord(3,2,4),                                // 10 = DISPLAY_WORD_NACH           = "NACH"
+    DisplayWord(3,6,3),                                // 11 = DISPLAY_WORD_VOR            = "VOR"
+    DisplayWord(4,0,4),                                // 12 = DISPLAY_WORD_HALB           = "HALB"
+    DisplayWord(4,5,5),                                // 13 = DISPLAY_WORD_HOUR_ZWOELF    = "ZWÖLF"
+    DisplayWord(5,0,4),                                // 14 = DISPLAY_WORD_HOUR_ZWEI      = "ZWEI"
+    DisplayWord(5,2,3),                                // 15 = DISPLAY_WORD_HOUR_EIN       = "EIN"
+    DisplayWord(5,2,4),                                // 16 = DISPLAY_WORD_HOUR_EINS      = "EINS"
+    DisplayWord(5,5,6),                                // 17 = DISPLAY_WORD_HOUR_SIEBEN    = "SIEBEN"
+    DisplayWord(6,1,4),                                // 18 = DISPLAY_WORD_HOUR_DREI      = "DREI"
+    DisplayWord(6,7,4),                                // 19 = DISPLAY_WORD_HOUR_FUENF     = "FÜNF"
+    DisplayWord(7,0,3),                                // 20 = DISPLAY_WORD_HOUR_ELF       = "ELF"
+    DisplayWord(7,3,4),                                // 21 = DISPLAY_WORD_HOUR_NEUN      = "NEUN"
+    DisplayWord(7,7,4),                                // 22 = DISPLAY_WORD_HOUR_VIER      = "VIER"
+    DisplayWord(8,1,4),                                // 23 = DISPLAY_WORD_HOUR_ACHT      = "ACHT"
+    DisplayWord(8,5,4),                                // 24 = DISPLAY_WORD_HOUR_ZEHN      = "ZEHN"
+    DisplayWord(9,1,5),                                // 25 = DISPLAY_WORD_HOUR_SECHS     = "SECHS"
+    DisplayWord(9,8,3),                                // 26 = DISPLAY_WORD_UHR            = "UHR"
+};
 
 
 /******************************************************************************************************************************************************
@@ -65,20 +94,6 @@ DisplayWords::~DisplayWords()
 {
 
 } /* ~DisplayWords */
-
-
-/******************************************************************************************************************************************************
-  init()
-******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
- *  \return         -
-******************************************************************************************************************************************************/
-void DisplayWords::init()
-{
-
-} /* init */
 
 
 /******************************************************************************************************************************************************

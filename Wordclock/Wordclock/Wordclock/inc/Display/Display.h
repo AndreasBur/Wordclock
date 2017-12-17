@@ -35,7 +35,7 @@
 
 /* Display parameter */
 #define DISPLAY_NUMBER_OF_ROWS                  10
-#define DISPLAY_NUMBER_OF_COLUMNS               11
+#define DISPLAY_NUMBER_OF_COLUMNS               DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS
 #define DISPLAY_NUMBER_OF_LEDS                  WS2812_NUMBER_OF_LEDS
 #define DISPLAY_NUMBER_OF_PIXELS                DISPLAY_NUMBER_OF_LEDS
 
@@ -92,13 +92,12 @@ class Display
     /* mapping to underlying hardware */
     using PixelColorType = WS2812PixelType;
     using Stripe = WS2812;
-    using WordType = DisplayWords::WordType;
+    using WordType = DisplayWords::WordIdType;
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
-
     StateType State;
     Stripe Pixels;
     PixelColorType Color;
@@ -125,16 +124,16 @@ class Display
     void setColor(PixelColorType sColor) { Color = sColor; }
 
     // char methods
-    stdReturnType setCharacter(DisplayCharacters::CharacterType Character) { return setPixel(Character); }
-    stdReturnType clearCharacter(DisplayCharacters::CharacterType Character) { return clearPixel(Character); }
-    stdReturnType getCharacter(DisplayCharacters::CharacterType Character, boolean* Value) const { return getPixel(Character, Value); }
+    stdReturnType setCharacter(DisplayCharacters::CharacterIdType CharacterId) { return setPixel(CharacterId); }
+    stdReturnType clearCharacter(DisplayCharacters::CharacterIdType CharacterId) { return clearPixel(CharacterId); }
+    stdReturnType getCharacter(DisplayCharacters::CharacterIdType CharacterId, boolean* Value) const { return getPixel(CharacterId, Value); }
     stdReturnType getCharacter(byte, byte, char*) const;
     stdReturnType getCharacter(byte, char*) const;
 
     // char methods fast
-    void setCharacterFast(DisplayCharacters::CharacterType Character) { setPixelFast(Character); }
-    void clearCharacterFast(DisplayCharacters::CharacterType Character) { clearPixelFast(Character); }
-    boolean getCharacterFast(DisplayCharacters::CharacterType Character) const { return getPixelFast(Character); }
+    void setCharacterFast(DisplayCharacters::CharacterIdType CharacterId) { setPixelFast(CharacterId); }
+    void clearCharacterFast(DisplayCharacters::CharacterIdType CharacterId) { clearPixelFast(CharacterId); }
+    boolean getCharacterFast(DisplayCharacters::CharacterIdType CharacterId) const { return getPixelFast(CharacterId); }
     char getCharacterFast(byte Column, byte Row) const { return pgm_read_byte(&DisplayCharacters[Row][Column]); }
     char getCharacterFast(byte Index) const { return pgm_read_byte(&DisplayCharacters[Index / DISPLAY_NUMBER_OF_COLUMNS][Index % DISPLAY_NUMBER_OF_COLUMNS]); }
 
