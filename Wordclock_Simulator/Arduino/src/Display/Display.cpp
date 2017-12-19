@@ -126,13 +126,13 @@ stdReturnType Display::setWord(WordIdType WordId, byte MaxLength)
 
     if(WordId < DisplayWords::WORD_NUMBER_OF_WORDS) {
         ReturnValue = E_OK;
-        DisplayWord Word = Words.getDisplayWordFast(WordId);
+        DisplayWords::Word Word = Words.getDisplayWordFast(WordId);
 
-        if(MaxLength == DISPLAY_WORD_LENGTH_UNLIMITED) Length = Word.getLength();
+        if(MaxLength == DISPLAY_WORD_LENGTH_UNLIMITED) Length = Word.Length;
         else Length = MaxLength;
 
         for(byte Index = 0; Index < Length; Index++) {
-            if(setPixel(Word.getColumn() + Index,  Word.getRow()) == E_NOT_OK) ReturnValue = E_NOT_OK;
+            if(setPixel(Word.Column + Index,  Word.Row) == E_NOT_OK) ReturnValue = E_NOT_OK;
         }
     } else {
         ReturnValue = E_NOT_OK;
@@ -153,12 +153,12 @@ void Display::setWordFast(WordIdType WordId, byte MaxLength)
 {
     byte Length;
 
-    DisplayWord Word = Words.getDisplayWordFast(WordId);
+    DisplayWords::Word Word = Words.getDisplayWordFast(WordId);
 
-    if(MaxLength == DISPLAY_WORD_LENGTH_UNLIMITED) Length = Word.getLength();
+    if(MaxLength == DISPLAY_WORD_LENGTH_UNLIMITED) Length = Word.Length;
     else Length = MaxLength;
 
-    for(byte Index = 0; Index < Length; Index++) { setPixelFast(Word.getColumn() + Index,  Word.getRow()); }
+    for(byte Index = 0; Index < Length; Index++) { setPixelFast(Word.Column + Index,  Word.Row); }
 } /* setWordFast */
 
 
@@ -176,10 +176,10 @@ stdReturnType Display::clearWord(WordIdType WordId)
 
     if(WordId < DisplayWords::WORD_NUMBER_OF_WORDS) {
         ReturnValue = E_OK;
-        DisplayWord Word = Words.getDisplayWordFast(WordId);
+        DisplayWords::Word Word = Words.getDisplayWordFast(WordId);
 
-        for(byte Index = 0; Index < Word.getLength(); Index++) {
-            if(clearPixel(Word.getColumn() + Index,  Word.getRow()) == E_NOT_OK) ReturnValue = E_NOT_OK;
+        for(byte Index = 0; Index < Word.Length; Index++) {
+            if(clearPixel(Word.Column + Index,  Word.Row) == E_NOT_OK) ReturnValue = E_NOT_OK;
         }
     } else {
         ReturnValue = E_NOT_OK;
@@ -198,9 +198,9 @@ stdReturnType Display::clearWord(WordIdType WordId)
 ******************************************************************************************************************************************************/
 void Display::clearWordFast(WordIdType WordId)
 {
-    DisplayWord Word = Words.getDisplayWordFast(WordId);
+    DisplayWords::Word Word = Words.getDisplayWordFast(WordId);
 
-    for(byte Index = 0; Index < Word.getLength(); Index++) { clearPixelFast(Word.getColumn() + Index,  Word.getRow()); }
+    for(byte Index = 0; Index < Word.Length; Index++) { clearPixelFast(Word.Column + Index,  Word.Row); }
 } /* clearWordFast */
 
 

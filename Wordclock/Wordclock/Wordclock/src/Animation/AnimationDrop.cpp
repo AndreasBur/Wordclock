@@ -100,9 +100,9 @@ stdReturnType AnimationDrop::setClock(byte Hour, byte Minute)
     stdReturnType ReturnValue{E_NOT_OK};
 
     if(pClock->getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
-        if(setNextActivePixelIndex() == E_NOT_OK) { State = STATE_SET_TIME; }
-        else { State = STATE_CLEAR_TIME; }
         setNextWordIndex();
+        if(setNextActivePixelIndex() == E_NOT_OK) { setStateToSetTime(); }
+        else { State = STATE_CLEAR_TIME; }
     }
     return ReturnValue;
 } /* setClock */
@@ -138,7 +138,6 @@ void AnimationDrop::task()
 void AnimationDrop::reset()
 {
     CurrentPixelIndex = 0;
-    CurrentCharIndex = 0;
     CurrenWordIndex = CLOCK_WORDS_TABLE_TYPE_SIZE - 1;
 } /* reset */
 
@@ -164,7 +163,7 @@ void AnimationDrop::clearTimeTask()
         pDisplay->togglePixelFast(CurrentPixelIndex);
     } else {
         // no more active pixels available
-        if(setNextActivePixelIndex() == E_NOT_OK) { State = STATE_SET_TIME; }
+        if(setNextActivePixelIndex() == E_NOT_OK) { setStateToSetTime(); }
     }
 } /* clearTimeTask */
 
@@ -180,24 +179,27 @@ void AnimationDrop::clearTimeTask()
 void AnimationDrop::setTimeTask()
 {
     byte Column, Row;
-    DisplayWord CurrentWord = Words.getDisplayWordFast(ClockWordsTable[CurrenWordIndex]);
+    DisplayWords::Word CurrentWord = Words.getDisplayWordFast(ClockWordsTable[CurrenWordIndex]);
 
     pDisplay->indexToColumnAndRow(CurrentPixelIndex, Row, Column);
 
     // break condition
-    if(Row >= CurrentWord.getRow()) {
-        if(CurrentCharIndex >= CurrentWord.getLength()) {
-            if(setNextWordIndex() == E_NOT_OK) { State = STATE_IDLE; }
-            else { CurrentPixelIndex = Words.getDisplayWordColumnFast(ClockWordsTable[CurrenWordIndex]); }
+    if(Row >= CurrentWord.Row) {
+        if(Column - Words.getDisplayWordColumnFast(ClockWordsTable[CurrenWordIndex]) >= CurrentWord.Length - 1) {
+            if(setNextWordIndex() == E_NOT_OK) { 
+                State = STATE_IDLE;
+            } else { 
+                CurrentPixelIndex = Words.getDisplayWordColumnFast(ClockWordsTable[CurrenWordIndex]);
+                pDisplay->indexToColumnAndRow(CurrentPixelIndex, Row, Column);
+            }
         } else {
-            CurrentCharIndex++;
+            Column++;
             Row = 0;
         }
     } else {
         pDisplay->clearPixelFast(CurrentPixelIndex);
         Row++;
     }
-
     CurrentPixelIndex = pDisplay->columnAndRowToIndex(Column, Row);
     pDisplay->setPixelFast(CurrentPixelIndex);
 } /* setTimeTask */
@@ -241,6 +243,23 @@ stdReturnType AnimationDrop::setNextWordIndex()
     }
     return E_NOT_OK;
 } /* setNextWordIndex */
+
+
+/******************************************************************************************************************************************************
+  setStateToSetTime()
+******************************************************************************************************************************************************/
+/*! \brief
+ *  \details
+ *
+ *  \return         -
+******************************************************************************************************************************************************/
+void AnimationDrop::setStateToSetTime()
+{
+    CurrentPixelIndex = Words.getDisplayWordColumnFast(ClockWordsTable[CurrenWordIndex]);
+    pDisplay->setPixelFast(CurrentPixelIndex);
+    State = STATE_SET_TIME;
+} /* setStateToSetTime */
+
 
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E

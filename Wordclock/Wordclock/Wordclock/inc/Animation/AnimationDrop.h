@@ -73,7 +73,6 @@ class AnimationDrop
     byte CurrentPixelIndex;
     Clock::ClockWordsTableType ClockWordsTable;
     byte CurrenWordIndex;
-    byte CurrentCharIndex;
 
     // functions
     void reset();
@@ -81,6 +80,7 @@ class AnimationDrop
     void clearTimeTask();
     void setTimeTask();
     stdReturnType setNextWordIndex();
+    void setStateToSetTime();
     
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S

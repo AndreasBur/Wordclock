@@ -133,7 +133,7 @@ class Clock
 
     static const HoursType HoursTable[][CLOCK_NUMBER_OF_HOURS];
     static const MinutesType MinutesTable[][CLOCK_NUMBER_OF_MINUTE_STEPS];
-
+    
     // functions
     MinutesTableEntryType getMinutesTableEntry(ModesType Mode, byte Minute) {
         MinutesTableEntryType MinutesTableEntry;

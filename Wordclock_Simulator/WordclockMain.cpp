@@ -30,7 +30,7 @@ WordclockDialog::WordclockDialog(wxDialog *dlg, const wxString &title) : wxDialo
     Time = wxDateTime::Now();
     int Hour = Time.GetHour();
     int Minute = Time.GetMinute();
-    //WcClock.setClock(Hour, Minute);
+    WcClock.setClock(Hour, Minute);
 
     //WcDisplay.setPixelRowFast(5, 0xFFFF);
     //WcDisplay.show();
@@ -42,8 +42,8 @@ WordclockDialog::WordclockDialog(wxDialog *dlg, const wxString &title) : wxDialo
     //WcTransformation.shiftRight(true);
     //WcTransformation.shiftUp(false);
     //WcTransformation.shiftDown(true);
-    WcAnimation.setAnimation(Animation::ANIMATION_TELETYPE);
-    WcAnimation.setClock(Hour, Minute);
+    WcAnimation.setAnimation(Animation::ANIMATION_DROP);
+    WcAnimation.setClock(18, 30);
     //WcClock.show();
 }
 

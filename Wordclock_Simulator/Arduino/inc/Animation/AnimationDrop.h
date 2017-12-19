@@ -68,18 +68,19 @@ class AnimationDrop
   private:
     Clock* pClock;
     Display* pDisplay;
+    DisplayWords Words;
     StateType State;
     byte CurrentPixelIndex;
     Clock::ClockWordsTableType ClockWordsTable;
-    //Display::WordIlluminationType CurrenWordIllumination;
     byte CurrenWordIndex;
-    byte CurrentCharIndex;
 
     // functions
     void reset();
     stdReturnType setNextActivePixelIndex();
     void clearTimeTask();
     void setTimeTask();
+    stdReturnType setNextWordIndex();
+    void setStateToSetTime();
     
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S

@@ -25,10 +25,9 @@ void setup() {
 //		flag = 0;
   //}
   //wcAnimation.setChar(0,0, 'T', ANIMATION_FONT_4X6);
-  wcClock.setClock(10,10);
+  //wcClock.setClock(10,10);
   
   wcAnimation.setAnimation(Animation::ANIMATION_DROP);
-  wcAnimation.init();
   
   wcAnimation.setClock(12, 10);
 }

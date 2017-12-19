@@ -78,9 +78,7 @@
 		<Unit filename="Arduino/inc/Animation/AnimationTeletype.h" />
 		<Unit filename="Arduino/inc/Clock/Clock.h" />
 		<Unit filename="Arduino/inc/Display/Display.h" />
-		<Unit filename="Arduino/inc/Display/DisplayCharacter.h" />
 		<Unit filename="Arduino/inc/Display/DisplayCharacters.h" />
-		<Unit filename="Arduino/inc/Display/DisplayWord.h" />
 		<Unit filename="Arduino/inc/Display/DisplayWords.h" />
 		<Unit filename="Arduino/inc/StandardTypes/StandardTypes.h" />
 		<Unit filename="Arduino/inc/Transformation/Transformation.h" />
@@ -91,9 +89,7 @@
 		<Unit filename="Arduino/src/Animation/Font.cpp" />
 		<Unit filename="Arduino/src/Clock/Clock.cpp" />
 		<Unit filename="Arduino/src/Display/Display.cpp" />
-		<Unit filename="Arduino/src/Display/DisplayCharacter.cpp" />
 		<Unit filename="Arduino/src/Display/DisplayCharacters.cpp" />
-		<Unit filename="Arduino/src/Display/DisplayWord.cpp" />
 		<Unit filename="Arduino/src/Display/DisplayWords.cpp" />
 		<Unit filename="Arduino/src/Transformation/Transformation.cpp" />
 		<Unit filename="Wordclock.ico" />
