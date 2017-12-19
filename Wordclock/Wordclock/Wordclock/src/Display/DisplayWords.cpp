@@ -68,7 +68,6 @@ const DisplayWord DisplayWords::DisplayWordsTable[] PROGMEM
     DisplayWord(9,8,3),                                // 26 = DISPLAY_WORD_UHR            = "UHR"
 };
 
-
 /******************************************************************************************************************************************************
  * P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
@@ -115,7 +114,73 @@ stdReturnType DisplayWords::getDisplayWord(WordIdType WordId, DisplayWord& Word)
         ReturnValue = E_NOT_OK;
     }
     return ReturnValue;
-} /* getWordIllumination */
+} /* getDisplayWord */
+
+
+/******************************************************************************************************************************************************
+  getDisplayWordLength()
+******************************************************************************************************************************************************/
+/*! \brief          
+ *  \details        
+ *                  
+ *  \return         -
+******************************************************************************************************************************************************/
+stdReturnType DisplayWords::getDisplayWordLength(WordIdType WordId, byte& Length) const
+{
+    stdReturnType ReturnValue = E_NOT_OK;
+
+    if(WordId < DisplayWords::WORD_NUMBER_OF_WORDS) {
+        Length = getDisplayWordLengthFast(WordId);
+        ReturnValue = E_OK;
+        } else {
+        ReturnValue = E_NOT_OK;
+    }
+    return ReturnValue;
+} /* getDisplayWordLength */
+
+
+/******************************************************************************************************************************************************
+  getDisplayWordColumn()
+******************************************************************************************************************************************************/
+/*! \brief          
+ *  \details        
+ *                  
+ *  \return         -
+******************************************************************************************************************************************************/
+stdReturnType DisplayWords::getDisplayWordColumn(WordIdType WordId, byte& Column) const
+{
+    stdReturnType ReturnValue = E_NOT_OK;
+
+    if(WordId < DisplayWords::WORD_NUMBER_OF_WORDS) {
+        Column = getDisplayWordColumnFast(WordId);
+        ReturnValue = E_OK;
+        } else {
+        ReturnValue = E_NOT_OK;
+    }
+    return ReturnValue;
+} /* getDisplayWordColumn */
+
+
+/******************************************************************************************************************************************************
+  getDisplayWordRow()
+******************************************************************************************************************************************************/
+/*! \brief          
+ *  \details        
+ *                  
+ *  \return         -
+******************************************************************************************************************************************************/
+stdReturnType DisplayWords::getDisplayWordRow(WordIdType WordId, byte& Row) const
+{
+    stdReturnType ReturnValue = E_NOT_OK;
+
+    if(WordId < DisplayWords::WORD_NUMBER_OF_WORDS) {
+        Row = getDisplayWordRowFast(WordId);
+        ReturnValue = E_OK;
+        } else {
+        ReturnValue = E_NOT_OK;
+    }
+    return ReturnValue;
+} /* getDisplayWordRow */
 
 
 /******************************************************************************************************************************************************

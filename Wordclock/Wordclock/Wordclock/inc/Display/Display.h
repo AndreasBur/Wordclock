@@ -26,6 +26,7 @@
 #include "DisplayCharacters.h"
 #include "DisplayWords.h"
 
+
 /******************************************************************************************************************************************************
  *  GLOBAL CONSTANT MACROS
 ******************************************************************************************************************************************************/
@@ -52,6 +53,11 @@
 
 
 /******************************************************************************************************************************************************
+ *  GLOBAL DATA TYPES AND STRUCTURES
+ *****************************************************************************************************************************************************/
+
+
+/******************************************************************************************************************************************************
  *  CLASS  Display
 ******************************************************************************************************************************************************/
 class Display
@@ -66,13 +72,6 @@ class Display
         STATE_UNINIT,
         STATE_INIT,
         STATE_READY
-    };
-
-    /* type which describes the  */
-    struct WordIlluminationType {
-        byte Row;
-        byte Column;
-        byte Length;
     };
 
     using PixelType = boolean;
@@ -90,7 +89,7 @@ class Display
     using PixelColumnType = uint16_t;
 
     /* mapping to underlying hardware */
-    using PixelColorType = WS2812PixelType;
+    using PixelColorType = WS2812::PixelType;
     using Stripe = WS2812;
     using WordIdType = DisplayWords::WordIdType;
 
@@ -101,9 +100,7 @@ class Display
     StateType State;
     Stripe Pixels;
     PixelColorType Color;
-
-    static const char DisplayCharacters[][DISPLAY_NUMBER_OF_COLUMNS + 1];
-    static const WordIlluminationType WordIlluminationTable[];
+    DisplayWords Words;
     
     // functions
     byte transformToSerpentine(byte, byte) const;
@@ -127,30 +124,18 @@ class Display
     stdReturnType setCharacter(DisplayCharacters::CharacterIdType CharacterId) { return setPixel(CharacterId); }
     stdReturnType clearCharacter(DisplayCharacters::CharacterIdType CharacterId) { return clearPixel(CharacterId); }
     stdReturnType getCharacter(DisplayCharacters::CharacterIdType CharacterId, boolean* Value) const { return getPixel(CharacterId, Value); }
-    //stdReturnType getCharacter(byte, byte, char*) const;
-    //stdReturnType getCharacter(byte, char*) const;
 
     // char methods fast
     void setCharacterFast(DisplayCharacters::CharacterIdType CharacterId) { setPixelFast(CharacterId); }
     void clearCharacterFast(DisplayCharacters::CharacterIdType CharacterId) { clearPixelFast(CharacterId); }
     boolean getCharacterFast(DisplayCharacters::CharacterIdType CharacterId) const { return getPixelFast(CharacterId); }
-    //char getCharacterFast(byte Column, byte Row) const { return pgm_read_byte(&DisplayCharacters[Row][Column]); }
-    //char getCharacterFast(byte Index) const { return pgm_read_byte(&DisplayCharacters[Index / DISPLAY_NUMBER_OF_COLUMNS][Index % DISPLAY_NUMBER_OF_COLUMNS]); }
 
     // word methods
-    //stdReturnType getWordIllumination(WordIdType, WordIlluminationType*) const;
-    //stdReturnType getWordLength(byte*) const;
-    //stdReturnType getWordColumn(byte*) const;
-    //stdReturnType getWordRow(byte*) const;
     stdReturnType setWord(WordIdType, byte MaxLength = DISPLAY_WORD_LENGTH_UNLIMITED);
     stdReturnType clearWord(WordIdType);
     stdReturnType clearAllWords();
 
     // word methods fast
-    //WordIlluminationType getWordIlluminationFast(WordIdType Word) const { WordIlluminationType WordIllu; memcpy_P(&WordIllu, &WordIlluminationTable[Word], sizeof(WordIllu)); return WordIllu; }
-    //byte getWordLengthFast(WordIdType Word) const { WordIlluminationType WordIllu = getWordIlluminationFast(Word); return WordIllu.Length; }
-    //byte getWordRowFast(WordIdType Word) const { WordIlluminationType WordIllu = getWordIlluminationFast(Word); return WordIllu.Row; }
-    //byte getWordColumnFast(WordIdType Word) const { WordIlluminationType WordIllu = getWordIlluminationFast(Word); return WordIllu.Column; }
     void setWordFast(WordIdType, byte MaxLength = DISPLAY_WORD_LENGTH_UNLIMITED);
     void clearWordFast(WordIdType);
     void clearAllWordsFast();

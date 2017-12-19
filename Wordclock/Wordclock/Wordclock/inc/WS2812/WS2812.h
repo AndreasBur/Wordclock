@@ -67,21 +67,6 @@
 /******************************************************************************************************************************************************
  *  GLOBAL DATA TYPES AND STRUCTURES
  *****************************************************************************************************************************************************/
-/* type which describes the color order of the protocol */
-#if (WS2812_RGB_ORDER_ON_RUNTIME == STD_ON)
-enum WS2812ColorOrderType {
-    WS2812_COLOR_ORDER_RGB,
-    WS2812_COLOR_ORDER_BRG,
-    WS2812_COLOR_ORDER_GBR
-};
-#endif
-
-/* type which describes the structure of a pixel */
-struct WS2812PixelType {
-    byte Red;
-    byte Green;
-    byte Blue;
-};
 
 
 /******************************************************************************************************************************************************
@@ -89,6 +74,29 @@ struct WS2812PixelType {
  *****************************************************************************************************************************************************/
 class WS2812
 {
+/******************************************************************************************************************************************************
+ *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
+******************************************************************************************************************************************************/
+  public:
+/* type which describes the color order of the protocol */
+#if (WS2812_RGB_ORDER_ON_RUNTIME == STD_ON)
+enum WS2812ColorOrderType {
+    COLOR_ORDER_RGB,
+    COLOR_ORDER_BRG,
+    COLOR_ORDER_GBR
+};
+#endif
+
+/* type which describes the structure of a pixel */
+struct PixelType {
+    byte Red;
+    byte Green;
+    byte Blue;
+};
+
+/******************************************************************************************************************************************************
+ *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
+******************************************************************************************************************************************************/
   private:
     byte PinMask;
     const volatile byte* PortOutputRegister;
@@ -110,29 +118,32 @@ class WS2812
     uint8_t calcGamma7CorrectionValue(uint8_t);
     void sendData(const byte*, uint16_t);
     void dimmPixels(byte*, uint16_t);
-    void dimmPixel(WS2812PixelType*, WS2812PixelType);
-    void dimmPixel(WS2812PixelType*, byte, byte, byte);
+    void dimmPixel(PixelType*, PixelType);
+    void dimmPixel(PixelType*, byte, byte, byte);
 
     void dimmColor(byte* ColorDimmed, byte Color) const { *ColorDimmed = (Color * Brightness) >> 8; }
 
+/******************************************************************************************************************************************************
+ *  P U B L I C   F U N C T I O N S
+******************************************************************************************************************************************************/
   public:
     WS2812(byte);
     ~WS2812();
 
     // get methods
     byte getBrightness() const { return Brightness; }
-    stdReturnType getPixel(byte, WS2812PixelType*) const;
-    stdReturnType getPixelDimmed(byte, WS2812PixelType*) const;
-    WS2812PixelType getPixelFast(byte) const;
-    WS2812PixelType getPixelDimmedFast(byte) const;
+    stdReturnType getPixel(byte, PixelType*) const;
+    stdReturnType getPixelDimmed(byte, PixelType*) const;
+    PixelType getPixelFast(byte) const;
+    PixelType getPixelDimmedFast(byte) const;
 
     // set methods
     //void setBrightness(byte sBrightness) { Brightness = sBrightness; }
     void setBrightness(byte sBrightness, boolean = false);
     stdReturnType setPin(byte);
-    stdReturnType setPixel(byte, WS2812PixelType);
+    stdReturnType setPixel(byte, PixelType);
     stdReturnType setPixel(byte, byte, byte, byte);
-    void setPixelFast(byte, WS2812PixelType);
+    void setPixelFast(byte, PixelType);
     void setPixelFast(byte, byte, byte, byte);
 
     // methods

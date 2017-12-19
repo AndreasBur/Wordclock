@@ -40,12 +40,17 @@
 
 
 /******************************************************************************************************************************************************
+ *  GLOBAL DATA TYPES AND STRUCTURES
+ *****************************************************************************************************************************************************/
+
+
+/******************************************************************************************************************************************************
  *  CLASS  DisplayWords
 ******************************************************************************************************************************************************/
 class DisplayWords
 {
 /******************************************************************************************************************************************************
- *  GLOBAL DATA TYPES AND STRUCTURES
+ *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
     enum WordIdType {
@@ -79,23 +84,36 @@ class DisplayWords
         WORD_NUMBER_OF_WORDS
     };
 
+    struct Word {
+        byte Row;
+        byte Column;
+        byte Length;
+    };
+
+/******************************************************************************************************************************************************
+ *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
+******************************************************************************************************************************************************/
   private:
     static const DisplayWord DisplayWordsTable[];
 
+/******************************************************************************************************************************************************
+ *  P U B L I C   F U N C T I O N S
+******************************************************************************************************************************************************/
   public:
     DisplayWords();
     ~DisplayWords();
 
 	// get methods
+    stdReturnType getDisplayWord(WordIdType, DisplayWord&) const;
+    stdReturnType getDisplayWordLength(WordIdType, byte&) const;
+    stdReturnType getDisplayWordColumn(WordIdType, byte&) const;
+    stdReturnType getDisplayWordRow(WordIdType, byte&) const;
+
+    // get methods fast
     DisplayWord getDisplayWordFast(WordIdType WordId) const { DisplayWord Word; memcpy_P(&Word, &DisplayWordsTable[WordId], sizeof(DisplayWord)); return Word; }
     byte getDisplayWordRowFast(WordIdType WordId) const { DisplayWord Word; memcpy_P(&Word, &DisplayWordsTable[WordId], sizeof(DisplayWord)); return Word.getRow(); }
     byte getDisplayWordColumnFast(WordIdType WordId) const { DisplayWord Word; memcpy_P(&Word, &DisplayWordsTable[WordId], sizeof(DisplayWord)); return Word.getColumn(); }
     byte getDisplayWordLengthFast(WordIdType WordId) const { DisplayWord Word; memcpy_P(&Word, &DisplayWordsTable[WordId], sizeof(DisplayWord)); return Word.getLength(); }
-
-    stdReturnType getDisplayWord(WordIdType, DisplayWord&) const;
-    stdReturnType getDisplayWordLength(WordIdType, byte*) const;
-    stdReturnType getDisplayWordColumn(WordIdType, byte*) const;
-    stdReturnType getDisplayWordRow(WordIdType, byte*) const;
 
 	// set methods
 
@@ -103,8 +121,8 @@ class DisplayWords
 
 };
 
-#endif
 
+#endif
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E
 ******************************************************************************************************************************************************/

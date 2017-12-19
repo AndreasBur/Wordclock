@@ -224,25 +224,26 @@ stdReturnType Clock::getClockWords(byte Hour, byte Minute, ClockWordsTableType C
 {
     ClockWordsType ClockWords;
     stdReturnType ReturnValue{E_OK};
+    byte ClockWordsTableIndex{0};
 
+    memset(ClockWordsTable, DisplayWords::WORD_NONE, sizeof(ClockWordsTableType));
     if(getClockWords(Hour, Minute, &ClockWords) == E_NOT_OK) ReturnValue = E_NOT_OK;
 
     if(ClockWords.ShowItIs) {
-        ClockWordsTable[0] = DisplayWords::WORD_ES;
-        ClockWordsTable[1] = DisplayWords::WORD_IST;
-    } else {
-        ClockWordsTable[0] = DisplayWords::WORD_NONE;
-        ClockWordsTable[1] = DisplayWords::WORD_NONE;
+        ClockWordsTable[ClockWordsTableIndex++] = DisplayWords::WORD_ES;
+        ClockWordsTable[ClockWordsTableIndex++] = DisplayWords::WORD_IST;
     }
-
-    ClockWordsTable[2] = ClockWords.MinuteWords[0];
-    ClockWordsTable[3] = ClockWords.MinuteWords[1];
-    ClockWordsTable[4] = ClockWords.MinuteWords[2];
-    ClockWordsTable[5] = ClockWords.HourWords[0];
-    ClockWordsTable[6] = ClockWords.HourWords[1];
-
+    for(uint8_t Index = 0; Index < CLOCK_MAX_NUMBER_OF_MINUTE_WORDS; Index++) {
+        if(ClockWords.MinuteWords[Index] != DisplayWords::WORD_NONE) {
+            ClockWordsTable[ClockWordsTableIndex++] = ClockWords.MinuteWords[Index];
+        }
+    }
+    for(uint8_t Index = 0; Index < CLOCK_MAX_NUMBER_OF_HOUR_WORDS; Index++) {
+        if(ClockWords.HourWords[Index] != DisplayWords::WORD_NONE) {
+            ClockWordsTable[ClockWordsTableIndex++] = ClockWords.HourWords[Index];
+        }
+    }
     return ReturnValue;
-
 } /* getClockWords */
 
 

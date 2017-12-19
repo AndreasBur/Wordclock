@@ -83,7 +83,7 @@ void Simulator::OnAbout(wxCommandEvent &event)
 
 }
 
-stdReturnType Simulator::getPixel(byte Index, WS2812PixelType* Pixel) const
+stdReturnType Simulator::getPixel(byte Index, PixelType* Pixel) const
 {
     byte Row = Index / DISPLAY_NUMBER_OF_COLUMNS;
     byte Column = Index % DISPLAY_NUMBER_OF_COLUMNS;
@@ -104,9 +104,9 @@ stdReturnType Simulator::getPixel(byte Index, WS2812PixelType* Pixel) const
     }
 }
 
-WS2812PixelType Simulator::getPixelFast(byte Index) const
+WS2812::PixelType Simulator::getPixelFast(byte Index) const
 {
-    WS2812PixelType Pixel;
+    PixelType Pixel;
     byte Row = Index / DISPLAY_NUMBER_OF_COLUMNS;
     byte Column = Index % DISPLAY_NUMBER_OF_COLUMNS;
 
@@ -122,7 +122,7 @@ WS2812PixelType Simulator::getPixelFast(byte Index) const
     return Pixel;
 }
 
-stdReturnType Simulator::setPixel(byte Index, WS2812PixelType Pixel)
+stdReturnType Simulator::setPixel(byte Index, PixelType Pixel)
 {
     byte Row = Index / DISPLAY_NUMBER_OF_COLUMNS;
     byte Column = Index % DISPLAY_NUMBER_OF_COLUMNS;
@@ -156,7 +156,7 @@ stdReturnType Simulator::setPixel(byte Index, byte Red, byte Green, byte Blue)
     }
 }
 
-void Simulator::setPixelFast(byte Index, WS2812PixelType Pixel)
+void Simulator::setPixelFast(byte Index, PixelType Pixel)
 {
     byte Row = Index / DISPLAY_NUMBER_OF_COLUMNS;
     byte Column = Index % DISPLAY_NUMBER_OF_COLUMNS;

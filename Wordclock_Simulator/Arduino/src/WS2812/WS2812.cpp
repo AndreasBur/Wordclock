@@ -107,7 +107,7 @@ WS2812::WS2812(byte Pin)
 #endif
     clearAllPixels();
 #if (WS2812_RGB_ORDER_ON_RUNTIME == STD_ON)
-    setColorOrder(WS2812_COLOR_ORDER_BRG);
+    setColorOrder(COLOR_ORDER_BRG);
 #endif
 } /* WS2812 */
 
@@ -178,7 +178,7 @@ void WS2812::show()
  *                  
  *  \return         -
  *****************************************************************************************************************************************************/
-stdReturnType WS2812::getPixel(byte Index, WS2812PixelType* Pixel) const
+stdReturnType WS2812::getPixel(byte Index, PixelType* Pixel) const
 {
     if(Index < WS2812_NUMBER_OF_LEDS) {
         Pixel->Red = Pixels[WS2812_POS_ABS_RED(Index)];
@@ -199,9 +199,9 @@ stdReturnType WS2812::getPixel(byte Index, WS2812PixelType* Pixel) const
  *                  
  *  \return         -
  *****************************************************************************************************************************************************/
-WS2812PixelType WS2812::getPixelFast(byte Index) const
+WS2812::PixelType WS2812::getPixelFast(byte Index) const
 {
-    WS2812PixelType Pixel;
+    PixelType Pixel;
     
     Pixel.Red = Pixels[WS2812_POS_ABS_RED(Index)];
     Pixel.Green = Pixels[WS2812_POS_ABS_GREEN(Index)];
@@ -219,7 +219,7 @@ WS2812PixelType WS2812::getPixelFast(byte Index) const
  *                  
  *  \return         -
  *****************************************************************************************************************************************************/
-stdReturnType WS2812::getPixelDimmed(byte Index, WS2812PixelType* Pixel) const
+stdReturnType WS2812::getPixelDimmed(byte Index, PixelType* Pixel) const
 {
     if(Index < WS2812_NUMBER_OF_LEDS) {
         if(Brightness != 255) {
@@ -244,9 +244,9 @@ stdReturnType WS2812::getPixelDimmed(byte Index, WS2812PixelType* Pixel) const
  *                  
  *  \return         -
  *****************************************************************************************************************************************************/
-WS2812PixelType WS2812::getPixelDimmedFast(byte Index) const
+WS2812::PixelType WS2812::getPixelDimmedFast(byte Index) const
 {
-    WS2812PixelType Pixel;
+    PixelType Pixel;
 
     if(Brightness == 255) {
         return getPixelFast(Index);
@@ -308,7 +308,7 @@ stdReturnType WS2812::setPin(byte Pin)
  *                  
  *  \return         -
  *****************************************************************************************************************************************************/
-stdReturnType WS2812::setPixel(byte Index, WS2812PixelType Pixel)
+stdReturnType WS2812::setPixel(byte Index, PixelType Pixel)
 {
     if(Index < WS2812_NUMBER_OF_LEDS) {
         Pixels[WS2812_POS_ABS_RED(Index)] = Pixel.Red;
@@ -329,7 +329,7 @@ stdReturnType WS2812::setPixel(byte Index, WS2812PixelType Pixel)
  *                  
  *  \return         -
  *****************************************************************************************************************************************************/
-void WS2812::setPixelFast(byte Index, WS2812PixelType Pixel)
+void WS2812::setPixelFast(byte Index, PixelType Pixel)
 {
     Pixels[WS2812_POS_ABS_RED(Index)] = Pixel.Red;
     Pixels[WS2812_POS_ABS_GREEN(Index)] = Pixel.Green;
@@ -385,17 +385,17 @@ void WS2812::setPixelFast(byte Index, byte Red, byte Green, byte Blue)
 #if (WS2812_RGB_ORDER_ON_RUNTIME == STD_ON)
 void WS2812::setColorOrder(WS2812ColorOrderType ColorOrder)
 {
-    if(ColorOrder == WS2812_COLOR_ORDER_BRG) {
+    if(ColorOrder == COLOR_ORDER_BRG) {
         OffsetBlue = 0;
         OffsetRed = 1;
         OffsetGreen = 2;
     }
-    if(ColorOrder == WS2812_COLOR_ORDER_GBR) {
+    if(ColorOrder == COLOR_ORDER_GBR) {
         OffsetGreen = 0;
         OffsetRed = 1;
         OffsetBlue = 2;
     }
-    if(ColorOrder == WS2812_COLOR_ORDER_RGB) {
+    if(ColorOrder == COLOR_ORDER_RGB) {
         OffsetRed = 0;
         OffsetGreen = 1;
         OffsetBlue = 2;
@@ -432,7 +432,7 @@ uint8_t WS2812::calcGamma7CorrectionValue(uint8_t ValueLinear)
  *                  
  *  \return         -
  *****************************************************************************************************************************************************/
-inline void WS2812::dimmPixel(WS2812PixelType* PixelDimmed, WS2812PixelType Pixel)
+inline void WS2812::dimmPixel(PixelType* PixelDimmed, PixelType Pixel)
 {
     dimmColor(&PixelDimmed->Red, Pixel.Red);
     dimmColor(&PixelDimmed->Green, Pixel.Green);
@@ -448,7 +448,7 @@ inline void WS2812::dimmPixel(WS2812PixelType* PixelDimmed, WS2812PixelType Pixe
  *                  
  *  \return         -
  *****************************************************************************************************************************************************/
-inline void WS2812::dimmPixel(WS2812PixelType* PixelDimmed, byte Red, byte Green, byte Blue)
+inline void WS2812::dimmPixel(PixelType* PixelDimmed, byte Red, byte Green, byte Blue)
 {
     dimmColor(&PixelDimmed->Red, Red);
     dimmColor(&PixelDimmed->Green, Green);

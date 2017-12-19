@@ -39,51 +39,6 @@
 /******************************************************************************************************************************************************
  *  LOCAL DATA TYPES AND STRUCTURES
 ******************************************************************************************************************************************************/
-const char Display::DisplayCharacters[][DISPLAY_NUMBER_OF_COLUMNS + 1] PROGMEM
-{
-    "ESKISTLFÜNF",
-    "ZEHNZWANZIG",
-    "DREIVIERTEL",
-    "TGNACHVORJM",
-    "HALBQZWÖLFP",
-    "ZWEINSIEBEN",
-    "KDREIRHFÜNF",
-    "ELFNEUNVIER",
-    "WACHTZEHNRS",
-    "BSECHSFMUHR"
-};
-
-
-const Display::WordIlluminationType Display::WordIlluminationTable[] PROGMEM
-{
-    {0,0,0},                                //  0 = DISPLAY_WORD_NONE           = ""
-    {0,0,2},                                //  1 = DisplayWords::WORD_ES       = "ES"
-    {0,3,3},                                //  2 = DISPLAY_WORD_IST            = "IST"
-    {0,7,4},                                //  3 = DISPLAY_WORD_FUENF          = "FÜNF"
-    {1,0,4},                                //  4 = DISPLAY_WORD_ZEHN           = "ZEHN"
-    {1,4,7},                                //  5 = DISPLAY_WORD_ZWANZIG        = "ZWANZIG"
-    {2,0,4},                                //  6 = DISPLAY_WORD_DREI           = "DREI"
-    {2,4,4},                                //  7 = DISPLAY_WORD_VIER           = "VIER"
-    {2,4,7},                                //  8 = DISPLAY_WORD_VIERTEL        = "VIERTEL"
-    {2,0,11},                               //  9 = DISPLAY_WORD_DREIVIERTEL    = "DREIVIERTEL"
-    {3,2,4},                                // 10 = DISPLAY_WORD_NACH           = "NACH"
-    {3,6,3},                                // 11 = DISPLAY_WORD_VOR            = "VOR"
-    {4,0,4},                                // 12 = DISPLAY_WORD_HALB           = "HALB"
-    {4,5,5},                                // 13 = DISPLAY_WORD_HOUR_ZWOELF    = "ZWÖLF"
-    {5,0,4},                                // 14 = DISPLAY_WORD_HOUR_ZWEI      = "ZWEI"
-    {5,2,3},                                // 15 = DISPLAY_WORD_HOUR_EIN       = "EIN"
-    {5,2,4},                                // 16 = DISPLAY_WORD_HOUR_EINS      = "EINS"
-    {5,5,6},                                // 17 = DISPLAY_WORD_HOUR_SIEBEN    = "SIEBEN"
-    {6,1,4},                                // 18 = DISPLAY_WORD_HOUR_DREI      = "DREI"
-    {6,7,4},                                // 19 = DISPLAY_WORD_HOUR_FUENF     = "FÜNF"
-    {7,0,3},                                // 20 = DISPLAY_WORD_HOUR_ELF       = "ELF"
-    {7,3,4},                                // 21 = DISPLAY_WORD_HOUR_NEUN      = "NEUN"
-    {7,7,4},                                // 22 = DISPLAY_WORD_HOUR_VIER      = "VIER"
-    {8,1,4},                                // 23 = DISPLAY_WORD_HOUR_ACHT      = "ACHT"
-    {8,5,4},                                // 24 = DISPLAY_WORD_HOUR_ZEHN      = "ZEHN"
-    {9,1,5},                                // 25 = DISPLAY_WORD_HOUR_SECHS     = "SECHS"
-    {9,8,3},                                // 26 = DISPLAY_WORD_UHR            = "UHR"
-};
 
 
 /******************************************************************************************************************************************************
@@ -171,13 +126,13 @@ stdReturnType Display::setWord(WordIdType WordId, byte MaxLength)
 
     if(WordId < DisplayWords::WORD_NUMBER_OF_WORDS) {
         ReturnValue = E_OK;
-        WordIlluminationType WordIllu = getWordIlluminationFast(WordId);
+        DisplayWord Word = Words.getDisplayWordFast(WordId);
 
-        if(MaxLength == DISPLAY_WORD_LENGTH_UNLIMITED) Length = WordIllu.Length;
+        if(MaxLength == DISPLAY_WORD_LENGTH_UNLIMITED) Length = Word.getLength();
         else Length = MaxLength;
 
         for(byte Index = 0; Index < Length; Index++) {
-            if(setPixel(WordIllu.Column + Index,  WordIllu.Row) == E_NOT_OK) ReturnValue = E_NOT_OK;
+            if(setPixel(Word.getColumn() + Index,  Word.getRow()) == E_NOT_OK) ReturnValue = E_NOT_OK;
         }
     } else {
         ReturnValue = E_NOT_OK;
@@ -198,12 +153,12 @@ void Display::setWordFast(WordIdType WordId, byte MaxLength)
 {
     byte Length;
 
-    WordIlluminationType WordIllu = getWordIlluminationFast(WordId);
+    DisplayWord Word = Words.getDisplayWordFast(WordId);
 
-    if(MaxLength == DISPLAY_WORD_LENGTH_UNLIMITED) Length = WordIllu.Length;
+    if(MaxLength == DISPLAY_WORD_LENGTH_UNLIMITED) Length = Word.getLength();
     else Length = MaxLength;
 
-    for(byte Index = 0; Index < Length; Index++) { setPixelFast(WordIllu.Column + Index,  WordIllu.Row); }
+    for(byte Index = 0; Index < Length; Index++) { setPixelFast(Word.getColumn() + Index,  Word.getRow()); }
 } /* setWordFast */
 
 
@@ -221,10 +176,10 @@ stdReturnType Display::clearWord(WordIdType WordId)
 
     if(WordId < DisplayWords::WORD_NUMBER_OF_WORDS) {
         ReturnValue = E_OK;
-        WordIlluminationType WordIllu = getWordIlluminationFast(WordId);
+        DisplayWord Word = Words.getDisplayWordFast(WordId);
 
-        for(byte Index = 0; Index < WordIllu.Length; Index++) {
-            if(clearPixel(WordIllu.Column + Index,  WordIllu.Row) == E_NOT_OK) ReturnValue = E_NOT_OK;
+        for(byte Index = 0; Index < Word.getLength(); Index++) {
+            if(clearPixel(Word.getColumn() + Index,  Word.getRow()) == E_NOT_OK) ReturnValue = E_NOT_OK;
         }
     } else {
         ReturnValue = E_NOT_OK;
@@ -243,9 +198,9 @@ stdReturnType Display::clearWord(WordIdType WordId)
 ******************************************************************************************************************************************************/
 void Display::clearWordFast(WordIdType WordId)
 {
-    WordIlluminationType WordIllu = getWordIlluminationFast(WordId);
+    DisplayWord Word = Words.getDisplayWordFast(WordId);
 
-    for(byte Index = 0; Index < WordIllu.Length; Index++) { clearPixelFast(WordIllu.Column + Index,  WordIllu.Row); }
+    for(byte Index = 0; Index < Word.getLength(); Index++) { clearPixelFast(Word.getColumn() + Index,  Word.getRow()); }
 } /* clearWordFast */
 
 

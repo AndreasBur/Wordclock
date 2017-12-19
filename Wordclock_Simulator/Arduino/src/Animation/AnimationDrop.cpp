@@ -9,10 +9,10 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       AnimationDrop.cpp
- *      \brief
+ *      \brief      
  *
- *      \details
- *
+ *      \details    
+ *                  
  *
 ******************************************************************************************************************************************************/
 #define _ANIMATION_DROP_SOURCE_
@@ -73,9 +73,9 @@ AnimationDrop::~AnimationDrop()
 /******************************************************************************************************************************************************
   init()
 ******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
+/*! \brief          
+ *  \details        
+ *                  
  *  \return         -
 ******************************************************************************************************************************************************/
 void AnimationDrop::init(Display* Display, Clock* Clock)
@@ -90,17 +90,19 @@ void AnimationDrop::init(Display* Display, Clock* Clock)
 /******************************************************************************************************************************************************
   setClock()
 ******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
+/*! \brief          
+ *  \details        
+ *                  
  *  \return         -
 ******************************************************************************************************************************************************/
 stdReturnType AnimationDrop::setClock(byte Hour, byte Minute)
 {
     stdReturnType ReturnValue{E_NOT_OK};
-    if(State == STATE_IDLE) {
+
+    if(pClock->getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
         if(setNextActivePixelIndex() == E_NOT_OK) { State = STATE_SET_TIME; }
         else { State = STATE_CLEAR_TIME; }
+        CurrenWordIndex = CLOCK_WORDS_TABLE_TYPE_SIZE - 1;
     }
     return ReturnValue;
 } /* setClock */
@@ -109,9 +111,9 @@ stdReturnType AnimationDrop::setClock(byte Hour, byte Minute)
 /******************************************************************************************************************************************************
   task()
 ******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
+/*! \brief          
+ *  \details        
+ *                  
  *  \return         -
 ******************************************************************************************************************************************************/
 void AnimationDrop::task()
@@ -136,28 +138,30 @@ void AnimationDrop::task()
 void AnimationDrop::reset()
 {
     CurrentPixelIndex = 0;
+    CurrentCharIndex = 0;
+    CurrenWordIndex = 0;
 } /* reset */
 
 
 /******************************************************************************************************************************************************
   clearTimeTask()
 ******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
+/*! \brief          
+ *  \details        
+ *                  
  *  \return         -
 ******************************************************************************************************************************************************/
 void AnimationDrop::clearTimeTask()
 {
     byte Column, Row;
-    pDisplay->indexToColumnAndRowFast(CurrentPixelIndex, Row, Column);
+    pDisplay->indexToColumnAndRow(CurrentPixelIndex, Row, Column);
     // toggle current Pixel
-    if(CurrentPixelIndex < DISPLAY_NUMBER_OF_PIXELS) { pDisplay->clearPixelFast(CurrentPixelIndex); }
+    if(CurrentPixelIndex < DISPLAY_NUMBER_OF_PIXELS) { pDisplay->togglePixelFast(CurrentPixelIndex); }
     // increment row and check for out of bounds
     if(Row + 1 < DISPLAY_NUMBER_OF_ROWS) {
         // toggle Pixel in next row
-        CurrentPixelIndex = pDisplay->columnAndRowToIndexFast(Column, Row + 1);
-        pDisplay->setPixelFast(CurrentPixelIndex);
+        CurrentPixelIndex = pDisplay->columnAndRowToIndex(Column, Row + 1);
+        pDisplay->togglePixelFast(CurrentPixelIndex);
     } else {
         // no more active pixels available
         if(setNextActivePixelIndex() == E_NOT_OK) { State = STATE_SET_TIME; }
@@ -169,9 +173,9 @@ void AnimationDrop::clearTimeTask()
 /******************************************************************************************************************************************************
   setTimeTask()
 ******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
+/*! \brief          
+ *  \details        
+ *                  
  *  \return         -
 ******************************************************************************************************************************************************/
 void AnimationDrop::setTimeTask()
@@ -192,7 +196,7 @@ stdReturnType AnimationDrop::setNextActivePixelIndex()
 {
     for(int16_t Index = DISPLAY_NUMBER_OF_PIXELS - 1; Index >= 0; Index--) {
         if(pDisplay->getPixelFast(Index)) {
-            CurrentPixelIndex = Index;
+            CurrentPixelIndex = Index; 
             return E_OK;
         }
     }
@@ -202,3 +206,4 @@ stdReturnType AnimationDrop::setNextActivePixelIndex()
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E
 ******************************************************************************************************************************************************/
+ 

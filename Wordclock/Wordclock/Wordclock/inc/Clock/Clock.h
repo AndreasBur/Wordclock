@@ -55,6 +55,11 @@
 
 
 /******************************************************************************************************************************************************
+ *  GLOBAL DATA TYPES AND STRUCTURES
+ *****************************************************************************************************************************************************/
+
+
+/******************************************************************************************************************************************************
  *  CLASS  Clock
 ******************************************************************************************************************************************************/
 class Clock
@@ -86,10 +91,31 @@ class Clock
         DisplayWords::WordIdType Words[CLOCK_MAX_NUMBER_OF_HOUR_WORDS];
     };
 
-    struct ClockWordsType {
+    class ClockWordsType {
+      public:
         boolean ShowItIs;
         DisplayWords::WordIdType HourWords[CLOCK_MAX_NUMBER_OF_HOUR_WORDS];
         DisplayWords::WordIdType MinuteWords[CLOCK_MAX_NUMBER_OF_MINUTE_WORDS];
+
+        bool operator==(const ClockWordsType& ClockWords)
+        {
+            if(ShowItIs       == ClockWords.ShowItIs        &&
+               HourWords[0]   == ClockWords.HourWords[0]    &&
+               HourWords[1]   == ClockWords.HourWords[1]    &&
+               MinuteWords[0] == ClockWords.MinuteWords[0]  &&
+               MinuteWords[1] == ClockWords.MinuteWords[1]  &&
+               MinuteWords[2] == ClockWords.MinuteWords[2]  )
+            {
+                return true;
+            } else {
+                return false;
+            }
+        }
+        bool operator!=(const ClockWordsType& ClockWords)
+        {
+            if(operator==(ClockWords)) return false;
+            else return true;
+        }
     };
 
     using ClockWordsTableType = DisplayWords::WordIdType[CLOCK_WORDS_TABLE_TYPE_SIZE];

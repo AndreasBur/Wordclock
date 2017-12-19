@@ -145,7 +145,7 @@ void AnimationCursor::task()
 ******************************************************************************************************************************************************/
 void AnimationCursor::reset()
 {
-    for(auto& Word : ClockWordsTable) { Word = Display::WORD_NONE; }
+    for(auto& Word : ClockWordsTable) { Word = DisplayWords::WORD_NONE; }
     CurrentPixelIndex = 0;
 } /* reset */
 
@@ -161,15 +161,14 @@ void AnimationCursor::reset()
 boolean AnimationCursor::isPixelPartOfClockWords(byte Index)
 {
     byte Row, Column;
-    pDisplay->indexToColumnAndRowFast(Index, Row, Column);
+    pDisplay->indexToColumnAndRow(Index, Row, Column);
 
     for(uint8_t WordIndex = 0; WordIndex < CLOCK_WORDS_TABLE_TYPE_SIZE; WordIndex++) {
-        if(ClockWordsTable[WordIndex] != Display::WORD_NONE) {
-            Display::WordIlluminationType WordIllumination = pDisplay->getWordIlluminationFast(ClockWordsTable[WordIndex]);
-            if(WordIllumination.Row == Row) {
-                if(Column >= WordIllumination.Column && Column < WordIllumination.Column + WordIllumination.Length) { 
-                    return true; 
-                }
+        if(ClockWordsTable[WordIndex] == DisplayWords::WORD_NONE) { break; }
+        DisplayWord Word = Words.getDisplayWordFast(ClockWordsTable[WordIndex]);
+        if(Word.getRow() == Row) {
+            if(Column >= Word.getColumn() && Column < Word.getColumn() + Word.getLength()) { 
+                return true;   
             }
         }
     }

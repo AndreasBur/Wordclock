@@ -1,6 +1,8 @@
 #ifndef _ARDUINO_H_
 #define _ARDUINO_H_
 
+#include <string.h>
+
 typedef unsigned char byte;
 
 #ifndef _WIN32

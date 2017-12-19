@@ -103,7 +103,7 @@ stdReturnType AnimationTeletype::setClock(byte Hour, byte Minute)
         ReturnValue = E_OK;
         CurrentWordIndex = 0;
         CurrentCharIndex = 0;
-        CurrentWordLength = pDisplay->getWordLengthFast(ClockWordsTable[CurrentWordIndex]);
+        CurrentWordLength = Words.getDisplayWordLengthFast(ClockWordsTable[CurrentWordIndex]);
         State = STATE_WORKING;
     }
     return ReturnValue;
@@ -127,7 +127,7 @@ void AnimationTeletype::task()
                 return;
             }
             CurrentCharIndex = 0;
-            CurrentWordLength = pDisplay->getWordLengthFast(ClockWordsTable[CurrentWordIndex]);
+            CurrentWordLength = Words.getDisplayWordLengthFast(ClockWordsTable[CurrentWordIndex]);
         }
         CurrentCharIndex++;
         pDisplay->setWordFast(ClockWordsTable[CurrentWordIndex], CurrentCharIndex);
@@ -166,12 +166,9 @@ void AnimationTeletype::reset()
 ******************************************************************************************************************************************************/
 stdReturnType AnimationTeletype::setNextWordIndex()
 {
-    for(uint8_t Index = CurrentWordIndex + 1; Index < CLOCK_WORDS_TABLE_TYPE_SIZE; Index++)
-    {
-        if(ClockWordsTable[Index] != DisplayWords::WORD_NONE) {
-            CurrentWordIndex = Index;
-            return E_OK;
-        }
+    if(CurrentWordIndex + 1 < CLOCK_WORDS_TABLE_TYPE_SIZE) {
+        CurrentWordIndex++;
+        return E_OK;
     }
     return E_NOT_OK;
 } /* setNextWordIndex */

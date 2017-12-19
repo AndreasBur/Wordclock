@@ -23,6 +23,8 @@
 #include "StandardTypes.h"
 #include "Arduino.h"
 #include "WS2812.h"
+#include "DisplayCharacters.h"
+#include "DisplayWords.h"
 
 
 /******************************************************************************************************************************************************
@@ -33,8 +35,8 @@
 #define DISPLAY_LED_STRIPE_SERPENTINE           STD_OFF
 
 /* Display parameter */
-#define DISPLAY_NUMBER_OF_ROWS                  10
-#define DISPLAY_NUMBER_OF_COLUMNS               11
+#define DISPLAY_NUMBER_OF_ROWS                  DISPLAY_CHARACTERS_NUMBER_OF_ROWS
+#define DISPLAY_NUMBER_OF_COLUMNS               DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS
 #define DISPLAY_NUMBER_OF_LEDS                  WS2812_NUMBER_OF_LEDS
 #define DISPLAY_NUMBER_OF_PIXELS                DISPLAY_NUMBER_OF_LEDS
 
@@ -51,6 +53,11 @@
 
 
 /******************************************************************************************************************************************************
+ *  GLOBAL DATA TYPES AND STRUCTURES
+ *****************************************************************************************************************************************************/
+
+
+/******************************************************************************************************************************************************
  *  CLASS  Display
 ******************************************************************************************************************************************************/
 class Display
@@ -59,22 +66,12 @@ class Display
  *  GLOBAL DATA TYPES AND STRUCTURES
 ******************************************************************************************************************************************************/
   public:
-
-#include "DisplayCharacters.h"
-#include "DisplayWords.h"
     /* type which describes the internal state of the Display */
     enum StateType {
         STATE_NONE,
         STATE_UNINIT,
         STATE_INIT,
         STATE_READY
-    };
-
-    /* type which describes the  */
-    struct WordIlluminationType {
-        byte Row;
-        byte Column;
-        byte Length;
     };
 
     using PixelType = boolean;
@@ -92,20 +89,18 @@ class Display
     using PixelColumnType = uint16_t;
 
     /* mapping to underlying hardware */
-    using PixelColorType = WS2812PixelType;
+    using PixelColorType = WS2812::PixelType;
     using Stripe = WS2812;
+    using WordIdType = DisplayWords::WordIdType;
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
-
     StateType State;
     Stripe Pixels;
     PixelColorType Color;
-
-    static const char DisplayCharacters[][DISPLAY_NUMBER_OF_COLUMNS + 1];
-    static const WordIlluminationType WordIlluminationTable[];
+    DisplayWords Words;
     
     // functions
     byte transformToSerpentine(byte, byte) const;
@@ -126,35 +121,23 @@ class Display
     void setColor(PixelColorType sColor) { Color = sColor; }
 
     // char methods
-    stdReturnType setCharacter(CharacterType Character) { return setPixel(Character); }
-    stdReturnType clearCharacter(CharacterType Character) { return clearPixel(Character); }
-    stdReturnType getCharacter(CharacterType Character, boolean* Value) const { return getPixel(Character, Value); }
-    stdReturnType getCharacter(byte, byte, char*) const;
-    stdReturnType getCharacter(byte, char*) const;
+    stdReturnType setCharacter(DisplayCharacters::CharacterIdType CharacterId) { return setPixel(CharacterId); }
+    stdReturnType clearCharacter(DisplayCharacters::CharacterIdType CharacterId) { return clearPixel(CharacterId); }
+    stdReturnType getCharacter(DisplayCharacters::CharacterIdType CharacterId, boolean* Value) const { return getPixel(CharacterId, Value); }
 
     // char methods fast
-    void setCharacterFast(CharacterType Character) { setPixelFast(Character); }
-    void clearCharacterFast(CharacterType Character) { clearPixelFast(Character); }
-    boolean getCharacterFast(CharacterType Character) const { return getPixelFast(Character); }
-    char getCharacterFast(byte Column, byte Row) const { return pgm_read_byte(&DisplayCharacters[Row][Column]); }
-    char getCharacterFast(byte Index) const { return pgm_read_byte(&DisplayCharacters[Index / DISPLAY_NUMBER_OF_COLUMNS][Index % DISPLAY_NUMBER_OF_COLUMNS]); }
+    void setCharacterFast(DisplayCharacters::CharacterIdType CharacterId) { setPixelFast(CharacterId); }
+    void clearCharacterFast(DisplayCharacters::CharacterIdType CharacterId) { clearPixelFast(CharacterId); }
+    boolean getCharacterFast(DisplayCharacters::CharacterIdType CharacterId) const { return getPixelFast(CharacterId); }
 
     // word methods
-    stdReturnType getWordIllumination(WordType, WordIlluminationType*) const;
-    stdReturnType getWordLength(byte*) const;
-    stdReturnType getWordColumn(byte*) const;
-    stdReturnType getWordRow(byte*) const;
-    stdReturnType setWord(WordType, byte MaxLength = DISPLAY_WORD_LENGTH_UNLIMITED);
-    stdReturnType clearWord(WordType);
+    stdReturnType setWord(WordIdType, byte MaxLength = DISPLAY_WORD_LENGTH_UNLIMITED);
+    stdReturnType clearWord(WordIdType);
     stdReturnType clearAllWords();
 
     // word methods fast
-    WordIlluminationType getWordIlluminationFast(WordType Word) const { WordIlluminationType WordIllu; memcpy_P(&WordIllu, &WordIlluminationTable[Word], sizeof(WordIllu)); return WordIllu; }
-    byte getWordLengthFast(WordType Word) const { WordIlluminationType WordIllu = getWordIlluminationFast(Word); return WordIllu.Length; }
-    byte getWordRowFast(WordType Word) const { WordIlluminationType WordIllu = getWordIlluminationFast(Word); return WordIllu.Row; }
-    byte getWordColumnFast(WordType Word) const { WordIlluminationType WordIllu = getWordIlluminationFast(Word); return WordIllu.Column; }
-    void setWordFast(WordType, byte MaxLength = DISPLAY_WORD_LENGTH_UNLIMITED);
-    void clearWordFast(WordType);
+    void setWordFast(WordIdType, byte MaxLength = DISPLAY_WORD_LENGTH_UNLIMITED);
+    void clearWordFast(WordIdType);
     void clearAllWordsFast();
     
     // pixel methods
@@ -189,19 +172,20 @@ class Display
     void setPixelRowFast(byte, PixelRowType);
     void setPixelColumnFast(byte, PixelColumnType);
 
-    void indexToColumnAndRowFast(byte Index, byte& Row, byte& Column) const {
-        Row = Index / DISPLAY_NUMBER_OF_COLUMNS;
-        Column = Index % DISPLAY_NUMBER_OF_COLUMNS;
-    }
-    byte columnAndRowToIndexFast(byte Column, byte Row) const {
-        return (Row * DISPLAY_NUMBER_OF_COLUMNS) + Column;
-    }
-
     // methods
     void init();
     void show() { Pixels.show(); }
     void test();
     void clear() { Pixels.clearAllPixels(); }
+
+    void indexToColumnAndRow(byte Index, byte& Row, byte& Column) const {
+        Row = Index / DISPLAY_NUMBER_OF_COLUMNS;
+        Column = Index % DISPLAY_NUMBER_OF_COLUMNS;
+    }
+    byte columnAndRowToIndex(byte Column, byte Row) const {
+        return (Row * DISPLAY_NUMBER_OF_COLUMNS) + Column;
+    }
+
 };
 
 

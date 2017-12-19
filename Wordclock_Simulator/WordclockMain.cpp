@@ -30,7 +30,7 @@ WordclockDialog::WordclockDialog(wxDialog *dlg, const wxString &title) : wxDialo
     Time = wxDateTime::Now();
     int Hour = Time.GetHour();
     int Minute = Time.GetMinute();
-    WcClock.setClock(Hour, Minute);
+    //WcClock.setClock(Hour, Minute);
 
     //WcDisplay.setPixelRowFast(5, 0xFFFF);
     //WcDisplay.show();
@@ -42,8 +42,7 @@ WordclockDialog::WordclockDialog(wxDialog *dlg, const wxString &title) : wxDialo
     //WcTransformation.shiftRight(true);
     //WcTransformation.shiftUp(false);
     //WcTransformation.shiftDown(true);
-    WcAnimation.setAnimation(Animation::ANIMATION_DROP);
-    WcAnimation.init();
+    WcAnimation.setAnimation(Animation::ANIMATION_TELETYPE);
     WcAnimation.setClock(Hour, Minute);
     //WcClock.show();
 }
@@ -72,14 +71,7 @@ void WordclockDialog::OnTimer(wxTimerEvent& event)
 
     WcClock.getClockWords(Hour, Minute, &NewTimeWords);
 
-    if( NewTimeWords.HourWords[0] != CurrentTimeWords.HourWords[0]      ||
-        NewTimeWords.HourWords[1] != CurrentTimeWords.HourWords[1]      ||
-        NewTimeWords.MinuteWords[0] != CurrentTimeWords.MinuteWords[0]  ||
-        NewTimeWords.MinuteWords[1] != CurrentTimeWords.MinuteWords[1]  ||
-        NewTimeWords.MinuteWords[2] != CurrentTimeWords.MinuteWords[2]  )
-
-    //if(memcmp(&NewTimeWords, &CurrentTimeWords, sizeof(NewTimeWords)))
-    {
+    if(NewTimeWords != CurrentTimeWords) {
         CurrentTimeWords = NewTimeWords;
         //WcDisplay.clearAllWords();
         //WcDisplay.clear();

@@ -164,12 +164,11 @@ boolean AnimationCursor::isPixelPartOfClockWords(byte Index)
     pDisplay->indexToColumnAndRow(Index, Row, Column);
 
     for(uint8_t WordIndex = 0; WordIndex < CLOCK_WORDS_TABLE_TYPE_SIZE; WordIndex++) {
-        if(ClockWordsTable[WordIndex] != DisplayWords::WORD_NONE) {
-            Display::WordIlluminationType WordIllumination = pDisplay->getWordIlluminationFast(ClockWordsTable[WordIndex]);
-            if(WordIllumination.Row == Row) {
-                if(Column >= WordIllumination.Column && Column < WordIllumination.Column + WordIllumination.Length) { 
-                    return true;
-                }
+        if(ClockWordsTable[WordIndex] == DisplayWords::WORD_NONE) { break; }
+        DisplayWord Word = Words.getDisplayWordFast(ClockWordsTable[WordIndex]);
+        if(Word.getRow() == Row) {
+            if(Column >= Word.getColumn() && Column < Word.getColumn() + Word.getLength()) { 
+                return true;   
             }
         }
     }

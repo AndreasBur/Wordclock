@@ -7,41 +7,43 @@
 
 #include "StandardTypes.h"
 #include "Arduino.h"
+#include "DisplayCharacters.h"
 
 
-#define DISPLAY_NUMBER_OF_ROWS                  10
-#define DISPLAY_NUMBER_OF_COLUMNS               11
+#define DISPLAY_NUMBER_OF_ROWS                  DISPLAY_CHARACTERS_NUMBER_OF_ROWS
+#define DISPLAY_NUMBER_OF_COLUMNS               DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS
 #define SIMULATOR
 
 
-/* type which describes the structure of a pixel */
-typedef struct {
-    byte Red;
-    byte Green;
-    byte Blue;
-} WS2812PixelType;
+
 
 
 class Simulator : public wxFrame
 {
     public:
+        /* type which describes the structure of a pixel */
+        typedef struct {
+            byte Red;
+            byte Green;
+            byte Blue;
+        } PixelType;
+
         Simulator(wxFrame *dlg, const wxString& title);
         virtual ~Simulator();
 
-
         // get methods
         //byte getBrightness() { return Brightness; }
-        stdReturnType getPixel(byte, WS2812PixelType*) const;
-        WS2812PixelType getPixelFast(byte) const;
+        stdReturnType getPixel(byte, PixelType*) const;
+        PixelType getPixelFast(byte) const;
         //stdReturnType getPixelDimmed(byte, WS2812PixelType*);
 
         // set methods
         //stdReturnType setBrightness(byte);
         //stdReturnType setPin(byte);
-        stdReturnType setPixel(byte, WS2812PixelType);
+        stdReturnType setPixel(byte, PixelType);
         stdReturnType setPixel(byte, byte, byte, byte);
         stdReturnType clearPixel(byte Index) { return setPixel(Index, 0, 0, 0); }
-        void setPixelFast(byte, WS2812PixelType);
+        void setPixelFast(byte, PixelType);
         void setPixelFast(byte, byte, byte, byte);
         void clearPixelFast(byte Index) { setPixelFast(Index, 0, 0, 0); }
 
