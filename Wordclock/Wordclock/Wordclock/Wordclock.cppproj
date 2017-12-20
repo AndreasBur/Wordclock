@@ -248,6 +248,9 @@
     <Compile Include="inc\Animation\AnimationShift.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="inc\Animation\AnimationSnake.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="inc\Animation\AnimationTeletype.h">
       <SubType>compile</SubType>
     </Compile>
@@ -288,6 +291,9 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="src\Animation\AnimationShift.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\Animation\AnimationSnake.cpp">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="src\Animation\AnimationTeletype.cpp">
