@@ -106,11 +106,12 @@ class Animation
     enum AnimationType {
         ANIMATION_CURSOR,
         ANIMATION_TELETYPE,
+        ANIMATION_DROP,
+        ANIMATION_SHIFT,
         ANIMATION_FADE, // langsam verdunkeln
         ANIMATION_SNAKE,
         ANIMATION_EXPLODE,
         ANIMATION_IMPLODE,
-        ANIMATION_DROP,
         ANIMATION_NONE
     };
 

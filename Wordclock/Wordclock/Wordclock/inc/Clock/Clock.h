@@ -158,7 +158,6 @@ class Clock
     ModesType getMode() const { return Mode; }
     stdReturnType getClockWords(byte, byte, ClockWordsType*);
     stdReturnType getClockWords(byte, byte, ClockWordsTableType);
-    boolean compareClockWords(ClockWordsType*, ClockWordsType*) const;
 
     // set methods
     void setMode(ModesType sMode) { Mode = sMode; }

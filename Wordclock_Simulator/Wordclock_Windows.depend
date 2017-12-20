@@ -6171,7 +6171,7 @@
 	"Animation.h"
 	"Transformation.h"
 
-1513598566 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\clock\clock.h
+1513758098 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\clock\clock.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"Display.h"
@@ -6184,7 +6184,7 @@
 	"AnimationCursor.h"
 	"AnimationDrop.h"
 
-1513700051 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\wordclockmain.cpp
+1513700469 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\wordclockmain.cpp
 	"wx_pch.h"
 	"WordclockMain.h"
 

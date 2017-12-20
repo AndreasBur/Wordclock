@@ -39,7 +39,7 @@
 ******************************************************************************************************************************************************/
 const Clock::HoursType Clock::HoursTable[][CLOCK_NUMBER_OF_HOURS] PROGMEM
 {
-    {                                                                   // ClockHoursTable[0][] = hh:00 CLOCK_HOUR_MODE_FULL_HOUR
+    {                                                                               // ClockHoursTable[0][] = hh:00 CLOCK_HOUR_MODE_FULL_HOUR
         {DisplayWords::WORD_HOUR_ZWOELF, DisplayWords::WORD_UHR },                  // 00:00
         {DisplayWords::WORD_HOUR_EIN,    DisplayWords::WORD_UHR },                  // 01:00
         {DisplayWords::WORD_HOUR_ZWEI,   DisplayWords::WORD_UHR },                  // 02:00
@@ -53,7 +53,7 @@ const Clock::HoursType Clock::HoursTable[][CLOCK_NUMBER_OF_HOURS] PROGMEM
         {DisplayWords::WORD_HOUR_ZEHN,   DisplayWords::WORD_UHR },                  // 10:00
         {DisplayWords::WORD_HOUR_ELF,    DisplayWords::WORD_UHR }                   // 11:00
     },
-    {                                                                   // ClockHoursTable[1][] = hh:mm CLOCK_HOUR_MODE_NO_FULL_HOUR
+    {                                                                               // ClockHoursTable[1][] = hh:mm CLOCK_HOUR_MODE_NO_FULL_HOUR
         {DisplayWords::WORD_HOUR_ZWOELF, DisplayWords::WORD_NONE },                 // 00:mm
         {DisplayWords::WORD_HOUR_EINS,   DisplayWords::WORD_NONE },                 // 01:mm
         {DisplayWords::WORD_HOUR_ZWEI,   DisplayWords::WORD_NONE },                 // 02:mm
@@ -72,7 +72,7 @@ const Clock::HoursType Clock::HoursTable[][CLOCK_NUMBER_OF_HOURS] PROGMEM
 
 const Clock::MinutesType Clock::MinutesTable[][CLOCK_NUMBER_OF_MINUTE_STEPS] PROGMEM
 {
-    {                                                                                                                  // ClockMinutesTable[0][] = WESSI
+    {                                                                                                                             // ClockMinutesTable[0][] = WESSI
         {HOUR_MODE_FULL_HOUR,    0, {DisplayWords::WORD_NONE,        DisplayWords::WORD_NONE, DisplayWords::WORD_NONE}},          // 00
         {HOUR_MODE_NO_FULL_HOUR, 0, {DisplayWords::WORD_FUENF,       DisplayWords::WORD_NACH, DisplayWords::WORD_NONE}},          // 05
         {HOUR_MODE_NO_FULL_HOUR, 0, {DisplayWords::WORD_ZEHN,        DisplayWords::WORD_NACH, DisplayWords::WORD_NONE}},          // 10
@@ -86,8 +86,7 @@ const Clock::MinutesType Clock::MinutesTable[][CLOCK_NUMBER_OF_MINUTE_STEPS] PRO
         {HOUR_MODE_NO_FULL_HOUR, 1, {DisplayWords::WORD_ZEHN,        DisplayWords::WORD_VOR,  DisplayWords::WORD_NONE}},          // 50
         {HOUR_MODE_NO_FULL_HOUR, 1, {DisplayWords::WORD_FUENF,       DisplayWords::WORD_VOR,  DisplayWords::WORD_NONE}},          // 55
     },
-
-    {                                                                                                                  // ClockMinutesTable[1][] = OSSI
+    {                                                                                                                             // ClockMinutesTable[1][] = OSSI
         {HOUR_MODE_FULL_HOUR,    0, {DisplayWords::WORD_NONE,        DisplayWords::WORD_NONE, DisplayWords::WORD_NONE}},          // 00
         {HOUR_MODE_NO_FULL_HOUR, 0, {DisplayWords::WORD_FUENF,       DisplayWords::WORD_NACH, DisplayWords::WORD_NONE}},          // 05
         {HOUR_MODE_NO_FULL_HOUR, 0, {DisplayWords::WORD_ZEHN,        DisplayWords::WORD_NACH, DisplayWords::WORD_NONE}},          // 10
@@ -101,8 +100,7 @@ const Clock::MinutesType Clock::MinutesTable[][CLOCK_NUMBER_OF_MINUTE_STEPS] PRO
         {HOUR_MODE_NO_FULL_HOUR, 1, {DisplayWords::WORD_ZEHN,        DisplayWords::WORD_VOR,  DisplayWords::WORD_NONE}},          // 50
         {HOUR_MODE_NO_FULL_HOUR, 1, {DisplayWords::WORD_FUENF,       DisplayWords::WORD_VOR,  DisplayWords::WORD_NONE}},          // 55
     },
-
-    {                                                                                                                  // ClockMinutesTable[2][] = RHEIN-RUHR
+    {                                                                                                                             // ClockMinutesTable[2][] = RHEIN-RUHR
         {HOUR_MODE_FULL_HOUR,    0, {DisplayWords::WORD_NONE,        DisplayWords::WORD_NONE, DisplayWords::WORD_NONE}},          // 00
         {HOUR_MODE_NO_FULL_HOUR, 0, {DisplayWords::WORD_FUENF,       DisplayWords::WORD_NACH, DisplayWords::WORD_NONE}},          // 05
         {HOUR_MODE_NO_FULL_HOUR, 0, {DisplayWords::WORD_ZEHN,        DisplayWords::WORD_NACH, DisplayWords::WORD_NONE}},          // 10
@@ -116,8 +114,7 @@ const Clock::MinutesType Clock::MinutesTable[][CLOCK_NUMBER_OF_MINUTE_STEPS] PRO
         {HOUR_MODE_NO_FULL_HOUR, 1, {DisplayWords::WORD_ZEHN,        DisplayWords::WORD_VOR,  DisplayWords::WORD_NONE}},          // 50
         {HOUR_MODE_NO_FULL_HOUR, 1, {DisplayWords::WORD_FUENF,       DisplayWords::WORD_VOR,  DisplayWords::WORD_NONE}},          // 55
     },
-
-    {                                                                                                                  // ClockMinutesTable[3][] = SCHWABEN
+    {                                                                                                                             // ClockMinutesTable[3][] = SCHWABEN
         {HOUR_MODE_FULL_HOUR,    0, {DisplayWords::WORD_NONE,        DisplayWords::WORD_NONE, DisplayWords::WORD_NONE}},          // 00
         {HOUR_MODE_NO_FULL_HOUR, 0, {DisplayWords::WORD_FUENF,       DisplayWords::WORD_NACH, DisplayWords::WORD_NONE}},          // 05
         {HOUR_MODE_NO_FULL_HOUR, 0, {DisplayWords::WORD_ZEHN,        DisplayWords::WORD_NACH, DisplayWords::WORD_NONE}},          // 10
@@ -226,7 +223,7 @@ stdReturnType Clock::getClockWords(byte Hour, byte Minute, ClockWordsTableType C
     stdReturnType ReturnValue{E_OK};
     byte ClockWordsTableIndex{0};
 
-    memset(ClockWordsTable, DisplayWords::WORD_NONE, sizeof(ClockWordsTableType));
+    //memset(ClockWordsTable, DisplayWords::WORD_NONE, sizeof(ClockWordsTableType));
     if(getClockWords(Hour, Minute, &ClockWords) == E_NOT_OK) ReturnValue = E_NOT_OK;
 
     if(ClockWords.ShowItIs) {
@@ -243,31 +240,12 @@ stdReturnType Clock::getClockWords(byte Hour, byte Minute, ClockWordsTableType C
             ClockWordsTable[ClockWordsTableIndex++] = ClockWords.HourWords[Index];
         }
     }
+    for(uint8_t Index = ClockWordsTableIndex; Index < CLOCK_WORDS_TABLE_TYPE_SIZE; Index++) {
+        ClockWordsTable[Index] = DisplayWords::WORD_NONE;
+    }
     return ReturnValue;
 } /* getClockWords */
 
-
-/******************************************************************************************************************************************************
-  compareClockWords()
-******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
-******************************************************************************************************************************************************/
-boolean Clock::compareClockWords(ClockWordsType* ClockWords1, ClockWordsType* ClockWords2) const
-{
-    if( ClockWords1->HourWords[0] == ClockWords2->HourWords[0]      &&
-        ClockWords1->HourWords[1] == ClockWords2->HourWords[1]      &&
-        ClockWords1->MinuteWords[0] == ClockWords2->MinuteWords[0]  &&
-        ClockWords1->MinuteWords[1] == ClockWords2->MinuteWords[1]  &&
-        ClockWords1->MinuteWords[2] == ClockWords2->MinuteWords[2]  )
-    {
-        return true;
-    } else {
-        return false;
-    }
-} /* compareClockWords */
 
 /******************************************************************************************************************************************************
   setClock()
@@ -290,11 +268,9 @@ stdReturnType Clock::setClock(byte Hour, byte Minute)
         if(pDisplay->setWord(DisplayWords::WORD_ES) == E_NOT_OK) ReturnValue = E_NOT_OK;
         if(pDisplay->setWord(DisplayWords::WORD_IST) == E_NOT_OK) ReturnValue = E_NOT_OK;
     }
-
     for(byte Index = 0; Index < CLOCK_MAX_NUMBER_OF_HOUR_WORDS && ClockWords.HourWords[Index] != DisplayWords::WORD_NONE; Index++) {
         if(pDisplay->setWord(ClockWords.HourWords[Index]) == E_NOT_OK) ReturnValue = E_NOT_OK;
     }
-
     for(byte Index = 0; Index < CLOCK_MAX_NUMBER_OF_MINUTE_WORDS && ClockWords.MinuteWords[Index] != DisplayWords::WORD_NONE; Index++) {
         if(pDisplay->setWord(ClockWords.MinuteWords[Index]) == E_NOT_OK) ReturnValue = E_NOT_OK;
     }

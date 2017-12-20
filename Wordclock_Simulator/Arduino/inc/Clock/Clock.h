@@ -133,7 +133,7 @@ class Clock
 
     static const HoursType HoursTable[][CLOCK_NUMBER_OF_HOURS];
     static const MinutesType MinutesTable[][CLOCK_NUMBER_OF_MINUTE_STEPS];
-    
+
     // functions
     MinutesTableEntryType getMinutesTableEntry(ModesType Mode, byte Minute) {
         MinutesTableEntryType MinutesTableEntry;
@@ -158,7 +158,6 @@ class Clock
     ModesType getMode() const { return Mode; }
     stdReturnType getClockWords(byte, byte, ClockWordsType*);
     stdReturnType getClockWords(byte, byte, ClockWordsTableType);
-    boolean compareClockWords(ClockWordsType*, ClockWordsType*) const;
 
     // set methods
     void setMode(ModesType sMode) { Mode = sMode; }
