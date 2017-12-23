@@ -22,6 +22,7 @@
 ******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Arduino.h"
+#include "Clock.h"
 
 
 /******************************************************************************************************************************************************
@@ -48,13 +49,29 @@ class AnimationShift
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-  
+    enum StateType {
+        STATE_NONE,
+        STATE_UNINIT,
+        STATE_IDLE,
+        STATE_CLEAR_TIME,
+        //STATE_SHIFT_OUT,
+        //STATE_SHIFT_IN,
+        STATE_SET_TIME
+    };
   
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
+    Clock* pClock;
+    Display* pDisplay;
+    StateType State;
+    byte MaxWordColumn;
+    byte MinWordColumn;
+    byte CurrentColumn;
 
+    // functions
+    void reset();
   
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
@@ -69,7 +86,9 @@ class AnimationShift
 	// set methods
 
 	// methods
-    void init();
+    void init(Display*, Clock*);
+    stdReturnType setClock(byte, byte);
+    void task();
 };
 
 #endif
