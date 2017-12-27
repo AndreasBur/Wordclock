@@ -77,12 +77,22 @@ class Transformation
     stdReturnType shiftLeft(boolean = false);
     stdReturnType shiftRight(boolean = false);
     stdReturnType shiftUp(boolean = false);
-    stdReturnType shiftDown(boolean);
+    stdReturnType shiftDown(boolean = false);
+
+    stdReturnType shiftRowLeft(byte, boolean = false);
+    stdReturnType shiftRowRight(byte, boolean = false);
+    stdReturnType shiftColumnUp(byte, boolean = false);
+    stdReturnType shiftColumnDown(byte, boolean = false);
 
     void shiftLeftFast(boolean = false);
     void shiftRightFast(boolean = false);
     void shiftUpFast(boolean = false);
     void shiftDownFast(boolean = false);
+
+    void shiftRowLeftFast(byte, boolean = false);
+    void shiftRowRightFast(byte, boolean = false);
+    void shiftColumnUpFast(byte, boolean = false);
+    void shiftColumnDownFast(byte, boolean = false);
 };
 
 

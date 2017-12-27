@@ -132,7 +132,7 @@ stdReturnType DisplayWords::getDisplayWordLength(WordIdType WordId, byte& Length
     if(WordId < DisplayWords::WORD_NUMBER_OF_WORDS) {
         Length = getDisplayWordLengthFast(WordId);
         ReturnValue = E_OK;
-        } else {
+    } else {
         ReturnValue = E_NOT_OK;
     }
     return ReturnValue;
@@ -154,7 +154,7 @@ stdReturnType DisplayWords::getDisplayWordColumn(WordIdType WordId, byte& Column
     if(WordId < DisplayWords::WORD_NUMBER_OF_WORDS) {
         Column = getDisplayWordColumnFast(WordId);
         ReturnValue = E_OK;
-        } else {
+    } else {
         ReturnValue = E_NOT_OK;
     }
     return ReturnValue;
@@ -176,7 +176,7 @@ stdReturnType DisplayWords::getDisplayWordRow(WordIdType WordId, byte& Row) cons
     if(WordId < DisplayWords::WORD_NUMBER_OF_WORDS) {
         Row = getDisplayWordRowFast(WordId);
         ReturnValue = E_OK;
-        } else {
+    } else {
         ReturnValue = E_NOT_OK;
     }
     return ReturnValue;

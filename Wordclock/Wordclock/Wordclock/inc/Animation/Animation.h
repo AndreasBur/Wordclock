@@ -110,6 +110,7 @@ class Animation
         ANIMATION_SHIFT,
         ANIMATION_FADE, // langsam verdunkeln
         ANIMATION_SNAKE,
+        ANIMATION_WIPE,
         ANIMATION_EXPLODE,
         ANIMATION_IMPLODE,
         ANIMATION_NONE
