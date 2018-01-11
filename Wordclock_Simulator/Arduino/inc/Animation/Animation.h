@@ -26,7 +26,8 @@
 #include "AnimationTeletype.h"
 #include "AnimationCursor.h"
 #include "AnimationDrop.h"
-
+#include "AnimationWipe.h"
+#include "AnimationSnake.h"
 
 /******************************************************************************************************************************************************
  *  GLOBAL CONSTANT MACROS
@@ -86,31 +87,33 @@ class Animation
     };
 
     enum FontType {
-    #if(ANIMATION_SUPPORT_FONT_4X6 == STD_ON)
+#if(ANIMATION_SUPPORT_FONT_4X6 == STD_ON)
         FONT_4X6,
-    #endif
-    #if(ANIMATION_SUPPORT_FONT_5X8 == STD_ON)
+#endif
+#if(ANIMATION_SUPPORT_FONT_5X8 == STD_ON)
         FONT_5X8,
-    #endif
-    #if(ANIMATION_SUPPORT_FONT_6X8 == STD_ON)
+#endif
+#if(ANIMATION_SUPPORT_FONT_6X8 == STD_ON)
         FONT_6X8,
-    #endif
-    #if(ANIMATION_SUPPORT_FONT_6X10 == STD_ON)
+#endif
+#if(ANIMATION_SUPPORT_FONT_6X10 == STD_ON)
         FONT_6X10,
-    #endif
-    #if(ANIMATION_SUPPORT_FONT_8X8 == STD_ON)
+#endif
+#if(ANIMATION_SUPPORT_FONT_8X8 == STD_ON)
         FONT_8X8,
-    #endif
+#endif
     };
 
     enum AnimationType {
         ANIMATION_CURSOR,
         ANIMATION_TELETYPE,
+        ANIMATION_DROP,
+        ANIMATION_SHIFT,
         ANIMATION_FADE, // langsam verdunkeln
         ANIMATION_SNAKE,
+        ANIMATION_WIPE,
         ANIMATION_EXPLODE,
         ANIMATION_IMPLODE,
-        ANIMATION_DROP,
         ANIMATION_NONE
     };
 
@@ -118,6 +121,8 @@ class Animation
         AnimationCursor Cursor;
         AnimationTeletype Teletype;
         AnimationDrop Drop;
+        AnimationWipe Wipe;
+        AnimationSnake Snake;
         AnimationsType() {}
         ~AnimationsType() {}
     };

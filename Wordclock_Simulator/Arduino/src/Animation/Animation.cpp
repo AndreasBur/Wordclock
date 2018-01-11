@@ -45,7 +45,7 @@
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  CONSTRUCTOR OF Animation
+  Constrcutor of Animation
 ******************************************************************************************************************************************************/
 /*! \brief          Template Constructor
  *  \details        Instantiation of the Template library
@@ -61,7 +61,7 @@ Animation::Animation(Display* Display, Clock* Clock)
 
 
 /******************************************************************************************************************************************************
-  DESTRUCTOR OF Animation
+  Destructor of Animation
 ******************************************************************************************************************************************************/
 Animation::~Animation()
 {
@@ -139,9 +139,13 @@ void Animation::setAnimation(AnimationType Animation)
         case ANIMATION_DROP :
             Animations.Drop.init(pDisplay, pClock);
             break;
+        case ANIMATION_WIPE :
+            Animations.Wipe.init(pDisplay, pClock);
+            break;
         case ANIMATION_FADE :
             break;
         case ANIMATION_SNAKE :
+            Animations.Snake.init(pDisplay, pClock);
             break;
         case ANIMATION_EXPLODE :
             break;
@@ -174,9 +178,13 @@ stdReturnType Animation::setClock(byte Hour, byte Minute)
         case ANIMATION_DROP :
             return Animations.Drop.setClock(Hour, Minute);
             break;
+        case ANIMATION_WIPE :
+            return Animations.Wipe.setClock(Hour, Minute);
+            break;
         case ANIMATION_FADE :
             break;
         case ANIMATION_SNAKE :
+            return Animations.Snake.setClock(Hour, Minute);
             break;
         case ANIMATION_EXPLODE :
             break;
@@ -210,9 +218,13 @@ void Animation::task()
         case ANIMATION_DROP :
             return Animations.Drop.task();
             break;
+        case ANIMATION_WIPE :
+            return Animations.Wipe.task();
+            break;
         case ANIMATION_FADE :
             break;
         case ANIMATION_SNAKE :
+            return Animations.Snake.task();
             break;
         case ANIMATION_EXPLODE :
             break;

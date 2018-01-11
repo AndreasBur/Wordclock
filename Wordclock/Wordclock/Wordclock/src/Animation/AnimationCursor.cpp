@@ -45,7 +45,7 @@
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  CONSTRUCTOR OF AnimationCursor
+  Constructor of AnimationCursor
 ******************************************************************************************************************************************************/
 /*! \brief          AnimationCursor Constructor
  *  \details        Instantiation of the AnimationCursor library
@@ -62,7 +62,7 @@ AnimationCursor::AnimationCursor()
 
 
 /******************************************************************************************************************************************************
-  DESTRUCTOR OF AnimationCursor
+  Destructor of AnimationCursor
 ******************************************************************************************************************************************************/
 AnimationCursor::~AnimationCursor()
 {
@@ -161,7 +161,7 @@ void AnimationCursor::reset()
 boolean AnimationCursor::isPixelPartOfClockWords(byte Index)
 {
     byte Row, Column;
-    pDisplay->indexToColumnAndRow(Index, Row, Column);
+    pDisplay->indexToColumnAndRow(Index, Column, Row);
 
     for(uint8_t WordIndex = 0; WordIndex < CLOCK_WORDS_TABLE_TYPE_SIZE; WordIndex++) {
         if(ClockWordsTable[WordIndex] == DisplayWords::WORD_NONE) { break; }

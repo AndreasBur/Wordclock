@@ -65,6 +65,7 @@ class Transformation
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
+    Transformation() { pDisplay = nullptr; }
     Transformation(Display*);
     ~Transformation();
 
@@ -72,6 +73,7 @@ class Transformation
 
 
     // set methods
+    void setDisplay(Display* Display) { pDisplay = Display; }
 
     // methods
     stdReturnType shiftLeft(boolean = false);

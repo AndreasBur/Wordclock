@@ -46,7 +46,7 @@
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  CONSTRUCTOR OF Display
+  Constructor of Display
 ******************************************************************************************************************************************************/
 /*! \brief          Display Constructor
  *  \details        Instantiation of the Display library
@@ -66,7 +66,7 @@ Display::Display(PixelColorType sColor) : Pixels(DISPLAY_DATA_PIN)
 
 
 /******************************************************************************************************************************************************
-  CONSTRUCTOR OF Display
+  Constructor of Display
 ******************************************************************************************************************************************************/
 /*! \brief          Display Constructor
  *  \details        Instantiation of the Display library
@@ -88,7 +88,7 @@ Display::Display(byte Red, byte Green, byte Blue) : Pixels(DISPLAY_DATA_PIN)
 
 
 /******************************************************************************************************************************************************
-  DESTRUCTOR OF Display
+  Destructor of Display
 ******************************************************************************************************************************************************/
 Display::~Display()
 {
@@ -246,7 +246,7 @@ void Display::clearAllWordsFast()
 stdReturnType Display::getPixel(byte Index, boolean* Value) const
 {
     byte Row, Column;
-    indexToColumnAndRow(Index, Row, Column);
+    indexToColumnAndRow(Index, Column, Row);
     return getPixel(Column, Row, Value);
 } /* getPixel */
 
@@ -262,7 +262,7 @@ stdReturnType Display::getPixel(byte Index, boolean* Value) const
 boolean Display::getPixelFast(byte Index) const
 {
     byte Row, Column;
-    indexToColumnAndRow(Index, Row, Column);
+    indexToColumnAndRow(Index, Column, Row);
     return getPixelFast(Column, Row);
 } /* getPixelFast */
 
@@ -367,7 +367,7 @@ void Display::setPixelFast(byte Column, byte Row)
 stdReturnType Display::setPixel(byte Index)
 {
     byte Row, Column;
-    indexToColumnAndRow(Index, Row, Column);
+    indexToColumnAndRow(Index, Column, Row);
     return setPixel(Column,  Row);
 } /* setPixel */
 
@@ -383,7 +383,7 @@ stdReturnType Display::setPixel(byte Index)
 void Display::setPixelFast(byte Index)
 {
     byte Row, Column;
-    indexToColumnAndRow(Index, Row, Column);
+    indexToColumnAndRow(Index, Column, Row);
     setPixelFast(Column,  Row);
 } /* setPixelFast */
 
@@ -437,7 +437,7 @@ void Display::clearPixelFast(byte Column, byte Row)
 stdReturnType Display::clearPixel(byte Index)
 {
     byte Row, Column;
-    indexToColumnAndRow(Index, Row, Column);
+    indexToColumnAndRow(Index, Column, Row);
     return clearPixel(Column,  Row);
 } /* clearPixel */
 
@@ -453,7 +453,7 @@ stdReturnType Display::clearPixel(byte Index)
 void Display::clearPixelFast(byte Index)
 {
     byte Row, Column;
-    indexToColumnAndRow(Index, Row, Column);
+    indexToColumnAndRow(Index, Column, Row);
     clearPixelFast(Column,  Row);
 } /* clearPixelFast */
 
@@ -519,7 +519,7 @@ void Display::togglePixelFast(byte Column, byte Row)
 stdReturnType Display::togglePixel(byte Index)
 {
     byte Row, Column;
-    indexToColumnAndRow(Index, Row, Column);
+    indexToColumnAndRow(Index, Column, Row);
     return togglePixel(Column,  Row);
 } /* togglePixel */
 
@@ -535,7 +535,7 @@ stdReturnType Display::togglePixel(byte Index)
 void Display::togglePixelFast(byte Index)
 {
     byte Row, Column;
-    indexToColumnAndRow(Index, Row, Column);
+    indexToColumnAndRow(Index, Column, Row);
     togglePixelFast(Column,  Row);
 } /* togglePixelFast */
 

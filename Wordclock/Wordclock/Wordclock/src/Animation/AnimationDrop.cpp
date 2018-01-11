@@ -45,7 +45,7 @@
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  CONSTRUCTOR OF AnimationDrop
+  Constructor of AnimationDrop
 ******************************************************************************************************************************************************/
 /*! \brief          AnimationDrop Constructor
  *  \details        Instantiation of the AnimationDrop library
@@ -62,7 +62,7 @@ AnimationDrop::AnimationDrop()
 
 
 /******************************************************************************************************************************************************
-  DESTRUCTOR OF AnimationDrop
+  Destructor of AnimationDrop
 ******************************************************************************************************************************************************/
 AnimationDrop::~AnimationDrop()
 {
@@ -153,7 +153,7 @@ void AnimationDrop::reset()
 void AnimationDrop::clearTimeTask()
 {
     byte Column, Row;
-    pDisplay->indexToColumnAndRow(CurrentPixelIndex, Row, Column);
+    pDisplay->indexToColumnAndRow(CurrentPixelIndex, Column, Row);
     // toggle current Pixel
     if(CurrentPixelIndex < DISPLAY_NUMBER_OF_PIXELS) { pDisplay->togglePixelFast(CurrentPixelIndex); }
     // increment row and check for out of bounds
@@ -181,7 +181,7 @@ void AnimationDrop::setTimeTask()
     byte Column, Row;
     DisplayWords::Word CurrentWord = Words.getDisplayWordFast(ClockWordsTable[CurrenWordIndex]);
 
-    pDisplay->indexToColumnAndRow(CurrentPixelIndex, Row, Column);
+    pDisplay->indexToColumnAndRow(CurrentPixelIndex, Column, Row);
 
     // break condition
     if(Row >= CurrentWord.Row) {
@@ -190,7 +190,7 @@ void AnimationDrop::setTimeTask()
                 State = STATE_IDLE;
             } else { 
                 CurrentPixelIndex = Words.getDisplayWordColumnFast(ClockWordsTable[CurrenWordIndex]);
-                pDisplay->indexToColumnAndRow(CurrentPixelIndex, Row, Column);
+                pDisplay->indexToColumnAndRow(CurrentPixelIndex, Column, Row);
             }
         } else {
             Column++;

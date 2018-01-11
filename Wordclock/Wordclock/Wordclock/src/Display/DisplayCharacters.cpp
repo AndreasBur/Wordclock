@@ -57,7 +57,7 @@ const char DisplayCharacters::DisplayCharactersTable[][DISPLAY_CHARACTERS_NUMBER
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  CONSTRUCTOR OF DisplayCharacters
+  Constructor of DisplayCharacters
 ******************************************************************************************************************************************************/
 /*! \brief          DisplayCharacters Constructor
  *  \details        Instantiation of the DisplayCharacters library
@@ -71,7 +71,7 @@ DisplayCharacters::DisplayCharacters()
 
 
 /******************************************************************************************************************************************************
-  DESTRUCTOR OF DisplayCharacters
+  Destructor of DisplayCharacters
 ******************************************************************************************************************************************************/
 DisplayCharacters::~DisplayCharacters()
 {
@@ -109,7 +109,7 @@ stdReturnType DisplayCharacters::getCharacter(byte Column, byte Row, char* Chara
 stdReturnType DisplayCharacters::getCharacter(byte Index, char* Character) const
 {
     byte Row, Column;
-    indexToColumnAndRow(Index, Row, Column);
+    indexToColumnAndRow(Index, Column, Row);
 
     if(Index < DISPLAY_CHARACTERS_NUMBER_OF_CHARACTERS) {
         *Character =  getCharacterFast(Row, Column);
