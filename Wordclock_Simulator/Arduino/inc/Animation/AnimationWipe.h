@@ -9,10 +9,10 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       AnimationWipe.h
- *      \brief      
+ *      \brief
  *
- *      \details    
- *                  
+ *      \details
+ *
 ******************************************************************************************************************************************************/
 #ifndef _ANIMATION_WIPE_H_
 #define _ANIMATION_WIPE_H_
@@ -57,25 +57,29 @@ class AnimationWipe
         STATE_CLEAR_TIME,
         STATE_SET_TIME
     };
-  
+
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
     Clock* pClock;
     Display* pDisplay;
-    Transformation wcTransformation;
+    DisplayWords Words;
     StateType State;
     Clock::ClockWordsTableType ClockWordsTable;
-    byte ColumnCounter;
-    byte ShiftCounter;
-    DisplayWords Words;
+    byte Index;
+    boolean Toggle;
+
 
     // functions
     void reset();
     void clearTimeTask();
     void setTimeTask();
     boolean isPixelPartOfClockWords(byte, byte);
+    boolean setNextIndex();
+    void setPixelDown(byte, byte);
+    void setPixelRight(byte, byte);
+
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
@@ -85,7 +89,7 @@ class AnimationWipe
     ~AnimationWipe();
 
 	// get methods
-    
+
 
 	// set methods
 

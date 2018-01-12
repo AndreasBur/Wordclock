@@ -64,18 +64,19 @@ class AnimationWipe
   private:
     Clock* pClock;
     Display* pDisplay;
-    Transformation wcTransformation;
+    DisplayWords Words;
     StateType State;
     Clock::ClockWordsTableType ClockWordsTable;
-    byte ColumnCounter;
-    byte ShiftCounter;
-    DisplayWords Words;
+    byte Index;
+
 
     // functions
     void reset();
     void clearTimeTask();
     void setTimeTask();
     boolean isPixelPartOfClockWords(byte, byte);
+    boolean setNextIndex();
+    void setPixelDown(byte, byte);
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S

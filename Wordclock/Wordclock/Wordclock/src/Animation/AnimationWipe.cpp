@@ -82,7 +82,7 @@ void AnimationWipe::init(Display* Display, Clock* Clock)
 {
     pDisplay = Display;
     pClock = Clock;
-    wcTransformation.setDisplay(pDisplay);
+    //wcTransformation.setDisplay(pDisplay);
     State = STATE_IDLE;
     reset();
 } /* init */
@@ -137,8 +137,8 @@ void AnimationWipe::task()
 ******************************************************************************************************************************************************/
 void AnimationWipe::reset()
 {
-    ColumnCounter = 0;
-    ShiftCounter = 0;
+    Index = 0;
+    //ShiftCounter = 0;
 } /* reset */
 
 
@@ -152,15 +152,19 @@ void AnimationWipe::reset()
 ******************************************************************************************************************************************************/
 void AnimationWipe::clearTimeTask()
 {
-    for(byte Column = 0; Column <= ColumnCounter; Column++) {
-        wcTransformation.shiftColumnDownFast(Column);
+    byte Column, Row;
+    byte ColumnLine = Column, RowLine = Row;
+    
+    setNextIndex();
+    pDisplay->indexToColumnAndRow(Index, Column, Row);
+    
+    while(1) {
+        setPixelDown(ColumnLine, RowLine);
+        if(ColumnLine == 0 || RowLine == DISPLAY_NUMBER_OF_ROWS) break;
+        RowLine++;
+        ColumnLine--;
     }
-    if(ColumnCounter < DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS) ColumnCounter++;
-    if(ShiftCounter >= ANIMATION_WIRE_NUMBER_OF_SHIFT_CYCLES) {
-        State = STATE_SET_TIME;
-        reset();
-    }
-    ShiftCounter++;
+
 } /* clearTimeTask */
 
 
@@ -174,13 +178,7 @@ void AnimationWipe::clearTimeTask()
 ******************************************************************************************************************************************************/
 void AnimationWipe::setTimeTask()
 {
-    for(byte Column = 0; Column <= ColumnCounter; Column++) {
-        wcTransformation.shiftColumnDownFast(Column);
-        if(isPixelPartOfClockWords(Column, ShiftCounter - Column)) pDisplay->setPixelFast(Column, 0);
-    }
-    if(ColumnCounter < DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS) ColumnCounter++;
-    if(ShiftCounter >= ANIMATION_WIRE_NUMBER_OF_SHIFT_CYCLES) State = STATE_IDLE;
-    ShiftCounter++;
+
 } /* setTimeTask */
 
 
@@ -203,6 +201,50 @@ boolean AnimationWipe::isPixelPartOfClockWords(byte Column, byte Row)
     }
     return false;
 } /* isPixelPartOfWord */
+
+
+/******************************************************************************************************************************************************
+  setNextIndex()
+******************************************************************************************************************************************************/
+/*! \brief          
+ *  \details        
+ *                  
+ *  \return         -
+******************************************************************************************************************************************************/
+boolean AnimationWipe::setNextIndex()
+{
+    stdReturnType ReturValue = E_OK;
+    byte Column, Row;
+    pDisplay->indexToColumnAndRow(Index, Column, Row);
+    
+    if(Column < DISPLAY_NUMBER_OF_COLUMNS) Column++;
+    else if(Row < DISPLAY_NUMBER_OF_ROWS) Row++;
+    else ReturValue = E_NOT_OK;
+
+    Index = pDisplay->columnAndRowToIndex(Column, Row);
+    return ReturValue;
+} /* setNextIndex */
+
+
+/******************************************************************************************************************************************************
+  setPixelDown()
+******************************************************************************************************************************************************/
+/*! \brief          
+ *  \details        
+ *                  
+ *  \return         -
+******************************************************************************************************************************************************/
+void AnimationWipe::setPixelDown(byte Column, byte Row)
+{
+    pDisplay->clearPixelFast(Column, Row);
+    
+    for(byte ColumnNext = Column; ColumnNext < DISPLAY_NUMBER_OF_COLUMNS; ColumnNext++) {
+        if(pDisplay->getPixelFast(ColumnNext, Row)) {
+            pDisplay->setPixelFast(ColumnNext, Row);
+            break;
+        }
+    }
+} /* setPixelDown */
 
 
 /******************************************************************************************************************************************************

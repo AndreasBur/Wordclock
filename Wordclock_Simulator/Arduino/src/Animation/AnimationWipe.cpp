@@ -82,7 +82,7 @@ void AnimationWipe::init(Display* Display, Clock* Clock)
 {
     pDisplay = Display;
     pClock = Clock;
-    wcTransformation.setDisplay(pDisplay);
+    //wcTransformation.setDisplay(pDisplay);
     State = STATE_IDLE;
     reset();
 } /* init */
@@ -137,8 +137,9 @@ void AnimationWipe::task()
 ******************************************************************************************************************************************************/
 void AnimationWipe::reset()
 {
-    ColumnCounter = 0;
-    ShiftCounter = 0;
+    Index = 0;
+    Toggle = false;
+    //ShiftCounter = 0;
 } /* reset */
 
 
@@ -152,15 +153,29 @@ void AnimationWipe::reset()
 ******************************************************************************************************************************************************/
 void AnimationWipe::clearTimeTask()
 {
-    for(byte Column = 0; Column <= ColumnCounter; Column++) {
-        wcTransformation.shiftColumnDownFast(Column);
+    byte Column, Row;
+    volatile byte NumberOfActivePixels = 0;
+    TOGGLE_BIT(Toggle, 0);
+
+    pDisplay->indexToColumnAndRow(Index, Column, Row);
+
+    for(byte Index = 0; Index < DISPLAY_NUMBER_OF_PIXELS; Index++)
+    {
+        if(pDisplay->getPixelFast(Index)) NumberOfActivePixels++;
     }
-    if(ColumnCounter < DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS) ColumnCounter++;
-    if(ShiftCounter >= ANIMATION_WIRE_NUMBER_OF_SHIFT_CYCLES) {
-        State = STATE_SET_TIME;
-        reset();
+
+    while(1) {
+        if(pDisplay->getPixelFast(Column, Row)) {
+            if(Toggle) setPixelDown(Column, Row);
+            else setPixelRight(Column, Row);
+        }
+        if(Column == 0 || Row >= DISPLAY_NUMBER_OF_ROWS - 1) break;
+        Row++;
+        Column--;
     }
-    ShiftCounter++;
+    //while(Column != 0 && Row < DISPLAY_NUMBER_OF_ROWS)
+
+    setNextIndex();
 } /* clearTimeTask */
 
 
@@ -174,13 +189,7 @@ void AnimationWipe::clearTimeTask()
 ******************************************************************************************************************************************************/
 void AnimationWipe::setTimeTask()
 {
-    for(byte Column = 0; Column <= ColumnCounter; Column++) {
-        wcTransformation.shiftColumnDownFast(Column);
-        if(isPixelPartOfClockWords(DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS - Column - 1, ShiftCounter - Column)) pDisplay->setPixelFast(Column, 0);
-    }
-    if(ColumnCounter < DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS) ColumnCounter++;
-    if(ShiftCounter >= ANIMATION_WIRE_NUMBER_OF_SHIFT_CYCLES) State = STATE_IDLE;
-    ShiftCounter++;
+
 } /* setTimeTask */
 
 
@@ -198,13 +207,76 @@ boolean AnimationWipe::isPixelPartOfClockWords(byte Column, byte Row)
         if(ClockWordsTable[WordIndex] == DisplayWords::WORD_NONE) { break; }
         DisplayWords::Word Word = Words.getDisplayWordFast(ClockWordsTable[WordIndex]);
         if(Word.Row == Row) {
-            if(Column >= Word.Column && Column < Word.Column + Word.Length) {
-                return true;
-            }
+            if(Column >= Word.Column && Column < Word.Column + Word.Length) { return true; }
         }
     }
     return false;
 } /* isPixelPartOfWord */
+
+
+/******************************************************************************************************************************************************
+  setNextIndex()
+******************************************************************************************************************************************************/
+/*! \brief
+ *  \details
+ *
+ *  \return         -
+******************************************************************************************************************************************************/
+boolean AnimationWipe::setNextIndex()
+{
+    stdReturnType ReturValue = E_OK;
+    byte Column, Row;
+    pDisplay->indexToColumnAndRow(Index, Column, Row);
+
+    if(Column < DISPLAY_NUMBER_OF_COLUMNS - 1) Column++;
+    else if(Row < DISPLAY_NUMBER_OF_ROWS - 1) Row++;
+    else ReturValue = E_NOT_OK;
+
+    Index = pDisplay->columnAndRowToIndex(Column, Row);
+    return ReturValue;
+} /* setNextIndex */
+
+
+/******************************************************************************************************************************************************
+  setPixelDown()
+******************************************************************************************************************************************************/
+/*! \brief
+ *  \details
+ *
+ *  \return         -
+******************************************************************************************************************************************************/
+void AnimationWipe::setPixelDown(byte Column, byte Row)
+{
+    pDisplay->clearPixelFast(Column, Row);
+
+    for(byte RowNext = Row + 1; RowNext < DISPLAY_NUMBER_OF_ROWS; RowNext++) {
+        if(pDisplay->getPixelFast(Column, RowNext) == false) {
+            pDisplay->setPixelFast(Column, RowNext);
+            break;
+        }
+    }
+} /* setPixelDown */
+
+
+/******************************************************************************************************************************************************
+  setPixelRight()
+******************************************************************************************************************************************************/
+/*! \brief
+ *  \details
+ *
+ *  \return         -
+******************************************************************************************************************************************************/
+void AnimationWipe::setPixelRight(byte Column, byte Row)
+{
+    pDisplay->clearPixelFast(Column, Row);
+
+    for(byte ColumnNext = Column + 1; ColumnNext < DISPLAY_NUMBER_OF_COLUMNS; ColumnNext++) {
+        if(pDisplay->getPixelFast(ColumnNext, Row) == false) {
+            pDisplay->setPixelFast(ColumnNext, Row);
+            break;
+        }
+    }
+} /* setPixelRight */
 
 
 /******************************************************************************************************************************************************
