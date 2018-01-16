@@ -28,6 +28,8 @@
 #include "AnimationDrop.h"
 #include "AnimationWipe.h"
 #include "AnimationSnake.h"
+#include "AnimationShift.h"
+
 
 /******************************************************************************************************************************************************
  *  GLOBAL CONSTANT MACROS
@@ -122,7 +124,9 @@ class Animation
         AnimationTeletype Teletype;
         AnimationDrop Drop;
         AnimationWipe Wipe;
+        AnimationShift Shift;
         AnimationSnake Snake;
+
         AnimationsType() {}
         ~AnimationsType() {}
     };

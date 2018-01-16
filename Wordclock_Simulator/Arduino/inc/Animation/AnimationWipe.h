@@ -23,7 +23,8 @@
 #include "StandardTypes.h"
 #include "Arduino.h"
 #include "Clock.h"
-#include "Transformation.h"
+#include "AnimationCommon.h"
+
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
@@ -43,7 +44,7 @@
 /******************************************************************************************************************************************************
  *  C L A S S   T E M P L A T E
 ******************************************************************************************************************************************************/
-class AnimationWipe
+class AnimationWipe : public AnimationCommon
 {
 /******************************************************************************************************************************************************
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
@@ -58,24 +59,26 @@ class AnimationWipe
         STATE_SET_TIME
     };
 
+    enum SetPixelStateType {
+        STATE_SET_PIXEL_RIGHT,
+        STATE_SET_PIXEL_DOWN
+    };
+
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
     Clock* pClock;
     Display* pDisplay;
-    DisplayWords Words;
     StateType State;
     Clock::ClockWordsTableType ClockWordsTable;
     byte Index;
-    boolean Toggle;
-
+    SetPixelStateType SetPixelState;
 
     // functions
     void reset();
     void clearTimeTask();
     void setTimeTask();
-    boolean isPixelPartOfClockWords(byte, byte);
     boolean setNextIndex();
     void setPixelDown(byte, byte);
     void setPixelRight(byte, byte);

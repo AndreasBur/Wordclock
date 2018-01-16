@@ -82,7 +82,6 @@ void AnimationWipe::init(Display* Display, Clock* Clock)
 {
     pDisplay = Display;
     pClock = Clock;
-    //wcTransformation.setDisplay(pDisplay);
     State = STATE_IDLE;
     reset();
 } /* init */
@@ -138,8 +137,7 @@ void AnimationWipe::task()
 void AnimationWipe::reset()
 {
     Index = 0;
-    Toggle = false;
-    //ShiftCounter = 0;
+    SetPixelState = STATE_SET_PIXEL_DOWN;
 } /* reset */
 
 
@@ -154,28 +152,23 @@ void AnimationWipe::reset()
 void AnimationWipe::clearTimeTask()
 {
     byte Column, Row;
-    volatile byte NumberOfActivePixels = 0;
-    TOGGLE_BIT(Toggle, 0);
 
     pDisplay->indexToColumnAndRow(Index, Column, Row);
 
-    for(byte Index = 0; Index < DISPLAY_NUMBER_OF_PIXELS; Index++)
-    {
-        if(pDisplay->getPixelFast(Index)) NumberOfActivePixels++;
-    }
-
-    while(1) {
+    do {
         if(pDisplay->getPixelFast(Column, Row)) {
-            if(Toggle) setPixelDown(Column, Row);
+            if(SetPixelState == STATE_SET_PIXEL_DOWN) setPixelDown(Column, Row);
             else setPixelRight(Column, Row);
         }
-        if(Column == 0 || Row >= DISPLAY_NUMBER_OF_ROWS - 1) break;
-        Row++;
-        Column--;
-    }
-    //while(Column != 0 && Row < DISPLAY_NUMBER_OF_ROWS)
+    } while(Column-- != 0 && Row++ < DISPLAY_NUMBER_OF_ROWS - 1);
 
-    setNextIndex();
+    if(SetPixelState == STATE_SET_PIXEL_DOWN) SetPixelState = STATE_SET_PIXEL_RIGHT;
+    else SetPixelState = STATE_SET_PIXEL_DOWN;
+
+    if(setNextIndex() == E_NOT_OK) {
+        State = STATE_SET_TIME;
+        reset();
+    }
 } /* clearTimeTask */
 
 
@@ -189,29 +182,16 @@ void AnimationWipe::clearTimeTask()
 ******************************************************************************************************************************************************/
 void AnimationWipe::setTimeTask()
 {
+    byte Column, Row;
 
+    pDisplay->indexToColumnAndRow(Index, Column, Row);
+
+    do {
+        if(isPixelPartOfClockWords(ClockWordsTable, Column, Row)) { pDisplay->setPixelFast(Column, Row); }
+    } while(Column-- != 0 && Row++ < DISPLAY_NUMBER_OF_ROWS - 1);
+
+    if(setNextIndex() == E_NOT_OK) State = STATE_IDLE;
 } /* setTimeTask */
-
-
-/******************************************************************************************************************************************************
-  isPixelPartOfWord()
-******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
-******************************************************************************************************************************************************/
-boolean AnimationWipe::isPixelPartOfClockWords(byte Column, byte Row)
-{
-    for(uint8_t WordIndex = 0; WordIndex < CLOCK_WORDS_TABLE_TYPE_SIZE; WordIndex++) {
-        if(ClockWordsTable[WordIndex] == DisplayWords::WORD_NONE) { break; }
-        DisplayWords::Word Word = Words.getDisplayWordFast(ClockWordsTable[WordIndex]);
-        if(Word.Row == Row) {
-            if(Column >= Word.Column && Column < Word.Column + Word.Length) { return true; }
-        }
-    }
-    return false;
-} /* isPixelPartOfWord */
 
 
 /******************************************************************************************************************************************************
@@ -226,6 +206,7 @@ boolean AnimationWipe::setNextIndex()
 {
     stdReturnType ReturValue = E_OK;
     byte Column, Row;
+
     pDisplay->indexToColumnAndRow(Index, Column, Row);
 
     if(Column < DISPLAY_NUMBER_OF_COLUMNS - 1) Column++;

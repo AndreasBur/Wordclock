@@ -178,6 +178,8 @@ class Display
     void test();
     void clear() { Pixels.clearAllPixels(); }
     void indexToColumnAndRow(byte Index, byte& Column, byte& Row) const { Row = Index / DISPLAY_NUMBER_OF_COLUMNS; Column = Index % DISPLAY_NUMBER_OF_COLUMNS; }
+    byte indexToColumn(byte Index) const { return Index % DISPLAY_NUMBER_OF_COLUMNS; }
+    byte indexToRow(byte Index) const { return Index / DISPLAY_NUMBER_OF_COLUMNS; }
     byte columnAndRowToIndex(byte Column, byte Row) const { return (Row * DISPLAY_NUMBER_OF_COLUMNS) + Column; }
 
 };

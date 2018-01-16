@@ -42,8 +42,8 @@ WordclockDialog::WordclockDialog(wxDialog *dlg, const wxString &title) : wxDialo
     //WcTransformation.shiftRight(true);
     //WcTransformation.shiftUp(false);
     //WcTransformation.shiftDown(true);
-    WcAnimation.setAnimation(Animation::ANIMATION_WIPE);
-    WcAnimation.setClock(12, 00);
+    WcAnimation.setAnimation(Animation::ANIMATION_SHIFT);
+    WcAnimation.setClock(Hour, Minute);
     //WcClock.show();
 }
 

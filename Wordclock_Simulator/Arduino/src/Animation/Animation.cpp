@@ -142,6 +142,9 @@ void Animation::setAnimation(AnimationType Animation)
         case ANIMATION_WIPE :
             Animations.Wipe.init(pDisplay, pClock);
             break;
+        case ANIMATION_SHIFT :
+            Animations.Shift.init(pDisplay, pClock);
+            break;
         case ANIMATION_FADE :
             break;
         case ANIMATION_SNAKE :
@@ -180,6 +183,9 @@ stdReturnType Animation::setClock(byte Hour, byte Minute)
             break;
         case ANIMATION_WIPE :
             return Animations.Wipe.setClock(Hour, Minute);
+            break;
+        case ANIMATION_SHIFT :
+            return Animations.Shift.setClock(Hour, Minute);
             break;
         case ANIMATION_FADE :
             break;
@@ -220,6 +226,9 @@ void Animation::task()
             break;
         case ANIMATION_WIPE :
             return Animations.Wipe.task();
+            break;
+        case ANIMATION_SHIFT :
+            return Animations.Shift.task();
             break;
         case ANIMATION_FADE :
             break;

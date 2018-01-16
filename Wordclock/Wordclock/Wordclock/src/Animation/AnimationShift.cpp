@@ -83,8 +83,43 @@ void AnimationShift::init(Display* Display, Clock* Clock)
     pDisplay = Display;
     pClock = Clock;
     State = STATE_IDLE;
+    wcTransformation.setDisplay(Display);
     reset();
 } /* init */
+
+
+/******************************************************************************************************************************************************
+  setClock()
+******************************************************************************************************************************************************/
+/*! \brief          
+ *  \details        
+ *                  
+ *  \return         -
+******************************************************************************************************************************************************/
+stdReturnType AnimationShift::setClock(byte Hour, byte Minute)
+{
+    stdReturnType ReturnValue{E_NOT_OK};
+
+    if(pClock->getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
+        State = STATE_CLEAR_TIME;
+    }
+    return ReturnValue;
+} /* setClock */
+
+
+/******************************************************************************************************************************************************
+  task()
+******************************************************************************************************************************************************/
+/*! \brief          
+ *  \details        
+ *                  
+ *  \return         -
+******************************************************************************************************************************************************/
+void AnimationShift::task()
+{
+    if(State == STATE_CLEAR_TIME) { clearTimeTask(); }
+    if(State == STATE_SET_TIME) { setTimeTask(); }
+} /* task */
 
 
 /******************************************************************************************************************************************************
@@ -101,10 +136,72 @@ void AnimationShift::init(Display* Display, Clock* Clock)
 ******************************************************************************************************************************************************/
 void AnimationShift::reset()
 {
+#if (ANIMATION_SHIFT_HORIZONTAL == STD_ON)
     MaxWordColumn = 0;
     MinWordColumn = 0;
     CurrentColumn = 0;
+#endif
+
+#if (ANIMATION_SHIFT_VERTICAL == STD_ON)
+    MaxWordRow = 0;
+    MinWordRow = 0;
+    CurrentRow = 0;
+#endif
 } /* reset */
+
+
+/******************************************************************************************************************************************************
+  clearTimeTask()
+******************************************************************************************************************************************************/
+/*! \brief          
+ *  \details        
+ *                  
+ *  \return         -
+******************************************************************************************************************************************************/
+void AnimationShift::clearTimeTask()
+{
+#if (ANIMATION_SHIFT_HORIZONTAL == STD_ON)
+    if(CurrentColumn < DISPLAY_NUMBER_OF_COLUMNS) { 
+        wcTransformation.shiftRightFast();
+        CurrentColumn++;
+    } else {
+        State = STATE_SET_TIME;
+        reset();
+    }
+#endif
+
+#if (ANIMATION_SHIFT_VERTICAL == STD_ON)
+    if(CurrentRow < DISPLAY_NUMBER_OF_ROWS) wcTransformation.shiftDownFast();
+    CurrentRow++;
+#endif
+    
+} /* clearTimeTask */
+
+
+/******************************************************************************************************************************************************
+  setTimeTask()
+******************************************************************************************************************************************************/
+/*! \brief          
+ *  \details        
+ *                  
+ *  \return         -
+******************************************************************************************************************************************************/
+void AnimationShift::setTimeTask()
+{
+#if (ANIMATION_SHIFT_HORIZONTAL == STD_ON)
+    if(CurrentColumn < DISPLAY_NUMBER_OF_COLUMNS) {
+        wcTransformation.shiftRightFast();
+        for(byte Row = 0; Row < DISPLAY_NUMBER_OF_ROWS; Row++) {
+            if(isPixelPartOfClockWords(ClockWordsTable, CurrentColumn, Row)) {
+                pDisplay->setPixelFast(0, Row);
+            }
+        }
+        CurrentColumn++;
+    } else {
+        State = STATE_IDLE;
+    }
+#endif
+} /* setTimeTask */
 
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E

@@ -68,23 +68,45 @@ AnimationCommon::~AnimationCommon()
 
 
 /******************************************************************************************************************************************************
-  init()
+  isPixelPartOfWord()
 ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
+/*! \brief
+ *  \details
+ *
  *  \return         -
 ******************************************************************************************************************************************************/
-void AnimationCommon::init()
+boolean AnimationCommon::isPixelPartOfClockWords(Clock::ClockWordsTableType ClockWordsTable, byte Column, byte Row)
 {
+    DisplayWords Words;
 
-} /* init */
+    for(uint8_t WordIndex = 0; WordIndex < CLOCK_WORDS_TABLE_TYPE_SIZE; WordIndex++) {
+        if(ClockWordsTable[WordIndex] == DisplayWords::WORD_NONE) { break; }
+        DisplayWords::Word Word = Words.getDisplayWordFast(ClockWordsTable[WordIndex]);
+        if(Word.Row == Row) { if(Column >= Word.Column && Column < Word.Column + Word.Length) { return true; } }
+    }
+    return false;
+} /* isPixelPartOfWord */
+
+/******************************************************************************************************************************************************
+  isPixelPartOfWord()
+******************************************************************************************************************************************************/
+/*! \brief
+ *  \details
+ *
+ *  \return         -
+******************************************************************************************************************************************************/
+boolean AnimationCommon::isPixelPartOfClockWords(Clock::ClockWordsTableType ClockWordsTable, byte Index)
+{
+    byte Row = Index % DISPLAY_NUMBER_OF_COLUMNS;
+    byte Column = Index / DISPLAY_NUMBER_OF_COLUMNS;
+
+    return isPixelPartOfClockWords(ClockWordsTable, Column, Row);
+} /* isPixelPartOfWord */
 
 
 /******************************************************************************************************************************************************
  * P R I V A T E   F U N C T I O N S
 ******************************************************************************************************************************************************/
-
 
 
 /******************************************************************************************************************************************************

@@ -9,10 +9,10 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       AnimationShift.h
- *      \brief      
+ *      \brief
  *
- *      \details    
- *                  
+ *      \details
+ *
 ******************************************************************************************************************************************************/
 #ifndef _ANIMATION_SHIFT_H_
 #define _ANIMATION_SHIFT_H_
@@ -23,12 +23,24 @@
 #include "StandardTypes.h"
 #include "Arduino.h"
 #include "Clock.h"
-
+#include "Transformation.h"
+#include "AnimationCommon.h"
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
 /* AnimationShift configuration parameter */
+#define ANIMATION_SHIFT_HORIZONTAL              STD_ON
+#define ANIMATION_SHIFT_VERTICAL                STD_OFF
+
+
+#if (ANIMATION_SHIFT_HORIZONTAL == STD_OFF && ANIMATION_SHIFT_VERTICAL == STD_OFF)
+#error "AnimationShift: Exactly one switch must be set to STD_ON"
+#endif
+
+#if (ANIMATION_SHIFT_HORIZONTAL == STD_ON && ANIMATION_SHIFT_VERTICAL == STD_ON)
+#error "AnimationShift: ANIMATION_SHIFT_HORIZONTAL or ANIMATION_SHIFT_VERTICAL has to be STD_ON, but not both"
+#endif
 
 
 /* AnimationShift parameter */
@@ -43,7 +55,7 @@
 /******************************************************************************************************************************************************
  *  C L A S S   T E M P L A T E
 ******************************************************************************************************************************************************/
-class AnimationShift
+class AnimationShift : public AnimationCommon
 {
 /******************************************************************************************************************************************************
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
@@ -58,21 +70,30 @@ class AnimationShift
         //STATE_SHIFT_IN,
         STATE_SET_TIME
     };
-  
+
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
     Clock* pClock;
     Display* pDisplay;
+    Transformation wcTransformation;
     StateType State;
-    byte MaxWordColumn;
-    byte MinWordColumn;
+    Clock::ClockWordsTableType ClockWordsTable;
+
+#if (ANIMATION_SHIFT_HORIZONTAL == STD_ON)
     byte CurrentColumn;
+#endif
+
+#if (ANIMATION_SHIFT_VERTICAL == STD_ON)
+    byte CurrentRow;
+#endif
 
     // functions
     void reset();
-  
+    void clearTimeTask();
+    void setTimeTask();
+
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/

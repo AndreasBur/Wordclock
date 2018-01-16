@@ -23,12 +23,24 @@
 #include "StandardTypes.h"
 #include "Arduino.h"
 #include "Clock.h"
-
+#include "Transformation.h"
+#include "AnimationCommon.h"
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
 /* AnimationShift configuration parameter */
+#define ANIMATION_SHIFT_HORIZONTAL              STD_ON
+#define ANIMATION_SHIFT_VERTICAL                STD_OFF
+
+
+#if (ANIMATION_SHIFT_HORIZONTAL == STD_OFF && ANIMATION_SHIFT_VERTICAL == STD_OFF)
+#error "AnimationShift: Exactly one switch must be set to STD_ON"
+#endif
+
+#if (ANIMATION_SHIFT_HORIZONTAL == STD_ON && ANIMATION_SHIFT_VERTICAL == STD_ON)
+#error "AnimationShift: ANIMATION_SHIFT_HORIZONTAL or ANIMATION_SHIFT_VERTICAL has to be STD_ON, but not both"
+#endif
 
 
 /* AnimationShift parameter */
@@ -43,7 +55,7 @@
 /******************************************************************************************************************************************************
  *  C L A S S   T E M P L A T E
 ******************************************************************************************************************************************************/
-class AnimationShift
+class AnimationShift : public AnimationCommon
 {
 /******************************************************************************************************************************************************
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
@@ -65,13 +77,26 @@ class AnimationShift
   private:
     Clock* pClock;
     Display* pDisplay;
+    Transformation wcTransformation;
     StateType State;
+    Clock::ClockWordsTableType ClockWordsTable;
+
+#if (ANIMATION_SHIFT_HORIZONTAL == STD_ON)
     byte MaxWordColumn;
     byte MinWordColumn;
     byte CurrentColumn;
+#endif
+
+#if (ANIMATION_SHIFT_VERTICAL == STD_ON)
+    byte MaxWordRow;
+    byte MinWordRow;
+    byte CurrentRow;
+#endif
 
     // functions
     void reset();
+    void clearTimeTask();
+    void setTimeTask();
   
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
