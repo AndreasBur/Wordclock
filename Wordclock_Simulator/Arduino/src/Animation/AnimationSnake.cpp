@@ -9,10 +9,10 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       AnimationSnake.cpp
- *      \brief      
+ *      \brief
  *
- *      \details    
- *                  
+ *      \details
+ *
  *
 ******************************************************************************************************************************************************/
 #define _ANIMATION_SNAKE_SOURCE_
@@ -24,7 +24,7 @@
 
 
 /******************************************************************************************************************************************************
- *  L O C A L   C O N S T A N T   M A C R O S 
+ *  L O C A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
 
 
@@ -73,9 +73,9 @@ AnimationSnake::~AnimationSnake()
 /******************************************************************************************************************************************************
   init()
 ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
+/*! \brief
+ *  \details
+ *
  *  \return         -
 ******************************************************************************************************************************************************/
 void AnimationSnake::init(Display* Display, Clock* Clock)
@@ -90,16 +90,21 @@ void AnimationSnake::init(Display* Display, Clock* Clock)
 /******************************************************************************************************************************************************
   setClock()
 ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
+/*! \brief
+ *  \details
+ *
  *  \return         -
 ******************************************************************************************************************************************************/
 stdReturnType AnimationSnake::setClock(byte Hour, byte Minute)
 {
     stdReturnType ReturnValue{E_NOT_OK};
 
-
+    if(pClock->getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
+        ReturnValue = E_OK;
+        SnakeBeginIndex = 0;
+        SnakeEndIndex = 0;
+        State = STATE_WORKING;
+    }
     return ReturnValue;
 } /* setClock */
 
@@ -107,15 +112,26 @@ stdReturnType AnimationSnake::setClock(byte Hour, byte Minute)
 /******************************************************************************************************************************************************
   task()
 ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
+/*! \brief
+ *  \details
+ *
  *  \return         -
 ******************************************************************************************************************************************************/
 void AnimationSnake::task()
 {
     if(State == STATE_WORKING) {
+        byte SnakeEndIndexTrans = transformToSerpentine(SnakeEndIndex);
+        pDisplay->setPixelFast(transformToSerpentine(SnakeBeginIndex));
 
+        if((SnakeBeginIndex - SnakeEndIndex) == ANIMATION_SNAKE_LENGTH ||
+           (SnakeBeginIndex >= DISPLAY_NUMBER_OF_LEDS && SnakeEndIndex < DISPLAY_NUMBER_OF_LEDS))
+        {
+            //pDisplay->clearPixelFast(SnakeEndIndexTrans);
+            if(isPixelPartOfClockWords(ClockWordsTable, SnakeEndIndexTrans) == false) pDisplay->clearPixelFast(SnakeEndIndexTrans);
+            SnakeEndIndex++;
+        }
+        if(SnakeBeginIndex < DISPLAY_NUMBER_OF_LEDS) SnakeBeginIndex++;
+        if(SnakeEndIndex >= DISPLAY_NUMBER_OF_LEDS) State = STATE_IDLE;
     }
 } /* task */
 
@@ -137,7 +153,42 @@ void AnimationSnake::reset()
 
 } /* reset */
 
+
+/******************************************************************************************************************************************************
+  transformToSerpentine()
+******************************************************************************************************************************************************/
+/*! \brief
+ *  \details
+ *
+ *  \return         -
+******************************************************************************************************************************************************/
+byte AnimationSnake::transformToSerpentine(byte Column, byte Row) const
+{
+    byte Index;
+
+    if(IS_BIT_CLEARED(Row, 0)) Index = (Row * DISPLAY_NUMBER_OF_COLUMNS) + Column;
+    else Index = (Row * DISPLAY_NUMBER_OF_COLUMNS) + (DISPLAY_NUMBER_OF_COLUMNS - Column - 1);
+
+    return Index;
+} /* transformToSerpentine */
+
+
+/******************************************************************************************************************************************************
+  transformToSerpentine()
+******************************************************************************************************************************************************/
+/*! \brief
+ *  \details
+ *
+ *  \return         -
+******************************************************************************************************************************************************/
+byte AnimationSnake::transformToSerpentine(byte Index) const
+{
+    byte Column = pDisplay->indexToColumn(Index);
+    byte Row = pDisplay->indexToRow(Index);
+
+    return transformToSerpentine(Column, Row);
+} /* transformToSerpentine */
+
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E
 ******************************************************************************************************************************************************/
- 

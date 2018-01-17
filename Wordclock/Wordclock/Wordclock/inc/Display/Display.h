@@ -104,6 +104,7 @@ class Display
     
     // functions
     byte transformToSerpentine(byte, byte) const;
+    byte transformToSerpentine(byte) const;
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S

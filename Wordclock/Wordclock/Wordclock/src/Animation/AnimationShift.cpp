@@ -9,10 +9,10 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       AnimationShift.cpp
- *      \brief      
+ *      \brief
  *
- *      \details    
- *                  
+ *      \details
+ *
  *
 ******************************************************************************************************************************************************/
 #define _ANIMATION_SHIFT_SOURCE_
@@ -24,7 +24,7 @@
 
 
 /******************************************************************************************************************************************************
- *  L O C A L   C O N S T A N T   M A C R O S 
+ *  L O C A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
 
 
@@ -73,9 +73,9 @@ AnimationShift::~AnimationShift()
 /******************************************************************************************************************************************************
   init()
 ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
+/*! \brief
+ *  \details
+ *
  *  \return         -
 ******************************************************************************************************************************************************/
 void AnimationShift::init(Display* Display, Clock* Clock)
@@ -91,9 +91,9 @@ void AnimationShift::init(Display* Display, Clock* Clock)
 /******************************************************************************************************************************************************
   setClock()
 ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
+/*! \brief
+ *  \details
+ *
  *  \return         -
 ******************************************************************************************************************************************************/
 stdReturnType AnimationShift::setClock(byte Hour, byte Minute)
@@ -110,9 +110,9 @@ stdReturnType AnimationShift::setClock(byte Hour, byte Minute)
 /******************************************************************************************************************************************************
   task()
 ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
+/*! \brief
+ *  \details
+ *
  *  \return         -
 ******************************************************************************************************************************************************/
 void AnimationShift::task()
@@ -137,14 +137,10 @@ void AnimationShift::task()
 void AnimationShift::reset()
 {
 #if (ANIMATION_SHIFT_HORIZONTAL == STD_ON)
-    MaxWordColumn = 0;
-    MinWordColumn = 0;
     CurrentColumn = 0;
 #endif
 
 #if (ANIMATION_SHIFT_VERTICAL == STD_ON)
-    MaxWordRow = 0;
-    MinWordRow = 0;
     CurrentRow = 0;
 #endif
 } /* reset */
@@ -153,15 +149,15 @@ void AnimationShift::reset()
 /******************************************************************************************************************************************************
   clearTimeTask()
 ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
+/*! \brief
+ *  \details
+ *
  *  \return         -
 ******************************************************************************************************************************************************/
 void AnimationShift::clearTimeTask()
 {
 #if (ANIMATION_SHIFT_HORIZONTAL == STD_ON)
-    if(CurrentColumn < DISPLAY_NUMBER_OF_COLUMNS) { 
+    if(CurrentColumn < DISPLAY_NUMBER_OF_COLUMNS) {
         wcTransformation.shiftRightFast();
         CurrentColumn++;
     } else {
@@ -171,19 +167,24 @@ void AnimationShift::clearTimeTask()
 #endif
 
 #if (ANIMATION_SHIFT_VERTICAL == STD_ON)
-    if(CurrentRow < DISPLAY_NUMBER_OF_ROWS) wcTransformation.shiftDownFast();
-    CurrentRow++;
+    if(CurrentRow < DISPLAY_NUMBER_OF_ROWS) {
+        wcTransformation.shiftDownFast();
+        CurrentRow++;
+    } else {
+        State = STATE_SET_TIME;
+        reset();
+    }
 #endif
-    
+
 } /* clearTimeTask */
 
 
 /******************************************************************************************************************************************************
   setTimeTask()
 ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
+/*! \brief
+ *  \details
+ *
  *  \return         -
 ******************************************************************************************************************************************************/
 void AnimationShift::setTimeTask()
@@ -192,11 +193,25 @@ void AnimationShift::setTimeTask()
     if(CurrentColumn < DISPLAY_NUMBER_OF_COLUMNS) {
         wcTransformation.shiftRightFast();
         for(byte Row = 0; Row < DISPLAY_NUMBER_OF_ROWS; Row++) {
-            if(isPixelPartOfClockWords(ClockWordsTable, CurrentColumn, Row)) {
+            if(isPixelPartOfClockWords(ClockWordsTable, DISPLAY_NUMBER_OF_COLUMNS - CurrentColumn - 1, Row)) {
                 pDisplay->setPixelFast(0, Row);
             }
         }
         CurrentColumn++;
+    } else {
+        State = STATE_IDLE;
+    }
+#endif
+
+#if (ANIMATION_SHIFT_VERTICAL == STD_ON)
+    if(CurrentRow < DISPLAY_NUMBER_OF_ROWS) {
+        wcTransformation.shiftDownFast();
+        for(byte Column = 0; Column < DISPLAY_NUMBER_OF_COLUMNS; Column++) {
+            if(isPixelPartOfClockWords(ClockWordsTable, Column, DISPLAY_NUMBER_OF_ROWS - CurrentRow - 1)) {
+                pDisplay->setPixelFast(Column, 0);
+            }
+        }
+        CurrentRow++;
     } else {
         State = STATE_IDLE;
     }
@@ -206,4 +221,3 @@ void AnimationShift::setTimeTask()
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E
 ******************************************************************************************************************************************************/
- 

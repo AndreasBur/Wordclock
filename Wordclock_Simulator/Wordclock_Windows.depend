@@ -6122,7 +6122,7 @@
 1513586597 c:\users\virskl\documents\github\wordclock\wordclock_simulator\include\arduino.h
 	<string.h>
 
-1515678425 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\display\display.h
+1516196632 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\display\display.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"WS2812.h"
@@ -6187,7 +6187,7 @@
 	"AnimationSnake.h"
 	"AnimationShift.h"
 
-1516114862 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\wordclockmain.cpp
+1516197016 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\wordclockmain.cpp
 	"wx_pch.h"
 	"WordclockMain.h"
 
@@ -6200,7 +6200,7 @@
 1515414007 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\clock\clock.cpp
 	"Clock.h"
 
-1515677793 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\display\display.cpp
+1516196648 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\display\display.cpp
 	"Display.h"
 	"WordclockIcon.xpm"
 
@@ -6381,10 +6381,11 @@
 	"Clock.h"
 	"AnimationCommon.h"
 
-1515424910 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\animation\animationsnake.h
+1516196778 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\animation\animationsnake.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"Clock.h"
+	"AnimationCommon.h"
 
 1515413721 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\animationfade.cpp
 	"AnimationFade.h"
@@ -6410,7 +6411,7 @@
 	"Transformation.h"
 	"AnimationCommon.h"
 
-1515424950 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\animationsnake.cpp
+1516197966 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\animationsnake.cpp
 	"AnimationSnake.h"
 
 1516115241 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\animationwipe.cpp

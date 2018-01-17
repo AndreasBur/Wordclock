@@ -97,8 +97,8 @@ boolean AnimationCommon::isPixelPartOfClockWords(Clock::ClockWordsTableType Cloc
 ******************************************************************************************************************************************************/
 boolean AnimationCommon::isPixelPartOfClockWords(Clock::ClockWordsTableType ClockWordsTable, byte Index)
 {
-    byte Row = Index % DISPLAY_NUMBER_OF_COLUMNS;
-    byte Column = Index / DISPLAY_NUMBER_OF_COLUMNS;
+    byte Row = Index / DISPLAY_NUMBER_OF_COLUMNS;
+    byte Column = Index % DISPLAY_NUMBER_OF_COLUMNS;
 
     return isPixelPartOfClockWords(ClockWordsTable, Column, Row);
 } /* isPixelPartOfWord */

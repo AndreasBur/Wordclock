@@ -9,10 +9,10 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       AnimationCommon.cpp
- *      \brief      
+ *      \brief
  *
- *      \details    
- *                  
+ *      \details
+ *
  *
 ******************************************************************************************************************************************************/
 #define _ANIMATION_COMMON_SOURCE_
@@ -24,7 +24,7 @@
 
 
 /******************************************************************************************************************************************************
- *  L O C A L   C O N S T A N T   M A C R O S 
+ *  L O C A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
 
 
@@ -97,8 +97,8 @@ boolean AnimationCommon::isPixelPartOfClockWords(Clock::ClockWordsTableType Cloc
 ******************************************************************************************************************************************************/
 boolean AnimationCommon::isPixelPartOfClockWords(Clock::ClockWordsTableType ClockWordsTable, byte Index)
 {
-    byte Row = Index % DISPLAY_NUMBER_OF_COLUMNS;
-    byte Column = Index / DISPLAY_NUMBER_OF_COLUMNS;
+    byte Row = Index / DISPLAY_NUMBER_OF_COLUMNS;
+    byte Column = Index % DISPLAY_NUMBER_OF_COLUMNS;
 
     return isPixelPartOfClockWords(ClockWordsTable, Column, Row);
 } /* isPixelPartOfWord */
@@ -112,4 +112,3 @@ boolean AnimationCommon::isPixelPartOfClockWords(Clock::ClockWordsTableType Cloc
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E
 ******************************************************************************************************************************************************/
- 

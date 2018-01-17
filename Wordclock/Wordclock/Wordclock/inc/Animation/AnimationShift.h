@@ -9,10 +9,10 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       AnimationShift.h
- *      \brief      
+ *      \brief
  *
- *      \details    
- *                  
+ *      \details
+ *
 ******************************************************************************************************************************************************/
 #ifndef _ANIMATION_SHIFT_H_
 #define _ANIMATION_SHIFT_H_
@@ -70,7 +70,7 @@ class AnimationShift : public AnimationCommon
         //STATE_SHIFT_IN,
         STATE_SET_TIME
     };
-  
+
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
@@ -82,14 +82,10 @@ class AnimationShift : public AnimationCommon
     Clock::ClockWordsTableType ClockWordsTable;
 
 #if (ANIMATION_SHIFT_HORIZONTAL == STD_ON)
-    byte MaxWordColumn;
-    byte MinWordColumn;
     byte CurrentColumn;
 #endif
 
 #if (ANIMATION_SHIFT_VERTICAL == STD_ON)
-    byte MaxWordRow;
-    byte MinWordRow;
     byte CurrentRow;
 #endif
 
@@ -97,7 +93,7 @@ class AnimationShift : public AnimationCommon
     void reset();
     void clearTimeTask();
     void setTimeTask();
-  
+
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/

@@ -165,7 +165,10 @@ void AnimationWipe::clearTimeTask()
     if(SetPixelState == STATE_SET_PIXEL_DOWN) SetPixelState = STATE_SET_PIXEL_RIGHT;
     else SetPixelState = STATE_SET_PIXEL_DOWN;
 
-    if(setNextIndex() == E_NOT_OK) State = STATE_SET_TIME;
+    if(setNextIndex() == E_NOT_OK) {
+        State = STATE_SET_TIME;
+        reset();
+    }
 } /* clearTimeTask */
 
 
