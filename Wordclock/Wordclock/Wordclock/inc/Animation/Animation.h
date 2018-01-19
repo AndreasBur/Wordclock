@@ -111,11 +111,14 @@ class Animation
         ANIMATION_TELETYPE,
         ANIMATION_DROP,
         ANIMATION_SHIFT,
-        ANIMATION_FADE, // langsam verdunkeln
+        ANIMATION_FADE,
         ANIMATION_SNAKE,
         ANIMATION_WIPE,
         ANIMATION_EXPLODE,
         ANIMATION_IMPLODE,
+        ANIMATION_FLICKER,
+        ANIMATION_MATRIX,
+        ANIMATION_CUBE,
         ANIMATION_NONE
     };
 
