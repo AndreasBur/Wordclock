@@ -8,34 +8,34 @@
  *  ---------------------------------------------------------------------------------------------------------------------------------------------------
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       AnimationWipe.cpp
- *      \brief
+/**     \file       AnimationClockCursor.cpp
+ *      \brief      
  *
- *      \details
+ *      \details    
+ *                  
  *
- *
 ******************************************************************************************************************************************************/
-#define _ANIMATION_WIPE_SOURCE_
+#define _ANIMATION_CLOCK_CURSOR_SOURCE_
 
 /******************************************************************************************************************************************************
- * I N C L U D E S
+ * INCLUDES
 ******************************************************************************************************************************************************/
-#include "AnimationWipe.h"
-
-
-/******************************************************************************************************************************************************
- *  L O C A L   C O N S T A N T   M A C R O S
-******************************************************************************************************************************************************/
+#include "AnimationClockCursor.h"
 
 
 /******************************************************************************************************************************************************
- *  L O C A L   F U N C T I O N   M A C R O S
+ *  LOCAL CONSTANT MACROS
+******************************************************************************************************************************************************/
+
+
+/******************************************************************************************************************************************************
+ *  LOCAL FUNCTION MACROS
 ******************************************************************************************************************************************************/
 
 
 
 /******************************************************************************************************************************************************
- *  L O C A L   D A T A   T Y P E S   A N D   S T R U C T U R E S
+ *  LOCAL DATA TYPES AND STRUCTURES
 ******************************************************************************************************************************************************/
 
 
@@ -45,40 +45,40 @@
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  Constructor of AnimationWipe
+  Constructor of AnimationClockCursor
 ******************************************************************************************************************************************************/
-/*! \brief          AnimationWipe Constructor
- *  \details        Instantiation of the AnimationWipe library
+/*! \brief          AnimationClockCursor Constructor
+ *  \details        Instantiation of the AnimationClockCursor library
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-AnimationWipe::AnimationWipe()
+AnimationClockCursor::AnimationClockCursor()
 {
     pDisplay = nullptr;
     pClock = nullptr;
     State = STATE_UNINIT;
     reset();
-} /* AnimationWipe */
+} /* AnimationClockCursor */
 
 
 /******************************************************************************************************************************************************
-  Destructor of AnimationWipe
+  Destructor of AnimationClockCursor
 ******************************************************************************************************************************************************/
-AnimationWipe::~AnimationWipe()
+AnimationClockCursor::~AnimationClockCursor()
 {
 
-} /* ~AnimationWipe */
+} /* ~AnimationClockCursor */
 
 
 /******************************************************************************************************************************************************
   init()
 ******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
+/*! \brief          
+ *  \details        
+ *                  
  *  \return         -
 ******************************************************************************************************************************************************/
-void AnimationWipe::init(Display* Display, Clock* Clock)
+void AnimationClockCursor::init(Display* Display, Clock* Clock)
 {
     pDisplay = Display;
     pClock = Clock;
@@ -90,18 +90,19 @@ void AnimationWipe::init(Display* Display, Clock* Clock)
 /******************************************************************************************************************************************************
   setClock()
 ******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
+/*! \brief          
+ *  \details        
+ *                  
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType AnimationWipe::setClock(byte Hour, byte Minute)
+stdReturnType AnimationClockCursor::setClock(byte Hour, byte Minute)
 {
     stdReturnType ReturnValue{E_NOT_OK};
 
     if(pClock->getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
         ReturnValue = E_OK;
-        State = STATE_CLEAR_TIME;
+        CurrentPixelIndex = 0;
+        State = STATE_WORKING;
     }
     return ReturnValue;
 } /* setClock */
@@ -110,15 +111,23 @@ stdReturnType AnimationWipe::setClock(byte Hour, byte Minute)
 /******************************************************************************************************************************************************
   task()
 ******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
+/*! \brief          
+ *  \details        
+ *                  
  *  \return         -
 ******************************************************************************************************************************************************/
-void AnimationWipe::task()
+void AnimationClockCursor::task()
 {
-    if(State == STATE_CLEAR_TIME) { clearTimeTask(); }
-    if(State == STATE_SET_TIME) { setTimeTask(); }
+    if(State == STATE_WORKING) {
+        pDisplay->setPixelFast(CurrentPixelIndex);
+        if(CurrentPixelIndex > 0) {
+            if(isPixelPartOfClockWords(ClockWordsTable, CurrentPixelIndex - 1) == false) { 
+                pDisplay->clearPixelFast(CurrentPixelIndex - 1);
+            }
+        }
+        if(CurrentPixelIndex >= DISPLAY_NUMBER_OF_PIXELS) State = STATE_IDLE;
+        CurrentPixelIndex++;
+    }
 } /* task */
 
 
@@ -134,132 +143,14 @@ void AnimationWipe::task()
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-void AnimationWipe::reset()
+void AnimationClockCursor::reset()
 {
-    Index = 0;
-    SetPixelState = STATE_SET_PIXEL_DOWN;
+    for(auto& Word : ClockWordsTable) { Word = DisplayWords::WORD_NONE; }
+    CurrentPixelIndex = 0;
 } /* reset */
-
-
-/******************************************************************************************************************************************************
-  clearTimeTask()
-******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
-******************************************************************************************************************************************************/
-void AnimationWipe::clearTimeTask()
-{
-    byte Column, Row;
-
-    pDisplay->indexToColumnAndRow(Index, Column, Row);
-
-    do {
-        if(pDisplay->getPixelFast(Column, Row)) {
-            if(SetPixelState == STATE_SET_PIXEL_DOWN) setPixelDown(Column, Row);
-            else setPixelRight(Column, Row);
-        }
-    } while(Column-- != 0 && Row++ < DISPLAY_NUMBER_OF_ROWS - 1);
-
-    if(SetPixelState == STATE_SET_PIXEL_DOWN) SetPixelState = STATE_SET_PIXEL_RIGHT;
-    else SetPixelState = STATE_SET_PIXEL_DOWN;
-
-    if(setNextIndex() == E_NOT_OK) {
-        State = STATE_SET_TIME;
-        reset();
-    }
-} /* clearTimeTask */
-
-
-/******************************************************************************************************************************************************
-  setTimeTask()
-******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
-******************************************************************************************************************************************************/
-void AnimationWipe::setTimeTask()
-{
-    byte Column, Row;
-
-    pDisplay->indexToColumnAndRow(Index, Column, Row);
-
-    do {
-        if(isPixelPartOfClockWords(ClockWordsTable, Column, Row)) { pDisplay->setPixelFast(Column, Row); }
-    } while(Column-- != 0 && Row++ < DISPLAY_NUMBER_OF_ROWS - 1);
-
-    if(setNextIndex() == E_NOT_OK) State = STATE_IDLE;
-} /* setTimeTask */
-
-
-/******************************************************************************************************************************************************
-  setNextIndex()
-******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
-******************************************************************************************************************************************************/
-boolean AnimationWipe::setNextIndex()
-{
-    stdReturnType ReturValue = E_OK;
-    byte Column, Row;
-
-    pDisplay->indexToColumnAndRow(Index, Column, Row);
-
-    if(Column < DISPLAY_NUMBER_OF_COLUMNS - 1) Column++;
-    else if(Row < DISPLAY_NUMBER_OF_ROWS - 1) Row++;
-    else ReturValue = E_NOT_OK;
-
-    Index = pDisplay->columnAndRowToIndex(Column, Row);
-    return ReturValue;
-} /* setNextIndex */
-
-
-/******************************************************************************************************************************************************
-  setPixelDown()
-******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
-******************************************************************************************************************************************************/
-void AnimationWipe::setPixelDown(byte Column, byte Row)
-{
-    pDisplay->clearPixelFast(Column, Row);
-
-    for(byte RowNext = Row + 1; RowNext < DISPLAY_NUMBER_OF_ROWS; RowNext++) {
-        if(pDisplay->getPixelFast(Column, RowNext) == false) {
-            pDisplay->setPixelFast(Column, RowNext);
-            break;
-        }
-    }
-} /* setPixelDown */
-
-
-/******************************************************************************************************************************************************
-  setPixelRight()
-******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
-******************************************************************************************************************************************************/
-void AnimationWipe::setPixelRight(byte Column, byte Row)
-{
-    pDisplay->clearPixelFast(Column, Row);
-
-    for(byte ColumnNext = Column + 1; ColumnNext < DISPLAY_NUMBER_OF_COLUMNS; ColumnNext++) {
-        if(pDisplay->getPixelFast(ColumnNext, Row) == false) {
-            pDisplay->setPixelFast(ColumnNext, Row);
-            break;
-        }
-    }
-} /* setPixelRight */
 
 
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E
 ******************************************************************************************************************************************************/
+ 

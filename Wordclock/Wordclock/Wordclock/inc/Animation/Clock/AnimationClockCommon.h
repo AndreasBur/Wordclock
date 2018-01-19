@@ -8,14 +8,14 @@
  *  ---------------------------------------------------------------------------------------------------------------------------------------------------
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       AnimationSnake.h
+/**     \file       AnimationClockCommon.h
  *      \brief      
  *
  *      \details    
  *                  
 ******************************************************************************************************************************************************/
-#ifndef _ANIMATION_SNAKE_H_
-#define _ANIMATION_SNAKE_H_
+#ifndef _ANIMATION_CLOCK_COMMON_H_
+#define _ANIMATION_CLOCK_COMMON_H_
 
 /******************************************************************************************************************************************************
  * I N C L U D E S
@@ -23,15 +23,14 @@
 #include "StandardTypes.h"
 #include "Arduino.h"
 #include "Clock.h"
-#include "AnimationCommon.h"
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
-/* AnimationSnake configuration parameter */
-#define ANIMATION_SNAKE_LENGTH              8
+/* AnimationClockCommon configuration parameter */
 
-/* AnimationSnake parameter */
+
+/* AnimationClockCommon parameter */
 
 
 
@@ -43,48 +42,26 @@
 /******************************************************************************************************************************************************
  *  C L A S S   T E M P L A T E
 ******************************************************************************************************************************************************/
-class AnimationSnake : public AnimationCommon
+class AnimationClockCommon
 {
 /******************************************************************************************************************************************************
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-    enum StateType {
-        STATE_NONE,
-        STATE_UNINIT,
-        STATE_IDLE,
-        //STATE_READY,
-        STATE_WORKING
-    };
-
-    enum SnakeStateType {
-        SNAKE_STATE_TO_RIGHT,
-        SNAKE_STATE_TO_LEFT
-    };
+  
   
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
-    Clock* pClock;
-    Display* pDisplay;
-    StateType State;
-    SnakeStateType SnakeState;
-    Clock::ClockWordsTableType ClockWordsTable;
-    byte SnakeBeginIndex;
-    byte SnakeEndIndex;
+    
 
-    // functions
-    void reset();
-    byte transformToSerpentine(byte, byte) const;
-    byte transformToSerpentine(byte) const;
-  
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    AnimationSnake();
-    ~AnimationSnake();
+    AnimationClockCommon();
+    ~AnimationClockCommon();
 
 	// get methods
 
@@ -92,13 +69,12 @@ class AnimationSnake : public AnimationCommon
 	// set methods
 
 	// methods
-    void init(Display*, Clock*);
-    stdReturnType setClock(byte, byte);
-    void task();
-
+    boolean isPixelPartOfClockWords(Clock::ClockWordsTableType, byte, byte);
+    boolean isPixelPartOfClockWords(Clock::ClockWordsTableType, byte);
 };
 
 #endif
+
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E
 ******************************************************************************************************************************************************/

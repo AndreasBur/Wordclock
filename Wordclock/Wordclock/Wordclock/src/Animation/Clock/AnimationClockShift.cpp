@@ -8,23 +8,23 @@
  *  ---------------------------------------------------------------------------------------------------------------------------------------------------
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       AnimationFont.cpp
- *      \brief      
+/**     \file       AnimationClockShift.cpp
+ *      \brief
  *
- *      \details    
- *                  
+ *      \details
+ *
  *
 ******************************************************************************************************************************************************/
-#define _ANIMATION_FONT_SOURCE_
+#define _ANIMATION_CLOCK_SHIFT_SOURCE_
 
 /******************************************************************************************************************************************************
  * I N C L U D E S
 ******************************************************************************************************************************************************/
-#include "AnimationFont.h"
+#include "AnimationClockShift.h"
 
 
 /******************************************************************************************************************************************************
- *  L O C A L   C O N S T A N T   M A C R O S 
+ *  L O C A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
 
 
@@ -45,73 +45,81 @@
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  Constructor of AnimationFont
+  Constructor of AnimationClockShift
 ******************************************************************************************************************************************************/
-/*! \brief          AnimationFont Constructor
- *  \details        Instantiation of the AnimationFont library
+/*! \brief          AnimationClockShift Constructor
+ *  \details        Instantiation of the AnimationClockShift library
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-AnimationFont::AnimationFont(Display* Display)
+AnimationClockShift::AnimationClockShift()
 {
-    pDisplay = Display;
-} /* AnimationFont */
+    pDisplay = nullptr;
+    pClock = nullptr;
+    State = STATE_UNINIT;
+    reset();
+} /* AnimationClockShift */
 
 
 /******************************************************************************************************************************************************
-  Destructor of AnimationFont
+  Destructor of AnimationClockShift
 ******************************************************************************************************************************************************/
-AnimationFont::~AnimationFont()
+AnimationClockShift::~AnimationClockShift()
 {
 
-} /* ~AnimationFont */
+} /* ~AnimationClockShift */
 
 
 /******************************************************************************************************************************************************
   init()
-******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
- *  \return         -
-******************************************************************************************************************************************************/
-void AnimationFont::init()
-{
-
-} /* init */
-
-
-/******************************************************************************************************************************************************
-  setChar()
 ******************************************************************************************************************************************************/
 /*! \brief
  *  \details
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType AnimationFont::setChar(byte Column, byte Row, unsigned char Char, FontType Font)
+void AnimationClockShift::init(Display* Display, Clock* Clock)
 {
-#if(ANIMATION_SUPPORT_FONT_4X6 == STD_ON)
-    if(Font == FONT_4X6) return setCharFontHorizontal(Column, Row, Char, &Font_4x6[0][0], ANIMATION_FONT_4X6_WIDTH, ANIMATION_FONT_4X6_HEIGHT);
-#endif
+    pDisplay = Display;
+    pClock = Clock;
+    State = STATE_IDLE;
+    wcTransformation.setDisplay(Display);
+    reset();
+} /* init */
 
-#if(ANIMATION_SUPPORT_FONT_5X8 == STD_ON)
-    if(Font == FONT_5X8) return setCharFontHorizontal(Column, Row, Char, &Font_5x8[0][0], ANIMATION_FONT_5X8_WIDTH, ANIMATION_FONT_5X8_HEIGHT);
-#endif
 
-#if(ANIMATION_SUPPORT_FONT_6X8 == STD_ON)
-    if(Font == FONT_6X8) return setCharFontHorizontal(Column, Row, Char, &Font_6x8[0][0], ANIMATION_FONT_6X8_WIDTH, ANIMATION_FONT_6X8_HEIGHT);
-#endif
+/******************************************************************************************************************************************************
+  setClock()
+******************************************************************************************************************************************************/
+/*! \brief
+ *  \details
+ *
+ *  \return         -
+******************************************************************************************************************************************************/
+stdReturnType AnimationClockShift::setClock(byte Hour, byte Minute)
+{
+    stdReturnType ReturnValue{E_NOT_OK};
 
-#if(ANIMATION_SUPPORT_FONT_8X8 == STD_ON)
-    if(Font == FONT_8X8) return setCharFontHorizontal(Column, Row, Char, &Font_8x8[0][0], ANIMATION_FONT_8X8_WIDTH, ANIMATION_FONT_8X8_HEIGHT);
-#endif
+    if(pClock->getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
+        State = STATE_CLEAR_TIME;
+    }
+    return ReturnValue;
+} /* setClock */
 
-#if(ANIMATION_SUPPORT_FONT_6X10 == STD_ON)
-    if(Font == FONT_6X10) return setCharFontVertical(Column, Row, Char, &Font_6x10[0][0], ANIMATION_FONT_6X10_WIDTH, ANIMATION_FONT_6X10_HEIGHT);
-#endif
-    return E_NOT_OK;
-} /* setChar */
+
+/******************************************************************************************************************************************************
+  task()
+******************************************************************************************************************************************************/
+/*! \brief
+ *  \details
+ *
+ *  \return         -
+******************************************************************************************************************************************************/
+void AnimationClockShift::task()
+{
+    if(State == STATE_CLEAR_TIME) { clearTimeTask(); }
+    if(State == STATE_SET_TIME) { setTimeTask(); }
+} /* task */
 
 
 /******************************************************************************************************************************************************
@@ -119,93 +127,97 @@ stdReturnType AnimationFont::setChar(byte Column, byte Row, unsigned char Char, 
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  setCharFontHorizontal()
+  reset()
 ******************************************************************************************************************************************************/
 /*! \brief
  *  \details
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType AnimationFont::setCharFontHorizontal(byte Column, byte Row, unsigned char Char, const unsigned char* FontTable, byte FontWidth, byte FontHeight)
+void AnimationClockShift::reset()
 {
-    stdReturnType ReturnValue{E_OK};
-    byte FontIndex, ColumnAbs, RowAbs;
+#if (ANIMATION_CLOCK_SHIFT_HORIZONTAL == STD_ON)
+    CurrentColumn = 0;
+#endif
 
-    FontIndex = Char;
-
-    for(byte FontColumn = 0; FontColumn < FontWidth; FontColumn++)
-    {
-        byte Font_EntryItem = pgm_read_byte(&FontTable[(FontIndex * FontWidth) + FontColumn]);
-        for(byte FontRow = 0; FontRow < FontHeight; FontRow++)
-        {
-            ColumnAbs = Column + FontColumn;
-            RowAbs = Row + FontHeight - 1 - FontRow;
-            if(pDisplay->writePixel(ColumnAbs, RowAbs, bitRead(Font_EntryItem, FontRow)) == E_NOT_OK) ReturnValue = E_NOT_OK;
-        }
-    }
-    return ReturnValue;
-} /* setCharFontHorizontal */
+#if (ANIMATION_CLOCK_SHIFT_VERTICAL == STD_ON)
+    CurrentRow = 0;
+#endif
+} /* reset */
 
 
 /******************************************************************************************************************************************************
-  setCharFontVertical()
+  clearTimeTask()
 ******************************************************************************************************************************************************/
 /*! \brief
  *  \details
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType AnimationFont::setCharFontVertical(byte Column, byte Row, unsigned char Char, const unsigned char* FontTable, byte FontWidth, byte FontHeight)
+void AnimationClockShift::clearTimeTask()
 {
-    stdReturnType ReturnValue{E_OK};
-    byte FontIndex, ColumnAbs, RowAbs;
-
-    FontIndex = Char;
-
-    for(byte FontRow = 0; FontRow < FontHeight; FontRow++)
-    {
-        byte Font_EntryItem = pgm_read_byte(&FontTable[(FontIndex * FontHeight) + FontRow]);
-        for(byte FontColumn = 0; FontColumn < FontWidth; FontColumn++)
-        {
-            ColumnAbs = Column + FontColumn;
-            RowAbs = Row + FontRow;
-            if(pDisplay->writePixel(ColumnAbs, RowAbs, bitRead(Font_EntryItem, FontColumn)) == E_NOT_OK) ReturnValue = E_NOT_OK;
-        }
+#if (ANIMATION_CLOCK_SHIFT_HORIZONTAL == STD_ON)
+    if(CurrentColumn < DISPLAY_NUMBER_OF_COLUMNS) {
+        wcTransformation.shiftRightFast();
+        CurrentColumn++;
+    } else {
+        State = STATE_SET_TIME;
+        reset();
     }
-    return ReturnValue;
-} /* setCharVertical */
+#endif
+
+#if (ANIMATION_CLOCK_SHIFT_VERTICAL == STD_ON)
+    if(CurrentRow < DISPLAY_NUMBER_OF_ROWS) {
+        wcTransformation.shiftDownFast();
+        CurrentRow++;
+    } else {
+        State = STATE_SET_TIME;
+        reset();
+    }
+#endif
+
+} /* clearTimeTask */
 
 
 /******************************************************************************************************************************************************
-  convertCharToSprite()
+  setTimeTask()
 ******************************************************************************************************************************************************/
-/*! \brief          converts char to sprite
- *  \details        this function converts the ASCII char to sprite index
+/*! \brief
+ *  \details
  *
- *  \param[in]      Char            char to convert to sprite
- *  \param[out]     SpriteIndex     appropriate sprite
- *  \return         E_OK
- *                  E_NOT_OK
- *****************************************************************************************************************************************************/
-stdReturnType AnimationFont::convertCharToFontIndex(unsigned char Char, byte* Index)
+ *  \return         -
+******************************************************************************************************************************************************/
+void AnimationClockShift::setTimeTask()
 {
-    stdReturnType ReturnValue = E_NOT_OK;
-    *Index = Char + 0;
-    /* for umlauts we need a special treatment */
-    //if('Ä' == Char) { *Index = 95; ReturnValue = E_OK; }
-    //else if('Ö' == Char) { *Index = 153; ReturnValue = E_OK; }
-    //else if('Ü' == Char) { *Index = 154; ReturnValue = E_OK; }
-    //else if('ä' == Char) { *Index = 132; ReturnValue = E_OK; }
-    //else if('ö' == Char) { *Index = 148; ReturnValue = E_OK; }
-    //else if('ü' == Char) { *Index = 129; ReturnValue = E_OK; }
-    /* for all others only add offset */
-    //else if(Char >= 0 && Char <= 255) { *Index = Char + 0; ReturnValue = E_OK; }
+#if (ANIMATION_CLOCK_SHIFT_HORIZONTAL == STD_ON)
+    if(CurrentColumn < DISPLAY_NUMBER_OF_COLUMNS) {
+        wcTransformation.shiftRightFast();
+        for(byte Row = 0; Row < DISPLAY_NUMBER_OF_ROWS; Row++) {
+            if(isPixelPartOfClockWords(ClockWordsTable, DISPLAY_NUMBER_OF_COLUMNS - CurrentColumn - 1, Row)) {
+                pDisplay->setPixelFast(0, Row);
+            }
+        }
+        CurrentColumn++;
+    } else {
+        State = STATE_IDLE;
+    }
+#endif
 
-    return ReturnValue;
-} /* convertCharToSprite */
-
+#if (ANIMATION_CLOCK_SHIFT_VERTICAL == STD_ON)
+    if(CurrentRow < DISPLAY_NUMBER_OF_ROWS) {
+        wcTransformation.shiftDownFast();
+        for(byte Column = 0; Column < DISPLAY_NUMBER_OF_COLUMNS; Column++) {
+            if(isPixelPartOfClockWords(ClockWordsTable, Column, DISPLAY_NUMBER_OF_ROWS - CurrentRow - 1)) {
+                pDisplay->setPixelFast(Column, 0);
+            }
+        }
+        CurrentRow++;
+    } else {
+        State = STATE_IDLE;
+    }
+#endif
+} /* setTimeTask */
 
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E
 ******************************************************************************************************************************************************/
- 

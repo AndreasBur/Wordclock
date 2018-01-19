@@ -8,34 +8,34 @@
  *  ---------------------------------------------------------------------------------------------------------------------------------------------------
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       AnimationDrop.cpp
- *      \brief      
+/**     \file       AnimationClockSnake.cpp
+ *      \brief
  *
- *      \details    
- *                  
+ *      \details
+ *
  *
 ******************************************************************************************************************************************************/
-#define _ANIMATION_DROP_SOURCE_
+#define _ANIMATION_CLOCK_SNAKE_SOURCE_
 
 /******************************************************************************************************************************************************
- * INCLUDES
+ * I N C L U D E S
 ******************************************************************************************************************************************************/
-#include "AnimationDrop.h"
+#include "AnimationClockSnake.h"
 
 
 /******************************************************************************************************************************************************
- *  LOCAL CONSTANT MACROS
-******************************************************************************************************************************************************/
-
-
-/******************************************************************************************************************************************************
- *  LOCAL FUNCTION MACROS
+ *  L O C A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
 
 
+/******************************************************************************************************************************************************
+ *  L O C A L   F U N C T I O N   M A C R O S
+******************************************************************************************************************************************************/
+
+
 
 /******************************************************************************************************************************************************
- *  LOCAL DATA TYPES AND STRUCTURES
+ *  L O C A L   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
 
 
@@ -45,40 +45,40 @@
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  Constructor of AnimationDrop
+  Constructor of AnimationClockSnake
 ******************************************************************************************************************************************************/
-/*! \brief          AnimationDrop Constructor
- *  \details        Instantiation of the AnimationDrop library
+/*! \brief          AnimationClockSnake Constructor
+ *  \details        Instantiation of the AnimationClockSnake library
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-AnimationDrop::AnimationDrop()
+AnimationClockSnake::AnimationClockSnake()
 {
     pDisplay = nullptr;
     pClock = nullptr;
     State = STATE_UNINIT;
     reset();
-} /* AnimationDrop */
+} /* AnimationClockSnake */
 
 
 /******************************************************************************************************************************************************
-  Destructor of AnimationDrop
+  Destructor of AnimationClockSnake
 ******************************************************************************************************************************************************/
-AnimationDrop::~AnimationDrop()
+AnimationClockSnake::~AnimationClockSnake()
 {
 
-} /* ~AnimationDrop */
+} /* ~AnimationClockSnake */
 
 
 /******************************************************************************************************************************************************
   init()
 ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
+/*! \brief
+ *  \details
+ *
  *  \return         -
 ******************************************************************************************************************************************************/
-void AnimationDrop::init(Display* Display, Clock* Clock)
+void AnimationClockSnake::init(Display* Display, Clock* Clock)
 {
     pDisplay = Display;
     pClock = Clock;
@@ -90,19 +90,20 @@ void AnimationDrop::init(Display* Display, Clock* Clock)
 /******************************************************************************************************************************************************
   setClock()
 ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
+/*! \brief
+ *  \details
+ *
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType AnimationDrop::setClock(byte Hour, byte Minute)
+stdReturnType AnimationClockSnake::setClock(byte Hour, byte Minute)
 {
     stdReturnType ReturnValue{E_NOT_OK};
 
     if(pClock->getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
-        setNextWordIndex();
-        if(setNextActivePixelIndex() == E_NOT_OK) { setStateToSetTime(); }
-        else { State = STATE_CLEAR_TIME; }
+        ReturnValue = E_OK;
+        SnakeBeginIndex = 0;
+        SnakeEndIndex = 0;
+        State = STATE_WORKING;
     }
     return ReturnValue;
 } /* setClock */
@@ -111,15 +112,27 @@ stdReturnType AnimationDrop::setClock(byte Hour, byte Minute)
 /******************************************************************************************************************************************************
   task()
 ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
+/*! \brief
+ *  \details
+ *
  *  \return         -
 ******************************************************************************************************************************************************/
-void AnimationDrop::task()
+void AnimationClockSnake::task()
 {
-    if(State == STATE_CLEAR_TIME) { clearTimeTask(); }
-    if(State == STATE_SET_TIME) { setTimeTask(); }
+    if(State == STATE_WORKING) {
+        byte SnakeEndIndexTrans = transformToSerpentine(SnakeEndIndex);
+        pDisplay->setPixelFast(transformToSerpentine(SnakeBeginIndex));
+
+        if((SnakeBeginIndex - SnakeEndIndex) == ANIMATION_CLOCK_SNAKE_LENGTH ||
+           (SnakeBeginIndex >= DISPLAY_NUMBER_OF_LEDS && SnakeEndIndex < DISPLAY_NUMBER_OF_LEDS))
+        {
+            //pDisplay->clearPixelFast(SnakeEndIndexTrans);
+            if(isPixelPartOfClockWords(ClockWordsTable, SnakeEndIndexTrans) == false) pDisplay->clearPixelFast(SnakeEndIndexTrans);
+            SnakeEndIndex++;
+        }
+        if(SnakeBeginIndex < DISPLAY_NUMBER_OF_LEDS) SnakeBeginIndex++;
+        if(SnakeEndIndex >= DISPLAY_NUMBER_OF_LEDS) State = STATE_IDLE;
+    }
 } /* task */
 
 
@@ -135,133 +148,47 @@ void AnimationDrop::task()
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-void AnimationDrop::reset()
+void AnimationClockSnake::reset()
 {
-    CurrentPixelIndex = 0;
-    CurrenWordIndex = CLOCK_WORDS_TABLE_TYPE_SIZE - 1;
+
 } /* reset */
 
 
 /******************************************************************************************************************************************************
-  clearTimeTask()
-******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
- *  \return         -
-******************************************************************************************************************************************************/
-void AnimationDrop::clearTimeTask()
-{
-    byte Column, Row;
-    pDisplay->indexToColumnAndRow(CurrentPixelIndex, Column, Row);
-    // toggle current Pixel
-    if(CurrentPixelIndex < DISPLAY_NUMBER_OF_PIXELS) { pDisplay->togglePixelFast(CurrentPixelIndex); }
-    // increment row and check for out of bounds
-    if(Row + 1 < DISPLAY_NUMBER_OF_ROWS) {
-        // toggle Pixel in next row
-        CurrentPixelIndex = pDisplay->columnAndRowToIndex(Column, Row + 1);
-        pDisplay->togglePixelFast(CurrentPixelIndex);
-    } else {
-        // no more active pixels available
-        if(setNextActivePixelIndex() == E_NOT_OK) { setStateToSetTime(); }
-    }
-} /* clearTimeTask */
-
-
-/******************************************************************************************************************************************************
-  setTimeTask()
-******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
- *  \return         -
-******************************************************************************************************************************************************/
-void AnimationDrop::setTimeTask()
-{
-    byte Column, Row;
-    DisplayWords::Word CurrentWord = Words.getDisplayWordFast(ClockWordsTable[CurrenWordIndex]);
-
-    pDisplay->indexToColumnAndRow(CurrentPixelIndex, Column, Row);
-
-    // break condition
-    if(Row >= CurrentWord.Row) {
-        if(Column - Words.getDisplayWordColumnFast(ClockWordsTable[CurrenWordIndex]) >= CurrentWord.Length - 1) {
-            if(setNextWordIndex() == E_NOT_OK) { 
-                State = STATE_IDLE;
-            } else { 
-                CurrentPixelIndex = Words.getDisplayWordColumnFast(ClockWordsTable[CurrenWordIndex]);
-                pDisplay->indexToColumnAndRow(CurrentPixelIndex, Column, Row);
-            }
-        } else {
-            Column++;
-            Row = 0;
-        }
-    } else {
-        pDisplay->clearPixelFast(CurrentPixelIndex);
-        Row++;
-    }
-    CurrentPixelIndex = pDisplay->columnAndRowToIndex(Column, Row);
-    pDisplay->setPixelFast(CurrentPixelIndex);
-} /* setTimeTask */
-
-
-/******************************************************************************************************************************************************
-  getNextActivePixel()
+  transformToSerpentine()
 ******************************************************************************************************************************************************/
 /*! \brief
  *  \details
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType AnimationDrop::setNextActivePixelIndex()
+byte AnimationClockSnake::transformToSerpentine(byte Column, byte Row) const
 {
-    for(int16_t Index = DISPLAY_NUMBER_OF_PIXELS - 1; Index >= 0; Index--) {
-        if(pDisplay->getPixelFast(Index)) {
-            CurrentPixelIndex = Index;
-            return E_OK;
-        }
-    }
-    return E_NOT_OK;
-}
+    byte Index;
+
+    if(IS_BIT_CLEARED(Row, 0)) Index = (Row * DISPLAY_NUMBER_OF_COLUMNS) + Column;
+    else Index = (Row * DISPLAY_NUMBER_OF_COLUMNS) + (DISPLAY_NUMBER_OF_COLUMNS - Column - 1);
+
+    return Index;
+} /* transformToSerpentine */
 
 
 /******************************************************************************************************************************************************
-  setNextWordIndex()
+  transformToSerpentine()
 ******************************************************************************************************************************************************/
 /*! \brief
  *  \details
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType AnimationDrop::setNextWordIndex()
+byte AnimationClockSnake::transformToSerpentine(byte Index) const
 {
-    for(int8_t Index = CurrenWordIndex - 1; Index >= 0; Index--){
-        if(ClockWordsTable[Index] != DisplayWords::WORD_NONE) {
-            CurrenWordIndex = Index;
-            return E_OK;
-        }
-    }
-    return E_NOT_OK;
-} /* setNextWordIndex */
+    byte Column = pDisplay->indexToColumn(Index);
+    byte Row = pDisplay->indexToRow(Index);
 
-
-/******************************************************************************************************************************************************
-  setStateToSetTime()
-******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
-******************************************************************************************************************************************************/
-void AnimationDrop::setStateToSetTime()
-{
-    CurrentPixelIndex = Words.getDisplayWordColumnFast(ClockWordsTable[CurrenWordIndex]);
-    pDisplay->setPixelFast(CurrentPixelIndex);
-    State = STATE_SET_TIME;
-} /* setStateToSetTime */
-
+    return transformToSerpentine(Column, Row);
+} /* transformToSerpentine */
 
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E
 ******************************************************************************************************************************************************/
- 

@@ -8,14 +8,14 @@
  *  ---------------------------------------------------------------------------------------------------------------------------------------------------
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       AnimationShift.h
+/**     \file       AnimationClockShift.h
  *      \brief
  *
  *      \details
  *
 ******************************************************************************************************************************************************/
-#ifndef _ANIMATION_SHIFT_H_
-#define _ANIMATION_SHIFT_H_
+#ifndef _ANIMATION_CLOCK_SHIFT_H_
+#define _ANIMATION_CLOCK_SHIFT_H_
 
 /******************************************************************************************************************************************************
  * I N C L U D E S
@@ -24,26 +24,26 @@
 #include "Arduino.h"
 #include "Clock.h"
 #include "Transformation.h"
-#include "AnimationCommon.h"
+#include "AnimationClockCommon.h"
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
-/* AnimationShift configuration parameter */
-#define ANIMATION_SHIFT_HORIZONTAL              STD_ON
-#define ANIMATION_SHIFT_VERTICAL                STD_OFF
+/* AnimationClockShift configuration parameter */
+#define ANIMATION_CLOCK_SHIFT_HORIZONTAL              STD_ON
+#define ANIMATION_CLOCK_SHIFT_VERTICAL                STD_OFF
 
 
-#if (ANIMATION_SHIFT_HORIZONTAL == STD_OFF && ANIMATION_SHIFT_VERTICAL == STD_OFF)
-#error "AnimationShift: Exactly one switch must be set to STD_ON"
+#if (ANIMATION_CLOCK_SHIFT_HORIZONTAL == STD_OFF && ANIMATION_CLOCK_SHIFT_VERTICAL == STD_OFF)
+#error "AnimationClockShift: Exactly one switch must be set to STD_ON"
 #endif
 
-#if (ANIMATION_SHIFT_HORIZONTAL == STD_ON && ANIMATION_SHIFT_VERTICAL == STD_ON)
-#error "AnimationShift: ANIMATION_SHIFT_HORIZONTAL or ANIMATION_SHIFT_VERTICAL has to be STD_ON, but not both"
+#if (ANIMATION_CLOCK_SHIFT_HORIZONTAL == STD_ON && ANIMATION_CLOCK_SHIFT_VERTICAL == STD_ON)
+#error "AnimationClockShift: ANIMATION_CLOCK_SHIFT_HORIZONTAL or ANIMATION_CLOCK_SHIFT_VERTICAL has to be STD_ON, but not both"
 #endif
 
 
-/* AnimationShift parameter */
+/* AnimationClockShift parameter */
 
 
 
@@ -55,7 +55,7 @@
 /******************************************************************************************************************************************************
  *  C L A S S   T E M P L A T E
 ******************************************************************************************************************************************************/
-class AnimationShift : public AnimationCommon
+class AnimationClockShift : public AnimationClockCommon
 {
 /******************************************************************************************************************************************************
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
@@ -81,11 +81,11 @@ class AnimationShift : public AnimationCommon
     StateType State;
     Clock::ClockWordsTableType ClockWordsTable;
 
-#if (ANIMATION_SHIFT_HORIZONTAL == STD_ON)
+#if (ANIMATION_CLOCK_SHIFT_HORIZONTAL == STD_ON)
     byte CurrentColumn;
 #endif
 
-#if (ANIMATION_SHIFT_VERTICAL == STD_ON)
+#if (ANIMATION_CLOCK_SHIFT_VERTICAL == STD_ON)
     byte CurrentRow;
 #endif
 
@@ -98,8 +98,8 @@ class AnimationShift : public AnimationCommon
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    AnimationShift();
-    ~AnimationShift();
+    AnimationClockShift();
+    ~AnimationClockShift();
 
 	// get methods
 

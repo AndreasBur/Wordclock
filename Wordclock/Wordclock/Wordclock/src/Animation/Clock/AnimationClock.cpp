@@ -8,23 +8,23 @@
  *  ---------------------------------------------------------------------------------------------------------------------------------------------------
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       AnimationSnake.cpp
- *      \brief
+/**     \file       AnimationClock.cpp
+ *      \brief      
  *
- *      \details
- *
+ *      \details    
+ *                  
  *
 ******************************************************************************************************************************************************/
-#define _ANIMATION_SNAKE_SOURCE_
+#define _ANIMATION_CLOCK_SOURCE_
 
 /******************************************************************************************************************************************************
  * I N C L U D E S
 ******************************************************************************************************************************************************/
-#include "AnimationSnake.h"
+#include "AnimationClock.h"
 
 
 /******************************************************************************************************************************************************
- *  L O C A L   C O N S T A N T   M A C R O S
+ *  L O C A L   C O N S T A N T   M A C R O S 
 ******************************************************************************************************************************************************/
 
 
@@ -45,46 +45,86 @@
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  Constructor of AnimationSnake
+  Constructor of AnimationClock
 ******************************************************************************************************************************************************/
-/*! \brief          AnimationSnake Constructor
- *  \details        Instantiation of the AnimationSnake library
+/*! \brief          AnimationClock Constructor
+ *  \details        Instantiation of the AnimationClock library
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-AnimationSnake::AnimationSnake()
+AnimationClock::AnimationClock(Display* Display, Clock* Clock)
 {
-    pDisplay = nullptr;
-    pClock = nullptr;
-    State = STATE_UNINIT;
-    reset();
-} /* AnimationSnake */
+    pDisplay = Display;
+    pClock = Clock;
+    CurrentAnimation = ANIMATION_CLOCK_NONE;
+} /* AnimationClock */
 
 
 /******************************************************************************************************************************************************
-  Destructor of AnimationSnake
+  Destructor of AnimationClock
 ******************************************************************************************************************************************************/
-AnimationSnake::~AnimationSnake()
+AnimationClock::~AnimationClock()
 {
 
-} /* ~AnimationSnake */
+} /* ~AnimationClock */
 
 
 /******************************************************************************************************************************************************
   init()
+******************************************************************************************************************************************************/
+/*! \brief          
+ *  \details        
+ *                  
+ *  \return         -
+******************************************************************************************************************************************************/
+void AnimationClock::init()
+{
+
+} /* init */
+
+
+/******************************************************************************************************************************************************
+  setAnimation()
 ******************************************************************************************************************************************************/
 /*! \brief
  *  \details
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-void AnimationSnake::init(Display* Display, Clock* Clock)
+void AnimationClock::setAnimation(AnimationType Animation)
 {
-    pDisplay = Display;
-    pClock = Clock;
-    State = STATE_IDLE;
-    reset();
-} /* init */
+    CurrentAnimation = Animation;
+
+    switch(Animation)
+    {
+        case ANIMATION_CLOCK_CURSOR :
+            Animations.Cursor.init(pDisplay, pClock);
+            break;
+        case ANIMATION_CLOCK_TELETYPE :
+            Animations.Teletype.init(pDisplay, pClock);
+            break;
+        case ANIMATION_CLOCK_DROP :
+            Animations.Drop.init(pDisplay, pClock);
+            break;
+        case ANIMATION_CLOCK_WIPE :
+            Animations.Wipe.init(pDisplay, pClock);
+            break;
+        case ANIMATION_CLOCK_SHIFT :
+            Animations.Shift.init(pDisplay, pClock);
+            break;
+        case ANIMATION_CLOCK_FADE :
+            break;
+        case ANIMATION_CLOCK_SNAKE :
+            Animations.Snake.init(pDisplay, pClock);
+            break;
+        case ANIMATION_CLOCK_EXPLODE :
+            break;
+        case ANIMATION_CLOCK_IMPLODE :
+            break;
+        default :
+            break;
+    }
+} /* setAnimation */
 
 
 /******************************************************************************************************************************************************
@@ -95,17 +135,38 @@ void AnimationSnake::init(Display* Display, Clock* Clock)
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType AnimationSnake::setClock(byte Hour, byte Minute)
+stdReturnType AnimationClock::setClock(byte Hour, byte Minute)
 {
-    stdReturnType ReturnValue{E_NOT_OK};
-
-    if(pClock->getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
-        ReturnValue = E_OK;
-        SnakeBeginIndex = 0;
-        SnakeEndIndex = 0;
-        State = STATE_WORKING;
+    switch(CurrentAnimation)
+    {
+        case ANIMATION_CLOCK_CURSOR :
+            return Animations.Cursor.setClock(Hour, Minute);
+            break;
+        case ANIMATION_CLOCK_TELETYPE :
+            return Animations.Teletype.setClock(Hour, Minute);
+            break;
+        case ANIMATION_CLOCK_DROP :
+            return Animations.Drop.setClock(Hour, Minute);
+            break;
+        case ANIMATION_CLOCK_WIPE :
+            return Animations.Wipe.setClock(Hour, Minute);
+            break;
+        case ANIMATION_CLOCK_SHIFT :
+            return Animations.Shift.setClock(Hour, Minute);
+            break;
+        case ANIMATION_CLOCK_FADE :
+            break;
+        case ANIMATION_CLOCK_SNAKE :
+            return Animations.Snake.setClock(Hour, Minute);
+            break;
+        case ANIMATION_CLOCK_EXPLODE :
+            break;
+        case ANIMATION_CLOCK_IMPLODE :
+            break;
+        default :
+            break;
     }
-    return ReturnValue;
+    return E_NOT_OK;
 } /* setClock */
 
 
@@ -117,21 +178,36 @@ stdReturnType AnimationSnake::setClock(byte Hour, byte Minute)
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-void AnimationSnake::task()
+void AnimationClock::task()
 {
-    if(State == STATE_WORKING) {
-        byte SnakeEndIndexTrans = transformToSerpentine(SnakeEndIndex);
-        pDisplay->setPixelFast(transformToSerpentine(SnakeBeginIndex));
-
-        if((SnakeBeginIndex - SnakeEndIndex) == ANIMATION_SNAKE_LENGTH ||
-           (SnakeBeginIndex >= DISPLAY_NUMBER_OF_LEDS && SnakeEndIndex < DISPLAY_NUMBER_OF_LEDS))
-        {
-            //pDisplay->clearPixelFast(SnakeEndIndexTrans);
-            if(isPixelPartOfClockWords(ClockWordsTable, SnakeEndIndexTrans) == false) pDisplay->clearPixelFast(SnakeEndIndexTrans);
-            SnakeEndIndex++;
-        }
-        if(SnakeBeginIndex < DISPLAY_NUMBER_OF_LEDS) SnakeBeginIndex++;
-        if(SnakeEndIndex >= DISPLAY_NUMBER_OF_LEDS) State = STATE_IDLE;
+    switch(CurrentAnimation)
+    {
+        case ANIMATION_CLOCK_CURSOR :
+            return Animations.Cursor.task();
+            break;
+        case ANIMATION_CLOCK_TELETYPE :
+            return Animations.Teletype.task();
+            break;
+        case ANIMATION_CLOCK_DROP :
+            return Animations.Drop.task();
+            break;
+        case ANIMATION_CLOCK_WIPE :
+            return Animations.Wipe.task();
+            break;
+        case ANIMATION_CLOCK_SHIFT :
+            return Animations.Shift.task();
+            break;
+        case ANIMATION_CLOCK_FADE :
+            break;
+        case ANIMATION_CLOCK_SNAKE :
+            return Animations.Snake.task();
+            break;
+        case ANIMATION_CLOCK_EXPLODE :
+            break;
+        case ANIMATION_CLOCK_IMPLODE :
+            break;
+        default :
+            break;
     }
 } /* task */
 
@@ -140,55 +216,9 @@ void AnimationSnake::task()
  * P R I V A T E   F U N C T I O N S
 ******************************************************************************************************************************************************/
 
-/******************************************************************************************************************************************************
-  reset()
-******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
-******************************************************************************************************************************************************/
-void AnimationSnake::reset()
-{
 
-} /* reset */
-
-
-/******************************************************************************************************************************************************
-  transformToSerpentine()
-******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
-******************************************************************************************************************************************************/
-byte AnimationSnake::transformToSerpentine(byte Column, byte Row) const
-{
-    byte Index;
-
-    if(IS_BIT_CLEARED(Row, 0)) Index = (Row * DISPLAY_NUMBER_OF_COLUMNS) + Column;
-    else Index = (Row * DISPLAY_NUMBER_OF_COLUMNS) + (DISPLAY_NUMBER_OF_COLUMNS - Column - 1);
-
-    return Index;
-} /* transformToSerpentine */
-
-
-/******************************************************************************************************************************************************
-  transformToSerpentine()
-******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
-******************************************************************************************************************************************************/
-byte AnimationSnake::transformToSerpentine(byte Index) const
-{
-    byte Column = pDisplay->indexToColumn(Index);
-    byte Row = pDisplay->indexToRow(Index);
-
-    return transformToSerpentine(Column, Row);
-} /* transformToSerpentine */
 
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E
 ******************************************************************************************************************************************************/
+ 

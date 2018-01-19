@@ -8,14 +8,14 @@
  *  ---------------------------------------------------------------------------------------------------------------------------------------------------
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       AnimationWipe.h
- *      \brief
+/**     \file       AnimationClockSnake.h
+ *      \brief      
  *
- *      \details
- *
+ *      \details    
+ *                  
 ******************************************************************************************************************************************************/
-#ifndef _ANIMATION_WIPE_H_
-#define _ANIMATION_WIPE_H_
+#ifndef _ANIMATION_CLOCK_SNAKE_H_
+#define _ANIMATION_CLOCK_SNAKE_H_
 
 /******************************************************************************************************************************************************
  * I N C L U D E S
@@ -23,16 +23,15 @@
 #include "StandardTypes.h"
 #include "Arduino.h"
 #include "Clock.h"
-#include "AnimationCommon.h"
-
+#include "AnimationClockCommon.h"
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
-/* AnimationWipe configuration parameter */
-#define ANIMATION_WIRE_NUMBER_OF_SHIFT_CYCLES       (DISPLAY_CHARACTERS_NUMBER_OF_ROWS + DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS)
+/* AnimationClockSnake configuration parameter */
+#define ANIMATION_CLOCK_SNAKE_LENGTH              8
 
-/* AnimationWipe parameter */
+/* AnimationClockSnake parameter */
 
 
 
@@ -44,7 +43,7 @@
 /******************************************************************************************************************************************************
  *  C L A S S   T E M P L A T E
 ******************************************************************************************************************************************************/
-class AnimationWipe : public AnimationCommon
+class AnimationClockSnake : public AnimationClockCommon
 {
 /******************************************************************************************************************************************************
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
@@ -55,15 +54,14 @@ class AnimationWipe : public AnimationCommon
         STATE_UNINIT,
         STATE_IDLE,
         //STATE_READY,
-        STATE_CLEAR_TIME,
-        STATE_SET_TIME
+        STATE_WORKING
     };
 
-    enum SetPixelStateType {
-        STATE_SET_PIXEL_RIGHT,
-        STATE_SET_PIXEL_DOWN
+    enum SnakeStateType {
+        SNAKE_STATE_TO_RIGHT,
+        SNAKE_STATE_TO_LEFT
     };
-
+  
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
@@ -71,31 +69,27 @@ class AnimationWipe : public AnimationCommon
     Clock* pClock;
     Display* pDisplay;
     StateType State;
+    SnakeStateType SnakeState;
     Clock::ClockWordsTableType ClockWordsTable;
-    byte Index;
-    SetPixelStateType SetPixelState;
+    byte SnakeBeginIndex;
+    byte SnakeEndIndex;
 
     // functions
     void reset();
-    void clearTimeTask();
-    void setTimeTask();
-    boolean setNextIndex();
-    void setPixelDown(byte, byte);
-    void setPixelRight(byte, byte);
-
-
+    byte transformToSerpentine(byte, byte) const;
+    byte transformToSerpentine(byte) const;
+  
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    AnimationWipe();
-    ~AnimationWipe();
+    AnimationClockSnake();
+    ~AnimationClockSnake();
 
 	// get methods
 
 
 	// set methods
-
 
 	// methods
     void init(Display*, Clock*);

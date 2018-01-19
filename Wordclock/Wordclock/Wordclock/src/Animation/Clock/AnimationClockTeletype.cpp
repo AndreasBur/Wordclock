@@ -8,19 +8,19 @@
  *  ---------------------------------------------------------------------------------------------------------------------------------------------------
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       AnimationTeletype.cpp
+/**     \file       AnimationClockTeletype.cpp
  *      \brief      
  *
  *      \details    
  *                  
  *
 ******************************************************************************************************************************************************/
-#define _ANIMATION_TELETYPE_SOURCE_
+#define _ANIMATION_CLOCK_TELETYPE_SOURCE_
 
 /******************************************************************************************************************************************************
  * INCLUDES
 ******************************************************************************************************************************************************/
-#include "AnimationTeletype.h"
+#include "AnimationClockTeletype.h"
 
 
 /******************************************************************************************************************************************************
@@ -45,29 +45,29 @@
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  Constructor of AnimationTeletype
+  Constructor of AnimationClockTeletype
 ******************************************************************************************************************************************************/
-/*! \brief          AnimationTeletype Constructor
- *  \details        Instantiation of the AnimationTeletype library
+/*! \brief          AnimationClockTeletype Constructor
+ *  \details        Instantiation of the AnimationClockTeletype library
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-AnimationTeletype::AnimationTeletype()
+AnimationClockTeletype::AnimationClockTeletype()
 {
     pDisplay = nullptr;
     pClock = nullptr;
     State = STATE_UNINIT;
     reset();
-} /* AnimationTeletype */
+} /* AnimationClockTeletype */
 
 
 /******************************************************************************************************************************************************
-  Destructor of AnimationTeletype
+  Destructor of AnimationClockTeletype
 ******************************************************************************************************************************************************/
-AnimationTeletype::~AnimationTeletype()
+AnimationClockTeletype::~AnimationClockTeletype()
 {
 
-} /* ~AnimationTeletype */
+} /* ~AnimationClockTeletype */
 
 
 /******************************************************************************************************************************************************
@@ -78,7 +78,7 @@ AnimationTeletype::~AnimationTeletype()
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-void AnimationTeletype::init(Display* Display, Clock* Clock)
+void AnimationClockTeletype::init(Display* Display, Clock* Clock)
 {
     pDisplay = Display;
     pClock = Clock;
@@ -95,7 +95,7 @@ void AnimationTeletype::init(Display* Display, Clock* Clock)
  *                  
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType AnimationTeletype::setClock(byte Hour, byte Minute)
+stdReturnType AnimationClockTeletype::setClock(byte Hour, byte Minute)
 {
     stdReturnType ReturnValue{E_NOT_OK};
 
@@ -118,7 +118,7 @@ stdReturnType AnimationTeletype::setClock(byte Hour, byte Minute)
  *                  
  *  \return         -
 ******************************************************************************************************************************************************/
-void AnimationTeletype::task()
+void AnimationClockTeletype::task()
 {
     if(State == STATE_WORKING) {
         if(CurrentCharIndex >= CurrentWordLength) {
@@ -147,7 +147,7 @@ void AnimationTeletype::task()
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-void AnimationTeletype::reset()
+void AnimationClockTeletype::reset()
 {
     for(auto& Word : ClockWordsTable) { Word = DisplayWords::WORD_NONE; }
     CurrentWordIndex = 0;
@@ -164,7 +164,7 @@ void AnimationTeletype::reset()
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType AnimationTeletype::setNextWordIndex()
+stdReturnType AnimationClockTeletype::setNextWordIndex()
 {
     if(CurrentWordIndex + 1 < CLOCK_WORDS_TABLE_TYPE_SIZE) {
         CurrentWordIndex++;

@@ -8,96 +8,120 @@
  *  ---------------------------------------------------------------------------------------------------------------------------------------------------
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       ANIMATION_TELETYPE.h
+/**     \file       ANIMATION_CLOCK.h
  *      \brief      
  *
  *      \details    
  *                  
 ******************************************************************************************************************************************************/
-#ifndef _ANIMATION_TELETYPE_H_
-#define _ANIMATION_TELETYPE_H_
+#ifndef _ANIMATION_CLOCK_H_
+#define _ANIMATION_CLOCK_H_
 
 /******************************************************************************************************************************************************
- * INCLUDES
+ * I N C L U D E S
 ******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Arduino.h"
-#include "Clock.h"
+#include "Display.h"
+#include "AnimationClockTeletype.h"
+#include "AnimationClockCursor.h"
+#include "AnimationClockDrop.h"
+#include "AnimationClockWipe.h"
+#include "AnimationClockSnake.h"
+#include "AnimationClockShift.h"
 
 /******************************************************************************************************************************************************
- *  GLOBAL CONSTANT MACROS
+ *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
-/* AnimationTeletype configuration parameter */
+/* AnimationClock configuration parameter */
 
 
-/* AnimationTeletype parameter */
+/* AnimationClock parameter */
 
 
 
 /******************************************************************************************************************************************************
- *  GLOBAL FUNCTION MACROS
+ *  G L O B A L   F U N C T I O N   M A C R O S
 ******************************************************************************************************************************************************/
 
 
 /******************************************************************************************************************************************************
- *  GLOBAL DATA TYPES AND STRUCTURES
- *****************************************************************************************************************************************************/
-
-
-/******************************************************************************************************************************************************
- *  CLASS  AnimationTeletype
+ *  C L A S S   T E M P L A T E
 ******************************************************************************************************************************************************/
-class AnimationTeletype
+class AnimationClock
 {
-  public:
 /******************************************************************************************************************************************************
- *  GLOBAL DATA TYPES AND STRUCTURES
+ *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
+  public:
+    /* type which describes the internal state of the Animation */
     enum StateType {
         STATE_NONE,
         STATE_UNINIT,
-        STATE_IDLE,
-        //STATE_READY,
-        STATE_WORKING
+        STATE_INIT,
+        STATE_READY
     };
 
+    enum AnimationType {
+        ANIMATION_CLOCK_CURSOR,
+        ANIMATION_CLOCK_TELETYPE,
+        ANIMATION_CLOCK_DROP,
+        ANIMATION_CLOCK_SHIFT,
+        ANIMATION_CLOCK_FADE,
+        ANIMATION_CLOCK_SNAKE,
+        ANIMATION_CLOCK_WIPE,
+        ANIMATION_CLOCK_EXPLODE,
+        ANIMATION_CLOCK_IMPLODE,
+        ANIMATION_CLOCK_FLICKER,
+        ANIMATION_CLOCK_MATRIX,
+        ANIMATION_CLOCK_CUBE,
+        ANIMATION_CLOCK_NONE
+    };
+
+    union AnimationsType {
+        AnimationClockCursor Cursor;
+        AnimationClockTeletype Teletype;
+        AnimationClockDrop Drop;
+        AnimationClockWipe Wipe;
+        AnimationClockShift Shift;
+        AnimationClockSnake Snake;
+
+        AnimationsType() {}
+        ~AnimationsType() {}
+    };
+  
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
-    Clock* pClock;
     Display* pDisplay;
-    StateType State;
-    Clock::ClockWordsTableType ClockWordsTable;
-    byte CurrentWordIndex;
-    byte CurrentWordLength;
-    byte CurrentCharIndex;
-    DisplayWords Words;
+    Clock* pClock;
+    AnimationType CurrentAnimation;
+    AnimationsType Animations;
 
-    // functions
-    void reset();
-    stdReturnType setNextWordIndex();
-
+  
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    AnimationTeletype();
-    ~AnimationTeletype();
-    
+    AnimationClock(Display*, Clock*);
+    ~AnimationClock();
+
 	// get methods
+    AnimationType getAnimation() const { return CurrentAnimation; }
 
 	// set methods
+    void setAnimation(AnimationType);
 
 	// methods
-    void init(Display*, Clock*);
-    stdReturnType setClock(byte, byte);
+    void init();
     void task();
-
+    stdReturnType setClock(byte, byte);
+    void show() { pDisplay->show(); }
 };
 
-
 #endif
+
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E
 ******************************************************************************************************************************************************/

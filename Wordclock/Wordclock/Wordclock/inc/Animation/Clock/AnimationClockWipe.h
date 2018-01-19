@@ -8,60 +8,60 @@
  *  ---------------------------------------------------------------------------------------------------------------------------------------------------
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       AnimationCursor.h
- *      \brief      
+/**     \file       AnimationClockWipe.h
+ *      \brief
  *
- *      \details    
- *                  
+ *      \details
+ *
 ******************************************************************************************************************************************************/
-#ifndef _ANIMATION_CURSOR_H_
-#define _ANIMATION_CURSOR_H_
+#ifndef _ANIMATION_CLOCK_WIPE_H_
+#define _ANIMATION_CLOCK_WIPE_H_
 
 /******************************************************************************************************************************************************
- * INCLUDES
+ * I N C L U D E S
 ******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Arduino.h"
-#include "Display.h"
 #include "Clock.h"
-#include "AnimationCommon.h"
+#include "AnimationClockCommon.h"
 
 
 /******************************************************************************************************************************************************
- *  GLOBAL CONSTANT MACROS
+ *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
-/* AnimationCursor configuration parameter */
+/* AnimationClockWipe configuration parameter */
+#define ANIMATION_WIRE_NUMBER_OF_SHIFT_CYCLES       (DISPLAY_CHARACTERS_NUMBER_OF_ROWS + DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS)
 
-
-/* AnimationCursor parameter */
+/* AnimationClockWipe parameter */
 
 
 
 /******************************************************************************************************************************************************
- *  GLOBAL FUNCTION MACROS
+ *  G L O B A L   F U N C T I O N   M A C R O S
 ******************************************************************************************************************************************************/
 
 
 /******************************************************************************************************************************************************
- *  GLOBAL DATA TYPES AND STRUCTURES
- *****************************************************************************************************************************************************/
-
-
-/******************************************************************************************************************************************************
- *  CLASS  AnimationCursor
+ *  C L A S S   T E M P L A T E
 ******************************************************************************************************************************************************/
-class AnimationCursor : public AnimationCommon
+class AnimationClockWipe : public AnimationClockCommon
 {
-  public:
 /******************************************************************************************************************************************************
- *  GLOBAL DATA TYPES AND STRUCTURES
+ *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
+  public:
     enum StateType {
         STATE_NONE,
         STATE_UNINIT,
         STATE_IDLE,
         //STATE_READY,
-        STATE_WORKING
+        STATE_CLEAR_TIME,
+        STATE_SET_TIME
+    };
+
+    enum SetPixelStateType {
+        STATE_SET_PIXEL_RIGHT,
+        STATE_SET_PIXEL_DOWN
     };
 
 /******************************************************************************************************************************************************
@@ -70,32 +70,39 @@ class AnimationCursor : public AnimationCommon
   private:
     Clock* pClock;
     Display* pDisplay;
-    Clock::ClockWordsTableType ClockWordsTable;
-    byte CurrentPixelIndex;
     StateType State;
-    DisplayWords Words;
+    Clock::ClockWordsTableType ClockWordsTable;
+    byte Index;
+    SetPixelStateType SetPixelState;
 
     // functions
     void reset();
+    void clearTimeTask();
+    void setTimeTask();
+    boolean setNextIndex();
+    void setPixelDown(byte, byte);
+    void setPixelRight(byte, byte);
+
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    AnimationCursor();
-    ~AnimationCursor();
+    AnimationClockWipe();
+    ~AnimationClockWipe();
 
 	// get methods
 
 
 	// set methods
 
+
 	// methods
     void init(Display*, Clock*);
     stdReturnType setClock(byte, byte);
     void task();
-};
 
+};
 
 #endif
 /******************************************************************************************************************************************************

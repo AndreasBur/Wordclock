@@ -7,7 +7,7 @@
 int flag;
 Display wcDisplay(20, 20, 20);
 Clock wcClock(&wcDisplay, Clock::MODE_WESSI);
-Animation wcAnimation(&wcDisplay, &wcClock);
+//Animation wcAnimation(&wcDisplay, &wcClock);
 //DisplayCharacter WcDisplayCharacter;
 //Animation wcAnimation;
 //Beginning of Auto generated function prototypes by Atmel Studio
@@ -27,9 +27,9 @@ void setup() {
   //wcAnimation.setChar(0,0, 'T', ANIMATION_FONT_4X6);
   //wcClock.setClock(10,10);
   
-  wcAnimation.setAnimation(Animation::ANIMATION_DROP);
+  //wcAnimation.setAnimation(Animation::ANIMATION_CLOCK_DROP);
   
-  wcAnimation.setClock(12, 10);
+  //wcAnimation.setClock(12, 10);
 }
 
 void loop() {
@@ -37,6 +37,6 @@ void loop() {
   //wcClock.setClock(17,30);
   //wcDisplay.show();
   //wcDisplay.clearAllWords();
-  wcAnimation.task();
-  wcAnimation.show();
+  //wcAnimation.task();
+  //wcAnimation.show();
 }

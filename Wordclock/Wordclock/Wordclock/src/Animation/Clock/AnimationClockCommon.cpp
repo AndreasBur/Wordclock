@@ -8,23 +8,23 @@
  *  ---------------------------------------------------------------------------------------------------------------------------------------------------
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       AnimationShift.cpp
- *      \brief
+/**     \file       AnimationClockCommon.cpp
+ *      \brief      
  *
- *      \details
- *
+ *      \details    
+ *                  
  *
 ******************************************************************************************************************************************************/
-#define _ANIMATION_SHIFT_SOURCE_
+#define _ANIMATION_CLOCK_COMMON_SOURCE_
 
 /******************************************************************************************************************************************************
  * I N C L U D E S
 ******************************************************************************************************************************************************/
-#include "AnimationShift.h"
+#include "AnimationClockCommon.h"
 
 
 /******************************************************************************************************************************************************
- *  L O C A L   C O N S T A N T   M A C R O S
+ *  L O C A L   C O N S T A N T   M A C R O S 
 ******************************************************************************************************************************************************/
 
 
@@ -45,179 +45,71 @@
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  Constructor of AnimationShift
+  Constructor of AnimationClockCommon
 ******************************************************************************************************************************************************/
-/*! \brief          AnimationShift Constructor
- *  \details        Instantiation of the AnimationShift library
+/*! \brief          AnimationClockCommon Constructor
+ *  \details        Instantiation of the AnimationClockCommon library
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-AnimationShift::AnimationShift()
+AnimationClockCommon::AnimationClockCommon()
 {
-    pDisplay = nullptr;
-    pClock = nullptr;
-    State = STATE_UNINIT;
-    reset();
-} /* AnimationShift */
+
+} /* AnimationClockCommon */
 
 
 /******************************************************************************************************************************************************
-  Destructor of AnimationShift
+  Destructor of AnimationClockCommon
 ******************************************************************************************************************************************************/
-AnimationShift::~AnimationShift()
+AnimationClockCommon::~AnimationClockCommon()
 {
 
-} /* ~AnimationShift */
+} /* ~AnimationClockCommon */
 
 
 /******************************************************************************************************************************************************
-  init()
+  isPixelPartOfWord()
 ******************************************************************************************************************************************************/
 /*! \brief
  *  \details
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-void AnimationShift::init(Display* Display, Clock* Clock)
+boolean AnimationClockCommon::isPixelPartOfClockWords(Clock::ClockWordsTableType ClockWordsTable, byte Column, byte Row)
 {
-    pDisplay = Display;
-    pClock = Clock;
-    State = STATE_IDLE;
-    wcTransformation.setDisplay(Display);
-    reset();
-} /* init */
+    DisplayWords Words;
 
-
-/******************************************************************************************************************************************************
-  setClock()
-******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
-******************************************************************************************************************************************************/
-stdReturnType AnimationShift::setClock(byte Hour, byte Minute)
-{
-    stdReturnType ReturnValue{E_NOT_OK};
-
-    if(pClock->getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
-        State = STATE_CLEAR_TIME;
+    for(uint8_t WordIndex = 0; WordIndex < CLOCK_WORDS_TABLE_TYPE_SIZE; WordIndex++) {
+        if(ClockWordsTable[WordIndex] == DisplayWords::WORD_NONE) { break; }
+        DisplayWords::Word Word = Words.getDisplayWordFast(ClockWordsTable[WordIndex]);
+        if(Word.Row == Row) { if(Column >= Word.Column && Column < Word.Column + Word.Length) { return true; } }
     }
-    return ReturnValue;
-} /* setClock */
-
+    return false;
+} /* isPixelPartOfWord */
 
 /******************************************************************************************************************************************************
-  task()
+  isPixelPartOfWord()
 ******************************************************************************************************************************************************/
 /*! \brief
  *  \details
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-void AnimationShift::task()
+boolean AnimationClockCommon::isPixelPartOfClockWords(Clock::ClockWordsTableType ClockWordsTable, byte Index)
 {
-    if(State == STATE_CLEAR_TIME) { clearTimeTask(); }
-    if(State == STATE_SET_TIME) { setTimeTask(); }
-} /* task */
+    byte Row = Index / DISPLAY_NUMBER_OF_COLUMNS;
+    byte Column = Index % DISPLAY_NUMBER_OF_COLUMNS;
+
+    return isPixelPartOfClockWords(ClockWordsTable, Column, Row);
+} /* isPixelPartOfWord */
 
 
 /******************************************************************************************************************************************************
  * P R I V A T E   F U N C T I O N S
 ******************************************************************************************************************************************************/
 
-/******************************************************************************************************************************************************
-  reset()
-******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
-******************************************************************************************************************************************************/
-void AnimationShift::reset()
-{
-#if (ANIMATION_SHIFT_HORIZONTAL == STD_ON)
-    CurrentColumn = 0;
-#endif
-
-#if (ANIMATION_SHIFT_VERTICAL == STD_ON)
-    CurrentRow = 0;
-#endif
-} /* reset */
-
-
-/******************************************************************************************************************************************************
-  clearTimeTask()
-******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
-******************************************************************************************************************************************************/
-void AnimationShift::clearTimeTask()
-{
-#if (ANIMATION_SHIFT_HORIZONTAL == STD_ON)
-    if(CurrentColumn < DISPLAY_NUMBER_OF_COLUMNS) {
-        wcTransformation.shiftRightFast();
-        CurrentColumn++;
-    } else {
-        State = STATE_SET_TIME;
-        reset();
-    }
-#endif
-
-#if (ANIMATION_SHIFT_VERTICAL == STD_ON)
-    if(CurrentRow < DISPLAY_NUMBER_OF_ROWS) {
-        wcTransformation.shiftDownFast();
-        CurrentRow++;
-    } else {
-        State = STATE_SET_TIME;
-        reset();
-    }
-#endif
-
-} /* clearTimeTask */
-
-
-/******************************************************************************************************************************************************
-  setTimeTask()
-******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
-******************************************************************************************************************************************************/
-void AnimationShift::setTimeTask()
-{
-#if (ANIMATION_SHIFT_HORIZONTAL == STD_ON)
-    if(CurrentColumn < DISPLAY_NUMBER_OF_COLUMNS) {
-        wcTransformation.shiftRightFast();
-        for(byte Row = 0; Row < DISPLAY_NUMBER_OF_ROWS; Row++) {
-            if(isPixelPartOfClockWords(ClockWordsTable, DISPLAY_NUMBER_OF_COLUMNS - CurrentColumn - 1, Row)) {
-                pDisplay->setPixelFast(0, Row);
-            }
-        }
-        CurrentColumn++;
-    } else {
-        State = STATE_IDLE;
-    }
-#endif
-
-#if (ANIMATION_SHIFT_VERTICAL == STD_ON)
-    if(CurrentRow < DISPLAY_NUMBER_OF_ROWS) {
-        wcTransformation.shiftDownFast();
-        for(byte Column = 0; Column < DISPLAY_NUMBER_OF_COLUMNS; Column++) {
-            if(isPixelPartOfClockWords(ClockWordsTable, Column, DISPLAY_NUMBER_OF_ROWS - CurrentRow - 1)) {
-                pDisplay->setPixelFast(Column, 0);
-            }
-        }
-        CurrentRow++;
-    } else {
-        State = STATE_IDLE;
-    }
-#endif
-} /* setTimeTask */
 
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E
 ******************************************************************************************************************************************************/
+ 
