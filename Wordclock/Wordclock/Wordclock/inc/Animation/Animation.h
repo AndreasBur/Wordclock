@@ -22,7 +22,8 @@
 ******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Arduino.h"
-
+#include "AnimationClock.h"
+#include "AnimationFont.h"
 
 
 
@@ -54,7 +55,15 @@ class Animation
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-
+    enum StateType {
+        STATE_NONE,
+        STATE_UNINIT,
+        STATE_IDLE,
+        STATE_FONT, // ?
+        STATE_CLOCK // ?
+        //STATE_WORKING_CLOCK
+        //STATE_WORDKING_FONT
+    };
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S

@@ -98,6 +98,7 @@ class AnimationClockDrop
     void init(Display*, Clock*);
     stdReturnType setClock(byte, byte);
     void task();
+    void show() { pDisplay->show(); }
 };
 
 

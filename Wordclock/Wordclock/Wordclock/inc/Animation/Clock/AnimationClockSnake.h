@@ -95,7 +95,7 @@ class AnimationClockSnake : public AnimationClockCommon
     void init(Display*, Clock*);
     stdReturnType setClock(byte, byte);
     void task();
-
+    void show() { pDisplay->show(); }
 };
 
 #endif

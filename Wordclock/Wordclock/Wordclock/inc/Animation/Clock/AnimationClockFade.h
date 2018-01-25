@@ -70,6 +70,7 @@ class AnimationClockFade
 
 	// methods
     void init();
+    //void show() { pDisplay->show(); }
 };
 
 #endif

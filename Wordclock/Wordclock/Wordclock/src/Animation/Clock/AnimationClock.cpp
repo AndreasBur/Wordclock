@@ -213,6 +213,48 @@ void AnimationClock::task()
 
 
 /******************************************************************************************************************************************************
+  show()
+******************************************************************************************************************************************************/
+/*! \brief
+ *  \details
+ *
+ *  \return         -
+******************************************************************************************************************************************************/
+void AnimationClock::show()
+{
+    switch(CurrentAnimation)
+    {
+        case ANIMATION_CLOCK_CURSOR :
+            return Animations.Cursor.show();
+            break;
+        case ANIMATION_CLOCK_TELETYPE :
+            return Animations.Teletype.show();
+            break;
+        case ANIMATION_CLOCK_DROP :
+            return Animations.Drop.show();
+            break;
+        case ANIMATION_CLOCK_WIPE :
+            return Animations.Wipe.show();
+            break;
+        case ANIMATION_CLOCK_SHIFT :
+            return Animations.Shift.show();
+            break;
+        case ANIMATION_CLOCK_FADE :
+            break;
+        case ANIMATION_CLOCK_SNAKE :
+            return Animations.Snake.show();
+            break;
+        case ANIMATION_CLOCK_EXPLODE :
+            break;
+        case ANIMATION_CLOCK_IMPLODE :
+            break;
+        default :
+            break;
+    }
+} /* task */
+
+
+/******************************************************************************************************************************************************
  * P R I V A T E   F U N C T I O N S
 ******************************************************************************************************************************************************/
 
