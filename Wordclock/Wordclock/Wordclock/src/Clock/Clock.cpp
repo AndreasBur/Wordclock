@@ -219,10 +219,12 @@ stdReturnType Clock::getClockWords(byte Hour, byte Minute, ClockWordsType* Clock
 ******************************************************************************************************************************************************/
 stdReturnType Clock::getClockWords(byte Hour, byte Minute, ClockWordsTableType ClockWordsTable)
 {
+    /* ----- Local Variables ---------------------------------------------- */
     ClockWordsType ClockWords;
     stdReturnType ReturnValue{E_OK};
     byte ClockWordsTableIndex{0};
 
+    /* ----- Implementation ----------------------------------------------- */
     //memset(ClockWordsTable, DisplayWords::WORD_NONE, sizeof(ClockWordsTableType));
     if(getClockWords(Hour, Minute, &ClockWords) == E_NOT_OK) ReturnValue = E_NOT_OK;
 

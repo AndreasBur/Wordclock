@@ -52,7 +52,7 @@
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-AnimationClockShift::AnimationClockShift()
+AnimationClockShift::AnimationClockShift() : wcTransformation(nullptr)
 {
     pDisplay = nullptr;
     pClock = nullptr;

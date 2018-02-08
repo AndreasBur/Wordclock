@@ -65,6 +65,7 @@
 			<Add directory="Arduino/inc/StandardTypes" />
 			<Add directory="Arduino/inc/Transformation" />
 			<Add directory="../Wordclock" />
+			<Add directory="Arduino/inc/Animation/Clock" />
 		</Compiler>
 		<ResourceCompiler>
 			<Add directory="$(#wx30)/include" />
@@ -73,15 +74,16 @@
 			<Add option="-mthreads" />
 		</Linker>
 		<Unit filename="Arduino/inc/Animation/Animation.h" />
-		<Unit filename="Arduino/inc/Animation/AnimationCommon.h" />
-		<Unit filename="Arduino/inc/Animation/AnimationCursor.h" />
-		<Unit filename="Arduino/inc/Animation/AnimationDrop.h" />
-		<Unit filename="Arduino/inc/Animation/AnimationFade.h" />
 		<Unit filename="Arduino/inc/Animation/AnimationFont.h" />
-		<Unit filename="Arduino/inc/Animation/AnimationShift.h" />
-		<Unit filename="Arduino/inc/Animation/AnimationSnake.h" />
-		<Unit filename="Arduino/inc/Animation/AnimationTeletype.h" />
-		<Unit filename="Arduino/inc/Animation/AnimationWipe.h" />
+		<Unit filename="Arduino/inc/Animation/Clock/AnimationClock.h" />
+		<Unit filename="Arduino/inc/Animation/Clock/AnimationClockCommon.h" />
+		<Unit filename="Arduino/inc/Animation/Clock/AnimationClockCursor.h" />
+		<Unit filename="Arduino/inc/Animation/Clock/AnimationClockDrop.h" />
+		<Unit filename="Arduino/inc/Animation/Clock/AnimationClockFade.h" />
+		<Unit filename="Arduino/inc/Animation/Clock/AnimationClockShift.h" />
+		<Unit filename="Arduino/inc/Animation/Clock/AnimationClockSnake.h" />
+		<Unit filename="Arduino/inc/Animation/Clock/AnimationClockTeletype.h" />
+		<Unit filename="Arduino/inc/Animation/Clock/AnimationClockWipe.h" />
 		<Unit filename="Arduino/inc/Clock/Clock.h" />
 		<Unit filename="Arduino/inc/Display/Display.h" />
 		<Unit filename="Arduino/inc/Display/DisplayCharacters.h" />
@@ -89,15 +91,16 @@
 		<Unit filename="Arduino/inc/StandardTypes/StandardTypes.h" />
 		<Unit filename="Arduino/inc/Transformation/Transformation.h" />
 		<Unit filename="Arduino/src/Animation/Animation.cpp" />
-		<Unit filename="Arduino/src/Animation/AnimationCommon.cpp" />
-		<Unit filename="Arduino/src/Animation/AnimationCursor.cpp" />
-		<Unit filename="Arduino/src/Animation/AnimationDrop.cpp" />
-		<Unit filename="Arduino/src/Animation/AnimationFade.cpp" />
 		<Unit filename="Arduino/src/Animation/AnimationFont.cpp" />
-		<Unit filename="Arduino/src/Animation/AnimationShift.cpp" />
-		<Unit filename="Arduino/src/Animation/AnimationSnake.cpp" />
-		<Unit filename="Arduino/src/Animation/AnimationTeletype.cpp" />
-		<Unit filename="Arduino/src/Animation/AnimationWipe.cpp" />
+		<Unit filename="Arduino/src/Animation/Clock/AnimationClock.cpp" />
+		<Unit filename="Arduino/src/Animation/Clock/AnimationClockCommon.cpp" />
+		<Unit filename="Arduino/src/Animation/Clock/AnimationClockCursor.cpp" />
+		<Unit filename="Arduino/src/Animation/Clock/AnimationClockDrop.cpp" />
+		<Unit filename="Arduino/src/Animation/Clock/AnimationClockFade.cpp" />
+		<Unit filename="Arduino/src/Animation/Clock/AnimationClockShift.cpp" />
+		<Unit filename="Arduino/src/Animation/Clock/AnimationClockSnake.cpp" />
+		<Unit filename="Arduino/src/Animation/Clock/AnimationClockTeletype.cpp" />
+		<Unit filename="Arduino/src/Animation/Clock/AnimationClockWipe.cpp" />
 		<Unit filename="Arduino/src/Animation/Fonts.cpp" />
 		<Unit filename="Arduino/src/Clock/Clock.cpp" />
 		<Unit filename="Arduino/src/Display/Display.cpp" />

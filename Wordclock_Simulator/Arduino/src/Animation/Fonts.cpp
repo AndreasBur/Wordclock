@@ -20,7 +20,7 @@
 /******************************************************************************************************************************************************
  * INCLUDES
 ******************************************************************************************************************************************************/
-#include "Animation.h"
+#include "AnimationFont.h"
 
 
 /******************************************************************************************************************************************************
@@ -39,7 +39,7 @@
 ******************************************************************************************************************************************************/
 /* font 4x6 vertical MSB 1 */
 #if(ANIMATION_SUPPORT_FONT_4X6 == STD_ON)
-const unsigned char Animation::Font_4x6[][ANIMATION_FONT_4X6_WIDTH] PROGMEM =
+const unsigned char AnimationFont::Font_4x6[][ANIMATION_FONT_4X6_WIDTH] PROGMEM =
 {
     {0x00,0x00,0x00,0x00},  // 0x00
     {0x00,0x1C,0x2A,0x1C},  // 0x01
@@ -302,7 +302,7 @@ const unsigned char Animation::Font_4x6[][ANIMATION_FONT_4X6_WIDTH] PROGMEM =
 
 /* font 5x8 vertical MSB 1 */
 #if(ANIMATION_SUPPORT_FONT_5X8 == STD_ON)
-const unsigned char Animation::Font_5x8[][ANIMATION_FONT_5X8_WIDTH] PROGMEM =
+const unsigned char AnimationFont::Font_5x8[][ANIMATION_FONT_5X8_WIDTH] PROGMEM =
 {
     {0x00,0x00,0x00,0x00,0x00}, // 0x00
     {0x78,0xAC,0x8C,0xAC,0x78}, // 0x01
@@ -565,7 +565,7 @@ const unsigned char Animation::Font_5x8[][ANIMATION_FONT_5X8_WIDTH] PROGMEM =
 
 /* font 6x8 vertical MSB 1 */
 #if(ANIMATION_SUPPORT_FONT_6X8 == STD_ON)
-const unsigned char Animation::Font_6x8[][ANIMATION_FONT_6X8_WIDTH] PROGMEM =
+const unsigned char AnimationFont::Font_6x8[][ANIMATION_FONT_6X8_WIDTH] PROGMEM =
 {
     {0x00,0x00,0x00,0x00,0x00,0x00},    // 0x00
     {0x00,0x7C,0xA2,0x8A,0xA2,0x7C},    // 0x01
@@ -829,7 +829,7 @@ const unsigned char Animation::Font_6x8[][ANIMATION_FONT_6X8_WIDTH] PROGMEM =
 
 /* font 6x10 LSB 2 horizontal */
 #if(ANIMATION_SUPPORT_FONT_6X10 == STD_ON)
-const unsigned char Animation::Font_6x10[][ANIMATION_FONT_6X10_HEIGHT] PROGMEM =
+const unsigned char AnimationFont::Font_6x10[][ANIMATION_FONT_6X10_HEIGHT] PROGMEM =
 {
     {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00},    // 0x00
     {0x00,0x00,0x00,0x1E,0x23,0x2D,0x3F,0x1E,0x00,0x00},    // 0x01
@@ -1092,7 +1092,7 @@ const unsigned char Animation::Font_6x10[][ANIMATION_FONT_6X10_HEIGHT] PROGMEM =
 
 /* font 6x8 vertical MSB 1 */
 #if(ANIMATION_SUPPORT_FONT_8X8 == STD_ON)
-const unsigned char Animation::Font_8x8[][ANIMATION_FONT_8X8_WIDTH] PROGMEM =
+const unsigned char AnimationFont::Font_8x8[][ANIMATION_FONT_8X8_WIDTH] PROGMEM =
 {
     {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00},  // 0x00
     {0x7E,0x81,0xA9,0x8D,0x8D,0xA9,0x81,0x7E},  // 0x01

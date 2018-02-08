@@ -26,7 +26,6 @@
 #include "AnimationFont.h"
 
 
-
 /******************************************************************************************************************************************************
  *  GLOBAL CONSTANT MACROS
 ******************************************************************************************************************************************************/
@@ -54,28 +53,21 @@ class Animation
 /******************************************************************************************************************************************************
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
-  public:
-    enum StateType {
-        STATE_NONE,
-        STATE_UNINIT,
-        STATE_IDLE,
-        STATE_FONT, // ?
-        STATE_CLOCK // ?
-        //STATE_WORKING_CLOCK
-        //STATE_WORDKING_FONT
-    };
+    //using FontType = AnimationFont::FontType;
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
+    AnimationClock wcAnimationClock;
+    AnimationFont wcAnimationFont;
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
     //Animation() {}
-    Animation();
+    Animation(Display*, Clock*);
     ~Animation();
 
     // get methods
@@ -85,8 +77,12 @@ class Animation
 
     // methods
     void init();
-    void task();
+    void task() { wcAnimationFont.task(); }
     //void show() { pDisplay->show(); }
+    stdReturnType setChar(byte Column, byte Row, unsigned char Char, AnimationFont::FontType Font) { return wcAnimationFont.setChar(Column, Row, Char, Font); }
+    void setCharWithShift(unsigned char Char, AnimationFont::FontType Font) { wcAnimationFont.setCharWithShift(Char, Font); }
+    void setText(unsigned char* Text, AnimationFont::FontType Font) { wcAnimationFont.setText(Text, Font); }
+    void setTextWithShift(unsigned char* Text, AnimationFont::FontType Font) { wcAnimationFont.setTextWithShift(Text, Font); }
 };
 
 
