@@ -8,42 +8,29 @@
  *  ---------------------------------------------------------------------------------------------------------------------------------------------------
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       AnimationShift.h
- *      \brief
+/**     \file       AnimationClockFade.h
+ *      \brief      
  *
- *      \details
- *
+ *      \details    
+ *                  
 ******************************************************************************************************************************************************/
-#ifndef _ANIMATION_SHIFT_H_
-#define _ANIMATION_SHIFT_H_
+#ifndef _ANIMATION_CLOCK_FADE_H_
+#define _ANIMATION_CLOCK_FADE_H_
 
 /******************************************************************************************************************************************************
  * I N C L U D E S
 ******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Arduino.h"
-#include "Clock.h"
-#include "Transformation.h"
-#include "AnimationCommon.h"
+
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
-/* AnimationShift configuration parameter */
-#define ANIMATION_SHIFT_HORIZONTAL              STD_ON
-#define ANIMATION_SHIFT_VERTICAL                STD_OFF
+/* AnimationClockFade configuration parameter */
 
 
-#if (ANIMATION_SHIFT_HORIZONTAL == STD_OFF && ANIMATION_SHIFT_VERTICAL == STD_OFF)
-#error "AnimationShift: Exactly one switch must be set to STD_ON"
-#endif
-
-#if (ANIMATION_SHIFT_HORIZONTAL == STD_ON && ANIMATION_SHIFT_VERTICAL == STD_ON)
-#error "AnimationShift: ANIMATION_SHIFT_HORIZONTAL or ANIMATION_SHIFT_VERTICAL has to be STD_ON, but not both"
-#endif
-
-
-/* AnimationShift parameter */
+/* AnimationClockFade parameter */
 
 
 
@@ -55,51 +42,26 @@
 /******************************************************************************************************************************************************
  *  C L A S S   T E M P L A T E
 ******************************************************************************************************************************************************/
-class AnimationShift : public AnimationCommon
+class AnimationClockFade
 {
 /******************************************************************************************************************************************************
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-    enum StateType {
-        STATE_NONE,
-        STATE_UNINIT,
-        STATE_IDLE,
-        STATE_CLEAR_TIME,
-        //STATE_SHIFT_OUT,
-        //STATE_SHIFT_IN,
-        STATE_SET_TIME
-    };
-
+  
+  
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
-    Clock* pClock;
-    Display* pDisplay;
-    Transformation wcTransformation;
-    StateType State;
-    Clock::ClockWordsTableType ClockWordsTable;
 
-#if (ANIMATION_SHIFT_HORIZONTAL == STD_ON)
-    byte CurrentColumn;
-#endif
-
-#if (ANIMATION_SHIFT_VERTICAL == STD_ON)
-    byte CurrentRow;
-#endif
-
-    // functions
-    void reset();
-    void clearTimeTask();
-    void setTimeTask();
-
+  
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    AnimationShift();
-    ~AnimationShift();
+    AnimationClockFade();
+    ~AnimationClockFade();
 
 	// get methods
 
@@ -107,9 +69,8 @@ class AnimationShift : public AnimationCommon
 	// set methods
 
 	// methods
-    void init(Display*, Clock*);
-    stdReturnType setClock(byte, byte);
-    void task();
+    void init();
+    //void show() { pDisplay->show(); }
 };
 
 #endif

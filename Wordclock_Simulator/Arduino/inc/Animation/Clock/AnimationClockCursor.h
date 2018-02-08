@@ -8,29 +8,32 @@
  *  ---------------------------------------------------------------------------------------------------------------------------------------------------
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       ANIMATION_TELETYPE.h
+/**     \file       AnimationClockCursor.h
  *      \brief      
  *
  *      \details    
  *                  
 ******************************************************************************************************************************************************/
-#ifndef _ANIMATION_TELETYPE_H_
-#define _ANIMATION_TELETYPE_H_
+#ifndef _ANIMATION_CLOCK_CURSOR_H_
+#define _ANIMATION_CLOCK_CURSOR_H_
 
 /******************************************************************************************************************************************************
  * INCLUDES
 ******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Arduino.h"
+#include "Display.h"
 #include "Clock.h"
+#include "AnimationClockCommon.h"
+
 
 /******************************************************************************************************************************************************
  *  GLOBAL CONSTANT MACROS
 ******************************************************************************************************************************************************/
-/* AnimationTeletype configuration parameter */
+/* AnimationClockCursor configuration parameter */
 
 
-/* AnimationTeletype parameter */
+/* AnimationClockCursor parameter */
 
 
 
@@ -45,9 +48,9 @@
 
 
 /******************************************************************************************************************************************************
- *  CLASS  AnimationTeletype
+ *  CLASS  AnimationClockCursor
 ******************************************************************************************************************************************************/
-class AnimationTeletype
+class AnimationClockCursor : public AnimationClockCommon
 {
   public:
 /******************************************************************************************************************************************************
@@ -67,25 +70,23 @@ class AnimationTeletype
   private:
     Clock* pClock;
     Display* pDisplay;
-    StateType State;
     Clock::ClockWordsTableType ClockWordsTable;
-    byte CurrentWordIndex;
-    byte CurrentWordLength;
-    byte CurrentCharIndex;
+    byte CurrentPixelIndex;
+    StateType State;
     DisplayWords Words;
 
     // functions
     void reset();
-    stdReturnType setNextWordIndex();
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    AnimationTeletype();
-    ~AnimationTeletype();
-    
+    AnimationClockCursor();
+    ~AnimationClockCursor();
+
 	// get methods
+
 
 	// set methods
 
@@ -93,7 +94,7 @@ class AnimationTeletype
     void init(Display*, Clock*);
     stdReturnType setClock(byte, byte);
     void task();
-
+    void show() { pDisplay->show(); }
 };
 
 

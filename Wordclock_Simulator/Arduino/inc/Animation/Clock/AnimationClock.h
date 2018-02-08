@@ -8,29 +8,36 @@
  *  ---------------------------------------------------------------------------------------------------------------------------------------------------
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       ANIMATION_COMMON.h
+/**     \file       ANIMATION_CLOCK.h
  *      \brief      
  *
  *      \details    
  *                  
 ******************************************************************************************************************************************************/
-#ifndef _ANIMATION_COMMON_H_
-#define _ANIMATION_COMMON_H_
+#ifndef _ANIMATION_CLOCK_H_
+#define _ANIMATION_CLOCK_H_
 
 /******************************************************************************************************************************************************
  * I N C L U D E S
 ******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Arduino.h"
-#include "Clock.h"
+#include "Display.h"
+#include "AnimationClockTeletype.h"
+#include "AnimationClockCursor.h"
+#include "AnimationClockDrop.h"
+#include "AnimationClockWipe.h"
+#include "AnimationClockSnake.h"
+#include "AnimationClockShift.h"
+
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
-/* AnimationCommon configuration parameter */
+/* AnimationClock configuration parameter */
 
 
-/* AnimationCommon parameter */
+/* AnimationClock parameter */
 
 
 
@@ -42,39 +49,72 @@
 /******************************************************************************************************************************************************
  *  C L A S S   T E M P L A T E
 ******************************************************************************************************************************************************/
-class AnimationCommon
+class AnimationClock
 {
 /******************************************************************************************************************************************************
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-  
-  
+    enum AnimationType {
+        ANIMATION_CLOCK_CURSOR,
+        ANIMATION_CLOCK_TELETYPE,
+        ANIMATION_CLOCK_DROP,
+        ANIMATION_CLOCK_SHIFT,
+        ANIMATION_CLOCK_FADE,
+        ANIMATION_CLOCK_SNAKE,
+        ANIMATION_CLOCK_WIPE,
+        ANIMATION_CLOCK_EXPLODE,
+        ANIMATION_CLOCK_IMPLODE,
+        ANIMATION_CLOCK_FLICKER,
+        ANIMATION_CLOCK_MATRIX,
+        ANIMATION_CLOCK_CUBE,
+        ANIMATION_CLOCK_NONE
+    };
+
+    union AnimationsType {
+        AnimationClockCursor Cursor;
+        AnimationClockTeletype Teletype;
+        AnimationClockDrop Drop;
+        AnimationClockWipe Wipe;
+        AnimationClockShift Shift;
+        AnimationClockSnake Snake;
+
+        AnimationsType() {}
+        ~AnimationsType() {}
+    };
+
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
-    
+    Display* pDisplay;
+    Clock* pClock;
+    AnimationType CurrentAnimation;
+    AnimationsType Animations;
 
+  
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    AnimationCommon();
-    ~AnimationCommon();
+    AnimationClock(Display*, Clock*);
+    ~AnimationClock();
 
 	// get methods
-
+    AnimationType getAnimation() const { return CurrentAnimation; }
 
 	// set methods
+    void setAnimation(AnimationType);
 
 	// methods
-    boolean isPixelPartOfClockWords(Clock::ClockWordsTableType, byte, byte);
-    boolean isPixelPartOfClockWords(Clock::ClockWordsTableType, byte);
+    void init();
+    void task();
+    stdReturnType setClock(byte, byte);
+    void show();
 };
 
-#endif
 
+#endif
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E
 ******************************************************************************************************************************************************/
