@@ -1,0 +1,8 @@
+# depslib dependency file v1.0
+1518186683 source:c:\users\virskl\desktop\fontcreator\main.cpp
+	<iostream>
+	"StandardTypes.h"
+
+1518166152 c:\users\virskl\desktop\fontcreator\standardtypes.h
+	<stdint.h>
+

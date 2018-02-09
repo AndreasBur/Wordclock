@@ -137,7 +137,7 @@ inline ReturnType bitMask(LengthType Length)
 }
 
 template <typename VarType>
-inline boolean readBit(VarType Var, boolean Bit)
+inline boolean readBit(VarType Var, uint8_t Bit)
 {
     return ((Var & (UINT64_C(1) << Bit)) >> Bit);
 }
