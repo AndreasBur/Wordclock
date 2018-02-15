@@ -127,19 +127,21 @@ int main()
             Column++;
         }
 
-
         for(int a = 0; a < 11; a++)
         {
-             for(int i = 0; i < 8; i++) {
-                if(FontChar[i][a] == 0) cout << " ";
-                else cout << FontChar[i][a];
+            int Row = 0;
+            for(int i = 0; i < 8; i++) {
+                //if(FontChar[i][a] == 0) cout << " ";
+                //else cout << FontChar[i][a];
+                //WRITE_BIT(Row, i, FontChar[i][a]);
+                writeBit(Row, i, FontChar[i][a]);
             }
-            cout << endl;
+            //cout << endl;
+            if(Row < 16) cout << "0x0" << hex << Row << ",";
+            else cout << "0x" << hex << Row << ",";
         }
         cout << endl;
     }
-
-
 
     return 0;
 }

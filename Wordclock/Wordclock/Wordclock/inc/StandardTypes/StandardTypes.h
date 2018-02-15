@@ -143,9 +143,9 @@ inline boolean readBit(VarType Var, uint8_t Bit)
 }
 
 template <typename VarType>
-inline VarType writeBit(VarType Var, uint8_t Bit)
+inline VarType setBit(VarType Var, uint8_t Bit)
 {
-    return (Var & (unsigned)~(UINT64_C(1) << Bit));
+    return (Var & ~(UINT64_C(1) << Bit));
 }
 
 template <typename VarType, typename PositionType>

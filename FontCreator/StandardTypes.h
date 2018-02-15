@@ -143,9 +143,9 @@ inline bool readBit(VarType Var, uint8_t Bit)
 }
 
 template <typename VarType>
-inline VarType writeBit(VarType Var, uint8_t Bit)
+inline void writeBit(VarType& Var, uint8_t Bit, bool Value)
 {
-    return (Var & (unsigned)~(UINT64_C(1) << Bit));
+    Var = (Var & ~(UINT64_C(1) << Bit)) | (Value << Bit);
 }
 
 template <typename VarType, typename PositionType>
@@ -155,7 +155,7 @@ inline void shiftLeft(VarType& Var, PositionType Position)
 }
 
 template <typename VarType, typename PositionType>
-inline void shiftRight(VarType Var, PositionType Position)
+inline void shiftRight(VarType& Var, PositionType Position)
 {
     Var = Var >> Position;
 }
