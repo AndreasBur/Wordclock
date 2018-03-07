@@ -120,8 +120,8 @@ class Clock
 
     using ClockWordsTableType = DisplayWords::WordIdType[CLOCK_WORDS_TABLE_TYPE_SIZE];
 
-    using HoursTableEntryType = HoursType;
-    using MinutesTableEntryType = MinutesType;
+    using HoursTableElementType = HoursType;
+    using MinutesTableElementType = MinutesType;
 
 
 /******************************************************************************************************************************************************
@@ -135,15 +135,15 @@ class Clock
     static const MinutesType MinutesTable[][CLOCK_NUMBER_OF_MINUTE_STEPS];
     
     // functions
-    MinutesTableEntryType getMinutesTableEntry(ModesType Mode, byte Minute) {
-        MinutesTableEntryType MinutesTableEntry;
-        memcpy_P(&MinutesTableEntry, &MinutesTable[Mode][Minute / CLOCK_MINUTE_STEP_IN_MINUTES], sizeof(MinutesType));
-        return MinutesTableEntry;
+    MinutesTableElementType getMinutesTableElement(ModesType Mode, byte Minute) {
+        MinutesTableElementType MinutesTableElement;
+        memcpy_P(&MinutesTableElement, &MinutesTable[Mode][Minute / CLOCK_MINUTE_STEP_IN_MINUTES], sizeof(MinutesType));
+        return MinutesTableElement;
     }
-    HoursTableEntryType getHoursTableEntry(HourModesType HourMode, byte Hour) {
-        HoursTableEntryType HoursTableEntry;
-        memcpy_P(&HoursTableEntry, &HoursTable[HourMode][Hour], sizeof(HoursType));
-        return HoursTableEntry;
+    HoursTableElementType getHoursTableElement(HourModesType HourMode, byte Hour) {
+        HoursTableElementType HoursTableElement;
+        memcpy_P(&HoursTableElement, &HoursTable[HourMode][Hour], sizeof(HoursType));
+        return HoursTableElement;
     }
 
 

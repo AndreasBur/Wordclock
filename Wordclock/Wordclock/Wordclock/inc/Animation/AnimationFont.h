@@ -103,8 +103,8 @@ class AnimationFont
         ShiftStateType State : 1;
         byte Counter : 7;
         FontType Font;
-        unsigned char Char;
-        unsigned char* Text;
+        char Char;
+        char* Text;
       };
   
 /******************************************************************************************************************************************************
@@ -133,11 +133,11 @@ class AnimationFont
 #endif
 
     // functions
-    stdReturnType convertCharToFontIndex(unsigned char, byte*);
-    stdReturnType setCharFontHorizontal(byte, byte, unsigned char, const unsigned char*, byte, byte);
-    stdReturnType setCharFontVertical(byte, byte, unsigned char, const unsigned char*, byte, byte);
-    void setCharFontHorizontalFast(byte, byte, unsigned char, const unsigned char*, byte, byte);
-    void setCharFontVerticalFast(byte, byte, unsigned char, const unsigned char*, byte, byte);
+    stdReturnType convertCharToFontIndex(char, byte*);
+    stdReturnType setCharFontHorizontal(byte, byte, char, const byte*, byte, byte);
+    stdReturnType setCharFontVertical(byte, byte, char, const byte*, byte, byte);
+    void setCharFontHorizontalFast(byte, byte, char, const byte*, byte, byte);
+    void setCharFontVerticalFast(byte, byte, char, const byte*, byte, byte);
     void stringShiftTask();
     void charShiftTask();
     byte getColumnCenter(FontType Font) { return (DISPLAY_NUMBER_OF_COLUMNS / 2) - (getFontWidth(Font) / 2); }
@@ -159,10 +159,10 @@ class AnimationFont
     void init();
     void show() { pDisplay->show(); }
     void task();
-    stdReturnType setChar(byte, byte, unsigned char, FontType);
-    void setCharWithShift(unsigned char, FontType);
-    void setText(unsigned char*, FontType);
-    void setTextWithShift(unsigned char*, FontType);
+    stdReturnType setChar(byte, byte, char, FontType);
+    void setCharWithShift(char, FontType);
+    void setText(char*, FontType);
+    void setTextWithShift(char*, FontType);
     byte getFontHeight(FontType);
     byte getFontWidth(FontType);
 

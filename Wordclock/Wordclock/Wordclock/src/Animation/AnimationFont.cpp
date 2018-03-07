@@ -92,7 +92,7 @@ void AnimationFont::init()
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType AnimationFont::setChar(byte Column, byte Row, unsigned char Char, FontType Font)
+stdReturnType AnimationFont::setChar(byte Column, byte Row, char Char, FontType Font)
 {
 #if(ANIMATION_SUPPORT_FONT_4X6 == STD_ON)
     if(Font == FONT_4X6) return setCharFontHorizontal(Column, Row, Char, &Font_4x6[0][0], ANIMATION_FONT_4X6_WIDTH, ANIMATION_FONT_4X6_HEIGHT);
@@ -125,7 +125,7 @@ stdReturnType AnimationFont::setChar(byte Column, byte Row, unsigned char Char, 
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-void AnimationFont::setCharWithShift(unsigned char Char, FontType Font)
+void AnimationFont::setCharWithShift(char Char, FontType Font)
 {
     State = STATE_CHAR_SHIFT;
     Shift.Font = Font;
@@ -142,7 +142,7 @@ void AnimationFont::setCharWithShift(unsigned char Char, FontType Font)
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-void AnimationFont::setTextWithShift(unsigned char* Text, FontType Font)
+void AnimationFont::setTextWithShift(char* Text, FontType Font)
 {
     State = STATE_TEXT_SHIFT;
     Shift.Font = Font;
@@ -315,22 +315,20 @@ void AnimationFont::charShiftTask()
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType AnimationFont::setCharFontHorizontal(byte Column, byte Row, unsigned char Char, const unsigned char* FontTable, byte FontWidth, byte FontHeight)
+stdReturnType AnimationFont::setCharFontHorizontal(byte Column, byte Row, char Char, const byte* FontTable, byte FontWidth, byte FontHeight)
 {
     stdReturnType ReturnValue{E_OK};
-    byte FontIndex, ColumnAbs, RowAbs;
-
-    FontIndex = Char;
+    byte FontIndex = Char;
 
     for(byte FontColumn = 0; FontColumn < FontWidth; FontColumn++)
     {
-        byte Font_EntryItem = pgm_read_byte(&FontTable[(FontIndex * FontWidth) + FontColumn]);
+        byte CharRow = pgm_read_byte(&FontTable[(FontIndex * FontWidth) + FontColumn]);
         for(byte FontRow = 0; FontRow < FontHeight; FontRow++)
         {
-            ColumnAbs = Column + FontColumn;
-            RowAbs = Row + FontHeight - 1 - FontRow;
+            byte ColumnAbs = Column + FontColumn;
+            byte RowAbs = Row + FontHeight - 1 - FontRow;
             if(ColumnAbs < DISPLAY_NUMBER_OF_COLUMNS && RowAbs < DISPLAY_NUMBER_OF_ROWS) {
-                if(pDisplay->writePixel(ColumnAbs, RowAbs, bitRead(Font_EntryItem, FontRow)) == E_NOT_OK) {
+                if(pDisplay->writePixel(ColumnAbs, RowAbs, bitRead(CharRow, FontRow)) == E_NOT_OK) {
                     ReturnValue = E_NOT_OK;
                     break;
                 }
@@ -351,21 +349,19 @@ stdReturnType AnimationFont::setCharFontHorizontal(byte Column, byte Row, unsign
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-void AnimationFont::setCharFontHorizontalFast(byte Column, byte Row, unsigned char Char, const unsigned char* FontTable, byte FontWidth, byte FontHeight)
+void AnimationFont::setCharFontHorizontalFast(byte Column, byte Row, char Char, const byte* FontTable, byte FontWidth, byte FontHeight)
 {
-    byte FontIndex, ColumnAbs, RowAbs;
-
-    FontIndex = Char;
+    byte FontIndex = Char;
 
     for(byte FontColumn = 0; FontColumn < FontWidth; FontColumn++)
     {
-        byte Font_EntryItem = pgm_read_byte(&FontTable[(FontIndex * FontWidth) + FontColumn]);
+        byte CharRow = pgm_read_byte(&FontTable[(FontIndex * FontWidth) + FontColumn]);
         for(byte FontRow = 0; FontRow < FontHeight; FontRow++)
         {
-            ColumnAbs = Column + FontColumn;
-            RowAbs = Row + FontHeight - 1 - FontRow;
+            byte ColumnAbs = Column + FontColumn;
+            byte RowAbs = Row + FontHeight - 1 - FontRow;
             if(ColumnAbs < DISPLAY_NUMBER_OF_COLUMNS && RowAbs < DISPLAY_NUMBER_OF_ROWS) {
-                pDisplay->writePixelFast(ColumnAbs, RowAbs, bitRead(Font_EntryItem, FontRow));
+                pDisplay->writePixelFast(ColumnAbs, RowAbs, bitRead(CharRow, FontRow));
             } else {
                 break;
             }
@@ -382,22 +378,20 @@ void AnimationFont::setCharFontHorizontalFast(byte Column, byte Row, unsigned ch
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType AnimationFont::setCharFontVertical(byte Column, byte Row, unsigned char Char, const unsigned char* FontTable, byte FontWidth, byte FontHeight)
+stdReturnType AnimationFont::setCharFontVertical(byte Column, byte Row, char Char, const byte* FontTable, byte FontWidth, byte FontHeight)
 {
     stdReturnType ReturnValue{E_OK};
-    byte FontIndex, ColumnAbs, RowAbs;
-
-    FontIndex = Char;
+    byte FontIndex = Char;
 
     for(byte FontRow = 0; FontRow < FontHeight; FontRow++)
     {
-        byte Font_EntryItem = pgm_read_byte(&FontTable[(FontIndex * FontHeight) + FontRow]);
+        byte CharColumn = pgm_read_byte(&FontTable[(FontIndex * FontHeight) + FontRow]);
         for(byte FontColumn = 0; FontColumn < FontWidth; FontColumn++)
         {
-            ColumnAbs = Column + FontColumn;
-            RowAbs = Row + FontRow;
+            byte ColumnAbs = Column + FontColumn;
+            byte RowAbs = Row + FontRow;
             if(ColumnAbs < DISPLAY_NUMBER_OF_COLUMNS && RowAbs < DISPLAY_NUMBER_OF_ROWS) {
-                if(pDisplay->writePixel(ColumnAbs, RowAbs, bitRead(Font_EntryItem, FontColumn)) == E_NOT_OK) {
+                if(pDisplay->writePixel(ColumnAbs, RowAbs, bitRead(CharColumn, FontColumn)) == E_NOT_OK) {
                     ReturnValue = E_NOT_OK;
                     break;
                 }
@@ -418,21 +412,19 @@ stdReturnType AnimationFont::setCharFontVertical(byte Column, byte Row, unsigned
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-void AnimationFont::setCharFontVerticalFast(byte Column, byte Row, unsigned char Char, const unsigned char* FontTable, byte FontWidth, byte FontHeight)
+void AnimationFont::setCharFontVerticalFast(byte Column, byte Row, char Char, const byte* FontTable, byte FontWidth, byte FontHeight)
 {
-    byte FontIndex, ColumnAbs, RowAbs;
-
-    FontIndex = Char;
+    byte FontIndex = Char;
 
     for(byte FontRow = 0; FontRow < FontHeight; FontRow++)
     {
-        byte Font_EntryItem = pgm_read_byte(&FontTable[(FontIndex * FontHeight) + FontRow]);
+        byte CharColumn = pgm_read_byte(&FontTable[(FontIndex * FontHeight) + FontRow]);
         for(byte FontColumn = 0; FontColumn < FontWidth; FontColumn++)
         {
-            ColumnAbs = Column + FontColumn;
-            RowAbs = Row + FontRow;
+            byte ColumnAbs = Column + FontColumn;
+            byte RowAbs = Row + FontRow;
             if(ColumnAbs < DISPLAY_NUMBER_OF_COLUMNS && RowAbs < DISPLAY_NUMBER_OF_ROWS) {
-                pDisplay->writePixelFast(ColumnAbs, RowAbs, bitRead(Font_EntryItem, FontColumn));
+                pDisplay->writePixelFast(ColumnAbs, RowAbs, bitRead(CharColumn, FontColumn));
             } else {
                 break;
             }
@@ -452,7 +444,7 @@ void AnimationFont::setCharFontVerticalFast(byte Column, byte Row, unsigned char
  *  \return         E_OK
  *                  E_NOT_OK
  *****************************************************************************************************************************************************/
-stdReturnType AnimationFont::convertCharToFontIndex(unsigned char Char, byte* Index)
+stdReturnType AnimationFont::convertCharToFontIndex(char Char, byte* Index)
 {
     stdReturnType ReturnValue = E_NOT_OK;
     *Index = Char + 0;
