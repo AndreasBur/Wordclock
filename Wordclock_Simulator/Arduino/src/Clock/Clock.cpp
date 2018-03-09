@@ -187,20 +187,20 @@ stdReturnType Clock::getClockWords(byte Hour, byte Minute, ClockWordsType* Clock
             ClockWords->ShowItIs = false;
         }
 #endif
-        MinutesTableEntryType MinutesTableEntry = getMinutesTableEntry(Mode, Minute);
+        MinutesTableElementType MinutesTableElement = getMinutesTableElement(Mode, Minute);
 
         for(byte Index = 0; Index < CLOCK_MAX_NUMBER_OF_MINUTE_WORDS; Index++) {
-            ClockWords->MinuteWords[Index] = MinutesTableEntry.Words[Index];
+            ClockWords->MinuteWords[Index] = MinutesTableElement.Words[Index];
         }
 
         if(Hour >= CLOCK_NUMBER_OF_HOURS) Hour -= CLOCK_NUMBER_OF_HOURS;
-        Hour += MinutesTableEntry.HourOffset;                             // correct the hour offset from the minutes
+        Hour += MinutesTableElement.HourOffset;                             // correct the hour offset from the minutes
         if(Hour >= CLOCK_NUMBER_OF_HOURS) Hour -= CLOCK_NUMBER_OF_HOURS;
 
-        HoursTableEntryType HoursTableEntry = getHoursTableEntry(MinutesTableEntry.HourMode, Hour);
+        HoursTableElementType HoursTableElement = getHoursTableElement(MinutesTableElement.HourMode, Hour);
 
         for(byte Index = 0; Index < CLOCK_MAX_NUMBER_OF_HOUR_WORDS; Index++) {
-            ClockWords->HourWords[Index] = HoursTableEntry.Words[Index];
+            ClockWords->HourWords[Index] = HoursTableElement.Words[Index];
         }
     } else {
         ReturnValue = E_NOT_OK;

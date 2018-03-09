@@ -58,6 +58,7 @@ AnimationFont::AnimationFont(Display* Display) : wcTransformation(Display)
     Shift.Char = STD_NULL_CHARACTER;
     Shift.Font = FONT_NONE;
     Shift.State = SHIFT_STATE_IDLE;
+    State = STATE_UNINIT;
 } /* AnimationFont */
 
 
@@ -128,6 +129,7 @@ stdReturnType AnimationFont::setChar(byte Column, byte Row, char Char, FontType 
 void AnimationFont::setCharWithShift(char Char, FontType Font)
 {
     State = STATE_CHAR_SHIFT;
+    Shift.State = SHIFT_STATE_BUSY;
     Shift.Font = Font;
     Shift.Char = Char;
     Shift.Counter = getFontWidth(Font);
@@ -145,6 +147,7 @@ void AnimationFont::setCharWithShift(char Char, FontType Font)
 void AnimationFont::setTextWithShift(char* Text, FontType Font)
 {
     State = STATE_TEXT_SHIFT;
+    Shift.State = SHIFT_STATE_IDLE;
     Shift.Font = Font;
     Shift.Text = Text;
 }
@@ -295,11 +298,11 @@ void AnimationFont::stringShiftTask()
 void AnimationFont::charShiftTask()
 {
     if(Shift.State == SHIFT_STATE_BUSY) {
+        wcTransformation.shiftLeft();
         if(Shift.Counter == 0) {
             Shift.State = SHIFT_STATE_IDLE;
             if(State == STATE_CHAR_SHIFT) State = STATE_IDLE;
         } else {
-            wcTransformation.shiftLeft();
             Shift.Counter--;
             setChar(DISPLAY_NUMBER_OF_COLUMNS - (getFontWidth(Shift.Font) - Shift.Counter), getRowCenter(Shift.Font), Shift.Char, Shift.Font);
         }

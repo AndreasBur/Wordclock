@@ -38,8 +38,8 @@ WordclockDialog::WordclockDialog(wxDialog *dlg, const wxString &title) : wxDialo
 
     //WcAnimation.setChar(0,0,219, ANIMATION_FONT_6X10);
     //WcAnimation.setChar(5,0,'B', AnimationFont::FONT_6X10);
-    //WcAnimation.setCharWithShift('1', AnimationFont::FONT_5X8);
-    WcAnimation.setTextWithShift((unsigned char*) Text, AnimationFont::FONT_6X10);
+    //WcAnimation.setCharWithShift('A', AnimationFont::FONT_5X8);
+    WcAnimation.setTextWithShift(Text, AnimationFont::FONT_6X10);
     WcDisplay.show();
 
     //WcTransformation.shiftRightFast(true);

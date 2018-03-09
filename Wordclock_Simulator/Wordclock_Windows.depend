@@ -6115,7 +6115,7 @@
 	"Arduino.h"
 	"Display.h"
 
-1513076387 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\standardtypes\standardtypes.h
+1518166269 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\standardtypes\standardtypes.h
 	<stdint.h>
 	"Arduino.h"
 
@@ -6171,18 +6171,18 @@
 	"Animation.h"
 	"Transformation.h"
 
-1513758098 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\clock\clock.h
+1520417126 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\clock\clock.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"Display.h"
 
-1517927894 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\animation\animation.h
+1520593318 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\animation\animation.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"AnimationClock.h"
 	"AnimationFont.h"
 
-1518083127 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\wordclockmain.cpp
+1520603054 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\wordclockmain.cpp
 	"wx_pch.h"
 	"WordclockMain.h"
 
@@ -6192,7 +6192,7 @@
 1504860142 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\font.cpp
 	"Animation.h"
 
-1517927883 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\clock\clock.cpp
+1520593276 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\clock\clock.cpp
 	"Clock.h"
 
 1516196648 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\display\display.cpp
@@ -6389,10 +6389,10 @@
 	"StandardTypes.h"
 	"Arduino.h"
 
-1518083008 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\animationfont.cpp
+1520603339 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\animationfont.cpp
 	"AnimationFont.h"
 
-1518080431 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\animation\animationfont.h
+1520421703 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\animation\animationfont.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"Display.h"

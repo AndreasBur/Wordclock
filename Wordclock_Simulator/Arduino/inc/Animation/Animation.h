@@ -79,10 +79,10 @@ class Animation
     void init();
     void task() { wcAnimationFont.task(); }
     //void show() { pDisplay->show(); }
-    stdReturnType setChar(byte Column, byte Row, unsigned char Char, AnimationFont::FontType Font) { return wcAnimationFont.setChar(Column, Row, Char, Font); }
-    void setCharWithShift(unsigned char Char, AnimationFont::FontType Font) { wcAnimationFont.setCharWithShift(Char, Font); }
-    void setText(unsigned char* Text, AnimationFont::FontType Font) { wcAnimationFont.setText(Text, Font); }
-    void setTextWithShift(unsigned char* Text, AnimationFont::FontType Font) { wcAnimationFont.setTextWithShift(Text, Font); }
+    stdReturnType setChar(byte Column, byte Row, char Char, AnimationFont::FontType Font) { return wcAnimationFont.setChar(Column, Row, Char, Font); }
+    void setCharWithShift(char Char, AnimationFont::FontType Font) { wcAnimationFont.setCharWithShift(Char, Font); }
+    void setText(char* Text, AnimationFont::FontType Font) { wcAnimationFont.setText(Text, Font); }
+    void setTextWithShift(char* Text, AnimationFont::FontType Font) { wcAnimationFont.setTextWithShift(Text, Font); }
 };
 
 
