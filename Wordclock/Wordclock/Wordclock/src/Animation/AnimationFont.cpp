@@ -277,7 +277,7 @@ void AnimationFont::stringShiftTask()
             charShiftTask();
             Shift.Text++;
         } else { /* otherwise task has finished */
-            State = STATE_IDLE;
+            if(State == STATE_TEXT_SHIFT) State = STATE_IDLE;
             wcTransformation.shiftLeft();
         }
     } else {

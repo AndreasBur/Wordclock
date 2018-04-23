@@ -137,7 +137,7 @@ void AnimationClockWipe::task()
 void AnimationClockWipe::reset()
 {
     Index = 0;
-    SetPixelState = STATE_SET_PIXEL_DOWN;
+    SetPixelState = SET_PIXEL_STATE_DOWN;
 } /* reset */
 
 
@@ -157,13 +157,13 @@ void AnimationClockWipe::clearTimeTask()
 
     do {
         if(pDisplay->getPixelFast(Column, Row)) {
-            if(SetPixelState == STATE_SET_PIXEL_DOWN) setPixelDown(Column, Row);
+            if(SetPixelState == SET_PIXEL_STATE_DOWN) setPixelDown(Column, Row);
             else setPixelRight(Column, Row);
         }
     } while(Column-- != 0 && Row++ < DISPLAY_NUMBER_OF_ROWS - 1);
 
-    if(SetPixelState == STATE_SET_PIXEL_DOWN) SetPixelState = STATE_SET_PIXEL_RIGHT;
-    else SetPixelState = STATE_SET_PIXEL_DOWN;
+    if(SetPixelState == SET_PIXEL_STATE_DOWN) SetPixelState = SET_PIXEL_STATE_RIGHT;
+    else SetPixelState = SET_PIXEL_STATE_DOWN;
 
     if(setNextIndex() == E_NOT_OK) {
         State = STATE_SET_TIME;

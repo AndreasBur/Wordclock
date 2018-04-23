@@ -81,7 +81,7 @@ boolean AnimationClockCommon::isPixelPartOfClockWords(Clock::ClockWordsTableType
 
     for(uint8_t WordIndex = 0; WordIndex < CLOCK_WORDS_TABLE_TYPE_SIZE; WordIndex++) {
         if(ClockWordsTable[WordIndex] == DisplayWords::WORD_NONE) { break; }
-        DisplayWords::Word Word = Words.getDisplayWordFast(ClockWordsTable[WordIndex]);
+        DisplayWords::WordType Word = Words.getDisplayWordFast(ClockWordsTable[WordIndex]);
         if(Word.Row == Row) { if(Column >= Word.Column && Column < Word.Column + Word.Length) { return true; } }
     }
     return false;

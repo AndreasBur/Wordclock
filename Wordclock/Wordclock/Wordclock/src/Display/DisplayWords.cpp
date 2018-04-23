@@ -37,7 +37,7 @@
 /******************************************************************************************************************************************************
  *  LOCAL DATA TYPES AND STRUCTURES
 ******************************************************************************************************************************************************/
-const DisplayWords::Word DisplayWords::DisplayWordsTable[] PROGMEM
+const DisplayWords::WordType DisplayWords::DisplayWordsTable[] PROGMEM
 {
     {0,0,0},                                //  0 = DISPLAY_WORD_NONE           = ""
     {0,0,2},                                //  1 = DisplayWords::WORD_ES       = "ES"
@@ -103,7 +103,7 @@ DisplayWords::~DisplayWords()
  *                  
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType DisplayWords::getDisplayWord(WordIdType WordId, Word& Word) const
+stdReturnType DisplayWords::getDisplayWord(WordIdType WordId, WordType& Word) const
 {
     stdReturnType ReturnValue = E_NOT_OK;
 

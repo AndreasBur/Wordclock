@@ -83,7 +83,7 @@ class DisplayWords
         WORD_NUMBER_OF_WORDS
     };
 
-    struct Word {
+    struct WordType {
         byte Row;
         byte Column;
         byte Length;
@@ -93,7 +93,7 @@ class DisplayWords
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
-    static const Word DisplayWordsTable[];
+    static const WordType DisplayWordsTable[];
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
@@ -103,16 +103,16 @@ class DisplayWords
     ~DisplayWords();
 
 	// get methods
-    stdReturnType getDisplayWord(WordIdType, Word&) const;
+    stdReturnType getDisplayWord(WordIdType, WordType&) const;
     stdReturnType getDisplayWordLength(WordIdType, byte&) const;
     stdReturnType getDisplayWordColumn(WordIdType, byte&) const;
     stdReturnType getDisplayWordRow(WordIdType, byte&) const;
 
     // get methods fast
-    Word getDisplayWordFast(WordIdType WordId) const { Word Word; memcpy_P(&Word, &DisplayWordsTable[WordId], sizeof(Word)); return Word; }
-    byte getDisplayWordRowFast(WordIdType WordId) const { Word Word; memcpy_P(&Word, &DisplayWordsTable[WordId], sizeof(Word)); return Word.Row; }
-    byte getDisplayWordColumnFast(WordIdType WordId) const { Word Word; memcpy_P(&Word, &DisplayWordsTable[WordId], sizeof(Word)); return Word.Column; }
-    byte getDisplayWordLengthFast(WordIdType WordId) const { Word Word; memcpy_P(&Word, &DisplayWordsTable[WordId], sizeof(Word)); return Word.Length; }
+    WordType getDisplayWordFast(WordIdType WordId) const { WordType Word; memcpy_P(&Word, &DisplayWordsTable[WordId], sizeof(Word)); return Word; }
+    byte getDisplayWordRowFast(WordIdType WordId) const { WordType Word; memcpy_P(&Word, &DisplayWordsTable[WordId], sizeof(Word)); return Word.Row; }
+    byte getDisplayWordColumnFast(WordIdType WordId) const { WordType Word; memcpy_P(&Word, &DisplayWordsTable[WordId], sizeof(Word)); return Word.Column; }
+    byte getDisplayWordLengthFast(WordIdType WordId) const { WordType Word; memcpy_P(&Word, &DisplayWordsTable[WordId], sizeof(Word)); return Word.Length; }
 
 	// set methods
 

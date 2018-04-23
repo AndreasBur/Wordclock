@@ -70,7 +70,10 @@ class AnimationClockDrop
     Display* pDisplay;
     DisplayWords Words;
     StateType State;
-    byte CurrentPixelIndex;
+    //byte CurrentPixelIndex;
+    byte Row;
+    byte Column;
+
     Clock::ClockWordsTableType ClockWordsTable;
     byte CurrenWordIndex;
 
@@ -81,6 +84,8 @@ class AnimationClockDrop
     void setTimeTask();
     stdReturnType setNextWordIndex();
     void setStateToSetTime();
+    stdReturnType setNextRow(byte);
+    stdReturnType setNextColumn(byte);
     
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S

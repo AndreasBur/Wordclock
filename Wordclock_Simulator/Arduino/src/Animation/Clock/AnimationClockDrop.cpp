@@ -9,10 +9,10 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       AnimationClockDrop.cpp
- *      \brief      
+ *      \brief
  *
- *      \details    
- *                  
+ *      \details
+ *
  *
 ******************************************************************************************************************************************************/
 #define _ANIMATION_CLOCK_DROP_SOURCE_
@@ -73,9 +73,9 @@ AnimationClockDrop::~AnimationClockDrop()
 /******************************************************************************************************************************************************
   init()
 ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
+/*! \brief
+ *  \details
+ *
  *  \return         -
 ******************************************************************************************************************************************************/
 void AnimationClockDrop::init(Display* Display, Clock* Clock)
@@ -90,9 +90,9 @@ void AnimationClockDrop::init(Display* Display, Clock* Clock)
 /******************************************************************************************************************************************************
   setClock()
 ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
+/*! \brief
+ *  \details
+ *
  *  \return         -
 ******************************************************************************************************************************************************/
 stdReturnType AnimationClockDrop::setClock(byte Hour, byte Minute)
@@ -111,9 +111,9 @@ stdReturnType AnimationClockDrop::setClock(byte Hour, byte Minute)
 /******************************************************************************************************************************************************
   task()
 ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
+/*! \brief
+ *  \details
+ *
  *  \return         -
 ******************************************************************************************************************************************************/
 void AnimationClockDrop::task()
@@ -137,7 +137,8 @@ void AnimationClockDrop::task()
 ******************************************************************************************************************************************************/
 void AnimationClockDrop::reset()
 {
-    CurrentPixelIndex = 0;
+    Row = 0;
+    Column = 0;
     CurrenWordIndex = CLOCK_WORDS_TABLE_TYPE_SIZE - 1;
 } /* reset */
 
@@ -145,22 +146,20 @@ void AnimationClockDrop::reset()
 /******************************************************************************************************************************************************
   clearTimeTask()
 ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
+/*! \brief
+ *  \details
+ *
  *  \return         -
 ******************************************************************************************************************************************************/
 void AnimationClockDrop::clearTimeTask()
 {
-    byte Column, Row;
-    pDisplay->indexToColumnAndRow(CurrentPixelIndex, Column, Row);
     // toggle current Pixel
-    if(CurrentPixelIndex < DISPLAY_NUMBER_OF_PIXELS) { pDisplay->togglePixelFast(CurrentPixelIndex); }
+    if(Row < DISPLAY_NUMBER_OF_ROWS && Column < DISPLAY_NUMBER_OF_COLUMNS) { pDisplay->togglePixelFast(Column, Row); }
     // increment row and check for out of bounds
     if(Row + 1 < DISPLAY_NUMBER_OF_ROWS) {
         // toggle Pixel in next row
-        CurrentPixelIndex = pDisplay->columnAndRowToIndex(Column, Row + 1);
-        pDisplay->togglePixelFast(CurrentPixelIndex);
+        Row++;
+        pDisplay->togglePixelFast(Column, Row);
     } else {
         // no more active pixels available
         if(setNextActivePixelIndex() == E_NOT_OK) { setStateToSetTime(); }
@@ -171,37 +170,22 @@ void AnimationClockDrop::clearTimeTask()
 /******************************************************************************************************************************************************
   setTimeTask()
 ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
+/*! \brief
+ *  \details
+ *
  *  \return         -
 ******************************************************************************************************************************************************/
 void AnimationClockDrop::setTimeTask()
 {
-    byte Column, Row;
-    DisplayWords::Word CurrentWord = Words.getDisplayWordFast(ClockWordsTable[CurrenWordIndex]);
+    DisplayWords::WordType CurrentWord = Words.getDisplayWordFast(ClockWordsTable[CurrenWordIndex]);
+    const byte MaxColumn = Words.getDisplayWordColumnFast(ClockWordsTable[CurrenWordIndex]) + CurrentWord.Length - 1;
 
-    pDisplay->indexToColumnAndRow(CurrentPixelIndex, Column, Row);
-
-    // break condition
-    if(Row >= CurrentWord.Row) {
-        if(Column - Words.getDisplayWordColumnFast(ClockWordsTable[CurrenWordIndex]) >= CurrentWord.Length - 1) {
-            if(setNextWordIndex() == E_NOT_OK) { 
-                State = STATE_IDLE;
-            } else { 
-                CurrentPixelIndex = Words.getDisplayWordColumnFast(ClockWordsTable[CurrenWordIndex]);
-                pDisplay->indexToColumnAndRow(CurrentPixelIndex, Column, Row);
-            }
-        } else {
-            Column++;
-            Row = 0;
+    if(setNextRow(CurrentWord.Row) == E_NOT_OK) {
+        if(setNextColumn(MaxColumn) == E_NOT_OK) {
+            State = STATE_IDLE;
         }
-    } else {
-        pDisplay->clearPixelFast(CurrentPixelIndex);
-        Row++;
     }
-    CurrentPixelIndex = pDisplay->columnAndRowToIndex(Column, Row);
-    pDisplay->setPixelFast(CurrentPixelIndex);
+    pDisplay->setPixelFast(Column, Row);
 } /* setTimeTask */
 
 
@@ -217,7 +201,7 @@ stdReturnType AnimationClockDrop::setNextActivePixelIndex()
 {
     for(int16_t Index = DISPLAY_NUMBER_OF_PIXELS - 1; Index >= 0; Index--) {
         if(pDisplay->getPixelFast(Index)) {
-            CurrentPixelIndex = Index;
+            pDisplay->indexToColumnAndRow(Index, Column, Row);
             return E_OK;
         }
     }
@@ -235,7 +219,7 @@ stdReturnType AnimationClockDrop::setNextActivePixelIndex()
 ******************************************************************************************************************************************************/
 stdReturnType AnimationClockDrop::setNextWordIndex()
 {
-    for(int8_t Index = CurrenWordIndex - 1; Index >= 0; Index--){
+    for(int8_t Index = CurrenWordIndex - 1; Index >= 0; Index--) {
         if(ClockWordsTable[Index] != DisplayWords::WORD_NONE) {
             CurrenWordIndex = Index;
             return E_OK;
@@ -255,13 +239,58 @@ stdReturnType AnimationClockDrop::setNextWordIndex()
 ******************************************************************************************************************************************************/
 void AnimationClockDrop::setStateToSetTime()
 {
-    CurrentPixelIndex = Words.getDisplayWordColumnFast(ClockWordsTable[CurrenWordIndex]);
-    pDisplay->setPixelFast(CurrentPixelIndex);
+    Column = Words.getDisplayWordColumnFast(ClockWordsTable[CurrenWordIndex]);
+    pDisplay->setPixelFast(Column, Row);
     State = STATE_SET_TIME;
 } /* setStateToSetTime */
 
 
 /******************************************************************************************************************************************************
+  setNextRow()
+******************************************************************************************************************************************************/
+/*! \brief
+ *  \details
+ *
+ *  \return         -
+******************************************************************************************************************************************************/
+stdReturnType AnimationClockDrop::setNextRow(byte MaxRow)
+{
+    if(Row >= MaxRow) {
+        return E_NOT_OK;
+    } else {
+        pDisplay->clearPixelFast(Column, Row);
+        Row++;
+        return E_OK;
+    }
+} /* setNextRow */
+
+
+/******************************************************************************************************************************************************
+  setNextColumn()
+******************************************************************************************************************************************************/
+/*! \brief
+ *  \details
+ *
+ *  \return         -
+******************************************************************************************************************************************************/
+stdReturnType AnimationClockDrop::setNextColumn(byte MaxColumn)
+{
+    if(Column >= MaxColumn) {
+         if(setNextWordIndex() == E_OK) {
+            Column = Words.getDisplayWordColumnFast(ClockWordsTable[CurrenWordIndex]);
+            Row = 0;
+            return E_OK;
+        } else {
+            return E_NOT_OK;
+        }
+    } else {
+        Column++;
+        Row = 0;
+        return E_OK;
+    }
+} /* setNextColumn */
+
+
+/******************************************************************************************************************************************************
  *  E N D   O F   F I L E
 ******************************************************************************************************************************************************/
- 

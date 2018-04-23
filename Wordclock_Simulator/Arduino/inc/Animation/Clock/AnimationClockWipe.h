@@ -60,8 +60,8 @@ class AnimationClockWipe : public AnimationClockCommon
     };
 
     enum SetPixelStateType {
-        STATE_SET_PIXEL_RIGHT,
-        STATE_SET_PIXEL_DOWN
+        SET_PIXEL_STATE_RIGHT,
+        SET_PIXEL_STATE_DOWN
     };
 
 /******************************************************************************************************************************************************

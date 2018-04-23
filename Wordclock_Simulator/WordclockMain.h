@@ -19,6 +19,7 @@
 #include "Clock.h"
 #include "Display.h"
 #include "Animation.h"
+#include "AnimationClock.h"
 #include "Transformation.h"
 
 class WordclockDialog : public wxDialog
@@ -36,6 +37,7 @@ class WordclockDialog : public wxDialog
         Display WcDisplay;
         Clock WcClock;
         Animation WcAnimation;
+        AnimationClock WcAnimationClock;
         Transformation WcTransformation;
         wxDateTime Time;
         wxTimer Timer;

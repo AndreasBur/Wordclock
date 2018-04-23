@@ -23,31 +23,31 @@ wxBEGIN_EVENT_TABLE(WordclockDialog, wxDialog)
 wxEND_EVENT_TABLE()
 
 
-WordclockDialog::WordclockDialog(wxDialog *dlg, const wxString &title) : wxDialog(dlg, -1, title), WcDisplay(255, 255, 255), WcClock(&WcDisplay, Clock::MODE_WESSI), WcAnimation(&WcDisplay, &WcClock), WcTransformation(&WcDisplay), Timer(this, TIMER_ID)
+WordclockDialog::WordclockDialog(wxDialog *dlg, const wxString &title) : wxDialog(dlg, -1, title), WcDisplay(255, 255, 255), WcClock(&WcDisplay, Clock::MODE_WESSI), WcAnimation(&WcDisplay, &WcClock), WcAnimationClock(&WcDisplay, &WcClock), WcTransformation(&WcDisplay), Timer(this, TIMER_ID)
 {
     //Timer.Start(1000 * 2);
     strcpy(Text, "Andreas");
-    Timer.Start(300);
+    Timer.Start(100);
     Time = wxDateTime::Now();
     int Hour = Time.GetHour();
     int Minute = Time.GetMinute();
     //WcClock.setClock(Hour, Minute);
 
     //WcDisplay.setPixelRowFast(5, 0xFFFF);
-    WcDisplay.show();
+    //WcDisplay.show();
 
     //WcAnimation.setChar(0,0,219, ANIMATION_FONT_6X10);
     //WcAnimation.setChar(5,0,'B', AnimationFont::FONT_6X10);
     //WcAnimation.setCharWithShift('A', AnimationFont::FONT_5X8);
-    WcAnimation.setTextWithShift(Text, AnimationFont::FONT_6X10);
-    WcDisplay.show();
+    //WcAnimation.setTextWithShift(Text, AnimationFont::FONT_6X10);
+    //WcDisplay.show();
 
     //WcTransformation.shiftRightFast(true);
     //WcTransformation.shiftRight(true);
     //WcTransformation.shiftUp(false);
     //WcTransformation.shiftDown(true);
-    //WcAnimation.setAnimation(Animation::ANIMATION_SNAKE);
-    //WcAnimation.setClock(Hour, Minute);
+    WcAnimationClock.setAnimation(AnimationClock::ANIMATION_CLOCK_DROP);
+    WcAnimationClock.setClock(Hour, Minute);
     //WcClock.show();
 }
 
@@ -70,7 +70,7 @@ void WordclockDialog::OnTimer(wxTimerEvent& event)
     int Hour = Time.GetHour();
     int Minute = Time.GetMinute();
 
-    WcAnimation.task();
+    WcAnimationClock.task();
     WcDisplay.show();
 
     WcClock.getClockWords(Hour, Minute, &NewTimeWords);

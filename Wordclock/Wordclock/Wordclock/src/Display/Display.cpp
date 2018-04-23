@@ -126,7 +126,7 @@ stdReturnType Display::setWord(WordIdType WordId, byte MaxLength)
 
     if(WordId < DisplayWords::WORD_NUMBER_OF_WORDS) {
         ReturnValue = E_OK;
-        DisplayWords::Word Word = Words.getDisplayWordFast(WordId);
+        DisplayWords::WordType Word = Words.getDisplayWordFast(WordId);
 
         if(MaxLength == DISPLAY_WORD_LENGTH_UNLIMITED) Length = Word.Length;
         else Length = MaxLength;
@@ -153,7 +153,7 @@ void Display::setWordFast(WordIdType WordId, byte MaxLength)
 {
     byte Length;
 
-    DisplayWords::Word Word = Words.getDisplayWordFast(WordId);
+    DisplayWords::WordType Word = Words.getDisplayWordFast(WordId);
 
     if(MaxLength == DISPLAY_WORD_LENGTH_UNLIMITED) Length = Word.Length;
     else Length = MaxLength;
@@ -176,7 +176,7 @@ stdReturnType Display::clearWord(WordIdType WordId)
 
     if(WordId < DisplayWords::WORD_NUMBER_OF_WORDS) {
         ReturnValue = E_OK;
-        DisplayWords::Word Word = Words.getDisplayWordFast(WordId);
+        DisplayWords::WordType Word = Words.getDisplayWordFast(WordId);
 
         for(byte Index = 0; Index < Word.Length; Index++) {
             if(clearPixel(Word.Column + Index,  Word.Row) == E_NOT_OK) ReturnValue = E_NOT_OK;
@@ -198,9 +198,11 @@ stdReturnType Display::clearWord(WordIdType WordId)
 ******************************************************************************************************************************************************/
 void Display::clearWordFast(WordIdType WordId)
 {
-    DisplayWords::Word Word = Words.getDisplayWordFast(WordId);
+    DisplayWords::WordType Word = Words.getDisplayWordFast(WordId);
 
-    for(byte Index = 0; Index < Word.Length; Index++) { clearPixelFast(Word.Column + Index,  Word.Row); }
+    for(byte Index = 0; Index < Word.Length; Index++) { 
+        clearPixelFast(Word.Column + Index,  Word.Row); 
+    }
 } /* clearWordFast */
 
 
@@ -216,7 +218,9 @@ stdReturnType Display::clearAllWords()
 {
     stdReturnType ReturnValue = E_OK;
 
-    for(byte i = DisplayWords::WORD_ES; i < DisplayWords::WORD_NUMBER_OF_WORDS; i++) if(clearWord((WordIdType) i) == E_NOT_OK) ReturnValue = E_NOT_OK;
+    for(byte i = DisplayWords::WORD_ES; i < DisplayWords::WORD_NUMBER_OF_WORDS; i++) {
+        if(clearWord((WordIdType) i) == E_NOT_OK) ReturnValue = E_NOT_OK;
+    }
     return ReturnValue;
 } /* clearAllWords */
 
