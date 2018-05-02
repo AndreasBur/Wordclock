@@ -56,7 +56,6 @@ AnimationClockSnake::AnimationClockSnake()
 {
     pDisplay = nullptr;
     pClock = nullptr;
-    State = STATE_UNINIT;
     reset();
 } /* AnimationClockSnake */
 
@@ -82,7 +81,7 @@ void AnimationClockSnake::init(Display* Display, Clock* Clock)
 {
     pDisplay = Display;
     pClock = Clock;
-    State = STATE_IDLE;
+    setState(AnimationClockCommon::STATE_IDLE);
     reset();
 } /* init */
 
@@ -99,11 +98,11 @@ stdReturnType AnimationClockSnake::setClock(byte Hour, byte Minute)
 {
     stdReturnType ReturnValue{E_NOT_OK};
 
-    if(pClock->getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
+    if(pClock->getClockWords(Hour, Minute, ClockWordsTable) == E_OK && getState() == AnimationClockCommon::STATE_IDLE) {
         ReturnValue = E_OK;
         SnakeBeginIndex = 0;
         SnakeEndIndex = 0;
-        State = STATE_WORKING;
+        setState(AnimationClockCommon::STATE_SET_TIME);
     }
     return ReturnValue;
 } /* setClock */
@@ -119,7 +118,7 @@ stdReturnType AnimationClockSnake::setClock(byte Hour, byte Minute)
 ******************************************************************************************************************************************************/
 void AnimationClockSnake::task()
 {
-    if(State == STATE_WORKING) {
+    if(getState() == AnimationClockCommon::STATE_SET_TIME) {
         byte SnakeEndIndexTrans = transformToSerpentine(SnakeEndIndex);
         pDisplay->setPixelFast(transformToSerpentine(SnakeBeginIndex));
 
@@ -131,7 +130,7 @@ void AnimationClockSnake::task()
             SnakeEndIndex++;
         }
         if(SnakeBeginIndex < DISPLAY_NUMBER_OF_LEDS) SnakeBeginIndex++;
-        if(SnakeEndIndex >= DISPLAY_NUMBER_OF_LEDS) State = STATE_IDLE;
+        if(SnakeEndIndex >= DISPLAY_NUMBER_OF_LEDS) setState(AnimationClockCommon::STATE_IDLE);;
     }
 } /* task */
 

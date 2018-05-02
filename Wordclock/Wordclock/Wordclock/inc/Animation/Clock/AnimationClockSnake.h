@@ -49,14 +49,6 @@ class AnimationClockSnake : public AnimationClockCommon
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-    enum StateType {
-        STATE_NONE,
-        STATE_UNINIT,
-        STATE_IDLE,
-        //STATE_READY,
-        STATE_WORKING
-    };
-
     enum SnakeStateType {
         SNAKE_STATE_TO_RIGHT,
         SNAKE_STATE_TO_LEFT
@@ -68,7 +60,6 @@ class AnimationClockSnake : public AnimationClockCommon
   private:
     Clock* pClock;
     Display* pDisplay;
-    StateType State;
     SnakeStateType SnakeState;
     Clock::ClockWordsTableType ClockWordsTable;
     byte SnakeBeginIndex;

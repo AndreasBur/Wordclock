@@ -50,15 +50,6 @@ class AnimationClockWipe : public AnimationClockCommon
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-    enum StateType {
-        STATE_NONE,
-        STATE_UNINIT,
-        STATE_IDLE,
-        //STATE_READY,
-        STATE_CLEAR_TIME,
-        STATE_SET_TIME
-    };
-
     enum SetPixelStateType {
         SET_PIXEL_STATE_RIGHT,
         SET_PIXEL_STATE_DOWN
@@ -70,7 +61,6 @@ class AnimationClockWipe : public AnimationClockCommon
   private:
     Clock* pClock;
     Display* pDisplay;
-    StateType State;
     Clock::ClockWordsTableType ClockWordsTable;
     byte Index;
     SetPixelStateType SetPixelState;

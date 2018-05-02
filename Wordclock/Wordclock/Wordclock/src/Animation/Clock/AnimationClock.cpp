@@ -84,6 +84,53 @@ void AnimationClock::init()
 
 
 /******************************************************************************************************************************************************
+  getState()
+******************************************************************************************************************************************************/
+/*! \brief          
+ *  \details        
+ *                  
+ *  \return         -
+******************************************************************************************************************************************************/
+AnimationClockCommon::StateType AnimationClock::getState() const
+{
+    switch(CurrentAnimation)
+    {
+        case ANIMATION_CLOCK_CURSOR :
+            return Animations.Cursor.getState();
+            break;
+        case ANIMATION_CLOCK_TELETYPE :
+            return Animations.Teletype.getState();
+            break;
+        case ANIMATION_CLOCK_DROP :
+            return Animations.Drop.getState();
+            break;
+        case ANIMATION_CLOCK_WIPE :
+            return Animations.Wipe.getState();
+            break;
+        case ANIMATION_CLOCK_SHIFT :
+            return Animations.Shift.getState();
+            break;
+        case ANIMATION_CLOCK_FADE :
+            //return Animations.Fade.getState();
+            return AnimationClockCommon::STATE_NONE;
+            break;
+        case ANIMATION_CLOCK_SNAKE :
+            return Animations.Snake.getState();
+            break;
+        case ANIMATION_CLOCK_EXPLODE :
+            return AnimationClockCommon::STATE_NONE;
+            break;
+        case ANIMATION_CLOCK_IMPLODE :
+            return AnimationClockCommon::STATE_NONE;
+            break;
+        default :
+            return AnimationClockCommon::STATE_NONE;
+            break;
+    }
+} /* getState */
+
+
+/******************************************************************************************************************************************************
   setAnimation()
 ******************************************************************************************************************************************************/
 /*! \brief

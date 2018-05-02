@@ -72,17 +72,24 @@ class Animation
 
     // get methods
 
+
     // set methods
 
 
     // methods
     void init();
-    void task() { wcAnimationFont.task(); }
+    void task();
     //void show() { pDisplay->show(); }
+
+    // AnimationClock functions
     stdReturnType setChar(byte Column, byte Row, char Char, AnimationFont::FontType Font) { return wcAnimationFont.setChar(Column, Row, Char, Font); }
     void setCharWithShift(char Char, AnimationFont::FontType Font) { wcAnimationFont.setCharWithShift(Char, Font); }
     void setText(char* Text, AnimationFont::FontType Font) { wcAnimationFont.setText(Text, Font); }
     void setTextWithShift(char* Text, AnimationFont::FontType Font) { wcAnimationFont.setTextWithShift(Text, Font); }
+
+    // AnimationFont functions
+    void setAnimation(AnimationClock::AnimationType Animation) { wcAnimationClock.setAnimation(Animation); }
+    stdReturnType setClock(byte Hour, byte Minute) { return wcAnimationClock.setClock(Hour, Minute); }
 };
 
 

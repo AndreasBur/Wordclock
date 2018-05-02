@@ -23,6 +23,7 @@
 #include "StandardTypes.h"
 #include "Arduino.h"
 #include "Display.h"
+#include "AnimationClockCommon.h"
 #include "AnimationClockTeletype.h"
 #include "AnimationClockCursor.h"
 #include "AnimationClockDrop.h"
@@ -102,6 +103,7 @@ class AnimationClock
 
 	// get methods
     AnimationType getAnimation() const { return CurrentAnimation; }
+    AnimationClockCommon::StateType getState() const;
 
 	// set methods
     void setAnimation(AnimationType);

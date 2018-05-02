@@ -52,11 +52,10 @@
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-AnimationClockCursor::AnimationClockCursor()
+AnimationClockCursor::AnimationClockCursor() 
 {
     pDisplay = nullptr;
     pClock = nullptr;
-    State = STATE_UNINIT;
     reset();
 } /* AnimationClockCursor */
 
@@ -82,7 +81,7 @@ void AnimationClockCursor::init(Display* Display, Clock* Clock)
 {
     pDisplay = Display;
     pClock = Clock;
-    State = STATE_IDLE;
+    setState(AnimationClockCommon::STATE_IDLE);
     reset();
 } /* init */
 
@@ -99,10 +98,10 @@ stdReturnType AnimationClockCursor::setClock(byte Hour, byte Minute)
 {
     stdReturnType ReturnValue{E_NOT_OK};
 
-    if(pClock->getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
+    if(pClock->getClockWords(Hour, Minute, ClockWordsTable) == E_OK && getState() == AnimationClockCommon::STATE_IDLE) {
         ReturnValue = E_OK;
         CurrentPixelIndex = 0;
-        State = STATE_WORKING;
+        setState(AnimationClockCommon::STATE_SET_TIME);
     }
     return ReturnValue;
 } /* setClock */
@@ -118,14 +117,14 @@ stdReturnType AnimationClockCursor::setClock(byte Hour, byte Minute)
 ******************************************************************************************************************************************************/
 void AnimationClockCursor::task()
 {
-    if(State == STATE_WORKING) {
+    if(getState() == AnimationClockCommon::STATE_SET_TIME) {
         pDisplay->setPixelFast(CurrentPixelIndex);
         if(CurrentPixelIndex > 0) {
             if(isPixelPartOfClockWords(ClockWordsTable, CurrentPixelIndex - 1) == false) { 
                 pDisplay->clearPixelFast(CurrentPixelIndex - 1);
             }
         }
-        if(CurrentPixelIndex >= DISPLAY_NUMBER_OF_PIXELS) State = STATE_IDLE;
+        if(CurrentPixelIndex >= DISPLAY_NUMBER_OF_PIXELS) setState(AnimationClockCommon::STATE_IDLE);
         CurrentPixelIndex++;
     }
 } /* task */

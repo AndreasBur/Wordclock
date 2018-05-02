@@ -61,15 +61,7 @@ class AnimationClockShift : public AnimationClockCommon
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-    enum StateType {
-        STATE_NONE,
-        STATE_UNINIT,
-        STATE_IDLE,
-        STATE_CLEAR_TIME,
-        //STATE_SHIFT_OUT,
-        //STATE_SHIFT_IN,
-        STATE_SET_TIME
-    };
+
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
@@ -78,7 +70,6 @@ class AnimationClockShift : public AnimationClockCommon
     Clock* pClock;
     Display* pDisplay;
     Transformation wcTransformation;
-    StateType State;
     Clock::ClockWordsTableType ClockWordsTable;
 
 #if (ANIMATION_CLOCK_SHIFT_HORIZONTAL == STD_ON)
