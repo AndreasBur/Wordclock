@@ -117,9 +117,11 @@ class Display
     // get methods
     PixelColorType getColor() const { return Color; }
     StateType getState() const { return State; }
+    byte getBrightness() const { return Pixels.getBrightness(); }
 
     // set methods
     void setColor(PixelColorType sColor) { Color = sColor; }
+    void setBrightness(byte Brightness) { Pixels.setBrightness(Brightness, true); }
 
     // char methods
     stdReturnType setCharacter(DisplayCharacters::CharacterIdType CharacterId) { return setPixel(CharacterId); }

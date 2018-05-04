@@ -30,6 +30,7 @@
 #include "AnimationClockWipe.h"
 #include "AnimationClockSnake.h"
 #include "AnimationClockShift.h"
+#include "AnimationClockFade.h"
 
 
 /******************************************************************************************************************************************************
@@ -79,6 +80,7 @@ class AnimationClock
         AnimationClockWipe Wipe;
         AnimationClockShift Shift;
         AnimationClockSnake Snake;
+        AnimationClockFade Fade;
 
         AnimationsType() {}
         ~AnimationsType() {}

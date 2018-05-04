@@ -77,12 +77,38 @@ Animation::~Animation()
 ******************************************************************************************************************************************************/
 void Animation::init()
 {
-
+    wcAnimationClock.init();
+    wcAnimationFont.init();
 } /* init */
 
 
 /******************************************************************************************************************************************************
-  init()
+  getState()
+******************************************************************************************************************************************************/
+/*! \brief
+ *  \details
+ *
+ *  \return         -
+******************************************************************************************************************************************************/
+Animation::StateType Animation::getState()
+{
+    if( wcAnimationClock.getState() == AnimationClockCommon::STATE_CLEAR_TIME ||
+    wcAnimationClock.getState() == AnimationClockCommon::STATE_SET_TIME)
+    {
+        return STATE_CLOCK;
+    }
+    else if( wcAnimationFont.getState() == AnimationFont::STATE_CHAR_SHIFT ||
+    wcAnimationFont.getState() == AnimationFont::STATE_TEXT_SHIFT)
+    {
+        return STATE_FONT;
+    }
+
+    return STATE_IDLE;
+} /* getState */
+
+
+/******************************************************************************************************************************************************
+  task()
 ******************************************************************************************************************************************************/
 /*! \brief
  *  \details
@@ -91,11 +117,38 @@ void Animation::init()
 ******************************************************************************************************************************************************/
 void Animation::task()
 {
-    if(wcAnimationClock.getState() == AnimationClockCommon::STATE_CLEAR_TIME || wcAnimationClock.getState() == AnimationClockCommon::STATE_SET_TIME) {
+    if( wcAnimationClock.getState() == AnimationClockCommon::STATE_CLEAR_TIME ||
+        wcAnimationClock.getState() == AnimationClockCommon::STATE_SET_TIME)
+    {
         wcAnimationClock.task();
     }
-    if(wcAnimationFont.getState() == AnimationFont::STATE_CHAR_SHIFT || wcAnimationFont.getState() == AnimationFont::STATE_TEXT_SHIFT) {
+    else if( wcAnimationFont.getState() == AnimationFont::STATE_CHAR_SHIFT ||
+        wcAnimationFont.getState() == AnimationFont::STATE_TEXT_SHIFT)
+    {
         wcAnimationFont.task();
+    }
+} /* task */
+
+
+/******************************************************************************************************************************************************
+  show()
+******************************************************************************************************************************************************/
+/*! \brief
+ *  \details
+ *
+ *  \return         -
+******************************************************************************************************************************************************/
+void Animation::show()
+{
+    if( wcAnimationClock.getState() == AnimationClockCommon::STATE_CLEAR_TIME ||
+        wcAnimationClock.getState() == AnimationClockCommon::STATE_SET_TIME)
+    {
+        wcAnimationClock.show();
+    }
+    else if( wcAnimationFont.getState() == AnimationFont::STATE_CHAR_SHIFT ||
+        wcAnimationFont.getState() == AnimationFont::STATE_TEXT_SHIFT)
+    {
+        wcAnimationFont.show();
     }
 } /* task */
 

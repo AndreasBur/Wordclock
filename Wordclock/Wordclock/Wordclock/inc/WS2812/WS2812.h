@@ -115,7 +115,7 @@ struct PixelType {
     byte OffsetBlue;
 #endif
     // functions
-    uint8_t calcGamma7CorrectionValue(uint8_t);
+    uint8_t calcGamma7CorrectionValue(byte);
     void sendData(const byte*, uint16_t);
     void dimmPixels(byte*, uint16_t);
     void dimmPixel(PixelType*, PixelType);

@@ -414,10 +414,10 @@ void WS2812::setColorOrder(WS2812ColorOrderType ColorOrder)
 /*! \brief          
  *  \details        calculates the gamma correction value with the help of a small table
  *                  and very efficient shift calculation
- *  param[in]       ValueLinear    7 bit unsigned (0..127)  
+ *  param[in]       ValueLinear    7 bit unsigned (0..127)
  *  \return         exponential value (approx. 1.0443^x) (1..255)
  *****************************************************************************************************************************************************/
-uint8_t WS2812::calcGamma7CorrectionValue(uint8_t ValueLinear)
+uint8_t WS2812::calcGamma7CorrectionValue(byte ValueLinear)
 {
     uint8_t Exponent = pgm_read_byte(&Gamma7Table[ValueLinear % WS2812_GAMMA7_TABLE_NUMBER_OF_VALUES]);
     return Exponent >> (7 - ValueLinear / WS2812_GAMMA7_TABLE_NUMBER_OF_VALUES);
