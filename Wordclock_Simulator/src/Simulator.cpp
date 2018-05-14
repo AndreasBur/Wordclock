@@ -25,6 +25,8 @@ END_EVENT_TABLE()
 
 Simulator::Simulator(wxFrame *dlg, const wxString &title) : wxFrame(dlg, -1, title)
 {
+    Brightness = 255;
+
     SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DFACE));
     //this->SetSizeHints(wxDefaultSize, wxDefaultSize);
     wxBoxSizer* SizerCharacters[DISPLAY_NUMBER_OF_ROWS];

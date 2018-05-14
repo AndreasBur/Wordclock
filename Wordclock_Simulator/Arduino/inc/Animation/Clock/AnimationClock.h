@@ -23,12 +23,14 @@
 #include "StandardTypes.h"
 #include "Arduino.h"
 #include "Display.h"
+#include "AnimationClockCommon.h"
 #include "AnimationClockTeletype.h"
 #include "AnimationClockCursor.h"
 #include "AnimationClockDrop.h"
 #include "AnimationClockWipe.h"
 #include "AnimationClockSnake.h"
 #include "AnimationClockShift.h"
+#include "AnimationClockFade.h"
 
 
 /******************************************************************************************************************************************************
@@ -78,6 +80,7 @@ class AnimationClock
         AnimationClockWipe Wipe;
         AnimationClockShift Shift;
         AnimationClockSnake Snake;
+        AnimationClockFade Fade;
 
         AnimationsType() {}
         ~AnimationsType() {}
@@ -102,6 +105,7 @@ class AnimationClock
 
 	// get methods
     AnimationType getAnimation() const { return CurrentAnimation; }
+    AnimationClockCommon::StateType getState() const;
 
 	// set methods
     void setAnimation(AnimationType);

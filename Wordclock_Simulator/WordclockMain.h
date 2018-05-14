@@ -37,7 +37,6 @@ class WordclockDialog : public wxDialog
         Display WcDisplay;
         Clock WcClock;
         Animation WcAnimation;
-        AnimationClock WcAnimationClock;
         Transformation WcTransformation;
         wxDateTime Time;
         wxTimer Timer;

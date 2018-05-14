@@ -56,13 +56,7 @@ class AnimationClockCursor : public AnimationClockCommon
 /******************************************************************************************************************************************************
  *  GLOBAL DATA TYPES AND STRUCTURES
 ******************************************************************************************************************************************************/
-    enum StateType {
-        STATE_NONE,
-        STATE_UNINIT,
-        STATE_IDLE,
-        //STATE_READY,
-        STATE_WORKING
-    };
+
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
@@ -72,7 +66,6 @@ class AnimationClockCursor : public AnimationClockCommon
     Display* pDisplay;
     Clock::ClockWordsTableType ClockWordsTable;
     byte CurrentPixelIndex;
-    StateType State;
     DisplayWords Words;
 
     // functions

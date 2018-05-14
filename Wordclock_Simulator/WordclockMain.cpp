@@ -23,7 +23,7 @@ wxBEGIN_EVENT_TABLE(WordclockDialog, wxDialog)
 wxEND_EVENT_TABLE()
 
 
-WordclockDialog::WordclockDialog(wxDialog *dlg, const wxString &title) : wxDialog(dlg, -1, title), WcDisplay(255, 255, 255), WcClock(&WcDisplay, Clock::MODE_WESSI), WcAnimation(&WcDisplay, &WcClock), WcAnimationClock(&WcDisplay, &WcClock), WcTransformation(&WcDisplay), Timer(this, TIMER_ID)
+WordclockDialog::WordclockDialog(wxDialog *dlg, const wxString &title) : wxDialog(dlg, -1, title), WcDisplay(255, 255, 255), WcClock(&WcDisplay, Clock::MODE_WESSI), WcAnimation(&WcDisplay, &WcClock), WcTransformation(&WcDisplay), Timer(this, TIMER_ID)
 {
     //Timer.Start(1000 * 2);
     strcpy(Text, "Andreas");
@@ -46,8 +46,8 @@ WordclockDialog::WordclockDialog(wxDialog *dlg, const wxString &title) : wxDialo
     //WcTransformation.shiftRight(true);
     //WcTransformation.shiftUp(false);
     //WcTransformation.shiftDown(true);
-    WcAnimationClock.setAnimation(AnimationClock::ANIMATION_CLOCK_DROP);
-    WcAnimationClock.setClock(Hour, Minute);
+    WcAnimation.setAnimation(AnimationClock::ANIMATION_CLOCK_DROP);
+    WcAnimation.setClock(Hour, Minute);
     //WcClock.show();
 }
 
@@ -70,7 +70,7 @@ void WordclockDialog::OnTimer(wxTimerEvent& event)
     int Hour = Time.GetHour();
     int Minute = Time.GetMinute();
 
-    WcAnimationClock.task();
+    WcAnimation.task();
     WcDisplay.show();
 
     WcClock.getClockWords(Hour, Minute, &NewTimeWords);

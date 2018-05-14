@@ -23,6 +23,7 @@
 #include "StandardTypes.h"
 #include "Arduino.h"
 #include "Clock.h"
+#include "AnimationClockCommon.h"
 
 /******************************************************************************************************************************************************
  *  GLOBAL CONSTANT MACROS
@@ -47,19 +48,13 @@
 /******************************************************************************************************************************************************
  *  CLASS  AnimationClockTeletype
 ******************************************************************************************************************************************************/
-class AnimationClockTeletype
+class AnimationClockTeletype : public AnimationClockCommon
 {
   public:
 /******************************************************************************************************************************************************
  *  GLOBAL DATA TYPES AND STRUCTURES
 ******************************************************************************************************************************************************/
-    enum StateType {
-        STATE_NONE,
-        STATE_UNINIT,
-        STATE_IDLE,
-        //STATE_READY,
-        STATE_WORKING
-    };
+
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
@@ -67,7 +62,6 @@ class AnimationClockTeletype
   private:
     Clock* pClock;
     Display* pDisplay;
-    StateType State;
     Clock::ClockWordsTableType ClockWordsTable;
     byte CurrentWordIndex;
     byte CurrentWordLength;

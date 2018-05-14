@@ -32,13 +32,13 @@ class Simulator : public wxFrame
         virtual ~Simulator();
 
         // get methods
-        //byte getBrightness() { return Brightness; }
+        byte getBrightness() const { return Brightness; }
         stdReturnType getPixel(byte, PixelType*) const;
         PixelType getPixelFast(byte) const;
         //stdReturnType getPixelDimmed(byte, WS2812PixelType*);
 
         // set methods
-        //stdReturnType setBrightness(byte);
+        void setBrightness(byte sBrightness, bool GammaCorrection = false) { Brightness = sBrightness;}
         //stdReturnType setPin(byte);
         stdReturnType setPixel(byte, PixelType);
         stdReturnType setPixel(byte, byte, byte, byte);
@@ -66,6 +66,7 @@ class Simulator : public wxFrame
         };
 
         wxStaticText* Characters[DISPLAY_NUMBER_OF_ROWS][DISPLAY_NUMBER_OF_COLUMNS];
+        uint8_t Brightness;
 
         wxButton* BtnAbout;
         wxButton* BtnQuit;

@@ -56,7 +56,6 @@ AnimationClockTeletype::AnimationClockTeletype()
 {
     pDisplay = nullptr;
     pClock = nullptr;
-    State = STATE_UNINIT;
     reset();
 } /* AnimationClockTeletype */
 
@@ -82,7 +81,7 @@ void AnimationClockTeletype::init(Display* Display, Clock* Clock)
 {
     pDisplay = Display;
     pClock = Clock;
-    State = STATE_IDLE;
+    setState(AnimationClockCommon::STATE_IDLE);
     reset();
 } /* init */
 
@@ -99,12 +98,12 @@ stdReturnType AnimationClockTeletype::setClock(byte Hour, byte Minute)
 {
     stdReturnType ReturnValue{E_NOT_OK};
 
-    if(pClock->getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
+    if(pClock->getClockWords(Hour, Minute, ClockWordsTable) == E_OK && getState() == AnimationClockCommon::STATE_IDLE) {
         ReturnValue = E_OK;
         CurrentWordIndex = 0;
         CurrentCharIndex = 0;
         CurrentWordLength = Words.getDisplayWordLengthFast(ClockWordsTable[CurrentWordIndex]);
-        State = STATE_WORKING;
+        setState(AnimationClockCommon::STATE_SET_TIME);
     }
     return ReturnValue;
 } /* setClock */
@@ -120,10 +119,10 @@ stdReturnType AnimationClockTeletype::setClock(byte Hour, byte Minute)
 ******************************************************************************************************************************************************/
 void AnimationClockTeletype::task()
 {
-    if(State == STATE_WORKING) {
+    if(getState() == AnimationClockCommon::STATE_SET_TIME) {
         if(CurrentCharIndex >= CurrentWordLength) {
             if(setNextWordIndex() == E_NOT_OK) {
-                State = STATE_IDLE;
+                setState(AnimationClockCommon::STATE_IDLE);
                 return;
             }
             CurrentCharIndex = 0;

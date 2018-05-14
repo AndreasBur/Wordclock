@@ -48,13 +48,19 @@ class AnimationClockCommon
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-  
+      enum StateType {
+          STATE_NONE,
+          STATE_UNINIT,
+          STATE_IDLE,
+          STATE_CLEAR_TIME,
+          STATE_SET_TIME
+      };
   
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
-    
+    StateType State;
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
@@ -64,9 +70,10 @@ class AnimationClockCommon
     ~AnimationClockCommon();
 
 	// get methods
-
+    StateType getState() const { return State; }
 
 	// set methods
+    void setState(StateType sState) { State = sState; }
 
 	// methods
     boolean isPixelPartOfClockWords(Clock::ClockWordsTableType, byte, byte);

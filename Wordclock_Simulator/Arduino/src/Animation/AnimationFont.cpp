@@ -9,10 +9,10 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       AnimationFont.cpp
- *      \brief
+ *      \brief      
  *
- *      \details
- *
+ *      \details    
+ *                  
  *
 ******************************************************************************************************************************************************/
 #define _ANIMATION_FONT_SOURCE_
@@ -24,7 +24,7 @@
 
 
 /******************************************************************************************************************************************************
- *  L O C A L   C O N S T A N T   M A C R O S
+ *  L O C A L   C O N S T A N T   M A C R O S 
 ******************************************************************************************************************************************************/
 
 
@@ -74,9 +74,9 @@ AnimationFont::~AnimationFont()
 /******************************************************************************************************************************************************
   init()
 ******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
+/*! \brief          
+ *  \details        
+ *                  
  *  \return         -
 ******************************************************************************************************************************************************/
 void AnimationFont::init()
@@ -180,8 +180,8 @@ byte AnimationFont::getFontHeight(FontType Font)
 {
     switch(Font) {
 #if(ANIMATION_SUPPORT_FONT_4X6 == STD_ON)
-        case FONT_4X6:
-            return ANIMATION_FONT_4X6_HEIGHT;
+        case FONT_4X6: 
+            return ANIMATION_FONT_4X6_HEIGHT; 
             break;
 #endif
 #if(ANIMATION_SUPPORT_FONT_5X8 == STD_ON)
@@ -268,24 +268,21 @@ byte AnimationFont::getFontWidth(FontType Font)
 ******************************************************************************************************************************************************/
 void AnimationFont::stringShiftTask()
 {
-    if(State == STATE_TEXT_SHIFT) {
-        /* is char shift completed? */
-        if(Shift.State == SHIFT_STATE_IDLE) {
-            /* If end of string is not reached, load next char */
-            if(*Shift.Text != STD_NULL_CHARACTER) {
-                Shift.Char = *Shift.Text;
-                Shift.State = SHIFT_STATE_BUSY;
-                Shift.Counter = getFontWidth(Shift.Font);
-                charShiftTask();
-                Shift.Text++;
-            } else { /* otherwise task has finished */
-                State = STATE_IDLE;
-                //wcTransformation.shiftLeft();
-            }
-        } else {
-            /* go on shifting char */
+    if(Shift.State == SHIFT_STATE_BUSY) {
+        /* If end of string is not reached, load next char */
+        if(*Shift.Text != STD_NULL_CHARACTER) {
+            Shift.Char = *Shift.Text;
+            Shift.State = SHIFT_STATE_BUSY;
+            Shift.Counter = getFontWidth(Shift.Font);
             charShiftTask();
+            Shift.Text++;
+        } else { /* otherwise task has finished */
+            if(State == STATE_TEXT_SHIFT) State = STATE_IDLE;
+            wcTransformation.shiftLeft();
         }
+    } else {
+        /* go on shifting char */
+        charShiftTask();
     }
 } /* stringShiftTask */
 
@@ -471,3 +468,4 @@ stdReturnType AnimationFont::convertCharToFontIndex(char Char, byte* Index)
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E
 ******************************************************************************************************************************************************/
+ 

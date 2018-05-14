@@ -84,6 +84,52 @@ void AnimationClock::init()
 
 
 /******************************************************************************************************************************************************
+  getState()
+******************************************************************************************************************************************************/
+/*! \brief          
+ *  \details        
+ *                  
+ *  \return         -
+******************************************************************************************************************************************************/
+AnimationClockCommon::StateType AnimationClock::getState() const
+{
+    switch(CurrentAnimation)
+    {
+        case ANIMATION_CLOCK_CURSOR :
+            return Animations.Cursor.getState();
+            break;
+        case ANIMATION_CLOCK_TELETYPE :
+            return Animations.Teletype.getState();
+            break;
+        case ANIMATION_CLOCK_DROP :
+            return Animations.Drop.getState();
+            break;
+        case ANIMATION_CLOCK_WIPE :
+            return Animations.Wipe.getState();
+            break;
+        case ANIMATION_CLOCK_SHIFT :
+            return Animations.Shift.getState();
+            break;
+        case ANIMATION_CLOCK_FADE :
+            return Animations.Fade.getState();
+            break;
+        case ANIMATION_CLOCK_SNAKE :
+            return Animations.Snake.getState();
+            break;
+        case ANIMATION_CLOCK_EXPLODE :
+            return AnimationClockCommon::STATE_NONE;
+            break;
+        case ANIMATION_CLOCK_IMPLODE :
+            return AnimationClockCommon::STATE_NONE;
+            break;
+        default :
+            return AnimationClockCommon::STATE_NONE;
+            break;
+    }
+} /* getState */
+
+
+/******************************************************************************************************************************************************
   setAnimation()
 ******************************************************************************************************************************************************/
 /*! \brief
@@ -113,6 +159,7 @@ void AnimationClock::setAnimation(AnimationType Animation)
             Animations.Shift.init(pDisplay, pClock);
             break;
         case ANIMATION_CLOCK_FADE :
+            Animations.Fade.init(pDisplay, pClock);
             break;
         case ANIMATION_CLOCK_SNAKE :
             Animations.Snake.init(pDisplay, pClock);
@@ -155,6 +202,7 @@ stdReturnType AnimationClock::setClock(byte Hour, byte Minute)
             return Animations.Shift.setClock(Hour, Minute);
             break;
         case ANIMATION_CLOCK_FADE :
+            return Animations.Fade.setClock(Hour, Minute);
             break;
         case ANIMATION_CLOCK_SNAKE :
             return Animations.Snake.setClock(Hour, Minute);
@@ -198,6 +246,7 @@ void AnimationClock::task()
             return Animations.Shift.task();
             break;
         case ANIMATION_CLOCK_FADE :
+            return Animations.Fade.task();
             break;
         case ANIMATION_CLOCK_SNAKE :
             return Animations.Snake.task();
@@ -240,6 +289,7 @@ void AnimationClock::show()
             return Animations.Shift.show();
             break;
         case ANIMATION_CLOCK_FADE :
+            return Animations.Fade.show();
             break;
         case ANIMATION_CLOCK_SNAKE :
             return Animations.Snake.show();

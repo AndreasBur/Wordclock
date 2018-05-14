@@ -9,10 +9,10 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       Display.h
- *      \brief      
+ *      \brief
  *
- *      \details    
- *                  
+ *      \details
+ *
 ******************************************************************************************************************************************************/
 #ifndef _DISPLAY_H_
 #define _DISPLAY_H_
@@ -101,7 +101,7 @@ class Display
     Stripe Pixels;
     PixelColorType Color;
     DisplayWords Words;
-    
+
     // functions
     byte transformToSerpentine(byte, byte) const;
     byte transformToSerpentine(byte) const;
@@ -117,9 +117,11 @@ class Display
     // get methods
     PixelColorType getColor() const { return Color; }
     StateType getState() const { return State; }
+    byte getBrightness() const { return Pixels.getBrightness(); }
 
     // set methods
     void setColor(PixelColorType sColor) { Color = sColor; }
+    void setBrightness(byte Brightness) { Pixels.setBrightness(Brightness, true); }
 
     // char methods
     stdReturnType setCharacter(DisplayCharacters::CharacterIdType CharacterId) { return setPixel(CharacterId); }
@@ -140,7 +142,7 @@ class Display
     void setWordFast(WordIdType, byte MaxLength = DISPLAY_WORD_LENGTH_UNLIMITED);
     void clearWordFast(WordIdType);
     void clearAllWordsFast();
-    
+
     // pixel methods
     stdReturnType writePixel(byte Column, byte Row, boolean Value) { if(Value) return setPixel(Column, Row); else return clearPixel(Column, Row); }
     stdReturnType writePixel(byte Index, boolean Value) { if(Value) return setPixel(Index); else return clearPixel(Index); }
