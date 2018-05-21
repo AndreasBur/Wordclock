@@ -39,22 +39,46 @@
 			<Add directory="Arduino/inc/Display" />
 			<Add directory="Arduino/inc/StandardTypes" />
 			<Add directory="Arduino/inc/Transformation" />
-			<Add directory="../Wordclock" />
+			<Add directory="../Wordclock_Simulator" />
+			<Add directory="Arduino/inc/Animation/Clock" />
 		</Compiler>
 		<Linker>
 			<Add option="`wx-config --libs`" />
 		</Linker>
 		<Unit filename="Arduino/inc/Animation/Animation.h" />
+		<Unit filename="Arduino/inc/Animation/AnimationFont.h" />
+		<Unit filename="Arduino/inc/Animation/Clock/AnimationClock.h" />
+		<Unit filename="Arduino/inc/Animation/Clock/AnimationClockCommon.h" />
+		<Unit filename="Arduino/inc/Animation/Clock/AnimationClockCursor.h" />
+		<Unit filename="Arduino/inc/Animation/Clock/AnimationClockDrop.h" />
+		<Unit filename="Arduino/inc/Animation/Clock/AnimationClockFade.h" />
+		<Unit filename="Arduino/inc/Animation/Clock/AnimationClockShift.h" />
+		<Unit filename="Arduino/inc/Animation/Clock/AnimationClockSnake.h" />
+		<Unit filename="Arduino/inc/Animation/Clock/AnimationClockTeletype.h" />
+		<Unit filename="Arduino/inc/Animation/Clock/AnimationClockWipe.h" />
 		<Unit filename="Arduino/inc/Clock/Clock.h" />
 		<Unit filename="Arduino/inc/Display/Display.h" />
 		<Unit filename="Arduino/inc/Display/DisplayCharacters.h" />
 		<Unit filename="Arduino/inc/Display/DisplayWords.h" />
 		<Unit filename="Arduino/inc/StandardTypes/StandardTypes.h" />
 		<Unit filename="Arduino/inc/Transformation/Transformation.h" />
+		<Unit filename="Arduino/inc/WS2812/WS2812.h" />
 		<Unit filename="Arduino/src/Animation/Animation.cpp" />
-		<Unit filename="Arduino/src/Animation/Font.cpp" />
+		<Unit filename="Arduino/src/Animation/AnimationFont.cpp" />
+		<Unit filename="Arduino/src/Animation/Clock/AnimationClock.cpp" />
+		<Unit filename="Arduino/src/Animation/Clock/AnimationClockCommon.cpp" />
+		<Unit filename="Arduino/src/Animation/Clock/AnimationClockCursor.cpp" />
+		<Unit filename="Arduino/src/Animation/Clock/AnimationClockDrop.cpp" />
+		<Unit filename="Arduino/src/Animation/Clock/AnimationClockFade.cpp" />
+		<Unit filename="Arduino/src/Animation/Clock/AnimationClockShift.cpp" />
+		<Unit filename="Arduino/src/Animation/Clock/AnimationClockSnake.cpp" />
+		<Unit filename="Arduino/src/Animation/Clock/AnimationClockTeletype.cpp" />
+		<Unit filename="Arduino/src/Animation/Clock/AnimationClockWipe.cpp" />
+		<Unit filename="Arduino/src/Animation/Fonts.cpp" />
 		<Unit filename="Arduino/src/Clock/Clock.cpp" />
 		<Unit filename="Arduino/src/Display/Display.cpp" />
+		<Unit filename="Arduino/src/Display/DisplayCharacters.cpp" />
+		<Unit filename="Arduino/src/Display/DisplayWords.cpp" />
 		<Unit filename="Arduino/src/Transformation/Transformation.cpp" />
 		<Unit filename="WordclockApp.cpp" />
 		<Unit filename="WordclockApp.h" />
@@ -63,7 +87,6 @@
 		<Unit filename="WordclockMain.h" />
 		<Unit filename="include/Arduino.h" />
 		<Unit filename="include/Simulator.h" />
-		<Unit filename="include/WS2812.h" />
 		<Unit filename="src/Simulator.cpp" />
 		<Extensions>
 			<code_completion />
