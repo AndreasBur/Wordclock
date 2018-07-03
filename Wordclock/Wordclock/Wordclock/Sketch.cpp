@@ -35,7 +35,7 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
   //wcClock.setClock(17,30);
-  //wcDisplay.show();
+  wcDisplay.show();
   //wcDisplay.clearAllWords();
   //wcAnimation.task();
   //wcAnimation.show();
