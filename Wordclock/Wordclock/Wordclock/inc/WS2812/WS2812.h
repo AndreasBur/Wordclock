@@ -42,10 +42,10 @@
 #define WS2812_NUMBER_OF_BITS_PER_LED               (WS2812_NUMBER_OF_COLORS * WS2812_NUMBER_OF_BITS_PER_COLOR)
 
 /* Timing of WS2812 protocol */
-#define WS2812_ZERO_PULSE_DURATION_NS               350UL
-#define WS2812_ONE_PULSE_DURATION_NS                900UL
-#define WS2812_PERIOD_DURATION_NS                   1250UL
-#define WS2812_RESET_DURATION_NS                    50000UL
+#define WS2812_ZERO_PULSE_DURATION_NS               350
+#define WS2812_ONE_PULSE_DURATION_NS                900
+#define WS2812_PERIOD_DURATION_NS                   1250
+#define WS2812_RESET_DURATION_NS                    50000
 
 #define WS2812_GAMMA7_TABLE_NUMBER_OF_VALUES        16
 
@@ -80,7 +80,7 @@ class WS2812
   public:
 /* type which describes the color order of the protocol */
 #if (WS2812_RGB_ORDER_ON_RUNTIME == STD_ON)
-enum WS2812ColorOrderType {
+enum ColorOrderType {
     COLOR_ORDER_RGB,
     COLOR_ORDER_BRG,
     COLOR_ORDER_GBR
@@ -99,11 +99,12 @@ struct PixelType {
 ******************************************************************************************************************************************************/
   private:
     byte PinMask;
-    const volatile byte* PortOutputRegister;
+    volatile byte* PortOutputRegister;
     //volatile byte* PortModeRegister; /* wird im Original DDR enabled, wirklich  notwendig? */
     byte Pixels[WS2812_NUMBER_OF_LEDS * WS2812_NUMBER_OF_COLORS];
     byte Brightness;
     static const uint8_t Gamma7Table[];
+
 
 #if (WS2812_RESET_TIMER == STD_ON)
     unsigned long ResetTimer;
@@ -138,7 +139,6 @@ struct PixelType {
     PixelType getPixelDimmedFast(byte) const;
 
     // set methods
-    //void setBrightness(byte sBrightness) { Brightness = sBrightness; }
     void setBrightness(byte sBrightness, boolean = false);
     stdReturnType setPin(byte);
     stdReturnType setPixel(byte, PixelType);
@@ -159,7 +159,7 @@ struct PixelType {
 #endif
 
 #if (WS2812_RGB_ORDER_ON_RUNTIME == STD_ON)
-    void setColorOrder(WS2812ColorOrderType);
+    void setColorOrder(ColorOrderType);
 #endif
 };
 

@@ -100,7 +100,7 @@ const uint8_t Gamma7Table[] PROGMEM {133, 139, 145, 151, 158, 165, 172, 180, 188
  *****************************************************************************************************************************************************/
 WS2812::WS2812(byte Pin)
 {
-    setPin(Pin);
+    setPin(Pin); // wird evtl aufgerufen obwohl hardware noch nicht initialisiert ist
     Brightness = 255;
 #if (WS2812_RESET_TIMER == STD_ON)
     ResetTimer = 0;
@@ -291,11 +291,10 @@ stdReturnType WS2812::setPin(byte Pin)
     if(Pin < NUM_DIGITAL_PINS) {
         PinMask = digitalPinToBitMask(Pin);
         PortOutputRegister = portOutputRegister(digitalPinToPort(Pin));
-        //PortModeRegister = portModeRegister(digitalPinToPort(Pin));
         pinMode(Pin, OUTPUT);
         return E_OK;
     } else {
-         return E_NOT_OK;
+        return E_NOT_OK;
     }
 } /* setPin */
 
@@ -383,7 +382,7 @@ void WS2812::setPixelFast(byte Index, byte Red, byte Green, byte Blue)
  *  \return         -
  *****************************************************************************************************************************************************/
 #if (WS2812_RGB_ORDER_ON_RUNTIME == STD_ON)
-void WS2812::setColorOrder(WS2812ColorOrderType ColorOrder)
+void WS2812::setColorOrder(ColorOrderType ColorOrder)
 {
     if(ColorOrder == COLOR_ORDER_BRG) {
         OffsetBlue = 0;
