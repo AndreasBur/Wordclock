@@ -57,7 +57,7 @@ class FontChar
     byte Width;
 
 /******************************************************************************************************************************************************
- *  PROTECTED   D A T A   A N D   F U N C T I N O N S
+ *  P R O T E C T E D   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   protected:
     constexpr FontChar() : Width(0) {
@@ -110,6 +110,7 @@ template <typename RowType, byte RowsSize> class FontCharVertical : public FontC
     }
 
     constexpr FontCharVertical() : FontChar(0), Rows{} {
+    
     }
 
 	// methods

@@ -85,7 +85,6 @@ class FontSprite5x8
 	// set methods
 
 	// methods
-	void init();
 	CharType getCharFast(byte Index) { return getFontTableElement(Index); }
 	stdReturnType getChar(byte, CharType&);
 };
