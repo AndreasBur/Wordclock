@@ -74,8 +74,7 @@ template <typename FontCharType, byte FontTableSize> class FontCommon
 ******************************************************************************************************************************************************/
   public:
 
-    FontCommon(const FontTableType& sFontTable) : FontTable(sFontTable)
-    {
+    FontCommon(const FontTableType& sFontTable) : FontTable(sFontTable) {
 
     }
 
@@ -92,6 +91,7 @@ template <typename FontCharType, byte FontTableSize> class FontCommon
     virtual OrientationType getOrientation() const = 0;
     virtual byte getFontWidth() const = 0;
     virtual byte getFontHeight() const = 0;
+
     FontCharType getCharFast(byte Index) { return getFontTableElement(Index); }
     stdReturnType getChar(byte Index, FontCharType& FontChar) {
         if(Index < FontTableSize) {
