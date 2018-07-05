@@ -60,7 +60,15 @@ class AnimationClockCommon
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
-    StateType State;
+
+
+/******************************************************************************************************************************************************
+ *  P R O T E C T E D   D A T A   A N D   F U N C T I N O N S
+******************************************************************************************************************************************************/
+  protected:
+      StateType State;
+      Clock* pClock;
+      Display* pDisplay;
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
@@ -76,8 +84,12 @@ class AnimationClockCommon
     void setState(StateType sState) { State = sState; }
 
 	// methods
+    void init(Display*, Clock*, StateType);
+    void show() { pDisplay->show(); }
     boolean isPixelPartOfClockWords(Clock::ClockWordsTableType, byte, byte);
     boolean isPixelPartOfClockWords(Clock::ClockWordsTableType, byte);
+    virtual void task() = 0;
+    virtual stdReturnType setClock(byte, byte) = 0;
 };
 
 

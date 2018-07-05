@@ -52,10 +52,8 @@
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-AnimationClockCursor::AnimationClockCursor() 
+AnimationClockCursor::AnimationClockCursor()
 {
-    pDisplay = nullptr;
-    pClock = nullptr;
     reset();
 } /* AnimationClockCursor */
 
@@ -79,9 +77,7 @@ AnimationClockCursor::~AnimationClockCursor()
 ******************************************************************************************************************************************************/
 void AnimationClockCursor::init(Display* Display, Clock* Clock)
 {
-    pDisplay = Display;
-    pClock = Clock;
-    setState(AnimationClockCommon::STATE_IDLE);
+    AnimationClockCommon::init(Display, Clock, AnimationClockCommon::STATE_IDLE);
     reset();
 } /* init */
 

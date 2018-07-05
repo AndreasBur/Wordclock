@@ -58,8 +58,6 @@ class AnimationClockSnake : public AnimationClockCommon
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
-    Clock* pClock;
-    Display* pDisplay;
     SnakeStateType SnakeState;
     Clock::ClockWordsTableType ClockWordsTable;
     byte SnakeBeginIndex;
@@ -86,7 +84,6 @@ class AnimationClockSnake : public AnimationClockCommon
     void init(Display*, Clock*);
     stdReturnType setClock(byte, byte);
     void task();
-    void show() { pDisplay->show(); }
 };
 
 #endif

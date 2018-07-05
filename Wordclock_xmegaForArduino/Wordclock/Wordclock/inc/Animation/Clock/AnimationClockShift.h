@@ -67,8 +67,6 @@ class AnimationClockShift : public AnimationClockCommon
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
-    Clock* pClock;
-    Display* pDisplay;
     Transformation wcTransformation;
     Clock::ClockWordsTableType ClockWordsTable;
 
@@ -101,7 +99,6 @@ class AnimationClockShift : public AnimationClockCommon
     void init(Display*, Clock*);
     stdReturnType setClock(byte, byte);
     void task();
-    void show() { pDisplay->show(); }
 };
 
 #endif

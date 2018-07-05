@@ -54,8 +54,6 @@
 ******************************************************************************************************************************************************/
 AnimationClockDrop::AnimationClockDrop()
 {
-    pDisplay = nullptr;
-    pClock = nullptr;
     reset();
 } /* AnimationClockDrop */
 
@@ -79,9 +77,7 @@ AnimationClockDrop::~AnimationClockDrop()
 ******************************************************************************************************************************************************/
 void AnimationClockDrop::init(Display* Display, Clock* Clock)
 {
-    pDisplay = Display;
-    pClock = Clock;
-    setState(AnimationClockCommon::STATE_IDLE);
+    AnimationClockCommon::init(Display, Clock, AnimationClockCommon::STATE_IDLE);
     reset();
 } /* init */
 

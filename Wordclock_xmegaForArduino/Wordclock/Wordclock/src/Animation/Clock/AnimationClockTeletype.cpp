@@ -54,8 +54,6 @@
 ******************************************************************************************************************************************************/
 AnimationClockTeletype::AnimationClockTeletype()
 {
-    pDisplay = nullptr;
-    pClock = nullptr;
     reset();
 } /* AnimationClockTeletype */
 
@@ -79,9 +77,7 @@ AnimationClockTeletype::~AnimationClockTeletype()
 ******************************************************************************************************************************************************/
 void AnimationClockTeletype::init(Display* Display, Clock* Clock)
 {
-    pDisplay = Display;
-    pClock = Clock;
-    setState(AnimationClockCommon::STATE_IDLE);
+    AnimationClockCommon::init(Display, Clock, AnimationClockCommon::STATE_IDLE);
     reset();
 } /* init */
 

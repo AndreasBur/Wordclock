@@ -54,8 +54,6 @@
 ******************************************************************************************************************************************************/
 AnimationClockSnake::AnimationClockSnake()
 {
-    pDisplay = nullptr;
-    pClock = nullptr;
     reset();
 } /* AnimationClockSnake */
 
@@ -79,9 +77,7 @@ AnimationClockSnake::~AnimationClockSnake()
 ******************************************************************************************************************************************************/
 void AnimationClockSnake::init(Display* Display, Clock* Clock)
 {
-    pDisplay = Display;
-    pClock = Clock;
-    setState(AnimationClockCommon::STATE_IDLE);
+    AnimationClockCommon::init(Display, Clock, AnimationClockCommon::STATE_IDLE);
     reset();
 } /* init */
 

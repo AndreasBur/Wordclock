@@ -60,8 +60,6 @@ class AnimationClockTeletype : public AnimationClockCommon
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
-    Clock* pClock;
-    Display* pDisplay;
     Clock::ClockWordsTableType ClockWordsTable;
     byte CurrentWordIndex;
     byte CurrentWordLength;
@@ -87,7 +85,6 @@ class AnimationClockTeletype : public AnimationClockCommon
     void init(Display*, Clock*);
     stdReturnType setClock(byte, byte);
     void task();
-    void show() { pDisplay->show(); }
 };
 
 

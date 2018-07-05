@@ -54,8 +54,6 @@
 ******************************************************************************************************************************************************/
 AnimationClockShift::AnimationClockShift() : wcTransformation(nullptr)
 {
-    pDisplay = nullptr;
-    pClock = nullptr;
     reset();
 } /* AnimationClockShift */
 
@@ -79,9 +77,7 @@ AnimationClockShift::~AnimationClockShift()
 ******************************************************************************************************************************************************/
 void AnimationClockShift::init(Display* Display, Clock* Clock)
 {
-    pDisplay = Display;
-    pClock = Clock;
-    setState(AnimationClockCommon::STATE_IDLE);
+    AnimationClockCommon::init(Display, Clock, AnimationClockCommon::STATE_IDLE);
     wcTransformation.setDisplay(Display);
     reset();
 } /* init */

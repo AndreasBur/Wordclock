@@ -54,8 +54,6 @@
 ******************************************************************************************************************************************************/
 AnimationClockWipe::AnimationClockWipe()
 {
-    pDisplay = nullptr;
-    pClock = nullptr;
     reset();
 } /* AnimationClockWipe */
 
@@ -79,9 +77,7 @@ AnimationClockWipe::~AnimationClockWipe()
 ******************************************************************************************************************************************************/
 void AnimationClockWipe::init(Display* Display, Clock* Clock)
 {
-    pDisplay = Display;
-    pClock = Clock;
-    setState(AnimationClockCommon::STATE_IDLE);
+    AnimationClockCommon::init(Display, Clock, AnimationClockCommon::STATE_IDLE);
     reset();
 } /* init */
 
