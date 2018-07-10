@@ -37,7 +37,6 @@
 namespace std
 {
 
-
   template<typename _Tp, size_t _Nm>
     struct __array_traits
     {
@@ -271,8 +270,6 @@ namespace std
 
 namespace std
 {
-
-
   // Tuple interface to class template array.
 
   /// tuple_size

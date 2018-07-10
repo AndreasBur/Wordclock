@@ -100,7 +100,6 @@ struct PixelType {
   private:
     byte PinMask;
     volatile byte* PortOutputRegister;
-    //volatile byte* PortModeRegister; /* wird im Original DDR enabled, wirklich  notwendig? */
     byte Pixels[WS2812_NUMBER_OF_LEDS * WS2812_NUMBER_OF_COLORS];
     byte Brightness;
     static const uint8_t Gamma7Table[];

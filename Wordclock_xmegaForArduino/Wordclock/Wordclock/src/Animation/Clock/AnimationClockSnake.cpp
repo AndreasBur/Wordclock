@@ -98,7 +98,7 @@ stdReturnType AnimationClockSnake::setClock(byte Hour, byte Minute)
         ReturnValue = E_OK;
         SnakeBeginIndex = 0;
         SnakeEndIndex = 0;
-        setState(AnimationClockCommon::STATE_SET_TIME);
+        State = AnimationClockCommon::STATE_SET_TIME;
     }
     return ReturnValue;
 } /* setClock */
@@ -126,7 +126,7 @@ void AnimationClockSnake::task()
             SnakeEndIndex++;
         }
         if(SnakeBeginIndex < DISPLAY_NUMBER_OF_LEDS) SnakeBeginIndex++;
-        if(SnakeEndIndex >= DISPLAY_NUMBER_OF_LEDS) setState(AnimationClockCommon::STATE_IDLE);;
+        if(SnakeEndIndex >= DISPLAY_NUMBER_OF_LEDS) State = AnimationClockCommon::STATE_IDLE;
     }
 } /* task */
 

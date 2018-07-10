@@ -81,13 +81,13 @@ class AnimationClockCommon
     StateType getState() const { return State; }
 
 	// set methods
-    void setState(StateType sState) { State = sState; }
+    //void setState(StateType sState) { State = sState; }
 
 	// methods
     void init(Display*, Clock*, StateType);
     void show() { pDisplay->show(); }
-    boolean isPixelPartOfClockWords(Clock::ClockWordsTableType, byte, byte);
-    boolean isPixelPartOfClockWords(Clock::ClockWordsTableType, byte);
+    boolean isPixelPartOfClockWords(Clock::ClockWordsTableType, byte, byte) const;
+    boolean isPixelPartOfClockWords(Clock::ClockWordsTableType, byte) const;
     virtual void task() = 0;
     virtual stdReturnType setClock(byte, byte) = 0;
 };

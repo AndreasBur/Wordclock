@@ -74,7 +74,7 @@ class FontChar
 ******************************************************************************************************************************************************/
   public:
 	// get methods
-    byte getWidth() { return Width; }
+    byte getWidth() const { return Width; }
 
 	// set methods
     void setWidth(byte sWidth) { Width = sWidth; }
@@ -112,6 +112,30 @@ template <typename RowType, byte RowsSize> class FontCharVertical : public FontC
     constexpr FontCharVertical() : FontChar(0), Rows{} {
     
     }
+
+    // get methods
+    RowType getRowFast(byte Index) const { return Rows[Index]; }
+    stdReturnType getRow(byte Index, RowType& Row) {
+        if(Index < RowsSize) {
+            Row = Rows[Index];
+            return E_OK;
+        } else {
+            return E_NOT_OK;
+        }
+    }
+    RowsType getRows() const { return Rows; }
+
+    // set methods
+    void setRowFast(byte Index, RowType Row) { Rows[Index] = Row; }
+    stdReturnType setRow(byte Index, RowType Row) {
+        if(Index < RowsSize) {
+            Rows[Index] = Row;
+            return E_OK;
+            } else {
+            return E_NOT_OK;
+        }
+    }
+    void setRows(RowsType sRows) { Rows = sRows; }
 
 	// methods
 

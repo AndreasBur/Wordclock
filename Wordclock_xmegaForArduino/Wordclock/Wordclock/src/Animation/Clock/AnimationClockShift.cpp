@@ -96,7 +96,7 @@ stdReturnType AnimationClockShift::setClock(byte Hour, byte Minute)
     stdReturnType ReturnValue{E_NOT_OK};
 
     if(pClock->getClockWords(Hour, Minute, ClockWordsTable) == E_OK && getState() == AnimationClockCommon::STATE_IDLE) {
-        setState(AnimationClockCommon::STATE_CLEAR_TIME);
+        State = AnimationClockCommon::STATE_CLEAR_TIME;
     }
     return ReturnValue;
 } /* setClock */
@@ -156,7 +156,7 @@ void AnimationClockShift::clearTimeTask()
         wcTransformation.shiftRightFast();
         CurrentColumn++;
     } else {
-        setState(AnimationClockCommon::STATE_SET_TIME);
+        State = AnimationClockCommon::STATE_SET_TIME;
         reset();
     }
 #endif
@@ -166,7 +166,7 @@ void AnimationClockShift::clearTimeTask()
         wcTransformation.shiftDownFast();
         CurrentRow++;
     } else {
-        setState(AnimationClockCommon::STATE_SET_TIME);
+        State = AnimationClockCommon::STATE_SET_TIME;
         reset();
     }
 #endif
@@ -194,7 +194,7 @@ void AnimationClockShift::setTimeTask()
         }
         CurrentColumn++;
     } else {
-        setState(AnimationClockCommon::STATE_IDLE);
+        State = AnimationClockCommon::STATE_IDLE;
     }
 #endif
 

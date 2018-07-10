@@ -97,7 +97,7 @@ stdReturnType AnimationClockDrop::setClock(byte Hour, byte Minute)
     if(pClock->getClockWords(Hour, Minute, ClockWordsTable) == E_OK && getState() == AnimationClockCommon::STATE_IDLE) {
         setNextWordIndex();
         if(setNextActivePixelIndex() == E_NOT_OK) { setStateToSetTime(); }
-        else { setState(AnimationClockCommon::STATE_CLEAR_TIME); }
+        else { State = AnimationClockCommon::STATE_CLEAR_TIME; }
     }
     return ReturnValue;
 } /* setClock */
@@ -179,7 +179,7 @@ void AnimationClockDrop::setTimeTask()
         pDisplay->clearPixelFast(Column, Row - 1);
     } else {
         if(setNextColumn(MaxColumn) == E_NOT_OK) {
-            setState(AnimationClockCommon::STATE_IDLE);
+            State = AnimationClockCommon::STATE_IDLE;
         }
     }
     pDisplay->setPixelFast(Column, Row);
@@ -238,7 +238,7 @@ void AnimationClockDrop::setStateToSetTime()
 {
     Column = Words.getDisplayWordColumnFast(ClockWordsTable[CurrenWordIndex]);
     pDisplay->setPixelFast(Column, Row);
-    setState(AnimationClockCommon::STATE_SET_TIME);
+    State = AnimationClockCommon::STATE_SET_TIME;
 } /* setStateToSetTime */
 
 

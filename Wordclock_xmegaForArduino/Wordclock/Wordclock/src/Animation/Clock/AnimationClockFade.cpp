@@ -97,7 +97,7 @@ stdReturnType AnimationClockFade::setClock(byte sHour, byte sMinute)
     if(sHour < CLOCK_NUMBER_OF_HOURS_PER_DAY && sMinute < CLOCK_NUMBER_OF_MINUTES_PER_HOUR) {
         Hour = sHour;
         Minute = sMinute;
-        setState(AnimationClockCommon::STATE_CLEAR_TIME);
+        State = AnimationClockCommon::STATE_CLEAR_TIME;
         DisplayBrightness = pDisplay->getBrightness();
         ReturnValue = E_OK;
     }
@@ -169,7 +169,7 @@ void AnimationClockFade::setTimeTask()
     if(DisplayBrightness < pDisplay->getBrightness()) {
         DisplayBrightness++;
     } else {
-        setState(AnimationClockCommon::STATE_IDLE);
+        State = AnimationClockCommon::STATE_IDLE;
     }
 } /* setTimeTask */
 
@@ -184,7 +184,7 @@ void AnimationClockFade::setTimeTask()
 ******************************************************************************************************************************************************/
 void AnimationClockFade::setStateToSetTime()
 {
-    setState(AnimationClockCommon::STATE_SET_TIME);
+    State = AnimationClockCommon::STATE_SET_TIME;
     pClock->setClock(Hour, Minute);
     DisplayBrightness = 0;
 } /* setStateToSetTime */

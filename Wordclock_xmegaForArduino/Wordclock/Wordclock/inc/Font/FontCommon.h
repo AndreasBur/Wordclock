@@ -63,7 +63,7 @@ template <typename FontCharType, byte FontTableSize> class FontCommon
     const FontTableType& FontTable;
 
     // functions
-    FontTableElementType getFontTableElement(byte Index) {
+    FontTableElementType getFontTableElement(byte Index) const {
         FontTableElementType FontTableElement;
         memcpy_P(&FontTableElement, &FontTable[Index], sizeof(FontTableElementType));
         return FontTableElement;
@@ -73,7 +73,6 @@ template <typename FontCharType, byte FontTableSize> class FontCommon
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-
     FontCommon(const FontTableType& sFontTable) : FontTable(sFontTable) {
 
     }
@@ -92,8 +91,8 @@ template <typename FontCharType, byte FontTableSize> class FontCommon
     virtual byte getFontWidth() const = 0;
     virtual byte getFontHeight() const = 0;
 
-    FontCharType getCharFast(byte Index) { return getFontTableElement(Index); }
-    stdReturnType getChar(byte Index, FontCharType& FontChar) {
+    FontCharType getCharFast(byte Index) const { return getFontTableElement(Index); }
+    stdReturnType getChar(byte Index, FontCharType& FontChar) const {
         if(Index < FontTableSize) {
             FontChar = getFontTableElement(Index);
             return E_OK;

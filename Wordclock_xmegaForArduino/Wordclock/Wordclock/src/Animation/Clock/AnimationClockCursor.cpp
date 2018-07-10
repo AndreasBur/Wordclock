@@ -97,7 +97,7 @@ stdReturnType AnimationClockCursor::setClock(byte Hour, byte Minute)
     if(pClock->getClockWords(Hour, Minute, ClockWordsTable) == E_OK && getState() == AnimationClockCommon::STATE_IDLE) {
         ReturnValue = E_OK;
         CurrentPixelIndex = 0;
-        setState(AnimationClockCommon::STATE_SET_TIME);
+        State = AnimationClockCommon::STATE_SET_TIME;
     }
     return ReturnValue;
 } /* setClock */
@@ -120,7 +120,7 @@ void AnimationClockCursor::task()
                 pDisplay->clearPixelFast(CurrentPixelIndex - 1);
             }
         }
-        if(CurrentPixelIndex >= DISPLAY_NUMBER_OF_PIXELS) setState(AnimationClockCommon::STATE_IDLE);
+        if(CurrentPixelIndex >= DISPLAY_NUMBER_OF_PIXELS) State = AnimationClockCommon::STATE_IDLE;
         CurrentPixelIndex++;
     }
 } /* task */

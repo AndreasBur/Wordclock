@@ -96,7 +96,7 @@ stdReturnType AnimationClockWipe::setClock(byte Hour, byte Minute)
 
     if(pClock->getClockWords(Hour, Minute, ClockWordsTable) == E_OK && getState() == AnimationClockCommon::STATE_IDLE) {
         ReturnValue = E_OK;
-        setState(AnimationClockCommon::STATE_CLEAR_TIME);
+        State = AnimationClockCommon::STATE_CLEAR_TIME;
     }
     return ReturnValue;
 } /* setClock */
@@ -161,7 +161,7 @@ void AnimationClockWipe::clearTimeTask()
     else SetPixelState = SET_PIXEL_STATE_DOWN;
 
     if(setNextIndex() == E_NOT_OK) {
-        setState(AnimationClockCommon::STATE_SET_TIME);
+        State = AnimationClockCommon::STATE_SET_TIME;
         reset();
     }
 } /* clearTimeTask */
@@ -185,7 +185,7 @@ void AnimationClockWipe::setTimeTask()
         if(isPixelPartOfClockWords(ClockWordsTable, Column, Row)) { pDisplay->setPixelFast(Column, Row); }
     } while(Column-- != 0 && Row++ < DISPLAY_NUMBER_OF_ROWS - 1);
 
-    if(setNextIndex() == E_NOT_OK) setState(AnimationClockCommon::STATE_IDLE);
+    if(setNextIndex() == E_NOT_OK) State = AnimationClockCommon::STATE_IDLE;
 } /* setTimeTask */
 
 

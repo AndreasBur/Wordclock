@@ -93,7 +93,7 @@ void AnimationClockCommon::init(Display* Display, Clock* Clock, StateType sState
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-boolean AnimationClockCommon::isPixelPartOfClockWords(Clock::ClockWordsTableType ClockWordsTable, byte Column, byte Row)
+boolean AnimationClockCommon::isPixelPartOfClockWords(Clock::ClockWordsTableType ClockWordsTable, byte Column, byte Row) const
 {
     DisplayWords Words;
 
@@ -113,7 +113,7 @@ boolean AnimationClockCommon::isPixelPartOfClockWords(Clock::ClockWordsTableType
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-boolean AnimationClockCommon::isPixelPartOfClockWords(Clock::ClockWordsTableType ClockWordsTable, byte Index)
+boolean AnimationClockCommon::isPixelPartOfClockWords(Clock::ClockWordsTableType ClockWordsTable, byte Index) const
 {
     byte Row = Index / DISPLAY_NUMBER_OF_COLUMNS;
     byte Column = Index % DISPLAY_NUMBER_OF_COLUMNS;

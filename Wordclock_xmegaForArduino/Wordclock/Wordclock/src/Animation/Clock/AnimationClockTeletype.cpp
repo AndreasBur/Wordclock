@@ -99,7 +99,7 @@ stdReturnType AnimationClockTeletype::setClock(byte Hour, byte Minute)
         CurrentWordIndex = 0;
         CurrentCharIndex = 0;
         CurrentWordLength = Words.getDisplayWordLengthFast(ClockWordsTable[CurrentWordIndex]);
-        setState(AnimationClockCommon::STATE_SET_TIME);
+        State = AnimationClockCommon::STATE_SET_TIME;
     }
     return ReturnValue;
 } /* setClock */
@@ -118,7 +118,7 @@ void AnimationClockTeletype::task()
     if(getState() == AnimationClockCommon::STATE_SET_TIME) {
         if(CurrentCharIndex >= CurrentWordLength) {
             if(setNextWordIndex() == E_NOT_OK) {
-                setState(AnimationClockCommon::STATE_IDLE);
+                State = AnimationClockCommon::STATE_IDLE;
                 return;
             }
             CurrentCharIndex = 0;
