@@ -167,7 +167,7 @@ Clock::~Clock()
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType Clock::getClockWords(byte Hour, byte Minute, ClockWordsType* ClockWords)
+stdReturnType Clock::getClockWords(byte Hour, byte Minute, ClockWordsType* ClockWords) const
 {
     /* ----- Local Variables ---------------------------------------------- */
     stdReturnType ReturnValue{E_NOT_OK};
@@ -217,7 +217,7 @@ stdReturnType Clock::getClockWords(byte Hour, byte Minute, ClockWordsType* Clock
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType Clock::getClockWords(byte Hour, byte Minute, ClockWordsTableType ClockWordsTable)
+stdReturnType Clock::getClockWords(byte Hour, byte Minute, ClockWordsTableType ClockWordsTable) const
 {
     /* ----- Local Variables ---------------------------------------------- */
     ClockWordsType ClockWords;
