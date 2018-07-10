@@ -83,12 +83,21 @@ class DisplayWords
         WORD_UHR,
         WORD_NUMBER_OF_WORDS
     };
+	
+	using DisplayWordsTableElementType = DisplayWord;
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
     static const DisplayWord DisplayWordsTable[];
+	
+	// functions
+    DisplayWordsTableElementType getDisplayWordsTableElement(byte WordId) const {
+        DisplayWordsTableElementType DisplayWordsTableElement;
+        memcpy_P(&DisplayWordsTableElement, &DisplayWordsTable[WordId], sizeof(DisplayWordsTableElementType));
+        return DisplayWordsTableElement;
+    }
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
@@ -104,10 +113,10 @@ class DisplayWords
     stdReturnType getDisplayWordRow(WordIdType, byte&) const;
 
     // get methods fast
-    DisplayWord getDisplayWordFast(WordIdType WordId) const { DisplayWord Word; memcpy_P(&Word, &DisplayWordsTable[WordId], sizeof(Word)); return Word; }
-    byte getDisplayWordRowFast(WordIdType WordId) const { DisplayWord Word; memcpy_P(&Word, &DisplayWordsTable[WordId], sizeof(Word)); return Word.getRow(); }
-    byte getDisplayWordColumnFast(WordIdType WordId) const { DisplayWord Word; memcpy_P(&Word, &DisplayWordsTable[WordId], sizeof(Word)); return Word.getColumn(); }
-    byte getDisplayWordLengthFast(WordIdType WordId) const { DisplayWord Word; memcpy_P(&Word, &DisplayWordsTable[WordId], sizeof(Word)); return Word.getRow(); }
+    DisplayWord getDisplayWordFast(WordIdType WordId) const { return getDisplayWordsTableElement(WordId); }
+    byte getDisplayWordRowFast(WordIdType WordId) const { return getDisplayWordsTableElement(WordId).getRow(); }
+    byte getDisplayWordColumnFast(WordIdType WordId) const { return getDisplayWordsTableElement(WordId).getColumn(); }
+    byte getDisplayWordLengthFast(WordIdType WordId) const { return getDisplayWordsTableElement(WordId).getRow(); }
 
 	// set methods
 
