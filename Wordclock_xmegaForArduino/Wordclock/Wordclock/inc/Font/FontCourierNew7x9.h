@@ -52,6 +52,7 @@ class FontCourierNew7x9 : public FontCommon<FontCharHorizontal<byte, FONT_COURIE
 ******************************************************************************************************************************************************/
   public:
     using FontCharType = FontCharHorizontal<byte, FONT_COURIER_NEW_7X9_HEIGHT>;
+    using RowsType = std::array<byte, FONT_COURIER_NEW_7X9_HEIGHT>;
   
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
@@ -72,7 +73,7 @@ class FontCourierNew7x9 : public FontCommon<FontCharHorizontal<byte, FONT_COURIE
 	// set methods
 
 	// methods
-    void init();
+
 };
 
 #endif
