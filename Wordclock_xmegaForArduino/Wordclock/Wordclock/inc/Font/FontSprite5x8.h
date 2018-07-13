@@ -23,6 +23,7 @@
 #include "StandardTypes.h"
 #include "Arduino.h"
 #include "FontCommon.h"
+#include "FontChar.h"
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
@@ -31,8 +32,9 @@
 
 
 /* FontSprite5x8 parameter */
-#define FONT_SPRITE_5X8_WIDTH           5
-#define FONT_SPRITE_5X8_HEIGHT          8
+#define FONT_SPRITE_5X8_WIDTH                       5
+#define FONT_SPRITE_5X8_HEIGHT                      8
+#define FONT_SPRITE_5X8_FONT_TABLE_SIZE             102
 
 
 /******************************************************************************************************************************************************
@@ -41,34 +43,22 @@
 
 
 /******************************************************************************************************************************************************
- *  C L A S S   T E M P L A T E
+ *  C L A S S   F O N T S P R I T E 5 X 8
 ******************************************************************************************************************************************************/
-class FontSprite5x8
+class FontSprite5x8 : public FontCommon<FontCharVertical<byte, FONT_SPRITE_5X8_WIDTH>, FONT_SPRITE_5X8_FONT_TABLE_SIZE>
 {
 /******************************************************************************************************************************************************
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-    struct FontTableElementType {
-        byte Width;
-        byte Column[FONT_SPRITE_5X8_WIDTH];
-    };
-
-    using CharType = FontTableElementType;
+    using FontCharType = FontCharVertical<byte, FONT_SPRITE_5X8_WIDTH>;
+    using ColumnsType = std::array<byte, FONT_SPRITE_5X8_WIDTH>;
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
-    static const FontTableElementType FontTable[];
-
-    // functions
-    FontTableElementType getFontTableElement(byte Index) {
-        FontTableElementType FontTableElement;
-        memcpy_P(&FontTableElement, &FontTable[Index], sizeof(FontTableElementType));
-        return FontTableElement;
-    }
-    byte getNumberOfFontTableElements();
+    static const FontTableType FontTable;
   
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
@@ -78,15 +68,14 @@ class FontSprite5x8
     ~FontSprite5x8();
 
 	// get methods
-	//FontCommon::OrientationType getOrientation() const { return FontCommon::ORIENTATION_VERTICAL; }
     byte getFontWidth() const { return FONT_SPRITE_5X8_WIDTH; }
     byte getFontHeight() const { return FONT_SPRITE_5X8_HEIGHT; }
+    FontCommon::OrientationType getOrientation() const { return ORIENTATION_VERTICAL; }
 
 	// set methods
 
 	// methods
-	CharType getCharFast(byte Index) { return getFontTableElement(Index); }
-	stdReturnType getChar(byte, CharType&);
+
 };
 
 #endif

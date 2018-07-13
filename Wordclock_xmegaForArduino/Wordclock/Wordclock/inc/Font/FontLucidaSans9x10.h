@@ -23,6 +23,7 @@
 #include "StandardTypes.h"
 #include "Arduino.h"
 #include "FontCommon.h"
+#include "FontChar.h"
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
@@ -31,9 +32,9 @@
 
 
 /* FontLucidaSans9x10 parameter */
-#define FONT_SPRITE_9X10_WIDTH           9
-#define FONT_SPRITE_9X10_HEIGHT          10
-
+#define FONT_SPRITE_9X10_WIDTH                      9
+#define FONT_SPRITE_9X10_HEIGHT                     10
+#define FONT_SPRITE_9X10_FONT_TABLE_SIZE            102
 
 /******************************************************************************************************************************************************
  *  G L O B A L   F U N C T I O N   M A C R O S
@@ -41,34 +42,22 @@
 
 
 /******************************************************************************************************************************************************
- *  C L A S S   T E M P L A T E
+ *  C L A S S   F O N T L U C I D A S A N S 9 X 1 0
 ******************************************************************************************************************************************************/
-class FontLucidaSans9x10
+class FontLucidaSans9x10 : public FontCommon<FontCharVertical<uint16_t, FONT_SPRITE_9X10_WIDTH>, FONT_SPRITE_9X10_FONT_TABLE_SIZE>
 {
 /******************************************************************************************************************************************************
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-    struct FontTableElementType {
-        byte Width;
-        uint16_t Column[FONT_SPRITE_9X10_WIDTH];
-    };
-
-    using CharType = FontTableElementType;
+    using FontCharType = FontCharVertical<uint16_t, FONT_SPRITE_9X10_WIDTH>;
+    using ColumnsType = std::array<uint16_t, FONT_SPRITE_9X10_WIDTH>;
   
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
-    static const FontTableElementType FontTable[];
-
-    // functions
-    FontTableElementType getFontTableElement(byte Index) {
-        FontTableElementType FontTableElement;
-        memcpy_P(&FontTableElement, &FontTable[Index], sizeof(FontTableElementType));
-        return FontTableElement;
-    }
-    byte getNumberOfFontTableElements();
+    static const FontTableType FontTable;
   
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
@@ -78,14 +67,13 @@ class FontLucidaSans9x10
     ~FontLucidaSans9x10();
 
 	// get methods
-	//FontCommon::OrientationType getOrientation() { return FontCommon::ORIENTATION_VERTICAL; }
-
+    byte getFontWidth() const { return FONT_SPRITE_9X10_WIDTH; }
+    byte getFontHeight() const { return FONT_SPRITE_9X10_HEIGHT; }
+    FontCommon::OrientationType getOrientation() const { return ORIENTATION_VERTICAL; }
 	// set methods
 
 	// methods
-	void init();
-	CharType getCharFast(byte Index) { return getFontTableElement(Index); }
-	stdReturnType getChar(byte, CharType&);
+
 };
 
 #endif

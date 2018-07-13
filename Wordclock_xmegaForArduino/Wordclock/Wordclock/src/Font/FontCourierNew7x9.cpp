@@ -52,7 +52,7 @@
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-FontCourierNew7x9::FontCourierNew7x9()
+FontCourierNew7x9::FontCourierNew7x9() : FontCommon(FontTable)
 {
 
 } /* FontCourierNew7x9 */

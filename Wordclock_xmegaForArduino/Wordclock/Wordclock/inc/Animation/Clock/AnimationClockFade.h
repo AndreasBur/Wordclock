@@ -41,7 +41,7 @@
 
 
 /******************************************************************************************************************************************************
- *  C L A S S   T E M P L A T E
+ *  C L A S S   A N I M A T O N C L O C K F A D E
 ******************************************************************************************************************************************************/
 class AnimationClockFade : public AnimationClockCommon
 {
@@ -82,7 +82,6 @@ class AnimationClockFade : public AnimationClockCommon
     void init(Display*, Clock*);
     stdReturnType setClock(byte, byte);
     void task();
-    void init();
 };
 
 #endif

@@ -38,7 +38,7 @@
  *  L O C A L   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
 const FontTahoma10x10::FontTableType FontTahoma10x10::FontTable PROGMEM
-{{
+{
     FontTableElementType(6,  {0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000}),      // Code for char
     FontTableElementType(2,  {0x0000, 0x0002, 0x0002, 0x0002, 0x0002, 0x0002, 0x0002, 0x0000, 0x0002, 0x0000}),      // Code for char !
     FontTableElementType(3,  {0x0000, 0x0005, 0x0005, 0x0005, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000}),      // Code for char "
@@ -141,7 +141,7 @@ const FontTahoma10x10::FontTableType FontTahoma10x10::FontTable PROGMEM
     FontTableElementType(5,  {0x0000, 0x0000, 0x000a, 0x0000, 0x000e, 0x0010, 0x001e, 0x0011, 0x0011, 0x001e}),      // Code for char ä
     FontTableElementType(5,  {0x0000, 0x0000, 0x000a, 0x0000, 0x000e, 0x0011, 0x0011, 0x0011, 0x0011, 0x000e}),      // Code for char ö
     FontTableElementType(5,  {0x0000, 0x0000, 0x000a, 0x0000, 0x0011, 0x0011, 0x0011, 0x0011, 0x0011, 0x001e}),      // Code for char ü
-}};
+};
 
 
 /******************************************************************************************************************************************************

@@ -84,9 +84,9 @@ class FontChar
 
 
 /******************************************************************************************************************************************************
- *  C L A S S   F O N T C H A R V E R T I C A L
+ *  C L A S S   F O N T C H A R H O R I Z O N T A L
 ******************************************************************************************************************************************************/
-template <typename RowType, byte RowsSize> class FontCharVertical : public FontChar
+template <typename RowType, byte RowsSize> class FontCharHorizontal : public FontChar
 {
 /******************************************************************************************************************************************************
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
@@ -105,11 +105,11 @@ template <typename RowType, byte RowsSize> class FontCharVertical : public FontC
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr FontCharVertical(byte sWidth, std::array<RowType, RowsSize> sRows) : FontChar(sWidth), Rows(sRows) {
+    constexpr FontCharHorizontal(byte sWidth, std::array<RowType, RowsSize> sRows) : FontChar(sWidth), Rows(sRows) {
 
     }
 
-    constexpr FontCharVertical() : FontChar(0), Rows{} {
+    constexpr FontCharHorizontal() : FontChar(0), Rows{} {
     
     }
 
@@ -136,6 +136,65 @@ template <typename RowType, byte RowsSize> class FontCharVertical : public FontC
         }
     }
     void setRows(RowsType sRows) { Rows = sRows; }
+
+	// methods
+
+};
+
+
+/******************************************************************************************************************************************************
+ *  C L A S S   F O N T C H A R V E R T I C A L
+******************************************************************************************************************************************************/
+template <typename ColumnType, byte ColumnsSize> class FontCharVertical : public FontChar
+{
+/******************************************************************************************************************************************************
+ *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
+******************************************************************************************************************************************************/
+  public:
+
+  
+/******************************************************************************************************************************************************
+ *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
+******************************************************************************************************************************************************/
+  private:
+    using ColumnsType = std::array<ColumnType, ColumnsSize>;
+    ColumnsType Columns;
+
+/******************************************************************************************************************************************************
+ *  P U B L I C   F U N C T I O N S
+******************************************************************************************************************************************************/
+  public:
+    constexpr FontCharVertical(byte sWidth, std::array<ColumnType, ColumnsSize> sColumns) : FontChar(sWidth), Columns(sColumns) {
+
+    }
+
+    constexpr FontCharVertical() : FontChar(0), Columns{} {
+    
+    }
+
+    // get methods
+    ColumnType getColumnFast(byte Index) const { return Columns[Index]; }
+    stdReturnType getColumn(byte Index, ColumnType& Column) {
+        if(Index < ColumnsSize) {
+            Column = Columns[Index];
+            return E_OK;
+        } else {
+            return E_NOT_OK;
+        }
+    }
+    ColumnsType getColumns() const { return Columns; }
+
+    // set methods
+    void setColumnFast(byte Index, ColumnType Column) { Columns[Index] = Column; }
+    stdReturnType setColumn(byte Index, ColumnType Column) {
+        if(Index < ColumnsSize) {
+            Columns[Index] = Column;
+            return E_OK;
+            } else {
+            return E_NOT_OK;
+        }
+    }
+    void setColumns(ColumnsType sColumns) { Columns = sColumns; }
 
 	// methods
 
