@@ -84,7 +84,7 @@
 /******************************************************************************************************************************************************
  *  LOCAL DATA TYPES AND STRUCTURES
 ******************************************************************************************************************************************************/
-const uint8_t Gamma7Table[] PROGMEM {133, 139, 145, 151, 158, 165, 172, 180, 188, 196, 205, 214, 224, 234, 244, 255};
+const WS2812::Gamma7TableElementType Gamma7Table[] PROGMEM {133, 139, 145, 151, 158, 165, 172, 180, 188, 196, 205, 214, 224, 234, 244, 255};
 
 
 /******************************************************************************************************************************************************
@@ -99,9 +99,8 @@ const uint8_t Gamma7Table[] PROGMEM {133, 139, 145, 151, 158, 165, 172, 180, 188
  *
  *  \return         -
  *****************************************************************************************************************************************************/
-WS2812::WS2812(byte Pin)
+WS2812::WS2812()
 {
-    setPin(Pin); // wird evtl aufgerufen obwohl hardware noch nicht initialisiert ist
     Brightness = 255;
 #if (WS2812_RESET_TIMER == STD_ON)
     ResetTimer = 0;
@@ -130,8 +129,9 @@ WS2812::~WS2812()
  *                  
  *  \return         -
  *****************************************************************************************************************************************************/
-void WS2812::init()
+void WS2812::init(byte Pin)
 {
+    setPin(Pin);
     show();
 } /* init */
 
@@ -419,7 +419,7 @@ void WS2812::setColorOrder(ColorOrderType ColorOrder)
  *****************************************************************************************************************************************************/
 uint8_t WS2812::calcGamma7CorrectionValue(byte ValueLinear)
 {
-    uint8_t Exponent = pgm_read_byte(&Gamma7Table[ValueLinear % WS2812_GAMMA7_TABLE_NUMBER_OF_VALUES]);
+    Gamma7TableElementType Exponent = getGamma7TableElement(ValueLinear % WS2812_GAMMA7_TABLE_NUMBER_OF_VALUES);
     return Exponent >> (7 - ValueLinear / WS2812_GAMMA7_TABLE_NUMBER_OF_VALUES);
 } /* calcGamma7CorrectionValue */
 

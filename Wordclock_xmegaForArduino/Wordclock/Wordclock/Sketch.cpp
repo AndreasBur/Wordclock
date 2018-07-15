@@ -57,6 +57,6 @@ void loop()
 
     FontTahoma10x10::FontCharType Char;
     //Char = Font.getCharFast(5);
-    Font.getChar(Font.getFontHeight(), Char);
+    Font.getChar(5, Char);
 
 }

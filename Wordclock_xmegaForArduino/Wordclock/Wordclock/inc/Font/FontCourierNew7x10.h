@@ -68,12 +68,14 @@ class FontCourierNew7x10 : public FontCommon<FontCharHorizontal<byte, FONT_COURI
     ~FontCourierNew7x10();
 
 	// get methods
-
+    byte getFontWidth() const { return FONT_COURIER_NEW_7X10_WIDTH; }
+    byte getFontHeight() const { return FONT_COURIER_NEW_7X10_HEIGHT; }
+    FontCommon::OrientationType getOrientation() const { return ORIENTATION_VERTICAL; }
 
 	// set methods
 
 	// methods
-    void init();
+
 };
 
 #endif

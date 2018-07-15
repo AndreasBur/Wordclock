@@ -53,7 +53,7 @@
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-Display::Display(PixelColorType sColor) : Pixels(DISPLAY_DATA_PIN)
+Display::Display(PixelColorType sColor)
 {
     Color = sColor;
     State = STATE_UNINIT;
@@ -73,7 +73,7 @@ Display::Display(PixelColorType sColor) : Pixels(DISPLAY_DATA_PIN)
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-Display::Display(byte Red, byte Green, byte Blue) : Pixels(DISPLAY_DATA_PIN)
+Display::Display(byte Red, byte Green, byte Blue)
 {
     Color.Red = Red;
     Color.Green = Green;
@@ -107,6 +107,7 @@ Display::~Display()
 void Display::init()
 {
     clear();
+    Pixels.init(DISPLAY_DATA_PIN);
     State = STATE_INIT;
 } /* init */
 

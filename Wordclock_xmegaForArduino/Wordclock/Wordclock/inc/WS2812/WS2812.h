@@ -28,8 +28,8 @@
  *  GLOBAL CONSTANT MACROS
  *****************************************************************************************************************************************************/
 /* WS2812 configuration parameter */
-#define WS2812_RESET_TIMER                          STD_ON
-#define WS2812_RGB_ORDER_ON_RUNTIME                 STD_ON
+#define WS2812_RESET_TIMER                          STD_OFF
+#define WS2812_RGB_ORDER_ON_RUNTIME                 STD_OFF
 #define WS2812_NUMBER_OF_LEDS                       110
 
 /* WS2812 parameter */
@@ -78,21 +78,23 @@ class WS2812
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-/* type which describes the color order of the protocol */
 #if (WS2812_RGB_ORDER_ON_RUNTIME == STD_ON)
-enum ColorOrderType {
-    COLOR_ORDER_RGB,
-    COLOR_ORDER_BRG,
-    COLOR_ORDER_GBR
-};
+    /* type which describes the color order of the protocol */
+    enum ColorOrderType {
+        COLOR_ORDER_RGB,
+        COLOR_ORDER_BRG,
+        COLOR_ORDER_GBR
+    };
 #endif
 
-/* type which describes the structure of a pixel */
-struct PixelType {
-    byte Red;
-    byte Green;
-    byte Blue;
-};
+    /* type which describes the structure of a pixel */
+    struct PixelType {
+        byte Red;
+        byte Green;
+        byte Blue;
+    };
+
+    using Gamma7TableElementType = uint8_t;
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
@@ -102,7 +104,7 @@ struct PixelType {
     volatile byte* PortOutputRegister;
     byte Pixels[WS2812_NUMBER_OF_LEDS * WS2812_NUMBER_OF_COLORS];
     byte Brightness;
-    static const uint8_t Gamma7Table[];
+    static const Gamma7TableElementType Gamma7Table[];
 
 
 #if (WS2812_RESET_TIMER == STD_ON)
@@ -120,14 +122,19 @@ struct PixelType {
     void dimmPixels(byte*, uint16_t);
     void dimmPixel(PixelType*, PixelType);
     void dimmPixel(PixelType*, byte, byte, byte);
-
     void dimmColor(byte* ColorDimmed, byte Color) const { *ColorDimmed = (Color * Brightness) >> 8; }
+
+    Gamma7TableElementType getGamma7TableElement(byte Index) const {
+        Gamma7TableElementType Gamma7TableElement;
+        memcpy_P(&Gamma7TableElement, &Gamma7Table[Index], sizeof(Gamma7TableElementType));
+        return Gamma7TableElement;
+    }
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    WS2812(byte);
+    WS2812();
     ~WS2812();
 
     // get methods
@@ -146,7 +153,7 @@ struct PixelType {
     void setPixelFast(byte, byte, byte, byte);
 
     // methods
-    void init();
+    void init(byte);
     void clearAllPixels() { memset(Pixels, 0, sizeof(Pixels)); }
     stdReturnType clearPixel(byte Index) { return setPixel(Index, 0, 0, 0); }
     void clearPixelFast(byte Index) { setPixelFast(Index, 0, 0, 0); }

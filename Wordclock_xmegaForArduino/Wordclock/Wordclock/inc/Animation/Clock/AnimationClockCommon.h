@@ -81,7 +81,6 @@ class AnimationClockCommon
     StateType getState() const { return State; }
 
 	// set methods
-    //void setState(StateType sState) { State = sState; }
 
 	// methods
     void init(Display*, Clock*, StateType);
