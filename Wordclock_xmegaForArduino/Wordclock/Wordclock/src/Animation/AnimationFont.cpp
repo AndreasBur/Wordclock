@@ -87,7 +87,7 @@ stdReturnType AnimationFont::setChar(byte Column, byte Row, char Char, FontType 
     //if(FONT_5X8) return
 #endif
 #if(ANIMATION_SUPPORT_FONT_7X9 == STD_ON)
-    if(FONT_7X9) {
+    if(Font == FONT_7X9) {
         FontCourierNew7x9::FontCharType FontChar;
         if(Font7x9.getChar(FontIndex, FontChar) == E_OK) {
             return setCharFontHorizontal(Column, Row, FontChar, FONT_COURIER_NEW_7X9_HEIGHT);
@@ -122,22 +122,22 @@ void AnimationFont::setCharFast(byte Column, byte Row, char Char, FontType Font)
     byte FontIndex = convertCharToFontIndexFast(Char);
 
 #if(ANIMATION_SUPPORT_FONT_5X8 == STD_ON)
-    //if(FONT_5X8) return
+    //if(Font == FONT_5X8) return
 #endif
 #if(ANIMATION_SUPPORT_FONT_7X9 == STD_ON)
-    if(FONT_7X9) {
+    if(Font == FONT_7X9) {
         FontCourierNew7x9::FontCharType FontChar = Font7x9.getCharFast(FontIndex);
-        setCharFontHorizontal(Column, Row, FontChar, FONT_COURIER_NEW_7X9_HEIGHT);
+        setCharFontHorizontalFast(Column, Row, FontChar, FONT_COURIER_NEW_7X9_HEIGHT);
     }
 #endif
 #if(ANIMATION_SUPPORT_FONT_7X10 == STD_ON)
-    //if(FONT_7X10) return Font7x10.getHeight();
+    //if(Font == FONT_7X10) return Font7x10.getHeight();
 #endif
 #if(ANIMATION_SUPPORT_FONT_9X10 == STD_ON)
-    //if(FONT_9X10) return Font9x10.getHeight();
+    //if(Font == FONT_9X10) return Font9x10.getHeight();
 #endif
 #if(ANIMATION_SUPPORT_FONT_10X10 == STD_ON)
-    //if(FONT_10X10) return Font10x10.getHeight();
+    //if(Font == FONT_10X10) return Font10x10.getHeight();
 #endif
 } /* setCharFast */
 
@@ -203,21 +203,21 @@ void AnimationFont::task()
 byte AnimationFont::getFontHeight(FontType Font)
 {
 #if(ANIMATION_SUPPORT_FONT_5X8 == STD_ON)
-    if(FONT_5X8) Font5x8.getHeight();
+    if(Font == FONT_5X8) return Font5x8.getHeight();
 #endif
 #if(ANIMATION_SUPPORT_FONT_7X9 == STD_ON)
-    if(FONT_7X9) Font7x9.getHeight();
+    if(Font == FONT_7X9) return Font7x9.getHeight();
 #endif
 #if(ANIMATION_SUPPORT_FONT_7X10 == STD_ON)
-    if(FONT_7X10) Font7x10.getHeight();
+    if(Font == FONT_7X10) return Font7x10.getHeight();
 #endif
 #if(ANIMATION_SUPPORT_FONT_9X10 == STD_ON)
-    if(FONT_9X10) Font9x10.getHeight();
+    if(Font == FONT_9X10) return Font9x10.getHeight();
 #endif
 #if(ANIMATION_SUPPORT_FONT_10X10 == STD_ON)
-    if(FONT_10X10) Font10x10.getHeight();
+    if(Font == FONT_10X10) return Font10x10.getHeight();
 #endif
-    if(FONT_NONE) return 0;
+    return 0;
 } /* getFontHeight */
 
 
@@ -232,21 +232,21 @@ byte AnimationFont::getFontHeight(FontType Font)
 byte AnimationFont::getFontWidth(FontType Font)
 {
 #if(ANIMATION_SUPPORT_FONT_5X8 == STD_ON)
-    if(FONT_5X8) Font5x8.getWidth();
+    if(Font == FONT_5X8) return Font5x8.getWidth();
 #endif
 #if(ANIMATION_SUPPORT_FONT_7X9 == STD_ON)
-    if(FONT_7X9) Font7x9.getWidth();
+    if(Font == FONT_7X9) return Font7x9.getWidth();
 #endif
 #if(ANIMATION_SUPPORT_FONT_7X10 == STD_ON)
-    if(FONT_7X10) Font7x10.getWidth();
+    if(Font == FONT_7X10) Font7x10.getWidth();
 #endif
 #if(ANIMATION_SUPPORT_FONT_9X10 == STD_ON)
-    if(FONT_9X10) Font9x10.getWidth();
+    if(Font == FONT_9X10) return Font9x10.getWidth();
 #endif
 #if(ANIMATION_SUPPORT_FONT_10X10 == STD_ON)
-    if(FONT_10X10) Font10x10.getWidth();
+    if(Font == FONT_10X10) return Font10x10.getWidth();
 #endif
-    if(FONT_NONE) return 0;
+    return 0;
 } /* getFontWidth */
 
 
@@ -261,21 +261,21 @@ byte AnimationFont::getFontWidth(FontType Font)
 Orientation AnimationFont::getFontOrientation(FontType Font)
 {
 #if(ANIMATION_SUPPORT_FONT_5X8 == STD_ON)
-    if(FONT_5X8) Font5x8.getOrientation();
+    if(Font == FONT_5X8) return Font5x8.getOrientation();
 #endif
 #if(ANIMATION_SUPPORT_FONT_7X9 == STD_ON)
-    if(FONT_7X9) Font7x9.getOrientation();
+    if(Font == FONT_7X9) return Font7x9.getOrientation();
 #endif
 #if(ANIMATION_SUPPORT_FONT_7X10 == STD_ON)
-    if(FONT_7X10) Font7x10.getOrientation();
+    if(Font == FONT_7X10) return Font7x10.getOrientation();
 #endif
 #if(ANIMATION_SUPPORT_FONT_9X10 == STD_ON)
-    if(FONT_9X10) Font9x10.getOrientation();
+    if(Font == FONT_9X10) return Font9x10.getOrientation();
 #endif
 #if(ANIMATION_SUPPORT_FONT_10X10 == STD_ON)
-    if(FONT_10X10) Font10x10.getOrientation();
+    if(Font == FONT_10X10) return Font10x10.getOrientation();
 #endif
-    if(FONT_NONE) return Orientation::ORIENTATION_NONE;
+    return Orientation::ORIENTATION_NONE;
 } /* getFontOrientation */
 
 
@@ -330,8 +330,8 @@ void AnimationFont::charShiftTask()
             if(State == STATE_CHAR_SHIFT) State = STATE_IDLE;
         } else {
             Shift.Counter--;
-            setChar(DISPLAY_NUMBER_OF_COLUMNS - (getFontWidth(Shift.Font) - Shift.Counter), getRowCenter(Shift.Font), Shift.Char, Shift.Font);
-            //setCharFast(DISPLAY_NUMBER_OF_COLUMNS - (getFontWidth(Shift.Font) - Shift.Counter), getRowCenter(Shift.Font), Shift.Char, Shift.Font);
+            //setChar(DISPLAY_NUMBER_OF_COLUMNS - (getFontWidth(Shift.Font) - Shift.Counter), getRowCenter(Shift.Font), Shift.Char, Shift.Font);
+            setCharFast(DISPLAY_NUMBER_OF_COLUMNS - (getFontWidth(Shift.Font) - Shift.Counter), getRowCenter(Shift.Font), Shift.Char, Shift.Font);
         }
     }
 } /* charShiftTask */
@@ -404,15 +404,12 @@ stdReturnType AnimationFont::setCharRow(RowType CharRow, byte Column, byte Row, 
 template <typename RowType, byte RowsSize>
 void AnimationFont::setCharFontHorizontalFast(byte Column, byte Row, const FontCharHorizontal<RowType, RowsSize>& FontChar, byte Height)
 {
-    stdReturnType ReturnValue{E_OK};
-
     for(byte FontColumn = 0; FontColumn < FontChar.getWidth(); FontColumn++)
     {
         RowType CharRow = FontChar.getRowFast(FontColumn);
         byte ColumnAbs = Column + FontColumn;
-        setCharRow(CharRow, ColumnAbs, Row, Height);
+        setCharRowFast(CharRow, ColumnAbs, Row, Height);
     }
-    return ReturnValue;
 } /* setCharFontHorizontalFast */
 
 
@@ -542,10 +539,9 @@ stdReturnType AnimationFont::convertCharToFontIndex(char Char, byte& Index)
     else if('ö' == Char) { Index = 100; ReturnValue = E_OK; }
     else if('ü' == Char) { Index = 101; ReturnValue = E_OK; }
     /* for all others only add offset */
-    else if(Char >= ANIMATION_FONT_ASCII_CHAR_MIN && Char <= ANIMATION_FONT_ASCII_CHAR_MAX) {
+    else if(Char >= ANIMATION_FONT_ASCII_CHAR_MIN) {
         Index = Char + ANIMATION_FONT_ASCII_TABLE_OFFSET; ReturnValue = E_OK; 
     }
-
     return ReturnValue;
 } /* convertCharToFontIndex */
 
@@ -571,9 +567,10 @@ byte AnimationFont::convertCharToFontIndexFast(char Char)
     else if('ö' == Char) return 100;
     else if('ü' == Char) return 101;
     /* for all others only add offset */
-    else if(Char >= ANIMATION_FONT_ASCII_CHAR_MIN && Char <= ANIMATION_FONT_ASCII_CHAR_MAX) { 
+    else if(Char >= ANIMATION_FONT_ASCII_CHAR_MIN) { 
         return Char + ANIMATION_FONT_ASCII_TABLE_OFFSET;
     }
+    return 0;
 } /* convertCharToFontIndex */
 
 
