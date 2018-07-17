@@ -58,7 +58,6 @@ template <typename FontCharType, byte FontTableSize> class FontCommon
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-
     using FontTableElementType = FontCharType;
     using FontTableType = std::array<FontCharType, FontTableSize>;
   
@@ -98,7 +97,7 @@ template <typename FontCharType, byte FontTableSize> class FontCommon
         if(Index < FontTableSize) {
             FontChar = getFontTableElement(Index);
             return E_OK;
-            } else {
+        } else {
             return E_NOT_OK;
         }
     }

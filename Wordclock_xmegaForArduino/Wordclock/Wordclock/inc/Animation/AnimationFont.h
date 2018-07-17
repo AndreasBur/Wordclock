@@ -34,16 +34,16 @@
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
 /* AnimationFont configuration parameter */
-#define ANIMATION_SUPPORT_FONT_5X8          STD_ON
-#define ANIMATION_SUPPORT_FONT_7X9          STD_ON
-#define ANIMATION_SUPPORT_FONT_7X10         STD_ON
-#define ANIMATION_SUPPORT_FONT_9X10         STD_ON
-#define ANIMATION_SUPPORT_FONT_10X10        STD_ON
+#define ANIMATION_SUPPORT_FONT_5X8              STD_ON
+#define ANIMATION_SUPPORT_FONT_7X9              STD_ON
+#define ANIMATION_SUPPORT_FONT_7X10             STD_ON
+#define ANIMATION_SUPPORT_FONT_9X10             STD_ON
+#define ANIMATION_SUPPORT_FONT_10X10            STD_ON
 
 /* AnimationFont parameter */
-#define ANIMATION_FONT_ASCII_TABLE_OFFSET              -32
-#define ANIMATION_FONT_ASCII_CHAR_MIN                  32
-#define ANIMATION_FONT_ASCII_CHAR_MAX                  127
+#define ANIMATION_FONT_ASCII_TABLE_OFFSET       -32
+#define ANIMATION_FONT_ASCII_CHAR_MIN           32
+#define ANIMATION_FONT_ASCII_CHAR_MAX           127
 
 
 /******************************************************************************************************************************************************
@@ -116,55 +116,33 @@ class AnimationFont
 #endif
 
     // functions
-    stdReturnType convertCharToFontIndex(char, byte&);
+    template <typename RowType, byte RowsSize>
+    stdReturnType setCharFontHorizontal(byte, byte, const FontCharHorizontal<RowType, RowsSize>&, byte);
+    template <typename RowType>
+    stdReturnType setCharRow(RowType, byte, byte, byte);
 
     template <typename RowType, byte RowsSize>
-    stdReturnType setCharFontHorizontal(byte Column, byte Row, const FontCharHorizontal<RowType, RowsSize>& FontChar, byte Height)
-    {
-        stdReturnType ReturnValue{E_OK};
-
-        for(byte FontColumn = 0; FontColumn < FontChar.getWidth(); FontColumn++)
-        {
-            RowType CharRow;
-            byte ColumnAbs = Column + FontColumn;
-            if(FontChar.getRow(FontColumn, CharRow) == E_NOT_OK) {
-                ReturnValue = E_NOT_OK;
-                break;
-            }
-            setCharRow(CharRow, ColumnAbs, Row, Height);
-        }
-
-        return ReturnValue;
-    }
-
+    void setCharFontHorizontalFast(byte, byte, const FontCharHorizontal<RowType, RowsSize>&, byte);
     template <typename RowType>
-    stdReturnType setCharRow(RowType CharRow, byte Column, byte Row, byte Height) 
-    {
-        stdReturnType ReturnValue{E_OK};
-
-        for(byte FontRow = 0; FontRow < Height; FontRow++)
-        {
-            byte RowAbs = Row + Height - 1 - FontRow;
-            if(Column < DISPLAY_NUMBER_OF_COLUMNS && RowAbs < DISPLAY_NUMBER_OF_ROWS) {
-                if(pDisplay->writePixel(Column, RowAbs, bitRead(CharRow, FontRow)) == E_NOT_OK) {
-                    ReturnValue = E_NOT_OK;
-                    break;
-                }
-            } else {
-                break;
-            }
-        }
-        return ReturnValue;
-    }
+    void setCharRowFast(RowType, byte, byte, byte);
 
     template <typename ColumnType, byte ColumnsSize>
-    stdReturnType setCharFontVertical(byte, byte, char, const FontCharVertical<ColumnType, ColumnsSize>&);
+    stdReturnType setCharFontVertical(byte, byte, char, const FontCharVertical<ColumnType, ColumnsSize>&, byte FontHeight);
+    template <typename ColumnType>
+    stdReturnType setCharColumn(ColumnType, byte, byte, byte);
+
+    template <typename ColumnType, byte ColumnsSize>
+    void setCharFontVerticalFast(byte, byte, char, const FontCharVertical<ColumnType, ColumnsSize>&, byte FontHeight);
+    template <typename ColumnType>
+    void setCharColumnFast(ColumnType, byte, byte, byte);
 
     //stdReturnType setCharFontHorizontal(byte, byte, char, const byte*, byte, byte);
     //stdReturnType setCharFontVertical(byte, byte, char, const byte*, byte, byte);
     void setCharFontHorizontalFast(byte, byte, char, const byte*, byte, byte);
     void setCharFontVerticalFast(byte, byte, char, const byte*, byte, byte);
 
+    stdReturnType convertCharToFontIndex(char, byte&);
+    byte convertCharToFontIndexFast(char);
     void stringShiftTask();
     void charShiftTask();
     byte getColumnCenter(FontType Font) { return (DISPLAY_NUMBER_OF_COLUMNS / 2) - (getFontWidth(Font) / 2); }
@@ -187,6 +165,7 @@ class AnimationFont
     void show() { pDisplay->show(); }
     void task();
     stdReturnType setChar(byte, byte, char, FontType);
+    void setCharFast(byte, byte, char, FontType);
     void setCharWithShift(char, FontType);
     void setText(char*, FontType);
     void setTextWithShift(char*, FontType);

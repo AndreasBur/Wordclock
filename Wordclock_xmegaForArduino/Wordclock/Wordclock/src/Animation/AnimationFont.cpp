@@ -84,13 +84,16 @@ stdReturnType AnimationFont::setChar(byte Column, byte Row, char Char, FontType 
     if(convertCharToFontIndex(Char, FontIndex) == E_NOT_OK) return E_NOT_OK;
 
 #if(ANIMATION_SUPPORT_FONT_5X8 == STD_ON)
-    //if(FONT_5X8) return 
+    //if(FONT_5X8) return
 #endif
 #if(ANIMATION_SUPPORT_FONT_7X9 == STD_ON)
     if(FONT_7X9) {
         FontCourierNew7x9::FontCharType FontChar;
-        if(Font7x9.getChar(FontIndex, FontChar) == E_OK) return setCharFontHorizontal(Column, Row, FontChar, FONT_COURIER_NEW_7X9_HEIGHT);
-        else return E_NOT_OK;
+        if(Font7x9.getChar(FontIndex, FontChar) == E_OK) {
+            return setCharFontHorizontal(Column, Row, FontChar, FONT_COURIER_NEW_7X9_HEIGHT);
+        } else {
+            return E_NOT_OK;
+        }
     }
 #endif
 #if(ANIMATION_SUPPORT_FONT_7X10 == STD_ON)
@@ -104,6 +107,39 @@ stdReturnType AnimationFont::setChar(byte Column, byte Row, char Char, FontType 
 #endif
     if(FONT_NONE) return E_NOT_OK;
 } /* setChar */
+
+
+/******************************************************************************************************************************************************
+  setCharFast()
+******************************************************************************************************************************************************/
+/*! \brief
+ *  \details
+ *
+ *  \return         -
+******************************************************************************************************************************************************/
+void AnimationFont::setCharFast(byte Column, byte Row, char Char, FontType Font)
+{
+    byte FontIndex = convertCharToFontIndexFast(Char);
+
+#if(ANIMATION_SUPPORT_FONT_5X8 == STD_ON)
+    //if(FONT_5X8) return
+#endif
+#if(ANIMATION_SUPPORT_FONT_7X9 == STD_ON)
+    if(FONT_7X9) {
+        FontCourierNew7x9::FontCharType FontChar = Font7x9.getCharFast(FontIndex);
+        setCharFontHorizontal(Column, Row, FontChar, FONT_COURIER_NEW_7X9_HEIGHT);
+    }
+#endif
+#if(ANIMATION_SUPPORT_FONT_7X10 == STD_ON)
+    //if(FONT_7X10) return Font7x10.getHeight();
+#endif
+#if(ANIMATION_SUPPORT_FONT_9X10 == STD_ON)
+    //if(FONT_9X10) return Font9x10.getHeight();
+#endif
+#if(ANIMATION_SUPPORT_FONT_10X10 == STD_ON)
+    //if(FONT_10X10) return Font10x10.getHeight();
+#endif
+} /* setCharFast */
 
 
 /******************************************************************************************************************************************************
@@ -268,6 +304,7 @@ void AnimationFont::stringShiftTask()
         } else { /* otherwise task has finished */
             if(State == STATE_TEXT_SHIFT) State = STATE_IDLE;
             wcTransformation.shiftLeft();
+            //wcTransformation.shiftLeftFast();
         }
     } else {
         /* go on shifting char */
@@ -294,9 +331,66 @@ void AnimationFont::charShiftTask()
         } else {
             Shift.Counter--;
             setChar(DISPLAY_NUMBER_OF_COLUMNS - (getFontWidth(Shift.Font) - Shift.Counter), getRowCenter(Shift.Font), Shift.Char, Shift.Font);
+            //setCharFast(DISPLAY_NUMBER_OF_COLUMNS - (getFontWidth(Shift.Font) - Shift.Counter), getRowCenter(Shift.Font), Shift.Char, Shift.Font);
         }
     }
 } /* charShiftTask */
+
+
+/******************************************************************************************************************************************************
+  setCharFontHorizontal()
+******************************************************************************************************************************************************/
+/*! \brief
+ *  \details
+ *
+ *  \return         -
+******************************************************************************************************************************************************/
+template <typename RowType, byte RowsSize>
+stdReturnType AnimationFont::setCharFontHorizontal(byte Column, byte Row, const FontCharHorizontal<RowType, RowsSize>& FontChar, byte Height)
+{
+    stdReturnType ReturnValue{E_OK};
+
+    for(byte FontColumn = 0; FontColumn < FontChar.getWidth(); FontColumn++)
+    {
+        RowType CharRow;
+        byte ColumnAbs = Column + FontColumn;
+        if(FontChar.getRow(FontColumn, CharRow) == E_NOT_OK) {
+            ReturnValue = E_NOT_OK;
+            break;
+        }
+        setCharRow(CharRow, ColumnAbs, Row, Height);
+    }
+    return ReturnValue;
+} /* setCharFontHorizontal */
+
+
+/******************************************************************************************************************************************************
+  setCharRow()
+******************************************************************************************************************************************************/
+/*! \brief
+ *  \details
+ *
+ *  \return         -
+******************************************************************************************************************************************************/
+template <typename RowType> 
+stdReturnType AnimationFont::setCharRow(RowType CharRow, byte Column, byte Row, byte Height)
+{
+    stdReturnType ReturnValue{E_OK};
+
+    for(byte FontRow = 0; FontRow < Height; FontRow++)
+    {
+        byte RowAbs = Row + Height - 1 - FontRow;
+        if(Column < DISPLAY_NUMBER_OF_COLUMNS && RowAbs < DISPLAY_NUMBER_OF_ROWS) {
+            if(pDisplay->writePixel(Column, RowAbs, bitRead(CharRow, FontRow)) == E_NOT_OK) {
+                ReturnValue = E_NOT_OK;
+                break;
+            }
+        } else {
+            break;
+        }
+    }
+    return ReturnValue;
+} /* setCharRow */
 
 
 /******************************************************************************************************************************************************
@@ -307,25 +401,59 @@ void AnimationFont::charShiftTask()
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-void AnimationFont::setCharFontHorizontalFast(byte Column, byte Row, char Char, const byte* FontTable, byte FontWidth, byte FontHeight)
+template <typename RowType, byte RowsSize>
+void AnimationFont::setCharFontHorizontalFast(byte Column, byte Row, const FontCharHorizontal<RowType, RowsSize>& FontChar, byte Height)
 {
-    byte FontIndex = Char;
+    stdReturnType ReturnValue{E_OK};
 
-    for(byte FontColumn = 0; FontColumn < FontWidth; FontColumn++)
+    for(byte FontColumn = 0; FontColumn < FontChar.getWidth(); FontColumn++)
     {
-        byte CharRow = pgm_read_byte(&FontTable[(FontIndex * FontWidth) + FontColumn]);
-        for(byte FontRow = 0; FontRow < FontHeight; FontRow++)
-        {
-            byte ColumnAbs = Column + FontColumn;
-            byte RowAbs = Row + FontHeight - 1 - FontRow;
-            if(ColumnAbs < DISPLAY_NUMBER_OF_COLUMNS && RowAbs < DISPLAY_NUMBER_OF_ROWS) {
-                pDisplay->writePixelFast(ColumnAbs, RowAbs, bitRead(CharRow, FontRow));
-            } else {
-                break;
-            }
+        RowType CharRow = FontChar.getRowFast(FontColumn);
+        byte ColumnAbs = Column + FontColumn;
+        setCharRow(CharRow, ColumnAbs, Row, Height);
+    }
+    return ReturnValue;
+} /* setCharFontHorizontalFast */
+
+
+/******************************************************************************************************************************************************
+  setCharRowFast()
+******************************************************************************************************************************************************/
+/*! \brief
+ *  \details
+ *
+ *  \return         -
+******************************************************************************************************************************************************/
+template <typename RowType> 
+void AnimationFont::setCharRowFast(RowType CharRow, byte Column, byte Row, byte Height)
+{
+    for(byte FontRow = 0; FontRow < Height; FontRow++)
+    {
+        byte RowAbs = Row + Height - 1 - FontRow;
+        if(Column < DISPLAY_NUMBER_OF_COLUMNS && RowAbs < DISPLAY_NUMBER_OF_ROWS) {
+            pDisplay->writePixelFast(Column, RowAbs, bitRead(CharRow, FontRow));
+        } else {
+            break;
         }
     }
-} /* setCharFontHorizontalFast */
+} /* setCharRowFast */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 /******************************************************************************************************************************************************
@@ -392,7 +520,7 @@ void AnimationFont::setCharFontVerticalFast(byte Column, byte Row, char Char, co
 
 
 /******************************************************************************************************************************************************
-  convertCharToSprite()
+  convertCharToFontIndex()
 ******************************************************************************************************************************************************/
 /*! \brief          converts char to sprite
  *  \details        this function converts the ASCII char to sprite index
@@ -414,11 +542,39 @@ stdReturnType AnimationFont::convertCharToFontIndex(char Char, byte& Index)
     else if('ö' == Char) { Index = 100; ReturnValue = E_OK; }
     else if('ü' == Char) { Index = 101; ReturnValue = E_OK; }
     /* for all others only add offset */
-    else if(Char >= ANIMATION_FONT_ASCII_CHAR_MIN && Char <= ANIMATION_FONT_ASCII_CHAR_MAX)
-    { Index = Char + ANIMATION_FONT_ASCII_TABLE_OFFSET; ReturnValue = E_OK; }
+    else if(Char >= ANIMATION_FONT_ASCII_CHAR_MIN && Char <= ANIMATION_FONT_ASCII_CHAR_MAX) {
+        Index = Char + ANIMATION_FONT_ASCII_TABLE_OFFSET; ReturnValue = E_OK; 
+    }
 
     return ReturnValue;
-} /* convertCharToSprite */
+} /* convertCharToFontIndex */
+
+
+/******************************************************************************************************************************************************
+  convertCharToFontIndex()
+******************************************************************************************************************************************************/
+/*! \brief          converts char to sprite
+ *  \details        this function converts the ASCII char to sprite index
+ *
+ *  \param[in]      Char            char to convert to sprite
+ *  \param[out]     SpriteIndex     appropriate sprite
+ *  \return         E_OK
+ *                  E_NOT_OK
+ *****************************************************************************************************************************************************/
+byte AnimationFont::convertCharToFontIndexFast(char Char)
+{
+    /* for umlauts we need a special treatment */
+    if('Ä' == Char)  return 96; 
+    else if('Ö' == Char) return 97;
+    else if('Ü' == Char) return 98;
+    else if('ä' == Char) return 99;
+    else if('ö' == Char) return 100;
+    else if('ü' == Char) return 101;
+    /* for all others only add offset */
+    else if(Char >= ANIMATION_FONT_ASCII_CHAR_MIN && Char <= ANIMATION_FONT_ASCII_CHAR_MAX) { 
+        return Char + ANIMATION_FONT_ASCII_TABLE_OFFSET;
+    }
+} /* convertCharToFontIndex */
 
 
 /******************************************************************************************************************************************************
