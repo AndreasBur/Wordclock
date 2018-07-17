@@ -40,6 +40,16 @@
 
 
 /******************************************************************************************************************************************************
+ *  G L O B A L   D A T A   T Y P E S   A N D   S T R U C T U R E S
+******************************************************************************************************************************************************/
+enum class Orientation {
+    ORIENTATION_HORIZONTAL,
+    ORIENTATION_VERTICAL,
+    ORIENTATION_NONE
+};
+
+
+/******************************************************************************************************************************************************
  *  C L A S S   F O N T C O M M O N
 ******************************************************************************************************************************************************/
 template <typename FontCharType, byte FontTableSize> class FontCommon
@@ -48,10 +58,6 @@ template <typename FontCharType, byte FontTableSize> class FontCommon
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-    enum OrientationType {
-        ORIENTATION_HORIZONTAL,
-        ORIENTATION_VERTICAL
-    };
 
     using FontTableElementType = FontCharType;
     using FontTableType = std::array<FontCharType, FontTableSize>;
@@ -83,23 +89,24 @@ template <typename FontCharType, byte FontTableSize> class FontCommon
 
 	// get methods
     const FontTableType& getFontTable() const { return FontTable; }
-
-	// set methods
-
-	// methods
-    virtual OrientationType getOrientation() const = 0;
-    virtual byte getFontWidth() const = 0;
-    virtual byte getFontHeight() const = 0;
+    virtual Orientation getOrientation() const = 0;
+    virtual byte getWidth() const = 0;
+    virtual byte getHeight() const = 0;
 
     FontCharType getCharFast(byte Index) const { return getFontTableElement(Index); }
     stdReturnType getChar(byte Index, FontCharType& FontChar) const {
         if(Index < FontTableSize) {
             FontChar = getFontTableElement(Index);
             return E_OK;
-        } else {
+            } else {
             return E_NOT_OK;
         }
     }
+
+	// set methods
+
+	// methods
+
 };
 
 #endif

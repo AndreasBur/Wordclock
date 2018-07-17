@@ -278,9 +278,6 @@
     <Compile Include="inc\Font\FontCommon.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="inc\Font\Font.h">
-      <SubType>compile</SubType>
-    </Compile>
     <Compile Include="inc\Font\FontCourierNew7x10.h">
       <SubType>compile</SubType>
     </Compile>
@@ -341,9 +338,6 @@
     <Compile Include="src\Animation\Clock\AnimationClockWipe.cpp">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="src\Animation\Fonts.cpp">
-      <SubType>compile</SubType>
-    </Compile>
     <Compile Include="src\Clock\Clock.cpp">
       <SubType>compile</SubType>
     </Compile>
@@ -357,9 +351,6 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="src\Display\DisplayWords.cpp">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="src\Font\Font.cpp">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="src\Font\FontCourierNew7x10.cpp">

@@ -3,8 +3,7 @@
 #include "Display.h"
 #include "Animation.h"
 #include "Clock.h"
-#include "FontTahoma10x10.h"
-#include "array.h"
+//#include "array.h"
 
 
 //volatile uint8_t* const PROGMEM port_to_mode_PGMdfg[] = {
@@ -44,7 +43,7 @@ void setup() {
 Display wcDisplay(20, 20, 20);
 Clock wcClock(&wcDisplay, Clock::MODE_WESSI);
 Animation wcAnimation(&wcDisplay, &wcClock);
-FontTahoma10x10 Font;
+//Font wcFont;
 
 void loop()
 {
@@ -55,8 +54,9 @@ void loop()
     wcClock.setClock(17,30);
     wcDisplay.show();
 
-    FontTahoma10x10::FontCharType Char;
-    //Char = Font.getCharFast(5);
-    Font.getChar(5, Char);
+    FontSprite5x8::FontCharType Char;
+    //Char = 
+    //wcFont.getCharFast(Font::FONT_5X8, (byte)5);
+    //Font.getChar(5, Char);
 
 }

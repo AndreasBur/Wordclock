@@ -114,8 +114,9 @@ template <typename RowType, byte RowsSize> class FontCharHorizontal : public Fon
     }
 
     // get methods
+    //byte getHeight() const { RowsSize; }
     RowType getRowFast(byte Index) const { return Rows[Index]; }
-    stdReturnType getRow(byte Index, RowType& Row) {
+    stdReturnType getRow(byte Index, RowType& Row) const {
         if(Index < RowsSize) {
             Row = Rows[Index];
             return E_OK;
@@ -127,11 +128,11 @@ template <typename RowType, byte RowsSize> class FontCharHorizontal : public Fon
 
     // set methods
     void setRowFast(byte Index, RowType Row) { Rows[Index] = Row; }
-    stdReturnType setRow(byte Index, RowType Row) {
+    stdReturnType setRow(byte Index, RowType Row) const {
         if(Index < RowsSize) {
             Rows[Index] = Row;
             return E_OK;
-            } else {
+        } else {
             return E_NOT_OK;
         }
     }
@@ -173,6 +174,7 @@ template <typename ColumnType, byte ColumnsSize> class FontCharVertical : public
     }
 
     // get methods
+    //byte getHeight() const { RowsSize; }
     ColumnType getColumnFast(byte Index) const { return Columns[Index]; }
     stdReturnType getColumn(byte Index, ColumnType& Column) {
         if(Index < ColumnsSize) {
@@ -190,7 +192,7 @@ template <typename ColumnType, byte ColumnsSize> class FontCharVertical : public
         if(Index < ColumnsSize) {
             Columns[Index] = Column;
             return E_OK;
-            } else {
+        } else {
             return E_NOT_OK;
         }
     }
