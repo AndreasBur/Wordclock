@@ -66,6 +66,7 @@
    warn or throw error if this timing can not be met with current F_CPU settings. */
 #define WS2812_ZERO_PULSE_DURATION_NS_CALC (((WS2812_ASM_W1_NOPs + WS2812_ASM_FIXED_CYCLES_LOW) * 1000000) / (F_CPU / 1000))
 
+
 #if (WS2812_ZERO_PULSE_DURATION_NS_CALC > 550)
     #error "WS2812: sorry, the clock speed is too low. Did you set F_CPU correctly?"
 #elif (WS2812_ZERO_PULSE_DURATION_NS_CALC > 450)
@@ -83,7 +84,7 @@
 /******************************************************************************************************************************************************
  *  LOCAL DATA TYPES AND STRUCTURES
 ******************************************************************************************************************************************************/
-const uint8_t Gamma7Table[] PROGMEM {133, 139, 145, 151, 158, 165, 172, 180, 188, 196, 205, 214, 224, 234, 244, 255};
+const WS2812::Gamma7TableElementType Gamma7Table[] PROGMEM {133, 139, 145, 151, 158, 165, 172, 180, 188, 196, 205, 214, 224, 234, 244, 255};
 
 
 /******************************************************************************************************************************************************
@@ -98,9 +99,8 @@ const uint8_t Gamma7Table[] PROGMEM {133, 139, 145, 151, 158, 165, 172, 180, 188
  *
  *  \return         -
  *****************************************************************************************************************************************************/
-WS2812::WS2812(byte Pin)
+WS2812::WS2812()
 {
-    setPin(Pin);
     Brightness = 255;
 #if (WS2812_RESET_TIMER == STD_ON)
     ResetTimer = 0;
@@ -129,8 +129,9 @@ WS2812::~WS2812()
  *                  
  *  \return         -
  *****************************************************************************************************************************************************/
-void WS2812::init()
+void WS2812::init(byte Pin)
 {
+    setPin(Pin);
     show();
 } /* init */
 
@@ -291,11 +292,10 @@ stdReturnType WS2812::setPin(byte Pin)
     if(Pin < NUM_DIGITAL_PINS) {
         PinMask = digitalPinToBitMask(Pin);
         PortOutputRegister = portOutputRegister(digitalPinToPort(Pin));
-        //PortModeRegister = portModeRegister(digitalPinToPort(Pin));
         pinMode(Pin, OUTPUT);
         return E_OK;
     } else {
-         return E_NOT_OK;
+        return E_NOT_OK;
     }
 } /* setPin */
 
@@ -383,7 +383,7 @@ void WS2812::setPixelFast(byte Index, byte Red, byte Green, byte Blue)
  *  \return         -
  *****************************************************************************************************************************************************/
 #if (WS2812_RGB_ORDER_ON_RUNTIME == STD_ON)
-void WS2812::setColorOrder(WS2812ColorOrderType ColorOrder)
+void WS2812::setColorOrder(ColorOrderType ColorOrder)
 {
     if(ColorOrder == COLOR_ORDER_BRG) {
         OffsetBlue = 0;
@@ -414,12 +414,12 @@ void WS2812::setColorOrder(WS2812ColorOrderType ColorOrder)
 /*! \brief          
  *  \details        calculates the gamma correction value with the help of a small table
  *                  and very efficient shift calculation
- *  param[in]       ValueLinear    7 bit unsigned (0..127)  
+ *  param[in]       ValueLinear    7 bit unsigned (0..127)
  *  \return         exponential value (approx. 1.0443^x) (1..255)
  *****************************************************************************************************************************************************/
 uint8_t WS2812::calcGamma7CorrectionValue(byte ValueLinear)
 {
-    uint8_t Exponent = pgm_read_byte(&Gamma7Table[ValueLinear % WS2812_GAMMA7_TABLE_NUMBER_OF_VALUES]);
+    Gamma7TableElementType Exponent = getGamma7TableElement(ValueLinear % WS2812_GAMMA7_TABLE_NUMBER_OF_VALUES);
     return Exponent >> (7 - ValueLinear / WS2812_GAMMA7_TABLE_NUMBER_OF_VALUES);
 } /* calcGamma7CorrectionValue */
 

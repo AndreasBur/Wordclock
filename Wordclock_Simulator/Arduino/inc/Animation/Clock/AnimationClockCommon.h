@@ -40,7 +40,7 @@
 
 
 /******************************************************************************************************************************************************
- *  C L A S S   T E M P L A T E
+ *  C L A S S   A N I M A T I O N C L O C K C O M M O N
 ******************************************************************************************************************************************************/
 class AnimationClockCommon
 {
@@ -48,19 +48,27 @@ class AnimationClockCommon
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-      enum StateType {
-          STATE_NONE,
-          STATE_UNINIT,
-          STATE_IDLE,
-          STATE_CLEAR_TIME,
-          STATE_SET_TIME
-      };
+    enum StateType {
+        STATE_NONE,
+        STATE_UNINIT,
+        STATE_IDLE,
+        STATE_CLEAR_TIME,
+        STATE_SET_TIME
+    };
   
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
-    StateType State;
+
+
+/******************************************************************************************************************************************************
+ *  P R O T E C T E D   D A T A   A N D   F U N C T I N O N S
+******************************************************************************************************************************************************/
+  protected:
+      StateType State;
+      Clock* pClock;
+      Display* pDisplay;
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
@@ -73,15 +81,18 @@ class AnimationClockCommon
     StateType getState() const { return State; }
 
 	// set methods
-    void setState(StateType sState) { State = sState; }
 
 	// methods
-    boolean isPixelPartOfClockWords(Clock::ClockWordsTableType, byte, byte);
-    boolean isPixelPartOfClockWords(Clock::ClockWordsTableType, byte);
+    void init(Display*, Clock*, StateType);
+    void show() { pDisplay->show(); }
+    boolean isPixelPartOfClockWords(Clock::ClockWordsTableType, byte, byte) const;
+    boolean isPixelPartOfClockWords(Clock::ClockWordsTableType, byte) const;
+    virtual void task() = 0;
+    virtual stdReturnType setClock(byte, byte) = 0;
 };
 
-#endif
 
+#endif
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E
 ******************************************************************************************************************************************************/

@@ -60,7 +60,7 @@
 
 
 /******************************************************************************************************************************************************
- *  CLASS  Clock
+ *  C L A S S   C L O C K
 ******************************************************************************************************************************************************/
 class Clock
 {
@@ -135,12 +135,12 @@ class Clock
     static const MinutesType MinutesTable[][CLOCK_NUMBER_OF_MINUTE_STEPS];
     
     // functions
-    MinutesTableElementType getMinutesTableElement(ModesType Mode, byte Minute) {
+    MinutesTableElementType getMinutesTableElement(ModesType Mode, byte Minute) const {
         MinutesTableElementType MinutesTableElement;
         memcpy_P(&MinutesTableElement, &MinutesTable[Mode][Minute / CLOCK_MINUTE_STEP_IN_MINUTES], sizeof(MinutesType));
         return MinutesTableElement;
     }
-    HoursTableElementType getHoursTableElement(HourModesType HourMode, byte Hour) {
+    HoursTableElementType getHoursTableElement(HourModesType HourMode, byte Hour) const {
         HoursTableElementType HoursTableElement;
         memcpy_P(&HoursTableElement, &HoursTable[HourMode][Hour], sizeof(HoursType));
         return HoursTableElement;
@@ -156,14 +156,15 @@ class Clock
 
     // get methods
     ModesType getMode() const { return Mode; }
-    stdReturnType getClockWords(byte, byte, ClockWordsType*);
-    stdReturnType getClockWords(byte, byte, ClockWordsTableType);
+    stdReturnType getClockWords(byte, byte, ClockWordsType*) const;
+    stdReturnType getClockWords(byte, byte, ClockWordsTableType) const;
 
     // set methods
     void setMode(ModesType sMode) { Mode = sMode; }
 
     // methods
     stdReturnType setClock(byte, byte);
+    void setClockFast(byte, byte);
     void show() { pDisplay->show(); }
 };
 

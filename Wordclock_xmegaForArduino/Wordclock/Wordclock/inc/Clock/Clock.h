@@ -164,6 +164,7 @@ class Clock
 
     // methods
     stdReturnType setClock(byte, byte);
+    void setClockFast(byte, byte);
     void show() { pDisplay->show(); }
 };
 

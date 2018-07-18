@@ -41,7 +41,7 @@
 
 
 /******************************************************************************************************************************************************
- *  C L A S S   T E M P L A T E
+ *  C L A S S   A N I M A T O N C L O C K F A D E
 ******************************************************************************************************************************************************/
 class AnimationClockFade : public AnimationClockCommon
 {
@@ -55,8 +55,6 @@ class AnimationClockFade : public AnimationClockCommon
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
-    Clock* pClock;
-    Display* pDisplay;
     byte DisplayBrightness;
     byte Hour;
     byte Minute;
@@ -84,8 +82,6 @@ class AnimationClockFade : public AnimationClockCommon
     void init(Display*, Clock*);
     stdReturnType setClock(byte, byte);
     void task();
-    void init();
-    void show() { pDisplay->show(); }
 };
 
 #endif

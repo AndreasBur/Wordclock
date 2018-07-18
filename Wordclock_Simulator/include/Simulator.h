@@ -38,7 +38,10 @@ class Simulator : public wxFrame
         //stdReturnType getPixelDimmed(byte, WS2812PixelType*);
 
         // set methods
-        void setBrightness(byte sBrightness, bool GammaCorrection = false) { Brightness = sBrightness;}
+        void setBrightness(byte sBrightness, bool sGammaCorrection = false) {
+            Brightness = sBrightness;
+            GammaCorrection = sGammaCorrection;
+        }
         //stdReturnType setPin(byte);
         stdReturnType setPixel(byte, PixelType);
         stdReturnType setPixel(byte, byte, byte, byte);
@@ -48,7 +51,7 @@ class Simulator : public wxFrame
         void clearPixelFast(byte Index) { setPixelFast(Index, 0, 0, 0); }
 
         // methods
-        //void init();
+        void init(byte sPin) { Pin = sPin; }
         void clearAllPixels();
         //stdReturnType clearPixel(byte Index) { return setPixel(Index, 0, 0, 0); }
         void show() { Refresh(); }
@@ -67,6 +70,8 @@ class Simulator : public wxFrame
 
         wxStaticText* Characters[DISPLAY_NUMBER_OF_ROWS][DISPLAY_NUMBER_OF_COLUMNS];
         uint8_t Brightness;
+        bool GammaCorrection;
+        byte Pin;
 
         wxButton* BtnAbout;
         wxButton* BtnQuit;

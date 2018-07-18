@@ -9,10 +9,10 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       AnimationClockDrop.cpp
- *      \brief
+ *      \brief      
  *
- *      \details
- *
+ *      \details    
+ *                  
  *
 ******************************************************************************************************************************************************/
 #define _ANIMATION_CLOCK_DROP_SOURCE_
@@ -54,8 +54,6 @@
 ******************************************************************************************************************************************************/
 AnimationClockDrop::AnimationClockDrop()
 {
-    pDisplay = nullptr;
-    pClock = nullptr;
     reset();
 } /* AnimationClockDrop */
 
@@ -72,16 +70,14 @@ AnimationClockDrop::~AnimationClockDrop()
 /******************************************************************************************************************************************************
   init()
 ******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
+/*! \brief          
+ *  \details        
+ *                  
  *  \return         -
 ******************************************************************************************************************************************************/
 void AnimationClockDrop::init(Display* Display, Clock* Clock)
 {
-    pDisplay = Display;
-    pClock = Clock;
-    setState(AnimationClockCommon::STATE_IDLE);
+    AnimationClockCommon::init(Display, Clock, AnimationClockCommon::STATE_IDLE);
     reset();
 } /* init */
 
@@ -89,9 +85,9 @@ void AnimationClockDrop::init(Display* Display, Clock* Clock)
 /******************************************************************************************************************************************************
   setClock()
 ******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
+/*! \brief          
+ *  \details        
+ *                  
  *  \return         -
 ******************************************************************************************************************************************************/
 stdReturnType AnimationClockDrop::setClock(byte Hour, byte Minute)
@@ -101,7 +97,7 @@ stdReturnType AnimationClockDrop::setClock(byte Hour, byte Minute)
     if(pClock->getClockWords(Hour, Minute, ClockWordsTable) == E_OK && getState() == AnimationClockCommon::STATE_IDLE) {
         setNextWordIndex();
         if(setNextActivePixelIndex() == E_NOT_OK) { setStateToSetTime(); }
-        else { setState(AnimationClockCommon::STATE_CLEAR_TIME); }
+        else { State = AnimationClockCommon::STATE_CLEAR_TIME; }
     }
     return ReturnValue;
 } /* setClock */
@@ -110,9 +106,9 @@ stdReturnType AnimationClockDrop::setClock(byte Hour, byte Minute)
 /******************************************************************************************************************************************************
   task()
 ******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
+/*! \brief          
+ *  \details        
+ *                  
  *  \return         -
 ******************************************************************************************************************************************************/
 void AnimationClockDrop::task()
@@ -145,9 +141,9 @@ void AnimationClockDrop::reset()
 /******************************************************************************************************************************************************
   clearTimeTask()
 ******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
+/*! \brief          
+ *  \details        
+ *                  
  *  \return         -
 ******************************************************************************************************************************************************/
 void AnimationClockDrop::clearTimeTask()
@@ -169,21 +165,21 @@ void AnimationClockDrop::clearTimeTask()
 /******************************************************************************************************************************************************
   setTimeTask()
 ******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
+/*! \brief          
+ *  \details        
+ *                  
  *  \return         -
 ******************************************************************************************************************************************************/
 void AnimationClockDrop::setTimeTask()
 {
-    DisplayWords::WordType CurrentWord = Words.getDisplayWordFast(ClockWordsTable[CurrenWordIndex]);
-    const byte MaxColumn = Words.getDisplayWordColumnFast(ClockWordsTable[CurrenWordIndex]) + CurrentWord.Length - 1;
+    DisplayWord CurrentWord = Words.getDisplayWordFast(ClockWordsTable[CurrenWordIndex]);
+    const byte MaxColumn = Words.getDisplayWordColumnFast(ClockWordsTable[CurrenWordIndex]) + CurrentWord.getLength() - 1;
 
-    if(setNextRow(CurrentWord.Row) == E_OK) {
+    if(setNextRow(CurrentWord.getRow()) == E_OK) {
         pDisplay->clearPixelFast(Column, Row - 1);
     } else {
         if(setNextColumn(MaxColumn) == E_NOT_OK) {
-            setState(AnimationClockCommon::STATE_IDLE);
+            State = AnimationClockCommon::STATE_IDLE;
         }
     }
     pDisplay->setPixelFast(Column, Row);
@@ -240,10 +236,9 @@ stdReturnType AnimationClockDrop::setNextWordIndex()
 ******************************************************************************************************************************************************/
 void AnimationClockDrop::setStateToSetTime()
 {
-    Row = 0;
     Column = Words.getDisplayWordColumnFast(ClockWordsTable[CurrenWordIndex]);
     pDisplay->setPixelFast(Column, Row);
-    setState(AnimationClockCommon::STATE_SET_TIME);
+    State = AnimationClockCommon::STATE_SET_TIME;
 } /* setStateToSetTime */
 
 
@@ -295,3 +290,4 @@ stdReturnType AnimationClockDrop::setNextColumn(byte MaxColumn)
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E
 ******************************************************************************************************************************************************/
+ 

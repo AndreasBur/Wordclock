@@ -31,7 +31,7 @@ WordclockDialog::WordclockDialog(wxDialog *dlg, const wxString &title) : wxDialo
     Time = wxDateTime::Now();
     int Hour = Time.GetHour();
     int Minute = Time.GetMinute();
-    WcClock.setClock(Hour, Minute);
+    WcClock.setClock(12, 42);
 
     //WcDisplay.setPixelRowFast(5, 0xFFFF);
     //WcDisplay.show();
@@ -76,7 +76,7 @@ void WordclockDialog::OnTimer(wxTimerEvent& event)
     WcClock.getClockWords(Hour, Minute, &NewTimeWords);
 
     if(NewTimeWords != CurrentTimeWords) {
-        CurrentTimeWords = NewTimeWords;
+        //CurrentTimeWords = NewTimeWords;
         //WcDisplay.clearAllWords();
         //WcDisplay.clear();
         //WcClock.setClock(Hour, Minute);

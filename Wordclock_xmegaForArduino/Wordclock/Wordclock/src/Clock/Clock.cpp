@@ -277,7 +277,34 @@ stdReturnType Clock::setClock(byte Hour, byte Minute)
         if(pDisplay->setWord(ClockWords.MinuteWords[Index]) == E_NOT_OK) ReturnValue = E_NOT_OK;
     }
     return ReturnValue;
-} /* show */
+} /* setClock */
+
+
+/******************************************************************************************************************************************************
+  setClockFast()
+******************************************************************************************************************************************************/
+/*! \brief
+ *  \details
+ *
+ *  \return         -
+******************************************************************************************************************************************************/
+void Clock::setClockFast(byte Hour, byte Minute)
+{
+    ClockWordsType ClockWords;
+
+    if(getClockWords(Hour, Minute, &ClockWords) == E_OK) {
+        if(ClockWords.ShowItIs) {
+            pDisplay->setWordFast(DisplayWords::WORD_ES);
+            pDisplay->setWordFast(DisplayWords::WORD_IST);
+        }
+        for(byte Index = 0; Index < CLOCK_MAX_NUMBER_OF_HOUR_WORDS && ClockWords.HourWords[Index] != DisplayWords::WORD_NONE; Index++) {
+            pDisplay->setWordFast(ClockWords.HourWords[Index]);
+        }
+        for(byte Index = 0; Index < CLOCK_MAX_NUMBER_OF_MINUTE_WORDS && ClockWords.MinuteWords[Index] != DisplayWords::WORD_NONE; Index++) {
+            pDisplay->setWordFast(ClockWords.MinuteWords[Index]);
+        }
+    }
+} /* setClockFast */
 
 
 /******************************************************************************************************************************************************

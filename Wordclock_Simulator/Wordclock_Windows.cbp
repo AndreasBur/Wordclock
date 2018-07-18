@@ -50,6 +50,7 @@
 			</Target>
 		</Build>
 		<Compiler>
+			<Add option="-Wextra" />
 			<Add option="-Wall" />
 			<Add option="-std=c++11" />
 			<Add option="-pipe" />
@@ -66,6 +67,7 @@
 			<Add directory="Arduino/inc/Transformation" />
 			<Add directory="../Wordclock" />
 			<Add directory="Arduino/inc/Animation/Clock" />
+			<Add directory="Arduino/inc/Font" />
 		</Compiler>
 		<ResourceCompiler>
 			<Add directory="$(#wx31)/include" />
@@ -87,7 +89,15 @@
 		<Unit filename="Arduino/inc/Clock/Clock.h" />
 		<Unit filename="Arduino/inc/Display/Display.h" />
 		<Unit filename="Arduino/inc/Display/DisplayCharacters.h" />
+		<Unit filename="Arduino/inc/Display/DisplayWord.h" />
 		<Unit filename="Arduino/inc/Display/DisplayWords.h" />
+		<Unit filename="Arduino/inc/Font/FontChar.h" />
+		<Unit filename="Arduino/inc/Font/FontCommon.h" />
+		<Unit filename="Arduino/inc/Font/FontCourierNew7x10.h" />
+		<Unit filename="Arduino/inc/Font/FontCourierNew7x9.h" />
+		<Unit filename="Arduino/inc/Font/FontLucidaSans9x10.h" />
+		<Unit filename="Arduino/inc/Font/FontSprite5x8.h" />
+		<Unit filename="Arduino/inc/Font/FontTahoma10x10.h" />
 		<Unit filename="Arduino/inc/StandardTypes/StandardTypes.h" />
 		<Unit filename="Arduino/inc/Transformation/Transformation.h" />
 		<Unit filename="Arduino/src/Animation/Animation.cpp" />
@@ -101,11 +111,16 @@
 		<Unit filename="Arduino/src/Animation/Clock/AnimationClockSnake.cpp" />
 		<Unit filename="Arduino/src/Animation/Clock/AnimationClockTeletype.cpp" />
 		<Unit filename="Arduino/src/Animation/Clock/AnimationClockWipe.cpp" />
-		<Unit filename="Arduino/src/Animation/Fonts.cpp" />
 		<Unit filename="Arduino/src/Clock/Clock.cpp" />
 		<Unit filename="Arduino/src/Display/Display.cpp" />
 		<Unit filename="Arduino/src/Display/DisplayCharacters.cpp" />
+		<Unit filename="Arduino/src/Display/DisplayWord.cpp" />
 		<Unit filename="Arduino/src/Display/DisplayWords.cpp" />
+		<Unit filename="Arduino/src/Font/FontCourierNew7x10.cpp" />
+		<Unit filename="Arduino/src/Font/FontCourierNew7x9.cpp" />
+		<Unit filename="Arduino/src/Font/FontLucidaSans9x10.cpp" />
+		<Unit filename="Arduino/src/Font/FontSprite5x8.cpp" />
+		<Unit filename="Arduino/src/Font/FontTahoma10x10.cpp" />
 		<Unit filename="Arduino/src/Transformation/Transformation.cpp" />
 		<Unit filename="Wordclock.ico" />
 		<Unit filename="WordclockApp.cpp" />

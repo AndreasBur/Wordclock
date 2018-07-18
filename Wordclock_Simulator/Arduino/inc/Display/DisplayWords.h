@@ -22,6 +22,7 @@
 ******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Arduino.h"
+#include "DisplayWord.h"
 
 /******************************************************************************************************************************************************
  *  GLOBAL CONSTANT MACROS
@@ -44,7 +45,7 @@
 
 
 /******************************************************************************************************************************************************
- *  CLASS  DisplayWords
+ *  C L A S S  D I S P L A Y W O R D S
 ******************************************************************************************************************************************************/
 class DisplayWords
 {
@@ -82,18 +83,21 @@ class DisplayWords
         WORD_UHR,
         WORD_NUMBER_OF_WORDS
     };
-
-    struct WordType {
-        byte Row;
-        byte Column;
-        byte Length;
-    };
+	
+	using DisplayWordsTableElementType = DisplayWord;
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
-    static const WordType DisplayWordsTable[];
+    static const DisplayWord DisplayWordsTable[];
+	
+	// functions
+    DisplayWordsTableElementType getDisplayWordsTableElement(byte WordId) const {
+        DisplayWordsTableElementType DisplayWordsTableElement;
+        memcpy_P(&DisplayWordsTableElement, &DisplayWordsTable[WordId], sizeof(DisplayWordsTableElementType));
+        return DisplayWordsTableElement;
+    }
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
@@ -103,16 +107,16 @@ class DisplayWords
     ~DisplayWords();
 
 	// get methods
-    stdReturnType getDisplayWord(WordIdType, WordType&) const;
+    stdReturnType getDisplayWord(WordIdType, DisplayWord&) const;
     stdReturnType getDisplayWordLength(WordIdType, byte&) const;
     stdReturnType getDisplayWordColumn(WordIdType, byte&) const;
     stdReturnType getDisplayWordRow(WordIdType, byte&) const;
 
     // get methods fast
-    WordType getDisplayWordFast(WordIdType WordId) const { WordType Word; memcpy_P(&Word, &DisplayWordsTable[WordId], sizeof(Word)); return Word; }
-    byte getDisplayWordRowFast(WordIdType WordId) const { WordType Word; memcpy_P(&Word, &DisplayWordsTable[WordId], sizeof(Word)); return Word.Row; }
-    byte getDisplayWordColumnFast(WordIdType WordId) const { WordType Word; memcpy_P(&Word, &DisplayWordsTable[WordId], sizeof(Word)); return Word.Column; }
-    byte getDisplayWordLengthFast(WordIdType WordId) const { WordType Word; memcpy_P(&Word, &DisplayWordsTable[WordId], sizeof(Word)); return Word.Length; }
+    DisplayWord getDisplayWordFast(WordIdType WordId) const { return getDisplayWordsTableElement(WordId); }
+    byte getDisplayWordRowFast(WordIdType WordId) const { return getDisplayWordsTableElement(WordId).getRow(); }
+    byte getDisplayWordColumnFast(WordIdType WordId) const { return getDisplayWordsTableElement(WordId).getColumn(); }
+    byte getDisplayWordLengthFast(WordIdType WordId) const { return getDisplayWordsTableElement(WordId).getRow(); }
 
 	// set methods
 

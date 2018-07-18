@@ -8,30 +8,29 @@
  *  ---------------------------------------------------------------------------------------------------------------------------------------------------
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       AnimationClockSnake.h
+/**     \file       DisplayWord.h
  *      \brief      
  *
  *      \details    
  *                  
 ******************************************************************************************************************************************************/
-#ifndef _ANIMATION_CLOCK_SNAKE_H_
-#define _ANIMATION_CLOCK_SNAKE_H_
+#ifndef _DISPLAY_WORD_H_
+#define _DISPLAY_WORD_H_
 
 /******************************************************************************************************************************************************
  * I N C L U D E S
 ******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Arduino.h"
-#include "Clock.h"
-#include "AnimationClockCommon.h"
+
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
-/* AnimationClockSnake configuration parameter */
-#define ANIMATION_CLOCK_SNAKE_LENGTH              8
+/* DisplayWord configuration parameter */
 
-/* AnimationClockSnake parameter */
+
+/* DisplayWord parameter */
 
 
 
@@ -41,53 +40,47 @@
 
 
 /******************************************************************************************************************************************************
- *  C L A S S   A N I M A T I O N C L O C K S N A K E
+ *  C L A S S   D I S P L A Y W O R D
 ******************************************************************************************************************************************************/
-class AnimationClockSnake : public AnimationClockCommon
+class DisplayWord
 {
 /******************************************************************************************************************************************************
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-    enum SnakeStateType {
-        SNAKE_STATE_TO_RIGHT,
-        SNAKE_STATE_TO_LEFT
-    };
+  
   
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
-    SnakeStateType SnakeState;
-    Clock::ClockWordsTableType ClockWordsTable;
-    byte SnakeBeginIndex;
-    byte SnakeEndIndex;
-
-    // functions
-    void reset();
-    byte transformToSerpentine(byte, byte) const;
-    byte transformToSerpentine(byte) const;
+    byte Column;
+    byte Row;
+    byte Length;
   
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    AnimationClockSnake();
-    ~AnimationClockSnake();
+    constexpr DisplayWord(byte sColumn, byte sRow, byte sLength) : Column(sColumn), Row(sRow), Length(sLength) {}
+    DisplayWord();
 
 	// get methods
-
-
+    byte getLength() const { return Length; }
+	byte getRow() const { return Row; }
+	byte getColumn() const { return Column; }
+    
 	// set methods
+    void setLength(byte sLength) { Length = sLength; }
+    void setRow(byte sRow) { Row = sRow; }
+    void setColumn(byte sColumn) { Column = sColumn; }
 
 	// methods
-    void init(Display*, Clock*);
-    stdReturnType setClock(byte, byte);
-    void task();
+
 };
 
-
 #endif
+
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E
 ******************************************************************************************************************************************************/

@@ -93,12 +93,12 @@ void Animation::init()
 Animation::StateType Animation::getState()
 {
     if( wcAnimationClock.getState() == AnimationClockCommon::STATE_CLEAR_TIME ||
-    wcAnimationClock.getState() == AnimationClockCommon::STATE_SET_TIME)
+        wcAnimationClock.getState() == AnimationClockCommon::STATE_SET_TIME)
     {
         return STATE_CLOCK;
     }
     else if( wcAnimationFont.getState() == AnimationFont::STATE_CHAR_SHIFT ||
-    wcAnimationFont.getState() == AnimationFont::STATE_TEXT_SHIFT)
+             wcAnimationFont.getState() == AnimationFont::STATE_TEXT_SHIFT)
     {
         return STATE_FONT;
     }
@@ -123,7 +123,7 @@ void Animation::task()
         wcAnimationClock.task();
     }
     else if( wcAnimationFont.getState() == AnimationFont::STATE_CHAR_SHIFT ||
-        wcAnimationFont.getState() == AnimationFont::STATE_TEXT_SHIFT)
+             wcAnimationFont.getState() == AnimationFont::STATE_TEXT_SHIFT)
     {
         wcAnimationFont.task();
     }
@@ -146,7 +146,7 @@ void Animation::show()
         wcAnimationClock.show();
     }
     else if( wcAnimationFont.getState() == AnimationFont::STATE_CHAR_SHIFT ||
-        wcAnimationFont.getState() == AnimationFont::STATE_TEXT_SHIFT)
+             wcAnimationFont.getState() == AnimationFont::STATE_TEXT_SHIFT)
     {
         wcAnimationFont.show();
     }
