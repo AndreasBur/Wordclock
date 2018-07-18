@@ -95,7 +95,7 @@ stdReturnType AnimationClockShift::setClock(byte Hour, byte Minute)
 {
     stdReturnType ReturnValue{E_NOT_OK};
 
-    if(pClock->getClockWords(Hour, Minute, ClockWordsTable) == E_OK && getState() == AnimationClockCommon::STATE_IDLE) {
+    if(pClock->getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == AnimationClockCommon::STATE_IDLE) {
         State = AnimationClockCommon::STATE_CLEAR_TIME;
     }
     return ReturnValue;
@@ -112,8 +112,8 @@ stdReturnType AnimationClockShift::setClock(byte Hour, byte Minute)
 ******************************************************************************************************************************************************/
 void AnimationClockShift::task()
 {
-    if(getState() == AnimationClockCommon::STATE_CLEAR_TIME) { clearTimeTask(); }
-    else if(getState() == AnimationClockCommon::STATE_SET_TIME) { setTimeTask(); }
+    if(State == AnimationClockCommon::STATE_CLEAR_TIME) { clearTimeTask(); }
+    if(State == AnimationClockCommon::STATE_SET_TIME) { setTimeTask(); }
 } /* task */
 
 
