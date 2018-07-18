@@ -53,7 +53,7 @@
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-Display::Display(PixelColorType sColor)
+Display::Display(PixelColorType sColor) : Pixels()
 {
     Color = sColor;
     State = STATE_UNINIT;
@@ -73,7 +73,7 @@ Display::Display(PixelColorType sColor)
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-Display::Display(byte Red, byte Green, byte Blue)
+Display::Display(byte Red, byte Green, byte Blue) : Pixels()
 {
     Color.Red = Red;
     Color.Green = Green;

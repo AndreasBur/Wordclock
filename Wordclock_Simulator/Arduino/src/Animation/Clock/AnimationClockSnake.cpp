@@ -119,13 +119,13 @@ void AnimationClockSnake::task()
         pDisplay->setPixelFast(transformToSerpentine(SnakeBeginIndex));
 
         if((SnakeBeginIndex - SnakeEndIndex) == ANIMATION_CLOCK_SNAKE_LENGTH ||
-           (SnakeBeginIndex >= DISPLAY_NUMBER_OF_LEDS && SnakeEndIndex < DISPLAY_NUMBER_OF_LEDS))
+           (SnakeBeginIndex >= DISPLAY_NUMBER_OF_LEDS - 1 && SnakeEndIndex < DISPLAY_NUMBER_OF_LEDS))
         {
             //pDisplay->clearPixelFast(SnakeEndIndexTrans);
             if(isPixelPartOfClockWords(ClockWordsTable, SnakeEndIndexTrans) == false) pDisplay->clearPixelFast(SnakeEndIndexTrans);
             SnakeEndIndex++;
         }
-        if(SnakeBeginIndex < DISPLAY_NUMBER_OF_LEDS) SnakeBeginIndex++;
+        if(SnakeBeginIndex < DISPLAY_NUMBER_OF_LEDS - 1) SnakeBeginIndex++;
         if(SnakeEndIndex >= DISPLAY_NUMBER_OF_LEDS) State = AnimationClockCommon::STATE_IDLE;
     }
 } /* task */

@@ -113,7 +113,7 @@ stdReturnType AnimationClockShift::setClock(byte Hour, byte Minute)
 void AnimationClockShift::task()
 {
     if(getState() == AnimationClockCommon::STATE_CLEAR_TIME) { clearTimeTask(); }
-    if(getState() == AnimationClockCommon::STATE_SET_TIME) { setTimeTask(); }
+    else if(getState() == AnimationClockCommon::STATE_SET_TIME) { setTimeTask(); }
 } /* task */
 
 

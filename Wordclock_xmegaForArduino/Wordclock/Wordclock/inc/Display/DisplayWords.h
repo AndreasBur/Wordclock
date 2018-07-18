@@ -116,7 +116,7 @@ class DisplayWords
     DisplayWord getDisplayWordFast(WordIdType WordId) const { return getDisplayWordsTableElement(WordId); }
     byte getDisplayWordRowFast(WordIdType WordId) const { return getDisplayWordsTableElement(WordId).getRow(); }
     byte getDisplayWordColumnFast(WordIdType WordId) const { return getDisplayWordsTableElement(WordId).getColumn(); }
-    byte getDisplayWordLengthFast(WordIdType WordId) const { return getDisplayWordsTableElement(WordId).getRow(); }
+    byte getDisplayWordLengthFast(WordIdType WordId) const { return getDisplayWordsTableElement(WordId).getLength(); }
 
 	// set methods
 

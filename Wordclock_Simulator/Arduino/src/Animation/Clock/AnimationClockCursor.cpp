@@ -9,10 +9,10 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       AnimationClockCursor.cpp
- *      \brief      
+ *      \brief
  *
- *      \details    
- *                  
+ *      \details
+ *
  *
 ******************************************************************************************************************************************************/
 #define _ANIMATION_CLOCK_CURSOR_SOURCE_
@@ -70,9 +70,9 @@ AnimationClockCursor::~AnimationClockCursor()
 /******************************************************************************************************************************************************
   init()
 ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
+/*! \brief
+ *  \details
+ *
  *  \return         -
 ******************************************************************************************************************************************************/
 void AnimationClockCursor::init(Display* Display, Clock* Clock)
@@ -85,9 +85,9 @@ void AnimationClockCursor::init(Display* Display, Clock* Clock)
 /******************************************************************************************************************************************************
   setClock()
 ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
+/*! \brief
+ *  \details
+ *
  *  \return         -
 ******************************************************************************************************************************************************/
 stdReturnType AnimationClockCursor::setClock(byte Hour, byte Minute)
@@ -106,17 +106,17 @@ stdReturnType AnimationClockCursor::setClock(byte Hour, byte Minute)
 /******************************************************************************************************************************************************
   task()
 ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
+/*! \brief
+ *  \details
+ *
  *  \return         -
 ******************************************************************************************************************************************************/
 void AnimationClockCursor::task()
 {
     if(getState() == AnimationClockCommon::STATE_SET_TIME) {
-        pDisplay->setPixelFast(CurrentPixelIndex);
+        if(CurrentPixelIndex < DISPLAY_NUMBER_OF_PIXELS) { pDisplay->setPixelFast(CurrentPixelIndex); }
         if(CurrentPixelIndex > 0) {
-            if(isPixelPartOfClockWords(ClockWordsTable, CurrentPixelIndex - 1) == false) { 
+            if(isPixelPartOfClockWords(ClockWordsTable, CurrentPixelIndex - 1) == false) {
                 pDisplay->clearPixelFast(CurrentPixelIndex - 1);
             }
         }

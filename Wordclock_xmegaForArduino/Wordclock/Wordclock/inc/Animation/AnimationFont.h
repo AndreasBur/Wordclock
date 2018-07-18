@@ -157,7 +157,7 @@ class AnimationFont
 	// set methods
 
 	// methods
-    void init();
+    void init() {}
     void show() { pDisplay->show(); }
     void task();
     stdReturnType setChar(byte, byte, char, FontType);

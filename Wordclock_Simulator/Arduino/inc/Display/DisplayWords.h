@@ -9,10 +9,10 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       DisplayWords.h
- *      \brief      
+ *      \brief
  *
- *      \details    
- *                  
+ *      \details
+ *
 ******************************************************************************************************************************************************/
 #ifndef _DISPLAY_WORDS_H_
 #define _DISPLAY_WORDS_H_
@@ -83,7 +83,7 @@ class DisplayWords
         WORD_UHR,
         WORD_NUMBER_OF_WORDS
     };
-	
+
 	using DisplayWordsTableElementType = DisplayWord;
 
 /******************************************************************************************************************************************************
@@ -91,7 +91,7 @@ class DisplayWords
 ******************************************************************************************************************************************************/
   private:
     static const DisplayWord DisplayWordsTable[];
-	
+
 	// functions
     DisplayWordsTableElementType getDisplayWordsTableElement(byte WordId) const {
         DisplayWordsTableElementType DisplayWordsTableElement;
@@ -116,7 +116,7 @@ class DisplayWords
     DisplayWord getDisplayWordFast(WordIdType WordId) const { return getDisplayWordsTableElement(WordId); }
     byte getDisplayWordRowFast(WordIdType WordId) const { return getDisplayWordsTableElement(WordId).getRow(); }
     byte getDisplayWordColumnFast(WordIdType WordId) const { return getDisplayWordsTableElement(WordId).getColumn(); }
-    byte getDisplayWordLengthFast(WordIdType WordId) const { return getDisplayWordsTableElement(WordId).getRow(); }
+    byte getDisplayWordLengthFast(WordIdType WordId) const { return getDisplayWordsTableElement(WordId).getLength(); }
 
 	// set methods
 
