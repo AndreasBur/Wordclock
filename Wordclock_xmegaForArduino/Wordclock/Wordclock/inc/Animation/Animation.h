@@ -88,6 +88,7 @@ class Animation
 
     // AnimationClock functions
     stdReturnType setChar(byte Column, byte Row, char Char, AnimationFont::FontType Font) { return wcAnimationFont.setChar(Column, Row, Char, Font); }
+    void setCharFast(byte Column, byte Row, char Char, AnimationFont::FontType Font) { wcAnimationFont.setCharFast(Column, Row, Char, Font); }
     void setCharWithShift(char Char, AnimationFont::FontType Font) { wcAnimationFont.setCharWithShift(Char, Font); }
     void setText(char* Text, AnimationFont::FontType Font) { wcAnimationFont.setText(Text, Font); }
     void setTextWithShift(char* Text, AnimationFont::FontType Font) { wcAnimationFont.setTextWithShift(Text, Font); }

@@ -126,20 +126,16 @@ class AnimationFont
     template <typename RowType>
     void setCharRowFast(RowType, byte, byte, byte);
 
+
     template <typename ColumnType, byte ColumnsSize>
-    stdReturnType setCharFontVertical(byte, byte, char, const FontCharVertical<ColumnType, ColumnsSize>&, byte FontHeight);
+    stdReturnType setCharFontVertical(byte, byte, const FontCharVertical<ColumnType, ColumnsSize>&, byte);
     template <typename ColumnType>
     stdReturnType setCharColumn(ColumnType, byte, byte, byte);
 
     template <typename ColumnType, byte ColumnsSize>
-    void setCharFontVerticalFast(byte, byte, char, const FontCharVertical<ColumnType, ColumnsSize>&, byte FontHeight);
+    void setCharFontVerticalFast(byte, byte, const FontCharVertical<ColumnType, ColumnsSize>&, byte);
     template <typename ColumnType>
     void setCharColumnFast(ColumnType, byte, byte, byte);
-
-    //stdReturnType setCharFontHorizontal(byte, byte, char, const byte*, byte, byte);
-    //stdReturnType setCharFontVertical(byte, byte, char, const byte*, byte, byte);
-    void setCharFontHorizontalFast(byte, byte, char, const byte*, byte, byte);
-    void setCharFontVerticalFast(byte, byte, char, const byte*, byte, byte);
 
     stdReturnType convertCharToFontIndex(char, byte&);
     byte convertCharToFontIndexFast(char);

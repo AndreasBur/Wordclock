@@ -176,7 +176,7 @@ template <typename ColumnType, byte ColumnsSize> class FontCharVertical : public
     // get methods
     //byte getHeight() const { RowsSize; }
     ColumnType getColumnFast(byte Index) const { return Columns[Index]; }
-    stdReturnType getColumn(byte Index, ColumnType& Column) {
+    stdReturnType getColumn(byte Index, ColumnType& Column) const {
         if(Index < ColumnsSize) {
             Column = Columns[Index];
             return E_OK;
@@ -188,7 +188,7 @@ template <typename ColumnType, byte ColumnsSize> class FontCharVertical : public
 
     // set methods
     void setColumnFast(byte Index, ColumnType Column) { Columns[Index] = Column; }
-    stdReturnType setColumn(byte Index, ColumnType Column) {
+    stdReturnType setColumn(byte Index, ColumnType Column) const {
         if(Index < ColumnsSize) {
             Columns[Index] = Column;
             return E_OK;
