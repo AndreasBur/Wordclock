@@ -6152,7 +6152,7 @@
 1502189458 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\resource.rc
 	"wx/msw/wx.rc"
 
-1531910629 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\src\simulator.cpp
+1532008529 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\src\simulator.cpp
 	"Simulator.h"
 	"WS2812.h"
 
@@ -6184,7 +6184,7 @@
 	"AnimationClock.h"
 	"AnimationFont.h"
 
-1531916728 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\wordclockmain.cpp
+1531917715 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\wordclockmain.cpp
 	"wx_pch.h"
 	"WordclockMain.h"
 
@@ -6493,7 +6493,7 @@
 1531313706 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\clock\animationclockcommon.cpp
 	"AnimationClockCommon.h"
 
-1531915766 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\clock\animationclockcursor.cpp
+1531917844 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\clock\animationclockcursor.cpp
 	"AnimationClockCursor.h"
 
 1531914556 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\clock\animationclockdrop.cpp

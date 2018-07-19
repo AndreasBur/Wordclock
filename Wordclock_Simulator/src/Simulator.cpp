@@ -163,6 +163,10 @@ void Simulator::setPixelFast(byte Index, PixelType Pixel)
     byte Row = Index / DISPLAY_NUMBER_OF_COLUMNS;
     byte Column = Index % DISPLAY_NUMBER_OF_COLUMNS;
 
+    if(Index >= WS2812_NUMBER_OF_LEDS ) {
+        // set breakpoint to find index out of bounce calls
+    }
+
     if(Pixel.Red != 0 || Pixel.Green != 0 || Pixel.Blue != 0) {
         Characters[Row][Column]->SetForegroundColour(wxColour(*wxBLACK));
     } else {
@@ -175,6 +179,9 @@ void Simulator::setPixelFast(byte Index, byte Red, byte Green, byte Blue)
     byte Row = Index / DISPLAY_NUMBER_OF_COLUMNS;
     byte Column = Index % DISPLAY_NUMBER_OF_COLUMNS;
 
+    if(Index >= WS2812_NUMBER_OF_LEDS ) {
+        // set breakpoint to find index out of bounce calls
+    }
 
     if(Red != 0 || Green != 0 || Blue != 0) {
         Characters[Row][Column]->SetForegroundColour(wxColour(*wxBLACK));
