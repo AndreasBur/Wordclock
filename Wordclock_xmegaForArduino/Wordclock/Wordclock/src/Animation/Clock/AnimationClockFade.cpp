@@ -116,7 +116,7 @@ stdReturnType AnimationClockFade::setClock(byte sHour, byte sMinute)
 void AnimationClockFade::task()
 {
     if(State == AnimationClockCommon::STATE_CLEAR_TIME) { clearTimeTask(); }
-    if(State == AnimationClockCommon::STATE_SET_TIME) { setTimeTask(); }
+    else if(State == AnimationClockCommon::STATE_SET_TIME) { setTimeTask(); }
 } /* task */
 
 

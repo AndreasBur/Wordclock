@@ -94,7 +94,7 @@ stdReturnType AnimationClockSnake::setClock(byte Hour, byte Minute)
 {
     stdReturnType ReturnValue{E_NOT_OK};
 
-    if(pClock->getClockWords(Hour, Minute, ClockWordsTable) == E_OK && getState() == AnimationClockCommon::STATE_IDLE) {
+    if(pClock->getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == AnimationClockCommon::STATE_IDLE) {
         ReturnValue = E_OK;
         SnakeBeginIndex = 0;
         SnakeEndIndex = 0;
@@ -114,7 +114,7 @@ stdReturnType AnimationClockSnake::setClock(byte Hour, byte Minute)
 ******************************************************************************************************************************************************/
 void AnimationClockSnake::task()
 {
-    if(getState() == AnimationClockCommon::STATE_SET_TIME) {
+    if(State == AnimationClockCommon::STATE_SET_TIME) {
         byte SnakeEndIndexTrans = transformToSerpentine(SnakeEndIndex);
         pDisplay->setPixelFast(transformToSerpentine(SnakeBeginIndex));
 

@@ -114,7 +114,7 @@ stdReturnType AnimationClockDrop::setClock(byte Hour, byte Minute)
 void AnimationClockDrop::task()
 {
     if(State == AnimationClockCommon::STATE_CLEAR_TIME) { clearTimeTask(); }
-    if(State == AnimationClockCommon::STATE_SET_TIME) { setTimeTask(); }
+    else if(State == AnimationClockCommon::STATE_SET_TIME) { setTimeTask(); }
 } /* task */
 
 
@@ -236,6 +236,7 @@ stdReturnType AnimationClockDrop::setNextWordIndex()
 ******************************************************************************************************************************************************/
 void AnimationClockDrop::setStateToSetTime()
 {
+    Row = 0;
     Column = Words.getDisplayWordColumnFast(ClockWordsTable[CurrenWordIndex]);
     pDisplay->setPixelFast(Column, Row);
     State = AnimationClockCommon::STATE_SET_TIME;

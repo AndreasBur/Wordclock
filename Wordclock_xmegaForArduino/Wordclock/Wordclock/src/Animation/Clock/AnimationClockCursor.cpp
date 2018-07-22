@@ -114,7 +114,7 @@ stdReturnType AnimationClockCursor::setClock(byte Hour, byte Minute)
 void AnimationClockCursor::task()
 {
     if(State == AnimationClockCommon::STATE_SET_TIME) {
-        pDisplay->setPixelFast(CurrentPixelIndex);
+        if(CurrentPixelIndex < DISPLAY_NUMBER_OF_PIXELS) { pDisplay->setPixelFast(CurrentPixelIndex); }
         if(CurrentPixelIndex > 0) {
             if(isPixelPartOfClockWords(ClockWordsTable, CurrentPixelIndex - 1) == false) { 
                 pDisplay->clearPixelFast(CurrentPixelIndex - 1);

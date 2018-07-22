@@ -113,7 +113,7 @@ stdReturnType AnimationClockWipe::setClock(byte Hour, byte Minute)
 void AnimationClockWipe::task()
 {
     if(State == AnimationClockCommon::STATE_CLEAR_TIME) { clearTimeTask(); }
-    if(State == AnimationClockCommon::STATE_SET_TIME) { setTimeTask(); }
+    else if(State == AnimationClockCommon::STATE_SET_TIME) { setTimeTask(); }
 } /* task */
 
 

@@ -94,7 +94,7 @@ stdReturnType AnimationClockTeletype::setClock(byte Hour, byte Minute)
 {
     stdReturnType ReturnValue{E_NOT_OK};
 
-    if(pClock->getClockWords(Hour, Minute, ClockWordsTable) == E_OK && getState() == AnimationClockCommon::STATE_IDLE) {
+    if(pClock->getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == AnimationClockCommon::STATE_IDLE) {
         ReturnValue = E_OK;
         CurrentWordIndex = 0;
         CurrentCharIndex = 0;
@@ -115,7 +115,7 @@ stdReturnType AnimationClockTeletype::setClock(byte Hour, byte Minute)
 ******************************************************************************************************************************************************/
 void AnimationClockTeletype::task()
 {
-    if(getState() == AnimationClockCommon::STATE_SET_TIME) {
+    if(State == AnimationClockCommon::STATE_SET_TIME) {
         if(CurrentCharIndex >= CurrentWordLength) {
             if(setNextWordIndex() == E_NOT_OK) {
                 State = AnimationClockCommon::STATE_IDLE;

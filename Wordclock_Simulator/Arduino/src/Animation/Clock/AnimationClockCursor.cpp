@@ -94,7 +94,7 @@ stdReturnType AnimationClockCursor::setClock(byte Hour, byte Minute)
 {
     stdReturnType ReturnValue{E_NOT_OK};
 
-    if(pClock->getClockWords(Hour, Minute, ClockWordsTable) == E_OK && getState() == AnimationClockCommon::STATE_IDLE) {
+    if(pClock->getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == AnimationClockCommon::STATE_IDLE) {
         ReturnValue = E_OK;
         CurrentPixelIndex = 0;
         State = AnimationClockCommon::STATE_SET_TIME;
@@ -113,7 +113,7 @@ stdReturnType AnimationClockCursor::setClock(byte Hour, byte Minute)
 ******************************************************************************************************************************************************/
 void AnimationClockCursor::task()
 {
-    if(getState() == AnimationClockCommon::STATE_SET_TIME) {
+    if(State == AnimationClockCommon::STATE_SET_TIME) {
         if(CurrentPixelIndex < DISPLAY_NUMBER_OF_PIXELS) { pDisplay->setPixelFast(CurrentPixelIndex); }
         if(CurrentPixelIndex > 0) {
             if(isPixelPartOfClockWords(ClockWordsTable, CurrentPixelIndex - 1) == false) {
