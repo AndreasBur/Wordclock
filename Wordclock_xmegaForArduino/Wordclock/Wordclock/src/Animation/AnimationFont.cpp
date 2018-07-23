@@ -181,7 +181,8 @@ void AnimationFont::setCharWithShift(char Char, FontType Font)
     Shift.State = SHIFT_STATE_BUSY;
     Shift.Font = Font;
     Shift.Char = Char;
-    Shift.Counter = getFontWidth(Font);
+    Shift.CharWidth = getFontCharWidth(Font, Char);
+    Shift.Counter = Shift.CharWidth;
 }
 
 
@@ -276,6 +277,37 @@ byte AnimationFont::getFontWidth(FontType Font)
 
 
 /******************************************************************************************************************************************************
+  getFontCharWidth()
+******************************************************************************************************************************************************/
+/*! \brief
+ *  \details
+ *
+ *  \return         -
+******************************************************************************************************************************************************/
+byte AnimationFont::getFontCharWidth(FontType Font, char Char)
+{
+    byte Index = convertCharToFontIndexFast(Char);
+
+#if(ANIMATION_SUPPORT_FONT_5X8 == STD_ON)
+    if(Font == FONT_5X8) return Font5x8.getCharWidthFast(Index);
+#endif
+#if(ANIMATION_SUPPORT_FONT_7X9 == STD_ON)
+    if(Font == FONT_7X9) return Font7x9.getCharWidthFast(Index);
+#endif
+#if(ANIMATION_SUPPORT_FONT_7X10 == STD_ON)
+    if(Font == FONT_7X10) Font7x10.getCharWidthFast(Index);
+#endif
+#if(ANIMATION_SUPPORT_FONT_9X10 == STD_ON)
+    if(Font == FONT_9X10) return Font9x10.getCharWidthFast(Index);
+#endif
+#if(ANIMATION_SUPPORT_FONT_10X10 == STD_ON)
+    if(Font == FONT_10X10) return Font10x10.getCharWidthFast(Index);
+#endif
+    return 0;
+} /* getFontCharWidth */
+
+
+/******************************************************************************************************************************************************
   getFontOrientation()
 ******************************************************************************************************************************************************/
 /*! \brief
@@ -318,12 +350,13 @@ Orientation AnimationFont::getFontOrientation(FontType Font)
 ******************************************************************************************************************************************************/
 void AnimationFont::stringShiftTask()
 {
-    if(Shift.State == SHIFT_STATE_BUSY) {
+    if(Shift.State == SHIFT_STATE_IDLE) {
         /* If end of string is not reached, load next char */
         if(*Shift.Text != STD_NULL_CHARACTER) {
             Shift.Char = *Shift.Text;
             Shift.State = SHIFT_STATE_BUSY;
-            Shift.Counter = getFontWidth(Shift.Font);
+            Shift.CharWidth = getFontCharWidth(Shift.Font, Shift.Char);
+            Shift.Counter = Shift.CharWidth;
             charShiftTask();
             Shift.Text++;
         } else { /* otherwise task has finished */
@@ -355,10 +388,10 @@ void AnimationFont::charShiftTask()
             if(State == STATE_CHAR_SHIFT) State = STATE_IDLE;
         } else {
             Shift.Counter--;
-            byte Column = DISPLAY_NUMBER_OF_COLUMNS - getFontWidth(Shift.Font) - Shift.Counter;
+            byte Column = DISPLAY_NUMBER_OF_COLUMNS - Shift.CharWidth + Shift.Counter;
             byte Row = getRowCenter(Shift.Font);
-            //setChar(Column, Row, Shift.Char, Shift.Font);
-            setCharFast(Column, Row, Shift.Char, Shift.Font);
+            setChar(Column, Row, Shift.Char, Shift.Font);
+            //setCharFast(Column, Row, Shift.Char, Shift.Font);
         }
     }
 } /* charShiftTask */
@@ -402,7 +435,7 @@ stdReturnType AnimationFont::setCharRow(RowType CharRow, byte Column, byte RowAb
     for(byte FontColumn = 0; FontColumn < FontWidth; FontColumn++)
     {
         byte ColumnAbs = Column + FontColumn;
-        if(Column < DISPLAY_NUMBER_OF_COLUMNS && RowAbs < DISPLAY_NUMBER_OF_ROWS) {
+        if(ColumnAbs < DISPLAY_NUMBER_OF_COLUMNS && RowAbs < DISPLAY_NUMBER_OF_ROWS) {
             if(pDisplay->writePixel(ColumnAbs, RowAbs, bitRead(CharRow, FontColumn)) == E_NOT_OK) { ReturnValue = E_NOT_OK; }
         } else {
             break;

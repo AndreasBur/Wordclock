@@ -9,10 +9,10 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       FontCommon.h
- *      \brief      
+ *      \brief
  *
- *      \details    
- *                  
+ *      \details
+ *
 ******************************************************************************************************************************************************/
 #ifndef _FONT_COMMON_H_
 #define _FONT_COMMON_H_
@@ -60,7 +60,7 @@ template <typename FontCharType, byte FontTableSize> class FontCommon
   public:
     using FontTableElementType = FontCharType;
     using FontTableType = std::array<FontCharType, FontTableSize>;
-  
+
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
@@ -83,7 +83,7 @@ template <typename FontCharType, byte FontTableSize> class FontCommon
     }
 
     virtual ~FontCommon() {
-    
+
     }
 
 	// get methods
@@ -93,9 +93,19 @@ template <typename FontCharType, byte FontTableSize> class FontCommon
     virtual byte getHeight() const = 0;
 
     FontCharType getCharFast(byte Index) const { return getFontTableElement(Index); }
+    byte getCharWidthFast(byte Index) const { return getFontTableElement(Index).getWidth(); }
+
     stdReturnType getChar(byte Index, FontCharType& FontChar) const {
         if(Index < FontTableSize) {
             FontChar = getFontTableElement(Index);
+            return E_OK;
+        } else {
+            return E_NOT_OK;
+        }
+    }
+    stdReturnType getCharWidth(byte Index, byte& Width) {
+        if(Index < FontTableSize) {
+            Width = getFontTableElement(Index).getWidth();
             return E_OK;
         } else {
             return E_NOT_OK;

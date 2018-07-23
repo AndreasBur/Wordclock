@@ -17,15 +17,15 @@
 					<Add option="-Wall" />
 					<Add option="-g" />
 					<Add option="-D__WXDEBUG__" />
-					<Add directory="$(#wx30)/lib/gcc_dll/mswud" />
+					<Add directory="$(#wx31)/lib/gcc_dll/mswud" />
 					<Add directory="include" />
 				</Compiler>
 				<ResourceCompiler>
-					<Add directory="$(#wx30)/lib/gcc_dll/mswud" />
+					<Add directory="$(#wx31)/lib/gcc_dll/mswud" />
 				</ResourceCompiler>
 				<Linker>
-					<Add library="libwxmsw30ud.a" />
-					<Add directory="$(#wx30)/lib/gcc_dll" />
+					<Add library="libwxmsw31ud.a" />
+					<Add directory="$(#wx31)/lib/gcc_dll" />
 				</Linker>
 			</Target>
 			<Target title="Release">
@@ -36,16 +36,16 @@
 				<Option projectLinkerOptionsRelation="2" />
 				<Compiler>
 					<Add option="-O2" />
-					<Add directory="$(#wx30)/lib/gcc_dll/mswu" />
+					<Add directory="$(#wx31)/lib/gcc_dll/mswu" />
 					<Add directory="include" />
 				</Compiler>
 				<ResourceCompiler>
-					<Add directory="$(#wx30)/lib/gcc_dll/mswu" />
+					<Add directory="$(#wx31)/lib/gcc_dll/mswu" />
 				</ResourceCompiler>
 				<Linker>
 					<Add option="-s" />
-					<Add library="libwxmsw30u.a" />
-					<Add directory="$(#wx30)/lib/gcc_dll" />
+					<Add library="libwxmsw31u.a" />
+					<Add directory="$(#wx31)/lib/gcc_dll" />
 				</Linker>
 			</Target>
 		</Build>
@@ -59,7 +59,7 @@
 			<Add option="-D__WXMSW__" />
 			<Add option="-DWXUSINGDLL" />
 			<Add option="-DwxUSE_UNICODE" />
-			<Add directory="$(#wx30)/include" />
+			<Add directory="$(#wx31)/include" />
 			<Add directory="Arduino/inc/Animation" />
 			<Add directory="Arduino/inc/Clock" />
 			<Add directory="Arduino/inc/Display" />
@@ -70,7 +70,7 @@
 			<Add directory="Arduino/inc/Font" />
 		</Compiler>
 		<ResourceCompiler>
-			<Add directory="$(#wx30)/include" />
+			<Add directory="$(#wx31)/include" />
 		</ResourceCompiler>
 		<Linker>
 			<Add option="-mthreads" />

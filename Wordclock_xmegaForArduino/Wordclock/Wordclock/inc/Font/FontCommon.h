@@ -93,9 +93,19 @@ template <typename FontCharType, byte FontTableSize> class FontCommon
     virtual byte getHeight() const = 0;
 
     FontCharType getCharFast(byte Index) const { return getFontTableElement(Index); }
+    byte getCharWidthFast(byte Index) const { return getFontTableElement(Index).getWidth(); }
+
     stdReturnType getChar(byte Index, FontCharType& FontChar) const {
         if(Index < FontTableSize) {
             FontChar = getFontTableElement(Index);
+            return E_OK;
+        } else {
+            return E_NOT_OK;
+        }
+    }
+    stdReturnType getCharWidth(byte Index, byte& Width) {
+        if(Index < FontTableSize) {
+            Width = getFontTableElement(Index).getWidth();
             return E_OK;
         } else {
             return E_NOT_OK;

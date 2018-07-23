@@ -83,11 +83,12 @@ class AnimationFont
     };
 
     struct ShiftType {
-        ShiftStateType State : 1;
-        byte Counter : 7;
+        char* Text;
         FontType Font;
         char Char;
-        char* Text;
+        byte CharWidth;
+        byte Counter : 7;
+        ShiftStateType State : 1;
     };
   
 /******************************************************************************************************************************************************
@@ -125,7 +126,6 @@ class AnimationFont
     void setCharFontHorizontalFast(byte, byte, const FontCharHorizontal<RowType, RowsSize>&, byte);
     template <typename RowType>
     void setCharRowFast(RowType, byte, byte, byte);
-
 
     template <typename ColumnType, byte ColumnsSize>
     stdReturnType setCharFontVertical(byte, byte, const FontCharVertical<ColumnType, ColumnsSize>&, byte);
@@ -167,6 +167,7 @@ class AnimationFont
     void setTextWithShift(char*, FontType);
     byte getFontHeight(FontType);
     byte getFontWidth(FontType);
+    byte getFontCharWidth(FontType, char);
     Orientation getFontOrientation(FontType);
 
 };
