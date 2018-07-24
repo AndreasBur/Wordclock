@@ -8,34 +8,34 @@
  *  ---------------------------------------------------------------------------------------------------------------------------------------------------
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       AnimationClockCursor.cpp
+/**     \file       AnimationClockFlicker.cpp
  *      \brief      
  *
  *      \details    
  *                  
  *
 ******************************************************************************************************************************************************/
-#define _ANIMATION_CLOCK_CURSOR_SOURCE_
+#define _ANIMATION_CLOCK_FLICKER_SOURCE_
 
 /******************************************************************************************************************************************************
- * INCLUDES
+ * I N C L U D E S
 ******************************************************************************************************************************************************/
-#include "AnimationClockCursor.h"
+#include "AnimationClockFlicker.h"
 
 
 /******************************************************************************************************************************************************
- *  LOCAL CONSTANT MACROS
-******************************************************************************************************************************************************/
-
-
-/******************************************************************************************************************************************************
- *  LOCAL FUNCTION MACROS
+ *  L O C A L   C O N S T A N T   M A C R O S 
 ******************************************************************************************************************************************************/
 
 
+/******************************************************************************************************************************************************
+ *  L O C A L   F U N C T I O N   M A C R O S
+******************************************************************************************************************************************************/
+
+
 
 /******************************************************************************************************************************************************
- *  LOCAL DATA TYPES AND STRUCTURES
+ *  L O C A L   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
 
 
@@ -45,26 +45,26 @@
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  Constructor of AnimationClockCursor
+  Constructor of AnimationClockFlicker
 ******************************************************************************************************************************************************/
-/*! \brief          AnimationClockCursor Constructor
- *  \details        Instantiation of the AnimationClockCursor library
+/*! \brief          AnimationClockFlicker Constructor
+ *  \details        Instantiation of the AnimationClockFlicker library
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-AnimationClockCursor::AnimationClockCursor()
+AnimationClockFlicker::AnimationClockFlicker()
 {
-    reset();
-} /* AnimationClockCursor */
+
+} /* AnimationClockFlicker */
 
 
 /******************************************************************************************************************************************************
-  Destructor of AnimationClockCursor
+  Destructor of AnimationClockFlicker
 ******************************************************************************************************************************************************/
-AnimationClockCursor::~AnimationClockCursor()
+AnimationClockFlicker::~AnimationClockFlicker()
 {
 
-} /* ~AnimationClockCursor */
+} /* ~AnimationClockFlicker */
 
 
 /******************************************************************************************************************************************************
@@ -75,10 +75,9 @@ AnimationClockCursor::~AnimationClockCursor()
  *                  
  *  \return         -
 ******************************************************************************************************************************************************/
-void AnimationClockCursor::init(Display* Display, Clock* Clock)
+void AnimationClockFlicker::init(Display* Display, Clock* Clock)
 {
-    AnimationClockCommon::init(Display, Clock, STATE_IDLE);
-    reset();
+
 } /* init */
 
 
@@ -90,15 +89,10 @@ void AnimationClockCursor::init(Display* Display, Clock* Clock)
  *                  
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType AnimationClockCursor::setClock(byte Hour, byte Minute)
+stdReturnType AnimationClockFlicker::setClock(byte Hour, byte Minute)
 {
     stdReturnType ReturnValue{E_NOT_OK};
 
-    if(pClock->getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
-        ReturnValue = E_OK;
-        CurrentPixelIndex = 0;
-        State = STATE_SET_TIME;
-    }
     return ReturnValue;
 } /* setClock */
 
@@ -111,18 +105,9 @@ stdReturnType AnimationClockCursor::setClock(byte Hour, byte Minute)
  *                  
  *  \return         -
 ******************************************************************************************************************************************************/
-void AnimationClockCursor::task()
+void AnimationClockFlicker::task()
 {
-    if(State == STATE_SET_TIME) {
-        if(CurrentPixelIndex < DISPLAY_NUMBER_OF_PIXELS) { pDisplay->setPixelFast(CurrentPixelIndex); }
-        if(CurrentPixelIndex > 0) {
-            if(isPixelPartOfClockWords(ClockWordsTable, CurrentPixelIndex - 1) == false) { 
-                pDisplay->clearPixelFast(CurrentPixelIndex - 1);
-            }
-        }
-        if(CurrentPixelIndex >= DISPLAY_NUMBER_OF_PIXELS) State = STATE_IDLE;
-        CurrentPixelIndex++;
-    }
+
 } /* task */
 
 
@@ -130,19 +115,6 @@ void AnimationClockCursor::task()
  * P R I V A T E   F U N C T I O N S
 ******************************************************************************************************************************************************/
 
-/******************************************************************************************************************************************************
-  reset()
-******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
-******************************************************************************************************************************************************/
-void AnimationClockCursor::reset()
-{
-    for(auto& Word : ClockWordsTable) { Word = DisplayWords::WORD_NONE; }
-    CurrentPixelIndex = 0;
-} /* reset */
 
 
 /******************************************************************************************************************************************************

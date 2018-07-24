@@ -77,7 +77,7 @@ AnimationClockFade::~AnimationClockFade()
 ******************************************************************************************************************************************************/
 void AnimationClockFade::init(Display* Display, Clock* Clock)
 {
-    AnimationClockCommon::init(Display, Clock, AnimationClockCommon::STATE_IDLE);
+    AnimationClockCommon::init(Display, Clock, STATE_IDLE);
     reset();
 } /* init */
 
@@ -97,7 +97,7 @@ stdReturnType AnimationClockFade::setClock(byte sHour, byte sMinute)
     if(sHour < CLOCK_NUMBER_OF_HOURS_PER_DAY && sMinute < CLOCK_NUMBER_OF_MINUTES_PER_HOUR) {
         Hour = sHour;
         Minute = sMinute;
-        State = AnimationClockCommon::STATE_CLEAR_TIME;
+        State = STATE_CLEAR_TIME;
         DisplayBrightness = pDisplay->getBrightness();
         ReturnValue = E_OK;
     }
@@ -115,8 +115,8 @@ stdReturnType AnimationClockFade::setClock(byte sHour, byte sMinute)
 ******************************************************************************************************************************************************/
 void AnimationClockFade::task()
 {
-    if(State == AnimationClockCommon::STATE_CLEAR_TIME) { clearTimeTask(); }
-    else if(State == AnimationClockCommon::STATE_SET_TIME) { setTimeTask(); }
+    if(State == STATE_CLEAR_TIME) { clearTimeTask(); }
+    else if(State == STATE_SET_TIME) { setTimeTask(); }
 } /* task */
 
 
@@ -169,7 +169,7 @@ void AnimationClockFade::setTimeTask()
     if(DisplayBrightness < pDisplay->getBrightness()) {
         DisplayBrightness++;
     } else {
-        State = AnimationClockCommon::STATE_IDLE;
+        State = STATE_IDLE;
     }
 } /* setTimeTask */
 
@@ -184,7 +184,7 @@ void AnimationClockFade::setTimeTask()
 ******************************************************************************************************************************************************/
 void AnimationClockFade::setStateToSetTime()
 {
-    State = AnimationClockCommon::STATE_SET_TIME;
+    State = STATE_SET_TIME;
     pClock->setClock(Hour, Minute);
     DisplayBrightness = 0;
 } /* setStateToSetTime */

@@ -116,6 +116,12 @@ AnimationClockCommon::StateType AnimationClock::getState() const
         case ANIMATION_CLOCK_SNAKE :
             return Animations.Snake.getState();
             break;
+        case ANIMATION_CLOCK_CUBE :
+            return Animations.Cube.getState();
+        break;
+        case ANIMATION_CLOCK_FLICKER :
+            return Animations.Flicker.getState();
+        break;
         case ANIMATION_CLOCK_EXPLODE :
             return AnimationClockCommon::STATE_NONE;
             break;
@@ -164,6 +170,12 @@ void AnimationClock::setAnimation(AnimationType Animation)
         case ANIMATION_CLOCK_SNAKE :
             Animations.Snake.init(pDisplay, pClock);
             break;
+        case ANIMATION_CLOCK_CUBE :
+            Animations.Cube.init(pDisplay, pClock);
+            break;
+        case ANIMATION_CLOCK_FLICKER :
+            Animations.Flicker.init(pDisplay, pClock);
+        break;
         case ANIMATION_CLOCK_EXPLODE :
             break;
         case ANIMATION_CLOCK_IMPLODE :
@@ -207,6 +219,12 @@ stdReturnType AnimationClock::setClock(byte Hour, byte Minute)
         case ANIMATION_CLOCK_SNAKE :
             return Animations.Snake.setClock(Hour, Minute);
             break;
+        case ANIMATION_CLOCK_CUBE :
+            return Animations.Cube.setClock(Hour, Minute);
+        break;
+        case ANIMATION_CLOCK_FLICKER :
+            return Animations.Flicker.setClock(Hour, Minute);
+        break;
         case ANIMATION_CLOCK_EXPLODE :
             break;
         case ANIMATION_CLOCK_IMPLODE :
@@ -251,6 +269,12 @@ void AnimationClock::task()
         case ANIMATION_CLOCK_SNAKE :
             return Animations.Snake.task();
             break;
+        case ANIMATION_CLOCK_CUBE :
+            return Animations.Cube.task();
+        break;
+        case ANIMATION_CLOCK_FLICKER :
+            return Animations.Flicker.task();
+        break;
         case ANIMATION_CLOCK_EXPLODE :
             break;
         case ANIMATION_CLOCK_IMPLODE :
@@ -293,6 +317,12 @@ void AnimationClock::show()
             break;
         case ANIMATION_CLOCK_SNAKE :
             return Animations.Snake.show();
+            break;
+        case ANIMATION_CLOCK_CUBE :
+            return Animations.Cube.show();
+            break;
+        case ANIMATION_CLOCK_FLICKER :
+            return Animations.Flicker.show();
             break;
         case ANIMATION_CLOCK_EXPLODE :
             break;

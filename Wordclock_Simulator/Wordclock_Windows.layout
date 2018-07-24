@@ -2,9 +2,104 @@
 <CodeBlocks_layout_file>
 	<FileVersion major="1" minor="0" />
 	<ActiveTarget name="Debug" />
-	<File name="Arduino\inc\Display\Display.h" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="Arduino\inc\Animation\Clock\AnimationClock.h" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="8877" topLine="142" />
+			<Cursor1 position="1798" topLine="17" />
+		</Cursor>
+	</File>
+	<File name="Arduino\src\Animation\AnimationFont.cpp" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="16622" topLine="334" />
+		</Cursor>
+	</File>
+	<File name="Arduino\src\Font\FontTahoma10x10.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1503" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="Arduino\src\Animation\Clock\AnimationClock.cpp" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="6295" topLine="127" />
+		</Cursor>
+	</File>
+	<File name="Arduino\src\Transformation\Transformation.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="20654" topLine="398" />
+		</Cursor>
+	</File>
+	<File name="Arduino\src\Animation\Clock\AnimationClockCommon.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="5260" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="Arduino\src\Animation\Clock\AnimationClockCursor.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="6397" topLine="98" />
+		</Cursor>
+	</File>
+	<File name="WordclockApp.cpp" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="519" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="Arduino\src\Animation\Clock\AnimationClockDrop.cpp" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="12799" topLine="239" />
+		</Cursor>
+	</File>
+	<File name="WordclockApp.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="436" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="Arduino\inc\Font\FontChar.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="6734" topLine="104" />
+		</Cursor>
+	</File>
+	<File name="Arduino\src\Animation\Clock\AnimationClockFade.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="5931" topLine="96" />
+		</Cursor>
+	</File>
+	<File name="WordclockMain.cpp" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1665" topLine="48" />
+		</Cursor>
+	</File>
+	<File name="Arduino\src\Animation\Clock\AnimationClockShift.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="6834" topLine="113" />
+		</Cursor>
+	</File>
+	<File name="WordclockMain.h" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="377" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="Arduino\inc\Display\DisplayWord.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="4113" topLine="35" />
+		</Cursor>
+	</File>
+	<File name="Arduino\src\Animation\Clock\AnimationClockSnake.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="6722" topLine="105" />
+		</Cursor>
+	</File>
+	<File name="include\Arduino.h" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="63" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="Arduino\src\Animation\Clock\AnimationClockCube.cpp" open="1" top="1" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="4069" topLine="68" />
+		</Cursor>
+	</File>
+	<File name="Arduino\src\Animation\Clock\AnimationClockTeletype.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="5687" topLine="91" />
 		</Cursor>
 	</File>
 	<File name="include\Simulator.h" open="0" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -12,9 +107,19 @@
 			<Cursor1 position="1763" topLine="19" />
 		</Cursor>
 	</File>
-	<File name="Arduino\inc\Font\FontCourierNew7x10.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="Arduino\inc\Animation\Clock\AnimationClockDrop.h" open="0" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="1600" topLine="42" />
+			<Cursor1 position="3959" topLine="53" />
+		</Cursor>
+	</File>
+	<File name="Arduino\src\Animation\Clock\AnimationClockFlicker.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="3616" topLine="9" />
+		</Cursor>
+	</File>
+	<File name="Arduino\src\Animation\Clock\AnimationClockWipe.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="6339" topLine="98" />
 		</Cursor>
 	</File>
 	<File name="include\WS2812.h" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -22,19 +127,99 @@
 			<Cursor1 position="163" topLine="0" />
 		</Cursor>
 	</File>
+	<File name="Arduino\inc\Animation\Clock\AnimationClockCommon.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="4102" topLine="56" />
+		</Cursor>
+	</File>
+	<File name="Arduino\inc\Animation\Clock\AnimationClockFlicker.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1592" topLine="48" />
+		</Cursor>
+	</File>
+	<File name="Arduino\src\Clock\Clock.cpp" open="0" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="20555" topLine="191" />
+		</Cursor>
+	</File>
+	<File name="Arduino\inc\Display\DisplayCharacters.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="0" topLine="6" />
+		</Cursor>
+	</File>
+	<File name="Arduino\src\Display\Display.cpp" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="3630" topLine="37" />
+		</Cursor>
+	</File>
+	<File name="src\Simulator.cpp" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="6635" topLine="153" />
+		</Cursor>
+	</File>
+	<File name="Arduino\inc\Display\DisplayWords.h" open="0" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="6038" topLine="90" />
+		</Cursor>
+	</File>
+	<File name="Arduino\inc\Animation\Clock\AnimationClockCube.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="4504" topLine="62" />
+		</Cursor>
+	</File>
+	<File name="Arduino\inc\Animation\Clock\AnimationClockSnake.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1348" topLine="35" />
+		</Cursor>
+	</File>
+	<File name="Arduino\src\Display\DisplayWord.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="3634" topLine="24" />
+		</Cursor>
+	</File>
+	<File name="Arduino\src\Display\DisplayWords.cpp" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="4753" topLine="38" />
+		</Cursor>
+	</File>
+	<File name="Arduino\inc\Animation\Clock\AnimationClockTeletype.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1573" topLine="58" />
+		</Cursor>
+	</File>
+	<File name="Arduino\inc\Display\Display.h" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="8877" topLine="142" />
+		</Cursor>
+	</File>
+	<File name="Arduino\src\Font\FontCourierNew7x9.cpp" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="4460" topLine="40" />
+		</Cursor>
+	</File>
+	<File name="Arduino\inc\Font\FontCourierNew7x10.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1600" topLine="42" />
+		</Cursor>
+	</File>
+	<File name="Arduino\src\Font\FontLucidaSans9x10.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2703" topLine="28" />
+		</Cursor>
+	</File>
 	<File name="Arduino\inc\Font\FontTahoma10x10.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="4435" topLine="33" />
 		</Cursor>
 	</File>
-	<File name="src\Simulator.cpp" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="Arduino\src\Font\FontSprite5x8.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="6488" topLine="151" />
+			<Cursor1 position="3924" topLine="126" />
 		</Cursor>
 	</File>
 	<File name="Arduino\inc\Animation\Clock\AnimationClockShift.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="4405" topLine="70" />
+			<Cursor1 position="4874" topLine="72" />
 		</Cursor>
 	</File>
 	<File name="Arduino\inc\StandardTypes\StandardTypes.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -52,34 +237,14 @@
 			<Cursor1 position="7625" topLine="130" />
 		</Cursor>
 	</File>
-	<File name="Arduino\src\Animation\Animation.cpp" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="6517" topLine="127" />
-		</Cursor>
-	</File>
-	<File name="Arduino\src\Animation\AnimationFont.cpp" open="1" top="1" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="22618" topLine="334" />
-		</Cursor>
-	</File>
 	<File name="Arduino\inc\Font\FontCommon.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="5534" topLine="84" />
 		</Cursor>
 	</File>
-	<File name="Arduino\src\Animation\Clock\AnimationClock.cpp" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="Arduino\inc\Animation\AnimationFont.h" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="6524" topLine="95" />
-		</Cursor>
-	</File>
-	<File name="Arduino\inc\Animation\AnimationFont.h" open="1" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="4208" topLine="79" />
-		</Cursor>
-	</File>
-	<File name="Arduino\src\Animation\Clock\AnimationClockCommon.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="5260" topLine="0" />
+			<Cursor1 position="7011" topLine="119" />
 		</Cursor>
 	</File>
 	<File name="Arduino\inc\Animation\Animation.h" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -87,149 +252,9 @@
 			<Cursor1 position="5096" topLine="68" />
 		</Cursor>
 	</File>
-	<File name="Arduino\src\Animation\Clock\AnimationClockCursor.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="Arduino\src\Animation\Animation.cpp" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="6397" topLine="98" />
-		</Cursor>
-	</File>
-	<File name="Arduino\inc\Animation\Clock\AnimationClock.h" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="1798" topLine="17" />
-		</Cursor>
-	</File>
-	<File name="Arduino\src\Animation\Clock\AnimationClockDrop.cpp" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="12799" topLine="239" />
-		</Cursor>
-	</File>
-	<File name="Arduino\src\Animation\Clock\AnimationClockFade.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="5931" topLine="96" />
-		</Cursor>
-	</File>
-	<File name="Arduino\src\Animation\Clock\AnimationClockShift.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="6834" topLine="113" />
-		</Cursor>
-	</File>
-	<File name="Arduino\src\Animation\Clock\AnimationClockSnake.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="6722" topLine="105" />
-		</Cursor>
-	</File>
-	<File name="Arduino\src\Animation\Clock\AnimationClockTeletype.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="5687" topLine="91" />
-		</Cursor>
-	</File>
-	<File name="Arduino\inc\Font\FontChar.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="6734" topLine="104" />
-		</Cursor>
-	</File>
-	<File name="Arduino\src\Animation\Clock\AnimationClockWipe.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="6339" topLine="98" />
-		</Cursor>
-	</File>
-	<File name="Arduino\src\Clock\Clock.cpp" open="0" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="20555" topLine="191" />
-		</Cursor>
-	</File>
-	<File name="Arduino\inc\Display\DisplayWord.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="4113" topLine="35" />
-		</Cursor>
-	</File>
-	<File name="Arduino\src\Display\Display.cpp" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="3630" topLine="37" />
-		</Cursor>
-	</File>
-	<File name="Arduino\src\Font\FontTahoma10x10.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="1503" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="Arduino\inc\Animation\Clock\AnimationClockDrop.h" open="0" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="3950" topLine="47" />
-		</Cursor>
-	</File>
-	<File name="Arduino\src\Transformation\Transformation.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="20654" topLine="398" />
-		</Cursor>
-	</File>
-	<File name="Arduino\src\Display\DisplayWord.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="3634" topLine="24" />
-		</Cursor>
-	</File>
-	<File name="Arduino\inc\Animation\Clock\AnimationClockCommon.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="4592" topLine="52" />
-		</Cursor>
-	</File>
-	<File name="Arduino\src\Display\DisplayWords.cpp" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="4753" topLine="38" />
-		</Cursor>
-	</File>
-	<File name="Arduino\inc\Display\DisplayCharacters.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="0" topLine="6" />
-		</Cursor>
-	</File>
-	<File name="WordclockApp.cpp" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="519" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="Arduino\inc\Display\DisplayWords.h" open="0" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="6038" topLine="90" />
-		</Cursor>
-	</File>
-	<File name="WordclockApp.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="436" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="Arduino\src\Font\FontCourierNew7x9.cpp" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="4460" topLine="40" />
-		</Cursor>
-	</File>
-	<File name="WordclockMain.cpp" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="1398" topLine="21" />
-		</Cursor>
-	</File>
-	<File name="Arduino\src\Font\FontLucidaSans9x10.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="2703" topLine="28" />
-		</Cursor>
-	</File>
-	<File name="WordclockMain.h" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="377" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="Arduino\src\Font\FontSprite5x8.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="3924" topLine="126" />
-		</Cursor>
-	</File>
-	<File name="Arduino\inc\Animation\Clock\AnimationClockTeletype.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="1573" topLine="58" />
-		</Cursor>
-	</File>
-	<File name="include\Arduino.h" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="63" topLine="0" />
+			<Cursor1 position="6523" topLine="78" />
 		</Cursor>
 	</File>
 </CodeBlocks_layout_file>

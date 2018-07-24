@@ -8,41 +8,35 @@
  *  ---------------------------------------------------------------------------------------------------------------------------------------------------
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       AnimationClock.h
- *      \brief      
+/**     \file       AnimationClockCube.h
+ *      \brief
  *
- *      \details    
- *                  
+ *      \details
+ *
 ******************************************************************************************************************************************************/
-#ifndef _ANIMATION_CLOCK_H_
-#define _ANIMATION_CLOCK_H_
+#ifndef _ANIMATION_CLOCK_CUBE_H_
+#define _ANIMATION_CLOCK_CUBE_H_
 
 /******************************************************************************************************************************************************
  * I N C L U D E S
 ******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Arduino.h"
-#include "Display.h"
 #include "AnimationClockCommon.h"
-#include "AnimationClockTeletype.h"
-#include "AnimationClockCursor.h"
-#include "AnimationClockDrop.h"
-#include "AnimationClockWipe.h"
-#include "AnimationClockSnake.h"
-#include "AnimationClockShift.h"
-#include "AnimationClockFade.h"
-#include "AnimationClockCube.h"
-#include "AnimationClockFlicker.h"
-
+#include "Clock.h"
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
-/* AnimationClock configuration parameter */
+/* AnimationClockCube configuration parameter */
 
 
-/* AnimationClock parameter */
+/* AnimationClockCube parameter */
+#define ANIMATION_CLOCK_CUBE_COLUMN_START_MAX_VALUE         4
+#define ANIMATION_CLOCK_CUBE_COLUMN_END_MIN_VALUE           6
 
+#define ANIMATION_CLOCK_CUBE_ROW_START_MAX_VALUE            4
+#define ANIMATION_CLOCK_CUBE_ROW_END_MIN_VALUE              5
 
 
 /******************************************************************************************************************************************************
@@ -51,78 +45,68 @@
 
 
 /******************************************************************************************************************************************************
- *  C L A S S   A N I M A T I O N C L O C K
+ *  C L A S S   T E M P L A T E
 ******************************************************************************************************************************************************/
-class AnimationClock
+class AnimationClockCube : public AnimationClockCommon
 {
 /******************************************************************************************************************************************************
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-    enum AnimationType {
-        ANIMATION_CLOCK_CURSOR,
-        ANIMATION_CLOCK_TELETYPE,
-        ANIMATION_CLOCK_DROP,
-        ANIMATION_CLOCK_SHIFT,
-        ANIMATION_CLOCK_FADE,
-        ANIMATION_CLOCK_SNAKE,
-        ANIMATION_CLOCK_WIPE,
-        ANIMATION_CLOCK_CUBE,
-        ANIMATION_CLOCK_FLICKER,
-        ANIMATION_CLOCK_EXPLODE,
-        ANIMATION_CLOCK_IMPLODE,
-        ANIMATION_CLOCK_MATRIX,
-        ANIMATION_CLOCK_NONE
+    struct BorderType {
+        byte ColumnStart;
+        byte ColumnEnd;
+        byte RowStart;
+        byte RowEnd;
     };
 
-    union AnimationsType {
-        AnimationClockCursor Cursor;
-        AnimationClockTeletype Teletype;
-        AnimationClockDrop Drop;
-        AnimationClockWipe Wipe;
-        AnimationClockShift Shift;
-        AnimationClockSnake Snake;
-        AnimationClockFade Fade;
-        AnimationClockCube Cube;
-        AnimationClockFlicker Flicker;
-
-        AnimationsType() {}
-        ~AnimationsType() {}
+    enum BorderStateType {
+        BORDER_STATE_MIN,
+        BORDER_STATE_MAX,
+        BORDER_STATE_BETWEEN
     };
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
-    Display* pDisplay;
-    Clock* pClock;
-    AnimationType CurrentAnimation;
-    AnimationsType Animations;
+    Clock::ClockWordsTableType ClockWordsTable;
+    BorderType Border;
+    BorderStateType BorderState;
 
-  
+    // functions
+    void reset();
+    void setBorderPixels(const BorderType& Border) { writeBorderPixels(true, Border); }
+    void clearBorderPixels(const BorderType& Border) { writeBorderPixels(false, Border); }
+    void writeBorderPixels(bool, const BorderType&);
+    stdReturnType increaseBorder(BorderType&);
+    stdReturnType decreaseBorder(BorderType&);
+    void clearTimeTask();
+    void setTimeTask();
+    void setMinBorder(BorderType&);
+    void setMaxBorder(BorderType&);
+
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    AnimationClock(Display*, Clock*);
-    ~AnimationClock();
+    AnimationClockCube();
+    ~AnimationClockCube();
 
 	// get methods
-    AnimationType getAnimation() const { return CurrentAnimation; }
-    AnimationClockCommon::StateType getState() const;
+
 
 	// set methods
-    void setAnimation(AnimationType);
 
 	// methods
-    void init();
-    void task();
+    void init(Display*, Clock*);
     stdReturnType setClock(byte, byte);
-    void show();
+    void task();
+
 };
 
-
 #endif
+
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E
 ******************************************************************************************************************************************************/

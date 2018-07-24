@@ -77,7 +77,7 @@ AnimationClockShift::~AnimationClockShift()
 ******************************************************************************************************************************************************/
 void AnimationClockShift::init(Display* Display, Clock* Clock)
 {
-    AnimationClockCommon::init(Display, Clock, AnimationClockCommon::STATE_IDLE);
+    AnimationClockCommon::init(Display, Clock, STATE_IDLE);
     wcTransformation.setDisplay(Display);
     reset();
 } /* init */
@@ -95,8 +95,8 @@ stdReturnType AnimationClockShift::setClock(byte Hour, byte Minute)
 {
     stdReturnType ReturnValue{E_NOT_OK};
 
-    if(pClock->getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == AnimationClockCommon::STATE_IDLE) {
-        State = AnimationClockCommon::STATE_CLEAR_TIME;
+    if(pClock->getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
+        State = STATE_CLEAR_TIME;
     }
     return ReturnValue;
 } /* setClock */
@@ -112,8 +112,8 @@ stdReturnType AnimationClockShift::setClock(byte Hour, byte Minute)
 ******************************************************************************************************************************************************/
 void AnimationClockShift::task()
 {
-    if(State == AnimationClockCommon::STATE_CLEAR_TIME) { clearTimeTask(); }
-    else if(State == AnimationClockCommon::STATE_SET_TIME) { setTimeTask(); }
+    if(State == STATE_CLEAR_TIME) { clearTimeTask(); }
+    else if(State == STATE_SET_TIME) { setTimeTask(); }
 } /* task */
 
 
@@ -156,7 +156,7 @@ void AnimationClockShift::clearTimeTask()
         wcTransformation.shiftRightFast();
         CurrentColumn++;
     } else {
-        State = AnimationClockCommon::STATE_SET_TIME;
+        State = STATE_SET_TIME;
         reset();
     }
 #endif
@@ -166,7 +166,7 @@ void AnimationClockShift::clearTimeTask()
         wcTransformation.shiftDownFast();
         CurrentRow++;
     } else {
-        State = AnimationClockCommon::STATE_SET_TIME;
+        State = STATE_SET_TIME;
         reset();
     }
 #endif
@@ -194,7 +194,7 @@ void AnimationClockShift::setTimeTask()
         }
         CurrentColumn++;
     } else {
-        State = AnimationClockCommon::STATE_IDLE;
+        State = STATE_IDLE;
     }
 #endif
 
@@ -208,7 +208,7 @@ void AnimationClockShift::setTimeTask()
         }
         CurrentRow++;
     } else {
-        setState(AnimationClockCommon::STATE_IDLE);
+        setState(STATE_IDLE);
     }
 #endif
 } /* setTimeTask */

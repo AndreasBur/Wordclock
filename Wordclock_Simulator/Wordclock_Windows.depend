@@ -6184,11 +6184,11 @@
 	"AnimationClock.h"
 	"AnimationFont.h"
 
-1532339270 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\wordclockmain.cpp
+1532442353 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\wordclockmain.cpp
 	"wx_pch.h"
 	"WordclockMain.h"
 
-1530691185 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\animation.cpp
+1532433892 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\animation.cpp
 	"Animation.h"
 
 1504860142 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\font.cpp
@@ -6391,7 +6391,7 @@
 	"StandardTypes.h"
 	"Arduino.h"
 
-1532339365 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\animationfont.cpp
+1532351509 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\animationfont.cpp
 	"AnimationFont.h"
 
 1532339796 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\animation\animationfont.h
@@ -6432,7 +6432,7 @@
 1516023835 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\animationcommon.cpp
 	"AnimationCommon.h"
 
-1531386981 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\animation\clock\animationclock.h
+1532430221 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\animation\clock\animationclock.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"Display.h"
@@ -6444,6 +6444,8 @@
 	"AnimationClockSnake.h"
 	"AnimationClockShift.h"
 	"AnimationClockFade.h"
+	"AnimationClockCube.h"
+	"AnimationClockFlicker.h"
 
 1531389849 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\animation\clock\animationclockteletype.h
 	"StandardTypes.h"
@@ -6488,19 +6490,19 @@
 	"Transformation.h"
 	"AnimationClockCommon.h"
 
-1530691186 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\clock\animationclock.cpp
+1532433932 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\clock\animationclock.cpp
 	"AnimationClock.h"
 
 1531313706 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\clock\animationclockcommon.cpp
 	"AnimationClockCommon.h"
 
-1532329568 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\clock\animationclockcursor.cpp
+1532433867 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\clock\animationclockcursor.cpp
 	"AnimationClockCursor.h"
 
-1532329568 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\clock\animationclockdrop.cpp
+1532433867 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\clock\animationclockdrop.cpp
 	"AnimationClockDrop.h"
 
-1532329568 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\clock\animationclockfade.cpp
+1532433867 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\clock\animationclockfade.cpp
 	"AnimationClockFade.h"
 
 1531386829 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\animation\clock\animationclockfade.h
@@ -6508,16 +6510,16 @@
 	"Arduino.h"
 	"AnimationClockCommon.h"
 
-1532329568 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\clock\animationclockshift.cpp
+1532433867 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\clock\animationclockshift.cpp
 	"AnimationClockShift.h"
 
-1532329568 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\clock\animationclocksnake.cpp
+1532433867 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\clock\animationclocksnake.cpp
 	"AnimationClockSnake.h"
 
-1532329568 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\clock\animationclockteletype.cpp
+1532433867 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\clock\animationclockteletype.cpp
 	"AnimationClockTeletype.h"
 
-1532329568 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\clock\animationclockwipe.cpp
+1532433867 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\clock\animationclockwipe.cpp
 	"AnimationClockWipe.h"
 
 1531951709 c:\users\andreas\documents\github\wordclock\wordclock_simulator\arduino\inc\animation\clock\animationclock.h
@@ -15317,4 +15319,21 @@
 	<aygshell.h>
 
 1520423738 d:\wxwidgets-3.0.4\include\wx\msw\rcdefs.h
+
+1532444351 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\animation\clock\animationclockcube.h
+	"StandardTypes.h"
+	"Arduino.h"
+	"AnimationClockCommon.h"
+	"Clock.h"
+
+1532432008 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\animation\clock\animationclockflicker.h
+	"StandardTypes.h"
+	"Arduino.h"
+	"AnimationClockCommon.h"
+
+1532446019 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\clock\animationclockcube.cpp
+	"AnimationClockCube.h"
+
+1532442139 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\clock\animationclockflicker.cpp
+	"AnimationClockFlicker.h"
 

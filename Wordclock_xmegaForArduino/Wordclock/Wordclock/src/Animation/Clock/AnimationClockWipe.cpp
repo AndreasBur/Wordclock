@@ -77,7 +77,7 @@ AnimationClockWipe::~AnimationClockWipe()
 ******************************************************************************************************************************************************/
 void AnimationClockWipe::init(Display* Display, Clock* Clock)
 {
-    AnimationClockCommon::init(Display, Clock, AnimationClockCommon::STATE_IDLE);
+    AnimationClockCommon::init(Display, Clock, STATE_IDLE);
     reset();
 } /* init */
 
@@ -94,9 +94,9 @@ stdReturnType AnimationClockWipe::setClock(byte Hour, byte Minute)
 {
     stdReturnType ReturnValue{E_NOT_OK};
 
-    if(pClock->getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == AnimationClockCommon::STATE_IDLE) {
+    if(pClock->getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
         ReturnValue = E_OK;
-        State = AnimationClockCommon::STATE_CLEAR_TIME;
+        State = STATE_CLEAR_TIME;
     }
     return ReturnValue;
 } /* setClock */
@@ -112,8 +112,8 @@ stdReturnType AnimationClockWipe::setClock(byte Hour, byte Minute)
 ******************************************************************************************************************************************************/
 void AnimationClockWipe::task()
 {
-    if(State == AnimationClockCommon::STATE_CLEAR_TIME) { clearTimeTask(); }
-    else if(State == AnimationClockCommon::STATE_SET_TIME) { setTimeTask(); }
+    if(State == STATE_CLEAR_TIME) { clearTimeTask(); }
+    else if(State == STATE_SET_TIME) { setTimeTask(); }
 } /* task */
 
 
@@ -161,7 +161,7 @@ void AnimationClockWipe::clearTimeTask()
     else SetPixelState = SET_PIXEL_STATE_DOWN;
 
     if(setNextIndex() == E_NOT_OK) {
-        State = AnimationClockCommon::STATE_SET_TIME;
+        State = STATE_SET_TIME;
         reset();
     }
 } /* clearTimeTask */
@@ -185,7 +185,7 @@ void AnimationClockWipe::setTimeTask()
         if(isPixelPartOfClockWords(ClockWordsTable, Column, Row)) { pDisplay->setPixelFast(Column, Row); }
     } while(Column-- != 0 && Row++ < DISPLAY_NUMBER_OF_ROWS - 1);
 
-    if(setNextIndex() == E_NOT_OK) State = AnimationClockCommon::STATE_IDLE;
+    if(setNextIndex() == E_NOT_OK) State = STATE_IDLE;
 } /* setTimeTask */
 
 

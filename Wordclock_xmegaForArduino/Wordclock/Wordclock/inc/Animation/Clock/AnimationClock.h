@@ -31,6 +31,8 @@
 #include "AnimationClockSnake.h"
 #include "AnimationClockShift.h"
 #include "AnimationClockFade.h"
+#include "AnimationClockCube.h"
+#include "AnimationClockFlicker.h"
 
 
 /******************************************************************************************************************************************************
@@ -65,11 +67,11 @@ class AnimationClock
         ANIMATION_CLOCK_FADE,
         ANIMATION_CLOCK_SNAKE,
         ANIMATION_CLOCK_WIPE,
+        ANIMATION_CLOCK_CUBE,
+        ANIMATION_CLOCK_FLICKER,
         ANIMATION_CLOCK_EXPLODE,
         ANIMATION_CLOCK_IMPLODE,
-        ANIMATION_CLOCK_FLICKER,
         ANIMATION_CLOCK_MATRIX,
-        ANIMATION_CLOCK_CUBE,
         ANIMATION_CLOCK_NONE
     };
 
@@ -81,6 +83,8 @@ class AnimationClock
         AnimationClockShift Shift;
         AnimationClockSnake Snake;
         AnimationClockFade Fade;
+        AnimationClockCube Cube;
+        AnimationClockFlicker Flicker;
 
         AnimationsType() {}
         ~AnimationsType() {}
