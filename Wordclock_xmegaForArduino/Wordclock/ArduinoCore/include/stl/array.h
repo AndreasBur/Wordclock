@@ -191,11 +191,11 @@ namespace std
 
       pointer
       data() noexcept
-      { return __addressof(_AT_Type::_S_ref(_M_elems, 0)); }
+      { return &(_AT_Type::_S_ref(_M_elems, 0)); }
 
       const_pointer
       data() const noexcept
-      { return __addressof(_AT_Type::_S_ref(_M_elems, 0)); }
+      { return &(_AT_Type::_S_ref(_M_elems, 0)); }
     };
 
   // Array comparisons.

@@ -23,7 +23,7 @@
 #include "StandardTypes.h"
 #include "Arduino.h"
 #include "Display.h"
-
+#include "array.h"
 
 /******************************************************************************************************************************************************
  *  GLOBAL CONSTANT MACROS
@@ -118,7 +118,8 @@ class Clock
         }
     };
 
-    using ClockWordsTableType = DisplayWords::WordIdType[CLOCK_WORDS_TABLE_TYPE_SIZE];
+    //using ClockWordsTableType = DisplayWords::WordIdType[CLOCK_WORDS_TABLE_TYPE_SIZE];
+    using ClockWordsTableType = std::array<DisplayWords::WordIdType, CLOCK_WORDS_TABLE_TYPE_SIZE>;
 
     using HoursTableElementType = HoursType;
     using MinutesTableElementType = MinutesType;
@@ -133,7 +134,7 @@ class Clock
 
     static const HoursType HoursTable[][CLOCK_NUMBER_OF_HOURS];
     static const MinutesType MinutesTable[][CLOCK_NUMBER_OF_MINUTE_STEPS];
-    
+
     // functions
     MinutesTableElementType getMinutesTableElement(ModesType Mode, byte Minute) const {
         MinutesTableElementType MinutesTableElement;
@@ -156,8 +157,8 @@ class Clock
 
     // get methods
     ModesType getMode() const { return Mode; }
-    stdReturnType getClockWords(byte, byte, ClockWordsType*) const;
-    stdReturnType getClockWords(byte, byte, ClockWordsTableType) const;
+    stdReturnType getClockWords(byte, byte, ClockWordsType&) const;
+    stdReturnType getClockWords(byte, byte, ClockWordsTableType&) const;
 
     // set methods
     void setMode(ModesType sMode) { Mode = sMode; }

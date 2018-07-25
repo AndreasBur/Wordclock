@@ -167,7 +167,7 @@ Clock::~Clock()
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType Clock::getClockWords(byte Hour, byte Minute, ClockWordsType* ClockWords) const
+stdReturnType Clock::getClockWords(byte Hour, byte Minute, ClockWordsType& ClockWords) const
 {
     /* ----- Local Variables ---------------------------------------------- */
     stdReturnType ReturnValue{E_NOT_OK};
@@ -177,10 +177,10 @@ stdReturnType Clock::getClockWords(byte Hour, byte Minute, ClockWordsType* Clock
         ReturnValue = E_OK;
         /* show IT IS permanently or only to full and half hour */
 #if (CLOCK_SHOW_IT_IS_PERMANENTLY == STD_ON)
-        ClockWords->ShowItIs = true;
+        ClockWords.ShowItIs = true;
 #else
-        if (Minute < CLOCK_MINUTE_STEP_IN_MINUTES || (Minute >= (CLOCK_NUMBER_OF_MINUTES_PER_HOUR/2) && 
-            Minute < (CLOCK_NUMBER_OF_MINUTES_PER_HOUR/2) + CLOCK_MINUTE_STEP_IN_MINUTES)) 
+        if (Minute < CLOCK_MINUTE_STEP_IN_MINUTES || (Minute >= (CLOCK_NUMBER_OF_MINUTES_PER_HOUR/2) &&
+            Minute < (CLOCK_NUMBER_OF_MINUTES_PER_HOUR/2) + CLOCK_MINUTE_STEP_IN_MINUTES))
         {
             ClockWords->ShowItIs = true;
         } else {
@@ -190,7 +190,7 @@ stdReturnType Clock::getClockWords(byte Hour, byte Minute, ClockWordsType* Clock
         MinutesTableElementType MinutesTableElement = getMinutesTableElement(Mode, Minute);
 
         for(byte Index = 0; Index < CLOCK_MAX_NUMBER_OF_MINUTE_WORDS; Index++) {
-            ClockWords->MinuteWords[Index] = MinutesTableElement.Words[Index];
+            ClockWords.MinuteWords[Index] = MinutesTableElement.Words[Index];
         }
 
         if(Hour >= CLOCK_NUMBER_OF_HOURS) Hour -= CLOCK_NUMBER_OF_HOURS;
@@ -200,7 +200,7 @@ stdReturnType Clock::getClockWords(byte Hour, byte Minute, ClockWordsType* Clock
         HoursTableElementType HoursTableElement = getHoursTableElement(MinutesTableElement.HourMode, Hour);
 
         for(byte Index = 0; Index < CLOCK_MAX_NUMBER_OF_HOUR_WORDS; Index++) {
-            ClockWords->HourWords[Index] = HoursTableElement.Words[Index];
+            ClockWords.HourWords[Index] = HoursTableElement.Words[Index];
         }
     } else {
         ReturnValue = E_NOT_OK;
@@ -217,7 +217,7 @@ stdReturnType Clock::getClockWords(byte Hour, byte Minute, ClockWordsType* Clock
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType Clock::getClockWords(byte Hour, byte Minute, ClockWordsTableType ClockWordsTable) const
+stdReturnType Clock::getClockWords(byte Hour, byte Minute, ClockWordsTableType& ClockWordsTable) const
 {
     /* ----- Local Variables ---------------------------------------------- */
     ClockWordsType ClockWords;
@@ -226,7 +226,7 @@ stdReturnType Clock::getClockWords(byte Hour, byte Minute, ClockWordsTableType C
 
     /* ----- Implementation ----------------------------------------------- */
     //memset(ClockWordsTable, DisplayWords::WORD_NONE, sizeof(ClockWordsTableType));
-    if(getClockWords(Hour, Minute, &ClockWords) == E_NOT_OK) ReturnValue = E_NOT_OK;
+    if(getClockWords(Hour, Minute, ClockWords) == E_NOT_OK) ReturnValue = E_NOT_OK;
 
     if(ClockWords.ShowItIs) {
         ClockWordsTable[ClockWordsTableIndex++] = DisplayWords::WORD_ES;
@@ -264,7 +264,7 @@ stdReturnType Clock::setClock(byte Hour, byte Minute)
     ClockWordsType ClockWords;
 
     /* ----- Implementation ----------------------------------------------- */
-    if(getClockWords(Hour, Minute, &ClockWords) == E_NOT_OK) ReturnValue = E_NOT_OK;
+    if(getClockWords(Hour, Minute, ClockWords) == E_NOT_OK) ReturnValue = E_NOT_OK;
 
     if(ClockWords.ShowItIs) {
         if(pDisplay->setWord(DisplayWords::WORD_ES) == E_NOT_OK) ReturnValue = E_NOT_OK;
@@ -292,7 +292,7 @@ void Clock::setClockFast(byte Hour, byte Minute)
 {
     ClockWordsType ClockWords;
 
-    if(getClockWords(Hour, Minute, &ClockWords) == E_OK) {
+    if(getClockWords(Hour, Minute, ClockWords) == E_OK) {
         if(ClockWords.ShowItIs) {
             pDisplay->setWordFast(DisplayWords::WORD_ES);
             pDisplay->setWordFast(DisplayWords::WORD_IST);

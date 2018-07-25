@@ -73,7 +73,7 @@ void WordclockDialog::OnTimer(wxTimerEvent& event)
     WcAnimation.task();
     WcDisplay.show();
 
-    WcClock.getClockWords(Hour, Minute, &NewTimeWords);
+    WcClock.getClockWords(Hour, Minute, NewTimeWords);
 
     if(NewTimeWords != CurrentTimeWords) {
         //CurrentTimeWords = NewTimeWords;
