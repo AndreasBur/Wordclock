@@ -9,10 +9,10 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       AnimationClockCube.cpp
- *      \brief      
+ *      \brief
  *
- *      \details    
- *                  
+ *      \details
+ *
  *
 ******************************************************************************************************************************************************/
 #define _TEMPLATE_SOURCE_
@@ -24,7 +24,7 @@
 
 
 /******************************************************************************************************************************************************
- *  L O C A L   C O N S T A N T   M A C R O S 
+ *  L O C A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
 
 
@@ -70,9 +70,9 @@ AnimationClockCube::~AnimationClockCube()
 /******************************************************************************************************************************************************
   init()
 ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
+/*! \brief
+ *  \details
+ *
  *  \return         -
 ******************************************************************************************************************************************************/
 void AnimationClockCube::init(Display* Display, Clock* Clock)
@@ -98,6 +98,7 @@ stdReturnType AnimationClockCube::setClock(byte Hour, byte Minute)
         ReturnValue = E_OK;
         setMaxBorder(Border);
         State = STATE_CLEAR_TIME;
+        BorderState = BORDER_STATE_MAX;
     }
     return ReturnValue;
 } /* setClock */
@@ -149,11 +150,19 @@ void AnimationClockCube::reset()
 ******************************************************************************************************************************************************/
 void AnimationClockCube::clearTimeTask()
 {
-    BorderType BorderTmp = Border;
-
-    if(increaseBorder(BorderTmp) == E_OK) { clearBorderPixels(BorderTmp); }
-    setBorderPixels(Border);
-    if(decreaseBorder(Border) == E_NOT_OK) State = STATE_SET_TIME;
+    if(BorderState == BORDER_STATE_MAX) {
+        setBorderPixels(Border);
+        BorderState = BORDER_STATE_BETWEEN;
+    } else if(BorderState == BORDER_STATE_BETWEEN) {
+        clearBorderPixels(Border);
+        if(decreaseBorder(Border) == E_NOT_OK) {
+            clearBorderPixels(Border);
+            State = STATE_SET_TIME;
+            BorderState = BORDER_STATE_MIN;
+        } else {
+            setBorderPixels(Border);
+        }
+    }
 } /* clearTimeTask */
 
 
@@ -167,7 +176,7 @@ void AnimationClockCube::clearTimeTask()
 ******************************************************************************************************************************************************/
 void AnimationClockCube::setTimeTask()
 {
-    
+
 } /* setTimeTask */
 
 
@@ -181,7 +190,7 @@ void AnimationClockCube::setTimeTask()
 ******************************************************************************************************************************************************/
 void AnimationClockCube::writeBorderPixels(bool Value, const BorderType& sBorder)
 {
-    for(byte Column = sBorder.ColumnStart; Column <= sBorder.ColumnEnd; Column++) { 
+    for(byte Column = sBorder.ColumnStart; Column <= sBorder.ColumnEnd; Column++) {
         // set border top
         pDisplay->writePixelFast(Column, sBorder.RowStart, Value);
         // set border bottom
@@ -210,13 +219,13 @@ stdReturnType AnimationClockCube::increaseBorder(BorderType& sBorder)
 
     if(sBorder.ColumnStart > 0) { sBorder.ColumnStart--; }
     else { ReturnValue = E_NOT_OK; }
-    if(sBorder.ColumnEnd < DISPLAY_NUMBER_OF_COLUMNS) { sBorder.ColumnEnd++; }
+    if(sBorder.ColumnEnd < DISPLAY_NUMBER_OF_COLUMNS - 1) { sBorder.ColumnEnd++; }
     else { ReturnValue = E_NOT_OK; }
     if(sBorder.RowStart > 0) { sBorder.RowStart--; }
     else { ReturnValue = E_NOT_OK; }
-    if(sBorder.RowEnd < DISPLAY_NUMBER_OF_ROWS) { sBorder.RowEnd++; }
+    if(sBorder.RowEnd < DISPLAY_NUMBER_OF_ROWS - 1) { sBorder.RowEnd++; }
     else { ReturnValue = E_NOT_OK; }
-    
+
     return ReturnValue;
 } /* increaseBorder */
 
@@ -283,4 +292,3 @@ void AnimationClockCube::setMinBorder(BorderType& sBorder)
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E
 ******************************************************************************************************************************************************/
- 

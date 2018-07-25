@@ -9,10 +9,10 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       AnimationClockCube.h
- *      \brief      
+ *      \brief
  *
- *      \details    
- *                  
+ *      \details
+ *
 ******************************************************************************************************************************************************/
 #ifndef _ANIMATION_CLOCK_CUBE_H_
 #define _ANIMATION_CLOCK_CUBE_H_
@@ -59,13 +59,20 @@ class AnimationClockCube : public AnimationClockCommon
         byte RowStart;
         byte RowEnd;
     };
-  
+
+    enum BorderStateType {
+        BORDER_STATE_MIN,
+        BORDER_STATE_MAX,
+        BORDER_STATE_BETWEEN
+    };
+
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
     Clock::ClockWordsTableType ClockWordsTable;
     BorderType Border;
+    BorderStateType BorderState;
 
     // functions
     void reset();
@@ -78,7 +85,7 @@ class AnimationClockCube : public AnimationClockCommon
     void setTimeTask();
     void setMinBorder(BorderType&);
     void setMaxBorder(BorderType&);
-  
+
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
