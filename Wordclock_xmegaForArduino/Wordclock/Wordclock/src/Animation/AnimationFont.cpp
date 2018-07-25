@@ -263,7 +263,7 @@ byte AnimationFont::getFontWidth(FontType Font)
     if(Font == FONT_7X9) return Font7x9.getWidth();
 #endif
 #if(ANIMATION_SUPPORT_FONT_7X10 == STD_ON)
-    if(Font == FONT_7X10) Font7x10.getWidth();
+    if(Font == FONT_7X10) return Font7x10.getWidth();
 #endif
 #if(ANIMATION_SUPPORT_FONT_9X10 == STD_ON)
     if(Font == FONT_9X10) return Font9x10.getWidth();
@@ -294,7 +294,7 @@ byte AnimationFont::getFontCharWidth(FontType Font, char Char)
     if(Font == FONT_7X9) return Font7x9.getCharWidthFast(Index);
 #endif
 #if(ANIMATION_SUPPORT_FONT_7X10 == STD_ON)
-    if(Font == FONT_7X10) Font7x10.getCharWidthFast(Index);
+    if(Font == FONT_7X10) return Font7x10.getCharWidthFast(Index);
 #endif
 #if(ANIMATION_SUPPORT_FONT_9X10 == STD_ON)
     if(Font == FONT_9X10) return Font9x10.getCharWidthFast(Index);

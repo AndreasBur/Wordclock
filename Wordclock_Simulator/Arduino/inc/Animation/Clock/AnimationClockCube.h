@@ -76,8 +76,10 @@ class AnimationClockCube : public AnimationClockCommon
 
     // functions
     void reset();
+    void setStateToSetTime();
     void setBorderPixels() { writeBorderPixels(true); }
     void clearBorderPixels() { writeBorderPixels(false); }
+    void clearBorderPixelsWithoutClockPixels();
     void writeBorderPixels(bool);
     stdReturnType increaseBorder();
     stdReturnType decreaseBorder();
