@@ -26,7 +26,7 @@ wxEND_EVENT_TABLE()
 WordclockDialog::WordclockDialog(wxDialog *dlg, const wxString &title) : wxDialog(dlg, -1, title), WcDisplay(255, 255, 255), WcClock(&WcDisplay, Clock::MODE_WESSI), WcAnimation(&WcDisplay, &WcClock), WcTransformation(&WcDisplay), Timer(this, TIMER_ID)
 {
     //Timer.Start(1000 * 2);
-    strcpy(Text, "Andreas");
+    strcpy(Text, "geht gut GUT");
     Timer.Start(500);
     Time = wxDateTime::Now();
     int Hour = Time.GetHour();
@@ -34,20 +34,20 @@ WordclockDialog::WordclockDialog(wxDialog *dlg, const wxString &title) : wxDialo
     //WcClock.setClock(12, 42);
 
     //WcDisplay.setPixelRowFast(5, 0xFFFF);
-    //WcDisplay.show();
+    WcDisplay.show();
 
     //WcAnimation.setChar(0,0,'Ö', AnimationFont::FONT_5X8);
-    //WcAnimation.setChar(5,0,'B', AnimationFont::FONT_6X10);
+    //WcAnimation.setChar(0,0,'B', AnimationFont::FONT_5X8);
     //WcAnimation.setCharWithShift('A', AnimationFont::FONT_10X10);
-    //WcAnimation.setTextWithShift(Text, AnimationFont::FONT_5X8);
+    WcAnimation.setTextWithShift(Text, AnimationFont::FONT_7X10);
     //WcDisplay.show();
 
     //WcTransformation.shiftRightFast(true);
     //WcTransformation.shiftRight(true);
     //WcTransformation.shiftUp(false);
     //WcTransformation.shiftDown(true);
-    WcAnimation.setAnimation(AnimationClock::ANIMATION_CLOCK_CUBE);
-    WcAnimation.setClock(12, 21);
+    //WcAnimation.setAnimation(AnimationClock::ANIMATION_CLOCK_CUBE);
+    //WcAnimation.setClock(12, 21);
     //WcClock.show();
 }
 
