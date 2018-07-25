@@ -121,6 +121,7 @@ class Display
 
     // set methods
     void setColor(PixelColorType sColor) { Color = sColor; }
+    void setColor(byte Red, byte Green, byte Blue) { Color.Red = Red; Color.Green = Green; Color.Blue = Blue; }
     void setBrightness(byte Brightness) { Pixels.setBrightness(Brightness, true); }
 
     // char methods

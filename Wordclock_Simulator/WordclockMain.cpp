@@ -27,7 +27,7 @@ WordclockDialog::WordclockDialog(wxDialog *dlg, const wxString &title) : wxDialo
 {
     //Timer.Start(1000 * 2);
     strcpy(Text, "geht gut GUT");
-    Timer.Start(500);
+    Timer.Start(100);
     Time = wxDateTime::Now();
     int Hour = Time.GetHour();
     int Minute = Time.GetMinute();
@@ -46,7 +46,7 @@ WordclockDialog::WordclockDialog(wxDialog *dlg, const wxString &title) : wxDialo
     //WcTransformation.shiftRight(true);
     //WcTransformation.shiftUp(false);
     //WcTransformation.shiftDown(true);
-    WcAnimation.setAnimation(AnimationClock::ANIMATION_CLOCK_CUBE);
+    WcAnimation.setAnimation(AnimationClock::ANIMATION_CLOCK_DROP);
     WcAnimation.setClock(Hour, Minute);
     //WcClock.show();
 }
@@ -76,6 +76,7 @@ void WordclockDialog::OnTimer(wxTimerEvent& event)
         Time = wxDateTime::Now();
         int Hour = Time.GetHour();
         int Minute = Time.GetMinute();
+        //WcDisplay.clear();
         WcAnimation.setClock(Hour, Minute);
     }
 

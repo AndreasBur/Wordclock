@@ -180,6 +180,7 @@ void AnimationClockDrop::setTimeTask()
     } else {
         if(setNextColumn(MaxColumn) == E_NOT_OK) {
             State = STATE_IDLE;
+            reset();
         }
     }
     pDisplay->setPixelFast(Column, Row);

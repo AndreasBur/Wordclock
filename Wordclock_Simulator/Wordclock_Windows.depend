@@ -6244,7 +6244,7 @@
 1526283432 c:\users\andreas\documents\github\wordclock\wordclock_simulator\include\arduino.h
 	<string.h>
 
-1531951709 c:\users\andreas\documents\github\wordclock\wordclock_simulator\arduino\inc\display\display.h
+1532553176 c:\users\andreas\documents\github\wordclock\wordclock_simulator\arduino\inc\display\display.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"WS2812.h"
@@ -6370,7 +6370,7 @@
 1531951709 source:c:\users\andreas\documents\github\wordclock\wordclock_simulator\arduino\src\display\displaywords.cpp
 	"DisplayWords.h"
 
-1532466087 source:c:\users\andreas\documents\github\wordclock\wordclock_simulator\wordclockmain.cpp
+1532552184 source:c:\users\andreas\documents\github\wordclock\wordclock_simulator\wordclockmain.cpp
 	"wx_pch.h"
 	"WordclockMain.h"
 
@@ -6605,7 +6605,7 @@
 1532460243 source:c:\users\andreas\documents\github\wordclock\wordclock_simulator\arduino\src\animation\clock\animationclockcursor.cpp
 	"AnimationClockCursor.h"
 
-1532460243 source:c:\users\andreas\documents\github\wordclock\wordclock_simulator\arduino\src\animation\clock\animationclockdrop.cpp
+1532552874 source:c:\users\andreas\documents\github\wordclock\wordclock_simulator\arduino\src\animation\clock\animationclockdrop.cpp
 	"AnimationClockDrop.h"
 
 1532460243 source:c:\users\andreas\documents\github\wordclock\wordclock_simulator\arduino\src\animation\clock\animationclockfade.cpp
@@ -6625,7 +6625,7 @@
 1532460243 source:c:\users\andreas\documents\github\wordclock\wordclock_simulator\arduino\src\animation\clock\animationclockteletype.cpp
 	"AnimationClockTeletype.h"
 
-1532460243 source:c:\users\andreas\documents\github\wordclock\wordclock_simulator\arduino\src\animation\clock\animationclockwipe.cpp
+1532551681 source:c:\users\andreas\documents\github\wordclock\wordclock_simulator\arduino\src\animation\clock\animationclockwipe.cpp
 	"AnimationClockWipe.h"
 
 1518126585 source:c:\users\andreas\documents\github\wordclock\wordclock_simulator\arduino\src\animation\fonts.cpp

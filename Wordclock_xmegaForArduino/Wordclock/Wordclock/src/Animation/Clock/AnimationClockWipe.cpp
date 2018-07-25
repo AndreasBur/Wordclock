@@ -185,7 +185,10 @@ void AnimationClockWipe::setTimeTask()
         if(isPixelPartOfClockWords(ClockWordsTable, Column, Row)) { pDisplay->setPixelFast(Column, Row); }
     } while(Column-- != 0 && Row++ < DISPLAY_NUMBER_OF_ROWS - 1);
 
-    if(setNextIndex() == E_NOT_OK) State = STATE_IDLE;
+    if(setNextIndex() == E_NOT_OK) {
+        State = STATE_IDLE;
+        reset();
+    }
 } /* setTimeTask */
 
 
