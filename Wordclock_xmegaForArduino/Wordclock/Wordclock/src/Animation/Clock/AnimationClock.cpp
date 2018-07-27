@@ -122,12 +122,12 @@ AnimationClockCommon::StateType AnimationClock::getState() const
         case ANIMATION_CLOCK_FLICKER :
             return Animations.Flicker.getState();
         break;
-        case ANIMATION_CLOCK_EXPLODE :
-            return AnimationClockCommon::STATE_NONE;
-            break;
-        case ANIMATION_CLOCK_IMPLODE :
-            return AnimationClockCommon::STATE_NONE;
-            break;
+        //case ANIMATION_CLOCK_EXPLODE :
+            //return AnimationClockCommon::STATE_NONE;
+            //break;
+        //case ANIMATION_CLOCK_IMPLODE :
+            //return AnimationClockCommon::STATE_NONE;
+            //break;
         default :
             return AnimationClockCommon::STATE_NONE;
             break;
@@ -176,10 +176,10 @@ void AnimationClock::setAnimation(AnimationType Animation)
         case ANIMATION_CLOCK_FLICKER :
             Animations.Flicker.init(pDisplay, pClock);
         break;
-        case ANIMATION_CLOCK_EXPLODE :
-            break;
-        case ANIMATION_CLOCK_IMPLODE :
-            break;
+        //case ANIMATION_CLOCK_EXPLODE :
+            //break;
+        //case ANIMATION_CLOCK_IMPLODE :
+            //break;
         default :
             break;
     }
@@ -225,10 +225,10 @@ stdReturnType AnimationClock::setClock(byte Hour, byte Minute)
         case ANIMATION_CLOCK_FLICKER :
             return Animations.Flicker.setClock(Hour, Minute);
         break;
-        case ANIMATION_CLOCK_EXPLODE :
-            break;
-        case ANIMATION_CLOCK_IMPLODE :
-            break;
+        //case ANIMATION_CLOCK_EXPLODE :
+            //break;
+        //case ANIMATION_CLOCK_IMPLODE :
+            //break;
         default :
             break;
     }
@@ -271,14 +271,14 @@ void AnimationClock::task()
             break;
         case ANIMATION_CLOCK_CUBE :
             return Animations.Cube.task();
-        break;
+            break;
         case ANIMATION_CLOCK_FLICKER :
             return Animations.Flicker.task();
-        break;
-        case ANIMATION_CLOCK_EXPLODE :
             break;
-        case ANIMATION_CLOCK_IMPLODE :
-            break;
+        //case ANIMATION_CLOCK_EXPLODE :
+            //break;
+        //case ANIMATION_CLOCK_IMPLODE :
+            //break;
         default :
             break;
     }
@@ -324,10 +324,10 @@ void AnimationClock::show()
         case ANIMATION_CLOCK_FLICKER :
             return Animations.Flicker.show();
             break;
-        case ANIMATION_CLOCK_EXPLODE :
-            break;
-        case ANIMATION_CLOCK_IMPLODE :
-            break;
+        //case ANIMATION_CLOCK_EXPLODE :
+            //break;
+        //case ANIMATION_CLOCK_IMPLODE :
+            //break;
         default :
             break;
     }
