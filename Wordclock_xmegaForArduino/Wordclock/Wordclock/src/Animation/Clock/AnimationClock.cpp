@@ -91,7 +91,7 @@ void AnimationClock::init()
  *                  
  *  \return         -
 ******************************************************************************************************************************************************/
-AnimationClockCommon::StateType AnimationClock::getState() const
+AnimationClock::StateType AnimationClock::getState() const
 {
     switch(CurrentAnimation)
     {

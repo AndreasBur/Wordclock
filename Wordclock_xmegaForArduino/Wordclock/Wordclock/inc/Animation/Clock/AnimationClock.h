@@ -90,6 +90,8 @@ class AnimationClock
         ~AnimationsType() {}
     };
 
+    using StateType = AnimationClockCommon::StateType;
+
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
@@ -109,7 +111,7 @@ class AnimationClock
 
 	// get methods
     AnimationType getAnimation() const { return CurrentAnimation; }
-    AnimationClockCommon::StateType getState() const;
+    StateType getState() const;
 
 	// set methods
     void setAnimation(AnimationType);
