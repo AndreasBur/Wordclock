@@ -137,6 +137,42 @@ void WS2812::init(byte Pin)
 
 
 /******************************************************************************************************************************************************
+  setAllPixels()
+******************************************************************************************************************************************************/
+/*! \brief          
+ *  \details        
+ *                  
+ *  \return         -
+ *****************************************************************************************************************************************************/
+void WS2812::setAllPixels(PixelType Pixel)
+{
+    for(byte Index = 0; Index < WS2812_NUMBER_OF_LEDS; Index++) {
+        Pixels[WS2812_POS_ABS_RED(Index)] = Pixel.Red;
+        Pixels[WS2812_POS_ABS_GREEN(Index)] = Pixel.Green;
+        Pixels[WS2812_POS_ABS_BLUE(Index)] = Pixel.Blue;
+    }
+}
+
+
+/******************************************************************************************************************************************************
+  setAllPixels()
+******************************************************************************************************************************************************/
+/*! \brief          
+ *  \details        
+ *                  
+ *  \return         -
+ *****************************************************************************************************************************************************/
+void WS2812::setAllPixels(byte Red, byte Green, byte Blue)
+{
+    for(byte Index = 0; Index < WS2812_NUMBER_OF_LEDS; Index++) {
+        Pixels[WS2812_POS_ABS_RED(Index)] = Red;
+        Pixels[WS2812_POS_ABS_GREEN(Index)] = Green;
+        Pixels[WS2812_POS_ABS_BLUE(Index)] = Blue;
+    }
+}
+
+
+/******************************************************************************************************************************************************
   show()
 ******************************************************************************************************************************************************/
 /*! \brief          
@@ -150,12 +186,11 @@ stdReturnType WS2812::show()
 void WS2812::show()
 #endif
 {
-    byte PixelsDimmed[WS2812_NUMBER_OF_LEDS * WS2812_NUMBER_OF_COLORS];
-
 #if (WS2812_RESET_TIMER == STD_ON)
     if((micros() - ResetTimer) > (WS2812_RESET_DURATION_NS / 1000) || ResetTimer == 0) {
 #endif
         if(Brightness != 255) {
+            byte PixelsDimmed[WS2812_NUMBER_OF_LEDS * WS2812_NUMBER_OF_COLORS];
             dimmPixels(PixelsDimmed, WS2812_NUMBER_OF_LEDS * WS2812_NUMBER_OF_COLORS);
             sendData(PixelsDimmed, WS2812_NUMBER_OF_LEDS * WS2812_NUMBER_OF_COLORS);
         } else {

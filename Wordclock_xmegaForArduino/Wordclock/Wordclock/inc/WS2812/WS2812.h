@@ -155,6 +155,8 @@ class WS2812
     // methods
     void init(byte);
     void clearAllPixels() { memset(Pixels, 0, sizeof(Pixels)); }
+    void setAllPixels(PixelType);
+    void setAllPixels(byte, byte, byte);
     stdReturnType clearPixel(byte Index) { return setPixel(Index, 0, 0, 0); }
     void clearPixelFast(byte Index) { setPixelFast(Index, 0, 0, 0); }
 
