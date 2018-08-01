@@ -75,15 +75,16 @@ class Display
     };
 
     using PixelType = boolean;
+    using CharacterIdType = DisplayCharacters::CharacterIdType;
 
 #if (DISPLAY_NUMBER_OF_ROWS > 16)
-    #error "Display: too many Rows, please extend PixelRowType"
+    #error "Display: too many rows, please extend PixelRowType"
 #endif
 
     using PixelRowType = uint16_t;
 
 #if (DISPLAY_NUMBER_OF_COLUMNS > 16)
-    #error "Display: too many Columns, please extend PixelColumnType"
+    #error "Display: too many columns, please extend PixelColumnType"
 #endif
 
     using PixelColumnType = uint16_t;
@@ -125,14 +126,14 @@ class Display
     void setBrightness(byte Brightness) { Pixels.setBrightness(Brightness, true); }
 
     // char methods
-    stdReturnType setCharacter(DisplayCharacters::CharacterIdType CharacterId) { return setPixel(CharacterId); }
-    stdReturnType clearCharacter(DisplayCharacters::CharacterIdType CharacterId) { return clearPixel(CharacterId); }
-    stdReturnType getCharacter(DisplayCharacters::CharacterIdType CharacterId, boolean* Value) const { return getPixel(CharacterId, Value); }
+    stdReturnType setCharacter(CharacterIdType CharacterId) { return setPixel(CharacterId); }
+    stdReturnType clearCharacter(CharacterIdType CharacterId) { return clearPixel(CharacterId); }
+    stdReturnType getCharacter(CharacterIdType CharacterId, boolean* Value) const { return getPixel(CharacterId, Value); }
 
     // char methods fast
-    void setCharacterFast(DisplayCharacters::CharacterIdType CharacterId) { setPixelFast(CharacterId); }
-    void clearCharacterFast(DisplayCharacters::CharacterIdType CharacterId) { clearPixelFast(CharacterId); }
-    boolean getCharacterFast(DisplayCharacters::CharacterIdType CharacterId) const { return getPixelFast(CharacterId); }
+    void setCharacterFast(CharacterIdType CharacterId) { setPixelFast(CharacterId); }
+    void clearCharacterFast(CharacterIdType CharacterId) { clearPixelFast(CharacterId); }
+    boolean getCharacterFast(CharacterIdType CharacterId) const { return getPixelFast(CharacterId); }
 
     // word methods
     stdReturnType setWord(WordIdType, byte MaxLength = DISPLAY_WORD_LENGTH_UNLIMITED);
