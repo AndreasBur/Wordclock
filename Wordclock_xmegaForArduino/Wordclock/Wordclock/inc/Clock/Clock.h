@@ -23,7 +23,7 @@
 #include "StandardTypes.h"
 #include "Arduino.h"
 #include "Display.h"
-#include "array.h"
+#include <array>
 
 /******************************************************************************************************************************************************
  *  GLOBAL CONSTANT MACROS

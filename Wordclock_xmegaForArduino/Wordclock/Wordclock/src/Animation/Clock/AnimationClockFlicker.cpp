@@ -77,7 +77,8 @@ AnimationClockFlicker::~AnimationClockFlicker()
 ******************************************************************************************************************************************************/
 void AnimationClockFlicker::init(Display* Display, Clock* Clock)
 {
-
+    pDisplay = Display;
+    pClock = Clock;
 } /* init */
 
 

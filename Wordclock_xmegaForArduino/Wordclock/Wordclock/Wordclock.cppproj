@@ -166,7 +166,6 @@
       <Value>../inc/Animation/Clock</Value>
       <Value>../inc/Font</Value>
       <Value>%24(PackRepoDir)\atmel\XMEGAE_DFP\1.2.51\include</Value>
-      <Value>../../ArduinoCore/include/stl</Value>
     </ListValues>
   </avrgcc.compiler.directories.IncludePaths>
   <avrgcc.compiler.optimization.level>Optimize for size (-Os)</avrgcc.compiler.optimization.level>
@@ -197,7 +196,11 @@
       <Value>../inc/Animation/Clock</Value>
       <Value>../inc/Font</Value>
       <Value>%24(PackRepoDir)\atmel\XMEGAE_DFP\1.2.51\include</Value>
-      <Value>../../ArduinoCore/include/stl</Value>
+      <Value>../../ArduinoCore/include/util/device</Value>
+      <Value>../../ArduinoCore/include/util/memory</Value>
+      <Value>../../ArduinoCore/include/util/STL</Value>
+      <Value>../../ArduinoCore/include/util/STL_C++XX_stdfloat</Value>
+      <Value>../../ArduinoCore/include/util/utility</Value>
     </ListValues>
   </avrgcccpp.compiler.directories.IncludePaths>
   <avrgcccpp.compiler.optimization.level>Optimize for size (-Os)</avrgcccpp.compiler.optimization.level>
@@ -208,7 +211,7 @@
   <avrgcccpp.compiler.warnings.AllWarnings>True</avrgcccpp.compiler.warnings.AllWarnings>
   <avrgcccpp.compiler.warnings.Undefined>True</avrgcccpp.compiler.warnings.Undefined>
   <avrgcccpp.compiler.warnings.Pedantic>True</avrgcccpp.compiler.warnings.Pedantic>
-  <avrgcccpp.compiler.miscellaneous.OtherFlags>-std=c++11 -Wextra</avrgcccpp.compiler.miscellaneous.OtherFlags>
+  <avrgcccpp.compiler.miscellaneous.OtherFlags>-std=gnu++11 -Wextra</avrgcccpp.compiler.miscellaneous.OtherFlags>
   <avrgcccpp.linker.libraries.Libraries>
     <ListValues>
       <Value>libm</Value>
