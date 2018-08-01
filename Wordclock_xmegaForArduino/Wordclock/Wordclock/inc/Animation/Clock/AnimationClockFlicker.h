@@ -28,7 +28,7 @@
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
 /* AnimationClockFlicker configuration parameter */
-
+#define ANIMATION_CLOCK_FLICKER_COUNTER_INIT_VALUE          10
 
 /* AnimationClockFlicker parameter */
 
@@ -54,9 +54,16 @@ class AnimationClockFlicker : public AnimationClockCommon
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
+    byte Minute;
+    byte Hour;
+    boolean isClockSet;
+    byte FlickerCounter;
+    byte DisplayBrightness;
 
     // functions
     void reset();
+    void clearTimeTask();
+    void setTimeTask();
   
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S

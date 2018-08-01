@@ -32,6 +32,7 @@
 #define Arduino_h
 
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 #include <math.h>
 
@@ -137,7 +138,7 @@ typedef unsigned int word;
 
 #define bit(b) (1UL << (b))
 
-typedef uint8_t boolean;
+typedef bool boolean;
 typedef uint8_t byte;
 
 void init(void);

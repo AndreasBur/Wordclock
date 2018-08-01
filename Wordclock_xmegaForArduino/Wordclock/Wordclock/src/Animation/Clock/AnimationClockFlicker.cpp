@@ -90,10 +90,17 @@ void AnimationClockFlicker::init(Display* Display, Clock* Clock)
  *                  
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType AnimationClockFlicker::setClock(byte Hour, byte Minute)
+stdReturnType AnimationClockFlicker::setClock(byte sHour, byte sMinute)
 {
     stdReturnType ReturnValue{E_NOT_OK};
 
+    if(sHour < CLOCK_NUMBER_OF_HOURS_PER_DAY && sMinute < CLOCK_NUMBER_OF_MINUTES_PER_HOUR) {
+        Hour = sHour;
+        Minute = sMinute;
+        DisplayBrightness = pDisplay->getBrightness();
+        State = STATE_CLEAR_TIME;
+        ReturnValue = E_OK;
+    }
     return ReturnValue;
 } /* setClock */
 
@@ -108,7 +115,8 @@ stdReturnType AnimationClockFlicker::setClock(byte Hour, byte Minute)
 ******************************************************************************************************************************************************/
 void AnimationClockFlicker::task()
 {
-
+    if(State == STATE_CLEAR_TIME) { clearTimeTask(); }
+    else if(State == STATE_SET_TIME) { setTimeTask(); }
 } /* task */
 
 
@@ -116,7 +124,60 @@ void AnimationClockFlicker::task()
  * P R I V A T E   F U N C T I O N S
 ******************************************************************************************************************************************************/
 
+/******************************************************************************************************************************************************
+  reset()
+******************************************************************************************************************************************************/
+/*! \brief
+ *  \details
+ *
+ *  \return         -
+******************************************************************************************************************************************************/
+void AnimationClockFlicker::reset()
+{
+    Minute = 0;
+    Hour = 0;
+    isClockSet = false;
+    FlickerCounter = ANIMATION_CLOCK_FLICKER_COUNTER_INIT_VALUE;
+} /* reset */
 
+
+/******************************************************************************************************************************************************
+  clearTimeTask()
+******************************************************************************************************************************************************/
+/*! \brief          
+ *  \details        
+ *                  
+ *  \return         -
+******************************************************************************************************************************************************/
+void AnimationClockFlicker::clearTimeTask()
+{
+
+    isClockSet = !isClockSet;
+
+    if(isClockSet) {
+        pDisplay->setBrightness(0);
+    } else {
+        pDisplay->setBrightness(DisplayBrightness);
+    }
+
+    if(FlickerCounter-- <= 0) State = STATE_SET_TIME;
+} /* clearTimeTask */
+
+
+/******************************************************************************************************************************************************
+  setTimeTask()
+******************************************************************************************************************************************************/
+/*! \brief          
+ *  \details        
+ *                  
+ *  \return         -
+******************************************************************************************************************************************************/
+void AnimationClockFlicker::setTimeTask()
+{
+    pClock->setClockFast(Hour, Minute);
+    State = STATE_IDLE;
+    reset();
+} /* setTimeTask */
 
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E

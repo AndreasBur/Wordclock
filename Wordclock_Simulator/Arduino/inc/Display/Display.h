@@ -9,10 +9,10 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       Display.h
- *      \brief
+ *      \brief      
  *
- *      \details
- *
+ *      \details    
+ *                  
 ******************************************************************************************************************************************************/
 #ifndef _DISPLAY_H_
 #define _DISPLAY_H_
@@ -75,15 +75,16 @@ class Display
     };
 
     using PixelType = boolean;
+    using CharacterIdType = DisplayCharacters::CharacterIdType;
 
 #if (DISPLAY_NUMBER_OF_ROWS > 16)
-    #error "Display: too many Rows, please extend PixelRowType"
+    #error "Display: too many rows, please extend PixelRowType"
 #endif
 
     using PixelRowType = uint16_t;
 
 #if (DISPLAY_NUMBER_OF_COLUMNS > 16)
-    #error "Display: too many Columns, please extend PixelColumnType"
+    #error "Display: too many columns, please extend PixelColumnType"
 #endif
 
     using PixelColumnType = uint16_t;
@@ -101,7 +102,7 @@ class Display
     Stripe Pixels;
     PixelColorType Color;
     DisplayWords Words;
-
+    
     // functions
     byte transformToSerpentine(byte, byte) const;
     byte transformToSerpentine(byte) const;
@@ -125,14 +126,14 @@ class Display
     void setBrightness(byte Brightness) { Pixels.setBrightness(Brightness, true); }
 
     // char methods
-    stdReturnType setCharacter(DisplayCharacters::CharacterIdType CharacterId) { return setPixel(CharacterId); }
-    stdReturnType clearCharacter(DisplayCharacters::CharacterIdType CharacterId) { return clearPixel(CharacterId); }
-    stdReturnType getCharacter(DisplayCharacters::CharacterIdType CharacterId, boolean* Value) const { return getPixel(CharacterId, Value); }
+    stdReturnType setCharacter(CharacterIdType CharacterId) { return setPixel(CharacterId); }
+    stdReturnType clearCharacter(CharacterIdType CharacterId) { return clearPixel(CharacterId); }
+    stdReturnType getCharacter(CharacterIdType CharacterId, boolean* Value) const { return getPixel(CharacterId, Value); }
 
     // char methods fast
-    void setCharacterFast(DisplayCharacters::CharacterIdType CharacterId) { setPixelFast(CharacterId); }
-    void clearCharacterFast(DisplayCharacters::CharacterIdType CharacterId) { clearPixelFast(CharacterId); }
-    boolean getCharacterFast(DisplayCharacters::CharacterIdType CharacterId) const { return getPixelFast(CharacterId); }
+    void setCharacterFast(CharacterIdType CharacterId) { setPixelFast(CharacterId); }
+    void clearCharacterFast(CharacterIdType CharacterId) { clearPixelFast(CharacterId); }
+    boolean getCharacterFast(CharacterIdType CharacterId) const { return getPixelFast(CharacterId); }
 
     // word methods
     stdReturnType setWord(WordIdType, byte MaxLength = DISPLAY_WORD_LENGTH_UNLIMITED);
@@ -143,7 +144,7 @@ class Display
     void setWordFast(WordIdType, byte MaxLength = DISPLAY_WORD_LENGTH_UNLIMITED);
     void clearWordFast(WordIdType);
     void clearAllWordsFast();
-
+    
     // pixel methods
     stdReturnType writePixel(byte Column, byte Row, boolean Value) { if(Value) return setPixel(Column, Row); else return clearPixel(Column, Row); }
     stdReturnType writePixel(byte Index, boolean Value) { if(Value) return setPixel(Index); else return clearPixel(Index); }

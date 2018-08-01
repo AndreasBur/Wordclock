@@ -23,7 +23,7 @@
 #include "StandardTypes.h"
 #include "Arduino.h"
 #include "Display.h"
-#include "array.h"
+#include <array>
 
 /******************************************************************************************************************************************************
  *  GLOBAL CONSTANT MACROS
@@ -134,7 +134,7 @@ class Clock
 
     static const HoursType HoursTable[][CLOCK_NUMBER_OF_HOURS];
     static const MinutesType MinutesTable[][CLOCK_NUMBER_OF_MINUTE_STEPS];
-
+    
     // functions
     MinutesTableElementType getMinutesTableElement(ModesType Mode, byte Minute) const {
         MinutesTableElementType MinutesTableElement;

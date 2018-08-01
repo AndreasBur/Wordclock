@@ -192,9 +192,35 @@ void Simulator::setPixelFast(byte Index, byte Red, byte Green, byte Blue)
 
 void Simulator::clearAllPixels()
 {
+    setAllPixels(wxColour(*wxLIGHT_GREY));
+}
+
+void Simulator::setAllPixels(wxColor Color)
+{
     for(int Row = 0; Row < DISPLAY_NUMBER_OF_ROWS; Row++) {
         for(int Column = 0; Column < DISPLAY_NUMBER_OF_COLUMNS; Column++) {
-            Characters[Row][Column]->SetForegroundColour(wxColour(*wxLIGHT_GREY));
+            Characters[Row][Column]->SetForegroundColour(Color);
+        }
+    }
+}
+
+void Simulator::setBrightness(byte sBrightness, bool GammaCorrection)
+{
+    Brightness = sBrightness;
+
+    if(Brightness == 0)
+    {
+        for(int Row = 0; Row < DISPLAY_NUMBER_OF_ROWS; Row++) {
+            for(int Column = 0; Column < DISPLAY_NUMBER_OF_COLUMNS; Column++) {
+                Colors[Row][Column] = Characters[Row][Column]->GetForegroundColour();
+            }
+        }
+        setAllPixels(wxColour(*wxLIGHT_GREY));
+    } else {
+        for(int Row = 0; Row < DISPLAY_NUMBER_OF_ROWS; Row++) {
+            for(int Column = 0; Column < DISPLAY_NUMBER_OF_COLUMNS; Column++) {
+                Characters[Row][Column]->SetForegroundColour(Colors[Row][Column]);
+            }
         }
     }
 }

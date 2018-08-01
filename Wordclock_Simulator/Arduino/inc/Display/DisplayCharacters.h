@@ -46,7 +46,7 @@
 
 
 /******************************************************************************************************************************************************
- *  C L A S S  D I S P L A Y C H A R A C T E R S
+ *  C L A S S   D I S P L A Y C H A R A C T E R S
 ******************************************************************************************************************************************************/
 class DisplayCharacters
 {
@@ -168,11 +168,25 @@ class DisplayCharacters
         CHARACTER_NUMBER_OF_CHARACTERS
     };
 
+    using DisplayCharactersTableElementType = char;
+
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
     static const char DisplayCharactersTable[][DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS + 1];
+
+    // functions
+    DisplayCharactersTableElementType getDisplayCharactersTableElement(byte Column, byte Row) const {
+        DisplayCharactersTableElementType DisplayCharactersTableElement;
+        memcpy_P(&DisplayCharactersTableElement, &DisplayCharactersTable[Column][Row], sizeof(DisplayCharactersTableElementType));
+        return DisplayCharactersTableElement;
+    }
+    DisplayCharactersTableElementType getDisplayCharactersTableElement(byte Index) const {
+        byte Column, Row;
+        indexToColumnAndRow(Index, Column, Row);
+        return getDisplayCharactersTableElement(Column, Row);
+    }
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
@@ -182,12 +196,14 @@ class DisplayCharacters
     ~DisplayCharacters();
 
 	// get methods fast
-    char getCharacterFast(byte Column, byte Row) const { return pgm_read_byte(&DisplayCharactersTable[Row][Column]); }
-    char getCharacterFast(byte Index) const { return pgm_read_byte(&DisplayCharactersTable[Index / DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS][Index % DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS]); }
+    char getCharacterFast(byte Column, byte Row) const { return getDisplayCharactersTableElement(Column, Row); }
+    char getCharacterFast(byte Index) const { return getDisplayCharactersTableElement(Index); }
+    char getCharacterFast(CharacterIdType CharacterId) const { return getDisplayCharactersTableElement(CharacterId); }
     
     // get methods
     stdReturnType getCharacter(byte, byte, char*) const;
     stdReturnType getCharacter(byte, char*) const;
+    stdReturnType getCharacter(CharacterIdType, char*) const;
 
 	// set methods
 

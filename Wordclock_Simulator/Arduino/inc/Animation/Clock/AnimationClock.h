@@ -69,9 +69,9 @@ class AnimationClock
         ANIMATION_CLOCK_WIPE,
         ANIMATION_CLOCK_CUBE,
         ANIMATION_CLOCK_FLICKER,
-        ANIMATION_CLOCK_EXPLODE,
-        ANIMATION_CLOCK_IMPLODE,
-        ANIMATION_CLOCK_MATRIX,
+        //ANIMATION_CLOCK_EXPLODE,
+        //ANIMATION_CLOCK_IMPLODE,
+        //ANIMATION_CLOCK_MATRIX,
         ANIMATION_CLOCK_NONE
     };
 
@@ -89,6 +89,8 @@ class AnimationClock
         AnimationsType() {}
         ~AnimationsType() {}
     };
+
+    using StateType = AnimationClockCommon::StateType;
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
@@ -109,7 +111,7 @@ class AnimationClock
 
 	// get methods
     AnimationType getAnimation() const { return CurrentAnimation; }
-    AnimationClockCommon::StateType getState() const;
+    StateType getState() const;
 
 	// set methods
     void setAnimation(AnimationType);

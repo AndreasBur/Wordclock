@@ -22,7 +22,7 @@
 ******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Arduino.h"
-#include "array.h"
+#include <array>
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
@@ -114,7 +114,6 @@ template <typename RowType, byte RowsSize> class FontCharHorizontal : public Fon
     }
 
     // get methods
-    //byte getHeight() const { RowsSize; }
     RowType getRowFast(byte Index) const { return Rows[Index]; }
     stdReturnType getRow(byte Index, RowType& Row) const {
         if(Index < RowsSize) {
@@ -174,7 +173,6 @@ template <typename ColumnType, byte ColumnsSize> class FontCharVertical : public
     }
 
     // get methods
-    //byte getHeight() const { RowsSize; }
     ColumnType getColumnFast(byte Index) const { return Columns[Index]; }
     stdReturnType getColumn(byte Index, ColumnType& Column) const {
         if(Index < ColumnsSize) {
@@ -202,8 +200,8 @@ template <typename ColumnType, byte ColumnsSize> class FontCharVertical : public
 
 };
 
-#endif
 
+#endif
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E
 ******************************************************************************************************************************************************/

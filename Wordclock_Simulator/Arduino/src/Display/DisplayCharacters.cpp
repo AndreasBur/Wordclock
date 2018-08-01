@@ -37,7 +37,7 @@
 /******************************************************************************************************************************************************
  *  LOCAL DATA TYPES AND STRUCTURES
 ******************************************************************************************************************************************************/
-const char DisplayCharacters::DisplayCharactersTable[][DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS + 1] PROGMEM
+const DisplayCharacters::DisplayCharactersTableElementType DisplayCharacters::DisplayCharactersTable[][DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS + 1] PROGMEM
 {
     "ESKISTLFÜNF",
     "ZEHNZWANZIG",
@@ -117,7 +117,29 @@ stdReturnType DisplayCharacters::getCharacter(byte Index, char* Character) const
     } else {
         return E_NOT_OK;
     }
-} /* getChar */
+} /* getCharacter */
+
+
+/******************************************************************************************************************************************************
+  getCharacter()
+  ******************************************************************************************************************************************************/
+/*! \brief          
+ *  \details        
+ *                  
+ *  \return         -
+******************************************************************************************************************************************************/
+stdReturnType DisplayCharacters::getCharacter(CharacterIdType CharacterId, char* Character) const
+{
+    byte Row, Column;
+    indexToColumnAndRow(CharacterId, Column, Row);
+
+    if(CharacterId < DISPLAY_CHARACTERS_NUMBER_OF_CHARACTERS) {
+        *Character =  getCharacterFast(CharacterId);
+        return E_OK;
+    } else {
+        return E_NOT_OK;
+    }
+} /* getCharacter */
 
 
 /******************************************************************************************************************************************************

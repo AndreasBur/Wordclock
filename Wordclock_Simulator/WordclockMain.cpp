@@ -25,9 +25,9 @@ wxEND_EVENT_TABLE()
 
 WordclockDialog::WordclockDialog(wxDialog *dlg, const wxString &title) : wxDialog(dlg, -1, title), WcDisplay(255, 255, 255), WcClock(&WcDisplay, Clock::MODE_WESSI), WcAnimation(&WcDisplay, &WcClock), WcTransformation(&WcDisplay), Timer(this, TIMER_ID)
 {
-    //Timer.Start(1000 * 2);
+    Timer.Start(1000);
     strcpy(Text, "geht gut GUT");
-    Timer.Start(100);
+    //Timer.Start(100);
     Time = wxDateTime::Now();
     int Hour = Time.GetHour();
     int Minute = Time.GetMinute();
@@ -46,7 +46,7 @@ WordclockDialog::WordclockDialog(wxDialog *dlg, const wxString &title) : wxDialo
     //WcTransformation.shiftRight(true);
     //WcTransformation.shiftUp(false);
     //WcTransformation.shiftDown(true);
-    WcAnimation.setAnimation(AnimationClock::ANIMATION_CLOCK_DROP);
+    WcAnimation.setAnimation(AnimationClock::ANIMATION_CLOCK_FLICKER);
     WcAnimation.setClock(Hour, Minute);
     //WcClock.show();
 }
@@ -72,13 +72,13 @@ void WordclockDialog::OnTimer(wxTimerEvent& event)
 
     WcAnimation.task();
 
-    if(WcAnimation.getState() == Animation::STATE_IDLE) {
-        Time = wxDateTime::Now();
-        int Hour = Time.GetHour();
-        int Minute = Time.GetMinute();
-        //WcDisplay.clear();
-        WcAnimation.setClock(Hour, Minute);
-    }
+//    if(WcAnimation.getState() == Animation::STATE_IDLE) {
+//        Time = wxDateTime::Now();
+//        int Hour = Time.GetHour();
+//        int Minute = Time.GetMinute();
+//        //WcDisplay.clear();
+//        WcAnimation.setClock(Hour, Minute);
+//    }
 
     WcDisplay.show();
 

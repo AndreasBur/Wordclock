@@ -134,6 +134,8 @@ void AnimationClockFade::task()
 ******************************************************************************************************************************************************/
 void AnimationClockFade::reset()
 {
+    Hour = 0;
+    Minute = 0;
     DisplayBrightness = 0;
 } /* reset */
 
