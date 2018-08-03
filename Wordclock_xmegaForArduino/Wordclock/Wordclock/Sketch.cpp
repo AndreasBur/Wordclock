@@ -58,5 +58,4 @@ void loop()
     //Char = 
     //wcFont.getCharFast(Font::FONT_5X8, (byte)5);
     //Font.getChar(5, Char);
-
 }

@@ -58,6 +58,11 @@ Display::Display(PixelColorType sColor) : Pixels()
     Color = sColor;
     State = STATE_UNINIT;
 
+#if (DISPLAY_USE_WS2812_DIMMING == STD_OFF)
+    Brightness = 255;
+    ColorDimmed = Color;
+#endif
+
 #ifdef SIMULATOR
     Pixels.SetIcon(wxICON(WordclockIcon));
     Pixels.Show();
@@ -79,6 +84,11 @@ Display::Display(byte Red, byte Green, byte Blue) : Pixels()
     Color.Green = Green;
     Color.Blue = Blue;
     State = STATE_UNINIT;
+
+#if (DISPLAY_USE_WS2812_DIMMING == STD_OFF)
+    Brightness = 255;
+    ColorDimmed = Color;
+#endif
 
 #ifdef SIMULATOR
     Pixels.SetIcon(wxICON(WordclockIcon));
@@ -110,6 +120,20 @@ void Display::init()
     Pixels.init(DISPLAY_DATA_PIN);
     State = STATE_INIT;
 } /* init */
+
+
+/******************************************************************************************************************************************************
+  setBrightness()
+******************************************************************************************************************************************************/
+/*! \brief          
+ *  \details        
+ *                  
+ *  \return         -
+******************************************************************************************************************************************************/
+void Display::setBrightness(byte sBrightness)
+{
+    
+} /* setBrightness */
 
 
 /******************************************************************************************************************************************************
@@ -335,9 +359,17 @@ stdReturnType Display::setPixel(byte Column, byte Row)
 {
 #if (DISPLAY_LED_STRIPE_SERPENTINE == STD_ON)
     /* if led stripe is snake or serpentine the odd row: count from right to left */
+# if (DISPLAY_USE_WS2812_DIMMING == STD_ON)
     return Pixels.setPixel(transformToSerpentine(Column,  Row), Color);
+# else
+    return Pixels.setPixel(transformToSerpentine(Column,  Row), ColorDimmed);
+# endif
 #else
+# if (DISPLAY_USE_WS2812_DIMMING == STD_ON)
     return Pixels.setPixel((Row * DISPLAY_NUMBER_OF_COLUMNS) + Column, Color);
+# else
+    return Pixels.setPixel((Row * DISPLAY_NUMBER_OF_COLUMNS) + Column, ColorDimmed);
+# endif
 #endif
 } /* setPixel */
 
@@ -479,13 +511,13 @@ stdReturnType Display::togglePixel(byte Column, byte Row)
     /* if led stripe is snake or serpentine then odd row: count from right to left */
     byte Index = transformToSerpentine(Column,  Row);
     getPixel(Index, &Pixel);
-    if(Pixel) { return Pixels.clearPixel(Index); }
-    else { return Pixels.setPixel(Index, Color); }
+    if(Pixel) { return clearPixel(Index); }
+    else { return setPixel(Index); }
 #else
     byte Index = (Row * DISPLAY_NUMBER_OF_COLUMNS) + Column;
     getPixel(Index, &Pixel);
     if(Pixel) { return Pixels.clearPixel(Index); }
-    else { return Pixels.setPixel(Index, Color); }
+    else { return setPixel(Index); }
 #endif
 } /* togglePixel */
 
@@ -503,12 +535,12 @@ void Display::togglePixelFast(byte Column, byte Row)
 #if (DISPLAY_LED_STRIPE_SERPENTINE == STD_ON)
     /* if led stripe is snake or serpentine then odd row: count from right to left */
     byte Index = transformToSerpentine(Column,  Row);
-    if(getPixelFast(Index)) Pixels.clearPixelFast(Index);
-    else Pixels.setPixelFast(Index, Color);
+    if(getPixelFast(Index)) clearPixelFast(Index);
+    else setPixelFast(Index);
 #else
     byte Index = (Row * DISPLAY_NUMBER_OF_COLUMNS) + Column;
-    if(getPixelFast(Index)) Pixels.clearPixelFast(Index);
-    else Pixels.setPixelFast(Index, Color);
+    if(getPixelFast(Index)) clearPixelFast(Index);
+    else setPixelFast(Index);
 #endif
 } /* togglePixelFast */
 

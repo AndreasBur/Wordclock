@@ -30,6 +30,7 @@
 /* WS2812 configuration parameter */
 #define WS2812_RESET_TIMER                          STD_OFF
 #define WS2812_RGB_ORDER_ON_RUNTIME                 STD_OFF
+#define WS2812_SUPPORT_DIMMING                      STD_ON
 #define WS2812_NUMBER_OF_LEDS                       110
 
 /* WS2812 parameter */
@@ -94,7 +95,7 @@ class WS2812
         byte Blue;
     };
 
-    using Gamma7TableElementType = uint8_t;
+    using Gamma7TableElementType = byte;
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
@@ -103,9 +104,11 @@ class WS2812
     byte PinMask;
     volatile byte* PortOutputRegister;
     byte Pixels[WS2812_NUMBER_OF_LEDS * WS2812_NUMBER_OF_COLORS];
-    byte Brightness;
     static const Gamma7TableElementType Gamma7Table[];
 
+#if (WS2812_SUPPORT_DIMMING == STD_ON)
+    byte Brightness;
+#endif
 
 #if (WS2812_RESET_TIMER == STD_ON)
     unsigned long ResetTimer;
@@ -117,18 +120,25 @@ class WS2812
     byte OffsetBlue;
 #endif
     // functions
-    uint8_t calcGamma7CorrectionValue(byte);
+    byte calcGamma7CorrectionValue(byte);
     void sendData(const byte*, uint16_t);
+
+#if (WS2812_SUPPORT_DIMMING == STD_ON)
     void dimmPixels(byte*, uint16_t);
     void dimmPixel(PixelType*, PixelType);
     void dimmPixel(PixelType*, byte, byte, byte);
     void dimmColor(byte* ColorDimmed, byte Color) const { *ColorDimmed = (Color * Brightness) >> 8; }
+#endif
 
     Gamma7TableElementType getGamma7TableElement(byte Index) const {
         Gamma7TableElementType Gamma7TableElement;
         memcpy_P(&Gamma7TableElement, &Gamma7Table[Index], sizeof(Gamma7TableElementType));
         return Gamma7TableElement;
     }
+
+#if (WS2812_RESET_TIMER == STD_ON)
+    boolean isResetTimeElapsed() { return ((micros() - ResetTimer) > (WS2812_RESET_DURATION_NS / 1000) || ResetTimer == 0); }
+#endif
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
@@ -138,11 +148,14 @@ class WS2812
     ~WS2812();
 
     // get methods
-    byte getBrightness() const { return Brightness; }
     stdReturnType getPixel(byte, PixelType*) const;
-    stdReturnType getPixelDimmed(byte, PixelType*) const;
     PixelType getPixelFast(byte) const;
+    
+#if (WS2812_SUPPORT_DIMMING == STD_ON)
+    byte getBrightness() const { return Brightness; }
+    stdReturnType getPixelDimmed(byte, PixelType*) const;
     PixelType getPixelDimmedFast(byte) const;
+#endif
 
     // set methods
     void setBrightness(byte sBrightness, boolean = false);

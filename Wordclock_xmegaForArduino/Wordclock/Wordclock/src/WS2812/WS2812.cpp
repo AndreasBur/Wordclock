@@ -101,7 +101,9 @@ const WS2812::Gamma7TableElementType Gamma7Table[] PROGMEM {133, 139, 145, 151, 
  *****************************************************************************************************************************************************/
 WS2812::WS2812()
 {
+#if (WS2812_SUPPORT_DIMMING == STD_ON)
     Brightness = 255;
+#endif
 #if (WS2812_RESET_TIMER == STD_ON)
     ResetTimer = 0;
 #endif
@@ -187,21 +189,24 @@ void WS2812::show()
 #endif
 {
 #if (WS2812_RESET_TIMER == STD_ON)
-    if((micros() - ResetTimer) > (WS2812_RESET_DURATION_NS / 1000) || ResetTimer == 0) {
+    if(isResetTimeElapsed() == false) return E_NOT_OK;
 #endif
-        if(Brightness != 255) {
-            byte PixelsDimmed[WS2812_NUMBER_OF_LEDS * WS2812_NUMBER_OF_COLORS];
-            dimmPixels(PixelsDimmed, WS2812_NUMBER_OF_LEDS * WS2812_NUMBER_OF_COLORS);
-            sendData(PixelsDimmed, WS2812_NUMBER_OF_LEDS * WS2812_NUMBER_OF_COLORS);
-        } else {
-            sendData(Pixels, WS2812_NUMBER_OF_LEDS * WS2812_NUMBER_OF_COLORS);
-        }
-#if (WS2812_RESET_TIMER == STD_ON)
-        ResetTimer = micros();
-        return E_OK;
+
+#if (WS2812_SUPPORT_DIMMING == STD_ON)
+    if(Brightness != 255) {
+        byte PixelsDimmed[WS2812_NUMBER_OF_LEDS * WS2812_NUMBER_OF_COLORS];
+        dimmPixels(PixelsDimmed, WS2812_NUMBER_OF_LEDS * WS2812_NUMBER_OF_COLORS);
+        sendData(PixelsDimmed, WS2812_NUMBER_OF_LEDS * WS2812_NUMBER_OF_COLORS);
     } else {
-        return E_NOT_OK;
+        sendData(Pixels, WS2812_NUMBER_OF_LEDS * WS2812_NUMBER_OF_COLORS);
     }
+#elif (WS2812_SUPPORT_DIMMING == STD_OFF)
+    sendData(Pixels, WS2812_NUMBER_OF_LEDS * WS2812_NUMBER_OF_COLORS);
+#endif
+
+#if (WS2812_RESET_TIMER == STD_ON)
+    ResetTimer = micros();
+    return E_OK;
 #endif
 } /* show */
 
@@ -247,6 +252,7 @@ WS2812::PixelType WS2812::getPixelFast(byte Index) const
 } /* getPixelFast */
 
 
+#if (WS2812_SUPPORT_DIMMING == STD_ON)
 /******************************************************************************************************************************************************
   getPixelDimmed()
 ******************************************************************************************************************************************************/
@@ -312,6 +318,7 @@ void WS2812::setBrightness(byte sBrightness, boolean GammaCorrection)
     }
 
 } /* setBrightness */
+#endif /* WS2812_SUPPORT_DIMMING */
 
 
 /******************************************************************************************************************************************************
@@ -452,13 +459,14 @@ void WS2812::setColorOrder(ColorOrderType ColorOrder)
  *  param[in]       ValueLinear    7 bit unsigned (0..127)
  *  \return         exponential value (approx. 1.0443^x) (1..255)
  *****************************************************************************************************************************************************/
-uint8_t WS2812::calcGamma7CorrectionValue(byte ValueLinear)
+byte WS2812::calcGamma7CorrectionValue(byte ValueLinear)
 {
     Gamma7TableElementType Exponent = getGamma7TableElement(ValueLinear % WS2812_GAMMA7_TABLE_NUMBER_OF_VALUES);
     return Exponent >> (7 - ValueLinear / WS2812_GAMMA7_TABLE_NUMBER_OF_VALUES);
 } /* calcGamma7CorrectionValue */
 
 
+#if (WS2812_SUPPORT_DIMMING == STD_ON)
 /******************************************************************************************************************************************************
   dimmPixel()
 ******************************************************************************************************************************************************/
@@ -508,7 +516,8 @@ inline void WS2812::dimmPixels(byte* PixelsDimmed, uint16_t DataLength)
         dimmColor(&PixelsDimmed[WS2812_POS_ABS_BLUE(i)], Pixels[WS2812_POS_ABS_BLUE(i)]);
     }
 } /* dimmPixels */
- 
+#endif
+
 
 /******************************************************************************************************************************************************
   sendData()

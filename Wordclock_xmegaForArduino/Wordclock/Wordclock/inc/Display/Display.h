@@ -33,6 +33,7 @@
 /* Display configuration parameter */
 #define DISPLAY_DATA_PIN                        10
 #define DISPLAY_LED_STRIPE_SERPENTINE           STD_OFF
+#define DISPLAY_USE_WS2812_DIMMING              STD_OFF
 
 /* Display parameter */
 #define DISPLAY_NUMBER_OF_ROWS                  DISPLAY_CHARACTERS_NUMBER_OF_ROWS
@@ -102,6 +103,11 @@ class Display
     Stripe Pixels;
     PixelColorType Color;
     DisplayWords Words;
+
+#if (DISPLAY_USE_WS2812_DIMMING == STD_OFF)
+    byte Brightness;
+    PixelColorType ColorDimmed;
+#endif
     
     // functions
     byte transformToSerpentine(byte, byte) const;
@@ -118,12 +124,22 @@ class Display
     // get methods
     PixelColorType getColor() const { return Color; }
     StateType getState() const { return State; }
+
+#if (DISPLAY_USE_WS2812_DIMMING == STD_ON)
     byte getBrightness() const { return Pixels.getBrightness(); }
+#else
+    byte getBrightness() const { return Brightness; }
+#endif
 
     // set methods
     void setColor(PixelColorType sColor) { Color = sColor; }
     void setColor(byte Red, byte Green, byte Blue) { Color.Red = Red; Color.Green = Green; Color.Blue = Blue; }
+
+#if (DISPLAY_USE_WS2812_DIMMING == STD_ON)
     void setBrightness(byte Brightness) { Pixels.setBrightness(Brightness, true); }
+#else
+    void setBrightness(byte);
+#endif
 
     // char methods
     stdReturnType setCharacter(CharacterIdType CharacterId) { return setPixel(CharacterId); }
