@@ -35,6 +35,10 @@
 #define DISPLAY_LED_STRIPE_SERPENTINE           STD_OFF
 #define DISPLAY_USE_WS2812_DIMMING              STD_OFF
 
+#if (DISPLAY_USE_WS2812_DIMMING == STD_ON) && (WS2812_SUPPORT_DIMMING == STD_OFF)
+    #error "Display: Please activate WS2812 dimming support"
+#endif
+
 /* Display parameter */
 #define DISPLAY_NUMBER_OF_ROWS                  DISPLAY_CHARACTERS_NUMBER_OF_ROWS
 #define DISPLAY_NUMBER_OF_COLUMNS               DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS
@@ -105,6 +109,7 @@ class Display
     DisplayWords Words;
 
 #if (DISPLAY_USE_WS2812_DIMMING == STD_OFF)
+    GammaCorrection GCorrection;
     byte Brightness;
     PixelColorType ColorDimmed;
 #endif
@@ -112,6 +117,10 @@ class Display
     // functions
     byte transformToSerpentine(byte, byte) const;
     byte transformToSerpentine(byte) const;
+
+#if (DISPLAY_USE_WS2812_DIMMING == STD_OFF)
+    byte dimmColor(byte Color) const { return (Color * Brightness) >> 8; }
+#endif
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S

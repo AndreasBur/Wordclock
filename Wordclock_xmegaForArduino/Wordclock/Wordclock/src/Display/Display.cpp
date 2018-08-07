@@ -121,7 +121,7 @@ void Display::init()
     State = STATE_INIT;
 } /* init */
 
-
+#if (DISPLAY_USE_WS2812_DIMMING == STD_OFF)
 /******************************************************************************************************************************************************
   setBrightness()
 ******************************************************************************************************************************************************/
@@ -132,9 +132,22 @@ void Display::init()
 ******************************************************************************************************************************************************/
 void Display::setBrightness(byte sBrightness)
 {
-    
-} /* setBrightness */
+    Brightness = GCorrection.getCorrectedValue(sBrightness);
 
+    ColorDimmed.Red = dimmColor(Color.Red);
+    ColorDimmed.Green = dimmColor(Color.Green);
+    ColorDimmed.Blue = dimmColor(Color.Blue);
+
+    if(Brightness == 0) {
+        Pixels.clearAllPixels();
+    } else {
+        for(byte Index = 0; Index < DISPLAY_NUMBER_OF_PIXELS; Index++) {
+            // update all pixels to new brightness
+            if(getPixelFast(Index)) { setPixelFast(Index); }
+        }
+    }
+} /* setBrightness */
+#endif
 
 /******************************************************************************************************************************************************
   setWord()
@@ -386,9 +399,17 @@ void Display::setPixelFast(byte Column, byte Row)
 {
 #if (DISPLAY_LED_STRIPE_SERPENTINE == STD_ON)
     /* if led stripe is snake or serpentine the odd row: count from right to left */
+# if (DISPLAY_USE_WS2812_DIMMING == STD_ON)
     Pixels.setPixelFast(transformToSerpentine(Column,  Row), Color);
+# else
+    Pixels.setPixelFast(transformToSerpentine(Column,  Row), ColorDimmed);
+# endif
 #else
+# if (DISPLAY_USE_WS2812_DIMMING == STD_ON)
     Pixels.setPixelFast((Row * DISPLAY_NUMBER_OF_COLUMNS) + Column, Color);
+# else
+    Pixels.setPixelFast((Row * DISPLAY_NUMBER_OF_COLUMNS) + Column, ColorDimmed);
+# endif
 #endif
 } /* setPixelFast */
 

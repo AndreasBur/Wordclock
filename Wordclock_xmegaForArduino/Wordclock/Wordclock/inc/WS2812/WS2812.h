@@ -22,7 +22,7 @@
 ******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Arduino.h"
-
+#include "GammaCorrection.h"
 
 /******************************************************************************************************************************************************
  *  GLOBAL CONSTANT MACROS
@@ -30,7 +30,7 @@
 /* WS2812 configuration parameter */
 #define WS2812_RESET_TIMER                          STD_OFF
 #define WS2812_RGB_ORDER_ON_RUNTIME                 STD_OFF
-#define WS2812_SUPPORT_DIMMING                      STD_ON
+#define WS2812_SUPPORT_DIMMING                      STD_OFF
 #define WS2812_NUMBER_OF_LEDS                       110
 
 /* WS2812 parameter */
@@ -48,21 +48,10 @@
 #define WS2812_PERIOD_DURATION_NS                   1250
 #define WS2812_RESET_DURATION_NS                    50000
 
-#define WS2812_GAMMA7_TABLE_NUMBER_OF_VALUES        16
-
 
 /******************************************************************************************************************************************************
  *  GLOBAL FUNCTION MACROS
 ******************************************************************************************************************************************************/
-#if (WS2812_RGB_ORDER_ON_RUNTIME == STD_ON)
-    #define WS2812_POS_ABS_RED(Red)             (Red + OffsetRed)
-    #define WS2812_POS_ABS_GREEN(Green)         (Green + OffsetGreen)
-    #define WS2812_POS_ABS_BLUE(Blue)           (Blue + OffsetBlue)
-#else
-    #define WS2812_POS_ABS_RED(Red)             (Red + WS2812_COLOR_OFFSET_RED)
-    #define WS2812_POS_ABS_GREEN(Green)         (Green + WS2812_COLOR_OFFSET_GREEN)
-    #define WS2812_POS_ABS_BLUE(Blue)           (Blue + WS2812_COLOR_OFFSET_BLUE)
-#endif
 
 
 /******************************************************************************************************************************************************
@@ -95,8 +84,6 @@ class WS2812
         byte Blue;
     };
 
-    using Gamma7TableElementType = byte;
-
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
@@ -104,9 +91,10 @@ class WS2812
     byte PinMask;
     volatile byte* PortOutputRegister;
     byte Pixels[WS2812_NUMBER_OF_LEDS * WS2812_NUMBER_OF_COLORS];
-    static const Gamma7TableElementType Gamma7Table[];
+
 
 #if (WS2812_SUPPORT_DIMMING == STD_ON)
+    GammaCorrection GCorrection;
     byte Brightness;
 #endif
 
@@ -120,7 +108,6 @@ class WS2812
     byte OffsetBlue;
 #endif
     // functions
-    byte calcGamma7CorrectionValue(byte);
     void sendData(const byte*, uint16_t);
 
 #if (WS2812_SUPPORT_DIMMING == STD_ON)
@@ -129,12 +116,6 @@ class WS2812
     void dimmPixel(PixelType*, byte, byte, byte);
     void dimmColor(byte* ColorDimmed, byte Color) const { *ColorDimmed = (Color * Brightness) >> 8; }
 #endif
-
-    Gamma7TableElementType getGamma7TableElement(byte Index) const {
-        Gamma7TableElementType Gamma7TableElement;
-        memcpy_P(&Gamma7TableElement, &Gamma7Table[Index], sizeof(Gamma7TableElementType));
-        return Gamma7TableElement;
-    }
 
 #if (WS2812_RESET_TIMER == STD_ON)
     boolean isResetTimeElapsed() { return ((micros() - ResetTimer) > (WS2812_RESET_DURATION_NS / 1000) || ResetTimer == 0); }

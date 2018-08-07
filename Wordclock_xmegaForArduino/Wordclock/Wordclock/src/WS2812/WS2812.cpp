@@ -78,13 +78,19 @@
 /******************************************************************************************************************************************************
  *  LOCAL FUNCTION MACROS
 ******************************************************************************************************************************************************/
-
-
+#if (WS2812_RGB_ORDER_ON_RUNTIME == STD_ON)
+    #define WS2812_POS_ABS_RED(Red)             (Red + OffsetRed)
+    #define WS2812_POS_ABS_GREEN(Green)         (Green + OffsetGreen)
+    #define WS2812_POS_ABS_BLUE(Blue)           (Blue + OffsetBlue)
+#else
+    #define WS2812_POS_ABS_RED(Red)             (Red + WS2812_COLOR_OFFSET_RED)
+    #define WS2812_POS_ABS_GREEN(Green)         (Green + WS2812_COLOR_OFFSET_GREEN)
+    #define WS2812_POS_ABS_BLUE(Blue)           (Blue + WS2812_COLOR_OFFSET_BLUE)
+#endif
 
 /******************************************************************************************************************************************************
  *  LOCAL DATA TYPES AND STRUCTURES
 ******************************************************************************************************************************************************/
-const WS2812::Gamma7TableElementType Gamma7Table[] PROGMEM {133, 139, 145, 151, 158, 165, 172, 180, 188, 196, 205, 214, 224, 234, 244, 255};
 
 
 /******************************************************************************************************************************************************
@@ -312,7 +318,7 @@ WS2812::PixelType WS2812::getPixelDimmedFast(byte Index) const
 void WS2812::setBrightness(byte sBrightness, boolean GammaCorrection)
 {
     if(GammaCorrection) {
-        Brightness = calcGamma7CorrectionValue(sBrightness / 2);
+        Brightness = GCorrection.getCorrectedValue(sBrightness / 2);
     } else {
         Brightness = sBrightness;
     }
@@ -449,22 +455,6 @@ void WS2812::setColorOrder(ColorOrderType ColorOrder)
 /******************************************************************************************************************************************************
  * P R I V A T E   F U N C T I O N S
 ******************************************************************************************************************************************************/
-
-/******************************************************************************************************************************************************
-  calcGammaCorrectionValue()
-******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        calculates the gamma correction value with the help of a small table
- *                  and very efficient shift calculation
- *  param[in]       ValueLinear    7 bit unsigned (0..127)
- *  \return         exponential value (approx. 1.0443^x) (1..255)
- *****************************************************************************************************************************************************/
-byte WS2812::calcGamma7CorrectionValue(byte ValueLinear)
-{
-    Gamma7TableElementType Exponent = getGamma7TableElement(ValueLinear % WS2812_GAMMA7_TABLE_NUMBER_OF_VALUES);
-    return Exponent >> (7 - ValueLinear / WS2812_GAMMA7_TABLE_NUMBER_OF_VALUES);
-} /* calcGamma7CorrectionValue */
-
 
 #if (WS2812_SUPPORT_DIMMING == STD_ON)
 /******************************************************************************************************************************************************

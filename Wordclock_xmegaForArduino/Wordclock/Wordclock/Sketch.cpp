@@ -54,8 +54,5 @@ void loop()
     wcClock.setClock(17,30);
     wcDisplay.show();
 
-    FontSprite5x8::FontCharType Char;
-    //Char = 
-    //wcFont.getCharFast(Font::FONT_5X8, (byte)5);
-    //Font.getChar(5, Char);
+    volatile int Test = 5;
 }

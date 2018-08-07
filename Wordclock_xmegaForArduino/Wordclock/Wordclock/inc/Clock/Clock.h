@@ -113,8 +113,8 @@ class Clock
         }
         bool operator!=(const ClockWordsType& ClockWords)
         {
-            if(operator==(ClockWords)) return false;
-            else return true;
+            if(operator==(ClockWords)) { return false; }
+            else { return true; }
         }
     };
 
