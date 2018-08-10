@@ -14,82 +14,41 @@
  *      \details    
  *                  
  *
- *****************************************************************************************************************************************************/
+******************************************************************************************************************************************************/
 #define _WS2812_SOURCE_
 
 /******************************************************************************************************************************************************
- * INCLUDES
- *****************************************************************************************************************************************************/
+ * I N C L U D E S
+******************************************************************************************************************************************************/
 #include "WS2812.h"
-#include <util/atomic.h>
+
 
 /******************************************************************************************************************************************************
- *  LOCAL CONSTANT MACROS
+ *  L O C A L   C O N S T A N T   M A C R O S 
 ******************************************************************************************************************************************************/
-/* fixed cycles by inline assembler in send data function */
-#define WS2812_ASM_FIXED_CYCLES_LOW         3
-#define WS2812_ASM_FIXED_CYCLES_HIGH        6
-#define WS2812_ASM_FIXED_CYCLES_TOTAL       10
+/* WS2812 parameter */
+#define WS2812_USART_SPI_BAUDRATE                   800000UL
+#define WS2812_ZERO_PULSE_DURATION_NS               350
+#define WS2812_ONE_PULSE_DURATION_NS                900
+#define WS2812_XCL_LUT_TRUTH_TABLE_VALUE            0xA0
 
-/* calculate cycles to match the timing, if possible */
-#define WS2812_ZERO_CYCLES                  (((F_CPU / 1000) * WS2812_ZERO_PULSE_DURATION_NS) / 1000000)
-#define WS2812_ONE_CYCLES                   (((F_CPU / 1000) * WS2812_ONE_PULSE_DURATION_NS)  / 1000000) /* +500000 überdenken */
-#define WS2812_TOTAL_CYCLES                 (((F_CPU / 1000) * WS2812_PERIOD_DURATION_NS)     / 1000000) /* +500000 überdenken */
+#define WS2812_BTC0_TIMER_CYCLES_ZERO_PULSE         (((F_CPU / 1000) * WS2812_ZERO_PULSE_DURATION_NS) / 1000000)
+#define WS2812_BTC0_TIMER_CYCLES_ONE_PULSE          (((F_CPU / 1000) * WS2812_ONE_PULSE_DURATION_NS)  / 1000000)
 
-/* W1 NOPs between start (rising edge) and falling edge low */
-#define WS2812_ASM_W1_SIGNED                (WS2812_ZERO_CYCLES - WS2812_ASM_FIXED_CYCLES_LOW)
-/* W2 NOPs between falling edge low and falling edge high */
-#define WS2812_ASM_W2_SIGNED                (WS2812_ONE_CYCLES - WS2812_ASM_FIXED_CYCLES_HIGH - WS2812_ASM_W1_SIGNED)
-/* W3 NOPs between falling edge high and end to complete loop */
-#define WS2812_ASM_W3_SIGNED                (WS2812_TOTAL_CYCLES - WS2812_ASM_FIXED_CYCLES_TOTAL - WS2812_ASM_W1_SIGNED - WS2812_ASM_W2_SIGNED)
-
-/* simple way to delete negative wait values */
-#if (WS2812_ASM_W1_SIGNED > 0)
-    #define WS2812_ASM_W1_NOPs              WS2812_ASM_W1_SIGNED
-#else
-    #define WS2812_ASM_W1_NOPs              0
-#endif
-
-#if (WS2812_ASM_W2_SIGNED > 0)
-    #define WS2812_ASM_W2_NOPs              WS2812_ASM_W2_SIGNED
-#else
-    #define WS2812_ASM_W2_NOPs              0
-#endif
-
-#if (WS2812_ASM_W3_SIGNED > 0)
-    #define WS2812_ASM_W3_NOPs              WS2812_ASM_W3_SIGNED
-#else
-    #define WS2812_ASM_W3_NOPs              0
-#endif
-
-/* the only critical timing parameter is the minimum pulse length of zero "0" 
-   warn or throw error if this timing can not be met with current F_CPU settings. */
-#define WS2812_ZERO_PULSE_DURATION_NS_CALC (((WS2812_ASM_W1_NOPs + WS2812_ASM_FIXED_CYCLES_LOW) * 1000000) / (F_CPU / 1000))
-
-
-#if (WS2812_ZERO_PULSE_DURATION_NS_CALC > 550)
-    #error "WS2812: sorry, the clock speed is too low. Did you set F_CPU correctly?"
-#elif (WS2812_ZERO_PULSE_DURATION_NS_CALC > 450)
-    #warning "WS2812: The timing is critical and may only work on WS2812B, not on WS2812(S)."
-    #warning "Please consider a higher clockspeed, if possible"
-#endif
+// missing in iox32e5.h
+#define USART_UCPHA_bm  0x02  /* Clock Phase bit mask. */
+#define USART_UCPHA_bp  1     /* Clock Phase bit position. */
+#define USART_UDORD_bm  0x04  /* Data Order bit mask. */
+#define USART_UDORD_bp  2     /* Data Order bit position. */
 
 
 /******************************************************************************************************************************************************
- *  LOCAL FUNCTION MACROS
+ *  L O C A L   F U N C T I O N   M A C R O S
 ******************************************************************************************************************************************************/
-#if (WS2812_RGB_ORDER_ON_RUNTIME == STD_ON)
-    #define WS2812_POS_ABS_RED(Red)             (Red + OffsetRed)
-    #define WS2812_POS_ABS_GREEN(Green)         (Green + OffsetGreen)
-    #define WS2812_POS_ABS_BLUE(Blue)           (Blue + OffsetBlue)
-#else
-    #define WS2812_POS_ABS_RED(Red)             (Red + WS2812_COLOR_OFFSET_RED)
-    #define WS2812_POS_ABS_GREEN(Green)         (Green + WS2812_COLOR_OFFSET_GREEN)
-    #define WS2812_POS_ABS_BLUE(Blue)           (Blue + WS2812_COLOR_OFFSET_BLUE)
-#endif
+
 
 /******************************************************************************************************************************************************
- *  LOCAL DATA TYPES AND STRUCTURES
+ *  L O C A L   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
 
 
@@ -104,18 +63,14 @@
  *  \details        Instantiation of the WS2812 library
  *
  *  \return         -
- *****************************************************************************************************************************************************/
-WS2812::WS2812()
+******************************************************************************************************************************************************/
+WS2812::WS2812() : State{STATE_UNINIT}, PixelsBuffer1{}, PixelsBuffer2{}
 {
+    pCurrentFrame = &PixelsBuffer1;
+    pNextFrame = &PixelsBuffer2;
+
 #if (WS2812_SUPPORT_DIMMING == STD_ON)
     Brightness = 255;
-#endif
-#if (WS2812_RESET_TIMER == STD_ON)
-    ResetTimer = 0;
-#endif
-    clearAllPixels();
-#if (WS2812_RGB_ORDER_ON_RUNTIME == STD_ON)
-    setColorOrder(COLOR_ORDER_BRG);
 #endif
 } /* WS2812 */
 
@@ -130,54 +85,43 @@ WS2812::~WS2812()
 
 
 /******************************************************************************************************************************************************
+  Singleton Instance of WS2812
+******************************************************************************************************************************************************/
+WS2812& WS2812::getInstance()
+{
+    static WS2812 SingletonInstance;
+    return SingletonInstance;
+}
+
+
+/******************************************************************************************************************************************************
   init()
 ******************************************************************************************************************************************************/
 /*! \brief          
  *  \details        
  *                  
  *  \return         -
- *****************************************************************************************************************************************************/
-void WS2812::init(byte Pin)
+******************************************************************************************************************************************************/
+void WS2812::init(PortType Port, PinType Pin)
 {
-    setPin(Pin);
-    show();
+    if(Port == PORT_C) {
+        initUsart(&USARTC0);
+        initPort(&PORTC);
+        initDma(&USARTC0, EDMA_CH_TRIGSRC_USARTC0_DRE_gc);
+        initEventSystem(EVSYS_CHMUX_PORTC_PIN3_gc, EVSYS_CHMUX_PORTC_PIN1_gc);
+        if(Pin == PIN_0) { initXcl(XCL_LUT0OUTEN_PIN0_gc, XCL_PORTSEL_PC_gc); }
+        else if(Pin == PIN_4) { initXcl(XCL_LUT0OUTEN_PIN4_gc, XCL_PORTSEL_PC_gc); } 
+    }
+    if(Port == PORT_D) {
+        initUsart(&USARTD0);
+        initPort(&PORTD);
+        initDma(&USARTD0, EDMA_CH_TRIGSRC_USARTD0_DRE_gc);
+        initEventSystem(EVSYS_CHMUX_PORTD_PIN3_gc, EVSYS_CHMUX_PORTD_PIN1_gc);
+        if(Pin == PIN_0) { initXcl(XCL_LUT0OUTEN_PIN0_gc, XCL_PORTSEL_PD_gc); }
+        else if(Pin == PIN_4) { initXcl(XCL_LUT0OUTEN_PIN4_gc, XCL_PORTSEL_PD_gc); }
+    }
+    State = STATE_IDLE;
 } /* init */
-
-
-/******************************************************************************************************************************************************
-  setAllPixels()
-******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
- *  \return         -
- *****************************************************************************************************************************************************/
-void WS2812::setAllPixels(PixelType Pixel)
-{
-    for(byte Index = 0; Index < WS2812_NUMBER_OF_LEDS; Index++) {
-        Pixels[WS2812_POS_ABS_RED(Index)] = Pixel.Red;
-        Pixels[WS2812_POS_ABS_GREEN(Index)] = Pixel.Green;
-        Pixels[WS2812_POS_ABS_BLUE(Index)] = Pixel.Blue;
-    }
-}
-
-
-/******************************************************************************************************************************************************
-  setAllPixels()
-******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
- *  \return         -
- *****************************************************************************************************************************************************/
-void WS2812::setAllPixels(byte Red, byte Green, byte Blue)
-{
-    for(byte Index = 0; Index < WS2812_NUMBER_OF_LEDS; Index++) {
-        Pixels[WS2812_POS_ABS_RED(Index)] = Red;
-        Pixels[WS2812_POS_ABS_GREEN(Index)] = Green;
-        Pixels[WS2812_POS_ABS_BLUE(Index)] = Blue;
-    }
-}
 
 
 /******************************************************************************************************************************************************
@@ -187,34 +131,42 @@ void WS2812::setAllPixels(byte Red, byte Green, byte Blue)
  *  \details        
  *                  
  *  \return         -
- *****************************************************************************************************************************************************/
-#if (WS2812_RESET_TIMER == STD_ON)
+******************************************************************************************************************************************************/
 stdReturnType WS2812::show()
-#elif (WS2812_RESET_TIMER == STD_OFF)
-void WS2812::show()
-#endif
 {
-#if (WS2812_RESET_TIMER == STD_ON)
-    if(isResetTimeElapsed() == false) return E_NOT_OK;
-#endif
-
+    if(State == STATE_IDLE) {
 #if (WS2812_SUPPORT_DIMMING == STD_ON)
-    if(Brightness != 255) {
-        byte PixelsDimmed[WS2812_NUMBER_OF_LEDS * WS2812_NUMBER_OF_COLORS];
-        dimmPixels(PixelsDimmed, WS2812_NUMBER_OF_LEDS * WS2812_NUMBER_OF_COLORS);
-        sendData(PixelsDimmed, WS2812_NUMBER_OF_LEDS * WS2812_NUMBER_OF_COLORS);
+        if(Brightness != 255) {
+            showNextFrameDimmed();
+        } else {
+            showNextFrame();
+        }
+#else
+        showNextFrame();
+#endif
+        return E_OK;
     } else {
-        sendData(Pixels, WS2812_NUMBER_OF_LEDS * WS2812_NUMBER_OF_COLORS);
+        return E_NOT_OK;
     }
-#elif (WS2812_SUPPORT_DIMMING == STD_OFF)
-    sendData(Pixels, WS2812_NUMBER_OF_LEDS * WS2812_NUMBER_OF_COLORS);
-#endif
-
-#if (WS2812_RESET_TIMER == STD_ON)
-    ResetTimer = micros();
-    return E_OK;
-#endif
 } /* show */
+
+
+/******************************************************************************************************************************************************
+  setPixels()
+******************************************************************************************************************************************************/
+/*! \brief          
+ *  \details        
+ *                  
+ *  \return         -
+******************************************************************************************************************************************************/
+void WS2812::setPixels(byte Red, byte Green, byte Blue)
+{
+    for(IndexType Index = 0; Index < WS2812_NUMBER_OF_LEDS; Index++) {
+        (*pNextFrame)[Index].setRed(Red);
+        (*pNextFrame)[Index].setGreen(Green);
+        (*pNextFrame)[Index].setGreen(Blue);
+    }
+} /* setPixels */
 
 
 /******************************************************************************************************************************************************
@@ -224,13 +176,11 @@ void WS2812::show()
  *  \details        
  *                  
  *  \return         -
- *****************************************************************************************************************************************************/
-stdReturnType WS2812::getPixel(byte Index, PixelType* Pixel) const
+******************************************************************************************************************************************************/
+stdReturnType WS2812::getPixel(IndexType Index, PixelType& Pixel) const
 {
     if(Index < WS2812_NUMBER_OF_LEDS) {
-        Pixel->Red = Pixels[WS2812_POS_ABS_RED(Index)];
-        Pixel->Green = Pixels[WS2812_POS_ABS_GREEN(Index)];
-        Pixel->Blue = Pixels[WS2812_POS_ABS_BLUE(Index)];
+        Pixel = (*pNextFrame)[Index].getPixel();
         return E_OK;
     } else {
         return E_NOT_OK;
@@ -239,23 +189,155 @@ stdReturnType WS2812::getPixel(byte Index, PixelType* Pixel) const
 
 
 /******************************************************************************************************************************************************
-  getPixelFast()
+  getPixelRed()
 ******************************************************************************************************************************************************/
 /*! \brief          
  *  \details        
  *                  
  *  \return         -
- *****************************************************************************************************************************************************/
-WS2812::PixelType WS2812::getPixelFast(byte Index) const
+******************************************************************************************************************************************************/
+stdReturnType WS2812::getPixelRed(IndexType Index, byte& Red) const
 {
-    PixelType Pixel;
-    
-    Pixel.Red = Pixels[WS2812_POS_ABS_RED(Index)];
-    Pixel.Green = Pixels[WS2812_POS_ABS_GREEN(Index)];
-    Pixel.Blue = Pixels[WS2812_POS_ABS_BLUE(Index)];
-    
-    return Pixel;
-} /* getPixelFast */
+    if(Index < WS2812_NUMBER_OF_LEDS) {
+        Red = (*pNextFrame)[Index].getRed();
+        return E_OK;
+    } else {
+        return E_NOT_OK;
+    }
+} /* getPixelRed */
+
+
+/******************************************************************************************************************************************************
+  getPixelGreen()
+******************************************************************************************************************************************************/
+/*! \brief          
+ *  \details        
+ *                  
+ *  \return         -
+******************************************************************************************************************************************************/
+stdReturnType WS2812::getPixelGreen(IndexType Index, byte& Green) const
+{
+    if(Index < WS2812_NUMBER_OF_LEDS) {
+        Green = (*pNextFrame)[Index].getGreen();
+        return E_OK;
+    } else {
+        return E_NOT_OK;
+    }
+} /* getPixelGreen */
+
+
+/******************************************************************************************************************************************************
+  getPixelBlue()
+******************************************************************************************************************************************************/
+/*! \brief          
+ *  \details        
+ *                  
+ *  \return         -
+******************************************************************************************************************************************************/
+stdReturnType WS2812::getPixelBlue(IndexType Index, byte& Blue) const
+{
+    if(Index < WS2812_NUMBER_OF_LEDS) {
+        Blue = (*pNextFrame)[Index].getBlue();
+        return E_OK;
+    } else {
+        return E_NOT_OK;
+    }
+} /* getPixelBlue */
+
+
+/******************************************************************************************************************************************************
+  setPixel()
+******************************************************************************************************************************************************/
+/*! \brief          
+ *  \details        
+ *                  
+ *  \return         -
+******************************************************************************************************************************************************/
+stdReturnType WS2812::setPixel(IndexType Index, PixelType Pixel)
+{
+    if(Index < WS2812_NUMBER_OF_LEDS) {
+        (*pNextFrame)[Index].setPixel(Pixel);
+        return E_OK;
+    } else {
+        return E_NOT_OK;
+    }
+} /* setPixel */
+
+
+/******************************************************************************************************************************************************
+  setPixelRed()
+******************************************************************************************************************************************************/
+/*! \brief          
+ *  \details        
+ *                  
+ *  \return         -
+******************************************************************************************************************************************************/
+stdReturnType WS2812::setPixelRed(IndexType Index, byte Red)
+{
+    if(Index < WS2812_NUMBER_OF_LEDS) {
+        (*pNextFrame)[Index].setRed(Red);
+        return E_OK;
+    } else {
+        return E_NOT_OK;
+    }
+} /* setPixelRed */
+
+
+/******************************************************************************************************************************************************
+  setPixelGreen()
+******************************************************************************************************************************************************/
+/*! \brief          
+ *  \details        
+ *                  
+ *  \return         -
+******************************************************************************************************************************************************/
+stdReturnType WS2812::setPixelGreen(IndexType Index, byte Green)
+{
+    if(Index < WS2812_NUMBER_OF_LEDS) {
+        (*pNextFrame)[Index].setGreen(Green);
+        return E_OK;
+    } else {
+        return E_NOT_OK;
+    }
+} /* setPixelGreen */
+
+
+/******************************************************************************************************************************************************
+  setPixelBlue()
+******************************************************************************************************************************************************/
+/*! \brief          
+ *  \details        
+ *                  
+ *  \return         -
+******************************************************************************************************************************************************/
+stdReturnType WS2812::setPixelBlue(IndexType Index, byte Blue)
+{
+    if(Index < WS2812_NUMBER_OF_LEDS) {
+        (*pNextFrame)[Index].setBlue(Blue);
+        return E_OK;
+    } else {
+        return E_NOT_OK;
+    }
+} /* setPixelBlue */
+
+
+/******************************************************************************************************************************************************
+  clearPixel()
+******************************************************************************************************************************************************/
+/*! \brief          
+ *  \details        
+ *                  
+ *  \return         -
+******************************************************************************************************************************************************/
+stdReturnType WS2812::clearPixel(IndexType Index)
+{
+    if(Index < WS2812_NUMBER_OF_LEDS) {
+        (*pNextFrame)[Index].clearPixel();
+        return E_OK;
+    } else {
+        return E_NOT_OK;
+    }
+} /* clearPixel */
 
 
 #if (WS2812_SUPPORT_DIMMING == STD_ON)
@@ -267,16 +349,10 @@ WS2812::PixelType WS2812::getPixelFast(byte Index) const
  *                  
  *  \return         -
  *****************************************************************************************************************************************************/
-stdReturnType WS2812::getPixelDimmed(byte Index, PixelType* Pixel) const
+stdReturnType WS2812::getPixelDimmed(IndexType Index, PixelType& Pixel) const
 {
     if(Index < WS2812_NUMBER_OF_LEDS) {
-        if(Brightness != 255) {
-            dimmColor(&Pixel->Red, Pixels[WS2812_POS_ABS_RED(Index)]);
-            dimmColor(&Pixel->Green, Pixels[WS2812_POS_ABS_GREEN(Index)]);
-            dimmColor(&Pixel->Blue, Pixels[WS2812_POS_ABS_BLUE(Index)]);
-        } else {
-            getPixel(Index, Pixel);
-        }
+        Pixel = getPixelDimmedFast(Index);
         return E_OK;
     } else {
         return E_NOT_OK;
@@ -292,16 +368,16 @@ stdReturnType WS2812::getPixelDimmed(byte Index, PixelType* Pixel) const
  *                  
  *  \return         -
  *****************************************************************************************************************************************************/
-WS2812::PixelType WS2812::getPixelDimmedFast(byte Index) const
+WS2812::PixelType WS2812::getPixelDimmedFast(IndexType Index) const
 {
     PixelType Pixel;
 
     if(Brightness == 255) {
         return getPixelFast(Index);
     } else {
-        dimmColor(&Pixel.Red, Pixels[WS2812_POS_ABS_RED(Index)]);
-        dimmColor(&Pixel.Green, Pixels[WS2812_POS_ABS_GREEN(Index)]);
-        dimmColor(&Pixel.Blue, Pixels[WS2812_POS_ABS_BLUE(Index)]);
+        Pixel.Red = dimmColor(getPixelRedFast(Index));
+        Pixel.Green = dimmColor(getPixelGreenFast(Index));
+        Pixel.Blue = dimmColor(getPixelBlueFast(Index));
     }
     return Pixel;
 } /* getPixelDimmedFast */
@@ -322,173 +398,186 @@ void WS2812::setBrightness(byte sBrightness, boolean GammaCorrection)
     } else {
         Brightness = sBrightness;
     }
-
 } /* setBrightness */
 #endif /* WS2812_SUPPORT_DIMMING */
-
-
-/******************************************************************************************************************************************************
-  setPin()
-******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
- *  \return         -
- *****************************************************************************************************************************************************/
-stdReturnType WS2812::setPin(byte Pin)
-{
-    if(Pin < NUM_DIGITAL_PINS) {
-        PinMask = digitalPinToBitMask(Pin);
-        PortOutputRegister = portOutputRegister(digitalPinToPort(Pin));
-        pinMode(Pin, OUTPUT);
-        return E_OK;
-    } else {
-        return E_NOT_OK;
-    }
-} /* setPin */
-
-
-/******************************************************************************************************************************************************
-  setPixel()
-******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
- *  \return         -
- *****************************************************************************************************************************************************/
-stdReturnType WS2812::setPixel(byte Index, PixelType Pixel)
-{
-    if(Index < WS2812_NUMBER_OF_LEDS) {
-        Pixels[WS2812_POS_ABS_RED(Index)] = Pixel.Red;
-        Pixels[WS2812_POS_ABS_GREEN(Index)] = Pixel.Green;
-        Pixels[WS2812_POS_ABS_BLUE(Index)] = Pixel.Blue;
-        return E_OK;
-    } else {
-        return E_NOT_OK;
-    }
-} /* setPixel */
-
-
-/******************************************************************************************************************************************************
-  setPixel()
-******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
- *  \return         -
- *****************************************************************************************************************************************************/
-void WS2812::setPixelFast(byte Index, PixelType Pixel)
-{
-    Pixels[WS2812_POS_ABS_RED(Index)] = Pixel.Red;
-    Pixels[WS2812_POS_ABS_GREEN(Index)] = Pixel.Green;
-    Pixels[WS2812_POS_ABS_BLUE(Index)] = Pixel.Blue;
-} /* setPixelFast */
-
-
-/******************************************************************************************************************************************************
-  setPixel()
-******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
- *  \return         -
- *****************************************************************************************************************************************************/
-stdReturnType WS2812::setPixel(byte Index, byte Red, byte Green, byte Blue)
-{
-    if(Index < WS2812_NUMBER_OF_LEDS) {
-        Pixels[WS2812_POS_ABS_RED(Index)] = Red;
-        Pixels[WS2812_POS_ABS_GREEN(Index)] = Green;
-        Pixels[WS2812_POS_ABS_BLUE(Index)] = Blue;
-        return E_OK;
-    } else {
-        return E_NOT_OK;
-    }
-} /* setPixel */
-
-
-/******************************************************************************************************************************************************
-  setPixelFast()
-******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
- *  \return         -
- *****************************************************************************************************************************************************/
-void WS2812::setPixelFast(byte Index, byte Red, byte Green, byte Blue)
-{
-    Pixels[WS2812_POS_ABS_RED(Index)] = Red;
-    Pixels[WS2812_POS_ABS_GREEN(Index)] = Green;
-    Pixels[WS2812_POS_ABS_BLUE(Index)] = Blue;
-} /* setPixelFast */
-
-
-/******************************************************************************************************************************************************
-  setColorOrder()
-******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
- *  \return         -
- *****************************************************************************************************************************************************/
-#if (WS2812_RGB_ORDER_ON_RUNTIME == STD_ON)
-void WS2812::setColorOrder(ColorOrderType ColorOrder)
-{
-    if(ColorOrder == COLOR_ORDER_BRG) {
-        OffsetBlue = 0;
-        OffsetRed = 1;
-        OffsetGreen = 2;
-    }
-    if(ColorOrder == COLOR_ORDER_GBR) {
-        OffsetGreen = 0;
-        OffsetRed = 1;
-        OffsetBlue = 2;
-    }
-    if(ColorOrder == COLOR_ORDER_RGB) {
-        OffsetRed = 0;
-        OffsetGreen = 1;
-        OffsetBlue = 2;
-    }
-} /* setColorOrder */
-#endif
 
 
 /******************************************************************************************************************************************************
  * P R I V A T E   F U N C T I O N S
 ******************************************************************************************************************************************************/
 
+/******************************************************************************************************************************************************
+  initUsart()
+******************************************************************************************************************************************************/
+/*! \brief          
+ *  \details        
+ *                  
+ *  \return         -
+******************************************************************************************************************************************************/
+void WS2812::initUsart(USART_t* pUsart)
+{
+    // Setup USART in master SPI mode 1, MSB first
+    pUsart->BAUDCTRLA = (F_CPU / (2 * WS2812_USART_SPI_BAUDRATE)) - 1;  
+    pUsart->BAUDCTRLB = 0;
+    pUsart->CTRLA = USART_DREINTLVL_OFF_gc | USART_RXCINTLVL_OFF_gc | USART_TXCINTLVL_OFF_gc;
+    pUsart->CTRLC = USART_CMODE_MSPI_gc;
+    pUsart->CTRLD = USART_DECTYPE_DATA_gc | USART_LUTACT_OFF_gc | USART_PECACT_OFF_gc;
+} /* initUsart */
+
+
+/******************************************************************************************************************************************************
+  initPort()
+******************************************************************************************************************************************************/
+/*! \brief          
+ *  \details        
+ *                  
+ *  \return         -
+******************************************************************************************************************************************************/
+void WS2812::initPort(PORT_t* pPort)
+{
+    // Setup port pins for TxD, XCK
+    pPort->PIN1CTRL = PORT_OPC_TOTEM_gc | PORT_ISC_RISING_gc;    // XCK
+    pPort->PIN3CTRL = PORT_OPC_TOTEM_gc | PORT_ISC_LEVEL_gc;     // TxD
+    pPort->DIRSET = PIN1_bm | PIN3_bm;
+} /* initUsart */
+
+
+/******************************************************************************************************************************************************
+  initDma()
+******************************************************************************************************************************************************/
+/*! \brief          
+ *  \details        
+ *                  
+ *  \return         -
+******************************************************************************************************************************************************/
+void WS2812::initDma(USART_t* pUsart, byte EdmaChTrigSrcUsartDreGc)
+{
+    // Setup EDMA channel 0(+1)
+    EDMA.CTRL = EDMA_ENABLE_bm | EDMA_CHMODE_STD02_gc | EDMA_DBUFMODE_DISABLE_gc | EDMA_PRIMODE_CH0123_gc;
+    EDMA.CH0.CTRLB = EDMA_CH_TRNINTLVL_LO_gc | EDMA_CH_ERRINTLVL_OFF_gc;
+    EDMA.CH0.ADDRCTRL = EDMA_CH_RELOAD_NONE_gc | EDMA_CH_DIR_INC_gc;
+    EDMA.CH0.DESTADDRCTRL = EDMA_CH_RELOAD_NONE_gc | EDMA_CH_DESTDIR_FIXED_gc;
+    EDMA.CH0.DESTADDR = (uint16_t)&pUsart->DATA;
+    EDMA.CH0.TRIGSRC = EdmaChTrigSrcUsartDreGc;
+} /* initDma */
+
+
+/******************************************************************************************************************************************************
+  initEventSystem()
+******************************************************************************************************************************************************/
+/*! \brief          
+ *  \details        
+ *                  
+ *  \return         -
+******************************************************************************************************************************************************/
+void WS2812::initEventSystem(byte EvsysChmuxPortPin3Gc, byte EvsysChmuxPortPin1Gc)
+{
+    // Setup Event channel 0 to TxD (async)
+    EVSYS.CH0MUX = EvsysChmuxPortPin3Gc;
+    EVSYS.CH0CTRL = EVSYS_DIGFILT_1SAMPLE_gc;
+    // Setup Event channel 6 to XCK rising edge
+    EVSYS.CH6MUX = EvsysChmuxPortPin1Gc;
+    EVSYS.CH6CTRL = EVSYS_DIGFILT_1SAMPLE_gc;
+} /* initEventSystem */
+
+
+/******************************************************************************************************************************************************
+  initXcl()
+******************************************************************************************************************************************************/
+/*! \brief          
+ *  \details        
+ *                  
+ *  \return         -
+******************************************************************************************************************************************************/
+void WS2812::initXcl(byte Lut0OutenPinGc, byte XclPortselGc)
+{
+   // Setup XCL BTC0 timer to 1shot PWM generation
+   XCL.CTRLE = XCL_CMDSEL_NONE_gc | XCL_TCSEL_BTC0_gc | XCL_CLKSEL_DIV1_gc;
+   XCL.CTRLF = XCL_CMDEN_DISABLE_gc | XCL_MODE_1SHOT_gc;
+   XCL.CTRLG = XCL_EVACTEN_bm | XCL_EVACT0_RESTART_gc | XCL_EVSRC_EVCH6_gc;
+   // Output high time if data is 1 (from RESTART to falling edge of one-shot)
+   XCL.PERCAPTL = WS2812_BTC0_TIMER_CYCLES_ONE_PULSE;  
+    // Output high time if data is 0 (from RESTART to rising edge of one-shot)                     
+   XCL.CMPL = WS2812_BTC0_TIMER_CYCLES_ONE_PULSE - WS2812_BTC0_TIMER_CYCLES_ZERO_PULSE;              
+   // Setup XCL LUT
+   // Setup glue logic for MUX
+   XCL.CTRLA = Lut0OutenPinGc | XclPortselGc | XCL_LUTCONF_MUX_gc;
+   XCL.CTRLB = XCL_IN3SEL_XCL_gc | XCL_IN2SEL_XCL_gc | XCL_IN1SEL_EVSYS_gc | XCL_IN0SEL_EVSYS_gc;
+   // Async inputs, no delay
+   XCL.CTRLC = XCL_EVASYSEL0_bm | XCL_DLY1CONF_DISABLE_gc;
+   // LUT truth tables (only LUT1 is used)
+   XCL.CTRLD = WS2812_XCL_LUT_TRUTH_TABLE_VALUE;
+} /* initXcl */
+
+
+/******************************************************************************************************************************************************
+  showNextFrame()
+******************************************************************************************************************************************************/
+/*! \brief          
+ *  \details        
+ *                  
+ *  \return         -
+******************************************************************************************************************************************************/
+void WS2812::showNextFrame()
+{
+    // exclusive area start
+    startDmaTransfer(pNextFrame);
+    copyNextFrameToCurrentFrame();
+    switchPixelsBufferPointer();
+    // exclusive area end
+} /* showNextFrame */
+
 #if (WS2812_SUPPORT_DIMMING == STD_ON)
 /******************************************************************************************************************************************************
-  dimmPixel()
+  showNextFrameDimmed()
 ******************************************************************************************************************************************************/
 /*! \brief          
  *  \details        
  *                  
  *  \return         -
- *****************************************************************************************************************************************************/
-inline void WS2812::dimmPixel(PixelType* PixelDimmed, PixelType Pixel)
+******************************************************************************************************************************************************/
+void WS2812::showNextFrameDimmed()
 {
-    dimmColor(&PixelDimmed->Red, Pixel.Red);
-    dimmColor(&PixelDimmed->Green, Pixel.Green);
-    dimmColor(&PixelDimmed->Blue, Pixel.Blue);
-} /* dimmPixel */
+    // exclusive area start
+    copyNextFrameToCurrentFrameDimmed();
+    startDmaTransfer(pCurrentFrame);
+    // exclusive area end
+} /* showNextFrameDimmed */
+#endif
+
+/******************************************************************************************************************************************************
+  startDmaTransfer()
+******************************************************************************************************************************************************/
+/*! \brief          
+ *  \details        
+ *                  
+ *  \return         -
+******************************************************************************************************************************************************/
+void WS2812::startDmaTransfer(pPixelsType pFrame)
+{
+    EDMA.CH0.ADDR = (uint16_t)pFrame;
+    EDMA.CH0.TRFCNT = sizeof(PixelsType);
+    EDMA.CH0.CTRLA = EDMA_CH_ENABLE_bm | EDMA_CH_SINGLE_bm; // Start DMA transfer to LEDs
+} /* startDmaTransfer */
 
 
 /******************************************************************************************************************************************************
-  dimmPixel()
+  switchBufferPointer()
 ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
+/*! \brief          switch the two frame buffers
+ *  \details        this function switches the two frame buffers PixelsBuffer1 and PixelsBuffer2
  *                  
  *  \return         -
- *****************************************************************************************************************************************************/
-inline void WS2812::dimmPixel(PixelType* PixelDimmed, byte Red, byte Green, byte Blue)
+******************************************************************************************************************************************************/
+void WS2812::switchPixelsBufferPointer()
 {
-    dimmColor(&PixelDimmed->Red, Red);
-    dimmColor(&PixelDimmed->Green, Green);
-    dimmColor(&PixelDimmed->Blue, Blue);
-} /* dimmPixel */
+    pPixelsType pTmp = pCurrentFrame;
+    pCurrentFrame = pNextFrame;
+    pNextFrame = pTmp;
+} /* switchBufferPointer */
 
 
+#if (WS2812_SUPPORT_DIMMING == STD_ON)
 /******************************************************************************************************************************************************
   dimmPixels()
 ******************************************************************************************************************************************************/
@@ -497,115 +586,66 @@ inline void WS2812::dimmPixel(PixelType* PixelDimmed, byte Red, byte Green, byte
  *                  
  *  \return         -
  *****************************************************************************************************************************************************/
-inline void WS2812::dimmPixels(byte* PixelsDimmed, uint16_t DataLength)
+void WS2812::dimmPixels(pPixelsType pPixels) const
 {
-    for(uint16_t i = 0; i < DataLength; i = i + WS2812_NUMBER_OF_COLORS)
-    {
-        dimmColor(&PixelsDimmed[WS2812_POS_ABS_RED(i)], Pixels[WS2812_POS_ABS_RED(i)]);
-        dimmColor(&PixelsDimmed[WS2812_POS_ABS_GREEN(i)], Pixels[WS2812_POS_ABS_GREEN(i)]);
-        dimmColor(&PixelsDimmed[WS2812_POS_ABS_BLUE(i)], Pixels[WS2812_POS_ABS_BLUE(i)]);
+    for(IndexType Index = 0; Index < WS2812_NUMBER_OF_LEDS; Index++) {
+        (*pPixels)[Index].setPixel(getPixelDimmedFast(Index));
     }
 } /* dimmPixels */
-#endif
 
 
 /******************************************************************************************************************************************************
-  sendData()
+  dimmPixel()
 ******************************************************************************************************************************************************/
 /*! \brief          
  *  \details        
  *                  
  *  \return         -
  *****************************************************************************************************************************************************/
-void  WS2812::sendData(const byte* Data, uint16_t DataLength)
+WS2812::PixelType WS2812::dimmPixel(byte Red, byte Green, byte Blue) const
 {
-    uint8_t BitCounter;
-    uint8_t PortMaskLow;
-    uint8_t PortMaskHigh;
-
-    ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
-    {
-        PortMaskLow = ~PinMask & *PortOutputRegister;
-        PortMaskHigh = PinMask | *PortOutputRegister;
-
-        for(uint16_t ByteCounter = 0; ByteCounter < DataLength; ByteCounter++)
-        {
-            asm volatile(
-
-                "ldi   %[BitCounter], 8             \n\t"
-                "loop%=:                            \n\t"
-                "st    X, %[PortMaskHigh]           \n\t"    //  '1' [02] '0' [02] - re
-
-#if IS_BIT_SET(WS2812_ASM_W1_NOPs, 0)
-                STD_NOP_1
-#endif
-#if IS_BIT_SET(WS2812_ASM_W1_NOPs, 1)
-                STD_NOP_2
-#endif
-#if IS_BIT_SET(WS2812_ASM_W1_NOPs, 2)
-                STD_NOP_4
-#endif
-#if IS_BIT_SET(WS2812_ASM_W1_NOPs, 3)
-                STD_NOP_8
-#endif
-#if IS_BIT_SET(WS2812_ASM_W1_NOPs, 4)
-                STD_NOP_16
-#endif
-
-                "sbrs  %[CurrentByte],  7           \n\t"    //  '1' [04] '0' [03]
-                "st    X, %[PortMaskLow]            \n\t"    //  '1' [--] '0' [05] - fe-low
-                "lsl   %[CurrentByte]               \n\t"    //  '1' [05] '0' [06]
-
-#if IS_BIT_SET(WS2812_ASM_W2_NOPs, 0)
-                STD_NOP_1
-#endif
-#if IS_BIT_SET(WS2812_ASM_W2_NOPs, 1)
-                STD_NOP_2
-#endif
-#if IS_BIT_SET(WS2812_ASM_W2_NOPs, 2)
-                STD_NOP_4
-#endif
-#if IS_BIT_SET(WS2812_ASM_W2_NOPs, 3)
-                STD_NOP_8
-#endif
-#if IS_BIT_SET(WS2812_ASM_W2_NOPs, 4)
-                STD_NOP_16
-#endif
-
-                "brcc skipone%=                     \n\t"    //  '1' [+1] '0' [+2] -
-                "st   X, %[PortMaskLow]             \n\t"    //  '1' [+3] '0' [--] - fe-high
-                "skipone%=:                         \n\t"    //  '1' [+3] '0' [+2] -
-
-#if IS_BIT_SET(WS2812_ASM_W3_NOPs, 0)
-                STD_NOP_1
-#endif
-#if IS_BIT_SET(WS2812_ASM_W3_NOPs, 1)
-                STD_NOP_2
-#endif
-#if IS_BIT_SET(WS2812_ASM_W3_NOPs, 2)
-                STD_NOP_4
-#endif
-#if IS_BIT_SET(WS2812_ASM_W3_NOPs, 3)
-                STD_NOP_8
-#endif
-#if IS_BIT_SET(WS2812_ASM_W3_NOPs, 4)
-                STD_NOP_16
-#endif
-
-                "dec   %[BitCounter]                \n\t"    //  '1' [+4] '0' [+3]
-                "brne  loop%=                       \n\t"    //  '1' [+5] '0' [+4]
-                : [BitCounter]      "=&d" (BitCounter)
-                : [CurrentByte]     "r"   (Data[ByteCounter]),
-                  [Port]            "x"   (PortOutputRegister),
-                  [PortMaskHigh]    "r"   (PortMaskHigh),
-                  [PortMaskLow]     "r"   (PortMaskLow)
-            );
-        }
-    }
-} /* sendData */
+    PixelType Pixel;
+    Pixel.Red = dimmColor(Red);
+    Pixel.Green = dimmColor(Green);
+    Pixel.Blue = dimmColor(Blue);
+    return Pixel;
+} /* dimmPixel */
 
 
 /******************************************************************************************************************************************************
- *  E N D   O F   F I L E
+  copyCurrentFrameToNextFrameDimmed()
+******************************************************************************************************************************************************/
+/*! \brief          
+ *  \details        
+ *                  
+ *  \return         -
  *****************************************************************************************************************************************************/
+void WS2812::copyNextFrameToCurrentFrameDimmed()
+{
+    dimmPixels(pCurrentFrame);
+} /* copyCurrentFrameToNextFrameDimmed */
+#endif
+
+/******************************************************************************************************************************************************
+  F R I E N D   F U N C T I O N S
+******************************************************************************************************************************************************/
+inline void dmaIsr()
+{
+    if(IS_BIT_SET(EDMA.CH0.CTRLB, EDMA_CH_TRNIF_bp)) {
+        SET_BIT(EDMA.CH0.CTRLB, EDMA_CH_TRNIF_bp);
+        WS2812::getInstance().State = WS2812::STATE_IDLE;
+    }
+}
+
+/******************************************************************************************************************************************************
+  I S R   F U N C T I O N S
+******************************************************************************************************************************************************/
+ISR(EDMA_CH0_vect)
+{
+    dmaIsr();
+}
+
+/******************************************************************************************************************************************************
+ *  E N D   O F   F I L E
+******************************************************************************************************************************************************/
  

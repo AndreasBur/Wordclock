@@ -66,6 +66,7 @@
    warn or throw error if this timing can not be met with current F_CPU settings. */
 #define WS2812_ZERO_PULSE_DURATION_NS_CALC (((WS2812_ASM_W1_NOPs + WS2812_ASM_FIXED_CYCLES_LOW) * 1000000) / (F_CPU / 1000))
 
+
 #if (WS2812_ZERO_PULSE_DURATION_NS_CALC > 550)
     #error "WS2812: sorry, the clock speed is too low. Did you set F_CPU correctly?"
 #elif (WS2812_ZERO_PULSE_DURATION_NS_CALC > 450)
@@ -77,13 +78,19 @@
 /******************************************************************************************************************************************************
  *  LOCAL FUNCTION MACROS
 ******************************************************************************************************************************************************/
-
-
+#if (WS2812_RGB_ORDER_ON_RUNTIME == STD_ON)
+    #define WS2812_POS_ABS_RED(Red)             (Red + OffsetRed)
+    #define WS2812_POS_ABS_GREEN(Green)         (Green + OffsetGreen)
+    #define WS2812_POS_ABS_BLUE(Blue)           (Blue + OffsetBlue)
+#else
+    #define WS2812_POS_ABS_RED(Red)             (Red + WS2812_COLOR_OFFSET_RED)
+    #define WS2812_POS_ABS_GREEN(Green)         (Green + WS2812_COLOR_OFFSET_GREEN)
+    #define WS2812_POS_ABS_BLUE(Blue)           (Blue + WS2812_COLOR_OFFSET_BLUE)
+#endif
 
 /******************************************************************************************************************************************************
  *  LOCAL DATA TYPES AND STRUCTURES
 ******************************************************************************************************************************************************/
-const uint8_t Gamma7Table[] PROGMEM {133, 139, 145, 151, 158, 165, 172, 180, 188, 196, 205, 214, 224, 234, 244, 255};
 
 
 /******************************************************************************************************************************************************
@@ -98,14 +105,15 @@ const uint8_t Gamma7Table[] PROGMEM {133, 139, 145, 151, 158, 165, 172, 180, 188
  *
  *  \return         -
  *****************************************************************************************************************************************************/
-WS2812::WS2812(byte Pin)
+WS2812::WS2812()
 {
-    setPin(Pin); // wird evtl aufgerufen obwohl hardware noch nicht initialisiert ist
+#if (WS2812_SUPPORT_DIMMING == STD_ON)
     Brightness = 255;
-#if (WS2812_RESET_TIMER == STD_ON)
-    ResetTimer = 0;
 #endif
-    clearAllPixels();
+#if (WS2812_RESET_TIMER == STD_ON)
+    ResetTimer = micros();
+#endif
+    clearPixels();
 #if (WS2812_RGB_ORDER_ON_RUNTIME == STD_ON)
     setColorOrder(COLOR_ORDER_BRG);
 #endif
@@ -129,10 +137,29 @@ WS2812::~WS2812()
  *                  
  *  \return         -
  *****************************************************************************************************************************************************/
-void WS2812::init()
+void WS2812::init(byte Pin)
 {
+    setPin(Pin);
     show();
 } /* init */
+
+
+/******************************************************************************************************************************************************
+  setAllPixels()
+******************************************************************************************************************************************************/
+/*! \brief          
+ *  \details        
+ *                  
+ *  \return         -
+ *****************************************************************************************************************************************************/
+void WS2812::setPixels(byte Red, byte Green, byte Blue)
+{
+    for(byte Index = 0; Index < WS2812_NUMBER_OF_LEDS; Index++) {
+        Pixels[WS2812_POS_ABS_RED(Index)] = Red;
+        Pixels[WS2812_POS_ABS_GREEN(Index)] = Green;
+        Pixels[WS2812_POS_ABS_BLUE(Index)] = Blue;
+    }
+}
 
 
 /******************************************************************************************************************************************************
@@ -150,21 +177,24 @@ void WS2812::show()
 #endif
 {
 #if (WS2812_RESET_TIMER == STD_ON)
-    if((micros() - ResetTimer) > (WS2812_RESET_DURATION_NS / 1000) || ResetTimer == 0) {
+    if(isResetTimeElapsed() == false) return E_NOT_OK;
 #endif
-        if(Brightness != 255) {
-            byte PixelsDimmed[WS2812_NUMBER_OF_LEDS * WS2812_NUMBER_OF_COLORS];
-            dimmPixels(PixelsDimmed, WS2812_NUMBER_OF_LEDS * WS2812_NUMBER_OF_COLORS);
-            sendData(PixelsDimmed, WS2812_NUMBER_OF_LEDS * WS2812_NUMBER_OF_COLORS);
-        } else {
-            sendData(Pixels, WS2812_NUMBER_OF_LEDS * WS2812_NUMBER_OF_COLORS);
-        }
-#if (WS2812_RESET_TIMER == STD_ON)
-        ResetTimer = micros();
-        return E_OK;
+
+#if (WS2812_SUPPORT_DIMMING == STD_ON)
+    if(Brightness != 255) {
+        byte PixelsDimmed[WS2812_NUMBER_OF_LEDS * WS2812_NUMBER_OF_COLORS];
+        dimmPixels(PixelsDimmed, WS2812_NUMBER_OF_LEDS * WS2812_NUMBER_OF_COLORS);
+        sendData(PixelsDimmed, WS2812_NUMBER_OF_LEDS * WS2812_NUMBER_OF_COLORS);
     } else {
-        return E_NOT_OK;
+        sendData(Pixels, WS2812_NUMBER_OF_LEDS * WS2812_NUMBER_OF_COLORS);
     }
+#elif (WS2812_SUPPORT_DIMMING == STD_OFF)
+    sendData(Pixels, WS2812_NUMBER_OF_LEDS * WS2812_NUMBER_OF_COLORS);
+#endif
+
+#if (WS2812_RESET_TIMER == STD_ON)
+    ResetTimer = micros();
+    return E_OK;
 #endif
 } /* show */
 
@@ -210,6 +240,7 @@ WS2812::PixelType WS2812::getPixelFast(byte Index) const
 } /* getPixelFast */
 
 
+#if (WS2812_SUPPORT_DIMMING == STD_ON)
 /******************************************************************************************************************************************************
   getPixelDimmed()
 ******************************************************************************************************************************************************/
@@ -221,13 +252,7 @@ WS2812::PixelType WS2812::getPixelFast(byte Index) const
 stdReturnType WS2812::getPixelDimmed(byte Index, PixelType* Pixel) const
 {
     if(Index < WS2812_NUMBER_OF_LEDS) {
-        if(Brightness != 255) {
-            dimmColor(&Pixel->Red, Pixels[WS2812_POS_ABS_RED(Index)]);
-            dimmColor(&Pixel->Green, Pixels[WS2812_POS_ABS_GREEN(Index)]);
-            dimmColor(&Pixel->Blue, Pixels[WS2812_POS_ABS_BLUE(Index)]);
-        } else {
-            getPixel(Index, Pixel);
-        }
+        *Pixel = getPixelDimmedFast(Index);
         return E_OK;
     } else {
         return E_NOT_OK;
@@ -269,12 +294,13 @@ WS2812::PixelType WS2812::getPixelDimmedFast(byte Index) const
 void WS2812::setBrightness(byte sBrightness, boolean GammaCorrection)
 {
     if(GammaCorrection) {
-        Brightness = calcGamma7CorrectionValue(sBrightness / 2);
+        Brightness = GCorrection.getCorrectedValue(sBrightness / 2);
     } else {
         Brightness = sBrightness;
     }
 
 } /* setBrightness */
+#endif /* WS2812_SUPPORT_DIMMING */
 
 
 /******************************************************************************************************************************************************
@@ -406,22 +432,7 @@ void WS2812::setColorOrder(ColorOrderType ColorOrder)
  * P R I V A T E   F U N C T I O N S
 ******************************************************************************************************************************************************/
 
-/******************************************************************************************************************************************************
-  calcGammaCorrectionValue()
-******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        calculates the gamma correction value with the help of a small table
- *                  and very efficient shift calculation
- *  param[in]       ValueLinear    7 bit unsigned (0..127)
- *  \return         exponential value (approx. 1.0443^x) (1..255)
- *****************************************************************************************************************************************************/
-uint8_t WS2812::calcGamma7CorrectionValue(byte ValueLinear)
-{
-    uint8_t Exponent = pgm_read_byte(&Gamma7Table[ValueLinear % WS2812_GAMMA7_TABLE_NUMBER_OF_VALUES]);
-    return Exponent >> (7 - ValueLinear / WS2812_GAMMA7_TABLE_NUMBER_OF_VALUES);
-} /* calcGamma7CorrectionValue */
-
-
+#if (WS2812_SUPPORT_DIMMING == STD_ON)
 /******************************************************************************************************************************************************
   dimmPixel()
 ******************************************************************************************************************************************************/
@@ -430,7 +441,7 @@ uint8_t WS2812::calcGamma7CorrectionValue(byte ValueLinear)
  *                  
  *  \return         -
  *****************************************************************************************************************************************************/
-inline void WS2812::dimmPixel(PixelType* PixelDimmed, PixelType Pixel)
+inline void WS2812::dimmPixel(PixelType* PixelDimmed, PixelType Pixel) const
 {
     dimmColor(&PixelDimmed->Red, Pixel.Red);
     dimmColor(&PixelDimmed->Green, Pixel.Green);
@@ -446,7 +457,7 @@ inline void WS2812::dimmPixel(PixelType* PixelDimmed, PixelType Pixel)
  *                  
  *  \return         -
  *****************************************************************************************************************************************************/
-inline void WS2812::dimmPixel(PixelType* PixelDimmed, byte Red, byte Green, byte Blue)
+inline void WS2812::dimmPixel(PixelType* PixelDimmed, byte Red, byte Green, byte Blue) const
 {
     dimmColor(&PixelDimmed->Red, Red);
     dimmColor(&PixelDimmed->Green, Green);
@@ -462,7 +473,7 @@ inline void WS2812::dimmPixel(PixelType* PixelDimmed, byte Red, byte Green, byte
  *                  
  *  \return         -
  *****************************************************************************************************************************************************/
-inline void WS2812::dimmPixels(byte* PixelsDimmed, uint16_t DataLength)
+inline void WS2812::dimmPixels(byte* PixelsDimmed, uint16_t DataLength) const
 {
     for(uint16_t i = 0; i < DataLength; i = i + WS2812_NUMBER_OF_COLORS)
     {
@@ -471,7 +482,8 @@ inline void WS2812::dimmPixels(byte* PixelsDimmed, uint16_t DataLength)
         dimmColor(&PixelsDimmed[WS2812_POS_ABS_BLUE(i)], Pixels[WS2812_POS_ABS_BLUE(i)]);
     }
 } /* dimmPixels */
- 
+#endif
+
 
 /******************************************************************************************************************************************************
   sendData()
@@ -568,6 +580,26 @@ void  WS2812::sendData(const byte* Data, uint16_t DataLength)
     }
 } /* sendData */
 
+
+#if (WS2812_RESET_TIMER == STD_ON)
+/******************************************************************************************************************************************************
+  isResetTimeElapsed()
+******************************************************************************************************************************************************/
+/*! \brief          
+ *  \details        
+ *                  
+ *  \return         -
+ *****************************************************************************************************************************************************/
+boolean WS2812::isResetTimeElapsed()
+{
+    // check for timer overflow
+    if(micros() < ResetTimer) {
+        return ((micros() - (UINT64_MAX - ResetTimer)) > (WS2812_RESET_DURATION_NS / 1000));
+    } else {
+        return ((micros() - ResetTimer) > (WS2812_RESET_DURATION_NS / 1000));
+    }
+} /* isResetTimeElapsed */
+#endif
 
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E

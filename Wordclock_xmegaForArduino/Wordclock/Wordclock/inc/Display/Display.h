@@ -34,6 +34,7 @@
 #define DISPLAY_DATA_PIN                        10
 #define DISPLAY_LED_STRIPE_SERPENTINE           STD_OFF
 #define DISPLAY_USE_WS2812_DIMMING              STD_OFF
+#define Pixels                                  WS2812::getInstance()
 
 #if (DISPLAY_USE_WS2812_DIMMING == STD_ON) && (WS2812_SUPPORT_DIMMING == STD_OFF)
     #error "Display: Please activate WS2812 dimming support"
@@ -96,7 +97,7 @@ class Display
 
     /* mapping to underlying hardware */
     using PixelColorType = WS2812::PixelType;
-    using Stripe = WS2812;
+    //using Stripe = WS2812;
     using WordIdType = DisplayWords::WordIdType;
 
 /******************************************************************************************************************************************************
@@ -104,7 +105,7 @@ class Display
 ******************************************************************************************************************************************************/
   private:
     StateType State;
-    Stripe Pixels;
+    //Stripe Pixels;
     PixelColorType Color;
     DisplayWords Words;
 
@@ -163,7 +164,7 @@ class Display
     // word methods
     stdReturnType setWord(WordIdType, byte MaxLength = DISPLAY_WORD_LENGTH_UNLIMITED);
     stdReturnType clearWord(WordIdType);
-    stdReturnType clearAllWords();
+    stdReturnType clearWords();
 
     // word methods fast
     void setWordFast(WordIdType, byte MaxLength = DISPLAY_WORD_LENGTH_UNLIMITED);
@@ -206,7 +207,7 @@ class Display
     void init();
     void show() { Pixels.show(); }
     void test();
-    void clear() { Pixels.clearAllPixels(); }
+    void clear() { Pixels.clearPixels(); }
     void indexToColumnAndRow(byte Index, byte& Column, byte& Row) const { Row = Index / DISPLAY_NUMBER_OF_COLUMNS; Column = Index % DISPLAY_NUMBER_OF_COLUMNS; }
     byte indexToColumn(byte Index) const { return Index % DISPLAY_NUMBER_OF_COLUMNS; }
     byte indexToRow(byte Index) const { return Index / DISPLAY_NUMBER_OF_COLUMNS; }

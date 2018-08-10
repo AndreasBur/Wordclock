@@ -9,58 +9,42 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       WS2812.h
- *      \brief      Main header file of WS2812 library
+ *      \brief      
  *
- *      \details    Arduino library to control WS2812 based LEDs
+ *      \details    
  *                  
- *****************************************************************************************************************************************************/
+******************************************************************************************************************************************************/
 #ifndef _WS2812_H_
 #define _WS2812_H_
 
 /******************************************************************************************************************************************************
- * INCLUDES
+ * I N C L U D E S
 ******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Arduino.h"
+#include "NeoPixel.h"
 #include "GammaCorrection.h"
 
 /******************************************************************************************************************************************************
- *  GLOBAL CONSTANT MACROS
+ *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
 /* WS2812 configuration parameter */
-#define WS2812_RESET_TIMER                          STD_OFF
-#define WS2812_RGB_ORDER_ON_RUNTIME                 STD_OFF
+#define WS2812_RESET_TIMER                          STD_ON
 #define WS2812_SUPPORT_DIMMING                      STD_OFF
 #define WS2812_NUMBER_OF_LEDS                       110
 
+
 /* WS2812 parameter */
-#define WS2812_NUMBER_OF_COLORS                     3
-#define WS2812_COLOR_OFFSET_GREEN                   0
-#define WS2812_COLOR_OFFSET_RED                     1
-#define WS2812_COLOR_OFFSET_BLUE                    2
 
-#define WS2812_NUMBER_OF_BITS_PER_COLOR             8
-#define WS2812_NUMBER_OF_BITS_PER_LED               (WS2812_NUMBER_OF_COLORS * WS2812_NUMBER_OF_BITS_PER_COLOR)
-
-/* Timing of WS2812 protocol */
-#define WS2812_ZERO_PULSE_DURATION_NS               350
-#define WS2812_ONE_PULSE_DURATION_NS                900
-#define WS2812_PERIOD_DURATION_NS                   1250
-#define WS2812_RESET_DURATION_NS                    50000
 
 
 /******************************************************************************************************************************************************
- *  GLOBAL FUNCTION MACROS
+ *  G L O B A L   F U N C T I O N   M A C R O S
 ******************************************************************************************************************************************************/
 
 
 /******************************************************************************************************************************************************
- *  GLOBAL DATA TYPES AND STRUCTURES
-******************************************************************************************************************************************************/
-
-
-/******************************************************************************************************************************************************
- *   C L A S S   W S 2 8 1 2
+ *  C L A S S   W S 2 8 1 2
 ******************************************************************************************************************************************************/
 class WS2812
 {
@@ -68,30 +52,48 @@ class WS2812
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-#if (WS2812_RGB_ORDER_ON_RUNTIME == STD_ON)
-    /* type which describes the color order of the protocol */
-    enum ColorOrderType {
-        COLOR_ORDER_RGB,
-        COLOR_ORDER_BRG,
-        COLOR_ORDER_GBR
+    enum PortType {
+        PORT_C,
+        PORT_D,
     };
+
+    enum PinType {
+        PIN_0,
+        PIN_4
+    };
+
+    enum StateType {
+        STATE_UNINIT,
+        STATE_BUSY,
+        STATE_IDLE,
+    };
+
+    using PixelType = NeoPixel::NeoPixelType;
+#if (WS2812_NUMBER_OF_LEDS < 255)
+    using IndexType = byte;
+#else
+    using IndexType = uint16_t;
 #endif
 
-    /* type which describes the structure of a pixel */
-    struct PixelType {
-        byte Red;
-        byte Green;
-        byte Blue;
-    };
+/******************************************************************************************************************************************************
+ *  P R I V A T E   D A T A   T Y P E S   A N D   S T R U C T U R E S
+******************************************************************************************************************************************************/
+  private:
+    using PixelsType = std::array<NeoPixel, WS2812_NUMBER_OF_LEDS>;
+    using pPixelsType = PixelsType*;
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
-    byte PinMask;
-    volatile byte* PortOutputRegister;
-    byte Pixels[WS2812_NUMBER_OF_LEDS * WS2812_NUMBER_OF_COLORS];
+    WS2812();
+    ~WS2812();
 
+    volatile StateType State;
+    PixelsType PixelsBuffer1;
+    PixelsType PixelsBuffer2;
+    pPixelsType pCurrentFrame;
+    pPixelsType pNextFrame;
 
 #if (WS2812_SUPPORT_DIMMING == STD_ON)
     GammaCorrection GCorrection;
@@ -102,71 +104,86 @@ class WS2812
     unsigned long ResetTimer;
 #endif
 
-#if (WS2812_RGB_ORDER_ON_RUNTIME == STD_ON)
-    byte OffsetRed;
-    byte OffsetGreen;
-    byte OffsetBlue;
-#endif
     // functions
-    void sendData(const byte*, uint16_t);
+    void initDma(USART_t*, byte);
+    void initEventSystem(byte, byte);
+    void initUsart(USART_t*);
+    void initXcl(byte, byte);
+    void initPort(PORT_t*);
+  
+    void switchPixelsBufferPointer();
+    void copyCurrentFrameToNextFrame() { memcpy(pNextFrame, pCurrentFrame, sizeof(PixelsType)); }
+    void copyNextFrameToCurrentFrame() { memcpy(pCurrentFrame, pNextFrame, sizeof(PixelsType)); }
+    void showNextFrame();
+    void showNextFrameDimmed();
+    void startDmaTransfer(pPixelsType);
+    boolean isDmaBusy() { return EDMA.STATUS & (EDMA_CH0BUSY_bm | EDMA_CH0PEND_bm); }
 
 #if (WS2812_SUPPORT_DIMMING == STD_ON)
-    void dimmPixels(byte*, uint16_t);
-    void dimmPixel(PixelType*, PixelType);
-    void dimmPixel(PixelType*, byte, byte, byte);
-    void dimmColor(byte* ColorDimmed, byte Color) const { *ColorDimmed = (Color * Brightness) >> 8; }
-#endif
-
-#if (WS2812_RESET_TIMER == STD_ON)
-    boolean isResetTimeElapsed() { return ((micros() - ResetTimer) > (WS2812_RESET_DURATION_NS / 1000) || ResetTimer == 0); }
+    void dimmPixels(pPixelsType pPixels) const;
+    PixelType dimmPixel(PixelType Pixel) const { return dimmPixel(Pixel.Red, Pixel.Green, Pixel.Blue); }
+    PixelType dimmPixel(byte, byte, byte) const;
+    byte dimmColor(byte Color) const { return (Color * Brightness) >> 8; }
+    void copyNextFrameToCurrentFrameDimmed();
 #endif
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    WS2812();
-    ~WS2812();
+	static WS2812& getInstance();
 
-    // get methods
-    stdReturnType getPixel(byte, PixelType*) const;
-    PixelType getPixelFast(byte) const;
-    
+	// get methods
+    StateType getState() const { return State; }
+
+    stdReturnType getPixel(IndexType, PixelType&) const;
+    stdReturnType getPixelRed(IndexType, byte&) const;
+    stdReturnType getPixelGreen(IndexType, byte&) const;
+    stdReturnType getPixelBlue(IndexType, byte&) const;
+
+    PixelType getPixelFast(IndexType Index) const { return (*pNextFrame)[Index].getPixel(); }
+    byte getPixelRedFast(IndexType Index) const { return (*pNextFrame)[Index].getRed(); }
+    byte getPixelGreenFast(IndexType Index) const { return (*pNextFrame)[Index].getGreen(); }
+    byte getPixelBlueFast(IndexType Index) const { return (*pNextFrame)[Index].getBlue(); }
+
 #if (WS2812_SUPPORT_DIMMING == STD_ON)
     byte getBrightness() const { return Brightness; }
-    stdReturnType getPixelDimmed(byte, PixelType*) const;
-    PixelType getPixelDimmedFast(byte) const;
+    stdReturnType getPixelDimmed(IndexType, PixelType&) const;
+    PixelType getPixelDimmedFast(IndexType) const;
 #endif
 
-    // set methods
+	// set methods
+    stdReturnType setPixel(IndexType, PixelType);
+    stdReturnType setPixel(IndexType, byte, byte, byte);
+    stdReturnType setPixelRed(IndexType, byte);
+    stdReturnType setPixelGreen(IndexType, byte);
+    stdReturnType setPixelBlue(IndexType, byte);
+
+    void setPixelFast(IndexType Index, PixelType Pixel) { (*pNextFrame)[Index].setPixel(Pixel); }
+    void setPixelFast(IndexType Index, byte Red, byte Green, byte Blue) { (*pNextFrame)[Index].setPixel(Red, Green, Blue); }
+    void setPixelRedFast(IndexType Index, byte Red) { (*pNextFrame)[Index].setRed(Red); }
+    void setPixelGreenFast(IndexType Index, byte Green) { (*pNextFrame)[Index].setGreen(Green); }
+    void setPixelBlueFast(IndexType Index, byte Blue) { (*pNextFrame)[Index].setGreen(Blue); }
+
+#if (WS2812_SUPPORT_DIMMING == STD_ON)
     void setBrightness(byte sBrightness, boolean = false);
-    stdReturnType setPin(byte);
-    stdReturnType setPixel(byte, PixelType);
-    stdReturnType setPixel(byte, byte, byte, byte);
-    void setPixelFast(byte, PixelType);
-    void setPixelFast(byte, byte, byte, byte);
+#endif
 
-    // methods
-    void init(byte);
-    void clearAllPixels() { memset(Pixels, 0, sizeof(Pixels)); }
-    void setAllPixels(PixelType);
-    void setAllPixels(byte, byte, byte);
-    stdReturnType clearPixel(byte Index) { return setPixel(Index, 0, 0, 0); }
-    void clearPixelFast(byte Index) { setPixelFast(Index, 0, 0, 0); }
-
-#if (WS2812_RESET_TIMER == STD_ON)
+	// methods
+    void init(PortType, PinType);
     stdReturnType show();
-#elif (WS2812_RESET_TIMER == STD_OFF)
-    void show();
-#endif
+    void setPixels(PixelType Pixel) { setPixels(Pixel.Red, Pixel.Green, Pixel.Blue); }
+    void setPixels(byte, byte, byte);
+    stdReturnType clearPixel(IndexType Index);
+    void clearPixelFast(IndexType Index) { (*pNextFrame)[Index].clearPixel(); }
+    void clearPixels() { for(IndexType Index = 0; Index < WS2812_NUMBER_OF_LEDS; Index++) clearPixelFast(Index); }
 
-#if (WS2812_RGB_ORDER_ON_RUNTIME == STD_ON)
-    void setColorOrder(ColorOrderType);
-#endif
+    // friend functions
+    friend void dmaIsr();
 };
 
-
 #endif
+
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E
 ******************************************************************************************************************************************************/

@@ -19,17 +19,18 @@
 
 /******************************************************************************************************************************************************
  * INCLUDES
- *****************************************************************************************************************************************************/
+******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Arduino.h"
-
+#include "GammaCorrection.h"
 
 /******************************************************************************************************************************************************
  *  GLOBAL CONSTANT MACROS
- *****************************************************************************************************************************************************/
+******************************************************************************************************************************************************/
 /* WS2812 configuration parameter */
-#define WS2812_RESET_TIMER                          STD_ON
-#define WS2812_RGB_ORDER_ON_RUNTIME                 STD_ON
+#define WS2812_RESET_TIMER                          STD_OFF
+#define WS2812_RGB_ORDER_ON_RUNTIME                 STD_OFF
+#define WS2812_SUPPORT_DIMMING                      STD_ON
 #define WS2812_NUMBER_OF_LEDS                       110
 
 /* WS2812 parameter */
@@ -47,52 +48,41 @@
 #define WS2812_PERIOD_DURATION_NS                   1250
 #define WS2812_RESET_DURATION_NS                    50000
 
-#define WS2812_GAMMA7_TABLE_NUMBER_OF_VALUES        16
-
 
 /******************************************************************************************************************************************************
  *  GLOBAL FUNCTION MACROS
- *****************************************************************************************************************************************************/
-#if (WS2812_RGB_ORDER_ON_RUNTIME == STD_ON)
-    #define WS2812_POS_ABS_RED(Red)             (Red + OffsetRed)
-    #define WS2812_POS_ABS_GREEN(Green)         (Green + OffsetGreen)
-    #define WS2812_POS_ABS_BLUE(Blue)           (Blue + OffsetBlue)
-#else
-    #define WS2812_POS_ABS_RED(Red)             (Red + WS2812_COLOR_OFFSET_RED)
-    #define WS2812_POS_ABS_GREEN(Green)         (Green + WS2812_COLOR_OFFSET_GREEN)
-    #define WS2812_POS_ABS_BLUE(Blue)           (Blue + WS2812_COLOR_OFFSET_BLUE)
-#endif
+******************************************************************************************************************************************************/
 
 
 /******************************************************************************************************************************************************
  *  GLOBAL DATA TYPES AND STRUCTURES
- *****************************************************************************************************************************************************/
+******************************************************************************************************************************************************/
 
 
 /******************************************************************************************************************************************************
- *  CLASS  WS2812
- *****************************************************************************************************************************************************/
+ *   C L A S S   W S 2 8 1 2
+******************************************************************************************************************************************************/
 class WS2812
 {
 /******************************************************************************************************************************************************
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-/* type which describes the color order of the protocol */
 #if (WS2812_RGB_ORDER_ON_RUNTIME == STD_ON)
-enum ColorOrderType {
-    COLOR_ORDER_RGB,
-    COLOR_ORDER_BRG,
-    COLOR_ORDER_GBR
-};
+    /* type which describes the color order of the protocol */
+    enum ColorOrderType {
+        COLOR_ORDER_RGB,
+        COLOR_ORDER_BRG,
+        COLOR_ORDER_GBR
+    };
 #endif
 
-/* type which describes the structure of a pixel */
-struct PixelType {
-    byte Red;
-    byte Green;
-    byte Blue;
-};
+    /* type which describes the structure of a pixel */
+    struct PixelType {
+        byte Red;
+        byte Green;
+        byte Blue;
+    };
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
@@ -100,11 +90,13 @@ struct PixelType {
   private:
     byte PinMask;
     volatile byte* PortOutputRegister;
-    //volatile byte* PortModeRegister; /* wird im Original DDR enabled, wirklich  notwendig? */
     byte Pixels[WS2812_NUMBER_OF_LEDS * WS2812_NUMBER_OF_COLORS];
-    byte Brightness;
-    static const uint8_t Gamma7Table[];
 
+
+#if (WS2812_SUPPORT_DIMMING == STD_ON)
+    GammaCorrection GCorrection;
+    byte Brightness;
+#endif
 
 #if (WS2812_RESET_TIMER == STD_ON)
     unsigned long ResetTimer;
@@ -116,39 +108,52 @@ struct PixelType {
     byte OffsetBlue;
 #endif
     // functions
-    uint8_t calcGamma7CorrectionValue(byte);
     void sendData(const byte*, uint16_t);
-    void dimmPixels(byte*, uint16_t);
-    void dimmPixel(PixelType*, PixelType);
-    void dimmPixel(PixelType*, byte, byte, byte);
 
+#if (WS2812_SUPPORT_DIMMING == STD_ON)
+    void dimmPixels(byte*, uint16_t) const;
+    void dimmPixel(PixelType*, PixelType) const;
+    void dimmPixel(PixelType*, byte, byte, byte) const;
     void dimmColor(byte* ColorDimmed, byte Color) const { *ColorDimmed = (Color * Brightness) >> 8; }
+#endif
+
+#if (WS2812_RESET_TIMER == STD_ON)
+    boolean isResetTimeElapsed();
+#endif
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    WS2812(byte);
+    WS2812();
     ~WS2812();
 
     // get methods
-    byte getBrightness() const { return Brightness; }
     stdReturnType getPixel(byte, PixelType*) const;
-    stdReturnType getPixelDimmed(byte, PixelType*) const;
     PixelType getPixelFast(byte) const;
+    
+#if (WS2812_SUPPORT_DIMMING == STD_ON)
+    byte getBrightness() const { return Brightness; }
+    stdReturnType getPixelDimmed(byte, PixelType*) const;
     PixelType getPixelDimmedFast(byte) const;
+#endif
 
     // set methods
-    void setBrightness(byte sBrightness, boolean = false);
     stdReturnType setPin(byte);
     stdReturnType setPixel(byte, PixelType);
     stdReturnType setPixel(byte, byte, byte, byte);
     void setPixelFast(byte, PixelType);
     void setPixelFast(byte, byte, byte, byte);
+    
+#if (WS2812_SUPPORT_DIMMING == STD_ON)
+    void setBrightness(byte sBrightness, boolean = false);
+#endif
 
     // methods
-    void init();
-    void clearAllPixels() { memset(Pixels, 0, sizeof(Pixels)); }
+    void init(byte);
+    void clearPixels() { memset(Pixels, 0, sizeof(Pixels)); }
+    void setPixels(PixelType Pixel) { setPixels(Pixel.Red, Pixel.Green, Pixel.Blue); }
+    void setPixels(byte, byte, byte);
     stdReturnType clearPixel(byte Index) { return setPixel(Index, 0, 0, 0); }
     void clearPixelFast(byte Index) { setPixelFast(Index, 0, 0, 0); }
 
@@ -167,4 +172,4 @@ struct PixelType {
 #endif
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E
- *****************************************************************************************************************************************************/
+******************************************************************************************************************************************************/

@@ -53,7 +53,7 @@
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-Display::Display(PixelColorType sColor) : Pixels()
+Display::Display(PixelColorType sColor)
 {
     Color = sColor;
     State = STATE_UNINIT;
@@ -78,7 +78,7 @@ Display::Display(PixelColorType sColor) : Pixels()
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-Display::Display(byte Red, byte Green, byte Blue) : Pixels()
+Display::Display(byte Red, byte Green, byte Blue)
 {
     Color.Red = Red;
     Color.Green = Green;
@@ -117,7 +117,7 @@ Display::~Display()
 void Display::init()
 {
     clear();
-    Pixels.init(DISPLAY_DATA_PIN);
+    Pixels.init(WS2812::PORT_C, WS2812::PIN_0);
     State = STATE_INIT;
 } /* init */
 
@@ -139,7 +139,7 @@ void Display::setBrightness(byte sBrightness)
     ColorDimmed.Blue = dimmColor(Color.Blue);
 
     if(Brightness == 0) {
-        Pixels.clearAllPixels();
+        Pixels.clearPixels();
     } else {
         for(byte Index = 0; Index < DISPLAY_NUMBER_OF_PIXELS; Index++) {
             // update all pixels to new brightness
@@ -252,7 +252,7 @@ void Display::clearWordFast(WordIdType WordId)
  *                  
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType Display::clearAllWords()
+stdReturnType Display::clearWords()
 {
     stdReturnType ReturnValue = E_OK;
 
@@ -324,9 +324,9 @@ stdReturnType Display::getPixel(byte Column, byte Row, boolean* Value)  const
 
 #if (DISPLAY_LED_STRIPE_SERPENTINE == STD_ON)
     /* if led stripe is snake or serpentine then odd row: count from right to left */
-    ReturnValue = Pixels.getPixel(transformToSerpentine(Column,  Row), &Pixel);
+    ReturnValue = Pixels.getPixel(transformToSerpentine(Column,  Row), Pixel);
 #else
-    ReturnValue = Pixels.getPixel((Row * DISPLAY_NUMBER_OF_COLUMNS) + Column, &Pixel);
+    ReturnValue = Pixels.getPixel((Row * DISPLAY_NUMBER_OF_COLUMNS) + Column, Pixel);
 #endif
     if(ReturnValue == E_OK) {
         /* Pixel is only off when all colors are zero */
