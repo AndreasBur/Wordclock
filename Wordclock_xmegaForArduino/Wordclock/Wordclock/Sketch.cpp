@@ -21,7 +21,14 @@
 //Beginning of Auto generated function prototypes by Atmel Studio
 //End of Auto generated function prototypes by Atmel Studio
 
+Display wcDisplay(20, 20, 20);
+Clock wcClock(&wcDisplay, Clock::MODE_WESSI);
+Animation wcAnimation(&wcDisplay, &wcClock);
+
 void setup() {
+    wcDisplay.init();
+    wcDisplay.setWord(DisplayWords::WORD_ES);
+    wcDisplay.show();
   // put your setup code here, to run once:
   //WordClockDisplay.setChar(2, 0, 10, 20, 30);
   //WcDisplayCharacter.getChar(1,1, &Char);
@@ -40,9 +47,8 @@ void setup() {
   //wcAnimation.setClock(12, 10);
 }
 
-Display wcDisplay(20, 20, 20);
-Clock wcClock(&wcDisplay, Clock::MODE_WESSI);
-Animation wcAnimation(&wcDisplay, &wcClock);
+
+
 //Font wcFont;
 
 void loop()
@@ -51,8 +57,8 @@ void loop()
 
   //FontTahoma10x10::CharType Char;
   // put your main code here, to run repeatedly:
-    wcClock.setClock(17,30);
-    wcDisplay.show();
+    //wcClock.setClock(17,30);
+    
 
     volatile int Test = 5;
 }

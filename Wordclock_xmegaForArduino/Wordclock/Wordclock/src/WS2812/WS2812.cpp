@@ -105,17 +105,17 @@ WS2812& WS2812::getInstance()
 void WS2812::init(PortType Port, PinType Pin)
 {
     if(Port == PORT_C) {
-        initUsart(&USARTC0);
-        initPort(&PORTC);
         initDma(&USARTC0, EDMA_CH_TRIGSRC_USARTC0_DRE_gc);
+        initPort(&PORTC);
         initEventSystem(EVSYS_CHMUX_PORTC_PIN3_gc, EVSYS_CHMUX_PORTC_PIN1_gc);
+        initUsart(&USARTC0);
         if(Pin == PIN_0) { initXcl(XCL_LUT0OUTEN_PIN0_gc, XCL_PORTSEL_PC_gc); }
-        else if(Pin == PIN_4) { initXcl(XCL_LUT0OUTEN_PIN4_gc, XCL_PORTSEL_PC_gc); } 
+        else if(Pin == PIN_4) { initXcl(XCL_LUT0OUTEN_PIN4_gc, XCL_PORTSEL_PC_gc); }
     }
     if(Port == PORT_D) {
-        initUsart(&USARTD0);
-        initPort(&PORTD);
         initDma(&USARTD0, EDMA_CH_TRIGSRC_USARTD0_DRE_gc);
+        initPort(&PORTD);
+        initUsart(&USARTD0);
         initEventSystem(EVSYS_CHMUX_PORTD_PIN3_gc, EVSYS_CHMUX_PORTD_PIN1_gc);
         if(Pin == PIN_0) { initXcl(XCL_LUT0OUTEN_PIN0_gc, XCL_PORTSEL_PD_gc); }
         else if(Pin == PIN_4) { initXcl(XCL_LUT0OUTEN_PIN4_gc, XCL_PORTSEL_PD_gc); }
@@ -420,8 +420,9 @@ void WS2812::initUsart(USART_t* pUsart)
     pUsart->BAUDCTRLA = (F_CPU / (2 * WS2812_USART_SPI_BAUDRATE)) - 1;  
     pUsart->BAUDCTRLB = 0;
     pUsart->CTRLA = USART_DREINTLVL_OFF_gc | USART_RXCINTLVL_OFF_gc | USART_TXCINTLVL_OFF_gc;
-    pUsart->CTRLC = USART_CMODE_MSPI_gc;
+    pUsart->CTRLC = USART_CMODE_MSPI_gc | USART_UCPHA_bm;
     pUsart->CTRLD = USART_DECTYPE_DATA_gc | USART_LUTACT_OFF_gc | USART_PECACT_OFF_gc;
+    pUsart->CTRLB = USART_TXEN_bm;
 } /* initUsart */
 
 
