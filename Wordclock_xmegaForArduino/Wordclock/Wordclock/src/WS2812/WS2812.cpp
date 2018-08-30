@@ -30,12 +30,13 @@
 #define WS2812_USART_SPI_BAUDRATE                   800000UL
 #define WS2812_ZERO_PULSE_DURATION_NS               350
 #define WS2812_ONE_PULSE_DURATION_NS                900
+#define WS2812_RESET_DURATION_NS                    50000
 #define WS2812_XCL_LUT_TRUTH_TABLE_VALUE            0xA0
 
 #define WS2812_BTC0_TIMER_CYCLES_ZERO_PULSE         (((F_CPU / 1000) * WS2812_ZERO_PULSE_DURATION_NS) / 1000000)
 #define WS2812_BTC0_TIMER_CYCLES_ONE_PULSE          (((F_CPU / 1000) * WS2812_ONE_PULSE_DURATION_NS)  / 1000000)
 
-// missing in iox32e5.h
+// missing in iox32e5.hl
 #define USART_UCPHA_bm  0x02  /* Clock Phase bit mask. */
 #define USART_UCPHA_bp  1     /* Clock Phase bit position. */
 #define USART_UDORD_bm  0x04  /* Data Order bit mask. */
@@ -120,6 +121,7 @@ void WS2812::init(PortType Port, PinType Pin)
         if(Pin == PIN_0) { initXcl(XCL_LUT0OUTEN_PIN0_gc, XCL_PORTSEL_PD_gc); }
         else if(Pin == PIN_4) { initXcl(XCL_LUT0OUTEN_PIN4_gc, XCL_PORTSEL_PD_gc); }
     }
+
     State = STATE_IDLE;
 } /* init */
 
@@ -135,7 +137,13 @@ void WS2812::init(PortType Port, PinType Pin)
 stdReturnType WS2812::show()
 {
     if(State == STATE_IDLE) {
+
+#if (WS2812_RESET_TIMER == STD_ON)
+        if(isResetTimeElapsed() == false) return E_NOT_OK;
+#endif
+
 #if (WS2812_SUPPORT_DIMMING == STD_ON)
+        State = STATE_BUSY;
         if(Brightness != 255) {
             showNextFrameDimmed();
         } else {
@@ -257,6 +265,25 @@ stdReturnType WS2812::setPixel(IndexType Index, PixelType Pixel)
 {
     if(Index < WS2812_NUMBER_OF_LEDS) {
         (*pNextFrame)[Index].setPixel(Pixel);
+        return E_OK;
+    } else {
+        return E_NOT_OK;
+    }
+} /* setPixel */
+
+
+/******************************************************************************************************************************************************
+  setPixel()
+******************************************************************************************************************************************************/
+/*! \brief          
+ *  \details        
+ *                  
+ *  \return         -
+******************************************************************************************************************************************************/
+stdReturnType WS2812::setPixel(IndexType Index, byte Red, byte Green, byte Blue)
+{
+    if(Index < WS2812_NUMBER_OF_LEDS) {
+        (*pNextFrame)[Index].setPixel(Red, Green, Blue);
         return E_OK;
     } else {
         return E_NOT_OK;
@@ -419,7 +446,11 @@ void WS2812::initUsart(USART_t* pUsart)
     // Setup USART in master SPI mode 1, MSB first
     pUsart->BAUDCTRLA = (F_CPU / (2 * WS2812_USART_SPI_BAUDRATE)) - 1;  
     pUsart->BAUDCTRLB = 0;
+#if (WS2812_RESET_TIMER == STD_ON)
+    pUsart->CTRLA = USART_DREINTLVL_OFF_gc | USART_RXCINTLVL_OFF_gc | USART_TXCINTLVL_LO_gc;
+#else
     pUsart->CTRLA = USART_DREINTLVL_OFF_gc | USART_RXCINTLVL_OFF_gc | USART_TXCINTLVL_OFF_gc;
+#endif
     pUsart->CTRLC = USART_CMODE_MSPI_gc | USART_UCPHA_bm;
     pUsart->CTRLD = USART_DECTYPE_DATA_gc | USART_LUTACT_OFF_gc | USART_PECACT_OFF_gc;
     pUsart->CTRLB = USART_TXEN_bm;
@@ -492,22 +523,24 @@ void WS2812::initEventSystem(byte EvsysChmuxPortPin3Gc, byte EvsysChmuxPortPin1G
 ******************************************************************************************************************************************************/
 void WS2812::initXcl(byte Lut0OutenPinGc, byte XclPortselGc)
 {
-   // Setup XCL BTC0 timer to 1shot PWM generation
-   XCL.CTRLE = XCL_CMDSEL_NONE_gc | XCL_TCSEL_BTC0_gc | XCL_CLKSEL_DIV1_gc;
-   XCL.CTRLF = XCL_CMDEN_DISABLE_gc | XCL_MODE_1SHOT_gc;
-   XCL.CTRLG = XCL_EVACTEN_bm | XCL_EVACT0_RESTART_gc | XCL_EVSRC_EVCH6_gc;
-   // Output high time if data is 1 (from RESTART to falling edge of one-shot)
-   XCL.PERCAPTL = WS2812_BTC0_TIMER_CYCLES_ONE_PULSE;  
-    // Output high time if data is 0 (from RESTART to rising edge of one-shot)                     
-   XCL.CMPL = WS2812_BTC0_TIMER_CYCLES_ONE_PULSE - WS2812_BTC0_TIMER_CYCLES_ZERO_PULSE;              
-   // Setup XCL LUT
-   // Setup glue logic for MUX
-   XCL.CTRLA = Lut0OutenPinGc | XclPortselGc | XCL_LUTCONF_MUX_gc;
-   XCL.CTRLB = XCL_IN3SEL_XCL_gc | XCL_IN2SEL_XCL_gc | XCL_IN1SEL_EVSYS_gc | XCL_IN0SEL_EVSYS_gc;
-   // Async inputs, no delay
-   XCL.CTRLC = XCL_EVASYSEL0_bm | XCL_DLY1CONF_DISABLE_gc;
-   // LUT truth tables (only LUT1 is used)
-   XCL.CTRLD = WS2812_XCL_LUT_TRUTH_TABLE_VALUE;
+    // Setup XCL BTC0 timer to 1shot PWM generation
+    XCL.CTRLE = XCL_CMDSEL_NONE_gc | XCL_TCSEL_BTC0_gc | XCL_CLKSEL_DIV1_gc;
+    XCL.CTRLF = XCL_CMDEN_DISABLE_gc | XCL_MODE_1SHOT_gc;
+    XCL.CTRLG = XCL_EVACTEN_bm | XCL_EVACT0_RESTART_gc | XCL_EVSRC_EVCH6_gc;
+    // Output high time if data is 1 (from RESTART to falling edge of one-shot)
+    XCL.PERCAPTL = WS2812_BTC0_TIMER_CYCLES_ONE_PULSE;
+    //XCL.PERCAPTL = 7;
+    // Output high time if data is 0 (from RESTART to rising edge of one-shot)
+    XCL.CMPL = WS2812_BTC0_TIMER_CYCLES_ONE_PULSE - WS2812_BTC0_TIMER_CYCLES_ZERO_PULSE;
+    //XCL.CMPL = 5;
+    // Setup XCL LUT
+    // Setup glue logic for MUX
+    XCL.CTRLA = Lut0OutenPinGc | XclPortselGc | XCL_LUTCONF_MUX_gc;
+    XCL.CTRLB = XCL_IN3SEL_XCL_gc | XCL_IN2SEL_XCL_gc | XCL_IN1SEL_EVSYS_gc | XCL_IN0SEL_EVSYS_gc;
+    // Async inputs, no delay
+    XCL.CTRLC = XCL_EVASYSEL0_bm | XCL_DLY1CONF_DISABLE_gc;
+    // LUT truth tables (only LUT1 is used)
+    XCL.CTRLD = WS2812_XCL_LUT_TRUTH_TABLE_VALUE;
 } /* initXcl */
 
 
@@ -578,6 +611,27 @@ void WS2812::switchPixelsBufferPointer()
 } /* switchBufferPointer */
 
 
+#if (WS2812_RESET_TIMER == STD_ON)
+/******************************************************************************************************************************************************
+  isResetTimeElapsed()
+******************************************************************************************************************************************************/
+/*! \brief          
+ *  \details        
+ *                  
+ *  \return         -
+ *****************************************************************************************************************************************************/
+boolean WS2812::isResetTimeElapsed()
+{
+    // check for timer overflow
+    if(micros() < ResetTimer) {
+        return ((micros() - (UINT64_MAX - ResetTimer)) > (WS2812_RESET_DURATION_NS / 1000));
+    } else {
+        return ((micros() - ResetTimer) > (WS2812_RESET_DURATION_NS / 1000));
+    }
+} /* isResetTimeElapsed */
+#endif
+
+
 #if (WS2812_SUPPORT_DIMMING == STD_ON)
 /******************************************************************************************************************************************************
   dimmPixels()
@@ -627,9 +681,11 @@ void WS2812::copyNextFrameToCurrentFrameDimmed()
 } /* copyCurrentFrameToNextFrameDimmed */
 #endif
 
+
 /******************************************************************************************************************************************************
   F R I E N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
+// Todo: Function header
 inline void dmaIsr()
 {
     if(IS_BIT_SET(EDMA.CH0.CTRLB, EDMA_CH_TRNIF_bp)) {
@@ -638,13 +694,36 @@ inline void dmaIsr()
     }
 }
 
+#if (WS2812_RESET_TIMER == STD_ON)
+// Todo: Function header
+inline void usartIsr()
+{
+    WS2812::getInstance().startResetTimer();
+}
+#endif
+
 /******************************************************************************************************************************************************
   I S R   F U N C T I O N S
 ******************************************************************************************************************************************************/
+// Todo: Function header
 ISR(EDMA_CH0_vect)
 {
     dmaIsr();
 }
+
+#if (WS2812_RESET_TIMER == STD_ON)
+// Todo: Function header
+ISR(USARTC0_TXC_vect)
+{
+    usartIsr();
+}
+
+// Todo: Function header
+ISR(USARTD0_TXC_vect)
+{
+    usartIsr();
+}
+#endif
 
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E

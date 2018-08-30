@@ -29,8 +29,8 @@
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
 /* WS2812 configuration parameter */
-#define WS2812_RESET_TIMER                          STD_ON
-#define WS2812_SUPPORT_DIMMING                      STD_OFF
+#define WS2812_RESET_TIMER                          STD_OFF
+#define WS2812_SUPPORT_DIMMING                      STD_ON
 #define WS2812_NUMBER_OF_LEDS                       110
 
 
@@ -119,6 +119,11 @@ class WS2812
     void startDmaTransfer(pPixelsType);
     boolean isDmaBusy() { return EDMA.STATUS & (EDMA_CH0BUSY_bm | EDMA_CH0PEND_bm); }
 
+#if (WS2812_RESET_TIMER == STD_ON)
+    void startResetTimer() { ResetTimer = micros(); }
+    boolean isResetTimeElapsed();
+#endif
+
 #if (WS2812_SUPPORT_DIMMING == STD_ON)
     void dimmPixels(pPixelsType pPixels) const;
     PixelType dimmPixel(PixelType Pixel) const { return dimmPixel(Pixel.Red, Pixel.Green, Pixel.Blue); }
@@ -180,6 +185,7 @@ class WS2812
 
     // friend functions
     friend void dmaIsr();
+    friend void usartIsr();
 };
 
 #endif

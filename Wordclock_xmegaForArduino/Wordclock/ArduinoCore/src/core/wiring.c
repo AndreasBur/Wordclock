@@ -30,7 +30,6 @@
 
 #include <avr/sleep.h>      // Include for sleep mode (see 'wait_for_interrupt()')
 
-
 // The xmega architecture differs significantly from the mega in a number
 // of ways that render the existing code unworkable.  Therefore a complete
 // re-write was done to ensure 100% compatibility at the code level.
@@ -637,7 +636,7 @@ void init()
 
   TCD5_CTRLA = 5; // b0101 - divide by 64 - E manual 13.13.1
 //  TCD5_CTRLB = TC45_BYTEM_BYTEMODE_gc; // byte mode, normal mode
-  //TCD5_CTRLB = TC45_BYTEM_BYTEMODE_gc | TC45_WGMODE_SINGLESLOPE_gc; // byte mode, single slope
+  TCD5_CTRLB = TC_BYTEM_BYTEMODE_gc | TC_WGMODE_SINGLESLOPE_gc; // byte mode, single slope
 //  TCD5_CTRLB = TC45_BYTEM_BYTEMODE_gc | TC45_WGMODE_DSBOTH_gc; // byte mode, dual slope, ovf on bottom AND top
 ////  TCD5_CTRLC = 0; // when timer not running, sets compare (13.9.3)
   TCD5_CTRLD = 0; // events off
@@ -676,7 +675,7 @@ void init()
   // TCC4
   // first the clock selection
   TCC4_CTRLA = 5; // b0101 - divide by 64 - E manual 13.13.1
-  //TCC4_CTRLB = TC45_BYTEM_BYTEMODE_gc | TC45_WGMODE_SINGLESLOPE_gc; // byte mode, single slope
+  TCC4_CTRLB = TC_BYTEM_BYTEMODE_gc | TC_WGMODE_SINGLESLOPE_gc; // byte mode, single slope
 //  TCC4_CTRLB = TC45_BYTEM_BYTEMODE_gc | TC45_WGMODE_DSBOTH_gc; // byte mode, dual slope, ovf on bottom AND top
 ////  TCC4_CTRLC = 0; // when timer not running, sets compare (13.9.3)
   TCC4_CTRLD = 0; // events off
@@ -709,7 +708,7 @@ void init()
   TCC5_INTCTRLB = 0;   // no comparison interrupts
 
   TCC5_CTRLA = 5; // b0101 - divide by 64 - E manual 13.13.1
-  //TCC5_CTRLB = TC45_WGMODE_NORMAL_gc; // 'normal' mode, 16-bit mode
+  TCC5_CTRLB = TC_WGMODE_NORMAL_gc; // 'normal' mode, 16-bit mode
 ////  TCC5_CTRLC = 0; // when timer not running, sets compare (13.9.3)
   TCC5_CTRLD = 0; // events off
   TCC5_CTRLE = 0; // no output on L pins
