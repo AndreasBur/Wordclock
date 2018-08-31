@@ -16,6 +16,22 @@
 
 /*End of auto generated code by Atmel studio */
 
+//void initClock()
+//{
+    //OSC.CTRL |= OSC_RC8MEN_bm;
+    //while(!(OSC.STATUS & OSC_RC8MRDY_bm));
+    //CCP = CCP_IOREG_gc;
+    //CLK.CTRL = CLK_SCLKSEL_RC8M_gc;
+//}
+
+void initClock(void)
+{
+    OSC.CTRL |= OSC_RC32MEN_bm;
+    while(!(OSC.STATUS & OSC_RC32MRDY_bm));
+    CCP = CCP_IOREG_gc;
+    CLK.CTRL = CLK_SCLKSEL_RC32M_gc;
+}
+
 //DisplayCharacter WcDisplayCharacter;
 //Animation wcAnimation;
 //Beginning of Auto generated function prototypes by Atmel Studio
@@ -27,6 +43,7 @@ Animation wcAnimation(&wcDisplay, &wcClock);
 byte Brightness = 0;
 
 void setup() {
+    initClock();
     wcDisplay.init();
     WS2812::getInstance().setBrightness(0);
     //WS2812::getInstance().show();
@@ -73,9 +90,9 @@ void loop()
    Brightness++;
    if(Brightness > 10) Brightness = 0;
 
-   delay(1000);
+    _delay_ms(1);
 
-
+   Brightness++;
   //FontTahoma10x10::CharType Char;
   // put your main code here, to run repeatedly:
     //wcClock.setClock(17,30);

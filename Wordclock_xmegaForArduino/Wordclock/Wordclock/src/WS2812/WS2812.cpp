@@ -529,10 +529,8 @@ void WS2812::initXcl(byte Lut0OutenPinGc, byte XclPortselGc)
     XCL.CTRLG = XCL_EVACTEN_bm | XCL_EVACT0_RESTART_gc | XCL_EVSRC_EVCH6_gc;
     // Output high time if data is 1 (from RESTART to falling edge of one-shot)
     XCL.PERCAPTL = WS2812_BTC0_TIMER_CYCLES_ONE_PULSE;
-    //XCL.PERCAPTL = 7;
     // Output high time if data is 0 (from RESTART to rising edge of one-shot)
     XCL.CMPL = WS2812_BTC0_TIMER_CYCLES_ONE_PULSE - WS2812_BTC0_TIMER_CYCLES_ZERO_PULSE;
-    //XCL.CMPL = 5;
     // Setup XCL LUT
     // Setup glue logic for MUX
     XCL.CTRLA = Lut0OutenPinGc | XclPortselGc | XCL_LUTCONF_MUX_gc;

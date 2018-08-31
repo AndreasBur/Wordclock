@@ -286,7 +286,7 @@ void delayMicroseconds(unsigned int us)
 
   // account for the time taken in the preceeding commands.
   us -= 2;
-#else
+#elif F_CPU >= 8000000L
   // for the 8 MHz internal clock on the ATmega168
 
   // for a one- or two-microsecond delay, simply return.  the overhead of
@@ -305,6 +305,8 @@ void delayMicroseconds(unsigned int us)
   // partially compensate for the time taken by the preceeding commands.
   // we can't subtract any more than this or we'd overflow w/ small delays.
   us--;
+#else
+#error "Clock not supported"
 #endif
 
   // busy wait
