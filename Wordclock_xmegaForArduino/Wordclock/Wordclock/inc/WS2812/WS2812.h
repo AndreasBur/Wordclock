@@ -185,7 +185,6 @@ class WS2812
 
     // friend functions
     friend void dmaIsr();
-    friend void usartIsr();
 };
 
 #endif

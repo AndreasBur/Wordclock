@@ -27,11 +27,13 @@
  *  L O C A L   C O N S T A N T   M A C R O S 
 ******************************************************************************************************************************************************/
 /* WS2812 parameter */
-#define WS2812_USART_SPI_BAUDRATE                   800000UL
 #define WS2812_ZERO_PULSE_DURATION_NS               350
 #define WS2812_ONE_PULSE_DURATION_NS                900
 #define WS2812_ZERO_PULSE_MAX_DURATION_NS           550
 #define WS2812_RESET_DURATION_NS                    50000UL
+
+/* xmega hardware parameter */
+#define WS2812_USART_SPI_BAUDRATE                   800000UL
 #define WS2812_XCL_LUT_TRUTH_TABLE_VALUE            0xA0
 
 #define WS2812_BTC0_CYCLES_ONE_PULSE                (((F_CPU / 1000) * WS2812_ONE_PULSE_DURATION_NS)  / 1000000)
@@ -40,12 +42,12 @@
 #define WS2812_BTC0_CYCLES_ONE_PULSE_CORRECTED      (WS2812_BTC0_CYCLES_ONE_PULSE - WS2812_BTC0_CYCLES_HARDWARE_DELAY)
 #define WS2812_BTC0_CYCLES_ZERO_PULSE_CORRECTED     (WS2812_BTC0_CYCLES_ZERO_PULSE - WS2812_BTC0_CYCLES_HARDWARE_DELAY)
 #define WS2812_BTC0_MIN_CYCLES_ZERO_PULSE           WS2812_BTC0_CYCLES_HARDWARE_DELAY
+#define WS2812_DMA_PORT_OUTPUT_DELAY_NS             50000UL
+#define WS2812_RESET_TIMER_DURATION_NS              (WS2812_RESET_DURATION_NS + WS2812_DMA_PORT_OUTPUT_DELAY_NS)
 
 #define WS2812_XCL_PERCAPTL_VALUE                   WS2812_BTC0_CYCLES_ONE_PULSE_CORRECTED
 
 /* 
-    the only critical timing parameter is the minimum pulse length of zero "0" 
-    warn or throw error if this timing can not be met with current F_CPU settings. 
     Xcl Cmpl max value is Xcl Percaptl.
 */
 #if ((WS2812_BTC0_CYCLES_ONE_PULSE_CORRECTED - WS2812_BTC0_CYCLES_ZERO_PULSE_CORRECTED) > WS2812_XCL_PERCAPTL_VALUE)
@@ -108,7 +110,6 @@ WS2812::WS2812() : State{STATE_UNINIT}, PixelsBuffer1{}, PixelsBuffer2{}
 #if (WS2812_RESET_TIMER == STD_ON)
     ResetTimer = 0;
 #endif
-
 } /* WS2812 */
 
 
@@ -654,9 +655,9 @@ boolean WS2812::isResetTimeElapsed()
 {
     // check for timer overflow
     if(micros() < ResetTimer) {
-        return ((micros() - (UINT64_MAX - ResetTimer)) > (WS2812_RESET_DURATION_NS / 1000));
+        return ((micros() - (UINT64_MAX - ResetTimer)) > (WS2812_RESET_TIMER_DURATION_NS / 1000));
     } else {
-        return ((micros() - ResetTimer) > (WS2812_RESET_DURATION_NS / 1000));
+        return ((micros() - ResetTimer) > (WS2812_RESET_TIMER_DURATION_NS / 1000));
     }
 } /* isResetTimeElapsed */
 #endif
@@ -715,42 +716,38 @@ void WS2812::copyNextFrameToCurrentFrameDimmed()
 /******************************************************************************************************************************************************
   F R I E N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
-// Todo: Function header
+
+/******************************************************************************************************************************************************
+  dmaIsr()
+******************************************************************************************************************************************************/
+/*! \brief          
+ *  \details        
+ *                  
+ *  \return         -
+ *****************************************************************************************************************************************************/
 inline void dmaIsr()
 {   // IS_BIT_CLEARED(EDMA.CH0.CTRLB, EDMA_CH_CHBUSY_bp)
     if(IS_BIT_SET(EDMA.CH0.CTRLB, EDMA_CH_TRNIF_bp)) {
         SET_BIT(EDMA.CH0.CTRLB, EDMA_CH_TRNIF_bp);
-        //WS2812::getInstance().State = WS2812::STATE_IDLE;
-    USARTC0.CTRLA = USART_DREINTLVL_LO_gc | USART_RXCINTLVL_OFF_gc | USART_TXCINTLVL_OFF_gc;
+        WS2812::getInstance().State = WS2812::STATE_IDLE;
 
 #if (WS2812_RESET_TIMER == STD_ON)
-        //WS2812::getInstance().startResetTimer();
+        WS2812::getInstance().startResetTimer();
 #endif
     }
-}
-
-inline void usartIsr()
-{
-#if (WS2812_RESET_TIMER == STD_ON)
-    WS2812::getInstance().State = WS2812::STATE_IDLE;
-    WS2812::getInstance().startResetTimer();
-#endif
 }
 
 
 /******************************************************************************************************************************************************
   I S R   F U N C T I O N S
 ******************************************************************************************************************************************************/
-// Todo: Function header
+
+/******************************************************************************************************************************************************
+  Isr Dma
+******************************************************************************************************************************************************/
 ISR(EDMA_CH0_vect)
 {
     dmaIsr();
-}
-
-ISR(USARTC0_DRE_vect)
-{
-    USARTC0.CTRLA = USART_DREINTLVL_OFF_gc | USART_RXCINTLVL_OFF_gc | USART_TXCINTLVL_OFF_gc;
-    usartIsr();
 }
 
 
