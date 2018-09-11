@@ -30,11 +30,42 @@
 #define WS2812_USART_SPI_BAUDRATE                   800000UL
 #define WS2812_ZERO_PULSE_DURATION_NS               350
 #define WS2812_ONE_PULSE_DURATION_NS                900
-#define WS2812_RESET_DURATION_NS                    50000
+#define WS2812_ZERO_PULSE_MAX_DURATION_NS           550
+#define WS2812_RESET_DURATION_NS                    50000UL
 #define WS2812_XCL_LUT_TRUTH_TABLE_VALUE            0xA0
 
-#define WS2812_BTC0_TIMER_CYCLES_ZERO_PULSE         (((F_CPU / 1000) * WS2812_ZERO_PULSE_DURATION_NS) / 1000000)
-#define WS2812_BTC0_TIMER_CYCLES_ONE_PULSE          (((F_CPU / 1000) * WS2812_ONE_PULSE_DURATION_NS)  / 1000000)
+#define WS2812_BTC0_CYCLES_ONE_PULSE                (((F_CPU / 1000) * WS2812_ONE_PULSE_DURATION_NS)  / 1000000)
+#define WS2812_BTC0_CYCLES_ZERO_PULSE               (((F_CPU / 1000) * WS2812_ZERO_PULSE_DURATION_NS) / 1000000)
+#define WS2812_BTC0_CYCLES_HARDWARE_DELAY           4
+#define WS2812_BTC0_CYCLES_ONE_PULSE_CORRECTED      (WS2812_BTC0_CYCLES_ONE_PULSE - WS2812_BTC0_CYCLES_HARDWARE_DELAY)
+#define WS2812_BTC0_CYCLES_ZERO_PULSE_CORRECTED     (WS2812_BTC0_CYCLES_ZERO_PULSE - WS2812_BTC0_CYCLES_HARDWARE_DELAY)
+#define WS2812_BTC0_MIN_CYCLES_ZERO_PULSE           WS2812_BTC0_CYCLES_HARDWARE_DELAY
+
+#define WS2812_XCL_PERCAPTL_VALUE                   WS2812_BTC0_CYCLES_ONE_PULSE_CORRECTED
+
+/* 
+    the only critical timing parameter is the minimum pulse length of zero "0" 
+    warn or throw error if this timing can not be met with current F_CPU settings. 
+    Xcl Cmpl max value is Xcl Percaptl.
+*/
+#if ((WS2812_BTC0_CYCLES_ONE_PULSE_CORRECTED - WS2812_BTC0_CYCLES_ZERO_PULSE_CORRECTED) > WS2812_XCL_PERCAPTL_VALUE)
+    #define WS2812_XCL_CMPL_VALUE                   WS2812_XCL_PERCAPTL_VALUE
+#else
+    #define WS2812_XCL_CMPL_VALUE                   (WS2812_BTC0_CYCLES_ONE_PULSE_CORRECTED - WS2812_BTC0_CYCLES_ZERO_PULSE_CORRECTED)
+#endif
+
+/* 
+    the only critical timing parameter is the minimum pulse length of zero "0" 
+    warn or throw error if this timing can not be met with current F_CPU settings. 
+*/
+#define WS2812_ZERO_PULSE_DURATION_NS_CALC          ((WS2812_BTC0_MIN_CYCLES_ZERO_PULSE * 1000000) / (F_CPU / 1000))
+
+#if (WS2812_ZERO_PULSE_DURATION_NS_CALC > WS2812_ZERO_PULSE_MAX_DURATION_NS)
+    //#error "WS2812: sorry, the clock speed is too low. Did you set F_CPU correctly?"
+#elif (WS2812_ZERO_PULSE_DURATION_NS_CALC > (WS2812_ZERO_PULSE_MAX_DURATION_NS - 100))
+    #warning "WS2812: The timing is critical and may only work on WS2812B, not on WS2812(S)."
+    #warning "Please consider a higher clockspeed, if possible"
+#endif
 
 // missing in iox32e5.hl
 #define USART_UCPHA_bm  0x02  /* Clock Phase bit mask. */
@@ -73,6 +104,11 @@ WS2812::WS2812() : State{STATE_UNINIT}, PixelsBuffer1{}, PixelsBuffer2{}
 #if (WS2812_SUPPORT_DIMMING == STD_ON)
     Brightness = 255;
 #endif
+
+#if (WS2812_RESET_TIMER == STD_ON)
+    ResetTimer = 0;
+#endif
+
 } /* WS2812 */
 
 
@@ -444,13 +480,9 @@ void WS2812::setBrightness(byte sBrightness, boolean GammaCorrection)
 void WS2812::initUsart(USART_t* pUsart)
 {
     // Setup USART in master SPI mode 1, MSB first
-    pUsart->BAUDCTRLA = (F_CPU / (2 * WS2812_USART_SPI_BAUDRATE)) - 1;  
+    pUsart->BAUDCTRLA = (F_CPU / (2 * WS2812_USART_SPI_BAUDRATE)) - 1;
     pUsart->BAUDCTRLB = 0;
-#if (WS2812_RESET_TIMER == STD_ON)
-    pUsart->CTRLA = USART_DREINTLVL_OFF_gc | USART_RXCINTLVL_OFF_gc | USART_TXCINTLVL_LO_gc;
-#else
     pUsart->CTRLA = USART_DREINTLVL_OFF_gc | USART_RXCINTLVL_OFF_gc | USART_TXCINTLVL_OFF_gc;
-#endif
     pUsart->CTRLC = USART_CMODE_MSPI_gc | USART_UCPHA_bm;
     pUsart->CTRLD = USART_DECTYPE_DATA_gc | USART_LUTACT_OFF_gc | USART_PECACT_OFF_gc;
     pUsart->CTRLB = USART_TXEN_bm;
@@ -528,9 +560,9 @@ void WS2812::initXcl(byte Lut0OutenPinGc, byte XclPortselGc)
     XCL.CTRLF = XCL_CMDEN_DISABLE_gc | XCL_MODE_1SHOT_gc;
     XCL.CTRLG = XCL_EVACTEN_bm | XCL_EVACT0_RESTART_gc | XCL_EVSRC_EVCH6_gc;
     // Output high time if data is 1 (from RESTART to falling edge of one-shot)
-    XCL.PERCAPTL = WS2812_BTC0_TIMER_CYCLES_ONE_PULSE;
+    XCL.PERCAPTL = WS2812_XCL_PERCAPTL_VALUE;
     // Output high time if data is 0 (from RESTART to rising edge of one-shot)
-    XCL.CMPL = WS2812_BTC0_TIMER_CYCLES_ONE_PULSE - WS2812_BTC0_TIMER_CYCLES_ZERO_PULSE;
+    XCL.CMPL = WS2812_XCL_CMPL_VALUE;
     // Setup XCL LUT
     // Setup glue logic for MUX
     XCL.CTRLA = Lut0OutenPinGc | XclPortselGc | XCL_LUTCONF_MUX_gc;
@@ -685,20 +717,26 @@ void WS2812::copyNextFrameToCurrentFrameDimmed()
 ******************************************************************************************************************************************************/
 // Todo: Function header
 inline void dmaIsr()
-{
+{   // IS_BIT_CLEARED(EDMA.CH0.CTRLB, EDMA_CH_CHBUSY_bp)
     if(IS_BIT_SET(EDMA.CH0.CTRLB, EDMA_CH_TRNIF_bp)) {
         SET_BIT(EDMA.CH0.CTRLB, EDMA_CH_TRNIF_bp);
-        WS2812::getInstance().State = WS2812::STATE_IDLE;
+        //WS2812::getInstance().State = WS2812::STATE_IDLE;
+    USARTC0.CTRLA = USART_DREINTLVL_LO_gc | USART_RXCINTLVL_OFF_gc | USART_TXCINTLVL_OFF_gc;
+
+#if (WS2812_RESET_TIMER == STD_ON)
+        //WS2812::getInstance().startResetTimer();
+#endif
     }
 }
 
-#if (WS2812_RESET_TIMER == STD_ON)
-// Todo: Function header
 inline void usartIsr()
 {
+#if (WS2812_RESET_TIMER == STD_ON)
+    WS2812::getInstance().State = WS2812::STATE_IDLE;
     WS2812::getInstance().startResetTimer();
-}
 #endif
+}
+
 
 /******************************************************************************************************************************************************
   I S R   F U N C T I O N S
@@ -709,19 +747,12 @@ ISR(EDMA_CH0_vect)
     dmaIsr();
 }
 
-#if (WS2812_RESET_TIMER == STD_ON)
-// Todo: Function header
-ISR(USARTC0_TXC_vect)
+ISR(USARTC0_DRE_vect)
 {
+    USARTC0.CTRLA = USART_DREINTLVL_OFF_gc | USART_RXCINTLVL_OFF_gc | USART_TXCINTLVL_OFF_gc;
     usartIsr();
 }
 
-// Todo: Function header
-ISR(USARTD0_TXC_vect)
-{
-    usartIsr();
-}
-#endif
 
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E

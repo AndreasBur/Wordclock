@@ -64,7 +64,7 @@
 
 /* the only critical timing parameter is the minimum pulse length of zero "0" 
    warn or throw error if this timing can not be met with current F_CPU settings. */
-#define WS2812_ZERO_PULSE_DURATION_NS_CALC (((WS2812_ASM_W1_NOPs + WS2812_ASM_FIXED_CYCLES_LOW) * 1000000) / (F_CPU / 1000))
+#define WS2812_ZERO_PULSE_DURATION_NS_CALC  (((WS2812_ASM_W1_NOPs + WS2812_ASM_FIXED_CYCLES_LOW) * 1000000) / (F_CPU / 1000))
 
 
 #if (WS2812_ZERO_PULSE_DURATION_NS_CALC > 550)

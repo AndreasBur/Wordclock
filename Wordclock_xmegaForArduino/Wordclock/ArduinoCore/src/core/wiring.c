@@ -249,7 +249,7 @@ void delayMicroseconds(unsigned int us)
   // delay requested.
   us = (us<<3);// * 8
 
-  // account for the time taken in the preceeding commands.
+  // account for the time taken in the preceding commands.
   us -= 2; // 2 clock cycles
 
 #elif F_CPU >= 20000000L
@@ -304,7 +304,13 @@ void delayMicroseconds(unsigned int us)
 
   // partially compensate for the time taken by the preceeding commands.
   // we can't subtract any more than this or we'd overflow w/ small delays.
-  us--;
+  //us--;
+#elif F_CPU >= 4000000L
+  if (--us == 0)
+  return;
+  us <<= 1;
+  // account for the time taken in the preceeding commands.
+  us -= 1;
 #else
 #error "Clock not supported"
 #endif

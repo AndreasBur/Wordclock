@@ -29,7 +29,7 @@
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
 /* WS2812 configuration parameter */
-#define WS2812_RESET_TIMER                          STD_OFF
+#define WS2812_RESET_TIMER                          STD_ON
 #define WS2812_SUPPORT_DIMMING                      STD_ON
 #define WS2812_NUMBER_OF_LEDS                       110
 

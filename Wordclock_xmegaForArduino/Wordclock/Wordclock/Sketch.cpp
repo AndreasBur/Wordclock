@@ -24,13 +24,13 @@
     //CLK.CTRL = CLK_SCLKSEL_RC8M_gc;
 //}
 
-void initClock(void)
-{
-    OSC.CTRL |= OSC_RC32MEN_bm;
-    while(!(OSC.STATUS & OSC_RC32MRDY_bm));
-    CCP = CCP_IOREG_gc;
-    CLK.CTRL = CLK_SCLKSEL_RC32M_gc;
-}
+//void initClock(void)
+//{
+    //OSC.CTRL |= OSC_RC32MEN_bm;
+    //while(!(OSC.STATUS & OSC_RC32MRDY_bm));
+    //CCP = CCP_IOREG_gc;
+    //CLK.CTRL = CLK_SCLKSEL_RC32M_gc;
+//}
 
 //DisplayCharacter WcDisplayCharacter;
 //Animation wcAnimation;
@@ -42,13 +42,27 @@ Clock wcClock(&wcDisplay, Clock::MODE_WESSI);
 Animation wcAnimation(&wcDisplay, &wcClock);
 byte Brightness = 0;
 
+void initClockPrescaler()
+{
+#if (F_CPU == 16000000L)
+    CCP = CCP_IOREG_gc;
+    CLK_PSCTRL = CLK_PSADIV_2_gc;
+#elif (F_CPU == 8000000L)
+    CCP = CCP_IOREG_gc;
+    CLK_PSCTRL = CLK_PSADIV_4_gc;
+#elif (F_CPU == 4000000L)
+    CCP = CCP_IOREG_gc;
+    CLK_PSCTRL = CLK_PSADIV_8_gc;
+#endif
+}
+
 void setup() {
-    initClock();
+    initClockPrescaler();
     wcDisplay.init();
-    WS2812::getInstance().setBrightness(0);
+    //WS2812::getInstance().setBrightness(0);
     //WS2812::getInstance().show();
     //delay(100);
-    WS2812::getInstance().setBrightness(255);
+    //WS2812::getInstance().setBrightness(255);
     //wcDisplay.setWord(DisplayWords::WORD_ES);
     //wcDisplay.show();
   // put your setup code here, to run once:
@@ -83,16 +97,17 @@ unsigned long Micros = 0;
 
 void loop()
 {
-   //WS2812::getInstance().setPixels(0, 0, 0);
-   //WS2812::getInstance().setPixels(255, 255, 255);
-   WS2812::getInstance().setPixel(0, Brightness, 0, 0);
-   WS2812::getInstance().show();
-   Brightness++;
-   if(Brightness > 10) Brightness = 0;
+    //WS2812::getInstance().setPixels(0, 0, 0);
+    //(WS2812::getInstance().setPixels(85, 85, 85);
+    //WS2812::getInstance().setPixels(255, 255, 255);
+    WS2812::getInstance().setPixel(0, Brightness, 0, 0);
+    WS2812::getInstance().show();
+    Brightness++;
+    if(Brightness > 10) Brightness = 0;
 
-    _delay_ms(1);
+    //delay(800);
 
-   Brightness++;
+    Brightness++;
   //FontTahoma10x10::CharType Char;
   // put your main code here, to run repeatedly:
     //wcClock.setClock(17,30);
