@@ -158,7 +158,6 @@ void WS2812::init(PortType Port, PinType Pin)
         if(Pin == PIN_0) { initXcl(XCL_LUT0OUTEN_PIN0_gc, XCL_PORTSEL_PD_gc); }
         else if(Pin == PIN_4) { initXcl(XCL_LUT0OUTEN_PIN4_gc, XCL_PORTSEL_PD_gc); }
     }
-
     State = STATE_IDLE;
 } /* init */
 

@@ -86,7 +86,7 @@ void setup() {
   //WS2812::getInstance().setPixelFast(2, 50, 100, 80);
 
   SET_BIT(PORTC_DIRSET, 6);
-
+  SET_BIT(PORTC_OUT, 6);
 }
 
 
@@ -105,7 +105,10 @@ void loop()
     Brightness++;
     if(Brightness > 10) Brightness = 0;
 
-    //delay(800);
+    SET_BIT(PORTC_OUT, 6);
+    delayMicroseconds(10);
+    CLEAR_BIT(PORTC_OUT, 6);
+    delayMicroseconds(10);
 
     Brightness++;
   //FontTahoma10x10::CharType Char;
