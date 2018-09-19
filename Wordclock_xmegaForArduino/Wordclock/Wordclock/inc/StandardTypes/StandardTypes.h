@@ -78,11 +78,11 @@
 /* is bit cleared */
 #define IS_BIT_CLEARED(Var, Bit) !IS_BIT_SET(Var, Bit)
 
-/* read Bit Group */
+/* read bit group */
 #define READ_BIT_GROUP(Var, BitGroupMask, BitGroupPosition) \
     (((Var) & ((BitGroupMask) << (BitGroupPosition))) >> (BitGroupPosition))
 
-/* write Bit Group */
+/* write bit group */
 #define WRITE_BIT_GROUP(Var, BitGroupMask, BitGroupPosition, Value) \
     ((Var) = (((Var) & ~((BitGroupMask) << (BitGroupPosition))) | (((Value) & (BitGroupMask)) << (BitGroupPosition))))
 
@@ -133,45 +133,84 @@ static inline ReturnType bitValue(BitType Bit)
 template <typename ReturnType, typename LengthType>
 inline ReturnType bitMask(LengthType Length)
 {
-    return (bitValue(Length) - 1);
+    return bitValue(Length) - 1;
 }
 
-template <typename VarType>
-inline boolean readBit(VarType Var, uint8_t Bit)
-{
-    return ((Var & (UINT64_C(1) << Bit)) >> Bit);
-}
-
+/* set bit */
 template <typename VarType>
 inline VarType setBit(VarType Var, uint8_t Bit)
 {
-    return (Var & ~(UINT64_C(1) << Bit));
+    return Var & ~(UINT64_C(1) << Bit);
 }
 
-template <typename VarType, typename PositionType>
-inline void shiftLeft(VarType& Var, PositionType Position)
+/* clear bit */
+template <typename VarType>
+inline VarType clearBit(VarType Var, uint8_t Bit)
 {
-    Var = Var << Position;
+    return Var & ~(UINT64_C(1) << Bit);
 }
 
-template <typename VarType, typename PositionType>
-inline void shiftRight(VarType Var, PositionType Position)
+/* toggle bit */
+template <typename VarType>
+inline VarType toggleBit(VarType Var, uint8_t Bit)
 {
-    Var = Var >> Position;
+    return Var ^ ~(UINT64_C(1) << Bit);
 }
 
-/* read Bit Group */
+/* read bit */
+template <typename VarType>
+inline boolean readBit(VarType Var, uint8_t Bit)
+{
+    return (Var & (UINT64_C(1) << Bit)) >> Bit;
+}
+
+/* write bit */
+template <typename VarType>
+inline VarType writeBit(VarType Var, uint8_t Bit, boolean Value)
+{
+    return Var & ~(UINT64_C(1) << Bit) | (Value << Bit);
+}
+
+/* is bit set */
+template <typename VarType>
+inline boolean isBitSet(VarType Var, uint8_t Bit)
+{
+    return Var & (UINT64_C(1) << Bit);
+}
+
+/* is bit cleared */
+template <typename VarType>
+inline boolean isBitCleared(VarType Var, uint8_t Bit)
+{
+    return !isBitSet(Var, Bit);
+}
+
+/* shift left */
+template <typename VarType, typename PositionType>
+inline VarType shiftLeft(VarType Var, PositionType Position)
+{
+    return Var << Position;
+}
+
+/* shift right */
+template <typename VarType, typename PositionType>
+inline VarType shiftRight(VarType Var, PositionType Position)
+{
+    return Var >> Position;
+}
+
+/* read bit group */
 template <typename VarType, typename MaskType, typename GroupType>
 inline VarType readBitGroup(VarType Var, MaskType BitGroupMask, GroupType BitGroupPosition)
 {
     return ((Var & (static_cast<VarType>(BitGroupMask) << BitGroupPosition)) >> BitGroupPosition);
 }
 
-/* write Bit Group */
+/* write bit group */
 template <typename VarType, typename MaskType, typename GroupType, typename ValType>
-inline void writeBitGroup(VarType& Var, MaskType BitGroupMask, GroupType BitGroupPosition, ValType Value)
+inline VarType writeBitGroup(VarType Var, MaskType BitGroupMask, GroupType BitGroupPosition, ValType Value)
 {
-    Var = ((Var & ~(static_cast<VarType>(BitGroupMask) << BitGroupPosition)) | ((VarType)(Value & BitGroupMask) << BitGroupPosition));
+    return (Var & ~(static_cast<VarType>(BitGroupMask) << BitGroupPosition)) | ((VarType)(Value & BitGroupMask) << BitGroupPosition);
 }
 
 
