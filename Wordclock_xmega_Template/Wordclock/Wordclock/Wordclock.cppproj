@@ -1,0 +1,273 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="14.0">
+  <PropertyGroup>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectVersion>7.0</ProjectVersion>
+    <ToolchainName>com.Atmel.AVRGCC8.CPP</ToolchainName>
+    <ProjectGuid>dce6c7e3-ee26-4d79-826b-08594b9ad897</ProjectGuid>
+    <avrdevice>ATxmega32E5</avrdevice>
+    <avrdeviceseries>none</avrdeviceseries>
+    <OutputType>Executable</OutputType>
+    <Language>CPP</Language>
+    <OutputFileName>$(MSBuildProjectName)</OutputFileName>
+    <ArduinoProjectType>Sketch</ArduinoProjectType>
+    <OutputFileExtension>.elf</OutputFileExtension>
+    <OutputDirectory>$(MSBuildProjectDirectory)\$(Configuration)</OutputDirectory>
+    <Name>Wordclock</Name>
+    <RootNamespace>Wordclock</RootNamespace>
+    <ArduinoIdeDir>C:\Program Files (x86)\Arduino</ArduinoIdeDir>
+    <ToolchainFlavour>Native</ToolchainFlavour>
+    <KeepTimersRunning>true</KeepTimersRunning>
+    <OverrideVtor>false</OverrideVtor>
+    <CacheFlash>true</CacheFlash>
+    <ProgFlashFromRam>true</ProgFlashFromRam>
+    <RamSnippetAddress>0x20000000</RamSnippetAddress>
+    <UncachedRange />
+    <preserveEEPROM>true</preserveEEPROM>
+    <OverrideVtorValue>exception_table</OverrideVtorValue>
+    <BootSegment>2</BootSegment>
+    <eraseonlaunchrule>0</eraseonlaunchrule>
+    <AssemblyName>Wordclock</AssemblyName>
+    <AsfFrameworkConfig>
+      <framework-data>
+        <options />
+        <configurations />
+        <files />
+        <documentation help="" />
+        <offline-documentation help="" />
+        <dependencies>
+          <content-extension eid="atmel.asf" uuidref="Atmel.ASF" version="3.34.1" />
+        </dependencies>
+      </framework-data>
+    </AsfFrameworkConfig>
+    <avrtool>com.atmel.avrdbg.tool.simulator</avrtool>
+    <avrtoolserialnumber />
+    <avrdeviceexpectedsignature>0x1E954C</avrdeviceexpectedsignature>
+    <com_atmel_avrdbg_tool_simulator>
+      <ToolOptions xmlns="">
+        <InterfaceProperties>
+        </InterfaceProperties>
+      </ToolOptions>
+      <ToolType xmlns="">com.atmel.avrdbg.tool.simulator</ToolType>
+      <ToolNumber xmlns="">
+      </ToolNumber>
+      <ToolName xmlns="">Simulator</ToolName>
+    </com_atmel_avrdbg_tool_simulator>
+    <ResetRule>0</ResetRule>
+    <EraseKey />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <ToolchainSettings>
+      <AvrGccCpp>
+        <avrgcc.common.Device>-mmcu=atxmega32e5 -B "%24(PackRepoDir)\atmel\XMEGAE_DFP\1.2.51\gcc\dev\atxmega32e5"</avrgcc.common.Device>
+        <avrgcc.common.outputfiles.hex>True</avrgcc.common.outputfiles.hex>
+        <avrgcc.common.outputfiles.lss>True</avrgcc.common.outputfiles.lss>
+        <avrgcc.common.outputfiles.eep>True</avrgcc.common.outputfiles.eep>
+        <avrgcc.common.outputfiles.srec>True</avrgcc.common.outputfiles.srec>
+        <avrgcc.common.outputfiles.usersignatures>False</avrgcc.common.outputfiles.usersignatures>
+        <avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>True</avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>
+        <avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>True</avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>
+        <avrgcc.compiler.symbols.DefSymbols>
+          <ListValues>
+            <Value>NDEBUG</Value>
+            <Value>F_CPU=16000000L</Value>
+            <Value>ARDUINO=10802</Value>
+            <Value>ARDUINO_AVR_UNO</Value>
+            <Value>ARDUINO_ARCH_AVR</Value>
+            <Value>USB_VID=0x2341</Value>
+            <Value>USB_PID=0x0043</Value>
+            <Value>USB_MANUFACTURER="\"Arduino LLC\""</Value>
+          </ListValues>
+        </avrgcc.compiler.symbols.DefSymbols>
+        <avrgcc.compiler.directories.IncludePaths>
+          <ListValues>
+            <Value>%24(ProjectDir)\..\ArduinoCore\include\core</Value>
+            <Value>%24(ProjectDir)\..\ArduinoCore\include\variants\standard</Value>
+            <Value>%24(PackRepoDir)\atmel\XMEGAE_DFP\1.2.51\include</Value>
+          </ListValues>
+        </avrgcc.compiler.directories.IncludePaths>
+        <avrgcc.compiler.optimization.level>Optimize for size (-Os)</avrgcc.compiler.optimization.level>
+        <avrgcc.compiler.optimization.OtherFlags>-fno-threadsafe-statics</avrgcc.compiler.optimization.OtherFlags>
+        <avrgcc.compiler.optimization.PackStructureMembers>True</avrgcc.compiler.optimization.PackStructureMembers>
+        <avrgcc.compiler.optimization.AllocateBytesNeededForEnum>True</avrgcc.compiler.optimization.AllocateBytesNeededForEnum>
+        <avrgcc.compiler.warnings.AllWarnings>True</avrgcc.compiler.warnings.AllWarnings>
+        <avrgcc.compiler.warnings.InhibitAllWarnings>True</avrgcc.compiler.warnings.InhibitAllWarnings>
+        <avrgcc.compiler.miscellaneous.OtherFlags>-std=gnu99 -std=gnu11</avrgcc.compiler.miscellaneous.OtherFlags>
+        <avrgcccpp.compiler.general.ChangeDefaultCharTypeUnsigned>True</avrgcccpp.compiler.general.ChangeDefaultCharTypeUnsigned>
+        <avrgcccpp.compiler.general.ChangeDefaultBitFieldUnsigned>True</avrgcccpp.compiler.general.ChangeDefaultBitFieldUnsigned>
+        <avrgcccpp.compiler.symbols.DefSymbols>
+          <ListValues>
+            <Value>NDEBUG</Value>
+            <Value>F_CPU=16000000L</Value>
+            <Value>ARDUINO=10802</Value>
+            <Value>ARDUINO_AVR_UNO</Value>
+            <Value>ARDUINO_ARCH_AVR</Value>
+            <Value>USB_VID=0x2341</Value>
+            <Value>USB_PID=0x0043</Value>
+            <Value>USB_MANUFACTURER="\"Arduino LLC\""</Value>
+          </ListValues>
+        </avrgcccpp.compiler.symbols.DefSymbols>
+        <avrgcccpp.compiler.directories.IncludePaths>
+          <ListValues>
+            <Value>%24(ProjectDir)\..\ArduinoCore\include\core</Value>
+            <Value>%24(ProjectDir)\..\ArduinoCore\include\variants\standard</Value>
+            <Value>%24(PackRepoDir)\atmel\XMEGAE_DFP\1.2.51\include</Value>
+          </ListValues>
+        </avrgcccpp.compiler.directories.IncludePaths>
+        <avrgcccpp.compiler.optimization.level>Optimize for size (-Os)</avrgcccpp.compiler.optimization.level>
+        <avrgcccpp.compiler.optimization.OtherFlags>-fno-threadsafe-statics</avrgcccpp.compiler.optimization.OtherFlags>
+        <avrgcccpp.compiler.optimization.PackStructureMembers>True</avrgcccpp.compiler.optimization.PackStructureMembers>
+        <avrgcccpp.compiler.optimization.AllocateBytesNeededForEnum>True</avrgcccpp.compiler.optimization.AllocateBytesNeededForEnum>
+        <avrgcccpp.compiler.warnings.AllWarnings>True</avrgcccpp.compiler.warnings.AllWarnings>
+        <avrgcccpp.compiler.warnings.Undefined>True</avrgcccpp.compiler.warnings.Undefined>
+        <avrgcccpp.compiler.warnings.Pedantic>True</avrgcccpp.compiler.warnings.Pedantic>
+        <avrgcccpp.compiler.miscellaneous.OtherFlags>-std=gnu++11</avrgcccpp.compiler.miscellaneous.OtherFlags>
+        <avrgcccpp.linker.libraries.Libraries>
+          <ListValues>
+            <Value>libm</Value>
+          </ListValues>
+        </avrgcccpp.linker.libraries.Libraries>
+        <avrgcccpp.linker.miscellaneous.LinkerFlags>-Os</avrgcccpp.linker.miscellaneous.LinkerFlags>
+        <avrgcccpp.assembler.general.IncludePaths>
+          <ListValues>
+            <Value>%24(PackRepoDir)\atmel\XMEGAE_DFP\1.2.51\include</Value>
+          </ListValues>
+        </avrgcccpp.assembler.general.IncludePaths>
+        <avrgcccpp.assembler.debugging.DebugLevel>Default (-Wa,-g)</avrgcccpp.assembler.debugging.DebugLevel>
+      </AvrGccCpp>
+    </ToolchainSettings>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <ToolchainSettings>
+      <AvrGccCpp>
+        <avrgcc.common.Device>-mmcu=atxmega32e5 -B "%24(PackRepoDir)\atmel\XMEGAE_DFP\1.2.51\gcc\dev\atxmega32e5"</avrgcc.common.Device>
+        <avrgcc.common.outputfiles.hex>True</avrgcc.common.outputfiles.hex>
+        <avrgcc.common.outputfiles.lss>True</avrgcc.common.outputfiles.lss>
+        <avrgcc.common.outputfiles.eep>True</avrgcc.common.outputfiles.eep>
+        <avrgcc.common.outputfiles.srec>True</avrgcc.common.outputfiles.srec>
+        <avrgcc.common.outputfiles.usersignatures>False</avrgcc.common.outputfiles.usersignatures>
+        <avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>True</avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>
+        <avrgcc.compiler.symbols.DefSymbols>
+          <ListValues>
+            <Value>DEBUG</Value>
+            <Value>F_CPU=8000000L</Value>
+          </ListValues>
+        </avrgcc.compiler.symbols.DefSymbols>
+        <avrgcc.compiler.directories.IncludePaths>
+          <ListValues>
+            <Value>%24(ProjectDir)\..\ArduinoCore\include\core</Value>
+            <Value>%24(ProjectDir)\..\ArduinoCore\include\variants\standard</Value>
+            <Value>../inc/Display</Value>
+            <Value>../inc/WS2812</Value>
+            <Value>../inc/Clock</Value>
+            <Value>../inc/Animation</Value>
+            <Value>../inc/Transformation</Value>
+            <Value>../inc/Animation/Clock</Value>
+            <Value>../inc/Font</Value>
+            <Value>%24(PackRepoDir)\atmel\XMEGAE_DFP\1.2.51\include</Value>
+            <Value>../inc/GammaCorrection</Value>
+          </ListValues>
+        </avrgcc.compiler.directories.IncludePaths>
+        <avrgcc.compiler.optimization.level>Optimize for size (-Os)</avrgcc.compiler.optimization.level>
+        <avrgcc.compiler.optimization.OtherFlags>-fno-threadsafe-statics</avrgcc.compiler.optimization.OtherFlags>
+        <avrgcc.compiler.optimization.PackStructureMembers>True</avrgcc.compiler.optimization.PackStructureMembers>
+        <avrgcc.compiler.optimization.AllocateBytesNeededForEnum>True</avrgcc.compiler.optimization.AllocateBytesNeededForEnum>
+        <avrgcc.compiler.optimization.DebugLevel>Default (-g2)</avrgcc.compiler.optimization.DebugLevel>
+        <avrgcc.compiler.warnings.AllWarnings>True</avrgcc.compiler.warnings.AllWarnings>
+        <avrgcc.compiler.warnings.ExtraWarnings>True</avrgcc.compiler.warnings.ExtraWarnings>
+        <avrgcc.compiler.warnings.Undefined>True</avrgcc.compiler.warnings.Undefined>
+        <avrgcccpp.compiler.general.ChangeDefaultBitFieldUnsigned>True</avrgcccpp.compiler.general.ChangeDefaultBitFieldUnsigned>
+        <avrgcccpp.compiler.symbols.DefSymbols>
+          <ListValues>
+            <Value>DEBUG</Value>
+            <Value>F_CPU=32000000L</Value>
+          </ListValues>
+        </avrgcccpp.compiler.symbols.DefSymbols>
+        <avrgcccpp.compiler.directories.IncludePaths>
+          <ListValues>
+            <Value>%24(ProjectDir)\..\ArduinoCore\include\core</Value>
+            <Value>%24(ProjectDir)\..\ArduinoCore\include\variants\standard</Value>
+            <Value>../inc/Display</Value>
+            <Value>../inc/StandardTypes</Value>
+            <Value>../inc/WS2812</Value>
+            <Value>../inc/Clock</Value>
+            <Value>../inc/Animation</Value>
+            <Value>../inc/Transformation</Value>
+            <Value>../inc/Animation/Clock</Value>
+            <Value>../inc/Font</Value>
+            <Value>%24(PackRepoDir)\atmel\XMEGAE_DFP\1.2.51\include</Value>
+            <Value>../../ArduinoCore/include/util/device</Value>
+            <Value>../../ArduinoCore/include/util/memory</Value>
+            <Value>../../ArduinoCore/include/util/STL</Value>
+            <Value>../../ArduinoCore/include/util/STL_C++XX_stdfloat</Value>
+            <Value>../../ArduinoCore/include/util/utility</Value>
+            <Value>../inc/GammaCorrection</Value>
+          </ListValues>
+        </avrgcccpp.compiler.directories.IncludePaths>
+        <avrgcccpp.compiler.optimization.level>Optimize for size (-Os)</avrgcccpp.compiler.optimization.level>
+        <avrgcccpp.compiler.optimization.OtherFlags>-fno-threadsafe-statics</avrgcccpp.compiler.optimization.OtherFlags>
+        <avrgcccpp.compiler.optimization.PackStructureMembers>True</avrgcccpp.compiler.optimization.PackStructureMembers>
+        <avrgcccpp.compiler.optimization.AllocateBytesNeededForEnum>True</avrgcccpp.compiler.optimization.AllocateBytesNeededForEnum>
+        <avrgcccpp.compiler.optimization.DebugLevel>Maximum (-g3)</avrgcccpp.compiler.optimization.DebugLevel>
+        <avrgcccpp.compiler.warnings.AllWarnings>True</avrgcccpp.compiler.warnings.AllWarnings>
+        <avrgcccpp.compiler.warnings.Undefined>True</avrgcccpp.compiler.warnings.Undefined>
+        <avrgcccpp.compiler.warnings.Pedantic>True</avrgcccpp.compiler.warnings.Pedantic>
+        <avrgcccpp.compiler.miscellaneous.OtherFlags>-std=gnu++11 -Wextra</avrgcccpp.compiler.miscellaneous.OtherFlags>
+        <avrgcccpp.linker.libraries.Libraries>
+          <ListValues>
+            <Value>libm</Value>
+          </ListValues>
+        </avrgcccpp.linker.libraries.Libraries>
+        <avrgcccpp.linker.miscellaneous.LinkerFlags>-Os</avrgcccpp.linker.miscellaneous.LinkerFlags>
+        <avrgcccpp.assembler.general.IncludePaths>
+          <ListValues>
+            <Value>%24(PackRepoDir)\atmel\XMEGAE_DFP\1.2.51\include</Value>
+          </ListValues>
+        </avrgcccpp.assembler.general.IncludePaths>
+        <avrgcccpp.assembler.debugging.DebugLevel>Default (-Wa,-g)</avrgcccpp.assembler.debugging.DebugLevel>
+      </AvrGccCpp>
+    </ToolchainSettings>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="inc\GammaCorrection\GammaCorrection.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="inc\StandardTypes\StandardTypes.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="inc\WS2812\NeoPixel.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="inc\WS2812\WS2812.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Sketch.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\GammaCorrection\GammaCorrection.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\WS2812\WS2812.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Content Include="readme.html">
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ArduinoCore\ArduinoCore.cppproj">
+      <Name>ArduinoCore</Name>
+      <Project>31641ca9-c9e9-499e-9933-c6a72b3b0b5a</Project>
+      <Private>True</Private>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="inc" />
+    <Folder Include="inc\GammaCorrection" />
+    <Folder Include="inc\WS2812" />
+    <Folder Include="inc\StandardTypes" />
+    <Folder Include="src" />
+    <Folder Include="src\GammaCorrection" />
+    <Folder Include="src\WS2812" />
+  </ItemGroup>
+  <Import Project="$(AVRSTUDIO_EXE_PATH)\\Vs\\Compiler.targets" />
+</Project>
