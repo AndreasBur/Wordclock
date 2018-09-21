@@ -140,23 +140,49 @@ WS2812& WS2812::getInstance()
  *                  
  *  \return         -
 ******************************************************************************************************************************************************/
-void WS2812::init(PortType Port, PinType Pin)
+boolean WS2812::init(byte Pin)
+{
+    PortPinType PortPin;
+    byte PinMask = digitalPinToBitMask(Pin);
+    byte Port = digitalPinToPort(digitalPinToPort(Pin));
+
+    if(isBitSet(PinMask, PORT_PIN_0)) { PortPin = PORT_PIN_0; } 
+    else if(isBitSet(PinMask, PORT_PIN_4)) { PortPin = PORT_PIN_4; } 
+    else { return E_NOT_OK; }
+
+    if((PortPin == PORT_PIN_0 || PortPin == PORT_PIN_4) && (Port == PORT_C || Port == PORT_D)) {
+        init(static_cast<PortType>(Port), PortPin);
+        return E_OK;
+    }
+    return E_NOT_OK;
+} /* init */
+
+
+/******************************************************************************************************************************************************
+  init()
+******************************************************************************************************************************************************/
+/*! \brief          
+ *  \details        
+ *                  
+ *  \return         -
+******************************************************************************************************************************************************/
+void WS2812::init(PortType Port, PortPinType PortPin)
 {
     if(Port == PORT_C) {
         initDma(&USARTC0, EDMA_CH_TRIGSRC_USARTC0_DRE_gc);
         initPort(&PORTC);
         initEventSystem(EVSYS_CHMUX_PORTC_PIN3_gc, EVSYS_CHMUX_PORTC_PIN1_gc);
         initUsart(&USARTC0);
-        if(Pin == PIN_0) { initXcl(XCL_LUT0OUTEN_PIN0_gc, XCL_PORTSEL_PC_gc); }
-        else if(Pin == PIN_4) { initXcl(XCL_LUT0OUTEN_PIN4_gc, XCL_PORTSEL_PC_gc); }
+        if(PortPin == PORT_PIN_0) { initXcl(XCL_LUT0OUTEN_PIN0_gc, XCL_PORTSEL_PC_gc); }
+        else if(PortPin == PORT_PIN_4) { initXcl(XCL_LUT0OUTEN_PIN4_gc, XCL_PORTSEL_PC_gc); }
     }
     if(Port == PORT_D) {
         initDma(&USARTD0, EDMA_CH_TRIGSRC_USARTD0_DRE_gc);
         initPort(&PORTD);
         initUsart(&USARTD0);
         initEventSystem(EVSYS_CHMUX_PORTD_PIN3_gc, EVSYS_CHMUX_PORTD_PIN1_gc);
-        if(Pin == PIN_0) { initXcl(XCL_LUT0OUTEN_PIN0_gc, XCL_PORTSEL_PD_gc); }
-        else if(Pin == PIN_4) { initXcl(XCL_LUT0OUTEN_PIN4_gc, XCL_PORTSEL_PD_gc); }
+        if(PortPin == PORT_PIN_0) { initXcl(XCL_LUT0OUTEN_PIN0_gc, XCL_PORTSEL_PD_gc); }
+        else if(PortPin == PORT_PIN_4) { initXcl(XCL_LUT0OUTEN_PIN4_gc, XCL_PORTSEL_PD_gc); }
     }
     State = STATE_IDLE;
 } /* init */

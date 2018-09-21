@@ -53,13 +53,13 @@ class WS2812
 ******************************************************************************************************************************************************/
   public:
     enum PortType {
-        PORT_C,
-        PORT_D,
+        PORT_C = 3,
+        PORT_D = 4,
     };
 
-    enum PinType {
-        PIN_0,
-        PIN_4
+    enum PortPinType {
+        PORT_PIN_0 = 0,
+        PORT_PIN_4 = 4
     };
 
     enum StateType {
@@ -175,7 +175,8 @@ class WS2812
 #endif
 
 	// methods
-    void init(PortType, PinType);
+    boolean init(byte);
+    void init(PortType, PortPinType);
     stdReturnType show();
     void setPixels(PixelType Pixel) { setPixels(Pixel.Red, Pixel.Green, Pixel.Blue); }
     void setPixels(byte, byte, byte);

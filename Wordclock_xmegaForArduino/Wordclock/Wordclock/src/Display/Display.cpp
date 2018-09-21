@@ -116,7 +116,7 @@ Display::~Display()
 void Display::init()
 {
     clear();
-    Pixels.init(WS2812::PORT_C, WS2812::PIN_0);
+    Pixels.init(DISPLAY_DATA_PIN);
     State = STATE_INIT;
 } /* init */
 

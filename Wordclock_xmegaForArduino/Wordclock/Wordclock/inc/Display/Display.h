@@ -31,7 +31,7 @@
  *  GLOBAL CONSTANT MACROS
 ******************************************************************************************************************************************************/
 /* Display configuration parameter */
-//#define DISPLAY_DATA_PIN                        10
+#define DISPLAY_DATA_PIN                        10
 #define DISPLAY_LED_STRIPE_SERPENTINE           STD_OFF
 #define DISPLAY_USE_WS2812_DIMMING              STD_OFF
 #define Pixels                                  WS2812::getInstance()
