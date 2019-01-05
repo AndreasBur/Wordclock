@@ -161,7 +161,7 @@ void AnimationClockTeletype::reset()
 ******************************************************************************************************************************************************/
 stdReturnType AnimationClockTeletype::setNextWordIndex()
 {
-    if(CurrentWordIndex + 1 < CLOCK_WORDS_TABLE_TYPE_SIZE) {
+    if(CurrentWordIndex + 1 < CLOCK_WORDS_MAX_NUMBER_OF_WORDS) {
         CurrentWordIndex++;
         return E_OK;
     }

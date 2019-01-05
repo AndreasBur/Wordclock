@@ -46,7 +46,7 @@
 #define CLOCK_MAX_NUMBER_OF_MINUTE_WORDS        3
 
 #define CLOCK_IT_IS_NUMBER_OF_WORDS             2
-#define CLOCK_WORDS_TABLE_TYPE_SIZE             (CLOCK_MAX_NUMBER_OF_HOUR_WORDS + CLOCK_MAX_NUMBER_OF_MINUTE_WORDS + CLOCK_IT_IS_NUMBER_OF_WORDS)
+#define CLOCK_WORDS_MAX_NUMBER_OF_WORDS         (CLOCK_MAX_NUMBER_OF_HOUR_WORDS + CLOCK_MAX_NUMBER_OF_MINUTE_WORDS + CLOCK_IT_IS_NUMBER_OF_WORDS)
 
 
 /******************************************************************************************************************************************************
@@ -119,7 +119,7 @@ class Clock
     };
 
     //using ClockWordsTableType = DisplayWords::WordIdType[CLOCK_WORDS_TABLE_TYPE_SIZE];
-    using ClockWordsTableType = std::array<DisplayWords::WordIdType, CLOCK_WORDS_TABLE_TYPE_SIZE>;
+    using ClockWordsTableType = std::array<DisplayWords::WordIdType, CLOCK_WORDS_MAX_NUMBER_OF_WORDS>;
 
     using HoursTableElementType = HoursType;
     using MinutesTableElementType = MinutesType;

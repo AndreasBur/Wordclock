@@ -179,8 +179,8 @@ stdReturnType Clock::getClockWords(byte Hour, byte Minute, ClockWordsType& Clock
 #if (CLOCK_SHOW_IT_IS_PERMANENTLY == STD_ON)
         ClockWords.ShowItIs = true;
 #else
-        if (Minute < CLOCK_MINUTE_STEP_IN_MINUTES || (Minute >= (CLOCK_NUMBER_OF_MINUTES_PER_HOUR/2) &&
-            Minute < (CLOCK_NUMBER_OF_MINUTES_PER_HOUR/2) + CLOCK_MINUTE_STEP_IN_MINUTES))
+        if (Minute < CLOCK_MINUTE_STEP_IN_MINUTES || (Minute >= (CLOCK_NUMBER_OF_MINUTES_PER_HOUR / 2) &&
+            Minute < (CLOCK_NUMBER_OF_MINUTES_PER_HOUR / 2) + CLOCK_MINUTE_STEP_IN_MINUTES))
         {
             ClockWords->ShowItIs = true;
         } else {
@@ -242,7 +242,7 @@ stdReturnType Clock::getClockWords(byte Hour, byte Minute, ClockWordsTableType& 
             ClockWordsTable[ClockWordsTableIndex++] = ClockWords.HourWords[Index];
         }
     }
-    for(uint8_t Index = ClockWordsTableIndex; Index < CLOCK_WORDS_TABLE_TYPE_SIZE; Index++) {
+    for(uint8_t Index = ClockWordsTableIndex; Index < CLOCK_WORDS_MAX_NUMBER_OF_WORDS; Index++) {
         ClockWordsTable[Index] = DisplayWords::WORD_NONE;
     }
     return ReturnValue;
