@@ -22,7 +22,8 @@
 ******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Arduino.h"
-
+#include "array"
+#include "DisplayWords.h"
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
@@ -51,32 +52,45 @@ class ClockWords
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-    using ClockWordsType = std::array<DisplayWords::WordIdType, CLOCKWORDS_MAX_NUMBER_OF_WORDS>;
-	using ClockHourWordsType = std::array<DisplayWords::WordIdType, CLOCKWORDS_MAX_NUMBER_OF_HOUR_WORDS>;
-	using ClockMinutesWordsType = std::array<DisplayWords::WordIdType, CLOCK_MAX_NUMBER_OF_MINUTE_WORDS>;
+    using WordsListType = std::array<DisplayWords::WordIdType, CLOCKWORDS_MAX_NUMBER_OF_WORDS>;
+	using HourWordsType = std::array<DisplayWords::WordIdType, CLOCKWORDS_MAX_NUMBER_OF_HOUR_WORDS>;
+	using MinutesWordsType = std::array<DisplayWords::WordIdType, CLOCKWORDS_MAX_NUMBER_OF_MINUTE_WORDS>;
   
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
 	boolean ShowItIs;
-	ClockHourWordsType HourWords;
-	ClockMinutesWordsType MinuteWords;
+	HourWordsType HourWords;
+	MinutesWordsType MinuteWords;
   
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
     ClockWords();
+	ClockWords(bool, HourWordsType, MinutesWordsType);
     ~ClockWords();
+	
+	bool operator==(const ClockWords& sClockWords);
+	bool operator!=(const ClockWords& sClockWords);
 
 	// get methods
-
+	boolean getShowItIs() const { return ShowItIs; }
+    HourWordsType getHourWords() const { return HourWords; }
+	DisplayWords::WordIdType getHourWord(byte Index) const { return HourWords[Index]; }
+	MinutesWordsType getMinuteWords() const { return MinuteWords; }
+	DisplayWords::WordIdType getMinuteWord(byte Index) const { return MinuteWords[Index]; }
+		
+	WordsListType getWordsList() const;
 
 	// set methods
+	void setShowItIs(bool sShowItIs) {ShowItIs = sShowItIs;}
+	void setMinuteWords(MinutesWordsType sMinutWords) { MinuteWords = sMinutWords; }
+	void setHourWords(HourWordsType sHourWords) { HourWords = sHourWords; }
 
 	// methods
-    void init();
+
 };
 
 #endif
