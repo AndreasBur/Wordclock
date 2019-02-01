@@ -73,7 +73,7 @@
     ((Var) = ((Var) & ~(UINT64_C(1) << (Bit))) | ((Value) << (Bit)))
 
 /* is bit set */
-#define IS_BIT_SET(Var, Bit) ((Var) & (UINT64_C(1) << (Bit)))
+#define IS_BIT_SET(Var, Bit) (!!((Var) & (UINT64_C(1) << (Bit))))
 
 /* is bit cleared */
 #define IS_BIT_CLEARED(Var, Bit) !IS_BIT_SET(Var, Bit)
