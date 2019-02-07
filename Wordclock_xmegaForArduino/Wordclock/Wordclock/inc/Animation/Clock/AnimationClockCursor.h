@@ -62,7 +62,7 @@ class AnimationClockCursor : public AnimationClockCommon
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
-    Clock::ClockWordsTableType ClockWordsTable;
+    ClockWords::WordsListType ClockWordsTable;
     byte CurrentPixelIndex;
     DisplayWords Words;
 

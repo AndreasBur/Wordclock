@@ -65,7 +65,7 @@ class AnimationClockDrop : public AnimationClockCommon
     byte Row;
     byte Column;
 
-    Clock::ClockWordsTableType ClockWordsTable;
+    ClockWords::WordsListType ClockWordsTable;
     byte CurrenWordIndex;
 
     // functions

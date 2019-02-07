@@ -68,7 +68,7 @@ class AnimationClockShift : public AnimationClockCommon
 ******************************************************************************************************************************************************/
   private:
     Transformation wcTransformation;
-    Clock::ClockWordsTableType ClockWordsTable;
+    ClockWords::WordsListType ClockWordsTable;
 
 #if (ANIMATION_CLOCK_SHIFT_HORIZONTAL == STD_ON)
     byte CurrentColumn;
@@ -101,8 +101,8 @@ class AnimationClockShift : public AnimationClockCommon
     void task();
 };
 
-#endif
 
+#endif
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E
 ******************************************************************************************************************************************************/

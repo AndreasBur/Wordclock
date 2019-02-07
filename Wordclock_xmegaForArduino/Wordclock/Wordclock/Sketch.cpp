@@ -113,7 +113,7 @@ void loop()
     Brightness++;
   //FontTahoma10x10::CharType Char;
   // put your main code here, to run repeatedly:
-    //wcClock.setClock(17,30);
+    wcClock.setClock(17,30);
     
 
     //volatile int Test = 5;

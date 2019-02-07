@@ -6107,41 +6107,42 @@
 
 1502918135 c:\users\andreas\documents\github\wordclock\wordclock_simulator\wordclock\wordclockicon.xpm
 
-1532584772 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\transformation\transformation.cpp
+1532581172 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\transformation\transformation.cpp
 	"Transformation.h"
 
-1531390108 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\transformation\transformation.h
+1531386508 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\transformation\transformation.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"Display.h"
 
-1518169869 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\standardtypes\standardtypes.h
+1518166269 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\standardtypes\standardtypes.h
 	<stdint.h>
 	"Arduino.h"
 
-1513590197 c:\users\virskl\documents\github\wordclock\wordclock_simulator\include\arduino.h
+1549544366 c:\users\virskl\documents\github\wordclock\wordclock_simulator\include\arduino.h
 	<string.h>
 
-1533028088 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\display\display.h
+1549544191 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\display\display.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"WS2812.h"
 	"DisplayCharacters.h"
 	"DisplayWords.h"
+	"GammaCorrection.h"
 
-1532958649 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\display\displaycharacters.h
+1532955049 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\display\displaycharacters.h
 	"StandardTypes.h"
 	"Arduino.h"
 
-1531917503 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\display\displaywords.h
+1531913903 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\display\displaywords.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"DisplayWord.h"
 
-1531906062 c:\users\virskl\documents\github\wordclock\wordclock_simulator\include\ws2812.h
+1549542185 c:\users\virskl\documents\github\wordclock\wordclock_simulator\include\ws2812.h
 	"Simulator.h"
 
-1533138104 c:\users\virskl\documents\github\wordclock\wordclock_simulator\include\simulator.h
+1549544470 c:\users\virskl\documents\github\wordclock\wordclock_simulator\include\simulator.h
 	<wx/wx.h>
 	<wx/button.h>
 	<wx/statline.h>
@@ -6149,22 +6150,22 @@
 	"Arduino.h"
 	"DisplayCharacters.h"
 
-1502189458 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\resource.rc
+1502185858 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\resource.rc
 	"wx/msw/wx.rc"
 
-1533137399 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\src\simulator.cpp
+1549544516 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\src\simulator.cpp
 	"Simulator.h"
 	"WS2812.h"
 
-1502260974 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\wordclockapp.cpp
+1502257374 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\wordclockapp.cpp
 	"wx_pch.h"
 	"WordclockApp.h"
 	"WordclockMain.h"
 
-1500038063 c:\users\virskl\documents\github\wordclock\wordclock_simulator\wordclockapp.h
+1500034463 c:\users\virskl\documents\github\wordclock\wordclock_simulator\wordclockapp.h
 	<wx/app.h>
 
-1526279389 c:\users\virskl\documents\github\wordclock\wordclock_simulator\wordclockmain.h
+1549543388 c:\users\virskl\documents\github\wordclock\wordclock_simulator\wordclockmain.h
 	<wx/wx.h>
 	"WordclockApp.h"
 	"Clock.h"
@@ -6173,32 +6174,33 @@
 	"AnimationClock.h"
 	"Transformation.h"
 
-1533121369 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\clock\clock.h
+1549541449 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\clock\clock.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"Display.h"
+	"ClockWords.h"
 	<array>
 
-1532584771 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\animation\animation.h
+1532581171 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\animation\animation.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"AnimationClock.h"
 	"AnimationFont.h"
 
-1533137445 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\wordclockmain.cpp
+1549548100 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\wordclockmain.cpp
 	"wx_pch.h"
 	"WordclockMain.h"
 
-1532433892 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\animation.cpp
+1532430292 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\animation.cpp
 	"Animation.h"
 
 1504860142 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\font.cpp
 	"Animation.h"
 
-1532529046 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\clock\clock.cpp
+1549550283 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\clock\clock.cpp
 	"Clock.h"
 
-1531917549 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\display\display.cpp
+1549544159 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\display\display.cpp
 	"Display.h"
 	"WordclockIcon.xpm"
 
@@ -6344,7 +6346,7 @@
 1513974693 source:c:\users\andreas\documents\github\wordclock\wordclock_simulator\arduino\src\animation\animationcursor.cpp
 	"AnimationCursor.h"
 
-1530691185 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\display\displayword.h
+1530687585 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\display\displayword.h
 	"StandardTypes.h"
 	"Arduino.h"
 
@@ -6355,13 +6357,13 @@
 	"StandardTypes.h"
 	"Arduino.h"
 
-1532699258 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\display\displaycharacters.cpp
+1532695658 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\display\displaycharacters.cpp
 	"DisplayCharacters.h"
 
-1530691186 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\display\displayword.cpp
+1530687586 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\display\displayword.cpp
 	"DisplayWord.h"
 
-1531910990 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\display\displaywords.cpp
+1531907390 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\display\displaywords.cpp
 	"DisplayWords.h"
 
 1526283432 source:c:\users\andreas\documents\github\wordclock\wordclock_simulator\arduino\src\display\displaycharacters.cpp
@@ -6393,10 +6395,10 @@
 	"StandardTypes.h"
 	"Arduino.h"
 
-1532503897 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\animationfont.cpp
+1532500297 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\animationfont.cpp
 	"AnimationFont.h"
 
-1532339796 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\animation\animationfont.h
+1532336196 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\animation\animationfont.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"Display.h"
@@ -6434,7 +6436,7 @@
 1516023835 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\animationcommon.cpp
 	"AnimationCommon.h"
 
-1532934835 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\animation\clock\animationclock.h
+1549018919 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\animation\clock\animationclock.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"Display.h"
@@ -6449,79 +6451,79 @@
 	"AnimationClockCube.h"
 	"AnimationClockFlicker.h"
 
-1531389849 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\animation\clock\animationclockteletype.h
+1549539996 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\animation\clock\animationclockteletype.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"Clock.h"
 	"AnimationClockCommon.h"
 
-1531389849 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\animation\clock\animationclockcursor.h
+1549539996 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\animation\clock\animationclockcursor.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"Display.h"
 	"Clock.h"
 	"AnimationClockCommon.h"
 
-1532525212 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\animation\clock\animationclockcommon.h
+1549539996 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\animation\clock\animationclockcommon.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"Clock.h"
 
-1531389849 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\animation\clock\animationclockdrop.h
-	"StandardTypes.h"
-	"Arduino.h"
-	"Clock.h"
-	"AnimationClockCommon.h"
-
-1531386829 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\animation\clock\animationclockwipe.h
+1549539996 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\animation\clock\animationclockdrop.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"Clock.h"
 	"AnimationClockCommon.h"
 
-1531386829 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\animation\clock\animationclocksnake.h
+1549539996 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\animation\clock\animationclockwipe.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"Clock.h"
 	"AnimationClockCommon.h"
 
-1531386829 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\animation\clock\animationclockshift.h
+1549539996 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\animation\clock\animationclocksnake.h
+	"StandardTypes.h"
+	"Arduino.h"
+	"Clock.h"
+	"AnimationClockCommon.h"
+
+1549539996 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\animation\clock\animationclockshift.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"Clock.h"
 	"Transformation.h"
 	"AnimationClockCommon.h"
 
-1532934892 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\clock\animationclock.cpp
+1532931292 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\clock\animationclock.cpp
 	"AnimationClock.h"
 
-1532584771 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\clock\animationclockcommon.cpp
+1549540073 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\clock\animationclockcommon.cpp
 	"AnimationClockCommon.h"
 
-1532433867 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\clock\animationclockcursor.cpp
+1532430267 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\clock\animationclockcursor.cpp
 	"AnimationClockCursor.h"
 
-1532584771 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\clock\animationclockdrop.cpp
+1549540126 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\clock\animationclockdrop.cpp
 	"AnimationClockDrop.h"
 
-1533131308 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\clock\animationclockfade.cpp
+1533127708 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\clock\animationclockfade.cpp
 	"AnimationClockFade.h"
 
-1531386829 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\animation\clock\animationclockfade.h
+1531908343 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\animation\clock\animationclockfade.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"AnimationClockCommon.h"
 
-1532433867 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\clock\animationclockshift.cpp
+1532430267 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\clock\animationclockshift.cpp
 	"AnimationClockShift.h"
 
-1532433867 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\clock\animationclocksnake.cpp
+1532430267 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\clock\animationclocksnake.cpp
 	"AnimationClockSnake.h"
 
-1532433867 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\clock\animationclockteletype.cpp
+1549540204 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\clock\animationclockteletype.cpp
 	"AnimationClockTeletype.h"
 
-1532584771 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\clock\animationclockwipe.cpp
+1532581172 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\clock\animationclockwipe.cpp
 	"AnimationClockWipe.h"
 
 1532460243 c:\users\andreas\documents\github\wordclock\wordclock_simulator\arduino\inc\animation\clock\animationclock.h
@@ -9598,7 +9600,7 @@
 
 1520445338 c:\wxwidgets-3.0.4\include\wx\msw\rcdefs.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\wx.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\wx.h
 	"wx/defs.h"
 	"wx/object.h"
 	"wx/dynarray.h"
@@ -9679,7 +9681,7 @@
 	"wx/validate.h"
 	"wx/valtext.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\defs.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\defs.h
 	"wx/msw/winundef.h"
 	"wx/platform.h"
 	"wx/version.h"
@@ -9692,9 +9694,9 @@
 	"wx/qt/defs.h"
 	"wx/features.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\msw\winundef.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\msw\winundef.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\platform.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\platform.h
 	<unistd.h>
 	<TargetConditionals.h>
 	<AvailabilityMacros.h>
@@ -9707,22 +9709,22 @@
 	<AvailabilityMacros.h>
 	"wx/chkconf.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\android\config_android.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\android\config_android.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\compiler.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\compiler.h
 
 1518989431 d:\wxwidgets-3.1.1\lib\gcc_dll\mswu\wx\setup.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\msw\libraries.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\msw\libraries.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\msw\gccpriv.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\msw\gccpriv.h
 	"wx/msw/winver.h"
 	<_mingw.h>
 	<w32api.h>
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\msw\winver.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\msw\winver.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\chkconf.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\chkconf.h
 	"wx/msw/chkconf.h"
 	"wx/gtk/chkconf.h"
 	"wx/gtk/chkconf.h"
@@ -9734,51 +9736,51 @@
 	"wx/unix/chkconf.h"
 	"wx/univ/chkconf.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\msw\chkconf.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\msw\chkconf.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk\chkconf.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk\chkconf.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\osx\chkconf.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\osx\chkconf.h
 	"wx/osx/iphone/chkconf.h"
 	"wx/osx/cocoa/chkconf.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\osx\iphone\chkconf.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\osx\iphone\chkconf.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\osx\cocoa\chkconf.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\osx\cocoa\chkconf.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\dfb\chkconf.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\dfb\chkconf.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\motif\chkconf.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\motif\chkconf.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\x11\chkconf.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\x11\chkconf.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\android\chkconf.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\android\chkconf.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\unix\chkconf.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\unix\chkconf.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\univ\chkconf.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\univ\chkconf.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\version.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\version.h
 	"wx/cpp.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\cpp.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\cpp.h
 	"wx/compiler.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\dlimpexp.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\dlimpexp.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\types.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\types.h
 	"wx/platform.h"
 	<sys/types.h>
 	<sys/types.h>
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\debug.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\debug.h
 	<assert.h>
 	<limits.h>
 	"wx/chartype.h"
 	"wx/cpp.h"
 	"wx/dlimpexp.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\chartype.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\chartype.h
 	"wx/types.h"
 	<sys/types.h>
 	<wchar.h>
@@ -9792,26 +9794,26 @@
 	<tchar.h>
 	<ctype.h>
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\windowid.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\windowid.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\qt\defs.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\qt\defs.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\features.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\features.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\object.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\object.h
 	"wx/memory.h"
 	"wx/xti.h"
 	"wx/rtti.h"
 	"wx/xti2.h"
 	"wx/msw/msvcrt.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\memory.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\memory.h
 	"wx/defs.h"
 	"wx/string.h"
 	"wx/msgout.h"
 	<stddef.h>
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\string.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\string.h
 	"wx/defs.h"
 	<ctype.h>
 	<string.h>
@@ -9831,7 +9833,7 @@
 	"wx/iosfwrap.h"
 	"wx/crt.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\wxcrtbase.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\wxcrtbase.h
 	"wx/chartype.h"
 	<stdio.h>
 	<string.h>
@@ -9840,7 +9842,7 @@
 	<time.h>
 	<io.h>
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\strvararg.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\strvararg.h
 	"wx/platform.h"
 	"wx/cpp.h"
 	"wx/chartype.h"
@@ -9852,27 +9854,27 @@
 	<tr1/type_traits>
 	"wx/stringimpl.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\strconv.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\strconv.h
 	"wx/defs.h"
 	"wx/chartype.h"
 	"wx/buffer.h"
 	<stdlib.h>
 	"wx/fontenc.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\buffer.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\buffer.h
 	"wx/defs.h"
 	"wx/wxcrtbase.h"
 	<stdlib.h>
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\fontenc.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\fontenc.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\unichar.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\unichar.h
 	"wx/defs.h"
 	"wx/chartype.h"
 	"wx/stringimpl.h"
 	<algorithm>
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\stringimpl.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\stringimpl.h
 	"wx/defs.h"
 	"wx/chartype.h"
 	"wx/wxcrtbase.h"
@@ -9881,39 +9883,39 @@
 	<string>
 	"wx/afterstd.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\beforestd.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\beforestd.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\afterstd.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\afterstd.h
 	"wx/msw/winundef.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\stringops.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\stringops.h
 	"wx/chartype.h"
 	"wx/stringimpl.h"
 	"wx/unichar.h"
 	"wx/buffer.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\tls.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\tls.h
 	"wx/defs.h"
 	"wx/msw/tls.h"
 	"wx/unix/tls.h"
 	<stdlib.h>
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\msw\tls.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\msw\tls.h
 	"wx/msw/wrapwin.h"
 	"wx/thread.h"
 	"wx/vector.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\msw\wrapwin.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\msw\wrapwin.h
 	"wx/platform.h"
 	"wx/msw/winver.h"
 	<winsock2.h>
 	<windows.h>
 	"wx/msw/winundef.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\thread.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\thread.h
 	"wx/defs.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\vector.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\vector.h
 	"wx/defs.h"
 	<vector>
 	<algorithm>
@@ -9924,59 +9926,59 @@
 	<new>
 	"wx/afterstd.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\scopeguard.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\scopeguard.h
 	"wx/defs.h"
 	"wx/except.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\except.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\except.h
 	"wx/defs.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\meta\movable.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\meta\movable.h
 	"wx/meta/pod.h"
 	"wx/string.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\meta\pod.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\meta\pod.h
 	"wx/defs.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\meta\if.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\meta\if.h
 	"wx/defs.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\unix\tls.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\unix\tls.h
 	<pthread.h>
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\iosfwrap.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\iosfwrap.h
 	<iostream.h>
 	<iosfwd>
 	"wx/msw/winundef.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\crt.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\crt.h
 	"wx/defs.h"
 	"wx/chartype.h"
 	"wx/wxcrt.h"
 	"wx/wxcrtvararg.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\wxcrt.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\wxcrt.h
 	"wx/wxcrtbase.h"
 	"wx/string.h"
 	<string.h>
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\wxcrtvararg.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\wxcrtvararg.h
 	"wx/wxcrt.h"
 	"wx/strvararg.h"
 	"wx/string.h"
 	<stdarg.h>
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\msgout.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\msgout.h
 	"wx/defs.h"
 	"wx/chartype.h"
 	"wx/strvararg.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\xti.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\xti.h
 	"wx/defs.h"
 	"wx/xtitypes.h"
 	"wx/xtihandler.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\xtitypes.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\xtitypes.h
 	"wx/defs.h"
 	"wx/string.h"
 	"wx/hashmap.h"
@@ -9986,7 +9988,7 @@
 	"wx/log.h"
 	<typeinfo>
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\hashmap.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\hashmap.h
 	"wx/string.h"
 	"wx/wxcrt.h"
 	<unordered_map>
@@ -9995,7 +9997,7 @@
 	<hash_map>
 	<stddef.h>
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\arrstr.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\arrstr.h
 	"wx/defs.h"
 	"wx/string.h"
 	<vector>
@@ -10004,23 +10006,23 @@
 	<iterator>
 	"wx/afterstd.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\dynarray.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\dynarray.h
 	"wx/defs.h"
 	"wx/beforestd.h"
 	<vector>
 	<algorithm>
 	"wx/afterstd.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\flags.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\flags.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\intl.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\intl.h
 	"wx/defs.h"
 	"wx/string.h"
 	"wx/translation.h"
 	"wx/fontenc.h"
 	"wx/language.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\translation.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\translation.h
 	"wx/defs.h"
 	"wx/string.h"
 	"wx/buffer.h"
@@ -10029,17 +10031,17 @@
 	"wx/strconv.h"
 	"wx/scopedptr.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\language.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\language.h
 	"wx/defs.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\scopedptr.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\scopedptr.h
 	"wx/defs.h"
 	"wx/checkeddelete.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\checkeddelete.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\checkeddelete.h
 	"wx/cpp.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\log.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\log.h
 	"wx/defs.h"
 	"wx/cpp.h"
 	"wx/string.h"
@@ -10053,26 +10055,26 @@
 	"wx/iosfwrap.h"
 	"wx/generic/logg.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\generic\logg.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\generic\logg.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\xtihandler.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\xtihandler.h
 	"wx/defs.h"
 	"wx/xti.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\rtti.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\rtti.h
 	"wx/memory.h"
 	"wx/flags.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\xti2.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\xti2.h
 	"wx/xtiprop.h"
 	"wx/xtictor.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\xtiprop.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\xtiprop.h
 	"wx/defs.h"
 	"wx/xti.h"
 	"wx/any.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\any.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\any.h
 	"wx/defs.h"
 	<new>
 	"wx/string.h"
@@ -10082,12 +10084,12 @@
 	"wx/datetime.h"
 	"wx/variant.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\typeinfo.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\typeinfo.h
 	"wx/defs.h"
 	<typeinfo>
 	<string.h>
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\list.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\list.h
 	"wx/defs.h"
 	"wx/object.h"
 	"wx/string.h"
@@ -10098,7 +10100,7 @@
 	<list>
 	"wx/afterstd.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\datetime.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\datetime.h
 	"wx/defs.h"
 	<time.h>
 	<limits.h>
@@ -10106,7 +10108,7 @@
 	"wx/anystr.h"
 	"wx/dynarray.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\longlong.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\longlong.h
 	"wx/defs.h"
 	"wx/string.h"
 	<limits.h>
@@ -10114,10 +10116,10 @@
 	<limits>
 	"wx/strvararg.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\anystr.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\anystr.h
 	"wx/string.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\variant.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\variant.h
 	"wx/defs.h"
 	"wx/object.h"
 	"wx/string.h"
@@ -10129,20 +10131,20 @@
 	"wx/iosfwrap.h"
 	"wx/any.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\xtictor.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\xtictor.h
 	"wx/defs.h"
 	"wx/xti.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\msw\msvcrt.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\msw\msvcrt.h
 	<stdlib.h>
 	<crtdbg.h>
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\hash.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\hash.h
 	"wx/defs.h"
 	"wx/string.h"
 	"wx/object.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\event.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\event.h
 	"wx/defs.h"
 	"wx/cpp.h"
 	"wx/object.h"
@@ -10159,12 +10161,12 @@
 	"wx/meta/convertible.h"
 	"wx/meta/removeref.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\clntdata.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\clntdata.h
 	"wx/defs.h"
 	"wx/string.h"
 	"wx/hashmap.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gdicmn.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gdicmn.h
 	"wx/defs.h"
 	"wx/list.h"
 	"wx/string.h"
@@ -10172,14 +10174,14 @@
 	"wx/hashmap.h"
 	"wx/math.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\math.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\math.h
 	"wx/defs.h"
 	<math.h>
 	<cmath>
 	<float.h>
 	<ieeefp.h>
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\cursor.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\cursor.h
 	"wx/gdiobj.h"
 	"wx/gdicmn.h"
 	"wx/msw/gdiimage.h"
@@ -10193,26 +10195,26 @@
 	"wx/qt/cursor.h"
 	"wx/utils.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gdiobj.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gdiobj.h
 	"wx/object.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\msw\gdiimage.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\msw\gdiimage.h
 	"wx/gdiobj.h"
 	"wx/gdicmn.h"
 	"wx/list.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\msw\cursor.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\msw\cursor.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\motif\cursor.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\motif\cursor.h
 	"wx/gdicmn.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk\cursor.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk\cursor.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk1\cursor.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk1\cursor.h
 	"wx/gdicmn.h"
 	"wx/image.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\image.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\image.h
 	"wx/defs.h"
 	"wx/object.h"
 	"wx/string.h"
@@ -10232,14 +10234,14 @@
 	"wx/imagxpm.h"
 	"wx/imagiff.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\stream.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\stream.h
 	"wx/defs.h"
 	<stdio.h>
 	"wx/object.h"
 	"wx/string.h"
 	"wx/filefn.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\filefn.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\filefn.h
 	"wx/list.h"
 	"wx/arrstr.h"
 	<time.h>
@@ -10254,49 +10256,49 @@
 	<fcntl.h>
 	<sys/types.h>
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\imagbmp.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\imagbmp.h
 	"wx/image.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\imagpng.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\imagpng.h
 	"wx/defs.h"
 	"wx/image.h"
 	"wx/versioninfo.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\versioninfo.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\versioninfo.h
 	"wx/string.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\imaggif.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\imaggif.h
 	"wx/image.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\imagpcx.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\imagpcx.h
 	"wx/image.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\imagjpeg.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\imagjpeg.h
 	"wx/defs.h"
 	"wx/image.h"
 	"wx/versioninfo.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\imagtga.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\imagtga.h
 	"wx/image.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\imagtiff.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\imagtiff.h
 	"wx/defs.h"
 	"wx/image.h"
 	"wx/versioninfo.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\imagpnm.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\imagpnm.h
 	"wx/image.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\imagxpm.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\imagxpm.h
 	"wx/image.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\imagiff.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\imagiff.h
 	"wx/image.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\x11\cursor.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\x11\cursor.h
 	"wx/colour.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\colour.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\colour.h
 	"wx/defs.h"
 	"wx/gdiobj.h"
 	"wx/variant.h"
@@ -10309,23 +10311,23 @@
 	"wx/osx/colour.h"
 	"wx/qt/colour.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\msw\colour.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\msw\colour.h
 	"wx/object.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\motif\colour.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\motif\colour.h
 	"wx/object.h"
 	"wx/string.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk\colour.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk\colour.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk1\colour.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk1\colour.h
 	"wx/defs.h"
 	"wx/object.h"
 	"wx/string.h"
 	"wx/gdiobj.h"
 	"wx/palette.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\palette.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\palette.h
 	"wx/defs.h"
 	"wx/object.h"
 	"wx/gdiobj.h"
@@ -10335,53 +10337,53 @@
 	"wx/osx/palette.h"
 	"wx/qt/palette.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\msw\palette.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\msw\palette.h
 	"wx/gdiobj.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\x11\palette.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\x11\palette.h
 	"wx/list.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\generic\paletteg.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\generic\paletteg.h
 	"wx/defs.h"
 	"wx/object.h"
 	"wx/gdiobj.h"
 	"wx/gdicmn.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\osx\palette.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\osx\palette.h
 	"wx/gdiobj.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\qt\palette.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\qt\palette.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\generic\colour.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\generic\colour.h
 	"wx/object.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\x11\colour.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\x11\colour.h
 	"wx/defs.h"
 	"wx/object.h"
 	"wx/string.h"
 	"wx/gdiobj.h"
 	"wx/palette.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\osx\colour.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\osx\colour.h
 	"wx/osx/core/colour.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\osx\core\colour.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\osx\core\colour.h
 	"wx/object.h"
 	"wx/string.h"
 	"wx/osx/core/cfref.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\osx\core\cfref.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\osx\core\cfref.h
 	<unistd.h>
 	<AvailabilityMacros.h>
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\qt\colour.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\qt\colour.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\dfb\cursor.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\dfb\cursor.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\osx\cursor.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\osx\cursor.h
 	"wx/bitmap.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\bitmap.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\bitmap.h
 	"wx/string.h"
 	"wx/gdicmn.h"
 	"wx/colour.h"
@@ -10397,43 +10399,43 @@
 	"wx/qt/bitmap.h"
 	"wx/generic/mask.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\msw\bitmap.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\msw\bitmap.h
 	"wx/msw/gdiimage.h"
 	"wx/math.h"
 	"wx/palette.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\x11\bitmap.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\x11\bitmap.h
 	"wx/defs.h"
 	"wx/object.h"
 	"wx/string.h"
 	"wx/palette.h"
 	"wx/gdiobj.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk\bitmap.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk\bitmap.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk1\bitmap.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk1\bitmap.h
 	"wx/defs.h"
 	"wx/object.h"
 	"wx/string.h"
 	"wx/palette.h"
 	"wx/gdiobj.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\dfb\bitmap.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\dfb\bitmap.h
 	"wx/dfb/dfbptr.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\dfb\dfbptr.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\dfb\dfbptr.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\osx\bitmap.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\osx\bitmap.h
 	"wx/palette.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\qt\bitmap.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\qt\bitmap.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\generic\mask.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\generic\mask.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\qt\cursor.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\qt\cursor.h
 	"wx/image.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\utils.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\utils.h
 	"wx/object.h"
 	"wx/list.h"
 	"wx/filefn.h"
@@ -10448,28 +10450,28 @@
 	<unistd.h>
 	<stdio.h>
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\meta\implicitconversion.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\meta\implicitconversion.h
 	"wx/defs.h"
 	"wx/meta/if.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\mousestate.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\mousestate.h
 	"wx/gdicmn.h"
 	"wx/kbdstate.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\kbdstate.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\kbdstate.h
 	"wx/defs.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\platinfo.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\platinfo.h
 	"wx/string.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\tracker.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\tracker.h
 	"wx/defs.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\meta\convertible.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\meta\convertible.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\meta\removeref.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\meta\removeref.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\app.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\app.h
 	"wx/event.h"
 	"wx/eventfilter.h"
 	"wx/build.h"
@@ -10488,31 +10490,31 @@
 	"wx/qt/app.h"
 	"wx/univ/theme.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\eventfilter.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\eventfilter.h
 	"wx/defs.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\build.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\build.h
 	"wx/version.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\cmdargs.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\cmdargs.h
 	"wx/arrstr.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\init.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\init.h
 	"wx/defs.h"
 	"wx/chartype.h"
 	"wx/msw/init.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\msw\init.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\msw\init.h
 	"wx/msw/wrapwin.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\unix\app.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\unix\app.h
 	<signal.h>
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\msw\app.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\msw\app.h
 	"wx/event.h"
 	"wx/icon.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\icon.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\icon.h
 	"wx/iconloc.h"
 	"wx/msw/icon.h"
 	"wx/motif/icon.h"
@@ -10525,39 +10527,39 @@
 	"wx/generic/icon.h"
 	"wx/variant.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\iconloc.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\iconloc.h
 	"wx/string.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\msw\icon.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\msw\icon.h
 	"wx/msw/gdiimage.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\motif\icon.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\motif\icon.h
 	"wx/bitmap.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\generic\icon.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\generic\icon.h
 	"wx/bitmap.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\osx\icon.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\osx\icon.h
 	"wx/bitmap.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\motif\app.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\motif\app.h
 	"wx/event.h"
 	"wx/hashmap.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\dfb\app.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\dfb\app.h
 	"wx/dfb/dfbptr.h"
 	"wx/vidmode.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\vidmode.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\vidmode.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk\app.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk\app.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk1\app.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk1\app.h
 	"wx/frame.h"
 	"wx/icon.h"
 	"wx/strconv.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\frame.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\frame.h
 	"wx/toplevel.h"
 	"wx/statusbr.h"
 	"wx/univ/frame.h"
@@ -10568,7 +10570,7 @@
 	"wx/osx/frame.h"
 	"wx/qt/frame.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\toplevel.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\toplevel.h
 	"wx/nonownedwnd.h"
 	"wx/iconbndl.h"
 	"wx/weakref.h"
@@ -10582,7 +10584,7 @@
 	"wx/qt/toplevel.h"
 	"wx/univ/toplevel.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\nonownedwnd.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\nonownedwnd.h
 	"wx/window.h"
 	"wx/dfb/nonownedwnd.h"
 	"wx/gtk/nonownedwnd.h"
@@ -10590,7 +10592,7 @@
 	"wx/msw/nonownedwnd.h"
 	"wx/qt/nonownedwnd.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\window.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\window.h
 	"wx/event.h"
 	"wx/list.h"
 	"wx/cursor.h"
@@ -10613,7 +10615,7 @@
 	"wx/qt/window.h"
 	"wx/univ/window.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\font.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\font.h
 	"wx/defs.h"
 	"wx/fontenc.h"
 	"wx/gdiobj.h"
@@ -10627,26 +10629,26 @@
 	"wx/osx/font.h"
 	"wx/qt/font.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\msw\font.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\msw\font.h
 	"wx/gdicmn.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\motif\font.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\motif\font.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk\font.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk\font.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk1\font.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk1\font.h
 	"wx/hash.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\x11\font.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\x11\font.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\dfb\font.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\dfb\font.h
 	"wx/dfb/dfbptr.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\osx\font.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\osx\font.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\qt\font.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\qt\font.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\region.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\region.h
 	"wx/gdiobj.h"
 	"wx/gdicmn.h"
 	"wx/msw/region.h"
@@ -10657,34 +10659,34 @@
 	"wx/osx/region.h"
 	"wx/qt/region.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\msw\region.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\msw\region.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk\region.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk\region.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk1\region.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk1\region.h
 	"wx/list.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\x11\region.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\x11\region.h
 	"wx/list.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\dfb\region.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\dfb\region.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\osx\region.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\osx\region.h
 	"wx/osx/carbon/region.h"
 	"wx/generic/region.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\osx\carbon\region.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\osx\carbon\region.h
 	"wx/list.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\generic\region.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\generic\region.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\qt\region.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\qt\region.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\validate.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\validate.h
 	"wx/defs.h"
 	"wx/event.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\accel.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\accel.h
 	"wx/defs.h"
 	"wx/object.h"
 	"wx/generic/accel.h"
@@ -10695,60 +10697,60 @@
 	"wx/osx/accel.h"
 	"wx/qt/accel.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\generic\accel.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\generic\accel.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\msw\accel.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\msw\accel.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\motif\accel.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\motif\accel.h
 	"wx/object.h"
 	"wx/string.h"
 	"wx/event.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk\accel.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk\accel.h
 	"wx/generic/accel.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk1\accel.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk1\accel.h
 	"wx/generic/accel.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\osx\accel.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\osx\accel.h
 	"wx/string.h"
 	"wx/event.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\qt\accel.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\qt\accel.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\access.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\access.h
 	"wx/defs.h"
 	"wx/variant.h"
 	"wx/msw/ole/access.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\msw\ole\access.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\msw\ole\access.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\msw\window.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\msw\window.h
 	"wx/settings.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\settings.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\settings.h
 	"wx/colour.h"
 	"wx/font.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\motif\window.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\motif\window.h
 	"wx/region.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk\window.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk\window.h
 	"wx/dynarray.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk1\window.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk1\window.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\x11\window.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\x11\window.h
 	"wx/region.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\dfb\window.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\dfb\window.h
 	"wx/dfb/dfbptr.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\osx\window.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\osx\window.h
 	"wx/brush.h"
 	"wx/dc.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\brush.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\brush.h
 	"wx/defs.h"
 	"wx/object.h"
 	"wx/gdiobj.h"
@@ -10761,35 +10763,35 @@
 	"wx/osx/brush.h"
 	"wx/qt/brush.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\msw\brush.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\msw\brush.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\x11\brush.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\x11\brush.h
 	"wx/gdiobj.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk\brush.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk\brush.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk1\brush.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk1\brush.h
 	"wx/defs.h"
 	"wx/object.h"
 	"wx/string.h"
 	"wx/gdiobj.h"
 	"wx/bitmap.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\dfb\brush.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\dfb\brush.h
 	"wx/defs.h"
 	"wx/object.h"
 	"wx/string.h"
 	"wx/gdiobj.h"
 	"wx/bitmap.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\osx\brush.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\osx\brush.h
 	"wx/gdicmn.h"
 	"wx/gdiobj.h"
 	"wx/bitmap.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\qt\brush.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\qt\brush.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\dc.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\dc.h
 	"wx/object.h"
 	"wx/intl.h"
 	"wx/colour.h"
@@ -10804,7 +10806,7 @@
 	"wx/region.h"
 	"wx/affinematrix2d.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\pen.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\pen.h
 	"wx/gdiobj.h"
 	"wx/peninfobase.h"
 	"wx/msw/pen.h"
@@ -10815,73 +10817,73 @@
 	"wx/osx/pen.h"
 	"wx/qt/pen.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\peninfobase.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\peninfobase.h
 	"wx/bitmap.h"
 	"wx/colour.h"
 	"wx/gdicmn.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\msw\pen.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\msw\pen.h
 	"wx/gdiobj.h"
 	"wx/gdicmn.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\x11\pen.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\x11\pen.h
 	"wx/gdicmn.h"
 	"wx/gdiobj.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk\pen.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk\pen.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk1\pen.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk1\pen.h
 	"wx/defs.h"
 	"wx/object.h"
 	"wx/string.h"
 	"wx/gdiobj.h"
 	"wx/gdicmn.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\dfb\pen.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\dfb\pen.h
 	"wx/defs.h"
 	"wx/object.h"
 	"wx/string.h"
 	"wx/gdiobj.h"
 	"wx/gdicmn.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\osx\pen.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\osx\pen.h
 	"wx/gdiobj.h"
 	"wx/colour.h"
 	"wx/bitmap.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\qt\pen.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\qt\pen.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\affinematrix2d.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\affinematrix2d.h
 	"wx/defs.h"
 	"wx/affinematrix2dbase.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\affinematrix2dbase.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\affinematrix2dbase.h
 	"wx/defs.h"
 	"wx/geometry.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\geometry.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\geometry.h
 	"wx/defs.h"
 	"wx/utils.h"
 	"wx/gdicmn.h"
 	"wx/math.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\qt\window.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\qt\window.h
 	<list>
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\univ\window.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\univ\window.h
 	"wx/bitmap.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\dfb\nonownedwnd.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\dfb\nonownedwnd.h
 	"wx/window.h"
 	"wx/dfb/dfbptr.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk\nonownedwnd.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk\nonownedwnd.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\osx\nonownedwnd.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\osx\nonownedwnd.h
 	"wx/window.h"
 	"wx/graphics.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\graphics.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\graphics.h
 	"wx/defs.h"
 	"wx/affinematrix2d.h"
 	"wx/geometry.h"
@@ -10892,53 +10894,53 @@
 	"wx/peninfobase.h"
 	"wx/vector.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\msw\nonownedwnd.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\msw\nonownedwnd.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\qt\nonownedwnd.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\qt\nonownedwnd.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\iconbndl.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\iconbndl.h
 	"wx/gdiobj.h"
 	"wx/gdicmn.h"
 	"wx/icon.h"
 	"wx/dynarray.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\weakref.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\weakref.h
 	"wx/tracker.h"
 	"wx/meta/convertible.h"
 	"wx/meta/int2type.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\meta\int2type.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\meta\int2type.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\msw\toplevel.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\msw\toplevel.h
 	"wx/weakref.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk\toplevel.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk\toplevel.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk1\toplevel.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk1\toplevel.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\x11\toplevel.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\x11\toplevel.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\dfb\toplevel.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\dfb\toplevel.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\osx\toplevel.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\osx\toplevel.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\motif\toplevel.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\motif\toplevel.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\qt\toplevel.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\qt\toplevel.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\univ\toplevel.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\univ\toplevel.h
 	"wx/univ/inpcons.h"
 	"wx/univ/inphand.h"
 	"wx/icon.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\univ\inpcons.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\univ\inpcons.h
 	"wx/object.h"
 	"wx/event.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\univ\inphand.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\univ\inphand.h
 	"wx/univ/inpcons.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\statusbr.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\statusbr.h
 	"wx/defs.h"
 	"wx/control.h"
 	"wx/list.h"
@@ -10950,7 +10952,7 @@
 	"wx/qt/statusbar.h"
 	"wx/generic/statusbr.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\control.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\control.h
 	"wx/defs.h"
 	"wx/window.h"
 	"wx/gdicmn.h"
@@ -10962,39 +10964,39 @@
 	"wx/osx/control.h"
 	"wx/qt/control.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\univ\control.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\univ\control.h
 	"wx/univ/inphand.h"
 	"wx/univ/inpcons.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\msw\control.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\msw\control.h
 	"wx/dynarray.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\motif\control.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\motif\control.h
 	"wx/window.h"
 	"wx/list.h"
 	"wx/validate.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk\control.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk\control.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk1\control.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk1\control.h
 	"wx/defs.h"
 	"wx/object.h"
 	"wx/list.h"
 	"wx/window.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\osx\control.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\osx\control.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\qt\control.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\qt\control.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\univ\statusbr.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\univ\statusbr.h
 	"wx/univ/inpcons.h"
 	"wx/arrstr.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\msw\statusbar.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\msw\statusbar.h
 	"wx/vector.h"
 	"wx/tooltip.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\tooltip.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\tooltip.h
 	"wx/defs.h"
 	"wx/msw/tooltip.h"
 	"wx/gtk/tooltip.h"
@@ -11002,52 +11004,52 @@
 	"wx/osx/tooltip.h"
 	"wx/qt/tooltip.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\msw\tooltip.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\msw\tooltip.h
 	"wx/object.h"
 	"wx/gdicmn.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk\tooltip.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk\tooltip.h
 	"wx/string.h"
 	"wx/object.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk1\tooltip.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk1\tooltip.h
 	"wx/defs.h"
 	"wx/string.h"
 	"wx/object.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\osx\tooltip.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\osx\tooltip.h
 	"wx/string.h"
 	"wx/event.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\qt\tooltip.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\qt\tooltip.h
 	"wx/object.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\generic\statusbr.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\generic\statusbr.h
 	"wx/defs.h"
 	"wx/pen.h"
 	"wx/arrstr.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\osx\statusbr.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\osx\statusbr.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\qt\statusbar.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\qt\statusbar.h
 	"wx/statusbr.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\univ\frame.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\univ\frame.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\msw\frame.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\msw\frame.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk\frame.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk\frame.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk1\frame.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk1\frame.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\motif\frame.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\motif\frame.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\osx\frame.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\osx\frame.h
 	"wx/toolbar.h"
 	"wx/accel.h"
 	"wx/icon.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\toolbar.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\toolbar.h
 	"wx/defs.h"
 	"wx/tbarbase.h"
 	"wx/univ/toolbar.h"
@@ -11058,16 +11060,16 @@
 	"wx/osx/toolbar.h"
 	"wx/qt/toolbar.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\tbarbase.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\tbarbase.h
 	"wx/defs.h"
 	"wx/bitmap.h"
 	"wx/list.h"
 	"wx/control.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\univ\toolbar.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\univ\toolbar.h
 	"wx/button.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\button.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\button.h
 	"wx/defs.h"
 	"wx/anybutton.h"
 	"wx/univ/button.h"
@@ -11078,7 +11080,7 @@
 	"wx/osx/button.h"
 	"wx/qt/button.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\anybutton.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\anybutton.h
 	"wx/defs.h"
 	"wx/bitmap.h"
 	"wx/control.h"
@@ -11088,99 +11090,99 @@
 	"wx/osx/anybutton.h"
 	"wx/qt/anybutton.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\univ\anybutton.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\univ\anybutton.h
 	"wx/univ/inphand.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\msw\anybutton.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\msw\anybutton.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk\anybutton.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk\anybutton.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\osx\anybutton.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\osx\anybutton.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\qt\anybutton.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\qt\anybutton.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\univ\button.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\univ\button.h
 	"wx/bitmap.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\msw\button.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\msw\button.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\motif\button.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\motif\button.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk\button.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk\button.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk1\button.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk1\button.h
 	"wx/defs.h"
 	"wx/object.h"
 	"wx/list.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\osx\button.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\osx\button.h
 	"wx/control.h"
 	"wx/gdicmn.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\qt\button.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\qt\button.h
 	"wx/control.h"
 	"wx/button.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\msw\toolbar.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\msw\toolbar.h
 	"wx/dynarray.h"
 	"wx/imaglist.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\imaglist.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\imaglist.h
 	"wx/defs.h"
 	"wx/generic/imaglist.h"
 	"wx/msw/imaglist.h"
 	"wx/osx/imaglist.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\generic\imaglist.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\generic\imaglist.h
 	"wx/gdicmn.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\msw\imaglist.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\msw\imaglist.h
 	"wx/bitmap.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\osx\imaglist.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\osx\imaglist.h
 	"wx/defs.h"
 	"wx/list.h"
 	"wx/icon.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\motif\toolbar.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\motif\toolbar.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk\toolbar.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk\toolbar.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk1\toolbar.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk1\toolbar.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\osx\toolbar.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\osx\toolbar.h
 	"wx/tbarbase.h"
 	"wx/dynarray.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\qt\toolbar.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\qt\toolbar.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\qt\frame.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\qt\frame.h
 	"wx/frame.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\x11\app.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\x11\app.h
 	"wx/gdicmn.h"
 	"wx/event.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\osx\app.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\osx\app.h
 	"wx/defs.h"
 	"wx/object.h"
 	"wx/gdicmn.h"
 	"wx/event.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\qt\app.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\qt\app.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\univ\theme.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\univ\theme.h
 	"wx/string.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\stopwatch.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\stopwatch.h
 	"wx/defs.h"
 	"wx/longlong.h"
 	"wx/time.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\time.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\time.h
 	"wx/longlong.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\timer.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\timer.h
 	"wx/defs.h"
 	"wx/object.h"
 	"wx/longlong.h"
@@ -11188,46 +11190,46 @@
 	"wx/stopwatch.h"
 	"wx/utils.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\module.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\module.h
 	"wx/object.h"
 	"wx/list.h"
 	"wx/arrstr.h"
 	"wx/dynarray.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\containr.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\containr.h
 	"wx/defs.h"
 	"wx/event.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\panel.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\panel.h
 	"wx/window.h"
 	"wx/containr.h"
 	"wx/univ/panel.h"
 	"wx/msw/panel.h"
 	"wx/generic/panelg.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\univ\panel.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\univ\panel.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\msw\panel.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\msw\panel.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\generic\panelg.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\generic\panelg.h
 	"wx/bitmap.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\dcclient.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\dcclient.h
 	"wx/dc.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\dcmemory.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\dcmemory.h
 	"wx/dc.h"
 	"wx/bitmap.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\dcprint.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\dcprint.h
 	"wx/defs.h"
 	"wx/dc.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\dcscreen.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\dcscreen.h
 	"wx/defs.h"
 	"wx/dc.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\menuitem.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\menuitem.h
 	"wx/defs.h"
 	"wx/object.h"
 	"wx/univ/menuitem.h"
@@ -11238,37 +11240,37 @@
 	"wx/osx/menuitem.h"
 	"wx/qt/menuitem.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\univ\menuitem.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\univ\menuitem.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\msw\menuitem.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\msw\menuitem.h
 	"wx/bitmap.h"
 	"wx/ownerdrw.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\ownerdrw.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\ownerdrw.h
 	"wx/defs.h"
 	"wx/font.h"
 	"wx/colour.h"
 	"wx/msw/ownerdrw.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\msw\ownerdrw.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\msw\ownerdrw.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\motif\menuitem.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\motif\menuitem.h
 	"wx/bitmap.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk\menuitem.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk\menuitem.h
 	"wx/bitmap.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk1\menuitem.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk1\menuitem.h
 	"wx/bitmap.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\osx\menuitem.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\osx\menuitem.h
 	"wx/defs.h"
 	"wx/bitmap.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\qt\menuitem.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\qt\menuitem.h
 	"wx/menuitem.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\menu.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\menu.h
 	"wx/defs.h"
 	"wx/list.h"
 	"wx/window.h"
@@ -11281,30 +11283,30 @@
 	"wx/osx/menu.h"
 	"wx/qt/menu.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\univ\menu.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\univ\menu.h
 	"wx/accel.h"
 	"wx/dynarray.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\msw\menu.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\msw\menu.h
 	"wx/accel.h"
 	"wx/dynarray.h"
 	"wx/arrstr.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\motif\menu.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\motif\menu.h
 	"wx/colour.h"
 	"wx/font.h"
 	"wx/arrstr.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk\menu.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk\menu.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk1\menu.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk1\menu.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\osx\menu.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\osx\menu.h
 	"wx/arrstr.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\qt\menu.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\qt\menu.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\dialog.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\dialog.h
 	"wx/toplevel.h"
 	"wx/containr.h"
 	"wx/sharedptr.h"
@@ -11316,35 +11318,35 @@
 	"wx/osx/dialog.h"
 	"wx/qt/dialog.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\sharedptr.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\sharedptr.h
 	"wx/defs.h"
 	"wx/atomic.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\atomic.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\atomic.h
 	"wx/defs.h"
 	"wx/msw/wrapwin.h"
 	"libkern/OSAtomic.h"
 	<atomic.h>
 	"wx/thread.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\univ\dialog.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\univ\dialog.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\msw\dialog.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\msw\dialog.h
 	"wx/panel.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\motif\dialog.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\motif\dialog.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk\dialog.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk\dialog.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk1\dialog.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk1\dialog.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\osx\dialog.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\osx\dialog.h
 	"wx/panel.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\qt\dialog.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\qt\dialog.h
 	"wx/dialog.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\msgdlg.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\msgdlg.h
 	"wx/defs.h"
 	"wx/dialog.h"
 	"wx/stockitem.h"
@@ -11355,26 +11357,26 @@
 	"wx/osx/msgdlg.h"
 	"wx/qt/msgdlg.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\stockitem.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\stockitem.h
 	"wx/defs.h"
 	"wx/chartype.h"
 	"wx/string.h"
 	"wx/accel.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\generic\msgdlgg.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\generic\msgdlgg.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\msw\msgdlg.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\msw\msgdlg.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\motif\msgdlg.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\motif\msgdlg.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk\msgdlg.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk\msgdlg.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\osx\msgdlg.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\osx\msgdlg.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\qt\msgdlg.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\qt\msgdlg.h
 	"wx/msgdlg.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\dataobj.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\dataobj.h
 	"wx/defs.h"
 	"wx/string.h"
 	"wx/bitmap.h"
@@ -11402,49 +11404,49 @@
 	"wx/osx/dataobj2.h"
 	"wx/qt/dataobj2.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\msw\ole\dataform.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\msw\ole\dataform.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\motif\dataform.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\motif\dataform.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk\dataform.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk\dataform.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk1\dataform.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk1\dataform.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\x11\dataform.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\x11\dataform.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\osx\dataform.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\osx\dataform.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\qt\dataform.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\qt\dataform.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\msw\ole\dataobj.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\msw\ole\dataobj.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\motif\dataobj.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\motif\dataobj.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\x11\dataobj.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\x11\dataobj.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk\dataobj.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk\dataobj.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk1\dataobj.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk1\dataobj.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\osx\dataobj.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\osx\dataobj.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\qt\dataobj.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\qt\dataobj.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\msw\ole\dataobj2.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\msw\ole\dataobj2.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk\dataobj2.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk\dataobj2.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk1\dataobj2.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk1\dataobj2.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\x11\dataobj2.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\x11\dataobj2.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\motif\dataobj2.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\motif\dataobj2.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\osx\dataobj2.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\osx\dataobj2.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\qt\dataobj2.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\qt\dataobj2.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\ctrlsub.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\ctrlsub.h
 	"wx/defs.h"
 	"wx/arrstr.h"
 	"wx/control.h"
@@ -11453,18 +11455,18 @@
 	"wx/motif/ctrlsub.h"
 	"wx/qt/ctrlsub.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\msw\ctrlsub.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\msw\ctrlsub.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\motif\ctrlsub.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\motif\ctrlsub.h
 	"wx/dynarray.h"
 	"wx/generic/ctrlsub.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\generic\ctrlsub.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\generic\ctrlsub.h
 	"wx/dynarray.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\qt\ctrlsub.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\qt\ctrlsub.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\bmpbuttn.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\bmpbuttn.h
 	"wx/defs.h"
 	"wx/button.h"
 	"wx/univ/bmpbuttn.h"
@@ -11475,30 +11477,30 @@
 	"wx/osx/bmpbuttn.h"
 	"wx/qt/bmpbuttn.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\univ\bmpbuttn.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\univ\bmpbuttn.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\msw\bmpbuttn.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\msw\bmpbuttn.h
 	"wx/button.h"
 	"wx/bitmap.h"
 	"wx/brush.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\motif\bmpbuttn.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\motif\bmpbuttn.h
 	"wx/motif/bmpmotif.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\motif\bmpmotif.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\motif\bmpmotif.h
 	"wx/defs.h"
 	"wx/bitmap.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk\bmpbuttn.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk\bmpbuttn.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk1\bmpbuttn.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk1\bmpbuttn.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\osx\bmpbuttn.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\osx\bmpbuttn.h
 	"wx/button.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\qt\bmpbuttn.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\qt\bmpbuttn.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\checkbox.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\checkbox.h
 	"wx/defs.h"
 	"wx/control.h"
 	"wx/univ/checkbox.h"
@@ -11509,25 +11511,25 @@
 	"wx/osx/checkbox.h"
 	"wx/qt/checkbox.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\univ\checkbox.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\univ\checkbox.h
 	"wx/button.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\msw\checkbox.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\msw\checkbox.h
 	"wx/msw/ownerdrawnbutton.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\msw\ownerdrawnbutton.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\msw\ownerdrawnbutton.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\motif\checkbox.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\motif\checkbox.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk\checkbox.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk\checkbox.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk1\checkbox.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk1\checkbox.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\osx\checkbox.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\osx\checkbox.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\qt\checkbox.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\qt\checkbox.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\checklst.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\checklst.h
 	"wx/defs.h"
 	"wx/listbox.h"
 	"wx/univ/checklst.h"
@@ -11538,7 +11540,7 @@
 	"wx/osx/checklst.h"
 	"wx/qt/checklst.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\listbox.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\listbox.h
 	"wx/defs.h"
 	"wx/ctrlsub.h"
 	"wx/univ/listbox.h"
@@ -11549,61 +11551,61 @@
 	"wx/osx/listbox.h"
 	"wx/qt/listbox.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\univ\listbox.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\univ\listbox.h
 	"wx/scrolwin.h"
 	"wx/dynarray.h"
 	"wx/arrstr.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\scrolwin.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\scrolwin.h
 	"wx/panel.h"
 	"wx/gtk/scrolwin.h"
 	"wx/gtk1/scrolwin.h"
 	"wx/generic/scrolwin.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk\scrolwin.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk\scrolwin.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk1\scrolwin.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk1\scrolwin.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\generic\scrolwin.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\generic\scrolwin.h
 	"wx/recguard.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\recguard.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\recguard.h
 	"wx/defs.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\msw\listbox.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\msw\listbox.h
 	"wx/dynarray.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\motif\listbox.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\motif\listbox.h
 	"wx/ctrlsub.h"
 	"wx/clntdata.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk\listbox.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk\listbox.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk1\listbox.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk1\listbox.h
 	"wx/list.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\osx\listbox.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\osx\listbox.h
 	"wx/dynarray.h"
 	"wx/arrstr.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\qt\listbox.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\qt\listbox.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\univ\checklst.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\univ\checklst.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\msw\checklst.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\msw\checklst.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\motif\checklst.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\motif\checklst.h
 	"wx/listbox.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk\checklst.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk\checklst.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk1\checklst.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk1\checklst.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\osx\checklst.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\osx\checklst.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\qt\checklst.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\qt\checklst.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\choice.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\choice.h
 	"wx/defs.h"
 	"wx/ctrlsub.h"
 	"wx/univ/choice.h"
@@ -11614,10 +11616,10 @@
 	"wx/osx/choice.h"
 	"wx/qt/choice.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\univ\choice.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\univ\choice.h
 	"wx/combobox.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\combobox.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\combobox.h
 	"wx/defs.h"
 	"wx/textctrl.h"
 	"wx/ctrlsub.h"
@@ -11630,7 +11632,7 @@
 	"wx/osx/combobox.h"
 	"wx/qt/combobox.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\textctrl.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\textctrl.h
 	"wx/defs.h"
 	"wx/control.h"
 	"wx/textentry.h"
@@ -11646,7 +11648,7 @@
 	"wx/osx/textctrl.h"
 	"wx/qt/textctrl.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\textentry.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\textentry.h
 	"wx/filefn.h"
 	"wx/gdicmn.h"
 	"wx/gtk/textentry.h"
@@ -11655,51 +11657,51 @@
 	"wx/motif/textentry.h"
 	"wx/qt/textentry.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk\textentry.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk\textentry.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\osx\textentry.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\osx\textentry.h
 	"wx/control.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\msw\textentry.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\msw\textentry.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\motif\textentry.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\motif\textentry.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\qt\textentry.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\qt\textentry.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\ioswrap.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\ioswrap.h
 	"wx/beforestd.h"
 	<iostream.h>
 	<iostream>
 	"wx/afterstd.h"
 	"wx/msw/winundef.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\x11\textctrl.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\x11\textctrl.h
 	"wx/univ/textctrl.h"
 	"wx/scrolwin.h"
 	"wx/arrstr.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\univ\textctrl.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\univ\textctrl.h
 	"wx/scrolwin.h"
 	"wx/univ/inphand.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\msw\textctrl.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\msw\textctrl.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\motif\textctrl.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\motif\textctrl.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk\textctrl.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk\textctrl.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk1\textctrl.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk1\textctrl.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\osx\textctrl.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\osx\textctrl.h
 	"wx/control.h"
 	"wx/textctrl.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\qt\textctrl.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\qt\textctrl.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\univ\combobox.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\univ\combobox.h
 	"wx/combo.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\combo.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\combo.h
 	"wx/defs.h"
 	"wx/control.h"
 	"wx/renderer.h"
@@ -11709,60 +11711,60 @@
 	"wx/msw/combo.h"
 	"wx/generic/combo.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\renderer.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\renderer.h
 	"wx/gdicmn.h"
 	"wx/colour.h"
 	"wx/font.h"
 	"wx/bitmap.h"
 	"wx/string.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\msw\combo.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\msw\combo.h
 	"wx/timer.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\generic\combo.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\generic\combo.h
 	"wx/containr.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\msw\combobox.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\msw\combobox.h
 	"wx/choice.h"
 	"wx/textentry.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\motif\combobox.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\motif\combobox.h
 	"wx/choice.h"
 	"wx/textentry.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk\combobox.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk\combobox.h
 	"wx/choice.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk1\combobox.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk1\combobox.h
 	"wx/defs.h"
 	"wx/object.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\osx\combobox.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\osx\combobox.h
 	"wx/containr.h"
 	"wx/choice.h"
 	"wx/textctrl.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\qt\combobox.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\qt\combobox.h
 	"wx/choice.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\msw\choice.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\msw\choice.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\motif\choice.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\motif\choice.h
 	"wx/clntdata.h"
 	"wx/dynarray.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk\choice.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk\choice.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk1\choice.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk1\choice.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\osx\choice.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\osx\choice.h
 	"wx/control.h"
 	"wx/dynarray.h"
 	"wx/arrstr.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\qt\choice.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\qt\choice.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\scrolbar.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\scrolbar.h
 	"wx/defs.h"
 	"wx/control.h"
 	"wx/univ/scrolbar.h"
@@ -11773,27 +11775,27 @@
 	"wx/osx/scrolbar.h"
 	"wx/qt/scrolbar.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\univ\scrolbar.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\univ\scrolbar.h
 	"wx/univ/scrarrow.h"
 	"wx/renderer.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\univ\scrarrow.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\univ\scrarrow.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\msw\scrolbar.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\msw\scrolbar.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\motif\scrolbar.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\motif\scrolbar.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk\scrolbar.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk\scrolbar.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk1\scrolbar.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk1\scrolbar.h
 	"wx/defs.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\osx\scrolbar.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\osx\scrolbar.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\qt\scrolbar.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\qt\scrolbar.h
 	"wx/scrolbar.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\stattext.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\stattext.h
 	"wx/defs.h"
 	"wx/control.h"
 	"wx/univ/stattext.h"
@@ -11804,25 +11806,25 @@
 	"wx/osx/stattext.h"
 	"wx/qt/stattext.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\univ\stattext.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\univ\stattext.h
 	"wx/generic/stattextg.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\generic\stattextg.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\generic\stattextg.h
 	"wx/stattext.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\msw\stattext.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\msw\stattext.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\motif\stattext.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\motif\stattext.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk\stattext.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk\stattext.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk1\stattext.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk1\stattext.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\osx\stattext.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\osx\stattext.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\qt\stattext.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\qt\stattext.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\statbmp.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\statbmp.h
 	"wx/defs.h"
 	"wx/control.h"
 	"wx/bitmap.h"
@@ -11835,33 +11837,33 @@
 	"wx/osx/statbmp.h"
 	"wx/qt/statbmp.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\univ\statbmp.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\univ\statbmp.h
 	"wx/bitmap.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\msw\statbmp.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\msw\statbmp.h
 	"wx/control.h"
 	"wx/icon.h"
 	"wx/bitmap.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\motif\statbmp.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\motif\statbmp.h
 	"wx/motif/bmpmotif.h"
 	"wx/icon.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk\statbmp.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk\statbmp.h
 	"wx/icon.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk1\statbmp.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk1\statbmp.h
 	"wx/icon.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\osx\statbmp.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\osx\statbmp.h
 	"wx/generic/statbmpg.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\generic\statbmpg.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\generic\statbmpg.h
 	"wx/statbmp.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\qt\statbmp.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\qt\statbmp.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\statbox.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\statbox.h
 	"wx/defs.h"
 	"wx/control.h"
 	"wx/containr.h"
@@ -11873,26 +11875,26 @@
 	"wx/osx/statbox.h"
 	"wx/qt/statbox.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\univ\statbox.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\univ\statbox.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\msw\statbox.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\msw\statbox.h
 	"wx/compositewin.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\compositewin.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\compositewin.h
 	"wx/window.h"
 	"wx/containr.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\motif\statbox.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\motif\statbox.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk\statbox.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk\statbox.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk1\statbox.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk1\statbox.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\osx\statbox.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\osx\statbox.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\qt\statbox.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\qt\statbox.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\radiobox.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\radiobox.h
 	"wx/defs.h"
 	"wx/ctrlsub.h"
 	"wx/dynarray.h"
@@ -11904,30 +11906,30 @@
 	"wx/osx/radiobox.h"
 	"wx/qt/radiobox.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\univ\radiobox.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\univ\radiobox.h
 	"wx/statbox.h"
 	"wx/dynarray.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\msw\radiobox.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\msw\radiobox.h
 	"wx/statbox.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\motif\radiobox.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\motif\radiobox.h
 	"wx/dynarray.h"
 	"wx/arrstr.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk\radiobox.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk\radiobox.h
 	"wx/bitmap.h"
 	"wx/list.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk1\radiobox.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk1\radiobox.h
 	"wx/bitmap.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\osx\radiobox.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\osx\radiobox.h
 	"wx/containr.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\qt\radiobox.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\qt\radiobox.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\radiobut.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\radiobut.h
 	"wx/defs.h"
 	"wx/control.h"
 	"wx/univ/radiobut.h"
@@ -11938,23 +11940,23 @@
 	"wx/osx/radiobut.h"
 	"wx/qt/radiobut.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\univ\radiobut.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\univ\radiobut.h
 	"wx/checkbox.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\msw\radiobut.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\msw\radiobut.h
 	"wx/msw/ownerdrawnbutton.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\motif\radiobut.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\motif\radiobut.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk\radiobut.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk\radiobut.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk1\radiobut.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk1\radiobut.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\osx\radiobut.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\osx\radiobut.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\qt\radiobut.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\qt\radiobut.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\slider.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\slider.h
 	"wx/defs.h"
 	"wx/control.h"
 	"wx/univ/slider.h"
@@ -11965,28 +11967,28 @@
 	"wx/osx/slider.h"
 	"wx/qt/slider.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\univ\slider.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\univ\slider.h
 	"wx/univ/scrthumb.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\univ\scrthumb.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\univ\scrthumb.h
 	"wx/timer.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\msw\slider.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\msw\slider.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\motif\slider.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\motif\slider.h
 	"wx/control.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk\slider.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk\slider.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk1\slider.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk1\slider.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\osx\slider.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\osx\slider.h
 	"wx/compositewin.h"
 	"wx/stattext.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\qt\slider.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\qt\slider.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gauge.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gauge.h
 	"wx/defs.h"
 	"wx/control.h"
 	"wx/univ/gauge.h"
@@ -11997,22 +11999,22 @@
 	"wx/osx/gauge.h"
 	"wx/qt/gauge.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\univ\gauge.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\univ\gauge.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\msw\gauge.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\msw\gauge.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\motif\gauge.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\motif\gauge.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk\gauge.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk\gauge.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk1\gauge.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk1\gauge.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\osx\gauge.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\osx\gauge.h
 	"wx/control.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\qt\gauge.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\qt\gauge.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\dirdlg.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\dirdlg.h
 	"wx/defs.h"
 	"wx/dialog.h"
 	"wx/generic/dirdlgg.h"
@@ -12024,46 +12026,46 @@
 	"wx/generic/dirdlgg.h"
 	"wx/qt/dirdlg.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\generic\dirdlgg.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\generic\dirdlgg.h
 	"wx/dialog.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\msw\dirdlg.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\msw\dirdlg.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk\dirdlg.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk\dirdlg.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\osx\dirdlg.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\osx\dirdlg.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\qt\dirdlg.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\qt\dirdlg.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\layout.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\layout.h
 	"wx/object.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\sizer.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\sizer.h
 	"wx/defs.h"
 	"wx/window.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\choicdlg.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\choicdlg.h
 	"wx/defs.h"
 	"wx/generic/choicdgg.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\generic\choicdgg.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\generic\choicdgg.h
 	"wx/dynarray.h"
 	"wx/dialog.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\textdlg.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\textdlg.h
 	"wx/generic/textdlgg.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\generic\textdlgg.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\generic\textdlgg.h
 	"wx/defs.h"
 	"wx/dialog.h"
 	"wx/valtext.h"
 	"wx/textctrl.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\valtext.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\valtext.h
 	"wx/defs.h"
 	"wx/validate.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\filedlg.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\filedlg.h
 	"wx/defs.h"
 	"wx/dialog.h"
 	"wx/arrstr.h"
@@ -12075,7 +12077,7 @@
 	"wx/osx/filedlg.h"
 	"wx/qt/filedlg.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\generic\filedlgg.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\generic\filedlgg.h
 	"wx/listctrl.h"
 	"wx/datetime.h"
 	"wx/filefn.h"
@@ -12083,14 +12085,14 @@
 	"wx/filedlg.h"
 	"wx/generic/filectrlg.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\listctrl.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\listctrl.h
 	"wx/defs.h"
 	"wx/listbase.h"
 	"wx/msw/listctrl.h"
 	"wx/qt/listctrl.h"
 	"wx/generic/listctrl.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\listbase.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\listbase.h
 	"wx/colour.h"
 	"wx/font.h"
 	"wx/gdicmn.h"
@@ -12099,48 +12101,48 @@
 	"wx/itemattr.h"
 	"wx/systhemectrl.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\itemattr.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\itemattr.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\systhemectrl.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\systhemectrl.h
 	"wx/defs.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\msw\listctrl.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\msw\listctrl.h
 	"wx/textctrl.h"
 	"wx/dynarray.h"
 	"wx/vector.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\qt\listctrl.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\qt\listctrl.h
 	"wx/textctrl.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\generic\listctrl.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\generic\listctrl.h
 	"wx/containr.h"
 	"wx/scrolwin.h"
 	"wx/textctrl.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\artprov.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\artprov.h
 	"wx/string.h"
 	"wx/bitmap.h"
 	"wx/icon.h"
 	"wx/iconbndl.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\generic\filectrlg.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\generic\filectrlg.h
 	"wx/containr.h"
 	"wx/listctrl.h"
 	"wx/filectrl.h"
 	"wx/filename.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\filectrl.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\filectrl.h
 	"wx/defs.h"
 	"wx/string.h"
 	"wx/event.h"
 	"wx/gtk/filectrl.h"
 	"wx/generic/filectrlg.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk\filectrl.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk\filectrl.h
 	"wx/control.h"
 	"wx/filectrl.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\filename.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\filename.h
 	"wx/arrstr.h"
 	"wx/filefn.h"
 	"wx/datetime.h"
@@ -12148,31 +12150,31 @@
 	"wx/longlong.h"
 	"wx/file.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\file.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\file.h
 	"wx/defs.h"
 	"wx/string.h"
 	"wx/filefn.h"
 	"wx/convauto.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\convauto.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\convauto.h
 	"wx/strconv.h"
 	"wx/fontenc.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\msw\filedlg.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\msw\filedlg.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\motif\filedlg.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\motif\filedlg.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk\filedlg.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk\filedlg.h
 	"wx/gtk/filectrl.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk1\filedlg.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk1\filedlg.h
 	"wx/generic/filedlgg.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\osx\filedlg.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\osx\filedlg.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\qt\filedlg.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\qt\filedlg.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\mdi.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\mdi.h
 	"wx/defs.h"
 	"wx/frame.h"
 	"wx/menu.h"
@@ -12183,23 +12185,23 @@
 	"wx/osx/mdi.h"
 	"wx/qt/mdi.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\generic\mdig.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\generic\mdig.h
 	"wx/panel.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\msw\mdi.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\msw\mdi.h
 	"wx/frame.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk\mdi.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk\mdi.h
 	"wx/frame.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk1\mdi.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk1\mdi.h
 	"wx/frame.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\osx\mdi.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\osx\mdi.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\qt\mdi.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\qt\mdi.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\statline.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\statline.h
 	"wx/defs.h"
 	"wx/control.h"
 	"wx/univ/statline.h"
@@ -12210,65 +12212,65 @@
 	"wx/qt/statline.h"
 	"wx/generic/statline.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\univ\statline.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\univ\statline.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\msw\statline.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\msw\statline.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk\statline.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk\statline.h
 	"wx/defs.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\gtk1\statline.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\gtk1\statline.h
 	"wx/defs.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\osx\statline.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\osx\statline.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\qt\statline.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\qt\statline.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\generic\statline.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\generic\statline.h
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\msw\wx.rc
+1518985831 d:\wxwidgets-3.1.1\include\wx\msw\wx.rc
 	<windows.h>
 	"wx/msw/rcdefs.h"
 
-1518989431 d:\wxwidgets-3.1.1\include\wx\msw\rcdefs.h
+1518985831 d:\wxwidgets-3.1.1\include\wx\msw\rcdefs.h
 
-1518989431 d:\wxwidgets-3.1.1\lib\gcc_dll\mswud\wx\setup.h
+1518985831 d:\wxwidgets-3.1.1\lib\gcc_dll\mswud\wx\setup.h
 
-1531824696 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\font\fontcouriernew7x10.h
+1531821096 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\font\fontcouriernew7x10.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"FontCommon.h"
 	"FontChar.h"
 
-1533121467 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\font\fontcommon.h
+1533117867 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\font\fontcommon.h
 	"StandardTypes.h"
 	"Arduino.h"
 	<array>
 
-1533121581 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\font\fontchar.h
+1533117981 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\font\fontchar.h
 	"StandardTypes.h"
 	"Arduino.h"
 	<array>
 
-1531824680 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\font\fontcouriernew7x9.h
+1531821080 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\font\fontcouriernew7x9.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"FontCommon.h"
 	"FontChar.h"
 
-1531820015 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\font\fontlucidasans9x10.h
+1531816415 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\font\fontlucidasans9x10.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"FontCommon.h"
 	"FontChar.h"
 
-1531820030 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\font\fontsprite5x8.h
+1531816430 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\font\fontsprite5x8.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"FontCommon.h"
 	"FontChar.h"
 
-1531820065 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\font\fonttahoma10x10.h
+1531816465 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\font\fonttahoma10x10.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"FontCommon.h"
@@ -12277,19 +12279,19 @@
 1531905473 c:\users\virskl\documents\github\wordclock\wordclock_simulator\include\array.h
 	<array>
 
-1532584771 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\font\fontcouriernew7x10.cpp
+1532581171 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\font\fontcouriernew7x10.cpp
 	"FontCourierNew7x10.h"
 
-1532503909 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\font\fontcouriernew7x9.cpp
+1532500309 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\font\fontcouriernew7x9.cpp
 	"FontCourierNew7x9.h"
 
-1531410874 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\font\fontlucidasans9x10.cpp
+1531407274 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\font\fontlucidasans9x10.cpp
 	"FontLucidaSans9x10.h"
 
-1533133888 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\font\fontsprite5x8.cpp
+1549543349 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\font\fontsprite5x8.cpp
 	"FontSprite5x8.h"
 
-1531399153 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\font\fonttahoma10x10.cpp
+1531395553 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\font\fonttahoma10x10.cpp
 	"FontTahoma10x10.h"
 
 1531951709 c:\users\andreas\documents\github\wordclock\wordclock_simulator\arduino\inc\display\displayword.h
@@ -15324,21 +15326,21 @@
 
 1520423738 d:\wxwidgets-3.0.4\include\wx\msw\rcdefs.h
 
-1532525084 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\animation\clock\animationclockcube.h
+1549539996 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\animation\clock\animationclockcube.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"AnimationClockCommon.h"
 	"Clock.h"
 
-1533137803 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\animation\clock\animationclockflicker.h
+1533129839 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\animation\clock\animationclockflicker.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"AnimationClockCommon.h"
 
-1532525362 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\clock\animationclockcube.cpp
+1532522009 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\clock\animationclockcube.cpp
 	"AnimationClockCube.h"
 
-1533134447 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\clock\animationclockflicker.cpp
+1533129899 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\clock\animationclockflicker.cpp
 	"AnimationClockFlicker.h"
 
 1532549461 c:\users\andreas\documents\github\wordclock\wordclock_simulator\arduino\inc\animation\clock\animationclockcube.h
@@ -17991,4 +17993,20 @@
 
 1532460243 source:c:\users\andreas\documents\github\wordclock\wordclock_simulator\arduino\src\animation\clock\animationclockflicker.cpp
 	"AnimationClockFlicker.h"
+
+1549543203 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\clock\clockwords.h
+	"StandardTypes.h"
+	"Arduino.h"
+	"array"
+	"DisplayWords.h"
+
+1535529158 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\gammacorrection\gammacorrection.h
+	"StandardTypes.h"
+	"Arduino.h"
+
+1549018919 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\clock\clockwords.cpp
+	"ClockWords.h"
+
+1535529706 source:c:\users\virskl\documents\github\wordclock\wordclock_xmegaforarduino\wordclock\wordclock\src\gammacorrection\gammacorrection.cpp
+	"GammaCorrection.h"
 

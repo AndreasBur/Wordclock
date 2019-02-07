@@ -83,22 +83,20 @@ void Simulator::OnQuit(wxCommandEvent &event)
 void Simulator::OnAbout(wxCommandEvent &event)
 {
 
-}
-
-stdReturnType Simulator::getPixel(byte Index, PixelType* Pixel) const
+}stdReturnType Simulator::getPixel(byte Index, PixelType& Pixel) const
 {
     byte Row = Index / DISPLAY_NUMBER_OF_COLUMNS;
     byte Column = Index % DISPLAY_NUMBER_OF_COLUMNS;
 
     if (Index < WS2812_NUMBER_OF_LEDS) {
         if(Characters[Row][Column]->GetForegroundColour() == wxColor(*wxBLACK)) {
-            Pixel->Blue = 255;
-            Pixel->Green = 255;
-            Pixel->Red = 255;
+            Pixel.Blue = 255;
+            Pixel.Green = 255;
+            Pixel.Red = 255;
         } else {
-            Pixel->Blue = 0;
-            Pixel->Green = 0;
-            Pixel->Red = 0;
+            Pixel.Blue = 0;
+            Pixel.Green = 0;
+            Pixel.Red = 0;
         }
         return E_OK;
     } else {
@@ -190,7 +188,7 @@ void Simulator::setPixelFast(byte Index, byte Red, byte Green, byte Blue)
     }
 }
 
-void Simulator::clearAllPixels()
+void Simulator::clearPixels()
 {
     setAllPixels(wxColour(*wxLIGHT_GREY));
 }

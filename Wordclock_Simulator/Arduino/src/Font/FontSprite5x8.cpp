@@ -134,7 +134,7 @@ const FontSprite5x8::FontTableType FontSprite5x8::FontTable PROGMEM
     FontTableElementType(1, {0b01111111, 0b00000000, 0b00000000, 0b00000000, 0b00000000}), // |
     FontTableElementType(3, {0b01000001, 0b00110110, 0b00001000, 0b00000000, 0b00000000}), // }
     FontTableElementType(4, {0b00001000, 0b00000100, 0b00001000, 0b00000100, 0b00000000}), // ~
-    FontTableElementType(4, {0b01111111, 0b01000001, 0b01000001, 0b01111111, 0b00000000}), // 
+    FontTableElementType(4, {0b01111111, 0b01000001, 0b01000001, 0b01111111, 0b00000000}), // 
     FontTableElementType(4, {0b01111100, 0b00010011, 0b00010011, 0b01111100, 0b00000000}), // Ä
     FontTableElementType(4, {0b00111100, 0b01000011, 0b01000011, 0b00111100, 0b00000000}), // Ö
     FontTableElementType(4, {0b00111110, 0b01000001, 0b01000001, 0b00111110, 0b00000000}), // Ü

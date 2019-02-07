@@ -25,7 +25,7 @@
 #include "WS2812.h"
 #include "DisplayCharacters.h"
 #include "DisplayWords.h"
-
+#include "GammaCorrection.h"
 
 /******************************************************************************************************************************************************
  *  GLOBAL CONSTANT MACROS
@@ -169,7 +169,7 @@ class Display
     // word methods fast
     void setWordFast(WordIdType, byte MaxLength = DISPLAY_WORD_LENGTH_UNLIMITED);
     void clearWordFast(WordIdType);
-    void clearAllWordsFast();
+    void clearWordsFast();
     
     // pixel methods
     stdReturnType writePixel(byte Column, byte Row, boolean Value) { if(Value) return setPixel(Column, Row); else return clearPixel(Column, Row); }

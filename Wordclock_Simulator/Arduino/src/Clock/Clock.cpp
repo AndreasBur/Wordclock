@@ -167,7 +167,7 @@ Clock::~Clock()
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType Clock::getClockWords(byte Hour, byte Minute, ClockWordsType& ClockWords) const
+stdReturnType Clock::getClockWords(byte Hour, byte Minute, ClockWords& ClockWords) const
 {
     /* ----- Local Variables ---------------------------------------------- */
     stdReturnType ReturnValue{E_NOT_OK};
@@ -177,31 +177,17 @@ stdReturnType Clock::getClockWords(byte Hour, byte Minute, ClockWordsType& Clock
         ReturnValue = E_OK;
         /* show IT IS permanently or only to full and half hour */
 #if (CLOCK_SHOW_IT_IS_PERMANENTLY == STD_ON)
-        ClockWords.ShowItIs = true;
+        ClockWords.setShowItIs(true);
 #else
-        if (Minute < CLOCK_MINUTE_STEP_IN_MINUTES || (Minute >= (CLOCK_NUMBER_OF_MINUTES_PER_HOUR/2) &&
-            Minute < (CLOCK_NUMBER_OF_MINUTES_PER_HOUR/2) + CLOCK_MINUTE_STEP_IN_MINUTES))
-        {
-            ClockWords->ShowItIs = true;
-        } else {
-            ClockWords->ShowItIs = false;
-        }
+        ClockWords.setShowItIs(calculateItIs(Minute));
 #endif
-        MinutesTableElementType MinutesTableElement = getMinutesTableElement(Mode, Minute);
+        MinutesTableElementType MinutesTableElement = getMinutesTableElement(Minute);
+        Hour = transformFrom24hTo12hFormat(Hour);
+        // correct the hour offset from the minutes and take care of overflow
+        Hour = (Hour + MinutesTableElement.HourOffset) % CLOCK_NUMBER_OF_HOURS;
 
-        for(byte Index = 0; Index < CLOCK_MAX_NUMBER_OF_MINUTE_WORDS; Index++) {
-            ClockWords.MinuteWords[Index] = MinutesTableElement.Words[Index];
-        }
-
-        if(Hour >= CLOCK_NUMBER_OF_HOURS) Hour -= CLOCK_NUMBER_OF_HOURS;
-        Hour += MinutesTableElement.HourOffset;                             // correct the hour offset from the minutes
-        if(Hour >= CLOCK_NUMBER_OF_HOURS) Hour -= CLOCK_NUMBER_OF_HOURS;
-
-        HoursTableElementType HoursTableElement = getHoursTableElement(MinutesTableElement.HourMode, Hour);
-
-        for(byte Index = 0; Index < CLOCK_MAX_NUMBER_OF_HOUR_WORDS; Index++) {
-            ClockWords.HourWords[Index] = HoursTableElement.Words[Index];
-        }
+        ClockWords.setHourWords(getHoursTableElement(MinutesTableElement.HourMode, Hour));
+        ClockWords.setMinuteWords(MinutesTableElement.Words);
     } else {
         ReturnValue = E_NOT_OK;
     }
@@ -217,35 +203,18 @@ stdReturnType Clock::getClockWords(byte Hour, byte Minute, ClockWordsType& Clock
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType Clock::getClockWords(byte Hour, byte Minute, ClockWordsTableType& ClockWordsTable) const
+stdReturnType Clock::getClockWords(byte Hour, byte Minute, ClockWordsListType& ClockWordsList) const
 {
     /* ----- Local Variables ---------------------------------------------- */
-    ClockWordsType ClockWords;
-    stdReturnType ReturnValue{E_OK};
-    byte ClockWordsTableIndex{0};
+    ClockWords ClockWords;
 
     /* ----- Implementation ----------------------------------------------- */
-    //memset(ClockWordsTable, DisplayWords::WORD_NONE, sizeof(ClockWordsTableType));
-    if(getClockWords(Hour, Minute, ClockWords) == E_NOT_OK) ReturnValue = E_NOT_OK;
-
-    if(ClockWords.ShowItIs) {
-        ClockWordsTable[ClockWordsTableIndex++] = DisplayWords::WORD_ES;
-        ClockWordsTable[ClockWordsTableIndex++] = DisplayWords::WORD_IST;
+    if(getClockWords(Hour, Minute, ClockWords) == E_OK) {
+        ClockWordsList = ClockWords.getWordsList();
+        return E_OK;
+    } else {
+        return E_NOT_OK;
     }
-    for(uint8_t Index = 0; Index < CLOCK_MAX_NUMBER_OF_MINUTE_WORDS; Index++) {
-        if(ClockWords.MinuteWords[Index] != DisplayWords::WORD_NONE) {
-            ClockWordsTable[ClockWordsTableIndex++] = ClockWords.MinuteWords[Index];
-        }
-    }
-    for(uint8_t Index = 0; Index < CLOCK_MAX_NUMBER_OF_HOUR_WORDS; Index++) {
-        if(ClockWords.HourWords[Index] != DisplayWords::WORD_NONE) {
-            ClockWordsTable[ClockWordsTableIndex++] = ClockWords.HourWords[Index];
-        }
-    }
-    for(uint8_t Index = ClockWordsTableIndex; Index < CLOCK_WORDS_TABLE_TYPE_SIZE; Index++) {
-        ClockWordsTable[Index] = DisplayWords::WORD_NONE;
-    }
-    return ReturnValue;
 } /* getClockWords */
 
 
@@ -261,20 +230,20 @@ stdReturnType Clock::setClock(byte Hour, byte Minute)
 {
     /* ----- Local Variables ---------------------------------------------- */
     stdReturnType ReturnValue{E_OK};
-    ClockWordsType ClockWords;
+    ClockWords ClockWords;
 
     /* ----- Implementation ----------------------------------------------- */
     if(getClockWords(Hour, Minute, ClockWords) == E_NOT_OK) ReturnValue = E_NOT_OK;
 
-    if(ClockWords.ShowItIs) {
+    if(ClockWords.getShowItIs()) {
         if(pDisplay->setWord(DisplayWords::WORD_ES) == E_NOT_OK) ReturnValue = E_NOT_OK;
         if(pDisplay->setWord(DisplayWords::WORD_IST) == E_NOT_OK) ReturnValue = E_NOT_OK;
     }
-    for(byte Index = 0; Index < CLOCK_MAX_NUMBER_OF_HOUR_WORDS && ClockWords.HourWords[Index] != DisplayWords::WORD_NONE; Index++) {
-        if(pDisplay->setWord(ClockWords.HourWords[Index]) == E_NOT_OK) ReturnValue = E_NOT_OK;
+    for(byte Index = 0; Index < ClockWords.getHourWords().size() && ClockWords.getHourWord(Index) != DisplayWords::WORD_NONE; Index++) {
+        if(pDisplay->setWord(ClockWords.getHourWord(Index)) == E_NOT_OK) ReturnValue = E_NOT_OK;
     }
-    for(byte Index = 0; Index < CLOCK_MAX_NUMBER_OF_MINUTE_WORDS && ClockWords.MinuteWords[Index] != DisplayWords::WORD_NONE; Index++) {
-        if(pDisplay->setWord(ClockWords.MinuteWords[Index]) == E_NOT_OK) ReturnValue = E_NOT_OK;
+    for(byte Index = 0; Index < ClockWords.getMinuteWord(Index) && ClockWords.getMinuteWord(Index) != DisplayWords::WORD_NONE; Index++) {
+        if(pDisplay->setWord(ClockWords.getMinuteWord(Index)) == E_NOT_OK) ReturnValue = E_NOT_OK;
     }
     return ReturnValue;
 } /* setClock */
@@ -290,18 +259,18 @@ stdReturnType Clock::setClock(byte Hour, byte Minute)
 ******************************************************************************************************************************************************/
 void Clock::setClockFast(byte Hour, byte Minute)
 {
-    ClockWordsType ClockWords;
+    ClockWords ClockWords;
 
     if(getClockWords(Hour, Minute, ClockWords) == E_OK) {
-        if(ClockWords.ShowItIs) {
+        if(ClockWords.getShowItIs()) {
             pDisplay->setWordFast(DisplayWords::WORD_ES);
             pDisplay->setWordFast(DisplayWords::WORD_IST);
         }
-        for(byte Index = 0; Index < CLOCK_MAX_NUMBER_OF_HOUR_WORDS && ClockWords.HourWords[Index] != DisplayWords::WORD_NONE; Index++) {
-            pDisplay->setWordFast(ClockWords.HourWords[Index]);
+        for(byte Index = 0; Index < ClockWords.getHourWords().size() && ClockWords.getHourWord(Index) != DisplayWords::WORD_NONE; Index++) {
+            pDisplay->setWordFast(ClockWords.getHourWord(Index));
         }
-        for(byte Index = 0; Index < CLOCK_MAX_NUMBER_OF_MINUTE_WORDS && ClockWords.MinuteWords[Index] != DisplayWords::WORD_NONE; Index++) {
-            pDisplay->setWordFast(ClockWords.MinuteWords[Index]);
+        for(byte Index = 0; Index < ClockWords.getMinuteWord(Index) && ClockWords.getMinuteWord(Index) != DisplayWords::WORD_NONE; Index++) {
+            pDisplay->setWordFast(ClockWords.getMinuteWord(Index));
         }
     }
 } /* setClockFast */

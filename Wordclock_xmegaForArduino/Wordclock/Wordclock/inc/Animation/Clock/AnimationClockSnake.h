@@ -59,7 +59,7 @@ class AnimationClockSnake : public AnimationClockCommon
 ******************************************************************************************************************************************************/
   private:
     SnakeStateType SnakeState;
-    Clock::ClockWordsTableType ClockWordsTable;
+    ClockWords::WordsListType ClockWordsTable;
     byte SnakeBeginIndex;
     byte SnakeEndIndex;
 

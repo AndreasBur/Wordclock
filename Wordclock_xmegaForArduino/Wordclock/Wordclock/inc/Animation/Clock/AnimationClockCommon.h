@@ -85,8 +85,8 @@ class AnimationClockCommon
 	// methods
     void init(Display*, Clock*, StateType);
     void show() { pDisplay->show(); }
-    boolean isPixelPartOfClockWords(Clock::ClockWordsTableType, byte, byte) const;
-    boolean isPixelPartOfClockWords(Clock::ClockWordsTableType, byte) const;
+    boolean isPixelPartOfClockWords(ClockWords::WordsListType, byte, byte) const;
+    boolean isPixelPartOfClockWords(ClockWords::WordsListType, byte) const;
     virtual void task() = 0;
     virtual stdReturnType setClock(byte, byte) = 0;
 };

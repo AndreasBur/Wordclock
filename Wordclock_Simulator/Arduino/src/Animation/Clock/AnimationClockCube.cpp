@@ -225,21 +225,21 @@ void AnimationClockCube::clearBorderPixelsWithoutClockPixels()
 {
     for(byte Column = Border.ColumnStart; Column <= Border.ColumnEnd; Column++) {
         if(isPixelPartOfClockWords(ClockWordsTable, Column, Border.RowStart) == false) {
-            // set border top
+            // clear border top
             pDisplay->clearPixelFast(Column, Border.RowStart);
         }
         if(isPixelPartOfClockWords(ClockWordsTable, Column, Border.RowEnd) == false) {
-            // set border bottom
+            // clear border bottom
             pDisplay->clearPixelFast(Column, Border.RowEnd);
         }
     }
     for(byte Row = Border.RowStart; Row <= Border.RowEnd; Row++) {
         if(isPixelPartOfClockWords(ClockWordsTable, Border.ColumnStart, Row) == false) {
-            // set border left
+            // clear border left
             pDisplay->clearPixelFast(Border.ColumnStart, Row);
         }
         if(isPixelPartOfClockWords(ClockWordsTable, Border.ColumnEnd, Row) == false) {
-            // set border right
+            // clear border right
             pDisplay->clearPixelFast(Border.ColumnEnd, Row);
         }
     }

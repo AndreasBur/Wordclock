@@ -270,7 +270,7 @@ stdReturnType Display::clearWords()
  *                  
  *  \return         -
 ******************************************************************************************************************************************************/
-void Display::clearAllWordsFast()
+void Display::clearWordsFast()
 {
     for(byte i = DisplayWords::WORD_ES; i < DisplayWords::WORD_NUMBER_OF_WORDS; i++) clearWordFast((WordIdType) i);
 } /* clearAllWordsFast */

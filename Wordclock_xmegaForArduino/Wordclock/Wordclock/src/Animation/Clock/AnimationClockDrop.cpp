@@ -134,7 +134,7 @@ void AnimationClockDrop::reset()
 {
     Row = 0;
     Column = 0;
-    CurrenWordIndex = CLOCK_WORDS_MAX_NUMBER_OF_WORDS - 1;
+    CurrenWordIndex = ClockWordsTable.size() - 1;
 } /* reset */
 
 

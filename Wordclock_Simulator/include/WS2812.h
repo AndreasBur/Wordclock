@@ -4,6 +4,7 @@
 #include "Simulator.h"
 
 #define WS2812_NUMBER_OF_LEDS               110
+#define WS2812_SUPPORT_DIMMING STD_OFF
 
 /* Wrapper for WxWidgets */
 #define Pixels() Pixels(0L, _("Wordclock Simulator"))

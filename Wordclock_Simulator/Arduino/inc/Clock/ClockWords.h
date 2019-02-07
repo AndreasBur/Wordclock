@@ -8,87 +8,93 @@
  *  ---------------------------------------------------------------------------------------------------------------------------------------------------
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       AnimationClockCursor.h
- *      \brief      
+/**     \file       ClockWords.h
+ *      \brief
  *
- *      \details    
- *                  
+ *      \details
+ *
 ******************************************************************************************************************************************************/
-#ifndef _ANIMATION_CLOCK_CURSOR_H_
-#define _ANIMATION_CLOCK_CURSOR_H_
+#ifndef _CLOCKWORDS_H_
+#define _CLOCKWORDS_H_
 
 /******************************************************************************************************************************************************
- * INCLUDES
+ * I N C L U D E S
 ******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Arduino.h"
-#include "Display.h"
-#include "Clock.h"
-#include "AnimationClockCommon.h"
-
+#include "array"
+#include "DisplayWords.h"
 
 /******************************************************************************************************************************************************
- *  GLOBAL CONSTANT MACROS
+ *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
-/* AnimationClockCursor configuration parameter */
+/* ClockWords configuration parameter */
 
 
-/* AnimationClockCursor parameter */
+/* ClockWords parameter */
+#define CLOCKWORDS_MAX_NUMBER_OF_HOUR_WORDS          2
+#define CLOCKWORDS_MAX_NUMBER_OF_MINUTE_WORDS        3
 
-
+#define CLOCKWORDS_IT_IS_NUMBER_OF_WORDS             2
+#define CLOCKWORDS_MAX_NUMBER_OF_WORDS				 (CLOCKWORDS_MAX_NUMBER_OF_HOUR_WORDS + CLOCKWORDS_MAX_NUMBER_OF_MINUTE_WORDS + CLOCKWORDS_IT_IS_NUMBER_OF_WORDS)
 
 /******************************************************************************************************************************************************
- *  GLOBAL FUNCTION MACROS
+ *  G L O B A L   F U N C T I O N   M A C R O S
 ******************************************************************************************************************************************************/
 
 
 /******************************************************************************************************************************************************
- *  GLOBAL DATA TYPES AND STRUCTURES
- *****************************************************************************************************************************************************/
-
-
-/******************************************************************************************************************************************************
- *  C L A S S  A N I M A T I O N C L O C K C U R S O R
+ *  C L A S S   T E M P L A T E
 ******************************************************************************************************************************************************/
-class AnimationClockCursor : public AnimationClockCommon
+class ClockWords
 {
-  public:
 /******************************************************************************************************************************************************
- *  GLOBAL DATA TYPES AND STRUCTURES
+ *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
-
+  public:
+    using WordsListType = std::array<DisplayWords::WordIdType, CLOCKWORDS_MAX_NUMBER_OF_WORDS>;
+	using HourWordsType = std::array<DisplayWords::WordIdType, CLOCKWORDS_MAX_NUMBER_OF_HOUR_WORDS>;
+	using MinutesWordsType = std::array<DisplayWords::WordIdType, CLOCKWORDS_MAX_NUMBER_OF_MINUTE_WORDS>;
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
-    ClockWords::WordsListType ClockWordsTable;
-    byte CurrentPixelIndex;
-    DisplayWords Words;
-
-    // functions
-    void reset();
+	bool ShowItIs;
+	HourWordsType HourWords;
+	MinutesWordsType MinuteWords;
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    AnimationClockCursor();
-    ~AnimationClockCursor();
+    ClockWords();
+	ClockWords(bool, HourWordsType, MinutesWordsType);
+    ~ClockWords();
+
+	bool operator==(const ClockWords& sClockWords);
+	bool operator!=(const ClockWords& sClockWords);
 
 	// get methods
+	bool getShowItIs() const { return ShowItIs; }
+    HourWordsType getHourWords() const { return HourWords; }
+	DisplayWords::WordIdType getHourWord(byte Index) const { return HourWords[Index]; }
+	MinutesWordsType getMinuteWords() const { return MinuteWords; }
+	DisplayWords::WordIdType getMinuteWord(byte Index) const { return MinuteWords[Index]; }
 
+	WordsListType getWordsList() const;
 
 	// set methods
+	void setShowItIs(bool sShowItIs) {ShowItIs = sShowItIs;}
+	void setMinuteWords(MinutesWordsType sMinutWords) { MinuteWords = sMinutWords; }
+	void setHourWords(HourWordsType sHourWords) { HourWords = sHourWords; }
 
 	// methods
-    void init(Display*, Clock*);
-    stdReturnType setClock(byte, byte);
-    void task();
+
 };
 
-
 #endif
+
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E
 ******************************************************************************************************************************************************/

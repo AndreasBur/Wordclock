@@ -41,7 +41,7 @@ class WordclockDialog : public wxDialog
         wxDateTime Time;
         wxTimer Timer;
         char Text[25];
-        Clock::ClockWordsType CurrentTimeWords;
+        ClockWords CurrentTimeWords;
         enum {
             TIMER_ID = 1500
         };

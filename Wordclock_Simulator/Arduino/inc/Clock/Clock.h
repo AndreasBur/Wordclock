@@ -23,6 +23,7 @@
 #include "StandardTypes.h"
 #include "Arduino.h"
 #include "Display.h"
+#include "ClockWords.h"
 #include <array>
 
 /******************************************************************************************************************************************************
@@ -35,7 +36,6 @@
 /* Hour */
 #define CLOCK_NUMBER_OF_HOUR_MODES              2
 #define CLOCK_NUMBER_OF_HOURS                   12
-#define CLOCK_MAX_NUMBER_OF_HOUR_WORDS          2
 
 #define CLOCK_NUMBER_OF_HOURS_PER_DAY           24
 #define CLOCK_NUMBER_OF_MINUTES_PER_HOUR        60
@@ -43,11 +43,6 @@
 /* Minute */
 #define CLOCK_MINUTE_STEP_IN_MINUTES            5
 #define CLOCK_NUMBER_OF_MINUTE_STEPS            12
-#define CLOCK_MAX_NUMBER_OF_MINUTE_WORDS        3
-
-#define CLOCK_IT_IS_NUMBER_OF_WORDS             2
-#define CLOCK_WORDS_TABLE_TYPE_SIZE             (CLOCK_MAX_NUMBER_OF_HOUR_WORDS + CLOCK_MAX_NUMBER_OF_MINUTE_WORDS + CLOCK_IT_IS_NUMBER_OF_WORDS)
-
 
 /******************************************************************************************************************************************************
  *  GLOBAL FUNCTION MACROS
@@ -84,42 +79,11 @@ class Clock
     struct MinutesType {
         HourModesType HourMode;
         byte HourOffset;
-        DisplayWords::WordIdType Words[CLOCK_MAX_NUMBER_OF_MINUTE_WORDS];
+        ClockWords::MinutesWordsType Words;
     };
 
-    struct HoursType {
-        DisplayWords::WordIdType Words[CLOCK_MAX_NUMBER_OF_HOUR_WORDS];
-    };
-
-    class ClockWordsType {
-      public:
-        boolean ShowItIs;
-        DisplayWords::WordIdType HourWords[CLOCK_MAX_NUMBER_OF_HOUR_WORDS];
-        DisplayWords::WordIdType MinuteWords[CLOCK_MAX_NUMBER_OF_MINUTE_WORDS];
-
-        bool operator==(const ClockWordsType& ClockWords)
-        {
-            if(ShowItIs       == ClockWords.ShowItIs        &&
-               HourWords[0]   == ClockWords.HourWords[0]    &&
-               HourWords[1]   == ClockWords.HourWords[1]    &&
-               MinuteWords[0] == ClockWords.MinuteWords[0]  &&
-               MinuteWords[1] == ClockWords.MinuteWords[1]  &&
-               MinuteWords[2] == ClockWords.MinuteWords[2]  )
-            {
-                return true;
-            } else {
-                return false;
-            }
-        }
-        bool operator!=(const ClockWordsType& ClockWords)
-        {
-            if(operator==(ClockWords)) return false;
-            else return true;
-        }
-    };
-
-    //using ClockWordsTableType = DisplayWords::WordIdType[CLOCK_WORDS_TABLE_TYPE_SIZE];
-    using ClockWordsTableType = std::array<DisplayWords::WordIdType, CLOCK_WORDS_TABLE_TYPE_SIZE>;
+    using HoursType = ClockWords::HourWordsType;
+    using ClockWordsListType = ClockWords::WordsListType;
 
     using HoursTableElementType = HoursType;
     using MinutesTableElementType = MinutesType;
@@ -136,7 +100,7 @@ class Clock
     static const MinutesType MinutesTable[][CLOCK_NUMBER_OF_MINUTE_STEPS];
     
     // functions
-    MinutesTableElementType getMinutesTableElement(ModesType Mode, byte Minute) const {
+    MinutesTableElementType getMinutesTableElement(byte Minute) const {
         MinutesTableElementType MinutesTableElement;
         memcpy_P(&MinutesTableElement, &MinutesTable[Mode][Minute / CLOCK_MINUTE_STEP_IN_MINUTES], sizeof(MinutesType));
         return MinutesTableElement;
@@ -147,6 +111,20 @@ class Clock
         return HoursTableElement;
     }
 
+    boolean calculateItIs(byte Minute) const {
+        byte MinuteSteps = Minute / CLOCK_MINUTE_STEP_IN_MINUTES;
+        // show it is only to full and half hour
+        if(MinuteSteps == 0 || MinuteSteps == (CLOCK_NUMBER_OF_MINUTE_STEPS / 2)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    byte transformFrom24hTo12hFormat(byte Hour) const {
+        if(Hour >= CLOCK_NUMBER_OF_HOURS) Hour -= CLOCK_NUMBER_OF_HOURS;
+        return Hour;
+    }
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
@@ -157,8 +135,8 @@ class Clock
 
     // get methods
     ModesType getMode() const { return Mode; }
-    stdReturnType getClockWords(byte, byte, ClockWordsType&) const;
-    stdReturnType getClockWords(byte, byte, ClockWordsTableType&) const;
+    stdReturnType getClockWords(byte, byte, ClockWords&) const;
+    stdReturnType getClockWords(byte, byte, ClockWordsListType&) const;
 
     // set methods
     void setMode(ModesType sMode) { Mode = sMode; }

@@ -9,10 +9,10 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       AnimationClockCommon.h
- *      \brief
+ *      \brief      
  *
- *      \details
- *
+ *      \details    
+ *                  
 ******************************************************************************************************************************************************/
 #ifndef _ANIMATION_CLOCK_COMMON_H_
 #define _ANIMATION_CLOCK_COMMON_H_
@@ -55,7 +55,7 @@ class AnimationClockCommon
         STATE_CLEAR_TIME,
         STATE_SET_TIME
     };
-
+  
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
@@ -85,8 +85,8 @@ class AnimationClockCommon
 	// methods
     void init(Display*, Clock*, StateType);
     void show() { pDisplay->show(); }
-    boolean isPixelPartOfClockWords(Clock::ClockWordsTableType, byte, byte) const;
-    boolean isPixelPartOfClockWords(Clock::ClockWordsTableType, byte) const;
+    boolean isPixelPartOfClockWords(ClockWords::WordsListType, byte, byte) const;
+    boolean isPixelPartOfClockWords(ClockWords::WordsListType, byte) const;
     virtual void task() = 0;
     virtual stdReturnType setClock(byte, byte) = 0;
 };

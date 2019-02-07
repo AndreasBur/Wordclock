@@ -9,10 +9,10 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       Display.h
- *      \brief      
+ *      \brief
  *
- *      \details    
- *                  
+ *      \details
+ *
 ******************************************************************************************************************************************************/
 #ifndef _DISPLAY_H_
 #define _DISPLAY_H_
@@ -25,7 +25,7 @@
 #include "WS2812.h"
 #include "DisplayCharacters.h"
 #include "DisplayWords.h"
-
+#include "GammaCorrection.h"
 
 /******************************************************************************************************************************************************
  *  GLOBAL CONSTANT MACROS
@@ -33,6 +33,12 @@
 /* Display configuration parameter */
 #define DISPLAY_DATA_PIN                        10
 #define DISPLAY_LED_STRIPE_SERPENTINE           STD_OFF
+#define DISPLAY_USE_WS2812_DIMMING              STD_OFF
+//#define Pixels                                  WS2812::getInstance()
+
+#if (DISPLAY_USE_WS2812_DIMMING == STD_ON) && (WS2812_SUPPORT_DIMMING == STD_OFF)
+    #error "Display: Please activate WS2812 dimming support"
+#endif
 
 /* Display parameter */
 #define DISPLAY_NUMBER_OF_ROWS                  DISPLAY_CHARACTERS_NUMBER_OF_ROWS
@@ -102,10 +108,20 @@ class Display
     Stripe Pixels;
     PixelColorType Color;
     DisplayWords Words;
-    
+
+#if (DISPLAY_USE_WS2812_DIMMING == STD_OFF)
+    GammaCorrection GCorrection;
+    byte Brightness;
+    PixelColorType ColorDimmed;
+#endif
+
     // functions
     byte transformToSerpentine(byte, byte) const;
     byte transformToSerpentine(byte) const;
+
+#if (DISPLAY_USE_WS2812_DIMMING == STD_OFF)
+    byte dimmColor(byte Color) const { return (Color * Brightness) >> 8; }
+#endif
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
@@ -118,12 +134,22 @@ class Display
     // get methods
     PixelColorType getColor() const { return Color; }
     StateType getState() const { return State; }
+
+#if (DISPLAY_USE_WS2812_DIMMING == STD_ON)
     byte getBrightness() const { return Pixels.getBrightness(); }
+#else
+    byte getBrightness() const { return Brightness; }
+#endif
 
     // set methods
     void setColor(PixelColorType sColor) { Color = sColor; }
     void setColor(byte Red, byte Green, byte Blue) { Color.Red = Red; Color.Green = Green; Color.Blue = Blue; }
+
+#if (DISPLAY_USE_WS2812_DIMMING == STD_ON)
     void setBrightness(byte Brightness) { Pixels.setBrightness(Brightness, true); }
+#else
+    void setBrightness(byte);
+#endif
 
     // char methods
     stdReturnType setCharacter(CharacterIdType CharacterId) { return setPixel(CharacterId); }
@@ -138,13 +164,13 @@ class Display
     // word methods
     stdReturnType setWord(WordIdType, byte MaxLength = DISPLAY_WORD_LENGTH_UNLIMITED);
     stdReturnType clearWord(WordIdType);
-    stdReturnType clearAllWords();
+    stdReturnType clearWords();
 
     // word methods fast
     void setWordFast(WordIdType, byte MaxLength = DISPLAY_WORD_LENGTH_UNLIMITED);
     void clearWordFast(WordIdType);
-    void clearAllWordsFast();
-    
+    void clearWordsFast();
+
     // pixel methods
     stdReturnType writePixel(byte Column, byte Row, boolean Value) { if(Value) return setPixel(Column, Row); else return clearPixel(Column, Row); }
     stdReturnType writePixel(byte Index, boolean Value) { if(Value) return setPixel(Index); else return clearPixel(Index); }
@@ -181,7 +207,7 @@ class Display
     void init();
     void show() { Pixels.show(); }
     void test();
-    void clear() { Pixels.clearAllPixels(); }
+    void clear() { Pixels.clearPixels(); }
     void indexToColumnAndRow(byte Index, byte& Column, byte& Row) const { Row = Index / DISPLAY_NUMBER_OF_COLUMNS; Column = Index % DISPLAY_NUMBER_OF_COLUMNS; }
     byte indexToColumn(byte Index) const { return Index % DISPLAY_NUMBER_OF_COLUMNS; }
     byte indexToRow(byte Index) const { return Index / DISPLAY_NUMBER_OF_COLUMNS; }

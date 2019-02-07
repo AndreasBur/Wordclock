@@ -30,7 +30,7 @@ class Simulator : public wxFrame
 
         // get methods
         byte getBrightness() const { return Brightness; }
-        stdReturnType getPixel(byte, PixelType*) const;
+        stdReturnType getPixel(byte, PixelType&) const;
         PixelType getPixelFast(byte) const;
         //stdReturnType getPixelDimmed(byte, WS2812PixelType*);
 
@@ -46,7 +46,7 @@ class Simulator : public wxFrame
 
         // methods
         void init(byte sPin) { Pin = sPin; }
-        void clearAllPixels();
+        void clearPixels();
         //void setAllPixels(PixelType) {}
         //stdReturnType clearPixel(byte Index) { return setPixel(Index, 0, 0, 0); }
         void show() { Refresh(); }
