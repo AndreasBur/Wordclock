@@ -33,7 +33,7 @@
 /* Display configuration parameter */
 #define DISPLAY_DATA_PIN                        10
 #define DISPLAY_LED_STRIPE_SERPENTINE           STD_OFF
-#define DISPLAY_USE_WS2812_DIMMING              STD_OFF
+#define DISPLAY_USE_WS2812_DIMMING              STD_ON
 //#define Pixels                                  WS2812::getInstance()
 
 #if (DISPLAY_USE_WS2812_DIMMING == STD_ON) && (WS2812_SUPPORT_DIMMING == STD_OFF)

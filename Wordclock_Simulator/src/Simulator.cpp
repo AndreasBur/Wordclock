@@ -83,7 +83,9 @@ void Simulator::OnQuit(wxCommandEvent &event)
 void Simulator::OnAbout(wxCommandEvent &event)
 {
 
-}stdReturnType Simulator::getPixel(byte Index, PixelType& Pixel) const
+}
+
+stdReturnType Simulator::getPixel(byte Index, PixelType& Pixel) const
 {
     byte Row = Index / DISPLAY_NUMBER_OF_COLUMNS;
     byte Column = Index % DISPLAY_NUMBER_OF_COLUMNS;

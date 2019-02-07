@@ -536,7 +536,7 @@ stdReturnType Display::togglePixel(byte Column, byte Row)
 #else
     byte Index = (Row * DISPLAY_NUMBER_OF_COLUMNS) + Column;
     getPixel(Index, &Pixel);
-    if(Pixel) { return Pixels.clearPixel(Index); }
+    if(Pixel) { return clearPixel(Index); }
     else { return setPixel(Index); }
 #endif
 } /* togglePixel */

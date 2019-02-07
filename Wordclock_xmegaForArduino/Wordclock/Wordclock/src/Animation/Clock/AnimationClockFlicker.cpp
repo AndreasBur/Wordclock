@@ -54,7 +54,7 @@
 ******************************************************************************************************************************************************/
 AnimationClockFlicker::AnimationClockFlicker()
 {
-
+    reset();
 } /* AnimationClockFlicker */
 
 
@@ -77,8 +77,8 @@ AnimationClockFlicker::~AnimationClockFlicker()
 ******************************************************************************************************************************************************/
 void AnimationClockFlicker::init(Display* Display, Clock* Clock)
 {
-    pDisplay = Display;
-    pClock = Clock;
+    AnimationClockCommon::init(Display, Clock, STATE_IDLE);
+    reset();
 } /* init */
 
 
