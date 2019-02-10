@@ -60,7 +60,7 @@ class ClockWords
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
-	boolean ShowItIs;
+	bool ShowItIs;
 	HourWordsType HourWords;
 	MinutesWordsType MinuteWords;
   
@@ -76,7 +76,7 @@ class ClockWords
 	bool operator!=(const ClockWords& sClockWords);
 
 	// get methods
-	boolean getShowItIs() const { return ShowItIs; }
+	bool getShowItIs() const { return ShowItIs; }
     HourWordsType getHourWords() const { return HourWords; }
 	DisplayWords::WordIdType getHourWord(byte Index) const { return HourWords[Index]; }
 	MinutesWordsType getMinuteWords() const { return MinuteWords; }

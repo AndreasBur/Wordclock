@@ -188,7 +188,7 @@ class WS2812
     stdReturnType clearPixel(IndexType Index);
     void clearPixelFast(IndexType Index) { (*pNextFrame)[Index].clearPixel(); }
     void clearPixels() { for(IndexType Index = 0; Index < WS2812_NUMBER_OF_LEDS; Index++) clearPixelFast(Index); }
-	void enblePixels() { switchPixelsBufferPointer(); show(); }
+	void enablePixels() { switchPixelsBufferPointer(); show(); }
 	void disablePixels() { switchPixelsBufferPointer(); clearPixels(); startDmaTransfer(pNextFrame); };
 
     // friend functions

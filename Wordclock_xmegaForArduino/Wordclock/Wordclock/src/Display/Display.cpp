@@ -53,7 +53,9 @@
  *  \return         -
 ******************************************************************************************************************************************************/
 Display::Display(PixelColorType sColor)
-#if (WS2812_IS_SINGLETON == STD_OFF)
+#ifdef SIMULATOR
+: Pixels(0L, _("Wordclock Simulator"))
+#elif (WS2812_IS_SINGLETON == STD_OFF)
 : Pixels()
 #endif
 {
@@ -81,7 +83,9 @@ Display::Display(PixelColorType sColor)
  *  \return         -
 ******************************************************************************************************************************************************/
 Display::Display(byte Red, byte Green, byte Blue)
-#if (WS2812_IS_SINGLETON == STD_OFF)
+#ifdef SIMULATOR
+: Pixels(0L, _("Wordclock Simulator"))
+#elif (WS2812_IS_SINGLETON == STD_OFF)
 : Pixels()
 #endif
 {
@@ -191,7 +195,6 @@ stdReturnType Display::setWord(WordIdType WordId, byte MaxLength)
 void Display::setWordFast(WordIdType WordId, byte MaxLength)
 {
     byte Length;
-
     DisplayWord Word = Words.getDisplayWordFast(WordId);
 
     if(MaxLength == DISPLAY_WORD_LENGTH_UNLIMITED) Length = Word.getLength();
