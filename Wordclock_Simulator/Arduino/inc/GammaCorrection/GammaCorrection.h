@@ -75,7 +75,7 @@ class GammaCorrection
 
 
 	// get methods
-    byte getCorrectedValue(byte ValueLinear) { return calcGamma7CorrectionValue(ValueLinear); }
+    byte getCorrectedValue(byte ValueLinear) { return calcGamma7CorrectionValue(ValueLinear / 2); }
 
 	// set methods
 

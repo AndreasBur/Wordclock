@@ -9,10 +9,10 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       AnimationClockFlicker.h
- *      \brief      
+ *      \brief
  *
- *      \details    
- *                  
+ *      \details
+ *
 ******************************************************************************************************************************************************/
 #ifndef _ANIMATION_CLOCK_FLICKER_H_
 #define _ANIMATION_CLOCK_FLICKER_H_
@@ -28,7 +28,7 @@
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
 /* AnimationClockFlicker configuration parameter */
-#define ANIMATION_CLOCK_FLICKER_COUNTER_INIT_VALUE          5
+#define ANIMATION_CLOCK_FLICKER_COUNTER_INIT_VALUE          4
 
 /* AnimationClockFlicker parameter */
 
@@ -48,8 +48,8 @@ class AnimationClockFlicker : public AnimationClockCommon
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-  
-  
+
+
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
@@ -58,13 +58,12 @@ class AnimationClockFlicker : public AnimationClockCommon
     byte Hour;
     boolean isClockSet;
     byte FlickerCounter;
-    byte DisplayBrightness;
 
     // functions
     void reset();
     void clearTimeTask();
     void setTimeTask();
-  
+
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/

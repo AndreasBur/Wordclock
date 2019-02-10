@@ -28,7 +28,7 @@
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
 /* AnimationClockFlicker configuration parameter */
-#define ANIMATION_CLOCK_FLICKER_COUNTER_INIT_VALUE          10
+#define ANIMATION_CLOCK_FLICKER_COUNTER_INIT_VALUE          4
 
 /* AnimationClockFlicker parameter */
 
@@ -58,7 +58,6 @@ class AnimationClockFlicker : public AnimationClockCommon
     byte Hour;
     boolean isClockSet;
     byte FlickerCounter;
-    byte DisplayBrightness;
 
     // functions
     void reset();

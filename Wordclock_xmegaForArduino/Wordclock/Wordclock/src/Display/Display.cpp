@@ -53,6 +53,9 @@
  *  \return         -
 ******************************************************************************************************************************************************/
 Display::Display(PixelColorType sColor)
+#if (WS2812_IS_SINGLETON == STD_OFF)
+: Pixels()
+#endif
 {
     Color = sColor;
     State = STATE_UNINIT;
@@ -78,6 +81,9 @@ Display::Display(PixelColorType sColor)
  *  \return         -
 ******************************************************************************************************************************************************/
 Display::Display(byte Red, byte Green, byte Blue)
+#if (WS2812_IS_SINGLETON == STD_OFF)
+: Pixels()
+#endif
 {
     Color.Red = Red;
     Color.Green = Green;
@@ -137,13 +143,9 @@ void Display::setBrightness(byte sBrightness)
     ColorDimmed.Green = dimmColor(Color.Green);
     ColorDimmed.Blue = dimmColor(Color.Blue);
 
-    if(Brightness == 0) {
-        Pixels.clearPixels();
-    } else {
-        for(byte Index = 0; Index < DISPLAY_NUMBER_OF_PIXELS; Index++) {
-            // update all pixels to new brightness
-            if(getPixelFast(Index)) { setPixelFast(Index); }
-        }
+    for(byte Index = 0; Index < DISPLAY_NUMBER_OF_PIXELS; Index++) {
+        // update all pixels to new brightness
+        if(getPixelFast(Index)) { setPixelFast(Index); }
     }
 } /* setBrightness */
 #endif
@@ -536,7 +538,7 @@ stdReturnType Display::togglePixel(byte Column, byte Row)
 #else
     byte Index = (Row * DISPLAY_NUMBER_OF_COLUMNS) + Column;
     getPixel(Index, &Pixel);
-    if(Pixel) { return Pixels.clearPixel(Index); }
+    if(Pixel) { return clearPixel(Index); }
     else { return setPixel(Index); }
 #endif
 } /* togglePixel */

@@ -63,7 +63,7 @@ const GammaCorrection::Gamma7TableElementType GammaCorrection::Gamma7Table[] PRO
  *****************************************************************************************************************************************************/
 byte GammaCorrection::calcGamma7CorrectionValue(byte ValueLinear)
 {
-    Gamma7TableElementType Exponent = getGamma7TableElement(ValueLinear % GAMMA_CORRECTION_GAMMA7_TABLE_NUMBER_OF_VALUES);
+    Gamma7TableElementType Exponent = getGamma7TableElement(ValueLinear);
     return Exponent >> (7 - (ValueLinear / GAMMA_CORRECTION_GAMMA7_TABLE_NUMBER_OF_VALUES));
 } /* calcGamma7CorrectionValue */
 

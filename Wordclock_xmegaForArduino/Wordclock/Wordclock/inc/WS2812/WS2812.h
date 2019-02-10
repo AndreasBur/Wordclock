@@ -9,9 +9,9 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       WS2812.h
- *      \brief      
+ *      \brief      Main header file of WS2812 library
  *
- *      \details    
+ *      \details    Arduino library to control WS2812 based LEDs
  *                  
 ******************************************************************************************************************************************************/
 #ifndef _WS2812_H_
@@ -35,7 +35,7 @@
 
 
 /* WS2812 parameter */
-
+#define WS2812_IS_SINGLETON							STD_ON
 
 
 /******************************************************************************************************************************************************
@@ -128,8 +128,13 @@ class WS2812
     void dimmPixels(pPixelsType pPixels) const;
     PixelType dimmPixel(PixelType Pixel) const { return dimmPixel(Pixel.Red, Pixel.Green, Pixel.Blue); }
     PixelType dimmPixel(byte, byte, byte) const;
-    byte dimmColor(byte Color) const { return (Color * Brightness) >> 8; }
-    void copyNextFrameToCurrentFrameDimmed();
+	void copyNextFrameToCurrentFrameDimmed();
+    
+	byte dimmColor(byte Color) const {
+	    byte dimmedColor = (Color * Brightness) >> 8;
+	    if(dimmedColor == 0) return 1;
+	    else return dimmedColor;
+    }
 #endif
 
 /******************************************************************************************************************************************************
@@ -183,6 +188,8 @@ class WS2812
     stdReturnType clearPixel(IndexType Index);
     void clearPixelFast(IndexType Index) { (*pNextFrame)[Index].clearPixel(); }
     void clearPixels() { for(IndexType Index = 0; Index < WS2812_NUMBER_OF_LEDS; Index++) clearPixelFast(Index); }
+	void enblePixels() { switchPixelsBufferPointer(); show(); }
+	void disablePixels() { switchPixelsBufferPointer(); clearPixels(); startDmaTransfer(pNextFrame); };
 
     // friend functions
     friend void dmaIsr();

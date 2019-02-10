@@ -33,8 +33,11 @@
 /* Display configuration parameter */
 #define DISPLAY_DATA_PIN                        10
 #define DISPLAY_LED_STRIPE_SERPENTINE           STD_OFF
-#define DISPLAY_USE_WS2812_DIMMING              STD_ON
-//#define Pixels                                  WS2812::getInstance()
+#define DISPLAY_USE_WS2812_DIMMING              STD_OFF
+
+#if (WS2812_IS_SINGLETON == STD_ON)
+    #define Pixels                              WS2812::getInstance()
+#endif
 
 #if (DISPLAY_USE_WS2812_DIMMING == STD_ON) && (WS2812_SUPPORT_DIMMING == STD_OFF)
     #error "Display: Please activate WS2812 dimming support"
@@ -105,7 +108,9 @@ class Display
 ******************************************************************************************************************************************************/
   private:
     StateType State;
+#if (WS2812_IS_SINGLETON == STD_OFF)
     Stripe Pixels;
+#endif
     PixelColorType Color;
     DisplayWords Words;
 
@@ -120,7 +125,11 @@ class Display
     byte transformToSerpentine(byte) const;
 
 #if (DISPLAY_USE_WS2812_DIMMING == STD_OFF)
-    byte dimmColor(byte Color) const { return (Color * Brightness) >> 8; }
+    byte dimmColor(byte Color) const {
+		byte dimmedColor = (Color * Brightness) >> 8;
+		if(dimmedColor == 0) return 1;
+		else return dimmedColor;
+	}
 #endif
 
 /******************************************************************************************************************************************************
@@ -206,6 +215,8 @@ class Display
     // methods
     void init();
     void show() { Pixels.show(); }
+	void enable() { Pixels.enablePixels(); }
+	void disable() { Pixels.disablePixels(); }
     void test();
     void clear() { Pixels.clearPixels(); }
     void indexToColumnAndRow(byte Index, byte& Column, byte& Row) const { Row = Index / DISPLAY_NUMBER_OF_COLUMNS; Column = Index % DISPLAY_NUMBER_OF_COLUMNS; }

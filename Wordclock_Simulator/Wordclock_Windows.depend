@@ -18041,7 +18041,7 @@
 	"AnimationClockCube.h"
 	"AnimationClockFlicker.h"
 
-1549575263 c:\users\aburn\documents\github\wordclock\wordclock_simulator\arduino\inc\display\display.h
+1549812310 c:\users\aburn\documents\github\wordclock\wordclock_simulator\arduino\inc\display\display.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"WS2812.h"
@@ -18049,10 +18049,10 @@
 	"DisplayWords.h"
 	"GammaCorrection.h"
 
-1549575252 c:\users\aburn\documents\github\wordclock\wordclock_simulator\include\ws2812.h
+1549812323 c:\users\aburn\documents\github\wordclock\wordclock_simulator\include\ws2812.h
 	"Simulator.h"
 
-1549570976 c:\users\aburn\documents\github\wordclock\wordclock_simulator\include\simulator.h
+1549811756 c:\users\aburn\documents\github\wordclock\wordclock_simulator\include\simulator.h
 	<wx/wx.h>
 	<wx/button.h>
 	<wx/statline.h>
@@ -18149,7 +18149,7 @@
 	"AnimationClockCommon.h"
 	"Clock.h"
 
-1549577112 c:\users\aburn\documents\github\wordclock\wordclock_simulator\arduino\inc\animation\clock\animationclockflicker.h
+1549811165 c:\users\aburn\documents\github\wordclock\wordclock_simulator\arduino\inc\animation\clock\animationclockflicker.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"AnimationClockCommon.h"
@@ -18226,7 +18226,7 @@
 1533491010 source:c:\users\aburn\documents\github\wordclock\wordclock_simulator\arduino\src\animation\clock\animationclockfade.cpp
 	"AnimationClockFade.h"
 
-1549570976 source:c:\users\aburn\documents\github\wordclock\wordclock_simulator\arduino\src\animation\clock\animationclockflicker.cpp
+1549811355 source:c:\users\aburn\documents\github\wordclock\wordclock_simulator\arduino\src\animation\clock\animationclockflicker.cpp
 	"AnimationClockFlicker.h"
 
 1532456643 source:c:\users\aburn\documents\github\wordclock\wordclock_simulator\arduino\src\animation\clock\animationclockshift.cpp
@@ -18244,7 +18244,7 @@
 1549570976 source:c:\users\aburn\documents\github\wordclock\wordclock_simulator\arduino\src\clock\clock.cpp
 	"Clock.h"
 
-1549577851 source:c:\users\aburn\documents\github\wordclock\wordclock_simulator\arduino\src\display\display.cpp
+1549812657 source:c:\users\aburn\documents\github\wordclock\wordclock_simulator\arduino\src\display\display.cpp
 	"Display.h"
 	"WordclockIcon.xpm"
 

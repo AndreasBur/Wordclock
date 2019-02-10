@@ -52,7 +52,12 @@
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-Display::Display(PixelColorType sColor) : Pixels()
+Display::Display(PixelColorType sColor)
+#ifdef SIMULATOR
+: Pixels(0L, _("Wordclock Simulator"))
+#elif (WS2812_IS_SINGLETON == STD_OFF)
+: Pixels()
+#endif
 {
     Color = sColor;
     State = STATE_UNINIT;
@@ -77,7 +82,12 @@ Display::Display(PixelColorType sColor) : Pixels()
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-Display::Display(byte Red, byte Green, byte Blue) : Pixels()
+Display::Display(byte Red, byte Green, byte Blue)
+#ifdef SIMULATOR
+: Pixels(0L, _("Wordclock Simulator"))
+#elif (WS2812_IS_SINGLETON == STD_OFF)
+: Pixels()
+#endif
 {
     Color.Red = Red;
     Color.Green = Green;
@@ -137,13 +147,9 @@ void Display::setBrightness(byte sBrightness)
     ColorDimmed.Green = dimmColor(Color.Green);
     ColorDimmed.Blue = dimmColor(Color.Blue);
 
-    if(Brightness == 0) {
-        Pixels.clearPixels();
-    } else {
-        for(byte Index = 0; Index < DISPLAY_NUMBER_OF_PIXELS; Index++) {
-            // update all pixels to new brightness
-            if(getPixelFast(Index)) { setPixelFast(Index); }
-        }
+    for(byte Index = 0; Index < DISPLAY_NUMBER_OF_PIXELS; Index++) {
+        // update all pixels to new brightness
+        if(getPixelFast(Index)) { setPixelFast(Index); }
     }
 } /* setBrightness */
 #endif
@@ -244,7 +250,7 @@ void Display::clearWordFast(WordIdType WordId)
 
 
 /******************************************************************************************************************************************************
-  clearAllWords()
+  clearWords()
 ******************************************************************************************************************************************************/
 /*! \brief
  *  \details
@@ -259,11 +265,11 @@ stdReturnType Display::clearWords()
         if(clearWord((WordIdType) i) == E_NOT_OK) ReturnValue = E_NOT_OK;
     }
     return ReturnValue;
-} /* clearAllWords */
+} /* clearWords */
 
 
 /******************************************************************************************************************************************************
-  clearAllWordsFast()
+  clearWordsFast()
 ******************************************************************************************************************************************************/
 /*! \brief
  *  \details
@@ -273,7 +279,7 @@ stdReturnType Display::clearWords()
 void Display::clearWordsFast()
 {
     for(byte i = DisplayWords::WORD_ES; i < DisplayWords::WORD_NUMBER_OF_WORDS; i++) clearWordFast((WordIdType) i);
-} /* clearAllWordsFast */
+} /* clearWordsFast */
 
 
 /******************************************************************************************************************************************************

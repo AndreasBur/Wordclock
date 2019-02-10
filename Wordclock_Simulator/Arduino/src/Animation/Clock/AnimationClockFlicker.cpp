@@ -97,7 +97,6 @@ stdReturnType AnimationClockFlicker::setClock(byte sHour, byte sMinute)
     if(sHour < CLOCK_NUMBER_OF_HOURS_PER_DAY && sMinute < CLOCK_NUMBER_OF_MINUTES_PER_HOUR) {
         Hour = sHour;
         Minute = sMinute;
-        DisplayBrightness = pDisplay->getBrightness();
         State = STATE_CLEAR_TIME;
         ReturnValue = E_OK;
     }
@@ -155,9 +154,9 @@ void AnimationClockFlicker::clearTimeTask()
     isClockSet = !isClockSet;
 
     if(isClockSet) {
-        pDisplay->setBrightness(0);
+        pDisplay->disable();
     } else {
-        pDisplay->setBrightness(DisplayBrightness);
+        pDisplay->enable();
     }
 
     if(FlickerCounter-- <= 0) State = STATE_SET_TIME;
@@ -174,6 +173,7 @@ void AnimationClockFlicker::clearTimeTask()
 ******************************************************************************************************************************************************/
 void AnimationClockFlicker::setTimeTask()
 {
+    pDisplay->clear();
     pClock->setClockFast(Hour, Minute);
     State = STATE_IDLE;
     reset();

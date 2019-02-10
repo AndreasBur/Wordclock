@@ -46,6 +46,8 @@ class Simulator : public wxFrame
 
         // methods
         void init(byte sPin) { Pin = sPin; }
+        void enablePixels() { setBrightness(255); }
+        void disablePixels() { setBrightness(0); }
         void clearPixels();
         //void setAllPixels(PixelType) {}
         //stdReturnType clearPixel(byte Index) { return setPixel(Index, 0, 0, 0); }
