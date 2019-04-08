@@ -184,7 +184,7 @@ stdReturnType Clock::getClockWords(byte Hour, byte Minute, ClockWords& ClockWord
         MinutesTableElementType MinutesTableElement = getMinutesTableElement(Minute);
         Hour = transformFrom24hTo12hFormat(Hour);
         // correct the hour offset from the minutes and take care of overflow
-        Hour = (Hour + MinutesTableElement.HourOffset) % CLOCK_NUMBER_OF_HOURS;                             
+        Hour = (Hour + MinutesTableElement.HourOffset) % CLOCK_NUMBER_OF_HOURS;
 
         ClockWords.setHourWords(getHoursTableElement(MinutesTableElement.HourMode, Hour));
         ClockWords.setMinuteWords(MinutesTableElement.Words);

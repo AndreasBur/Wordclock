@@ -12,7 +12,7 @@
  *      \brief      Main header file of standard types library
  *
  *      \details    Library with standard types
- *                  
+ *
  *
 ******************************************************************************************************************************************************/
 #ifndef _STANDARD_TYPES_H_
@@ -63,7 +63,7 @@
 /* toggle bit */
 #define TOGGLE_BIT(Var, Bit) \
     ((Var) ^= (UINT64_C(1) << (Bit)))
-    
+
 /* read bit */
 #define READ_BIT(Var, Bit) \
     (((Var) & (UINT64_C(1) << (Bit))) >> (Bit))
@@ -159,28 +159,28 @@ inline VarType toggleBit(VarType Var, uint8_t Bit)
 
 /* read bit */
 template <typename VarType>
-inline boolean readBit(VarType Var, uint8_t Bit)
+inline bool readBit(VarType Var, uint8_t Bit)
 {
     return (Var & (UINT64_C(1) << Bit)) >> Bit;
 }
 
 /* write bit */
 template <typename VarType>
-inline VarType writeBit(VarType Var, uint8_t Bit, boolean Value)
+inline VarType writeBit(VarType Var, uint8_t Bit, bool Value)
 {
     return Var & ~(UINT64_C(1) << Bit) | (Value << Bit);
 }
 
 /* is bit set */
 template <typename VarType>
-inline boolean isBitSet(VarType Var, uint8_t Bit)
+inline bool isBitSet(VarType Var, uint8_t Bit)
 {
     return Var & (UINT64_C(1) << Bit);
 }
 
 /* is bit cleared */
 template <typename VarType>
-inline boolean isBitCleared(VarType Var, uint8_t Bit)
+inline bool isBitCleared(VarType Var, uint8_t Bit)
 {
     return !isBitSet(Var, Bit);
 }

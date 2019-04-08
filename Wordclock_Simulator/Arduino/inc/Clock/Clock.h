@@ -122,8 +122,7 @@ class Clock
     }
 
     byte transformFrom24hTo12hFormat(byte Hour) const {
-        if(Hour >= CLOCK_NUMBER_OF_HOURS) Hour -= CLOCK_NUMBER_OF_HOURS;
-        return Hour;
+        return Hour % CLOCK_NUMBER_OF_HOURS;
     }
 
 /******************************************************************************************************************************************************

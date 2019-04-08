@@ -6115,14 +6115,14 @@
 	"Arduino.h"
 	"Display.h"
 
-1518166269 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\standardtypes\standardtypes.h
+1549897085 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\standardtypes\standardtypes.h
 	<stdint.h>
 	"Arduino.h"
 
 1549544366 c:\users\virskl\documents\github\wordclock\wordclock_simulator\include\arduino.h
 	<string.h>
 
-1549544191 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\display\display.h
+1549874578 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\display\display.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"WS2812.h"
@@ -6139,10 +6139,10 @@
 	"Arduino.h"
 	"DisplayWord.h"
 
-1549542185 c:\users\virskl\documents\github\wordclock\wordclock_simulator\include\ws2812.h
+1549874578 c:\users\virskl\documents\github\wordclock\wordclock_simulator\include\ws2812.h
 	"Simulator.h"
 
-1549544470 c:\users\virskl\documents\github\wordclock\wordclock_simulator\include\simulator.h
+1549874578 c:\users\virskl\documents\github\wordclock\wordclock_simulator\include\simulator.h
 	<wx/wx.h>
 	<wx/button.h>
 	<wx/statline.h>
@@ -6153,7 +6153,7 @@
 1502185858 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\resource.rc
 	"wx/msw/wx.rc"
 
-1549544516 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\src\simulator.cpp
+1549874578 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\src\simulator.cpp
 	"Simulator.h"
 	"WS2812.h"
 
@@ -6174,7 +6174,7 @@
 	"AnimationClock.h"
 	"Transformation.h"
 
-1549541449 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\clock\clock.h
+1549897230 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\clock\clock.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"Display.h"
@@ -6187,7 +6187,7 @@
 	"AnimationClock.h"
 	"AnimationFont.h"
 
-1549548100 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\wordclockmain.cpp
+1549874578 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\wordclockmain.cpp
 	"wx_pch.h"
 	"WordclockMain.h"
 
@@ -6200,7 +6200,7 @@
 1549550283 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\clock\clock.cpp
 	"Clock.h"
 
-1549544159 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\display\display.cpp
+1549874578 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\display\display.cpp
 	"Display.h"
 	"WordclockIcon.xpm"
 
@@ -15332,7 +15332,7 @@
 	"AnimationClockCommon.h"
 	"Clock.h"
 
-1533129839 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\animation\clock\animationclockflicker.h
+1549874578 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\animation\clock\animationclockflicker.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"AnimationClockCommon.h"
@@ -15340,7 +15340,7 @@
 1532522009 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\clock\animationclockcube.cpp
 	"AnimationClockCube.h"
 
-1533129899 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\clock\animationclockflicker.cpp
+1549874578 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\clock\animationclockflicker.cpp
 	"AnimationClockFlicker.h"
 
 1532549461 c:\users\andreas\documents\github\wordclock\wordclock_simulator\arduino\inc\animation\clock\animationclockcube.h
@@ -18000,7 +18000,7 @@
 	"array"
 	"DisplayWords.h"
 
-1535529158 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\gammacorrection\gammacorrection.h
+1549874578 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\gammacorrection\gammacorrection.h
 	"StandardTypes.h"
 	"Arduino.h"
 
@@ -18307,5 +18307,8 @@
 	"ClockWords.h"
 
 1549572147 source:c:\users\aburn\documents\github\wordclock\wordclock_simulator\arduino\src\gammacorrection\gammacorrection.cpp
+	"GammaCorrection.h"
+
+1549874578 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\gammacorrection\gammacorrection.cpp
 	"GammaCorrection.h"
 
