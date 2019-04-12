@@ -204,6 +204,7 @@
       <Value>../inc/Font</Value>
       <Value>%24(PackRepoDir)\atmel\XMEGAE_DFP\1.2.51\include</Value>
       <Value>../inc/GammaCorrection</Value>
+      <Value>../inc/BH1750</Value>
     </ListValues>
   </avrgcc.compiler.directories.IncludePaths>
   <avrgcc.compiler.optimization.level>Optimize for size (-Os)</avrgcc.compiler.optimization.level>
@@ -240,6 +241,7 @@
       <Value>../../ArduinoCore/include/util/STL_C++XX_stdfloat</Value>
       <Value>../../ArduinoCore/include/util/utility</Value>
       <Value>../inc/GammaCorrection</Value>
+      <Value>../inc/BH1750</Value>
     </ListValues>
   </avrgcccpp.compiler.directories.IncludePaths>
   <avrgcccpp.compiler.optimization.level>Optimize for size (-Os)</avrgcccpp.compiler.optimization.level>
@@ -304,6 +306,9 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="inc\Animation\Clock\AnimationClockWipe.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="inc\BH1750\BH1750.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="inc\Clock\Clock.h">
@@ -402,6 +407,9 @@
     <Compile Include="src\Animation\Clock\AnimationClockWipe.cpp">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="src\BH1750\BH1750.cpp">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="src\Clock\Clock.cpp">
       <SubType>compile</SubType>
     </Compile>
@@ -462,6 +470,7 @@
     <Folder Include="inc\Animation" />
     <Folder Include="inc\Font" />
     <Folder Include="inc\GammaCorrection" />
+    <Folder Include="inc\BH1750" />
     <Folder Include="inc\Transformation" />
     <Folder Include="inc\WS2812" />
     <Folder Include="inc\StandardTypes" />
@@ -472,6 +481,7 @@
     <Folder Include="src\Animation" />
     <Folder Include="src\Font" />
     <Folder Include="src\GammaCorrection" />
+    <Folder Include="src\BH1750" />
     <Folder Include="src\Transformation" />
     <Folder Include="src\WS2812" />
   </ItemGroup>
