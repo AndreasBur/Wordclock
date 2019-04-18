@@ -226,6 +226,7 @@
     <ListValues>
       <Value>%24(ProjectDir)\..\ArduinoCore\include\core</Value>
       <Value>%24(ProjectDir)\..\ArduinoCore\include\variants\standard</Value>
+      <Value>%24(ProjectDir)\..\ArduinoCore\include\libraries\XWire</Value>
       <Value>../inc/Display</Value>
       <Value>../inc/StandardTypes</Value>
       <Value>../inc/WS2812</Value>

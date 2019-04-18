@@ -28,7 +28,7 @@
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
 /* BH1750 configuration parameter */
-
+#define BH1750_I2C_ADDR                             0x76u
 
 /* BH1750 parameter */
 #define BH1750_REG_MT_MIN_VALUE                     31u
@@ -47,7 +47,7 @@
 #define BH1750_CMD_ONE_TIME_HIGH_RES_MODE_2         0b00100001
 #define BH1750_CMD_ONE_TIME_LOW_RES_MODE            0b00100011
 
-
+#define BH1750_ILLUMINANCE_RAW_VALUE_DIVIDER                1.2
 
 /******************************************************************************************************************************************************
  *  G L O B A L   F U N C T I O N   M A C R O S
@@ -63,7 +63,8 @@ class BH1750
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-    enum Mode {
+    enum ModeType {
+        MODE_NONE,
         MODE_CONTINUOUS_LOW_RES_MODE = BH1750_CMD_CONTINUOUS_LOW_RES_MODE,
         MODE_CONTINUOUS_HIGH_RES_MODE = BH1750_CMD_CONTINUOUS_HIGH_RES_MODE,
         MODE_CONTINUOUS_HIGH_RES_MODE_2 = BH1750_CMD_CONTINUOUS_HIGH_RES_MODE_2,
@@ -76,7 +77,21 @@ class BH1750
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
-  Wire.
+    ModeType Mode;
+    uint16_t Illuminance;
+
+    // functions
+    uint16_t readIlluminance();
+    void sendModeForOneTimeMode();
+    stdReturnType sendMode();
+
+    uint16_t convertRawToLux(uint16_t IlluminanceRaw) {
+        return IlluminanceRaw / BH1750_ILLUMINANCE_RAW_VALUE_DIVIDER;
+    }
+
+    uint16_t combineRawValueParts(byte HighByte, byte LowByte) {
+        static_cast<uint16_t>(HighByte) << 8 | LowByte;
+    }
   
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
@@ -86,12 +101,15 @@ class BH1750
     ~BH1750();
 
 	// get methods
-    uint8_t test = BH1750_CMD_POWER_DOWN;
+    ModeType getMode() const { return Mode; }
+    uint16_t getIlluminance() const { return Illuminance; }
 
 	// set methods
+    stdReturnType setMode(ModeType);
 
 	// methods
-    void init();
+    stdReturnType init(ModeType Mode);
+    void task();
 };
 
 #endif
