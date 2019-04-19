@@ -34,13 +34,11 @@
 #define BH1750_MT_REG_VALUE_LOW_BITS_GM                     0b11111
 #define BH1750_MT_REG_VALUE_LOW_BITS_GP                     0
 
-#define BH1750_MT_CMD_HIGH_BITS_GM                          0b11111
-#define BH1750_MT_CMD_HIGH_BITS_GP                          3
-#define BH1750_MT_CMD_HIGH_BITS                             0b01000
+#define BH1750_MT_CMD_HIGH_BITS_GM                          0b111
+#define BH1750_MT_CMD_HIGH_BITS_GP                          0
 
-#define BH1750_MT_CMD_LOW_BITS_GM                           0b111
-#define BH1750_MT_CMD_LOW_BITS_GP                           5
-#define BH1750_MT_CMD_LOW_BITS                              0b011
+#define BH1750_MT_CMD_LOW_BITS_GM                           0b11111
+#define BH1750_MT_CMD_LOW_BITS_GP                           0
 
 /******************************************************************************************************************************************************
  *  L O C A L   F U N C T I O N   M A C R O S
@@ -145,12 +143,20 @@ stdReturnType BH1750::changeMeasurementTime(byte MTRegValue)
     stdReturnType ReturnValue = E_NOT_OK;
 
     if(isMTRegValueInRange(MTRegValue)) {
-        
-        byte MTRegHighBits = 
-        
-        ReturnValue = E_OK;
-
-
+        byte MTRegValueHighBits = readBitGroup(MTRegValue, BH1750_MT_REG_VALUE_HIGH_BITS_GM, BH1750_MT_REG_VALUE_HIGH_BITS_GP);
+		byte MTRegValueLowBits = readBitGroup(MTRegValue, BH1750_MT_REG_VALUE_LOW_BITS_GM, BH1750_MT_REG_VALUE_LOW_BITS_GP);
+		
+		ReturnValue = E_OK;
+		
+		byte CmdCMTHighBitsWithValue = BH1750_CMD_CHANGE_MEASUREMENT_TIME_HIGH_BITS;
+		writeBitGroup(CmdCMTHighBitsWithValue, BH1750_MT_CMD_HIGH_BITS_GM, BH1750_MT_CMD_HIGH_BITS_GP, MTRegValueHighBits);
+		
+		byte CmdCMTLowBitsWithValue = BH1750_CMD_CHANGE_MEASUREMENT_TIME_LOW_BITS;
+		writeBitGroup(CmdCMTLowBitsWithValue, BH1750_MT_CMD_LOW_BITS_GM, BH1750_MT_CMD_LOW_BITS_GP, MTRegValueLowBits);
+       
+	    if(sendCommand(CmdCMTHighBitsWithValue) == E_NOT_OK) { ReturnValue = E_NOT_OK; }
+		if(sendCommand(CmdCMTLowBitsWithValue) == E_NOT_OK) { ReturnValue = E_NOT_OK; }
+		if(sendMode() == E_NOT_OK) { ReturnValue = E_NOT_OK; }
     }
 
     return ReturnValue;
@@ -173,7 +179,7 @@ stdReturnType BH1750::changeMeasurementTime(byte MTRegValue)
 stdReturnType BH1750::readIlluminance()
 {
     stdReturnType ReturnValue = E_NOT_OK;
-    uint8_t LowByte, HighByte;
+    byte LowByte, HighByte;
 
     Wire.requestFrom(BH1750_I2C_ADDR, BH1750_ILLUMINANCE_RAW_VALUE_NUMBER_OF_BYTES);
     
@@ -209,19 +215,18 @@ void BH1750::sendModeForOneTimeMode()
     }
 }
 
-
 /******************************************************************************************************************************************************
-  sendMode()
+  sendCommand()
 ******************************************************************************************************************************************************/
 /*! \brief          
  *  \details        
  *                  
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType BH1750::sendMode()
+stdReturnType BH1750::sendCommand(byte Command)
 {
         Wire.beginTransmission(static_cast<uint8_t>(BH1750_I2C_ADDR));
-        Wire.write(Mode);
+        Wire.write(Command);
         if(Wire.endTransmission() == E_OK) { return E_OK; }
         else { return E_NOT_OK; }
 }

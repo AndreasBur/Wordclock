@@ -28,26 +28,29 @@
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
 /* BH1750 configuration parameter */
-#define BH1750_I2C_ADDR                             0x76u
+#define BH1750_I2C_ADDR									0x76u
 
 /* BH1750 parameter */
-#define BH1750_REG_MT_MIN_VALUE                     31u
-#define BH1750_REG_MT_MAX_VALUE                     254u
-#define BH1750_REG_MT_DEFAULT_VALUE                 69u
+#define BH1750_REG_MT_MIN_VALUE							31u
+#define BH1750_REG_MT_MAX_VALUE							254u
+#define BH1750_REG_MT_DEFAULT_VALUE						69u
 
-#define BH1750_CMD_POWER_DOWN                       0b0000000
-#define BH1750_CMD_POWER_ON                         0b0000001
-#define BH1750_CMD_RESET                            0b0000111
+#define BH1750_CMD_POWER_DOWN							0b00000000
+#define BH1750_CMD_POWER_ON								0b00000001
+#define BH1750_CMD_RESET								0b00000111
 
-#define BH1750_CMD_CONTINUOUS_HIGH_RES_MODE         0b00010000
-#define BH1750_CMD_CONTINUOUS_HIGH_RES_MODE_2       0b00010001
-#define BH1750_CMD_CONTINUOUS_LOW_RES_MODE          0b00010011
+#define BH1750_CMD_CONTINUOUS_HIGH_RES_MODE				0b00010000
+#define BH1750_CMD_CONTINUOUS_HIGH_RES_MODE_2			0b00010001
+#define BH1750_CMD_CONTINUOUS_LOW_RES_MODE				0b00010011
 
-#define BH1750_CMD_ONE_TIME_HIGH_RES_MODE           0b00100000
-#define BH1750_CMD_ONE_TIME_HIGH_RES_MODE_2         0b00100001
-#define BH1750_CMD_ONE_TIME_LOW_RES_MODE            0b00100011
+#define BH1750_CMD_ONE_TIME_HIGH_RES_MODE				0b00100000
+#define BH1750_CMD_ONE_TIME_HIGH_RES_MODE_2				0b00100001
+#define BH1750_CMD_ONE_TIME_LOW_RES_MODE				0b00100011
 
-#define BH1750_ILLUMINANCE_RAW_VALUE_DIVIDER        1.2
+#define BH1750_CMD_CHANGE_MEASUREMENT_TIME_HIGH_BITS	0b01000000
+#define BH1750_CMD_CHANGE_MEASUREMENT_TIME_LOW_BITS     0b01100000
+
+#define BH1750_ILLUMINANCE_RAW_VALUE_DIVIDER			1.2
 
 /******************************************************************************************************************************************************
  *  G L O B A L   F U N C T I O N   M A C R O S
@@ -83,19 +86,12 @@ class BH1750
     // functions
     stdReturnType readIlluminance();
     void sendModeForOneTimeMode();
-    stdReturnType sendMode();
+	stdReturnType sendCommand(byte);
 
-    uint16_t convertRawToLux(uint16_t IlluminanceRaw) {
-        return IlluminanceRaw / BH1750_ILLUMINANCE_RAW_VALUE_DIVIDER;
-    }
-
-    uint16_t combineRawValueParts(byte HighByte, byte LowByte) {
-        return static_cast<uint16_t>(HighByte) << 8 | LowByte;
-    }
-
-    bool isMTRegValueInRange(byte MTRegValue) {
-        return (MTRegValue <= BH1750_REG_MT_MAX_VALUE && MTRegValue >= BH1750_REG_MT_MIN_VALUE);
-    }
+	stdReturnType sendMode() { return sendCommand(Mode); }
+    uint16_t convertRawToLux(uint16_t IlluminanceRaw) { return IlluminanceRaw / BH1750_ILLUMINANCE_RAW_VALUE_DIVIDER; }
+    uint16_t combineRawValueParts(byte HighByte, byte LowByte) { return static_cast<uint16_t>(HighByte) << 8 | LowByte; }
+    bool isMTRegValueInRange(byte MTRegValue) { return (MTRegValue <= BH1750_REG_MT_MAX_VALUE && MTRegValue >= BH1750_REG_MT_MIN_VALUE); }
   
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
