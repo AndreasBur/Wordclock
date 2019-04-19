@@ -28,6 +28,20 @@
 ******************************************************************************************************************************************************/
 #define BH1750_ILLUMINANCE_RAW_VALUE_NUMBER_OF_BYTES        2
 
+#define BH1750_MT_REG_VALUE_HIGH_BITS_GM                    0b111
+#define BH1750_MT_REG_VALUE_HIGH_BITS_GP                    5
+
+#define BH1750_MT_REG_VALUE_LOW_BITS_GM                     0b11111
+#define BH1750_MT_REG_VALUE_LOW_BITS_GP                     0
+
+#define BH1750_MT_CMD_HIGH_BITS_GM                          0b11111
+#define BH1750_MT_CMD_HIGH_BITS_GP                          3
+#define BH1750_MT_CMD_HIGH_BITS                             0b01000
+
+#define BH1750_MT_CMD_LOW_BITS_GM                           0b111
+#define BH1750_MT_CMD_LOW_BITS_GP                           5
+#define BH1750_MT_CMD_LOW_BITS                              0b011
+
 /******************************************************************************************************************************************************
  *  L O C A L   F U N C T I O N   M A C R O S
 ******************************************************************************************************************************************************/
@@ -111,11 +125,37 @@ stdReturnType BH1750::setMode(ModeType sMode)
     Mode = sMode;
 
     if(Mode != MODE_NONE) {
-        if(sendMode() == E_OK) ReturnValue = E_OK;
+        ReturnValue = sendMode();
     }
 
     return ReturnValue;
 } /* setMode */
+
+
+/******************************************************************************************************************************************************
+  changeMeasurementTime()
+******************************************************************************************************************************************************/
+/*! \brief          
+ *  \details        
+ *                  
+ *  \return         -
+******************************************************************************************************************************************************/
+stdReturnType BH1750::changeMeasurementTime(byte MTRegValue)
+{
+    stdReturnType ReturnValue = E_NOT_OK;
+
+    if(isMTRegValueInRange(MTRegValue)) {
+        
+        byte MTRegHighBits = 
+        
+        ReturnValue = E_OK;
+
+
+    }
+
+    return ReturnValue;
+
+} /* changeMeasurementTime */
 
 
 /******************************************************************************************************************************************************
@@ -130,15 +170,21 @@ stdReturnType BH1750::setMode(ModeType sMode)
  *                  
  *  \return         -
 ******************************************************************************************************************************************************/
-uint16_t BH1750::readIlluminance()
+stdReturnType BH1750::readIlluminance()
 {
+    stdReturnType ReturnValue = E_NOT_OK;
     uint8_t LowByte, HighByte;
 
     Wire.requestFrom(BH1750_I2C_ADDR, BH1750_ILLUMINANCE_RAW_VALUE_NUMBER_OF_BYTES);
-    HighByte = Wire.read();
-    LowByte = Wire.read();
+    
+    if(Wire.available() == BH1750_ILLUMINANCE_RAW_VALUE_NUMBER_OF_BYTES) {
+        ReturnValue = E_OK;
+        HighByte = Wire.read();
+        LowByte = Wire.read();
+        Illuminance = convertRawToLux(combineRawValueParts(HighByte, LowByte));
+    }
 
-    return convertRawToLux(combineRawValueParts(HighByte, LowByte));
+    return ReturnValue;
 }
 
 

@@ -47,7 +47,7 @@
 #define BH1750_CMD_ONE_TIME_HIGH_RES_MODE_2         0b00100001
 #define BH1750_CMD_ONE_TIME_LOW_RES_MODE            0b00100011
 
-#define BH1750_ILLUMINANCE_RAW_VALUE_DIVIDER                1.2
+#define BH1750_ILLUMINANCE_RAW_VALUE_DIVIDER        1.2
 
 /******************************************************************************************************************************************************
  *  G L O B A L   F U N C T I O N   M A C R O S
@@ -81,7 +81,7 @@ class BH1750
     uint16_t Illuminance;
 
     // functions
-    uint16_t readIlluminance();
+    stdReturnType readIlluminance();
     void sendModeForOneTimeMode();
     stdReturnType sendMode();
 
@@ -90,7 +90,11 @@ class BH1750
     }
 
     uint16_t combineRawValueParts(byte HighByte, byte LowByte) {
-        static_cast<uint16_t>(HighByte) << 8 | LowByte;
+        return static_cast<uint16_t>(HighByte) << 8 | LowByte;
+    }
+
+    bool isMTRegValueInRange(byte MTRegValue) {
+        return (MTRegValue <= BH1750_REG_MT_MAX_VALUE && MTRegValue >= BH1750_REG_MT_MIN_VALUE);
     }
   
 /******************************************************************************************************************************************************
@@ -108,7 +112,8 @@ class BH1750
     stdReturnType setMode(ModeType);
 
 	// methods
-    stdReturnType init(ModeType Mode);
+    stdReturnType init(ModeType);
+    stdReturnType changeMeasurementTime(byte);
     void task();
 };
 
