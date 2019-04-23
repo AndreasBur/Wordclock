@@ -61,7 +61,7 @@
 //#define MASTER_SMART_ACK /* uncomment this to use 'smart ack' and not the ISR to generate acks from master */
 //#define MASTER_QUICK_COMMAND /* uncomment this to set the 'quick command' bit in init - this typically screws up though */
 //#define USE_STATIC_PORT_STATE /* uncomment this to pre-allocate buffers for all available TWI; otherwise, use malloc() */
-//#define DEBUG /* uncomment this for debug output - you must implement the debug output functions elsewhere */
+#undef DEBUG /* uncomment this for debug output - you must implement the debug output functions elsewhere */
 
 // NOTE:  'twi.h' includes Arduino.h which includes the correct pins_arduino.h file
 

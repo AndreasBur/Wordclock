@@ -114,10 +114,18 @@ enum stdReturnType {
  *  GLOBAL INLINE FUNCTION PROTOTYPES
 ******************************************************************************************************************************************************/
 template <typename ReturnType, typename BitType> static inline ReturnType bitValue(BitType);
-template <typename ReturnValue, typename LengthType> static inline ReturnValue bitMask(LengthType);
-template <typename VarType, typename MaskType, typename ValType> static inline void writeBitGroup(VarType&, MaskType, MaskType, ValType);
-template <typename VarType, typename MaskType> static inline VarType readBitGroup(VarType, MaskType, MaskType);
-
+template <typename ReturnType, typename LengthType> static inline ReturnType bitMask(LengthType);
+template <typename VarType> static inline VarType setBit(VarType, uint8_t);
+template <typename VarType> static inline VarType clearBit(VarType, uint8_t);
+template <typename VarType> static inline VarType toggleBit(VarType, uint8_t);
+template <typename VarType> static inline boolean readBit(VarType, uint8_t);
+template <typename VarType> static inline VarType writeBit(VarType, uint8_t, boolean);
+template <typename VarType> static inline boolean isBitSet(VarType, uint8_t);
+template <typename VarType> static inline boolean isBitCleared(VarType, uint8_t);
+template <typename VarType, typename PositionType> static inline VarType shiftLeft(VarType, PositionType);
+template <typename VarType, typename PositionType> static inline VarType shiftRight(VarType, PositionType);
+template <typename VarType, typename MaskType, typename GroupType> static inline VarType readBitGroup(VarType, MaskType, GroupType);
+template <typename VarType, typename MaskType, typename GroupType, typename ValType> static inline VarType writeBitGroup(VarType, MaskType, GroupType, ValType);
 
 /******************************************************************************************************************************************************
  *  GLOBAL INLINE FUNCTIONS
@@ -131,84 +139,84 @@ static inline ReturnType bitValue(BitType Bit)
 
 /* bit mask */
 template <typename ReturnType, typename LengthType>
-inline ReturnType bitMask(LengthType Length)
+static inline ReturnType bitMask(LengthType Length)
 {
     return bitValue(Length) - 1;
 }
 
 /* set bit */
 template <typename VarType>
-inline VarType setBit(VarType Var, uint8_t Bit)
+static inline VarType setBit(VarType Var, uint8_t Bit)
 {
     return Var & ~(UINT64_C(1) << Bit);
 }
 
 /* clear bit */
 template <typename VarType>
-inline VarType clearBit(VarType Var, uint8_t Bit)
+static inline VarType clearBit(VarType Var, uint8_t Bit)
 {
     return Var & ~(UINT64_C(1) << Bit);
 }
 
 /* toggle bit */
 template <typename VarType>
-inline VarType toggleBit(VarType Var, uint8_t Bit)
+static inline VarType toggleBit(VarType Var, uint8_t Bit)
 {
     return Var ^ ~(UINT64_C(1) << Bit);
 }
 
 /* read bit */
 template <typename VarType>
-inline boolean readBit(VarType Var, uint8_t Bit)
+static inline boolean readBit(VarType Var, uint8_t Bit)
 {
     return (Var & (UINT64_C(1) << Bit)) >> Bit;
 }
 
 /* write bit */
 template <typename VarType>
-inline VarType writeBit(VarType Var, uint8_t Bit, boolean Value)
+static inline VarType writeBit(VarType Var, uint8_t Bit, boolean Value)
 {
     return Var & ~(UINT64_C(1) << Bit) | (Value << Bit);
 }
 
 /* is bit set */
 template <typename VarType>
-inline boolean isBitSet(VarType Var, uint8_t Bit)
+static inline boolean isBitSet(VarType Var, uint8_t Bit)
 {
     return Var & (UINT64_C(1) << Bit);
 }
 
 /* is bit cleared */
 template <typename VarType>
-inline boolean isBitCleared(VarType Var, uint8_t Bit)
+static inline boolean isBitCleared(VarType Var, uint8_t Bit)
 {
     return !isBitSet(Var, Bit);
 }
 
 /* shift left */
 template <typename VarType, typename PositionType>
-inline VarType shiftLeft(VarType Var, PositionType Position)
+static inline VarType shiftLeft(VarType Var, PositionType Position)
 {
     return Var << Position;
 }
 
 /* shift right */
 template <typename VarType, typename PositionType>
-inline VarType shiftRight(VarType Var, PositionType Position)
+static inline VarType shiftRight(VarType Var, PositionType Position)
 {
     return Var >> Position;
 }
 
 /* read bit group */
 template <typename VarType, typename MaskType, typename GroupType>
-inline VarType readBitGroup(VarType Var, MaskType BitGroupMask, GroupType BitGroupPosition)
+static inline VarType readBitGroup(VarType Var, MaskType BitGroupMask, GroupType BitGroupPosition)
 {
     return ((Var & (static_cast<VarType>(BitGroupMask) << BitGroupPosition)) >> BitGroupPosition);
 }
 
 /* write bit group */
 template <typename VarType, typename MaskType, typename GroupType, typename ValType>
-inline VarType writeBitGroup(VarType Var, MaskType BitGroupMask, GroupType BitGroupPosition, ValType Value)
+static inline VarType writeBitGroup(VarType Var, MaskType BitGroupMask, GroupType BitGroupPosition, ValType Value)
 {
     return (Var & ~(static_cast<VarType>(BitGroupMask) << BitGroupPosition)) | ((VarType)(Value & BitGroupMask) << BitGroupPosition);
 }

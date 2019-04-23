@@ -21,15 +21,25 @@
 extern "C"
 {
 #endif // __cplusplus
-extern void error_print(const char *p1); // TEMPORARY
-extern void error_print_(const char *p1); // TEMPORARY
-extern void error_printH(unsigned long); // TEMPORARY
-extern void error_printH_(unsigned long); // TEMPORARY
-extern void error_printL(unsigned long); // TEMPORARY
-extern void error_printL_(unsigned long); // TEMPORARY
-extern void error_printP(const void * /*PROGMEM*/ p1);  // TEMPORARY
-extern void error_printP_(const void * /*PROGMEM*/ p1);  // TEMPORARY
-extern void DumpHex(void *pBuf, uint8_t nBytes);
+//extern void error_print(const char *p1); // TEMPORARY
+//extern void error_print_(const char *p1); // TEMPORARY
+//extern void error_printH(unsigned long); // TEMPORARY
+//extern void error_printH_(unsigned long); // TEMPORARY
+//extern void error_printL(unsigned long); // TEMPORARY
+//extern void error_printL_(unsigned long); // TEMPORARY
+//extern void error_printP(const void * /*PROGMEM*/ p1);  // TEMPORARY
+//extern void error_printP_(const void * /*PROGMEM*/ p1);  // TEMPORARY
+//extern void DumpHex(void *pBuf, uint8_t nBytes);
+
+#define error_print(p1)
+#define error_print_(p1)
+#define error_printH(X)
+#define error_printH_(X)
+#define error_printL(X)
+#define error_printL_(X)
+#define error_printP(p1)
+#define error_printP_(p1)
+#define DumpHex(X,Y)
 
 #ifdef __cplusplus
 }
