@@ -149,10 +149,10 @@ stdReturnType BH1750::changeMeasurementTime(byte MTRegValue)
 		ReturnValue = E_OK;
 		
 		byte CmdCMTHighBitsWithValue = BH1750_CMD_CHANGE_MEASUREMENT_TIME_HIGH_BITS;
-		CmdCMTHighBitsWithValue = writeBitGroup(CmdCMTHighBitsWithValue, BH1750_MT_CMD_HIGH_BITS_GM, BH1750_MT_CMD_HIGH_BITS_GP, MTRegValueHighBits);
+		writeBitGroup(CmdCMTHighBitsWithValue, BH1750_MT_CMD_HIGH_BITS_GM, BH1750_MT_CMD_HIGH_BITS_GP, MTRegValueHighBits);
 		
 		byte CmdCMTLowBitsWithValue = BH1750_CMD_CHANGE_MEASUREMENT_TIME_LOW_BITS;
-		CmdCMTLowBitsWithValue = writeBitGroup(CmdCMTLowBitsWithValue, BH1750_MT_CMD_LOW_BITS_GM, BH1750_MT_CMD_LOW_BITS_GP, MTRegValueLowBits);
+		writeBitGroup(CmdCMTLowBitsWithValue, BH1750_MT_CMD_LOW_BITS_GM, BH1750_MT_CMD_LOW_BITS_GP, MTRegValueLowBits);
        
 	    if(sendCommand(CmdCMTHighBitsWithValue) == E_NOT_OK) { ReturnValue = E_NOT_OK; }
 		if(sendCommand(CmdCMTLowBitsWithValue) == E_NOT_OK) { ReturnValue = E_NOT_OK; }

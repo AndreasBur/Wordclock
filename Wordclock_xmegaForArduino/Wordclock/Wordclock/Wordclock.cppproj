@@ -205,6 +205,7 @@
       <Value>%24(PackRepoDir)\atmel\XMEGAE_DFP\1.2.51\include</Value>
       <Value>../inc/GammaCorrection</Value>
       <Value>../inc/BH1750</Value>
+      <Value>../inc/Timer</Value>
     </ListValues>
   </avrgcc.compiler.directories.IncludePaths>
   <avrgcc.compiler.optimization.level>Optimize for size (-Os)</avrgcc.compiler.optimization.level>
@@ -243,6 +244,7 @@
       <Value>../../ArduinoCore/include/util/utility</Value>
       <Value>../inc/GammaCorrection</Value>
       <Value>../inc/BH1750</Value>
+      <Value>../inc/Timer</Value>
     </ListValues>
   </avrgcccpp.compiler.directories.IncludePaths>
   <avrgcccpp.compiler.optimization.OtherFlags>-fno-threadsafe-statics</avrgcccpp.compiler.optimization.OtherFlags>
@@ -356,6 +358,9 @@
     <Compile Include="inc\StandardTypes\StandardTypes.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="inc\Timer\Timer.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="inc\Transformation\Transformation.h">
       <SubType>compile</SubType>
     </Compile>
@@ -446,6 +451,9 @@
     <Compile Include="src\GammaCorrection\GammaCorrection.cpp">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="src\Timer\Timer.cpp">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="src\Transformation\Transformation.cpp">
       <SubType>compile</SubType>
     </Compile>
@@ -471,6 +479,7 @@
     <Folder Include="inc\Font" />
     <Folder Include="inc\GammaCorrection" />
     <Folder Include="inc\BH1750" />
+    <Folder Include="inc\Timer" />
     <Folder Include="inc\Transformation" />
     <Folder Include="inc\WS2812" />
     <Folder Include="inc\StandardTypes" />
@@ -482,6 +491,7 @@
     <Folder Include="src\Font" />
     <Folder Include="src\GammaCorrection" />
     <Folder Include="src\BH1750" />
+    <Folder Include="src\Timer" />
     <Folder Include="src\Transformation" />
     <Folder Include="src\WS2812" />
   </ItemGroup>
