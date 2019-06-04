@@ -87,10 +87,10 @@ stdReturnType Timer::init(uint32_t Microseconds, TimerIsrCallbackF_void sTimerOv
     	State = TIMER_STATE_INIT;
 
         /* set mode 7: Dual-slope PWM*/
-        writeBitGroup(TCC4_CTRLB, TC4_WGMODE_gm, TC_WGMODE_DSBOTTOM_gc);
+        writeBitGroup(TIMER_TC.CTRLB, TC4_WGMODE_gm, TC_WGMODE_DSBOTTOM_gc);
     	
     	if(setPeriod(Microseconds) == E_NOT_OK) ReturnValue = E_NOT_OK;
-    	//if(sTimerOverflowCallback != NULL) if(attachInterrupt(sTimerOverflowCallback) == E_NOT_OK) ReturnValue = E_NOT_OK;
+    	if(sTimerOverflowCallback != NULL) if(attachInterrupt(sTimerOverflowCallback) == E_NOT_OK) ReturnValue = E_NOT_OK;
 
     	State = TIMER_STATE_READY;
 	}
@@ -111,13 +111,12 @@ stdReturnType Timer::init(uint32_t Microseconds, TimerIsrCallbackF_void sTimerOv
 stdReturnType Timer::setPeriod(uint32_t Microseconds)
 {
 	stdReturnType ReturnValue = E_NOT_OK;
-	unsigned long TimerCycles;
     
     /* was request out of bounds? */
     if(Microseconds <= ((TIMER_RESOLUTION / (F_CPU / 1000000)) * TIMER_MAX_PRESCALER * 2)) {
         ReturnValue = E_OK;
         /* calculate timer cycles to reach timer period, counter runs backwards after TOP, interrupt is at BOTTOM so divide microseconds by 2 */
-        TimerCycles = (F_CPU / 2000000) * Microseconds;
+        uint32_t TimerCycles = (F_CPU / 2000000) * Microseconds;
         /* calculate timer prescaler */
         if(TimerCycles < TIMER_RESOLUTION)              ClockSelectBitGroup = TIMER_REG_CS_NO_PRESCALER;
         else if((TimerCycles >>= 1) < TIMER_RESOLUTION) ClockSelectBitGroup = TIMER_REG_CS_PRESCALE_2;
@@ -127,18 +126,18 @@ stdReturnType Timer::setPeriod(uint32_t Microseconds)
         else if((TimerCycles >>= 2) < TIMER_RESOLUTION) ClockSelectBitGroup = TIMER_REG_CS_PRESCALE_256;
         else if((TimerCycles >>= 2) < TIMER_RESOLUTION) ClockSelectBitGroup = TIMER_REG_CS_PRESCALE_1024;
         else {
-            /* request was out of bounds, set as maximum */
+            /* request was out of bounds, set to maximum */
             TimerCycles = TIMER_RESOLUTION - 1;
             ClockSelectBitGroup = TIMER_REG_CS_PRESCALE_1024;
             ReturnValue = E_NOT_OK;
         }
         /* Set TOP value of timer */
-        ATOMIC_BLOCK(ATOMIC_RESTORESTATE) { TCC4_PER = TimerCycles; }
+        ATOMIC_BLOCK(ATOMIC_RESTORESTATE) { TIMER_TC.PER = TimerCycles; }
 
         if(TIMER_STATE_RUNNING == State)
         {
-            /* reset clock select register, and starts the clock */
-            writeBitGroup(TCC4_CTRLA, CLK_SCLKSEL_gm, ClockSelectBitGroup << CLK_SCLKSEL_gp);
+            /* reset clock select register, and start the clock */
+            writeBitGroup(TIMER_TC.CTRLA, CLK_SCLKSEL_gm, ClockSelectBitGroup << CLK_SCLKSEL_gp);
         }
     }
 	return ReturnValue;

@@ -6,6 +6,7 @@
 #include "WS2812.h"
 #include "BH1750.h"
 #include <util/delay.h>
+#include "Timer.h"
 
 //volatile uint8_t* const PROGMEM port_to_mode_PGMdfg[] = {
     //NOT_A_PORT,
@@ -62,6 +63,8 @@ void setup() {
     wcDisplay.init();
 
     BH1750 bh1750;
+
+    Timer myTimer;
 
     bh1750.changeMeasurementTime(0b10100111);
     //WS2812::getInstance().setBrightness(0);
