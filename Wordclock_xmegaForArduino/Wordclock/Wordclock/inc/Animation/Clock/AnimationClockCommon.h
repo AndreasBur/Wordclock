@@ -67,8 +67,6 @@ class AnimationClockCommon
 ******************************************************************************************************************************************************/
   protected:
       StateType State;
-      Clock* pClock;
-      Display* pDisplay;
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
@@ -83,8 +81,8 @@ class AnimationClockCommon
 	// set methods
 
 	// methods
-    void init(Display*, Clock*, StateType);
-    void show() { pDisplay->show(); }
+    void init(StateType);
+    void show() { Display::getInstance().show(); }
     boolean isPixelPartOfClockWords(ClockWords::WordsListType, byte, byte) const;
     boolean isPixelPartOfClockWords(ClockWords::WordsListType, byte) const;
     virtual void task() = 0;

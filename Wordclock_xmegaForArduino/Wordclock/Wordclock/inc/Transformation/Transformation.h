@@ -59,20 +59,18 @@ class Transformation
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
-    Display* pDisplay;
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    Transformation(Display*);
+    Transformation();
     ~Transformation();
 
     // get methods
 
 
     // set methods
-    void setDisplay(Display* Display) { pDisplay = Display; }
 
     // methods
     stdReturnType shiftLeft(boolean = false);

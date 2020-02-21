@@ -75,9 +75,9 @@ AnimationClockCube::~AnimationClockCube()
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-void AnimationClockCube::init(Display* Display, Clock* Clock)
+void AnimationClockCube::init()
 {
-    AnimationClockCommon::init(Display, Clock, STATE_IDLE);
+    AnimationClockCommon::init(STATE_IDLE);
     reset();
 } /* init */
 
@@ -94,7 +94,7 @@ stdReturnType AnimationClockCube::setClock(byte Hour, byte Minute)
 {
     stdReturnType ReturnValue{E_NOT_OK};
 
-    if(pClock->getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
+    if(Clock::getInstance().getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
         ReturnValue = E_OK;
         setMaxBorder();
         State = STATE_CLEAR_TIME;
@@ -226,21 +226,21 @@ void AnimationClockCube::clearBorderPixelsWithoutClockPixels()
     for(byte Column = Border.ColumnStart; Column <= Border.ColumnEnd; Column++) {
         if(isPixelPartOfClockWords(ClockWordsTable, Column, Border.RowStart) == false) {
             // clear border top
-            pDisplay->clearPixelFast(Column, Border.RowStart);
+            Display::getInstance().clearPixelFast(Column, Border.RowStart);
         }
         if(isPixelPartOfClockWords(ClockWordsTable, Column, Border.RowEnd) == false) {
             // clear border bottom
-            pDisplay->clearPixelFast(Column, Border.RowEnd);
+            Display::getInstance().clearPixelFast(Column, Border.RowEnd);
         }
     }
     for(byte Row = Border.RowStart; Row <= Border.RowEnd; Row++) {
         if(isPixelPartOfClockWords(ClockWordsTable, Border.ColumnStart, Row) == false) {
             // clear border left
-            pDisplay->clearPixelFast(Border.ColumnStart, Row);
+            Display::getInstance().clearPixelFast(Border.ColumnStart, Row);
         }
         if(isPixelPartOfClockWords(ClockWordsTable, Border.ColumnEnd, Row) == false) {
             // clear border right
-            pDisplay->clearPixelFast(Border.ColumnEnd, Row);
+            Display::getInstance().clearPixelFast(Border.ColumnEnd, Row);
         }
     }
 } /* writeBorderPixels */
@@ -258,15 +258,15 @@ void AnimationClockCube::writeBorderPixels(bool Value)
 {
     for(byte Column = Border.ColumnStart; Column <= Border.ColumnEnd; Column++) {
         // set border top
-        pDisplay->writePixelFast(Column, Border.RowStart, Value);
+        Display::getInstance().writePixelFast(Column, Border.RowStart, Value);
         // set border bottom
-        pDisplay->writePixelFast(Column, Border.RowEnd, Value);
+        Display::getInstance().writePixelFast(Column, Border.RowEnd, Value);
     }
     for(byte Row = Border.RowStart; Row <= Border.RowEnd; Row++) {
         // set border left
-        pDisplay->writePixelFast(Border.ColumnStart, Row, Value);
+        Display::getInstance().writePixelFast(Border.ColumnStart, Row, Value);
         // set border right
-        pDisplay->writePixelFast(Border.ColumnEnd, Row, Value);
+        Display::getInstance().writePixelFast(Border.ColumnEnd, Row, Value);
     }
 } /* writeBorderPixels */
 

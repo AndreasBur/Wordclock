@@ -52,7 +52,7 @@
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-Animation::Animation(Display* Display, Clock* Clock) : wcAnimationClock(Display, Clock), wcAnimationFont(Display)
+Animation::Animation()
 {
 
 } /* Animation */

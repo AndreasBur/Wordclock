@@ -34,11 +34,12 @@
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
 /* AnimationFont configuration parameter */
-#define ANIMATION_SUPPORT_FONT_5X8              STD_ON
-#define ANIMATION_SUPPORT_FONT_7X9              STD_ON
-#define ANIMATION_SUPPORT_FONT_7X10             STD_ON
-#define ANIMATION_SUPPORT_FONT_9X10             STD_ON
-#define ANIMATION_SUPPORT_FONT_10X10            STD_ON
+#define ANIMATION_FONT_TASK_CYCLE_INIT_VALUE			10u
+#define ANIMATION_FONT_SUPPORT_FONT_5X8              STD_ON
+#define ANIMATION_FONT_SUPPORT_FONT_7X9              STD_ON
+#define ANIMATION_FONT_SUPPORT_FONT_7X10             STD_ON
+#define ANIMATION_FONT_SUPPORT_FONT_9X10             STD_ON
+#define ANIMATION_FONT_SUPPORT_FONT_10X10            STD_ON
 
 /* AnimationFont parameter */
 #define ANIMATION_FONT_ASCII_TABLE_OFFSET       -32
@@ -74,16 +75,16 @@ class AnimationFont
     };
 
     enum FontType {
-        FONT_5X8,
+		FONT_NONE,
+		FONT_5X8,
         FONT_7X9,
         FONT_7X10,
         FONT_9X10,
         FONT_10X10,
-        FONT_NONE
     };
 
     struct ShiftType {
-        char* Text;
+        const char* Text;
         FontType Font;
         char Char;
         byte CharWidth;
@@ -96,23 +97,23 @@ class AnimationFont
 ******************************************************************************************************************************************************/
   private:
     Transformation wcTransformation;
-    Display* pDisplay;
+	byte TaskCycle;
     ShiftType Shift;
     StateType State;
 
-#if(ANIMATION_SUPPORT_FONT_5X8 == STD_ON)
+#if(ANIMATION_FONT_SUPPORT_FONT_5X8 == STD_ON)
     FontSprite5x8 Font5x8;
 #endif
-#if(ANIMATION_SUPPORT_FONT_7X9 == STD_ON)
+#if(ANIMATION_FONT_SUPPORT_FONT_7X9 == STD_ON)
     FontCourierNew7x9 Font7x9;
 #endif
-#if(ANIMATION_SUPPORT_FONT_7X10 == STD_ON)
+#if(ANIMATION_FONT_SUPPORT_FONT_7X10 == STD_ON)
     FontCourierNew7x10 Font7x10;
 #endif
-#if(ANIMATION_SUPPORT_FONT_9X10 == STD_ON)
+#if(ANIMATION_FONT_SUPPORT_FONT_9X10 == STD_ON)
     FontLucidaSans9x10 Font9x10;
 #endif
-#if(ANIMATION_SUPPORT_FONT_10X10 == STD_ON)
+#if(ANIMATION_FONT_SUPPORT_FONT_10X10 == STD_ON)
     FontTahoma10x10 Font10x10;
 #endif
 
@@ -148,23 +149,25 @@ class AnimationFont
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    AnimationFont(Display*);
+    AnimationFont();
     ~AnimationFont();
 
 	// get methods
     StateType getState() const { return State; }
+	byte getTaskCycle() const { return TaskCycle; }
 
 	// set methods
+	void setTaskCycle(byte Cycle) { TaskCycle = Cycle; }
 
 	// methods
     void init() {}
-    void show() { pDisplay->show(); }
+    void show() { Display::getInstance().show(); }
     void task();
     stdReturnType setChar(byte, byte, char, FontType);
     void setCharFast(byte, byte, char, FontType);
     void setCharWithShift(char, FontType);
-    void setText(char*, FontType);
-    void setTextWithShift(char*, FontType);
+    void setText(const char*, FontType);
+    void setTextWithShift(const char*, FontType);
     byte getFontHeight(FontType);
     byte getFontWidth(FontType);
     byte getFontCharWidth(FontType, char);

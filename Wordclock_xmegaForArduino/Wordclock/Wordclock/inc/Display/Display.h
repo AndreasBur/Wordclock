@@ -100,6 +100,7 @@ class Display
 
     /* mapping to underlying hardware */
     using PixelColorType = WS2812::PixelType;
+	using ColorType = NeoPixel::ColorType;
     using Stripe = WS2812;
     using WordIdType = DisplayWords::WordIdType;
 
@@ -121,6 +122,10 @@ class Display
 #endif
     
     // functions
+    Display(PixelColorType);
+    Display(byte, byte, byte);
+    ~Display();
+	
     byte transformToSerpentine(byte, byte) const;
     byte transformToSerpentine(byte) const;
 
@@ -136,12 +141,14 @@ class Display
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    Display(PixelColorType);
-    Display(byte, byte, byte);
-    ~Display();
+  	static Display& getInstance();
 
     // get methods
     PixelColorType getColor() const { return Color; }
+	ColorType getColorRed() const { return Color.Red; }
+	ColorType getColorGreen() const { return Color.Green; }
+	ColorType getColorBlue() const { return Color.Blue; }
+	
     StateType getState() const { return State; }
 
 #if (DISPLAY_USE_WS2812_DIMMING == STD_ON)
@@ -152,7 +159,10 @@ class Display
 
     // set methods
     void setColor(PixelColorType sColor) { Color = sColor; }
-    void setColor(byte Red, byte Green, byte Blue) { Color.Red = Red; Color.Green = Green; Color.Blue = Blue; }
+    void setColor(ColorType Red, byte Green, ColorType Blue) { Color.Red = Red; Color.Green = Green; Color.Blue = Blue; }
+	void setColorRed(ColorType Red) { Color.Red = Red; }
+	void setColorGreen(ColorType Green) { Color.Green = Green; }
+	void setColorBlue(ColorType Blue) { Color.Blue = Blue;}
 
 #if (DISPLAY_USE_WS2812_DIMMING == STD_ON)
     void setBrightness(byte Brightness) { Pixels.setBrightness(Brightness, true); }

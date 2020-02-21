@@ -36,7 +36,7 @@
         <documentation help="" />
         <offline-documentation help="" />
         <dependencies>
-          <content-extension eid="atmel.asf" uuidref="Atmel.ASF" version="3.37" />
+          <content-extension eid="atmel.asf" uuidref="Atmel.ASF" version="3.39.0" />
         </dependencies>
       </framework-data>
     </AsfFrameworkConfig>
@@ -59,16 +59,15 @@
     <EraseKey />
     <avrtoolinterface>PDI</avrtoolinterface>
     <custom>
-      <ToolOptions xmlns="">
+      <ToolOptions>
         <InterfaceProperties>
         </InterfaceProperties>
-        <InterfaceName>
-        </InterfaceName>
+        <InterfaceName>PDI</InterfaceName>
       </ToolOptions>
-      <ToolType xmlns="">custom</ToolType>
-      <ToolNumber xmlns="">
+      <ToolType>custom</ToolType>
+      <ToolNumber>
       </ToolNumber>
-      <ToolName xmlns="">Custom Programming Tool</ToolName>
+      <ToolName>Custom Programming Tool</ToolName>
     </custom>
     <com_atmel_avrdbg_tool_jtagice3plus>
       <ToolOptions>
@@ -206,6 +205,8 @@
       <Value>../inc/GammaCorrection</Value>
       <Value>../inc/BH1750</Value>
       <Value>../inc/Timer</Value>
+      <Value>../inc/Communication</Value>
+      <Value>../inc/Communication/MessageParser</Value>
     </ListValues>
   </avrgcc.compiler.directories.IncludePaths>
   <avrgcc.compiler.optimization.level>Optimize for size (-Os)</avrgcc.compiler.optimization.level>
@@ -245,8 +246,11 @@
       <Value>../inc/GammaCorrection</Value>
       <Value>../inc/BH1750</Value>
       <Value>../inc/Timer</Value>
+      <Value>../inc/Communication</Value>
+      <Value>../inc/Communication/MessageParser</Value>
     </ListValues>
   </avrgcccpp.compiler.directories.IncludePaths>
+  <avrgcccpp.compiler.optimization.level>Optimize (-O1)</avrgcccpp.compiler.optimization.level>
   <avrgcccpp.compiler.optimization.OtherFlags>-fno-threadsafe-statics</avrgcccpp.compiler.optimization.OtherFlags>
   <avrgcccpp.compiler.optimization.PackStructureMembers>True</avrgcccpp.compiler.optimization.PackStructureMembers>
   <avrgcccpp.compiler.optimization.AllocateBytesNeededForEnum>True</avrgcccpp.compiler.optimization.AllocateBytesNeededForEnum>
@@ -317,6 +321,30 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="inc\Clock\ClockWords.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="inc\Communication\Communication.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="inc\Communication\ErrorMessage.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="inc\Communication\Message.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="inc\Communication\MessageParser\MsgCmdDisplayColorParser.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="inc\Communication\MessageParser\MsgCmdParser.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="inc\Communication\MessageParser\MsgCmdParserCommon.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="inc\Communication\MessageParser\MsgParser.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="inc\Communication\StringManipulation.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="inc\Display\Display.h">
@@ -421,6 +449,24 @@
     <Compile Include="src\Clock\ClockWords.cpp">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="src\Communication\Communication.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\Communication\Message.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\Communication\MessageParser\MsgCmdDisplayColorParser.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\Communication\MessageParser\MsgCmdParser.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\Communication\MessageParser\MsgCmdParserCommon.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\Communication\MessageParser\MsgParser.cpp">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="src\Display\Display.cpp">
       <SubType>compile</SubType>
     </Compile>
@@ -473,24 +519,28 @@
   <ItemGroup>
     <Folder Include="inc" />
     <Folder Include="inc\Animation\Clock" />
+    <Folder Include="inc\Communication\MessageParser" />
     <Folder Include="inc\Display" />
     <Folder Include="inc\Clock" />
     <Folder Include="inc\Animation" />
     <Folder Include="inc\Font" />
     <Folder Include="inc\GammaCorrection" />
     <Folder Include="inc\BH1750" />
+    <Folder Include="inc\Communication" />
     <Folder Include="inc\Timer" />
     <Folder Include="inc\Transformation" />
     <Folder Include="inc\WS2812" />
     <Folder Include="inc\StandardTypes" />
     <Folder Include="src" />
     <Folder Include="src\Animation\Clock" />
+    <Folder Include="src\Communication\MessageParser" />
     <Folder Include="src\Display" />
     <Folder Include="src\Clock" />
     <Folder Include="src\Animation" />
     <Folder Include="src\Font" />
     <Folder Include="src\GammaCorrection" />
     <Folder Include="src\BH1750" />
+    <Folder Include="src\Communication" />
     <Folder Include="src\Timer" />
     <Folder Include="src\Transformation" />
     <Folder Include="src\WS2812" />

@@ -28,12 +28,12 @@
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
 /* NeoPixel configuration parameter */
-#define NEO_PIXEL_COLOR_OFFSET_GREEN                   0
-#define NEO_PIXEL_COLOR_OFFSET_RED                     1
-#define NEO_PIXEL_COLOR_OFFSET_BLUE                    2
+#define NEO_PIXEL_COLOR_OFFSET_GREEN                   0u
+#define NEO_PIXEL_COLOR_OFFSET_RED                     1u
+#define NEO_PIXEL_COLOR_OFFSET_BLUE                    2u
 
 /* NeoPixel parameter */
-#define NEO_PIXEL_NUMBER_OF_COLORS                     3
+#define NEO_PIXEL_NUMBER_OF_COLORS                     3u
 
 
 /******************************************************************************************************************************************************
@@ -50,11 +50,13 @@ class NeoPixel
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
+	using ColorType = byte;
+  
     /* type which describes the structure of a pixel */
     struct NeoPixelType {
-        byte Red;
-        byte Green;
-        byte Blue;
+        ColorType Red;
+        ColorType Green;
+        ColorType Blue;
     };
 
 /******************************************************************************************************************************************************
@@ -84,9 +86,9 @@ class NeoPixel
     }
 
 	// get methods
-    byte getRed() const { return Pixel[colorOffsetRed()]; }
-    byte getBlue() const { return Pixel[colorOffsetBlue()]; }
-    byte getGreen() const { return Pixel[colorOffsetGreen()]; }
+    ColorType getRed() const { return Pixel[colorOffsetRed()]; }
+    ColorType getBlue() const { return Pixel[colorOffsetBlue()]; }
+    ColorType getGreen() const { return Pixel[colorOffsetGreen()]; }
     NeoPixelType getPixel() const
     {
         NeoPixelType NeoPixel;
@@ -97,16 +99,16 @@ class NeoPixel
     }
 
 	// set methods
-    void setRed(byte Value) { Pixel[colorOffsetRed()] = Value; }
-    void setBlue(byte Value) { Pixel[colorOffsetBlue()] = Value; }
-    void setGreen(byte Value) { Pixel[colorOffsetGreen()] = Value; }
+    void setRed(ColorType Value) { Pixel[colorOffsetRed()] = Value; }
+    void setBlue(ColorType Value) { Pixel[colorOffsetBlue()] = Value; }
+    void setGreen(ColorType Value) { Pixel[colorOffsetGreen()] = Value; }
     void setPixel(NeoPixelType NeoPixel)
     {
          Pixel[colorOffsetRed()] = NeoPixel.Red;
          Pixel[colorOffsetBlue()] = NeoPixel.Blue;
          Pixel[colorOffsetGreen()] = NeoPixel.Green;
     }
-    void setPixel(byte Red, byte Green, byte Blue)
+    void setPixel(ColorType Red, ColorType Green, ColorType Blue)
     {
          Pixel[colorOffsetRed()] = Red;
          Pixel[colorOffsetBlue()] = Blue;

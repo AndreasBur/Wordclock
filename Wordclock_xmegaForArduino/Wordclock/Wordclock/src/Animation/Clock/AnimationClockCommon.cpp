@@ -54,8 +54,6 @@
 ******************************************************************************************************************************************************/
 AnimationClockCommon::AnimationClockCommon()
 {
-    pDisplay = nullptr;
-    pClock = nullptr;
     State = STATE_NONE;
 } /* AnimationClockCommon */
 
@@ -77,11 +75,9 @@ AnimationClockCommon::~AnimationClockCommon()
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-void AnimationClockCommon::init(Display* Display, Clock* Clock, StateType sState)
+void AnimationClockCommon::init(StateType State)
 {
-    pDisplay = Display;
-    pClock = Clock;
-    State = sState;
+    State = State;
 } /* init */
 
 

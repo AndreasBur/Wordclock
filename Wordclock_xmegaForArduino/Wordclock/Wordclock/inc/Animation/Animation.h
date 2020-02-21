@@ -60,6 +60,8 @@ class Animation
         STATE_CLOCK,
         STATE_FONT,
     };
+	
+	using AnimationClockType = AnimationClock::AnimationType;
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
@@ -72,14 +74,17 @@ class Animation
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    Animation(Display*, Clock*);
+    Animation();
     ~Animation();
 
     // get methods
     StateType getState();
+	byte getFontTaskCycle() const { return wcAnimationFont.getTaskCycle(); }
+	byte getClockTaskCycle(AnimationClockType AnimationClock) const { return wcAnimationClock.getTaskCycle(AnimationClock); }
 
     // set methods
-
+	void setFontTaskCylce(byte Cycle) { wcAnimationFont.setTaskCycle(Cycle); }
+	void setClockTaskCylce(AnimationClockType AnimationClock, byte Cycle) { wcAnimationClock.setTaskCycle(AnimationClock, Cycle); }
 
     // methods
     void init();
@@ -90,8 +95,8 @@ class Animation
     stdReturnType setChar(byte Column, byte Row, char Char, AnimationFont::FontType Font) { return wcAnimationFont.setChar(Column, Row, Char, Font); }
     void setCharFast(byte Column, byte Row, char Char, AnimationFont::FontType Font) { wcAnimationFont.setCharFast(Column, Row, Char, Font); }
     void setCharWithShift(char Char, AnimationFont::FontType Font) { wcAnimationFont.setCharWithShift(Char, Font); }
-    void setText(char* Text, AnimationFont::FontType Font) { wcAnimationFont.setText(Text, Font); }
-    void setTextWithShift(char* Text, AnimationFont::FontType Font) { wcAnimationFont.setTextWithShift(Text, Font); }
+    void setText(const char* Text, AnimationFont::FontType Font) { wcAnimationFont.setText(Text, Font); }
+    void setTextWithShift(const char* Text, AnimationFont::FontType Font) { wcAnimationFont.setTextWithShift(Text, Font); }
 
     // AnimationFont functions
     void setAnimation(AnimationClock::AnimationType Animation) { wcAnimationClock.setAnimation(Animation); }

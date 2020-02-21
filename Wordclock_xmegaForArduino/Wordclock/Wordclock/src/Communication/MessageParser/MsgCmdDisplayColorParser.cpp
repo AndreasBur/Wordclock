@@ -8,20 +8,20 @@
  *  ---------------------------------------------------------------------------------------------------------------------------------------------------
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       GammaCorrection.cpp
+/**     \file       MsgCmdDisplayColorParser.cpp
  *      \brief      
  *
  *      \details    
  *                  
  *
 ******************************************************************************************************************************************************/
-#define _GAMMA_CORRECTION_SOURCE_
+#define _MSG_CMD_DISPLAY_COLOR_PARSER_SOURCE_
 
 /******************************************************************************************************************************************************
  * I N C L U D E S
 ******************************************************************************************************************************************************/
-#include "GammaCorrection.h"
-
+#include "MsgCmdDisplayColorParser.h"
+#include "StringManipulation.h"
 
 /******************************************************************************************************************************************************
  *  L O C A L   C O N S T A N T   M A C R O S 
@@ -37,35 +37,130 @@
 /******************************************************************************************************************************************************
  *  L O C A L   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
-const GammaCorrection::Gamma7TableElementType GammaCorrection::Gamma7Table[] PROGMEM
-{
-    133, 139, 145, 151, 158, 165, 172, 180, 188, 196, 205, 214, 224, 234, 244, 255
-};
+
 
 
 /******************************************************************************************************************************************************
  * P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
 
+/******************************************************************************************************************************************************
+  Constructor of MsgCmdDisplayColorParser
+******************************************************************************************************************************************************/
+/*! \brief          MsgCmdDisplayColorParser Constructor
+ *  \details        Instantiation of the MsgCmdDisplayColorParser library
+ *
+ *  \return         -
+******************************************************************************************************************************************************/
+MsgCmdDisplayColorParser::MsgCmdDisplayColorParser()
+{
+
+} /* MsgCmdDisplayColorParser */
+
+
+/******************************************************************************************************************************************************
+  Destructor of MsgCmdDisplayColorParser
+******************************************************************************************************************************************************/
+MsgCmdDisplayColorParser::~MsgCmdDisplayColorParser()
+{
+
+} /* ~MsgCmdDisplayColorParser */
+
+
+void MsgCmdDisplayColorParser::parse(const char* CmdValue)
+{
+	if(CmdValue == nullptr) {
+		sendAnswer();
+	} else {
+		setColors(CmdValue);
+		sendAnswer();
+	}
+}
+
+void MsgCmdDisplayColorParser::sendAnswer()
+{
+	sendAnswerRed();
+	sendAnswerGreen();
+	sendAnswerBlue();
+	Serial.println();
+}
+
+void MsgCmdDisplayColorParser::sendAnswerRed()
+{
+	Serial.print(RedParameterChar);
+	Serial.print(ColorValueDelimiter);
+	Serial.print(Display::getInstance().getColorRed());
+}
+
+void MsgCmdDisplayColorParser::sendAnswerGreen()
+{
+	Serial.print(GreenParameterChar);
+	Serial.print(ColorValueDelimiter);
+	Serial.print(Display::getInstance().getColorGreen());
+}
+
+void MsgCmdDisplayColorParser::sendAnswerBlue()
+{
+	Serial.print(BlueParameterChar);
+	Serial.print(ColorValueDelimiter);
+	Serial.print(Display::getInstance().getColorBlue());
+}
+
 
 /******************************************************************************************************************************************************
  * P R I V A T E   F U N C T I O N S
 ******************************************************************************************************************************************************/
 
-/******************************************************************************************************************************************************
-  calcGammaCorrectionValue()
-******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        calculates the gamma correction value with the help of a small table
- *                  and very efficient shift calculation
- *  param[in]       ValueLinear    7 bit unsigned (0..127)
- *  \return         exponential value (approx. 1.0443^x) (1..255)
- *****************************************************************************************************************************************************/
-byte GammaCorrection::calcGamma7CorrectionValue(byte ValueLinear)
+void MsgCmdDisplayColorParser::setColors(const char* CmdValue)
 {
-    Gamma7TableElementType Exponent = getGamma7TableElement(ValueLinear);
-    return Exponent >> (7 - (ValueLinear / GAMMA_CORRECTION_GAMMA7_TABLE_NUMBER_OF_VALUES));
-} /* calcGamma7CorrectionValue */
+	setColorRed(CmdValue);
+	setColorGreen(CmdValue);
+	setColorBlue(CmdValue);
+}
+
+void MsgCmdDisplayColorParser::setColorRed(const char* CmdValue)
+{
+	uint8_t Value;
+	
+	if(getColorValue(CmdValue, RedParameterChar, Value) == E_OK) {
+		Display::getInstance().setColorRed(Value);
+	}
+}
+
+void MsgCmdDisplayColorParser::setColorGreen(const char* CmdValue)
+{
+	uint8_t Value;
+	
+	if(getColorValue(CmdValue, RedParameterChar, Value) == E_OK) {
+		Display::getInstance().setColorGreen(Value);
+	}
+}
+
+void MsgCmdDisplayColorParser::setColorBlue(const char* CmdValue)
+{
+	uint8_t Value;
+	
+	if(getColorValue(CmdValue, RedParameterChar, Value) == E_OK) {
+		Display::getInstance().setColorBlue(Value);
+	}
+}
+
+stdReturnType MsgCmdDisplayColorParser::getColorValue(const char* CmdValue, char ColorParameterChar, ColorType& Value)
+{
+	char parameterAndDelimiter[]{ColorParameterChar, ColorValueDelimiter, '\0'};
+	const char* parameterStart = strstr(CmdValue, parameterAndDelimiter);
+	StringManipulation::ResultType result = StringManipulation::stringToUnsignedInteger(parameterStart, 10, Value);
+	
+	if((result == StringManipulation::RESULT_OVERFLOW)) {
+		Error.send(ErrorMessage::ERROR_VALUE_OUT_OF_BOUNCE);
+		return E_NOT_OK;
+	} else if (result == StringManipulation::RESULT_NO_VALUE){
+		Error.send(ErrorMessage::ERROR_NO_VALUE_GIVEN);
+		return E_NOT_OK;
+	} else {
+		return E_OK;
+	}
+}
 
 
 /******************************************************************************************************************************************************

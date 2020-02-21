@@ -50,12 +50,12 @@
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-AnimationFont::AnimationFont(Display* Display) : wcTransformation(Display)
+AnimationFont::AnimationFont()
 {
-    pDisplay = Display;
     Shift.Char = STD_NULL_CHARACTER;
     Shift.Font = FONT_NONE;
     Shift.State = SHIFT_STATE_IDLE;
+	TaskCycle = ANIMATION_FONT_TASK_CYCLE_INIT_VALUE;
     State = STATE_UNINIT;
 } /* AnimationFont */
 
@@ -82,35 +82,35 @@ stdReturnType AnimationFont::setChar(byte Column, byte Row, char Char, FontType 
     byte FontIndex;
     if(convertCharToFontIndex(Char, FontIndex) == E_NOT_OK) return E_NOT_OK;
 
-#if(ANIMATION_SUPPORT_FONT_5X8 == STD_ON)
+#if(ANIMATION_FONT_SUPPORT_FONT_5X8 == STD_ON)
     if(Font == FONT_5X8) {
         FontSprite5x8::FontCharType FontChar;
         if(Font5x8.getChar(FontIndex, FontChar) == E_NOT_OK) { return E_NOT_OK; }
         return setCharFontVertical(Column, Row, FontChar, FONT_SPRITE_5X8_HEIGHT);
     }
 #endif
-#if(ANIMATION_SUPPORT_FONT_7X9 == STD_ON)
+#if(ANIMATION_FONT_SUPPORT_FONT_7X9 == STD_ON)
     if(Font == FONT_7X9) {
         FontCourierNew7x9::FontCharType FontChar;
         if(Font7x9.getChar(FontIndex, FontChar) == E_NOT_OK) { return E_NOT_OK; }
         return setCharFontHorizontal(Column, Row, FontChar, FONT_COURIER_NEW_7X9_HEIGHT);
     }
 #endif
-#if(ANIMATION_SUPPORT_FONT_7X10 == STD_ON)
+#if(ANIMATION_FONT_SUPPORT_FONT_7X10 == STD_ON)
     if(Font == FONT_7X10) {
         FontCourierNew7x10::FontCharType FontChar;
         if(Font7x10.getChar(FontIndex, FontChar) == E_NOT_OK) { return E_NOT_OK; }
         return setCharFontHorizontal(Column, Row, FontChar, FONT_COURIER_NEW_7X10_HEIGHT);
     }
 #endif
-#if(ANIMATION_SUPPORT_FONT_9X10 == STD_ON)
+#if(ANIMATION_FONT_SUPPORT_FONT_9X10 == STD_ON)
     if(Font == FONT_9X10) {
         FontLucidaSans9x10::FontCharType FontChar;
         if(Font9x10.getChar(FontIndex, FontChar) == E_NOT_OK) { return E_NOT_OK; }
         return setCharFontVertical(Column, Row, FontChar, FONT_LUCIDA_SANS_9X10_HEIGHT);
     }
 #endif
-#if(ANIMATION_SUPPORT_FONT_10X10 == STD_ON)
+#if(ANIMATION_FONT_SUPPORT_FONT_10X10 == STD_ON)
     if(Font == FONT_10X10) {
         FontTahoma10x10::FontCharType FontChar;
         if(Font10x10.getChar(FontIndex, FontChar) == E_NOT_OK) { return E_NOT_OK; }
@@ -133,31 +133,31 @@ void AnimationFont::setCharFast(byte Column, byte Row, char Char, FontType Font)
 {
     byte FontIndex = convertCharToFontIndexFast(Char);
 
-#if(ANIMATION_SUPPORT_FONT_5X8 == STD_ON)
+#if(ANIMATION_FONT_SUPPORT_FONT_5X8 == STD_ON)
     if(Font == FONT_5X8) {
         FontSprite5x8::FontCharType FontChar = Font5x8.getCharFast(FontIndex);
         setCharFontVerticalFast(Column, Row, FontChar, FONT_SPRITE_5X8_HEIGHT);
     }
 #endif
-#if(ANIMATION_SUPPORT_FONT_7X9 == STD_ON)
+#if(ANIMATION_FONT_SUPPORT_FONT_7X9 == STD_ON)
     if(Font == FONT_7X9) {
         FontCourierNew7x9::FontCharType FontChar = Font7x9.getCharFast(FontIndex);
         setCharFontHorizontalFast(Column, Row, FontChar, FONT_COURIER_NEW_7X9_HEIGHT);
     }
 #endif
-#if(ANIMATION_SUPPORT_FONT_7X10 == STD_ON)
+#if(ANIMATION_FONT_SUPPORT_FONT_7X10 == STD_ON)
     if(Font == FONT_7X10) {
         FontCourierNew7x10::FontCharType FontChar = Font7x10.getCharFast(FontIndex);
         setCharFontHorizontalFast(Column, Row, FontChar, FONT_COURIER_NEW_7X10_HEIGHT);
     }
 #endif
-#if(ANIMATION_SUPPORT_FONT_9X10 == STD_ON)
+#if(ANIMATION_FONT_SUPPORT_FONT_9X10 == STD_ON)
     if(Font == FONT_9X10) {
         FontLucidaSans9x10::FontCharType FontChar = Font9x10.getCharFast(FontIndex);
         setCharFontVertical(Column, Row, FontChar, FONT_LUCIDA_SANS_9X10_HEIGHT);
     }
 #endif
-#if(ANIMATION_SUPPORT_FONT_10X10 == STD_ON)
+#if(ANIMATION_FONT_SUPPORT_FONT_10X10 == STD_ON)
     if(Font == FONT_10X10) {
         FontTahoma10x10::FontCharType FontChar = Font10x10.getCharFast(FontIndex);
         setCharFontHorizontalFast(Column, Row, FontChar, FONT_TAHOMA_10X10_HEIGHT);
@@ -193,7 +193,7 @@ void AnimationFont::setCharWithShift(char Char, FontType Font)
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-void AnimationFont::setTextWithShift(char* Text, FontType Font)
+void AnimationFont::setTextWithShift(const char* Text, FontType Font)
 {
     State = STATE_TEXT_SHIFT;
     Shift.State = SHIFT_STATE_IDLE;
@@ -227,19 +227,19 @@ void AnimationFont::task()
 ******************************************************************************************************************************************************/
 byte AnimationFont::getFontHeight(FontType Font)
 {
-#if(ANIMATION_SUPPORT_FONT_5X8 == STD_ON)
+#if(ANIMATION_FONT_SUPPORT_FONT_5X8 == STD_ON)
     if(Font == FONT_5X8) return Font5x8.getHeight();
 #endif
-#if(ANIMATION_SUPPORT_FONT_7X9 == STD_ON)
+#if(ANIMATION_FONT_SUPPORT_FONT_7X9 == STD_ON)
     if(Font == FONT_7X9) return Font7x9.getHeight();
 #endif
-#if(ANIMATION_SUPPORT_FONT_7X10 == STD_ON)
+#if(ANIMATION_FONT_SUPPORT_FONT_7X10 == STD_ON)
     if(Font == FONT_7X10) return Font7x10.getHeight();
 #endif
-#if(ANIMATION_SUPPORT_FONT_9X10 == STD_ON)
+#if(ANIMATION_FONT_SUPPORT_FONT_9X10 == STD_ON)
     if(Font == FONT_9X10) return Font9x10.getHeight();
 #endif
-#if(ANIMATION_SUPPORT_FONT_10X10 == STD_ON)
+#if(ANIMATION_FONT_SUPPORT_FONT_10X10 == STD_ON)
     if(Font == FONT_10X10) return Font10x10.getHeight();
 #endif
     return 0;
@@ -256,19 +256,19 @@ byte AnimationFont::getFontHeight(FontType Font)
 ******************************************************************************************************************************************************/
 byte AnimationFont::getFontWidth(FontType Font)
 {
-#if(ANIMATION_SUPPORT_FONT_5X8 == STD_ON)
+#if(ANIMATION_FONT_SUPPORT_FONT_5X8 == STD_ON)
     if(Font == FONT_5X8) return Font5x8.getWidth();
 #endif
-#if(ANIMATION_SUPPORT_FONT_7X9 == STD_ON)
+#if(ANIMATION_FONT_SUPPORT_FONT_7X9 == STD_ON)
     if(Font == FONT_7X9) return Font7x9.getWidth();
 #endif
-#if(ANIMATION_SUPPORT_FONT_7X10 == STD_ON)
+#if(ANIMATION_FONT_SUPPORT_FONT_7X10 == STD_ON)
     if(Font == FONT_7X10) return Font7x10.getWidth();
 #endif
-#if(ANIMATION_SUPPORT_FONT_9X10 == STD_ON)
+#if(ANIMATION_FONT_SUPPORT_FONT_9X10 == STD_ON)
     if(Font == FONT_9X10) return Font9x10.getWidth();
 #endif
-#if(ANIMATION_SUPPORT_FONT_10X10 == STD_ON)
+#if(ANIMATION_FONT_SUPPORT_FONT_10X10 == STD_ON)
     if(Font == FONT_10X10) return Font10x10.getWidth();
 #endif
     return 0;
@@ -287,19 +287,19 @@ byte AnimationFont::getFontCharWidth(FontType Font, char Char)
 {
     byte Index = convertCharToFontIndexFast(Char);
 
-#if(ANIMATION_SUPPORT_FONT_5X8 == STD_ON)
+#if(ANIMATION_FONT_SUPPORT_FONT_5X8 == STD_ON)
     if(Font == FONT_5X8) return Font5x8.getCharWidthFast(Index);
 #endif
-#if(ANIMATION_SUPPORT_FONT_7X9 == STD_ON)
+#if(ANIMATION_FONT_SUPPORT_FONT_7X9 == STD_ON)
     if(Font == FONT_7X9) return Font7x9.getCharWidthFast(Index);
 #endif
-#if(ANIMATION_SUPPORT_FONT_7X10 == STD_ON)
+#if(ANIMATION_FONT_SUPPORT_FONT_7X10 == STD_ON)
     if(Font == FONT_7X10) return Font7x10.getCharWidthFast(Index);
 #endif
-#if(ANIMATION_SUPPORT_FONT_9X10 == STD_ON)
+#if(ANIMATION_FONT_SUPPORT_FONT_9X10 == STD_ON)
     if(Font == FONT_9X10) return Font9x10.getCharWidthFast(Index);
 #endif
-#if(ANIMATION_SUPPORT_FONT_10X10 == STD_ON)
+#if(ANIMATION_FONT_SUPPORT_FONT_10X10 == STD_ON)
     if(Font == FONT_10X10) return Font10x10.getCharWidthFast(Index);
 #endif
     return 0;
@@ -316,19 +316,19 @@ byte AnimationFont::getFontCharWidth(FontType Font, char Char)
 ******************************************************************************************************************************************************/
 Orientation AnimationFont::getFontOrientation(FontType Font)
 {
-#if(ANIMATION_SUPPORT_FONT_5X8 == STD_ON)
+#if(ANIMATION_FONT_SUPPORT_FONT_5X8 == STD_ON)
     if(Font == FONT_5X8) return Font5x8.getOrientation();
 #endif
-#if(ANIMATION_SUPPORT_FONT_7X9 == STD_ON)
+#if(ANIMATION_FONT_SUPPORT_FONT_7X9 == STD_ON)
     if(Font == FONT_7X9) return Font7x9.getOrientation();
 #endif
-#if(ANIMATION_SUPPORT_FONT_7X10 == STD_ON)
+#if(ANIMATION_FONT_SUPPORT_FONT_7X10 == STD_ON)
     if(Font == FONT_7X10) return Font7x10.getOrientation();
 #endif
-#if(ANIMATION_SUPPORT_FONT_9X10 == STD_ON)
+#if(ANIMATION_FONT_SUPPORT_FONT_9X10 == STD_ON)
     if(Font == FONT_9X10) return Font9x10.getOrientation();
 #endif
-#if(ANIMATION_SUPPORT_FONT_10X10 == STD_ON)
+#if(ANIMATION_FONT_SUPPORT_FONT_10X10 == STD_ON)
     if(Font == FONT_10X10) return Font10x10.getOrientation();
 #endif
     return Orientation::ORIENTATION_NONE;
@@ -435,7 +435,7 @@ stdReturnType AnimationFont::setCharRow(RowType CharRow, byte Column, byte RowAb
     {
         byte ColumnAbs = Column + FontColumn;
         if(ColumnAbs < DISPLAY_NUMBER_OF_COLUMNS && RowAbs < DISPLAY_NUMBER_OF_ROWS) {
-            if(pDisplay->writePixel(ColumnAbs, RowAbs, bitRead(CharRow, FontColumn)) == E_NOT_OK) { ReturnValue = E_NOT_OK; }
+            if(Display::getInstance().writePixel(ColumnAbs, RowAbs, bitRead(CharRow, FontColumn)) == E_NOT_OK) { ReturnValue = E_NOT_OK; }
         } else {
             break;
         }
@@ -479,7 +479,7 @@ void AnimationFont::setCharRowFast(RowType CharRow, byte Column, byte RowAbs, by
     {
         byte ColumnAbs = Column + FontColumn;
         if(ColumnAbs < DISPLAY_NUMBER_OF_COLUMNS && RowAbs < DISPLAY_NUMBER_OF_ROWS) {
-            pDisplay->writePixelFast(ColumnAbs, RowAbs, bitRead(CharRow, FontColumn));
+            Display::getInstance().writePixelFast(ColumnAbs, RowAbs, bitRead(CharRow, FontColumn));
         } else {
             break;
         }
@@ -526,7 +526,7 @@ stdReturnType AnimationFont::setCharColumn(ColumnType CharColumn, byte ColumnAbs
     {
         byte RowAbs = Row + FontRow;
         if(ColumnAbs < DISPLAY_NUMBER_OF_COLUMNS && RowAbs < DISPLAY_NUMBER_OF_ROWS) {
-            if(pDisplay->writePixel(ColumnAbs, RowAbs, bitRead(CharColumn, FontRow)) == E_NOT_OK) { ReturnValue = E_NOT_OK; }
+            if(Display::getInstance().writePixel(ColumnAbs, RowAbs, bitRead(CharColumn, FontRow)) == E_NOT_OK) { ReturnValue = E_NOT_OK; }
         } else {
             break;
         }
@@ -570,7 +570,7 @@ void AnimationFont::setCharColumnFast(ColumnType CharColumn, byte ColumnAbs, byt
     {
         byte RowAbs = Row + FontRow;
         if(ColumnAbs < DISPLAY_NUMBER_OF_COLUMNS && RowAbs < DISPLAY_NUMBER_OF_ROWS) {
-            pDisplay->writePixelFast(ColumnAbs, RowAbs, bitRead(CharColumn, FontRow));
+            Display::getInstance().writePixelFast(ColumnAbs, RowAbs, bitRead(CharColumn, FontRow));
         } else {
             break;
         }

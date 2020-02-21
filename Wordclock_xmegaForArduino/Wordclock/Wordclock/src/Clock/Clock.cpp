@@ -143,9 +143,8 @@ const Clock::MinutesType Clock::MinutesTable[][CLOCK_NUMBER_OF_MINUTE_STEPS] PRO
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-Clock::Clock(Display* Display, ModesType sMode)
+Clock::Clock(ModesType sMode)
 {
-    pDisplay = Display;
     Mode = sMode;
 } /* Clock */
 
@@ -157,6 +156,15 @@ Clock::~Clock()
 {
 
 } /* ~Clock */
+
+/******************************************************************************************************************************************************
+  Singleton Instance of Clock
+******************************************************************************************************************************************************/
+Clock& Clock::getInstance()
+{
+    static Clock SingletonInstance(Clock::MODE_WESSI);
+    return SingletonInstance;
+}
 
 
 /******************************************************************************************************************************************************
@@ -236,14 +244,14 @@ stdReturnType Clock::setClock(byte Hour, byte Minute)
     if(getClockWords(Hour, Minute, ClockWords) == E_NOT_OK) ReturnValue = E_NOT_OK;
 
     if(ClockWords.getShowItIs()) {
-        if(pDisplay->setWord(DisplayWords::WORD_ES) == E_NOT_OK) ReturnValue = E_NOT_OK;
-        if(pDisplay->setWord(DisplayWords::WORD_IST) == E_NOT_OK) ReturnValue = E_NOT_OK;
+        if(Display::getInstance().setWord(DisplayWords::WORD_ES) == E_NOT_OK) ReturnValue = E_NOT_OK;
+        if(Display::getInstance().setWord(DisplayWords::WORD_IST) == E_NOT_OK) ReturnValue = E_NOT_OK;
     }
     for(byte Index = 0; Index < ClockWords.getHourWords().size() && ClockWords.getHourWord(Index) != DisplayWords::WORD_NONE; Index++) {
-        if(pDisplay->setWord(ClockWords.getHourWord(Index)) == E_NOT_OK) ReturnValue = E_NOT_OK;
+        if(Display::getInstance().setWord(ClockWords.getHourWord(Index)) == E_NOT_OK) ReturnValue = E_NOT_OK;
     }
     for(byte Index = 0; Index < ClockWords.getMinuteWord(Index) && ClockWords.getMinuteWord(Index) != DisplayWords::WORD_NONE; Index++) {
-        if(pDisplay->setWord(ClockWords.getMinuteWord(Index)) == E_NOT_OK) ReturnValue = E_NOT_OK;
+        if(Display::getInstance().setWord(ClockWords.getMinuteWord(Index)) == E_NOT_OK) ReturnValue = E_NOT_OK;
     }
     return ReturnValue;
 } /* setClock */
@@ -263,14 +271,14 @@ void Clock::setClockFast(byte Hour, byte Minute)
 
     if(getClockWords(Hour, Minute, ClockWords) == E_OK) {
         if(ClockWords.getShowItIs()) {
-            pDisplay->setWordFast(DisplayWords::WORD_ES);
-            pDisplay->setWordFast(DisplayWords::WORD_IST);
+            Display::getInstance().setWordFast(DisplayWords::WORD_ES);
+            Display::getInstance().setWordFast(DisplayWords::WORD_IST);
         }
         for(byte Index = 0; Index < ClockWords.getHourWords().size() && ClockWords.getHourWord(Index) != DisplayWords::WORD_NONE; Index++) {
-            pDisplay->setWordFast(ClockWords.getHourWord(Index));
+            Display::getInstance().setWordFast(ClockWords.getHourWord(Index));
         }
         for(byte Index = 0; Index < ClockWords.getMinuteWord(Index) && ClockWords.getMinuteWord(Index) != DisplayWords::WORD_NONE; Index++) {
-            pDisplay->setWordFast(ClockWords.getMinuteWord(Index));
+            Display::getInstance().setWordFast(ClockWords.getMinuteWord(Index));
         }
     }
 } /* setClockFast */

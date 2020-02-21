@@ -75,9 +75,9 @@ AnimationClockDrop::~AnimationClockDrop()
  *                  
  *  \return         -
 ******************************************************************************************************************************************************/
-void AnimationClockDrop::init(Display* Display, Clock* Clock)
+void AnimationClockDrop::init()
 {
-    AnimationClockCommon::init(Display, Clock, STATE_IDLE);
+    AnimationClockCommon::init(STATE_IDLE);
     reset();
 } /* init */
 
@@ -94,7 +94,7 @@ stdReturnType AnimationClockDrop::setClock(byte Hour, byte Minute)
 {
     stdReturnType ReturnValue{E_NOT_OK};
 
-    if(pClock->getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
+    if(Clock::getInstance().getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
         setNextWordIndex();
         if(setNextActivePixelIndex() == E_NOT_OK) { setStateToSetTime(); }
         else { State = STATE_CLEAR_TIME; }
@@ -149,12 +149,12 @@ void AnimationClockDrop::reset()
 void AnimationClockDrop::clearTimeTask()
 {
     // toggle current Pixel
-    if(Row < DISPLAY_NUMBER_OF_ROWS && Column < DISPLAY_NUMBER_OF_COLUMNS) { pDisplay->togglePixelFast(Column, Row); }
+    if(Row < DISPLAY_NUMBER_OF_ROWS && Column < DISPLAY_NUMBER_OF_COLUMNS) { Display::getInstance().togglePixelFast(Column, Row); }
     // increment row and check for out of bounds
     if(Row + 1 < DISPLAY_NUMBER_OF_ROWS) {
         // toggle Pixel in next row
         Row++;
-        pDisplay->togglePixelFast(Column, Row);
+        Display::getInstance().togglePixelFast(Column, Row);
     } else {
         // no more active pixels available
         if(setNextActivePixelIndex() == E_NOT_OK) { setStateToSetTime(); }
@@ -176,14 +176,14 @@ void AnimationClockDrop::setTimeTask()
     const byte MaxColumn = Words.getDisplayWordColumnFast(ClockWordsTable[CurrenWordIndex]) + CurrentWord.getLength() - 1;
 
     if(setNextRow(CurrentWord.getRow()) == E_OK) {
-        pDisplay->clearPixelFast(Column, Row - 1);
+        Display::getInstance().clearPixelFast(Column, Row - 1);
     } else {
         if(setNextColumn(MaxColumn) == E_NOT_OK) {
             State = STATE_IDLE;
             reset();
         }
     }
-    pDisplay->setPixelFast(Column, Row);
+    Display::getInstance().setPixelFast(Column, Row);
 } /* setTimeTask */
 
 
@@ -198,8 +198,8 @@ void AnimationClockDrop::setTimeTask()
 stdReturnType AnimationClockDrop::setNextActivePixelIndex()
 {
     for(int16_t Index = DISPLAY_NUMBER_OF_PIXELS - 1; Index >= 0; Index--) {
-        if(pDisplay->getPixelFast(Index)) {
-            pDisplay->indexToColumnAndRow(Index, Column, Row);
+        if(Display::getInstance().getPixelFast(Index)) {
+            Display::getInstance().indexToColumnAndRow(Index, Column, Row);
             return E_OK;
         }
     }
@@ -239,7 +239,7 @@ void AnimationClockDrop::setStateToSetTime()
 {
     Row = 0;
     Column = Words.getDisplayWordColumnFast(ClockWordsTable[CurrenWordIndex]);
-    pDisplay->setPixelFast(Column, Row);
+    Display::getInstance().setPixelFast(Column, Row);
     State = STATE_SET_TIME;
 } /* setStateToSetTime */
 

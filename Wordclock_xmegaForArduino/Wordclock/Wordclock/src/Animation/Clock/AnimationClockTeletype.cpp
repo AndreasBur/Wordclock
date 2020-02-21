@@ -75,9 +75,9 @@ AnimationClockTeletype::~AnimationClockTeletype()
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-void AnimationClockTeletype::init(Display* Display, Clock* Clock)
+void AnimationClockTeletype::init()
 {
-    AnimationClockCommon::init(Display, Clock, STATE_IDLE);
+    AnimationClockCommon::init(STATE_IDLE);
     reset();
 } /* init */
 
@@ -94,7 +94,7 @@ stdReturnType AnimationClockTeletype::setClock(byte Hour, byte Minute)
 {
     stdReturnType ReturnValue{E_NOT_OK};
 
-    if(pClock->getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
+    if(Clock::getInstance().getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
         ReturnValue = E_OK;
         CurrentWordIndex = 0;
         CurrentCharIndex = 0;
@@ -125,7 +125,7 @@ void AnimationClockTeletype::task()
             CurrentWordLength = Words.getDisplayWordLengthFast(ClockWordsTable[CurrentWordIndex]);
         }
         CurrentCharIndex++;
-        pDisplay->setWordFast(ClockWordsTable[CurrentWordIndex], CurrentCharIndex);
+        Display::getInstance().setWordFast(ClockWordsTable[CurrentWordIndex], CurrentCharIndex);
     }
 } /* task */
 

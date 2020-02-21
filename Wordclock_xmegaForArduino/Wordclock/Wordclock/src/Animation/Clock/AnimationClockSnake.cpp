@@ -75,9 +75,9 @@ AnimationClockSnake::~AnimationClockSnake()
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-void AnimationClockSnake::init(Display* Display, Clock* Clock)
+void AnimationClockSnake::init()
 {
-    AnimationClockCommon::init(Display, Clock, STATE_IDLE);
+    AnimationClockCommon::init(STATE_IDLE);
     reset();
 } /* init */
 
@@ -94,7 +94,7 @@ stdReturnType AnimationClockSnake::setClock(byte Hour, byte Minute)
 {
     stdReturnType ReturnValue{E_NOT_OK};
 
-    if(pClock->getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
+    if(Clock::getInstance().getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
         ReturnValue = E_OK;
         SnakeBeginIndex = 0;
         SnakeEndIndex = 0;
@@ -116,13 +116,13 @@ void AnimationClockSnake::task()
 {
     if(State == STATE_SET_TIME) {
         byte SnakeEndIndexTrans = transformToSerpentine(SnakeEndIndex);
-        pDisplay->setPixelFast(transformToSerpentine(SnakeBeginIndex));
+        Display::getInstance().setPixelFast(transformToSerpentine(SnakeBeginIndex));
 
         if((SnakeBeginIndex - SnakeEndIndex) == ANIMATION_CLOCK_SNAKE_LENGTH ||
            (SnakeBeginIndex >= DISPLAY_NUMBER_OF_LEDS - 1 && SnakeEndIndex < DISPLAY_NUMBER_OF_LEDS))
         {
-            //pDisplay->clearPixelFast(SnakeEndIndexTrans);
-            if(isPixelPartOfClockWords(ClockWordsTable, SnakeEndIndexTrans) == false) pDisplay->clearPixelFast(SnakeEndIndexTrans);
+            //Display::getInstance().clearPixelFast(SnakeEndIndexTrans);
+            if(isPixelPartOfClockWords(ClockWordsTable, SnakeEndIndexTrans) == false) Display::getInstance().clearPixelFast(SnakeEndIndexTrans);
             SnakeEndIndex++;
         }
         if(SnakeBeginIndex < DISPLAY_NUMBER_OF_LEDS - 1) SnakeBeginIndex++;
@@ -178,8 +178,8 @@ byte AnimationClockSnake::transformToSerpentine(byte Column, byte Row) const
 ******************************************************************************************************************************************************/
 byte AnimationClockSnake::transformToSerpentine(byte Index) const
 {
-    byte Column = pDisplay->indexToColumn(Index);
-    byte Row = pDisplay->indexToRow(Index);
+    byte Column = Display::getInstance().indexToColumn(Index);
+    byte Row = Display::getInstance().indexToRow(Index);
 
     return transformToSerpentine(Column, Row);
 } /* transformToSerpentine */

@@ -93,14 +93,16 @@ class Clock
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
-    Display* pDisplay;
     ModesType Mode;
 
     static const HoursType HoursTable[][CLOCK_NUMBER_OF_HOURS];
     static const MinutesType MinutesTable[][CLOCK_NUMBER_OF_MINUTE_STEPS];
     
     // functions
-    MinutesTableElementType getMinutesTableElement(byte Minute) const {
+	Clock(ModesType);
+    ~Clock();
+	
+	MinutesTableElementType getMinutesTableElement(byte Minute) const {
         MinutesTableElementType MinutesTableElement;
         memcpy_P(&MinutesTableElement, &MinutesTable[Mode][Minute / CLOCK_MINUTE_STEP_IN_MINUTES], sizeof(MinutesType));
         return MinutesTableElement;
@@ -113,7 +115,7 @@ class Clock
 
     boolean calculateItIs(byte Minute) const {
         byte MinuteSteps = Minute / CLOCK_MINUTE_STEP_IN_MINUTES;
-        // show it is only to full and half hour
+        // show "it is" only to full and half hour
         if(MinuteSteps == 0 || MinuteSteps == (CLOCK_NUMBER_OF_MINUTE_STEPS / 2)) {
             return true;
         } else {
@@ -129,9 +131,8 @@ class Clock
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    Clock(Display*, ModesType);
-    ~Clock();
-
+  	static Clock& getInstance();
+	  
     // get methods
     ModesType getMode() const { return Mode; }
     stdReturnType getClockWords(byte, byte, ClockWords&) const;
@@ -143,7 +144,7 @@ class Clock
     // methods
     stdReturnType setClock(byte, byte);
     void setClockFast(byte, byte);
-    void show() { pDisplay->show(); }
+    void show() { Display::getInstance().show(); }
 };
 
 

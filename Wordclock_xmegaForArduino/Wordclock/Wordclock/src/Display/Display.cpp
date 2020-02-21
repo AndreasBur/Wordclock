@@ -82,7 +82,7 @@ Display::Display(PixelColorType sColor)
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-Display::Display(byte Red, byte Green, byte Blue)
+Display::Display(ColorType Red, ColorType Green, ColorType Blue)
 #ifdef SIMULATOR
 : Pixels(0L, _("Wordclock Simulator"))
 #elif (WS2812_IS_SINGLETON == STD_OFF)
@@ -112,7 +112,16 @@ Display::Display(byte Red, byte Green, byte Blue)
 Display::~Display()
 {
 
-} /* ~Template */
+} /* ~Display */
+
+/******************************************************************************************************************************************************
+  Singleton Instance of Display
+******************************************************************************************************************************************************/
+Display& Display::getInstance()
+{
+    static Display SingletonInstance(0, 0, 0);
+    return SingletonInstance;
+}
 
 
 /******************************************************************************************************************************************************

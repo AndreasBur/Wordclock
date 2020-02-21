@@ -75,9 +75,9 @@ AnimationClockFlicker::~AnimationClockFlicker()
  *                  
  *  \return         -
 ******************************************************************************************************************************************************/
-void AnimationClockFlicker::init(Display* Display, Clock* Clock)
+void AnimationClockFlicker::init()
 {
-    AnimationClockCommon::init(Display, Clock, STATE_IDLE);
+    AnimationClockCommon::init(STATE_IDLE);
     reset();
 } /* init */
 
@@ -154,9 +154,9 @@ void AnimationClockFlicker::clearTimeTask()
     isClockSet = !isClockSet;
 
     if(isClockSet) {
-        pDisplay->disable();
+        Display::getInstance().disable();
     } else {
-        pDisplay->enable();
+        Display::getInstance().enable();
     }
 
     if(FlickerCounter-- <= 0) State = STATE_SET_TIME;
@@ -173,8 +173,8 @@ void AnimationClockFlicker::clearTimeTask()
 ******************************************************************************************************************************************************/
 void AnimationClockFlicker::setTimeTask()
 {
-    pDisplay->clear();
-    pClock->setClockFast(Hour, Minute);
+    Display::getInstance().clear();
+    Clock::getInstance().setClockFast(Hour, Minute);
     State = STATE_IDLE;
     reset();
 } /* setTimeTask */

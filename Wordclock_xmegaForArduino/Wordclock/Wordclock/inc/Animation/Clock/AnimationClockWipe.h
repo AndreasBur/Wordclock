@@ -86,7 +86,7 @@ class AnimationClockWipe : public AnimationClockCommon
 
 
 	// methods
-    void init(Display*, Clock*);
+    void init();
     stdReturnType setClock(byte, byte);
     void task();
 };

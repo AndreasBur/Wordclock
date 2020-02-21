@@ -75,9 +75,9 @@ AnimationClockWipe::~AnimationClockWipe()
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-void AnimationClockWipe::init(Display* Display, Clock* Clock)
+void AnimationClockWipe::init()
 {
-    AnimationClockCommon::init(Display, Clock, STATE_IDLE);
+    AnimationClockCommon::init(STATE_IDLE);
     reset();
 } /* init */
 
@@ -94,7 +94,7 @@ stdReturnType AnimationClockWipe::setClock(byte Hour, byte Minute)
 {
     stdReturnType ReturnValue{E_NOT_OK};
 
-    if(pClock->getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
+    if(Clock::getInstance().getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
         ReturnValue = E_OK;
         State = STATE_CLEAR_TIME;
     }
@@ -148,10 +148,10 @@ void AnimationClockWipe::clearTimeTask()
 {
     byte Column, Row;
 
-    pDisplay->indexToColumnAndRow(Index, Column, Row);
+    Display::getInstance().indexToColumnAndRow(Index, Column, Row);
 
     do {
-        if(pDisplay->getPixelFast(Column, Row)) {
+        if(Display::getInstance().getPixelFast(Column, Row)) {
             if(SetPixelState == SET_PIXEL_STATE_DOWN) setPixelDown(Column, Row);
             else setPixelRight(Column, Row);
         }
@@ -179,10 +179,10 @@ void AnimationClockWipe::setTimeTask()
 {
     byte Column, Row;
 
-    pDisplay->indexToColumnAndRow(Index, Column, Row);
+    Display::getInstance().indexToColumnAndRow(Index, Column, Row);
 
     do {
-        if(isPixelPartOfClockWords(ClockWordsTable, Column, Row)) { pDisplay->setPixelFast(Column, Row); }
+        if(isPixelPartOfClockWords(ClockWordsTable, Column, Row)) { Display::getInstance().setPixelFast(Column, Row); }
     } while(Column-- != 0 && Row++ < DISPLAY_NUMBER_OF_ROWS - 1);
 
     if(setNextIndex() == E_NOT_OK) {
@@ -205,13 +205,13 @@ boolean AnimationClockWipe::setNextIndex()
     stdReturnType ReturValue = E_OK;
     byte Column, Row;
 
-    pDisplay->indexToColumnAndRow(Index, Column, Row);
+    Display::getInstance().indexToColumnAndRow(Index, Column, Row);
 
     if(Column < DISPLAY_NUMBER_OF_COLUMNS - 1) Column++;
     else if(Row < DISPLAY_NUMBER_OF_ROWS - 1) Row++;
     else ReturValue = E_NOT_OK;
 
-    Index = pDisplay->columnAndRowToIndex(Column, Row);
+    Index = Display::getInstance().columnAndRowToIndex(Column, Row);
     return ReturValue;
 } /* setNextIndex */
 
@@ -226,11 +226,11 @@ boolean AnimationClockWipe::setNextIndex()
 ******************************************************************************************************************************************************/
 void AnimationClockWipe::setPixelDown(byte Column, byte Row)
 {
-    pDisplay->clearPixelFast(Column, Row);
+    Display::getInstance().clearPixelFast(Column, Row);
 
     for(byte RowNext = Row + 1; RowNext < DISPLAY_NUMBER_OF_ROWS; RowNext++) {
-        if(pDisplay->getPixelFast(Column, RowNext) == false) {
-            pDisplay->setPixelFast(Column, RowNext);
+        if(Display::getInstance().getPixelFast(Column, RowNext) == false) {
+            Display::getInstance().setPixelFast(Column, RowNext);
             break;
         }
     }
@@ -247,11 +247,11 @@ void AnimationClockWipe::setPixelDown(byte Column, byte Row)
 ******************************************************************************************************************************************************/
 void AnimationClockWipe::setPixelRight(byte Column, byte Row)
 {
-    pDisplay->clearPixelFast(Column, Row);
+    Display::getInstance().clearPixelFast(Column, Row);
 
     for(byte ColumnNext = Column + 1; ColumnNext < DISPLAY_NUMBER_OF_COLUMNS; ColumnNext++) {
-        if(pDisplay->getPixelFast(ColumnNext, Row) == false) {
-            pDisplay->setPixelFast(ColumnNext, Row);
+        if(Display::getInstance().getPixelFast(ColumnNext, Row) == false) {
+            Display::getInstance().setPixelFast(ColumnNext, Row);
             break;
         }
     }

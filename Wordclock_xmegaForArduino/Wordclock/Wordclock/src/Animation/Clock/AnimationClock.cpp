@@ -52,10 +52,8 @@
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-AnimationClock::AnimationClock(Display* Display, Clock* Clock)
+AnimationClock::AnimationClock()
 {
-    pDisplay = Display;
-    pClock = Clock;
     CurrentAnimation = ANIMATION_CLOCK_NONE;
 } /* AnimationClock */
 
@@ -150,31 +148,31 @@ void AnimationClock::setAnimation(AnimationType Animation)
     switch(Animation)
     {
         case ANIMATION_CLOCK_CURSOR :
-            Animations.Cursor.init(pDisplay, pClock);
+            Animations.Cursor.init();
             break;
         case ANIMATION_CLOCK_TELETYPE :
-            Animations.Teletype.init(pDisplay, pClock);
+            Animations.Teletype.init();
             break;
         case ANIMATION_CLOCK_DROP :
-            Animations.Drop.init(pDisplay, pClock);
+            Animations.Drop.init();
             break;
         case ANIMATION_CLOCK_WIPE :
-            Animations.Wipe.init(pDisplay, pClock);
+            Animations.Wipe.init();
             break;
         case ANIMATION_CLOCK_SHIFT :
-            Animations.Shift.init(pDisplay, pClock);
+            Animations.Shift.init();
             break;
         case ANIMATION_CLOCK_FADE :
-            Animations.Fade.init(pDisplay, pClock);
+            Animations.Fade.init();
             break;
         case ANIMATION_CLOCK_SNAKE :
-            Animations.Snake.init(pDisplay, pClock);
+            Animations.Snake.init();
             break;
         case ANIMATION_CLOCK_CUBE :
-            Animations.Cube.init(pDisplay, pClock);
+            Animations.Cube.init();
             break;
         case ANIMATION_CLOCK_FLICKER :
-            Animations.Flicker.init(pDisplay, pClock);
+            Animations.Flicker.init();
         break;
         //case ANIMATION_CLOCK_EXPLODE :
             //break;

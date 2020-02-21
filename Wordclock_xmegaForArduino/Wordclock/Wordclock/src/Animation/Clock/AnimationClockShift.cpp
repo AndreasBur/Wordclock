@@ -52,7 +52,7 @@
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-AnimationClockShift::AnimationClockShift() : wcTransformation(nullptr)
+AnimationClockShift::AnimationClockShift()
 {
     reset();
 } /* AnimationClockShift */
@@ -75,10 +75,9 @@ AnimationClockShift::~AnimationClockShift()
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-void AnimationClockShift::init(Display* Display, Clock* Clock)
+void AnimationClockShift::init()
 {
-    AnimationClockCommon::init(Display, Clock, STATE_IDLE);
-    wcTransformation.setDisplay(Display);
+    AnimationClockCommon::init(STATE_IDLE);
     reset();
 } /* init */
 
@@ -95,7 +94,7 @@ stdReturnType AnimationClockShift::setClock(byte Hour, byte Minute)
 {
     stdReturnType ReturnValue{E_NOT_OK};
 
-    if(pClock->getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
+    if(Clock::getInstance().getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
         State = STATE_CLEAR_TIME;
     }
     return ReturnValue;
@@ -189,7 +188,7 @@ void AnimationClockShift::setTimeTask()
         wcTransformation.shiftRightFast();
         for(byte Row = 0; Row < DISPLAY_NUMBER_OF_ROWS; Row++) {
             if(isPixelPartOfClockWords(ClockWordsTable, DISPLAY_NUMBER_OF_COLUMNS - CurrentColumn - 1, Row)) {
-                pDisplay->setPixelFast(0, Row);
+                Display::getInstance().setPixelFast(0, Row);
             }
         }
         CurrentColumn++;
@@ -203,7 +202,7 @@ void AnimationClockShift::setTimeTask()
         wcTransformation.shiftDownFast();
         for(byte Column = 0; Column < DISPLAY_NUMBER_OF_COLUMNS; Column++) {
             if(isPixelPartOfClockWords(ClockWordsTable, Column, DISPLAY_NUMBER_OF_ROWS - CurrentRow - 1)) {
-                pDisplay->setPixelFast(Column, 0);
+                Display::getInstance().setPixelFast(Column, 0);
             }
         }
         CurrentRow++;

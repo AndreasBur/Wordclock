@@ -81,7 +81,7 @@ class AnimationClockSnake : public AnimationClockCommon
 	// set methods
 
 	// methods
-    void init(Display*, Clock*);
+    void init();
     stdReturnType setClock(byte, byte);
     void task();
 };

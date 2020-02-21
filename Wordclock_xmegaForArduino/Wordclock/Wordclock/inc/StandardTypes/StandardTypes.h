@@ -23,6 +23,7 @@
 ******************************************************************************************************************************************************/
 #include <stdint.h>
 #include "Arduino.h"
+#include "limits"
 
 /******************************************************************************************************************************************************
  *  GLOBAL CONSTANT MACROS
@@ -128,6 +129,7 @@ template <typename VarType, typename MaskType, typename GroupType> static inline
 template <typename VarType, typename MaskType, typename GroupType, typename ValType> static inline void writeBitGroup(VarType&, MaskType, GroupType, ValType, bool = true);
 template <typename VarType, typename MaskType> static inline VarType readBitGroup(VarType, MaskType);
 template <typename VarType, typename MaskType, typename ValType> static inline void writeBitGroup(VarType&, MaskType, ValType);
+template <typename T> uint8_t digitsOfNumber(T Number, unsigned = 10);
 
 /******************************************************************************************************************************************************
  *  GLOBAL INLINE FUNCTIONS
@@ -246,7 +248,16 @@ static inline void writeBitGroup(VarType& Var, MaskType BitGroupMask, ValType Va
     Var = (Var & ~(static_cast<VarType>(BitGroupMask))) | (static_cast<VarType>(Value & BitGroupMask));
 }
 
+template <typename T>
+uint8_t digitsOfNumber(T Number, unsigned Base)
+{
+	T NumberOfDigits = 0;
 
+	do { Number /= Base; NumberOfDigits++; }
+	while (Number != 0);
+
+	return NumberOfDigits;
+}
 
 #endif
 /******************************************************************************************************************************************************

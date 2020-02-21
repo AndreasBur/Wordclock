@@ -75,9 +75,9 @@ AnimationClockFade::~AnimationClockFade()
  *                  
  *  \return         -
 ******************************************************************************************************************************************************/
-void AnimationClockFade::init(Display* Display, Clock* Clock)
+void AnimationClockFade::init()
 {
-    AnimationClockCommon::init(Display, Clock, STATE_IDLE);
+    AnimationClockCommon::init(STATE_IDLE);
     reset();
 } /* init */
 
@@ -98,7 +98,7 @@ stdReturnType AnimationClockFade::setClock(byte sHour, byte sMinute)
         Hour = sHour;
         Minute = sMinute;
         State = STATE_CLEAR_TIME;
-        DisplayBrightness = pDisplay->getBrightness();
+        DisplayBrightness = Display::getInstance().getBrightness();
         ReturnValue = E_OK;
     }
     return ReturnValue;
@@ -168,7 +168,7 @@ void AnimationClockFade::clearTimeTask()
 ******************************************************************************************************************************************************/
 void AnimationClockFade::setTimeTask()
 {
-    if(DisplayBrightness < pDisplay->getBrightness()) {
+    if(DisplayBrightness < Display::getInstance().getBrightness()) {
         DisplayBrightness++;
     } else {
         State = STATE_IDLE;
@@ -187,7 +187,7 @@ void AnimationClockFade::setTimeTask()
 void AnimationClockFade::setStateToSetTime()
 {
     State = STATE_SET_TIME;
-    pClock->setClock(Hour, Minute);
+    Clock::getInstance().setClock(Hour, Minute);
     DisplayBrightness = 0;
 } /* setStateToSetTime */
 

@@ -60,6 +60,7 @@ class AnimationClock
 ******************************************************************************************************************************************************/
   public:
     enum AnimationType {
+		ANIMATION_CLOCK_NONE,
         ANIMATION_CLOCK_CURSOR,
         ANIMATION_CLOCK_TELETYPE,
         ANIMATION_CLOCK_DROP,
@@ -72,7 +73,7 @@ class AnimationClock
         //ANIMATION_CLOCK_EXPLODE,
         //ANIMATION_CLOCK_IMPLODE,
         //ANIMATION_CLOCK_MATRIX,
-        ANIMATION_CLOCK_NONE
+		ANIMATION_CLOCK_NUMBER_OF_ANIMATIONS
     };
 
     union AnimationsType {
@@ -96,8 +97,7 @@ class AnimationClock
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
-    Display* pDisplay;
-    Clock* pClock;
+  	std::array<byte, ANIMATION_CLOCK_NUMBER_OF_ANIMATIONS> TaskCycles;
     AnimationType CurrentAnimation;
     AnimationsType Animations;
 
@@ -105,14 +105,16 @@ class AnimationClock
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    AnimationClock(Display*, Clock*);
+    AnimationClock();
     ~AnimationClock();
 
 	// get methods
     AnimationType getAnimation() const { return CurrentAnimation; }
     StateType getState() const;
+	byte getTaskCycle(AnimationType Animation) const { return TaskCycles[Animation]; }
 
 	// set methods
+	void setTaskCycle(AnimationType Animation, byte Cycle) { TaskCycles[Animation] = Cycle; }
     void setAnimation(AnimationType);
 
 	// methods

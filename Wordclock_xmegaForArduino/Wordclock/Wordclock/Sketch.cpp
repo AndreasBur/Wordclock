@@ -7,6 +7,7 @@
 #include "BH1750.h"
 #include <util/delay.h>
 #include "Timer.h"
+#include "Communication.h"
 
 //volatile uint8_t* const PROGMEM port_to_mode_PGMdfg[] = {
     //NOT_A_PORT,
@@ -39,10 +40,9 @@
 //Beginning of Auto generated function prototypes by Atmel Studio
 //End of Auto generated function prototypes by Atmel Studio
 
-Display wcDisplay(20, 20, 20);
-Clock wcClock(&wcDisplay, Clock::MODE_WESSI);
-Animation wcAnimation(&wcDisplay, &wcClock);
+Animation wcAnimation();
 byte Brightness = 0;
+Communication wcCommunication;
 
 void initClockPrescaler()
 {
@@ -60,10 +60,9 @@ void initClockPrescaler()
 
 void setup() {
     initClockPrescaler();
-    wcDisplay.init();
+    Display::getInstance().init();
 
     BH1750 bh1750;
-
     Timer myTimer;
 
     bh1750.changeMeasurementTime(0b10100111);
@@ -121,8 +120,11 @@ void loop()
     Brightness++;
   //FontTahoma10x10::CharType Char;
   // put your main code here, to run repeatedly:
-    wcClock.setClock(17,30);
-    
+    Clock::getInstance().setClock(17,30);
+	while(1) {
+	    wcCommunication.task();
+	}
+
 
     //volatile int Test = 5;
 }
