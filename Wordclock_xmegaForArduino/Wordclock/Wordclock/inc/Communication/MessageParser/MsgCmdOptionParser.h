@@ -54,17 +54,21 @@ template <size_t OptionTableSize> class MsgCmdOptionParser
 	using OptionTableType = std::array<OptionTableElementType, OptionTableSize>;
   
 /******************************************************************************************************************************************************
+ *  P R O T E C T E D   D A T A   A N D   F U N C T I N O N S
+******************************************************************************************************************************************************/
+  protected:	
+    const char* CmdValue;
+  
+/******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
-  private:	
-    //const char* CmdValue;
-	//const OptionTableType& OptionTable;
+  private:
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr MsgCmdOptionParser() {
+    constexpr MsgCmdOptionParser(const char* sCmdValue) : CmdValue(sCmdValue) {
 		
 	}
     virtual ~MsgCmdOptionParser() {
@@ -72,7 +76,7 @@ template <size_t OptionTableSize> class MsgCmdOptionParser
 	}
 
 	// get methods
-	virtual const char* getCmdValue() const = 0;
+	const char* getCmdValue() const { return CmdValue; }
 	virtual const OptionTableType& getOptionTable() const = 0;
 
 	// set methods

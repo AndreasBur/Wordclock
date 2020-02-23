@@ -57,7 +57,7 @@ const MsgCmdDisplayColorParser::OptionTableType MsgCmdDisplayColorParser::Option
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-MsgCmdDisplayColorParser::MsgCmdDisplayColorParser(const char* sCmdValue) : CmdValue(sCmdValue)
+MsgCmdDisplayColorParser::MsgCmdDisplayColorParser(const char* sCmdValue) : MsgCmdOptionParser(sCmdValue)
 {
 
 } /* MsgCmdDisplayColorParser */

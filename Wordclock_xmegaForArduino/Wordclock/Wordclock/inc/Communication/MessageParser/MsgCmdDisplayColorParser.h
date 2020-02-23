@@ -57,7 +57,7 @@ class MsgCmdDisplayColorParser : public MsgCmdOptionParser<MSG_CMD_DISPLAY_COLOR
 ******************************************************************************************************************************************************/
   private:
 	static const OptionTableType OptionTable;
-	const char* CmdValue;
+
   
 	static const char RedParameterChar{'R'};
 	static const char GreenParameterChar{'G'};
@@ -84,7 +84,6 @@ class MsgCmdDisplayColorParser : public MsgCmdOptionParser<MSG_CMD_DISPLAY_COLOR
     ~MsgCmdDisplayColorParser();
 
 	// get methods
-	const char* getCmdValue() const { return CmdValue; }
 	const OptionTableType& getOptionTable() const { return OptionTable; }
 
 	// set methods
