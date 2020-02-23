@@ -22,11 +22,10 @@
 ******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Arduino.h"
-#include "Message.h"
 #include "MsgCmdParserCommon.h"
 #include "NeoPixel.h"
-#include "ErrorMessage.h"
 #include "Display.h"
+#include "MsgCmdValueParser.h"
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
@@ -35,8 +34,7 @@
 
 
 /* MsgCmdDisplayColorParser parameter */
-
-
+#define MSG_CMD_DISPLAY_COLOR_PARSER_OPTIONS_TABLE_SIZE           3u
 
 /******************************************************************************************************************************************************
  *  G L O B A L   F U N C T I O N   M A C R O S
@@ -46,18 +44,20 @@
 /******************************************************************************************************************************************************
  *  C L A S S   T E M P L A T E
 ******************************************************************************************************************************************************/
-class MsgCmdDisplayColorParser : public MsgCmdParserCommon
+class MsgCmdDisplayColorParser : public MsgCmdValueParser<MSG_CMD_DISPLAY_COLOR_PARSER_OPTIONS_TABLE_SIZE>
 {
 /******************************************************************************************************************************************************
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-  
+	using ColorType = NeoPixel::ColorType;
+	
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
-  	using ColorType = NeoPixel::ColorType;
+	static const OptionTableType OptionTable;
+	const char* CmdValue;
   
 	static const char RedParameterChar{'R'};
 	static const char GreenParameterChar{'G'};
@@ -80,7 +80,7 @@ class MsgCmdDisplayColorParser : public MsgCmdParserCommon
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    MsgCmdDisplayColorParser();
+    MsgCmdDisplayColorParser(const char*);
     ~MsgCmdDisplayColorParser();
 
 	// get methods
@@ -89,7 +89,7 @@ class MsgCmdDisplayColorParser : public MsgCmdParserCommon
 	// set methods
 
 	// methods
-	void parse(const char*);
+	void parse();
 	void sendAnswer();
 };
 

@@ -52,7 +52,7 @@
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-Transformation::Transformation()
+constexpr Transformation::Transformation()
 {
 } /* Transformation */
 

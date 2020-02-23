@@ -77,7 +77,8 @@ Communication::~Communication()
 void Communication::task()
 {
 	if(isMessageComplete()) {
-		Parser.parse(IncomingMessage);
+		MsgCmdParser CmdParser(IncomingMessage);
+		CmdParser.parse();
 	} else {
 		addMessagePart();
 	}

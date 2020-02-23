@@ -156,7 +156,7 @@ const FontTahoma10x10::FontTableType FontTahoma10x10::FontTable PROGMEM
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-FontTahoma10x10::FontTahoma10x10() : FontCommon(FontTable)
+constexpr FontTahoma10x10::FontTahoma10x10()
 {
 
 } /* FontTahoma10x10 */

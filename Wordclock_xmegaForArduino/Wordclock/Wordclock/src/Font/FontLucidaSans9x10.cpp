@@ -155,7 +155,7 @@ const FontLucidaSans9x10::FontTableType FontLucidaSans9x10::FontTable PROGMEM
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-FontLucidaSans9x10::FontLucidaSans9x10() : FontCommon(FontTable)
+constexpr FontLucidaSans9x10::FontLucidaSans9x10()
 {
 
 } /* FontLucidaSans9x10 */

@@ -8,28 +8,31 @@
  *  ---------------------------------------------------------------------------------------------------------------------------------------------------
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       StringManipulation.h
+/**     \file       MsgParser.h
  *      \brief      
  *
  *      \details    
  *                  
 ******************************************************************************************************************************************************/
-#ifndef _STRING_MANIPULATION_H_
-#define _STRING_MANIPULATION_H_
+#ifndef _MSG_PARSER_H_
+#define _MSG_PARSER_H_
 
 /******************************************************************************************************************************************************
  * I N C L U D E S
 ******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Arduino.h"
-#include "errno.h"
+#include "Message.h"
+#include "ErrorMessage.h"
+#include "MsgOption.h"
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
-/* StringManipulation configuration parameter */
+/* MsgParser configuration parameter */
 
-/* StringManipulation parameter */
+
+/* MsgParser parameter */
 
 
 
@@ -41,58 +44,41 @@
 /******************************************************************************************************************************************************
  *  C L A S S   T E M P L A T E
 ******************************************************************************************************************************************************/
-class StringManipulation
+template <size_t OptionTableSize> class MsgCmdValueParser
 {
 /******************************************************************************************************************************************************
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-  	enum ResultType {
-	  	RESULT_OVERFLOW,
-	  	RESULT_NO_VALUE,
-	  	RESULT_OK
-  	};
-	  
-	 static const size_t npos = -1;
-	  
+	using OptionTableElementType = MsgOption;
+	using OptionTableType = std::array<OptionTableElementType, OptionTableSize>;
+  
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
-
-		
+	const OptionTableType& OptionTable;
+	const char* CmdValue;
+  
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    StringManipulation() {}
-    ~StringManipulation() {}
+    MsgCmdValueParser(const char* sCmdValue, const OptionTableType& sOptionTable) : CmdValue(sCmdValue), OptionTable(sOptionTable) {
+		
+	}
+    virtual ~MsgCmdValueParser() {
+		
+	}
 
 	// get methods
+
 
 	// set methods
 
 	// methods
-	static void stringCopy(char *Destination, const char *Source, int Length) {
-		strncpy(Destination, Source, Length - 1);
-		Destination[Length - 1] = '\0';
-	}
+	void parse() {}
 	
-	template<typename T> static ResultType stringToUnsignedInteger(const char* String, uint8_t Base, T Value) {
-		char* end;
-		errno = 0;
-		uint64_t valueMax = strtoul(String, &end, Base);
-		
-		if(String == end) { 
-			return RESULT_NO_VALUE;
-		} else if(errno == ERANGE || valueMax > std::numeric_limits<T>::max()) {
-			Value = std::numeric_limits<T>::max();
-			return RESULT_OVERFLOW;
-		} else {
-			Value = static_cast<T>(valueMax);	
-			return RESULT_OK;
-		}
-	}
 };
 
 #endif

@@ -156,7 +156,7 @@ const FontCourierNew7x9::FontTableType FontCourierNew7x9::FontTable PROGMEM
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-FontCourierNew7x9::FontCourierNew7x9() : FontCommon(FontTable)
+constexpr FontCourierNew7x9::FontCourierNew7x9()
 {
 
 } /* FontCourierNew7x9 */

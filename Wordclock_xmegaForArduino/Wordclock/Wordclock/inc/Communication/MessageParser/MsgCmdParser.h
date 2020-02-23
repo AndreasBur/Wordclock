@@ -58,23 +58,23 @@ class MsgCmdParser
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
-  	static const char commandValueDelimiter{' '};
-    MsgCmdDisplayColorParser CmdDisplayColorParser;
+    const Message& IncomingMessage;
+  	static const char CommandValueDelimiter{' '};
 	ErrorMessage Error;
   
   	//private functions
 	void sendAnswer(CommandsType Command) const {
 		Serial.print(Command);
-		Serial.println(commandValueDelimiter);
+		Serial.println(CommandValueDelimiter);
 	}
 	
-	CommandsType getCommand(const Message& Message) const {
-		return static_cast<CommandsType>(atoi(Message.getMessage()));
+	CommandsType getCommand() const {
+		return static_cast<CommandsType>(atoi(IncomingMessage.getMessage()));
 	}
 
-	const char* getCmdValue(const Message& Message) const {
-		const char* message = Message.getMessage();
-		size_t valuePos = Message.find(commandValueDelimiter);
+	const char* getCmdValue() const {
+		const char* message = IncomingMessage.getMessage();
+		size_t valuePos = IncomingMessage.find(CommandValueDelimiter);
 
 		if(valuePos == Message::npos) { return nullptr; }
 		else { return &message[valuePos]; }
@@ -84,7 +84,7 @@ class MsgCmdParser
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    MsgCmdParser();
+    MsgCmdParser(const Message&);
     ~MsgCmdParser();
 
 	// get methods
@@ -93,7 +93,7 @@ class MsgCmdParser
 	// set methods
 
 	// methods
-	void parse(const Message&);
+	void parse();
 
 };
 

@@ -22,7 +22,7 @@
 ******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Arduino.h"
-#include "FontCommon.h"
+#include "Font.h"
 #include "FontChar.h"
 
 /******************************************************************************************************************************************************
@@ -45,7 +45,7 @@
 /******************************************************************************************************************************************************
  *  C L A S S   F O N T S P R I T E 5 X 8
 ******************************************************************************************************************************************************/
-class FontSprite5x8 : public FontCommon<FontCharVertical<byte, FONT_SPRITE_5X8_WIDTH>, FONT_SPRITE_5X8_FONT_TABLE_SIZE>
+class FontSprite5x8 : public Font<FontCharVertical<byte, FONT_SPRITE_5X8_WIDTH>, FONT_SPRITE_5X8_FONT_TABLE_SIZE>
 {
 /******************************************************************************************************************************************************
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
@@ -64,14 +64,15 @@ class FontSprite5x8 : public FontCommon<FontCharVertical<byte, FONT_SPRITE_5X8_W
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    FontSprite5x8();
+    constexpr FontSprite5x8();
     ~FontSprite5x8();
 
 	// get methods
     byte getWidth() const { return FONT_SPRITE_5X8_WIDTH; }
     byte getHeight() const { return FONT_SPRITE_5X8_HEIGHT; }
     Orientation getOrientation() const { return Orientation::ORIENTATION_VERTICAL; }
-
+	const FontTableType& getFontTable() const { return FontTable; }
+		
 	// set methods
 
 	// methods

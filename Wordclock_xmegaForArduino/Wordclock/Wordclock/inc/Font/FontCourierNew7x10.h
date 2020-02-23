@@ -22,7 +22,7 @@
 ******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Arduino.h"
-#include "FontCommon.h"
+#include "Font.h"
 #include "FontChar.h"
 
 /******************************************************************************************************************************************************
@@ -45,7 +45,7 @@
 /******************************************************************************************************************************************************
  *  C L A S S   F O N T C O U R I E R N E W 7 X 1 0
 ******************************************************************************************************************************************************/
-class FontCourierNew7x10 : public FontCommon<FontCharHorizontal<byte, FONT_COURIER_NEW_7X10_HEIGHT>, FONT_COURIER_NEW_7X10_FONT_TABLE_SIZE>
+class FontCourierNew7x10 : public Font<FontCharHorizontal<byte, FONT_COURIER_NEW_7X10_HEIGHT>, FONT_COURIER_NEW_7X10_FONT_TABLE_SIZE>
 {
 /******************************************************************************************************************************************************
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
@@ -64,14 +64,15 @@ class FontCourierNew7x10 : public FontCommon<FontCharHorizontal<byte, FONT_COURI
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    FontCourierNew7x10();
+    constexpr FontCourierNew7x10();
     ~FontCourierNew7x10();
 
 	// get methods
     byte getWidth() const { return FONT_COURIER_NEW_7X10_WIDTH; }
     byte getHeight() const { return FONT_COURIER_NEW_7X10_HEIGHT; }
     Orientation getOrientation() const { return Orientation::ORIENTATION_HORIZONTAL; }
-
+	const FontTableType& getFontTable() const { return FontTable; }
+		
 	// set methods
 
 	// methods

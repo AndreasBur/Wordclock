@@ -52,7 +52,7 @@
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-MsgCmdParser::MsgCmdParser()
+MsgCmdParser::MsgCmdParser(const Message& sMessage) : IncomingMessage(sMessage) 
 {
 
 } /* MsgCmdParser */
@@ -66,16 +66,17 @@ MsgCmdParser::~MsgCmdParser()
 
 } /* ~MsgCmdParser */
 
-void MsgCmdParser::parse(const Message& Message)
+void MsgCmdParser::parse()
 {
-	CommandsType command = getCommand(Message);
-	const char* cmdValue = getCmdValue(Message);
+	CommandsType command = getCommand();
+	const char* cmdValue = getCmdValue();
 	
 	switch(command) {
-		case COMMAND_DISPLAY_COLOR :
-		    CmdDisplayColorParser.parse(cmdValue);
+		case COMMAND_DISPLAY_COLOR : {
+			MsgCmdDisplayColorParser CmdDisplayColorParser(cmdValue);
+		    CmdDisplayColorParser.parse();
 			sendAnswer(command);
-			break;
+			break; }
 		case COMMAND_DISPLAY_MODE :
 			sendAnswer(command);
 			break;

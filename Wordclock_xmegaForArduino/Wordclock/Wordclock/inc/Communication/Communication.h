@@ -24,7 +24,7 @@
 #include "Arduino.h"
 #include "Message.h"
 #include "ErrorMessage.h"
-#include "MsgParser.h"
+#include "MsgCmdParser.h"
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
@@ -61,7 +61,6 @@ class Communication
     StateType State;
 	Message IncomingMessage;
 	ErrorMessage Error;
-	MsgParser Parser;
 	
 	// private functions
 	void addMessagePart();

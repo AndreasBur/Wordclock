@@ -22,7 +22,7 @@
 ******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Arduino.h"
-#include "FontCommon.h"
+#include "Font.h"
 #include "FontChar.h"
 
 /******************************************************************************************************************************************************
@@ -45,7 +45,7 @@
 /******************************************************************************************************************************************************
  *  C L A S S   F O N T C O U R I E R N E W 7 X 9
 ******************************************************************************************************************************************************/
-class FontCourierNew7x9 : public FontCommon<FontCharHorizontal<byte, FONT_COURIER_NEW_7X9_HEIGHT>, FONT_COURIER_NEW_7X9_FONT_TABLE_SIZE>
+class FontCourierNew7x9 : public Font<FontCharHorizontal<byte, FONT_COURIER_NEW_7X9_HEIGHT>, FONT_COURIER_NEW_7X9_FONT_TABLE_SIZE>
 {
 /******************************************************************************************************************************************************
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
@@ -64,14 +64,15 @@ class FontCourierNew7x9 : public FontCommon<FontCharHorizontal<byte, FONT_COURIE
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    FontCourierNew7x9();
+    constexpr FontCourierNew7x9();
     ~FontCourierNew7x9();
 
 	// get methods
     byte getWidth() const { return FONT_COURIER_NEW_7X9_WIDTH; }
     byte getHeight() const { return FONT_COURIER_NEW_7X9_HEIGHT; }
     Orientation getOrientation() const { return Orientation::ORIENTATION_HORIZONTAL; }
-
+	const FontTableType& getFontTable() const { return FontTable; }
+		
 	// set methods
 
 	// methods

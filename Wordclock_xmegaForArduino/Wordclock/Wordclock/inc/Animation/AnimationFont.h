@@ -102,19 +102,19 @@ class AnimationFont
     StateType State;
 
 #if(ANIMATION_FONT_SUPPORT_FONT_5X8 == STD_ON)
-    FontSprite5x8 Font5x8;
+FontSprite5x8 Font5x8;
 #endif
 #if(ANIMATION_FONT_SUPPORT_FONT_7X9 == STD_ON)
-    FontCourierNew7x9 Font7x9;
+FontCourierNew7x9 Font7x9;
 #endif
 #if(ANIMATION_FONT_SUPPORT_FONT_7X10 == STD_ON)
-    FontCourierNew7x10 Font7x10;
+FontCourierNew7x10 Font7x10;
 #endif
 #if(ANIMATION_FONT_SUPPORT_FONT_9X10 == STD_ON)
-    FontLucidaSans9x10 Font9x10;
+FontLucidaSans9x10 Font9x10;
 #endif
 #if(ANIMATION_FONT_SUPPORT_FONT_10X10 == STD_ON)
-    FontTahoma10x10 Font10x10;
+FontTahoma10x10 Font10x10;
 #endif
 
     // functions

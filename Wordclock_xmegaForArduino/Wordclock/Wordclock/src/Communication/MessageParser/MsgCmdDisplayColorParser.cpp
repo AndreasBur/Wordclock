@@ -21,7 +21,7 @@
  * I N C L U D E S
 ******************************************************************************************************************************************************/
 #include "MsgCmdDisplayColorParser.h"
-#include "StringManipulation.h"
+#include "StringTools.h"
 
 /******************************************************************************************************************************************************
  *  L O C A L   C O N S T A N T   M A C R O S 
@@ -37,7 +37,12 @@
 /******************************************************************************************************************************************************
  *  L O C A L   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
-
+const MsgCmdDisplayColorParser::OptionTableType MsgCmdDisplayColorParser::OptionTable PROGMEM
+{
+	OptionTableElementType('R', MsgOption::VALUE_TYPE_UINT8),
+	OptionTableElementType('G', MsgOption::VALUE_TYPE_UINT8),
+	OptionTableElementType('B', MsgOption::VALUE_TYPE_UINT8)
+};
 
 
 /******************************************************************************************************************************************************
@@ -52,7 +57,7 @@
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-MsgCmdDisplayColorParser::MsgCmdDisplayColorParser()
+MsgCmdDisplayColorParser::MsgCmdDisplayColorParser(const char* sCmdValue) : MsgCmdValueParser(sCmdValue, OptionTable)
 {
 
 } /* MsgCmdDisplayColorParser */
@@ -67,7 +72,7 @@ MsgCmdDisplayColorParser::~MsgCmdDisplayColorParser()
 } /* ~MsgCmdDisplayColorParser */
 
 
-void MsgCmdDisplayColorParser::parse(const char* CmdValue)
+void MsgCmdDisplayColorParser::parse()
 {
 	if(CmdValue == nullptr) {
 		sendAnswer();
@@ -150,12 +155,12 @@ stdReturnType MsgCmdDisplayColorParser::getColorValue(const char* CmdValue, char
 	char parameterAndDelimiter[]{ColorParameterChar, ColorValueDelimiter, '\0'};
 	const char* parameterStart = strstr(CmdValue, parameterAndDelimiter);
 	const char* valueStart = parameterStart + 2u;
-	StringManipulation::ResultType result = StringManipulation::stringToUnsignedInteger(valueStart, 10, Value);
+	StringTools::ResultType result = StringTools::stringToUnsignedInteger(valueStart, 10, Value);
 	
-	if((result == StringManipulation::RESULT_OVERFLOW)) {
+	if((result == StringTools::RESULT_OVERFLOW)) {
 		Error.send(ErrorMessage::ERROR_VALUE_OUT_OF_BOUNCE);
 		return E_NOT_OK;
-	} else if (result == StringManipulation::RESULT_NO_VALUE){
+	} else if (result == StringTools::RESULT_NO_VALUE){
 		Error.send(ErrorMessage::ERROR_NO_VALUE_GIVEN);
 		return E_NOT_OK;
 	} else {

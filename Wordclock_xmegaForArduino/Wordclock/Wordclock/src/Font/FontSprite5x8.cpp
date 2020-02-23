@@ -156,7 +156,7 @@ const FontSprite5x8::FontTableType FontSprite5x8::FontTable PROGMEM
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-FontSprite5x8::FontSprite5x8() : FontCommon(FontTable)
+constexpr FontSprite5x8::FontSprite5x8()
 {
 
 } /* FontSprite5x8 */
