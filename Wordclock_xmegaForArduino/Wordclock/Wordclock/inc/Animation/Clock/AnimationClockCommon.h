@@ -68,12 +68,14 @@ class AnimationClockCommon
   protected:
       StateType State;
 
+    ~AnimationClockCommon();
+	
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
     AnimationClockCommon();
-    ~AnimationClockCommon();
+
 
 	// get methods
     StateType getState() const { return State; }
