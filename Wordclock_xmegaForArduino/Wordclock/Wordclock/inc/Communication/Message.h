@@ -8,30 +8,30 @@
  *  ---------------------------------------------------------------------------------------------------------------------------------------------------
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       MsgCmdParser.h
+/**     \file       Message.h
  *      \brief      
  *
  *      \details    
  *                  
 ******************************************************************************************************************************************************/
-#ifndef _MSG_CMD_PARSER_H_
-#define _MSG_CMD_PARSER_H_
+#ifndef _MESSAGE_H_
+#define _MESSAGE_H_
 
 /******************************************************************************************************************************************************
  * I N C L U D E S
 ******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Arduino.h"
-#include "Message.h"
-#include "MsgCmdDisplayColorParser.h"
+
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
-/* MsgCmdParser configuration parameter */
+/* Message configuration parameter */
+#define MESSAGE_LENGTH    20u
 
+/* Message parameter */
 
-/* MsgCmdParser parameter */
 
 
 /******************************************************************************************************************************************************
@@ -42,59 +42,49 @@
 /******************************************************************************************************************************************************
  *  C L A S S   T E M P L A T E
 ******************************************************************************************************************************************************/
-class MsgCmdParser
+class Message
 {
 /******************************************************************************************************************************************************
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-    enum CommandsType {
-		COMMAND_NONE,
-		COMMAND_DISPLAY_MODE,
-		COMMAND_DISPLAY_COLOR
-	};
-  
+	  static const size_t npos = -1;
+	  
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
-  	static const char commandValueDelimiter{' '};
-    MsgCmdDisplayColorParser CmdDisplayColorParser;
-	ErrorMessage Error;
-  
-  	//private functions
-	void sendAnswer(CommandsType Command) const {
-		Serial.print(Command);
-		Serial.println(commandValueDelimiter);
-	}
-	
-	CommandsType getCommand(const Message& Message) const {
-		return static_cast<CommandsType>(atoi(Message.getMessage()));
-	}
+	char Buffer[MESSAGE_LENGTH];
 
-	const char* getCmdValue(const Message& Message) const {
-		const char* message = Message.getMessage();
-		size_t valuePos = Message.find(commandValueDelimiter);
 
-		if(valuePos == Message::npos) { return nullptr; }
-		else { return &message[valuePos]; }
-	}
-  
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    MsgCmdParser();
-    ~MsgCmdParser();
+    Message();
+    ~Message();
 
 	// get methods
-
+	const char* getMessage() const { return Buffer; }
 
 	// set methods
 
 	// methods
-	void parse(const Message&);
+	void clear() { Buffer[0] = '\0'; }
 
+    size_t find(const char* String, size_t position = 0) const {
+		const char* finding = strstr(&Buffer[position], String);
+		if(finding == nullptr) return npos;
+		else return finding - Buffer;
+	}
+	
+	size_t find(char Char, size_t position = 0) const {
+		const char* finding = strchr(&Buffer[position], Char);
+		if(finding == nullptr) return npos;
+		else return finding - Buffer;
+	}
+	
+	stdReturnType addChar(char);
 };
 
 #endif

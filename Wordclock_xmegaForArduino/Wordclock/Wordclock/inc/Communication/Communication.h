@@ -8,14 +8,14 @@
  *  ---------------------------------------------------------------------------------------------------------------------------------------------------
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       MsgCmdParser.h
+/**     \file       Communication.h
  *      \brief      
  *
  *      \details    
  *                  
 ******************************************************************************************************************************************************/
-#ifndef _MSG_CMD_PARSER_H_
-#define _MSG_CMD_PARSER_H_
+#ifndef _COMMUNICATION_H_
+#define _COMMUNICATION_H_
 
 /******************************************************************************************************************************************************
  * I N C L U D E S
@@ -23,15 +23,15 @@
 #include "StandardTypes.h"
 #include "Arduino.h"
 #include "Message.h"
-#include "MsgCmdDisplayColorParser.h"
+#include "ErrorMessage.h"
+#include "MsgParser.h"
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
-/* MsgCmdParser configuration parameter */
+/* Communication configuration parameter */
 
-
-/* MsgCmdParser parameter */
+/* Communication parameter */
 
 
 /******************************************************************************************************************************************************
@@ -40,61 +40,47 @@
 
 
 /******************************************************************************************************************************************************
- *  C L A S S   T E M P L A T E
+ *  C L A S S   C O M M U N I C A T I O N
 ******************************************************************************************************************************************************/
-class MsgCmdParser
+class Communication 
 {
 /******************************************************************************************************************************************************
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-    enum CommandsType {
-		COMMAND_NONE,
-		COMMAND_DISPLAY_MODE,
-		COMMAND_DISPLAY_COLOR
-	};
+  	enum StateType {
+	  	STATE_MESSAGE_COMPLETE,
+	  	STATE_MESSAGE_INCOMPLETE,
+  	};
   
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
-  	static const char commandValueDelimiter{' '};
-    MsgCmdDisplayColorParser CmdDisplayColorParser;
+  	static const char EndOfMessageChar{'\n'};
+    StateType State;
+	Message IncomingMessage;
 	ErrorMessage Error;
-  
-  	//private functions
-	void sendAnswer(CommandsType Command) const {
-		Serial.print(Command);
-		Serial.println(commandValueDelimiter);
-	}
+	MsgParser Parser;
 	
-	CommandsType getCommand(const Message& Message) const {
-		return static_cast<CommandsType>(atoi(Message.getMessage()));
-	}
+	// private functions
+	void addMessagePart();
 
-	const char* getCmdValue(const Message& Message) const {
-		const char* message = Message.getMessage();
-		size_t valuePos = Message.find(commandValueDelimiter);
-
-		if(valuePos == Message::npos) { return nullptr; }
-		else { return &message[valuePos]; }
-	}
-  
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    MsgCmdParser();
-    ~MsgCmdParser();
+    Communication();
+    ~Communication();
 
 	// get methods
-
+	StateType getState() const { return State; }
 
 	// set methods
 
 	// methods
-	void parse(const Message&);
-
+	void task();
+    boolean isMessageComplete() const { return (State == STATE_MESSAGE_COMPLETE) ? true : false; }
 };
 
 #endif

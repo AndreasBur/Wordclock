@@ -74,14 +74,16 @@ void MsgCmdParser::parse(const Message& Message)
 	switch(command) {
 		case COMMAND_DISPLAY_COLOR :
 		    CmdDisplayColorParser.parse(cmdValue);
+			sendAnswer(command);
 			break;
 		case COMMAND_DISPLAY_MODE :
+			sendAnswer(command);
 			break;
 		default:
+			Error.send(ErrorMessage::ERROR_WRONG_COMMAND);
 			break;
 	}
-	
-	sendAnswer(command);
+
 }
 
 

@@ -8,14 +8,14 @@
  *  ---------------------------------------------------------------------------------------------------------------------------------------------------
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       MsgCmdParser.h
+/**     \file       MsgCmdDisplayColorParser.h
  *      \brief      
  *
  *      \details    
  *                  
 ******************************************************************************************************************************************************/
-#ifndef _MSG_CMD_PARSER_H_
-#define _MSG_CMD_PARSER_H_
+#ifndef _MSG_CMD_DISPLAY_COLOR_PARSER_H_
+#define _MSG_CMD_DISPLAY_COLOR_PARSER_H_
 
 /******************************************************************************************************************************************************
  * I N C L U D E S
@@ -23,15 +23,19 @@
 #include "StandardTypes.h"
 #include "Arduino.h"
 #include "Message.h"
-#include "MsgCmdDisplayColorParser.h"
+#include "MsgCmdParserCommon.h"
+#include "NeoPixel.h"
+#include "ErrorMessage.h"
+#include "Display.h"
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
-/* MsgCmdParser configuration parameter */
+/* MsgCmdDisplayColorParser configuration parameter */
 
 
-/* MsgCmdParser parameter */
+/* MsgCmdDisplayColorParser parameter */
+
 
 
 /******************************************************************************************************************************************************
@@ -42,50 +46,42 @@
 /******************************************************************************************************************************************************
  *  C L A S S   T E M P L A T E
 ******************************************************************************************************************************************************/
-class MsgCmdParser
+class MsgCmdDisplayColorParser : public MsgCmdParserCommon
 {
 /******************************************************************************************************************************************************
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-    enum CommandsType {
-		COMMAND_NONE,
-		COMMAND_DISPLAY_MODE,
-		COMMAND_DISPLAY_COLOR
-	};
   
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
-  	static const char commandValueDelimiter{' '};
-    MsgCmdDisplayColorParser CmdDisplayColorParser;
-	ErrorMessage Error;
+  	using ColorType = NeoPixel::ColorType;
   
-  	//private functions
-	void sendAnswer(CommandsType Command) const {
-		Serial.print(Command);
-		Serial.println(commandValueDelimiter);
-	}
-	
-	CommandsType getCommand(const Message& Message) const {
-		return static_cast<CommandsType>(atoi(Message.getMessage()));
-	}
-
-	const char* getCmdValue(const Message& Message) const {
-		const char* message = Message.getMessage();
-		size_t valuePos = Message.find(commandValueDelimiter);
-
-		if(valuePos == Message::npos) { return nullptr; }
-		else { return &message[valuePos]; }
-	}
+	static const char RedParameterChar{'R'};
+	static const char GreenParameterChar{'G'};
+	static const char BlueParameterChar{'B'};
+	static const char ColorValueDelimiter{':'};
+		
+	ErrorMessage Error;
+		
+	// functions
+	void setColors(const char*);
+	void setColorRed(const char*);
+	void setColorGreen(const char*);
+	void setColorBlue(const char*);
+	void sendAnswerRed();
+	void sendAnswerGreen();
+	void sendAnswerBlue();
+	stdReturnType getColorValue(const char*, char, ColorType&);
   
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    MsgCmdParser();
-    ~MsgCmdParser();
+    MsgCmdDisplayColorParser();
+    ~MsgCmdDisplayColorParser();
 
 	// get methods
 
@@ -93,8 +89,8 @@ class MsgCmdParser
 	// set methods
 
 	// methods
-	void parse(const Message&);
-
+	void parse(const char*);
+	void sendAnswer();
 };
 
 #endif

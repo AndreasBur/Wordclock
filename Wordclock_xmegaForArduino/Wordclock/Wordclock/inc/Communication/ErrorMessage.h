@@ -8,30 +8,30 @@
  *  ---------------------------------------------------------------------------------------------------------------------------------------------------
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       MsgCmdParser.h
+/**     \file       ErrorMessage.h
  *      \brief      
  *
  *      \details    
  *                  
 ******************************************************************************************************************************************************/
-#ifndef _MSG_CMD_PARSER_H_
-#define _MSG_CMD_PARSER_H_
+#ifndef _ERROR_MESSAGE_H_
+#define _ERROR_MESSAGE_H_
 
 /******************************************************************************************************************************************************
  * I N C L U D E S
 ******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Arduino.h"
-#include "Message.h"
-#include "MsgCmdDisplayColorParser.h"
+
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
-/* MsgCmdParser configuration parameter */
+/* ErrorMessage configuration parameter */
 
 
-/* MsgCmdParser parameter */
+/* ErrorMessage parameter */
+
 
 
 /******************************************************************************************************************************************************
@@ -42,59 +42,42 @@
 /******************************************************************************************************************************************************
  *  C L A S S   T E M P L A T E
 ******************************************************************************************************************************************************/
-class MsgCmdParser
+class ErrorMessage
 {
 /******************************************************************************************************************************************************
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-    enum CommandsType {
-		COMMAND_NONE,
-		COMMAND_DISPLAY_MODE,
-		COMMAND_DISPLAY_COLOR
-	};
+  	enum ErrorType {
+	  	ERROR_MESSAGE_TOO_LONG,
+		ERROR_WRONG_COMMAND,
+		ERROR_VALUE_OUT_OF_BOUNCE,
+		ERROR_NO_VALUE_GIVEN
+  	};
   
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
-  	static const char commandValueDelimiter{' '};
-    MsgCmdDisplayColorParser CmdDisplayColorParser;
-	ErrorMessage Error;
-  
-  	//private functions
-	void sendAnswer(CommandsType Command) const {
-		Serial.print(Command);
-		Serial.println(commandValueDelimiter);
-	}
-	
-	CommandsType getCommand(const Message& Message) const {
-		return static_cast<CommandsType>(atoi(Message.getMessage()));
-	}
 
-	const char* getCmdValue(const Message& Message) const {
-		const char* message = Message.getMessage();
-		size_t valuePos = Message.find(commandValueDelimiter);
-
-		if(valuePos == Message::npos) { return nullptr; }
-		else { return &message[valuePos]; }
-	}
   
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    MsgCmdParser();
-    ~MsgCmdParser();
-
+	constexpr ErrorMessage() {}
+	~ErrorMessage() {}
+		
 	// get methods
 
 
 	// set methods
 
 	// methods
-	void parse(const Message&);
-
+    void send(ErrorType Error) const {
+		Serial.print(F("Error: "));
+		Serial.println(Error); 
+	}
 };
 
 #endif

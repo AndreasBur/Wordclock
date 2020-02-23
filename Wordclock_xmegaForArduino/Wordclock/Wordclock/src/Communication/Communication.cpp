@@ -89,6 +89,7 @@ void Communication::task()
 ******************************************************************************************************************************************************/
 void Communication::addMessagePart()
 {
+/*
 	while (Serial.available()) {
 		// get the new byte from uart
 		char inChar = static_cast<char>(Serial.read());
@@ -97,12 +98,13 @@ void Communication::addMessagePart()
 			Error.send(ErrorMessage::ERROR_MESSAGE_TOO_LONG);
 		}
 	}
-	
-	char Buffer[] = "2=R:56\n";
+*/
+	char Buffer[] = "2 R:56\n";
 	
 	for(uint8_t i = 0; i <= strlen(Buffer); i++)
 	{
-		IncomingMessage.addChar(Buffer[i]);
+		if(Buffer[i] == EndOfMessageChar) { State = STATE_MESSAGE_COMPLETE; }
+		else IncomingMessage.addChar(Buffer[i]);
 	}
 }
 

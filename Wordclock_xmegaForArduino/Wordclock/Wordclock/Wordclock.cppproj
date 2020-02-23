@@ -250,7 +250,6 @@
       <Value>../inc/Communication/MessageParser</Value>
     </ListValues>
   </avrgcccpp.compiler.directories.IncludePaths>
-  <avrgcccpp.compiler.optimization.level>Optimize (-O1)</avrgcccpp.compiler.optimization.level>
   <avrgcccpp.compiler.optimization.OtherFlags>-fno-threadsafe-statics</avrgcccpp.compiler.optimization.OtherFlags>
   <avrgcccpp.compiler.optimization.PackStructureMembers>True</avrgcccpp.compiler.optimization.PackStructureMembers>
   <avrgcccpp.compiler.optimization.AllocateBytesNeededForEnum>True</avrgcccpp.compiler.optimization.AllocateBytesNeededForEnum>
@@ -527,6 +526,9 @@
     <Folder Include="inc\GammaCorrection" />
     <Folder Include="inc\BH1750" />
     <Folder Include="inc\Communication" />
+    <Folder Include="inc\DisplayManager" />
+    <Folder Include="inc\Scheduler" />
+    <Folder Include="inc\NonVolatile" />
     <Folder Include="inc\Timer" />
     <Folder Include="inc\Transformation" />
     <Folder Include="inc\WS2812" />
@@ -537,10 +539,13 @@
     <Folder Include="src\Display" />
     <Folder Include="src\Clock" />
     <Folder Include="src\Animation" />
+    <Folder Include="src\DisplayManager\" />
     <Folder Include="src\Font" />
     <Folder Include="src\GammaCorrection" />
     <Folder Include="src\BH1750" />
     <Folder Include="src\Communication" />
+    <Folder Include="src\NonVolatile\" />
+    <Folder Include="src\Scheduler\" />
     <Folder Include="src\Timer" />
     <Folder Include="src\Transformation" />
     <Folder Include="src\WS2812" />

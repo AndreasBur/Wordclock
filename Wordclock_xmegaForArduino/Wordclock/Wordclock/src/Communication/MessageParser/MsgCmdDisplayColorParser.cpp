@@ -131,7 +131,7 @@ void MsgCmdDisplayColorParser::setColorGreen(const char* CmdValue)
 {
 	uint8_t Value;
 	
-	if(getColorValue(CmdValue, RedParameterChar, Value) == E_OK) {
+	if(getColorValue(CmdValue, GreenParameterChar, Value) == E_OK) {
 		Display::getInstance().setColorGreen(Value);
 	}
 }
@@ -140,7 +140,7 @@ void MsgCmdDisplayColorParser::setColorBlue(const char* CmdValue)
 {
 	uint8_t Value;
 	
-	if(getColorValue(CmdValue, RedParameterChar, Value) == E_OK) {
+	if(getColorValue(CmdValue, BlueParameterChar, Value) == E_OK) {
 		Display::getInstance().setColorBlue(Value);
 	}
 }
@@ -149,7 +149,8 @@ stdReturnType MsgCmdDisplayColorParser::getColorValue(const char* CmdValue, char
 {
 	char parameterAndDelimiter[]{ColorParameterChar, ColorValueDelimiter, '\0'};
 	const char* parameterStart = strstr(CmdValue, parameterAndDelimiter);
-	StringManipulation::ResultType result = StringManipulation::stringToUnsignedInteger(parameterStart, 10, Value);
+	const char* valueStart = parameterStart + 2u;
+	StringManipulation::ResultType result = StringManipulation::stringToUnsignedInteger(valueStart, 10, Value);
 	
 	if((result == StringManipulation::RESULT_OVERFLOW)) {
 		Error.send(ErrorMessage::ERROR_VALUE_OUT_OF_BOUNCE);
