@@ -25,7 +25,7 @@
 #include "MsgCmdParserCommon.h"
 #include "NeoPixel.h"
 #include "Display.h"
-#include "MsgCmdValueParser.h"
+#include "MsgCmdOptionParser.h"
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
@@ -44,7 +44,7 @@
 /******************************************************************************************************************************************************
  *  C L A S S   T E M P L A T E
 ******************************************************************************************************************************************************/
-class MsgCmdDisplayColorParser : public MsgCmdValueParser<MSG_CMD_DISPLAY_COLOR_PARSER_OPTIONS_TABLE_SIZE>
+class MsgCmdDisplayColorParser : public MsgCmdOptionParser<MSG_CMD_DISPLAY_COLOR_PARSER_OPTIONS_TABLE_SIZE>
 {
 /******************************************************************************************************************************************************
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
@@ -84,7 +84,8 @@ class MsgCmdDisplayColorParser : public MsgCmdValueParser<MSG_CMD_DISPLAY_COLOR_
     ~MsgCmdDisplayColorParser();
 
 	// get methods
-
+	const char* getCmdValue() const { return CmdValue; }
+	const OptionTableType& getOptionTable() const { return OptionTable; }
 
 	// set methods
 

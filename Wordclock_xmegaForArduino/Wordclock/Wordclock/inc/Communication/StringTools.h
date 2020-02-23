@@ -78,7 +78,7 @@ class StringTools
 		Destination[Length - 1] = '\0';
 	}
 	
-	template<typename T> static ResultType stringToUnsignedInteger(const char* String, uint8_t Base, T Value) {
+	template<typename T> static ResultType stringToUnsignedInteger(const char* String, uint8_t Base, T& Value) {
 		char* end;
 		errno = 0;
 		uint64_t valueMax = strtoul(String, &end, Base);

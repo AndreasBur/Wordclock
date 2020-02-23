@@ -63,8 +63,12 @@ class FontLucidaSans9x10 : public Font<FontCharVertical<uint16_t, FONT_LUCIDA_SA
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr FontLucidaSans9x10();
-    ~FontLucidaSans9x10();
+    constexpr FontLucidaSans9x10() {
+		
+	}
+    ~FontLucidaSans9x10(){
+		
+	}
 
 	// get methods
     byte getWidth() const { return FONT_LUCIDA_SANS_9X10_WIDTH; }

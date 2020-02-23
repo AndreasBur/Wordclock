@@ -52,13 +52,14 @@
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-Display::Display(PixelColorType sColor)
+Display::Display(PixelColorType sColor) 
 #ifdef SIMULATOR
 : Pixels(0L, _("Wordclock Simulator"))
 #elif (WS2812_IS_SINGLETON == STD_OFF)
 : Pixels()
 #endif
 {
+	//Pixels = WS2812::getInstance();
     Color = sColor;
     State = STATE_UNINIT;
 
@@ -89,6 +90,7 @@ Display::Display(ColorType Red, ColorType Green, ColorType Blue)
 : Pixels()
 #endif
 {
+	//Pixels = WS2812::getInstance();
     Color.Red = Red;
     Color.Green = Green;
     Color.Blue = Blue;

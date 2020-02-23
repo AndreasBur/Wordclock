@@ -82,6 +82,7 @@ class Timer
 
     /* Type which includes the Pwm Pins */
     typedef enum {
+		TEST
         //TIMER_PWM_PIN_9 = TIMER_A_ARDUINO_PIN,
         //TIMER_PWM_PIN_10 = TIMER_B_ARDUINO_PIN
     } TimerPwmPinType;

@@ -80,7 +80,7 @@ class MsgOption
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-	constexpr MsgOption(char sShortName, ValueTypeType sValueType) : ShortName(ShortName), ValueType(sValueType) {
+	constexpr MsgOption(char sShortName, ValueTypeType sValueType) : ShortName(sShortName), ValueType(sValueType) {
 
 	}
 	
