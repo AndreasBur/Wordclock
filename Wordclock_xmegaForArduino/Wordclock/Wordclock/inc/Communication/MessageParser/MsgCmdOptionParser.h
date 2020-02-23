@@ -58,6 +58,10 @@ template <size_t OptionTableSize> class MsgCmdOptionParser
 ******************************************************************************************************************************************************/
   protected:	
     const char* CmdValue;
+	
+	~MsgCmdOptionParser() {
+			
+	}
   
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
@@ -69,9 +73,6 @@ template <size_t OptionTableSize> class MsgCmdOptionParser
 ******************************************************************************************************************************************************/
   public:
     constexpr MsgCmdOptionParser(const char* sCmdValue) : CmdValue(sCmdValue) {
-		
-	}
-    virtual ~MsgCmdOptionParser() {
 		
 	}
 

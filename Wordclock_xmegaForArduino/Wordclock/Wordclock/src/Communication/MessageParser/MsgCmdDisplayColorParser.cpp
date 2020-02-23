@@ -63,15 +63,6 @@ MsgCmdDisplayColorParser::MsgCmdDisplayColorParser(const char* sCmdValue) : MsgC
 } /* MsgCmdDisplayColorParser */
 
 
-/******************************************************************************************************************************************************
-  Destructor of MsgCmdDisplayColorParser
-******************************************************************************************************************************************************/
-MsgCmdDisplayColorParser::~MsgCmdDisplayColorParser()
-{
-
-} /* ~MsgCmdDisplayColorParser */
-
-
 void MsgCmdDisplayColorParser::parse()
 {
 	if(CmdValue == nullptr) {

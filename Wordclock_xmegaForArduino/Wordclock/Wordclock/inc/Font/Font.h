@@ -71,6 +71,14 @@ template <typename FontCharType, size_t FontTableSize> class Font
         memcpy_P(&FontTableElement, &getFontTable()[Index], sizeof(FontTableElementType));
         return FontTableElement;
     }
+	
+/******************************************************************************************************************************************************
+ *  P R O T E C T E D   D A T A   A N D   F U N C T I N O N S
+******************************************************************************************************************************************************/
+  protected:	
+	~Font() {
+		
+	}
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
@@ -78,10 +86,6 @@ template <typename FontCharType, size_t FontTableSize> class Font
   public:
     constexpr Font() {
 
-    }
-
-    virtual ~Font() {
-    
     }
 
 	// get methods

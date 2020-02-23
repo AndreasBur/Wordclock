@@ -81,7 +81,7 @@ class MsgCmdDisplayColorParser : public MsgCmdOptionParser<MSG_CMD_DISPLAY_COLOR
 ******************************************************************************************************************************************************/
   public:
     MsgCmdDisplayColorParser(const char*);
-    ~MsgCmdDisplayColorParser();
+    //~MsgCmdDisplayColorParser();
 
 	// get methods
 	const OptionTableType& getOptionTable() const { return OptionTable; }
