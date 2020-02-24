@@ -92,7 +92,7 @@ template <typename FontCharType, size_t FontTableSize> class Font
     virtual Orientation getOrientation() const = 0;
     virtual byte getWidth() const = 0;
     virtual byte getHeight() const = 0;
-	virtual const FontTableType& getFontTable() const = 0;
+    virtual const FontTableType& getFontTable() const = 0;
 
     FontCharType getCharFast(byte Index) const { return getFontTableElement(Index); }
     byte getCharWidthFast(byte Index) const { return getFontTableElement(Index).getWidth(); }
