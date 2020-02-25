@@ -100,7 +100,7 @@ void Communication::addMessagePart()
 		}
 	}
 */
-	char Buffer[] = "2 R:56\n";
+	char Buffer[] = "2 -R56 -B 132\n";
 	
 	for(uint8_t i = 0; i <= strlen(Buffer); i++)
 	{

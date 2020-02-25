@@ -37,11 +37,11 @@
 /******************************************************************************************************************************************************
  *  L O C A L   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
-const MsgCmdDisplayColorParser::OptionTableType MsgCmdDisplayColorParser::OptionTable PROGMEM
+const MsgCmdDisplayColorParser::ParameterTableType MsgCmdDisplayColorParser::ParameterTable PROGMEM
 {
-	OptionTableElementType('R', MsgOption::VALUE_TYPE_UINT8),
-	OptionTableElementType('G', MsgOption::VALUE_TYPE_UINT8),
-	OptionTableElementType('B', MsgOption::VALUE_TYPE_UINT8)
+	ParameterTableElementType('R', MsgParameter::ARGUMENT_TYPE_UINT8),
+	ParameterTableElementType('G', MsgParameter::ARGUMENT_TYPE_UINT8),
+	ParameterTableElementType('B', MsgParameter::ARGUMENT_TYPE_UINT8)
 };
 
 
@@ -57,12 +57,12 @@ const MsgCmdDisplayColorParser::OptionTableType MsgCmdDisplayColorParser::Option
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-MsgCmdDisplayColorParser::MsgCmdDisplayColorParser(const char* sCmdValue) : MsgCmdOptionParser(sCmdValue)
+MsgCmdDisplayColorParser::MsgCmdDisplayColorParser(const char* sParameter) : MsgParameterParser(sParameter)
 {
 
 } /* MsgCmdDisplayColorParser */
 
-
+/*
 void MsgCmdDisplayColorParser::parse()
 {
 	if(CmdValue == nullptr) {
@@ -72,7 +72,7 @@ void MsgCmdDisplayColorParser::parse()
 		sendAnswer();
 	}
 }
-
+*/
 void MsgCmdDisplayColorParser::sendAnswer()
 {
 	sendAnswerRed();
@@ -146,7 +146,8 @@ stdReturnType MsgCmdDisplayColorParser::getColorValue(const char* CmdValue, char
 	char parameterAndDelimiter[]{ColorParameterChar, ColorValueDelimiter, '\0'};
 	const char* parameterStart = strstr(CmdValue, parameterAndDelimiter);
 	const char* valueStart = parameterStart + 2u;
-	StringTools::ResultType result = StringTools::stringToUnsignedInteger(valueStart, 10, Value);
+	StringTools::PositionType position;
+	StringTools::ResultType result = StringTools::stringToUnsignedInteger(valueStart, position, 10, Value);
 	
 	if((result == StringTools::RESULT_OVERFLOW)) {
 		Error.send(ErrorMessage::ERROR_VALUE_OUT_OF_BOUNCE);

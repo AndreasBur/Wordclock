@@ -8,31 +8,28 @@
  *  ---------------------------------------------------------------------------------------------------------------------------------------------------
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       MsgCmdOptionParser.h
+/**     \file       MsgOption.h
  *      \brief      
  *
  *      \details    
  *                  
 ******************************************************************************************************************************************************/
-#ifndef _MSG_CMD_OPTION_PARSER_H_
-#define _MSG_CMD_OPTION_PARSER_H_
+#ifndef _MSG_PARAMETER_H_
+#define _MSG_PARAMETER_H_
 
 /******************************************************************************************************************************************************
  * I N C L U D E S
 ******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Arduino.h"
-#include "Message.h"
-#include "ErrorMessage.h"
-#include "MsgOption.h"
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
-/* MsgParser configuration parameter */
+/* FontChar configuration parameter */
 
 
-/* MsgParser parameter */
+/* FontChar parameter */
 
 
 
@@ -42,53 +39,68 @@
 
 
 /******************************************************************************************************************************************************
- *  C L A S S   T E M P L A T E
+ *  C L A S S   F O N T C H A R
 ******************************************************************************************************************************************************/
-template <size_t OptionTableSize> class MsgCmdOptionParser
+class MsgParameter
 {
 /******************************************************************************************************************************************************
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-	using OptionTableElementType = MsgOption;
-	using OptionTableType = std::array<OptionTableElementType, OptionTableSize>;
-  
-/******************************************************************************************************************************************************
- *  P R O T E C T E D   D A T A   A N D   F U N C T I N O N S
-******************************************************************************************************************************************************/
-  protected:	
-    const char* CmdValue;
-	
-	~MsgCmdOptionParser() {
-			
-	}
+  	enum ArgumentTypeType {
+	  	ARGUMENT_TYPE_NONE,
+	  	ARGUMENT_TYPE_STRING,
+	  	ARGUMENT_TYPE_CHAR,
+	  	ARGUMENT_TYPE_UINT8,
+	  	ARGUMENT_TYPE_UINT16,
+	  	ARGUMENT_TYPE_UINT32,
+	  	ARGUMENT_TYPE_UINT64,
+	  	ARGUMENT_TYPE_SINT8,
+	  	ARGUMENT_TYPE_INT8,
+	  	ARGUMENT_TYPE_INT16,
+	  	ARGUMENT_TYPE_INT32,
+	  	ARGUMENT_TYPE_FLOAT,
+	  	ARGUMENT_TYPE_DOUBLE
+  	};
   
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
+	char OptionShortName;
+	ArgumentTypeType ArgumentType;
+
+/******************************************************************************************************************************************************
+ *  P R O T E C T E D   D A T A   A N D   F U N C T I N O N S
+******************************************************************************************************************************************************/
+  protected:
+
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr MsgCmdOptionParser(const char* sCmdValue) : CmdValue(sCmdValue) {
-		
-	}
+	constexpr MsgParameter(char sOptionShortName, ArgumentTypeType sArgumentType) : OptionShortName(sOptionShortName), ArgumentType(sArgumentType) {
 
+	}
+	
+	constexpr MsgParameter() : OptionShortName(' '), ArgumentType(ARGUMENT_TYPE_NONE) {
+
+	}
+	
 	// get methods
-	const char* getCmdValue() const { return CmdValue; }
-	virtual const OptionTableType& getOptionTable() const = 0;
+    byte getOptionShortName() const { return OptionShortName; }
+	ArgumentTypeType getArgumentType() const { return ArgumentType; }
 
 	// set methods
+    void setOptionShortName(byte sOptionShortName) { OptionShortName = sOptionShortName; }
+	void setArgumentType(ArgumentTypeType sArgumentType) { ArgumentType = sArgumentType; }
 
-	// methods
-	void parse() {}
-	
+    // methods
 };
 
-#endif
 
+#endif
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E
 ******************************************************************************************************************************************************/

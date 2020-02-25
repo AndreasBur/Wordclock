@@ -72,7 +72,7 @@ class MsgCmdParser
 		return static_cast<CommandsType>(atoi(IncomingMessage.getMessage()));
 	}
 
-	const char* getCmdValue() const {
+	const char* getParameter() const {
 		const char* message = IncomingMessage.getMessage();
 		size_t valuePos = IncomingMessage.find(CommandValueDelimiter);
 

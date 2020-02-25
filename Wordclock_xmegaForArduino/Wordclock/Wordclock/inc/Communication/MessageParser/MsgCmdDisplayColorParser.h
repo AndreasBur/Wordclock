@@ -25,7 +25,7 @@
 #include "MsgCmdParserCommon.h"
 #include "NeoPixel.h"
 #include "Display.h"
-#include "MsgCmdOptionParser.h"
+#include "MsgParameterParser.h"
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
@@ -34,7 +34,7 @@
 
 
 /* MsgCmdDisplayColorParser parameter */
-#define MSG_CMD_DISPLAY_COLOR_PARSER_OPTIONS_TABLE_SIZE           3u
+#define MSG_CMD_DISPLAY_COLOR_PARSER_PARAMETER_TABLE_SIZE           3u
 
 /******************************************************************************************************************************************************
  *  G L O B A L   F U N C T I O N   M A C R O S
@@ -44,7 +44,7 @@
 /******************************************************************************************************************************************************
  *  C L A S S   T E M P L A T E
 ******************************************************************************************************************************************************/
-class MsgCmdDisplayColorParser : public MsgCmdOptionParser<MSG_CMD_DISPLAY_COLOR_PARSER_OPTIONS_TABLE_SIZE>
+class MsgCmdDisplayColorParser : public MsgParameterParser<MSG_CMD_DISPLAY_COLOR_PARSER_PARAMETER_TABLE_SIZE>
 {
 /******************************************************************************************************************************************************
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
@@ -56,7 +56,7 @@ class MsgCmdDisplayColorParser : public MsgCmdOptionParser<MSG_CMD_DISPLAY_COLOR
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
-	static const OptionTableType OptionTable;
+	static const ParameterTableType ParameterTable;
 
   
 	static const char RedParameterChar{'R'};
@@ -84,12 +84,12 @@ class MsgCmdDisplayColorParser : public MsgCmdOptionParser<MSG_CMD_DISPLAY_COLOR
     //~MsgCmdDisplayColorParser();
 
 	// get methods
-	const OptionTableType& getOptionTable() const { return OptionTable; }
+	const ParameterTableType& getParameterTable() const { return ParameterTable; }
 
 	// set methods
 
 	// methods
-	void parse();
+	//void parse();
 	void sendAnswer();
 };
 

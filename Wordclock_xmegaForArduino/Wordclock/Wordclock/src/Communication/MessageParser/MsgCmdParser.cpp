@@ -69,11 +69,11 @@ MsgCmdParser::~MsgCmdParser()
 void MsgCmdParser::parse()
 {
 	CommandsType command = getCommand();
-	const char* cmdValue = getCmdValue();
+	const char* parameter = getParameter();
 	
 	switch(command) {
 		case COMMAND_DISPLAY_COLOR : {
-			MsgCmdDisplayColorParser CmdDisplayColorParser(cmdValue);
+			MsgCmdDisplayColorParser CmdDisplayColorParser(parameter);
 		    CmdDisplayColorParser.parse();
 			sendAnswer(command);
 			break; }

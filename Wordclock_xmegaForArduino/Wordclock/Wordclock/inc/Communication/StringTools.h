@@ -54,6 +54,7 @@ class StringTools
   	};
 	  
 	 static const size_t npos = -1;
+	 using PositionType = uint8_t;
 	  
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
@@ -78,10 +79,11 @@ class StringTools
 		Destination[Length - 1] = '\0';
 	}
 	
-	template<typename T> static ResultType stringToUnsignedInteger(const char* String, uint8_t Base, T& Value) {
+	template<typename T> static ResultType stringToUnsignedInteger(const char* String, PositionType& Position, uint8_t Base, T& Value) {
 		char* end;
 		errno = 0;
 		uint64_t valueMax = strtoul(String, &end, Base);
+		Position = end - String;
 		
 		if(String == end) { 
 			return RESULT_NO_VALUE;

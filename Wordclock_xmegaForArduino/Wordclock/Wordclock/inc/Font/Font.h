@@ -67,9 +67,9 @@ template <typename FontCharType, size_t FontTableSize> class Font
   private:
     // functions
     FontTableElementType getFontTableElement(byte Index) const {
-        FontTableElementType FontTableElement;
-        memcpy_P(&FontTableElement, &getFontTable()[Index], sizeof(FontTableElementType));
-        return FontTableElement;
+        FontTableElementType fontTableElement;
+        memcpy_P(&fontTableElement, &getFontTable()[Index], sizeof(FontTableElementType));
+        return fontTableElement;
     }
 	
 /******************************************************************************************************************************************************
