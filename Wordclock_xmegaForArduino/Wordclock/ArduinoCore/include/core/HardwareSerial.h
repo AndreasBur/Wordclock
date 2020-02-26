@@ -32,7 +32,6 @@
 #include <inttypes.h>
 
 #include "Stream.h"
-#include "serstream"
 
 struct ring_buffer;
 

@@ -57,7 +57,8 @@ const MsgCmdDisplayColorParser::ParameterTableType MsgCmdDisplayColorParser::Par
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-MsgCmdDisplayColorParser::MsgCmdDisplayColorParser(const char* sParameter) : MsgParameterParser(sParameter)
+MsgCmdDisplayColorParser::MsgCmdDisplayColorParser(const char* sParameter)
+: MsgParameterParser(ParameterTable, sParameter)
 {
 
 } /* MsgCmdDisplayColorParser */

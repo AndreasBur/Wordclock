@@ -48,7 +48,6 @@ enum class Orientation {
     ORIENTATION_NONE
 };
 
-
 /******************************************************************************************************************************************************
  *  C L A S S   F O N T
 ******************************************************************************************************************************************************/
@@ -65,10 +64,12 @@ template <typename FontCharType, size_t FontTableSize> class Font
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
+	const FontTableType& FontTable;
+  
     // functions
     FontTableElementType getFontTableElement(byte Index) const {
         FontTableElementType fontTableElement;
-        memcpy_P(&fontTableElement, &getFontTable()[Index], sizeof(FontTableElementType));
+        memcpy_P(&fontTableElement, &FontTable[Index], sizeof(FontTableElementType));
         return fontTableElement;
     }
 	
@@ -76,23 +77,25 @@ template <typename FontCharType, size_t FontTableSize> class Font
  *  P R O T E C T E D   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   protected:	
-	~Font() {
-		
-	}
+
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr Font() {
+    constexpr Font(const FontTableType& sFontTable) : FontTable(sFontTable) {
 
     }
+	
+	~Font() {
+
+	}
 
 	// get methods
-    virtual Orientation getOrientation() const = 0;
-    virtual byte getWidth() const = 0;
-    virtual byte getHeight() const = 0;
-    virtual const FontTableType& getFontTable() const = 0;
+    //virtual Orientation getOrientation() const = 0;
+    //virtual byte getWidth() const = 0;
+    //virtual byte getHeight() const = 0;
+    //virtual const FontTableType& getFontTable() const = 0;
 
     FontCharType getCharFast(byte Index) const { return getFontTableElement(Index); }
     byte getCharWidthFast(byte Index) const { return getFontTableElement(Index).getWidth(); }

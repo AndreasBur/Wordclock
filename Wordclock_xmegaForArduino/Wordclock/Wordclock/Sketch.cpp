@@ -58,9 +58,6 @@ void initClockPrescaler()
 #endif
 }
 
-std::ohserialstream cout(Serial);
-std::ihserialstream cin(Serial);
-
 void setup() {
 	Serial.begin(9600);
     initClockPrescaler();

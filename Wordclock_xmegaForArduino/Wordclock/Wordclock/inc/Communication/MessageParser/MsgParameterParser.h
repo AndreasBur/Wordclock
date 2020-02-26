@@ -61,6 +61,7 @@ template <size_t ParameterTableSize> class MsgParameterParser
   protected:
 	ErrorMessage Error;
     const char* Parameter;
+	const ParameterTableType& ParameterTable;
 	
 	~MsgParameterParser() {
 		
@@ -83,12 +84,12 @@ template <size_t ParameterTableSize> class MsgParameterParser
 	// functions
     ParameterTableElementType getParameterTableElement(byte Index) const {
 	    ParameterTableElementType parameterTableElement;
-	    memcpy_P(&parameterTableElement, &getParameterTable()[Index], sizeof(ParameterTableElementType));
+	    memcpy_P(&parameterTableElement, &ParameterTable[Index], sizeof(ParameterTableElementType));
 	    return parameterTableElement;
     }
 	
 	stdReturnType getMsgParameterByOptionShortName(char OptionShortName, ParameterTableElementType& sMsgOption) {
-		for(size_t index = 0; index < getParameterTable().size(); index++) {
+		for(size_t index = 0; index < ParameterTable.size(); index++) {
 			ParameterTableElementType parameterTableElement = getParameterTableElement(index);
 			if(parameterTableElement.getOptionShortName() == OptionShortName) {
 				sMsgOption = parameterTableElement;
@@ -122,14 +123,15 @@ template <size_t ParameterTableSize> class MsgParameterParser
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr MsgParameterParser(const char* sParameter) : Parameter(sParameter) {
+    constexpr MsgParameterParser(const ParameterTableType& sParameterTable, const char* sParameter)
+	: Parameter(sParameter), ParameterTable(sParameterTable) {
 		
 	}
 
 	// get methods
 	
 	const char* getParameter() const { return Parameter; }
-	virtual const ParameterTableType& getParameterTable() const = 0;
+	const ParameterTableType& getParameterTable();
 
 	// set methods
 

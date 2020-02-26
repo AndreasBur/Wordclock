@@ -64,9 +64,10 @@ class FontCourierNew7x9 : public Font<FontCharHorizontal<byte, FONT_COURIER_NEW_
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr FontCourierNew7x9() {
+    FontCourierNew7x9() : Font(FontTable) {
 		
 	}
+	
     ~FontCourierNew7x9() {
 		
 	}
