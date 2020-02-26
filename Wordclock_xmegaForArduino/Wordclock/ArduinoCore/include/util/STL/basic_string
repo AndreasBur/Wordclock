@@ -20,68 +20,12 @@
   #include <initializer_list>
   #include <iterator>
   #include <memory>
+  #include <char_traits>
 
   #include <string.h>
 
   #include "impl/allocator_impl.h"
 
-  // Implement some of std::char_traits for compilers that do not yet support it.
-
-  namespace std
-  {
-    template<typename char_type>
-    class char_traits
-    {
-    public:
-      static std::size_t length(const char_type* first)
-      {
-        const char_type* p = first;
-
-        while(*p != char_type('\0'))
-        {
-          ++p;
-        }
-
-        return (std::size_t) (p - first);
-      }
-
-      static int compare(const char_type* first1, const char_type* first2, size_t count)
-      {
-        for( ; 0 < count; --count, ++first1, ++first2)
-        {
-          if(*first1 != *first2)
-          {
-            return ((*first1 < *first2) ? -1 : +1);
-          }
-        }
-
-        return 0;
-      }
-    };
-
-    template<>
-    class char_traits<char>
-    {
-    public:
-      static std::size_t length(const char* first)
-      {
-        return ::strlen(first);
-      }
-
-      static int compare(const char* first1, const char* first2, size_t count)
-      {
-        for( ; 0 < count; --count, ++first1, ++first2)
-        {
-          if(*first1 != *first2)
-          {
-            return ((*first1 < *first2) ? -1 : +1);
-          }
-        }
-
-        return 0;
-      }
-    };
-  }
 
   // Implement some of std::basic_string for compilers that do not yet support it.
 

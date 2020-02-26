@@ -32,6 +32,7 @@
 ******************************************************************************************************************************************************/
 /* MsgParser configuration parameter */
 
+
 /* MsgParser parameter */
 
 
@@ -57,7 +58,8 @@ template <size_t ParameterTableSize> class MsgParameterParser
 /******************************************************************************************************************************************************
  *  P R O T E C T E D   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
-  protected:	
+  protected:
+	ErrorMessage Error;
     const char* Parameter;
 	
 	~MsgParameterParser() {
@@ -76,6 +78,7 @@ template <size_t ParameterTableSize> class MsgParameterParser
 	};
   
 	static const char OptionStartChar{'-'};
+	static const byte ArgumentNumberBase{10u};
 	
 	// functions
     ParameterTableElementType getParameterTableElement(byte Index) const {
@@ -99,8 +102,19 @@ template <size_t ParameterTableSize> class MsgParameterParser
 		if(Option.getArgumentType() == MsgParameter::ARGUMENT_TYPE_UINT8) {
 			PositionType position;
 			uint8_t value;
-			StringTools::stringToUnsignedInteger(Argument, position, 10, value);
+			handleConvertResult(StringTools::stringToUnsignedInteger(
+				Argument, position, ArgumentNumberBase, value));
 			return position;
+		}
+		return 0u;
+	}
+	
+	void handleConvertResult(StringTools::ResultType Result) {
+		if(Result == StringTools::RESULT_NO_VALUE) {
+			Error.send(ErrorMessage::ERROR_NO_VALUE_GIVEN);
+		}
+		if(Result == StringTools::RESULT_OVERFLOW) {
+			Error.send(ErrorMessage::ERROR_VALUE_OUT_OF_BOUNCE);
 		}
 	}
 
@@ -121,15 +135,23 @@ template <size_t ParameterTableSize> class MsgParameterParser
 
 	// methods
 	void parse()
-	{
+	{	
+		StateType State = STATE_PARSE;
+		char optionChar;
+		
 		for(PositionType position = 0; Parameter[position] != '\0'; position++) {
-			char currentChar = Parameter[position];
-			if(currentChar == OptionStartChar) {
-				char optionChar = Parameter[++position];
+			if(State == STATE_PARSE) {
+				char currentChar = Parameter[position];
+				if(currentChar == OptionStartChar) { State = STATE_OPTION_CHAR; }
+			} else if(State == STATE_OPTION_CHAR) {
+				optionChar = Parameter[position];
+				State = STATE_OPTION_ARGUMENT;
+			} else if(State == STATE_OPTION_ARGUMENT) {
 				ParameterTableElementType option;
 				if(getMsgParameterByOptionShortName(optionChar, option) == E_OK) {
-					position += parseArgument(option, &Parameter[++position]);
+					position += parseArgument(option, &Parameter[position]) - 1u;
 				}
+				State = STATE_PARSE;
 			}
 		}
 	}

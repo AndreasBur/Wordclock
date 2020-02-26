@@ -300,7 +300,7 @@ void Display::clearWordsFast()
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType Display::getPixel(byte Index, boolean* Value) const
+stdReturnType Display::getPixel(byte Index, boolean& Value) const
 {
     byte Row, Column;
     indexToColumnAndRow(Index, Column, Row);
@@ -332,7 +332,7 @@ boolean Display::getPixelFast(byte Index) const
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType Display::getPixel(byte Column, byte Row, boolean* Value)  const
+stdReturnType Display::getPixel(byte Column, byte Row, boolean& Value)  const
 {
     stdReturnType ReturnValue{E_NOT_OK};
     PixelColorType Pixel;
@@ -345,8 +345,8 @@ stdReturnType Display::getPixel(byte Column, byte Row, boolean* Value)  const
 #endif
     if(ReturnValue == E_OK) {
         /* Pixel is only off when all colors are zero */
-        if(Pixel.Red == 0 && Pixel.Green == 0 && Pixel.Blue == 0) *Value = false;
-        else *Value = true;
+        if(Pixel.Red == 0 && Pixel.Green == 0 && Pixel.Blue == 0) Value = false;
+        else Value = true;
     }
     return ReturnValue;
 } /* getPixel */
@@ -541,7 +541,7 @@ void Display::clearPixelFast(byte Index)
 ******************************************************************************************************************************************************/
 stdReturnType Display::togglePixel(byte Column, byte Row)
 {
-    boolean Pixel;
+    boolean Pixel = false;
 
 #if (DISPLAY_LED_STRIPE_SERPENTINE == STD_ON)
     /* if led stripe is snake or serpentine then odd row: count from right to left */
@@ -551,7 +551,7 @@ stdReturnType Display::togglePixel(byte Column, byte Row)
     else { return setPixel(Index); }
 #else
     byte Index = (Row * DISPLAY_NUMBER_OF_COLUMNS) + Column;
-    getPixel(Index, &Pixel);
+    getPixel(Index, Pixel);
     if(Pixel) { return clearPixel(Index); }
     else { return setPixel(Index); }
 #endif
@@ -621,14 +621,14 @@ void Display::togglePixelFast(byte Index)
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType Display::getPixelRow(byte Row, PixelRowType* PixelRow) const
+stdReturnType Display::getPixelRow(byte Row, PixelRowType& PixelRow) const
 {
     stdReturnType ReturnValue = E_OK;
     PixelType Pixel;
 
     for(byte Column = 0; Column < DISPLAY_NUMBER_OF_COLUMNS; Column++) {
-        if(getPixel(Column, Row, &Pixel) == E_OK) {
-            WRITE_BIT(*PixelRow, Column, Pixel);
+        if(getPixel(Column, Row, Pixel) == E_OK) {
+            WRITE_BIT(PixelRow, Column, Pixel);
         } else {
             ReturnValue = E_NOT_OK;
         }
@@ -664,14 +664,14 @@ Display::PixelRowType Display::getPixelRowFast(byte Row)  const
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType Display::getPixelColumn(byte Column, PixelRowType* PixelColumn)  const
+stdReturnType Display::getPixelColumn(byte Column, PixelRowType& PixelColumn)  const
 {
     stdReturnType ReturnValue = E_OK;
     PixelType Pixel;
 
     for(byte Row = 0; Row < DISPLAY_NUMBER_OF_ROWS; Row++) {
-        if(getPixel(Column, Row, &Pixel) == E_OK) {
-            WRITE_BIT(*PixelColumn, Row, Pixel);
+        if(getPixel(Column, Row, Pixel) == E_OK) {
+            WRITE_BIT(PixelColumn, Row, Pixel);
         } else {
             ReturnValue = E_NOT_OK;
         }

@@ -58,12 +58,18 @@ void initClockPrescaler()
 #endif
 }
 
+std::ohserialstream cout(Serial);
+std::ihserialstream cin(Serial);
+
 void setup() {
+	Serial.begin(9600);
     initClockPrescaler();
     Display::getInstance().init();
 
     BH1750 bh1750;
     Timer myTimer;
+
+	//cout << F("Hallo") << std::endl;
 
     bh1750.changeMeasurementTime(0b10100111);
     //WS2812::getInstance().setBrightness(0);

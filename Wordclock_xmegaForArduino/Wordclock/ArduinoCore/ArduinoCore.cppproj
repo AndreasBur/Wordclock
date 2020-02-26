@@ -140,80 +140,80 @@
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <ToolchainSettings>
       <AvrGccCpp>
-        <avrgcc.common.Device>-mmcu=atxmega32e5 -B "%24(PackRepoDir)\atmel\XMEGAE_DFP\1.2.51\gcc\dev\atxmega32e5"</avrgcc.common.Device>
-        <avrgcc.common.outputfiles.hex>True</avrgcc.common.outputfiles.hex>
-        <avrgcc.common.outputfiles.lss>True</avrgcc.common.outputfiles.lss>
-        <avrgcc.common.outputfiles.eep>True</avrgcc.common.outputfiles.eep>
-        <avrgcc.common.outputfiles.srec>True</avrgcc.common.outputfiles.srec>
-        <avrgcc.common.outputfiles.usersignatures>False</avrgcc.common.outputfiles.usersignatures>
-        <avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>True</avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>
-        <avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>True</avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>
-        <avrgcc.compiler.symbols.DefSymbols>
-          <ListValues>
-            <Value>DEBUG</Value>
-            <Value>F_CPU=32000000L</Value>
-          </ListValues>
-        </avrgcc.compiler.symbols.DefSymbols>
-        <avrgcc.compiler.directories.IncludePaths>
-          <ListValues>
-            <Value>..\include\core</Value>
-            <Value>..\include\variants\standard</Value>
-            <Value>%24(PackRepoDir)\atmel\XMEGAE_DFP\1.2.51\include</Value>
-            <Value>../include/stl</Value>
-            <Value>../include/libraries/XWire/utility</Value>
-          </ListValues>
-        </avrgcc.compiler.directories.IncludePaths>
-        <avrgcc.compiler.optimization.level>Optimize for size (-Os)</avrgcc.compiler.optimization.level>
-        <avrgcc.compiler.optimization.OtherFlags>-fno-threadsafe-statics</avrgcc.compiler.optimization.OtherFlags>
-        <avrgcc.compiler.optimization.PackStructureMembers>True</avrgcc.compiler.optimization.PackStructureMembers>
-        <avrgcc.compiler.optimization.AllocateBytesNeededForEnum>True</avrgcc.compiler.optimization.AllocateBytesNeededForEnum>
-        <avrgcc.compiler.optimization.DebugLevel>Default (-g2)</avrgcc.compiler.optimization.DebugLevel>
-        <avrgcc.compiler.warnings.AllWarnings>True</avrgcc.compiler.warnings.AllWarnings>
-        <avrgcc.compiler.warnings.InhibitAllWarnings>True</avrgcc.compiler.warnings.InhibitAllWarnings>
-        <avrgcc.compiler.miscellaneous.OtherFlags>-std=gnu99 -std=gnu11</avrgcc.compiler.miscellaneous.OtherFlags>
-        <avrgcccpp.compiler.general.ChangeDefaultCharTypeUnsigned>True</avrgcccpp.compiler.general.ChangeDefaultCharTypeUnsigned>
-        <avrgcccpp.compiler.general.ChangeDefaultBitFieldUnsigned>True</avrgcccpp.compiler.general.ChangeDefaultBitFieldUnsigned>
-        <avrgcccpp.compiler.symbols.DefSymbols>
-          <ListValues>
-            <Value>DEBUG</Value>
-            <Value>F_CPU=32000000L</Value>
-          </ListValues>
-        </avrgcccpp.compiler.symbols.DefSymbols>
-        <avrgcccpp.compiler.directories.IncludePaths>
-          <ListValues>
-            <Value>..\include\core</Value>
-            <Value>..\include\variants\standard</Value>
-            <Value>%24(PackRepoDir)\atmel\XMEGAE_DFP\1.2.51\include</Value>
-            <Value>../include/util</Value>
-            <Value>../include/util/device</Value>
-            <Value>../include/util/memory</Value>
-            <Value>../include/util/STL</Value>
-            <Value>../include/util/STL_C++XX_stdfloat</Value>
-            <Value>../include/util/utility</Value>
-            <Value>../include/libraries/XWire</Value>
-            <Value>../include/libraries/XWire/utility</Value>
-          </ListValues>
-        </avrgcccpp.compiler.directories.IncludePaths>
-        <avrgcccpp.compiler.optimization.level>Optimize for size (-Os)</avrgcccpp.compiler.optimization.level>
-        <avrgcccpp.compiler.optimization.OtherFlags>-fno-threadsafe-statics</avrgcccpp.compiler.optimization.OtherFlags>
-        <avrgcccpp.compiler.optimization.PackStructureMembers>True</avrgcccpp.compiler.optimization.PackStructureMembers>
-        <avrgcccpp.compiler.optimization.AllocateBytesNeededForEnum>True</avrgcccpp.compiler.optimization.AllocateBytesNeededForEnum>
-        <avrgcccpp.compiler.optimization.DebugLevel>Maximum (-g3)</avrgcccpp.compiler.optimization.DebugLevel>
-        <avrgcccpp.compiler.warnings.AllWarnings>True</avrgcccpp.compiler.warnings.AllWarnings>
-        <avrgcccpp.compiler.miscellaneous.OtherFlags>-std=gnu++11</avrgcccpp.compiler.miscellaneous.OtherFlags>
-        <avrgcccpp.linker.libraries.Libraries>
-          <ListValues>
-            <Value>libm</Value>
-          </ListValues>
-        </avrgcccpp.linker.libraries.Libraries>
-        <avrgcccpp.linker.miscellaneous.LinkerFlags>-Os</avrgcccpp.linker.miscellaneous.LinkerFlags>
-        <avrgcccpp.assembler.general.IncludePaths>
-          <ListValues>
-            <Value>%24(PackRepoDir)\atmel\XMEGAE_DFP\1.2.51\include</Value>
-          </ListValues>
-        </avrgcccpp.assembler.general.IncludePaths>
-        <avrgcccpp.assembler.debugging.DebugLevel>Default (-Wa,-g)</avrgcccpp.assembler.debugging.DebugLevel>
-      </AvrGccCpp>
+  <avrgcc.common.Device>-mmcu=atxmega32e5 -B "%24(PackRepoDir)\atmel\XMEGAE_DFP\1.2.51\gcc\dev\atxmega32e5"</avrgcc.common.Device>
+  <avrgcc.common.outputfiles.hex>True</avrgcc.common.outputfiles.hex>
+  <avrgcc.common.outputfiles.lss>True</avrgcc.common.outputfiles.lss>
+  <avrgcc.common.outputfiles.eep>True</avrgcc.common.outputfiles.eep>
+  <avrgcc.common.outputfiles.srec>True</avrgcc.common.outputfiles.srec>
+  <avrgcc.common.outputfiles.usersignatures>False</avrgcc.common.outputfiles.usersignatures>
+  <avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>True</avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>
+  <avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>True</avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>
+  <avrgcc.compiler.symbols.DefSymbols>
+    <ListValues>
+      <Value>DEBUG</Value>
+      <Value>F_CPU=32000000L</Value>
+    </ListValues>
+  </avrgcc.compiler.symbols.DefSymbols>
+  <avrgcc.compiler.directories.IncludePaths>
+    <ListValues>
+      <Value>..\include\core</Value>
+      <Value>..\include\variants\standard</Value>
+      <Value>%24(PackRepoDir)\atmel\XMEGAE_DFP\1.2.51\include</Value>
+      <Value>../include/stl</Value>
+      <Value>../include/libraries/XWire/utility</Value>
+    </ListValues>
+  </avrgcc.compiler.directories.IncludePaths>
+  <avrgcc.compiler.optimization.level>Optimize for size (-Os)</avrgcc.compiler.optimization.level>
+  <avrgcc.compiler.optimization.OtherFlags>-fno-threadsafe-statics</avrgcc.compiler.optimization.OtherFlags>
+  <avrgcc.compiler.optimization.PackStructureMembers>True</avrgcc.compiler.optimization.PackStructureMembers>
+  <avrgcc.compiler.optimization.AllocateBytesNeededForEnum>True</avrgcc.compiler.optimization.AllocateBytesNeededForEnum>
+  <avrgcc.compiler.optimization.DebugLevel>Default (-g2)</avrgcc.compiler.optimization.DebugLevel>
+  <avrgcc.compiler.warnings.AllWarnings>True</avrgcc.compiler.warnings.AllWarnings>
+  <avrgcc.compiler.warnings.InhibitAllWarnings>True</avrgcc.compiler.warnings.InhibitAllWarnings>
+  <avrgcc.compiler.miscellaneous.OtherFlags>-std=gnu99 -std=gnu11</avrgcc.compiler.miscellaneous.OtherFlags>
+  <avrgcccpp.compiler.general.ChangeDefaultCharTypeUnsigned>True</avrgcccpp.compiler.general.ChangeDefaultCharTypeUnsigned>
+  <avrgcccpp.compiler.general.ChangeDefaultBitFieldUnsigned>True</avrgcccpp.compiler.general.ChangeDefaultBitFieldUnsigned>
+  <avrgcccpp.compiler.symbols.DefSymbols>
+    <ListValues>
+      <Value>DEBUG</Value>
+      <Value>F_CPU=32000000L</Value>
+    </ListValues>
+  </avrgcccpp.compiler.symbols.DefSymbols>
+  <avrgcccpp.compiler.directories.IncludePaths>
+    <ListValues>
+      <Value>..\include\core</Value>
+      <Value>..\include\variants\standard</Value>
+      <Value>%24(PackRepoDir)\atmel\XMEGAE_DFP\1.2.51\include</Value>
+      <Value>../include/util</Value>
+      <Value>../include/util/device</Value>
+      <Value>../include/util/memory</Value>
+      <Value>../include/util/STL</Value>
+      <Value>../include/util/STL_C++XX_stdfloat</Value>
+      <Value>../include/util/utility</Value>
+      <Value>../include/libraries/XWire</Value>
+      <Value>../include/libraries/XWire/utility</Value>
+    </ListValues>
+  </avrgcccpp.compiler.directories.IncludePaths>
+  <avrgcccpp.compiler.optimization.level>Optimize for size (-Os)</avrgcccpp.compiler.optimization.level>
+  <avrgcccpp.compiler.optimization.OtherFlags>-fno-threadsafe-statics</avrgcccpp.compiler.optimization.OtherFlags>
+  <avrgcccpp.compiler.optimization.PackStructureMembers>True</avrgcccpp.compiler.optimization.PackStructureMembers>
+  <avrgcccpp.compiler.optimization.AllocateBytesNeededForEnum>True</avrgcccpp.compiler.optimization.AllocateBytesNeededForEnum>
+  <avrgcccpp.compiler.optimization.DebugLevel>Maximum (-g3)</avrgcccpp.compiler.optimization.DebugLevel>
+  <avrgcccpp.compiler.warnings.AllWarnings>True</avrgcccpp.compiler.warnings.AllWarnings>
+  <avrgcccpp.compiler.miscellaneous.OtherFlags>-std=gnu++14</avrgcccpp.compiler.miscellaneous.OtherFlags>
+  <avrgcccpp.linker.libraries.Libraries>
+    <ListValues>
+      <Value>libm</Value>
+    </ListValues>
+  </avrgcccpp.linker.libraries.Libraries>
+  <avrgcccpp.linker.miscellaneous.LinkerFlags>-Os</avrgcccpp.linker.miscellaneous.LinkerFlags>
+  <avrgcccpp.assembler.general.IncludePaths>
+    <ListValues>
+      <Value>%24(PackRepoDir)\atmel\XMEGAE_DFP\1.2.51\include</Value>
+    </ListValues>
+  </avrgcccpp.assembler.general.IncludePaths>
+  <avrgcccpp.assembler.debugging.DebugLevel>Default (-Wa,-g)</avrgcccpp.assembler.debugging.DebugLevel>
+</AvrGccCpp>
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
@@ -314,6 +314,12 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="include\util\STL\impl\stl_local_noexcept.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="include\util\STL\string_view">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="include\util\STL\system_configuration.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="include\util\STL\time.h">
@@ -462,6 +468,9 @@
     <Folder Include="src\util\STD_LIBC" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="include\core\char_traits">
+      <SubType>compile</SubType>
+    </None>
     <None Include="include\util\STL\algorithm">
       <SubType>compile</SubType>
     </None>
@@ -474,7 +483,13 @@
     <None Include="include\util\STL\atomic">
       <SubType>compile</SubType>
     </None>
+    <None Include="include\util\STL\basic_definitions">
+      <SubType>compile</SubType>
+    </None>
     <None Include="include\util\STL\basic_string">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="include\util\STL\cctype">
       <SubType>compile</SubType>
     </None>
     <None Include="include\util\STL\cfloat">
@@ -501,10 +516,16 @@
     <None Include="include\util\STL\cstdint">
       <SubType>compile</SubType>
     </None>
+    <None Include="include\util\STL\cstdio">
+      <SubType>compile</SubType>
+    </None>
     <None Include="include\util\STL\cstdlib">
       <SubType>compile</SubType>
     </None>
     <None Include="include\util\STL\ctime">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="include\util\STL\exception">
       <SubType>compile</SubType>
     </None>
     <None Include="include\util\STL\functional">
@@ -513,10 +534,28 @@
     <None Include="include\util\STL\initializer_list">
       <SubType>compile</SubType>
     </None>
+    <None Include="include\util\STL\ios">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="include\util\STL\iosfwd">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="include\util\STL\iostream">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="include\util\STL\istream">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="include\util\STL\istream_helpers">
+      <SubType>compile</SubType>
+    </None>
     <None Include="include\util\STL\iterator">
       <SubType>compile</SubType>
     </None>
     <None Include="include\util\STL\limits">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="include\util\STL\locale">
       <SubType>compile</SubType>
     </None>
     <None Include="include\util\STL\memory">
@@ -525,10 +564,25 @@
     <None Include="include\util\STL\numeric">
       <SubType>compile</SubType>
     </None>
+    <None Include="include\util\STL\ostream">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="include\util\STL\ostream_helpers">
+      <SubType>compile</SubType>
+    </None>
     <None Include="include\util\STL\ratio">
       <SubType>compile</SubType>
     </None>
+    <None Include="include\util\STL\serstream">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="include\util\STL\streambuf">
+      <SubType>compile</SubType>
+    </None>
     <None Include="include\util\STL\string">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="include\util\STL\string_iostream">
       <SubType>compile</SubType>
     </None>
     <None Include="include\util\STL\tuple">

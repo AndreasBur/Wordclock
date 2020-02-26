@@ -80,7 +80,8 @@ class MsgParameter
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-	constexpr MsgParameter(char sOptionShortName, ArgumentTypeType sArgumentType) : OptionShortName(sOptionShortName), ArgumentType(sArgumentType) {
+	constexpr MsgParameter(char sOptionShortName, ArgumentTypeType sArgumentType)
+	: OptionShortName(sOptionShortName), ArgumentType(sArgumentType) {
 
 	}
 	

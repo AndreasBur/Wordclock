@@ -1836,8 +1836,11 @@ HardwareSerial::operator bool()
 
 #ifdef USBCON
 HardwareSerial Serial1(&rx_buffer, &tx_buffer, (uint16_t)&(SERIAL_0_USART_NAME)); // name changes to 'Serial1' when USB present
+//std::ohserialstream cout(Serial1);
+//std::ihserialstream cin(Serial1);
 #else // normal
 HardwareSerial Serial(&rx_buffer, &tx_buffer, (uint16_t)&(SERIAL_0_USART_NAME));
+
 #endif // USBCON or normal
 
 HardwareSerial Serial2(&rx_buffer2, &tx_buffer2, (uint16_t)&(SERIAL_1_USART_NAME));

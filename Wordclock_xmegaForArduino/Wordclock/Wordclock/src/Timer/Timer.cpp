@@ -211,7 +211,7 @@ stdReturnType Timer::read(uint32_t& Microseconds)
 ******************************************************************************************************************************************************/
 Timer::TimerCountDirection Timer::getCountingDirection()
 {
-        byte DIRValue;
+        byte DIRValue = 0;
 
         if(isTimerOfType4(TIMER_TC)) DIRValue = readBitGroup(TIMER_TC.CTRLGSET, TC4_DIR_bm, TC4_DIR_bp, false);
         if(isTimerOfType5(TIMER_TC)) DIRValue = readBitGroup(TIMER_TC.CTRLGSET, TC5_DIR_bm, TC5_DIR_bp, false);

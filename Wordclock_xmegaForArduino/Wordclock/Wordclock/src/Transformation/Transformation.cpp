@@ -116,10 +116,10 @@ stdReturnType Transformation::shiftRowLeft(byte Row, boolean Rotate)
     Display::PixelType Pixel;
     stdReturnType ReturnValue = E_OK;
 
-    if(Rotate) if(Display::getInstance().getPixel(0, Row, &FirstPixel) == E_NOT_OK) ReturnValue = E_NOT_OK;
+    if(Rotate) if(Display::getInstance().getPixel(0, Row, FirstPixel) == E_NOT_OK) ReturnValue = E_NOT_OK;
 
     for(byte Column = 0; Column < DISPLAY_NUMBER_OF_COLUMNS - 1; Column++) {
-        if(Display::getInstance().getPixel(Column + 1, Row, &Pixel) == E_NOT_OK) ReturnValue = E_NOT_OK;
+        if(Display::getInstance().getPixel(Column + 1, Row, Pixel) == E_NOT_OK) ReturnValue = E_NOT_OK;
         if(Display::getInstance().writePixel(Column, Row, Pixel) == E_NOT_OK) ReturnValue = E_NOT_OK;
     }
     if(Rotate) { if(Display::getInstance().writePixel(DISPLAY_NUMBER_OF_COLUMNS - 1, Row, FirstPixel) == E_NOT_OK) ReturnValue = E_NOT_OK; }
@@ -200,10 +200,10 @@ stdReturnType Transformation::shiftRowRight(byte Row, boolean Rotate)
     Display::PixelType Pixel;
     stdReturnType ReturnValue = E_OK;
 
-    if(Rotate) if(Display::getInstance().getPixel(DISPLAY_NUMBER_OF_COLUMNS - 1, Row, &LastPixel) == E_NOT_OK) ReturnValue = E_NOT_OK;
+    if(Rotate) if(Display::getInstance().getPixel(DISPLAY_NUMBER_OF_COLUMNS - 1, Row, LastPixel) == E_NOT_OK) ReturnValue = E_NOT_OK;
 
     for(int8_t Column = DISPLAY_NUMBER_OF_COLUMNS - 1; Column > 0; Column--) {
-        if(Display::getInstance().getPixel(Column - 1, Row, &Pixel) == E_NOT_OK) ReturnValue = E_NOT_OK;
+        if(Display::getInstance().getPixel(Column - 1, Row, Pixel) == E_NOT_OK) ReturnValue = E_NOT_OK;
         if(Display::getInstance().writePixel(Column, Row, Pixel) == E_NOT_OK) ReturnValue = E_NOT_OK;
     }
     if(Rotate) { if(Display::getInstance().writePixel(0, Row, LastPixel) == E_NOT_OK) ReturnValue = E_NOT_OK; }
@@ -284,10 +284,10 @@ stdReturnType Transformation::shiftColumnUp(byte Column, boolean Rotate)
     Display::PixelType Pixel;
     stdReturnType ReturnValue = E_OK;
 
-    if(Rotate) if(Display::getInstance().getPixel(Column, 0, &FirstPixel) == E_NOT_OK) ReturnValue = E_NOT_OK;
+    if(Rotate) if(Display::getInstance().getPixel(Column, 0, FirstPixel) == E_NOT_OK) ReturnValue = E_NOT_OK;
 
     for(byte Row = 0; Row < DISPLAY_NUMBER_OF_ROWS - 1; Row++) {
-        if(Display::getInstance().getPixel(Column, Row + 1, &Pixel) == E_NOT_OK) ReturnValue = E_NOT_OK;
+        if(Display::getInstance().getPixel(Column, Row + 1, Pixel) == E_NOT_OK) ReturnValue = E_NOT_OK;
         if(Display::getInstance().writePixel(Column, Row, Pixel) == E_NOT_OK) ReturnValue = E_NOT_OK;
     }
     if(Rotate) { if(Display::getInstance().writePixel(Column, DISPLAY_NUMBER_OF_ROWS - 1, FirstPixel) == E_NOT_OK) ReturnValue = E_NOT_OK; }
@@ -368,10 +368,10 @@ stdReturnType Transformation::shiftColumnDown(byte Column, boolean Rotate)
     Display::PixelType Pixel;
     stdReturnType ReturnValue = E_OK;
 
-    if(Rotate) if(Display::getInstance().getPixel(Column, DISPLAY_NUMBER_OF_ROWS - 1, &LastPixel) == E_NOT_OK) ReturnValue = E_NOT_OK;
+    if(Rotate) if(Display::getInstance().getPixel(Column, DISPLAY_NUMBER_OF_ROWS - 1, LastPixel) == E_NOT_OK) ReturnValue = E_NOT_OK;
 
     for(int8_t Row = DISPLAY_NUMBER_OF_ROWS - 1; Row > 0; Row--) {
-        if(Display::getInstance().getPixel(Column, Row - 1, &Pixel) == E_NOT_OK) ReturnValue = E_NOT_OK;
+        if(Display::getInstance().getPixel(Column, Row - 1, Pixel) == E_NOT_OK) ReturnValue = E_NOT_OK;
         if(Display::getInstance().writePixel(Column, Row, Pixel) == E_NOT_OK) ReturnValue = E_NOT_OK;
     }
     if(Rotate) { if(Display::getInstance().writePixel(Column, 0, LastPixel) == E_NOT_OK) ReturnValue = E_NOT_OK; }

@@ -173,7 +173,7 @@ class Display
     // char methods
     stdReturnType setCharacter(CharacterIdType CharacterId) { return setPixel(CharacterId); }
     stdReturnType clearCharacter(CharacterIdType CharacterId) { return clearPixel(CharacterId); }
-    stdReturnType getCharacter(CharacterIdType CharacterId, boolean* Value) const { return getPixel(CharacterId, Value); }
+    stdReturnType getCharacter(CharacterIdType CharacterId, boolean& Value) const { return getPixel(CharacterId, Value); }
 
     // char methods fast
     void setCharacterFast(CharacterIdType CharacterId) { setPixelFast(CharacterId); }
@@ -199,10 +199,10 @@ class Display
     stdReturnType clearPixel(byte);
     stdReturnType togglePixel(byte, byte);
     stdReturnType togglePixel(byte);
-    stdReturnType getPixel(byte, byte, boolean*) const;
-    stdReturnType getPixel(byte, boolean*) const;
-    stdReturnType getPixelRow(byte, PixelRowType*) const;
-    stdReturnType getPixelColumn(byte, PixelColumnType*) const;
+    stdReturnType getPixel(byte, byte, boolean&) const;
+    stdReturnType getPixel(byte, boolean&) const;
+    stdReturnType getPixelRow(byte, PixelRowType&) const;
+    stdReturnType getPixelColumn(byte, PixelColumnType&) const;
     stdReturnType setPixelRow(byte, PixelRowType);
     stdReturnType setPixelColumn(byte, PixelColumnType);
 

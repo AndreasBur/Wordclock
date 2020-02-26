@@ -32,6 +32,7 @@
 #include <inttypes.h>
 
 #include "Stream.h"
+#include "serstream"
 
 struct ring_buffer;
 
@@ -111,6 +112,8 @@ class HardwareSerial : public Stream
   extern HardwareSerial Serial1;
 #else // normal hardware serial
   extern HardwareSerial Serial;
+  //extern std::ohserialstream cout;
+  //extern std::ihserialstream cin;
 #define Serial1 Serial /* define as 'Serial' so compatible code won't break */
 #endif
 

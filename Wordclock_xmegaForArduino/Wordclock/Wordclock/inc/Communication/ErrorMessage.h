@@ -22,7 +22,7 @@
 ******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Arduino.h"
-
+#include <serstream>
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
@@ -75,8 +75,9 @@ class ErrorMessage
 
 	// methods
     void send(ErrorType Error) const {
-		Serial.print(F("Error: "));
-		Serial.println(Error); 
+		//cout << F("Error: ") << Error << std::endl;
+		Serial.print(Error);
+		//Serial.println(); 
 	}
 };
 
