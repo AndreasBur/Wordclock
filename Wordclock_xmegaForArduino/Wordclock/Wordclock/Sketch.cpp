@@ -69,6 +69,7 @@ void setup() {
 	//cout << F("Hallo") << std::endl;
 
     bh1750.changeMeasurementTime(0b10100111);
+	
     //WS2812::getInstance().setBrightness(0);
     //WS2812::getInstance().show();
     //delay(100);
@@ -79,7 +80,7 @@ void setup() {
   //WordClockDisplay.setChar(2, 0, 10, 20, 30);
   //WcDisplayCharacter.getChar(1,1, &Char);
   //WordClockDisplay.setCharacter(DISPLAY_CHARACTER_A_1);
-  //WordClockDisplay.setWord(DISPLAY_WORD_DREIVIERTEL);
+  Display::getInstance().setWord(DisplayWords::WORD_ZEHN);
   //if (WordClockDisplay.clearAllWords() == E_OK) {
 //		flag = 1;
   //} else {
@@ -99,7 +100,35 @@ void setup() {
   SET_BIT(PORTC_OUT, 6);
 }
 
+class Singleton {
+	private:
+	Singleton() {}
+	~Singleton() {}
 
+	public:
+
+	void write() { Serial.println(); }
+	static Singleton& getInstance() {
+		static Singleton SingletonInstance;
+		return SingletonInstance;
+	}
+};
+
+class myClass {
+	private:
+	Singleton& single;
+
+	public:
+	myClass() : single(Singleton::getInstance())
+	{  }
+	~myClass() {}
+	void write() {
+		single.write();
+	}
+	void writemore() { Serial.println(); Serial.println(); }
+};
+
+myClass myClassInstance;
 
 //Font wcFont;
 
@@ -119,6 +148,9 @@ void loop()
     delayMicroseconds(10);
     CLEAR_BIT(PORTC_OUT, 6);
     delayMicroseconds(10);
+	
+		myClassInstance.write();
+		myClassInstance.writemore();
 
     Brightness++;
   //FontTahoma10x10::CharType Char;
@@ -127,6 +159,7 @@ void loop()
 	while(1) {
 	    wcCommunication.task();
 	}
+
 
 
     //volatile int Test = 5;

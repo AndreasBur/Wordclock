@@ -192,7 +192,7 @@ class DisplayCharacters
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    DisplayCharacters();
+    constexpr DisplayCharacters() {}
     ~DisplayCharacters();
 
 	// get methods fast

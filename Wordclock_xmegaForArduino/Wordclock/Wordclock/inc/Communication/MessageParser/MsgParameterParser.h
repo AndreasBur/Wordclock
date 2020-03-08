@@ -100,14 +100,20 @@ template <size_t ParameterTableSize> class MsgParameterParser
 	}
 	
 	PositionType parseArgument(MsgParameter Option, const char* Argument) {
-		if(Option.getArgumentType() == MsgParameter::ARGUMENT_TYPE_UINT8) {
-			PositionType position;
-			uint8_t value;
-			handleConvertResult(StringTools::stringToUnsignedInteger(
-				Argument, position, ArgumentNumberBase, value));
-			return position;
-		}
+		if(Option.getArgumentType() == MsgParameter::ARGUMENT_TYPE_UINT8) { return convertArgument<byte>(Option, Argument); }
+		if(Option.getArgumentType() == MsgParameter::ARGUMENT_TYPE_UINT16) { return convertArgument<uint16_t>(Option, Argument); }
+		if(Option.getArgumentType() == MsgParameter::ARGUMENT_TYPE_UINT32) { return convertArgument<uint32_t>(Option, Argument); }
+		if(Option.getArgumentType() == MsgParameter::ARGUMENT_TYPE_UINT64) { return convertArgument<uint64_t>(Option, Argument); }
 		return 0u;
+	}
+	
+	template <typename T> PositionType convertArgument(MsgParameter Option, const char* Argument) {
+		T value;
+		PositionType position;
+		StringTools::ResultType result = StringTools::stringToUnsignedInteger(Argument, position, ArgumentNumberBase, value);
+		handleConvertResult(result);
+		if(result == StringTools::RESULT_OK) handleParameter(Option, value);
+		return position;
 	}
 	
 	void handleConvertResult(StringTools::ResultType Result) {
@@ -158,6 +164,7 @@ template <size_t ParameterTableSize> class MsgParameterParser
 		}
 	}
 	
+	void handleParameter(MsgParameter Option, auto Argument) = 0;
 };
 
 #endif

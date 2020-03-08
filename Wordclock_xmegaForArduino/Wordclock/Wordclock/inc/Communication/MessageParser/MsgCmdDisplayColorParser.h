@@ -58,7 +58,6 @@ class MsgCmdDisplayColorParser : public MsgParameterParser<MSG_CMD_DISPLAY_COLOR
   private:
 	static const ParameterTableType ParameterTable;
 
-  
 	static const char RedParameterChar{'R'};
 	static const char GreenParameterChar{'G'};
 	static const char BlueParameterChar{'B'};

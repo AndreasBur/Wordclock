@@ -63,7 +63,7 @@ class DisplayWord
 ******************************************************************************************************************************************************/
   public:
     constexpr DisplayWord(byte sColumn, byte sRow, byte sLength) : Column(sColumn), Row(sRow), Length(sLength) {}
-    DisplayWord();
+	constexpr DisplayWord() : Column(0u), Row(0u), Length(0u) {}
 
 	// get methods
     byte getLength() const { return Length; }
