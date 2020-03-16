@@ -82,6 +82,9 @@
       typedef the_value_type type;
     };
 
+	template< bool B, class T = void >
+	using enable_if_t = typename enable_if<B,T>::type;
+
     template<typename the_value_type1,
              typename the_value_type2>
     struct is_same : false_type { };

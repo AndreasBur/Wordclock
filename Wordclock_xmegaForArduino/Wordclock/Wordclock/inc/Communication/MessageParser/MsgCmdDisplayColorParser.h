@@ -44,7 +44,7 @@
 /******************************************************************************************************************************************************
  *  C L A S S   T E M P L A T E
 ******************************************************************************************************************************************************/
-class MsgCmdDisplayColorParser : public MsgParameterParser<MSG_CMD_DISPLAY_COLOR_PARSER_PARAMETER_TABLE_SIZE>
+class MsgCmdDisplayColorParser : public MsgParameterParser<MsgCmdDisplayColorParser, MSG_CMD_DISPLAY_COLOR_PARSER_PARAMETER_TABLE_SIZE>
 {
 /******************************************************************************************************************************************************
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
@@ -56,6 +56,7 @@ class MsgCmdDisplayColorParser : public MsgParameterParser<MSG_CMD_DISPLAY_COLOR
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
+  	friend class MsgParameterParser;
 	static const ParameterTableType ParameterTable;
 
 	static const char RedParameterChar{'R'};
@@ -66,14 +67,11 @@ class MsgCmdDisplayColorParser : public MsgParameterParser<MSG_CMD_DISPLAY_COLOR
 	ErrorMessage Error;
 		
 	// functions
-	void setColors(const char*);
-	void setColorRed(const char*);
-	void setColorGreen(const char*);
-	void setColorBlue(const char*);
 	void sendAnswerRed();
 	void sendAnswerGreen();
 	void sendAnswerBlue();
-	stdReturnType getColorValue(const char*, char, ColorType&);
+	
+	void handleParameter(char, uint8_t);
   
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
@@ -90,6 +88,7 @@ class MsgCmdDisplayColorParser : public MsgParameterParser<MSG_CMD_DISPLAY_COLOR
 	// methods
 	//void parse();
 	void sendAnswer();
+
 };
 
 #endif

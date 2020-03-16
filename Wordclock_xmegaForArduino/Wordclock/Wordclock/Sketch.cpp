@@ -100,36 +100,6 @@ void setup() {
   SET_BIT(PORTC_OUT, 6);
 }
 
-class Singleton {
-	private:
-	Singleton() {}
-	~Singleton() {}
-
-	public:
-
-	void write() { Serial.println(); }
-	static Singleton& getInstance() {
-		static Singleton SingletonInstance;
-		return SingletonInstance;
-	}
-};
-
-class myClass {
-	private:
-	Singleton& single;
-
-	public:
-	myClass() : single(Singleton::getInstance())
-	{  }
-	~myClass() {}
-	void write() {
-		single.write();
-	}
-	void writemore() { Serial.println(); Serial.println(); }
-};
-
-myClass myClassInstance;
-
 //Font wcFont;
 
 unsigned long Micros = 0;
@@ -148,9 +118,6 @@ void loop()
     delayMicroseconds(10);
     CLEAR_BIT(PORTC_OUT, 6);
     delayMicroseconds(10);
-	
-		myClassInstance.write();
-		myClassInstance.writemore();
 
     Brightness++;
   //FontTahoma10x10::CharType Char;

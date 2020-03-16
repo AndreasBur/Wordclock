@@ -39,9 +39,9 @@
 ******************************************************************************************************************************************************/
 const MsgCmdDisplayColorParser::ParameterTableType MsgCmdDisplayColorParser::ParameterTable PROGMEM
 {
-	ParameterTableElementType('R', MsgParameter::ARGUMENT_TYPE_UINT8),
-	ParameterTableElementType('G', MsgParameter::ARGUMENT_TYPE_UINT8),
-	ParameterTableElementType('B', MsgParameter::ARGUMENT_TYPE_UINT8)
+	ParameterTableElementType(RedParameterChar, MsgParameter::ARGUMENT_TYPE_UINT8),
+	ParameterTableElementType(GreenParameterChar, MsgParameter::ARGUMENT_TYPE_UINT8),
+	ParameterTableElementType(BlueParameterChar, MsgParameter::ARGUMENT_TYPE_UINT8)
 };
 
 
@@ -61,19 +61,8 @@ MsgCmdDisplayColorParser::MsgCmdDisplayColorParser(const char* sParameter)
 : MsgParameterParser(ParameterTable, sParameter)
 {
 
-} /* MsgCmdDisplayColorParser */
-
-/*
-void MsgCmdDisplayColorParser::parse()
-{
-	if(CmdValue == nullptr) {
-		sendAnswer();
-	} else {
-		setColors(CmdValue);
-		sendAnswer();
-	}
 }
-*/
+
 void MsgCmdDisplayColorParser::sendAnswer()
 {
 	sendAnswerRed();
@@ -81,6 +70,11 @@ void MsgCmdDisplayColorParser::sendAnswer()
 	sendAnswerBlue();
 	Serial.println();
 }
+
+
+/******************************************************************************************************************************************************
+ * P R I V A T E   F U N C T I O N S
+******************************************************************************************************************************************************/
 
 void MsgCmdDisplayColorParser::sendAnswerRed()
 {
@@ -103,64 +97,12 @@ void MsgCmdDisplayColorParser::sendAnswerBlue()
 	Serial.print(Display::getInstance().getColorBlue());
 }
 
-
-/******************************************************************************************************************************************************
- * P R I V A T E   F U N C T I O N S
-******************************************************************************************************************************************************/
-
-void MsgCmdDisplayColorParser::setColors(const char* CmdValue)
+void MsgCmdDisplayColorParser::handleParameter(char ParameterShortName, uint8_t Argument)
 {
-	setColorRed(CmdValue);
-	setColorGreen(CmdValue);
-	setColorBlue(CmdValue);
+	if(ParameterShortName == RedParameterChar) { Display::getInstance().setColorRed(Argument); }
+	if(ParameterShortName == GreenParameterChar) { Display::getInstance().setColorGreen(Argument); }
+	if(ParameterShortName == BlueParameterChar) { Display::getInstance().setColorBlue(Argument); }
 }
-
-void MsgCmdDisplayColorParser::setColorRed(const char* CmdValue)
-{
-	uint8_t Value;
-	
-	if(getColorValue(CmdValue, RedParameterChar, Value) == E_OK) {
-		Display::getInstance().setColorRed(Value);
-	}
-}
-
-void MsgCmdDisplayColorParser::setColorGreen(const char* CmdValue)
-{
-	uint8_t Value;
-	
-	if(getColorValue(CmdValue, GreenParameterChar, Value) == E_OK) {
-		Display::getInstance().setColorGreen(Value);
-	}
-}
-
-void MsgCmdDisplayColorParser::setColorBlue(const char* CmdValue)
-{
-	uint8_t Value;
-	
-	if(getColorValue(CmdValue, BlueParameterChar, Value) == E_OK) {
-		Display::getInstance().setColorBlue(Value);
-	}
-}
-
-stdReturnType MsgCmdDisplayColorParser::getColorValue(const char* CmdValue, char ColorParameterChar, ColorType& Value)
-{
-	char parameterAndDelimiter[]{ColorParameterChar, ColorValueDelimiter, '\0'};
-	const char* parameterStart = strstr(CmdValue, parameterAndDelimiter);
-	const char* valueStart = parameterStart + 2u;
-	StringTools::PositionType position;
-	StringTools::ResultType result = StringTools::stringToUnsignedInteger(valueStart, position, 10, Value);
-	
-	if((result == StringTools::RESULT_OVERFLOW)) {
-		Error.send(ErrorMessage::ERROR_VALUE_OUT_OF_BOUNCE);
-		return E_NOT_OK;
-	} else if (result == StringTools::RESULT_NO_VALUE){
-		Error.send(ErrorMessage::ERROR_NO_VALUE_GIVEN);
-		return E_NOT_OK;
-	} else {
-		return E_OK;
-	}
-}
-
 
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E
