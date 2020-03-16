@@ -88,7 +88,7 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
 	    return parameterTableElement;
     }
 	
-	stdReturnType getMsgParameterByOptionShortName(char OptionShortName, ParameterTableElementType& sMsgOption) {
+	stdReturnType getMsgParameterByOptionShortName(char OptionShortName, ParameterTableElementType& sMsgOption) const {
 		for(size_t index = 0; index < ParameterTable.size(); index++) {
 			ParameterTableElementType parameterTableElement = getParameterTableElement(index);
 			if(parameterTableElement.getOptionShortName() == OptionShortName) {
@@ -100,6 +100,7 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
 	}
 	
 	PositionType parseArgument(MsgParameter Option, const char* Argument) {
+		if(Option.getArgumentType() == MsgParameter::ARGUMENT_TYPE_CHAR) { return convertArgument<char>(Option, Argument); }
 		if(Option.getArgumentType() == MsgParameter::ARGUMENT_TYPE_UINT8) { return convertArgument<uint8_t>(Option, Argument); }
 		if(Option.getArgumentType() == MsgParameter::ARGUMENT_TYPE_UINT16) { return convertArgument<uint16_t>(Option, Argument); }
 		if(Option.getArgumentType() == MsgParameter::ARGUMENT_TYPE_UINT32) { return convertArgument<uint32_t>(Option, Argument); }
@@ -111,16 +112,17 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
 		return 0u;
 	}
 	
-	template <typename Unsigned> PositionType convertArgument(MsgParameter Option, const char* Argument) {
-		Unsigned value;
+	template <typename T> PositionType convertArgument(MsgParameter Option, const char* Argument) {
+		T value;
 		PositionType position;
-		StringTools::ResultType result = StringTools::stringTo(Argument, position, ArgumentNumberBase, value);
+		
+		StringTools::ResultType result = StringTools::stringTo(Argument, position, value, ArgumentNumberBase);
 		handleConvertResult(result);
 		if(result == StringTools::RESULT_OK) static_cast<Derived*>(this)->handleParameter(Option.getOptionShortName(), value);
 		return position;
 	}
 	
-	void handleConvertResult(StringTools::ResultType Result) {
+	void handleConvertResult(StringTools::ResultType Result) const {
 		if(Result == StringTools::RESULT_NO_VALUE) {
 			Error.send(ErrorMessage::ERROR_NO_VALUE_GIVEN);
 		}

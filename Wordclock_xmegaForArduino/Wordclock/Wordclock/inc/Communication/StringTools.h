@@ -79,41 +79,67 @@ class StringTools
 		Destination[Length - 1] = '\0';
 	}
 	
-	template<typename Unsigned, typename std::enable_if_t<std::is_unsigned<Unsigned>::value, int> = 0>
-	static ResultType stringTo(const char* String, PositionType& Position, uint8_t Base, Unsigned& Value) {
+	template<typename T,
+	         typename std::enable_if_t<std::is_unsigned<T>::value, int> = 0,
+			 typename std::enable_if_t<std::is_integral<T>::value, int> = 0>
+	static ResultType stringTo(const char* String, PositionType& Position, T& Value, uint8_t Base = 10) {
 		char* end = nullptr;
 		errno = 0;
-		uint64_t valueMax = strtoul(String, &end, Base);
+		uint64_t valueBig = strtoul(String, &end, Base);
 		Position = end - String;
 		
 		if(String == end) { 
 			return RESULT_NO_VALUE;
-		} else if(errno == ERANGE || valueMax > std::numeric_limits<Unsigned>::max()) {
-			Value = std::numeric_limits<Unsigned>::max();
+		} else if(errno == ERANGE || valueBig > std::numeric_limits<T>::max()) {
+			Value = std::numeric_limits<T>::max();
 			return RESULT_OVERFLOW;
 		} else {
-			Value = static_cast<Unsigned>(valueMax);	
+			Value = static_cast<T>(valueBig);	
 			return RESULT_OK;
 		}
 	}
 	
-	template<typename Signed, typename std::enable_if_t<std::is_signed<Signed>::value, int> = 0> 
-	static ResultType stringTo(const char* String, PositionType& Position, uint8_t Base, Signed& Value) {
+	template<typename Signed, 
+			 typename std::enable_if_t<std::is_signed<Signed>::value, int> = 0,
+			 typename std::enable_if_t<std::is_integral<Signed>::value, int> = 0> 
+	static ResultType stringTo(const char* String, PositionType& Position, Signed& Value, uint8_t Base = 10) {
 		char* end = nullptr;
 		errno = 0;
-		int64_t valueMax = strtol(String, &end, Base);
+		int64_t valueBig = strtol(String, &end, Base);
 		Position = end - String;
 		
 		if(String == end) {
 			return RESULT_NO_VALUE;
-		} else if(errno == ERANGE || valueMax > std::numeric_limits<Signed>::max()) {
-			Value = std::numeric_limits<Signed>::max();
+		} else if(errno == ERANGE) {
+			if(valueBig > std::numeric_limits<Signed>::max()) { Value = std::numeric_limits<Signed>::max(); }
+			if(valueBig < std::numeric_limits<Signed>::min()) { Value = std::numeric_limits<Signed>::min(); }
 			return RESULT_OVERFLOW;
 		} else {
-			Value = static_cast<Signed>(valueMax);
+			Value = static_cast<Signed>(valueBig);
 			return RESULT_OK;
 		}
 	}
+
+	template<typename Float,
+	         typename std::enable_if_t<std::is_floating_point<Float>::value, int> = 0>
+	static ResultType stringTo(const char* String, PositionType& Position, Float& Value, uint8_t Base = 10) {
+		char* end = nullptr;
+		errno = 0;
+		double valueBig = strtod(String, &end);
+		Position = end - String;
+		
+		if(String == end) {
+			return RESULT_NO_VALUE;
+			} else if(errno == ERANGE) {
+			if(valueBig > std::numeric_limits<Float>::max()) { Value = std::numeric_limits<Float>::max(); }
+			if(valueBig < std::numeric_limits<Float>::min()) { Value = std::numeric_limits<Float>::min(); }
+			return RESULT_OVERFLOW;
+			} else {
+			Value = static_cast<Float>(valueBig);
+			return RESULT_OK;
+		}
+	}
+
 };
 
 #endif
