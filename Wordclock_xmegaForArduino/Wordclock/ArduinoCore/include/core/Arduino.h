@@ -76,8 +76,8 @@ extern "C"{
 //        low level as a '0' (as it should be) via digitalRead, even though the value MUST be inverted for this to work.
 
 // NOTE:  the values of 'true' and 'false' should be defined by C++ already
-#define true /*0x1*/(!0) /* rather than '1' true is defined as '!0' - it's logically accurate */
-#define false 0x0
+//#define true /*0x1*/(!0) /* rather than '1' true is defined as '!0' - it's logically accurate */
+//#define false 0x0
 
 #define PI 3.1415926535897932384626433832795
 #define HALF_PI 1.5707963267948966192313216916398

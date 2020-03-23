@@ -100,18 +100,20 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
 	}
 	
 	PositionType parseArgument(MsgParameter Option, const char* Argument) {
-		if(Option.getArgumentType() == MsgParameter::ARGUMENT_TYPE_CHAR) { return convertArgument<char>(Option, Argument); }
+		//if(Option.getArgumentType() == MsgParameter::ARGUMENT_TYPE_CHAR) { return convertArgument<char>(Option, Argument); }
 		if(Option.getArgumentType() == MsgParameter::ARGUMENT_TYPE_UINT8) { return convertArgument<uint8_t>(Option, Argument); }
-		if(Option.getArgumentType() == MsgParameter::ARGUMENT_TYPE_UINT16) { return convertArgument<uint16_t>(Option, Argument); }
-		if(Option.getArgumentType() == MsgParameter::ARGUMENT_TYPE_UINT32) { return convertArgument<uint32_t>(Option, Argument); }
-		if(Option.getArgumentType() == MsgParameter::ARGUMENT_TYPE_UINT64) { return convertArgument<uint64_t>(Option, Argument); }
-		if(Option.getArgumentType() == MsgParameter::ARGUMENT_TYPE_INT8) { return convertArgument<int8_t>(Option, Argument); }
-		if(Option.getArgumentType() == MsgParameter::ARGUMENT_TYPE_INT16) { return convertArgument<int16_t>(Option, Argument); }
-		if(Option.getArgumentType() == MsgParameter::ARGUMENT_TYPE_INT32) { return convertArgument<int32_t>(Option, Argument); }
-		if(Option.getArgumentType() == MsgParameter::ARGUMENT_TYPE_INT64) { return convertArgument<int64_t>(Option, Argument); }
+		//if(Option.getArgumentType() == MsgParameter::ARGUMENT_TYPE_UINT16) { return convertArgument<uint16_t>(Option, Argument); }
+		//if(Option.getArgumentType() == MsgParameter::ARGUMENT_TYPE_UINT32) { return convertArgument<uint32_t>(Option, Argument); }
+		//if(Option.getArgumentType() == MsgParameter::ARGUMENT_TYPE_UINT64) { return convertArgument<uint64_t>(Option, Argument); }
+		//if(Option.getArgumentType() == MsgParameter::ARGUMENT_TYPE_INT8) { return convertArgument<int8_t>(Option, Argument); }
+		//if(Option.getArgumentType() == MsgParameter::ARGUMENT_TYPE_INT16) { return convertArgument<int16_t>(Option, Argument); }
+		//if(Option.getArgumentType() == MsgParameter::ARGUMENT_TYPE_INT32) { return convertArgument<int32_t>(Option, Argument); }
+		//if(Option.getArgumentType() == MsgParameter::ARGUMENT_TYPE_INT64) { return convertArgument<int64_t>(Option, Argument); }
+		//if(Option.getArgumentType() == MsgParameter::ARGUMENT_TYPE_FLOAT) { return convertArgument<float>(Option, Argument); }
+		//if(Option.getArgumentType() == MsgParameter::ARGUMENT_TYPE_DOUBLE) { return convertArgument<double>(Option, Argument); }
 		return 0u;
 	}
-	
+
 	template <typename T> PositionType convertArgument(MsgParameter Option, const char* Argument) {
 		T value;
 		PositionType position;

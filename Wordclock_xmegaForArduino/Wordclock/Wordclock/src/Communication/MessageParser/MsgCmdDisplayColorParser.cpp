@@ -63,6 +63,14 @@ MsgCmdDisplayColorParser::MsgCmdDisplayColorParser(const char* sParameter)
 
 }
 
+/******************************************************************************************************************************************************
+  Destructor of MsgCmdDisplayColorParser
+******************************************************************************************************************************************************/
+MsgCmdDisplayColorParser::~MsgCmdDisplayColorParser()
+{
+
+} /* ~MsgCmdDisplayColorParser */
+
 void MsgCmdDisplayColorParser::sendAnswer()
 {
 	sendAnswerRed();
@@ -70,7 +78,6 @@ void MsgCmdDisplayColorParser::sendAnswer()
 	sendAnswerBlue();
 	Serial.println();
 }
-
 
 /******************************************************************************************************************************************************
  * P R I V A T E   F U N C T I O N S
@@ -97,7 +104,7 @@ void MsgCmdDisplayColorParser::sendAnswerBlue()
 	Serial.print(Display::getInstance().getColorBlue());
 }
 
-void MsgCmdDisplayColorParser::handleParameter(char ParameterShortName, uint8_t Argument)
+void MsgCmdDisplayColorParser::handleParameter(char ParameterShortName, byte Argument)
 {
 	if(ParameterShortName == RedParameterChar) { Display::getInstance().setColorRed(Argument); }
 	if(ParameterShortName == GreenParameterChar) { Display::getInstance().setColorGreen(Argument); }

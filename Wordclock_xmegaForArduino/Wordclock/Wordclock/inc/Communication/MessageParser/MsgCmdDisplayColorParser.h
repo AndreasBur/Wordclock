@@ -71,14 +71,14 @@ class MsgCmdDisplayColorParser : public MsgParameterParser<MsgCmdDisplayColorPar
 	void sendAnswerGreen();
 	void sendAnswerBlue();
 	
-	void handleParameter(char, uint8_t);
+	void handleParameter(char, byte);
   
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
     MsgCmdDisplayColorParser(const char*);
-    //~MsgCmdDisplayColorParser();
+    ~MsgCmdDisplayColorParser();
 
 	// get methods
 	const ParameterTableType& getParameterTable() const { return ParameterTable; }
@@ -86,7 +86,6 @@ class MsgCmdDisplayColorParser : public MsgParameterParser<MsgCmdDisplayColorPar
 	// set methods
 
 	// methods
-	//void parse();
 	void sendAnswer();
 
 };

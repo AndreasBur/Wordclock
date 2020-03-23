@@ -98,7 +98,7 @@ class StringTools
 			return RESULT_OK;
 		}
 	}
-	
+
 	template<typename Signed, 
 			 typename std::enable_if_t<std::is_signed<Signed>::value, int> = 0,
 			 typename std::enable_if_t<std::is_integral<Signed>::value, int> = 0> 
@@ -130,11 +130,11 @@ class StringTools
 		
 		if(String == end) {
 			return RESULT_NO_VALUE;
-			} else if(errno == ERANGE) {
+		} else if(errno == ERANGE) {
 			if(valueBig > std::numeric_limits<Float>::max()) { Value = std::numeric_limits<Float>::max(); }
 			if(valueBig < std::numeric_limits<Float>::min()) { Value = std::numeric_limits<Float>::min(); }
 			return RESULT_OVERFLOW;
-			} else {
+		} else {
 			Value = static_cast<Float>(valueBig);
 			return RESULT_OK;
 		}
