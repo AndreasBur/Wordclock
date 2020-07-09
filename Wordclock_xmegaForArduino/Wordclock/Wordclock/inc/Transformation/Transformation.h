@@ -77,15 +77,15 @@ class Transformation
     // set methods
 
     // methods
-    stdReturnType shiftLeft(boolean = false);
-    stdReturnType shiftRight(boolean = false);
-    stdReturnType shiftUp(boolean = false);
-    stdReturnType shiftDown(boolean = false);
+    StdReturnType shiftLeft(boolean = false);
+    StdReturnType shiftRight(boolean = false);
+    StdReturnType shiftUp(boolean = false);
+    StdReturnType shiftDown(boolean = false);
 
-    stdReturnType shiftRowLeft(byte, boolean = false);
-    stdReturnType shiftRowRight(byte, boolean = false);
-    stdReturnType shiftColumnUp(byte, boolean = false);
-    stdReturnType shiftColumnDown(byte, boolean = false);
+    StdReturnType shiftRowLeft(byte, boolean = false);
+    StdReturnType shiftRowRight(byte, boolean = false);
+    StdReturnType shiftColumnUp(byte, boolean = false);
+    StdReturnType shiftColumnDown(byte, boolean = false);
 
     void shiftLeftFast(boolean = false);
     void shiftRightFast(boolean = false);

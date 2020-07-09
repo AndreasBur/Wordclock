@@ -90,9 +90,9 @@ void AnimationClockSnake::init()
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType AnimationClockSnake::setClock(byte Hour, byte Minute)
+StdReturnType AnimationClockSnake::setClock(byte Hour, byte Minute)
 {
-    stdReturnType ReturnValue{E_NOT_OK};
+    StdReturnType ReturnValue{E_NOT_OK};
 
     if(Clock::getInstance().getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
         ReturnValue = E_OK;

@@ -90,9 +90,9 @@ void AnimationClockCube::init()
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType AnimationClockCube::setClock(byte Hour, byte Minute)
+StdReturnType AnimationClockCube::setClock(byte Hour, byte Minute)
 {
-    stdReturnType ReturnValue{E_NOT_OK};
+    StdReturnType ReturnValue{E_NOT_OK};
 
     if(Clock::getInstance().getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
         ReturnValue = E_OK;
@@ -279,9 +279,9 @@ void AnimationClockCube::writeBorderPixels(bool Value)
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType AnimationClockCube::increaseBorder()
+StdReturnType AnimationClockCube::increaseBorder()
 {
-    stdReturnType ReturnValue = E_OK;
+    StdReturnType ReturnValue = E_OK;
 
     if(Border.ColumnStart > 0) { Border.ColumnStart--; }
     else { ReturnValue = E_NOT_OK; }
@@ -304,9 +304,9 @@ stdReturnType AnimationClockCube::increaseBorder()
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType AnimationClockCube::decreaseBorder()
+StdReturnType AnimationClockCube::decreaseBorder()
 {
-    stdReturnType ReturnValue = E_OK;
+    StdReturnType ReturnValue = E_OK;
 
     if(Border.ColumnStart < ANIMATION_CLOCK_CUBE_COLUMN_START_MAX_VALUE) { Border.ColumnStart++; }
     else { ReturnValue = E_NOT_OK; }

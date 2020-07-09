@@ -88,7 +88,7 @@ BH1750::~BH1750()
  *                  
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType BH1750::init(ModeType Mode)
+StdReturnType BH1750::init(ModeType Mode)
 {
     return setMode(Mode);
 } /* init */
@@ -117,9 +117,9 @@ void BH1750::task()
  *                  
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType BH1750::setMode(ModeType sMode)
+StdReturnType BH1750::setMode(ModeType sMode)
 {
-    stdReturnType ReturnValue = E_NOT_OK;
+    StdReturnType ReturnValue = E_NOT_OK;
     Mode = sMode;
 
     if(Mode != MODE_NONE) {
@@ -138,9 +138,9 @@ stdReturnType BH1750::setMode(ModeType sMode)
  *                  
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType BH1750::changeMeasurementTime(byte MTRegValue)
+StdReturnType BH1750::changeMeasurementTime(byte MTRegValue)
 {
-    stdReturnType ReturnValue = E_NOT_OK;
+    StdReturnType ReturnValue = E_NOT_OK;
 
     if(isMTRegValueInRange(MTRegValue)) {
         byte MTRegValueHighBits = readBitGroup(MTRegValue, BH1750_MT_REG_VALUE_HIGH_BITS_GM, BH1750_MT_REG_VALUE_HIGH_BITS_GP);
@@ -176,9 +176,9 @@ stdReturnType BH1750::changeMeasurementTime(byte MTRegValue)
  *                  
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType BH1750::readIlluminance()
+StdReturnType BH1750::readIlluminance()
 {
-    stdReturnType ReturnValue = E_NOT_OK;
+    StdReturnType ReturnValue = E_NOT_OK;
     byte LowByte, HighByte;
 
     Wire.requestFrom(BH1750_I2C_ADDR, BH1750_ILLUMINANCE_RAW_VALUE_NUMBER_OF_BYTES);
@@ -223,7 +223,7 @@ void BH1750::sendModeForOneTimeMode()
  *                  
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType BH1750::sendCommand(byte Command)
+StdReturnType BH1750::sendCommand(byte Command)
 {
 	Wire.beginTransmission(static_cast<uint8_t>(BH1750_I2C_ADDR));
     Wire.write(Command);

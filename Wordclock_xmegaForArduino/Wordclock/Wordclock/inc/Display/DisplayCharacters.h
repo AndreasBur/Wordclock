@@ -201,9 +201,9 @@ class DisplayCharacters
     char getCharacterFast(CharacterIdType CharacterId) const { return getDisplayCharactersTableElement(CharacterId); }
     
     // get methods
-    stdReturnType getCharacter(byte, byte, char*) const;
-    stdReturnType getCharacter(byte, char*) const;
-    stdReturnType getCharacter(CharacterIdType, char*) const;
+    StdReturnType getCharacter(byte, byte, char&) const;
+    StdReturnType getCharacter(byte, char&) const;
+    StdReturnType getCharacter(CharacterIdType, char&) const;
 
 	// set methods
 

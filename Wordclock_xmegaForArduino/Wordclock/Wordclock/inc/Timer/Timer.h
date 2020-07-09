@@ -122,17 +122,17 @@ class Timer
 	// methods
 	static Timer& getInstance();
 	TimerIsrCallbackF_void TimerOverflowCallback;
-	stdReturnType init(uint32_t = 1000, TimerIsrCallbackF_void = NULL);
-	stdReturnType setPeriod(uint32_t);
-	stdReturnType enablePwm(TimerPwmPinType, uint16_t);
-	stdReturnType disablePwm(TimerPwmPinType);
-	stdReturnType setPwmDuty(TimerPwmPinType, uint16_t);
-	stdReturnType start();
+	StdReturnType init(uint32_t = 1000, TimerIsrCallbackF_void = NULL);
+	StdReturnType setPeriod(uint32_t);
+	StdReturnType enablePwm(TimerPwmPinType, uint16_t);
+	StdReturnType disablePwm(TimerPwmPinType);
+	StdReturnType setPwmDuty(TimerPwmPinType, uint16_t);
+	StdReturnType start();
 	void stop();
-	stdReturnType resume();
-	stdReturnType attachInterrupt(TimerIsrCallbackF_void);
+	StdReturnType resume();
+	StdReturnType attachInterrupt(TimerIsrCallbackF_void);
 	void detachInterrupt();
-	stdReturnType read(uint32_t&);
+	StdReturnType read(uint32_t&);
 };
 
 #endif

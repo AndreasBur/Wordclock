@@ -107,10 +107,10 @@ class DisplayWords
     ~DisplayWords();
 
 	// get methods
-    stdReturnType getDisplayWord(WordIdType, DisplayWord&) const;
-    stdReturnType getDisplayWordLength(WordIdType, byte&) const;
-    stdReturnType getDisplayWordColumn(WordIdType, byte&) const;
-    stdReturnType getDisplayWordRow(WordIdType, byte&) const;
+    StdReturnType getDisplayWord(WordIdType, DisplayWord&) const;
+    StdReturnType getDisplayWordLength(WordIdType, byte&) const;
+    StdReturnType getDisplayWordColumn(WordIdType, byte&) const;
+    StdReturnType getDisplayWordRow(WordIdType, byte&) const;
 
     // get methods fast
     DisplayWord getDisplayWordFast(WordIdType WordId) const { return getDisplayWordsTableElement(WordId); }

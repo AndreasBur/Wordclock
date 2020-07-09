@@ -91,9 +91,9 @@ void Transformation::shiftRowLeftFast(byte Row, boolean Rotate)
  *                  
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType Transformation::shiftLeft(boolean Rotate)
+StdReturnType Transformation::shiftLeft(boolean Rotate)
 {
-    stdReturnType ReturnValue = E_OK;
+    StdReturnType ReturnValue = E_OK;
 
     for(byte Row = 0; Row < DISPLAY_NUMBER_OF_ROWS; Row++) {
         if(shiftRowLeft(Row, Rotate) == E_NOT_OK) { ReturnValue = E_NOT_OK; }
@@ -110,11 +110,11 @@ stdReturnType Transformation::shiftLeft(boolean Rotate)
  *                  
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType Transformation::shiftRowLeft(byte Row, boolean Rotate)
+StdReturnType Transformation::shiftRowLeft(byte Row, boolean Rotate)
 {
     Display::PixelType FirstPixel;
     Display::PixelType Pixel;
-    stdReturnType ReturnValue = E_OK;
+    StdReturnType ReturnValue = E_OK;
 
     if(Rotate) if(Display::getInstance().getPixel(0, Row, FirstPixel) == E_NOT_OK) ReturnValue = E_NOT_OK;
 
@@ -175,9 +175,9 @@ void Transformation::shiftRowRightFast(byte Row, boolean Rotate)
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType Transformation::shiftRight(boolean Rotate)
+StdReturnType Transformation::shiftRight(boolean Rotate)
 {
-    stdReturnType ReturnValue = E_OK;
+    StdReturnType ReturnValue = E_OK;
 
     for(byte Row = 0; Row < DISPLAY_NUMBER_OF_ROWS; Row++) {
         if(shiftRowRight(Row, Rotate) == E_NOT_OK) { ReturnValue = E_NOT_OK; }
@@ -194,11 +194,11 @@ stdReturnType Transformation::shiftRight(boolean Rotate)
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType Transformation::shiftRowRight(byte Row, boolean Rotate)
+StdReturnType Transformation::shiftRowRight(byte Row, boolean Rotate)
 {
     Display::PixelType LastPixel;
     Display::PixelType Pixel;
-    stdReturnType ReturnValue = E_OK;
+    StdReturnType ReturnValue = E_OK;
 
     if(Rotate) if(Display::getInstance().getPixel(DISPLAY_NUMBER_OF_COLUMNS - 1, Row, LastPixel) == E_NOT_OK) ReturnValue = E_NOT_OK;
 
@@ -259,9 +259,9 @@ void Transformation::shiftColumnUpFast(byte Column, boolean Rotate)
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType Transformation::shiftUp(boolean Rotate)
+StdReturnType Transformation::shiftUp(boolean Rotate)
 {
-    stdReturnType ReturnValue = E_OK;
+    StdReturnType ReturnValue = E_OK;
 
     for(byte Column = 0; Column < DISPLAY_NUMBER_OF_COLUMNS; Column++) {
         if(shiftColumnUp(Column, Rotate) == E_NOT_OK) { ReturnValue = E_NOT_OK; }
@@ -278,11 +278,11 @@ stdReturnType Transformation::shiftUp(boolean Rotate)
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType Transformation::shiftColumnUp(byte Column, boolean Rotate)
+StdReturnType Transformation::shiftColumnUp(byte Column, boolean Rotate)
 {
     Display::PixelType FirstPixel;
     Display::PixelType Pixel;
-    stdReturnType ReturnValue = E_OK;
+    StdReturnType ReturnValue = E_OK;
 
     if(Rotate) if(Display::getInstance().getPixel(Column, 0, FirstPixel) == E_NOT_OK) ReturnValue = E_NOT_OK;
 
@@ -343,9 +343,9 @@ void Transformation::shiftColumnDownFast(byte Column, boolean Rotate)
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType Transformation::shiftDown(boolean Rotate)
+StdReturnType Transformation::shiftDown(boolean Rotate)
 {
-    stdReturnType ReturnValue = E_OK;
+    StdReturnType ReturnValue = E_OK;
 
     for(byte Column = 0; Column < DISPLAY_NUMBER_OF_COLUMNS; Column++) {
         if(shiftColumnDown(Column, Rotate) == E_NOT_OK) { ReturnValue = E_NOT_OK; }
@@ -362,11 +362,11 @@ stdReturnType Transformation::shiftDown(boolean Rotate)
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType Transformation::shiftColumnDown(byte Column, boolean Rotate)
+StdReturnType Transformation::shiftColumnDown(byte Column, boolean Rotate)
 {
     Display::PixelType LastPixel;
     Display::PixelType Pixel;
-    stdReturnType ReturnValue = E_OK;
+    StdReturnType ReturnValue = E_OK;
 
     if(Rotate) if(Display::getInstance().getPixel(Column, DISPLAY_NUMBER_OF_ROWS - 1, LastPixel) == E_NOT_OK) ReturnValue = E_NOT_OK;
 

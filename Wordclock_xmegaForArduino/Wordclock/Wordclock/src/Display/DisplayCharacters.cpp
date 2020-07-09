@@ -64,10 +64,10 @@ const DisplayCharacters::DisplayCharactersTableElementType DisplayCharacters::Di
  *                  
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType DisplayCharacters::getCharacter(byte Column, byte Row, char* Character) const
+StdReturnType DisplayCharacters::getCharacter(byte Column, byte Row, char& Character) const
 {
     if(Row < DISPLAY_CHARACTERS_NUMBER_OF_ROWS && Column < DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS) {
-        *Character =  getCharacterFast(Row, Column);
+        Character =  getCharacterFast(Row, Column);
         return E_OK;
     } else {
         return E_NOT_OK;
@@ -83,13 +83,13 @@ stdReturnType DisplayCharacters::getCharacter(byte Column, byte Row, char* Chara
  *                  
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType DisplayCharacters::getCharacter(byte Index, char* Character) const
+StdReturnType DisplayCharacters::getCharacter(byte Index, char& Character) const
 {
     byte Row, Column;
     indexToColumnAndRow(Index, Column, Row);
 
     if(Index < DISPLAY_CHARACTERS_NUMBER_OF_CHARACTERS) {
-        *Character =  getCharacterFast(Row, Column);
+        Character =  getCharacterFast(Row, Column);
         return E_OK;
     } else {
         return E_NOT_OK;
@@ -105,13 +105,13 @@ stdReturnType DisplayCharacters::getCharacter(byte Index, char* Character) const
  *                  
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType DisplayCharacters::getCharacter(CharacterIdType CharacterId, char* Character) const
+StdReturnType DisplayCharacters::getCharacter(CharacterIdType CharacterId, char& Character) const
 {
     byte Row, Column;
     indexToColumnAndRow(CharacterId, Column, Row);
 
     if(CharacterId < DISPLAY_CHARACTERS_NUMBER_OF_CHARACTERS) {
-        *Character =  getCharacterFast(CharacterId);
+        Character =  getCharacterFast(CharacterId);
         return E_OK;
     } else {
         return E_NOT_OK;

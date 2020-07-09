@@ -77,9 +77,9 @@ Timer::~Timer()
  *                  
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType Timer::init(uint32_t Microseconds, TimerIsrCallbackF_void sTimerOverflowCallback)
+StdReturnType Timer::init(uint32_t Microseconds, TimerIsrCallbackF_void sTimerOverflowCallback)
 {
-	stdReturnType ReturnValue = E_NOT_OK;
+	StdReturnType ReturnValue = E_NOT_OK;
 
 	if(TIMER_STATE_NONE == State) {
     	ReturnValue = E_OK;
@@ -107,9 +107,9 @@ stdReturnType Timer::init(uint32_t Microseconds, TimerIsrCallbackF_void sTimerOv
  *  \return         E_OK
  *                  E_NOT_OK
  *****************************************************************************************************************************************************/
-stdReturnType Timer::setPeriod(uint32_t Microseconds)
+StdReturnType Timer::setPeriod(uint32_t Microseconds)
 {
-	stdReturnType ReturnValue = E_NOT_OK;
+	StdReturnType ReturnValue = E_NOT_OK;
     
     /* was request out of bounds? */
     if(Microseconds <= ((TIMER_RESOLUTION / (F_CPU / 1000000)) * TIMER_MAX_PRESCALER * 2)) {
@@ -155,9 +155,9 @@ stdReturnType Timer::setPeriod(uint32_t Microseconds)
  *                  E_NOT_OK
  *  \pre			Timer has to be in RUNNING STATE
  *****************************************************************************************************************************************************/
-stdReturnType Timer::read(uint32_t& Microseconds)
+StdReturnType Timer::read(uint32_t& Microseconds)
 {
-	stdReturnType ReturnValue = E_NOT_OK;
+	StdReturnType ReturnValue = E_NOT_OK;
 	uint32_t CounterValue = 0;
 	byte PrescaleShiftScale = 0;
 

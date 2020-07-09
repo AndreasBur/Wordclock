@@ -105,7 +105,7 @@
  *  GLOBAL DATA TYPES AND STRUCTURES
 ******************************************************************************************************************************************************/
 /* standard return type for functions */
-enum stdReturnType {
+enum StdReturnType {
     E_OK = 0,
     E_NOT_OK = 1
 };

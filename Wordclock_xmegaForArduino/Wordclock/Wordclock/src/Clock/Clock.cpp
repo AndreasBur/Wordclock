@@ -39,33 +39,33 @@
 ******************************************************************************************************************************************************/
 const Clock::HoursType Clock::HoursTable[][CLOCK_NUMBER_OF_HOURS] PROGMEM
 {
-    {                                                                               // ClockHoursTable[0][] = hh:00 CLOCK_HOUR_MODE_FULL_HOUR
-        {DisplayWords::WORD_HOUR_ZWOELF, DisplayWords::WORD_UHR },                  // 00:00
-        {DisplayWords::WORD_HOUR_EIN,    DisplayWords::WORD_UHR },                  // 01:00
-        {DisplayWords::WORD_HOUR_ZWEI,   DisplayWords::WORD_UHR },                  // 02:00
-        {DisplayWords::WORD_HOUR_DREI,   DisplayWords::WORD_UHR },                  // 03:00
-        {DisplayWords::WORD_HOUR_VIER,   DisplayWords::WORD_UHR },                  // 04:00
-        {DisplayWords::WORD_HOUR_FUENF,  DisplayWords::WORD_UHR },                  // 05:00
-        {DisplayWords::WORD_HOUR_SECHS,  DisplayWords::WORD_UHR },                  // 06:00
-        {DisplayWords::WORD_HOUR_SIEBEN, DisplayWords::WORD_UHR },                  // 07:00
-        {DisplayWords::WORD_HOUR_ACHT,   DisplayWords::WORD_UHR },                  // 08:00
-        {DisplayWords::WORD_HOUR_NEUN,   DisplayWords::WORD_UHR },                  // 09:00
-        {DisplayWords::WORD_HOUR_ZEHN,   DisplayWords::WORD_UHR },                  // 10:00
-        {DisplayWords::WORD_HOUR_ELF,    DisplayWords::WORD_UHR }                   // 11:00
+    {                                                                    // ClockHoursTable[0][] = hh:00 CLOCK_HOUR_MODE_FULL_HOUR
+        {DisplayWords::WORD_HOUR_ZWOELF, DisplayWords::WORD_UHR},        // 00:00
+        {DisplayWords::WORD_HOUR_EIN,    DisplayWords::WORD_UHR},        // 01:00
+        {DisplayWords::WORD_HOUR_ZWEI,   DisplayWords::WORD_UHR},        // 02:00
+        {DisplayWords::WORD_HOUR_DREI,   DisplayWords::WORD_UHR},        // 03:00
+        {DisplayWords::WORD_HOUR_VIER,   DisplayWords::WORD_UHR},        // 04:00
+        {DisplayWords::WORD_HOUR_FUENF,  DisplayWords::WORD_UHR},        // 05:00
+        {DisplayWords::WORD_HOUR_SECHS,  DisplayWords::WORD_UHR},        // 06:00
+        {DisplayWords::WORD_HOUR_SIEBEN, DisplayWords::WORD_UHR},        // 07:00
+        {DisplayWords::WORD_HOUR_ACHT,   DisplayWords::WORD_UHR},        // 08:00
+        {DisplayWords::WORD_HOUR_NEUN,   DisplayWords::WORD_UHR},        // 09:00
+        {DisplayWords::WORD_HOUR_ZEHN,   DisplayWords::WORD_UHR},        // 10:00
+        {DisplayWords::WORD_HOUR_ELF,    DisplayWords::WORD_UHR}         // 11:00
     },
-    {                                                                               // ClockHoursTable[1][] = hh:mm CLOCK_HOUR_MODE_NO_FULL_HOUR
-        {DisplayWords::WORD_HOUR_ZWOELF, DisplayWords::WORD_NONE },                 // 00:mm
-        {DisplayWords::WORD_HOUR_EINS,   DisplayWords::WORD_NONE },                 // 01:mm
-        {DisplayWords::WORD_HOUR_ZWEI,   DisplayWords::WORD_NONE },                 // 02:mm
-        {DisplayWords::WORD_HOUR_DREI,   DisplayWords::WORD_NONE },                 // 03:mm
-        {DisplayWords::WORD_HOUR_VIER,   DisplayWords::WORD_NONE },                 // 04:mm
-        {DisplayWords::WORD_HOUR_FUENF,  DisplayWords::WORD_NONE },                 // 05:mm
-        {DisplayWords::WORD_HOUR_SECHS,  DisplayWords::WORD_NONE },                 // 06:mm
-        {DisplayWords::WORD_HOUR_SIEBEN, DisplayWords::WORD_NONE },                 // 07:mm
-        {DisplayWords::WORD_HOUR_ACHT,   DisplayWords::WORD_NONE },                 // 08:mm
-        {DisplayWords::WORD_HOUR_NEUN,   DisplayWords::WORD_NONE },                 // 09:mm
-        {DisplayWords::WORD_HOUR_ZEHN,   DisplayWords::WORD_NONE },                 // 10:mm
-        {DisplayWords::WORD_HOUR_ELF,    DisplayWords::WORD_NONE }                  // 11:mm
+    {                                                                    // ClockHoursTable[1][] = hh:mm CLOCK_HOUR_MODE_NO_FULL_HOUR
+        {DisplayWords::WORD_HOUR_ZWOELF, DisplayWords::WORD_NONE},       // 00:mm
+        {DisplayWords::WORD_HOUR_EINS,   DisplayWords::WORD_NONE},       // 01:mm
+        {DisplayWords::WORD_HOUR_ZWEI,   DisplayWords::WORD_NONE},       // 02:mm
+        {DisplayWords::WORD_HOUR_DREI,   DisplayWords::WORD_NONE},       // 03:mm
+        {DisplayWords::WORD_HOUR_VIER,   DisplayWords::WORD_NONE},       // 04:mm
+        {DisplayWords::WORD_HOUR_FUENF,  DisplayWords::WORD_NONE},       // 05:mm
+        {DisplayWords::WORD_HOUR_SECHS,  DisplayWords::WORD_NONE},       // 06:mm
+        {DisplayWords::WORD_HOUR_SIEBEN, DisplayWords::WORD_NONE},       // 07:mm
+        {DisplayWords::WORD_HOUR_ACHT,   DisplayWords::WORD_NONE},       // 08:mm
+        {DisplayWords::WORD_HOUR_NEUN,   DisplayWords::WORD_NONE},       // 09:mm
+        {DisplayWords::WORD_HOUR_ZEHN,   DisplayWords::WORD_NONE},       // 10:mm
+        {DisplayWords::WORD_HOUR_ELF,    DisplayWords::WORD_NONE}        // 11:mm
     }
 };
 
@@ -175,10 +175,10 @@ Clock& Clock::getInstance()
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType Clock::getClockWords(byte Hour, byte Minute, ClockWords& ClockWords) const
+StdReturnType Clock::getClockWords(byte Hour, byte Minute, ClockWords& ClockWords) const
 {
     /* ----- Local Variables ---------------------------------------------- */
-    stdReturnType ReturnValue{E_NOT_OK};
+    StdReturnType ReturnValue{E_NOT_OK};
 
     /* ----- Implementation ----------------------------------------------- */
     if(Hour < CLOCK_NUMBER_OF_HOURS_PER_DAY && Minute < CLOCK_NUMBER_OF_MINUTES_PER_HOUR) {
@@ -190,7 +190,7 @@ stdReturnType Clock::getClockWords(byte Hour, byte Minute, ClockWords& ClockWord
         ClockWords.setShowItIs(calculateItIs(Minute));
 #endif
         MinutesTableElementType MinutesTableElement = getMinutesTableElement(Minute);
-        Hour = transformFrom24hTo12hFormat(Hour);
+        Hour = transform24hTo12hFormat(Hour);
         // correct the hour offset from the minutes and take care of overflow
         Hour = (Hour + MinutesTableElement.HourOffset) % CLOCK_NUMBER_OF_HOURS;
 
@@ -211,7 +211,7 @@ stdReturnType Clock::getClockWords(byte Hour, byte Minute, ClockWords& ClockWord
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType Clock::getClockWords(byte Hour, byte Minute, ClockWordsListType& ClockWordsList) const
+StdReturnType Clock::getClockWords(byte Hour, byte Minute, ClockWordsListType& ClockWordsList) const
 {
     /* ----- Local Variables ---------------------------------------------- */
     ClockWords ClockWords;
@@ -234,10 +234,10 @@ stdReturnType Clock::getClockWords(byte Hour, byte Minute, ClockWordsListType& C
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType Clock::setClock(byte Hour, byte Minute)
+StdReturnType Clock::setClock(byte Hour, byte Minute)
 {
     /* ----- Local Variables ---------------------------------------------- */
-    stdReturnType ReturnValue{E_OK};
+    StdReturnType ReturnValue{E_OK};
     ClockWords ClockWords;
 
     /* ----- Implementation ----------------------------------------------- */

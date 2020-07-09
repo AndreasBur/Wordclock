@@ -90,9 +90,9 @@ void AnimationClockWipe::init()
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType AnimationClockWipe::setClock(byte Hour, byte Minute)
+StdReturnType AnimationClockWipe::setClock(byte Hour, byte Minute)
 {
-    stdReturnType ReturnValue{E_NOT_OK};
+    StdReturnType ReturnValue{E_NOT_OK};
 
     if(Clock::getInstance().getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
         ReturnValue = E_OK;
@@ -202,7 +202,7 @@ void AnimationClockWipe::setTimeTask()
 ******************************************************************************************************************************************************/
 boolean AnimationClockWipe::setNextIndex()
 {
-    stdReturnType ReturValue = E_OK;
+    StdReturnType ReturValue = E_OK;
     byte Column, Row;
 
     Display::getInstance().indexToColumnAndRow(Index, Column, Row);

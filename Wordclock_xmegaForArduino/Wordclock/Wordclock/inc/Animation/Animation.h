@@ -92,7 +92,7 @@ class Animation
     void show();
 
     // AnimationClock functions
-    stdReturnType setChar(byte Column, byte Row, char Char, AnimationFont::FontType Font) { return wcAnimationFont.setChar(Column, Row, Char, Font); }
+    StdReturnType setChar(byte Column, byte Row, char Char, AnimationFont::FontType Font) { return wcAnimationFont.setChar(Column, Row, Char, Font); }
     void setCharFast(byte Column, byte Row, char Char, AnimationFont::FontType Font) { wcAnimationFont.setCharFast(Column, Row, Char, Font); }
     void setCharWithShift(char Char, AnimationFont::FontType Font) { wcAnimationFont.setCharWithShift(Char, Font); }
     void setText(const char* Text, AnimationFont::FontType Font) { wcAnimationFont.setText(Text, Font); }
@@ -100,7 +100,7 @@ class Animation
 
     // AnimationFont functions
     void setAnimation(AnimationClock::AnimationType Animation) { wcAnimationClock.setAnimation(Animation); }
-    stdReturnType setClock(byte Hour, byte Minute) { return wcAnimationClock.setClock(Hour, Minute); }
+    StdReturnType setClock(byte Hour, byte Minute) { return wcAnimationClock.setClock(Hour, Minute); }
 };
 
 

@@ -196,7 +196,7 @@ void WS2812::init(PortType Port, PortPinType PortPin)
  *                  
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType WS2812::show()
+StdReturnType WS2812::show()
 {
     if(State == STATE_IDLE) {
 
@@ -247,7 +247,7 @@ void WS2812::setPixels(byte Red, byte Green, byte Blue)
  *                  
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType WS2812::getPixel(IndexType Index, PixelType& Pixel) const
+StdReturnType WS2812::getPixel(IndexType Index, PixelType& Pixel) const
 {
     if(Index < WS2812_NUMBER_OF_LEDS) {
         Pixel = (*pNextFrame)[Index].getPixel();
@@ -266,7 +266,7 @@ stdReturnType WS2812::getPixel(IndexType Index, PixelType& Pixel) const
  *                  
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType WS2812::getPixelRed(IndexType Index, byte& Red) const
+StdReturnType WS2812::getPixelRed(IndexType Index, byte& Red) const
 {
     if(Index < WS2812_NUMBER_OF_LEDS) {
         Red = (*pNextFrame)[Index].getRed();
@@ -285,7 +285,7 @@ stdReturnType WS2812::getPixelRed(IndexType Index, byte& Red) const
  *                  
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType WS2812::getPixelGreen(IndexType Index, byte& Green) const
+StdReturnType WS2812::getPixelGreen(IndexType Index, byte& Green) const
 {
     if(Index < WS2812_NUMBER_OF_LEDS) {
         Green = (*pNextFrame)[Index].getGreen();
@@ -304,7 +304,7 @@ stdReturnType WS2812::getPixelGreen(IndexType Index, byte& Green) const
  *                  
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType WS2812::getPixelBlue(IndexType Index, byte& Blue) const
+StdReturnType WS2812::getPixelBlue(IndexType Index, byte& Blue) const
 {
     if(Index < WS2812_NUMBER_OF_LEDS) {
         Blue = (*pNextFrame)[Index].getBlue();
@@ -323,7 +323,7 @@ stdReturnType WS2812::getPixelBlue(IndexType Index, byte& Blue) const
  *                  
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType WS2812::setPixel(IndexType Index, PixelType Pixel)
+StdReturnType WS2812::setPixel(IndexType Index, PixelType Pixel)
 {
     if(Index < WS2812_NUMBER_OF_LEDS) {
         (*pNextFrame)[Index].setPixel(Pixel);
@@ -342,7 +342,7 @@ stdReturnType WS2812::setPixel(IndexType Index, PixelType Pixel)
  *                  
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType WS2812::setPixel(IndexType Index, byte Red, byte Green, byte Blue)
+StdReturnType WS2812::setPixel(IndexType Index, byte Red, byte Green, byte Blue)
 {
     if(Index < WS2812_NUMBER_OF_LEDS) {
         (*pNextFrame)[Index].setPixel(Red, Green, Blue);
@@ -361,7 +361,7 @@ stdReturnType WS2812::setPixel(IndexType Index, byte Red, byte Green, byte Blue)
  *                  
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType WS2812::setPixelRed(IndexType Index, byte Red)
+StdReturnType WS2812::setPixelRed(IndexType Index, byte Red)
 {
     if(Index < WS2812_NUMBER_OF_LEDS) {
         (*pNextFrame)[Index].setRed(Red);
@@ -380,7 +380,7 @@ stdReturnType WS2812::setPixelRed(IndexType Index, byte Red)
  *                  
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType WS2812::setPixelGreen(IndexType Index, byte Green)
+StdReturnType WS2812::setPixelGreen(IndexType Index, byte Green)
 {
     if(Index < WS2812_NUMBER_OF_LEDS) {
         (*pNextFrame)[Index].setGreen(Green);
@@ -399,7 +399,7 @@ stdReturnType WS2812::setPixelGreen(IndexType Index, byte Green)
  *                  
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType WS2812::setPixelBlue(IndexType Index, byte Blue)
+StdReturnType WS2812::setPixelBlue(IndexType Index, byte Blue)
 {
     if(Index < WS2812_NUMBER_OF_LEDS) {
         (*pNextFrame)[Index].setBlue(Blue);
@@ -418,7 +418,7 @@ stdReturnType WS2812::setPixelBlue(IndexType Index, byte Blue)
  *                  
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType WS2812::clearPixel(IndexType Index)
+StdReturnType WS2812::clearPixel(IndexType Index)
 {
     if(Index < WS2812_NUMBER_OF_LEDS) {
         (*pNextFrame)[Index].clearPixel();
@@ -438,7 +438,7 @@ stdReturnType WS2812::clearPixel(IndexType Index)
  *                  
  *  \return         -
  *****************************************************************************************************************************************************/
-stdReturnType WS2812::getPixelDimmed(IndexType Index, PixelType& Pixel) const
+StdReturnType WS2812::getPixelDimmed(IndexType Index, PixelType& Pixel) const
 {
     if(Index < WS2812_NUMBER_OF_LEDS) {
         Pixel = getPixelDimmedFast(Index);

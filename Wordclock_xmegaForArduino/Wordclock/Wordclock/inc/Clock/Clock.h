@@ -123,7 +123,7 @@ class Clock
         }
     }
 
-    byte transformFrom24hTo12hFormat(byte Hour) const {
+    byte transform24hTo12hFormat(byte Hour) const {
         return Hour % CLOCK_NUMBER_OF_HOURS;
     }
 
@@ -135,14 +135,14 @@ class Clock
 	  
     // get methods
     ModesType getMode() const { return Mode; }
-    stdReturnType getClockWords(byte, byte, ClockWords&) const;
-    stdReturnType getClockWords(byte, byte, ClockWordsListType&) const;
+    StdReturnType getClockWords(byte, byte, ClockWords&) const;
+    StdReturnType getClockWords(byte, byte, ClockWordsListType&) const;
 
     // set methods
     void setMode(ModesType sMode) { Mode = sMode; }
 
     // methods
-    stdReturnType setClock(byte, byte);
+    StdReturnType setClock(byte, byte);
     void setClockFast(byte, byte);
     void show() { Display::getInstance().show(); }
 };

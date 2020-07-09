@@ -88,7 +88,7 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
 	    return parameterTableElement;
     }
 	
-	stdReturnType getMsgParameterByOptionShortName(char OptionShortName, ParameterTableElementType& sMsgOption) const {
+	StdReturnType getMsgParameterByOptionShortName(char OptionShortName, ParameterTableElementType& sMsgOption) const {
 		for(size_t index = 0; index < ParameterTable.size(); index++) {
 			ParameterTableElementType parameterTableElement = getParameterTableElement(index);
 			if(parameterTableElement.getOptionShortName() == OptionShortName) {

@@ -68,7 +68,7 @@ class AnimationClockTeletype : public AnimationClockCommon
 
     // functions
     void reset();
-    stdReturnType setNextWordIndex();
+    StdReturnType setNextWordIndex();
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
@@ -83,7 +83,7 @@ class AnimationClockTeletype : public AnimationClockCommon
 
 	// methods
     void init();
-    stdReturnType setClock(byte, byte);
+    StdReturnType setClock(byte, byte);
     void task();
 };
 

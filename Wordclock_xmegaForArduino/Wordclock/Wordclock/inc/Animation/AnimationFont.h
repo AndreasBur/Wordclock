@@ -119,9 +119,9 @@ FontTahoma10x10 Font10x10;
 
     // functions
     template <typename RowType, byte RowsSize>
-    stdReturnType setCharFontHorizontal(byte, byte, const FontCharHorizontal<RowType, RowsSize>&, byte);
+    StdReturnType setCharFontHorizontal(byte, byte, const FontCharHorizontal<RowType, RowsSize>&, byte);
     template <typename RowType>
-    stdReturnType setCharRow(RowType, byte, byte, byte);
+    StdReturnType setCharRow(RowType, byte, byte, byte);
 
     template <typename RowType, byte RowsSize>
     void setCharFontHorizontalFast(byte, byte, const FontCharHorizontal<RowType, RowsSize>&, byte);
@@ -129,16 +129,16 @@ FontTahoma10x10 Font10x10;
     void setCharRowFast(RowType, byte, byte, byte);
 
     template <typename ColumnType, byte ColumnsSize>
-    stdReturnType setCharFontVertical(byte, byte, const FontCharVertical<ColumnType, ColumnsSize>&, byte);
+    StdReturnType setCharFontVertical(byte, byte, const FontCharVertical<ColumnType, ColumnsSize>&, byte);
     template <typename ColumnType>
-    stdReturnType setCharColumn(ColumnType, byte, byte, byte);
+    StdReturnType setCharColumn(ColumnType, byte, byte, byte);
 
     template <typename ColumnType, byte ColumnsSize>
     void setCharFontVerticalFast(byte, byte, const FontCharVertical<ColumnType, ColumnsSize>&, byte);
     template <typename ColumnType>
     void setCharColumnFast(ColumnType, byte, byte, byte);
 
-    stdReturnType convertCharToFontIndex(char, byte&);
+    StdReturnType convertCharToFontIndex(char, byte&);
     byte convertCharToFontIndexFast(char);
     void stringShiftTask();
     void charShiftTask();
@@ -163,7 +163,7 @@ FontTahoma10x10 Font10x10;
     void init() {}
     void show() { Display::getInstance().show(); }
     void task();
-    stdReturnType setChar(byte, byte, char, FontType);
+    StdReturnType setChar(byte, byte, char, FontType);
     void setCharFast(byte, byte, char, FontType);
     void setCharWithShift(char, FontType);
     void setText(const char*, FontType);

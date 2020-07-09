@@ -90,9 +90,9 @@ void AnimationClockFade::init()
  *                  
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType AnimationClockFade::setClock(byte sHour, byte sMinute)
+StdReturnType AnimationClockFade::setClock(byte sHour, byte sMinute)
 {
-    stdReturnType ReturnValue{E_NOT_OK};
+    StdReturnType ReturnValue{E_NOT_OK};
 
     if(sHour < CLOCK_NUMBER_OF_HOURS_PER_DAY && sMinute < CLOCK_NUMBER_OF_MINUTES_PER_HOUR) {
         Hour = sHour;

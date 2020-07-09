@@ -81,8 +81,8 @@ class AnimationClockCube : public AnimationClockCommon
     void clearBorderPixels() { writeBorderPixels(false); }
     void clearBorderPixelsWithoutClockPixels();
     void writeBorderPixels(bool);
-    stdReturnType increaseBorder();
-    stdReturnType decreaseBorder();
+    StdReturnType increaseBorder();
+    StdReturnType decreaseBorder();
     void clearTimeTask();
     void setTimeTask();
     void setMinBorder();
@@ -102,7 +102,7 @@ class AnimationClockCube : public AnimationClockCommon
 
 	// methods
     void init();
-    stdReturnType setClock(byte, byte);
+    StdReturnType setClock(byte, byte);
     void task();
 
 };

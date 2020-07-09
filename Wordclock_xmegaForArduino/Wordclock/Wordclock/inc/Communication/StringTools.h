@@ -53,7 +53,18 @@ class StringTools
 	  	RESULT_NO_VALUE,
 	  	RESULT_OK
   	};
-	  
+	  /*
+	  	struct ResultType {
+		  	PositionType Position;
+		  	ConvertResultType ConvertResult;
+	  	}
+	  	
+	  	enum ConvertResultType {
+		  	CONVERT_RESULT_OVERFLOW,
+		  	CONVERT_RESULT_NO_VALUE,
+		  	CONVERT_RESULT_OK
+	  	};
+	  */
 	 static const size_t npos = -1;
 	 using PositionType = uint8_t;
 	  

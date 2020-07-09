@@ -90,9 +90,9 @@ void AnimationClockTeletype::init()
  *                  
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType AnimationClockTeletype::setClock(byte Hour, byte Minute)
+StdReturnType AnimationClockTeletype::setClock(byte Hour, byte Minute)
 {
-    stdReturnType ReturnValue{E_NOT_OK};
+    StdReturnType ReturnValue{E_NOT_OK};
 
     if(Clock::getInstance().getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
         ReturnValue = E_OK;
@@ -159,7 +159,7 @@ void AnimationClockTeletype::reset()
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType AnimationClockTeletype::setNextWordIndex()
+StdReturnType AnimationClockTeletype::setNextWordIndex()
 {
     if(CurrentWordIndex + 1 < static_cast<byte>(ClockWordsTable.size())) {
         CurrentWordIndex++;

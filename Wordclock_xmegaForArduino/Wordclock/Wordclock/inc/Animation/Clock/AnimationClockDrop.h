@@ -70,13 +70,13 @@ class AnimationClockDrop : public AnimationClockCommon
 
     // functions
     void reset();
-    stdReturnType setNextActivePixelIndex();
+    StdReturnType setNextActivePixelIndex();
     void clearTimeTask();
     void setTimeTask();
-    stdReturnType setNextWordIndex();
+    StdReturnType setNextWordIndex();
     void setStateToSetTime();
-    stdReturnType setNextRow(byte);
-    stdReturnType setNextColumn(byte);
+    StdReturnType setNextRow(byte);
+    StdReturnType setNextColumn(byte);
     
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
@@ -92,7 +92,7 @@ class AnimationClockDrop : public AnimationClockCommon
 
 	// methods
     void init();
-    stdReturnType setClock(byte, byte);
+    StdReturnType setClock(byte, byte);
     void task();
 };
 

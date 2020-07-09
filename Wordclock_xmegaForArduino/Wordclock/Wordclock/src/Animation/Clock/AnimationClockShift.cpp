@@ -90,9 +90,9 @@ void AnimationClockShift::init()
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType AnimationClockShift::setClock(byte Hour, byte Minute)
+StdReturnType AnimationClockShift::setClock(byte Hour, byte Minute)
 {
-    stdReturnType ReturnValue{E_NOT_OK};
+    StdReturnType ReturnValue{E_NOT_OK};
 
     if(Clock::getInstance().getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
         State = STATE_CLEAR_TIME;

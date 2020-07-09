@@ -90,9 +90,9 @@ void AnimationClockDrop::init()
  *                  
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType AnimationClockDrop::setClock(byte Hour, byte Minute)
+StdReturnType AnimationClockDrop::setClock(byte Hour, byte Minute)
 {
-    stdReturnType ReturnValue{E_NOT_OK};
+    StdReturnType ReturnValue{E_NOT_OK};
 
     if(Clock::getInstance().getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
         setNextWordIndex();
@@ -195,7 +195,7 @@ void AnimationClockDrop::setTimeTask()
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType AnimationClockDrop::setNextActivePixelIndex()
+StdReturnType AnimationClockDrop::setNextActivePixelIndex()
 {
     for(int16_t Index = DISPLAY_NUMBER_OF_PIXELS - 1; Index >= 0; Index--) {
         if(Display::getInstance().getPixelFast(Index)) {
@@ -215,7 +215,7 @@ stdReturnType AnimationClockDrop::setNextActivePixelIndex()
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType AnimationClockDrop::setNextWordIndex()
+StdReturnType AnimationClockDrop::setNextWordIndex()
 {
     for(int8_t Index = CurrenWordIndex - 1; Index >= 0; Index--) {
         if(ClockWordsTable[Index] != DisplayWords::WORD_NONE) {
@@ -252,7 +252,7 @@ void AnimationClockDrop::setStateToSetTime()
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType AnimationClockDrop::setNextRow(byte MaxRow)
+StdReturnType AnimationClockDrop::setNextRow(byte MaxRow)
 {
     if(Row >= MaxRow) {
         return E_NOT_OK;
@@ -271,7 +271,7 @@ stdReturnType AnimationClockDrop::setNextRow(byte MaxRow)
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType AnimationClockDrop::setNextColumn(byte MaxColumn)
+StdReturnType AnimationClockDrop::setNextColumn(byte MaxColumn)
 {
     if(Column >= MaxColumn) {
          if(setNextWordIndex() == E_OK) {

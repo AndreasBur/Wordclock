@@ -90,9 +90,9 @@ void AnimationClockCursor::init()
  *                  
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType AnimationClockCursor::setClock(byte Hour, byte Minute)
+StdReturnType AnimationClockCursor::setClock(byte Hour, byte Minute)
 {
-    stdReturnType ReturnValue{E_NOT_OK};
+    StdReturnType ReturnValue{E_NOT_OK};
 
     if(Clock::getInstance().getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
         ReturnValue = E_OK;

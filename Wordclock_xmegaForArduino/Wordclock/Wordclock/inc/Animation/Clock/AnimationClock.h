@@ -120,7 +120,7 @@ class AnimationClock
 	// methods
     void init();
     void task();
-    stdReturnType setClock(byte, byte);
+    StdReturnType setClock(byte, byte);
     void show();
 };
 

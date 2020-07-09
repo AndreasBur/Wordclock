@@ -83,7 +83,7 @@ class Message
 		else return finding - Buffer;
 	}
 	
-	stdReturnType addChar(char);
+	StdReturnType addChar(char);
 };
 
 #endif

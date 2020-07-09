@@ -84,11 +84,11 @@ class BH1750
     uint16_t Illuminance;
 
     // functions
-    stdReturnType readIlluminance();
+    StdReturnType readIlluminance();
     void sendModeForOneTimeMode();
-	stdReturnType sendCommand(byte);
+	StdReturnType sendCommand(byte);
 
-	stdReturnType sendMode() { return sendCommand(Mode); }
+	StdReturnType sendMode() { return sendCommand(Mode); }
     uint16_t convertRawToLux(uint16_t IlluminanceRaw) { return IlluminanceRaw / BH1750_ILLUMINANCE_RAW_VALUE_DIVIDER; }
     uint16_t combineRawValueParts(byte HighByte, byte LowByte) { return static_cast<uint16_t>(HighByte) << 8 | LowByte; }
     bool isMTRegValueInRange(byte MTRegValue) { return (MTRegValue <= BH1750_REG_MT_MAX_VALUE && MTRegValue >= BH1750_REG_MT_MIN_VALUE); }
@@ -105,11 +105,11 @@ class BH1750
     uint16_t getIlluminance() const { return Illuminance; }
 
 	// set methods
-    stdReturnType setMode(ModeType);
+    StdReturnType setMode(ModeType);
 
 	// methods
-    stdReturnType init(ModeType);
-    stdReturnType changeMeasurementTime(byte);
+    StdReturnType init(ModeType);
+    StdReturnType changeMeasurementTime(byte);
     void task();
 };
 

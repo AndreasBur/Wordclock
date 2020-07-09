@@ -192,7 +192,7 @@ void AnimationClock::setAnimation(AnimationType Animation)
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType AnimationClock::setClock(byte Hour, byte Minute)
+StdReturnType AnimationClock::setClock(byte Hour, byte Minute)
 {
     switch(CurrentAnimation)
     {

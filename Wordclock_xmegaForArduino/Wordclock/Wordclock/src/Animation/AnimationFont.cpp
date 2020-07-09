@@ -77,7 +77,7 @@ AnimationFont::~AnimationFont()
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-stdReturnType AnimationFont::setChar(byte Column, byte Row, char Char, FontType Font)
+StdReturnType AnimationFont::setChar(byte Column, byte Row, char Char, FontType Font)
 {
     byte FontIndex;
     if(convertCharToFontIndex(Char, FontIndex) == E_NOT_OK) return E_NOT_OK;
@@ -405,7 +405,7 @@ void AnimationFont::charShiftTask()
  *  \return         -
 ******************************************************************************************************************************************************/
 template <typename RowType, byte RowsSize>
-stdReturnType AnimationFont::setCharFontHorizontal(byte Column, byte Row, const FontCharHorizontal<RowType, RowsSize>& FontChar, byte FontHeight)
+StdReturnType AnimationFont::setCharFontHorizontal(byte Column, byte Row, const FontCharHorizontal<RowType, RowsSize>& FontChar, byte FontHeight)
 {
     for(byte FontRow = 0; FontRow < FontHeight; FontRow++)
     {
@@ -427,9 +427,9 @@ stdReturnType AnimationFont::setCharFontHorizontal(byte Column, byte Row, const 
  *  \return         -
 ******************************************************************************************************************************************************/
 template <typename RowType>
-stdReturnType AnimationFont::setCharRow(RowType CharRow, byte Column, byte RowAbs, byte FontWidth)
+StdReturnType AnimationFont::setCharRow(RowType CharRow, byte Column, byte RowAbs, byte FontWidth)
 {
-    stdReturnType ReturnValue{E_OK};
+    StdReturnType ReturnValue{E_OK};
 
     for(byte FontColumn = 0; FontColumn < FontWidth; FontColumn++)
     {
@@ -496,7 +496,7 @@ void AnimationFont::setCharRowFast(RowType CharRow, byte Column, byte RowAbs, by
  *  \return         -
 ******************************************************************************************************************************************************/
 template <typename ColumnType, byte ColumnsSize>
-stdReturnType AnimationFont::setCharFontVertical(byte Column, byte Row, const FontCharVertical<ColumnType, ColumnsSize>& FontChar, byte FontHeight)
+StdReturnType AnimationFont::setCharFontVertical(byte Column, byte Row, const FontCharVertical<ColumnType, ColumnsSize>& FontChar, byte FontHeight)
 {
     for(byte FontColumn = 0; FontColumn < FontChar.getWidth(); FontColumn++)
     {
@@ -518,9 +518,9 @@ stdReturnType AnimationFont::setCharFontVertical(byte Column, byte Row, const Fo
  *  \return         -
 ******************************************************************************************************************************************************/
 template <typename ColumnType>
-stdReturnType AnimationFont::setCharColumn(ColumnType CharColumn, byte ColumnAbs, byte Row, byte FontHeight)
+StdReturnType AnimationFont::setCharColumn(ColumnType CharColumn, byte ColumnAbs, byte Row, byte FontHeight)
 {
-    stdReturnType ReturnValue{E_OK};
+    StdReturnType ReturnValue{E_OK};
 
     for(byte FontRow = 0; FontRow < FontHeight; FontRow++)
     {
@@ -589,9 +589,9 @@ void AnimationFont::setCharColumnFast(ColumnType CharColumn, byte ColumnAbs, byt
  *  \return         E_OK
  *                  E_NOT_OK
  *****************************************************************************************************************************************************/
-stdReturnType AnimationFont::convertCharToFontIndex(char Char, byte& Index)
+StdReturnType AnimationFont::convertCharToFontIndex(char Char, byte& Index)
 {
-    stdReturnType ReturnValue = E_NOT_OK;
+    StdReturnType ReturnValue = E_NOT_OK;
 
     /* for umlauts we need a special treatment */
     if('Ä' == Char) { Index = 96; ReturnValue = E_OK; }
