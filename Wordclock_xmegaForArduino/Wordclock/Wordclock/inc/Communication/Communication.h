@@ -57,7 +57,7 @@ class Communication
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
-  	static const char EndOfMessageChar{'\n'};
+  	static constexpr char EndOfMessageChar{'\n'};
     StateType State;
 	Message IncomingMessage;
 	ErrorMessage Error;

@@ -59,10 +59,10 @@ class MsgCmdDisplayColorParser : public MsgParameterParser<MsgCmdDisplayColorPar
   	friend class MsgParameterParser;
 	static const ParameterTableType ParameterTable;
 
-	static const char RedParameterChar{'R'};
-	static const char GreenParameterChar{'G'};
-	static const char BlueParameterChar{'B'};
-	static const char ColorValueDelimiter{':'};
+	static constexpr char RedParameterChar{'R'};
+	static constexpr char GreenParameterChar{'G'};
+	static constexpr char BlueParameterChar{'B'};
+	static constexpr char ColorValueDelimiter{':'};
 		
 	ErrorMessage Error;
 		

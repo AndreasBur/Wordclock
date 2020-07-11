@@ -78,8 +78,8 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
 		STATE_OPTION_ARGUMENT
 	};
   
-	static const char OptionStartChar{'-'};
-	static const byte ArgumentNumberBase{10u};
+	static constexpr char OptionStartChar{'-'};
+	static constexpr byte ArgumentNumberBase{10u};
 	
 	// functions
     ParameterTableElementType getParameterTableElement(byte Index) const {
