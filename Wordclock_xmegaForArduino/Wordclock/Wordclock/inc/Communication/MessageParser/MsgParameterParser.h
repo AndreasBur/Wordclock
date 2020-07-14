@@ -152,22 +152,22 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
 	// methods
 	void parse()
 	{	
-		StateType State = STATE_PARSE;
+		StateType state = STATE_PARSE;
 		char optionChar;
 		
 		for(PositionType position = 0; Parameter[position] != '\0'; position++) {
-			if(State == STATE_PARSE) {
+			if(state == STATE_PARSE) {
 				char currentChar = Parameter[position];
-				if(currentChar == OptionStartChar) { State = STATE_OPTION_CHAR; }
-			} else if(State == STATE_OPTION_CHAR) {
+				if(currentChar == OptionStartChar) { state = STATE_OPTION_CHAR; }
+			} else if(state == STATE_OPTION_CHAR) {
 				optionChar = Parameter[position];
-				State = STATE_OPTION_ARGUMENT;
-			} else if(State == STATE_OPTION_ARGUMENT) {
+				state = STATE_OPTION_ARGUMENT;
+			} else if(state == STATE_OPTION_ARGUMENT) {
 				ParameterTableElementType option;
 				if(getMsgParameterByOptionShortName(optionChar, option) == E_OK) {
 					position += parseArgument(option, &Parameter[position]) - 1u;
 				}
-				State = STATE_PARSE;
+				state = STATE_PARSE;
 			}
 		}
 	}
