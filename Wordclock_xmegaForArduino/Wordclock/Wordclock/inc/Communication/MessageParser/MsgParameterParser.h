@@ -63,7 +63,7 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
     static constexpr char OptionArgumentDelimiter{':'};
   
 	ErrorMessage Error;
-    const char* Parameter;
+    const char* ParameterStream;
 	const ParameterTableType& ParameterTable;
 	
 	~MsgParameterParser() {
@@ -91,39 +91,39 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
 	    return parameterTableElement;
     }
 	
-	StdReturnType getMsgParameterByOptionShortName(char OptionShortName, ParameterTableElementType& sMsgOption) const {
+	StdReturnType getMsgParameterByOptionShortName(char OptionShortName, ParameterTableElementType& Parameter) const {
 		for(size_t index = 0; index < ParameterTable.size(); index++) {
 			ParameterTableElementType parameterTableElement = getParameterTableElement(index);
 			if(parameterTableElement.getOptionShortName() == OptionShortName) {
-				sMsgOption = parameterTableElement;
+				Parameter = parameterTableElement;
 				return E_OK;
 			}
 		}
 		return E_NOT_OK;
 	}
 	
-	PositionType parseArgument(MsgParameter Option, const char* Argument) {
-		//if(Option.getArgumentType() == MsgParameter::ARGUMENT_TYPE_CHAR) { return convertArgument<char>(Option, Argument); }
-		if(Option.getArgumentType() == MsgParameter::ARGUMENT_TYPE_UINT8) { return convertArgument<uint8_t>(Option, Argument); }
-		//if(Option.getArgumentType() == MsgParameter::ARGUMENT_TYPE_UINT16) { return convertArgument<uint16_t>(Option, Argument); }
-		//if(Option.getArgumentType() == MsgParameter::ARGUMENT_TYPE_UINT32) { return convertArgument<uint32_t>(Option, Argument); }
-		//if(Option.getArgumentType() == MsgParameter::ARGUMENT_TYPE_UINT64) { return convertArgument<uint64_t>(Option, Argument); }
-		//if(Option.getArgumentType() == MsgParameter::ARGUMENT_TYPE_INT8) { return convertArgument<int8_t>(Option, Argument); }
-		//if(Option.getArgumentType() == MsgParameter::ARGUMENT_TYPE_INT16) { return convertArgument<int16_t>(Option, Argument); }
-		//if(Option.getArgumentType() == MsgParameter::ARGUMENT_TYPE_INT32) { return convertArgument<int32_t>(Option, Argument); }
-		//if(Option.getArgumentType() == MsgParameter::ARGUMENT_TYPE_INT64) { return convertArgument<int64_t>(Option, Argument); }
-		//if(Option.getArgumentType() == MsgParameter::ARGUMENT_TYPE_FLOAT) { return convertArgument<float>(Option, Argument); }
-		//if(Option.getArgumentType() == MsgParameter::ARGUMENT_TYPE_DOUBLE) { return convertArgument<double>(Option, Argument); }
+	PositionType parseArgument(MsgParameter Parameter, const char* Argument) {
+		//if(Parameter.getArgumentType() == MsgParameter::ARGUMENT_TYPE_CHAR) { return convertArgument<char>(Parameter, Argument); }
+		if(Parameter.getArgumentType() == MsgParameter::ARGUMENT_TYPE_UINT8) { return convertArgument<uint8_t>(Parameter, Argument); }
+		//if(Parameter.getArgumentType() == MsgParameter::ARGUMENT_TYPE_UINT16) { return convertArgument<uint16_t>(Parameter, Argument); }
+		//if(Parameter.getArgumentType() == MsgParameter::ARGUMENT_TYPE_UINT32) { return convertArgument<uint32_t>(Parameter, Argument); }
+		//if(Parameter.getArgumentType() == MsgParameter::ARGUMENT_TYPE_UINT64) { return convertArgument<uint64_t>(Parameter, Argument); }
+		//if(Parameter.getArgumentType() == MsgParameter::ARGUMENT_TYPE_INT8) { return convertArgument<int8_t>(Parameter, Argument); }
+		//if(Parameter.getArgumentType() == MsgParameter::ARGUMENT_TYPE_INT16) { return convertArgument<int16_t>(Parameter, Argument); }
+		//if(Parameter.getArgumentType() == MsgParameter::ARGUMENT_TYPE_INT32) { return convertArgument<int32_t>(Parameter, Argument); }
+		//if(Parameter.getArgumentType() == MsgParameter::ARGUMENT_TYPE_INT64) { return convertArgument<int64_t>(Parameter, Argument); }
+		//if(Parameter.getArgumentType() == MsgParameter::ARGUMENT_TYPE_FLOAT) { return convertArgument<float>(Parameter, Argument); }
+		//if(Parameter.getArgumentType() == MsgParameter::ARGUMENT_TYPE_DOUBLE) { return convertArgument<double>(Parameter, Argument); }
 		return 0u;
 	}
 
-	template <typename T> PositionType convertArgument(MsgParameter Option, const char* Argument) {
+	template <typename T> PositionType convertArgument(MsgParameter Parameter, const char* Argument) {
 		T value;
 		PositionType position;
 		
 		StringTools::ResultType result = StringTools::stringTo(Argument, position, value, ArgumentNumberBase);
 		handleConvertResult(result);
-		if(result == StringTools::RESULT_OK) static_cast<Derived*>(this)->handleParameter(Option.getOptionShortName(), value);
+		if(result == StringTools::RESULT_OK) static_cast<Derived*>(this)->handleParameter(Parameter.getOptionShortName(), value);
 		return position;
 	}
 	
@@ -141,13 +141,13 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
 ******************************************************************************************************************************************************/
   public:
     constexpr MsgParameterParser(const ParameterTableType& sParameterTable, const char* sParameter)
-	: Parameter(sParameter), ParameterTable(sParameterTable) {
+	: ParameterStream(sParameter), ParameterTable(sParameterTable) {
 		
 	}
 
 	// get methods
 	
-	const char* getParameter() const { return Parameter; }
+	const char* getParameterStream() const { return ParameterStream; }
 	const ParameterTableType& getParameterTable();
 
 	// set methods
@@ -158,17 +158,17 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
 		StateType state = STATE_PARSE;
 		char optionChar;
 		
-		for(PositionType position = 0; Parameter[position] != '\0'; position++) {
+		for(PositionType position = 0; ParameterStream[position] != '\0'; position++) {
 			if(state == STATE_PARSE) {
-				char currentChar = Parameter[position];
+				char currentChar = ParameterStream[position];
 				if(currentChar == OptionStartChar) { state = STATE_OPTION_CHAR; }
 			} else if(state == STATE_OPTION_CHAR) {
-				optionChar = Parameter[position];
+				optionChar = ParameterStream[position];
 				state = STATE_OPTION_ARGUMENT;
 			} else if(state == STATE_OPTION_ARGUMENT) {
-				ParameterTableElementType option;
-				if(getMsgParameterByOptionShortName(optionChar, option) == E_OK) {
-					position += parseArgument(option, &Parameter[position]) - 1u;
+				ParameterTableElementType parameter;
+				if(getMsgParameterByOptionShortName(optionChar, parameter) == E_OK) {
+					position += parseArgument(parameter, &ParameterStream[position]) - 1u;
 				}
 				state = STATE_PARSE;
 			}

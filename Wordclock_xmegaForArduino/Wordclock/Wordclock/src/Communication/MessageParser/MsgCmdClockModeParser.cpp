@@ -34,13 +34,12 @@
 ******************************************************************************************************************************************************/
 
 
-
 /******************************************************************************************************************************************************
  *  L O C A L   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
 const MsgCmdClockModeParser::ParameterTableType MsgCmdClockModeParser::ParameterTable PROGMEM
 {
-	ParameterTableElementType(ModeOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8),
+	ParameterTableElementType(ModeOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8)
 };
 
 
@@ -53,7 +52,6 @@ MsgCmdClockModeParser::MsgCmdClockModeParser(const char* sParameter)
 {
 
 }
-
 
 MsgCmdClockModeParser::~MsgCmdClockModeParser()
 {
