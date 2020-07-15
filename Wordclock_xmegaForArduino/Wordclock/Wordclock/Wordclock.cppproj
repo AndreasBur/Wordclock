@@ -497,6 +497,9 @@
     <Compile Include="src\Communication\Message.cpp">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="src\Communication\MessageParser\MsgCmdClockModeParser.cpp">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="src\Communication\MessageParser\MsgCmdDisplayColorParser.cpp">
       <SubType>compile</SubType>
     </Compile>

@@ -39,7 +39,7 @@
 ******************************************************************************************************************************************************/
 const GammaCorrection::Gamma7TableElementType GammaCorrection::Gamma7Table[] PROGMEM
 {
-    133, 139, 145, 151, 158, 165, 172, 180, 188, 196, 205, 214, 224, 234, 244, 255
+    133u, 139u, 145u, 151u, 158u, 165u, 172u, 180u, 188u, 196u, 205u, 214u, 224u, 234u, 244u, 255u
 };
 
 
@@ -61,10 +61,10 @@ const GammaCorrection::Gamma7TableElementType GammaCorrection::Gamma7Table[] PRO
  *  param[in]       ValueLinear    7 bit unsigned (0..127)
  *  \return         exponential value (approx. 1.0443^x) (1..255)
  *****************************************************************************************************************************************************/
-byte GammaCorrection::calcGamma7CorrectionValue(byte ValueLinear)
+byte GammaCorrection::calcGamma7CorrectionValue(byte ValueLinear) const
 {
     Gamma7TableElementType Exponent = getGamma7TableElement(ValueLinear);
-    return Exponent >> (7 - (ValueLinear / GAMMA_CORRECTION_GAMMA7_TABLE_NUMBER_OF_VALUES));
+    return Exponent >> (7u - (ValueLinear / GAMMA_CORRECTION_GAMMA7_TABLE_NUMBER_OF_VALUES));
 } /* calcGamma7CorrectionValue */
 
 

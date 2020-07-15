@@ -26,19 +26,19 @@
 /******************************************************************************************************************************************************
  *  L O C A L   C O N S T A N T   M A C R O S 
 ******************************************************************************************************************************************************/
-#define BH1750_ILLUMINANCE_RAW_VALUE_NUMBER_OF_BYTES        2
+#define BH1750_ILLUMINANCE_RAW_VALUE_NUMBER_OF_BYTES        2u
 
-#define BH1750_MT_REG_VALUE_HIGH_BITS_GM                    0b111
-#define BH1750_MT_REG_VALUE_HIGH_BITS_GP                    5
+#define BH1750_MT_REG_VALUE_HIGH_BITS_GM                    0b111u
+#define BH1750_MT_REG_VALUE_HIGH_BITS_GP                    5u
 
-#define BH1750_MT_REG_VALUE_LOW_BITS_GM                     0b11111
-#define BH1750_MT_REG_VALUE_LOW_BITS_GP                     0
+#define BH1750_MT_REG_VALUE_LOW_BITS_GM                     0b11111u
+#define BH1750_MT_REG_VALUE_LOW_BITS_GP                     0u
 
-#define BH1750_MT_CMD_HIGH_BITS_GM                          0b111
-#define BH1750_MT_CMD_HIGH_BITS_GP                          0
+#define BH1750_MT_CMD_HIGH_BITS_GM                          0b111u
+#define BH1750_MT_CMD_HIGH_BITS_GP                          0u
 
-#define BH1750_MT_CMD_LOW_BITS_GM                           0b11111
-#define BH1750_MT_CMD_LOW_BITS_GP                           0
+#define BH1750_MT_CMD_LOW_BITS_GM                           0b11111u
+#define BH1750_MT_CMD_LOW_BITS_GP                           0u
 
 /******************************************************************************************************************************************************
  *  L O C A L   F U N C T I O N   M A C R O S
@@ -67,7 +67,7 @@
 BH1750::BH1750()
 {
     Mode = MODE_NONE;
-    Illuminance = 0;
+    Illuminance = 0u;
 } /* BH1750 */
 
 
@@ -181,7 +181,7 @@ StdReturnType BH1750::readIlluminance()
     StdReturnType ReturnValue = E_NOT_OK;
     byte LowByte, HighByte;
 
-    Wire.requestFrom(BH1750_I2C_ADDR, BH1750_ILLUMINANCE_RAW_VALUE_NUMBER_OF_BYTES);
+    Wire.requestFrom(BH1750_I2C_ADDR, static_cast<uint8_t>(BH1750_ILLUMINANCE_RAW_VALUE_NUMBER_OF_BYTES));
     
     if(Wire.available() == BH1750_ILLUMINANCE_RAW_VALUE_NUMBER_OF_BYTES) {
         ReturnValue = E_OK;

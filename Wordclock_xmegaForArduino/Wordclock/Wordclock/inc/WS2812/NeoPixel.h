@@ -80,7 +80,7 @@ class NeoPixel
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr NeoPixel() : Pixel{0,0,0}
+    constexpr NeoPixel() : Pixel{0u, 0u, 0u}
     {
 
     }
@@ -116,7 +116,7 @@ class NeoPixel
     }
 
 	// methods
-    void clearPixel() { setPixel(0, 0, 0); }
+    void clearPixel() { setPixel(0u, 0u, 0u); }
 
 };
 

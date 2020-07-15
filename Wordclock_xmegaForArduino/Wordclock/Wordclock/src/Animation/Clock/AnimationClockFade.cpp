@@ -134,9 +134,9 @@ void AnimationClockFade::task()
 ******************************************************************************************************************************************************/
 void AnimationClockFade::reset()
 {
-    Hour = 0;
-    Minute = 0;
-    DisplayBrightness = 0;
+    Hour = 0u;
+    Minute = 0u;
+    DisplayBrightness = 0u;
 } /* reset */
 
 
@@ -150,7 +150,7 @@ void AnimationClockFade::reset()
 ******************************************************************************************************************************************************/
 void AnimationClockFade::clearTimeTask()
 {
-    if(DisplayBrightness > 0) {
+    if(DisplayBrightness > 0u) {
         DisplayBrightness--;
     } else {
         setStateToSetTime();
@@ -188,7 +188,7 @@ void AnimationClockFade::setStateToSetTime()
 {
     State = STATE_SET_TIME;
     Clock::getInstance().setClock(Hour, Minute);
-    DisplayBrightness = 0;
+    DisplayBrightness = 0u;
 } /* setStateToSetTime */
 
 

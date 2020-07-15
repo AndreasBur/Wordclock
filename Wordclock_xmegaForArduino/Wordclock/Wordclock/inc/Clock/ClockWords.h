@@ -32,10 +32,10 @@
 
 
 /* ClockWords parameter */
-#define CLOCKWORDS_MAX_NUMBER_OF_HOUR_WORDS          2
-#define CLOCKWORDS_MAX_NUMBER_OF_MINUTE_WORDS        3
+#define CLOCKWORDS_MAX_NUMBER_OF_HOUR_WORDS          2u
+#define CLOCKWORDS_MAX_NUMBER_OF_MINUTE_WORDS        3u
 
-#define CLOCKWORDS_IT_IS_NUMBER_OF_WORDS             2
+#define CLOCKWORDS_IT_IS_NUMBER_OF_WORDS             2u
 #define CLOCKWORDS_MAX_NUMBER_OF_WORDS				 (CLOCKWORDS_MAX_NUMBER_OF_HOUR_WORDS + CLOCKWORDS_MAX_NUMBER_OF_MINUTE_WORDS + CLOCKWORDS_IT_IS_NUMBER_OF_WORDS)
 
 /******************************************************************************************************************************************************

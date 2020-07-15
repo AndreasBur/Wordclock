@@ -68,21 +68,19 @@ MsgCmdParser::~MsgCmdParser()
 
 void MsgCmdParser::parse()
 {
-	CommandsType command = getCommand();
+	CommandType command = getCommand();
 	const char* parameter = getParameter();
 	
-	switch(command) {
-		case COMMAND_DISPLAY_COLOR : {
-			MsgCmdDisplayColorParser CmdDisplayColorParser(parameter);
-		    CmdDisplayColorParser.parse();
-			sendAnswer(command);
-			break; }
-		case COMMAND_DISPLAY_MODE :
-			sendAnswer(command);
-			break;
-		default:
-			Error.send(ErrorMessage::ERROR_WRONG_COMMAND);
-			break;
+	if(command == COMMAND_DISPLAY_COLOR) {
+		MsgCmdDisplayColorParser CmdDisplayColorParser(parameter);
+		CmdDisplayColorParser.parse();
+		CmdDisplayColorParser.process();
+		CmdDisplayColorParser.sendAnswer();
+		sendAnswer(command);
+	} else if(COMMAND_DISPLAY_MODE) {
+		
+	} else {
+		Error.send(ErrorMessage::ERROR_WRONG_COMMAND);
 	}
 
 }

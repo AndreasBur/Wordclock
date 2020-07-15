@@ -98,8 +98,8 @@ class Timer
   private:
 
     // functions
-    template <typename TimerType> bool isTimerOfType5(TimerType Timer) { return (uint16_t)&Timer & 0x40 ? true : false; }
-    template <typename TimerType> bool isTimerOfType4(TimerType Timer) { return (uint16_t)&Timer & 0x40 ? false : true; }
+    template <typename TimerType> bool isTimerOfType5(TimerType Timer) { return (uint16_t)&Timer & 0x40u ? true : false; }
+    template <typename TimerType> bool isTimerOfType4(TimerType Timer) { return (uint16_t)&Timer & 0x40u ? false : true; }
 
     TimerCountDirection getCountingDirection();
 
@@ -122,7 +122,7 @@ class Timer
 	// methods
 	static Timer& getInstance();
 	TimerIsrCallbackF_void TimerOverflowCallback;
-	StdReturnType init(uint32_t = 1000, TimerIsrCallbackF_void = NULL);
+	StdReturnType init(uint32_t = 1000u, TimerIsrCallbackF_void = NULL);
 	StdReturnType setPeriod(uint32_t);
 	StdReturnType enablePwm(TimerPwmPinType, uint16_t);
 	StdReturnType disablePwm(TimerPwmPinType);

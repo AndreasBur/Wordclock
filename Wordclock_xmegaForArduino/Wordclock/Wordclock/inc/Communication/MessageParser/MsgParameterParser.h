@@ -26,6 +26,7 @@
 #include "ErrorMessage.h"
 #include "MsgParameter.h"
 #include "StringTools.h"
+#include <array>
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
@@ -59,6 +60,8 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
  *  P R O T E C T E D   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   protected:
+    static constexpr char OptionArgumentDelimiter{':'};
+  
 	ErrorMessage Error;
     const char* Parameter;
 	const ParameterTableType& ParameterTable;

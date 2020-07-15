@@ -133,8 +133,8 @@ void AnimationClockFlicker::task()
 ******************************************************************************************************************************************************/
 void AnimationClockFlicker::reset()
 {
-    Minute = 0;
-    Hour = 0;
+    Minute = 0u;
+    Hour = 0u;
     isClockSet = false;
     FlickerCounter = ANIMATION_CLOCK_FLICKER_COUNTER_INIT_VALUE;
 } /* reset */
@@ -159,7 +159,7 @@ void AnimationClockFlicker::clearTimeTask()
         Display::getInstance().enable();
     }
 
-    if(FlickerCounter-- <= 0) State = STATE_SET_TIME;
+    if(FlickerCounter-- <= 0u) State = STATE_SET_TIME;
 } /* clearTimeTask */
 
 

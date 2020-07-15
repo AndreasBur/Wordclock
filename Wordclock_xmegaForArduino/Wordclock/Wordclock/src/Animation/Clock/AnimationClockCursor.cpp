@@ -96,7 +96,7 @@ StdReturnType AnimationClockCursor::setClock(byte Hour, byte Minute)
 
     if(Clock::getInstance().getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
         ReturnValue = E_OK;
-        CurrentPixelIndex = 0;
+        CurrentPixelIndex = 0u;
         State = STATE_SET_TIME;
     }
     return ReturnValue;
@@ -115,9 +115,9 @@ void AnimationClockCursor::task()
 {
     if(State == STATE_SET_TIME) {
         if(CurrentPixelIndex < DISPLAY_NUMBER_OF_PIXELS) { Display::getInstance().setPixelFast(CurrentPixelIndex); }
-        if(CurrentPixelIndex > 0) {
-            if(isPixelPartOfClockWords(ClockWordsTable, CurrentPixelIndex - 1) == false) { 
-                Display::getInstance().clearPixelFast(CurrentPixelIndex - 1);
+        if(CurrentPixelIndex > 0u) {
+            if(isPixelPartOfClockWords(ClockWordsTable, CurrentPixelIndex - 1u) == false) { 
+                Display::getInstance().clearPixelFast(CurrentPixelIndex - 1u);
             }
         }
         if(CurrentPixelIndex >= DISPLAY_NUMBER_OF_PIXELS) State = STATE_IDLE;
@@ -141,7 +141,7 @@ void AnimationClockCursor::task()
 void AnimationClockCursor::reset()
 {
     for(auto& Word : ClockWordsTable) { Word = DisplayWords::WORD_NONE; }
-    CurrentPixelIndex = 0;
+    CurrentPixelIndex = 0u;
 } /* reset */
 
 

@@ -131,11 +131,11 @@ void AnimationClockShift::task()
 void AnimationClockShift::reset()
 {
 #if (ANIMATION_CLOCK_SHIFT_HORIZONTAL == STD_ON)
-    CurrentColumn = 0;
+    CurrentColumn = 0u;
 #endif
 
 #if (ANIMATION_CLOCK_SHIFT_VERTICAL == STD_ON)
-    CurrentRow = 0;
+    CurrentRow = 0u;
 #endif
 } /* reset */
 
@@ -187,7 +187,7 @@ void AnimationClockShift::setTimeTask()
     if(CurrentColumn < DISPLAY_NUMBER_OF_COLUMNS) {
         wcTransformation.shiftRightFast();
         for(byte Row = 0; Row < DISPLAY_NUMBER_OF_ROWS; Row++) {
-            if(isPixelPartOfClockWords(ClockWordsTable, DISPLAY_NUMBER_OF_COLUMNS - CurrentColumn - 1, Row)) {
+            if(isPixelPartOfClockWords(ClockWordsTable, DISPLAY_NUMBER_OF_COLUMNS - CurrentColumn - 1u, Row)) {
                 Display::getInstance().setPixelFast(0, Row);
             }
         }
@@ -200,9 +200,9 @@ void AnimationClockShift::setTimeTask()
 #if (ANIMATION_CLOCK_SHIFT_VERTICAL == STD_ON)
     if(CurrentRow < DISPLAY_NUMBER_OF_ROWS) {
         wcTransformation.shiftDownFast();
-        for(byte Column = 0; Column < DISPLAY_NUMBER_OF_COLUMNS; Column++) {
-            if(isPixelPartOfClockWords(ClockWordsTable, Column, DISPLAY_NUMBER_OF_ROWS - CurrentRow - 1)) {
-                Display::getInstance().setPixelFast(Column, 0);
+        for(byte Column = 0u; Column < DISPLAY_NUMBER_OF_COLUMNS; Column++) {
+            if(isPixelPartOfClockWords(ClockWordsTable, Column, DISPLAY_NUMBER_OF_ROWS - CurrentRow - 1u)) {
+                Display::getInstance().setPixelFast(Column, 0u);
             }
         }
         CurrentRow++;

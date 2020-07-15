@@ -96,8 +96,8 @@ StdReturnType AnimationClockTeletype::setClock(byte Hour, byte Minute)
 
     if(Clock::getInstance().getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
         ReturnValue = E_OK;
-        CurrentWordIndex = 0;
-        CurrentCharIndex = 0;
+        CurrentWordIndex = 0u;
+        CurrentCharIndex = 0u;
         CurrentWordLength = Words.getDisplayWordLengthFast(ClockWordsTable[CurrentWordIndex]);
         State = STATE_SET_TIME;
     }
@@ -121,7 +121,7 @@ void AnimationClockTeletype::task()
                 State = STATE_IDLE;
                 return;
             }
-            CurrentCharIndex = 0;
+            CurrentCharIndex = 0u;
             CurrentWordLength = Words.getDisplayWordLengthFast(ClockWordsTable[CurrentWordIndex]);
         }
         CurrentCharIndex++;
@@ -145,9 +145,9 @@ void AnimationClockTeletype::task()
 void AnimationClockTeletype::reset()
 {
     for(auto& Word : ClockWordsTable) { Word = DisplayWords::WORD_NONE; }
-    CurrentWordIndex = 0;
-    CurrentWordLength = 0;
-    CurrentCharIndex = 0;
+    CurrentWordIndex = 0u;
+    CurrentWordLength = 0u;
+    CurrentCharIndex = 0u;
 } /* reset */
 
 
@@ -161,7 +161,7 @@ void AnimationClockTeletype::reset()
 ******************************************************************************************************************************************************/
 StdReturnType AnimationClockTeletype::setNextWordIndex()
 {
-    if(CurrentWordIndex + 1 < static_cast<byte>(ClockWordsTable.size())) {
+    if(CurrentWordIndex + 1u < static_cast<byte>(ClockWordsTable.size())) {
         CurrentWordIndex++;
         return E_OK;
     }

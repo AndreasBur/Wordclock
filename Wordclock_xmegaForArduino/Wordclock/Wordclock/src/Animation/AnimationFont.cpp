@@ -382,7 +382,7 @@ void AnimationFont::charShiftTask()
 {
     if(Shift.State == SHIFT_STATE_BUSY) {
         wcTransformation.shiftLeft();
-        if(Shift.Counter == 0) {
+        if(Shift.Counter == 0u) {
             Shift.State = SHIFT_STATE_IDLE;
             if(State == STATE_CHAR_SHIFT) State = STATE_IDLE;
         } else {
@@ -407,7 +407,7 @@ void AnimationFont::charShiftTask()
 template <typename RowType, byte RowsSize>
 StdReturnType AnimationFont::setCharFontHorizontal(byte Column, byte Row, const FontCharHorizontal<RowType, RowsSize>& FontChar, byte FontHeight)
 {
-    for(byte FontRow = 0; FontRow < FontHeight; FontRow++)
+    for(byte FontRow = 0u; FontRow < FontHeight; FontRow++)
     {
         RowType CharRow;
         byte RowAbs = Row + FontRow;
@@ -431,7 +431,7 @@ StdReturnType AnimationFont::setCharRow(RowType CharRow, byte Column, byte RowAb
 {
     StdReturnType ReturnValue{E_OK};
 
-    for(byte FontColumn = 0; FontColumn < FontWidth; FontColumn++)
+    for(byte FontColumn = 0u; FontColumn < FontWidth; FontColumn++)
     {
         byte ColumnAbs = Column + FontColumn;
         if(ColumnAbs < DISPLAY_NUMBER_OF_COLUMNS && RowAbs < DISPLAY_NUMBER_OF_ROWS) {
@@ -455,7 +455,7 @@ StdReturnType AnimationFont::setCharRow(RowType CharRow, byte Column, byte RowAb
 template <typename RowType, byte RowsSize>
 void AnimationFont::setCharFontHorizontalFast(byte Column, byte Row, const FontCharHorizontal<RowType, RowsSize>& FontChar, byte FontHeight)
 {
-    for(byte FontRow = 0; FontRow < FontHeight; FontRow++)
+    for(byte FontRow = 0u; FontRow < FontHeight; FontRow++)
     {
         RowType CharRow = FontChar.getRowFast(FontRow);
         byte RowAbs = Row + FontRow;
@@ -475,7 +475,7 @@ void AnimationFont::setCharFontHorizontalFast(byte Column, byte Row, const FontC
 template <typename RowType>
 void AnimationFont::setCharRowFast(RowType CharRow, byte Column, byte RowAbs, byte FontWidth)
 {
-    for(byte FontColumn = 0; FontColumn < FontWidth; FontColumn++)
+    for(byte FontColumn = 0u; FontColumn < FontWidth; FontColumn++)
     {
         byte ColumnAbs = Column + FontColumn;
         if(ColumnAbs < DISPLAY_NUMBER_OF_COLUMNS && RowAbs < DISPLAY_NUMBER_OF_ROWS) {
@@ -498,7 +498,7 @@ void AnimationFont::setCharRowFast(RowType CharRow, byte Column, byte RowAbs, by
 template <typename ColumnType, byte ColumnsSize>
 StdReturnType AnimationFont::setCharFontVertical(byte Column, byte Row, const FontCharVertical<ColumnType, ColumnsSize>& FontChar, byte FontHeight)
 {
-    for(byte FontColumn = 0; FontColumn < FontChar.getWidth(); FontColumn++)
+    for(byte FontColumn = 0u; FontColumn < FontChar.getWidth(); FontColumn++)
     {
         ColumnType CharColumn;
         byte ColumnAbs = Column + FontColumn;
@@ -522,7 +522,7 @@ StdReturnType AnimationFont::setCharColumn(ColumnType CharColumn, byte ColumnAbs
 {
     StdReturnType ReturnValue{E_OK};
 
-    for(byte FontRow = 0; FontRow < FontHeight; FontRow++)
+    for(byte FontRow = 0u; FontRow < FontHeight; FontRow++)
     {
         byte RowAbs = Row + FontRow;
         if(ColumnAbs < DISPLAY_NUMBER_OF_COLUMNS && RowAbs < DISPLAY_NUMBER_OF_ROWS) {
@@ -546,7 +546,7 @@ StdReturnType AnimationFont::setCharColumn(ColumnType CharColumn, byte ColumnAbs
 template <typename ColumnType, byte ColumnsSize>
 void AnimationFont::setCharFontVerticalFast(byte Column, byte Row, const FontCharVertical<ColumnType, ColumnsSize>& FontChar, byte FontHeight)
 {
-    for(byte FontColumn = 0; FontColumn < FontChar.getWidth(); FontColumn++)
+    for(byte FontColumn = 0u; FontColumn < FontChar.getWidth(); FontColumn++)
     {
         ColumnType CharColumn = FontChar.getColumnFast(FontColumn);
         byte ColumnAbs = Column + FontColumn;
@@ -566,7 +566,7 @@ void AnimationFont::setCharFontVerticalFast(byte Column, byte Row, const FontCha
 template <typename ColumnType>
 void AnimationFont::setCharColumnFast(ColumnType CharColumn, byte ColumnAbs, byte Row, byte FontHeight)
 {
-    for(byte FontRow = 0; FontRow < FontHeight; FontRow++)
+    for(byte FontRow = 0u; FontRow < FontHeight; FontRow++)
     {
         byte RowAbs = Row + FontRow;
         if(ColumnAbs < DISPLAY_NUMBER_OF_COLUMNS && RowAbs < DISPLAY_NUMBER_OF_ROWS) {
@@ -594,12 +594,12 @@ StdReturnType AnimationFont::convertCharToFontIndex(char Char, byte& Index)
     StdReturnType ReturnValue = E_NOT_OK;
 
     /* for umlauts we need a special treatment */
-    if('Ä' == Char) { Index = 96; ReturnValue = E_OK; }
-    else if('Ö' == Char) { Index = 97; ReturnValue = E_OK; }
-    else if('Ü' == Char) { Index = 98; ReturnValue = E_OK; }
-    else if('ä' == Char) { Index = 99; ReturnValue = E_OK; }
-    else if('ö' == Char) { Index = 100; ReturnValue = E_OK; }
-    else if('ü' == Char) { Index = 101; ReturnValue = E_OK; }
+    if('Ä' == Char) { Index = 96u; ReturnValue = E_OK; }
+    else if('Ö' == Char) { Index = 97u; ReturnValue = E_OK; }
+    else if('Ü' == Char) { Index = 98u; ReturnValue = E_OK; }
+    else if('ä' == Char) { Index = 99u; ReturnValue = E_OK; }
+    else if('ö' == Char) { Index = 100u; ReturnValue = E_OK; }
+    else if('ü' == Char) { Index = 101u; ReturnValue = E_OK; }
     /* for all others only add offset */
     else if(Char >= ANIMATION_FONT_ASCII_CHAR_MIN) {
         Index = Char + ANIMATION_FONT_ASCII_TABLE_OFFSET; ReturnValue = E_OK;
@@ -622,17 +622,17 @@ StdReturnType AnimationFont::convertCharToFontIndex(char Char, byte& Index)
 byte AnimationFont::convertCharToFontIndexFast(char Char)
 {
     /* for umlauts we need a special treatment */
-    if('Ä' == Char)  return 96;
-    else if('Ö' == Char) return 97;
-    else if('Ü' == Char) return 98;
-    else if('ä' == Char) return 99;
-    else if('ö' == Char) return 100;
-    else if('ü' == Char) return 101;
+    if('Ä' == Char)  return 96u;
+    else if('Ö' == Char) return 97u;
+    else if('Ü' == Char) return 98u;
+    else if('ä' == Char) return 99u;
+    else if('ö' == Char) return 100u;
+    else if('ü' == Char) return 101u;
     /* for all others only add offset */
     else if(Char >= ANIMATION_FONT_ASCII_CHAR_MIN) {
         return Char + ANIMATION_FONT_ASCII_TABLE_OFFSET;
     }
-    return 0;
+    return 0u;
 } /* convertCharToFontIndex */
 
 

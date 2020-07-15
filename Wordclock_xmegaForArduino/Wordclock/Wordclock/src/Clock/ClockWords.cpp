@@ -73,7 +73,7 @@ ClockWords::ClockWords(bool sShowItIs, HourWordsType sHourWords, MinutesWordsTyp
 	ShowItIs = sShowItIs;
 	HourWords = sHourWords;
 	MinuteWords = sMinuteWords;
-} /* ClockWords */
+}
 
 
 /******************************************************************************************************************************************************
@@ -82,12 +82,8 @@ ClockWords::ClockWords(bool sShowItIs, HourWordsType sHourWords, MinutesWordsTyp
 ClockWords::~ClockWords()
 {
 
-} /* ~ClockWords */
+}
 
-
-/******************************************************************************************************************************************************
-  Operator == of ClockWords
-******************************************************************************************************************************************************/
 bool ClockWords::operator==(const ClockWords& sClockWords)
 {
 	if(ShowItIs    == sClockWords.getShowItIs()    &&
@@ -100,20 +96,12 @@ bool ClockWords::operator==(const ClockWords& sClockWords)
 	}
 }
 
-
-/******************************************************************************************************************************************************
-  Operator != of ClockWords
-******************************************************************************************************************************************************/
 bool ClockWords::operator!=(const ClockWords& sClockWords)
 {
 	if(operator==(sClockWords)) { return false; }
 	else { return true; }
 }
 
-
-/******************************************************************************************************************************************************
-  getWords
-******************************************************************************************************************************************************/
 ClockWords::WordsListType ClockWords::getWordsList() const
 {
     /* ----- Local Variables ---------------------------------------------- */

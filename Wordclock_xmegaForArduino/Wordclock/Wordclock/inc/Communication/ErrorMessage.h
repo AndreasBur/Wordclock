@@ -74,9 +74,9 @@ class ErrorMessage
 
 	// methods
     void send(ErrorType Error) const {
-		//cout << F("Error: ") << Error << std::endl;
+		Serial.print(F("Error: "));
 		Serial.print(Error);
-		//Serial.println(); 
+		Serial.println(); 
 	}
 };
 

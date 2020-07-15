@@ -48,10 +48,11 @@ class MsgCmdParser
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-    enum CommandsType {
+    enum CommandType {
 		COMMAND_NONE,
 		COMMAND_DISPLAY_MODE,
 		COMMAND_DISPLAY_COLOR,
+		COMMAND_DISPLAY_BRIGHTNESS,
 		COMMAND_TIME,
 		COMMAND_DATE
 	};
@@ -60,23 +61,23 @@ class MsgCmdParser
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
-  	static const char CommandValueDelimiter{' '};
+  	static const char CommandParameterDelimiter{' '};
     const Message& IncomingMessage;
 	ErrorMessage Error;
   
   	//private functions
-	void sendAnswer(CommandsType Command) const {
+	void sendAnswer(CommandType Command) const {
 		Serial.print(Command);
-		Serial.println(CommandValueDelimiter);
+		Serial.println(CommandParameterDelimiter);
 	}
 	
-	CommandsType getCommand() const {
-		return static_cast<CommandsType>(atoi(IncomingMessage.getMessage()));
+	CommandType getCommand() const {
+		return static_cast<CommandType>(atoi(IncomingMessage.getMessage()));
 	}
 
 	const char* getParameter() const {
 		const char* message = IncomingMessage.getMessage();
-		size_t valuePos = IncomingMessage.find(CommandValueDelimiter);
+		size_t valuePos = IncomingMessage.find(CommandParameterDelimiter);
 
 		if(valuePos == Message::npos) { return nullptr; }
 		else { return &message[valuePos]; }

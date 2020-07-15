@@ -58,7 +58,7 @@ class Animation
         STATE_NONE,
         STATE_IDLE,
         STATE_CLOCK,
-        STATE_FONT,
+        STATE_FONT
     };
 	
 	using AnimationClockType = AnimationClock::AnimationType;

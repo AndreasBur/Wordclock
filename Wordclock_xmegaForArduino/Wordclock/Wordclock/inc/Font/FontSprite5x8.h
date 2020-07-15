@@ -32,9 +32,9 @@
 
 
 /* FontSprite5x8 parameter */
-#define FONT_SPRITE_5X8_WIDTH                       5
-#define FONT_SPRITE_5X8_HEIGHT                      8
-#define FONT_SPRITE_5X8_FONT_TABLE_SIZE             102
+#define FONT_SPRITE_5X8_WIDTH                       5u
+#define FONT_SPRITE_5X8_HEIGHT                      8u
+#define FONT_SPRITE_5X8_FONT_TABLE_SIZE             102u
 
 
 /******************************************************************************************************************************************************

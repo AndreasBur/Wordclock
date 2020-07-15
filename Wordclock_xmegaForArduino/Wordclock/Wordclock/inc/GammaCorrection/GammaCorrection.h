@@ -31,7 +31,7 @@
 
 
 /* GammaCorrection parameter */
-#define GAMMA_CORRECTION_GAMMA7_TABLE_NUMBER_OF_VALUES        16
+#define GAMMA_CORRECTION_GAMMA7_TABLE_NUMBER_OF_VALUES        16u
 
 
 /******************************************************************************************************************************************************
@@ -57,7 +57,7 @@ class GammaCorrection
     static const Gamma7TableElementType Gamma7Table[];
 
     // functions
-    byte calcGamma7CorrectionValue(byte);
+    byte calcGamma7CorrectionValue(byte) const;
     Gamma7TableElementType getGamma7TableElement(byte Index) const {
         Gamma7TableElementType Gamma7TableElement;
         memcpy_P(&Gamma7TableElement, &Gamma7Table[Index], sizeof(Gamma7TableElementType));
@@ -70,12 +70,12 @@ class GammaCorrection
   public:
     constexpr GammaCorrection() 
     {
-  
+		
     }
 
 
 	// get methods
-    byte getCorrectedValue(byte ValueLinear) { return calcGamma7CorrectionValue(ValueLinear / 2); }
+    byte getCorrectedValue(byte ValueLinear) const { return calcGamma7CorrectionValue(ValueLinear / 2u); }
 
 	// set methods
 

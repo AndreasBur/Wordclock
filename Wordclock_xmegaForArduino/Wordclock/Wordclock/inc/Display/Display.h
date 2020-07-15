@@ -31,7 +31,7 @@
  *  GLOBAL CONSTANT MACROS
 ******************************************************************************************************************************************************/
 /* Display configuration parameter */
-#define DISPLAY_DATA_PIN                        10
+#define DISPLAY_DATA_PIN                        10u
 #define DISPLAY_LED_STRIPE_SERPENTINE           STD_OFF
 #define DISPLAY_USE_WS2812_DIMMING              STD_OFF
 
@@ -53,7 +53,7 @@
     #error "Display: LED number missmatch"
 #endif
 
-#define DISPLAY_WORD_LENGTH_UNLIMITED           0
+#define DISPLAY_WORD_LENGTH_UNLIMITED           0u
 
 
 /******************************************************************************************************************************************************
@@ -86,13 +86,13 @@ class Display
     using PixelType = boolean;
     using CharacterIdType = DisplayCharacters::CharacterIdType;
 
-#if (DISPLAY_NUMBER_OF_ROWS > 16)
+#if (DISPLAY_NUMBER_OF_ROWS > 16u)
     #error "Display: too many rows, please extend PixelRowType"
 #endif
 
     using PixelRowType = uint16_t;
 
-#if (DISPLAY_NUMBER_OF_COLUMNS > 16)
+#if (DISPLAY_NUMBER_OF_COLUMNS > 16u)
     #error "Display: too many columns, please extend PixelColumnType"
 #endif
 
@@ -131,8 +131,8 @@ class Display
 
 #if (DISPLAY_USE_WS2812_DIMMING == STD_OFF)
     byte dimmColor(byte Color) const { 
-		byte dimmedColor = (Color * Brightness) >> 8;
-		if(dimmedColor == 0) return 1;
+		byte dimmedColor = (Color * Brightness) >> 8u;
+		if(dimmedColor == 0u) return 1u;
 		else return dimmedColor;
 	}
 #endif

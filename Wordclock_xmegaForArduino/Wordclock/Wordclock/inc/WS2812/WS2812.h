@@ -31,7 +31,7 @@
 /* WS2812 configuration parameter */
 #define WS2812_RESET_TIMER                          STD_OFF
 #define WS2812_SUPPORT_DIMMING                      STD_OFF
-#define WS2812_NUMBER_OF_LEDS                       110
+#define WS2812_NUMBER_OF_LEDS                       110u
 
 
 /* WS2812 parameter */
@@ -53,13 +53,13 @@ class WS2812
 ******************************************************************************************************************************************************/
   public:
     enum PortType {
-        PORT_C = 3,
-        PORT_D = 4,
+        PORT_C = 3u,
+        PORT_D = 4u,
     };
 
     enum PortPinType {
-        PORT_PIN_0 = 0,
-        PORT_PIN_4 = 4
+        PORT_PIN_0 = 0u,
+        PORT_PIN_4 = 4u
     };
 
     enum StateType {
@@ -69,7 +69,7 @@ class WS2812
     };
 
     using PixelType = NeoPixel::NeoPixelType;
-#if (WS2812_NUMBER_OF_LEDS < 255)
+#if (WS2812_NUMBER_OF_LEDS < 255u)
     using IndexType = byte;
 #else
     using IndexType = uint16_t;
@@ -131,8 +131,8 @@ class WS2812
 	void copyNextFrameToCurrentFrameDimmed();
     
 	byte dimmColor(byte Color) const {
-	    byte dimmedColor = (Color * Brightness) >> 8;
-	    if(dimmedColor == 0) return 1;
+	    byte dimmedColor = (Color * Brightness) >> 8u;
+	    if(dimmedColor == 0u) return 1;
 	    else return dimmedColor;
     }
 #endif
@@ -187,7 +187,7 @@ class WS2812
     void setPixels(byte, byte, byte);
     StdReturnType clearPixel(IndexType Index);
     void clearPixelFast(IndexType Index) { (*pNextFrame)[Index].clearPixel(); }
-    void clearPixels() { for(IndexType Index = 0; Index < WS2812_NUMBER_OF_LEDS; Index++) clearPixelFast(Index); }
+    void clearPixels() { for(IndexType Index = 0u; Index < WS2812_NUMBER_OF_LEDS; Index++) clearPixelFast(Index); }
 	void enablePixels() { switchPixelsBufferPointer(); show(); }
 	void disablePixels() { switchPixelsBufferPointer(); clearPixels(); startDmaTransfer(pNextFrame); };
 

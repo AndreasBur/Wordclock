@@ -132,10 +132,10 @@ void AnimationClockCube::task()
 ******************************************************************************************************************************************************/
 void AnimationClockCube::reset()
 {
-    Border.ColumnStart = 0;
-    Border.ColumnEnd = 0;
-    Border.RowStart = 0;
-    Border.RowEnd = 0;
+    Border.ColumnStart = 0u;
+    Border.ColumnEnd = 0u;
+    Border.RowStart = 0u;
+    Border.RowEnd = 0u;
 } /* reset */
 
 
@@ -283,7 +283,7 @@ StdReturnType AnimationClockCube::increaseBorder()
 {
     StdReturnType ReturnValue = E_OK;
 
-    if(Border.ColumnStart > 0) { Border.ColumnStart--; }
+    if(Border.ColumnStart > 0u) { Border.ColumnStart--; }
     else { ReturnValue = E_NOT_OK; }
     if(Border.ColumnEnd < DISPLAY_NUMBER_OF_COLUMNS - 1) { Border.ColumnEnd++; }
     else { ReturnValue = E_NOT_OK; }
@@ -331,10 +331,10 @@ StdReturnType AnimationClockCube::decreaseBorder()
 ******************************************************************************************************************************************************/
 void AnimationClockCube::setMaxBorder()
 {
-    Border.ColumnStart = 0;
-    Border.ColumnEnd = DISPLAY_NUMBER_OF_COLUMNS - 1;
-    Border.RowStart = 0;
-    Border.RowEnd = DISPLAY_NUMBER_OF_ROWS - 1;
+    Border.ColumnStart = 0u;
+    Border.ColumnEnd = DISPLAY_NUMBER_OF_COLUMNS - 1u;
+    Border.RowStart = 0u;
+    Border.RowEnd = DISPLAY_NUMBER_OF_ROWS - 1u;
     BorderState = BORDER_STATE_MAX;
 } /* setMaxBorder */
 

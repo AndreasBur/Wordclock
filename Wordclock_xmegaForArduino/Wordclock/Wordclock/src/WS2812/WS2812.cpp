@@ -27,22 +27,22 @@
  *  L O C A L   C O N S T A N T   M A C R O S 
 ******************************************************************************************************************************************************/
 /* WS2812 parameter */
-#define WS2812_ZERO_PULSE_DURATION_NS               350
-#define WS2812_ONE_PULSE_DURATION_NS                900
-#define WS2812_ZERO_PULSE_MAX_DURATION_NS           550
+#define WS2812_ZERO_PULSE_DURATION_NS               350u
+#define WS2812_ONE_PULSE_DURATION_NS                900u
+#define WS2812_ZERO_PULSE_MAX_DURATION_NS           550u
 #define WS2812_RESET_DURATION_NS                    50000UL
 
 /* xmega hardware parameter */
-#define WS2812_USART_SPI_BAUDRATE                   800000UL
-#define WS2812_XCL_LUT_TRUTH_TABLE_VALUE            0xA0
+#define WS2812_USART_SPI_BAUDRATE                   800000uL
+#define WS2812_XCL_LUT_TRUTH_TABLE_VALUE            0xA0u
 
-#define WS2812_BTC0_CYCLES_ONE_PULSE                (((F_CPU / 1000) * WS2812_ONE_PULSE_DURATION_NS)  / 1000000)
-#define WS2812_BTC0_CYCLES_ZERO_PULSE               (((F_CPU / 1000) * WS2812_ZERO_PULSE_DURATION_NS) / 1000000)
-#define WS2812_BTC0_CYCLES_HARDWARE_DELAY           4
+#define WS2812_BTC0_CYCLES_ONE_PULSE                (((F_CPU / 1000u) * WS2812_ONE_PULSE_DURATION_NS)  / 1000000u)
+#define WS2812_BTC0_CYCLES_ZERO_PULSE               (((F_CPU / 1000u) * WS2812_ZERO_PULSE_DURATION_NS) / 1000000u)
+#define WS2812_BTC0_CYCLES_HARDWARE_DELAY           4u
 #define WS2812_BTC0_CYCLES_ONE_PULSE_CORRECTED      (WS2812_BTC0_CYCLES_ONE_PULSE - WS2812_BTC0_CYCLES_HARDWARE_DELAY)
 #define WS2812_BTC0_CYCLES_ZERO_PULSE_CORRECTED     (WS2812_BTC0_CYCLES_ZERO_PULSE - WS2812_BTC0_CYCLES_HARDWARE_DELAY)
 #define WS2812_BTC0_MIN_CYCLES_ZERO_PULSE           WS2812_BTC0_CYCLES_HARDWARE_DELAY
-#define WS2812_DMA_PORT_OUTPUT_DELAY_NS             50000UL
+#define WS2812_DMA_PORT_OUTPUT_DELAY_NS             50000uL
 #define WS2812_RESET_TIMER_DURATION_NS              (WS2812_RESET_DURATION_NS + WS2812_DMA_PORT_OUTPUT_DELAY_NS)
 
 #define WS2812_XCL_PERCAPTL_VALUE                   WS2812_BTC0_CYCLES_ONE_PULSE_CORRECTED
@@ -60,20 +60,20 @@
     the only critical timing parameter is the minimum pulse length of zero "0" 
     warn or throw error if this timing can not be met with current F_CPU settings. 
 */
-#define WS2812_ZERO_PULSE_DURATION_NS_CALC          ((WS2812_BTC0_MIN_CYCLES_ZERO_PULSE * 1000000) / (F_CPU / 1000))
+#define WS2812_ZERO_PULSE_DURATION_NS_CALC          ((WS2812_BTC0_MIN_CYCLES_ZERO_PULSE * 1000000u) / (F_CPU / 1000u))
 
 #if (WS2812_ZERO_PULSE_DURATION_NS_CALC > WS2812_ZERO_PULSE_MAX_DURATION_NS)
     //#error "WS2812: sorry, the clock speed is too low. Did you set F_CPU correctly?"
-#elif (WS2812_ZERO_PULSE_DURATION_NS_CALC > (WS2812_ZERO_PULSE_MAX_DURATION_NS - 100))
+#elif (WS2812_ZERO_PULSE_DURATION_NS_CALC > (WS2812_ZERO_PULSE_MAX_DURATION_NS - 100u))
     #warning "WS2812: The timing is critical and may only work on WS2812B, not on WS2812(S)."
     #warning "Please consider a higher clockspeed, if possible"
 #endif
 
 // missing in iox32e5.hl
-#define USART_UCPHA_bm  0x02  /* Clock Phase bit mask. */
-#define USART_UCPHA_bp  1     /* Clock Phase bit position. */
-#define USART_UDORD_bm  0x04  /* Data Order bit mask. */
-#define USART_UDORD_bp  2     /* Data Order bit position. */
+#define USART_UCPHA_bm  0x02u  /* Clock Phase bit mask. */
+#define USART_UCPHA_bp  1u     /* Clock Phase bit position. */
+#define USART_UDORD_bm  0x04u  /* Data Order bit mask. */
+#define USART_UDORD_bp  2u     /* Data Order bit position. */
 
 
 /******************************************************************************************************************************************************
@@ -104,11 +104,11 @@ WS2812::WS2812() : State{STATE_UNINIT}, PixelsBuffer1{}, PixelsBuffer2{}
     pNextFrame = &PixelsBuffer2;
 
 #if (WS2812_SUPPORT_DIMMING == STD_ON)
-    Brightness = 255;
+    Brightness = 255u;
 #endif
 
 #if (WS2812_RESET_TIMER == STD_ON)
-    ResetTimer = 0;
+    ResetTimer = 0u;
 #endif
 } /* WS2812 */
 
@@ -206,7 +206,7 @@ StdReturnType WS2812::show()
 
 #if (WS2812_SUPPORT_DIMMING == STD_ON)
         State = STATE_BUSY;
-        if(Brightness != 255) {
+        if(Brightness != 255u) {
             showNextFrameDimmed();
         } else {
             showNextFrame();
@@ -231,7 +231,7 @@ StdReturnType WS2812::show()
 ******************************************************************************************************************************************************/
 void WS2812::setPixels(byte Red, byte Green, byte Blue)
 {
-    for(IndexType Index = 0; Index < WS2812_NUMBER_OF_LEDS; Index++) {
+    for(IndexType Index = 0u; Index < WS2812_NUMBER_OF_LEDS; Index++) {
         (*pNextFrame)[Index].setRed(Red);
         (*pNextFrame)[Index].setGreen(Green);
         (*pNextFrame)[Index].setGreen(Blue);
@@ -461,7 +461,7 @@ WS2812::PixelType WS2812::getPixelDimmedFast(IndexType Index) const
 {
     PixelType Pixel;
 
-    if(Brightness == 255) {
+    if(Brightness == 255u) {
         return getPixelFast(Index);
     } else {
         Pixel.Red = dimmColor(getPixelRedFast(Index));
@@ -506,8 +506,8 @@ void WS2812::setBrightness(byte sBrightness, boolean GammaCorrection)
 void WS2812::initUsart(USART_t* pUsart)
 {
     // Setup USART in master SPI mode 1, MSB first
-    pUsart->BAUDCTRLA = (F_CPU / (2 * WS2812_USART_SPI_BAUDRATE)) - 1;
-    pUsart->BAUDCTRLB = 0;
+    pUsart->BAUDCTRLA = (F_CPU / (2u * WS2812_USART_SPI_BAUDRATE)) - 1u;
+    pUsart->BAUDCTRLB = 0u;
     pUsart->CTRLA = USART_DREINTLVL_OFF_gc | USART_RXCINTLVL_OFF_gc | USART_TXCINTLVL_OFF_gc;
     pUsart->CTRLC = USART_CMODE_MSPI_gc | USART_UCPHA_bm;
     pUsart->CTRLD = USART_DECTYPE_DATA_gc | USART_LUTACT_OFF_gc | USART_PECACT_OFF_gc;
@@ -680,9 +680,9 @@ boolean WS2812::isResetTimeElapsed()
 {
     // check for timer overflow
     if(micros() < ResetTimer) {
-        return ((micros() - (UINT64_MAX - ResetTimer)) > (WS2812_RESET_TIMER_DURATION_NS / 1000));
+        return ((micros() - (UINT64_MAX - ResetTimer)) > (WS2812_RESET_TIMER_DURATION_NS / 1000u));
     } else {
-        return ((micros() - ResetTimer) > (WS2812_RESET_TIMER_DURATION_NS / 1000));
+        return ((micros() - ResetTimer) > (WS2812_RESET_TIMER_DURATION_NS / 1000u));
     }
 } /* isResetTimeElapsed */
 #endif

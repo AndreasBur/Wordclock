@@ -60,7 +60,7 @@ class FontChar
  *  P R O T E C T E D   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   protected:
-    constexpr FontChar() : Width(0) {
+    constexpr FontChar() : Width(0u) {
 
     }
 
@@ -109,7 +109,7 @@ template <typename RowType, byte RowsSize> class FontCharHorizontal : public Fon
 
     }
 
-    constexpr FontCharHorizontal() : FontChar(0), Rows{} {
+    constexpr FontCharHorizontal() : FontChar(0u), Rows{} {
     
     }
 

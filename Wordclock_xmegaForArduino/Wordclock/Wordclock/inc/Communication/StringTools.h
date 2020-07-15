@@ -53,6 +53,18 @@ class StringTools
 	  	RESULT_NO_VALUE,
 	  	RESULT_OK
   	};
+	  /*
+	  	struct ResultType {
+		  	PositionType Position;
+		  	ConvertResultType ConvertResult;
+	  	}
+	  	
+	  	enum ConvertResultType {
+		  	CONVERT_RESULT_OVERFLOW,
+		  	CONVERT_RESULT_NO_VALUE,
+		  	CONVERT_RESULT_OK
+	  	};
+	  */
 	  
 	 static constexpr size_t npos = -1;
 	 using PositionType = uint8_t;
@@ -74,15 +86,15 @@ class StringTools
 	// set methods
 
 	// methods
-	static void stringCopy(char *Destination, const char *Source, int Length) {
-		strncpy(Destination, Source, Length - 1);
-		Destination[Length - 1] = '\0';
+	static void stringCopy(char* Destination, const char* Source, int Length) {
+		strncpy(Destination, Source, Length - 1u);
+		Destination[Length - 1u] = '\0';
 	}
 	
 	template<typename T,
 	         typename std::enable_if_t<std::is_unsigned<T>::value, int> = 0,
 			 typename std::enable_if_t<std::is_integral<T>::value, int> = 0>
-	static ResultType stringTo(const char* String, PositionType& Position, T& Value, uint8_t Base = 10) {
+	static ResultType stringTo(const char* String, PositionType& Position, T& Value, uint8_t Base = 10u) {
 		char* end = nullptr;
 		errno = 0;
 		uint64_t valueBig = strtoul(String, &end, Base);
@@ -102,7 +114,7 @@ class StringTools
 	template<typename Signed, 
 			 typename std::enable_if_t<std::is_signed<Signed>::value, int> = 0,
 			 typename std::enable_if_t<std::is_integral<Signed>::value, int> = 0> 
-	static ResultType stringTo(const char* String, PositionType& Position, Signed& Value, uint8_t Base = 10) {
+	static ResultType stringTo(const char* String, PositionType& Position, Signed& Value, uint8_t Base = 10u) {
 		char* end = nullptr;
 		errno = 0;
 		int64_t valueBig = strtol(String, &end, Base);
@@ -122,7 +134,7 @@ class StringTools
 
 	template<typename Float,
 	         typename std::enable_if_t<std::is_floating_point<Float>::value, int> = 0>
-	static ResultType stringTo(const char* String, PositionType& Position, Float& Value, uint8_t Base = 10) {
+	static ResultType stringTo(const char* String, PositionType& Position, Float& Value, uint8_t Base = 10u) {
 		char* end = nullptr;
 		errno = 0;
 		double valueBig = strtod(String, &end);

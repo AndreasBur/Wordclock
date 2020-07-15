@@ -39,9 +39,9 @@
 ******************************************************************************************************************************************************/
 const MsgCmdDisplayColorParser::ParameterTableType MsgCmdDisplayColorParser::ParameterTable PROGMEM
 {
-	ParameterTableElementType(RedParameterChar, MsgParameter::ARGUMENT_TYPE_UINT8),
-	ParameterTableElementType(GreenParameterChar, MsgParameter::ARGUMENT_TYPE_UINT8),
-	ParameterTableElementType(BlueParameterChar, MsgParameter::ARGUMENT_TYPE_UINT8)
+	ParameterTableElementType(RedOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8),
+	ParameterTableElementType(GreenOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8),
+	ParameterTableElementType(BlueOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8)
 };
 
 
@@ -85,30 +85,30 @@ void MsgCmdDisplayColorParser::sendAnswer()
 
 void MsgCmdDisplayColorParser::sendAnswerRed()
 {
-	Serial.print(RedParameterChar);
-	Serial.print(ColorValueDelimiter);
+	Serial.print(RedOptionShortName);
+	Serial.print(OptionArgumentDelimiter);
 	Serial.print(Display::getInstance().getColorRed());
 }
 
 void MsgCmdDisplayColorParser::sendAnswerGreen()
 {
-	Serial.print(GreenParameterChar);
-	Serial.print(ColorValueDelimiter);
+	Serial.print(GreenOptionShortName);
+	Serial.print(OptionArgumentDelimiter);
 	Serial.print(Display::getInstance().getColorGreen());
 }
 
 void MsgCmdDisplayColorParser::sendAnswerBlue()
 {
-	Serial.print(BlueParameterChar);
-	Serial.print(ColorValueDelimiter);
+	Serial.print(BlueOptionShortName);
+	Serial.print(OptionArgumentDelimiter);
 	Serial.print(Display::getInstance().getColorBlue());
 }
 
 void MsgCmdDisplayColorParser::handleParameter(char ParameterShortName, byte Argument)
 {
-	if(ParameterShortName == RedParameterChar) { Display::getInstance().setColorRed(Argument); }
-	if(ParameterShortName == GreenParameterChar) { Display::getInstance().setColorGreen(Argument); }
-	if(ParameterShortName == BlueParameterChar) { Display::getInstance().setColorBlue(Argument); }
+	if(ParameterShortName == RedOptionShortName) { Display::getInstance().setColorRed(Argument); }
+	if(ParameterShortName == GreenOptionShortName) { Display::getInstance().setColorGreen(Argument); }
+	if(ParameterShortName == BlueOptionShortName) { Display::getInstance().setColorBlue(Argument); }
 }
 
 /******************************************************************************************************************************************************

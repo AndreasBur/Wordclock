@@ -37,7 +37,7 @@
 /******************************************************************************************************************************************************
  *  LOCAL DATA TYPES AND STRUCTURES
 ******************************************************************************************************************************************************/
-const Clock::HoursType Clock::HoursTable[][CLOCK_NUMBER_OF_HOURS] PROGMEM
+const Clock::HourType Clock::HoursTable[][CLOCK_NUMBER_OF_HOURS] PROGMEM
 {
     {                                                                    // ClockHoursTable[0][] = hh:00 CLOCK_HOUR_MODE_FULL_HOUR
         {DisplayWords::WORD_HOUR_ZWOELF, DisplayWords::WORD_UHR},        // 00:00
@@ -70,63 +70,63 @@ const Clock::HoursType Clock::HoursTable[][CLOCK_NUMBER_OF_HOURS] PROGMEM
 };
 
 
-const Clock::MinutesType Clock::MinutesTable[][CLOCK_NUMBER_OF_MINUTE_STEPS] PROGMEM
+const Clock::MinuteType Clock::MinutesTable[][CLOCK_NUMBER_OF_MINUTE_STEPS] PROGMEM
 {
-    {                                                                                                                             // ClockMinutesTable[0][] = WESSI
-        {HOUR_MODE_FULL_HOUR,    0, {DisplayWords::WORD_NONE,        DisplayWords::WORD_NONE, DisplayWords::WORD_NONE}},          // 00
-        {HOUR_MODE_NO_FULL_HOUR, 0, {DisplayWords::WORD_FUENF,       DisplayWords::WORD_NACH, DisplayWords::WORD_NONE}},          // 05
-        {HOUR_MODE_NO_FULL_HOUR, 0, {DisplayWords::WORD_ZEHN,        DisplayWords::WORD_NACH, DisplayWords::WORD_NONE}},          // 10
-        {HOUR_MODE_NO_FULL_HOUR, 0, {DisplayWords::WORD_VIERTEL,     DisplayWords::WORD_NACH, DisplayWords::WORD_NONE}},          // 15
-        {HOUR_MODE_NO_FULL_HOUR, 1, {DisplayWords::WORD_ZEHN,        DisplayWords::WORD_VOR,  DisplayWords::WORD_HALB}},          // 20
-        {HOUR_MODE_NO_FULL_HOUR, 1, {DisplayWords::WORD_FUENF,       DisplayWords::WORD_VOR,  DisplayWords::WORD_HALB}},          // 25
-        {HOUR_MODE_NO_FULL_HOUR, 1, {DisplayWords::WORD_HALB,        DisplayWords::WORD_NONE, DisplayWords::WORD_NONE}},          // 30
-        {HOUR_MODE_NO_FULL_HOUR, 1, {DisplayWords::WORD_FUENF,       DisplayWords::WORD_NACH, DisplayWords::WORD_HALB}},          // 35
-        {HOUR_MODE_NO_FULL_HOUR, 1, {DisplayWords::WORD_ZEHN,        DisplayWords::WORD_NACH, DisplayWords::WORD_HALB}},          // 40
-        {HOUR_MODE_NO_FULL_HOUR, 1, {DisplayWords::WORD_VIERTEL,     DisplayWords::WORD_VOR,  DisplayWords::WORD_NONE}},          // 45
-        {HOUR_MODE_NO_FULL_HOUR, 1, {DisplayWords::WORD_ZEHN,        DisplayWords::WORD_VOR,  DisplayWords::WORD_NONE}},          // 50
-        {HOUR_MODE_NO_FULL_HOUR, 1, {DisplayWords::WORD_FUENF,       DisplayWords::WORD_VOR,  DisplayWords::WORD_NONE}},          // 55
+    {                                                                                                                              // ClockMinutesTable[0][] = WESSI
+        {HOUR_MODE_FULL_HOUR,    0u, {DisplayWords::WORD_NONE,        DisplayWords::WORD_NONE, DisplayWords::WORD_NONE}},          // 00
+        {HOUR_MODE_NO_FULL_HOUR, 0u, {DisplayWords::WORD_FUENF,       DisplayWords::WORD_NACH, DisplayWords::WORD_NONE}},          // 05
+        {HOUR_MODE_NO_FULL_HOUR, 0u, {DisplayWords::WORD_ZEHN,        DisplayWords::WORD_NACH, DisplayWords::WORD_NONE}},          // 10
+        {HOUR_MODE_NO_FULL_HOUR, 0u, {DisplayWords::WORD_VIERTEL,     DisplayWords::WORD_NACH, DisplayWords::WORD_NONE}},          // 15
+        {HOUR_MODE_NO_FULL_HOUR, 1u, {DisplayWords::WORD_ZEHN,        DisplayWords::WORD_VOR,  DisplayWords::WORD_HALB}},          // 20
+        {HOUR_MODE_NO_FULL_HOUR, 1u, {DisplayWords::WORD_FUENF,       DisplayWords::WORD_VOR,  DisplayWords::WORD_HALB}},          // 25
+        {HOUR_MODE_NO_FULL_HOUR, 1u, {DisplayWords::WORD_HALB,        DisplayWords::WORD_NONE, DisplayWords::WORD_NONE}},          // 30
+        {HOUR_MODE_NO_FULL_HOUR, 1u, {DisplayWords::WORD_FUENF,       DisplayWords::WORD_NACH, DisplayWords::WORD_HALB}},          // 35
+        {HOUR_MODE_NO_FULL_HOUR, 1u, {DisplayWords::WORD_ZEHN,        DisplayWords::WORD_NACH, DisplayWords::WORD_HALB}},          // 40
+        {HOUR_MODE_NO_FULL_HOUR, 1u, {DisplayWords::WORD_VIERTEL,     DisplayWords::WORD_VOR,  DisplayWords::WORD_NONE}},          // 45
+        {HOUR_MODE_NO_FULL_HOUR, 1u, {DisplayWords::WORD_ZEHN,        DisplayWords::WORD_VOR,  DisplayWords::WORD_NONE}},          // 50
+        {HOUR_MODE_NO_FULL_HOUR, 1u, {DisplayWords::WORD_FUENF,       DisplayWords::WORD_VOR,  DisplayWords::WORD_NONE}},          // 55
     },
-    {                                                                                                                             // ClockMinutesTable[1][] = OSSI
-        {HOUR_MODE_FULL_HOUR,    0, {DisplayWords::WORD_NONE,        DisplayWords::WORD_NONE, DisplayWords::WORD_NONE}},          // 00
-        {HOUR_MODE_NO_FULL_HOUR, 0, {DisplayWords::WORD_FUENF,       DisplayWords::WORD_NACH, DisplayWords::WORD_NONE}},          // 05
-        {HOUR_MODE_NO_FULL_HOUR, 0, {DisplayWords::WORD_ZEHN,        DisplayWords::WORD_NACH, DisplayWords::WORD_NONE}},          // 10
-        {HOUR_MODE_NO_FULL_HOUR, 1, {DisplayWords::WORD_VIERTEL,     DisplayWords::WORD_NONE, DisplayWords::WORD_NONE}},          // 45
-        {HOUR_MODE_NO_FULL_HOUR, 1, {DisplayWords::WORD_ZEHN,        DisplayWords::WORD_VOR,  DisplayWords::WORD_HALB}},          // 20
-        {HOUR_MODE_NO_FULL_HOUR, 1, {DisplayWords::WORD_FUENF,       DisplayWords::WORD_VOR,  DisplayWords::WORD_HALB}},          // 25
-        {HOUR_MODE_NO_FULL_HOUR, 1, {DisplayWords::WORD_HALB,        DisplayWords::WORD_NONE, DisplayWords::WORD_NONE}},          // 30
-        {HOUR_MODE_NO_FULL_HOUR, 1, {DisplayWords::WORD_FUENF,       DisplayWords::WORD_NACH, DisplayWords::WORD_HALB}},          // 35
-        {HOUR_MODE_NO_FULL_HOUR, 1, {DisplayWords::WORD_ZEHN,        DisplayWords::WORD_NACH, DisplayWords::WORD_HALB}},          // 40
-        {HOUR_MODE_NO_FULL_HOUR, 1, {DisplayWords::WORD_DREIVIERTEL, DisplayWords::WORD_NONE, DisplayWords::WORD_NONE}},          // 15
-        {HOUR_MODE_NO_FULL_HOUR, 1, {DisplayWords::WORD_ZEHN,        DisplayWords::WORD_VOR,  DisplayWords::WORD_NONE}},          // 50
-        {HOUR_MODE_NO_FULL_HOUR, 1, {DisplayWords::WORD_FUENF,       DisplayWords::WORD_VOR,  DisplayWords::WORD_NONE}},          // 55
+    {                                                                                                                              // ClockMinutesTable[1][] = OSSI
+        {HOUR_MODE_FULL_HOUR,    0u, {DisplayWords::WORD_NONE,        DisplayWords::WORD_NONE, DisplayWords::WORD_NONE}},          // 00
+        {HOUR_MODE_NO_FULL_HOUR, 0u, {DisplayWords::WORD_FUENF,       DisplayWords::WORD_NACH, DisplayWords::WORD_NONE}},          // 05
+        {HOUR_MODE_NO_FULL_HOUR, 0u, {DisplayWords::WORD_ZEHN,        DisplayWords::WORD_NACH, DisplayWords::WORD_NONE}},          // 10
+        {HOUR_MODE_NO_FULL_HOUR, 1u, {DisplayWords::WORD_VIERTEL,     DisplayWords::WORD_NONE, DisplayWords::WORD_NONE}},          // 45
+        {HOUR_MODE_NO_FULL_HOUR, 1u, {DisplayWords::WORD_ZEHN,        DisplayWords::WORD_VOR,  DisplayWords::WORD_HALB}},          // 20
+        {HOUR_MODE_NO_FULL_HOUR, 1u, {DisplayWords::WORD_FUENF,       DisplayWords::WORD_VOR,  DisplayWords::WORD_HALB}},          // 25
+        {HOUR_MODE_NO_FULL_HOUR, 1u, {DisplayWords::WORD_HALB,        DisplayWords::WORD_NONE, DisplayWords::WORD_NONE}},          // 30
+        {HOUR_MODE_NO_FULL_HOUR, 1u, {DisplayWords::WORD_FUENF,       DisplayWords::WORD_NACH, DisplayWords::WORD_HALB}},          // 35
+        {HOUR_MODE_NO_FULL_HOUR, 1u, {DisplayWords::WORD_ZEHN,        DisplayWords::WORD_NACH, DisplayWords::WORD_HALB}},          // 40
+        {HOUR_MODE_NO_FULL_HOUR, 1u, {DisplayWords::WORD_DREIVIERTEL, DisplayWords::WORD_NONE, DisplayWords::WORD_NONE}},          // 15
+        {HOUR_MODE_NO_FULL_HOUR, 1u, {DisplayWords::WORD_ZEHN,        DisplayWords::WORD_VOR,  DisplayWords::WORD_NONE}},          // 50
+        {HOUR_MODE_NO_FULL_HOUR, 1u, {DisplayWords::WORD_FUENF,       DisplayWords::WORD_VOR,  DisplayWords::WORD_NONE}},          // 55
     },
-    {                                                                                                                             // ClockMinutesTable[2][] = RHEIN-RUHR
-        {HOUR_MODE_FULL_HOUR,    0, {DisplayWords::WORD_NONE,        DisplayWords::WORD_NONE, DisplayWords::WORD_NONE}},          // 00
-        {HOUR_MODE_NO_FULL_HOUR, 0, {DisplayWords::WORD_FUENF,       DisplayWords::WORD_NACH, DisplayWords::WORD_NONE}},          // 05
-        {HOUR_MODE_NO_FULL_HOUR, 0, {DisplayWords::WORD_ZEHN,        DisplayWords::WORD_NACH, DisplayWords::WORD_NONE}},          // 10
-        {HOUR_MODE_NO_FULL_HOUR, 0, {DisplayWords::WORD_VIERTEL,     DisplayWords::WORD_NACH, DisplayWords::WORD_NONE}},          // 15
-        {HOUR_MODE_NO_FULL_HOUR, 0, {DisplayWords::WORD_ZWANZIG,     DisplayWords::WORD_NACH, DisplayWords::WORD_NONE}},          // 20
-        {HOUR_MODE_NO_FULL_HOUR, 1, {DisplayWords::WORD_FUENF,       DisplayWords::WORD_VOR,  DisplayWords::WORD_HALB}},          // 25
-        {HOUR_MODE_NO_FULL_HOUR, 1, {DisplayWords::WORD_HALB,        DisplayWords::WORD_NONE, DisplayWords::WORD_NONE}},          // 30
-        {HOUR_MODE_NO_FULL_HOUR, 1, {DisplayWords::WORD_FUENF,       DisplayWords::WORD_NACH, DisplayWords::WORD_HALB}},          // 35
-        {HOUR_MODE_NO_FULL_HOUR, 1, {DisplayWords::WORD_ZWANZIG,     DisplayWords::WORD_VOR,  DisplayWords::WORD_NONE}},          // 40
-        {HOUR_MODE_NO_FULL_HOUR, 1, {DisplayWords::WORD_VIERTEL,     DisplayWords::WORD_VOR,  DisplayWords::WORD_NONE}},          // 45
-        {HOUR_MODE_NO_FULL_HOUR, 1, {DisplayWords::WORD_ZEHN,        DisplayWords::WORD_VOR,  DisplayWords::WORD_NONE}},          // 50
-        {HOUR_MODE_NO_FULL_HOUR, 1, {DisplayWords::WORD_FUENF,       DisplayWords::WORD_VOR,  DisplayWords::WORD_NONE}},          // 55
+    {                                                                                                                              // ClockMinutesTable[2][] = RHEIN-RUHR
+        {HOUR_MODE_FULL_HOUR,    0u, {DisplayWords::WORD_NONE,        DisplayWords::WORD_NONE, DisplayWords::WORD_NONE}},          // 00
+        {HOUR_MODE_NO_FULL_HOUR, 0u, {DisplayWords::WORD_FUENF,       DisplayWords::WORD_NACH, DisplayWords::WORD_NONE}},          // 05
+        {HOUR_MODE_NO_FULL_HOUR, 0u, {DisplayWords::WORD_ZEHN,        DisplayWords::WORD_NACH, DisplayWords::WORD_NONE}},          // 10
+        {HOUR_MODE_NO_FULL_HOUR, 0u, {DisplayWords::WORD_VIERTEL,     DisplayWords::WORD_NACH, DisplayWords::WORD_NONE}},          // 15
+        {HOUR_MODE_NO_FULL_HOUR, 0u, {DisplayWords::WORD_ZWANZIG,     DisplayWords::WORD_NACH, DisplayWords::WORD_NONE}},          // 20
+        {HOUR_MODE_NO_FULL_HOUR, 1u, {DisplayWords::WORD_FUENF,       DisplayWords::WORD_VOR,  DisplayWords::WORD_HALB}},          // 25
+        {HOUR_MODE_NO_FULL_HOUR, 1u, {DisplayWords::WORD_HALB,        DisplayWords::WORD_NONE, DisplayWords::WORD_NONE}},          // 30
+        {HOUR_MODE_NO_FULL_HOUR, 1u, {DisplayWords::WORD_FUENF,       DisplayWords::WORD_NACH, DisplayWords::WORD_HALB}},          // 35
+        {HOUR_MODE_NO_FULL_HOUR, 1u, {DisplayWords::WORD_ZWANZIG,     DisplayWords::WORD_VOR,  DisplayWords::WORD_NONE}},          // 40
+        {HOUR_MODE_NO_FULL_HOUR, 1u, {DisplayWords::WORD_VIERTEL,     DisplayWords::WORD_VOR,  DisplayWords::WORD_NONE}},          // 45
+        {HOUR_MODE_NO_FULL_HOUR, 1u, {DisplayWords::WORD_ZEHN,        DisplayWords::WORD_VOR,  DisplayWords::WORD_NONE}},          // 50
+        {HOUR_MODE_NO_FULL_HOUR, 1u, {DisplayWords::WORD_FUENF,       DisplayWords::WORD_VOR,  DisplayWords::WORD_NONE}},          // 55
     },
-    {                                                                                                                             // ClockMinutesTable[3][] = SCHWABEN
-        {HOUR_MODE_FULL_HOUR,    0, {DisplayWords::WORD_NONE,        DisplayWords::WORD_NONE, DisplayWords::WORD_NONE}},          // 00
-        {HOUR_MODE_NO_FULL_HOUR, 0, {DisplayWords::WORD_FUENF,       DisplayWords::WORD_NACH, DisplayWords::WORD_NONE}},          // 05
-        {HOUR_MODE_NO_FULL_HOUR, 0, {DisplayWords::WORD_ZEHN,        DisplayWords::WORD_NACH, DisplayWords::WORD_NONE}},          // 10
-        {HOUR_MODE_NO_FULL_HOUR, 1, {DisplayWords::WORD_VIERTEL,     DisplayWords::WORD_NONE, DisplayWords::WORD_NONE}},          // 45
-        {HOUR_MODE_NO_FULL_HOUR, 0, {DisplayWords::WORD_ZWANZIG,     DisplayWords::WORD_NACH, DisplayWords::WORD_NONE}},          // 20
-        {HOUR_MODE_NO_FULL_HOUR, 1, {DisplayWords::WORD_FUENF,       DisplayWords::WORD_VOR,  DisplayWords::WORD_HALB}},          // 25
-        {HOUR_MODE_NO_FULL_HOUR, 1, {DisplayWords::WORD_HALB,        DisplayWords::WORD_NONE, DisplayWords::WORD_NONE}},          // 30
-        {HOUR_MODE_NO_FULL_HOUR, 1, {DisplayWords::WORD_FUENF,       DisplayWords::WORD_NACH, DisplayWords::WORD_HALB}},          // 35
-        {HOUR_MODE_NO_FULL_HOUR, 1, {DisplayWords::WORD_ZWANZIG,     DisplayWords::WORD_VOR,  DisplayWords::WORD_NONE}},          // 40
-        {HOUR_MODE_NO_FULL_HOUR, 1, {DisplayWords::WORD_DREIVIERTEL, DisplayWords::WORD_NONE, DisplayWords::WORD_NONE}},          // 15
-        {HOUR_MODE_NO_FULL_HOUR, 1, {DisplayWords::WORD_ZEHN,        DisplayWords::WORD_VOR,  DisplayWords::WORD_NONE}},          // 50
-        {HOUR_MODE_NO_FULL_HOUR, 1, {DisplayWords::WORD_FUENF,       DisplayWords::WORD_VOR,  DisplayWords::WORD_NONE}},          // 55
+    {                                                                                                                              // ClockMinutesTable[3][] = SCHWABEN
+        {HOUR_MODE_FULL_HOUR,    0u, {DisplayWords::WORD_NONE,        DisplayWords::WORD_NONE, DisplayWords::WORD_NONE}},          // 00
+        {HOUR_MODE_NO_FULL_HOUR, 0u, {DisplayWords::WORD_FUENF,       DisplayWords::WORD_NACH, DisplayWords::WORD_NONE}},          // 05
+        {HOUR_MODE_NO_FULL_HOUR, 0u, {DisplayWords::WORD_ZEHN,        DisplayWords::WORD_NACH, DisplayWords::WORD_NONE}},          // 10
+        {HOUR_MODE_NO_FULL_HOUR, 1u, {DisplayWords::WORD_VIERTEL,     DisplayWords::WORD_NONE, DisplayWords::WORD_NONE}},          // 45
+        {HOUR_MODE_NO_FULL_HOUR, 0u, {DisplayWords::WORD_ZWANZIG,     DisplayWords::WORD_NACH, DisplayWords::WORD_NONE}},          // 20
+        {HOUR_MODE_NO_FULL_HOUR, 1u, {DisplayWords::WORD_FUENF,       DisplayWords::WORD_VOR,  DisplayWords::WORD_HALB}},          // 25
+        {HOUR_MODE_NO_FULL_HOUR, 1u, {DisplayWords::WORD_HALB,        DisplayWords::WORD_NONE, DisplayWords::WORD_NONE}},          // 30
+        {HOUR_MODE_NO_FULL_HOUR, 1u, {DisplayWords::WORD_FUENF,       DisplayWords::WORD_NACH, DisplayWords::WORD_HALB}},          // 35
+        {HOUR_MODE_NO_FULL_HOUR, 1u, {DisplayWords::WORD_ZWANZIG,     DisplayWords::WORD_VOR,  DisplayWords::WORD_NONE}},          // 40
+        {HOUR_MODE_NO_FULL_HOUR, 1u, {DisplayWords::WORD_DREIVIERTEL, DisplayWords::WORD_NONE, DisplayWords::WORD_NONE}},          // 15
+        {HOUR_MODE_NO_FULL_HOUR, 1u, {DisplayWords::WORD_ZEHN,        DisplayWords::WORD_VOR,  DisplayWords::WORD_NONE}},          // 50
+        {HOUR_MODE_NO_FULL_HOUR, 1u, {DisplayWords::WORD_FUENF,       DisplayWords::WORD_VOR,  DisplayWords::WORD_NONE}},          // 55
     }
 };
 
@@ -143,7 +143,7 @@ const Clock::MinutesType Clock::MinutesTable[][CLOCK_NUMBER_OF_MINUTE_STEPS] PRO
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-Clock::Clock(ModesType sMode)
+Clock::Clock(ModeType sMode)
 {
     Mode = sMode;
 } /* Clock */
@@ -189,7 +189,7 @@ StdReturnType Clock::getClockWords(byte Hour, byte Minute, ClockWords& ClockWord
 #else
         ClockWords.setShowItIs(calculateItIs(Minute));
 #endif
-        MinutesTableElementType MinutesTableElement = getMinutesTableElement(Minute);
+        MinuteTableElementType MinutesTableElement = getMinutesTableElement(Minute);
         Hour = transform24hTo12hFormat(Hour);
         // correct the hour offset from the minutes and take care of overflow
         Hour = (Hour + MinutesTableElement.HourOffset) % CLOCK_NUMBER_OF_HOURS;
@@ -247,10 +247,10 @@ StdReturnType Clock::setClock(byte Hour, byte Minute)
         if(Display::getInstance().setWord(DisplayWords::WORD_ES) == E_NOT_OK) ReturnValue = E_NOT_OK;
         if(Display::getInstance().setWord(DisplayWords::WORD_IST) == E_NOT_OK) ReturnValue = E_NOT_OK;
     }
-    for(byte Index = 0; Index < ClockWords.getHourWords().size() && ClockWords.getHourWord(Index) != DisplayWords::WORD_NONE; Index++) {
+    for(byte Index = 0u; Index < ClockWords.getHourWords().size() && ClockWords.getHourWord(Index) != DisplayWords::WORD_NONE; Index++) {
         if(Display::getInstance().setWord(ClockWords.getHourWord(Index)) == E_NOT_OK) ReturnValue = E_NOT_OK;
     }
-    for(byte Index = 0; Index < ClockWords.getMinuteWord(Index) && ClockWords.getMinuteWord(Index) != DisplayWords::WORD_NONE; Index++) {
+    for(byte Index = 0u; Index < ClockWords.getMinuteWord(Index) && ClockWords.getMinuteWord(Index) != DisplayWords::WORD_NONE; Index++) {
         if(Display::getInstance().setWord(ClockWords.getMinuteWord(Index)) == E_NOT_OK) ReturnValue = E_NOT_OK;
     }
     return ReturnValue;
@@ -274,10 +274,10 @@ void Clock::setClockFast(byte Hour, byte Minute)
             Display::getInstance().setWordFast(DisplayWords::WORD_ES);
             Display::getInstance().setWordFast(DisplayWords::WORD_IST);
         }
-        for(byte Index = 0; Index < ClockWords.getHourWords().size() && ClockWords.getHourWord(Index) != DisplayWords::WORD_NONE; Index++) {
+        for(byte Index = 0u; Index < ClockWords.getHourWords().size() && ClockWords.getHourWord(Index) != DisplayWords::WORD_NONE; Index++) {
             Display::getInstance().setWordFast(ClockWords.getHourWord(Index));
         }
-        for(byte Index = 0; Index < ClockWords.getMinuteWord(Index) && ClockWords.getMinuteWord(Index) != DisplayWords::WORD_NONE; Index++) {
+        for(byte Index = 0u; Index < ClockWords.getMinuteWord(Index) && ClockWords.getMinuteWord(Index) != DisplayWords::WORD_NONE; Index++) {
             Display::getInstance().setWordFast(ClockWords.getMinuteWord(Index));
         }
     }
