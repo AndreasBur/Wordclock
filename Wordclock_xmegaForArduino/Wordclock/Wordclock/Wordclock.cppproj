@@ -557,11 +557,11 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="inc" />
-    <Folder Include="inc\Animation\Clock" />
+    <Folder Include="inc\Animation\" />
+    <Folder Include="inc\Animation\Clock\" />
     <Folder Include="inc\Communication\MessageParser" />
     <Folder Include="inc\Display" />
     <Folder Include="inc\Clock" />
-    <Folder Include="inc\Animation" />
     <Folder Include="inc\Font" />
     <Folder Include="inc\GammaCorrection" />
     <Folder Include="inc\BH1750" />

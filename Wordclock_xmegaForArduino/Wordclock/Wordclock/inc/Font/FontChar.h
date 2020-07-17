@@ -73,10 +73,10 @@ class FontChar
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-	// get methods
+    // get methods
     byte getWidth() const { return Width; }
 
-	// set methods
+    // set methods
     void setWidth(byte sWidth) { Width = sWidth; }
 
     // methods
@@ -137,7 +137,7 @@ template <typename RowType, byte RowsSize> class FontCharHorizontal : public Fon
     }
     void setRows(RowsType sRows) { Rows = sRows; }
 
-	// methods
+    // methods
 
 };
 
@@ -196,7 +196,7 @@ template <typename ColumnType, byte ColumnsSize> class FontCharVertical : public
     }
     void setColumns(ColumnsType sColumns) { Columns = sColumns; }
 
-	// methods
+    // methods
 
 };
 

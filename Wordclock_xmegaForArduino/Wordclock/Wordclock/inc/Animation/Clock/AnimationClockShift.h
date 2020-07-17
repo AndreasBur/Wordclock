@@ -35,11 +35,11 @@
 
 
 #if (ANIMATION_CLOCK_SHIFT_HORIZONTAL == STD_OFF && ANIMATION_CLOCK_SHIFT_VERTICAL == STD_OFF)
-#error "AnimationClockShift: Exactly one switch must be set to STD_ON"
+# error "AnimationClockShift: Exactly one switch must be set to STD_ON"
 #endif
 
 #if (ANIMATION_CLOCK_SHIFT_HORIZONTAL == STD_ON && ANIMATION_CLOCK_SHIFT_VERTICAL == STD_ON)
-#error "AnimationClockShift: ANIMATION_CLOCK_SHIFT_HORIZONTAL or ANIMATION_CLOCK_SHIFT_VERTICAL has to be STD_ON, but not both"
+# error "AnimationClockShift: ANIMATION_CLOCK_SHIFT_HORIZONTAL or ANIMATION_CLOCK_SHIFT_VERTICAL has to be STD_ON, but not both"
 #endif
 
 
@@ -90,12 +90,12 @@ class AnimationClockShift : public AnimationClockCommon
     AnimationClockShift();
     ~AnimationClockShift();
 
-	// get methods
+    // get methods
 
 
-	// set methods
+    // set methods
 
-	// methods
+    // methods
     void init();
     StdReturnType setClock(byte, byte);
     void task();

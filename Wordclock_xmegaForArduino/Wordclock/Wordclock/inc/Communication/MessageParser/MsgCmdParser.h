@@ -23,7 +23,7 @@
 #include "StandardTypes.h"
 #include "Arduino.h"
 #include "Message.h"
-#include "MsgCmdDisplayColorParser.h"
+#include "ErrorMessage.h"
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
@@ -49,39 +49,39 @@ class MsgCmdParser
 ******************************************************************************************************************************************************/
   public:
     enum CommandType {
-		COMMAND_NONE,
-		COMMAND_DISPLAY_MODE,
-		COMMAND_DISPLAY_COLOR,
-		COMMAND_DISPLAY_BRIGHTNESS,
-		COMMAND_TIME,
-		COMMAND_DATE
-	};
+        COMMAND_NONE,
+        COMMAND_DISPLAY_MODE,
+        COMMAND_DISPLAY_COLOR,
+        COMMAND_DISPLAY_BRIGHTNESS,
+        COMMAND_TIME,
+        COMMAND_DATE
+    };
   
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
-  	static const char CommandParameterDelimiter{' '};
+    static const char CommandParameterDelimiter{' '};
     const Message& IncomingMessage;
-	ErrorMessage Error;
+    ErrorMessage Error;
   
-  	//private functions
-	void sendAnswer(CommandType Command) const {
-		Serial.print(Command);
-		Serial.println(CommandParameterDelimiter);
-	}
-	
-	CommandType getCommand() const {
-		return static_cast<CommandType>(atoi(IncomingMessage.getMessage()));
-	}
+    //private functions
+    void sendAnswer(CommandType Command) const {
+        Serial.print(Command);
+        Serial.println(CommandParameterDelimiter);
+    }
+    
+    CommandType getCommand() const {
+        return static_cast<CommandType>(atoi(IncomingMessage.getMessage()));
+    }
 
-	const char* getParameter() const {
-		const char* message = IncomingMessage.getMessage();
-		size_t valuePos = IncomingMessage.find(CommandParameterDelimiter);
+    const char* getParameter() const {
+        const char* message = IncomingMessage.getMessage();
+        size_t valuePos = IncomingMessage.find(CommandParameterDelimiter);
 
-		if(valuePos == Message::npos) { return nullptr; }
-		else { return &message[valuePos]; }
-	}
+        if(valuePos == Message::npos) { return nullptr; }
+        else { return &message[valuePos]; }
+    }
   
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
@@ -90,13 +90,13 @@ class MsgCmdParser
     MsgCmdParser(const Message&);
     ~MsgCmdParser();
 
-	// get methods
+    // get methods
 
 
-	// set methods
+    // set methods
 
-	// methods
-	void parse();
+    // methods
+    void parse();
 
 };
 

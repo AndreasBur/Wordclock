@@ -47,28 +47,28 @@ class MsgParameter
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-  	enum ArgumentTypeType {
-	  	ARGUMENT_TYPE_NONE,
-	  	ARGUMENT_TYPE_STRING,
-	  	ARGUMENT_TYPE_CHAR,
-	  	ARGUMENT_TYPE_UINT8,
-	  	ARGUMENT_TYPE_UINT16,
-	  	ARGUMENT_TYPE_UINT32,
-	  	ARGUMENT_TYPE_UINT64,
-	  	ARGUMENT_TYPE_INT8,
-	  	ARGUMENT_TYPE_INT16,
-	  	ARGUMENT_TYPE_INT32,
-	  	ARGUMENT_TYPE_INT64,
-	  	ARGUMENT_TYPE_FLOAT,
-	  	ARGUMENT_TYPE_DOUBLE
-  	};
+    enum ArgumentTypeType {
+        ARGUMENT_TYPE_NONE,
+        ARGUMENT_TYPE_STRING,
+        ARGUMENT_TYPE_CHAR,
+        ARGUMENT_TYPE_UINT8,
+        ARGUMENT_TYPE_UINT16,
+        ARGUMENT_TYPE_UINT32,
+        ARGUMENT_TYPE_UINT64,
+        ARGUMENT_TYPE_INT8,
+        ARGUMENT_TYPE_INT16,
+        ARGUMENT_TYPE_INT32,
+        ARGUMENT_TYPE_INT64,
+        ARGUMENT_TYPE_FLOAT,
+        ARGUMENT_TYPE_DOUBLE
+    };
   
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
-	char OptionShortName;
-	ArgumentTypeType ArgumentType;
+    char OptionShortName;
+    ArgumentTypeType ArgumentType;
 
 /******************************************************************************************************************************************************
  *  P R O T E C T E D   D A T A   A N D   F U N C T I N O N S
@@ -79,22 +79,22 @@ class MsgParameter
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-	constexpr MsgParameter(char sOptionShortName, ArgumentTypeType sArgumentType)
-	: OptionShortName(sOptionShortName), ArgumentType(sArgumentType) {
+    constexpr MsgParameter(char sOptionShortName, ArgumentTypeType sArgumentType)
+    : OptionShortName(sOptionShortName), ArgumentType(sArgumentType) {
 
-	}
-	
-	constexpr MsgParameter() : OptionShortName(' '), ArgumentType(ARGUMENT_TYPE_NONE) {
+    }
+    
+    constexpr MsgParameter() : OptionShortName(' '), ArgumentType(ARGUMENT_TYPE_NONE) {
 
-	}
-	
-	// get methods
+    }
+    
+    // get methods
     byte getOptionShortName() const { return OptionShortName; }
-	ArgumentTypeType getArgumentType() const { return ArgumentType; }
+    ArgumentTypeType getArgumentType() const { return ArgumentType; }
 
-	// set methods
+    // set methods
     void setOptionShortName(byte sOptionShortName) { OptionShortName = sOptionShortName; }
-	void setArgumentType(ArgumentTypeType sArgumentType) { ArgumentType = sArgumentType; }
+    void setArgumentType(ArgumentTypeType sArgumentType) { ArgumentType = sArgumentType; }
 
     // methods
 };

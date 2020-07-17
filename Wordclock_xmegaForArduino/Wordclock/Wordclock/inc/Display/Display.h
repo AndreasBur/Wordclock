@@ -100,7 +100,7 @@ class Display
 
     /* mapping to underlying hardware */
     using PixelColorType = WS2812::PixelType;
-	using ColorType = NeoPixel::ColorType;
+    using ColorType = NeoPixel::ColorType;
     using Stripe = WS2812;
     using WordIdType = DisplayWords::WordIdType;
 
@@ -125,30 +125,30 @@ class Display
     Display(PixelColorType);
     Display(byte, byte, byte);
     ~Display();
-	
+    
     byte transformToSerpentine(byte, byte) const;
     byte transformToSerpentine(byte) const;
 
 #if (DISPLAY_USE_WS2812_DIMMING == STD_OFF)
     byte dimmColor(byte Color) const { 
-		byte dimmedColor = (Color * Brightness) >> 8u;
-		if(dimmedColor == 0u) return 1u;
-		else return dimmedColor;
-	}
+        byte dimmedColor = (Color * Brightness) >> 8u;
+        if(dimmedColor == 0u) return 1u;
+        else return dimmedColor;
+    }
 #endif
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-  	static Display& getInstance();
+    static Display& getInstance();
 
     // get methods
     PixelColorType getColor() const { return Color; }
-	ColorType getColorRed() const { return Color.Red; }
-	ColorType getColorGreen() const { return Color.Green; }
-	ColorType getColorBlue() const { return Color.Blue; }
-	
+    ColorType getColorRed() const { return Color.Red; }
+    ColorType getColorGreen() const { return Color.Green; }
+    ColorType getColorBlue() const { return Color.Blue; }
+    
     StateType getState() const { return State; }
 
 #if (DISPLAY_USE_WS2812_DIMMING == STD_ON)
@@ -160,9 +160,9 @@ class Display
     // set methods
     void setColor(PixelColorType sColor) { Color = sColor; }
     void setColor(ColorType Red, byte Green, ColorType Blue) { Color.Red = Red; Color.Green = Green; Color.Blue = Blue; }
-	void setColorRed(ColorType Red) { Color.Red = Red; }
-	void setColorGreen(ColorType Green) { Color.Green = Green; }
-	void setColorBlue(ColorType Blue) { Color.Blue = Blue;}
+    void setColorRed(ColorType Red) { Color.Red = Red; }
+    void setColorGreen(ColorType Green) { Color.Green = Green; }
+    void setColorBlue(ColorType Blue) { Color.Blue = Blue;}
 
 #if (DISPLAY_USE_WS2812_DIMMING == STD_ON)
     void setBrightness(byte Brightness) { Pixels.setBrightness(Brightness, true); }
@@ -225,8 +225,8 @@ class Display
     // methods
     void init();
     void show() { Pixels.show(); }
-	void enable() { Pixels.enablePixels(); }
-	void disable() { Pixels.disablePixels(); }
+    void enable() { Pixels.enablePixels(); }
+    void disable() { Pixels.disablePixels(); }
     void test();
     void clear() { Pixels.clearPixels(); }
     void indexToColumnAndRow(byte Index, byte& Column, byte& Row) const { Row = Index / DISPLAY_NUMBER_OF_COLUMNS; Column = Index % DISPLAY_NUMBER_OF_COLUMNS; }

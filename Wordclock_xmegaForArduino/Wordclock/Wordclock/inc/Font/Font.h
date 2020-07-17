@@ -64,7 +64,7 @@ template <typename FontCharType, size_t FontTableSize> class Font
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
-	const FontTableType& FontTable;
+    const FontTableType& FontTable;
   
     // functions
     FontTableElementType getFontTableElement(byte Index) const {
@@ -72,11 +72,11 @@ template <typename FontCharType, size_t FontTableSize> class Font
         memcpy_P(&fontTableElement, &FontTable[Index], sizeof(FontTableElementType));
         return fontTableElement;
     }
-	
+    
 /******************************************************************************************************************************************************
  *  P R O T E C T E D   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
-  protected:	
+  protected:    
 
 
 /******************************************************************************************************************************************************
@@ -86,12 +86,12 @@ template <typename FontCharType, size_t FontTableSize> class Font
     constexpr Font(const FontTableType& sFontTable) : FontTable(sFontTable) {
 
     }
-	
-	~Font() {
+    
+    ~Font() {
 
-	}
+    }
 
-	// get methods
+    // get methods
     //virtual Orientation getOrientation() const = 0;
     //virtual byte getWidth() const = 0;
     //virtual byte getHeight() const = 0;
@@ -117,9 +117,9 @@ template <typename FontCharType, size_t FontTableSize> class Font
         }
     }
 
-	// set methods
+    // set methods
 
-	// methods
+    // methods
 
 };
 

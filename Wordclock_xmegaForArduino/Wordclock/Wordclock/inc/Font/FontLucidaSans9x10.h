@@ -64,22 +64,22 @@ class FontLucidaSans9x10 : public Font<FontCharVertical<uint16_t, FONT_LUCIDA_SA
 ******************************************************************************************************************************************************/
   public:
     FontLucidaSans9x10() : Font(FontTable) {
-		
-	}
-	
+        
+    }
+    
     ~FontLucidaSans9x10(){
-		
-	}
+        
+    }
 
-	// get methods
+    // get methods
     byte getWidth() const { return FONT_LUCIDA_SANS_9X10_WIDTH; }
     byte getHeight() const { return FONT_LUCIDA_SANS_9X10_HEIGHT; }
     Orientation getOrientation() const { return Orientation::ORIENTATION_VERTICAL; }
-	const FontTableType& getFontTable() const { return FontTable; }
-				
-	// set methods
+    const FontTableType& getFontTable() const { return FontTable; }
+                
+    // set methods
 
-	// methods
+    // methods
 
 };
 

@@ -81,6 +81,11 @@ class Clock
         byte HourOffset;
         ClockWords::MinutesWordsType Words;
     };
+    
+    //struct TimeType {
+        //byte Hour : 5;
+        //byte Minute : 6;
+    //};
 
     using HourType = ClockWords::HourWordsType;
     using ClockWordsListType = ClockWords::WordsListType;
@@ -99,10 +104,10 @@ class Clock
     static const MinuteType MinutesTable[][CLOCK_NUMBER_OF_MINUTE_STEPS];
     
     // functions
-	Clock(ModeType);
+    Clock(ModeType);
     ~Clock();
-	
-	MinuteTableElementType getMinutesTableElement(byte Minute) const {
+    
+    MinuteTableElementType getMinutesTableElement(byte Minute) const {
         MinuteTableElementType MinutesTableElement;
         memcpy_P(&MinutesTableElement, &MinutesTable[Mode][Minute / CLOCK_MINUTE_STEP_IN_MINUTES], sizeof(MinuteType));
         return MinutesTableElement;
@@ -131,8 +136,8 @@ class Clock
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-  	static Clock& getInstance();
-	  
+    static Clock& getInstance();
+      
     // get methods
     ModeType getMode() const { return Mode; }
     StdReturnType getClockWords(byte, byte, ClockWords&) const;
@@ -145,6 +150,7 @@ class Clock
     StdReturnType setClock(byte, byte);
     void setClockFast(byte, byte);
     void show() { Display::getInstance().show(); }
+    void refresh(byte Hour, byte Minute) { setClock(Hour, Minute); show(); }
 };
 
 

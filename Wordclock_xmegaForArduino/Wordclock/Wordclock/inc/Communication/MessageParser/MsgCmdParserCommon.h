@@ -60,12 +60,12 @@ class MsgCmdParserCommon
     MsgCmdParserCommon();
     ~MsgCmdParserCommon();
 
-	// get methods
+    // get methods
 
 
-	// set methods
+    // set methods
 
-	// methods
+    // methods
 };
 
 #endif

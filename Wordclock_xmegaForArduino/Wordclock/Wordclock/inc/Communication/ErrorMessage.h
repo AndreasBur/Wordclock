@@ -47,12 +47,12 @@ class ErrorMessage
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-  	enum ErrorType {
-	  	ERROR_MESSAGE_TOO_LONG,
-		ERROR_WRONG_COMMAND,
-		ERROR_VALUE_OUT_OF_BOUNCE,
-		ERROR_NO_VALUE_GIVEN
-  	};
+    enum ErrorType {
+        ERROR_MESSAGE_TOO_LONG,
+        ERROR_WRONG_COMMAND,
+        ERROR_VALUE_OUT_OF_BOUNCE,
+        ERROR_NO_VALUE_GIVEN
+    };
   
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
@@ -64,20 +64,20 @@ class ErrorMessage
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-	constexpr ErrorMessage() {}
-	~ErrorMessage() {}
-		
-	// get methods
+    constexpr ErrorMessage() {}
+    ~ErrorMessage() {}
+        
+    // get methods
 
 
-	// set methods
+    // set methods
 
-	// methods
+    // methods
     void send(ErrorType Error) const {
-		Serial.print(F("Error: "));
-		Serial.print(Error);
-		Serial.println(); 
-	}
+        Serial.print(F("Error: "));
+        Serial.print(Error);
+        Serial.println(); 
+    }
 };
 
 #endif

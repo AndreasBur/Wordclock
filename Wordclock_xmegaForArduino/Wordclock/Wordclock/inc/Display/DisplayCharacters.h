@@ -195,7 +195,7 @@ class DisplayCharacters
     constexpr DisplayCharacters() {}
     ~DisplayCharacters();
 
-	// get methods fast
+    // get methods fast
     char getCharacterFast(byte Column, byte Row) const { return getDisplayCharactersTableElement(Column, Row); }
     char getCharacterFast(byte Index) const { return getDisplayCharactersTableElement(Index); }
     char getCharacterFast(CharacterIdType CharacterId) const { return getDisplayCharactersTableElement(CharacterId); }
@@ -205,9 +205,9 @@ class DisplayCharacters
     StdReturnType getCharacter(byte, char&) const;
     StdReturnType getCharacter(CharacterIdType, char&) const;
 
-	// set methods
+    // set methods
 
-	// methods
+    // methods
     void indexToColumnAndRow(byte Index, byte& Row, byte& Column) const { Row = Index / DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS; Column = Index % DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS; }
     byte columnAndRowToIndex(byte Column, byte Row) const { return (Row * DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS) + Column; }
 

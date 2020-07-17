@@ -56,7 +56,7 @@ class AnimationClockFlicker : public AnimationClockCommon
   private:
     byte Minute;
     byte Hour;
-    boolean isClockSet;
+    boolean IsClockSet;
     byte FlickerCounter;
 
     // functions
@@ -71,12 +71,12 @@ class AnimationClockFlicker : public AnimationClockCommon
     AnimationClockFlicker();
     ~AnimationClockFlicker();
 
-	// get methods
+    // get methods
 
 
-	// set methods
+    // set methods
 
-	// methods
+    // methods
     void init();
     StdReturnType setClock(byte, byte);
     void task();

@@ -95,12 +95,12 @@ class AnimationClockCube : public AnimationClockCommon
     AnimationClockCube();
     ~AnimationClockCube();
 
-	// get methods
+    // get methods
 
 
-	// set methods
+    // set methods
 
-	// methods
+    // methods
     void init();
     StdReturnType setClock(byte, byte);
     void task();

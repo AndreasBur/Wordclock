@@ -34,7 +34,7 @@
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
 /* AnimationFont configuration parameter */
-#define ANIMATION_FONT_TASK_CYCLE_INIT_VALUE			10u
+#define ANIMATION_FONT_TASK_CYCLE_INIT_VALUE            10u
 #define ANIMATION_FONT_SUPPORT_FONT_5X8              STD_ON
 #define ANIMATION_FONT_SUPPORT_FONT_7X9              STD_ON
 #define ANIMATION_FONT_SUPPORT_FONT_7X10             STD_ON
@@ -75,8 +75,8 @@ class AnimationFont
     };
 
     enum FontType {
-		FONT_NONE,
-		FONT_5X8,
+        FONT_NONE,
+        FONT_5X8,
         FONT_7X9,
         FONT_7X10,
         FONT_9X10,
@@ -97,24 +97,24 @@ class AnimationFont
 ******************************************************************************************************************************************************/
   private:
     Transformation wcTransformation;
-	byte TaskCycle;
+    byte TaskCycle;
     ShiftType Shift;
     StateType State;
 
 #if(ANIMATION_FONT_SUPPORT_FONT_5X8 == STD_ON)
-	FontSprite5x8 Font5x8;
+    FontSprite5x8 Font5x8;
 #endif
 #if(ANIMATION_FONT_SUPPORT_FONT_7X9 == STD_ON)
-	FontCourierNew7x9 Font7x9;
+    FontCourierNew7x9 Font7x9;
 #endif
 #if(ANIMATION_FONT_SUPPORT_FONT_7X10 == STD_ON)
-	FontCourierNew7x10 Font7x10;
+    FontCourierNew7x10 Font7x10;
 #endif
 #if(ANIMATION_FONT_SUPPORT_FONT_9X10 == STD_ON)
-	FontLucidaSans9x10 Font9x10;
+    FontLucidaSans9x10 Font9x10;
 #endif
 #if(ANIMATION_FONT_SUPPORT_FONT_10X10 == STD_ON)
-	FontTahoma10x10 Font10x10;
+    FontTahoma10x10 Font10x10;
 #endif
 
     // functions
@@ -142,8 +142,8 @@ class AnimationFont
     byte convertCharToFontIndexFast(char);
     void stringShiftTask();
     void charShiftTask();
-    byte getColumnCenter(FontType Font) { return (DISPLAY_NUMBER_OF_COLUMNS / 2) - (getFontWidth(Font) / 2); }
-    byte getRowCenter(FontType Font) { return (DISPLAY_NUMBER_OF_ROWS / 2) - (getFontHeight(Font) / 2); }
+    byte getColumnCenter(FontType Font) { return (DISPLAY_NUMBER_OF_COLUMNS / 2u) - (getFontWidth(Font) / 2u); }
+    byte getRowCenter(FontType Font) { return (DISPLAY_NUMBER_OF_ROWS / 2u) - (getFontHeight(Font) / 2u); }
     
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
@@ -152,14 +152,14 @@ class AnimationFont
     AnimationFont();
     ~AnimationFont();
 
-	// get methods
+    // get methods
     StateType getState() const { return State; }
-	byte getTaskCycle() const { return TaskCycle; }
+    byte getTaskCycle() const { return TaskCycle; }
 
-	// set methods
-	void setTaskCycle(byte Cycle) { TaskCycle = Cycle; }
+    // set methods
+    void setTaskCycle(byte Cycle) { TaskCycle = Cycle; }
 
-	// methods
+    // methods
     void init() {}
     void show() { Display::getInstance().show(); }
     void task();

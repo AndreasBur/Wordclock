@@ -35,7 +35,7 @@
 
 
 /* WS2812 parameter */
-#define WS2812_IS_SINGLETON							STD_ON
+#define WS2812_IS_SINGLETON                         STD_ON
 
 
 /******************************************************************************************************************************************************
@@ -128,12 +128,12 @@ class WS2812
     void dimmPixels(pPixelsType pPixels) const;
     PixelType dimmPixel(PixelType Pixel) const { return dimmPixel(Pixel.Red, Pixel.Green, Pixel.Blue); }
     PixelType dimmPixel(byte, byte, byte) const;
-	void copyNextFrameToCurrentFrameDimmed();
+    void copyNextFrameToCurrentFrameDimmed();
     
-	byte dimmColor(byte Color) const {
-	    byte dimmedColor = (Color * Brightness) >> 8u;
-	    if(dimmedColor == 0u) return 1;
-	    else return dimmedColor;
+    byte dimmColor(byte Color) const {
+        byte dimmedColor = (Color * Brightness) >> 8u;
+        if(dimmedColor == 0u) return 1;
+        else return dimmedColor;
     }
 #endif
 
@@ -141,9 +141,9 @@ class WS2812
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-	static WS2812& getInstance();
+    static WS2812& getInstance();
 
-	// get methods
+    // get methods
     StateType getState() const { return State; }
 
     StdReturnType getPixel(IndexType, PixelType&) const;
@@ -162,7 +162,7 @@ class WS2812
     PixelType getPixelDimmedFast(IndexType) const;
 #endif
 
-	// set methods
+    // set methods
     StdReturnType setPixel(IndexType, PixelType);
     StdReturnType setPixel(IndexType, byte, byte, byte);
     StdReturnType setPixelRed(IndexType, byte);
@@ -179,7 +179,7 @@ class WS2812
     void setBrightness(byte sBrightness, boolean = false);
 #endif
 
-	// methods
+    // methods
     boolean init(byte);
     void init(PortType, PortPinType);
     StdReturnType show();
@@ -188,8 +188,8 @@ class WS2812
     StdReturnType clearPixel(IndexType Index);
     void clearPixelFast(IndexType Index) { (*pNextFrame)[Index].clearPixel(); }
     void clearPixels() { for(IndexType Index = 0u; Index < WS2812_NUMBER_OF_LEDS; Index++) clearPixelFast(Index); }
-	void enablePixels() { switchPixelsBufferPointer(); show(); }
-	void disablePixels() { switchPixelsBufferPointer(); clearPixels(); startDmaTransfer(pNextFrame); };
+    void enablePixels() { switchPixelsBufferPointer(); show(); }
+    void disablePixels() { switchPixelsBufferPointer(); clearPixels(); startDmaTransfer(pNextFrame); };
 
     // friend functions
     friend void dmaIsr();

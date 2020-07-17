@@ -50,7 +50,7 @@ class NeoPixel
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-	using ColorType = byte;
+    using ColorType = byte;
   
     /* type which describes the structure of a pixel */
     struct NeoPixelType {
@@ -85,7 +85,7 @@ class NeoPixel
 
     }
 
-	// get methods
+    // get methods
     ColorType getRed() const { return Pixel[colorOffsetRed()]; }
     ColorType getBlue() const { return Pixel[colorOffsetBlue()]; }
     ColorType getGreen() const { return Pixel[colorOffsetGreen()]; }
@@ -98,7 +98,7 @@ class NeoPixel
         return NeoPixel;
     }
 
-	// set methods
+    // set methods
     void setRed(ColorType Value) { Pixel[colorOffsetRed()] = Value; }
     void setBlue(ColorType Value) { Pixel[colorOffsetBlue()] = Value; }
     void setGreen(ColorType Value) { Pixel[colorOffsetGreen()] = Value; }
@@ -115,7 +115,7 @@ class NeoPixel
          Pixel[colorOffsetGreen()] = Green;
     }
 
-	// methods
+    // methods
     void clearPixel() { setPixel(0u, 0u, 0u); }
 
 };

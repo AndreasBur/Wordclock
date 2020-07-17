@@ -70,16 +70,16 @@ class GammaCorrection
   public:
     constexpr GammaCorrection() 
     {
-		
+        
     }
 
 
-	// get methods
+    // get methods
     byte getCorrectedValue(byte ValueLinear) const { return calcGamma7CorrectionValue(ValueLinear / 2u); }
 
-	// set methods
+    // set methods
 
-	// methods
+    // methods
     
 };
 

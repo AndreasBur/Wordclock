@@ -21,7 +21,8 @@
  * I N C L U D E S
 ******************************************************************************************************************************************************/
 #include "MsgCmdParser.h"
-
+#include "MsgCmdDisplayColorParser.h"
+#include "MsgCmdClockModeParser.h"
 
 /******************************************************************************************************************************************************
  *  L O C A L   C O N S T A N T   M A C R O S 
@@ -78,7 +79,11 @@ void MsgCmdParser::parse()
 		CmdDisplayColorParser.sendAnswer();
 		sendAnswer(command);
 	} else if(COMMAND_DISPLAY_MODE) {
-		
+		MsgCmdClockModeParser CmdClockModeParser(parameter);
+		CmdClockModeParser.parse();
+		CmdClockModeParser.process();
+		CmdClockModeParser.sendAnswer();
+		sendAnswer(command);
 	} else {
 		Error.send(ErrorMessage::ERROR_WRONG_COMMAND);
 	}

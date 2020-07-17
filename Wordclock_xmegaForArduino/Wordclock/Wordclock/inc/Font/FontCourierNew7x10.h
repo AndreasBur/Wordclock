@@ -65,22 +65,22 @@ class FontCourierNew7x10 : public Font<FontCharHorizontal<byte, FONT_COURIER_NEW
 ******************************************************************************************************************************************************/
   public:
     FontCourierNew7x10() : Font(FontTable) {
-		
-	}
-	
+        
+    }
+    
     ~FontCourierNew7x10() {
-		
-	}
+        
+    }
 
-	// get methods
+    // get methods
     byte getWidth() const { return FONT_COURIER_NEW_7X10_WIDTH; }
     byte getHeight() const { return FONT_COURIER_NEW_7X10_HEIGHT; }
     Orientation getOrientation() const { return Orientation::ORIENTATION_HORIZONTAL; }
-	const FontTableType& getFontTable() const { return FontTable; }
-		
-	// set methods
+    const FontTableType& getFontTable() const { return FontTable; }
+        
+    // set methods
 
-	// methods
+    // methods
 
 };
 

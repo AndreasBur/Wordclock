@@ -251,12 +251,12 @@ static inline void writeBitGroup(VarType& Var, MaskType BitGroupMask, ValType Va
 template <typename T>
 uint8_t digitsOfNumber(T Number, unsigned Base)
 {
-	T NumberOfDigits = 0;
+    T NumberOfDigits = 0;
 
-	do { Number /= Base; NumberOfDigits++; }
-	while (Number != 0);
+    do { Number /= Base; NumberOfDigits++; }
+    while (Number != 0);
 
-	return NumberOfDigits;
+    return NumberOfDigits;
 }
 
 #endif

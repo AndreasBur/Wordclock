@@ -47,11 +47,6 @@
 /******************************************************************************************************************************************************
   Constructor of AnimationClockCommon
 ******************************************************************************************************************************************************/
-/*! \brief          AnimationClockCommon Constructor
- *  \details        Instantiation of the AnimationClockCommon library
- *
- *  \return         -
-******************************************************************************************************************************************************/
 AnimationClockCommon::AnimationClockCommon()
 {
     State = STATE_NONE;
@@ -70,11 +65,6 @@ AnimationClockCommon::~AnimationClockCommon()
 /******************************************************************************************************************************************************
   init()
 ******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
-******************************************************************************************************************************************************/
 void AnimationClockCommon::init(StateType State)
 {
     State = State;
@@ -82,18 +72,13 @@ void AnimationClockCommon::init(StateType State)
 
 
 /******************************************************************************************************************************************************
-  isPixelPartOfWord()
-******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
+  isPixelPartOfClockWords()
 ******************************************************************************************************************************************************/
 boolean AnimationClockCommon::isPixelPartOfClockWords(const ClockWords::WordsListType ClockWordsTable, byte Column, byte Row) const
 {
     DisplayWords Words;
 
-    for(uint8_t WordIndex = 0; WordIndex < ClockWordsTable.size(); WordIndex++) {
+    for(uint8_t WordIndex = 0u; WordIndex < ClockWordsTable.size(); WordIndex++) {
         if(ClockWordsTable[WordIndex] == DisplayWords::WORD_NONE) { break; }
         DisplayWord Word = Words.getDisplayWordFast(ClockWordsTable[WordIndex]);
         if(Word.getRow() == Row) { if(Column >= Word.getColumn() && Column < Word.getColumn() + Word.getLength()) { return true; } }
@@ -102,12 +87,7 @@ boolean AnimationClockCommon::isPixelPartOfClockWords(const ClockWords::WordsLis
 } /* isPixelPartOfWord */
 
 /******************************************************************************************************************************************************
-  isPixelPartOfWord()
-******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
+  isPixelPartOfClockWords()
 ******************************************************************************************************************************************************/
 boolean AnimationClockCommon::isPixelPartOfClockWords(const ClockWords::WordsListType ClockWordsTable, byte Index) const
 {

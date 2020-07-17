@@ -50,25 +50,25 @@ class MsgCmdDisplayColorParser : public MsgParameterParser<MsgCmdDisplayColorPar
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-	using ColorType = NeoPixel::ColorType;
-	
+    using ColorType = NeoPixel::ColorType;
+    
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
-  	friend class MsgParameterParser;
-	static const ParameterTableType ParameterTable;
+    friend class MsgParameterParser;
+    static const ParameterTableType ParameterTable;
 
-	static constexpr char RedOptionShortName{'R'};
-	static constexpr char GreenOptionShortName{'G'};
-	static constexpr char BlueOptionShortName{'B'};
+    static constexpr char RedOptionShortName{'R'};
+    static constexpr char GreenOptionShortName{'G'};
+    static constexpr char BlueOptionShortName{'B'};
 
-	// functions
-	void sendAnswerRed();
-	void sendAnswerGreen();
-	void sendAnswerBlue();
-	
-	void handleParameter(char, byte);
+    // functions
+    void sendAnswerRed();
+    void sendAnswerGreen();
+    void sendAnswerBlue();
+    
+    void handleParameter(char, byte);
   
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
@@ -77,14 +77,14 @@ class MsgCmdDisplayColorParser : public MsgParameterParser<MsgCmdDisplayColorPar
     MsgCmdDisplayColorParser(const char*);
     ~MsgCmdDisplayColorParser();
 
-	// get methods
-	const ParameterTableType& getParameterTable() const { return ParameterTable; }
+    // get methods
+    const ParameterTableType& getParameterTable() const { return ParameterTable; }
 
-	// set methods
+    // set methods
 
-	// methods
-	void sendAnswer();
-	void process() { }
+    // methods
+    void sendAnswer();
+    void process() { }
 
 };
 

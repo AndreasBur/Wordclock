@@ -77,11 +77,11 @@ class AnimationClockTeletype : public AnimationClockCommon
     AnimationClockTeletype();
     ~AnimationClockTeletype();
     
-	// get methods
+    // get methods
 
-	// set methods
+    // set methods
 
-	// methods
+    // methods
     void init();
     StdReturnType setClock(byte, byte);
     void task();

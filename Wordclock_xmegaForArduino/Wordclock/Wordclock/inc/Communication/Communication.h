@@ -48,22 +48,22 @@ class Communication
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-  	enum StateType {
-	  	STATE_MESSAGE_COMPLETE,
-	  	STATE_MESSAGE_INCOMPLETE,
-  	};
+    enum StateType {
+        STATE_MESSAGE_COMPLETE,
+        STATE_MESSAGE_INCOMPLETE,
+    };
   
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
-  	static constexpr char EndOfMessageChar{'\n'};
+    static constexpr char EndOfMessageChar{'\n'};
     StateType State;
-	Message IncomingMessage;
-	ErrorMessage Error;
-	
-	// private functions
-	void addMessagePart();
+    Message IncomingMessage;
+    ErrorMessage Error;
+    
+    // private functions
+    void addMessagePart();
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
@@ -72,13 +72,13 @@ class Communication
     Communication();
     ~Communication();
 
-	// get methods
-	StateType getState() const { return State; }
+    // get methods
+    StateType getState() const { return State; }
 
-	// set methods
+    // set methods
 
-	// methods
-	void task();
+    // methods
+    void task();
     boolean isMessageComplete() const { return (State == STATE_MESSAGE_COMPLETE) ? true : false; }
 };
 

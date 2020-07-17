@@ -65,22 +65,22 @@ class FontSprite5x8 : public Font<FontCharVertical<byte, FONT_SPRITE_5X8_WIDTH>,
 ******************************************************************************************************************************************************/
   public:
     FontSprite5x8() : Font(FontTable) {
-		
-	}
-	
+        
+    }
+    
     ~FontSprite5x8(){
-		
-	}
+        
+    }
 
-	// get methods
+    // get methods
     byte getWidth() const { return FONT_SPRITE_5X8_WIDTH; }
     byte getHeight() const { return FONT_SPRITE_5X8_HEIGHT; }
     Orientation getOrientation() const { return Orientation::ORIENTATION_VERTICAL; }
-	const FontTableType& getFontTable() const { return FontTable; }
-		
-	// set methods
+    const FontTableType& getFontTable() const { return FontTable; }
+        
+    // set methods
 
-	// methods
+    // methods
 
 };
 

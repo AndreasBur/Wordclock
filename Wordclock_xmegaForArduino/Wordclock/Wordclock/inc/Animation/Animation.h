@@ -60,8 +60,8 @@ class Animation
         STATE_CLOCK,
         STATE_FONT
     };
-	
-	using AnimationClockType = AnimationClock::AnimationType;
+    
+    using AnimationClockType = AnimationClock::AnimationType;
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
@@ -79,12 +79,12 @@ class Animation
 
     // get methods
     StateType getState();
-	byte getFontTaskCycle() const { return wcAnimationFont.getTaskCycle(); }
-	byte getClockTaskCycle(AnimationClockType AnimationClock) const { return wcAnimationClock.getTaskCycle(AnimationClock); }
+    byte getFontTaskCycle() const { return wcAnimationFont.getTaskCycle(); }
+    byte getClockTaskCycle(AnimationClockType AnimationClock) const { return wcAnimationClock.getTaskCycle(AnimationClock); }
 
     // set methods
-	void setFontTaskCylce(byte Cycle) { wcAnimationFont.setTaskCycle(Cycle); }
-	void setClockTaskCylce(AnimationClockType AnimationClock, byte Cycle) { wcAnimationClock.setTaskCycle(AnimationClock, Cycle); }
+    void setFontTaskCylce(byte Cycle) { wcAnimationFont.setTaskCycle(Cycle); }
+    void setClockTaskCylce(AnimationClockType AnimationClock, byte Cycle) { wcAnimationClock.setTaskCycle(AnimationClock, Cycle); }
 
     // methods
     void init();

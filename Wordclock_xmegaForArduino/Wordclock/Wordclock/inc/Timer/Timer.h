@@ -82,7 +82,7 @@ class Timer
 
     /* Type which includes the Pwm Pins */
     typedef enum {
-		TEST
+        TEST
         //TIMER_PWM_PIN_9 = TIMER_A_ARDUINO_PIN,
         //TIMER_PWM_PIN_10 = TIMER_B_ARDUINO_PIN
     } TimerPwmPinType;
@@ -114,25 +114,25 @@ class Timer
     TimerClockSelectType ClockSelectBitGroup;
     uint32_t PwmPeriod;
 
-	// get methods
+    // get methods
 
 
-	// set methods
+    // set methods
 
-	// methods
-	static Timer& getInstance();
-	TimerIsrCallbackF_void TimerOverflowCallback;
-	StdReturnType init(uint32_t = 1000u, TimerIsrCallbackF_void = NULL);
-	StdReturnType setPeriod(uint32_t);
-	StdReturnType enablePwm(TimerPwmPinType, uint16_t);
-	StdReturnType disablePwm(TimerPwmPinType);
-	StdReturnType setPwmDuty(TimerPwmPinType, uint16_t);
-	StdReturnType start();
-	void stop();
-	StdReturnType resume();
-	StdReturnType attachInterrupt(TimerIsrCallbackF_void);
-	void detachInterrupt();
-	StdReturnType read(uint32_t&);
+    // methods
+    static Timer& getInstance();
+    TimerIsrCallbackF_void TimerOverflowCallback;
+    StdReturnType init(uint32_t = 1000u, TimerIsrCallbackF_void = NULL);
+    StdReturnType setPeriod(uint32_t);
+    StdReturnType enablePwm(TimerPwmPinType, uint16_t);
+    StdReturnType disablePwm(TimerPwmPinType);
+    StdReturnType setPwmDuty(TimerPwmPinType, uint16_t);
+    StdReturnType start();
+    void stop();
+    StdReturnType resume();
+    StdReturnType attachInterrupt(TimerIsrCallbackF_void);
+    void detachInterrupt();
+    StdReturnType read(uint32_t&);
 };
 
 #endif

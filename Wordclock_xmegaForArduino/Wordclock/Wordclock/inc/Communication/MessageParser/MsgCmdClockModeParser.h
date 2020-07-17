@@ -54,13 +54,13 @@ class MsgCmdClockModeParser : public MsgParameterParser<MsgCmdClockModeParser, M
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
-  	friend class MsgParameterParser;
-  	static const ParameterTableType ParameterTable;
+    friend class MsgParameterParser;
+    static const ParameterTableType ParameterTable;
 
-  	static constexpr char ModeOptionShortName{'M'};
-	
-	// functions// functions	  
-	void handleParameter(char, byte);
+    static constexpr char ModeOptionShortName{'M'};
+    
+    // functions// functions      
+    void handleParameter(char, byte);
   
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
@@ -69,14 +69,14 @@ class MsgCmdClockModeParser : public MsgParameterParser<MsgCmdClockModeParser, M
     MsgCmdClockModeParser(const char*);
     ~MsgCmdClockModeParser();
 
-	// get methods
-	const ParameterTableType& getParameterTable() const { return ParameterTable; }
+    // get methods
+    const ParameterTableType& getParameterTable() const { return ParameterTable; }
 
-	// set methods
+    // set methods
 
-	// methods
-	void sendAnswer();
-	void process() { }
+    // methods
+    void sendAnswer();
+    void process() { }
 };
 
 #endif

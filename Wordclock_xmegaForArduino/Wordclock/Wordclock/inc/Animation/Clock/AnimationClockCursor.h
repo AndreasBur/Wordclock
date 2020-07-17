@@ -64,7 +64,6 @@ class AnimationClockCursor : public AnimationClockCommon
   private:
     ClockWords::WordsListType ClockWordsTable;
     byte CurrentPixelIndex;
-    DisplayWords Words;
 
     // functions
     void reset();
@@ -76,12 +75,12 @@ class AnimationClockCursor : public AnimationClockCommon
     AnimationClockCursor();
     ~AnimationClockCursor();
 
-	// get methods
+    // get methods
 
 
-	// set methods
+    // set methods
 
-	// methods
+    // methods
     void init();
     StdReturnType setClock(byte, byte);
     void task();

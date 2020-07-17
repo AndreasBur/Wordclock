@@ -27,8 +27,8 @@
  *  L O C A L   C O N S T A N T   M A C R O S 
 ******************************************************************************************************************************************************/
 /* All Timers of XMEGA are 16 bit */
-#define TIMER_NUMBER_OF_BITS						16
-#define TIMER_RESOLUTION							(1UL << TIMER_NUMBER_OF_BITS)
+#define TIMER_NUMBER_OF_BITS                        16
+#define TIMER_RESOLUTION                            (1UL << TIMER_NUMBER_OF_BITS)
 #define TIMER_MAX_PRESCALER                         1024
 
 /******************************************************************************************************************************************************
@@ -49,11 +49,6 @@
 /******************************************************************************************************************************************************
   Constructor of Timer
 ******************************************************************************************************************************************************/
-/*! \brief          Timer Constructor
- *  \details        Instantiation of the Timer library
- *
- *  \return         -
-******************************************************************************************************************************************************/
 Timer::Timer()
 {
 
@@ -72,28 +67,23 @@ Timer::~Timer()
 /******************************************************************************************************************************************************
   init()
 ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
- *  \return         -
-******************************************************************************************************************************************************/
 StdReturnType Timer::init(uint32_t Microseconds, TimerIsrCallbackF_void sTimerOverflowCallback)
 {
-	StdReturnType ReturnValue = E_NOT_OK;
+    StdReturnType ReturnValue = E_NOT_OK;
 
-	if(TIMER_STATE_NONE == State) {
-    	ReturnValue = E_OK;
-    	State = TIMER_STATE_INIT;
+    if(TIMER_STATE_NONE == State) {
+        ReturnValue = E_OK;
+        State = TIMER_STATE_INIT;
 
         /* set mode 7: Dual-slope PWM */
         writeBitGroup(TIMER_TC.CTRLB, TC4_WGMODE_gm, TC_WGMODE_DSBOTTOM_gc);
-    	
-    	if(setPeriod(Microseconds) == E_NOT_OK) ReturnValue = E_NOT_OK;
-    	if(sTimerOverflowCallback != NULL) if(attachInterrupt(sTimerOverflowCallback) == E_NOT_OK) ReturnValue = E_NOT_OK;
+        
+        if(setPeriod(Microseconds) == E_NOT_OK) ReturnValue = E_NOT_OK;
+        if(sTimerOverflowCallback != NULL) if(attachInterrupt(sTimerOverflowCallback) == E_NOT_OK) ReturnValue = E_NOT_OK;
 
-    	State = TIMER_STATE_READY;
-	}
-	return ReturnValue;
+        State = TIMER_STATE_READY;
+    }
+    return ReturnValue;
 } /* init */
 
 
@@ -103,13 +93,13 @@ StdReturnType Timer::init(uint32_t Microseconds, TimerIsrCallbackF_void sTimerOv
 /*! \brief          set period of Timer1 overflow interrupt
  *  \details        this functions sets the period of the Timer1 overflow interrupt therefore 
  *                  prescaler and timer top value will be calculated
- *  \param[in]      Microseconds				period of the timer overflow interrupt
+ *  \param[in]      Microseconds                period of the timer overflow interrupt
  *  \return         E_OK
  *                  E_NOT_OK
  *****************************************************************************************************************************************************/
 StdReturnType Timer::setPeriod(uint32_t Microseconds)
 {
-	StdReturnType ReturnValue = E_NOT_OK;
+    StdReturnType ReturnValue = E_NOT_OK;
     
     /* was request out of bounds? */
     if(Microseconds <= ((TIMER_RESOLUTION / (F_CPU / 1000000)) * TIMER_MAX_PRESCALER * 2)) {
@@ -140,7 +130,7 @@ StdReturnType Timer::setPeriod(uint32_t Microseconds)
             writeBitGroup(TIMER_TC.CTRLA, CLK_SCLKSEL_gm, CLK_SCLKSEL_gp, ClockSelectBitGroup, false);
         }
     }
-	return ReturnValue;
+    return ReturnValue;
 } /* setPeriod */
 
 
@@ -150,56 +140,56 @@ StdReturnType Timer::setPeriod(uint32_t Microseconds)
 /*! \brief          read current timer value in microseconds
  *  \details        this function returns the current timer value in microseconds
  *                  
- *  \param[out]     Microseconds		current timer value
+ *  \param[out]     Microseconds        current timer value
  *  \return         E_OK
  *                  E_NOT_OK
- *  \pre			Timer has to be in RUNNING STATE
+ *  \pre            Timer has to be in RUNNING STATE
  *****************************************************************************************************************************************************/
 StdReturnType Timer::read(uint32_t& Microseconds)
 {
-	StdReturnType ReturnValue = E_NOT_OK;
-	uint32_t CounterValue = 0;
-	byte PrescaleShiftScale = 0;
+    StdReturnType ReturnValue = E_NOT_OK;
+    uint32_t CounterValue = 0;
+    byte PrescaleShiftScale = 0;
 
-	if(TIMER_STATE_RUNNING == State || TIMER_STATE_STOPPED == State) {
-    	ReturnValue = E_OK;
-    	/* save current timer value */
-    	CounterValue = TIMER_TC.CNT;
+    if(TIMER_STATE_RUNNING == State || TIMER_STATE_STOPPED == State) {
+        ReturnValue = E_OK;
+        /* save current timer value */
+        CounterValue = TIMER_TC.CNT;
 
-    	switch (ClockSelectBitGroup)
-    	{
-        	case TIMER_REG_CS_NO_PRESCALER:
-        	PrescaleShiftScale = 0;
-        	break;
-        	case TIMER_REG_CS_PRESCALE_2:
-        	PrescaleShiftScale = 1;
-        	break;
-        	case TIMER_REG_CS_PRESCALE_4:
-        	PrescaleShiftScale = 2;
-        	break;
-        	case TIMER_REG_CS_PRESCALE_8:
-        	PrescaleShiftScale = 3;
-        	break;
-        	case TIMER_REG_CS_PRESCALE_64:
-        	PrescaleShiftScale = 4;
-        	break;
-        	case TIMER_REG_CS_PRESCALE_256:
-        	PrescaleShiftScale = 8;
-        	break;
-        	case TIMER_REG_CS_PRESCALE_1024:
-        	PrescaleShiftScale = 10;
-        	break;
-        	default:
-        	ReturnValue = E_NOT_OK;
-    	}
-    	/* if counter counting down, add top value to current value */
-    	if(getCountingDirection() == TIMER_COUNT_DIRECTION_DOWN) { 
+        switch (ClockSelectBitGroup)
+        {
+            case TIMER_REG_CS_NO_PRESCALER:
+            PrescaleShiftScale = 0;
+            break;
+            case TIMER_REG_CS_PRESCALE_2:
+            PrescaleShiftScale = 1;
+            break;
+            case TIMER_REG_CS_PRESCALE_4:
+            PrescaleShiftScale = 2;
+            break;
+            case TIMER_REG_CS_PRESCALE_8:
+            PrescaleShiftScale = 3;
+            break;
+            case TIMER_REG_CS_PRESCALE_64:
+            PrescaleShiftScale = 4;
+            break;
+            case TIMER_REG_CS_PRESCALE_256:
+            PrescaleShiftScale = 8;
+            break;
+            case TIMER_REG_CS_PRESCALE_1024:
+            PrescaleShiftScale = 10;
+            break;
+            default:
+            ReturnValue = E_NOT_OK;
+        }
+        /* if counter counting down, add top value to current value */
+        if(getCountingDirection() == TIMER_COUNT_DIRECTION_DOWN) { 
             CounterValue = static_cast<uint32_t>(TIMER_TC.PER - CounterValue) + TIMER_TC.PER; 
         }
-    	/* transform counter value to microseconds in an efficient way */
-    	Microseconds = ((CounterValue * 1000UL) / (F_CPU / 1000UL)) << PrescaleShiftScale;
-	}
-	return ReturnValue;
+        /* transform counter value to microseconds in an efficient way */
+        Microseconds = ((CounterValue * 1000UL) / (F_CPU / 1000UL)) << PrescaleShiftScale;
+    }
+    return ReturnValue;
 } /* read */
 
 /******************************************************************************************************************************************************

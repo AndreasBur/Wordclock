@@ -61,7 +61,6 @@ class AnimationClockDrop : public AnimationClockCommon
 ******************************************************************************************************************************************************/
   private:
     DisplayWords Words;
-    //byte CurrentPixelIndex;
     byte Row;
     byte Column;
 
@@ -85,12 +84,12 @@ class AnimationClockDrop : public AnimationClockCommon
     AnimationClockDrop();
     ~AnimationClockDrop();
 
-	// get methods
+    // get methods
 
 
-	// set methods
+    // set methods
 
-	// methods
+    // methods
     void init();
     StdReturnType setClock(byte, byte);
     void task();

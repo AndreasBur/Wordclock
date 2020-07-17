@@ -67,7 +67,7 @@ class AnimationClockCommon
 ******************************************************************************************************************************************************/
   protected:
     StateType State;
-	
+    
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
@@ -75,12 +75,12 @@ class AnimationClockCommon
     AnimationClockCommon();
     ~AnimationClockCommon();
 
-	// get methods
+    // get methods
     StateType getState() const { return State; }
 
-	// set methods
+    // set methods
 
-	// methods
+    // methods
     void init(StateType);
     void show() { Display::getInstance().show(); }
     boolean isPixelPartOfClockWords(ClockWords::WordsListType, byte, byte) const;
