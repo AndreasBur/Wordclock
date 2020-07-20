@@ -23,7 +23,7 @@
 #include "MsgCmdParser.h"
 #include "MsgCmdDisplayColorParser.h"
 #include "MsgCmdClockModeParser.h"
-//#include "MsgCmdDisplayBrightnessParser.h"
+#include "MsgCmdDisplayBrightnessParser.h"
 
 /******************************************************************************************************************************************************
  *  L O C A L   C O N S T A N T   M A C R O S 
@@ -74,12 +74,12 @@ void MsgCmdParser::parse()
 		cmdDisplayColorParser.process();
 		cmdDisplayColorParser.sendAnswer();
 		sendAnswer(command);
-	//} else if(command == COMMAND_DISPLAY_BRIGHTNESS) {
-		//MsgCmdDisplayBrightnessParser cmdDisplayBrightnessParser(parameter);
-		//cmdDisplayBrightnessParser.parse();
-		//cmdDisplayBrightnessParser.process();
-		//cmdDisplayBrightnessParser.sendAnswer();
-		//sendAnswer(command);
+	} else if(command == COMMAND_DISPLAY_BRIGHTNESS) {
+		MsgCmdDisplayBrightnessParser cmdDisplayBrightnessParser(parameter);
+		cmdDisplayBrightnessParser.parse();
+		cmdDisplayBrightnessParser.process();
+		cmdDisplayBrightnessParser.sendAnswer();
+		sendAnswer(command);
 	} else if(command == COMMAND_CLOCK_MODE) {
 		MsgCmdClockModeParser cmdClockModeParser(parameter);
 		cmdClockModeParser.parse();

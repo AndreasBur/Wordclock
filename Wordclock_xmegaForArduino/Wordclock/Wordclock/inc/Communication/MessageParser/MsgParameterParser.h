@@ -62,7 +62,7 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
   protected:
     static constexpr char OptionArgumentDelimiter{':'};
     ErrorMessage Error;
-    
+
     ~MsgParameterParser() {
         
     }
@@ -77,7 +77,7 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
         STATE_OPTION_CHAR,
         STATE_OPTION_ARGUMENT
     };
-  
+
     static constexpr char OptionStartChar{'-'};
     static constexpr byte ArgumentNumberBase{10u};
 		
@@ -90,7 +90,7 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
         memcpy_P(&parameterTableElement, &ParameterTable[Index], sizeof(ParameterTableElementType));
         return parameterTableElement;
     }
-    
+
     StdReturnType getMsgParameterByOptionShortName(char OptionShortName, ParameterTableElementType& Parameter) const {
         for(size_t index = 0; index < ParameterTable.size(); index++) {
             ParameterTableElementType parameterTableElement = getParameterTableElement(index);
@@ -101,7 +101,7 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
         }
         return E_NOT_OK;
     }
-    
+
     PositionType parseArgument(MsgParameter Parameter, const char* Argument) {
         //if(Parameter.getArgumentType() == MsgParameter::ARGUMENT_TYPE_CHAR) { return convertArgument<char>(Parameter, Argument); }
         if(Parameter.getArgumentType() == MsgParameter::ARGUMENT_TYPE_UINT8) { return convertArgument<uint8_t>(Parameter, Argument); }
@@ -126,7 +126,7 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
         if(result == StringTools::RESULT_OK) static_cast<Derived*>(this)->handleParameter(Parameter.getOptionShortName(), value);
         return position;
     }
-    
+
     void handleConvertResult(StringTools::ResultType Result) const {
         if(Result == StringTools::RESULT_NO_VALUE) {
             Error.send(ErrorMessage::ERROR_NO_VALUE_GIVEN);
@@ -154,7 +154,7 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
 
     // methods
     void parse()
-    {   
+    {
         StateType state = STATE_PARSE;
         char optionChar;
         
