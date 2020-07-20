@@ -61,10 +61,7 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
 ******************************************************************************************************************************************************/
   protected:
     static constexpr char OptionArgumentDelimiter{':'};
-  
     ErrorMessage Error;
-    const char* ParameterBuffer;
-    const ParameterTableType& ParameterTable;
     
     ~MsgParameterParser() {
         
@@ -83,6 +80,9 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
   
     static constexpr char OptionStartChar{'-'};
     static constexpr byte ArgumentNumberBase{10u};
+		
+    const char* ParameterBuffer;
+    const ParameterTableType& ParameterTable;
     
     // functions
     ParameterTableElementType getParameterTableElement(byte Index) const {
@@ -148,7 +148,7 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
     // get methods
     
     const char* getParameter() const { return ParameterBuffer; }
-    const ParameterTableType& getParameterTable();
+    const ParameterTableType& getParameterTable() const { return ParameterTable; }
 
     // set methods
 

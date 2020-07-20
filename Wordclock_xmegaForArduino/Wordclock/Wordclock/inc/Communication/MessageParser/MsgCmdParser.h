@@ -50,9 +50,10 @@ class MsgCmdParser
   public:
     enum CommandType {
         COMMAND_NONE,
-        COMMAND_DISPLAY_MODE,
+        //COMMAND_DISPLAY_MODE,
         COMMAND_DISPLAY_COLOR,
         COMMAND_DISPLAY_BRIGHTNESS,
+		COMMAND_CLOCK_MODE,
         COMMAND_TIME,
         COMMAND_DATE
     };

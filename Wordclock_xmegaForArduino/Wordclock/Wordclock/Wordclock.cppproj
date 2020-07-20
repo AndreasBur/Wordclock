@@ -567,6 +567,7 @@
     <Folder Include="inc\BH1750" />
     <Folder Include="inc\Communication" />
     <Folder Include="inc\DisplayManager" />
+    <Folder Include="inc\Power" />
     <Folder Include="inc\Scheduler" />
     <Folder Include="inc\NonVolatile" />
     <Folder Include="inc\Timer" />
@@ -584,6 +585,7 @@
     <Folder Include="src\GammaCorrection" />
     <Folder Include="src\BH1750" />
     <Folder Include="src\Communication" />
+    <Folder Include="src\Power" />
     <Folder Include="src\NonVolatile\" />
     <Folder Include="src\Scheduler\" />
     <Folder Include="src\Timer" />

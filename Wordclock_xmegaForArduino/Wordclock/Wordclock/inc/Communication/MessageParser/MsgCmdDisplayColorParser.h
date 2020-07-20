@@ -57,13 +57,12 @@ class MsgCmdDisplayColorParser : public MsgParameterParser<MsgCmdDisplayColorPar
 ******************************************************************************************************************************************************/
   private:
     friend class MsgParameterParser;
-    static const ParameterTableType ParameterTable;
-
     static constexpr char RedOptionShortName{'R'};
     static constexpr char GreenOptionShortName{'G'};
     static constexpr char BlueOptionShortName{'B'};
-
-    // functions
+	static const ParameterTableType ParameterTable;
+    
+	// functions
     void sendAnswerRed();
     void sendAnswerGreen();
     void sendAnswerBlue();
@@ -78,7 +77,7 @@ class MsgCmdDisplayColorParser : public MsgParameterParser<MsgCmdDisplayColorPar
     ~MsgCmdDisplayColorParser();
 
     // get methods
-    const ParameterTableType& getParameterTable() const { return ParameterTable; }
+    //const ParameterTableType& getParameterTable() const { return ParameterTable; }
 
     // set methods
 

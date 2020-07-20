@@ -23,6 +23,7 @@
 #include "MsgCmdParser.h"
 #include "MsgCmdDisplayColorParser.h"
 #include "MsgCmdClockModeParser.h"
+//#include "MsgCmdDisplayBrightnessParser.h"
 
 /******************************************************************************************************************************************************
  *  L O C A L   C O N S T A N T   M A C R O S 
@@ -48,11 +49,6 @@
 /******************************************************************************************************************************************************
   Constructor of MsgCmdParser
 ******************************************************************************************************************************************************/
-/*! \brief          MsgCmdParser Constructor
- *  \details        Instantiation of the MsgCmdParser library
- *
- *  \return         -
-******************************************************************************************************************************************************/
 MsgCmdParser::MsgCmdParser(const Message& sMessage) : IncomingMessage(sMessage) 
 {
 
@@ -73,16 +69,22 @@ void MsgCmdParser::parse()
 	const char* parameter = getParameter();
 	
 	if(command == COMMAND_DISPLAY_COLOR) {
-		MsgCmdDisplayColorParser CmdDisplayColorParser(parameter);
-		CmdDisplayColorParser.parse();
-		CmdDisplayColorParser.process();
-		CmdDisplayColorParser.sendAnswer();
+		MsgCmdDisplayColorParser cmdDisplayColorParser(parameter);
+		cmdDisplayColorParser.parse();
+		cmdDisplayColorParser.process();
+		cmdDisplayColorParser.sendAnswer();
 		sendAnswer(command);
-	} else if(COMMAND_DISPLAY_MODE) {
-		MsgCmdClockModeParser CmdClockModeParser(parameter);
-		CmdClockModeParser.parse();
-		CmdClockModeParser.process();
-		CmdClockModeParser.sendAnswer();
+	//} else if(command == COMMAND_DISPLAY_BRIGHTNESS) {
+		//MsgCmdDisplayBrightnessParser cmdDisplayBrightnessParser(parameter);
+		//cmdDisplayBrightnessParser.parse();
+		//cmdDisplayBrightnessParser.process();
+		//cmdDisplayBrightnessParser.sendAnswer();
+		//sendAnswer(command);
+	} else if(command == COMMAND_CLOCK_MODE) {
+		MsgCmdClockModeParser cmdClockModeParser(parameter);
+		cmdClockModeParser.parse();
+		cmdClockModeParser.process();
+		cmdClockModeParser.sendAnswer();
 		sendAnswer(command);
 	} else {
 		Error.send(ErrorMessage::ERROR_WRONG_COMMAND);

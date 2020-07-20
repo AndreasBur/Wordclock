@@ -173,7 +173,7 @@ StdReturnType AnimationClockDrop::setNextActivePixelIndex()
 ******************************************************************************************************************************************************/
 StdReturnType AnimationClockDrop::setNextWordIndex()
 {
-    for(int8_t Index = CurrenWordIndex - 1u; Index >= 0u; Index--) {
+    for(int8_t Index = CurrenWordIndex - 1u; Index >= 0; Index--) {
         if(ClockWordsTable[Index] != DisplayWords::WORD_NONE) {
             CurrenWordIndex = Index;
             return E_OK;
