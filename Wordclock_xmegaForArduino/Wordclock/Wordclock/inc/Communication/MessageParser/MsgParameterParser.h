@@ -32,7 +32,17 @@
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
 /* MsgParser configuration parameter */
-
+#define MSG_PARAMETER_PARSER_ARGUMENT_TYPE_CHAR                     STD_OFF
+#define MSG_PARAMETER_PARSER_ARGUMENT_TYPE_UINT8                    STD_ON
+#define MSG_PARAMETER_PARSER_ARGUMENT_TYPE_UINT16                   STD_OFF
+#define MSG_PARAMETER_PARSER_ARGUMENT_TYPE_UINT32                   STD_OFF
+#define MSG_PARAMETER_PARSER_ARGUMENT_TYPE_UINT64                   STD_OFF
+#define MSG_PARAMETER_PARSER_ARGUMENT_TYPE_INT8                     STD_OFF
+#define MSG_PARAMETER_PARSER_ARGUMENT_TYPE_INT16                    STD_OFF
+#define MSG_PARAMETER_PARSER_ARGUMENT_TYPE_INT32                    STD_OFF
+#define MSG_PARAMETER_PARSER_ARGUMENT_TYPE_INT64                    STD_OFF
+#define MSG_PARAMETER_PARSER_ARGUMENT_TYPE_FLOAT                    STD_OFF
+#define MSG_PARAMETER_PARSER_ARGUMENT_TYPE_DOUBLE                   STD_OFF
 
 /* MsgParser parameter */
 
@@ -103,17 +113,39 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
     }
 
     PositionType parseArgument(MsgParameter Parameter, const char* Argument) {
-        //if(Parameter.getArgumentType() == MsgParameter::ARGUMENT_TYPE_CHAR) { return convertArgument<char>(Parameter, Argument); }
+# if (MSG_PARAMETER_PARSER_ARGUMENT_TYPE_CHAR == STD_ON)
+        if(Parameter.getArgumentType() == MsgParameter::ARGUMENT_TYPE_CHAR) { return convertArgument<char>(Parameter, Argument); }
+# endif
+# if (MSG_PARAMETER_PARSER_ARGUMENT_TYPE_UINT8 == STD_ON)
         if(Parameter.getArgumentType() == MsgParameter::ARGUMENT_TYPE_UINT8) { return convertArgument<uint8_t>(Parameter, Argument); }
-        //if(Parameter.getArgumentType() == MsgParameter::ARGUMENT_TYPE_UINT16) { return convertArgument<uint16_t>(Parameter, Argument); }
-        //if(Parameter.getArgumentType() == MsgParameter::ARGUMENT_TYPE_UINT32) { return convertArgument<uint32_t>(Parameter, Argument); }
-        //if(Parameter.getArgumentType() == MsgParameter::ARGUMENT_TYPE_UINT64) { return convertArgument<uint64_t>(Parameter, Argument); }
-        //if(Parameter.getArgumentType() == MsgParameter::ARGUMENT_TYPE_INT8) { return convertArgument<int8_t>(Parameter, Argument); }
-        //if(Parameter.getArgumentType() == MsgParameter::ARGUMENT_TYPE_INT16) { return convertArgument<int16_t>(Parameter, Argument); }
-        //if(Parameter.getArgumentType() == MsgParameter::ARGUMENT_TYPE_INT32) { return convertArgument<int32_t>(Parameter, Argument); }
-        //if(Parameter.getArgumentType() == MsgParameter::ARGUMENT_TYPE_INT64) { return convertArgument<int64_t>(Parameter, Argument); }
-        //if(Parameter.getArgumentType() == MsgParameter::ARGUMENT_TYPE_FLOAT) { return convertArgument<float>(Parameter, Argument); }
-        //if(Parameter.getArgumentType() == MsgParameter::ARGUMENT_TYPE_DOUBLE) { return convertArgument<double>(Parameter, Argument); }
+# endif
+# if (MSG_PARAMETER_PARSER_ARGUMENT_TYPE_UINT16 == STD_ON)
+        if(Parameter.getArgumentType() == MsgParameter::ARGUMENT_TYPE_UINT16) { return convertArgument<uint16_t>(Parameter, Argument); }
+# endif
+# if (MSG_PARAMETER_PARSER_ARGUMENT_TYPE_UINT32 == STD_ON)
+        if(Parameter.getArgumentType() == MsgParameter::ARGUMENT_TYPE_UINT32) { return convertArgument<uint32_t>(Parameter, Argument); }
+# endif
+# if (MSG_PARAMETER_PARSER_ARGUMENT_TYPE_UINT64 == STD_ON)
+        if(Parameter.getArgumentType() == MsgParameter::ARGUMENT_TYPE_UINT64) { return convertArgument<uint64_t>(Parameter, Argument); }
+# endif
+# if (MSG_PARAMETER_PARSER_ARGUMENT_TYPE_INT8 == STD_ON)
+        if(Parameter.getArgumentType() == MsgParameter::ARGUMENT_TYPE_INT8) { return convertArgument<int8_t>(Parameter, Argument); }
+# endif
+# if (MSG_PARAMETER_PARSER_ARGUMENT_TYPE_INT16 == STD_ON)
+        if(Parameter.getArgumentType() == MsgParameter::ARGUMENT_TYPE_INT16) { return convertArgument<int16_t>(Parameter, Argument); }
+# endif
+# if (MSG_PARAMETER_PARSER_ARGUMENT_TYPE_INT32 == STD_ON)
+        if(Parameter.getArgumentType() == MsgParameter::ARGUMENT_TYPE_INT32) { return convertArgument<int32_t>(Parameter, Argument); }
+# endif
+# if (MSG_PARAMETER_PARSER_ARGUMENT_TYPE_INT64 == STD_ON)
+        if(Parameter.getArgumentType() == MsgParameter::ARGUMENT_TYPE_INT64) { return convertArgument<int64_t>(Parameter, Argument); }
+# endif
+# if (MSG_PARAMETER_PARSER_ARGUMENT_TYPE_FLOAT == STD_ON)
+        if(Parameter.getArgumentType() == MsgParameter::ARGUMENT_TYPE_FLOAT) { return convertArgument<float>(Parameter, Argument); }
+# endif
+# if (MSG_PARAMETER_PARSER_ARGUMENT_TYPE_DOUBLE == STD_ON)
+        if(Parameter.getArgumentType() == MsgParameter::ARGUMENT_TYPE_DOUBLE) { return convertArgument<double>(Parameter, Argument); }
+# endif
         return 0u;
     }
 
