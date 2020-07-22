@@ -23,6 +23,7 @@
 #include "StandardTypes.h"
 #include "Arduino.h"
 #include "MsgParameterParser.h"
+#include "Clock.h"
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
@@ -56,25 +57,39 @@ class MsgCmdClockModeParser : public MsgParameterParser<MsgCmdClockModeParser, M
   private:
     friend class MsgParameterParser;
     static constexpr char ModeOptionShortName{'M'};
-    static const ParameterTableType ParameterTable;
+        
+    static constexpr ParameterTableType ParameterTable PROGMEM {
+        ParameterTableElementType(ModeOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8)
+    };
     
-    // functions// functions      
-    void handleParameter(char, byte);
+    // functions// functions
+    void handleParameter(char ParameterShortName, byte Argument)
+    {
+        if(ParameterShortName == ModeOptionShortName) {
+            Clock::getInstance().setMode(static_cast<Clock::ModeType>(Argument));
+        }
+    }
   
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    MsgCmdClockModeParser(const char*);
-    ~MsgCmdClockModeParser();
+    constexpr MsgCmdClockModeParser(const char* Parameter) : MsgParameterParser(ParameterTable, Parameter) { }
+    ~MsgCmdClockModeParser() { }
 
     // get methods
-    //const ParameterTableType& getParameterTable() const { return ParameterTable; }
 
     // set methods
 
     // methods
-    void sendAnswer();
+    void sendAnswer()
+    {
+        Serial.print(ModeOptionShortName);
+        Serial.print(OptionArgumentDelimiter);
+        Serial.print(Display::getInstance().getColorRed());
+        Serial.println();
+    }
+    
     void process() { }
 };
 

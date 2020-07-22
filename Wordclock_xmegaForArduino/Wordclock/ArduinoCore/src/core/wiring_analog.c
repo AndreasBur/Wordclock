@@ -349,7 +349,7 @@ uint8_t mode;
 #endif // analogInputToAnalogPin
     }
 
-    if(negpin >= 0 && negpin <= 3)
+    if(negpin <= 3)
     {
       mode = ADC_CH_INPUTMODE_DIFFWGAINL_gc;
     }

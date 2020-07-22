@@ -65,30 +65,30 @@ MsgCmdParser::~MsgCmdParser()
 
 void MsgCmdParser::parse()
 {
-	CommandType command = getCommand();
-	const char* parameter = getParameter();
-	
-	if(command == COMMAND_DISPLAY_COLOR) {
-		MsgCmdDisplayColorParser cmdDisplayColorParser(parameter);
-		cmdDisplayColorParser.parse();
-		cmdDisplayColorParser.process();
-		cmdDisplayColorParser.sendAnswer();
-		sendAnswer(command);
-	} else if(command == COMMAND_DISPLAY_BRIGHTNESS) {
-		MsgCmdDisplayBrightnessParser cmdDisplayBrightnessParser(parameter);
-		cmdDisplayBrightnessParser.parse();
-		cmdDisplayBrightnessParser.process();
-		cmdDisplayBrightnessParser.sendAnswer();
-		sendAnswer(command);
-	} else if(command == COMMAND_CLOCK_MODE) {
-		MsgCmdClockModeParser cmdClockModeParser(parameter);
-		cmdClockModeParser.parse();
-		cmdClockModeParser.process();
-		cmdClockModeParser.sendAnswer();
-		sendAnswer(command);
-	} else {
-		Error.send(ErrorMessage::ERROR_WRONG_COMMAND);
-	}
+    CommandType command = getCommand();
+    const char* parameter = getParameter();
+    
+    if(command == COMMAND_DISPLAY_COLOR) {
+        MsgCmdDisplayColorParser cmdDisplayColorParser(parameter);
+        cmdDisplayColorParser.parse();
+        cmdDisplayColorParser.process();
+        cmdDisplayColorParser.sendAnswer();
+        sendAnswer(command);
+    } else if(command == COMMAND_DISPLAY_BRIGHTNESS) {
+        MsgCmdDisplayBrightnessParser cmdDisplayBrightnessParser(parameter);
+        cmdDisplayBrightnessParser.parse();
+        cmdDisplayBrightnessParser.process();
+        cmdDisplayBrightnessParser.sendAnswer();
+        sendAnswer(command);
+    } else if(command == COMMAND_CLOCK_MODE) {
+        MsgCmdClockModeParser cmdClockModeParser(parameter);
+        cmdClockModeParser.parse();
+        cmdClockModeParser.process();
+        cmdClockModeParser.sendAnswer();
+        sendAnswer(command);
+    } else {
+        Error.send(ErrorMessage::ERROR_WRONG_COMMAND);
+    }
 
 }
 

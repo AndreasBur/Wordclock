@@ -54,7 +54,7 @@
 ******************************************************************************************************************************************************/
 Message::Message()
 {
-	clear();
+    clear();
 } /* Message */
 
 
@@ -68,17 +68,17 @@ Message::~Message()
 
 StdReturnType Message::addChar(char Char)
 {
-	byte messageLength = strlen(Buffer);
-	// check for free space in Message buffer
-	if(messageLength < (MESSAGE_LENGTH - 1u))
-	{
-		// save new char
-		Buffer[messageLength] = Char;
-		Buffer[messageLength + 1] = '\0';
-		return E_OK;
-	} else {
-		return E_NOT_OK;
-	}
+    byte messageLength = strlen(Buffer);
+    // check for free space in Message buffer
+    if(messageLength < (MESSAGE_LENGTH - 1u))
+    {
+        // save new char
+        Buffer[messageLength] = Char;
+        Buffer[messageLength + 1] = '\0';
+        return E_OK;
+    } else {
+        return E_NOT_OK;
+    }
 }
 
 

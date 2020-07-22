@@ -47,7 +47,7 @@
 ******************************************************************************************************************************************************/
 Communication::Communication()
 {
-	State = STATE_MESSAGE_INCOMPLETE;
+    State = STATE_MESSAGE_INCOMPLETE;
 } /* Communication */
 
 
@@ -64,12 +64,12 @@ Communication::~Communication()
 ******************************************************************************************************************************************************/
 void Communication::task()
 {
-	if(isMessageComplete()) {
-		MsgCmdParser CmdParser(IncomingMessage);
-		CmdParser.parse();
-	} else {
-		addMessagePart();
-	}
+    if(isMessageComplete()) {
+        MsgCmdParser CmdParser(IncomingMessage);
+        CmdParser.parse();
+    } else {
+        addMessagePart();
+    }
 }
 
 
@@ -83,22 +83,22 @@ void Communication::task()
 void Communication::addMessagePart()
 {
 /*
-	while (Serial.available()) {
-		// get the new byte from uart
-		char inChar = static_cast<char>(Serial.read());
-		if(inChar == EndOfMessageChar) { State = STATE_MESSAGE_COMPLETE; }
-		if(IncomingMessage.addChar(inChar) == E_NOT_OK) {
-			Error.send(ErrorMessage::ERROR_MESSAGE_TOO_LONG);
-		}
-	}
+    while (Serial.available()) {
+        // get the new byte from uart
+        char inChar = static_cast<char>(Serial.read());
+        if(inChar == EndOfMessageChar) { State = STATE_MESSAGE_COMPLETE; }
+        if(IncomingMessage.addChar(inChar) == E_NOT_OK) {
+            Error.send(ErrorMessage::ERROR_MESSAGE_TOO_LONG);
+        }
+    }
 */
-	char Buffer[] = "2 -R56-B 132\n";
-	
-	for(uint8_t i = 0u; i <= strlen(Buffer); i++)
-	{
-		if(Buffer[i] == EndOfMessageChar) { State = STATE_MESSAGE_COMPLETE; }
-		else IncomingMessage.addChar(Buffer[i]);
-	}
+    char Buffer[] = "2 -B20\n";
+    
+    for(uint8_t i = 0u; i <= strlen(Buffer); i++)
+    {
+        if(Buffer[i] == EndOfMessageChar) { State = STATE_MESSAGE_COMPLETE; }
+        else IncomingMessage.addChar(Buffer[i]);
+    }
 }
 
 /******************************************************************************************************************************************************

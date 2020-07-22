@@ -22,7 +22,6 @@
 ******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Arduino.h"
-#include "MsgCmdParserCommon.h"
 #include "NeoPixel.h"
 #include "Display.h"
 #include "MsgParameterParser.h"
@@ -59,20 +58,27 @@ class MsgCmdDisplayBrightnessParser : public MsgParameterParser<MsgCmdDisplayBri
     friend class MsgParameterParser;
     static constexpr char BrightnessOptionShortName{'B'};
     static constexpr char AutomaticOptionShortName{'A'};
-    static constexpr ParameterTableType ParameterTable {
-		MsgParameter(BrightnessOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8),
-		MsgParameter(AutomaticOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8)
-	};
+        
+    static constexpr ParameterTableType ParameterTable PROGMEM 
+    {
+        MsgParameter(BrightnessOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8),
+        MsgParameter(AutomaticOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8)
+    };
     
-	// functions
+    // functions
     
-    void handleParameter(char, byte) {}
+    void handleParameter(char ParameterShortName, byte Argument)
+    {
+        if(ParameterShortName == BrightnessOptionShortName) {
+            Display::getInstance().setBrightness(Argument);
+        }
+    }
   
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    MsgCmdDisplayBrightnessParser(const char* Parameter) : MsgParameterParser(ParameterTable, Parameter) {}
+    constexpr MsgCmdDisplayBrightnessParser(const char* Parameter) : MsgParameterParser(ParameterTable, Parameter) {}
     ~MsgCmdDisplayBrightnessParser() {}
 
     // get methods

@@ -22,8 +22,6 @@
 ******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Arduino.h"
-#include "MsgCmdParserCommon.h"
-#include "NeoPixel.h"
 #include "Display.h"
 #include "MsgParameterParser.h"
 
@@ -60,29 +58,63 @@ class MsgCmdDisplayColorParser : public MsgParameterParser<MsgCmdDisplayColorPar
     static constexpr char RedOptionShortName{'R'};
     static constexpr char GreenOptionShortName{'G'};
     static constexpr char BlueOptionShortName{'B'};
-	static const ParameterTableType ParameterTable;
     
-	// functions
-    void sendAnswerRed();
-    void sendAnswerGreen();
-    void sendAnswerBlue();
+    static constexpr ParameterTableType ParameterTable PROGMEM
+    {
+        ParameterTableElementType(RedOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8),
+        ParameterTableElementType(GreenOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8),
+        ParameterTableElementType(BlueOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8)
+    };
     
-    void handleParameter(char, byte);
+    // functions
+    void sendAnswerRed()
+    {
+        Serial.print(RedOptionShortName);
+        Serial.print(OptionArgumentDelimiter);
+        Serial.print(Display::getInstance().getColorRed());
+    }
+
+    void sendAnswerGreen()
+    {
+        Serial.print(GreenOptionShortName);
+        Serial.print(OptionArgumentDelimiter);
+        Serial.print(Display::getInstance().getColorGreen());
+    }
+
+    void sendAnswerBlue()
+    {
+        Serial.print(BlueOptionShortName);
+        Serial.print(OptionArgumentDelimiter);
+        Serial.print(Display::getInstance().getColorBlue());
+    }
+    
+    void handleParameter(char ParameterShortName, byte Argument)
+    {
+        if(ParameterShortName == RedOptionShortName) { Display::getInstance().setColorRed(Argument); }
+        if(ParameterShortName == GreenOptionShortName) { Display::getInstance().setColorGreen(Argument); }
+        if(ParameterShortName == BlueOptionShortName) { Display::getInstance().setColorBlue(Argument); }
+    }
   
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    MsgCmdDisplayColorParser(const char*);
-    ~MsgCmdDisplayColorParser();
+    constexpr MsgCmdDisplayColorParser(const char* Parameter) : MsgParameterParser(ParameterTable, Parameter) { }
+    ~MsgCmdDisplayColorParser() { }
 
     // get methods
-    //const ParameterTableType& getParameterTable() const { return ParameterTable; }
 
     // set methods
 
     // methods
-    void sendAnswer();
+    void sendAnswer()
+    {
+        sendAnswerRed();
+        sendAnswerGreen();
+        sendAnswerBlue();
+        Serial.println();
+    }
+    
     void process() { }
 
 };

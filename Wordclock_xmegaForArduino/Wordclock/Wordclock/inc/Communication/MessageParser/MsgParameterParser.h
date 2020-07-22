@@ -80,7 +80,7 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
 
     static constexpr char OptionStartChar{'-'};
     static constexpr byte ArgumentNumberBase{10u};
-		
+
     const char* ParameterBuffer;
     const ParameterTableType& ParameterTable;
     
