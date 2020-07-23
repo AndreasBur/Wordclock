@@ -77,14 +77,14 @@ void AnimationClockCursor::init()
 ******************************************************************************************************************************************************/
 StdReturnType AnimationClockCursor::setClock(byte Hour, byte Minute)
 {
-    StdReturnType ReturnValue{E_NOT_OK};
+    StdReturnType returnValue{E_NOT_OK};
 
     if(Clock::getInstance().getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
-        ReturnValue = E_OK;
+        returnValue = E_OK;
         CurrentPixelIndex = 0u;
         State = STATE_SET_TIME;
     }
-    return ReturnValue;
+    return returnValue;
 } /* setClock */
 
 

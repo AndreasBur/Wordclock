@@ -94,9 +94,9 @@ class DisplayWords
     
     // functions
     DisplayWordsTableElementType getDisplayWordsTableElement(byte WordId) const {
-        DisplayWordsTableElementType DisplayWordsTableElement;
-        memcpy_P(&DisplayWordsTableElement, &DisplayWordsTable[WordId], sizeof(DisplayWordsTableElementType));
-        return DisplayWordsTableElement;
+        DisplayWordsTableElementType displayWordsTableElement;
+        memcpy_P(&displayWordsTableElement, &DisplayWordsTable[WordId], sizeof(DisplayWordsTableElementType));
+        return displayWordsTableElement;
     }
 
 /******************************************************************************************************************************************************

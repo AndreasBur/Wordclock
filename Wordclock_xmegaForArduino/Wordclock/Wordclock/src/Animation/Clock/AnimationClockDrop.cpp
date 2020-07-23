@@ -77,14 +77,14 @@ void AnimationClockDrop::init()
 ******************************************************************************************************************************************************/
 StdReturnType AnimationClockDrop::setClock(byte Hour, byte Minute)
 {
-    StdReturnType ReturnValue{E_NOT_OK};
+    StdReturnType returnValue{E_NOT_OK};
 
     if(Clock::getInstance().getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
         setNextWordIndex();
         if(setNextActivePixelIndex() == E_NOT_OK) { setStateToSetTime(); }
         else { State = STATE_CLEAR_TIME; }
     }
-    return ReturnValue;
+    return returnValue;
 } /* setClock */
 
 
@@ -138,10 +138,10 @@ void AnimationClockDrop::clearTimeTask()
 ******************************************************************************************************************************************************/
 void AnimationClockDrop::setTimeTask()
 {
-    DisplayWord CurrentWord = Words.getDisplayWordFast(ClockWordsTable[CurrenWordIndex]);
-    const byte MaxColumn = Words.getDisplayWordColumnFast(ClockWordsTable[CurrenWordIndex]) + CurrentWord.getLength() - 1u;
+    DisplayWord currentWord = Words.getDisplayWordFast(ClockWordsTable[CurrenWordIndex]);
+    const byte MaxColumn = Words.getDisplayWordColumnFast(ClockWordsTable[CurrenWordIndex]) + currentWord.getLength() - 1u;
 
-    if(setNextRow(CurrentWord.getRow()) == E_OK) {
+    if(setNextRow(currentWord.getRow()) == E_OK) {
         Display::getInstance().clearPixelFast(Column, Row - 1u);
     } else {
         if(setNextColumn(MaxColumn) == E_NOT_OK) {
@@ -158,9 +158,9 @@ void AnimationClockDrop::setTimeTask()
 ******************************************************************************************************************************************************/
 StdReturnType AnimationClockDrop::setNextActivePixelIndex()
 {
-    for(int16_t Index = DISPLAY_NUMBER_OF_PIXELS - 1u; Index >= 0; Index--) {
-        if(Display::getInstance().getPixelFast(Index)) {
-            Display::getInstance().indexToColumnAndRow(Index, Column, Row);
+    for(int16_t index = DISPLAY_NUMBER_OF_PIXELS - 1u; index >= 0; index--) {
+        if(Display::getInstance().getPixelFast(index)) {
+            Display::getInstance().indexToColumnAndRow(index, Column, Row);
             return E_OK;
         }
     }
@@ -173,9 +173,9 @@ StdReturnType AnimationClockDrop::setNextActivePixelIndex()
 ******************************************************************************************************************************************************/
 StdReturnType AnimationClockDrop::setNextWordIndex()
 {
-    for(int8_t Index = CurrenWordIndex - 1u; Index >= 0; Index--) {
-        if(ClockWordsTable[Index] != DisplayWords::WORD_NONE) {
-            CurrenWordIndex = Index;
+    for(int8_t index = CurrenWordIndex - 1u; index >= 0; index--) {
+        if(ClockWordsTable[index] != DisplayWords::WORD_NONE) {
+            CurrenWordIndex = index;
             return E_OK;
         }
     }

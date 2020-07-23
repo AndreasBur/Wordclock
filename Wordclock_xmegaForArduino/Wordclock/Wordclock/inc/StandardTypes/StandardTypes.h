@@ -145,7 +145,7 @@ static inline ReturnType bitValue(BitType Bit)
 template <typename ReturnType, typename LengthType>
 static inline ReturnType bitMask(LengthType Length)
 {
-    return bitValue(Length) - 1;
+    return bitValue(Length) - 1u;
 }
 
 /* set bit */
@@ -251,12 +251,12 @@ static inline void writeBitGroup(VarType& Var, MaskType BitGroupMask, ValType Va
 template <typename T>
 uint8_t digitsOfNumber(T Number, unsigned Base)
 {
-    T NumberOfDigits = 0;
+    T numberOfDigits = 0u;
 
-    do { Number /= Base; NumberOfDigits++; }
-    while (Number != 0);
+    do { Number /= Base; numberOfDigits++; }
+    while (Number != 0u);
 
-    return NumberOfDigits;
+    return numberOfDigits;
 }
 
 #endif

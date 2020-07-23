@@ -74,11 +74,6 @@ const DisplayWord DisplayWords::DisplayWordsTable[] PROGMEM
 /******************************************************************************************************************************************************
   Constructor of DisplayWords
 ******************************************************************************************************************************************************/
-/*! \brief          DisplayWords Constructor
- *  \details        Instantiation of the DisplayWords library
- *
- *  \return         -
-******************************************************************************************************************************************************/
 DisplayWords::DisplayWords()
 {
 
@@ -99,7 +94,7 @@ DisplayWords::~DisplayWords()
 ******************************************************************************************************************************************************/
 StdReturnType DisplayWords::getDisplayWord(WordIdType WordId, DisplayWord& Word) const
 {
-    StdReturnType ReturnValue = E_NOT_OK;
+    StdReturnType ReturnValue{E_NOT_OK};
 
     if(WordId < DisplayWords::WORD_NUMBER_OF_WORDS) {
         Word = getDisplayWordFast(WordId);
@@ -116,7 +111,7 @@ StdReturnType DisplayWords::getDisplayWord(WordIdType WordId, DisplayWord& Word)
 ******************************************************************************************************************************************************/
 StdReturnType DisplayWords::getDisplayWordLength(WordIdType WordId, byte& Length) const
 {
-    StdReturnType ReturnValue = E_NOT_OK;
+    StdReturnType ReturnValue{E_NOT_OK};
 
     if(WordId < DisplayWords::WORD_NUMBER_OF_WORDS) {
         Length = getDisplayWordLengthFast(WordId);
@@ -133,7 +128,7 @@ StdReturnType DisplayWords::getDisplayWordLength(WordIdType WordId, byte& Length
 ******************************************************************************************************************************************************/
 StdReturnType DisplayWords::getDisplayWordColumn(WordIdType WordId, byte& Column) const
 {
-    StdReturnType ReturnValue = E_NOT_OK;
+    StdReturnType ReturnValue{E_NOT_OK};
 
     if(WordId < DisplayWords::WORD_NUMBER_OF_WORDS) {
         Column = getDisplayWordColumnFast(WordId);
@@ -150,7 +145,7 @@ StdReturnType DisplayWords::getDisplayWordColumn(WordIdType WordId, byte& Column
 ******************************************************************************************************************************************************/
 StdReturnType DisplayWords::getDisplayWordRow(WordIdType WordId, byte& Row) const
 {
-    StdReturnType ReturnValue = E_NOT_OK;
+    StdReturnType ReturnValue{E_NOT_OK};
 
     if(WordId < DisplayWords::WORD_NUMBER_OF_WORDS) {
         Row = getDisplayWordRowFast(WordId);

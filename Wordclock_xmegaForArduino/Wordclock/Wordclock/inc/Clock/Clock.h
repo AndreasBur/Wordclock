@@ -108,20 +108,20 @@ class Clock
     ~Clock();
     
     MinuteTableElementType getMinutesTableElement(byte Minute) const {
-        MinuteTableElementType MinutesTableElement;
-        memcpy_P(&MinutesTableElement, &MinutesTable[Mode][Minute / CLOCK_MINUTE_STEP_IN_MINUTES], sizeof(MinuteType));
-        return MinutesTableElement;
+        MinuteTableElementType minutesTableElement;
+        memcpy_P(&minutesTableElement, &MinutesTable[Mode][Minute / CLOCK_MINUTE_STEP_IN_MINUTES], sizeof(MinuteType));
+        return minutesTableElement;
     }
     HourTableElementType getHoursTableElement(HourModeType HourMode, byte Hour) const {
-        HourTableElementType HoursTableElement;
-        memcpy_P(&HoursTableElement, &HoursTable[HourMode][Hour], sizeof(HourType));
-        return HoursTableElement;
+        HourTableElementType hoursTableElement;
+        memcpy_P(&hoursTableElement, &HoursTable[HourMode][Hour], sizeof(HourType));
+        return hoursTableElement;
     }
 
     boolean calculateItIs(byte Minute) const {
-        byte MinuteSteps = Minute / CLOCK_MINUTE_STEP_IN_MINUTES;
+        byte minuteSteps = Minute / CLOCK_MINUTE_STEP_IN_MINUTES;
         // show "it is" only to full and half hour
-        if(MinuteSteps == 0u || MinuteSteps == (CLOCK_NUMBER_OF_MINUTE_STEPS / 2u)) {
+        if(minuteSteps == 0u || minuteSteps == (CLOCK_NUMBER_OF_MINUTE_STEPS / 2u)) {
             return true;
         } else {
             return false;

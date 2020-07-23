@@ -178,14 +178,14 @@ class DisplayCharacters
 
     // functions
     DisplayCharactersTableElementType getDisplayCharactersTableElement(byte Column, byte Row) const {
-        DisplayCharactersTableElementType DisplayCharactersTableElement;
-        memcpy_P(&DisplayCharactersTableElement, &DisplayCharactersTable[Column][Row], sizeof(DisplayCharactersTableElementType));
-        return DisplayCharactersTableElement;
+        DisplayCharactersTableElementType displayCharactersTableElement;
+        memcpy_P(&displayCharactersTableElement, &DisplayCharactersTable[Column][Row], sizeof(DisplayCharactersTableElementType));
+        return displayCharactersTableElement;
     }
     DisplayCharactersTableElementType getDisplayCharactersTableElement(byte Index) const {
-        byte Column, Row;
-        indexToColumnAndRow(Index, Column, Row);
-        return getDisplayCharactersTableElement(Column, Row);
+        byte column, row;
+        indexToColumnAndRow(Index, column, row);
+        return getDisplayCharactersTableElement(column, row);
     }
 
 /******************************************************************************************************************************************************

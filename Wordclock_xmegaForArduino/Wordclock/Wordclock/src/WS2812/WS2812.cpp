@@ -30,14 +30,14 @@
 #define WS2812_ZERO_PULSE_DURATION_NS               350u
 #define WS2812_ONE_PULSE_DURATION_NS                900u
 #define WS2812_ZERO_PULSE_MAX_DURATION_NS           550u
-#define WS2812_RESET_DURATION_NS                    50000UL
+#define WS2812_RESET_DURATION_NS                    50000uL
 
-/* xmega hardware parameter */
+/* Xmega hardware parameter */
 #define WS2812_USART_SPI_BAUDRATE                   800000uL
 #define WS2812_XCL_LUT_TRUTH_TABLE_VALUE            0xA0u
 
-#define WS2812_BTC0_CYCLES_ONE_PULSE                (((F_CPU / 1000u) * WS2812_ONE_PULSE_DURATION_NS)  / 1000000u)
-#define WS2812_BTC0_CYCLES_ZERO_PULSE               (((F_CPU / 1000u) * WS2812_ZERO_PULSE_DURATION_NS) / 1000000u)
+#define WS2812_BTC0_CYCLES_ONE_PULSE                (((F_CPU / 1000uL) * WS2812_ONE_PULSE_DURATION_NS)  / 1000000uL)
+#define WS2812_BTC0_CYCLES_ZERO_PULSE               (((F_CPU / 1000uL) * WS2812_ZERO_PULSE_DURATION_NS) / 1000000uL)
 #define WS2812_BTC0_CYCLES_HARDWARE_DELAY           4u
 #define WS2812_BTC0_CYCLES_ONE_PULSE_CORRECTED      (WS2812_BTC0_CYCLES_ONE_PULSE - WS2812_BTC0_CYCLES_HARDWARE_DELAY)
 #define WS2812_BTC0_CYCLES_ZERO_PULSE_CORRECTED     (WS2812_BTC0_CYCLES_ZERO_PULSE - WS2812_BTC0_CYCLES_HARDWARE_DELAY)
@@ -47,23 +47,19 @@
 
 #define WS2812_XCL_PERCAPTL_VALUE                   WS2812_BTC0_CYCLES_ONE_PULSE_CORRECTED
 
-/* 
-    Xcl Cmpl max value is Xcl Percaptl.
-*/
+/* Xcl Cmpl max value is Xcl Percaptl. */
 #if ((WS2812_BTC0_CYCLES_ONE_PULSE_CORRECTED - WS2812_BTC0_CYCLES_ZERO_PULSE_CORRECTED) > WS2812_XCL_PERCAPTL_VALUE)
     #define WS2812_XCL_CMPL_VALUE                   WS2812_XCL_PERCAPTL_VALUE
 #else
     #define WS2812_XCL_CMPL_VALUE                   (WS2812_BTC0_CYCLES_ONE_PULSE_CORRECTED - WS2812_BTC0_CYCLES_ZERO_PULSE_CORRECTED)
 #endif
 
-/* 
-    the only critical timing parameter is the minimum pulse length of zero "0" 
-    warn or throw error if this timing can not be met with current F_CPU settings. 
-*/
-#define WS2812_ZERO_PULSE_DURATION_NS_CALC          ((WS2812_BTC0_MIN_CYCLES_ZERO_PULSE * 1000000u) / (F_CPU / 1000u))
+/* The only critical timing parameter is the minimum pulse length of zero "0",
+ *  warn or throw error if this timing can not be met with current F_CPU settings. */
+#define WS2812_ZERO_PULSE_DURATION_NS_CALC          ((WS2812_BTC0_MIN_CYCLES_ZERO_PULSE * 1000000uL) / (F_CPU / 1000uL))
 
 #if (WS2812_ZERO_PULSE_DURATION_NS_CALC > WS2812_ZERO_PULSE_MAX_DURATION_NS)
-    //#error "WS2812: sorry, the clock speed is too low. Did you set F_CPU correctly?"
+    #error "WS2812: sorry, the clock speed is too low. Did you set F_CPU correctly?"
 #elif (WS2812_ZERO_PULSE_DURATION_NS_CALC > (WS2812_ZERO_PULSE_MAX_DURATION_NS - 100u))
     #warning "WS2812: The timing is critical and may only work on WS2812B, not on WS2812(S)."
     #warning "Please consider a higher clockspeed, if possible"
@@ -132,16 +128,16 @@ WS2812& WS2812::getInstance()
 ******************************************************************************************************************************************************/
 boolean WS2812::init(byte Pin)
 {
-    PortPinType PortPin;
-    byte PinMask = digitalPinToBitMask(Pin);
-    byte Port = digitalPinToPort(digitalPinToPort(Pin));
+    PortPinType portPin;
+    byte pinMask = digitalPinToBitMask(Pin);
+    byte port = digitalPinToPort(digitalPinToPort(Pin));
 
-    if(isBitSet(PinMask, PORT_PIN_0)) { PortPin = PORT_PIN_0; } 
-    else if(isBitSet(PinMask, PORT_PIN_4)) { PortPin = PORT_PIN_4; } 
+    if(isBitSet(pinMask, PORT_PIN_0)) { portPin = PORT_PIN_0; } 
+    else if(isBitSet(pinMask, PORT_PIN_4)) { portPin = PORT_PIN_4; } 
     else { return E_NOT_OK; }
 
-    if((PortPin == PORT_PIN_0 || PortPin == PORT_PIN_4) && (Port == PORT_C || Port == PORT_D)) {
-        init(static_cast<PortType>(Port), PortPin);
+    if((portPin == PORT_PIN_0 || portPin == PORT_PIN_4) && (port == PORT_C || port == PORT_D)) {
+        init(static_cast<PortType>(port), portPin);
         return E_OK;
     }
     return E_NOT_OK;
@@ -374,16 +370,16 @@ StdReturnType WS2812::getPixelDimmed(IndexType Index, PixelType& Pixel) const
 ******************************************************************************************************************************************************/
 WS2812::PixelType WS2812::getPixelDimmedFast(IndexType Index) const
 {
-    PixelType Pixel;
+    PixelType pixel;
 
     if(Brightness == 255u) {
         return getPixelFast(Index);
     } else {
-        Pixel.Red = dimmColor(getPixelRedFast(Index));
-        Pixel.Green = dimmColor(getPixelGreenFast(Index));
-        Pixel.Blue = dimmColor(getPixelBlueFast(Index));
+        pixel.Red = dimmColor(getPixelRedFast(Index));
+        pixel.Green = dimmColor(getPixelGreenFast(Index));
+        pixel.Blue = dimmColor(getPixelBlueFast(Index));
     }
-    return Pixel;
+    return pixel;
 } /* getPixelDimmedFast */
 
 
@@ -559,8 +555,8 @@ boolean WS2812::isResetTimeElapsed()
 ******************************************************************************************************************************************************/
 void WS2812::dimmPixels(pPixelsType pPixels) const
 {
-    for(IndexType Index = 0; Index < WS2812_NUMBER_OF_LEDS; Index++) {
-        (*pPixels)[Index].setPixel(getPixelDimmedFast(Index));
+    for(IndexType index = 0; index < WS2812_NUMBER_OF_LEDS; index++) {
+        (*pPixels)[index].setPixel(getPixelDimmedFast(index));
     }
 } /* dimmPixels */
 
@@ -570,11 +566,11 @@ void WS2812::dimmPixels(pPixelsType pPixels) const
 ******************************************************************************************************************************************************/
 WS2812::PixelType WS2812::dimmPixel(byte Red, byte Green, byte Blue) const
 {
-    PixelType Pixel;
-    Pixel.Red = dimmColor(Red);
-    Pixel.Green = dimmColor(Green);
-    Pixel.Blue = dimmColor(Blue);
-    return Pixel;
+    PixelType pixel;
+    pixel.Red = dimmColor(Red);
+    pixel.Green = dimmColor(Green);
+    pixel.Blue = dimmColor(Blue);
+    return pixel;
 } /* dimmPixel */
 
 

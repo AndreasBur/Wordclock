@@ -21,6 +21,7 @@
  * I N C L U D E S
 ******************************************************************************************************************************************************/
 #include "AnimationClockCube.h"
+#include "StandardTypes.h"
 
 
 /******************************************************************************************************************************************************
@@ -77,14 +78,14 @@ void AnimationClockCube::init()
 ******************************************************************************************************************************************************/
 StdReturnType AnimationClockCube::setClock(byte Hour, byte Minute)
 {
-    StdReturnType ReturnValue{E_NOT_OK};
+    StdReturnType returnValue{E_NOT_OK};
 
     if(Clock::getInstance().getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
-        ReturnValue = E_OK;
+        returnValue = E_OK;
         setMaxBorder();
         State = STATE_CLEAR_TIME;
     }
-    return ReturnValue;
+    return returnValue;
 } /* setClock */
 
 
@@ -220,18 +221,18 @@ void AnimationClockCube::writeBorderPixels(bool Value)
 ******************************************************************************************************************************************************/
 StdReturnType AnimationClockCube::increaseBorder()
 {
-    StdReturnType ReturnValue = E_OK;
+    StdReturnType returnValue = E_OK;
 
     if(Border.ColumnStart > 0u) { Border.ColumnStart--; }
-    else { ReturnValue = E_NOT_OK; }
+    else { returnValue = E_NOT_OK; }
     if(Border.ColumnEnd < DISPLAY_NUMBER_OF_COLUMNS - 1) { Border.ColumnEnd++; }
-    else { ReturnValue = E_NOT_OK; }
+    else { returnValue = E_NOT_OK; }
     if(Border.RowStart > 0u) { Border.RowStart--; }
-    else { ReturnValue = E_NOT_OK; }
+    else { returnValue = E_NOT_OK; }
     if(Border.RowEnd < DISPLAY_NUMBER_OF_ROWS - 1) { Border.RowEnd++; }
-    else { ReturnValue = E_NOT_OK; }
+    else { returnValue = E_NOT_OK; }
 
-    return ReturnValue;
+    return returnValue;
 } /* increaseBorder */
 
 
@@ -240,18 +241,18 @@ StdReturnType AnimationClockCube::increaseBorder()
 ******************************************************************************************************************************************************/
 StdReturnType AnimationClockCube::decreaseBorder()
 {
-    StdReturnType ReturnValue = E_OK;
+    StdReturnType returnValue = E_OK;
 
     if(Border.ColumnStart < ANIMATION_CLOCK_CUBE_COLUMN_START_MAX_VALUE) { Border.ColumnStart++; }
-    else { ReturnValue = E_NOT_OK; }
+    else { returnValue = E_NOT_OK; }
     if(Border.ColumnEnd > ANIMATION_CLOCK_CUBE_COLUMN_END_MIN_VALUE) {Border. ColumnEnd--; }
-    else { ReturnValue = E_NOT_OK; }
+    else { returnValue = E_NOT_OK; }
     if(Border.RowStart < ANIMATION_CLOCK_CUBE_ROW_START_MAX_VALUE) { Border.RowStart++; }
-    else { ReturnValue = E_NOT_OK; }
+    else { returnValue = E_NOT_OK; }
     if(Border.RowEnd > ANIMATION_CLOCK_CUBE_ROW_END_MIN_VALUE) { Border.RowEnd--; }
-    else { ReturnValue = E_NOT_OK; }
+    else { returnValue = E_NOT_OK; }
 
-    return ReturnValue;
+    return returnValue;
 } /* decreaseBorder */
 
 

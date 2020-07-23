@@ -76,11 +76,11 @@ void AnimationClockCommon::init(StateType State)
 ******************************************************************************************************************************************************/
 boolean AnimationClockCommon::isPixelPartOfClockWords(const ClockWords::WordsListType ClockWordsTable, byte Column, byte Row) const
 {
-    DisplayWords Words;
+    DisplayWords words;
 
-    for(uint8_t WordIndex = 0u; WordIndex < ClockWordsTable.size(); WordIndex++) {
-        if(ClockWordsTable[WordIndex] == DisplayWords::WORD_NONE) { break; }
-        DisplayWord Word = Words.getDisplayWordFast(ClockWordsTable[WordIndex]);
+    for(uint8_t wordIndex = 0u; wordIndex < ClockWordsTable.size(); wordIndex++) {
+        if(ClockWordsTable[wordIndex] == DisplayWords::WORD_NONE) { break; }
+        DisplayWord Word = words.getDisplayWordFast(ClockWordsTable[wordIndex]);
         if(Word.getRow() == Row) { if(Column >= Word.getColumn() && Column < Word.getColumn() + Word.getLength()) { return true; } }
     }
     return false;
@@ -91,10 +91,10 @@ boolean AnimationClockCommon::isPixelPartOfClockWords(const ClockWords::WordsLis
 ******************************************************************************************************************************************************/
 boolean AnimationClockCommon::isPixelPartOfClockWords(const ClockWords::WordsListType ClockWordsTable, byte Index) const
 {
-    byte Row = Index / DISPLAY_NUMBER_OF_COLUMNS;
-    byte Column = Index % DISPLAY_NUMBER_OF_COLUMNS;
+    byte row = Index / DISPLAY_NUMBER_OF_COLUMNS;
+    byte column = Index % DISPLAY_NUMBER_OF_COLUMNS;
 
-    return isPixelPartOfClockWords(ClockWordsTable, Column, Row);
+    return isPixelPartOfClockWords(ClockWordsTable, column, row);
 } /* isPixelPartOfWord */
 
 

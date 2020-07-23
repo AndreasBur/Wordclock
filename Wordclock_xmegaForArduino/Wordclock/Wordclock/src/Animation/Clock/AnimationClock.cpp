@@ -121,11 +121,11 @@ AnimationClock::StateType AnimationClock::getState() const
 /******************************************************************************************************************************************************
   setAnimation()
 ******************************************************************************************************************************************************/
-void AnimationClock::setAnimation(AnimationType Animation)
+void AnimationClock::setAnimation(AnimationType animation)
 {
-    CurrentAnimation = Animation;
+    CurrentAnimation = animation;
 
-    switch(Animation)
+    switch(animation)
     {
         case ANIMATION_CLOCK_CURSOR :
             Animations.Cursor.init();

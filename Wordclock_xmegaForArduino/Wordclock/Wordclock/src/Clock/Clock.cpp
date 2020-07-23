@@ -168,11 +168,11 @@ Clock& Clock::getInstance()
 StdReturnType Clock::getClockWords(byte Hour, byte Minute, ClockWords& ClockWords) const
 {
     /* ----- Local Variables ---------------------------------------------- */
-    StdReturnType ReturnValue{E_NOT_OK};
+    StdReturnType returnValue{E_NOT_OK};
 
     /* ----- Implementation ----------------------------------------------- */
     if(Hour < CLOCK_NUMBER_OF_HOURS_PER_DAY && Minute < CLOCK_NUMBER_OF_MINUTES_PER_HOUR) {
-        ReturnValue = E_OK;
+        returnValue = E_OK;
         /* show IT IS permanently or only to full and half hour */
 #if (CLOCK_SHOW_IT_IS_PERMANENTLY == STD_ON)
         ClockWords.setShowItIs(true);
@@ -187,9 +187,9 @@ StdReturnType Clock::getClockWords(byte Hour, byte Minute, ClockWords& ClockWord
         ClockWords.setHourWords(getHoursTableElement(MinutesTableElement.HourMode, Hour));
         ClockWords.setMinuteWords(MinutesTableElement.Words);
     } else {
-        ReturnValue = E_NOT_OK;
+        returnValue = E_NOT_OK;
     }
-    return ReturnValue;
+    return returnValue;
 } /* getClockWords */
 
 
@@ -199,11 +199,11 @@ StdReturnType Clock::getClockWords(byte Hour, byte Minute, ClockWords& ClockWord
 StdReturnType Clock::getClockWords(byte Hour, byte Minute, ClockWordsListType& ClockWordsList) const
 {
     /* ----- Local Variables ---------------------------------------------- */
-    ClockWords ClockWords;
+    ClockWords clockWords;
 
     /* ----- Implementation ----------------------------------------------- */
-    if(getClockWords(Hour, Minute, ClockWords) == E_OK) {
-        ClockWordsList = ClockWords.getWordsList();
+    if(getClockWords(Hour, Minute, clockWords) == E_OK) {
+        ClockWordsList = clockWords.getWordsList();
         return E_OK;
     } else {
         return E_NOT_OK;
@@ -217,23 +217,23 @@ StdReturnType Clock::getClockWords(byte Hour, byte Minute, ClockWordsListType& C
 StdReturnType Clock::setClock(byte Hour, byte Minute)
 {
     /* ----- Local Variables ---------------------------------------------- */
-    StdReturnType ReturnValue{E_OK};
-    ClockWords ClockWords;
+    StdReturnType returnValue{E_OK};
+    ClockWords clockWords;
 
     /* ----- Implementation ----------------------------------------------- */
-    if(getClockWords(Hour, Minute, ClockWords) == E_NOT_OK) ReturnValue = E_NOT_OK;
+    if(getClockWords(Hour, Minute, clockWords) == E_NOT_OK) returnValue = E_NOT_OK;
 
-    if(ClockWords.getShowItIs()) {
-        if(Display::getInstance().setWord(DisplayWords::WORD_ES) == E_NOT_OK) ReturnValue = E_NOT_OK;
-        if(Display::getInstance().setWord(DisplayWords::WORD_IST) == E_NOT_OK) ReturnValue = E_NOT_OK;
+    if(clockWords.getShowItIs()) {
+        if(Display::getInstance().setWord(DisplayWords::WORD_ES) == E_NOT_OK) returnValue = E_NOT_OK;
+        if(Display::getInstance().setWord(DisplayWords::WORD_IST) == E_NOT_OK) returnValue = E_NOT_OK;
     }
-    for(byte Index = 0u; Index < ClockWords.getHourWords().size() && ClockWords.getHourWord(Index) != DisplayWords::WORD_NONE; Index++) {
-        if(Display::getInstance().setWord(ClockWords.getHourWord(Index)) == E_NOT_OK) ReturnValue = E_NOT_OK;
+    for(byte Index = 0u; Index < clockWords.getHourWords().size() && clockWords.getHourWord(Index) != DisplayWords::WORD_NONE; Index++) {
+        if(Display::getInstance().setWord(clockWords.getHourWord(Index)) == E_NOT_OK) returnValue = E_NOT_OK;
     }
-    for(byte Index = 0u; Index < ClockWords.getMinuteWord(Index) && ClockWords.getMinuteWord(Index) != DisplayWords::WORD_NONE; Index++) {
-        if(Display::getInstance().setWord(ClockWords.getMinuteWord(Index)) == E_NOT_OK) ReturnValue = E_NOT_OK;
+    for(byte Index = 0u; Index < clockWords.getMinuteWord(Index) && clockWords.getMinuteWord(Index) != DisplayWords::WORD_NONE; Index++) {
+        if(Display::getInstance().setWord(clockWords.getMinuteWord(Index)) == E_NOT_OK) returnValue = E_NOT_OK;
     }
-    return ReturnValue;
+    return returnValue;
 } /* setClock */
 
 
@@ -242,18 +242,18 @@ StdReturnType Clock::setClock(byte Hour, byte Minute)
 ******************************************************************************************************************************************************/
 void Clock::setClockFast(byte Hour, byte Minute)
 {
-    ClockWords ClockWords;
+    ClockWords clockWords;
 
-    if(getClockWords(Hour, Minute, ClockWords) == E_OK) {
-        if(ClockWords.getShowItIs()) {
+    if(getClockWords(Hour, Minute, clockWords) == E_OK) {
+        if(clockWords.getShowItIs()) {
             Display::getInstance().setWordFast(DisplayWords::WORD_ES);
             Display::getInstance().setWordFast(DisplayWords::WORD_IST);
         }
-        for(byte Index = 0u; Index < ClockWords.getHourWords().size() && ClockWords.getHourWord(Index) != DisplayWords::WORD_NONE; Index++) {
-            Display::getInstance().setWordFast(ClockWords.getHourWord(Index));
+        for(byte Index = 0u; Index < clockWords.getHourWords().size() && clockWords.getHourWord(Index) != DisplayWords::WORD_NONE; Index++) {
+            Display::getInstance().setWordFast(clockWords.getHourWord(Index));
         }
-        for(byte Index = 0u; Index < ClockWords.getMinuteWord(Index) && ClockWords.getMinuteWord(Index) != DisplayWords::WORD_NONE; Index++) {
-            Display::getInstance().setWordFast(ClockWords.getMinuteWord(Index));
+        for(byte Index = 0u; Index < clockWords.getMinuteWord(Index) && clockWords.getMinuteWord(Index) != DisplayWords::WORD_NONE; Index++) {
+            Display::getInstance().setWordFast(clockWords.getMinuteWord(Index));
         }
     }
 } /* setClockFast */

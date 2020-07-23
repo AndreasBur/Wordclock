@@ -115,13 +115,13 @@ StdReturnType BH1750::setMode(ModeType sMode)
 ******************************************************************************************************************************************************/
 StdReturnType BH1750::changeMeasurementTime(byte MTRegValue)
 {
-    StdReturnType ReturnValue = E_NOT_OK;
+    StdReturnType returnValue = E_NOT_OK;
 
     if(isMTRegValueInRange(MTRegValue)) {
         byte MTRegValueHighBits = readBitGroup(MTRegValue, BH1750_MT_REG_VALUE_HIGH_BITS_GM, BH1750_MT_REG_VALUE_HIGH_BITS_GP);
         byte MTRegValueLowBits = readBitGroup(MTRegValue, BH1750_MT_REG_VALUE_LOW_BITS_GM, BH1750_MT_REG_VALUE_LOW_BITS_GP);
         
-        ReturnValue = E_OK;
+        returnValue = E_OK;
         
         byte CmdCMTHighBitsWithValue = BH1750_CMD_CHANGE_MEASUREMENT_TIME_HIGH_BITS;
         writeBitGroup(CmdCMTHighBitsWithValue, BH1750_MT_CMD_HIGH_BITS_GM, BH1750_MT_CMD_HIGH_BITS_GP, MTRegValueHighBits);
@@ -129,12 +129,12 @@ StdReturnType BH1750::changeMeasurementTime(byte MTRegValue)
         byte CmdCMTLowBitsWithValue = BH1750_CMD_CHANGE_MEASUREMENT_TIME_LOW_BITS;
         writeBitGroup(CmdCMTLowBitsWithValue, BH1750_MT_CMD_LOW_BITS_GM, BH1750_MT_CMD_LOW_BITS_GP, MTRegValueLowBits);
        
-        if(sendCommand(CmdCMTHighBitsWithValue) == E_NOT_OK) { ReturnValue = E_NOT_OK; }
-        if(sendCommand(CmdCMTLowBitsWithValue) == E_NOT_OK) { ReturnValue = E_NOT_OK; }
-        if(sendMode() == E_NOT_OK) { ReturnValue = E_NOT_OK; }
+        if(sendCommand(CmdCMTHighBitsWithValue) == E_NOT_OK) { returnValue = E_NOT_OK; }
+        if(sendCommand(CmdCMTLowBitsWithValue) == E_NOT_OK) { returnValue = E_NOT_OK; }
+        if(sendMode() == E_NOT_OK) { returnValue = E_NOT_OK; }
     }
 
-    return ReturnValue;
+    return returnValue;
 
 } /* changeMeasurementTime */
 
@@ -148,19 +148,19 @@ StdReturnType BH1750::changeMeasurementTime(byte MTRegValue)
 ******************************************************************************************************************************************************/
 StdReturnType BH1750::readIlluminance()
 {
-    StdReturnType ReturnValue = E_NOT_OK;
-    byte LowByte, HighByte;
+    StdReturnType returnValue = E_NOT_OK;
+    byte lowByte, highByte;
 
     Wire.requestFrom(BH1750_I2C_ADDR, static_cast<uint8_t>(BH1750_ILLUMINANCE_RAW_VALUE_NUMBER_OF_BYTES));
     
     if(Wire.available() == BH1750_ILLUMINANCE_RAW_VALUE_NUMBER_OF_BYTES) {
-        ReturnValue = E_OK;
-        HighByte = Wire.read();
-        LowByte = Wire.read();
-        Illuminance = convertRawToLux(combineRawValueParts(HighByte, LowByte));
+        returnValue = E_OK;
+        highByte = Wire.read();
+        lowByte = Wire.read();
+        Illuminance = convertRawToLux(combineRawValueParts(highByte, lowByte));
     }
 
-    return ReturnValue;
+    return returnValue;
 }
 
 
