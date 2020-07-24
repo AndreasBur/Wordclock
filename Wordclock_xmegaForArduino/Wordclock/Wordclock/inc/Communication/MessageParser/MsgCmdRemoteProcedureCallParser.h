@@ -54,8 +54,11 @@ class MsgCmdRemoteProcedureCallParser : public MsgParameterParser<MsgCmdRemotePr
     {
         RPC_ID_BH1750_CALIBRATION_MAX_VALUE,
         RPC_ID_BH1750_CALIBRATION_MIN_VALUE,
-        RPC_ID_DISPLAY_TEST,
+        RPC_ID_DISPLAY_ENABLE,
+        RPC_ID_DISPLAY_DISABLE,
         RPC_ID_DISPLAY_CLEAR,
+        RPC_ID_DISPLAY_TEST,
+
         
     };
   
@@ -84,7 +87,8 @@ class MsgCmdRemoteProcedureCallParser : public MsgParameterParser<MsgCmdRemotePr
                 break;
             case RPC_ID_DISPLAY_TEST :
                 Display::getInstance().test();
-            case 
+                break;
+            default:
         }
     }
   
@@ -100,7 +104,9 @@ class MsgCmdRemoteProcedureCallParser : public MsgParameterParser<MsgCmdRemotePr
     // set methods
 
     // methods
-    void sendAnswer() { }
+    void sendAnswer() {
+        Serial.print(F(RpcId:)); 
+    }
     
     void process() { }
 };

@@ -76,7 +76,6 @@ class ErrorMessage
     void send(ErrorType Error) const {
         Serial.print(F("Error: "));
         Serial.print(Error);
-        Serial.println(); 
     }
 };
 

@@ -112,7 +112,6 @@ class MsgCmdDisplayColorParser : public MsgParameterParser<MsgCmdDisplayColorPar
         sendAnswerRed();
         sendAnswerGreen();
         sendAnswerBlue();
-        Serial.println();
     }
     
     void process() { }

@@ -69,7 +69,7 @@ class MsgCmdParser
     //private functions
     void sendAnswer(CommandType Command) const {
         Serial.print(Command);
-        Serial.println(CommandParameterDelimiter);
+        Serial.print(CommandParameterDelimiter);
     }
     
     CommandType getCommand() const {
