@@ -24,6 +24,7 @@
 #include "Arduino.h"
 #include "limits"
 #include <stdint.h>
+#include <limits.h>
 
 /******************************************************************************************************************************************************
  *  GLOBAL CONSTANT MACROS
@@ -246,6 +247,12 @@ template <typename VarType, typename MaskType, typename ValType>
 static inline void writeBitGroup(VarType& Var, MaskType BitGroupMask, ValType Value)
 {
     Var = (Var & ~(static_cast<VarType>(BitGroupMask))) | (static_cast<VarType>(Value & BitGroupMask));
+}
+
+template <typename T>
+size_t numberOfBits()
+{
+    return sizeof (T) * (CHAR_BIT);
 }
 
 template <typename T>

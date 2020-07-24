@@ -1,13 +1,13 @@
 ﻿/*Begining of Auto generated code by Atmel studio */
-#include <Arduino.h>
+//#include <Arduino.h>
 #include "Display.h"
 #include "Animation.h"
 #include "Clock.h"
 #include "WS2812.h"
-#include "BH1750.h"
 #include <util/delay.h>
 #include "Timer.h"
 #include "Communication.h"
+#include "BH1750.h"
 
 //volatile uint8_t* const PROGMEM port_to_mode_PGMdfg[] = {
     //NOT_A_PORT,
@@ -41,7 +41,6 @@
 //End of Auto generated function prototypes by Atmel Studio
 
 Animation wcAnimation();
-byte Brightness = 0;
 Communication wcCommunication;
 
 void initClockPrescaler()
@@ -62,13 +61,17 @@ void setup() {
 	Serial.begin(9600);
     initClockPrescaler();
     Display::getInstance().init();
+    Display::getInstance().enableBrightnessAutomatic();
+    BH1750::getInstance().setCalibrationValuesMaxValue(30000u);
+    Display::getInstance().setBrightness(200u);
 
-    BH1750 bh1750;
+    //BH1750 bh1750;
+
     Timer myTimer;
 
 	//cout << F("Hallo") << std::endl;
 
-    bh1750.changeMeasurementTime(0b10100111);
+    //bh1750.changeMeasurementTime(0b10100111);
 	
     //WS2812::getInstance().setBrightness(0);
     //WS2812::getInstance().show();
@@ -109,17 +112,14 @@ void loop()
     //WS2812::getInstance().setPixels(0, 0, 0);
     //(WS2812::getInstance().setPixels(85, 85, 85);
     //WS2812::getInstance().setPixels(255, 255, 255);
-    WS2812::getInstance().setPixel(0, Brightness, 0, 0);
-    WS2812::getInstance().show();
-    Brightness++;
-    if(Brightness > 10) Brightness = 0;
+    //WS2812::getInstance().setPixel(0, Brightness, 0, 0);
+    //WS2812::getInstance().show();
 
     SET_BIT(PORTC_OUT, 6);
     delayMicroseconds(10);
     CLEAR_BIT(PORTC_OUT, 6);
     delayMicroseconds(10);
 
-    Brightness++;
   //FontTahoma10x10::CharType Char;
   // put your main code here, to run repeatedly:
     Clock::getInstance().setClock(17,30);

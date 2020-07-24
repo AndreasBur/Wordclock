@@ -77,8 +77,9 @@ class GammaCorrection
      *************************************************************************************************************************************************/
     byte calcGamma7CorrectionValue(byte ValueLinear) const
     {
-        Gamma7TableElementType exponent = getGamma7TableElement(ValueLinear);
-        return exponent >> (7u - (ValueLinear / GAMMA_CORRECTION_GAMMA7_TABLE_NUMBER_OF_VALUES));
+        Gamma7TableElementType exponent{getGamma7TableElement(ValueLinear % GAMMA_CORRECTION_GAMMA7_TABLE_NUMBER_OF_VALUES)};
+        byte Log2OfResolution = numberOfBits<byte>();
+        return exponent >> ((Log2OfResolution - 1u) - (ValueLinear / GAMMA_CORRECTION_GAMMA7_TABLE_NUMBER_OF_VALUES));
     }
     
 /******************************************************************************************************************************************************

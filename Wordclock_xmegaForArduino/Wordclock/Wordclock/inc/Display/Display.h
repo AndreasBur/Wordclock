@@ -26,14 +26,16 @@
 #include "DisplayCharacters.h"
 #include "DisplayWords.h"
 #include "GammaCorrection.h"
+#include "BH1750.h"
 
 /******************************************************************************************************************************************************
  *  GLOBAL CONSTANT MACROS
 ******************************************************************************************************************************************************/
 /* Display configuration parameter */
-#define DISPLAY_DATA_PIN                        10u
-#define DISPLAY_LED_STRIPE_SERPENTINE           STD_OFF
-#define DISPLAY_USE_WS2812_DIMMING              STD_OFF
+#define DISPLAY_DATA_PIN                                        10u
+#define DISPLAY_LED_STRIPE_SERPENTINE                           STD_OFF
+#define DISPLAY_USE_WS2812_DIMMING                              STD_OFF
+#define DISPLAY_BRIGHTNESS_AUTOMATIC_CORRECTION_FACTOR          1.0f
 
 #if (WS2812_IS_SINGLETON == STD_ON)
     #define Pixels                              WS2812::getInstance()
@@ -99,6 +101,8 @@ class Display
     using PixelColumnType = uint16_t;
 
     /* mapping to underlying hardware */
+    using IlluminanceType = BH1750::IlluminanceType;
+    
     using PixelColorType = WS2812::PixelType;
     using ColorType = NeoPixel::ColorType;
     using Stripe = WS2812;
@@ -109,6 +113,7 @@ class Display
 ******************************************************************************************************************************************************/
   private:
     StateType State;
+    boolean BrightnessAutomatic;
 #if (WS2812_IS_SINGLETON == STD_OFF)
     Stripe Pixels;
 #endif
@@ -126,12 +131,14 @@ class Display
     Display(byte, byte, byte);
     ~Display();
     
+    byte calculateBrightnessAutomaticCorrected(byte) const;
+    
     byte transformToSerpentine(byte, byte) const;
     byte transformToSerpentine(byte) const;
 
 #if (DISPLAY_USE_WS2812_DIMMING == STD_OFF)
-    byte dimmColor(byte Color) const { 
-        byte dimmedColor = (Color * Brightness) >> 8u;
+    byte dimmColor(byte Color, byte BrightnessCorrected) const {
+        byte dimmedColor = (Color * BrightnessCorrected) >> 8u;
         if(dimmedColor == 0u) return 1u;
         else return dimmedColor;
     }
@@ -144,12 +151,13 @@ class Display
     static Display& getInstance();
 
     // get methods
+    StateType getState() const { return State; }
+    boolean getBrightnessAutomatic() const { return BrightnessAutomatic; }
+    
     PixelColorType getColor() const { return Color; }
     ColorType getColorRed() const { return Color.Red; }
     ColorType getColorGreen() const { return Color.Green; }
     ColorType getColorBlue() const { return Color.Blue; }
-    
-    StateType getState() const { return State; }
 
 #if (DISPLAY_USE_WS2812_DIMMING == STD_ON)
     byte getBrightness() const { return Pixels.getBrightness(); }
@@ -158,6 +166,7 @@ class Display
 #endif
 
     // set methods
+    void setBrightnessAutomatic(boolean sBrightnessAutomatic) { BrightnessAutomatic = sBrightnessAutomatic; }
     void setColor(PixelColorType sColor) { Color = sColor; }
     void setColor(ColorType Red, byte Green, ColorType Blue) { Color.Red = Red; Color.Green = Green; Color.Blue = Blue; }
     void setColorRed(ColorType Red) { Color.Red = Red; }
@@ -165,7 +174,10 @@ class Display
     void setColorBlue(ColorType Blue) { Color.Blue = Blue;}
 
 #if (DISPLAY_USE_WS2812_DIMMING == STD_ON)
-    void setBrightness(byte Brightness) { Pixels.setBrightness(Brightness, true); }
+    void setBrightness(byte Brightness) { 
+        if(BrightnessAutomatic == true) { Pixels.setBrightness(Brightness, true); }
+        else { Pixels.setBrightness(calculateBrightnessAutomaticCorrected(Brightness)); } 
+    }
 #else
     void setBrightness(byte);
 #endif
@@ -227,6 +239,8 @@ class Display
     void show() { Pixels.show(); }
     void enable() { Pixels.enablePixels(); }
     void disable() { Pixels.disablePixels(); }
+    void enableBrightnessAutomatic() { BrightnessAutomatic = true; }
+    void disableBrightnessAutomatic() { BrightnessAutomatic = false; }
     void test();
     void clear() { Pixels.clearPixels(); }
     void indexToColumnAndRow(byte Index, byte& Column, byte& Row) const { Row = Index / DISPLAY_NUMBER_OF_COLUMNS; Column = Index % DISPLAY_NUMBER_OF_COLUMNS; }

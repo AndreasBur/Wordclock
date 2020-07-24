@@ -45,73 +45,11 @@
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  Constructor of Display
-******************************************************************************************************************************************************/
-Display::Display(PixelColorType sColor) 
-#ifdef SIMULATOR
-: Pixels(0L, _("Wordclock Simulator"))
-#elif (WS2812_IS_SINGLETON == STD_OFF)
-: Pixels()
-#endif
-{
-    //Pixels = WS2812::getInstance();
-    Color = sColor;
-    State = STATE_UNINIT;
-
-#if (DISPLAY_USE_WS2812_DIMMING == STD_OFF)
-    Brightness = 255;
-    ColorDimmed = Color;
-#endif
-
-#ifdef SIMULATOR
-    Pixels.SetIcon(wxICON(WordclockIcon));
-    Pixels.Show();
-#endif
-} /* Display */
-
-
-/******************************************************************************************************************************************************
-  Constructor of Display
-******************************************************************************************************************************************************/
-Display::Display(ColorType Red, ColorType Green, ColorType Blue)
-#ifdef SIMULATOR
-: Pixels(0L, _("Wordclock Simulator"))
-#elif (WS2812_IS_SINGLETON == STD_OFF)
-: Pixels()
-#endif
-{
-    //Pixels = WS2812::getInstance();
-    Color.Red = Red;
-    Color.Green = Green;
-    Color.Blue = Blue;
-    State = STATE_UNINIT;
-
-#if (DISPLAY_USE_WS2812_DIMMING == STD_OFF)
-    Brightness = 255;
-    ColorDimmed = Color;
-#endif
-
-#ifdef SIMULATOR
-    Pixels.SetIcon(wxICON(WordclockIcon));
-    Pixels.Show();
-#endif
-} /* Display */
-
-
-/******************************************************************************************************************************************************
-  Destructor of Display
-******************************************************************************************************************************************************/
-Display::~Display()
-{
-
-} /* ~Display */
-
-/******************************************************************************************************************************************************
   Singleton Instance of Display
 ******************************************************************************************************************************************************/
 Display& Display::getInstance()
 {
-    static Display SingletonInstance(0, 0, 0);
+    static Display SingletonInstance(0u, 0u, 0u);
     return SingletonInstance;
 }
 
@@ -132,11 +70,18 @@ void Display::init()
 ******************************************************************************************************************************************************/
 void Display::setBrightness(byte sBrightness)
 {
-    Brightness = GCorrection.getCorrectedValue(sBrightness);
+    Brightness = sBrightness;
+    byte BrightnessCorrected;
+    
+    if(BrightnessAutomatic == true) {
+        BrightnessCorrected = GCorrection.getCorrectedValue(calculateBrightnessAutomaticCorrected(Brightness));
+    } else {
+        BrightnessCorrected = GCorrection.getCorrectedValue(Brightness);
+    }
 
-    ColorDimmed.Red = dimmColor(Color.Red);
-    ColorDimmed.Green = dimmColor(Color.Green);
-    ColorDimmed.Blue = dimmColor(Color.Blue);
+    ColorDimmed.Red = dimmColor(Color.Red, BrightnessCorrected);
+    ColorDimmed.Green = dimmColor(Color.Green, BrightnessCorrected);
+    ColorDimmed.Blue = dimmColor(Color.Blue, BrightnessCorrected);
 
     for(byte Index = 0; Index < DISPLAY_NUMBER_OF_PIXELS; Index++) {
         // update all pixels to new brightness
@@ -601,6 +546,81 @@ void Display::setPixelColumnFast(byte Column, PixelRowType PixelColumn)
 /******************************************************************************************************************************************************
  * P R I V A T E   F U N C T I O N S
 ******************************************************************************************************************************************************/
+
+/******************************************************************************************************************************************************
+  Constructor of Display
+******************************************************************************************************************************************************/
+Display::Display(PixelColorType sColor) 
+#ifdef SIMULATOR
+: Pixels(0L, _("Wordclock Simulator"))
+#elif (WS2812_IS_SINGLETON == STD_OFF)
+: Pixels()
+#endif
+{
+    //Pixels = WS2812::getInstance();
+    BrightnessAutomatic = false;
+    State = STATE_UNINIT;
+    Color = sColor;
+    
+#if (DISPLAY_USE_WS2812_DIMMING == STD_OFF)
+    Brightness = 255;
+    ColorDimmed = Color;
+#endif
+
+#ifdef SIMULATOR
+    Pixels.SetIcon(wxICON(WordclockIcon));
+    Pixels.Show();
+#endif
+} /* Display */
+
+
+/******************************************************************************************************************************************************
+  Constructor of Display
+******************************************************************************************************************************************************/
+Display::Display(ColorType Red, ColorType Green, ColorType Blue)
+#ifdef SIMULATOR
+: Pixels(0L, _("Wordclock Simulator"))
+#elif (WS2812_IS_SINGLETON == STD_OFF)
+: Pixels()
+#endif
+{
+    //Pixels = WS2812::getInstance();
+    Color.Red = Red;
+    Color.Green = Green;
+    Color.Blue = Blue;
+    State = STATE_UNINIT;
+
+#if (DISPLAY_USE_WS2812_DIMMING == STD_OFF)
+    Brightness = 255;
+    ColorDimmed = Color;
+#endif
+
+#ifdef SIMULATOR
+    Pixels.SetIcon(wxICON(WordclockIcon));
+    Pixels.Show();
+#endif
+} /* Display */
+
+
+/******************************************************************************************************************************************************
+  Destructor of Display
+******************************************************************************************************************************************************/
+Display::~Display()
+{
+
+} /* ~Display */
+
+/******************************************************************************************************************************************************
+  calculateBrightnessAutomaticCorrected()
+******************************************************************************************************************************************************/
+byte Display::calculateBrightnessAutomaticCorrected(byte sBrightness) const
+{
+     IlluminanceType Illuminance = BH1750::getInstance().getIlluminance();
+     IlluminanceType IlluminanceMax = BH1750::getInstance().getCalibrationValuesMaxValue();
+     float IlluminanceFactor = static_cast<float>(Illuminance) / IlluminanceMax;
+     
+     return static_cast<byte>(sBrightness * IlluminanceFactor * DISPLAY_BRIGHTNESS_AUTOMATIC_CORRECTION_FACTOR);
+} /* calculateBrightnessAutomaticCorrected */ 
 
 /******************************************************************************************************************************************************
   transformToSerpentine()
