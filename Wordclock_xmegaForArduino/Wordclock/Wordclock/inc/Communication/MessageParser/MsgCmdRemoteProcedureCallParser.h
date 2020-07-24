@@ -8,147 +8,105 @@
  *  ---------------------------------------------------------------------------------------------------------------------------------------------------
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       Clock.h
- *      \brief
+/**     \file       MsgCmdRemoteProcedureCallParser.h
+ *      \brief      
  *
- *      \details
- *
- *****************************************************************************************************************************************************/
-#ifndef _CLOCK_H_
-#define _CLOCK_H_
+ *      \details    
+ *                  
+******************************************************************************************************************************************************/
+#ifndef _MSG_CMD_REMOTE_PROCEDURE_CALL_PARSER_H_
+#define _MSG_CMD_REMOTE_PROCEDURE_CALL_PARSER_H_
 
 /******************************************************************************************************************************************************
- * INCLUDES
+ * I N C L U D E S
 ******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Arduino.h"
+#include "MsgParameterParser.h"
+#include "BH1750.h"
 #include "Display.h"
-#include "ClockWords.h"
-#include <array>
 
 /******************************************************************************************************************************************************
- *  GLOBAL CONSTANT MACROS
+ *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
-/* Clock configuration parameter */
-#define CLOCK_SHOW_IT_IS_PERMANENTLY            STD_ON
+/* MsgCmdRemoteProcedureCallParser configuration parameter */
 
-/* Clock  parameter */
-/* Hour */
-#define CLOCK_NUMBER_OF_HOUR_MODES              2u
-#define CLOCK_NUMBER_OF_HOURS                   12u
 
-#define CLOCK_NUMBER_OF_HOURS_PER_DAY           24u
-#define CLOCK_NUMBER_OF_MINUTES_PER_HOUR        60u
+/* MsgCmdRemoteProcedureCallParser parameter */
+#define MSG_CMD_REMOTE_PROCEDURE_CALL_PARSER_PARAMETER_TABLE_SIZE           1u
 
-/* Minute */
-#define CLOCK_MINUTE_STEP_IN_MINUTES            5u
-#define CLOCK_NUMBER_OF_MINUTE_STEPS            12u
 
 /******************************************************************************************************************************************************
- *  GLOBAL FUNCTION MACROS
+ *  G L O B A L   F U N C T I O N   M A C R O S
 ******************************************************************************************************************************************************/
 
 
 /******************************************************************************************************************************************************
- *  GLOBAL DATA TYPES AND STRUCTURES
- *****************************************************************************************************************************************************/
-
-
-/******************************************************************************************************************************************************
- *  C L A S S   C L O C K
+ *  C L A S S   T E M P L A T E
 ******************************************************************************************************************************************************/
-class Clock
+class MsgCmdRemoteProcedureCallParser : public MsgParameterParser<MsgCmdRemoteProcedureCallParser, MSG_CMD_REMOTE_PROCEDURE_CALL_PARSER_PARAMETER_TABLE_SIZE>
 {
 /******************************************************************************************************************************************************
- *  GLOBAL DATA TYPES AND STRUCTURES
+ *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-    /*  */
-    enum ModeType {
-        MODE_WESSI,
-        MODE_OSSI,
-        MODE_RHEIN_RUHR,
-        MODE_SCHWABEN
+    enum RpcIdType
+    {
+        RPC_ID_BH1750_CALIBRATION_MAX_VALUE,
+        RPC_ID_BH1750_CALIBRATION_MIN_VALUE,
+        RPC_ID_DISPLAY_TEST,
+        RPC_ID_DISPLAY_CLEAR,
+        
     };
-
-    enum HourModeType {
-        HOUR_MODE_FULL_HOUR,
-        HOUR_MODE_NO_FULL_HOUR
-    };
-
-    struct MinuteType {
-        HourModeType HourMode;
-        byte HourOffset;
-        ClockWords::MinutesWordsType Words;
-    };
-
-    using HourType = ClockWords::HourWordsType;
-    using ClockWordsListType = ClockWords::WordsListType;
-
-    using HourTableElementType = HourType;
-    using MinuteTableElementType = MinuteType;
-
+  
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
-    ModeType Mode;
-
-    static const HourType HoursTable[][CLOCK_NUMBER_OF_HOURS];
-    static const MinuteType MinutesTable[][CLOCK_NUMBER_OF_MINUTE_STEPS];
+    friend class MsgParameterParser;
+    static constexpr char RemoteProcedureShortName{'P'};
+        
+    static constexpr ParameterTableType ParameterTable PROGMEM {
+        ParameterTableElementType(RemoteProcedureShortName, MsgParameter::ARGUMENT_TYPE_UINT8)
+    };
     
-    // functions
-    Clock(ModeType);
-    ~Clock();
-    
-    MinuteTableElementType getMinutesTableElement(byte Minute) const {
-        MinuteTableElementType minutesTableElement;
-        memcpy_P(&minutesTableElement, &MinutesTable[Mode][Minute / CLOCK_MINUTE_STEP_IN_MINUTES], sizeof(MinuteType));
-        return minutesTableElement;
-    }
-    HourTableElementType getHoursTableElement(HourModeType HourMode, byte Hour) const {
-        HourTableElementType hoursTableElement;
-        memcpy_P(&hoursTableElement, &HoursTable[HourMode][Hour], sizeof(HourType));
-        return hoursTableElement;
-    }
-
-    boolean calculateItIs(byte Minute) const {
-        byte minuteSteps = Minute / CLOCK_MINUTE_STEP_IN_MINUTES;
-        // show "it is" only to full and half hour
-        if(minuteSteps == 0u || minuteSteps == (CLOCK_NUMBER_OF_MINUTE_STEPS / 2u)) {
-            return true;
-        } else {
-            return false;
+    // functions// functions
+    void handleParameter(char ParameterShortName, byte Argument)
+    {
+        RpcIdType RpcId = static_cast<RpcIdType>(Argument);
+        
+        switch(RpcId) {
+            case RPC_ID_BH1750_CALIBRATION_MAX_VALUE :
+                BH1750::getInstance().startCalibrationMaxValue();
+                break;
+            case RPC_ID_BH1750_CALIBRATION_MIN_VALUE :
+                BH1750::getInstance().startCalibrationMinValue();
+                break;
+            case RPC_ID_DISPLAY_TEST :
+                Display::getInstance().test();
+            case 
         }
     }
-
-    byte transform24hTo12hFormat(byte Hour) const {
-        return Hour % CLOCK_NUMBER_OF_HOURS;
-    }
-
+  
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    static Clock& getInstance();
-      
+    constexpr MsgCmdRemoteProcedureCallParser(const char* Parameter) : MsgParameterParser(ParameterTable, Parameter) { }
+    ~MsgCmdRemoteProcedureCallParser() { }
+
     // get methods
-    ModeType getMode() const { return Mode; }
-    StdReturnType getClockWords(byte, byte, ClockWords&) const;
-    StdReturnType getClockWords(byte, byte, ClockWordsListType&) const;
 
     // set methods
-    void setMode(ModeType sMode) { Mode = sMode; }
 
     // methods
-    StdReturnType setClock(byte, byte);
-    void setClockFast(byte, byte);
-    void show() { Display::getInstance().show(); }
-    void refresh(byte Hour, byte Minute) { setClock(Hour, Minute); show(); }
+    void sendAnswer() { }
+    
+    void process() { }
 };
 
-
 #endif
+
 /******************************************************************************************************************************************************
- *  END OF FILE
+ *  E N D   O F   F I L E
 ******************************************************************************************************************************************************/

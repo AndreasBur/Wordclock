@@ -178,7 +178,6 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
     }
 
     // get methods
-    
     const char* getParameter() const { return ParameterBuffer; }
     const ParameterTableType& getParameterTable() const { return ParameterTable; }
 

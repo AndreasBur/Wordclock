@@ -379,6 +379,9 @@
     <Compile Include="inc\Communication\MessageParser\MsgCmdParser.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="inc\Communication\MessageParser\MsgCmdRemoteProcedureCallParser.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="inc\Communication\MessageParser\MsgParameter.h">
       <SubType>compile</SubType>
     </Compile>

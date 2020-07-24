@@ -42,9 +42,9 @@
 #define ANIMATION_FONT_SUPPORT_FONT_10X10            STD_ON
 
 /* AnimationFont parameter */
-#define ANIMATION_FONT_ASCII_TABLE_OFFSET       -32
-#define ANIMATION_FONT_ASCII_CHAR_MIN           32
-#define ANIMATION_FONT_ASCII_CHAR_MAX           127
+#define ANIMATION_FONT_ASCII_TABLE_OFFSET               -32
+#define ANIMATION_FONT_ASCII_CHAR_MIN                    32
+#define ANIMATION_FONT_ASCII_CHAR_MAX                   127
 
 
 /******************************************************************************************************************************************************
