@@ -54,6 +54,7 @@ class MsgCmdParser
         COMMAND_DISPLAY_COLOR,
         COMMAND_DISPLAY_BRIGHTNESS,
         COMMAND_CLOCK_MODE,
+        COMMAND_CLOCK_ANIMATION,
         COMMAND_TIME,
         COMMAND_DATE
     };

@@ -52,6 +52,7 @@ class MsgCmdRemoteProcedureCallParser : public MsgParameterParser<MsgCmdRemotePr
   public:
     enum RpcIdType
     {
+        RPC_ID_NONE,
         RPC_ID_BH1750_CALIBRATION_MAX_VALUE,
         RPC_ID_BH1750_CALIBRATION_MIN_VALUE,
         RPC_ID_DISPLAY_ENABLE,
@@ -67,16 +68,17 @@ class MsgCmdRemoteProcedureCallParser : public MsgParameterParser<MsgCmdRemotePr
 ******************************************************************************************************************************************************/
   private:
     friend class MsgParameterParser;
+    RpcIdType RpcId;
     static constexpr char RemoteProcedureShortName{'P'};
         
     static constexpr ParameterTableType ParameterTable PROGMEM {
         ParameterTableElementType(RemoteProcedureShortName, MsgParameter::ARGUMENT_TYPE_UINT8)
     };
     
-    // functions// functions
+    // functions
     void handleParameter(char ParameterShortName, byte Argument)
     {
-        RpcIdType RpcId = static_cast<RpcIdType>(Argument);
+        RpcId = static_cast<RpcIdType>(Argument);
         
         switch(RpcId) {
             case RPC_ID_BH1750_CALIBRATION_MAX_VALUE :
@@ -84,6 +86,15 @@ class MsgCmdRemoteProcedureCallParser : public MsgParameterParser<MsgCmdRemotePr
                 break;
             case RPC_ID_BH1750_CALIBRATION_MIN_VALUE :
                 BH1750::getInstance().startCalibrationMinValue();
+                break;
+            case RPC_ID_DISPLAY_ENABLE :
+                Display::getInstance().enable();
+                break;
+            case RPC_ID_DISPLAY_DISABLE :
+                Display::getInstance().disable();
+                break;
+            case RPC_ID_DISPLAY_CLEAR :
+                Display::getInstance().clear();
                 break;
             case RPC_ID_DISPLAY_TEST :
                 Display::getInstance().test();
@@ -96,7 +107,7 @@ class MsgCmdRemoteProcedureCallParser : public MsgParameterParser<MsgCmdRemotePr
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr MsgCmdRemoteProcedureCallParser(const char* Parameter) : MsgParameterParser(ParameterTable, Parameter) { }
+    constexpr MsgCmdRemoteProcedureCallParser(const char* Parameter) : MsgParameterParser(ParameterTable, Parameter), RpcId(RPC_ID_NONE) { }
     ~MsgCmdRemoteProcedureCallParser() { }
 
     // get methods
@@ -105,7 +116,8 @@ class MsgCmdRemoteProcedureCallParser : public MsgParameterParser<MsgCmdRemotePr
 
     // methods
     void sendAnswer() {
-        Serial.print(F(RpcId:)); 
+        Serial.print(F("RpcId: "));
+        Serial.print(RpcId);
     }
     
     void process() { }

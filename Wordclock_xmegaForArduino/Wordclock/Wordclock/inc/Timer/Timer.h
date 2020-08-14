@@ -28,7 +28,7 @@
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
 /* Timer configuration parameter */
-#define TIMER_TC                    TCC4
+#define TIMER_TC                            TCC4
 
 /* Timer parameter */
 
@@ -49,7 +49,7 @@ class Timer
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-  /* Timer ISR callback function */
+    /* Timer ISR callback function */
     typedef void (*TimerIsrCallbackF_void)(void);
 
     /* Type which describes the Timer peripheral */
@@ -80,7 +80,7 @@ class Timer
         TIMER_REG_CS_PRESCALE_1024
     } TimerClockSelectType;
 
-    /* Type which includes the Pwm Pins */
+    /* Type which defines the Pwm Pins */
     typedef enum {
         TEST
         //TIMER_PWM_PIN_9 = TIMER_A_ARDUINO_PIN,

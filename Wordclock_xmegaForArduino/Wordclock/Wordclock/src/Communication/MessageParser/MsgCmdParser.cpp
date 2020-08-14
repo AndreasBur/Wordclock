@@ -22,8 +22,9 @@
 ******************************************************************************************************************************************************/
 #include "MsgCmdParser.h"
 #include "MsgCmdDisplayColorParser.h"
-#include "MsgCmdClockModeParser.h"
 #include "MsgCmdDisplayBrightnessParser.h"
+#include "MsgCmdClockModeParser.h"
+#include "MsgCmdAnimationClockParser.h"
 
 /******************************************************************************************************************************************************
  *  L O C A L   C O N S T A N T   M A C R O S 
@@ -63,6 +64,9 @@ MsgCmdParser::~MsgCmdParser()
 
 } /* ~MsgCmdParser */
 
+/******************************************************************************************************************************************************
+  parse()
+******************************************************************************************************************************************************/
 void MsgCmdParser::parse()
 {
     CommandType command = getCommand();
@@ -80,6 +84,11 @@ void MsgCmdParser::parse()
         cmdDisplayBrightnessParser.parse();
         cmdDisplayBrightnessParser.process();
         cmdDisplayBrightnessParser.sendAnswer();
+    } else if(command == COMMAND_DISPLAY_BRIGHTNESS) {
+        MsgCmdAnimationClockParser cmdAnimationClockParser(parameter);
+        cmdAnimationClockParser.parse();
+        cmdAnimationClockParser.process();
+        cmdAnimationClockParser.sendAnswer();
     } else if(command == COMMAND_CLOCK_MODE) {
         MsgCmdClockModeParser cmdClockModeParser(parameter);
         cmdClockModeParser.parse();

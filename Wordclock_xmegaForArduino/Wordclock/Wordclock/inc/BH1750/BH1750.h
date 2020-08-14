@@ -109,7 +109,7 @@ class BH1750
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
-  public:  
+  public:
     static BH1750& getInstance();
 
     // get methods
@@ -128,8 +128,8 @@ class BH1750
     // methods
     StdReturnType init(ModeType);
     StdReturnType changeMeasurementTime(byte);
-    void startCalibrationMaxValue() { task(); CalibrationValues.MaxValue = readIlluminance(); }
-    void startCalibrationMinValue() { task(); CalibrationValues.MinValue = readIlluminance(); }
+    void startCalibrationMaxValue() { task(); CalibrationValues.MaxValue = Illuminance; }
+    void startCalibrationMinValue() { task(); CalibrationValues.MinValue = Illuminance; }
     
     void task();
 };

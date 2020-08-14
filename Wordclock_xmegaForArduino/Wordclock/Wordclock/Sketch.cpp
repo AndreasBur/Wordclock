@@ -40,7 +40,7 @@
 //Beginning of Auto generated function prototypes by Atmel Studio
 //End of Auto generated function prototypes by Atmel Studio
 
-Animation wcAnimation();
+//Animation wcAnimation();
 Communication wcCommunication;
 
 void initClockPrescaler()

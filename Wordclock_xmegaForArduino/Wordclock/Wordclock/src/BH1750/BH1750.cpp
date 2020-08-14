@@ -57,12 +57,12 @@
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  Singleton Instance of Display
+  Singleton Instance of BH1750
 ******************************************************************************************************************************************************/
 BH1750& BH1750::getInstance()
 {
-    static BH1750 SingletonInstance;
-    return SingletonInstance;
+    static BH1750 singletonInstance;
+    return singletonInstance;
 }
 
 /******************************************************************************************************************************************************
@@ -79,6 +79,7 @@ StdReturnType BH1750::init(ModeType Mode)
 ******************************************************************************************************************************************************/
 void BH1750::task()
 {
+    // TODO: call error handler in case of error.
     sendMode();
     readIlluminance();
 } /* task */
@@ -89,14 +90,14 @@ void BH1750::task()
 ******************************************************************************************************************************************************/
 StdReturnType BH1750::setMode(ModeType sMode)
 {
-    StdReturnType ReturnValue = E_NOT_OK;
+    StdReturnType returnValue = E_NOT_OK;
     Mode = sMode;
 
     if(Mode != MODE_NONE) {
-        ReturnValue = sendMode();
+        returnValue = sendMode();
     }
 
-    return ReturnValue;
+    return returnValue;
 } /* setMode */
 
 

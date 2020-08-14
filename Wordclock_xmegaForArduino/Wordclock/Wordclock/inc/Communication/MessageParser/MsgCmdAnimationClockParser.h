@@ -1,4 +1,4 @@
-/*************************************************************************************************************_MSG_CMD_DISPLAY_BRIGHTNESS_PARSER_H_*****************************************
+/******************************************************************************************************************************************************
  *  COPYRIGHT
  *  ---------------------------------------------------------------------------------------------------------------------------------------------------
  *  \verbatim
@@ -8,32 +8,32 @@
  *  ---------------------------------------------------------------------------------------------------------------------------------------------------
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       MsgCmdDisplayBrightnessParser.h
+/**     \file       MsgCmdAnimationClockParser.h
  *      \brief      
  *
  *      \details    
  *                  
 ******************************************************************************************************************************************************/
-#ifndef _MSG_CMD_DISPLAY_BRIGHTNESS_PARSER_H_
-#define _MSG_CMD_DISPLAY_BRIGHTNESS_PARSER_H_
+#ifndef _MSG_CMD_ANIMATION_CLOCK_PARSER_H_
+#define _MSG_CMD_ANIMATION_CLOCK_PARSER_H_
 
 /******************************************************************************************************************************************************
  * I N C L U D E S
 ******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Arduino.h"
-#include "NeoPixel.h"
-#include "Display.h"
 #include "MsgParameterParser.h"
+#include "Animation.h"
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
-/* MsgCmdDisplayBrightnessParser configuration parameter */
+/* MsgCmdAnimationClockParser configuration parameter */
 
 
-/* MsgCmdDisplayBrightnessParser parameter */
-#define MSG_CMD_DISPLAY_BRIGHTNESS_PARSER_PARAMETER_TABLE_SIZE           2u
+/* MsgCmdAnimationClockParser parameter */
+#define MSG_CMD_ANIMATION_CLOCK_PARSER_PARAMETER_TABLE_SIZE           2u
+
 
 /******************************************************************************************************************************************************
  *  G L O B A L   F U N C T I O N   M A C R O S
@@ -43,37 +43,40 @@
 /******************************************************************************************************************************************************
  *  C L A S S   T E M P L A T E
 ******************************************************************************************************************************************************/
-class MsgCmdDisplayBrightnessParser : public MsgParameterParser<MsgCmdDisplayBrightnessParser, MSG_CMD_DISPLAY_BRIGHTNESS_PARSER_PARAMETER_TABLE_SIZE>
+class MsgCmdAnimationClockParser : public MsgParameterParser<MsgCmdAnimationClockParser, MSG_CMD_ANIMATION_CLOCK_PARSER_PARAMETER_TABLE_SIZE>
 {
 /******************************************************************************************************************************************************
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-
-    
+    using AnimationClockType = Animation::AnimationClockType;
+  
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
-    friend class MsgParameterParser;
-    static constexpr char BrightnessOptionShortName{'B'};
-    static constexpr char AutomaticOptionShortName{'A'};
+    AnimationClockType AnimationClock;
+    byte Speed;
         
-    static constexpr ParameterTableType ParameterTable PROGMEM 
-    {
-        MsgParameter(BrightnessOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8),
-        MsgParameter(AutomaticOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8)
+    friend class MsgParameterParser;
+    static constexpr char AnimationOptionShortName{'A'};
+    static constexpr char SpeedOptionShortName{'S'};
+
+    static constexpr ParameterTableType ParameterTable PROGMEM {
+        ParameterTableElementType(AnimationOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8),
+        ParameterTableElementType(SpeedOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8)
     };
     
-    // functions
+    // functions// functions
+    byte convertSpeedToTaskCycle(byte Speed) { return UINT8_MAX - Speed; }
     
     void handleParameter(char ParameterShortName, byte Argument)
     {
-        if(ParameterShortName == BrightnessOptionShortName) {
-            Display::getInstance().setBrightness(Argument);
+        if(ParameterShortName == AnimationOptionShortName) {
+            Animation::getInstance().setAnimation(static_cast<Animation::AnimationClockType>(Argument));
         }
-        if(ParameterShortName == AutomaticOptionShortName) {
-            Display::getInstance().setBrightnessAutomatic(Argument);
+        if(ParameterShortName == SpeedOptionShortName) {
+             Animation::getInstance().setClockTaskCylce(convertSpeedToTaskCycle(Argument));
         }
     }
   
@@ -81,17 +84,22 @@ class MsgCmdDisplayBrightnessParser : public MsgParameterParser<MsgCmdDisplayBri
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr MsgCmdDisplayBrightnessParser(const char* Parameter) : MsgParameterParser(ParameterTable, Parameter) {}
-    ~MsgCmdDisplayBrightnessParser() {}
+    constexpr MsgCmdAnimationClockParser(const char* Parameter) : MsgParameterParser(ParameterTable, Parameter) { }
+    ~MsgCmdAnimationClockParser() { }
 
     // get methods
 
     // set methods
 
     // methods
-    void sendAnswer() {}
+    void sendAnswer()
+    {
+        Serial.print(ModeOptionShortName);
+        Serial.print(OptionArgumentDelimiter);
+        Serial.print(Display::getInstance().getColorRed());
+    }
+    
     void process() { }
-
 };
 
 #endif
