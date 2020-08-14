@@ -67,8 +67,8 @@ class Animation
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
-    Animation();
-    ~Animation();
+    constexpr Animation() : wcAnimationClock(), wcAnimationFont() {}
+    ~Animation() {}
     
     AnimationClock wcAnimationClock;
     AnimationFont wcAnimationFont;
@@ -81,6 +81,7 @@ class Animation
 
     // get methods
     StateType getState();
+    AnimationClockType getAnimation() const { return wcAnimationClock.getAnimation(); }
     byte getFontTaskCycle() const { return wcAnimationFont.getTaskCycle(); }
     byte getClockTaskCycle(AnimationClockType AnimationClock) const { return wcAnimationClock.getTaskCycle(AnimationClock); }
 
@@ -101,7 +102,7 @@ class Animation
     void setTextWithShift(const char* Text, AnimationFont::FontType Font) { wcAnimationFont.setTextWithShift(Text, Font); }
 
     // AnimationFont functions
-    void setAnimation(AnimationClock::AnimationType Animation) { wcAnimationClock.setAnimation(Animation); }
+    void setAnimation(AnimationClockType Animation) { wcAnimationClock.setAnimation(Animation); }
     StdReturnType setClock(byte Hour, byte Minute) { return wcAnimationClock.setClock(Hour, Minute); }
 };
 

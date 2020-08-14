@@ -87,8 +87,16 @@ class AnimationClockShift : public AnimationClockCommon
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    AnimationClockShift();
-    ~AnimationClockShift();
+    constexpr AnimationClockShift() : wcTransformation(), ClockWordsTable{DisplayWords::WORD_NONE},
+#if (ANIMATION_CLOCK_SHIFT_HORIZONTAL == STD_ON)
+                            CurrentColumn()
+#endif
+
+#if (ANIMATION_CLOCK_SHIFT_VERTICAL == STD_ON)
+                            CurrentRow()
+#endif
+    {}
+    ~AnimationClockShift() {}
 
     // get methods
 

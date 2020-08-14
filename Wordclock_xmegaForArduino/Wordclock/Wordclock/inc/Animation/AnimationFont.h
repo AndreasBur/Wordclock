@@ -97,8 +97,8 @@ class AnimationFont
 ******************************************************************************************************************************************************/
   private:
     Transformation wcTransformation;
-    byte TaskCycle;
     ShiftType Shift;
+    byte TaskCycle;
     StateType State;
 
 #if(ANIMATION_FONT_SUPPORT_FONT_5X8 == STD_ON)
@@ -149,8 +149,26 @@ class AnimationFont
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    AnimationFont();
-    ~AnimationFont();
+    constexpr AnimationFont() : wcTransformation(), Shift{nullptr, FONT_NONE, STD_NULL_CHARACTER, 0, 0, SHIFT_STATE_IDLE},
+                                TaskCycle(ANIMATION_FONT_TASK_CYCLE_INIT_VALUE), State(STATE_UNINIT),
+
+#if(ANIMATION_FONT_SUPPORT_FONT_5X8 == STD_ON)
+                                Font5x8(),
+#endif
+#if(ANIMATION_FONT_SUPPORT_FONT_7X9 == STD_ON)
+                                Font7x9(),
+#endif
+#if(ANIMATION_FONT_SUPPORT_FONT_7X10 == STD_ON)
+                                Font7x10(),
+#endif
+#if(ANIMATION_FONT_SUPPORT_FONT_9X10 == STD_ON)
+                                Font9x10(),
+#endif
+#if(ANIMATION_FONT_SUPPORT_FONT_10X10 == STD_ON)
+                                Font10x10()
+#endif 
+    {}
+    ~AnimationFont() {}
 
     // get methods
     StateType getState() const { return State; }

@@ -55,10 +55,10 @@ class MsgCmdAnimationClockParser : public MsgParameterParser<MsgCmdAnimationCloc
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
+    friend class MsgParameterParser;
     AnimationClockType AnimationClock;
     byte Speed;
-        
-    friend class MsgParameterParser;
+
     static constexpr char AnimationOptionShortName{'A'};
     static constexpr char SpeedOptionShortName{'S'};
 
@@ -69,14 +69,15 @@ class MsgCmdAnimationClockParser : public MsgParameterParser<MsgCmdAnimationCloc
     
     // functions// functions
     byte convertSpeedToTaskCycle(byte Speed) { return UINT8_MAX - Speed; }
+    byte convertTaskCycleToSpeed(byte TaskCylce) { return UINT8_MAX - TaskCylce; }
     
     void handleParameter(char ParameterShortName, byte Argument)
     {
         if(ParameterShortName == AnimationOptionShortName) {
-            Animation::getInstance().setAnimation(static_cast<Animation::AnimationClockType>(Argument));
+            AnimationClock = static_cast<Animation::AnimationClockType>(Argument);
         }
         if(ParameterShortName == SpeedOptionShortName) {
-             Animation::getInstance().setClockTaskCylce(convertSpeedToTaskCycle(Argument));
+             Speed = Argument;
         }
     }
   
@@ -84,7 +85,12 @@ class MsgCmdAnimationClockParser : public MsgParameterParser<MsgCmdAnimationCloc
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr MsgCmdAnimationClockParser(const char* Parameter) : MsgParameterParser(ParameterTable, Parameter) { }
+    MsgCmdAnimationClockParser(const char* Parameter) : MsgParameterParser(ParameterTable, Parameter), AnimationClock(), Speed(0u)
+    {
+        AnimationClock = Animation::getInstance().getAnimation();
+        Speed = Animation::getInstance().getClockTaskCycle(AnimationClock);
+    }
+    
     ~MsgCmdAnimationClockParser() { }
 
     // get methods
@@ -94,12 +100,16 @@ class MsgCmdAnimationClockParser : public MsgParameterParser<MsgCmdAnimationCloc
     // methods
     void sendAnswer()
     {
-        Serial.print(ModeOptionShortName);
+        //Serial.print(ModeOptionShortName);
         Serial.print(OptionArgumentDelimiter);
         Serial.print(Display::getInstance().getColorRed());
     }
     
-    void process() { }
+    void process()
+    {
+        Animation::getInstance().setAnimation(AnimationClock);
+        Animation::getInstance().setClockTaskCylce(AnimationClock, convertSpeedToTaskCycle(Speed));
+    }
 };
 
 #endif

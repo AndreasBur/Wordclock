@@ -87,7 +87,7 @@ class AnimationClock
         AnimationClockCube Cube;
         AnimationClockFlicker Flicker;
 
-        AnimationsType() {}
+        constexpr AnimationsType() : Cursor() {}
         ~AnimationsType() {}
     };
 
@@ -105,8 +105,8 @@ class AnimationClock
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    AnimationClock();
-    ~AnimationClock();
+    constexpr AnimationClock() : TaskCycles{0}, CurrentAnimation(ANIMATION_CLOCK_NONE), Animations() {}
+    ~AnimationClock() {}
 
     // get methods
     AnimationType getAnimation() const { return CurrentAnimation; }

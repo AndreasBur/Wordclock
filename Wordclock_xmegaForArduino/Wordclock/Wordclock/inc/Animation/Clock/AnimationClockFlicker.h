@@ -28,7 +28,7 @@
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
 /* AnimationClockFlicker configuration parameter */
-#define ANIMATION_CLOCK_FLICKER_COUNTER_INIT_VALUE          4
+#define ANIMATION_CLOCK_FLICKER_COUNTER_INIT_VALUE          4u
 
 /* AnimationClockFlicker parameter */
 
@@ -68,8 +68,8 @@ class AnimationClockFlicker : public AnimationClockCommon
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    AnimationClockFlicker();
-    ~AnimationClockFlicker();
+    constexpr AnimationClockFlicker() : Minute(0u), Hour(0u), IsClockSet(false), FlickerCounter(ANIMATION_CLOCK_FLICKER_COUNTER_INIT_VALUE) {}
+    ~AnimationClockFlicker() {}
 
     // get methods
 

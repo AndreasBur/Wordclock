@@ -72,8 +72,8 @@ class AnimationClockCommon
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    AnimationClockCommon();
-    ~AnimationClockCommon();
+    constexpr AnimationClockCommon() : State(STATE_NONE) {}
+    ~AnimationClockCommon() {}
 
     // get methods
     StateType getState() const { return State; }
@@ -81,7 +81,7 @@ class AnimationClockCommon
     // set methods
 
     // methods
-    void init(StateType);
+    constexpr void init(StateType sState) { State = sState; }
     void show() { Display::getInstance().show(); }
     boolean isPixelPartOfClockWords(ClockWords::WordsListType, byte, byte) const;
     boolean isPixelPartOfClockWords(ClockWords::WordsListType, byte) const;

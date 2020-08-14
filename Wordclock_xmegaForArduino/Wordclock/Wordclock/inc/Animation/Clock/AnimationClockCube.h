@@ -92,8 +92,9 @@ class AnimationClockCube : public AnimationClockCommon
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    AnimationClockCube();
-    ~AnimationClockCube();
+    constexpr AnimationClockCube() : ClockWordsTable{DisplayWords::WORD_NONE}, Border{ANIMATION_CLOCK_CUBE_COLUMN_START_MAX_VALUE, ANIMATION_CLOCK_CUBE_COLUMN_END_MIN_VALUE, 
+        ANIMATION_CLOCK_CUBE_ROW_START_MAX_VALUE, ANIMATION_CLOCK_CUBE_ROW_END_MIN_VALUE}, BorderState(BORDER_STATE_MIN) {}
+    ~AnimationClockCube() { }
 
     // get methods
 

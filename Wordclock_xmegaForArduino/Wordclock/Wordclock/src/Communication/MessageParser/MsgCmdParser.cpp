@@ -50,7 +50,7 @@
 /******************************************************************************************************************************************************
   Constructor of MsgCmdParser
 ******************************************************************************************************************************************************/
-MsgCmdParser::MsgCmdParser(const Message& sMessage) : IncomingMessage(sMessage) 
+MsgCmdParser::MsgCmdParser(const Message& sMessage) : Error(), IncomingMessage(sMessage) 
 {
 
 } /* MsgCmdParser */

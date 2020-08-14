@@ -98,8 +98,8 @@ class Clock
     static const MinuteType MinutesTable[][CLOCK_NUMBER_OF_MINUTE_STEPS];
     
     // functions
-    Clock(ModeType);
-    ~Clock();
+    constexpr Clock(ModeType sMode) : Mode(sMode) {}
+    ~Clock() {}
     
     MinuteTableElementType getMinutesTableElement(byte Minute) const {
         MinuteTableElementType minutesTableElement;

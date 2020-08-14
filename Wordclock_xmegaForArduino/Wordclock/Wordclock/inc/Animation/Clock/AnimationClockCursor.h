@@ -72,8 +72,8 @@ class AnimationClockCursor : public AnimationClockCommon
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    AnimationClockCursor();
-    ~AnimationClockCursor();
+    constexpr AnimationClockCursor() : ClockWordsTable{DisplayWords::WORD_NONE}, CurrentPixelIndex(0) {}
+    ~AnimationClockCursor() {}
 
     // get methods
 

@@ -61,12 +61,12 @@ class Timer
 
     /* Type which describes the internal state of the TIMER */
     typedef enum {
-        TIMER_STATE_NONE,
-        TIMER_STATE_INIT,
-        TIMER_STATE_READY,
-        TIMER_STATE_RUNNING,
-        TIMER_STATE_STOPPED
-    } TimerStateType;
+        STATE_NONE,
+        STATE_INIT,
+        STATE_READY,
+        STATE_RUNNING,
+        STATE_STOPPED
+    } StateType;
 
     /* Type which includes the values of the Clock Select Bit Group */
     typedef enum {
@@ -96,6 +96,9 @@ class Timer
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
+    StateType State;
+    TimerClockSelectType ClockSelectBitGroup;
+    TimerIsrCallbackF_void TimerOverflowCallback;
 
     // functions
     template <typename TimerType> bool isTimerOfType5(TimerType Timer) { return (uint16_t)&Timer & 0x40u ? true : false; }
@@ -107,12 +110,8 @@ class Timer
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    Timer();
-    ~Timer();
-    Timer(const Timer&);
-    TimerStateType State;
-    TimerClockSelectType ClockSelectBitGroup;
-    uint32_t PwmPeriod;
+    constexpr Timer() : State(STATE_NONE), ClockSelectBitGroup(TIMER_REG_CS_NO_PRESCALER), TimerOverflowCallback(nullptr)  {}
+    ~Timer() {}
 
     // get methods
 
@@ -121,8 +120,7 @@ class Timer
 
     // methods
     static Timer& getInstance();
-    TimerIsrCallbackF_void TimerOverflowCallback;
-    StdReturnType init(uint32_t = 1000u, TimerIsrCallbackF_void = NULL);
+    StdReturnType init(uint32_t = 1000u, TimerIsrCallbackF_void = nullptr);
     StdReturnType setPeriod(uint32_t);
     StdReturnType enablePwm(TimerPwmPinType, uint16_t);
     StdReturnType disablePwm(TimerPwmPinType);

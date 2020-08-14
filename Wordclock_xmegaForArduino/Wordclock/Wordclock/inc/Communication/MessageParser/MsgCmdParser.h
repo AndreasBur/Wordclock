@@ -64,8 +64,8 @@ class MsgCmdParser
 ******************************************************************************************************************************************************/
   private:
     static const char CommandParameterDelimiter{' '};
-    const Message& IncomingMessage;
     ErrorMessage Error;
+    const Message& IncomingMessage;
   
     //private functions
     void sendAnswer(CommandType Command) const {

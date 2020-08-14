@@ -47,33 +47,15 @@
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  Constructor of Timer
-******************************************************************************************************************************************************/
-Timer::Timer()
-{
-
-} /* Timer */
-
-
-/******************************************************************************************************************************************************
-  Destructor of Timer
-******************************************************************************************************************************************************/
-Timer::~Timer()
-{
-
-} /* ~Timer */
-
-
-/******************************************************************************************************************************************************
   init()
 ******************************************************************************************************************************************************/
 StdReturnType Timer::init(uint32_t Microseconds, TimerIsrCallbackF_void sTimerOverflowCallback)
 {
     StdReturnType returnValue{E_NOT_OK};
 
-    if(TIMER_STATE_NONE == State) {
+    if(STATE_NONE == State) {
         returnValue = E_OK;
-        State = TIMER_STATE_INIT;
+        State = STATE_INIT;
 
         /* set mode 7: Dual-slope PWM */
         writeBitGroup(TIMER_TC.CTRLB, TC4_WGMODE_gm, TC_WGMODE_DSBOTTOM_gc);
@@ -81,7 +63,7 @@ StdReturnType Timer::init(uint32_t Microseconds, TimerIsrCallbackF_void sTimerOv
         if(setPeriod(Microseconds) == E_NOT_OK) returnValue = E_NOT_OK;
         if(sTimerOverflowCallback != NULL) if(attachInterrupt(sTimerOverflowCallback) == E_NOT_OK) returnValue = E_NOT_OK;
 
-        State = TIMER_STATE_READY;
+        State = STATE_READY;
     }
     return returnValue;
 } /* init */
@@ -123,7 +105,7 @@ StdReturnType Timer::setPeriod(uint32_t Microseconds)
         /* Set TOP value of timer */
         ATOMIC_BLOCK(ATOMIC_RESTORESTATE) { TIMER_TC.PER = timerCycles; }
 
-        if(TIMER_STATE_RUNNING == State)
+        if(STATE_RUNNING == State)
         {
             /* reset clock select register, and start the clock */
             //writeBitGroup(TIMER_TC.CTRLA, CLK_SCLKSEL_gm, ClockSelectBitGroup << CLK_SCLKSEL_gp);
@@ -149,7 +131,7 @@ StdReturnType Timer::read(uint32_t& Microseconds)
 {
     StdReturnType returnValue{E_NOT_OK};
 
-    if(TIMER_STATE_RUNNING == State || TIMER_STATE_STOPPED == State) {
+    if(STATE_RUNNING == State || STATE_STOPPED == State) {
         uint32_t counterValue{0u};
         byte prescaleShiftScale{0u};
         returnValue = E_OK;

@@ -58,9 +58,9 @@ class Communication
 ******************************************************************************************************************************************************/
   private:
     static constexpr char EndOfMessageChar{'\n'};
-    StateType State;
-    Message IncomingMessage;
     ErrorMessage Error;
+    Message IncomingMessage;
+    StateType State;
     
     // private functions
     void addMessagePart();
@@ -69,8 +69,8 @@ class Communication
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    Communication();
-    ~Communication();
+    Communication() : Error(), IncomingMessage(), State(STATE_MESSAGE_INCOMPLETE) {}
+    ~Communication() {}
 
     // get methods
     StateType getState() const { return State; }

@@ -64,7 +64,7 @@ class FontSprite5x8 : public Font<FontCharVertical<byte, FONT_SPRITE_5X8_WIDTH>,
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    FontSprite5x8() : Font(FontTable) {
+    constexpr FontSprite5x8() : Font(FontTable) {
         
     }
     

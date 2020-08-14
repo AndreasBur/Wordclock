@@ -60,11 +60,11 @@ class AnimationClockTeletype : public AnimationClockCommon
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
+    DisplayWords Words;
     ClockWords::WordsListType ClockWordsTable;
     byte CurrentWordIndex;
     byte CurrentWordLength;
     byte CurrentCharIndex;
-    DisplayWords Words;
 
     // functions
     void reset();
@@ -74,8 +74,9 @@ class AnimationClockTeletype : public AnimationClockCommon
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    AnimationClockTeletype();
-    ~AnimationClockTeletype();
+    constexpr AnimationClockTeletype() : Words(), ClockWordsTable{DisplayWords::WORD_NONE}, 
+                                         CurrentWordIndex(0u), CurrentWordLength(0u), CurrentCharIndex(0u) {}
+    ~AnimationClockTeletype() {}
     
     // get methods
 

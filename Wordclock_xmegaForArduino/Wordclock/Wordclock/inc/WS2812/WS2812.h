@@ -132,7 +132,7 @@ class WS2812
     
     byte dimmColor(byte Color) const {
         byte dimmedColor = (Color * Brightness) >> 8u;
-        if(dimmedColor == 0u) return 1;
+        if(dimmedColor == 0u) return 1u;
         else return dimmedColor;
     }
 #endif

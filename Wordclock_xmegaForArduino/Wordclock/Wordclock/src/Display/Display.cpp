@@ -557,7 +557,6 @@ Display::Display(PixelColorType sColor)
 : Pixels()
 #endif
 {
-    //Pixels = WS2812::getInstance();
     BrightnessAutomatic = false;
     State = STATE_UNINIT;
     Color = sColor;
@@ -584,7 +583,6 @@ Display::Display(ColorType Red, ColorType Green, ColorType Blue)
 : Pixels()
 #endif
 {
-    //Pixels = WS2812::getInstance();
     Color.Red = Red;
     Color.Green = Green;
     Color.Blue = Blue;
