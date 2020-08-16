@@ -173,9 +173,7 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
 ******************************************************************************************************************************************************/
   public:
     constexpr MsgParameterParser(const ParameterTableType& sParameterTable, const char* sParameter)
-    : Error(), ParameterBuffer(sParameter), ParameterTable(sParameterTable) {
-        
-    }
+    : Error(), ParameterBuffer(sParameter), ParameterTable(sParameterTable) {}
 
     // get methods
     const char* getParameter() const { return ParameterBuffer; }
