@@ -73,7 +73,7 @@ class AnimationClockSnake : public AnimationClockCommon
 ******************************************************************************************************************************************************/
   public:
     constexpr AnimationClockSnake() : SnakeState(SNAKE_STATE_TO_RIGHT), ClockWordsTable{DisplayWords::WORD_NONE}, 
-                                      SnakeBeginIndex(0u), SnakeEndIndex(0u) {}
+                                      SnakeBeginIndex(0u), SnakeEndIndex(0u) { }
     ~AnimationClockSnake();
 
     // get methods

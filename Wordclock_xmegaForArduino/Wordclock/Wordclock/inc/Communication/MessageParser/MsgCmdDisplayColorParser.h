@@ -67,6 +67,13 @@ class MsgCmdDisplayColorParser : public MsgParameterParser<MsgCmdDisplayColorPar
     };
     
     // functions
+    void handleParameter(char ParameterShortName, byte Argument)
+    {
+        if(ParameterShortName == RedOptionShortName) { Display::getInstance().setColorRed(Argument); }
+        if(ParameterShortName == GreenOptionShortName) { Display::getInstance().setColorGreen(Argument); }
+        if(ParameterShortName == BlueOptionShortName) { Display::getInstance().setColorBlue(Argument); }
+    }    
+
     void sendAnswerRed()
     {
         Serial.print(RedOptionShortName);
@@ -86,13 +93,6 @@ class MsgCmdDisplayColorParser : public MsgParameterParser<MsgCmdDisplayColorPar
         Serial.print(BlueOptionShortName);
         Serial.print(OptionArgumentDelimiter);
         Serial.print(Display::getInstance().getColorBlue());
-    }
-    
-    void handleParameter(char ParameterShortName, byte Argument)
-    {
-        if(ParameterShortName == RedOptionShortName) { Display::getInstance().setColorRed(Argument); }
-        if(ParameterShortName == GreenOptionShortName) { Display::getInstance().setColorGreen(Argument); }
-        if(ParameterShortName == BlueOptionShortName) { Display::getInstance().setColorBlue(Argument); }
     }
   
 /******************************************************************************************************************************************************

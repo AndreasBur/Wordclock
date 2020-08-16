@@ -86,10 +86,7 @@ class GammaCorrection
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr GammaCorrection() 
-    {
-        
-    }
+    constexpr GammaCorrection() { }
 
 
     // get methods

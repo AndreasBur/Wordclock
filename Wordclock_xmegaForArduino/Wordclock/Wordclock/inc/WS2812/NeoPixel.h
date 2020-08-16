@@ -80,7 +80,8 @@ class NeoPixel
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr NeoPixel() : Pixel{0u, 0u, 0u} {}
+    constexpr NeoPixel() : Pixel{0u, 0u, 0u} { }
+    ~NeoPixel() { }
 
     // get methods
     ColorType getRed() const { return Pixel[colorOffsetRed()]; }

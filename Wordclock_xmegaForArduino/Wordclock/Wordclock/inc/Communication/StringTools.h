@@ -78,8 +78,8 @@ class StringTools
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    StringTools() {}
-    ~StringTools() {}
+    constexpr StringTools() { }
+    ~StringTools() { }
 
     // get methods
 
@@ -90,7 +90,7 @@ class StringTools
         strncpy(Destination, Source, Length - 1u);
         Destination[Length - 1u] = '\0';
     }
-    
+
     template<typename T,
              typename std::enable_if_t<std::is_unsigned<T>::value, int> = 0,
              typename std::enable_if_t<std::is_integral<T>::value, int> = 0>
@@ -99,7 +99,7 @@ class StringTools
         errno = 0;
         uint64_t valueBig = strtoul(String, &end, Base);
         Position = end - String;
-        
+
         if(String == end) { 
             return RESULT_NO_VALUE;
         } else if(errno == ERANGE || valueBig > std::numeric_limits<T>::max()) {

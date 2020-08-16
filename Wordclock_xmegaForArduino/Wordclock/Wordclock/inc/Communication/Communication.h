@@ -69,8 +69,8 @@ class Communication
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    Communication() : Error(), IncomingMessage(), State(STATE_MESSAGE_INCOMPLETE) {}
-    ~Communication() {}
+    Communication() : Error(), IncomingMessage(), State(STATE_MESSAGE_INCOMPLETE) { }
+    ~Communication() { }
 
     // get methods
     StateType getState() const { return State; }

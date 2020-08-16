@@ -57,6 +57,7 @@ class MsgCmdRemoteProcedureCallParser : public MsgParameterParser<MsgCmdRemotePr
         RPC_ID_BH1750_CALIBRATION_MIN_VALUE,
         RPC_ID_DISPLAY_ENABLE,
         RPC_ID_DISPLAY_DISABLE,
+        RPC_ID_DISPLAY_SHOW,
         RPC_ID_DISPLAY_CLEAR,
         RPC_ID_DISPLAY_TEST,
 
@@ -68,7 +69,8 @@ class MsgCmdRemoteProcedureCallParser : public MsgParameterParser<MsgCmdRemotePr
 ******************************************************************************************************************************************************/
   private:
     friend class MsgParameterParser;
-    RpcIdType RpcId;
+    RpcIdType RpcId{RPC_ID_NONE};
+    StdReturnType ReturnValue{E_OK};
     static constexpr char RemoteProcedureShortName{'P'};
         
     static constexpr ParameterTableType ParameterTable PROGMEM {
@@ -93,6 +95,9 @@ class MsgCmdRemoteProcedureCallParser : public MsgParameterParser<MsgCmdRemotePr
             case RPC_ID_DISPLAY_DISABLE :
                 Display::getInstance().disable();
                 break;
+            case RPC_ID_DISPLAY_SHOW :
+                ReturnValue = Display::getInstance().show();
+                break;
             case RPC_ID_DISPLAY_CLEAR :
                 Display::getInstance().clear();
                 break;
@@ -107,7 +112,7 @@ class MsgCmdRemoteProcedureCallParser : public MsgParameterParser<MsgCmdRemotePr
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr MsgCmdRemoteProcedureCallParser(const char* Parameter) : MsgParameterParser(ParameterTable, Parameter), RpcId(RPC_ID_NONE) { }
+    constexpr MsgCmdRemoteProcedureCallParser(const char* Parameter) : MsgParameterParser(ParameterTable, Parameter) { }
     ~MsgCmdRemoteProcedureCallParser() { }
 
     // get methods
@@ -117,7 +122,8 @@ class MsgCmdRemoteProcedureCallParser : public MsgParameterParser<MsgCmdRemotePr
     // methods
     void sendAnswer() {
         Serial.print(F("RpcId: "));
-        Serial.print(RpcId);
+        Serial.println(RpcId);
+        Error.send(ReturnValue);
     }
     
     void process() { }

@@ -80,8 +80,8 @@ class AnimationClockDrop : public AnimationClockCommon
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr AnimationClockDrop() : Words(), ClockWordsTable{DisplayWords::WORD_NONE}, Row(0u), Column(0u), CurrenWordIndex(0u) {}
-    ~AnimationClockDrop() {}
+    constexpr AnimationClockDrop() : Words(), ClockWordsTable{DisplayWords::WORD_NONE}, Row(0u), Column(0u), CurrenWordIndex(0u) { }
+    ~AnimationClockDrop() { }
 
     // get methods
 

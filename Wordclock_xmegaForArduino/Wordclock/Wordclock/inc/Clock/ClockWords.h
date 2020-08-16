@@ -68,10 +68,10 @@ class ClockWords
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr ClockWords() : ShowItIs(false), HourWords{DisplayWords::WORD_NONE}, MinuteWords{DisplayWords::WORD_NONE} {}
+    constexpr ClockWords() : ShowItIs(false), HourWords{DisplayWords::WORD_NONE}, MinuteWords{DisplayWords::WORD_NONE} { }
     constexpr ClockWords(bool sShowItIs, HourWordsType sHourWords, MinutesWordsType sMinuteWords) 
-        : ShowItIs(sShowItIs), HourWords(sHourWords), MinuteWords(sMinuteWords) {}
-    ~ClockWords() {}
+        : ShowItIs(sShowItIs), HourWords(sHourWords), MinuteWords(sMinuteWords) { }
+    ~ClockWords() { }
     
     bool operator==(const ClockWords& sClockWords);
     bool operator!=(const ClockWords& sClockWords);

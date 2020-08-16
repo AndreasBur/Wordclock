@@ -192,8 +192,8 @@ class DisplayCharacters
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr DisplayCharacters() {}
-    ~DisplayCharacters();
+    constexpr DisplayCharacters() { }
+    ~DisplayCharacters() { }
 
     // get methods fast
     char getCharacterFast(byte Column, byte Row) const { return getDisplayCharactersTableElement(Column, Row); }

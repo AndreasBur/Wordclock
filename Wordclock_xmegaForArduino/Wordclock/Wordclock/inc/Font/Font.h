@@ -83,9 +83,8 @@ template <typename FontCharType, size_t FontTableSize> class Font
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr Font(const FontTableType& sFontTable) : FontTable(sFontTable) {}
-    
-    ~Font() {}
+    constexpr Font(const FontTableType& sFontTable) : FontTable(sFontTable) { }
+    ~Font() { }
 
     // get methods
     FontCharType getCharFast(byte Index) const { return getFontTableElement(Index); }

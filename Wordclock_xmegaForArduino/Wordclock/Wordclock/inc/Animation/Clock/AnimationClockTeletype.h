@@ -75,8 +75,8 @@ class AnimationClockTeletype : public AnimationClockCommon
 ******************************************************************************************************************************************************/
   public:
     constexpr AnimationClockTeletype() : Words(), ClockWordsTable{DisplayWords::WORD_NONE}, 
-                                         CurrentWordIndex(0u), CurrentWordLength(0u), CurrentCharIndex(0u) {}
-    ~AnimationClockTeletype() {}
+                                         CurrentWordIndex(0u), CurrentWordLength(0u), CurrentCharIndex(0u) { }
+    ~AnimationClockTeletype() { }
     
     // get methods
 

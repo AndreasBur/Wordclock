@@ -95,8 +95,8 @@ class BH1750
 
     // functions
     BH1750() : Mode(MODE_NONE), Illuminance(BH1750_ILLUMINANCE_MIN_LX_VALUE), 
-               CalibrationValues{BH1750_ILLUMINANCE_MAX_LX_VALUE, BH1750_ILLUMINANCE_MIN_LX_VALUE} {}
-    ~BH1750() {}
+               CalibrationValues{BH1750_ILLUMINANCE_MAX_LX_VALUE, BH1750_ILLUMINANCE_MIN_LX_VALUE} { }
+    ~BH1750() { }
     
     StdReturnType readIlluminance();
     void sendModeForOneTimeMode();

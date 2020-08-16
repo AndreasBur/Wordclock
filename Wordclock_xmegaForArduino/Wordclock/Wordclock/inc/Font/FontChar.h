@@ -60,13 +60,8 @@ class FontChar
  *  P R O T E C T E D   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   protected:
-    constexpr FontChar() : Width(0u) {
-
-    }
-
-    constexpr FontChar(byte sWidth) : Width(sWidth) {
-
-    }
+    constexpr FontChar() : Width(0u) { }
+    constexpr FontChar(byte sWidth) : Width(sWidth) { }
 
 
 /******************************************************************************************************************************************************
@@ -105,8 +100,8 @@ template <typename RowType, byte RowsSize> class FontCharHorizontal : public Fon
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr FontCharHorizontal(byte sWidth, std::array<RowType, RowsSize> sRows) : FontChar(sWidth), Rows(sRows) {}
-    constexpr FontCharHorizontal() : FontChar(0u), Rows{} {}
+    constexpr FontCharHorizontal(byte sWidth, std::array<RowType, RowsSize> sRows) : FontChar(sWidth), Rows(sRows) { }
+    constexpr FontCharHorizontal() : FontChar(0u), Rows{} { }
 
     // get methods
     RowType getRowFast(byte Index) const { return Rows[Index]; }
@@ -159,13 +154,9 @@ template <typename ColumnType, byte ColumnsSize> class FontCharVertical : public
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr FontCharVertical(byte sWidth, std::array<ColumnType, ColumnsSize> sColumns) : FontChar(sWidth), Columns(sColumns) {
+    constexpr FontCharVertical(byte sWidth, std::array<ColumnType, ColumnsSize> sColumns) : FontChar(sWidth), Columns(sColumns) { }
 
-    }
-
-    constexpr FontCharVertical() : FontChar(0), Columns{} {
-    
-    }
+    constexpr FontCharVertical() : FontChar(0), Columns{} { }
 
     // get methods
     ColumnType getColumnFast(byte Index) const { return Columns[Index]; }

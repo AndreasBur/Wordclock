@@ -68,7 +68,8 @@ class Clock
         MODE_WESSI,
         MODE_OSSI,
         MODE_RHEIN_RUHR,
-        MODE_SCHWABEN
+        MODE_SCHWABEN,
+        MODE_NUMBER_OF_MODES
     };
 
     enum HourModeType {
@@ -98,8 +99,8 @@ class Clock
     static const MinuteType MinutesTable[][CLOCK_NUMBER_OF_MINUTE_STEPS];
     
     // functions
-    constexpr Clock(ModeType sMode) : Mode(sMode) {}
-    ~Clock() {}
+    constexpr Clock(ModeType sMode) : Mode(sMode) { }
+    ~Clock() { }
     
     MinuteTableElementType getMinutesTableElement(byte Minute) const {
         MinuteTableElementType minutesTableElement;
@@ -125,6 +126,11 @@ class Clock
     byte transform24hTo12hFormat(byte Hour) const {
         return Hour % CLOCK_NUMBER_OF_HOURS;
     }
+    
+    boolean isModeValid(ModeType sMode) {
+        if(sMode < MODE_NUMBER_OF_MODES) { return true; }
+        else { return false; }
+    }
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
@@ -141,7 +147,16 @@ class Clock
     StdReturnType getClockWords(byte, byte, ClockWordsListType&) const;
 
     // set methods
-    void setMode(ModeType sMode) { Mode = sMode; }
+    void setModeFast(ModeType sMode) { Mode = sMode; }
+    StdReturnType setMode(ModeType sMode)
+    { 
+        if(isModeValid(sMode)) {
+            Mode = sMode;
+            return E_OK;    
+        } else {
+            return E_NOT_OK;
+        }
+    }
 
     // methods
     StdReturnType setClock(byte, byte);

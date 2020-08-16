@@ -95,8 +95,8 @@ class AnimationClockShift : public AnimationClockCommon
 #if (ANIMATION_CLOCK_SHIFT_VERTICAL == STD_ON)
                             CurrentRow()
 #endif
-    {}
-    ~AnimationClockShift() {}
+    { }
+    ~AnimationClockShift() { }
 
     // get methods
 

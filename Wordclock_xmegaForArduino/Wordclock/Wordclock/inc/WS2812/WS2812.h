@@ -112,8 +112,8 @@ class WS2812
     void initPort(PORT_t*);
   
     void switchPixelsBufferPointer();
-    void copyCurrentFrameToNextFrame() { memcpy(pNextFrame, pCurrentFrame, sizeof(PixelsType)); }
-    void copyNextFrameToCurrentFrame() { memcpy(pCurrentFrame, pNextFrame, sizeof(PixelsType)); }
+    void copyCurrentFrameToNextFrame() { *pNextFrame = *pCurrentFrame; }
+    void copyNextFrameToCurrentFrame() { *pCurrentFrame = *pNextFrame; }
     void showNextFrame();
     void showNextFrameDimmed();
     void startDmaTransfer(pPixelsType);

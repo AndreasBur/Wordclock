@@ -66,11 +66,11 @@ class MsgCmdAnimationClockParser : public MsgParameterParser<MsgCmdAnimationCloc
         ParameterTableElementType(AnimationOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8),
         ParameterTableElementType(SpeedOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8)
     };
-    
+
     // functions
     byte convertSpeedToTaskCycle(byte Speed) { return UINT8_MAX - Speed; }
     byte convertTaskCycleToSpeed(byte TaskCylce) { return UINT8_MAX - TaskCylce; }
-    
+
     void handleParameter(char ParameterShortName, byte Argument)
     {
         if(ParameterShortName == AnimationOptionShortName) {

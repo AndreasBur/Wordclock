@@ -87,8 +87,8 @@ class AnimationClock
         AnimationClockCube Cube;
         AnimationClockFlicker Flicker;
 
-        constexpr AnimationsType() : Cursor() {}
-        ~AnimationsType() {}
+        constexpr AnimationsType() : Cursor() { }
+        ~AnimationsType() { }
     };
 
     using StateType = AnimationClockCommon::StateType;
@@ -98,24 +98,30 @@ class AnimationClock
 ******************************************************************************************************************************************************/
   private:
     std::array<byte, ANIMATION_CLOCK_NUMBER_OF_ANIMATIONS> TaskCycles;
-    AnimationType CurrentAnimation;
+    AnimationType Animation;
     AnimationsType Animations;
+    
+    // functions
+    boolean isAnimationValid(AnimationType sAnimation) {
+        if(sAnimation < ANIMATION_CLOCK_NUMBER_OF_ANIMATIONS) { return true; }
+        else { return false; }
+    }
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr AnimationClock() : TaskCycles{0}, CurrentAnimation(ANIMATION_CLOCK_NONE), Animations() {}
-    ~AnimationClock() {}
+    constexpr AnimationClock() : TaskCycles{0}, Animation(ANIMATION_CLOCK_NONE), Animations() { }
+    ~AnimationClock() { }
 
     // get methods
-    AnimationType getAnimation() const { return CurrentAnimation; }
+    AnimationType getAnimation() const { return Animation; }
     StateType getState() const;
     byte getTaskCycle(AnimationType Animation) const { return TaskCycles[Animation]; }
 
     // set methods
     void setTaskCycle(AnimationType Animation, byte Cycle) { TaskCycles[Animation] = Cycle; }
-    void setAnimation(AnimationType);
+    StdReturnType setAnimation(AnimationType);
 
     // methods
     void init();

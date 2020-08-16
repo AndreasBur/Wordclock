@@ -58,7 +58,7 @@ void AnimationClock::init()
 ******************************************************************************************************************************************************/
 AnimationClock::StateType AnimationClock::getState() const
 {
-    switch(CurrentAnimation)
+    switch(Animation)
     {
         case ANIMATION_CLOCK_CURSOR :
             return Animations.Cursor.getState();
@@ -103,9 +103,10 @@ AnimationClock::StateType AnimationClock::getState() const
 /******************************************************************************************************************************************************
   setAnimation()
 ******************************************************************************************************************************************************/
-void AnimationClock::setAnimation(AnimationType Animation)
+StdReturnType AnimationClock::setAnimation(AnimationType Animation)
 {
-    CurrentAnimation = Animation;
+    if(!isAnimationValid(Animation)) { return E_NOT_OK; }
+    Animation = Animation;
 
     switch(Animation)
     {
@@ -141,9 +142,10 @@ void AnimationClock::setAnimation(AnimationType Animation)
         //case ANIMATION_CLOCK_IMPLODE :
             //break;
         default :
-            CurrentAnimation = ANIMATION_CLOCK_NONE;
+            Animation = ANIMATION_CLOCK_NONE;
             break;
     }
+    return E_OK;
 } /* setAnimation */
 
 
@@ -152,7 +154,7 @@ void AnimationClock::setAnimation(AnimationType Animation)
 ******************************************************************************************************************************************************/
 StdReturnType AnimationClock::setClock(byte Hour, byte Minute)
 {
-    switch(CurrentAnimation)
+    switch(Animation)
     {
         case ANIMATION_CLOCK_CURSOR :
             return Animations.Cursor.setClock(Hour, Minute);
@@ -197,7 +199,7 @@ StdReturnType AnimationClock::setClock(byte Hour, byte Minute)
 ******************************************************************************************************************************************************/
 void AnimationClock::task()
 {
-    switch(CurrentAnimation)
+    switch(Animation)
     {
         case ANIMATION_CLOCK_CURSOR :
             return Animations.Cursor.task();
@@ -241,7 +243,7 @@ void AnimationClock::task()
 ******************************************************************************************************************************************************/
 void AnimationClock::show()
 {
-    switch(CurrentAnimation)
+    switch(Animation)
     {
         case ANIMATION_CLOCK_CURSOR :
             return Animations.Cursor.show();

@@ -76,8 +76,8 @@ class AnimationClockWipe : public AnimationClockCommon
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr AnimationClockWipe() : ClockWordsTable{DisplayWords::WORD_NONE}, Index(0u), SetPixelState(SET_PIXEL_STATE_DOWN) {}
-    ~AnimationClockWipe() {}
+    constexpr AnimationClockWipe() : ClockWordsTable{DisplayWords::WORD_NONE}, Index(0u), SetPixelState(SET_PIXEL_STATE_DOWN) { }
+    ~AnimationClockWipe() { }
 
     // get methods
 

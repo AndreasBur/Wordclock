@@ -48,10 +48,17 @@ class ErrorMessage
 ******************************************************************************************************************************************************/
   public:
     enum ErrorType {
+        ERROR_NO_ERROR,
         ERROR_MESSAGE_TOO_LONG,
         ERROR_WRONG_COMMAND,
         ERROR_VALUE_OUT_OF_BOUNCE,
-        ERROR_NO_VALUE_GIVEN
+        ERROR_NO_VALUE_GIVEN,
+        ERROR_UNKNOWN
+    };
+    
+    enum ApiType {
+        API_NONE,
+        API_DISPLAY_SHOW    
     };
   
 /******************************************************************************************************************************************************
@@ -64,8 +71,8 @@ class ErrorMessage
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr ErrorMessage() {}
-    ~ErrorMessage() {}
+    constexpr ErrorMessage() { }
+    ~ErrorMessage() { }
         
     // get methods
 
@@ -73,9 +80,24 @@ class ErrorMessage
     // set methods
 
     // methods
-    void send(ErrorType Error) const {
-        Serial.print(F("Error: "));
-        Serial.print(Error);
+    void send(ErrorType Error) const
+    {
+        Serial.print(F("Error:"));
+        Serial.println(Error);
+    }
+    
+    void send(bool ReturnValue) const
+    {
+        if(ReturnValue) { send(ERROR_NO_ERROR); }
+        else { send(ERROR_UNKNOWN); }
+    }
+    
+    void send(ApiType Api, bool ReturnValue) const
+    {
+        Serial.print(F("Api:"));
+        Serial.print(Api);
+        Serial.print(' ');
+        send(ReturnValue);
     }
 };
 

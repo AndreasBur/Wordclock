@@ -72,8 +72,8 @@ class AnimationClockCommon
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr AnimationClockCommon() : State(STATE_NONE) {}
-    ~AnimationClockCommon() {}
+    constexpr AnimationClockCommon() : State(STATE_NONE) { }
+    ~AnimationClockCommon() { }
 
     // get methods
     StateType getState() const { return State; }

@@ -103,8 +103,8 @@ class DisplayWords
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr DisplayWords() {}
-    ~DisplayWords() {}
+    constexpr DisplayWords() { }
+    ~DisplayWords() { }
 
     // get methods
     StdReturnType getDisplayWord(WordIdType, DisplayWord&) const;

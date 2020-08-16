@@ -73,9 +73,7 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
     static constexpr char OptionArgumentDelimiter{':'};
     ErrorMessage Error;
 
-    ~MsgParameterParser() {
-        
-    }
+    ~MsgParameterParser() { }
   
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
@@ -173,7 +171,7 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
 ******************************************************************************************************************************************************/
   public:
     constexpr MsgParameterParser(const ParameterTableType& sParameterTable, const char* sParameter)
-    : Error(), ParameterBuffer(sParameter), ParameterTable(sParameterTable) {}
+    : Error(), ParameterBuffer(sParameter), ParameterTable(sParameterTable) { }
 
     // get methods
     const char* getParameter() const { return ParameterBuffer; }

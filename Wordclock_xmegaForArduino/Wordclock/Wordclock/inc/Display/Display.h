@@ -112,18 +112,18 @@ class Display
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
-    StateType State;
-    boolean BrightnessAutomatic;
+    StateType State{STATE_NONE};
+    boolean BrightnessAutomatic{false};
 #if (WS2812_IS_SINGLETON == STD_OFF)
     Stripe Pixels;
 #endif
-    PixelColorType Color;
+    PixelColorType Color{255u, 255u, 255u};
     DisplayWords Words;
 
 #if (DISPLAY_USE_WS2812_DIMMING == STD_OFF)
     GammaCorrection GCorrection;
-    byte Brightness;
-    PixelColorType ColorDimmed;
+    byte Brightness{255u};
+    PixelColorType ColorDimmed{255u, 255u, 255u};
 #endif
     
     // functions
@@ -239,7 +239,7 @@ class Display
 
     // methods
     void init();
-    void show() { Pixels.show(); }
+    StdReturnType show() { return Pixels.show(); }
     void enable() { Pixels.enablePixels(); }
     void disable() { Pixels.disablePixels(); }
     void enableBrightnessAutomatic() { BrightnessAutomatic = true; }

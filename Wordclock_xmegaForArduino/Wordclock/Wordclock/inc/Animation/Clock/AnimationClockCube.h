@@ -93,7 +93,7 @@ class AnimationClockCube : public AnimationClockCommon
 ******************************************************************************************************************************************************/
   public:
     constexpr AnimationClockCube() : ClockWordsTable{DisplayWords::WORD_NONE}, Border{ANIMATION_CLOCK_CUBE_COLUMN_START_MAX_VALUE, ANIMATION_CLOCK_CUBE_COLUMN_END_MIN_VALUE, 
-        ANIMATION_CLOCK_CUBE_ROW_START_MAX_VALUE, ANIMATION_CLOCK_CUBE_ROW_END_MIN_VALUE}, BorderState(BORDER_STATE_MIN) {}
+        ANIMATION_CLOCK_CUBE_ROW_START_MAX_VALUE, ANIMATION_CLOCK_CUBE_ROW_END_MIN_VALUE}, BorderState(BORDER_STATE_MIN) { }
     ~AnimationClockCube() { }
 
     // get methods

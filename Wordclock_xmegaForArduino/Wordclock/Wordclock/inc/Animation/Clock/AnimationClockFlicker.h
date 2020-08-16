@@ -68,8 +68,8 @@ class AnimationClockFlicker : public AnimationClockCommon
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr AnimationClockFlicker() : Minute(0u), Hour(0u), IsClockSet(false), FlickerCounter(ANIMATION_CLOCK_FLICKER_COUNTER_INIT_VALUE) {}
-    ~AnimationClockFlicker() {}
+    constexpr AnimationClockFlicker() : Minute(0u), Hour(0u), IsClockSet(false), FlickerCounter(ANIMATION_CLOCK_FLICKER_COUNTER_INIT_VALUE) { }
+    ~AnimationClockFlicker() { }
 
     // get methods
 

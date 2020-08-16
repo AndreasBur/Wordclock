@@ -62,7 +62,7 @@ class MsgCmdClockModeParser : public MsgParameterParser<MsgCmdClockModeParser, M
         ParameterTableElementType(ModeOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8)
     };
     
-    // functions// functions
+    // functions
     void handleParameter(char ParameterShortName, byte Argument)
     {
         if(ParameterShortName == ModeOptionShortName) {
@@ -86,7 +86,7 @@ class MsgCmdClockModeParser : public MsgParameterParser<MsgCmdClockModeParser, M
     {
         Serial.print(ModeOptionShortName);
         Serial.print(OptionArgumentDelimiter);
-        Serial.print(Display::getInstance().getColorRed());
+        Serial.print(Clock::getInstance().getMode());
     }
     
     void process() { Clock::getInstance().show(); }

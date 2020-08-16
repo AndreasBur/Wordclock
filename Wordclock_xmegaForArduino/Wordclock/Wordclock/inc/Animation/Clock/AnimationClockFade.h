@@ -70,8 +70,8 @@ class AnimationClockFade : public AnimationClockCommon
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr AnimationClockFade() : DisplayBrightness(0u), Hour(0u), Minute(0u) {}
-    ~AnimationClockFade() {}
+    constexpr AnimationClockFade() : DisplayBrightness(0u), Hour(0u), Minute(0u) { }
+    ~AnimationClockFade() { }
 
     // get methods
 

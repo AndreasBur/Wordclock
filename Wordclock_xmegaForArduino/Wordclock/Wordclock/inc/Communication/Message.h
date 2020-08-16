@@ -61,7 +61,7 @@ class Message
 ******************************************************************************************************************************************************/
   public:
     Message() { clear(); }
-    ~Message() {}
+    ~Message() { }
 
     // get methods
     const char* getMessage() const { return Buffer; }

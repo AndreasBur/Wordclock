@@ -167,8 +167,8 @@ class AnimationFont
 #if(ANIMATION_FONT_SUPPORT_FONT_10X10 == STD_ON)
                                 Font10x10()
 #endif 
-    {}
-    ~AnimationFont() {}
+    { }
+    ~AnimationFont() { }
 
     // get methods
     StateType getState() const { return State; }
@@ -178,7 +178,7 @@ class AnimationFont
     void setTaskCycle(byte Cycle) { TaskCycle = Cycle; }
 
     // methods
-    void init() {}
+    void init() { }
     void show() { Display::getInstance().show(); }
     void task();
     StdReturnType setChar(byte, byte, char, FontType);
