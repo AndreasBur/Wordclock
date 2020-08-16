@@ -60,8 +60,8 @@ class Message
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    Message();
-    ~Message();
+    Message() { clear(); }
+    ~Message() {}
 
     // get methods
     const char* getMessage() const { return Buffer; }
@@ -71,19 +71,34 @@ class Message
     // methods
     void clear() { Buffer[0u] = '\0'; }
 
-    size_t find(const char* String, size_t position = 0u) const {
+    size_t find(const char* String, size_t position = 0u) const
+    {
         const char* finding = strstr(&Buffer[position], String);
         if(finding == nullptr) return npos;
         else return finding - Buffer;
     }
     
-    size_t find(char Char, size_t position = 0u) const {
+    size_t find(char Char, size_t position = 0u) const
+    {
         const char* finding = strchr(&Buffer[position], Char);
         if(finding == nullptr) return npos;
         else return finding - Buffer;
     }
     
-    StdReturnType addChar(char);
+    StdReturnType addChar(char Char)
+    {
+        byte messageLength = strlen(Buffer);
+        // check for free space in Message buffer
+        if(messageLength < (MESSAGE_LENGTH - 1u))
+        {
+            // save new char
+            Buffer[messageLength] = Char;
+            Buffer[messageLength + 1] = '\0';
+            return E_OK;
+            } else {
+            return E_NOT_OK;
+        }
+    }
 };
 
 #endif

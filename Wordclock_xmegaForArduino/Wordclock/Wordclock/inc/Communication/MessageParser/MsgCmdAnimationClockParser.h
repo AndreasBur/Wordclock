@@ -67,7 +67,7 @@ class MsgCmdAnimationClockParser : public MsgParameterParser<MsgCmdAnimationCloc
         ParameterTableElementType(SpeedOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8)
     };
     
-    // functions// functions
+    // functions
     byte convertSpeedToTaskCycle(byte Speed) { return UINT8_MAX - Speed; }
     byte convertTaskCycleToSpeed(byte TaskCylce) { return UINT8_MAX - TaskCylce; }
     
@@ -79,6 +79,20 @@ class MsgCmdAnimationClockParser : public MsgParameterParser<MsgCmdAnimationCloc
         if(ParameterShortName == SpeedOptionShortName) {
              Speed = Argument;
         }
+    }
+    
+    void sendAnswerAnimation()
+    {
+        Serial.print(AnimationClock);
+        Serial.print(OptionArgumentDelimiter);
+        Serial.print(Animation::getInstance().getAnimation());
+    }
+    
+    void sendAnswerSpeed()
+    {
+        Serial.print(Speed);
+        Serial.print(OptionArgumentDelimiter);
+        Serial.print(convertSpeedToTaskCycle(Animation::getInstance().getClockTaskCycle(Animation::getInstance().getAnimation())));
     }
   
 /******************************************************************************************************************************************************
@@ -100,15 +114,15 @@ class MsgCmdAnimationClockParser : public MsgParameterParser<MsgCmdAnimationCloc
     // methods
     void sendAnswer()
     {
-        //Serial.print(ModeOptionShortName);
-        Serial.print(OptionArgumentDelimiter);
-        Serial.print(Display::getInstance().getColorRed());
+        sendAnswerAnimation();
+        sendAnswerSpeed();
     }
     
     void process()
     {
         Animation::getInstance().setAnimation(AnimationClock);
         Animation::getInstance().setClockTaskCylce(AnimationClock, convertSpeedToTaskCycle(Speed));
+        Animation::getInstance().show();
     }
 };
 

@@ -83,24 +83,16 @@ template <typename FontCharType, size_t FontTableSize> class Font
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr Font(const FontTableType& sFontTable) : FontTable(sFontTable) {
-
-    }
+    constexpr Font(const FontTableType& sFontTable) : FontTable(sFontTable) {}
     
-    ~Font() {
-
-    }
+    ~Font() {}
 
     // get methods
-    //virtual Orientation getOrientation() const = 0;
-    //virtual byte getWidth() const = 0;
-    //virtual byte getHeight() const = 0;
-    //virtual const FontTableType& getFontTable() const = 0;
-
     FontCharType getCharFast(byte Index) const { return getFontTableElement(Index); }
     byte getCharWidthFast(byte Index) const { return getFontTableElement(Index).getWidth(); }
 
-    StdReturnType getChar(byte Index, FontCharType& FontChar) const {
+    StdReturnType getChar(byte Index, FontCharType& FontChar) const
+    {
         if(Index < FontTableSize) {
             FontChar = getFontTableElement(Index);
             return E_OK;
@@ -108,7 +100,9 @@ template <typename FontCharType, size_t FontTableSize> class Font
             return E_NOT_OK;
         }
     }
-    StdReturnType getCharWidth(byte Index, byte& Width) {
+    
+    StdReturnType getCharWidth(byte Index, byte& Width)
+    {
         if(Index < FontTableSize) {
             Width = getFontTableElement(Index).getWidth();
             return E_OK;

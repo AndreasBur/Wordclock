@@ -64,13 +64,8 @@ class FontTahoma10x10 : public Font<FontCharHorizontal<uint16_t, FONT_TAHOMA_10X
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr FontTahoma10x10() : Font(FontTable) {
-        
-    }
-    
-    ~FontTahoma10x10() {
-        
-    }
+    constexpr FontTahoma10x10() : Font(FontTable) {}
+    ~FontTahoma10x10() {}
 
     // get methods
     byte getWidth() const { return FONT_TAHOMA_10X10_WIDTH; }

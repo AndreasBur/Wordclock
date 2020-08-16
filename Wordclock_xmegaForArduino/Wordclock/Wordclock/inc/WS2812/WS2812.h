@@ -141,7 +141,10 @@ class WS2812
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    static WS2812& getInstance();
+    static WS2812& getInstance() {
+        static WS2812 SingletonInstance;
+        return SingletonInstance;
+    }
 
     // get methods
     StateType getState() const { return State; }

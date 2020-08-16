@@ -111,7 +111,10 @@ class BH1750
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    static BH1750& getInstance();
+    static BH1750& getInstance() {
+        static BH1750 singletonInstance;
+        return singletonInstance;
+    }
 
     // get methods
     ModeType getMode() const { return Mode; }

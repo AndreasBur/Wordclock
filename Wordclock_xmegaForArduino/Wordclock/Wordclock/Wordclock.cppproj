@@ -291,7 +291,7 @@
   <avrgcccpp.compiler.warnings.AllWarnings>True</avrgcccpp.compiler.warnings.AllWarnings>
   <avrgcccpp.compiler.warnings.Undefined>True</avrgcccpp.compiler.warnings.Undefined>
   <avrgcccpp.compiler.warnings.Pedantic>True</avrgcccpp.compiler.warnings.Pedantic>
-  <avrgcccpp.compiler.miscellaneous.OtherFlags>-std=gnu++17 -Wextra -Weffc++ -fplugin=%24(ToolchainDir)\..\plugins\avr-flash-vtbl.dll</avrgcccpp.compiler.miscellaneous.OtherFlags>
+  <avrgcccpp.compiler.miscellaneous.OtherFlags>-std=gnu++17 -Wextra -fplugin=%24(ToolchainDir)\..\plugins\avr-flash-vtbl.dll</avrgcccpp.compiler.miscellaneous.OtherFlags>
   <avrgcccpp.linker.libraries.Libraries>
     <ListValues>
       <Value>libm</Value>
@@ -388,10 +388,10 @@
     <Compile Include="inc\Communication\MessageParser\MsgParameter.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="inc\Communication\MessageParser\MsgParameterParser.h">
+    <Compile Include="inc\Communication\MessageParser\MsgCmdClockModeParser.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="inc\Communication\MessageParser\MsgCmdClockModeParser.h">
+    <Compile Include="inc\Communication\MsgParameterParser.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="inc\Communication\StringTools.h">
@@ -500,9 +500,6 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="src\Communication\Communication.cpp">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="src\Communication\Message.cpp">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="src\Communication\MessageParser\MsgCmdParser.cpp">

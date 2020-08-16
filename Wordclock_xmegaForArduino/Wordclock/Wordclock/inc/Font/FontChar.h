@@ -105,13 +105,8 @@ template <typename RowType, byte RowsSize> class FontCharHorizontal : public Fon
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr FontCharHorizontal(byte sWidth, std::array<RowType, RowsSize> sRows) : FontChar(sWidth), Rows(sRows) {
-
-    }
-
-    constexpr FontCharHorizontal() : FontChar(0u), Rows{} {
-    
-    }
+    constexpr FontCharHorizontal(byte sWidth, std::array<RowType, RowsSize> sRows) : FontChar(sWidth), Rows(sRows) {}
+    constexpr FontCharHorizontal() : FontChar(0u), Rows{} {}
 
     // get methods
     RowType getRowFast(byte Index) const { return Rows[Index]; }

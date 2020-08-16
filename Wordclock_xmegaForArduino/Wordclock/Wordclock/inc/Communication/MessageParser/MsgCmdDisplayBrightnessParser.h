@@ -66,7 +66,6 @@ class MsgCmdDisplayBrightnessParser : public MsgParameterParser<MsgCmdDisplayBri
     };
     
     // functions
-    
     void handleParameter(char ParameterShortName, byte Argument)
     {
         if(ParameterShortName == BrightnessOptionShortName) {
@@ -76,7 +75,21 @@ class MsgCmdDisplayBrightnessParser : public MsgParameterParser<MsgCmdDisplayBri
             Display::getInstance().setBrightnessAutomatic(Argument);
         }
     }
-  
+    
+     void sendAnswerBrightness()
+     {
+        Serial.print(BrightnessOptionShortName);
+        Serial.print(OptionArgumentDelimiter);
+        Serial.print(Display::getInstance().getBrightness());
+     }
+     
+     void sendAnswerAutomatic()
+     {
+        Serial.print(AutomaticOptionShortName);
+        Serial.print(OptionArgumentDelimiter);
+        Serial.print(Display::getInstance().getBrightnessAutomatic());
+     }
+       
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
@@ -89,8 +102,13 @@ class MsgCmdDisplayBrightnessParser : public MsgParameterParser<MsgCmdDisplayBri
     // set methods
 
     // methods
-    void sendAnswer() {}
-    void process() { }
+    void sendAnswer()    
+    {
+        sendAnswerBrightness();
+        sendAnswerAutomatic();
+    }
+
+    void process() { Display::getInstance().show(); }
 
 };
 

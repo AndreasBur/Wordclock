@@ -64,13 +64,8 @@ class FontCourierNew7x10 : public Font<FontCharHorizontal<byte, FONT_COURIER_NEW
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr FontCourierNew7x10() : Font(FontTable) {
-        
-    }
-    
-    ~FontCourierNew7x10() {
-        
-    }
+    constexpr FontCourierNew7x10() : Font(FontTable) {}
+    ~FontCourierNew7x10() {}
 
     // get methods
     byte getWidth() const { return FONT_COURIER_NEW_7X10_WIDTH; }

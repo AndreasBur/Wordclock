@@ -148,7 +148,10 @@ class Display
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    static Display& getInstance();
+    static Display& getInstance() {
+        static Display SingletonInstance(0u, 0u, 0u);
+        return SingletonInstance;
+    }
 
     // get methods
     StateType getState() const { return State; }

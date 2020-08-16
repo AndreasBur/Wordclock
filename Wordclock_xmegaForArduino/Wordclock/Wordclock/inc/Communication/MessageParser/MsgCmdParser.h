@@ -89,8 +89,8 @@ class MsgCmdParser
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    MsgCmdParser(const Message&);
-    ~MsgCmdParser();
+    constexpr MsgCmdParser(const Message& sMessage) : Error(), IncomingMessage(sMessage)  {}
+    ~MsgCmdParser() {}
 
     // get methods
 

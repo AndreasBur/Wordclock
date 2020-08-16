@@ -114,7 +114,7 @@ class MsgCmdDisplayColorParser : public MsgParameterParser<MsgCmdDisplayColorPar
         sendAnswerBlue();
     }
     
-    void process() { }
+    void process() { Display::getInstance().show(); }
 
 };
 

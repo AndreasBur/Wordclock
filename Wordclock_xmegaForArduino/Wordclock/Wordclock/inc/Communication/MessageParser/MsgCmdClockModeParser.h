@@ -89,7 +89,7 @@ class MsgCmdClockModeParser : public MsgParameterParser<MsgCmdClockModeParser, M
         Serial.print(Display::getInstance().getColorRed());
     }
     
-    void process() { }
+    void process() { Clock::getInstance().show(); }
 };
 
 #endif

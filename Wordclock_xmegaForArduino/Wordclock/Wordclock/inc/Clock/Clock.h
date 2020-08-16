@@ -130,7 +130,10 @@ class Clock
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    static Clock& getInstance();
+    static Clock& getInstance() {
+        static Clock SingletonInstance(Clock::MODE_WESSI);
+        return SingletonInstance;
+    }
       
     // get methods
     ModeType getMode() const { return Mode; }
