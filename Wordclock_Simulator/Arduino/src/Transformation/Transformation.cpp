@@ -9,10 +9,10 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       Transformation.cpp
- *      \brief      
+ *      \brief
  *
- *      \details    
- *                  
+ *      \details
+ *
  *
 ******************************************************************************************************************************************************/
 #define _TRANSFORMATION_SOURCE_
@@ -61,7 +61,7 @@ void Transformation::shiftLeftFast(bool Rotate)
 ******************************************************************************************************************************************************/
 void Transformation::shiftRowLeftFast(byte Row, bool Rotate)
 {
-    Display::PixelType firstPixel;
+    Display::PixelType firstPixel{0u};
 
     if(Rotate) firstPixel = Display::getInstance().getPixelFast(0u, Row);
 
@@ -125,7 +125,7 @@ void Transformation::shiftRightFast(bool Rotate)
 ******************************************************************************************************************************************************/
 void Transformation::shiftRowRightFast(byte Row, bool Rotate)
 {
-    Display::PixelType lastPixel;
+    Display::PixelType lastPixel{0u};
 
     if(Rotate) lastPixel = Display::getInstance().getPixelFast(DISPLAY_NUMBER_OF_COLUMNS - 1u, Row);
 
@@ -189,7 +189,7 @@ void Transformation::shiftUpFast(bool Rotate)
 ******************************************************************************************************************************************************/
 void Transformation::shiftColumnUpFast(byte Column, bool Rotate)
 {
-    Display::PixelType firstPixel;
+    Display::PixelType firstPixel{0u};
 
     if(Rotate) firstPixel = Display::getInstance().getPixelFast(Column, 0u);
 
@@ -253,7 +253,7 @@ void Transformation::shiftDownFast(bool Rotate)
 ******************************************************************************************************************************************************/
 void Transformation::shiftColumnDownFast(byte Column, bool Rotate)
 {
-    Display::PixelType lastPixel;
+    Display::PixelType lastPixel{0u};
 
     if(Rotate) lastPixel = Display::getInstance().getPixelFast(Column, DISPLAY_NUMBER_OF_ROWS - 1u);
 
@@ -310,4 +310,3 @@ StdReturnType Transformation::shiftColumnDown(byte Column, bool Rotate)
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E
 ******************************************************************************************************************************************************/
- 

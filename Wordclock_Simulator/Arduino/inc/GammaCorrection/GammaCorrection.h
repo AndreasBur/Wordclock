@@ -62,7 +62,7 @@ class GammaCorrection
     // functions
     Gamma7TableElementType getGamma7TableElement(byte Index) const {
         Gamma7TableElementType Gamma7TableElement;
-        //memcpy_P(&Gamma7TableElement, &Gamma7Table[Index], sizeof(Gamma7TableElementType));
+        memcpy_P(&Gamma7TableElement, &Gamma7Table[Index], sizeof(Gamma7TableElementType));
         return Gamma7TableElement;
     }
 

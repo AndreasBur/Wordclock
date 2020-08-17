@@ -16,7 +16,6 @@
 					<Add option="-Wextra" />
 					<Add option="-Wall" />
 					<Add option="-g" />
-					<Add option="-std=c++17" />
 					<Add option="-D__WXDEBUG__" />
 					<Add directory="$(#wx31)/lib/gcc_dll/mswud" />
 					<Add directory="include" />
@@ -53,7 +52,7 @@
 		<Compiler>
 			<Add option="-Wextra" />
 			<Add option="-Wall" />
-			<Add option="-std=c++11" />
+			<Add option="-std=c++17" />
 			<Add option="-pipe" />
 			<Add option="-mthreads" />
 			<Add option="-D__GNUWIN32__" />
@@ -145,10 +144,6 @@
 			<Option compilerVar="WINDRES" />
 		</Unit>
 		<Unit filename="src/Simulator.cpp" />
-		<Extensions>
-			<code_completion />
-			<envvars />
-			<debugger />
-		</Extensions>
+		<Extensions />
 	</Project>
 </CodeBlocks_project_file>
