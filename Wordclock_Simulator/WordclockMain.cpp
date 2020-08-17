@@ -23,7 +23,7 @@ wxBEGIN_EVENT_TABLE(WordclockDialog, wxDialog)
 wxEND_EVENT_TABLE()
 
 
-WordclockDialog::WordclockDialog(wxDialog *dlg, const wxString &title) : wxDialog(dlg, -1, title), WcDisplay(255, 255, 255), WcClock(&WcDisplay, Clock::MODE_WESSI), WcAnimation(&WcDisplay, &WcClock), WcTransformation(&WcDisplay), Timer(this, TIMER_ID)
+WordclockDialog::WordclockDialog(wxDialog *dlg, const wxString &title) : wxDialog(dlg, -1, title), Timer(this, TIMER_ID)
 {
     Timer.Start(1000);
     strcpy(Text, "geht gut GUT");
@@ -31,10 +31,10 @@ WordclockDialog::WordclockDialog(wxDialog *dlg, const wxString &title) : wxDialo
     Time = wxDateTime::Now();
     int Hour = Time.GetHour();
     int Minute = Time.GetMinute();
-    WcClock.setClock(12, 42);
+    Clock::getInstance().setClock(12, 42);
 
     //WcDisplay.setPixelRowFast(5, 0xFFFF);
-    WcDisplay.show();
+    Display::getInstance().show();
 
     //WcAnimation.setChar(0,0,'Ö', AnimationFont::FONT_5X8);
     //WcAnimation.setChar(0,0,'B', AnimationFont::FONT_5X8);
@@ -46,8 +46,8 @@ WordclockDialog::WordclockDialog(wxDialog *dlg, const wxString &title) : wxDialo
     //WcTransformation.shiftRight(true);
     //WcTransformation.shiftUp(false);
     //WcTransformation.shiftDown(true);
-    WcAnimation.setAnimation(AnimationClock::ANIMATION_CLOCK_FLICKER);
-    WcAnimation.setClock(Hour, Minute);
+    Animation::getInstance().setAnimation(AnimationClock::ANIMATION_CLOCK_FLICKER);
+    Animation::getInstance().setClock(Hour, Minute);
     //WcClock.show();
 }
 
@@ -70,7 +70,7 @@ void WordclockDialog::OnTimer(wxTimerEvent& event)
     int Hour = Time.GetHour();
     int Minute = Time.GetMinute();
 
-    WcAnimation.task();
+    Animation::getInstance().task();
 
 //    if(WcAnimation.getState() == Animation::STATE_IDLE) {
 //        Time = wxDateTime::Now();
@@ -80,9 +80,9 @@ void WordclockDialog::OnTimer(wxTimerEvent& event)
 //        WcAnimation.setClock(Hour, Minute);
 //    }
 
-    WcDisplay.show();
+    Display::getInstance().show();
 
-    WcClock.getClockWords(Hour, Minute, NewTimeWords);
+    Clock::getInstance().getClockWords(Hour, Minute, NewTimeWords);
 
     if(NewTimeWords != CurrentTimeWords) {
         //CurrentTimeWords = NewTimeWords;

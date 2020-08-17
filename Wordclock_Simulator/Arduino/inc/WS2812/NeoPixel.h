@@ -8,33 +8,32 @@
  *  ---------------------------------------------------------------------------------------------------------------------------------------------------
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       FontCourierNew7x10.h
+/**     \file       NeoPixel.h
  *      \brief      
  *
  *      \details    
  *                  
 ******************************************************************************************************************************************************/
-#ifndef _FONT_COURIER_NEW_7X10_H_
-#define _FONT_COURIER_NEW_7X10_H_
+#ifndef _NEO_PIXEL_H_
+#define _NEO_PIXEL_H_
 
 /******************************************************************************************************************************************************
  * I N C L U D E S
 ******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Arduino.h"
-#include "Font.h"
-#include "FontChar.h"
+#include <array>
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
-/* FontCourierNew7x10 configuration parameter */
+/* NeoPixel configuration parameter */
+#define NEO_PIXEL_COLOR_OFFSET_GREEN                   0u
+#define NEO_PIXEL_COLOR_OFFSET_RED                     1u
+#define NEO_PIXEL_COLOR_OFFSET_BLUE                    2u
 
-
-/* FontCourierNew7x10 parameter */
-#define FONT_COURIER_NEW_7X10_WIDTH                     7u
-#define FONT_COURIER_NEW_7X10_HEIGHT                    10u
-#define FONT_COURIER_NEW_7X10_FONT_TABLE_SIZE           102u
+/* NeoPixel parameter */
+#define NEO_PIXEL_NUMBER_OF_COLORS                     3u
 
 
 /******************************************************************************************************************************************************
@@ -43,44 +42,84 @@
 
 
 /******************************************************************************************************************************************************
- *  C L A S S   F O N T C O U R I E R N E W 7 X 1 0
+ *  C L A S S   N E O P I X E L
 ******************************************************************************************************************************************************/
-class FontCourierNew7x10 : public Font<FontCharHorizontal<byte, FONT_COURIER_NEW_7X10_HEIGHT>, FONT_COURIER_NEW_7X10_FONT_TABLE_SIZE>
+class NeoPixel
 {
 /******************************************************************************************************************************************************
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-    using FontCharType = FontCharHorizontal<byte, FONT_COURIER_NEW_7X10_HEIGHT>;
-    using RowsType = std::array<byte, FONT_COURIER_NEW_7X10_HEIGHT>;
+    using ColorType = byte;
+  
+    /* type which describes the structure of a pixel */
+    struct NeoPixelType {
+        ColorType Red;
+        ColorType Green;
+        ColorType Blue;
+    };
+
+/******************************************************************************************************************************************************
+ *  P R I V A T E   D A T A   T Y P E S   A N D   S T R U C T U R E S
+******************************************************************************************************************************************************/
+  private:
+    using PixelType = std::array<byte, NEO_PIXEL_NUMBER_OF_COLORS>;
   
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
-    static const FontTableType FontTable;
+    PixelType Pixel;
+
+    // functions
+    byte colorOffsetRed() const { return NEO_PIXEL_COLOR_OFFSET_RED; }
+    byte colorOffsetGreen() const { return NEO_PIXEL_COLOR_OFFSET_GREEN; }
+    byte colorOffsetBlue() const { return NEO_PIXEL_COLOR_OFFSET_BLUE; }
   
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr FontCourierNew7x10() : Font(FontTable) { }
-    ~FontCourierNew7x10() { }
+    constexpr NeoPixel() : Pixel{0u, 0u, 0u} { }
+    ~NeoPixel() { }
 
     // get methods
-    byte getWidth() const { return FONT_COURIER_NEW_7X10_WIDTH; }
-    byte getHeight() const { return FONT_COURIER_NEW_7X10_HEIGHT; }
-    Orientation getOrientation() const { return Orientation::ORIENTATION_HORIZONTAL; }
-    const FontTableType& getFontTable() const { return FontTable; }
-        
+    ColorType getRed() const { return Pixel[colorOffsetRed()]; }
+    ColorType getBlue() const { return Pixel[colorOffsetBlue()]; }
+    ColorType getGreen() const { return Pixel[colorOffsetGreen()]; }
+    NeoPixelType getPixel() const
+    {
+        NeoPixelType NeoPixel;
+        NeoPixel.Red = Pixel[colorOffsetRed()];
+        NeoPixel.Blue = Pixel[colorOffsetBlue()];
+        NeoPixel.Green = Pixel[colorOffsetGreen()];
+        return NeoPixel;
+    }
+
     // set methods
+    void setRed(ColorType Value) { Pixel[colorOffsetRed()] = Value; }
+    void setBlue(ColorType Value) { Pixel[colorOffsetBlue()] = Value; }
+    void setGreen(ColorType Value) { Pixel[colorOffsetGreen()] = Value; }
+    void setPixel(NeoPixelType NeoPixel)
+    {
+         Pixel[colorOffsetRed()] = NeoPixel.Red;
+         Pixel[colorOffsetBlue()] = NeoPixel.Blue;
+         Pixel[colorOffsetGreen()] = NeoPixel.Green;
+    }
+    void setPixel(ColorType Red, ColorType Green, ColorType Blue)
+    {
+         Pixel[colorOffsetRed()] = Red;
+         Pixel[colorOffsetBlue()] = Blue;
+         Pixel[colorOffsetGreen()] = Green;
+    }
 
     // methods
+    void clearPixel() { setPixel(0u, 0u, 0u); }
 
 };
 
-
 #endif
+
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E
 ******************************************************************************************************************************************************/

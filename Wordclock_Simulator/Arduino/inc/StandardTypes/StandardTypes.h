@@ -12,7 +12,7 @@
  *      \brief      Main header file of standard types library
  *
  *      \details    Library with standard types
- *
+ *                  
  *
 ******************************************************************************************************************************************************/
 #ifndef _STANDARD_TYPES_H_
@@ -21,8 +21,10 @@
 /******************************************************************************************************************************************************
  * INCLUDES
 ******************************************************************************************************************************************************/
-#include <stdint.h>
 #include "Arduino.h"
+#include "limits"
+#include <stdint.h>
+#include <limits.h>
 
 /******************************************************************************************************************************************************
  *  GLOBAL CONSTANT MACROS
@@ -63,7 +65,7 @@
 /* toggle bit */
 #define TOGGLE_BIT(Var, Bit) \
     ((Var) ^= (UINT64_C(1) << (Bit)))
-
+    
 /* read bit */
 #define READ_BIT(Var, Bit) \
     (((Var) & (UINT64_C(1) << (Bit))) >> (Bit))
@@ -104,9 +106,9 @@
  *  GLOBAL DATA TYPES AND STRUCTURES
 ******************************************************************************************************************************************************/
 /* standard return type for functions */
-enum stdReturnType {
-    E_OK = 0,
-    E_NOT_OK = 1
+enum StdReturnType {
+    E_OK = 0u,
+    E_NOT_OK = 1u
 };
 
 
@@ -114,10 +116,21 @@ enum stdReturnType {
  *  GLOBAL INLINE FUNCTION PROTOTYPES
 ******************************************************************************************************************************************************/
 template <typename ReturnType, typename BitType> static inline ReturnType bitValue(BitType);
-template <typename ReturnValue, typename LengthType> static inline ReturnValue bitMask(LengthType);
-template <typename VarType, typename MaskType, typename ValType> static inline void writeBitGroup(VarType&, MaskType, MaskType, ValType);
-template <typename VarType, typename MaskType> static inline VarType readBitGroup(VarType, MaskType, MaskType);
-
+template <typename ReturnType, typename LengthType> static inline ReturnType bitMask(LengthType);
+template <typename VarType> static inline VarType setBit(VarType, uint8_t);
+template <typename VarType> static inline VarType clearBit(VarType, uint8_t);
+template <typename VarType> static inline VarType toggleBit(VarType, uint8_t);
+template <typename VarType> static inline bool readBit(VarType, uint8_t);
+template <typename VarType> static inline VarType writeBit(VarType, uint8_t, bool);
+template <typename VarType> static inline bool isBitSet(VarType, uint8_t);
+template <typename VarType> static inline bool isBitCleared(VarType, uint8_t);
+template <typename VarType, typename PositionType> static inline VarType shiftLeft(VarType, PositionType);
+template <typename VarType, typename PositionType> static inline VarType shiftRight(VarType, PositionType);
+template <typename VarType, typename MaskType, typename GroupType> static inline VarType readBitGroup(VarType, MaskType, GroupType, bool = true);
+template <typename VarType, typename MaskType, typename GroupType, typename ValType> static inline void writeBitGroup(VarType&, MaskType, GroupType, ValType, bool = true);
+template <typename VarType, typename MaskType> static inline VarType readBitGroup(VarType, MaskType);
+template <typename VarType, typename MaskType, typename ValType> static inline void writeBitGroup(VarType&, MaskType, ValType);
+template <typename T> uint8_t digitsOfNumber(T Number, unsigned = 10);
 
 /******************************************************************************************************************************************************
  *  GLOBAL INLINE FUNCTIONS
@@ -131,88 +144,127 @@ static inline ReturnType bitValue(BitType Bit)
 
 /* bit mask */
 template <typename ReturnType, typename LengthType>
-inline ReturnType bitMask(LengthType Length)
+static inline ReturnType bitMask(LengthType Length)
 {
-    return bitValue(Length) - 1;
+    return bitValue(Length) - 1u;
 }
 
 /* set bit */
 template <typename VarType>
-inline VarType setBit(VarType Var, uint8_t Bit)
+static inline VarType setBit(VarType Var, uint8_t Bit)
 {
     return Var & ~(UINT64_C(1) << Bit);
 }
 
 /* clear bit */
 template <typename VarType>
-inline VarType clearBit(VarType Var, uint8_t Bit)
+static inline VarType clearBit(VarType Var, uint8_t Bit)
 {
     return Var & ~(UINT64_C(1) << Bit);
 }
 
 /* toggle bit */
 template <typename VarType>
-inline VarType toggleBit(VarType Var, uint8_t Bit)
+static inline VarType toggleBit(VarType Var, uint8_t Bit)
 {
     return Var ^ ~(UINT64_C(1) << Bit);
 }
 
 /* read bit */
 template <typename VarType>
-inline bool readBit(VarType Var, uint8_t Bit)
+static inline bool readBit(VarType Var, uint8_t Bit)
 {
     return (Var & (UINT64_C(1) << Bit)) >> Bit;
 }
 
 /* write bit */
 template <typename VarType>
-inline VarType writeBit(VarType Var, uint8_t Bit, bool Value)
+static inline VarType writeBit(VarType Var, uint8_t Bit, bool Value)
 {
     return Var & ~(UINT64_C(1) << Bit) | (Value << Bit);
 }
 
 /* is bit set */
 template <typename VarType>
-inline bool isBitSet(VarType Var, uint8_t Bit)
+static inline bool isBitSet(VarType Var, uint8_t Bit)
 {
     return Var & (UINT64_C(1) << Bit);
 }
 
 /* is bit cleared */
 template <typename VarType>
-inline bool isBitCleared(VarType Var, uint8_t Bit)
+static inline bool isBitCleared(VarType Var, uint8_t Bit)
 {
     return !isBitSet(Var, Bit);
 }
 
 /* shift left */
 template <typename VarType, typename PositionType>
-inline VarType shiftLeft(VarType Var, PositionType Position)
+static inline VarType shiftLeft(VarType Var, PositionType Position)
 {
     return Var << Position;
 }
 
 /* shift right */
 template <typename VarType, typename PositionType>
-inline VarType shiftRight(VarType Var, PositionType Position)
+static inline VarType shiftRight(VarType Var, PositionType Position)
 {
     return Var >> Position;
 }
 
 /* read bit group */
 template <typename VarType, typename MaskType, typename GroupType>
-inline VarType readBitGroup(VarType Var, MaskType BitGroupMask, GroupType BitGroupPosition)
+static inline VarType readBitGroup(VarType Var, MaskType BitGroupMask, GroupType BitGroupPosition, bool ShiftBitGroupMask)
 {
-    return ((Var & (static_cast<VarType>(BitGroupMask) << BitGroupPosition)) >> BitGroupPosition);
+    if(ShiftBitGroupMask) {
+        return ((Var & (static_cast<VarType>(BitGroupMask) << BitGroupPosition)) >> BitGroupPosition);
+    } else {
+        return ((Var & static_cast<VarType>(BitGroupMask)) >> BitGroupPosition);
+    }
+
 }
 
 /* write bit group */
 template <typename VarType, typename MaskType, typename GroupType, typename ValType>
-inline VarType writeBitGroup(VarType Var, MaskType BitGroupMask, GroupType BitGroupPosition, ValType Value)
+static inline void writeBitGroup(VarType& Var, MaskType BitGroupMask, GroupType BitGroupPosition, ValType Value, bool ShiftBitGroupMask)
 {
-    return (Var & ~(static_cast<VarType>(BitGroupMask) << BitGroupPosition)) | ((VarType)(Value & BitGroupMask) << BitGroupPosition);
+    if(ShiftBitGroupMask) {
+        Var = (Var & ~(static_cast<VarType>(BitGroupMask) << BitGroupPosition)) | (static_cast<VarType>(Value & BitGroupMask) << BitGroupPosition);
+    } else {
+        Var = (Var & ~(static_cast<VarType>(BitGroupMask))) | (static_cast<VarType>(Value & BitGroupMask) << BitGroupPosition);
+    }
 }
 
+/* read bit group */
+template <typename VarType, typename MaskType>
+static inline VarType readBitGroup(VarType Var, MaskType BitGroupMask)
+{
+    return (Var & (static_cast<VarType>(BitGroupMask)));
+}
+
+/* write bit group */
+template <typename VarType, typename MaskType, typename ValType>
+static inline void writeBitGroup(VarType& Var, MaskType BitGroupMask, ValType Value)
+{
+    Var = (Var & ~(static_cast<VarType>(BitGroupMask))) | (static_cast<VarType>(Value & BitGroupMask));
+}
+
+template <typename T>
+size_t numberOfBits()
+{
+    return sizeof (T) * (CHAR_BIT);
+}
+
+template <typename T>
+uint8_t digitsOfNumber(T Number, unsigned Base)
+{
+    T numberOfDigits = 0u;
+
+    do { Number /= Base; numberOfDigits++; }
+    while (Number != 0u);
+
+    return numberOfDigits;
+}
 
 #endif
 /******************************************************************************************************************************************************

@@ -68,14 +68,14 @@ class AnimationClockShift : public AnimationClockCommon
 ******************************************************************************************************************************************************/
   private:
     Transformation wcTransformation;
-    ClockWords::WordsListType ClockWordsTable;
+    ClockWords::WordsListType ClockWordsTable{DisplayWords::WORD_NONE};
 
 #if (ANIMATION_CLOCK_SHIFT_HORIZONTAL == STD_ON)
-    byte CurrentColumn;
+    byte CurrentColumn{0u};
 #endif
 
 #if (ANIMATION_CLOCK_SHIFT_VERTICAL == STD_ON)
-    byte CurrentRow;
+    byte CurrentRow{0u};
 #endif
 
     // functions
@@ -87,15 +87,7 @@ class AnimationClockShift : public AnimationClockCommon
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr AnimationClockShift() : wcTransformation(), ClockWordsTable{DisplayWords::WORD_NONE},
-#if (ANIMATION_CLOCK_SHIFT_HORIZONTAL == STD_ON)
-                            CurrentColumn()
-#endif
-
-#if (ANIMATION_CLOCK_SHIFT_VERTICAL == STD_ON)
-                            CurrentRow()
-#endif
-    { }
+    constexpr AnimationClockShift() : wcTransformation() { }
     ~AnimationClockShift() { }
 
     // get methods

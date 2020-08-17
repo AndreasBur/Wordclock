@@ -9,10 +9,10 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       AnimationFont.h
- *      \brief
+ *      \brief      
  *
- *      \details
- *
+ *      \details    
+ *                  
 ******************************************************************************************************************************************************/
 #ifndef _ANIMATION_FONT_H_
 #define _ANIMATION_FONT_H_
@@ -34,16 +34,17 @@
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
 /* AnimationFont configuration parameter */
-#define ANIMATION_SUPPORT_FONT_5X8              STD_ON
-#define ANIMATION_SUPPORT_FONT_7X9              STD_ON
-#define ANIMATION_SUPPORT_FONT_7X10             STD_ON
-#define ANIMATION_SUPPORT_FONT_9X10             STD_ON
-#define ANIMATION_SUPPORT_FONT_10X10            STD_ON
+#define ANIMATION_FONT_TASK_CYCLE_INIT_VALUE            10u
+#define ANIMATION_FONT_SUPPORT_FONT_5X8              STD_ON
+#define ANIMATION_FONT_SUPPORT_FONT_7X9              STD_ON
+#define ANIMATION_FONT_SUPPORT_FONT_7X10             STD_ON
+#define ANIMATION_FONT_SUPPORT_FONT_9X10             STD_ON
+#define ANIMATION_FONT_SUPPORT_FONT_10X10            STD_ON
 
 /* AnimationFont parameter */
-#define ANIMATION_FONT_ASCII_TABLE_OFFSET       -32
-#define ANIMATION_FONT_ASCII_CHAR_MIN           32
-#define ANIMATION_FONT_ASCII_CHAR_MAX           127
+#define ANIMATION_FONT_ASCII_TABLE_OFFSET               -32
+#define ANIMATION_FONT_ASCII_CHAR_MIN                    32
+#define ANIMATION_FONT_ASCII_CHAR_MAX                   127
 
 
 /******************************************************************************************************************************************************
@@ -74,53 +75,53 @@ class AnimationFont
     };
 
     enum FontType {
+        FONT_NONE,
         FONT_5X8,
         FONT_7X9,
         FONT_7X10,
         FONT_9X10,
         FONT_10X10,
-        FONT_NONE
     };
 
     struct ShiftType {
-        char* Text;
+        const char* Text;
         FontType Font;
         char Char;
         byte CharWidth;
         byte Counter : 7;
         ShiftStateType State : 1;
     };
-
+  
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
     Transformation wcTransformation;
-    Display* pDisplay;
     ShiftType Shift;
+    byte TaskCycle;
     StateType State;
 
-#if(ANIMATION_SUPPORT_FONT_5X8 == STD_ON)
+#if(ANIMATION_FONT_SUPPORT_FONT_5X8 == STD_ON)
     FontSprite5x8 Font5x8;
 #endif
-#if(ANIMATION_SUPPORT_FONT_7X9 == STD_ON)
+#if(ANIMATION_FONT_SUPPORT_FONT_7X9 == STD_ON)
     FontCourierNew7x9 Font7x9;
 #endif
-#if(ANIMATION_SUPPORT_FONT_7X10 == STD_ON)
+#if(ANIMATION_FONT_SUPPORT_FONT_7X10 == STD_ON)
     FontCourierNew7x10 Font7x10;
 #endif
-#if(ANIMATION_SUPPORT_FONT_9X10 == STD_ON)
+#if(ANIMATION_FONT_SUPPORT_FONT_9X10 == STD_ON)
     FontLucidaSans9x10 Font9x10;
 #endif
-#if(ANIMATION_SUPPORT_FONT_10X10 == STD_ON)
+#if(ANIMATION_FONT_SUPPORT_FONT_10X10 == STD_ON)
     FontTahoma10x10 Font10x10;
 #endif
 
     // functions
     template <typename RowType, byte RowsSize>
-    stdReturnType setCharFontHorizontal(byte, byte, const FontCharHorizontal<RowType, RowsSize>&, byte);
+    StdReturnType setCharFontHorizontal(byte, byte, const FontCharHorizontal<RowType, RowsSize>&, byte);
     template <typename RowType>
-    stdReturnType setCharRow(RowType, byte, byte, byte);
+    StdReturnType setCharRow(RowType, byte, byte, byte);
 
     template <typename RowType, byte RowsSize>
     void setCharFontHorizontalFast(byte, byte, const FontCharHorizontal<RowType, RowsSize>&, byte);
@@ -128,43 +129,63 @@ class AnimationFont
     void setCharRowFast(RowType, byte, byte, byte);
 
     template <typename ColumnType, byte ColumnsSize>
-    stdReturnType setCharFontVertical(byte, byte, const FontCharVertical<ColumnType, ColumnsSize>&, byte);
+    StdReturnType setCharFontVertical(byte, byte, const FontCharVertical<ColumnType, ColumnsSize>&, byte);
     template <typename ColumnType>
-    stdReturnType setCharColumn(ColumnType, byte, byte, byte);
+    StdReturnType setCharColumn(ColumnType, byte, byte, byte);
 
     template <typename ColumnType, byte ColumnsSize>
     void setCharFontVerticalFast(byte, byte, const FontCharVertical<ColumnType, ColumnsSize>&, byte);
     template <typename ColumnType>
     void setCharColumnFast(ColumnType, byte, byte, byte);
 
-    stdReturnType convertCharToFontIndex(char, byte&);
+    StdReturnType convertCharToFontIndex(char, byte&);
     byte convertCharToFontIndexFast(char);
     void stringShiftTask();
     void charShiftTask();
-    byte getColumnCenter(FontType Font) { return (DISPLAY_NUMBER_OF_COLUMNS / 2) - (getFontWidth(Font) / 2); }
-    byte getRowCenter(FontType Font) { return (DISPLAY_NUMBER_OF_ROWS / 2) - (getFontHeight(Font) / 2); }
-
+    byte getColumnCenter(FontType Font) { return (DISPLAY_NUMBER_OF_COLUMNS / 2u) - (getFontWidth(Font) / 2u); }
+    byte getRowCenter(FontType Font) { return (DISPLAY_NUMBER_OF_ROWS / 2u) - (getFontHeight(Font) / 2u); }
+    
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    AnimationFont(Display*);
-    ~AnimationFont();
+    constexpr AnimationFont() : wcTransformation(), Shift{nullptr, FONT_NONE, STD_NULL_CHARACTER, 0, 0, SHIFT_STATE_IDLE},
+                                TaskCycle(ANIMATION_FONT_TASK_CYCLE_INIT_VALUE), State(STATE_UNINIT),
 
-	// get methods
+#if(ANIMATION_FONT_SUPPORT_FONT_5X8 == STD_ON)
+                                Font5x8(),
+#endif
+#if(ANIMATION_FONT_SUPPORT_FONT_7X9 == STD_ON)
+                                Font7x9(),
+#endif
+#if(ANIMATION_FONT_SUPPORT_FONT_7X10 == STD_ON)
+                                Font7x10(),
+#endif
+#if(ANIMATION_FONT_SUPPORT_FONT_9X10 == STD_ON)
+                                Font9x10(),
+#endif
+#if(ANIMATION_FONT_SUPPORT_FONT_10X10 == STD_ON)
+                                Font10x10()
+#endif 
+    { }
+    ~AnimationFont() { }
+
+    // get methods
     StateType getState() const { return State; }
+    byte getTaskCycle() const { return TaskCycle; }
 
-	// set methods
+    // set methods
+    void setTaskCycle(byte Cycle) { TaskCycle = Cycle; }
 
-	// methods
-    void init() {}
-    void show() { pDisplay->show(); }
+    // methods
+    void init() { }
+    void show() { Display::getInstance().show(); }
     void task();
-    stdReturnType setChar(byte, byte, char, FontType);
+    StdReturnType setChar(byte, byte, char, FontType);
     void setCharFast(byte, byte, char, FontType);
     void setCharWithShift(char, FontType);
-    void setText(char*, FontType);
-    void setTextWithShift(char*, FontType);
+    void setText(const char*, FontType);
+    void setTextWithShift(const char*, FontType);
     byte getFontHeight(FontType);
     byte getFontWidth(FontType);
     byte getFontCharWidth(FontType, char);

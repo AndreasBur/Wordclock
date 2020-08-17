@@ -33,7 +33,6 @@
 ******************************************************************************************************************************************************/
 
 
-
 /******************************************************************************************************************************************************
  *  LOCAL DATA TYPES AND STRUCTURES
 ******************************************************************************************************************************************************/
@@ -73,39 +72,11 @@ const DisplayWord DisplayWords::DisplayWordsTable[] PROGMEM
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  Constructor of DisplayWords
-******************************************************************************************************************************************************/
-/*! \brief          DisplayWords Constructor
- *  \details        Instantiation of the DisplayWords library
- *
- *  \return         -
-******************************************************************************************************************************************************/
-DisplayWords::DisplayWords()
-{
-
-} /* DisplayWords */
-
-
-/******************************************************************************************************************************************************
-  Destructor of DisplayWords
-******************************************************************************************************************************************************/
-DisplayWords::~DisplayWords()
-{
-
-} /* ~DisplayWords */
-
-
-/******************************************************************************************************************************************************
   getDisplayWord()
 ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
- *  \return         -
-******************************************************************************************************************************************************/
-stdReturnType DisplayWords::getDisplayWord(WordIdType WordId, DisplayWord& Word) const
+StdReturnType DisplayWords::getDisplayWord(WordIdType WordId, DisplayWord& Word) const
 {
-    stdReturnType ReturnValue = E_NOT_OK;
+    StdReturnType ReturnValue{E_NOT_OK};
 
     if(WordId < DisplayWords::WORD_NUMBER_OF_WORDS) {
         Word = getDisplayWordFast(WordId);
@@ -120,14 +91,9 @@ stdReturnType DisplayWords::getDisplayWord(WordIdType WordId, DisplayWord& Word)
 /******************************************************************************************************************************************************
   getDisplayWordLength()
 ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
- *  \return         -
-******************************************************************************************************************************************************/
-stdReturnType DisplayWords::getDisplayWordLength(WordIdType WordId, byte& Length) const
+StdReturnType DisplayWords::getDisplayWordLength(WordIdType WordId, byte& Length) const
 {
-    stdReturnType ReturnValue = E_NOT_OK;
+    StdReturnType ReturnValue{E_NOT_OK};
 
     if(WordId < DisplayWords::WORD_NUMBER_OF_WORDS) {
         Length = getDisplayWordLengthFast(WordId);
@@ -142,14 +108,9 @@ stdReturnType DisplayWords::getDisplayWordLength(WordIdType WordId, byte& Length
 /******************************************************************************************************************************************************
   getDisplayWordColumn()
 ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
- *  \return         -
-******************************************************************************************************************************************************/
-stdReturnType DisplayWords::getDisplayWordColumn(WordIdType WordId, byte& Column) const
+StdReturnType DisplayWords::getDisplayWordColumn(WordIdType WordId, byte& Column) const
 {
-    stdReturnType ReturnValue = E_NOT_OK;
+    StdReturnType ReturnValue{E_NOT_OK};
 
     if(WordId < DisplayWords::WORD_NUMBER_OF_WORDS) {
         Column = getDisplayWordColumnFast(WordId);
@@ -164,14 +125,9 @@ stdReturnType DisplayWords::getDisplayWordColumn(WordIdType WordId, byte& Column
 /******************************************************************************************************************************************************
   getDisplayWordRow()
 ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
- *  \return         -
-******************************************************************************************************************************************************/
-stdReturnType DisplayWords::getDisplayWordRow(WordIdType WordId, byte& Row) const
+StdReturnType DisplayWords::getDisplayWordRow(WordIdType WordId, byte& Row) const
 {
-    stdReturnType ReturnValue = E_NOT_OK;
+    StdReturnType ReturnValue{E_NOT_OK};
 
     if(WordId < DisplayWords::WORD_NUMBER_OF_WORDS) {
         Row = getDisplayWordRowFast(WordId);

@@ -34,10 +34,10 @@ class WordclockDialog : public wxDialog
     protected:
 
     private:
-        Display WcDisplay;
-        Clock WcClock;
-        Animation WcAnimation;
-        Transformation WcTransformation;
+        //Display WcDisplay;
+        //Clock WcClock;
+        //Animation WcAnimation;
+        //Transformation WcTransformation;
         wxDateTime Time;
         wxTimer Timer;
         char Text[25];

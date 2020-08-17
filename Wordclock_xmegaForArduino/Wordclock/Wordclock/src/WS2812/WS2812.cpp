@@ -116,7 +116,7 @@ WS2812::~WS2812()
 /******************************************************************************************************************************************************
   init()
 ******************************************************************************************************************************************************/
-boolean WS2812::init(byte Pin)
+bool WS2812::init(byte Pin)
 {
     PortPinType portPin;
     byte pinMask = digitalPinToBitMask(Pin);
@@ -376,7 +376,7 @@ WS2812::PixelType WS2812::getPixelDimmedFast(IndexType Index) const
 /******************************************************************************************************************************************************
   setBrightness()
 ******************************************************************************************************************************************************/
-void WS2812::setBrightness(byte sBrightness, boolean GammaCorrection)
+void WS2812::setBrightness(byte sBrightness, bool GammaCorrection)
 {
     if(GammaCorrection) {
         Brightness = GCorrection.getCorrectedValue(sBrightness / 2);
@@ -527,7 +527,7 @@ void WS2812::switchPixelsBufferPointer()
 /******************************************************************************************************************************************************
   isResetTimeElapsed()
 ******************************************************************************************************************************************************/
-boolean WS2812::isResetTimeElapsed()
+bool WS2812::isResetTimeElapsed()
 {
     // check for timer overflow
     if(micros() < ResetTimer) {

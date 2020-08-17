@@ -45,39 +45,11 @@
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  Constructor of AnimationClockTeletype
-******************************************************************************************************************************************************/
-/*! \brief          AnimationClockTeletype Constructor
- *  \details        Instantiation of the AnimationClockTeletype library
- *
- *  \return         -
-******************************************************************************************************************************************************/
-AnimationClockTeletype::AnimationClockTeletype()
-{
-    reset();
-} /* AnimationClockTeletype */
-
-
-/******************************************************************************************************************************************************
-  Destructor of AnimationClockTeletype
-******************************************************************************************************************************************************/
-AnimationClockTeletype::~AnimationClockTeletype()
-{
-
-} /* ~AnimationClockTeletype */
-
-
-/******************************************************************************************************************************************************
   init()
 ******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
-******************************************************************************************************************************************************/
-void AnimationClockTeletype::init(Display* Display, Clock* Clock)
+void AnimationClockTeletype::init()
 {
-    AnimationClockCommon::init(Display, Clock, STATE_IDLE);
+    AnimationClockCommon::init(STATE_IDLE);
     reset();
 } /* init */
 
@@ -85,19 +57,14 @@ void AnimationClockTeletype::init(Display* Display, Clock* Clock)
 /******************************************************************************************************************************************************
   setClock()
 ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
- *  \return         -
-******************************************************************************************************************************************************/
-stdReturnType AnimationClockTeletype::setClock(byte Hour, byte Minute)
+StdReturnType AnimationClockTeletype::setClock(byte Hour, byte Minute)
 {
-    stdReturnType ReturnValue{E_NOT_OK};
+    StdReturnType ReturnValue{E_NOT_OK};
 
-    if(pClock->getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
+    if(Clock::getInstance().getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
         ReturnValue = E_OK;
-        CurrentWordIndex = 0;
-        CurrentCharIndex = 0;
+        CurrentWordIndex = 0u;
+        CurrentCharIndex = 0u;
         CurrentWordLength = Words.getDisplayWordLengthFast(ClockWordsTable[CurrentWordIndex]);
         State = STATE_SET_TIME;
     }
@@ -108,11 +75,6 @@ stdReturnType AnimationClockTeletype::setClock(byte Hour, byte Minute)
 /******************************************************************************************************************************************************
   task()
 ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
- *  \return         -
-******************************************************************************************************************************************************/
 void AnimationClockTeletype::task()
 {
     if(State == STATE_SET_TIME) {
@@ -121,11 +83,11 @@ void AnimationClockTeletype::task()
                 State = STATE_IDLE;
                 return;
             }
-            CurrentCharIndex = 0;
+            CurrentCharIndex = 0u;
             CurrentWordLength = Words.getDisplayWordLengthFast(ClockWordsTable[CurrentWordIndex]);
         }
         CurrentCharIndex++;
-        pDisplay->setWordFast(ClockWordsTable[CurrentWordIndex], CurrentCharIndex);
+        Display::getInstance().setWordFast(ClockWordsTable[CurrentWordIndex], CurrentCharIndex);
     }
 } /* task */
 
@@ -137,31 +99,21 @@ void AnimationClockTeletype::task()
 /******************************************************************************************************************************************************
   reset()
 ******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
-******************************************************************************************************************************************************/
 void AnimationClockTeletype::reset()
 {
-    for(auto& Word : ClockWordsTable) { Word = DisplayWords::WORD_NONE; }
-    CurrentWordIndex = 0;
-    CurrentWordLength = 0;
-    CurrentCharIndex = 0;
+    ClockWordsTable.fill(DisplayWords::WORD_NONE);
+    CurrentWordIndex = 0u;
+    CurrentWordLength = 0u;
+    CurrentCharIndex = 0u;
 } /* reset */
 
 
 /******************************************************************************************************************************************************
   setNextWordIndex()
 ******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
-******************************************************************************************************************************************************/
-stdReturnType AnimationClockTeletype::setNextWordIndex()
+StdReturnType AnimationClockTeletype::setNextWordIndex()
 {
-    if(CurrentWordIndex + 1 < static_cast<byte>(ClockWordsTable.size())) {
+    if(CurrentWordIndex + 1u < static_cast<byte>(ClockWordsTable.size())) {
         CurrentWordIndex++;
         return E_OK;
     }

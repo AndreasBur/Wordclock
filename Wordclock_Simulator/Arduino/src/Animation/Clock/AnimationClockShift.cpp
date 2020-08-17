@@ -45,40 +45,11 @@
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  Constructor of AnimationClockShift
-******************************************************************************************************************************************************/
-/*! \brief          AnimationClockShift Constructor
- *  \details        Instantiation of the AnimationClockShift library
- *
- *  \return         -
-******************************************************************************************************************************************************/
-AnimationClockShift::AnimationClockShift() : wcTransformation(nullptr)
-{
-    reset();
-} /* AnimationClockShift */
-
-
-/******************************************************************************************************************************************************
-  Destructor of AnimationClockShift
-******************************************************************************************************************************************************/
-AnimationClockShift::~AnimationClockShift()
-{
-
-} /* ~AnimationClockShift */
-
-
-/******************************************************************************************************************************************************
   init()
 ******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
-******************************************************************************************************************************************************/
-void AnimationClockShift::init(Display* Display, Clock* Clock)
+void AnimationClockShift::init()
 {
-    AnimationClockCommon::init(Display, Clock, STATE_IDLE);
-    wcTransformation.setDisplay(Display);
+    AnimationClockCommon::init(STATE_IDLE);
     reset();
 } /* init */
 
@@ -86,16 +57,11 @@ void AnimationClockShift::init(Display* Display, Clock* Clock)
 /******************************************************************************************************************************************************
   setClock()
 ******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
-******************************************************************************************************************************************************/
-stdReturnType AnimationClockShift::setClock(byte Hour, byte Minute)
+StdReturnType AnimationClockShift::setClock(byte Hour, byte Minute)
 {
-    stdReturnType ReturnValue{E_NOT_OK};
+    StdReturnType ReturnValue{E_NOT_OK};
 
-    if(pClock->getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
+    if(Clock::getInstance().getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
         State = STATE_CLEAR_TIME;
     }
     return ReturnValue;
@@ -104,11 +70,6 @@ stdReturnType AnimationClockShift::setClock(byte Hour, byte Minute)
 
 /******************************************************************************************************************************************************
   task()
-******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
 ******************************************************************************************************************************************************/
 void AnimationClockShift::task()
 {
@@ -124,30 +85,21 @@ void AnimationClockShift::task()
 /******************************************************************************************************************************************************
   reset()
 ******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
-******************************************************************************************************************************************************/
 void AnimationClockShift::reset()
 {
 #if (ANIMATION_CLOCK_SHIFT_HORIZONTAL == STD_ON)
-    CurrentColumn = 0;
+    CurrentColumn = 0u;
 #endif
 
 #if (ANIMATION_CLOCK_SHIFT_VERTICAL == STD_ON)
-    CurrentRow = 0;
+    CurrentRow = 0u;
 #endif
+    ClockWordsTable.fill(DisplayWords::WORD_NONE);
 } /* reset */
 
 
 /******************************************************************************************************************************************************
   clearTimeTask()
-******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
 ******************************************************************************************************************************************************/
 void AnimationClockShift::clearTimeTask()
 {
@@ -177,19 +129,14 @@ void AnimationClockShift::clearTimeTask()
 /******************************************************************************************************************************************************
   setTimeTask()
 ******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
-******************************************************************************************************************************************************/
 void AnimationClockShift::setTimeTask()
 {
 #if (ANIMATION_CLOCK_SHIFT_HORIZONTAL == STD_ON)
     if(CurrentColumn < DISPLAY_NUMBER_OF_COLUMNS) {
         wcTransformation.shiftRightFast();
-        for(byte Row = 0; Row < DISPLAY_NUMBER_OF_ROWS; Row++) {
-            if(isPixelPartOfClockWords(ClockWordsTable, DISPLAY_NUMBER_OF_COLUMNS - CurrentColumn - 1, Row)) {
-                pDisplay->setPixelFast(0, Row);
+        for(byte Row = 0u; Row < DISPLAY_NUMBER_OF_ROWS; Row++) {
+            if(isPixelPartOfClockWords(ClockWordsTable, DISPLAY_NUMBER_OF_COLUMNS - CurrentColumn - 1u, Row)) {
+                Display::getInstance().setPixelFast(0u, Row);
             }
         }
         CurrentColumn++;
@@ -201,9 +148,9 @@ void AnimationClockShift::setTimeTask()
 #if (ANIMATION_CLOCK_SHIFT_VERTICAL == STD_ON)
     if(CurrentRow < DISPLAY_NUMBER_OF_ROWS) {
         wcTransformation.shiftDownFast();
-        for(byte Column = 0; Column < DISPLAY_NUMBER_OF_COLUMNS; Column++) {
-            if(isPixelPartOfClockWords(ClockWordsTable, Column, DISPLAY_NUMBER_OF_ROWS - CurrentRow - 1)) {
-                pDisplay->setPixelFast(Column, 0);
+        for(byte Column = 0u; Column < DISPLAY_NUMBER_OF_COLUMNS; Column++) {
+            if(isPixelPartOfClockWords(ClockWordsTable, Column, DISPLAY_NUMBER_OF_ROWS - CurrentRow - 1u)) {
+                Display::getInstance().setPixelFast(Column, 0u);
             }
         }
         CurrentRow++;

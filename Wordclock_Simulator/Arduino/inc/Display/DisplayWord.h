@@ -62,25 +62,25 @@ class DisplayWord
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr DisplayWord(byte sColumn, byte sRow, byte sLength) : Column(sColumn), Row(sRow), Length(sLength) {}
-    DisplayWord();
+    constexpr DisplayWord(byte sColumn, byte sRow, byte sLength) : Column(sColumn), Row(sRow), Length(sLength) { }
+    constexpr DisplayWord() : Column(0u), Row(0u), Length(0u) { }
 
-	// get methods
+    // get methods
     byte getLength() const { return Length; }
-	byte getRow() const { return Row; }
-	byte getColumn() const { return Column; }
+    byte getRow() const { return Row; }
+    byte getColumn() const { return Column; }
     
-	// set methods
+    // set methods
     void setLength(byte sLength) { Length = sLength; }
     void setRow(byte sRow) { Row = sRow; }
     void setColumn(byte sColumn) { Column = sColumn; }
 
-	// methods
+    // methods
 
 };
 
-#endif
 
+#endif
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E
 ******************************************************************************************************************************************************/

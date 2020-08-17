@@ -45,39 +45,11 @@
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  Constructor of AnimationClockSnake
-******************************************************************************************************************************************************/
-/*! \brief          AnimationClockSnake Constructor
- *  \details        Instantiation of the AnimationClockSnake library
- *
- *  \return         -
-******************************************************************************************************************************************************/
-AnimationClockSnake::AnimationClockSnake()
-{
-    reset();
-} /* AnimationClockSnake */
-
-
-/******************************************************************************************************************************************************
-  Destructor of AnimationClockSnake
-******************************************************************************************************************************************************/
-AnimationClockSnake::~AnimationClockSnake()
-{
-
-} /* ~AnimationClockSnake */
-
-
-/******************************************************************************************************************************************************
   init()
 ******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
-******************************************************************************************************************************************************/
-void AnimationClockSnake::init(Display* Display, Clock* Clock)
+void AnimationClockSnake::init()
 {
-    AnimationClockCommon::init(Display, Clock, STATE_IDLE);
+    AnimationClockCommon::init(STATE_IDLE);
     reset();
 } /* init */
 
@@ -85,19 +57,14 @@ void AnimationClockSnake::init(Display* Display, Clock* Clock)
 /******************************************************************************************************************************************************
   setClock()
 ******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
-******************************************************************************************************************************************************/
-stdReturnType AnimationClockSnake::setClock(byte Hour, byte Minute)
+StdReturnType AnimationClockSnake::setClock(byte Hour, byte Minute)
 {
-    stdReturnType ReturnValue{E_NOT_OK};
+    StdReturnType ReturnValue{E_NOT_OK};
 
-    if(pClock->getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
+    if(Clock::getInstance().getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
         ReturnValue = E_OK;
-        SnakeBeginIndex = 0;
-        SnakeEndIndex = 0;
+        SnakeBeginIndex = 0u;
+        SnakeEndIndex = 0u;
         State = STATE_SET_TIME;
     }
     return ReturnValue;
@@ -107,25 +74,20 @@ stdReturnType AnimationClockSnake::setClock(byte Hour, byte Minute)
 /******************************************************************************************************************************************************
   task()
 ******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
-******************************************************************************************************************************************************/
 void AnimationClockSnake::task()
 {
     if(State == STATE_SET_TIME) {
         byte SnakeEndIndexTrans = transformToSerpentine(SnakeEndIndex);
-        pDisplay->setPixelFast(transformToSerpentine(SnakeBeginIndex));
+        Display::getInstance().setPixelFast(transformToSerpentine(SnakeBeginIndex));
 
         if((SnakeBeginIndex - SnakeEndIndex) == ANIMATION_CLOCK_SNAKE_LENGTH ||
-           (SnakeBeginIndex >= DISPLAY_NUMBER_OF_LEDS - 1 && SnakeEndIndex < DISPLAY_NUMBER_OF_LEDS))
+           (SnakeBeginIndex >= DISPLAY_NUMBER_OF_LEDS - 1u && SnakeEndIndex < DISPLAY_NUMBER_OF_LEDS))
         {
-            //pDisplay->clearPixelFast(SnakeEndIndexTrans);
-            if(isPixelPartOfClockWords(ClockWordsTable, SnakeEndIndexTrans) == false) pDisplay->clearPixelFast(SnakeEndIndexTrans);
+            //Display::getInstance().clearPixelFast(SnakeEndIndexTrans);
+            if(isPixelPartOfClockWords(ClockWordsTable, SnakeEndIndexTrans) == false) Display::getInstance().clearPixelFast(SnakeEndIndexTrans);
             SnakeEndIndex++;
         }
-        if(SnakeBeginIndex < DISPLAY_NUMBER_OF_LEDS - 1) SnakeBeginIndex++;
+        if(SnakeBeginIndex < DISPLAY_NUMBER_OF_LEDS - 1u) SnakeBeginIndex++;
         if(SnakeEndIndex >= DISPLAY_NUMBER_OF_LEDS) State = STATE_IDLE;
     }
 } /* task */
@@ -138,31 +100,23 @@ void AnimationClockSnake::task()
 /******************************************************************************************************************************************************
   reset()
 ******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
-******************************************************************************************************************************************************/
 void AnimationClockSnake::reset()
 {
-
+    SnakeBeginIndex = 0u;
+    SnakeEndIndex = 0u;
+    SnakeState = SNAKE_STATE_TO_RIGHT;
 } /* reset */
 
 
 /******************************************************************************************************************************************************
   transformToSerpentine()
 ******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
-******************************************************************************************************************************************************/
 byte AnimationClockSnake::transformToSerpentine(byte Column, byte Row) const
 {
     byte Index;
 
-    if(IS_BIT_CLEARED(Row, 0)) Index = (Row * DISPLAY_NUMBER_OF_COLUMNS) + Column;
-    else Index = (Row * DISPLAY_NUMBER_OF_COLUMNS) + (DISPLAY_NUMBER_OF_COLUMNS - Column - 1);
+    if(IS_BIT_CLEARED(Row, 0u)) Index = (Row * DISPLAY_NUMBER_OF_COLUMNS) + Column;
+    else Index = (Row * DISPLAY_NUMBER_OF_COLUMNS) + (DISPLAY_NUMBER_OF_COLUMNS - Column - 1u);
 
     return Index;
 } /* transformToSerpentine */
@@ -171,15 +125,10 @@ byte AnimationClockSnake::transformToSerpentine(byte Column, byte Row) const
 /******************************************************************************************************************************************************
   transformToSerpentine()
 ******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
-******************************************************************************************************************************************************/
 byte AnimationClockSnake::transformToSerpentine(byte Index) const
 {
-    byte Column = pDisplay->indexToColumn(Index);
-    byte Row = pDisplay->indexToRow(Index);
+    byte Column = Display::getInstance().indexToColumn(Index);
+    byte Row = Display::getInstance().indexToRow(Index);
 
     return transformToSerpentine(Column, Row);
 } /* transformToSerpentine */

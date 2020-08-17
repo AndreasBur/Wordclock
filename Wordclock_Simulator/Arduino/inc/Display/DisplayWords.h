@@ -9,10 +9,10 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       DisplayWords.h
- *      \brief
+ *      \brief      
  *
- *      \details
- *
+ *      \details    
+ *                  
 ******************************************************************************************************************************************************/
 #ifndef _DISPLAY_WORDS_H_
 #define _DISPLAY_WORDS_H_
@@ -45,7 +45,7 @@
 
 
 /******************************************************************************************************************************************************
- *  C L A S S  D I S P L A Y W O R D S
+ *  C L A S S   D I S P L A Y W O R D S
 ******************************************************************************************************************************************************/
 class DisplayWords
 {
@@ -83,34 +83,34 @@ class DisplayWords
         WORD_UHR,
         WORD_NUMBER_OF_WORDS
     };
-
-	using DisplayWordsTableElementType = DisplayWord;
+    
+    using DisplayWordsTableElementType = DisplayWord;
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
     static const DisplayWord DisplayWordsTable[];
-
-	// functions
+    
+    // functions
     DisplayWordsTableElementType getDisplayWordsTableElement(byte WordId) const {
-        DisplayWordsTableElementType DisplayWordsTableElement;
-        memcpy_P(&DisplayWordsTableElement, &DisplayWordsTable[WordId], sizeof(DisplayWordsTableElementType));
-        return DisplayWordsTableElement;
+        DisplayWordsTableElementType displayWordsTableElement;
+        memcpy_P(&displayWordsTableElement, &DisplayWordsTable[WordId], sizeof(DisplayWordsTableElementType));
+        return displayWordsTableElement;
     }
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    DisplayWords();
-    ~DisplayWords();
+    constexpr DisplayWords() { }
+    ~DisplayWords() { }
 
-	// get methods
-    stdReturnType getDisplayWord(WordIdType, DisplayWord&) const;
-    stdReturnType getDisplayWordLength(WordIdType, byte&) const;
-    stdReturnType getDisplayWordColumn(WordIdType, byte&) const;
-    stdReturnType getDisplayWordRow(WordIdType, byte&) const;
+    // get methods
+    StdReturnType getDisplayWord(WordIdType, DisplayWord&) const;
+    StdReturnType getDisplayWordLength(WordIdType, byte&) const;
+    StdReturnType getDisplayWordColumn(WordIdType, byte&) const;
+    StdReturnType getDisplayWordRow(WordIdType, byte&) const;
 
     // get methods fast
     DisplayWord getDisplayWordFast(WordIdType WordId) const { return getDisplayWordsTableElement(WordId); }
@@ -118,9 +118,9 @@ class DisplayWords
     byte getDisplayWordColumnFast(WordIdType WordId) const { return getDisplayWordsTableElement(WordId).getColumn(); }
     byte getDisplayWordLengthFast(WordIdType WordId) const { return getDisplayWordsTableElement(WordId).getLength(); }
 
-	// set methods
+    // set methods
 
-	// methods
+    // methods
 
 };
 

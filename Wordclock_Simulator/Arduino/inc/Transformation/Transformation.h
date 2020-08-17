@@ -59,41 +59,39 @@ class Transformation
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
-    Display* pDisplay;
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    Transformation(Display*);
-    ~Transformation();
+    constexpr Transformation() { }
+    ~Transformation() { }
 
     // get methods
 
 
     // set methods
-    void setDisplay(Display* Display) { pDisplay = Display; }
 
     // methods
-    stdReturnType shiftLeft(boolean = false);
-    stdReturnType shiftRight(boolean = false);
-    stdReturnType shiftUp(boolean = false);
-    stdReturnType shiftDown(boolean = false);
+    StdReturnType shiftLeft(bool = false);
+    StdReturnType shiftRight(bool = false);
+    StdReturnType shiftUp(bool = false);
+    StdReturnType shiftDown(bool = false);
 
-    stdReturnType shiftRowLeft(byte, boolean = false);
-    stdReturnType shiftRowRight(byte, boolean = false);
-    stdReturnType shiftColumnUp(byte, boolean = false);
-    stdReturnType shiftColumnDown(byte, boolean = false);
+    StdReturnType shiftRowLeft(byte, bool = false);
+    StdReturnType shiftRowRight(byte, bool = false);
+    StdReturnType shiftColumnUp(byte, bool = false);
+    StdReturnType shiftColumnDown(byte, bool = false);
 
-    void shiftLeftFast(boolean = false);
-    void shiftRightFast(boolean = false);
-    void shiftUpFast(boolean = false);
-    void shiftDownFast(boolean = false);
+    void shiftLeftFast(bool = false);
+    void shiftRightFast(bool = false);
+    void shiftUpFast(bool = false);
+    void shiftDownFast(bool = false);
 
-    void shiftRowLeftFast(byte, boolean = false);
-    void shiftRowRightFast(byte, boolean = false);
-    void shiftColumnUpFast(byte, boolean = false);
-    void shiftColumnDownFast(byte, boolean = false);
+    void shiftRowLeftFast(byte, bool = false);
+    void shiftRowRightFast(byte, bool = false);
+    void shiftColumnUpFast(byte, bool = false);
+    void shiftColumnDownFast(byte, bool = false);
 };
 
 

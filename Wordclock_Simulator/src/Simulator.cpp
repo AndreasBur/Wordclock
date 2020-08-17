@@ -1,5 +1,6 @@
 #include "Simulator.h"
 #include "WS2812.h"
+#include <array>
 
 const wxString DisplayCharacters[][DISPLAY_NUMBER_OF_COLUMNS] =
 {
@@ -18,8 +19,8 @@ const wxString DisplayCharacters[][DISPLAY_NUMBER_OF_COLUMNS] =
 
 BEGIN_EVENT_TABLE(Simulator, wxFrame)
     EVT_CLOSE(Simulator::OnClose)
-    EVT_BUTTON(idBtnQuit, Simulator::OnQuit)
-    EVT_BUTTON(idBtnAbout, Simulator::OnAbout)
+    EVT_BUTTON(ID_BUTTON_QUIT, Simulator::OnQuit)
+    EVT_BUTTON(ID_BUTTON_ABOUT, Simulator::OnAbout)
 END_EVENT_TABLE()
 
 
@@ -29,36 +30,74 @@ Simulator::Simulator(wxFrame *dlg, const wxString &title) : wxFrame(dlg, -1, tit
 
     SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DFACE));
     //this->SetSizeHints(wxDefaultSize, wxDefaultSize);
-    wxBoxSizer* SizerCharacters[DISPLAY_NUMBER_OF_ROWS];
-    wxBoxSizer* SizerAll;
-    SizerAll = new wxBoxSizer(wxVERTICAL);
 
-    for(int Row = 0; Row < DISPLAY_NUMBER_OF_ROWS; Row++) {
+    wxBoxSizer* SizerAll = new wxBoxSizer(wxHORIZONTAL);
 
-        SizerCharacters[Row] = new wxBoxSizer(wxHORIZONTAL);
-
-        for(int Column = 0; Column < DISPLAY_NUMBER_OF_COLUMNS; Column++) {
-            Characters[Row][Column] = new wxStaticText(this, wxID_ANY, DisplayCharacters[Row][Column], wxDefaultPosition, wxDefaultSize, 0);
-            Characters[Row][Column]->SetFont(wxFont(wxSize(40,40), wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false));
-            Characters[Row][Column]->SetForegroundColour(wxColour(*wxLIGHT_GREY));
-            SizerCharacters[Row]->Add(Characters[Row][Column], 1, wxALL|wxEXPAND, 5);
-        }
-        //SizerAll->Add(SizerCharacters[Row], 1, wxTOP|wxBOTTOM|wxEXPAND, 5);
-        SizerAll->Add(SizerCharacters[Row], 1, wxEXPAND, 5);
-    }
-
-    wxBoxSizer* SizerButton = new wxBoxSizer(wxHORIZONTAL);
-    BtnAbout = new wxButton(this, idBtnAbout, wxT("&About"), wxDefaultPosition, wxDefaultSize, 0);
-    BtnQuit = new wxButton(this, idBtnQuit, wxT("&Quit"), wxDefaultPosition, wxDefaultSize, 0);
-
-    SizerButton->Add(BtnAbout, 1, wxALL|wxEXPAND, 10);
-    SizerButton->Add(BtnQuit, 1, wxALL|wxEXPAND, 10);
-
-    SizerAll->Add(SizerButton, 1, wxEXPAND, 5);
+    SizerAll->Add(createSizerCharacters(), 1, wxALL|wxEXPAND, 10);
+    //SizerAll->Add(createSizerButton(), 1, wxEXPAND, 5);
+    SizerAll->Add(createSizerControl(), 0, wxALL|wxEXPAND, 10);
 
     this->SetSizer(SizerAll);
     this->Layout();
     SizerAll->Fit(this);
+}
+
+wxBoxSizer* Simulator::createSizerCharacter(int Row)
+{
+    wxBoxSizer* SizerCharacter = new wxBoxSizer(wxHORIZONTAL);
+
+    for(int Column = 0; Column < DISPLAY_NUMBER_OF_COLUMNS; Column++)
+    {
+        Characters[Row][Column] = new wxStaticText(this, wxID_ANY, DisplayCharacters[Row][Column], wxDefaultPosition, wxDefaultSize, 0);
+        Characters[Row][Column]->SetFont(wxFont(wxSize(40,40), wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false));
+        Characters[Row][Column]->SetForegroundColour(wxColour(*wxLIGHT_GREY));
+        SizerCharacter->Add(Characters[Row][Column], 1, wxALL|wxEXPAND, 5);
+    }
+
+    return SizerCharacter;
+}
+
+wxBoxSizer* Simulator::createSizerCharacters()
+{
+    wxBoxSizer* SizerCharacters = new wxBoxSizer(wxVERTICAL);
+
+    for(int Row = 0; Row < DISPLAY_NUMBER_OF_ROWS; Row++) {
+        SizerCharacters->Add(createSizerCharacter(Row), 1, wxEXPAND, 5);
+    }
+
+    return SizerCharacters;
+}
+
+wxBoxSizer* Simulator::createSizerButton()
+{
+    wxBoxSizer* SizerButton = new wxBoxSizer(wxHORIZONTAL);
+    BtnAbout = new wxButton(this, ID_BUTTON_ABOUT, wxT("&About"), wxDefaultPosition, wxDefaultSize, 0);
+    BtnQuit = new wxButton(this, ID_BUTTON_QUIT, wxT("&Quit"), wxDefaultPosition, wxDefaultSize, 0);
+
+    SizerButton->Add(BtnAbout, 1, wxALL|wxEXPAND, 10);
+    SizerButton->Add(BtnQuit, 1, wxALL|wxEXPAND, 10);
+
+    return SizerButton;
+}
+
+wxBoxSizer* Simulator::createSizerControl()
+{
+    wxStaticBox* StaticBox = new wxStaticBox(this, ID_STATIC_BOX, _T("Control"));
+    wxStaticBoxSizer* SizerControl = new wxStaticBoxSizer(StaticBox, wxVERTICAL);
+    wxStaticText* OutputLabel = new wxStaticText(this, wxID_ANY, _T("Output"));
+    wxStaticText* InputLabel = new wxStaticText(this, wxID_ANY, _T("Input"));
+    BtnSend = new wxButton(this, ID_BUTTON_SEND, wxT("&Send"), wxDefaultPosition, wxDefaultSize, 0);
+
+    Output = new wxTextCtrl(this, ID_TEXT_CTRL_OUTPUT, _(""), wxDefaultPosition, wxSize(200, 200), wxTE_MULTILINE|wxTE_READONLY);
+    Input  = new wxTextCtrl(this, ID_TEXT_CTRL_INPUT, _(""), wxDefaultPosition, wxSize(200, 20));
+
+    SizerControl->Add(OutputLabel, 0, wxLEFT | wxTOP | wxEXPAND, 10);
+    SizerControl->Add(Output, 0, wxRight | wxLEFT, 10);
+    SizerControl->Add(InputLabel, 0, wxLEFT | wxTOP, 10);
+    SizerControl->Add(Input, 0, wxRIGHT | wxLEFT, 10);
+    SizerControl->Add(BtnSend, 0, wxTOP | wxRIGHT | wxLEFT | wxEXPAND, 10);
+
+    return SizerControl;
 }
 
 Simulator::~Simulator()
@@ -85,7 +124,7 @@ void Simulator::OnAbout(wxCommandEvent &event)
 
 }
 
-stdReturnType Simulator::getPixel(byte Index, PixelType& Pixel) const
+StdReturnType Simulator::getPixel(byte Index, PixelType& Pixel) const
 {
     byte Row = Index / DISPLAY_NUMBER_OF_COLUMNS;
     byte Column = Index % DISPLAY_NUMBER_OF_COLUMNS;
@@ -124,7 +163,7 @@ WS2812::PixelType Simulator::getPixelFast(byte Index) const
     return Pixel;
 }
 
-stdReturnType Simulator::setPixel(byte Index, PixelType Pixel)
+StdReturnType Simulator::setPixel(byte Index, PixelType Pixel)
 {
     byte Row = Index / DISPLAY_NUMBER_OF_COLUMNS;
     byte Column = Index % DISPLAY_NUMBER_OF_COLUMNS;
@@ -141,7 +180,7 @@ stdReturnType Simulator::setPixel(byte Index, PixelType Pixel)
     }
 }
 
-stdReturnType Simulator::setPixel(byte Index, byte Red, byte Green, byte Blue)
+StdReturnType Simulator::setPixel(byte Index, byte Red, byte Green, byte Blue)
 {
     byte Row = Index / DISPLAY_NUMBER_OF_COLUMNS;
     byte Column = Index % DISPLAY_NUMBER_OF_COLUMNS;

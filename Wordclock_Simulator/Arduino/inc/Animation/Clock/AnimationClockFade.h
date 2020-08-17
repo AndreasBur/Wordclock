@@ -55,9 +55,9 @@ class AnimationClockFade : public AnimationClockCommon
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
-    byte DisplayBrightness;
-    byte Hour;
-    byte Minute;
+    byte DisplayBrightness{0u};
+    byte Hour{0u};
+    byte Minute{0u};
 
     // functions
     void reset();
@@ -70,17 +70,17 @@ class AnimationClockFade : public AnimationClockCommon
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    AnimationClockFade();
-    ~AnimationClockFade();
+    constexpr AnimationClockFade() { }
+    ~AnimationClockFade() { }
 
-	// get methods
+    // get methods
 
 
-	// set methods
+    // set methods
 
-	// methods
-    void init(Display*, Clock*);
-    stdReturnType setClock(byte, byte);
+    // methods
+    void init();
+    StdReturnType setClock(byte, byte);
     void task();
 };
 

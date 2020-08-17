@@ -26,14 +26,16 @@
 #include "DisplayCharacters.h"
 #include "DisplayWords.h"
 #include "GammaCorrection.h"
+#include "BH1750.h"
 
 /******************************************************************************************************************************************************
  *  GLOBAL CONSTANT MACROS
 ******************************************************************************************************************************************************/
 /* Display configuration parameter */
-#define DISPLAY_DATA_PIN                        10
-#define DISPLAY_LED_STRIPE_SERPENTINE           STD_OFF
-#define DISPLAY_USE_WS2812_DIMMING              STD_OFF
+#define DISPLAY_DATA_PIN                                        10u
+#define DISPLAY_LED_STRIPE_SERPENTINE                           STD_OFF
+#define DISPLAY_USE_WS2812_DIMMING                              STD_OFF
+#define DISPLAY_BRIGHTNESS_AUTOMATIC_CORRECTION_FACTOR          1.0f
 
 #if (WS2812_IS_SINGLETON == STD_ON)
     #define Pixels                              WS2812::getInstance()
@@ -53,7 +55,7 @@
     #error "Display: LED number missmatch"
 #endif
 
-#define DISPLAY_WORD_LENGTH_UNLIMITED           0
+#define DISPLAY_WORD_LENGTH_UNLIMITED           0u
 
 
 /******************************************************************************************************************************************************
@@ -83,23 +85,26 @@ class Display
         STATE_READY
     };
 
-    using PixelType = boolean;
+    using PixelType = bool;
     using CharacterIdType = DisplayCharacters::CharacterIdType;
 
-#if (DISPLAY_NUMBER_OF_ROWS > 16)
+#if (DISPLAY_NUMBER_OF_ROWS > 16u)
     #error "Display: too many rows, please extend PixelRowType"
 #endif
 
     using PixelRowType = uint16_t;
 
-#if (DISPLAY_NUMBER_OF_COLUMNS > 16)
+#if (DISPLAY_NUMBER_OF_COLUMNS > 16u)
     #error "Display: too many columns, please extend PixelColumnType"
 #endif
 
     using PixelColumnType = uint16_t;
 
     /* mapping to underlying hardware */
+    using IlluminanceType = BH1750::IlluminanceType;
+
     using PixelColorType = WS2812::PixelType;
+    using ColorType = NeoPixel::ColorType;
     using Stripe = WS2812;
     using WordIdType = DisplayWords::WordIdType;
 
@@ -107,42 +112,55 @@ class Display
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
-    StateType State;
+    StateType State{STATE_NONE};
+    bool BrightnessAutomatic{false};
 #if (WS2812_IS_SINGLETON == STD_OFF)
     Stripe Pixels;
 #endif
-    PixelColorType Color;
+    PixelColorType Color{255u, 255u, 255u};
     DisplayWords Words;
 
 #if (DISPLAY_USE_WS2812_DIMMING == STD_OFF)
     GammaCorrection GCorrection;
-    byte Brightness;
-    PixelColorType ColorDimmed;
+    byte Brightness{255u};
+    PixelColorType ColorDimmed{255u, 255u, 255u};
 #endif
 
     // functions
+    Display(PixelColorType);
+    Display(byte, byte, byte);
+    ~Display();
+
+    byte calculateBrightnessAutomaticCorrected(byte) const;
+
     byte transformToSerpentine(byte, byte) const;
     byte transformToSerpentine(byte) const;
 
 #if (DISPLAY_USE_WS2812_DIMMING == STD_OFF)
-    byte dimmColor(byte Color) const {
-		byte dimmedColor = (Color * Brightness) >> 8;
-		if(dimmedColor == 0) return 1;
-		else return dimmedColor;
-	}
+    byte dimmColor(byte Color, byte BrightnessCorrected) const {
+        byte dimmedColor = (Color * BrightnessCorrected) >> 8u;
+        if(dimmedColor == 0u) return 1u;
+        else return dimmedColor;
+    }
 #endif
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    Display(PixelColorType);
-    Display(byte, byte, byte);
-    ~Display();
+    static Display& getInstance() {
+        static Display SingletonInstance(255u, 255u, 255u);
+        return SingletonInstance;
+    }
 
     // get methods
-    PixelColorType getColor() const { return Color; }
     StateType getState() const { return State; }
+    bool getBrightnessAutomatic() const { return BrightnessAutomatic; }
+
+    PixelColorType getColor() const { return Color; }
+    ColorType getColorRed() const { return Color.Red; }
+    ColorType getColorGreen() const { return Color.Green; }
+    ColorType getColorBlue() const { return Color.Blue; }
 
 #if (DISPLAY_USE_WS2812_DIMMING == STD_ON)
     byte getBrightness() const { return Pixels.getBrightness(); }
@@ -151,29 +169,36 @@ class Display
 #endif
 
     // set methods
+    void setBrightnessAutomatic(bool sBrightnessAutomatic) { BrightnessAutomatic = sBrightnessAutomatic; }
     void setColor(PixelColorType sColor) { Color = sColor; }
-    void setColor(byte Red, byte Green, byte Blue) { Color.Red = Red; Color.Green = Green; Color.Blue = Blue; }
+    void setColor(ColorType Red, byte Green, ColorType Blue) { Color.Red = Red; Color.Green = Green; Color.Blue = Blue; }
+    void setColorRed(ColorType Red) { Color.Red = Red; }
+    void setColorGreen(ColorType Green) { Color.Green = Green; }
+    void setColorBlue(ColorType Blue) { Color.Blue = Blue;}
 
 #if (DISPLAY_USE_WS2812_DIMMING == STD_ON)
-    void setBrightness(byte Brightness) { Pixels.setBrightness(Brightness, true); }
+    void setBrightness(byte Brightness) {
+        if(BrightnessAutomatic == true) { Pixels.setBrightness(Brightness, true); }
+        else { Pixels.setBrightness(calculateBrightnessAutomaticCorrected(Brightness)); }
+    }
 #else
     void setBrightness(byte);
 #endif
 
     // char methods
-    stdReturnType setCharacter(CharacterIdType CharacterId) { return setPixel(CharacterId); }
-    stdReturnType clearCharacter(CharacterIdType CharacterId) { return clearPixel(CharacterId); }
-    stdReturnType getCharacter(CharacterIdType CharacterId, boolean* Value) const { return getPixel(CharacterId, Value); }
+    StdReturnType setCharacter(CharacterIdType CharacterId) { return setPixel(CharacterId); }
+    StdReturnType clearCharacter(CharacterIdType CharacterId) { return clearPixel(CharacterId); }
+    StdReturnType getCharacter(CharacterIdType CharacterId, bool& Value) const { return getPixel(CharacterId, Value); }
 
     // char methods fast
     void setCharacterFast(CharacterIdType CharacterId) { setPixelFast(CharacterId); }
     void clearCharacterFast(CharacterIdType CharacterId) { clearPixelFast(CharacterId); }
-    boolean getCharacterFast(CharacterIdType CharacterId) const { return getPixelFast(CharacterId); }
+    bool getCharacterFast(CharacterIdType CharacterId) const { return getPixelFast(CharacterId); }
 
     // word methods
-    stdReturnType setWord(WordIdType, byte MaxLength = DISPLAY_WORD_LENGTH_UNLIMITED);
-    stdReturnType clearWord(WordIdType);
-    stdReturnType clearWords();
+    StdReturnType setWord(WordIdType, byte MaxLength = DISPLAY_WORD_LENGTH_UNLIMITED);
+    StdReturnType clearWord(WordIdType);
+    StdReturnType clearWords();
 
     // word methods fast
     void setWordFast(WordIdType, byte MaxLength = DISPLAY_WORD_LENGTH_UNLIMITED);
@@ -181,32 +206,32 @@ class Display
     void clearWordsFast();
 
     // pixel methods
-    stdReturnType writePixel(byte Column, byte Row, boolean Value) { if(Value) return setPixel(Column, Row); else return clearPixel(Column, Row); }
-    stdReturnType writePixel(byte Index, boolean Value) { if(Value) return setPixel(Index); else return clearPixel(Index); }
-    stdReturnType setPixel(byte, byte);
-    stdReturnType setPixel(byte);
-    stdReturnType clearPixel(byte, byte);
-    stdReturnType clearPixel(byte);
-    stdReturnType togglePixel(byte, byte);
-    stdReturnType togglePixel(byte);
-    stdReturnType getPixel(byte, byte, boolean*) const;
-    stdReturnType getPixel(byte, boolean*) const;
-    stdReturnType getPixelRow(byte, PixelRowType*) const;
-    stdReturnType getPixelColumn(byte, PixelColumnType*) const;
-    stdReturnType setPixelRow(byte, PixelRowType);
-    stdReturnType setPixelColumn(byte, PixelColumnType);
+    StdReturnType writePixel(byte Column, byte Row, bool Value) { if(Value) return setPixel(Column, Row); else return clearPixel(Column, Row); }
+    StdReturnType writePixel(byte Index, bool Value) { if(Value) return setPixel(Index); else return clearPixel(Index); }
+    StdReturnType setPixel(byte, byte);
+    StdReturnType setPixel(byte);
+    StdReturnType clearPixel(byte, byte);
+    StdReturnType clearPixel(byte);
+    StdReturnType togglePixel(byte, byte);
+    StdReturnType togglePixel(byte);
+    StdReturnType getPixel(byte, byte, bool&) const;
+    StdReturnType getPixel(byte, bool&) const;
+    StdReturnType getPixelRow(byte, PixelRowType&) const;
+    StdReturnType getPixelColumn(byte, PixelColumnType&) const;
+    StdReturnType setPixelRow(byte, PixelRowType);
+    StdReturnType setPixelColumn(byte, PixelColumnType);
 
     // pixel methods fast
-    void writePixelFast(byte Column, byte Row, boolean Value) { if(Value) setPixelFast(Column, Row); else clearPixelFast(Column, Row); }
-    void writePixelFast(byte Index, boolean Value) { if(Value) setPixelFast(Index); else clearPixelFast(Index); }
+    void writePixelFast(byte Column, byte Row, bool Value) { if(Value) setPixelFast(Column, Row); else clearPixelFast(Column, Row); }
+    void writePixelFast(byte Index, bool Value) { if(Value) setPixelFast(Index); else clearPixelFast(Index); }
     void setPixelFast(byte, byte);
     void setPixelFast(byte);
     void clearPixelFast(byte, byte);
     void clearPixelFast(byte);
     void togglePixelFast(byte, byte);
     void togglePixelFast(byte);
-    boolean getPixelFast(byte, byte) const;
-    boolean getPixelFast(byte) const;
+    bool getPixelFast(byte, byte) const;
+    bool getPixelFast(byte) const;
     PixelRowType getPixelRowFast(byte) const;
     PixelColumnType getPixelColumnFast(byte) const;
     void setPixelRowFast(byte, PixelRowType);
@@ -214,9 +239,11 @@ class Display
 
     // methods
     void init();
-    void show() { Pixels.show(); }
-	void enable() { Pixels.enablePixels(); }
-	void disable() { Pixels.disablePixels(); }
+    StdReturnType show() { return Pixels.show(); }
+    void enable() { Pixels.enablePixels(); }
+    void disable() { Pixels.disablePixels(); }
+    void enableBrightnessAutomatic() { BrightnessAutomatic = true; }
+    void disableBrightnessAutomatic() { BrightnessAutomatic = false; }
     void test();
     void clear() { Pixels.clearPixels(); }
     void indexToColumnAndRow(byte Index, byte& Column, byte& Row) const { Row = Index / DISPLAY_NUMBER_OF_COLUMNS; Column = Index % DISPLAY_NUMBER_OF_COLUMNS; }

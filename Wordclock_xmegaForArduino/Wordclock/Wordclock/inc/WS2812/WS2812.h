@@ -117,11 +117,11 @@ class WS2812
     void showNextFrame();
     void showNextFrameDimmed();
     void startDmaTransfer(pPixelsType);
-    boolean isDmaBusy() { return EDMA.STATUS & (EDMA_CH0BUSY_bm | EDMA_CH0PEND_bm); }
+    bool isDmaBusy() { return EDMA.STATUS & (EDMA_CH0BUSY_bm | EDMA_CH0PEND_bm); }
 
 #if (WS2812_RESET_TIMER == STD_ON)
     void startResetTimer() { ResetTimer = micros(); }
-    boolean isResetTimeElapsed();
+    bool isResetTimeElapsed();
 #endif
 
 #if (WS2812_SUPPORT_DIMMING == STD_ON)
@@ -179,11 +179,11 @@ class WS2812
     void setPixelBlueFast(IndexType Index, byte Blue) { (*pNextFrame)[Index].setGreen(Blue); }
 
 #if (WS2812_SUPPORT_DIMMING == STD_ON)
-    void setBrightness(byte sBrightness, boolean = false);
+    void setBrightness(byte sBrightness, bool = false);
 #endif
 
     // methods
-    boolean init(byte);
+    bool init(byte);
     void init(PortType, PortPinType);
     StdReturnType show();
     void setPixels(PixelType Pixel) { setPixels(Pixel.Red, Pixel.Green, Pixel.Blue); }

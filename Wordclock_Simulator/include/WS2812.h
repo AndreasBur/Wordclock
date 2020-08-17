@@ -2,6 +2,7 @@
 #define _WS2812_H_
 
 #include "Simulator.h"
+#include "Neopixel.h"
 
 #define WS2812_NUMBER_OF_LEDS               110
 #define WS2812_SUPPORT_DIMMING              STD_ON

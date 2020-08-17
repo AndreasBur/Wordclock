@@ -85,7 +85,7 @@ class Display
         STATE_READY
     };
 
-    using PixelType = boolean;
+    using PixelType = bool;
     using CharacterIdType = DisplayCharacters::CharacterIdType;
 
 #if (DISPLAY_NUMBER_OF_ROWS > 16u)
@@ -113,7 +113,7 @@ class Display
 ******************************************************************************************************************************************************/
   private:
     StateType State{STATE_NONE};
-    boolean BrightnessAutomatic{false};
+    bool BrightnessAutomatic{false};
 #if (WS2812_IS_SINGLETON == STD_OFF)
     Stripe Pixels;
 #endif
@@ -155,7 +155,7 @@ class Display
 
     // get methods
     StateType getState() const { return State; }
-    boolean getBrightnessAutomatic() const { return BrightnessAutomatic; }
+    bool getBrightnessAutomatic() const { return BrightnessAutomatic; }
     
     PixelColorType getColor() const { return Color; }
     ColorType getColorRed() const { return Color.Red; }
@@ -169,7 +169,7 @@ class Display
 #endif
 
     // set methods
-    void setBrightnessAutomatic(boolean sBrightnessAutomatic) { BrightnessAutomatic = sBrightnessAutomatic; }
+    void setBrightnessAutomatic(bool sBrightnessAutomatic) { BrightnessAutomatic = sBrightnessAutomatic; }
     void setColor(PixelColorType sColor) { Color = sColor; }
     void setColor(ColorType Red, byte Green, ColorType Blue) { Color.Red = Red; Color.Green = Green; Color.Blue = Blue; }
     void setColorRed(ColorType Red) { Color.Red = Red; }
@@ -188,12 +188,12 @@ class Display
     // char methods
     StdReturnType setCharacter(CharacterIdType CharacterId) { return setPixel(CharacterId); }
     StdReturnType clearCharacter(CharacterIdType CharacterId) { return clearPixel(CharacterId); }
-    StdReturnType getCharacter(CharacterIdType CharacterId, boolean& Value) const { return getPixel(CharacterId, Value); }
+    StdReturnType getCharacter(CharacterIdType CharacterId, bool& Value) const { return getPixel(CharacterId, Value); }
 
     // char methods fast
     void setCharacterFast(CharacterIdType CharacterId) { setPixelFast(CharacterId); }
     void clearCharacterFast(CharacterIdType CharacterId) { clearPixelFast(CharacterId); }
-    boolean getCharacterFast(CharacterIdType CharacterId) const { return getPixelFast(CharacterId); }
+    bool getCharacterFast(CharacterIdType CharacterId) const { return getPixelFast(CharacterId); }
 
     // word methods
     StdReturnType setWord(WordIdType, byte MaxLength = DISPLAY_WORD_LENGTH_UNLIMITED);
@@ -206,32 +206,32 @@ class Display
     void clearWordsFast();
     
     // pixel methods
-    StdReturnType writePixel(byte Column, byte Row, boolean Value) { if(Value) return setPixel(Column, Row); else return clearPixel(Column, Row); }
-    StdReturnType writePixel(byte Index, boolean Value) { if(Value) return setPixel(Index); else return clearPixel(Index); }
+    StdReturnType writePixel(byte Column, byte Row, bool Value) { if(Value) return setPixel(Column, Row); else return clearPixel(Column, Row); }
+    StdReturnType writePixel(byte Index, bool Value) { if(Value) return setPixel(Index); else return clearPixel(Index); }
     StdReturnType setPixel(byte, byte);
     StdReturnType setPixel(byte);
     StdReturnType clearPixel(byte, byte);
     StdReturnType clearPixel(byte);
     StdReturnType togglePixel(byte, byte);
     StdReturnType togglePixel(byte);
-    StdReturnType getPixel(byte, byte, boolean&) const;
-    StdReturnType getPixel(byte, boolean&) const;
+    StdReturnType getPixel(byte, byte, bool&) const;
+    StdReturnType getPixel(byte, bool&) const;
     StdReturnType getPixelRow(byte, PixelRowType&) const;
     StdReturnType getPixelColumn(byte, PixelColumnType&) const;
     StdReturnType setPixelRow(byte, PixelRowType);
     StdReturnType setPixelColumn(byte, PixelColumnType);
 
     // pixel methods fast
-    void writePixelFast(byte Column, byte Row, boolean Value) { if(Value) setPixelFast(Column, Row); else clearPixelFast(Column, Row); }
-    void writePixelFast(byte Index, boolean Value) { if(Value) setPixelFast(Index); else clearPixelFast(Index); }
+    void writePixelFast(byte Column, byte Row, bool Value) { if(Value) setPixelFast(Column, Row); else clearPixelFast(Column, Row); }
+    void writePixelFast(byte Index, bool Value) { if(Value) setPixelFast(Index); else clearPixelFast(Index); }
     void setPixelFast(byte, byte);
     void setPixelFast(byte);
     void clearPixelFast(byte, byte);
     void clearPixelFast(byte);
     void togglePixelFast(byte, byte);
     void togglePixelFast(byte);
-    boolean getPixelFast(byte, byte) const;
-    boolean getPixelFast(byte) const;
+    bool getPixelFast(byte, byte) const;
+    bool getPixelFast(byte) const;
     PixelRowType getPixelRowFast(byte) const;
     PixelColumnType getPixelColumnFast(byte) const;
     void setPixelRowFast(byte, PixelRowType);

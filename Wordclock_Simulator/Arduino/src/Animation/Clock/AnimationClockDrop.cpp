@@ -45,39 +45,11 @@
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  Constructor of AnimationClockDrop
-******************************************************************************************************************************************************/
-/*! \brief          AnimationClockDrop Constructor
- *  \details        Instantiation of the AnimationClockDrop library
- *
- *  \return         -
-******************************************************************************************************************************************************/
-AnimationClockDrop::AnimationClockDrop()
-{
-    reset();
-} /* AnimationClockDrop */
-
-
-/******************************************************************************************************************************************************
-  Destructor of AnimationClockDrop
-******************************************************************************************************************************************************/
-AnimationClockDrop::~AnimationClockDrop()
-{
-
-} /* ~AnimationClockDrop */
-
-
-/******************************************************************************************************************************************************
   init()
 ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
- *  \return         -
-******************************************************************************************************************************************************/
-void AnimationClockDrop::init(Display* Display, Clock* Clock)
+void AnimationClockDrop::init()
 {
-    AnimationClockCommon::init(Display, Clock, STATE_IDLE);
+    AnimationClockCommon::init(STATE_IDLE);
     reset();
 } /* init */
 
@@ -85,31 +57,21 @@ void AnimationClockDrop::init(Display* Display, Clock* Clock)
 /******************************************************************************************************************************************************
   setClock()
 ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
- *  \return         -
-******************************************************************************************************************************************************/
-stdReturnType AnimationClockDrop::setClock(byte Hour, byte Minute)
+StdReturnType AnimationClockDrop::setClock(byte Hour, byte Minute)
 {
-    stdReturnType ReturnValue{E_NOT_OK};
+    StdReturnType returnValue{E_NOT_OK};
 
-    if(pClock->getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
+    if(Clock::getInstance().getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
         setNextWordIndex();
         if(setNextActivePixelIndex() == E_NOT_OK) { setStateToSetTime(); }
         else { State = STATE_CLEAR_TIME; }
     }
-    return ReturnValue;
+    return returnValue;
 } /* setClock */
 
 
 /******************************************************************************************************************************************************
   task()
-******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
- *  \return         -
 ******************************************************************************************************************************************************/
 void AnimationClockDrop::task()
 {
@@ -125,36 +87,27 @@ void AnimationClockDrop::task()
 /******************************************************************************************************************************************************
   reset()
 ******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
-******************************************************************************************************************************************************/
 void AnimationClockDrop::reset()
 {
-    Row = 0;
-    Column = 0;
-    CurrenWordIndex = ClockWordsTable.size() - 1;
+    Row = 0u;
+    Column = 0u;
+    ClockWordsTable.fill(DisplayWords::WORD_NONE);
+    CurrenWordIndex = ClockWordsTable.size() - 1u;
 } /* reset */
 
 
 /******************************************************************************************************************************************************
   clearTimeTask()
 ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
- *  \return         -
-******************************************************************************************************************************************************/
 void AnimationClockDrop::clearTimeTask()
 {
     // toggle current Pixel
-    if(Row < DISPLAY_NUMBER_OF_ROWS && Column < DISPLAY_NUMBER_OF_COLUMNS) { pDisplay->togglePixelFast(Column, Row); }
+    if(Row < DISPLAY_NUMBER_OF_ROWS && Column < DISPLAY_NUMBER_OF_COLUMNS) { Display::getInstance().togglePixelFast(Column, Row); }
     // increment row and check for out of bounds
-    if(Row + 1 < DISPLAY_NUMBER_OF_ROWS) {
+    if(Row + 1u < DISPLAY_NUMBER_OF_ROWS) {
         // toggle Pixel in next row
         Row++;
-        pDisplay->togglePixelFast(Column, Row);
+        Display::getInstance().togglePixelFast(Column, Row);
     } else {
         // no more active pixels available
         if(setNextActivePixelIndex() == E_NOT_OK) { setStateToSetTime(); }
@@ -165,41 +118,31 @@ void AnimationClockDrop::clearTimeTask()
 /******************************************************************************************************************************************************
   setTimeTask()
 ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
- *  \return         -
-******************************************************************************************************************************************************/
 void AnimationClockDrop::setTimeTask()
 {
-    DisplayWord CurrentWord = Words.getDisplayWordFast(ClockWordsTable[CurrenWordIndex]);
-    const byte MaxColumn = Words.getDisplayWordColumnFast(ClockWordsTable[CurrenWordIndex]) + CurrentWord.getLength() - 1;
+    DisplayWord currentWord = Words.getDisplayWordFast(ClockWordsTable[CurrenWordIndex]);
+    const byte MaxColumn = Words.getDisplayWordColumnFast(ClockWordsTable[CurrenWordIndex]) + currentWord.getLength() - 1u;
 
-    if(setNextRow(CurrentWord.getRow()) == E_OK) {
-        pDisplay->clearPixelFast(Column, Row - 1);
+    if(setNextRow(currentWord.getRow()) == E_OK) {
+        Display::getInstance().clearPixelFast(Column, Row - 1u);
     } else {
         if(setNextColumn(MaxColumn) == E_NOT_OK) {
             State = STATE_IDLE;
             reset();
         }
     }
-    pDisplay->setPixelFast(Column, Row);
+    Display::getInstance().setPixelFast(Column, Row);
 } /* setTimeTask */
 
 
 /******************************************************************************************************************************************************
   getNextActivePixel()
 ******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
-******************************************************************************************************************************************************/
-stdReturnType AnimationClockDrop::setNextActivePixelIndex()
+StdReturnType AnimationClockDrop::setNextActivePixelIndex()
 {
-    for(int16_t Index = DISPLAY_NUMBER_OF_PIXELS - 1; Index >= 0; Index--) {
-        if(pDisplay->getPixelFast(Index)) {
-            pDisplay->indexToColumnAndRow(Index, Column, Row);
+    for(int16_t index = DISPLAY_NUMBER_OF_PIXELS - 1u; index >= 0; index--) {
+        if(Display::getInstance().getPixelFast(index)) {
+            Display::getInstance().indexToColumnAndRow(index, Column, Row);
             return E_OK;
         }
     }
@@ -210,16 +153,11 @@ stdReturnType AnimationClockDrop::setNextActivePixelIndex()
 /******************************************************************************************************************************************************
   setNextWordIndex()
 ******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
-******************************************************************************************************************************************************/
-stdReturnType AnimationClockDrop::setNextWordIndex()
+StdReturnType AnimationClockDrop::setNextWordIndex()
 {
-    for(int8_t Index = CurrenWordIndex - 1; Index >= 0; Index--) {
-        if(ClockWordsTable[Index] != DisplayWords::WORD_NONE) {
-            CurrenWordIndex = Index;
+    for(int8_t index = CurrenWordIndex - 1u; index >= 0; index--) {
+        if(ClockWordsTable[index] != DisplayWords::WORD_NONE) {
+            CurrenWordIndex = index;
             return E_OK;
         }
     }
@@ -230,16 +168,11 @@ stdReturnType AnimationClockDrop::setNextWordIndex()
 /******************************************************************************************************************************************************
   setStateToSetTime()
 ******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
-******************************************************************************************************************************************************/
 void AnimationClockDrop::setStateToSetTime()
 {
-    Row = 0;
+    Row = 0u;
     Column = Words.getDisplayWordColumnFast(ClockWordsTable[CurrenWordIndex]);
-    pDisplay->setPixelFast(Column, Row);
+    Display::getInstance().setPixelFast(Column, Row);
     State = STATE_SET_TIME;
 } /* setStateToSetTime */
 
@@ -247,12 +180,7 @@ void AnimationClockDrop::setStateToSetTime()
 /******************************************************************************************************************************************************
   setNextRow()
 ******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
-******************************************************************************************************************************************************/
-stdReturnType AnimationClockDrop::setNextRow(byte MaxRow)
+StdReturnType AnimationClockDrop::setNextRow(byte MaxRow)
 {
     if(Row >= MaxRow) {
         return E_NOT_OK;
@@ -266,24 +194,19 @@ stdReturnType AnimationClockDrop::setNextRow(byte MaxRow)
 /******************************************************************************************************************************************************
   setNextColumn()
 ******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
-******************************************************************************************************************************************************/
-stdReturnType AnimationClockDrop::setNextColumn(byte MaxColumn)
+StdReturnType AnimationClockDrop::setNextColumn(byte MaxColumn)
 {
     if(Column >= MaxColumn) {
          if(setNextWordIndex() == E_OK) {
             Column = Words.getDisplayWordColumnFast(ClockWordsTable[CurrenWordIndex]);
-            Row = 0;
+            Row = 0u;
             return E_OK;
         } else {
             return E_NOT_OK;
         }
     } else {
         Column++;
-        Row = 0;
+        Row = 0u;
         return E_OK;
     }
 } /* setNextColumn */

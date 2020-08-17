@@ -58,13 +58,18 @@ class Animation
         STATE_NONE,
         STATE_IDLE,
         STATE_CLOCK,
-        STATE_FONT,
+        STATE_FONT
     };
+
+    using AnimationClockType = AnimationClock::AnimationType;
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
+    constexpr Animation() : wcAnimationClock(), wcAnimationFont() { }
+    ~Animation() { }
+
     AnimationClock wcAnimationClock;
     AnimationFont wcAnimationFont;
 
@@ -72,14 +77,20 @@ class Animation
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    Animation(Display*, Clock*);
-    ~Animation();
+    static Animation& getInstance() {
+        static Animation singletonInstance;
+        return singletonInstance;
+    }
 
     // get methods
     StateType getState();
+    AnimationClockType getAnimation() const { return wcAnimationClock.getAnimation(); }
+    byte getFontTaskCycle() const { return wcAnimationFont.getTaskCycle(); }
+    byte getClockTaskCycle(AnimationClockType AnimationClock) const { return wcAnimationClock.getTaskCycle(AnimationClock); }
 
     // set methods
-
+    void setFontTaskCylce(byte Cycle) { wcAnimationFont.setTaskCycle(Cycle); }
+    void setClockTaskCylce(AnimationClockType AnimationClock, byte Cycle) { wcAnimationClock.setTaskCycle(AnimationClock, Cycle); }
 
     // methods
     void init();
@@ -87,15 +98,15 @@ class Animation
     void show();
 
     // AnimationClock functions
-    stdReturnType setChar(byte Column, byte Row, char Char, AnimationFont::FontType Font) { return wcAnimationFont.setChar(Column, Row, Char, Font); }
+    StdReturnType setChar(byte Column, byte Row, char Char, AnimationFont::FontType Font) { return wcAnimationFont.setChar(Column, Row, Char, Font); }
     void setCharFast(byte Column, byte Row, char Char, AnimationFont::FontType Font) { wcAnimationFont.setCharFast(Column, Row, Char, Font); }
     void setCharWithShift(char Char, AnimationFont::FontType Font) { wcAnimationFont.setCharWithShift(Char, Font); }
-    void setText(char* Text, AnimationFont::FontType Font) { wcAnimationFont.setText(Text, Font); }
-    void setTextWithShift(char* Text, AnimationFont::FontType Font) { wcAnimationFont.setTextWithShift(Text, Font); }
+    void setText(const char* Text, AnimationFont::FontType Font) { wcAnimationFont.setText(Text, Font); }
+    void setTextWithShift(const char* Text, AnimationFont::FontType Font) { wcAnimationFont.setTextWithShift(Text, Font); }
 
     // AnimationFont functions
-    void setAnimation(AnimationClock::AnimationType Animation) { wcAnimationClock.setAnimation(Animation); }
-    stdReturnType setClock(byte Hour, byte Minute) { return wcAnimationClock.setClock(Hour, Minute); }
+    void setAnimation(AnimationClockType Animation) { wcAnimationClock.setAnimation(Animation); }
+    StdReturnType setClock(byte Hour, byte Minute) { return wcAnimationClock.setClock(Hour, Minute); }
 };
 
 

@@ -9,10 +9,10 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       AnimationClockCursor.h
- *      \brief      
+ *      \brief
  *
- *      \details    
- *                  
+ *      \details
+ *
 ******************************************************************************************************************************************************/
 #ifndef _ANIMATION_CLOCK_CURSOR_H_
 #define _ANIMATION_CLOCK_CURSOR_H_
@@ -62,9 +62,8 @@ class AnimationClockCursor : public AnimationClockCommon
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
-    ClockWords::WordsListType ClockWordsTable;
-    byte CurrentPixelIndex;
-    DisplayWords Words;
+    ClockWords::WordsListType ClockWordsTable{{DisplayWords::WORD_NONE}};
+    byte CurrentPixelIndex{0u};
 
     // functions
     void reset();
@@ -73,17 +72,17 @@ class AnimationClockCursor : public AnimationClockCommon
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    AnimationClockCursor();
-    ~AnimationClockCursor();
+    constexpr AnimationClockCursor() { }
+    ~AnimationClockCursor() { }
 
-	// get methods
+    // get methods
 
 
-	// set methods
+    // set methods
 
-	// methods
-    void init(Display*, Clock*);
-    stdReturnType setClock(byte, byte);
+    // methods
+    void init();
+    StdReturnType setClock(byte, byte);
     void task();
 };
 

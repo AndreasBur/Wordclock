@@ -181,7 +181,7 @@ void WS2812::setAllPixels(byte Red, byte Green, byte Blue)
  *  \return         -
  *****************************************************************************************************************************************************/
 #if (WS2812_RESET_TIMER == STD_ON)
-stdReturnType WS2812::show()
+StdReturnType WS2812::show()
 #elif (WS2812_RESET_TIMER == STD_OFF)
 void WS2812::show()
 #endif
@@ -214,7 +214,7 @@ void WS2812::show()
  *                  
  *  \return         -
  *****************************************************************************************************************************************************/
-stdReturnType WS2812::getPixel(byte Index, PixelType* Pixel) const
+StdReturnType WS2812::getPixel(byte Index, PixelType* Pixel) const
 {
     if(Index < WS2812_NUMBER_OF_LEDS) {
         Pixel->Red = Pixels[WS2812_POS_ABS_RED(Index)];
@@ -255,7 +255,7 @@ WS2812::PixelType WS2812::getPixelFast(byte Index) const
  *                  
  *  \return         -
  *****************************************************************************************************************************************************/
-stdReturnType WS2812::getPixelDimmed(byte Index, PixelType* Pixel) const
+StdReturnType WS2812::getPixelDimmed(byte Index, PixelType* Pixel) const
 {
     if(Index < WS2812_NUMBER_OF_LEDS) {
         if(Brightness != 255) {
@@ -303,7 +303,7 @@ WS2812::PixelType WS2812::getPixelDimmedFast(byte Index) const
  *                  
  *  \return         -
  *****************************************************************************************************************************************************/
-void WS2812::setBrightness(byte sBrightness, boolean GammaCorrection)
+void WS2812::setBrightness(byte sBrightness, bool GammaCorrection)
 {
     if(GammaCorrection) {
         Brightness = calcGamma7CorrectionValue(sBrightness / 2);
@@ -322,7 +322,7 @@ void WS2812::setBrightness(byte sBrightness, boolean GammaCorrection)
  *                  
  *  \return         -
  *****************************************************************************************************************************************************/
-stdReturnType WS2812::setPin(byte Pin)
+StdReturnType WS2812::setPin(byte Pin)
 {
     if(Pin < NUM_DIGITAL_PINS) {
         PinMask = digitalPinToBitMask(Pin);
@@ -343,7 +343,7 @@ stdReturnType WS2812::setPin(byte Pin)
  *                  
  *  \return         -
  *****************************************************************************************************************************************************/
-stdReturnType WS2812::setPixel(byte Index, PixelType Pixel)
+StdReturnType WS2812::setPixel(byte Index, PixelType Pixel)
 {
     if(Index < WS2812_NUMBER_OF_LEDS) {
         Pixels[WS2812_POS_ABS_RED(Index)] = Pixel.Red;
@@ -380,7 +380,7 @@ void WS2812::setPixelFast(byte Index, PixelType Pixel)
  *                  
  *  \return         -
  *****************************************************************************************************************************************************/
-stdReturnType WS2812::setPixel(byte Index, byte Red, byte Green, byte Blue)
+StdReturnType WS2812::setPixel(byte Index, byte Red, byte Green, byte Blue)
 {
     if(Index < WS2812_NUMBER_OF_LEDS) {
         Pixels[WS2812_POS_ABS_RED(Index)] = Red;

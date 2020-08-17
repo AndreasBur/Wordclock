@@ -54,10 +54,10 @@ class AnimationClockFlicker : public AnimationClockCommon
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
-    byte Minute;
-    byte Hour;
-    boolean IsClockSet;
-    byte FlickerCounter;
+    byte Minute{0u};
+    byte Hour{0u};
+    bool IsClockSet{false};
+    byte FlickerCounter{ANIMATION_CLOCK_FLICKER_COUNTER_INIT_VALUE};
 
     // functions
     void reset();
@@ -68,7 +68,7 @@ class AnimationClockFlicker : public AnimationClockCommon
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr AnimationClockFlicker() : Minute(0u), Hour(0u), IsClockSet(false), FlickerCounter(ANIMATION_CLOCK_FLICKER_COUNTER_INIT_VALUE) { }
+    constexpr AnimationClockFlicker() { }
     ~AnimationClockFlicker() { }
 
     // get methods

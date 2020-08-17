@@ -31,6 +31,7 @@
 ******************************************************************************************************************************************************/
 /* Clock configuration parameter */
 #define CLOCK_SHOW_IT_IS_PERMANENTLY            STD_ON
+#define CLOCK_INITIAL_MODE                      MODE_WESSI
 
 /* Clock  parameter */
 /* Hour */
@@ -93,7 +94,7 @@ class Clock
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
-    ModeType Mode;
+    ModeType Mode{CLOCK_INITIAL_MODE};
 
     static const HourType HoursTable[][CLOCK_NUMBER_OF_HOURS];
     static const MinuteType MinutesTable[][CLOCK_NUMBER_OF_MINUTE_STEPS];
@@ -113,7 +114,7 @@ class Clock
         return hoursTableElement;
     }
 
-    boolean calculateItIs(byte Minute) const {
+    bool calculateItIs(byte Minute) const {
         byte minuteSteps = Minute / CLOCK_MINUTE_STEP_IN_MINUTES;
         // show "it is" only to full and half hour
         if(minuteSteps == 0u || minuteSteps == (CLOCK_NUMBER_OF_MINUTE_STEPS / 2u)) {
@@ -127,7 +128,7 @@ class Clock
         return Hour % CLOCK_NUMBER_OF_HOURS;
     }
     
-    boolean isModeValid(ModeType sMode) {
+    bool isModeValid(ModeType sMode) {
         if(sMode < MODE_NUMBER_OF_MODES) { return true; }
         else { return false; }
     }
@@ -137,7 +138,7 @@ class Clock
 ******************************************************************************************************************************************************/
   public:
     static Clock& getInstance() {
-        static Clock SingletonInstance(Clock::MODE_WESSI);
+        static Clock SingletonInstance(CLOCK_INITIAL_MODE);
         return SingletonInstance;
     }
       

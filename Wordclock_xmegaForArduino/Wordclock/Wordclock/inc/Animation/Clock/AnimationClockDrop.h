@@ -61,10 +61,10 @@ class AnimationClockDrop : public AnimationClockCommon
 ******************************************************************************************************************************************************/
   private:
     DisplayWords Words;
-    ClockWords::WordsListType ClockWordsTable;
-    byte Row;
-    byte Column;
-    byte CurrenWordIndex;
+    ClockWords::WordsListType ClockWordsTable{DisplayWords::WORD_NONE};
+    byte Row{0u};
+    byte Column{0u};
+    byte CurrenWordIndex{0u};
 
     // functions
     void reset();
@@ -80,7 +80,7 @@ class AnimationClockDrop : public AnimationClockCommon
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr AnimationClockDrop() : Words(), ClockWordsTable{DisplayWords::WORD_NONE}, Row(0u), Column(0u), CurrenWordIndex(0u) { }
+    constexpr AnimationClockDrop() : Words() { }
     ~AnimationClockDrop() { }
 
     // get methods

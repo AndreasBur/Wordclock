@@ -60,23 +60,18 @@ class FontChar
  *  P R O T E C T E D   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   protected:
-    constexpr FontChar() : Width(0) {
-
-    }
-
-    constexpr FontChar(byte sWidth) : Width(sWidth) {
-
-    }
+    constexpr FontChar() : Width(0u) { }
+    constexpr FontChar(byte sWidth) : Width(sWidth) { }
 
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-	// get methods
+    // get methods
     byte getWidth() const { return Width; }
 
-	// set methods
+    // set methods
     void setWidth(byte sWidth) { Width = sWidth; }
 
     // methods
@@ -105,17 +100,12 @@ template <typename RowType, byte RowsSize> class FontCharHorizontal : public Fon
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr FontCharHorizontal(byte sWidth, std::array<RowType, RowsSize> sRows) : FontChar(sWidth), Rows(sRows) {
-
-    }
-
-    constexpr FontCharHorizontal() : FontChar(0), Rows{} {
-    
-    }
+    constexpr FontCharHorizontal(byte sWidth, std::array<RowType, RowsSize> sRows) : FontChar(sWidth), Rows(sRows) { }
+    constexpr FontCharHorizontal() : FontChar(0u), Rows{} { }
 
     // get methods
     RowType getRowFast(byte Index) const { return Rows[Index]; }
-    stdReturnType getRow(byte Index, RowType& Row) const {
+    StdReturnType getRow(byte Index, RowType& Row) const {
         if(Index < RowsSize) {
             Row = Rows[Index];
             return E_OK;
@@ -127,7 +117,7 @@ template <typename RowType, byte RowsSize> class FontCharHorizontal : public Fon
 
     // set methods
     void setRowFast(byte Index, RowType Row) { Rows[Index] = Row; }
-    stdReturnType setRow(byte Index, RowType Row) const {
+    StdReturnType setRow(byte Index, RowType Row) const {
         if(Index < RowsSize) {
             Rows[Index] = Row;
             return E_OK;
@@ -137,7 +127,7 @@ template <typename RowType, byte RowsSize> class FontCharHorizontal : public Fon
     }
     void setRows(RowsType sRows) { Rows = sRows; }
 
-	// methods
+    // methods
 
 };
 
@@ -164,17 +154,13 @@ template <typename ColumnType, byte ColumnsSize> class FontCharVertical : public
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr FontCharVertical(byte sWidth, std::array<ColumnType, ColumnsSize> sColumns) : FontChar(sWidth), Columns(sColumns) {
+    constexpr FontCharVertical(byte sWidth, std::array<ColumnType, ColumnsSize> sColumns) : FontChar(sWidth), Columns(sColumns) { }
 
-    }
-
-    constexpr FontCharVertical() : FontChar(0), Columns{} {
-    
-    }
+    constexpr FontCharVertical() : FontChar(0), Columns{} { }
 
     // get methods
     ColumnType getColumnFast(byte Index) const { return Columns[Index]; }
-    stdReturnType getColumn(byte Index, ColumnType& Column) const {
+    StdReturnType getColumn(byte Index, ColumnType& Column) const {
         if(Index < ColumnsSize) {
             Column = Columns[Index];
             return E_OK;
@@ -186,7 +172,7 @@ template <typename ColumnType, byte ColumnsSize> class FontCharVertical : public
 
     // set methods
     void setColumnFast(byte Index, ColumnType Column) { Columns[Index] = Column; }
-    stdReturnType setColumn(byte Index, ColumnType Column) const {
+    StdReturnType setColumn(byte Index, ColumnType Column) const {
         if(Index < ColumnsSize) {
             Columns[Index] = Column;
             return E_OK;
@@ -196,7 +182,7 @@ template <typename ColumnType, byte ColumnsSize> class FontCharVertical : public
     }
     void setColumns(ColumnsType sColumns) { Columns = sColumns; }
 
-	// methods
+    // methods
 
 };
 

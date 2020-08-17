@@ -16,6 +16,7 @@
 					<Add option="-Wextra" />
 					<Add option="-Wall" />
 					<Add option="-g" />
+					<Add option="-std=c++17" />
 					<Add option="-D__WXDEBUG__" />
 					<Add directory="$(#wx31)/lib/gcc_dll/mswud" />
 					<Add directory="include" />
@@ -69,6 +70,8 @@
 			<Add directory="Arduino/inc/Animation/Clock" />
 			<Add directory="Arduino/inc/Font" />
 			<Add directory="Arduino/inc/GammaCorrection" />
+			<Add directory="Arduino/inc/BH1750" />
+			<Add directory="Arduino/inc/WS2812" />
 		</Compiler>
 		<ResourceCompiler>
 			<Add directory="$(#wx31)/include" />
@@ -89,6 +92,7 @@
 		<Unit filename="Arduino/inc/Animation/Clock/AnimationClockSnake.h" />
 		<Unit filename="Arduino/inc/Animation/Clock/AnimationClockTeletype.h" />
 		<Unit filename="Arduino/inc/Animation/Clock/AnimationClockWipe.h" />
+		<Unit filename="Arduino/inc/BH1750/BH1750.h" />
 		<Unit filename="Arduino/inc/Clock/Clock.h" />
 		<Unit filename="Arduino/inc/Clock/ClockWords.h" />
 		<Unit filename="Arduino/inc/Display/Display.h" />
@@ -96,7 +100,6 @@
 		<Unit filename="Arduino/inc/Display/DisplayWord.h" />
 		<Unit filename="Arduino/inc/Display/DisplayWords.h" />
 		<Unit filename="Arduino/inc/Font/FontChar.h" />
-		<Unit filename="Arduino/inc/Font/FontCommon.h" />
 		<Unit filename="Arduino/inc/Font/FontCourierNew7x10.h" />
 		<Unit filename="Arduino/inc/Font/FontCourierNew7x9.h" />
 		<Unit filename="Arduino/inc/Font/FontLucidaSans9x10.h" />
@@ -105,6 +108,7 @@
 		<Unit filename="Arduino/inc/GammaCorrection/GammaCorrection.h" />
 		<Unit filename="Arduino/inc/StandardTypes/StandardTypes.h" />
 		<Unit filename="Arduino/inc/Transformation/Transformation.h" />
+		<Unit filename="Arduino/inc/WS2812/NeoPixel.h" />
 		<Unit filename="Arduino/src/Animation/Animation.cpp" />
 		<Unit filename="Arduino/src/Animation/AnimationFont.cpp" />
 		<Unit filename="Arduino/src/Animation/Clock/AnimationClock.cpp" />
@@ -122,14 +126,12 @@
 		<Unit filename="Arduino/src/Clock/ClockWords.cpp" />
 		<Unit filename="Arduino/src/Display/Display.cpp" />
 		<Unit filename="Arduino/src/Display/DisplayCharacters.cpp" />
-		<Unit filename="Arduino/src/Display/DisplayWord.cpp" />
 		<Unit filename="Arduino/src/Display/DisplayWords.cpp" />
 		<Unit filename="Arduino/src/Font/FontCourierNew7x10.cpp" />
 		<Unit filename="Arduino/src/Font/FontCourierNew7x9.cpp" />
 		<Unit filename="Arduino/src/Font/FontLucidaSans9x10.cpp" />
 		<Unit filename="Arduino/src/Font/FontSprite5x8.cpp" />
 		<Unit filename="Arduino/src/Font/FontTahoma10x10.cpp" />
-		<Unit filename="Arduino/src/GammaCorrection/GammaCorrection.cpp" />
 		<Unit filename="Arduino/src/Transformation/Transformation.cpp" />
 		<Unit filename="Wordclock.ico" />
 		<Unit filename="WordclockApp.cpp" />

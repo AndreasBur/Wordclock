@@ -59,15 +59,15 @@ class AnimationClockWipe : public AnimationClockCommon
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
-    ClockWords::WordsListType ClockWordsTable;
-    byte Index;
-    SetPixelStateType SetPixelState;
+    ClockWords::WordsListType ClockWordsTable{DisplayWords::WORD_NONE};
+    byte Index{0u};
+    SetPixelStateType SetPixelState{SET_PIXEL_STATE_DOWN};
 
     // functions
     void reset();
     void clearTimeTask();
     void setTimeTask();
-    boolean setNextIndex();
+    bool setNextIndex();
     void setPixelDown(byte, byte);
     void setPixelRight(byte, byte);
 
@@ -76,7 +76,7 @@ class AnimationClockWipe : public AnimationClockCommon
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr AnimationClockWipe() : ClockWordsTable{DisplayWords::WORD_NONE}, Index(0u), SetPixelState(SET_PIXEL_STATE_DOWN) { }
+    constexpr AnimationClockWipe() { }
     ~AnimationClockWipe() { }
 
     // get methods

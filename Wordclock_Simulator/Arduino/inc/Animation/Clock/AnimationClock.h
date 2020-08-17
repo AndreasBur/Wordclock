@@ -9,10 +9,10 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       AnimationClock.h
- *      \brief      
+ *      \brief
  *
- *      \details    
- *                  
+ *      \details
+ *
 ******************************************************************************************************************************************************/
 #ifndef _ANIMATION_CLOCK_H_
 #define _ANIMATION_CLOCK_H_
@@ -60,6 +60,7 @@ class AnimationClock
 ******************************************************************************************************************************************************/
   public:
     enum AnimationType {
+        ANIMATION_CLOCK_NONE,
         ANIMATION_CLOCK_CURSOR,
         ANIMATION_CLOCK_TELETYPE,
         ANIMATION_CLOCK_DROP,
@@ -72,7 +73,7 @@ class AnimationClock
         //ANIMATION_CLOCK_EXPLODE,
         //ANIMATION_CLOCK_IMPLODE,
         //ANIMATION_CLOCK_MATRIX,
-        ANIMATION_CLOCK_NONE
+        ANIMATION_CLOCK_NUMBER_OF_ANIMATIONS
     };
 
     union AnimationsType {
@@ -86,8 +87,8 @@ class AnimationClock
         AnimationClockCube Cube;
         AnimationClockFlicker Flicker;
 
-        AnimationsType() {}
-        ~AnimationsType() {}
+        constexpr AnimationsType() : Cursor() { }
+        ~AnimationsType() { }
     };
 
     using StateType = AnimationClockCommon::StateType;
@@ -96,29 +97,36 @@ class AnimationClock
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
-    Display* pDisplay;
-    Clock* pClock;
-    AnimationType CurrentAnimation;
+    std::array<byte, ANIMATION_CLOCK_NUMBER_OF_ANIMATIONS> TaskCycles{{0}};
+    AnimationType Animation{ANIMATION_CLOCK_NONE};
     AnimationsType Animations;
+
+    // functions
+    bool isAnimationValid(AnimationType sAnimation) {
+        if(sAnimation < ANIMATION_CLOCK_NUMBER_OF_ANIMATIONS) { return true; }
+        else { return false; }
+    }
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    AnimationClock(Display*, Clock*);
-    ~AnimationClock();
+    constexpr AnimationClock() : TaskCycles{0}, Animation(ANIMATION_CLOCK_NONE), Animations() { }
+    ~AnimationClock() { }
 
-	// get methods
-    AnimationType getAnimation() const { return CurrentAnimation; }
+    // get methods
+    AnimationType getAnimation() const { return Animation; }
     StateType getState() const;
+    byte getTaskCycle(AnimationType Animation) const { return TaskCycles[Animation]; }
 
-	// set methods
-    void setAnimation(AnimationType);
+    // set methods
+    void setTaskCycle(AnimationType Animation, byte Cycle) { TaskCycles[Animation] = Cycle; }
+    StdReturnType setAnimation(AnimationType);
 
-	// methods
+    // methods
     void init();
     void task();
-    stdReturnType setClock(byte, byte);
+    StdReturnType setClock(byte, byte);
     void show();
 };
 

@@ -47,7 +47,7 @@
 /******************************************************************************************************************************************************
   isPixelPartOfClockWords()
 ******************************************************************************************************************************************************/
-boolean AnimationClockCommon::isPixelPartOfClockWords(const ClockWords::WordsListType ClockWordsTable, byte Column, byte Row) const
+bool AnimationClockCommon::isPixelPartOfClockWords(const ClockWords::WordsListType ClockWordsTable, byte Column, byte Row) const
 {
     DisplayWords words;
 
@@ -62,7 +62,7 @@ boolean AnimationClockCommon::isPixelPartOfClockWords(const ClockWords::WordsLis
 /******************************************************************************************************************************************************
   isPixelPartOfClockWords()
 ******************************************************************************************************************************************************/
-boolean AnimationClockCommon::isPixelPartOfClockWords(const ClockWords::WordsListType ClockWordsTable, byte Index) const
+bool AnimationClockCommon::isPixelPartOfClockWords(const ClockWords::WordsListType ClockWordsTable, byte Index) const
 {
     byte row = Index / DISPLAY_NUMBER_OF_COLUMNS;
     byte column = Index % DISPLAY_NUMBER_OF_COLUMNS;

@@ -35,11 +35,11 @@
 
 
 #if (ANIMATION_CLOCK_SHIFT_HORIZONTAL == STD_OFF && ANIMATION_CLOCK_SHIFT_VERTICAL == STD_OFF)
-#error "AnimationClockShift: Exactly one switch must be set to STD_ON"
+# error "AnimationClockShift: Exactly one switch must be set to STD_ON"
 #endif
 
 #if (ANIMATION_CLOCK_SHIFT_HORIZONTAL == STD_ON && ANIMATION_CLOCK_SHIFT_VERTICAL == STD_ON)
-#error "AnimationClockShift: ANIMATION_CLOCK_SHIFT_HORIZONTAL or ANIMATION_CLOCK_SHIFT_VERTICAL has to be STD_ON, but not both"
+# error "AnimationClockShift: ANIMATION_CLOCK_SHIFT_HORIZONTAL or ANIMATION_CLOCK_SHIFT_VERTICAL has to be STD_ON, but not both"
 #endif
 
 
@@ -68,14 +68,14 @@ class AnimationClockShift : public AnimationClockCommon
 ******************************************************************************************************************************************************/
   private:
     Transformation wcTransformation;
-    ClockWords::WordsListType ClockWordsTable;
+    ClockWords::WordsListType ClockWordsTable{{DisplayWords::WORD_NONE}};
 
 #if (ANIMATION_CLOCK_SHIFT_HORIZONTAL == STD_ON)
-    byte CurrentColumn;
+    byte CurrentColumn{0u};
 #endif
 
 #if (ANIMATION_CLOCK_SHIFT_VERTICAL == STD_ON)
-    byte CurrentRow;
+    byte CurrentRow{0u};
 #endif
 
     // functions
@@ -87,17 +87,17 @@ class AnimationClockShift : public AnimationClockCommon
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    AnimationClockShift();
-    ~AnimationClockShift();
+    constexpr AnimationClockShift() : wcTransformation() { }
+    ~AnimationClockShift() { }
 
-	// get methods
+    // get methods
 
 
-	// set methods
+    // set methods
 
-	// methods
-    void init(Display*, Clock*);
-    stdReturnType setClock(byte, byte);
+    // methods
+    void init();
+    StdReturnType setClock(byte, byte);
     void task();
 };
 

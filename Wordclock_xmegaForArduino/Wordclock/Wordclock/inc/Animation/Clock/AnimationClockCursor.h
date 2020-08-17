@@ -62,8 +62,8 @@ class AnimationClockCursor : public AnimationClockCommon
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
-    ClockWords::WordsListType ClockWordsTable;
-    byte CurrentPixelIndex;
+    ClockWords::WordsListType ClockWordsTable{DisplayWords::WORD_NONE};
+    byte CurrentPixelIndex{0u};
 
     // functions
     void reset();
@@ -72,7 +72,7 @@ class AnimationClockCursor : public AnimationClockCommon
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr AnimationClockCursor() : ClockWordsTable{DisplayWords::WORD_NONE}, CurrentPixelIndex(0) { }
+    constexpr AnimationClockCursor() { }
     ~AnimationClockCursor() { }
 
     // get methods

@@ -31,18 +31,19 @@
 ******************************************************************************************************************************************************/
 /* Clock configuration parameter */
 #define CLOCK_SHOW_IT_IS_PERMANENTLY            STD_ON
+#define CLOCK_INITIAL_MODE                      MODE_WESSI
 
 /* Clock  parameter */
 /* Hour */
-#define CLOCK_NUMBER_OF_HOUR_MODES              2
-#define CLOCK_NUMBER_OF_HOURS                   12
+#define CLOCK_NUMBER_OF_HOUR_MODES              2u
+#define CLOCK_NUMBER_OF_HOURS                   12u
 
-#define CLOCK_NUMBER_OF_HOURS_PER_DAY           24
-#define CLOCK_NUMBER_OF_MINUTES_PER_HOUR        60
+#define CLOCK_NUMBER_OF_HOURS_PER_DAY           24u
+#define CLOCK_NUMBER_OF_MINUTES_PER_HOUR        60u
 
 /* Minute */
-#define CLOCK_MINUTE_STEP_IN_MINUTES            5
-#define CLOCK_NUMBER_OF_MINUTE_STEPS            12
+#define CLOCK_MINUTE_STEP_IN_MINUTES            5u
+#define CLOCK_NUMBER_OF_MINUTE_STEPS            12u
 
 /******************************************************************************************************************************************************
  *  GLOBAL FUNCTION MACROS
@@ -64,86 +65,105 @@ class Clock
 ******************************************************************************************************************************************************/
   public:
     /*  */
-    enum ModesType {
+    enum ModeType {
         MODE_WESSI,
         MODE_OSSI,
         MODE_RHEIN_RUHR,
-        MODE_SCHWABEN
+        MODE_SCHWABEN,
+        MODE_NUMBER_OF_MODES
     };
 
-    enum HourModesType {
+    enum HourModeType {
         HOUR_MODE_FULL_HOUR,
         HOUR_MODE_NO_FULL_HOUR
     };
 
-    struct MinutesType {
-        HourModesType HourMode;
+    struct MinuteType {
+        HourModeType HourMode;
         byte HourOffset;
         ClockWords::MinutesWordsType Words;
     };
 
-    using HoursType = ClockWords::HourWordsType;
+    using HourType = ClockWords::HourWordsType;
     using ClockWordsListType = ClockWords::WordsListType;
 
-    using HoursTableElementType = HoursType;
-    using MinutesTableElementType = MinutesType;
-
+    using HourTableElementType = HourType;
+    using MinuteTableElementType = MinuteType;
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
-    Display* pDisplay;
-    ModesType Mode;
+    ModeType Mode{CLOCK_INITIAL_MODE};
 
-    static const HoursType HoursTable[][CLOCK_NUMBER_OF_HOURS];
-    static const MinutesType MinutesTable[][CLOCK_NUMBER_OF_MINUTE_STEPS];
+    static const HourType HoursTable[][CLOCK_NUMBER_OF_HOURS];
+    static const MinuteType MinutesTable[][CLOCK_NUMBER_OF_MINUTE_STEPS];
     
     // functions
-    MinutesTableElementType getMinutesTableElement(byte Minute) const {
-        MinutesTableElementType MinutesTableElement;
-        memcpy_P(&MinutesTableElement, &MinutesTable[Mode][Minute / CLOCK_MINUTE_STEP_IN_MINUTES], sizeof(MinutesType));
-        return MinutesTableElement;
+    constexpr Clock(ModeType sMode) : Mode(sMode) { }
+    ~Clock() { }
+    
+    MinuteTableElementType getMinutesTableElement(byte Minute) const {
+        MinuteTableElementType minutesTableElement;
+        memcpy_P(&minutesTableElement, &MinutesTable[Mode][Minute / CLOCK_MINUTE_STEP_IN_MINUTES], sizeof(MinuteType));
+        return minutesTableElement;
     }
-    HoursTableElementType getHoursTableElement(HourModesType HourMode, byte Hour) const {
-        HoursTableElementType HoursTableElement;
-        memcpy_P(&HoursTableElement, &HoursTable[HourMode][Hour], sizeof(HoursType));
-        return HoursTableElement;
+    HourTableElementType getHoursTableElement(HourModeType HourMode, byte Hour) const {
+        HourTableElementType hoursTableElement;
+        memcpy_P(&hoursTableElement, &HoursTable[HourMode][Hour], sizeof(HourType));
+        return hoursTableElement;
     }
 
-    boolean calculateItIs(byte Minute) const {
-        byte MinuteSteps = Minute / CLOCK_MINUTE_STEP_IN_MINUTES;
-        // show it is only to full and half hour
-        if(MinuteSteps == 0 || MinuteSteps == (CLOCK_NUMBER_OF_MINUTE_STEPS / 2)) {
+    bool calculateItIs(byte Minute) const {
+        byte minuteSteps = Minute / CLOCK_MINUTE_STEP_IN_MINUTES;
+        // show "it is" only to full and half hour
+        if(minuteSteps == 0u || minuteSteps == (CLOCK_NUMBER_OF_MINUTE_STEPS / 2u)) {
             return true;
         } else {
             return false;
         }
     }
 
-    byte transformFrom24hTo12hFormat(byte Hour) const {
+    byte transform24hTo12hFormat(byte Hour) const {
         return Hour % CLOCK_NUMBER_OF_HOURS;
+    }
+    
+    bool isModeValid(ModeType sMode) {
+        if(sMode < MODE_NUMBER_OF_MODES) { return true; }
+        else { return false; }
     }
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    Clock(Display*, ModesType);
-    ~Clock();
-
+    static Clock& getInstance() {
+        static Clock SingletonInstance(CLOCK_INITIAL_MODE);
+        return SingletonInstance;
+    }
+      
     // get methods
-    ModesType getMode() const { return Mode; }
-    stdReturnType getClockWords(byte, byte, ClockWords&) const;
-    stdReturnType getClockWords(byte, byte, ClockWordsListType&) const;
+    ModeType getMode() const { return Mode; }
+    StdReturnType getClockWords(byte, byte, ClockWords&) const;
+    StdReturnType getClockWords(byte, byte, ClockWordsListType&) const;
 
     // set methods
-    void setMode(ModesType sMode) { Mode = sMode; }
+    void setModeFast(ModeType sMode) { Mode = sMode; }
+    StdReturnType setMode(ModeType sMode)
+    { 
+        if(isModeValid(sMode)) {
+            Mode = sMode;
+            return E_OK;    
+        } else {
+            return E_NOT_OK;
+        }
+    }
 
     // methods
-    stdReturnType setClock(byte, byte);
+    StdReturnType setClock(byte, byte);
     void setClockFast(byte, byte);
-    void show() { pDisplay->show(); }
+    void show() { Display::getInstance().show(); }
+    void refresh(byte Hour, byte Minute) { setClock(Hour, Minute); show(); }
 };
 
 

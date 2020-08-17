@@ -48,7 +48,7 @@
 /******************************************************************************************************************************************************
   shiftLeftFast()
 ******************************************************************************************************************************************************/
-void Transformation::shiftLeftFast(boolean Rotate)
+void Transformation::shiftLeftFast(bool Rotate)
 {
     for(byte row = 0; row < DISPLAY_NUMBER_OF_ROWS; row++) {
         shiftRowLeftFast(row, Rotate);
@@ -59,7 +59,7 @@ void Transformation::shiftLeftFast(boolean Rotate)
 /******************************************************************************************************************************************************
   shiftRowLeftFast()
 ******************************************************************************************************************************************************/
-void Transformation::shiftRowLeftFast(byte Row, boolean Rotate)
+void Transformation::shiftRowLeftFast(byte Row, bool Rotate)
 {
     Display::PixelType firstPixel;
 
@@ -76,7 +76,7 @@ void Transformation::shiftRowLeftFast(byte Row, boolean Rotate)
 /******************************************************************************************************************************************************
   shiftLeft()
 ******************************************************************************************************************************************************/
-StdReturnType Transformation::shiftLeft(boolean Rotate)
+StdReturnType Transformation::shiftLeft(bool Rotate)
 {
     StdReturnType returnValue{E_OK};
 
@@ -90,7 +90,7 @@ StdReturnType Transformation::shiftLeft(boolean Rotate)
 /******************************************************************************************************************************************************
   shiftRowLeft()
 ******************************************************************************************************************************************************/
-StdReturnType Transformation::shiftRowLeft(byte Row, boolean Rotate)
+StdReturnType Transformation::shiftRowLeft(byte Row, bool Rotate)
 {
     Display::PixelType firstPixel;
     Display::PixelType pixel;
@@ -112,7 +112,7 @@ StdReturnType Transformation::shiftRowLeft(byte Row, boolean Rotate)
 /******************************************************************************************************************************************************
   shiftRightFast()
 ******************************************************************************************************************************************************/
-void Transformation::shiftRightFast(boolean Rotate)
+void Transformation::shiftRightFast(bool Rotate)
 {
     for(byte row = 0u; row < DISPLAY_NUMBER_OF_ROWS; row++) {
         shiftRowRightFast(row, Rotate);
@@ -123,7 +123,7 @@ void Transformation::shiftRightFast(boolean Rotate)
 /******************************************************************************************************************************************************
   shiftRowRightFast()
 ******************************************************************************************************************************************************/
-void Transformation::shiftRowRightFast(byte Row, boolean Rotate)
+void Transformation::shiftRowRightFast(byte Row, bool Rotate)
 {
     Display::PixelType lastPixel;
 
@@ -140,7 +140,7 @@ void Transformation::shiftRowRightFast(byte Row, boolean Rotate)
 /******************************************************************************************************************************************************
   shiftRight()
 ******************************************************************************************************************************************************/
-StdReturnType Transformation::shiftRight(boolean Rotate)
+StdReturnType Transformation::shiftRight(bool Rotate)
 {
     StdReturnType returnValue = E_OK;
 
@@ -154,7 +154,7 @@ StdReturnType Transformation::shiftRight(boolean Rotate)
 /******************************************************************************************************************************************************
   shiftRowRight()
 ******************************************************************************************************************************************************/
-StdReturnType Transformation::shiftRowRight(byte Row, boolean Rotate)
+StdReturnType Transformation::shiftRowRight(byte Row, bool Rotate)
 {
     Display::PixelType lastPixel;
     Display::PixelType pixel;
@@ -176,7 +176,7 @@ StdReturnType Transformation::shiftRowRight(byte Row, boolean Rotate)
 /******************************************************************************************************************************************************
   shiftUpFast()
 ******************************************************************************************************************************************************/
-void Transformation::shiftUpFast(boolean Rotate)
+void Transformation::shiftUpFast(bool Rotate)
 {
     for(byte column = 0u; column < DISPLAY_NUMBER_OF_COLUMNS; column++) {
         shiftColumnUpFast(column, Rotate);
@@ -187,7 +187,7 @@ void Transformation::shiftUpFast(boolean Rotate)
 /******************************************************************************************************************************************************
   shiftColumnUpFast()
 ******************************************************************************************************************************************************/
-void Transformation::shiftColumnUpFast(byte Column, boolean Rotate)
+void Transformation::shiftColumnUpFast(byte Column, bool Rotate)
 {
     Display::PixelType firstPixel;
 
@@ -204,7 +204,7 @@ void Transformation::shiftColumnUpFast(byte Column, boolean Rotate)
 /******************************************************************************************************************************************************
   shiftUp()
 ******************************************************************************************************************************************************/
-StdReturnType Transformation::shiftUp(boolean Rotate)
+StdReturnType Transformation::shiftUp(bool Rotate)
 {
     StdReturnType returnValue{E_OK};
 
@@ -218,7 +218,7 @@ StdReturnType Transformation::shiftUp(boolean Rotate)
 /******************************************************************************************************************************************************
   shiftColumnUp()
 ******************************************************************************************************************************************************/
-StdReturnType Transformation::shiftColumnUp(byte Column, boolean Rotate)
+StdReturnType Transformation::shiftColumnUp(byte Column, bool Rotate)
 {
     Display::PixelType firstPixel;
     Display::PixelType pixel;
@@ -240,7 +240,7 @@ StdReturnType Transformation::shiftColumnUp(byte Column, boolean Rotate)
 /******************************************************************************************************************************************************
   shiftDownFast()
 ******************************************************************************************************************************************************/
-void Transformation::shiftDownFast(boolean Rotate)
+void Transformation::shiftDownFast(bool Rotate)
 {
     for(byte column = 0u; column < DISPLAY_NUMBER_OF_COLUMNS; column++) {
         shiftColumnDownFast(column, Rotate);
@@ -251,7 +251,7 @@ void Transformation::shiftDownFast(boolean Rotate)
 /******************************************************************************************************************************************************
   shiftColumnDownFast()
 ******************************************************************************************************************************************************/
-void Transformation::shiftColumnDownFast(byte Column, boolean Rotate)
+void Transformation::shiftColumnDownFast(byte Column, bool Rotate)
 {
     Display::PixelType lastPixel;
 
@@ -268,7 +268,7 @@ void Transformation::shiftColumnDownFast(byte Column, boolean Rotate)
 /******************************************************************************************************************************************************
   shiftDown()
 ******************************************************************************************************************************************************/
-StdReturnType Transformation::shiftDown(boolean Rotate)
+StdReturnType Transformation::shiftDown(bool Rotate)
 {
     StdReturnType returnValue{E_OK};
 
@@ -282,7 +282,7 @@ StdReturnType Transformation::shiftDown(boolean Rotate)
 /******************************************************************************************************************************************************
   shiftColumnDown()
 ******************************************************************************************************************************************************/
-StdReturnType Transformation::shiftColumnDown(byte Column, boolean Rotate)
+StdReturnType Transformation::shiftColumnDown(byte Column, bool Rotate)
 {
     Display::PixelType lastPixel;
     Display::PixelType pixel;

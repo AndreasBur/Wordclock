@@ -44,41 +44,14 @@
  * P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
 
-/******************************************************************************************************************************************************
-  Constructor of Transformation
-******************************************************************************************************************************************************/
-/*! \brief          Transformation Constructor
- *  \details        Instantiation of the Template library
- *
- *  \return         -
-******************************************************************************************************************************************************/
-Transformation::Transformation(Display* Display)
-{
-    pDisplay = Display;
-} /* Transformation */
-
-
-/******************************************************************************************************************************************************
-  Destructor of Transformation
-******************************************************************************************************************************************************/
-Transformation::~Transformation()
-{
-
-} /* ~Transformation */
-
 
 /******************************************************************************************************************************************************
   shiftLeftFast()
 ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
- *  \return         -
-******************************************************************************************************************************************************/
-void Transformation::shiftLeftFast(boolean Rotate)
+void Transformation::shiftLeftFast(bool Rotate)
 {
-    for(byte Row = 0; Row < DISPLAY_NUMBER_OF_ROWS; Row++) {
-        shiftRowLeftFast(Row, Rotate);
+    for(byte row = 0; row < DISPLAY_NUMBER_OF_ROWS; row++) {
+        shiftRowLeftFast(row, Rotate);
     }
 } /* shiftLeftFast */
 
@@ -86,83 +59,63 @@ void Transformation::shiftLeftFast(boolean Rotate)
 /******************************************************************************************************************************************************
   shiftRowLeftFast()
 ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
- *  \return         -
-******************************************************************************************************************************************************/
-void Transformation::shiftRowLeftFast(byte Row, boolean Rotate)
+void Transformation::shiftRowLeftFast(byte Row, bool Rotate)
 {
-    Display::PixelType FirstPixel;
+    Display::PixelType firstPixel;
 
-    if(Rotate) FirstPixel = pDisplay->getPixelFast(0, Row);
+    if(Rotate) firstPixel = Display::getInstance().getPixelFast(0u, Row);
 
-    for(byte Column = 0; Column < DISPLAY_NUMBER_OF_COLUMNS - 1; Column++) {
-        pDisplay->writePixelFast(Column, Row, pDisplay->getPixelFast(Column + 1, Row));
+    for(byte column = 0u; column < DISPLAY_NUMBER_OF_COLUMNS - 1u; column++) {
+        Display::getInstance().writePixelFast(column, Row, Display::getInstance().getPixelFast(column + 1u, Row));
     }
-    if(Rotate) pDisplay->writePixelFast(DISPLAY_NUMBER_OF_COLUMNS - 1, Row, FirstPixel);
-    else pDisplay->clearPixelFast(DISPLAY_NUMBER_OF_COLUMNS - 1, Row);
+    if(Rotate) Display::getInstance().writePixelFast(DISPLAY_NUMBER_OF_COLUMNS - 1u, Row, firstPixel);
+    else Display::getInstance().clearPixelFast(DISPLAY_NUMBER_OF_COLUMNS - 1u, Row);
 } /* shiftRowLeftFast */
 
 
 /******************************************************************************************************************************************************
   shiftLeft()
 ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
- *  \return         -
-******************************************************************************************************************************************************/
-stdReturnType Transformation::shiftLeft(boolean Rotate)
+StdReturnType Transformation::shiftLeft(bool Rotate)
 {
-    stdReturnType ReturnValue = E_OK;
+    StdReturnType returnValue{E_OK};
 
-    for(byte Row = 0; Row < DISPLAY_NUMBER_OF_ROWS; Row++) {
-        if(shiftRowLeft(Row, Rotate) == E_NOT_OK) { ReturnValue = E_NOT_OK; }
+    for(byte row = 0u; row < DISPLAY_NUMBER_OF_ROWS; row++) {
+        if(shiftRowLeft(row, Rotate) == E_NOT_OK) { returnValue = E_NOT_OK; }
     }
-    return ReturnValue;
+    return returnValue;
 } /* shiftLeft */
 
 
 /******************************************************************************************************************************************************
   shiftRowLeft()
 ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
- *  \return         -
-******************************************************************************************************************************************************/
-stdReturnType Transformation::shiftRowLeft(byte Row, boolean Rotate)
+StdReturnType Transformation::shiftRowLeft(byte Row, bool Rotate)
 {
-    Display::PixelType FirstPixel;
-    Display::PixelType Pixel;
-    stdReturnType ReturnValue = E_OK;
+    Display::PixelType firstPixel;
+    Display::PixelType pixel;
+    StdReturnType returnValue{E_OK};
 
-    if(Rotate) if(pDisplay->getPixel(0, Row, &FirstPixel) == E_NOT_OK) ReturnValue = E_NOT_OK;
+    if(Rotate) if(Display::getInstance().getPixel(0, Row, firstPixel) == E_NOT_OK) returnValue = E_NOT_OK;
 
-    for(byte Column = 0; Column < DISPLAY_NUMBER_OF_COLUMNS - 1; Column++) {
-        if(pDisplay->getPixel(Column + 1, Row, &Pixel) == E_NOT_OK) ReturnValue = E_NOT_OK;
-        if(pDisplay->writePixel(Column, Row, Pixel) == E_NOT_OK) ReturnValue = E_NOT_OK;
+    for(byte Column = 0u; Column < DISPLAY_NUMBER_OF_COLUMNS - 1u; Column++) {
+        if(Display::getInstance().getPixel(Column + 1u, Row, pixel) == E_NOT_OK) returnValue = E_NOT_OK;
+        if(Display::getInstance().writePixel(Column, Row, pixel) == E_NOT_OK) returnValue = E_NOT_OK;
     }
-    if(Rotate) { if(pDisplay->writePixel(DISPLAY_NUMBER_OF_COLUMNS - 1, Row, FirstPixel) == E_NOT_OK) ReturnValue = E_NOT_OK; }
-    else { if(pDisplay->clearPixel(DISPLAY_NUMBER_OF_COLUMNS - 1, Row) == E_NOT_OK) ReturnValue = E_NOT_OK; }
+    if(Rotate) { if(Display::getInstance().writePixel(DISPLAY_NUMBER_OF_COLUMNS - 1u, Row, firstPixel) == E_NOT_OK) returnValue = E_NOT_OK; }
+    else { if(Display::getInstance().clearPixel(DISPLAY_NUMBER_OF_COLUMNS - 1u, Row) == E_NOT_OK) returnValue = E_NOT_OK; }
 
-    return ReturnValue;
+    return returnValue;
 } /* shiftRowLeft */
 
 
 /******************************************************************************************************************************************************
   shiftRightFast()
 ******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
-******************************************************************************************************************************************************/
-void Transformation::shiftRightFast(boolean Rotate)
+void Transformation::shiftRightFast(bool Rotate)
 {
-    for(byte Row = 0; Row < DISPLAY_NUMBER_OF_ROWS; Row++) {
-        shiftRowRightFast(Row, Rotate);
+    for(byte row = 0u; row < DISPLAY_NUMBER_OF_ROWS; row++) {
+        shiftRowRightFast(row, Rotate);
     }
 } /* shiftRightFast */
 
@@ -170,83 +123,63 @@ void Transformation::shiftRightFast(boolean Rotate)
 /******************************************************************************************************************************************************
   shiftRowRightFast()
 ******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
-******************************************************************************************************************************************************/
-void Transformation::shiftRowRightFast(byte Row, boolean Rotate)
+void Transformation::shiftRowRightFast(byte Row, bool Rotate)
 {
-    Display::PixelType LastPixel;
+    Display::PixelType lastPixel;
 
-    if(Rotate) LastPixel = pDisplay->getPixelFast(DISPLAY_NUMBER_OF_COLUMNS - 1, Row);
+    if(Rotate) lastPixel = Display::getInstance().getPixelFast(DISPLAY_NUMBER_OF_COLUMNS - 1u, Row);
 
-    for(int8_t Column = DISPLAY_NUMBER_OF_COLUMNS - 1; Column > 0; Column--) {
-        pDisplay->writePixelFast(Column, Row, pDisplay->getPixelFast(Column - 1, Row));
+    for(int8_t Column = DISPLAY_NUMBER_OF_COLUMNS - 1u; Column > 0; Column--) {
+        Display::getInstance().writePixelFast(Column, Row, Display::getInstance().getPixelFast(Column - 1u, Row));
     }
-    if(Rotate) pDisplay->writePixelFast(0, Row, LastPixel);
-    else pDisplay->clearPixelFast(0, Row);
+    if(Rotate) Display::getInstance().writePixelFast(0u, Row, lastPixel);
+    else Display::getInstance().clearPixelFast(0u, Row);
 } /* shiftRowRightFast */
 
 
 /******************************************************************************************************************************************************
   shiftRight()
 ******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
-******************************************************************************************************************************************************/
-stdReturnType Transformation::shiftRight(boolean Rotate)
+StdReturnType Transformation::shiftRight(bool Rotate)
 {
-    stdReturnType ReturnValue = E_OK;
+    StdReturnType returnValue = E_OK;
 
-    for(byte Row = 0; Row < DISPLAY_NUMBER_OF_ROWS; Row++) {
-        if(shiftRowRight(Row, Rotate) == E_NOT_OK) { ReturnValue = E_NOT_OK; }
+    for(byte Row = 0u; Row < DISPLAY_NUMBER_OF_ROWS; Row++) {
+        if(shiftRowRight(Row, Rotate) == E_NOT_OK) { returnValue = E_NOT_OK; }
     }
-    return ReturnValue;
+    return returnValue;
 } /* shiftRight */
 
 
 /******************************************************************************************************************************************************
   shiftRowRight()
 ******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
-******************************************************************************************************************************************************/
-stdReturnType Transformation::shiftRowRight(byte Row, boolean Rotate)
+StdReturnType Transformation::shiftRowRight(byte Row, bool Rotate)
 {
-    Display::PixelType LastPixel;
-    Display::PixelType Pixel;
-    stdReturnType ReturnValue = E_OK;
+    Display::PixelType lastPixel;
+    Display::PixelType pixel;
+    StdReturnType returnValue{E_OK};
 
-    if(Rotate) if(pDisplay->getPixel(DISPLAY_NUMBER_OF_COLUMNS - 1, Row, &LastPixel) == E_NOT_OK) ReturnValue = E_NOT_OK;
+    if(Rotate) if(Display::getInstance().getPixel(DISPLAY_NUMBER_OF_COLUMNS - 1u, Row, lastPixel) == E_NOT_OK) returnValue = E_NOT_OK;
 
-    for(int8_t Column = DISPLAY_NUMBER_OF_COLUMNS - 1; Column > 0; Column--) {
-        if(pDisplay->getPixel(Column - 1, Row, &Pixel) == E_NOT_OK) ReturnValue = E_NOT_OK;
-        if(pDisplay->writePixel(Column, Row, Pixel) == E_NOT_OK) ReturnValue = E_NOT_OK;
+    for(int8_t column = DISPLAY_NUMBER_OF_COLUMNS - 1u; column > 0; column--) {
+        if(Display::getInstance().getPixel(column - 1u, Row, pixel) == E_NOT_OK) returnValue = E_NOT_OK;
+        if(Display::getInstance().writePixel(column, Row, pixel) == E_NOT_OK) returnValue = E_NOT_OK;
     }
-    if(Rotate) { if(pDisplay->writePixel(0, Row, LastPixel) == E_NOT_OK) ReturnValue = E_NOT_OK; }
-    else{ if(pDisplay->clearPixel(0, Row) == E_NOT_OK) ReturnValue = E_NOT_OK; }
+    if(Rotate) { if(Display::getInstance().writePixel(0u, Row, lastPixel) == E_NOT_OK) returnValue = E_NOT_OK; }
+    else{ if(Display::getInstance().clearPixel(0u, Row) == E_NOT_OK) returnValue = E_NOT_OK; }
 
-    return ReturnValue;
+    return returnValue;
 } /* shiftRowRight */
 
 
 /******************************************************************************************************************************************************
   shiftUpFast()
 ******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
-******************************************************************************************************************************************************/
-void Transformation::shiftUpFast(boolean Rotate)
+void Transformation::shiftUpFast(bool Rotate)
 {
-    for(byte Column = 0; Column < DISPLAY_NUMBER_OF_COLUMNS; Column++) {
-        shiftColumnUpFast(Column, Rotate);
+    for(byte column = 0u; column < DISPLAY_NUMBER_OF_COLUMNS; column++) {
+        shiftColumnUpFast(column, Rotate);
     }
 } /* shiftUpFast */
 
@@ -254,83 +187,63 @@ void Transformation::shiftUpFast(boolean Rotate)
 /******************************************************************************************************************************************************
   shiftColumnUpFast()
 ******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
-******************************************************************************************************************************************************/
-void Transformation::shiftColumnUpFast(byte Column, boolean Rotate)
+void Transformation::shiftColumnUpFast(byte Column, bool Rotate)
 {
-    Display::PixelType FirstPixel;
+    Display::PixelType firstPixel;
 
-    if(Rotate) FirstPixel = pDisplay->getPixelFast(Column, 0);
+    if(Rotate) firstPixel = Display::getInstance().getPixelFast(Column, 0u);
 
-    for(byte Row = 0; Row < DISPLAY_NUMBER_OF_ROWS - 1; Row++) {
-        pDisplay->writePixelFast(Column, Row, pDisplay->getPixelFast(Column, Row + 1));
+    for(byte Row = 0u; Row < DISPLAY_NUMBER_OF_ROWS - 1u; Row++) {
+        Display::getInstance().writePixelFast(Column, Row, Display::getInstance().getPixelFast(Column, Row + 1u));
     }
-    if(Rotate) pDisplay->writePixelFast(Column, DISPLAY_NUMBER_OF_ROWS - 1, FirstPixel);
-    else pDisplay->clearPixelFast(Column, DISPLAY_NUMBER_OF_ROWS - 1);
+    if(Rotate) Display::getInstance().writePixelFast(Column, DISPLAY_NUMBER_OF_ROWS - 1u, firstPixel);
+    else Display::getInstance().clearPixelFast(Column, DISPLAY_NUMBER_OF_ROWS - 1u);
 } /* shiftColumnUpFast */
 
 
 /******************************************************************************************************************************************************
   shiftUp()
 ******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
-******************************************************************************************************************************************************/
-stdReturnType Transformation::shiftUp(boolean Rotate)
+StdReturnType Transformation::shiftUp(bool Rotate)
 {
-    stdReturnType ReturnValue = E_OK;
+    StdReturnType returnValue{E_OK};
 
-    for(byte Column = 0; Column < DISPLAY_NUMBER_OF_COLUMNS; Column++) {
-        if(shiftColumnUp(Column, Rotate) == E_NOT_OK) { ReturnValue = E_NOT_OK; }
+    for(byte column = 0u; column < DISPLAY_NUMBER_OF_COLUMNS; column++) {
+        if(shiftColumnUp(column, Rotate) == E_NOT_OK) { returnValue = E_NOT_OK; }
     }
-    return ReturnValue;
+    return returnValue;
 } /* shiftUp */
 
 
 /******************************************************************************************************************************************************
   shiftColumnUp()
 ******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
-******************************************************************************************************************************************************/
-stdReturnType Transformation::shiftColumnUp(byte Column, boolean Rotate)
+StdReturnType Transformation::shiftColumnUp(byte Column, bool Rotate)
 {
-    Display::PixelType FirstPixel;
-    Display::PixelType Pixel;
-    stdReturnType ReturnValue = E_OK;
+    Display::PixelType firstPixel;
+    Display::PixelType pixel;
+    StdReturnType returnValue{E_OK};
 
-    if(Rotate) if(pDisplay->getPixel(Column, 0, &FirstPixel) == E_NOT_OK) ReturnValue = E_NOT_OK;
+    if(Rotate) if(Display::getInstance().getPixel(Column, 0u, firstPixel) == E_NOT_OK) returnValue = E_NOT_OK;
 
-    for(byte Row = 0; Row < DISPLAY_NUMBER_OF_ROWS - 1; Row++) {
-        if(pDisplay->getPixel(Column, Row + 1, &Pixel) == E_NOT_OK) ReturnValue = E_NOT_OK;
-        if(pDisplay->writePixel(Column, Row, Pixel) == E_NOT_OK) ReturnValue = E_NOT_OK;
+    for(byte Row = 0u; Row < DISPLAY_NUMBER_OF_ROWS - 1u; Row++) {
+        if(Display::getInstance().getPixel(Column, Row + 1u, pixel) == E_NOT_OK) returnValue = E_NOT_OK;
+        if(Display::getInstance().writePixel(Column, Row, pixel) == E_NOT_OK) returnValue = E_NOT_OK;
     }
-    if(Rotate) { if(pDisplay->writePixel(Column, DISPLAY_NUMBER_OF_ROWS - 1, FirstPixel) == E_NOT_OK) ReturnValue = E_NOT_OK; }
-    else { if(pDisplay->clearPixel(Column, DISPLAY_NUMBER_OF_ROWS - 1) == E_NOT_OK) ReturnValue = E_NOT_OK; }
+    if(Rotate) { if(Display::getInstance().writePixel(Column, DISPLAY_NUMBER_OF_ROWS - 1u, firstPixel) == E_NOT_OK) returnValue = E_NOT_OK; }
+    else { if(Display::getInstance().clearPixel(Column, DISPLAY_NUMBER_OF_ROWS - 1u) == E_NOT_OK) returnValue = E_NOT_OK; }
 
-    return ReturnValue;
+    return returnValue;
 } /* shiftColumnUp */
 
 
 /******************************************************************************************************************************************************
   shiftDownFast()
 ******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
-******************************************************************************************************************************************************/
-void Transformation::shiftDownFast(boolean Rotate)
+void Transformation::shiftDownFast(bool Rotate)
 {
-    for(byte Column = 0; Column < DISPLAY_NUMBER_OF_COLUMNS; Column++) {
-        shiftColumnDownFast(Column, Rotate);
+    for(byte column = 0u; column < DISPLAY_NUMBER_OF_COLUMNS; column++) {
+        shiftColumnDownFast(column, Rotate);
     }
 } /* shiftDownFast */
 
@@ -338,68 +251,53 @@ void Transformation::shiftDownFast(boolean Rotate)
 /******************************************************************************************************************************************************
   shiftColumnDownFast()
 ******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
-******************************************************************************************************************************************************/
-void Transformation::shiftColumnDownFast(byte Column, boolean Rotate)
+void Transformation::shiftColumnDownFast(byte Column, bool Rotate)
 {
-    Display::PixelType LastPixel;
+    Display::PixelType lastPixel;
 
-    if(Rotate) LastPixel = pDisplay->getPixelFast(Column, DISPLAY_NUMBER_OF_ROWS - 1);
+    if(Rotate) lastPixel = Display::getInstance().getPixelFast(Column, DISPLAY_NUMBER_OF_ROWS - 1u);
 
-    for(int8_t Row = DISPLAY_NUMBER_OF_ROWS - 1; Row > 0; Row--) {
-        pDisplay->writePixelFast(Column, Row, pDisplay->getPixelFast(Column, Row - 1));
+    for(int8_t row = DISPLAY_NUMBER_OF_ROWS - 1u; row > 0; row--) {
+        Display::getInstance().writePixelFast(Column, row, Display::getInstance().getPixelFast(Column, row - 1u));
     }
-    if(Rotate) pDisplay->writePixelFast(Column, 0, LastPixel);
-    else pDisplay->clearPixelFast(Column, 0);
+    if(Rotate) Display::getInstance().writePixelFast(Column, 0u, lastPixel);
+    else Display::getInstance().clearPixelFast(Column, 0u);
 } /* shiftColumnDownFast */
 
 
 /******************************************************************************************************************************************************
   shiftDown()
 ******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
-******************************************************************************************************************************************************/
-stdReturnType Transformation::shiftDown(boolean Rotate)
+StdReturnType Transformation::shiftDown(bool Rotate)
 {
-    stdReturnType ReturnValue = E_OK;
+    StdReturnType returnValue{E_OK};
 
-    for(byte Column = 0; Column < DISPLAY_NUMBER_OF_COLUMNS; Column++) {
-        if(shiftColumnDown(Column, Rotate) == E_NOT_OK) { ReturnValue = E_NOT_OK; }
+    for(byte column = 0u; column < DISPLAY_NUMBER_OF_COLUMNS; column++) {
+        if(shiftColumnDown(column, Rotate) == E_NOT_OK) { returnValue = E_NOT_OK; }
     }
-    return ReturnValue;
+    return returnValue;
 } /* shiftDown */
 
 
 /******************************************************************************************************************************************************
   shiftColumnDown()
 ******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
-******************************************************************************************************************************************************/
-stdReturnType Transformation::shiftColumnDown(byte Column, boolean Rotate)
+StdReturnType Transformation::shiftColumnDown(byte Column, bool Rotate)
 {
-    Display::PixelType LastPixel;
-    Display::PixelType Pixel;
-    stdReturnType ReturnValue = E_OK;
+    Display::PixelType lastPixel;
+    Display::PixelType pixel;
+    StdReturnType returnValue{E_OK};
 
-    if(Rotate) if(pDisplay->getPixel(Column, DISPLAY_NUMBER_OF_ROWS - 1, &LastPixel) == E_NOT_OK) ReturnValue = E_NOT_OK;
+    if(Rotate) if(Display::getInstance().getPixel(Column, DISPLAY_NUMBER_OF_ROWS - 1u, lastPixel) == E_NOT_OK) returnValue = E_NOT_OK;
 
-    for(int8_t Row = DISPLAY_NUMBER_OF_ROWS - 1; Row > 0; Row--) {
-        if(pDisplay->getPixel(Column, Row - 1, &Pixel) == E_NOT_OK) ReturnValue = E_NOT_OK;
-        if(pDisplay->writePixel(Column, Row, Pixel) == E_NOT_OK) ReturnValue = E_NOT_OK;
+    for(int8_t row = DISPLAY_NUMBER_OF_ROWS - 1u; row > 0; row--) {
+        if(Display::getInstance().getPixel(Column, row - 1u, pixel) == E_NOT_OK) returnValue = E_NOT_OK;
+        if(Display::getInstance().writePixel(Column, row, pixel) == E_NOT_OK) returnValue = E_NOT_OK;
     }
-    if(Rotate) { if(pDisplay->writePixel(Column, 0, LastPixel) == E_NOT_OK) ReturnValue = E_NOT_OK; }
-    else { if(pDisplay->clearPixel(Column, 0) == E_NOT_OK) ReturnValue = E_NOT_OK; }
+    if(Rotate) { if(Display::getInstance().writePixel(Column, 0u, lastPixel) == E_NOT_OK) returnValue = E_NOT_OK; }
+    else { if(Display::getInstance().clearPixel(Column, 0u) == E_NOT_OK) returnValue = E_NOT_OK; }
 
-    return ReturnValue;
+    return returnValue;
 } /* shiftColumnDown */
 
 

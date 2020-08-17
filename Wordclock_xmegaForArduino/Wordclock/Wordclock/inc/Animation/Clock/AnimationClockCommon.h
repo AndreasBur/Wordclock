@@ -66,13 +66,13 @@ class AnimationClockCommon
  *  P R O T E C T E D   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   protected:
-    StateType State;
+    StateType State{STATE_NONE};
     
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr AnimationClockCommon() : State(STATE_NONE) { }
+    constexpr AnimationClockCommon() : State{STATE_NONE} { }
     ~AnimationClockCommon() { }
 
     // get methods
@@ -81,10 +81,10 @@ class AnimationClockCommon
     // set methods
 
     // methods
-    constexpr void init(StateType sState) { State = sState; }
+    void init(StateType sState) { State = sState; }
     void show() { Display::getInstance().show(); }
-    boolean isPixelPartOfClockWords(ClockWords::WordsListType, byte, byte) const;
-    boolean isPixelPartOfClockWords(ClockWords::WordsListType, byte) const;
+    bool isPixelPartOfClockWords(ClockWords::WordsListType, byte, byte) const;
+    bool isPixelPartOfClockWords(ClockWords::WordsListType, byte) const;
     //virtual void task() = 0;
     //virtual stdReturnType setClock(byte, byte) = 0;
 };

@@ -8,14 +8,14 @@
  *  ---------------------------------------------------------------------------------------------------------------------------------------------------
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       FontCommon.h
+/**     \file       Font.h
  *      \brief      
  *
  *      \details    
  *                  
 ******************************************************************************************************************************************************/
-#ifndef _FONT_COMMON_H_
-#define _FONT_COMMON_H_
+#ifndef _FONT_H_
+#define _FONT_H_
 
 /******************************************************************************************************************************************************
  * I N C L U D E S
@@ -48,11 +48,10 @@ enum class Orientation {
     ORIENTATION_NONE
 };
 
-
 /******************************************************************************************************************************************************
- *  C L A S S   F O N T C O M M O N
+ *  C L A S S   F O N T
 ******************************************************************************************************************************************************/
-template <typename FontCharType, byte FontTableSize> class FontCommon
+template <typename FontCharType, size_t FontTableSize> class Font
 {
 /******************************************************************************************************************************************************
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
@@ -66,36 +65,33 @@ template <typename FontCharType, byte FontTableSize> class FontCommon
 ******************************************************************************************************************************************************/
   private:
     const FontTableType& FontTable;
-
+  
     // functions
     FontTableElementType getFontTableElement(byte Index) const {
-        FontTableElementType FontTableElement;
-        memcpy_P(&FontTableElement, &FontTable[Index], sizeof(FontTableElementType));
-        return FontTableElement;
+        FontTableElementType fontTableElement;
+        memcpy_P(&fontTableElement, &FontTable[Index], sizeof(FontTableElementType));
+        return fontTableElement;
     }
+    
+/******************************************************************************************************************************************************
+ *  P R O T E C T E D   D A T A   A N D   F U N C T I N O N S
+******************************************************************************************************************************************************/
+  protected:    
+
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    FontCommon(const FontTableType& sFontTable) : FontTable(sFontTable) {
+    constexpr Font(const FontTableType& sFontTable) : FontTable(sFontTable) { }
+    ~Font() { }
 
-    }
-
-    virtual ~FontCommon() {
-    
-    }
-
-	// get methods
-    const FontTableType& getFontTable() const { return FontTable; }
-    virtual Orientation getOrientation() const = 0;
-    virtual byte getWidth() const = 0;
-    virtual byte getHeight() const = 0;
-
+    // get methods
     FontCharType getCharFast(byte Index) const { return getFontTableElement(Index); }
     byte getCharWidthFast(byte Index) const { return getFontTableElement(Index).getWidth(); }
 
-    stdReturnType getChar(byte Index, FontCharType& FontChar) const {
+    StdReturnType getChar(byte Index, FontCharType& FontChar) const
+    {
         if(Index < FontTableSize) {
             FontChar = getFontTableElement(Index);
             return E_OK;
@@ -103,7 +99,9 @@ template <typename FontCharType, byte FontTableSize> class FontCommon
             return E_NOT_OK;
         }
     }
-    stdReturnType getCharWidth(byte Index, byte& Width) {
+    
+    StdReturnType getCharWidth(byte Index, byte& Width)
+    {
         if(Index < FontTableSize) {
             Width = getFontTableElement(Index).getWidth();
             return E_OK;
@@ -112,9 +110,9 @@ template <typename FontCharType, byte FontTableSize> class FontCommon
         }
     }
 
-	// set methods
+    // set methods
 
-	// methods
+    // methods
 
 };
 

@@ -45,39 +45,11 @@
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  Constructor of AnimationClockCursor
-******************************************************************************************************************************************************/
-/*! \brief          AnimationClockCursor Constructor
- *  \details        Instantiation of the AnimationClockCursor library
- *
- *  \return         -
-******************************************************************************************************************************************************/
-AnimationClockCursor::AnimationClockCursor()
-{
-    reset();
-} /* AnimationClockCursor */
-
-
-/******************************************************************************************************************************************************
-  Destructor of AnimationClockCursor
-******************************************************************************************************************************************************/
-AnimationClockCursor::~AnimationClockCursor()
-{
-
-} /* ~AnimationClockCursor */
-
-
-/******************************************************************************************************************************************************
   init()
 ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
- *  \return         -
-******************************************************************************************************************************************************/
-void AnimationClockCursor::init(Display* Display, Clock* Clock)
+void AnimationClockCursor::init()
 {
-    AnimationClockCommon::init(Display, Clock, STATE_IDLE);
+    AnimationClockCommon::init(STATE_IDLE);
     reset();
 } /* init */
 
@@ -85,39 +57,29 @@ void AnimationClockCursor::init(Display* Display, Clock* Clock)
 /******************************************************************************************************************************************************
   setClock()
 ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
- *  \return         -
-******************************************************************************************************************************************************/
-stdReturnType AnimationClockCursor::setClock(byte Hour, byte Minute)
+StdReturnType AnimationClockCursor::setClock(byte Hour, byte Minute)
 {
-    stdReturnType ReturnValue{E_NOT_OK};
+    StdReturnType returnValue{E_NOT_OK};
 
-    if(pClock->getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
-        ReturnValue = E_OK;
-        CurrentPixelIndex = 0;
+    if(Clock::getInstance().getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
+        returnValue = E_OK;
+        CurrentPixelIndex = 0u;
         State = STATE_SET_TIME;
     }
-    return ReturnValue;
+    return returnValue;
 } /* setClock */
 
 
 /******************************************************************************************************************************************************
   task()
 ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
- *  \return         -
-******************************************************************************************************************************************************/
 void AnimationClockCursor::task()
 {
     if(State == STATE_SET_TIME) {
-        if(CurrentPixelIndex < DISPLAY_NUMBER_OF_PIXELS) { pDisplay->setPixelFast(CurrentPixelIndex); }
-        if(CurrentPixelIndex > 0) {
-            if(isPixelPartOfClockWords(ClockWordsTable, CurrentPixelIndex - 1) == false) { 
-                pDisplay->clearPixelFast(CurrentPixelIndex - 1);
+        if(CurrentPixelIndex < DISPLAY_NUMBER_OF_PIXELS) { Display::getInstance().setPixelFast(CurrentPixelIndex); }
+        if(CurrentPixelIndex > 0u) {
+            if(isPixelPartOfClockWords(ClockWordsTable, CurrentPixelIndex - 1u) == false) { 
+                Display::getInstance().clearPixelFast(CurrentPixelIndex - 1u);
             }
         }
         if(CurrentPixelIndex >= DISPLAY_NUMBER_OF_PIXELS) State = STATE_IDLE;
@@ -133,15 +95,10 @@ void AnimationClockCursor::task()
 /******************************************************************************************************************************************************
   reset()
 ******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
-******************************************************************************************************************************************************/
 void AnimationClockCursor::reset()
 {
-    for(auto& Word : ClockWordsTable) { Word = DisplayWords::WORD_NONE; }
-    CurrentPixelIndex = 0;
+    ClockWordsTable.fill(DisplayWords::WORD_NONE);
+    CurrentPixelIndex = 0u;
 } /* reset */
 
 

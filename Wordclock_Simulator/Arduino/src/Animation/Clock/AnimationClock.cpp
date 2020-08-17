@@ -45,37 +45,7 @@
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  Constructor of AnimationClock
-******************************************************************************************************************************************************/
-/*! \brief          AnimationClock Constructor
- *  \details        Instantiation of the AnimationClock library
- *
- *  \return         -
-******************************************************************************************************************************************************/
-AnimationClock::AnimationClock(Display* Display, Clock* Clock)
-{
-    pDisplay = Display;
-    pClock = Clock;
-    CurrentAnimation = ANIMATION_CLOCK_NONE;
-} /* AnimationClock */
-
-
-/******************************************************************************************************************************************************
-  Destructor of AnimationClock
-******************************************************************************************************************************************************/
-AnimationClock::~AnimationClock()
-{
-
-} /* ~AnimationClock */
-
-
-/******************************************************************************************************************************************************
   init()
-******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
- *  \return         -
 ******************************************************************************************************************************************************/
 void AnimationClock::init()
 {
@@ -86,14 +56,9 @@ void AnimationClock::init()
 /******************************************************************************************************************************************************
   getState()
 ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
- *  \return         -
-******************************************************************************************************************************************************/
 AnimationClock::StateType AnimationClock::getState() const
 {
-    switch(CurrentAnimation)
+    switch(Animation)
     {
         case ANIMATION_CLOCK_CURSOR :
             return Animations.Cursor.getState();
@@ -138,65 +103,58 @@ AnimationClock::StateType AnimationClock::getState() const
 /******************************************************************************************************************************************************
   setAnimation()
 ******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
-******************************************************************************************************************************************************/
-void AnimationClock::setAnimation(AnimationType Animation)
+StdReturnType AnimationClock::setAnimation(AnimationType Animation)
 {
-    CurrentAnimation = Animation;
+    if(!isAnimationValid(Animation)) { return E_NOT_OK; }
+    Animation = Animation;
 
     switch(Animation)
     {
         case ANIMATION_CLOCK_CURSOR :
-            Animations.Cursor.init(pDisplay, pClock);
+            Animations.Cursor.init();
             break;
         case ANIMATION_CLOCK_TELETYPE :
-            Animations.Teletype.init(pDisplay, pClock);
+            Animations.Teletype.init();
             break;
         case ANIMATION_CLOCK_DROP :
-            Animations.Drop.init(pDisplay, pClock);
+            Animations.Drop.init();
             break;
         case ANIMATION_CLOCK_WIPE :
-            Animations.Wipe.init(pDisplay, pClock);
+            Animations.Wipe.init();
             break;
         case ANIMATION_CLOCK_SHIFT :
-            Animations.Shift.init(pDisplay, pClock);
+            Animations.Shift.init();
             break;
         case ANIMATION_CLOCK_FADE :
-            Animations.Fade.init(pDisplay, pClock);
+            Animations.Fade.init();
             break;
         case ANIMATION_CLOCK_SNAKE :
-            Animations.Snake.init(pDisplay, pClock);
+            Animations.Snake.init();
             break;
         case ANIMATION_CLOCK_CUBE :
-            Animations.Cube.init(pDisplay, pClock);
+            Animations.Cube.init();
             break;
         case ANIMATION_CLOCK_FLICKER :
-            Animations.Flicker.init(pDisplay, pClock);
+            Animations.Flicker.init();
         break;
         //case ANIMATION_CLOCK_EXPLODE :
             //break;
         //case ANIMATION_CLOCK_IMPLODE :
             //break;
         default :
+            Animation = ANIMATION_CLOCK_NONE;
             break;
     }
+    return E_OK;
 } /* setAnimation */
 
 
 /******************************************************************************************************************************************************
   setClock()
 ******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
-******************************************************************************************************************************************************/
-stdReturnType AnimationClock::setClock(byte Hour, byte Minute)
+StdReturnType AnimationClock::setClock(byte Hour, byte Minute)
 {
-    switch(CurrentAnimation)
+    switch(Animation)
     {
         case ANIMATION_CLOCK_CURSOR :
             return Animations.Cursor.setClock(Hour, Minute);
@@ -239,14 +197,9 @@ stdReturnType AnimationClock::setClock(byte Hour, byte Minute)
 /******************************************************************************************************************************************************
   task()
 ******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
-******************************************************************************************************************************************************/
 void AnimationClock::task()
 {
-    switch(CurrentAnimation)
+    switch(Animation)
     {
         case ANIMATION_CLOCK_CURSOR :
             return Animations.Cursor.task();
@@ -288,14 +241,9 @@ void AnimationClock::task()
 /******************************************************************************************************************************************************
   show()
 ******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
-******************************************************************************************************************************************************/
 void AnimationClock::show()
 {
-    switch(CurrentAnimation)
+    switch(Animation)
     {
         case ANIMATION_CLOCK_CURSOR :
             return Animations.Cursor.show();

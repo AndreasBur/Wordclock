@@ -9,10 +9,10 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       AnimationClockDrop.h
- *      \brief      
+ *      \brief
  *
- *      \details    
- *                  
+ *      \details
+ *
 ******************************************************************************************************************************************************/
 #ifndef _ANIMATION_CLOCK_DROP_H_
 #define _ANIMATION_CLOCK_DROP_H_
@@ -61,38 +61,36 @@ class AnimationClockDrop : public AnimationClockCommon
 ******************************************************************************************************************************************************/
   private:
     DisplayWords Words;
-    //byte CurrentPixelIndex;
-    byte Row;
-    byte Column;
-
-    ClockWords::WordsListType ClockWordsTable;
-    byte CurrenWordIndex;
+    ClockWords::WordsListType ClockWordsTable{{DisplayWords::WORD_NONE}};
+    byte Row{0u};
+    byte Column{0u};
+    byte CurrenWordIndex{0u};
 
     // functions
     void reset();
-    stdReturnType setNextActivePixelIndex();
+    StdReturnType setNextActivePixelIndex();
     void clearTimeTask();
     void setTimeTask();
-    stdReturnType setNextWordIndex();
+    StdReturnType setNextWordIndex();
     void setStateToSetTime();
-    stdReturnType setNextRow(byte);
-    stdReturnType setNextColumn(byte);
-    
+    StdReturnType setNextRow(byte);
+    StdReturnType setNextColumn(byte);
+
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    AnimationClockDrop();
-    ~AnimationClockDrop();
+    constexpr AnimationClockDrop() : Words() { }
+    ~AnimationClockDrop() { }
 
-	// get methods
+    // get methods
 
 
-	// set methods
+    // set methods
 
-	// methods
-    void init(Display*, Clock*);
-    stdReturnType setClock(byte, byte);
+    // methods
+    void init();
+    StdReturnType setClock(byte, byte);
     void task();
 };
 

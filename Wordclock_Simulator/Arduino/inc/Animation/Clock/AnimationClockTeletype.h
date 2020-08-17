@@ -9,10 +9,10 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       AnimationClockTeletype.h
- *      \brief      
+ *      \brief
  *
- *      \details    
- *                  
+ *      \details
+ *
 ******************************************************************************************************************************************************/
 #ifndef _ANIMATION_CLOCK_TELETYPE_H_
 #define _ANIMATION_CLOCK_TELETYPE_H_
@@ -60,30 +60,31 @@ class AnimationClockTeletype : public AnimationClockCommon
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
-    ClockWords::WordsListType ClockWordsTable;
-    byte CurrentWordIndex;
-    byte CurrentWordLength;
-    byte CurrentCharIndex;
     DisplayWords Words;
+    ClockWords::WordsListType ClockWordsTable{{DisplayWords::WORD_NONE}};
+    byte CurrentWordIndex{0u};
+    byte CurrentWordLength{0u};
+    byte CurrentCharIndex{0u};
 
     // functions
     void reset();
-    stdReturnType setNextWordIndex();
+    StdReturnType setNextWordIndex();
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    AnimationClockTeletype();
-    ~AnimationClockTeletype();
-    
-	// get methods
+    constexpr AnimationClockTeletype() : Words(), ClockWordsTable{DisplayWords::WORD_NONE},
+                                         CurrentWordIndex(0u), CurrentWordLength(0u), CurrentCharIndex(0u) { }
+    ~AnimationClockTeletype() { }
 
-	// set methods
+    // get methods
 
-	// methods
-    void init(Display*, Clock*);
-    stdReturnType setClock(byte, byte);
+    // set methods
+
+    // methods
+    void init();
+    StdReturnType setClock(byte, byte);
     void task();
 };
 

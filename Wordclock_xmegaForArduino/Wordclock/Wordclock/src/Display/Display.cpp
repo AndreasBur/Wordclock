@@ -180,7 +180,7 @@ void Display::clearWordsFast()
 /******************************************************************************************************************************************************
   getPixel()
 ******************************************************************************************************************************************************/
-StdReturnType Display::getPixel(byte Index, boolean& Value) const
+StdReturnType Display::getPixel(byte Index, bool& Value) const
 {
     byte row, column;
     indexToColumnAndRow(Index, column, row);
@@ -191,7 +191,7 @@ StdReturnType Display::getPixel(byte Index, boolean& Value) const
 /******************************************************************************************************************************************************
   getPixelFast()
 ******************************************************************************************************************************************************/
-boolean Display::getPixelFast(byte Index) const
+bool Display::getPixelFast(byte Index) const
 {
     byte row, column;
     indexToColumnAndRow(Index, column, row);
@@ -202,7 +202,7 @@ boolean Display::getPixelFast(byte Index) const
 /******************************************************************************************************************************************************
   getPixel()
 ******************************************************************************************************************************************************/
-StdReturnType Display::getPixel(byte Column, byte Row, boolean& Value)  const
+StdReturnType Display::getPixel(byte Column, byte Row, bool& Value)  const
 {
     StdReturnType returnValue{E_NOT_OK};
     PixelColorType pixel;
@@ -225,7 +225,7 @@ StdReturnType Display::getPixel(byte Column, byte Row, boolean& Value)  const
 /******************************************************************************************************************************************************
   getPixelFast()
 ******************************************************************************************************************************************************/
-boolean Display::getPixelFast(byte Column, byte Row)  const
+bool Display::getPixelFast(byte Column, byte Row)  const
 {
     PixelColorType pixel;
 
@@ -361,7 +361,7 @@ void Display::clearPixelFast(byte Index)
 ******************************************************************************************************************************************************/
 StdReturnType Display::togglePixel(byte Column, byte Row)
 {
-    boolean pixel{false};
+    bool pixel{false};
 
 #if (DISPLAY_LED_STRIPE_SERPENTINE == STD_ON)
     /* if led stripe is snake or serpentine then odd row: count from right to left */

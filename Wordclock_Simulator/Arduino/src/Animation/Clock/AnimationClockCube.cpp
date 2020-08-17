@@ -21,6 +21,7 @@
  * I N C L U D E S
 ******************************************************************************************************************************************************/
 #include "AnimationClockCube.h"
+#include "StandardTypes.h"
 
 
 /******************************************************************************************************************************************************
@@ -45,39 +46,11 @@
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  Constructor of AnimationClockCube
-******************************************************************************************************************************************************/
-/*! \brief          AnimationClockCube Constructor
- *  \details        Instantiation of the AnimationClockCube library
- *
- *  \return         -
-******************************************************************************************************************************************************/
-AnimationClockCube::AnimationClockCube()
-{
-    reset();
-} /* AnimationClockCube */
-
-
-/******************************************************************************************************************************************************
-  Destructor of AnimationClockCube
-******************************************************************************************************************************************************/
-AnimationClockCube::~AnimationClockCube()
-{
-
-} /* ~AnimationClockCube */
-
-
-/******************************************************************************************************************************************************
   init()
 ******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
-******************************************************************************************************************************************************/
-void AnimationClockCube::init(Display* Display, Clock* Clock)
+void AnimationClockCube::init()
 {
-    AnimationClockCommon::init(Display, Clock, STATE_IDLE);
+    AnimationClockCommon::init(STATE_IDLE);
     reset();
 } /* init */
 
@@ -85,31 +58,21 @@ void AnimationClockCube::init(Display* Display, Clock* Clock)
 /******************************************************************************************************************************************************
   setClock()
 ******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
-******************************************************************************************************************************************************/
-stdReturnType AnimationClockCube::setClock(byte Hour, byte Minute)
+StdReturnType AnimationClockCube::setClock(byte Hour, byte Minute)
 {
-    stdReturnType ReturnValue{E_NOT_OK};
+    StdReturnType returnValue{E_NOT_OK};
 
-    if(pClock->getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
-        ReturnValue = E_OK;
+    if(Clock::getInstance().getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
+        returnValue = E_OK;
         setMaxBorder();
         State = STATE_CLEAR_TIME;
     }
-    return ReturnValue;
+    return returnValue;
 } /* setClock */
 
 
 /******************************************************************************************************************************************************
   task()
-******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
 ******************************************************************************************************************************************************/
 void AnimationClockCube::task()
 {
@@ -125,27 +88,15 @@ void AnimationClockCube::task()
 /******************************************************************************************************************************************************
   reset()
 ******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
-******************************************************************************************************************************************************/
 void AnimationClockCube::reset()
 {
-    Border.ColumnStart = 0;
-    Border.ColumnEnd = 0;
-    Border.RowStart = 0;
-    Border.RowEnd = 0;
+    ClockWordsTable.fill(DisplayWords::WORD_NONE);
+    setMinBorder();
 } /* reset */
 
 
 /******************************************************************************************************************************************************
   setStateToSetTime()
-******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
 ******************************************************************************************************************************************************/
 void AnimationClockCube::setStateToSetTime()
 {
@@ -158,11 +109,6 @@ void AnimationClockCube::setStateToSetTime()
 /******************************************************************************************************************************************************
   clearTimeTask()
 ******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
-******************************************************************************************************************************************************/
 void AnimationClockCube::clearTimeTask()
 {
     switch(BorderState)
@@ -173,11 +119,9 @@ void AnimationClockCube::clearTimeTask()
             break;
         case BORDER_STATE_BETWEEN:
             clearBorderPixels();
-            if(decreaseBorder() == E_NOT_OK) {
-                setStateToSetTime();
-            } else {
-                setBorderPixels();
-            }
+            if(decreaseBorder() == E_NOT_OK) { setStateToSetTime(); } 
+            else { setBorderPixels(); }
+            break;
         default:
             break;
     }
@@ -186,11 +130,6 @@ void AnimationClockCube::clearTimeTask()
 
 /******************************************************************************************************************************************************
   setTimeTask()
-******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
 ******************************************************************************************************************************************************/
 void AnimationClockCube::setTimeTask()
 {
@@ -202,11 +141,9 @@ void AnimationClockCube::setTimeTask()
             break;
         case BORDER_STATE_BETWEEN:
             clearBorderPixelsWithoutClockPixels();
-            if(increaseBorder() == E_NOT_OK) {
-                State = STATE_IDLE;
-            } else {
-                setBorderPixels();
-            }
+            if(increaseBorder() == E_NOT_OK) { State = STATE_IDLE; } 
+            else { setBorderPixels(); }
+            break;
         default:
             break;
     }
@@ -216,31 +153,26 @@ void AnimationClockCube::setTimeTask()
 /******************************************************************************************************************************************************
   writeBorderPixels()
 ******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
-******************************************************************************************************************************************************/
 void AnimationClockCube::clearBorderPixelsWithoutClockPixels()
 {
     for(byte Column = Border.ColumnStart; Column <= Border.ColumnEnd; Column++) {
         if(isPixelPartOfClockWords(ClockWordsTable, Column, Border.RowStart) == false) {
             // clear border top
-            pDisplay->clearPixelFast(Column, Border.RowStart);
+            Display::getInstance().clearPixelFast(Column, Border.RowStart);
         }
         if(isPixelPartOfClockWords(ClockWordsTable, Column, Border.RowEnd) == false) {
             // clear border bottom
-            pDisplay->clearPixelFast(Column, Border.RowEnd);
+            Display::getInstance().clearPixelFast(Column, Border.RowEnd);
         }
     }
     for(byte Row = Border.RowStart; Row <= Border.RowEnd; Row++) {
         if(isPixelPartOfClockWords(ClockWordsTable, Border.ColumnStart, Row) == false) {
             // clear border left
-            pDisplay->clearPixelFast(Border.ColumnStart, Row);
+            Display::getInstance().clearPixelFast(Border.ColumnStart, Row);
         }
         if(isPixelPartOfClockWords(ClockWordsTable, Border.ColumnEnd, Row) == false) {
             // clear border right
-            pDisplay->clearPixelFast(Border.ColumnEnd, Row);
+            Display::getInstance().clearPixelFast(Border.ColumnEnd, Row);
         }
     }
 } /* writeBorderPixels */
@@ -249,24 +181,19 @@ void AnimationClockCube::clearBorderPixelsWithoutClockPixels()
 /******************************************************************************************************************************************************
   writeBorderPixels()
 ******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
-******************************************************************************************************************************************************/
 void AnimationClockCube::writeBorderPixels(bool Value)
 {
     for(byte Column = Border.ColumnStart; Column <= Border.ColumnEnd; Column++) {
         // set border top
-        pDisplay->writePixelFast(Column, Border.RowStart, Value);
+        Display::getInstance().writePixelFast(Column, Border.RowStart, Value);
         // set border bottom
-        pDisplay->writePixelFast(Column, Border.RowEnd, Value);
+        Display::getInstance().writePixelFast(Column, Border.RowEnd, Value);
     }
     for(byte Row = Border.RowStart; Row <= Border.RowEnd; Row++) {
         // set border left
-        pDisplay->writePixelFast(Border.ColumnStart, Row, Value);
+        Display::getInstance().writePixelFast(Border.ColumnStart, Row, Value);
         // set border right
-        pDisplay->writePixelFast(Border.ColumnEnd, Row, Value);
+        Display::getInstance().writePixelFast(Border.ColumnEnd, Row, Value);
     }
 } /* writeBorderPixels */
 
@@ -274,78 +201,58 @@ void AnimationClockCube::writeBorderPixels(bool Value)
 /******************************************************************************************************************************************************
   increaseBorder()
 ******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
-******************************************************************************************************************************************************/
-stdReturnType AnimationClockCube::increaseBorder()
+StdReturnType AnimationClockCube::increaseBorder()
 {
-    stdReturnType ReturnValue = E_OK;
+    StdReturnType returnValue = E_OK;
 
-    if(Border.ColumnStart > 0) { Border.ColumnStart--; }
-    else { ReturnValue = E_NOT_OK; }
+    if(Border.ColumnStart > 0u) { Border.ColumnStart--; }
+    else { returnValue = E_NOT_OK; }
     if(Border.ColumnEnd < DISPLAY_NUMBER_OF_COLUMNS - 1) { Border.ColumnEnd++; }
-    else { ReturnValue = E_NOT_OK; }
-    if(Border.RowStart > 0) { Border.RowStart--; }
-    else { ReturnValue = E_NOT_OK; }
+    else { returnValue = E_NOT_OK; }
+    if(Border.RowStart > 0u) { Border.RowStart--; }
+    else { returnValue = E_NOT_OK; }
     if(Border.RowEnd < DISPLAY_NUMBER_OF_ROWS - 1) { Border.RowEnd++; }
-    else { ReturnValue = E_NOT_OK; }
+    else { returnValue = E_NOT_OK; }
 
-    return ReturnValue;
+    return returnValue;
 } /* increaseBorder */
 
 
 /******************************************************************************************************************************************************
   decreaseBorder()
 ******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
-******************************************************************************************************************************************************/
-stdReturnType AnimationClockCube::decreaseBorder()
+StdReturnType AnimationClockCube::decreaseBorder()
 {
-    stdReturnType ReturnValue = E_OK;
+    StdReturnType returnValue = E_OK;
 
     if(Border.ColumnStart < ANIMATION_CLOCK_CUBE_COLUMN_START_MAX_VALUE) { Border.ColumnStart++; }
-    else { ReturnValue = E_NOT_OK; }
+    else { returnValue = E_NOT_OK; }
     if(Border.ColumnEnd > ANIMATION_CLOCK_CUBE_COLUMN_END_MIN_VALUE) {Border. ColumnEnd--; }
-    else { ReturnValue = E_NOT_OK; }
+    else { returnValue = E_NOT_OK; }
     if(Border.RowStart < ANIMATION_CLOCK_CUBE_ROW_START_MAX_VALUE) { Border.RowStart++; }
-    else { ReturnValue = E_NOT_OK; }
+    else { returnValue = E_NOT_OK; }
     if(Border.RowEnd > ANIMATION_CLOCK_CUBE_ROW_END_MIN_VALUE) { Border.RowEnd--; }
-    else { ReturnValue = E_NOT_OK; }
+    else { returnValue = E_NOT_OK; }
 
-    return ReturnValue;
+    return returnValue;
 } /* decreaseBorder */
 
 
 /******************************************************************************************************************************************************
   setMaxBorder()
 ******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
-******************************************************************************************************************************************************/
 void AnimationClockCube::setMaxBorder()
 {
-    Border.ColumnStart = 0;
-    Border.ColumnEnd = DISPLAY_NUMBER_OF_COLUMNS - 1;
-    Border.RowStart = 0;
-    Border.RowEnd = DISPLAY_NUMBER_OF_ROWS - 1;
+    Border.ColumnStart = 0u;
+    Border.ColumnEnd = DISPLAY_NUMBER_OF_COLUMNS - 1u;
+    Border.RowStart = 0u;
+    Border.RowEnd = DISPLAY_NUMBER_OF_ROWS - 1u;
     BorderState = BORDER_STATE_MAX;
 } /* setMaxBorder */
 
 
 /******************************************************************************************************************************************************
   setMinBorder()
-******************************************************************************************************************************************************/
-/*! \brief
- *  \details
- *
- *  \return         -
 ******************************************************************************************************************************************************/
 void AnimationClockCube::setMinBorder()
 {

@@ -61,10 +61,10 @@ class AnimationClockTeletype : public AnimationClockCommon
 ******************************************************************************************************************************************************/
   private:
     DisplayWords Words;
-    ClockWords::WordsListType ClockWordsTable;
-    byte CurrentWordIndex;
-    byte CurrentWordLength;
-    byte CurrentCharIndex;
+    ClockWords::WordsListType ClockWordsTable{DisplayWords::WORD_NONE};
+    byte CurrentWordIndex{0u};
+    byte CurrentWordLength{0u};
+    byte CurrentCharIndex{0u};
 
     // functions
     void reset();

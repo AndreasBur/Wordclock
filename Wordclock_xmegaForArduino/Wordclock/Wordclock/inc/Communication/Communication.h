@@ -79,7 +79,7 @@ class Communication
 
     // methods
     void task();
-    boolean isMessageComplete() const { return (State == STATE_MESSAGE_COMPLETE) ? true : false; }
+    bool isMessageComplete() const { return (State == STATE_MESSAGE_COMPLETE) ? true : false; }
 };
 
 #endif

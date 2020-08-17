@@ -22,7 +22,7 @@
 ******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Arduino.h"
-#include "FontCommon.h"
+#include "Font.h"
 #include "FontChar.h"
 
 /******************************************************************************************************************************************************
@@ -32,9 +32,9 @@
 
 
 /* FontTahoma10x10 parameter */
-#define FONT_TAHOMA_10X10_WIDTH                    10
-#define FONT_TAHOMA_10X10_HEIGHT                   10
-#define FONT_TAHOMA_10X10_FONT_TABLE_SIZE          102
+#define FONT_TAHOMA_10X10_WIDTH                    10u
+#define FONT_TAHOMA_10X10_HEIGHT                   10u
+#define FONT_TAHOMA_10X10_FONT_TABLE_SIZE          102u
 
 
 /******************************************************************************************************************************************************
@@ -45,7 +45,7 @@
 /******************************************************************************************************************************************************
  *  C L A S S   F O N T T A H O M A 1 0 X 1 0
 ******************************************************************************************************************************************************/
-class FontTahoma10x10 : public FontCommon<FontCharHorizontal<uint16_t, FONT_TAHOMA_10X10_HEIGHT>, FONT_TAHOMA_10X10_FONT_TABLE_SIZE>
+class FontTahoma10x10 : public Font<FontCharHorizontal<uint16_t, FONT_TAHOMA_10X10_HEIGHT>, FONT_TAHOMA_10X10_FONT_TABLE_SIZE>
 {
 /******************************************************************************************************************************************************
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
@@ -64,22 +64,23 @@ class FontTahoma10x10 : public FontCommon<FontCharHorizontal<uint16_t, FONT_TAHO
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    FontTahoma10x10();
-    ~FontTahoma10x10();
+    constexpr FontTahoma10x10() : Font(FontTable) { }
+    ~FontTahoma10x10() { }
 
-	// get methods
+    // get methods
     byte getWidth() const { return FONT_TAHOMA_10X10_WIDTH; }
     byte getHeight() const { return FONT_TAHOMA_10X10_HEIGHT; }
     Orientation getOrientation() const { return Orientation::ORIENTATION_HORIZONTAL; }
+    const FontTableType& getFontTable() const { return FontTable; }
 
-	// set methods
+    // set methods
 
-	// methods
+    // methods
 
 };
 
-#endif
 
+#endif
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E
 ******************************************************************************************************************************************************/

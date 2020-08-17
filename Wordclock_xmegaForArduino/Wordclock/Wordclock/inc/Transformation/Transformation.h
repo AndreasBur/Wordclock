@@ -73,25 +73,25 @@ class Transformation
     // set methods
 
     // methods
-    StdReturnType shiftLeft(boolean = false);
-    StdReturnType shiftRight(boolean = false);
-    StdReturnType shiftUp(boolean = false);
-    StdReturnType shiftDown(boolean = false);
+    StdReturnType shiftLeft(bool = false);
+    StdReturnType shiftRight(bool = false);
+    StdReturnType shiftUp(bool = false);
+    StdReturnType shiftDown(bool = false);
 
-    StdReturnType shiftRowLeft(byte, boolean = false);
-    StdReturnType shiftRowRight(byte, boolean = false);
-    StdReturnType shiftColumnUp(byte, boolean = false);
-    StdReturnType shiftColumnDown(byte, boolean = false);
+    StdReturnType shiftRowLeft(byte, bool = false);
+    StdReturnType shiftRowRight(byte, bool = false);
+    StdReturnType shiftColumnUp(byte, bool = false);
+    StdReturnType shiftColumnDown(byte, bool = false);
 
-    void shiftLeftFast(boolean = false);
-    void shiftRightFast(boolean = false);
-    void shiftUpFast(boolean = false);
-    void shiftDownFast(boolean = false);
+    void shiftLeftFast(bool = false);
+    void shiftRightFast(bool = false);
+    void shiftUpFast(bool = false);
+    void shiftDownFast(bool = false);
 
-    void shiftRowLeftFast(byte, boolean = false);
-    void shiftRowRightFast(byte, boolean = false);
-    void shiftColumnUpFast(byte, boolean = false);
-    void shiftColumnDownFast(byte, boolean = false);
+    void shiftRowLeftFast(byte, bool = false);
+    void shiftRowRightFast(byte, bool = false);
+    void shiftColumnUpFast(byte, bool = false);
+    void shiftColumnDownFast(byte, bool = false);
 };
 
 

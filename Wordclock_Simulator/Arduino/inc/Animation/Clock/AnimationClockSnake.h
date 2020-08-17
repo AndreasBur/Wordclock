@@ -9,10 +9,10 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       AnimationClockSnake.h
- *      \brief      
+ *      \brief
  *
- *      \details    
- *                  
+ *      \details
+ *
 ******************************************************************************************************************************************************/
 #ifndef _ANIMATION_CLOCK_SNAKE_H_
 #define _ANIMATION_CLOCK_SNAKE_H_
@@ -53,36 +53,36 @@ class AnimationClockSnake : public AnimationClockCommon
         SNAKE_STATE_TO_RIGHT,
         SNAKE_STATE_TO_LEFT
     };
-  
+
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
-    SnakeStateType SnakeState;
-    ClockWords::WordsListType ClockWordsTable;
-    byte SnakeBeginIndex;
-    byte SnakeEndIndex;
+    SnakeStateType SnakeState{SNAKE_STATE_TO_RIGHT};
+    ClockWords::WordsListType ClockWordsTable{{DisplayWords::WORD_NONE}};
+    byte SnakeBeginIndex{0u};
+    byte SnakeEndIndex{0u};
 
     // functions
     void reset();
     byte transformToSerpentine(byte, byte) const;
     byte transformToSerpentine(byte) const;
-  
+
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    AnimationClockSnake();
+    constexpr AnimationClockSnake() { }
     ~AnimationClockSnake();
 
-	// get methods
+    // get methods
 
 
-	// set methods
+    // set methods
 
-	// methods
-    void init(Display*, Clock*);
-    stdReturnType setClock(byte, byte);
+    // methods
+    void init();
+    StdReturnType setClock(byte, byte);
     void task();
 };
 

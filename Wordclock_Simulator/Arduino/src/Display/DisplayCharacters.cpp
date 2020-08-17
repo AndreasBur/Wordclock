@@ -57,40 +57,12 @@ const DisplayCharacters::DisplayCharactersTableElementType DisplayCharacters::Di
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  Constructor of DisplayCharacters
-******************************************************************************************************************************************************/
-/*! \brief          DisplayCharacters Constructor
- *  \details        Instantiation of the DisplayCharacters library
- *
- *  \return         -
-******************************************************************************************************************************************************/
-DisplayCharacters::DisplayCharacters()
-{
-
-} /* DisplayCharacters */
-
-
-/******************************************************************************************************************************************************
-  Destructor of DisplayCharacters
-******************************************************************************************************************************************************/
-DisplayCharacters::~DisplayCharacters()
-{
-
-} /* ~DisplayCharacters */
-
-
-/******************************************************************************************************************************************************
   getCharacter()
 ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
- *  \return         -
-******************************************************************************************************************************************************/
-stdReturnType DisplayCharacters::getCharacter(byte Column, byte Row, char* Character) const
+StdReturnType DisplayCharacters::getCharacter(byte Column, byte Row, char& Character) const
 {
     if(Row < DISPLAY_CHARACTERS_NUMBER_OF_ROWS && Column < DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS) {
-        *Character =  getCharacterFast(Row, Column);
+        Character =  getCharacterFast(Row, Column);
         return E_OK;
     } else {
         return E_NOT_OK;
@@ -100,19 +72,14 @@ stdReturnType DisplayCharacters::getCharacter(byte Column, byte Row, char* Chara
 
 /******************************************************************************************************************************************************
   getCharacter()
-  ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
- *  \return         -
-******************************************************************************************************************************************************/
-stdReturnType DisplayCharacters::getCharacter(byte Index, char* Character) const
+  ****************************************************************************************************************************************************/
+StdReturnType DisplayCharacters::getCharacter(byte Index, char& Character) const
 {
     byte Row, Column;
     indexToColumnAndRow(Index, Column, Row);
 
     if(Index < DISPLAY_CHARACTERS_NUMBER_OF_CHARACTERS) {
-        *Character =  getCharacterFast(Row, Column);
+        Character =  getCharacterFast(Row, Column);
         return E_OK;
     } else {
         return E_NOT_OK;
@@ -122,19 +89,14 @@ stdReturnType DisplayCharacters::getCharacter(byte Index, char* Character) const
 
 /******************************************************************************************************************************************************
   getCharacter()
-  ******************************************************************************************************************************************************/
-/*! \brief          
- *  \details        
- *                  
- *  \return         -
-******************************************************************************************************************************************************/
-stdReturnType DisplayCharacters::getCharacter(CharacterIdType CharacterId, char* Character) const
+  ****************************************************************************************************************************************************/
+StdReturnType DisplayCharacters::getCharacter(CharacterIdType CharacterId, char& Character) const
 {
     byte Row, Column;
     indexToColumnAndRow(CharacterId, Column, Row);
 
     if(CharacterId < DISPLAY_CHARACTERS_NUMBER_OF_CHARACTERS) {
-        *Character =  getCharacterFast(CharacterId);
+        Character =  getCharacterFast(CharacterId);
         return E_OK;
     } else {
         return E_NOT_OK;

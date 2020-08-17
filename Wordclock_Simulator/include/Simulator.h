@@ -3,7 +3,6 @@
 
 #include <wx/wx.h>
 #include <wx/button.h>
-#include <wx/statline.h>
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -25,21 +24,23 @@ class Simulator : public wxFrame
             byte Blue;
         } PixelType;
 
+        using SizerCharactersType = std::array<wxBoxSizer*, DISPLAY_NUMBER_OF_ROWS>;
+
         Simulator(wxFrame *dlg, const wxString& title);
         virtual ~Simulator();
 
         // get methods
         byte getBrightness() const { return Brightness; }
-        stdReturnType getPixel(byte, PixelType&) const;
+        StdReturnType getPixel(byte, PixelType&) const;
         PixelType getPixelFast(byte) const;
-        //stdReturnType getPixelDimmed(byte, WS2812PixelType*);
+        //StdReturnType getPixelDimmed(byte, WS2812PixelType*);
 
         // set methods
         void setBrightness(byte, bool = false);
-        //stdReturnType setPin(byte);
-        stdReturnType setPixel(byte, PixelType);
-        stdReturnType setPixel(byte, byte, byte, byte);
-        stdReturnType clearPixel(byte Index) { return setPixel(Index, 0, 0, 0); }
+        //StdReturnType setPin(byte);
+        StdReturnType setPixel(byte, PixelType);
+        StdReturnType setPixel(byte, byte, byte, byte);
+        StdReturnType clearPixel(byte Index) { return setPixel(Index, 0, 0, 0); }
         void setPixelFast(byte, PixelType);
         void setPixelFast(byte, byte, byte, byte);
         void clearPixelFast(byte Index) { setPixelFast(Index, 0, 0, 0); }
@@ -50,8 +51,11 @@ class Simulator : public wxFrame
         void disablePixels() { setBrightness(0); }
         void clearPixels();
         //void setAllPixels(PixelType) {}
-        //stdReturnType clearPixel(byte Index) { return setPixel(Index, 0, 0, 0); }
-        void show() { Refresh(); }
+        //StdReturnType clearPixel(byte Index) { return setPixel(Index, 0, 0, 0); }
+        StdReturnType show() {
+            Refresh();
+            return E_OK;
+        }
 
 
     protected:
@@ -61,8 +65,12 @@ class Simulator : public wxFrame
 
         enum
         {
-            idBtnQuit = 1000,
-            idBtnAbout
+            ID_BUTTON_QUIT = 1000,
+            ID_BUTTON_ABOUT,
+            ID_BUTTON_SEND,
+            ID_TEXT_CTRL_OUTPUT,
+            ID_TEXT_CTRL_INPUT,
+            ID_STATIC_BOX
         };
 
         wxStaticText* Characters[DISPLAY_NUMBER_OF_ROWS][DISPLAY_NUMBER_OF_COLUMNS];
@@ -72,6 +80,10 @@ class Simulator : public wxFrame
 
         wxButton* BtnAbout;
         wxButton* BtnQuit;
+        wxButton* BtnSend;
+
+        wxTextCtrl* Output;
+        wxTextCtrl* Input;
 
         void OnClose(wxCloseEvent& event);
         void OnQuit(wxCommandEvent& event);
@@ -80,6 +92,10 @@ class Simulator : public wxFrame
 
         // functions
         void setAllPixels(wxColour);
+        wxBoxSizer* createSizerCharacters();
+        wxBoxSizer* createSizerCharacter(int Row);
+        wxBoxSizer* createSizerButton();
+        wxBoxSizer* createSizerControl();
 };
 
 #endif // SIMULATOR_H

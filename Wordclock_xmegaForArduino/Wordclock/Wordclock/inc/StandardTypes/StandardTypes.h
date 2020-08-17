@@ -120,10 +120,10 @@ template <typename ReturnType, typename LengthType> static inline ReturnType bit
 template <typename VarType> static inline VarType setBit(VarType, uint8_t);
 template <typename VarType> static inline VarType clearBit(VarType, uint8_t);
 template <typename VarType> static inline VarType toggleBit(VarType, uint8_t);
-template <typename VarType> static inline boolean readBit(VarType, uint8_t);
-template <typename VarType> static inline VarType writeBit(VarType, uint8_t, boolean);
-template <typename VarType> static inline boolean isBitSet(VarType, uint8_t);
-template <typename VarType> static inline boolean isBitCleared(VarType, uint8_t);
+template <typename VarType> static inline bool readBit(VarType, uint8_t);
+template <typename VarType> static inline VarType writeBit(VarType, uint8_t, bool);
+template <typename VarType> static inline bool isBitSet(VarType, uint8_t);
+template <typename VarType> static inline bool isBitCleared(VarType, uint8_t);
 template <typename VarType, typename PositionType> static inline VarType shiftLeft(VarType, PositionType);
 template <typename VarType, typename PositionType> static inline VarType shiftRight(VarType, PositionType);
 template <typename VarType, typename MaskType, typename GroupType> static inline VarType readBitGroup(VarType, MaskType, GroupType, bool = true);
@@ -172,28 +172,28 @@ static inline VarType toggleBit(VarType Var, uint8_t Bit)
 
 /* read bit */
 template <typename VarType>
-static inline boolean readBit(VarType Var, uint8_t Bit)
+static inline bool readBit(VarType Var, uint8_t Bit)
 {
     return (Var & (UINT64_C(1) << Bit)) >> Bit;
 }
 
 /* write bit */
 template <typename VarType>
-static inline VarType writeBit(VarType Var, uint8_t Bit, boolean Value)
+static inline VarType writeBit(VarType Var, uint8_t Bit, bool Value)
 {
     return Var & ~(UINT64_C(1) << Bit) | (Value << Bit);
 }
 
 /* is bit set */
 template <typename VarType>
-static inline boolean isBitSet(VarType Var, uint8_t Bit)
+static inline bool isBitSet(VarType Var, uint8_t Bit)
 {
     return Var & (UINT64_C(1) << Bit);
 }
 
 /* is bit cleared */
 template <typename VarType>
-static inline boolean isBitCleared(VarType Var, uint8_t Bit)
+static inline bool isBitCleared(VarType Var, uint8_t Bit)
 {
     return !isBitSet(Var, Bit);
 }
