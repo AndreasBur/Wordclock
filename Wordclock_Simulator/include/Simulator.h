@@ -79,13 +79,13 @@ class Simulator : public wxFrame
         wxColor Colors[DISPLAY_NUMBER_OF_ROWS][DISPLAY_NUMBER_OF_COLUMNS];
         byte Pin;
         byte Brightness;
-
-        wxButton* BtnAbout;
-        wxButton* BtnQuit;
-        wxButton* BtnSend;
-
-        wxTextCtrl* Output;
-        wxTextCtrl* Input;
+//
+//        wxButton* BtnAbout;
+//        wxButton* BtnQuit;
+//        wxButton* BtnSend;
+//
+//        wxTextCtrl* Output;
+//        wxTextCtrl* Input;
 
         void OnClose(wxCloseEvent& event);
         void OnQuit(wxCommandEvent& event);

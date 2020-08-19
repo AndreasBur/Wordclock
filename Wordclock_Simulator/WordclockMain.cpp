@@ -60,7 +60,7 @@ WordclockDialog::~WordclockDialog()
 void WordclockDialog::OnClose(wxCloseEvent &event)
 {
     Timer.Stop();
-    Destroy();
+    Close();
 }
 
 void WordclockDialog::OnTimer(wxTimerEvent& event)

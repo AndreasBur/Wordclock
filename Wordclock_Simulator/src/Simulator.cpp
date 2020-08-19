@@ -27,7 +27,6 @@ END_EVENT_TABLE()
 Simulator::Simulator(wxFrame *dlg, const wxString &title) : wxFrame(dlg, -1, title)
 {
     Brightness = 255;
-    SetIcon(wxICON(WordclockIcon));
 
     SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DFACE));
     //this->SetSizeHints(wxDefaultSize, wxDefaultSize);
@@ -72,8 +71,8 @@ wxBoxSizer* Simulator::createSizerCharacters()
 wxBoxSizer* Simulator::createSizerButton()
 {
     wxBoxSizer* SizerButton = new wxBoxSizer(wxHORIZONTAL);
-    BtnAbout = new wxButton(this, ID_BUTTON_ABOUT, wxT("&About"), wxDefaultPosition, wxDefaultSize, 0);
-    BtnQuit = new wxButton(this, ID_BUTTON_QUIT, wxT("&Quit"), wxDefaultPosition, wxDefaultSize, 0);
+    wxButton* BtnAbout = new wxButton(this, ID_BUTTON_ABOUT, wxT("&About"), wxDefaultPosition, wxDefaultSize, 0);
+    wxButton* BtnQuit = new wxButton(this, ID_BUTTON_QUIT, wxT("&Quit"), wxDefaultPosition, wxDefaultSize, 0);
 
     SizerButton->Add(BtnAbout, 1, wxALL|wxEXPAND, 10);
     SizerButton->Add(BtnQuit, 1, wxALL|wxEXPAND, 10);
@@ -87,10 +86,10 @@ wxBoxSizer* Simulator::createSizerControl()
     wxStaticBoxSizer* SizerControl = new wxStaticBoxSizer(StaticBox, wxVERTICAL);
     wxStaticText* OutputLabel = new wxStaticText(this, wxID_ANY, _T("Output"));
     wxStaticText* InputLabel = new wxStaticText(this, wxID_ANY, _T("Input"));
-    BtnSend = new wxButton(this, ID_BUTTON_SEND, wxT("&Send"), wxDefaultPosition, wxDefaultSize, 0);
+    wxButton* BtnSend = new wxButton(this, ID_BUTTON_SEND, wxT("&Send"), wxDefaultPosition, wxDefaultSize, 0);
 
-    Output = new wxTextCtrl(this, ID_TEXT_CTRL_OUTPUT, _(""), wxDefaultPosition, wxSize(200, 200), wxTE_MULTILINE|wxTE_READONLY);
-    Input  = new wxTextCtrl(this, ID_TEXT_CTRL_INPUT, _(""), wxDefaultPosition, wxSize(200, 20));
+    wxTextCtrl* Output = new wxTextCtrl(this, ID_TEXT_CTRL_OUTPUT, _(""), wxDefaultPosition, wxSize(200, 200), wxTE_MULTILINE|wxTE_READONLY);
+    wxTextCtrl* Input  = new wxTextCtrl(this, ID_TEXT_CTRL_INPUT, _(""), wxDefaultPosition, wxSize(200, 20));
 
     SizerControl->Add(OutputLabel, 0, wxLEFT | wxTOP | wxEXPAND, 10);
     SizerControl->Add(Output, 0, wxRight | wxLEFT, 10);
@@ -103,21 +102,21 @@ wxBoxSizer* Simulator::createSizerControl()
 
 Simulator::~Simulator()
 {
+
 }
 
 void Simulator::OnClose(wxCloseEvent &event)
 {
-    wxTheApp->Exit();
+    //wxTheApp->Exit();
     //wxTheApp->AddPendingEvent(wxCloseEvent());
-    //wxTheApp->GetTopWindow()->Destroy();
-    //wxTheApp->GetTopWindow()->Destroy();
+    wxTheApp->GetTopWindow()->Close();
 }
 
 void Simulator::OnQuit(wxCommandEvent &event)
 {
-    wxTheApp->Exit();
+    //wxTheApp->Exit();
     //wxTheApp->AddPendingEvent(wxCloseEvent());
-    //wxTheApp->GetTopWindow()->Destroy();
+    wxTheApp->GetTopWindow()->Close();
 }
 
 void Simulator::OnAbout(wxCommandEvent &event)
