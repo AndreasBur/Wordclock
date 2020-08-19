@@ -27,6 +27,7 @@ END_EVENT_TABLE()
 Simulator::Simulator(wxFrame *dlg, const wxString &title) : wxFrame(dlg, -1, title)
 {
     Brightness = 255;
+    SetIcon(wxICON(WordclockIcon));
 
     SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DFACE));
     //this->SetSizeHints(wxDefaultSize, wxDefaultSize);
@@ -102,21 +103,21 @@ wxBoxSizer* Simulator::createSizerControl()
 
 Simulator::~Simulator()
 {
-
 }
 
 void Simulator::OnClose(wxCloseEvent &event)
 {
-    //wxTheApp->Exit();
+    wxTheApp->Exit();
     //wxTheApp->AddPendingEvent(wxCloseEvent());
-    wxTheApp->GetTopWindow()->Destroy();
+    //wxTheApp->GetTopWindow()->Destroy();
+    //wxTheApp->GetTopWindow()->Destroy();
 }
 
 void Simulator::OnQuit(wxCommandEvent &event)
 {
-    //wxTheApp->Exit();
+    wxTheApp->Exit();
     //wxTheApp->AddPendingEvent(wxCloseEvent());
-    wxTheApp->GetTopWindow()->Destroy();
+    //wxTheApp->GetTopWindow()->Destroy();
 }
 
 void Simulator::OnAbout(wxCommandEvent &event)

@@ -17,6 +17,11 @@
 class Simulator : public wxFrame
 {
     public:
+        static Simulator& getInstance() {
+            static Simulator* pSingletonInstance = new Simulator(0L, _("Wordclock Simulator"));
+            return *pSingletonInstance;
+        }
+
         /* type which describes the structure of a pixel */
         typedef struct {
             byte Red;
@@ -25,9 +30,6 @@ class Simulator : public wxFrame
         } PixelType;
 
         using SizerCharactersType = std::array<wxBoxSizer*, DISPLAY_NUMBER_OF_ROWS>;
-
-        Simulator(wxFrame *dlg, const wxString& title);
-        virtual ~Simulator();
 
         // get methods
         byte getBrightness() const { return Brightness; }
@@ -91,6 +93,8 @@ class Simulator : public wxFrame
         DECLARE_EVENT_TABLE()
 
         // functions
+        Simulator(wxFrame *dlg, const wxString& title);
+        virtual ~Simulator();
         void setAllPixels(wxColour);
         wxBoxSizer* createSizerCharacters();
         wxBoxSizer* createSizerCharacter(int Row);

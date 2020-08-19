@@ -84,11 +84,11 @@ void WordclockDialog::OnTimer(wxTimerEvent& event)
 
     //Clock::getInstance().getClockWords(Hour, Minute, NewTimeWords);
 
-    if(NewTimeWords != CurrentTimeWords) {
+    //if(NewTimeWords != CurrentTimeWords) {
         //CurrentTimeWords = NewTimeWords;
         //WcDisplay.clearAllWords();
         //WcDisplay.clear();
         //WcClock.setClock(Hour, Minute);
         //WcClock.show();
-    }
+    //}
 }

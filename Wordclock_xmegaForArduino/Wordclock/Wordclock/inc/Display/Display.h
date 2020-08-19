@@ -149,7 +149,7 @@ class Display
 ******************************************************************************************************************************************************/
   public:
     static Display& getInstance() {
-        static Display SingletonInstance(0u, 0u, 0u);
+        static Display SingletonInstance(255u, 255u, 255u);
         return SingletonInstance;
     }
 

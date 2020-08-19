@@ -9,10 +9,10 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       Display.cpp
- *      \brief      
+ *      \brief
  *
- *      \details    
- *                  
+ *      \details
+ *
  *
 ******************************************************************************************************************************************************/
 #define _DISPLAY_SOURCE_
@@ -62,7 +62,7 @@ void Display::setBrightness(byte sBrightness)
 {
     Brightness = sBrightness;
     byte BrightnessCorrected;
-    
+
     if(BrightnessAutomatic == true) {
         BrightnessCorrected = GCorrection.getCorrectedValue(calculateBrightnessAutomaticCorrected(Brightness));
     } else {
@@ -148,8 +148,8 @@ void Display::clearWordFast(WordIdType WordId)
 {
     DisplayWord word = Words.getDisplayWordFast(WordId);
 
-    for(byte Index = 0; Index < word.getLength(); Index++) { 
-        clearPixelFast(word.getColumn() + Index,  word.getRow()); 
+    for(byte Index = 0; Index < word.getLength(); Index++) {
+        clearPixelFast(word.getColumn() + Index,  word.getRow());
     }
 } /* clearWordFast */
 
@@ -443,7 +443,7 @@ StdReturnType Display::getPixelRow(byte Row, PixelRowType& PixelRow) const
 Display::PixelRowType Display::getPixelRowFast(byte Row)  const
 {
     PixelRowType pixelRow{0};
-    
+
     for(byte column = 0; column < DISPLAY_NUMBER_OF_COLUMNS; column++) {
         WRITE_BIT(pixelRow, column, getPixelFast(column, Row));
     }
@@ -476,7 +476,7 @@ StdReturnType Display::getPixelColumn(byte Column, PixelRowType& PixelColumn)  c
 Display::PixelColumnType Display::getPixelColumnFast(byte Column)  const
 {
     Display::PixelColumnType pixelColumn{0};
-    
+
     for(byte row = 0; row < DISPLAY_NUMBER_OF_ROWS; row++) {
         WRITE_BIT(pixelColumn, row, getPixelFast(Column, row));
     }
@@ -540,25 +540,18 @@ void Display::setPixelColumnFast(byte Column, PixelRowType PixelColumn)
 /******************************************************************************************************************************************************
   Constructor of Display
 ******************************************************************************************************************************************************/
-Display::Display(PixelColorType sColor) 
-#ifdef SIMULATOR
-: Pixels(0L, _("Wordclock Simulator"))
-#elif (WS2812_IS_SINGLETON == STD_OFF)
+Display::Display(PixelColorType sColor)
+#if (WS2812_IS_SINGLETON == STD_OFF)
 : Pixels()
 #endif
 {
     BrightnessAutomatic = false;
     State = STATE_UNINIT;
     Color = sColor;
-    
+
 #if (DISPLAY_USE_WS2812_DIMMING == STD_OFF)
     Brightness = 255;
     ColorDimmed = Color;
-#endif
-
-#ifdef SIMULATOR
-    Pixels.SetIcon(wxICON(WordclockIcon));
-    Pixels.Show();
 #endif
 } /* Display */
 
@@ -567,9 +560,7 @@ Display::Display(PixelColorType sColor)
   Constructor of Display
 ******************************************************************************************************************************************************/
 Display::Display(ColorType Red, ColorType Green, ColorType Blue)
-#ifdef SIMULATOR
-: Pixels(0L, _("Wordclock Simulator"))
-#elif (WS2812_IS_SINGLETON == STD_OFF)
+#if (WS2812_IS_SINGLETON == STD_OFF)
 : Pixels()
 #endif
 {
@@ -581,11 +572,6 @@ Display::Display(ColorType Red, ColorType Green, ColorType Blue)
 #if (DISPLAY_USE_WS2812_DIMMING == STD_OFF)
     Brightness = 255;
     ColorDimmed = Color;
-#endif
-
-#ifdef SIMULATOR
-    Pixels.SetIcon(wxICON(WordclockIcon));
-    Pixels.Show();
 #endif
 } /* Display */
 
@@ -606,9 +592,9 @@ byte Display::calculateBrightnessAutomaticCorrected(byte sBrightness) const
      IlluminanceType Illuminance = BH1750::getInstance().getIlluminance();
      IlluminanceType IlluminanceMax = BH1750::getInstance().getCalibrationValuesMaxValue();
      float IlluminanceFactor = static_cast<float>(Illuminance) / IlluminanceMax;
-     
+
      return static_cast<byte>(sBrightness * IlluminanceFactor * DISPLAY_BRIGHTNESS_AUTOMATIC_CORRECTION_FACTOR);
-} /* calculateBrightnessAutomaticCorrected */ 
+} /* calculateBrightnessAutomaticCorrected */
 
 /******************************************************************************************************************************************************
   transformToSerpentine()
@@ -619,7 +605,7 @@ byte Display::transformToSerpentine(byte Column, byte Row) const
 
     if(IS_BIT_CLEARED(Row, 0)) index = (Row * DISPLAY_NUMBER_OF_COLUMNS) + Column;
     else index = (Row * DISPLAY_NUMBER_OF_COLUMNS) + (DISPLAY_NUMBER_OF_COLUMNS - Column - 1);
-    
+
     return index;
 } /* transformToSerpentine */
 
@@ -631,7 +617,7 @@ byte Display::transformToSerpentine(byte Index) const
 {
     byte column = indexToColumn(Index);
     byte row = indexToRow(Index);
-  
+
     return transformToSerpentine(column, row);
 } /* transformToSerpentine */
 
