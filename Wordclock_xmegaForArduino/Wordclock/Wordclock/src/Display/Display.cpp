@@ -537,17 +537,15 @@ void Display::setPixelColumnFast(byte Column, PixelRowType PixelColumn)
 /******************************************************************************************************************************************************
   Constructor of Display
 ******************************************************************************************************************************************************/
-Display::Display(PixelColorType sColor) 
-#ifdef SIMULATOR
-: Pixels(0L, _("Wordclock Simulator"))
-#elif (WS2812_IS_SINGLETON == STD_OFF)
+Display::Display(PixelColorType sColor)
+#if (WS2812_IS_SINGLETON == STD_OFF)
 : Pixels()
 #endif
 {
     BrightnessAutomatic = false;
     State = STATE_UNINIT;
     Color = sColor;
-    
+
 #if (DISPLAY_USE_WS2812_DIMMING == STD_OFF)
     Brightness = 255;
     ColorDimmed = Color;
@@ -564,9 +562,7 @@ Display::Display(PixelColorType sColor)
   Constructor of Display
 ******************************************************************************************************************************************************/
 Display::Display(ColorType Red, ColorType Green, ColorType Blue)
-#ifdef SIMULATOR
-: Pixels(0L, _("Wordclock Simulator"))
-#elif (WS2812_IS_SINGLETON == STD_OFF)
+#if (WS2812_IS_SINGLETON == STD_OFF)
 : Pixels()
 #endif
 {

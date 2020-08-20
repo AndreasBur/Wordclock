@@ -5,13 +5,11 @@
 #include <wx/button.h>
 
 #include "StandardTypes.h"
-#include "Arduino.h"
-#include "DisplayCharacters.h"
+//#include "DisplayCharacters.h"
 
 
-#define DISPLAY_NUMBER_OF_ROWS                  DISPLAY_CHARACTERS_NUMBER_OF_ROWS
-#define DISPLAY_NUMBER_OF_COLUMNS               DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS
-#define SIMULATOR
+#define SIMULATOR_DISPLAY_NUMBER_OF_ROWS                  11u
+#define SIMULATOR_DISPLAY_NUMBER_OF_COLUMNS               10u
 
 
 class Simulator : public wxFrame
@@ -29,7 +27,7 @@ class Simulator : public wxFrame
             byte Blue;
         } PixelType;
 
-        using SizerCharactersType = std::array<wxBoxSizer*, DISPLAY_NUMBER_OF_ROWS>;
+        using SizerCharactersType = std::array<wxBoxSizer*, SIMULATOR_DISPLAY_NUMBER_OF_ROWS>;
 
         // get methods
         byte getBrightness() const { return Brightness; }
@@ -59,6 +57,14 @@ class Simulator : public wxFrame
             return E_OK;
         }
 
+        void println() { Output->AppendText(_T("\n")); }
+        void print(const char* Text) { Output->AppendText(Text); }
+        void print(int Number) { Output->AppendText(wxString::Format(wxT("%i"), Number)); }
+        void println(const char* Text) { print(Text); println(); }
+        void println(int Number) { print(Number); println(); }
+
+        bool available() { return false; }
+        char read() { return ' '; }
 
     protected:
 
@@ -78,8 +84,8 @@ class Simulator : public wxFrame
         wxTextCtrl* Output;
         //wxTextCtrl* Output;
 
-        wxStaticText* Characters[DISPLAY_NUMBER_OF_ROWS][DISPLAY_NUMBER_OF_COLUMNS];
-        wxColor Colors[DISPLAY_NUMBER_OF_ROWS][DISPLAY_NUMBER_OF_COLUMNS];
+        wxStaticText* Characters[SIMULATOR_DISPLAY_NUMBER_OF_ROWS][SIMULATOR_DISPLAY_NUMBER_OF_COLUMNS];
+        wxColor Colors[SIMULATOR_DISPLAY_NUMBER_OF_ROWS][SIMULATOR_DISPLAY_NUMBER_OF_COLUMNS];
         byte Pin{0};
         byte Brightness{255};
 

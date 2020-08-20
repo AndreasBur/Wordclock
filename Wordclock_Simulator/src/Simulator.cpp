@@ -6,7 +6,7 @@
 #include "WordclockIcon.xpm"
 #endif
 
-const wxString DisplayCharacters[][DISPLAY_NUMBER_OF_COLUMNS] =
+const wxString DisplayCharacters[][SIMULATOR_DISPLAY_NUMBER_OF_COLUMNS] =
 {
     wxT("E"),wxT("S"),wxT("K"),wxT("I"),wxT("S"),wxT("T"),wxT("L"),wxT("F"),wxT("Ü"),wxT("N"),wxT("F"),
     wxT("Z"),wxT("E"),wxT("H"),wxT("N"),wxT("Z"),wxT("W"),wxT("A"),wxT("N"),wxT("Z"),wxT("I"),wxT("G"),
@@ -63,7 +63,7 @@ wxBoxSizer* Simulator::createSizerCharacters(wxWindow* Parent)
 {
     wxBoxSizer* SizerCharacters = new wxBoxSizer(wxVERTICAL);
 
-    for(unsigned int Row = 0; Row < DISPLAY_NUMBER_OF_ROWS; Row++) {
+    for(unsigned int Row = 0; Row < SIMULATOR_DISPLAY_NUMBER_OF_ROWS; Row++) {
         SizerCharacters->Add(createSizerCharacter(Parent, Row), 1, wxEXPAND, 5);
     }
 
@@ -74,7 +74,7 @@ wxBoxSizer* Simulator::createSizerCharacter(wxWindow* Parent, int Row)
 {
     wxBoxSizer* SizerCharacter = new wxBoxSizer(wxHORIZONTAL);
 
-    for(unsigned int Column = 0; Column < DISPLAY_NUMBER_OF_COLUMNS; Column++) {
+    for(unsigned int Column = 0; Column < SIMULATOR_DISPLAY_NUMBER_OF_COLUMNS; Column++) {
         Characters[Row][Column] = new wxStaticText(Parent, wxID_ANY, DisplayCharacters[Row][Column], wxDefaultPosition, wxDefaultSize, 0);
         Characters[Row][Column]->SetFont(wxFont(wxSize(40,40), wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false));
         Characters[Row][Column]->SetForegroundColour(wxColour(*wxLIGHT_GREY));
@@ -153,8 +153,8 @@ void Simulator::OnAbout(wxCommandEvent &event)
 
 StdReturnType Simulator::getPixel(byte Index, PixelType& Pixel) const
 {
-    byte Row = Index / DISPLAY_NUMBER_OF_COLUMNS;
-    byte Column = Index % DISPLAY_NUMBER_OF_COLUMNS;
+    byte Row = Index / SIMULATOR_DISPLAY_NUMBER_OF_COLUMNS;
+    byte Column = Index % SIMULATOR_DISPLAY_NUMBER_OF_COLUMNS;
 
     if (Index < WS2812_NUMBER_OF_LEDS) {
         if(Characters[Row][Column]->GetForegroundColour() == wxColor(*wxBLACK)) {
@@ -175,8 +175,8 @@ StdReturnType Simulator::getPixel(byte Index, PixelType& Pixel) const
 WS2812::PixelType Simulator::getPixelFast(byte Index) const
 {
     PixelType Pixel;
-    byte Row = Index / DISPLAY_NUMBER_OF_COLUMNS;
-    byte Column = Index % DISPLAY_NUMBER_OF_COLUMNS;
+    byte Row = Index / SIMULATOR_DISPLAY_NUMBER_OF_COLUMNS;
+    byte Column = Index % SIMULATOR_DISPLAY_NUMBER_OF_COLUMNS;
 
     if(Characters[Row][Column]->GetForegroundColour() == wxColor(*wxBLACK)) {
         Pixel.Blue = 255;
@@ -192,8 +192,8 @@ WS2812::PixelType Simulator::getPixelFast(byte Index) const
 
 StdReturnType Simulator::setPixel(byte Index, PixelType Pixel)
 {
-    byte Row = Index / DISPLAY_NUMBER_OF_COLUMNS;
-    byte Column = Index % DISPLAY_NUMBER_OF_COLUMNS;
+    byte Row = Index / SIMULATOR_DISPLAY_NUMBER_OF_COLUMNS;
+    byte Column = Index % SIMULATOR_DISPLAY_NUMBER_OF_COLUMNS;
 
     if (Index < WS2812_NUMBER_OF_LEDS) {
         if(Pixel.Red != 0 || Pixel.Green != 0 || Pixel.Blue != 0) {
@@ -209,8 +209,8 @@ StdReturnType Simulator::setPixel(byte Index, PixelType Pixel)
 
 StdReturnType Simulator::setPixel(byte Index, byte Red, byte Green, byte Blue)
 {
-    byte Row = Index / DISPLAY_NUMBER_OF_COLUMNS;
-    byte Column = Index % DISPLAY_NUMBER_OF_COLUMNS;
+    byte Row = Index / SIMULATOR_DISPLAY_NUMBER_OF_COLUMNS;
+    byte Column = Index % SIMULATOR_DISPLAY_NUMBER_OF_COLUMNS;
 
     if (Index < WS2812_NUMBER_OF_LEDS) {
         if(Red != 0 || Green != 0 || Blue != 0) {
@@ -226,8 +226,8 @@ StdReturnType Simulator::setPixel(byte Index, byte Red, byte Green, byte Blue)
 
 void Simulator::setPixelFast(byte Index, PixelType Pixel)
 {
-    byte Row = Index / DISPLAY_NUMBER_OF_COLUMNS;
-    byte Column = Index % DISPLAY_NUMBER_OF_COLUMNS;
+    byte Row = Index / SIMULATOR_DISPLAY_NUMBER_OF_COLUMNS;
+    byte Column = Index % SIMULATOR_DISPLAY_NUMBER_OF_COLUMNS;
 
     if(Index >= WS2812_NUMBER_OF_LEDS ) {
         // set breakpoint to find index out of bounce calls
@@ -242,8 +242,8 @@ void Simulator::setPixelFast(byte Index, PixelType Pixel)
 
 void Simulator::setPixelFast(byte Index, byte Red, byte Green, byte Blue)
 {
-    byte Row = Index / DISPLAY_NUMBER_OF_COLUMNS;
-    byte Column = Index % DISPLAY_NUMBER_OF_COLUMNS;
+    byte Row = Index / SIMULATOR_DISPLAY_NUMBER_OF_COLUMNS;
+    byte Column = Index % SIMULATOR_DISPLAY_NUMBER_OF_COLUMNS;
 
     if(Index >= WS2812_NUMBER_OF_LEDS ) {
         // set breakpoint to find index out of bounce calls
@@ -263,8 +263,8 @@ void Simulator::clearPixels()
 
 void Simulator::setAllPixels(wxColor Color)
 {
-    for(unsigned int Row = 0; Row < DISPLAY_NUMBER_OF_ROWS; Row++) {
-        for(unsigned int Column = 0; Column < DISPLAY_NUMBER_OF_COLUMNS; Column++) {
+    for(unsigned int Row = 0; Row < SIMULATOR_DISPLAY_NUMBER_OF_ROWS; Row++) {
+        for(unsigned int Column = 0; Column < SIMULATOR_DISPLAY_NUMBER_OF_COLUMNS; Column++) {
             Characters[Row][Column]->SetForegroundColour(Color);
         }
     }
@@ -276,15 +276,15 @@ void Simulator::setBrightness(byte sBrightness, bool GammaCorrection)
 
     if(Brightness == 0)
     {
-        for(unsigned int Row = 0; Row < DISPLAY_NUMBER_OF_ROWS; Row++) {
-            for(unsigned int Column = 0; Column < DISPLAY_NUMBER_OF_COLUMNS; Column++) {
+        for(unsigned int Row = 0; Row < SIMULATOR_DISPLAY_NUMBER_OF_ROWS; Row++) {
+            for(unsigned int Column = 0; Column < SIMULATOR_DISPLAY_NUMBER_OF_COLUMNS; Column++) {
                 Colors[Row][Column] = Characters[Row][Column]->GetForegroundColour();
             }
         }
         setAllPixels(wxColour(*wxLIGHT_GREY));
     } else {
-        for(unsigned int Row = 0; Row < DISPLAY_NUMBER_OF_ROWS; Row++) {
-            for(unsigned int Column = 0; Column < DISPLAY_NUMBER_OF_COLUMNS; Column++) {
+        for(unsigned int Row = 0; Row < SIMULATOR_DISPLAY_NUMBER_OF_ROWS; Row++) {
+            for(unsigned int Column = 0; Column < SIMULATOR_DISPLAY_NUMBER_OF_COLUMNS; Column++) {
                 Characters[Row][Column]->SetForegroundColour(Colors[Row][Column]);
             }
         }
