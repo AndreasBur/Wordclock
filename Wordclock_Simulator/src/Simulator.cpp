@@ -31,8 +31,11 @@ Simulator::Simulator(wxFrame *dlg, const wxString &title) : wxFrame(dlg, -1, tit
     SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DFACE));
     //this->SetSizeHints(wxDefaultSize, wxDefaultSize);
 
+    wxScrolledWindow* ScrolledWindow = new wxScrolledWindow(this);
+    ScrolledWindows->
     wxBoxSizer* SizerAll = new wxBoxSizer(wxHORIZONTAL);
 
+    SizerAll->
     SizerAll->Add(createSizerCharacters(), 1, wxALL|wxEXPAND, 10);
     //SizerAll->Add(createSizerButton(), 1, wxEXPAND, 5);
     SizerAll->Add(createSizerControl(), 0, wxALL|wxEXPAND, 10);
@@ -40,6 +43,7 @@ Simulator::Simulator(wxFrame *dlg, const wxString &title) : wxFrame(dlg, -1, tit
     this->SetSizer(SizerAll);
     this->Layout();
     SizerAll->Fit(this);
+    Show();
 }
 
 wxBoxSizer* Simulator::createSizerCharacter(int Row)
@@ -71,11 +75,11 @@ wxBoxSizer* Simulator::createSizerCharacters()
 wxBoxSizer* Simulator::createSizerButton()
 {
     wxBoxSizer* SizerButton = new wxBoxSizer(wxHORIZONTAL);
-    wxButton* BtnAbout = new wxButton(this, ID_BUTTON_ABOUT, wxT("&About"), wxDefaultPosition, wxDefaultSize, 0);
-    wxButton* BtnQuit = new wxButton(this, ID_BUTTON_QUIT, wxT("&Quit"), wxDefaultPosition, wxDefaultSize, 0);
+    wxButton* About = new wxButton(this, ID_BUTTON_ABOUT, wxT("&About"), wxDefaultPosition, wxDefaultSize, 0);
+    wxButton* Quit = new wxButton(this, ID_BUTTON_QUIT, wxT("&Quit"), wxDefaultPosition, wxDefaultSize, 0);
 
-    SizerButton->Add(BtnAbout, 1, wxALL|wxEXPAND, 10);
-    SizerButton->Add(BtnQuit, 1, wxALL|wxEXPAND, 10);
+    SizerButton->Add(About, 1, wxALL|wxEXPAND, 10);
+    SizerButton->Add(Quit, 1, wxALL|wxEXPAND, 10);
 
     return SizerButton;
 }
@@ -86,16 +90,18 @@ wxBoxSizer* Simulator::createSizerControl()
     wxStaticBoxSizer* SizerControl = new wxStaticBoxSizer(StaticBox, wxVERTICAL);
     wxStaticText* OutputLabel = new wxStaticText(this, wxID_ANY, _T("Output"));
     wxStaticText* InputLabel = new wxStaticText(this, wxID_ANY, _T("Input"));
-    wxButton* BtnSend = new wxButton(this, ID_BUTTON_SEND, wxT("&Send"), wxDefaultPosition, wxDefaultSize, 0);
+    wxButton* Send = new wxButton(this, ID_BUTTON_SEND, wxT("&Send"), wxDefaultPosition, wxDefaultSize, 0);
+    wxButton* Clear = new wxButton(this, ID_BUTTON_CLEAR, wxT("&Clear"), wxDefaultPosition, wxDefaultSize, 0);
 
     wxTextCtrl* Output = new wxTextCtrl(this, ID_TEXT_CTRL_OUTPUT, _(""), wxDefaultPosition, wxSize(200, 200), wxTE_MULTILINE|wxTE_READONLY);
     wxTextCtrl* Input  = new wxTextCtrl(this, ID_TEXT_CTRL_INPUT, _(""), wxDefaultPosition, wxSize(200, 20));
 
     SizerControl->Add(OutputLabel, 0, wxLEFT | wxTOP | wxEXPAND, 10);
     SizerControl->Add(Output, 0, wxRight | wxLEFT, 10);
+    SizerControl->Add(Clear, 0, wxTOP | wxRIGHT | wxLEFT | wxEXPAND, 10);
     SizerControl->Add(InputLabel, 0, wxLEFT | wxTOP, 10);
     SizerControl->Add(Input, 0, wxRIGHT | wxLEFT, 10);
-    SizerControl->Add(BtnSend, 0, wxTOP | wxRIGHT | wxLEFT | wxEXPAND, 10);
+    SizerControl->Add(Send, 0, wxTOP | wxRIGHT | wxLEFT | wxEXPAND, 10);
 
     return SizerControl;
 }

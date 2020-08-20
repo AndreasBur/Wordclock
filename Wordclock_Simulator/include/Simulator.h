@@ -69,6 +69,7 @@ class Simulator : public wxFrame
         {
             ID_BUTTON_QUIT = 1000,
             ID_BUTTON_ABOUT,
+            ID_BUTTON_CLEAR,
             ID_BUTTON_SEND,
             ID_TEXT_CTRL_OUTPUT,
             ID_TEXT_CTRL_INPUT,
@@ -79,13 +80,6 @@ class Simulator : public wxFrame
         wxColor Colors[DISPLAY_NUMBER_OF_ROWS][DISPLAY_NUMBER_OF_COLUMNS];
         byte Pin;
         byte Brightness;
-//
-//        wxButton* BtnAbout;
-//        wxButton* BtnQuit;
-//        wxButton* BtnSend;
-//
-//        wxTextCtrl* Output;
-//        wxTextCtrl* Input;
 
         void OnClose(wxCloseEvent& event);
         void OnQuit(wxCommandEvent& event);
