@@ -64,7 +64,6 @@ class Simulator : public wxFrame
 
 
     private:
-
         enum
         {
             ID_BUTTON_QUIT = 1000,
@@ -76,24 +75,29 @@ class Simulator : public wxFrame
             ID_STATIC_BOX
         };
 
+        wxTextCtrl* Output;
+        //wxTextCtrl* Output;
+
         wxStaticText* Characters[DISPLAY_NUMBER_OF_ROWS][DISPLAY_NUMBER_OF_COLUMNS];
         wxColor Colors[DISPLAY_NUMBER_OF_ROWS][DISPLAY_NUMBER_OF_COLUMNS];
-        byte Pin;
-        byte Brightness;
+        byte Pin{0};
+        byte Brightness{255};
 
-        void OnClose(wxCloseEvent& event);
-        void OnQuit(wxCommandEvent& event);
-        void OnAbout(wxCommandEvent& event);
+        void OnClose(wxCloseEvent&);
+        void OnClear(wxCommandEvent&);
+        void OnAbout(wxCommandEvent&);
+        void OnQuit(wxCommandEvent&);
         DECLARE_EVENT_TABLE()
 
         // functions
-        Simulator(wxFrame *dlg, const wxString& title);
+        Simulator(wxWindow*, const wxString&);
         virtual ~Simulator();
         void setAllPixels(wxColour);
-        wxBoxSizer* createSizerCharacters();
-        wxBoxSizer* createSizerCharacter(int Row);
-        wxBoxSizer* createSizerButton();
-        wxBoxSizer* createSizerControl();
+        wxBoxSizer* createSizerAll(wxWindow*);
+        wxBoxSizer* createSizerCharacters(wxWindow*);
+        wxBoxSizer* createSizerCharacter(wxWindow*, int Row);
+        wxBoxSizer* createSizerButton(wxWindow*);
+        wxBoxSizer* createSizerControl(wxWindow*);
 };
 
 #endif // SIMULATOR_H

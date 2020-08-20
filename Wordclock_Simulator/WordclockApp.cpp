@@ -16,13 +16,31 @@
 #endif //__BORLANDC__
 
 #include "WordclockApp.h"
-#include "WordclockMain.h"
 
 IMPLEMENT_APP(WordclockApp);
 
+wxBEGIN_EVENT_TABLE(WordclockApp, wxApp)
+    EVT_CLOSE(WordclockApp::OnClose)
+    EVT_TIMER(TIMER_ID, WordclockApp::OnTimer)
+wxEND_EVENT_TABLE()
+
+WordclockApp::WordclockApp() : Timer(this, TIMER_ID)
+{
+    Timer.Start(1000);
+}
+
 bool WordclockApp::OnInit()
 {
-    WordclockDialog* dlg = new WordclockDialog(0L, wxT(""));
-    //dlg->Show();
+    Simulator::getInstance().Show();
     return true;
+}
+
+void WordclockApp::OnClose(wxCloseEvent &event)
+{
+    Timer.Stop();
+}
+
+void WordclockApp::OnTimer(wxTimerEvent& event)
+{
+    Wordclock.task();
 }

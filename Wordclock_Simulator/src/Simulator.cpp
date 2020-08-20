@@ -2,6 +2,10 @@
 #include "WS2812.h"
 #include <array>
 
+#if defined(SIMULATOR) && (defined(__APPLE__ ) || defined(__linux__))
+#include "WordclockIcon.xpm"
+#endif
+
 const wxString DisplayCharacters[][DISPLAY_NUMBER_OF_COLUMNS] =
 {
     wxT("E"),wxT("S"),wxT("K"),wxT("I"),wxT("S"),wxT("T"),wxT("L"),wxT("F"),wxT("Ü"),wxT("N"),wxT("F"),
@@ -19,40 +23,59 @@ const wxString DisplayCharacters[][DISPLAY_NUMBER_OF_COLUMNS] =
 
 BEGIN_EVENT_TABLE(Simulator, wxFrame)
     EVT_CLOSE(Simulator::OnClose)
-    EVT_BUTTON(ID_BUTTON_QUIT, Simulator::OnQuit)
+    EVT_BUTTON(ID_BUTTON_CLEAR, Simulator::OnClear)
     EVT_BUTTON(ID_BUTTON_ABOUT, Simulator::OnAbout)
+    EVT_BUTTON(ID_BUTTON_QUIT, Simulator::OnQuit)
 END_EVENT_TABLE()
 
 
-Simulator::Simulator(wxFrame *dlg, const wxString &title) : wxFrame(dlg, -1, title)
+Simulator::Simulator(wxWindow* parent, const wxString &title) : wxFrame(parent, -1, title)
 {
-    Brightness = 255;
-
+    SetIcon(wxICON(WordclockIcon));
     SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DFACE));
     //this->SetSizeHints(wxDefaultSize, wxDefaultSize);
 
     wxScrolledWindow* ScrolledWindow = new wxScrolledWindow(this);
-    ScrolledWindows->
-    wxBoxSizer* SizerAll = new wxBoxSizer(wxHORIZONTAL);
 
-    SizerAll->
-    SizerAll->Add(createSizerCharacters(), 1, wxALL|wxEXPAND, 10);
-    //SizerAll->Add(createSizerButton(), 1, wxEXPAND, 5);
-    SizerAll->Add(createSizerControl(), 0, wxALL|wxEXPAND, 10);
+    ScrolledWindow->SetSizer(createSizerAll(ScrolledWindow));
+    ScrolledWindow->FitInside();
+    ScrolledWindow->SetScrollRate(5, 5);
+    ScrolledWindow->Show();
 
-    this->SetSizer(SizerAll);
     this->Layout();
-    SizerAll->Fit(this);
-    Show();
 }
 
-wxBoxSizer* Simulator::createSizerCharacter(int Row)
+wxBoxSizer* Simulator::createSizerAll(wxWindow* Parent)
+{
+    wxBoxSizer* SizerAll = new wxBoxSizer(wxHORIZONTAL);
+    wxBoxSizer* SizerControl = createSizerControl(Parent);
+    SizerControl->AddStretchSpacer();
+    SizerControl->Add(createSizerButton(Parent), 0, wxEXPAND);
+
+    SizerAll->Add(createSizerCharacters(Parent), 1, wxALL|wxEXPAND, 10);
+    SizerAll->Add(SizerControl, 0, wxALL|wxEXPAND, 10);
+    SizerAll->Fit(this);
+
+    return SizerAll;
+}
+
+wxBoxSizer* Simulator::createSizerCharacters(wxWindow* Parent)
+{
+    wxBoxSizer* SizerCharacters = new wxBoxSizer(wxVERTICAL);
+
+    for(unsigned int Row = 0; Row < DISPLAY_NUMBER_OF_ROWS; Row++) {
+        SizerCharacters->Add(createSizerCharacter(Parent, Row), 1, wxEXPAND, 5);
+    }
+
+    return SizerCharacters;
+}
+
+wxBoxSizer* Simulator::createSizerCharacter(wxWindow* Parent, int Row)
 {
     wxBoxSizer* SizerCharacter = new wxBoxSizer(wxHORIZONTAL);
 
-    for(unsigned int Column = 0; Column < DISPLAY_NUMBER_OF_COLUMNS; Column++)
-    {
-        Characters[Row][Column] = new wxStaticText(this, wxID_ANY, DisplayCharacters[Row][Column], wxDefaultPosition, wxDefaultSize, 0);
+    for(unsigned int Column = 0; Column < DISPLAY_NUMBER_OF_COLUMNS; Column++) {
+        Characters[Row][Column] = new wxStaticText(Parent, wxID_ANY, DisplayCharacters[Row][Column], wxDefaultPosition, wxDefaultSize, 0);
         Characters[Row][Column]->SetFont(wxFont(wxSize(40,40), wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false));
         Characters[Row][Column]->SetForegroundColour(wxColour(*wxLIGHT_GREY));
         SizerCharacter->Add(Characters[Row][Column], 1, wxALL|wxEXPAND, 5);
@@ -61,40 +84,29 @@ wxBoxSizer* Simulator::createSizerCharacter(int Row)
     return SizerCharacter;
 }
 
-wxBoxSizer* Simulator::createSizerCharacters()
-{
-    wxBoxSizer* SizerCharacters = new wxBoxSizer(wxVERTICAL);
-
-    for(unsigned int Row = 0; Row < DISPLAY_NUMBER_OF_ROWS; Row++) {
-        SizerCharacters->Add(createSizerCharacter(Row), 1, wxEXPAND, 5);
-    }
-
-    return SizerCharacters;
-}
-
-wxBoxSizer* Simulator::createSizerButton()
+wxBoxSizer* Simulator::createSizerButton(wxWindow* Parent)
 {
     wxBoxSizer* SizerButton = new wxBoxSizer(wxHORIZONTAL);
-    wxButton* About = new wxButton(this, ID_BUTTON_ABOUT, wxT("&About"), wxDefaultPosition, wxDefaultSize, 0);
-    wxButton* Quit = new wxButton(this, ID_BUTTON_QUIT, wxT("&Quit"), wxDefaultPosition, wxDefaultSize, 0);
+    wxButton* About = new wxButton(Parent, ID_BUTTON_ABOUT, wxT("&About"), wxDefaultPosition, wxDefaultSize, 0);
+    wxButton* Quit = new wxButton(Parent, ID_BUTTON_QUIT, wxT("&Quit"), wxDefaultPosition, wxDefaultSize, 0);
 
-    SizerButton->Add(About, 1, wxALL|wxEXPAND, 10);
-    SizerButton->Add(Quit, 1, wxALL|wxEXPAND, 10);
+    SizerButton->Add(About, 1, wxALL | wxEXPAND, 10);
+    SizerButton->Add(Quit, 1, wxALL | wxEXPAND, 10);
 
     return SizerButton;
 }
 
-wxBoxSizer* Simulator::createSizerControl()
+wxBoxSizer* Simulator::createSizerControl(wxWindow* Parent)
 {
-    wxStaticBox* StaticBox = new wxStaticBox(this, ID_STATIC_BOX, _T("Control"));
+    wxStaticBox* StaticBox = new wxStaticBox(Parent, ID_STATIC_BOX, _T("Control"));
     wxStaticBoxSizer* SizerControl = new wxStaticBoxSizer(StaticBox, wxVERTICAL);
-    wxStaticText* OutputLabel = new wxStaticText(this, wxID_ANY, _T("Output"));
-    wxStaticText* InputLabel = new wxStaticText(this, wxID_ANY, _T("Input"));
-    wxButton* Send = new wxButton(this, ID_BUTTON_SEND, wxT("&Send"), wxDefaultPosition, wxDefaultSize, 0);
-    wxButton* Clear = new wxButton(this, ID_BUTTON_CLEAR, wxT("&Clear"), wxDefaultPosition, wxDefaultSize, 0);
+    wxStaticText* OutputLabel = new wxStaticText(Parent, wxID_ANY, _T("Output"));
+    wxStaticText* InputLabel = new wxStaticText(Parent, wxID_ANY, _T("Input"));
+    wxButton* Send = new wxButton(Parent, ID_BUTTON_SEND, wxT("&Send"), wxDefaultPosition, wxDefaultSize, 0);
+    wxButton* Clear = new wxButton(Parent, ID_BUTTON_CLEAR, wxT("&Clear"), wxDefaultPosition, wxDefaultSize, 0);
 
-    wxTextCtrl* Output = new wxTextCtrl(this, ID_TEXT_CTRL_OUTPUT, _(""), wxDefaultPosition, wxSize(200, 200), wxTE_MULTILINE|wxTE_READONLY);
-    wxTextCtrl* Input  = new wxTextCtrl(this, ID_TEXT_CTRL_INPUT, _(""), wxDefaultPosition, wxSize(200, 20));
+    Output = new wxTextCtrl(Parent, ID_TEXT_CTRL_OUTPUT, _(""), wxDefaultPosition, wxSize(200, 200), wxTE_MULTILINE|wxTE_READONLY);
+    wxTextCtrl* Input  = new wxTextCtrl(Parent, ID_TEXT_CTRL_INPUT, _(""), wxDefaultPosition, wxSize(200, 20));
 
     SizerControl->Add(OutputLabel, 0, wxLEFT | wxTOP | wxEXPAND, 10);
     SizerControl->Add(Output, 0, wxRight | wxLEFT, 10);
@@ -115,20 +127,29 @@ void Simulator::OnClose(wxCloseEvent &event)
 {
     //wxTheApp->Exit();
     //wxTheApp->AddPendingEvent(wxCloseEvent());
-    wxTheApp->GetTopWindow()->Close();
+    //wxTheApp->GetTopWindow()->Destroy();
+    //wxTheApp->GetTopWindow()->Close();
+    Destroy();
+}
+
+void Simulator::OnClear(wxCommandEvent &event)
+{
+    Output->Clear();
 }
 
 void Simulator::OnQuit(wxCommandEvent &event)
 {
     //wxTheApp->Exit();
     //wxTheApp->AddPendingEvent(wxCloseEvent());
-    wxTheApp->GetTopWindow()->Close();
+    //wxTheApp->GetTopWindow()->Destroy();
+    Destroy();
 }
 
 void Simulator::OnAbout(wxCommandEvent &event)
 {
-
+    wxMessageBox(_("Copyright Andreas Burnickl\nWordclock Simulator"));
 }
+
 
 StdReturnType Simulator::getPixel(byte Index, PixelType& Pixel) const
 {

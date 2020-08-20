@@ -17,15 +17,9 @@
 
 #include "WordclockMain.h"
 
-wxBEGIN_EVENT_TABLE(WordclockDialog, wxDialog)
-    EVT_CLOSE(WordclockDialog::OnClose)
-    EVT_TIMER(TIMER_ID, WordclockDialog::OnTimer)
-wxEND_EVENT_TABLE()
-
-
-WordclockDialog::WordclockDialog(wxDialog *dlg, const wxString &title) : wxDialog(dlg, -1, title), Timer(this, TIMER_ID)
+WordclockMain::WordclockMain()
 {
-    Timer.Start(1000);
+    //Timer.Start(1000);
     strcpy(Text, "geht gut GUT");
     //Timer.Start(100);
     Time = wxDateTime::Now();
@@ -34,7 +28,7 @@ WordclockDialog::WordclockDialog(wxDialog *dlg, const wxString &title) : wxDialo
     //Clock::getInstance().setClock(12, 42);
 
     //WcDisplay.setPixelRowFast(5, 0xFFFF);
-    Display::getInstance().show();
+    //Display::getInstance().show();
 
     //WcAnimation.setChar(0,0,'Ö', AnimationFont::FONT_5X8);
     //WcAnimation.setChar(0,0,'B', AnimationFont::FONT_5X8);
@@ -52,18 +46,12 @@ WordclockDialog::WordclockDialog(wxDialog *dlg, const wxString &title) : wxDialo
 }
 
 
-WordclockDialog::~WordclockDialog()
+WordclockMain::~WordclockMain()
 {
 
 }
 
-void WordclockDialog::OnClose(wxCloseEvent &event)
-{
-    Timer.Stop();
-    Close();
-}
-
-void WordclockDialog::OnTimer(wxTimerEvent& event)
+void WordclockMain::task()
 {
     ClockWords NewTimeWords;
     Time = wxDateTime::Now();

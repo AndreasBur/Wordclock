@@ -14,22 +14,19 @@
     #include <wx/wx.h>
 #endif
 
-#include "WordclockApp.h"
-
 #include "Clock.h"
 #include "Display.h"
 #include "Animation.h"
 #include "AnimationClock.h"
 #include "Transformation.h"
 
-class WordclockDialog : public wxDialog
+class WordclockMain
 {
     public:
-        WordclockDialog(wxDialog *dlg, const wxString& title);
-        ~WordclockDialog();
+        WordclockMain();
+        ~WordclockMain();
 
-        void OnTimer(wxTimerEvent& event);
-        void OnClose(wxCloseEvent& event);
+        void task();
 
     protected:
 
@@ -39,13 +36,12 @@ class WordclockDialog : public wxDialog
         //Animation WcAnimation;
         //Transformation WcTransformation;
         wxDateTime Time;
-        wxTimer Timer;
+
         char Text[25];
         ClockWords CurrentTimeWords;
         enum {
             TIMER_ID = 1500
         };
-        wxDECLARE_EVENT_TABLE();
 };
 
 #endif // WORDCLOCKMAIN_H
