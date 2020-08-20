@@ -23,6 +23,7 @@ const wxString DisplayCharacters[][SIMULATOR_DISPLAY_NUMBER_OF_COLUMNS] =
 
 BEGIN_EVENT_TABLE(Simulator, wxFrame)
     EVT_CLOSE(Simulator::OnClose)
+    EVT_BUTTON(ID_BUTTON_SEND, Simulator::OnSend)
     EVT_BUTTON(ID_BUTTON_CLEAR, Simulator::OnClear)
     EVT_BUTTON(ID_BUTTON_ABOUT, Simulator::OnAbout)
     EVT_BUTTON(ID_BUTTON_QUIT, Simulator::OnQuit)
@@ -106,7 +107,7 @@ wxBoxSizer* Simulator::createSizerControl(wxWindow* Parent)
     wxButton* Clear = new wxButton(Parent, ID_BUTTON_CLEAR, wxT("&Clear"), wxDefaultPosition, wxDefaultSize, 0);
 
     Output = new wxTextCtrl(Parent, ID_TEXT_CTRL_OUTPUT, _(""), wxDefaultPosition, wxSize(200, 200), wxTE_MULTILINE|wxTE_READONLY);
-    wxTextCtrl* Input  = new wxTextCtrl(Parent, ID_TEXT_CTRL_INPUT, _(""), wxDefaultPosition, wxSize(200, 20));
+    Input  = new wxTextCtrl(Parent, ID_TEXT_CTRL_INPUT, _(""), wxDefaultPosition, wxSize(200, 20));
 
     SizerControl->Add(OutputLabel, 0, wxLEFT | wxTOP | wxEXPAND, 10);
     SizerControl->Add(Output, 0, wxRight | wxLEFT, 10);
@@ -130,6 +131,13 @@ void Simulator::OnClose(wxCloseEvent &event)
     //wxTheApp->GetTopWindow()->Destroy();
     //wxTheApp->GetTopWindow()->Close();
     Destroy();
+}
+
+void Simulator::OnSend(wxCommandEvent &event)
+{
+    if(SendBuffer.IsEmpty()) {
+        SendBuffer = Input->GetValue() + _T("\n");
+    }
 }
 
 void Simulator::OnClear(wxCommandEvent &event)
@@ -291,3 +299,13 @@ void Simulator::setBrightness(byte sBrightness, bool GammaCorrection)
     }
 }
 
+char Simulator::read()
+{
+    char FirstChar{' '};
+
+    if(!SendBuffer.IsEmpty()) {
+        FirstChar = SendBuffer.at(0).GetValue();
+        SendBuffer.Remove(0, 1);
+    }
+    return FirstChar;
+}

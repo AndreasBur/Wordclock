@@ -19,6 +19,7 @@
 #include "Animation.h"
 #include "AnimationClock.h"
 #include "Transformation.h"
+#include "Communication.h"
 
 class WordclockMain
 {
@@ -31,6 +32,7 @@ class WordclockMain
     protected:
 
     private:
+        Communication wcCommunication;
         //Display WcDisplay;
         //Clock WcClock;
         //Animation WcAnimation;

@@ -67,7 +67,7 @@ void WordclockMain::task()
 //        //WcDisplay.clear();
 //        WcAnimation.setClock(Hour, Minute);
 //    }
-
+    wcCommunication.task();
     //Display::getInstance().show();
 
     //Clock::getInstance().getClockWords(Hour, Minute, NewTimeWords);

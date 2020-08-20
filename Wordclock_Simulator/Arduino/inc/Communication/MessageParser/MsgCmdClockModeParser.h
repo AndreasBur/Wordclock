@@ -9,10 +9,10 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       MsgCmdClockModeParser.h
- *      \brief      
+ *      \brief
  *
- *      \details    
- *                  
+ *      \details
+ *
 ******************************************************************************************************************************************************/
 #ifndef _MSG_CMD_CLOCK_MODE_PARSER_H_
 #define _MSG_CMD_CLOCK_MODE_PARSER_H_
@@ -49,19 +49,19 @@ class MsgCmdClockModeParser : public MsgParameterParser<MsgCmdClockModeParser, M
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-  
-  
+
+
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
     friend class MsgParameterParser;
     static constexpr char ModeOptionShortName{'M'};
-        
+
     static constexpr ParameterTableType ParameterTable PROGMEM {
         ParameterTableElementType(ModeOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8)
     };
-    
+
     // functions
     void handleParameter(char ParameterShortName, byte Argument)
     {
@@ -69,7 +69,7 @@ class MsgCmdClockModeParser : public MsgParameterParser<MsgCmdClockModeParser, M
             Clock::getInstance().setMode(static_cast<Clock::ModeType>(Argument));
         }
     }
-  
+
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
@@ -82,13 +82,7 @@ class MsgCmdClockModeParser : public MsgParameterParser<MsgCmdClockModeParser, M
     // set methods
 
     // methods
-    void sendAnswer()
-    {
-        Serial.print(ModeOptionShortName);
-        Serial.print(OptionArgumentDelimiter);
-        Serial.print(Clock::getInstance().getMode());
-    }
-    
+    void sendAnswer() { sendAnswerParameter(ModeOptionShortName, Clock::getInstance().getMode()); }
     void process() { Clock::getInstance().show(); }
 };
 

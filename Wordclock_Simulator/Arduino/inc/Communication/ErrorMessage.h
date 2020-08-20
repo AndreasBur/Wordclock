@@ -9,10 +9,10 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       ErrorMessage.h
- *      \brief      
+ *      \brief
  *
- *      \details    
- *                  
+ *      \details
+ *
 ******************************************************************************************************************************************************/
 #ifndef _ERROR_MESSAGE_H_
 #define _ERROR_MESSAGE_H_
@@ -55,25 +55,25 @@ class ErrorMessage
         ERROR_NO_VALUE_GIVEN,
         ERROR_UNKNOWN
     };
-    
+
     enum ApiType {
         API_NONE,
-        API_DISPLAY_SHOW    
+        API_DISPLAY_SHOW
     };
-  
+
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
 
-  
+
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
     constexpr ErrorMessage() { }
     ~ErrorMessage() { }
-        
+
     // get methods
 
 
@@ -83,15 +83,16 @@ class ErrorMessage
     void send(ErrorType Error) const
     {
         Serial.print(F("Error:"));
-        Serial.println(Error);
+        Serial.print(Error);
+        Serial.print(' ');
     }
-    
+
     void send(bool ReturnValue) const
     {
         if(ReturnValue) { send(ERROR_NO_ERROR); }
         else { send(ERROR_UNKNOWN); }
     }
-    
+
     void send(ApiType Api, bool ReturnValue) const
     {
         Serial.print(F("Api:"));

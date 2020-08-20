@@ -62,9 +62,10 @@ class Simulator : public wxFrame
         void print(int Number) { Output->AppendText(wxString::Format(wxT("%i"), Number)); }
         void println(const char* Text) { print(Text); println(); }
         void println(int Number) { print(Number); println(); }
+        void print(char Char) { Output->AppendText(Char); }
 
-        bool available() { return false; }
-        char read() { return ' '; }
+        bool available() { return !SendBuffer.IsEmpty(); }
+        char read();
 
     protected:
 
@@ -81,23 +82,25 @@ class Simulator : public wxFrame
             ID_STATIC_BOX
         };
 
+        wxString SendBuffer{""};
         wxTextCtrl* Output;
-        //wxTextCtrl* Output;
+        wxTextCtrl* Input;
 
         wxStaticText* Characters[SIMULATOR_DISPLAY_NUMBER_OF_ROWS][SIMULATOR_DISPLAY_NUMBER_OF_COLUMNS];
         wxColor Colors[SIMULATOR_DISPLAY_NUMBER_OF_ROWS][SIMULATOR_DISPLAY_NUMBER_OF_COLUMNS];
         byte Pin{0};
         byte Brightness{255};
 
-        void OnClose(wxCloseEvent&);
-        void OnClear(wxCommandEvent&);
-        void OnAbout(wxCommandEvent&);
-        void OnQuit(wxCommandEvent&);
         DECLARE_EVENT_TABLE()
 
         // functions
         Simulator(wxWindow*, const wxString&);
         virtual ~Simulator();
+        void OnClose(wxCloseEvent&);
+        void OnClear(wxCommandEvent&);
+        void OnAbout(wxCommandEvent&);
+        void OnSend(wxCommandEvent&);
+        void OnQuit(wxCommandEvent&);
         void setAllPixels(wxColour);
         wxBoxSizer* createSizerAll(wxWindow*);
         wxBoxSizer* createSizerCharacters(wxWindow*);

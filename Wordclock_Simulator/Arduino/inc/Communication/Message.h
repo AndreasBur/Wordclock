@@ -9,10 +9,10 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       Message.h
- *      \brief      
+ *      \brief
  *
- *      \details    
- *                  
+ *      \details
+ *
 ******************************************************************************************************************************************************/
 #ifndef _MESSAGE_H_
 #define _MESSAGE_H_
@@ -49,7 +49,7 @@ class Message
 ******************************************************************************************************************************************************/
   public:
       static constexpr size_t npos = -1;
-      
+
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
@@ -71,20 +71,25 @@ class Message
     // methods
     void clear() { Buffer[0u] = '\0'; }
 
+    size_t length() const
+    {
+        return strlen(Buffer);
+    }
+
     size_t find(const char* String, size_t position = 0u) const
     {
         const char* finding = strstr(&Buffer[position], String);
         if(finding == nullptr) return npos;
         else return finding - Buffer;
     }
-    
+
     size_t find(char Char, size_t position = 0u) const
     {
         const char* finding = strchr(&Buffer[position], Char);
         if(finding == nullptr) return npos;
         else return finding - Buffer;
     }
-    
+
     StdReturnType addChar(char Char)
     {
         byte messageLength = strlen(Buffer);

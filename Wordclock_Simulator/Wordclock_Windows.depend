@@ -18022,14 +18022,14 @@
 	"AnimationClock.h"
 	"AnimationFont.h"
 
-1597689412 c:\users\aburn\documents\github\wordclock\wordclock_simulator\arduino\inc\standardtypes\standardtypes.h
-	"Arduino.h"
+1597948681 c:\users\aburn\documents\github\wordclock\wordclock_simulator\arduino\inc\standardtypes\standardtypes.h
 	"limits"
 	<stdint.h>
 	<limits.h>
 
-1597689413 c:\users\aburn\documents\github\wordclock\wordclock_simulator\include\arduino.h
+1597948681 c:\users\aburn\documents\github\wordclock\wordclock_simulator\include\arduino.h
 	<string.h>
+	"Simulator.h"
 
 1597689412 c:\users\aburn\documents\github\wordclock\wordclock_simulator\arduino\inc\animation\clock\animationclock.h
 	"StandardTypes.h"
@@ -18055,16 +18055,14 @@
 	"GammaCorrection.h"
 	"BH1750.h"
 
-1597689413 c:\users\aburn\documents\github\wordclock\wordclock_simulator\include\ws2812.h
+1597862674 c:\users\aburn\documents\github\wordclock\wordclock_simulator\include\ws2812.h
 	"Simulator.h"
 	"Neopixel.h"
 
-1597777679 c:\users\aburn\documents\github\wordclock\wordclock_simulator\include\simulator.h
+1597952383 c:\users\aburn\documents\github\wordclock\wordclock_simulator\include\simulator.h
 	<wx/wx.h>
 	<wx/button.h>
 	"StandardTypes.h"
-	"Arduino.h"
-	"DisplayCharacters.h"
 
 1597689412 c:\users\aburn\documents\github\wordclock\wordclock_simulator\arduino\inc\display\displaycharacters.h
 	"StandardTypes.h"
@@ -18251,9 +18249,8 @@
 1597689412 source:c:\users\aburn\documents\github\wordclock\wordclock_simulator\arduino\src\clock\clock.cpp
 	"Clock.h"
 
-1597689412 source:c:\users\aburn\documents\github\wordclock\wordclock_simulator\arduino\src\display\display.cpp
+1597948681 source:c:\users\aburn\documents\github\wordclock\wordclock_simulator\arduino\src\display\display.cpp
 	"Display.h"
-	"WordclockIcon.xpm"
 
 1597689412 source:c:\users\aburn\documents\github\wordclock\wordclock_simulator\arduino\src\display\displaycharacters.cpp
 	"DisplayCharacters.h"
@@ -18285,29 +18282,31 @@
 1526279832 source:c:\users\aburn\documents\github\wordclock\wordclock_simulator\resource.rc
 	"wx/msw/wx.rc"
 
-1597777759 source:c:\users\aburn\documents\github\wordclock\wordclock_simulator\src\simulator.cpp
+1597952013 source:c:\users\aburn\documents\github\wordclock\wordclock_simulator\src\simulator.cpp
 	"Simulator.h"
 	"WS2812.h"
 	<array>
+	"WordclockIcon.xpm"
 
-1597775798 source:c:\users\aburn\documents\github\wordclock\wordclock_simulator\wordclockapp.cpp
+1597948681 source:c:\users\aburn\documents\github\wordclock\wordclock_simulator\wordclockapp.cpp
 	"wx_pch.h"
 	"WordclockApp.h"
+
+1597948681 c:\users\aburn\documents\github\wordclock\wordclock_simulator\wordclockapp.h
+	<wx/app.h>
+	<wx/timer.h>
 	"WordclockMain.h"
 
-1526279832 c:\users\aburn\documents\github\wordclock\wordclock_simulator\wordclockapp.h
-	<wx/app.h>
-
-1597689413 c:\users\aburn\documents\github\wordclock\wordclock_simulator\wordclockmain.h
+1597950854 c:\users\aburn\documents\github\wordclock\wordclock_simulator\wordclockmain.h
 	<wx/wx.h>
-	"WordclockApp.h"
 	"Clock.h"
 	"Display.h"
 	"Animation.h"
 	"AnimationClock.h"
 	"Transformation.h"
+	"Communication.h"
 
-1597775172 source:c:\users\aburn\documents\github\wordclock\wordclock_simulator\wordclockmain.cpp
+1597950868 source:c:\users\aburn\documents\github\wordclock\wordclock_simulator\wordclockmain.cpp
 	"wx_pch.h"
 	"WordclockMain.h"
 
@@ -26638,6 +26637,81 @@
 	"Clock.h"
 
 1597650433 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\communication\messageparser\msgcmdanimationclockparser.h
+	"StandardTypes.h"
+	"Arduino.h"
+	"MsgParameterParser.h"
+	"Animation.h"
+
+1597952667 source:c:\users\aburn\documents\github\wordclock\wordclock_simulator\arduino\src\communication\communication.cpp
+	"Communication.h"
+
+1597948681 c:\users\aburn\documents\github\wordclock\wordclock_simulator\arduino\inc\communication\communication.h
+	"StandardTypes.h"
+	"Arduino.h"
+	"Message.h"
+	"ErrorMessage.h"
+	"MsgCmdParser.h"
+
+1597955214 c:\users\aburn\documents\github\wordclock\wordclock_simulator\arduino\inc\communication\message.h
+	"StandardTypes.h"
+	"Arduino.h"
+
+1597953117 c:\users\aburn\documents\github\wordclock\wordclock_simulator\arduino\inc\communication\errormessage.h
+	"StandardTypes.h"
+	"Arduino.h"
+
+1597955044 c:\users\aburn\documents\github\wordclock\wordclock_simulator\arduino\inc\communication\messageparser\msgcmdparser.h
+	"StandardTypes.h"
+	"Arduino.h"
+	"Message.h"
+	"ErrorMessage.h"
+
+1597948681 source:c:\users\aburn\documents\github\wordclock\wordclock_simulator\arduino\src\communication\messageparser\msgcmdparser.cpp
+	"MsgCmdParser.h"
+	"MsgCmdDisplayColorParser.h"
+	"MsgCmdDisplayBrightnessParser.h"
+	"MsgCmdClockModeParser.h"
+	"MsgCmdAnimationClockParser.h"
+
+1597954945 c:\users\aburn\documents\github\wordclock\wordclock_simulator\arduino\inc\communication\messageparser\msgcmddisplaycolorparser.h
+	"StandardTypes.h"
+	"Arduino.h"
+	"Display.h"
+	"MsgParameterParser.h"
+
+1597955337 c:\users\aburn\documents\github\wordclock\wordclock_simulator\arduino\inc\communication\msgparameterparser.h
+	"StandardTypes.h"
+	"Arduino.h"
+	"Message.h"
+	"ErrorMessage.h"
+	"MsgParameter.h"
+	"StringTools.h"
+	<array>
+
+1597948681 c:\users\aburn\documents\github\wordclock\wordclock_simulator\arduino\inc\communication\messageparser\msgparameter.h
+	"StandardTypes.h"
+	"Arduino.h"
+
+1597948681 c:\users\aburn\documents\github\wordclock\wordclock_simulator\arduino\inc\communication\stringtools.h
+	"StandardTypes.h"
+	"Arduino.h"
+	"errno.h"
+	<type_traits>
+
+1597955495 c:\users\aburn\documents\github\wordclock\wordclock_simulator\arduino\inc\communication\messageparser\msgcmddisplaybrightnessparser.h
+	"StandardTypes.h"
+	"Arduino.h"
+	"NeoPixel.h"
+	"Display.h"
+	"MsgParameterParser.h"
+
+1597955399 c:\users\aburn\documents\github\wordclock\wordclock_simulator\arduino\inc\communication\messageparser\msgcmdclockmodeparser.h
+	"StandardTypes.h"
+	"Arduino.h"
+	"MsgParameterParser.h"
+	"Clock.h"
+
+1597955319 c:\users\aburn\documents\github\wordclock\wordclock_simulator\arduino\inc\communication\messageparser\msgcmdanimationclockparser.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"MsgParameterParser.h"
