@@ -97,10 +97,10 @@ class AnimationClock
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
-    std::array<byte, ANIMATION_CLOCK_NUMBER_OF_ANIMATIONS> TaskCycles{0};
+    std::array<byte, ANIMATION_CLOCK_NUMBER_OF_ANIMATIONS> TaskCycles{{0}};
     AnimationType Animation{ANIMATION_CLOCK_NONE};
     AnimationsType Animations;
-    
+
     // functions
     bool isAnimationValid(AnimationType sAnimation) {
         if(sAnimation < ANIMATION_CLOCK_NUMBER_OF_ANIMATIONS) { return true; }

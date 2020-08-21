@@ -152,17 +152,17 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
         PositionType position;
 
         StringTools::ResultType result = StringTools::stringTo(Argument, position, value, ArgumentNumberBase);
-        handleConvertResult(result);
+        handleConvertResult(Parameter, result);
         if(result == StringTools::RESULT_OK) static_cast<Derived*>(this)->handleParameter(Parameter.getOptionShortName(), value);
         return position;
     }
 
-    void handleConvertResult(StringTools::ResultType Result) const {
+    void handleConvertResult(MsgParameter Parameter, StringTools::ResultType Result) const {
         if(Result == StringTools::RESULT_NO_VALUE) {
-            Error.send(ErrorMessage::ERROR_NO_VALUE_GIVEN);
+            Error.send(Parameter, ErrorMessage::ERROR_NO_VALUE_GIVEN);
         }
         if(Result == StringTools::RESULT_OVERFLOW) {
-            Error.send(ErrorMessage::ERROR_VALUE_OUT_OF_BOUNCE);
+            Error.send(Parameter, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNCE);
         }
     }
 
@@ -183,30 +183,33 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
     void parse()
     {
         StateType state = STATE_PARSE;
-        char optionChar;
+        char optionShortName;
 
-        for(PositionType position = 0; ParameterBuffer[position] != '\0'; position++) {
+        for(PositionType position = 0; ParameterBuffer[position] != STD_NULL_CHARACTER; position++) {
             if(state == STATE_PARSE) {
                 char currentChar = ParameterBuffer[position];
                 if(currentChar == OptionStartChar) { state = STATE_OPTION_CHAR; }
             } else if(state == STATE_OPTION_CHAR) {
-                optionChar = ParameterBuffer[position];
+                optionShortName = ParameterBuffer[position];
                 state = STATE_OPTION_ARGUMENT;
             } else if(state == STATE_OPTION_ARGUMENT) {
                 ParameterTableElementType parameter;
-                if(getMsgParameterByOptionShortName(optionChar, parameter) == E_OK) {
+                if(getMsgParameterByOptionShortName(optionShortName, parameter) == E_OK) {
                     position += parseArgument(parameter, &ParameterBuffer[position]) - 1u;
+                } else {
+                    Error.send(optionShortName, ErrorMessage::ERROR_PARAMETER_UNKNOWN);
                 }
                 state = STATE_PARSE;
             }
         }
     }
-    template <typename T> void sendAnswerParameter(char OptionShortName, T Value)
+
+    template <typename T> void sendAnswerParameter(char OptionShortName, T Value, bool AppendSpace = true)
     {
         Serial.print(OptionShortName);
         Serial.print(OptionArgumentDelimiter);
         Serial.print(Value);
-        Serial.print(' ');
+        if(AppendSpace) { Serial.print(' '); }
     }
 };
 

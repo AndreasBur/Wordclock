@@ -9,10 +9,10 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       DisplayWords.h
- *      \brief      
+ *      \brief
  *
- *      \details    
- *                  
+ *      \details
+ *
 ******************************************************************************************************************************************************/
 #ifndef _DISPLAY_WORDS_H_
 #define _DISPLAY_WORDS_H_
@@ -83,7 +83,7 @@ class DisplayWords
         WORD_UHR,
         WORD_NUMBER_OF_WORDS
     };
-    
+
     using DisplayWordsTableElementType = DisplayWord;
 
 /******************************************************************************************************************************************************
@@ -91,12 +91,17 @@ class DisplayWords
 ******************************************************************************************************************************************************/
   private:
     static const DisplayWord DisplayWordsTable[];
-    
+
     // functions
     DisplayWordsTableElementType getDisplayWordsTableElement(byte WordId) const {
         DisplayWordsTableElementType displayWordsTableElement;
         memcpy_P(&displayWordsTableElement, &DisplayWordsTable[WordId], sizeof(DisplayWordsTableElementType));
         return displayWordsTableElement;
+    }
+
+    bool isWordIdValid(WordIdType WordId) const {
+        if(WordId < WORD_NUMBER_OF_WORDS) { return true; }
+        else { return false; }
     }
 
 /******************************************************************************************************************************************************

@@ -9,10 +9,10 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       GammaCorrection.h
- *      \brief      
+ *      \brief
  *
- *      \details    
- *                  
+ *      \details
+ *
 ******************************************************************************************************************************************************/
 #ifndef _GAMMA_CORRECTION_H_
 #define _GAMMA_CORRECTION_H_
@@ -65,11 +65,11 @@ class GammaCorrection
         memcpy_P(&Gamma7TableElement, &Gamma7Table[Index], sizeof(Gamma7TableElementType));
         return Gamma7TableElement;
     }
-   
+
     /**************************************************************************************************************************************************
       calcGammaCorrectionValue()
     **************************************************************************************************************************************************/
-    /*! \brief          
+    /*! \brief
      *  \details        calculates the gamma correction value with the help of a small table
      *                  and very efficient shift calculation
      *  param[in]       ValueLinear    7 bit unsigned (0..127)
@@ -81,7 +81,7 @@ class GammaCorrection
         byte Log2OfResolution = numberOfBits<byte>();
         return exponent >> ((Log2OfResolution - 1u) - (ValueLinear / GAMMA_CORRECTION_GAMMA7_TABLE_NUMBER_OF_VALUES));
     }
-    
+
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
@@ -95,7 +95,7 @@ class GammaCorrection
     // set methods
 
     // methods
-    
+
 };
 
 #endif

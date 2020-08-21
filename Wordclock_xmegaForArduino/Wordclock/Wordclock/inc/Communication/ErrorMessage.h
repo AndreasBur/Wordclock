@@ -9,10 +9,10 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       ErrorMessage.h
- *      \brief      
+ *      \brief
  *
- *      \details    
- *                  
+ *      \details
+ *
 ******************************************************************************************************************************************************/
 #ifndef _ERROR_MESSAGE_H_
 #define _ERROR_MESSAGE_H_
@@ -22,6 +22,7 @@
 ******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Arduino.h"
+#include "MsgParameter.h"
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
@@ -39,7 +40,7 @@
 
 
 /******************************************************************************************************************************************************
- *  C L A S S   T E M P L A T E
+ *  C L A S S   E R R O R   M E S S A G E
 ******************************************************************************************************************************************************/
 class ErrorMessage
 {
@@ -51,53 +52,71 @@ class ErrorMessage
         ERROR_NO_ERROR,
         ERROR_MESSAGE_TOO_LONG,
         ERROR_WRONG_COMMAND,
+        ERROR_PARAMETER_UNKNOWN,
         ERROR_VALUE_OUT_OF_BOUNCE,
         ERROR_NO_VALUE_GIVEN,
         ERROR_UNKNOWN
     };
-    
+
     enum ApiType {
         API_NONE,
-        API_DISPLAY_SHOW    
+        API_DISPLAY_SHOW
     };
-  
+
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
 
-  
+    // functions
+    void sendSpace() const { Serial.print(' '); }
+
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
     constexpr ErrorMessage() { }
     ~ErrorMessage() { }
-        
+
     // get methods
 
 
     // set methods
 
     // methods
-    void send(ErrorType Error) const
+    void send(ErrorType Error, bool AppendSpace = true) const
     {
         Serial.print(F("Error:"));
-        Serial.println(Error);
+        Serial.print(Error);
+        if(AppendSpace) {  }
     }
-    
+
+    void send(char OptionShortName, ErrorType Error, bool AppendSpace = true) const
+    {
+        send(Error, false);
+        Serial.print(':');
+        Serial.print(OptionShortName);
+        if(AppendSpace) { sendSpace(); }
+    }
+
+    void send(MsgParameter Parameter, ErrorType Error, bool AppendSpace = true) const
+    {
+        send(Parameter.getOptionShortName(), Error, AppendSpace);
+    }
+
     void send(bool ReturnValue) const
     {
         if(ReturnValue) { send(ERROR_NO_ERROR); }
         else { send(ERROR_UNKNOWN); }
     }
-    
-    void send(ApiType Api, bool ReturnValue) const
+
+    void send(ApiType Api, bool ReturnValue, bool AppendSpace = true) const
     {
         Serial.print(F("Api:"));
         Serial.print(Api);
-        Serial.print(' ');
+        Serial.print(':');
         send(ReturnValue);
+        if(AppendSpace) { sendSpace(); }
     }
 };
 

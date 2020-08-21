@@ -77,7 +77,7 @@ class MsgCmdDisplayBrightnessParser : public MsgParameterParser<MsgCmdDisplayBri
     }
 
      void sendAnswerBrightness() { sendAnswerParameter(BrightnessOptionShortName, Display::getInstance().getBrightness()); }
-     void sendAnswerAutomatic() { sendAnswerParameter(AutomaticOptionShortName, Display::getInstance().getBrightnessAutomatic()); }
+     void sendAnswerAutomatic() { sendAnswerParameter(AutomaticOptionShortName, Display::getInstance().getBrightnessAutomatic(), false); }
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S

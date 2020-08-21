@@ -105,7 +105,8 @@ class Animation
     void setTextWithShift(const char* Text, AnimationFont::FontType Font) { wcAnimationFont.setTextWithShift(Text, Font); }
 
     // AnimationFont functions
-    void setAnimation(AnimationClockType Animation) { wcAnimationClock.setAnimation(Animation); }
+    StdReturnType setAnimation(AnimationClockType Animation) { return wcAnimationClock.setAnimation(Animation); }
+    void setAnimationFast(AnimationClockType Animation) { wcAnimationClock.setAnimationFast(Animation); }
     StdReturnType setClock(byte Hour, byte Minute) { return wcAnimationClock.setClock(Hour, Minute); }
 };
 

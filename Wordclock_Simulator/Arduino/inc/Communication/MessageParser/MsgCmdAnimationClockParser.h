@@ -82,7 +82,11 @@ class MsgCmdAnimationClockParser : public MsgParameterParser<MsgCmdAnimationCloc
     }
 
     void sendAnswerAnimation() { sendAnswerParameter(AnimationOptionShortName, Animation::getInstance().getAnimation()); }
-    void sendAnswerSpeed() { sendAnswerParameter(SpeedOptionShortName, convertSpeedToTaskCycle(Animation::getInstance().getClockTaskCycle(Animation::getInstance().getAnimation()))); }
+    void sendAnswerSpeed() {
+        AnimationClockType animation = Animation::getInstance().getAnimation();
+        byte taskCylce = Animation::getInstance().getClockTaskCycle(animation);
+        sendAnswerParameter(SpeedOptionShortName, convertSpeedToTaskCycle(taskCylce), false);
+    }
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S

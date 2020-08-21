@@ -9,10 +9,10 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       StringTools.h
- *      \brief      
+ *      \brief
  *
- *      \details    
- *                  
+ *      \details
+ *
 ******************************************************************************************************************************************************/
 #ifndef _STRING_TOOLS_H_
 #define _STRING_TOOLS_H_
@@ -58,22 +58,23 @@ class StringTools
             PositionType Position;
             ConvertResultType ConvertResult;
         }
-        
+
         enum ConvertResultType {
             CONVERT_RESULT_OVERFLOW,
             CONVERT_RESULT_NO_VALUE,
             CONVERT_RESULT_OK
         };
       */
-      
+
      static constexpr size_t npos = -1;
+     static constexpr char NullCharacter{'\0'};
      using PositionType = uint8_t;
-      
+
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
-        
+
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
@@ -88,7 +89,7 @@ class StringTools
     // methods
     static void stringCopy(char* Destination, const char* Source, int Length) {
         strncpy(Destination, Source, Length - 1u);
-        Destination[Length - 1u] = '\0';
+        Destination[Length - 1u] = NullCharacter;
     }
 
     template<typename T,
@@ -100,26 +101,26 @@ class StringTools
         uint64_t valueBig = strtoul(String, &end, Base);
         Position = end - String;
 
-        if(String == end) { 
+        if(String == end) {
             return RESULT_NO_VALUE;
         } else if(errno == ERANGE || valueBig > std::numeric_limits<T>::max()) {
             Value = std::numeric_limits<T>::max();
             return RESULT_OVERFLOW;
         } else {
-            Value = static_cast<T>(valueBig);   
+            Value = static_cast<T>(valueBig);
             return RESULT_OK;
         }
     }
 
-    template<typename Signed, 
+    template<typename Signed,
              typename std::enable_if_t<std::is_signed<Signed>::value, int> = 0,
-             typename std::enable_if_t<std::is_integral<Signed>::value, int> = 0> 
+             typename std::enable_if_t<std::is_integral<Signed>::value, int> = 0>
     static ResultType stringTo(const char* String, PositionType& Position, Signed& Value, uint8_t Base = 10u) {
         char* end = nullptr;
         errno = 0;
         int64_t valueBig = strtol(String, &end, Base);
         Position = end - String;
-        
+
         if(String == end) {
             return RESULT_NO_VALUE;
         } else if(errno == ERANGE) {
@@ -139,7 +140,7 @@ class StringTools
         errno = 0;
         double valueBig = strtod(String, &end);
         Position = end - String;
-        
+
         if(String == end) {
             return RESULT_NO_VALUE;
         } else if(errno == ERANGE) {

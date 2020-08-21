@@ -50,6 +50,8 @@ void Communication::task()
     if(isMessageComplete()) {
         MsgCmdParser CmdParser(IncomingMessage);
         CmdParser.parse();
+        IncomingMessage.clear();
+        State = STATE_MESSAGE_INCOMPLETE;
     } else {
         addMessagePart();
     }

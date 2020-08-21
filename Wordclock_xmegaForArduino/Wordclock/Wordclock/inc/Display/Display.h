@@ -9,10 +9,10 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       Display.h
- *      \brief      
+ *      \brief
  *
- *      \details    
- *                  
+ *      \details
+ *
 ******************************************************************************************************************************************************/
 #ifndef _DISPLAY_H_
 #define _DISPLAY_H_
@@ -102,7 +102,7 @@ class Display
 
     /* mapping to underlying hardware */
     using IlluminanceType = BH1750::IlluminanceType;
-    
+
     using PixelColorType = WS2812::PixelType;
     using ColorType = NeoPixel::ColorType;
     using Stripe = WS2812;
@@ -125,14 +125,14 @@ class Display
     byte Brightness{255u};
     PixelColorType ColorDimmed{255u, 255u, 255u};
 #endif
-    
+
     // functions
     Display(PixelColorType);
     Display(byte, byte, byte);
     ~Display();
-    
+
     byte calculateBrightnessAutomaticCorrected(byte) const;
-    
+
     byte transformToSerpentine(byte, byte) const;
     byte transformToSerpentine(byte) const;
 
@@ -156,7 +156,7 @@ class Display
     // get methods
     StateType getState() const { return State; }
     bool getBrightnessAutomatic() const { return BrightnessAutomatic; }
-    
+
     PixelColorType getColor() const { return Color; }
     ColorType getColorRed() const { return Color.Red; }
     ColorType getColorGreen() const { return Color.Green; }
@@ -177,9 +177,9 @@ class Display
     void setColorBlue(ColorType Blue) { Color.Blue = Blue;}
 
 #if (DISPLAY_USE_WS2812_DIMMING == STD_ON)
-    void setBrightness(byte Brightness) { 
+    void setBrightness(byte Brightness) {
         if(BrightnessAutomatic == true) { Pixels.setBrightness(Brightness, true); }
-        else { Pixels.setBrightness(calculateBrightnessAutomaticCorrected(Brightness)); } 
+        else { Pixels.setBrightness(calculateBrightnessAutomaticCorrected(Brightness)); }
     }
 #else
     void setBrightness(byte);
@@ -204,7 +204,7 @@ class Display
     void setWordFast(WordIdType, byte MaxLength = DISPLAY_WORD_LENGTH_UNLIMITED);
     void clearWordFast(WordIdType);
     void clearWordsFast();
-    
+
     // pixel methods
     StdReturnType writePixel(byte Column, byte Row, bool Value) { if(Value) return setPixel(Column, Row); else return clearPixel(Column, Row); }
     StdReturnType writePixel(byte Index, bool Value) { if(Value) return setPixel(Index); else return clearPixel(Index); }

@@ -53,13 +53,13 @@ class AnimationClockSnake : public AnimationClockCommon
         SNAKE_STATE_TO_RIGHT,
         SNAKE_STATE_TO_LEFT
     };
-  
+
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
     SnakeStateType SnakeState{SNAKE_STATE_TO_RIGHT};
-    ClockWords::WordsListType ClockWordsTable{DisplayWords::WORD_NONE};
+    ClockWords::WordsListType ClockWordsTable{{DisplayWords::WORD_NONE}};
     byte SnakeBeginIndex{0u};
     byte SnakeEndIndex{0u};
 
@@ -67,7 +67,7 @@ class AnimationClockSnake : public AnimationClockCommon
     void reset();
     byte transformToSerpentine(byte, byte) const;
     byte transformToSerpentine(byte) const;
-  
+
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/

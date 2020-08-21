@@ -61,7 +61,7 @@ class AnimationClockDrop : public AnimationClockCommon
 ******************************************************************************************************************************************************/
   private:
     DisplayWords Words;
-    ClockWords::WordsListType ClockWordsTable{DisplayWords::WORD_NONE};
+    ClockWords::WordsListType ClockWordsTable{{DisplayWords::WORD_NONE}};
     byte Row{0u};
     byte Column{0u};
     byte CurrenWordIndex{0u};
@@ -75,7 +75,7 @@ class AnimationClockDrop : public AnimationClockCommon
     void setStateToSetTime();
     StdReturnType setNextRow(byte);
     StdReturnType setNextColumn(byte);
-    
+
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/

@@ -9,10 +9,10 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       MsgParameterParser.h
- *      \brief      
+ *      \brief
  *
- *      \details    
- *                  
+ *      \details
+ *
 ******************************************************************************************************************************************************/
 #ifndef _MSG_PARAMETER_PARSER_H_
 #define _MSG_PARAMETER_PARSER_H_
@@ -65,7 +65,7 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
     using ParameterTableElementType = MsgParameter;
     using ParameterTableType = std::array<ParameterTableElementType, ParameterTableSize>;
     using PositionType = StringTools::PositionType;
-  
+
 /******************************************************************************************************************************************************
  *  P R O T E C T E D   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
@@ -74,7 +74,7 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
     ErrorMessage Error;
 
     ~MsgParameterParser() { }
-  
+
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
@@ -89,9 +89,9 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
     static constexpr char OptionStartChar{'-'};
     static constexpr byte ArgumentNumberBase{10u};
 
-    const char* ParameterBuffer;
+    const char* ParameterBuffer{nullptr};
     const ParameterTableType& ParameterTable;
-    
+
     // functions
     ParameterTableElementType getParameterTableElement(byte Index) const {
         ParameterTableElementType parameterTableElement;
@@ -150,19 +150,19 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
     template <typename T> PositionType convertArgument(MsgParameter Parameter, const char* Argument) {
         T value;
         PositionType position;
-        
+
         StringTools::ResultType result = StringTools::stringTo(Argument, position, value, ArgumentNumberBase);
-        handleConvertResult(result);
+        handleConvertResult(Parameter, result);
         if(result == StringTools::RESULT_OK) static_cast<Derived*>(this)->handleParameter(Parameter.getOptionShortName(), value);
         return position;
     }
 
-    void handleConvertResult(StringTools::ResultType Result) const {
+    void handleConvertResult(MsgParameter Parameter, StringTools::ResultType Result) const {
         if(Result == StringTools::RESULT_NO_VALUE) {
-            Error.send(ErrorMessage::ERROR_NO_VALUE_GIVEN);
+            Error.send(Parameter, ErrorMessage::ERROR_NO_VALUE_GIVEN);
         }
         if(Result == StringTools::RESULT_OVERFLOW) {
-            Error.send(ErrorMessage::ERROR_VALUE_OUT_OF_BOUNCE);
+            Error.send(Parameter, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNCE);
         }
     }
 
@@ -183,23 +183,33 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
     void parse()
     {
         StateType state = STATE_PARSE;
-        char optionChar;
-        
-        for(PositionType position = 0; ParameterBuffer[position] != '\0'; position++) {
+        char optionShortName;
+
+        for(PositionType position = 0; ParameterBuffer[position] != STD_NULL_CHARACTER; position++) {
             if(state == STATE_PARSE) {
                 char currentChar = ParameterBuffer[position];
                 if(currentChar == OptionStartChar) { state = STATE_OPTION_CHAR; }
             } else if(state == STATE_OPTION_CHAR) {
-                optionChar = ParameterBuffer[position];
+                optionShortName = ParameterBuffer[position];
                 state = STATE_OPTION_ARGUMENT;
             } else if(state == STATE_OPTION_ARGUMENT) {
                 ParameterTableElementType parameter;
-                if(getMsgParameterByOptionShortName(optionChar, parameter) == E_OK) {
+                if(getMsgParameterByOptionShortName(optionShortName, parameter) == E_OK) {
                     position += parseArgument(parameter, &ParameterBuffer[position]) - 1u;
+                } else {
+                    Error.send(optionShortName, ErrorMessage::ERROR_PARAMETER_UNKNOWN);
                 }
                 state = STATE_PARSE;
             }
         }
+    }
+
+    template <typename T> void sendAnswerParameter(char OptionShortName, T Value, bool AppendSpace = true)
+    {
+        Serial.print(OptionShortName);
+        Serial.print(OptionArgumentDelimiter);
+        Serial.print(Value);
+        if(AppendSpace) { Serial.print(' '); }
     }
 };
 

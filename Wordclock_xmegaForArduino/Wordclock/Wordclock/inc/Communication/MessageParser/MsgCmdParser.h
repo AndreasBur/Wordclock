@@ -9,10 +9,10 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       MsgCmdParser.h
- *      \brief      
+ *      \brief
  *
- *      \details    
- *                  
+ *      \details
+ *
 ******************************************************************************************************************************************************/
 #ifndef _MSG_CMD_PARSER_H_
 #define _MSG_CMD_PARSER_H_
@@ -49,7 +49,7 @@ class MsgCmdParser
 ******************************************************************************************************************************************************/
   public:
     enum CommandType {
-        COMMAND_NONE,
+        //COMMAND_NONE,
         //COMMAND_DISPLAY_MODE,
         COMMAND_DISPLAY_COLOR,
         COMMAND_DISPLAY_BRIGHTNESS,
@@ -58,7 +58,7 @@ class MsgCmdParser
         COMMAND_TIME,
         COMMAND_DATE
     };
-  
+
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
@@ -66,13 +66,13 @@ class MsgCmdParser
     static const char CommandParameterDelimiter{' '};
     ErrorMessage Error;
     const Message& IncomingMessage;
-  
+
     //private functions
     void sendAnswer(CommandType Command) const {
         Serial.print(Command);
         Serial.print(CommandParameterDelimiter);
     }
-    
+
     CommandType getCommand() const {
         return static_cast<CommandType>(atoi(IncomingMessage.getMessage()));
     }
@@ -81,10 +81,10 @@ class MsgCmdParser
         const char* message = IncomingMessage.getMessage();
         size_t valuePos = IncomingMessage.find(CommandParameterDelimiter);
 
-        if(valuePos == Message::npos) { return nullptr; }
+        if(valuePos == Message::npos) { return &message[IncomingMessage.length() - 1u]; }
         else { return &message[valuePos]; }
     }
-  
+
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/

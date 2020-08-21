@@ -50,7 +50,7 @@ class MsgCmdDisplayBrightnessParser : public MsgParameterParser<MsgCmdDisplayBri
 ******************************************************************************************************************************************************/
   public:
 
-    
+
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
@@ -58,13 +58,13 @@ class MsgCmdDisplayBrightnessParser : public MsgParameterParser<MsgCmdDisplayBri
     friend class MsgParameterParser;
     static constexpr char BrightnessOptionShortName{'B'};
     static constexpr char AutomaticOptionShortName{'A'};
-        
-    static constexpr ParameterTableType ParameterTable PROGMEM 
+
+    static constexpr ParameterTableType ParameterTable PROGMEM
     {
         MsgParameter(BrightnessOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8),
         MsgParameter(AutomaticOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8)
     };
-    
+
     // functions
     void handleParameter(char ParameterShortName, byte Argument)
     {
@@ -75,21 +75,10 @@ class MsgCmdDisplayBrightnessParser : public MsgParameterParser<MsgCmdDisplayBri
             Display::getInstance().setBrightnessAutomatic(Argument);
         }
     }
-    
-     void sendAnswerBrightness()
-     {
-        Serial.print(BrightnessOptionShortName);
-        Serial.print(OptionArgumentDelimiter);
-        Serial.print(Display::getInstance().getBrightness());
-     }
-     
-     void sendAnswerAutomatic()
-     {
-        Serial.print(AutomaticOptionShortName);
-        Serial.print(OptionArgumentDelimiter);
-        Serial.print(Display::getInstance().getBrightnessAutomatic());
-     }
-       
+
+     void sendAnswerBrightness() { sendAnswerParameter(BrightnessOptionShortName, Display::getInstance().getBrightness()); }
+     void sendAnswerAutomatic() { sendAnswerParameter(AutomaticOptionShortName, Display::getInstance().getBrightnessAutomatic(), false); }
+
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
@@ -102,7 +91,7 @@ class MsgCmdDisplayBrightnessParser : public MsgParameterParser<MsgCmdDisplayBri
     // set methods
 
     // methods
-    void sendAnswer()    
+    void sendAnswer()
     {
         sendAnswerBrightness();
         sendAnswerAutomatic();

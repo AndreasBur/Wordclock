@@ -70,7 +70,7 @@ class AnimationClockCube : public AnimationClockCommon
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
-    ClockWords::WordsListType ClockWordsTable{DisplayWords::WORD_NONE};
+    ClockWords::WordsListType ClockWordsTable{{DisplayWords::WORD_NONE}};
     BorderType Border{ANIMATION_CLOCK_CUBE_COLUMN_START_MAX_VALUE, ANIMATION_CLOCK_CUBE_COLUMN_END_MIN_VALUE,
       ANIMATION_CLOCK_CUBE_ROW_START_MAX_VALUE, ANIMATION_CLOCK_CUBE_ROW_END_MIN_VALUE};
     BorderStateType BorderState{BORDER_STATE_MIN};

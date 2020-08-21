@@ -60,7 +60,7 @@ class Animation
         STATE_CLOCK,
         STATE_FONT
     };
-    
+
     using AnimationClockType = AnimationClock::AnimationType;
 
 /******************************************************************************************************************************************************
@@ -69,7 +69,7 @@ class Animation
   private:
     constexpr Animation() : wcAnimationClock(), wcAnimationFont() { }
     ~Animation() { }
-    
+
     AnimationClock wcAnimationClock;
     AnimationFont wcAnimationFont;
 

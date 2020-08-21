@@ -49,6 +49,7 @@ class Message
 ******************************************************************************************************************************************************/
   public:
       static constexpr size_t npos = -1;
+      static constexpr char NullCharacter{STD_NULL_CHARACTER};
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
@@ -69,7 +70,7 @@ class Message
     // set methods
 
     // methods
-    void clear() { Buffer[0u] = '\0'; }
+    void clear() { Buffer[0u] = NullCharacter; }
 
     size_t length() const
     {
@@ -98,7 +99,7 @@ class Message
         {
             // save new char
             Buffer[messageLength] = Char;
-            Buffer[messageLength + 1] = '\0';
+            Buffer[messageLength + 1] = NullCharacter;
             return E_OK;
             } else {
             return E_NOT_OK;

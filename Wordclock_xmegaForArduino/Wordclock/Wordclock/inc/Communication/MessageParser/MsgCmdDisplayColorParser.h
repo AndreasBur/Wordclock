@@ -9,10 +9,10 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       MsgCmdDisplayColorParser.h
- *      \brief      
+ *      \brief
  *
- *      \details    
- *                  
+ *      \details
+ *
 ******************************************************************************************************************************************************/
 #ifndef _MSG_CMD_DISPLAY_COLOR_PARSER_H_
 #define _MSG_CMD_DISPLAY_COLOR_PARSER_H_
@@ -49,7 +49,7 @@ class MsgCmdDisplayColorParser : public MsgParameterParser<MsgCmdDisplayColorPar
 ******************************************************************************************************************************************************/
   public:
     using ColorType = NeoPixel::ColorType;
-    
+
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
@@ -58,21 +58,21 @@ class MsgCmdDisplayColorParser : public MsgParameterParser<MsgCmdDisplayColorPar
     static constexpr char RedOptionShortName{'R'};
     static constexpr char GreenOptionShortName{'G'};
     static constexpr char BlueOptionShortName{'B'};
-    
+
     static constexpr ParameterTableType ParameterTable PROGMEM
     {
         ParameterTableElementType(RedOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8),
         ParameterTableElementType(GreenOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8),
         ParameterTableElementType(BlueOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8)
     };
-    
+
     // functions
     void handleParameter(char ParameterShortName, byte Argument)
     {
         if(ParameterShortName == RedOptionShortName) { Display::getInstance().setColorRed(Argument); }
         if(ParameterShortName == GreenOptionShortName) { Display::getInstance().setColorGreen(Argument); }
         if(ParameterShortName == BlueOptionShortName) { Display::getInstance().setColorBlue(Argument); }
-    }    
+    }
 
     void sendAnswerRed()
     {
@@ -113,7 +113,7 @@ class MsgCmdDisplayColorParser : public MsgParameterParser<MsgCmdDisplayColorPar
         sendAnswerGreen();
         sendAnswerBlue();
     }
-    
+
     void process() { Display::getInstance().show(); }
 
 };

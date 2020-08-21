@@ -8,8 +8,8 @@
 //#include "DisplayCharacters.h"
 
 
-#define SIMULATOR_DISPLAY_NUMBER_OF_ROWS                  11u
-#define SIMULATOR_DISPLAY_NUMBER_OF_COLUMNS               10u
+#define SIMULATOR_DISPLAY_NUMBER_OF_ROWS                  10u
+#define SIMULATOR_DISPLAY_NUMBER_OF_COLUMNS               11u
 
 
 class Simulator : public wxFrame

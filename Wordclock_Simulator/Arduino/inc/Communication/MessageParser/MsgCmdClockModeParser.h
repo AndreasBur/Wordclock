@@ -82,7 +82,7 @@ class MsgCmdClockModeParser : public MsgParameterParser<MsgCmdClockModeParser, M
     // set methods
 
     // methods
-    void sendAnswer() { sendAnswerParameter(ModeOptionShortName, Clock::getInstance().getMode()); }
+    void sendAnswer() { sendAnswerParameter(ModeOptionShortName, Clock::getInstance().getMode(), false); }
     void process() { Clock::getInstance().show(); }
 };
 

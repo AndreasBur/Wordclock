@@ -25,7 +25,7 @@ WordclockMain::WordclockMain()
     Time = wxDateTime::Now();
     int Hour = Time.GetHour();
     int Minute = Time.GetMinute();
-    //Clock::getInstance().setClock(12, 42);
+    Clock::getInstance().setClock(Hour, Minute);
 
     //WcDisplay.setPixelRowFast(5, 0xFFFF);
     //Display::getInstance().show();
@@ -65,12 +65,12 @@ void WordclockMain::task()
 //        int Hour = Time.GetHour();
 //        int Minute = Time.GetMinute();
 //        //WcDisplay.clear();
-//        WcAnimation.setClock(Hour, Minute);
+    //WcAnimation.setClock(Hour, Minute);
 //    }
     wcCommunication.task();
     //Display::getInstance().show();
 
-    //Clock::getInstance().getClockWords(Hour, Minute, NewTimeWords);
+     //Clock::getInstance().getClockWords(Hour, Minute, NewTimeWords);
 
     //if(NewTimeWords != CurrentTimeWords) {
         //CurrentTimeWords = NewTimeWords;

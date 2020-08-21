@@ -120,14 +120,23 @@ class AnimationClock
     byte getTaskCycle(AnimationType Animation) const { return TaskCycles[Animation]; }
 
     // set methods
-    void setTaskCycle(AnimationType Animation, byte Cycle) { TaskCycles[Animation] = Cycle; }
-    StdReturnType setAnimation(AnimationType);
+    void setTaskCycleFast(AnimationType Animation, byte Cycle) { TaskCycles[Animation] = Cycle; }
+    StdReturnType setTaskCycle(AnimationType, byte);
+    void setAnimationFast(AnimationType);
+    StdReturnType setAnimation(AnimationType Animation) {
+        if(isAnimationValid(Animation)) {
+            setAnimationFast(Animation);
+            return E_OK;
+        } else {
+            return E_NOT_OK;
+        }
+    }
 
     // methods
     void init();
     void task();
     StdReturnType setClock(byte, byte);
-    void show();
+    StdReturnType show();
 };
 
 

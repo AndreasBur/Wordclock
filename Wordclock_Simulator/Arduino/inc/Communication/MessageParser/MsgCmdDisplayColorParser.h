@@ -76,7 +76,7 @@ class MsgCmdDisplayColorParser : public MsgParameterParser<MsgCmdDisplayColorPar
 
     void sendAnswerRed() { sendAnswerParameter(RedOptionShortName, Display::getInstance().getColorRed()); }
     void sendAnswerGreen() { sendAnswerParameter(GreenOptionShortName, Display::getInstance().getColorGreen()); }
-    void sendAnswerBlue() { sendAnswerParameter(BlueOptionShortName, Display::getInstance().getColorBlue()); }
+    void sendAnswerBlue() { sendAnswerParameter(BlueOptionShortName, Display::getInstance().getColorBlue(), false); }
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
