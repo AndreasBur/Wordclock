@@ -9,10 +9,10 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       MsgCmdRemoteProcedureCallParser.h
- *      \brief      
+ *      \brief
  *
- *      \details    
- *                  
+ *      \details
+ *
 ******************************************************************************************************************************************************/
 #ifndef _MSG_CMD_REMOTE_PROCEDURE_CALL_PARSER_H_
 #define _MSG_CMD_REMOTE_PROCEDURE_CALL_PARSER_H_
@@ -61,9 +61,9 @@ class MsgCmdRemoteProcedureCallParser : public MsgParameterParser<MsgCmdRemotePr
         RPC_ID_DISPLAY_CLEAR,
         RPC_ID_DISPLAY_TEST,
 
-        
+
     };
-  
+
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
@@ -72,16 +72,16 @@ class MsgCmdRemoteProcedureCallParser : public MsgParameterParser<MsgCmdRemotePr
     RpcIdType RpcId{RPC_ID_NONE};
     StdReturnType ReturnValue{E_OK};
     static constexpr char RemoteProcedureShortName{'P'};
-        
+
     static constexpr ParameterTableType ParameterTable PROGMEM {
         ParameterTableElementType(RemoteProcedureShortName, MsgParameter::ARGUMENT_TYPE_UINT8)
     };
-    
+
     // functions
     void handleParameter(char ParameterShortName, byte Argument)
     {
         RpcId = static_cast<RpcIdType>(Argument);
-        
+
         switch(RpcId) {
             case RPC_ID_BH1750_CALIBRATION_MAX_VALUE :
                 BH1750::getInstance().startCalibrationMaxValue();
@@ -107,7 +107,7 @@ class MsgCmdRemoteProcedureCallParser : public MsgParameterParser<MsgCmdRemotePr
             default:
         }
     }
-  
+
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
@@ -120,12 +120,12 @@ class MsgCmdRemoteProcedureCallParser : public MsgParameterParser<MsgCmdRemotePr
     // set methods
 
     // methods
-    void sendAnswer() {
-        Serial.print(F("RpcId: "));
+    void sendAnswer() const {
+        Serial.print(F("RpcId="));
         Serial.println(RpcId);
         Error.send(ReturnValue);
     }
-    
+
     void process() { }
 };
 

@@ -74,9 +74,15 @@ class MsgCmdDisplayColorParser : public MsgParameterParser<MsgCmdDisplayColorPar
         if(ParameterShortName == BlueOptionShortName) { Display::getInstance().setColorBlue(Argument); }
     }
 
-    void sendAnswerRed() { sendAnswerParameter(RedOptionShortName, Display::getInstance().getColorRed()); }
-    void sendAnswerGreen() { sendAnswerParameter(GreenOptionShortName, Display::getInstance().getColorGreen()); }
-    void sendAnswerBlue() { sendAnswerParameter(BlueOptionShortName, Display::getInstance().getColorBlue(), false); }
+    void sendAnswerRed(bool AppendSpace) const { sendAnswerParameter(RedOptionShortName, Display::getInstance().getColorRed(), AppendSpace); }
+    void sendAnswerGreen(bool AppendSpace) const { sendAnswerParameter(GreenOptionShortName, Display::getInstance().getColorGreen(), AppendSpace); }
+    void sendAnswerBlue(bool AppendSpace) const { sendAnswerParameter(BlueOptionShortName, Display::getInstance().getColorBlue(), AppendSpace); }
+
+    void show() const
+    {
+        StdReturnType returnValue = Display::getInstance().show();
+        Error.checkReturnValueAndSend(ErrorMessage::API_DISPLAY_SHOW, returnValue, ErrorMessage::ERROR_DISPLAY_PENDING);
+    }
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
@@ -90,14 +96,14 @@ class MsgCmdDisplayColorParser : public MsgParameterParser<MsgCmdDisplayColorPar
     // set methods
 
     // methods
-    void sendAnswer()
+    void sendAnswer() const
     {
-        sendAnswerRed();
-        sendAnswerGreen();
-        sendAnswerBlue();
+        sendAnswerRed(false);
+        sendAnswerGreen(false);
+        sendAnswerBlue(true);
     }
 
-    void process() { Display::getInstance().show(); }
+    void process() const { show(); }
 
 };
 

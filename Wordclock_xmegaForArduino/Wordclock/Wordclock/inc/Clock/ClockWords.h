@@ -86,7 +86,7 @@ class ClockWords
     WordsListType getWordsList() const;
 
     // set methods
-    void setShowItIs(bool sShowItIs) {ShowItIs = sShowItIs;}
+    void setShowItIs(bool sShowItIs) { ShowItIs = sShowItIs; }
     void setMinuteWords(MinutesWordsType sMinutWords) { MinuteWords = sMinutWords; }
     void setHourWords(HourWordsType sHourWords) { HourWords = sHourWords; }
 

@@ -90,12 +90,13 @@ class Animation
 
     // set methods
     void setFontTaskCylce(byte Cycle) { wcAnimationFont.setTaskCycle(Cycle); }
-    void setClockTaskCylce(AnimationClockType AnimationClock, byte Cycle) { wcAnimationClock.setTaskCycle(AnimationClock, Cycle); }
+    StdReturnType setClockTaskCylce(AnimationClockType AnimationClock, byte Cycle) { return wcAnimationClock.setTaskCycle(AnimationClock, Cycle); }
+    void setClockTaskCylceFast(AnimationClockType AnimationClock, byte Cycle) { wcAnimationClock.setTaskCycleFast(AnimationClock, Cycle); }
 
     // methods
     void init();
     void task();
-    void show();
+    StdReturnType show() const;
 
     // AnimationClock functions
     StdReturnType setChar(byte Column, byte Row, char Char, AnimationFont::FontType Font) { return wcAnimationFont.setChar(Column, Row, Char, Font); }
@@ -105,7 +106,8 @@ class Animation
     void setTextWithShift(const char* Text, AnimationFont::FontType Font) { wcAnimationFont.setTextWithShift(Text, Font); }
 
     // AnimationFont functions
-    void setAnimation(AnimationClockType Animation) { wcAnimationClock.setAnimation(Animation); }
+    StdReturnType setAnimation(AnimationClockType Animation) { return wcAnimationClock.setAnimation(Animation); }
+    void setAnimationFast(AnimationClockType Animation) { wcAnimationClock.setAnimationFast(Animation); }
     StdReturnType setClock(byte Hour, byte Minute) { return wcAnimationClock.setClock(Hour, Minute); }
 };
 

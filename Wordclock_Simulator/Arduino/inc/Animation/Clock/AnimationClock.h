@@ -102,16 +102,12 @@ class AnimationClock
     AnimationsType Animations;
 
     // functions
-    bool isAnimationValid(AnimationType sAnimation) {
-        if(sAnimation < ANIMATION_CLOCK_NUMBER_OF_ANIMATIONS) { return true; }
-        else { return false; }
-    }
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr AnimationClock() : TaskCycles{0}, Animation(ANIMATION_CLOCK_NONE), Animations() { }
+    constexpr AnimationClock() : TaskCycles{255u}, Animation(ANIMATION_CLOCK_NONE), Animations() { }
     ~AnimationClock() { }
 
     // get methods
@@ -135,8 +131,9 @@ class AnimationClock
     // methods
     void init();
     void task();
+    bool isAnimationValid(AnimationType sAnimation) const { return sAnimation < ANIMATION_CLOCK_NUMBER_OF_ANIMATIONS; }
     StdReturnType setClock(byte, byte);
-    StdReturnType show();
+    StdReturnType show() const;
 };
 
 

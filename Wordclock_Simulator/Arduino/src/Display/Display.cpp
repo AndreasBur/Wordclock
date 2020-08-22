@@ -70,7 +70,7 @@ void Display::setBrightness(byte sBrightness)
     ColorDimmed.Green = dimmColor(Color.Green, BrightnessCorrected);
     ColorDimmed.Blue = dimmColor(Color.Blue, BrightnessCorrected);
 
-    for(byte Index = 0; Index < DISPLAY_NUMBER_OF_PIXELS; Index++) {
+    for(IndexType Index = 0; Index < DISPLAY_NUMBER_OF_PIXELS; Index++) {
         // update all pixels to new brightness
         if(getPixelFast(Index)) { setPixelFast(Index); }
     }
@@ -92,7 +92,7 @@ StdReturnType Display::setWord(WordIdType WordId, byte MaxLength)
         if(MaxLength == DISPLAY_WORD_LENGTH_UNLIMITED) Length = word.getLength();
         else Length = MaxLength;
 
-        for(byte Index = 0; Index < Length; Index++) {
+        for(IndexType Index = 0; Index < Length; Index++) {
             if(setPixel(word.getColumn() + Index,  word.getRow()) == E_NOT_OK) returnValue = E_NOT_OK;
         }
     } else {
@@ -113,7 +113,7 @@ void Display::setWordFast(WordIdType WordId, byte MaxLength)
     if(MaxLength == DISPLAY_WORD_LENGTH_UNLIMITED) length = word.getLength();
     else length = MaxLength;
 
-    for(byte Index = 0; Index < length; Index++) { setPixelFast(word.getColumn() + Index,  word.getRow()); }
+    for(IndexType Index = 0; Index < length; Index++) { setPixelFast(word.getColumn() + Index,  word.getRow()); }
 } /* setWordFast */
 
 
@@ -128,7 +128,7 @@ StdReturnType Display::clearWord(WordIdType WordId)
         returnValue = E_OK;
         DisplayWord Word = Words.getDisplayWordFast(WordId);
 
-        for(byte Index = 0; Index < Word.getLength(); Index++) {
+        for(IndexType Index = 0; Index < Word.getLength(); Index++) {
             if(clearPixel(Word.getColumn() + Index,  Word.getRow()) == E_NOT_OK) returnValue = E_NOT_OK;
         }
     } else {
@@ -145,7 +145,7 @@ void Display::clearWordFast(WordIdType WordId)
 {
     DisplayWord word = Words.getDisplayWordFast(WordId);
 
-    for(byte Index = 0; Index < word.getLength(); Index++) {
+    for(IndexType Index = 0; Index < word.getLength(); Index++) {
         clearPixelFast(word.getColumn() + Index,  word.getRow());
     }
 } /* clearWordFast */
@@ -177,7 +177,7 @@ void Display::clearWordsFast()
 /******************************************************************************************************************************************************
   getPixel()
 ******************************************************************************************************************************************************/
-StdReturnType Display::getPixel(byte Index, bool& Value) const
+StdReturnType Display::getPixel(IndexType Index, bool& Value) const
 {
     byte row, column;
     indexToColumnAndRow(Index, column, row);
@@ -188,7 +188,7 @@ StdReturnType Display::getPixel(byte Index, bool& Value) const
 /******************************************************************************************************************************************************
   getPixelFast()
 ******************************************************************************************************************************************************/
-bool Display::getPixelFast(byte Index) const
+bool Display::getPixelFast(IndexType Index) const
 {
     byte row, column;
     indexToColumnAndRow(Index, column, row);
@@ -284,7 +284,7 @@ void Display::setPixelFast(byte Column, byte Row)
 /******************************************************************************************************************************************************
   setPixel()
 ******************************************************************************************************************************************************/
-StdReturnType Display::setPixel(byte Index)
+StdReturnType Display::setPixel(IndexType Index)
 {
     byte row, column;
     indexToColumnAndRow(Index, column, row);
@@ -295,7 +295,7 @@ StdReturnType Display::setPixel(byte Index)
 /******************************************************************************************************************************************************
   setPixelFast()
 ******************************************************************************************************************************************************/
-void Display::setPixelFast(byte Index)
+void Display::setPixelFast(IndexType Index)
 {
     byte row, column;
     indexToColumnAndRow(Index, column, row);
@@ -334,7 +334,7 @@ void Display::clearPixelFast(byte Column, byte Row)
 /******************************************************************************************************************************************************
   clearPixel()
 ******************************************************************************************************************************************************/
-StdReturnType Display::clearPixel(byte Index)
+StdReturnType Display::clearPixel(IndexType Index)
 {
     byte row, column;
     indexToColumnAndRow(Index, column, row);
@@ -345,7 +345,7 @@ StdReturnType Display::clearPixel(byte Index)
 /******************************************************************************************************************************************************
   clearPixelFast()
 ******************************************************************************************************************************************************/
-void Display::clearPixelFast(byte Index)
+void Display::clearPixelFast(IndexType Index)
 {
     byte row, column;
     indexToColumnAndRow(Index, column, row);
@@ -396,7 +396,7 @@ void Display::togglePixelFast(byte Column, byte Row)
 /******************************************************************************************************************************************************
   togglePixel()
 ******************************************************************************************************************************************************/
-StdReturnType Display::togglePixel(byte Index)
+StdReturnType Display::togglePixel(IndexType Index)
 {
     byte row, column;
     indexToColumnAndRow(Index, column, row);
@@ -407,7 +407,7 @@ StdReturnType Display::togglePixel(byte Index)
 /******************************************************************************************************************************************************
   togglePixelFast()
 ******************************************************************************************************************************************************/
-void Display::togglePixelFast(byte Index)
+void Display::togglePixelFast(IndexType Index)
 {
     byte row, column;
     indexToColumnAndRow(Index, column, row);
@@ -610,7 +610,7 @@ byte Display::transformToSerpentine(byte Column, byte Row) const
 /******************************************************************************************************************************************************
   transformToSerpentine()
 ******************************************************************************************************************************************************/
-byte Display::transformToSerpentine(byte Index) const
+byte Display::transformToSerpentine(IndexType Index) const
 {
     byte column = indexToColumn(Index);
     byte row = indexToRow(Index);

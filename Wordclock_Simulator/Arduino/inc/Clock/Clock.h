@@ -84,6 +84,11 @@ class Clock
         ClockWords::MinutesWordsType Words;
     };
 
+    struct TimeType {
+        byte Hour;
+        byte Minute;
+    };
+
     using HourType = ClockWords::HourWordsType;
     using ClockWordsListType = ClockWords::WordsListType;
 
@@ -98,11 +103,11 @@ class Clock
 
     static const HourType HoursTable[][CLOCK_NUMBER_OF_HOURS];
     static const MinuteType MinutesTable[][CLOCK_NUMBER_OF_MINUTE_STEPS];
-    
+
     // functions
     constexpr Clock(ModeType sMode) : Mode(sMode) { }
     ~Clock() { }
-    
+
     MinuteTableElementType getMinutesTableElement(byte Minute) const {
         MinuteTableElementType minutesTableElement;
         memcpy_P(&minutesTableElement, &MinutesTable[Mode][Minute / CLOCK_MINUTE_STEP_IN_MINUTES], sizeof(MinuteType));
@@ -127,11 +132,6 @@ class Clock
     byte transform24hTo12hFormat(byte Hour) const {
         return Hour % CLOCK_NUMBER_OF_HOURS;
     }
-    
-    bool isModeValid(ModeType sMode) {
-        if(sMode < MODE_NUMBER_OF_MODES) { return true; }
-        else { return false; }
-    }
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
@@ -141,7 +141,7 @@ class Clock
         static Clock SingletonInstance(CLOCK_INITIAL_MODE);
         return SingletonInstance;
     }
-      
+
     // get methods
     ModeType getMode() const { return Mode; }
     StdReturnType getClockWords(byte, byte, ClockWords&) const;
@@ -150,20 +150,28 @@ class Clock
     // set methods
     void setModeFast(ModeType sMode) { Mode = sMode; }
     StdReturnType setMode(ModeType sMode)
-    { 
+    {
         if(isModeValid(sMode)) {
             Mode = sMode;
-            return E_OK;    
+            return E_OK;
         } else {
             return E_NOT_OK;
         }
     }
 
     // methods
-    StdReturnType setClock(byte, byte);
-    void setClockFast(byte, byte);
-    void show() { Display::getInstance().show(); }
-    void refresh(byte Hour, byte Minute) { setClock(Hour, Minute); show(); }
+    bool isModeValid(ModeType sMode) const { return sMode < MODE_NUMBER_OF_MODES; }
+    StdReturnType setTime(TimeType Time) const { return setTime(Time.Hour, Time.Minute); }
+    StdReturnType setTime(byte, byte) const;
+    void setTimeFast(TimeType Time) const { setTimeFast(Time.Hour, Time.Minute); }
+    void setTimeFast(byte, byte) const;
+    StdReturnType show() const { return Display::getInstance().show(); }
+    StdReturnType refresh(byte Hour, byte Minute) const {
+        StdReturnType returnValue{E_OK};
+        if(setTime(Hour, Minute) == E_NOT_OK) { returnValue = E_NOT_OK; }
+        if(show() == E_NOT_OK) { returnValue = E_NOT_OK; }
+        return returnValue;
+    }
 };
 
 

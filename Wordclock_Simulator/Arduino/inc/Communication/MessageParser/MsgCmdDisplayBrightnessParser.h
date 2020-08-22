@@ -76,8 +76,14 @@ class MsgCmdDisplayBrightnessParser : public MsgParameterParser<MsgCmdDisplayBri
         }
     }
 
-     void sendAnswerBrightness() { sendAnswerParameter(BrightnessOptionShortName, Display::getInstance().getBrightness()); }
-     void sendAnswerAutomatic() { sendAnswerParameter(AutomaticOptionShortName, Display::getInstance().getBrightnessAutomatic(), false); }
+     void sendAnswerBrightness(bool AppendSpace) const { sendAnswerParameter(BrightnessOptionShortName, Display::getInstance().getBrightness(), AppendSpace); }
+     void sendAnswerAutomatic(bool AppendSpace) const { sendAnswerParameter(AutomaticOptionShortName, Display::getInstance().getBrightnessAutomatic(), AppendSpace); }
+
+    void show() const
+    {
+        StdReturnType returnValue = Display::getInstance().show();
+        Error.checkReturnValueAndSend(ErrorMessage::API_DISPLAY_SHOW, returnValue, ErrorMessage::ERROR_DISPLAY_PENDING);
+    }
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
@@ -93,11 +99,11 @@ class MsgCmdDisplayBrightnessParser : public MsgParameterParser<MsgCmdDisplayBri
     // methods
     void sendAnswer()
     {
-        sendAnswerBrightness();
-        sendAnswerAutomatic();
+        sendAnswerBrightness(false);
+        sendAnswerAutomatic(true);
     }
 
-    void process() { Display::getInstance().show(); }
+    void process() { show(); }
 
 };
 

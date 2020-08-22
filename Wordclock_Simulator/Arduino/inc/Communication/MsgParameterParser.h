@@ -70,7 +70,7 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
  *  P R O T E C T E D   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   protected:
-    static constexpr char OptionArgumentDelimiter{':'};
+    static constexpr char OptionArgumentDelimiter{'='};
     ErrorMessage Error;
 
     ~MsgParameterParser() { }
@@ -185,7 +185,7 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
         StateType state = STATE_PARSE;
         char optionShortName;
 
-        for(PositionType position = 0; ParameterBuffer[position] != STD_NULL_CHARACTER; position++) {
+        for(PositionType position = 0u; ParameterBuffer[position] != STD_NULL_CHARACTER; position++) {
             if(state == STATE_PARSE) {
                 char currentChar = ParameterBuffer[position];
                 if(currentChar == OptionStartChar) { state = STATE_OPTION_CHAR; }
@@ -204,7 +204,7 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
         }
     }
 
-    template <typename T> void sendAnswerParameter(char OptionShortName, T Value, bool AppendSpace = true)
+    template <typename T> void sendAnswerParameter(char OptionShortName, T Value, bool AppendSpace = true) const
     {
         Serial.print(OptionShortName);
         Serial.print(OptionArgumentDelimiter);

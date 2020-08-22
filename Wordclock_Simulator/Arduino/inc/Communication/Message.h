@@ -71,6 +71,7 @@ class Message
 
     // methods
     void clear() { Buffer[0u] = NullCharacter; }
+    bool isEmpty() { return Buffer[0u] == NullCharacter; }
 
     size_t length() const
     {

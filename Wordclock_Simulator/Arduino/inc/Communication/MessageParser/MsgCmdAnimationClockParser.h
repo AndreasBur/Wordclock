@@ -56,8 +56,8 @@ class MsgCmdAnimationClockParser : public MsgParameterParser<MsgCmdAnimationCloc
 ******************************************************************************************************************************************************/
   private:
     friend class MsgParameterParser;
-    AnimationClockType AnimationClock;
-    byte Speed;
+    AnimationClockType AnimationClock{AnimationClock::ANIMATION_CLOCK_NONE};
+    byte Speed{0u};
 
     static constexpr char AnimationOptionShortName{'A'};
     static constexpr char SpeedOptionShortName{'S'};
@@ -68,8 +68,8 @@ class MsgCmdAnimationClockParser : public MsgParameterParser<MsgCmdAnimationCloc
     };
 
     // functions
-    byte convertSpeedToTaskCycle(byte Speed) { return UINT8_MAX - Speed; }
-    byte convertTaskCycleToSpeed(byte TaskCylce) { return UINT8_MAX - TaskCylce; }
+    byte convertSpeedToTaskCycle(byte Speed) const { return UINT8_MAX - Speed; }
+    byte convertTaskCycleToSpeed(byte TaskCylce) const { return UINT8_MAX - TaskCylce; }
 
     void handleParameter(char ParameterShortName, byte Argument)
     {
@@ -81,11 +81,23 @@ class MsgCmdAnimationClockParser : public MsgParameterParser<MsgCmdAnimationCloc
         }
     }
 
-    void sendAnswerAnimation() { sendAnswerParameter(AnimationOptionShortName, Animation::getInstance().getAnimation()); }
-    void sendAnswerSpeed() {
+    void sendAnswerAnimation(bool AppendSpace) const { sendAnswerParameter(AnimationOptionShortName, Animation::getInstance().getAnimation(), AppendSpace); }
+    void sendAnswerSpeed(bool AppendSpace) const {
         AnimationClockType animation = Animation::getInstance().getAnimation();
         byte taskCylce = Animation::getInstance().getClockTaskCycle(animation);
-        sendAnswerParameter(SpeedOptionShortName, convertSpeedToTaskCycle(taskCylce), false);
+        sendAnswerParameter(SpeedOptionShortName, convertTaskCycleToSpeed(taskCylce), AppendSpace);
+    }
+
+    void setAnimation() const
+    {
+        StdReturnType returnValue = Animation::getInstance().setAnimation(AnimationClock);
+        Error.checkReturnValueAndSend(ErrorMessage::API_ANIMATION_SET_ANIMATION, returnValue, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNCE);
+    }
+
+    void setClockTaskCylce() const
+    {
+        StdReturnType returnValue = Animation::getInstance().setClockTaskCylce(AnimationClock, convertSpeedToTaskCycle(Speed));
+        Error.checkReturnValueAndSend(ErrorMessage::API_ANIMATION_SET_CLOCK_TASK_CYCLE, returnValue, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNCE);
     }
 
 /******************************************************************************************************************************************************
@@ -95,7 +107,7 @@ class MsgCmdAnimationClockParser : public MsgParameterParser<MsgCmdAnimationCloc
     MsgCmdAnimationClockParser(const char* Parameter) : MsgParameterParser(ParameterTable, Parameter), AnimationClock(), Speed(0u)
     {
         AnimationClock = Animation::getInstance().getAnimation();
-        Speed = Animation::getInstance().getClockTaskCycle(AnimationClock);
+        Speed = convertTaskCycleToSpeed(Animation::getInstance().getClockTaskCycle(AnimationClock));
     }
 
     ~MsgCmdAnimationClockParser() { }
@@ -105,17 +117,16 @@ class MsgCmdAnimationClockParser : public MsgParameterParser<MsgCmdAnimationCloc
     // set methods
 
     // methods
-    void sendAnswer()
+    void sendAnswer() const
     {
-        sendAnswerAnimation();
-        sendAnswerSpeed();
+        sendAnswerAnimation(true);
+        sendAnswerSpeed(false);
     }
 
-    void process()
+    void process() const
     {
-        Animation::getInstance().setAnimation(AnimationClock);
-        Animation::getInstance().setClockTaskCylce(AnimationClock, convertSpeedToTaskCycle(Speed));
-        Animation::getInstance().show();
+        setAnimation();
+        setClockTaskCylce();
     }
 };
 

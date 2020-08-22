@@ -9,10 +9,10 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       MsgCmdDisplayPixelParser.h
- *      \brief      
+ *      \brief
  *
- *      \details    
- *                  
+ *      \details
+ *
 ******************************************************************************************************************************************************/
 #ifndef _MSG_CMD_DISPLAY_PIXEL_PARSER_H_
 #define _MSG_CMD_DISPLAY_PIXEL_PARSER_H_
@@ -34,6 +34,12 @@
 /* MsgCmdDisplayPixelParser parameter */
 #define MSG_CMD_DISPLAY_PIXEL_PARSER_PARAMETER_TABLE_SIZE           2u
 
+# if (WS2812_NUMBER_OF_LEDS < 255u)
+#  define MSG_CMD_DISPLAY_PIXEL_PARSER_INDEX_ARGUMENT_TYPE      MsgParameter::ARGUMENT_TYPE_UINT8
+# else
+#  define MSG_CMD_DISPLAY_PIXEL_PARSER_INDEX_ARGUMENT_TYPE      MsgParameter::ARGUMENT_TYPE_UINT16
+# endif
+
 /******************************************************************************************************************************************************
  *  G L O B A L   F U N C T I O N   M A C R O S
 ******************************************************************************************************************************************************/
@@ -48,46 +54,82 @@ class MsgCmdDisplayPixelParser : public MsgParameterParser<MsgCmdDisplayPixelPar
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
+    enum StateType {
+        STATE_NONE,
+        STATE_OFF,
+        STATE_ON
+    };
 
-    
+    using IndexType = Display::IndexType;
+
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
     friend class MsgParameterParser;
     byte Index{0u};
-    bool State{false};
-    
+    StateType State{STATE_NONE};
+
     static constexpr char IndexOptionShortName{'I'};
     static constexpr char StateOptionShortName{'S'};
-    
+
     static constexpr ParameterTableType ParameterTable PROGMEM
     {
-        ParameterTableElementType(IndexOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8),
+        ParameterTableElementType(IndexOptionShortName, MSG_CMD_DISPLAY_PIXEL_PARSER_INDEX_ARGUMENT_TYPE),
         ParameterTableElementType(StateOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8),
     };
-    
+
     // functions
     void handleParameter(char ParameterShortName, byte Argument)
     {
-        if(ParameterShortName == IndexOptionShortName) { Index = Argument; }
-        if(ParameterShortName == StateOptionShortName) { State = Argument; }
-    }
-    
-    void sendAnswerIndex()
-    {
-        Serial.print(IndexOptionShortName);
-        Serial.print(OptionArgumentDelimiter);
-        Serial.print(Index);
+        if(ParameterShortName == IndexOptionShortName) { handleParameterIndex(Argument); }
+        if(ParameterShortName == StateOptionShortName) { handleParameterState(Argument); }
     }
 
-    void sendAnswerState()
+    void handleParameterIndex(byte Argument)
     {
-        Serial.print(StateOptionShortName);
-        Serial.print(OptionArgumentDelimiter);
-        Serial.print(Display::getInstance().getPixel(Index));
+        Index = Argument;
+        if(State == STATE_NONE) {
+            State = getPixelState(Index);
+        }
     }
-  
+
+    void handleParameterState(byte Argument)
+    {
+        bool pixelValue = Argument;
+        State = getPixelState(pixelValue);
+    }
+
+    StateType getPixelState(byte Index) const
+    {
+        bool pixelValue;
+        if(Display::getInstance().getPixel(Index, pixelValue) == E_OK) {
+            return getPixelState(pixelValue);
+        } else {
+            return STATE_NONE;
+        }
+    }
+
+    StateType getPixelState(bool PixelValue) const { return PixelValue ? STATE_ON : STATE_OFF; }
+    bool getPixelValue(StateType PixelState) const { return (PixelState == STATE_ON) ? true : false; }
+
+    void sendAnswerIndex(bool AppendSpace) const { sendAnswerParameter(IndexOptionShortName, Index, AppendSpace); }
+    void sendAnswerState(bool AppendSpace) const { sendAnswerParameter(StateOptionShortName, Display::getInstance().getPixelFast(Index), AppendSpace); }
+
+    void setPixel() const
+    {
+        if(State != STATE_NONE) {
+            StdReturnType returnValue = Display::getInstance().writePixel(Index, getPixelValue(State));
+            Error.checkReturnValueAndSend(ErrorMessage::API_DISPLAY_WRITE_PIXEL, returnValue, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNCE);
+        }
+    }
+
+    void show() const
+    {
+        StdReturnType returnValue = Display::getInstance().show();
+        Error.checkReturnValueAndSend(ErrorMessage::API_DISPLAY_SHOW, returnValue, ErrorMessage::ERROR_DISPLAY_PENDING);
+    }
+
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
@@ -100,13 +142,23 @@ class MsgCmdDisplayPixelParser : public MsgParameterParser<MsgCmdDisplayPixelPar
     // set methods
 
     // methods
-    void sendAnswer()
+    void sendAnswer() const
     {
-        sendAnswerIndex();
-        sendAnswerState();
+        if(Display::getInstance().isIndexValid(Index)) {
+            sendAnswerIndex(true);
+            sendAnswerState(false);
+        }
     }
-    
-    void process() { Error.send(Error::API_DISPLAY_SHOW, Display::getInstance().show()); }
+
+    void process()
+    {
+        if(!Display::getInstance().isIndexValid(Index)) {
+            Error.send(IndexOptionShortName, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNCE, false);
+        } else {
+            setPixel();
+        }
+        show();
+    }
 
 };
 

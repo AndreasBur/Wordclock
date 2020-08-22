@@ -9,10 +9,10 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       AnimationFont.h
- *      \brief      
+ *      \brief
  *
- *      \details    
- *                  
+ *      \details
+ *
 ******************************************************************************************************************************************************/
 #ifndef _ANIMATION_FONT_H_
 #define _ANIMATION_FONT_H_
@@ -91,7 +91,7 @@ class AnimationFont
         byte Counter : 7;
         ShiftStateType State : 1;
     };
-  
+
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
@@ -138,13 +138,13 @@ class AnimationFont
     template <typename ColumnType>
     void setCharColumnFast(ColumnType, byte, byte, byte);
 
-    StdReturnType convertCharToFontIndex(char, byte&);
-    byte convertCharToFontIndexFast(char);
+    StdReturnType convertCharToFontIndex(char, byte&) const;
+    byte convertCharToFontIndexFast(char) const;
     void stringShiftTask();
     void charShiftTask();
-    byte getColumnCenter(FontType Font) { return (DISPLAY_NUMBER_OF_COLUMNS / 2u) - (getFontWidth(Font) / 2u); }
-    byte getRowCenter(FontType Font) { return (DISPLAY_NUMBER_OF_ROWS / 2u) - (getFontHeight(Font) / 2u); }
-    
+    byte getColumnCenter(FontType Font) const { return (DISPLAY_NUMBER_OF_COLUMNS / 2u) - (getFontWidth(Font) / 2u); }
+    byte getRowCenter(FontType Font) const { return (DISPLAY_NUMBER_OF_ROWS / 2u) - (getFontHeight(Font) / 2u); }
+
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
@@ -166,7 +166,7 @@ class AnimationFont
 #endif
 #if(ANIMATION_FONT_SUPPORT_FONT_10X10 == STD_ON)
                                 Font10x10()
-#endif 
+#endif
     { }
     ~AnimationFont() { }
 
@@ -179,17 +179,17 @@ class AnimationFont
 
     // methods
     void init() { }
-    void show() { Display::getInstance().show(); }
+    StdReturnType show() const { return Display::getInstance().show(); }
     void task();
     StdReturnType setChar(byte, byte, char, FontType);
     void setCharFast(byte, byte, char, FontType);
     void setCharWithShift(char, FontType);
     void setText(const char*, FontType);
     void setTextWithShift(const char*, FontType);
-    byte getFontHeight(FontType);
-    byte getFontWidth(FontType);
-    byte getFontCharWidth(FontType, char);
-    Orientation getFontOrientation(FontType);
+    byte getFontHeight(FontType) const;
+    byte getFontWidth(FontType) const;
+    byte getFontCharWidth(FontType, char) const;
+    Orientation getFontOrientation(FontType) const;
 
 };
 

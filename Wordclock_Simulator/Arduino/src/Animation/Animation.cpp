@@ -95,18 +95,20 @@ void Animation::task()
 /******************************************************************************************************************************************************
   show()
 ******************************************************************************************************************************************************/
-void Animation::show()
+StdReturnType Animation::show() const
 {
     if( wcAnimationClock.getState() == AnimationClockCommon::STATE_CLEAR_TIME ||
         wcAnimationClock.getState() == AnimationClockCommon::STATE_SET_TIME)
     {
-        wcAnimationClock.show();
+        return wcAnimationClock.show();
     }
     else if( wcAnimationFont.getState() == AnimationFont::STATE_CHAR_SHIFT ||
              wcAnimationFont.getState() == AnimationFont::STATE_TEXT_SHIFT)
     {
-        wcAnimationFont.show();
+        return wcAnimationFont.show();
     }
+
+    return E_NOT_OK;
 } /* task */
 
 

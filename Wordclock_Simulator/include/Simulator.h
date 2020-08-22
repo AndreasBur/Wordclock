@@ -5,12 +5,12 @@
 #include <wx/button.h>
 
 #include "StandardTypes.h"
-//#include "DisplayCharacters.h"
+#include "NeoPixel.h"
 
 
 #define SIMULATOR_DISPLAY_NUMBER_OF_ROWS                  10u
 #define SIMULATOR_DISPLAY_NUMBER_OF_COLUMNS               11u
-
+#define SIMULATOR_NUMBER_OF_PIXELS                        (SIMULATOR_DISPLAY_NUMBER_OF_ROWS * SIMULATOR_DISPLAY_NUMBER_OF_COLUMNS)
 
 class Simulator : public wxFrame
 {
@@ -20,12 +20,12 @@ class Simulator : public wxFrame
             return *pSingletonInstance;
         }
 
-        /* type which describes the structure of a pixel */
-        typedef struct {
-            byte Red;
-            byte Green;
-            byte Blue;
-        } PixelType;
+        using PixelType = NeoPixel::NeoPixelType;
+#if (SIMULATOR_NUMBER_OF_PIXELS < 255u)
+        using IndexType = byte;
+#else
+        using IndexType = uint16_t;
+#endif
 
         using SizerCharactersType = std::array<wxBoxSizer*, SIMULATOR_DISPLAY_NUMBER_OF_ROWS>;
 
@@ -46,6 +46,7 @@ class Simulator : public wxFrame
         void clearPixelFast(byte Index) { setPixelFast(Index, 0, 0, 0); }
 
         // methods
+        bool isIndexValid(IndexType Index) const { return Index < SIMULATOR_NUMBER_OF_PIXELS; }
         void init(byte sPin) { Pin = sPin; }
         void enablePixels() { setBrightness(255); }
         void disablePixels() { setBrightness(0); }

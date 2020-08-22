@@ -103,6 +103,7 @@ class Display
     /* mapping to underlying hardware */
     using IlluminanceType = BH1750::IlluminanceType;
 
+    using IndexType = WS2812::IndexType;
     using PixelColorType = WS2812::PixelType;
     using ColorType = NeoPixel::ColorType;
     using Stripe = WS2812;
@@ -207,23 +208,24 @@ class Display
 
     // pixel methods
     StdReturnType writePixel(byte Column, byte Row, bool Value) { if(Value) return setPixel(Column, Row); else return clearPixel(Column, Row); }
-    StdReturnType writePixel(byte Index, bool Value) { if(Value) return setPixel(Index); else return clearPixel(Index); }
+    StdReturnType writePixel(IndexType Index, bool Value) { if(Value) return setPixel(Index); else return clearPixel(Index); }
     StdReturnType setPixel(byte, byte);
-    StdReturnType setPixel(byte);
+    StdReturnType setPixel(IndexType);
     StdReturnType clearPixel(byte, byte);
-    StdReturnType clearPixel(byte);
+    StdReturnType clearPixel(IndexType);
     StdReturnType togglePixel(byte, byte);
-    StdReturnType togglePixel(byte);
+    StdReturnType togglePixel(IndexType);
     StdReturnType getPixel(byte, byte, bool&) const;
-    StdReturnType getPixel(byte, bool&) const;
+    StdReturnType getPixel(IndexType, bool&) const;
     StdReturnType getPixelRow(byte, PixelRowType&) const;
     StdReturnType getPixelColumn(byte, PixelColumnType&) const;
     StdReturnType setPixelRow(byte, PixelRowType);
     StdReturnType setPixelColumn(byte, PixelColumnType);
 
     // pixel methods fast
+    bool isIndexValid(IndexType Index) const { return Pixels.isIndexValid(Index); }
     void writePixelFast(byte Column, byte Row, bool Value) { if(Value) setPixelFast(Column, Row); else clearPixelFast(Column, Row); }
-    void writePixelFast(byte Index, bool Value) { if(Value) setPixelFast(Index); else clearPixelFast(Index); }
+    void writePixelFast(IndexType Index, bool Value) { if(Value) setPixelFast(Index); else clearPixelFast(Index); }
     void setPixelFast(byte, byte);
     void setPixelFast(byte);
     void clearPixelFast(byte, byte);
@@ -246,9 +248,9 @@ class Display
     void disableBrightnessAutomatic() { BrightnessAutomatic = false; }
     void test();
     void clear() { Pixels.clearPixels(); }
-    void indexToColumnAndRow(byte Index, byte& Column, byte& Row) const { Row = Index / DISPLAY_NUMBER_OF_COLUMNS; Column = Index % DISPLAY_NUMBER_OF_COLUMNS; }
-    byte indexToColumn(byte Index) const { return Index % DISPLAY_NUMBER_OF_COLUMNS; }
-    byte indexToRow(byte Index) const { return Index / DISPLAY_NUMBER_OF_COLUMNS; }
+    void indexToColumnAndRow(IndexType Index, byte& Column, byte& Row) const { Row = Index / DISPLAY_NUMBER_OF_COLUMNS; Column = Index % DISPLAY_NUMBER_OF_COLUMNS; }
+    byte indexToColumn(IndexType Index) const { return Index % DISPLAY_NUMBER_OF_COLUMNS; }
+    byte indexToRow(IndexType Index) const { return Index / DISPLAY_NUMBER_OF_COLUMNS; }
     byte columnAndRowToIndex(byte Column, byte Row) const { return (Row * DISPLAY_NUMBER_OF_COLUMNS) + Column; }
 
 };

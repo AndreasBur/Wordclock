@@ -186,7 +186,7 @@ StdReturnType Clock::getClockWords(byte Hour, byte Minute, ClockWordsListType& C
 /******************************************************************************************************************************************************
   setClock()
 ******************************************************************************************************************************************************/
-StdReturnType Clock::setClock(byte Hour, byte Minute)
+StdReturnType Clock::setTime(byte Hour, byte Minute) const
 {
     /* ----- Local Variables ---------------------------------------------- */
     StdReturnType returnValue{E_OK};
@@ -212,7 +212,7 @@ StdReturnType Clock::setClock(byte Hour, byte Minute)
 /******************************************************************************************************************************************************
   setClockFast()
 ******************************************************************************************************************************************************/
-void Clock::setClockFast(byte Hour, byte Minute)
+void Clock::setTimeFast(byte Hour, byte Minute) const
 {
     ClockWords clockWords;
 

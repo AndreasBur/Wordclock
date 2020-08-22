@@ -122,7 +122,7 @@ void loop()
 
   //FontTahoma10x10::CharType Char;
   // put your main code here, to run repeatedly:
-    Clock::getInstance().setClock(17,30);
+    Clock::getInstance().setTime(17,30);
 	while(1) {
 	    wcCommunication.task();
 	}

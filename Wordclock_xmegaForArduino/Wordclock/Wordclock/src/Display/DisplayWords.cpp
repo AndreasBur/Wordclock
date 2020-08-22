@@ -9,10 +9,10 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       DisplayWords.cpp
- *      \brief      
+ *      \brief
  *
- *      \details    
- *                  
+ *      \details
+ *
  *
 ******************************************************************************************************************************************************/
 #define _DISPLAY_WORDS_SOURCE_
@@ -78,7 +78,7 @@ StdReturnType DisplayWords::getDisplayWord(WordIdType WordId, DisplayWord& Word)
 {
     StdReturnType ReturnValue{E_NOT_OK};
 
-    if(WordId < DisplayWords::WORD_NUMBER_OF_WORDS) {
+    if(isWordIdValid(WordId)) {
         Word = getDisplayWordFast(WordId);
         ReturnValue = E_OK;
     } else {
@@ -95,7 +95,7 @@ StdReturnType DisplayWords::getDisplayWordLength(WordIdType WordId, byte& Length
 {
     StdReturnType ReturnValue{E_NOT_OK};
 
-    if(WordId < DisplayWords::WORD_NUMBER_OF_WORDS) {
+    if(isWordIdValid(WordId)) {
         Length = getDisplayWordLengthFast(WordId);
         ReturnValue = E_OK;
     } else {
@@ -112,7 +112,7 @@ StdReturnType DisplayWords::getDisplayWordColumn(WordIdType WordId, byte& Column
 {
     StdReturnType ReturnValue{E_NOT_OK};
 
-    if(WordId < DisplayWords::WORD_NUMBER_OF_WORDS) {
+    if(isWordIdValid(WordId)) {
         Column = getDisplayWordColumnFast(WordId);
         ReturnValue = E_OK;
     } else {
@@ -129,7 +129,7 @@ StdReturnType DisplayWords::getDisplayWordRow(WordIdType WordId, byte& Row) cons
 {
     StdReturnType ReturnValue{E_NOT_OK};
 
-    if(WordId < DisplayWords::WORD_NUMBER_OF_WORDS) {
+    if(isWordIdValid(WordId)) {
         Row = getDisplayWordRowFast(WordId);
         ReturnValue = E_OK;
     } else {
@@ -148,4 +148,3 @@ StdReturnType DisplayWords::getDisplayWordRow(WordIdType WordId, byte& Row) cons
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E
 ******************************************************************************************************************************************************/
- 

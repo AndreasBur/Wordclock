@@ -9,10 +9,10 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       MsgCmdDisplayBrightnessParser.h
- *      \brief      
+ *      \brief
  *
- *      \details    
- *                  
+ *      \details
+ *
 ******************************************************************************************************************************************************/
 #ifndef _MSG_CMD_DISPLAY_BRIGHTNESS_PARSER_H_
 #define _MSG_CMD_DISPLAY_BRIGHTNESS_PARSER_H_
@@ -76,8 +76,14 @@ class MsgCmdDisplayBrightnessParser : public MsgParameterParser<MsgCmdDisplayBri
         }
     }
 
-     void sendAnswerBrightness() { sendAnswerParameter(BrightnessOptionShortName, Display::getInstance().getBrightness()); }
-     void sendAnswerAutomatic() { sendAnswerParameter(AutomaticOptionShortName, Display::getInstance().getBrightnessAutomatic(), false); }
+     void sendAnswerBrightness() const { sendAnswerParameter(BrightnessOptionShortName, Display::getInstance().getBrightness()); }
+     void sendAnswerAutomatic() const { sendAnswerParameter(AutomaticOptionShortName, Display::getInstance().getBrightnessAutomatic(), false); }
+
+    void show() const
+    {
+        StdReturnType returnValue = Display::getInstance().show();
+        Error.checkReturnValueAndSend(ErrorMessage::API_DISPLAY_SHOW, returnValue, ErrorMessage::ERROR_DISPLAY_PENDING);
+    }
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
@@ -97,7 +103,7 @@ class MsgCmdDisplayBrightnessParser : public MsgParameterParser<MsgCmdDisplayBri
         sendAnswerAutomatic();
     }
 
-    void process() { Display::getInstance().show(); }
+    void process() { show(); }
 
 };
 

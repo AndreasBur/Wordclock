@@ -9,10 +9,10 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       MsgCmdParser.cpp
- *      \brief      
+ *      \brief
  *
- *      \details    
- *                  
+ *      \details
+ *
  *
 ******************************************************************************************************************************************************/
 #define _MSG_CMD_PARSER_SOURCE_
@@ -23,11 +23,12 @@
 #include "MsgCmdParser.h"
 #include "MsgCmdDisplayColorParser.h"
 #include "MsgCmdDisplayBrightnessParser.h"
-#include "MsgCmdClockModeParser.h"
+#include "MsgCmdDisplayPixelParser.h"
+#include "MsgCmdClockTimeParser.h"
 #include "MsgCmdAnimationClockParser.h"
 
 /******************************************************************************************************************************************************
- *  L O C A L   C O N S T A N T   M A C R O S 
+ *  L O C A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
 
 
@@ -54,9 +55,9 @@ void MsgCmdParser::parse()
 {
     CommandType command = getCommand();
     const char* parameter = getParameter();
-    
+
     sendAnswer(command);
-    
+
     if(command == COMMAND_DISPLAY_COLOR) {
         MsgCmdDisplayColorParser cmdDisplayColorParser(parameter);
         cmdDisplayColorParser.parse();
@@ -67,21 +68,26 @@ void MsgCmdParser::parse()
         cmdDisplayBrightnessParser.parse();
         cmdDisplayBrightnessParser.process();
         cmdDisplayBrightnessParser.sendAnswer();
-    } else if(command == COMMAND_CLOCK_ANIMATION) {
+    } else if(command == COMMAND_DISPLAY_PIXEL) {
+        MsgCmdDisplayPixelParser cmdDisplayPixelParser(parameter);
+        cmdDisplayPixelParser.parse();
+        cmdDisplayPixelParser.process();
+        cmdDisplayPixelParser.sendAnswer();
+    } else if(command == COMMAND_ANIMATION_CLOCK) {
         MsgCmdAnimationClockParser cmdAnimationClockParser(parameter);
         cmdAnimationClockParser.parse();
         cmdAnimationClockParser.process();
         cmdAnimationClockParser.sendAnswer();
-    } else if(command == COMMAND_CLOCK_MODE) {
-        MsgCmdClockModeParser cmdClockModeParser(parameter);
-        cmdClockModeParser.parse();
-        cmdClockModeParser.process();
-        cmdClockModeParser.sendAnswer();
+    } else if(command == COMMAND_CLOCK_TIME) {
+        MsgCmdClockTimeParser cmdClockTimeParser(parameter);
+        cmdClockTimeParser.parse();
+        cmdClockTimeParser.process();
+        cmdClockTimeParser.sendAnswer();
     } else {
         Error.send(ErrorMessage::ERROR_WRONG_COMMAND);
     }
 
-    Serial.println(); 
+    Serial.println();
 }
 
 
@@ -94,4 +100,3 @@ void MsgCmdParser::parse()
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E
 ******************************************************************************************************************************************************/
- 

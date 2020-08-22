@@ -82,7 +82,7 @@ class AnimationClockCommon
 
     // methods
     void init(StateType sState) { State = sState; }
-    StdReturnType show() { return Display::getInstance().show(); }
+    StdReturnType show() const { return Display::getInstance().show(); }
     bool isPixelPartOfClockWords(ClockWords::WordsListType, byte, byte) const;
     bool isPixelPartOfClockWords(ClockWords::WordsListType, byte) const;
 };

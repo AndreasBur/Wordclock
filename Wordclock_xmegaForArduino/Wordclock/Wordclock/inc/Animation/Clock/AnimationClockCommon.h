@@ -9,10 +9,10 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       AnimationClockCommon.h
- *      \brief      
+ *      \brief
  *
- *      \details    
- *                  
+ *      \details
+ *
 ******************************************************************************************************************************************************/
 #ifndef _ANIMATION_CLOCK_COMMON_H_
 #define _ANIMATION_CLOCK_COMMON_H_
@@ -55,7 +55,7 @@ class AnimationClockCommon
         STATE_CLEAR_TIME,
         STATE_SET_TIME
     };
-  
+
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
@@ -67,7 +67,7 @@ class AnimationClockCommon
 ******************************************************************************************************************************************************/
   protected:
     StateType State{STATE_NONE};
-    
+
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
@@ -82,11 +82,9 @@ class AnimationClockCommon
 
     // methods
     void init(StateType sState) { State = sState; }
-    void show() { Display::getInstance().show(); }
+    StdReturnType show() const { return Display::getInstance().show(); }
     bool isPixelPartOfClockWords(ClockWords::WordsListType, byte, byte) const;
     bool isPixelPartOfClockWords(ClockWords::WordsListType, byte) const;
-    //virtual void task() = 0;
-    //virtual stdReturnType setClock(byte, byte) = 0;
 };
 
 

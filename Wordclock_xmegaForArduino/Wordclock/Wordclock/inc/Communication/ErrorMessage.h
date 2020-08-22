@@ -55,21 +55,37 @@ class ErrorMessage
         ERROR_PARAMETER_UNKNOWN,
         ERROR_VALUE_OUT_OF_BOUNCE,
         ERROR_NO_VALUE_GIVEN,
+        ERROR_DISPLAY_PENDING,
         ERROR_UNKNOWN
     };
 
     enum ApiType {
         API_NONE,
-        API_DISPLAY_SHOW
+        API_DISPLAY_SHOW,
+        API_DISPLAY_WRITE_PIXEL,
+        API_ANIMATION_SHOW,
+        API_CLOCK_SHOW,
+        API_ANIMATION_SET_ANIMATION,
+        API_ANIMATION_SET_CLOCK_TASK_CYCLE
     };
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
+    //static constexpr char ErrorOptionCharDelimiter{':'};
 
     // functions
     void sendSpace() const { Serial.print(' '); }
+    void sendColon() const { Serial.print(':'); }
+    void sendEqual() const { Serial.print('='); }
+
+    void send(ApiType Api) const
+    {
+        Serial.print(F("Api"));
+        sendEqual();
+        Serial.print(Api);
+    }
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
@@ -86,7 +102,8 @@ class ErrorMessage
     // methods
     void send(ErrorType Error, bool AppendSpace = true) const
     {
-        Serial.print(F("Error:"));
+        Serial.print(F("Error"));
+        sendEqual();
         Serial.print(Error);
         if(AppendSpace) {  }
     }
@@ -94,7 +111,7 @@ class ErrorMessage
     void send(char OptionShortName, ErrorType Error, bool AppendSpace = true) const
     {
         send(Error, false);
-        Serial.print(':');
+        sendColon();
         Serial.print(OptionShortName);
         if(AppendSpace) { sendSpace(); }
     }
@@ -104,19 +121,27 @@ class ErrorMessage
         send(Parameter.getOptionShortName(), Error, AppendSpace);
     }
 
-    void send(bool ReturnValue) const
+    void send(StdReturnType ReturnValue) const
     {
-        if(ReturnValue) { send(ERROR_NO_ERROR); }
+        if(ReturnValue == E_OK) { send(ERROR_NO_ERROR); }
         else { send(ERROR_UNKNOWN); }
     }
 
-    void send(ApiType Api, bool ReturnValue, bool AppendSpace = true) const
+//    void send(ApiType Api, StdReturnType ReturnValue, bool AppendSpace = true) const
+//    {
+//        Serial.print(':');
+//        send(ReturnValue);
+//        if(AppendSpace) { sendSpace(); }
+//    }
+
+    void checkReturnValueAndSend(ApiType Api, StdReturnType ReturnValue, ErrorType Error, bool AppendSpace = true) const
     {
-        Serial.print(F("Api:"));
-        Serial.print(Api);
-        Serial.print(':');
-        send(ReturnValue);
-        if(AppendSpace) { sendSpace(); }
+        if(ReturnValue == E_NOT_OK) {
+            send(Api);
+            sendColon();
+            send(Error);
+            if(AppendSpace) { sendSpace(); }
+        }
     }
 };
 

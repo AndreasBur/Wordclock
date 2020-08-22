@@ -168,7 +168,7 @@ void AnimationFont::task()
 /******************************************************************************************************************************************************
   getFontHeight()
 ******************************************************************************************************************************************************/
-byte AnimationFont::getFontHeight(FontType Font)
+byte AnimationFont::getFontHeight(FontType Font) const
 {
 #if(ANIMATION_FONT_SUPPORT_FONT_5X8 == STD_ON)
     if(Font == FONT_5X8) return Font5x8.getHeight();
@@ -192,7 +192,7 @@ byte AnimationFont::getFontHeight(FontType Font)
 /******************************************************************************************************************************************************
   getFontWidth()
 ******************************************************************************************************************************************************/
-byte AnimationFont::getFontWidth(FontType Font)
+byte AnimationFont::getFontWidth(FontType Font) const
 {
 #if(ANIMATION_FONT_SUPPORT_FONT_5X8 == STD_ON)
     if(Font == FONT_5X8) return Font5x8.getWidth();
@@ -216,7 +216,7 @@ byte AnimationFont::getFontWidth(FontType Font)
 /******************************************************************************************************************************************************
   getFontCharWidth()
 ******************************************************************************************************************************************************/
-byte AnimationFont::getFontCharWidth(FontType Font, char Char)
+byte AnimationFont::getFontCharWidth(FontType Font, char Char) const
 {
     byte Index = convertCharToFontIndexFast(Char);
 
@@ -242,7 +242,7 @@ byte AnimationFont::getFontCharWidth(FontType Font, char Char)
 /******************************************************************************************************************************************************
   getFontOrientation()
 ******************************************************************************************************************************************************/
-Orientation AnimationFont::getFontOrientation(FontType Font)
+Orientation AnimationFont::getFontOrientation(FontType Font) const
 {
 #if(ANIMATION_FONT_SUPPORT_FONT_5X8 == STD_ON)
     if(Font == FONT_5X8) return Font5x8.getOrientation();
@@ -467,7 +467,7 @@ void AnimationFont::setCharColumnFast(ColumnType CharColumn, byte ColumnAbs, byt
  *  \return         E_OK
  *                  E_NOT_OK
  *****************************************************************************************************************************************************/
-StdReturnType AnimationFont::convertCharToFontIndex(char Char, byte& Index)
+StdReturnType AnimationFont::convertCharToFontIndex(char Char, byte& Index) const
 {
     StdReturnType ReturnValue = E_NOT_OK;
 
@@ -497,7 +497,7 @@ StdReturnType AnimationFont::convertCharToFontIndex(char Char, byte& Index)
  *  \return         E_OK
  *                  E_NOT_OK
  *****************************************************************************************************************************************************/
-byte AnimationFont::convertCharToFontIndexFast(char Char)
+byte AnimationFont::convertCharToFontIndexFast(char Char) const
 {
     /* for umlauts we need a special treatment */
     if('Ä' == Char)  return 96u;

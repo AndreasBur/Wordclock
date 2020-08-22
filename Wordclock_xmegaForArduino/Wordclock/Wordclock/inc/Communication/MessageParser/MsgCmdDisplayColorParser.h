@@ -74,27 +74,16 @@ class MsgCmdDisplayColorParser : public MsgParameterParser<MsgCmdDisplayColorPar
         if(ParameterShortName == BlueOptionShortName) { Display::getInstance().setColorBlue(Argument); }
     }
 
-    void sendAnswerRed()
+    void sendAnswerRed() const { sendAnswerParameter(RedOptionShortName, Display::getInstance().getColorRed()); }
+    void sendAnswerGreen() const { sendAnswerParameter(GreenOptionShortName, Display::getInstance().getColorGreen()); }
+    void sendAnswerBlue() const { sendAnswerParameter(BlueOptionShortName, Display::getInstance().getColorBlue(), false); }
+
+    void show() const
     {
-        Serial.print(RedOptionShortName);
-        Serial.print(OptionArgumentDelimiter);
-        Serial.print(Display::getInstance().getColorRed());
+        StdReturnType returnValue = Display::getInstance().show();
+        Error.checkReturnValueAndSend(ErrorMessage::API_DISPLAY_SHOW, returnValue, ErrorMessage::ERROR_DISPLAY_PENDING);
     }
 
-    void sendAnswerGreen()
-    {
-        Serial.print(GreenOptionShortName);
-        Serial.print(OptionArgumentDelimiter);
-        Serial.print(Display::getInstance().getColorGreen());
-    }
-
-    void sendAnswerBlue()
-    {
-        Serial.print(BlueOptionShortName);
-        Serial.print(OptionArgumentDelimiter);
-        Serial.print(Display::getInstance().getColorBlue());
-    }
-  
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
@@ -107,14 +96,14 @@ class MsgCmdDisplayColorParser : public MsgParameterParser<MsgCmdDisplayColorPar
     // set methods
 
     // methods
-    void sendAnswer()
+    void sendAnswer() const
     {
         sendAnswerRed();
         sendAnswerGreen();
         sendAnswerBlue();
     }
 
-    void process() { Display::getInstance().show(); }
+    void process() const { show(); }
 
 };
 

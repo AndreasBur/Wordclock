@@ -9,10 +9,10 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       MsgOption.h
- *      \brief      
+ *      \brief
  *
- *      \details    
- *                  
+ *      \details
+ *
 ******************************************************************************************************************************************************/
 #ifndef _MSG_PARAMETER_H_
 #define _MSG_PARAMETER_H_
@@ -62,7 +62,7 @@ class MsgParameter
         ARGUMENT_TYPE_FLOAT,
         ARGUMENT_TYPE_DOUBLE
     };
-  
+
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
@@ -80,14 +80,10 @@ class MsgParameter
 ******************************************************************************************************************************************************/
   public:
     constexpr MsgParameter(char sOptionShortName, ArgumentTypeType sArgumentType)
-    : OptionShortName(sOptionShortName), ArgumentType(sArgumentType) {
+    : OptionShortName(sOptionShortName), ArgumentType(sArgumentType) { }
 
-    }
-    
-    constexpr MsgParameter() : OptionShortName(' '), ArgumentType(ARGUMENT_TYPE_NONE) {
+    constexpr MsgParameter() : OptionShortName(' '), ArgumentType(ARGUMENT_TYPE_NONE) { }
 
-    }
-    
     // get methods
     byte getOptionShortName() const { return OptionShortName; }
     ArgumentTypeType getArgumentType() const { return ArgumentType; }

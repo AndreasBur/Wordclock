@@ -9,10 +9,10 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       Transformation.h
- *      \brief      
+ *      \brief
  *
- *      \details    
- *                  
+ *      \details
+ *
 ******************************************************************************************************************************************************/
 #ifndef _TRANSFORMATION_H_
 #define _TRANSFORMATION_H_
@@ -73,25 +73,25 @@ class Transformation
     // set methods
 
     // methods
-    StdReturnType shiftLeft(bool = false);
-    StdReturnType shiftRight(bool = false);
-    StdReturnType shiftUp(bool = false);
-    StdReturnType shiftDown(bool = false);
+    StdReturnType shiftLeft(bool = false) const;
+    StdReturnType shiftRight(bool = false) const;
+    StdReturnType shiftUp(bool = false) const;
+    StdReturnType shiftDown(bool = false) const;
 
-    StdReturnType shiftRowLeft(byte, bool = false);
-    StdReturnType shiftRowRight(byte, bool = false);
-    StdReturnType shiftColumnUp(byte, bool = false);
-    StdReturnType shiftColumnDown(byte, bool = false);
+    StdReturnType shiftRowLeft(byte, bool = false) const;
+    StdReturnType shiftRowRight(byte, bool = false) const;
+    StdReturnType shiftColumnUp(byte, bool = false) const;
+    StdReturnType shiftColumnDown(byte, bool = false) const;
 
-    void shiftLeftFast(bool = false);
-    void shiftRightFast(bool = false);
-    void shiftUpFast(bool = false);
-    void shiftDownFast(bool = false);
+    void shiftLeftFast(bool = false) const;
+    void shiftRightFast(bool = false) const;
+    void shiftUpFast(bool = false) const;
+    void shiftDownFast(bool = false) const;
 
-    void shiftRowLeftFast(byte, bool = false);
-    void shiftRowRightFast(byte, bool = false);
-    void shiftColumnUpFast(byte, bool = false);
-    void shiftColumnDownFast(byte, bool = false);
+    void shiftRowLeftFast(byte, bool = false) const;
+    void shiftRowRightFast(byte, bool = false) const;
+    void shiftColumnUpFast(byte, bool = false) const;
+    void shiftColumnDownFast(byte, bool = false) const;
 };
 
 

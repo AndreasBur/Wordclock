@@ -9,10 +9,10 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       Communication.cpp
- *      \brief      
+ *      \brief
  *
- *      \details    
- *                  
+ *      \details
+ *
  *
 ******************************************************************************************************************************************************/
 #define _COMMUNICATION_SOURCE_
@@ -24,7 +24,7 @@
 
 
 /******************************************************************************************************************************************************
- *  L O C A L   C O N S T A N T   M A C R O S 
+ *  L O C A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
 
 
@@ -67,26 +67,14 @@ void Communication::task()
 ******************************************************************************************************************************************************/
 void Communication::addMessagePart()
 {
-/*
     while (Serial.available()) {
         // get the new byte from uart
         char inChar = static_cast<char>(Serial.read());
         if(inChar == EndOfMessageChar) { State = STATE_MESSAGE_COMPLETE; }
-        if(IncomingMessage.addChar(inChar) == E_NOT_OK) {
-            Error.send(ErrorMessage::ERROR_MESSAGE_TOO_LONG);
-        }
-    }
-*/
-    char Buffer[] = "4 -S50 -A1\n";
-    
-    for(uint8_t i = 0u; i <= strlen(Buffer); i++)
-    {
-        if(Buffer[i] == EndOfMessageChar) { State = STATE_MESSAGE_COMPLETE; }
-        else IncomingMessage.addChar(Buffer[i]);
+        if(IncomingMessage.addChar(inChar) == E_NOT_OK) { Error.send(ErrorMessage::ERROR_MESSAGE_TOO_LONG); }
     }
 }
 
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E
 ******************************************************************************************************************************************************/
- 

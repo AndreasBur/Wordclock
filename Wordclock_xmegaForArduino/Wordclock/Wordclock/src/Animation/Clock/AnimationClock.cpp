@@ -9,10 +9,10 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       AnimationClock.cpp
- *      \brief      
+ *      \brief
  *
- *      \details    
- *                  
+ *      \details
+ *
  *
 ******************************************************************************************************************************************************/
 #define _ANIMATION_CLOCK_SOURCE_
@@ -24,7 +24,7 @@
 
 
 /******************************************************************************************************************************************************
- *  L O C A L   C O N S T A N T   M A C R O S 
+ *  L O C A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
 
 
@@ -99,14 +99,25 @@ AnimationClock::StateType AnimationClock::getState() const
     }
 } /* getState */
 
+/******************************************************************************************************************************************************
+  setTaskCycle()
+******************************************************************************************************************************************************/
+StdReturnType AnimationClock::setTaskCycle(AnimationType Animation, byte Cycle)
+{
+    if(isAnimationValid(Animation)) {
+        setTaskCycleFast(Animation, Cycle);
+        return E_OK;
+    } else {
+        return E_NOT_OK;
+    }
+}
 
 /******************************************************************************************************************************************************
   setAnimation()
 ******************************************************************************************************************************************************/
-StdReturnType AnimationClock::setAnimation(AnimationType Animation)
+void AnimationClock::setAnimationFast(AnimationType sAnimation)
 {
-    if(!isAnimationValid(Animation)) { return E_NOT_OK; }
-    Animation = Animation;
+    Animation = sAnimation;
 
     switch(Animation)
     {
@@ -145,8 +156,7 @@ StdReturnType AnimationClock::setAnimation(AnimationType Animation)
             Animation = ANIMATION_CLOCK_NONE;
             break;
     }
-    return E_OK;
-} /* setAnimation */
+} /* setAnimationFast */
 
 
 /******************************************************************************************************************************************************
@@ -179,18 +189,18 @@ StdReturnType AnimationClock::setClock(byte Hour, byte Minute)
             break;
         case ANIMATION_CLOCK_CUBE :
             return Animations.Cube.setClock(Hour, Minute);
-        break;
+            break;
         case ANIMATION_CLOCK_FLICKER :
             return Animations.Flicker.setClock(Hour, Minute);
-        break;
+            break;
         //case ANIMATION_CLOCK_EXPLODE :
             //break;
         //case ANIMATION_CLOCK_IMPLODE :
             //break;
         default :
+            return E_NOT_OK;
             break;
     }
-    return E_NOT_OK;
 } /* setClock */
 
 
@@ -241,7 +251,7 @@ void AnimationClock::task()
 /******************************************************************************************************************************************************
   show()
 ******************************************************************************************************************************************************/
-void AnimationClock::show()
+StdReturnType AnimationClock::show() const
 {
     switch(Animation)
     {
@@ -277,6 +287,7 @@ void AnimationClock::show()
         //case ANIMATION_CLOCK_IMPLODE :
             //break;
         default :
+            return E_OK;
             break;
     }
 } /* task */
@@ -291,4 +302,3 @@ void AnimationClock::show()
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E
 ******************************************************************************************************************************************************/
- 
