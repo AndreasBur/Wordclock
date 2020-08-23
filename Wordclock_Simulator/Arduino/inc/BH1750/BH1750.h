@@ -9,10 +9,10 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       BH1750.h
- *      \brief      
+ *      \brief
  *
- *      \details    
- *                  
+ *      \details
+ *
 ******************************************************************************************************************************************************/
 #ifndef _BH1750_H_
 #define _BH1750_H_
@@ -69,7 +69,7 @@ class BH1750
 ******************************************************************************************************************************************************/
   public:
     using IlluminanceType = uint16_t;
-  
+
     enum ModeType {
         MODE_NONE,
         MODE_CONTINUOUS_LOW_RES_MODE = BH1750_CMD_CONTINUOUS_LOW_RES_MODE,
@@ -79,12 +79,12 @@ class BH1750
         MODE_ONE_TIME_HIGH_RES_MODE = BH1750_CMD_ONE_TIME_HIGH_RES_MODE,
         MODE_ONE_TIME_HIGH_RES_MODE_2 = BH1750_CMD_ONE_TIME_HIGH_RES_MODE_2
     };
-    
+
     struct CalibrationValuesType {
         IlluminanceType MaxValue;
         IlluminanceType MinValue;
     };
-  
+
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
@@ -94,10 +94,10 @@ class BH1750
     CalibrationValuesType CalibrationValues;
 
     // functions
-    BH1750() : Mode(MODE_NONE), Illuminance(BH1750_ILLUMINANCE_MIN_LX_VALUE), 
+    BH1750() : Mode(MODE_NONE), Illuminance(BH1750_ILLUMINANCE_MIN_LX_VALUE),
                CalibrationValues{BH1750_ILLUMINANCE_MAX_LX_VALUE, BH1750_ILLUMINANCE_MIN_LX_VALUE} { }
     ~BH1750() { }
-    
+
     StdReturnType readIlluminance();
     void sendModeForOneTimeMode();
     StdReturnType sendCommand(byte);
@@ -106,7 +106,7 @@ class BH1750
     IlluminanceType convertRawToLux(uint16_t IlluminanceRaw) const { return IlluminanceRaw / BH1750_ILLUMINANCE_RAW_VALUE_DIVIDER; }
     IlluminanceType combineRawValueParts(byte HighByte, byte LowByte) const { return static_cast<uint16_t>(HighByte) << 8u | LowByte; }
     bool isMTRegValueInRange(byte MTRegValue) const { return (MTRegValue <= BH1750_REG_MT_MAX_VALUE && MTRegValue >= BH1750_REG_MT_MIN_VALUE); }
-  
+
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
@@ -125,8 +125,8 @@ class BH1750
 
     // set methods
     StdReturnType setMode(ModeType);
-    void setCalibrationValuesMaxValue(uint16_t MaxValue) { CalibrationValues.MaxValue = MaxValue; }
-    void setCalibrationValuesMinValue(uint16_t MinValue) { CalibrationValues.MinValue = MinValue; }
+    void setCalibrationValuesMaxValue(IlluminanceType MaxValue) { CalibrationValues.MaxValue = MaxValue; }
+    void setCalibrationValuesMinValue(IlluminanceType MinValue) { CalibrationValues.MinValue = MinValue; }
     void setCalibrationValues(CalibrationValuesType sCalibrationValues) { CalibrationValues = sCalibrationValues; }
 
     // methods
@@ -134,7 +134,7 @@ class BH1750
     StdReturnType changeMeasurementTime(byte);
     void startCalibrationMaxValue() { task(); CalibrationValues.MaxValue = Illuminance; }
     void startCalibrationMinValue() { task(); CalibrationValues.MinValue = Illuminance; }
-    
+
     void task();
 };
 

@@ -26680,7 +26680,7 @@
 	"MsgCmdClockTimeParser.h"
 	"MsgCmdAnimationClockParser.h"
 
-1598119781 c:\users\aburn\documents\github\wordclock\wordclock_simulator\arduino\inc\communication\messageparser\msgcmddisplaycolorparser.h
+1598128254 c:\users\aburn\documents\github\wordclock\wordclock_simulator\arduino\inc\communication\messageparser\msgcmddisplaycolorparser.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"Display.h"
@@ -26705,7 +26705,7 @@
 	"errno.h"
 	<type_traits>
 
-1598119821 c:\users\aburn\documents\github\wordclock\wordclock_simulator\arduino\inc\communication\messageparser\msgcmddisplaybrightnessparser.h
+1598128273 c:\users\aburn\documents\github\wordclock\wordclock_simulator\arduino\inc\communication\messageparser\msgcmddisplaybrightnessparser.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"NeoPixel.h"

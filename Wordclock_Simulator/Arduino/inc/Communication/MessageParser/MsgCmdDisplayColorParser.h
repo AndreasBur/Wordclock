@@ -98,9 +98,9 @@ class MsgCmdDisplayColorParser : public MsgParameterParser<MsgCmdDisplayColorPar
     // methods
     void sendAnswer() const
     {
-        sendAnswerRed(false);
-        sendAnswerGreen(false);
-        sendAnswerBlue(true);
+        sendAnswerRed(true);
+        sendAnswerGreen(true);
+        sendAnswerBlue(false);
     }
 
     void process() const { show(); }

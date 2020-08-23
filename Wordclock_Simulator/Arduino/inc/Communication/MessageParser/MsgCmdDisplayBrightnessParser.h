@@ -99,8 +99,8 @@ class MsgCmdDisplayBrightnessParser : public MsgParameterParser<MsgCmdDisplayBri
     // methods
     void sendAnswer()
     {
-        sendAnswerBrightness(false);
-        sendAnswerAutomatic(true);
+        sendAnswerBrightness(true);
+        sendAnswerAutomatic(false);
     }
 
     void process() { show(); }

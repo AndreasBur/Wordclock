@@ -125,8 +125,8 @@ class BH1750
 
     // set methods
     StdReturnType setMode(ModeType);
-    void setCalibrationValuesMaxValue(uint16_t MaxValue) { CalibrationValues.MaxValue = MaxValue; }
-    void setCalibrationValuesMinValue(uint16_t MinValue) { CalibrationValues.MinValue = MinValue; }
+    void setCalibrationValuesMaxValue(IlluminanceType MaxValue) { CalibrationValues.MaxValue = MaxValue; }
+    void setCalibrationValuesMinValue(IlluminanceType MinValue) { CalibrationValues.MinValue = MinValue; }
     void setCalibrationValues(CalibrationValuesType sCalibrationValues) { CalibrationValues = sCalibrationValues; }
 
     // methods
