@@ -185,7 +185,7 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
         StateType state = STATE_PARSE;
         char optionShortName;
 
-        for(PositionType position = 0; ParameterBuffer[position] != STD_NULL_CHARACTER; position++) {
+        for(PositionType position = 0u; ParameterBuffer[position] != STD_NULL_CHARACTER; position++) {
             if(state == STATE_PARSE) {
                 char currentChar = ParameterBuffer[position];
                 if(currentChar == OptionStartChar) { state = STATE_OPTION_CHAR; }

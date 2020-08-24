@@ -76,8 +76,8 @@ class MsgCmdDisplayBrightnessParser : public MsgParameterParser<MsgCmdDisplayBri
         }
     }
 
-     void sendAnswerBrightness() const { sendAnswerParameter(BrightnessOptionShortName, Display::getInstance().getBrightness()); }
-     void sendAnswerAutomatic() const { sendAnswerParameter(AutomaticOptionShortName, Display::getInstance().getBrightnessAutomatic(), false); }
+     void sendAnswerBrightness(bool AppendSpace) const { sendAnswerParameter(BrightnessOptionShortName, Display::getInstance().getBrightness(), AppendSpace); }
+     void sendAnswerAutomatic(bool AppendSpace) const { sendAnswerParameter(AutomaticOptionShortName, Display::getInstance().getBrightnessAutomatic(), AppendSpace); }
 
     void show() const
     {
@@ -99,8 +99,8 @@ class MsgCmdDisplayBrightnessParser : public MsgParameterParser<MsgCmdDisplayBri
     // methods
     void sendAnswer()
     {
-        sendAnswerBrightness();
-        sendAnswerAutomatic();
+        sendAnswerBrightness(true);
+        sendAnswerAutomatic(false);
     }
 
     void process() { show(); }

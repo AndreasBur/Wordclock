@@ -81,11 +81,11 @@ class MsgCmdAnimationClockParser : public MsgParameterParser<MsgCmdAnimationCloc
         }
     }
 
-    void sendAnswerAnimation() const { sendAnswerParameter(AnimationOptionShortName, Animation::getInstance().getAnimation()); }
-    void sendAnswerSpeed() const {
+    void sendAnswerAnimation(bool AppendSpace) const { sendAnswerParameter(AnimationOptionShortName, Animation::getInstance().getAnimation(), AppendSpace); }
+    void sendAnswerSpeed(bool AppendSpace) const {
         AnimationClockType animation = Animation::getInstance().getAnimation();
         byte taskCylce = Animation::getInstance().getClockTaskCycle(animation);
-        sendAnswerParameter(SpeedOptionShortName, convertTaskCycleToSpeed(taskCylce), false);
+        sendAnswerParameter(SpeedOptionShortName, convertTaskCycleToSpeed(taskCylce), AppendSpace);
     }
 
     void setAnimation() const
@@ -119,8 +119,8 @@ class MsgCmdAnimationClockParser : public MsgParameterParser<MsgCmdAnimationCloc
     // methods
     void sendAnswer() const
     {
-        sendAnswerAnimation();
-        sendAnswerSpeed();
+        sendAnswerAnimation(true);
+        sendAnswerSpeed(false);
     }
 
     void process() const

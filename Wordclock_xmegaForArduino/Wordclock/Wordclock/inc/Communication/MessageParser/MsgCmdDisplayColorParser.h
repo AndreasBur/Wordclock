@@ -74,9 +74,9 @@ class MsgCmdDisplayColorParser : public MsgParameterParser<MsgCmdDisplayColorPar
         if(ParameterShortName == BlueOptionShortName) { Display::getInstance().setColorBlue(Argument); }
     }
 
-    void sendAnswerRed() const { sendAnswerParameter(RedOptionShortName, Display::getInstance().getColorRed()); }
-    void sendAnswerGreen() const { sendAnswerParameter(GreenOptionShortName, Display::getInstance().getColorGreen()); }
-    void sendAnswerBlue() const { sendAnswerParameter(BlueOptionShortName, Display::getInstance().getColorBlue(), false); }
+    void sendAnswerRed(bool AppendSpace) const { sendAnswerParameter(RedOptionShortName, Display::getInstance().getColorRed(), AppendSpace); }
+    void sendAnswerGreen(bool AppendSpace) const { sendAnswerParameter(GreenOptionShortName, Display::getInstance().getColorGreen(), AppendSpace); }
+    void sendAnswerBlue(bool AppendSpace) const { sendAnswerParameter(BlueOptionShortName, Display::getInstance().getColorBlue(), AppendSpace); }
 
     void show() const
     {
@@ -98,9 +98,9 @@ class MsgCmdDisplayColorParser : public MsgParameterParser<MsgCmdDisplayColorPar
     // methods
     void sendAnswer() const
     {
-        sendAnswerRed();
-        sendAnswerGreen();
-        sendAnswerBlue();
+        sendAnswerRed(true);
+        sendAnswerGreen(true);
+        sendAnswerBlue(false);
     }
 
     void process() const { show(); }

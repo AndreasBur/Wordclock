@@ -102,7 +102,7 @@ class Message
             Buffer[messageLength] = Char;
             Buffer[messageLength + 1] = NullCharacter;
             return E_OK;
-            } else {
+        } else {
             return E_NOT_OK;
         }
     }
