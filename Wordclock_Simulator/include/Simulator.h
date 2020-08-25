@@ -34,7 +34,7 @@ class Simulator : public wxFrame
         StdReturnType getPixel(byte, PixelType&) const;
         PixelType getPixelFast(byte) const;
         //StdReturnType getPixelDimmed(byte, WS2812PixelType*);
-
+        void setPixels(PixelType);
         // set methods
         void setBrightness(byte, bool = false);
         //StdReturnType setPin(byte);
@@ -51,8 +51,6 @@ class Simulator : public wxFrame
         void enablePixels() { setBrightness(255); }
         void disablePixels() { setBrightness(0); }
         void clearPixels();
-        //void setAllPixels(PixelType) {}
-        //StdReturnType clearPixel(byte Index) { return setPixel(Index, 0, 0, 0); }
         StdReturnType show() {
             Refresh();
             return E_OK;
@@ -102,7 +100,7 @@ class Simulator : public wxFrame
         void OnAbout(wxCommandEvent&);
         void OnSend(wxCommandEvent&);
         void OnQuit(wxCommandEvent&);
-        void setAllPixels(wxColour);
+        void setPixels(wxColour);
         wxBoxSizer* createSizerAll(wxWindow*);
         wxBoxSizer* createSizerCharacters(wxWindow*);
         wxBoxSizer* createSizerCharacter(wxWindow*, int Row);

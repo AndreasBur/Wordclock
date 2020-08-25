@@ -99,11 +99,6 @@ class DisplayWords
         return displayWordsTableElement;
     }
 
-    bool isWordIdValid(WordIdType WordId) const {
-        if(WordId < WORD_NUMBER_OF_WORDS) { return true; }
-        else { return false; }
-    }
-
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
@@ -126,7 +121,7 @@ class DisplayWords
     // set methods
 
     // methods
-
+    bool isWordIdValid(WordIdType WordId) const { return WordId < WORD_NUMBER_OF_WORDS; }
 };
 
 

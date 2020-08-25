@@ -84,6 +84,8 @@ class Message
         if(finding == nullptr) return npos;
         else return finding - Buffer;
     }
+    
+    bool contains(char Character) const { return strchr(Buffer, Character); }
 
     size_t find(char Char, size_t position = 0u) const
     {

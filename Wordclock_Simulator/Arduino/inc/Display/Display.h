@@ -37,13 +37,13 @@
 #define DISPLAY_USE_WS2812_DIMMING                              STD_OFF
 #define DISPLAY_BRIGHTNESS_AUTOMATIC_CORRECTION_FACTOR          1.0f
 
-#if (WS2812_IS_SINGLETON == STD_ON)
-    #define Pixels                              WS2812::getInstance()
-#endif
+# if (WS2812_IS_SINGLETON == STD_ON)
+#  define Pixels                              WS2812::getInstance()
+# endif
 
-#if (DISPLAY_USE_WS2812_DIMMING == STD_ON) && (WS2812_SUPPORT_DIMMING == STD_OFF)
-    #error "Display: Please activate WS2812 dimming support"
-#endif
+# if (DISPLAY_USE_WS2812_DIMMING == STD_ON) && (WS2812_SUPPORT_DIMMING == STD_OFF)
+#  error "Display: Please activate WS2812 dimming support"
+# endif
 
 /* Display parameter */
 #define DISPLAY_NUMBER_OF_ROWS                  DISPLAY_CHARACTERS_NUMBER_OF_ROWS
@@ -51,9 +51,12 @@
 #define DISPLAY_NUMBER_OF_LEDS                  WS2812_NUMBER_OF_LEDS
 #define DISPLAY_NUMBER_OF_PIXELS                DISPLAY_NUMBER_OF_LEDS
 
-#if ((DISPLAY_NUMBER_OF_ROWS * DISPLAY_NUMBER_OF_COLUMNS) != DISPLAY_NUMBER_OF_LEDS)
-    #error "Display: LED number missmatch"
-#endif
+#define DISPLAY_COLOR_MAX_VALUE                 255u
+#define DISPLAY_BRIGHTNESS_MAX_VALUE            255u
+
+# if ((DISPLAY_NUMBER_OF_ROWS * DISPLAY_NUMBER_OF_COLUMNS) != DISPLAY_NUMBER_OF_LEDS)
+#  error "Display: LED number missmatch"
+# endif
 
 #define DISPLAY_WORD_LENGTH_UNLIMITED           0u
 
@@ -88,15 +91,15 @@ class Display
     using PixelType = bool;
     using CharacterIdType = DisplayCharacters::CharacterIdType;
 
-#if (DISPLAY_NUMBER_OF_ROWS > 16u)
-    #error "Display: too many rows, please extend PixelRowType"
-#endif
+# if (DISPLAY_NUMBER_OF_ROWS > 16u)
+#  error "Display: too many rows, please extend PixelRowType"
+# endif
 
     using PixelRowType = uint16_t;
 
-#if (DISPLAY_NUMBER_OF_COLUMNS > 16u)
-    #error "Display: too many columns, please extend PixelColumnType"
-#endif
+# if (DISPLAY_NUMBER_OF_COLUMNS > 16u)
+#  error "Display: too many columns, please extend PixelColumnType"
+# endif
 
     using PixelColumnType = uint16_t;
 
@@ -115,17 +118,17 @@ class Display
   private:
     StateType State{STATE_NONE};
     bool BrightnessAutomatic{false};
-#if (WS2812_IS_SINGLETON == STD_OFF)
+# if (WS2812_IS_SINGLETON == STD_OFF)
     Stripe Pixels;
-#endif
+# endif
     PixelColorType Color{255u, 255u, 255u};
     DisplayWords Words;
 
-#if (DISPLAY_USE_WS2812_DIMMING == STD_OFF)
+# if (DISPLAY_USE_WS2812_DIMMING == STD_OFF)
     GammaCorrection GCorrection;
     byte Brightness{255u};
     PixelColorType ColorDimmed{255u, 255u, 255u};
-#endif
+# endif
 
     // functions
     Display(PixelColorType);
@@ -137,13 +140,13 @@ class Display
     byte transformToSerpentine(byte, byte) const;
     byte transformToSerpentine(byte) const;
 
-#if (DISPLAY_USE_WS2812_DIMMING == STD_OFF)
+# if (DISPLAY_USE_WS2812_DIMMING == STD_OFF)
     byte dimmColor(byte Color, byte BrightnessCorrected) const {
         byte dimmedColor = (Color * BrightnessCorrected) >> 8u;
         if(dimmedColor == 0u) return 1u;
         else return dimmedColor;
     }
-#endif
+# endif
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
@@ -163,11 +166,11 @@ class Display
     ColorType getColorGreen() const { return Color.Green; }
     ColorType getColorBlue() const { return Color.Blue; }
 
-#if (DISPLAY_USE_WS2812_DIMMING == STD_ON)
+# if (DISPLAY_USE_WS2812_DIMMING == STD_ON)
     byte getBrightness() const { return Pixels.getBrightness(); }
-#else
+# else
     byte getBrightness() const { return Brightness; }
-#endif
+# endif
 
     // set methods
     void setBrightnessAutomatic(bool sBrightnessAutomatic) { BrightnessAutomatic = sBrightnessAutomatic; }
@@ -177,12 +180,12 @@ class Display
     void setColorGreen(ColorType Green) { Color.Green = Green; }
     void setColorBlue(ColorType Blue) { Color.Blue = Blue;}
 
-#if (DISPLAY_USE_WS2812_DIMMING == STD_ON)
+# if (DISPLAY_USE_WS2812_DIMMING == STD_ON)
     void setBrightness(byte Brightness) {
         if(BrightnessAutomatic == true) { Pixels.setBrightness(Brightness, true); }
         else { Pixels.setBrightness(calculateBrightnessAutomaticCorrected(Brightness)); }
     }
-#else
+# else
     void setBrightness(byte);
 #endif
 
@@ -223,7 +226,7 @@ class Display
     StdReturnType setPixelColumn(byte, PixelColumnType);
 
     // pixel methods fast
-    bool isIndexValid(IndexType Index) const { return Pixels.isIndexValid(Index); }
+    static bool isIndexValid(IndexType Index) { return Pixels.isIndexValid(Index); }
     void writePixelFast(byte Column, byte Row, bool Value) { if(Value) setPixelFast(Column, Row); else clearPixelFast(Column, Row); }
     void writePixelFast(IndexType Index, bool Value) { if(Value) setPixelFast(Index); else clearPixelFast(Index); }
     void setPixelFast(byte, byte);
@@ -246,8 +249,19 @@ class Display
     void disable() { Pixels.disablePixels(); }
     void enableBrightnessAutomatic() { BrightnessAutomatic = true; }
     void disableBrightnessAutomatic() { BrightnessAutomatic = false; }
-    void test();
+    void test() { Pixels.setPixels(ColorDimmed); }
     void clear() { Pixels.clearPixels(); }
+       
+    void incrementColorRed() { if(Color.Red < DISPLAY_COLOR_MAX_VALUE) Color.Red++; }
+    void incrementColorGreen() { if(Color.Green < DISPLAY_COLOR_MAX_VALUE) Color.Green++; }
+    void incrementColorBlue() { if(Color.Blue < DISPLAY_COLOR_MAX_VALUE) Color.Blue++; }
+    void incrementBrightness() { if(Brightness < DISPLAY_BRIGHTNESS_MAX_VALUE) Brightness++; }
+    
+    void decrementColorRed() { if(Color.Red > 0u) Color.Red--; }
+    void decrementColorGreen() { if(Color.Green > 0u) Color.Green--; }
+    void decrementColorBlue() { if(Color.Blue > 0u) Color.Blue--; }
+    void decrementBrightness() { if(Brightness > 0u) Brightness--; }
+       
     void indexToColumnAndRow(IndexType Index, byte& Column, byte& Row) const { Row = Index / DISPLAY_NUMBER_OF_COLUMNS; Column = Index % DISPLAY_NUMBER_OF_COLUMNS; }
     byte indexToColumn(IndexType Index) const { return Index % DISPLAY_NUMBER_OF_COLUMNS; }
     byte indexToRow(IndexType Index) const { return Index / DISPLAY_NUMBER_OF_COLUMNS; }

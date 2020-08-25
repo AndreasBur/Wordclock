@@ -208,6 +208,8 @@ class DisplayCharacters
     // set methods
 
     // methods
+    static bool isCharacterIdValid(CharacterIdType CharacterId) { return CharacterId < DISPLAY_CHARACTERS_NUMBER_OF_CHARACTERS; };
+    static bool isIndexValid(byte Index) { return Index < DISPLAY_CHARACTERS_NUMBER_OF_CHARACTERS; };
     void indexToColumnAndRow(byte Index, byte& Row, byte& Column) const { Row = Index / DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS; Column = Index % DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS; }
     byte columnAndRowToIndex(byte Column, byte Row) const { return (Row * DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS) + Column; }
 

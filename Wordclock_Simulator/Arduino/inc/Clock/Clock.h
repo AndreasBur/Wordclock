@@ -160,7 +160,7 @@ class Clock
     }
 
     // methods
-    bool isModeValid(ModeType sMode) const { return sMode < MODE_NUMBER_OF_MODES; }
+    static bool isModeValid(ModeType sMode) { return sMode < MODE_NUMBER_OF_MODES; }
     StdReturnType setTime(TimeType Time) const { return setTime(Time.Hour, Time.Minute); }
     StdReturnType setTime(byte, byte) const;
     void setTimeFast(TimeType Time) const { setTimeFast(Time.Hour, Time.Minute); }

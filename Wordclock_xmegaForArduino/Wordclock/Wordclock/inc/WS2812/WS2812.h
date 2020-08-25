@@ -186,7 +186,7 @@ class WS2812
     bool init(byte);
     void init(PortType, PortPinType);
     StdReturnType show();
-    bool isIndexValid(IndexType Index) const { return Index < WS2812_NUMBER_OF_LEDS; }
+    static bool isIndexValid(IndexType Index) { return Index < WS2812_NUMBER_OF_LEDS; }
     void setPixels(PixelType Pixel) { setPixels(Pixel.Red, Pixel.Green, Pixel.Blue); }
     void setPixels(byte, byte, byte);
     StdReturnType clearPixel(IndexType Index);

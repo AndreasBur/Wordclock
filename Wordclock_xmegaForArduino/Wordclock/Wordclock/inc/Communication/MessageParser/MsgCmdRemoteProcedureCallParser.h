@@ -60,7 +60,18 @@ class MsgCmdRemoteProcedureCallParser : public MsgParameterParser<MsgCmdRemotePr
         RPC_ID_DISPLAY_SHOW,
         RPC_ID_DISPLAY_CLEAR,
         RPC_ID_DISPLAY_TEST,
-
+        RPC_ID_DISPLAY_COLOR_RED_INCREMENT,
+        RPC_ID_DISPLAY_COLOR_GREEN_INCREMENT,
+        RPC_ID_DISPLAY_COLOR_BLUE_INCREMENT,
+        RPC_ID_DISPLAY_COLOR_RED_DECREMENT,
+        RPC_ID_DISPLAY_COLOR_GREEN_DECREMENT,
+        RPC_ID_DISPLAY_COLOR_BLUE_DECREMENT,
+        RPC_ID_DISPLAY_BRIGHTNESS_INCREMENT,
+        RPC_ID_DISPLAY_BRIGHTNESS_DECREMENT,
+        RPC_ID_DISPLAY_BRIGHTNESS_AUTOMATIC_ON,
+        RPC_ID_DISPLAY_BRIGHTNESS_AUTOMATIC_OFF,
+        RPC_ID_POWER_ON,
+        RPC_ID_POWER_OFF,
 
     };
 
@@ -81,31 +92,6 @@ class MsgCmdRemoteProcedureCallParser : public MsgParameterParser<MsgCmdRemotePr
     void handleParameter(char ParameterShortName, byte Argument)
     {
         RpcId = static_cast<RpcIdType>(Argument);
-
-        switch(RpcId) {
-            case RPC_ID_BH1750_CALIBRATION_MAX_VALUE :
-                BH1750::getInstance().startCalibrationMaxValue();
-                break;
-            case RPC_ID_BH1750_CALIBRATION_MIN_VALUE :
-                BH1750::getInstance().startCalibrationMinValue();
-                break;
-            case RPC_ID_DISPLAY_ENABLE :
-                Display::getInstance().enable();
-                break;
-            case RPC_ID_DISPLAY_DISABLE :
-                Display::getInstance().disable();
-                break;
-            case RPC_ID_DISPLAY_SHOW :
-                ReturnValue = Display::getInstance().show();
-                break;
-            case RPC_ID_DISPLAY_CLEAR :
-                Display::getInstance().clear();
-                break;
-            case RPC_ID_DISPLAY_TEST :
-                Display::getInstance().test();
-                break;
-            default:
-        }
     }
 
 /******************************************************************************************************************************************************
@@ -126,7 +112,64 @@ class MsgCmdRemoteProcedureCallParser : public MsgParameterParser<MsgCmdRemotePr
         Error.send(ReturnValue);
     }
 
-    void process() { }
+    void process()
+    {
+        switch(RpcId) {
+            case RPC_ID_BH1750_CALIBRATION_MAX_VALUE :
+                BH1750::getInstance().startCalibrationMaxValue();
+                break;
+            case RPC_ID_BH1750_CALIBRATION_MIN_VALUE :
+                BH1750::getInstance().startCalibrationMinValue();
+                break;
+            case RPC_ID_DISPLAY_ENABLE :
+                Display::getInstance().enable();
+                break;
+            case RPC_ID_DISPLAY_DISABLE :
+                Display::getInstance().disable();
+                break;
+            case RPC_ID_DISPLAY_BRIGHTNESS_INCREMENT :
+                Display::getInstance().incrementBrightness();
+                break;
+            case RPC_ID_DISPLAY_BRIGHTNESS_DECREMENT :
+                Display::getInstance().decrementBrightness();
+                break;
+            case RPC_ID_DISPLAY_BRIGHTNESS_AUTOMATIC_ON :
+                Display::getInstance().enableBrightnessAutomatic();
+                break;
+            case RPC_ID_DISPLAY_BRIGHTNESS_AUTOMATIC_OFF :
+                Display::getInstance().disableBrightnessAutomatic();
+                break;
+            case RPC_ID_DISPLAY_COLOR_RED_INCREMENT :
+                Display::getInstance().incrementColorRed();
+                break;
+            case RPC_ID_DISPLAY_COLOR_GREEN_INCREMENT :
+                Display::getInstance().incrementColorGreen();
+                break;
+            case RPC_ID_DISPLAY_COLOR_BLUE_INCREMENT :
+                Display::getInstance().incrementColorBlue();
+                break;
+            case RPC_ID_DISPLAY_COLOR_RED_DECREMENT :
+                Display::getInstance().decrementColorRed();
+                break;
+            case RPC_ID_DISPLAY_COLOR_GREEN_DECREMENT :
+                Display::getInstance().decrementColorGreen();
+                break;
+            case RPC_ID_DISPLAY_COLOR_BLUE_DECREMENT :
+                Display::getInstance().decrementColorBlue();
+                break;
+            case RPC_ID_DISPLAY_SHOW :
+                ReturnValue = Display::getInstance().show();
+                break;
+            case RPC_ID_DISPLAY_CLEAR :
+                Display::getInstance().clear();
+                break;
+            case RPC_ID_DISPLAY_TEST :
+                Display::getInstance().test();
+                break;
+            default:
+                break;
+        }
+    }
 };
 
 #endif

@@ -21,6 +21,7 @@
  * I N C L U D E S
 ******************************************************************************************************************************************************/
 #include "MsgCmdParser.h"
+#include "MsgCmdRemoteProcedureCallParser.h"
 #include "MsgCmdDisplayColorParser.h"
 #include "MsgCmdDisplayBrightnessParser.h"
 #include "MsgCmdDisplayPixelParser.h"
@@ -56,9 +57,14 @@ void MsgCmdParser::parse()
     CommandType command = getCommand();
     const char* parameter = getParameter();
 
-    sendAnswer(command);
+    if(command != COMMAND_NONE) sendAnswer(command);
 
-    if(command == COMMAND_DISPLAY_COLOR) {
+    if(command == COMMAND_REMOTE_PROCEDURE_CALL) {
+        MsgCmdRemoteProcedureCallParser cmdRemoteProcedureCallParser(parameter);
+        cmdRemoteProcedureCallParser.parse();
+        cmdRemoteProcedureCallParser.process();
+        cmdRemoteProcedureCallParser.sendAnswer();
+    } else if(command == COMMAND_DISPLAY_COLOR) {
         MsgCmdDisplayColorParser cmdDisplayColorParser(parameter);
         cmdDisplayColorParser.parse();
         cmdDisplayColorParser.process();

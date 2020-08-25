@@ -32,7 +32,7 @@
 
 
 /* MsgCmdParser parameter */
-
+# define MSG_COMMAND_NONE_NUMBER        0u
 
 /******************************************************************************************************************************************************
  *  G L O B A L   F U N C T I O N   M A C R O S
@@ -49,7 +49,8 @@ class MsgCmdParser
 ******************************************************************************************************************************************************/
   public:
     enum CommandType {
-        COMMAND_NONE,
+        COMMAND_NONE = MSG_COMMAND_NONE_NUMBER,
+        COMMAND_REMOTE_PROCEDURE_CALL,
         //COMMAND_DISPLAY_MODE,
         COMMAND_DISPLAY_COLOR,
         COMMAND_DISPLAY_BRIGHTNESS,
@@ -57,7 +58,8 @@ class MsgCmdParser
         COMMAND_CLOCK_TIME,
         COMMAND_ANIMATION_CLOCK,
         COMMAND_TIME,
-        COMMAND_DATE
+        COMMAND_DATE,
+
     };
 
 /******************************************************************************************************************************************************

@@ -60,7 +60,7 @@
 
 
 /******************************************************************************************************************************************************
- *  C L A S S   T E M P L A T E
+ *  C L A S S   B H 1 7 5 0
 ******************************************************************************************************************************************************/
 class BH1750
 {
@@ -135,7 +135,7 @@ class BH1750
     void startCalibrationMaxValue() { task(); CalibrationValues.MaxValue = Illuminance; }
     void startCalibrationMinValue() { task(); CalibrationValues.MinValue = Illuminance; }
 
-    void task();
+    void task() { }
 };
 
 #endif

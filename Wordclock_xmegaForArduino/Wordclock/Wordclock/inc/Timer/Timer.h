@@ -28,7 +28,7 @@
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
 /* Timer configuration parameter */
-#define TIMER_TC                            TCC4
+#define TIMER_TC                                TCC4
 
 /* Timer parameter */
 

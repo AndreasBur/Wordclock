@@ -78,7 +78,7 @@ StdReturnType DisplayCharacters::getCharacter(byte Index, char& Character) const
     byte Row, Column;
     indexToColumnAndRow(Index, Column, Row);
 
-    if(Index < DISPLAY_CHARACTERS_NUMBER_OF_CHARACTERS) {
+    if(isIndexValid(Index)) {
         Character =  getCharacterFast(Row, Column);
         return E_OK;
     } else {
@@ -95,7 +95,7 @@ StdReturnType DisplayCharacters::getCharacter(CharacterIdType CharacterId, char&
     byte Row, Column;
     indexToColumnAndRow(CharacterId, Column, Row);
 
-    if(CharacterId < DISPLAY_CHARACTERS_NUMBER_OF_CHARACTERS) {
+    if(isCharacterIdValid(CharacterId)) {
         Character =  getCharacterFast(CharacterId);
         return E_OK;
     } else {
