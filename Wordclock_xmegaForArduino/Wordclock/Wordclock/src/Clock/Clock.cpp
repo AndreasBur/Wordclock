@@ -184,7 +184,7 @@ StdReturnType Clock::getClockWords(byte Hour, byte Minute, ClockWordsListType& C
 
 
 /******************************************************************************************************************************************************
-  setClock()
+  setTime()
 ******************************************************************************************************************************************************/
 StdReturnType Clock::setTime(byte Hour, byte Minute) const
 {
@@ -206,11 +206,11 @@ StdReturnType Clock::setTime(byte Hour, byte Minute) const
         if(Display::getInstance().setWord(clockWords.getMinuteWord(Index)) == E_NOT_OK) returnValue = E_NOT_OK;
     }
     return returnValue;
-} /* setClock */
+} /* setTime */
 
 
 /******************************************************************************************************************************************************
-  setClockFast()
+  setTimeFast()
 ******************************************************************************************************************************************************/
 void Clock::setTimeFast(byte Hour, byte Minute) const
 {
@@ -228,7 +228,7 @@ void Clock::setTimeFast(byte Hour, byte Minute) const
             Display::getInstance().setWordFast(clockWords.getMinuteWord(Index));
         }
     }
-} /* setClockFast */
+} /* setTimeFast */
 
 
 /******************************************************************************************************************************************************

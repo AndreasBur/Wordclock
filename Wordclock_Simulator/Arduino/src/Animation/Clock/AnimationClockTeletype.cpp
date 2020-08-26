@@ -55,9 +55,9 @@ void AnimationClockTeletype::init()
 
 
 /******************************************************************************************************************************************************
-  setClock()
+  setTime()
 ******************************************************************************************************************************************************/
-StdReturnType AnimationClockTeletype::setClock(byte Hour, byte Minute)
+StdReturnType AnimationClockTeletype::setTime(byte Hour, byte Minute)
 {
     StdReturnType ReturnValue{E_NOT_OK};
 
@@ -69,7 +69,7 @@ StdReturnType AnimationClockTeletype::setClock(byte Hour, byte Minute)
         State = STATE_SET_TIME;
     }
     return ReturnValue;
-} /* setClock */
+} /* setTime */
 
 
 /******************************************************************************************************************************************************

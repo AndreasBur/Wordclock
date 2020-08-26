@@ -55,9 +55,9 @@ void AnimationClockSnake::init()
 
 
 /******************************************************************************************************************************************************
-  setClock()
+  setTime()
 ******************************************************************************************************************************************************/
-StdReturnType AnimationClockSnake::setClock(byte Hour, byte Minute)
+StdReturnType AnimationClockSnake::setTime(byte Hour, byte Minute)
 {
     StdReturnType ReturnValue{E_NOT_OK};
 
@@ -68,7 +68,7 @@ StdReturnType AnimationClockSnake::setClock(byte Hour, byte Minute)
         State = STATE_SET_TIME;
     }
     return ReturnValue;
-} /* setClock */
+} /* setTime */
 
 
 /******************************************************************************************************************************************************

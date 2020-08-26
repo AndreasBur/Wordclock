@@ -55,9 +55,9 @@ void AnimationClockWipe::init()
 
 
 /******************************************************************************************************************************************************
-  setClock()
+  setTime()
 ******************************************************************************************************************************************************/
-StdReturnType AnimationClockWipe::setClock(byte Hour, byte Minute)
+StdReturnType AnimationClockWipe::setTime(byte Hour, byte Minute)
 {
     StdReturnType ReturnValue{E_NOT_OK};
 
@@ -66,7 +66,7 @@ StdReturnType AnimationClockWipe::setClock(byte Hour, byte Minute)
         State = STATE_CLEAR_TIME;
     }
     return ReturnValue;
-} /* setClock */
+} /* setTime */
 
 
 /******************************************************************************************************************************************************

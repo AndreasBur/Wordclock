@@ -60,6 +60,9 @@ AnimationClock::StateType AnimationClock::getState() const
 {
     switch(Animation)
     {
+        case ANIMATION_CLOCK_NONE :
+            return AnimationClockCommon::STATE_IDLE;
+        break;
         case ANIMATION_CLOCK_CURSOR :
             return Animations.Cursor.getState();
             break;
@@ -83,16 +86,19 @@ AnimationClock::StateType AnimationClock::getState() const
             break;
         case ANIMATION_CLOCK_CUBE :
             return Animations.Cube.getState();
-        break;
+            break;
         case ANIMATION_CLOCK_FLICKER :
             return Animations.Flicker.getState();
-        break;
-        //case ANIMATION_CLOCK_EXPLODE :
-            //return AnimationClockCommon::STATE_NONE;
-            //break;
-        //case ANIMATION_CLOCK_IMPLODE :
-            //return AnimationClockCommon::STATE_NONE;
-            //break;
+            break;
+        case ANIMATION_CLOCK_SQUEEZE :
+            return Animations.Squeeze.getState();
+            break;
+        case ANIMATION_CLOCK_EXPLODE :
+            return Animations.Explode.getState();
+            break;
+        case ANIMATION_CLOCK_IMPLODE :
+            return Animations.Implode.getState();
+            break;
         default :
             return AnimationClockCommon::STATE_NONE;
             break;
@@ -121,6 +127,9 @@ void AnimationClock::setAnimationFast(AnimationType sAnimation)
 
     switch(Animation)
     {
+        case ANIMATION_CLOCK_NONE :
+            Animation = ANIMATION_CLOCK_NONE;
+            break;
         case ANIMATION_CLOCK_CURSOR :
             Animations.Cursor.init();
             break;
@@ -147,11 +156,16 @@ void AnimationClock::setAnimationFast(AnimationType sAnimation)
             break;
         case ANIMATION_CLOCK_FLICKER :
             Animations.Flicker.init();
-        break;
-        //case ANIMATION_CLOCK_EXPLODE :
-            //break;
-        //case ANIMATION_CLOCK_IMPLODE :
-            //break;
+            break;
+        case ANIMATION_CLOCK_SQUEEZE :
+            Animations.Squeeze.init();
+            break;
+        case ANIMATION_CLOCK_EXPLODE :
+            Animations.Explode.init();
+            break;
+        case ANIMATION_CLOCK_IMPLODE :
+            Animations.Implode.init();
+            break;
         default :
             Animation = ANIMATION_CLOCK_NONE;
             break;
@@ -160,48 +174,56 @@ void AnimationClock::setAnimationFast(AnimationType sAnimation)
 
 
 /******************************************************************************************************************************************************
-  setClock()
+  setTime()
 ******************************************************************************************************************************************************/
-StdReturnType AnimationClock::setClock(byte Hour, byte Minute)
+StdReturnType AnimationClock::setTime(byte Hour, byte Minute)
 {
     switch(Animation)
     {
+        case ANIMATION_CLOCK_NONE :
+            return Clock::getInstance().setTime(Hour, Minute);
+            break;
         case ANIMATION_CLOCK_CURSOR :
-            return Animations.Cursor.setClock(Hour, Minute);
+            return Animations.Cursor.setTime(Hour, Minute);
             break;
         case ANIMATION_CLOCK_TELETYPE :
-            return Animations.Teletype.setClock(Hour, Minute);
+            return Animations.Teletype.setTime(Hour, Minute);
             break;
         case ANIMATION_CLOCK_DROP :
-            return Animations.Drop.setClock(Hour, Minute);
+            return Animations.Drop.setTime(Hour, Minute);
             break;
         case ANIMATION_CLOCK_WIPE :
-            return Animations.Wipe.setClock(Hour, Minute);
+            return Animations.Wipe.setTime(Hour, Minute);
             break;
         case ANIMATION_CLOCK_SHIFT :
-            return Animations.Shift.setClock(Hour, Minute);
+            return Animations.Shift.setTime(Hour, Minute);
             break;
         case ANIMATION_CLOCK_FADE :
-            return Animations.Fade.setClock(Hour, Minute);
+            return Animations.Fade.setTime(Hour, Minute);
             break;
         case ANIMATION_CLOCK_SNAKE :
-            return Animations.Snake.setClock(Hour, Minute);
+            return Animations.Snake.setTime(Hour, Minute);
             break;
         case ANIMATION_CLOCK_CUBE :
-            return Animations.Cube.setClock(Hour, Minute);
+            return Animations.Cube.setTime(Hour, Minute);
             break;
         case ANIMATION_CLOCK_FLICKER :
-            return Animations.Flicker.setClock(Hour, Minute);
+            return Animations.Flicker.setTime(Hour, Minute);
             break;
-        //case ANIMATION_CLOCK_EXPLODE :
-            //break;
-        //case ANIMATION_CLOCK_IMPLODE :
-            //break;
+        case ANIMATION_CLOCK_SQUEEZE :
+            return Animations.Squeeze.setTime(Hour, Minute);
+            break;
+        case ANIMATION_CLOCK_EXPLODE :
+            return Animations.Explode.setTime(Hour, Minute);
+            break;
+        case ANIMATION_CLOCK_IMPLODE :
+            return Animations.Implode.setTime(Hour, Minute);
+            break;
         default :
             return E_NOT_OK;
             break;
     }
-} /* setClock */
+} /* setTime */
 
 
 /******************************************************************************************************************************************************
@@ -211,37 +233,44 @@ void AnimationClock::task()
 {
     switch(Animation)
     {
+        case ANIMATION_CLOCK_NONE :
+            break;
         case ANIMATION_CLOCK_CURSOR :
-            return Animations.Cursor.task();
+            Animations.Cursor.task();
             break;
         case ANIMATION_CLOCK_TELETYPE :
-            return Animations.Teletype.task();
+            Animations.Teletype.task();
             break;
         case ANIMATION_CLOCK_DROP :
-            return Animations.Drop.task();
+            Animations.Drop.task();
             break;
         case ANIMATION_CLOCK_WIPE :
-            return Animations.Wipe.task();
+            Animations.Wipe.task();
             break;
         case ANIMATION_CLOCK_SHIFT :
-            return Animations.Shift.task();
+            Animations.Shift.task();
             break;
         case ANIMATION_CLOCK_FADE :
-            return Animations.Fade.task();
+            Animations.Fade.task();
             break;
         case ANIMATION_CLOCK_SNAKE :
-            return Animations.Snake.task();
+            Animations.Snake.task();
             break;
         case ANIMATION_CLOCK_CUBE :
-            return Animations.Cube.task();
+            Animations.Cube.task();
             break;
         case ANIMATION_CLOCK_FLICKER :
-            return Animations.Flicker.task();
+            Animations.Flicker.task();
             break;
-        //case ANIMATION_CLOCK_EXPLODE :
-            //break;
-        //case ANIMATION_CLOCK_IMPLODE :
-            //break;
+        case ANIMATION_CLOCK_SQUEEZE :
+            Animations.Squeeze.task();
+            break;
+        case ANIMATION_CLOCK_EXPLODE :
+            Animations.Explode.task();
+            break;
+        case ANIMATION_CLOCK_IMPLODE :
+            Animations.Implode.task();
+            break;
         default :
             break;
     }
@@ -255,6 +284,9 @@ StdReturnType AnimationClock::show() const
 {
     switch(Animation)
     {
+        case ANIMATION_CLOCK_NONE :
+            return Display::getInstance().show();
+            break;
         case ANIMATION_CLOCK_CURSOR :
             return Animations.Cursor.show();
             break;
@@ -282,12 +314,17 @@ StdReturnType AnimationClock::show() const
         case ANIMATION_CLOCK_FLICKER :
             return Animations.Flicker.show();
             break;
-        //case ANIMATION_CLOCK_EXPLODE :
-            //break;
-        //case ANIMATION_CLOCK_IMPLODE :
-            //break;
+        case ANIMATION_CLOCK_SQUEEZE :
+            return Animations.Squeeze.show();
+            break;
+        case ANIMATION_CLOCK_EXPLODE :
+            return Animations.Explode.show();
+            break;
+        case ANIMATION_CLOCK_IMPLODE :
+            return Animations.Implode.show();
+            break;
         default :
-            return E_OK;
+            return E_NOT_OK;
             break;
     }
 } /* task */

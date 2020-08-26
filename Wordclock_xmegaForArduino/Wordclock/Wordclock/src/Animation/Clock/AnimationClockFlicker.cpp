@@ -55,9 +55,9 @@ void AnimationClockFlicker::init()
 
 
 /******************************************************************************************************************************************************
-  setClock()
+  setTime()
 ******************************************************************************************************************************************************/
-StdReturnType AnimationClockFlicker::setClock(byte sHour, byte sMinute)
+StdReturnType AnimationClockFlicker::setTime(byte sHour, byte sMinute)
 {
     StdReturnType ReturnValue{E_NOT_OK};
 
@@ -68,7 +68,7 @@ StdReturnType AnimationClockFlicker::setClock(byte sHour, byte sMinute)
         ReturnValue = E_OK;
     }
     return ReturnValue;
-} /* setClock */
+} /* setTime */
 
 
 /******************************************************************************************************************************************************

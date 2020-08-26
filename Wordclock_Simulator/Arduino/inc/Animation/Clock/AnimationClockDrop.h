@@ -90,7 +90,7 @@ class AnimationClockDrop : public AnimationClockCommon
 
     // methods
     void init();
-    StdReturnType setClock(byte, byte);
+    StdReturnType setTime(byte, byte);
     void task();
 };
 

@@ -55,9 +55,9 @@ void AnimationClockFade::init()
 
 
 /******************************************************************************************************************************************************
-  setClock()
+  setTime()
 ******************************************************************************************************************************************************/
-StdReturnType AnimationClockFade::setClock(byte sHour, byte sMinute)
+StdReturnType AnimationClockFade::setTime(byte sHour, byte sMinute)
 {
     StdReturnType returnValue{E_NOT_OK};
 
@@ -69,7 +69,7 @@ StdReturnType AnimationClockFade::setClock(byte sHour, byte sMinute)
         returnValue = E_OK;
     }
     return returnValue;
-} /* setClock */
+} /* setTime */
 
 
 /******************************************************************************************************************************************************

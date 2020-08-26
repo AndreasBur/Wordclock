@@ -56,9 +56,9 @@ void AnimationClockCube::init()
 
 
 /******************************************************************************************************************************************************
-  setClock()
+  setTime()
 ******************************************************************************************************************************************************/
-StdReturnType AnimationClockCube::setClock(byte Hour, byte Minute)
+StdReturnType AnimationClockCube::setTime(byte Hour, byte Minute)
 {
     StdReturnType returnValue{E_NOT_OK};
 
@@ -68,7 +68,7 @@ StdReturnType AnimationClockCube::setClock(byte Hour, byte Minute)
         State = STATE_CLEAR_TIME;
     }
     return returnValue;
-} /* setClock */
+} /* setTime */
 
 
 /******************************************************************************************************************************************************

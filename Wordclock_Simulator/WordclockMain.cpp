@@ -25,7 +25,9 @@ WordclockMain::WordclockMain()
     Time = wxDateTime::Now();
     int Hour = Time.GetHour();
     int Minute = Time.GetMinute();
-    Clock::getInstance().setTime(Hour, Minute);
+    Clock::getInstance().setTime(11, 45);
+    Display::getInstance().setWord(DisplayWords::WORD_UHR);
+    Display::getInstance().setWord(DisplayWords::WORD_HOUR_ACHT);
 
     //WcDisplay.setPixelRowFast(5, 0xFFFF);
     //Display::getInstance().show();
@@ -40,8 +42,8 @@ WordclockMain::WordclockMain()
     //WcTransformation.shiftRight(true);
     //WcTransformation.shiftUp(false);
     //WcTransformation.shiftDown(true);
-    //Animation::getInstance().setAnimation(AnimationClock::ANIMATION_CLOCK_FLICKER);
-    //Animation::getInstance().setClock(Hour, Minute);
+    Animation::getInstance().setAnimation(AnimationClock::ANIMATION_CLOCK_IMPLODE);
+    Animation::getInstance().setTime(Hour, Minute);
     //WcClock.show();
 }
 
@@ -58,7 +60,7 @@ void WordclockMain::task()
     int Hour = Time.GetHour();
     int Minute = Time.GetMinute();
 
-    //Animation::getInstance().task();
+    Animation::getInstance().task();
 
 //    if(WcAnimation.getState() == Animation::STATE_IDLE) {
 //        Time = wxDateTime::Now();
@@ -68,7 +70,8 @@ void WordclockMain::task()
     //WcAnimation.setClock(Hour, Minute);
 //    }
     wcCommunication.task();
-    //Display::getInstance().show();
+
+    Display::getInstance().show();
 
      //Clock::getInstance().getClockWords(Hour, Minute, NewTimeWords);
 

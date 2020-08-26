@@ -55,9 +55,9 @@ void AnimationClockShift::init()
 
 
 /******************************************************************************************************************************************************
-  setClock()
+  setTime()
 ******************************************************************************************************************************************************/
-StdReturnType AnimationClockShift::setClock(byte Hour, byte Minute)
+StdReturnType AnimationClockShift::setTime(byte Hour, byte Minute)
 {
     StdReturnType ReturnValue{E_NOT_OK};
 
@@ -65,7 +65,7 @@ StdReturnType AnimationClockShift::setClock(byte Hour, byte Minute)
         State = STATE_CLEAR_TIME;
     }
     return ReturnValue;
-} /* setClock */
+} /* setTime */
 
 
 /******************************************************************************************************************************************************

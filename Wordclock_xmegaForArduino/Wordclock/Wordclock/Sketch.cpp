@@ -90,11 +90,11 @@ void setup() {
 //		flag = 0;
   //}
   //wcAnimation.setChar(0,0, 'T', AnimationFont::FONT_4X6);
-  //wcClock.setClock(10,10);
+  //wcClock.setTime(10,10);
   
   //wcAnimation.setAnimation(Animation::ANIMATION_CLOCK_DROP);
  
-  //wcAnimation.setClock(12, 10);
+  //wcAnimation.setTime(12, 10);
   //WS2812::getInstance().setPixelFast(0, 180, 20, 50);
   //WS2812::getInstance().setPixelFast(1, 20, 180, 200);
   //WS2812::getInstance().setPixelFast(2, 50, 100, 80);
@@ -125,6 +125,7 @@ void loop()
     Clock::getInstance().setTime(17,30);
 	while(1) {
 	    wcCommunication.task();
+        Animation::getInstance().task();
 	}
 
 

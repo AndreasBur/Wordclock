@@ -55,9 +55,9 @@ void AnimationClockDrop::init()
 
 
 /******************************************************************************************************************************************************
-  setClock()
+  setTime()
 ******************************************************************************************************************************************************/
-StdReturnType AnimationClockDrop::setClock(byte Hour, byte Minute)
+StdReturnType AnimationClockDrop::setTime(byte Hour, byte Minute)
 {
     StdReturnType returnValue{E_NOT_OK};
 
@@ -67,7 +67,7 @@ StdReturnType AnimationClockDrop::setClock(byte Hour, byte Minute)
         else { State = STATE_CLEAR_TIME; }
     }
     return returnValue;
-} /* setClock */
+} /* setTime */
 
 
 /******************************************************************************************************************************************************

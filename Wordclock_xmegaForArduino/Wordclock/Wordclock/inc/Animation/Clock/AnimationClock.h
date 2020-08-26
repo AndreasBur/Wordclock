@@ -33,7 +33,9 @@
 #include "AnimationClockFade.h"
 #include "AnimationClockCube.h"
 #include "AnimationClockFlicker.h"
-
+#include "AnimationClockSqueeze.h"
+#include "AnimationClockImplode.h"
+#include "AnimationClockExplode.h"
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
@@ -63,6 +65,7 @@ class AnimationClock
         ANIMATION_CLOCK_NONE,
         ANIMATION_CLOCK_CURSOR,
         ANIMATION_CLOCK_TELETYPE,
+        //ANIMATION_CLOCK_TELETYPE_PARALLEL,
         ANIMATION_CLOCK_DROP,
         ANIMATION_CLOCK_SHIFT,
         ANIMATION_CLOCK_FADE,
@@ -70,8 +73,9 @@ class AnimationClock
         ANIMATION_CLOCK_WIPE,
         ANIMATION_CLOCK_CUBE,
         ANIMATION_CLOCK_FLICKER,
-        //ANIMATION_CLOCK_EXPLODE,
-        //ANIMATION_CLOCK_IMPLODE,
+        ANIMATION_CLOCK_SQUEEZE,
+        ANIMATION_CLOCK_IMPLODE,
+        ANIMATION_CLOCK_EXPLODE,
         //ANIMATION_CLOCK_MATRIX,
         ANIMATION_CLOCK_NUMBER_OF_ANIMATIONS
     };
@@ -86,6 +90,9 @@ class AnimationClock
         AnimationClockFade Fade;
         AnimationClockCube Cube;
         AnimationClockFlicker Flicker;
+        AnimationClockSqueeze Squeeze;
+        AnimationClockImplode Implode;
+        AnimationClockExplode Explode;
 
         constexpr AnimationsType() : Cursor() { }
         ~AnimationsType() { }
@@ -132,7 +139,7 @@ class AnimationClock
     void init();
     void task();
     bool isAnimationValid(AnimationType sAnimation) const { return sAnimation < ANIMATION_CLOCK_NUMBER_OF_ANIMATIONS; }
-    StdReturnType setClock(byte, byte);
+    StdReturnType setTime(byte, byte);
     StdReturnType show() const;
 };
 

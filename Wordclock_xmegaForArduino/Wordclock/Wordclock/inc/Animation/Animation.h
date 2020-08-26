@@ -90,8 +90,8 @@ class Animation
 
     // set methods
     void setFontTaskCylce(byte Cycle) { wcAnimationFont.setTaskCycle(Cycle); }
-    StdReturnType setClockTaskCylce(AnimationClockType AnimationClock, byte Cycle) { return wcAnimationClock.setTaskCycle(AnimationClock, Cycle); }
-    void setClockTaskCylceFast(AnimationClockType AnimationClock, byte Cycle) { wcAnimationClock.setTaskCycleFast(AnimationClock, Cycle); }
+    StdReturnType setClockTaskCycle(AnimationClockType AnimationClock, byte Cycle) { return wcAnimationClock.setTaskCycle(AnimationClock, Cycle); }
+    void setClockTaskCycleFast(AnimationClockType AnimationClock, byte Cycle) { wcAnimationClock.setTaskCycleFast(AnimationClock, Cycle); }
 
     // methods
     void init();
@@ -108,7 +108,7 @@ class Animation
     // AnimationFont functions
     StdReturnType setAnimation(AnimationClockType Animation) { return wcAnimationClock.setAnimation(Animation); }
     void setAnimationFast(AnimationClockType Animation) { wcAnimationClock.setAnimationFast(Animation); }
-    StdReturnType setClock(byte Hour, byte Minute) { return wcAnimationClock.setClock(Hour, Minute); }
+    StdReturnType setTime(byte Hour, byte Minute) { return wcAnimationClock.setTime(Hour, Minute); }
 };
 
 

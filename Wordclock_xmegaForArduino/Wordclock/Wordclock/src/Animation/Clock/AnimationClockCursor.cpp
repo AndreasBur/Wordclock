@@ -55,9 +55,9 @@ void AnimationClockCursor::init()
 
 
 /******************************************************************************************************************************************************
-  setClock()
+  setTime()
 ******************************************************************************************************************************************************/
-StdReturnType AnimationClockCursor::setClock(byte Hour, byte Minute)
+StdReturnType AnimationClockCursor::setTime(byte Hour, byte Minute)
 {
     StdReturnType returnValue{E_NOT_OK};
 
@@ -67,7 +67,7 @@ StdReturnType AnimationClockCursor::setClock(byte Hour, byte Minute)
         State = STATE_SET_TIME;
     }
     return returnValue;
-} /* setClock */
+} /* setTime */
 
 
 /******************************************************************************************************************************************************
