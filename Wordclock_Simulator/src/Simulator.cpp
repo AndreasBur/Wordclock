@@ -3,10 +3,10 @@
 #include <array>
 
 #if defined(SIMULATOR) && (defined(__APPLE__ ) || defined(__linux__))
-#include "WordclockIcon.xpm"
+# include "WordclockIcon.xpm"
 #endif
 
-const wxString DisplayCharacters[][SIMULATOR_DISPLAY_NUMBER_OF_COLUMNS] =
+const wxString DisplayCharacters[][SIMULATOR_DISPLAY_NUMBER_OF_COLUMNS]
 {
     wxT("E"),wxT("S"),wxT("K"),wxT("I"),wxT("S"),wxT("T"),wxT("L"),wxT("F"),wxT("Ü"),wxT("N"),wxT("F"),
     wxT("Z"),wxT("E"),wxT("H"),wxT("N"),wxT("Z"),wxT("W"),wxT("A"),wxT("N"),wxT("Z"),wxT("I"),wxT("G"),
@@ -182,7 +182,7 @@ StdReturnType Simulator::getPixel(byte Index, PixelType& Pixel) const
 
 WS2812::PixelType Simulator::getPixelFast(byte Index) const
 {
-    PixelType Pixel;
+    PixelType Pixel{0, 0, 0};
     byte Row = Index / SIMULATOR_DISPLAY_NUMBER_OF_COLUMNS;
     byte Column = Index % SIMULATOR_DISPLAY_NUMBER_OF_COLUMNS;
 

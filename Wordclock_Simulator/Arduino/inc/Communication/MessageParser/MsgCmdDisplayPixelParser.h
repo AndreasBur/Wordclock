@@ -116,13 +116,7 @@ class MsgCmdDisplayPixelParser : public MsgParameterParser<MsgCmdDisplayPixelPar
     void sendAnswerIndex(bool AppendSpace) const { sendAnswerParameter(IndexOptionShortName, Index, AppendSpace); }
     void sendAnswerState(bool AppendSpace) const { sendAnswerParameter(StateOptionShortName, Display::getInstance().getPixelFast(Index), AppendSpace); }
 
-    void setPixel() const
-    {
-        if(State != STATE_NONE) {
-            StdReturnType returnValue = Display::getInstance().writePixel(Index, getPixelValue(State));
-            Error.checkReturnValueAndSend(ErrorMessage::API_DISPLAY_WRITE_PIXEL, returnValue, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNCE);
-        }
-    }
+    void setPixel() const { if(State != STATE_NONE) { Display::getInstance().writePixelFast(Index, getPixelValue(State)); } }
 
     void show() const
     {

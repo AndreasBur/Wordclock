@@ -3,7 +3,6 @@
 
 #include <wx/wx.h>
 #include <wx/button.h>
-
 #include "StandardTypes.h"
 #include "NeoPixel.h"
 
@@ -21,11 +20,11 @@ class Simulator : public wxFrame
         }
 
         using PixelType = NeoPixel::NeoPixelType;
-#if (SIMULATOR_NUMBER_OF_PIXELS < 255u)
+# if (SIMULATOR_NUMBER_OF_PIXELS < 255u)
         using IndexType = byte;
-#else
+# else
         using IndexType = uint16_t;
-#endif
+# endif
 
         using SizerCharactersType = std::array<wxBoxSizer*, SIMULATOR_DISPLAY_NUMBER_OF_ROWS>;
 
