@@ -87,10 +87,13 @@
 		<Unit filename="Arduino/inc/Animation/Clock/AnimationClockCube.h" />
 		<Unit filename="Arduino/inc/Animation/Clock/AnimationClockCursor.h" />
 		<Unit filename="Arduino/inc/Animation/Clock/AnimationClockDrop.h" />
+		<Unit filename="Arduino/inc/Animation/Clock/AnimationClockExplode.h" />
 		<Unit filename="Arduino/inc/Animation/Clock/AnimationClockFade.h" />
 		<Unit filename="Arduino/inc/Animation/Clock/AnimationClockFlicker.h" />
+		<Unit filename="Arduino/inc/Animation/Clock/AnimationClockImplode.h" />
 		<Unit filename="Arduino/inc/Animation/Clock/AnimationClockShift.h" />
 		<Unit filename="Arduino/inc/Animation/Clock/AnimationClockSnake.h" />
+		<Unit filename="Arduino/inc/Animation/Clock/AnimationClockSqueeze.h" />
 		<Unit filename="Arduino/inc/Animation/Clock/AnimationClockTeletype.h" />
 		<Unit filename="Arduino/inc/Animation/Clock/AnimationClockWipe.h" />
 		<Unit filename="Arduino/inc/BH1750/BH1750.h" />
@@ -130,10 +133,13 @@
 		<Unit filename="Arduino/src/Animation/Clock/AnimationClockCube.cpp" />
 		<Unit filename="Arduino/src/Animation/Clock/AnimationClockCursor.cpp" />
 		<Unit filename="Arduino/src/Animation/Clock/AnimationClockDrop.cpp" />
+		<Unit filename="Arduino/src/Animation/Clock/AnimationClockExplode.cpp" />
 		<Unit filename="Arduino/src/Animation/Clock/AnimationClockFade.cpp" />
 		<Unit filename="Arduino/src/Animation/Clock/AnimationClockFlicker.cpp" />
+		<Unit filename="Arduino/src/Animation/Clock/AnimationClockImplode.cpp" />
 		<Unit filename="Arduino/src/Animation/Clock/AnimationClockShift.cpp" />
 		<Unit filename="Arduino/src/Animation/Clock/AnimationClockSnake.cpp" />
+		<Unit filename="Arduino/src/Animation/Clock/AnimationClockSqueeze.cpp" />
 		<Unit filename="Arduino/src/Animation/Clock/AnimationClockTeletype.cpp" />
 		<Unit filename="Arduino/src/Animation/Clock/AnimationClockWipe.cpp" />
 		<Unit filename="Arduino/src/Clock/Clock.cpp" />
