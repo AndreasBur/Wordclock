@@ -69,6 +69,7 @@ class AnimationClockImplode : public AnimationClockCommon
     // functions
     void reset();
     void clearTimeTask();
+    void shiftQuadrants();
 
     void shiftQuadrantUpperLeft();
     void shiftQuadrantUpperRight();
@@ -79,6 +80,8 @@ class AnimationClockImplode : public AnimationClockCommon
     void shiftDownLeft(byte, byte);
     void shiftUpRight(byte, byte);
     void shiftUpLeft(byte, byte);
+
+    void clearOldAndsetNewPixel(byte, byte, byte, byte);
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S

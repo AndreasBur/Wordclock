@@ -102,35 +102,15 @@ void AnimationClockImplode::clearTimeTask()
 {
     if(ShiftCounter < ANIMATION_CLOCK_SHIFT_COUNTER_MAX_VALUE) {
         ShiftCounter++;
-        //shiftQuadrants();
         shiftQuadrantUpperLeft();
         shiftQuadrantLowerRight();
         shiftQuadrantUpperRight();
         shiftQuadrantLowerLeft();
     } else {
         State = STATE_SET_TIME;
+        Display::getInstance().clear();
     }
 } /* clearTimeTask */
-
-/******************************************************************************************************************************************************
-  shiftQuadrants()
-******************************************************************************************************************************************************/
-void AnimationClockImplode::shiftQuadrants()
-{
-    for(uint8_t Column = 0u; Column < DISPLAY_NUMBER_OF_COLUMNS; Column++) {
-        for(uint8_t Row = 0u; Row < DISPLAY_NUMBER_OF_ROWS; Row++) {
-            if(Display::getInstance().getPixelFast(Column, Row)) {
-                byte ColumnNext = Column, RowNext = Row;
-                Display::getInstance().clearPixelFast(Column, Row);
-                if(Column < DISPLAY_NUMBER_OF_COLUMNS / 2u) ColumnNext = shiftRight(Column);
-                if(Column > DISPLAY_NUMBER_OF_COLUMNS / 2u) ColumnNext = shiftLeft(Column);
-                if(Row < DISPLAY_NUMBER_OF_ROWS / 2u) RowNext = shiftDown(Row);
-                if(Row > DISPLAY_NUMBER_OF_ROWS / 2u) RowNext = shiftUp(Row);
-                Display::getInstance().setPixelFast(ColumnNext, RowNext);
-            }
-        }
-    }
-}
 
 /******************************************************************************************************************************************************
   shiftQuadrantUpperLeft()
@@ -149,13 +129,11 @@ void AnimationClockImplode::shiftQuadrantUpperLeft()
 ******************************************************************************************************************************************************/
 void AnimationClockImplode::shiftDownRight(byte Column, byte Row)
 {
-    byte ColumnNext = Column;
-    byte RowNext = Row;
+    byte ColumnNext = Column, RowNext = Row;
 
-    Display::getInstance().clearPixelFast(Column, Row);
     if(Column < DISPLAY_NUMBER_OF_COLUMNS / 2u) ColumnNext++;
     if(Row < DISPLAY_NUMBER_OF_COLUMNS / 2u) RowNext++;
-    Display::getInstance().setPixelFast(ColumnNext, RowNext);
+    clearOldAndsetNewPixel(Column, Row, ColumnNext, RowNext);
 }
 
 /******************************************************************************************************************************************************
@@ -175,13 +153,11 @@ void AnimationClockImplode::shiftQuadrantUpperRight()
 ******************************************************************************************************************************************************/
 void AnimationClockImplode::shiftDownLeft(byte Column, byte Row)
 {
-    byte ColumnNext = Column;
-    byte RowNext = Row;
+    byte ColumnNext = Column, RowNext = Row;
 
-    Display::getInstance().clearPixelFast(Column, Row);
     if(Column > DISPLAY_NUMBER_OF_COLUMNS / 2u) ColumnNext--;
     if(Row < DISPLAY_NUMBER_OF_COLUMNS / 2u) RowNext++;
-    Display::getInstance().setPixelFast(ColumnNext, RowNext);
+    clearOldAndsetNewPixel(Column, Row, ColumnNext, RowNext);
 }
 
 /******************************************************************************************************************************************************
@@ -201,13 +177,11 @@ void AnimationClockImplode::shiftQuadrantLowerLeft()
 ******************************************************************************************************************************************************/
 void AnimationClockImplode::shiftUpRight(byte Column, byte Row)
 {
-    byte ColumnNext = Column;
-    byte RowNext = Row;
+    byte ColumnNext = Column, RowNext = Row;
 
-    Display::getInstance().clearPixelFast(Column, Row);
     if(Column < DISPLAY_NUMBER_OF_COLUMNS / 2u) ColumnNext++;
     if(Row > DISPLAY_NUMBER_OF_COLUMNS / 2u) RowNext--;
-    Display::getInstance().setPixelFast(ColumnNext, RowNext);
+    clearOldAndsetNewPixel(Column, Row, ColumnNext, RowNext);
 }
 
 /******************************************************************************************************************************************************
@@ -227,16 +201,24 @@ void AnimationClockImplode::shiftQuadrantLowerRight()
 ******************************************************************************************************************************************************/
 void AnimationClockImplode::shiftUpLeft(byte Column, byte Row)
 {
-    byte ColumnNext = Column;
-    byte RowNext = Row;
+    byte ColumnNext = Column, RowNext = Row;
 
-    Display::getInstance().clearPixelFast(Column, Row);
     if(Column > DISPLAY_NUMBER_OF_COLUMNS / 2u) ColumnNext--;
     if(Row > DISPLAY_NUMBER_OF_COLUMNS / 2u) RowNext--;
-    Display::getInstance().setPixelFast(ColumnNext, RowNext);
+    clearOldAndsetNewPixel(Column, Row, ColumnNext, RowNext);
 }
 
-
+/******************************************************************************************************************************************************
+  clearOldAndsetNewPixel()
+******************************************************************************************************************************************************/
+void AnimationClockImplode::clearOldAndsetNewPixel(byte ColumnOld, byte RowOld, byte ColumnNew, byte RowNew)
+{
+    if((ColumnOld != ColumnNew) || (RowOld != RowNew))
+    {
+        Display::getInstance().clearPixelFast(ColumnOld, RowOld);
+        Display::getInstance().setPixelFast(ColumnNew, RowNew);
+    }
+}
 
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E
