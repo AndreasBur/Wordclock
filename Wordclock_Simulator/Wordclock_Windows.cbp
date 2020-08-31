@@ -114,6 +114,7 @@
 		<Unit filename="Arduino/inc/Communication/StringTools.h" />
 		<Unit filename="Arduino/inc/Display/Display.h" />
 		<Unit filename="Arduino/inc/Display/DisplayCharacters.h" />
+		<Unit filename="Arduino/inc/Display/DisplayPixels.h" />
 		<Unit filename="Arduino/inc/Display/DisplayWord.h" />
 		<Unit filename="Arduino/inc/Display/DisplayWords.h" />
 		<Unit filename="Arduino/inc/Font/FontChar.h" />
