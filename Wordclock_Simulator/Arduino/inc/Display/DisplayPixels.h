@@ -23,6 +23,7 @@
 #include "StandardTypes.h"
 #include "Arduino.h"
 #include "DisplayCharacters.h"
+#include "Display.h"
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
@@ -32,8 +33,6 @@
 
 
 /* DisplayPixels parameter */
-#define DISPLAY_NUMBER_OF_COLUMNS       DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS
-#define DISPLAY_NUMBER_OF_ROWS          DISPLAY_CHARACTERS_NUMBER_OF_ROWS
 
 
 /******************************************************************************************************************************************************
@@ -68,12 +67,20 @@ class DisplayPixels
     ~DisplayPixels();
 
 	// get methods
-
+    boolean getPixel(byte Column, byte Row) const { return readBit(PixelsBuffer[Row], Column); }
 
 	// set methods
+	void setPixel(byte Column, byte Row, bool Value) { writeBit(PixelsBuffer[Row], Column, Value); }
 
 	// methods
-    void init();
+	void send() const
+	{
+        for(byte Column = 0; Column < DISPLAY_NUMBER_OF_COLUMNS; Column++) {
+            for(byte Row = 0; Row < DISPLAY_NUMBER_OF_ROWS; Row++) {
+                Display::getInstance().setPixel(getPixel(Column, Row));
+            }
+        }
+	}
 };
 
 #endif

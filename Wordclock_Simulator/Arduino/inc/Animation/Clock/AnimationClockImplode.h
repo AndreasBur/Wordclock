@@ -24,6 +24,7 @@
 #include "Arduino.h"
 #include "Clock.h"
 #include "AnimationClockCommon.h"
+#include "DisplayPixels.h"
 
 /******************************************************************************************************************************************************
  *  GLOBAL CONSTANT MACROS

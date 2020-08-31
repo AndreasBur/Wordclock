@@ -180,7 +180,7 @@ static inline bool readBit(VarType Var, uint8_t Bit)
 template <typename VarType>
 static inline VarType writeBit(VarType Var, uint8_t Bit, bool Value)
 {
-    return Var & ~(UINT64_C(1) << Bit) | (Value << Bit);
+    return Var & (~(UINT64_C(1) << Bit) | (Value << Bit));
 }
 
 /* is bit set */
