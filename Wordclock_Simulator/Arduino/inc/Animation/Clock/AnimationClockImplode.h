@@ -82,7 +82,7 @@ class AnimationClockImplode : public AnimationClockCommon
     void shiftUpRight(byte, byte);
     void shiftUpLeft(byte, byte);
 
-    void clearOldAndsetNewPixel(byte, byte, byte, byte);
+    void clearOldAndSetNewPixel(byte, byte, byte, byte);
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S

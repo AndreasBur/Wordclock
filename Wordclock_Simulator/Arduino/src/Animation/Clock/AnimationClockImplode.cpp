@@ -133,7 +133,7 @@ void AnimationClockImplode::shiftDownRight(byte Column, byte Row)
 
     if(Column < DISPLAY_NUMBER_OF_COLUMNS / 2u) ColumnNext++;
     if(Row < DISPLAY_NUMBER_OF_COLUMNS / 2u) RowNext++;
-    clearOldAndsetNewPixel(Column, Row, ColumnNext, RowNext);
+    clearOldAndSetNewPixel(Column, Row, ColumnNext, RowNext);
 }
 
 /******************************************************************************************************************************************************
@@ -157,7 +157,7 @@ void AnimationClockImplode::shiftDownLeft(byte Column, byte Row)
 
     if(Column > DISPLAY_NUMBER_OF_COLUMNS / 2u) ColumnNext--;
     if(Row < DISPLAY_NUMBER_OF_COLUMNS / 2u) RowNext++;
-    clearOldAndsetNewPixel(Column, Row, ColumnNext, RowNext);
+    clearOldAndSetNewPixel(Column, Row, ColumnNext, RowNext);
 }
 
 /******************************************************************************************************************************************************
@@ -181,7 +181,7 @@ void AnimationClockImplode::shiftUpRight(byte Column, byte Row)
 
     if(Column < DISPLAY_NUMBER_OF_COLUMNS / 2u) ColumnNext++;
     if(Row > DISPLAY_NUMBER_OF_COLUMNS / 2u) RowNext--;
-    clearOldAndsetNewPixel(Column, Row, ColumnNext, RowNext);
+    clearOldAndSetNewPixel(Column, Row, ColumnNext, RowNext);
 }
 
 /******************************************************************************************************************************************************
@@ -205,13 +205,13 @@ void AnimationClockImplode::shiftUpLeft(byte Column, byte Row)
 
     if(Column > DISPLAY_NUMBER_OF_COLUMNS / 2u) ColumnNext--;
     if(Row > DISPLAY_NUMBER_OF_COLUMNS / 2u) RowNext--;
-    clearOldAndsetNewPixel(Column, Row, ColumnNext, RowNext);
+    clearOldAndSetNewPixel(Column, Row, ColumnNext, RowNext);
 }
 
 /******************************************************************************************************************************************************
-  clearOldAndsetNewPixel()
+  clearOldAndSetNewPixel()
 ******************************************************************************************************************************************************/
-void AnimationClockImplode::clearOldAndsetNewPixel(byte ColumnOld, byte RowOld, byte ColumnNew, byte RowNew)
+void AnimationClockImplode::clearOldAndSetNewPixel(byte ColumnOld, byte RowOld, byte ColumnNew, byte RowNew)
 {
     if((ColumnOld != ColumnNew) || (RowOld != RowNew))
     {

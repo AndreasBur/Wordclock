@@ -51,6 +51,8 @@ class DisplayPixels
   public:
     using PixelRowType = Display::PixelRowType;
     using PixelColumnType = Display::PixelColumnType;
+    using WordIdType = DisplayWords::WordIdType;
+    using IndexType = Display::IndexType;
     using PixelsBufferType = std::array<PixelColumnType, DISPLAY_NUMBER_OF_ROWS>;
 
 /******************************************************************************************************************************************************
@@ -58,6 +60,7 @@ class DisplayPixels
 ******************************************************************************************************************************************************/
   private:
     PixelsBufferType PixelsBuffer;
+    DisplayWords Words;
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
@@ -70,9 +73,19 @@ class DisplayPixels
     boolean getPixel(byte Column, byte Row) const { return readBit(PixelsBuffer[Row], Column); }
 
 	// set methods
-	void setPixel(byte Column, byte Row, bool Value) { writeBit(PixelsBuffer[Row], Column, Value); }
+	void setPixel(byte Column, byte Row) { writeBit(PixelsBuffer[Row], Column, true); }
+	void setPixel(IndexType Index) {
+	    byte Column, Row;
+	    Display::indexToColumnAndRow(Index, Column, Row);
+	    setPixel(Column, Row);
+    }
 
 	// methods
+	void setWord(WordIdType WordId) {
+        DisplayWord word = Words.getDisplayWordFast(WordId);
+        for(IndexType Index = 0; Index < word.getLength(); Index++) { setPixel(word.getColumn() + Index,  word.getRow()); }
+    }
+
 	void send() const
 	{
         for(byte Column = 0; Column < DISPLAY_NUMBER_OF_COLUMNS; Column++) {

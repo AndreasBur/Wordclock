@@ -6115,7 +6115,7 @@
 	"Arduino.h"
 	"Display.h"
 
-1598010993 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\standardtypes\standardtypes.h
+1598942676 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\standardtypes\standardtypes.h
 	"limits"
 	<stdint.h>
 	<limits.h>
@@ -6125,7 +6125,7 @@
 	<string.h>
 	"Simulator.h"
 
-1598363489 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\display\display.h
+1598959767 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\display\display.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"WS2812.h"
@@ -26776,7 +26776,7 @@
 	"Clock.h"
 	"AnimationClockCommon.h"
 
-1598445701 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\clock\animationclocksqueeze.cpp
+1598886827 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\clock\animationclocksqueeze.cpp
 	"AnimationClockSqueeze.h"
 
 1598886495 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\animation\clock\animationclocksqueeze.h
@@ -26785,13 +26785,14 @@
 	"Clock.h"
 	"AnimationClockCommon.h"
 
-1598879755 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\animation\clock\animationclockimplode.h
+1598960072 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\animation\clock\animationclockimplode.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"Clock.h"
 	"AnimationClockCommon.h"
+	"DisplayPixels.h"
 
-1598879957 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\clock\animationclockimplode.cpp
+1598960111 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\clock\animationclockimplode.cpp
 	"AnimationClockImplode.h"
 
 1598894934 c:\users\aburn\documents\github\wordclock\wordclock_simulator\arduino\inc\animation\clock\animationclocksqueeze.h
@@ -26830,6 +26831,12 @@
 	"Display.h"
 
 1598902376 c:\users\aburn\documents\github\wordclock\wordclock_simulator\arduino\inc\display\displaypixels.h
+	"StandardTypes.h"
+	"Arduino.h"
+	"DisplayCharacters.h"
+	"Display.h"
+
+1598959999 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\display\displaypixels.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"DisplayCharacters.h"
