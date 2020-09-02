@@ -9,10 +9,10 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       AnimationClockSqueeze.cpp
- *      \brief      
+ *      \brief
  *
- *      \details    
- *                  
+ *      \details
+ *
  *
 ******************************************************************************************************************************************************/
 #define _ANIMATION_CLOCK_SQUEEZE_SOURCE_
@@ -64,9 +64,8 @@ StdReturnType AnimationClockSqueeze::setTime(byte Hour, byte Minute)
     if(Clock::getInstance().getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
         ReturnValue = E_OK;
         CurrentWordIndex = 0u;
-        CurrentCharIndex = 0u;
         CurrentWordLength = Words.getDisplayWordLengthFast(ClockWordsTable[CurrentWordIndex]);
-        State = STATE_SET_TIME;
+        State = STATE_CLEAR_TIME;
     }
     return ReturnValue;
 } /* setTime */
@@ -77,18 +76,8 @@ StdReturnType AnimationClockSqueeze::setTime(byte Hour, byte Minute)
 ******************************************************************************************************************************************************/
 void AnimationClockSqueeze::task()
 {
-    if(State == STATE_SET_TIME) {
-        if(CurrentCharIndex >= CurrentWordLength) {
-            if(setNextWordIndex() == E_NOT_OK) {
-                State = STATE_IDLE;
-                return;
-            }
-            CurrentCharIndex = 0u;
-            CurrentWordLength = Words.getDisplayWordLengthFast(ClockWordsTable[CurrentWordIndex]);
-        }
-        CurrentCharIndex++;
-        Display::getInstance().setWordFast(ClockWordsTable[CurrentWordIndex], CurrentCharIndex);
-    }
+    if(State == STATE_CLEAR_TIME) { clearTimeTask(); }
+    if(State == STATE_SET_TIME) { setTimeTask(); }
 } /* task */
 
 
@@ -104,24 +93,25 @@ void AnimationClockSqueeze::reset()
     ClockWordsTable.fill(DisplayWords::WORD_NONE);
     CurrentWordIndex = 0u;
     CurrentWordLength = 0u;
-    CurrentCharIndex = 0u;
 } /* reset */
 
+/******************************************************************************************************************************************************
+  clearTimeTask()
+******************************************************************************************************************************************************/
+void AnimationClockSqueeze::clearTimeTask()
+{
+
+} /* clearTimeTask */
 
 /******************************************************************************************************************************************************
-  setNextWordIndex()
+  setTimeTask()
 ******************************************************************************************************************************************************/
-StdReturnType AnimationClockSqueeze::setNextWordIndex()
+void AnimationClockSqueeze::setTimeTask()
 {
-    if(CurrentWordIndex + 1u < static_cast<byte>(ClockWordsTable.size())) {
-        CurrentWordIndex++;
-        return E_OK;
-    }
-    return E_NOT_OK;
-} /* setNextWordIndex */
+
+} /* setTimeTask */
 
 
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E
 ******************************************************************************************************************************************************/
- 

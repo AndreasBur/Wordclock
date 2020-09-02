@@ -62,7 +62,7 @@ AnimationClock::StateType AnimationClock::getState() const
     {
         case ANIMATION_CLOCK_NONE :
             return AnimationClockCommon::STATE_IDLE;
-        break;
+            break;
         case ANIMATION_CLOCK_CURSOR :
             return Animations.Cursor.getState();
             break;

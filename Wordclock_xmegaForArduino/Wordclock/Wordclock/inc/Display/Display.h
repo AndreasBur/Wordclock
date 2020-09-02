@@ -251,18 +251,18 @@ class Display
     void disableBrightnessAutomatic() { BrightnessAutomatic = false; }
     void test() { Pixels.setPixels(ColorDimmed); }
     void clear() { Pixels.clearPixels(); }
-       
+
     void incrementColorRed() { if(Color.Red < DISPLAY_COLOR_MAX_VALUE) Color.Red++; }
     void incrementColorGreen() { if(Color.Green < DISPLAY_COLOR_MAX_VALUE) Color.Green++; }
     void incrementColorBlue() { if(Color.Blue < DISPLAY_COLOR_MAX_VALUE) Color.Blue++; }
     void incrementBrightness() { if(Brightness < DISPLAY_BRIGHTNESS_MAX_VALUE) Brightness++; }
-    
+
     void decrementColorRed() { if(Color.Red > 0u) Color.Red--; }
     void decrementColorGreen() { if(Color.Green > 0u) Color.Green--; }
     void decrementColorBlue() { if(Color.Blue > 0u) Color.Blue--; }
     void decrementBrightness() { if(Brightness > 0u) Brightness--; }
-       
-    void indexToColumnAndRow(IndexType Index, byte& Column, byte& Row) const { Row = Index / DISPLAY_NUMBER_OF_COLUMNS; Column = Index % DISPLAY_NUMBER_OF_COLUMNS; }
+
+    static void indexToColumnAndRow(IndexType Index, byte& Column, byte& Row) { Row = Index / DISPLAY_NUMBER_OF_COLUMNS; Column = Index % DISPLAY_NUMBER_OF_COLUMNS; }
     byte indexToColumn(IndexType Index) const { return Index % DISPLAY_NUMBER_OF_COLUMNS; }
     byte indexToRow(IndexType Index) const { return Index / DISPLAY_NUMBER_OF_COLUMNS; }
     byte columnAndRowToIndex(byte Column, byte Row) const { return (Row * DISPLAY_NUMBER_OF_COLUMNS) + Column; }

@@ -112,6 +112,26 @@ void AnimationClockImplode::clearTimeTask()
     }
 } /* clearTimeTask */
 
+///******************************************************************************************************************************************************
+//  shiftQuadrants()
+//******************************************************************************************************************************************************/
+//void AnimationClockImplode::shiftQuadrants()
+//{
+//    for(uint8_t Column = 0u; Column < DISPLAY_NUMBER_OF_COLUMNS; Column++) {
+//        for(uint8_t Row = 0u; Row < DISPLAY_NUMBER_OF_ROWS; Row++) {
+//            if(Display::getInstance().getPixelFast(Column, Row)) {
+//                byte ColumnNext = Column, RowNext = Row;
+//                Display::getInstance().clearPixelFast(Column, Row);
+//                if(Column < DISPLAY_NUMBER_OF_COLUMNS / 2u) ColumnNext = shiftRight(Column);
+//                if(Column > DISPLAY_NUMBER_OF_COLUMNS / 2u) ColumnNext = shiftLeft(Column);
+//                if(Row < DISPLAY_NUMBER_OF_ROWS / 2u) RowNext = shiftDown(Row);
+//                if(Row > DISPLAY_NUMBER_OF_ROWS / 2u) RowNext = shiftUp(Row);
+//                Display::getInstance().setPixelFast(ColumnNext, RowNext);
+//            }
+//        }
+//    }
+//}
+
 /******************************************************************************************************************************************************
   shiftQuadrantUpperLeft()
 ******************************************************************************************************************************************************/
@@ -133,7 +153,7 @@ void AnimationClockImplode::shiftDownRight(byte Column, byte Row)
 
     if(Column < DISPLAY_NUMBER_OF_COLUMNS / 2u) ColumnNext++;
     if(Row < DISPLAY_NUMBER_OF_COLUMNS / 2u) RowNext++;
-    clearOldAndsetNewPixel(Column, Row, ColumnNext, RowNext);
+    clearOldAndSetNewPixel(Column, Row, ColumnNext, RowNext);
 }
 
 /******************************************************************************************************************************************************
@@ -157,7 +177,7 @@ void AnimationClockImplode::shiftDownLeft(byte Column, byte Row)
 
     if(Column > DISPLAY_NUMBER_OF_COLUMNS / 2u) ColumnNext--;
     if(Row < DISPLAY_NUMBER_OF_COLUMNS / 2u) RowNext++;
-    clearOldAndsetNewPixel(Column, Row, ColumnNext, RowNext);
+    clearOldAndSetNewPixel(Column, Row, ColumnNext, RowNext);
 }
 
 /******************************************************************************************************************************************************
@@ -181,7 +201,7 @@ void AnimationClockImplode::shiftUpRight(byte Column, byte Row)
 
     if(Column < DISPLAY_NUMBER_OF_COLUMNS / 2u) ColumnNext++;
     if(Row > DISPLAY_NUMBER_OF_COLUMNS / 2u) RowNext--;
-    clearOldAndsetNewPixel(Column, Row, ColumnNext, RowNext);
+    clearOldAndSetNewPixel(Column, Row, ColumnNext, RowNext);
 }
 
 /******************************************************************************************************************************************************
@@ -205,13 +225,13 @@ void AnimationClockImplode::shiftUpLeft(byte Column, byte Row)
 
     if(Column > DISPLAY_NUMBER_OF_COLUMNS / 2u) ColumnNext--;
     if(Row > DISPLAY_NUMBER_OF_COLUMNS / 2u) RowNext--;
-    clearOldAndsetNewPixel(Column, Row, ColumnNext, RowNext);
+    clearOldAndSetNewPixel(Column, Row, ColumnNext, RowNext);
 }
 
 /******************************************************************************************************************************************************
-  clearOldAndsetNewPixel()
+  clearOldAndSetNewPixel()
 ******************************************************************************************************************************************************/
-void AnimationClockImplode::clearOldAndsetNewPixel(byte ColumnOld, byte RowOld, byte ColumnNew, byte RowNew)
+void AnimationClockImplode::clearOldAndSetNewPixel(byte ColumnOld, byte RowOld, byte ColumnNew, byte RowNew)
 {
     if((ColumnOld != ColumnNew) || (RowOld != RowNew))
     {

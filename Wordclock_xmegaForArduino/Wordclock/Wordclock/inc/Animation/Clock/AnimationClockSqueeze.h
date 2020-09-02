@@ -64,11 +64,11 @@ class AnimationClockSqueeze : public AnimationClockCommon
     ClockWords::WordsListType ClockWordsTable{{DisplayWords::WORD_NONE}};
     byte CurrentWordIndex{0u};
     byte CurrentWordLength{0u};
-    byte CurrentCharIndex{0u};
 
     // functions
     void reset();
-    StdReturnType setNextWordIndex();
+    void clearTimeTask();
+    void setTimeTask();
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S

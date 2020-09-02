@@ -112,6 +112,26 @@ void AnimationClockImplode::clearTimeTask()
     }
 } /* clearTimeTask */
 
+///******************************************************************************************************************************************************
+//  shiftQuadrants()
+//******************************************************************************************************************************************************/
+//void AnimationClockImplode::shiftQuadrants()
+//{
+//    for(uint8_t Column = 0u; Column < DISPLAY_NUMBER_OF_COLUMNS; Column++) {
+//        for(uint8_t Row = 0u; Row < DISPLAY_NUMBER_OF_ROWS; Row++) {
+//            if(Display::getInstance().getPixelFast(Column, Row)) {
+//                byte ColumnNext = Column, RowNext = Row;
+//                Display::getInstance().clearPixelFast(Column, Row);
+//                if(Column < DISPLAY_NUMBER_OF_COLUMNS / 2u) ColumnNext = shiftRight(Column);
+//                if(Column > DISPLAY_NUMBER_OF_COLUMNS / 2u) ColumnNext = shiftLeft(Column);
+//                if(Row < DISPLAY_NUMBER_OF_ROWS / 2u) RowNext = shiftDown(Row);
+//                if(Row > DISPLAY_NUMBER_OF_ROWS / 2u) RowNext = shiftUp(Row);
+//                Display::getInstance().setPixelFast(ColumnNext, RowNext);
+//            }
+//        }
+//    }
+//}
+
 /******************************************************************************************************************************************************
   shiftQuadrantUpperLeft()
 ******************************************************************************************************************************************************/

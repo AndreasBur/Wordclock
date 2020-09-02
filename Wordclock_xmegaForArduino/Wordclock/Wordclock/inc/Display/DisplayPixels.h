@@ -9,10 +9,10 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       DisplayPixels.h
- *      \brief      
+ *      \brief
  *
- *      \details    
- *                  
+ *      \details
+ *
 ******************************************************************************************************************************************************/
 #ifndef _DISPLAY_PIXELS_H_
 #define _DISPLAY_PIXELS_H_
@@ -23,6 +23,7 @@
 #include "StandardTypes.h"
 #include "Arduino.h"
 #include "DisplayCharacters.h"
+#include "Display.h"
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
@@ -32,8 +33,6 @@
 
 
 /* DisplayPixels parameter */
-#define DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS
-#define DISPLAY_CHARACTERS_NUMBER_OF_ROWS
 
 
 /******************************************************************************************************************************************************
@@ -50,14 +49,19 @@ class DisplayPixels
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-  
-  
+    using PixelRowType = Display::PixelRowType;
+    using PixelColumnType = Display::PixelColumnType;
+    using WordIdType = DisplayWords::WordIdType;
+    using IndexType = Display::IndexType;
+    using PixelsBufferType = std::array<PixelColumnType, DISPLAY_NUMBER_OF_ROWS>;
+
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
+    PixelsBufferType PixelsBuffer;
+    DisplayWords Words;
 
-  
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
@@ -66,12 +70,30 @@ class DisplayPixels
     ~DisplayPixels();
 
 	// get methods
-
+    boolean getPixel(byte Column, byte Row) const { return readBit(PixelsBuffer[Row], Column); }
 
 	// set methods
+	void setPixel(byte Column, byte Row) { writeBit(PixelsBuffer[Row], Column, true); }
+	void setPixel(IndexType Index) {
+	    byte Column, Row;
+	    Display::indexToColumnAndRow(Index, Column, Row);
+	    setPixel(Column, Row);
+    }
 
 	// methods
-    void init();
+	void setWord(WordIdType WordId) {
+        DisplayWord word = Words.getDisplayWordFast(WordId);
+        for(IndexType Index = 0; Index < word.getLength(); Index++) { setPixel(word.getColumn() + Index,  word.getRow()); }
+    }
+
+	void send() const
+	{
+        for(byte Column = 0; Column < DISPLAY_NUMBER_OF_COLUMNS; Column++) {
+            for(byte Row = 0; Row < DISPLAY_NUMBER_OF_ROWS; Row++) {
+                Display::getInstance().setPixel(getPixel(Column, Row));
+            }
+        }
+	}
 };
 
 #endif
