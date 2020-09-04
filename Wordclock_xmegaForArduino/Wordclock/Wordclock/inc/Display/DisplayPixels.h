@@ -66,14 +66,14 @@ class DisplayPixels
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    DisplayPixels();
-    ~DisplayPixels();
+    DisplayPixels() : PixelsBuffer{0u} {}
+    ~DisplayPixels() {}
 
 	// get methods
     boolean getPixel(byte Column, byte Row) const { return readBit(PixelsBuffer[Row], Column); }
 
 	// set methods
-	void setPixel(byte Column, byte Row) { writeBit(PixelsBuffer[Row], Column, true); }
+	void setPixel(byte Column, byte Row) { PixelsBuffer[Row] = writeBit(PixelsBuffer[Row], Column, true); }
 	void setPixel(IndexType Index) {
 	    byte Column, Row;
 	    Display::indexToColumnAndRow(Index, Column, Row);
@@ -81,16 +81,28 @@ class DisplayPixels
     }
 
 	// methods
+	void clearPixel(byte Column, byte Row) { PixelsBuffer[Row] = writeBit(PixelsBuffer[Row], Column, false); }
+	void writePixel(byte Column, byte Row, bool Value) { PixelsBuffer[Row] = writeBit(PixelsBuffer[Row], Column, Value); }
+
 	void setWord(WordIdType WordId) {
         DisplayWord word = Words.getDisplayWordFast(WordId);
-        for(IndexType Index = 0; Index < word.getLength(); Index++) { setPixel(word.getColumn() + Index,  word.getRow()); }
+        for(IndexType Index = 0u; Index < word.getLength(); Index++) { setPixel(word.getColumn() + Index,  word.getRow()); }
     }
 
-	void send() const
+	void setPixelsToDisplay() const
 	{
-        for(byte Column = 0; Column < DISPLAY_NUMBER_OF_COLUMNS; Column++) {
-            for(byte Row = 0; Row < DISPLAY_NUMBER_OF_ROWS; Row++) {
-                Display::getInstance().setPixel(getPixel(Column, Row));
+        for(byte Column = 0u; Column < DISPLAY_NUMBER_OF_COLUMNS; Column++) {
+            for(byte Row = 0u; Row < DISPLAY_NUMBER_OF_ROWS; Row++) {
+                Display::getInstance().writePixel(Column, Row, getPixel(Column, Row));
+            }
+        }
+	}
+
+	void getPixelsFromDisplay()
+	{
+        for(byte Column = 0u; Column < DISPLAY_NUMBER_OF_COLUMNS; Column++) {
+            for(byte Row = 0u; Row < DISPLAY_NUMBER_OF_ROWS; Row++) {
+                PixelsBuffer[Row] = writeBit(PixelsBuffer[Row], Column, Display::getInstance().getPixelFast(Column, Row));
             }
         }
 	}

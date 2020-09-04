@@ -93,6 +93,8 @@ void setup() {
   //wcClock.setTime(10,10);
   
   //wcAnimation.setAnimation(Animation::ANIMATION_CLOCK_DROP);
+    Animation::getInstance().setAnimation(AnimationClock::ANIMATION_CLOCK_IMPLODE);
+    Animation::getInstance().setTime(17, 40);
  
   //wcAnimation.setTime(12, 10);
   //WS2812::getInstance().setPixelFast(0, 180, 20, 50);

@@ -33,8 +33,6 @@
 
 
 /* AnimationClockImplode parameter */
-#define ANIMATION_CLOCK_SHIFT_COUNTER_MAX_VALUE       5u
-
 
 /******************************************************************************************************************************************************
  *  GLOBAL FUNCTION MACROS
@@ -47,7 +45,7 @@
 
 
 /******************************************************************************************************************************************************
- *  C L A S S   A N I M A T I O N C L O C K T E L E T Y P E
+ *  C L A S S   A N I M A T I O N   C L O C K   I M P L O D E
 ******************************************************************************************************************************************************/
 class AnimationClockImplode : public AnimationClockCommon
 {
@@ -61,8 +59,12 @@ class AnimationClockImplode : public AnimationClockCommon
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
+    //static constexpr byte NumberOfColumns{DISPLAY_NUMBER_OF_COLUMNS};
+    //static constexpr byte NumberOfRows{DISPLAY_NUMBER_OF_ROWS};
+    static constexpr byte ShiftCounterMaxValue{5u};
+    static constexpr byte ColumnCenter{DISPLAY_NUMBER_OF_COLUMNS / 2u};
+    static constexpr byte RowCenter{DISPLAY_NUMBER_OF_ROWS / 2u};
     DisplayWords Words;
-    //ClockWords::WordsListType ClockWordsTable{{DisplayWords::WORD_NONE}};
     byte ShiftCounter{0u};
     byte Hour{0u};
     byte Minute{0u};
@@ -70,7 +72,11 @@ class AnimationClockImplode : public AnimationClockCommon
     // functions
     void reset();
     void clearTimeTask();
+    void setTimeTask();
+    void setStateToSetTime();
     void shiftQuadrants();
+
+    void shiftQuadrants(DisplayPixels&, byte);
 
     void shiftQuadrantUpperLeft();
     void shiftQuadrantUpperRight();
@@ -83,11 +89,20 @@ class AnimationClockImplode : public AnimationClockCommon
     void shiftUpLeft(byte, byte);
 
     void clearOldAndSetNewPixel(byte, byte, byte, byte);
+    void setNewPixel(byte, byte, byte, byte);
 
-//    byte shiftLeft(byte Column) { return Column > (DISPLAY_NUMBER_OF_COLUMNS / 2u) ? --Column : Column; }
-//    byte shiftRight(byte Column) { return Column < (DISPLAY_NUMBER_OF_COLUMNS / 2u) ? ++Column : Column; }
-//    byte shiftDown(byte Row) { return Row < (DISPLAY_NUMBER_OF_ROWS / 2u) ? ++Row : Row; }
-//    byte shiftUp(byte Row) { return Row > (DISPLAY_NUMBER_OF_ROWS / 2u) ?  --Row : Row; }
+    byte shiftLeft(byte Column, byte NumberOfShifts) {
+         return (static_cast<int16_t>(Column) - NumberOfShifts > ColumnCenter) ? (Column - NumberOfShifts) : ColumnCenter;
+    }
+    byte shiftRight(byte Column, byte NumberOfShifts) {
+         return (static_cast<uint16_t>(Column) + NumberOfShifts < ColumnCenter) ? (Column + NumberOfShifts) : ColumnCenter;
+    }
+    byte shiftUp(byte Row, byte NumberOfShifts) {
+         return (static_cast<int16_t>(Row) - NumberOfShifts > RowCenter) ? (Row - NumberOfShifts) : RowCenter;
+    }
+    byte shiftDown(byte Row, byte NumberOfShifts) {
+         return (static_cast<uint16_t>(Row) + NumberOfShifts < RowCenter) ? (Row + NumberOfShifts) : RowCenter;
+    }
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S

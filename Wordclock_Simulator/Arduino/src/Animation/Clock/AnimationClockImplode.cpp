@@ -61,7 +61,7 @@ StdReturnType AnimationClockImplode::setTime(byte sHour, byte sMinute)
 
     if(State == STATE_IDLE) {
         ReturnValue = E_OK;
-        Display::getInstance().setCharacterFast(DisplayCharacters::CHARACTER_S_3);
+        Display::getInstance().setPixel(ColumnCenter, RowCenter);
         ShiftCounter = 0u;
         Hour = sHour;
         Minute = sMinute;
@@ -133,7 +133,7 @@ void AnimationClockImplode::setTimeTask()
     pixels.getPixelsFromDisplay();
     Display::getInstance().clear();
     shiftQuadrants(pixels, ShiftCounter);
-    //pixels.setPixelsToDisplay();
+    Display::getInstance().setPixel(ColumnCenter, RowCenter);
 } /* setTimeTask */
 
 /******************************************************************************************************************************************************

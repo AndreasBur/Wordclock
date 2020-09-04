@@ -37,9 +37,9 @@
 #define DISPLAY_USE_WS2812_DIMMING                              STD_OFF
 #define DISPLAY_BRIGHTNESS_AUTOMATIC_CORRECTION_FACTOR          1.0f
 
-# if (WS2812_IS_SINGLETON == STD_ON)
-#  define Pixels                              WS2812::getInstance()
-# endif
+//# if (WS2812_IS_SINGLETON == STD_ON)
+//#  define Pixels                              WS2812::getInstance()
+//# endif
 
 # if (DISPLAY_USE_WS2812_DIMMING == STD_ON) && (WS2812_SUPPORT_DIMMING == STD_OFF)
 #  error "Display: Please activate WS2812 dimming support"
@@ -120,6 +120,8 @@ class Display
     bool BrightnessAutomatic{false};
 # if (WS2812_IS_SINGLETON == STD_OFF)
     Stripe Pixels;
+# else
+    Stripe& Pixels;
 # endif
     PixelColorType Color{255u, 255u, 255u};
     DisplayWords Words;
@@ -226,7 +228,7 @@ class Display
     StdReturnType setPixelColumn(byte, PixelColumnType);
 
     // pixel methods fast
-    static bool isIndexValid(IndexType Index) { return Pixels.isIndexValid(Index); }
+    bool isIndexValid(IndexType Index) { return Pixels.isIndexValid(Index); }
     void writePixelFast(byte Column, byte Row, bool Value) { if(Value) setPixelFast(Column, Row); else clearPixelFast(Column, Row); }
     void writePixelFast(IndexType Index, bool Value) { if(Value) setPixelFast(Index); else clearPixelFast(Index); }
     void setPixelFast(byte, byte);

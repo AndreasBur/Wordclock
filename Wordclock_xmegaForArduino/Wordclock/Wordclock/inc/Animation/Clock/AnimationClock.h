@@ -41,7 +41,18 @@
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
 /* AnimationClock configuration parameter */
-
+#define ANIMATION_CLOCK_SUPPORT_TELETYPE             STD_ON
+#define ANIMATION_CLOCK_SUPPORT_CURSOR               STD_ON
+#define ANIMATION_CLOCK_SUPPORT_DROP                 STD_ON
+#define ANIMATION_CLOCK_SUPPORT_WIPE                 STD_ON
+#define ANIMATION_CLOCK_SUPPORT_SNAKE                STD_ON
+#define ANIMATION_CLOCK_SUPPORT_SHIFT                STD_ON
+#define ANIMATION_CLOCK_SUPPORT_FADE                 STD_ON
+#define ANIMATION_CLOCK_SUPPORT_CUBE                 STD_ON
+#define ANIMATION_CLOCK_SUPPORT_FLICKER              STD_ON
+#define ANIMATION_CLOCK_SUPPORT_SQUEEZE              STD_ON
+#define ANIMATION_CLOCK_SUPPORT_IMPLODE              STD_ON
+#define ANIMATION_CLOCK_SUPPORT_EXPLODE              STD_ON
 
 /* AnimationClock parameter */
 
@@ -53,7 +64,7 @@
 
 
 /******************************************************************************************************************************************************
- *  C L A S S   A N I M A T I O N C L O C K
+ *  C L A S S   A N I M A T I O N   C L O C K
 ******************************************************************************************************************************************************/
 class AnimationClock
 {
@@ -63,38 +74,111 @@ class AnimationClock
   public:
     enum AnimationType {
         ANIMATION_CLOCK_NONE,
+# if(ANIMATION_CLOCK_SUPPORT_CURSOR == STD_ON)
         ANIMATION_CLOCK_CURSOR,
+# endif
+# if(ANIMATION_CLOCK_SUPPORT_TELETYPE == STD_ON)
         ANIMATION_CLOCK_TELETYPE,
-        //ANIMATION_CLOCK_TELETYPE_PARALLEL,
+# endif
+# if(ANIMATION_CLOCK_SUPPORT_DROP == STD_ON)
         ANIMATION_CLOCK_DROP,
+# endif
+# if(ANIMATION_CLOCK_SUPPORT_SHIFT == STD_ON)
         ANIMATION_CLOCK_SHIFT,
+# endif
+# if(ANIMATION_CLOCK_SUPPORT_FADE == STD_ON)
         ANIMATION_CLOCK_FADE,
+# endif
+# if(ANIMATION_CLOCK_SUPPORT_SNAKE == STD_ON)
         ANIMATION_CLOCK_SNAKE,
+# endif
+# if(ANIMATION_CLOCK_SUPPORT_WIPE == STD_ON)
         ANIMATION_CLOCK_WIPE,
+# endif
+# if(ANIMATION_CLOCK_SUPPORT_CUBE == STD_ON)
         ANIMATION_CLOCK_CUBE,
+# endif
+# if(ANIMATION_CLOCK_SUPPORT_FLICKER == STD_ON)
         ANIMATION_CLOCK_FLICKER,
+# endif
+# if(ANIMATION_CLOCK_SUPPORT_SQUEEZE == STD_ON)
         ANIMATION_CLOCK_SQUEEZE,
+# endif
+# if(ANIMATION_CLOCK_SUPPORT_IMPLODE == STD_ON)
         ANIMATION_CLOCK_IMPLODE,
+# endif
+# if(ANIMATION_CLOCK_SUPPORT_EXPLODE == STD_ON)
         ANIMATION_CLOCK_EXPLODE,
+# endif
         //ANIMATION_CLOCK_MATRIX,
+        //ANIMATION_CLOCK_TELETYPE_PARALLEL,
         ANIMATION_CLOCK_NUMBER_OF_ANIMATIONS
     };
 
     union AnimationsType {
+# if(ANIMATION_CLOCK_SUPPORT_CURSOR == STD_ON)
         AnimationClockCursor Cursor;
+# endif
+# if(ANIMATION_CLOCK_SUPPORT_TELETYPE == STD_ON)
         AnimationClockTeletype Teletype;
+# endif
+# if(ANIMATION_CLOCK_SUPPORT_DROP == STD_ON)
         AnimationClockDrop Drop;
-        AnimationClockWipe Wipe;
+# endif
+# if(ANIMATION_CLOCK_SUPPORT_SHIFT == STD_ON)
         AnimationClockShift Shift;
+# endif
+# if(ANIMATION_CLOCK_SUPPORT_WIPE == STD_ON)
+        AnimationClockWipe Wipe;
+# endif
+# if(ANIMATION_CLOCK_SUPPORT_SNAKE == STD_ON)
         AnimationClockSnake Snake;
+# endif
+# if(ANIMATION_CLOCK_SUPPORT_FADE == STD_ON)
         AnimationClockFade Fade;
+# endif
+# if(ANIMATION_CLOCK_SUPPORT_CUBE == STD_ON)
         AnimationClockCube Cube;
+# endif
+# if(ANIMATION_CLOCK_SUPPORT_FLICKER == STD_ON)
         AnimationClockFlicker Flicker;
+# endif
+# if(ANIMATION_CLOCK_SUPPORT_SQUEEZE == STD_ON)
         AnimationClockSqueeze Squeeze;
+# endif
+# if(ANIMATION_CLOCK_SUPPORT_IMPLODE == STD_ON)
         AnimationClockImplode Implode;
+# endif
+# if(ANIMATION_CLOCK_SUPPORT_EXPLODE == STD_ON)
         AnimationClockExplode Explode;
-
-        constexpr AnimationsType() : Cursor() { }
+# endif
+        constexpr AnimationsType() :
+# if(ANIMATION_CLOCK_SUPPORT_CURSOR == STD_ON)
+        Cursor()
+# elif(ANIMATION_CLOCK_SUPPORT_TELETYPE == STD_ON)
+        Teletype()
+# elif(ANIMATION_CLOCK_SUPPORT_DROP == STD_ON)
+        Drop()
+# elif(ANIMATION_CLOCK_SUPPORT_SHIFT == STD_ON)
+        Shift()
+# elif(ANIMATION_CLOCK_SUPPORT_WIPE == STD_ON)
+        Wipe()
+# elif(ANIMATION_CLOCK_SUPPORT_SNAKE == STD_ON)
+        Snake()
+# elif(ANIMATION_CLOCK_SUPPORT_FADE == STD_ON)
+        Fade()
+# elif(ANIMATION_CLOCK_SUPPORT_CUBE == STD_ON)
+        Cube()
+# elif(ANIMATION_CLOCK_SUPPORT_FLICKER == STD_ON)
+        Flicker()
+# elif(ANIMATION_CLOCK_SUPPORT_SQUEEZE == STD_ON)
+        Squeeze()
+# elif(ANIMATION_CLOCK_SUPPORT_IMPLODE == STD_ON)
+        Implode()
+# elif(ANIMATION_CLOCK_SUPPORT_EXPLODE == STD_ON)
+        Explode()
+# endif
+{ }
         ~AnimationsType() { }
     };
 
