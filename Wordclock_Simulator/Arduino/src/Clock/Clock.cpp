@@ -202,7 +202,7 @@ StdReturnType Clock::setTime(byte Hour, byte Minute) const
     for(byte Index = 0u; Index < clockWords.getHourWords().size() && clockWords.getHourWord(Index) != DisplayWords::WORD_NONE; Index++) {
         if(Display::getInstance().setWord(clockWords.getHourWord(Index)) == E_NOT_OK) returnValue = E_NOT_OK;
     }
-    for(byte Index = 0u; Index < clockWords.getMinuteWord(Index) && clockWords.getMinuteWord(Index) != DisplayWords::WORD_NONE; Index++) {
+    for(byte Index = 0u; Index < clockWords.getMinuteWords().size() && clockWords.getMinuteWord(Index) != DisplayWords::WORD_NONE; Index++) {
         if(Display::getInstance().setWord(clockWords.getMinuteWord(Index)) == E_NOT_OK) returnValue = E_NOT_OK;
     }
     return returnValue;
@@ -224,7 +224,7 @@ void Clock::setTimeFast(byte Hour, byte Minute) const
         for(byte Index = 0u; Index < clockWords.getHourWords().size() && clockWords.getHourWord(Index) != DisplayWords::WORD_NONE; Index++) {
             Display::getInstance().setWordFast(clockWords.getHourWord(Index));
         }
-        for(byte Index = 0u; Index < clockWords.getMinuteWord(Index) && clockWords.getMinuteWord(Index) != DisplayWords::WORD_NONE; Index++) {
+        for(byte Index = 0u; Index < clockWords.getMinuteWords().size() && clockWords.getMinuteWord(Index) != DisplayWords::WORD_NONE; Index++) {
             Display::getInstance().setWordFast(clockWords.getMinuteWord(Index));
         }
     }

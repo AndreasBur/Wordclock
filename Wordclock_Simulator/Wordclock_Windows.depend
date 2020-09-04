@@ -6115,7 +6115,7 @@
 	"Arduino.h"
 	"Display.h"
 
-1598942676 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\standardtypes\standardtypes.h
+1599161110 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\standardtypes\standardtypes.h
 	"limits"
 	<stdint.h>
 	<limits.h>
@@ -6125,7 +6125,7 @@
 	<string.h>
 	"Simulator.h"
 
-1598959767 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\display\display.h
+1599133333 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\display\display.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"WS2812.h"
@@ -6191,7 +6191,7 @@
 	"AnimationClock.h"
 	"AnimationFont.h"
 
-1598886153 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\wordclockmain.cpp
+1599166317 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\wordclockmain.cpp
 	"WordclockMain.h"
 
 1598257759 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\animation.cpp
@@ -6200,10 +6200,10 @@
 1504860142 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\font.cpp
 	"Animation.h"
 
-1598445701 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\clock\clock.cpp
+1599160088 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\clock\clock.cpp
 	"Clock.h"
 
-1598257758 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\display\display.cpp
+1599133401 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\display\display.cpp
 	"Display.h"
 
 1513592186 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\animation\animationteletype.h
@@ -26748,7 +26748,7 @@
 	"Display.h"
 	"MsgParameterParser.h"
 
-1598858989 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\communication\messageparser\msgcmddisplaypixelparser.h
+1599037528 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\communication\messageparser\msgcmddisplaypixelparser.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"Display.h"
@@ -26760,7 +26760,7 @@
 	"MsgParameterParser.h"
 	"Clock.h"
 
-1598363812 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\communication\messageparser\msgcmdremoteprocedurecallparser.h
+1599123101 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\communication\messageparser\msgcmdremoteprocedurecallparser.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"MsgParameterParser.h"
@@ -26785,14 +26785,14 @@
 	"Clock.h"
 	"AnimationClockCommon.h"
 
-1598960072 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\animation\clock\animationclockimplode.h
+1599161929 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\animation\clock\animationclockimplode.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"Clock.h"
 	"AnimationClockCommon.h"
 	"DisplayPixels.h"
 
-1598960111 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\clock\animationclockimplode.cpp
+1599166161 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\clock\animationclockimplode.cpp
 	"AnimationClockImplode.h"
 
 1598894934 c:\users\aburn\documents\github\wordclock\wordclock_simulator\arduino\inc\animation\clock\animationclocksqueeze.h
@@ -26836,7 +26836,7 @@
 	"DisplayCharacters.h"
 	"Display.h"
 
-1598959999 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\display\displaypixels.h
+1599165171 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\display\displaypixels.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"DisplayCharacters.h"

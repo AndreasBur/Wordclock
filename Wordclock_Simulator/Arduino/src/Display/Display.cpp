@@ -537,7 +537,7 @@ void Display::setPixelColumnFast(byte Column, PixelRowType PixelColumn)
 /******************************************************************************************************************************************************
   Constructor of Display
 ******************************************************************************************************************************************************/
-Display::Display(PixelColorType sColor)
+Display::Display(PixelColorType sColor) : Pixels{WS2812::getInstance()}
 #if (WS2812_IS_SINGLETON == STD_OFF)
 : Pixels()
 #endif
@@ -556,7 +556,7 @@ Display::Display(PixelColorType sColor)
 /******************************************************************************************************************************************************
   Constructor of Display
 ******************************************************************************************************************************************************/
-Display::Display(ColorType Red, ColorType Green, ColorType Blue)
+Display::Display(ColorType Red, ColorType Green, ColorType Blue) : Pixels{WS2812::getInstance()}
 #if (WS2812_IS_SINGLETON == STD_OFF)
 : Pixels()
 #endif
