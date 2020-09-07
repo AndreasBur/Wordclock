@@ -253,6 +253,7 @@ class Display
     void disableBrightnessAutomatic() { BrightnessAutomatic = false; }
     void test() { Pixels.setPixels(ColorDimmed); }
     void clear() { Pixels.clearPixels(); }
+    bool isCleared() { for(byte Index = 0; Index < DISPLAY_NUMBER_OF_PIXELS; Index++) { if(getPixelFast(Index)) return false; } return true; }
 
     void incrementColorRed() { if(Color.Red < DISPLAY_COLOR_MAX_VALUE) Color.Red++; }
     void incrementColorGreen() { if(Color.Green < DISPLAY_COLOR_MAX_VALUE) Color.Green++; }

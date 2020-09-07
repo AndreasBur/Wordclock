@@ -163,6 +163,11 @@ class Clock
     static bool isModeValid(ModeType sMode) { return sMode < MODE_NUMBER_OF_MODES; }
     StdReturnType setTime(TimeType Time) const { return setTime(Time.Hour, Time.Minute); }
     StdReturnType setTime(byte, byte) const;
+    void setTime(ClockWords::WordsListType ClockWordsTable) const {
+            for(byte Index  = 0u; Index < ClockWordsTable.size(); Index++) {
+            Display::getInstance().setWord(ClockWordsTable[Index]);
+        }
+    }
     void setTimeFast(TimeType Time) const { setTimeFast(Time.Hour, Time.Minute); }
     void setTimeFast(byte, byte) const;
     StdReturnType show() const { return Display::getInstance().show(); }

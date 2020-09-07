@@ -42,7 +42,7 @@
 ******************************************************************************************************************************************************/
 /* AnimationClock configuration parameter */
 #define ANIMATION_CLOCK_SUPPORT_TELETYPE             STD_ON
-#define ANIMATION_CLOCK_SUPPORT_CURSOR               STD_OFF
+#define ANIMATION_CLOCK_SUPPORT_CURSOR               STD_ON
 #define ANIMATION_CLOCK_SUPPORT_DROP                 STD_ON
 #define ANIMATION_CLOCK_SUPPORT_WIPE                 STD_ON
 #define ANIMATION_CLOCK_SUPPORT_SNAKE                STD_ON

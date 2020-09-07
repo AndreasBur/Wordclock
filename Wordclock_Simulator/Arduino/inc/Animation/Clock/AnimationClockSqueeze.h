@@ -62,13 +62,17 @@ class AnimationClockSqueeze : public AnimationClockCommon
   private:
     DisplayWords Words;
     ClockWords::WordsListType ClockWordsTable{{DisplayWords::WORD_NONE}};
-    byte CurrentWordIndex{0u};
-    byte CurrentWordLength{0u};
+    byte MaxWordLength{0u};
+    byte CurrentLength{1u};
 
     // functions
     void reset();
     void clearTimeTask();
     void setTimeTask();
+
+    byte getNextClearedPixel(byte);
+    byte getNextSetPixel(byte);
+    void setMaxWordLength();
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S

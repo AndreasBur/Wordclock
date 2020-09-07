@@ -64,10 +64,9 @@ class AnimationClockImplode : public AnimationClockCommon
     static constexpr byte ShiftCounterMaxValue{5u};
     static constexpr byte ColumnCenter{DISPLAY_NUMBER_OF_COLUMNS / 2u};
     static constexpr byte RowCenter{DISPLAY_NUMBER_OF_ROWS / 2u};
+    ClockWords::WordsListType ClockWordsTable{{DisplayWords::WORD_NONE}};
     DisplayWords Words;
     byte ShiftCounter{0u};
-    byte Hour{0u};
-    byte Minute{0u};
 
     // functions
     void reset();
@@ -102,6 +101,12 @@ class AnimationClockImplode : public AnimationClockCommon
     }
     byte shiftDown(byte Row, byte NumberOfShifts) {
          return (static_cast<uint16_t>(Row) + NumberOfShifts < RowCenter) ? (Row + NumberOfShifts) : RowCenter;
+    }
+
+    void setTime(DisplayPixels& Pixels) {
+        for(byte Index  = 0u; Index < ClockWordsTable.size(); Index++) {
+            Pixels.setWord(ClockWordsTable[Index]);
+        }
     }
 
 /******************************************************************************************************************************************************

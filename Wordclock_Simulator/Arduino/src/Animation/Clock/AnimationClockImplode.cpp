@@ -55,16 +55,14 @@ void AnimationClockImplode::init()
 /******************************************************************************************************************************************************
   setTime()
 ******************************************************************************************************************************************************/
-StdReturnType AnimationClockImplode::setTime(byte sHour, byte sMinute)
+StdReturnType AnimationClockImplode::setTime(byte Hour, byte Minute)
 {
     StdReturnType ReturnValue{E_NOT_OK};
 
-    if(State == STATE_IDLE) {
+    if(Clock::getInstance().getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
         ReturnValue = E_OK;
         Display::getInstance().setPixel(ColumnCenter, RowCenter);
         ShiftCounter = 0u;
-        Hour = sHour;
-        Minute = sMinute;
         State = STATE_CLEAR_TIME;
     }
     return ReturnValue;
@@ -90,7 +88,7 @@ void AnimationClockImplode::task()
             setTimeTask();
         } else {
             Display::getInstance().clear();
-            Clock::getInstance().setTimeFast(Hour, Minute);
+            Clock::getInstance().setTime(ClockWordsTable);
             State = STATE_IDLE;
         }
     }
@@ -107,8 +105,7 @@ void AnimationClockImplode::task()
 void AnimationClockImplode::reset()
 {
     ShiftCounter = 0u;
-    Hour = 0u;
-    Minute = 0u;
+    ClockWordsTable.fill(DisplayWords::WORD_NONE);
 } /* reset */
 
 /******************************************************************************************************************************************************
@@ -129,9 +126,7 @@ void AnimationClockImplode::setTimeTask()
 {
     DisplayPixels pixels;
     Display::getInstance().clear();
-    Clock::getInstance().setTimeFast(Hour, Minute);
-    pixels.getPixelsFromDisplay();
-    Display::getInstance().clear();
+    setTime(pixels);
     shiftQuadrants(pixels, ShiftCounter);
     Display::getInstance().setPixel(ColumnCenter, RowCenter);
 } /* setTimeTask */
