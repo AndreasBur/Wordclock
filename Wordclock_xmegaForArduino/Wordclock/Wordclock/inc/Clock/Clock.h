@@ -164,10 +164,14 @@ class Clock
     StdReturnType setTime(TimeType Time) const { return setTime(Time.Hour, Time.Minute); }
     StdReturnType setTime(byte, byte) const;
     void setTime(ClockWords::WordsListType ClockWordsTable) const {
+        setTime(ClockWordsTable, 0u);
+    }
+    void setTime(ClockWords::WordsListType ClockWordsTable, byte MaxLength) const {
             for(byte Index  = 0u; Index < ClockWordsTable.size(); Index++) {
-            Display::getInstance().setWord(ClockWordsTable[Index]);
+            Display::getInstance().setWord(ClockWordsTable[Index], MaxLength);
         }
     }
+
     void setTimeFast(TimeType Time) const { setTimeFast(Time.Hour, Time.Minute); }
     void setTimeFast(byte, byte) const;
     StdReturnType show() const { return Display::getInstance().show(); }

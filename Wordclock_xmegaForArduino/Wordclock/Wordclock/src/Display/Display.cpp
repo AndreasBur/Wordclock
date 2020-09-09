@@ -88,9 +88,10 @@ StdReturnType Display::setWord(WordIdType WordId, byte MaxLength)
     if(WordId < DisplayWords::WORD_NUMBER_OF_WORDS) {
         returnValue = E_OK;
         DisplayWord word = Words.getDisplayWordFast(WordId);
+        byte WordLength = word.getLength();
 
-        if(MaxLength == DISPLAY_WORD_LENGTH_UNLIMITED) Length = word.getLength();
-        else Length = MaxLength;
+        if(MaxLength == DISPLAY_WORD_LENGTH_UNLIMITED || MaxLength >= WordLength) { Length = WordLength; }
+        else { Length = MaxLength; }
 
         for(IndexType Index = 0; Index < Length; Index++) {
             if(setPixel(word.getColumn() + Index,  word.getRow()) == E_NOT_OK) returnValue = E_NOT_OK;

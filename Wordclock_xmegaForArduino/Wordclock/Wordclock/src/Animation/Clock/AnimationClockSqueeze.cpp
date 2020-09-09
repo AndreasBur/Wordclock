@@ -63,8 +63,6 @@ StdReturnType AnimationClockSqueeze::setTime(byte Hour, byte Minute)
 
     if(Clock::getInstance().getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
         ReturnValue = E_OK;
-        CurrentWordIndex = 0u;
-        CurrentWordLength = Words.getDisplayWordLengthFast(ClockWordsTable[CurrentWordIndex]);
         State = STATE_CLEAR_TIME;
     }
     return ReturnValue;
@@ -76,8 +74,16 @@ StdReturnType AnimationClockSqueeze::setTime(byte Hour, byte Minute)
 ******************************************************************************************************************************************************/
 void AnimationClockSqueeze::task()
 {
-    if(State == STATE_CLEAR_TIME) { clearTimeTask(); }
-    if(State == STATE_SET_TIME) { setTimeTask(); }
+    if(State == STATE_CLEAR_TIME) {
+        clearTimeTask();
+        if(Display::getInstance().isCleared()) {
+            setMaxWordLength();
+            State = STATE_SET_TIME;
+        }
+    } else if(State == STATE_SET_TIME) {
+        setTimeTask();
+        if(CurrentLength > MaxWordLength) { State = STATE_IDLE; }
+    }
 } /* task */
 
 
@@ -91,8 +97,8 @@ void AnimationClockSqueeze::task()
 void AnimationClockSqueeze::reset()
 {
     ClockWordsTable.fill(DisplayWords::WORD_NONE);
-    CurrentWordIndex = 0u;
-    CurrentWordLength = 0u;
+    MaxWordLength = 0u;
+    CurrentLength = 1u;
 } /* reset */
 
 /******************************************************************************************************************************************************
@@ -100,7 +106,13 @@ void AnimationClockSqueeze::reset()
 ******************************************************************************************************************************************************/
 void AnimationClockSqueeze::clearTimeTask()
 {
-
+    for(byte pixelIndex = 0u; pixelIndex < DISPLAY_NUMBER_OF_PIXELS; pixelIndex++)
+    {
+        pixelIndex = getNextSetPixel(pixelIndex);
+        Display::getInstance().clearPixel(pixelIndex);
+        pixelIndex++;
+        pixelIndex = getNextClearedPixel(pixelIndex);
+    }
 } /* clearTimeTask */
 
 /******************************************************************************************************************************************************
@@ -108,16 +120,49 @@ void AnimationClockSqueeze::clearTimeTask()
 ******************************************************************************************************************************************************/
 void AnimationClockSqueeze::setTimeTask()
 {
-
+    Clock::getInstance().setTime(ClockWordsTable, CurrentLength);
+    CurrentLength++;
 } /* setTimeTask */
 
 /******************************************************************************************************************************************************
-  setNextWordIndex()
+  getNextClearedPixel()
 ******************************************************************************************************************************************************/
-StdReturnType setNextWordIndex()
+byte AnimationClockSqueeze::getNextClearedPixel(byte Index)
 {
-    
-} /* setnextWordIndex */
+    for(byte i = Index; i < DISPLAY_NUMBER_OF_PIXELS; i++) {
+        if(!Display::getInstance().getPixelFast(i)) {
+            return i;
+        }
+    }
+    return Index;
+} /* getNextClearedPixel */
+
+/******************************************************************************************************************************************************
+  getNextSetPixel()
+******************************************************************************************************************************************************/
+byte AnimationClockSqueeze::getNextSetPixel(byte Index)
+{
+    for(byte i = Index; i < DISPLAY_NUMBER_OF_PIXELS; i++) {
+        if(Display::getInstance().getPixelFast(i)) {
+            return i;
+        }
+    }
+    return Index;
+} /* getNextSetPixel */
+
+/******************************************************************************************************************************************************
+  getMaxWordLength()
+******************************************************************************************************************************************************/
+void AnimationClockSqueeze::setMaxWordLength()
+{
+    for(byte index = 0u; index < ClockWordsTable.size(); index++)
+    {
+        byte CurrentWordLength = Words.getDisplayWordLengthFast(ClockWordsTable[index]);
+        if(CurrentWordLength > MaxWordLength) {
+            MaxWordLength = CurrentWordLength;
+        }
+    }
+} /* getMaxWordLength */
 
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E

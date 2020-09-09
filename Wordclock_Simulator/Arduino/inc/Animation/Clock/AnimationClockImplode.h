@@ -53,17 +53,14 @@ class AnimationClockImplode : public AnimationClockCommon
 /******************************************************************************************************************************************************
  *  GLOBAL DATA TYPES AND STRUCTURES
 ******************************************************************************************************************************************************/
-
+    static constexpr byte ShiftCounterMaxValue{5u};
+    static constexpr byte ColumnCenter{DISPLAY_NUMBER_OF_COLUMNS / 2u};
+    static constexpr byte RowCenter{DISPLAY_NUMBER_OF_ROWS / 2u};
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
 ******************************************************************************************************************************************************/
   private:
-    //static constexpr byte NumberOfColumns{DISPLAY_NUMBER_OF_COLUMNS};
-    //static constexpr byte NumberOfRows{DISPLAY_NUMBER_OF_ROWS};
-    static constexpr byte ShiftCounterMaxValue{5u};
-    static constexpr byte ColumnCenter{DISPLAY_NUMBER_OF_COLUMNS / 2u};
-    static constexpr byte RowCenter{DISPLAY_NUMBER_OF_ROWS / 2u};
     ClockWords::WordsListType ClockWordsTable{{DisplayWords::WORD_NONE}};
     DisplayWords Words;
     byte ShiftCounter{0u};

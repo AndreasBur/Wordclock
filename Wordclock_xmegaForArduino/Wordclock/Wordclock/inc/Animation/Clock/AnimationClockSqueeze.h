@@ -46,7 +46,7 @@
 
 
 /******************************************************************************************************************************************************
- *  C L A S S   A N I M A T I O N C L O C K S Q U E E Z E
+ *  C L A S S   A N I M A T I O N   C L O C K   S Q U E E Z E
 ******************************************************************************************************************************************************/
 class AnimationClockSqueeze : public AnimationClockCommon
 {
@@ -62,13 +62,17 @@ class AnimationClockSqueeze : public AnimationClockCommon
   private:
     DisplayWords Words;
     ClockWords::WordsListType ClockWordsTable{{DisplayWords::WORD_NONE}};
-    byte CurrentWordIndex{0u};
-    byte CurrentWordLength{0u};
+    byte MaxWordLength{0u};
+    byte CurrentLength{1u};
 
     // functions
     void reset();
     void clearTimeTask();
     void setTimeTask();
+
+    byte getNextClearedPixel(byte);
+    byte getNextSetPixel(byte);
+    void setMaxWordLength();
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S

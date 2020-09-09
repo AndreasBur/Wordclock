@@ -105,17 +105,17 @@ void AnimationClockWipe::clearTimeTask()
 
     do {
         if(Display::getInstance().getPixelFast(Column, Row)) {
-            if(SetPixelState == SET_PIXEL_STATE_DOWN) setPixelDown(Column, Row);
-            else setPixelRight(Column, Row);
+            if(SetPixelState == SET_PIXEL_STATE_DOWN) { setPixelDown(Column, Row); }
+            else { setPixelRight(Column, Row); }
         }
     } while(Column-- != 0u && Row++ < DISPLAY_NUMBER_OF_ROWS - 1u);
 
-    if(SetPixelState == SET_PIXEL_STATE_DOWN) SetPixelState = SET_PIXEL_STATE_RIGHT;
-    else SetPixelState = SET_PIXEL_STATE_DOWN;
+    if(SetPixelState == SET_PIXEL_STATE_DOWN) { SetPixelState = SET_PIXEL_STATE_RIGHT; }
+    else { SetPixelState = SET_PIXEL_STATE_DOWN; }
 
     if(setNextIndex() == E_NOT_OK) {
+        Index = 0u;
         State = STATE_SET_TIME;
-        reset();
     }
 } /* clearTimeTask */
 
@@ -130,12 +130,13 @@ void AnimationClockWipe::setTimeTask()
     Display::getInstance().indexToColumnAndRow(Index, Column, Row);
 
     do {
-        if(isPixelPartOfClockWords(ClockWordsTable, Column, Row)) { Display::getInstance().setPixelFast(Column, Row); }
+        if(isPixelPartOfClockWords(ClockWordsTable, Column, Row)) {
+            Display::getInstance().setPixelFast(Column, Row);
+        }
     } while(Column-- != 0u && Row++ < DISPLAY_NUMBER_OF_ROWS - 1u);
 
     if(setNextIndex() == E_NOT_OK) {
         State = STATE_IDLE;
-        reset();
     }
 } /* setTimeTask */
 

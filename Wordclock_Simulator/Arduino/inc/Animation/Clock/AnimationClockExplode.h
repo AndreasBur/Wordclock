@@ -46,7 +46,7 @@
 
 
 /******************************************************************************************************************************************************
- *  C L A S S   A N I M A T I O N C L O C K E X P L O D E
+ *  C L A S S   A N I M A T I O N   C L O C K   E X P L O D E
 ******************************************************************************************************************************************************/
 class AnimationClockExplode : public AnimationClockCommon
 {
@@ -54,7 +54,8 @@ class AnimationClockExplode : public AnimationClockCommon
 /******************************************************************************************************************************************************
  *  GLOBAL DATA TYPES AND STRUCTURES
 ******************************************************************************************************************************************************/
-
+    static constexpr byte ColumnCenter{DISPLAY_NUMBER_OF_COLUMNS / 2u};
+    static constexpr byte RowCenter{DISPLAY_NUMBER_OF_ROWS / 2u};
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
@@ -64,11 +65,12 @@ class AnimationClockExplode : public AnimationClockCommon
     ClockWords::WordsListType ClockWordsTable{{DisplayWords::WORD_NONE}};
     byte CurrentWordIndex{0u};
     byte CurrentWordLength{0u};
-    byte CurrentCharIndex{0u};
 
     // functions
     void reset();
-    StdReturnType setNextWordIndex();
+    void clearTimeTask();
+    StdReturnType setNextWord();
+    void shiftWord();
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
