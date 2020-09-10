@@ -95,33 +95,29 @@ void AnimationClockExplode::reset()
 ******************************************************************************************************************************************************/
 void AnimationClockExplode::clearTimeTask()
 {
-    if(setNextWord() == E_NOT_OK) {
-        State = STATE_IDLE;
+    if(isFinalIndexReached()) {
+        if(setNextWord() == E_OK) { shiftWord(); }
+        else { State = STATE_SET_TIME; }
+    } else {
+        shiftWord();
     }
 } /* clearTimeTask */
+
+
 
 /******************************************************************************************************************************************************
   setNextWord()
 ******************************************************************************************************************************************************/
 StdReturnType AnimationClockExplode::setNextWord()
 {
-    byte nextWordIndex = CurrentWordIndex + CurrentWordLength;
-
-    do {
+    for(byte nextWordIndex = CurrentWordIndex + CurrentWordLength; nextWordIndex < DISPLAY_NUMBER_OF_PIXELS; nextWordIndex++) {
         if(Display::getInstance().getPixelFast(nextWordIndex)) {
             CurrentWordIndex = nextWordIndex;
-            break;
-        } else {
-            nextWordIndex++;
+            setNextWordLength();
+            return E_OK;
         }
-    } while(nextWordIndex < DISPLAY_NUMBER_OF_PIXELS);
-
-    if(nextWordIndex < DISPLAY_NUMBER_OF_PIXELS) {
-        setNextWordLength();
-        return E_OK;
-    } else {
-        return E_NOT_OK;
     }
+    return E_NOT_OK;
 } /* setNextWord */
 
 /******************************************************************************************************************************************************

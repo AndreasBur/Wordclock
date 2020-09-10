@@ -65,6 +65,8 @@ class AnimationClockExplode : public AnimationClockCommon
     ClockWords::WordsListType ClockWordsTable{{DisplayWords::WORD_NONE}};
     byte CurrentWordIndex{0u};
     byte CurrentWordLength{0u};
+    byte FinalRow{0u};
+    byte FinalColumn{0u};
 
     // functions
     void reset();
@@ -72,6 +74,8 @@ class AnimationClockExplode : public AnimationClockCommon
     StdReturnType setNextWord();
     void setNextWordLength();
     void shiftWord();
+    bool isFinalIndexReached();
+    byte getFinalIndex();
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
