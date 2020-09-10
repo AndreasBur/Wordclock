@@ -26,7 +26,7 @@ WordclockMain::WordclockMain()
     //WcTransformation.shiftRight(true);
     //WcTransformation.shiftUp(false);
     //WcTransformation.shiftDown(true);
-    Animation::getInstance().setAnimation(AnimationClock::ANIMATION_CLOCK_WIPE);
+    Animation::getInstance().setAnimation(AnimationClock::ANIMATION_CLOCK_EXPLODE);
     Animation::getInstance().setTime(Hour, Minute);
     //WcClock.show();
 }

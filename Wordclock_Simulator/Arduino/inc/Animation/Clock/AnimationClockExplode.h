@@ -70,6 +70,7 @@ class AnimationClockExplode : public AnimationClockCommon
     void reset();
     void clearTimeTask();
     StdReturnType setNextWord();
+    void setNextWordLength();
     void shiftWord();
 
 /******************************************************************************************************************************************************

@@ -33,11 +33,9 @@
 ******************************************************************************************************************************************************/
 
 
-
 /******************************************************************************************************************************************************
  *  LOCAL DATA TYPES AND STRUCTURES
 ******************************************************************************************************************************************************/
-
 
 
 /******************************************************************************************************************************************************
@@ -63,9 +61,7 @@ StdReturnType AnimationClockExplode::setTime(byte Hour, byte Minute)
 
     if(Clock::getInstance().getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
         ReturnValue = E_OK;
-        CurrentWordIndex = 0u;
-        CurrentWordLength = Words.getDisplayWordLengthFast(ClockWordsTable[CurrentWordIndex]);
-        State = STATE_SET_TIME;
+        State = STATE_CLEAR_TIME;
     }
     return ReturnValue;
 } /* setTime */
@@ -99,7 +95,9 @@ void AnimationClockExplode::reset()
 ******************************************************************************************************************************************************/
 void AnimationClockExplode::clearTimeTask()
 {
-
+    if(setNextWord() == E_NOT_OK) {
+        State = STATE_IDLE;
+    }
 } /* clearTimeTask */
 
 /******************************************************************************************************************************************************
@@ -107,9 +105,40 @@ void AnimationClockExplode::clearTimeTask()
 ******************************************************************************************************************************************************/
 StdReturnType AnimationClockExplode::setNextWord()
 {
+    byte nextWordIndex = CurrentWordIndex + CurrentWordLength;
 
+    do {
+        if(Display::getInstance().getPixelFast(nextWordIndex)) {
+            CurrentWordIndex = nextWordIndex;
+            break;
+        } else {
+            nextWordIndex++;
+        }
+    } while(nextWordIndex < DISPLAY_NUMBER_OF_PIXELS);
+
+    if(nextWordIndex < DISPLAY_NUMBER_OF_PIXELS) {
+        setNextWordLength();
+        return E_OK;
+    } else {
+        return E_NOT_OK;
+    }
 } /* setNextWord */
 
+/******************************************************************************************************************************************************
+  setNextWordLength()
+******************************************************************************************************************************************************/
+void AnimationClockExplode::setNextWordLength()
+{
+    CurrentWordLength = 1u;
+
+    for(byte index = CurrentWordIndex + 1u; index < DISPLAY_NUMBER_OF_PIXELS; index++) {
+        if(Display::getInstance().getPixelFast(index)) {
+            CurrentWordLength++;
+        } else {
+            break;
+        }
+    }
+}
 
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E
