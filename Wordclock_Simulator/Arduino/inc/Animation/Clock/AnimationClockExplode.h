@@ -63,19 +63,43 @@ class AnimationClockExplode : public AnimationClockCommon
   private:
     DisplayWords Words;
     ClockWords::WordsListType ClockWordsTable{{DisplayWords::WORD_NONE}};
+    byte ClockWordsTableIndex{0u};
     byte CurrentWordIndex{0u};
     byte CurrentWordLength{0u};
-    byte FinalRow{0u};
-    byte FinalColumn{0u};
+    byte Column{0u};
+    byte Row{0u};
 
     // functions
     void reset();
     void clearTimeTask();
-    StdReturnType setNextWord();
-    void setNextWordLength();
-    void shiftWord();
-    bool isFinalIndexReached();
-    byte getFinalIndex();
+    void setTimeTask();
+    void setWordToSet(DisplayWords::WordIdType);
+    StdReturnType setNextWordToClear();
+    StdReturnType setNextWordToSet();
+    void setWordIndex(DisplayWords::WordIdType);
+    void setWordLength();
+    StdReturnType shiftWord(byte, byte);
+    void toggleWordOnDisplay();
+
+    //byte getFinalIndex() const { return Display::getInstance().columnAndRowToIndex(getFinalColumn(), getFinalRow()); }
+    byte getClearFinalRow() const { return RowCenter; }
+    byte getSetFinalRow() const { return Display::getInstance().indexToRow(CurrentWordIndex); }
+    byte getClearFinalColumn() const { return ColumnCenter - (CurrentWordLength / 2u); }
+    byte getSetFinalColumn() const { return Display::getInstance().indexToColumn(CurrentWordIndex); }
+
+    byte getColumnNext(byte FinalColumn) const {
+        byte ColumnNext = Column;
+        if(Column < FinalColumn) ColumnNext++;
+        if(Column > FinalColumn) ColumnNext--;
+        return ColumnNext;
+    }
+
+    byte getRowNext(byte FinalRow) const {
+        byte RowNext = Row;
+        if(Row < FinalRow) RowNext++;
+        if(Row > FinalRow) RowNext--;
+        return RowNext;
+    }
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S

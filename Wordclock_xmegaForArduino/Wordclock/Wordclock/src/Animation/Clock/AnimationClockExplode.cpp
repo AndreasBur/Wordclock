@@ -63,9 +63,8 @@ StdReturnType AnimationClockExplode::setTime(byte Hour, byte Minute)
 
     if(Clock::getInstance().getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
         ReturnValue = E_OK;
-        CurrentWordIndex = 0u;
-        CurrentWordLength = Words.getDisplayWordLengthFast(ClockWordsTable[CurrentWordIndex]);
-        State = STATE_SET_TIME;
+        if(setNextWord() == E_OK) { State = STATE_CLEAR_TIME; }
+        else { State = STATE_SET_TIME; }
     }
     return ReturnValue;
 } /* setTime */
@@ -92,6 +91,8 @@ void AnimationClockExplode::reset()
     ClockWordsTable.fill(DisplayWords::WORD_NONE);
     CurrentWordIndex = 0u;
     CurrentWordLength = 0u;
+    Column = 0u;
+    Row = 0u;
 } /* reset */
 
 /******************************************************************************************************************************************************
@@ -99,17 +100,70 @@ void AnimationClockExplode::reset()
 ******************************************************************************************************************************************************/
 void AnimationClockExplode::clearTimeTask()
 {
-
+    if(shiftWord() == E_NOT_OK) {
+        if(setNextWord() == E_NOT_OK) { State = STATE_SET_TIME; }
+    }
 } /* clearTimeTask */
+
+/******************************************************************************************************************************************************
+  shiftWord()
+******************************************************************************************************************************************************/
+StdReturnType AnimationClockExplode::shiftWord()
+{
+    if(Column != getColumnNext() || Row != getRowNext()) {
+        toggleWordOnDisplay();
+        Column = getColumnNext();
+        Row = getRowNext();
+        toggleWordOnDisplay();
+        return E_OK;
+    } else {
+        toggleWordOnDisplay();
+        return E_NOT_OK;
+    }
+} /* shiftWord */
+
+/******************************************************************************************************************************************************
+  toggleWordOnDisplay()
+******************************************************************************************************************************************************/
+void AnimationClockExplode::toggleWordOnDisplay()
+{
+    for(byte columnIndex = Column; columnIndex < Column + CurrentWordLength; columnIndex++) {
+        Display::getInstance().togglePixelFast(columnIndex, Row);
+    }
+} /* toggleWordOnDisplay */
 
 /******************************************************************************************************************************************************
   setNextWord()
 ******************************************************************************************************************************************************/
 StdReturnType AnimationClockExplode::setNextWord()
 {
-
+    for(byte nextWordIndex = CurrentWordIndex + CurrentWordLength; nextWordIndex < DISPLAY_NUMBER_OF_PIXELS; nextWordIndex++) {
+        if(Display::getInstance().getPixelFast(nextWordIndex)) {
+            CurrentWordIndex = nextWordIndex;
+            setNextWordLength();
+            Column = Display::getInstance().indexToColumn(CurrentWordIndex);
+            Row = Display::getInstance().indexToRow(CurrentWordIndex);
+            return E_OK;
+        }
+    }
+    return E_NOT_OK;
 } /* setNextWord */
 
+/******************************************************************************************************************************************************
+  setNextWordLength()
+******************************************************************************************************************************************************/
+void AnimationClockExplode::setNextWordLength()
+{
+    CurrentWordLength = 1u;
+
+    for(byte index = CurrentWordIndex + 1u; index < DISPLAY_NUMBER_OF_PIXELS; index++) {
+        if(Display::getInstance().getPixelFast(index)) {
+            CurrentWordLength++;
+        } else {
+            break;
+        }
+    }
+}
 
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E

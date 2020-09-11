@@ -64,13 +64,38 @@ class AnimationClockExplode : public AnimationClockCommon
     DisplayWords Words;
     ClockWords::WordsListType ClockWordsTable{{DisplayWords::WORD_NONE}};
     byte CurrentWordIndex{0u};
+    byte ClockWordsTableIndex{0u};
     byte CurrentWordLength{0u};
+    byte Column{0u};
+    byte Row{0u};
 
     // functions
     void reset();
     void clearTimeTask();
     StdReturnType setNextWord();
-    void shiftWord();
+    void setNextWordLength();
+    StdReturnType shiftWord();
+    void toggleWordOnDisplay();
+    StdReturnType calculateColumnAndRowNext(byte, byte, byte, byte);
+
+    byte getFinalIndex() const { return Display::getInstance().columnAndRowToIndex(getFinalColumn(), getFinalRow()); }
+    byte getFinalRow() const { return RowCenter; }
+    byte getFinalColumn() const { return ColumnCenter - (CurrentWordLength / 2u); }
+    //bool isFinalIndexReached() const {  }
+
+    byte getColumnNext() const {
+        byte ColumnNext = Column;
+        if(Column < getFinalColumn()) ColumnNext++;
+        if(Column > getFinalColumn()) ColumnNext--;
+        return ColumnNext;
+    }
+
+    byte getRowNext() const {
+        byte RowNext = Row;
+        if(Row < getFinalRow()) RowNext++;
+        if(Row > getFinalRow()) RowNext--;
+        return RowNext;
+    }
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S

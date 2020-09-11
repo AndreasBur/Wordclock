@@ -9,10 +9,10 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       AnimationClockDrop.h
- *      \brief      
+ *      \brief
  *
- *      \details    
- *                  
+ *      \details
+ *
 ******************************************************************************************************************************************************/
 #ifndef _ANIMATION_CLOCK_DROP_H_
 #define _ANIMATION_CLOCK_DROP_H_
@@ -46,7 +46,7 @@
 
 
 /******************************************************************************************************************************************************
- *  C L A S S   A N I M A T I O N C L O C K D R O P
+ *  C L A S S   A N I M A T I O N   C L O C K   D R O P
 ******************************************************************************************************************************************************/
 class AnimationClockDrop : public AnimationClockCommon
 {
@@ -64,7 +64,7 @@ class AnimationClockDrop : public AnimationClockCommon
     ClockWords::WordsListType ClockWordsTable{{DisplayWords::WORD_NONE}};
     byte Row{0u};
     byte Column{0u};
-    byte CurrenWordIndex{0u};
+    byte CurrentWordIndex{0u};
 
     // functions
     void reset();
