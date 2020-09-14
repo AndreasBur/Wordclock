@@ -80,6 +80,7 @@ class AnimationClockExplode : public AnimationClockCommon
     void setWordLength();
     StdReturnType shiftWord(byte, byte);
     void toggleWordOnDisplay();
+    void setWordOnDisplay();
 
     //byte getFinalIndex() const { return Display::getInstance().columnAndRowToIndex(getFinalColumn(), getFinalRow()); }
     byte getClearFinalRow() const { return RowCenter; }
