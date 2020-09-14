@@ -59,15 +59,15 @@ void AnimationClockFlicker::init()
 ******************************************************************************************************************************************************/
 StdReturnType AnimationClockFlicker::setTime(byte sHour, byte sMinute)
 {
-    StdReturnType ReturnValue{E_NOT_OK};
+    StdReturnType returnValue{E_NOT_OK};
 
     if(sHour < CLOCK_NUMBER_OF_HOURS_PER_DAY && sMinute < CLOCK_NUMBER_OF_MINUTES_PER_HOUR) {
         Hour = sHour;
         Minute = sMinute;
         State = STATE_CLEAR_TIME;
-        ReturnValue = E_OK;
+        returnValue = E_OK;
     }
-    return ReturnValue;
+    return returnValue;
 } /* setTime */
 
 

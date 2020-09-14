@@ -76,15 +76,15 @@ const DisplayWord DisplayWords::DisplayWordsTable[] PROGMEM
 ******************************************************************************************************************************************************/
 StdReturnType DisplayWords::getDisplayWord(WordIdType WordId, DisplayWord& Word) const
 {
-    StdReturnType ReturnValue{E_NOT_OK};
+    StdReturnType returnValue{E_NOT_OK};
 
     if(isWordIdValid(WordId)) {
         Word = getDisplayWordFast(WordId);
-        ReturnValue = E_OK;
+        returnValue = E_OK;
     } else {
-        ReturnValue = E_NOT_OK;
+        returnValue = E_NOT_OK;
     }
-    return ReturnValue;
+    return returnValue;
 } /* getDisplayWord */
 
 
@@ -93,15 +93,15 @@ StdReturnType DisplayWords::getDisplayWord(WordIdType WordId, DisplayWord& Word)
 ******************************************************************************************************************************************************/
 StdReturnType DisplayWords::getDisplayWordLength(WordIdType WordId, byte& Length) const
 {
-    StdReturnType ReturnValue{E_NOT_OK};
+    StdReturnType returnValue{E_NOT_OK};
 
     if(isWordIdValid(WordId)) {
         Length = getDisplayWordLengthFast(WordId);
-        ReturnValue = E_OK;
+        returnValue = E_OK;
     } else {
-        ReturnValue = E_NOT_OK;
+        returnValue = E_NOT_OK;
     }
-    return ReturnValue;
+    return returnValue;
 } /* getDisplayWordLength */
 
 
@@ -110,15 +110,15 @@ StdReturnType DisplayWords::getDisplayWordLength(WordIdType WordId, byte& Length
 ******************************************************************************************************************************************************/
 StdReturnType DisplayWords::getDisplayWordColumn(WordIdType WordId, byte& Column) const
 {
-    StdReturnType ReturnValue{E_NOT_OK};
+    StdReturnType returnValue{E_NOT_OK};
 
     if(isWordIdValid(WordId)) {
         Column = getDisplayWordColumnFast(WordId);
-        ReturnValue = E_OK;
+        returnValue = E_OK;
     } else {
-        ReturnValue = E_NOT_OK;
+        returnValue = E_NOT_OK;
     }
-    return ReturnValue;
+    return returnValue;
 } /* getDisplayWordColumn */
 
 
@@ -127,15 +127,15 @@ StdReturnType DisplayWords::getDisplayWordColumn(WordIdType WordId, byte& Column
 ******************************************************************************************************************************************************/
 StdReturnType DisplayWords::getDisplayWordRow(WordIdType WordId, byte& Row) const
 {
-    StdReturnType ReturnValue{E_NOT_OK};
+    StdReturnType returnValue{E_NOT_OK};
 
     if(isWordIdValid(WordId)) {
         Row = getDisplayWordRowFast(WordId);
-        ReturnValue = E_OK;
+        returnValue = E_OK;
     } else {
-        ReturnValue = E_NOT_OK;
+        returnValue = E_NOT_OK;
     }
-    return ReturnValue;
+    return returnValue;
 } /* getDisplayWordRow */
 
 

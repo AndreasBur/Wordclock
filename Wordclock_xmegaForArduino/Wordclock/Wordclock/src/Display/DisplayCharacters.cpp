@@ -75,11 +75,11 @@ StdReturnType DisplayCharacters::getCharacter(byte Column, byte Row, char& Chara
   ****************************************************************************************************************************************************/
 StdReturnType DisplayCharacters::getCharacter(byte Index, char& Character) const
 {
-    byte Row, Column;
-    indexToColumnAndRow(Index, Column, Row);
+    byte row, column;
+    indexToColumnAndRow(Index, column, row);
 
     if(isIndexValid(Index)) {
-        Character =  getCharacterFast(Row, Column);
+        Character =  getCharacterFast(row, column);
         return E_OK;
     } else {
         return E_NOT_OK;
@@ -92,8 +92,8 @@ StdReturnType DisplayCharacters::getCharacter(byte Index, char& Character) const
   ****************************************************************************************************************************************************/
 StdReturnType DisplayCharacters::getCharacter(CharacterIdType CharacterId, char& Character) const
 {
-    byte Row, Column;
-    indexToColumnAndRow(CharacterId, Column, Row);
+    byte row, column;
+    indexToColumnAndRow(CharacterId, column, row);
 
     if(isCharacterIdValid(CharacterId)) {
         Character =  getCharacterFast(CharacterId);

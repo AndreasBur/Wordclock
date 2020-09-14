@@ -126,7 +126,7 @@ void AnimationClockDrop::setTimeTask()
     if(setNextRow(currentWord.getRow()) == E_OK) {
         Display::getInstance().clearPixelFast(Column, Row - 1u);
     } else {
-        if(setNextColumn(MaxColumn) == E_NOT_OK) {
+        if(setNextColumn(maxColumn) == E_NOT_OK) {
             State = STATE_IDLE;
             reset();
         }

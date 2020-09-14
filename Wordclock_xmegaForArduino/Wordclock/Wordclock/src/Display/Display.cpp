@@ -58,17 +58,17 @@ void Display::init()
 void Display::setBrightness(byte sBrightness)
 {
     Brightness = sBrightness;
-    byte BrightnessCorrected;
+    byte brightnessCorrected;
 
     if(BrightnessAutomatic == true) {
-        BrightnessCorrected = GCorrection.getCorrectedValue(calculateBrightnessAutomaticCorrected(Brightness));
+        brightnessCorrected = GCorrection.getCorrectedValue(calculateBrightnessAutomaticCorrected(Brightness));
     } else {
-        BrightnessCorrected = GCorrection.getCorrectedValue(Brightness);
+        brightnessCorrected = GCorrection.getCorrectedValue(Brightness);
     }
 
-    ColorDimmed.Red = dimmColor(Color.Red, BrightnessCorrected);
-    ColorDimmed.Green = dimmColor(Color.Green, BrightnessCorrected);
-    ColorDimmed.Blue = dimmColor(Color.Blue, BrightnessCorrected);
+    ColorDimmed.Red = dimmColor(Color.Red, brightnessCorrected);
+    ColorDimmed.Green = dimmColor(Color.Green, brightnessCorrected);
+    ColorDimmed.Blue = dimmColor(Color.Blue, brightnessCorrected);
 
     for(IndexType Index = 0; Index < DISPLAY_NUMBER_OF_PIXELS; Index++) {
         // update all pixels to new brightness
@@ -83,17 +83,17 @@ void Display::setBrightness(byte sBrightness)
 StdReturnType Display::setWord(WordIdType WordId, byte MaxLength)
 {
     StdReturnType returnValue{E_NOT_OK};
-    byte Length;
+    byte length;
 
     if(WordId < DisplayWords::WORD_NUMBER_OF_WORDS) {
         returnValue = E_OK;
         DisplayWord word = Words.getDisplayWordFast(WordId);
         byte WordLength = word.getLength();
 
-        if(MaxLength == DISPLAY_WORD_LENGTH_UNLIMITED || MaxLength >= WordLength) { Length = WordLength; }
-        else { Length = MaxLength; }
+        if(MaxLength == DISPLAY_WORD_LENGTH_UNLIMITED || MaxLength >= WordLength) { length = WordLength; }
+        else { length = MaxLength; }
 
-        for(IndexType Index = 0; Index < Length; Index++) {
+        for(IndexType Index = 0; Index < length; Index++) {
             if(setPixel(word.getColumn() + Index,  word.getRow()) == E_NOT_OK) returnValue = E_NOT_OK;
         }
     } else {
@@ -146,8 +146,8 @@ void Display::clearWordFast(WordIdType WordId)
 {
     DisplayWord word = Words.getDisplayWordFast(WordId);
 
-    for(IndexType Index = 0; Index < word.getLength(); Index++) {
-        clearPixelFast(word.getColumn() + Index,  word.getRow());
+    for(IndexType index = 0; index < word.getLength(); index++) {
+        clearPixelFast(word.getColumn() + index,  word.getRow());
     }
 } /* clearWordFast */
 
