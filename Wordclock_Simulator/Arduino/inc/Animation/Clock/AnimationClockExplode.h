@@ -66,8 +66,8 @@ class AnimationClockExplode : public AnimationClockCommon
     byte ClockWordsTableIndex{0u};
     byte CurrentWordIndex{0u};
     byte CurrentWordLength{0u};
-    byte Column{0u};
-    byte Row{0u};
+    byte CurrentColumn{0u};
+    byte CurrentRow{0u};
 
     // functions
     void reset();
@@ -75,6 +75,8 @@ class AnimationClockExplode : public AnimationClockCommon
     void setTimeTask();
     void setWordToSet(DisplayWords::WordIdType);
     StdReturnType setNextWordToClear();
+    StdReturnType setNextWordToClearInColumn();
+    StdReturnType setNextRowToClear();
     StdReturnType setNextWordToSet();
     void setWordIndex(DisplayWords::WordIdType);
     void setWordLength();
@@ -88,18 +90,18 @@ class AnimationClockExplode : public AnimationClockCommon
     byte getClearFinalColumn() const { return ColumnCenter - (CurrentWordLength / 2u); }
     byte getSetFinalColumn() const { return Display::getInstance().indexToColumn(CurrentWordIndex); }
 
-    byte getColumnNext(byte FinalColumn) const {
-        byte ColumnNext = Column;
-        if(Column < FinalColumn) ColumnNext++;
-        if(Column > FinalColumn) ColumnNext--;
-        return ColumnNext;
+    byte getNextColumn(byte FinalColumn) const {
+        byte nextColumn = CurrentColumn;
+        if(CurrentColumn < FinalColumn) nextColumn++;
+        if(CurrentColumn > FinalColumn) nextColumn--;
+        return nextColumn;
     }
 
-    byte getRowNext(byte FinalRow) const {
-        byte RowNext = Row;
-        if(Row < FinalRow) RowNext++;
-        if(Row > FinalRow) RowNext--;
-        return RowNext;
+    byte getNextRow(byte FinalRow) const {
+        byte nextRow = CurrentRow;
+        if(CurrentRow < FinalRow) nextRow++;
+        if(CurrentRow > FinalRow) nextRow--;
+        return nextRow;
     }
 
 /******************************************************************************************************************************************************

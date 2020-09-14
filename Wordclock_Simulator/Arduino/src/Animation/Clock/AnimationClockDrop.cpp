@@ -121,7 +121,7 @@ void AnimationClockDrop::clearTimeTask()
 void AnimationClockDrop::setTimeTask()
 {
     DisplayWord currentWord = Words.getDisplayWordFast(ClockWordsTable[CurrentWordIndex]);
-    const byte MaxColumn = Words.getDisplayWordColumnFast(ClockWordsTable[CurrentWordIndex]) + currentWord.getLength() - 1u;
+    const byte maxColumn = Words.getDisplayWordColumnFast(ClockWordsTable[CurrentWordIndex]) + currentWord.getLength() - 1u;
 
     if(setNextRow(currentWord.getRow()) == E_OK) {
         Display::getInstance().clearPixelFast(Column, Row - 1u);

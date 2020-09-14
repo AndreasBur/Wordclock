@@ -92,7 +92,7 @@ void AnimationClockDrop::reset()
     Row = 0u;
     Column = 0u;
     ClockWordsTable.fill(DisplayWords::WORD_NONE);
-    CurrenWordIndex = ClockWordsTable.size() - 1u;
+    CurrentWordIndex = ClockWordsTable.size() - 1u;
 } /* reset */
 
 
@@ -120,8 +120,8 @@ void AnimationClockDrop::clearTimeTask()
 ******************************************************************************************************************************************************/
 void AnimationClockDrop::setTimeTask()
 {
-    DisplayWord currentWord = Words.getDisplayWordFast(ClockWordsTable[CurrenWordIndex]);
-    const byte MaxColumn = Words.getDisplayWordColumnFast(ClockWordsTable[CurrenWordIndex]) + currentWord.getLength() - 1u;
+    DisplayWord currentWord = Words.getDisplayWordFast(ClockWordsTable[CurrentWordIndex]);
+    const byte MaxColumn = Words.getDisplayWordColumnFast(ClockWordsTable[CurrentWordIndex]) + currentWord.getLength() - 1u;
 
     if(setNextRow(currentWord.getRow()) == E_OK) {
         Display::getInstance().clearPixelFast(Column, Row - 1u);
@@ -155,9 +155,9 @@ StdReturnType AnimationClockDrop::setNextActivePixelIndex()
 ******************************************************************************************************************************************************/
 StdReturnType AnimationClockDrop::setNextWordIndex()
 {
-    for(int8_t index = CurrenWordIndex - 1u; index >= 0; index--) {
+    for(int8_t index = CurrentWordIndex - 1u; index >= 0; index--) {
         if(ClockWordsTable[index] != DisplayWords::WORD_NONE) {
-            CurrenWordIndex = index;
+            CurrentWordIndex = index;
             return E_OK;
         }
     }
@@ -171,7 +171,7 @@ StdReturnType AnimationClockDrop::setNextWordIndex()
 void AnimationClockDrop::setStateToSetTime()
 {
     Row = 0u;
-    Column = Words.getDisplayWordColumnFast(ClockWordsTable[CurrenWordIndex]);
+    Column = Words.getDisplayWordColumnFast(ClockWordsTable[CurrentWordIndex]);
     Display::getInstance().setPixelFast(Column, Row);
     State = STATE_SET_TIME;
 } /* setStateToSetTime */
@@ -198,7 +198,7 @@ StdReturnType AnimationClockDrop::setNextColumn(byte MaxColumn)
 {
     if(Column >= MaxColumn) {
          if(setNextWordIndex() == E_OK) {
-            Column = Words.getDisplayWordColumnFast(ClockWordsTable[CurrenWordIndex]);
+            Column = Words.getDisplayWordColumnFast(ClockWordsTable[CurrentWordIndex]);
             Row = 0u;
             return E_OK;
         } else {

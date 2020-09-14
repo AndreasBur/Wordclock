@@ -64,7 +64,7 @@ class AnimationClockDrop : public AnimationClockCommon
     ClockWords::WordsListType ClockWordsTable{{DisplayWords::WORD_NONE}};
     byte Row{0u};
     byte Column{0u};
-    byte CurrenWordIndex{0u};
+    byte CurrentWordIndex{0u};
 
     // functions
     void reset();

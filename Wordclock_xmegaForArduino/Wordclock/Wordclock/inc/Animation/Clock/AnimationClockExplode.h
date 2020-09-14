@@ -63,38 +63,45 @@ class AnimationClockExplode : public AnimationClockCommon
   private:
     DisplayWords Words;
     ClockWords::WordsListType ClockWordsTable{{DisplayWords::WORD_NONE}};
-    byte CurrentWordIndex{0u};
     byte ClockWordsTableIndex{0u};
+    byte CurrentWordIndex{0u};
     byte CurrentWordLength{0u};
-    byte Column{0u};
-    byte Row{0u};
+    byte CurrentColumn{0u};
+    byte CurrentRow{0u};
 
     // functions
     void reset();
     void clearTimeTask();
-    StdReturnType setNextWord();
-    void setNextWordLength();
-    StdReturnType shiftWord();
+    void setTimeTask();
+    void setWordToSet(DisplayWords::WordIdType);
+    StdReturnType setNextWordToClear();
+    StdReturnType setNextWordToClearInColumn();
+    StdReturnType setNextRowToClear();
+    StdReturnType setNextWordToSet();
+    void setWordIndex(DisplayWords::WordIdType);
+    void setWordLength();
+    StdReturnType shiftWord(byte, byte);
     void toggleWordOnDisplay();
-    StdReturnType calculateColumnAndRowNext(byte, byte, byte, byte);
+    void setWordOnDisplay();
 
-    byte getFinalIndex() const { return Display::getInstance().columnAndRowToIndex(getFinalColumn(), getFinalRow()); }
-    byte getFinalRow() const { return RowCenter; }
-    byte getFinalColumn() const { return ColumnCenter - (CurrentWordLength / 2u); }
-    //bool isFinalIndexReached() const {  }
+    //byte getFinalIndex() const { return Display::getInstance().columnAndRowToIndex(getFinalColumn(), getFinalRow()); }
+    byte getClearFinalRow() const { return RowCenter; }
+    byte getSetFinalRow() const { return Display::getInstance().indexToRow(CurrentWordIndex); }
+    byte getClearFinalColumn() const { return ColumnCenter - (CurrentWordLength / 2u); }
+    byte getSetFinalColumn() const { return Display::getInstance().indexToColumn(CurrentWordIndex); }
 
-    byte getColumnNext() const {
-        byte ColumnNext = Column;
-        if(Column < getFinalColumn()) ColumnNext++;
-        if(Column > getFinalColumn()) ColumnNext--;
-        return ColumnNext;
+    byte getNextColumn(byte FinalColumn) const {
+        byte nextColumn = CurrentColumn;
+        if(CurrentColumn < FinalColumn) nextColumn++;
+        if(CurrentColumn > FinalColumn) nextColumn--;
+        return nextColumn;
     }
 
-    byte getRowNext() const {
-        byte RowNext = Row;
-        if(Row < getFinalRow()) RowNext++;
-        if(Row > getFinalRow()) RowNext--;
-        return RowNext;
+    byte getNextRow(byte FinalRow) const {
+        byte nextRow = CurrentRow;
+        if(CurrentRow < FinalRow) nextRow++;
+        if(CurrentRow > FinalRow) nextRow--;
+        return nextRow;
     }
 
 /******************************************************************************************************************************************************

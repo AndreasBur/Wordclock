@@ -33,11 +33,9 @@
 ******************************************************************************************************************************************************/
 
 
-
 /******************************************************************************************************************************************************
  *  LOCAL DATA TYPES AND STRUCTURES
 ******************************************************************************************************************************************************/
-
 
 
 /******************************************************************************************************************************************************
@@ -63,7 +61,7 @@ StdReturnType AnimationClockExplode::setTime(byte Hour, byte Minute)
 
     if(Clock::getInstance().getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
         ReturnValue = E_OK;
-        if(setNextWord() == E_OK) { State = STATE_CLEAR_TIME; }
+        if(setNextWordToClear() == E_OK) { State = STATE_CLEAR_TIME; }
         else { State = STATE_SET_TIME; }
     }
     return ReturnValue;
@@ -76,6 +74,7 @@ StdReturnType AnimationClockExplode::setTime(byte Hour, byte Minute)
 void AnimationClockExplode::task()
 {
     if(State == STATE_CLEAR_TIME) clearTimeTask();
+    else if(State == STATE_SET_TIME) setTimeTask();
 } /* task */
 
 
@@ -89,10 +88,11 @@ void AnimationClockExplode::task()
 void AnimationClockExplode::reset()
 {
     ClockWordsTable.fill(DisplayWords::WORD_NONE);
-    CurrentWordIndex = 0u;
+    ClockWordsTableIndex = 0u;
+    CurrentWordIndex = Display::getInstance().columnAndRowToIndex(0u, RowCenter);
     CurrentWordLength = 0u;
-    Column = 0u;
-    Row = 0u;
+    CurrentColumn = 0u;
+    CurrentRow = 0u;
 } /* reset */
 
 /******************************************************************************************************************************************************
@@ -100,24 +100,40 @@ void AnimationClockExplode::reset()
 ******************************************************************************************************************************************************/
 void AnimationClockExplode::clearTimeTask()
 {
-    if(shiftWord() == E_NOT_OK) {
-        if(setNextWord() == E_NOT_OK) { State = STATE_SET_TIME; }
+    if(shiftWord(getClearFinalColumn(), getClearFinalRow()) == E_NOT_OK) {
+        toggleWordOnDisplay();
+        if(setNextWordToClear() == E_NOT_OK) {
+            CurrentWordIndex = 0u;
+            setWordToSet(ClockWordsTable[CurrentWordIndex]);
+            setWordOnDisplay();
+            State = STATE_SET_TIME;
+        }
     }
 } /* clearTimeTask */
 
 /******************************************************************************************************************************************************
+  setTimeTask()
+******************************************************************************************************************************************************/
+void AnimationClockExplode::setTimeTask()
+{
+    if(shiftWord(getSetFinalColumn(), getSetFinalRow()) == E_NOT_OK) {
+        if(setNextWordToSet() == E_NOT_OK) { State = STATE_IDLE; }
+        else { toggleWordOnDisplay(); }
+    }
+} /* setTimeTask */
+
+/******************************************************************************************************************************************************
   shiftWord()
 ******************************************************************************************************************************************************/
-StdReturnType AnimationClockExplode::shiftWord()
+StdReturnType AnimationClockExplode::shiftWord(byte FinalColum, byte FinalRow)
 {
-    if(Column != getColumnNext() || Row != getRowNext()) {
+    if(CurrentColumn != getNextColumn(FinalColum) || CurrentRow != getNextRow(FinalRow)) {
         toggleWordOnDisplay();
-        Column = getColumnNext();
-        Row = getRowNext();
+        CurrentColumn = getNextColumn(FinalColum);
+        CurrentRow = getNextRow(FinalRow);
         toggleWordOnDisplay();
         return E_OK;
     } else {
-        toggleWordOnDisplay();
         return E_NOT_OK;
     }
 } /* shiftWord */
@@ -127,32 +143,106 @@ StdReturnType AnimationClockExplode::shiftWord()
 ******************************************************************************************************************************************************/
 void AnimationClockExplode::toggleWordOnDisplay()
 {
-    for(byte columnIndex = Column; columnIndex < Column + CurrentWordLength; columnIndex++) {
-        Display::getInstance().togglePixelFast(columnIndex, Row);
+    for(byte columnIndex = CurrentColumn; columnIndex < CurrentColumn + CurrentWordLength; columnIndex++) {
+        Display::getInstance().togglePixelFast(columnIndex, CurrentRow);
     }
 } /* toggleWordOnDisplay */
 
 /******************************************************************************************************************************************************
-  setNextWord()
+  setWordOnDisplay()
 ******************************************************************************************************************************************************/
-StdReturnType AnimationClockExplode::setNextWord()
+void AnimationClockExplode::setWordOnDisplay()
 {
-    for(byte nextWordIndex = CurrentWordIndex + CurrentWordLength; nextWordIndex < DISPLAY_NUMBER_OF_PIXELS; nextWordIndex++) {
-        if(Display::getInstance().getPixelFast(nextWordIndex)) {
-            CurrentWordIndex = nextWordIndex;
-            setNextWordLength();
-            Column = Display::getInstance().indexToColumn(CurrentWordIndex);
-            Row = Display::getInstance().indexToRow(CurrentWordIndex);
+    for(byte columnIndex = CurrentColumn; columnIndex < CurrentColumn + CurrentWordLength; columnIndex++) {
+        Display::getInstance().setPixelFast(columnIndex, CurrentRow);
+    }
+} /* setWordOnDisplay */
+
+/******************************************************************************************************************************************************
+  setNextWordToClear()
+******************************************************************************************************************************************************/
+StdReturnType AnimationClockExplode::setNextWordToClear()
+{
+    CurrentColumn = Display::getInstance().indexToColumn(CurrentWordIndex) + CurrentWordLength;
+    CurrentRow = Display::getInstance().indexToRow(CurrentWordIndex);
+
+    do {
+        if(setNextWordToClearInColumn() == E_OK) { return E_OK; }
+        CurrentColumn = 0;
+    } while(setNextRowToClear() == E_OK);
+
+    return E_NOT_OK;
+} /* setNextWordToClear */
+
+/******************************************************************************************************************************************************
+  setNextWordToClearInColumn()
+******************************************************************************************************************************************************/
+StdReturnType AnimationClockExplode::setNextWordToClearInColumn()
+{
+    for(; CurrentColumn < DISPLAY_NUMBER_OF_COLUMNS; CurrentColumn++) {
+        if(Display::getInstance().getPixelFast(CurrentColumn, CurrentRow)) {
+            CurrentWordIndex = Display::getInstance().columnAndRowToIndex(CurrentColumn, CurrentRow);
+            setWordLength();
             return E_OK;
         }
     }
     return E_NOT_OK;
-} /* setNextWord */
+} /* setNextWordToClearInColumn */
 
 /******************************************************************************************************************************************************
-  setNextWordLength()
+  setRowNextToClear()
 ******************************************************************************************************************************************************/
-void AnimationClockExplode::setNextWordLength()
+StdReturnType AnimationClockExplode::setNextRowToClear()
+{
+    if(CurrentRow > 0 && CurrentRow < DISPLAY_NUMBER_OF_ROWS) {
+        if(CurrentRow >= RowCenter) { CurrentRow = DISPLAY_NUMBER_OF_ROWS - CurrentRow - 1u; }
+        else { CurrentRow = DISPLAY_NUMBER_OF_ROWS - CurrentRow; }
+        return E_OK;
+    } else {
+        return E_NOT_OK;
+    }
+} /* setRowNextToClear */
+
+/******************************************************************************************************************************************************
+  setNextWordToSet()
+******************************************************************************************************************************************************/
+StdReturnType AnimationClockExplode::setNextWordToSet()
+{
+    for(byte index = ClockWordsTableIndex + 1u; index < ClockWordsTable.size(); index++) {
+        if(ClockWordsTable[index] != DisplayWords::WORD_NONE) {
+            ClockWordsTableIndex = index;
+            setWordToSet(ClockWordsTable[ClockWordsTableIndex]);
+            return E_OK;
+        }
+    }
+    return E_NOT_OK;
+} /* setNextWordToSet */
+
+/******************************************************************************************************************************************************
+  setWordToSet()
+******************************************************************************************************************************************************/
+void AnimationClockExplode::setWordToSet(DisplayWords::WordIdType WordId)
+{
+    setWordIndex(WordId);
+    CurrentWordLength = Words.getDisplayWordLengthFast(WordId);
+    CurrentColumn = getClearFinalColumn();
+    CurrentRow = getClearFinalRow();
+} /* setWordToSet */
+
+/******************************************************************************************************************************************************
+  setWordIndex()
+******************************************************************************************************************************************************/
+void AnimationClockExplode::setWordIndex(DisplayWords::WordIdType WordId)
+{
+    byte column = Words.getDisplayWordColumnFast(WordId);
+    byte row = Words.getDisplayWordRowFast(WordId);
+    CurrentWordIndex = Display::getInstance().columnAndRowToIndex(column, row);
+} /* setWordIndex */
+
+/******************************************************************************************************************************************************
+  setWordLength()
+******************************************************************************************************************************************************/
+void AnimationClockExplode::setWordLength()
 {
     CurrentWordLength = 1u;
 
@@ -163,7 +253,7 @@ void AnimationClockExplode::setNextWordLength()
             break;
         }
     }
-}
+} /* setWordLength */
 
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E
