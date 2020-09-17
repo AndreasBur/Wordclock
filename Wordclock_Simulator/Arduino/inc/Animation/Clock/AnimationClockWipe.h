@@ -67,7 +67,7 @@ class AnimationClockWipe : public AnimationClockCommon
     void reset();
     void clearTimeTask();
     void setTimeTask();
-    bool setNextIndex();
+    StdReturnType setNextIndex();
     void setPixelDown(byte, byte);
     void setPixelRight(byte, byte);
 
