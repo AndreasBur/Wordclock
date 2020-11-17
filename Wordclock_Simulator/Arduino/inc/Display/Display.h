@@ -145,8 +145,8 @@ class Display
 # if (DISPLAY_USE_WS2812_DIMMING == STD_OFF)
     byte dimmColor(byte Color, byte BrightnessCorrected) const {
         byte dimmedColor = (Color * BrightnessCorrected) >> 8u;
-        if(dimmedColor == 0u) return 1u;
-        else return dimmedColor;
+        if(dimmedColor == 0u) { return 1u; }
+        else { return dimmedColor; }
     }
 # endif
 

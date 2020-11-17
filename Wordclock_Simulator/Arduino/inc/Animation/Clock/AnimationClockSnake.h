@@ -9,10 +9,10 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       AnimationClockSnake.h
- *      \brief      
+ *      \brief
  *
- *      \details    
- *                  
+ *      \details
+ *
 ******************************************************************************************************************************************************/
 #ifndef _ANIMATION_CLOCK_SNAKE_H_
 #define _ANIMATION_CLOCK_SNAKE_H_
@@ -29,7 +29,7 @@
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
 /* AnimationClockSnake configuration parameter */
-#define ANIMATION_CLOCK_SNAKE_LENGTH              8
+#define ANIMATION_CLOCK_SNAKE_LENGTH              8u
 
 /* AnimationClockSnake parameter */
 
