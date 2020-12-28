@@ -8,6 +8,7 @@
 #include "Timer.h"
 #include "Communication.h"
 #include "BH1750.h"
+#include "Bit.h"
 
 //volatile uint8_t* const PROGMEM port_to_mode_PGMdfg[] = {
     //NOT_A_PORT,
@@ -130,7 +131,7 @@ void loop()
         Animation::getInstance().task();
 	}
 
-
+    Bit myBit(10u);
 
     //volatile int Test = 5;
 }
