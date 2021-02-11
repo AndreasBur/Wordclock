@@ -119,10 +119,8 @@ class Bit
     static uint8_t digitsOfNumber(NumberType Number, unsigned Base)
     {
         T numberOfDigits = 0u;
-
         do { Number /= Base; numberOfDigits++; }
         while (Number != 0u);
-
         return numberOfDigits;
     }
 };
