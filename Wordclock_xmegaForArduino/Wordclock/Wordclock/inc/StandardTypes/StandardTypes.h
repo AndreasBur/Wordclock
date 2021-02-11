@@ -220,6 +220,7 @@ static inline VarType readBitGroup(VarType Var, MaskType BitGroupMask, GroupType
     } else {
         return ((Var & static_cast<VarType>(BitGroupMask)) >> BitGroupPosition);
     }
+
 }
 
 /* write bit group */
