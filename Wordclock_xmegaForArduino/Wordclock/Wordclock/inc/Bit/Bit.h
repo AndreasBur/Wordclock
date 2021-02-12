@@ -115,8 +115,7 @@ class Bit
     static uint64_t bitMask(uint8_t Length) { return bitValue(Length) - 1u; }
     template <typename Type> size_t numberOfBits() { return sizeof(Type) * (CHAR_BIT); }
 
-    template <typename NumberType>
-    static uint8_t digitsOfNumber(NumberType Number, unsigned Base)
+    template <typename NumberType> static uint8_t digitsOfNumber(NumberType Number, unsigned Base)
     {
         T numberOfDigits = 0u;
         do { Number /= Base; numberOfDigits++; }
