@@ -216,9 +216,9 @@ template <typename VarType, typename MaskType, typename GroupType>
 static inline VarType readBitGroup(VarType Var, MaskType BitGroupMask, GroupType BitGroupPosition, bool ShiftBitGroupMask)
 {
     if(ShiftBitGroupMask) {
-        return ((Var & (static_cast<VarType>(BitGroupMask) << BitGroupPosition)) >> BitGroupPosition);
+        return (Var & (static_cast<VarType>(BitGroupMask) << BitGroupPosition)) >> BitGroupPosition;
     } else {
-        return ((Var & static_cast<VarType>(BitGroupMask)) >> BitGroupPosition);
+        return (Var & static_cast<VarType>(BitGroupMask)) >> BitGroupPosition;
     }
 
 }
@@ -228,9 +228,9 @@ template <typename VarType, typename MaskType, typename GroupType, typename ValT
 static inline void writeBitGroup(VarType& Var, MaskType BitGroupMask, GroupType BitGroupPosition, ValType Value, bool ShiftBitGroupMask)
 {
     if(ShiftBitGroupMask) {
-        Var = (Var & ~(static_cast<VarType>(BitGroupMask) << BitGroupPosition)) | (static_cast<VarType>(Value & BitGroupMask) << BitGroupPosition);
+        Var = Var & ~(static_cast<VarType>(BitGroupMask) << BitGroupPosition)) | (static_cast<VarType>(Value & BitGroupMask) << BitGroupPosition;
     } else {
-        Var = (Var & ~(static_cast<VarType>(BitGroupMask))) | (static_cast<VarType>(Value & BitGroupMask) << BitGroupPosition);
+        Var = Var & ~(static_cast<VarType>(BitGroupMask))) | (static_cast<VarType>(Value & BitGroupMask) << BitGroupPosition;
     }
 }
 
@@ -238,14 +238,14 @@ static inline void writeBitGroup(VarType& Var, MaskType BitGroupMask, GroupType 
 template <typename VarType, typename MaskType>
 static inline VarType readBitGroup(VarType Var, MaskType BitGroupMask)
 {
-    return (Var & (static_cast<VarType>(BitGroupMask)));
+    return Var & (static_cast<VarType>(BitGroupMask));
 }
 
 /* write bit group */
 template <typename VarType, typename MaskType, typename ValType>
 static inline void writeBitGroup(VarType& Var, MaskType BitGroupMask, ValType Value)
 {
-    Var = (Var & ~(static_cast<VarType>(BitGroupMask))) | (static_cast<VarType>(Value & BitGroupMask));
+    Var = Var & ~(static_cast<VarType>(BitGroupMask))) | (static_cast<VarType>(Value & BitGroupMask);
 }
 
 template <typename T>

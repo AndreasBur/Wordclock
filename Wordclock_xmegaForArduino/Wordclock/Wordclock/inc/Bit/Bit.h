@@ -113,7 +113,7 @@ class Bit
     // static methods
     static uint64_t bitValue(uint8_t BitPos) { return UINT64_C(1) << BitPos; }
     static uint64_t bitMask(uint8_t Length) { return bitValue(Length) - 1u; }
-    template <typename Type> size_t numberOfBits() { return sizeof(Type) * (CHAR_BIT); }
+    template <typename Type> size_t numberOfBits() { return sizeof(Type) * CHAR_BIT; }
 
     template <typename NumberType> static uint8_t digitsOfNumber(NumberType Number, unsigned Base)
     {
