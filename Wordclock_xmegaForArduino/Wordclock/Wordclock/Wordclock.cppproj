@@ -16,7 +16,7 @@
     <Name>Wordclock</Name>
     <RootNamespace>Wordclock</RootNamespace>
     <ArduinoIdeDir>C:\Program Files (x86)\Arduino</ArduinoIdeDir>
-    <ToolchainFlavour>Native</ToolchainFlavour>
+    <ToolchainFlavour>avr-gcc-10.1.0-x64-windows</ToolchainFlavour>
     <KeepTimersRunning>true</KeepTimersRunning>
     <OverrideVtor>false</OverrideVtor>
     <CacheFlash>true</CacheFlash>
@@ -30,15 +30,15 @@
     <AssemblyName>Wordclock</AssemblyName>
     <AsfFrameworkConfig>
       <framework-data>
-        <options />
-        <configurations />
-        <files />
-        <documentation help="" />
-        <offline-documentation help="" />
-        <dependencies>
-          <content-extension eid="atmel.asf" uuidref="Atmel.ASF" version="3.42.0" />
-        </dependencies>
-      </framework-data>
+  <options />
+  <configurations />
+  <files />
+  <documentation help="" />
+  <offline-documentation help="" />
+  <dependencies>
+    <content-extension eid="atmel.asf" uuidref="Atmel.ASF" version="3.43.0" />
+  </dependencies>
+</framework-data>
     </AsfFrameworkConfig>
     <avrtool>com.atmel.avrdbg.tool.simulator</avrtool>
     <avrtoolserialnumber>
@@ -302,6 +302,7 @@
             <Value>../../..</Value>
           </ListValues>
         </avrgcccpp.linker.libraries.LibrarySearchPaths>
+        <avrgcccpp.linker.miscellaneous.LinkerFlags>-Wl,--verbose</avrgcccpp.linker.miscellaneous.LinkerFlags>
         <avrgcccpp.assembler.general.IncludePaths>
           <ListValues>
             <Value>%24(PackRepoDir)\atmel\XMEGAE_DFP\1.3.114\include\</Value>
@@ -412,16 +413,16 @@
     <Compile Include="inc\Communication\StringTools.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="inc\Font\Display\Display.h">
+    <Compile Include="inc\Display\Display.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="inc\Font\Display\DisplayCharacters.h">
+    <Compile Include="inc\Display\DisplayCharacters.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="inc\Font\Display\DisplayWord.h">
+    <Compile Include="inc\Display\DisplayWord.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="inc\Font\Display\DisplayWords.h">
+    <Compile Include="inc\Display\DisplayWords.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="inc\Font\FontChar.h">
@@ -577,9 +578,9 @@
     <Folder Include="inc\Animation\" />
     <Folder Include="inc\Animation\Clock\" />
     <Folder Include="inc\Communication\MessageParser" />
+    <Folder Include="inc\Display" />
     <Folder Include="inc\Clock" />
     <Folder Include="inc\Font" />
-    <Folder Include="inc\Font\Display\" />
     <Folder Include="inc\GammaCorrection" />
     <Folder Include="inc\BH1750" />
     <Folder Include="inc\Communication" />
