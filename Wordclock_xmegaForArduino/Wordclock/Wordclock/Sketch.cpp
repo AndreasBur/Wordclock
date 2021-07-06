@@ -42,7 +42,7 @@
 //End of Auto generated function prototypes by Atmel Studio
 
 //Animation wcAnimation();
-Communication wcCommunication;
+//Communication wcCommunication;
 
 void initClockPrescaler()
 {
@@ -61,10 +61,10 @@ void initClockPrescaler()
 void setup() {
 	Serial.begin(9600);
     initClockPrescaler();
-    Display::getInstance().init();
-    Display::getInstance().enableBrightnessAutomatic();
-    BH1750::getInstance().setCalibrationValuesMaxValue(30000u);
-    Display::getInstance().setBrightness(200u);
+    //Display::getInstance().init();
+    //Display::getInstance().enableBrightnessAutomatic();
+    //BH1750::getInstance().setCalibrationValuesMaxValue(30000u);
+    //Display::getInstance().setBrightness(200u);
 
     //BH1750 bh1750;
 
@@ -84,7 +84,7 @@ void setup() {
   //WordClockDisplay.setChar(2, 0, 10, 20, 30);
   //WcDisplayCharacter.getChar(1,1, &Char);
   //WordClockDisplay.setCharacter(DISPLAY_CHARACTER_A_1);
-  Display::getInstance().setWord(DisplayWords::WORD_ZEHN);
+  //Display::getInstance().setWord(DisplayWords::WORD_ZEHN);
   //if (WordClockDisplay.clearAllWords() == E_OK) {
 //		flag = 1;
   //} else {
@@ -94,8 +94,8 @@ void setup() {
   //wcClock.setTime(10,10);
   
   //wcAnimation.setAnimation(Animation::ANIMATION_CLOCK_DROP);
-    Animation::getInstance().setAnimation(AnimationClock::ANIMATION_CLOCK_IMPLODE);
-    Animation::getInstance().setTime(17, 40);
+    //Animation::getInstance().setAnimation(AnimationClock::ANIMATION_CLOCK_IMPLODE);
+    //Animation::getInstance().setTime(17, 40);
  
   //wcAnimation.setTime(12, 10);
   //WS2812::getInstance().setPixelFast(0, 180, 20, 50);
@@ -125,10 +125,10 @@ void loop()
 
   //FontTahoma10x10::CharType Char;
   // put your main code here, to run repeatedly:
-    Clock::getInstance().setTime(17,30);
+    //Clock::getInstance().setTime(17,30);
 	while(1) {
-	    wcCommunication.task();
-        Animation::getInstance().task();
+	    //wcCommunication.task();
+        //Animation::getInstance().task();
 	}
 
     Bit myBit(10u);

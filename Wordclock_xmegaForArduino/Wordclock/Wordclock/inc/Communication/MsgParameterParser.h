@@ -67,7 +67,7 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
     using PositionType = StringTools::PositionType;
 
 /******************************************************************************************************************************************************
- *  P R O T E C T E D   D A T A   A N D   F U N C T I N O N S
+ *  P R O T E C T E D   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   protected:
     static constexpr char OptionArgumentDelimiter{'='};
@@ -76,7 +76,7 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
     ~MsgParameterParser() { }
 
 /******************************************************************************************************************************************************
- *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
+ *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
     enum StateType {

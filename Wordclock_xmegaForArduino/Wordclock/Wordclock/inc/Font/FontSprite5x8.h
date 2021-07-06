@@ -55,7 +55,7 @@ class FontSprite5x8 : public Font<FontCharVertical<byte, FONT_SPRITE_5X8_WIDTH>,
     using ColumnsType = std::array<byte, FONT_SPRITE_5X8_WIDTH>;
 
 /******************************************************************************************************************************************************
- *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
+ *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
     static const FontTableType FontTable;

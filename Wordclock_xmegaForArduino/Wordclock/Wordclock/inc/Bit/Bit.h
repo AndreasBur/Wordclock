@@ -9,10 +9,10 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       Bit.h
- *      \brief      
+ *      \brief
  *
- *      \details    
- *                  
+ *      \details
+ *
 ******************************************************************************************************************************************************/
 #ifndef _BIT_H_
 #define _BIT_H_
@@ -20,8 +20,6 @@
 /******************************************************************************************************************************************************
  * I N C L U D E S
 ******************************************************************************************************************************************************/
-#include "StandardTypes.h"
-#include "Arduino.h"
 
 
 /******************************************************************************************************************************************************
@@ -48,27 +46,27 @@ class Bit
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-  
-  
+
+
 /******************************************************************************************************************************************************
- *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
+ *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
     T Value;
-    
+
     class BitReference
     {
         public:
             constexpr BitReference(T& sValue, size_t sBitPos) : Value(sValue), BitPos(sBitPos) {}
 
             operator bool() const { return readBit(Value, BitPos); }
-            void operator = (bool Bit) { writeBit(Value, BitPos); }
+            void operator = (bool Bit) { Value = writeBit(Value, Bit, BitPos); }
 
         private:
             T& Value;
             size_t BitPos;
     };
-  
+
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
@@ -102,7 +100,7 @@ class Bit
     bool isBitCleared(size_t BitPos) const { return !isBitSet(Value, BitPos); }
     bool areBitsSet(T BitMask) const { return areBitsSet(Value, BitMask); }
     bool areBitsCleared(T BitMask) const { return readBits(~BitMask); }
-		
+
 	// operators
 	// read [] operator
     bool operator [] (size_t BitPos) const { return readBit(BitPos); }
@@ -126,7 +124,7 @@ class Bit
     template <typename ValueType> static ValueType readBits(ValueType sValue, T BitMask) { return sValue & BitMask; }
 
     template <typename ValueType> static ValueType isBitSet(ValueType sValue, size_t BitPos) { return sValue & (UINT64_C(1) << BitPos); }
-    template <typename ValueType> static ValueType isBitCleared(ValueType sValue, size_t BitPos) { return !isBitSet(sValue, BitPos); }        
+    template <typename ValueType> static ValueType isBitCleared(ValueType sValue, size_t BitPos) { return !isBitSet(sValue, BitPos); }
     template <typename ValueType> static ValueType areBitsSet(ValueType sValue, T BitMask) { return readBits(sValue, BitMask) == BitMask; }
     template <typename ValueType> static ValueType areBitsCleared(ValueType sValue, T BitMask) { return readBits(sValue, ~BitMask); }
 
@@ -142,7 +140,7 @@ class Bit
         while (Number != 0u);
         return numberOfDigits;
     }
-	
+
 };
 
 #endif

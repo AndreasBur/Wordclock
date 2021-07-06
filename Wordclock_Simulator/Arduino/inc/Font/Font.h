@@ -61,7 +61,7 @@ template <typename FontCharType, size_t FontTableSize> class Font
     using FontTableType = std::array<FontCharType, FontTableSize>;
   
 /******************************************************************************************************************************************************
- *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
+ *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
     const FontTableType& FontTable;
@@ -74,7 +74,7 @@ template <typename FontCharType, size_t FontTableSize> class Font
     }
     
 /******************************************************************************************************************************************************
- *  P R O T E C T E D   D A T A   A N D   F U N C T I N O N S
+ *  P R O T E C T E D   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   protected:    
 

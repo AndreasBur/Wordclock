@@ -51,7 +51,7 @@ class GammaCorrection
     using Gamma7TableElementType = byte;
 
 /******************************************************************************************************************************************************
- *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
+ *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
     static constexpr Gamma7TableElementType Gamma7Table[] PROGMEM {

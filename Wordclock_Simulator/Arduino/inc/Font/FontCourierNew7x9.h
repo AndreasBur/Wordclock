@@ -55,7 +55,7 @@ class FontCourierNew7x9 : public Font<FontCharHorizontal<byte, FONT_COURIER_NEW_
     using RowsType = std::array<byte, FONT_COURIER_NEW_7X9_HEIGHT>;
   
 /******************************************************************************************************************************************************
- *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
+ *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
     static const FontTableType FontTable;

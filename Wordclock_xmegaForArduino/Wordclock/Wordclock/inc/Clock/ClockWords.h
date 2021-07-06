@@ -57,7 +57,7 @@ class ClockWords
     using MinutesWordsType = std::array<DisplayWords::WordIdType, CLOCKWORDS_MAX_NUMBER_OF_MINUTE_WORDS>;
   
 /******************************************************************************************************************************************************
- *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
+ *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
     bool ShowItIs;

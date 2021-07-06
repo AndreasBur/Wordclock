@@ -54,7 +54,7 @@ class FontLucidaSans9x10 : public Font<FontCharVertical<uint16_t, FONT_LUCIDA_SA
     using ColumnsType = std::array<uint16_t, FONT_LUCIDA_SANS_9X10_WIDTH>;
   
 /******************************************************************************************************************************************************
- *  P R I V A T E   D A T A   A N D   F U N C T I N O N S
+ *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
     static const FontTableType FontTable;
