@@ -132,6 +132,7 @@ void loop()
 	}
 
     Bit myBit(10u);
+    myBit.writeBit(true, 1);
 
     //volatile int Test = 5;
 }

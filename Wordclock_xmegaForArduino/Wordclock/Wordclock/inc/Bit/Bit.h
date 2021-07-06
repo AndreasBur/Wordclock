@@ -85,7 +85,7 @@ class Bit
     Bit& setBit(size_t BitPos) { Value = setBit(Value, BitPos); return *this; }
     Bit& clearBit(size_t BitPos) { Value = clearBit(Value, BitPos); return *this; }
     Bit& toggleBit(size_t BitPos) { Value = toggleBit(Value, BitPos); return *this; }
-    Bit& writeBit(size_t BitPos, bool sValue) { Value = writeBit(Value, BitPos); return *this; }
+    Bit& writeBit(size_t BitPos, bool BitValue) { Value = writeBit(Value, BitValue, BitPos); return *this; }
     Bit& shiftRight(size_t BitPos) { Value = shiftRight(Value, BitPos); return *this; }
     Bit& shiftLeft(size_t BitPos) { Value = shiftLeft(Value, BitPos); return *this; }
     Bit& setBitMask(T BitMask) { Value = setBitMask(Value, BitMask); return *this; }
@@ -113,7 +113,7 @@ class Bit
     template <typename ValueType> static ValueType setBit(ValueType sValue, size_t BitPos) { return sValue | (UINT64_C(1) << BitPos); }
     template <typename ValueType> static ValueType clearBit(ValueType sValue, size_t BitPos) { return sValue & ~(UINT64_C(1) << BitPos); }
     template <typename ValueType> static ValueType toggleBit(ValueType sValue, size_t BitPos) { return sValue ^ ~(UINT64_C(1) << BitPos); }
-    template <typename ValueType> static ValueType writeBit(ValueType sValue, size_t BitPos) { return clearBit(sValue, BitPos) | (sValue << BitPos); }
+    template <typename ValueType> static ValueType writeBit(ValueType sValue, bool BitValue, size_t BitPos) { return clearBit(sValue, BitPos) | (static_cast<ValueType>(BitValue) << BitPos); }
     template <typename ValueType> static ValueType shiftRight(ValueType sValue, size_t BitPos) { return sValue >> BitPos; }
     template <typename ValueType> static ValueType shiftLeft(ValueType sValue, size_t BitPos) { return sValue << BitPos; }
     template <typename ValueType> static ValueType setBitMask(ValueType sValue, T BitMask) { return sValue | BitMask; }
