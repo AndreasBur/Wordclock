@@ -35,11 +35,11 @@
 ******************************************************************************************************************************************************/
 /* AnimationFont configuration parameter */
 #define ANIMATION_FONT_TASK_CYCLE_INIT_VALUE            10u
-#define ANIMATION_FONT_SUPPORT_FONT_5X8              STD_ON
-#define ANIMATION_FONT_SUPPORT_FONT_7X9              STD_ON
-#define ANIMATION_FONT_SUPPORT_FONT_7X10             STD_ON
-#define ANIMATION_FONT_SUPPORT_FONT_9X10             STD_ON
-#define ANIMATION_FONT_SUPPORT_FONT_10X10            STD_ON
+#define ANIMATION_FONT_SUPPORT_FONT_5X8                 STD_OFF
+#define ANIMATION_FONT_SUPPORT_FONT_7X9                 STD_OFF
+#define ANIMATION_FONT_SUPPORT_FONT_7X10                STD_OFF
+#define ANIMATION_FONT_SUPPORT_FONT_9X10                STD_OFF
+#define ANIMATION_FONT_SUPPORT_FONT_10X10               STD_OFF
 
 /* AnimationFont parameter */
 #define ANIMATION_FONT_ASCII_TABLE_OFFSET               -32

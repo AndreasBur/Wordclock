@@ -55,6 +55,19 @@ class Bit
 ******************************************************************************************************************************************************/
   private:
     T Value;
+    
+    class BitReference
+    {
+        public:
+            constexpr BitReference(T& sValue, size_t sBitPos) : Value(sValue), BitPos(sBitPos) {}
+
+            operator bool() const { return readBit(Value, BitPos); }
+            void operator = (bool Bit) { writeBit(Value, BitPos); }
+
+        private:
+            T& Value;
+            size_t BitPos;
+    };
   
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
@@ -68,7 +81,7 @@ class Bit
     T getValue() const { return Value; }
 
 	// set methods
-    Bit& setValue(T sValue) { Value = sValue; }
+    Bit& setValue(T sValue) { Value = sValue; return *this; }
     Bit& setBit(size_t BitPos) { Value = setBit(Value, BitPos); return *this; }
     Bit& clearBit(size_t BitPos) { Value = clearBit(Value, BitPos); return *this; }
     Bit& toggleBit(size_t BitPos) { Value = toggleBit(Value, BitPos); return *this; }
@@ -79,8 +92,9 @@ class Bit
     Bit& clearBitMask(T BitMask) { Value = clearBitMask(Value, BitMask); return *this; }
     Bit& writeBits(T BitMask, T BitsValue) { Value = writeBits(Value, BitMask, BitsValue); return *this; }
 
-	// methods  
-    bool readBit(size_t BitPos) { return readBit(Value, BitPos); }
+	// methods
+    size_t numberOfDigits(unsigned Base) { return numberOfDigits(Value, Base); }
+    bool readBit(size_t BitPos) const { return readBit(Value, BitPos); }
     T readBitsValue(T BitMask, size_t BitPos) const { return readBitsValue(Value, BitPos); }
     T readBits(T BitMask) const { return readBits(Value, BitMask); }
 
@@ -91,9 +105,9 @@ class Bit
 		
 	// operators
 	// read [] operator
-    bool operator[] (size_t BitPos) const { return readBit(BitPos); }
+    bool operator [] (size_t BitPos) const { return readBit(BitPos); }
     // write [] operator
-    T& operator [] (size_t BitPos) { return setBit(BitPos); }
+    BitReference operator [] (size_t BitPos) { return BitReference(Value, BitPos); }
 
     // static set methods
     template <typename ValueType> static ValueType setBit(ValueType sValue, size_t BitPos) { return sValue | (UINT64_C(1) << BitPos); }
@@ -121,9 +135,9 @@ class Bit
     static uint64_t bitMask(size_t Length) { return bitValue(Length) - 1u; }
     template <typename Type> size_t numberOfBits() { return sizeof(Type) * CHAR_BIT; }
 
-    template <typename NumberType> static size_t digitsOfNumber(NumberType Number, unsigned Base)
+    template <typename NumberType> static size_t numberOfDigits(NumberType Number, unsigned Base)
     {
-        T numberOfDigits = 0u;
+        size_t numberOfDigits = 0u;
         do { Number /= Base; numberOfDigits++; }
         while (Number != 0u);
         return numberOfDigits;
