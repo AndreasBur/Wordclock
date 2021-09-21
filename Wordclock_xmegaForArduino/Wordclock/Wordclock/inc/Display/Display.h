@@ -105,7 +105,6 @@ class Display
 
     /* mapping to underlying hardware */
     using IlluminanceType = BH1750::IlluminanceType;
-
     using IndexType = WS2812::IndexType;
     using PixelColorType = WS2812::PixelType;
     using ColorType = NeoPixel::ColorType;

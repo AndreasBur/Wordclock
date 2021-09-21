@@ -68,7 +68,7 @@ class GammaCorrection
     /**************************************************************************************************************************************************
       calcGammaCorrectionValue()
     **************************************************************************************************************************************************/
-    /*! \brief
+    /*! \brief          calculates the gamma correction value
      *  \details        calculates the gamma correction value with the help of a small table
      *                  and very efficient shift calculation
      *  param[in]       ValueLinear    7 bit unsigned (0..127)
