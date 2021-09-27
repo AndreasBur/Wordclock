@@ -81,8 +81,8 @@ class Message
     size_t find(const char* String, size_t position = 0u) const
     {
         const char* finding = strstr(&Buffer[position], String);
-        if(finding == nullptr) return npos;
-        else return finding - Buffer;
+        if(finding == nullptr) { return npos; }
+        else { return finding - Buffer; }
     }
     
     bool contains(char Character) const { return strchr(Buffer, Character); }
@@ -90,14 +90,14 @@ class Message
     size_t find(char Char, size_t position = 0u) const
     {
         const char* finding = strchr(&Buffer[position], Char);
-        if(finding == nullptr) return npos;
-        else return finding - Buffer;
+        if(finding == nullptr) { return npos; }
+        else { return finding - Buffer; }
     }
 
     StdReturnType addChar(char Char)
     {
         byte messageLength = strlen(Buffer);
-        // check for free space in Message buffer
+        // check for free space in message buffer
         if(messageLength < (MESSAGE_LENGTH - 1u))
         {
             // save new char

@@ -9,10 +9,10 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       ClockWords.h
- *      \brief      
+ *      \brief
  *
- *      \details    
- *                  
+ *      \details
+ *
 ******************************************************************************************************************************************************/
 #ifndef _CLOCKWORDS_H_
 #define _CLOCKWORDS_H_
@@ -36,7 +36,9 @@
 #define CLOCKWORDS_MAX_NUMBER_OF_MINUTE_WORDS        3u
 
 #define CLOCKWORDS_IT_IS_NUMBER_OF_WORDS             2u
-#define CLOCKWORDS_MAX_NUMBER_OF_WORDS               (CLOCKWORDS_MAX_NUMBER_OF_HOUR_WORDS + CLOCKWORDS_MAX_NUMBER_OF_MINUTE_WORDS + CLOCKWORDS_IT_IS_NUMBER_OF_WORDS)
+#define CLOCKWORDS_MAX_NUMBER_OF_WORDS               (CLOCKWORDS_MAX_NUMBER_OF_HOUR_WORDS + \
+                                                      CLOCKWORDS_MAX_NUMBER_OF_MINUTE_WORDS + \
+                                                      CLOCKWORDS_IT_IS_NUMBER_OF_WORDS)
 
 /******************************************************************************************************************************************************
  *  G L O B A L   F U N C T I O N   M A C R O S
@@ -55,7 +57,7 @@ class ClockWords
     using WordsListType = std::array<DisplayWords::WordIdType, CLOCKWORDS_MAX_NUMBER_OF_WORDS>;
     using HourWordsType = std::array<DisplayWords::WordIdType, CLOCKWORDS_MAX_NUMBER_OF_HOUR_WORDS>;
     using MinutesWordsType = std::array<DisplayWords::WordIdType, CLOCKWORDS_MAX_NUMBER_OF_MINUTE_WORDS>;
-  
+
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
@@ -63,16 +65,16 @@ class ClockWords
     bool ShowItIs;
     HourWordsType HourWords;
     MinutesWordsType MinuteWords;
-  
+
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
     constexpr ClockWords() : ShowItIs(false), HourWords{DisplayWords::WORD_NONE}, MinuteWords{DisplayWords::WORD_NONE} { }
-    constexpr ClockWords(bool sShowItIs, HourWordsType sHourWords, MinutesWordsType sMinuteWords) 
+    constexpr ClockWords(bool sShowItIs, HourWordsType sHourWords, MinutesWordsType sMinuteWords)
         : ShowItIs(sShowItIs), HourWords(sHourWords), MinuteWords(sMinuteWords) { }
     ~ClockWords() { }
-    
+
     bool operator==(const ClockWords& sClockWords);
     bool operator!=(const ClockWords& sClockWords);
 
@@ -82,7 +84,7 @@ class ClockWords
     DisplayWords::WordIdType getHourWord(byte Index) const { return HourWords[Index]; }
     MinutesWordsType getMinuteWords() const { return MinuteWords; }
     DisplayWords::WordIdType getMinuteWord(byte Index) const { return MinuteWords[Index]; }
-        
+
     WordsListType getWordsList() const;
 
     // set methods

@@ -213,7 +213,7 @@ StdReturnType Display::getPixel(byte Column, byte Row, bool& Value)  const
 #endif
     if(returnValue == E_OK) {
         /* Pixel is only off when all colors are zero */
-        if(pixel.Red == 0 && pixel.Green == 0 && pixel.Blue == 0) Value = false;
+        if(pixel.Red == 0u && pixel.Green == 0u && pixel.Blue == 0u) Value = false;
         else Value = true;
     }
     return returnValue;
@@ -233,7 +233,7 @@ bool Display::getPixelFast(byte Column, byte Row)  const
 #else
     pixel = Pixels.getPixelFast((Row * DISPLAY_NUMBER_OF_COLUMNS) + Column);
 #endif
-    if(pixel.Red == 0 && pixel.Green == 0 && pixel.Blue == 0) return false;
+    if(pixel.Red == 0u && pixel.Green == 0u && pixel.Blue == 0u) return false;
     else return true;
 } /* getPixelFast */
 

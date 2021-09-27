@@ -92,10 +92,10 @@ class StringTools
         Destination[Length - 1u] = NullCharacter;
     }
 
-    template<typename T,
-             typename std::enable_if_t<std::is_unsigned<T>::value, int> = 0,
-             typename std::enable_if_t<std::is_integral<T>::value, int> = 0>
-    static ResultType stringTo(const char* String, PositionType& Position, T& Value, uint8_t Base = 10u) {
+    template<typename Unsigned,
+             typename std::enable_if_t<std::is_unsigned<Unsigned>::value, int> = 0,
+             typename std::enable_if_t<std::is_integral<Unsigned>::value, int> = 0>
+    static ResultType stringTo(const char* String, PositionType& Position, Unsigned& Value, uint8_t Base = 10u) {
         char* end = nullptr;
         errno = 0;
         uint64_t valueBig = strtoul(String, &end, Base);
@@ -103,11 +103,11 @@ class StringTools
 
         if(String == end) {
             return RESULT_NO_VALUE;
-        } else if(errno == ERANGE || valueBig > std::numeric_limits<T>::max()) {
-            Value = std::numeric_limits<T>::max();
+        } else if(errno == ERANGE || valueBig > std::numeric_limits<Unsigned>::max()) {
+            Value = std::numeric_limits<Unsigned>::max();
             return RESULT_OVERFLOW;
         } else {
-            Value = static_cast<T>(valueBig);
+            Value = static_cast<Unsigned>(valueBig);
             return RESULT_OK;
         }
     }
