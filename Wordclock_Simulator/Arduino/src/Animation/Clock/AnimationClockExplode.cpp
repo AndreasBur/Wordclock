@@ -56,14 +56,14 @@ void AnimationClockExplode::init()
 ******************************************************************************************************************************************************/
 StdReturnType AnimationClockExplode::setTime(byte Hour, byte Minute)
 {
-    StdReturnType ReturnValue{E_NOT_OK};
+    StdReturnType returnValue{E_NOT_OK};
 
     if(Clock::getInstance().getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
-        ReturnValue = E_OK;
+        returnValue = E_OK;
         if(setNextWordToClear() == E_OK) { State = STATE_CLEAR_TIME; }
         else { State = STATE_SET_TIME; }
     }
-    return ReturnValue;
+    return returnValue;
 } /* setTime */
 
 /******************************************************************************************************************************************************

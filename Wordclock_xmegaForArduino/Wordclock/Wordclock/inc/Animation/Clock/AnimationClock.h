@@ -187,7 +187,7 @@ class AnimationClock
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    std::array<byte, ANIMATION_CLOCK_NUMBER_OF_ANIMATIONS> TaskCycles{{0}};
+    std::array<byte, ANIMATION_CLOCK_NUMBER_OF_ANIMATIONS> TaskCycles{{0u}};
     AnimationType Animation{ANIMATION_CLOCK_NONE};
     AnimationsType Animations;
 

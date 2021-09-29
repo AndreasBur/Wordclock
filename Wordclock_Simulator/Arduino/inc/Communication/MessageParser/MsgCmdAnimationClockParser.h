@@ -91,13 +91,13 @@ class MsgCmdAnimationClockParser : public MsgParameterParser<MsgCmdAnimationCloc
     void setAnimation() const
     {
         StdReturnType returnValue = Animation::getInstance().setAnimation(AnimationClock);
-        Error.checkReturnValueAndSend(ErrorMessage::API_ANIMATION_SET_ANIMATION, returnValue, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNCE);
+        Error.checkReturnValueAndSend(AnimationOptionShortName, returnValue, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNCE);
     }
 
     void setClockTaskCycle() const
     {
         StdReturnType returnValue = Animation::getInstance().setClockTaskCycle(AnimationClock, convertSpeedToTaskCycle(Speed));
-        Error.checkReturnValueAndSend(ErrorMessage::API_ANIMATION_SET_CLOCK_TASK_CYCLE, returnValue, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNCE);
+        Error.checkReturnValueAndSend(SpeedOptionShortName, returnValue, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNCE);
     }
 
 /******************************************************************************************************************************************************

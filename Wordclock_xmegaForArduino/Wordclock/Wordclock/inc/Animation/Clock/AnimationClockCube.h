@@ -32,11 +32,11 @@
 
 
 /* AnimationClockCube parameter */
-#define ANIMATION_CLOCK_CUBE_COLUMN_START_MAX_VALUE         4
-#define ANIMATION_CLOCK_CUBE_COLUMN_END_MIN_VALUE           6
+#define ANIMATION_CLOCK_CUBE_COLUMN_START_MAX_VALUE         4u
+#define ANIMATION_CLOCK_CUBE_COLUMN_END_MIN_VALUE           6u
 
-#define ANIMATION_CLOCK_CUBE_ROW_START_MAX_VALUE            4
-#define ANIMATION_CLOCK_CUBE_ROW_END_MIN_VALUE              5
+#define ANIMATION_CLOCK_CUBE_ROW_START_MAX_VALUE            4u
+#define ANIMATION_CLOCK_CUBE_ROW_END_MIN_VALUE              5u
 
 
 /******************************************************************************************************************************************************

@@ -196,9 +196,7 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
                 ParameterTableElementType parameter;
                 if(getMsgParameterByOptionShortName(optionShortName, parameter) == E_OK) {
                     position += parseArgument(parameter, &ParameterBuffer[position]) - 1u;
-                } else {
-                    Error.send(optionShortName, ErrorMessage::ERROR_PARAMETER_UNKNOWN);
-                }
+                } else { Error.send(optionShortName, ErrorMessage::ERROR_PARAMETER_UNKNOWN); }
                 state = STATE_PARSE;
             }
         }

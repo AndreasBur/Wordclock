@@ -91,16 +91,16 @@ class AnimationClockExplode : public AnimationClockCommon
     byte getSetFinalColumn() const { return Display::getInstance().indexToColumn(CurrentWordIndex); }
 
     byte getNextColumn(byte FinalColumn) const {
-        byte nextColumn{CurrentColumn};
-        if(CurrentColumn < FinalColumn) nextColumn++;
-        if(CurrentColumn > FinalColumn) nextColumn--;
+        byte nextColumn = CurrentColumn;
+        if(CurrentColumn < FinalColumn) { nextColumn++; }
+        if(CurrentColumn > FinalColumn) { nextColumn--; }
         return nextColumn;
     }
 
     byte getNextRow(byte FinalRow) const {
-        byte nextRow{CurrentRow};
-        if(CurrentRow < FinalRow) nextRow++;
-        if(CurrentRow > FinalRow) nextRow--;
+        byte nextRow = CurrentRow;
+        if(CurrentRow < FinalRow) { nextRow++; }
+        if(CurrentRow > FinalRow) { nextRow--; }
         return nextRow;
     }
 

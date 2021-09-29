@@ -25,8 +25,9 @@
 #include "MsgCmdDisplayColorParser.h"
 #include "MsgCmdDisplayBrightnessParser.h"
 #include "MsgCmdDisplayPixelParser.h"
-#include "MsgCmdClockTimeParser.h"
+#include "MsgCmdClockModeParser.h"
 #include "MsgCmdAnimationClockParser.h"
+#include "MsgCmdTimeParser.h"
 
 /******************************************************************************************************************************************************
  *  L O C A L   C O N S T A N T   M A C R O S
@@ -84,11 +85,16 @@ void MsgCmdParser::parse()
         cmdAnimationClockParser.parse();
         cmdAnimationClockParser.process();
         cmdAnimationClockParser.sendAnswer();
-    } else if(command == COMMAND_CLOCK_TIME) {
-        MsgCmdClockTimeParser cmdClockTimeParser(parameter);
-        cmdClockTimeParser.parse();
-        cmdClockTimeParser.process();
-        cmdClockTimeParser.sendAnswer();
+    } else if(command == COMMAND_CLOCK_MODE) {
+        MsgCmdClockModeParser cmdClockModeParser(parameter);
+        cmdClockModeParser.parse();
+        cmdClockModeParser.process();
+        cmdClockModeParser.sendAnswer();
+    } else if(command == COMMAND_TIME) {
+        MsgCmdTimeParser cmdClockTimeParser(parameter);
+        MsgCmdTimeParser.parse();
+        MsgCmdTimeParser.process();
+        MsgCmdTimeParser.sendAnswer();
     } else {
         Error.send(ErrorMessage::ERROR_WRONG_COMMAND);
     }

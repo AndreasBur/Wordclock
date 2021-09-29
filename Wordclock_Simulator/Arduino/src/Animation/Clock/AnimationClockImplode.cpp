@@ -57,15 +57,15 @@ void AnimationClockImplode::init()
 ******************************************************************************************************************************************************/
 StdReturnType AnimationClockImplode::setTime(byte Hour, byte Minute)
 {
-    StdReturnType ReturnValue{E_NOT_OK};
+    StdReturnType returnValue{E_NOT_OK};
 
     if(Clock::getInstance().getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
-        ReturnValue = E_OK;
+        returnValue = E_OK;
         Display::getInstance().setPixel(ColumnCenter, RowCenter);
         ShiftCounter = 0u;
         State = STATE_CLEAR_TIME;
     }
-    return ReturnValue;
+    return returnValue;
 } /* setTime */
 
 
@@ -146,15 +146,15 @@ void AnimationClockImplode::setStateToSetTime()
 ******************************************************************************************************************************************************/
 void AnimationClockImplode::shiftQuadrants(DisplayPixels& Pixels, byte NumberOfShifts)
 {
-    for(uint8_t Row = 0u; Row < DISPLAY_NUMBER_OF_ROWS; Row++) {
-        for(uint8_t Column = 0u; Column < DISPLAY_NUMBER_OF_COLUMNS; Column++) {
-            if(Pixels.getPixel(Column, Row)) {
-                byte ColumnNext = Column, RowNext = Row;
-                if(Column < ColumnCenter) ColumnNext = shiftRight(Column, NumberOfShifts);
-                if(Column > ColumnCenter) ColumnNext = shiftLeft(Column, NumberOfShifts);
-                if(Row < RowCenter) RowNext = shiftDown(Row, NumberOfShifts);
-                if(Row > RowCenter) RowNext = shiftUp(Row, NumberOfShifts);
-                setNewPixel(Column, Row, ColumnNext, RowNext);
+    for(uint8_t row = 0u; row < DISPLAY_NUMBER_OF_ROWS; row++) {
+        for(uint8_t column = 0u; column < DISPLAY_NUMBER_OF_COLUMNS; column++) {
+            if(Pixels.getPixel(column, row)) {
+                byte ColumnNext = column, RowNext = row;
+                if(column < ColumnCenter) ColumnNext = shiftRight(column, NumberOfShifts);
+                if(column > ColumnCenter) ColumnNext = shiftLeft(column, NumberOfShifts);
+                if(row < RowCenter) RowNext = shiftDown(row, NumberOfShifts);
+                if(row > RowCenter) RowNext = shiftUp(row, NumberOfShifts);
+                setNewPixel(column, row, ColumnNext, RowNext);
             }
         }
     }
@@ -165,9 +165,9 @@ void AnimationClockImplode::shiftQuadrants(DisplayPixels& Pixels, byte NumberOfS
 ******************************************************************************************************************************************************/
 void AnimationClockImplode::shiftQuadrantUpperLeft()
 {
-    for(int8_t Column = ColumnCenter; Column >= 0; Column--) {
-        for(int8_t Row = RowCenter; Row >= 0; Row--) {
-            if(Display::getInstance().getPixelFast(Column, Row)) { shiftDownRight(Column, Row); }
+    for(int8_t column = ColumnCenter; column >= 0; column--) {
+        for(int8_t row = RowCenter; row >= 0; row--) {
+            if(Display::getInstance().getPixelFast(column, row)) { shiftDownRight(column, row); }
         }
     }
 }
@@ -177,11 +177,11 @@ void AnimationClockImplode::shiftQuadrantUpperLeft()
 ******************************************************************************************************************************************************/
 void AnimationClockImplode::shiftDownRight(byte Column, byte Row)
 {
-    byte ColumnNext = Column, RowNext = Row;
+    byte columnNext = Column, rowNext = Row;
 
-    if(Column < ColumnCenter) ColumnNext++;
-    if(Row < ColumnCenter) RowNext++;
-    clearOldAndSetNewPixel(Column, Row, ColumnNext, RowNext);
+    if(Column < ColumnCenter) columnNext++;
+    if(Row < ColumnCenter) rowNext++;
+    clearOldAndSetNewPixel(Column, Row, columnNext, rowNext);
 }
 
 /******************************************************************************************************************************************************
@@ -189,9 +189,9 @@ void AnimationClockImplode::shiftDownRight(byte Column, byte Row)
 ******************************************************************************************************************************************************/
 void AnimationClockImplode::shiftQuadrantUpperRight()
 {
-    for(uint8_t Column = ColumnCenter + 1u; Column < DISPLAY_NUMBER_OF_COLUMNS; Column++) {
-        for(int8_t Row = RowCenter - 1u; Row >= 0; Row--) {
-            if(Display::getInstance().getPixelFast(Column, Row)) { shiftDownLeft(Column, Row); }
+    for(uint8_t column = ColumnCenter + 1u; column < DISPLAY_NUMBER_OF_COLUMNS; column++) {
+        for(int8_t row = RowCenter - 1u; row >= 0; row--) {
+            if(Display::getInstance().getPixelFast(column, row)) { shiftDownLeft(column, row); }
         }
     }
 }
@@ -201,11 +201,11 @@ void AnimationClockImplode::shiftQuadrantUpperRight()
 ******************************************************************************************************************************************************/
 void AnimationClockImplode::shiftDownLeft(byte Column, byte Row)
 {
-    byte ColumnNext = Column, RowNext = Row;
+    byte columnNext = Column, rowNext = Row;
 
-    if(Column > ColumnCenter) ColumnNext--;
-    if(Row < ColumnCenter) RowNext++;
-    clearOldAndSetNewPixel(Column, Row, ColumnNext, RowNext);
+    if(Column > ColumnCenter) columnNext--;
+    if(Row < ColumnCenter) rowNext++;
+    clearOldAndSetNewPixel(Column, Row, columnNext, rowNext);
 }
 
 /******************************************************************************************************************************************************
@@ -213,9 +213,9 @@ void AnimationClockImplode::shiftDownLeft(byte Column, byte Row)
 ******************************************************************************************************************************************************/
 void AnimationClockImplode::shiftQuadrantLowerLeft()
 {
-    for(int8_t Column = ColumnCenter - 1u; Column >= 0; Column--) {
-        for(int8_t Row = RowCenter + 1u; Row < static_cast<int8_t>(DISPLAY_NUMBER_OF_ROWS); Row++) {
-            if(Display::getInstance().getPixelFast(Column, Row)) { shiftUpRight(Column, Row); }
+    for(int8_t column = ColumnCenter - 1u; column >= 0; column--) {
+        for(int8_t row = RowCenter + 1u; row < static_cast<int8_t>(DISPLAY_NUMBER_OF_ROWS); row++) {
+            if(Display::getInstance().getPixelFast(column, row)) { shiftUpRight(column, row); }
         }
     }
 }
@@ -225,11 +225,11 @@ void AnimationClockImplode::shiftQuadrantLowerLeft()
 ******************************************************************************************************************************************************/
 void AnimationClockImplode::shiftUpRight(byte Column, byte Row)
 {
-    byte ColumnNext = Column, RowNext = Row;
+    byte columnNext = Column, rowNext = Row;
 
-    if(Column < ColumnCenter) ColumnNext++;
-    if(Row > ColumnCenter) RowNext--;
-    clearOldAndSetNewPixel(Column, Row, ColumnNext, RowNext);
+    if(Column < ColumnCenter) columnNext++;
+    if(Row > ColumnCenter) rowNext--;
+    clearOldAndSetNewPixel(Column, Row, columnNext, rowNext);
 }
 
 /******************************************************************************************************************************************************
@@ -237,9 +237,9 @@ void AnimationClockImplode::shiftUpRight(byte Column, byte Row)
 ******************************************************************************************************************************************************/
 void AnimationClockImplode::shiftQuadrantLowerRight()
 {
-    for(uint8_t Column = ColumnCenter; Column < DISPLAY_NUMBER_OF_COLUMNS; Column++) {
-        for(int8_t Row = RowCenter; Row < static_cast<int8_t>(DISPLAY_NUMBER_OF_ROWS); Row++) {
-            if(Display::getInstance().getPixelFast(Column, Row)) { shiftUpLeft(Column, Row); }
+    for(uint8_t column = ColumnCenter; column < DISPLAY_NUMBER_OF_COLUMNS; column++) {
+        for(int8_t row = RowCenter; row < static_cast<int8_t>(DISPLAY_NUMBER_OF_ROWS); row++) {
+            if(Display::getInstance().getPixelFast(column, row)) { shiftUpLeft(column, row); }
         }
     }
 }
@@ -249,11 +249,11 @@ void AnimationClockImplode::shiftQuadrantLowerRight()
 ******************************************************************************************************************************************************/
 void AnimationClockImplode::shiftUpLeft(byte Column, byte Row)
 {
-    byte ColumnNext = Column, RowNext = Row;
+    byte columnNext = Column, rowNext = Row;
 
-    if(Column > ColumnCenter) ColumnNext--;
-    if(Row > ColumnCenter) RowNext--;
-    clearOldAndSetNewPixel(Column, Row, ColumnNext, RowNext);
+    if(Column > ColumnCenter) columnNext--;
+    if(Row > ColumnCenter) rowNext--;
+    clearOldAndSetNewPixel(Column, Row, columnNext, rowNext);
 }
 
 /******************************************************************************************************************************************************

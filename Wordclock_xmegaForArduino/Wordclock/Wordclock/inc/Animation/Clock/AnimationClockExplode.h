@@ -92,15 +92,15 @@ class AnimationClockExplode : public AnimationClockCommon
 
     byte getNextColumn(byte FinalColumn) const {
         byte nextColumn = CurrentColumn;
-        if(CurrentColumn < FinalColumn) nextColumn++;
-        if(CurrentColumn > FinalColumn) nextColumn--;
+        if(CurrentColumn < FinalColumn) { nextColumn++; }
+        if(CurrentColumn > FinalColumn) { nextColumn--; }
         return nextColumn;
     }
 
     byte getNextRow(byte FinalRow) const {
         byte nextRow = CurrentRow;
-        if(CurrentRow < FinalRow) nextRow++;
-        if(CurrentRow > FinalRow) nextRow--;
+        if(CurrentRow < FinalRow) { nextRow++; }
+        if(CurrentRow > FinalRow) { nextRow--; }
         return nextRow;
     }
 

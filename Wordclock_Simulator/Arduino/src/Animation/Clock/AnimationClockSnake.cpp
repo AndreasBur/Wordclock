@@ -59,15 +59,15 @@ void AnimationClockSnake::init()
 ******************************************************************************************************************************************************/
 StdReturnType AnimationClockSnake::setTime(byte Hour, byte Minute)
 {
-    StdReturnType ReturnValue{E_NOT_OK};
+    StdReturnType returnValue{E_NOT_OK};
 
     if(Clock::getInstance().getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
-        ReturnValue = E_OK;
+        returnValue = E_OK;
         SnakeBeginIndex = 0u;
         SnakeEndIndex = 0u;
         State = STATE_SET_TIME;
     }
-    return ReturnValue;
+    return returnValue;
 } /* setTime */
 
 
@@ -77,14 +77,14 @@ StdReturnType AnimationClockSnake::setTime(byte Hour, byte Minute)
 void AnimationClockSnake::task()
 {
     if(State == STATE_SET_TIME) {
-        byte SnakeEndIndexTrans = transformToSerpentine(SnakeEndIndex);
+        byte snakeEndIndexTrans = transformToSerpentine(SnakeEndIndex);
         Display::getInstance().setPixelFast(transformToSerpentine(SnakeBeginIndex));
 
         if((SnakeBeginIndex - SnakeEndIndex) == ANIMATION_CLOCK_SNAKE_LENGTH ||
            (SnakeBeginIndex >= DISPLAY_NUMBER_OF_LEDS - 1u && SnakeEndIndex < DISPLAY_NUMBER_OF_LEDS))
         {
             //Display::getInstance().clearPixelFast(SnakeEndIndexTrans);
-            if(isPixelPartOfClockWords(ClockWordsTable, SnakeEndIndexTrans) == false) Display::getInstance().clearPixelFast(SnakeEndIndexTrans);
+            if(isPixelPartOfClockWords(ClockWordsTable, snakeEndIndexTrans) == false) Display::getInstance().clearPixelFast(snakeEndIndexTrans);
             SnakeEndIndex++;
         }
         if(SnakeBeginIndex < DISPLAY_NUMBER_OF_LEDS - 1u) SnakeBeginIndex++;
@@ -113,12 +113,12 @@ void AnimationClockSnake::reset()
 ******************************************************************************************************************************************************/
 byte AnimationClockSnake::transformToSerpentine(byte Column, byte Row) const
 {
-    byte Index;
+    byte index;
 
-    if(IS_BIT_CLEARED(Row, 0u)) Index = (Row * DISPLAY_NUMBER_OF_COLUMNS) + Column;
-    else Index = (Row * DISPLAY_NUMBER_OF_COLUMNS) + (DISPLAY_NUMBER_OF_COLUMNS - Column - 1u);
+    if(IS_BIT_CLEARED(Row, 0u)) index = (Row * DISPLAY_NUMBER_OF_COLUMNS) + Column;
+    else index = (Row * DISPLAY_NUMBER_OF_COLUMNS) + (DISPLAY_NUMBER_OF_COLUMNS - Column - 1u);
 
-    return Index;
+    return index;
 } /* transformToSerpentine */
 
 
@@ -127,10 +127,10 @@ byte AnimationClockSnake::transformToSerpentine(byte Column, byte Row) const
 ******************************************************************************************************************************************************/
 byte AnimationClockSnake::transformToSerpentine(byte Index) const
 {
-    byte Column = Display::getInstance().indexToColumn(Index);
-    byte Row = Display::getInstance().indexToRow(Index);
+    byte column = Display::getInstance().indexToColumn(Index);
+    byte row = Display::getInstance().indexToRow(Index);
 
-    return transformToSerpentine(Column, Row);
+    return transformToSerpentine(column, row);
 } /* transformToSerpentine */
 
 /******************************************************************************************************************************************************

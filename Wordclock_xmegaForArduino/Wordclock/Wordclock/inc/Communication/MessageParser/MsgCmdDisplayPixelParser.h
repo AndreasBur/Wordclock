@@ -89,9 +89,7 @@ class MsgCmdDisplayPixelParser : public MsgParameterParser<MsgCmdDisplayPixelPar
     void handleParameterIndex(byte Argument)
     {
         Index = Argument;
-        if(State == STATE_NONE) {
-            State = getPixelState(Index);
-        }
+        if(State == STATE_NONE) { State = getPixelState(Index); }
     }
 
     void handleParameterState(byte Argument)

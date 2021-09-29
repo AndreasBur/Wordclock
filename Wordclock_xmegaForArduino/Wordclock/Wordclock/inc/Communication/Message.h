@@ -78,9 +78,9 @@ class Message
         return strlen(Buffer);
     }
 
-    size_t find(const char* String, size_t position = 0u) const
+    size_t find(const char* String, size_t Position = 0u) const
     {
-        const char* finding = strstr(&Buffer[position], String);
+        const char* finding = strstr(&Buffer[Position], String);
         if(finding == nullptr) { return npos; }
         else { return finding - Buffer; }
     }
@@ -102,7 +102,7 @@ class Message
         {
             // save new char
             Buffer[messageLength] = Char;
-            Buffer[messageLength + 1] = NullCharacter;
+            Buffer[messageLength + 1u] = NullCharacter;
             return E_OK;
         } else {
             return E_NOT_OK;

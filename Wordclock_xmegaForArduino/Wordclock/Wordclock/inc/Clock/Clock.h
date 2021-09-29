@@ -88,6 +88,7 @@ class Clock
         byte Minute;
     };
 
+  private:
     using HourType = ClockWords::HourWordsType;
     using ClockWordsListType = ClockWords::WordsListType;
 
@@ -109,12 +110,13 @@ class Clock
 
     MinuteTableElementType getMinutesTableElement(byte Minute) const {
         MinuteTableElementType minutesTableElement;
-        memcpy_P(&minutesTableElement, &MinutesTable[Mode][Minute / CLOCK_MINUTE_STEP_IN_MINUTES], sizeof(MinuteType));
+        memcpy_P(&minutesTableElement, &MinutesTable[Mode][Minute / CLOCK_MINUTE_STEP_IN_MINUTES], sizeof(MinuteTableElementType));
         return minutesTableElement;
     }
+
     HourTableElementType getHoursTableElement(HourModeType HourMode, byte Hour) const {
         HourTableElementType hoursTableElement;
-        memcpy_P(&hoursTableElement, &HoursTable[HourMode][Hour], sizeof(HourType));
+        memcpy_P(&hoursTableElement, &HoursTable[HourMode][Hour], sizeof(HourTableElementType));
         return hoursTableElement;
     }
 

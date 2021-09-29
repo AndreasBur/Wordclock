@@ -64,7 +64,6 @@ class Clock
  *  GLOBAL DATA TYPES AND STRUCTURES
 ******************************************************************************************************************************************************/
   public:
-    /*  */
     enum ModeType {
         MODE_WESSI,
         MODE_OSSI,
@@ -89,6 +88,7 @@ class Clock
         byte Minute;
     };
 
+  private:
     using HourType = ClockWords::HourWordsType;
     using ClockWordsListType = ClockWords::WordsListType;
 
@@ -168,8 +168,8 @@ class Clock
         setTime(ClockWordsTable, 0u);
     }
     void setTime(ClockWords::WordsListType ClockWordsTable, byte MaxLength) const {
-            for(byte Index  = 0u; Index < ClockWordsTable.size(); Index++) {
-            Display::getInstance().setWord(ClockWordsTable[Index], MaxLength);
+        for(byte index = 0u; index < ClockWordsTable.size(); index++) {
+            Display::getInstance().setWord(ClockWordsTable[index], MaxLength);
         }
     }
 

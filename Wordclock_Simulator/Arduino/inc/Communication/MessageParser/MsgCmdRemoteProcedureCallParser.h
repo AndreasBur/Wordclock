@@ -72,7 +72,6 @@ class MsgCmdRemoteProcedureCallParser : public MsgParameterParser<MsgCmdRemotePr
         RPC_ID_DISPLAY_BRIGHTNESS_AUTOMATIC_OFF,
         RPC_ID_POWER_ON,
         RPC_ID_POWER_OFF,
-
     };
 
 /******************************************************************************************************************************************************

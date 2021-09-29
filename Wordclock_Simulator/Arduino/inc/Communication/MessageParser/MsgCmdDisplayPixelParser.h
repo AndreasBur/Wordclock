@@ -32,7 +32,7 @@
 
 
 /* MsgCmdDisplayPixelParser parameter */
-#define MSG_CMD_DISPLAY_PIXEL_PARSER_PARAMETER_TABLE_SIZE           2u
+#define MSG_CMD_DISPLAY_PIXEL_PARSER_PARAMETER_TABLE_SIZE       2u
 
 # if (WS2812_NUMBER_OF_LEDS < 255u)
 #  define MSG_CMD_DISPLAY_PIXEL_PARSER_INDEX_ARGUMENT_TYPE      MsgParameter::ARGUMENT_TYPE_UINT8
@@ -89,9 +89,7 @@ class MsgCmdDisplayPixelParser : public MsgParameterParser<MsgCmdDisplayPixelPar
     void handleParameterIndex(byte Argument)
     {
         Index = Argument;
-        if(State == STATE_NONE) {
-            State = getPixelState(Index);
-        }
+        if(State == STATE_NONE) { State = getPixelState(Index); }
     }
 
     void handleParameterState(byte Argument)

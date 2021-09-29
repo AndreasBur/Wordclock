@@ -59,12 +59,12 @@ void AnimationClockShift::init()
 ******************************************************************************************************************************************************/
 StdReturnType AnimationClockShift::setTime(byte Hour, byte Minute)
 {
-    StdReturnType ReturnValue{E_NOT_OK};
+    StdReturnType returnValue{E_NOT_OK};
 
     if(Clock::getInstance().getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
         State = STATE_CLEAR_TIME;
     }
-    return ReturnValue;
+    return returnValue;
 } /* setTime */
 
 

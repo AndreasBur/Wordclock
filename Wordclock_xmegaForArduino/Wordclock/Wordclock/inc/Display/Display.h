@@ -144,8 +144,8 @@ class Display
 # if (DISPLAY_USE_WS2812_DIMMING == STD_OFF)
     byte dimmColor(byte Color, byte BrightnessCorrected) const {
         byte dimmedColor = (Color * BrightnessCorrected) >> 8u;
-        if(dimmedColor == 0u) return 1u;
-        else return dimmedColor;
+        if(dimmedColor == 0u) { return 1u; }
+        else { return dimmedColor; }
     }
 # endif
 
@@ -211,8 +211,8 @@ class Display
     void clearWordsFast();
 
     // pixel methods
-    StdReturnType writePixel(byte Column, byte Row, bool Value) { if(Value) { return setPixel(Column, Row); } else { return clearPixel(Column, Row); } }
-    StdReturnType writePixel(IndexType Index, bool Value) { if(Value) { return setPixel(Index); } else { return clearPixel(Index); } }
+    StdReturnType writePixel(byte Column, byte Row, bool Value) { if(Value) return setPixel(Column, Row); else return clearPixel(Column, Row); }
+    StdReturnType writePixel(IndexType Index, bool Value) { if(Value) return setPixel(Index); else return clearPixel(Index); }
     StdReturnType setPixel(byte, byte);
     StdReturnType setPixel(IndexType);
     StdReturnType clearPixel(byte, byte);

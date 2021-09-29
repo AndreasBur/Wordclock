@@ -273,7 +273,10 @@ void AnimationClockImplode::clearOldAndSetNewPixel(byte ColumnOld, byte RowOld, 
 ******************************************************************************************************************************************************/
 void AnimationClockImplode::setNewPixel(byte ColumnOld, byte RowOld, byte ColumnNew, byte RowNew)
 {
-    if((ColumnOld != ColumnNew) || (RowOld != RowNew)) { Display::getInstance().setPixel(ColumnNew, RowNew); }
+    if((ColumnOld != ColumnNew) || (RowOld != RowNew))
+    {
+        Display::getInstance().setPixel(ColumnNew, RowNew);
+    }
 }
 
 /******************************************************************************************************************************************************

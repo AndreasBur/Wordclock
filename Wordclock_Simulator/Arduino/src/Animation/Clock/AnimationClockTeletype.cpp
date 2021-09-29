@@ -59,16 +59,16 @@ void AnimationClockTeletype::init()
 ******************************************************************************************************************************************************/
 StdReturnType AnimationClockTeletype::setTime(byte Hour, byte Minute)
 {
-    StdReturnType ReturnValue{E_NOT_OK};
+    StdReturnType returnValue{E_NOT_OK};
 
     if(Clock::getInstance().getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
-        ReturnValue = E_OK;
+        returnValue = E_OK;
         CurrentWordIndex = 0u;
         CurrentCharIndex = 0u;
         CurrentWordLength = Words.getDisplayWordLengthFast(ClockWordsTable[CurrentWordIndex]);
         State = STATE_SET_TIME;
     }
-    return ReturnValue;
+    return returnValue;
 } /* setTime */
 
 
