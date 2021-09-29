@@ -144,7 +144,7 @@ void AnimationClockWipe::setTimeTask()
 /******************************************************************************************************************************************************
   setNextIndex()
 ******************************************************************************************************************************************************/
-bool AnimationClockWipe::setNextIndex()
+StdReturnType AnimationClockWipe::setNextIndex()
 {
     StdReturnType returnValue = E_OK;
     byte column, row;

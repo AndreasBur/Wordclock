@@ -8,14 +8,14 @@
  *  ---------------------------------------------------------------------------------------------------------------------------------------------------
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       MsgCmdClockTimeParser.h
+/**     \file       MsgCmdClockModeParser.h
  *      \brief
  *
  *      \details
  *
 ******************************************************************************************************************************************************/
-#ifndef _MSG_CMD_CLOCK_TIME_PARSER_H_
-#define _MSG_CMD_CLOCK_TIME_PARSER_H_
+#ifndef _MSG_CMD_CLOCK_MODE_PARSER_H_
+#define _MSG_CMD_CLOCK_MODE_PARSER_H_
 
 /******************************************************************************************************************************************************
  * I N C L U D E S
@@ -28,11 +28,11 @@
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
-/* MsgCmdClockTimeParser configuration parameter */
+/* MsgCmdClockModeParser configuration parameter */
 
 
-/* MsgCmdClockTimeParser parameter */
-#define MSG_CMD_CLOCK_TIME_PARSER_PARAMETER_TABLE_SIZE           3u
+/* MsgCmdClockModeParser parameter */
+#define MSG_CMD_CLOCK_MODE_PARSER_PARAMETER_TABLE_SIZE           1u
 
 
 /******************************************************************************************************************************************************
@@ -43,7 +43,7 @@
 /******************************************************************************************************************************************************
  *  C L A S S   T E M P L A T E
 ******************************************************************************************************************************************************/
-class MsgCmdClockTimeParser : public MsgParameterParser<MsgCmdClockTimeParser, MSG_CMD_CLOCK_TIME_PARSER_PARAMETER_TABLE_SIZE>
+class MsgCmdClockModeParser : public MsgParameterParser<MsgCmdClockModeParser, MSG_CMD_CLOCK_MODE_PARSER_PARAMETER_TABLE_SIZE>
 {
 /******************************************************************************************************************************************************
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
@@ -56,7 +56,6 @@ class MsgCmdClockTimeParser : public MsgParameterParser<MsgCmdClockTimeParser, M
 ******************************************************************************************************************************************************/
   private:
     friend class MsgParameterParser;
-    ModeType Mode{Clock::MODE_WESSI};
 
     static constexpr char ModeOptionShortName{'M'};
 
@@ -68,7 +67,7 @@ class MsgCmdClockTimeParser : public MsgParameterParser<MsgCmdClockTimeParser, M
     void handleParameter(char ParameterShortName, byte Argument)
     {
         if(ParameterShortName == ModeOptionShortName) {
-            Clock::getInstance().setMode(static_cast<Clock::ModeType>(Argument));
+            
         }
     }
 
@@ -82,15 +81,16 @@ class MsgCmdClockTimeParser : public MsgParameterParser<MsgCmdClockTimeParser, M
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr MsgCmdClockTimeParser(const char* Parameter) : MsgParameterParser(ParameterTable, Parameter) { }
-    ~MsgCmdClockTimeParser() { }
+    constexpr MsgCmdClockModeParser(const char* Parameter) : MsgParameterParser(ParameterTable, Parameter) { }
+    ~MsgCmdClockModeParser() { }
 
     // get methods
 
     // set methods
 
     // methods
-    void sendAnswer() const { sendAnswerParameter(ModeOptionShortName, Clock::getInstance().getMode(), false); }
+    void sendAnswer() const { }
+
     void process() const { show(); }
 };
 

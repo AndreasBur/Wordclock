@@ -92,9 +92,9 @@ void MsgCmdParser::parse()
         cmdClockModeParser.sendAnswer();
     } else if(command == COMMAND_TIME) {
         MsgCmdTimeParser cmdClockTimeParser(parameter);
-        MsgCmdTimeParser.parse();
-        MsgCmdTimeParser.process();
-        MsgCmdTimeParser.sendAnswer();
+        cmdClockTimeParser.parse();
+        cmdClockTimeParser.process();
+        cmdClockTimeParser.sendAnswer();
     } else {
         Error.send(ErrorMessage::ERROR_WRONG_COMMAND);
     }
