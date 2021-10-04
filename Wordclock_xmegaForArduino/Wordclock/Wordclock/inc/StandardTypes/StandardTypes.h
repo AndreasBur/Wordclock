@@ -228,9 +228,9 @@ template <typename VarType, typename MaskType, typename GroupType, typename ValT
 static inline void writeBitGroup(VarType& Var, MaskType BitGroupMask, GroupType BitGroupPosition, ValType Value, bool ShiftBitGroupMask)
 {
     if(ShiftBitGroupMask) {
-        Var = (Var & ~(static_cast<VarType>(BitGroupMask) << BitGroupPosition)) | (static_cast<VarType>(Value & BitGroupMask) << BitGroupPosition);
+        Var = Var & ~(static_cast<VarType>(BitGroupMask) << BitGroupPosition) | static_cast<VarType>(Value & BitGroupMask) << BitGroupPosition;
     } else {
-        Var = (Var & ~(static_cast<VarType>(BitGroupMask))) | (static_cast<VarType>(Value & BitGroupMask) << BitGroupPosition);
+        Var = Var & ~(static_cast<VarType>(BitGroupMask)) | static_cast<VarType>(Value & BitGroupMask) << BitGroupPosition;
     }
 }
 
@@ -245,7 +245,7 @@ static inline VarType readBitGroup(VarType Var, MaskType BitGroupMask)
 template <typename VarType, typename MaskType, typename ValType>
 static inline void writeBitGroup(VarType& Var, MaskType BitGroupMask, ValType Value)
 {
-    Var = (Var & ~(static_cast<VarType>(BitGroupMask))) | (static_cast<VarType>(Value & BitGroupMask));
+    Var = Var & ~(static_cast<VarType>(BitGroupMask)) | static_cast<VarType>(Value & BitGroupMask);
 }
 
 template <typename T>
