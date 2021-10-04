@@ -105,6 +105,7 @@
 		<Unit filename="Arduino/inc/Communication/Message.h" />
 		<Unit filename="Arduino/inc/Communication/MessageParser/MsgCmdAnimationClockParser.h" />
 		<Unit filename="Arduino/inc/Communication/MessageParser/MsgCmdClockModeParser.h" />
+		<Unit filename="Arduino/inc/Communication/MessageParser/MsgCmdDateParser.h" />
 		<Unit filename="Arduino/inc/Communication/MessageParser/MsgCmdDisplayBrightnessParser.h" />
 		<Unit filename="Arduino/inc/Communication/MessageParser/MsgCmdDisplayColorParser.h" />
 		<Unit filename="Arduino/inc/Communication/MessageParser/MsgCmdDisplayPixelParser.h" />

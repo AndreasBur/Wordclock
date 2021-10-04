@@ -78,20 +78,25 @@ class RealTimeClock
 
 	// get methods
     RealTimeClockTime getTime() const { return Time; }
-    uint8_t getTimeHour() const { return Time.getHour(); }
-    uint8_t getTimeMinute() const { return Time.getMinute(); }
-    uint8_t getTimeSecond() const { return Time.getSecond(); }
+    HourType getTimeHour() const { return Time.getHour(); }
+    MinuteType getTimeMinute() const { return Time.getMinute(); }
+    SecondType getTimeSecond() const { return Time.getSecond(); }
+
+    RealTimeClockDate getDate() const { return Date; }
+    YearType getDateYear() const { return Date.getYear(); }
+    MonthType getDateMonth() const { return Date.getMonth(); }
+    DayType getDateDay() const { return Date.getDay(); }
 
     // set methods
     void setTime(RealTimeClockTime sTime) { Time = sTime; }
-    StdReturnType setTimeHour(uint8_t Hour) { return Time.setHour(Hour); }
-    StdReturnType setTimeMinute(uint8_t Minute) { return Time.setMinute(Minute); }
-    StdReturnType setTimeSecond(uint8_t Second) { return Time.setSecond(Second); }
+    StdReturnType setTimeHour(HourType Hour) { return Time.setHour(Hour); }
+    StdReturnType setTimeMinute(MinuteType Minute) { return Time.setMinute(Minute); }
+    StdReturnType setTimeSecond(SecondType Second) { return Time.setSecond(Second); }
 
     void setDate(RealTimeClockDate sDate) { Date = sDate; }
-    StdReturnType setDateYear(uint16_t Year) { return Date.setYear(Year); }
-    StdReturnType setDateMonth(uint8_t Month) { return Date.setMonth(Month); }
-    StdReturnType setDateDay(uint8_t Day) { return Date.setDay(Day); }
+    StdReturnType setDateYear(YearType Year) { return Date.setYear(Year); }
+    StdReturnType setDateMonth(MonthType Month) { return Date.setMonth(Month); }
+    StdReturnType setDateDay(DayType Day) { return Date.setDay(Day); }
 
 	// methods
 };
