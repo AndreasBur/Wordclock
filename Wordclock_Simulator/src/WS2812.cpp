@@ -1,12 +1,12 @@
-#include "Simulator.h"
+#include "WS2812.h"
 #include "WS2812.h"
 #include <array>
 
-#if defined(SIMULATOR) && (defined(__APPLE__ ) || defined(__linux__))
+#if defined(WS2812) && (defined(__APPLE__ ) || defined(__linux__))
 # include "WordclockIcon.xpm"
 #endif
 
-const wxString DisplayCharacters[][SIMULATOR_DISPLAY_NUMBER_OF_COLUMNS]
+const wxString DisplayCharacters[][WS2812_DISPLAY_NUMBER_OF_COLUMNS]
 {
     wxT("E"),wxT("S"),wxT("K"),wxT("I"),wxT("S"),wxT("T"),wxT("L"),wxT("F"),wxT("Ü"),wxT("N"),wxT("F"),
     wxT("Z"),wxT("E"),wxT("H"),wxT("N"),wxT("Z"),wxT("W"),wxT("A"),wxT("N"),wxT("Z"),wxT("I"),wxT("G"),
@@ -21,16 +21,16 @@ const wxString DisplayCharacters[][SIMULATOR_DISPLAY_NUMBER_OF_COLUMNS]
 };
 
 
-BEGIN_EVENT_TABLE(Simulator, wxFrame)
-    EVT_CLOSE(Simulator::OnClose)
-    EVT_BUTTON(ID_BUTTON_SEND, Simulator::OnSend)
-    EVT_BUTTON(ID_BUTTON_CLEAR, Simulator::OnClear)
-    EVT_BUTTON(ID_BUTTON_ABOUT, Simulator::OnAbout)
-    EVT_BUTTON(ID_BUTTON_QUIT, Simulator::OnQuit)
+BEGIN_EVENT_TABLE(WS2812, wxFrame)
+    EVT_CLOSE(WS2812::OnClose)
+    EVT_BUTTON(ID_BUTTON_SEND, WS2812::OnSend)
+    EVT_BUTTON(ID_BUTTON_CLEAR, WS2812::OnClear)
+    EVT_BUTTON(ID_BUTTON_ABOUT, WS2812::OnAbout)
+    EVT_BUTTON(ID_BUTTON_QUIT, WS2812::OnQuit)
 END_EVENT_TABLE()
 
 
-Simulator::Simulator(wxWindow* parent, const wxString &title) : wxFrame(parent, -1, title)
+WS2812::WS2812(wxWindow* parent, const wxString &title) : wxFrame(parent, -1, title)
 {
     SetIcon(wxICON(WordclockIcon));
     SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DFACE));
@@ -46,7 +46,7 @@ Simulator::Simulator(wxWindow* parent, const wxString &title) : wxFrame(parent, 
     this->Layout();
 }
 
-wxBoxSizer* Simulator::createSizerAll(wxWindow* Parent)
+wxBoxSizer* WS2812::createSizerAll(wxWindow* Parent)
 {
     wxBoxSizer* SizerAll = new wxBoxSizer(wxHORIZONTAL);
     wxBoxSizer* SizerControl = createSizerControl(Parent);
@@ -60,22 +60,22 @@ wxBoxSizer* Simulator::createSizerAll(wxWindow* Parent)
     return SizerAll;
 }
 
-wxBoxSizer* Simulator::createSizerCharacters(wxWindow* Parent)
+wxBoxSizer* WS2812::createSizerCharacters(wxWindow* Parent)
 {
     wxBoxSizer* SizerCharacters = new wxBoxSizer(wxVERTICAL);
 
-    for(unsigned int Row = 0; Row < SIMULATOR_DISPLAY_NUMBER_OF_ROWS; Row++) {
+    for(unsigned int Row = 0; Row < WS2812_DISPLAY_NUMBER_OF_ROWS; Row++) {
         SizerCharacters->Add(createSizerCharacter(Parent, Row), 1, wxEXPAND, 5);
     }
 
     return SizerCharacters;
 }
 
-wxBoxSizer* Simulator::createSizerCharacter(wxWindow* Parent, int Row)
+wxBoxSizer* WS2812::createSizerCharacter(wxWindow* Parent, int Row)
 {
     wxBoxSizer* SizerCharacter = new wxBoxSizer(wxHORIZONTAL);
 
-    for(unsigned int Column = 0; Column < SIMULATOR_DISPLAY_NUMBER_OF_COLUMNS; Column++) {
+    for(unsigned int Column = 0; Column < WS2812_DISPLAY_NUMBER_OF_COLUMNS; Column++) {
         Characters[Row][Column] = new wxStaticText(Parent, wxID_ANY, DisplayCharacters[Row][Column], wxDefaultPosition, wxDefaultSize, 0);
         Characters[Row][Column]->SetFont(wxFont(wxSize(40,40), wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false));
         Characters[Row][Column]->SetForegroundColour(wxColour(*wxLIGHT_GREY));
@@ -85,7 +85,7 @@ wxBoxSizer* Simulator::createSizerCharacter(wxWindow* Parent, int Row)
     return SizerCharacter;
 }
 
-wxBoxSizer* Simulator::createSizerButton(wxWindow* Parent)
+wxBoxSizer* WS2812::createSizerButton(wxWindow* Parent)
 {
     wxBoxSizer* SizerButton = new wxBoxSizer(wxHORIZONTAL);
     wxButton* About = new wxButton(Parent, ID_BUTTON_ABOUT, wxT("&About"), wxDefaultPosition, wxDefaultSize, 0);
@@ -97,7 +97,7 @@ wxBoxSizer* Simulator::createSizerButton(wxWindow* Parent)
     return SizerButton;
 }
 
-wxBoxSizer* Simulator::createSizerControl(wxWindow* Parent)
+wxBoxSizer* WS2812::createSizerControl(wxWindow* Parent)
 {
     wxStaticBox* StaticBox = new wxStaticBox(Parent, ID_STATIC_BOX, _T("Control"));
     wxStaticBoxSizer* SizerControl = new wxStaticBoxSizer(StaticBox, wxVERTICAL);
@@ -119,12 +119,12 @@ wxBoxSizer* Simulator::createSizerControl(wxWindow* Parent)
     return SizerControl;
 }
 
-Simulator::~Simulator()
+WS2812::~WS2812()
 {
 
 }
 
-void Simulator::OnClose(wxCloseEvent &event)
+void WS2812::OnClose(wxCloseEvent &event)
 {
     //wxTheApp->Exit();
     //wxTheApp->AddPendingEvent(wxCloseEvent());
@@ -133,19 +133,19 @@ void Simulator::OnClose(wxCloseEvent &event)
     Destroy();
 }
 
-void Simulator::OnSend(wxCommandEvent &event)
+void WS2812::OnSend(wxCommandEvent &event)
 {
     if(SendBuffer.IsEmpty()) {
         SendBuffer = Input->GetValue() + _T("\n");
     }
 }
 
-void Simulator::OnClear(wxCommandEvent &event)
+void WS2812::OnClear(wxCommandEvent &event)
 {
     Output->Clear();
 }
 
-void Simulator::OnQuit(wxCommandEvent &event)
+void WS2812::OnQuit(wxCommandEvent &event)
 {
     //wxTheApp->Exit();
     //wxTheApp->AddPendingEvent(wxCloseEvent());
@@ -153,16 +153,16 @@ void Simulator::OnQuit(wxCommandEvent &event)
     Destroy();
 }
 
-void Simulator::OnAbout(wxCommandEvent &event)
+void WS2812::OnAbout(wxCommandEvent &event)
 {
-    wxMessageBox(_("Copyright Andreas Burnickl\nWordclock Simulator"));
+    wxMessageBox(_("Copyright Andreas Burnickl\nWordclock WS2812"));
 }
 
 
-StdReturnType Simulator::getPixel(byte Index, PixelType& Pixel) const
+StdReturnType WS2812::getPixel(byte Index, PixelType& Pixel) const
 {
-    byte Row = Index / SIMULATOR_DISPLAY_NUMBER_OF_COLUMNS;
-    byte Column = Index % SIMULATOR_DISPLAY_NUMBER_OF_COLUMNS;
+    byte Row = Index / WS2812_DISPLAY_NUMBER_OF_COLUMNS;
+    byte Column = Index % WS2812_DISPLAY_NUMBER_OF_COLUMNS;
 
     if (Index < WS2812_NUMBER_OF_LEDS) {
         if(Characters[Row][Column]->GetForegroundColour() == wxColor(*wxBLACK)) {
@@ -180,11 +180,11 @@ StdReturnType Simulator::getPixel(byte Index, PixelType& Pixel) const
     }
 }
 
-WS2812::PixelType Simulator::getPixelFast(byte Index) const
+WS2812::PixelType WS2812::getPixelFast(byte Index) const
 {
     PixelType Pixel{0, 0, 0};
-    byte Row = Index / SIMULATOR_DISPLAY_NUMBER_OF_COLUMNS;
-    byte Column = Index % SIMULATOR_DISPLAY_NUMBER_OF_COLUMNS;
+    byte Row = Index / WS2812_DISPLAY_NUMBER_OF_COLUMNS;
+    byte Column = Index % WS2812_DISPLAY_NUMBER_OF_COLUMNS;
 
     if(Characters[Row][Column]->GetForegroundColour() == wxColor(*wxBLACK)) {
         Pixel.Blue = 255;
@@ -198,10 +198,10 @@ WS2812::PixelType Simulator::getPixelFast(byte Index) const
     return Pixel;
 }
 
-StdReturnType Simulator::setPixel(byte Index, PixelType Pixel)
+StdReturnType WS2812::setPixel(byte Index, PixelType Pixel)
 {
-    byte Row = Index / SIMULATOR_DISPLAY_NUMBER_OF_COLUMNS;
-    byte Column = Index % SIMULATOR_DISPLAY_NUMBER_OF_COLUMNS;
+    byte Row = Index / WS2812_DISPLAY_NUMBER_OF_COLUMNS;
+    byte Column = Index % WS2812_DISPLAY_NUMBER_OF_COLUMNS;
 
     if (Index < WS2812_NUMBER_OF_LEDS) {
         if(Pixel.Red != 0 || Pixel.Green != 0 || Pixel.Blue != 0) {
@@ -215,10 +215,10 @@ StdReturnType Simulator::setPixel(byte Index, PixelType Pixel)
     }
 }
 
-StdReturnType Simulator::setPixel(byte Index, byte Red, byte Green, byte Blue)
+StdReturnType WS2812::setPixel(byte Index, byte Red, byte Green, byte Blue)
 {
-    byte Row = Index / SIMULATOR_DISPLAY_NUMBER_OF_COLUMNS;
-    byte Column = Index % SIMULATOR_DISPLAY_NUMBER_OF_COLUMNS;
+    byte Row = Index / WS2812_DISPLAY_NUMBER_OF_COLUMNS;
+    byte Column = Index % WS2812_DISPLAY_NUMBER_OF_COLUMNS;
 
     if (Index < WS2812_NUMBER_OF_LEDS) {
         if(Red != 0 || Green != 0 || Blue != 0) {
@@ -232,10 +232,10 @@ StdReturnType Simulator::setPixel(byte Index, byte Red, byte Green, byte Blue)
     }
 }
 
-void Simulator::setPixelFast(byte Index, PixelType Pixel)
+void WS2812::setPixelFast(byte Index, PixelType Pixel)
 {
-    byte Row = Index / SIMULATOR_DISPLAY_NUMBER_OF_COLUMNS;
-    byte Column = Index % SIMULATOR_DISPLAY_NUMBER_OF_COLUMNS;
+    byte Row = Index / WS2812_DISPLAY_NUMBER_OF_COLUMNS;
+    byte Column = Index % WS2812_DISPLAY_NUMBER_OF_COLUMNS;
 
     if(Index >= WS2812_NUMBER_OF_LEDS) {
         // set breakpoint to find index out of bounce calls
@@ -250,10 +250,10 @@ void Simulator::setPixelFast(byte Index, PixelType Pixel)
     }
 }
 
-void Simulator::setPixelFast(byte Index, byte Red, byte Green, byte Blue)
+void WS2812::setPixelFast(byte Index, byte Red, byte Green, byte Blue)
 {
-    byte Row = Index / SIMULATOR_DISPLAY_NUMBER_OF_COLUMNS;
-    byte Column = Index % SIMULATOR_DISPLAY_NUMBER_OF_COLUMNS;
+    byte Row = Index / WS2812_DISPLAY_NUMBER_OF_COLUMNS;
+    byte Column = Index % WS2812_DISPLAY_NUMBER_OF_COLUMNS;
 
     if(Index >= WS2812_NUMBER_OF_LEDS) {
         // set breakpoint to find index out of bounce calls
@@ -268,21 +268,21 @@ void Simulator::setPixelFast(byte Index, byte Red, byte Green, byte Blue)
     }
 }
 
-void Simulator::clearPixels()
+void WS2812::clearPixels()
 {
     setPixels(wxColour(*wxLIGHT_GREY));
 }
 
-void Simulator::setPixels(wxColor Color)
+void WS2812::setPixels(wxColor Color)
 {
-    for(unsigned int Row = 0; Row < SIMULATOR_DISPLAY_NUMBER_OF_ROWS; Row++) {
-        for(unsigned int Column = 0; Column < SIMULATOR_DISPLAY_NUMBER_OF_COLUMNS; Column++) {
+    for(unsigned int Row = 0; Row < WS2812_DISPLAY_NUMBER_OF_ROWS; Row++) {
+        for(unsigned int Column = 0; Column < WS2812_DISPLAY_NUMBER_OF_COLUMNS; Column++) {
             Characters[Row][Column]->SetForegroundColour(Color);
         }
     }
 }
 
-void Simulator::setPixels(PixelType Pixel)
+void WS2812::setPixels(PixelType Pixel)
 {
     if(Pixel.Red != 0 || Pixel.Green != 0 || Pixel.Blue != 0) {
         setPixels(wxColour(*wxBLACK));
@@ -291,28 +291,28 @@ void Simulator::setPixels(PixelType Pixel)
     }
 }
 
-void Simulator::setBrightness(byte sBrightness, bool GammaCorrection)
+void WS2812::setBrightness(byte sBrightness, bool GammaCorrection)
 {
     Brightness = sBrightness;
 
     if(Brightness == 0)
     {
-        for(unsigned int Row = 0; Row < SIMULATOR_DISPLAY_NUMBER_OF_ROWS; Row++) {
-            for(unsigned int Column = 0; Column < SIMULATOR_DISPLAY_NUMBER_OF_COLUMNS; Column++) {
+        for(unsigned int Row = 0; Row < WS2812_DISPLAY_NUMBER_OF_ROWS; Row++) {
+            for(unsigned int Column = 0; Column < WS2812_DISPLAY_NUMBER_OF_COLUMNS; Column++) {
                 Colors[Row][Column] = Characters[Row][Column]->GetForegroundColour();
             }
         }
         setPixels(wxColour(*wxLIGHT_GREY));
     } else {
-        for(unsigned int Row = 0; Row < SIMULATOR_DISPLAY_NUMBER_OF_ROWS; Row++) {
-            for(unsigned int Column = 0; Column < SIMULATOR_DISPLAY_NUMBER_OF_COLUMNS; Column++) {
+        for(unsigned int Row = 0; Row < WS2812_DISPLAY_NUMBER_OF_ROWS; Row++) {
+            for(unsigned int Column = 0; Column < WS2812_DISPLAY_NUMBER_OF_COLUMNS; Column++) {
                 Characters[Row][Column]->SetForegroundColour(Colors[Row][Column]);
             }
         }
     }
 }
 
-char Simulator::read()
+char WS2812::read()
 {
     char FirstChar{' '};
 

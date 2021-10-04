@@ -240,6 +240,7 @@
             <Value>../inc/Communication</Value>
             <Value>../inc/Communication/MessageParser</Value>
             <Value>%24(PackRepoDir)\atmel\XMEGAE_DFP\1.3.114\include\</Value>
+            <Value>../inc/RealTimeClock</Value>
           </ListValues>
         </avrgcc.compiler.directories.IncludePaths>
         <avrgcc.compiler.optimization.level>Optimize for size (-Os)</avrgcc.compiler.optimization.level>
@@ -282,6 +283,7 @@
             <Value>../inc/Communication/MessageParser</Value>
             <Value>../inc/Bit</Value>
             <Value>%24(PackRepoDir)\atmel\XMEGAE_DFP\1.3.114\include\</Value>
+            <Value>../inc/RealTimeClock</Value>
           </ListValues>
         </avrgcccpp.compiler.directories.IncludePaths>
         <avrgcccpp.compiler.optimization.OtherFlags>-fno-threadsafe-statics</avrgcccpp.compiler.optimization.OtherFlags>
@@ -388,9 +390,6 @@
     <Compile Include="inc\Communication\MessageParser\MsgCmdClockModeParser.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="inc\Communication\MessageParser\MsgCmdClockTimeParser.h">
-      <SubType>compile</SubType>
-    </Compile>
     <Compile Include="inc\Communication\MessageParser\MsgCmdDisplayBrightnessParser.h">
       <SubType>compile</SubType>
     </Compile>
@@ -452,6 +451,15 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="inc\GammaCorrection\GammaCorrection.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="inc\RealTimeClock\RealTimeClock.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="inc\RealTimeClock\RealTimeClockDate.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="inc\RealTimeClock\RealTimeClockTime.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="inc\StandardTypes\StandardTypes.h">
@@ -591,6 +599,7 @@
     <Folder Include="inc\Communication" />
     <Folder Include="inc\DisplayManager" />
     <Folder Include="inc\Bit" />
+    <Folder Include="inc\RealTimeClock" />
     <Folder Include="inc\Power" />
     <Folder Include="inc\Scheduler" />
     <Folder Include="inc\NonVolatile" />

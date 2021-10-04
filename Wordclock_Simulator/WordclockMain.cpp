@@ -1,5 +1,7 @@
 #include "WordclockMain.h"
 
+#include "RealTimeClock.h"
+
 WordclockMain::WordclockMain()
 {
     //Timer.Start(1000);

@@ -9,6 +9,7 @@
 #include "Communication.h"
 #include "BH1750.h"
 #include "Bit.h"
+#include "RealTimeClock.h"
 
 //volatile uint8_t* const PROGMEM port_to_mode_PGMdfg[] = {
     //NOT_A_PORT,

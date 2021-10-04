@@ -14,7 +14,7 @@ WordclockApp::WordclockApp() : Timer(this, TIMER_ID)
 
 bool WordclockApp::OnInit()
 {
-    Simulator::getInstance().Show();
+    WS2812::getInstance().Show();
     return true;
 }
 

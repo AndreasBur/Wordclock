@@ -8,102 +8,120 @@
  *  ---------------------------------------------------------------------------------------------------------------------------------------------------
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       ClockWords.cpp
+/**     \file       RealTimeClockTime.h
  *      \brief
  *
  *      \details
  *
- *
 ******************************************************************************************************************************************************/
-#define _CLOCKWORDS_SOURCE_
+#ifndef _REAL_TIME_CLOCK_TIME_H_
+#define _REAL_TIME_CLOCK_TIME_H_
 
 /******************************************************************************************************************************************************
  * I N C L U D E S
 ******************************************************************************************************************************************************/
-#include "ClockWords.h"
+#include "StandardTypes.h"
+#include "Arduino.h"
 
 
 /******************************************************************************************************************************************************
- *  L O C A L   C O N S T A N T   M A C R O S
+ *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
+/* RealTimeClockTime configuration parameter */
 
 
-/******************************************************************************************************************************************************
- *  L O C A L   F U N C T I O N   M A C R O S
-******************************************************************************************************************************************************/
-
-
-
-/******************************************************************************************************************************************************
- *  L O C A L   D A T A   T Y P E S   A N D   S T R U C T U R E S
-******************************************************************************************************************************************************/
+/* RealTimeClockTime parameter */
 
 
 
 /******************************************************************************************************************************************************
- * P U B L I C   F U N C T I O N S
+ *  G L O B A L   F U N C T I O N   M A C R O S
 ******************************************************************************************************************************************************/
 
+
 /******************************************************************************************************************************************************
-  Operator ==
+ *  C L A S S   T E M P L A T E
 ******************************************************************************************************************************************************/
-bool ClockWords::operator==(const ClockWords& sClockWords)
+class RealTimeClockTime
 {
-    if(ShowItIs    == sClockWords.getShowItIs()    &&
-       HourWords   == sClockWords.getHourWords()   &&
-       MinuteWords == sClockWords.getMinuteWords() )
+/******************************************************************************************************************************************************
+ *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
+******************************************************************************************************************************************************/
+  public:
+    using HourType = uint8_t;
+    using MinuteType = uint8_t;
+    using SecondType = uint8_t;
+
+/******************************************************************************************************************************************************
+ *  P R I V A T E   D A T A   A N D   F U N C T I O N S
+******************************************************************************************************************************************************/
+  private:
+    HourType Hour{0u};
+    MinuteType Minute{0u};
+    SecondType Second{0u};
+
+    static constexpr HourType HourMinValue{0u};
+    static constexpr HourType HourMaxValue{23u};
+    static constexpr MinuteType MinuteMinValue{0u};
+    static constexpr MinuteType MinuteMaxValue{59u};
+    static constexpr SecondType SecondMinValue{0u};
+    static constexpr SecondType SecondMaxValue{59u};
+
+    // functions
+
+/******************************************************************************************************************************************************
+ *  P U B L I C   F U N C T I O N S
+******************************************************************************************************************************************************/
+  public:
+    constexpr RealTimeClockTime() { }
+    constexpr RealTimeClockTime(HourType sHour, MinuteType sMinute, SecondType sSecond)
     {
-        return true;
-    } else {
-        return false;
+        setHour(sHour);
+        setMinute(sMinute);
+        setSecond(sSecond);
     }
-}
+    ~RealTimeClockTime() {}
 
-/******************************************************************************************************************************************************
-  Operator !=
-******************************************************************************************************************************************************/
-bool ClockWords::operator!=(const ClockWords& sClockWords)
-{
-    if(operator==(sClockWords)) { return false; }
-    else { return true; }
-}
+	// get methods
+    HourType getHour() const { return Hour; }
+    MinuteType getMinute() const { return Minute; }
+    SecondType getSecond() const { return Second; }
 
-/******************************************************************************************************************************************************
-  getWordsList()
-******************************************************************************************************************************************************/
-ClockWords::WordsListType ClockWords::getWordsList() const
-{
-    /* ----- Local Variables ---------------------------------------------- */
-    WordsListType clockWords;
-    byte clockWordsIndex{0};
-
-    /* ----- Implementation ----------------------------------------------- */
-    if(ShowItIs) {
-        clockWords[clockWordsIndex++] = DisplayWords::WORD_ES;
-        clockWords[clockWordsIndex++] = DisplayWords::WORD_IST;
-    }
-    for(uint8_t Index = 0; Index < CLOCK_WORDS_MAX_NUMBER_OF_MINUTE_WORDS; Index++) {
-        if(MinuteWords[Index] != DisplayWords::WORD_NONE) {
-            clockWords[clockWordsIndex++] = MinuteWords[Index];
+	// set methods
+    StdReturnType setHour(HourType sHour)
+    {
+        if(isHourValid(sHour)) {
+            Hour = sHour;
+            return E_OK;
+        } else {
+            return E_NOT_OK;
         }
     }
-    for(uint8_t Index = 0; Index < CLOCK_WORDS_MAX_NUMBER_OF_HOUR_WORDS; Index++) {
-        if(HourWords[Index] != DisplayWords::WORD_NONE) {
-            clockWords[clockWordsIndex++] = HourWords[Index];
+    StdReturnType setMinute(MinuteType sMinute)
+    {
+        if(isMinuteValid(sMinute)) {
+            Minute = sMinute;
+            return E_OK;
+        } else {
+            return E_NOT_OK; }
+    }
+    StdReturnType setSecond(SecondType sSecond)
+    {
+        if(isSecondValid(sSecond)) {
+            Second = sSecond;
+            return E_OK;
+        } else {
+            return E_NOT_OK;
         }
     }
-    for(uint8_t Index = clockWordsIndex; Index < CLOCK_WORDS_MAX_NUMBER_OF_WORDS; Index++) {
-        clockWords[Index] = DisplayWords::WORD_NONE;
-    }
-    return clockWords;
-}
 
+	// methods
+    static constexpr bool isHourValid(HourType Hour) { return (Hour >= HourMinValue) && (Hour <= HourMaxValue); }
+    static constexpr bool isMinuteValid(MinuteType Minute) { return (Minute >= MinuteMinValue) && (Minute <= MinuteMaxValue); }
+    static constexpr bool isSecondValid(SecondType Second) { return (Second >= SecondMinValue) && (Second <= SecondMaxValue);  }
+};
 
-/******************************************************************************************************************************************************
- * P R I V A T E   F U N C T I O N S
-******************************************************************************************************************************************************/
-
-
+#endif
 
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E

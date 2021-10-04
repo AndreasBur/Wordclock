@@ -40,7 +40,7 @@
 
 
 /******************************************************************************************************************************************************
- *  C L A S S   T E M P L A T E
+ *  C L A S S   M E S S A G E
 ******************************************************************************************************************************************************/
 class Message
 {
@@ -81,28 +81,28 @@ class Message
     size_t find(const char* String, size_t Position = 0u) const
     {
         const char* finding = strstr(&Buffer[Position], String);
-        if(finding == nullptr) return npos;
-        else return finding - Buffer;
+        if(finding == nullptr) { return npos; }
+        else { return finding - Buffer; }
     }
-
+    
     bool contains(char Character) const { return strchr(Buffer, Character); }
 
     size_t find(char Char, size_t position = 0u) const
     {
         const char* finding = strchr(&Buffer[position], Char);
-        if(finding == nullptr) return npos;
-        else return finding - Buffer;
+        if(finding == nullptr) { return npos; }
+        else { return finding - Buffer; }
     }
 
     StdReturnType addChar(char Char)
     {
         byte messageLength = strlen(Buffer);
-        // check for free space in Message buffer
+        // check for free space in message buffer
         if(messageLength < (MESSAGE_LENGTH - 1u))
         {
             // save new char
             Buffer[messageLength] = Char;
-            Buffer[messageLength + 1] = NullCharacter;
+            Buffer[messageLength + 1u] = NullCharacter;
             return E_OK;
         } else {
             return E_NOT_OK;

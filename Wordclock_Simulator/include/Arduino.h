@@ -2,7 +2,7 @@
 #define _ARDUINO_H_
 
 #include <string.h>
-#include "Simulator.h"
+#include "WS2812.h"
 
 typedef unsigned char byte;
 
@@ -14,7 +14,6 @@ typedef unsigned char byte;
 
 #define bitRead(value, bit) (((value) >> (bit)) & 0x01)
 
-#define Serial  Simulator::getInstance()
-//typedef Simulator Serial;
+#define Serial  WS2812::getInstance()
 
 #endif

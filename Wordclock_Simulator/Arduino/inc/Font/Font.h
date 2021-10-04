@@ -90,8 +90,7 @@ template <typename FontCharType, size_t FontTableSize> class Font
     FontCharType getCharFast(byte Index) const { return getFontTableElement(Index); }
     byte getCharWidthFast(byte Index) const { return getFontTableElement(Index).getWidth(); }
 
-    StdReturnType getChar(byte Index, FontCharType& FontChar) const
-    {
+    StdReturnType getChar(byte Index, FontCharType& FontChar) const {
         if(Index < FontTableSize) {
             FontChar = getFontTableElement(Index);
             return E_OK;
@@ -99,9 +98,8 @@ template <typename FontCharType, size_t FontTableSize> class Font
             return E_NOT_OK;
         }
     }
-    
-    StdReturnType getCharWidth(byte Index, byte& Width)
-    {
+
+    StdReturnType getCharWidth(byte Index, byte& Width) const {
         if(Index < FontTableSize) {
             Width = getFontTableElement(Index).getWidth();
             return E_OK;

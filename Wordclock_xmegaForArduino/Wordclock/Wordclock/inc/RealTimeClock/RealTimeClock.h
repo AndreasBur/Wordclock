@@ -8,102 +8,91 @@
  *  ---------------------------------------------------------------------------------------------------------------------------------------------------
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       ClockWords.cpp
+/**     \file       RealTimeClock.h
  *      \brief
  *
  *      \details
  *
- *
 ******************************************************************************************************************************************************/
-#define _CLOCKWORDS_SOURCE_
+#ifndef _REAL_TIME_CLOCK_H_
+#define _REAL_TIME_CLOCK_H_
 
 /******************************************************************************************************************************************************
  * I N C L U D E S
 ******************************************************************************************************************************************************/
-#include "ClockWords.h"
-
-
-/******************************************************************************************************************************************************
- *  L O C A L   C O N S T A N T   M A C R O S
-******************************************************************************************************************************************************/
-
+#include "StandardTypes.h"
+#include "Arduino.h"
+#include "RealTimeClockTime.h"
+#include "RealTimeClockDate.h"
 
 /******************************************************************************************************************************************************
- *  L O C A L   F U N C T I O N   M A C R O S
+ *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
+/* RealTimeClock configuration parameter */
 
 
-
-/******************************************************************************************************************************************************
- *  L O C A L   D A T A   T Y P E S   A N D   S T R U C T U R E S
-******************************************************************************************************************************************************/
+/* RealTimeClock parameter */
 
 
 
 /******************************************************************************************************************************************************
- * P U B L I C   F U N C T I O N S
+ *  G L O B A L   F U N C T I O N   M A C R O S
 ******************************************************************************************************************************************************/
 
+
 /******************************************************************************************************************************************************
-  Operator ==
+ *  C L A S S   R E A L   T I M E   C L O C K
 ******************************************************************************************************************************************************/
-bool ClockWords::operator==(const ClockWords& sClockWords)
+class RealTimeClock
 {
-    if(ShowItIs    == sClockWords.getShowItIs()    &&
-       HourWords   == sClockWords.getHourWords()   &&
-       MinuteWords == sClockWords.getMinuteWords() )
-    {
-        return true;
-    } else {
-        return false;
-    }
-}
+/******************************************************************************************************************************************************
+ *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
+******************************************************************************************************************************************************/
+  public:
+    using HourType = RealTimeClockTime::HourType;
+    using MinuteType = RealTimeClockTime::MinuteType;
+    using SecondType = RealTimeClockTime::SecondType;
+    
+    using YearType = RealTimeClockDate::YearType;
+    using MonthType = RealTimeClockDate::MonthType;
+    using DayType = RealTimeClockDate::DayType;
 
 /******************************************************************************************************************************************************
-  Operator !=
+ *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
-bool ClockWords::operator!=(const ClockWords& sClockWords)
-{
-    if(operator==(sClockWords)) { return false; }
-    else { return true; }
-}
+  private:
+    RealTimeClockDate Date;
+    RealTimeClockTime Time;
 
 /******************************************************************************************************************************************************
-  getWordsList()
+ *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
-ClockWords::WordsListType ClockWords::getWordsList() const
-{
-    /* ----- Local Variables ---------------------------------------------- */
-    WordsListType clockWords;
-    byte clockWordsIndex{0};
+  public:
+    RealTimeClock() {}
+    ~RealTimeClock() {}
 
-    /* ----- Implementation ----------------------------------------------- */
-    if(ShowItIs) {
-        clockWords[clockWordsIndex++] = DisplayWords::WORD_ES;
-        clockWords[clockWordsIndex++] = DisplayWords::WORD_IST;
-    }
-    for(uint8_t Index = 0; Index < CLOCK_WORDS_MAX_NUMBER_OF_MINUTE_WORDS; Index++) {
-        if(MinuteWords[Index] != DisplayWords::WORD_NONE) {
-            clockWords[clockWordsIndex++] = MinuteWords[Index];
-        }
-    }
-    for(uint8_t Index = 0; Index < CLOCK_WORDS_MAX_NUMBER_OF_HOUR_WORDS; Index++) {
-        if(HourWords[Index] != DisplayWords::WORD_NONE) {
-            clockWords[clockWordsIndex++] = HourWords[Index];
-        }
-    }
-    for(uint8_t Index = clockWordsIndex; Index < CLOCK_WORDS_MAX_NUMBER_OF_WORDS; Index++) {
-        clockWords[Index] = DisplayWords::WORD_NONE;
-    }
-    return clockWords;
-}
+	// get methods
+    HourType getTimeHour() const { return Time.getHour(); }
+    MinuteType getTimeMinute() const { return Time.getMinute(); }
+    SecondType getTimeSecond() const { return Time.getSecond(); }
 
+    YearType getDateYear() const { return Date.getYear(); }
+    MonthType getDateMonth() const { return Date.getMonth(); }
+    DayType getDateDay() const { return Date.getDay(); }
 
-/******************************************************************************************************************************************************
- * P R I V A T E   F U N C T I O N S
-******************************************************************************************************************************************************/
+	// set methods
+    //void setTime(Time sTime) { Time = sTime; }
+    //void setTimeHour(uint8_t Hour) { Time.Hour = Hour; }
+    //void setTimeMinute(uint8_t Minute) { Time.Minute = Minute; }
+    //void setTimeSecond(uint8_t Second) { Time.Second = Second; }
+//
+    //void setDate(Date sDate) { Date = sDate; }
+    //void setDateYear(uint16_t Year) { Date.Year = Year; }
+    //void setDateMonth(uint8_t Month) { Date.Month = Month; }
+	// methods
+};
 
-
+#endif
 
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E

@@ -73,6 +73,7 @@
 			<Add directory="Arduino/inc/WS2812" />
 			<Add directory="Arduino/inc/Communication" />
 			<Add directory="Arduino/inc/Communication/MessageParser" />
+			<Add directory="Arduino/inc/RealTimeClock" />
 		</Compiler>
 		<ResourceCompiler>
 			<Add directory="$(#wx31)/include" />
@@ -125,6 +126,8 @@
 		<Unit filename="Arduino/inc/Font/FontSprite5x8.h" />
 		<Unit filename="Arduino/inc/Font/FontTahoma10x10.h" />
 		<Unit filename="Arduino/inc/GammaCorrection/GammaCorrection.h" />
+		<Unit filename="Arduino/inc/RealTimeClock/RealTimeClockDate.h" />
+		<Unit filename="Arduino/inc/RealTimeClock/RealTimeClockTime.h" />
 		<Unit filename="Arduino/inc/StandardTypes/StandardTypes.h" />
 		<Unit filename="Arduino/inc/Transformation/Transformation.h" />
 		<Unit filename="Arduino/inc/WS2812/NeoPixel.h" />
@@ -163,12 +166,12 @@
 		<Unit filename="WordclockMain.cpp" />
 		<Unit filename="WordclockMain.h" />
 		<Unit filename="include/Arduino.h" />
-		<Unit filename="include/Simulator.h" />
+		<Unit filename="include/RealTimeClock.h" />
 		<Unit filename="include/WS2812.h" />
 		<Unit filename="resource.rc">
 			<Option compilerVar="WINDRES" />
 		</Unit>
-		<Unit filename="src/Simulator.cpp" />
+		<Unit filename="src/WS2812.cpp" />
 		<Extensions />
 	</Project>
 </CodeBlocks_project_file>

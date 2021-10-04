@@ -111,8 +111,12 @@ class MsgCmdDisplayPixelParser : public MsgParameterParser<MsgCmdDisplayPixelPar
     StateType getPixelState(bool PixelValue) const { return PixelValue ? STATE_ON : STATE_OFF; }
     bool getPixelValue(StateType PixelState) const { return (PixelState == STATE_ON) ? true : false; }
 
-    void sendAnswerIndex(bool AppendSpace) const { sendAnswerParameter(IndexOptionShortName, Index, AppendSpace); }
-    void sendAnswerState(bool AppendSpace) const { sendAnswerParameter(StateOptionShortName, Display::getInstance().getPixelFast(Index), AppendSpace); }
+    void sendAnswerIndex(bool AppendSpace) const {
+        sendAnswerParameter(IndexOptionShortName, Index, AppendSpace);
+    }
+    void sendAnswerState(bool AppendSpace) const {
+        sendAnswerParameter(StateOptionShortName, Display::getInstance().getPixelFast(Index), AppendSpace);
+    }
 
     void setPixel() const { if(State != STATE_NONE) { Display::getInstance().writePixelFast(Index, getPixelValue(State)); }}
 

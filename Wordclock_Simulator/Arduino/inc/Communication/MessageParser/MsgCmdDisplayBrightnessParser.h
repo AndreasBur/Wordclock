@@ -56,6 +56,7 @@ class MsgCmdDisplayBrightnessParser : public MsgParameterParser<MsgCmdDisplayBri
 ******************************************************************************************************************************************************/
   private:
     friend class MsgParameterParser;
+
     static constexpr char BrightnessOptionShortName{'B'};
     static constexpr char AutomaticOptionShortName{'A'};
 

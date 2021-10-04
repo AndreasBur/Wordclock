@@ -14,8 +14,8 @@
  *      \details
  *
 ******************************************************************************************************************************************************/
-#ifndef _CLOCKWORDS_H_
-#define _CLOCKWORDS_H_
+#ifndef _CLOCK_WORDS_H_
+#define _CLOCK_WORDS_H_
 
 /******************************************************************************************************************************************************
  * I N C L U D E S
@@ -32,13 +32,11 @@
 
 
 /* ClockWords parameter */
-#define CLOCKWORDS_MAX_NUMBER_OF_HOUR_WORDS          2u
-#define CLOCKWORDS_MAX_NUMBER_OF_MINUTE_WORDS        3u
+#define CLOCK_WORDS_MAX_NUMBER_OF_HOUR_WORDS          2u
+#define CLOCK_WORDS_MAX_NUMBER_OF_MINUTE_WORDS        3u
 
-#define CLOCKWORDS_IT_IS_NUMBER_OF_WORDS             2u
-#define CLOCKWORDS_MAX_NUMBER_OF_WORDS               (CLOCKWORDS_MAX_NUMBER_OF_HOUR_WORDS + \
-                                                      CLOCKWORDS_MAX_NUMBER_OF_MINUTE_WORDS + \
-                                                      CLOCKWORDS_IT_IS_NUMBER_OF_WORDS)
+#define CLOCK_WORDS_IT_IS_NUMBER_OF_WORDS             2u
+#define CLOCK_WORDS_MAX_NUMBER_OF_WORDS               (CLOCK_WORDS_MAX_NUMBER_OF_HOUR_WORDS + CLOCK_WORDS_MAX_NUMBER_OF_MINUTE_WORDS + CLOCK_WORDS_IT_IS_NUMBER_OF_WORDS)
 
 /******************************************************************************************************************************************************
  *  G L O B A L   F U N C T I O N   M A C R O S
@@ -54,10 +52,10 @@ class ClockWords
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-    using WordsListType = std::array<DisplayWords::WordIdType, CLOCKWORDS_MAX_NUMBER_OF_WORDS>;
-    using HourWordsType = std::array<DisplayWords::WordIdType, CLOCKWORDS_MAX_NUMBER_OF_HOUR_WORDS>;
-    using MinutesWordsType = std::array<DisplayWords::WordIdType, CLOCKWORDS_MAX_NUMBER_OF_MINUTE_WORDS>;
-
+    using WordsListType = std::array<DisplayWords::WordIdType, CLOCK_WORDS_MAX_NUMBER_OF_WORDS>;
+    using HourWordsType = std::array<DisplayWords::WordIdType, CLOCK_WORDS_MAX_NUMBER_OF_HOUR_WORDS>;
+    using MinutesWordsType = std::array<DisplayWords::WordIdType, CLOCK_WORDS_MAX_NUMBER_OF_MINUTE_WORDS>;
+  
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/

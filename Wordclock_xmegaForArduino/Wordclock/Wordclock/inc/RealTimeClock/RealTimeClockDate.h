@@ -8,102 +8,148 @@
  *  ---------------------------------------------------------------------------------------------------------------------------------------------------
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       ClockWords.cpp
- *      \brief
+/**     \file       Date.h
+ *      \brief      
  *
- *      \details
- *
- *
+ *      \details    
+ *                  
 ******************************************************************************************************************************************************/
-#define _CLOCKWORDS_SOURCE_
+#ifndef _REAL_TIME_CLOCK_DATE_H_
+#define _REAL_TIME_CLOCK_DATE_H_
 
 /******************************************************************************************************************************************************
  * I N C L U D E S
 ******************************************************************************************************************************************************/
-#include "ClockWords.h"
+#include "StandardTypes.h"
+#include "Arduino.h"
 
 
 /******************************************************************************************************************************************************
- *  L O C A L   C O N S T A N T   M A C R O S
+ *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
+/* Date configuration parameter */
 
 
-/******************************************************************************************************************************************************
- *  L O C A L   F U N C T I O N   M A C R O S
-******************************************************************************************************************************************************/
-
-
-
-/******************************************************************************************************************************************************
- *  L O C A L   D A T A   T Y P E S   A N D   S T R U C T U R E S
-******************************************************************************************************************************************************/
+/* Date parameter */
 
 
 
 /******************************************************************************************************************************************************
- * P U B L I C   F U N C T I O N S
+ *  G L O B A L   F U N C T I O N   M A C R O S
 ******************************************************************************************************************************************************/
 
+
 /******************************************************************************************************************************************************
-  Operator ==
+ *  C L A S S   T E M P L A T E
 ******************************************************************************************************************************************************/
-bool ClockWords::operator==(const ClockWords& sClockWords)
+class RealTimeClockDate
 {
-    if(ShowItIs    == sClockWords.getShowItIs()    &&
-       HourWords   == sClockWords.getHourWords()   &&
-       MinuteWords == sClockWords.getMinuteWords() )
+/******************************************************************************************************************************************************
+ *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
+******************************************************************************************************************************************************/
+  public:
+    enum WeekdayType {
+        WEEKDAY_MONDAY = 1u,
+        WEEKDAY_TUESDAY,
+        WEEKDAY_WEDNESDAY,
+        WEEKDAY_THURSDAY,
+        WEEKDAY_FRIDAY,
+        WEEKDAY_SATURDAY,
+        WEEKDAY_SUNDAY
+    };
+
+    //enum MonthType {
+        //MONTH_JANUARY = 1u,
+        //MONTH_FEBRUARY,
+        //MONTH_MARCH,
+        //MONTH_APRIL,
+        //MONTH_MAY,
+        //MONTH_JUNE,
+        //MONTH_JULY,
+        //MONTH_AUGUST,
+        //MONTH_SEPTEMBER,
+        //MONTH_OCTOBER,
+        //MONTH_NOVEMBER,
+        //MONTH_DEZEMBER
+    //};
+
+    using YearType = uint16_t;
+    using MonthType = uint8_t;
+    using DayType = uint8_t;
+  
+/******************************************************************************************************************************************************
+ *  P R I V A T E   D A T A   A N D   F U N C T I O N S
+******************************************************************************************************************************************************/
+  private:
+    uint16_t Year{YearMinValue};
+    uint8_t Month{MonthMinValue};
+    uint8_t Day{DayMinValue};
+    
+    static constexpr YearType YearMinValue{2000u};
+    static constexpr YearType YearMaxValue{2099u};
+    static constexpr MonthType MonthMinValue{1u};
+    static constexpr MonthType MonthMaxValue{12u};
+    static constexpr DayType DayMinValue{1u};
+    static constexpr DayType DayMaxValue{31u};
+        
+    // functions
+
+  
+/******************************************************************************************************************************************************
+ *  P U B L I C   F U N C T I O N S
+******************************************************************************************************************************************************/
+  public:
+    constexpr RealTimeClockDate() { }
+    constexpr RealTimeClockDate(YearType sYear, MonthType sMonth, DayType sDay)
     {
-        return true;
-    } else {
-        return false;
+        setYear(sYear);
+        setMonth(sMonth);
+        setDay(sDay);        
     }
-}
+    ~RealTimeClockDate() {}
 
-/******************************************************************************************************************************************************
-  Operator !=
-******************************************************************************************************************************************************/
-bool ClockWords::operator!=(const ClockWords& sClockWords)
-{
-    if(operator==(sClockWords)) { return false; }
-    else { return true; }
-}
+	// get methods
+    YearType getYear() const { return Year; }
+    //MonthType getMonth() const { return static_cast<MonthType>(Month); }
+    MonthType getMonth() const { return Month; }
+    DayType getDay() const { return Day; }
+    WeekdayType getWeekday() const {  }
 
-/******************************************************************************************************************************************************
-  getWordsList()
-******************************************************************************************************************************************************/
-ClockWords::WordsListType ClockWords::getWordsList() const
-{
-    /* ----- Local Variables ---------------------------------------------- */
-    WordsListType clockWords;
-    byte clockWordsIndex{0};
-
-    /* ----- Implementation ----------------------------------------------- */
-    if(ShowItIs) {
-        clockWords[clockWordsIndex++] = DisplayWords::WORD_ES;
-        clockWords[clockWordsIndex++] = DisplayWords::WORD_IST;
-    }
-    for(uint8_t Index = 0; Index < CLOCK_WORDS_MAX_NUMBER_OF_MINUTE_WORDS; Index++) {
-        if(MinuteWords[Index] != DisplayWords::WORD_NONE) {
-            clockWords[clockWordsIndex++] = MinuteWords[Index];
+	// set methods
+    StdReturnType setYear(YearType sYear)
+    {
+        if(isYearValid(sYear)) { 
+            Year = sYear; 
+            return E_OK; 
+        } else { 
+            return E_NOT_OK; 
         }
     }
-    for(uint8_t Index = 0; Index < CLOCK_WORDS_MAX_NUMBER_OF_HOUR_WORDS; Index++) {
-        if(HourWords[Index] != DisplayWords::WORD_NONE) {
-            clockWords[clockWordsIndex++] = HourWords[Index];
+    StdReturnType setMonth(MonthType sMonth)
+    {
+        if(isMonthValid(sMonth)) {
+            Month = sMonth;
+            return E_OK;
+        } else {
+            return E_NOT_OK; }
+    }
+    StdReturnType setDay(DayType sDay)
+    {
+        if(isDayValid(sDay)) {
+            Day = sDay;
+            return E_OK;
+        } else {
+            return E_NOT_OK; 
         }
     }
-    for(uint8_t Index = clockWordsIndex; Index < CLOCK_WORDS_MAX_NUMBER_OF_WORDS; Index++) {
-        clockWords[Index] = DisplayWords::WORD_NONE;
-    }
-    return clockWords;
-}
 
+	// methods
+    static constexpr bool isYearValid(YearType Year) { return (Year >= YearMinValue) && (Year <= YearMaxValue); }
+    static constexpr bool isMonthValid(MonthType Month) { return (Month >= MonthMinValue) && (Month <= MonthMaxValue); }
+    static constexpr bool isDayValid(DayType Day) { return (Day >= DayMinValue) && (Day <= DayMaxValue);  }
+};
 
-/******************************************************************************************************************************************************
- * P R I V A T E   F U N C T I O N S
-******************************************************************************************************************************************************/
-
-
+#endif
 
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E
