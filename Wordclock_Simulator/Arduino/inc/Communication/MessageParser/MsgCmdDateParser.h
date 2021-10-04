@@ -72,20 +72,13 @@ class MsgCmdDateParser : public MsgParameterParser<MsgCmdDateParser, MSG_CMD_DAT
     // functions
     void handleParameter(char ParameterShortName, byte Argument)
     {
-
-        if(ParameterShortName == MonthOptionShortName) {
-            setMonth(Argument);
-        }
-        if(ParameterShortName == DayOptionShortName) {
-            setDay(Argument);
-        }
+        if(ParameterShortName == MonthOptionShortName) { setMonth(static_cast<MonthType>(Argument)); }
+        if(ParameterShortName == DayOptionShortName) { setDay(Argument); }
     }
 
 	void handleParameter(char ParameterShortName, uint16_t Argument)
 	{
-		if(ParameterShortName == YearOptionShortName) {
-            setYear(Argument);
-        }
+		if(ParameterShortName == YearOptionShortName) { setYear(Argument); }
 	}
 
     void sendAnswerYear(bool AppendSpace) const {
@@ -102,12 +95,10 @@ class MsgCmdDateParser : public MsgParameterParser<MsgCmdDateParser, MSG_CMD_DAT
         StdReturnType returnValue = RealTimeClock::getInstance().setDateYear(Year);
         Error.checkReturnValueAndSend(YearOptionShortName, returnValue, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNCE);
     }
-
     void setMonth(MonthType Month) const {
         StdReturnType returnValue = RealTimeClock::getInstance().setDateMonth(Month);
         Error.checkReturnValueAndSend(MonthOptionShortName, returnValue, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNCE);
     }
-
     void setDay(DayType Day) const {
         StdReturnType returnValue = RealTimeClock::getInstance().setDateDay(Day);
         Error.checkReturnValueAndSend(DayOptionShortName, returnValue, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNCE);

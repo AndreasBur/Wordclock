@@ -55,6 +55,7 @@ class RealTimeClock
     using YearType = RealTimeClockDate::YearType;
     using MonthType = RealTimeClockDate::MonthType;
     using DayType = RealTimeClockDate::DayType;
+    using WeekdayType = RealTimeClockDate::WeekdayType;
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
@@ -86,6 +87,7 @@ class RealTimeClock
     YearType getDateYear() const { return Date.getYear(); }
     MonthType getDateMonth() const { return Date.getMonth(); }
     DayType getDateDay() const { return Date.getDay(); }
+    WeekdayType getDateWeekday() const { return Date.getWeekday(); }
 
     // set methods
     void setTime(RealTimeClockTime sTime) { Time = sTime; }
