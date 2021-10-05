@@ -22,8 +22,7 @@
 ******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Arduino.h"
-#include "RealTimeClockTime.h"
-#include "RealTimeClockDate.h"
+#include "ClockDateTime.h"
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
@@ -48,22 +47,20 @@ class RealTimeClock
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-    using HourType = RealTimeClockTime::HourType;
-    using MinuteType = RealTimeClockTime::MinuteType;
-    using SecondType = RealTimeClockTime::SecondType;
+    using HourType = ClockDateTime::HourType;
+    using MinuteType = ClockDateTime::MinuteType;
+    using SecondType = ClockDateTime::SecondType;
 
-    using YearType = RealTimeClockDate::YearType;
-    using MonthType = RealTimeClockDate::MonthType;
-    using DayType = RealTimeClockDate::DayType;
-    using WeekdayType = RealTimeClockDate::WeekdayType;
+    using YearType = ClockDateTime::YearType;
+    using MonthType = ClockDateTime::MonthType;
+    using DayType = ClockDateTime::DayType;
+    using WeekdayType = ClockDateTime::WeekdayType;
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    RealTimeClockTime Time;
-    RealTimeClockDate Date;
-
+    ClockDateTime DateTime;
     // functions
     constexpr RealTimeClock() {}
     ~RealTimeClock() {}
@@ -78,27 +75,15 @@ class RealTimeClock
     }
 
 	// get methods
-    RealTimeClockTime getTime() const { return Time; }
-    HourType getTimeHour() const { return Time.getHour(); }
-    MinuteType getTimeMinute() const { return Time.getMinute(); }
-    SecondType getTimeSecond() const { return Time.getSecond(); }
+	ClockDateTime getDateTime() const { return DateTime; }
+    ClockTime getTime() const { return DateTime.getTime(); }
+    ClockDate getDate() const { return DateTime.getDate(); }
 
-    RealTimeClockDate getDate() const { return Date; }
-    YearType getDateYear() const { return Date.getYear(); }
-    MonthType getDateMonth() const { return Date.getMonth(); }
-    DayType getDateDay() const { return Date.getDay(); }
-    WeekdayType getDateWeekday() const { return Date.getWeekday(); }
 
     // set methods
-    void setTime(RealTimeClockTime sTime) { Time = sTime; }
-    StdReturnType setTimeHour(HourType Hour) { return Time.setHour(Hour); }
-    StdReturnType setTimeMinute(MinuteType Minute) { return Time.setMinute(Minute); }
-    StdReturnType setTimeSecond(SecondType Second) { return Time.setSecond(Second); }
-
-    void setDate(RealTimeClockDate sDate) { Date = sDate; }
-    StdReturnType setDateYear(YearType Year) { return Date.setYear(Year); }
-    StdReturnType setDateMonth(MonthType Month) { return Date.setMonth(Month); }
-    StdReturnType setDateDay(DayType Day) { return Date.setDay(Day); }
+    void setDateTime(ClockDateTime sDateTime) { DateTime = sDateTime; }
+    void setTime(ClockTime Time) { DateTime.setTime(Time); }
+    void setDate(ClockDate Date) { DateTime.setDate(Date); }
 
 	// methods
 };

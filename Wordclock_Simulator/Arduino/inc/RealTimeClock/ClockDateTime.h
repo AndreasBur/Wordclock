@@ -8,30 +8,30 @@
  *  ---------------------------------------------------------------------------------------------------------------------------------------------------
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       Date.h
+/**     \file       ClockDateTime.h
  *      \brief
  *
  *      \details
  *
 ******************************************************************************************************************************************************/
-#ifndef _REAL_TIME_CLOCK_DATE_H_
-#define _REAL_TIME_CLOCK_DATE_H_
+#ifndef _CLOCK_DATE_TIME_H_
+#define _CLOCK_DATE_TIME_H_
 
 /******************************************************************************************************************************************************
  * I N C L U D E S
 ******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Arduino.h"
-
+#include "ClockDate.h"
+#include "ClockTime.h"
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
-/* Date configuration parameter */
+/* ClockDateTime configuration parameter */
 
 
-/* Date parameter */
-
+/* ClockDateTime parameter */
 
 
 /******************************************************************************************************************************************************
@@ -40,116 +40,64 @@
 
 
 /******************************************************************************************************************************************************
- *  C L A S S   T E M P L A T E
+ *  C L A S S   R E A L   T I M E   C L O C K
 ******************************************************************************************************************************************************/
-class RealTimeClockDate
+class ClockDateTime
 {
 /******************************************************************************************************************************************************
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-    enum WeekdayType {
-        WEEKDAY_SUNDAY = 0u,
-        WEEKDAY_MONDAY,
-        WEEKDAY_TUESDAY,
-        WEEKDAY_WEDNESDAY,
-        WEEKDAY_THURSDAY,
-        WEEKDAY_FRIDAY,
-        WEEKDAY_SATURDAY,
-    };
+    using HourType = ClockTime::HourType;
+    using MinuteType = ClockTime::MinuteType;
+    using SecondType = ClockTime::SecondType;
 
-    enum MonthType {
-        MONTH_JANUARY = 1u,
-        MONTH_FEBRUARY,
-        MONTH_MARCH,
-        MONTH_APRIL,
-        MONTH_MAY,
-        MONTH_JUNE,
-        MONTH_JULY,
-        MONTH_AUGUST,
-        MONTH_SEPTEMBER,
-        MONTH_OCTOBER,
-        MONTH_NOVEMBER,
-        MONTH_DEZEMBER
-    };
-
-    using YearType = uint16_t;
-    //using MonthType = uint8_t;
-    using DayType = uint8_t;
+    using YearType = ClockDate::YearType;
+    using MonthType = ClockDate::MonthType;
+    using DayType = ClockDate::DayType;
+    using WeekdayType = ClockDate::WeekdayType;
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    YearType Year{YearMinValue};
-    MonthType Month{MonthMinValue};
-    DayType Day{DayMinValue};
-
-    static constexpr YearType YearMinValue{2000u};
-    static constexpr YearType YearMaxValue{2099u};
-    static constexpr MonthType MonthMinValue{MONTH_JANUARY};
-    static constexpr MonthType MonthMaxValue{MONTH_DEZEMBER};
-    static constexpr DayType DayMinValue{1u};
-    static constexpr DayType DayMaxValue{31u};
+    ClockTime Time;
+    ClockDate Date;
 
     // functions
-    static constexpr DayType getWeekday(YearType Year, MonthType Month, DayType Day) {
-        return (Day+=Month < 3 ? Year-- : Year-2, 23*Month/9+Day+4+Year/4-Year/100+Year/400)%7;
-    }
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr RealTimeClockDate() { }
-    constexpr RealTimeClockDate(YearType sYear, MonthType sMonth, DayType sDay)
-    {
-        setYear(sYear);
-        setMonth(sMonth);
-        setDay(sDay);
-    }
-    ~RealTimeClockDate() {}
+    constexpr ClockDateTime() {}
+    ~ClockDateTime() {}
 
 	// get methods
-    YearType getYear() const { return Year; }
-    MonthType getMonth() const { return Month; }
-    DayType getDay() const { return Day; }
-    WeekdayType getWeekday() const {
-        return static_cast<WeekdayType>(getWeekday(Year, Month, Day));
-    }
+    ClockTime getTime() const { return Time; }
+    HourType getTimeHour() const { return Time.getHour(); }
+    MinuteType getTimeMinute() const { return Time.getMinute(); }
+    SecondType getTimeSecond() const { return Time.getSecond(); }
 
-	// set methods
-    StdReturnType setYear(YearType sYear)
-    {
-        if(isYearValid(sYear)) {
-            Year = sYear;
-            return E_OK;
-        } else {
-            return E_NOT_OK;
-        }
-    }
-    StdReturnType setMonth(MonthType sMonth)
-    {
-        if(isMonthValid(sMonth)) {
-            Month = sMonth;
-            return E_OK;
-        } else {
-            return E_NOT_OK; }
-    }
-    StdReturnType setDay(DayType sDay)
-    {
-        if(isDayValid(sDay)) {
-            Day = sDay;
-            return E_OK;
-        } else {
-            return E_NOT_OK;
-        }
-    }
+    ClockDate getDate() const { return Date; }
+    YearType getDateYear() const { return Date.getYear(); }
+    MonthType getDateMonth() const { return Date.getMonth(); }
+    DayType getDateDay() const { return Date.getDay(); }
+    WeekdayType getDateWeekday() const { return Date.getWeekday(); }
+
+    // set methods
+    void setTime(ClockTime sTime) { Time = sTime; }
+    StdReturnType setTimeHour(HourType Hour) { return Time.setHour(Hour); }
+    StdReturnType setTimeMinute(MinuteType Minute) { return Time.setMinute(Minute); }
+    StdReturnType setTimeSecond(SecondType Second) { return Time.setSecond(Second); }
+
+    void setDate(ClockDate sDate) { Date = sDate; }
+    StdReturnType setDateYear(YearType Year) { return Date.setYear(Year); }
+    StdReturnType setDateMonth(MonthType Month) { return Date.setMonth(Month); }
+    StdReturnType setDateDay(DayType Day) { return Date.setDay(Day); }
 
 	// methods
-    static constexpr bool isYearValid(YearType Year) { return (Year >= YearMinValue) && (Year <= YearMaxValue); }
-    static constexpr bool isMonthValid(MonthType Month) { return (Month >= MonthMinValue) && (Month <= MonthMaxValue); }
-    static constexpr bool isDayValid(DayType Day) { return (Day >= DayMinValue) && (Day <= DayMaxValue); }
+
 };
 
 #endif

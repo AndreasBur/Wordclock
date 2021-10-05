@@ -8,31 +8,30 @@
  *  ---------------------------------------------------------------------------------------------------------------------------------------------------
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       MsgCmdTimeParser.h
+/**     \file       ClockDate.h
  *      \brief
  *
  *      \details
  *
 ******************************************************************************************************************************************************/
-#ifndef _MSG_CMD_TIME_PARSER_H_
-#define _MSG_CMD_TIME_PARSER_H_
+#ifndef _CLOCK_DATE_H_
+#define _CLOCK_DATE_H_
 
 /******************************************************************************************************************************************************
  * I N C L U D E S
 ******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Arduino.h"
-#include "MsgParameterParser.h"
-#include "RealTimeClock.h"
+
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
-/* MsgCmdTimeParser configuration parameter */
+/* ClockDate configuration parameter */
 
 
-/* MsgCmdTimeParser parameter */
-#define MSG_CMD_TIME_PARSER_PARAMETER_TABLE_SIZE           3u
+/* ClockDate parameter */
+
 
 
 /******************************************************************************************************************************************************
@@ -43,98 +42,114 @@
 /******************************************************************************************************************************************************
  *  C L A S S   T E M P L A T E
 ******************************************************************************************************************************************************/
-class MsgCmdTimeParser : public MsgParameterParser<MsgCmdTimeParser, MSG_CMD_TIME_PARSER_PARAMETER_TABLE_SIZE>
+class ClockDate
 {
 /******************************************************************************************************************************************************
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-    using HourType = RealTimeClock::HourType;
-    using MinuteType = RealTimeClock::MinuteType;
-    using SecondType = RealTimeClock::SecondType;
+    enum WeekdayType {
+        WEEKDAY_SUNDAY = 0u,
+        WEEKDAY_MONDAY,
+        WEEKDAY_TUESDAY,
+        WEEKDAY_WEDNESDAY,
+        WEEKDAY_THURSDAY,
+        WEEKDAY_FRIDAY,
+        WEEKDAY_SATURDAY,
+    };
+
+    enum MonthType {
+        MONTH_JANUARY = 1u,
+        MONTH_FEBRUARY,
+        MONTH_MARCH,
+        MONTH_APRIL,
+        MONTH_MAY,
+        MONTH_JUNE,
+        MONTH_JULY,
+        MONTH_AUGUST,
+        MONTH_SEPTEMBER,
+        MONTH_OCTOBER,
+        MONTH_NOVEMBER,
+        MONTH_DEZEMBER
+    };
+
+    using YearType = uint16_t;
+    //using MonthType = uint8_t;
+    using DayType = uint8_t;
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    friend class MsgParameterParser;
-    ClockTime Time;
+    YearType Year{YearMinValue};
+    MonthType Month{MonthMinValue};
+    DayType Day{DayMinValue};
 
-    static constexpr char HourOptionShortName{'H'};
-    static constexpr char MinuteOptionShortName{'M'};
-    static constexpr char SecondOptionShortName{'S'};
-
-    static constexpr ParameterTableType ParameterTable PROGMEM {
-        ParameterTableElementType(HourOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8),
-        ParameterTableElementType(MinuteOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8),
-        ParameterTableElementType(SecondOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8)
-    };
+    static constexpr YearType YearMinValue{2000u};
+    static constexpr YearType YearMaxValue{2099u};
+    static constexpr MonthType MonthMinValue{MONTH_JANUARY};
+    static constexpr MonthType MonthMaxValue{MONTH_DEZEMBER};
+    static constexpr DayType DayMinValue{1u};
+    static constexpr DayType DayMaxValue{31u};
 
     // functions
-    void handleParameter(char ParameterShortName, byte Argument)
-    {
-        if(ParameterShortName == HourOptionShortName) {
-            setHour(Argument);
-        }
-        if(ParameterShortName == MinuteOptionShortName) {
-            setMinute(Argument);
-        }
-        if(ParameterShortName == SecondOptionShortName) {
-            setSecond(Argument);
-        }
-    }
-
-    void sendAnswerHour(bool AppendSpace) const {
-        sendAnswerParameter(HourOptionShortName, Time.getHour(), AppendSpace);
-    }
-    void sendAnswerMinute(bool AppendSpace) const {
-        sendAnswerParameter(MinuteOptionShortName, Time.getMinute(), AppendSpace);
-    }
-    void sendAnswerSecond(bool AppendSpace) const {
-        sendAnswerParameter(SecondOptionShortName, Time.getSecond(), AppendSpace);
-    }
-
-    void setHour(HourType Hour) {
-        StdReturnType returnValue = Time.setHour(Hour);
-        Error.checkReturnValueAndSend(HourOptionShortName, returnValue, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNCE);
-    }
-
-    void setMinute(MinuteType Minute) {
-        StdReturnType returnValue = Time.setMinute(Minute);
-        Error.checkReturnValueAndSend(MinuteOptionShortName, returnValue, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNCE);
-    }
-
-    void setSecond(SecondType Second) {
-        StdReturnType returnValue = Time.setSecond(Second);
-        Error.checkReturnValueAndSend(SecondOptionShortName, returnValue, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNCE);
+    static constexpr DayType getWeekday(YearType Year, MonthType Month, DayType Day) {
+        return (Day+=Month < 3 ? Year-- : Year-2, 23*Month/9+Day+4+Year/4-Year/100+Year/400)%7;
     }
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr MsgCmdTimeParser(const char* Parameter) : MsgParameterParser(ParameterTable, Parameter) {
-        Time = RealTimeClock::getInstance().getTime();
-    }
-    ~MsgCmdTimeParser() { }
-
-    // get methods
-
-    // set methods
-
-    // methods
-    void sendAnswer() const
+    constexpr ClockDate() { }
+    constexpr ClockDate(YearType sYear, MonthType sMonth, DayType sDay)
     {
-        sendAnswerHour(true);
-        sendAnswerMinute(true);
-        sendAnswerSecond(false);
+        setYear(sYear);
+        setMonth(sMonth);
+        setDay(sDay);
+    }
+    ~ClockDate() {}
+
+	// get methods
+    YearType getYear() const { return Year; }
+    MonthType getMonth() const { return Month; }
+    DayType getDay() const { return Day; }
+    WeekdayType getWeekday() const {
+        return static_cast<WeekdayType>(getWeekday(Year, Month, Day));
     }
 
-    void process()
+	// set methods
+    StdReturnType setYear(YearType sYear)
     {
-        RealTimeClock::getInstance().setTime(Time);
-        Time = RealTimeClock::getInstance().getTime();
+        if(isYearValid(sYear)) {
+            Year = sYear;
+            return E_OK;
+        } else {
+            return E_NOT_OK;
+        }
     }
+    StdReturnType setMonth(MonthType sMonth)
+    {
+        if(isMonthValid(sMonth)) {
+            Month = sMonth;
+            return E_OK;
+        } else {
+            return E_NOT_OK; }
+    }
+    StdReturnType setDay(DayType sDay)
+    {
+        if(isDayValid(sDay)) {
+            Day = sDay;
+            return E_OK;
+        } else {
+            return E_NOT_OK;
+        }
+    }
+
+	// methods
+    static constexpr bool isYearValid(YearType Year) { return (Year >= YearMinValue) && (Year <= YearMaxValue); }
+    static constexpr bool isMonthValid(MonthType Month) { return (Month >= MonthMinValue) && (Month <= MonthMaxValue); }
+    static constexpr bool isDayValid(DayType Day) { return (Day >= DayMinValue) && (Day <= DayMaxValue); }
 };
 
 #endif

@@ -58,6 +58,7 @@ class MsgCmdDateParser : public MsgParameterParser<MsgCmdDateParser, MSG_CMD_DAT
 ******************************************************************************************************************************************************/
   private:
     friend class MsgParameterParser;
+    ClockDate Date;
 
     static constexpr char YearOptionShortName{'Y'};
     static constexpr char MonthOptionShortName{'M'};
@@ -70,51 +71,45 @@ class MsgCmdDateParser : public MsgParameterParser<MsgCmdDateParser, MSG_CMD_DAT
     };
 
     // functions
-    void handleParameter(char ParameterShortName, byte Argument)
-    {
+    void handleParameter(char ParameterShortName, byte Argument) {
         if(ParameterShortName == MonthOptionShortName) { setMonth(static_cast<MonthType>(Argument)); }
         if(ParameterShortName == DayOptionShortName) { setDay(Argument); }
     }
 
-	void handleParameter(char ParameterShortName, uint16_t Argument)
-	{
+	void handleParameter(char ParameterShortName, uint16_t Argument) {
 		if(ParameterShortName == YearOptionShortName) { setYear(Argument); }
 	}
 
     void sendAnswerYear(bool AppendSpace) const {
-        sendAnswerParameter(YearOptionShortName, RealTimeClock::getInstance().getDateYear(), AppendSpace);
+        sendAnswerParameter(YearOptionShortName, Date.getYear(), AppendSpace);
     }
     void sendAnswerMonth(bool AppendSpace) const {
-        sendAnswerParameter(MonthOptionShortName, RealTimeClock::getInstance().getDateMonth(), AppendSpace);
+        sendAnswerParameter(MonthOptionShortName, Date.getMonth(), AppendSpace);
     }
     void sendAnswerDay(bool AppendSpace) const {
-        sendAnswerParameter(DayOptionShortName, RealTimeClock::getInstance().getDateDay(), AppendSpace);
+        sendAnswerParameter(DayOptionShortName, Date.getDay(), AppendSpace);
     }
 
-    void setYear(YearType Year) const {
-        StdReturnType returnValue = RealTimeClock::getInstance().setDateYear(Year);
+    void setYear(YearType Year)  {
+        StdReturnType returnValue =  Date.setYear(Year);
         Error.checkReturnValueAndSend(YearOptionShortName, returnValue, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNCE);
     }
-    void setMonth(MonthType Month) const {
-        StdReturnType returnValue = RealTimeClock::getInstance().setDateMonth(Month);
+    void setMonth(MonthType Month)  {
+        StdReturnType returnValue = Date.setMonth(Month);
         Error.checkReturnValueAndSend(MonthOptionShortName, returnValue, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNCE);
     }
-    void setDay(DayType Day) const {
-        StdReturnType returnValue = RealTimeClock::getInstance().setDateDay(Day);
+    void setDay(DayType Day)  {
+        StdReturnType returnValue = Date.setDay(Day);
         Error.checkReturnValueAndSend(DayOptionShortName, returnValue, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNCE);
-    }
-
-    void show() const
-    {
-        StdReturnType returnValue = Clock::getInstance().show();
-        Error.checkReturnValueAndSend(ErrorMessage::API_CLOCK_SHOW, returnValue, ErrorMessage::ERROR_DISPLAY_PENDING);
     }
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr MsgCmdDateParser(const char* Parameter) : MsgParameterParser(ParameterTable, Parameter) { }
+    constexpr MsgCmdDateParser(const char* Parameter) : MsgParameterParser(ParameterTable, Parameter) {
+        Date = RealTimeClock::getInstance().getDate();
+    }
     ~MsgCmdDateParser() { }
 
     // get methods
@@ -129,9 +124,10 @@ class MsgCmdDateParser : public MsgParameterParser<MsgCmdDateParser, MSG_CMD_DAT
         sendAnswerDay(false);
     }
 
-    void process() const
+    void process()
     {
-        show();
+        RealTimeClock::getInstance().setDate(Date);
+        Date = RealTimeClock::getInstance().getDate();
     }
 };
 

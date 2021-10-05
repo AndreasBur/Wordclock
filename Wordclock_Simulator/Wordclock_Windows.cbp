@@ -127,8 +127,9 @@
 		<Unit filename="Arduino/inc/Font/FontSprite5x8.h" />
 		<Unit filename="Arduino/inc/Font/FontTahoma10x10.h" />
 		<Unit filename="Arduino/inc/GammaCorrection/GammaCorrection.h" />
-		<Unit filename="Arduino/inc/RealTimeClock/RealTimeClockDate.h" />
-		<Unit filename="Arduino/inc/RealTimeClock/RealTimeClockTime.h" />
+		<Unit filename="Arduino/inc/RealTimeClock/ClockDate.h" />
+		<Unit filename="Arduino/inc/RealTimeClock/ClockDateTime.h" />
+		<Unit filename="Arduino/inc/RealTimeClock/ClockTime.h" />
 		<Unit filename="Arduino/inc/StandardTypes/StandardTypes.h" />
 		<Unit filename="Arduino/inc/Transformation/Transformation.h" />
 		<Unit filename="Arduino/inc/WS2812/NeoPixel.h" />

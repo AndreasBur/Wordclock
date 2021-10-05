@@ -26603,7 +26603,7 @@
 	"Message.h"
 	"ErrorMessage.h"
 
-1632926921 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\communication\messageparser\msgcmdparser.cpp
+1633359307 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\communication\messageparser\msgcmdparser.cpp
 	"MsgCmdParser.h"
 	"MsgCmdRemoteProcedureCallParser.h"
 	"MsgCmdDisplayColorParser.h"
@@ -26612,6 +26612,7 @@
 	"MsgCmdClockModeParser.h"
 	"MsgCmdAnimationClockParser.h"
 	"MsgCmdTimeParser.h"
+	"MsgCmdDateParser.h"
 
 1625566534 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\communication\messageparser\msgcmddisplaycolorparser.h
 	"StandardTypes.h"
@@ -26851,7 +26852,7 @@
 	"DisplayCharacters.h"
 	"Display.h"
 
-1633357620 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\communication\messageparser\msgcmdtimeparser.h
+1633440175 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\communication\messageparser\msgcmdtimeparser.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"MsgParameterParser.h"
@@ -26867,11 +26868,10 @@
 	<array>
 	"WordclockIcon.xpm"
 
-1633359513 c:\users\virskl\documents\github\wordclock\wordclock_simulator\include\realtimeclock.h
+1633439961 c:\users\virskl\documents\github\wordclock\wordclock_simulator\include\realtimeclock.h
 	"StandardTypes.h"
 	"Arduino.h"
-	"RealTimeClockTime.h"
-	"RealTimeClockDate.h"
+	"ClockDateTime.h"
 
 1633354586 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\realtimeclock\time.h
 	"StandardTypes.h"
@@ -26885,7 +26885,7 @@
 	"StandardTypes.h"
 	"Arduino.h"
 
-1633357056 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\realtimeclock\realtimeclockdate.h
+1633420338 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\realtimeclock\realtimeclockdate.h
 	"StandardTypes.h"
 	"Arduino.h"
 
@@ -26920,4 +26920,24 @@
 	"WS2812.h"
 	<array>
 	"WordclockIcon.xpm"
+
+1633440188 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\communication\messageparser\msgcmddateparser.h
+	"StandardTypes.h"
+	"Arduino.h"
+	"MsgParameterParser.h"
+	"RealTimeClock.h"
+
+1633439934 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\realtimeclock\clockdatetime.h
+	"StandardTypes.h"
+	"Arduino.h"
+	"ClockDate.h"
+	"ClockTime.h"
+
+1633438792 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\realtimeclock\clockdate.h
+	"StandardTypes.h"
+	"Arduino.h"
+
+1633438397 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\realtimeclock\clocktime.h
+	"StandardTypes.h"
+	"Arduino.h"
 
