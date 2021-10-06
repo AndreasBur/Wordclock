@@ -75,6 +75,9 @@ class DS3231
     static constexpr byte TimeDateNumberOfBytes{TimeNumberOfBytes + DateNumberOfBytes};
     
     // functions
+	uint8_t convBinToBcd(uint8_t Value) { return Value + 6u * (Value / 10u); }
+	uint8_t convBcdToBin(uint8_t Value) { return Value - 6u * (Value >> 4u); }
+	
     ClockDateTime readDateTime() const {
         ClockDateTime dateTime;
         dateTime.setTime(readTime());
@@ -87,7 +90,7 @@ class DS3231
         ClockDate date;
         date.setDay(Wire.read());
         date.setMonth(static_cast<ClockDate::MonthType>(Wire.read()));
-        date.setYear(Wire.read());
+        date.setYear(Wire.read() + 2000u);
         return date;
     }
     
