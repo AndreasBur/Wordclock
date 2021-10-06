@@ -8,29 +8,31 @@
  *  ---------------------------------------------------------------------------------------------------------------------------------------------------
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       RealTimeClock.h
+/**     \file       ClockDate.h
  *      \brief
  *
  *      \details
  *
 ******************************************************************************************************************************************************/
-#ifndef _REAL_TIME_CLOCK_H_
-#define _REAL_TIME_CLOCK_H_
+#ifndef _CLOCK_DATE_H_
+#define _CLOCK_DATE_H_
 
 /******************************************************************************************************************************************************
  * I N C L U D E S
 ******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Arduino.h"
-#include "DS3231.h"
+
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
-/* RealTimeClock configuration parameter */
+/* ClockDate configuration parameter */
 
 
-/* RealTimeClock parameter */
+/* ClockDate parameter */
+
+
 
 /******************************************************************************************************************************************************
  *  G L O B A L   F U N C T I O N   M A C R O S
@@ -38,53 +40,116 @@
 
 
 /******************************************************************************************************************************************************
- *  C L A S S   R E A L   T I M E   C L O C K
+ *  C L A S S   T E M P L A T E
 ******************************************************************************************************************************************************/
-class RealTimeClock
+class ClockDate
 {
 /******************************************************************************************************************************************************
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-    using HourType = ClockDateTime::HourType;
-    using MinuteType = ClockDateTime::MinuteType;
-    using SecondType = ClockDateTime::SecondType;
+    enum WeekdayType {
+        WEEKDAY_SUNDAY = 0u,
+        WEEKDAY_MONDAY,
+        WEEKDAY_TUESDAY,
+        WEEKDAY_WEDNESDAY,
+        WEEKDAY_THURSDAY,
+        WEEKDAY_FRIDAY,
+        WEEKDAY_SATURDAY,
+    };
 
-    using YearType = ClockDateTime::YearType;
-    using MonthType = ClockDateTime::MonthType;
-    using DayType = ClockDateTime::DayType;
-    using WeekdayType = ClockDateTime::WeekdayType;
+    enum MonthType {
+        MONTH_JANUARY = 1u,
+        MONTH_FEBRUARY,
+        MONTH_MARCH,
+        MONTH_APRIL,
+        MONTH_MAY,
+        MONTH_JUNE,
+        MONTH_JULY,
+        MONTH_AUGUST,
+        MONTH_SEPTEMBER,
+        MONTH_OCTOBER,
+        MONTH_NOVEMBER,
+        MONTH_DEZEMBER
+    };
+
+    using YearType = uint16_t;
+    //using MonthType = uint8_t;
+    using DayType = uint8_t;
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    DS3231 Rtc;
+    YearType Year{YearMinValue};
+    MonthType Month{MonthMinValue};
+    DayType Day{DayMinValue};
+
+    static constexpr YearType YearMinValue{2000u};
+    static constexpr YearType YearMaxValue{2099u};
+    static constexpr MonthType MonthMinValue{MONTH_JANUARY};
+    static constexpr MonthType MonthMaxValue{MONTH_DEZEMBER};
+    static constexpr DayType DayMinValue{1u};
+    static constexpr DayType DayMaxValue{31u};
+
     // functions
-    constexpr RealTimeClock() {}
-    ~RealTimeClock() {}
+    static constexpr DayType getWeekday(YearType Year, MonthType Month, DayType Day) {
+        return (Day+=Month < 3 ? Year-- : Year-2, 23*Month/9+Day+4+Year/4-Year/100+Year/400)%7;
+    }
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    static RealTimeClock& getInstance() {
-        static RealTimeClock singletonInstance;
-        return singletonInstance;
+    constexpr ClockDate() { }
+    constexpr ClockDate(YearType sYear, MonthType sMonth, DayType sDay)
+    {
+        setYear(sYear);
+        setMonth(sMonth);
+        setDay(sDay);
     }
+    ~ClockDate() {}
 
 	// get methods
-	ClockDateTime getDateTime() const { return Rtc.getDateTime(); }
-    ClockTime getTime() const { return Rtc.getTime(); }
-    ClockDate getDate() const { return Rtc.getDate(); }
+    YearType getYear() const { return Year; }
+    MonthType getMonth() const { return Month; }
+    DayType getDay() const { return Day; }
+    WeekdayType getWeekday() const {
+        return static_cast<WeekdayType>(getWeekday(Year, Month, Day));
+    }
 
-
-    // set methods
-    void setDateTime(ClockDateTime DateTime) { Rtc.setDateTime(DateTime); }
-    void setTime(ClockTime Time) { Rtc.setTime(Time); }
-    void setDate(ClockDate Date) { Rtc.setDate(Date); }
+	// set methods
+    StdReturnType setYear(YearType sYear)
+    {
+        if(isYearValid(sYear)) {
+            Year = sYear;
+            return E_OK;
+        } else {
+            return E_NOT_OK;
+        }
+    }
+    StdReturnType setMonth(MonthType sMonth)
+    {
+        if(isMonthValid(sMonth)) {
+            Month = sMonth;
+            return E_OK;
+        } else {
+            return E_NOT_OK; }
+    }
+    StdReturnType setDay(DayType sDay)
+    {
+        if(isDayValid(sDay)) {
+            Day = sDay;
+            return E_OK;
+        } else {
+            return E_NOT_OK;
+        }
+    }
 
 	// methods
+    static constexpr bool isYearValid(YearType Year) { return (Year >= YearMinValue) && (Year <= YearMaxValue); }
+    static constexpr bool isMonthValid(MonthType Month) { return (Month >= MonthMinValue) && (Month <= MonthMaxValue); }
+    static constexpr bool isDayValid(DayType Day) { return (Day >= DayMinValue) && (Day <= DayMaxValue); }
 };
 
 #endif

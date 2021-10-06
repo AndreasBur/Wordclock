@@ -453,13 +453,19 @@
     <Compile Include="inc\GammaCorrection\GammaCorrection.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="inc\RealTimeClock\ClockDate.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="inc\RealTimeClock\ClockDateTime.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="inc\RealTimeClock\ClockTime.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="inc\RealTimeClock\DS3231.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="inc\RealTimeClock\RealTimeClock.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="inc\RealTimeClock\RealTimeClockDate.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="inc\RealTimeClock\RealTimeClockTime.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="inc\StandardTypes\StandardTypes.h">

@@ -8,30 +8,30 @@
  *  ---------------------------------------------------------------------------------------------------------------------------------------------------
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       RealTimeClockTime.h
+/**     \file       DS3231.h
  *      \brief      
  *
  *      \details    
  *                  
 ******************************************************************************************************************************************************/
-#ifndef _REAL_TIME_CLOCK_TIME_H_
-#define _REAL_TIME_CLOCK_TIME_H_
+#ifndef _DS3231_H_
+#define _DS3231_H_
 
 /******************************************************************************************************************************************************
  * I N C L U D E S
 ******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Arduino.h"
-
+#include "ClockDateTime.h"
+#include "Wire.h"
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
-/* RealTimeClockTime configuration parameter */
+/* DS3231 configuration parameter */
 
 
-/* RealTimeClockTime parameter */
-
+/* DS3231 parameter */
 
 
 /******************************************************************************************************************************************************
@@ -42,83 +42,108 @@
 /******************************************************************************************************************************************************
  *  C L A S S   T E M P L A T E
 ******************************************************************************************************************************************************/
-class RealTimeClockTime
+class DS3231
 {
 /******************************************************************************************************************************************************
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-    using HourType = uint8_t;
-    using MinuteType = uint8_t;
-    using SecondType = uint8_t;
+  
   
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    HourType Hour{0u};
-    MinuteType Minute{0u};
-    SecondType Second{0u};
-    
-    static constexpr HourType HourMinValue{0u};
-    static constexpr HourType HourMaxValue{23u};
-    static constexpr MinuteType MinuteMinValue{0u};
-    static constexpr MinuteType MinuteMaxValue{59u};
-    static constexpr SecondType SecondMinValue{0u};
-    static constexpr SecondType SecondMaxValue{59u};
+    static constexpr byte DeviceAddress{0x68u};
+    static constexpr byte AddrSecond{0x00u};
+    static constexpr byte AddrMinute{0x01u};
+    static constexpr byte AddrHour{0x02u};
+    static constexpr byte AddrWeekday{0x03u};
+    static constexpr byte AddrDay{0x04u};
+    static constexpr byte AddrMonthCentury{0x05u};
+    static constexpr byte AddrYear{0x06u};
+    static constexpr byte AddrControl{0x0Eu};
+    static constexpr byte AddrStatus{0x0Fu};
+    static constexpr byte AddrAgingOffset{0x10u};
+    static constexpr byte AddrTmpMSB{0x11u};
+    static constexpr byte AddrTmpLSB{0x12u};
         
+    static constexpr byte StartAddrTime{0x00u};
+    static constexpr byte StartAddrDate{0x03u};
+    static constexpr byte TimeNumberOfBytes{0x03u};
+    static constexpr byte DateNumberOfBytes{0x04u};
+    static constexpr byte TimeDateNumberOfBytes{TimeNumberOfBytes + DateNumberOfBytes};
+    
     // functions
+    ClockDateTime readDateTime() const {
+        ClockDateTime dateTime;
+        dateTime.setTime(readTime());
+        Wire.read(); // dummy read for weekdays
+        dateTime.setDate(readDate());
+        return dateTime;
+    }
+    
+    ClockDate readDate() const {
+        ClockDate date;
+        date.setDay(Wire.read());
+        date.setMonth(static_cast<ClockDate::MonthType>(Wire.read()));
+        date.setYear(Wire.read());
+        return date;
+    }
+    
+    ClockTime readTime() const {
+        ClockTime time;
+        time.setSecond(Wire.read());
+        time.setMinute(Wire.read());
+        time.setHour(Wire.read());
+        return time;
+    }
   
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr RealTimeClockTime() { }
-    constexpr RealTimeClockTime(HourType sHour, MinuteType sMinute, SecondType sSecond)
-    {
-        setHour(sHour);
-        setMinute(sMinute);
-        setSecond(sSecond);
-    }
-    ~RealTimeClockTime() {}
+    constexpr DS3231() { }
+    ~DS3231() { }
 
 	// get methods
-    HourType getHour() const { return Hour; }
-    MinuteType getMinute() const { return Minute; }
-    SecondType getSecond() const { return Second; }
 
 	// set methods
-    StdReturnType setHour(HourType sHour) 
-    {
-        if(isHourValid(sHour)) { 
-            Hour = sHour; 
-            return E_OK; 
-        } else { 
-            return E_NOT_OK; 
-        }
-    }
-    StdReturnType setMinute(MinuteType sMinute)
-    {
-        if(isMinuteValid(sMinute)) {
-            Minute = sMinute;
-            return E_OK;
-        } else {
-            return E_NOT_OK; }
-    }
-    StdReturnType setSecond(SecondType sSecond)
-    {
-        if(isSecondValid(sSecond)) {
-            Second = sSecond;
-            return E_OK;
-        } else {
-            return E_NOT_OK; 
-        }
-    }
 
 	// methods
-    static constexpr bool isHourValid(HourType Hour) { return (Hour >= HourMinValue) && (Hour <= HourMaxValue); }
-    static constexpr bool isMinuteValid(MinuteType Minute) { return (Minute >= MinuteMinValue) && (Minute <= MinuteMaxValue); }
-    static constexpr bool isSecondValid(SecondType Second) { return (Second >= SecondMinValue) && (Second <= SecondMaxValue);  }
+	ClockDateTime getDateTime() const
+	{
+    	Wire.beginTransmission(DeviceAddress);
+    	Wire.write(StartAddrTime);
+    	Wire.endTransmission();
+        
+        Wire.requestFrom(DeviceAddress, TimeDateNumberOfBytes);
+    	return readDateTime();
+	}
+	
+	ClockTime getTime() const
+	{
+    	Wire.beginTransmission(DeviceAddress);
+    	Wire.write(StartAddrTime);
+    	Wire.endTransmission();
+    	
+    	Wire.requestFrom(DeviceAddress, TimeNumberOfBytes);
+        return readTime();
+	}
+	
+	ClockDate getDate() const
+	{
+    	Wire.beginTransmission(DeviceAddress);
+    	Wire.write(StartAddrDate);
+    	Wire.endTransmission();
+    	
+        Wire.requestFrom(DeviceAddress, DateNumberOfBytes);
+        return readDate();
+	}
+    
+    void setDateTime(ClockDateTime DateTime) const {  }
+    void setTime(ClockTime Time) const {  }
+    void setDate(ClockDate Date) const {  }
 };
 
 #endif
