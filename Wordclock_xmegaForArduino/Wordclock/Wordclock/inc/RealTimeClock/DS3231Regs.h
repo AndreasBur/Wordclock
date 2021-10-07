@@ -8,29 +8,28 @@
  *  ---------------------------------------------------------------------------------------------------------------------------------------------------
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       RealTimeClock.h
- *      \brief
+/**     \file       DS3231Regs.h
+ *      \brief      
  *
- *      \details
- *
+ *      \details    
+ *                  
 ******************************************************************************************************************************************************/
-#ifndef _REAL_TIME_CLOCK_H_
-#define _REAL_TIME_CLOCK_H_
+#ifndef _DS3231_REGS_H_
+#define _DS3231_REGS_H_
 
 /******************************************************************************************************************************************************
  * I N C L U D E S
 ******************************************************************************************************************************************************/
-#include "StandardTypes.h"
-#include "Arduino.h"
-#include "DS3231.h"
+
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
-/* RealTimeClock configuration parameter */
+/* DS3231Regs configuration parameter */
 
 
-/* RealTimeClock parameter */
+/* DS3231Regs parameter */
+
 
 /******************************************************************************************************************************************************
  *  G L O B A L   F U N C T I O N   M A C R O S
@@ -38,53 +37,62 @@
 
 
 /******************************************************************************************************************************************************
- *  C L A S S   R E A L   T I M E   C L O C K
+ *  C L A S S   T E M P L A T E
 ******************************************************************************************************************************************************/
-class RealTimeClock
+class DS3231Regs
 {
 /******************************************************************************************************************************************************
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-    using HourType = ClockDateTime::HourType;
-    using MinuteType = ClockDateTime::MinuteType;
-    using SecondType = ClockDateTime::SecondType;
+    static constexpr byte AddrSecond{0x00u};
+    static constexpr byte AddrMinute{0x01u};
+    static constexpr byte AddrHour{0x02u};
+    static constexpr byte AddrWeekday{0x03u};
+    static constexpr byte AddrDay{0x04u};
+    static constexpr byte AddrMonthCentury{0x05u};
+    static constexpr byte AddrYear{0x06u};
+    static constexpr byte AddrControl{0x0Eu};
+    static constexpr byte AddrStatus{0x0Fu};
+    static constexpr byte AddrAgingOffset{0x10u};
+    static constexpr byte AddrTmpMSB{0x11u};
+    static constexpr byte AddrTmpLSB{0x12u};
+        
+    static constexpr byte StartAddrTime{0x00u};
+    static constexpr byte StartAddrDate{0x03u};
+    
+    static constexpr byte MonthBM{0b01111111u};
+    static constexpr byte MonthBP{0u};
+    static constexpr byte MonthCenturyBM{0b1000000};
+    static constexpr byte MonthCenturyBP{7u};
+    
+    static constexpr byte StatusBusyBM{0b100u};
+    static constexpr byte StatusBusyBP{2u};
+    static constexpr byte StatusBusyBusy{1u};
+    static constexpr byte StatusBusyNotBusy{0u};
 
-    using YearType = ClockDateTime::YearType;
-    using MonthType = ClockDateTime::MonthType;
-    using DayType = ClockDateTime::DayType;
-    using WeekdayType = ClockDateTime::WeekdayType;
-
+    static constexpr byte StatusOscillatorStopFlagBM{0b10000000};
+    static constexpr byte StatusOscillatorStopFlagBP{7u};
+    static constexpr byte StatusOscillatorStopFlagStopped{1u};
+    static constexpr byte StatusOscillatorStopFlagRunning{0u};
+    
+    static constexpr byte ControlEnableOscillatorBM{0b10000000};
+    static constexpr byte ControlEnableOscillatorBP{7u};
+    static constexpr byte ControlEnableOscillatorEnabled{0u};
+    static constexpr byte ControlEnableOscillatorDisabled{1u};
+    
+  
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    DS3231 Rtc;
-    // functions
-    constexpr RealTimeClock() {}
-    ~RealTimeClock() {}
-
+  
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    static RealTimeClock& getInstance() {
-        static RealTimeClock singletonInstance;
-        return singletonInstance;
-    }
-
-	// get methods
-	ClockDateTime getDateTime() const { return Rtc.getDateTime(); }
-    ClockTime getTime() const { return Rtc.getTime(); }
-    ClockDate getDate() const { return Rtc.getDate(); }
-
-
-    // set methods
-    void setDateTime(const ClockDateTime& DateTime) { Rtc.setDateTime(DateTime); }
-    void setTime(const ClockTime& Time) { Rtc.setTime(Time); }
-    void setDate(const ClockDate& Date) { Rtc.setDate(Date); }
-
-	// methods
+    constexpr DS3231Regs() { }
+    ~DS3231Regs() { }
 };
 
 #endif

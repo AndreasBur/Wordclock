@@ -22,6 +22,8 @@
 ******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Arduino.h"
+#include "DS3231Regs.h"
+#include "Bit.h"
 #include "ClockDateTime.h"
 #include "Wire.h"
 
@@ -40,7 +42,7 @@
 
 
 /******************************************************************************************************************************************************
- *  C L A S S   T E M P L A T E
+ *  C L A S S   D S 3 2 3 1
 ******************************************************************************************************************************************************/
 class DS3231
 {
@@ -48,35 +50,46 @@ class DS3231
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-  
+    using HourType = ClockDateTime::HourType;
+    using minutetype = ClockDateTime::MinuteType;
+    using SecondType = ClockDateTime::SecondType;
+
+    using YearType = ClockDateTime::YearType;
+    using MonthType = ClockDateTime::MonthType;
+    using DayType = ClockDateTime::DayType;
+    using WeekdayType = ClockDateTime::WeekdayType;
   
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    static constexpr byte DeviceAddress{0x68u};
-    static constexpr byte AddrSecond{0x00u};
-    static constexpr byte AddrMinute{0x01u};
-    static constexpr byte AddrHour{0x02u};
-    static constexpr byte AddrWeekday{0x03u};
-    static constexpr byte AddrDay{0x04u};
-    static constexpr byte AddrMonthCentury{0x05u};
-    static constexpr byte AddrYear{0x06u};
-    static constexpr byte AddrControl{0x0Eu};
-    static constexpr byte AddrStatus{0x0Fu};
-    static constexpr byte AddrAgingOffset{0x10u};
-    static constexpr byte AddrTmpMSB{0x11u};
-    static constexpr byte AddrTmpLSB{0x12u};
-        
-    static constexpr byte StartAddrTime{0x00u};
-    static constexpr byte StartAddrDate{0x03u};
+    static constexpr byte DeviceAddress{0x68u};       
     static constexpr byte TimeNumberOfBytes{0x03u};
     static constexpr byte DateNumberOfBytes{0x04u};
     static constexpr byte TimeDateNumberOfBytes{TimeNumberOfBytes + DateNumberOfBytes};
     
     // functions
-	uint8_t convBinToBcd(uint8_t Value) { return Value + 6u * (Value / 10u); }
-	uint8_t convBcdToBin(uint8_t Value) { return Value - 6u * (Value >> 4u); }
+	uint8_t convBinToBcd(uint8_t Value) const { return Value + 6u * (Value / 10u); }
+	uint8_t convBcdToBin(uint8_t Value) const { return Value - 6u * (Value >> 4u); }
+    uint8_t convWeekday(WeekdayType Weekday) const {
+        return Weekday == 0u ? 7 : Weekday;
+    }
+        
+    byte readRegister(byte RegAddress) const {
+    	Wire.beginTransmission(DeviceAddress);
+    	Wire.write(RegAddress);
+    	Wire.endTransmission();
+        
+        Wire.requestFrom(RegAddress, 1u);
+        return Wire.read();
+    }
+    
+    void writeRegister(byte RegAddress, byte Value) const {
+    	Wire.beginTransmission(DeviceAddress);
+    	Wire.write(RegAddress);
+        Wire.write(Value);
+    	Wire.endTransmission();
+    }
 	
     ClockDateTime readDateTime() const {
         ClockDateTime dateTime;
@@ -88,18 +101,48 @@ class DS3231
     
     ClockDate readDate() const {
         ClockDate date;
-        date.setDay(Wire.read());
-        date.setMonth(static_cast<ClockDate::MonthType>(Wire.read()));
-        date.setYear(Wire.read() + 2000u);
+        date.setDay(convBcdToBin(Wire.read()));
+        date.setMonth(readMonth());
+        date.setYear(convBcdToBin(Wire.read()) + 2000u);
         return date;
+    }
+    
+    MonthType readMonth() const {
+        uint8_t monthRaw = Bit(Wire.read()).readBits(DS3231Regs::MonthBM);
+        return static_cast<MonthType>(convBcdToBin(monthRaw));
     }
     
     ClockTime readTime() const {
         ClockTime time;
-        time.setSecond(Wire.read());
-        time.setMinute(Wire.read());
-        time.setHour(Wire.read());
+        time.setSecond(convBcdToBin(Wire.read()));
+        time.setMinute(convBcdToBin(Wire.read()));
+        time.setHour(convBcdToBin(Wire.read()));
         return time;
+    }
+    
+    void writeDateTime(ClockDateTime DateTime) const {
+        writeTime(DateTime.getTime());
+        writeDate(DateTime.getDate());
+    }
+    
+    void writeTime(ClockTime Time) const {
+        Wire.write(convBinToBcd(Time.getSecond()));
+        Wire.write(convBinToBcd(Time.getMinute()));
+        Wire.write(convBinToBcd(Time.getHour()));
+    }
+    
+    void writeDate(ClockDate Date) const {
+        Wire.write(convWeekday(Date.getWeekday()));
+        Wire.write(convBinToBcd(Date.getDay()));
+        Wire.write(convBinToBcd(Date.getMonth()));
+        Wire.write(convBinToBcd(Date.getYear() - 2000u));
+    }
+    
+    void enableOscillator() const {
+        byte status = readRegister(DS3231Regs::AddrStatus);
+        Bit(status).writeBit(DS3231Regs::StatusOscillatorStopFlagBP, 
+            DS3231Regs::StatusOscillatorStopFlagRunning);
+        writeRegister(DS3231Regs::AddrStatus, status);
     }
   
 /******************************************************************************************************************************************************
@@ -117,7 +160,7 @@ class DS3231
 	ClockDateTime getDateTime() const
 	{
     	Wire.beginTransmission(DeviceAddress);
-    	Wire.write(StartAddrTime);
+    	Wire.write(DS3231Regs::StartAddrTime);
     	Wire.endTransmission();
         
         Wire.requestFrom(DeviceAddress, TimeDateNumberOfBytes);
@@ -127,7 +170,7 @@ class DS3231
 	ClockTime getTime() const
 	{
     	Wire.beginTransmission(DeviceAddress);
-    	Wire.write(StartAddrTime);
+    	Wire.write(DS3231Regs::StartAddrTime);
     	Wire.endTransmission();
     	
     	Wire.requestFrom(DeviceAddress, TimeNumberOfBytes);
@@ -137,16 +180,39 @@ class DS3231
 	ClockDate getDate() const
 	{
     	Wire.beginTransmission(DeviceAddress);
-    	Wire.write(StartAddrDate);
+    	Wire.write(DS3231Regs::StartAddrDate);
     	Wire.endTransmission();
     	
         Wire.requestFrom(DeviceAddress, DateNumberOfBytes);
         return readDate();
 	}
     
-    void setDateTime(ClockDateTime DateTime) const {  }
-    void setTime(ClockTime Time) const {  }
-    void setDate(ClockDate Date) const {  }
+    void setDateTime(ClockDateTime DateTime) const
+    { 
+    	Wire.beginTransmission(DeviceAddress);
+    	Wire.write(DS3231Regs::StartAddrTime);
+        writeDateTime(DateTime);
+    	Wire.endTransmission();
+        enableOscillator();
+    }
+    
+    void setTime(ClockTime Time) const
+    {
+        Wire.beginTransmission(DeviceAddress);
+        Wire.write(DS3231Regs::StartAddrTime);
+        writeTime(Time);
+        Wire.endTransmission();
+        enableOscillator();
+    }
+    
+    void setDate(ClockDate Date) const
+    {
+        Wire.beginTransmission(DeviceAddress);
+        Wire.write(DS3231Regs::StartAddrDate);
+        writeDate(Date);
+        Wire.endTransmission();
+        enableOscillator();
+    }
 };
 
 #endif

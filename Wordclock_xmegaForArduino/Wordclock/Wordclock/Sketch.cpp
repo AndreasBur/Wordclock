@@ -123,6 +123,9 @@ void loop()
     delayMicroseconds(10);
     CLEAR_BIT(PORTC_OUT, 6);
     delayMicroseconds(10);
+    
+    //ClockDateTime dateTime;
+    //RealTimeClock::getInstance().setDateTime(dateTime);
 
   //FontTahoma10x10::CharType Char;
   // put your main code here, to run repeatedly:
@@ -134,6 +137,8 @@ void loop()
 
     Bit myBit(10u);
     myBit.writeBit(true, 1);
+    
+
 
     //volatile int Test = 5;
 }

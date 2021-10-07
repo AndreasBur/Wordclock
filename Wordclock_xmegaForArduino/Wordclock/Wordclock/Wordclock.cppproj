@@ -465,6 +465,9 @@
     <Compile Include="inc\RealTimeClock\DS3231.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="inc\RealTimeClock\DS3231Regs.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="inc\RealTimeClock\RealTimeClock.h">
       <SubType>compile</SubType>
     </Compile>
