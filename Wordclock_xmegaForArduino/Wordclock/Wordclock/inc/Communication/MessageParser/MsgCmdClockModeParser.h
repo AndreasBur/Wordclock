@@ -67,8 +67,14 @@ class MsgCmdClockModeParser : public MsgParameterParser<MsgCmdClockModeParser, M
     void handleParameter(char ParameterShortName, byte Argument)
     {
         if(ParameterShortName == ModeOptionShortName) {
-            
+            setMode(static_cast<ModeType>(Argument));
         }
+    }
+
+    void setMode(ModeType Mode) const
+    {
+        StdReturnType returnValue = Clock::getInstance().setMode(Mode);
+        Error.checkReturnValueAndSend(ModeOptionShortName, returnValue, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNCE);
     }
 
     void show() const
@@ -89,7 +95,7 @@ class MsgCmdClockModeParser : public MsgParameterParser<MsgCmdClockModeParser, M
     // set methods
 
     // methods
-    void sendAnswer() const { }
+    void sendAnswer() const { sendAnswerParameter(ModeOptionShortName, Clock::getInstance().getMode(), false); }
 
     void process() const { show(); }
 };

@@ -9,10 +9,10 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       ClockWords.h
- *      \brief      
+ *      \brief
  *
- *      \details    
- *                  
+ *      \details
+ *
 ******************************************************************************************************************************************************/
 #ifndef _CLOCK_WORDS_H_
 #define _CLOCK_WORDS_H_
@@ -63,16 +63,16 @@ class ClockWords
     bool ShowItIs;
     HourWordsType HourWords;
     MinutesWordsType MinuteWords;
-  
+
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
     constexpr ClockWords() : ShowItIs(false), HourWords{DisplayWords::WORD_NONE}, MinuteWords{DisplayWords::WORD_NONE} { }
-    constexpr ClockWords(bool sShowItIs, HourWordsType sHourWords, MinutesWordsType sMinuteWords) 
+    constexpr ClockWords(bool sShowItIs, HourWordsType sHourWords, MinutesWordsType sMinuteWords)
         : ShowItIs(sShowItIs), HourWords(sHourWords), MinuteWords(sMinuteWords) { }
     ~ClockWords() { }
-    
+
     bool operator==(const ClockWords& sClockWords);
     bool operator!=(const ClockWords& sClockWords);
 
@@ -82,7 +82,7 @@ class ClockWords
     DisplayWords::WordIdType getHourWord(byte Index) const { return HourWords[Index]; }
     MinutesWordsType getMinuteWords() const { return MinuteWords; }
     DisplayWords::WordIdType getMinuteWord(byte Index) const { return MinuteWords[Index]; }
-        
+
     WordsListType getWordsList() const;
 
     // set methods

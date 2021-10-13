@@ -79,7 +79,6 @@ class RealTimeClock
     ClockTime getTime() const { return DateTime.getTime(); }
     ClockDate getDate() const { return DateTime.getDate(); }
 
-
     // set methods
     void setDateTime(ClockDateTime sDateTime) { DateTime = sDateTime; }
     void setTime(ClockTime Time) { DateTime.setTime(Time); }

@@ -23,7 +23,7 @@
 #include "StandardTypes.h"
 #include "Arduino.h"
 #include "MsgParameterParser.h"
-#include "Clock.h"
+#include "RealTimeClock.h"
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
@@ -32,7 +32,7 @@
 
 
 /* MsgCmdTimeParser parameter */
-#define MSG_CMD_TIME_PARSER_PARAMETER_TABLE_SIZE           2u
+#define MSG_CMD_TIME_PARSER_PARAMETER_TABLE_SIZE           3u
 
 
 /******************************************************************************************************************************************************
@@ -49,47 +49,73 @@ class MsgCmdTimeParser : public MsgParameterParser<MsgCmdTimeParser, MSG_CMD_TIM
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-    //using HourType = Clock::HourType;
-    //using MinuteType = Clock::MinuteType;
+    using HourType = RealTimeClock::HourType;
+    using MinuteType = RealTimeClock::MinuteType;
+    using SecondType = RealTimeClock::SecondType;
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
     friend class MsgParameterParser;
-    //HourType Hour;
-    //MinuteType Minute;
+    ClockTime Time;
 
     static constexpr char HourOptionShortName{'H'};
     static constexpr char MinuteOptionShortName{'M'};
+    static constexpr char SecondOptionShortName{'S'};
 
     static constexpr ParameterTableType ParameterTable PROGMEM {
         ParameterTableElementType(HourOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8),
-        ParameterTableElementType(MinuteOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8)
+        ParameterTableElementType(MinuteOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8),
+        ParameterTableElementType(SecondOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8)
     };
 
     // functions
     void handleParameter(char ParameterShortName, byte Argument)
     {
         if(ParameterShortName == HourOptionShortName) {
-            //Hour = static_cast<HourType>(Argument);
+            setHour(Argument);
         }
         if(ParameterShortName == MinuteOptionShortName) {
-           // Minute = static_cast<MinuteType>(Argument);
+            setMinute(Argument);
+        }
+        if(ParameterShortName == SecondOptionShortName) {
+            setSecond(Argument);
         }
     }
 
-    void show() const
-    {
-        StdReturnType returnValue = Clock::getInstance().show();
-        Error.checkReturnValueAndSend(ErrorMessage::API_CLOCK_SHOW, returnValue, ErrorMessage::ERROR_DISPLAY_PENDING);
+    void sendAnswerHour(bool AppendSpace) const {
+        sendAnswerParameter(HourOptionShortName, Time.getHour(), AppendSpace);
+    }
+    void sendAnswerMinute(bool AppendSpace) const {
+        sendAnswerParameter(MinuteOptionShortName, Time.getMinute(), AppendSpace);
+    }
+    void sendAnswerSecond(bool AppendSpace) const {
+        sendAnswerParameter(SecondOptionShortName, Time.getSecond(), AppendSpace);
+    }
+
+    void setHour(HourType Hour) {
+        StdReturnType returnValue = Time.setHour(Hour);
+        Error.checkReturnValueAndSend(HourOptionShortName, returnValue, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNCE);
+    }
+
+    void setMinute(MinuteType Minute) {
+        StdReturnType returnValue = Time.setMinute(Minute);
+        Error.checkReturnValueAndSend(MinuteOptionShortName, returnValue, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNCE);
+    }
+
+    void setSecond(SecondType Second) {
+        StdReturnType returnValue = Time.setSecond(Second);
+        Error.checkReturnValueAndSend(SecondOptionShortName, returnValue, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNCE);
     }
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr MsgCmdTimeParser(const char* Parameter) : MsgParameterParser(ParameterTable, Parameter) { }
+    constexpr MsgCmdTimeParser(const char* Parameter) : MsgParameterParser(ParameterTable, Parameter) {
+        Time = RealTimeClock::getInstance().getTime();
+    }
     ~MsgCmdTimeParser() { }
 
     // get methods
@@ -97,11 +123,17 @@ class MsgCmdTimeParser : public MsgParameterParser<MsgCmdTimeParser, MSG_CMD_TIM
     // set methods
 
     // methods
-    void sendAnswer() const {  }
-
-    void process() const
+    void sendAnswer() const
     {
-        show();
+        sendAnswerHour(true);
+        sendAnswerMinute(true);
+        sendAnswerSecond(false);
+    }
+
+    void process()
+    {
+        RealTimeClock::getInstance().setTime(Time);
+        Time = RealTimeClock::getInstance().getTime();
     }
 };
 

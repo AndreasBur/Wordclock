@@ -32,7 +32,7 @@
 
 
 /* MsgCmdDisplayPixelParser parameter */
-#define MSG_CMD_DISPLAY_PIXEL_PARSER_PARAMETER_TABLE_SIZE           2u
+#define MSG_CMD_DISPLAY_PIXEL_PARSER_PARAMETER_TABLE_SIZE       2u
 
 # if (WS2812_NUMBER_OF_LEDS < 255u)
 #  define MSG_CMD_DISPLAY_PIXEL_PARSER_INDEX_ARGUMENT_TYPE      MsgParameter::ARGUMENT_TYPE_UINT8
@@ -111,8 +111,12 @@ class MsgCmdDisplayPixelParser : public MsgParameterParser<MsgCmdDisplayPixelPar
     StateType getPixelState(bool PixelValue) const { return PixelValue ? STATE_ON : STATE_OFF; }
     bool getPixelValue(StateType PixelState) const { return (PixelState == STATE_ON) ? true : false; }
 
-    void sendAnswerIndex(bool AppendSpace) const { sendAnswerParameter(IndexOptionShortName, Index, AppendSpace); }
-    void sendAnswerState(bool AppendSpace) const { sendAnswerParameter(StateOptionShortName, Display::getInstance().getPixelFast(Index), AppendSpace); }
+    void sendAnswerIndex(bool AppendSpace) const {
+        sendAnswerParameter(IndexOptionShortName, Index, AppendSpace);
+    }
+    void sendAnswerState(bool AppendSpace) const {
+        sendAnswerParameter(StateOptionShortName, Display::getInstance().getPixelFast(Index), AppendSpace);
+    }
 
     void setPixel() const { if(State != STATE_NONE) { Display::getInstance().writePixelFast(Index, getPixelValue(State)); }}
 

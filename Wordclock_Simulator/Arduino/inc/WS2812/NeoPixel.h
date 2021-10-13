@@ -72,9 +72,9 @@ class NeoPixel
     PixelType Pixel;
 
     // functions
-    byte colorOffsetRed() const { return NEO_PIXEL_COLOR_OFFSET_RED; }
-    byte colorOffsetGreen() const { return NEO_PIXEL_COLOR_OFFSET_GREEN; }
-    byte colorOffsetBlue() const { return NEO_PIXEL_COLOR_OFFSET_BLUE; }
+    byte getColorOffsetRed() const { return NEO_PIXEL_COLOR_OFFSET_RED; }
+    byte getColorOffsetGreen() const { return NEO_PIXEL_COLOR_OFFSET_GREEN; }
+    byte getColorOffsetBlue() const { return NEO_PIXEL_COLOR_OFFSET_BLUE; }
   
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
@@ -84,33 +84,33 @@ class NeoPixel
     ~NeoPixel() { }
 
     // get methods
-    ColorType getRed() const { return Pixel[colorOffsetRed()]; }
-    ColorType getBlue() const { return Pixel[colorOffsetBlue()]; }
-    ColorType getGreen() const { return Pixel[colorOffsetGreen()]; }
+    ColorType getRed() const { return Pixel[getColorOffsetRed()]; }
+    ColorType getBlue() const { return Pixel[getColorOffsetBlue()]; }
+    ColorType getGreen() const { return Pixel[getColorOffsetGreen()]; }
     NeoPixelType getPixel() const
     {
         NeoPixelType NeoPixel;
-        NeoPixel.Red = Pixel[colorOffsetRed()];
-        NeoPixel.Blue = Pixel[colorOffsetBlue()];
-        NeoPixel.Green = Pixel[colorOffsetGreen()];
+        NeoPixel.Red = Pixel[getColorOffsetRed()];
+        NeoPixel.Blue = Pixel[getColorOffsetBlue()];
+        NeoPixel.Green = Pixel[getColorOffsetGreen()];
         return NeoPixel;
     }
 
     // set methods
-    void setRed(ColorType Value) { Pixel[colorOffsetRed()] = Value; }
-    void setBlue(ColorType Value) { Pixel[colorOffsetBlue()] = Value; }
-    void setGreen(ColorType Value) { Pixel[colorOffsetGreen()] = Value; }
+    void setRed(ColorType Value) { Pixel[getColorOffsetRed()] = Value; }
+    void setBlue(ColorType Value) { Pixel[getColorOffsetBlue()] = Value; }
+    void setGreen(ColorType Value) { Pixel[getColorOffsetGreen()] = Value; }
     void setPixel(NeoPixelType NeoPixel)
     {
-         Pixel[colorOffsetRed()] = NeoPixel.Red;
-         Pixel[colorOffsetBlue()] = NeoPixel.Blue;
-         Pixel[colorOffsetGreen()] = NeoPixel.Green;
+         Pixel[getColorOffsetRed()] = NeoPixel.Red;
+         Pixel[getColorOffsetBlue()] = NeoPixel.Blue;
+         Pixel[getColorOffsetGreen()] = NeoPixel.Green;
     }
     void setPixel(ColorType Red, ColorType Green, ColorType Blue)
     {
-         Pixel[colorOffsetRed()] = Red;
-         Pixel[colorOffsetBlue()] = Blue;
-         Pixel[colorOffsetGreen()] = Green;
+         Pixel[getColorOffsetRed()] = Red;
+         Pixel[getColorOffsetBlue()] = Blue;
+         Pixel[getColorOffsetGreen()] = Green;
     }
 
     // methods
