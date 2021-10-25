@@ -23,7 +23,6 @@
 #include "StandardTypes.h"
 #include "Arduino.h"
 
-
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
@@ -89,21 +88,17 @@ class BH1750
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    ModeType Mode;
-    IlluminanceType Illuminance;
-    CalibrationValuesType CalibrationValues;
+    ModeType Mode{MODE_NONE};
+    IlluminanceType Illuminance{BH1750_ILLUMINANCE_MIN_LX_VALUE};
+    CalibrationValuesType CalibrationValues{BH1750_ILLUMINANCE_MAX_LX_VALUE, BH1750_ILLUMINANCE_MIN_LX_VALUE};
 
     // functions
-    BH1750() : Mode(MODE_NONE), Illuminance(BH1750_ILLUMINANCE_MIN_LX_VALUE),
-               CalibrationValues{BH1750_ILLUMINANCE_MAX_LX_VALUE, BH1750_ILLUMINANCE_MIN_LX_VALUE} { }
-    ~BH1750() { }
-
     StdReturnType readIlluminance();
     void sendModeForOneTimeMode();
     StdReturnType sendCommand(byte);
 
     StdReturnType sendMode() { return sendCommand(Mode); }
-    IlluminanceType convertRawToLux(uint16_t IlluminanceRaw) const { return IlluminanceRaw / BH1750_ILLUMINANCE_RAW_VALUE_DIVIDER; }
+    IlluminanceType convertRawToLux(IlluminanceType IlluminanceRaw) const { return IlluminanceRaw / BH1750_ILLUMINANCE_RAW_VALUE_DIVIDER; }
     IlluminanceType combineRawValueParts(byte HighByte, byte LowByte) const { return static_cast<uint16_t>(HighByte) << 8u | LowByte; }
     bool isMTRegValueInRange(byte MTRegValue) const { return (MTRegValue <= BH1750_REG_MT_MAX_VALUE && MTRegValue >= BH1750_REG_MT_MIN_VALUE); }
 
@@ -111,10 +106,8 @@ class BH1750
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    static BH1750& getInstance() {
-        static BH1750 singletonInstance;
-        return singletonInstance;
-    }
+    constexpr BH1750() { }
+    ~BH1750() { }
 
     // get methods
     ModeType getMode() const { return Mode; }
@@ -132,8 +125,14 @@ class BH1750
     // methods
     StdReturnType init(ModeType);
     StdReturnType changeMeasurementTime(byte);
-    void startCalibrationMaxValue() { task(); CalibrationValues.MaxValue = Illuminance; }
-    void startCalibrationMinValue() { task(); CalibrationValues.MinValue = Illuminance; }
+    void startCalibrationMaxValue() {
+        task();
+        CalibrationValues.MaxValue = Illuminance;
+    }
+    void startCalibrationMinValue() {
+        task();
+        CalibrationValues.MinValue = Illuminance;
+    }
 
     void task() {}
 };

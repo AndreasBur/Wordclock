@@ -23,7 +23,7 @@
 #include "StandardTypes.h"
 #include "Arduino.h"
 #include "MsgParameterParser.h"
-#include "BH1750.h"
+#include "Illuminance.h"
 #include "Display.h"
 
 /******************************************************************************************************************************************************
@@ -53,8 +53,8 @@ class MsgCmdRemoteProcedureCallParser : public MsgParameterParser<MsgCmdRemotePr
     enum RpcIdType
     {
         RPC_ID_NONE,
-        RPC_ID_BH1750_CALIBRATION_MAX_VALUE,
-        RPC_ID_BH1750_CALIBRATION_MIN_VALUE,
+        RPC_ID_ILLUMINANCE_CALIBRATION_MAX_VALUE,
+        RPC_ID_ILLUMINANCE_CALIBRATION_MIN_VALUE,
         RPC_ID_DISPLAY_ENABLE,
         RPC_ID_DISPLAY_DISABLE,
         RPC_ID_DISPLAY_SHOW,
@@ -70,6 +70,8 @@ class MsgCmdRemoteProcedureCallParser : public MsgParameterParser<MsgCmdRemotePr
         RPC_ID_DISPLAY_BRIGHTNESS_DECREMENT,
         RPC_ID_DISPLAY_BRIGHTNESS_AUTOMATIC_ON,
         RPC_ID_DISPLAY_BRIGHTNESS_AUTOMATIC_OFF,
+        RPC_ID_DISPLAY_BRIGHTNESS_GAMMA_CORRECTION_ON,
+        RPC_ID_DISPLAY_BRIGHTNESS_GAMMA_CORRECTION_OFF,
         RPC_ID_POWER_ON,
         RPC_ID_POWER_OFF,
     };
@@ -114,11 +116,11 @@ class MsgCmdRemoteProcedureCallParser : public MsgParameterParser<MsgCmdRemotePr
     void process()
     {
         switch(RpcId) {
-            case RPC_ID_BH1750_CALIBRATION_MAX_VALUE :
-                BH1750::getInstance().startCalibrationMaxValue();
+            case RPC_ID_ILLUMINANCE_CALIBRATION_MAX_VALUE :
+                Illuminance::getInstance().startCalibrationMaxValue();
                 break;
-            case RPC_ID_BH1750_CALIBRATION_MIN_VALUE :
-                BH1750::getInstance().startCalibrationMinValue();
+            case RPC_ID_ILLUMINANCE_CALIBRATION_MIN_VALUE :
+                Illuminance::getInstance().startCalibrationMinValue();
                 break;
             case RPC_ID_DISPLAY_ENABLE :
                 Display::getInstance().enable();
@@ -134,6 +136,12 @@ class MsgCmdRemoteProcedureCallParser : public MsgParameterParser<MsgCmdRemotePr
                 break;
             case RPC_ID_DISPLAY_BRIGHTNESS_AUTOMATIC_ON :
                 Display::getInstance().enableBrightnessAutomatic();
+                break;
+            case RPC_ID_DISPLAY_BRIGHTNESS_GAMMA_CORRECTION_OFF :
+                Display::getInstance().disableBrightnessGammaCorrection();
+                break;
+            case RPC_ID_DISPLAY_BRIGHTNESS_GAMMA_CORRECTION_ON :
+                Display::getInstance().enbleBrightnessGammaCorrection();
                 break;
             case RPC_ID_DISPLAY_BRIGHTNESS_AUTOMATIC_OFF :
                 Display::getInstance().disableBrightnessAutomatic();

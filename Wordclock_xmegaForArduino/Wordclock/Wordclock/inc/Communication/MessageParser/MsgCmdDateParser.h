@@ -49,7 +49,7 @@ class MsgCmdDateParser : public MsgParameterParser<MsgCmdDateParser, MSG_CMD_DAT
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-    using YearType = RealTimeClock::HourType;
+    using YearType = RealTimeClock::YearType;
     using MonthType = RealTimeClock::MonthType;
     using DayType = RealTimeClock::DayType;
 

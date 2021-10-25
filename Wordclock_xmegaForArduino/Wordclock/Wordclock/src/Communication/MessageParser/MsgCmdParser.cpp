@@ -28,6 +28,7 @@
 #include "MsgCmdClockModeParser.h"
 #include "MsgCmdAnimationClockParser.h"
 #include "MsgCmdTimeParser.h"
+#include "MsgCmdDateParser.h"
 
 /******************************************************************************************************************************************************
  *  L O C A L   C O N S T A N T   M A C R O S
@@ -95,6 +96,11 @@ void MsgCmdParser::parse()
         cmdClockTimeParser.parse();
         cmdClockTimeParser.process();
         cmdClockTimeParser.sendAnswer();
+    } else if(command == COMMAND_DATE) {
+        MsgCmdDateParser cmdClockDateParser(parameter);
+        cmdClockDateParser.parse();
+        cmdClockDateParser.process();
+        cmdClockDateParser.sendAnswer();
     } else {
         Error.send(ErrorMessage::ERROR_WRONG_COMMAND);
     }

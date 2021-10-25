@@ -22,7 +22,7 @@
 ******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Arduino.h"
-#include "NeoPixel.h"
+#include "Pixel.h"
 #include "Display.h"
 #include "MsgParameterParser.h"
 
@@ -33,7 +33,7 @@
 
 
 /* MsgCmdDisplayBrightnessParser parameter */
-#define MSG_CMD_DISPLAY_BRIGHTNESS_PARSER_PARAMETER_TABLE_SIZE           2u
+#define MSG_CMD_DISPLAY_BRIGHTNESS_PARSER_PARAMETER_TABLE_SIZE           3u
 
 /******************************************************************************************************************************************************
  *  G L O B A L   F U N C T I O N   M A C R O S
@@ -57,12 +57,15 @@ class MsgCmdDisplayBrightnessParser : public MsgParameterParser<MsgCmdDisplayBri
   private:
     friend class MsgParameterParser;
     static constexpr char BrightnessOptionShortName{'B'};
-    static constexpr char AutomaticOptionShortName{'A'};
+    static constexpr char UseAutomaticOptionShortName{'A'};
+    static constexpr char UseGammaCorrectionOptionShortName{'G'};
 
     static constexpr ParameterTableType ParameterTable PROGMEM
     {
         MsgParameter(BrightnessOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8),
-        MsgParameter(AutomaticOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8)
+        MsgParameter(UseAutomaticOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8),
+        MsgParameter(UseGammaCorrectionOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8)
+        
     };
 
     // functions
@@ -71,13 +74,17 @@ class MsgCmdDisplayBrightnessParser : public MsgParameterParser<MsgCmdDisplayBri
         if(ParameterShortName == BrightnessOptionShortName) {
             Display::getInstance().setBrightness(Argument);
         }
-        if(ParameterShortName == AutomaticOptionShortName) {
-            Display::getInstance().setBrightnessAutomatic(Argument);
+        if(ParameterShortName == UseAutomaticOptionShortName) {
+            Display::getInstance().setBrightnessUseAutomatic(Argument);
+        }
+        if(ParameterShortName == UseGammaCorrectionOptionShortName) {
+            Display::getInstance().setBrightnessUseGammaCorrection(Argument);
         }
     }
 
      void sendAnswerBrightness(bool AppendSpace) const { sendAnswerParameter(BrightnessOptionShortName, Display::getInstance().getBrightness(), AppendSpace); }
-     void sendAnswerAutomatic(bool AppendSpace) const { sendAnswerParameter(AutomaticOptionShortName, Display::getInstance().getBrightnessAutomatic(), AppendSpace); }
+     void sendAnswerAutomatic(bool AppendSpace) const { sendAnswerParameter(UseAutomaticOptionShortName, Display::getInstance().getBrightnessUseAutomatic(), AppendSpace); }
+     void sendAnswerGammaCorrection(bool AppendSpace) const { sendAnswerParameter(UseGammaCorrectionOptionShortName, Display::getInstance().getBrightnessUseGammaCorrection(), AppendSpace); }
 
     void show() const
     {
@@ -100,7 +107,9 @@ class MsgCmdDisplayBrightnessParser : public MsgParameterParser<MsgCmdDisplayBri
     void sendAnswer()
     {
         sendAnswerBrightness(true);
-        sendAnswerAutomatic(false);
+        sendAnswerAutomatic(true);
+        sendAnswerGammaCorrection(false);
+        
     }
 
     void process() { show(); }

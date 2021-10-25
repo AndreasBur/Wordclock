@@ -223,7 +223,7 @@
       <Value>%24(ProjectDir)\..\ArduinoCore\include\libraries\XWire</Value>
       <Value>../inc/Display</Value>
       <Value>../inc/StandardTypes</Value>
-      <Value>../inc/WS2812</Value>
+      <Value>../inc/Pixels/WS2812</Value>
       <Value>../inc/Clock</Value>
       <Value>../inc/Animation</Value>
       <Value>../inc/Transformation</Value>
@@ -235,13 +235,15 @@
       <Value>../../ArduinoCore/include/util/STL_C++XX_stdfloat</Value>
       <Value>../../ArduinoCore/include/util/utility</Value>
       <Value>../inc/GammaCorrection</Value>
-      <Value>../inc/BH1750</Value>
+      <Value>../inc/Illuminance/BH1750</Value>
       <Value>../inc/Timer</Value>
       <Value>../inc/Communication</Value>
       <Value>../inc/Communication/MessageParser</Value>
       <Value>%24(PackRepoDir)\atmel\XMEGAE_DFP\1.3.114\include\</Value>
       <Value>../inc/RealTimeClock</Value>
       <Value>../inc/RealTimeClock/DS3231</Value>
+      <Value>../inc/Pixels</Value>
+      <Value>../inc/Illuminance</Value>
     </ListValues>
   </avrgcc.compiler.directories.IncludePaths>
   <avrgcc.compiler.optimization.level>Optimize for size (-Os)</avrgcc.compiler.optimization.level>
@@ -266,7 +268,7 @@
       <Value>%24(ProjectDir)\..\ArduinoCore\include\libraries\XWire</Value>
       <Value>../inc/Display</Value>
       <Value>../inc/StandardTypes</Value>
-      <Value>../inc/WS2812</Value>
+      <Value>../inc/Pixels/WS2812</Value>
       <Value>../inc/Clock</Value>
       <Value>../inc/Animation</Value>
       <Value>../inc/Transformation</Value>
@@ -278,7 +280,7 @@
       <Value>../../ArduinoCore/include/util/STL_C++XX_stdfloat</Value>
       <Value>../../ArduinoCore/include/util/utility</Value>
       <Value>../inc/GammaCorrection</Value>
-      <Value>../inc/BH1750</Value>
+      <Value>../inc/Illuminance/BH1750</Value>
       <Value>../inc/Timer</Value>
       <Value>../inc/Communication</Value>
       <Value>../inc/Communication/MessageParser</Value>
@@ -286,6 +288,8 @@
       <Value>%24(PackRepoDir)\atmel\XMEGAE_DFP\1.3.114\include\</Value>
       <Value>../inc/RealTimeClock</Value>
       <Value>../inc/RealTimeClock/DS3231</Value>
+      <Value>../inc/Pixels</Value>
+      <Value>../inc/Illuminance</Value>
     </ListValues>
   </avrgcccpp.compiler.directories.IncludePaths>
   <avrgcccpp.compiler.optimization.OtherFlags>-fno-threadsafe-statics</avrgcccpp.compiler.optimization.OtherFlags>
@@ -365,9 +369,6 @@
     <Compile Include="inc\Animation\Clock\AnimationClockWipe.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="inc\BH1750\BH1750.h">
-      <SubType>compile</SubType>
-    </Compile>
     <Compile Include="inc\Bit\Bit.h">
       <SubType>compile</SubType>
     </Compile>
@@ -419,10 +420,16 @@
     <Compile Include="inc\Communication\StringTools.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="inc\Display\DisplayBrightness.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="inc\Display\Display.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="inc\Display\DisplayCharacters.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="inc\Display\DisplayPixels.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="inc\Display\DisplayWord.h">
@@ -455,6 +462,21 @@
     <Compile Include="inc\GammaCorrection\GammaCorrection.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="inc\Illuminance\BH1750\BH1750.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="inc\Illuminance\Illuminance.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="inc\Pixels\Pixel.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="inc\Pixels\Pixels.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="inc\Pixels\WS2812\WS2812.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="inc\RealTimeClock\ClockDate.h">
       <SubType>compile</SubType>
     </Compile>
@@ -480,12 +502,6 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="inc\Transformation\Transformation.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="inc\WS2812\NeoPixel.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="inc\WS2812\WS2812.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="Sketch.cpp">
@@ -539,7 +555,7 @@
     <Compile Include="src\Animation\Clock\AnimationClockWipe.cpp">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="src\BH1750\BH1750.cpp">
+    <Compile Include="src\Illuminance\BH1750\BH1750.cpp">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="src\Clock\Clock.cpp">
@@ -578,6 +594,9 @@
     <Compile Include="src\Font\FontTahoma10x10.cpp">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="src\Pixels\WS2812\WS2812.cpp">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="src\RealTimeClock\DS3231\DS3231.cpp">
       <SubType>compile</SubType>
     </Compile>
@@ -585,9 +604,6 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="src\Transformation\Transformation.cpp">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="src\WS2812\WS2812.cpp">
       <SubType>compile</SubType>
     </Compile>
     <Content Include="readme.html">
@@ -609,10 +625,13 @@
     <Folder Include="inc\Clock" />
     <Folder Include="inc\Font" />
     <Folder Include="inc\GammaCorrection" />
-    <Folder Include="inc\BH1750" />
     <Folder Include="inc\Communication" />
     <Folder Include="inc\DisplayManager" />
     <Folder Include="inc\Bit" />
+    <Folder Include="inc\Illuminance" />
+    <Folder Include="inc\Illuminance\BH1750\" />
+    <Folder Include="inc\Pixels" />
+    <Folder Include="inc\Pixels\WS2812\" />
     <Folder Include="inc\RealTimeClock" />
     <Folder Include="inc\Power" />
     <Folder Include="inc\RealTimeClock\DS3231\" />
@@ -620,18 +639,20 @@
     <Folder Include="inc\NonVolatile" />
     <Folder Include="inc\Timer" />
     <Folder Include="inc\Transformation" />
-    <Folder Include="inc\WS2812" />
     <Folder Include="inc\StandardTypes" />
     <Folder Include="src" />
     <Folder Include="src\Animation\Clock" />
+    <Folder Include="src\Illuminance\BH1750" />
     <Folder Include="src\Communication\MessageParser" />
     <Folder Include="src\Display" />
     <Folder Include="src\Clock" />
     <Folder Include="src\Animation" />
     <Folder Include="src\DisplayManager\" />
     <Folder Include="src\Font" />
-    <Folder Include="src\BH1750" />
     <Folder Include="src\Communication" />
+    <Folder Include="src\Illuminance" />
+    <Folder Include="src\Pixels" />
+    <Folder Include="src\Pixels\WS2812\" />
     <Folder Include="src\RealTimeClock" />
     <Folder Include="src\Power" />
     <Folder Include="src\NonVolatile\" />
@@ -639,7 +660,6 @@
     <Folder Include="src\Scheduler\" />
     <Folder Include="src\Timer" />
     <Folder Include="src\Transformation" />
-    <Folder Include="src\WS2812" />
   </ItemGroup>
   <Import Project="$(AVRSTUDIO_EXE_PATH)\\Vs\\Compiler.targets" />
 </Project>

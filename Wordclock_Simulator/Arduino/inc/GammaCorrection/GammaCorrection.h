@@ -31,7 +31,6 @@
 
 
 /* GammaCorrection parameter */
-#define GAMMA_CORRECTION_GAMMA7_TABLE_NUMBER_OF_VALUES        16u
 
 
 /******************************************************************************************************************************************************
@@ -54,6 +53,8 @@ class GammaCorrection
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
+    static byte constexpr Gamma7TableNumberOfValues{16u};
+  
     static constexpr Gamma7TableElementType Gamma7Table[] PROGMEM {
         133u, 139u, 145u, 151u, 158u, 165u, 172u, 180u, 188u, 196u, 205u, 214u, 224u, 234u, 244u, 255u
     };
@@ -75,9 +76,9 @@ class GammaCorrection
      *  \return         exponential value (approx. 1.0443^x) (1..255)
      *************************************************************************************************************************************************/
     byte calcGamma7CorrectionValue(byte ValueLinear) const {
-        Gamma7TableElementType exponent{getGamma7TableElement(ValueLinear % GAMMA_CORRECTION_GAMMA7_TABLE_NUMBER_OF_VALUES)};
+        Gamma7TableElementType exponent{getGamma7TableElement(ValueLinear % Gamma7TableNumberOfValues)};
         byte Log2OfResolution = numberOfBits<byte>();
-        return exponent >> ((Log2OfResolution - 1u) - (ValueLinear / GAMMA_CORRECTION_GAMMA7_TABLE_NUMBER_OF_VALUES));
+        return exponent >> ((Log2OfResolution - 1u) - (ValueLinear / Gamma7TableNumberOfValues));
     }
 
 /******************************************************************************************************************************************************
@@ -88,12 +89,11 @@ class GammaCorrection
 
 
     // get methods
-    byte getCorrectedValue(byte ValueLinear) const { return calcGamma7CorrectionValue(ValueLinear / 2u); }
 
     // set methods
 
     // methods
-
+    byte calcCorrectedValue(byte ValueLinear) const { return calcGamma7CorrectionValue(ValueLinear / 2u); }
 };
 
 #endif

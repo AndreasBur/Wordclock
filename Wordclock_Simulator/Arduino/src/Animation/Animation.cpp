@@ -33,9 +33,11 @@
 ******************************************************************************************************************************************************/
 
 
+
 /******************************************************************************************************************************************************
  *  LOCAL DATA TYPES AND STRUCTURES
 ******************************************************************************************************************************************************/
+
 
 
 /******************************************************************************************************************************************************
@@ -57,13 +59,13 @@ void Animation::init()
 ******************************************************************************************************************************************************/
 Animation::StateType Animation::getState()
 {
-    if( wcAnimationClock.getState() == AnimationClockCommon::STATE_CLEAR_TIME ||
-        wcAnimationClock.getState() == AnimationClockCommon::STATE_SET_TIME)
+    if(wcAnimationClock.getState() == AnimationClockCommon::STATE_CLEAR_TIME ||
+       wcAnimationClock.getState() == AnimationClockCommon::STATE_SET_TIME)
     {
         return STATE_CLOCK;
     }
-    else if( wcAnimationFont.getState() == AnimationFont::STATE_CHAR_SHIFT ||
-             wcAnimationFont.getState() == AnimationFont::STATE_TEXT_SHIFT)
+    else if(wcAnimationFont.getState() == AnimationFont::STATE_CHAR_SHIFT ||
+            wcAnimationFont.getState() == AnimationFont::STATE_TEXT_SHIFT)
     {
         return STATE_FONT;
     }

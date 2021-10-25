@@ -34,7 +34,7 @@
 /* MsgParser configuration parameter */
 #define MSG_PARAMETER_PARSER_ARGUMENT_TYPE_CHAR                     STD_OFF
 #define MSG_PARAMETER_PARSER_ARGUMENT_TYPE_UINT8                    STD_ON
-#define MSG_PARAMETER_PARSER_ARGUMENT_TYPE_UINT16                   STD_OFF
+#define MSG_PARAMETER_PARSER_ARGUMENT_TYPE_UINT16                   STD_ON
 #define MSG_PARAMETER_PARSER_ARGUMENT_TYPE_UINT32                   STD_OFF
 #define MSG_PARAMETER_PARSER_ARGUMENT_TYPE_UINT64                   STD_OFF
 #define MSG_PARAMETER_PARSER_ARGUMENT_TYPE_INT8                     STD_OFF

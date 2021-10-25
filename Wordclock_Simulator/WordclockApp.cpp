@@ -14,7 +14,7 @@ WordclockApp::WordclockApp() : Timer(this, TIMER_ID)
 
 bool WordclockApp::OnInit()
 {
-    WS2812::getInstance().Show();
+    Pixels::getInstance().Show();
     return true;
 }
 
