@@ -26,15 +26,19 @@
 #include "DisplayCharacters.h"
 #include "DisplayWords.h"
 #include "DisplayBrightness.h"
-
+#include "DisplayColor.h"
 
 /******************************************************************************************************************************************************
  *  GLOBAL CONSTANT MACROS
 ******************************************************************************************************************************************************/
 /* Display configuration parameter */
-#define DISPLAY_DATA_PIN                        10u
-#define DISPLAY_LED_STRIPE_SERPENTINE           STD_OFF
-#define DISPLAY_USE_PIXELS_DIMMING              STD_OFF
+#define DISPLAY_DATA_PIN                            10u
+#define DISPLAY_LED_STRIPE_SERPENTINE               STD_OFF
+#if (DISPLAY_COLOR_SUPPORT_DIMMING == STD_ON)
+# define DISPLAY_USE_PIXELS_DIMMING                 STD_OFF
+#else
+# # define DISPLAY_USE_PIXELS_DIMMING               STD_ON
+#endif
 
 //# if (PIXELS_IS_SINGLETON == STD_ON)
 //#  define Pixels                              Pixels::getInstance()
@@ -45,10 +49,10 @@
 # endif
 
 /* Display parameter */
-#define DISPLAY_NUMBER_OF_ROWS                  DISPLAY_CHARACTERS_NUMBER_OF_ROWS
-#define DISPLAY_NUMBER_OF_COLUMNS               DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS
-#define DISPLAY_NUMBER_OF_LEDS                  PIXELS_NUMBER_OF_LEDS
-#define DISPLAY_NUMBER_OF_PIXELS                DISPLAY_NUMBER_OF_LEDS
+#define DISPLAY_NUMBER_OF_ROWS                      DISPLAY_CHARACTERS_NUMBER_OF_ROWS
+#define DISPLAY_NUMBER_OF_COLUMNS                   DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS
+#define DISPLAY_NUMBER_OF_LEDS                      PIXELS_NUMBER_OF_LEDS
+#define DISPLAY_NUMBER_OF_PIXELS                    DISPLAY_NUMBER_OF_LEDS
 
 # if ((DISPLAY_NUMBER_OF_ROWS * DISPLAY_NUMBER_OF_COLUMNS) != DISPLAY_NUMBER_OF_LEDS)
 #  error "Display: LED number missmatch"
@@ -113,13 +117,9 @@ class Display
 # else
     Pixels& PixelStripe;
 # endif
-    Pixel Color{255u, 255u, 255u};
+    DisplayColor Color;
     DisplayWords Words;
     DisplayBrightness Brightness; 
-
-# if (DISPLAY_USE_PIXELS_DIMMING == STD_OFF)
-    Pixel ColorDimmed{255u, 255u, 255u};
-# endif
 
     // functions
     Display(Pixel);
@@ -128,14 +128,6 @@ class Display
 
     byte transformToSerpentine(byte, byte) const;
     byte transformToSerpentine(byte) const;
-
-# if (DISPLAY_USE_PIXELS_DIMMING == STD_OFF)
-    byte dimmColor(byte Color, byte BrightnessCorrected) const {
-        byte dimmedColor = (Color * BrightnessCorrected) >> 8u;
-        if(dimmedColor == 0u) { return 1u; }
-        else { return dimmedColor; }
-    }
-# endif
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
@@ -151,10 +143,10 @@ class Display
     bool getBrightnessUseAutomatic() const { return Brightness.getUseAutomatic(); }
     bool getBrightnessUseGammaCorrection() const { return Brightness.getUseGammaCorrection(); }
 
-    Pixel getColor() const { return Color; }
-    ColorType getColorRed() const { return Color.getRed(); }
-    ColorType getColorGreen() const { return Color.getGreen(); }
-    ColorType getColorBlue() const { return Color.getBlue(); }
+    Pixel getColor() const { return Color.getColor(); }
+    ColorType getColorRed() const { return Color.getColorRed(); }
+    ColorType getColorGreen() const { return Color.getColorGreen(); }
+    ColorType getColorBlue() const { return Color.getColorBlue(); }
 
 # if (DISPLAY_USE_PIXELS_DIMMING == STD_ON)
     byte getBrightness() const { return PixelStripe.getBrightness(); }
@@ -165,11 +157,11 @@ class Display
     // set methods
     void setBrightnessUseAutomatic(bool BrightnessUseAutomatic) { Brightness.setUseAutomatic(BrightnessUseAutomatic); }
     void setBrightnessUseGammaCorrection(bool BrightnessUseGammaCorrection) { Brightness.setUseGammaCorrection(BrightnessUseGammaCorrection); }
-    void setColor(Pixel sColor) { Color = sColor; }
-    void setColor(ColorType Red, byte Green, ColorType Blue) { Color.setRed(Red); Color.setGreen(Green); Color.setBlue(Blue); }
-    void setColorRed(ColorType Red) { Color.setRed(Red); }
-    void setColorGreen(ColorType Green) { Color.setGreen(Green); }
-    void setColorBlue(ColorType Blue) { Color.setBlue(Blue);}
+    void setColor(Pixel sColor) { Color.setColor(sColor);; }
+    void setColor(ColorType Red, byte Green, ColorType Blue) { Color.setColorRed(Red); Color.setColorGreen(Green); Color.setColorBlue(Blue); }
+    void setColorRed(ColorType Red) { Color.setColorRed(Red); }
+    void setColorGreen(ColorType Green) { Color.setColorGreen(Green); }
+    void setColorBlue(ColorType Blue) { Color.setColorBlue(Blue);}
 
 # if (DISPLAY_USE_PIXELS_DIMMING == STD_ON)
     void setBrightness(byte sBrightness) {
@@ -242,7 +234,7 @@ class Display
     void disableBrightnessAutomatic() { Brightness.disableAutomatic(); }
     void enbleBrightnessGammaCorrection() { Brightness.enableGammaCorrection(); }
     void disableBrightnessGammaCorrection() { Brightness.disableGammaCorrection(); }
-    void test() { PixelStripe.setPixels(ColorDimmed); }
+    void test() { PixelStripe.setPixels(Color.getColorDimmed()); }
     void clear() { PixelStripe.clearPixels(); }
     bool isCleared() { for(byte Index = 0; Index < DISPLAY_NUMBER_OF_PIXELS; Index++) { if(getPixelFast(Index)) return false; } return true; }
 

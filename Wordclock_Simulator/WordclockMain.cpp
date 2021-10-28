@@ -33,7 +33,6 @@ WordclockMain::WordclockMain()
     //WcClock.show();
 }
 
-
 WordclockMain::~WordclockMain()
 {
 

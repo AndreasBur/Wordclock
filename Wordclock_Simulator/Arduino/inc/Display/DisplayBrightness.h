@@ -9,10 +9,10 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       DisplayBrightness.h
- *      \brief
+ *      \brief      
  *
- *      \details
- *
+ *      \details    
+ *                  
 ******************************************************************************************************************************************************/
 #ifndef _DISPLAY_BRIGHTNESS_H_
 #define _DISPLAY_BRIGHTNESS_H_
@@ -50,7 +50,7 @@ class DisplayBrightness
 ******************************************************************************************************************************************************/
   public:
      using IlluminanceType = Illuminance::IlluminanceType;
-
+ 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
@@ -62,9 +62,9 @@ class DisplayBrightness
 
     static constexpr float AutomaticCorrectionFactor{1.0f};
     static constexpr byte BrightnessMaxValue{255};
-
+        
     // function
-    byte calcBrightnessAutomatic(byte sBrightness) const {
+    byte calcBrightnessAutomatic(byte sBrightness) const { 
         IlluminanceType Illuminance = Illuminance::getInstance().getIlluminance();
         IlluminanceType IlluminanceMax = Illuminance::getInstance().getCalibrationValuesMaxValue();
         float IlluminanceFactor = static_cast<float>(Illuminance) / IlluminanceMax;
@@ -73,7 +73,7 @@ class DisplayBrightness
     byte calcBrightnessCorrected() const { return GCorrection.calcCorrectedValue(Brightness); }
     byte calcBrightnessAutomatic() const { return calcBrightnessAutomatic(Brightness); }
     byte calcBrightnessAutomaticCorrected() const { return calcBrightnessAutomatic(GCorrection.calcCorrectedValue(Brightness)); }
-
+        
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
@@ -98,7 +98,7 @@ class DisplayBrightness
     void disableGammaCorrection() { UseGammaCorrection = false; }
     void incrementBrightness() { if(Brightness < BrightnessMaxValue) { Brightness++; }}
     void decrementBrightness() { if(Brightness > 0u) { Brightness--; }}
-
+        
     byte calcBrightness() const {
         if(UseGammaCorrection) {
             if(UseAutomatic) { return calcBrightnessAutomaticCorrected(); }
@@ -108,7 +108,7 @@ class DisplayBrightness
             else { return Brightness; }
         }
     }
-
+        
 };
 
 #endif

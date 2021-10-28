@@ -70,6 +70,8 @@ class MsgCmdRemoteProcedureCallParser : public MsgParameterParser<MsgCmdRemotePr
         RPC_ID_DISPLAY_BRIGHTNESS_DECREMENT,
         RPC_ID_DISPLAY_BRIGHTNESS_AUTOMATIC_ON,
         RPC_ID_DISPLAY_BRIGHTNESS_AUTOMATIC_OFF,
+        RPC_ID_DISPLAY_BRIGHTNESS_GAMMA_CORRECTION_ON,
+        RPC_ID_DISPLAY_BRIGHTNESS_GAMMA_CORRECTION_OFF,
         RPC_ID_POWER_ON,
         RPC_ID_POWER_OFF,
     };
@@ -134,6 +136,12 @@ class MsgCmdRemoteProcedureCallParser : public MsgParameterParser<MsgCmdRemotePr
                 break;
             case RPC_ID_DISPLAY_BRIGHTNESS_AUTOMATIC_ON :
                 Display::getInstance().enableBrightnessAutomatic();
+                break;
+            case RPC_ID_DISPLAY_BRIGHTNESS_GAMMA_CORRECTION_OFF :
+                Display::getInstance().disableBrightnessGammaCorrection();
+                break;
+            case RPC_ID_DISPLAY_BRIGHTNESS_GAMMA_CORRECTION_ON :
+                Display::getInstance().enbleBrightnessGammaCorrection();
                 break;
             case RPC_ID_DISPLAY_BRIGHTNESS_AUTOMATIC_OFF :
                 Display::getInstance().disableBrightnessAutomatic();

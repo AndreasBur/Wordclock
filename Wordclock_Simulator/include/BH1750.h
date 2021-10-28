@@ -100,7 +100,7 @@ class BH1750
     StdReturnType sendMode() { return sendCommand(Mode); }
     IlluminanceType convertRawToLux(IlluminanceType IlluminanceRaw) const { return IlluminanceRaw / BH1750_ILLUMINANCE_RAW_VALUE_DIVIDER; }
     IlluminanceType combineRawValueParts(byte HighByte, byte LowByte) const { return static_cast<uint16_t>(HighByte) << 8u | LowByte; }
-    bool isMTRegValueInRange(byte MTRegValue) const { return (MTRegValue <= BH1750_REG_MT_MAX_VALUE && MTRegValue >= BH1750_REG_MT_MIN_VALUE); }
+    bool isMTRegValueInRange(byte MTRegValue) const { return ((MTRegValue <= BH1750_REG_MT_MAX_VALUE) && (MTRegValue >= BH1750_REG_MT_MIN_VALUE)); }
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S

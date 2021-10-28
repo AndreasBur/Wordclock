@@ -33,16 +33,14 @@ Pixels::Pixels(wxWindow* parent, const wxString &title) : wxFrame(parent, -1, ti
 {
     SetIcon(wxICON(WordclockIcon));
     SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DFACE));
-    //this->SetSizeHints(wxDefaultSize, wxDefaultSize);
-
     wxScrolledWindow* ScrolledWindow = new wxScrolledWindow(this);
 
     ScrolledWindow->SetSizer(createSizerAll(ScrolledWindow));
-    ScrolledWindow->FitInside();
+    ScrolledWindow->Fit();
     ScrolledWindow->SetScrollRate(5, 5);
     ScrolledWindow->Show();
 
-    this->Layout();
+    Fit();
 }
 
 wxBoxSizer* Pixels::createSizerAll(wxWindow* Parent)

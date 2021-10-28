@@ -8,31 +8,29 @@
  *  ---------------------------------------------------------------------------------------------------------------------------------------------------
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       Pixel.h
- *      \brief
+/**     \file       DisplayColor.h
+ *      \brief      
  *
- *      \details
- *
+ *      \details    
+ *                  
 ******************************************************************************************************************************************************/
-#ifndef _PIXEL_H_
-#define _PIXEL_H_
+#ifndef _DISPLAY_COLOR_H_
+#define _DISPLAY_COLOR_H_
 
 /******************************************************************************************************************************************************
  * I N C L U D E S
 ******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Arduino.h"
-#include <array>
+#include "Pixel.h"
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
-/* Pixel configuration parameter */
-#define PIXEL_COLOR_OFFSET_GREEN                   0u
-#define PIXEL_COLOR_OFFSET_RED                     1u
-#define PIXEL_COLOR_OFFSET_BLUE                    2u
+/* DisplayColor configuration parameter */
+#define DISPLAY_COLOR_SUPPORT_DIMMING                   STD_ON
 
-/* Pixel parameter */
+/* DisplayColor parameter */
 
 
 
@@ -42,72 +40,81 @@
 
 
 /******************************************************************************************************************************************************
- *  C L A S S   N E O P I X E L
+ *  C L A S S   D I S P L A Y   C O L O R
 ******************************************************************************************************************************************************/
-class Pixel
+class DisplayColor
 {
 /******************************************************************************************************************************************************
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-    using ColorType = byte;
-
-/******************************************************************************************************************************************************
- *  P R I V A T E   D A T A   T Y P E S   A N D   S T R U C T U R E S
-******************************************************************************************************************************************************/
-  private:
-    static constexpr byte NumberOfColors{3u};
-    using PixelRawType = std::array<byte, NumberOfColors>;
-
+  
+  
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    PixelRawType PixelRaw{0u, 0u, 0u};
+    Pixel Color{255, 255, 255};
 
-    static constexpr byte ColorMaxValue{255u};
-    static constexpr byte ColorOffsetRed{PIXEL_COLOR_OFFSET_RED};
-    static constexpr byte ColorOffsetGreen{PIXEL_COLOR_OFFSET_GREEN};
-    static constexpr byte ColorOffsetBlue{PIXEL_COLOR_OFFSET_BLUE};
+#if (DISPLAY_COLOR_SUPPORT_DIMMING == STD_ON)
+    Pixel ColorDimmed{Color};
+#endif
 
     // functions
+#if (DISPLAY_COLOR_SUPPORT_DIMMING == STD_ON)
+    byte dimmColor(byte Color, byte Brightness) const {
+        byte dimmedColor = (Color * Brightness) >> 8u;
+        if(dimmedColor == 0u) { return 1u; }
+        else { return dimmedColor; }
+    }
+#endif
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr Pixel() { }
-    constexpr Pixel(ColorType ColorRed, ColorType ColorGreen, ColorType ColorBlue)
-        : PixelRaw{ColorRed, ColorGreen, ColorBlue} { }
-    ~Pixel() { }
+    DisplayColor() { }
+    ~DisplayColor() { }
 
-    // get methods
-    static constexpr byte getNumberOfColors() { return NumberOfColors; }
-    ColorType getRed() const { return PixelRaw[ColorOffsetRed]; }
-    ColorType getBlue() const { return PixelRaw[ColorOffsetBlue]; }
-    ColorType getGreen() const { return PixelRaw[ColorOffsetGreen]; }
+	// get methods
+    Pixel getColor() const { return Color; }
+    byte getColorRed() const { return Color.getRed(); }
+    byte getColorGreen() const { return Color.getGreen(); }
+    byte getColorBlue() const { return Color.getBlue(); }
+        
+#if (DISPLAY_COLOR_SUPPORT_DIMMING == STD_ON)
+    Pixel getColorDimmed() { return ColorDimmed; }
+    byte getColorRedDimmed() { return ColorDimmed.getRed(); }
+    byte getColorGreenDimmed() { return ColorDimmed.getGreen(); }
+    byte getColorBlueDimmed() { return ColorDimmed.getBlue(); }
+#endif
 
-    // set methods
-    void setRed(ColorType Value) { PixelRaw[ColorOffsetRed] = Value; }
-    void setBlue(ColorType Value) { PixelRaw[ColorOffsetBlue] = Value; }
-    void setGreen(ColorType Value) { PixelRaw[ColorOffsetGreen] = Value; }
+	// set methods
+    void setColor(Pixel sColor) { Color = sColor; }
+    void setColorRed(byte Red) { Color.setRed(Red); }
+    void setColorGreen(byte Green) { Color.setGreen(Green); }
+    void setColorBlue(byte Blue) { Color.setBlue(Blue); }
 
-    void setPixel(ColorType Red, ColorType Green, ColorType Blue) {
-         PixelRaw[ColorOffsetRed] = Red;
-         PixelRaw[ColorOffsetBlue] = Blue;
-         PixelRaw[ColorOffsetGreen] = Green;
+	// methods
+    void incrementColorRed() { Color.incrementRed(); }
+    void incrementColorGreen() { Color.incrementGreen(); }
+    void incrementColorBlue() { Color.incrementBlue(); }
+    
+    void decrementColorRed() { Color.decrementRed(); }
+    void decrementColorGreen() { Color.decrementGreen(); }
+    void decrementColorBlue() { Color.decrementBlue(); }    
+    
+#if (DISPLAY_COLOR_SUPPORT_DIMMING == STD_ON)
+    void dimmColorRed(byte Brightness) { ColorDimmed.setRed(dimmColor(Color.getRed(), Brightness)); }
+    void dimmColorGreen(byte Brightness) { ColorDimmed.setGreen(dimmColor(Color.getGreen(), Brightness)); }
+    void dimmColorBlue(byte Brightness) { ColorDimmed.setBlue(dimmColor(Color.getBlue(), Brightness)); }
+    
+    void dimmColors(byte Brightness) {
+        dimmColorRed(Brightness);
+        dimmColorGreen(Brightness);
+        dimmColorBlue(Brightness);
     }
-
-    // methods
-    void clearPixel() { setPixel(0u, 0u, 0u); }
-
-    void incrementRed() { if(PixelRaw[ColorOffsetRed] < ColorMaxValue) PixelRaw[ColorOffsetRed]++; }
-    void incrementGreen() { if(PixelRaw[ColorOffsetGreen] < ColorMaxValue) PixelRaw[ColorOffsetGreen]++; }
-    void incrementBlue() { if(PixelRaw[ColorOffsetBlue] < ColorMaxValue) PixelRaw[ColorOffsetBlue]++; }
-
-    void decrementRed() { if(PixelRaw[ColorOffsetRed] > 0u) PixelRaw[ColorOffsetRed]--; }
-    void decrementGreen() { if(PixelRaw[ColorOffsetGreen] > 0u) PixelRaw[ColorOffsetGreen]--; }
-    void decrementBlue() { if(PixelRaw[ColorOffsetBlue] > 0u) PixelRaw[ColorOffsetBlue]--; }
+#endif
 };
 
 #endif

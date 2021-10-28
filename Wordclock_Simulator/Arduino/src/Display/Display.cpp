@@ -58,9 +58,7 @@ void Display::init()
 void Display::setBrightness(byte sBrightness)
 {
     Brightness.setBrightness(sBrightness);
-    ColorDimmed.setRed(dimmColor(Color.getRed(), Brightness.calcBrightness()));
-    ColorDimmed.setGreen(dimmColor(Color.getGreen(), Brightness.calcBrightness()));
-    ColorDimmed.setBlue(dimmColor(Color.getBlue(), Brightness.calcBrightness()));
+    Color.dimmColors(sBrightness);
 
     for(IndexType Index = 0; Index < DISPLAY_NUMBER_OF_PIXELS; Index++) {
         // update all pixels to new brightness
@@ -225,7 +223,7 @@ Display::PixelValueType Display::getPixelFast(byte Column, byte Row)  const
 #else
     pixel = PixelStripe.getPixelFast((Row * DISPLAY_NUMBER_OF_COLUMNS) + Column);
 #endif
-    if(pixel.getRed() == 0 && pixel.getGreen() == 0 && pixel.getBlue() == 0) return false;
+    if(pixel.getRed() == 0u && pixel.getGreen() == 0u && pixel.getBlue() == 0u) return false;
     else return true;
 } /* getPixelFast */
 
@@ -240,13 +238,13 @@ StdReturnType Display::setPixel(byte Column, byte Row)
 # if (DISPLAY_USE_PIXELS_DIMMING == STD_ON)
     return PixelStripe.setPixel(transformToSerpentine(Column,  Row), Color);
 # else
-    return PixelStripe.setPixel(transformToSerpentine(Column,  Row), ColorDimmed);
+    return PixelStripe.setPixel(transformToSerpentine(Column,  Row), Color.getColorDimmed());
 # endif
 #else
 # if (DISPLAY_USE_PIXELS_DIMMING == STD_ON)
     return PixelStripe.setPixel((Row * DISPLAY_NUMBER_OF_COLUMNS) + Column, Color);
 # else
-    return PixelStripe.setPixel((Row * DISPLAY_NUMBER_OF_COLUMNS) + Column, ColorDimmed);
+    return PixelStripe.setPixel((Row * DISPLAY_NUMBER_OF_COLUMNS) + Column, Color.getColorDimmed());
 # endif
 #endif
 } /* setPixel */
@@ -262,13 +260,13 @@ void Display::setPixelFast(byte Column, byte Row)
 # if (DISPLAY_USE_PIXELS_DIMMING == STD_ON)
     PixelStripe.setPixelFast(transformToSerpentine(Column,  Row), Color);
 # else
-    PixelStripe.setPixelFast(transformToSerpentine(Column,  Row), ColorDimmed);
+    PixelStripe.setPixelFast(transformToSerpentine(Column,  Row), Color.getColorDimmed());
 # endif
 #else
 # if (DISPLAY_USE_PIXELS_DIMMING == STD_ON)
     PixelStripe.setPixelFast((Row * DISPLAY_NUMBER_OF_COLUMNS) + Column, Color);
 # else
-    PixelStripe.setPixelFast((Row * DISPLAY_NUMBER_OF_COLUMNS) + Column, ColorDimmed);
+    PixelStripe.setPixelFast((Row * DISPLAY_NUMBER_OF_COLUMNS) + Column, Color.getColorDimmed());
 # endif
 #endif
 } /* setPixelFast */
@@ -536,11 +534,10 @@ Display::Display(Pixel sColor) : PixelStripe{Pixels::getInstance()}
 #endif
 {
     State = STATE_UNINIT;
-    Color = sColor;
+    Color.setColor(sColor);
 
 #if (DISPLAY_USE_PIXELS_DIMMING == STD_OFF)
     Brightness.setBrightness(255u);
-    ColorDimmed = Color;
 #endif
 } /* Display */
 
@@ -553,14 +550,13 @@ Display::Display(ColorType Red, ColorType Green, ColorType Blue) : PixelStripe{P
 : PixelStripe()
 #endif
 {
-    Color.setRed(Red);
-    Color.setGreen(Green);
-    Color.setBlue(Blue);
+    Color.setColorRed(Red);
+    Color.setColorGreen(Green);
+    Color.setColorBlue(Blue);
     State = STATE_UNINIT;
 
 #if (DISPLAY_USE_PIXELS_DIMMING == STD_OFF)
     Brightness.setBrightness(255u);
-    ColorDimmed = Color;
 #endif
 } /* Display */
 

@@ -71,9 +71,6 @@ class Pixel
     static constexpr byte ColorOffsetBlue{PIXEL_COLOR_OFFSET_BLUE};
     
     // functions
-    //ColorType getColorRed() const { return PixelRaw[ColorOffsetRed]; }
-    //ColorType getColorGreen() const { return PixelRaw[ColorOffsetGreen]; }
-    //ColorType getColorBlue() const { return PixelRaw[ColorOffsetBlue]; }
   
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
@@ -95,8 +92,7 @@ class Pixel
     void setBlue(ColorType Value) { PixelRaw[ColorOffsetBlue] = Value; }
     void setGreen(ColorType Value) { PixelRaw[ColorOffsetGreen] = Value; }
 
-    void setPixel(ColorType Red, ColorType Green, ColorType Blue)
-    {
+    void setPixel(ColorType Red, ColorType Green, ColorType Blue) {
          PixelRaw[ColorOffsetRed] = Red;
          PixelRaw[ColorOffsetBlue] = Blue;
          PixelRaw[ColorOffsetGreen] = Green;
@@ -105,13 +101,13 @@ class Pixel
     // methods
     void clearPixel() { setPixel(0u, 0u, 0u); }
         
-    void incrementColorRed() { if(PixelRaw[ColorOffsetRed] < ColorMaxValue) PixelRaw[ColorOffsetRed]++; }
-    void incrementColorGreen() { if(PixelRaw[ColorOffsetGreen] < ColorMaxValue) PixelRaw[ColorOffsetGreen]++; }
-    void incrementColorBlue() { if(PixelRaw[ColorOffsetBlue] < ColorMaxValue) PixelRaw[ColorOffsetBlue]++; }
+    void incrementRed() { if(PixelRaw[ColorOffsetRed] < ColorMaxValue) PixelRaw[ColorOffsetRed]++; }
+    void incrementGreen() { if(PixelRaw[ColorOffsetGreen] < ColorMaxValue) PixelRaw[ColorOffsetGreen]++; }
+    void incrementBlue() { if(PixelRaw[ColorOffsetBlue] < ColorMaxValue) PixelRaw[ColorOffsetBlue]++; }
         
-    void decrementColorRed() { if(PixelRaw[ColorOffsetRed] > 0u) PixelRaw[ColorOffsetRed]--; }
-    void decrementColorGreen() { if(PixelRaw[ColorOffsetGreen] > 0u) PixelRaw[ColorOffsetGreen]--; }
-    void decrementColorBlue() { if(PixelRaw[ColorOffsetBlue] > 0u) PixelRaw[ColorOffsetBlue]--; }
+    void decrementRed() { if(PixelRaw[ColorOffsetRed] > 0u) PixelRaw[ColorOffsetRed]--; }
+    void decrementGreen() { if(PixelRaw[ColorOffsetGreen] > 0u) PixelRaw[ColorOffsetGreen]--; }
+    void decrementBlue() { if(PixelRaw[ColorOffsetBlue] > 0u) PixelRaw[ColorOffsetBlue]--; }
 };
 
 #endif
