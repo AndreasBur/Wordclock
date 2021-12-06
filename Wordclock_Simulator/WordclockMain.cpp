@@ -46,7 +46,6 @@ void WordclockMain::task()
     int Minute = Time.GetMinute();
 
     wcScheduler.task();
-    Display::getInstance().show();
 
      //Clock::getInstance().getClockWords(Hour, Minute, NewTimeWords);
 

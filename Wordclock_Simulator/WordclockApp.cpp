@@ -9,7 +9,7 @@ wxEND_EVENT_TABLE()
 
 WordclockApp::WordclockApp() : Timer(this, TIMER_ID)
 {
-    Timer.Start(1000);
+    Timer.Start(50);
 }
 
 bool WordclockApp::OnInit()

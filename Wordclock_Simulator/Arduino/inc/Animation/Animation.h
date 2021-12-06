@@ -97,7 +97,7 @@ class Animation
 
     // methods
     void init();
-    void task();
+    void task(bool=false);
     StdReturnType show() const;
 
     // AnimationClock functions
