@@ -28,7 +28,7 @@
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
 /* Scheduler configuration parameter */
-
+#define SCHEDULER_TASK_CYCLE                100u
 
 /* Scheduler parameter */
 
@@ -49,28 +49,16 @@ class Scheduler
 ******************************************************************************************************************************************************/
   public:
 
-
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    //static constexpr byte TaskCycleInitValue{10u};
-    //byte TaskCycle{10u};
+    static constexpr byte TaskCycle{SCHEDULER_TASK_CYCLE};
     byte TaskCycleCounter{0u};
 
     // functions
     bool isCycleHit(byte);
     void triggerTasks();
-
-    void triggerTaskOnCycle(byte TaskCycle, std::function<void(void)> TaskFunction)
-    {
-        if(isCycleHit(TaskCycle)) { TaskFunction(); }
-    }
-
-
-    void incrementTaskCycleCounter() {
-        TaskCycleCounter++;
-    }
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
@@ -80,12 +68,10 @@ class Scheduler
     ~Scheduler() { }
 
 	// get methods
-    //static constexpr byte getTaskCycleInitValue() { return TaskCycleInitValue; }
-    //byte getTaskCycle() const { return TaskCycle; }
+    static constexpr byte getTaskCycle() { return TaskCycle; }
     byte getTaskCycleCounter() const { return TaskCycleCounter; }
 
 	// set methods
-    //void setTaskCycle(byte sTaskCycle) { TaskCycle = sTaskCycle; }
     void setTaskCycleCounter(byte sTaskCycleCounter) { TaskCycleCounter = sTaskCycleCounter; }
 
 	// methods

@@ -51,7 +51,7 @@
 ******************************************************************************************************************************************************/
 void Scheduler::task()
 {
-    incrementTaskCycleCounter();
+    TaskCycleCounter++;
     triggerTasks();
 } /* task */
 
@@ -75,9 +75,9 @@ bool Scheduler::isCycleHit(byte Cycle) {
 ******************************************************************************************************************************************************/
 void Scheduler::triggerTasks()
 {
-    //triggerTaskOnCycle(Illuminance::getInstance().getTaskCycle(), std::bind(&Illuminance::getInstance().task, &Illuminance::getInstance()));
-    triggerTaskOnCycle(Animation::getInstance().getTaskCycle(), std::bind(&Animation::getInstance().task, &Animation::getInstance());
-    //triggerTaskOnCycle(Communication::getInstance().getTaskCycle(), &Communication::getInstance().task);
+    if(isCycleHit(Illuminance::getInstance().getTaskCycle())) { Illuminance::getInstance().task(); }
+    if(isCycleHit(Animation::getInstance().getTaskCycle())) { Animation::getInstance().task(); }
+    if(isCycleHit(Communication::getInstance().getTaskCycle())) { Communication::getInstance().task(); }
 } /* triggerTasks */
 
 /******************************************************************************************************************************************************
