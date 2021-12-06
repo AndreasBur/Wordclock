@@ -97,17 +97,19 @@ byte Animation::getTaskCycle() const
 /******************************************************************************************************************************************************
   task()
 ******************************************************************************************************************************************************/
-void Animation::task()
+void Animation::task(bool Show)
 {
     if( wcAnimationClock.getState() == AnimationClockCommon::STATE_CLEAR_TIME ||
         wcAnimationClock.getState() == AnimationClockCommon::STATE_SET_TIME)
     {
         wcAnimationClock.task();
+        if(Show) { wcAnimationClock.show(); }
     }
     else if( wcAnimationFont.getState() == AnimationFont::STATE_CHAR_SHIFT ||
              wcAnimationFont.getState() == AnimationFont::STATE_TEXT_SHIFT)
     {
         wcAnimationFont.task();
+        if(Show) { wcAnimationFont.show(); }
     }
 } /* task */
 
