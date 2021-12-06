@@ -8,29 +8,29 @@
  *  ---------------------------------------------------------------------------------------------------------------------------------------------------
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       Illuminance.h
+/**     \file       DisplayManager.h
  *      \brief      
  *
  *      \details    
  *                  
 ******************************************************************************************************************************************************/
-#ifndef _ILLUMINANCE_H_
-#define _ILLUMINANCE_H_
+#ifndef _DISPLAY_MANAGER_H_
+#define _DISPLAY_MANAGER_H_
 
 /******************************************************************************************************************************************************
  * I N C L U D E S
 ******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Arduino.h"
-#include "BH1750.h"
+
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
-/* Illuminance configuration parameter */
+/* DisplayManager configuration parameter */
 
 
-/* Illuminance parameter */
+/* DisplayManager parameter */
 
 
 
@@ -40,54 +40,36 @@
 
 
 /******************************************************************************************************************************************************
- *  C L A S S   I L L U M I N A N C E
+ *  C L A S S   D I S P L A Y   M A N A G E R
 ******************************************************************************************************************************************************/
-class Illuminance
+class DisplayManager
 {
 /******************************************************************************************************************************************************
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-    using IlluminanceType = BH1750::IlluminanceType;
-    using CalibrationValuesType = BH1750::CalibrationValuesType;
-    using ModeType = BH1750::ModeType;
+  
   
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    constexpr Illuminance() { }
-    ~Illuminance() { }
-    
-    BH1750 Sensor;
+
   
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    static Illuminance& getInstance() {
-        static Illuminance singletonInstance;
-        return singletonInstance;
-    }
+    DisplayManager();
+    ~DisplayManager();
 
-    byte getTaskCycle() const { return Sensor.getTaskCycle(); }
-    IlluminanceType getIlluminance() const { return Sensor.getIlluminance(); }
-    CalibrationValuesType getCalibrationValues() const { return Sensor.getCalibrationValues(); }
-    IlluminanceType getCalibrationValuesMaxValue() const { return Sensor.getCalibrationValues().MaxValue; }
-    IlluminanceType getCalibrationValuesMinValue() const { return Sensor.getCalibrationValues().MinValue; }
+	// get methods
 
-    // set methods
-    void setCalibrationValuesMaxValue(IlluminanceType MaxValue) { Sensor.setCalibrationValuesMaxValue(MaxValue); }
-    void setCalibrationValuesMinValue(IlluminanceType MinValue) { Sensor.setCalibrationValuesMinValue(MinValue); }
-    void setCalibrationValues(CalibrationValuesType CalibrationValues) { Sensor.setCalibrationValues(CalibrationValues); }
 
-    // methods
-    StdReturnType init(ModeType);
-    StdReturnType changeMeasurementTime(byte);
-    void startCalibrationMaxValue() { Sensor.startCalibrationMaxValue(); }
-    void startCalibrationMinValue() { Sensor.startCalibrationMinValue(); }
+	// set methods
 
-    void task() { Sensor.task(); }
+	// methods
+    void init();
 };
 
 #endif

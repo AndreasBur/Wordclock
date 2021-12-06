@@ -6,14 +6,13 @@
 #include "StandardTypes.h"
 #include "Pixel.h"
 
-#define PIXELS_NUMBER_OF_LEDS               110
-#define PIXELS_SUPPORT_DIMMING              STD_ON
-#define PIXELS_IS_SINGLETON                 STD_ON
+#define PIXELS_NUMBER_OF_LEDS                           110
+#define PIXELS_SUPPORT_DIMMING                          STD_ON
+#define PIXELS_IS_SINGLETON                             STD_ON
 
-
-#define PIXELS_DISPLAY_NUMBER_OF_ROWS                  10u
-#define PIXELS_DISPLAY_NUMBER_OF_COLUMNS               11u
-#define PIXELS_NUMBER_OF_PIXELS                        (PIXELS_DISPLAY_NUMBER_OF_ROWS * PIXELS_DISPLAY_NUMBER_OF_COLUMNS)
+#define PIXELS_DISPLAY_NUMBER_OF_ROWS                   10u
+#define PIXELS_DISPLAY_NUMBER_OF_COLUMNS                11u
+#define PIXELS_NUMBER_OF_PIXELS                         (PIXELS_DISPLAY_NUMBER_OF_ROWS * PIXELS_DISPLAY_NUMBER_OF_COLUMNS)
 
 class Pixels : public wxFrame
 {
@@ -77,6 +76,7 @@ class Pixels : public wxFrame
         {
             ID_BUTTON_QUIT = 1000,
             ID_BUTTON_ABOUT,
+            //ID_BUTTON_CREATE_INPUT,
             ID_BUTTON_CLEAR,
             ID_BUTTON_SEND,
             ID_TEXT_CTRL_OUTPUT,
@@ -101,6 +101,7 @@ class Pixels : public wxFrame
         void OnClose(wxCloseEvent&);
         void OnClear(wxCommandEvent&);
         void OnAbout(wxCommandEvent&);
+        //void OnCreateInput(wxCommandEvent&);
         void OnSend(wxCommandEvent&);
         void OnQuit(wxCommandEvent&);
         void setPixels(wxColour);

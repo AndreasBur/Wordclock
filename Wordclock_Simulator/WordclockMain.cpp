@@ -45,17 +45,7 @@ void WordclockMain::task()
     int Hour = Time.GetHour();
     int Minute = Time.GetMinute();
 
-    Animation::getInstance().task();
-
-//    if(WcAnimation.getState() == Animation::STATE_IDLE) {
-//        Time = wxDateTime::Now();
-//        int Hour = Time.GetHour();
-//        int Minute = Time.GetMinute();
-//        //WcDisplay.clear();
-    //WcAnimation.setClock(Hour, Minute);
-//    }
-    wcCommunication.task();
-
+    wcScheduler.task();
     Display::getInstance().show();
 
      //Clock::getInstance().getClockWords(Hour, Minute, NewTimeWords);

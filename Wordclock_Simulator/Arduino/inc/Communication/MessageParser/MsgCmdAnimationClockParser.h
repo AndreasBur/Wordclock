@@ -84,6 +84,7 @@ class MsgCmdAnimationClockParser : public MsgParameterParser<MsgCmdAnimationCloc
     void sendAnswerAnimation(bool AppendSpace) const {
         sendAnswerParameter(AnimationOptionShortName, Animation::getInstance().getAnimation(), AppendSpace);
     }
+
     void sendAnswerSpeed(bool AppendSpace) const {
         AnimationClockType animation = Animation::getInstance().getAnimation();
         byte taskCylce = Animation::getInstance().getClockTaskCycle(animation);

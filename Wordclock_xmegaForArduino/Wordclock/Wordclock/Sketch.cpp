@@ -1,15 +1,7 @@
 ﻿/*Begining of Auto generated code by Atmel studio */
-//#include <Arduino.h>
-#include "Display.h"
-#include "Animation.h"
-#include "Clock.h"
-#include "WS2812.h"
 #include <util/delay.h>
+#include "Scheduler.h"
 #include "Timer.h"
-#include "Communication.h"
-#include "BH1750.h"
-#include "Bit.h"
-#include "RealTimeClock.h"
 
 //volatile uint8_t* const PROGMEM port_to_mode_PGMdfg[] = {
     //NOT_A_PORT,
@@ -44,6 +36,7 @@
 
 //Animation wcAnimation();
 //Communication wcCommunication;
+Scheduler wcScheduler;
 
 void initClockPrescaler()
 {
@@ -131,12 +124,9 @@ void loop()
   // put your main code here, to run repeatedly:
     //Clock::getInstance().setTime(17,30);
 	while(1) {
-	    //wcCommunication.task();
-        //Animation::getInstance().task();
+        wcScheduler.task();
 	}
 
-    Bit myBit(10u);
-    myBit.writeBit(true, 1);
     
 
 

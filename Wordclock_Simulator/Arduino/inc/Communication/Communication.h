@@ -30,6 +30,7 @@
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
 /* Communication configuration parameter */
+#define COMMUNICATION_TASK_CYCLE                         100u
 
 /* Communication parameter */
 
@@ -57,6 +58,10 @@ class Communication
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
+    Communication() : Error(), IncomingMessage(), State(STATE_MESSAGE_INCOMPLETE) { }
+    ~Communication() { }
+        
+    static constexpr byte TaskCycle{COMMUNICATION_TASK_CYCLE};
     static constexpr char EndOfMessageChar{'\n'};
     ErrorMessage Error;
     Message IncomingMessage;
@@ -68,11 +73,14 @@ class Communication
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
-  public:
-    Communication() : Error(), IncomingMessage(), State(STATE_MESSAGE_INCOMPLETE) { }
-    ~Communication() { }
+  public:        
+    static Communication& getInstance() {
+        static Communication SingletonInstance;
+        return SingletonInstance;
+    }
 
     // get methods
+    static constexpr byte getTaskCycle() { return TaskCycle; }
     StateType getState() const { return State; }
 
     // set methods

@@ -28,6 +28,7 @@
 ******************************************************************************************************************************************************/
 /* BH1750 configuration parameter */
 #define BH1750_I2C_ADDR                                 0x76u
+#define BH1750_TASK_CYCLE                               100u
 
 /* BH1750 parameter */
 #define BH1750_ILLUMINANCE_MAX_LX_VALUE                 65535u
@@ -88,6 +89,7 @@ class BH1750
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
+    static constexpr byte TaskCycle{BH1750_TASK_CYCLE};
     ModeType Mode{MODE_NONE};
     IlluminanceType Illuminance{BH1750_ILLUMINANCE_MIN_LX_VALUE};
     CalibrationValuesType CalibrationValues{BH1750_ILLUMINANCE_MAX_LX_VALUE, BH1750_ILLUMINANCE_MIN_LX_VALUE};
@@ -100,7 +102,7 @@ class BH1750
     StdReturnType sendMode() { return sendCommand(Mode); }
     IlluminanceType convertRawToLux(IlluminanceType IlluminanceRaw) const { return IlluminanceRaw / BH1750_ILLUMINANCE_RAW_VALUE_DIVIDER; }
     IlluminanceType combineRawValueParts(byte HighByte, byte LowByte) const { return static_cast<uint16_t>(HighByte) << 8u | LowByte; }
-    bool isMTRegValueInRange(byte MTRegValue) const { return (MTRegValue <= BH1750_REG_MT_MAX_VALUE && MTRegValue >= BH1750_REG_MT_MIN_VALUE); }
+    bool isMTRegValueInRange(byte MTRegValue) const { return ((MTRegValue <= BH1750_REG_MT_MAX_VALUE) && (MTRegValue >= BH1750_REG_MT_MIN_VALUE)); }
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
@@ -110,6 +112,7 @@ class BH1750
     ~BH1750() { }
 
     // get methods
+    static constexpr byte getTaskCycle() { return TaskCycle; }
     ModeType getMode() const { return Mode; }
     IlluminanceType getIlluminance() const { return Illuminance; }
     CalibrationValuesType getCalibrationValues() const { return CalibrationValues; }

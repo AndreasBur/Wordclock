@@ -75,6 +75,26 @@ Animation::StateType Animation::getState()
 
 
 /******************************************************************************************************************************************************
+  getTaskCycle()
+******************************************************************************************************************************************************/
+byte Animation::getTaskCycle() const
+{
+    if( wcAnimationClock.getState() == AnimationClockCommon::STATE_CLEAR_TIME ||
+        wcAnimationClock.getState() == AnimationClockCommon::STATE_SET_TIME)
+    {
+        return wcAnimationClock.getTaskCycle(wcAnimationClock.getAnimation());
+    }
+    else if( wcAnimationFont.getState() == AnimationFont::STATE_CHAR_SHIFT ||
+             wcAnimationFont.getState() == AnimationFont::STATE_TEXT_SHIFT)
+    {
+        return wcAnimationFont.getTaskCycle();
+    }
+
+    return E_NOT_OK;
+} /* task */
+
+
+/******************************************************************************************************************************************************
   task()
 ******************************************************************************************************************************************************/
 void Animation::task()

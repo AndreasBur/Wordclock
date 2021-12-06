@@ -70,6 +70,7 @@ class Illuminance
         return singletonInstance;
     }
 
+    byte getTaskCycle() const { return Sensor.getTaskCycle(); }
     IlluminanceType getIlluminance() const { return Sensor.getIlluminance(); }
     CalibrationValuesType getCalibrationValues() const { return Sensor.getCalibrationValues(); }
     IlluminanceType getCalibrationValuesMaxValue() const { return Sensor.getCalibrationValues().MaxValue; }
@@ -86,7 +87,7 @@ class Illuminance
     void startCalibrationMaxValue() { Sensor.startCalibrationMaxValue(); }
     void startCalibrationMinValue() { Sensor.startCalibrationMinValue(); }
 
-    void task();
+    void task() { Sensor.task(); }
 };
 
 #endif

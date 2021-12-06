@@ -54,6 +54,8 @@
 #define ANIMATION_CLOCK_SUPPORT_IMPLODE              STD_ON
 #define ANIMATION_CLOCK_SUPPORT_EXPLODE              STD_ON
 
+#define ANIMATION_CLOCK_TASK_CYCLE_INIT_VALUE        10u
+
 /* AnimationClock parameter */
 
 
@@ -187,7 +189,8 @@ class AnimationClock
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    std::array<byte, ANIMATION_CLOCK_NUMBER_OF_ANIMATIONS> TaskCycles{{0u}};
+    static constexpr byte TaskCycleInitValue{ANIMATION_CLOCK_TASK_CYCLE_INIT_VALUE};
+    std::array<byte, ANIMATION_CLOCK_NUMBER_OF_ANIMATIONS> TaskCycles;
     AnimationType Animation{ANIMATION_CLOCK_NONE};
     AnimationsType Animations;
 
@@ -197,7 +200,7 @@ class AnimationClock
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr AnimationClock() : TaskCycles{255u}, Animation(ANIMATION_CLOCK_NONE), Animations() { }
+    AnimationClock() : Animations() { TaskCycles.fill(TaskCycleInitValue); }
     ~AnimationClock() { }
 
     // get methods

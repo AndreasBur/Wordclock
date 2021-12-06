@@ -8,109 +8,77 @@
  *  ---------------------------------------------------------------------------------------------------------------------------------------------------
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       Pixel.h
+/**     \file       Scheduler.cpp
  *      \brief
  *
  *      \details
  *
+ *
 ******************************************************************************************************************************************************/
-#ifndef _PIXEL_H_
-#define _PIXEL_H_
+#define _SCHEDULER_SOURCE_
 
 /******************************************************************************************************************************************************
  * I N C L U D E S
 ******************************************************************************************************************************************************/
-#include "StandardTypes.h"
-#include "Arduino.h"
-#include <array>
+#include "Scheduler.h"
+#include "Animation.h"
+#include "Illuminance.h"
+#include "Communication.h"
 
 /******************************************************************************************************************************************************
- *  G L O B A L   C O N S T A N T   M A C R O S
-******************************************************************************************************************************************************/
-/* Pixel configuration parameter */
-#define PIXEL_COLOR_OFFSET_GREEN                   0u
-#define PIXEL_COLOR_OFFSET_RED                     1u
-#define PIXEL_COLOR_OFFSET_BLUE                    2u
-
-/* Pixel parameter */
-
-
-
-/******************************************************************************************************************************************************
- *  G L O B A L   F U N C T I O N   M A C R O S
+ *  L O C A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
 
 
 /******************************************************************************************************************************************************
- *  C L A S S   N E O P I X E L
+ *  L O C A L   F U N C T I O N   M A C R O S
 ******************************************************************************************************************************************************/
-class Pixel
+
+
+
+/******************************************************************************************************************************************************
+ *  L O C A L   D A T A   T Y P E S   A N D   S T R U C T U R E S
+******************************************************************************************************************************************************/
+
+
+
+/******************************************************************************************************************************************************
+ * P U B L I C   F U N C T I O N S
+******************************************************************************************************************************************************/
+
+/******************************************************************************************************************************************************
+  task()
+******************************************************************************************************************************************************/
+void Scheduler::task()
 {
-/******************************************************************************************************************************************************
- *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
-******************************************************************************************************************************************************/
-  public:
-    using ColorType = byte;
+    incrementTaskCycleCounter();
+    triggerTasks();
+} /* task */
+
 
 /******************************************************************************************************************************************************
- *  P R I V A T E   D A T A   T Y P E S   A N D   S T R U C T U R E S
+ * P R I V A T E   F U N C T I O N S
 ******************************************************************************************************************************************************/
-  private:
-    static constexpr byte NumberOfColors{3u};
-    using PixelRawType = std::array<byte, NumberOfColors>;
 
 /******************************************************************************************************************************************************
- *  P R I V A T E   D A T A   A N D   F U N C T I O N S
+  isCycleHit()
 ******************************************************************************************************************************************************/
-  private:
-    PixelRawType PixelRaw{0u, 0u, 0u};
+bool Scheduler::isCycleHit(byte Cycle) {
+    if(Cycle == 0u) { return false; }
+    if(TaskCycleCounter % Cycle) { return false; }
+    else { return true; }
+} /* isCycleHit */
 
-    static constexpr byte ColorMaxValue{255u};
-    static constexpr byte ColorOffsetRed{PIXEL_COLOR_OFFSET_RED};
-    static constexpr byte ColorOffsetGreen{PIXEL_COLOR_OFFSET_GREEN};
-    static constexpr byte ColorOffsetBlue{PIXEL_COLOR_OFFSET_BLUE};
-
-    // functions
 
 /******************************************************************************************************************************************************
- *  P U B L I C   F U N C T I O N S
+  triggerTasks()
 ******************************************************************************************************************************************************/
-  public:
-    constexpr Pixel() { }
-    constexpr Pixel(ColorType ColorRed, ColorType ColorGreen, ColorType ColorBlue)
-        : PixelRaw{ColorRed, ColorGreen, ColorBlue} { }
-    ~Pixel() { }
-
-    // get methods
-    static constexpr byte getNumberOfColors() { return NumberOfColors; }
-    ColorType getRed() const { return PixelRaw[ColorOffsetRed]; }
-    ColorType getBlue() const { return PixelRaw[ColorOffsetBlue]; }
-    ColorType getGreen() const { return PixelRaw[ColorOffsetGreen]; }
-
-    // set methods
-    void setRed(ColorType Value) { PixelRaw[ColorOffsetRed] = Value; }
-    void setBlue(ColorType Value) { PixelRaw[ColorOffsetBlue] = Value; }
-    void setGreen(ColorType Value) { PixelRaw[ColorOffsetGreen] = Value; }
-
-    void setPixel(ColorType Red, ColorType Green, ColorType Blue) {
-         PixelRaw[ColorOffsetRed] = Red;
-         PixelRaw[ColorOffsetBlue] = Blue;
-         PixelRaw[ColorOffsetGreen] = Green;
-    }
-
-    // methods
-    void clearPixel() { setPixel(0u, 0u, 0u); }
-
-    void incrementRed() { if(PixelRaw[ColorOffsetRed] < ColorMaxValue) PixelRaw[ColorOffsetRed]++; }
-    void incrementGreen() { if(PixelRaw[ColorOffsetGreen] < ColorMaxValue) PixelRaw[ColorOffsetGreen]++; }
-    void incrementBlue() { if(PixelRaw[ColorOffsetBlue] < ColorMaxValue) PixelRaw[ColorOffsetBlue]++; }
-
-    void decrementRed() { if(PixelRaw[ColorOffsetRed] > 0u) PixelRaw[ColorOffsetRed]--; }
-    void decrementGreen() { if(PixelRaw[ColorOffsetGreen] > 0u) PixelRaw[ColorOffsetGreen]--; }
-    void decrementBlue() { if(PixelRaw[ColorOffsetBlue] > 0u) PixelRaw[ColorOffsetBlue]--; }
-};
-
-#endif
+void Scheduler::triggerTasks()
+{
+    //triggerTaskOnCycle(Illuminance::getInstance().getTaskCycle(), std::bind(&Illuminance::getInstance().task, &Illuminance::getInstance()));
+    triggerTaskOnCycle(Animation::getInstance().getTaskCycle(), std::bind(&Animation::getInstance().task, &Animation::getInstance());
+    //triggerTaskOnCycle(Communication::getInstance().getTaskCycle(), &Communication::getInstance().task);
+} /* triggerTasks */
 
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E

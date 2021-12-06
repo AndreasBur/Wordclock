@@ -23,6 +23,7 @@ const wxString DisplayCharacters[][PIXELS_DISPLAY_NUMBER_OF_COLUMNS]
 BEGIN_EVENT_TABLE(Pixels, wxFrame)
     EVT_CLOSE(Pixels::OnClose)
     EVT_BUTTON(ID_BUTTON_SEND, Pixels::OnSend)
+    //EVT_BUTTON(ID_BUTTON_CREATE_INPUT, Pixels::OnCreateInput)
     EVT_BUTTON(ID_BUTTON_CLEAR, Pixels::OnClear)
     EVT_BUTTON(ID_BUTTON_ABOUT, Pixels::OnAbout)
     EVT_BUTTON(ID_BUTTON_QUIT, Pixels::OnQuit)
@@ -100,6 +101,7 @@ wxBoxSizer* Pixels::createSizerControl(wxWindow* Parent)
     wxStaticBoxSizer* SizerControl = new wxStaticBoxSizer(StaticBox, wxVERTICAL);
     wxStaticText* OutputLabel = new wxStaticText(Parent, wxID_ANY, _T("Output"));
     wxStaticText* InputLabel = new wxStaticText(Parent, wxID_ANY, _T("Input"));
+    //wxButton* CreateInput = new wxButton(Parent, ID_BUTTON_CREATE_INPUT, wxT("&Create Input"), wxDefaultPosition, wxDefaultSize, 0);
     wxButton* Send = new wxButton(Parent, ID_BUTTON_SEND, wxT("&Send"), wxDefaultPosition, wxDefaultSize, 0);
     wxButton* Clear = new wxButton(Parent, ID_BUTTON_CLEAR, wxT("&Clear"), wxDefaultPosition, wxDefaultSize, 0);
 
@@ -111,6 +113,7 @@ wxBoxSizer* Pixels::createSizerControl(wxWindow* Parent)
     SizerControl->Add(Clear, 0, wxTOP | wxRIGHT | wxLEFT | wxEXPAND, 10);
     SizerControl->Add(InputLabel, 0, wxLEFT | wxTOP, 10);
     SizerControl->Add(Input, 0, wxRIGHT | wxLEFT, 10);
+    //SizerControl->Add(CreateInput, 0, wxTOP | wxRIGHT | wxLEFT | wxEXPAND, 10);
     SizerControl->Add(Send, 0, wxTOP | wxRIGHT | wxLEFT | wxEXPAND, 10);
 
     return SizerControl;
@@ -129,6 +132,11 @@ void Pixels::OnClose(wxCloseEvent &event)
     //wxTheApp->GetTopWindow()->Close();
     Destroy();
 }
+
+//void Pixels::OnCreateInput(wxCommandEvent &event)
+//{
+//
+//}
 
 void Pixels::OnSend(wxCommandEvent &event)
 {
@@ -152,7 +160,7 @@ void Pixels::OnQuit(wxCommandEvent &event)
 
 void Pixels::OnAbout(wxCommandEvent &event)
 {
-    wxMessageBox(_("Copyright Andreas Burnickl\nWordclock Pixels"));
+    wxMessageBox(_("Copyright Andreas Burnickl\nWordclock Simulator"));
 }
 
 
