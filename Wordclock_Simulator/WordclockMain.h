@@ -4,8 +4,7 @@
 
 #include "Clock.h"
 #include "Display.h"
-#include "Animation.h"
-#include "AnimationClock.h"
+#include "Animations.h"
 #include "Transformation.h"
 #include "Communication.h"
 #include "Scheduler.h"

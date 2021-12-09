@@ -28,8 +28,8 @@ WordclockMain::WordclockMain()
     //WcTransformation.shiftRight(true);
     //WcTransformation.shiftUp(false);
     //WcTransformation.shiftDown(true);
-    Animation::getInstance().setAnimation(AnimationClock::ANIMATION_CLOCK_EXPLODE);
-    Animation::getInstance().setTime(Hour, Minute);
+    Animations::getInstance().setAnimation(Animations::ANIMATION_EXPLODE);
+    Animations::getInstance().setTime(Hour, Minute);
     //WcClock.show();
 }
 

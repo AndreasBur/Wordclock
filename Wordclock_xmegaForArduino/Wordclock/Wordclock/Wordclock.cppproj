@@ -227,7 +227,6 @@
       <Value>../inc/Clock</Value>
       <Value>../inc/Animation</Value>
       <Value>../inc/Transformation</Value>
-      <Value>../inc/Animation/Clock</Value>
       <Value>../inc/Font</Value>
       <Value>../../ArduinoCore/include/util/device</Value>
       <Value>../../ArduinoCore/include/util/memory</Value>
@@ -246,6 +245,8 @@
       <Value>../inc/Illuminance</Value>
       <Value>../inc/DisplayManager</Value>
       <Value>../inc/Scheduler</Value>
+      <Value>../inc/Overlay</Value>
+      <Value>../inc/Text</Value>
     </ListValues>
   </avrgcc.compiler.directories.IncludePaths>
   <avrgcc.compiler.optimization.level>Optimize for size (-Os)</avrgcc.compiler.optimization.level>
@@ -274,7 +275,6 @@
       <Value>../inc/Clock</Value>
       <Value>../inc/Animation</Value>
       <Value>../inc/Transformation</Value>
-      <Value>../inc/Animation/Clock</Value>
       <Value>../inc/Font</Value>
       <Value>../../ArduinoCore/include/util/device</Value>
       <Value>../../ArduinoCore/include/util/memory</Value>
@@ -294,6 +294,8 @@
       <Value>../inc/Illuminance</Value>
       <Value>../inc/DisplayManager</Value>
       <Value>../inc/Scheduler</Value>
+      <Value>../inc/Overlay</Value>
+      <Value>../inc/Text</Value>
     </ListValues>
   </avrgcccpp.compiler.directories.IncludePaths>
   <avrgcccpp.compiler.optimization.OtherFlags>-fno-threadsafe-statics</avrgcccpp.compiler.optimization.OtherFlags>
@@ -325,52 +327,46 @@
     <PostBuildEvent>$(ToolchainDir)\avr-objdump.exe Wordclock.elf -Pmem-usage</PostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="inc\Animation\Animation.h">
+    <Compile Include="inc\Animation\Animations.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="inc\Animation\AnimationFont.h">
+    <Compile Include="inc\Animation\AnimationCommon.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="inc\Animation\Clock\AnimationClock.h">
+    <Compile Include="inc\Animation\AnimationCube.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="inc\Animation\Clock\AnimationClockCommon.h">
+    <Compile Include="inc\Animation\AnimationCursor.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="inc\Animation\Clock\AnimationClockCube.h">
+    <Compile Include="inc\Animation\AnimationDrop.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="inc\Animation\Clock\AnimationClockCursor.h">
+    <Compile Include="inc\Animation\AnimationExplode.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="inc\Animation\Clock\AnimationClockDrop.h">
+    <Compile Include="inc\Animation\AnimationFade.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="inc\Animation\Clock\AnimationClockExplode.h">
+    <Compile Include="inc\Animation\AnimationFlicker.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="inc\Animation\Clock\AnimationClockFade.h">
+    <Compile Include="inc\Animation\AnimationImplode.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="inc\Animation\Clock\AnimationClockFlicker.h">
+    <Compile Include="inc\Animation\AnimationShift.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="inc\Animation\Clock\AnimationClockImplode.h">
+    <Compile Include="inc\Animation\AnimationSnake.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="inc\Animation\Clock\AnimationClockShift.h">
+    <Compile Include="inc\Animation\AnimationSqueeze.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="inc\Animation\Clock\AnimationClockSnake.h">
+    <Compile Include="inc\Animation\AnimationTeletype.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="inc\Animation\Clock\AnimationClockSqueeze.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="inc\Animation\Clock\AnimationClockTeletype.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="inc\Animation\Clock\AnimationClockWipe.h">
+    <Compile Include="inc\Animation\AnimationWipe.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="inc\Bit\Bit.h">
@@ -391,7 +387,7 @@
     <Compile Include="inc\Communication\Message.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="inc\Communication\MessageParser\MsgCmdAnimationClockParser.h">
+    <Compile Include="inc\Communication\MessageParser\MsgCmdAnimationParser.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="inc\Communication\MessageParser\MsgCmdClockModeParser.h">
@@ -478,6 +474,21 @@
     <Compile Include="inc\Illuminance\Illuminance.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="inc\Overlay\Overlays.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="inc\Overlay\OverlayCommon.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="inc\Overlay\OverlayDate.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="inc\Overlay\OverlayTemperature.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="inc\Overlay\OverlayText.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="inc\Pixels\Pixel.h">
       <SubType>compile</SubType>
     </Compile>
@@ -511,6 +522,9 @@
     <Compile Include="inc\StandardTypes\StandardTypes.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="inc\Text\Text.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="inc\Timer\Timer.h">
       <SubType>compile</SubType>
     </Compile>
@@ -520,52 +534,46 @@
     <Compile Include="Sketch.cpp">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="src\Animation\Animation.cpp">
+    <Compile Include="src\Animation\Animations.cpp">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="src\Animation\AnimationFont.cpp">
+    <Compile Include="src\Animation\AnimationCommon.cpp">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="src\Animation\Clock\AnimationClock.cpp">
+    <Compile Include="src\Animation\AnimationCube.cpp">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="src\Animation\Clock\AnimationClockCommon.cpp">
+    <Compile Include="src\Animation\AnimationCursor.cpp">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="src\Animation\Clock\AnimationClockCube.cpp">
+    <Compile Include="src\Animation\AnimationDrop.cpp">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="src\Animation\Clock\AnimationClockCursor.cpp">
+    <Compile Include="src\Animation\AnimationExplode.cpp">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="src\Animation\Clock\AnimationClockDrop.cpp">
+    <Compile Include="src\Animation\AnimationFade.cpp">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="src\Animation\Clock\AnimationClockExplode.cpp">
+    <Compile Include="src\Animation\AnimationFlicker.cpp">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="src\Animation\Clock\AnimationClockFade.cpp">
+    <Compile Include="src\Animation\AnimationImplode.cpp">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="src\Animation\Clock\AnimationClockFlicker.cpp">
+    <Compile Include="src\Animation\AnimationShift.cpp">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="src\Animation\Clock\AnimationClockImplode.cpp">
+    <Compile Include="src\Animation\AnimationSnake.cpp">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="src\Animation\Clock\AnimationClockShift.cpp">
+    <Compile Include="src\Animation\AnimationSqueeze.cpp">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="src\Animation\Clock\AnimationClockSnake.cpp">
+    <Compile Include="src\Animation\AnimationTeletype.cpp">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="src\Animation\Clock\AnimationClockSqueeze.cpp">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="src\Animation\Clock\AnimationClockTeletype.cpp">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="src\Animation\Clock\AnimationClockWipe.cpp">
+    <Compile Include="src\Animation\AnimationWipe.cpp">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="src\DisplayManager\DisplayManager.cpp">
@@ -610,6 +618,21 @@
     <Compile Include="src\Font\FontTahoma10x10.cpp">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="src\Overlay\Overlays.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\Overlay\OverlayCommon.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\Overlay\OverlayDate.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\Overlay\OverlayTemperature.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\Overlay\OverlayText.cpp">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="src\Pixels\WS2812\WS2812.cpp">
       <SubType>compile</SubType>
     </Compile>
@@ -617,6 +640,9 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="src\Scheduler\Scheduler.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\Text\Text.cpp">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="src\Timer\Timer.cpp">
@@ -638,7 +664,6 @@
   <ItemGroup>
     <Folder Include="inc" />
     <Folder Include="inc\Animation\" />
-    <Folder Include="inc\Animation\Clock\" />
     <Folder Include="inc\Communication\MessageParser" />
     <Folder Include="inc\Display" />
     <Folder Include="inc\Clock" />
@@ -649,6 +674,8 @@
     <Folder Include="inc\Bit" />
     <Folder Include="inc\Illuminance" />
     <Folder Include="inc\Illuminance\BH1750\" />
+    <Folder Include="inc\Text" />
+    <Folder Include="inc\Overlay" />
     <Folder Include="inc\Pixels" />
     <Folder Include="inc\Pixels\WS2812\" />
     <Folder Include="inc\RealTimeClock" />
@@ -660,7 +687,6 @@
     <Folder Include="inc\Transformation" />
     <Folder Include="inc\StandardTypes" />
     <Folder Include="src" />
-    <Folder Include="src\Animation\Clock" />
     <Folder Include="src\Illuminance\BH1750" />
     <Folder Include="src\Communication\MessageParser" />
     <Folder Include="src\Display" />
@@ -670,6 +696,8 @@
     <Folder Include="src\Font" />
     <Folder Include="src\Communication" />
     <Folder Include="src\Illuminance" />
+    <Folder Include="src\Text" />
+    <Folder Include="src\Overlay" />
     <Folder Include="src\Pixels" />
     <Folder Include="src\Pixels\WS2812\" />
     <Folder Include="src\RealTimeClock" />

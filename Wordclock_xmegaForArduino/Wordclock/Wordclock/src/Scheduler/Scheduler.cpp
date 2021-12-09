@@ -21,7 +21,7 @@
  * I N C L U D E S
 ******************************************************************************************************************************************************/
 #include "Scheduler.h"
-#include "Animation.h"
+#include "Animations.h"
 #include "Illuminance.h"
 #include "Communication.h"
 
@@ -76,7 +76,7 @@ bool Scheduler::isCycleHit(byte Cycle) {
 void Scheduler::triggerTasks()
 {
     if(isCycleHit(Illuminance::getInstance().getTaskCycle())) { Illuminance::getInstance().task(); }
-    if(isCycleHit(Animation::getInstance().getTaskCycle())) { Animation::getInstance().task(true); }
+    if(isCycleHit(Animations::getInstance().getTaskCycle())) { Animations::getInstance().task(true); }
     if(isCycleHit(Communication::getInstance().getTaskCycle())) { Communication::getInstance().task(); }
 } /* triggerTasks */
 

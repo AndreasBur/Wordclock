@@ -26,7 +26,7 @@
 #include "MsgCmdDisplayBrightnessParser.h"
 #include "MsgCmdDisplayPixelParser.h"
 #include "MsgCmdClockModeParser.h"
-#include "MsgCmdAnimationClockParser.h"
+#include "MsgCmdAnimationParser.h"
 #include "MsgCmdTimeParser.h"
 #include "MsgCmdDateParser.h"
 
@@ -82,10 +82,10 @@ void MsgCmdParser::parse()
         cmdDisplayPixelParser.process();
         cmdDisplayPixelParser.sendAnswer();
     } else if(command == COMMAND_ANIMATION_CLOCK) {
-        MsgCmdAnimationClockParser cmdAnimationClockParser(parameter);
-        cmdAnimationClockParser.parse();
-        cmdAnimationClockParser.process();
-        cmdAnimationClockParser.sendAnswer();
+        MsgCmdAnimationParser cmdAnimationParser(parameter);
+        cmdAnimationParser.parse();
+        cmdAnimationParser.process();
+        cmdAnimationParser.sendAnswer();
     } else if(command == COMMAND_CLOCK_MODE) {
         MsgCmdClockModeParser cmdClockModeParser(parameter);
         cmdClockModeParser.parse();
