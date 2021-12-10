@@ -40,7 +40,7 @@
 
 
 /******************************************************************************************************************************************************
- *  C L A S S   T E M P L A T E
+ *  C L A S S   O V E R L A Y   C O M M O N
 ******************************************************************************************************************************************************/
 class OverlayCommon
 {
@@ -49,6 +49,16 @@ class OverlayCommon
 ******************************************************************************************************************************************************/
   public:
   
+/******************************************************************************************************************************************************
+ *  P R O T E C T E D   D A T A   A N D   F U N C T I O N S
+******************************************************************************************************************************************************/
+  protected:
+    byte IntervalInMinutes;
+    byte DurationInSeconds;
+    bool IsActive;
+    byte Month;
+    byte Day;
+    byte ValidInDays;
   
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
@@ -64,12 +74,15 @@ class OverlayCommon
     ~OverlayCommon();
 
 	// get methods
-
+    byte getIntervalInMinutes() const { return IntervalInMinutes; }
+    byte getDurationInSeconds() const { return DurationInSeconds; }
 
 	// set methods
+    void setIntervalInMinutes(byte sIntervalInMinutes) { IntervalInMinutes = sIntervalInMinutes; }
+    void setDurationInSeconds(byte sDurationInSeconds) { DurationInSeconds = sDurationInSeconds; }
 
 	// methods
-    void init();
+
 };
 
 #endif
