@@ -88,7 +88,7 @@
 		<Linker>
 			<Add option="-mthreads" />
 		</Linker>
-		<Unit filename="Arduino/inc/Animation/AnimationCommon.h" />
+		<Unit filename="Arduino/inc/Animation/Animation.h" />
 		<Unit filename="Arduino/inc/Animation/AnimationCube.h" />
 		<Unit filename="Arduino/inc/Animation/AnimationCursor.h" />
 		<Unit filename="Arduino/inc/Animation/AnimationDrop.h" />
@@ -142,7 +142,7 @@
 		<Unit filename="Arduino/inc/Scheduler/Scheduler.h" />
 		<Unit filename="Arduino/inc/StandardTypes/StandardTypes.h" />
 		<Unit filename="Arduino/inc/Transformation/Transformation.h" />
-		<Unit filename="Arduino/src/Animation/AnimationCommon.cpp" />
+		<Unit filename="Arduino/src/Animation/Animation.cpp" />
 		<Unit filename="Arduino/src/Animation/AnimationCube.cpp" />
 		<Unit filename="Arduino/src/Animation/AnimationCursor.cpp" />
 		<Unit filename="Arduino/src/Animation/AnimationDrop.cpp" />

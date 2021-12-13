@@ -8,19 +8,19 @@
  *  ---------------------------------------------------------------------------------------------------------------------------------------------------
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       AnimationCommon.cpp
+/**     \file       Animation.cpp
  *      \brief      
  *
  *      \details    
  *                  
  *
 ******************************************************************************************************************************************************/
-#define _ANIMATION_COMMON_SOURCE_
+#define _ANIMATION_SOURCE_
 
 /******************************************************************************************************************************************************
  * I N C L U D E S
 ******************************************************************************************************************************************************/
-#include "AnimationCommon.h"
+#include "Animation.h"
 
 
 /******************************************************************************************************************************************************
@@ -47,7 +47,7 @@
 /******************************************************************************************************************************************************
   isPixelPartOfClockWords()
 ******************************************************************************************************************************************************/
-bool AnimationCommon::isPixelPartOfClockWords(const ClockWords::WordsListType ClockWordsTable, byte Column, byte Row) const
+bool Animation::isPixelPartOfClockWords(const ClockWords::WordsListType ClockWordsTable, byte Column, byte Row) const
 {
     DisplayWords words;
 
@@ -62,7 +62,7 @@ bool AnimationCommon::isPixelPartOfClockWords(const ClockWords::WordsListType Cl
 /******************************************************************************************************************************************************
   isPixelPartOfClockWords()
 ******************************************************************************************************************************************************/
-bool AnimationCommon::isPixelPartOfClockWords(const ClockWords::WordsListType ClockWordsTable, byte Index) const
+bool Animation::isPixelPartOfClockWords(const ClockWords::WordsListType ClockWordsTable, byte Index) const
 {
     byte row = Index / DISPLAY_NUMBER_OF_COLUMNS;
     byte column = Index % DISPLAY_NUMBER_OF_COLUMNS;

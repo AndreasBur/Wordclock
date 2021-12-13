@@ -49,8 +49,8 @@
 ******************************************************************************************************************************************************/
 Animations::StateType Animations::getState() const
 {
-    if(getStateOfCurrentAnimation() == AnimationCommon::STATE_CLEAR_TIME ||
-       getStateOfCurrentAnimation() == AnimationCommon::STATE_SET_TIME)
+    if(getStateOfCurrentAnimation() == Animation::STATE_CLEAR_TIME ||
+       getStateOfCurrentAnimation() == Animation::STATE_SET_TIME)
     {
         return STATE_PENDING;
     }
@@ -64,8 +64,8 @@ Animations::StateType Animations::getState() const
 ******************************************************************************************************************************************************/
 void Animations::task(bool Show)
 {
-    if(getStateOfCurrentAnimation() == AnimationCommon::STATE_CLEAR_TIME ||
-       getStateOfCurrentAnimation() == AnimationCommon::STATE_SET_TIME)
+    if(getStateOfCurrentAnimation() == Animation::STATE_CLEAR_TIME ||
+       getStateOfCurrentAnimation() == Animation::STATE_SET_TIME)
     {
         taskOfCurrentAnimation();
         if(Show) { showOfCurrentAnimation(); }
@@ -78,8 +78,8 @@ void Animations::task(bool Show)
 ******************************************************************************************************************************************************/
 StdReturnType Animations::show() const
 {
-    if(getStateOfCurrentAnimation() == AnimationCommon::STATE_CLEAR_TIME ||
-       getStateOfCurrentAnimation() == AnimationCommon::STATE_SET_TIME)
+    if(getStateOfCurrentAnimation() == Animation::STATE_CLEAR_TIME ||
+       getStateOfCurrentAnimation() == Animation::STATE_SET_TIME)
     {
         return showOfCurrentAnimation();
     }
@@ -260,12 +260,12 @@ StdReturnType Animations::setTime(byte Hour, byte Minute)
 /******************************************************************************************************************************************************
   getStateOfCurrentAnimation()
 ******************************************************************************************************************************************************/
-AnimationCommon::StateType Animations::getStateOfCurrentAnimation() const
+Animation::StateType Animations::getStateOfCurrentAnimation() const
 {
     switch(AnimationId)
     {
         case ANIMATION_ID_NONE :
-            return AnimationCommon::STATE_IDLE;
+            return Animation::STATE_IDLE;
             break;
 # if(ANIMATIONS_SUPPORT_CURSOR == STD_ON)
         case ANIMATION_ID_CURSOR :
@@ -328,7 +328,7 @@ AnimationCommon::StateType Animations::getStateOfCurrentAnimation() const
             break;
 # endif
         default :
-            return AnimationCommon::STATE_NONE;
+            return Animation::STATE_NONE;
             break;
     }
 } /* getStateOfCurrentAnimation */
