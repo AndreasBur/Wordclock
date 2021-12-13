@@ -23,7 +23,7 @@
 #include "StandardTypes.h"
 #include "Arduino.h"
 #include "Display.h"
-#include "AnimationCommon.h"
+#include "Animation.h"
 #include "AnimationTeletype.h"
 #include "AnimationCursor.h"
 #include "AnimationDrop.h"
@@ -202,7 +202,7 @@ class Animations
     Animations() : AnimationsRaw() { TaskCycles.fill(TaskCycleInitValue); }
     ~Animations() { }
 
-    AnimationCommon::StateType getStateOfCurrentAnimation() const;
+    Animation::StateType getStateOfCurrentAnimation() const;
     void taskOfCurrentAnimation();
     StdReturnType showOfCurrentAnimation() const;
 

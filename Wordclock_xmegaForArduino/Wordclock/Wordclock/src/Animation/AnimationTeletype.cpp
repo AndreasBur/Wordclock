@@ -49,7 +49,7 @@
 ******************************************************************************************************************************************************/
 void AnimationTeletype::init()
 {
-    AnimationCommon::init(STATE_IDLE);
+    Animation::init(STATE_IDLE);
     reset();
 } /* init */
 
