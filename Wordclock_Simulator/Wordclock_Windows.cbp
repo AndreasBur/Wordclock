@@ -81,6 +81,7 @@
 			<Add directory="Arduino/inc/Illuminance" />
 			<Add directory="Arduino/inc/DisplayManager" />
 			<Add directory="Arduino/inc/Scheduler" />
+			<Add directory="Arduino/inc/Overlay" />
 		</Compiler>
 		<ResourceCompiler>
 			<Add directory="$(#wx31)/include" />
@@ -139,6 +140,12 @@
 		<Unit filename="Arduino/inc/Font/FontTahoma10x10.h" />
 		<Unit filename="Arduino/inc/GammaCorrection/GammaCorrection.h" />
 		<Unit filename="Arduino/inc/Illuminance/Illuminance.h" />
+		<Unit filename="Arduino/inc/Overlay/Overlay.h" />
+		<Unit filename="Arduino/inc/Overlay/OverlayCommon.h" />
+		<Unit filename="Arduino/inc/Overlay/OverlayDate.h" />
+		<Unit filename="Arduino/inc/Overlay/OverlayTemperature.h" />
+		<Unit filename="Arduino/inc/Overlay/OverlayText.h" />
+		<Unit filename="Arduino/inc/Overlay/Overlays.h" />
 		<Unit filename="Arduino/inc/Pixels/Pixel.h" />
 		<Unit filename="Arduino/inc/RealTimeClock/ClockDate.h" />
 		<Unit filename="Arduino/inc/RealTimeClock/ClockDateTime.h" />
