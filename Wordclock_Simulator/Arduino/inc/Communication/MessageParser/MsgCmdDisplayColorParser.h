@@ -67,6 +67,7 @@ class MsgCmdDisplayColorParser : public MsgParameterParser<MsgCmdDisplayColorPar
     };
 
     // functions
+    void handleParameter(char ParameterShortName, const char* Argument, PositionType Length) { }
     void handleParameter(char ParameterShortName, byte Argument)
     {
         if(ParameterShortName == RedOptionShortName) { Display::getInstance().setColorRed(Argument); }

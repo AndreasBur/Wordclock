@@ -80,6 +80,7 @@ class MsgCmdDisplayPixelParser : public MsgParameterParser<MsgCmdDisplayPixelPar
     };
 
     // functions
+    void handleParameter(char ParameterShortName, const char* Argument, PositionType Length) { }
     void handleParameter(char ParameterShortName, byte Argument)
     {
         if(ParameterShortName == IndexOptionShortName) { handleParameterIndex(Argument); }

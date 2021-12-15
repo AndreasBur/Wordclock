@@ -64,6 +64,7 @@ class MsgCmdClockModeParser : public MsgParameterParser<MsgCmdClockModeParser, M
     };
 
     // functions
+    void handleParameter(char ParameterShortName, const char* Argument, PositionType Length) { }
     void handleParameter(char ParameterShortName, byte Argument)
     {
         if(ParameterShortName == ModeOptionShortName) {

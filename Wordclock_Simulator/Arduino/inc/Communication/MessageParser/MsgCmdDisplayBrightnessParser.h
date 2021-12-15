@@ -65,10 +65,11 @@ class MsgCmdDisplayBrightnessParser : public MsgParameterParser<MsgCmdDisplayBri
         MsgParameter(BrightnessOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8),
         MsgParameter(UseAutomaticOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8),
         MsgParameter(UseGammaCorrectionOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8)
-        
+
     };
 
     // functions
+    void handleParameter(char ParameterShortName, const char* Argument, PositionType Length) { }
     void handleParameter(char ParameterShortName, byte Argument)
     {
         if(ParameterShortName == BrightnessOptionShortName) {
@@ -109,7 +110,7 @@ class MsgCmdDisplayBrightnessParser : public MsgParameterParser<MsgCmdDisplayBri
         sendAnswerBrightness(true);
         sendAnswerAutomatic(true);
         sendAnswerGammaCorrection(false);
-        
+
     }
 
     void process() { show(); }

@@ -60,7 +60,7 @@ class MsgParameter
         ARGUMENT_TYPE_INT32,
         ARGUMENT_TYPE_INT64,
         ARGUMENT_TYPE_FLOAT,
-        ARGUMENT_TYPE_DOUBLE
+        ARGUMENT_TYPE_DOUBLE,
     };
 
 /******************************************************************************************************************************************************

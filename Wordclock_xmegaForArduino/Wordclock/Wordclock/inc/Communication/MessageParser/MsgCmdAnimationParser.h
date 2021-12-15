@@ -71,6 +71,7 @@ class MsgCmdAnimationParser : public MsgParameterParser<MsgCmdAnimationParser, M
     byte convertSpeedToTaskCycle(byte Speed) const { return UINT8_MAX - Speed; }
     byte convertTaskCycleToSpeed(byte TaskCylce) const { return UINT8_MAX - TaskCylce; }
 
+    void handleParameter(char ParameterShortName, const char* Argument, PositionType Length) { }
     void handleParameter(char ParameterShortName, byte Argument)
     {
         if(ParameterShortName == AnimationOptionShortName) {

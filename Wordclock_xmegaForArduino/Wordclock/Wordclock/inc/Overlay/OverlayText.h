@@ -60,8 +60,8 @@ class OverlayText : public Overlay
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    OverlayText();
-    ~OverlayText();
+    constexpr OverlayText() { }
+    ~OverlayText() { }
 
 	// get methods
 

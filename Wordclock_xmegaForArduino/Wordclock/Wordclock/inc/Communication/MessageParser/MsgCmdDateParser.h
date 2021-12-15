@@ -71,6 +71,7 @@ class MsgCmdDateParser : public MsgParameterParser<MsgCmdDateParser, MSG_CMD_DAT
     };
 
     // functions
+    void handleParameter(char ParameterShortName, const char* Argument, PositionType Length) { }
     void handleParameter(char ParameterShortName, byte Argument) {
         if(ParameterShortName == MonthOptionShortName) { setMonth(static_cast<MonthType>(Argument)); }
         if(ParameterShortName == DayOptionShortName) { setDay(Argument); }

@@ -58,6 +58,9 @@ class MsgCmdParser
         COMMAND_ANIMATION_CLOCK,
         COMMAND_TIME,
         COMMAND_DATE,
+        COMMAND_OVERLAY_DATE,
+        COMMAND_OVERLAY_TEMPERATURE,
+        COMMAND_OVERLAY_TEXT
     };
 
 /******************************************************************************************************************************************************

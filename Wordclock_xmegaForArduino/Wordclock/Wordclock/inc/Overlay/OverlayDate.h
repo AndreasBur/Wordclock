@@ -60,11 +60,10 @@ class OverlayDate : public Overlay
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    OverlayDate();
-    ~OverlayDate();
+    constexpr OverlayDate() { }
+    ~OverlayDate() { }
 
 	// get methods
-
 
 	// set methods
 

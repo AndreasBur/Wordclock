@@ -29,6 +29,7 @@
 #include "MsgCmdAnimationParser.h"
 #include "MsgCmdTimeParser.h"
 #include "MsgCmdDateParser.h"
+#include "MsgCmdOverlayDateParser.h"
 
 /******************************************************************************************************************************************************
  *  L O C A L   C O N S T A N T   M A C R O S
@@ -101,6 +102,11 @@ void MsgCmdParser::parse()
         cmdClockDateParser.parse();
         cmdClockDateParser.process();
         cmdClockDateParser.sendAnswer();
+    } else if(command == COMMAND_OVERLAY_DATE) {
+        MsgCmdOverlayDateParser cmdOverlayDateParser(parameter);
+        cmdOverlayDateParser.parse();
+        cmdOverlayDateParser.process();
+        cmdOverlayDateParser.sendAnswer();
     } else {
         Error.send(ErrorMessage::ERROR_WRONG_COMMAND);
     }

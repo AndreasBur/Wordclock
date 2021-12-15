@@ -43,6 +43,7 @@
 #define MSG_PARAMETER_PARSER_ARGUMENT_TYPE_INT64                    STD_OFF
 #define MSG_PARAMETER_PARSER_ARGUMENT_TYPE_FLOAT                    STD_OFF
 #define MSG_PARAMETER_PARSER_ARGUMENT_TYPE_DOUBLE                   STD_OFF
+#define MSG_PARAMETER_PARSER_ARGUMENT_TYPE_STRING                   STD_ON
 
 /* MsgParser parameter */
 
@@ -73,6 +74,8 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
     static constexpr char OptionArgumentDelimiter{'='};
     ErrorMessage Error;
 
+    constexpr MsgParameterParser(const ParameterTableType& sParameterTable, const char* sParameter)
+    : Error(), ParameterBuffer(sParameter), ParameterTable(sParameterTable) { }
     ~MsgParameterParser() { }
 
 /******************************************************************************************************************************************************
@@ -93,6 +96,9 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
     const ParameterTableType& ParameterTable;
 
     // functions
+    Derived& underlying() { return static_cast<Derived&>(*this); }
+    Derived const& underlying() const { return static_cast<Derived const&>(*this); }
+
     ParameterTableElementType getParameterTableElement(byte Index) const {
         ParameterTableElementType parameterTableElement;
         memcpy_P(&parameterTableElement, &ParameterTable[Index], sizeof(ParameterTableElementType));
@@ -144,6 +150,9 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
 # if (MSG_PARAMETER_PARSER_ARGUMENT_TYPE_DOUBLE == STD_ON)
         if(Parameter.getArgumentType() == MsgParameter::ARGUMENT_TYPE_DOUBLE) { return convertArgument<double>(Parameter, Argument); }
 # endif
+# if (MSG_PARAMETER_PARSER_ARGUMENT_TYPE_STRING == STD_ON)
+        if(Parameter.getArgumentType() == MsgParameter::ARGUMENT_TYPE_STRING) { return convertArgumentToString(Parameter, Argument); }
+# endif
         return 0u;
     }
 
@@ -153,7 +162,19 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
 
         StringTools::ResultType result = StringTools::stringTo(Argument, position, value, ArgumentNumberBase);
         handleConvertResult(Parameter, result);
-        if(result == StringTools::RESULT_OK) static_cast<Derived*>(this)->handleParameter(Parameter.getOptionShortName(), value);
+        if(result == StringTools::RESULT_OK) { underlying().handleParameter(Parameter.getOptionShortName(), value); }
+        return position;
+    }
+
+    PositionType convertArgumentToString(MsgParameter Parameter, const char* Argument) {
+        PositionType position = 0u;
+        for(; Argument[position] != STD_NULL_CHARACTER; position++) {
+            char currentChar = Argument[position];
+            if(currentChar == OptionStartChar) {
+                underlying().handleParameter(Parameter.getOptionShortName(), Argument, position);
+                return position;
+            }
+        }
         return position;
     }
 
@@ -170,8 +191,6 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr MsgParameterParser(const ParameterTableType& sParameterTable, const char* sParameter)
-    : Error(), ParameterBuffer(sParameter), ParameterTable(sParameterTable) { }
 
     // get methods
     const char* getParameter() const { return ParameterBuffer; }

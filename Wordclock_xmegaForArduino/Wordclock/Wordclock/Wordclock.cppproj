@@ -402,6 +402,18 @@
     <Compile Include="inc\Communication\MessageParser\MsgCmdDisplayPixelParser.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="inc\Communication\MessageParser\MsgCmdOverlayDateParser.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="inc\Communication\MessageParser\MsgCmdOverlayParser.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="inc\Communication\MessageParser\MsgCmdOverlayTemperatureParser.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="inc\Communication\MessageParser\MsgCmdOverlayTextParser.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="inc\Communication\MessageParser\MsgCmdParser.h">
       <SubType>compile</SubType>
     </Compile>
