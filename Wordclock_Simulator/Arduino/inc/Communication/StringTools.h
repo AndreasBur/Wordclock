@@ -69,6 +69,7 @@ class StringTools
      static constexpr size_t npos = -1;
      static constexpr char NullCharacter{'\0'};
      using PositionType = uint8_t;
+     using LengthType = uint8_t;
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S

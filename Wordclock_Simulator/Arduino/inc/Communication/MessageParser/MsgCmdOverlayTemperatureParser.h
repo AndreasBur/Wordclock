@@ -82,9 +82,9 @@ class MsgCmdOverlayTemperatureParser : public MsgCmdOverlayParser<MsgCmdOverlayT
     void setDay(byte Day) { Overlays::getInstance().setTemperatureDay(Day); }
     void setValidInDays(byte ValidInDays) { Overlays::getInstance().setTemperatureValidInDays(ValidInDays); }
     void setIsActive(bool IsActive) { Overlays::getInstance().setTemperatureIsActive(IsActive); }
-    void setText(const char* Text, PositionType Length) { }
+    void setText(const char* Text, LengthType Length) { }
 
-    void sendAnswerText(bool AppendSpace) {}
+    void sendAnswerText(bool AppendSpace) const {}
 
 };
 

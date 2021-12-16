@@ -26,6 +26,7 @@
 #include "ErrorMessage.h"
 #include "MsgParameter.h"
 #include "StringTools.h"
+#include "Communication.h"
 #include <array>
 
 /******************************************************************************************************************************************************
@@ -66,6 +67,7 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
     using ParameterTableElementType = MsgParameter;
     using ParameterTableType = std::array<ParameterTableElementType, ParameterTableSize>;
     using PositionType = StringTools::PositionType;
+    using LengthType = StringTools::LengthType;
 
 /******************************************************************************************************************************************************
  *  P R O T E C T E D   D A T A   A N D   F U N C T I O N S
@@ -98,6 +100,12 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
     // functions
     Derived& underlying() { return static_cast<Derived&>(*this); }
     Derived const& underlying() const { return static_cast<Derived const&>(*this); }
+
+    bool isEndOfStringReached(char Char) {
+        return (Char == STD_NULL_CHARACTER) ||
+               (Char == Communication::getEndOfMessageChar() ||
+               (Char == OptionStartChar));
+    }
 
     ParameterTableElementType getParameterTableElement(byte Index) const {
         ParameterTableElementType parameterTableElement;
@@ -159,7 +167,6 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
     template <typename T> PositionType convertArgument(MsgParameter Parameter, const char* Argument) {
         T value;
         PositionType position;
-
         StringTools::ResultType result = StringTools::stringTo(Argument, position, value, ArgumentNumberBase);
         handleConvertResult(Parameter, result);
         if(result == StringTools::RESULT_OK) { underlying().handleParameter(Parameter.getOptionShortName(), value); }
@@ -168,13 +175,9 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
 
     PositionType convertArgumentToString(MsgParameter Parameter, const char* Argument) {
         PositionType position = 0u;
-        for(; Argument[position] != STD_NULL_CHARACTER; position++) {
-            char currentChar = Argument[position];
-            if(currentChar == OptionStartChar) {
-                underlying().handleParameter(Parameter.getOptionShortName(), Argument, position);
-                return position;
-            }
-        }
+        while(!isEndOfStringReached(Argument[position])) { position++; }
+        LengthType length = position + 1u;
+        underlying().handleParameter(Parameter.getOptionShortName(), Argument, length);
         return position;
     }
 

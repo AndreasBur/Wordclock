@@ -22,9 +22,7 @@
 ******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Arduino.h"
-#include "OverlayDate.h"
-#include "OverlayText.h"
-#include "OverlayTemperature.h"
+#include "StringTools.h"
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
@@ -36,7 +34,18 @@
 
 /* Overlays parameter */
 
-
+/******************************************************************************************************************************************************
+ * D E P E N D E N D   I N C L U D E S
+******************************************************************************************************************************************************/
+#if (OVERLAYS_SUPPORT_DATE == STD_ON)
+# include "OverlayDate.h"
+#endif
+#if (OVERLAYS_SUPPORT_TEMPERATURE == STD_ON)
+# include "OverlayTemperature.h"
+#endif
+#if (OVERLAYS_SUPPORT_TEXT == STD_ON)
+# include "OverlayText.h"
+#endif
 
 /******************************************************************************************************************************************************
  *  G L O B A L   F U N C T I O N   M A C R O S
@@ -52,6 +61,11 @@ class Overlays
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
+#if (OVERLAYS_SUPPORT_TEXT == STD_ON)
+    using LengthType = OverlayText::LengthType;
+#endif
+
+
     enum OverlayIdType {
 #if (OVERLAYS_SUPPORT_DATE == STD_ON)
         OVERLAY_ID_DATE,
@@ -108,12 +122,15 @@ class Overlays
     byte getTemperatureValidInDays() const { return Temperature.getValidInDays(); }
     bool getTemperatureIsActive() const { return Temperature.getIsActive(); }
 #endif
+#if (OVERLAYS_SUPPORT_TEXT == STD_ON)
     byte getTextPeriodInMinutes() const { return Text.getPeriodInMinutes(); }
     byte getTextEnduranceInSeconds() const { return Text.getEnduranceInSeconds(); }
     byte getTextMonth() const { return Text.getMonth(); }
     byte getTextDay() const { return Text.getDay(); }
     byte getTextValidInDays() const { return Text.getValidInDays(); }
     bool getTextIsActive() const { return Text.getIsActive(); }
+    const char* getTextText() const { return Text.getText(); }
+#endif
 
 	// set methods
 #if (OVERLAYS_SUPPORT_DATE == STD_ON)
@@ -139,6 +156,7 @@ class Overlays
     void setTextDay(byte Day) { Text.setDay(Day); }
     void setTextValidInDays(byte ValidInDays) { Text.setValidInDays(ValidInDays); }
     void setTextIsActive(bool IsActive) { Text.setIsActive(IsActive); }
+    void setTextText(const char* sText, LengthType Length) { Text.setText(sText, Length); }
 #endif
 
 	// methods

@@ -141,7 +141,6 @@
 		<Unit filename="Arduino/inc/GammaCorrection/GammaCorrection.h" />
 		<Unit filename="Arduino/inc/Illuminance/Illuminance.h" />
 		<Unit filename="Arduino/inc/Overlay/Overlay.h" />
-		<Unit filename="Arduino/inc/Overlay/OverlayCommon.h" />
 		<Unit filename="Arduino/inc/Overlay/OverlayDate.h" />
 		<Unit filename="Arduino/inc/Overlay/OverlayTemperature.h" />
 		<Unit filename="Arduino/inc/Overlay/OverlayText.h" />

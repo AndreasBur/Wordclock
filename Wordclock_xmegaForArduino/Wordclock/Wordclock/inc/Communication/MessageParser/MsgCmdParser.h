@@ -24,6 +24,7 @@
 #include "Arduino.h"
 #include "Message.h"
 #include "ErrorMessage.h"
+#include "Overlays.h"
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
@@ -54,13 +55,19 @@ class MsgCmdParser
         COMMAND_DISPLAY_COLOR,
         COMMAND_DISPLAY_BRIGHTNESS,
         COMMAND_DISPLAY_PIXEL,
-        COMMAND_CLOCK_MODE,
-        COMMAND_ANIMATION_CLOCK,
-        COMMAND_TIME,
-        COMMAND_DATE,
+#if (OVERLAYS_SUPPORT_DATE == STD_ON)
         COMMAND_OVERLAY_DATE,
+#endif
+#if (OVERLAYS_SUPPORT_TEMPERATURE == STD_ON)
         COMMAND_OVERLAY_TEMPERATURE,
-        COMMAND_OVERLAY_TEXT
+#endif
+#if (OVERLAYS_SUPPORT_TEXT == STD_ON)
+        COMMAND_OVERLAY_TEXT,
+#endif
+        COMMAND_CLOCK_MODE,
+        COMMAND_ANIMATION,
+        COMMAND_TIME,
+        COMMAND_DATE
     };
 
 /******************************************************************************************************************************************************

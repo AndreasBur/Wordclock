@@ -75,6 +75,7 @@ class MsgCmdOverlayTextParser : public MsgCmdOverlayParser<MsgCmdOverlayTextPars
     byte getDay() const { return Overlays::getInstance().getTextDay(); }
     byte getValidInDays() const { return Overlays::getInstance().getTextValidInDays(); }
     byte getIsActive() const { return Overlays::getInstance().getTextIsActive(); }
+    const char* getText() const { return Overlays::getInstance().getTextText(); }
 
     void setPeriodInMinutes(byte PeriodInMinutes) { Overlays::getInstance().setTextPeriodInMinutes(PeriodInMinutes); }
     void setEnduranceInSeconds(byte EnduranceInSeconds) {Overlays::getInstance().setTextEnduranceInSeconds(EnduranceInSeconds); }
@@ -82,9 +83,9 @@ class MsgCmdOverlayTextParser : public MsgCmdOverlayParser<MsgCmdOverlayTextPars
     void setDay(byte Day) { Overlays::getInstance().setTextDay(Day); }
     void setValidInDays(byte ValidInDays) { Overlays::getInstance().setTextValidInDays(ValidInDays); }
     void setIsActive(bool IsActive) { Overlays::getInstance().setTextIsActive(IsActive); }
-    void setText(const char* Text, PositionType Length) { }
+    void setText(const char* Text, LengthType Length) { Overlays::getInstance().setTextText(Text, Length); }
 
-    void sendAnswerText(bool AppendSpace) {}
+    void sendAnswerText(bool AppendSpace) const { sendAnswerParameter(TextOptionShortName, getText(), AppendSpace); }
 
 };
 

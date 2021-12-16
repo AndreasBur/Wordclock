@@ -51,12 +51,13 @@ template <typename Derived> class MsgCmdOverlayParser : public MsgParameterParse
     using ParameterTableType = typename MsgParameterParserType::ParameterTableType;
     using ParameterTableElementType = typename MsgParameterParserType::ParameterTableElementType;
     using PositionType = typename MsgParameterParserType::PositionType;
+    using LengthType = StringTools::LengthType;
 
 /******************************************************************************************************************************************************
  *  P R O T E C T E D   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   protected:
-
+    static constexpr char TextOptionShortName{'T'};
     // functions
     constexpr MsgCmdOverlayParser(const char* Parameter) : MsgParameterParserType(ParameterTable, Parameter) { }
     ~MsgCmdOverlayParser() { }
@@ -72,7 +73,7 @@ template <typename Derived> class MsgCmdOverlayParser : public MsgParameterParse
     static constexpr char DayOptionShortName{'D'};
     static constexpr char ValidOptionShortName{'V'};
     static constexpr char ActiveOptionShortName{'A'};
-    static constexpr char TextOptionShortName{'T'};
+
 
     static constexpr ParameterTableType ParameterTable PROGMEM
     {
@@ -129,6 +130,7 @@ template <typename Derived> class MsgCmdOverlayParser : public MsgParameterParse
         sendAnswerMonth(true);
         sendAnswerDay(true);
         sendAnswerValid(true);
+        sendAnswerText(true);
         sendAnswerActive(false);
     }
 

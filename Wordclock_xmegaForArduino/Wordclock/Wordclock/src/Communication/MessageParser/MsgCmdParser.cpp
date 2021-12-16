@@ -29,7 +29,16 @@
 #include "MsgCmdAnimationParser.h"
 #include "MsgCmdTimeParser.h"
 #include "MsgCmdDateParser.h"
-#include "MsgCmdOverlayDateParser.h"
+
+#if (OVERLAYS_SUPPORT_DATE == STD_ON)
+# include "MsgCmdOverlayDateParser.h"
+#endif
+#if (OVERLAYS_SUPPORT_TEMPERATURE == STD_ON)
+# include "MsgCmdOverlayTemperatureParser.h"
+#endif
+#if (OVERLAYS_SUPPORT_TEXT == STD_ON)
+# include "MsgCmdOverlayTextParser.h"
+#endif
 
 /******************************************************************************************************************************************************
  *  L O C A L   C O N S T A N T   M A C R O S
@@ -82,7 +91,7 @@ void MsgCmdParser::parse()
         cmdDisplayPixelParser.parse();
         cmdDisplayPixelParser.process();
         cmdDisplayPixelParser.sendAnswer();
-    } else if(command == COMMAND_ANIMATION_CLOCK) {
+    } else if(command == COMMAND_ANIMATION) {
         MsgCmdAnimationParser cmdAnimationParser(parameter);
         cmdAnimationParser.parse();
         cmdAnimationParser.process();
@@ -102,11 +111,27 @@ void MsgCmdParser::parse()
         cmdClockDateParser.parse();
         cmdClockDateParser.process();
         cmdClockDateParser.sendAnswer();
+#if (OVERLAYS_SUPPORT_DATE == STD_ON)
     } else if(command == COMMAND_OVERLAY_DATE) {
         MsgCmdOverlayDateParser cmdOverlayDateParser(parameter);
         cmdOverlayDateParser.parse();
         cmdOverlayDateParser.process();
         cmdOverlayDateParser.sendAnswer();
+#endif
+#if (OVERLAYS_SUPPORT_TEMPERATURE == STD_ON)
+    } else if(command == COMMAND_OVERLAY_TEMPERATURE) {
+        MsgCmdOverlayTemperatureParser cmdOverlayTemperatureParser(parameter);
+        cmdOverlayTemperatureParser.parse();
+        cmdOverlayTemperatureParser.process();
+        cmdOverlayTemperatureParser.sendAnswer();
+#endif
+#if (OVERLAYS_SUPPORT_TEXT == STD_ON)
+    } else if(command == COMMAND_OVERLAY_TEXT) {
+        MsgCmdOverlayTextParser MsgCmdOverlayTextParser(parameter);
+        MsgCmdOverlayTextParser.parse();
+        MsgCmdOverlayTextParser.process();
+        MsgCmdOverlayTextParser.sendAnswer();
+#endif
     } else {
         Error.send(ErrorMessage::ERROR_WRONG_COMMAND);
     }

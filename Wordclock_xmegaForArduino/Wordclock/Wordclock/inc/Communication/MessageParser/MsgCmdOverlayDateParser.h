@@ -8,7 +8,7 @@
  *  ---------------------------------------------------------------------------------------------------------------------------------------------------
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       MsgCmdOverlayParser.h
+/**     \file       MsgCmdOverlayDateParser.h
  *      \brief
  *
  *      \details
@@ -82,9 +82,9 @@ class MsgCmdOverlayDateParser : public MsgCmdOverlayParser<MsgCmdOverlayDatePars
     void setDay(byte Day) { Overlays::getInstance().setDateDay(Day); }
     void setValidInDays(byte ValidInDays) { Overlays::getInstance().setDateValidInDays(ValidInDays); }
     void setIsActive(bool IsActive) { Overlays::getInstance().setDateIsActive(IsActive); }
-    void setText(const char* Text, PositionType Length) { }
+    void setText(const char* Text, LengthType Length) { }
 
-    void sendAnswerText(bool AppendSpace) { }
+    void sendAnswerText(bool AppendSpace) const {}
 
 };
 

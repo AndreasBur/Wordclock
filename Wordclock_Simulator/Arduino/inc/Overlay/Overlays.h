@@ -52,6 +52,8 @@ class Overlays
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
+    using LengthType = OverlayText::LengthType;
+
     enum OverlayIdType {
 #if (OVERLAYS_SUPPORT_DATE == STD_ON)
         OVERLAY_ID_DATE,
@@ -114,6 +116,7 @@ class Overlays
     byte getTextDay() const { return Text.getDay(); }
     byte getTextValidInDays() const { return Text.getValidInDays(); }
     bool getTextIsActive() const { return Text.getIsActive(); }
+    const char* getTextText() const { return Text.getText(); }
 
 	// set methods
 #if (OVERLAYS_SUPPORT_DATE == STD_ON)
@@ -139,6 +142,7 @@ class Overlays
     void setTextDay(byte Day) { Text.setDay(Day); }
     void setTextValidInDays(byte ValidInDays) { Text.setValidInDays(ValidInDays); }
     void setTextIsActive(bool IsActive) { Text.setIsActive(IsActive); }
+    void setTextText(const char* sText, LengthType Length) { Text.setText(sText, Length); }
 #endif
 
 	// methods

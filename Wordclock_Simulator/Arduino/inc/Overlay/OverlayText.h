@@ -28,7 +28,7 @@
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
 /* OverlayText configuration parameter */
-
+#define OVERLAY_TEXT_TEXT_SIZE              50u
 
 /* OverlayText parameter */
 
@@ -48,25 +48,26 @@ class OverlayText : public Overlay
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-
+    using LengthType = StringTools::LengthType;
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-
+    char Text[OVERLAY_TEXT_TEXT_SIZE];
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr OverlayText() { }
+    constexpr OverlayText() : Text{0} { }
     ~OverlayText() { }
 
 	// get methods
-
+    const char* getText() const { return Text; }
 
 	// set methods
+    void setText(const char* sText, LengthType Length) { StringTools::stringCopy(Text, sText, Length); }
 
 	// methods
 };
