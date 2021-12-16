@@ -175,7 +175,7 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
                 return position;
             }
         }
-        return position;
+        return position - 1u;
     }
 
     void handleConvertResult(MsgParameter Parameter, StringTools::ResultType Result) const {
