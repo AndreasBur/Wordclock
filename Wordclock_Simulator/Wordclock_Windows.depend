@@ -32416,7 +32416,7 @@
 1606936517 source:c:\users\aburn\github\andreasbur\wordclock\wordclock_simulator\arduino\src\communication\communication.cpp
 	"Communication.h"
 
-1638902565 c:\users\aburn\github\andreasbur\wordclock\wordclock_simulator\arduino\inc\communication\communication.h
+1639680147 c:\users\aburn\github\andreasbur\wordclock\wordclock_simulator\arduino\inc\communication\communication.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"Message.h"
@@ -32436,11 +32436,12 @@
 	"StandardTypes.h"
 	"Arduino.h"
 
-1639590537 c:\users\aburn\github\andreasbur\wordclock\wordclock_simulator\arduino\inc\communication\messageparser\msgcmdparser.h
+1640119205 c:\users\aburn\github\andreasbur\wordclock\wordclock_simulator\arduino\inc\communication\messageparser\msgcmdparser.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"Message.h"
 	"ErrorMessage.h"
+	"Overlays.h"
 
 1638902565 source:c:\users\aburn\github\andreasbur\wordclock\wordclock_simulator\arduino\src\display\display.cpp
 	"Display.h"
@@ -32758,7 +32759,7 @@
 	"StringTools.h"
 	<array>
 
-1633367486 c:\users\aburn\github\andreasbur\wordclock\wordclock_simulator\arduino\inc\communication\stringtools.h
+1639680147 c:\users\aburn\github\andreasbur\wordclock\wordclock_simulator\arduino\inc\communication\stringtools.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"errno.h"
@@ -32818,14 +32819,15 @@
 	"Arduino.h"
 	"MsgParameterParser.h"
 
-1639590537 c:\users\aburn\github\andreasbur\wordclock\wordclock_simulator\arduino\inc\overlay\overlays.h
+1640119188 c:\users\aburn\github\andreasbur\wordclock\wordclock_simulator\arduino\inc\overlay\overlays.h
 	"StandardTypes.h"
 	"Arduino.h"
+	"StringTools.h"
 	"OverlayDate.h"
-	"OverlayText.h"
 	"OverlayTemperature.h"
+	"OverlayText.h"
 
-1639590537 c:\users\aburn\github\andreasbur\wordclock\wordclock_simulator\arduino\inc\overlay\overlaydate.h
+1639604121 c:\users\aburn\github\andreasbur\wordclock\wordclock_simulator\arduino\inc\overlay\overlaydate.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"Overlay.h"
@@ -32834,12 +32836,12 @@
 	"StandardTypes.h"
 	"Arduino.h"
 
-1639590537 c:\users\aburn\github\andreasbur\wordclock\wordclock_simulator\arduino\inc\overlay\overlaytext.h
+1639680147 c:\users\aburn\github\andreasbur\wordclock\wordclock_simulator\arduino\inc\overlay\overlaytext.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"Overlay.h"
 
-1639590537 c:\users\aburn\github\andreasbur\wordclock\wordclock_simulator\arduino\inc\overlay\overlaytemperature.h
+1639591773 c:\users\aburn\github\andreasbur\wordclock\wordclock_simulator\arduino\inc\overlay\overlaytemperature.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"Overlay.h"

@@ -16,7 +16,7 @@
     <Name>Wordclock</Name>
     <RootNamespace>Wordclock</RootNamespace>
     <ArduinoIdeDir>C:\Program Files (x86)\Arduino</ArduinoIdeDir>
-    <ToolchainFlavour>avr-gcc-10.1.0-x64-windows</ToolchainFlavour>
+    <ToolchainFlavour>avr-gcc-11.1.0-x64-windows</ToolchainFlavour>
     <KeepTimersRunning>true</KeepTimersRunning>
     <OverrideVtor>false</OverrideVtor>
     <CacheFlash>true</CacheFlash>
@@ -307,7 +307,7 @@
   <avrgcccpp.compiler.warnings.AllWarnings>True</avrgcccpp.compiler.warnings.AllWarnings>
   <avrgcccpp.compiler.warnings.Undefined>True</avrgcccpp.compiler.warnings.Undefined>
   <avrgcccpp.compiler.warnings.Pedantic>True</avrgcccpp.compiler.warnings.Pedantic>
-  <avrgcccpp.compiler.miscellaneous.OtherFlags>-std=gnu++17 -Wextra -fplugin=%24(ToolchainDir)\..\plugins\avr-flash-vtbl.dll</avrgcccpp.compiler.miscellaneous.OtherFlags>
+  <avrgcccpp.compiler.miscellaneous.OtherFlags>-std=gnu++17 -Wextra</avrgcccpp.compiler.miscellaneous.OtherFlags>
   <avrgcccpp.linker.libraries.Libraries>
     <ListValues>
       <Value>libm</Value>

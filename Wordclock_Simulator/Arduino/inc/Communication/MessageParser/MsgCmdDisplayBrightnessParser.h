@@ -60,12 +60,10 @@ class MsgCmdDisplayBrightnessParser : public MsgParameterParser<MsgCmdDisplayBri
     static constexpr char UseAutomaticOptionShortName{'A'};
     static constexpr char UseGammaCorrectionOptionShortName{'G'};
 
-    static constexpr ParameterTableType ParameterTable PROGMEM
-    {
+    static constexpr ParameterTableType ParameterTable PROGMEM {
         MsgParameter(BrightnessOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8),
         MsgParameter(UseAutomaticOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8),
         MsgParameter(UseGammaCorrectionOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8)
-
     };
 
     // functions

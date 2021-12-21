@@ -15,7 +15,7 @@
     <Name>ArduinoCore</Name>
     <ArduinoIdeDir>C:\Program Files (x86)\Arduino</ArduinoIdeDir>
     <ArduinoProjectType>Core</ArduinoProjectType>
-    <ToolchainFlavour>avr-gcc-10.1.0-x64-windows</ToolchainFlavour>
+    <ToolchainFlavour>Native</ToolchainFlavour>
     <AssemblyName>ArduinoCore</AssemblyName>
     <RootNamespace>ArduinoCore</RootNamespace>
     <KeepTimersRunning>true</KeepTimersRunning>
@@ -30,15 +30,15 @@
     <eraseonlaunchrule>0</eraseonlaunchrule>
     <AsfFrameworkConfig>
       <framework-data>
-  <options />
-  <configurations />
-  <files />
-  <documentation help="" />
-  <offline-documentation help="" />
-  <dependencies>
-    <content-extension eid="atmel.asf" uuidref="Atmel.ASF" version="3.43.0" />
-  </dependencies>
-</framework-data>
+        <options />
+        <configurations />
+        <files />
+        <documentation help="" />
+        <offline-documentation help="" />
+        <dependencies>
+          <content-extension eid="atmel.asf" uuidref="Atmel.ASF" version="3.43.0" />
+        </dependencies>
+      </framework-data>
     </AsfFrameworkConfig>
     <ResetRule>0</ResetRule>
     <EraseKey />
