@@ -59,8 +59,7 @@ class MsgCmdDisplayColorParser : public MsgParameterParser<MsgCmdDisplayColorPar
     static constexpr char GreenOptionShortName{'G'};
     static constexpr char BlueOptionShortName{'B'};
 
-    static constexpr ParameterTableType ParameterTable PROGMEM
-    {
+    static constexpr ParameterTableType ParameterTable PROGMEM {
         ParameterTableElementType(RedOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8),
         ParameterTableElementType(GreenOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8),
         ParameterTableElementType(BlueOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8)

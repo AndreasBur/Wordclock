@@ -23,6 +23,7 @@
 #include "StandardTypes.h"
 #include "Arduino.h"
 #include "MsgParameterParser.h"
+#include "MsgCmdBaseOverlayParser.h"
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
@@ -31,7 +32,7 @@
 
 
 /* MsgCmdOverlayParser parameter */
-#define MSG_CMD_OVERLAY_PARSER_PARAMETER_TABLE_SIZE           7u
+
 
 /******************************************************************************************************************************************************
  *  G L O B A L   F U N C T I O N   M A C R O S
@@ -39,17 +40,16 @@
 
 
 /******************************************************************************************************************************************************
- *  C L A S S   T E M P L A T E
+ *  C L A S S   M S G   C M D   O V E R L A Y   P A R S E R
 ******************************************************************************************************************************************************/
-template <typename Derived> class MsgCmdOverlayParser : public MsgParameterParser<MsgCmdOverlayParser<Derived>, MSG_CMD_OVERLAY_PARSER_PARAMETER_TABLE_SIZE>
+template <typename Derived> class MsgCmdOverlayParser
+    : public MsgParameterParser<MsgCmdOverlayParser<Derived>, MSG_CMD_BASE_OVERLAY_PARSER_PARAMETER_TABLE_SIZE>, public MsgCmdBaseOverlayParser
 {
 /******************************************************************************************************************************************************
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-    using MsgParameterParserType = MsgParameterParser<MsgCmdOverlayParser<Derived>, MSG_CMD_OVERLAY_PARSER_PARAMETER_TABLE_SIZE>;
-    using ParameterTableType = typename MsgParameterParserType::ParameterTableType;
-    using ParameterTableElementType = typename MsgParameterParserType::ParameterTableElementType;
+    using MsgParameterParserType = MsgParameterParser<MsgCmdOverlayParser<Derived>, MSG_CMD_BASE_OVERLAY_PARSER_PARAMETER_TABLE_SIZE>;
     using PositionType = typename MsgParameterParserType::PositionType;
     using LengthType = StringTools::LengthType;
 
@@ -57,7 +57,6 @@ template <typename Derived> class MsgCmdOverlayParser : public MsgParameterParse
  *  P R O T E C T E D   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   protected:
-    static constexpr char TextOptionShortName{'T'};
     // functions
     constexpr MsgCmdOverlayParser(const char* Parameter) : MsgParameterParserType(ParameterTable, Parameter) { }
     ~MsgCmdOverlayParser() { }
@@ -66,31 +65,13 @@ template <typename Derived> class MsgCmdOverlayParser : public MsgParameterParse
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    friend class MsgParameterParser<MsgCmdOverlayParser<Derived>, MSG_CMD_OVERLAY_PARSER_PARAMETER_TABLE_SIZE>;
-    static constexpr char PeriodOptionShortName{'P'};
-    static constexpr char EnduranceOptionShortName{'E'};
-    static constexpr char MonthOptionShortName{'M'};
-    static constexpr char DayOptionShortName{'D'};
-    static constexpr char ValidOptionShortName{'V'};
-    static constexpr char ActiveOptionShortName{'A'};
-
-    static constexpr ParameterTableType ParameterTable PROGMEM
-    {
-        ParameterTableElementType(PeriodOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8),
-        ParameterTableElementType(EnduranceOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8),
-        ParameterTableElementType(MonthOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8),
-        ParameterTableElementType(DayOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8),
-        ParameterTableElementType(ValidOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8),
-        ParameterTableElementType(ActiveOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8),
-        ParameterTableElementType(TextOptionShortName, MsgParameter::ARGUMENT_TYPE_STRING)
-    };
+    friend class MsgParameterParser<MsgCmdOverlayParser<Derived>, MSG_CMD_BASE_OVERLAY_PARSER_PARAMETER_TABLE_SIZE>;
 
     // functions
     Derived& underlying() { return static_cast<Derived&>(*this); }
     Derived const& underlying() const { return static_cast<Derived const&>(*this); }
 
-    void handleParameter(char ParameterShortName, byte Argument)
-    {
+    void handleParameter(char ParameterShortName, byte Argument) {
         if(ParameterShortName == PeriodOptionShortName) { underlying().setPeriodInMinutes(Argument); }
         if(ParameterShortName == EnduranceOptionShortName) { underlying().setEnduranceInSeconds(Argument); }
         if(ParameterShortName == MonthOptionShortName) { underlying().setMonth(Argument); }
@@ -98,8 +79,7 @@ template <typename Derived> class MsgCmdOverlayParser : public MsgParameterParse
         if(ParameterShortName == ActiveOptionShortName) { underlying().setIsActive(static_cast<bool>(Argument)); }
     }
 
-    void handleParameter(char ParameterShortName, const char* Argument, PositionType Length)
-    {
+    void handleParameter(char ParameterShortName, const char* Argument, PositionType Length) {
         if(ParameterShortName == TextOptionShortName) { underlying().setText(Argument, Length); }
     }
 

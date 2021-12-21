@@ -247,6 +247,7 @@
       <Value>../inc/Scheduler</Value>
       <Value>../inc/Overlay</Value>
       <Value>../inc/Text</Value>
+      <Value>../inc/Communication/MessageParser/Base</Value>
     </ListValues>
   </avrgcc.compiler.directories.IncludePaths>
   <avrgcc.compiler.optimization.level>Optimize for size (-Os)</avrgcc.compiler.optimization.level>
@@ -296,6 +297,7 @@
       <Value>../inc/Scheduler</Value>
       <Value>../inc/Overlay</Value>
       <Value>../inc/Text</Value>
+      <Value>../inc/Communication/MessageParser/Base</Value>
     </ListValues>
   </avrgcccpp.compiler.directories.IncludePaths>
   <avrgcccpp.compiler.optimization.level>Optimize for size (-Os)</avrgcccpp.compiler.optimization.level>
@@ -388,6 +390,15 @@
     <Compile Include="inc\Communication\Message.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="inc\Communication\MessageParser\Base\MsgCmdBaseOverlayParser.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="inc\Communication\MessageParser\Base\MsgCmdOverlayParser.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="inc\Communication\MessageParser\Base\MsgParameterParser.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="inc\Communication\MessageParser\MsgCmdAnimationParser.h">
       <SubType>compile</SubType>
     </Compile>
@@ -406,9 +417,6 @@
     <Compile Include="inc\Communication\MessageParser\MsgCmdOverlayDateParser.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="inc\Communication\MessageParser\MsgCmdOverlayParser.h">
-      <SubType>compile</SubType>
-    </Compile>
     <Compile Include="inc\Communication\MessageParser\MsgCmdOverlayTemperatureParser.h">
       <SubType>compile</SubType>
     </Compile>
@@ -425,9 +433,6 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="inc\Communication\MessageParser\MsgParameter.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="inc\Communication\MsgParameterParser.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="inc\Communication\StringTools.h">
@@ -663,6 +668,7 @@
     <Folder Include="inc" />
     <Folder Include="inc\Animation\" />
     <Folder Include="inc\Communication\MessageParser" />
+    <Folder Include="inc\Communication\MessageParser\Base" />
     <Folder Include="inc\Display" />
     <Folder Include="inc\Clock" />
     <Folder Include="inc\Font" />
