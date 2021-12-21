@@ -29,6 +29,7 @@
 #include "MsgCmdAnimationParser.h"
 #include "MsgCmdTimeParser.h"
 #include "MsgCmdDateParser.h"
+#include "Overlays.h"
 #if (OVERLAYS_SUPPORT_DATE == STD_ON)
 # include "MsgCmdOverlayDateParser.h"
 #endif

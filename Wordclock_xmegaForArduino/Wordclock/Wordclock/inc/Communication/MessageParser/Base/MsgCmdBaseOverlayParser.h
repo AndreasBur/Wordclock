@@ -62,7 +62,7 @@ class MsgCmdBaseOverlayParser
     static constexpr char DayOptionShortName{'D'};
     static constexpr char ValidOptionShortName{'V'};
     static constexpr char ActiveOptionShortName{'A'};
-    static constexpr char TextOptionShortName{'T'};
+	static constexpr char TextOptionShortName{'T'};
 
     static constexpr ParameterTableType ParameterTable PROGMEM {
         ParameterTableElementType(PeriodOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8),
@@ -70,7 +70,8 @@ class MsgCmdBaseOverlayParser
         ParameterTableElementType(MonthOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8),
         ParameterTableElementType(DayOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8),
         ParameterTableElementType(ValidOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8),
-        ParameterTableElementType(ActiveOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8)
+        ParameterTableElementType(ActiveOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8),
+		ParameterTableElementType(TextOptionShortName, MsgParameter::ARGUMENT_TYPE_STRING),
     };
     
     constexpr MsgCmdBaseOverlayParser() { }

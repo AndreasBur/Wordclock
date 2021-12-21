@@ -110,6 +110,7 @@ class Overlays
     byte getTemperatureValidInDays() const { return Temperature.getValidInDays(); }
     bool getTemperatureIsActive() const { return Temperature.getIsActive(); }
 #endif
+#if (OVERLAYS_SUPPORT_TEXT == STD_ON)
     byte getTextPeriodInMinutes() const { return Text.getPeriodInMinutes(); }
     byte getTextEnduranceInSeconds() const { return Text.getEnduranceInSeconds(); }
     byte getTextMonth() const { return Text.getMonth(); }
@@ -117,6 +118,7 @@ class Overlays
     byte getTextValidInDays() const { return Text.getValidInDays(); }
     bool getTextIsActive() const { return Text.getIsActive(); }
     const char* getTextText() const { return Text.getText(); }
+#endif
 
 	// set methods
 #if (OVERLAYS_SUPPORT_DATE == STD_ON)
