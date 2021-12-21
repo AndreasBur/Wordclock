@@ -82,6 +82,7 @@
 			<Add directory="Arduino/inc/DisplayManager" />
 			<Add directory="Arduino/inc/Scheduler" />
 			<Add directory="Arduino/inc/Overlay" />
+			<Add directory="Arduino/inc/Communication/MessageParser/Base" />
 		</Compiler>
 		<ResourceCompiler>
 			<Add directory="$(#wx31)/include" />
@@ -109,6 +110,9 @@
 		<Unit filename="Arduino/inc/Communication/Communication.h" />
 		<Unit filename="Arduino/inc/Communication/ErrorMessage.h" />
 		<Unit filename="Arduino/inc/Communication/Message.h" />
+		<Unit filename="Arduino/inc/Communication/MessageParser/Base/MsgCmdBaseOverlayParser.h" />
+		<Unit filename="Arduino/inc/Communication/MessageParser/Base/MsgCmdOverlayParser.h" />
+		<Unit filename="Arduino/inc/Communication/MessageParser/Base/MsgParameterParser.h" />
 		<Unit filename="Arduino/inc/Communication/MessageParser/MsgCmdAnimationParser.h" />
 		<Unit filename="Arduino/inc/Communication/MessageParser/MsgCmdClockModeParser.h" />
 		<Unit filename="Arduino/inc/Communication/MessageParser/MsgCmdDateParser.h" />
@@ -116,14 +120,12 @@
 		<Unit filename="Arduino/inc/Communication/MessageParser/MsgCmdDisplayColorParser.h" />
 		<Unit filename="Arduino/inc/Communication/MessageParser/MsgCmdDisplayPixelParser.h" />
 		<Unit filename="Arduino/inc/Communication/MessageParser/MsgCmdOverlayDateParser.h" />
-		<Unit filename="Arduino/inc/Communication/MessageParser/MsgCmdOverlayParser.h" />
 		<Unit filename="Arduino/inc/Communication/MessageParser/MsgCmdOverlayTemperatureParser.h" />
 		<Unit filename="Arduino/inc/Communication/MessageParser/MsgCmdOverlayTextParser.h" />
 		<Unit filename="Arduino/inc/Communication/MessageParser/MsgCmdParser.h" />
 		<Unit filename="Arduino/inc/Communication/MessageParser/MsgCmdRemoteProcedureCallParser.h" />
 		<Unit filename="Arduino/inc/Communication/MessageParser/MsgCmdTimeParser.h" />
 		<Unit filename="Arduino/inc/Communication/MessageParser/MsgParameter.h" />
-		<Unit filename="Arduino/inc/Communication/MsgParameterParser.h" />
 		<Unit filename="Arduino/inc/Communication/StringTools.h" />
 		<Unit filename="Arduino/inc/DisplayManager/DisplayManager.h" />
 		<Unit filename="Arduino/inc/Display/Display.h" />
