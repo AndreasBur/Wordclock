@@ -130,6 +130,7 @@ class Overlays
     byte getTextValidInDays() const { return Text.getValidInDays(); }
     bool getTextIsActive() const { return Text.getIsActive(); }
     const char* getTextText() const { return Text.getText(); }
+    byte getTextSpeed() const { return Text.getSpeed(); }
 #endif
 
 	// set methods
@@ -157,9 +158,13 @@ class Overlays
     void setTextValidInDays(byte ValidInDays) { Text.setValidInDays(ValidInDays); }
     void setTextIsActive(bool IsActive) { Text.setIsActive(IsActive); }
     void setTextText(const char* sText, LengthType Length) { Text.setText(sText, Length); }
+    void setTextSpeed(byte Speed) { Text.setSpeed(Speed); }
 #endif
 
 	// methods
+	void task() {
+
+	}
 
 };
 

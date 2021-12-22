@@ -20,6 +20,7 @@ const wxString DisplayCharacters[][PIXELS_DISPLAY_NUMBER_OF_COLUMNS]
 };
 
 
+
 BEGIN_EVENT_TABLE(Pixels, wxFrame)
     EVT_CLOSE(Pixels::OnClose)
     EVT_BUTTON(ID_BUTTON_SEND, Pixels::OnSend)

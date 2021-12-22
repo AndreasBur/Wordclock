@@ -118,6 +118,11 @@ class Text
 #endif
 
     // functions
+    constexpr Text() : wcTransformation(), Shift{nullptr, FONT_NONE, STD_NULL_CHARACTER, 0, 0, SHIFT_STATE_IDLE},
+                       TaskCycle(TEXT_TASK_CYCLE_INIT_VALUE), State(STATE_UNINIT) { }
+    ~Text() { }
+
+
     template <typename RowType, byte RowsSize>
     StdReturnType setCharFontHorizontal(byte, byte, const FontCharHorizontal<RowType, RowsSize>&, byte);
     template <typename RowType>
@@ -149,9 +154,10 @@ class Text
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr Text() : wcTransformation(), Shift{nullptr, FONT_NONE, STD_NULL_CHARACTER, 0, 0, SHIFT_STATE_IDLE},
-                       TaskCycle(TEXT_TASK_CYCLE_INIT_VALUE), State(STATE_UNINIT) { }
-    ~Text() { }
+    static Text& getInstance() {
+        static Text singletonInstance;
+        return singletonInstance;
+    }
 
     // get methods
     StateType getState() const { return State; }

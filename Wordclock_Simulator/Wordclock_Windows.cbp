@@ -38,7 +38,7 @@
 				<Option compiler="gcc" />
 				<Option projectLinkerOptionsRelation="2" />
 				<Compiler>
-					<Add option="-O2" />
+					<Add option="-Os" />
 					<Add directory="$(#wx31)/lib/gcc_dll/mswu" />
 					<Add directory="include" />
 				</Compiler>
@@ -83,12 +83,14 @@
 			<Add directory="Arduino/inc/Scheduler" />
 			<Add directory="Arduino/inc/Overlay" />
 			<Add directory="Arduino/inc/Communication/MessageParser/Base" />
+			<Add directory="Arduino/inc/Text" />
 		</Compiler>
 		<ResourceCompiler>
 			<Add directory="$(#wx31)/include" />
 		</ResourceCompiler>
 		<Linker>
 			<Add option="-mthreads" />
+			<Add option="-Wl,-Map=$(TARGET_OUTPUT_DIR)${PROJECT_NAME}.map" />
 		</Linker>
 		<Unit filename="Arduino/inc/Animation/Animation.h" />
 		<Unit filename="Arduino/inc/Animation/AnimationCube.h" />
@@ -153,6 +155,7 @@
 		<Unit filename="Arduino/inc/RealTimeClock/ClockTime.h" />
 		<Unit filename="Arduino/inc/Scheduler/Scheduler.h" />
 		<Unit filename="Arduino/inc/StandardTypes/StandardTypes.h" />
+		<Unit filename="Arduino/inc/Text/Text.h" />
 		<Unit filename="Arduino/inc/Transformation/Transformation.h" />
 		<Unit filename="Arduino/src/Animation/Animation.cpp" />
 		<Unit filename="Arduino/src/Animation/AnimationCube.cpp" />
@@ -182,6 +185,7 @@
 		<Unit filename="Arduino/src/Font/FontSprite5x8.cpp" />
 		<Unit filename="Arduino/src/Font/FontTahoma10x10.cpp" />
 		<Unit filename="Arduino/src/Scheduler/Scheduler.cpp" />
+		<Unit filename="Arduino/src/Text/Text.cpp" />
 		<Unit filename="Arduino/src/Transformation/Transformation.cpp" />
 		<Unit filename="Wordclock.ico" />
 		<Unit filename="WordclockApp.cpp" />

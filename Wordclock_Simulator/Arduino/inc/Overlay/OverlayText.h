@@ -23,6 +23,7 @@
 #include "StandardTypes.h"
 #include "Arduino.h"
 #include "Overlay.h"
+#include "Text.h"
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
@@ -56,18 +57,26 @@ class OverlayText : public Overlay
   private:
     char Text[OVERLAY_TEXT_TEXT_SIZE];
 
+    // functions
+    byte convertSpeedToTaskCycle(byte Speed) const { return UINT8_MAX - Speed; }
+    byte convertTaskCycleToSpeed(byte TaskCylce) const { return UINT8_MAX - TaskCylce; }
+
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr OverlayText() : Text{0} { }
+    constexpr OverlayText() : Text{StringTools::NullCharacter} { }
     ~OverlayText() { }
 
 	// get methods
     const char* getText() const { return Text; }
+    byte getSpeed() const { return convertTaskCycleToSpeed(Text::getInstance().getTaskCycle()); }
+
+    // set methods
 
 	// set methods
     void setText(const char* sText, LengthType Length) { StringTools::stringCopy(Text, sText, Length); }
+    void setSpeed(byte Cycle) { Text::getInstance().setTaskCycle(convertSpeedToTaskCycle(Cycle)); }
 
 	// methods
 };

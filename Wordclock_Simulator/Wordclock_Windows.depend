@@ -6196,7 +6196,7 @@
 	"WordclockMain.h"
 	"RealTimeClock.h"
 
-1639387568 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\animation.cpp
+1640171810 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\animation.cpp
 	"Animation.h"
 
 1504860142 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\animation\font.cpp
@@ -26599,13 +26599,14 @@
 	"Arduino.h"
 	"MsgParameter.h"
 
-1639573401 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\communication\messageparser\msgcmdparser.h
+1640170976 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\communication\messageparser\msgcmdparser.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"Message.h"
 	"ErrorMessage.h"
+	"Overlays.h"
 
-1639650298 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\communication\messageparser\msgcmdparser.cpp
+1640170976 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\communication\messageparser\msgcmdparser.cpp
 	"MsgCmdParser.h"
 	"MsgCmdRemoteProcedureCallParser.h"
 	"MsgCmdDisplayColorParser.h"
@@ -26615,11 +26616,12 @@
 	"MsgCmdAnimationParser.h"
 	"MsgCmdTimeParser.h"
 	"MsgCmdDateParser.h"
+	"Overlays.h"
 	"MsgCmdOverlayDateParser.h"
 	"MsgCmdOverlayTemperatureParser.h"
 	"MsgCmdOverlayTextParser.h"
 
-1639562304 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\communication\messageparser\msgcmddisplaycolorparser.h
+1640170976 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\communication\messageparser\msgcmddisplaycolorparser.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"Display.h"
@@ -26645,7 +26647,7 @@
 	"errno.h"
 	<type_traits>
 
-1639562316 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\communication\messageparser\msgcmddisplaybrightnessparser.h
+1640170976 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\communication\messageparser\msgcmddisplaybrightnessparser.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"Pixel.h"
@@ -26764,7 +26766,7 @@
 	"Display.h"
 	"MsgParameterParser.h"
 
-1639562286 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\communication\messageparser\msgcmddisplaypixelparser.h
+1640170976 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\communication\messageparser\msgcmddisplaypixelparser.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"Display.h"
@@ -26968,7 +26970,7 @@
 	"Illuminance.h"
 	"GammaCorrection.h"
 
-1635841741 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\src\pixels.cpp
+1640172362 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\src\pixels.cpp
 	"Pixels.h"
 	<array>
 	"WordclockIcon.xpm"
@@ -29685,7 +29687,7 @@
 	"MsgParameterParser.h"
 	"Animations.h"
 
-1639650846 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\communication\messageparser\msgcmdoverlaydateparser.h
+1640180350 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\communication\messageparser\msgcmdoverlaydateparser.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"MsgCmdOverlayParser.h"
@@ -29696,26 +29698,29 @@
 	"Arduino.h"
 	"MsgParameterParser.h"
 
-1639648891 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\overlay\overlays.h
+1640178671 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\overlay\overlays.h
 	"StandardTypes.h"
 	"Arduino.h"
+	"StringTools.h"
 	"OverlayDate.h"
-	"OverlayText.h"
 	"OverlayTemperature.h"
+	"OverlayText.h"
 
 1639643136 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\overlay\overlaydate.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"Overlay.h"
 
-1639575037 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\overlay\overlay.h
+1640188503 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\overlay\overlay.h
 	"StandardTypes.h"
 	"Arduino.h"
+	"ClockDateTime.h"
 
-1639658787 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\overlay\overlaytext.h
+1640181631 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\overlay\overlaytext.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"Overlay.h"
+	"Text.h"
 
 1639643136 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\overlay\overlaytemperature.h
 	"StandardTypes.h"
@@ -32846,15 +32851,51 @@
 	"Arduino.h"
 	"Overlay.h"
 
-1639650839 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\communication\messageparser\msgcmdoverlaytemperatureparser.h
+1640180350 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\communication\messageparser\msgcmdoverlaytemperatureparser.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"MsgCmdOverlayParser.h"
 	"Overlays.h"
 
-1639650746 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\communication\messageparser\msgcmdoverlaytextparser.h
+1640181695 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\communication\messageparser\msgcmdoverlaytextparser.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"MsgCmdOverlayParser.h"
 	"Overlays.h"
+
+1640180727 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\communication\messageparser\base\msgparameterparser.h
+	"StandardTypes.h"
+	"Arduino.h"
+	"Message.h"
+	"ErrorMessage.h"
+	"MsgParameter.h"
+	"StringTools.h"
+	"Communication.h"
+	<array>
+
+1640180878 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\communication\messageparser\base\msgcmdoverlayparser.h
+	"StandardTypes.h"
+	"Arduino.h"
+	"MsgParameterParser.h"
+	"MsgCmdBaseOverlayParser.h"
+
+1640178977 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\communication\messageparser\base\msgcmdbaseoverlayparser.h
+	"StandardTypes.h"
+	"Arduino.h"
+
+1618262638 d:\wxwidgets-3.1.5\lib\gcc_dll\mswu\wx\setup.h
+
+1639643136 source:c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\src\text\text.cpp
+	"Text.h"
+
+1640178585 c:\users\virskl\documents\github\wordclock\wordclock_simulator\arduino\inc\text\text.h
+	"StandardTypes.h"
+	"Arduino.h"
+	"Display.h"
+	"Transformation.h"
+	"FontCourierNew7x10.h"
+	"FontCourierNew7x9.h"
+	"FontLucidaSans9x10.h"
+	"FontSprite5x8.h"
+	"FontTahoma10x10.h"
 

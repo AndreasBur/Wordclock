@@ -9,10 +9,10 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       MsgCmdBaseOverlayParser.h
- *      \brief      
+ *      \brief
  *
- *      \details    
- *                  
+ *      \details
+ *
 ******************************************************************************************************************************************************/
 #ifndef _MSG_CMD_BASE_OVERLAY_PARSER_H_
 #define _MSG_CMD_BASE_OVERLAY_PARSER_H_
@@ -31,7 +31,7 @@
 
 
 /* MsgCmdBaseOverlayParser parameter */
-#define MSG_CMD_BASE_OVERLAY_PARSER_PARAMETER_TABLE_SIZE           7u
+#define MSG_CMD_BASE_OVERLAY_PARSER_PARAMETER_TABLE_SIZE           8u
 
 
 /******************************************************************************************************************************************************
@@ -51,7 +51,7 @@ class MsgCmdBaseOverlayParser
     using MsgParameterBaseParserType = MsgParameterParser<MsgCmdBaseOverlayParser, MSG_CMD_BASE_OVERLAY_PARSER_PARAMETER_TABLE_SIZE>;
     using ParameterTableType = typename MsgParameterBaseParserType::ParameterTableType;
     using ParameterTableElementType = typename MsgParameterBaseParserType::ParameterTableElementType;
-    
+
 /******************************************************************************************************************************************************
  *  P R O T E C T E D   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
@@ -63,6 +63,7 @@ class MsgCmdBaseOverlayParser
     static constexpr char ValidOptionShortName{'V'};
     static constexpr char ActiveOptionShortName{'A'};
 	static constexpr char TextOptionShortName{'T'};
+	static constexpr char TextSpeedOptionShortName{'S'};
 
     static constexpr ParameterTableType ParameterTable PROGMEM {
         ParameterTableElementType(PeriodOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8),
@@ -72,17 +73,18 @@ class MsgCmdBaseOverlayParser
         ParameterTableElementType(ValidOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8),
         ParameterTableElementType(ActiveOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8),
 		ParameterTableElementType(TextOptionShortName, MsgParameter::ARGUMENT_TYPE_STRING),
+		ParameterTableElementType(TextSpeedOptionShortName, MsgParameter::ARGUMENT_TYPE_STRING),
     };
-    
+
     constexpr MsgCmdBaseOverlayParser() { }
     ~MsgCmdBaseOverlayParser() { }
-  
+
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
 
-  
+
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/

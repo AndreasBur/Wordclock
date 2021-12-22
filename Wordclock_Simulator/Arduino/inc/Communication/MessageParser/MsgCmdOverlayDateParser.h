@@ -83,8 +83,10 @@ class MsgCmdOverlayDateParser : public MsgCmdOverlayParser<MsgCmdOverlayDatePars
     void setValidInDays(byte ValidInDays) { Overlays::getInstance().setDateValidInDays(ValidInDays); }
     void setIsActive(bool IsActive) { Overlays::getInstance().setDateIsActive(IsActive); }
     void setText(const char* Text, LengthType Length) { }
+    void setTextSpeed(byte Speed) { }
 
     void sendAnswerText(bool AppendSpace) const {}
+    void sendAnswerSpeedText(bool AppendSpace) const {}
 
 };
 
