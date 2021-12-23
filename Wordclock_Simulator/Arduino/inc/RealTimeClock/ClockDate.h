@@ -74,8 +74,10 @@ class ClockDate
     };
 
     using YearType = uint16_t;
+    using MonthRawType = byte;
     //using MonthType = uint8_t;
-    using DayType = uint8_t;
+    using DayType = byte;
+    using RataDieDayType = uint32_t;
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
@@ -150,6 +152,25 @@ class ClockDate
     static constexpr bool isYearValid(YearType Year) { return (Year >= YearMinValue) && (Year <= YearMaxValue); }
     static constexpr bool isMonthValid(MonthType Month) { return (Month >= MonthMinValue) && (Month <= MonthMaxValue); }
     static constexpr bool isDayValid(DayType Day) { return (Day >= DayMinValue) && (Day <= DayMaxValue); }
+
+    static RataDieDayType getRataDieDay(YearType Year, MonthType Month, DayType Day) {
+        if (Month < 3) { Year--, Month += 12; }
+        return 365*Year+Year/4-Year/100+Year/400+(153*Month-457)/5+Day-306;
+    }
+
+    static DayType getDaysOfMonth(MonthType Month, YearType Year) {
+        MonthRawType monthRaw = static_cast<MonthRawType>(Month);
+
+        if(monthRaw == 4 || monthRaw == 6 || monthRaw == 9 || monthRaw == 11) {
+            return 30u;
+        } else if(monthRaw == 2u) {
+            if(Year % 4 == 0u) { return 29u; }
+            else { return 28u; }
+        } else if((monthRaw == 1u) || (monthRaw == 3u) || (monthRaw == 5u) ||
+                (monthRaw == 7u) || (monthRaw == 8u) || (monthRaw == 12)) {
+            return 31u;
+        }
+	}
 };
 
 #endif

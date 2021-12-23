@@ -54,6 +54,7 @@ class ClockDateTime
 
     using YearType = ClockDate::YearType;
     using MonthType = ClockDate::MonthType;
+    using MonthRawType = ClockDate::MonthRawType;
     using DayType = ClockDate::DayType;
     using WeekdayType = ClockDate::WeekdayType;
 
@@ -97,7 +98,7 @@ class ClockDateTime
     StdReturnType setDateDay(DayType Day) { return Date.setDay(Day); }
 
 	// methods
-
+    DayType getDaysOfMonth(MonthType Month, YearType Year) { return Date.getDaysOfMonth(Month, Year); }
 };
 
 #endif
