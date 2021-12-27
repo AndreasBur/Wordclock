@@ -77,6 +77,7 @@ template <typename Derived> class MsgCmdOverlayParser
         if(ParameterShortName == MonthOptionShortName) { underlying().setMonth(Argument); }
         if(ParameterShortName == ValidOptionShortName) { underlying().setValidInDays(Argument); }
         if(ParameterShortName == ActiveOptionShortName) { underlying().setIsActive(static_cast<bool>(Argument)); }
+        if(ParameterShortName == TextSpeedOptionShortName) { underlying().setTextSpeed(Argument); }
     }
 
     void handleParameter(char ParameterShortName, const char* Argument, PositionType Length) {
@@ -90,6 +91,7 @@ template <typename Derived> class MsgCmdOverlayParser
     void sendAnswerValid(bool AppendSpace) const { MsgParameterParserType::sendAnswerParameter(ValidOptionShortName, underlying().getValidInDays(), AppendSpace); }
     void sendAnswerActive(bool AppendSpace) const { MsgParameterParserType::sendAnswerParameter(ActiveOptionShortName, underlying().getIsActive(), AppendSpace); }
     void sendAnswerText(bool AppendSpace) const { underlying().sendAnswerText(AppendSpace); }
+    void sendAnswerSpeedText(bool AppendSpace) const { underlying().sendAnswerSpeedText(AppendSpace); }
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
@@ -110,6 +112,7 @@ template <typename Derived> class MsgCmdOverlayParser
         sendAnswerDay(true);
         sendAnswerValid(true);
         sendAnswerText(true);
+        sendAnswerSpeedText(true);
         sendAnswerActive(false);
     }
 

@@ -56,6 +56,7 @@ class MsgCmdOverlayTextParser : public MsgCmdOverlayParser<MsgCmdOverlayTextPars
   private:
     friend class MsgCmdOverlayParser;
 
+    // functions
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
@@ -76,6 +77,7 @@ class MsgCmdOverlayTextParser : public MsgCmdOverlayParser<MsgCmdOverlayTextPars
     byte getValidInDays() const { return Overlays::getInstance().getTextValidInDays(); }
     byte getIsActive() const { return Overlays::getInstance().getTextIsActive(); }
     const char* getText() const { return Overlays::getInstance().getTextText(); }
+    byte getTextSpeed() const { return Overlays::getInstance().getTextSpeed(); }
 
     void setPeriodInMinutes(byte PeriodInMinutes) { Overlays::getInstance().setTextPeriodInMinutes(PeriodInMinutes); }
     void setEnduranceInSeconds(byte EnduranceInSeconds) {Overlays::getInstance().setTextEnduranceInSeconds(EnduranceInSeconds); }
@@ -84,8 +86,10 @@ class MsgCmdOverlayTextParser : public MsgCmdOverlayParser<MsgCmdOverlayTextPars
     void setValidInDays(byte ValidInDays) { Overlays::getInstance().setTextValidInDays(ValidInDays); }
     void setIsActive(bool IsActive) { Overlays::getInstance().setTextIsActive(IsActive); }
     void setText(const char* Text, LengthType Length) { Overlays::getInstance().setTextText(Text, Length); }
+    void setTextSpeed(byte Speed) { Overlays::getInstance().setTextSpeed(Speed); }
 
     void sendAnswerText(bool AppendSpace) const { sendAnswerParameter(TextOptionShortName, getText(), AppendSpace); }
+    void sendAnswerSpeedText(bool AppendSpace) const { sendAnswerParameter(TextSpeedOptionShortName, getTextSpeed(), AppendSpace); }
 
 };
 

@@ -58,7 +58,7 @@ class ClockDate
         WEEKDAY_SATURDAY,
     };
 
-    enum MonthType {
+    enum MonthEnumType {
         MONTH_JANUARY = 1u,
         MONTH_FEBRUARY,
         MONTH_MARCH,
@@ -74,8 +74,7 @@ class ClockDate
     };
 
     using YearType = uint16_t;
-    using MonthRawType = byte;
-    //using MonthType = uint8_t;
+    using MonthType = byte;
     using DayType = byte;
     using RataDieDayType = uint32_t;
 
@@ -89,8 +88,8 @@ class ClockDate
 
     static constexpr YearType YearMinValue{2000u};
     static constexpr YearType YearMaxValue{2099u};
-    static constexpr MonthType MonthMinValue{MONTH_JANUARY};
-    static constexpr MonthType MonthMaxValue{MONTH_DEZEMBER};
+    static constexpr MonthType MonthMinValue{1u};
+    static constexpr MonthType MonthMaxValue{12u};
     static constexpr DayType DayMinValue{1u};
     static constexpr DayType DayMaxValue{31u};
 
@@ -115,6 +114,7 @@ class ClockDate
 	// get methods
     YearType getYear() const { return Year; }
     MonthType getMonth() const { return Month; }
+    MonthEnumType getMonthEnum() const { return static_cast<MonthEnumType>(Month); }
     DayType getDay() const { return Day; }
     WeekdayType getWeekday() const {
         return static_cast<WeekdayType>(getWeekday(Year, Month, Day));
@@ -155,19 +155,17 @@ class ClockDate
 
     static RataDieDayType getRataDieDay(YearType Year, MonthType Month, DayType Day) {
         if (Month < 3) { Year--, Month += 12; }
-        return 365*Year+Year/4-Year/100+Year/400+(153*Month-457)/5+Day-306;
+        return static_cast<RataDieDayType>(365)*Year+Year/4-Year/100+Year/400+(153*Month-457)/5+Day-306;
     }
 
     static DayType getDaysOfMonth(MonthType Month, YearType Year) {
-        MonthRawType monthRaw = static_cast<MonthRawType>(Month);
-
-        if(monthRaw == 4 || monthRaw == 6 || monthRaw == 9 || monthRaw == 11) {
+        if(Month == 4 || Month == 6 || Month == 9 || Month == 11) {
             return 30u;
-        } else if(monthRaw == 2u) {
+        } else if(Month == 2u) {
             if(Year % 4 == 0u) { return 29u; }
             else { return 28u; }
-        } else if((monthRaw == 1u) || (monthRaw == 3u) || (monthRaw == 5u) ||
-                (monthRaw == 7u) || (monthRaw == 8u) || (monthRaw == 12)) {
+        } else if((Month == 1u) || (Month == 3u) || (Month == 5u) ||
+                (Month == 7u) || (Month == 8u) || (Month == 12)) {
             return 31u;
         }
 	}

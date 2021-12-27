@@ -79,6 +79,13 @@ class OverlayText : public Overlay
     void setSpeed(byte Cycle) { Text::getInstance().setTaskCycle(convertSpeedToTaskCycle(Cycle)); }
 
 	// methods
+    SecondType task(SecondType ShowTimerInSeconds, ClockDate Date, ClockTime Time) {
+        ShowTimerInSeconds = Overlay::task(ShowTimerInSeconds, Date, Time);
+        if(State == STATE_SHOW) {
+            Text::getInstance().setTextWithShift(Text, Text::FONT_10X10);
+        }
+        return ShowTimerInSeconds;
+    }
 };
 
 #endif

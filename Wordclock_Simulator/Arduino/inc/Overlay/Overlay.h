@@ -54,8 +54,8 @@ class Overlay
         STATE_SHOW
     };
 
+    using YearType = ClockDate::YearType;
     using MonthType = ClockDateTime::MonthType;
-    using MonthRawType = ClockDateTime::MonthRawType;
     using DayType = ClockDateTime::DayType;
     using HourType = ClockDateTime::HourType;
     using MinuteType = ClockDateTime::MinuteType;
@@ -65,7 +65,7 @@ class Overlay
  *  P R O T E C T E D   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   protected:
-
+    StateType State{STATE_DISABLED};
     // functions
     constexpr Overlay() { }
     ~Overlay() { }
@@ -75,32 +75,28 @@ class Overlay
 ******************************************************************************************************************************************************/
   private:
     static constexpr SecondType SecondToStartShow{30u};
-    StateType State{STATE_DISABLED};
     MinuteType PeriodInMinutes{1u};
     SecondType EnduranceInSeconds{1u};
-    MonthRawType Month{0u};
+    MonthType Month{0u};
     DayType Day{0u};
     DayType ValidInDays{0u};
-    ClockDateTime DT;
-    SecondType ShowTimerInSeconds{0u};
-    SecondType SecondLast{0u};
 
     // functions
-    bool isShowTimerExpired() const { return ShowTimerInSeconds == 0u; }
-    void decrementShowTimer() { if(ShowTimerInSeconds > 0) { ShowTimerInSeconds--; } }
+    bool isShowTimerExpired(SecondType ShowTimerInSeconds) const { return ShowTimerInSeconds == 0u; }
+    SecondType decrementShowTimer(SecondType ShowTimerInSeconds) { if(ShowTimerInSeconds > 0) { return ShowTimerInSeconds--; } }
 
     bool isDateSet() const { return (Month != 0u) || (Day != 0u); }
     bool isDayAndMonthSet() const { return isDaySet() && isMonthSet(); }
-    bool isMonthMatching(MonthRawType CurrentMonth) const { return CurrentMonth == Month; }
+    bool isMonthMatching(MonthType CurrentMonth) const { return CurrentMonth == Month; }
     bool isDayMatching(DayType CurrentDay) const { return CurrentDay == Day; }
-    bool isDateMatchingDayAndMonthSet(MonthRawType CurrentMonth, DayType CurrentDay) const { return isMonthMatching(CurrentMonth) && isDayMatching(CurrentDay); }
-    bool isDateMatchingMonthSet(MonthRawType CurrentMonth) const { return CurrentMonth == Month; }
+    bool isDateMatchingDayAndMonthSet(MonthType CurrentMonth, DayType CurrentDay) const { return isMonthMatching(CurrentMonth) && isDayMatching(CurrentDay); }
+    bool isDateMatchingMonthSet(MonthType CurrentMonth) const { return CurrentMonth == Month; }
     bool isDateMatchingDaySet(DayType CurrentDay) const { return CurrentDay == Day; }
     bool isMinuteMatching(MinuteType CurrentMinute) const { return CurrentMinute % PeriodInMinutes; }
     bool isSecondMatching(SecondType CurrentSecond) const { return CurrentSecond == SecondToStartShow; }
     bool isDaySet() const { return Day != 0u; }
     bool isMonthSet() const { return Month != 0u; }
-    //bool isNextYear() const { return CurrentMonth > Month; }
+    bool isNextYear(MonthType CurrentMonth) const { return CurrentMonth > Month; }
 
     bool isTimeMatching(MinuteType CurrentMinute, SecondType CurrentSecond) const { return isMinuteMatching(CurrentMinute) && isSecondMatching(CurrentSecond); }
     bool isDateMachtching(MonthType CurrentMonth, DayType CurrentDay) const {
@@ -109,38 +105,32 @@ class Overlay
         if(isDaySet()) { return isDateMatchingDaySet(CurrentDay); }
     }
 
-    //bool isDayValid(DayType CurrentDay) const { return (Day + ValidInDays) <= CurrentDay; }
-
     bool isDateValid(ClockDate CurrentDate) const {
-        //if(isMonthMatching(CurrentMonth)) {
-        //    return isDayValid(CurrentDay);
-        //} else
+        YearType year = CurrentDate.getYear();
+        if(isNextYear(CurrentDate.getMonth())) { year - 1u;}
+        return CurrentDate.getRataDieDay(year, Month, Day) < ValidInDays;
     }
 
-    void setStateToShow() {
-        ShowTimerInSeconds = EnduranceInSeconds;
+    SecondType setStateToShow(SecondType ShowTimerInSeconds) {
         State = STATE_SHOW;
+        return EnduranceInSeconds;
     }
 
-    //SecondsType getPassedSeconds()
-    void showTimerTask(SecondType CurrentSecond) {
-        if(CurrentSecond != SecondLast) {
-            SecondLast = CurrentSecond;
-            decrementShowTimer();
-        }
+    SecondType showTimerTask(SecondType ShowTimerInSeconds, SecondType CurrentSecond) {
+        return decrementShowTimer(ShowTimerInSeconds);
     }
 
-    void idleTask(ClockDate CurrentDate, ClockTime CurrentTime) {
+    SecondType idleTask(SecondType ShowTimerInSeconds, ClockDate CurrentDate, ClockTime CurrentTime) {
         if(isDateSet()) {
             if(isDateValid(CurrentDate)) {
-                if(isTimeMatching(CurrentTime.getMinute(), CurrentTime.getSecond())) { setStateToShow(); }
+                if(isTimeMatching(CurrentTime.getMinute(), CurrentTime.getSecond())) { return setStateToShow(ShowTimerInSeconds); }
             }
-        } else { if(isTimeMatching(CurrentTime.getMinute(), CurrentTime.getSecond())) { setStateToShow(); } }
+        } else if(isTimeMatching(CurrentTime.getMinute(), CurrentTime.getSecond())) { return setStateToShow(ShowTimerInSeconds); }
     }
 
-    void showTask(ClockTime CurrentTime) {
-        showTimerTask(CurrentTime.getSecond());
-        if(isShowTimerExpired()) { State = STATE_IDLE; }
+    SecondType showTask(SecondType ShowTimerInSeconds, ClockTime CurrentTime) {
+        if(isShowTimerExpired(ShowTimerInSeconds)) { State = STATE_IDLE; }
+        return showTimerTask(ShowTimerInSeconds, CurrentTime.getSecond());
     }
 
 /******************************************************************************************************************************************************
@@ -148,9 +138,10 @@ class Overlay
 ******************************************************************************************************************************************************/
   public:
 	// get methods
+	StateType getState() const { return State; }
     MinuteType getPeriodInMinutes() const { return PeriodInMinutes; }
     SecondType getEnduranceInSeconds() const { return EnduranceInSeconds; }
-    MonthRawType getMonth() const { return Month; }
+    MonthType getMonth() const { return Month; }
     DayType getDay() const { return Day; }
     DayType getValidInDays() const { return ValidInDays; }
     bool getIsActive() const { return State != STATE_DISABLED; }
@@ -158,7 +149,7 @@ class Overlay
 	// set methods
     void setPeriodInMinutes(MinuteType sPeriodInMinutes) { PeriodInMinutes = sPeriodInMinutes; }
     void setEnduranceInSeconds(SecondType sEnduranceInSeconds) { EnduranceInSeconds = sEnduranceInSeconds; }
-    void setMonth(MonthRawType sMonth) { Month = sMonth; }
+    void setMonth(MonthType sMonth) { Month = sMonth; }
     void setDay(DayType sDay) { Day = sDay; }
     void setValidInDays(DayType sValidInDays) { ValidInDays = sValidInDays; }
     void setIsActive(bool sIsActive) { if(sIsActive) { enableIsActive(); } else { disableIsActive(); } }
@@ -167,9 +158,10 @@ class Overlay
     void enableIsActive() { if(State == STATE_DISABLED) { State = STATE_IDLE; } }
     void disableIsActive() { State = STATE_DISABLED; }
 
-    task() {
-        ClockTime time = DT.getTime();
-        ClockDate date = DT.getDate();
+    SecondType task(SecondType ShowTimerInSeconds, ClockDate Date, ClockTime Time) {
+        if(State == STATE_IDLE) { return idleTask(ShowTimerInSeconds, Date, Time); }
+        if(State == STATE_SHOW) { return showTask(ShowTimerInSeconds, Time); }
+        return 0u;
     }
 };
 

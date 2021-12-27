@@ -48,9 +48,9 @@ class ClockTime
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-    using HourType = uint8_t;
-    using MinuteType = uint8_t;
-    using SecondType = uint8_t;
+    using HourType = byte;
+    using MinuteType = byte;
+    using SecondType = byte;
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S

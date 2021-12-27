@@ -32,6 +32,8 @@
 #define OVERLAYS_SUPPORT_TEMPERATURE      STD_ON
 #define OVERLAYS_SUPPORT_TEXT             STD_ON
 
+#define OVERLAYS_TASK_CYCLE                 100u
+
 /* Overlays parameter */
 
 /******************************************************************************************************************************************************
@@ -62,7 +64,6 @@ class Overlays
 ******************************************************************************************************************************************************/
   public:
     using MonthType = Overlay::MonthType;
-    using MonthRawType = Overlay::MonthRawType;
     using DayType = Overlay::DayType;
     using HourType = Overlay::HourType;
     using MinuteType = Overlay::MinuteType;
@@ -89,6 +90,10 @@ class Overlays
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
+    static constexpr byte TaskCycle{OVERLAYS_TASK_CYCLE};
+    SecondType ShowTimerInSeconds{0u};
+    SecondType LastSecond{0u};
+    ClockDateTime DT;
 #if (OVERLAYS_SUPPORT_DATE == STD_ON)
     OverlayDate Date;
 #endif
@@ -103,6 +108,34 @@ class Overlays
     constexpr Overlays() { }
     ~Overlays() { }
 
+    bool isShowActive() {
+        return ((Date.getState() == Overlay::STATE_SHOW) ||
+                (Temperature.getState() == Overlay::STATE_SHOW) ||
+                (Text.getState() == Overlay::STATE_SHOW));
+    }
+
+    SecondType taskIdle(ClockDate date, ClockTime time) {
+        SecondType ShowTimerInSecondsNew = 0u;
+#if (OVERLAYS_SUPPORT_DATE == STD_ON)
+        ShowTimerInSecondsNew = Date.task(ShowTimerInSeconds, date, time);
+        if(ShowTimerInSecondsNew != 0u) { return ShowTimerInSecondsNew; }
+#endif
+#if (OVERLAYS_SUPPORT_TEMPERATURE == STD_ON)
+        ShowTimerInSecondsNew = Temperature.task(ShowTimerInSeconds, date, time);
+        if(ShowTimerInSecondsNew != 0u) { return ShowTimerInSecondsNew; }
+#endif
+#if (OVERLAYS_SUPPORT_TEXT == STD_ON)
+        ShowTimerInSecondsNew = Text.task(ShowTimerInSeconds, date, time);
+        if(Text.task(ShowTimerInSecondsNew, date, time) != 0u) { return ShowTimerInSecondsNew; }
+#endif
+    }
+
+    SecondType taskShow(ClockDate date, ClockTime time) {
+        if(Date.getState() == Overlay::STATE_SHOW) { return Date.task(ShowTimerInSeconds, date, time); }
+        if(Temperature.getState() == Overlay::STATE_SHOW) { return Temperature.task(ShowTimerInSeconds, date, time); }
+        if(Text.getState() == Overlay::STATE_SHOW) { return Text.task(ShowTimerInSeconds, date, time); }
+    }
+
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
@@ -113,10 +146,12 @@ class Overlays
     }
 
 	// get methods
+    byte getTaskCycle() const { return TaskCycle; }
+    
 #if (OVERLAYS_SUPPORT_DATE == STD_ON)
     MinuteType getDatePeriodInMinutes() const { return Date.getPeriodInMinutes(); }
     SecondType getDateEnduranceInSeconds() const { return Date.getEnduranceInSeconds(); }
-    MonthRawType getDateMonth() const { return Date.getMonth(); }
+    MonthType getDateMonth() const { return Date.getMonth(); }
     DayType getDateDay() const { return Date.getDay(); }
     DayType getDateValidInDays() const { return Date.getValidInDays(); }
     bool getDateIsActive() const { return Date.getIsActive(); }
@@ -124,7 +159,7 @@ class Overlays
 #if (OVERLAYS_SUPPORT_TEMPERATURE == STD_ON)
     MinuteType getTemperaturePeriodInMinutes() const { return Temperature.getPeriodInMinutes(); }
     SecondType getTemperatureEnduranceInSeconds() const { return Temperature.getEnduranceInSeconds(); }
-    MonthRawType getTemperatureMonth() const { return Temperature.getMonth(); }
+    MonthType getTemperatureMonth() const { return Temperature.getMonth(); }
     DayType getTemperatureDay() const { return Temperature.getDay(); }
     DayType getTemperatureValidInDays() const { return Temperature.getValidInDays(); }
     bool getTemperatureIsActive() const { return Temperature.getIsActive(); }
@@ -132,7 +167,7 @@ class Overlays
 #if (OVERLAYS_SUPPORT_TEXT == STD_ON)
     MinuteType getTextPeriodInMinutes() const { return Text.getPeriodInMinutes(); }
     SecondType getTextEnduranceInSeconds() const { return Text.getEnduranceInSeconds(); }
-    MonthRawType getTextMonth() const { return Text.getMonth(); }
+    MonthType getTextMonth() const { return Text.getMonth(); }
     DayType getTextDay() const { return Text.getDay(); }
     DayType getTextValidInDays() const { return Text.getValidInDays(); }
     bool getTextIsActive() const { return Text.getIsActive(); }
@@ -144,7 +179,7 @@ class Overlays
 #if (OVERLAYS_SUPPORT_DATE == STD_ON)
     void setDatePeriodInMinutes(MinuteType PeriodInMinutes) { Date.setPeriodInMinutes(PeriodInMinutes); }
     void setDateEnduranceInSeconds(SecondType EnduranceInSeconds) { Date.setEnduranceInSeconds(EnduranceInSeconds); }
-    void setDateMonth(MonthRawType Month) { Date.setMonth(Month); }
+    void setDateMonth(MonthType Month) { Date.setMonth(Month); }
     void setDateDay(DayType Day) { Date.setDay(Day); }
     void setDateValidInDays(DayType ValidInDays) { Date.setValidInDays(ValidInDays); }
     void setDateIsActive(bool IsActive) { Date.setIsActive(IsActive); }
@@ -152,7 +187,7 @@ class Overlays
 #if (OVERLAYS_SUPPORT_TEMPERATURE == STD_ON)
     void setTemperaturePeriodInMinutes(MinuteType PeriodInMinutes) { Temperature.setPeriodInMinutes(PeriodInMinutes); }
     void setTemperatureEnduranceInSeconds(SecondType EnduranceInSeconds) { Temperature.setEnduranceInSeconds(EnduranceInSeconds); }
-    void setTemperatureMonth(MonthRawType Month) { Temperature.setMonth(Month); }
+    void setTemperatureMonth(MonthType Month) { Temperature.setMonth(Month); }
     void setTemperatureDay(DayType Day) { Temperature.setDay(Day); }
     void setTemperatureValidInDays(DayType ValidInDays) { Temperature.setValidInDays(ValidInDays); }
     void setTemperatureIsActive(bool IsActive) { Temperature.setIsActive(IsActive); }
@@ -160,7 +195,7 @@ class Overlays
 #if (OVERLAYS_SUPPORT_TEXT == STD_ON)
     void setTextPeriodInMinutes(MinuteType PeriodInMinutes) { Text.setPeriodInMinutes(PeriodInMinutes); }
     void setTextEnduranceInSeconds(SecondType EnduranceInSeconds) { Text.setEnduranceInSeconds(EnduranceInSeconds); }
-    void setTextMonth(MonthRawType Month) { Text.setMonth(Month); }
+    void setTextMonth(MonthType Month) { Text.setMonth(Month); }
     void setTextDay(DayType Day) { Text.setDay(Day); }
     void setTextValidInDays(DayType ValidInDays) { Text.setValidInDays(ValidInDays); }
     void setTextIsActive(bool IsActive) { Text.setIsActive(IsActive); }
@@ -170,7 +205,14 @@ class Overlays
 
 	// methods
 	void task() {
+        ClockDate date = DT.getDate();
+        ClockTime time = DT.getTime();
 
+        if(LastSecond != time.getSecond()) {
+            LastSecond = time.getSecond();
+            if(isShowActive()) { ShowTimerInSeconds = taskShow(date, time); }
+            else { ShowTimerInSeconds = taskIdle(date, time); }
+        }
 	}
 
 };

@@ -24,6 +24,8 @@
 #include "Animations.h"
 #include "Illuminance.h"
 #include "Communication.h"
+#include "Overlays.h"
+#include "Text.h"
 
 /******************************************************************************************************************************************************
  *  L O C A L   C O N S T A N T   M A C R O S
@@ -78,6 +80,8 @@ void Scheduler::triggerTasks()
     if(isCycleHit(Illuminance::getInstance().getTaskCycle())) { Illuminance::getInstance().task(); }
     if(isCycleHit(Animations::getInstance().getTaskCycle())) { Animations::getInstance().task(true); }
     if(isCycleHit(Communication::getInstance().getTaskCycle())) { Communication::getInstance().task(); }
+    if(isCycleHit(Overlays::getInstance().getTaskCycle())) { Overlays::getInstance().task(); }
+    if(isCycleHit(Text::getInstance().getTaskCycle())) { Text::getInstance().task(); }
 } /* triggerTasks */
 
 /******************************************************************************************************************************************************

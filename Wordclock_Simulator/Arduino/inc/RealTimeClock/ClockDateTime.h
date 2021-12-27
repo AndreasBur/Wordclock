@@ -54,7 +54,6 @@ class ClockDateTime
 
     using YearType = ClockDate::YearType;
     using MonthType = ClockDate::MonthType;
-    using MonthRawType = ClockDate::MonthRawType;
     using DayType = ClockDate::DayType;
     using WeekdayType = ClockDate::WeekdayType;
 
