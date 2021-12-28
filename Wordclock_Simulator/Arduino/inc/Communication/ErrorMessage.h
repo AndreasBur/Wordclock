@@ -108,7 +108,7 @@ class ErrorMessage
         Serial.print(F("Error"));
         sendEqual();
         Serial.print(Error);
-        if(AppendSpace) {  }
+        if(AppendSpace) { sendSpace(); }
     }
 
     void send(char OptionShortName, ErrorType Error, bool AppendSpace = true) const
