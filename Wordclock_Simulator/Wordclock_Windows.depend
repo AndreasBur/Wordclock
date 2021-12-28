@@ -32821,7 +32821,7 @@
 	"MsgParameterParser.h"
 	"RealTimeClock.h"
 
-1640730514 c:\users\aburn\github\andreasbur\wordclock\wordclock_simulator\arduino\inc\communication\messageparser\msgcmdoverlaydateparser.h
+1640731664 c:\users\aburn\github\andreasbur\wordclock\wordclock_simulator\arduino\inc\communication\messageparser\msgcmdoverlaydateparser.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"MsgCmdOverlayParser.h"
@@ -32831,7 +32831,7 @@
 	"Arduino.h"
 	"MsgParameterParser.h"
 
-1640731179 c:\users\aburn\github\andreasbur\wordclock\wordclock_simulator\arduino\inc\overlay\overlays.h
+1640732572 c:\users\aburn\github\andreasbur\wordclock\wordclock_simulator\arduino\inc\overlay\overlays.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"StringTools.h"
@@ -33197,7 +33197,7 @@
 
 1618262638 c:\wxwidgets-3.1.5\lib\gcc_dll\mswu\wx\setup.h
 
-1640729704 c:\users\aburn\github\andreasbur\wordclock\wordclock_simulator\arduino\inc\text\text.h
+1640732106 c:\users\aburn\github\andreasbur\wordclock\wordclock_simulator\arduino\inc\text\text.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"Display.h"
@@ -33229,16 +33229,16 @@
 	"StandardTypes.h"
 	"Arduino.h"
 
-1640730577 c:\users\aburn\github\andreasbur\wordclock\wordclock_simulator\arduino\inc\communication\messageparser\msgcmdoverlaytemperatureparser.h
+1640731711 c:\users\aburn\github\andreasbur\wordclock\wordclock_simulator\arduino\inc\communication\messageparser\msgcmdoverlaytemperatureparser.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"MsgCmdOverlayParser.h"
 
-1640730634 c:\users\aburn\github\andreasbur\wordclock\wordclock_simulator\arduino\inc\communication\messageparser\msgcmdoverlaytextparser.h
+1640731711 c:\users\aburn\github\andreasbur\wordclock\wordclock_simulator\arduino\inc\communication\messageparser\msgcmdoverlaytextparser.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"MsgCmdOverlayParser.h"
 
-1640725695 source:c:\users\aburn\github\andreasbur\wordclock\wordclock_simulator\arduino\src\text\text.cpp
+1640732086 source:c:\users\aburn\github\andreasbur\wordclock\wordclock_simulator\arduino\src\text\text.cpp
 	"Text.h"
 

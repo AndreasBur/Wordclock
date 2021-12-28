@@ -31,7 +31,7 @@
 
 
 /* MsgCmdBaseOverlayParser parameter */
-#define MSG_CMD_BASE_OVERLAY_PARSER_PARAMETER_TABLE_SIZE           8u
+#define MSG_CMD_BASE_OVERLAY_PARSER_PARAMETER_TABLE_SIZE           9u
 
 
 /******************************************************************************************************************************************************
@@ -63,7 +63,7 @@ class MsgCmdBaseOverlayParser
     static constexpr char ValidOptionShortName{'V'};
     static constexpr char ActiveOptionShortName{'A'};
 	static constexpr char TextOptionShortName{'T'};
-	static constexpr char TextSpeedOptionShortName{'S'};
+	static constexpr char SpeedOptionShortName{'S'};
 	static constexpr char FontOptionShortName{'F'};
 
     static constexpr ParameterTableType ParameterTable PROGMEM {
@@ -74,7 +74,8 @@ class MsgCmdBaseOverlayParser
         ParameterTableElementType(ValidOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8),
         ParameterTableElementType(ActiveOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8),
 		ParameterTableElementType(TextOptionShortName, MsgParameter::ARGUMENT_TYPE_STRING),
-		ParameterTableElementType(TextSpeedOptionShortName, MsgParameter::ARGUMENT_TYPE_STRING),
+		ParameterTableElementType(SpeedOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8),
+		ParameterTableElementType(FontOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8),
     };
 
     constexpr MsgCmdBaseOverlayParser() { }

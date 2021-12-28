@@ -74,12 +74,12 @@ class Text
     };
 
     enum FontType {
-        FONT_NONE,
         FONT_5X8,
         FONT_7X9,
         FONT_7X10,
         FONT_9X10,
         FONT_10X10,
+        FONT_NUMBER_OF_FONTS
     };
 
     struct ShiftType {
@@ -97,8 +97,8 @@ class Text
   private:
     Transformation wcTransformation;
     ShiftType Shift;
-    byte TaskCycle;
-    StateType State;
+    byte TaskCycle{TEXT_TASK_CYCLE_INIT_VALUE};
+    StateType State{STATE_IDLE};
 
 #if(TEXT_SUPPORT_FONT_5X8 == STD_ON)
     FontSprite5x8 Font5x8;
@@ -117,8 +117,7 @@ class Text
 #endif
 
     // functions
-    constexpr Text() : wcTransformation(), Shift{nullptr, FONT_NONE, STD_NULL_CHARACTER, 0, 0, SHIFT_STATE_IDLE},
-                       TaskCycle(TEXT_TASK_CYCLE_INIT_VALUE), State(STATE_IDLE) { }
+    constexpr Text() : wcTransformation(), Shift{nullptr, FONT_10X10, STD_NULL_CHARACTER, 0, 0, SHIFT_STATE_IDLE} { }
     ~Text() { }
 
 
@@ -166,6 +165,7 @@ class Text
     void setTaskCycle(byte Cycle) { TaskCycle = Cycle; }
 
     // methods
+    static bool isFontValid(FontType sFont) { return sFont < FONT_NUMBER_OF_FONTS; }
     StdReturnType show() const { return Display::getInstance().show(); }
     void task(bool=false);
     void stop();

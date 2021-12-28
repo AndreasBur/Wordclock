@@ -162,11 +162,11 @@ void Text::task(bool Show)
 {
     if(State == STATE_TEXT_SHIFT) {
         stringShiftTask();
-        Display::getInstance().show();
+        if(Show) { Display::getInstance().show(); }
     }
     if(State == STATE_CHAR_SHIFT) {
         charShiftTask();
-        Display::getInstance().show();
+        if(Show) { Display::getInstance().show(); }
     }
 } /* task */
 

@@ -112,21 +112,19 @@ class Overlays
     ~Overlays() { }
 
     bool isShow() const {
-        return ((Date.getState() == OverlayType::STATE_SHOW) ||
-                (Temperature.getState() == OverlayType::STATE_SHOW) ||
-                (Text.getState() == OverlayType::STATE_SHOW));
+        return ((Date.getState() == OverlayDate::STATE_SHOW) ||
+                (Temperature.getState() == OverlayTemperature::STATE_SHOW) ||
+                (Text.getState() == OverlayText::STATE_SHOW));
     }
-
     bool isIdle() const {
-        return ((Date.getState() == OverlayType::STATE_IDLE) &&
-                (Temperature.getState() == OverlayType::STATE_IDLE) &&
-                (Text.getState() == OverlayType::STATE_IDLE));
+        return ((Date.getState() == OverlayDate::STATE_IDLE) &&
+                (Temperature.getState() == OverlayTemperature::STATE_IDLE) &&
+                (Text.getState() == OverlayText::STATE_IDLE));
     }
-
     bool isDisabled() const {
-        return ((Date.getState() == OverlayType::STATE_DISABLED) &&
-                (Temperature.getState() == OverlayType::STATE_DISABLED) &&
-                (Text.getState() == OverlayType::STATE_DISABLED));
+        return ((Date.getState() == OverlayDate::STATE_DISABLED) &&
+                (Temperature.getState() == OverlayTemperature::STATE_DISABLED) &&
+                (Text.getState() == OverlayText::STATE_DISABLED));
     }
 
     void taskIdle(ClockDate date, ClockTime time) {
@@ -147,9 +145,9 @@ class Overlays
     }
 
     void taskShow(ClockDate date, ClockTime time) {
-        if(Date.getState() == OverlayType::STATE_SHOW) { ShowTimerInSeconds = Date.task(ShowTimerInSeconds, date, time); }
-        if(Temperature.getState() == OverlayType::STATE_SHOW) { ShowTimerInSeconds =  Temperature.task(ShowTimerInSeconds, date, time); }
-        if(Text.getState() == OverlayType::STATE_SHOW) { ShowTimerInSeconds =  Text.task(ShowTimerInSeconds, date, time); }
+        if(Date.getState() == OverlayDate::STATE_SHOW) { ShowTimerInSeconds = Date.task(ShowTimerInSeconds, date, time); }
+        if(Temperature.getState() == OverlayTemperature::STATE_SHOW) { ShowTimerInSeconds =  Temperature.task(ShowTimerInSeconds, date, time); }
+        if(Text.getState() == OverlayText::STATE_SHOW) { ShowTimerInSeconds =  Text.task(ShowTimerInSeconds, date, time); }
     }
 
 /******************************************************************************************************************************************************

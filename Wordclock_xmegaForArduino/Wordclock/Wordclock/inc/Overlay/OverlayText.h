@@ -23,7 +23,6 @@
 #include "StandardTypes.h"
 #include "Arduino.h"
 #include "Overlay.h"
-#include "Text.h"
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
@@ -63,9 +62,6 @@ class OverlayText : public Overlay<OverlayText>
     void setStateToIdle() { Text::getInstance().stop(); }
 
     void showTask() { if(Text::getInstance().getState() == Text::STATE_IDLE) { setText(); } }
-
-    byte convertSpeedToTaskCycle(byte Speed) const { return UINT8_MAX - Speed; }
-    byte convertTaskCycleToSpeed(byte TaskCylce) const { return UINT8_MAX - TaskCylce; }
     void setText() { Text::getInstance().setTextWithShift(Text, Text::FONT_10X10); }
 
 /******************************************************************************************************************************************************
@@ -77,13 +73,13 @@ class OverlayText : public Overlay<OverlayText>
 
 	// get methods
     const char* getText() const { return Text; }
-    byte getSpeed() const { return convertTaskCycleToSpeed(Text::getInstance().getTaskCycle()); }
+    //byte getSpeed() const { return convertTaskCycleToSpeed(Text::getInstance().getTaskCycle()); }
 
     // set methods
 
 	// set methods
     void setText(const char* sText, LengthType Length) { StringTools::stringCopy(Text, sText, Length); }
-    void setSpeed(byte Cycle) { Text::getInstance().setTaskCycle(convertSpeedToTaskCycle(Cycle)); }
+    //void setSpeed(byte Cycle) { Text::getInstance().setTaskCycle(convertSpeedToTaskCycle(Cycle)); }
 
 	// methods
     SecondType task(SecondType ShowTimerInSeconds, ClockDate Date, ClockTime Time) {

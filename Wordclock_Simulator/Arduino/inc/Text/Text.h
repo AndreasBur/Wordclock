@@ -165,7 +165,7 @@ class Text
     void setTaskCycle(byte Cycle) { TaskCycle = Cycle; }
 
     // methods
-    static isFontValid(FontType sFont) { return sFont < FONT_NUMBER_OF_FONTS; }
+    static bool isFontValid(FontType sFont) { return sFont < FONT_NUMBER_OF_FONTS; }
     StdReturnType show() const { return Display::getInstance().show(); }
     void task(bool=false);
     void stop();

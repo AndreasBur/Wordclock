@@ -54,6 +54,14 @@ template <typename Derived> class MsgCmdOverlayParser
     using PositionType = typename MsgParameterParserType::PositionType;
     using LengthType = StringTools::LengthType;
 
+    using YearType = ClockDate::YearType;
+    using MonthType = ClockDateTime::MonthType;
+    using DayType = ClockDateTime::DayType;
+    using HourType = ClockDateTime::HourType;
+    using MinuteType = ClockDateTime::MinuteType;
+    using SecondType = ClockDateTime::SecondType;
+    using FontType = Text::FontType;
+
 /******************************************************************************************************************************************************
  *  P R O T E C T E D   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
@@ -78,22 +86,29 @@ template <typename Derived> class MsgCmdOverlayParser
         if(ParameterShortName == MonthOptionShortName) { underlying().setMonth(Argument); }
         if(ParameterShortName == ValidOptionShortName) { underlying().setValidInDays(Argument); }
         if(ParameterShortName == ActiveOptionShortName) { underlying().setIsActive(static_cast<bool>(Argument)); }
-        if(ParameterShortName == TextSpeedOptionShortName) { underlying().setTextSpeed(Argument); }
+        if(ParameterShortName == SpeedOptionShortName) { underlying().setSpeed(Argument); }
+        if(ParameterShortName == FontOptionShortName) { underlying().setFont(static_cast<FontType>(Argument)); }
     }
 
     void handleParameter(char ParameterShortName, const char* Argument, PositionType Length) {
         if(ParameterShortName == TextOptionShortName) { underlying().setText(Argument, Length); }
     }
 
-    void setPeriodInMinutes(Overlays::MinuteType PeriodInMinutes)
+    void setPeriodInMinutes(MinuteType PeriodInMinutes)
     {
         StdReturnType returnValue = underlying().setPeriodInMinutes(PeriodInMinutes);
         MsgParameterParserType::Error.checkReturnValueAndSend(PeriodOptionShortName, returnValue, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNCE);
     }
-    void setEnduranceInSeconds(Overlays::SecondType EnduranceInSeconds)
+    void setEnduranceInSeconds(SecondType EnduranceInSeconds)
     {
         StdReturnType returnValue = underlying().setEnduranceInSeconds(EnduranceInSeconds);
         MsgParameterParserType::Error.checkReturnValueAndSend(EnduranceOptionShortName, returnValue, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNCE);
+    }
+    void setFont(FontType Font)
+    {
+        StdReturnType returnValue = underlying().setFont(Font);
+        MsgParameterParserType::Error.checkReturnValueAndSend(FontOptionShortName, returnValue, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNCE);
+
     }
 
     void sendAnswerPeriod(bool AppendSpace) const { MsgParameterParserType::sendAnswerParameter(PeriodOptionShortName,  underlying().getPeriodInMinutes(), AppendSpace); }
@@ -101,9 +116,10 @@ template <typename Derived> class MsgCmdOverlayParser
     void sendAnswerMonth(bool AppendSpace) const { MsgParameterParserType::sendAnswerParameter(MonthOptionShortName, underlying().getMonth(), AppendSpace); }
     void sendAnswerDay(bool AppendSpace) const { MsgParameterParserType::sendAnswerParameter(DayOptionShortName, underlying().getDay(), AppendSpace); }
     void sendAnswerValid(bool AppendSpace) const { MsgParameterParserType::sendAnswerParameter(ValidOptionShortName, underlying().getValidInDays(), AppendSpace); }
+    void sendAnswerSpeed(bool AppendSpace) const { MsgParameterParserType::sendAnswerParameter(SpeedOptionShortName, underlying().getSpeed(), AppendSpace); }
+    void sendAnswerFont(bool AppendSpace) const { MsgParameterParserType::sendAnswerParameter(FontOptionShortName, underlying().getFont(), AppendSpace); }
     void sendAnswerActive(bool AppendSpace) const { MsgParameterParserType::sendAnswerParameter(ActiveOptionShortName, underlying().getIsActive(), AppendSpace); }
     void sendAnswerText(bool AppendSpace) const { underlying().sendAnswerText(AppendSpace); }
-    void sendAnswerSpeedText(bool AppendSpace) const { underlying().sendAnswerSpeedText(AppendSpace); }
 
 
 /******************************************************************************************************************************************************
@@ -125,7 +141,8 @@ template <typename Derived> class MsgCmdOverlayParser
         sendAnswerDay(true);
         sendAnswerValid(true);
         sendAnswerText(true);
-        sendAnswerSpeedText(true);
+        sendAnswerSpeed(true);
+        sendAnswerFont(true);
         sendAnswerActive(false);
     }
 
