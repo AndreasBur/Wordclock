@@ -23,16 +23,17 @@
 #include "StandardTypes.h"
 #include "Arduino.h"
 #include "StringTools.h"
+#include "RealTimeClock.h"
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
 /* Overlays configuration parameter */
-#define OVERLAYS_SUPPORT_DATE             STD_ON
-#define OVERLAYS_SUPPORT_TEMPERATURE      STD_ON
-#define OVERLAYS_SUPPORT_TEXT             STD_ON
+#define OVERLAYS_SUPPORT_DATE               STD_ON
+#define OVERLAYS_SUPPORT_TEMPERATURE        STD_ON
+#define OVERLAYS_SUPPORT_TEXT               STD_ON
 
-#define OVERLAYS_TASK_CYCLE                 100u
+#define OVERLAYS_TASK_CYCLE                 1u
 
 /* Overlays parameter */
 
@@ -63,11 +64,13 @@ class Overlays
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-    using MonthType = Overlay::MonthType;
-    using DayType = Overlay::DayType;
-    using HourType = Overlay::HourType;
-    using MinuteType = Overlay::MinuteType;
-    using SecondType = Overlay::SecondType;
+    using OverlayType = Overlay<Overlays>;
+    using MonthType = OverlayType::MonthType;
+    using DayType = OverlayType::DayType;
+    using HourType = OverlayType::HourType;
+    using MinuteType = OverlayType::MinuteType;
+    using SecondType = OverlayType::SecondType;
+    using StateType = OverlayType::StateType;
 
 #if (OVERLAYS_SUPPORT_TEXT == STD_ON)
     using LengthType = OverlayText::LengthType;
@@ -93,7 +96,6 @@ class Overlays
     static constexpr byte TaskCycle{OVERLAYS_TASK_CYCLE};
     SecondType ShowTimerInSeconds{0u};
     SecondType LastSecond{0u};
-    ClockDateTime DT;
 #if (OVERLAYS_SUPPORT_DATE == STD_ON)
     OverlayDate Date;
 #endif
@@ -108,32 +110,45 @@ class Overlays
     constexpr Overlays() { }
     ~Overlays() { }
 
-    bool isShowActive() {
-        return ((Date.getState() == Overlay::STATE_SHOW) ||
-                (Temperature.getState() == Overlay::STATE_SHOW) ||
-                (Text.getState() == Overlay::STATE_SHOW));
+    bool isShow() const {
+        return ((Date.getState() == OverlayType::STATE_SHOW) ||
+                (Temperature.getState() == OverlayType::STATE_SHOW) ||
+                (Text.getState() == OverlayType::STATE_SHOW));
     }
 
-    SecondType taskIdle(ClockDate date, ClockTime time) {
-        SecondType ShowTimerInSecondsNew = 0u;
+    bool isIdle() const {
+        return ((Date.getState() == OverlayType::STATE_IDLE) &&
+                (Temperature.getState() == OverlayType::STATE_IDLE) &&
+                (Text.getState() == OverlayType::STATE_IDLE));
+    }
+
+    bool isDisabled() const {
+        return ((Date.getState() == OverlayType::STATE_DISABLED) &&
+                (Temperature.getState() == OverlayType::STATE_DISABLED) &&
+                (Text.getState() == OverlayType::STATE_DISABLED));
+    }
+
+    void taskIdle(ClockDate date, ClockTime time) {
 #if (OVERLAYS_SUPPORT_DATE == STD_ON)
-        ShowTimerInSecondsNew = Date.task(ShowTimerInSeconds, date, time);
-        if(ShowTimerInSecondsNew != 0u) { return ShowTimerInSecondsNew; }
+        if((Date.getIsActive()) && (ShowTimerInSeconds == 0u)) {
+            ShowTimerInSeconds = Date.task(ShowTimerInSeconds, date, time);
+        }
 #endif
 #if (OVERLAYS_SUPPORT_TEMPERATURE == STD_ON)
-        ShowTimerInSecondsNew = Temperature.task(ShowTimerInSeconds, date, time);
-        if(ShowTimerInSecondsNew != 0u) { return ShowTimerInSecondsNew; }
+        if((Temperature.getIsActive()) && (ShowTimerInSeconds == 0u)) {
+            ShowTimerInSeconds =  Temperature.task(ShowTimerInSeconds, date, time);
+        }
 #endif
 #if (OVERLAYS_SUPPORT_TEXT == STD_ON)
-        ShowTimerInSecondsNew = Text.task(ShowTimerInSeconds, date, time);
-        if(Text.task(ShowTimerInSecondsNew, date, time) != 0u) { return ShowTimerInSecondsNew; }
+        if((Text.getIsActive()) && (ShowTimerInSeconds == 0u)) {
+            ShowTimerInSeconds =  Text.task(ShowTimerInSeconds, date, time); }
 #endif
     }
 
-    SecondType taskShow(ClockDate date, ClockTime time) {
-        if(Date.getState() == Overlay::STATE_SHOW) { return Date.task(ShowTimerInSeconds, date, time); }
-        if(Temperature.getState() == Overlay::STATE_SHOW) { return Temperature.task(ShowTimerInSeconds, date, time); }
-        if(Text.getState() == Overlay::STATE_SHOW) { return Text.task(ShowTimerInSeconds, date, time); }
+    void taskShow(ClockDate date, ClockTime time) {
+        if(Date.getState() == OverlayType::STATE_SHOW) { ShowTimerInSeconds = Date.task(ShowTimerInSeconds, date, time); }
+        if(Temperature.getState() == OverlayType::STATE_SHOW) { ShowTimerInSeconds =  Temperature.task(ShowTimerInSeconds, date, time); }
+        if(Text.getState() == OverlayType::STATE_SHOW) { ShowTimerInSeconds =  Text.task(ShowTimerInSeconds, date, time); }
     }
 
 /******************************************************************************************************************************************************
@@ -147,7 +162,13 @@ class Overlays
 
 	// get methods
     byte getTaskCycle() const { return TaskCycle; }
-    
+    StateType getState() const {
+        if(isDisabled()) { return OverlayType::STATE_DISABLED; }
+        if(isIdle()) { return OverlayType::STATE_IDLE; }
+        if(isShow()) { return OverlayType::STATE_SHOW; }
+        return OverlayType::STATE_DISABLED;
+    }
+
 #if (OVERLAYS_SUPPORT_DATE == STD_ON)
     MinuteType getDatePeriodInMinutes() const { return Date.getPeriodInMinutes(); }
     SecondType getDateEnduranceInSeconds() const { return Date.getEnduranceInSeconds(); }
@@ -177,24 +198,24 @@ class Overlays
 
 	// set methods
 #if (OVERLAYS_SUPPORT_DATE == STD_ON)
-    void setDatePeriodInMinutes(MinuteType PeriodInMinutes) { Date.setPeriodInMinutes(PeriodInMinutes); }
-    void setDateEnduranceInSeconds(SecondType EnduranceInSeconds) { Date.setEnduranceInSeconds(EnduranceInSeconds); }
+    StdReturnType setDatePeriodInMinutes(MinuteType PeriodInMinutes) { return Date.setPeriodInMinutes(PeriodInMinutes); }
+    StdReturnType setDateEnduranceInSeconds(SecondType EnduranceInSeconds) { return Date.setEnduranceInSeconds(EnduranceInSeconds); }
     void setDateMonth(MonthType Month) { Date.setMonth(Month); }
     void setDateDay(DayType Day) { Date.setDay(Day); }
     void setDateValidInDays(DayType ValidInDays) { Date.setValidInDays(ValidInDays); }
     void setDateIsActive(bool IsActive) { Date.setIsActive(IsActive); }
 #endif
 #if (OVERLAYS_SUPPORT_TEMPERATURE == STD_ON)
-    void setTemperaturePeriodInMinutes(MinuteType PeriodInMinutes) { Temperature.setPeriodInMinutes(PeriodInMinutes); }
-    void setTemperatureEnduranceInSeconds(SecondType EnduranceInSeconds) { Temperature.setEnduranceInSeconds(EnduranceInSeconds); }
+    StdReturnType setTemperaturePeriodInMinutes(MinuteType PeriodInMinutes) { return Temperature.setPeriodInMinutes(PeriodInMinutes); }
+    StdReturnType setTemperatureEnduranceInSeconds(SecondType EnduranceInSeconds) { return Temperature.setEnduranceInSeconds(EnduranceInSeconds); }
     void setTemperatureMonth(MonthType Month) { Temperature.setMonth(Month); }
     void setTemperatureDay(DayType Day) { Temperature.setDay(Day); }
     void setTemperatureValidInDays(DayType ValidInDays) { Temperature.setValidInDays(ValidInDays); }
     void setTemperatureIsActive(bool IsActive) { Temperature.setIsActive(IsActive); }
 #endif
 #if (OVERLAYS_SUPPORT_TEXT == STD_ON)
-    void setTextPeriodInMinutes(MinuteType PeriodInMinutes) { Text.setPeriodInMinutes(PeriodInMinutes); }
-    void setTextEnduranceInSeconds(SecondType EnduranceInSeconds) { Text.setEnduranceInSeconds(EnduranceInSeconds); }
+    StdReturnType setTextPeriodInMinutes(MinuteType PeriodInMinutes) { return Text.setPeriodInMinutes(PeriodInMinutes); }
+    StdReturnType setTextEnduranceInSeconds(SecondType EnduranceInSeconds) { return Text.setEnduranceInSeconds(EnduranceInSeconds); }
     void setTextMonth(MonthType Month) { Text.setMonth(Month); }
     void setTextDay(DayType Day) { Text.setDay(Day); }
     void setTextValidInDays(DayType ValidInDays) { Text.setValidInDays(ValidInDays); }
@@ -205,16 +226,15 @@ class Overlays
 
 	// methods
 	void task() {
-        ClockDate date = DT.getDate();
-        ClockTime time = DT.getTime();
+        ClockDate date = RealTimeClock::getInstance().getDate();
+        ClockTime time = RealTimeClock::getInstance().getTime();
 
         if(LastSecond != time.getSecond()) {
             LastSecond = time.getSecond();
-            if(isShowActive()) { ShowTimerInSeconds = taskShow(date, time); }
-            else { ShowTimerInSeconds = taskIdle(date, time); }
+            if(isShow()) { taskShow(date, time); }
+            else { taskIdle(date, time); }
         }
 	}
-
 };
 
 #endif

@@ -23,7 +23,6 @@
 #include "StandardTypes.h"
 #include "Arduino.h"
 #include "MsgCmdOverlayParser.h"
-#include "Overlays.h"
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
@@ -76,8 +75,8 @@ class MsgCmdOverlayDateParser : public MsgCmdOverlayParser<MsgCmdOverlayDatePars
     byte getValidInDays() const { return Overlays::getInstance().getDateValidInDays(); }
     byte getIsActive() const { return Overlays::getInstance().getDateIsActive(); }
 
-    void setPeriodInMinutes(byte PeriodInMinutes) { Overlays::getInstance().setDatePeriodInMinutes(PeriodInMinutes); }
-    void setEnduranceInSeconds(byte EnduranceInSeconds) {Overlays::getInstance().setDateEnduranceInSeconds(EnduranceInSeconds); }
+    StdReturnType setPeriodInMinutes(byte PeriodInMinutes) { return Overlays::getInstance().setDatePeriodInMinutes(PeriodInMinutes); }
+    StdReturnType setEnduranceInSeconds(byte EnduranceInSeconds) { return Overlays::getInstance().setDateEnduranceInSeconds(EnduranceInSeconds); }
     void setMonth(byte Month) { Overlays::getInstance().setDateMonth(Month); }
     void setDay(byte Day) { Overlays::getInstance().setDateDay(Day); }
     void setValidInDays(byte ValidInDays) { Overlays::getInstance().setDateValidInDays(ValidInDays); }

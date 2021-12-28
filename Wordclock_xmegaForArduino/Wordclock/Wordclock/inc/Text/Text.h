@@ -34,7 +34,7 @@
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
 /* Text configuration parameter */
-#define TEXT_TASK_CYCLE_INIT_VALUE            10u
+#define TEXT_TASK_CYCLE_INIT_VALUE            5u
 #define TEXT_SUPPORT_FONT_5X8                 STD_ON
 #define TEXT_SUPPORT_FONT_7X9                 STD_ON
 #define TEXT_SUPPORT_FONT_7X10                STD_ON
@@ -62,9 +62,8 @@ class Text
 ******************************************************************************************************************************************************/
   public:
     enum StateType {
-        STATE_NONE,
-        STATE_UNINIT,
         STATE_IDLE,
+        //STATE_PAUSE,
         STATE_TEXT_SHIFT,
         STATE_CHAR_SHIFT
     };
@@ -119,7 +118,7 @@ class Text
 
     // functions
     constexpr Text() : wcTransformation(), Shift{nullptr, FONT_NONE, STD_NULL_CHARACTER, 0, 0, SHIFT_STATE_IDLE},
-                       TaskCycle(TEXT_TASK_CYCLE_INIT_VALUE), State(STATE_UNINIT) { }
+                       TaskCycle(TEXT_TASK_CYCLE_INIT_VALUE), State(STATE_IDLE) { }
     ~Text() { }
 
 
@@ -167,9 +166,9 @@ class Text
     void setTaskCycle(byte Cycle) { TaskCycle = Cycle; }
 
     // methods
-    void init() { }
     StdReturnType show() const { return Display::getInstance().show(); }
-    void task();
+    void task(bool=false);
+    void stop();
     StdReturnType setChar(byte, byte, char, FontType);
     void setCharFast(byte, byte, char, FontType);
     void setCharWithShift(char, FontType);
@@ -179,7 +178,6 @@ class Text
     byte getFontWidth(FontType) const;
     byte getFontCharWidth(FontType, char) const;
     Orientation getFontOrientation(FontType) const;
-
 };
 
 

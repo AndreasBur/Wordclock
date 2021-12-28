@@ -43,7 +43,7 @@
 /******************************************************************************************************************************************************
  *  C L A S S   O V E R L A Y   T E X T
 ******************************************************************************************************************************************************/
-class OverlayText : public Overlay
+class OverlayText : public Overlay<OverlayText>
 {
 /******************************************************************************************************************************************************
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
@@ -55,11 +55,18 @@ class OverlayText : public Overlay
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
+    friend class Overlay;
     char Text[OVERLAY_TEXT_TEXT_SIZE];
 
     // functions
+    void setStateToShow() { setText(); }
+    void setStateToIdle() { Text::getInstance().stop(); }
+
+    void showTask() { if(Text::getInstance().getState() == Text::STATE_IDLE) { setText(); } }
+
     byte convertSpeedToTaskCycle(byte Speed) const { return UINT8_MAX - Speed; }
     byte convertTaskCycleToSpeed(byte TaskCylce) const { return UINT8_MAX - TaskCylce; }
+    void setText() { Text::getInstance().setTextWithShift(Text, Text::FONT_10X10); }
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
@@ -80,11 +87,8 @@ class OverlayText : public Overlay
 
 	// methods
     SecondType task(SecondType ShowTimerInSeconds, ClockDate Date, ClockTime Time) {
-        ShowTimerInSeconds = Overlay::task(ShowTimerInSeconds, Date, Time);
-        if(State == STATE_SHOW) {
-            Text::getInstance().setTextWithShift(Text, Text::FONT_10X10);
-        }
-        return ShowTimerInSeconds;
+        if(State == STATE_SHOW) { showTask(); }
+        return Overlay::task(ShowTimerInSeconds, Date, Time);
     }
 };
 

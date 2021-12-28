@@ -28,7 +28,7 @@
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
 /* Message configuration parameter */
-#define MESSAGE_LENGTH    20u
+#define MESSAGE_LENGTH    50u
 
 /* Message parameter */
 
@@ -48,6 +48,7 @@ class Message
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
+      static constexpr size_t MessageLength{MESSAGE_LENGTH};
       static constexpr size_t npos = -1;
       static constexpr char NullCharacter{STD_NULL_CHARACTER};
 
@@ -55,7 +56,7 @@ class Message
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    char Buffer[MESSAGE_LENGTH];
+    char Buffer[MessageLength];
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
@@ -84,7 +85,7 @@ class Message
         if(finding == nullptr) { return npos; }
         else { return finding - Buffer; }
     }
-    
+
     bool contains(char Character) const { return strchr(Buffer, Character); }
 
     size_t find(char Char, size_t position = 0u) const

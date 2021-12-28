@@ -81,7 +81,7 @@ void Scheduler::triggerTasks()
     if(isCycleHit(Animations::getInstance().getTaskCycle())) { Animations::getInstance().task(true); }
     if(isCycleHit(Communication::getInstance().getTaskCycle())) { Communication::getInstance().task(); }
     if(isCycleHit(Overlays::getInstance().getTaskCycle())) { Overlays::getInstance().task(); }
-    if(isCycleHit(Text::getInstance().getTaskCycle())) { Text::getInstance().task(); }
+    if(isCycleHit(Text::getInstance().getTaskCycle())) { Text::getInstance().task(true); }
 } /* triggerTasks */
 
 /******************************************************************************************************************************************************

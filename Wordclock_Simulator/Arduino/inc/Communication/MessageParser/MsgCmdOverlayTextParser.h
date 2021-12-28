@@ -69,26 +69,28 @@ class MsgCmdOverlayTextParser : public MsgCmdOverlayParser<MsgCmdOverlayTextPars
     // set methods
 
     // methods
-    byte getPeriodInMinutes() const { return Overlays::getInstance().getTextPeriodInMinutes(); }
-    byte getEnduranceInSeconds() const { return Overlays::getInstance().getTextEnduranceInSeconds(); }
-    byte getMonth() const { return Overlays::getInstance().getTextMonth(); }
-    byte getDay() const { return Overlays::getInstance().getTextDay(); }
-    byte getValidInDays() const { return Overlays::getInstance().getTextValidInDays(); }
-    byte getIsActive() const { return Overlays::getInstance().getTextIsActive(); }
+    MinuteType getPeriodInMinutes() const { return Overlays::getInstance().getTextPeriodInMinutes(); }
+    SecondType getEnduranceInSeconds() const { return Overlays::getInstance().getTextEnduranceInSeconds(); }
+    MonthType getMonth() const { return Overlays::getInstance().getTextMonth(); }
+    DayType getDay() const { return Overlays::getInstance().getTextDay(); }
+    DayType getValidInDays() const { return Overlays::getInstance().getTextValidInDays(); }
+    byte getSpeed() const { return Overlays::getInstance().getTextSpeed(); }
+    FontType getFont() const {return Overlays::getInstance().getTextFont(); }
+    bool getIsActive() const { return Overlays::getInstance().getTextIsActive(); }
     const char* getText() const { return Overlays::getInstance().getTextText(); }
-    byte getTextSpeed() const { return Overlays::getInstance().getTextSpeed(); }
 
-    StdReturnType setPeriodInMinutes(byte PeriodInMinutes) { return Overlays::getInstance().setTextPeriodInMinutes(PeriodInMinutes); }
-    StdReturnType setEnduranceInSeconds(byte EnduranceInSeconds) { return Overlays::getInstance().setTextEnduranceInSeconds(EnduranceInSeconds); }
-    void setMonth(byte Month) { Overlays::getInstance().setTextMonth(Month); }
-    void setDay(byte Day) { Overlays::getInstance().setTextDay(Day); }
-    void setValidInDays(byte ValidInDays) { Overlays::getInstance().setTextValidInDays(ValidInDays); }
+    StdReturnType setPeriodInMinutes(MinuteType PeriodInMinutes) { return Overlays::getInstance().setTextPeriodInMinutes(PeriodInMinutes); }
+    StdReturnType setEnduranceInSeconds(SecondType EnduranceInSeconds) { return Overlays::getInstance().setTextEnduranceInSeconds(EnduranceInSeconds); }
+    void setMonth(MonthType Month) { Overlays::getInstance().setTextMonth(Month); }
+    void setDay(DayType Day) { Overlays::getInstance().setTextDay(Day); }
+    void setValidInDays(DayType ValidInDays) { Overlays::getInstance().setTextValidInDays(ValidInDays); }
+    void setSpeed(byte Speed) { Overlays::getInstance().setTextSpeed(Speed); }
+    StdReturnType setFont(FontType Font) { return Overlays::getInstance().setTextFont(Font); }
     void setIsActive(bool IsActive) { Overlays::getInstance().setTextIsActive(IsActive); }
     void setText(const char* Text, LengthType Length) { Overlays::getInstance().setTextText(Text, Length); }
-    void setTextSpeed(byte Speed) { Overlays::getInstance().setTextSpeed(Speed); }
 
     void sendAnswerText(bool AppendSpace) const { sendAnswerParameter(TextOptionShortName, getText(), AppendSpace); }
-    void sendAnswerSpeedText(bool AppendSpace) const { sendAnswerParameter(TextSpeedOptionShortName, getTextSpeed(), AppendSpace); }
+    void sendAnswerSpeed(bool AppendSpace) const { sendAnswerParameter(SpeedOptionShortName, getSpeed(), AppendSpace); }
 
 };
 

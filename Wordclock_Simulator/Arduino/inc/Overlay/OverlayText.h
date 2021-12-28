@@ -23,7 +23,6 @@
 #include "StandardTypes.h"
 #include "Arduino.h"
 #include "Overlay.h"
-#include "Text.h"
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
@@ -43,7 +42,7 @@
 /******************************************************************************************************************************************************
  *  C L A S S   O V E R L A Y   T E X T
 ******************************************************************************************************************************************************/
-class OverlayText : public Overlay
+class OverlayText : public Overlay<OverlayText>
 {
 /******************************************************************************************************************************************************
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
@@ -55,11 +54,15 @@ class OverlayText : public Overlay
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
+    friend class Overlay;
     char Text[OVERLAY_TEXT_TEXT_SIZE];
 
     // functions
-    byte convertSpeedToTaskCycle(byte Speed) const { return UINT8_MAX - Speed; }
-    byte convertTaskCycleToSpeed(byte TaskCylce) const { return UINT8_MAX - TaskCylce; }
+    void setStateToShow() { setText(); }
+    void setStateToIdle() { Text::getInstance().stop(); }
+
+    void showTask() { if(Text::getInstance().getState() == Text::STATE_IDLE) { setText(); } }
+    void setText() { Text::getInstance().setTextWithShift(Text, Text::FONT_10X10); }
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
@@ -70,22 +73,18 @@ class OverlayText : public Overlay
 
 	// get methods
     const char* getText() const { return Text; }
-    byte getSpeed() const { return convertTaskCycleToSpeed(Text::getInstance().getTaskCycle()); }
+    //byte getSpeed() const { return convertTaskCycleToSpeed(Text::getInstance().getTaskCycle()); }
 
     // set methods
 
 	// set methods
     void setText(const char* sText, LengthType Length) { StringTools::stringCopy(Text, sText, Length); }
-    void setSpeed(byte Cycle) { Text::getInstance().setTaskCycle(convertSpeedToTaskCycle(Cycle)); }
+    //void setSpeed(byte Cycle) { Text::getInstance().setTaskCycle(convertSpeedToTaskCycle(Cycle)); }
 
 	// methods
     SecondType task(SecondType ShowTimerInSeconds, ClockDate Date, ClockTime Time) {
-        StateType stateOld = Overlay::getState();
-        ShowTimerInSeconds = Overlay::task(ShowTimerInSeconds, Date, Time);
-        if(State == STATE_SHOW && stateOld == STATE_IDLE) {
-            Text::getInstance().setTextWithShift(Text, Text::FONT_10X10);
-        }
-        return ShowTimerInSeconds;
+        if(State == STATE_SHOW) { showTask(); }
+        return Overlay::task(ShowTimerInSeconds, Date, Time);
     }
 };
 

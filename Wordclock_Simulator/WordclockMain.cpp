@@ -21,7 +21,7 @@ WordclockMain::WordclockMain()
     //WcAnimation.setChar(0,0,'Ö', AnimationFont::FONT_5X8);
     //WcAnimation.setChar(0,0,'B', AnimationFont::FONT_5X8);
     //WcAnimation.setCharWithShift('A', AnimationFont::FONT_10X10);
-    Text::getInstance().setTextWithShift(Text, Text::FONT_7X10);
+    //Text::getInstance().setTextWithShift(Text, Text::FONT_7X10);
     //WcDisplay.show();
 
     //WcTransformation.shiftRightFast(true);

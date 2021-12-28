@@ -23,6 +23,7 @@
 #include "StandardTypes.h"
 #include "Arduino.h"
 #include "ClockDateTime.h"
+#include "Text.h"
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
@@ -42,7 +43,7 @@
 /******************************************************************************************************************************************************
  *  C L A S S   O V E R L A Y
 ******************************************************************************************************************************************************/
-class Overlay
+template <typename Derived> class Overlay
 {
 /******************************************************************************************************************************************************
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
@@ -60,15 +61,20 @@ class Overlay
     using HourType = ClockDateTime::HourType;
     using MinuteType = ClockDateTime::MinuteType;
     using SecondType = ClockDateTime::SecondType;
+    using FontType = Text::FontType;
 
 /******************************************************************************************************************************************************
  *  P R O T E C T E D   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   protected:
     StateType State{STATE_DISABLED};
+
     // functions
     constexpr Overlay() { }
     ~Overlay() { }
+
+    byte convertSpeedToTaskCycle(byte Speed) const { return UINT8_MAX - Speed; }
+    byte convertTaskCycleToSpeed(byte TaskCylce) const { return UINT8_MAX - TaskCylce; }
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
@@ -80,8 +86,13 @@ class Overlay
     MonthType Month{0u};
     DayType Day{0u};
     DayType ValidInDays{0u};
+    byte Speed{1u};
+    FontType Font{Text::FONT_10X10};
 
     // functions
+    Derived& underlying() { return static_cast<Derived&>(*this); }
+    Derived const& underlying() const { return static_cast<Derived const&>(*this); }
+
     bool isShowTimerExpired(SecondType ShowTimerInSeconds) const { return ShowTimerInSeconds == 0u; }
     SecondType decrementShowTimer(SecondType ShowTimerInSeconds) {
         if(ShowTimerInSeconds > 0) { return ShowTimerInSeconds - 1u; }
@@ -118,7 +129,13 @@ class Overlay
 
     SecondType setStateToShow() {
         State = STATE_SHOW;
+        underlying().setStateToShow();
         return EnduranceInSeconds;
+    }
+
+    void setStateToIdle() {
+        State = STATE_IDLE;
+        underlying().setStateToIdle();
     }
 
     SecondType showTimerTask(SecondType ShowTimerInSeconds) {
@@ -126,25 +143,19 @@ class Overlay
     }
 
     SecondType checkTimeAndSetStateToShow(SecondType ShowTimerInSeconds, ClockTime CurrentTime) {
-        if(isTimeMatching(CurrentTime.getMinute(), CurrentTime.getSecond())) {
-            return setStateToShow();
-        }
+        if(isTimeMatching(CurrentTime.getMinute(), CurrentTime.getSecond())) { return setStateToShow(); }
         return ShowTimerInSeconds;
     }
 
     SecondType idleTask(SecondType ShowTimerInSeconds, ClockDate CurrentDate, ClockTime CurrentTime) {
         if(isDateSet()) {
-            if(isDateValid(CurrentDate)) {
-                return checkTimeAndSetStateToShow(ShowTimerInSeconds, CurrentTime);
-            }
-        } else {
-            return checkTimeAndSetStateToShow(ShowTimerInSeconds, CurrentTime);
-        }
+            if(isDateValid(CurrentDate)) { return checkTimeAndSetStateToShow(ShowTimerInSeconds, CurrentTime); }
+        } else { return checkTimeAndSetStateToShow(ShowTimerInSeconds, CurrentTime); }
         return ShowTimerInSeconds;
     }
 
     SecondType showTask(SecondType ShowTimerInSeconds) {
-        if(isShowTimerExpired(ShowTimerInSeconds)) { State = STATE_IDLE; }
+        if(isShowTimerExpired(ShowTimerInSeconds)) { setStateToIdle(); }
         return showTimerTask(ShowTimerInSeconds);
     }
 
@@ -159,6 +170,8 @@ class Overlay
     MonthType getMonth() const { return Month; }
     DayType getDay() const { return Day; }
     DayType getValidInDays() const { return ValidInDays; }
+    byte getSpeed() const { return Speed; }
+    FontType getFont() const { return Font; }
     bool getIsActive() const { return State != STATE_DISABLED; }
 
 	// set methods
@@ -178,9 +191,18 @@ class Overlay
             return E_NOT_OK;
         }
     }
+    StdReturnType setFont(FontType sFont) {
+        if(Text::isFontValid(sFont)) {
+            Font = sFont;
+            return E_OK;
+        } else {
+            return E_NOT_OK;
+        }
+    }
     void setMonth(MonthType sMonth) { Month = sMonth; }
     void setDay(DayType sDay) { Day = sDay; }
     void setValidInDays(DayType sValidInDays) { ValidInDays = sValidInDays; }
+    void setSpeed(byte sSpeed) { Speed = sSpeed; }
     void setIsActive(bool sIsActive) { if(sIsActive) { enableIsActive(); } else { disableIsActive(); } }
 
 	// methods

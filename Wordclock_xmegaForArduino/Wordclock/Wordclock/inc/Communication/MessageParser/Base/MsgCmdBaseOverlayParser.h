@@ -64,6 +64,7 @@ class MsgCmdBaseOverlayParser
     static constexpr char ActiveOptionShortName{'A'};
 	static constexpr char TextOptionShortName{'T'};
 	static constexpr char TextSpeedOptionShortName{'S'};
+	static constexpr char FontOptionShortName{'F'};
 
     static constexpr ParameterTableType ParameterTable PROGMEM {
         ParameterTableElementType(PeriodOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8),

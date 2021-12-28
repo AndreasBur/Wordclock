@@ -32421,7 +32421,7 @@
 1635183975 source:c:\users\aburn\github\andreasbur\wordclock\wordclock_simulator\arduino\src\clock\clockwords.cpp
 	"ClockWords.h"
 
-1640704607 source:c:\users\aburn\github\andreasbur\wordclock\wordclock_simulator\arduino\src\communication\communication.cpp
+1640704679 source:c:\users\aburn\github\andreasbur\wordclock\wordclock_simulator\arduino\src\communication\communication.cpp
 	"Communication.h"
 
 1639680147 c:\users\aburn\github\andreasbur\wordclock\wordclock_simulator\arduino\inc\communication\communication.h
@@ -32431,7 +32431,7 @@
 	"ErrorMessage.h"
 	"MsgCmdParser.h"
 
-1633367486 c:\users\aburn\github\andreasbur\wordclock\wordclock_simulator\arduino\inc\communication\message.h
+1640724224 c:\users\aburn\github\andreasbur\wordclock\wordclock_simulator\arduino\inc\communication\message.h
 	"StandardTypes.h"
 	"Arduino.h"
 
@@ -32675,7 +32675,7 @@
 	"Communication.h"
 	"Scheduler.h"
 
-1640703982 source:c:\users\aburn\github\andreasbur\wordclock\wordclock_simulator\wordclockmain.cpp
+1640724654 source:c:\users\aburn\github\andreasbur\wordclock\wordclock_simulator\wordclockmain.cpp
 	"WordclockMain.h"
 	"RealTimeClock.h"
 
@@ -32778,7 +32778,7 @@
 	"errno.h"
 	<type_traits>
 
-1640113801 c:\users\aburn\github\andreasbur\wordclock\wordclock_simulator\arduino\inc\communication\messageparser\msgcmddisplaycolorparser.h
+1640730688 c:\users\aburn\github\andreasbur\wordclock\wordclock_simulator\arduino\inc\communication\messageparser\msgcmddisplaycolorparser.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"Display.h"
@@ -32821,7 +32821,7 @@
 	"MsgParameterParser.h"
 	"RealTimeClock.h"
 
-1640691850 c:\users\aburn\github\andreasbur\wordclock\wordclock_simulator\arduino\inc\communication\messageparser\msgcmdoverlaydateparser.h
+1640730514 c:\users\aburn\github\andreasbur\wordclock\wordclock_simulator\arduino\inc\communication\messageparser\msgcmdoverlaydateparser.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"MsgCmdOverlayParser.h"
@@ -32831,7 +32831,7 @@
 	"Arduino.h"
 	"MsgParameterParser.h"
 
-1640700342 c:\users\aburn\github\andreasbur\wordclock\wordclock_simulator\arduino\inc\overlay\overlays.h
+1640731179 c:\users\aburn\github\andreasbur\wordclock\wordclock_simulator\arduino\inc\overlay\overlays.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"StringTools.h"
@@ -32840,23 +32840,23 @@
 	"OverlayTemperature.h"
 	"OverlayText.h"
 
-1639604121 c:\users\aburn\github\andreasbur\wordclock\wordclock_simulator\arduino\inc\overlay\overlaydate.h
+1640723886 c:\users\aburn\github\andreasbur\wordclock\wordclock_simulator\arduino\inc\overlay\overlaydate.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"Overlay.h"
 
-1640702791 c:\users\aburn\github\andreasbur\wordclock\wordclock_simulator\arduino\inc\overlay\overlay.h
+1640731040 c:\users\aburn\github\andreasbur\wordclock\wordclock_simulator\arduino\inc\overlay\overlay.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"ClockDateTime.h"
+	"Text.h"
 
-1640703950 c:\users\aburn\github\andreasbur\wordclock\wordclock_simulator\arduino\inc\overlay\overlaytext.h
+1640727727 c:\users\aburn\github\andreasbur\wordclock\wordclock_simulator\arduino\inc\overlay\overlaytext.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"Overlay.h"
-	"Text.h"
 
-1639591773 c:\users\aburn\github\andreasbur\wordclock\wordclock_simulator\arduino\inc\overlay\overlaytemperature.h
+1640723886 c:\users\aburn\github\andreasbur\wordclock\wordclock_simulator\arduino\inc\overlay\overlaytemperature.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"Overlay.h"
@@ -33197,7 +33197,7 @@
 
 1618262638 c:\wxwidgets-3.1.5\lib\gcc_dll\mswu\wx\setup.h
 
-1640700359 c:\users\aburn\github\andreasbur\wordclock\wordclock_simulator\arduino\inc\text\text.h
+1640729704 c:\users\aburn\github\andreasbur\wordclock\wordclock_simulator\arduino\inc\text\text.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"Display.h"
@@ -33218,27 +33218,27 @@
 	"Communication.h"
 	<array>
 
-1640692840 c:\users\aburn\github\andreasbur\wordclock\wordclock_simulator\arduino\inc\communication\messageparser\base\msgcmdoverlayparser.h
+1640731370 c:\users\aburn\github\andreasbur\wordclock\wordclock_simulator\arduino\inc\communication\messageparser\base\msgcmdoverlayparser.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"MsgParameterParser.h"
 	"MsgCmdBaseOverlayParser.h"
 	"Overlays.h"
 
-1640293698 c:\users\aburn\github\andreasbur\wordclock\wordclock_simulator\arduino\inc\communication\messageparser\base\msgcmdbaseoverlayparser.h
+1640727179 c:\users\aburn\github\andreasbur\wordclock\wordclock_simulator\arduino\inc\communication\messageparser\base\msgcmdbaseoverlayparser.h
 	"StandardTypes.h"
 	"Arduino.h"
 
-1640691850 c:\users\aburn\github\andreasbur\wordclock\wordclock_simulator\arduino\inc\communication\messageparser\msgcmdoverlaytemperatureparser.h
-	"StandardTypes.h"
-	"Arduino.h"
-	"MsgCmdOverlayParser.h"
-
-1640691815 c:\users\aburn\github\andreasbur\wordclock\wordclock_simulator\arduino\inc\communication\messageparser\msgcmdoverlaytextparser.h
+1640730577 c:\users\aburn\github\andreasbur\wordclock\wordclock_simulator\arduino\inc\communication\messageparser\msgcmdoverlaytemperatureparser.h
 	"StandardTypes.h"
 	"Arduino.h"
 	"MsgCmdOverlayParser.h"
 
-1640700452 source:c:\users\aburn\github\andreasbur\wordclock\wordclock_simulator\arduino\src\text\text.cpp
+1640730634 c:\users\aburn\github\andreasbur\wordclock\wordclock_simulator\arduino\inc\communication\messageparser\msgcmdoverlaytextparser.h
+	"StandardTypes.h"
+	"Arduino.h"
+	"MsgCmdOverlayParser.h"
+
+1640725695 source:c:\users\aburn\github\andreasbur\wordclock\wordclock_simulator\arduino\src\text\text.cpp
 	"Text.h"
 

@@ -42,7 +42,7 @@
 /******************************************************************************************************************************************************
  *  C L A S S   O V E R L A Y
 ******************************************************************************************************************************************************/
-class Overlay
+template <typename Derived> class Overlay
 {
 /******************************************************************************************************************************************************
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
@@ -82,9 +82,17 @@ class Overlay
     DayType ValidInDays{0u};
 
     // functions
-    bool isShowTimerExpired(SecondType ShowTimerInSeconds) const { return ShowTimerInSeconds == 0u; }
-    SecondType decrementShowTimer(SecondType ShowTimerInSeconds) { if(ShowTimerInSeconds > 0) { return ShowTimerInSeconds--; } }
+    Derived& underlying() { return static_cast<Derived&>(*this); }
+    Derived const& underlying() const { return static_cast<Derived const&>(*this); }
 
+    bool isShowTimerExpired(SecondType ShowTimerInSeconds) const { return ShowTimerInSeconds == 0u; }
+    SecondType decrementShowTimer(SecondType ShowTimerInSeconds) {
+        if(ShowTimerInSeconds > 0) { return ShowTimerInSeconds - 1u; }
+        else { return 0u; }
+    }
+
+    bool isPeriodValid(MinuteType Period) const { return Period > 0u; }
+    bool isEnduranceValid(SecondType Endurance) const { return Endurance > 0u; }
     bool isDateSet() const { return (Month != 0u) || (Day != 0u); }
     bool isDayAndMonthSet() const { return isDaySet() && isMonthSet(); }
     bool isMonthMatching(MonthType CurrentMonth) const { return CurrentMonth == Month; }
@@ -92,11 +100,11 @@ class Overlay
     bool isDateMatchingDayAndMonthSet(MonthType CurrentMonth, DayType CurrentDay) const { return isMonthMatching(CurrentMonth) && isDayMatching(CurrentDay); }
     bool isDateMatchingMonthSet(MonthType CurrentMonth) const { return CurrentMonth == Month; }
     bool isDateMatchingDaySet(DayType CurrentDay) const { return CurrentDay == Day; }
-    bool isMinuteMatching(MinuteType CurrentMinute) const { return CurrentMinute % PeriodInMinutes; }
+    bool isMinuteMatching(MinuteType CurrentMinute) const { return !(CurrentMinute % PeriodInMinutes); }
     bool isSecondMatching(SecondType CurrentSecond) const { return CurrentSecond == SecondToStartShow; }
     bool isDaySet() const { return Day != 0u; }
     bool isMonthSet() const { return Month != 0u; }
-    bool isNextYear(MonthType CurrentMonth) const { return CurrentMonth > Month; }
+    bool isNextYear(MonthType CurrentMonth) const { return CurrentMonth < Month; }
 
     bool isTimeMatching(MinuteType CurrentMinute, SecondType CurrentSecond) const { return isMinuteMatching(CurrentMinute) && isSecondMatching(CurrentSecond); }
     bool isDateMachtching(MonthType CurrentMonth, DayType CurrentDay) const {
@@ -107,30 +115,40 @@ class Overlay
 
     bool isDateValid(ClockDate CurrentDate) const {
         YearType year = CurrentDate.getYear();
-        if(isNextYear(CurrentDate.getMonth())) { year - 1u;}
+        if(isNextYear(CurrentDate.getMonth())) { year--;}
         return CurrentDate.getRataDieDay(year, Month, Day) < ValidInDays;
     }
 
-    SecondType setStateToShow(SecondType ShowTimerInSeconds) {
+    SecondType setStateToShow() {
         State = STATE_SHOW;
+        underlying().setStateToShow();
         return EnduranceInSeconds;
     }
 
-    SecondType showTimerTask(SecondType ShowTimerInSeconds, SecondType CurrentSecond) {
+    void setStateToIdle() {
+        State = STATE_IDLE;
+        underlying().setStateToIdle();
+    }
+
+    SecondType showTimerTask(SecondType ShowTimerInSeconds) {
         return decrementShowTimer(ShowTimerInSeconds);
+    }
+
+    SecondType checkTimeAndSetStateToShow(SecondType ShowTimerInSeconds, ClockTime CurrentTime) {
+        if(isTimeMatching(CurrentTime.getMinute(), CurrentTime.getSecond())) { return setStateToShow(); }
+        return ShowTimerInSeconds;
     }
 
     SecondType idleTask(SecondType ShowTimerInSeconds, ClockDate CurrentDate, ClockTime CurrentTime) {
         if(isDateSet()) {
-            if(isDateValid(CurrentDate)) {
-                if(isTimeMatching(CurrentTime.getMinute(), CurrentTime.getSecond())) { return setStateToShow(ShowTimerInSeconds); }
-            }
-        } else if(isTimeMatching(CurrentTime.getMinute(), CurrentTime.getSecond())) { return setStateToShow(ShowTimerInSeconds); }
+            if(isDateValid(CurrentDate)) { return checkTimeAndSetStateToShow(ShowTimerInSeconds, CurrentTime); }
+        } else { return checkTimeAndSetStateToShow(ShowTimerInSeconds, CurrentTime); }
+        return ShowTimerInSeconds;
     }
 
-    SecondType showTask(SecondType ShowTimerInSeconds, ClockTime CurrentTime) {
-        if(isShowTimerExpired(ShowTimerInSeconds)) { State = STATE_IDLE; }
-        return showTimerTask(ShowTimerInSeconds, CurrentTime.getSecond());
+    SecondType showTask(SecondType ShowTimerInSeconds) {
+        if(isShowTimerExpired(ShowTimerInSeconds)) { setStateToIdle(); }
+        return showTimerTask(ShowTimerInSeconds);
     }
 
 /******************************************************************************************************************************************************
@@ -147,8 +165,22 @@ class Overlay
     bool getIsActive() const { return State != STATE_DISABLED; }
 
 	// set methods
-    void setPeriodInMinutes(MinuteType sPeriodInMinutes) { PeriodInMinutes = sPeriodInMinutes; }
-    void setEnduranceInSeconds(SecondType sEnduranceInSeconds) { EnduranceInSeconds = sEnduranceInSeconds; }
+    StdReturnType setPeriodInMinutes(MinuteType sPeriodInMinutes) {
+        if(isPeriodValid(sPeriodInMinutes)) {
+            PeriodInMinutes = sPeriodInMinutes;
+            return E_OK;
+        } else {
+            return E_NOT_OK;
+        }
+    }
+    StdReturnType setEnduranceInSeconds(SecondType sEnduranceInSeconds) {
+        if(isEnduranceValid(sEnduranceInSeconds)) {
+            EnduranceInSeconds = sEnduranceInSeconds;
+            return E_OK;
+        } else {
+            return E_NOT_OK;
+        }
+    }
     void setMonth(MonthType sMonth) { Month = sMonth; }
     void setDay(DayType sDay) { Day = sDay; }
     void setValidInDays(DayType sValidInDays) { ValidInDays = sValidInDays; }
@@ -160,7 +192,7 @@ class Overlay
 
     SecondType task(SecondType ShowTimerInSeconds, ClockDate Date, ClockTime Time) {
         if(State == STATE_IDLE) { return idleTask(ShowTimerInSeconds, Date, Time); }
-        if(State == STATE_SHOW) { return showTask(ShowTimerInSeconds, Time); }
+        if(State == STATE_SHOW) { return showTask(ShowTimerInSeconds); }
         return 0u;
     }
 };

@@ -67,7 +67,9 @@ class ErrorMessage
         API_CLOCK_SHOW,
         API_ANIMATION_SET_ANIMATION,
         API_ANIMATION_SET_CLOCK_TASK_CYCLE,
-        API_CLOCK_SET_MODE
+        //API_CLOCK_SET_MODE,
+        //API_OVERLAY_SET_PERIOD,
+        //API_OVERLAY_SET_ENDURANCE
     };
 
 /******************************************************************************************************************************************************
@@ -106,7 +108,7 @@ class ErrorMessage
         Serial.print(F("Error"));
         sendEqual();
         Serial.print(Error);
-        if(AppendSpace) {  }
+        if(AppendSpace) { sendSpace(); }
     }
 
     void send(char OptionShortName, ErrorType Error, bool AppendSpace = true) const
