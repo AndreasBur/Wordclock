@@ -80,8 +80,9 @@ class OverlayText : public Overlay
 
 	// methods
     SecondType task(SecondType ShowTimerInSeconds, ClockDate Date, ClockTime Time) {
+        StateType stateOld = Overlay::getState();
         ShowTimerInSeconds = Overlay::task(ShowTimerInSeconds, Date, Time);
-        if(State == STATE_SHOW) {
+        if(State == STATE_SHOW && stateOld == STATE_IDLE) {
             Text::getInstance().setTextWithShift(Text, Text::FONT_10X10);
         }
         return ShowTimerInSeconds;

@@ -4,7 +4,7 @@
 #include <string.h>
 #include "Pixels.h"
 
-typedef unsigned char byte;
+typedef uint8_t byte;
 
 #define F(x)                    x
 

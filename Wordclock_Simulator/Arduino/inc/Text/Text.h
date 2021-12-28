@@ -34,7 +34,7 @@
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
 /* Text configuration parameter */
-#define TEXT_TASK_CYCLE_INIT_VALUE            10u
+#define TEXT_TASK_CYCLE_INIT_VALUE            5u
 #define TEXT_SUPPORT_FONT_5X8                 STD_ON
 #define TEXT_SUPPORT_FONT_7X9                 STD_ON
 #define TEXT_SUPPORT_FONT_7X10                STD_ON
@@ -169,7 +169,7 @@ class Text
     // methods
     void init() { }
     StdReturnType show() const { return Display::getInstance().show(); }
-    void task();
+    void task(bool=false);
     StdReturnType setChar(byte, byte, char, FontType);
     void setCharFast(byte, byte, char, FontType);
     void setCharWithShift(char, FontType);

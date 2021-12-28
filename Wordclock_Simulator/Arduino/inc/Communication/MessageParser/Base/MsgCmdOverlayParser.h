@@ -24,6 +24,7 @@
 #include "Arduino.h"
 #include "MsgParameterParser.h"
 #include "MsgCmdBaseOverlayParser.h"
+#include "Overlays.h"
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
@@ -72,8 +73,8 @@ template <typename Derived> class MsgCmdOverlayParser
     Derived const& underlying() const { return static_cast<Derived const&>(*this); }
 
     void handleParameter(char ParameterShortName, byte Argument) {
-        if(ParameterShortName == PeriodOptionShortName) { underlying().setPeriodInMinutes(Argument); }
-        if(ParameterShortName == EnduranceOptionShortName) { underlying().setEnduranceInSeconds(Argument); }
+        if(ParameterShortName == PeriodOptionShortName) { setPeriodInMinutes(Argument); }
+        if(ParameterShortName == EnduranceOptionShortName) { setEnduranceInSeconds(Argument); }
         if(ParameterShortName == MonthOptionShortName) { underlying().setMonth(Argument); }
         if(ParameterShortName == ValidOptionShortName) { underlying().setValidInDays(Argument); }
         if(ParameterShortName == ActiveOptionShortName) { underlying().setIsActive(static_cast<bool>(Argument)); }
@@ -84,14 +85,26 @@ template <typename Derived> class MsgCmdOverlayParser
         if(ParameterShortName == TextOptionShortName) { underlying().setText(Argument, Length); }
     }
 
+    void setPeriodInMinutes(Overlays::MinuteType PeriodInMinutes)
+    {
+        StdReturnType returnValue = underlying().setPeriodInMinutes(PeriodInMinutes);
+        MsgParameterParserType::Error.checkReturnValueAndSend(PeriodOptionShortName, returnValue, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNCE);
+    }
+    void setEnduranceInSeconds(Overlays::SecondType EnduranceInSeconds)
+    {
+        StdReturnType returnValue = underlying().setEnduranceInSeconds(EnduranceInSeconds);
+        MsgParameterParserType::Error.checkReturnValueAndSend(EnduranceOptionShortName, returnValue, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNCE);
+    }
+
     void sendAnswerPeriod(bool AppendSpace) const { MsgParameterParserType::sendAnswerParameter(PeriodOptionShortName,  underlying().getPeriodInMinutes(), AppendSpace); }
     void sendAnswerEndurance(bool AppendSpace) const { MsgParameterParserType::sendAnswerParameter(EnduranceOptionShortName, underlying().getEnduranceInSeconds(), AppendSpace); }
     void sendAnswerMonth(bool AppendSpace) const { MsgParameterParserType::sendAnswerParameter(MonthOptionShortName, underlying().getMonth(), AppendSpace); }
-    void sendAnswerDay(bool AppendSpace) const { MsgParameterParserType::sendAnswerParameter(MonthOptionShortName, underlying().getDay(), AppendSpace); }
+    void sendAnswerDay(bool AppendSpace) const { MsgParameterParserType::sendAnswerParameter(DayOptionShortName, underlying().getDay(), AppendSpace); }
     void sendAnswerValid(bool AppendSpace) const { MsgParameterParserType::sendAnswerParameter(ValidOptionShortName, underlying().getValidInDays(), AppendSpace); }
     void sendAnswerActive(bool AppendSpace) const { MsgParameterParserType::sendAnswerParameter(ActiveOptionShortName, underlying().getIsActive(), AppendSpace); }
     void sendAnswerText(bool AppendSpace) const { underlying().sendAnswerText(AppendSpace); }
     void sendAnswerSpeedText(bool AppendSpace) const { underlying().sendAnswerSpeedText(AppendSpace); }
+
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S

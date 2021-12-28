@@ -158,10 +158,16 @@ void Text::setTextWithShift(const char* Text, FontType Font)
 /******************************************************************************************************************************************************
   task()
 ******************************************************************************************************************************************************/
-void Text::task()
+void Text::task(bool Show)
 {
-    if(State == STATE_TEXT_SHIFT) stringShiftTask();
-    if(State == STATE_CHAR_SHIFT) charShiftTask();
+    if(State == STATE_TEXT_SHIFT) {
+        stringShiftTask();
+        Display::getInstance().show();
+    }
+    if(State == STATE_CHAR_SHIFT) {
+        charShiftTask();
+        Display::getInstance().show();
+    }
 } /* task */
 
 

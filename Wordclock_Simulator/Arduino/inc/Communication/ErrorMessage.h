@@ -67,7 +67,9 @@ class ErrorMessage
         API_CLOCK_SHOW,
         API_ANIMATION_SET_ANIMATION,
         API_ANIMATION_SET_CLOCK_TASK_CYCLE,
-        API_CLOCK_SET_MODE
+        //API_CLOCK_SET_MODE,
+        //API_OVERLAY_SET_PERIOD,
+        //API_OVERLAY_SET_ENDURANCE
     };
 
 /******************************************************************************************************************************************************
