@@ -95,7 +95,7 @@ template <typename Derived> class Overlay
 
     bool isShowTimerExpired(SecondType ShowTimerInSeconds) const { return ShowTimerInSeconds == 0u; }
     SecondType decrementShowTimer(SecondType ShowTimerInSeconds) {
-        if(ShowTimerInSeconds > 0) { return ShowTimerInSeconds - 1u; }
+        if(ShowTimerInSeconds > 0u) { return ShowTimerInSeconds - 1u; }
         else { return 0u; }
     }
 
