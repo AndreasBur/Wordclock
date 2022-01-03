@@ -127,28 +127,8 @@ class Overlays
                 (Text.getState() == OverlayText::STATE_DISABLED));
     }
 
-    void taskIdle(ClockDate date, ClockTime time) {
-#if (OVERLAYS_SUPPORT_DATE == STD_ON)
-        if((Date.getIsActive()) && (ShowTimerInSeconds == 0u)) {
-            ShowTimerInSeconds = Date.task(ShowTimerInSeconds, date, time);
-        }
-#endif
-#if (OVERLAYS_SUPPORT_TEMPERATURE == STD_ON)
-        if((Temperature.getIsActive()) && (ShowTimerInSeconds == 0u)) {
-            ShowTimerInSeconds =  Temperature.task(ShowTimerInSeconds, date, time);
-        }
-#endif
-#if (OVERLAYS_SUPPORT_TEXT == STD_ON)
-        if((Text.getIsActive()) && (ShowTimerInSeconds == 0u)) {
-            ShowTimerInSeconds =  Text.task(ShowTimerInSeconds, date, time); }
-#endif
-    }
-
-    void taskShow(ClockDate date, ClockTime time) {
-        if(Date.getState() == OverlayDate::STATE_SHOW) { ShowTimerInSeconds = Date.task(ShowTimerInSeconds, date, time); }
-        if(Temperature.getState() == OverlayTemperature::STATE_SHOW) { ShowTimerInSeconds =  Temperature.task(ShowTimerInSeconds, date, time); }
-        if(Text.getState() == OverlayText::STATE_SHOW) { ShowTimerInSeconds =  Text.task(ShowTimerInSeconds, date, time); }
-    }
+    void taskIdle(ClockDate, ClockTime);
+    void taskShow(ClockDate, ClockTime);
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
@@ -161,12 +141,7 @@ class Overlays
 
 	// get methods
     byte getTaskCycle() const { return TaskCycle; }
-    StateType getState() const {
-        if(isDisabled()) { return OverlayType::STATE_DISABLED; }
-        if(isIdle()) { return OverlayType::STATE_IDLE; }
-        if(isShow()) { return OverlayType::STATE_SHOW; }
-        return OverlayType::STATE_DISABLED;
-    }
+    StateType getState() const;
 
 #if (OVERLAYS_SUPPORT_DATE == STD_ON)
     MinuteType getDatePeriodInMinutes() const { return Date.getPeriodInMinutes(); }
@@ -234,16 +209,7 @@ class Overlays
 #endif
 
 	// methods
-	void task() {
-        ClockDate date = RealTimeClock::getInstance().getDate();
-        ClockTime time = RealTimeClock::getInstance().getTime();
-
-        if(LastSecond != time.getSecond()) {
-            LastSecond = time.getSecond();
-            if(isShow()) { taskShow(date, time); }
-            else { taskIdle(date, time); }
-        }
-	}
+	void task();
 };
 
 #endif

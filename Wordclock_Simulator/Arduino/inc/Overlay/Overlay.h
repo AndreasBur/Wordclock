@@ -124,11 +124,12 @@ template <typename Derived> class Overlay
     bool isDateValid(ClockDate CurrentDate) const {
         YearType year = CurrentDate.getYear();
         if(isNextYear(CurrentDate.getMonth())) { year--;}
-        return CurrentDate.getRataDieDay(year, Month, Day) < ValidInDays;
+        return CurrentDate.getPassedDays(year, Month, Day) < ValidInDays;
     }
 
     SecondType setStateToShow() {
         State = STATE_SHOW;
+        Text::getInstance().setTaskCycle(convertSpeedToTaskCycle(Speed));
         underlying().setStateToShow();
         return EnduranceInSeconds;
     }

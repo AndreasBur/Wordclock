@@ -153,19 +153,23 @@ class ClockDate
     static constexpr bool isMonthValid(MonthType Month) { return (Month >= MonthMinValue) && (Month <= MonthMaxValue); }
     static constexpr bool isDayValid(DayType Day) { return (Day >= DayMinValue) && (Day <= DayMaxValue); }
 
-    static RataDieDayType getRataDieDay(YearType Year, MonthType Month, DayType Day) {
-        if (Month < 3) { Year--, Month += 12; }
-        return static_cast<RataDieDayType>(365)*Year+Year/4-Year/100+Year/400+(153*Month-457)/5+Day-306;
+    static RataDieDayType getRataDieDay(YearType sYear, MonthType sMonth, DayType sDay) {
+        if (sMonth < 3u) { sYear--, sMonth += 12u; }
+        return static_cast<RataDieDayType>(365u)*sYear+sYear/4u-sYear/100u+sYear/400u+(153u*sMonth-457u)/5u+sDay-306u;
     }
 
-    static DayType getDaysOfMonth(MonthType Month, YearType Year) {
-        if(Month == 4 || Month == 6 || Month == 9 || Month == 11) {
+    RataDieDayType getPassedDays(YearType sYear, MonthType sMonth, DayType sDay) {
+        return labs(getRataDieDay(sYear, sMonth, sDay) - getRataDieDay(Year, Month, Day));
+    }
+
+    static DayType getDaysOfMonth(MonthType sMonth, YearType sYear) {
+        if(sMonth == 4u || sMonth == 6u || sMonth == 9u || sMonth == 11u) {
             return 30u;
-        } else if(Month == 2u) {
-            if(Year % 4 == 0u) { return 29u; }
+        } else if(sMonth == 2u) {
+            if(sYear % 4u == 0u) { return 29u; }
             else { return 28u; }
-        } else if((Month == 1u) || (Month == 3u) || (Month == 5u) ||
-                (Month == 7u) || (Month == 8u) || (Month == 12)) {
+        } else if((sMonth == 1u) || (sMonth == 3u) || (sMonth == 5u) ||
+                (sMonth == 7u) || (sMonth == 8u) || (sMonth == 12)) {
             return 31u;
         }
 	}

@@ -15,7 +15,7 @@
     <Name>ArduinoCore</Name>
     <ArduinoIdeDir>C:\Program Files (x86)\Arduino</ArduinoIdeDir>
     <ArduinoProjectType>Core</ArduinoProjectType>
-    <ToolchainFlavour>avr-gcc-11.1.0-x64-windows</ToolchainFlavour>
+    <ToolchainFlavour>avr-gcc-10.1.0-x64-windows</ToolchainFlavour>
     <AssemblyName>ArduinoCore</AssemblyName>
     <RootNamespace>ArduinoCore</RootNamespace>
     <KeepTimersRunning>true</KeepTimersRunning>

@@ -73,13 +73,11 @@ class OverlayText : public Overlay<OverlayText>
 
 	// get methods
     const char* getText() const { return Text; }
-    //byte getSpeed() const { return convertTaskCycleToSpeed(Text::getInstance().getTaskCycle()); }
 
     // set methods
 
 	// set methods
     void setText(const char* sText, LengthType Length) { StringTools::stringCopy(Text, sText, Length); }
-    //void setSpeed(byte Cycle) { Text::getInstance().setTaskCycle(convertSpeedToTaskCycle(Cycle)); }
 
 	// methods
     SecondType task(SecondType ShowTimerInSeconds, ClockDate Date, ClockTime Time) {

@@ -109,7 +109,7 @@ class MsgCmdDisplayPixelParser : public MsgParameterParser<MsgCmdDisplayPixelPar
     }
 
     StateType getPixelState(bool PixelValue) const { return PixelValue ? STATE_ON : STATE_OFF; }
-    bool getPixelValue(StateType PixelState) const { return (PixelState == STATE_ON) ? true : false; }
+    bool getPixelValue(StateType PixelState) const { return PixelState == STATE_ON; }
 
     void sendAnswerIndex(bool AppendSpace) const {
         sendAnswerParameter(IndexOptionShortName, Index, AppendSpace);

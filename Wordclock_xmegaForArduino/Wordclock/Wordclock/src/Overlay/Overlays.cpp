@@ -8,90 +8,99 @@
  *  ---------------------------------------------------------------------------------------------------------------------------------------------------
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       Communication.h
+/**     \file       Overlays.cpp
  *      \brief
  *
  *      \details
  *
+ *
 ******************************************************************************************************************************************************/
-#ifndef _COMMUNICATION_H_
-#define _COMMUNICATION_H_
+#define _OVERLAYS_SOURCE_
 
 /******************************************************************************************************************************************************
  * I N C L U D E S
 ******************************************************************************************************************************************************/
-#include "StandardTypes.h"
-#include "Arduino.h"
-#include "Message.h"
-#include "ErrorMessage.h"
-#include "MsgCmdParser.h"
-
-/******************************************************************************************************************************************************
- *  G L O B A L   C O N S T A N T   M A C R O S
-******************************************************************************************************************************************************/
-/* Communication configuration parameter */
-#define COMMUNICATION_TASK_CYCLE                         10u
-
-/* Communication parameter */
+#include "Overlays.h"
 
 
 /******************************************************************************************************************************************************
- *  G L O B A L   F U N C T I O N   M A C R O S
+ *  L O C A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
 
 
 /******************************************************************************************************************************************************
- *  C L A S S   C O M M U N I C A T I O N
+ *  L O C A L   F U N C T I O N   M A C R O S
 ******************************************************************************************************************************************************/
-class Communication
-{
-/******************************************************************************************************************************************************
- *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
-******************************************************************************************************************************************************/
-  public:
-    enum StateType {
-        STATE_MESSAGE_COMPLETE,
-        STATE_MESSAGE_INCOMPLETE,
-    };
+
 
 /******************************************************************************************************************************************************
- *  P R I V A T E   D A T A   A N D   F U N C T I O N S
+ *  L O C A L   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
-  private:
-    Communication() : Error(), IncomingMessage(), State(STATE_MESSAGE_INCOMPLETE) { }
-    ~Communication() { }
 
-    static constexpr byte TaskCycle{COMMUNICATION_TASK_CYCLE};
-    static constexpr char EndOfMessageChar{'\n'};
-    ErrorMessage Error;
-    Message IncomingMessage;
-    StateType State;
-
-    // private functions
-    void addMessagePart();
 
 /******************************************************************************************************************************************************
- *  P U B L I C   F U N C T I O N S
+ * P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
-  public:
-    static Communication& getInstance() {
-        static Communication SingletonInstance;
-        return SingletonInstance;
+
+/******************************************************************************************************************************************************
+  getState()
+******************************************************************************************************************************************************/
+Overlays::StateType Overlays::getState() const {
+    if(isDisabled()) { return OverlayType::STATE_DISABLED; }
+    if(isIdle()) { return OverlayType::STATE_IDLE; }
+    if(isShow()) { return OverlayType::STATE_SHOW; }
+    return OverlayType::STATE_DISABLED;
+} /* getState */
+
+/******************************************************************************************************************************************************
+  task()
+******************************************************************************************************************************************************/
+void Overlays::task() {
+    ClockDate date = RealTimeClock::getInstance().getDate();
+    ClockTime time = RealTimeClock::getInstance().getTime();
+
+    if(LastSecond != time.getSecond()) {
+        LastSecond = time.getSecond();
+        if(isShow()) { taskShow(date, time); }
+        else { taskIdle(date, time); }
     }
+} /* task */
 
-    // get methods
-    static constexpr char getEndOfMessageChar() { return EndOfMessageChar; }
-    static constexpr byte getTaskCycle() { return TaskCycle; }
-    StateType getState() const { return State; }
 
-    // set methods
+/******************************************************************************************************************************************************
+ * P R I V A T E   F U N C T I O N S
+******************************************************************************************************************************************************/
 
-    // methods
-    void task();
-    bool isMessageComplete() const { return State == STATE_MESSAGE_COMPLETE; }
-};
-
+/******************************************************************************************************************************************************
+  taskIdle()
+******************************************************************************************************************************************************/
+void Overlays::taskIdle(ClockDate date, ClockTime time) {
+#if (OVERLAYS_SUPPORT_DATE == STD_ON)
+    if((Date.getIsActive()) && (ShowTimerInSeconds == 0u)) {
+        ShowTimerInSeconds = Date.task(ShowTimerInSeconds, date, time);
+    }
 #endif
+#if (OVERLAYS_SUPPORT_TEMPERATURE == STD_ON)
+    if((Temperature.getIsActive()) && (ShowTimerInSeconds == 0u)) {
+        ShowTimerInSeconds =  Temperature.task(ShowTimerInSeconds, date, time);
+    }
+#endif
+#if (OVERLAYS_SUPPORT_TEXT == STD_ON)
+    if((Text.getIsActive()) && (ShowTimerInSeconds == 0u)) {
+        ShowTimerInSeconds =  Text.task(ShowTimerInSeconds, date, time);
+    }
+#endif
+} /* taskIdle */
+
+/******************************************************************************************************************************************************
+  taskShow()
+******************************************************************************************************************************************************/
+void Overlays::taskShow(ClockDate date, ClockTime time) {
+    if(Date.getState() == OverlayDate::STATE_SHOW) { ShowTimerInSeconds = Date.task(ShowTimerInSeconds, date, time); }
+    if(Temperature.getState() == OverlayTemperature::STATE_SHOW) { ShowTimerInSeconds =  Temperature.task(ShowTimerInSeconds, date, time); }
+    if(Text.getState() == OverlayText::STATE_SHOW) { ShowTimerInSeconds =  Text.task(ShowTimerInSeconds, date, time); }
+} /* taskShow */
+
 
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E

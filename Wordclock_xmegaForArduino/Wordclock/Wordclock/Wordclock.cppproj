@@ -16,7 +16,7 @@
     <Name>Wordclock</Name>
     <RootNamespace>Wordclock</RootNamespace>
     <ArduinoIdeDir>C:\Program Files (x86)\Arduino</ArduinoIdeDir>
-    <ToolchainFlavour>avr-gcc-11.1.0-x64-windows</ToolchainFlavour>
+    <ToolchainFlavour>avr-gcc-10.1.0-x64-windows</ToolchainFlavour>
     <KeepTimersRunning>true</KeepTimersRunning>
     <OverrideVtor>false</OverrideVtor>
     <CacheFlash>true</CacheFlash>
@@ -636,6 +636,9 @@
     <Compile Include="src\Font\FontTahoma10x10.cpp">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="src\Overlay\Overlays.cpp">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="src\Pixels\WS2812\WS2812.cpp">
       <SubType>compile</SubType>
     </Compile>
@@ -700,6 +703,7 @@
     <Folder Include="src\Font" />
     <Folder Include="src\Communication" />
     <Folder Include="src\Illuminance" />
+    <Folder Include="src\Overlay" />
     <Folder Include="src\Text" />
     <Folder Include="src\Pixels" />
     <Folder Include="src\Pixels\WS2812\" />
