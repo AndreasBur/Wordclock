@@ -34,7 +34,7 @@
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
 /* Text configuration parameter */
-#define TEXT_TASK_CYCLE_INIT_VALUE            5u
+#define TEXT_TASK_CYCLE_INIT_VALUE            1u
 #define TEXT_SUPPORT_FONT_5X8                 STD_ON
 #define TEXT_SUPPORT_FONT_7X9                 STD_ON
 #define TEXT_SUPPORT_FONT_7X10                STD_ON
@@ -160,9 +160,11 @@ class Text
     // get methods
     StateType getState() const { return State; }
     byte getTaskCycle() const { return TaskCycle; }
+    FontType getFontShift() const { return Shift.Font; }
 
     // set methods
     void setTaskCycle(byte Cycle) { TaskCycle = Cycle; }
+    void setFontShift(FontType Font) { if(isFontValid(Font)) { Shift.Font = Font; } }
 
     // methods
     static bool isFontValid(FontType sFont) { return sFont < FONT_NUMBER_OF_FONTS; }
@@ -174,6 +176,7 @@ class Text
     void setCharWithShift(char, FontType);
     void setText(const char*, FontType);
     void setTextWithShift(const char*, FontType);
+    void setTextWithShift(const char* Text) { setTextWithShift(Text, Shift.Font); }
     byte getFontHeight(FontType) const;
     byte getFontWidth(FontType) const;
     byte getFontCharWidth(FontType, char) const;

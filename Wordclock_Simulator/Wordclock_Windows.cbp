@@ -184,6 +184,7 @@
 		<Unit filename="Arduino/src/Font/FontLucidaSans9x10.cpp" />
 		<Unit filename="Arduino/src/Font/FontSprite5x8.cpp" />
 		<Unit filename="Arduino/src/Font/FontTahoma10x10.cpp" />
+		<Unit filename="Arduino/src/Overlay/Overlays.cpp" />
 		<Unit filename="Arduino/src/Scheduler/Scheduler.cpp" />
 		<Unit filename="Arduino/src/Text/Text.cpp" />
 		<Unit filename="Arduino/src/Transformation/Transformation.cpp" />

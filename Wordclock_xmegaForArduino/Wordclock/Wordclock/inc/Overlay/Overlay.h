@@ -24,6 +24,7 @@
 #include "Arduino.h"
 #include "ClockDateTime.h"
 #include "Text.h"
+#include "Scheduler.h"
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
@@ -73,9 +74,6 @@ template <typename Derived> class Overlay
     constexpr Overlay() { }
     ~Overlay() { }
 
-    byte convertSpeedToTaskCycle(byte Speed) const { return UINT8_MAX - Speed; }
-    byte convertTaskCycleToSpeed(byte TaskCylce) const { return UINT8_MAX - TaskCylce; }
-
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
@@ -93,12 +91,6 @@ template <typename Derived> class Overlay
     Derived& underlying() { return static_cast<Derived&>(*this); }
     Derived const& underlying() const { return static_cast<Derived const&>(*this); }
 
-    bool isShowTimerExpired(SecondType ShowTimerInSeconds) const { return ShowTimerInSeconds == 0u; }
-    SecondType decrementShowTimer(SecondType ShowTimerInSeconds) {
-        if(ShowTimerInSeconds > 0u) { return ShowTimerInSeconds - 1u; }
-        else { return 0u; }
-    }
-
     bool isPeriodValid(MinuteType Period) const { return Period > 0u; }
     bool isEnduranceValid(SecondType Endurance) const { return Endurance > 0u; }
     bool isDateSet() const { return (Month != 0u) || (Day != 0u); }
@@ -112,6 +104,7 @@ template <typename Derived> class Overlay
     bool isSecondMatching(SecondType CurrentSecond) const { return CurrentSecond == SecondToStartShow; }
     bool isDaySet() const { return Day != 0u; }
     bool isMonthSet() const { return Month != 0u; }
+    bool isValidInDaysSet() const { return ValidInDays != 0; }
     bool isNextYear(MonthType CurrentMonth) const { return CurrentMonth < Month; }
 
     bool isTimeMatching(MinuteType CurrentMinute, SecondType CurrentSecond) const { return isMinuteMatching(CurrentMinute) && isSecondMatching(CurrentSecond); }
@@ -119,17 +112,27 @@ template <typename Derived> class Overlay
         if(isDayAndMonthSet()) { return isDateMatchingDayAndMonthSet(CurrentMonth, CurrentDay); }
         if(isMonthSet()) { return isDateMatchingMonthSet(CurrentMonth); }
         if(isDaySet()) { return isDateMatchingDaySet(CurrentDay); }
+        return false;
     }
 
     bool isDateValid(ClockDate CurrentDate) const {
         YearType year = CurrentDate.getYear();
         if(isNextYear(CurrentDate.getMonth())) { year--;}
-        return CurrentDate.getPassedDays(year, Month, Day) < ValidInDays;
+        return CurrentDate.getPassedDays(year, Month, Day) <= ValidInDays;
+    }
+
+    SecondType checkDateAndSetStateToShow(SecondType ShowTimerInSeconds, ClockDate CurrentDate) {
+        if(isValidInDaysSet() && isDayAndMonthSet()) {
+            if(isDateValid(CurrentDate)) { return setStateToShow(); }
+        } else if(isDateMachtching(CurrentDate.getMonth(), CurrentDate.getDay())) {
+            return setStateToShow();
+        }
+        return ShowTimerInSeconds;
     }
 
     SecondType setStateToShow() {
         State = STATE_SHOW;
-        Text::getInstance().setTaskCycle(convertSpeedToTaskCycle(Speed));
+        Text::getInstance().setTaskCycle(Scheduler::convertSpeedToTaskCycle(Speed));
         underlying().setStateToShow();
         return EnduranceInSeconds;
     }
@@ -143,15 +146,11 @@ template <typename Derived> class Overlay
         return decrementShowTimer(ShowTimerInSeconds);
     }
 
-    SecondType checkTimeAndSetStateToShow(SecondType ShowTimerInSeconds, ClockTime CurrentTime) {
-        if(isTimeMatching(CurrentTime.getMinute(), CurrentTime.getSecond())) { return setStateToShow(); }
-        return ShowTimerInSeconds;
-    }
-
     SecondType idleTask(SecondType ShowTimerInSeconds, ClockDate CurrentDate, ClockTime CurrentTime) {
-        if(isDateSet()) {
-            if(isDateValid(CurrentDate)) { return checkTimeAndSetStateToShow(ShowTimerInSeconds, CurrentTime); }
-        } else { return checkTimeAndSetStateToShow(ShowTimerInSeconds, CurrentTime); }
+        if(isTimeMatching(CurrentTime.getMinute(), CurrentTime.getSecond())) {
+            if(isDateSet()) { return checkDateAndSetStateToShow(ShowTimerInSeconds, CurrentDate); }
+            else { return setStateToShow(); }
+        }
         return ShowTimerInSeconds;
     }
 
@@ -159,6 +158,13 @@ template <typename Derived> class Overlay
         if(isShowTimerExpired(ShowTimerInSeconds)) { setStateToIdle(); }
         return showTimerTask(ShowTimerInSeconds);
     }
+
+    bool isShowTimerExpired(SecondType ShowTimerInSeconds) const { return ShowTimerInSeconds == 0u; }
+    SecondType decrementShowTimer(SecondType ShowTimerInSeconds) {
+        if(ShowTimerInSeconds > 0u) { return ShowTimerInSeconds - 1u; }
+        else { return 0u; }
+    }
+
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S

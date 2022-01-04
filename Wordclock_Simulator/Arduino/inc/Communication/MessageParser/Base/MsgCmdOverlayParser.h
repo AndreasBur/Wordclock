@@ -84,6 +84,7 @@ template <typename Derived> class MsgCmdOverlayParser
         if(ParameterShortName == PeriodOptionShortName) { setPeriodInMinutes(Argument); }
         if(ParameterShortName == EnduranceOptionShortName) { setEnduranceInSeconds(Argument); }
         if(ParameterShortName == MonthOptionShortName) { underlying().setMonth(Argument); }
+        if(ParameterShortName == DayOptionShortName) { underlying().setDay(Argument); }
         if(ParameterShortName == ValidOptionShortName) { underlying().setValidInDays(Argument); }
         if(ParameterShortName == ActiveOptionShortName) { underlying().setIsActive(static_cast<bool>(Argument)); }
         if(ParameterShortName == SpeedOptionShortName) { underlying().setSpeed(Argument); }
@@ -94,18 +95,15 @@ template <typename Derived> class MsgCmdOverlayParser
         if(ParameterShortName == TextOptionShortName) { underlying().setText(Argument, Length); }
     }
 
-    void setPeriodInMinutes(MinuteType PeriodInMinutes)
-    {
+    void setPeriodInMinutes(MinuteType PeriodInMinutes) {
         StdReturnType returnValue = underlying().setPeriodInMinutes(PeriodInMinutes);
         MsgParameterParserType::Error.checkReturnValueAndSend(PeriodOptionShortName, returnValue, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNCE);
     }
-    void setEnduranceInSeconds(SecondType EnduranceInSeconds)
-    {
+    void setEnduranceInSeconds(SecondType EnduranceInSeconds) {
         StdReturnType returnValue = underlying().setEnduranceInSeconds(EnduranceInSeconds);
         MsgParameterParserType::Error.checkReturnValueAndSend(EnduranceOptionShortName, returnValue, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNCE);
     }
-    void setFont(FontType Font)
-    {
+    void setFont(FontType Font) {
         StdReturnType returnValue = underlying().setFont(Font);
         MsgParameterParserType::Error.checkReturnValueAndSend(FontOptionShortName, returnValue, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNCE);
 

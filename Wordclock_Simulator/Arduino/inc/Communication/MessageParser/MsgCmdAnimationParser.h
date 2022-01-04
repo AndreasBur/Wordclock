@@ -24,6 +24,7 @@
 #include "Arduino.h"
 #include "MsgParameterParser.h"
 #include "Animations.h"
+#include "Scheduler.h"
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
@@ -68,9 +69,6 @@ class MsgCmdAnimationParser : public MsgParameterParser<MsgCmdAnimationParser, M
     };
 
     // functions
-    byte convertSpeedToTaskCycle(byte Speed) const { return UINT8_MAX - Speed; }
-    byte convertTaskCycleToSpeed(byte TaskCylce) const { return UINT8_MAX - TaskCylce; }
-
     void handleParameter(char ParameterShortName, const char* Argument, PositionType Length) { }
     void handleParameter(char ParameterShortName, byte Argument)
     {
@@ -89,7 +87,7 @@ class MsgCmdAnimationParser : public MsgParameterParser<MsgCmdAnimationParser, M
     void sendAnswerSpeed(bool AppendSpace) const {
         AnimationIdType animation = Animations::getInstance().getAnimation();
         byte taskCylce = Animations::getInstance().getTaskCycle(animation);
-        sendAnswerParameter(SpeedOptionShortName, convertTaskCycleToSpeed(taskCylce), AppendSpace);
+        sendAnswerParameter(SpeedOptionShortName, Scheduler::convertTaskCycleToSpeed(taskCylce), AppendSpace);
     }
 
     void setAnimation() const
@@ -100,7 +98,7 @@ class MsgCmdAnimationParser : public MsgParameterParser<MsgCmdAnimationParser, M
 
     void setClockTaskCycle() const
     {
-        StdReturnType returnValue = Animations::getInstance().setTaskCycle(AnimationId, convertSpeedToTaskCycle(Speed));
+        StdReturnType returnValue = Animations::getInstance().setTaskCycle(AnimationId, Scheduler::convertSpeedToTaskCycle(Speed));
         Error.checkReturnValueAndSend(SpeedOptionShortName, returnValue, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNCE);
     }
 
@@ -111,7 +109,7 @@ class MsgCmdAnimationParser : public MsgParameterParser<MsgCmdAnimationParser, M
     MsgCmdAnimationParser(const char* Parameter) : MsgParameterParser(ParameterTable, Parameter), AnimationId(), Speed(0u)
     {
         AnimationId = Animations::getInstance().getAnimation();
-        Speed = convertTaskCycleToSpeed(Animations::getInstance().getTaskCycle(AnimationId));
+        Speed = Scheduler::convertTaskCycleToSpeed(Animations::getInstance().getTaskCycle(AnimationId));
     }
 
     ~MsgCmdAnimationParser() { }
