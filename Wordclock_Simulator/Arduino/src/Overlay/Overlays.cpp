@@ -50,7 +50,7 @@ Overlays::StateType Overlays::getState() const {
     if(isIdle()) { return OverlayType::STATE_IDLE; }
     if(isShow()) { return OverlayType::STATE_SHOW; }
     return OverlayType::STATE_DISABLED;
-}
+} /* getState */
 
 /******************************************************************************************************************************************************
   task()
