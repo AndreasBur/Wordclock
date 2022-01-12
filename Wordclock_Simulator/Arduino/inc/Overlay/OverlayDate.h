@@ -60,7 +60,10 @@ class OverlayDate : public Overlay<OverlayDate>
     char DateString[DateStringLength]{0u};
 
     // functions
-    void setStateToShow(ClockDate CurrentDate, ClockTime CurrentTime) { setDateString(CurrentDate); }
+    void setStateToShow(ClockDate CurrentDate, ClockTime CurrentTime) {
+        setDateString(CurrentDate);
+        setText();
+    }
     void setStateToIdle(ClockDate CurrentDate, ClockTime CurrentTime) { Text::getInstance().stop(); }
 
     void showTask() { if(Text::getInstance().getState() == Text::STATE_IDLE) { setText(); } }
