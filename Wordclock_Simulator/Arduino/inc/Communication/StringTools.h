@@ -93,6 +93,35 @@ class StringTools
         Destination[Length - 1u] = NullCharacter;
     }
 
+    static char* itoa(int32_t Number, char* String)
+    {
+        int32_t i, sign;
+
+        if ((sign = Number) < 0) { /* record sign */
+            Number = -Number;          /* make n positive */
+        }
+        i = 0;
+        do {       /* generate digits in reverse order */
+            String[i++] = Number % 10 + '0';   /* get next digit */
+        } while ((Number /= 10) > 0);     /* delete it */
+        if (sign < 0)
+            String[i++] = '-';
+        String[i] = '\0';
+        stringReverse(String);
+        return &String[i];
+    }
+
+    static stringReverse(char* String) {
+        unsigned int i, j;
+        char c;
+
+        for (i = 0, j = strlen(String)-1; i<j; i++, j--) {
+            c = String[i];
+            String[i] = String[j];
+            String[j] = c;
+        }
+    }
+
     template<typename Unsigned,
              typename std::enable_if_t<std::is_unsigned<Unsigned>::value, int> = 0,
              typename std::enable_if_t<std::is_integral<Unsigned>::value, int> = 0>

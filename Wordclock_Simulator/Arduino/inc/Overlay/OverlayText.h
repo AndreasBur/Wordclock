@@ -58,11 +58,11 @@ class OverlayText : public Overlay<OverlayText>
     char Text[OVERLAY_TEXT_TEXT_SIZE];
 
     // functions
-    void setStateToShow() { setText(); }
-    void setStateToIdle() { Text::getInstance().stop(); }
+    void setStateToShow(ClockDate CurrentDate, ClockTime CurrentTime) { setText(); }
+    void setStateToIdle(ClockDate CurrentDate, ClockTime CurrentTime) { Text::getInstance().stop(); }
 
     void showTask() { if(Text::getInstance().getState() == Text::STATE_IDLE) { setText(); } }
-    void setText() { Text::getInstance().setTextWithShift(Text, Text::FONT_10X10); }
+    void setText() { Text::getInstance().setTextWithShift(Text, getFont()); }
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
@@ -80,9 +80,9 @@ class OverlayText : public Overlay<OverlayText>
     void setText(const char* sText, LengthType Length) { StringTools::stringCopy(Text, sText, Length); }
 
 	// methods
-    SecondType task(SecondType ShowTimerInSeconds, ClockDate Date, ClockTime Time) {
+    SecondType task(SecondType ShowTimerInSeconds, ClockDate CurrentDate, ClockTime CurrentTime) {
         if(State == STATE_SHOW) { showTask(); }
-        return Overlay::task(ShowTimerInSeconds, Date, Time);
+        return Overlay::task(ShowTimerInSeconds, CurrentDate, CurrentTime);
     }
 };
 

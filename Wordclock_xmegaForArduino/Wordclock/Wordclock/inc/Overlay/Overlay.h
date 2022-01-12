@@ -121,25 +121,25 @@ template <typename Derived> class Overlay
         return CurrentDate.getPassedDays(year, Month, Day) <= ValidInDays;
     }
 
-    SecondType checkDateAndSetStateToShow(SecondType ShowTimerInSeconds, ClockDate CurrentDate) {
+    SecondType checkDateAndSetStateToShow(SecondType ShowTimerInSeconds, ClockDate CurrentDate, ClockTime CurrentTime) {
         if(isValidInDaysSet() && isDayAndMonthSet()) {
-            if(isDateValid(CurrentDate)) { return setStateToShow(); }
+            if(isDateValid(CurrentDate)) { return setStateToShow(CurrentDate, CurrentTime); }
         } else if(isDateMachtching(CurrentDate.getMonth(), CurrentDate.getDay())) {
-            return setStateToShow();
+            return setStateToShow(CurrentDate, CurrentTime);
         }
         return ShowTimerInSeconds;
     }
 
-    SecondType setStateToShow() {
+    SecondType setStateToShow(ClockDate CurrentDate, ClockTime CurrentTime) {
         State = STATE_SHOW;
         Text::getInstance().setTaskCycle(Scheduler::convertSpeedToTaskCycle(Speed));
-        underlying().setStateToShow();
+        underlying().setStateToShow(CurrentDate, CurrentTime);
         return EnduranceInSeconds;
     }
 
-    void setStateToIdle() {
+    void setStateToIdle(ClockDate CurrentDate, ClockTime CurrentTime) {
         State = STATE_IDLE;
-        underlying().setStateToIdle();
+        underlying().setStateToIdle(CurrentDate, CurrentTime);
     }
 
     SecondType showTimerTask(SecondType ShowTimerInSeconds) {
@@ -148,14 +148,14 @@ template <typename Derived> class Overlay
 
     SecondType idleTask(SecondType ShowTimerInSeconds, ClockDate CurrentDate, ClockTime CurrentTime) {
         if(isTimeMatching(CurrentTime.getMinute(), CurrentTime.getSecond())) {
-            if(isDateSet()) { return checkDateAndSetStateToShow(ShowTimerInSeconds, CurrentDate); }
-            else { return setStateToShow(); }
+            if(isDateSet()) { return checkDateAndSetStateToShow(ShowTimerInSeconds, CurrentDate, CurrentTime); }
+            else { return setStateToShow(CurrentDate, CurrentTime); }
         }
         return ShowTimerInSeconds;
     }
 
-    SecondType showTask(SecondType ShowTimerInSeconds) {
-        if(isShowTimerExpired(ShowTimerInSeconds)) { setStateToIdle(); }
+    SecondType showTask(SecondType ShowTimerInSeconds, ClockDate CurrentDate, ClockTime CurrentTime) {
+        if(isShowTimerExpired(ShowTimerInSeconds)) { setStateToIdle(CurrentDate, CurrentTime); }
         return showTimerTask(ShowTimerInSeconds);
     }
 
@@ -216,9 +216,9 @@ template <typename Derived> class Overlay
     void enableIsActive() { if(State == STATE_DISABLED) { State = STATE_IDLE; } }
     void disableIsActive() { State = STATE_DISABLED; }
 
-    SecondType task(SecondType ShowTimerInSeconds, ClockDate Date, ClockTime Time) {
-        if(State == STATE_IDLE) { return idleTask(ShowTimerInSeconds, Date, Time); }
-        if(State == STATE_SHOW) { return showTask(ShowTimerInSeconds); }
+    SecondType task(SecondType ShowTimerInSeconds, ClockDate CurrentDate, ClockTime CurrentTime) {
+        if(State == STATE_IDLE) { return idleTask(ShowTimerInSeconds, CurrentDate, CurrentTime); }
+        if(State == STATE_SHOW) { return showTask(ShowTimerInSeconds, CurrentDate, CurrentTime); }
         return 0u;
     }
 };

@@ -23,6 +23,7 @@
 #include "StandardTypes.h"
 #include "Arduino.h"
 #include "Overlay.h"
+#include <stdlib.h>
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
@@ -54,11 +55,31 @@ class OverlayDate : public Overlay<OverlayDate>
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
+    static constexpr byte DateStringLength{10u + 1u};
     friend class Overlay;
+    char DateString[DateStringLength]{0u};
 
     // functions
-    void setStateToShow() { }
-    void setStateToIdle() { }
+    void setStateToShow(ClockDate CurrentDate, ClockTime CurrentTime) { setDateString(CurrentDate); }
+    void setStateToIdle(ClockDate CurrentDate, ClockTime CurrentTime) { Text::getInstance().stop(); }
+
+    void showTask() { if(Text::getInstance().getState() == Text::STATE_IDLE) { setText(); } }
+    void setText() { Text::getInstance().setTextWithShift(DateString, getFont()); }
+
+    void setDateString(ClockDate CurrentDate) {
+        char* tmp = DateString;
+        dayToString(CurrentDate.getDay(), tmp);
+        tmp = checkDigitsAndAppendDot(CurrentDate.getDay(), tmp);
+        monthToString(CurrentDate.getMonth(), tmp);
+        tmp = checkDigitsAndAppendDot(CurrentDate.getMonth(), tmp);
+        yearToString(CurrentDate.getYear(), tmp);
+    }
+
+    char* dayToString(DayType Day, char* DayString) { return itoa(Day, DayString, 10u); }
+    char* monthToString(MonthType Month, char* MonthString) { return itoa(Month, MonthString, 10u); }
+    char* yearToString(YearType Year, char* YearString) { return itoa(Year, YearString, 10u); }
+    char* appendDot(char* String) { String[0u] = '.'; return &String[1u]; }
+    char* checkDigitsAndAppendDot(uint16_t Value, char* String) { return appendDot(&String[digitsOfNumber(Value)]); }
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
@@ -73,7 +94,10 @@ class OverlayDate : public Overlay<OverlayDate>
 	// set methods
 
 	// methods
-
+    SecondType task(SecondType ShowTimerInSeconds, ClockDate CurrentDate, ClockTime CurrentTime) {
+        if(State == STATE_SHOW) { showTask(); }
+        return Overlay::task(ShowTimerInSeconds, CurrentDate, CurrentTime);
+    }
 };
 
 #endif

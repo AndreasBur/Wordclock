@@ -54,11 +54,13 @@ class OverlayDate : public Overlay<OverlayDate>
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
+    static constexpr byte DateStringLength{11u};
     friend class Overlay;
+    char DateString[DateStringLength]{0u};
 
     // functions
-    void setStateToShow() { }
-    void setStateToIdle() { }
+    void setStateToShow(ClockDate CurrentDate, ClockTime CurrentTime) { }
+    void setStateToIdle(ClockDate CurrentDate, ClockTime CurrentTime) { }
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
