@@ -111,7 +111,7 @@ class StringTools
         return &String[i];
     }
 
-    static stringReverse(char* String) {
+    static void stringReverse(char* String) {
         unsigned int i, j;
         char c;
 

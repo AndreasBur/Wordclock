@@ -2,69 +2,9 @@
 <CodeBlocks_layout_file>
 	<FileVersion major="1" minor="0" />
 	<ActiveTarget name="Debug" />
-	<File name="Arduino\inc\Communication\MessageParser\MsgCmdAnimationParser.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="Arduino\inc\Communication\MessageParser\MsgCmdOverlayTemperatureParser.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="6358" topLine="82" />
-		</Cursor>
-	</File>
-	<File name="include\Pixels.h" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="2082" topLine="54" />
-		</Cursor>
-	</File>
-	<File name="Arduino\inc\Illuminance\Illuminance.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="3704" topLine="37" />
-		</Cursor>
-	</File>
-	<File name="Arduino\inc\Communication\MessageParser\MsgCmdDisplayPixelParser.h" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="0" topLine="133" />
-		</Cursor>
-	</File>
-	<File name="Arduino\inc\Transformation\Transformation.h" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="5100" topLine="70" />
-		</Cursor>
-	</File>
-	<File name="Arduino\src\Scheduler\Scheduler.cpp" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="5045" topLine="46" />
-		</Cursor>
-	</File>
-	<File name="Arduino\inc\Display\Display.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="6590" topLine="115" />
-		</Cursor>
-	</File>
-	<File name="include\BH1750.h" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="6479" topLine="70" />
-		</Cursor>
-	</File>
-	<File name="Arduino\inc\RealTimeClock\ClockDate.h" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="6648" topLine="137" />
-		</Cursor>
-	</File>
-	<File name="Arduino\src\Display\DisplayWords.cpp" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="5710" topLine="35" />
-		</Cursor>
-	</File>
-	<File name="Arduino\inc\Communication\MessageParser\MsgCmdRemoteProcedureCallParser.h" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="2903" topLine="29" />
-		</Cursor>
-	</File>
-	<File name="Arduino\inc\Communication\MessageParser\Base\MsgCmdOverlayParser.h" open="1" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="8206" topLine="92" />
-		</Cursor>
-	</File>
-	<File name="Arduino\inc\Font\FontLucidaSans9x10.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="0" topLine="51" />
+			<Cursor1 position="5694" topLine="68" />
 		</Cursor>
 	</File>
 	<File name="Arduino\inc\Communication\Message.h" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -72,14 +12,84 @@
 			<Cursor1 position="3107" topLine="71" />
 		</Cursor>
 	</File>
-	<File name="Arduino\src\Animation\AnimationDrop.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="Arduino\inc\Display\Display.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="0" topLine="144" />
+			<Cursor1 position="6590" topLine="115" />
 		</Cursor>
 	</File>
-	<File name="Arduino\inc\Display\DisplayPixels.h" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="Arduino\src\Font\FontCourierNew7x9.cpp" open="0" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="3169" topLine="75" />
+			<Cursor1 position="2754" topLine="25" />
+		</Cursor>
+	</File>
+	<File name="Arduino\inc\RealTimeClock\ClockDate.h" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="6648" topLine="137" />
+		</Cursor>
+	</File>
+	<File name="Arduino\inc\Communication\MessageParser\MsgCmdDisplayPixelParser.h" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="0" topLine="133" />
+		</Cursor>
+	</File>
+	<File name="Arduino\src\Communication\Communication.cpp" open="0" top="0" tabpos="13" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="4529" topLine="38" />
+		</Cursor>
+	</File>
+	<File name="Arduino\inc\Transformation\Transformation.h" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="5100" topLine="70" />
+		</Cursor>
+	</File>
+	<File name="Arduino\inc\Communication\MessageParser\MsgParameter.h" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="3397" topLine="25" />
+		</Cursor>
+	</File>
+	<File name="src\Pixels.cpp" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1277" topLine="228" />
+		</Cursor>
+	</File>
+	<File name="Arduino\src\Display\DisplayWords.cpp" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="5710" topLine="35" />
+		</Cursor>
+	</File>
+	<File name="Arduino\inc\Overlay\OverlayDate.h" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="4096" topLine="35" />
+		</Cursor>
+	</File>
+	<File name="Arduino\inc\Font\FontCourierNew7x9.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="0" topLine="57" />
+		</Cursor>
+	</File>
+	<File name="Arduino\inc\Communication\MessageParser\Base\MsgCmdBaseOverlayParser.h" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="1" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="4800" topLine="63" />
+		</Cursor>
+	</File>
+	<File name="WordclockApp.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="124" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="Arduino\src\Font\FontLucidaSans9x10.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="15108" topLine="123" />
+		</Cursor>
+	</File>
+	<File name="Arduino\inc\Text\Text.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="3946" topLine="106" />
+		</Cursor>
+	</File>
+	<File name="Arduino\inc\Display\DisplayWords.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="5312" topLine="91" />
 		</Cursor>
 	</File>
 	<File name="Arduino\inc\Communication\Communication.h" open="0" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -87,79 +97,9 @@
 			<Cursor1 position="4796" topLine="8" />
 		</Cursor>
 	</File>
-	<File name="Arduino\src\Animation\AnimationCube.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="include\Pixels.h" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="8098" topLine="138" />
-		</Cursor>
-	</File>
-	<File name="Arduino\inc\Font\FontChar.h" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="9230" topLine="49" />
-		</Cursor>
-	</File>
-	<File name="Arduino\src\Transformation\Transformation.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="8738" topLine="272" />
-		</Cursor>
-	</File>
-	<File name="Arduino\inc\Clock\Clock.h" open="0" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="7746" topLine="67" />
-		</Cursor>
-	</File>
-	<File name="Arduino\inc\Font\FontSprite5x8.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="3968" topLine="46" />
-		</Cursor>
-	</File>
-	<File name="Arduino\inc\Display\DisplayCharacters.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="8448" topLine="14" />
-		</Cursor>
-	</File>
-	<File name="Arduino\src\Animation\Animations.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="16025" topLine="10" />
-		</Cursor>
-	</File>
-	<File name="Arduino\inc\Communication\MessageParser\MsgCmdTimeParser.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="4417" topLine="83" />
-		</Cursor>
-	</File>
-	<File name="Arduino\src\Overlay\Overlays.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="6197" topLine="63" />
-		</Cursor>
-	</File>
-	<File name="Arduino\src\Clock\ClockWords.cpp" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="4873" topLine="75" />
-		</Cursor>
-	</File>
-	<File name="include\Arduino.h" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="111" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="Arduino\src\Clock\Clock.cpp" open="0" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="13538" topLine="207" />
-		</Cursor>
-	</File>
-	<File name="Arduino\inc\Communication\MessageParser\MsgCmdDisplayBrightnessParser.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="4422" topLine="65" />
-		</Cursor>
-	</File>
-	<File name="Arduino\inc\Animation\AnimationImplode.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="0" topLine="86" />
-		</Cursor>
-	</File>
-	<File name="include\RealTimeClock.h" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="4371" topLine="13" />
+			<Cursor1 position="2082" topLine="54" />
 		</Cursor>
 	</File>
 	<File name="Arduino\inc\Font\FontTahoma10x10.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -167,24 +107,49 @@
 			<Cursor1 position="4435" topLine="46" />
 		</Cursor>
 	</File>
-	<File name="Arduino\src\Font\FontSprite5x8.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="Arduino\inc\Display\DisplayPixels.h" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="2690" topLine="4" />
+			<Cursor1 position="3169" topLine="75" />
+		</Cursor>
+	</File>
+	<File name="Arduino\inc\StandardTypes\StandardTypes.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="10298" topLine="229" />
+		</Cursor>
+	</File>
+	<File name="Arduino\inc\Display\DisplayBrightness.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="5017" topLine="66" />
+		</Cursor>
+	</File>
+	<File name="Arduino\inc\Clock\Clock.h" open="0" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="7746" topLine="67" />
+		</Cursor>
+	</File>
+	<File name="Arduino\src\Display\Display.cpp" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="27218" topLine="547" />
+		</Cursor>
+	</File>
+	<File name="Arduino\inc\RealTimeClock\ClockTime.h" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="5578" topLine="82" />
 		</Cursor>
 	</File>
 	<File name="Arduino\inc\Communication\StringTools.h" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="4913" topLine="96" />
+			<Cursor1 position="5285" topLine="105" />
 		</Cursor>
 	</File>
-	<File name="Arduino\src\Animation\Animation.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="Arduino\inc\Animation\AnimationFade.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="4466" topLine="56" />
+			<Cursor1 position="0" topLine="62" />
 		</Cursor>
 	</File>
-	<File name="Arduino\src\Display\DisplayCharacters.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="Arduino\inc\Overlay\Overlay.h" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="0" topLine="57" />
+			<Cursor1 position="4632" topLine="47" />
 		</Cursor>
 	</File>
 	<File name="Arduino\inc\Communication\MessageParser\MsgCmdOverlayTextParser.h" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -192,14 +157,44 @@
 			<Cursor1 position="4990" topLine="59" />
 		</Cursor>
 	</File>
-	<File name="WordclockMain.cpp" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="Arduino\src\Scheduler\Scheduler.cpp" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="790" topLine="19" />
+			<Cursor1 position="5045" topLine="46" />
 		</Cursor>
 	</File>
-	<File name="Arduino\inc\RealTimeClock\ClockDateTime.h" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="Arduino\src\Animation\AnimationCube.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="3338" topLine="64" />
+			<Cursor1 position="8098" topLine="138" />
+		</Cursor>
+	</File>
+	<File name="include\RealTimeClock.h" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="4371" topLine="13" />
+		</Cursor>
+	</File>
+	<File name="Arduino\inc\Communication\MessageParser\MsgCmdParser.h" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="3454" topLine="53" />
+		</Cursor>
+	</File>
+	<File name="Arduino\src\Display\DisplayCharacters.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="0" topLine="57" />
+		</Cursor>
+	</File>
+	<File name="Arduino\inc\Illuminance\Illuminance.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="3704" topLine="37" />
+		</Cursor>
+	</File>
+	<File name="Arduino\inc\Communication\MessageParser\MsgCmdClockModeParser.h" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="4328" topLine="55" />
+		</Cursor>
+	</File>
+	<File name="Arduino\inc\Communication\MessageParser\MsgCmdAnimationParser.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="6358" topLine="82" />
 		</Cursor>
 	</File>
 	<File name="Arduino\src\Communication\MessageParser\MsgCmdParser.cpp" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -207,19 +202,169 @@
 			<Cursor1 position="4559" topLine="65" />
 		</Cursor>
 	</File>
+	<File name="Arduino\inc\Pixels\Pixel.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="5044" topLine="37" />
+		</Cursor>
+	</File>
+	<File name="WordclockMain.h" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="121" topLine="13" />
+		</Cursor>
+	</File>
+	<File name="Arduino\inc\Communication\MessageParser\MsgCmdTimeParser.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="4417" topLine="83" />
+		</Cursor>
+	</File>
+	<File name="Arduino\inc\Communication\MessageParser\Base\MsgCmdOverlayParser.h" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="8206" topLine="92" />
+		</Cursor>
+	</File>
+	<File name="Arduino\src\Animation\Animations.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="16025" topLine="10" />
+		</Cursor>
+	</File>
+	<File name="Arduino\inc\Display\DisplayCharacters.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="8448" topLine="14" />
+		</Cursor>
+	</File>
+	<File name="Arduino\inc\Bit\Bit.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="0" topLine="59" />
+		</Cursor>
+	</File>
+	<File name="Arduino\src\Font\FontTahoma10x10.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1503" topLine="125" />
+		</Cursor>
+	</File>
+	<File name="Arduino\inc\RealTimeClock\ClockDateTime.h" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="3338" topLine="64" />
+		</Cursor>
+	</File>
+	<File name="Arduino\inc\Communication\MessageParser\MsgCmdDisplayBrightnessParser.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="4422" topLine="65" />
+		</Cursor>
+	</File>
+	<File name="include\Arduino.h" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="111" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="Arduino\src\Clock\ClockWords.cpp" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="4873" topLine="75" />
+		</Cursor>
+	</File>
+	<File name="Arduino\inc\Overlay\OverlayText.h" open="0" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="3644" topLine="27" />
+		</Cursor>
+	</File>
+	<File name="Arduino\inc\Communication\MessageParser\MsgCmdDateParser.h" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="4398" topLine="104" />
+		</Cursor>
+	</File>
+	<File name="Arduino\inc\Animation\AnimationImplode.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="0" topLine="86" />
+		</Cursor>
+	</File>
+	<File name="Arduino\src\Animation\AnimationImplode.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="0" topLine="105" />
+		</Cursor>
+	</File>
+	<File name="Arduino\inc\Scheduler\Scheduler.h" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="4535" topLine="53" />
+		</Cursor>
+	</File>
+	<File name="Arduino\inc\Font\FontLucidaSans9x10.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="0" topLine="51" />
+		</Cursor>
+	</File>
+	<File name="include\BH1750.h" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="6479" topLine="70" />
+		</Cursor>
+	</File>
+	<File name="Arduino\src\Font\FontSprite5x8.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2690" topLine="4" />
+		</Cursor>
+	</File>
+	<File name="Arduino\inc\Overlay\Overlays.h" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="6633" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="Arduino\inc\Font\FontCourierNew7x10.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="4554" topLine="55" />
+		</Cursor>
+	</File>
+	<File name="Arduino\inc\Animation\Animation.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="4652" topLine="71" />
+		</Cursor>
+	</File>
+	<File name="Arduino\src\Clock\Clock.cpp" open="0" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="13538" topLine="207" />
+		</Cursor>
+	</File>
+	<File name="Arduino\src\Animation\AnimationDrop.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="0" topLine="144" />
+		</Cursor>
+	</File>
+	<File name="Arduino\inc\Display\DisplayWord.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="4167" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="Arduino\inc\Clock\ClockWords.h" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="5241" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="Arduino\src\Transformation\Transformation.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="8738" topLine="272" />
+		</Cursor>
+	</File>
+	<File name="Arduino\inc\Font\FontSprite5x8.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="3968" topLine="46" />
+		</Cursor>
+	</File>
 	<File name="Arduino\inc\Communication\MessageParser\MsgCmdDisplayColorParser.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="6113" topLine="84" />
 		</Cursor>
 	</File>
-	<File name="Arduino\inc\Overlay\Overlay.h" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="Arduino\inc\Animation\AnimationExplode.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="10878" topLine="125" />
+			<Cursor1 position="0" topLine="15" />
 		</Cursor>
 	</File>
-	<File name="Arduino\src\Communication\Communication.cpp" open="0" top="0" tabpos="13" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="Arduino\src\Text\Text.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="4529" topLine="38" />
+			<Cursor1 position="8153" topLine="145" />
+		</Cursor>
+	</File>
+	<File name="Arduino\src\Animation\AnimationCursor.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="0" topLine="68" />
 		</Cursor>
 	</File>
 	<File name="Arduino\inc\DisplayManager\DisplayManager.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -232,59 +377,34 @@
 			<Cursor1 position="9407" topLine="225" />
 		</Cursor>
 	</File>
+	<File name="Arduino\inc\GammaCorrection\GammaCorrection.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="3751" topLine="48" />
+		</Cursor>
+	</File>
 	<File name="WordclockApp.cpp" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="537" topLine="3" />
 		</Cursor>
 	</File>
-	<File name="Arduino\inc\Overlay\Overlays.h" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="WordclockMain.cpp" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="6633" topLine="177" />
+			<Cursor1 position="790" topLine="19" />
 		</Cursor>
 	</File>
-	<File name="Arduino\src\Text\Text.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="Arduino\inc\Communication\MessageParser\MsgCmdRemoteProcedureCallParser.h" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="8153" topLine="145" />
+			<Cursor1 position="2903" topLine="29" />
 		</Cursor>
 	</File>
-	<File name="Arduino\inc\Display\DisplayWord.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="Arduino\src\Overlay\Overlays.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="4167" topLine="0" />
+			<Cursor1 position="6197" topLine="63" />
 		</Cursor>
 	</File>
-	<File name="Arduino\inc\Communication\MessageParser\Base\MsgParameterParser.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="Arduino\inc\Overlay\OverlayTemperature.h" open="1" top="1" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="5708" topLine="184" />
-		</Cursor>
-	</File>
-	<File name="src\Pixels.cpp" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="1277" topLine="228" />
-		</Cursor>
-	</File>
-	<File name="Arduino\inc\Overlay\OverlayDate.h" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="4070" topLine="44" />
-		</Cursor>
-	</File>
-	<File name="Arduino\src\Font\FontCourierNew7x9.cpp" open="0" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="2754" topLine="25" />
-		</Cursor>
-	</File>
-	<File name="Arduino\inc\Communication\MessageParser\MsgCmdDateParser.h" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="4398" topLine="104" />
-		</Cursor>
-	</File>
-	<File name="Arduino\inc\Animation\AnimationFade.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="0" topLine="62" />
-		</Cursor>
-	</File>
-	<File name="Arduino\inc\GammaCorrection\GammaCorrection.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="3751" topLine="48" />
+			<Cursor1 position="4172" topLine="0" />
 		</Cursor>
 	</File>
 	<File name="Arduino\inc\Communication\MessageParser\MsgCmdOverlayDateParser.h" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -292,49 +412,9 @@
 			<Cursor1 position="4626" topLine="24" />
 		</Cursor>
 	</File>
-	<File name="Arduino\inc\Communication\MessageParser\Base\MsgCmdBaseOverlayParser.h" open="1" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="1" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="4800" topLine="63" />
-		</Cursor>
-	</File>
-	<File name="Arduino\inc\Font\FontCourierNew7x9.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="0" topLine="57" />
-		</Cursor>
-	</File>
 	<File name="Arduino\inc\Communication\ErrorMessage.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="5128" topLine="39" />
-		</Cursor>
-	</File>
-	<File name="WordclockMain.h" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="121" topLine="13" />
-		</Cursor>
-	</File>
-	<File name="Arduino\inc\Pixels\Pixel.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="5044" topLine="37" />
-		</Cursor>
-	</File>
-	<File name="Arduino\inc\Font\FontCourierNew7x10.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="4554" topLine="55" />
-		</Cursor>
-	</File>
-	<File name="Arduino\inc\Clock\ClockWords.h" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="5241" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="Arduino\inc\RealTimeClock\ClockTime.h" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="5578" topLine="82" />
-		</Cursor>
-	</File>
-	<File name="Arduino\inc\Display\DisplayWords.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="5312" topLine="91" />
 		</Cursor>
 	</File>
 	<File name="Arduino\src\Font\FontCourierNew7x10.cpp" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -342,99 +422,19 @@
 			<Cursor1 position="15483" topLine="160" />
 		</Cursor>
 	</File>
-	<File name="Arduino\inc\Bit\Bit.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="Arduino\src\Animation\Animation.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="0" topLine="59" />
+			<Cursor1 position="4466" topLine="56" />
 		</Cursor>
 	</File>
-	<File name="Arduino\inc\StandardTypes\StandardTypes.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="Arduino\inc\Font\FontChar.h" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="10298" topLine="229" />
+			<Cursor1 position="9230" topLine="49" />
 		</Cursor>
 	</File>
-	<File name="Arduino\inc\Communication\MessageParser\MsgCmdOverlayTemperatureParser.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="Arduino\inc\Communication\MessageParser\Base\MsgParameterParser.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="5694" topLine="68" />
-		</Cursor>
-	</File>
-	<File name="Arduino\src\Display\Display.cpp" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="27218" topLine="547" />
-		</Cursor>
-	</File>
-	<File name="Arduino\inc\Overlay\OverlayTemperature.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="4172" topLine="42" />
-		</Cursor>
-	</File>
-	<File name="Arduino\src\Animation\AnimationImplode.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="0" topLine="105" />
-		</Cursor>
-	</File>
-	<File name="Arduino\src\Animation\AnimationCursor.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="0" topLine="68" />
-		</Cursor>
-	</File>
-	<File name="Arduino\src\Font\FontTahoma10x10.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="1503" topLine="125" />
-		</Cursor>
-	</File>
-	<File name="Arduino\inc\Communication\MessageParser\MsgCmdClockModeParser.h" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="4328" topLine="55" />
-		</Cursor>
-	</File>
-	<File name="Arduino\inc\Animation\AnimationExplode.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="0" topLine="15" />
-		</Cursor>
-	</File>
-	<File name="Arduino\inc\Text\Text.h" open="1" top="1" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="3946" topLine="76" />
-		</Cursor>
-	</File>
-	<File name="Arduino\src\Font\FontLucidaSans9x10.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="15108" topLine="123" />
-		</Cursor>
-	</File>
-	<File name="Arduino\inc\Communication\MessageParser\MsgCmdParser.h" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="3454" topLine="53" />
-		</Cursor>
-	</File>
-	<File name="Arduino\inc\Animation\Animation.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="4652" topLine="71" />
-		</Cursor>
-	</File>
-	<File name="Arduino\inc\Scheduler\Scheduler.h" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="4535" topLine="53" />
-		</Cursor>
-	</File>
-	<File name="Arduino\inc\Communication\MessageParser\MsgParameter.h" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="3397" topLine="25" />
-		</Cursor>
-	</File>
-	<File name="WordclockApp.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="124" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="Arduino\inc\Overlay\OverlayText.h" open="0" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="3644" topLine="48" />
-		</Cursor>
-	</File>
-	<File name="Arduino\inc\Display\DisplayBrightness.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="5017" topLine="66" />
+			<Cursor1 position="5708" topLine="184" />
 		</Cursor>
 	</File>
 </CodeBlocks_layout_file>

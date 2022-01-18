@@ -55,8 +55,8 @@ class OverlayDate : public Overlay<OverlayDate>
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    static constexpr byte DateStringLength{10u + 1u};
     friend class Overlay;
+    static constexpr byte DateStringLength{10u + 1u};
     char DateString[DateStringLength]{0u};
 
     // functions
@@ -71,16 +71,13 @@ class OverlayDate : public Overlay<OverlayDate>
 
     void setDateString(ClockDate CurrentDate) {
         char* tmp = DateString;
-        dayToString(CurrentDate.getDay(), tmp);
+        itoa(CurrentDate.getDay(), tmp, 10u);
         tmp = checkDigitsAndAppendDot(CurrentDate.getDay(), tmp);
-        monthToString(CurrentDate.getMonth(), tmp);
+        itoa(CurrentDate.getMonth(), tmp, 10u);
         tmp = checkDigitsAndAppendDot(CurrentDate.getMonth(), tmp);
-        yearToString(CurrentDate.getYear(), tmp);
+        itoa(CurrentDate.getYear(), tmp, 10u);
     }
 
-    char* dayToString(DayType Day, char* DayString) { return itoa(Day, DayString, 10u); }
-    char* monthToString(MonthType Month, char* MonthString) { return itoa(Month, MonthString, 10u); }
-    char* yearToString(YearType Year, char* YearString) { return itoa(Year, YearString, 10u); }
     char* appendDot(char* String) { String[0u] = '.'; return &String[1u]; }
     char* checkDigitsAndAppendDot(uint16_t Value, char* String) { return appendDot(&String[digitsOfNumber(Value)]); }
 
