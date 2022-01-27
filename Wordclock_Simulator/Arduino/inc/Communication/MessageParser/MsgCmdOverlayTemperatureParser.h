@@ -85,10 +85,10 @@ class MsgCmdOverlayTemperatureParser : public MsgCmdOverlayParser<MsgCmdOverlayT
     void setSpeed(byte Speed) { Overlays::getInstance().setTemperatureSpeed(Speed); }
     StdReturnType setFont(FontType Font) { return Overlays::getInstance().setTemperatureFont(Font); }
     void setIsActive(bool IsActive) { Overlays::getInstance().setTemperatureIsActive(IsActive); }
-    void setText(const char* Text, LengthType Length) { }
+    void setText(const char* Text, LengthType Length) { UNUSED(Text); UNUSED(Length); }
 
-    void sendAnswerText(bool AppendSpace) const {}
-    void sendAnswerSpeedText(bool AppendSpace) const {}
+    void sendAnswerText(bool AppendSpace) const { UNUSED(AppendSpace); }
+    void sendAnswerSpeedText(bool AppendSpace) const { UNUSED(AppendSpace); }
 
 };
 

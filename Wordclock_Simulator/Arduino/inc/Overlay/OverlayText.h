@@ -58,8 +58,8 @@ class OverlayText : public Overlay<OverlayText>
     char Text[OVERLAY_TEXT_TEXT_SIZE];
 
     // functions
-    void setStateToShow(ClockDate CurrentDate, ClockTime CurrentTime) { setText(); }
-    void setStateToIdle(ClockDate CurrentDate, ClockTime CurrentTime) { Text::getInstance().stop(); }
+    void setStateToShow(ClockDate CurrentDate, ClockTime CurrentTime) { setText(); UNUSED(CurrentDate); UNUSED(CurrentTime); }
+    void setStateToIdle(ClockDate CurrentDate, ClockTime CurrentTime) { Text::getInstance().stop(); UNUSED(CurrentDate); UNUSED(CurrentTime); }
 
     void showTask() { if(Text::getInstance().getState() == Text::STATE_IDLE) { setText(); } }
     void setText() { Text::getInstance().setTextWithShift(Text, getFont()); }

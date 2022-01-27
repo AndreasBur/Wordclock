@@ -21,9 +21,11 @@ bool WordclockApp::OnInit()
 void WordclockApp::OnClose(wxCloseEvent &event)
 {
     Timer.Stop();
+    UNUSED(event);
 }
 
 void WordclockApp::OnTimer(wxTimerEvent& event)
 {
     Wordclock.task();
+    UNUSED(event);
 }

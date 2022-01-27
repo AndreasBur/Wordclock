@@ -24543,25 +24543,25 @@ LOAD C:/Program Files/CodeBlocks/MinGW/bin/../lib/gcc/x86_64-w64-mingw32/8.1.0/c
  .debug_line    0x000000000117371e     0x1463 obj\Debug\Windows\Arduino\src\Clock\Clock.o
  .debug_line    0x0000000001174b81     0x12c9 obj\Debug\Windows\Arduino\src\Clock\ClockWords.o
  .debug_line    0x0000000001175e4a     0x27d9 obj\Debug\Windows\Arduino\src\Communication\Communication.o
- .debug_line    0x0000000001178623     0x9773 obj\Debug\Windows\Arduino\src\Communication\MessageParser\MsgCmdParser.o
- .debug_line    0x0000000001181d96     0x2545 obj\Debug\Windows\Arduino\src\Display\Display.o
- .debug_line    0x00000000011842db      0xffb obj\Debug\Windows\Arduino\src\Display\DisplayCharacters.o
- .debug_line    0x00000000011852d6     0x1059 obj\Debug\Windows\Arduino\src\Display\DisplayWords.o
- .debug_line    0x000000000118632f      0xe8f obj\Debug\Windows\Arduino\src\DisplayManager\DisplayManager.o
- .debug_line    0x00000000011871be      0xec2 obj\Debug\Windows\Arduino\src\Font\FontCourierNew7x10.o
- .debug_line    0x0000000001188080      0xec0 obj\Debug\Windows\Arduino\src\Font\FontCourierNew7x9.o
- .debug_line    0x0000000001188f40      0xec2 obj\Debug\Windows\Arduino\src\Font\FontLucidaSans9x10.o
- .debug_line    0x0000000001189e02      0xeb8 obj\Debug\Windows\Arduino\src\Font\FontSprite5x8.o
- .debug_line    0x000000000118acba      0xebc obj\Debug\Windows\Arduino\src\Font\FontTahoma10x10.o
- .debug_line    0x000000000118bb76     0x2a50 obj\Debug\Windows\Arduino\src\Overlay\Overlays.o
- .debug_line    0x000000000118e5c6     0x177d obj\Debug\Windows\Arduino\src\Scheduler\Scheduler.o
- .debug_line    0x000000000118fd43     0x232a obj\Debug\Windows\Arduino\src\Text\Text.o
- .debug_line    0x000000000119206d     0x1614 obj\Debug\Windows\Arduino\src\Transformation\Transformation.o
- .debug_line    0x0000000001193681     0x6f8a obj\Debug\Windows\src\Pixels.o
- .debug_line    0x000000000119a60b     0x27dd obj\Debug\Windows\WordclockApp.o
- .debug_line    0x000000000119cde8     0x194b obj\Debug\Windows\WordclockMain.o
- .debug_line    0x000000000119e733       0x7b C:/Program Files/CodeBlocks/MinGW/bin/../lib/gcc/x86_64-w64-mingw32/8.1.0/libgcc.a(_chkstk_ms.o)
- .debug_line    0x000000000119e7ae      0x1a7 C:/Program Files/CodeBlocks/MinGW/bin/../lib/gcc/x86_64-w64-mingw32/8.1.0/libgcc.a(_ctors.o)
+ .debug_line    0x0000000001178623     0x977b obj\Debug\Windows\Arduino\src\Communication\MessageParser\MsgCmdParser.o
+ .debug_line    0x0000000001181d9e     0x2545 obj\Debug\Windows\Arduino\src\Display\Display.o
+ .debug_line    0x00000000011842e3      0xffb obj\Debug\Windows\Arduino\src\Display\DisplayCharacters.o
+ .debug_line    0x00000000011852de     0x1059 obj\Debug\Windows\Arduino\src\Display\DisplayWords.o
+ .debug_line    0x0000000001186337      0xe8f obj\Debug\Windows\Arduino\src\DisplayManager\DisplayManager.o
+ .debug_line    0x00000000011871c6      0xec2 obj\Debug\Windows\Arduino\src\Font\FontCourierNew7x10.o
+ .debug_line    0x0000000001188088      0xec0 obj\Debug\Windows\Arduino\src\Font\FontCourierNew7x9.o
+ .debug_line    0x0000000001188f48      0xec2 obj\Debug\Windows\Arduino\src\Font\FontLucidaSans9x10.o
+ .debug_line    0x0000000001189e0a      0xeb8 obj\Debug\Windows\Arduino\src\Font\FontSprite5x8.o
+ .debug_line    0x000000000118acc2      0xebc obj\Debug\Windows\Arduino\src\Font\FontTahoma10x10.o
+ .debug_line    0x000000000118bb7e     0x2a51 obj\Debug\Windows\Arduino\src\Overlay\Overlays.o
+ .debug_line    0x000000000118e5cf     0x177d obj\Debug\Windows\Arduino\src\Scheduler\Scheduler.o
+ .debug_line    0x000000000118fd4c     0x232a obj\Debug\Windows\Arduino\src\Text\Text.o
+ .debug_line    0x0000000001192076     0x1614 obj\Debug\Windows\Arduino\src\Transformation\Transformation.o
+ .debug_line    0x000000000119368a     0x6f8e obj\Debug\Windows\src\Pixels.o
+ .debug_line    0x000000000119a618     0x27dd obj\Debug\Windows\WordclockApp.o
+ .debug_line    0x000000000119cdf5     0x194b obj\Debug\Windows\WordclockMain.o
+ .debug_line    0x000000000119e740       0x7b C:/Program Files/CodeBlocks/MinGW/bin/../lib/gcc/x86_64-w64-mingw32/8.1.0/libgcc.a(_chkstk_ms.o)
+ .debug_line    0x000000000119e7bb      0x1a7 C:/Program Files/CodeBlocks/MinGW/bin/../lib/gcc/x86_64-w64-mingw32/8.1.0/libgcc.a(_ctors.o)
 
 .zdebug_line
  *(.zdebug_line)

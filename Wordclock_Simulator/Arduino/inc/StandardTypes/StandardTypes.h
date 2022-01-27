@@ -42,6 +42,8 @@
 #define STD_NOP_8               STD_NOP_4 STD_NOP_4
 #define STD_NOP_16              STD_NOP_8 STD_NOP_8
 
+/* Dummy statement to prevent compiler warnings unused parameter */
+#define UNUSED(x) (void)(x)
 
 /******************************************************************************************************************************************************
  *  GLOBAL FUNCTION MACROS

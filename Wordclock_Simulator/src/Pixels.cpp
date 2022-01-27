@@ -132,6 +132,7 @@ void Pixels::OnClose(wxCloseEvent &event)
     //wxTheApp->GetTopWindow()->Destroy();
     //wxTheApp->GetTopWindow()->Close();
     Destroy();
+    UNUSED(event);
 }
 
 //void Pixels::OnCreateInput(wxCommandEvent &event)
@@ -144,11 +145,13 @@ void Pixels::OnSend(wxCommandEvent &event)
     if(SendBuffer.IsEmpty()) {
         SendBuffer = Input->GetValue() + _T("\n");
     }
+    UNUSED(event);
 }
 
 void Pixels::OnClear(wxCommandEvent &event)
 {
     Output->Clear();
+    UNUSED(event);
 }
 
 void Pixels::OnQuit(wxCommandEvent &event)
@@ -157,11 +160,13 @@ void Pixels::OnQuit(wxCommandEvent &event)
     //wxTheApp->AddPendingEvent(wxCloseEvent());
     //wxTheApp->GetTopWindow()->Destroy();
     Destroy();
+    UNUSED(event);
 }
 
 void Pixels::OnAbout(wxCommandEvent &event)
 {
     wxMessageBox(_("Copyright Andreas Burnickl\nWordclock Simulator"));
+    UNUSED(event);
 }
 
 
@@ -316,6 +321,7 @@ void Pixels::setBrightness(byte sBrightness, bool GammaCorrection)
             }
         }
     }
+    UNUSED(GammaCorrection);
 }
 
 char Pixels::read()

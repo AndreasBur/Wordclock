@@ -85,10 +85,10 @@ class MsgCmdOverlayDateParser : public MsgCmdOverlayParser<MsgCmdOverlayDatePars
     void setSpeed(byte Speed) { Overlays::getInstance().setDateSpeed(Speed); }
     StdReturnType setFont(FontType Font) { return Overlays::getInstance().setDateFont(Font); }
     void setIsActive(bool IsActive) { Overlays::getInstance().setDateIsActive(IsActive); }
-    void setText(const char* Text, LengthType Length) { }
+    void setText(const char* Text, LengthType Length) { UNUSED(Text); UNUSED(Length); }
 
-    void sendAnswerText(bool AppendSpace) const {}
-    void sendAnswerSpeedText(bool AppendSpace) const {}
+    void sendAnswerText(bool AppendSpace) const { UNUSED(AppendSpace); }
+    void sendAnswerSpeedText(bool AppendSpace) const { UNUSED(AppendSpace); }
 
 };
 

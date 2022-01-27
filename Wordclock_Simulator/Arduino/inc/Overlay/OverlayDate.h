@@ -63,8 +63,13 @@ class OverlayDate : public Overlay<OverlayDate>
     void setStateToShow(ClockDate CurrentDate, ClockTime CurrentTime) {
         setDateString(CurrentDate);
         setText();
+        UNUSED(CurrentTime);
     }
-    void setStateToIdle(ClockDate CurrentDate, ClockTime CurrentTime) { Text::getInstance().stop(); }
+    void setStateToIdle(ClockDate CurrentDate, ClockTime CurrentTime) {
+        Text::getInstance().stop();
+        UNUSED(CurrentDate);
+        UNUSED(CurrentTime);
+    }
 
     void showTask() { if(Text::getInstance().getState() == Text::STATE_IDLE) { setText(); } }
     void setText() { Text::getInstance().setTextWithShift(DateString, getFont()); }
