@@ -23,7 +23,7 @@
 #include "StandardTypes.h"
 #include "Arduino.h"
 #include "Overlay.h"
-#include <stdlib.h>
+//#include <stdlib.h>
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S

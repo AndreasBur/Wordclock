@@ -16,7 +16,7 @@
     <Name>Wordclock</Name>
     <RootNamespace>Wordclock</RootNamespace>
     <ArduinoIdeDir>C:\Program Files (x86)\Arduino</ArduinoIdeDir>
-    <ToolchainFlavour>avr-gcc-10.1.0-x64-windows</ToolchainFlavour>
+    <ToolchainFlavour>avr-gcc-11.1.0-x64-windows</ToolchainFlavour>
     <KeepTimersRunning>true</KeepTimersRunning>
     <OverrideVtor>false</OverrideVtor>
     <CacheFlash>true</CacheFlash>

@@ -69,7 +69,7 @@ class MsgCmdAnimationParser : public MsgParameterParser<MsgCmdAnimationParser, M
     };
 
     // functions
-    void handleParameter(char ParameterShortName, const char* Argument, PositionType Length) { }
+    void handleParameter(char ParameterShortName, const char* Argument, PositionType Length) { UNUSED(ParameterShortName); UNUSED(Argument); UNUSED(Length); }
     void handleParameter(char ParameterShortName, byte Argument)
     {
         if(ParameterShortName == AnimationOptionShortName) {

@@ -8,8 +8,8 @@ WordclockMain::WordclockMain()
     strcpy(Text, "Andreas");
     //Timer.Start(100);
     Time = wxDateTime::Now();
-    int Hour = Time.GetHour();
-    int Minute = Time.GetMinute();
+    //int Hour = Time.GetHour();
+    //int Minute = Time.GetMinute();
     //Clock::getInstance().setTime(10, 15);
     //Display::getInstance().setWord(DisplayWords::WORD_UHR);
     //Display::getInstance().setWord(DisplayWords::WORD_HOUR_ACHT);

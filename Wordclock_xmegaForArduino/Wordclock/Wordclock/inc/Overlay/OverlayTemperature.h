@@ -58,8 +58,8 @@ class OverlayTemperature : public Overlay<OverlayTemperature>
     friend class Overlay;
 
     // functions
-    void setStateToShow(ClockDate CurrentDate, ClockTime CurrentTime) { }
-    void setStateToIdle(ClockDate CurrentDate, ClockTime CurrentTime) { }
+    void setStateToShow(ClockDate CurrentDate, ClockTime CurrentTime) { UNUSED(CurrentDate); UNUSED(CurrentTime); }
+    void setStateToIdle(ClockDate CurrentDate, ClockTime CurrentTime) { UNUSED(CurrentDate); UNUSED(CurrentTime); }
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
