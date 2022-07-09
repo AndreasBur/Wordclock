@@ -173,6 +173,10 @@ class ClockDate
             return 31u;
         }
 	}
+
+//	RataDieDayType getPassedDays(YearType sYear, MonthType sMonth, DayType sDay) {
+//        return abs(static_cast<int64_t>(getRataDieDay(sYear, sMonth, sDay)) - getRataDieDay(Year, Month, Day));
+//	}
 };
 
 #endif

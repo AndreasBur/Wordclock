@@ -123,8 +123,8 @@ class StringTools
     }
 
     template<typename Unsigned,
-             std::enable_if_t<std::is_unsigned<Unsigned>::value, int> = 0,
-             std::enable_if_t<std::is_integral<Unsigned>::value, int> = 0>
+             std::enable_if_t<std::is_unsigned<Unsigned>::value>* = nullptr,
+             std::enable_if_t<std::is_integral<Unsigned>::value>* = nullptr>
     static ResultType stringTo(const char* String, PositionType& Position, Unsigned& Value, uint8_t Base = 10u) {
         char* end = nullptr;
         errno = 0;
@@ -143,8 +143,8 @@ class StringTools
     }
 
     template<typename Signed,
-             std::enable_if_t<std::is_signed<Signed>::value, int> = 0,
-             std::enable_if_t<std::is_integral<Signed>::value, int> = 0>
+             std::enable_if_t<std::is_signed<Signed>::value>* = nullptr,
+             std::enable_if_t<std::is_integral<Signed>::value>* = nullptr>
     static ResultType stringTo(const char* String, PositionType& Position, Signed& Value, uint8_t Base = 10u) {
         char* end = nullptr;
         errno = 0;
@@ -164,7 +164,7 @@ class StringTools
     }
 
     template<typename Float,
-             std::enable_if_t<std::is_floating_point<Float>::value, int> = 0>
+             std::enable_if_t<std::is_floating_point<Float>::value>* = nullptr>
     static ResultType stringTo(const char* String, PositionType& Position, Float& Value, uint8_t Base = 10u) {
         char* end = nullptr;
         errno = 0;

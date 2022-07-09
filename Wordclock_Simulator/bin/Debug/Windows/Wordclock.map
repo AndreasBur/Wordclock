@@ -8717,12 +8717,12 @@ LOAD C:/Program Files/CodeBlocks/MinGW/bin/../lib/gcc/x86_64-w64-mingw32/8.1.0/c
  .text$_ZN11StringTools10stringCopyEPcPKci
                 0x0000000000412de0       0x50 obj\Debug\Windows\Arduino\src\Communication\MessageParser\MsgCmdParser.o
                 0x0000000000412de0                StringTools::stringCopy(char*, char const*, int)
- .text$_ZN11StringTools8stringToIhLi0ELi0EEENS_10ResultTypeEPKcRhRT_h
+ .text$_ZN11StringTools8stringToIhLPv0ELS1_0EEENS_10ResultTypeEPKcRhRT_h
                 0x0000000000412e30       0xd0 obj\Debug\Windows\Arduino\src\Communication\MessageParser\MsgCmdParser.o
-                0x0000000000412e30                StringTools::ResultType StringTools::stringTo<unsigned char, 0, 0>(char const*, unsigned char&, unsigned char&, unsigned char)
- .text$_ZN11StringTools8stringToItLi0ELi0EEENS_10ResultTypeEPKcRhRT_h
+                0x0000000000412e30                StringTools::ResultType StringTools::stringTo<unsigned char, (void*)0, (void*)0>(char const*, unsigned char&, unsigned char&, unsigned char)
+ .text$_ZN11StringTools8stringToItLPv0ELS1_0EEENS_10ResultTypeEPKcRhRT_h
                 0x0000000000412f00       0xd0 obj\Debug\Windows\Arduino\src\Communication\MessageParser\MsgCmdParser.o
-                0x0000000000412f00                StringTools::ResultType StringTools::stringTo<unsigned short, 0, 0>(char const*, unsigned char&, unsigned short&, unsigned char)
+                0x0000000000412f00                StringTools::ResultType StringTools::stringTo<unsigned short, (void*)0, (void*)0>(char const*, unsigned char&, unsigned short&, unsigned char)
  .text$_ZN11wxAnyButtonC2Ev
                 0x0000000000412fd0       0x50 obj\Debug\Windows\src\Pixels.o
                 0x0000000000412fd0                wxAnyButton::wxAnyButton()
@@ -16159,13 +16159,13 @@ LOAD C:/Program Files/CodeBlocks/MinGW/bin/../lib/gcc/x86_64-w64-mingw32/8.1.0/c
                 0x000000000043c1f8        0xc obj\Debug\Windows\Arduino\src\Communication\MessageParser\MsgCmdParser.o
  .pdata$_ZNKSt5arrayI12MsgParameterLy1EEixEy
                 0x000000000043c204        0xc obj\Debug\Windows\Arduino\src\Communication\MessageParser\MsgCmdParser.o
- .pdata$_ZN11StringTools8stringToIhLi0ELi0EEENS_10ResultTypeEPKcRhRT_h
+ .pdata$_ZN11StringTools8stringToIhLPv0ELS1_0EEENS_10ResultTypeEPKcRhRT_h
                 0x000000000043c210        0xc obj\Debug\Windows\Arduino\src\Communication\MessageParser\MsgCmdParser.o
  .pdata$_ZNK18MsgParameterParserI31MsgCmdRemoteProcedureCallParserLy1EE19handleConvertResultE12MsgParameterN11StringTools10ResultTypeE
                 0x000000000043c21c        0xc obj\Debug\Windows\Arduino\src\Communication\MessageParser\MsgCmdParser.o
  .pdata$_ZN18MsgParameterParserI31MsgCmdRemoteProcedureCallParserLy1EE10underlyingEv
                 0x000000000043c228        0xc obj\Debug\Windows\Arduino\src\Communication\MessageParser\MsgCmdParser.o
- .pdata$_ZN11StringTools8stringToItLi0ELi0EEENS_10ResultTypeEPKcRhRT_h
+ .pdata$_ZN11StringTools8stringToItLPv0ELS1_0EEENS_10ResultTypeEPKcRhRT_h
                 0x000000000043c234        0xc obj\Debug\Windows\Arduino\src\Communication\MessageParser\MsgCmdParser.o
  .pdata$_ZN18MsgParameterParserI31MsgCmdRemoteProcedureCallParserLy1EE20isEndOfStringReachedEc
                 0x000000000043c240        0xc obj\Debug\Windows\Arduino\src\Communication\MessageParser\MsgCmdParser.o
@@ -19471,13 +19471,13 @@ LOAD C:/Program Files/CodeBlocks/MinGW/bin/../lib/gcc/x86_64-w64-mingw32/8.1.0/c
                 0x000000000044327c        0xc obj\Debug\Windows\Arduino\src\Communication\MessageParser\MsgCmdParser.o
  .xdata$_ZNKSt5arrayI12MsgParameterLy1EEixEy
                 0x0000000000443288        0xc obj\Debug\Windows\Arduino\src\Communication\MessageParser\MsgCmdParser.o
- .xdata$_ZN11StringTools8stringToIhLi0ELi0EEENS_10ResultTypeEPKcRhRT_h
+ .xdata$_ZN11StringTools8stringToIhLPv0ELS1_0EEENS_10ResultTypeEPKcRhRT_h
                 0x0000000000443294        0xc obj\Debug\Windows\Arduino\src\Communication\MessageParser\MsgCmdParser.o
  .xdata$_ZNK18MsgParameterParserI31MsgCmdRemoteProcedureCallParserLy1EE19handleConvertResultE12MsgParameterN11StringTools10ResultTypeE
                 0x00000000004432a0        0xc obj\Debug\Windows\Arduino\src\Communication\MessageParser\MsgCmdParser.o
  .xdata$_ZN18MsgParameterParserI31MsgCmdRemoteProcedureCallParserLy1EE10underlyingEv
                 0x00000000004432ac        0x8 obj\Debug\Windows\Arduino\src\Communication\MessageParser\MsgCmdParser.o
- .xdata$_ZN11StringTools8stringToItLi0ELi0EEENS_10ResultTypeEPKcRhRT_h
+ .xdata$_ZN11StringTools8stringToItLPv0ELS1_0EEENS_10ResultTypeEPKcRhRT_h
                 0x00000000004432b4        0xc obj\Debug\Windows\Arduino\src\Communication\MessageParser\MsgCmdParser.o
  .xdata$_ZN18MsgParameterParserI31MsgCmdRemoteProcedureCallParserLy1EE20isEndOfStringReachedEc
                 0x00000000004432c0        0xc obj\Debug\Windows\Arduino\src\Communication\MessageParser\MsgCmdParser.o
@@ -24459,25 +24459,25 @@ LOAD C:/Program Files/CodeBlocks/MinGW/bin/../lib/gcc/x86_64-w64-mingw32/8.1.0/c
  .debug_info    0x000000000096c0b0    0x5a9d2 obj\Debug\Windows\Arduino\src\Clock\Clock.o
  .debug_info    0x00000000009c6a82    0x566a0 obj\Debug\Windows\Arduino\src\Clock\ClockWords.o
  .debug_info    0x0000000000a1d122    0x74b80 obj\Debug\Windows\Arduino\src\Communication\Communication.o
- .debug_info    0x0000000000a91ca2    0x97b32 obj\Debug\Windows\Arduino\src\Communication\MessageParser\MsgCmdParser.o
- .debug_info    0x0000000000b297d4    0x62c8b obj\Debug\Windows\Arduino\src\Display\Display.o
- .debug_info    0x0000000000b8c45f    0x53e3f obj\Debug\Windows\Arduino\src\Display\DisplayCharacters.o
- .debug_info    0x0000000000be029e    0x53b1b obj\Debug\Windows\Arduino\src\Display\DisplayWords.o
- .debug_info    0x0000000000c33db9    0x52fc2 obj\Debug\Windows\Arduino\src\DisplayManager\DisplayManager.o
- .debug_info    0x0000000000c86d7b    0x54b61 obj\Debug\Windows\Arduino\src\Font\FontCourierNew7x10.o
- .debug_info    0x0000000000cdb8dc    0x54b02 obj\Debug\Windows\Arduino\src\Font\FontCourierNew7x9.o
- .debug_info    0x0000000000d303de    0x54b5c obj\Debug\Windows\Arduino\src\Font\FontLucidaSans9x10.o
- .debug_info    0x0000000000d84f3a    0x54aa8 obj\Debug\Windows\Arduino\src\Font\FontSprite5x8.o
- .debug_info    0x0000000000dd99e2    0x54bc5 obj\Debug\Windows\Arduino\src\Font\FontTahoma10x10.o
- .debug_info    0x0000000000e2e5a7    0x6a5fa obj\Debug\Windows\Arduino\src\Overlay\Overlays.o
- .debug_info    0x0000000000e98ba1    0x70016 obj\Debug\Windows\Arduino\src\Scheduler\Scheduler.o
- .debug_info    0x0000000000f08bb7    0x63906 obj\Debug\Windows\Arduino\src\Text\Text.o
- .debug_info    0x0000000000f6c4bd    0x583bf obj\Debug\Windows\Arduino\src\Transformation\Transformation.o
- .debug_info    0x0000000000fc487c    0x8259c obj\Debug\Windows\src\Pixels.o
- .debug_info    0x0000000001046e18    0x7e93f obj\Debug\Windows\WordclockApp.o
- .debug_info    0x00000000010c5757    0x702f6 obj\Debug\Windows\WordclockMain.o
- .debug_info    0x0000000001135a4d       0x2e C:/Program Files/CodeBlocks/MinGW/bin/../lib/gcc/x86_64-w64-mingw32/8.1.0/libgcc.a(_chkstk_ms.o)
- .debug_info    0x0000000001135a7b     0x1eda C:/Program Files/CodeBlocks/MinGW/bin/../lib/gcc/x86_64-w64-mingw32/8.1.0/libgcc.a(_ctors.o)
+ .debug_info    0x0000000000a91ca2    0x97b38 obj\Debug\Windows\Arduino\src\Communication\MessageParser\MsgCmdParser.o
+ .debug_info    0x0000000000b297da    0x62c8b obj\Debug\Windows\Arduino\src\Display\Display.o
+ .debug_info    0x0000000000b8c465    0x53e3f obj\Debug\Windows\Arduino\src\Display\DisplayCharacters.o
+ .debug_info    0x0000000000be02a4    0x53b1b obj\Debug\Windows\Arduino\src\Display\DisplayWords.o
+ .debug_info    0x0000000000c33dbf    0x52fc2 obj\Debug\Windows\Arduino\src\DisplayManager\DisplayManager.o
+ .debug_info    0x0000000000c86d81    0x54b61 obj\Debug\Windows\Arduino\src\Font\FontCourierNew7x10.o
+ .debug_info    0x0000000000cdb8e2    0x54b02 obj\Debug\Windows\Arduino\src\Font\FontCourierNew7x9.o
+ .debug_info    0x0000000000d303e4    0x54b5c obj\Debug\Windows\Arduino\src\Font\FontLucidaSans9x10.o
+ .debug_info    0x0000000000d84f40    0x54aa8 obj\Debug\Windows\Arduino\src\Font\FontSprite5x8.o
+ .debug_info    0x0000000000dd99e8    0x54bc5 obj\Debug\Windows\Arduino\src\Font\FontTahoma10x10.o
+ .debug_info    0x0000000000e2e5ad    0x6a5fa obj\Debug\Windows\Arduino\src\Overlay\Overlays.o
+ .debug_info    0x0000000000e98ba7    0x70016 obj\Debug\Windows\Arduino\src\Scheduler\Scheduler.o
+ .debug_info    0x0000000000f08bbd    0x63906 obj\Debug\Windows\Arduino\src\Text\Text.o
+ .debug_info    0x0000000000f6c4c3    0x583bf obj\Debug\Windows\Arduino\src\Transformation\Transformation.o
+ .debug_info    0x0000000000fc4882    0x8259c obj\Debug\Windows\src\Pixels.o
+ .debug_info    0x0000000001046e1e    0x7e93f obj\Debug\Windows\WordclockApp.o
+ .debug_info    0x00000000010c575d    0x702f6 obj\Debug\Windows\WordclockMain.o
+ .debug_info    0x0000000001135a53       0x2e C:/Program Files/CodeBlocks/MinGW/bin/../lib/gcc/x86_64-w64-mingw32/8.1.0/libgcc.a(_chkstk_ms.o)
+ .debug_info    0x0000000001135a81     0x1eda C:/Program Files/CodeBlocks/MinGW/bin/../lib/gcc/x86_64-w64-mingw32/8.1.0/libgcc.a(_ctors.o)
 
 .zdebug_info
  *(.zdebug_info .zdebug.gnu.linkonce.wi.*)
@@ -24755,9 +24755,9 @@ LOAD C:/Program Files/CodeBlocks/MinGW/bin/../lib/gcc/x86_64-w64-mingw32/8.1.0/c
                 0x00000000011a4af8       0x40 obj\Debug\Windows\Arduino\src\Communication\MessageParser\MsgCmdParser.o
  .debug_frame$_ZN11StringTools10stringCopyEPcPKci
                 0x00000000011a4b38       0x40 obj\Debug\Windows\Arduino\src\Communication\MessageParser\MsgCmdParser.o
- .debug_frame$_ZN11StringTools8stringToIhLi0ELi0EEENS_10ResultTypeEPKcRhRT_h
+ .debug_frame$_ZN11StringTools8stringToIhLPv0ELS1_0EEENS_10ResultTypeEPKcRhRT_h
                 0x00000000011a4b78       0x40 obj\Debug\Windows\Arduino\src\Communication\MessageParser\MsgCmdParser.o
- .debug_frame$_ZN11StringTools8stringToItLi0ELi0EEENS_10ResultTypeEPKcRhRT_h
+ .debug_frame$_ZN11StringTools8stringToItLPv0ELS1_0EEENS_10ResultTypeEPKcRhRT_h
                 0x00000000011a4bb8       0x40 obj\Debug\Windows\Arduino\src\Communication\MessageParser\MsgCmdParser.o
  .debug_frame$_ZN11wxAnyButtonC2Ev
                 0x00000000011a4bf8       0x40 obj\Debug\Windows\src\Pixels.o
