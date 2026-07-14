@@ -55,6 +55,7 @@
 			<Add directory="../../../firmware/inc/StandardTypes" />
 			<Add directory="../../../firmware/inc/Text" />
 			<Add directory="../../../firmware/inc/Transformation" />
+			<Add directory="../include/sim" />
 			<Add directory="../include" />
 		</Compiler>
 		<Linker>
@@ -165,9 +166,9 @@
 		<Unit filename="../WordclockMain.cpp" />
 		<Unit filename="../WordclockMain.h" />
 		<Unit filename="../include/Arduino.h" />
-		<Unit filename="../include/BH1750.h" />
-		<Unit filename="../include/Pixels.h" />
-		<Unit filename="../include/RealTimeClock.h" />
+		<Unit filename="../include/sim/BH1750.h" />
+		<Unit filename="../include/sim/Pixels.h" />
+		<Unit filename="../include/sim/RealTimeClock.h" />
 		<Unit filename="../src/Pixels.cpp" />
 		<Extensions>
 			<code_completion />

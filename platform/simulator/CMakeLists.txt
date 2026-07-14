@@ -58,8 +58,11 @@ add_executable(Wordclock WIN32 ${SOURCES})
 # Include directories
 # --------------------------------------------------------------------------
 # The simulator's own headers, plus the project root (holds WordclockIcon.xpm).
+# Keep include/sim ahead of include so legacy includes like "Pixels.h" resolve
+# directly to simulator implementations even without compatibility wrappers.
 target_include_directories(Wordclock PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/sim"
     "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
 # Every firmware inc/* module directory (Animation, Clock, Display, ...).

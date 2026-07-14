@@ -1,6 +1,6 @@
 #include "WordclockMain.h"
 
-#include "RealTimeClock.h"
+#include "sim/RealTimeClock.h"
 
 WordclockMain::WordclockMain()
 {
@@ -18,7 +18,7 @@ WordclockMain::WordclockMain()
     //WcDisplay.setPixelRowFast(5, 0xFFFF);
     //Display::getInstance().show();
 
-    //WcAnimation.setChar(0,0,'Ö', AnimationFont::FONT_5X8);
+    //WcAnimation.setChar(0,0,'ï¿½', AnimationFont::FONT_5X8);
     //WcAnimation.setChar(0,0,'B', AnimationFont::FONT_5X8);
     //WcAnimation.setCharWithShift('A', AnimationFont::FONT_10X10);
     //Text::getInstance().setTextWithShift(Text, Text::FONT_7X10);

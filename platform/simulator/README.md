@@ -65,10 +65,12 @@ CMake build is otherwise authoritative.
 firmware/                 shared, platform-agnostic core (../../firmware)
 platform/simulator/
 ├── include/              simulator-only HAL headers
+│   ├── sim/              simulator implementations
+│   │   ├── Pixels.h      wxWidgets LED-matrix frame
+│   │   ├── RealTimeClock.h   time source
+│   │   └── BH1750.h      ambient-light sensor
 │   ├── Arduino.h         Arduino-core shim (Serial, PROGMEM, itoa, …)
-│   ├── Pixels.h          wxWidgets LED-matrix frame
-│   ├── RealTimeClock.h   time source
-│   └── BH1750.h          ambient-light sensor
+│   └── arduino/          split Arduino helper shims (types, bits, progmem, itoa)
 ├── src/Pixels.cpp        matrix rendering + serial console
 ├── WordclockApp.*        wxApp entry point + 50 ms task timer
 ├── WordclockMain.*       wires the scheduler to the simulated real-time clock
@@ -84,3 +86,7 @@ runs the `Scheduler`. The scheduler drives the display, and every "LED" write
 ends up recolouring a `wxStaticText` cell in the matrix — lit letters turn dark,
 unlit ones stay light grey. The right-hand console mirrors the device's serial
 output and lets you send commands back via the `Serial`/`Pixels` bridge.
+
+The firmware still includes the historical header names (`Pixels.h`,
+`RealTimeClock.h`, `BH1750.h`), resolved by placing `include/sim` on the
+compiler include path before `include`.

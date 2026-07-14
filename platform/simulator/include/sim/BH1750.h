@@ -9,9 +9,12 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       BH1750.h
- *      \brief
+ *      \brief      Simulator stub of the BH1750 ambient light sensor driver
  *
- *      \details
+ *      \details    Mirrors the public API of the hardware BH1750 driver (mode,
+ *                  illuminance, calibration) so the shared firmware core builds
+ *                  against the simulator. The I2C access paths are stubbed out;
+ *                  no physical sensor is present in the wxWidgets simulator.
  *
 ******************************************************************************************************************************************************/
 #ifndef _BH1750_H_
@@ -105,7 +108,7 @@ class BH1750
     bool isMTRegValueInRange(byte MTRegValue) const { return ((MTRegValue <= BH1750_REG_MT_MAX_VALUE) && (MTRegValue >= BH1750_REG_MT_MIN_VALUE)); }
 
 /******************************************************************************************************************************************************
- *  P U B L I C   F U N C T I O N S
+ *  P U B L I C   F U N C T I O N   S
 ******************************************************************************************************************************************************/
   public:
     constexpr BH1750() { }

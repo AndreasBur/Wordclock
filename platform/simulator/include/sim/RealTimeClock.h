@@ -9,9 +9,12 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       RealTimeClock.h
- *      \brief
+ *      \brief      Simulator stub of the real-time clock driver
  *
- *      \details
+ *      \details    Mirrors the public API of the hardware RTC driver (date/time
+ *                  getters and setters, singleton access) so the shared firmware
+ *                  core builds against the simulator. Time is held in a plain
+ *                  ClockDateTime; no physical RTC is present in the simulator.
  *
 ******************************************************************************************************************************************************/
 #ifndef _REAL_TIME_CLOCK_H_
@@ -74,8 +77,8 @@ class RealTimeClock
         return singletonInstance;
     }
 
-	// get methods
-	ClockDateTime getDateTime() const { return DateTime; }
+    // get methods
+    ClockDateTime getDateTime() const { return DateTime; }
     ClockTime getTime() const { return DateTime.getTime(); }
     ClockDate getDate() const { return DateTime.getDate(); }
 
@@ -84,7 +87,7 @@ class RealTimeClock
     void setTime(ClockTime Time) { DateTime.setTime(Time); }
     void setDate(ClockDate Date) { DateTime.setDate(Date); }
 
-	// methods
+    // methods
 };
 
 #endif

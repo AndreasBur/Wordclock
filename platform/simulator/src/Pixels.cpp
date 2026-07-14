@@ -1,4 +1,4 @@
-#include "Pixels.h"
+#include "sim/Pixels.h"
 #include <array>
 
 #if defined(PIXELS) && (defined(__APPLE__ ) || defined(__linux__))

@@ -18,6 +18,7 @@
 					<Add option="-g" />
 					<Add option="-D__WXDEBUG__" />
 					<Add directory="$(#wx31)/lib/gcc_dll/mswud" />
+					<Add directory="../include/sim" />
 					<Add directory="../include" />
 				</Compiler>
 				<ResourceCompiler>
@@ -40,6 +41,7 @@
 				<Compiler>
 					<Add option="-Os" />
 					<Add directory="$(#wx31)/lib/gcc_dll/mswu" />
+					<Add directory="../include/sim" />
 					<Add directory="../include" />
 				</Compiler>
 				<ResourceCompiler>
@@ -83,6 +85,8 @@
 			<Add directory="../../../firmware/inc/Overlay" />
 			<Add directory="../../../firmware/inc/Communication/MessageParser/Base" />
 			<Add directory="../../../firmware/inc/Text" />
+			<Add directory="../include/sim" />
+			<Add directory="../include" />
 		</Compiler>
 		<ResourceCompiler>
 			<Add directory="$(#wx31)/include" />
@@ -193,9 +197,9 @@
 		<Unit filename="../WordclockMain.cpp" />
 		<Unit filename="../WordclockMain.h" />
 		<Unit filename="../include/Arduino.h" />
-		<Unit filename="../include/BH1750.h" />
-		<Unit filename="../include/Pixels.h" />
-		<Unit filename="../include/RealTimeClock.h" />
+		<Unit filename="../include/sim/BH1750.h" />
+		<Unit filename="../include/sim/Pixels.h" />
+		<Unit filename="../include/sim/RealTimeClock.h" />
 		<Unit filename="../resource.rc">
 			<Option compilerVar="WINDRES" />
 		</Unit>
