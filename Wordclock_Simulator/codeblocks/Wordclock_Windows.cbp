@@ -71,7 +71,6 @@
 			<Add directory="../Arduino/inc/Display" />
 			<Add directory="../Arduino/inc/StandardTypes" />
 			<Add directory="../Arduino/inc/Transformation" />
-			<Add directory="../../Wordclock" />
 			<Add directory="../Arduino/inc/Font" />
 			<Add directory="../Arduino/inc/GammaCorrection" />
 			<Add directory="../Arduino/inc/Communication" />
