@@ -35,14 +35,30 @@ Pixels::Pixels(wxWindow* parent, const wxString &title) : wxFrame(parent, -1, ti
 {
     SetIcon(wxICON(WordclockIcon));
     SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DFACE));
-    wxScrolledWindow* ScrolledWindow = new wxScrolledWindow(this);
 
-    ScrolledWindow->SetSizer(createSizerAll(ScrolledWindow));
-    ScrolledWindow->Fit();
+    wxScrolledWindow* ScrolledWindow = new wxScrolledWindow(this);
+    wxBoxSizer* ContentSizer = createSizerAll(ScrolledWindow);
+    ScrolledWindow->SetSizer(ContentSizer);
     ScrolledWindow->SetScrollRate(5, 5);
+
+    // Lay the scrolled window out to fill the frame's client area.
+    wxBoxSizer* FrameSizer = new wxBoxSizer(wxVERTICAL);
+    FrameSizer->Add(ScrolledWindow, 1, wxEXPAND);
+    SetSizer(FrameSizer);
+
+    // A wxScrolledWindow advertises a tiny best size (it is meant to scroll),
+    // so Fit() would shrink the frame and clip the letter grid. Size the frame
+    // to the content's minimum instead. Note that wxWidgets/GTK only finalises
+    // font metrics once the window is mapped, so GetMinSize() under-measures the
+    // grid here; this initial size just avoids a tiny first paint.
+    SetClientSize(ContentSizer->GetMinSize());
     ScrolledWindow->Show();
 
-    Fit();
+    // Re-fit once the window is on screen and the letter sizes are accurate, so
+    // nothing gets clipped. Scrollbars still appear if the user shrinks it.
+    CallAfter([this, ContentSizer] {
+        SetClientSize(ContentSizer->GetMinSize());
+    });
 }
 
 wxBoxSizer* Pixels::createSizerAll(wxWindow* Parent)
@@ -54,7 +70,6 @@ wxBoxSizer* Pixels::createSizerAll(wxWindow* Parent)
 
     SizerAll->Add(createSizerCharacters(Parent), 1, wxALL|wxEXPAND, 10);
     SizerAll->Add(SizerControl, 0, wxALL|wxEXPAND, 10);
-    SizerAll->Fit(this);
 
     return SizerAll;
 }
@@ -64,7 +79,9 @@ wxBoxSizer* Pixels::createSizerCharacters(wxWindow* Parent)
     wxBoxSizer* SizerCharacters = new wxBoxSizer(wxVERTICAL);
 
     for(unsigned int Row = 0; Row < PIXELS_DISPLAY_NUMBER_OF_ROWS; Row++) {
-        SizerCharacters->Add(createSizerCharacter(Parent, Row), 1, wxEXPAND, 5);
+        // Proportion 0: rows keep their (square-cell) height instead of being
+        // stretched vertically to fill the frame.
+        SizerCharacters->Add(createSizerCharacter(Parent, Row), 0, wxALIGN_CENTER);
     }
 
     return SizerCharacters;
@@ -74,11 +91,17 @@ wxBoxSizer* Pixels::createSizerCharacter(wxWindow* Parent, int Row)
 {
     wxBoxSizer* SizerCharacter = new wxBoxSizer(wxHORIZONTAL);
 
+    // Each letter lives in a fixed square cell so the grid reads as a real
+    // matrix instead of vertically-stretched columns.
+    static constexpr int CellSize = 44;
+
     for(unsigned int Column = 0; Column < PIXELS_DISPLAY_NUMBER_OF_COLUMNS; Column++) {
-        Characters[Row][Column] = new wxStaticText(Parent, wxID_ANY, DisplayCharacters[Row][Column], wxDefaultPosition, wxDefaultSize, 0);
+        Characters[Row][Column] = new wxStaticText(Parent, wxID_ANY, DisplayCharacters[Row][Column], wxDefaultPosition, wxSize(CellSize, CellSize), wxALIGN_CENTRE_HORIZONTAL);
         Characters[Row][Column]->SetFont(wxFont(wxSize(40,40), wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false));
         Characters[Row][Column]->SetForegroundColour(wxColour(*wxLIGHT_GREY));
-        SizerCharacter->Add(Characters[Row][Column], 1, wxALL|wxEXPAND, 5);
+        Characters[Row][Column]->SetMinSize(wxSize(CellSize, CellSize));
+        // Proportion 0 + centered: the cell stays square and never stretches.
+        SizerCharacter->Add(Characters[Row][Column], 0, wxALIGN_CENTER);
     }
 
     return SizerCharacter;
