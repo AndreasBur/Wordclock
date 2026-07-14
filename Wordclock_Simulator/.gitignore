@@ -1,1 +1,15 @@
+# Build output
 /obj/
+/bin/
+/build/
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+compile_commands.json
+
+# Code::Blocks generated artifacts
+*.depend
+*.layout
+*.cscope_file_list
