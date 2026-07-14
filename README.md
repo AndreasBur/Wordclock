@@ -8,16 +8,38 @@ temperature, text) and a serial command interface.
 
 | Directory | Purpose |
 |-----------|---------|
-| [Wordclock_Simulator/](Wordclock_Simulator/) | **Canonical firmware** (`Arduino/`) + a wxWidgets desktop simulator. Develop and debug the clock logic on a PC. |
-| [Wordclock_xmegaForArduino/](Wordclock_xmegaForArduino/) | Hardware target (Atmel xmega). Intended home of the on-device build. |
+| [firmware/](firmware/) | **Single source of truth** for the clock logic — platform-agnostic (animations, clock, display, scheduler, overlays, communication). |
+| [platform/simulator/](platform/simulator/) | wxWidgets desktop backend: renders the matrix in a window so the firmware can be developed and debugged on a PC. |
+| [platform/hardware/](platform/hardware/) | On-device backend (Atmel xmega) — currently an [interface contract](platform/hardware/README.md), not yet implemented. |
+| [Wordclock_xmegaForArduino/](Wordclock_xmegaForArduino/) | Existing hardware project (older firmware); source for the eventual hardware port. |
 | [FontCreator/](FontCreator/) | Tool that generates the bitmap font tables (`Font*.cpp`). |
 
-The firmware logic lives once, in
-[Wordclock_Simulator/Arduino/](Wordclock_Simulator/Arduino/); the simulator
-swaps only the hardware layer (LED output, real-time clock, light sensor) for
-wxWidgets implementations. See the
-[simulator README](Wordclock_Simulator/README.md) for build instructions
-(CMake, dev container, Code::Blocks).
+## Architecture
+
+The firmware core reaches the hardware **only through header names**
+(`Arduino.h`, `Pixels.h`, `RealTimeClock.h`, `BH1750.h`), resolved via the
+include path. Each platform under `platform/` supplies those headers with its own
+implementation — a compile-time swap with no runtime cost. See
+[platform/hardware/README.md](platform/hardware/README.md) for the contract.
+
+## Building
+
+Pick a platform with the `PLATFORM` switch (default `simulator`):
+
+```bash
+cmake -B build -S . -DPLATFORM=simulator
+cmake --build build
+./build/bin/Wordclock
+```
+
+Requires CMake ≥ 3.16, a C++17 compiler and wxWidgets 3.x (GTK on Linux). A ready
+-made toolchain and a WSLg GUI setup are provided in
+[.devcontainer/](.devcontainer/) — open the repo in VS Code and *Reopen in
+Container*. See the [simulator README](platform/simulator/README.md) for details
+and the Code::Blocks projects.
+
+The `hardware` platform is built with the AVR toolchain, not CMake (see its
+README).
 
 ## History note
 
