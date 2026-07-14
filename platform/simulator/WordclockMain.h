@@ -30,6 +30,7 @@ class WordclockMain
 
         char Text[25];
         ClockWords CurrentTimeWords;
+        byte LastMinute{255};   // sentinel: force a draw on the first task() call
         enum {
             TIMER_ID = 1500
         };

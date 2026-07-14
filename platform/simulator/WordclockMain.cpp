@@ -44,7 +44,7 @@ void WordclockMain::task()
     ClockDateTime dateTime;
 
     dateTime.setDateYear(wxDT.GetYear());
-    dateTime.setDateMonth(wxDT.GetMonth());
+    dateTime.setDateMonth(wxDT.GetMonth() + 1);   // wxDateTime months are 0-based (Jan=0); ClockDate expects 1-12
     dateTime.setDateDay(wxDT.GetDay());
     dateTime.setTimeHour(wxDT.GetHour());
     dateTime.setTimeMinute(wxDT.GetMinute());
@@ -52,17 +52,23 @@ void WordclockMain::task()
 
     RealTimeClock::getInstance().setDateTime(dateTime);
 
-
-
     wcScheduler.task();
 
-     //Clock::getInstance().getClockWords(Hour, Minute, NewTimeWords);
-
-    //if(NewTimeWords != CurrentTimeWords) {
-        //CurrentTimeWords = NewTimeWords;
-        //WcDisplay.clearAllWords();
-        //WcDisplay.clear();
-        //WcClock.setClock(Hour, Minute);
-        //WcClock.show();
-    //}
+    // Push the current time on every minute change. Without an animation the
+    // clock is drawn statically (setWord() only lights letters, so the grid is
+    // cleared first, then the words are set and shown). With an animation
+    // selected, Animations::setTime() kicks off the transition and the
+    // scheduler's Animations task steps through and shows the frames.
+    ClockTime time = RealTimeClock::getInstance().getTime();
+    if(time.getMinute() != LastMinute) {
+        LastMinute = time.getMinute();
+        Animations& animations = Animations::getInstance();
+        if(animations.getAnimation() == Animations::ANIMATION_ID_NONE) {
+            Display::getInstance().clear();
+            Clock::getInstance().setTime(time.getHour(), time.getMinute());
+            Display::getInstance().show();
+        } else {
+            animations.setTime(time.getHour(), time.getMinute());
+        }
+    }
 }
