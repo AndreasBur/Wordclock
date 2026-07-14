@@ -1,0 +1,36 @@
+{
+    "name": "Wordclock Simulator (wxWidgets)",
+    "build": {
+        "dockerfile": "Dockerfile"
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-vscode.cpptools",
+                "ms-vscode.cmake-tools"
+            ],
+            "settings": {
+                "cmake.configureOnOpen": true,
+                "cmake.generator": "Ninja",
+                "cmake.sourceDirectory": "${workspaceFolder}",
+                "cmake.configureSettings": {
+                    "PLATFORM": "simulator"
+                }
+            }
+        }
+    },
+    // The Wordclock UI is a wxWidgets/GTK window. Under WSL2/WSLg the host
+    // exposes both an X11 socket (Xwayland) and a Wayland socket; we forward
+    // both so the GUI shows up on the Windows desktop with no extra X server.
+    "containerEnv": {
+        "DISPLAY": "${localEnv:DISPLAY}",
+        "WAYLAND_DISPLAY": "${localEnv:WAYLAND_DISPLAY}",
+        "XDG_RUNTIME_DIR": "/mnt/wslg/runtime-dir",
+        "PULSE_SERVER": "/mnt/wslg/PulseServer"
+    },
+    "mounts": [
+        "source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind",
+        "source=/mnt/wslg,target=/mnt/wslg,type=bind"
+    ],
+    "postCreateCommand": "wx-config --version && cmake --version"
+}

@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="Wordclock" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="../bin/Debug/Windows/Wordclock" prefix_auto="1" extension_auto="1" />
+				<Option object_output="../obj/Debug/Windows" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Option projectLinkerOptionsRelation="2" />
+				<Compiler>
+					<Add option="-Wextra" />
+					<Add option="-Wall" />
+					<Add option="-g" />
+					<Add option="-D__WXDEBUG__" />
+					<Add directory="$(#wx31)/lib/gcc_dll/mswud" />
+					<Add directory="../include/sim" />
+					<Add directory="../include" />
+				</Compiler>
+				<ResourceCompiler>
+					<Add directory="$(#wx31)/lib/gcc_dll/mswud" />
+				</ResourceCompiler>
+				<Linker>
+					<Add library="libwxmsw31ud_core.a" />
+					<Add library="libwxbase31ud.a" />
+					<Add library="libwxpngd.a" />
+					<Add library="libwxzlibd.a" />
+					<Add directory="$(#wx31)/lib/gcc_dll" />
+				</Linker>
+			</Target>
+			<Target title="Release">
+				<Option output="../bin/Release/Windows/Wordclock" prefix_auto="1" extension_auto="1" />
+				<Option object_output="../obj/Release/Windows" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Option projectLinkerOptionsRelation="2" />
+				<Compiler>
+					<Add option="-Os" />
+					<Add directory="$(#wx31)/lib/gcc_dll/mswu" />
+					<Add directory="../include/sim" />
+					<Add directory="../include" />
+				</Compiler>
+				<ResourceCompiler>
+					<Add directory="$(#wx31)/lib/gcc_dll/mswu" />
+				</ResourceCompiler>
+				<Linker>
+					<Add option="-s" />
+					<Add library="libwxmsw31u_core.a" />
+					<Add library="libwxbase31u.a" />
+					<Add library="libwxpng.a" />
+					<Add library="libwxzlib.a" />
+					<Add directory="$(#wx31)/lib/gcc_dll" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wextra" />
+			<Add option="-Wall" />
+			<Add option="-std=c++17" />
+			<Add option="-pipe" />
+			<Add option="-mthreads" />
+			<Add option="-D__GNUWIN32__" />
+			<Add option="-D__WXMSW__" />
+			<Add option="-DWXUSINGDLL" />
+			<Add option="-DwxUSE_UNICODE" />
+			<Add directory="$(#wx31)/include" />
+			<Add directory="../../../firmware/inc/Animation" />
+			<Add directory="../../../firmware/inc/Clock" />
+			<Add directory="../../../firmware/inc/Display" />
+			<Add directory="../../../firmware/inc/StandardTypes" />
+			<Add directory="../../../firmware/inc/Transformation" />
+			<Add directory="../../../firmware/inc/Font" />
+			<Add directory="../../../firmware/inc/GammaCorrection" />
+			<Add directory="../../../firmware/inc/Communication" />
+			<Add directory="../../../firmware/inc/Communication/MessageParser" />
+			<Add directory="../../../firmware/inc/RealTimeClock" />
+			<Add directory="../../../firmware/inc/Pixels" />
+			<Add directory="../../../firmware/inc/Illuminance" />
+			<Add directory="../../../firmware/inc/DisplayManager" />
+			<Add directory="../../../firmware/inc/Scheduler" />
+			<Add directory="../../../firmware/inc/Overlay" />
+			<Add directory="../../../firmware/inc/Communication/MessageParser/Base" />
+			<Add directory="../../../firmware/inc/Text" />
+			<Add directory="../include/sim" />
+			<Add directory="../include" />
+		</Compiler>
+		<ResourceCompiler>
+			<Add directory="$(#wx31)/include" />
+		</ResourceCompiler>
+		<Linker>
+			<Add option="-mthreads" />
+			<Add option="-Wl,-Map=$(TARGET_OUTPUT_DIR)${PROJECT_NAME}.map" />
+		</Linker>
+		<Unit filename="../../../firmware/inc/Animation/Animation.h" />
+		<Unit filename="../../../firmware/inc/Animation/AnimationCube.h" />
+		<Unit filename="../../../firmware/inc/Animation/AnimationCursor.h" />
+		<Unit filename="../../../firmware/inc/Animation/AnimationDrop.h" />
+		<Unit filename="../../../firmware/inc/Animation/AnimationExplode.h" />
+		<Unit filename="../../../firmware/inc/Animation/AnimationFade.h" />
+		<Unit filename="../../../firmware/inc/Animation/AnimationFlicker.h" />
+		<Unit filename="../../../firmware/inc/Animation/AnimationImplode.h" />
+		<Unit filename="../../../firmware/inc/Animation/AnimationShift.h" />
+		<Unit filename="../../../firmware/inc/Animation/AnimationSnake.h" />
+		<Unit filename="../../../firmware/inc/Animation/AnimationSqueeze.h" />
+		<Unit filename="../../../firmware/inc/Animation/AnimationTeletype.h" />
+		<Unit filename="../../../firmware/inc/Animation/AnimationWipe.h" />
+		<Unit filename="../../../firmware/inc/Animation/Animations.h" />
+		<Unit filename="../../../firmware/inc/Bit/Bit.h" />
+		<Unit filename="../../../firmware/inc/Clock/Clock.h" />
+		<Unit filename="../../../firmware/inc/Clock/ClockWords.h" />
+		<Unit filename="../../../firmware/inc/Communication/Communication.h" />
+		<Unit filename="../../../firmware/inc/Communication/ErrorMessage.h" />
+		<Unit filename="../../../firmware/inc/Communication/Message.h" />
+		<Unit filename="../../../firmware/inc/Communication/MessageParser/Base/MsgCmdBaseOverlayParser.h" />
+		<Unit filename="../../../firmware/inc/Communication/MessageParser/Base/MsgCmdOverlayParser.h" />
+		<Unit filename="../../../firmware/inc/Communication/MessageParser/Base/MsgParameterParser.h" />
+		<Unit filename="../../../firmware/inc/Communication/MessageParser/MsgCmdAnimationParser.h" />
+		<Unit filename="../../../firmware/inc/Communication/MessageParser/MsgCmdClockModeParser.h" />
+		<Unit filename="../../../firmware/inc/Communication/MessageParser/MsgCmdDateParser.h" />
+		<Unit filename="../../../firmware/inc/Communication/MessageParser/MsgCmdDisplayBrightnessParser.h" />
+		<Unit filename="../../../firmware/inc/Communication/MessageParser/MsgCmdDisplayColorParser.h" />
+		<Unit filename="../../../firmware/inc/Communication/MessageParser/MsgCmdDisplayPixelParser.h" />
+		<Unit filename="../../../firmware/inc/Communication/MessageParser/MsgCmdOverlayDateParser.h" />
+		<Unit filename="../../../firmware/inc/Communication/MessageParser/MsgCmdOverlayTemperatureParser.h" />
+		<Unit filename="../../../firmware/inc/Communication/MessageParser/MsgCmdOverlayTextParser.h" />
+		<Unit filename="../../../firmware/inc/Communication/MessageParser/MsgCmdParser.h" />
+		<Unit filename="../../../firmware/inc/Communication/MessageParser/MsgCmdRemoteProcedureCallParser.h" />
+		<Unit filename="../../../firmware/inc/Communication/MessageParser/MsgCmdTimeParser.h" />
+		<Unit filename="../../../firmware/inc/Communication/MessageParser/MsgParameter.h" />
+		<Unit filename="../../../firmware/inc/Communication/StringTools.h" />
+		<Unit filename="../../../firmware/inc/DisplayManager/DisplayManager.h" />
+		<Unit filename="../../../firmware/inc/Display/Display.h" />
+		<Unit filename="../../../firmware/inc/Display/DisplayBrightness.h" />
+		<Unit filename="../../../firmware/inc/Display/DisplayCharacters.h" />
+		<Unit filename="../../../firmware/inc/Display/DisplayPixels.h" />
+		<Unit filename="../../../firmware/inc/Display/DisplayWord.h" />
+		<Unit filename="../../../firmware/inc/Display/DisplayWords.h" />
+		<Unit filename="../../../firmware/inc/Font/FontChar.h" />
+		<Unit filename="../../../firmware/inc/Font/FontCourierNew7x10.h" />
+		<Unit filename="../../../firmware/inc/Font/FontCourierNew7x9.h" />
+		<Unit filename="../../../firmware/inc/Font/FontLucidaSans9x10.h" />
+		<Unit filename="../../../firmware/inc/Font/FontSprite5x8.h" />
+		<Unit filename="../../../firmware/inc/Font/FontTahoma10x10.h" />
+		<Unit filename="../../../firmware/inc/GammaCorrection/GammaCorrection.h" />
+		<Unit filename="../../../firmware/inc/Illuminance/Illuminance.h" />
+		<Unit filename="../../../firmware/inc/Overlay/Overlay.h" />
+		<Unit filename="../../../firmware/inc/Overlay/OverlayDate.h" />
+		<Unit filename="../../../firmware/inc/Overlay/OverlayTemperature.h" />
+		<Unit filename="../../../firmware/inc/Overlay/OverlayText.h" />
+		<Unit filename="../../../firmware/inc/Overlay/Overlays.h" />
+		<Unit filename="../../../firmware/inc/Pixels/Pixel.h" />
+		<Unit filename="../../../firmware/inc/RealTimeClock/ClockDate.h" />
+		<Unit filename="../../../firmware/inc/RealTimeClock/ClockDateTime.h" />
+		<Unit filename="../../../firmware/inc/RealTimeClock/ClockTime.h" />
+		<Unit filename="../../../firmware/inc/Scheduler/Scheduler.h" />
+		<Unit filename="../../../firmware/inc/StandardTypes/StandardTypes.h" />
+		<Unit filename="../../../firmware/inc/Text/Text.h" />
+		<Unit filename="../../../firmware/inc/Transformation/Transformation.h" />
+		<Unit filename="../../../firmware/src/Animation/Animation.cpp" />
+		<Unit filename="../../../firmware/src/Animation/AnimationCube.cpp" />
+		<Unit filename="../../../firmware/src/Animation/AnimationCursor.cpp" />
+		<Unit filename="../../../firmware/src/Animation/AnimationDrop.cpp" />
+		<Unit filename="../../../firmware/src/Animation/AnimationExplode.cpp" />
+		<Unit filename="../../../firmware/src/Animation/AnimationFade.cpp" />
+		<Unit filename="../../../firmware/src/Animation/AnimationFlicker.cpp" />
+		<Unit filename="../../../firmware/src/Animation/AnimationImplode.cpp" />
+		<Unit filename="../../../firmware/src/Animation/AnimationShift.cpp" />
+		<Unit filename="../../../firmware/src/Animation/AnimationSnake.cpp" />
+		<Unit filename="../../../firmware/src/Animation/AnimationSqueeze.cpp" />
+		<Unit filename="../../../firmware/src/Animation/AnimationTeletype.cpp" />
+		<Unit filename="../../../firmware/src/Animation/AnimationWipe.cpp" />
+		<Unit filename="../../../firmware/src/Animation/Animations.cpp" />
+		<Unit filename="../../../firmware/src/Clock/Clock.cpp" />
+		<Unit filename="../../../firmware/src/Clock/ClockWords.cpp" />
+		<Unit filename="../../../firmware/src/Communication/Communication.cpp" />
+		<Unit filename="../../../firmware/src/Communication/MessageParser/MsgCmdParser.cpp" />
+		<Unit filename="../../../firmware/src/DisplayManager/DisplayManager.cpp" />
+		<Unit filename="../../../firmware/src/Display/Display.cpp" />
+		<Unit filename="../../../firmware/src/Display/DisplayCharacters.cpp" />
+		<Unit filename="../../../firmware/src/Display/DisplayWords.cpp" />
+		<Unit filename="../../../firmware/src/Font/FontCourierNew7x10.cpp" />
+		<Unit filename="../../../firmware/src/Font/FontCourierNew7x9.cpp" />
+		<Unit filename="../../../firmware/src/Font/FontLucidaSans9x10.cpp" />
+		<Unit filename="../../../firmware/src/Font/FontSprite5x8.cpp" />
+		<Unit filename="../../../firmware/src/Font/FontTahoma10x10.cpp" />
+		<Unit filename="../../../firmware/src/Overlay/Overlays.cpp" />
+		<Unit filename="../../../firmware/src/Scheduler/Scheduler.cpp" />
+		<Unit filename="../../../firmware/src/Text/Text.cpp" />
+		<Unit filename="../../../firmware/src/Transformation/Transformation.cpp" />
+		<Unit filename="../Wordclock.ico" />
+		<Unit filename="../WordclockApp.cpp" />
+		<Unit filename="../WordclockApp.h" />
+		<Unit filename="../WordclockMain.cpp" />
+		<Unit filename="../WordclockMain.h" />
+		<Unit filename="../include/Arduino.h" />
+		<Unit filename="../include/sim/BH1750.h" />
+		<Unit filename="../include/sim/Pixels.h" />
+		<Unit filename="../include/sim/RealTimeClock.h" />
+		<Unit filename="../resource.rc">
+			<Option compilerVar="WINDRES" />
+		</Unit>
+		<Unit filename="../src/Pixels.cpp" />
+		<Extensions />
+	</Project>
+</CodeBlocks_project_file>
