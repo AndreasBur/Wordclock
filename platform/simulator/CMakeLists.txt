@@ -26,9 +26,12 @@ include(${wxWidgets_USE_FILE})
 # --------------------------------------------------------------------------
 # Sources
 # --------------------------------------------------------------------------
+# Platform-agnostic firmware core, shared with the hardware target.
+set(FIRMWARE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../firmware")
+
 # Firmware logic shared with the real hardware target...
 file(GLOB_RECURSE ARDUINO_SOURCES CONFIGURE_DEPENDS
-    "${CMAKE_CURRENT_SOURCE_DIR}/Arduino/src/*.cpp")
+    "${FIRMWARE_DIR}/src/*.cpp")
 
 # ...plus the wxWidgets simulator glue.
 set(SIMULATOR_SOURCES
@@ -59,10 +62,10 @@ target_include_directories(Wordclock PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}"
     "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
-# Every Arduino/inc/* module directory (Animation, Clock, Display, ...).
+# Every firmware inc/* module directory (Animation, Clock, Display, ...).
 file(GLOB ARDUINO_INC_DIRS LIST_DIRECTORIES true
-    "${CMAKE_CURRENT_SOURCE_DIR}/Arduino/inc/*")
-target_include_directories(Wordclock PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/Arduino/inc")
+    "${FIRMWARE_DIR}/inc/*")
+target_include_directories(Wordclock PRIVATE "${FIRMWARE_DIR}/inc")
 foreach(dir ${ARDUINO_INC_DIRS})
     if(IS_DIRECTORY "${dir}")
         target_include_directories(Wordclock PRIVATE "${dir}")
@@ -70,8 +73,8 @@ foreach(dir ${ARDUINO_INC_DIRS})
 endforeach()
 # Nested Communication/MessageParser dirs are not caught by the glob above.
 target_include_directories(Wordclock PRIVATE
-    "${CMAKE_CURRENT_SOURCE_DIR}/Arduino/inc/Communication/MessageParser"
-    "${CMAKE_CURRENT_SOURCE_DIR}/Arduino/inc/Communication/MessageParser/Base")
+    "${FIRMWARE_DIR}/inc/Communication/MessageParser"
+    "${FIRMWARE_DIR}/inc/Communication/MessageParser/Base")
 
 # --------------------------------------------------------------------------
 # Warnings & libraries

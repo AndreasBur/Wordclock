@@ -1,7 +1,7 @@
-# Build output
-/obj/
-/bin/
-/build/
+# Build output (any directory: platform/simulator/{bin,obj}, ./build, ...)
+obj/
+bin/
+build/
 
 # CMake
 CMakeCache.txt

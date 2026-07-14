@@ -11,7 +11,11 @@
             ],
             "settings": {
                 "cmake.configureOnOpen": true,
-                "cmake.generator": "Ninja"
+                "cmake.generator": "Ninja",
+                "cmake.sourceDirectory": "${workspaceFolder}",
+                "cmake.configureSettings": {
+                    "PLATFORM": "simulator"
+                }
             }
         }
     },
