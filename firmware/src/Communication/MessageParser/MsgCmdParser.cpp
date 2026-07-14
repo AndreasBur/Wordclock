@@ -54,7 +54,19 @@
 /******************************************************************************************************************************************************
  *  L O C A L   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
-
+namespace {
+/* Every command parser shares the same lifecycle: construct from the parameter
+ * string, then parse -> process -> sendAnswer. This helper runs that sequence so
+ * the dispatch below stays a flat table instead of a copy-pasted if/else chain. */
+template <typename ParserType>
+void dispatchCommand(const char* Parameter)
+{
+    ParserType parser(Parameter);
+    parser.parse();
+    parser.process();
+    parser.sendAnswer();
+}
+} /* namespace */
 
 
 /******************************************************************************************************************************************************
@@ -71,69 +83,25 @@ void MsgCmdParser::parse()
 
     if(command != COMMAND_NONE) sendAnswer(command);
 
-    if(command == COMMAND_REMOTE_PROCEDURE_CALL) {
-        MsgCmdRemoteProcedureCallParser cmdRemoteProcedureCallParser(parameter);
-        cmdRemoteProcedureCallParser.parse();
-        cmdRemoteProcedureCallParser.process();
-        cmdRemoteProcedureCallParser.sendAnswer();
-    } else if(command == COMMAND_DISPLAY_COLOR) {
-        MsgCmdDisplayColorParser cmdDisplayColorParser(parameter);
-        cmdDisplayColorParser.parse();
-        cmdDisplayColorParser.process();
-        cmdDisplayColorParser.sendAnswer();
-    } else if(command == COMMAND_DISPLAY_BRIGHTNESS) {
-        MsgCmdDisplayBrightnessParser cmdDisplayBrightnessParser(parameter);
-        cmdDisplayBrightnessParser.parse();
-        cmdDisplayBrightnessParser.process();
-        cmdDisplayBrightnessParser.sendAnswer();
-    } else if(command == COMMAND_DISPLAY_PIXEL) {
-        MsgCmdDisplayPixelParser cmdDisplayPixelParser(parameter);
-        cmdDisplayPixelParser.parse();
-        cmdDisplayPixelParser.process();
-        cmdDisplayPixelParser.sendAnswer();
-    } else if(command == COMMAND_ANIMATION) {
-        MsgCmdAnimationParser cmdAnimationParser(parameter);
-        cmdAnimationParser.parse();
-        cmdAnimationParser.process();
-        cmdAnimationParser.sendAnswer();
-    } else if(command == COMMAND_CLOCK_MODE) {
-        MsgCmdClockModeParser cmdClockModeParser(parameter);
-        cmdClockModeParser.parse();
-        cmdClockModeParser.process();
-        cmdClockModeParser.sendAnswer();
-    } else if(command == COMMAND_TIME) {
-        MsgCmdTimeParser cmdClockTimeParser(parameter);
-        cmdClockTimeParser.parse();
-        cmdClockTimeParser.process();
-        cmdClockTimeParser.sendAnswer();
-    } else if(command == COMMAND_DATE) {
-        MsgCmdDateParser cmdClockDateParser(parameter);
-        cmdClockDateParser.parse();
-        cmdClockDateParser.process();
-        cmdClockDateParser.sendAnswer();
+    switch(command) {
+        case COMMAND_REMOTE_PROCEDURE_CALL: dispatchCommand<MsgCmdRemoteProcedureCallParser>(parameter); break;
+        case COMMAND_DISPLAY_COLOR:         dispatchCommand<MsgCmdDisplayColorParser>(parameter);        break;
+        case COMMAND_DISPLAY_BRIGHTNESS:    dispatchCommand<MsgCmdDisplayBrightnessParser>(parameter);   break;
+        case COMMAND_DISPLAY_PIXEL:         dispatchCommand<MsgCmdDisplayPixelParser>(parameter);        break;
+        case COMMAND_ANIMATION:             dispatchCommand<MsgCmdAnimationParser>(parameter);           break;
+        case COMMAND_CLOCK_MODE:            dispatchCommand<MsgCmdClockModeParser>(parameter);           break;
+        case COMMAND_TIME:                  dispatchCommand<MsgCmdTimeParser>(parameter);                break;
+        case COMMAND_DATE:                  dispatchCommand<MsgCmdDateParser>(parameter);                break;
 #if (OVERLAYS_SUPPORT_DATE == STD_ON)
-    } else if(command == COMMAND_OVERLAY_DATE) {
-        MsgCmdOverlayDateParser cmdOverlayDateParser(parameter);
-        cmdOverlayDateParser.parse();
-        cmdOverlayDateParser.process();
-        cmdOverlayDateParser.sendAnswer();
+        case COMMAND_OVERLAY_DATE:          dispatchCommand<MsgCmdOverlayDateParser>(parameter);         break;
 #endif
 #if (OVERLAYS_SUPPORT_TEMPERATURE == STD_ON)
-    } else if(command == COMMAND_OVERLAY_TEMPERATURE) {
-        MsgCmdOverlayTemperatureParser cmdOverlayTemperatureParser(parameter);
-        cmdOverlayTemperatureParser.parse();
-        cmdOverlayTemperatureParser.process();
-        cmdOverlayTemperatureParser.sendAnswer();
+        case COMMAND_OVERLAY_TEMPERATURE:   dispatchCommand<MsgCmdOverlayTemperatureParser>(parameter);  break;
 #endif
 #if (OVERLAYS_SUPPORT_TEXT == STD_ON)
-    } else if(command == COMMAND_OVERLAY_TEXT) {
-        MsgCmdOverlayTextParser MsgCmdOverlayTextParser(parameter);
-        MsgCmdOverlayTextParser.parse();
-        MsgCmdOverlayTextParser.process();
-        MsgCmdOverlayTextParser.sendAnswer();
+        case COMMAND_OVERLAY_TEXT:          dispatchCommand<MsgCmdOverlayTextParser>(parameter);         break;
 #endif
-    } else {
-        Error.send(ErrorMessage::ERROR_WRONG_COMMAND);
+        default:                            Error.send(ErrorMessage::ERROR_WRONG_COMMAND);               break;
     }
 
     Serial.println();

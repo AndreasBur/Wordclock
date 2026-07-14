@@ -86,20 +86,20 @@ class MsgCmdAnimationParser : public MsgParameterParser<MsgCmdAnimationParser, M
 
     void sendAnswerSpeed(bool AppendSpace) const {
         AnimationIdType animation = Animations::getInstance().getAnimation();
-        byte taskCylce = Animations::getInstance().getTaskCycle(animation);
-        sendAnswerParameter(SpeedOptionShortName, Scheduler::convertTaskCycleToSpeed(taskCylce), AppendSpace);
+        byte taskCycle = Animations::getInstance().getTaskCycle(animation);
+        sendAnswerParameter(SpeedOptionShortName, Scheduler::convertTaskCycleToSpeed(taskCycle), AppendSpace);
     }
 
     void setAnimation() const
     {
         StdReturnType returnValue = Animations::getInstance().setAnimation(AnimationId);
-        Error.checkReturnValueAndSend(AnimationOptionShortName, returnValue, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNCE);
+        Error.checkReturnValueAndSend(AnimationOptionShortName, returnValue, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNDS);
     }
 
     void setClockTaskCycle() const
     {
         StdReturnType returnValue = Animations::getInstance().setTaskCycle(AnimationId, Scheduler::convertSpeedToTaskCycle(Speed));
-        Error.checkReturnValueAndSend(SpeedOptionShortName, returnValue, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNCE);
+        Error.checkReturnValueAndSend(SpeedOptionShortName, returnValue, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNDS);
     }
 
 /******************************************************************************************************************************************************

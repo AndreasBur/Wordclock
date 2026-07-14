@@ -232,7 +232,7 @@ class Display
     void disable() { PixelStripe.disablePixels(); }
     void enableBrightnessAutomatic() { Brightness.enableAutomatic(); }
     void disableBrightnessAutomatic() { Brightness.disableAutomatic(); }
-    void enbleBrightnessGammaCorrection() { Brightness.enableGammaCorrection(); }
+    void enableBrightnessGammaCorrection() { Brightness.enableGammaCorrection(); }
     void disableBrightnessGammaCorrection() { Brightness.disableGammaCorrection(); }
     void test() { PixelStripe.setPixels(Color.getColorDimmed()); }
     void clear() { PixelStripe.clearPixels(); }

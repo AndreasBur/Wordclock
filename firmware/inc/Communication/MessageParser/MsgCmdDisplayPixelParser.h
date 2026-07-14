@@ -149,7 +149,7 @@ class MsgCmdDisplayPixelParser : public MsgParameterParser<MsgCmdDisplayPixelPar
     void process()
     {
         if(!Display::getInstance().isIndexValid(Index)) {
-            Error.send(IndexOptionShortName, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNCE, false);
+            Error.send(IndexOptionShortName, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNDS, false);
         } else {
             setPixel();
         }

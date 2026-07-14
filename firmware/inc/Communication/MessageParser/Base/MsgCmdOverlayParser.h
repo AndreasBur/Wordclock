@@ -97,15 +97,15 @@ template <typename Derived> class MsgCmdOverlayParser
 
     void setPeriodInMinutes(MinuteType PeriodInMinutes) {
         StdReturnType returnValue = underlying().setPeriodInMinutes(PeriodInMinutes);
-        MsgParameterParserType::Error.checkReturnValueAndSend(PeriodOptionShortName, returnValue, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNCE);
+        MsgParameterParserType::Error.checkReturnValueAndSend(PeriodOptionShortName, returnValue, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNDS);
     }
     void setEnduranceInSeconds(SecondType EnduranceInSeconds) {
         StdReturnType returnValue = underlying().setEnduranceInSeconds(EnduranceInSeconds);
-        MsgParameterParserType::Error.checkReturnValueAndSend(EnduranceOptionShortName, returnValue, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNCE);
+        MsgParameterParserType::Error.checkReturnValueAndSend(EnduranceOptionShortName, returnValue, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNDS);
     }
     void setFont(FontType Font) {
         StdReturnType returnValue = underlying().setFont(Font);
-        MsgParameterParserType::Error.checkReturnValueAndSend(FontOptionShortName, returnValue, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNCE);
+        MsgParameterParserType::Error.checkReturnValueAndSend(FontOptionShortName, returnValue, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNDS);
 
     }
 

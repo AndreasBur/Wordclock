@@ -108,7 +108,7 @@ template <typename Derived> class Overlay
     bool isNextYear(MonthType CurrentMonth) const { return CurrentMonth < Month; }
 
     bool isTimeMatching(MinuteType CurrentMinute, SecondType CurrentSecond) const { return isMinuteMatching(CurrentMinute) && isSecondMatching(CurrentSecond); }
-    bool isDateMachtching(MonthType CurrentMonth, DayType CurrentDay) const {
+    bool isDateMatching(MonthType CurrentMonth, DayType CurrentDay) const {
         if(isDayAndMonthSet()) { return isDateMatchingDayAndMonthSet(CurrentMonth, CurrentDay); }
         if(isMonthSet()) { return isDateMatchingMonthSet(CurrentMonth); }
         if(isDaySet()) { return isDateMatchingDaySet(CurrentDay); }
@@ -124,7 +124,7 @@ template <typename Derived> class Overlay
     SecondType checkDateAndSetStateToShow(SecondType ShowTimerInSeconds, ClockDate CurrentDate, ClockTime CurrentTime) {
         if(isValidInDaysSet() && isDayAndMonthSet()) {
             if(isDateValid(CurrentDate)) { return setStateToShow(CurrentDate, CurrentTime); }
-        } else if(isDateMachtching(CurrentDate.getMonth(), CurrentDate.getDay())) {
+        } else if(isDateMatching(CurrentDate.getMonth(), CurrentDate.getDay())) {
             return setStateToShow(CurrentDate, CurrentTime);
         }
         return ShowTimerInSeconds;

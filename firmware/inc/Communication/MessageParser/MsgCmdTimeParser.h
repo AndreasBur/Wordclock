@@ -97,17 +97,17 @@ class MsgCmdTimeParser : public MsgParameterParser<MsgCmdTimeParser, MSG_CMD_TIM
 
     void setHour(HourType Hour) {
         StdReturnType returnValue = Time.setHour(Hour);
-        Error.checkReturnValueAndSend(HourOptionShortName, returnValue, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNCE);
+        Error.checkReturnValueAndSend(HourOptionShortName, returnValue, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNDS);
     }
 
     void setMinute(MinuteType Minute) {
         StdReturnType returnValue = Time.setMinute(Minute);
-        Error.checkReturnValueAndSend(MinuteOptionShortName, returnValue, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNCE);
+        Error.checkReturnValueAndSend(MinuteOptionShortName, returnValue, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNDS);
     }
 
     void setSecond(SecondType Second) {
         StdReturnType returnValue = Time.setSecond(Second);
-        Error.checkReturnValueAndSend(SecondOptionShortName, returnValue, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNCE);
+        Error.checkReturnValueAndSend(SecondOptionShortName, returnValue, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNDS);
     }
 
 /******************************************************************************************************************************************************

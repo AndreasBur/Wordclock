@@ -75,7 +75,7 @@ class MsgCmdClockModeParser : public MsgParameterParser<MsgCmdClockModeParser, M
     void setMode(ModeType Mode) const
     {
         StdReturnType returnValue = Clock::getInstance().setMode(Mode);
-        Error.checkReturnValueAndSend(ModeOptionShortName, returnValue, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNCE);
+        Error.checkReturnValueAndSend(ModeOptionShortName, returnValue, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNDS);
     }
 
     void show() const

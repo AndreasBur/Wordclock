@@ -142,7 +142,7 @@ class MsgCmdRemoteProcedureCallParser : public MsgParameterParser<MsgCmdRemotePr
                 Display::getInstance().disableBrightnessGammaCorrection();
                 break;
             case RPC_ID_DISPLAY_BRIGHTNESS_GAMMA_CORRECTION_ON :
-                Display::getInstance().enbleBrightnessGammaCorrection();
+                Display::getInstance().enableBrightnessGammaCorrection();
                 break;
             case RPC_ID_DISPLAY_BRIGHTNESS_AUTOMATIC_OFF :
                 Display::getInstance().disableBrightnessAutomatic();

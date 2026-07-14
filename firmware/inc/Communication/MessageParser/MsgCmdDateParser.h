@@ -93,15 +93,15 @@ class MsgCmdDateParser : public MsgParameterParser<MsgCmdDateParser, MSG_CMD_DAT
 
     void setYear(YearType Year)  {
         StdReturnType returnValue =  Date.setYear(Year);
-        Error.checkReturnValueAndSend(YearOptionShortName, returnValue, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNCE);
+        Error.checkReturnValueAndSend(YearOptionShortName, returnValue, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNDS);
     }
     void setMonth(MonthType Month)  {
         StdReturnType returnValue = Date.setMonth(Month);
-        Error.checkReturnValueAndSend(MonthOptionShortName, returnValue, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNCE);
+        Error.checkReturnValueAndSend(MonthOptionShortName, returnValue, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNDS);
     }
     void setDay(DayType Day)  {
         StdReturnType returnValue = Date.setDay(Day);
-        Error.checkReturnValueAndSend(DayOptionShortName, returnValue, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNCE);
+        Error.checkReturnValueAndSend(DayOptionShortName, returnValue, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNDS);
     }
 
 /******************************************************************************************************************************************************

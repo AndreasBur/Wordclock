@@ -81,10 +81,10 @@ class Scheduler
         if(Speed == 0u) { return 0u; }
         return UINT8_MAX - Speed;
     }
-    static byte convertTaskCycleToSpeed(byte TaskCylce) {
+    static byte convertTaskCycleToSpeed(byte TaskCycle) {
         if(TaskCycle == UINT8_MAX) { return 1u; }
         if(TaskCycle == 0u) { return 0u; }
-        return UINT8_MAX - (TaskCylce - 1u);
+        return UINT8_MAX - (TaskCycle - 1u);
     }
 };
 

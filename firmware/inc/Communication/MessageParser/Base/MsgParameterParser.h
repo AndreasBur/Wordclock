@@ -186,7 +186,7 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
             Error.send(Parameter, ErrorMessage::ERROR_NO_VALUE_GIVEN);
         }
         if(Result == StringTools::RESULT_OVERFLOW) {
-            Error.send(Parameter, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNCE);
+            Error.send(Parameter, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNDS);
         }
     }
 
