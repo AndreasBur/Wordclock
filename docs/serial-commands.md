@@ -83,7 +83,7 @@ From
 | 14 / 15 | Brightness increment / decrement |
 | 16 / 17 | Auto-brightness on / off |
 | 18 / 19 | Gamma correction on / off |
-| 20 / 21 | Power on / off — ⚠️ declared but **not handled** in the `process()` switch (currently no-ops) |
+| 20 / 21 | Master output on / off — applies immediately via `show()` (unlike Display enable/disable). Off blanks the panel but keeps the frame buffer, so On restores it |
 
 ## Examples
 

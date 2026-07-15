@@ -77,7 +77,7 @@ bool Scheduler::isCycleHit(byte Cycle) {
 ******************************************************************************************************************************************************/
 void Scheduler::triggerTasks()
 {
-    //if(isCycleHit(Illuminance::getInstance().getTaskCycle())) { Illuminance::getInstance().task(); }
+    if(isCycleHit(Illuminance::getInstance().getTaskCycle())) { Illuminance::getInstance().task(); }
     if(isCycleHit(Animations::getInstance().getTaskCycle())) { Animations::getInstance().task(true); }
     if(isCycleHit(Communication::getInstance().getTaskCycle())) { Communication::getInstance().task(); }
     if(isCycleHit(Overlays::getInstance().getTaskCycle())) { Overlays::getInstance().task(); }

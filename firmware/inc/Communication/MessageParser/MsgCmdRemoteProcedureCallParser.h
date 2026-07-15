@@ -174,6 +174,18 @@ class MsgCmdRemoteProcedureCallParser : public MsgParameterParser<MsgCmdRemotePr
             case RPC_ID_DISPLAY_TEST :
                 Display::getInstance().test();
                 break;
+            case RPC_ID_POWER_ON :
+                // Master output on: restore the panel and push it out immediately
+                // (unlike DISPLAY_ENABLE, which only sets the state without a show).
+                Display::getInstance().enable();
+                ReturnValue = Display::getInstance().show();
+                break;
+            case RPC_ID_POWER_OFF :
+                // Master output off: blank the panel now but keep the frame buffer,
+                // so POWER_ON brings the previous content straight back.
+                Display::getInstance().disable();
+                ReturnValue = Display::getInstance().show();
+                break;
             default:
                 break;
         }
