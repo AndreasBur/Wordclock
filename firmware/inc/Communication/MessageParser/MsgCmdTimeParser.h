@@ -114,7 +114,7 @@ class MsgCmdTimeParser : public MsgParameterParser<MsgCmdTimeParser, MSG_CMD_TIM
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr MsgCmdTimeParser(const char* Parameter) : MsgParameterParser(ParameterTable, Parameter) {
+    MsgCmdTimeParser(const char* Parameter) : MsgParameterParser(ParameterTable, Parameter) {
         Time = RealTimeClock::getInstance().getTime();
     }
     ~MsgCmdTimeParser() { }

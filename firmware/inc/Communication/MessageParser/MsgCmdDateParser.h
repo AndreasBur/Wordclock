@@ -108,7 +108,7 @@ class MsgCmdDateParser : public MsgParameterParser<MsgCmdDateParser, MSG_CMD_DAT
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr MsgCmdDateParser(const char* Parameter) : MsgParameterParser(ParameterTable, Parameter) {
+    MsgCmdDateParser(const char* Parameter) : MsgParameterParser(ParameterTable, Parameter) {
         Date = RealTimeClock::getInstance().getDate();
     }
     ~MsgCmdDateParser() { }

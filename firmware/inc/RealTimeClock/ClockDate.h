@@ -121,7 +121,7 @@ class ClockDate
     }
 
 	// set methods
-    StdReturnType setYear(YearType sYear)
+    constexpr StdReturnType setYear(YearType sYear)
     {
         if(isYearValid(sYear)) {
             Year = sYear;
@@ -130,7 +130,7 @@ class ClockDate
             return E_NOT_OK;
         }
     }
-    StdReturnType setMonth(MonthType sMonth)
+    constexpr StdReturnType setMonth(MonthType sMonth)
     {
         if(isMonthValid(sMonth)) {
             Month = sMonth;
@@ -138,7 +138,7 @@ class ClockDate
         } else {
             return E_NOT_OK; }
     }
-    StdReturnType setDay(DayType sDay)
+    constexpr StdReturnType setDay(DayType sDay)
     {
         if(isDayValid(sDay)) {
             Day = sDay;

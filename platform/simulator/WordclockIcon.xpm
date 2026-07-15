@@ -1,5 +1,5 @@
 /* XPM */
-static char * WordclockIcon_xpm[] = {
+static const char * WordclockIcon_xpm[] = {
 "146 108 237 2",
 "  	c None",
 ". 	c #343434",

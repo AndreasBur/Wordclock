@@ -88,7 +88,7 @@ class ClockTime
     SecondType getSecond() const { return Second; }
 
 	// set methods
-    StdReturnType setHour(HourType sHour)
+    constexpr StdReturnType setHour(HourType sHour)
     {
         if(isHourValid(sHour)) {
             Hour = sHour;
@@ -97,7 +97,7 @@ class ClockTime
             return E_NOT_OK;
         }
     }
-    StdReturnType setMinute(MinuteType sMinute)
+    constexpr StdReturnType setMinute(MinuteType sMinute)
     {
         if(isMinuteValid(sMinute)) {
             Minute = sMinute;
@@ -105,7 +105,7 @@ class ClockTime
         } else {
             return E_NOT_OK; }
     }
-    StdReturnType setSecond(SecondType sSecond)
+    constexpr StdReturnType setSecond(SecondType sSecond)
     {
         if(isSecondValid(sSecond)) {
             Second = sSecond;
