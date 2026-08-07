@@ -1,0 +1,28 @@
+{
+    // Debug-Konfigurationen für den Wordclock-Simulator (wxWidgets/GTK).
+    // Das Hardware-Target wird mit der AVR-Toolchain gebaut und ist hier nicht enthalten.
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug Simulator (gdb)",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/bin/Wordclock",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "miDebuggerPath": "/usr/bin/gdb",
+            "preLaunchTask": "CMake: build",
+            "setupCommands": [
+                {
+                    "description": "Pretty-printing für gdb aktivieren",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        }
+    ]
+}
