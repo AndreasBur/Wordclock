@@ -83,6 +83,7 @@ class MsgCmdRemoteProcedureCallParser : public MsgParameterParser<MsgCmdRemotePr
     friend class MsgParameterParser;
     RpcIdType RpcId{RPC_ID_NONE};
     StdReturnType ReturnValue{E_OK};
+    ErrorMessage::ErrorType AnswerError{ErrorMessage::ERROR_NO_ERROR};
     static constexpr char RemoteProcedureShortName{'P'};
 
     static constexpr ParameterTableType ParameterTable PROGMEM {
@@ -109,9 +110,15 @@ class MsgCmdRemoteProcedureCallParser : public MsgParameterParser<MsgCmdRemotePr
 
     // methods
     void sendAnswer() const {
+        // Keep the whole response on one line, like every other command answer;
+        // the command parser adds the terminating println() afterwards.
         Serial.print(F("RpcId="));
-        Serial.println(RpcId);
-        Error.send(ReturnValue);
+        Serial.print(RpcId);
+        Serial.print(' ');
+        // Last field before that terminating println(); no trailing separator space.
+        // An unknown RPC id reports its own code; otherwise the execution result.
+        if(AnswerError != ErrorMessage::ERROR_NO_ERROR) { Error.send(AnswerError, false); }
+        else { Error.send(ReturnValue, false); }
     }
 
     void process()
@@ -187,6 +194,9 @@ class MsgCmdRemoteProcedureCallParser : public MsgParameterParser<MsgCmdRemotePr
                 ReturnValue = Display::getInstance().show();
                 break;
             default:
+                // Unknown or missing RPC id (including RPC_ID_NONE): there is
+                // nothing to execute, so report a specific error instead of Error=0.
+                AnswerError = ErrorMessage::ERROR_RPC_ID_UNKNOWN;
                 break;
         }
     }

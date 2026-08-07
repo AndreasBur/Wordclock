@@ -101,7 +101,7 @@ void MsgCmdParser::parse()
 #if (OVERLAYS_SUPPORT_TEXT == STD_ON)
         case COMMAND_OVERLAY_TEXT:          dispatchCommand<MsgCmdOverlayTextParser>(parameter);         break;
 #endif
-        default:                            Error.send(ErrorMessage::ERROR_WRONG_COMMAND);               break;
+        default:                            Error.send(ErrorMessage::ERROR_WRONG_COMMAND, false);        break;
     }
 
     Serial.println();

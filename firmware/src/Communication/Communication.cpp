@@ -70,8 +70,15 @@ void Communication::addMessagePart()
     while (Serial.available()) {
         // get the new byte from uart
         char inChar = static_cast<char>(Serial.read());
-        if(inChar == EndOfMessageChar) { State = STATE_MESSAGE_COMPLETE; }
-        if(IncomingMessage.addChar(inChar) == E_NOT_OK) { Error.send(ErrorMessage::ERROR_MESSAGE_TOO_LONG); }
+        // The end-of-message marker terminates the message but is not part of
+        // it, so stop before appending it to the buffer.
+        if(inChar == EndOfMessageChar) { State = STATE_MESSAGE_COMPLETE; break; }
+        if(IncomingMessage.addChar(inChar) == E_NOT_OK) {
+            // Emitted while reading, outside the command parser's line framing,
+            // so terminate it as its own line without a trailing separator space.
+            Error.send(ErrorMessage::ERROR_MESSAGE_TOO_LONG, false);
+            Serial.println();
+        }
     }
 }
 

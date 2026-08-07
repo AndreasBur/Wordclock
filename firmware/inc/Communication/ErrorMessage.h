@@ -56,7 +56,8 @@ class ErrorMessage
         ERROR_VALUE_OUT_OF_BOUNDS,
         ERROR_NO_VALUE_GIVEN,
         ERROR_DISPLAY_PENDING,
-        ERROR_UNKNOWN
+        ERROR_UNKNOWN,
+        ERROR_RPC_ID_UNKNOWN
     };
 
     enum ApiType {
@@ -124,10 +125,10 @@ class ErrorMessage
         send(Parameter.getOptionShortName(), Error, AppendSpace);
     }
 
-    void send(StdReturnType ReturnValue) const
+    void send(StdReturnType ReturnValue, bool AppendSpace = true) const
     {
-        if(ReturnValue == E_OK) { send(ERROR_NO_ERROR); }
-        else { send(ERROR_UNKNOWN); }
+        if(ReturnValue == E_OK) { send(ERROR_NO_ERROR, AppendSpace); }
+        else { send(ERROR_UNKNOWN, AppendSpace); }
     }
 
 //    void send(ApiType Api, StdReturnType ReturnValue, bool AppendSpace = true) const
