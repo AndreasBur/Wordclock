@@ -85,6 +85,27 @@ From
 | 18 / 19 | Gamma correction on / off |
 | 20 / 21 | Master output on / off — applies immediately via `show()` (unlike Display enable/disable). Off blanks the panel but keeps the frame buffer, so On restores it |
 
+The RPC answer is `RpcId=<id> Error=<code>`. An unknown or missing id (including
+`0`, e.g. when `-P` is omitted) is rejected with `Error=8`
+(`ERROR_RPC_ID_UNKNOWN`) instead of being silently accepted.
+
+## Error codes
+
+Returned in the `Error=<code>` field
+([`ErrorMessage::ErrorType`](../firmware/inc/Communication/ErrorMessage.h)):
+
+| code | Name | Meaning |
+|------|------|---------|
+| 0 | `ERROR_NO_ERROR` | Success |
+| 1 | `ERROR_MESSAGE_TOO_LONG` | Incoming message exceeded the buffer |
+| 2 | `ERROR_WRONG_COMMAND` | Unknown/empty command number |
+| 3 | `ERROR_PARAMETER_UNKNOWN` | Unknown option short name |
+| 4 | `ERROR_VALUE_OUT_OF_BOUNDS` | Value outside the allowed range |
+| 5 | `ERROR_NO_VALUE_GIVEN` | Option given without a value |
+| 6 | `ERROR_DISPLAY_PENDING` | Display busy / show still pending |
+| 7 | `ERROR_UNKNOWN` | Unspecified failure |
+| 8 | `ERROR_RPC_ID_UNKNOWN` | RPC command with an unknown/missing `-P<id>` |
+
 ## Examples
 
 ```
