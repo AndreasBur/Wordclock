@@ -56,8 +56,8 @@ class ErrorMessage
         ERROR_VALUE_OUT_OF_BOUNDS,
         ERROR_NO_VALUE_GIVEN,
         ERROR_DISPLAY_PENDING,
+        ERROR_RPC_ID_UNKNOWN,
         ERROR_UNKNOWN,
-        ERROR_RPC_ID_UNKNOWN
     };
 
     enum ApiType {
