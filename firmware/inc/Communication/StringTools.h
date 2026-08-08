@@ -165,7 +165,7 @@ class StringTools
 
     template<typename Float,
              std::enable_if_t<std::is_floating_point<Float>::value>* = nullptr>
-    static ResultType stringTo(const char* String, PositionType& Position, Float& Value, uint8_t Base = 10u) {
+    static ResultType stringTo(const char* String, PositionType& Position, Float& Value, uint8_t = 10u) {
         char* end = nullptr;
         errno = 0;
         double valueBig = strtod(String, &end);

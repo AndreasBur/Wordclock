@@ -158,25 +158,33 @@ class ClockDate
         return static_cast<RataDieDayType>(365u)*sYear+sYear/4u-sYear/100u+sYear/400u+(153u*sMonth-457u)/5u+sDay-306u;
     }
 
-    RataDieDayType getPassedDays(YearType sYear, MonthType sMonth, DayType sDay) {
-        return labs(getRataDieDay(sYear, sMonth, sDay) - getRataDieDay(Year, Month, Day));
+    RataDieDayType getPassedDays(YearType sYear, MonthType sMonth, DayType sDay) const {
+        const RataDieDayType requestedDay = getRataDieDay(sYear, sMonth, sDay);
+        const RataDieDayType currentDay = getRataDieDay(Year, Month, Day);
+        return requestedDay >= currentDay ? requestedDay - currentDay : currentDay - requestedDay;
     }
 
     static DayType getDaysOfMonth(MonthType sMonth, YearType sYear) {
-        if(sMonth == 4u || sMonth == 6u || sMonth == 9u || sMonth == 11u) {
-            return 30u;
-        } else if(sMonth == 2u) {
-            if(sYear % 4u == 0u) { return 29u; }
-            else { return 28u; }
-        } else if((sMonth == 1u) || (sMonth == 3u) || (sMonth == 5u) ||
-                (sMonth == 7u) || (sMonth == 8u) || (sMonth == 12)) {
-            return 31u;
+        switch (sMonth) {
+            case 4u:
+            case 6u:
+            case 9u:
+            case 11u:
+                return 30u;
+            case 2u:
+                return (sYear % 4u == 0u) ? 29u : 28u;
+            case 1u:
+            case 3u:
+            case 5u:
+            case 7u:
+            case 8u:
+            case 10u:
+            case 12u:
+                return 31u;
+            default:
+                return 0u;
         }
-	}
-
-//	RataDieDayType getPassedDays(YearType sYear, MonthType sMonth, DayType sDay) {
-//        return abs(static_cast<int64_t>(getRataDieDay(sYear, sMonth, sDay)) - getRataDieDay(Year, Month, Day));
-//	}
+    }
 };
 
 #endif
