@@ -7,7 +7,8 @@
         "vscode": {
             "extensions": [
                 "ms-vscode.cpptools",
-                "ms-vscode.cmake-tools"
+                "ms-vscode.cmake-tools",
+                "openai.chatgpt"
             ],
             "settings": {
                 "cmake.configureOnOpen": true,
@@ -19,18 +20,17 @@
             }
         }
     },
-    // The Wordclock UI is a wxWidgets/GTK window. Under WSL2/WSLg the host
-    // exposes both an X11 socket (Xwayland) and a Wayland socket; we forward
-    // both so the GUI shows up on the Windows desktop with no extra X server.
+    // Forward X11 for the wxWidgets/GTK simulator. VS Code forwards Wayland
+    // itself when the host exposes it; do not mount /mnt/wslg here because that
+    // WSL-only path prevents the container from starting on native Linux.
     "containerEnv": {
         "DISPLAY": "${localEnv:DISPLAY}",
         "WAYLAND_DISPLAY": "${localEnv:WAYLAND_DISPLAY}",
-        "XDG_RUNTIME_DIR": "/mnt/wslg/runtime-dir",
-        "PULSE_SERVER": "/mnt/wslg/PulseServer"
+        "TZ": "Europe/Berlin"
     },
+
     "mounts": [
-        "source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind",
-        "source=/mnt/wslg,target=/mnt/wslg,type=bind"
+        "source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind"
     ],
     "postCreateCommand": "wx-config --version && cmake --version"
 }
