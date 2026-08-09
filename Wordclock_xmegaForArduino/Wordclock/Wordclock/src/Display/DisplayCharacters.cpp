@@ -39,13 +39,13 @@
 ******************************************************************************************************************************************************/
 const DisplayCharacters::DisplayCharactersTableElementType DisplayCharacters::DisplayCharactersTable[][DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS + 1] PROGMEM
 {
-    "ESKISTLFÜNF",
+    "ESKISTLF\xDCNF",
     "ZEHNZWANZIG",
     "DREIVIERTEL",
     "TGNACHVORJM",
-    "HALBQZWÖLFP",
+    "HALBQZW\xD6LFP",
     "ZWEINSIEBEN",
-    "KDREIRHFÜNF",
+    "KDREIRHF\xDCNF",
     "ELFNEUNVIER",
     "WACHTZEHNRS",
     "BSECHSFMUHR"

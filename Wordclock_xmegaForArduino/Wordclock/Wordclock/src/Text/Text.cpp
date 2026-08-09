@@ -488,12 +488,12 @@ StdReturnType Text::convertCharToFontIndex(char Char, byte& Index) const
     StdReturnType returnValue = E_NOT_OK;
 
     /* for umlauts we need a special treatment */
-    if('Ä' == Char) { Index = 96u; returnValue = E_OK; }
-    else if('Ö' == Char) { Index = 97u; returnValue = E_OK; }
-    else if('Ü' == Char) { Index = 98u; returnValue = E_OK; }
-    else if('ä' == Char) { Index = 99u; returnValue = E_OK; }
-    else if('ö' == Char) { Index = 100u; returnValue = E_OK; }
-    else if('ü' == Char) { Index = 101u; returnValue = E_OK; }
+    if('\xC4' == Char) { Index = 96u; returnValue = E_OK; }
+    else if('\xD6' == Char) { Index = 97u; returnValue = E_OK; }
+    else if('\xDC' == Char) { Index = 98u; returnValue = E_OK; }
+    else if('\xE4' == Char) { Index = 99u; returnValue = E_OK; }
+    else if('\xF6' == Char) { Index = 100u; returnValue = E_OK; }
+    else if('\xFC' == Char) { Index = 101u; returnValue = E_OK; }
     /* for all others only add offset */
     else if(Char >= TEXT_ASCII_CHAR_MIN) {
         Index = Char + TEXT_ASCII_TABLE_OFFSET; returnValue = E_OK;
@@ -516,12 +516,12 @@ StdReturnType Text::convertCharToFontIndex(char Char, byte& Index) const
 byte Text::convertCharToFontIndexFast(char Char) const
 {
     /* for umlauts we need a special treatment */
-    if('Ä' == Char)  return 96u;
-    else if('Ö' == Char) return 97u;
-    else if('Ü' == Char) return 98u;
-    else if('ä' == Char) return 99u;
-    else if('ö' == Char) return 100u;
-    else if('ü' == Char) return 101u;
+    if('\xC4' == Char)  return 96u;
+    else if('\xD6' == Char) return 97u;
+    else if('\xDC' == Char) return 98u;
+    else if('\xE4' == Char) return 99u;
+    else if('\xF6' == Char) return 100u;
+    else if('\xFC' == Char) return 101u;
     /* for all others only add offset */
     else if(Char >= TEXT_ASCII_CHAR_MIN) {
         return Char + TEXT_ASCII_TABLE_OFFSET;
@@ -533,4 +533,3 @@ byte Text::convertCharToFontIndexFast(char Char) const
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E
 ******************************************************************************************************************************************************/
-
