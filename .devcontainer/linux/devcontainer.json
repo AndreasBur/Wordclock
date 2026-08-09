@@ -4,30 +4,11 @@
         "dockerfile": "../Dockerfile",
         "context": ".."
     },
-    "customizations": {
-        "vscode": {
-            "extensions": [
-                "ms-vscode.cpptools",
-                "ms-vscode.cmake-tools",
-                "openai.chatgpt"
-            ],
-            "settings": {
-                "cmake.configureOnOpen": true,
-                "cmake.generator": "Ninja",
-                "cmake.sourceDirectory": "${workspaceFolder}",
-                "cmake.configureSettings": {
-                    "PLATFORM": "simulator"
-                }
-            }
-        }
-    },
     // X11 works on native Linux without requiring the WSL-only /mnt/wslg path.
     "containerEnv": {
-        "DISPLAY": "${localEnv:DISPLAY}",
-        "TZ": "Europe/Berlin"
+        "DISPLAY": "${localEnv:DISPLAY}"
     },
     "mounts": [
         "source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind"
-    ],
-    "postCreateCommand": "wx-config --version && cmake --version"
+    ]
 }

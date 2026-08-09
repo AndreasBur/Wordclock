@@ -4,34 +4,15 @@
         "dockerfile": "../Dockerfile",
         "context": ".."
     },
-    "customizations": {
-        "vscode": {
-            "extensions": [
-                "ms-vscode.cpptools",
-                "ms-vscode.cmake-tools",
-                "openai.chatgpt"
-            ],
-            "settings": {
-                "cmake.configureOnOpen": true,
-                "cmake.generator": "Ninja",
-                "cmake.sourceDirectory": "${workspaceFolder}",
-                "cmake.configureSettings": {
-                    "PLATFORM": "simulator"
-                }
-            }
-        }
-    },
     // WSLg exposes its X11, Wayland and PulseAudio sockets below /mnt/wslg.
     "containerEnv": {
         "DISPLAY": "${localEnv:DISPLAY}",
         "WAYLAND_DISPLAY": "${localEnv:WAYLAND_DISPLAY}",
         "XDG_RUNTIME_DIR": "/mnt/wslg/runtime-dir",
-        "PULSE_SERVER": "/mnt/wslg/PulseServer",
-        "TZ": "Europe/Berlin"
+        "PULSE_SERVER": "/mnt/wslg/PulseServer"
     },
     "mounts": [
         "source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind",
         "source=/mnt/wslg,target=/mnt/wslg,type=bind"
-    ],
-    "postCreateCommand": "wx-config --version && cmake --version"
+    ]
 }

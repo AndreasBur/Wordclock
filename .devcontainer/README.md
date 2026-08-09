@@ -10,3 +10,8 @@ Container**:
 Choose the configuration matching the host. Keeping the WSLg mount in its own
 configuration prevents native Linux container startup from failing when
 `/mnt/wslg` does not exist.
+
+Shared VS Code extensions, CMake settings and lifecycle commands are stored in
+the `devcontainer.metadata` label in `Dockerfile`. Dev Container clients merge
+that metadata with either platform-specific configuration, so common settings
+only need to be maintained once.
