@@ -1,7 +1,8 @@
 {
-    "name": "Wordclock Simulator (wxWidgets)",
+    "name": "Wordclock Simulator (WSL2/WSLg)",
     "build": {
-        "dockerfile": "Dockerfile"
+        "dockerfile": "../Dockerfile",
+        "context": ".."
     },
     "customizations": {
         "vscode": {
@@ -20,17 +21,17 @@
             }
         }
     },
-    // Forward X11 for the wxWidgets/GTK simulator. VS Code forwards Wayland
-    // itself when the host exposes it; do not mount /mnt/wslg here because that
-    // WSL-only path prevents the container from starting on native Linux.
+    // WSLg exposes its X11, Wayland and PulseAudio sockets below /mnt/wslg.
     "containerEnv": {
         "DISPLAY": "${localEnv:DISPLAY}",
         "WAYLAND_DISPLAY": "${localEnv:WAYLAND_DISPLAY}",
+        "XDG_RUNTIME_DIR": "/mnt/wslg/runtime-dir",
+        "PULSE_SERVER": "/mnt/wslg/PulseServer",
         "TZ": "Europe/Berlin"
     },
-
     "mounts": [
-        "source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind"
+        "source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind",
+        "source=/mnt/wslg,target=/mnt/wslg,type=bind"
     ],
     "postCreateCommand": "wx-config --version && cmake --version"
 }

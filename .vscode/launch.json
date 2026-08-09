@@ -1,6 +1,7 @@
 {
-    // Debug-Konfigurationen für den Wordclock-Simulator (wxWidgets/GTK).
-    // Das Hardware-Target wird mit der AVR-Toolchain gebaut und ist hier nicht enthalten.
+    // Launch configuration for the Wordclock simulator (wxWidgets/GTK):
+    // F5 starts with GDB; Ctrl+F5 runs the same binary without a debugger.
+    // The hardware target is built with the AVR toolchain and is not included here.
     "version": "0.2.0",
     "configurations": [
         {

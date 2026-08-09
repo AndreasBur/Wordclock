@@ -36,15 +36,16 @@ per-platform edits.
 
 ### 2. Dev container (VS Code)
 
-The [.devcontainer/](../../.devcontainer/) config (at the repo root) provides a
-ready-made toolchain (Ubuntu 24.04 + wxWidgets 3.2). Open the repository in VS
-Code: **Dev Containers: Reopen in Container** — CMake configures on open with
+The [.devcontainer/](../../.devcontainer/) directory provides a ready-made
+toolchain (Ubuntu 24.04 + wxWidgets 3.2). Open the repository in VS Code and run
+**Dev Containers: Reopen in Container**. Select **Linux/X11** on native Linux or
+**WSL2/WSLg** when VS Code runs in WSL2. CMake then configures on open with
 `PLATFORM=simulator`; build and run the `Wordclock` target.
 
-On **WSL2/WSLg** the container forwards both the X11 and Wayland sockets, so the
-GUI appears on the Windows desktop with no extra X server. See the comments in
-[.devcontainer/devcontainer.json](../../.devcontainer/devcontainer.json) if you
-need to switch the GTK backend to Wayland.
+The WSLg configuration forwards the X11, Wayland and PulseAudio sockets, so the
+GUI appears on the Windows desktop without an extra X server. Its WSL-only
+mounts are isolated from the Linux configuration, where `/mnt/wslg` need not
+exist.
 
 ### 3. Code::Blocks
 

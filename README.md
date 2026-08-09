@@ -34,10 +34,11 @@ cmake --build build
 ```
 
 Requires CMake ≥ 3.16, a C++17 compiler and wxWidgets 3.x (GTK on Linux). A ready
--made toolchain and a WSLg GUI setup are provided in
-[.devcontainer/](.devcontainer/) — open the repo in VS Code and *Reopen in
-Container*. See the [simulator README](platform/simulator/README.md) for details
-and the Code::Blocks projects.
+-made toolchain with separate Linux/X11 and WSLg GUI configurations is provided
+in [.devcontainer/](.devcontainer/) — open the repo in VS Code, select *Reopen in
+Container*, and choose the configuration matching the host. See the
+[simulator README](platform/simulator/README.md) for details and the Code::Blocks
+projects.
 
 The `hardware` platform is built with the AVR toolchain, not CMake (see its
 README).
