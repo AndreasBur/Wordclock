@@ -40,7 +40,6 @@
 # define DISPLAY_USE_PIXELS_DIMMING                 STD_ON
 #endif
 
-/* how often the display task recalculates the brightness, see Display::task() */
 #define DISPLAY_TASK_CYCLE                          50u
 
 //# if (PIXELS_IS_SINGLETON == STD_ON)
@@ -261,8 +260,6 @@ class Display
     void decrementColorBlue() { Color.decrementColorBlue(); }
     void decrementBrightness() { Brightness.decrementBrightness(); applyBrightness(); }
 
-    /* Recalculates the brightness. Needed because the automatic follows the light
-       sensor, so the value changes without anyone setting it. */
     void task() { applyBrightness(); }
     static constexpr byte getTaskCycle() { return TaskCycle; }
 
