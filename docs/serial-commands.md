@@ -85,6 +85,7 @@ numbers, these shift if an animation is disabled through its
 | 11 | Implode |
 | 12 | Explode |
 | 13 | Matrix — falling code rain, in the display color |
+| 14 | Roll — previous time rolls out while the new one rolls in, direction drawn per minute |
 
 `-S<speed>` sets the task cycle of the selected animation: the animation task runs
 every `speed` scheduler ticks, so **lower is faster** and `0` stops it entirely

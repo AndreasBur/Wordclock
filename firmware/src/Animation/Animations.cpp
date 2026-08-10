@@ -174,6 +174,11 @@ void Animations::setAnimationFast(AnimationIdType sAnimationId)
             return AnimationsRaw.Matrix.init();
             break;
 # endif
+# if(ANIMATIONS_SUPPORT_ROLL == STD_ON)
+        case ANIMATION_ID_ROLL :
+            return AnimationsRaw.Roll.init();
+            break;
+# endif
         default :
             AnimationId = ANIMATION_ID_NONE;
             break;
@@ -254,6 +259,11 @@ StdReturnType Animations::setTime(byte Hour, byte Minute)
 # if(ANIMATIONS_SUPPORT_MATRIX == STD_ON)
         case ANIMATION_ID_MATRIX :
             return AnimationsRaw.Matrix.setTime(Hour, Minute);
+            break;
+# endif
+# if(ANIMATIONS_SUPPORT_ROLL == STD_ON)
+        case ANIMATION_ID_ROLL :
+            return AnimationsRaw.Roll.setTime(Hour, Minute);
             break;
 # endif
         default :
@@ -342,6 +352,11 @@ Animation::StateType Animations::getStateOfCurrentAnimation() const
             return AnimationsRaw.Matrix.getState();
             break;
 # endif
+# if(ANIMATIONS_SUPPORT_ROLL == STD_ON)
+        case ANIMATION_ID_ROLL :
+            return AnimationsRaw.Roll.getState();
+            break;
+# endif
         default :
             return Animation::STATE_NONE;
             break;
@@ -423,6 +438,11 @@ void Animations::taskOfCurrentAnimation()
             AnimationsRaw.Matrix.task();
             break;
 # endif
+# if(ANIMATIONS_SUPPORT_ROLL == STD_ON)
+        case ANIMATION_ID_ROLL :
+            AnimationsRaw.Roll.task();
+            break;
+# endif
         default :
             break;
     }
@@ -502,6 +522,11 @@ StdReturnType Animations::showOfCurrentAnimation() const
 # if(ANIMATIONS_SUPPORT_MATRIX == STD_ON)
         case ANIMATION_ID_MATRIX :
             return AnimationsRaw.Matrix.show();
+            break;
+# endif
+# if(ANIMATIONS_SUPPORT_ROLL == STD_ON)
+        case ANIMATION_ID_ROLL :
+            return AnimationsRaw.Roll.show();
             break;
 # endif
         default :
