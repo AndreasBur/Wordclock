@@ -58,11 +58,6 @@
 #define ANIMATIONS_SUPPORT_MATRIX               STD_ON
 #define ANIMATIONS_SUPPORT_ROLL                 STD_ON
 
-/* These two do not animate themselves, they pick one of the animations above per
-   minute. They have to stay the last ids, see FirstMetaAnimation. */
-#define ANIMATIONS_SUPPORT_RANDOM               STD_ON
-#define ANIMATIONS_SUPPORT_SEQUENCE             STD_ON
-
 #define ANIMATIONS_TASK_CYCLE_INIT_VALUE        10u
 
 /* Animations parameter */
@@ -133,16 +128,17 @@ class Animations
 # if(ANIMATIONS_SUPPORT_ROLL == STD_ON)
         ANIMATION_ID_ROLL,
 # endif
-        /* meta animations, they select one of the ids above. Everything below the
-           first of them is a real animation, which is how they know what they may
-           pick, so they have to stay at the end of this list. */
-# if(ANIMATIONS_SUPPORT_RANDOM == STD_ON)
-        ANIMATION_ID_RANDOM,
-# endif
-# if(ANIMATIONS_SUPPORT_SEQUENCE == STD_ON)
-        ANIMATION_ID_SEQUENCE,
-# endif
         ANIMATION_ID_NUMBER_OF_ANIMATIONS
+    };
+
+    /* Which animation runs on a minute change. Only MODE_FIXED uses the selected
+       animation, the others pick one themselves, which is why selecting an animation
+       and selecting a strategy are two separate settings. */
+    enum ModeType {
+        MODE_FIXED,
+        MODE_RANDOM,
+        MODE_SEQUENCE,
+        MODE_NUMBER_OF_MODES
     };
 
     union AnimationsType {
@@ -228,25 +224,19 @@ class Animations
   private:
     static constexpr byte TaskCycleInitValue{ANIMATIONS_TASK_CYCLE_INIT_VALUE};
 
-    /* first id that selects instead of animates, everything from ANIMATION_ID_NONE + 1
-       up to it is a real animation that the meta animations may pick */
-# if(ANIMATIONS_SUPPORT_RANDOM == STD_ON)
-    static constexpr AnimationIdType FirstMetaAnimation{ANIMATION_ID_RANDOM};
-# elif(ANIMATIONS_SUPPORT_SEQUENCE == STD_ON)
-    static constexpr AnimationIdType FirstMetaAnimation{ANIMATION_ID_SEQUENCE};
-# else
-    static constexpr AnimationIdType FirstMetaAnimation{ANIMATION_ID_NUMBER_OF_ANIMATIONS};
-# endif
-    static constexpr byte NumberOfRealAnimations{FirstMetaAnimation - ANIMATION_ID_NONE - 1u};
+    /* ANIMATION_ID_NONE means no animation at all, so the ids a mode may pick start
+       behind it */
+    static constexpr byte FirstAnimation{ANIMATION_ID_NONE + 1u};
+    static constexpr byte NumberOfAnimations{ANIMATION_ID_NUMBER_OF_ANIMATIONS - FirstAnimation};
     /* odd factor of the hash in calcRandomAnimation(), see there */
     static constexpr byte RandomHashFactor{181u};
 
     std::array<byte, ANIMATION_ID_NUMBER_OF_ANIMATIONS> TaskCycles;
-    /* what the user selected, may be a meta animation */
+    /* what the user selected, used as it is in MODE_FIXED */
     AnimationIdType AnimationId{ANIMATION_ID_NONE};
-    /* what is really running, never a meta animation. Equal to AnimationId unless a
-       meta animation selected something. */
+    /* what is really running, equal to AnimationId unless a mode selected something */
     AnimationIdType CurrentAnimationId{ANIMATION_ID_NONE};
+    ModeType Mode{MODE_FIXED};
     uint16_t RandomState{0u};
     AnimationsType AnimationsRaw;
 
@@ -258,7 +248,7 @@ class Animations
     void taskOfCurrentAnimation();
     StdReturnType showOfCurrentAnimation() const;
     void initCurrentAnimation();
-    void selectAnimationOfMeta();
+    void selectAnimationOfMode();
     AnimationIdType calcRandomAnimation();
     AnimationIdType calcNextAnimation() const;
 
@@ -275,7 +265,7 @@ class Animations
     StateType getState() const;
     AnimationIdType getAnimation() const { return AnimationId; }
     AnimationIdType getCurrentAnimation() const { return CurrentAnimationId; }
-    bool isMetaAnimation(AnimationIdType sAnimationId) const { return sAnimationId >= FirstMetaAnimation; }
+    ModeType getMode() const { return Mode; }
 
     byte getTaskCycle(AnimationIdType sAnimationId) const { return TaskCycles[sAnimationId]; }
     /* the cycle of the running animation, so every animation keeps its own speed while
@@ -295,10 +285,21 @@ class Animations
         }
     }
 
+    void setModeFast(ModeType);
+    StdReturnType setMode(ModeType sMode) {
+        if(isModeValid(sMode)) {
+            setModeFast(sMode);
+            return E_OK;
+        } else {
+            return E_NOT_OK;
+        }
+    }
+
     // methods
     void task(bool=false);
     StdReturnType show() const;
     bool isAnimationValid(AnimationIdType AnimationId) const { return AnimationId < ANIMATION_ID_NUMBER_OF_ANIMATIONS; }
+    static bool isModeValid(ModeType sMode) { return sMode < MODE_NUMBER_OF_MODES; }
     StdReturnType setTime(byte, byte);
 
 };

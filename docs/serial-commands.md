@@ -40,7 +40,7 @@ overlay is disabled at compile time.
 | 6 | Overlay Temperature | `-P -E -M -D -V -A` | See overlay options |
 | 7 | Overlay Text | `-P -E -M -D -V -T -S -F -A` | Text overlay adds text/speed/font |
 | 8 | Clock Mode | `-M<mode>` (uint8) | Sets the clock display mode |
-| 9 | Animation | `-A<id>` `-S<speed>` | Animation id + speed |
+| 9 | Animation | `-A<id>` `-M<mode>` `-S<speed>` | Animation id, selection mode, speed |
 | 10 | Time | `-H<hour>` `-M<min>` `-S<sec>` | Sets RTC time |
 | 11 | Date | `-Y<year>` (uint16) `-M<month>` `-D<day>` | Sets RTC date |
 
@@ -86,19 +86,29 @@ numbers, these shift if an animation is disabled through its
 | 12 | Explode |
 | 13 | Matrix — falling code rain, in the display color |
 | 14 | Roll — previous time rolls out while the new one rolls in, direction drawn per minute |
-| 15 | Random — draws one of the animations 1–14 per minute |
-| 16 | Sequence — runs the animations 1–14 in order, one per minute |
 
-Ids 15 and 16 do not animate themselves, they select one of the others. A query of
-command 9 reports the selected id, so it keeps answering 15 or 16 rather than the
-animation currently running.
+### Animation mode (`command 9 -M<mode>`)
 
-`-S<speed>` sets the task cycle of the selected animation: the animation task runs
-every `speed` scheduler ticks, so **lower is faster** and `0` stops it entirely
-([`Scheduler::isCycleHit`](../firmware/src/Scheduler/Scheduler.cpp)). Default is
-`ANIMATIONS_TASK_CYCLE_INIT_VALUE` = 10. Every animation keeps its own speed, which
-is also the speed used while 15 or 16 switch between them — so a speed has to be set
-per animation, and setting one for 15 or 16 has no effect.
+The mode decides which animation runs on a minute change. `-A` and `-M` are
+independent: `-A` selects the animation of `-M0`, and switching back to `-M0` returns
+to it.
+
+| mode | Meaning |
+|------|---------|
+| 0 | Fixed — always the animation selected with `-A` |
+| 1 | Random — draws one of the animations 1–14 per minute |
+| 2 | Sequence — runs the animations 1–14 in order, one per minute |
+
+A mode only selects while no animation is running, so a minute change during a
+running animation is ignored, exactly as the animations themselves ignore it.
+Selecting an animation with `-A` shows it right away even in mode 1 or 2, which then
+take over again on the next minute change.
+
+`-S<speed>` sets the task cycle of the animation selected with `-A`: the animation
+task runs every `speed` scheduler ticks, so **lower is faster** and `0` stops it
+entirely ([`Scheduler::isCycleHit`](../firmware/src/Scheduler/Scheduler.cpp)). Default
+is `ANIMATIONS_TASK_CYCLE_INIT_VALUE` = 10. Every animation keeps its own speed, and
+modes 1 and 2 use the speed of whichever animation they picked.
 
 ## RPC sub-commands (`command 1 -P<id>`)
 
@@ -149,6 +159,9 @@ Returned in the `Error=<code>` field
 2 -R255 -G128 -B0     # set display color to orange and show it
 4 -I5 -S1             # turn pixel 5 on
 1 -P7                 # run display test
+9 -A13                # show the matrix animation from now on
+9 -M2                 # cycle through all animations, one per minute
+9                     # query animation, mode and speed
 10 -H14 -M30 -S0      # set time to 14:30:00
 10                    # query current time (echoes H=.. M=.. S=..)
 ```

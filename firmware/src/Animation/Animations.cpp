@@ -106,14 +106,28 @@ StdReturnType Animations::setTaskCycle(AnimationIdType AnimationId, byte Cycle)
 void Animations::setAnimationFast(AnimationIdType sAnimationId)
 {
     AnimationId = sAnimationId;
-
-    /* A meta animation has nothing of its own to initialize. It leaves the running
-       animation at none, so the first setTime() selects one right away. */
-    if(isMetaAnimation(AnimationId)) { CurrentAnimationId = ANIMATION_ID_NONE; }
-    else { CurrentAnimationId = AnimationId; }
+    /* shows the selected animation right away, even in a mode that selects on its own;
+       that mode takes over again on the next minute change */
+    CurrentAnimationId = AnimationId;
 
     initCurrentAnimation();
 } /* setAnimationFast */
+
+
+/******************************************************************************************************************************************************
+  setModeFast()
+******************************************************************************************************************************************************/
+void Animations::setModeFast(ModeType sMode)
+{
+    Mode = sMode;
+
+    /* Back to the selected animation. The selecting modes leave the current animation
+       alone and take over on the next minute change. */
+    if(Mode == MODE_FIXED) {
+        CurrentAnimationId = AnimationId;
+        initCurrentAnimation();
+    }
+} /* setModeFast */
 
 
 /******************************************************************************************************************************************************
@@ -207,8 +221,8 @@ StdReturnType Animations::setTime(byte Hour, byte Minute)
 {
     /* Only while nothing is running, so a minute change during a still running
        animation is ignored here exactly as it is by the animations themselves. */
-    if(isMetaAnimation(AnimationId) && getStateOfCurrentAnimation() == Animation::STATE_IDLE) {
-        selectAnimationOfMeta();
+    if(Mode != MODE_FIXED && getStateOfCurrentAnimation() == Animation::STATE_IDLE) {
+        selectAnimationOfMode();
     }
 
     switch(CurrentAnimationId)
@@ -557,22 +571,18 @@ StdReturnType Animations::showOfCurrentAnimation() const
 
 
 /******************************************************************************************************************************************************
-  selectAnimationOfMeta()
+  selectAnimationOfMode()
 ******************************************************************************************************************************************************/
-void Animations::selectAnimationOfMeta()
+void Animations::selectAnimationOfMode()
 {
-    switch(AnimationId)
+    switch(Mode)
     {
-# if(ANIMATIONS_SUPPORT_RANDOM == STD_ON)
-        case ANIMATION_ID_RANDOM :
+        case MODE_RANDOM :
             CurrentAnimationId = calcRandomAnimation();
             break;
-# endif
-# if(ANIMATIONS_SUPPORT_SEQUENCE == STD_ON)
-        case ANIMATION_ID_SEQUENCE :
+        case MODE_SEQUENCE :
             CurrentAnimationId = calcNextAnimation();
             break;
-# endif
         default :
             break;
     }
@@ -580,7 +590,7 @@ void Animations::selectAnimationOfMeta()
     /* the selected animation shares its memory with the previous one, so it has to be
        initialized before it is used */
     initCurrentAnimation();
-} /* selectAnimationOfMeta */
+} /* selectAnimationOfMode */
 
 
 /******************************************************************************************************************************************************
@@ -600,9 +610,9 @@ Animations::AnimationIdType Animations::calcRandomAnimation()
 
     /* scaled by multiplication instead of a modulo, which would favour the first
        animations because 256 is not a multiple of their number */
-    const byte offset = static_cast<byte>((static_cast<uint16_t>(hash) * NumberOfRealAnimations) >> 8u);
+    const byte offset = static_cast<byte>((static_cast<uint16_t>(hash) * NumberOfAnimations) >> 8u);
 
-    return static_cast<AnimationIdType>(ANIMATION_ID_NONE + 1u + offset);
+    return static_cast<AnimationIdType>(FirstAnimation + offset);
 } /* calcRandomAnimation */
 
 
@@ -612,8 +622,8 @@ Animations::AnimationIdType Animations::calcRandomAnimation()
 Animations::AnimationIdType Animations::calcNextAnimation() const
 {
     /* none as the running animation means nothing ran yet, so start at the first one */
-    if(CurrentAnimationId == ANIMATION_ID_NONE || CurrentAnimationId + 1u >= FirstMetaAnimation) {
-        return static_cast<AnimationIdType>(ANIMATION_ID_NONE + 1u);
+    if(CurrentAnimationId == ANIMATION_ID_NONE || CurrentAnimationId + 1u >= ANIMATION_ID_NUMBER_OF_ANIMATIONS) {
+        return static_cast<AnimationIdType>(FirstAnimation);
     }
 
     return static_cast<AnimationIdType>(CurrentAnimationId + 1u);

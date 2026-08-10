@@ -33,7 +33,7 @@
 
 
 /* MsgCmdAnimationParser parameter */
-#define MSG_CMD_ANIMATION_PARSER_PARAMETER_TABLE_SIZE           2u
+#define MSG_CMD_ANIMATION_PARSER_PARAMETER_TABLE_SIZE           3u
 
 
 /******************************************************************************************************************************************************
@@ -51,6 +51,7 @@ class MsgCmdAnimationParser : public MsgParameterParser<MsgCmdAnimationParser, M
 ******************************************************************************************************************************************************/
   public:
     using AnimationIdType = Animations::AnimationIdType;
+    using ModeType = Animations::ModeType;
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
@@ -58,13 +59,16 @@ class MsgCmdAnimationParser : public MsgParameterParser<MsgCmdAnimationParser, M
   private:
     friend class MsgParameterParser;
     AnimationIdType AnimationId{Animations::ANIMATION_ID_NONE};
+    ModeType Mode{Animations::MODE_FIXED};
     byte Speed{0u};
 
     static constexpr char AnimationOptionShortName{'A'};
+    static constexpr char ModeOptionShortName{'M'};
     static constexpr char SpeedOptionShortName{'S'};
 
     static constexpr ParameterTableType ParameterTable PROGMEM {
         ParameterTableElementType(AnimationOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8),
+        ParameterTableElementType(ModeOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8),
         ParameterTableElementType(SpeedOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8)
     };
 
@@ -75,6 +79,9 @@ class MsgCmdAnimationParser : public MsgParameterParser<MsgCmdAnimationParser, M
         if(ParameterShortName == AnimationOptionShortName) {
             AnimationId = static_cast<Animations::AnimationIdType>(Argument);
         }
+        if(ParameterShortName == ModeOptionShortName) {
+            Mode = static_cast<Animations::ModeType>(Argument);
+        }
         if(ParameterShortName == SpeedOptionShortName) {
              Speed = Argument;
         }
@@ -82,6 +89,10 @@ class MsgCmdAnimationParser : public MsgParameterParser<MsgCmdAnimationParser, M
 
     void sendAnswerAnimation(bool AppendSpace) const {
         sendAnswerParameter(AnimationOptionShortName, Animations::getInstance().getAnimation(), AppendSpace);
+    }
+
+    void sendAnswerMode(bool AppendSpace) const {
+        sendAnswerParameter(ModeOptionShortName, Animations::getInstance().getMode(), AppendSpace);
     }
 
     void sendAnswerSpeed(bool AppendSpace) const {
@@ -96,6 +107,12 @@ class MsgCmdAnimationParser : public MsgParameterParser<MsgCmdAnimationParser, M
         Error.checkReturnValueAndSend(AnimationOptionShortName, returnValue, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNDS);
     }
 
+    void setMode() const
+    {
+        StdReturnType returnValue = Animations::getInstance().setMode(Mode);
+        Error.checkReturnValueAndSend(ModeOptionShortName, returnValue, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNDS);
+    }
+
     void setClockTaskCycle() const
     {
         StdReturnType returnValue = Animations::getInstance().setTaskCycle(AnimationId, Scheduler::convertSpeedToTaskCycle(Speed));
@@ -106,9 +123,12 @@ class MsgCmdAnimationParser : public MsgParameterParser<MsgCmdAnimationParser, M
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    MsgCmdAnimationParser(const char* Parameter) : MsgParameterParser(ParameterTable, Parameter), AnimationId(), Speed(0u)
+    MsgCmdAnimationParser(const char* Parameter) : MsgParameterParser(ParameterTable, Parameter), AnimationId(), Mode(), Speed(0u)
     {
+        /* preloaded with the current settings, so a command may set single options
+           without resetting the others */
         AnimationId = Animations::getInstance().getAnimation();
+        Mode = Animations::getInstance().getMode();
         Speed = Scheduler::convertTaskCycleToSpeed(Animations::getInstance().getTaskCycle(AnimationId));
     }
 
@@ -122,12 +142,14 @@ class MsgCmdAnimationParser : public MsgParameterParser<MsgCmdAnimationParser, M
     void sendAnswer() const
     {
         sendAnswerAnimation(true);
+        sendAnswerMode(true);
         sendAnswerSpeed(false);
     }
 
     void process() const
     {
         setAnimation();
+        setMode();
         setClockTaskCycle();
     }
 };
