@@ -81,10 +81,14 @@ class Scheduler
         if(Speed == 0u) { return 0u; }
         return UINT8_MAX - Speed;
     }
+    /* Has to be the inverse of convertSpeedToTaskCycle(), otherwise every command that
+       reads a speed and writes it back unchanged shifts the cycle by one. The command
+       parsers do exactly that, since they preload their options with the current
+       settings so a command may set single options. */
     static byte convertTaskCycleToSpeed(byte TaskCycle) {
-        if(TaskCycle == UINT8_MAX) { return 1u; }
         if(TaskCycle == 0u) { return 0u; }
-        return UINT8_MAX - (TaskCycle - 1u);
+        if(TaskCycle == UINT8_MAX) { return 1u; }
+        return UINT8_MAX - TaskCycle;
     }
 };
 

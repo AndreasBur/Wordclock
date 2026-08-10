@@ -118,11 +118,13 @@ The **last** remaining flag cannot be cleared — the selecting modes would be l
 nothing to pick, so the firmware answers `Error=4` and keeps it. Clearing the flag of
 id 0 is rejected the same way, since `0` is not an animation.
 
-`-S<speed>` sets the task cycle of the animation selected with `-A`: the animation
-task runs every `speed` scheduler ticks, so **lower is faster** and `0` stops it
-entirely ([`Scheduler::isCycleHit`](../firmware/src/Scheduler/Scheduler.cpp)). Default
-is `ANIMATIONS_TASK_CYCLE_INIT_VALUE` = 10. Every animation keeps its own speed, and
-modes 1 and 2 use the speed of whichever animation they picked.
+`-S<speed>` sets the speed of the animation selected with `-A`: **higher is faster**,
+`255` is the fastest and `0` stops the animation entirely. The speed is the inverse of
+the task cycle the scheduler counts in
+([`Scheduler::convertSpeedToTaskCycle`](../firmware/inc/Scheduler/Scheduler.h)), which
+is why the two run in opposite directions. The default task cycle of `10`
+(`ANIMATIONS_TASK_CYCLE_INIT_VALUE`) is reported as `S=245`. Every animation keeps its
+own speed, and modes 1 and 2 use the speed of whichever animation they picked.
 
 ## RPC sub-commands (`command 1 -P<id>`)
 
