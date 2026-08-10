@@ -79,11 +79,11 @@ numbers, these shift if an animation is disabled through its
 | 5 | Fade | Dims the display down to dark, changes the time, and fades it back up |
 | 6 | Snake | A short snake travels along the LED strip and leaves the new letters lit behind it |
 | 7 | Wipe | A diagonal line sweeps across the display and uncovers the new letters |
-| 8 | Cube | A rectangle collapses towards the centre and grows back out, uncovering the new time |
+| 8 | Cube | A rectangle shrinks towards the centre and grows back out, leaving the new letters behind |
 | 9 | Flicker | The display flickers a few times, then the new time is there |
-| 10 | Squeeze | Every word of the new time grows out of its first letter |
-| 11 | Implode | The picture is pulled apart into its four quadrants, then the new time comes back together towards the centre |
-| 12 | Explode | The words of the new time travel one after the other from the corner to their place |
+| 10 | Squeeze | The words of the previous time are eaten away letter by letter, the new ones grow out of their first letter |
+| 11 | Implode | Every lit pixel is pulled into the centre, then the new time expands out of it again — pixel by pixel |
+| 12 | Explode | The same movement as 11, but whole words travel into the centre and back out, one after the other |
 | 13 | Matrix | Falling code rain in the display color; the new time stays behind as the drops pass over its letters |
 | 14 | Roll | The previous time rolls out while the new one rolls in behind it, direction drawn per minute — never empty |
 
