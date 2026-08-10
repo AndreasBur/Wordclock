@@ -16,28 +16,9 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && \
         wx-common && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Settings shared by all devcontainer.json variants. Dev Container clients
-# merge this image metadata with the selected platform-specific configuration.
-LABEL devcontainer.metadata='[{ \
-    "customizations": { \
-        "vscode": { \
-            "extensions": [ \
-                "ms-vscode.cpptools", \
-                "ms-vscode.cmake-tools", \
-                "EditorConfig.EditorConfig", \
-                "eamodio.gitlens", \
-                "openai.chatgpt" \
-            ], \
-            "settings": { \
-                "cmake.configureOnOpen": true, \
-                "cmake.generator": "Ninja", \
-                "cmake.configureSettings": { \
-                    "PLATFORM": "simulator" \
-                } \
-            } \
-        } \
-    }, \
-    "postCreateCommand": "wx-config --version && cmake --version" \
-}]'
-
 ENV TZ=Europe/Berlin
+
+# Extensions, editor settings and lifecycle commands belong in each
+# devcontainer.json. A devcontainer.metadata label set here would not work:
+# clients read image metadata from the image the final FROM points at, then
+# overwrite the label on the image they build from this file.
