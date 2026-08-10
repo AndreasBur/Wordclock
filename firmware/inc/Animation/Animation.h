@@ -66,14 +66,14 @@ class Animation
  *  P R O T E C T E D   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   protected:
-    /* odd factor of the hash in drawFromTime(), see there */
-    static constexpr byte DrawHashFactor{181u};
+    /* odd factor of the hash in selectByTime(), see there */
+    static constexpr byte SelectHashFactor{181u};
 
     StateType State{STATE_NONE};
 
     // functions
     void init(StateType sState) { State = sState; }
-    byte drawFromTime(byte, byte, byte) const;
+    byte selectByTime(byte, byte, byte) const;
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S

@@ -72,22 +72,22 @@ bool Animation::isPixelPartOfClockWords(const ClockWords::WordsListType ClockWor
 
 
 /******************************************************************************************************************************************************
-  drawFromTime()
+  selectByTime()
 ******************************************************************************************************************************************************/
-byte Animation::drawFromTime(byte Hour, byte Minute, byte NumberOfValues) const
+byte Animation::selectByTime(byte Hour, byte Minute, byte NumberOfValues) const
 {
     /* Lets an animation vary from minute to minute without keeping a random generator
        of its own. A plain modulo of the minute would not do, because it walks through
        the values in a fixed order; two multiplications with an xor fold in between
        scatter them as a random generator would. */
-    byte hash = static_cast<byte>(((Hour * 60u) + Minute) * DrawHashFactor);
+    byte hash = static_cast<byte>(((Hour * 60u) + Minute) * SelectHashFactor);
     hash ^= static_cast<byte>(hash >> 4u);
-    hash = static_cast<byte>(hash * DrawHashFactor);
+    hash = static_cast<byte>(hash * SelectHashFactor);
 
     /* scaled by multiplication instead of a modulo, which would favour the lower
        values because 256 is not a multiple of NumberOfValues */
     return static_cast<byte>((static_cast<uint16_t>(hash) * NumberOfValues) >> 8u);
-} /* drawFromTime */
+} /* selectByTime */
 
 
 /******************************************************************************************************************************************************

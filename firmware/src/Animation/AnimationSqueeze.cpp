@@ -63,7 +63,7 @@ StdReturnType AnimationSqueeze::setTime(byte Hour, byte Minute)
 
     if(Clock::getInstance().getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
         ReturnValue = E_OK;
-        Direction = static_cast<DirectionType>(drawFromTime(Hour, Minute, DIRECTION_NUMBER_OF_DIRECTIONS));
+        Direction = static_cast<DirectionType>(selectByTime(Hour, Minute, DIRECTION_NUMBER_OF_DIRECTIONS));
         State = STATE_CLEAR_TIME;
     }
     return ReturnValue;

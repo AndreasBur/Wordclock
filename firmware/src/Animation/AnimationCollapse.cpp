@@ -64,7 +64,7 @@ StdReturnType AnimationCollapse::setTime(byte Hour, byte Minute)
 
     if(Clock::getInstance().getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
         Step = 0u;
-        Direction = static_cast<DirectionType>(drawFromTime(Hour, Minute, DIRECTION_NUMBER_OF_DIRECTIONS));
+        Direction = static_cast<DirectionType>(selectByTime(Hour, Minute, DIRECTION_NUMBER_OF_DIRECTIONS));
         /* the previous time is on the display and is what collapses first. An empty
            display simply finishes that phase on its first task. */
         State = STATE_CLEAR_TIME;
