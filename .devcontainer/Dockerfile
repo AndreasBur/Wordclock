@@ -18,7 +18,8 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && \
 
 ENV TZ=Europe/Berlin
 
-# Extensions, editor settings and lifecycle commands belong in each
-# devcontainer.json. A devcontainer.metadata label set here would not work:
-# clients read image metadata from the image the final FROM points at, then
-# overwrite the label on the image they build from this file.
+# Extensions, editor settings and lifecycle commands live in the local feature
+# in shared/, which every devcontainer.json variant references. A
+# devcontainer.metadata label set here would not work: clients read image
+# metadata from the image the final FROM points at, then overwrite the label on
+# the image they build from this file.

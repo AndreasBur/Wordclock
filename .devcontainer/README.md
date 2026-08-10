@@ -11,11 +11,28 @@ Choose the configuration matching the host. Keeping the WSLg mount in its own
 configuration prevents native Linux container startup from failing when
 `/mnt/wslg` does not exist.
 
-Both configurations repeat the same VS Code extensions, CMake settings and
-`postCreateCommand`. Keep them in sync when changing one. A
-`devcontainer.metadata` label in `Dockerfile` does not work as a shared place
-for them: clients read image metadata from the image the final `FROM` points
-at, and overwrite the label on the image built from this file.
+## Shared editor configuration
+
+VS Code extensions, CMake settings and the toolchain sanity check live in the
+local dev container feature in `shared/`, which every configuration references:
+
+```jsonc
+"features": { "./../shared": {} }
+```
+
+Feature metadata is merged with the referencing `devcontainer.json`, so a
+variant can add its own extensions on top without repeating the shared list.
+
+Feature metadata is baked into the image at build time, so editing
+`shared/devcontainer-feature.json` requires **Dev Containers: Rebuild
+Container**. Reopening the folder keeps the previous metadata, which looks like
+a newly added extension being ignored. Entries in the `customizations` section
+of a `devcontainer.json` take effect on reopen instead.
+
+A `devcontainer.metadata` label in `Dockerfile` does *not* work for this:
+clients read image metadata from the image the final `FROM` points at, and then
+overwrite the label on the image built from this file. Extensions declared that
+way are silently ignored.
 
 ## Site-specific variants
 
