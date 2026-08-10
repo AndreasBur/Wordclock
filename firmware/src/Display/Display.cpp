@@ -196,7 +196,7 @@ StdReturnType Display::getPixel(byte Column, byte Row, PixelValueType& Value)  c
     Pixel pixel;
 
 #if (DISPLAY_LED_STRIPE_SERPENTINE == STD_ON)
-    /* if led stripe is snake or serpentine then odd row: count from right to left */
+    
     returnValue = PixelStripe.getPixel(transformToSerpentine(Column,  Row), pixel);
 #else
     returnValue = PixelStripe.getPixel((Row * DISPLAY_NUMBER_OF_COLUMNS) + Column, pixel);
@@ -218,7 +218,6 @@ Display::PixelValueType Display::getPixelFast(byte Column, byte Row)  const
     Pixel pixel;
 
 #if (DISPLAY_LED_STRIPE_SERPENTINE == STD_ON)
-    /* if led stripe is snake or serpentine then odd row: count from right to left */
     pixel = PixelStripe.getPixelFast(transformToSerpentine(Column,  Row));
 #else
     pixel = PixelStripe.getPixelFast((Row * DISPLAY_NUMBER_OF_COLUMNS) + Column);
@@ -273,6 +272,50 @@ void Display::setPixelFast(byte Column, byte Row)
 
 
 /******************************************************************************************************************************************************
+  getColorDimmed()
+******************************************************************************************************************************************************/
+Pixel Display::getColorDimmed(byte Brightness)
+{
+    /* the display color stays the only color, the brightness just dimms it. It comes
+       on top of the display brightness, which is already part of the color here. */
+#if (DISPLAY_USE_PIXELS_DIMMING == STD_ON)
+    Pixel pixelColor = Color.getColor();
+#else
+    Pixel pixelColor = Color.getColorDimmed();
+#endif
+    pixelColor.dimmPixel(Brightness);
+
+    return pixelColor;
+} /* getColorDimmed */
+
+
+/******************************************************************************************************************************************************
+  setPixel()
+******************************************************************************************************************************************************/
+StdReturnType Display::setPixel(byte Column, byte Row, byte Brightness)
+{
+#if (DISPLAY_LED_STRIPE_SERPENTINE == STD_ON)
+    return PixelStripe.setPixel(transformToSerpentine(Column,  Row), getColorDimmed(Brightness));
+#else
+    return PixelStripe.setPixel((Row * DISPLAY_NUMBER_OF_COLUMNS) + Column, getColorDimmed(Brightness));
+#endif
+} /* setPixel */
+
+
+/******************************************************************************************************************************************************
+  setPixelFast()
+******************************************************************************************************************************************************/
+void Display::setPixelFast(byte Column, byte Row, byte Brightness)
+{
+#if (DISPLAY_LED_STRIPE_SERPENTINE == STD_ON)
+    PixelStripe.setPixelFast(transformToSerpentine(Column,  Row), getColorDimmed(Brightness));
+#else
+    PixelStripe.setPixelFast((Row * DISPLAY_NUMBER_OF_COLUMNS) + Column, getColorDimmed(Brightness));
+#endif
+} /* setPixelFast */
+
+
+/******************************************************************************************************************************************************
   setPixel()
 ******************************************************************************************************************************************************/
 StdReturnType Display::setPixel(IndexType Index)
@@ -300,7 +343,6 @@ void Display::setPixelFast(IndexType Index)
 StdReturnType Display::clearPixel(byte Column, byte Row)
 {
 #if (DISPLAY_LED_STRIPE_SERPENTINE == STD_ON)
-    /* if led stripe is snake or serpentine then odd row: count from right to left */
     return PixelStripe.clearPixel(transformToSerpentine(Column,  Row));
 #else
     return PixelStripe.clearPixel((Row * DISPLAY_NUMBER_OF_COLUMNS) + Column);
@@ -314,7 +356,6 @@ StdReturnType Display::clearPixel(byte Column, byte Row)
 void Display::clearPixelFast(byte Column, byte Row)
 {
 #if (DISPLAY_LED_STRIPE_SERPENTINE == STD_ON)
-    /* if led stripe is snake or serpentine then odd row: count from right to left */
     PixelStripe.clearPixelFast(transformToSerpentine(Column,  Row));
 #else
     PixelStripe.clearPixelFast((Row * DISPLAY_NUMBER_OF_COLUMNS) + Column);
@@ -352,7 +393,6 @@ StdReturnType Display::togglePixel(byte Column, byte Row)
     PixelValueType pixelValue{false};
 
 #if (DISPLAY_LED_STRIPE_SERPENTINE == STD_ON)
-    /* if led stripe is snake or serpentine then odd row: count from right to left */
     byte index = transformToSerpentine(Column,  Row);
     getPixel(index, &pixelValue);
     if(pixelValue) { return clearPixel(index); }
@@ -372,7 +412,6 @@ StdReturnType Display::togglePixel(byte Column, byte Row)
 void Display::togglePixelFast(byte Column, byte Row)
 {
 #if (DISPLAY_LED_STRIPE_SERPENTINE == STD_ON)
-    /* if led stripe is snake or serpentine then odd row: count from right to left */
     byte index = transformToSerpentine(Column,  Row);
     if(getPixelFast(index)) clearPixelFast(index);
     else setPixelFast(index);

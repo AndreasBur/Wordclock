@@ -36,6 +36,7 @@
 #include "AnimationSqueeze.h"
 #include "AnimationImplode.h"
 #include "AnimationExplode.h"
+#include "AnimationMatrix.h"
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
@@ -53,6 +54,7 @@
 #define ANIMATIONS_SUPPORT_SQUEEZE              STD_ON
 #define ANIMATIONS_SUPPORT_IMPLODE              STD_ON
 #define ANIMATIONS_SUPPORT_EXPLODE              STD_ON
+#define ANIMATIONS_SUPPORT_MATRIX               STD_ON
 
 #define ANIMATIONS_TASK_CYCLE_INIT_VALUE        10u
 
@@ -116,9 +118,11 @@ class Animations
         ANIMATION_ID_IMPLODE,
 # endif
 # if(ANIMATIONS_SUPPORT_EXPLODE == STD_ON)
-        ANIMATION_EXPLODE,
+        ANIMATION_ID_EXPLODE,
 # endif
-        //ANIMATION_MATRIX,
+# if(ANIMATIONS_SUPPORT_MATRIX == STD_ON)
+        ANIMATION_ID_MATRIX,
+# endif
         ANIMATION_ID_NUMBER_OF_ANIMATIONS
     };
 
@@ -159,6 +163,9 @@ class Animations
 # if(ANIMATIONS_SUPPORT_EXPLODE == STD_ON)
         AnimationExplode Explode;
 # endif
+# if(ANIMATIONS_SUPPORT_MATRIX == STD_ON)
+        AnimationMatrix Matrix;
+# endif
         constexpr AnimationsType() :
 # if(ANIMATIONS_SUPPORT_CURSOR == STD_ON)
         Cursor()
@@ -184,6 +191,8 @@ class Animations
         Implode()
 # elif(ANIMATIONS_SUPPORT_EXPLODE == STD_ON)
         Explode()
+# elif(ANIMATIONS_SUPPORT_MATRIX == STD_ON)
+        Matrix()
 # endif
 { }
         ~AnimationsType() { }

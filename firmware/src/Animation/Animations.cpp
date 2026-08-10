@@ -165,8 +165,13 @@ void Animations::setAnimationFast(AnimationIdType sAnimationId)
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_EXPLODE == STD_ON)
-        case ANIMATION_EXPLODE :
+        case ANIMATION_ID_EXPLODE :
             return AnimationsRaw.Explode.init();
+            break;
+# endif
+# if(ANIMATIONS_SUPPORT_MATRIX == STD_ON)
+        case ANIMATION_ID_MATRIX :
+            return AnimationsRaw.Matrix.init();
             break;
 # endif
         default :
@@ -242,8 +247,13 @@ StdReturnType Animations::setTime(byte Hour, byte Minute)
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_EXPLODE == STD_ON)
-        case ANIMATION_EXPLODE :
+        case ANIMATION_ID_EXPLODE :
             return AnimationsRaw.Explode.setTime(Hour, Minute);
+            break;
+# endif
+# if(ANIMATIONS_SUPPORT_MATRIX == STD_ON)
+        case ANIMATION_ID_MATRIX :
+            return AnimationsRaw.Matrix.setTime(Hour, Minute);
             break;
 # endif
         default :
@@ -323,8 +333,13 @@ Animation::StateType Animations::getStateOfCurrentAnimation() const
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_EXPLODE == STD_ON)
-        case ANIMATION_EXPLODE :
+        case ANIMATION_ID_EXPLODE :
             return AnimationsRaw.Explode.getState();
+            break;
+# endif
+# if(ANIMATIONS_SUPPORT_MATRIX == STD_ON)
+        case ANIMATION_ID_MATRIX :
+            return AnimationsRaw.Matrix.getState();
             break;
 # endif
         default :
@@ -399,10 +414,15 @@ void Animations::taskOfCurrentAnimation()
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_EXPLODE == STD_ON)
-        case ANIMATION_EXPLODE :
+        case ANIMATION_ID_EXPLODE :
             AnimationsRaw.Explode.task();
-# endif
             break;
+# endif
+# if(ANIMATIONS_SUPPORT_MATRIX == STD_ON)
+        case ANIMATION_ID_MATRIX :
+            AnimationsRaw.Matrix.task();
+            break;
+# endif
         default :
             break;
     }
@@ -475,8 +495,13 @@ StdReturnType Animations::showOfCurrentAnimation() const
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_EXPLODE == STD_ON)
-        case ANIMATION_EXPLODE :
+        case ANIMATION_ID_EXPLODE :
             return AnimationsRaw.Explode.show();
+            break;
+# endif
+# if(ANIMATIONS_SUPPORT_MATRIX == STD_ON)
+        case ANIMATION_ID_MATRIX :
+            return AnimationsRaw.Matrix.show();
             break;
 # endif
         default :

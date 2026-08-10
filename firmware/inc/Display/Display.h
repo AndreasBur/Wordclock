@@ -129,6 +129,8 @@ class Display
     byte transformToSerpentine(byte, byte) const;
     byte transformToSerpentine(byte) const;
 
+    Pixel getColorDimmed(byte);
+
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
@@ -197,6 +199,7 @@ class Display
     StdReturnType writePixel(IndexType Index, PixelValueType Value) { if(Value) return setPixel(Index); else return clearPixel(Index); }
     StdReturnType setPixel(byte, byte);
     StdReturnType setPixel(IndexType);
+    StdReturnType setPixel(byte, byte, byte);
     StdReturnType clearPixel(byte, byte);
     StdReturnType clearPixel(IndexType);
     StdReturnType togglePixel(byte, byte);
@@ -214,6 +217,7 @@ class Display
     void writePixelFast(IndexType Index, PixelValueType Value) { if(Value) setPixelFast(Index); else clearPixelFast(Index); }
     void setPixelFast(byte, byte);
     void setPixelFast(byte);
+    void setPixelFast(byte, byte, byte);
     void clearPixelFast(byte, byte);
     void clearPixelFast(byte);
     void togglePixelFast(byte, byte);

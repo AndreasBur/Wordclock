@@ -8,119 +8,119 @@
  *  ---------------------------------------------------------------------------------------------------------------------------------------------------
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       Pixel.h
- *      \brief
+/**     \file       AnimationMatrix.h
+ *      \brief      Falling code rain, as seen in the Matrix movie
  *
- *      \details
+ *      \details    One drop falls per column. All drops move at the same speed, the
+ *                  rain pattern comes from their different start delays only. Letters
+ *                  of the new time light up at full intensity once the drop has
+ *                  passed them far enough, so the time appears out of the rain.
+ *
+ *                  Everything is drawn in the display color and differs in intensity
+ *                  only, so the display keeps one uniform color. Set the display
+ *                  color to green for the look of the movie.
+ *
+ *                  Ported from the wordclock24h project by Frank Meyer
+ *                  (display_animation_generic_matrix in src/display/display.c), which
+ *                  uses a yellow head and green rain regardless of the display color.
  *
 ******************************************************************************************************************************************************/
-#ifndef _PIXEL_H_
-#define _PIXEL_H_
+#ifndef _ANIMATION_MATRIX_H_
+#define _ANIMATION_MATRIX_H_
 
 /******************************************************************************************************************************************************
- * I N C L U D E S
+ * INCLUDES
 ******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Arduino.h"
-#include <array>
+#include "Clock.h"
+#include "Animation.h"
 
 /******************************************************************************************************************************************************
- *  G L O B A L   C O N S T A N T   M A C R O S
+ *  GLOBAL CONSTANT MACROS
 ******************************************************************************************************************************************************/
-/* Pixel configuration parameter */
-#define PIXEL_COLOR_OFFSET_GREEN                   0u
-#define PIXEL_COLOR_OFFSET_RED                     1u
-#define PIXEL_COLOR_OFFSET_BLUE                    2u
-
-/* Pixel parameter */
+/* AnimationMatrix configuration parameter */
 
 
+/* AnimationMatrix parameter */
 
-/******************************************************************************************************************************************************
- *  G L O B A L   F U N C T I O N   M A C R O S
-******************************************************************************************************************************************************/
 
 
 /******************************************************************************************************************************************************
- *  C L A S S   N E O P I X E L
+ *  GLOBAL FUNCTION MACROS
 ******************************************************************************************************************************************************/
-class Pixel
+
+
+/******************************************************************************************************************************************************
+ *  GLOBAL DATA TYPES AND STRUCTURES
+ *****************************************************************************************************************************************************/
+
+
+/******************************************************************************************************************************************************
+ *  C L A S S   A N I M A T I O N   M A T R I X
+******************************************************************************************************************************************************/
+class AnimationMatrix : public Animation
 {
-/******************************************************************************************************************************************************
- *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
-******************************************************************************************************************************************************/
   public:
-    using ColorType = byte;
-
 /******************************************************************************************************************************************************
- *  P R I V A T E   D A T A   T Y P E S   A N D   S T R U C T U R E S
+ *  GLOBAL DATA TYPES AND STRUCTURES
 ******************************************************************************************************************************************************/
-  private:
-    static constexpr byte NumberOfColors{3u};
-    using PixelRawType = std::array<byte, NumberOfColors>;
+
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    PixelRawType PixelRaw{0u, 0u, 0u};
+    /* number of frames a column stays dark before its drop enters the display */
+    static constexpr byte MaxStartDelay{DISPLAY_NUMBER_OF_ROWS};
+    /* the drop has to run past the last row until its trail has left the display */
+    static constexpr byte NumberOfFrames{4u * DISPLAY_NUMBER_OF_ROWS};
+    /* fade step from which letters of the new time are shown, see drawColumn() */
+    static constexpr byte RevealFadeStep{3u};
+    /* last fade step of the trail, above it a pixel goes dark. The original has no
+       such limit, its trail always reaches up to the first row. With the limit the
+       trail follows the drop out of the display instead of leaving a dim haze
+       behind, so the animation ends on a black display showing only the new time. */
+    static constexpr byte TrailFadeSteps{6u};
+    /* odd factor of the hash in startFrame(), see there */
+    static constexpr byte StartFrameHashFactor{181u};
+    /* per pixel brightness of the brightest trail pixel, divided by the fade step for
+       the ones behind it. The drop head and the letters of the new time do not use it,
+       they are set without a brightness and are therefore at full display brightness. */
+    static constexpr byte TrailBrightness{255u};
 
-    static constexpr byte ColorMaxValue{255u};
-    static constexpr byte ColorOffsetRed{PIXEL_COLOR_OFFSET_RED};
-    static constexpr byte ColorOffsetGreen{PIXEL_COLOR_OFFSET_GREEN};
-    static constexpr byte ColorOffsetBlue{PIXEL_COLOR_OFFSET_BLUE};
+    ClockWords::WordsListType ClockWordsTable{{DisplayWords::WORD_NONE}};
+    byte FrameCounter{0u};
+    /* varies the start frames from minute to minute, see startFrame() */
+    byte Seed{0u};
 
     // functions
-    static constexpr ColorType dimmColor(ColorType Color, byte Brightness) {
-        return static_cast<ColorType>((static_cast<uint16_t>(Color) * (Brightness + 1u)) >> 8u);
-    }
+    void reset();
+    void setTimeTask();
+    void drawColumn(byte, byte);
+    byte startFrame(byte) const;
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr Pixel() { }
-    constexpr Pixel(ColorType ColorRed, ColorType ColorGreen, ColorType ColorBlue)
-        : PixelRaw{ColorRed, ColorGreen, ColorBlue} { }
-    ~Pixel() { }
+    constexpr AnimationMatrix() { }
+    ~AnimationMatrix() { }
 
     // get methods
-    static constexpr byte getNumberOfColors() { return NumberOfColors; }
-    ColorType getRed() const { return PixelRaw[ColorOffsetRed]; }
-    ColorType getBlue() const { return PixelRaw[ColorOffsetBlue]; }
-    ColorType getGreen() const { return PixelRaw[ColorOffsetGreen]; }
+
 
     // set methods
-    void setRed(ColorType Value) { PixelRaw[ColorOffsetRed] = Value; }
-    void setBlue(ColorType Value) { PixelRaw[ColorOffsetBlue] = Value; }
-    void setGreen(ColorType Value) { PixelRaw[ColorOffsetGreen] = Value; }
 
-    void setPixel(ColorType Red, ColorType Green, ColorType Blue) {
-         PixelRaw[ColorOffsetRed] = Red;
-         PixelRaw[ColorOffsetBlue] = Blue;
-         PixelRaw[ColorOffsetGreen] = Green;
-    }
 
     // methods
-    void clearPixel() { setPixel(0u, 0u, 0u); }
-
-    /* dimms all three colors, ColorMaxValue keeps the pixel unchanged. Dimms the
-       color as a whole, so the hue is preserved and only the brightness changes. */
-    void dimmPixel(byte Brightness) {
-        setPixel(dimmColor(getRed(), Brightness), dimmColor(getGreen(), Brightness), dimmColor(getBlue(), Brightness));
-    }
-
-    void incrementRed() { if(PixelRaw[ColorOffsetRed] < ColorMaxValue) PixelRaw[ColorOffsetRed]++; }
-    void incrementGreen() { if(PixelRaw[ColorOffsetGreen] < ColorMaxValue) PixelRaw[ColorOffsetGreen]++; }
-    void incrementBlue() { if(PixelRaw[ColorOffsetBlue] < ColorMaxValue) PixelRaw[ColorOffsetBlue]++; }
-
-    void decrementRed() { if(PixelRaw[ColorOffsetRed] > 0u) PixelRaw[ColorOffsetRed]--; }
-    void decrementGreen() { if(PixelRaw[ColorOffsetGreen] > 0u) PixelRaw[ColorOffsetGreen]--; }
-    void decrementBlue() { if(PixelRaw[ColorOffsetBlue] > 0u) PixelRaw[ColorOffsetBlue]--; }
+    void init();
+    StdReturnType setTime(byte, byte);
+    void task();
 };
 
-#endif
 
+#endif
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E
 ******************************************************************************************************************************************************/

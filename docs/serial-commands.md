@@ -63,6 +63,27 @@ From
 
 The Date and Temperature overlays ignore `-T` / `-S` / `-F`.
 
+### Animation ids (`command 9 -A<id>`)
+
+From [`Animations.h`](../firmware/inc/Animation/Animations.h). Like the command
+numbers, these shift if an animation is disabled through its
+`ANIMATIONS_SUPPORT_*` switch:
+
+| id | Animation | id | Animation |
+|----|-----------|----|-----------|
+| 0 | *(none)* — set the time without animation | 7 | Wipe |
+| 1 | Cursor | 8 | Cube |
+| 2 | Teletype | 9 | Flicker |
+| 3 | Drop | 10 | Squeeze |
+| 4 | Shift | 11 | Implode |
+| 5 | Fade | 12 | Explode |
+| 6 | Snake | 13 | Matrix — falling code rain |
+
+`-S<speed>` sets the task cycle of the selected animation: the animation task runs
+every `speed` scheduler ticks, so **lower is faster** and `0` stops it entirely
+([`Scheduler::isCycleHit`](../firmware/src/Scheduler/Scheduler.cpp)). Default is
+`ANIMATIONS_TASK_CYCLE_INIT_VALUE` = 10.
+
 ## RPC sub-commands (`command 1 -P<id>`)
 
 From
