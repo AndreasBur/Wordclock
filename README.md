@@ -4,6 +4,14 @@ A word clock based on Arduino: an 11×10 grid of letters that spells out the
 time in German ("ES IST FÜNF NACH ZEHN"), with animations, overlays (date,
 temperature, text) and a serial command interface.
 
+![The simulator window, showing 16:20 as "ES IST ZEHN VOR HALB FÜNF"](docs/images/simulator.png)
+
+The whole firmware runs on a PC as well: the simulator draws the matrix in a
+window and routes the serial interface to the text boxes beside it, so commands
+can be sent and answers read without any hardware. Above it shows 16:20, which
+German says as *zehn vor halb fünf* — ten before half five, the kind of wording
+the word tables have to cover.
+
 ## Repository layout
 
 | Directory | Purpose |
