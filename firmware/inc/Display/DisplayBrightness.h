@@ -62,10 +62,6 @@ class DisplayBrightness
 
     static constexpr float AutomaticCorrectionFactor{1.0f};
     static constexpr byte BrightnessMaxValue{255};
-    /* Floor of the automatic. Without it a dark room scales the brightness down to
-       zero and the clock disappears completely, which is never what is wanted from a
-       clock; the automatic only dims, it does not switch off. Switching off is what a
-       brightness of zero is for. */
     static constexpr byte BrightnessAutomaticMinValue{8u};
         
     // function
@@ -73,16 +69,11 @@ class DisplayBrightness
         IlluminanceType Illuminance = Illuminance::getInstance().getIlluminance();
         IlluminanceType IlluminanceMax = Illuminance::getInstance().getCalibrationValuesMaxValue();
 
-        /* A maximum of zero would divide by zero, and a reading above it would scale the
-           brightness past its own value and overflow the cast. Both are reachable after
-           a calibration run, so the sensor cannot brighten beyond what was asked for. */
         if(IlluminanceMax == 0u || Illuminance >= IlluminanceMax) { return sBrightness; }
 
         float IlluminanceFactor = static_cast<float>(Illuminance) / IlluminanceMax;
         byte automaticBrightness = static_cast<byte>(sBrightness * IlluminanceFactor * AutomaticCorrectionFactor);
 
-        /* never below the floor, but never above what was asked for either: a brightness
-           of zero has to stay off */
         if(sBrightness < BrightnessAutomaticMinValue) { return sBrightness; }
         if(automaticBrightness < BrightnessAutomaticMinValue) { return BrightnessAutomaticMinValue; }
 
