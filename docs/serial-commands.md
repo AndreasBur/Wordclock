@@ -69,23 +69,23 @@ From [`Animations.h`](../firmware/inc/Animation/Animations.h). Like the command
 numbers, these shift if an animation is disabled through its
 `ANIMATIONS_SUPPORT_*` switch:
 
-| id | Animation |
-|----|-----------|
-| 0 | *(none)* — set the time without animation |
-| 1 | Cursor |
-| 2 | Teletype |
-| 3 | Drop |
-| 4 | Shift |
-| 5 | Fade |
-| 6 | Snake |
-| 7 | Wipe |
-| 8 | Cube |
-| 9 | Flicker |
-| 10 | Squeeze |
-| 11 | Implode |
-| 12 | Explode |
-| 13 | Matrix — falling code rain, in the display color |
-| 14 | Roll — previous time rolls out while the new one rolls in, direction drawn per minute |
+| id | Animation | What it looks like |
+|----|-----------|--------------------|
+| 0 | *(none)* | The new time simply appears, no transition |
+| 1 | Cursor | A single pixel walks across all LEDs and leaves the letters of the new time lit behind it |
+| 2 | Teletype | Writes the words of the new time letter by letter, one word after the other |
+| 3 | Drop | The letters of the new time fall down their column into place |
+| 4 | Shift | Shifts the previous time out of the display, then shifts the new one in — so the display is empty in between |
+| 5 | Fade | Dims the display down to dark, changes the time, and fades it back up |
+| 6 | Snake | A short snake travels along the LED strip and leaves the new letters lit behind it |
+| 7 | Wipe | A diagonal line sweeps across the display and uncovers the new letters |
+| 8 | Cube | A rectangle collapses towards the centre and grows back out, uncovering the new time |
+| 9 | Flicker | The display flickers a few times, then the new time is there |
+| 10 | Squeeze | Every word of the new time grows out of its first letter |
+| 11 | Implode | The picture is pulled apart into its four quadrants, then the new time comes back together towards the centre |
+| 12 | Explode | The words of the new time travel one after the other from the corner to their place |
+| 13 | Matrix | Falling code rain in the display color; the new time stays behind as the drops pass over its letters |
+| 14 | Roll | The previous time rolls out while the new one rolls in behind it, direction drawn per minute — never empty |
 
 ### Animation mode (`command 9 -M<mode>`)
 
