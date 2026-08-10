@@ -140,7 +140,19 @@ class BH1750
         CalibrationValues.MinValue = Illuminance;
     }
 
-    void task() {}
+    /* On hardware this reads the sensor. Here it takes what the window dialled in, so
+       the brightness automatic can be exercised without a sensor. The value is static
+       because the firmware keeps its BH1750 inside the Illuminance singleton, which
+       leaves the window no instance to talk to. */
+    void task() { Illuminance = SimulatedIlluminance; }
+
+    static void setSimulatedIlluminance(IlluminanceType Value) { SimulatedIlluminance = Value; }
+    static IlluminanceType getSimulatedIlluminance() { return SimulatedIlluminance; }
+
+  private:
+    /* a bright room by default, so switching the automatic on does not darken the
+       display before anything was dialled in */
+    static inline IlluminanceType SimulatedIlluminance{BH1750_ILLUMINANCE_MAX_LX_VALUE};
 };
 
 #endif

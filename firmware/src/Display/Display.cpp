@@ -51,21 +51,44 @@ void Display::init()
     State = STATE_INIT;
 } /* init */
 
-#if (DISPLAY_USE_PIXELS_DIMMING == STD_OFF)
 /******************************************************************************************************************************************************
   setBrightness()
 ******************************************************************************************************************************************************/
 void Display::setBrightness(byte sBrightness)
 {
+    /* only the wish is stored here, what reaches the LEDs is calcBrightness() */
     Brightness.setBrightness(sBrightness);
-    Color.dimmColors(sBrightness);
+    applyBrightness();
+} /* setBrightness */
 
+
+/******************************************************************************************************************************************************
+  applyBrightness()
+******************************************************************************************************************************************************/
+void Display::applyBrightness()
+{
+    /* calcBrightness() folds gamma correction and the light sensor into the brightness
+       that was asked for. Using the raw wish here is what kept both switches without
+       effect. */
+    const byte brightness = Brightness.calcBrightness();
+
+    /* Nothing to do while the calculated value stays put, which is the normal case: only
+       the automatic makes it move on its own. Without this check the task would rewrite
+       every lit pixel on every run. */
+    if(brightness == AppliedBrightness) { return; }
+    AppliedBrightness = brightness;
+
+#if (DISPLAY_USE_PIXELS_DIMMING == STD_ON)
+    PixelStripe.setBrightness(brightness);
+#else
+    Color.dimmColors(brightness);
+
+    /* the pixels already on the display still carry the previous color */
     for(IndexType Index = 0; Index < DISPLAY_NUMBER_OF_PIXELS; Index++) {
-        // update all pixels to new brightness
         if(getPixelFast(Index)) { setPixelFast(Index); }
     }
-} /* setBrightness */
 #endif
+} /* applyBrightness */
 
 /******************************************************************************************************************************************************
   setWord()

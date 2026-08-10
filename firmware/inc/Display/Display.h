@@ -37,8 +37,11 @@
 #if (DISPLAY_COLOR_SUPPORT_DIMMING == STD_ON)
 # define DISPLAY_USE_PIXELS_DIMMING                 STD_OFF
 #else
-# # define DISPLAY_USE_PIXELS_DIMMING               STD_ON
+# define DISPLAY_USE_PIXELS_DIMMING                 STD_ON
 #endif
+
+/* how often the display task recalculates the brightness, see Display::task() */
+#define DISPLAY_TASK_CYCLE                          50u
 
 //# if (PIXELS_IS_SINGLETON == STD_ON)
 //#  define Pixels                              Pixels::getInstance()
@@ -111,7 +114,12 @@ class Display
 ******************************************************************************************************************************************************/
   private:
     static constexpr byte WordLengthUnlimited{0u};
+    static constexpr byte TaskCycle{DISPLAY_TASK_CYCLE};
     StateType State{STATE_NONE};
+    /* brightness the pixels on the display were last written with. Zero rather than the
+       initial brightness, so the first task establishes a defined state; the display is
+       still empty then, which makes that first pass free. */
+    byte AppliedBrightness{0u};
 # if (PIXELS_IS_SINGLETON == STD_OFF)
     Pixels PixelStripe;
 # else
@@ -130,6 +138,7 @@ class Display
     byte transformToSerpentine(byte) const;
 
     Pixel getColorDimmed(byte);
+    void applyBrightness();
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
@@ -157,22 +166,25 @@ class Display
 # endif
 
     // set methods
-    void setBrightnessUseAutomatic(bool BrightnessUseAutomatic) { Brightness.setUseAutomatic(BrightnessUseAutomatic); }
-    void setBrightnessUseGammaCorrection(bool BrightnessUseGammaCorrection) { Brightness.setUseGammaCorrection(BrightnessUseGammaCorrection); }
+    /* both change what calcBrightness() returns, so both have to be applied right away
+       instead of waiting for the next task */
+    void setBrightnessUseAutomatic(bool BrightnessUseAutomatic) {
+        Brightness.setUseAutomatic(BrightnessUseAutomatic);
+        applyBrightness();
+    }
+    void setBrightnessUseGammaCorrection(bool BrightnessUseGammaCorrection) {
+        Brightness.setUseGammaCorrection(BrightnessUseGammaCorrection);
+        applyBrightness();
+    }
     void setColor(Pixel sColor) { Color.setColor(sColor);; }
     void setColor(ColorType Red, byte Green, ColorType Blue) { Color.setColorRed(Red); Color.setColorGreen(Green); Color.setColorBlue(Blue); }
     void setColorRed(ColorType Red) { Color.setColorRed(Red); }
     void setColorGreen(ColorType Green) { Color.setColorGreen(Green); }
     void setColorBlue(ColorType Blue) { Color.setColorBlue(Blue);}
 
-# if (DISPLAY_USE_PIXELS_DIMMING == STD_ON)
-    void setBrightness(byte sBrightness) {
-        Brightness.setBrightness(sBrightness);
-        PixelStripe.setBrightness(Brightness.calcBrightness());
-    }
-# else
+    /* Takes the brightness the user asked for. What reaches the LEDs is
+       calcBrightness(), which folds in gamma correction and the light sensor. */
     void setBrightness(byte);
-# endif
 
     // char methods
     StdReturnType setCharacter(CharacterIdType CharacterId) { return setPixel(CharacterId); }
@@ -245,12 +257,17 @@ class Display
     void incrementColorRed() { Color.incrementColorRed(); }
     void incrementColorGreen() {  Color.incrementColorGreen(); }
     void incrementColorBlue() { Color.incrementColorBlue(); }
-    void incrementBrightness() { Brightness.incrementBrightness(); }
+    void incrementBrightness() { Brightness.incrementBrightness(); applyBrightness(); }
 
     void decrementColorRed() { Color.decrementColorRed(); }
     void decrementColorGreen() { Color.decrementColorGreen(); }
     void decrementColorBlue() { Color.decrementColorBlue(); }
-    void decrementBrightness() { Brightness.decrementBrightness(); }
+    void decrementBrightness() { Brightness.decrementBrightness(); applyBrightness(); }
+
+    /* Recalculates the brightness. Needed because the automatic follows the light
+       sensor, so the value changes without anyone setting it. */
+    void task() { applyBrightness(); }
+    static constexpr byte getTaskCycle() { return TaskCycle; }
 
     static void indexToColumnAndRow(IndexType Index, byte& Column, byte& Row) { Row = Index / DISPLAY_NUMBER_OF_COLUMNS; Column = Index % DISPLAY_NUMBER_OF_COLUMNS; }
     byte indexToColumn(IndexType Index) const { return Index % DISPLAY_NUMBER_OF_COLUMNS; }

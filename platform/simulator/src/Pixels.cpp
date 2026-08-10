@@ -1,4 +1,6 @@
 #include "sim/Pixels.h"
+/* for the simulated light sensor the illuminance slider feeds */
+#include "sim/BH1750.h"
 #include <array>
 
 #if defined(PIXELS) && (defined(__APPLE__ ) || defined(__linux__))
@@ -26,6 +28,7 @@ BEGIN_EVENT_TABLE(Pixels, wxFrame)
     EVT_BUTTON(ID_BUTTON_SEND, Pixels::OnSend)
     //EVT_BUTTON(ID_BUTTON_CREATE_INPUT, Pixels::OnCreateInput)
     EVT_BUTTON(ID_BUTTON_CLEAR, Pixels::OnClear)
+    EVT_SLIDER(ID_SLIDER_ILLUMINANCE, Pixels::OnIlluminance)
     EVT_BUTTON(ID_BUTTON_ABOUT, Pixels::OnAbout)
     EVT_BUTTON(ID_BUTTON_QUIT, Pixels::OnQuit)
 END_EVENT_TABLE()
@@ -125,12 +128,18 @@ wxBoxSizer* Pixels::createSizerControl(wxWindow* Parent)
     wxStaticBoxSizer* SizerControl = new wxStaticBoxSizer(StaticBox, wxVERTICAL);
     wxStaticText* OutputLabel = new wxStaticText(Parent, wxID_ANY, _T("Output"));
     wxStaticText* InputLabel = new wxStaticText(Parent, wxID_ANY, _T("Input"));
+    wxStaticText* IlluminanceLabel = new wxStaticText(Parent, wxID_ANY, _T("Illuminance (%)"));
     //wxButton* CreateInput = new wxButton(Parent, ID_BUTTON_CREATE_INPUT, wxT("&Create Input"), wxDefaultPosition, wxDefaultSize, 0);
     wxButton* Send = new wxButton(Parent, ID_BUTTON_SEND, wxT("&Send"), wxDefaultPosition, wxDefaultSize, 0);
     wxButton* Clear = new wxButton(Parent, ID_BUTTON_CLEAR, wxT("&Clear"), wxDefaultPosition, wxDefaultSize, 0);
 
     Output = new wxTextCtrl(Parent, ID_TEXT_CTRL_OUTPUT, _(""), wxDefaultPosition, wxSize(200, 200), wxTE_MULTILINE|wxTE_READONLY);
     Input  = new wxTextCtrl(Parent, ID_TEXT_CTRL_INPUT, _(""), wxDefaultPosition, wxSize(200, 20));
+
+    /* stands in for the light sensor, which has nothing to measure here. Only has an
+       effect while the brightness automatic is on (command 3 -A1). */
+    IlluminanceSlider = new wxSlider(Parent, ID_SLIDER_ILLUMINANCE, 100, 0, 100, wxDefaultPosition, wxSize(200, -1),
+                                     wxSL_HORIZONTAL | wxSL_LABELS);
 
     SizerControl->Add(OutputLabel, 0, wxLEFT | wxTOP | wxEXPAND, 10);
     SizerControl->Add(Output, 0, wxRight | wxLEFT, 10);
@@ -139,6 +148,8 @@ wxBoxSizer* Pixels::createSizerControl(wxWindow* Parent)
     SizerControl->Add(Input, 0, wxRIGHT | wxLEFT, 10);
     //SizerControl->Add(CreateInput, 0, wxTOP | wxRIGHT | wxLEFT | wxEXPAND, 10);
     SizerControl->Add(Send, 0, wxTOP | wxRIGHT | wxLEFT | wxEXPAND, 10);
+    SizerControl->Add(IlluminanceLabel, 0, wxLEFT | wxTOP, 10);
+    SizerControl->Add(IlluminanceSlider, 0, wxRIGHT | wxLEFT | wxBOTTOM | wxEXPAND, 10);
 
     return SizerControl;
 }
@@ -174,6 +185,15 @@ void Pixels::OnSend(wxCommandEvent &event)
 void Pixels::OnClear(wxCommandEvent &event)
 {
     Output->Clear();
+    UNUSED(event);
+}
+
+void Pixels::OnIlluminance(wxCommandEvent &event)
+{
+    /* the slider is a percentage of the calibration maximum, which is what the
+       brightness automatic divides by */
+    const BH1750::IlluminanceType Maximum = BH1750_ILLUMINANCE_MAX_LX_VALUE;
+    BH1750::setSimulatedIlluminance(static_cast<BH1750::IlluminanceType>((Maximum / 100u) * IlluminanceSlider->GetValue()));
     UNUSED(event);
 }
 

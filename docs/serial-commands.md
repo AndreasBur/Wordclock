@@ -34,7 +34,7 @@ overlay is disabled at compile time.
 | 0 | *(none)* | — | Reserved; empty/invalid command → `ERROR_WRONG_COMMAND` |
 | 1 | Remote Procedure Call | `-P<id>` (uint8) | Fire-and-forget action; see RPC table below |
 | 2 | Display Color | `-R<0-255>` `-G<0-255>` `-B<0-255>` | RGB color; triggers `Display.show()` |
-| 3 | Display Brightness | `-B<0-255>` `-A<0\|1>` `-G<0\|1>` | Brightness, auto-brightness, gamma correction |
+| 3 | Display Brightness | `-B<0-255>` `-A<0\|1>` `-G<0\|1>` | Brightness, auto-brightness, gamma correction; see below |
 | 4 | Display Pixel | `-I<index>` `-S<0\|1>` | Set a single LED on/off; out-of-range index → error |
 | 5 | Overlay Date | `-P -E -M -D -V -A` | See overlay options |
 | 6 | Overlay Temperature | `-P -E -M -D -V -A` | See overlay options |
@@ -62,6 +62,24 @@ From
 | `-F` | Font |
 
 The Date and Temperature overlays ignore `-T` / `-S` / `-F`.
+
+### Brightness (`command 3`)
+
+`-B` sets the brightness that is *asked for*. What reaches the LEDs is that value
+after gamma correction (`-G1`) and the light sensor (`-A1`), recalculated by the
+display task, so the automatic follows the room without any command being sent.
+
+The automatic scales the brightness by the sensor reading divided by the calibrated
+maximum, which is why it needs a calibration first — RPC `1` with the sensor in the
+brightest light it should ever see, RPC `2` in the darkest. Without it the maximum is
+the sensor's full range and the display stays dim in a normal room.
+
+Two bounds keep it usable: the automatic never dims below a floor, so a dark room
+does not make the clock disappear, and it never brightens beyond what `-B` asked
+for. A `-B0` therefore stays off, floor or not.
+
+In the simulator there is no sensor to read, so the **Illuminance** slider in the
+window stands in for it. It only has an effect while `-A1` is set.
 
 ### Clock modes (`command 8 -M<mode>`)
 
