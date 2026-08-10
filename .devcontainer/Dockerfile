@@ -1,4 +1,7 @@
-FROM mcr.microsoft.com/devcontainers/cpp:ubuntu-24.04
+# Base image, overridable via build.args in a devcontainer.json variant so that
+# site-specific base images can be used without touching this file.
+ARG BASE_IMAGE=mcr.microsoft.com/devcontainers/cpp:ubuntu-24.04
+FROM ${BASE_IMAGE}
 
 # Toolchain + wxWidgets development libraries.
 # Ubuntu 24.04 ships wxWidgets 3.2 (GTK build), which satisfies the
