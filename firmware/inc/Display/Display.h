@@ -165,9 +165,6 @@ class Display
     byte getBrightness() const { return Brightness.getBrightness(); }
 # endif
 
-    // set methods
-    /* both change what calcBrightness() returns, so both have to be applied right away
-       instead of waiting for the next task */
     void setBrightnessUseAutomatic(bool BrightnessUseAutomatic) {
         Brightness.setUseAutomatic(BrightnessUseAutomatic);
         applyBrightness();
