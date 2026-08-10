@@ -86,11 +86,19 @@ numbers, these shift if an animation is disabled through its
 | 12 | Explode |
 | 13 | Matrix — falling code rain, in the display color |
 | 14 | Roll — previous time rolls out while the new one rolls in, direction drawn per minute |
+| 15 | Random — draws one of the animations 1–14 per minute |
+| 16 | Sequence — runs the animations 1–14 in order, one per minute |
+
+Ids 15 and 16 do not animate themselves, they select one of the others. A query of
+command 9 reports the selected id, so it keeps answering 15 or 16 rather than the
+animation currently running.
 
 `-S<speed>` sets the task cycle of the selected animation: the animation task runs
 every `speed` scheduler ticks, so **lower is faster** and `0` stops it entirely
 ([`Scheduler::isCycleHit`](../firmware/src/Scheduler/Scheduler.cpp)). Default is
-`ANIMATIONS_TASK_CYCLE_INIT_VALUE` = 10.
+`ANIMATIONS_TASK_CYCLE_INIT_VALUE` = 10. Every animation keeps its own speed, which
+is also the speed used while 15 or 16 switch between them — so a speed has to be set
+per animation, and setting one for 15 or 16 has no effect.
 
 ## RPC sub-commands (`command 1 -P<id>`)
 
