@@ -69,15 +69,22 @@ From [`Animations.h`](../firmware/inc/Animation/Animations.h). Like the command
 numbers, these shift if an animation is disabled through its
 `ANIMATIONS_SUPPORT_*` switch:
 
-| id | Animation | id | Animation |
-|----|-----------|----|-----------|
-| 0 | *(none)* — set the time without animation | 7 | Wipe |
-| 1 | Cursor | 8 | Cube |
-| 2 | Teletype | 9 | Flicker |
-| 3 | Drop | 10 | Squeeze |
-| 4 | Shift | 11 | Implode |
-| 5 | Fade | 12 | Explode |
-| 6 | Snake | 13 | Matrix — falling code rain |
+| id | Animation |
+|----|-----------|
+| 0 | *(none)* — set the time without animation |
+| 1 | Cursor |
+| 2 | Teletype |
+| 3 | Drop |
+| 4 | Shift |
+| 5 | Fade |
+| 6 | Snake |
+| 7 | Wipe |
+| 8 | Cube |
+| 9 | Flicker |
+| 10 | Squeeze |
+| 11 | Implode |
+| 12 | Explode |
+| 13 | Matrix — falling code rain, in the display color |
 
 `-S<speed>` sets the task cycle of the selected animation: the animation task runs
 every `speed` scheduler ticks, so **lower is faster** and `0` stops it entirely
