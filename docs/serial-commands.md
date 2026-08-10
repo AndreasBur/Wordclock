@@ -83,7 +83,7 @@ From
 | 14 / 15 | Brightness increment / decrement |
 | 16 / 17 | Auto-brightness on / off |
 | 18 / 19 | Gamma correction on / off |
-| 20 / 21 | Master output on / off — applies immediately via `show()` (unlike Display enable/disable). Off blanks the panel but keeps the frame buffer, so On restores it |
+| 20 / 21 | Power on / off — **reserved, not implemented yet.** These ids wait for the hardware switch that cuts the 5 V supply of the LED stripes via a controller port. They are accepted and answer `Error=0` without doing anything |
 
 The RPC answer is `RpcId=<id> Error=<code>`. An unknown or missing id (including
 `0`, e.g. when `-P` is omitted) is rejected with `Error=8`

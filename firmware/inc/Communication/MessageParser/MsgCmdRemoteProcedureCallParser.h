@@ -181,17 +181,24 @@ class MsgCmdRemoteProcedureCallParser : public MsgParameterParser<MsgCmdRemotePr
             case RPC_ID_DISPLAY_TEST :
                 Display::getInstance().test();
                 break;
+            // POWER_ON and POWER_OFF are reserved for the planned hardware switch
+            // that cuts the 5 V supply of the LED stripes via a microcontroller
+            // port (high side P-MOSFET, driven through an N-MOSFET, so the port is
+            // active high and the pull down leaves the supply off after reset).
+            // These ids are not display enable/disable, which have their own ids.
+            //
+            // The order matters once the port exists: data pulses must not reach
+            // DIN while the supply is off. So POWER_OFF has to blank the stripes
+            // over the data line first, wait for that transfer to complete, and
+            // only then switch the supply off; POWER_ON switches the supply on and
+            // resumes data output afterwards. Note that disable() already starts a
+            // DMA transfer of its own (see WS2812::disablePixels), so it must not
+            // be followed by a second show().
+            //
+            // Until the port exists the ids stay intentionally unimplemented.
             case RPC_ID_POWER_ON :
-                // Master output on: restore the panel and push it out immediately
-                // (unlike DISPLAY_ENABLE, which only sets the state without a show).
-                Display::getInstance().enable();
-                ReturnValue = Display::getInstance().show();
                 break;
             case RPC_ID_POWER_OFF :
-                // Master output off: blank the panel now but keep the frame buffer,
-                // so POWER_ON brings the previous content straight back.
-                Display::getInstance().disable();
-                ReturnValue = Display::getInstance().show();
                 break;
             default:
                 // Unknown or missing RPC id (including RPC_ID_NONE): there is
