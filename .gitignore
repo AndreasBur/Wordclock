@@ -13,3 +13,6 @@ compile_commands.json
 *.depend
 *.layout
 *.cscope_file_list
+
+# Dev container feature lock files (auto-generated)
+devcontainer-lock.json
