@@ -63,6 +63,23 @@ From
 
 The Date and Temperature overlays ignore `-T` / `-S` / `-F`.
 
+### Clock modes (`command 8 -M<mode>`)
+
+From [`Clock.h`](../firmware/inc/Clock/Clock.h). The modes are the regional ways of
+saying the time in German, and they differ in exactly two places: how the quarters
+are said, and whether 20 and 40 minutes past are counted from the hour or from the
+half hour. Everything else is identical between them.
+
+| mode | Name | 4:15 | 4:20 | 4:40 | 4:45 |
+|------|------|------|------|------|------|
+| 0 | Wessi *(default)* | viertel **nach** vier | zehn vor **halb** fünf | zehn nach **halb** fünf | viertel **vor** fünf |
+| 1 | Ossi | **viertel fünf** | zehn vor **halb** fünf | zehn nach **halb** fünf | **dreiviertel fünf** |
+| 2 | Rhein-Ruhr | viertel **nach** vier | **zwanzig nach** vier | **zwanzig vor** fünf | viertel **vor** fünf |
+| 3 | Schwaben | **viertel fünf** | **zwanzig nach** vier | **zwanzig vor** fünf | **dreiviertel fünf** |
+
+The quarters of Ossi and Schwaben name the hour they are counting towards, so
+"viertel fünf" is a quarter past four, not a quarter past five.
+
 ### Animation ids (`command 9 -A<id>`)
 
 From [`Animations.h`](../firmware/inc/Animation/Animations.h). Like the command
