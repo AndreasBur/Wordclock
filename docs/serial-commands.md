@@ -86,6 +86,7 @@ numbers, these shift if an animation is disabled through its
 | 12 | Explode words | The same movement, but whole words travel into the centre and back out, one after the other |
 | 13 | Matrix | Falling code rain in the display color; the new time stays behind as the drops pass over its letters |
 | 14 | Roll | The previous time rolls out while the new one rolls in behind it, direction drawn per minute — never empty |
+| 15 | Collapse | The letters slide to the left edge of their row and close every gap, then the new ones slide apart into their words |
 
 ### Animation mode (`command 9 -M<mode>`)
 
@@ -96,8 +97,8 @@ to it.
 | mode | Meaning |
 |------|---------|
 | 0 | Fixed — always the animation selected with `-A` |
-| 1 | Random — draws one of the animations 1–14 per minute |
-| 2 | Sequence — runs the animations 1–14 in order, one per minute |
+| 1 | Random — draws one of the animations 1–15 per minute |
+| 2 | Sequence — runs the animations 1–15 in order, one per minute |
 
 A mode only selects while no animation is running, so a minute change during a
 running animation is ignored, exactly as the animations themselves ignore it.

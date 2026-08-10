@@ -38,6 +38,7 @@
 #include "AnimationExplodeWords.h"
 #include "AnimationMatrix.h"
 #include "AnimationRoll.h"
+#include "AnimationCollapse.h"
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
@@ -57,6 +58,7 @@
 #define ANIMATIONS_SUPPORT_EXPLODE_WORDS        STD_ON
 #define ANIMATIONS_SUPPORT_MATRIX               STD_ON
 #define ANIMATIONS_SUPPORT_ROLL                 STD_ON
+#define ANIMATIONS_SUPPORT_COLLAPSE             STD_ON
 
 #define ANIMATIONS_TASK_CYCLE_INIT_VALUE        10u
 
@@ -128,6 +130,9 @@ class Animations
 # if(ANIMATIONS_SUPPORT_ROLL == STD_ON)
         ANIMATION_ID_ROLL,
 # endif
+# if(ANIMATIONS_SUPPORT_COLLAPSE == STD_ON)
+        ANIMATION_ID_COLLAPSE,
+# endif
         ANIMATION_ID_NUMBER_OF_ANIMATIONS
     };
 
@@ -184,6 +189,9 @@ class Animations
 # if(ANIMATIONS_SUPPORT_ROLL == STD_ON)
         AnimationRoll Roll;
 # endif
+# if(ANIMATIONS_SUPPORT_COLLAPSE == STD_ON)
+        AnimationCollapse Collapse;
+# endif
         constexpr AnimationsType() :
 # if(ANIMATIONS_SUPPORT_CURSOR == STD_ON)
         Cursor()
@@ -213,6 +221,8 @@ class Animations
         Matrix()
 # elif(ANIMATIONS_SUPPORT_ROLL == STD_ON)
         Roll()
+# elif(ANIMATIONS_SUPPORT_COLLAPSE == STD_ON)
+        Collapse()
 # endif
 { }
         ~AnimationsType() { }

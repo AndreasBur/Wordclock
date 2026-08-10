@@ -207,6 +207,11 @@ void Animations::initCurrentAnimation()
             return AnimationsRaw.Roll.init();
             break;
 # endif
+# if(ANIMATIONS_SUPPORT_COLLAPSE == STD_ON)
+        case ANIMATION_ID_COLLAPSE :
+            return AnimationsRaw.Collapse.init();
+            break;
+# endif
         default :
             CurrentAnimationId = ANIMATION_ID_NONE;
             break;
@@ -300,6 +305,11 @@ StdReturnType Animations::setTime(byte Hour, byte Minute)
             return AnimationsRaw.Roll.setTime(Hour, Minute);
             break;
 # endif
+# if(ANIMATIONS_SUPPORT_COLLAPSE == STD_ON)
+        case ANIMATION_ID_COLLAPSE :
+            return AnimationsRaw.Collapse.setTime(Hour, Minute);
+            break;
+# endif
         default :
             return E_NOT_OK;
             break;
@@ -391,6 +401,11 @@ Animation::StateType Animations::getStateOfCurrentAnimation() const
             return AnimationsRaw.Roll.getState();
             break;
 # endif
+# if(ANIMATIONS_SUPPORT_COLLAPSE == STD_ON)
+        case ANIMATION_ID_COLLAPSE :
+            return AnimationsRaw.Collapse.getState();
+            break;
+# endif
         default :
             return Animation::STATE_NONE;
             break;
@@ -477,6 +492,11 @@ void Animations::taskOfCurrentAnimation()
             AnimationsRaw.Roll.task();
             break;
 # endif
+# if(ANIMATIONS_SUPPORT_COLLAPSE == STD_ON)
+        case ANIMATION_ID_COLLAPSE :
+            AnimationsRaw.Collapse.task();
+            break;
+# endif
         default :
             break;
     }
@@ -561,6 +581,11 @@ StdReturnType Animations::showOfCurrentAnimation() const
 # if(ANIMATIONS_SUPPORT_ROLL == STD_ON)
         case ANIMATION_ID_ROLL :
             return AnimationsRaw.Roll.show();
+            break;
+# endif
+# if(ANIMATIONS_SUPPORT_COLLAPSE == STD_ON)
+        case ANIMATION_ID_COLLAPSE :
+            return AnimationsRaw.Collapse.show();
             break;
 # endif
         default :
