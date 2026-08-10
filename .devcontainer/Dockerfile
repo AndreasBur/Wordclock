@@ -22,6 +22,10 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && \
         x11-utils && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
+# VS Code creates /tmp/user/<uid> before postCreateCommand runs. Provide its
+# shared parent so the non-root remote user can create the per-user directory.
+RUN chmod 1777 /tmp && install -d -m 1777 /tmp/user
+
 ENV TZ=Europe/Berlin
 
 # Extensions, editor settings and lifecycle commands live in the local feature
