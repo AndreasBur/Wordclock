@@ -40,7 +40,7 @@ overlay is disabled at compile time.
 | 6 | Overlay Temperature | `-P -E -M -D -V -A` | See overlay options |
 | 7 | Overlay Text | `-P -E -M -D -V -T -S -F -A` | Text overlay adds text/speed/font |
 | 8 | Clock Mode | `-M<mode>` (uint8) | Sets the clock display mode |
-| 9 | Animation | `-A<id>` `-M<mode>` `-S<speed>` | Animation id, selection mode, speed |
+| 9 | Animation | `-A<id>` `-M<mode>` `-S<speed>` `-F<0\|1>` | Animation id, selection mode, speed, favourite flag |
 | 10 | Time | `-H<hour>` `-M<min>` `-S<sec>` | Sets RTC time |
 | 11 | Date | `-Y<year>` (uint16) `-M<month>` `-D<day>` | Sets RTC date |
 
@@ -103,6 +103,19 @@ A mode only selects while no animation is running, so a minute change during a
 running animation is ignored, exactly as the animations themselves ignore it.
 Selecting an animation with `-A` shows it right away even in mode 1 or 2, which then
 take over again on the next minute change.
+
+`-F<0|1>` decides whether the animation selected with `-A` takes part in modes 1 and
+2. All animations do by default. The flag belongs to the animation, so it is set for
+whichever id `-A` addresses, and a query reports the flag of that id:
+
+```
+9 -A9 -F0             # never show Flicker again in mode 1 or 2
+9 -A13 -F1 -M1        # Matrix takes part again, and switch to random
+```
+
+The **last** remaining flag cannot be cleared — the selecting modes would be left with
+nothing to pick, so the firmware answers `Error=4` and keeps it. Clearing the flag of
+id 0 is rejected the same way, since `0` is not an animation.
 
 `-S<speed>` sets the task cycle of the animation selected with `-A`: the animation
 task runs every `speed` scheduler ticks, so **lower is faster** and `0` stops it

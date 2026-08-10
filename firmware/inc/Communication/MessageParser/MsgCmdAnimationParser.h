@@ -33,7 +33,7 @@
 
 
 /* MsgCmdAnimationParser parameter */
-#define MSG_CMD_ANIMATION_PARSER_PARAMETER_TABLE_SIZE           3u
+#define MSG_CMD_ANIMATION_PARSER_PARAMETER_TABLE_SIZE           4u
 
 
 /******************************************************************************************************************************************************
@@ -61,15 +61,18 @@ class MsgCmdAnimationParser : public MsgParameterParser<MsgCmdAnimationParser, M
     AnimationIdType AnimationId{Animations::ANIMATION_ID_NONE};
     ModeType Mode{Animations::MODE_FIXED};
     byte Speed{0u};
+    bool Favourite{true};
 
     static constexpr char AnimationOptionShortName{'A'};
     static constexpr char ModeOptionShortName{'M'};
     static constexpr char SpeedOptionShortName{'S'};
+    static constexpr char FavouriteOptionShortName{'F'};
 
     static constexpr ParameterTableType ParameterTable PROGMEM {
         ParameterTableElementType(AnimationOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8),
         ParameterTableElementType(ModeOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8),
-        ParameterTableElementType(SpeedOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8)
+        ParameterTableElementType(SpeedOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8),
+        ParameterTableElementType(FavouriteOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8)
     };
 
     // functions
@@ -84,6 +87,9 @@ class MsgCmdAnimationParser : public MsgParameterParser<MsgCmdAnimationParser, M
         }
         if(ParameterShortName == SpeedOptionShortName) {
              Speed = Argument;
+        }
+        if(ParameterShortName == FavouriteOptionShortName) {
+            Favourite = (Argument != 0u);
         }
     }
 
@@ -113,6 +119,19 @@ class MsgCmdAnimationParser : public MsgParameterParser<MsgCmdAnimationParser, M
         Error.checkReturnValueAndSend(ModeOptionShortName, returnValue, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNDS);
     }
 
+    void sendAnswerFavourite(bool AppendSpace) const {
+        /* the flag of the selected animation, not of the one a mode is running */
+        AnimationIdType animation = Animations::getInstance().getAnimation();
+        byte favourite = Animations::getInstance().isFavourite(animation) ? 1u : 0u;
+        sendAnswerParameter(FavouriteOptionShortName, favourite, AppendSpace);
+    }
+
+    void setFavourite() const
+    {
+        StdReturnType returnValue = Animations::getInstance().setFavourite(AnimationId, Favourite);
+        Error.checkReturnValueAndSend(FavouriteOptionShortName, returnValue, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNDS);
+    }
+
     void setClockTaskCycle() const
     {
         StdReturnType returnValue = Animations::getInstance().setTaskCycle(AnimationId, Scheduler::convertSpeedToTaskCycle(Speed));
@@ -123,13 +142,14 @@ class MsgCmdAnimationParser : public MsgParameterParser<MsgCmdAnimationParser, M
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    MsgCmdAnimationParser(const char* Parameter) : MsgParameterParser(ParameterTable, Parameter), AnimationId(), Mode(), Speed(0u)
+    MsgCmdAnimationParser(const char* Parameter) : MsgParameterParser(ParameterTable, Parameter), AnimationId(), Mode(), Speed(0u), Favourite(true)
     {
         /* preloaded with the current settings, so a command may set single options
            without resetting the others */
         AnimationId = Animations::getInstance().getAnimation();
         Mode = Animations::getInstance().getMode();
         Speed = Scheduler::convertTaskCycleToSpeed(Animations::getInstance().getTaskCycle(AnimationId));
+        Favourite = Animations::getInstance().isFavourite(AnimationId);
     }
 
     ~MsgCmdAnimationParser() { }
@@ -143,6 +163,7 @@ class MsgCmdAnimationParser : public MsgParameterParser<MsgCmdAnimationParser, M
     {
         sendAnswerAnimation(true);
         sendAnswerMode(true);
+        sendAnswerFavourite(true);
         sendAnswerSpeed(false);
     }
 
@@ -150,6 +171,7 @@ class MsgCmdAnimationParser : public MsgParameterParser<MsgCmdAnimationParser, M
     {
         setAnimation();
         setMode();
+        setFavourite();
         setClockTaskCycle();
     }
 };

@@ -608,11 +608,20 @@ Animations::AnimationIdType Animations::calcRandomAnimation()
     hash ^= static_cast<byte>(hash >> 4u);
     hash = static_cast<byte>(hash * RandomHashFactor);
 
-    /* scaled by multiplication instead of a modulo, which would favour the first
-       animations because 256 is not a multiple of their number */
-    const byte offset = static_cast<byte>((static_cast<uint16_t>(hash) * NumberOfAnimations) >> 8u);
+    /* Drawn among the favourites only, so the draw counts them and then walks to the
+       one it landed on. Scaled by multiplication instead of a modulo, which would
+       favour the first animations because 256 is not a multiple of their number. */
+    byte offset = static_cast<byte>((static_cast<uint16_t>(hash) * numberOfFavourites()) >> 8u);
 
-    return static_cast<AnimationIdType>(FirstAnimation + offset);
+    for(byte animationId = FirstAnimation; animationId < ANIMATION_ID_NUMBER_OF_ANIMATIONS; animationId++) {
+        if(isFavourite(static_cast<AnimationIdType>(animationId))) {
+            if(offset == 0u) { return static_cast<AnimationIdType>(animationId); }
+            offset--;
+        }
+    }
+
+    /* unreachable while at least one favourite is set, which setFavourite() enforces */
+    return AnimationId;
 } /* calcRandomAnimation */
 
 
@@ -621,13 +630,35 @@ Animations::AnimationIdType Animations::calcRandomAnimation()
 ******************************************************************************************************************************************************/
 Animations::AnimationIdType Animations::calcNextAnimation() const
 {
-    /* none as the running animation means nothing ran yet, so start at the first one */
-    if(CurrentAnimationId == ANIMATION_ID_NONE || CurrentAnimationId + 1u >= ANIMATION_ID_NUMBER_OF_ANIMATIONS) {
-        return static_cast<AnimationIdType>(FirstAnimation);
+    byte next = CurrentAnimationId;
+
+    /* Walks on until it finds a favourite. It cannot loop forever, because at least
+       one favourite is always set and there are only that many animations to try. */
+    for(byte tries = 0u; tries < NumberOfAnimations; tries++) {
+        /* none as the running animation means nothing ran yet, so start at the first */
+        if(next == ANIMATION_ID_NONE || next + 1u >= ANIMATION_ID_NUMBER_OF_ANIMATIONS) { next = FirstAnimation; }
+        else { next++; }
+
+        if(isFavourite(static_cast<AnimationIdType>(next))) { return static_cast<AnimationIdType>(next); }
     }
 
-    return static_cast<AnimationIdType>(CurrentAnimationId + 1u);
+    return AnimationId;
 } /* calcNextAnimation */
+
+
+/******************************************************************************************************************************************************
+  numberOfFavourites()
+******************************************************************************************************************************************************/
+byte Animations::numberOfFavourites() const
+{
+    byte count{0u};
+
+    for(byte animationId = FirstAnimation; animationId < ANIMATION_ID_NUMBER_OF_ANIMATIONS; animationId++) {
+        if(isFavourite(static_cast<AnimationIdType>(animationId))) { count++; }
+    }
+
+    return count;
+} /* numberOfFavourites */
 
 
 /******************************************************************************************************************************************************

@@ -231,12 +231,22 @@ class Animations
     /* odd factor of the hash in calcRandomAnimation(), see there */
     static constexpr byte RandomHashFactor{181u};
 
+    static_assert(ANIMATION_ID_NUMBER_OF_ANIMATIONS <= 16u,
+                  "Animations: too many animations for the favourites bit mask, please widen it");
+
+    /* one bit per animation id, bit 0 of ANIMATION_ID_NONE stays unused */
+    static constexpr uint16_t AllFavourites{
+        static_cast<uint16_t>(((1u << ANIMATION_ID_NUMBER_OF_ANIMATIONS) - 1u) & ~((1u << FirstAnimation) - 1u))
+    };
+
     std::array<byte, ANIMATION_ID_NUMBER_OF_ANIMATIONS> TaskCycles;
     /* what the user selected, used as it is in MODE_FIXED */
     AnimationIdType AnimationId{ANIMATION_ID_NONE};
     /* what is really running, equal to AnimationId unless a mode selected something */
     AnimationIdType CurrentAnimationId{ANIMATION_ID_NONE};
     ModeType Mode{MODE_FIXED};
+    /* animations the selecting modes may pick, all of them until told otherwise */
+    uint16_t Favourites{AllFavourites};
     uint16_t RandomState{0u};
     AnimationsType AnimationsRaw;
 
@@ -251,6 +261,7 @@ class Animations
     void selectAnimationOfMode();
     AnimationIdType calcRandomAnimation();
     AnimationIdType calcNextAnimation() const;
+    byte numberOfFavourites() const;
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
@@ -266,6 +277,9 @@ class Animations
     AnimationIdType getAnimation() const { return AnimationId; }
     AnimationIdType getCurrentAnimation() const { return CurrentAnimationId; }
     ModeType getMode() const { return Mode; }
+    bool isFavourite(AnimationIdType sAnimationId) const {
+        return (Favourites & static_cast<uint16_t>(1u << sAnimationId)) != 0u;
+    }
 
     byte getTaskCycle(AnimationIdType sAnimationId) const { return TaskCycles[sAnimationId]; }
     /* the cycle of the running animation, so every animation keeps its own speed while
@@ -293,6 +307,21 @@ class Animations
         } else {
             return E_NOT_OK;
         }
+    }
+
+    void setFavouriteFast(AnimationIdType sAnimationId, bool Favourite) {
+        if(Favourite) { Favourites |= static_cast<uint16_t>(1u << sAnimationId); }
+        else { Favourites &= static_cast<uint16_t>(~(1u << sAnimationId)); }
+    }
+    StdReturnType setFavourite(AnimationIdType sAnimationId, bool Favourite) {
+        /* ANIMATION_ID_NONE is no animation and cannot be a favourite */
+        if(sAnimationId < FirstAnimation || !isAnimationValid(sAnimationId)) { return E_NOT_OK; }
+        /* the last favourite may not be dropped, the selecting modes would be left
+           with nothing to pick */
+        if(!Favourite && isFavourite(sAnimationId) && numberOfFavourites() <= 1u) { return E_NOT_OK; }
+
+        setFavouriteFast(sAnimationId, Favourite);
+        return E_OK;
     }
 
     // methods
