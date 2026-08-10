@@ -33,7 +33,17 @@ implementation — a compile-time swap with no runtime cost. See
 
 ## Building
 
-Pick a platform with the `PLATFORM` switch (default `simulator`):
+The quickest way needs nothing installed but VS Code: open the repository, run
+**Dev Containers: Reopen in Container** and pick the configuration matching the
+host — **Linux/X11** on native Linux, **WSL2/WSLg** when VS Code runs in WSL2.
+The container brings the toolchain and wxWidgets, CMake configures on open, and
+the WSLg configuration forwards the GUI to the Windows desktop without an extra
+X server. See [.devcontainer/README.md](.devcontainer/README.md) for what the
+configurations share, how to add a site-specific one on an internal base image,
+and why changing the shared settings needs a container rebuild.
+
+Without a container, pick a platform with the `PLATFORM` switch (default
+`simulator`):
 
 ```bash
 cmake -B build -S . -DPLATFORM=simulator
@@ -41,12 +51,9 @@ cmake --build build
 ./build/bin/Wordclock
 ```
 
-Requires CMake ≥ 3.16, a C++17 compiler and wxWidgets 3.x (GTK on Linux). A ready
--made toolchain with separate Linux/X11 and WSLg GUI configurations is provided
-in [.devcontainer/](.devcontainer/) — open the repo in VS Code, select *Reopen in
-Container*, and choose the configuration matching the host. See the
-[simulator README](platform/simulator/README.md) for details and the Code::Blocks
-projects.
+That way requires CMake ≥ 3.16, a C++17 compiler and wxWidgets 3.x (GTK on
+Linux). See the [simulator README](platform/simulator/README.md) for details and
+the Code::Blocks projects.
 
 The `hardware` platform is built with the AVR toolchain, not CMake (see its
 README).

@@ -16,7 +16,26 @@ core is emulated by a small shim in [include/Arduino.h](include/Arduino.h)
 
 There are three ways to build, in order of preference.
 
-### 1. CMake (recommended)
+### 1. Dev container (VS Code, recommended)
+
+The [.devcontainer/](../../.devcontainer/) directory provides a ready-made
+toolchain (Ubuntu 24.04 + wxWidgets 3.2), so nothing has to be installed on the
+host. Open the repository in VS Code and run **Dev Containers: Reopen in
+Container**. Select **Linux/X11** on native Linux or **WSL2/WSLg** when VS Code
+runs in WSL2. CMake then configures on open with `PLATFORM=simulator`; build and
+run the `Wordclock` target.
+
+The WSLg configuration forwards the X11, Wayland and PulseAudio sockets, so the
+GUI appears on the Windows desktop without an extra X server. Its WSL-only
+mounts are isolated from the Linux configuration, where `/mnt/wslg` need not
+exist.
+
+A site-specific configuration on an internal base image can be added next to
+them without being committed, and the settings the configurations share live in a
+local feature that a rebuild has to pick up — see
+[.devcontainer/README.md](../../.devcontainer/README.md) for both.
+
+### 2. CMake on the host
 
 Requires CMake ≥ 3.16, a C++17 compiler and wxWidgets 3.x (GTK build on Linux).
 
@@ -32,20 +51,7 @@ cmake --build build
 
 wxWidgets is located via `find_package(wxWidgets)`, so the same
 [CMakeLists.txt](CMakeLists.txt) works on Linux, macOS and Windows without
-per-platform edits.
-
-### 2. Dev container (VS Code)
-
-The [.devcontainer/](../../.devcontainer/) directory provides a ready-made
-toolchain (Ubuntu 24.04 + wxWidgets 3.2). Open the repository in VS Code and run
-**Dev Containers: Reopen in Container**. Select **Linux/X11** on native Linux or
-**WSL2/WSLg** when VS Code runs in WSL2. CMake then configures on open with
-`PLATFORM=simulator`; build and run the `Wordclock` target.
-
-The WSLg configuration forwards the X11, Wayland and PulseAudio sockets, so the
-GUI appears on the Windows desktop without an extra X server. Its WSL-only
-mounts are isolated from the Linux configuration, where `/mnt/wslg` need not
-exist.
+per-platform edits. This is also the build that runs inside the container.
 
 ### 3. Code::Blocks
 
