@@ -65,10 +65,10 @@
 		<Unit filename="../../../firmware/inc/Animation/AnimationCube.h" />
 		<Unit filename="../../../firmware/inc/Animation/AnimationCursor.h" />
 		<Unit filename="../../../firmware/inc/Animation/AnimationDrop.h" />
-		<Unit filename="../../../firmware/inc/Animation/AnimationExplode.h" />
+		<Unit filename="../../../firmware/inc/Animation/AnimationExplodeWords.h" />
 		<Unit filename="../../../firmware/inc/Animation/AnimationFade.h" />
 		<Unit filename="../../../firmware/inc/Animation/AnimationFlicker.h" />
-		<Unit filename="../../../firmware/inc/Animation/AnimationImplode.h" />
+		<Unit filename="../../../firmware/inc/Animation/AnimationExplodePixels.h" />
 		<Unit filename="../../../firmware/inc/Animation/AnimationShift.h" />
 		<Unit filename="../../../firmware/inc/Animation/AnimationSnake.h" />
 		<Unit filename="../../../firmware/inc/Animation/AnimationSqueeze.h" />
@@ -133,10 +133,10 @@
 		<Unit filename="../../../firmware/src/Animation/AnimationCube.cpp" />
 		<Unit filename="../../../firmware/src/Animation/AnimationCursor.cpp" />
 		<Unit filename="../../../firmware/src/Animation/AnimationDrop.cpp" />
-		<Unit filename="../../../firmware/src/Animation/AnimationExplode.cpp" />
+		<Unit filename="../../../firmware/src/Animation/AnimationExplodeWords.cpp" />
 		<Unit filename="../../../firmware/src/Animation/AnimationFade.cpp" />
 		<Unit filename="../../../firmware/src/Animation/AnimationFlicker.cpp" />
-		<Unit filename="../../../firmware/src/Animation/AnimationImplode.cpp" />
+		<Unit filename="../../../firmware/src/Animation/AnimationExplodePixels.cpp" />
 		<Unit filename="../../../firmware/src/Animation/AnimationShift.cpp" />
 		<Unit filename="../../../firmware/src/Animation/AnimationSnake.cpp" />
 		<Unit filename="../../../firmware/src/Animation/AnimationSqueeze.cpp" />

@@ -187,14 +187,14 @@ void Animations::initCurrentAnimation()
             return AnimationsRaw.Squeeze.init();
             break;
 # endif
-# if(ANIMATIONS_SUPPORT_IMPLODE == STD_ON)
-        case ANIMATION_ID_IMPLODE :
-            return AnimationsRaw.Implode.init();
+# if(ANIMATIONS_SUPPORT_EXPLODE_PIXELS == STD_ON)
+        case ANIMATION_ID_EXPLODE_PIXELS :
+            return AnimationsRaw.ExplodePixels.init();
             break;
 # endif
-# if(ANIMATIONS_SUPPORT_EXPLODE == STD_ON)
-        case ANIMATION_ID_EXPLODE :
-            return AnimationsRaw.Explode.init();
+# if(ANIMATIONS_SUPPORT_EXPLODE_WORDS == STD_ON)
+        case ANIMATION_ID_EXPLODE_WORDS :
+            return AnimationsRaw.ExplodeWords.init();
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_MATRIX == STD_ON)
@@ -280,14 +280,14 @@ StdReturnType Animations::setTime(byte Hour, byte Minute)
             return AnimationsRaw.Squeeze.setTime(Hour, Minute);
             break;
 # endif
-# if(ANIMATIONS_SUPPORT_IMPLODE == STD_ON)
-        case ANIMATION_ID_IMPLODE :
-            return AnimationsRaw.Implode.setTime(Hour, Minute);
+# if(ANIMATIONS_SUPPORT_EXPLODE_PIXELS == STD_ON)
+        case ANIMATION_ID_EXPLODE_PIXELS :
+            return AnimationsRaw.ExplodePixels.setTime(Hour, Minute);
             break;
 # endif
-# if(ANIMATIONS_SUPPORT_EXPLODE == STD_ON)
-        case ANIMATION_ID_EXPLODE :
-            return AnimationsRaw.Explode.setTime(Hour, Minute);
+# if(ANIMATIONS_SUPPORT_EXPLODE_WORDS == STD_ON)
+        case ANIMATION_ID_EXPLODE_WORDS :
+            return AnimationsRaw.ExplodeWords.setTime(Hour, Minute);
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_MATRIX == STD_ON)
@@ -371,14 +371,14 @@ Animation::StateType Animations::getStateOfCurrentAnimation() const
             return AnimationsRaw.Squeeze.getState();
             break;
 # endif
-# if(ANIMATIONS_SUPPORT_IMPLODE == STD_ON)
-        case ANIMATION_ID_IMPLODE :
-            return AnimationsRaw.Implode.getState();
+# if(ANIMATIONS_SUPPORT_EXPLODE_PIXELS == STD_ON)
+        case ANIMATION_ID_EXPLODE_PIXELS :
+            return AnimationsRaw.ExplodePixels.getState();
             break;
 # endif
-# if(ANIMATIONS_SUPPORT_EXPLODE == STD_ON)
-        case ANIMATION_ID_EXPLODE :
-            return AnimationsRaw.Explode.getState();
+# if(ANIMATIONS_SUPPORT_EXPLODE_WORDS == STD_ON)
+        case ANIMATION_ID_EXPLODE_WORDS :
+            return AnimationsRaw.ExplodeWords.getState();
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_MATRIX == STD_ON)
@@ -457,14 +457,14 @@ void Animations::taskOfCurrentAnimation()
             AnimationsRaw.Squeeze.task();
             break;
 # endif
-# if(ANIMATIONS_SUPPORT_IMPLODE == STD_ON)
-        case ANIMATION_ID_IMPLODE :
-            AnimationsRaw.Implode.task();
+# if(ANIMATIONS_SUPPORT_EXPLODE_PIXELS == STD_ON)
+        case ANIMATION_ID_EXPLODE_PIXELS :
+            AnimationsRaw.ExplodePixels.task();
             break;
 # endif
-# if(ANIMATIONS_SUPPORT_EXPLODE == STD_ON)
-        case ANIMATION_ID_EXPLODE :
-            AnimationsRaw.Explode.task();
+# if(ANIMATIONS_SUPPORT_EXPLODE_WORDS == STD_ON)
+        case ANIMATION_ID_EXPLODE_WORDS :
+            AnimationsRaw.ExplodeWords.task();
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_MATRIX == STD_ON)
@@ -543,14 +543,14 @@ StdReturnType Animations::showOfCurrentAnimation() const
             return AnimationsRaw.Squeeze.show();
             break;
 # endif
-# if(ANIMATIONS_SUPPORT_IMPLODE == STD_ON)
-        case ANIMATION_ID_IMPLODE :
-            return AnimationsRaw.Implode.show();
+# if(ANIMATIONS_SUPPORT_EXPLODE_PIXELS == STD_ON)
+        case ANIMATION_ID_EXPLODE_PIXELS :
+            return AnimationsRaw.ExplodePixels.show();
             break;
 # endif
-# if(ANIMATIONS_SUPPORT_EXPLODE == STD_ON)
-        case ANIMATION_ID_EXPLODE :
-            return AnimationsRaw.Explode.show();
+# if(ANIMATIONS_SUPPORT_EXPLODE_WORDS == STD_ON)
+        case ANIMATION_ID_EXPLODE_WORDS :
+            return AnimationsRaw.ExplodeWords.show();
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_MATRIX == STD_ON)

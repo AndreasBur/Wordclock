@@ -8,7 +8,7 @@
  *  ---------------------------------------------------------------------------------------------------------------------------------------------------
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       AnimationExplode.cpp
+/**     \file       AnimationExplodeWords.cpp
  *      \brief
  *
  *      \details
@@ -20,7 +20,7 @@
 /******************************************************************************************************************************************************
  * INCLUDES
 ******************************************************************************************************************************************************/
-#include "AnimationExplode.h"
+#include "AnimationExplodeWords.h"
 
 
 /******************************************************************************************************************************************************
@@ -45,7 +45,7 @@
 /******************************************************************************************************************************************************
   init()
 ******************************************************************************************************************************************************/
-void AnimationExplode::init()
+void AnimationExplodeWords::init()
 {
     Animation::init(STATE_IDLE);
     reset();
@@ -54,7 +54,7 @@ void AnimationExplode::init()
 /******************************************************************************************************************************************************
   setTime()
 ******************************************************************************************************************************************************/
-StdReturnType AnimationExplode::setTime(byte Hour, byte Minute)
+StdReturnType AnimationExplodeWords::setTime(byte Hour, byte Minute)
 {
     StdReturnType returnValue{E_NOT_OK};
 
@@ -69,7 +69,7 @@ StdReturnType AnimationExplode::setTime(byte Hour, byte Minute)
 /******************************************************************************************************************************************************
   task()
 ******************************************************************************************************************************************************/
-void AnimationExplode::task()
+void AnimationExplodeWords::task()
 {
     if(State == STATE_CLEAR_TIME) clearTimeTask();
     else if(State == STATE_SET_TIME) setTimeTask();
@@ -83,7 +83,7 @@ void AnimationExplode::task()
 /******************************************************************************************************************************************************
   reset()
 ******************************************************************************************************************************************************/
-void AnimationExplode::reset()
+void AnimationExplodeWords::reset()
 {
     ClockWordsTable.fill(DisplayWords::WORD_NONE);
     ClockWordsTableIndex = 0u;
@@ -96,7 +96,7 @@ void AnimationExplode::reset()
 /******************************************************************************************************************************************************
   clearTimeTask()
 ******************************************************************************************************************************************************/
-void AnimationExplode::clearTimeTask()
+void AnimationExplodeWords::clearTimeTask()
 {
     if(shiftWord(getClearFinalColumn(), getClearFinalRow()) == E_NOT_OK) {
         toggleWordOnDisplay();
@@ -112,7 +112,7 @@ void AnimationExplode::clearTimeTask()
 /******************************************************************************************************************************************************
   setTimeTask()
 ******************************************************************************************************************************************************/
-void AnimationExplode::setTimeTask()
+void AnimationExplodeWords::setTimeTask()
 {
     if(shiftWord(getSetFinalColumn(), getSetFinalRow()) == E_NOT_OK) {
         if(setNextWordToSet() == E_NOT_OK) { State = STATE_IDLE; }
@@ -123,7 +123,7 @@ void AnimationExplode::setTimeTask()
 /******************************************************************************************************************************************************
   shiftWord()
 ******************************************************************************************************************************************************/
-StdReturnType AnimationExplode::shiftWord(byte FinalColum, byte FinalRow)
+StdReturnType AnimationExplodeWords::shiftWord(byte FinalColum, byte FinalRow)
 {
     if(CurrentColumn != getNextColumn(FinalColum) || CurrentRow != getNextRow(FinalRow)) {
         toggleWordOnDisplay();
@@ -139,7 +139,7 @@ StdReturnType AnimationExplode::shiftWord(byte FinalColum, byte FinalRow)
 /******************************************************************************************************************************************************
   toggleWordOnDisplay()
 ******************************************************************************************************************************************************/
-void AnimationExplode::toggleWordOnDisplay()
+void AnimationExplodeWords::toggleWordOnDisplay()
 {
     for(byte columnIndex = CurrentColumn; columnIndex < CurrentColumn + CurrentWordLength; columnIndex++) {
         Display::getInstance().togglePixelFast(columnIndex, CurrentRow);
@@ -149,7 +149,7 @@ void AnimationExplode::toggleWordOnDisplay()
 /******************************************************************************************************************************************************
   setWordOnDisplay()
 ******************************************************************************************************************************************************/
-void AnimationExplode::setWordOnDisplay()
+void AnimationExplodeWords::setWordOnDisplay()
 {
     for(byte columnIndex = CurrentColumn; columnIndex < CurrentColumn + CurrentWordLength; columnIndex++) {
         Display::getInstance().setPixelFast(columnIndex, CurrentRow);
@@ -159,7 +159,7 @@ void AnimationExplode::setWordOnDisplay()
 /******************************************************************************************************************************************************
   setNextWordToClear()
 ******************************************************************************************************************************************************/
-StdReturnType AnimationExplode::setNextWordToClear()
+StdReturnType AnimationExplodeWords::setNextWordToClear()
 {
     CurrentColumn = Display::getInstance().indexToColumn(CurrentWordIndex) + CurrentWordLength;
     CurrentRow = Display::getInstance().indexToRow(CurrentWordIndex);
@@ -175,7 +175,7 @@ StdReturnType AnimationExplode::setNextWordToClear()
 /******************************************************************************************************************************************************
   setNextWordToClearInColumn()
 ******************************************************************************************************************************************************/
-StdReturnType AnimationExplode::setNextWordToClearInColumn()
+StdReturnType AnimationExplodeWords::setNextWordToClearInColumn()
 {
     for(; CurrentColumn < DISPLAY_NUMBER_OF_COLUMNS; CurrentColumn++) {
         if(Display::getInstance().getPixelFast(CurrentColumn, CurrentRow)) {
@@ -190,7 +190,7 @@ StdReturnType AnimationExplode::setNextWordToClearInColumn()
 /******************************************************************************************************************************************************
   setRowNextToClear()
 ******************************************************************************************************************************************************/
-StdReturnType AnimationExplode::setNextRowToClear()
+StdReturnType AnimationExplodeWords::setNextRowToClear()
 {
     if(CurrentRow > 0 && CurrentRow < DISPLAY_NUMBER_OF_ROWS) {
         if(CurrentRow >= RowCenter) { CurrentRow = DISPLAY_NUMBER_OF_ROWS - CurrentRow - 1u; }
@@ -204,7 +204,7 @@ StdReturnType AnimationExplode::setNextRowToClear()
 /******************************************************************************************************************************************************
   setNextWordToSet()
 ******************************************************************************************************************************************************/
-StdReturnType AnimationExplode::setNextWordToSet()
+StdReturnType AnimationExplodeWords::setNextWordToSet()
 {
     for(byte index = ClockWordsTableIndex + 1u; index < ClockWordsTable.size(); index++) {
         if(ClockWordsTable[index] != DisplayWords::WORD_NONE) {
@@ -219,7 +219,7 @@ StdReturnType AnimationExplode::setNextWordToSet()
 /******************************************************************************************************************************************************
   setWordToSet()
 ******************************************************************************************************************************************************/
-void AnimationExplode::setWordToSet(DisplayWords::WordIdType WordId)
+void AnimationExplodeWords::setWordToSet(DisplayWords::WordIdType WordId)
 {
     setWordIndex(WordId);
     CurrentWordLength = Words.getDisplayWordLengthFast(WordId);
@@ -230,7 +230,7 @@ void AnimationExplode::setWordToSet(DisplayWords::WordIdType WordId)
 /******************************************************************************************************************************************************
   setWordIndex()
 ******************************************************************************************************************************************************/
-void AnimationExplode::setWordIndex(DisplayWords::WordIdType WordId)
+void AnimationExplodeWords::setWordIndex(DisplayWords::WordIdType WordId)
 {
     byte column = Words.getDisplayWordColumnFast(WordId);
     byte row = Words.getDisplayWordRowFast(WordId);
@@ -240,7 +240,7 @@ void AnimationExplode::setWordIndex(DisplayWords::WordIdType WordId)
 /******************************************************************************************************************************************************
   setWordLength()
 ******************************************************************************************************************************************************/
-void AnimationExplode::setWordLength()
+void AnimationExplodeWords::setWordLength()
 {
     CurrentWordLength = 1u;
 

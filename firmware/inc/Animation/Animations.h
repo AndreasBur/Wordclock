@@ -34,8 +34,8 @@
 #include "AnimationCube.h"
 #include "AnimationFlicker.h"
 #include "AnimationSqueeze.h"
-#include "AnimationImplode.h"
-#include "AnimationExplode.h"
+#include "AnimationExplodePixels.h"
+#include "AnimationExplodeWords.h"
 #include "AnimationMatrix.h"
 #include "AnimationRoll.h"
 
@@ -53,8 +53,8 @@
 #define ANIMATIONS_SUPPORT_CUBE                 STD_ON
 #define ANIMATIONS_SUPPORT_FLICKER              STD_ON
 #define ANIMATIONS_SUPPORT_SQUEEZE              STD_ON
-#define ANIMATIONS_SUPPORT_IMPLODE              STD_ON
-#define ANIMATIONS_SUPPORT_EXPLODE              STD_ON
+#define ANIMATIONS_SUPPORT_EXPLODE_PIXELS       STD_ON
+#define ANIMATIONS_SUPPORT_EXPLODE_WORDS        STD_ON
 #define ANIMATIONS_SUPPORT_MATRIX               STD_ON
 #define ANIMATIONS_SUPPORT_ROLL                 STD_ON
 
@@ -116,11 +116,11 @@ class Animations
 # if(ANIMATIONS_SUPPORT_SQUEEZE == STD_ON)
         ANIMATION_ID_SQUEEZE,
 # endif
-# if(ANIMATIONS_SUPPORT_IMPLODE == STD_ON)
-        ANIMATION_ID_IMPLODE,
+# if(ANIMATIONS_SUPPORT_EXPLODE_PIXELS == STD_ON)
+        ANIMATION_ID_EXPLODE_PIXELS,
 # endif
-# if(ANIMATIONS_SUPPORT_EXPLODE == STD_ON)
-        ANIMATION_ID_EXPLODE,
+# if(ANIMATIONS_SUPPORT_EXPLODE_WORDS == STD_ON)
+        ANIMATION_ID_EXPLODE_WORDS,
 # endif
 # if(ANIMATIONS_SUPPORT_MATRIX == STD_ON)
         ANIMATION_ID_MATRIX,
@@ -172,11 +172,11 @@ class Animations
 # if(ANIMATIONS_SUPPORT_SQUEEZE == STD_ON)
         AnimationSqueeze Squeeze;
 # endif
-# if(ANIMATIONS_SUPPORT_IMPLODE == STD_ON)
-        AnimationImplode Implode;
+# if(ANIMATIONS_SUPPORT_EXPLODE_PIXELS == STD_ON)
+        AnimationExplodePixels ExplodePixels;
 # endif
-# if(ANIMATIONS_SUPPORT_EXPLODE == STD_ON)
-        AnimationExplode Explode;
+# if(ANIMATIONS_SUPPORT_EXPLODE_WORDS == STD_ON)
+        AnimationExplodeWords ExplodeWords;
 # endif
 # if(ANIMATIONS_SUPPORT_MATRIX == STD_ON)
         AnimationMatrix Matrix;
@@ -205,10 +205,10 @@ class Animations
         Flicker()
 # elif(ANIMATIONS_SUPPORT_SQUEEZE == STD_ON)
         Squeeze()
-# elif(ANIMATIONS_SUPPORT_IMPLODE == STD_ON)
-        Implode()
-# elif(ANIMATIONS_SUPPORT_EXPLODE == STD_ON)
-        Explode()
+# elif(ANIMATIONS_SUPPORT_EXPLODE_PIXELS == STD_ON)
+        ExplodePixels()
+# elif(ANIMATIONS_SUPPORT_EXPLODE_WORDS == STD_ON)
+        ExplodeWords()
 # elif(ANIMATIONS_SUPPORT_MATRIX == STD_ON)
         Matrix()
 # elif(ANIMATIONS_SUPPORT_ROLL == STD_ON)

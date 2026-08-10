@@ -8,7 +8,7 @@
  *  ---------------------------------------------------------------------------------------------------------------------------------------------------
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       AnimationImplode.cpp
+/**     \file       AnimationExplodePixels.cpp
  *      \brief
  *
  *      \details
@@ -20,7 +20,7 @@
 /******************************************************************************************************************************************************
  * INCLUDES
 ******************************************************************************************************************************************************/
-#include "AnimationImplode.h"
+#include "AnimationExplodePixels.h"
 
 
 /******************************************************************************************************************************************************
@@ -45,7 +45,7 @@
 /******************************************************************************************************************************************************
   init()
 ******************************************************************************************************************************************************/
-void AnimationImplode::init()
+void AnimationExplodePixels::init()
 {
     Animation::init(STATE_IDLE);
     reset();
@@ -55,7 +55,7 @@ void AnimationImplode::init()
 /******************************************************************************************************************************************************
   setTime()
 ******************************************************************************************************************************************************/
-StdReturnType AnimationImplode::setTime(byte Hour, byte Minute)
+StdReturnType AnimationExplodePixels::setTime(byte Hour, byte Minute)
 {
     StdReturnType returnValue{E_NOT_OK};
 
@@ -72,7 +72,7 @@ StdReturnType AnimationImplode::setTime(byte Hour, byte Minute)
 /******************************************************************************************************************************************************
   task()
 ******************************************************************************************************************************************************/
-void AnimationImplode::task()
+void AnimationExplodePixels::task()
 {
     if(State == STATE_CLEAR_TIME) {
         if(ShiftCounter < ShiftCounterMaxValue) {
@@ -102,7 +102,7 @@ void AnimationImplode::task()
 /******************************************************************************************************************************************************
   reset()
 ******************************************************************************************************************************************************/
-void AnimationImplode::reset()
+void AnimationExplodePixels::reset()
 {
     ShiftCounter = 0u;
     ClockWordsTable.fill(DisplayWords::WORD_NONE);
@@ -111,7 +111,7 @@ void AnimationImplode::reset()
 /******************************************************************************************************************************************************
   clearTimeTask()
 ******************************************************************************************************************************************************/
-void AnimationImplode::clearTimeTask()
+void AnimationExplodePixels::clearTimeTask()
 {
     shiftQuadrantUpperLeft();
     shiftQuadrantLowerRight();
@@ -122,7 +122,7 @@ void AnimationImplode::clearTimeTask()
 /******************************************************************************************************************************************************
   setTimeTask()
 ******************************************************************************************************************************************************/
-void AnimationImplode::setTimeTask()
+void AnimationExplodePixels::setTimeTask()
 {
     DisplayPixels pixels;
     Display::getInstance().clear();
@@ -134,7 +134,7 @@ void AnimationImplode::setTimeTask()
 /******************************************************************************************************************************************************
   setStateToSetTime()
 ******************************************************************************************************************************************************/
-void AnimationImplode::setStateToSetTime()
+void AnimationExplodePixels::setStateToSetTime()
 {
     State = STATE_SET_TIME;
     Display::getInstance().clear();
@@ -144,7 +144,7 @@ void AnimationImplode::setStateToSetTime()
 /******************************************************************************************************************************************************
   shiftQuadrants()
 ******************************************************************************************************************************************************/
-void AnimationImplode::shiftQuadrants(DisplayPixels& Pixels, byte NumberOfShifts)
+void AnimationExplodePixels::shiftQuadrants(DisplayPixels& Pixels, byte NumberOfShifts)
 {
     for(uint8_t row = 0u; row < DISPLAY_NUMBER_OF_ROWS; row++) {
         for(uint8_t column = 0u; column < DISPLAY_NUMBER_OF_COLUMNS; column++) {
@@ -163,7 +163,7 @@ void AnimationImplode::shiftQuadrants(DisplayPixels& Pixels, byte NumberOfShifts
 /******************************************************************************************************************************************************
   shiftQuadrantUpperLeft()
 ******************************************************************************************************************************************************/
-void AnimationImplode::shiftQuadrantUpperLeft()
+void AnimationExplodePixels::shiftQuadrantUpperLeft()
 {
     for(int8_t column = ColumnCenter; column >= 0; column--) {
         for(int8_t row = RowCenter; row >= 0; row--) {
@@ -175,7 +175,7 @@ void AnimationImplode::shiftQuadrantUpperLeft()
 /******************************************************************************************************************************************************
   shiftDownRight()
 ******************************************************************************************************************************************************/
-void AnimationImplode::shiftDownRight(byte Column, byte Row)
+void AnimationExplodePixels::shiftDownRight(byte Column, byte Row)
 {
     byte columnNext = Column, rowNext = Row;
 
@@ -187,7 +187,7 @@ void AnimationImplode::shiftDownRight(byte Column, byte Row)
 /******************************************************************************************************************************************************
   shiftQuadrantUpperRight()
 ******************************************************************************************************************************************************/
-void AnimationImplode::shiftQuadrantUpperRight()
+void AnimationExplodePixels::shiftQuadrantUpperRight()
 {
     for(uint8_t column = ColumnCenter + 1u; column < DISPLAY_NUMBER_OF_COLUMNS; column++) {
         for(int8_t row = RowCenter - 1u; row >= 0; row--) {
@@ -199,7 +199,7 @@ void AnimationImplode::shiftQuadrantUpperRight()
 /******************************************************************************************************************************************************
   shiftDownLeft()
 ******************************************************************************************************************************************************/
-void AnimationImplode::shiftDownLeft(byte Column, byte Row)
+void AnimationExplodePixels::shiftDownLeft(byte Column, byte Row)
 {
     byte columnNext = Column, rowNext = Row;
 
@@ -211,7 +211,7 @@ void AnimationImplode::shiftDownLeft(byte Column, byte Row)
 /******************************************************************************************************************************************************
   shiftQuadrantLowerLeft()
 ******************************************************************************************************************************************************/
-void AnimationImplode::shiftQuadrantLowerLeft()
+void AnimationExplodePixels::shiftQuadrantLowerLeft()
 {
     for(int8_t column = ColumnCenter - 1u; column >= 0; column--) {
         for(int8_t row = RowCenter + 1u; row < static_cast<int8_t>(DISPLAY_NUMBER_OF_ROWS); row++) {
@@ -223,7 +223,7 @@ void AnimationImplode::shiftQuadrantLowerLeft()
 /******************************************************************************************************************************************************
   shiftUpRight()
 ******************************************************************************************************************************************************/
-void AnimationImplode::shiftUpRight(byte Column, byte Row)
+void AnimationExplodePixels::shiftUpRight(byte Column, byte Row)
 {
     byte columnNext = Column, rowNext = Row;
 
@@ -235,7 +235,7 @@ void AnimationImplode::shiftUpRight(byte Column, byte Row)
 /******************************************************************************************************************************************************
   shiftQuadrantLowerRight()
 ******************************************************************************************************************************************************/
-void AnimationImplode::shiftQuadrantLowerRight()
+void AnimationExplodePixels::shiftQuadrantLowerRight()
 {
     for(uint8_t column = ColumnCenter; column < DISPLAY_NUMBER_OF_COLUMNS; column++) {
         for(int8_t row = RowCenter; row < static_cast<int8_t>(DISPLAY_NUMBER_OF_ROWS); row++) {
@@ -247,7 +247,7 @@ void AnimationImplode::shiftQuadrantLowerRight()
 /******************************************************************************************************************************************************
   shiftUpLeft()
 ******************************************************************************************************************************************************/
-void AnimationImplode::shiftUpLeft(byte Column, byte Row)
+void AnimationExplodePixels::shiftUpLeft(byte Column, byte Row)
 {
     byte columnNext = Column, rowNext = Row;
 
@@ -259,7 +259,7 @@ void AnimationImplode::shiftUpLeft(byte Column, byte Row)
 /******************************************************************************************************************************************************
   clearOldAndSetNewPixel()
 ******************************************************************************************************************************************************/
-void AnimationImplode::clearOldAndSetNewPixel(byte ColumnOld, byte RowOld, byte ColumnNew, byte RowNew)
+void AnimationExplodePixels::clearOldAndSetNewPixel(byte ColumnOld, byte RowOld, byte ColumnNew, byte RowNew)
 {
     if((ColumnOld != ColumnNew) || (RowOld != RowNew))
     {
@@ -271,7 +271,7 @@ void AnimationImplode::clearOldAndSetNewPixel(byte ColumnOld, byte RowOld, byte 
 /******************************************************************************************************************************************************
   setNewPixel()
 ******************************************************************************************************************************************************/
-void AnimationImplode::setNewPixel(byte ColumnOld, byte RowOld, byte ColumnNew, byte RowNew)
+void AnimationExplodePixels::setNewPixel(byte ColumnOld, byte RowOld, byte ColumnNew, byte RowNew)
 {
     if((ColumnOld != ColumnNew) || (RowOld != RowNew))
     {
