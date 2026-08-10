@@ -59,19 +59,28 @@ class AnimationSqueeze : public Animation
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
+  public:
+    /* Side the letters are eaten away from, drawn per minute. From the right is what
+       the reference project does, from the left is the other half of the coin. */
+    enum DirectionType {
+        DIRECTION_FROM_LEFT,
+        DIRECTION_FROM_RIGHT,
+        DIRECTION_NUMBER_OF_DIRECTIONS
+    };
+
   private:
     DisplayWords Words;
     ClockWords::WordsListType ClockWordsTable{{DisplayWords::WORD_NONE}};
     byte MaxWordLength{0u};
     byte CurrentLength{1u};
+    DirectionType Direction{DIRECTION_FROM_LEFT};
 
     // functions
     void reset();
     void clearTimeTask();
     void setTimeTask();
 
-    byte getNextClearedPixel(byte);
-    byte getNextSetPixel(byte);
+    void clearRow(byte);
     void setMaxWordLength();
 
 /******************************************************************************************************************************************************

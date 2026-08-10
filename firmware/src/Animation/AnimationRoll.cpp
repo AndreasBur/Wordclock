@@ -182,16 +182,7 @@ byte AnimationRoll::numberOfSteps() const
 ******************************************************************************************************************************************************/
 AnimationRoll::DirectionType AnimationRoll::calcDirection(byte Hour, byte Minute) const
 {
-    /* Same hash as AnimationMatrix::startFrame(), for the same reason: taking the
-       minute modulo the number of directions would walk through them in a fixed order
-       instead of drawing one. */
-    byte hash = static_cast<byte>(((Hour * 60u) + Minute) * DirectionHashFactor);
-    hash ^= static_cast<byte>(hash >> 4u);
-    hash = static_cast<byte>(hash * DirectionHashFactor);
-
-    /* scaled by multiplication instead of a modulo, which would favour the first
-       directions because 256 is not a multiple of the number of directions */
-    return static_cast<DirectionType>((static_cast<uint16_t>(hash) * DIRECTION_NUMBER_OF_DIRECTIONS) >> 8u);
+    return static_cast<DirectionType>(drawFromTime(Hour, Minute, DIRECTION_NUMBER_OF_DIRECTIONS));
 } /* calcDirection */
 
 

@@ -64,6 +64,7 @@ StdReturnType AnimationCollapse::setTime(byte Hour, byte Minute)
 
     if(Clock::getInstance().getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
         Step = 0u;
+        Direction = static_cast<DirectionType>(drawFromTime(Hour, Minute, DIRECTION_NUMBER_OF_DIRECTIONS));
         /* the previous time is on the display and is what collapses first. An empty
            display simply finishes that phase on its first task. */
         State = STATE_CLEAR_TIME;
@@ -94,6 +95,8 @@ void AnimationCollapse::reset()
 {
     ClockWordsTable.fill(DisplayWords::WORD_NONE);
     Step = 0u;
+    ExpandSteps = 1u;
+    Direction = DIRECTION_TO_LEFT;
 } /* reset */
 
 
@@ -124,16 +127,28 @@ bool AnimationCollapse::collapseRow(byte Row)
 {
     bool moved{false};
 
-    /* From left to right on purpose: a pixel that just moved frees the place for its
-       right neighbour, so a whole word slides by one column per frame instead of
-       collapsing into a single pixel. */
-    for(byte column = 1u; column < DISPLAY_NUMBER_OF_COLUMNS; column++) {
-        if(Display::getInstance().getPixelFast(column, Row) &&
-           !Display::getInstance().getPixelFast(column - 1u, Row))
-        {
-            Display::getInstance().clearPixelFast(column, Row);
-            Display::getInstance().setPixelFast(column - 1u, Row);
-            moved = true;
+    /* Scanned towards the target edge on purpose: a pixel that just moved frees the
+       place for the next one behind it, so a whole word slides by one column per frame
+       instead of collapsing into a single pixel. */
+    if(Direction == DIRECTION_TO_LEFT) {
+        for(byte column = 1u; column < DISPLAY_NUMBER_OF_COLUMNS; column++) {
+            if(Display::getInstance().getPixelFast(column, Row) &&
+               !Display::getInstance().getPixelFast(column - 1u, Row))
+            {
+                Display::getInstance().clearPixelFast(column, Row);
+                Display::getInstance().setPixelFast(column - 1u, Row);
+                moved = true;
+            }
+        }
+    } else {
+        for(int8_t column = DISPLAY_NUMBER_OF_COLUMNS - 2; column >= 0; column--) {
+            if(Display::getInstance().getPixelFast(static_cast<byte>(column), Row) &&
+               !Display::getInstance().getPixelFast(static_cast<byte>(column + 1), Row))
+            {
+                Display::getInstance().clearPixelFast(static_cast<byte>(column), Row);
+                Display::getInstance().setPixelFast(static_cast<byte>(column + 1), Row);
+                moved = true;
+            }
         }
     }
 
@@ -149,12 +164,13 @@ void AnimationCollapse::setTimeTask()
     Display::getInstance().clear();
 
     for(byte row = 0u; row < DISPLAY_NUMBER_OF_ROWS; row++) {
-        byte blockColumn{0u};
+        const byte lettersOfRow = countLettersOfRow(row);
+        byte letterIndex{0u};
 
         for(byte column = 0u; column < DISPLAY_NUMBER_OF_COLUMNS; column++) {
             if(isPixelPartOfClockWords(ClockWordsTable, column, row)) {
-                Display::getInstance().setPixelFast(calcColumn(column, blockColumn), row);
-                blockColumn++;
+                Display::getInstance().setPixelFast(calcColumn(column, calcBlockColumn(letterIndex, lettersOfRow)), row);
+                letterIndex++;
             }
         }
     }
@@ -174,12 +190,45 @@ void AnimationCollapse::setTimeTask()
 byte AnimationCollapse::calcColumn(byte FinalColumn, byte BlockColumn) const
 {
     /* Interpolates between the position in the block and the final one, which needs no
-       memory of where a letter currently is: the block position is simply how many
-       letters of that row come before it. */
+       memory of where a letter currently is. Split by direction to stay unsigned: the
+       block is left of the final position in one and right of it in the other. */
     const byte remainingSteps = ExpandSteps - Step;
+
+    if(BlockColumn > FinalColumn) {
+        return static_cast<byte>(FinalColumn + (((BlockColumn - FinalColumn) * remainingSteps) / ExpandSteps));
+    }
 
     return static_cast<byte>(FinalColumn - (((FinalColumn - BlockColumn) * remainingSteps) / ExpandSteps));
 } /* calcColumn */
+
+
+/******************************************************************************************************************************************************
+  calcBlockColumn()
+******************************************************************************************************************************************************/
+byte AnimationCollapse::calcBlockColumn(byte LetterIndex, byte LettersOfRow) const
+{
+    /* Where a letter sits while the row is one solid block. Counting the letters of the
+       row up front keeps this a plain calculation, so both directions come out of one
+       ascending loop instead of two mirrored ones. */
+    if(Direction == DIRECTION_TO_LEFT) { return LetterIndex; }
+
+    return static_cast<byte>(DISPLAY_NUMBER_OF_COLUMNS - LettersOfRow + LetterIndex);
+} /* calcBlockColumn */
+
+
+/******************************************************************************************************************************************************
+  countLettersOfRow()
+******************************************************************************************************************************************************/
+byte AnimationCollapse::countLettersOfRow(byte Row) const
+{
+    byte letters{0u};
+
+    for(byte column = 0u; column < DISPLAY_NUMBER_OF_COLUMNS; column++) {
+        if(isPixelPartOfClockWords(ClockWordsTable, column, Row)) { letters++; }
+    }
+
+    return letters;
+} /* countLettersOfRow */
 
 
 /******************************************************************************************************************************************************
@@ -190,13 +239,15 @@ byte AnimationCollapse::calcExpandSteps() const
     byte longestWay{0u};
 
     for(byte row = 0u; row < DISPLAY_NUMBER_OF_ROWS; row++) {
-        byte blockColumn{0u};
+        const byte lettersOfRow = countLettersOfRow(row);
+        byte letterIndex{0u};
 
         for(byte column = 0u; column < DISPLAY_NUMBER_OF_COLUMNS; column++) {
             if(isPixelPartOfClockWords(ClockWordsTable, column, row)) {
-                const byte way = column - blockColumn;
+                const byte blockColumn = calcBlockColumn(letterIndex, lettersOfRow);
+                const byte way = (blockColumn > column) ? (blockColumn - column) : (column - blockColumn);
                 if(way > longestWay) { longestWay = way; }
-                blockColumn++;
+                letterIndex++;
             }
         }
     }

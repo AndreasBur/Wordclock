@@ -75,9 +75,6 @@ class AnimationRoll : public Animation
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    /* odd factor of the hash in calcDirection(), see there */
-    static constexpr byte DirectionHashFactor{181u};
-
     Transformation wcTransformation;
     ClockWords::WordsListType ClockWordsTable{{DisplayWords::WORD_NONE}};
     byte Step{0u};

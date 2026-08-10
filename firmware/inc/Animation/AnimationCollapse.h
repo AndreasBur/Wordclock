@@ -11,10 +11,10 @@
 /**     \file       AnimationCollapse.h
  *      \brief      Letters slide together and the new ones slide apart again
  *
- *      \details    The letters of the previous time slide to the left edge of their
- *                  row, closing every gap between the words on the way, until each row
- *                  is one solid block. The letters of the new time start as such a
- *                  block and slide apart into their words.
+ *      \details    The letters of the previous time slide to one edge of their row,
+ *                  closing every gap between the words on the way, until each row is
+ *                  one solid block. The letters of the new time start as such a block
+ *                  and slide apart into their words. The edge is drawn per minute.
  *
  *                  Unlike AnimationSqueeze, which lets the letters disappear one by
  *                  one, nothing vanishes here: the letters move.
@@ -60,7 +60,12 @@ class AnimationCollapse : public Animation
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-
+    /* Edge the letters collapse against, drawn per minute */
+    enum DirectionType {
+        DIRECTION_TO_LEFT,
+        DIRECTION_TO_RIGHT,
+        DIRECTION_NUMBER_OF_DIRECTIONS
+    };
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
@@ -68,6 +73,7 @@ class AnimationCollapse : public Animation
   private:
     ClockWords::WordsListType ClockWordsTable{{DisplayWords::WORD_NONE}};
     byte Step{0u};
+    DirectionType Direction{DIRECTION_TO_LEFT};
     /* Steps the expansion needs, which is the longest way a single letter has to
        travel. Taking the display width instead would let the letters arrive long
        before the animation ends, because the gaps between words are only one or two
@@ -80,6 +86,8 @@ class AnimationCollapse : public Animation
     void setTimeTask();
     bool collapseRow(byte);
     byte calcColumn(byte, byte) const;
+    byte calcBlockColumn(byte, byte) const;
+    byte countLettersOfRow(byte) const;
     byte calcExpandSteps() const;
 
 /******************************************************************************************************************************************************

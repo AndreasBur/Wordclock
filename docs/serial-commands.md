@@ -81,12 +81,12 @@ numbers, these shift if an animation is disabled through its
 | 7 | Wipe | A diagonal line sweeps across the display and uncovers the new letters |
 | 8 | Cube | A rectangle shrinks towards the centre and grows back out, leaving the new letters behind |
 | 9 | Flicker | The display flickers a few times, then the new time is there |
-| 10 | Squeeze | The words of the previous time are eaten away letter by letter, the new ones grow out of their first letter |
+| 10 | Squeeze | The words of the previous time are eaten away letter by letter, from the left or from the right as drawn per minute; the new ones grow out of their first letter |
 | 11 | Explode pixels | Every lit pixel is pulled into the centre, then the new time expands out of it again |
 | 12 | Explode words | The same movement, but whole words travel into the centre and back out, one after the other |
 | 13 | Matrix | Falling code rain in the display color; the new time stays behind as the drops pass over its letters |
 | 14 | Roll | The previous time rolls out while the new one rolls in behind it, direction drawn per minute — never empty |
-| 15 | Collapse | The letters slide to the left edge of their row and close every gap, then the new ones slide apart into their words |
+| 15 | Collapse | The letters slide to one edge of their row and close every gap, then the new ones slide apart into their words; the edge is drawn per minute |
 
 ### Animation mode (`command 9 -M<mode>`)
 

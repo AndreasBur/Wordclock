@@ -63,6 +63,7 @@ StdReturnType AnimationSqueeze::setTime(byte Hour, byte Minute)
 
     if(Clock::getInstance().getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
         ReturnValue = E_OK;
+        Direction = static_cast<DirectionType>(drawFromTime(Hour, Minute, DIRECTION_NUMBER_OF_DIRECTIONS));
         State = STATE_CLEAR_TIME;
     }
     return ReturnValue;
@@ -99,6 +100,7 @@ void AnimationSqueeze::reset()
     ClockWordsTable.fill(DisplayWords::WORD_NONE);
     MaxWordLength = 0u;
     CurrentLength = 1u;
+    Direction = DIRECTION_FROM_LEFT;
 } /* reset */
 
 /******************************************************************************************************************************************************
@@ -106,14 +108,41 @@ void AnimationSqueeze::reset()
 ******************************************************************************************************************************************************/
 void AnimationSqueeze::clearTimeTask()
 {
-    for(byte pixelIndex = 0u; pixelIndex < DISPLAY_NUMBER_OF_PIXELS; pixelIndex++)
-    {
-        pixelIndex = getNextSetPixel(pixelIndex);
-        Display::getInstance().clearPixel(pixelIndex);
-        pixelIndex++;
-        pixelIndex = getNextClearedPixel(pixelIndex);
-    }
+    /* Row by row, not over the linear pixel index: on the index a block at the end of
+       one row and a block at the start of the next count as one, which makes the
+       result depend on where the rows wrap. */
+    for(byte row = 0u; row < DISPLAY_NUMBER_OF_ROWS; row++) { clearRow(row); }
 } /* clearTimeTask */
+
+
+/******************************************************************************************************************************************************
+  clearRow()
+******************************************************************************************************************************************************/
+void AnimationSqueeze::clearRow(byte Row)
+{
+    /* Takes one letter off every block of the row, on the side the direction says, so
+       all words of the row get shorter at the same time. */
+    if(Direction == DIRECTION_FROM_LEFT) {
+        for(byte column = 0u; column < DISPLAY_NUMBER_OF_COLUMNS; column++) {
+            if(Display::getInstance().getPixelFast(column, Row)) {
+                Display::getInstance().clearPixelFast(column, Row);
+
+                /* skip the rest of this block, only its first letter goes this frame */
+                while((column + 1u < DISPLAY_NUMBER_OF_COLUMNS) &&
+                      Display::getInstance().getPixelFast(column + 1u, Row)) { column++; }
+            }
+        }
+    } else {
+        for(int8_t column = DISPLAY_NUMBER_OF_COLUMNS - 1; column >= 0; column--) {
+            if(Display::getInstance().getPixelFast(static_cast<byte>(column), Row)) {
+                Display::getInstance().clearPixelFast(static_cast<byte>(column), Row);
+
+                while((column - 1 >= 0) &&
+                      Display::getInstance().getPixelFast(static_cast<byte>(column - 1), Row)) { column--; }
+            }
+        }
+    }
+} /* clearRow */
 
 /******************************************************************************************************************************************************
   setTimeTask()
@@ -123,32 +152,6 @@ void AnimationSqueeze::setTimeTask()
     Clock::getInstance().setTime(ClockWordsTable, CurrentLength);
     CurrentLength++;
 } /* setTimeTask */
-
-/******************************************************************************************************************************************************
-  getNextClearedPixel()
-******************************************************************************************************************************************************/
-byte AnimationSqueeze::getNextClearedPixel(byte Index)
-{
-    for(byte i = Index; i < DISPLAY_NUMBER_OF_PIXELS; i++) {
-        if(!Display::getInstance().getPixelFast(i)) {
-            return i;
-        }
-    }
-    return Index;
-} /* getNextClearedPixel */
-
-/******************************************************************************************************************************************************
-  getNextSetPixel()
-******************************************************************************************************************************************************/
-byte AnimationSqueeze::getNextSetPixel(byte Index)
-{
-    for(byte i = Index; i < DISPLAY_NUMBER_OF_PIXELS; i++) {
-        if(Display::getInstance().getPixelFast(i)) {
-            return i;
-        }
-    }
-    return Index;
-} /* getNextSetPixel */
 
 /******************************************************************************************************************************************************
   getMaxWordLength()
