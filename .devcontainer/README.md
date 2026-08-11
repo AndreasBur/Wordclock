@@ -11,6 +11,35 @@ Choose the configuration matching the host. Keeping the WSLg mount in its own
 configuration prevents native Linux container startup from failing when
 `/mnt/wslg` does not exist.
 
+Both configurations mount the named `wordclock-codex` volume at
+`/home/vscode/.codex`. This preserves the Codex login and local configuration
+when the development container is rebuilt. The volume contains credentials and
+must not be shared or committed.
+
+## SSH agent with Podman
+
+The native Linux configuration bind-mounts the host's `SSH_AUTH_SOCK` at
+`/tmp/ssh-agent` and sets the environment variable inside the container to that
+path. The WSLg configuration instead relies on VS Code's built-in SSH-agent
+forwarding.
+
+The image also enforces the standard `1777` permissions on `/tmp` and creates
+`/tmp/user`. This allows the non-root `vscode` user to create runtime files when
+the Linux configuration derives `XDG_RUNTIME_DIR` from `/tmp/user/$(id -u)`.
+Some Podman storage/filesystem combinations otherwise leave `/tmp` at `0755`.
+
+Before opening the container, verify on the host that the agent is available
+and contains the expected key:
+
+```sh
+test -S "$SSH_AUTH_SOCK" && ssh-add -l
+```
+
+After **Dev Containers: Rebuild and Reopen in Container**, `ssh-add -l` inside
+the container should list the same public key identities. The private key files
+themselves are not copied into the container. If the Linux configuration fails
+to start, verify that `SSH_AUTH_SOCK` names an existing socket on the host.
+
 ## Shared editor configuration
 
 VS Code extensions, CMake settings and the toolchain sanity check live in the

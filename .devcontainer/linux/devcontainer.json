@@ -10,9 +10,12 @@
     },
     // X11 works on native Linux without requiring the WSL-only /mnt/wslg path.
     "containerEnv": {
-        "DISPLAY": "${localEnv:DISPLAY}"
+        "DISPLAY": "${localEnv:DISPLAY}",
+        "SSH_AUTH_SOCK": "/tmp/ssh-agent"
     },
     "mounts": [
-        "source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind"
+        "source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind",
+        "source=wordclock-codex,target=/home/vscode/.codex,type=volume",
+        "source=${localEnv:SSH_AUTH_SOCK},target=/tmp/ssh-agent,type=bind"
     ]
 }

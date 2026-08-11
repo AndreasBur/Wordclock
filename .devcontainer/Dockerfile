@@ -22,15 +22,17 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && \
         x11-utils && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# The VS Code server derives XDG_RUNTIME_DIR from /tmp/user/$(id -u) whenever the
-# devcontainer.json variant does not set one itself, as the Linux/X11 variant
-# does not (the WSLg variants point it at /mnt/wslg/runtime-dir). It creates that
-# path under `umask 077` and gives up if the parent is missing on a host whose
-# /tmp it cannot write to. Pre-create the parent with the permissions systemd
-# gives /run/user: world-writable so each user can add their own directory,
-# sticky so none can remove another's. install -d, because a plain mkdir would
-# inherit the build umask rather than the mode spelled out here.
-RUN install -d -m 1777 /tmp/user
+# The Linux devcontainer variant may derive XDG_RUNTIME_DIR from
+# /tmp/user/$(id -u). Some Podman storage/filesystem combinations leave /tmp
+# at 0755, preventing the non-root remote user from creating runtime files.
+# Restore the standard sticky permissions and provide a writable runtime parent.
+# The SSH-agent socket mounted at /tmp/ssh-agent also relies on /tmp being
+# accessible to the remote user.
+RUN chmod 1777 /tmp && install -d -m 1777 /tmp/user
+
+# Seed the named Codex data volume with permissions for the remote user. This
+# lets Codex persist its login and configuration across container rebuilds.
+RUN install -d -o vscode -g vscode -m 0700 /home/vscode/.codex
 
 ENV TZ=Europe/Berlin
 
