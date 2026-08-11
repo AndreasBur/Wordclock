@@ -125,9 +125,7 @@ class Overlays
 #endif
         return Show;
     }
-    /* Any, not all: activating a single overlay leaves the others disabled, so requiring
-       all of them to be idle reported the whole set as disabled while one was armed and
-       waiting — which is the ordinary case after one overlay has been switched on. */
+
     bool isIdle() const {
         bool Idle{false};
 #if (OVERLAYS_SUPPORT_DATE == STD_ON)
