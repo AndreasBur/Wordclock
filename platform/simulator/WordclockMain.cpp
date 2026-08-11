@@ -53,22 +53,4 @@ void WordclockMain::task()
     RealTimeClock::getInstance().setDateTime(dateTime);
 
     wcScheduler.task();
-
-    // Push the current time on every minute change. Without an animation the
-    // clock is drawn statically (setWord() only lights letters, so the grid is
-    // cleared first, then the words are set and shown). With an animation
-    // selected, Animations::setTime() kicks off the transition and the
-    // scheduler's Animations task steps through and shows the frames.
-    ClockTime time = RealTimeClock::getInstance().getTime();
-    if(time.getMinute() != LastMinute) {
-        LastMinute = time.getMinute();
-        Animations& animations = Animations::getInstance();
-        if(animations.getAnimation() == Animations::ANIMATION_ID_NONE) {
-            Display::getInstance().clear();
-            Clock::getInstance().setTime(time.getHour(), time.getMinute());
-            Display::getInstance().show();
-        } else {
-            animations.setTime(time.getHour(), time.getMinute());
-        }
-    }
 }

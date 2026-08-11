@@ -67,9 +67,6 @@ void Display::setBrightness(byte sBrightness)
 ******************************************************************************************************************************************************/
 void Display::applyBrightness()
 {
-    /* calcBrightness() folds gamma correction and the light sensor into the brightness
-       that was asked for. Using the raw wish here is what kept both switches without
-       effect. */
     const byte brightness = Brightness.calcBrightness();
 
     /* Nothing to do while the calculated value stays put, which is the normal case: only

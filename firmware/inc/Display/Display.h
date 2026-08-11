@@ -40,8 +40,6 @@
 # define DISPLAY_USE_PIXELS_DIMMING                 STD_ON
 #endif
 
-#define DISPLAY_TASK_CYCLE                          50u
-
 //# if (PIXELS_IS_SINGLETON == STD_ON)
 //#  define Pixels                              Pixels::getInstance()
 //# endif
@@ -113,7 +111,6 @@ class Display
 ******************************************************************************************************************************************************/
   private:
     static constexpr byte WordLengthUnlimited{0u};
-    static constexpr byte TaskCycle{DISPLAY_TASK_CYCLE};
     StateType State{STATE_NONE};
     /* brightness the pixels on the display were last written with. Zero rather than the
        initial brightness, so the first task establishes a defined state; the display is
@@ -137,7 +134,6 @@ class Display
     byte transformToSerpentine(byte) const;
 
     Pixel getColorDimmed(byte);
-    void applyBrightness();
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
@@ -260,8 +256,7 @@ class Display
     void decrementColorBlue() { Color.decrementColorBlue(); }
     void decrementBrightness() { Brightness.decrementBrightness(); applyBrightness(); }
 
-    void task() { applyBrightness(); }
-    static constexpr byte getTaskCycle() { return TaskCycle; }
+    void applyBrightness();
 
     static void indexToColumnAndRow(IndexType Index, byte& Column, byte& Row) { Row = Index / DISPLAY_NUMBER_OF_COLUMNS; Column = Index % DISPLAY_NUMBER_OF_COLUMNS; }
     byte indexToColumn(IndexType Index) const { return Index % DISPLAY_NUMBER_OF_COLUMNS; }
