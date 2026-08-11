@@ -111,7 +111,6 @@ class DisplayManager
 	// set methods
 
 	// methods
-    void init();
     void task();
 };
 
