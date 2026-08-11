@@ -24,9 +24,42 @@ The **display color cannot be shown** on a light background: a white display col
 at full brightness would be invisible. Only brightness is rendered, the hue is
 dropped.
 
-The **Illuminance** slider stands in for the light sensor, which has nothing to
-measure on a PC. It only has an effect while the brightness automatic is on
-(`3 -A1`).
+During a **text overlay** the grid is not a word clock at all but a 10×11 dot
+matrix: the date or the temperature is pushed through it as a scrolled string, so
+the letters that light up are only the cells the font's pixels fall on. Eleven
+columns are narrow for that, and a long string needs many steps to pass through:
+`-F` picks a smaller font, `-S` how fast it steps — the higher the faster, and `0`
+stops it altogether. Give the overlay enough `-E` seconds for a full pass.
+
+## Windows
+
+**File → Settings** holds what stands in for hardware the PC does not have. So far
+that is the **Illuminance** slider for the light sensor, which has nothing to
+measure here; it only takes effect while the brightness automatic is on (`3 -A1`).
+
+**File → Message**, or the **Create** button, puts a command together instead of
+leaving it to be typed: pick it by name, tick the options it should carry, and
+values that are an enumeration — the clock modes, the animations, the fonts — are
+offered by name rather than by number. **Insert** writes the result into the input
+field, where it can still be corrected before **Send** hands it over.
+
+What comes back is read into a readable form underneath the raw line, in both
+directions of the protocol:
+
+```
+3 B=255 A=1 G=0
+   Display brightness
+      Brightness = 255
+      Automatic = on (1)
+      Gamma correction = off (0)
+Error=4:M
+   Error = Value out of bounds (4)
+   Option = M
+```
+
+The raw line stays, because that is what actually went over the wire — what
+matters when the protocol itself is in doubt. Anything that is neither an answer
+nor an error passes through untouched.
 
 ## Building
 
@@ -91,10 +124,15 @@ platform/simulator/
 │   ├── sim/              simulator implementations
 │   │   ├── Pixels.h      wxWidgets LED-matrix frame
 │   │   ├── RealTimeClock.h   time source
-│   │   └── BH1750.h      ambient-light sensor
+│   │   ├── BH1750.h      ambient-light sensor
+│   │   ├── SerialShim.h  the port Serial is bound to
+│   │   ├── Settings.h    stand-ins for absent hardware
+│   │   ├── MessageBuilder.h  puts a command together
+│   │   ├── MessageCatalog.h  what the commands are called
+│   │   └── MessageDecoder.h  reads an answer back into names
 │   ├── Arduino.h         Arduino-core shim (Serial, PROGMEM, itoa, …)
 │   └── arduino/          split Arduino helper shims (types, bits, progmem, itoa)
-├── src/Pixels.cpp        matrix rendering + serial console
+├── src/                  their implementations
 ├── WordclockApp.*        wxApp entry point + 50 ms task timer
 ├── WordclockMain.*       wires the scheduler to the simulated real-time clock
 ├── CMakeLists.txt        simulator build (pulled in by the root switch)
@@ -105,10 +143,15 @@ platform/simulator/
 
 `WordclockApp` starts a 50 ms `wxTimer` that calls `WordclockMain::task()`,
 which feeds the current wall-clock time into the firmware's `RealTimeClock` and
-runs the `Scheduler`. The scheduler drives the display, and every "LED" write
-ends up recolouring a `wxStaticText` cell in the matrix — lit letters turn dark,
-unlit ones stay light grey. The right-hand console mirrors the device's serial
-output and lets you send commands back via the `Serial`/`Pixels` bridge.
+runs the `Scheduler`. That is all this layer does: what reaches the display is
+decided by the firmware's `DisplayManager`, so the hardware backend will behave
+the same without repeating any of it.
+
+Every "LED" write ends up recolouring a `wxStaticText` cell in the matrix — lit
+letters turn dark, unlit ones stay light grey. The right-hand console mirrors the
+device's serial output and lets you send commands back: `Serial` is bound to
+`SerialShim`, which writes into the two text controls the matrix window lays out
+for it.
 
 The firmware still includes the historical header names (`Pixels.h`,
 `RealTimeClock.h`, `BH1750.h`), resolved by placing `include/sim` on the
