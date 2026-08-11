@@ -56,11 +56,11 @@ Settings::Settings(wxWindow* parent, const wxString &title) : wxDialog(parent, w
     SetSizerAndFit(createSizerAll(this));
 
     /* Under X11 this places the window. Under Wayland a client cannot position its own
-       toplevel at all, which is why this used to open wherever the compositor felt like:
-       there, what centres it is being a dialog that is transient for the main window,
-       which the compositor then places over its parent. Hence wxDialog and not wxFrame.
-       Only on construction, so a window the user has dragged somewhere stays put when it
-       is closed and opened again. */
+       toplevel at all, so a frame lands wherever the compositor puts it; what centres it
+       there is being a dialog that is transient for the main window, which the compositor
+       then places over its parent. Hence wxDialog and not wxFrame. Only on construction,
+       so a window the user has dragged somewhere stays put when it is closed and opened
+       again. */
     CentreOnParent();
 }
 
