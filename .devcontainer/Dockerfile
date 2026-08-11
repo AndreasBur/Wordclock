@@ -22,9 +22,15 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && \
         x11-utils && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# VS Code creates /tmp/user/<uid> before postCreateCommand runs. Provide its
-# shared parent so the non-root remote user can create the per-user directory.
-RUN chmod 1777 /tmp && install -d -m 1777 /tmp/user
+# The VS Code server derives XDG_RUNTIME_DIR from /tmp/user/$(id -u) whenever the
+# devcontainer.json variant does not set one itself, as the Linux/X11 variant
+# does not (the WSLg variants point it at /mnt/wslg/runtime-dir). It creates that
+# path under `umask 077` and gives up if the parent is missing on a host whose
+# /tmp it cannot write to. Pre-create the parent with the permissions systemd
+# gives /run/user: world-writable so each user can add their own directory,
+# sticky so none can remove another's. install -d, because a plain mkdir would
+# inherit the build umask rather than the mode spelled out here.
+RUN install -d -m 1777 /tmp/user
 
 ENV TZ=Europe/Berlin
 
