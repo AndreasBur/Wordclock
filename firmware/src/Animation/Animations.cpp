@@ -107,7 +107,7 @@ void Animations::setAnimationFast(AnimationIdType sAnimationId)
 {
     AnimationId = sAnimationId;
     /* shows the selected animation right away, even in a mode that selects on its own;
-       that mode takes over again on the next minute change */
+       that mode takes over again on the next word change */
     CurrentAnimationId = AnimationId;
 
     initCurrentAnimation();
@@ -122,7 +122,7 @@ void Animations::setModeFast(ModeType sMode)
     Mode = sMode;
 
     /* Back to the selected animation. The selecting modes leave the current animation
-       alone and take over on the next minute change. */
+       alone and take over on the next word change. */
     if(Mode == MODE_FIXED) {
         CurrentAnimationId = AnimationId;
         initCurrentAnimation();
@@ -224,7 +224,7 @@ void Animations::initCurrentAnimation()
 ******************************************************************************************************************************************************/
 StdReturnType Animations::setTime(byte Hour, byte Minute)
 {
-    /* Only while nothing is running, so a minute change during a still running
+    /* Only while nothing is running, so a word change during a still running
        animation is ignored here exactly as it is by the animations themselves. */
     if(Mode != MODE_FIXED && getStateOfCurrentAnimation() == Animation::STATE_IDLE) {
         selectAnimationOfMode();

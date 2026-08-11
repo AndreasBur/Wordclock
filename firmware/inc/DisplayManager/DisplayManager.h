@@ -13,7 +13,7 @@
  *
  *      \details    The Scheduler answers when something runs and the Display how it
  *                  reaches the LEDs; this decides what is on it. Its task arbitrates
- *                  between the clock, the animation that carries a minute change and
+ *                  between the clock, the animation that carries a word change and
  *                  an overlay that takes the display over for a while, and it keeps
  *                  the brightness the LEDs are driven with up to date.
  *

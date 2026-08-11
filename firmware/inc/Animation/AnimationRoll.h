@@ -16,7 +16,7 @@
  *                  together here. The display therefore never goes blank and the
  *                  animation takes one pass instead of two.
  *
- *                  The direction is drawn per minute out of right, left, down and up.
+ *                  The direction is selected for each word change out of right, left, down and up.
  *
  *                  Ported from the wordclock24h project by Frank Meyer
  *                  (display_animation_roll in src/display/display.c).

@@ -136,7 +136,7 @@ class Animations
         ANIMATION_ID_NUMBER_OF_ANIMATIONS
     };
 
-    /* Which animation runs on a minute change. Only MODE_FIXED uses the selected
+    /* Which animation runs on a word change. Only MODE_FIXED uses the selected
        animation, the others pick one themselves, which is why selecting an animation
        and selecting a strategy are two separate settings. */
     enum ModeType {

@@ -14,7 +14,7 @@
  *      \details    The letters of the previous time slide to one edge of their row,
  *                  closing every gap between the words on the way, until each row is
  *                  one solid block. The letters of the new time start as such a block
- *                  and slide apart into their words. The edge is drawn per minute.
+ *                  and slide apart into their words. The edge is selected for each word change.
  *
  *                  Unlike AnimationSqueeze, which lets the letters disappear one by
  *                  one, nothing vanishes here: the letters move.
@@ -60,7 +60,7 @@ class AnimationCollapse : public Animation
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-    /* Edge the letters collapse against, drawn per minute */
+    /* Edge the letters collapse against, selected for each word change */
     enum DirectionType {
         DIRECTION_TO_LEFT,
         DIRECTION_TO_RIGHT,

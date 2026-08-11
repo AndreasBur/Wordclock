@@ -133,7 +133,7 @@ platform/simulator/
 │   ├── Arduino.h         Arduino-core shim (Serial, PROGMEM, itoa, …)
 │   └── arduino/          split Arduino helper shims (types, bits, progmem, itoa)
 ├── src/                  their implementations
-├── WordclockApp.*        wxApp entry point + 50 ms task timer
+├── WordclockApp.*        wxApp entry point + 10 ms task timer
 ├── WordclockMain.*       wires the scheduler to the simulated real-time clock
 ├── CMakeLists.txt        simulator build (pulled in by the root switch)
 └── codeblocks/           legacy Code::Blocks projects
@@ -141,7 +141,7 @@ platform/simulator/
 
 ## How it works
 
-`WordclockApp` starts a 50 ms `wxTimer` that calls `WordclockMain::task()`,
+`WordclockApp` starts a 10 ms `wxTimer` that calls `WordclockMain::task()`,
 which feeds the current wall-clock time into the firmware's `RealTimeClock` and
 runs the `Scheduler`. That is all this layer does: what reaches the display is
 decided by the firmware's `DisplayManager`, so the hardware backend will behave

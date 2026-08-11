@@ -116,29 +116,29 @@ numbers, these shift if an animation is disabled through its
 | 7 | Wipe | A diagonal line sweeps across the display and uncovers the new letters |
 | 8 | Cube | A rectangle shrinks towards the centre and grows back out, leaving the new letters behind |
 | 9 | Flicker | The display flickers a few times, then the new time is there |
-| 10 | Squeeze | The words of the previous time are eaten away letter by letter, from the left or from the right as drawn per minute; the new ones grow out of their first letter |
+| 10 | Squeeze | The words of the previous time are eaten away letter by letter, from the left or from the right as selected for each word change; the new ones grow out of their first letter |
 | 11 | Explode pixels | The previous time is pulled into the centre, all of its pixels at once, until the display is empty; then the new time expands out of the centre the same way |
 | 12 | Explode words | The same two halves, but word by word: every word of the previous time travels into the centre on its own, then the words of the new time come back out one after the other |
 | 13 | Matrix | Falling code rain in the display color; the new time stays behind as the drops pass over its letters |
-| 14 | Roll | The previous time rolls out while the new one rolls in behind it, direction drawn per minute — never empty |
-| 15 | Collapse | The letters slide to one edge of their row and close every gap, then the new ones slide apart into their words; the edge is drawn per minute |
+| 14 | Roll | The previous time rolls out while the new one rolls in behind it, direction selected for each word change — never empty |
+| 15 | Collapse | The letters slide to one edge of their row and close every gap, then the new ones slide apart into their words; the edge is selected for each word change |
 
 ### Animation mode (`command 9 -M<mode>`)
 
-The mode decides which animation runs on a minute change. `-A` and `-M` are
+The mode decides which animation runs on a word change. `-A` and `-M` are
 independent: `-A` selects the animation of `-M0`, and switching back to `-M0` returns
 to it.
 
 | mode | Meaning |
 |------|---------|
 | 0 | Fixed — always the animation selected with `-A` |
-| 1 | Random — draws one of the animations 1–15 per minute |
-| 2 | Sequence — runs the animations 1–15 in order, one per minute |
+| 1 | Random — draws one of the animations 1–15 on each word change |
+| 2 | Sequence — runs the animations 1–15 in order, one on each word change |
 
-A mode only selects while no animation is running, so a minute change during a
+A mode only selects while no animation is running, so a word change during a
 running animation is ignored, exactly as the animations themselves ignore it.
 Selecting an animation with `-A` shows it right away even in mode 1 or 2, which then
-take over again on the next minute change.
+take over again on the next word change.
 
 `-F<0|1>` decides whether the animation selected with `-A` takes part in modes 1 and
 2. All animations do by default. The flag belongs to the animation, so it is set for
@@ -154,11 +154,11 @@ nothing to pick, so the firmware answers `Error=4` and keeps it. Clearing the fl
 id 0 is rejected the same way, since `0` is not an animation.
 
 `-S<speed>` sets the speed of the animation selected with `-A`: **higher is faster**,
-`255` is the fastest and `0` stops the animation entirely. The speed is the inverse of
-the task cycle the scheduler counts in
+`255` is the fastest and `0` stops the animation entirely. Speeds `1` through `255`
+map one-to-one to task cycles `255` through `1`; the scheduler counts those cycles in
 ([`Scheduler::convertSpeedToTaskCycle`](../firmware/inc/Scheduler/Scheduler.h)), which
 is why the two run in opposite directions. The default task cycle of `10`
-(`ANIMATIONS_TASK_CYCLE_INIT_VALUE`) is reported as `S=245`. Every animation keeps its
+(`ANIMATIONS_TASK_CYCLE_INIT_VALUE`) is reported as `S=246`. Every animation keeps its
 own speed, and modes 1 and 2 use the speed of whichever animation they picked.
 
 ## RPC sub-commands (`command 1 -P<id>`)
@@ -211,7 +211,7 @@ Returned in the `Error=<code>` field
 4 -I5 -S1             # turn pixel 5 on
 1 -P7                 # run display test
 9 -A13                # show the matrix animation from now on
-9 -M2                 # cycle through all animations, one per minute
+9 -M2                 # cycle through all animations, one per word change
 9                     # query animation, mode and speed
 10 -H14 -M30 -S0      # set time to 14:30:00
 10                    # query current time (echoes H=.. M=.. S=..)

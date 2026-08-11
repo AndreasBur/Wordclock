@@ -28,13 +28,6 @@
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
-/* Scheduler configuration parameter */
-#define SCHEDULER_TASK_CYCLE                100u
-
-/* Scheduler parameter */
-
-
-
 /******************************************************************************************************************************************************
  *  G L O B A L   F U N C T I O N   M A C R O S
 ******************************************************************************************************************************************************/
@@ -64,7 +57,7 @@ class Scheduler
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    static constexpr byte TaskCycle{SCHEDULER_TASK_CYCLE};
+    static constexpr byte TaskIntervalMs{10u};
 
     using RemainingTicksType = byte;
     std::array<RemainingTicksType, TASK_ID_NUMBER_OF_TASKS> RemainingTicks{};
@@ -81,23 +74,30 @@ class Scheduler
     ~Scheduler() { }
 
 	// get methods
-    static constexpr byte getTaskCycle() { return TaskCycle; }
+    static constexpr byte getTaskIntervalMs() { return TaskIntervalMs; }
 
 	// set methods
 
-	// methods
+    // methods
     void task();
-    static byte convertSpeedToTaskCycle(byte Speed) {
-        if(Speed == UINT8_MAX) { return 1u; }
+    static constexpr byte convertSpeedToTaskCycle(byte Speed) {
         if(Speed == 0u) { return 0u; }
-        return UINT8_MAX - Speed;
+        return static_cast<byte>((UINT8_MAX - Speed) + 1u);
     }
-    static byte convertTaskCycleToSpeed(byte TaskCycle) {
+    static constexpr byte convertTaskCycleToSpeed(byte TaskCycle) {
         if(TaskCycle == 0u) { return 0u; }
-        if(TaskCycle == UINT8_MAX) { return 1u; }
-        return UINT8_MAX - TaskCycle;
+        return static_cast<byte>((UINT8_MAX - TaskCycle) + 1u);
     }
+
 };
+
+static_assert(Scheduler::convertSpeedToTaskCycle(0u) == 0u, "Speed zero must stop the task");
+static_assert(Scheduler::convertSpeedToTaskCycle(1u) == UINT8_MAX, "Slowest speed must use the longest cycle");
+static_assert(Scheduler::convertSpeedToTaskCycle(UINT8_MAX - 1u) == 2u, "Second-fastest speed must use cycle two");
+static_assert(Scheduler::convertSpeedToTaskCycle(UINT8_MAX) == 1u, "Fastest speed must use cycle one");
+static_assert(Scheduler::convertTaskCycleToSpeed(0u) == 0u, "Cycle zero must report speed zero");
+static_assert(Scheduler::convertTaskCycleToSpeed(1u) == UINT8_MAX, "Cycle one must report the fastest speed");
+static_assert(Scheduler::convertTaskCycleToSpeed(UINT8_MAX) == 1u, "Longest cycle must report the slowest speed");
 
 #endif
 

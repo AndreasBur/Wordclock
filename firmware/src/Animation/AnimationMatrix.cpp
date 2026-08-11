@@ -63,7 +63,7 @@ StdReturnType AnimationMatrix::setTime(byte Hour, byte Minute)
     StdReturnType returnValue{E_NOT_OK};
 
     if(Clock::getInstance().getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
-        /* rotates the start frames, so every minute gets a different rain pattern */
+        /* derives the start frames from the time, so word changes vary the rain pattern */
         Seed = static_cast<byte>((Hour * 60u) + Minute);
         FrameCounter = 0u;
         /* no clear here: the previous time stays visible below the drops and is eaten

@@ -10,7 +10,7 @@ wxEND_EVENT_TABLE()
 
 WordclockApp::WordclockApp() : Timer(this, TIMER_ID)
 {
-    Timer.Start(50);
+    Timer.Start(Scheduler::getTaskIntervalMs());
 }
 
 bool WordclockApp::OnInit()

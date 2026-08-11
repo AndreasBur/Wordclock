@@ -60,7 +60,7 @@ class AnimationSqueeze : public Animation
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    /* Side the letters are eaten away from, drawn per minute. From the right is what
+    /* Side the letters are eaten away from, selected for each word change. From the right is what
        the reference project does, from the left is the other half of the coin. */
     enum DirectionType {
         DIRECTION_FROM_LEFT,
