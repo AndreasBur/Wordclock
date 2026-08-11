@@ -27,7 +27,6 @@ const wxString DisplayCharacters[][PIXELS_DISPLAY_NUMBER_OF_COLUMNS]
 BEGIN_EVENT_TABLE(Pixels, wxFrame)
     EVT_CLOSE(Pixels::OnClose)
     EVT_BUTTON(ID_BUTTON_SEND, Pixels::OnSend)
-    //EVT_BUTTON(ID_BUTTON_CREATE_INPUT, Pixels::OnCreateInput)
     EVT_BUTTON(ID_BUTTON_CLEAR, Pixels::OnClear)
     EVT_MENU(wxID_PREFERENCES, Pixels::OnSettings)
     EVT_BUTTON(ID_BUTTON_CREATE, Pixels::OnMessage)
@@ -171,11 +170,6 @@ void Pixels::OnClose(wxCloseEvent &event)
     Destroy();
     UNUSED(event);
 }
-
-//void Pixels::OnCreateInput(wxCommandEvent &event)
-//{
-//
-//}
 
 void Pixels::OnSend(wxCommandEvent &event)
 {
@@ -334,4 +328,3 @@ void Pixels::setBrightness(byte sBrightness, bool GammaCorrection)
 
     UNUSED(GammaCorrection);
 }
-

@@ -1,4 +1,5 @@
 #include "WordclockApp.h"
+#include "sim/Pixels.h"
 
 IMPLEMENT_APP(WordclockApp);
 
