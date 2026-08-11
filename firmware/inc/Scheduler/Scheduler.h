@@ -23,6 +23,7 @@
 #include "StandardTypes.h"
 #include "Arduino.h"
 #include "functional"
+#include <array>
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
@@ -48,16 +49,28 @@ class Scheduler
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
+    /* One per task that triggerTasks() drives, and in the order it drives them. */
+    enum TaskIdType {
+        TASK_ID_ILLUMINANCE,
+        TASK_ID_DISPLAY_MANAGER,
+        TASK_ID_ANIMATIONS,
+        TASK_ID_COMMUNICATION,
+        TASK_ID_OVERLAYS,
+        TASK_ID_TEXT,
+        TASK_ID_NUMBER_OF_TASKS
+    };
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
     static constexpr byte TaskCycle{SCHEDULER_TASK_CYCLE};
-    byte TaskCycleCounter{0u};
+
+    using RemainingTicksType = byte;
+    std::array<RemainingTicksType, TASK_ID_NUMBER_OF_TASKS> RemainingTicks{};
 
     // functions
-    bool isCycleHit(byte);
+    bool isDue(TaskIdType, byte);
     void triggerTasks();
 
 /******************************************************************************************************************************************************
@@ -69,10 +82,8 @@ class Scheduler
 
 	// get methods
     static constexpr byte getTaskCycle() { return TaskCycle; }
-    byte getTaskCycleCounter() const { return TaskCycleCounter; }
 
 	// set methods
-    void setTaskCycleCounter(byte sTaskCycleCounter) { TaskCycleCounter = sTaskCycleCounter; }
 
 	// methods
     void task();
@@ -81,10 +92,6 @@ class Scheduler
         if(Speed == 0u) { return 0u; }
         return UINT8_MAX - Speed;
     }
-    /* Has to be the inverse of convertSpeedToTaskCycle(), otherwise every command that
-       reads a speed and writes it back unchanged shifts the cycle by one. The command
-       parsers do exactly that, since they preload their options with the current
-       settings so a command may set single options. */
     static byte convertTaskCycleToSpeed(byte TaskCycle) {
         if(TaskCycle == 0u) { return 0u; }
         if(TaskCycle == UINT8_MAX) { return 1u; }

@@ -54,7 +54,6 @@
 ******************************************************************************************************************************************************/
 void Scheduler::task()
 {
-    TaskCycleCounter++;
     triggerTasks();
 } /* task */
 
@@ -64,13 +63,24 @@ void Scheduler::task()
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  isCycleHit()
+  isDue()
 ******************************************************************************************************************************************************/
-bool Scheduler::isCycleHit(byte Cycle) {
-    if(Cycle == 0u) { return false; }
-    if(TaskCycleCounter % Cycle) { return false; }
-    else { return true; }
-} /* isCycleHit */
+/*! \brief          Tells whether a task is due on this tick, and counts it down if not
+ *  \details        A cycle of zero switches the task off. Its remaining ticks are
+ *                  cleared along with it, so switching it back on runs it right away
+ *                  instead of somewhere inside a period left over from before.
+ *
+ *  \return         E_OK if the task is to run on this tick
+******************************************************************************************************************************************************/
+bool Scheduler::isDue(TaskIdType TaskId, byte Cycle) {
+    if(Cycle == 0u) { RemainingTicks[TaskId] = 0u; return false; }
+    if(RemainingTicks[TaskId] > 1u) { RemainingTicks[TaskId]--; return false; }
+
+    /* Reloading here rather than on the previous run is what makes a cycle that changed
+       in between take effect. Starting from zero, every task is due on the first tick. */
+    RemainingTicks[TaskId] = Cycle;
+    return true;
+} /* isDue */
 
 
 /******************************************************************************************************************************************************
@@ -78,13 +88,13 @@ bool Scheduler::isCycleHit(byte Cycle) {
 ******************************************************************************************************************************************************/
 void Scheduler::triggerTasks()
 {
-    if(isCycleHit(Illuminance::getInstance().getTaskCycle())) { Illuminance::getInstance().task(); }
+    if(isDue(TASK_ID_ILLUMINANCE, Illuminance::getInstance().getTaskCycle())) { Illuminance::getInstance().task(); }
     /* after the sensor, so the brightness automatic works on a fresh reading */
-    if(isCycleHit(DisplayManager::getInstance().getTaskCycle())) { DisplayManager::getInstance().task(); }
-    if(isCycleHit(Animations::getInstance().getTaskCycle())) { Animations::getInstance().task(true); }
-    if(isCycleHit(Communication::getInstance().getTaskCycle())) { Communication::getInstance().task(); }
-    if(isCycleHit(Overlays::getInstance().getTaskCycle())) { Overlays::getInstance().task(); }
-    if(isCycleHit(Text::getInstance().getTaskCycle())) { Text::getInstance().task(true); }
+    if(isDue(TASK_ID_DISPLAY_MANAGER, DisplayManager::getInstance().getTaskCycle())) { DisplayManager::getInstance().task(); }
+    if(isDue(TASK_ID_ANIMATIONS, Animations::getInstance().getTaskCycle())) { Animations::getInstance().task(true); }
+    if(isDue(TASK_ID_COMMUNICATION, Communication::getInstance().getTaskCycle())) { Communication::getInstance().task(); }
+    if(isDue(TASK_ID_OVERLAYS, Overlays::getInstance().getTaskCycle())) { Overlays::getInstance().task(); }
+    if(isDue(TASK_ID_TEXT, Text::getInstance().getTaskCycle())) { Text::getInstance().task(true); }
 } /* triggerTasks */
 
 /******************************************************************************************************************************************************
