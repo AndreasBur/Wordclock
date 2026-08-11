@@ -36,8 +36,11 @@
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
 /* DisplayManager configuration parameter */
-
-#define DISPLAY_MANAGER_TASK_CYCLE                  50u
+/* Every tick, because the task is what notices a minute change: at the 50 the Display's
+   own task used to run at, the clock would be drawn up to 2.5 seconds after the minute
+   turned. Running this often costs little, as applyBrightness() returns early while the
+   calculated brightness stays put, and the automatic follows more closely for it. */
+#define DISPLAY_MANAGER_TASK_CYCLE                  1u
 
 /* DisplayManager parameter */
 
