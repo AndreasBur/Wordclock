@@ -219,15 +219,7 @@ StdReturnType Pixels::getPixel(byte Index, PixelType& Pixel) const
     byte Column = Index % PIXELS_DISPLAY_NUMBER_OF_COLUMNS;
 
     if (Index < PIXELS_NUMBER_OF_LEDS) {
-        if(Characters[Row][Column]->GetForegroundColour() == wxColor(*wxBLACK)) {
-            Pixel.setBlue(255);
-            Pixel.setGreen(255);
-            Pixel.setRed(255);
-        } else {
-            Pixel.setBlue(0);
-            Pixel.setGreen(0);
-            Pixel.setRed(0);
-        }
+        Pixel = PixelBuffer[Row][Column];
         return E_OK;
     } else {
         return E_NOT_OK;
@@ -236,20 +228,33 @@ StdReturnType Pixels::getPixel(byte Index, PixelType& Pixel) const
 
 Pixels::PixelType Pixels::getPixelFast(byte Index) const
 {
-    PixelType Pixel{0, 0, 0};
     byte Row = Index / PIXELS_DISPLAY_NUMBER_OF_COLUMNS;
     byte Column = Index % PIXELS_DISPLAY_NUMBER_OF_COLUMNS;
 
-    if(Characters[Row][Column]->GetForegroundColour() == wxColor(*wxBLACK)) {
-        Pixel.setBlue(255);
-        Pixel.setGreen(255);
-        Pixel.setRed(255);
-    } else {
-        Pixel.setBlue(0);
-        Pixel.setGreen(0);
-        Pixel.setRed(0);
+    return PixelBuffer[Row][Column];
+}
+
+wxColour Pixels::toColour(PixelType Pixel) const
+{
+    /* Only a pixel's brightness is rendered, as the grey level of its letter. */
+    const byte Level = toLevel(getWeightedIntensity(getIntensity(Pixel)));
+
+    return wxColour(Level, Level, Level);
+}
+
+void Pixels::renderPixel(byte Row, byte Column)
+{
+    if(Brightness == 0u) { Characters[Row][Column]->SetForegroundColour(wxColour(*wxLIGHT_GREY)); }
+    else { Characters[Row][Column]->SetForegroundColour(toColour(PixelBuffer[Row][Column])); }
+}
+
+void Pixels::renderAllPixels()
+{
+    for(unsigned int Row = 0; Row < PIXELS_DISPLAY_NUMBER_OF_ROWS; Row++) {
+        for(unsigned int Column = 0; Column < PIXELS_DISPLAY_NUMBER_OF_COLUMNS; Column++) {
+            renderPixel(Row, Column);
+        }
     }
-    return Pixel;
 }
 
 StdReturnType Pixels::setPixel(byte Index, PixelType Pixel)
@@ -258,11 +263,8 @@ StdReturnType Pixels::setPixel(byte Index, PixelType Pixel)
     byte Column = Index % PIXELS_DISPLAY_NUMBER_OF_COLUMNS;
 
     if (Index < PIXELS_NUMBER_OF_LEDS) {
-        if(Pixel.getRed() != 0 || Pixel.getGreen() != 0 || Pixel.getBlue() != 0) {
-            Characters[Row][Column]->SetForegroundColour(wxColour(*wxBLACK));
-        } else {
-            Characters[Row][Column]->SetForegroundColour(wxColour(*wxLIGHT_GREY));
-        }
+        PixelBuffer[Row][Column] = Pixel;
+        renderPixel(Row, Column);
         return E_OK;
     } else {
         return E_NOT_OK;
@@ -271,19 +273,7 @@ StdReturnType Pixels::setPixel(byte Index, PixelType Pixel)
 
 StdReturnType Pixels::setPixel(byte Index, byte Red, byte Green, byte Blue)
 {
-    byte Row = Index / PIXELS_DISPLAY_NUMBER_OF_COLUMNS;
-    byte Column = Index % PIXELS_DISPLAY_NUMBER_OF_COLUMNS;
-
-    if (Index < PIXELS_NUMBER_OF_LEDS) {
-        if(Red != 0 || Green != 0 || Blue != 0) {
-            Characters[Row][Column]->SetForegroundColour(wxColour(*wxBLACK));
-        } else {
-            Characters[Row][Column]->SetForegroundColour(wxColour(*wxLIGHT_GREY));
-        }
-        return E_OK;
-    } else {
-        return E_NOT_OK;
-    }
+    return setPixel(Index, PixelType(Red, Green, Blue));
 }
 
 void Pixels::setPixelFast(byte Index, PixelType Pixel)
@@ -297,34 +287,18 @@ void Pixels::setPixelFast(byte Index, PixelType Pixel)
 
     wxASSERT(Index < PIXELS_NUMBER_OF_LEDS);
 
-    if(Pixel.getRed() != 0 || Pixel.getGreen() != 0 || Pixel.getBlue() != 0) {
-        Characters[Row][Column]->SetForegroundColour(wxColour(*wxBLACK));
-    } else {
-        Characters[Row][Column]->SetForegroundColour(wxColour(*wxLIGHT_GREY));
-    }
+    PixelBuffer[Row][Column] = Pixel;
+    renderPixel(Row, Column);
 }
 
 void Pixels::setPixelFast(byte Index, byte Red, byte Green, byte Blue)
 {
-    byte Row = Index / PIXELS_DISPLAY_NUMBER_OF_COLUMNS;
-    byte Column = Index % PIXELS_DISPLAY_NUMBER_OF_COLUMNS;
-
-    if(Index >= PIXELS_NUMBER_OF_LEDS) {
-        // set breakpoint to find index out of bounce calls
-    }
-
-    wxASSERT(Index < PIXELS_NUMBER_OF_LEDS);
-
-    if(Red != 0 || Green != 0 || Blue != 0) {
-        Characters[Row][Column]->SetForegroundColour(wxColour(*wxBLACK));
-    } else {
-        Characters[Row][Column]->SetForegroundColour(wxColour(*wxLIGHT_GREY));
-    }
+    setPixelFast(Index, PixelType(Red, Green, Blue));
 }
 
 void Pixels::clearPixels()
 {
-    setPixels(wxColour(*wxLIGHT_GREY));
+    setPixels(PixelType(0u, 0u, 0u));
 }
 
 void Pixels::setPixels(wxColor Color)
@@ -338,32 +312,22 @@ void Pixels::setPixels(wxColor Color)
 
 void Pixels::setPixels(PixelType Pixel)
 {
-    if(Pixel.getRed() != 0 || Pixel.getGreen() != 0 || Pixel.getBlue() != 0) {
-        setPixels(wxColour(*wxBLACK));
-    } else {
-        setPixels(wxColour(*wxLIGHT_GREY));
+    for(unsigned int Row = 0; Row < PIXELS_DISPLAY_NUMBER_OF_ROWS; Row++) {
+        for(unsigned int Column = 0; Column < PIXELS_DISPLAY_NUMBER_OF_COLUMNS; Column++) {
+            PixelBuffer[Row][Column] = Pixel;
+        }
     }
+    renderAllPixels();
 }
 
 void Pixels::setBrightness(byte sBrightness, bool GammaCorrection)
 {
+    /* Master output on and off, driven by enablePixels() and disablePixels(). The
+       buffer is left alone, so switching back on restores the picture without having to
+       copy the label colours away first. */
     Brightness = sBrightness;
+    renderAllPixels();
 
-    if(Brightness == 0)
-    {
-        for(unsigned int Row = 0; Row < PIXELS_DISPLAY_NUMBER_OF_ROWS; Row++) {
-            for(unsigned int Column = 0; Column < PIXELS_DISPLAY_NUMBER_OF_COLUMNS; Column++) {
-                Colors[Row][Column] = Characters[Row][Column]->GetForegroundColour();
-            }
-        }
-        setPixels(wxColour(*wxLIGHT_GREY));
-    } else {
-        for(unsigned int Row = 0; Row < PIXELS_DISPLAY_NUMBER_OF_ROWS; Row++) {
-            for(unsigned int Column = 0; Column < PIXELS_DISPLAY_NUMBER_OF_COLUMNS; Column++) {
-                Characters[Row][Column]->SetForegroundColour(Colors[Row][Column]);
-            }
-        }
-    }
     UNUSED(GammaCorrection);
 }
 

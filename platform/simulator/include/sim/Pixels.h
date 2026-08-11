@@ -25,6 +25,7 @@
 ******************************************************************************************************************************************************/
 #include <wx/wx.h>
 #include <wx/button.h>
+#include <cmath>
 #include "StandardTypes.h"
 #include "Pixel.h"
 
@@ -83,13 +84,41 @@ class Pixels : public wxFrame
     wxSlider* IlluminanceSlider;
 
     wxStaticText* Characters[PIXELS_DISPLAY_NUMBER_OF_ROWS][PIXELS_DISPLAY_NUMBER_OF_COLUMNS];
-    wxColor Colors[PIXELS_DISPLAY_NUMBER_OF_ROWS][PIXELS_DISPLAY_NUMBER_OF_COLUMNS];
+    PixelType PixelBuffer[PIXELS_DISPLAY_NUMBER_OF_ROWS][PIXELS_DISPLAY_NUMBER_OF_COLUMNS];
     byte Pin{0};
     byte Brightness{255};
+
+    static constexpr byte IntensityMaxValue{255u};
+    static constexpr byte UnlitLevel{192u};             /* wxLIGHT_GREY */
 
     DECLARE_EVENT_TABLE()
 
     // functions
+    /* The brightest channel decides how far the letter is pulled from the unlit colour
+       towards black. Colour itself cannot be shown on a light background — a white LED
+       at full would be invisible — so only the brightness is rendered. */
+    static byte getIntensity(PixelType Pixel) {
+        byte Intensity = Pixel.getRed();
+        if(Pixel.getGreen() > Intensity) { Intensity = Pixel.getGreen(); }
+        if(Pixel.getBlue() > Intensity) { Intensity = Pixel.getBlue(); }
+        return Intensity;
+    }
+
+    /* Weighted rather than proportional. Unlit letters sit at UnlitLevel and not at
+       black, which leaves the dark end of the range squeezed: proportionally, a pixel at
+       3 percent would land five levels off the unlit colour and be invisible, while on
+       real LEDs it is clearly visible against LEDs that are truly off. The square root
+       spreads the low end, which is also closer to how the eye reads brightness. */
+    static byte getWeightedIntensity(byte Intensity) {
+        return static_cast<byte>(std::sqrt(static_cast<double>(Intensity) * IntensityMaxValue));
+    }
+
+    /* Grey level of the letter, which the weighted intensity pulls from UnlitLevel
+       towards black. */
+    static constexpr byte toLevel(byte WeightedIntensity) {
+        return static_cast<byte>(UnlitLevel - ((UnlitLevel * WeightedIntensity) / IntensityMaxValue));
+    }
+
     Pixels(wxWindow*, const wxString&);
     ~Pixels();
     void OnClose(wxCloseEvent&);
@@ -99,6 +128,9 @@ class Pixels : public wxFrame
     void OnIlluminance(wxCommandEvent&);
     void OnQuit(wxCommandEvent&);
     void setPixels(wxColour);
+    wxColour toColour(PixelType) const;
+    void renderPixel(byte Row, byte Column);
+    void renderAllPixels();
     wxBoxSizer* createSizerAll(wxWindow*);
     wxBoxSizer* createSizerCharacters(wxWindow*);
     wxBoxSizer* createSizerCharacter(wxWindow*, int Row);
