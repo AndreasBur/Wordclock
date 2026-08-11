@@ -38,7 +38,10 @@ set(SIMULATOR_SOURCES
     WordclockApp.cpp
     WordclockMain.cpp
     src/Pixels.cpp
-    src/Settings.cpp)
+    src/Settings.cpp
+    src/MessageCatalog.cpp
+    src/MessageBuilder.cpp
+    src/MessageDecoder.cpp)
 
 set(SOURCES ${ARDUINO_SOURCES} ${SIMULATOR_SOURCES})
 

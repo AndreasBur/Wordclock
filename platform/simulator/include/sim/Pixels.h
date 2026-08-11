@@ -72,10 +72,17 @@ class Pixels : public wxFrame
         ID_BUTTON_SEND,
         ID_TEXT_CTRL_OUTPUT,
         ID_TEXT_CTRL_INPUT,
-        ID_STATIC_BOX
+        ID_STATIC_BOX,
+        ID_BUTTON_CREATE,
+        /* No stock wx id fits the message builder, unlike Settings, About and Quit. */
+        ID_MENU_MESSAGE
     };
 
     wxString SendBuffer{""};
+    /* What the firmware has printed since the last newline. Kept so a whole answer can
+       be read back into readable form once it is complete, which single characters do not
+       allow. */
+    wxString OutputLine{""};
     wxTextCtrl* Output;
     wxTextCtrl* Input;
 
@@ -122,6 +129,9 @@ class Pixels : public wxFrame
     void OnAbout(wxCommandEvent&);
     void OnSend(wxCommandEvent&);
     void OnSettings(wxCommandEvent&);
+    void OnMessage(wxCommandEvent&);
+    void appendOutput(const wxString&);
+    void finishOutputLine();
     void OnQuit(wxCommandEvent&);
     void setPixels(wxColour);
     wxColour toColour(PixelType) const;
@@ -169,15 +179,22 @@ class Pixels : public wxFrame
     }
 
     // Serial shim (Arduino Serial is #defined to this instance)
-    void println() { Output->AppendText(_T("\n")); }
-    void print(const char* Text) { Output->AppendText(Text); }
-    void print(int Number) { Output->AppendText(wxString::Format(wxT("%i"), Number)); }
+    /* All of them go through appendOutput(), which is what keeps track of the line being
+       printed; println() is where every newline ends up, and so where a finished line can
+       be read back. */
+    void println() { finishOutputLine(); }
+    void print(const char* Text) { appendOutput(Text); }
+    void print(int Number) { appendOutput(wxString::Format(wxT("%i"), Number)); }
     void println(const char* Text) { print(Text); println(); }
     void println(int Number) { print(Number); println(); }
-    void print(char Char) { Output->AppendText(Char); }
+    void print(char Char) { appendOutput(wxString(Char)); }
 
     bool available() { return !SendBuffer.IsEmpty(); }
     char read();
+
+    /* Puts a line into the input field, ready to be looked over and sent from there.
+       What the message builder uses; it deliberately does not send by itself. */
+    void setInput(const wxString& Line) { Input->SetValue(Line); }
 };
 
 #endif // PIXELS_H

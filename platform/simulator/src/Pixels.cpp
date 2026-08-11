@@ -1,6 +1,7 @@
 #include "sim/Pixels.h"
-/* the window the Settings menu entry opens */
 #include "sim/Settings.h"
+#include "sim/MessageBuilder.h"
+#include "sim/MessageDecoder.h"
 #include <array>
 
 #if defined(PIXELS) && (defined(__APPLE__ ) || defined(__linux__))
@@ -29,6 +30,8 @@ BEGIN_EVENT_TABLE(Pixels, wxFrame)
     //EVT_BUTTON(ID_BUTTON_CREATE_INPUT, Pixels::OnCreateInput)
     EVT_BUTTON(ID_BUTTON_CLEAR, Pixels::OnClear)
     EVT_MENU(wxID_PREFERENCES, Pixels::OnSettings)
+    EVT_BUTTON(ID_BUTTON_CREATE, Pixels::OnMessage)
+    EVT_MENU(ID_MENU_MESSAGE, Pixels::OnMessage)
     EVT_MENU(wxID_ABOUT, Pixels::OnAbout)
     EVT_MENU(wxID_EXIT, Pixels::OnQuit)
 END_EVENT_TABLE()
@@ -69,6 +72,7 @@ wxMenuBar* Pixels::createMenuBar()
 {
     wxMenu* MenuFile = new wxMenu();
     MenuFile->Append(wxID_PREFERENCES, _T("&Settings"));
+    MenuFile->Append(ID_MENU_MESSAGE, _T("&Message"));
     MenuFile->AppendSeparator();
     MenuFile->Append(wxID_EXIT);
 
@@ -132,7 +136,8 @@ wxBoxSizer* Pixels::createSizerControl(wxWindow* Parent)
     wxStaticBoxSizer* SizerControl = new wxStaticBoxSizer(StaticBox, wxVERTICAL);
     wxStaticText* OutputLabel = new wxStaticText(Parent, wxID_ANY, _T("Output"));
     wxStaticText* InputLabel = new wxStaticText(Parent, wxID_ANY, _T("Input"));
-    //wxButton* CreateInput = new wxButton(Parent, ID_BUTTON_CREATE_INPUT, wxT("&Create Input"), wxDefaultPosition, wxDefaultSize, 0);
+    /* Opens the message builder, which fills the input field below. */
+    wxButton* Create = new wxButton(Parent, ID_BUTTON_CREATE, wxT("C&reate"), wxDefaultPosition, wxDefaultSize, 0);
     wxButton* Send = new wxButton(Parent, ID_BUTTON_SEND, wxT("&Send"), wxDefaultPosition, wxDefaultSize, 0);
     wxButton* Clear = new wxButton(Parent, ID_BUTTON_CLEAR, wxT("&Clear"), wxDefaultPosition, wxDefaultSize, 0);
 
@@ -144,7 +149,7 @@ wxBoxSizer* Pixels::createSizerControl(wxWindow* Parent)
     SizerControl->Add(Clear, 0, wxTOP | wxRIGHT | wxLEFT | wxEXPAND, 10);
     SizerControl->Add(InputLabel, 0, wxLEFT | wxTOP, 10);
     SizerControl->Add(Input, 0, wxRIGHT | wxLEFT, 10);
-    //SizerControl->Add(CreateInput, 0, wxTOP | wxRIGHT | wxLEFT | wxEXPAND, 10);
+    SizerControl->Add(Create, 0, wxTOP | wxRIGHT | wxLEFT | wxEXPAND, 10);
     SizerControl->Add(Send, 0, wxTOP | wxRIGHT | wxLEFT | wxBOTTOM | wxEXPAND, 10);
 
     return SizerControl;
@@ -172,6 +177,8 @@ void Pixels::OnClose(wxCloseEvent &event)
 
 void Pixels::OnSend(wxCommandEvent &event)
 {
+    /* Only while the shim is empty: read() drains a line one character at a time, and a
+       second one written over it would be lost. */
     if(SendBuffer.IsEmpty()) {
         SendBuffer = Input->GetValue() + _T("\n");
     }
@@ -188,6 +195,32 @@ void Pixels::OnSettings(wxCommandEvent &event)
 {
     Settings::getInstance().reveal();
     UNUSED(event);
+}
+
+void Pixels::OnMessage(wxCommandEvent &event)
+{
+    MessageBuilder::getInstance().reveal();
+    UNUSED(event);
+}
+
+void Pixels::appendOutput(const wxString &Text)
+{
+    Output->AppendText(Text);
+    OutputLine += Text;
+}
+
+void Pixels::finishOutputLine()
+{
+    Output->AppendText(_T("\n"));
+
+    /* An answer gets its readable form underneath, indented to show it belongs to the
+       line above; the decoder brings its own layout. The raw line stays: it is what
+       actually went over the wire, which is what matters when the protocol itself is in
+       doubt. Anything the decoder does not recognise — an error line, or plain text —
+       passes through untouched. */
+    Output->AppendText(MessageDecoder::describe(OutputLine));
+
+    OutputLine.Clear();
 }
 
 void Pixels::OnQuit(wxCommandEvent &event)
