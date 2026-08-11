@@ -13,6 +13,10 @@
         "DISPLAY": "${localEnv:DISPLAY}",
         "SSH_AUTH_SOCK": "/tmp/ssh-agent"
     },
+    // Keep VS Code from replacing the mounted agent with a transient socket.
+    "remoteEnv": {
+        "SSH_AUTH_SOCK": "/tmp/ssh-agent"
+    },
     "mounts": [
         "source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind",
         "source=wordclock-codex,target=/home/vscode/.codex,type=volume",
