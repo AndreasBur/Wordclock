@@ -43,6 +43,7 @@ const char* const MessageDecoder::NameValueSeparator{" = "};
 
 const char* const MessageDecoder::ErrorPrefix{"Error="};
 const char* const MessageDecoder::ApiPrefix{"Api="};
+const char* const MessageDecoder::RemoteProcedureIdPrefix{"RpcId="};
 const char* const MessageDecoder::OptionLabel{"Option"};
 
 /* ErrorMessage::ErrorType */
@@ -87,6 +88,9 @@ wxString MessageDecoder::describe(const wxString& Line)
 {
     const wxString Answer = describeAnswer(Line);
     if(!Answer.IsEmpty()) { return Answer; }
+
+    const wxString RemoteProcedureCall = describeRemoteProcedureCall(Line);
+    if(!RemoteProcedureCall.IsEmpty()) { return RemoteProcedureCall; }
 
     return describeError(Line);
 } /* describe */
@@ -159,6 +163,51 @@ wxString MessageDecoder::describeArgument(const MessageCatalog::CommandType& Com
 
 
 /******************************************************************************************************************************************************
+  describeRemoteProcedureCall()
+******************************************************************************************************************************************************/
+/*! \brief          reads the remote procedure call's answer back into names
+ *  \details        It is the one answer that does not begin with its command number:
+ *                  "RpcId=<number>" and then the error of carrying it out. Laid out like
+ *                  any other answer, with the command as the heading, so the procedure and
+ *                  the error read as what they are — two fields of one answer.
+ *
+ *                  The procedure names are the ones the catalog already carries for the
+ *                  command's option, rather than a second list.
+ *
+ *  \return         the readable form, or an empty string if this is not that answer
+******************************************************************************************************************************************************/
+wxString MessageDecoder::describeRemoteProcedureCall(const wxString& Line)
+{
+    wxStringTokenizer Tokenizer(Line, _T(" "));
+    if(!Tokenizer.HasMoreTokens()) { return wxEmptyString; }
+
+    wxString Number;
+    if(!Tokenizer.GetNextToken().StartsWith(RemoteProcedureIdPrefix, &Number)) { return wxEmptyString; }
+
+    /* As strict about the shape as an answer: without a number behind the prefix this is
+       something else that happens to begin the same way. */
+    uint16_t Procedure{0u};
+    if(!toValue(Number, Procedure)) { return wxEmptyString; }
+
+    const MessageCatalog::CommandType* Command = MessageCatalog::findRemoteProcedureCallCommand();
+    if((Command == nullptr) || (Command->NumberOfOptions == 0u)) { return wxEmptyString; }
+
+    /* The procedure is the command's only option. */
+    const MessageCatalog::OptionType& Option = Command->Options[0];
+    wxString Described = CommandIndent + wxString(Command->Label) + _T("\n")
+                       + ArgumentIndent
+                       + describeValue(Option.Label, Number, Option.ValueNames, Option.NumberOfValueNames, Option.Minimum)
+                       + _T("\n");
+
+    while(Tokenizer.HasMoreTokens()) {
+        Described += describeErrorPart(Tokenizer.GetNextToken(), ArgumentIndent);
+    }
+
+    return Described;
+} /* describeRemoteProcedureCall */
+
+
+/******************************************************************************************************************************************************
   describeError()
 ******************************************************************************************************************************************************/
 /*! \brief          reads an error line back into the names behind it
@@ -174,7 +223,7 @@ wxString MessageDecoder::describeError(const wxString& Line)
     wxStringTokenizer Tokenizer(Line, _T(" "));
 
     while(Tokenizer.HasMoreTokens()) {
-        Described += describeErrorPart(Tokenizer.GetNextToken());
+        Described += describeErrorPart(Tokenizer.GetNextToken(), CommandIndent);
     }
 
     return Described;
@@ -192,26 +241,26 @@ wxString MessageDecoder::describeError(const wxString& Line)
  *
  *  \return         the readable form, or an empty string if this is no error
 ******************************************************************************************************************************************************/
-wxString MessageDecoder::describeErrorPart(const wxString& Part)
+wxString MessageDecoder::describeErrorPart(const wxString& Part, const char* Indent)
 {
     wxString Rest;
 
     if(Part.StartsWith(ApiPrefix, &Rest)) {
-        return CommandIndent
+        return Indent
              + describeValue(ApiPrefix, Rest.BeforeFirst(ErrorPartDelimiter), ApiValueNames, NUMBER_OF(ApiValueNames))
              + _T("\n")
-             + describeErrorPart(Rest.AfterFirst(ErrorPartDelimiter));
+             + describeErrorPart(Rest.AfterFirst(ErrorPartDelimiter), Indent);
     }
 
     if(Part.StartsWith(ErrorPrefix, &Rest)) {
-        wxString Described = CommandIndent
+        wxString Described = Indent
                            + describeValue(ErrorPrefix, Rest.BeforeFirst(ErrorPartDelimiter), ErrorValueNames, NUMBER_OF(ErrorValueNames))
                            + _T("\n");
 
         /* Only the shape that names an option has anything after the delimiter. */
         const wxString Option = Rest.AfterFirst(ErrorPartDelimiter);
         if(!Option.IsEmpty()) {
-            Described += CommandIndent + wxString(OptionLabel) + NameValueSeparator + Option + _T("\n");
+            Described += Indent + wxString(OptionLabel) + NameValueSeparator + Option + _T("\n");
         }
 
         return Described;

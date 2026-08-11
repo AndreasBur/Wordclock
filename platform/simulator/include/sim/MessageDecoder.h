@@ -68,6 +68,8 @@ class MessageDecoder
 
     static const char* const ErrorPrefix;
     static const char* const ApiPrefix;
+    /* What the remote procedure call answers with in place of an option short name. */
+    static const char* const RemoteProcedureIdPrefix;
     static const char* const OptionLabel;
     static const char* const ErrorValueNames[];
     static const char* const ApiValueNames[];
@@ -95,8 +97,11 @@ class MessageDecoder
 
     static wxString describeAnswer(const wxString&);
     static wxString describeArgument(const MessageCatalog::CommandType&, const wxString&);
+    static wxString describeRemoteProcedureCall(const wxString&);
     static wxString describeError(const wxString&);
-    static wxString describeErrorPart(const wxString&);
+    /* The indent is a parameter because an error stands on its own on most lines, but sits
+       under a command heading in the remote procedure call's answer. */
+    static wxString describeErrorPart(const wxString&, const char* Indent);
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
