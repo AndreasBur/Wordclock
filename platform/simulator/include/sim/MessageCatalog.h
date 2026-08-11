@@ -105,6 +105,11 @@ class MessageCatalog
        looks like an answer is told apart from one that is. */
     static const CommandType* findCommandByNumber(byte Number);
     static const OptionType* findOption(const CommandType&, char ShortName);
+
+    /* The remote procedure call is the one command whose answer names its value in words
+       of its own ("RpcId=") rather than by the option's short name, so the decoder has to
+       reach it without having a number to look it up by. */
+    static const CommandType* findRemoteProcedureCallCommand();
 };
 
 #endif // MESSAGE_CATALOG_H

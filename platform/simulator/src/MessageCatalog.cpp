@@ -28,20 +28,30 @@
    they cannot end up naming the wrong value when one is switched off. */
 #include "Animations.h"
 #include "Text.h"
+/* For the ranges. The limits themselves are private to these classes, but the predicates
+   that test them are public and constexpr, so the range can be measured rather than
+   copied. */
+#include "Clock.h"
+#include "Display.h"
+#include "RealTimeClock.h"
+#include <limits>
 
 /******************************************************************************************************************************************************
  *  L O C A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
-/* Spelled out rather than taken from the firmware, because the parsers keep their
-   tables private. */
+/* For the options the firmware bounds only by the width of the argument: the overlay
+   periods and endurances reject nothing but zero, and the speeds nothing at all. */
 #define BYTE_MAX                                        255u
-#define WORD_MAX                                        65535u
 
 /******************************************************************************************************************************************************
  *  L O C A L   F U N C T I O N   M A C R O S
 ******************************************************************************************************************************************************/
 /* Counted rather than written out, so a value list and its length cannot drift apart. */
 #define NUMBER_OF(Array)                                static_cast<byte>(sizeof(Array) / sizeof((Array)[0]))
+
+/* The bounds of an option, measured off the firmware's own predicate instead of copied
+   from beside it. */
+#define MEASURED(ValueType, IsValid)                    findMinimum<ValueType>(IsValid), findMaximum<ValueType>(IsValid)
 
 /******************************************************************************************************************************************************
  *  L O C A L   D A T A   T Y P E S   A N D   S T R U C T U R E S
@@ -53,6 +63,34 @@ constexpr MessageCatalog::ArgumentType ARGUMENT_TYPE_UINT8{MessageCatalog::ARGUM
 constexpr MessageCatalog::ArgumentType ARGUMENT_TYPE_UINT16{MessageCatalog::ARGUMENT_TYPE_UINT16};
 constexpr MessageCatalog::ArgumentType ARGUMENT_TYPE_STRING{MessageCatalog::ARGUMENT_TYPE_STRING};
 
+/* Walk the whole range of the value's own type and ask the firmware which values it
+   accepts. Searching beats copying the limits: they are private, and a copy is a number
+   that can quietly fall behind. The type parameter keeps the search inside what the
+   predicate takes, so a byte predicate is never asked about 300. */
+template <typename ValueType, typename PredicateType>
+constexpr uint16_t findMinimum(PredicateType IsValid)
+{
+    constexpr uint32_t Limit{std::numeric_limits<ValueType>::max()};
+
+    for(uint32_t Value = 0u; Value <= Limit; Value++) {
+        if(IsValid(static_cast<ValueType>(Value))) { return static_cast<uint16_t>(Value); }
+    }
+
+    return 0u;
+}
+
+template <typename ValueType, typename PredicateType>
+constexpr uint16_t findMaximum(PredicateType IsValid)
+{
+    constexpr uint32_t Limit{std::numeric_limits<ValueType>::max()};
+
+    for(uint32_t Value = Limit + 1u; Value > 0u; Value--) {
+        if(IsValid(static_cast<ValueType>(Value - 1u))) { return static_cast<uint16_t>(Value - 1u); }
+    }
+
+    return 0u;
+}
+
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A
 ******************************************************************************************************************************************************/
@@ -62,9 +100,11 @@ constexpr const char* const BooleanValueNames[] {
     "off", "on"
 };
 
-/* MsgCmdRemoteProcedureCallParser::RpcIdType */
+/* MsgCmdRemoteProcedureCallParser::RpcIdType, from RPC_ID_NONE + 1 onwards. NONE is the
+   initial value of the parser's RpcId member, not a procedure: asking for it lands in the
+   default case and answers ERROR_RPC_ID_UNKNOWN. Offering it would offer a guaranteed
+   error, the same reason COMMAND_NONE is left out of the command list. */
 constexpr const char* const RemoteProcedureValueNames[] {
-    "None",
     "Illuminance calibration maximum",
     "Illuminance calibration minimum",
     "Display enable",
@@ -168,9 +208,13 @@ constexpr const char* const FontValueNames[] {
 #endif
 };
 
-/* MsgCmdRemoteProcedureCallParser */
+/* Where the values are named, the names are the range: the first one sits at the minimum
+   and there are as many values as names. */
+#define NAMED(Minimum, Names)                           (Minimum), static_cast<uint16_t>((Minimum) + NUMBER_OF(Names) - 1u), Names, NUMBER_OF(Names)
+
+/* MsgCmdRemoteProcedureCallParser. Starts at one, RPC_ID_NONE being left out. */
 constexpr MessageCatalog::OptionType RemoteProcedureCallOptions[] {
-    {'P', "Procedure",          ARGUMENT_TYPE_UINT8,  0u, BYTE_MAX, RemoteProcedureValueNames, NUMBER_OF(RemoteProcedureValueNames)}
+    {'P', "Procedure",          ARGUMENT_TYPE_UINT8,  NAMED(1u, RemoteProcedureValueNames)}
 };
 
 /* MsgCmdDisplayColorParser */
@@ -183,15 +227,15 @@ constexpr MessageCatalog::OptionType DisplayColorOptions[] {
 /* MsgCmdDisplayBrightnessParser */
 constexpr MessageCatalog::OptionType DisplayBrightnessOptions[] {
     {'B', "Brightness",         ARGUMENT_TYPE_UINT8,  0u, BYTE_MAX},
-    {'A', "Automatic",          ARGUMENT_TYPE_UINT8,  0u, 1u,       BooleanValueNames, NUMBER_OF(BooleanValueNames)},
-    {'G', "Gamma correction",   ARGUMENT_TYPE_UINT8,  0u, 1u,       BooleanValueNames, NUMBER_OF(BooleanValueNames)}
+    {'A', "Automatic",          ARGUMENT_TYPE_UINT8,  NAMED(0u, BooleanValueNames)},
+    {'G', "Gamma correction",   ARGUMENT_TYPE_UINT8,  NAMED(0u, BooleanValueNames)}
 };
 
 /* MsgCmdDisplayPixelParser. The index is a uint16 as soon as the display has more than
    255 pixels; 110 here, so the parser compiles it as a uint8. */
 constexpr MessageCatalog::OptionType DisplayPixelOptions[] {
-    {'I', "Index",              ARGUMENT_TYPE_UINT8,  0u, 109u},
-    {'S', "State",              ARGUMENT_TYPE_UINT8,  0u, 1u,       BooleanValueNames, NUMBER_OF(BooleanValueNames)}
+    {'I', "Index",              ARGUMENT_TYPE_UINT8,  0u, DISPLAY_NUMBER_OF_PIXELS - 1u},
+    {'S', "State",              ARGUMENT_TYPE_UINT8,  NAMED(0u, BooleanValueNames)}
 };
 
 /* MsgCmdBaseOverlayParser, shared by the date, temperature and text commands. Only the
@@ -205,9 +249,9 @@ constexpr MessageCatalog::OptionType OverlayOptions[] {
     {'M', "Month",              ARGUMENT_TYPE_UINT8,  0u, 12u},
     {'D', "Day",                ARGUMENT_TYPE_UINT8,  0u, 31u},
     {'V', "Valid in days",      ARGUMENT_TYPE_UINT8,  0u, BYTE_MAX},
-    {'A', "Active",             ARGUMENT_TYPE_UINT8,  0u, 1u,       BooleanValueNames, NUMBER_OF(BooleanValueNames)},
+    {'A', "Active",             ARGUMENT_TYPE_UINT8,  NAMED(0u, BooleanValueNames)},
     {'S', "Speed",              ARGUMENT_TYPE_UINT8,  0u, BYTE_MAX},
-    {'F', "Font",               ARGUMENT_TYPE_UINT8,  0u, BYTE_MAX, FontValueNames, NUMBER_OF(FontValueNames)},
+    {'F', "Font",               ARGUMENT_TYPE_UINT8,  NAMED(0u, FontValueNames)},
     {'T', "Text",               ARGUMENT_TYPE_STRING, 0u, 0u}
 };
 
@@ -224,29 +268,29 @@ static_assert(OverlayOptions[NumberOfOverlayOptionsWithoutText].ShortName == 'T'
 
 /* MsgCmdClockModeParser */
 constexpr MessageCatalog::OptionType ClockModeOptions[] {
-    {'M', "Mode",               ARGUMENT_TYPE_UINT8,  0u, 3u,       ClockModeValueNames, NUMBER_OF(ClockModeValueNames)}
+    {'M', "Mode",               ARGUMENT_TYPE_UINT8,  NAMED(0u, ClockModeValueNames)}
 };
 
 /* MsgCmdAnimationParser */
 constexpr MessageCatalog::OptionType AnimationOptions[] {
-    {'A', "Animation",          ARGUMENT_TYPE_UINT8,  0u, BYTE_MAX, AnimationValueNames, NUMBER_OF(AnimationValueNames)},
-    {'M', "Mode",               ARGUMENT_TYPE_UINT8,  0u, BYTE_MAX, AnimationModeValueNames, NUMBER_OF(AnimationModeValueNames)},
+    {'A', "Animation",          ARGUMENT_TYPE_UINT8,  NAMED(0u, AnimationValueNames)},
+    {'M', "Mode",               ARGUMENT_TYPE_UINT8,  NAMED(0u, AnimationModeValueNames)},
     {'S', "Speed",              ARGUMENT_TYPE_UINT8,  0u, BYTE_MAX},
     {'F', "Favourite",          ARGUMENT_TYPE_UINT8,  0u, BYTE_MAX}
 };
 
 /* MsgCmdTimeParser */
 constexpr MessageCatalog::OptionType TimeOptions[] {
-    {'H', "Hour",               ARGUMENT_TYPE_UINT8,  0u, 23u},
-    {'M', "Minute",             ARGUMENT_TYPE_UINT8,  0u, 59u},
-    {'S', "Second",             ARGUMENT_TYPE_UINT8,  0u, 59u}
+    {'H', "Hour",               ARGUMENT_TYPE_UINT8,  MEASURED(ClockTime::HourType, ClockTime::isHourValid)},
+    {'M', "Minute",             ARGUMENT_TYPE_UINT8,  MEASURED(ClockTime::MinuteType, ClockTime::isMinuteValid)},
+    {'S', "Second",             ARGUMENT_TYPE_UINT8,  MEASURED(ClockTime::SecondType, ClockTime::isSecondValid)}
 };
 
 /* MsgCmdDateParser */
 constexpr MessageCatalog::OptionType DateOptions[] {
-    {'Y', "Year",               ARGUMENT_TYPE_UINT16, 0u, WORD_MAX},
-    {'M', "Month",              ARGUMENT_TYPE_UINT8,  1u, 12u},
-    {'D', "Day",                ARGUMENT_TYPE_UINT8,  1u, 31u}
+    {'Y', "Year",               ARGUMENT_TYPE_UINT16, MEASURED(ClockDate::YearType, ClockDate::isYearValid)},
+    {'M', "Month",              ARGUMENT_TYPE_UINT8,  MEASURED(ClockDate::MonthType, ClockDate::isMonthValid)},
+    {'D', "Day",                ARGUMENT_TYPE_UINT8,  MEASURED(ClockDate::DayType, ClockDate::isDayValid)}
 };
 
 /* The numbers come from the enumeration itself, so they follow it instead of having to be
@@ -291,6 +335,28 @@ constexpr bool areOptionCountsWithinBounds()
 static_assert(areOptionCountsWithinBounds(),
               "a command has more options than MESSAGE_CATALOG_MAX_NUMBER_OF_OPTIONS allows rows for");
 
+/* Naming the values makes the names the range: the dropdown offers one entry per name and
+   the builder sends Minimum plus the position picked, so a range wider than the list would
+   promise values that cannot be picked, and a narrower one would name values outside it.
+   NAMED() gets this right by construction; this keeps a range written out by hand from
+   getting it wrong. */
+constexpr bool areNamedRangesConsistent()
+{
+    for(const MessageCatalog::CommandType& Command : Commands) {
+        for(byte Index = 0u; Index < Command.NumberOfOptions; Index++) {
+            const MessageCatalog::OptionType& Option = Command.Options[Index];
+
+            if(Option.ValueNames == nullptr) { continue; }
+            if((Option.Maximum - Option.Minimum + 1u) != Option.NumberOfValueNames) { return false; }
+        }
+    }
+
+    return true;
+}
+
+static_assert(areNamedRangesConsistent(),
+              "an option with named values has a range that does not match the number of names");
+
 /******************************************************************************************************************************************************
  * P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
@@ -330,6 +396,19 @@ const MessageCatalog::CommandType* MessageCatalog::findCommandByNumber(byte Numb
 
     return nullptr;
 } /* findCommandByNumber */
+
+
+/******************************************************************************************************************************************************
+  findRemoteProcedureCallCommand()
+******************************************************************************************************************************************************/
+/*! \brief          the remote procedure call, for a caller that has no number to look up
+ *
+ *  \return         the command, or nullptr if it is not in the table
+******************************************************************************************************************************************************/
+const MessageCatalog::CommandType* MessageCatalog::findRemoteProcedureCallCommand()
+{
+    return findCommandByNumber(MsgCmdParser::COMMAND_REMOTE_PROCEDURE_CALL);
+} /* findRemoteProcedureCallCommand */
 
 
 /******************************************************************************************************************************************************
