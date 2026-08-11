@@ -109,7 +109,7 @@ void AnimationShift::clearTimeTask()
         CurrentColumn++;
     } else {
         State = STATE_SET_TIME;
-        reset();
+        CurrentColumn = 0u;
     }
 #endif
 
@@ -119,7 +119,7 @@ void AnimationShift::clearTimeTask()
         CurrentRow++;
     } else {
         State = STATE_SET_TIME;
-        reset();
+        CurrentRow = 0u;
     }
 #endif
 
@@ -141,7 +141,7 @@ void AnimationShift::setTimeTask()
         }
         CurrentColumn++;
     } else {
-        State = STATE_IDLE;
+        finishWithClockWords(ClockWordsTable);
     }
 #endif
 
@@ -155,7 +155,7 @@ void AnimationShift::setTimeTask()
         }
         CurrentRow++;
     } else {
-        setState(STATE_IDLE);
+        finishWithClockWords(ClockWordsTable);
     }
 #endif
 } /* setTimeTask */

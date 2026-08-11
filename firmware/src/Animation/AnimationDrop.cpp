@@ -127,8 +127,9 @@ void AnimationDrop::setTimeTask()
         Display::getInstance().clearPixelFast(Column, Row - 1u);
     } else {
         if(setNextColumn(maxColumn) == E_NOT_OK) {
-            State = STATE_IDLE;
+            finishWithClockWords(ClockWordsTable);
             reset();
+            return;
         }
     }
     Display::getInstance().setPixelFast(Column, Row);

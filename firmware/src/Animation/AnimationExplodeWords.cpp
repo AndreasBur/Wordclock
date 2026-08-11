@@ -115,7 +115,7 @@ void AnimationExplodeWords::clearTimeTask()
 void AnimationExplodeWords::setTimeTask()
 {
     if(shiftWord(getSetFinalColumn(), getSetFinalRow()) == E_NOT_OK) {
-        if(setNextWordToSet() == E_NOT_OK) { State = STATE_IDLE; }
+        if(setNextWordToSet() == E_NOT_OK) { finishWithClockWords(ClockWordsTable); }
         else { toggleWordOnDisplay(); }
     }
 } /* setTimeTask */

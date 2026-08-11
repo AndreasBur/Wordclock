@@ -4,6 +4,8 @@ cmake_minimum_required(VERSION 3.16)
 # core in firmware/ is shared and pulled in by the chosen platform.
 project(Wordclock NONE)
 
+include(CTest)
+
 set(PLATFORM simulator CACHE STRING "Target platform: simulator | hardware")
 
 if(PLATFORM STREQUAL "simulator")

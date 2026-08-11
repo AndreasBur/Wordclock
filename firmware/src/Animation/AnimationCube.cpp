@@ -141,7 +141,7 @@ void AnimationCube::setTimeTask()
             break;
         case BORDER_STATE_BETWEEN:
             clearBorderPixelsWithoutClockPixels();
-            if(increaseBorder() == E_NOT_OK) { State = STATE_IDLE; } 
+            if(increaseBorder() == E_NOT_OK) { finishWithClockWords(ClockWordsTable); }
             else { setBorderPixels(); }
             break;
         default:

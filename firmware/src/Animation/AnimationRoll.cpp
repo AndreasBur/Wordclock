@@ -109,7 +109,7 @@ void AnimationRoll::setTimeTask()
         Step++;
     } else {
         /* the new time has reached its place, nothing left to shift */
-        State = STATE_IDLE;
+        finishWithClockWords(ClockWordsTable);
         reset();
     }
 } /* setTimeTask */

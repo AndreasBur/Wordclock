@@ -96,3 +96,43 @@ endif()
 target_compile_definitions(Wordclock PRIVATE ${PIXELS_DEFINE})
 
 target_link_libraries(Wordclock PRIVATE ${wxWidgets_LIBRARIES})
+
+# --------------------------------------------------------------------------
+# Tests
+# --------------------------------------------------------------------------
+if(BUILD_TESTING)
+    set(SIMULATOR_TEST_SOURCES
+        tests/ClockAndSchedulerTests.cpp
+        src/Pixels.cpp
+        src/Settings.cpp
+        src/MessageCatalog.cpp
+        src/MessageBuilder.cpp
+        src/MessageDecoder.cpp
+        src/SerialShim.cpp)
+
+    add_executable(WordclockTests ${ARDUINO_SOURCES} ${SIMULATOR_TEST_SOURCES})
+
+    target_include_directories(WordclockTests PRIVATE
+        "${CMAKE_CURRENT_SOURCE_DIR}"
+        "${CMAKE_CURRENT_SOURCE_DIR}/include/sim"
+        "${CMAKE_CURRENT_SOURCE_DIR}/include"
+        "${FIRMWARE_DIR}/inc")
+    foreach(dir ${ARDUINO_INC_DIRS})
+        if(IS_DIRECTORY "${dir}")
+            target_include_directories(WordclockTests PRIVATE "${dir}")
+        endif()
+    endforeach()
+    target_include_directories(WordclockTests PRIVATE
+        "${FIRMWARE_DIR}/inc/Communication/MessageParser"
+        "${FIRMWARE_DIR}/inc/Communication/MessageParser/Base")
+
+    if(MSVC)
+        target_compile_options(WordclockTests PRIVATE /W4)
+    else()
+        target_compile_options(WordclockTests PRIVATE -Wall -Wextra)
+    endif()
+
+    target_compile_definitions(WordclockTests PRIVATE ${PIXELS_DEFINE})
+    target_link_libraries(WordclockTests PRIVATE ${wxWidgets_LIBRARIES})
+    add_test(NAME WordclockTests COMMAND WordclockTests)
+endif()

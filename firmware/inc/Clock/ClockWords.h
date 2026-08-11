@@ -73,8 +73,8 @@ class ClockWords
         : ShowItIs(sShowItIs), HourWords(sHourWords), MinuteWords(sMinuteWords) { }
     ~ClockWords() { }
 
-    bool operator==(const ClockWords& sClockWords);
-    bool operator!=(const ClockWords& sClockWords);
+    bool operator==(const ClockWords& sClockWords) const;
+    bool operator!=(const ClockWords& sClockWords) const;
 
     // get methods
     bool getShowItIs() const { return ShowItIs; }

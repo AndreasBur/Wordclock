@@ -51,6 +51,7 @@ Without a container, pick a platform with the `PLATFORM` switch (default
 ```bash
 cmake -B build -S . -DPLATFORM=simulator
 cmake --build build
+ctest --test-dir build --output-on-failure
 ./build/bin/Wordclock
 ```
 

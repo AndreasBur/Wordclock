@@ -2,17 +2,9 @@
 
 #include "sim/RealTimeClock.h"
 
-WordclockMain::WordclockMain()
-{
+namespace {
 
-}
-
-WordclockMain::~WordclockMain()
-{
-
-}
-
-void WordclockMain::task()
+ClockDateTime getSystemDateTime()
 {
     wxDateTime wxDT = wxDateTime::Now();
     ClockDateTime dateTime;
@@ -23,8 +15,23 @@ void WordclockMain::task()
     dateTime.setTimeHour(wxDT.GetHour());
     dateTime.setTimeMinute(wxDT.GetMinute());
     dateTime.setTimeSecond(wxDT.GetSecond());
+    return dateTime;
+}
 
-    RealTimeClock::getInstance().setDateTime(dateTime);
+} // namespace
 
+WordclockMain::WordclockMain()
+{
+    RealTimeClock::getInstance().setDateTime(getSystemDateTime());
+}
+
+WordclockMain::~WordclockMain()
+{
+
+}
+
+void WordclockMain::task()
+{
+    RealTimeClock::getInstance().task();
     wcScheduler.task();
 }

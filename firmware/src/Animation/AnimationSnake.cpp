@@ -88,7 +88,7 @@ void AnimationSnake::task()
             SnakeEndIndex++;
         }
         if(SnakeBeginIndex < DISPLAY_NUMBER_OF_LEDS - 1u) SnakeBeginIndex++;
-        if(SnakeEndIndex >= DISPLAY_NUMBER_OF_LEDS) State = STATE_IDLE;
+        if(SnakeEndIndex >= DISPLAY_NUMBER_OF_LEDS) finishWithClockWords(ClockWordsTable);
     }
 } /* task */
 

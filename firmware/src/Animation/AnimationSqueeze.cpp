@@ -83,7 +83,7 @@ void AnimationSqueeze::task()
         }
     } else if(State == STATE_SET_TIME) {
         setTimeTask();
-        if(CurrentLength > MaxWordLength) { State = STATE_IDLE; }
+        if(CurrentLength > MaxWordLength) { finishWithClockWords(ClockWordsTable); }
     }
 } /* task */
 

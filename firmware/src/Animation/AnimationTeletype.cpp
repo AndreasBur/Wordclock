@@ -80,7 +80,7 @@ void AnimationTeletype::task()
     if(State == STATE_SET_TIME) {
         if(CurrentCharIndex >= CurrentWordLength) {
             if(setNextWordIndex() == E_NOT_OK) {
-                State = STATE_IDLE;
+                finishWithClockWords(ClockWordsTable);
                 return;
             }
             CurrentCharIndex = 0u;
@@ -124,4 +124,3 @@ StdReturnType AnimationTeletype::setNextWordIndex()
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E
 ******************************************************************************************************************************************************/
- 

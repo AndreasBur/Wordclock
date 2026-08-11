@@ -136,7 +136,7 @@ void AnimationWipe::setTimeTask()
     } while(column-- != 0u && row++ < DISPLAY_NUMBER_OF_ROWS - 1u);
 
     if(setNextIndex() == E_NOT_OK) {
-        State = STATE_IDLE;
+        finishWithClockWords(ClockWordsTable);
     }
 } /* setTimeTask */
 

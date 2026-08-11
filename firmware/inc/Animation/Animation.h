@@ -73,6 +73,11 @@ class Animation
 
     // functions
     void init(StateType sState) { State = sState; }
+    void finishWithClockWords(const ClockWords::WordsListType& ClockWordsTable) {
+        Display::getInstance().clear();
+        Clock::getInstance().setTime(ClockWordsTable);
+        State = STATE_IDLE;
+    }
     byte selectByTime(byte, byte, byte) const;
 
 /******************************************************************************************************************************************************

@@ -80,7 +80,12 @@ void AnimationCursor::task()
                 Display::getInstance().clearPixelFast(CurrentPixelIndex - 1u);
             }
         }
-        if(CurrentPixelIndex >= DISPLAY_NUMBER_OF_PIXELS) State = STATE_IDLE;
+        if(CurrentPixelIndex >= DISPLAY_NUMBER_OF_PIXELS) {
+            /* The cursor normally clears every old pixel as it passes. Rebuild the
+               target once at the end as well, so a skipped or overlapping pixel can
+               never leave a word from the previous time on the display. */
+            finishWithClockWords(ClockWordsTable);
+        }
         CurrentPixelIndex++;
     }
 } /* task */
