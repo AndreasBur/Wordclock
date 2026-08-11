@@ -125,31 +125,21 @@ class Overlays
 #endif
         return Show;
     }
+    /* Any, not all: activating a single overlay leaves the others disabled, so requiring
+       all of them to be idle reported the whole set as disabled while one was armed and
+       waiting — which is the ordinary case after one overlay has been switched on. */
     bool isIdle() const {
-        bool Idle{true};
+        bool Idle{false};
 #if (OVERLAYS_SUPPORT_DATE == STD_ON)
-        Idle = Idle && (Date.getState() == OverlayDate::STATE_IDLE);
+        Idle = Idle || (Date.getState() == OverlayDate::STATE_IDLE);
 #endif
 #if (OVERLAYS_SUPPORT_TEMPERATURE == STD_ON)
-        Idle = Idle && (Temperature.getState() == OverlayTemperature::STATE_IDLE);
+        Idle = Idle || (Temperature.getState() == OverlayTemperature::STATE_IDLE);
 #endif
 #if (OVERLAYS_SUPPORT_TEXT == STD_ON)
-        Idle = Idle && (Text.getState() == OverlayText::STATE_IDLE);
+        Idle = Idle || (Text.getState() == OverlayText::STATE_IDLE);
 #endif
         return Idle;
-    }
-    bool isDisabled() const {
-        bool Disabled{true};
-#if (OVERLAYS_SUPPORT_DATE == STD_ON)
-        Disabled = Disabled && (Date.getState() == OverlayDate::STATE_DISABLED);
-#endif
-#if (OVERLAYS_SUPPORT_TEMPERATURE == STD_ON)
-        Disabled = Disabled && (Temperature.getState() == OverlayTemperature::STATE_DISABLED);
-#endif
-#if (OVERLAYS_SUPPORT_TEXT == STD_ON)
-        Disabled = Disabled && (Text.getState() == OverlayText::STATE_DISABLED);
-#endif
-        return Disabled;
     }
 
     void taskIdle(ClockDate, ClockTime);

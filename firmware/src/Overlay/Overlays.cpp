@@ -45,10 +45,17 @@
 /******************************************************************************************************************************************************
   getState()
 ******************************************************************************************************************************************************/
+/*! \brief          the state of the overlays as a whole
+ *  \details        Showing beats idle beats disabled, so that the one overlay holding the
+ *                  display decides, and an armed one is not hidden behind the others that
+ *                  are switched off. Disabled is what is left over when none of them has
+ *                  anything to do, which is why it needs no test of its own.
+ *
+ *  \return         the state
+******************************************************************************************************************************************************/
 Overlays::StateType Overlays::getState() const {
-    if(isDisabled()) { return OverlayType::STATE_DISABLED; }
-    if(isIdle()) { return OverlayType::STATE_IDLE; }
     if(isShow()) { return OverlayType::STATE_SHOW; }
+    if(isIdle()) { return OverlayType::STATE_IDLE; }
     return OverlayType::STATE_DISABLED;
 } /* getState */
 
