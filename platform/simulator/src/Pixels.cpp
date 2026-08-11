@@ -1,7 +1,7 @@
 #include "sim/Pixels.h"
 #include "sim/Settings.h"
 #include "sim/MessageBuilder.h"
-#include "sim/MessageDecoder.h"
+#include "sim/SerialShim.h"
 #include <array>
 
 #if defined(PIXELS) && (defined(__APPLE__ ) || defined(__linux__))
@@ -141,8 +141,10 @@ wxBoxSizer* Pixels::createSizerControl(wxWindow* Parent)
     wxButton* Send = new wxButton(Parent, ID_BUTTON_SEND, wxT("&Send"), wxDefaultPosition, wxDefaultSize, 0);
     wxButton* Clear = new wxButton(Parent, ID_BUTTON_CLEAR, wxT("&Clear"), wxDefaultPosition, wxDefaultSize, 0);
 
-    Output = new wxTextCtrl(Parent, ID_TEXT_CTRL_OUTPUT, _(""), wxDefaultPosition, wxSize(200, 200), wxTE_MULTILINE|wxTE_READONLY);
-    Input  = new wxTextCtrl(Parent, ID_TEXT_CTRL_INPUT, _(""), wxDefaultPosition, wxSize(200, 20));
+    wxTextCtrl* Output = new wxTextCtrl(Parent, ID_TEXT_CTRL_OUTPUT, _(""), wxDefaultPosition, wxSize(200, 200), wxTE_MULTILINE|wxTE_READONLY);
+    wxTextCtrl* Input  = new wxTextCtrl(Parent, ID_TEXT_CTRL_INPUT, _(""), wxDefaultPosition, wxSize(200, 20));
+
+    SerialShim::getInstance().attach(Output, Input);
 
     SizerControl->Add(OutputLabel, 0, wxLEFT | wxTOP | wxEXPAND, 10);
     SizerControl->Add(Output, 1, wxRIGHT | wxLEFT | wxEXPAND, 10);
@@ -177,17 +179,13 @@ void Pixels::OnClose(wxCloseEvent &event)
 
 void Pixels::OnSend(wxCommandEvent &event)
 {
-    /* Only while the shim is empty: read() drains a line one character at a time, and a
-       second one written over it would be lost. */
-    if(SendBuffer.IsEmpty()) {
-        SendBuffer = Input->GetValue() + _T("\n");
-    }
+    SerialShim::getInstance().sendInput();
     UNUSED(event);
 }
 
 void Pixels::OnClear(wxCommandEvent &event)
 {
-    Output->Clear();
+    SerialShim::getInstance().clearOutput();
     UNUSED(event);
 }
 
@@ -201,26 +199,6 @@ void Pixels::OnMessage(wxCommandEvent &event)
 {
     MessageBuilder::getInstance().reveal();
     UNUSED(event);
-}
-
-void Pixels::appendOutput(const wxString &Text)
-{
-    Output->AppendText(Text);
-    OutputLine += Text;
-}
-
-void Pixels::finishOutputLine()
-{
-    Output->AppendText(_T("\n"));
-
-    /* An answer gets its readable form underneath, indented to show it belongs to the
-       line above; the decoder brings its own layout. The raw line stays: it is what
-       actually went over the wire, which is what matters when the protocol itself is in
-       doubt. Anything the decoder does not recognise — an error line, or plain text —
-       passes through untouched. */
-    Output->AppendText(MessageDecoder::describe(OutputLine));
-
-    OutputLine.Clear();
 }
 
 void Pixels::OnQuit(wxCommandEvent &event)
@@ -357,13 +335,3 @@ void Pixels::setBrightness(byte sBrightness, bool GammaCorrection)
     UNUSED(GammaCorrection);
 }
 
-char Pixels::read()
-{
-    char FirstChar{' '};
-
-    if(!SendBuffer.IsEmpty()) {
-        FirstChar = SendBuffer.at(0).GetValue();
-        SendBuffer.Remove(0, 1);
-    }
-    return FirstChar;
-}

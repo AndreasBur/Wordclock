@@ -41,7 +41,8 @@ set(SIMULATOR_SOURCES
     src/Settings.cpp
     src/MessageCatalog.cpp
     src/MessageBuilder.cpp
-    src/MessageDecoder.cpp)
+    src/MessageDecoder.cpp
+    src/SerialShim.cpp)
 
 set(SOURCES ${ARDUINO_SOURCES} ${SIMULATOR_SOURCES})
 

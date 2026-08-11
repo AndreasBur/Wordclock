@@ -13,8 +13,11 @@
  *
  *      \details    wxWidgets frame that renders the 10x11 character grid as
  *                  coloured cells. Mirrors the public API of the hardware pixel
- *                  driver (get/set/clear pixel, brightness, show) and also backs
- *                  the Arduino Serial shim via its print/read methods.
+ *                  driver (get/set/clear pixel, brightness, show).
+ *
+ *                  It also lays out the serial output and input controls, but only
+ *                  lays them out: what they mean belongs to SerialShim, which they are
+ *                  handed to.
  *
 ******************************************************************************************************************************************************/
 #ifndef PIXELS_H
@@ -78,14 +81,6 @@ class Pixels : public wxFrame
         ID_MENU_MESSAGE
     };
 
-    wxString SendBuffer{""};
-    /* What the firmware has printed since the last newline. Kept so a whole answer can
-       be read back into readable form once it is complete, which single characters do not
-       allow. */
-    wxString OutputLine{""};
-    wxTextCtrl* Output;
-    wxTextCtrl* Input;
-
     wxStaticText* Characters[PIXELS_DISPLAY_NUMBER_OF_ROWS][PIXELS_DISPLAY_NUMBER_OF_COLUMNS];
     PixelType PixelBuffer[PIXELS_DISPLAY_NUMBER_OF_ROWS][PIXELS_DISPLAY_NUMBER_OF_COLUMNS];
     byte Pin{0};
@@ -130,8 +125,6 @@ class Pixels : public wxFrame
     void OnSend(wxCommandEvent&);
     void OnSettings(wxCommandEvent&);
     void OnMessage(wxCommandEvent&);
-    void appendOutput(const wxString&);
-    void finishOutputLine();
     void OnQuit(wxCommandEvent&);
     void setPixels(wxColour);
     wxColour toColour(PixelType) const;
@@ -178,23 +171,6 @@ class Pixels : public wxFrame
         return E_OK;
     }
 
-    // Serial shim (Arduino Serial is #defined to this instance)
-    /* All of them go through appendOutput(), which is what keeps track of the line being
-       printed; println() is where every newline ends up, and so where a finished line can
-       be read back. */
-    void println() { finishOutputLine(); }
-    void print(const char* Text) { appendOutput(Text); }
-    void print(int Number) { appendOutput(wxString::Format(wxT("%i"), Number)); }
-    void println(const char* Text) { print(Text); println(); }
-    void println(int Number) { print(Number); println(); }
-    void print(char Char) { appendOutput(wxString(Char)); }
-
-    bool available() { return !SendBuffer.IsEmpty(); }
-    char read();
-
-    /* Puts a line into the input field, ready to be looked over and sent from there.
-       What the message builder uses; it deliberately does not send by itself. */
-    void setInput(const wxString& Line) { Input->SetValue(Line); }
 };
 
 #endif // PIXELS_H

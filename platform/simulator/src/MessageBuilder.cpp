@@ -20,6 +20,7 @@
  * I N C L U D E S
 ******************************************************************************************************************************************************/
 #include "sim/MessageBuilder.h"
+#include "sim/SerialShim.h"
 
 /******************************************************************************************************************************************************
  *  L O C A L   C O N S T A N T   M A C R O S
@@ -179,8 +180,8 @@ void MessageBuilder::showOptionsOfSelectedCommand()
     }
 
     /* Resizes the window to the rows that are left and moves its minimum along, so it
-       follows the content in both directions. Leaving it at the height of the longest
-       option list instead put a command with one option above 360 pixels of nothing. */
+       follows the content in both directions. Fixing it at the height of the longest
+       option list would leave a command with one option above 360 pixels of nothing. */
     Layout();
     GetSizer()->SetSizeHints(this);
     updatePreview();
@@ -275,7 +276,7 @@ void MessageBuilder::OnOptionChanged(wxCommandEvent &event)
 ******************************************************************************************************************************************************/
 void MessageBuilder::OnInsert(wxCommandEvent &event)
 {
-    Pixels::getInstance().setInput(buildMessage());
+    SerialShim::getInstance().setInput(buildMessage());
     Hide();
     UNUSED(event);
 } /* OnInsert */

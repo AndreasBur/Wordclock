@@ -5,13 +5,13 @@
 /*  Arduino compatibility shim for the wxWidgets simulator                    */
 /* -------------------------------------------------------------------------- */
 /*  Umbrella header that pulls the individual pieces together. Include order  */
-/*  matters: arduino/Types.h defines `byte`, which sim/Pixels.h depends on,   */
-/*  must come first. Serial is bound last because it needs the Pixels class.  */
+/*  matters: arduino/Types.h defines `byte`, which the sim headers depend on,  */
+/*  so it comes first. Serial is bound last because it needs SerialShim.      */
 /* ========================================================================== */
 
-#include "arduino/Types.h"      // byte, boolean  (before Pixels.h!)
+#include "arduino/Types.h"      // byte, boolean  (before the sim headers!)
 
-#include "sim/Pixels.h"
+#include "sim/SerialShim.h"
 
 #include "arduino/Progmem.h"    // PROGMEM, F, pgm_read_byte, memcpy_P
 #include "arduino/Bits.h"       // bitRead
@@ -20,10 +20,11 @@
 /* -------------------------------------------------------------------------- */
 /*  Serial → simulator window                                                 */
 /* -------------------------------------------------------------------------- */
-/*  Serial I/O is routed to the wxWidgets Pixels window (print/read live on   */
-/*  the Pixels singleton). Kept here rather than in a sub-header because it   */
-/*  is specific to this simulator, not to the Arduino API.                    */
+/*  Serial I/O goes to SerialShim, which writes it into the text controls of  */
+/*  the Pixels window and hands typed lines back. Kept here rather than in a  */
+/*  sub-header because it is specific to this simulator, not to the Arduino   */
+/*  API.                                                                      */
 /* -------------------------------------------------------------------------- */
-#define Serial                  Pixels::getInstance()
+#define Serial                  SerialShim::getInstance()
 
 #endif // _ARDUINO_H_
