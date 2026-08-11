@@ -12,6 +12,22 @@ core is emulated by a small shim in [include/Arduino.h](include/Arduino.h)
 [src/Pixels.cpp](src/Pixels.cpp). See
 [platform/hardware/README.md](../hardware/README.md) for the platform contract.
 
+## What the window shows, and what it cannot
+
+A lit letter is drawn as a grey between the unlit letter colour and black, so its
+**brightness** is visible — that is what makes the brightness automatic, the `Fade`
+animation and the trail of `Matrix` and `Collapse` readable here. The curve is
+deliberately not proportional: unlit letters sit at light grey rather than at black,
+which squeezes the dark end, so the low intensities are spread out to stay visible.
+
+The **display color cannot be shown** on a light background: a white display color
+at full brightness would be invisible. Only brightness is rendered, the hue is
+dropped.
+
+The **Illuminance** slider stands in for the light sensor, which has nothing to
+measure on a PC. It only has an effect while the brightness automatic is on
+(`3 -A1`).
+
 ## Building
 
 There are three ways to build, in order of preference.
