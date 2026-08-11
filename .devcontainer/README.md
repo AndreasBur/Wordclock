@@ -1,81 +1,34 @@
 # Wordclock development containers
 
-VS Code offers two configurations when running **Dev Containers: Reopen in
-Container**:
+VS Code provides two configurations:
 
-- **Wordclock Simulator (Linux/X11)** for native Linux and remote environments.
-- **Wordclock Simulator (WSL2/WSLg)** when VS Code runs in WSL2. This forwards
-  the WSLg X11, Wayland and PulseAudio sockets from `/mnt/wslg`.
+- **Linux/X11** for native Linux and remote Linux hosts.
+- **WSL2/WSLg** for VS Code running in WSL2.
 
-Choose the configuration matching the host. Keeping the WSLg mount in its own
-configuration prevents native Linux container startup from failing when
-`/mnt/wslg` does not exist.
+Both use the same image and shared editor configuration. Select the variant
+matching the host, then run **Dev Containers: Rebuild and Reopen in Container**.
 
-Both configurations mount the named `wordclock-codex` volume at
-`/home/vscode/.codex`. This preserves the Codex login and local configuration
-when the development container is rebuilt. The volume contains credentials and
-must not be shared or committed.
+## Persistent Codex data
 
-## SSH agent with Podman
+The named volume `wordclock-codex` is mounted at `/home/vscode/.codex` in both
+variants. It preserves the Codex login and local configuration across rebuilds.
+The volume contains credentials and must not be shared or committed.
 
-The native Linux configuration bind-mounts the host's `SSH_AUTH_SOCK` at
-`/tmp/ssh-agent` and sets the environment variable inside the container to that
-path. The WSLg configuration instead relies on VS Code's built-in SSH-agent
-forwarding.
+## SSH agent on Linux
 
-The image also enforces the standard `1777` permissions on `/tmp` and creates
-`/tmp/user`. This allows the non-root `vscode` user to create runtime files when
-the Linux configuration derives `XDG_RUNTIME_DIR` from `/tmp/user/$(id -u)`.
-Some Podman storage/filesystem combinations otherwise leave `/tmp` at `0755`.
-
-Before opening the container, verify on the host that the agent is available
-and contains the expected key:
+The Linux variant mounts the host's `SSH_AUTH_SOCK` at `/tmp/ssh-agent` and
+keeps that stable path in VS Code terminals. Before opening the container, the
+host agent must be running and contain the required key:
 
 ```sh
-test -S "$SSH_AUTH_SOCK" && ssh-add -l
+ssh-add -l
 ```
 
-After **Dev Containers: Rebuild and Reopen in Container**, `ssh-add -l` inside
-the container should list the same public key identities. The private key files
-themselves are not copied into the container. If the Linux configuration fails
-to start, verify that `SSH_AUTH_SOCK` names an existing socket on the host.
+Inside the container, the same command should list the same public identities.
+Private key files are never copied into the container. The WSLg variant uses VS
+Code's built-in SSH-agent forwarding instead.
 
-## Shared editor configuration
+## Shared configuration
 
-VS Code extensions, CMake settings and the toolchain sanity check live in the
-local dev container feature in `shared/`, which every configuration references:
-
-```jsonc
-"features": { "./../shared": {} }
-```
-
-Feature metadata is merged with the referencing `devcontainer.json`, so a
-variant can add its own extensions on top without repeating the shared list.
-
-Feature metadata is baked into the image at build time, so editing
-`shared/devcontainer-feature.json` requires **Dev Containers: Rebuild
-Container**. Reopening the folder keeps the previous metadata, which looks like
-a newly added extension being ignored. Entries in the `customizations` section
-of a `devcontainer.json` take effect on reopen instead.
-
-A `devcontainer.metadata` label in `Dockerfile` does *not* work for this:
-clients read image metadata from the image the final `FROM` points at, and then
-overwrite the label on the image built from this file. Extensions declared that
-way are silently ignored.
-
-## Site-specific variants
-
-An additional configuration directory next to `linux/` and `wslg/` shows up as
-another entry in the same picker, which is the place for settings that must not
-be committed (internal base images, registry-hosted features). The `Dockerfile`
-takes a `BASE_IMAGE` build argument for that purpose:
-
-```jsonc
-"build": {
-    "dockerfile": "../Dockerfile",
-    "context": "..",
-    "args": { "BASE_IMAGE": "registry.example.internal/base:latest" }
-}
-```
-
-Add such a directory to `.gitignore` to keep it local.
+Extensions, CMake settings and the toolchain check live in `shared/`. Changes to
+the local feature require a container rebuild.

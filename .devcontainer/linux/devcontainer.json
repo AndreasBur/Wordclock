@@ -4,19 +4,19 @@
         "dockerfile": "../Dockerfile",
         "context": ".."
     },
-    // Extensions, CMake settings and the toolchain check live in ../shared.
     "features": {
         "./../shared": {}
     },
-    // X11 works on native Linux without requiring the WSL-only /mnt/wslg path.
     "containerEnv": {
-        "DISPLAY": "${localEnv:DISPLAY}",
-        "SSH_AUTH_SOCK": "/tmp/ssh-agent"
+        "DISPLAY": "${localEnv:DISPLAY}"
     },
-    // Keep VS Code from replacing the mounted agent with a transient socket.
     "remoteEnv": {
         "SSH_AUTH_SOCK": "/tmp/ssh-agent"
     },
+    "runArgs": [
+        "--tmpfs",
+        "/tmp:rw,exec,mode=1777"
+    ],
     "mounts": [
         "source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind",
         "source=wordclock-codex,target=/home/vscode/.codex,type=volume",

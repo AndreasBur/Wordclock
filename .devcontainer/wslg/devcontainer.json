@@ -4,11 +4,9 @@
         "dockerfile": "../Dockerfile",
         "context": ".."
     },
-    // Extensions, CMake settings and the toolchain check live in ../shared.
     "features": {
         "./../shared": {}
     },
-    // WSLg exposes its X11, Wayland and PulseAudio sockets below /mnt/wslg.
     "containerEnv": {
         "DISPLAY": "${localEnv:DISPLAY}",
         "WAYLAND_DISPLAY": "${localEnv:WAYLAND_DISPLAY}",
