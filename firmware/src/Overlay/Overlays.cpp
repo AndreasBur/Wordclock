@@ -96,9 +96,15 @@ void Overlays::taskIdle(ClockDate date, ClockTime time) {
   taskShow()
 ******************************************************************************************************************************************************/
 void Overlays::taskShow(ClockDate date, ClockTime time) {
+#if (OVERLAYS_SUPPORT_DATE == STD_ON)
     if(Date.getState() == OverlayDate::STATE_SHOW) { ShowTimerInSeconds = Date.task(ShowTimerInSeconds, date, time); }
+#endif
+#if (OVERLAYS_SUPPORT_TEMPERATURE == STD_ON)
     if(Temperature.getState() == OverlayTemperature::STATE_SHOW) { ShowTimerInSeconds =  Temperature.task(ShowTimerInSeconds, date, time); }
+#endif
+#if (OVERLAYS_SUPPORT_TEXT == STD_ON)
     if(Text.getState() == OverlayText::STATE_SHOW) { ShowTimerInSeconds =  Text.task(ShowTimerInSeconds, date, time); }
+#endif
 } /* taskShow */
 
 

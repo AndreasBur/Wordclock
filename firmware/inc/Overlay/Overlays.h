@@ -24,6 +24,7 @@
 #include "Arduino.h"
 #include "StringTools.h"
 #include "RealTimeClock.h"
+#include "Overlay.h"
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
@@ -112,19 +113,43 @@ class Overlays
     ~Overlays() { }
 
     bool isShow() const {
-        return ((Date.getState() == OverlayDate::STATE_SHOW) ||
-                (Temperature.getState() == OverlayTemperature::STATE_SHOW) ||
-                (Text.getState() == OverlayText::STATE_SHOW));
+        bool Show{false};
+#if (OVERLAYS_SUPPORT_DATE == STD_ON)
+        Show = Show || (Date.getState() == OverlayDate::STATE_SHOW);
+#endif
+#if (OVERLAYS_SUPPORT_TEMPERATURE == STD_ON)
+        Show = Show || (Temperature.getState() == OverlayTemperature::STATE_SHOW);
+#endif
+#if (OVERLAYS_SUPPORT_TEXT == STD_ON)
+        Show = Show || (Text.getState() == OverlayText::STATE_SHOW);
+#endif
+        return Show;
     }
     bool isIdle() const {
-        return ((Date.getState() == OverlayDate::STATE_IDLE) &&
-                (Temperature.getState() == OverlayTemperature::STATE_IDLE) &&
-                (Text.getState() == OverlayText::STATE_IDLE));
+        bool Idle{true};
+#if (OVERLAYS_SUPPORT_DATE == STD_ON)
+        Idle = Idle && (Date.getState() == OverlayDate::STATE_IDLE);
+#endif
+#if (OVERLAYS_SUPPORT_TEMPERATURE == STD_ON)
+        Idle = Idle && (Temperature.getState() == OverlayTemperature::STATE_IDLE);
+#endif
+#if (OVERLAYS_SUPPORT_TEXT == STD_ON)
+        Idle = Idle && (Text.getState() == OverlayText::STATE_IDLE);
+#endif
+        return Idle;
     }
     bool isDisabled() const {
-        return ((Date.getState() == OverlayDate::STATE_DISABLED) &&
-                (Temperature.getState() == OverlayTemperature::STATE_DISABLED) &&
-                (Text.getState() == OverlayText::STATE_DISABLED));
+        bool Disabled{true};
+#if (OVERLAYS_SUPPORT_DATE == STD_ON)
+        Disabled = Disabled && (Date.getState() == OverlayDate::STATE_DISABLED);
+#endif
+#if (OVERLAYS_SUPPORT_TEMPERATURE == STD_ON)
+        Disabled = Disabled && (Temperature.getState() == OverlayTemperature::STATE_DISABLED);
+#endif
+#if (OVERLAYS_SUPPORT_TEXT == STD_ON)
+        Disabled = Disabled && (Text.getState() == OverlayText::STATE_DISABLED);
+#endif
+        return Disabled;
     }
 
     void taskIdle(ClockDate, ClockTime);

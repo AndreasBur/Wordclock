@@ -168,11 +168,11 @@ class Display
         Brightness.setUseGammaCorrection(BrightnessUseGammaCorrection);
         applyBrightness();
     }
-    void setColor(Pixel sColor) { Color.setColor(sColor);; }
-    void setColor(ColorType Red, byte Green, ColorType Blue) { Color.setColorRed(Red); Color.setColorGreen(Green); Color.setColorBlue(Blue); }
+    void setColor(Pixel sColor) { Color.setColor(sColor); }
+    void setColor(ColorType Red, ColorType Green, ColorType Blue) { Color.setColorRed(Red); Color.setColorGreen(Green); Color.setColorBlue(Blue); }
     void setColorRed(ColorType Red) { Color.setColorRed(Red); }
     void setColorGreen(ColorType Green) { Color.setColorGreen(Green); }
-    void setColorBlue(ColorType Blue) { Color.setColorBlue(Blue);}
+    void setColorBlue(ColorType Blue) { Color.setColorBlue(Blue); }
 
     /* Takes the brightness the user asked for. What reaches the LEDs is
        calcBrightness(), which folds in gamma correction and the light sensor. */
