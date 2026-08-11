@@ -70,7 +70,7 @@ void Scheduler::task()
  *                  cleared along with it, so switching it back on runs it right away
  *                  instead of somewhere inside a period left over from before.
  *
- *  \return         E_OK if the task is to run on this tick
+ *  \return         true if the task is to run on this tick
 ******************************************************************************************************************************************************/
 bool Scheduler::isDue(TaskIdType TaskId, byte Cycle) {
     if(Cycle == 0u) { RemainingTicks[TaskId] = 0u; return false; }
