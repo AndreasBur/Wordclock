@@ -68,20 +68,16 @@ class Pixels : public wxFrame
   private:
     enum
     {
-        ID_BUTTON_QUIT = 1000,
-        ID_BUTTON_ABOUT,
-        ID_BUTTON_CLEAR,
+        ID_BUTTON_CLEAR = 1000,
         ID_BUTTON_SEND,
         ID_TEXT_CTRL_OUTPUT,
         ID_TEXT_CTRL_INPUT,
-        ID_SLIDER_ILLUMINANCE,
         ID_STATIC_BOX
     };
 
     wxString SendBuffer{""};
     wxTextCtrl* Output;
     wxTextCtrl* Input;
-    wxSlider* IlluminanceSlider;
 
     wxStaticText* Characters[PIXELS_DISPLAY_NUMBER_OF_ROWS][PIXELS_DISPLAY_NUMBER_OF_COLUMNS];
     PixelType PixelBuffer[PIXELS_DISPLAY_NUMBER_OF_ROWS][PIXELS_DISPLAY_NUMBER_OF_COLUMNS];
@@ -125,16 +121,16 @@ class Pixels : public wxFrame
     void OnClear(wxCommandEvent&);
     void OnAbout(wxCommandEvent&);
     void OnSend(wxCommandEvent&);
-    void OnIlluminance(wxCommandEvent&);
+    void OnSettings(wxCommandEvent&);
     void OnQuit(wxCommandEvent&);
     void setPixels(wxColour);
     wxColour toColour(PixelType) const;
     void renderPixel(byte Row, byte Column);
     void renderAllPixels();
+    wxMenuBar* createMenuBar();
     wxBoxSizer* createSizerAll(wxWindow*);
     wxBoxSizer* createSizerCharacters(wxWindow*);
     wxBoxSizer* createSizerCharacter(wxWindow*, int Row);
-    wxBoxSizer* createSizerButton(wxWindow*);
     wxBoxSizer* createSizerControl(wxWindow*);
 
 /******************************************************************************************************************************************************

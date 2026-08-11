@@ -37,7 +37,8 @@ file(GLOB_RECURSE ARDUINO_SOURCES CONFIGURE_DEPENDS
 set(SIMULATOR_SOURCES
     WordclockApp.cpp
     WordclockMain.cpp
-    src/Pixels.cpp)
+    src/Pixels.cpp
+    src/Settings.cpp)
 
 set(SOURCES ${ARDUINO_SOURCES} ${SIMULATOR_SOURCES})
 

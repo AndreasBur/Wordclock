@@ -1,6 +1,6 @@
 #include "sim/Pixels.h"
-/* for the simulated light sensor the illuminance slider feeds */
-#include "sim/BH1750.h"
+/* the window the Settings menu entry opens */
+#include "sim/Settings.h"
 #include <array>
 
 #if defined(PIXELS) && (defined(__APPLE__ ) || defined(__linux__))
@@ -28,9 +28,9 @@ BEGIN_EVENT_TABLE(Pixels, wxFrame)
     EVT_BUTTON(ID_BUTTON_SEND, Pixels::OnSend)
     //EVT_BUTTON(ID_BUTTON_CREATE_INPUT, Pixels::OnCreateInput)
     EVT_BUTTON(ID_BUTTON_CLEAR, Pixels::OnClear)
-    EVT_SLIDER(ID_SLIDER_ILLUMINANCE, Pixels::OnIlluminance)
-    EVT_BUTTON(ID_BUTTON_ABOUT, Pixels::OnAbout)
-    EVT_BUTTON(ID_BUTTON_QUIT, Pixels::OnQuit)
+    EVT_MENU(wxID_PREFERENCES, Pixels::OnSettings)
+    EVT_MENU(wxID_ABOUT, Pixels::OnAbout)
+    EVT_MENU(wxID_EXIT, Pixels::OnQuit)
 END_EVENT_TABLE()
 
 
@@ -38,6 +38,7 @@ Pixels::Pixels(wxWindow* parent, const wxString &title) : wxFrame(parent, -1, ti
 {
     SetIcon(wxICON(WordclockIcon));
     SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DFACE));
+    SetMenuBar(createMenuBar());
 
     wxScrolledWindow* ScrolledWindow = new wxScrolledWindow(this);
     wxBoxSizer* ContentSizer = createSizerAll(ScrolledWindow);
@@ -64,12 +65,27 @@ Pixels::Pixels(wxWindow* parent, const wxString &title) : wxFrame(parent, -1, ti
     });
 }
 
+wxMenuBar* Pixels::createMenuBar()
+{
+    wxMenu* MenuFile = new wxMenu();
+    MenuFile->Append(wxID_PREFERENCES, _T("&Settings"));
+    MenuFile->AppendSeparator();
+    MenuFile->Append(wxID_EXIT);
+
+    wxMenu* MenuHelp = new wxMenu();
+    MenuHelp->Append(wxID_ABOUT);
+
+    wxMenuBar* MenuBar = new wxMenuBar();
+    MenuBar->Append(MenuFile, _T("&File"));
+    MenuBar->Append(MenuHelp, _T("&Help"));
+
+    return MenuBar;
+}
+
 wxBoxSizer* Pixels::createSizerAll(wxWindow* Parent)
 {
     wxBoxSizer* SizerAll = new wxBoxSizer(wxHORIZONTAL);
     wxBoxSizer* SizerControl = createSizerControl(Parent);
-    SizerControl->AddStretchSpacer();
-    SizerControl->Add(createSizerButton(Parent), 0, wxEXPAND);
 
     SizerAll->Add(createSizerCharacters(Parent), 1, wxALL|wxEXPAND, 10);
     SizerAll->Add(SizerControl, 0, wxALL|wxEXPAND, 10);
@@ -110,25 +126,12 @@ wxBoxSizer* Pixels::createSizerCharacter(wxWindow* Parent, int Row)
     return SizerCharacter;
 }
 
-wxBoxSizer* Pixels::createSizerButton(wxWindow* Parent)
-{
-    wxBoxSizer* SizerButton = new wxBoxSizer(wxHORIZONTAL);
-    wxButton* About = new wxButton(Parent, ID_BUTTON_ABOUT, wxT("&About"), wxDefaultPosition, wxDefaultSize, 0);
-    wxButton* Quit = new wxButton(Parent, ID_BUTTON_QUIT, wxT("&Quit"), wxDefaultPosition, wxDefaultSize, 0);
-
-    SizerButton->Add(About, 1, wxALL | wxEXPAND, 10);
-    SizerButton->Add(Quit, 1, wxALL | wxEXPAND, 10);
-
-    return SizerButton;
-}
-
 wxBoxSizer* Pixels::createSizerControl(wxWindow* Parent)
 {
     wxStaticBox* StaticBox = new wxStaticBox(Parent, ID_STATIC_BOX, _T("Control"));
     wxStaticBoxSizer* SizerControl = new wxStaticBoxSizer(StaticBox, wxVERTICAL);
     wxStaticText* OutputLabel = new wxStaticText(Parent, wxID_ANY, _T("Output"));
     wxStaticText* InputLabel = new wxStaticText(Parent, wxID_ANY, _T("Input"));
-    wxStaticText* IlluminanceLabel = new wxStaticText(Parent, wxID_ANY, _T("Illuminance (%)"));
     //wxButton* CreateInput = new wxButton(Parent, ID_BUTTON_CREATE_INPUT, wxT("&Create Input"), wxDefaultPosition, wxDefaultSize, 0);
     wxButton* Send = new wxButton(Parent, ID_BUTTON_SEND, wxT("&Send"), wxDefaultPosition, wxDefaultSize, 0);
     wxButton* Clear = new wxButton(Parent, ID_BUTTON_CLEAR, wxT("&Clear"), wxDefaultPosition, wxDefaultSize, 0);
@@ -136,20 +139,13 @@ wxBoxSizer* Pixels::createSizerControl(wxWindow* Parent)
     Output = new wxTextCtrl(Parent, ID_TEXT_CTRL_OUTPUT, _(""), wxDefaultPosition, wxSize(200, 200), wxTE_MULTILINE|wxTE_READONLY);
     Input  = new wxTextCtrl(Parent, ID_TEXT_CTRL_INPUT, _(""), wxDefaultPosition, wxSize(200, 20));
 
-    /* stands in for the light sensor, which has nothing to measure here. Only has an
-       effect while the brightness automatic is on (command 3 -A1). */
-    IlluminanceSlider = new wxSlider(Parent, ID_SLIDER_ILLUMINANCE, 100, 0, 100, wxDefaultPosition, wxSize(200, -1),
-                                     wxSL_HORIZONTAL | wxSL_LABELS);
-
     SizerControl->Add(OutputLabel, 0, wxLEFT | wxTOP | wxEXPAND, 10);
-    SizerControl->Add(Output, 0, wxRight | wxLEFT, 10);
+    SizerControl->Add(Output, 1, wxRIGHT | wxLEFT | wxEXPAND, 10);
     SizerControl->Add(Clear, 0, wxTOP | wxRIGHT | wxLEFT | wxEXPAND, 10);
     SizerControl->Add(InputLabel, 0, wxLEFT | wxTOP, 10);
     SizerControl->Add(Input, 0, wxRIGHT | wxLEFT, 10);
     //SizerControl->Add(CreateInput, 0, wxTOP | wxRIGHT | wxLEFT | wxEXPAND, 10);
-    SizerControl->Add(Send, 0, wxTOP | wxRIGHT | wxLEFT | wxEXPAND, 10);
-    SizerControl->Add(IlluminanceLabel, 0, wxLEFT | wxTOP, 10);
-    SizerControl->Add(IlluminanceSlider, 0, wxRIGHT | wxLEFT | wxBOTTOM | wxEXPAND, 10);
+    SizerControl->Add(Send, 0, wxTOP | wxRIGHT | wxLEFT | wxBOTTOM | wxEXPAND, 10);
 
     return SizerControl;
 }
@@ -188,12 +184,9 @@ void Pixels::OnClear(wxCommandEvent &event)
     UNUSED(event);
 }
 
-void Pixels::OnIlluminance(wxCommandEvent &event)
+void Pixels::OnSettings(wxCommandEvent &event)
 {
-    /* the slider is a percentage of the calibration maximum, which is what the
-       brightness automatic divides by */
-    const BH1750::IlluminanceType Maximum = BH1750_ILLUMINANCE_MAX_LX_VALUE;
-    BH1750::setSimulatedIlluminance(static_cast<BH1750::IlluminanceType>((Maximum / 100u) * IlluminanceSlider->GetValue()));
+    Settings::getInstance().reveal();
     UNUSED(event);
 }
 
