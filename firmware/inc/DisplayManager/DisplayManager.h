@@ -64,11 +64,10 @@ class DisplayManager
 ******************************************************************************************************************************************************/
   private:
     static constexpr byte TaskCycle{DISPLAY_MANAGER_TASK_CYCLE};
-    /* No minute, so the first task draws whatever time it finds instead of waiting for
-       the next change. */
-    static constexpr MinuteType MinuteNone{255u};
-
-    MinuteType LastMinute{MinuteNone};
+    ClockWords LastClockWords{};
+    /* The default ClockWords value may itself be a valid word combination. Keep
+       initialization separate so the first task always draws the current time. */
+    bool ClockWordsInitialized{false};
     /* Whether an overlay held the display on the previous task, which is what makes the
        end of one detectable. */
     bool OverlayWasShowing{false};
@@ -87,13 +86,28 @@ class DisplayManager
         Display::getInstance().show();
     }
 
-    void taskMinuteChange(HourType Hour, MinuteType Minute) const {
+    void taskClockWordsChange(HourType Hour, MinuteType Minute) const {
         Animations& animations = Animations::getInstance();
         if(animations.getAnimation() == Animations::ANIMATION_ID_NONE) {
             showClock(Hour, Minute);
         } else {
             animations.setTime(Hour, Minute);
         }
+    }
+
+    bool updateClockWords(HourType Hour, MinuteType Minute) {
+        ClockWords clockWords;
+        if(Clock::getInstance().getClockWords(Hour, Minute, clockWords) == E_NOT_OK) {
+            return false;
+        }
+
+        if(ClockWordsInitialized && clockWords == LastClockWords) {
+            return false;
+        }
+
+        LastClockWords = clockWords;
+        ClockWordsInitialized = true;
+        return true;
     }
 
 /******************************************************************************************************************************************************

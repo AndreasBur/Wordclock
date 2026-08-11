@@ -67,18 +67,17 @@ void DisplayManager::task()
 
     /* The overlay has ended. Nothing else brings the clock back — Overlay's transition
        to idle only stops the Text — so without this the grid would keep the last
-       overlay frame until the next minute change, which can be nearly a minute away.
-       Setting LastMinute keeps that change from drawing a second time. */
+       overlay frame until the next word change, which can be nearly five minutes away.
+       Updating LastClockWords keeps that change from drawing a second time. */
     if(OverlayWasShowing) {
         OverlayWasShowing = false;
-        LastMinute = time.getMinute();
+        updateClockWords(time.getHour(), time.getMinute());
         showClock(time.getHour(), time.getMinute());
         return;
     }
 
-    if(time.getMinute() != LastMinute) {
-        LastMinute = time.getMinute();
-        taskMinuteChange(time.getHour(), time.getMinute());
+    if(updateClockWords(time.getHour(), time.getMinute())) {
+        taskClockWordsChange(time.getHour(), time.getMinute());
     }
 } /* task */
 
