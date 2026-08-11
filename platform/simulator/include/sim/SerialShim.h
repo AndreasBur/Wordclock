@@ -102,7 +102,12 @@ class SerialShim
     void print(int Number) { appendOutput(wxString::Format(wxT("%i"), Number)); }
     void println(const char* Text) { print(Text); println(); }
     void println(int Number) { print(Number); println(); }
-    void print(char Char) { appendOutput(wxString(Char)); }
+    /* A newline that arrives as a character has to close the line the same way, otherwise
+       the line an answer is read back from would run on across it. */
+    void print(char Char) {
+        if(Char == '\n') { println(); }
+        else { appendOutput(wxString(Char)); }
+    }
 
     bool available() const { return !SendBuffer.IsEmpty(); }
     char read();
