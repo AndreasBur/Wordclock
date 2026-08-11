@@ -16,14 +16,13 @@
  *                  decoder can read an answer back through them. Simulator-only: it
  *                  adds nothing the firmware needs.
  *
- *                  MIRRORS the parsers in firmware/inc/Communication/MessageParser
- *                  and has to be kept in step with them by hand. Command numbers
- *                  come from MsgCmdParser::CommandType, short names and argument
- *                  types from each parser's ParameterTable; every entry below names
- *                  the parser it was taken from. The parsers keep those tables
- *                  private and carry no labels or ranges, which is what this table
- *                  adds; teaching them about both would mean changing firmware for
- *                  a simulator convenience.
+ *                  The command numbers are taken from MsgCmdParser::CommandType itself,
+ *                  and the value lists of the enumerations sit behind the same support
+ *                  switches as the enumerations do, so neither can drift. What remains
+ *                  MIRRORED by hand are the option short names and argument types, which
+ *                  each parser keeps private in its ParameterTable, plus the labels and
+ *                  ranges this table adds on top. Every entry names the parser it was
+ *                  taken from.
  *
 ******************************************************************************************************************************************************/
 #ifndef MESSAGE_CATALOG_H
@@ -33,13 +32,15 @@
  * I N C L U D E S
 ******************************************************************************************************************************************************/
 #include "StandardTypes.h"
+/* byte comes from here, not from StandardTypes.h */
 #include "Arduino.h"
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
 /* The widest option list of any command, which is the overlays' shared one. Fixes how
-   many option rows the message builder has to hold. */
+   many option rows the message builder has to hold; a static_assert in the source keeps it
+   from falling behind the table. */
 #define MESSAGE_CATALOG_MAX_NUMBER_OF_OPTIONS           9u
 
 /******************************************************************************************************************************************************
@@ -89,40 +90,17 @@ class MessageCatalog
     };
 
 /******************************************************************************************************************************************************
- *  P R I V A T E   D A T A   A N D   F U N C T I O N S
-******************************************************************************************************************************************************/
-  private:
-    static const char* const BooleanValueNames[];
-    static const char* const RemoteProcedureValueNames[];
-    static const char* const ClockModeValueNames[];
-    static const char* const AnimationValueNames[];
-    static const char* const AnimationModeValueNames[];
-    static const char* const FontValueNames[];
-
-    static const OptionType RemoteProcedureCallOptions[];
-    static const OptionType DisplayColorOptions[];
-    static const OptionType DisplayBrightnessOptions[];
-    static const OptionType DisplayPixelOptions[];
-    static const OptionType OverlayOptions[];
-    static const OptionType ClockModeOptions[];
-    static const OptionType AnimationOptions[];
-    static const OptionType TimeOptions[];
-    static const OptionType DateOptions[];
-
-    static const CommandType Commands[];
-    static const byte NumberOfCommands;
-
-/******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
+    /* The tables live in the source, where they can be constexpr and checked against the
+       firmware at compile time. Hence out of line rather than inline here. */
+
     // get methods
-    static byte getNumberOfCommands() { return NumberOfCommands; }
-    static const CommandType& getCommand(byte Index) { return Commands[Index]; }
+    static byte getNumberOfCommands();
+    static const CommandType& getCommand(byte Index);
 
     // methods
-    static bool isCommandValid(byte Index) { return Index < NumberOfCommands; }
-
     /* Both return nullptr when there is no such entry, which is how a line that only
        looks like an answer is told apart from one that is. */
     static const CommandType* findCommandByNumber(byte Number);

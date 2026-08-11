@@ -20,6 +20,9 @@
  * I N C L U D E S
 ******************************************************************************************************************************************************/
 #include "sim/MessageCatalog.h"
+/* The command numbers are taken from here rather than copied, so they cannot fall behind
+   the firmware. Its OVERLAYS_SUPPORT_* switches reach the entries below through it too. */
+#include "MsgCmdParser.h"
 /* Not for any type, only for the ANIMATIONS_SUPPORT_* and TEXT_SUPPORT_FONT_* switches:
    the value lists below are guarded by exactly the same ones as the enums they name, so
    they cannot end up naming the wrong value when one is switched off. */
@@ -43,19 +46,24 @@
 /******************************************************************************************************************************************************
  *  L O C A L   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
-
+/* The tables below sit outside the class, so that they can be constexpr and be checked at
+   compile time. These bring the argument types back within reach unqualified, which keeps
+   the tables readable. */
+constexpr MessageCatalog::ArgumentType ARGUMENT_TYPE_UINT8{MessageCatalog::ARGUMENT_TYPE_UINT8};
+constexpr MessageCatalog::ArgumentType ARGUMENT_TYPE_UINT16{MessageCatalog::ARGUMENT_TYPE_UINT16};
+constexpr MessageCatalog::ArgumentType ARGUMENT_TYPE_STRING{MessageCatalog::ARGUMENT_TYPE_STRING};
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A
 ******************************************************************************************************************************************************/
 
 /* For every option that carries a flag rather than a number. */
-const char* const MessageCatalog::BooleanValueNames[] {
+constexpr const char* const BooleanValueNames[] {
     "off", "on"
 };
 
 /* MsgCmdRemoteProcedureCallParser::RpcIdType */
-const char* const MessageCatalog::RemoteProcedureValueNames[] {
+constexpr const char* const RemoteProcedureValueNames[] {
     "None",
     "Illuminance calibration maximum",
     "Illuminance calibration minimum",
@@ -81,13 +89,13 @@ const char* const MessageCatalog::RemoteProcedureValueNames[] {
 };
 
 /* Clock::ModeType */
-const char* const MessageCatalog::ClockModeValueNames[] {
+constexpr const char* const ClockModeValueNames[] {
     "Wessi", "Ossi", "Rhein-Ruhr", "Schwaben"
 };
 
 /* Animations::AnimationIdType, under the same switches as the enum. Its values shift as
    soon as one animation is switched off, so a fixed list would name the wrong ones. */
-const char* const MessageCatalog::AnimationValueNames[] {
+constexpr const char* const AnimationValueNames[] {
     "None",
 #if(ANIMATIONS_SUPPORT_CURSOR == STD_ON)
     "Cursor",
@@ -137,12 +145,12 @@ const char* const MessageCatalog::AnimationValueNames[] {
 };
 
 /* Animations::ModeType */
-const char* const MessageCatalog::AnimationModeValueNames[] {
+constexpr const char* const AnimationModeValueNames[] {
     "Fixed", "Random", "Sequence"
 };
 
 /* Text::FontType, under the same switches as the enum. */
-const char* const MessageCatalog::FontValueNames[] {
+constexpr const char* const FontValueNames[] {
 #if(TEXT_SUPPORT_FONT_5X8 == STD_ON)
     "5x8",
 #endif
@@ -161,19 +169,19 @@ const char* const MessageCatalog::FontValueNames[] {
 };
 
 /* MsgCmdRemoteProcedureCallParser */
-const MessageCatalog::OptionType MessageCatalog::RemoteProcedureCallOptions[] {
+constexpr MessageCatalog::OptionType RemoteProcedureCallOptions[] {
     {'P', "Procedure",          ARGUMENT_TYPE_UINT8,  0u, BYTE_MAX, RemoteProcedureValueNames, NUMBER_OF(RemoteProcedureValueNames)}
 };
 
 /* MsgCmdDisplayColorParser */
-const MessageCatalog::OptionType MessageCatalog::DisplayColorOptions[] {
+constexpr MessageCatalog::OptionType DisplayColorOptions[] {
     {'R', "Red",                ARGUMENT_TYPE_UINT8,  0u, BYTE_MAX},
     {'G', "Green",              ARGUMENT_TYPE_UINT8,  0u, BYTE_MAX},
     {'B', "Blue",               ARGUMENT_TYPE_UINT8,  0u, BYTE_MAX}
 };
 
 /* MsgCmdDisplayBrightnessParser */
-const MessageCatalog::OptionType MessageCatalog::DisplayBrightnessOptions[] {
+constexpr MessageCatalog::OptionType DisplayBrightnessOptions[] {
     {'B', "Brightness",         ARGUMENT_TYPE_UINT8,  0u, BYTE_MAX},
     {'A', "Automatic",          ARGUMENT_TYPE_UINT8,  0u, 1u,       BooleanValueNames, NUMBER_OF(BooleanValueNames)},
     {'G', "Gamma correction",   ARGUMENT_TYPE_UINT8,  0u, 1u,       BooleanValueNames, NUMBER_OF(BooleanValueNames)}
@@ -181,33 +189,46 @@ const MessageCatalog::OptionType MessageCatalog::DisplayBrightnessOptions[] {
 
 /* MsgCmdDisplayPixelParser. The index is a uint16 as soon as the display has more than
    255 pixels; 110 here, so the parser compiles it as a uint8. */
-const MessageCatalog::OptionType MessageCatalog::DisplayPixelOptions[] {
+constexpr MessageCatalog::OptionType DisplayPixelOptions[] {
     {'I', "Index",              ARGUMENT_TYPE_UINT8,  0u, 109u},
     {'S', "State",              ARGUMENT_TYPE_UINT8,  0u, 1u,       BooleanValueNames, NUMBER_OF(BooleanValueNames)}
 };
 
-/* MsgCmdBaseOverlayParser, shared by the date, temperature and text commands. Not every
-   overlay makes use of every option — the text is only carried by the text overlay — but
-   all three accept the full list, so it is offered for all three. */
-const MessageCatalog::OptionType MessageCatalog::OverlayOptions[] {
+/* MsgCmdBaseOverlayParser, shared by the date, temperature and text commands. Only the
+   text overlay reads the text: the other two answer the parser's setText() and
+   sendAnswerText() with empty bodies, so a text sent to them is accepted, discarded and
+   never answered. It is therefore the last entry rather than one in the middle, which
+   lets those two share this table and simply stop one option short of it. */
+constexpr MessageCatalog::OptionType OverlayOptions[] {
     {'P', "Period (minutes)",   ARGUMENT_TYPE_UINT8,  1u, BYTE_MAX},
     {'E', "Endurance (s)",      ARGUMENT_TYPE_UINT8,  1u, BYTE_MAX},
     {'M', "Month",              ARGUMENT_TYPE_UINT8,  0u, 12u},
     {'D', "Day",                ARGUMENT_TYPE_UINT8,  0u, 31u},
     {'V', "Valid in days",      ARGUMENT_TYPE_UINT8,  0u, BYTE_MAX},
     {'A', "Active",             ARGUMENT_TYPE_UINT8,  0u, 1u,       BooleanValueNames, NUMBER_OF(BooleanValueNames)},
-    {'T', "Text",               ARGUMENT_TYPE_STRING, 0u, 0u},
     {'S', "Speed",              ARGUMENT_TYPE_UINT8,  0u, BYTE_MAX},
-    {'F', "Font",               ARGUMENT_TYPE_UINT8,  0u, BYTE_MAX, FontValueNames, NUMBER_OF(FontValueNames)}
+    {'F', "Font",               ARGUMENT_TYPE_UINT8,  0u, BYTE_MAX, FontValueNames, NUMBER_OF(FontValueNames)},
+    {'T', "Text",               ARGUMENT_TYPE_STRING, 0u, 0u}
 };
 
+/* The overlays that have no text of their own stop one short of the shared table. Derived
+   from its length rather than written out, so it follows if an option is added. */
+constexpr byte NumberOfOverlayOptionsWithoutText{static_cast<byte>(NUMBER_OF(OverlayOptions) - 1u)};
+
+/* Stopping one short only leaves out the text as long as the text is what sits last.
+   Appending an option would otherwise hide that one and offer the text instead, to two
+   overlays that do not read it — quietly, since both lists would still be the right
+   length. */
+static_assert(OverlayOptions[NumberOfOverlayOptionsWithoutText].ShortName == 'T',
+              "the text has to be the last of the overlay options, see NumberOfOverlayOptionsWithoutText");
+
 /* MsgCmdClockModeParser */
-const MessageCatalog::OptionType MessageCatalog::ClockModeOptions[] {
+constexpr MessageCatalog::OptionType ClockModeOptions[] {
     {'M', "Mode",               ARGUMENT_TYPE_UINT8,  0u, 3u,       ClockModeValueNames, NUMBER_OF(ClockModeValueNames)}
 };
 
 /* MsgCmdAnimationParser */
-const MessageCatalog::OptionType MessageCatalog::AnimationOptions[] {
+constexpr MessageCatalog::OptionType AnimationOptions[] {
     {'A', "Animation",          ARGUMENT_TYPE_UINT8,  0u, BYTE_MAX, AnimationValueNames, NUMBER_OF(AnimationValueNames)},
     {'M', "Mode",               ARGUMENT_TYPE_UINT8,  0u, BYTE_MAX, AnimationModeValueNames, NUMBER_OF(AnimationModeValueNames)},
     {'S', "Speed",              ARGUMENT_TYPE_UINT8,  0u, BYTE_MAX},
@@ -215,41 +236,82 @@ const MessageCatalog::OptionType MessageCatalog::AnimationOptions[] {
 };
 
 /* MsgCmdTimeParser */
-const MessageCatalog::OptionType MessageCatalog::TimeOptions[] {
+constexpr MessageCatalog::OptionType TimeOptions[] {
     {'H', "Hour",               ARGUMENT_TYPE_UINT8,  0u, 23u},
     {'M', "Minute",             ARGUMENT_TYPE_UINT8,  0u, 59u},
     {'S', "Second",             ARGUMENT_TYPE_UINT8,  0u, 59u}
 };
 
 /* MsgCmdDateParser */
-const MessageCatalog::OptionType MessageCatalog::DateOptions[] {
+constexpr MessageCatalog::OptionType DateOptions[] {
     {'Y', "Year",               ARGUMENT_TYPE_UINT16, 0u, WORD_MAX},
     {'M', "Month",              ARGUMENT_TYPE_UINT8,  1u, 12u},
     {'D', "Day",                ARGUMENT_TYPE_UINT8,  1u, 31u}
 };
 
-/* Numbers and order from MsgCmdParser::CommandType. COMMAND_NONE is left out, it is not
-   a command that can be sent. Sending a command with no option at all asks the firmware
-   for its current settings, which is why every entry is useful on its own. */
-const MessageCatalog::CommandType MessageCatalog::Commands[] {
-    { 1u, "Remote procedure call", RemoteProcedureCallOptions, NUMBER_OF(RemoteProcedureCallOptions)},
-    { 2u, "Display colour",        DisplayColorOptions,        NUMBER_OF(DisplayColorOptions)},
-    { 3u, "Display brightness",    DisplayBrightnessOptions,   NUMBER_OF(DisplayBrightnessOptions)},
-    { 4u, "Display pixel",         DisplayPixelOptions,        NUMBER_OF(DisplayPixelOptions)},
-    { 5u, "Overlay date",          OverlayOptions,             NUMBER_OF(OverlayOptions)},
-    { 6u, "Overlay temperature",   OverlayOptions,             NUMBER_OF(OverlayOptions)},
-    { 7u, "Overlay text",          OverlayOptions,             NUMBER_OF(OverlayOptions)},
-    { 8u, "Clock mode",            ClockModeOptions,           NUMBER_OF(ClockModeOptions)},
-    { 9u, "Animation",             AnimationOptions,           NUMBER_OF(AnimationOptions)},
-    {10u, "Time",                  TimeOptions,                NUMBER_OF(TimeOptions)},
-    {11u, "Date",                  DateOptions,                NUMBER_OF(DateOptions)}
+/* The numbers come from the enumeration itself, so they follow it instead of having to be
+   kept level with it — including when a support switch shortens it, which is why the
+   overlay entries carry the same guards the enumerators do. COMMAND_NONE is left out, it
+   is not a command that can be sent. Sending a command with no option at all asks the
+   firmware for its current settings, which is why every entry is useful on its own. */
+constexpr MessageCatalog::CommandType Commands[] {
+    {MsgCmdParser::COMMAND_REMOTE_PROCEDURE_CALL, "Remote procedure call", RemoteProcedureCallOptions, NUMBER_OF(RemoteProcedureCallOptions)},
+    {MsgCmdParser::COMMAND_DISPLAY_COLOR,         "Display colour",        DisplayColorOptions,        NUMBER_OF(DisplayColorOptions)},
+    {MsgCmdParser::COMMAND_DISPLAY_BRIGHTNESS,    "Display brightness",    DisplayBrightnessOptions,   NUMBER_OF(DisplayBrightnessOptions)},
+    {MsgCmdParser::COMMAND_DISPLAY_PIXEL,         "Display pixel",         DisplayPixelOptions,        NUMBER_OF(DisplayPixelOptions)},
+#if (OVERLAYS_SUPPORT_DATE == STD_ON)
+    {MsgCmdParser::COMMAND_OVERLAY_DATE,          "Overlay date",          OverlayOptions,             NumberOfOverlayOptionsWithoutText},
+#endif
+#if (OVERLAYS_SUPPORT_TEMPERATURE == STD_ON)
+    {MsgCmdParser::COMMAND_OVERLAY_TEMPERATURE,   "Overlay temperature",   OverlayOptions,             NumberOfOverlayOptionsWithoutText},
+#endif
+#if (OVERLAYS_SUPPORT_TEXT == STD_ON)
+    {MsgCmdParser::COMMAND_OVERLAY_TEXT,          "Overlay text",          OverlayOptions,             NUMBER_OF(OverlayOptions)},
+#endif
+    {MsgCmdParser::COMMAND_CLOCK_MODE,            "Clock mode",            ClockModeOptions,           NUMBER_OF(ClockModeOptions)},
+    {MsgCmdParser::COMMAND_ANIMATION,             "Animation",             AnimationOptions,           NUMBER_OF(AnimationOptions)},
+    {MsgCmdParser::COMMAND_TIME,                  "Time",                  TimeOptions,                NUMBER_OF(TimeOptions)},
+    {MsgCmdParser::COMMAND_DATE,                  "Date",                  DateOptions,                NUMBER_OF(DateOptions)}
 };
 
-const byte MessageCatalog::NumberOfCommands{NUMBER_OF(Commands)};
+constexpr byte NumberOfCommands{NUMBER_OF(Commands)};
+
+/* The message builder builds this many option rows once and shows the ones a command
+   needs, so a command with more options than that would have some of them unreachable.
+   Checked here rather than trusted, because the two live in different files. */
+constexpr bool areOptionCountsWithinBounds()
+{
+    for(const MessageCatalog::CommandType& Command : Commands) {
+        if(Command.NumberOfOptions > MESSAGE_CATALOG_MAX_NUMBER_OF_OPTIONS) { return false; }
+    }
+
+    return true;
+}
+
+static_assert(areOptionCountsWithinBounds(),
+              "a command has more options than MESSAGE_CATALOG_MAX_NUMBER_OF_OPTIONS allows rows for");
 
 /******************************************************************************************************************************************************
  * P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
+
+/******************************************************************************************************************************************************
+  getNumberOfCommands()
+******************************************************************************************************************************************************/
+byte MessageCatalog::getNumberOfCommands()
+{
+    return NumberOfCommands;
+} /* getNumberOfCommands */
+
+
+/******************************************************************************************************************************************************
+  getCommand()
+******************************************************************************************************************************************************/
+const MessageCatalog::CommandType& MessageCatalog::getCommand(byte Index)
+{
+    return Commands[Index];
+} /* getCommand */
+
 
 /******************************************************************************************************************************************************
   findCommandByNumber()
