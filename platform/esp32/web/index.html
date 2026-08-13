@@ -15,13 +15,53 @@
 <title>Wordclock</title>
 
 <style>
-    :root {
+    /* Light is the base, dark the alternative. The clock's own look is amber on a
+       near-black panel, but the console is usually read next to other light windows - and a
+       page that arrives dark on a light desktop is the more jarring of the two.
+
+       Three rules rather than one: the tokens as they are, the dark set when the system asks
+       for it and nothing was chosen by hand, and the dark set again when it was. The dark
+       values appear twice for that reason - resolving the system preference in script
+       instead would work, but the page would flash light before the script runs.
+       color-scheme comes along so the native controls, the dropdowns and the scrollbars
+       follow rather than staying light on a dark page. */
+    :root, :root[data-theme="light"] {
+        color-scheme: light;
+        --panel: #f6f6f3;
+        --field: #ffffff;
+        --text: #1e1e22;
+        /* Darker than the panel's own amber, which on white would be barely legible. */
+        --lit: #9a5b00;
+        --unlit: #5f5f66;
+        --line: #dcdcd6;
+        /* A console is read line by line, so it is capped rather than stretched: on a wide
+           screen the full width leaves short lines floating in emptiness and pushes the
+           send button a screen away from the field it belongs to. */
+        --content: 900px;
+    }
+    @media (prefers-color-scheme: dark) {
+        :root:not([data-theme="light"]) {
+            color-scheme: dark;
+            --panel: #0e0e11;
+            --field: #17171b;
+            --text: #d8d8de;
+            /* The panel's amber, which is what the clock itself shows. */
+            --lit: #ffb020;
+            --unlit: #6a6a72;
+            --line: #26262b;
+        }
+    }
+    :root[data-theme="dark"] {
+        color-scheme: dark;
         --panel: #0e0e11;
+        --field: #17171b;
+        --text: #d8d8de;
         --lit: #ffb020;
         --unlit: #6a6a72;
         --line: #26262b;
     }
     * { box-sizing: border-box; }
+    .bar { width: 100%; max-width: var(--content); margin-inline: auto; }
     body {
         margin: 0;
         min-height: 100vh;
@@ -32,36 +72,33 @@
         flex-direction: column;
     }
     header {
-        padding: 14px 18px;
         border-bottom: 1px solid var(--line);
-        display: flex;
-        align-items: baseline;
-        gap: 14px;
+        padding: 14px 0;
     }
+    header .bar { display: flex; align-items: baseline; gap: 14px; padding: 0 18px; }
     h1 { margin: 0; font-size: 15px; letter-spacing: .18em; color: var(--lit); font-weight: 700; }
     #state { font-size: 13px; }
     #state.up { color: var(--lit); }
+    #theme { margin-left: auto; padding: 4px 10px; font-size: 13px; }
     #log {
         flex: 1;
-        margin: 0;
+        margin: 0 auto;
+        width: 100%;
+        max-width: var(--content);
         padding: 14px 18px;
         overflow-y: auto;
         white-space: pre-wrap;
         word-break: break-word;
     }
-    #log .out { color: #d8d8de; }
+    #log .out { color: var(--text); }
     #log .in  { color: var(--lit); }
     #log .note { color: var(--unlit); font-style: italic; }
-    form {
-        display: flex;
-        gap: 10px;
-        padding: 12px 18px;
-        border-top: 1px solid var(--line);
-    }
+    form { border-top: 1px solid var(--line); padding: 12px 0; }
+    form .bar { display: flex; gap: 10px; padding: 0 18px; }
     input, button, select {
         font: inherit;
         color: inherit;
-        background: #17171b;
+        background: var(--field);
         border: 1px solid var(--line);
         border-radius: 6px;
         padding: 8px 12px;
@@ -73,32 +110,42 @@
     /* The builder. Collapsed by default: typing a command is the faster path once one
        knows it, and the form is what makes it findable in the first place. */
     details { border-top: 1px solid var(--line); }
-    summary { padding: 10px 18px; cursor: pointer; color: var(--lit); }
+    summary { padding: 10px 18px; cursor: pointer; color: var(--lit); max-width: var(--content); margin-inline: auto; }
     #builder { padding: 0 18px 12px; display: grid; gap: 8px; }
+    /* The button sits at its natural width on the right rather than spanning the column -
+       a full-width button reads as the page's main action, which it is not. */
+    #builder #use { justify-self: end; }
+    #builder[hidden] { display: none; }
     .row { display: grid; grid-template-columns: 22px 1fr 1fr; gap: 10px; align-items: center; }
     .row label { color: var(--unlit); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .row input[type=checkbox] { flex: none; width: 16px; height: 16px; accent-color: var(--lit); }
     #preview {
         font-family: inherit;
         color: var(--lit);
-        background: #17171b;
+        background: var(--field);
         border: 1px dashed var(--line);
         border-radius: 6px;
         padding: 8px 12px;
         min-height: 20px;
         word-break: break-all;
     }
+    #preview:empty::before { content: 'pick a command'; color: var(--unlit); font-style: italic; }
+    #builderNote { color: var(--unlit); font-style: italic; padding: 0 18px 12px; max-width: var(--content); margin-inline: auto; }
 </style>
 
 <header>
-    <h1>WORDCLOCK</h1>
-    <span id="state">connecting…</span>
+    <div class="bar">
+        <h1>WORDCLOCK</h1>
+        <span id="state">connecting…</span>
+        <button type="button" id="theme" title="Switch between the dark and the light theme"></button>
+    </div>
 </header>
 
 <div id="log"></div>
 
 <details id="builderBox">
     <summary>Build a command</summary>
+    <div id="builderNote" hidden></div>
     <div id="builder">
         <select id="commands"></select>
         <div id="options"></div>
@@ -108,8 +155,10 @@
 </details>
 
 <form id="entry">
-    <input id="command" placeholder="command, e.g. 3 -B255" autocomplete="off" spellcheck="false" autofocus>
-    <button type="submit">Send</button>
+    <div class="bar">
+        <input id="command" placeholder="command, e.g. 3 -B255" autocomplete="off" spellcheck="false" autofocus>
+        <button type="submit">Send</button>
+    </div>
 </form>
 
 <script>
@@ -117,6 +166,39 @@
     const state = document.getElementById('state');
     const entry = document.getElementById('entry');
     const commandInput = document.getElementById('command');
+
+    /* ---- theme ---------------------------------------------------------------------
+       Nothing is stored until the button is pressed: without a stored choice the page
+       follows the system, which the stylesheet already does on its own. The button then
+       overrides it, and says what it would switch to rather than what is showing. */
+    const themeButton = document.getElementById('theme');
+
+    function systemTheme() {
+        return matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+
+    function currentTheme() {
+        return document.documentElement.dataset.theme || systemTheme();
+    }
+
+    function showTheme() {
+        themeButton.textContent = currentTheme() === 'dark' ? 'light' : 'dark';
+    }
+
+    themeButton.addEventListener('click', () => {
+        const next = currentTheme() === 'dark' ? 'light' : 'dark';
+        document.documentElement.dataset.theme = next;
+        localStorage.setItem('wordclock-theme', next);
+        showTheme();
+    });
+
+    /* Follows the system while nothing was chosen by hand, so a machine switching at dusk
+       takes the page with it. */
+    matchMedia('(prefers-color-scheme: dark)').addEventListener('change', showTheme);
+
+    const storedTheme = localStorage.getItem('wordclock-theme');
+    if (storedTheme) { document.documentElement.dataset.theme = storedTheme; }
+    showTheme();
 
     function append(text, kind) {
         const line = document.createElement('div');
@@ -139,7 +221,11 @@
         return (location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/ws';
     }
 
+    /* The clock reboots on a firmware update and drops every socket with it, so coming back
+       on our own is the normal case rather than an error. */
+    const RETRY_MS = 2000;
     let socket = null;
+    let attempts = 0;
 
     function connect() {
         const url = socketUrl();
@@ -148,18 +234,22 @@
         socket = new WebSocket(url);
 
         socket.onopen = () => {
+            if (attempts > 0) { append('connected', 'note'); }
+            attempts = 0;
             state.textContent = 'connected';
             state.classList.add('up');
         };
         socket.onmessage = (event) => append(event.data, 'out');
         socket.onclose = () => {
-            state.textContent = 'reconnecting…';
+            attempts++;
             state.classList.remove('up');
-            /* The clock reboots on a firmware update and drops every socket with it, so
-               coming back on our own is the normal case rather than an error. */
-            setTimeout(connect, 2000);
+            state.textContent = 'reconnecting… (' + attempts + ')';
+            /* Reported once per outage rather than once per attempt: retrying every two
+               seconds forever, a line each time buries everything else in the log within a
+               minute - which is exactly what the state line above is for. */
+            if (attempts === 1) { append('no connection - retrying every ' + (RETRY_MS / 1000) + 's', 'note'); }
+            setTimeout(connect, RETRY_MS);
         };
-        socket.onerror = () => append('connection failed', 'note');
     }
 
     /* ---- the command builder ------------------------------------------------------
@@ -279,7 +369,17 @@
             }
             showOptions();
         })
-        .catch(() => append('the command catalog could not be loaded', 'note'));
+        .catch(() => {
+            /* An empty dropdown over an empty option list is worse than no form at all: it
+               looks like the clock has no commands rather than like the page could not
+               reach it. */
+            const note = document.getElementById('builderNote');
+            note.textContent = location.protocol === 'file:'
+                ? 'The command list comes from the clock. Opened from disk, it is reachable only once the address above connects.'
+                : 'The command list could not be loaded from the clock.';
+            note.hidden = false;
+            document.getElementById('builder').hidden = true;
+        });
 
     entry.addEventListener('submit', (event) => {
         event.preventDefault();

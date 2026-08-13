@@ -64,9 +64,12 @@ measured, not assumed.
 warnings** from any file in this repository:
 
 ```
-RAM:    10.8%  (35272 of 327680 bytes)
-Flash:  17.5%  (583958 of 3342336 bytes)
+RAM:    10.8%  of 320 KB
+Flash:  17.5%  of 3.2 MB
 ```
+
+Rounded on purpose: the exact byte count moves with every edit to the page, and a figure
+that rots on each commit is worse than none.
 
 A clean build takes about two minutes because it compiles the Arduino core alongside;
 changing one file of ours is about seven seconds.
@@ -164,8 +167,12 @@ separately. [`scripts/embed_web.py`](scripts/embed_web.py) gzips it at build tim
 it as an array **into the build directory**, so `pio run -t upload` ships page and firmware
 together and their versions cannot drift apart - the failure a second partition invites.
 The generated header is a build product on purpose; a checked-in one rots the moment
-someone edits the HTML and forgets to regenerate it. At the moment that is 10.6 KB of
-source, 3.6 KB compressed, and the default partition table is untouched.
+someone edits the HTML and forgets to regenerate it. At the moment that is 15.9 KB of
+source, 5.2 KB compressed, and the default partition table is untouched.
+
+It follows the system's light or dark preference, with a button in the header that
+overrides it and remembers the choice. Light is the base: the clock's own look is amber on
+near-black, but the console is usually read next to other light windows.
 
 While the layout is being worked on there is no need to flash: open `web/index.html`
 straight from disk and it asks for the clock's address instead of using its own host. The
