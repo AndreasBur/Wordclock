@@ -47,6 +47,37 @@ RUN ARCH="$(dpkg --print-architecture)" && \
     dpkg -i /tmp/gh.deb && \
     rm /tmp/gh.deb
 
+# PlatformIO for the ESP32 backend, plus what test/run.sh needs: python3 for the page
+# embedding, node for the local web console. In a virtual environment because Ubuntu 24.04
+# refuses to let pip write into the system one, and under /opt so it belongs to the image
+# rather than to a home directory a volume may replace.
+RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && \
+    apt-get install -y --no-install-recommends \
+        python3 \
+        python3-venv \
+        nodejs && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+
+RUN python3 -m venv /opt/platformio && \
+    /opt/platformio/bin/pip install --no-cache-dir --upgrade pip && \
+    /opt/platformio/bin/pip install --no-cache-dir platformio
+
+ENV PATH="/opt/platformio/bin:${PATH}"
+
+# PlatformIO downloads with requests and hands it its own certifi bundle, so it ignores
+# REQUESTS_CA_BUNDLE and fails behind a TLS-intercepting proxy with
+# CERTIFICATE_VERIFY_FAILED on URLs that curl and git fetch without complaint. Appending
+# the image's own trust store keeps verification on rather than turning it off. The
+# platform packages build a second environment under ~/.platformio at first use, which
+# needs the same and gets it from the shared feature's postStartCommand.
+RUN cat /etc/ssl/certs/ca-certificates.crt \
+        >> "$(/opt/platformio/bin/python -c 'import certifi; print(certifi.where())')"
+
+# The package cache is a named volume, and an empty one takes its ownership from the path
+# it covers - so the path has to exist and belong to the remote user first, or PlatformIO
+# cannot write the ~1.5 GB of toolchain into it.
+RUN install -d -o vscode -g vscode -m 0755 /home/vscode/.platformio
+
 ENV TZ=Europe/Berlin
 
 # Extensions, editor settings and lifecycle commands live in the local feature

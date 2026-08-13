@@ -2,7 +2,7 @@
     "id": "shared",
     "version": "1.0.0",
     "name": "Wordclock shared editor configuration",
-    "description": "Extensions, CMake settings and the toolchain sanity check shared by every devcontainer.json variant.",
+    "description": "Extensions, CMake settings, the toolchain sanity check and the PlatformIO package cache shared by every devcontainer.json variant.",
     "customizations": {
         "vscode": {
             "extensions": [
@@ -27,5 +27,13 @@
             }
         }
     },
-    "postCreateCommand": "wx-config --version && cmake --version"
+    "postCreateCommand": "wx-config --version && cmake --version && pio --version",
+    "mounts": [
+        {
+            "source": "wordclock-platformio",
+            "target": "/home/vscode/.platformio",
+            "type": "volume"
+        }
+    ],
+    "postStartCommand": "platformio-trust-store"
 }
