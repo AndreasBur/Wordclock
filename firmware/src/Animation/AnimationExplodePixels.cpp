@@ -87,9 +87,7 @@ void AnimationExplodePixels::task()
             ShiftCounter--;
             setTimeTask();
         } else {
-            Display::getInstance().clear();
-            Clock::getInstance().setTime(ClockWordsTable);
-            State = STATE_IDLE;
+            finishWithClockWords(ClockWordsTable);
         }
     }
 } /* task */

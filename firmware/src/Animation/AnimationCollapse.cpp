@@ -178,7 +178,7 @@ void AnimationCollapse::setTimeTask()
     /* the last step draws the letters exactly in place, only then it is done */
     if(Step < ExpandSteps) { Step++; }
     else {
-        State = STATE_IDLE;
+        finishWithClockWords(ClockWordsTable);
         reset();
     }
 } /* setTimeTask */

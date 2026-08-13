@@ -73,9 +73,20 @@ class Animation
 
     // functions
     void init(StateType sState) { State = sState; }
+    /* Every animation whose set phase places the letters itself ends through one of
+       these two instead of just going idle: drawing the target once more makes the last
+       frame authoritative, so a pixel the animation skipped or hit twice cannot leave a
+       word of the previous time behind. AnimationFade is the one animation outside this,
+       because its set phase only ramps the brightness of letters already in place. */
     void finishWithClockWords(const ClockWords::WordsListType& ClockWordsTable) {
         Display::getInstance().clear();
         Clock::getInstance().setTime(ClockWordsTable);
+        State = STATE_IDLE;
+    }
+    /* For the animations that kept the time rather than the word list. */
+    void finishWithTime(byte Hour, byte Minute) {
+        Display::getInstance().clear();
+        Clock::getInstance().setTime(Hour, Minute);
         State = STATE_IDLE;
     }
     byte selectByTime(byte, byte, byte) const;

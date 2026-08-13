@@ -112,10 +112,9 @@ void AnimationMatrix::setTimeTask()
         }
         FrameCounter++;
     } else {
-        /* snap to the final picture in the normal display color and hand back */
-        Display::getInstance().clear();
-        Clock::getInstance().setTime(ClockWordsTable);
-        State = STATE_IDLE;
+        /* also puts the letters back into the normal display color, which the drops
+           drew over */
+        finishWithClockWords(ClockWordsTable);
         reset();
     }
 } /* setTimeTask */

@@ -120,9 +120,8 @@ void AnimationFlicker::clearTimeTask()
 ******************************************************************************************************************************************************/
 void AnimationFlicker::setTimeTask()
 {
-    Display::getInstance().clear();
-    Clock::getInstance().setTime(Hour, Minute);
-    State = STATE_IDLE;
+    /* before reset(), which clears Hour and Minute */
+    finishWithTime(Hour, Minute);
     reset();
 } /* setTimeTask */
 
