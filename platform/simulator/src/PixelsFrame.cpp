@@ -147,8 +147,11 @@ wxBoxSizer* PixelsFrame::createSizerControl(wxWindow* Parent)
     wxButton* Send = new wxButton(Parent, ID_BUTTON_SEND, wxT("&Send"), wxDefaultPosition, wxDefaultSize, 0);
     wxButton* Clear = new wxButton(Parent, ID_BUTTON_CLEAR, wxT("&Clear"), wxDefaultPosition, wxDefaultSize, 0);
 
-    wxTextCtrl* Output = new wxTextCtrl(Parent, ID_TEXT_CTRL_OUTPUT, _(""), wxDefaultPosition, wxSize(200, 200), wxTE_MULTILINE|wxTE_READONLY);
-    wxTextCtrl* Input  = new wxTextCtrl(Parent, ID_TEXT_CTRL_INPUT, _(""), wxDefaultPosition, wxSize(200, 20));
+    static constexpr int ConsoleWidth = 300;
+
+    wxTextCtrl* Output = new wxTextCtrl(Parent, ID_TEXT_CTRL_OUTPUT, _(""), wxDefaultPosition,
+                                        wxSize(ConsoleWidth, 200), wxTE_MULTILINE|wxTE_READONLY|wxTE_DONTWRAP);
+    wxTextCtrl* Input  = new wxTextCtrl(Parent, ID_TEXT_CTRL_INPUT, _(""), wxDefaultPosition, wxSize(ConsoleWidth, 20));
 
     SerialShim::getInstance().attach(Output, Input);
 
@@ -156,7 +159,7 @@ wxBoxSizer* PixelsFrame::createSizerControl(wxWindow* Parent)
     SizerControl->Add(Output, 1, wxRIGHT | wxLEFT | wxEXPAND, 10);
     SizerControl->Add(Clear, 0, wxTOP | wxRIGHT | wxLEFT | wxEXPAND, 10);
     SizerControl->Add(InputLabel, 0, wxLEFT | wxTOP, 10);
-    SizerControl->Add(Input, 0, wxRIGHT | wxLEFT, 10);
+    SizerControl->Add(Input, 0, wxRIGHT | wxLEFT | wxEXPAND, 10);
     SizerControl->Add(Create, 0, wxTOP | wxRIGHT | wxLEFT | wxEXPAND, 10);
     SizerControl->Add(Send, 0, wxTOP | wxRIGHT | wxLEFT | wxBOTTOM | wxEXPAND, 10);
 
