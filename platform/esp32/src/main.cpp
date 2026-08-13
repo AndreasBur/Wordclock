@@ -36,6 +36,7 @@
 #include "Pixels.h"
 #include "RealTimeClock.h"
 #include "Scheduler.h"
+#include "WebInterface.h"
 #include "WordclockConfiguration.h"
 #include "WordclockMain.h"
 
@@ -125,6 +126,10 @@ void setup()
 
     startWifi();
     startTimeSync();
+    /* Before the network is up on purpose: the server listens on whatever address arrives
+       later, and starting it here keeps the order in setup() the same whether there is a
+       WiFi or not. */
+    WebInterface::getInstance().begin();
 
     LastWakeTime = xTaskGetTickCount();
 } /* setup */

@@ -29,7 +29,9 @@ command instead.
 **Arduino core 3.x (ESP-IDF ≥ 5.1) is required**, because `Pixels.cpp` uses the IDF 5
 RMT driver `<driver/rmt_tx.h>`. Core 2.x ships IDF 4.4, which has only the older
 `<driver/rmt.h>` with different types, so the build fails on that include rather than
-misbehaving later. `platformio.ini` notes where a core 3.x platform comes from.
+misbehaving later. `platformio.ini` notes where a core 3.x platform comes from. The web socket handler additionally
+needs `CONFIG_HTTPD_WS_SUPPORT` in the core's sdkconfig, which it enables by default - but
+that, like the RMT names, is unconfirmed until the real toolchain has run.
 
 ### Verification status
 
@@ -40,7 +42,10 @@ the frame `Pixels::render()` produces was checked byte for byte against a captur
 transmission (channel order, index-to-offset mapping, dirty-flag suppression, master
 brightness); and an injected command was driven through `Communication` to its answer,
 `3 B=255 A=0 G=0`, which is what proves a second front end takes the same path as the
-wire. What has **not** been run is the real toolchain, so the ESP-IDF API names and the
+wire. The web socket handler was driven the same way, through the registration call
+the server makes: a frame carrying `3 -B200` reached the parser and `3 B=200 A=0 G=0` came
+back out over the socket, the page is served as a real gzip stream, and an oversized frame
+is refused rather than truncated into the parser. What has **not** been run is the real toolchain, so the ESP-IDF API names and the
 timing on an actual strip are still unconfirmed.
 
 ## Configuration
@@ -104,6 +109,25 @@ to a sink. Two consequences: the framework's own headers must be included **befo
 is reached through a path the build script passes in rather than through `include_next`,
 which re-finds this file and lets its include guard swallow the real one.
 
+## Web console
+
+The clock serves a page at `http://wordclock.local/` - a console that speaks the same
+commands as the wire, because its web socket is wired straight to the port `Communication`
+reads from. Nothing about the protocol is repeated in the browser.
+
+The page is [`web/index.html`](web/index.html), one self-contained file with its CSS and
+script inline: the clock has nowhere to fetch anything from. It is **not** uploaded
+separately. [`scripts/embed_web.py`](scripts/embed_web.py) gzips it at build time and emits
+it as an array **into the build directory**, so `pio run -t upload` ships page and firmware
+together and their versions cannot drift apart - the failure a second partition invites.
+The generated header is a build product on purpose; a checked-in one rots the moment
+someone edits the HTML and forgets to regenerate it. At the moment that is 4.8 KB of
+source, 2.0 KB compressed, and the default partition table is untouched.
+
+While the layout is being worked on there is no need to flash: open `web/index.html`
+straight from disk and it asks for the clock's address instead of using its own host. The
+edit cycle is then a browser reload.
+
 ## Hardware notes
 
 - **Level shifting.** The ESP32's 3.3 V data line drives a 5 V WS2812 out of spec. It
@@ -128,4 +152,7 @@ which re-finds this file and lets its include guard swallow the real one.
 - **No time source without the network.** No RTC chip is read, so between power-on and the
   first SNTP answer the display holds its default date. A DS3231 on the same I²C bus is
   the fix for the stromless case.
-- **No web interface yet.** The serial command set works over UART0 only.
+- **The web console has no command form yet.** Commands are typed as text; a form built
+  from `MessageCatalog`, and a view of the letter grid, are the next step.
+- **No authentication.** Anyone on the network can send commands. Fine behind a home
+  router, not on an open network.

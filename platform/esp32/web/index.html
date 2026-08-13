@@ -1,0 +1,147 @@
+<!--
+  The web console. One self-contained file: no external stylesheet, script or font,
+  because the clock serves it from its own flash and has nowhere to fetch anything from.
+
+  It speaks the serial protocol from docs/serial-commands.md over a web socket, so it
+  needs no protocol of its own - what is typed here goes into the same parser as what is
+  typed on the wire.
+
+  While the layout is being worked on, this file can be opened straight from disk instead
+  of being flashed: the socket address then falls back to the prompt below rather than to
+  the page's own host.
+-->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wordclock</title>
+
+<style>
+    :root {
+        --panel: #0e0e11;
+        --lit: #ffb020;
+        --unlit: #6a6a72;
+        --line: #26262b;
+    }
+    * { box-sizing: border-box; }
+    body {
+        margin: 0;
+        min-height: 100vh;
+        background: var(--panel);
+        color: var(--unlit);
+        font: 15px/1.5 ui-monospace, "DejaVu Sans Mono", monospace;
+        display: flex;
+        flex-direction: column;
+    }
+    header {
+        padding: 14px 18px;
+        border-bottom: 1px solid var(--line);
+        display: flex;
+        align-items: baseline;
+        gap: 14px;
+    }
+    h1 { margin: 0; font-size: 15px; letter-spacing: .18em; color: var(--lit); font-weight: 700; }
+    #state { font-size: 13px; }
+    #state.up { color: var(--lit); }
+    #log {
+        flex: 1;
+        margin: 0;
+        padding: 14px 18px;
+        overflow-y: auto;
+        white-space: pre-wrap;
+        word-break: break-word;
+    }
+    #log .out { color: #d8d8de; }
+    #log .in  { color: var(--lit); }
+    #log .note { color: var(--unlit); font-style: italic; }
+    form {
+        display: flex;
+        gap: 10px;
+        padding: 12px 18px;
+        border-top: 1px solid var(--line);
+    }
+    input, button {
+        font: inherit;
+        color: inherit;
+        background: #17171b;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        padding: 8px 12px;
+    }
+    input { flex: 1; min-width: 0; }
+    input:focus, button:focus { outline: 2px solid var(--lit); outline-offset: 1px; }
+    button { color: var(--lit); cursor: pointer; }
+</style>
+
+<header>
+    <h1>WORDCLOCK</h1>
+    <span id="state">connecting…</span>
+</header>
+
+<div id="log"></div>
+
+<form id="entry">
+    <input id="command" placeholder="command, e.g. 3 -B255" autocomplete="off" spellcheck="false" autofocus>
+    <button type="submit">Send</button>
+</form>
+
+<script>
+    const log = document.getElementById('log');
+    const state = document.getElementById('state');
+    const entry = document.getElementById('entry');
+    const command = document.getElementById('command');
+
+    function append(text, kind) {
+        const line = document.createElement('div');
+        line.className = kind;
+        line.textContent = text;
+        log.appendChild(line);
+        log.scrollTop = log.scrollHeight;
+    }
+
+    /* Served from the clock, this is the clock. Opened from disk while the layout is being
+       worked on, there is no host to talk to, so ask for one - that is what keeps the edit
+       cycle a browser reload instead of a flash. */
+    function socketUrl() {
+        if (location.protocol === 'file:') {
+            const host = localStorage.getItem('wordclock-host') || prompt('Address of the clock', 'wordclock.local');
+            if (!host) { return null; }
+            localStorage.setItem('wordclock-host', host);
+            return 'ws://' + host + '/ws';
+        }
+        return (location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/ws';
+    }
+
+    let socket = null;
+
+    function connect() {
+        const url = socketUrl();
+        if (!url) { state.textContent = 'no address'; return; }
+
+        socket = new WebSocket(url);
+
+        socket.onopen = () => {
+            state.textContent = 'connected';
+            state.classList.add('up');
+        };
+        socket.onmessage = (event) => append(event.data, 'out');
+        socket.onclose = () => {
+            state.textContent = 'reconnecting…';
+            state.classList.remove('up');
+            /* The clock reboots on a firmware update and drops every socket with it, so
+               coming back on our own is the normal case rather than an error. */
+            setTimeout(connect, 2000);
+        };
+        socket.onerror = () => append('connection failed', 'note');
+    }
+
+    entry.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const text = command.value.trim();
+        if (!text || !socket || socket.readyState !== WebSocket.OPEN) { return; }
+
+        append(text, 'in');
+        socket.send(text);
+        command.value = '';
+    });
+
+    connect();
+</script>
