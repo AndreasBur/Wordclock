@@ -4,22 +4,29 @@
 /**     \file       WordclockTests.cpp
  *      \brief      Regression tests for the firmware core that run without a display
  *
- *      \details    Covers the two rules the DisplayManager relies on: that the word set
- *                  is a pure function of mode, hour and minute, and that it changes
- *                  exactly on the five-minute steps. DisplayManager::task() itself is
- *                  not called here — Display reaches the pixels through
- *                  Pixels::getInstance(), which constructs a wxFrame and therefore
- *                  needs a running application and a display.
+ *      \details    Covers DisplayManager's word-set latch and the two rules it rests on:
+ *                  that the word set is a pure function of mode, hour and minute, and
+ *                  that it changes exactly on the five-minute steps.
+ *
+ *                  Nothing here needs a display: the pixel buffer lives in Pixels and
+ *                  the window that renders it is a separate PixelsFrame, which is never
+ *                  constructed. testDisplayManagerLatch() runs first, because the latch
+ *                  it checks is only unlatched before the first task.
  *
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
  * I N C L U D E S
 ******************************************************************************************************************************************************/
+#include <array>
 #include <cstdlib>
 #include <iostream>
 
+#include "Animations.h"
 #include "Clock.h"
+#include "DisplayManager.h"
+#include "Pixels.h"
+#include "RealTimeClock.h"
 #include "Scheduler.h"
 
 /******************************************************************************************************************************************************
@@ -43,6 +50,91 @@ ClockWords wordsAt(byte Hour, byte Minute)
     expect(Clock::getInstance().getClockWords(Hour, Minute, words) == E_OK,
            "valid time must produce clock words");
     return words;
+}
+
+using PixelBufferType = std::array<Pixels::PixelType, PIXELS_NUMBER_OF_PIXELS>;
+
+PixelBufferType readPixels()
+{
+    PixelBufferType pixels;
+
+    for(byte index = 0u; index < PIXELS_NUMBER_OF_PIXELS; index++) {
+        pixels[index] = Pixels::getInstance().getPixelFast(index);
+    }
+    return pixels;
+}
+
+/* Pixel has no operator==, and comparing the three channels is all this needs. */
+bool arePixelsEqual(const PixelBufferType& Left, const PixelBufferType& Right)
+{
+    for(byte index = 0u; index < PIXELS_NUMBER_OF_PIXELS; index++) {
+        if(Left[index].getRed()   != Right[index].getRed()   ||
+           Left[index].getGreen() != Right[index].getGreen() ||
+           Left[index].getBlue()  != Right[index].getBlue()) { return false; }
+    }
+    return true;
+}
+
+bool isAnyPixelLit(const PixelBufferType& Pixels)
+{
+    for(byte index = 0u; index < PIXELS_NUMBER_OF_PIXELS; index++) {
+        if(Pixels[index].getRed() != 0u || Pixels[index].getGreen() != 0u ||
+           Pixels[index].getBlue() != 0u) { return true; }
+    }
+    return false;
+}
+
+void setTime(byte Hour, byte Minute, byte Second)
+{
+    RealTimeClock::getInstance().setTime(ClockTime(Hour, Minute, Second));
+}
+
+/* The latch itself: the display is redrawn when the word set changes and left alone
+   when it does not. Pixels::isDirty() is what makes "left alone" observable at all - the
+   buffer staying equal would not tell a skipped redraw from one that rewrote the same
+   words. Must run before any other test touches DisplayManager. */
+void testDisplayManagerLatch()
+{
+    Clock::getInstance().setModeFast(Clock::MODE_WESSI);
+    /* Without an animation the word change draws straight to the buffer, so what the
+       latch decided is visible in the same task. */
+    Animations::getInstance().setModeFast(Animations::MODE_FIXED);
+    Animations::getInstance().setAnimationFast(Animations::ANIMATION_ID_NONE);
+
+    Pixels& pixels = Pixels::getInstance();
+    DisplayManager& displayManager = DisplayManager::getInstance();
+
+    setTime(10u, 4u, 0u);
+    pixels.clearDirty();
+    displayManager.task();
+    expect(pixels.isDirty(), "the first task must draw the time it finds");
+
+    const PixelBufferType afterFirstTask = readPixels();
+    expect(isAnyPixelLit(afterFirstTask), "the first task must light some letters");
+
+    /* Same five-minute step, one task later. */
+    setTime(10u, 4u, 30u);
+    pixels.clearDirty();
+    displayManager.task();
+    expect(!pixels.isDirty(), "an unchanged word set must not redraw");
+    expect(arePixelsEqual(readPixels(), afterFirstTask),
+           "an unchanged word set must leave the letters as they were");
+
+    setTime(10u, 5u, 0u);
+    pixels.clearDirty();
+    displayManager.task();
+    expect(pixels.isDirty(), "a word change must redraw");
+    expect(!arePixelsEqual(readPixels(), afterFirstTask),
+           "a word change must reach the letters");
+
+    /* And back to standing still on the new step. */
+    const PixelBufferType afterChange = readPixels();
+    setTime(10u, 9u, 59u);
+    pixels.clearDirty();
+    displayManager.task();
+    expect(!pixels.isDirty(), "the rest of the step must not redraw either");
+    expect(arePixelsEqual(readPixels(), afterChange),
+           "the rest of the step must leave the letters as they were");
 }
 
 /* Only the round trip. That speed 1 maps to cycle 255 and speed 255 to cycle 1 is
@@ -144,6 +236,7 @@ void testClockWordsComparison()
 ******************************************************************************************************************************************************/
 int main()
 {
+    testDisplayManagerLatch();
     testSchedulerSpeedRoundTrip();
     testWordsChangeOnFiveMinuteStepsOnly();
     testInvalidTimeIsRejected();

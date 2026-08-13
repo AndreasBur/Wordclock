@@ -116,7 +116,11 @@ leaves them out.
 
 They run without a display, including the ones that drive `Display` and
 `DisplayManager`: `Pixels` is a plain buffer and the window that renders it,
-`PixelsFrame`, is simply never constructed.
+`PixelsFrame`, is simply never constructed. `Pixels::isDirty()` is what lets a
+test see whether the firmware wrote anything at all, which is how
+`DisplayManager`'s promise *not* to redraw an unchanged word set can be checked —
+a buffer that stayed equal would not tell a skipped redraw from one that rewrote
+the same words.
 
 ### 3. Code::Blocks
 
