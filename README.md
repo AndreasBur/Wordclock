@@ -18,6 +18,7 @@ the word tables have to cover.
 |-----------|---------|
 | [firmware/](firmware/) | **Single source of truth** for the clock logic — platform-agnostic (animations, clock, display, scheduler, overlays, communication). |
 | [docs/](docs/) | Reference documentation: the [serial command reference](docs/serial-commands.md) and the [font tables](docs/fonts.md). |
+| [assets/](assets/) | The icon's SVG masters and the script that generates the `.ico`, the `.xpm` and `docs/images/logo.png` from them. |
 | [platform/simulator/](platform/simulator/) | wxWidgets desktop backend: renders the matrix in a window so the firmware can be developed and debugged on a PC. |
 | [platform/esp32/](platform/esp32/) | On-device backend: WS2812 over the RMT peripheral, time from NTP. Built with PlatformIO — see its [README](platform/esp32/README.md). |
 | [platform/hardware/](platform/hardware/) | Atmel xmega backend — an [interface contract](platform/hardware/README.md) only, and no longer the intended target. |
