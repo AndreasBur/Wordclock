@@ -74,14 +74,19 @@ that rots on each commit is worse than none.
 A clean build takes about two minutes because it compiles the Arduino core alongside;
 changing one file of ours is about seven seconds.
 
-What behaviour has been checked, on the host against stand-ins for the framework rather
-than on hardware: the frame `Pixels::render()` produces, byte for byte against a captured
-transmission (channel order, index-to-offset mapping, dirty-flag suppression, master
-brightness); an injected command driven through `Communication` to its answer,
-`3 B=255 A=0 G=0`, which is what proves a second front end takes the same path as the
-wire; the web socket handler reached through the same registration call the server makes,
-where a frame carrying `3 -B200` comes back as `3 B=200 A=0 G=0`; the page served as a
-real gzip stream; and the catalog as a balanced JSON array of 11 commands in 4.2 KB.
+**And it is exercised**, by the host tests in [`test/`](test/README.md):
+
+```bash
+platform/esp32/test/run.sh              # build and run them
+platform/esp32/test/run.sh serve 8080   # the console on localhost, firmware behind it
+```
+
+Those compile the backend against stand-ins for the framework, so they reach everything
+above the peripherals: the frame `Pixels::render()` hands over, byte for byte; that an
+injected command takes the same path through `Communication` as one typed on the wire; and
+the handlers, driven through the same registration call the server makes. `serve` puts the
+real firmware behind the page on localhost, which is how the browser side is worked on
+without flashing.
 
 **What no test here can reach is the hardware itself**: the pulse timing on a real strip,
 whether the BH1750 answers on its bus, and whether SNTP arrives. Those need a board.

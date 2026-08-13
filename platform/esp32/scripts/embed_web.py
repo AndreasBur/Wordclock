@@ -14,9 +14,17 @@ regenerate it; as a build product that cannot happen.
 """
 
 import gzip
+import sys
 from pathlib import Path
 
-Import("env")  # noqa: F821
+# Called two ways: by PlatformIO as an extra script, where SCons injects Import, and from
+# the command line by test/run.sh, which needs the same header to compile the backend on
+# the host. One generator either way - a second one would drift from this.
+try:
+    Import("env")  # noqa: F821
+    FROM_PLATFORMIO = True
+except NameError:
+    FROM_PLATFORMIO = False
 
 
 HEADER_NAME = "WebPage.h"
@@ -73,9 +81,14 @@ def embed(source, build_dir):
     return target.parent
 
 
-build_dir = embed(
-    Path(env.subst("$PROJECT_DIR")) / "web" / "index.html",  # noqa: F821
-    env.subst("$BUILD_DIR"),  # noqa: F821
-)
+if FROM_PLATFORMIO:
+    build_dir = embed(
+        Path(env.subst("$PROJECT_DIR")) / "web" / "index.html",  # noqa: F821
+        env.subst("$BUILD_DIR"),  # noqa: F821
+    )
+    env.Append(CPPPATH=[str(build_dir)])  # noqa: F821
+elif __name__ == "__main__":
+    if len(sys.argv) != 3:
+        raise SystemExit(f"usage: {Path(sys.argv[0]).name} <index.html> <output directory>")
 
-env.Append(CPPPATH=[str(build_dir)])  # noqa: F821
+    embed(Path(sys.argv[1]), sys.argv[2])
