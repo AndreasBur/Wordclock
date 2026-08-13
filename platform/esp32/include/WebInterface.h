@@ -31,6 +31,8 @@
 ******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 
+#include "Pixels.h"
+
 #include <atomic>
 #include <stddef.h>
 
@@ -49,6 +51,11 @@
 
 #define WEB_INTERFACE_PORT                              80u
 
+/* In scheduler ticks, so 5 * 10 ms is twenty frames a second. The buffer is 330 bytes, so
+   that is under 7 KB/s and only while somebody is watching - sending on every tick would be
+   five times that for a display that changes far more slowly. */
+#define WEB_INTERFACE_FRAME_INTERVAL_TICKS              5u
+
 /* What the clock answers to on the local network, so no address has to be looked up. */
 #define WEB_INTERFACE_HOSTNAME                          "wordclock"
 
@@ -63,6 +70,21 @@ class WebInterface
   private:
     static constexpr size_t MaxClients{WEB_INTERFACE_MAX_CLIENTS};
     static constexpr int NoClient{-1};
+
+    static constexpr size_t FrameSize{PIXELS_NUMBER_OF_LEDS * Pixel::getNumberOfColors()};
+
+    /* What was last sent, so an unchanged display costs a comparison rather than a frame.
+       Same shape as Persistence, and for the same reason: nothing has to remember to report
+       a change, so nothing can forget. Pixels' own dirty flag cannot serve here - render()
+       clears it on its way to the strip, and a client that was not due on that tick would
+       never learn of the change. */
+    byte LastFrame[FrameSize]{};
+    byte FrameCountdown{0u};
+    /* Set when a client arrives, so the next frame goes out even though nothing changed. A
+       browser that connects to a standing display would otherwise wait for the next change -
+       on a word clock, up to five minutes of empty panel. Written by the server's task and
+       cleared by the firmware's; a byte either way, so a lost race costs one interval. */
+    std::atomic<bool> ForceFrame{false};
 
     /* Written only by the HTTP server's task - on a handshake and on a close - and read
        only by the firmware's task when it broadcasts. One writer is what makes the plain
@@ -97,6 +119,11 @@ class WebInterface
     /* Sends one finished line to every open socket. Called from the firmware's task through
        WordclockSerial's line sink, not from the server's. */
     void broadcastLine(const char*);
+
+    /* Sends the pixel buffer as one binary frame, at most every
+       WEB_INTERFACE_FRAME_INTERVAL_TICKS and only when it changed. Called from the
+       application's tick, after the display has been handed to the strip. */
+    void broadcastFrame();
 
     /* For the socket handler, which runs in the server's task. */
     void onClientOpened(int Descriptor) { addClient(Descriptor); }

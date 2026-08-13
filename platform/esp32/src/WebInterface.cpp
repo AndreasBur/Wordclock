@@ -23,6 +23,7 @@
 #include "Arduino.h"
 
 #include "Communication.h"
+#include "DisplayCharacters.h"
 #include "MessageCatalog.h"
 #include "WebInterface.h"
 #include "WebPage.h"
@@ -191,6 +192,53 @@ esp_err_t handleCommands(httpd_req_t* Request)
 
 
 /******************************************************************************************************************************************************
+  handleDisplay()
+******************************************************************************************************************************************************/
+/*! \brief          Serves the panel's shape and its letters
+ *  \details        The page draws a grid of letters and has to know which, and there is
+ *                  exactly one table of them - DisplayCharacters in the firmware. Serving
+ *                  it keeps the browser from carrying a second copy, which is the
+ *                  duplication the simulator used to have and no longer does.
+ *
+ *                  The table stores one byte per letter, so the umlauts are Latin-1 and are
+ *                  widened to UTF-8 on the way out: JSON is UTF-8, and a raw 0xDC makes the
+ *                  whole document invalid rather than one letter wrong.
+ *
+ *  \return         ESP_OK
+******************************************************************************************************************************************************/
+esp_err_t handleDisplay(httpd_req_t* Request)
+{
+    httpd_resp_set_type(Request, "application/json");
+
+    const DisplayCharacters Letters;
+    ChunkWriter Writer(Request);
+
+    Writer.put("{\"columns\":");
+    Writer.putNumber(DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS);
+    Writer.put(",\"rows\":");
+    Writer.putNumber(DISPLAY_CHARACTERS_NUMBER_OF_ROWS);
+    Writer.put(",\"letters\":\"");
+
+    for(byte Index = 0u; Index < DISPLAY_CHARACTERS_NUMBER_OF_CHARACTERS; Index++) {
+        const byte Letter = static_cast<byte>(Letters.getCharacterFast(Index));
+
+        if(Letter < 0x80u) {
+            Writer.put(static_cast<char>(Letter));
+        } else {
+            /* The whole of Latin-1 widens by this rule, so the two umlauts need no table. */
+            Writer.put(static_cast<char>(0xC0u | (Letter >> 6u)));
+            Writer.put(static_cast<char>(0x80u | (Letter & 0x3Fu)));
+        }
+    }
+
+    Writer.put("\"}");
+    Writer.finish();
+
+    return ESP_OK;
+}
+
+
+/******************************************************************************************************************************************************
   handleSocket()
 ******************************************************************************************************************************************************/
 /*! \brief          Takes one web socket frame and injects it as typed characters
@@ -285,10 +333,12 @@ StdReturnType WebInterface::begin()
 
     static const httpd_uri_t RootUri{"/", HTTP_GET, handleRoot, nullptr, false, false, nullptr};
     static const httpd_uri_t CommandsUri{"/commands", HTTP_GET, handleCommands, nullptr, false, false, nullptr};
+    static const httpd_uri_t DisplayUri{"/display", HTTP_GET, handleDisplay, nullptr, false, false, nullptr};
     static const httpd_uri_t SocketUri{"/ws", HTTP_GET, handleSocket, nullptr, true, false, nullptr};
 
     httpd_register_uri_handler(HttpServer, &RootUri);
     httpd_register_uri_handler(HttpServer, &CommandsUri);
+    httpd_register_uri_handler(HttpServer, &DisplayUri);
     httpd_register_uri_handler(HttpServer, &SocketUri);
 
     /* Only now, so a line printed during startup cannot reach a half-built server. */
@@ -337,6 +387,67 @@ void WebInterface::broadcastLine(const char* Line)
 
 
 /******************************************************************************************************************************************************
+  broadcastFrame()
+******************************************************************************************************************************************************/
+/*! \brief          Sends the pixel buffer to every open socket, when it changed
+ *  \details        Rate limited first and compared second, so a display that changes on
+ *                  every tick still costs one frame per interval, and one that stands still
+ *                  costs a comparison.
+ *
+ *                  Sent in the strip's own byte order, green first: it is what the buffer
+ *                  already holds, and the page is told the shape by /display rather than
+ *                  guessing it. Unlike the wx window, a browser can show the real colour -
+ *                  that window renders brightness only.
+ *
+ *  \return         -
+******************************************************************************************************************************************************/
+void WebInterface::broadcastFrame()
+{
+    if(HttpServer == nullptr) { return; }
+
+    const bool Forced = ForceFrame.exchange(false, std::memory_order_acq_rel);
+
+    if(!Forced) {
+        if(FrameCountdown > 0u) { FrameCountdown--; return; }
+    }
+    FrameCountdown = WEB_INTERFACE_FRAME_INTERVAL_TICKS - 1u;
+
+    /* Nothing to send to, so nothing is even gathered. */
+    bool HasClient = false;
+    for(size_t Slot = 0u; Slot < MaxClients; Slot++) {
+        if(Clients[Slot].load(std::memory_order_acquire) != NoClient) { HasClient = true; }
+    }
+    if(!HasClient) { return; }
+
+    byte Frame[FrameSize];
+    byte* Target = Frame;
+    const Pixels& Strip = Pixels::getInstance();
+
+    for(byte Index = 0u; Index < PIXELS_NUMBER_OF_LEDS; Index++) {
+        const Pixel Colour = Strip.getPixelFast(Index);
+
+        *Target++ = Colour.getGreen();
+        *Target++ = Colour.getRed();
+        *Target++ = Colour.getBlue();
+    }
+
+    if(!Forced && (memcmp(Frame, LastFrame, FrameSize) == 0)) { return; }
+    memcpy(LastFrame, Frame, FrameSize);
+
+    httpd_ws_frame_t WsFrame{};
+    WsFrame.type = HTTPD_WS_TYPE_BINARY;
+    WsFrame.payload = Frame;
+    WsFrame.len = FrameSize;
+
+    for(size_t Slot = 0u; Slot < MaxClients; Slot++) {
+        const int Descriptor = Clients[Slot].load(std::memory_order_acquire);
+
+        if(Descriptor != NoClient) { httpd_ws_send_frame_async(HttpServer, Descriptor, &WsFrame); }
+    }
+} /* broadcastFrame */
+
+
+/******************************************************************************************************************************************************
  * P R I V A T E   F U N C T I O N S
 ******************************************************************************************************************************************************/
 
@@ -350,6 +461,12 @@ void WebInterface::broadcastLine(const char* Line)
 ******************************************************************************************************************************************************/
 void WebInterface::addClient(int Descriptor)
 {
+    /* Set before the table is even looked at: either way a client just arrived, and it has to
+       be shown the display as it stands rather than as it next changes. That includes the
+       descriptor already being in the table - the system reuses them, so the same number
+       coming back is a new client rather than the old one. */
+    ForceFrame.store(true, std::memory_order_release);
+
     for(size_t Slot = 0u; Slot < MaxClients; Slot++) {
         if(Clients[Slot].load(std::memory_order_relaxed) == Descriptor) { return; }
     }

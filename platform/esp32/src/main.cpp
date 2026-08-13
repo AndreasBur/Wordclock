@@ -152,6 +152,10 @@ void loop()
        buffer holds once the whole pass over the tasks is done. */
     Pixels::getInstance().render();
 
+    /* After the strip, so a watching browser is shown the frame that went out rather than
+       one the firmware is still assembling. */
+    WebInterface::getInstance().broadcastFrame();
+
     reportProgress();
 
     vTaskDelayUntil(&LastWakeTime, TaskInterval);

@@ -20,8 +20,10 @@ const port = Number(portArg || 8080);
 
 const clock = spawn(hostPath, [], { stdio: ['pipe', 'pipe', 'inherit'] });
 const sockets = new Set();
-let catalog = null;
-const catalogWaiters = [];
+/* One waiter list per description, because both are asked for by the same channel. */
+const described = { commands: null, display: null };
+const waiters = { commands: [], display: [] };
+let asked = null;
 
 let pending = '';
 clock.stdout.on('data', (chunk) => {
@@ -32,20 +34,27 @@ clock.stdout.on('data', (chunk) => {
         pending = pending.slice(end + 1);
 
         if (line[0] === '#') {
-            catalog = line.slice(1);
-            while (catalogWaiters.length) { catalogWaiters.pop()(catalog); }
+            described[asked] = line.slice(1);
+            while (waiters[asked].length) { waiters[asked].pop()(described[asked]); }
         } else if (line[0] === '>') {
             const text = line.slice(1);
             console.log('  <-', text);
             for (const socket of sockets) { sendFrame(socket, text); }
+        } else if (line[0] === 'F') {
+            const bytes = Buffer.from(line.slice(1), 'hex');
+            let lit = 0;
+            for (let i = 0; i < bytes.length; i += 3) { if (bytes[i] || bytes[i + 1] || bytes[i + 2]) { lit++; } }
+            console.log(`  <- frame, ${lit} lit, to ${sockets.size} client(s)`);
+            for (const socket of sockets) { sendFrame(socket, bytes); }
         }
     }
 });
 
-function askCatalog() {
-    if (catalog !== null) { return Promise.resolve(catalog); }
-    clock.stdin.write('C\n');
-    return new Promise((resolve) => catalogWaiters.push(resolve));
+function describe(what) {
+    if (described[what] !== null) { return Promise.resolve(described[what]); }
+    asked = what;
+    clock.stdin.write((what === 'commands' ? 'C' : 'D') + '\n');
+    return new Promise((resolve) => waiters[what].push(resolve));
 }
 
 /* ---- the web socket, by hand ------------------------------------------------------- */
@@ -63,6 +72,9 @@ function accept(request, socket) {
     socket.setNoDelay(true);
     sockets.add(socket);
     console.log('  ++ client connected');
+    /* Ask for the display as it stands: the firmware only broadcasts on a change, so a
+       client arriving between two changes would otherwise see an empty panel. */
+    clock.stdin.write('R\n');
 
     let buffer = Buffer.alloc(0);
     socket.on('data', (chunk) => {
@@ -112,13 +124,20 @@ function readFrame(buffer) {
     return { opcode, payload, consumed: offset + maskLength + length };
 }
 
-function sendFrame(socket, text) {
-    const payload = Buffer.from(text);
-    const header = payload.length < 126
-        ? Buffer.from([0x81, payload.length])
-        : Buffer.concat([Buffer.from([0x81, 126]), (() => {
-            const b = Buffer.alloc(2); b.writeUInt16BE(payload.length); return b;
-        })()]);
+function sendFrame(socket, data) {
+    const binary = Buffer.isBuffer(data);
+    const payload = binary ? data : Buffer.from(data);
+    const opcode = binary ? 0x82 : 0x81;
+    let header;
+
+    if (payload.length < 126) {
+        header = Buffer.from([opcode, payload.length]);
+    } else {
+        header = Buffer.alloc(4);
+        header[0] = opcode;
+        header[1] = 126;
+        header.writeUInt16BE(payload.length, 2);
+    }
     socket.write(Buffer.concat([header, payload]));
 }
 
@@ -130,9 +149,9 @@ const server = http.createServer(async (request, response) => {
         response.end(fs.readFileSync(pagePath));
         return;
     }
-    if (request.url === '/commands') {
+    if (request.url === '/commands' || request.url === '/display') {
         response.writeHead(200, { 'Content-Type': 'application/json' });
-        response.end(await askCatalog());
+        response.end(await describe(request.url.slice(1)));
         return;
     }
     response.writeHead(404).end();

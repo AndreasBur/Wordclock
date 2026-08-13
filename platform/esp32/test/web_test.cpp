@@ -4,6 +4,7 @@
 #include <ESPmDNS.h>
 #include "Arduino.h"
 #include "Communication.h"
+#include "Pixels.h"
 #include "WebInterface.h"
 #include <algorithm>
 #include <cstdio>
@@ -15,6 +16,7 @@
 static httpd_handler_t SocketHandler = nullptr;
 static httpd_handler_t RootHandler = nullptr;
 static httpd_handler_t CommandsHandler = nullptr;
+static httpd_handler_t DisplayHandler = nullptr;
 static std::string PendingFrame;
 static std::vector<std::string> Sent;
 static std::string RootBody;
@@ -27,7 +29,8 @@ esp_err_t httpd_register_uri_handler(httpd_handle_t, const httpd_uri_t* u)
 {
     if(strcmp(u->uri, "/ws") == 0)            { SocketHandler = u->handler; }
     else if(strcmp(u->uri, "/commands") == 0) { CommandsHandler = u->handler; }
-    else                                     { RootHandler = u->handler; }
+    else if(strcmp(u->uri, "/display") == 0)  { DisplayHandler = u->handler; }
+    else                                      { RootHandler = u->handler; }
     return ESP_OK;
 }
 
@@ -62,10 +65,25 @@ esp_err_t httpd_ws_recv_frame(httpd_req_t*, httpd_ws_frame_t* f, size_t max)
     return ESP_OK;
 }
 
-esp_err_t httpd_ws_send_frame_async(httpd_handle_t, int, httpd_ws_frame_t* f)
+static std::vector<std::string> SentBinary;
+/* The descriptor each frame went to, so a test can ask who was served rather than only how
+   many frames left - the answer differs once more than one client is registered. */
+static std::vector<int> SentBinaryTo;
+
+esp_err_t httpd_ws_send_frame_async(httpd_handle_t, int descriptor, httpd_ws_frame_t* f)
 {
-    Sent.emplace_back(reinterpret_cast<const char*>(f->payload), f->len);
+    std::string payload(reinterpret_cast<const char*>(f->payload), f->len);
+
+    if(f->type == HTTPD_WS_TYPE_BINARY) { SentBinary.push_back(payload); SentBinaryTo.push_back(descriptor); }
+    else                                { Sent.push_back(payload); }
     return ESP_OK;
+}
+
+static size_t framesSentTo(int descriptor)
+{
+    size_t count = 0u;
+    for(const int to : SentBinaryTo) { if(to == descriptor) { count++; } }
+    return count;
 }
 
 static int Failures = 0;
@@ -102,8 +120,8 @@ static bool isBalancedJson(const std::string& Text)
 int main()
 {
     check(WebInterface::getInstance().begin() == E_OK, "the server starts and registers its handlers");
-    check((SocketHandler != nullptr) && (RootHandler != nullptr) && (CommandsHandler != nullptr),
-          "all three handlers were registered");
+    check((SocketHandler != nullptr) && (RootHandler != nullptr) && (CommandsHandler != nullptr)
+          && (DisplayHandler != nullptr), "all four handlers were registered");
 
     httpd_req_t request{};
     request.method = HTTP_GET;
@@ -128,6 +146,18 @@ int main()
     for(size_t At = Chunked.find("\"number\":"); At != std::string::npos; At = Chunked.find("\"number\":", At + 1u)) { Commands++; }
     printf("   catalog: %zu bytes, %zu commands\n", Chunked.size(), Commands);
 
+    /* the panel description: shape and letters, the letters as UTF-8 */
+    Chunked.clear();
+    DisplayHandler(&request);
+    check(isBalancedJson(Chunked), "the display description is well formed");
+    check(Chunked.find("\"columns\":11") != std::string::npos, "it carries the column count");
+    check(Chunked.find("\"rows\":10") != std::string::npos, "it carries the row count");
+    check(Chunked.find("ESKISTLF") != std::string::npos, "it carries the letters");
+    /* U with an umlaut is 0xDC in the firmware's table and has to arrive as two UTF-8 bytes;
+       the raw byte would make the whole document invalid. */
+    check(Chunked.find("\xc3\x9c") != std::string::npos, "the umlauts arrive as UTF-8");
+    check(Chunked.find("\xdc") == std::string::npos, "no raw Latin-1 byte escapes into the JSON");
+
     /* the handshake registers the client, so answers have somewhere to go */
     SocketHandler(&request);
 
@@ -145,6 +175,62 @@ int main()
     for(const auto& Line : Sent) { if(Line.find("B=200") != std::string::npos) { Found = true; } }
     check(Found, "the answer came back over the socket");
     for(const auto& Line : Sent) { printf("   sent: \"%s\"\n", Line.c_str()); }
+
+    /* the display frame */
+    WebInterface& web = WebInterface::getInstance();
+    const unsigned interval = WEB_INTERFACE_FRAME_INTERVAL_TICKS;
+    auto runInterval = [&web, interval](unsigned count) {
+        for(unsigned tick = 0u; tick < (count * interval); tick++) { web.broadcastFrame(); }
+    };
+
+    /* The handshake above counted as a client arriving, so one frame is already owed. Drain
+       it before measuring anything, or every count below is one too high. */
+    runInterval(1u);
+    SentBinary.clear();
+    SentBinaryTo.clear();
+
+    runInterval(3u);
+    check(SentBinary.empty(), "a display that never changed sends no frame");
+
+    Pixels::getInstance().setPixel(0u, 10u, 20u, 30u);
+    runInterval(3u);
+    check(SentBinary.size() == 1u, "a change is sent once and not repeated");
+
+    if(!SentBinary.empty()) {
+        const unsigned char* frame = reinterpret_cast<const unsigned char*>(SentBinary[0].data());
+
+        check(SentBinary[0].size() == 110u * 3u, "the frame is 110 * 3 bytes");
+        check((frame[0] == 20u) && (frame[1] == 10u) && (frame[2] == 30u),
+              "the frame carries green, red, blue like the strip");
+        printf("   frame: %zu bytes, one per %u ticks\n", SentBinary[0].size(), interval);
+    }
+
+    /* A client arriving between two changes still has to be shown the panel - and every
+       client that is already watching gets the same frame, which is why this counts by
+       descriptor rather than by frames. */
+    SentBinary.clear();
+    SentBinaryTo.clear();
+    web.onClientOpened(9);
+    runInterval(1u);
+    check(framesSentTo(9) == 1u, "a client that arrives is shown the standing display");
+    check(framesSentTo(7) == 1u, "and the one already watching gets it too");
+
+    /* A descriptor the system handed out again is a new client, not the old one, so it also
+       has to be shown the panel - the early return on the duplicate used to skip that. */
+    SentBinary.clear();
+    SentBinaryTo.clear();
+    web.onClientOpened(9);
+    runInterval(1u);
+    check(framesSentTo(9) == 1u, "a reused descriptor counts as a client arriving");
+
+    /* Changed on every tick, and still one frame per interval rather than one per tick. */
+    SentBinary.clear();
+    SentBinaryTo.clear();
+    for(unsigned tick = 0u; tick < (4u * interval); tick++) {
+        Pixels::getInstance().setPixel(1u, static_cast<byte>(tick + 1u), 0u, 0u);
+        web.broadcastFrame();
+    }
+    check(framesSentTo(9) == 4u, "a display changing every tick still sends one per interval");
 
     /* an oversized frame must be refused whole rather than truncated into the parser */
     PendingFrame.assign(WEB_INTERFACE_MAX_FRAME_LENGTH + 10u, 'x');

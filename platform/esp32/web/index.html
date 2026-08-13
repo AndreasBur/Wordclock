@@ -130,6 +130,28 @@
         word-break: break-all;
     }
     #preview:empty::before { content: 'pick a command'; color: var(--unlit); font-style: italic; }
+    /* The panel. Square cells so it reads as a matrix rather than as stretched columns,
+       and centred above the log because it is the thing one actually looks at. */
+    #panel {
+        display: grid;
+        gap: 2px;
+        padding: 16px 18px 4px;
+        width: 100%;
+        max-width: var(--content);
+        margin-inline: auto;
+    }
+    #panel span {
+        aspect-ratio: 1;
+        display: grid;
+        place-items: center;
+        font-weight: 700;
+        /* Unlit letters stay faintly readable rather than vanishing. The panel itself hides
+           them, but a view one reads wants the grid visible - the same choice the wx window
+           makes with its light grey. */
+        color: var(--line);
+        transition: color 90ms linear;
+    }
+    #panel[hidden] { display: none; }
     #builderNote { color: var(--unlit); font-style: italic; padding: 0 18px 12px; max-width: var(--content); margin-inline: auto; }
 </style>
 
@@ -140,6 +162,8 @@
         <button type="button" id="theme" title="Switch between the dark and the light theme"></button>
     </div>
 </header>
+
+<div id="panel" hidden></div>
 
 <div id="log"></div>
 
@@ -227,6 +251,16 @@
     let socket = null;
     let attempts = 0;
 
+    /* Same fallback as the socket: opened from disk there is no own host to ask, so the
+       address the socket already stored is used. */
+    function endpoint(path) {
+        if (location.protocol === 'file:') {
+            const host = localStorage.getItem('wordclock-host');
+            return host ? 'http://' + host + '/' + path : path;
+        }
+        return path;
+    }
+
     function connect() {
         const url = socketUrl();
         if (!url) { state.textContent = 'no address'; return; }
@@ -239,7 +273,11 @@
             state.textContent = 'connected';
             state.classList.add('up');
         };
-        socket.onmessage = (event) => append(event.data, 'out');
+        socket.binaryType = 'arraybuffer';
+        socket.onmessage = (event) => {
+            if (typeof event.data === 'string') { append(event.data, 'out'); return; }
+            showFrame(new Uint8Array(event.data));
+        };
         socket.onclose = () => {
             attempts++;
             state.classList.remove('up');
@@ -251,6 +289,45 @@
             setTimeout(connect, RETRY_MS);
         };
     }
+
+    /* ---- the panel -----------------------------------------------------------------
+       The letters and the shape come from /display, which the clock generates from
+       DisplayCharacters - so the browser carries no second copy of the letter table. The
+       colours arrive as binary frames on the same socket, in the strip's own byte order.
+
+       Unlike the wx window this can show the real colour: that one renders brightness as a
+       grey level and drops the hue. */
+    const panel = document.getElementById('panel');
+    let cells = [];
+
+    function buildPanel(shape) {
+        panel.style.gridTemplateColumns = `repeat(${shape.columns}, 1fr)`;
+        panel.textContent = '';
+        cells = [...shape.letters].map((letter) => {
+            const cell = document.createElement('span');
+            cell.textContent = letter;
+            panel.appendChild(cell);
+            return cell;
+        });
+        panel.hidden = cells.length === 0;
+    }
+
+    function showFrame(bytes) {
+        /* Green, red, blue - the strip's order, which is what the buffer holds. */
+        for (let index = 0; index < cells.length; index++) {
+            const at = index * 3;
+            const green = bytes[at], red = bytes[at + 1], blue = bytes[at + 2];
+
+            cells[index].style.color = (red || green || blue)
+                ? `rgb(${red} ${green} ${blue})`
+                : '';
+        }
+    }
+
+    fetch(endpoint('display'))
+        .then((response) => response.json())
+        .then(buildPanel)
+        .catch(() => { /* No panel then; the console below is the part that matters. */ });
 
     /* ---- the command builder ------------------------------------------------------
        Everything below is generated from what /commands serves, which the clock in turn
@@ -348,17 +425,7 @@
         commandInput.focus();
     });
 
-    /* Same fallback as the socket: opened from disk there is no own host to ask, so the
-       address the socket already stored is used. */
-    function catalogUrl() {
-        if (location.protocol === 'file:') {
-            const host = localStorage.getItem('wordclock-host');
-            return host ? 'http://' + host + '/commands' : 'commands';
-        }
-        return 'commands';
-    }
-
-    fetch(catalogUrl())
+    fetch(endpoint('commands'))
         .then((response) => response.json())
         .then((loaded) => {
             catalog = loaded;
