@@ -1,9 +1,13 @@
-# Hardware platform (interface contract — not yet implemented)
+# Hardware platform (interface contract — xmega, not implemented)
 
-This directory is a **placeholder** for the on-device backend of the Wordclock
-firmware. It is intentionally empty of code: the actual port must be built and
-tested on the real xmega hardware with the AVR toolchain, which is out of scope
-for the desktop tooling in this repo.
+This directory is a **placeholder** for an xmega backend of the Wordclock firmware.
+It is intentionally empty of code: that port would have to be built and tested on
+the real xmega hardware with the AVR toolchain, which is out of scope for the
+desktop tooling in this repo.
+
+The document below is still the description of the platform seam, and worth reading
+as such. For a backend that exists, see [`../esp32/`](../esp32/) — the xmega is no
+longer the intended target.
 
 ## How the platform seam works
 
@@ -47,10 +51,16 @@ per high-resolution conversion, which its task cycle must stay above.
 
 ## Suggested port path
 
-Reuse the concrete drivers already present in
+For an **xmega** target: reuse the concrete drivers already present in
 [`../../Wordclock_xmegaForArduino/`](../../Wordclock_xmegaForArduino/) (WS2812,
 RTC, I²C, ArduinoCore) and adapt them to the interfaces above. That project
 currently builds an **older** firmware architecture; the work is to retarget its
 drivers at today's `firmware/` core, then build and flash with the AVR toolchain.
+
+That advice does not carry over to [`../esp32/`](../esp32/), which is why none of
+those three drivers appear there. The RMT peripheral generates the WS2812 pulses in
+hardware, so the xmega's 800-line USART-as-SPI bit pusher has no counterpart; the
+time comes from SNTP rather than from an RTC chip; and I²C comes with the Arduino
+core. Only the BH1750's register handling was worth carrying across.
 
 **Status:** contract only. Nothing here compiles or runs yet.
