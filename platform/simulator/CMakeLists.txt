@@ -118,7 +118,7 @@ target_link_libraries(Wordclock PRIVATE WordclockCore WordclockShims)
 # Tests
 # --------------------------------------------------------------------------
 if(WORDCLOCK_BUILD_TESTS)
-    add_executable(WordclockTests tests/ClockAndSchedulerTests.cpp)
+    add_executable(WordclockTests tests/WordclockTests.cpp)
     target_link_libraries(WordclockTests PRIVATE WordclockCore WordclockShims)
     add_test(NAME WordclockTests COMMAND WordclockTests)
 endif()

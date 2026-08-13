@@ -102,6 +102,19 @@ wxWidgets is located via `find_package(wxWidgets)`, so the same
 [CMakeLists.txt](CMakeLists.txt) works on Linux, macOS and Windows without
 per-platform edits. This is also the build that runs inside the container.
 
+### Tests
+
+```bash
+ctest --test-dir build --output-on-failure
+```
+
+[tests/](tests/) holds regression tests for the firmware core. They build
+alongside the application and share its objects, so they add one translation
+unit and a link rather than a second build of the core; `-DWORDCLOCK_BUILD_TESTS=OFF`
+leaves them out. They deliberately touch nothing that reaches the display:
+`Display` gets at the pixels through `Pixels::getInstance()`, which constructs a
+`wxFrame` and would need a running application and a display.
+
 ### 3. Code::Blocks
 
 Per-platform projects live in [codeblocks/](codeblocks/):
@@ -133,6 +146,7 @@ platform/simulator/
 │   ├── Arduino.h         Arduino-core shim (Serial, PROGMEM, itoa, …)
 │   └── arduino/          split Arduino helper shims (types, bits, progmem, itoa)
 ├── src/                  their implementations
+├── tests/                regression tests that run without a display
 ├── WordclockApp.*        wxApp entry point + 10 ms task timer
 ├── WordclockMain.*       wires the scheduler to the simulated real-time clock
 ├── CMakeLists.txt        simulator build (pulled in by the root switch)
