@@ -14,6 +14,7 @@ FROM ${BASE_IMAGE}
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && \
     apt-get install -y --no-install-recommends \
         cmake \
+        clangd \
         ninja-build \
         libwxgtk3.2-dev \
         imagemagick \

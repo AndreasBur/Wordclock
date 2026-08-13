@@ -44,6 +44,10 @@ local dev container feature in `shared/`, which every configuration references:
 Feature metadata is merged with the referencing `devcontainer.json`, so a
 variant can add its own extensions on top without repeating the shared list.
 
+The shared settings install `clangd` and configure it to read CMake's
+`build/compile_commands.json`; C/C++ Tools remains installed for debugging but
+does not provide IntelliSense.
+
 Feature metadata is baked into the image at build time, so editing
 `shared/devcontainer-feature.json` requires **Dev Containers: Rebuild
 Container**. Reopening the folder keeps the previous metadata, which looks like
