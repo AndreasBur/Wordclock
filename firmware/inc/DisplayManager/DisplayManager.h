@@ -65,8 +65,10 @@ class DisplayManager
   private:
     static constexpr byte TaskCycle{DISPLAY_MANAGER_TASK_CYCLE};
     ClockWords LastClockWords{};
-    /* The default ClockWords value may itself be a valid word combination. Keep
-       initialization separate so the first task always draws the current time. */
+    /* Rather than letting a default-constructed ClockWords stand for "nothing drawn
+       yet": that only works as long as no real word set can equal it, which is a
+       property of ClockWords the compiler would not defend. An own flag says so
+       outright, and the first task then always draws the current time. */
     bool ClockWordsInitialized{false};
     /* Whether an overlay held the display on the previous task, which is what makes the
        end of one detectable. */
