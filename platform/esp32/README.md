@@ -23,32 +23,65 @@ pio run -t upload -d platform/esp32       # build and flash
 pio device monitor -d platform/esp32      # serial console, 115200 baud
 ```
 
+### PlatformIO in the dev container
+
+The container has no PlatformIO of its own yet. Installing it by hand:
+
+```bash
+sudo apt-get install -y --no-install-recommends python3 python3-venv
+python3 -m venv ~/.pio-venv && ~/.pio-venv/bin/pip install platformio
+export PATH="$HOME/.pio-venv/bin:$PATH"
+```
+
+Behind a TLS-intercepting proxy there is one trap worth knowing, because the error names
+neither the proxy nor the cause: PlatformIO downloads with `requests` and passes its own
+`certifi` bundle explicitly, so it ignores `REQUESTS_CA_BUNDLE` and fails with
+`CERTIFICATE_VERIFY_FAILED: self-signed certificate in certificate chain` while `curl`
+and `git` reach the same URL. Appending the container's trust store to that bundle fixes
+it without turning verification off:
+
+```bash
+cat /etc/ssl/certs/ca-certificates.crt | \
+    sudo tee -a "$(~/.pio-venv/bin/python -c 'import certifi;print(certifi.where())')" > /dev/null
+```
+
+The pioarduino platform builds a second virtual environment under
+`~/.platformio/penv` with its own copy, which needs the same treatment.
+
 CMake refuses this platform on purpose — `-DPLATFORM=esp32` prints the PlatformIO
 command instead.
 
 **Arduino core 3.x (ESP-IDF ≥ 5.1) is required**, because `Pixels.cpp` uses the IDF 5
-RMT driver `<driver/rmt_tx.h>`. Core 2.x ships IDF 4.4, which has only the older
-`<driver/rmt.h>` with different types, so the build fails on that include rather than
-misbehaving later. `platformio.ini` notes where a core 3.x platform comes from. The web socket handler additionally
-needs `CONFIG_HTTPD_WS_SUPPORT` in the core's sdkconfig, which it enables by default - but
-that, like the RMT names, is unconfirmed until the real toolchain has run.
+RMT driver `<driver/rmt_tx.h>`. The registry's `espressif32` does **not** provide it —
+version 7.0.1 still ships `framework-arduinoespressif32@3.20017`, which is core 2.0.17 on
+IDF 4.4, and the build fails on exactly that include. `platformio.ini` therefore pins the
+pioarduino fork of the platform, which carries core 3.3.11. Both halves of that were
+measured, not assumed.
 
 ### Verification status
 
-This backend was written and checked without an ESP32 toolchain in reach. What has been
-verified against stand-ins for the framework: every translation unit here plus the whole
-firmware core compiles clean under `-Wall -Wextra` and links with no undefined symbols;
-the frame `Pixels::render()` produces was checked byte for byte against a captured
+**Builds for real.** `pio run` produces a firmware image for the ESP32-S3 with **no
+warnings** from any file in this repository:
+
+```
+RAM:    10.8%  (35272 of 327680 bytes)
+Flash:  17.5%  (583958 of 3342336 bytes)
+```
+
+A clean build takes about two minutes because it compiles the Arduino core alongside;
+changing one file of ours is about seven seconds.
+
+What behaviour has been checked, on the host against stand-ins for the framework rather
+than on hardware: the frame `Pixels::render()` produces, byte for byte against a captured
 transmission (channel order, index-to-offset mapping, dirty-flag suppression, master
-brightness); and an injected command was driven through `Communication` to its answer,
+brightness); an injected command driven through `Communication` to its answer,
 `3 B=255 A=0 G=0`, which is what proves a second front end takes the same path as the
-wire. The web socket handler was driven the same way, through the registration call
-the server makes: a frame carrying `3 -B200` reached the parser and `3 B=200 A=0 G=0` came
-back out over the socket, the page is served as a real gzip stream, and an oversized frame
-is refused rather than truncated into the parser. The catalog endpoint was checked the same way:
-it is a balanced JSON array of 11 commands in 4.2 KB, carrying the option short names, the
-ranges and the named values. What has **not** been run is the real toolchain, so the ESP-IDF API names and the
-timing on an actual strip are still unconfirmed.
+wire; the web socket handler reached through the same registration call the server makes,
+where a frame carrying `3 -B200` comes back as `3 B=200 A=0 G=0`; the page served as a
+real gzip stream; and the catalog as a balanced JSON array of 11 commands in 4.2 KB.
+
+**What no test here can reach is the hardware itself**: the pulse timing on a real strip,
+whether the BH1750 answers on its bus, and whether SNTP arrives. Those need a board.
 
 ## Configuration
 

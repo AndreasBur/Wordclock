@@ -82,6 +82,11 @@ inline void hardwarePortBegin(unsigned long BaudRate) { Serial.begin(BaudRate); 
 /******************************************************************************************************************************************************
  *  S E R I A L
 ******************************************************************************************************************************************************/
+/* Undefined first, because the core defines Serial as a macro of its own - on this target
+   it aliases whichever port the board boots its console on. Replacing it without saying so
+   is a redefinition, and the compiler is right to warn; the alias is also exactly why the
+   port above is captured through a function rather than a reference. */
+#undef Serial
 #define Serial                  WordclockSerial::getInstance()
 
 #endif // _WORDCLOCK_ARDUINO_H_

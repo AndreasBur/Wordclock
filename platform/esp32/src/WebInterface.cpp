@@ -35,7 +35,9 @@
 ******************************************************************************************************************************************************/
 namespace {
 
-httpd_handle_t Server{nullptr};
+/* Named HttpServer rather than Server: the Arduino core has a class Server in the global
+   namespace, and an unqualified Server here is then ambiguous. */
+httpd_handle_t HttpServer{nullptr};
 
 /* Handed to WordclockSerial, which takes a plain function pointer - so the singleton is
    reached from here rather than carried along. */
@@ -275,8 +277,8 @@ StdReturnType WebInterface::begin()
     /* Its own task, so nothing here runs inside the firmware's tick. */
     Config.core_id = 0;
 
-    if(httpd_start(&Server, &Config) != ESP_OK) {
-        Server = nullptr;
+    if(httpd_start(&HttpServer, &Config) != ESP_OK) {
+        HttpServer = nullptr;
         Serial.println(F("Web: server failed to start, console stays on the UART"));
         return E_NOT_OK;
     }
@@ -285,9 +287,9 @@ StdReturnType WebInterface::begin()
     static const httpd_uri_t CommandsUri{"/commands", HTTP_GET, handleCommands, nullptr, false, false, nullptr};
     static const httpd_uri_t SocketUri{"/ws", HTTP_GET, handleSocket, nullptr, true, false, nullptr};
 
-    httpd_register_uri_handler(Server, &RootUri);
-    httpd_register_uri_handler(Server, &CommandsUri);
-    httpd_register_uri_handler(Server, &SocketUri);
+    httpd_register_uri_handler(HttpServer, &RootUri);
+    httpd_register_uri_handler(HttpServer, &CommandsUri);
+    httpd_register_uri_handler(HttpServer, &SocketUri);
 
     /* Only now, so a line printed during startup cannot reach a half-built server. */
     WordclockSerial::getInstance().setLineSink(sendLineToClients);
@@ -317,7 +319,7 @@ StdReturnType WebInterface::begin()
 ******************************************************************************************************************************************************/
 void WebInterface::broadcastLine(const char* Line)
 {
-    if((Server == nullptr) || (Line == nullptr)) { return; }
+    if((HttpServer == nullptr) || (Line == nullptr)) { return; }
 
     httpd_ws_frame_t Frame{};
     Frame.type = HTTPD_WS_TYPE_TEXT;
@@ -329,7 +331,7 @@ void WebInterface::broadcastLine(const char* Line)
     for(size_t Slot = 0u; Slot < MaxClients; Slot++) {
         const int Descriptor = Clients[Slot].load(std::memory_order_acquire);
 
-        if(Descriptor != NoClient) { httpd_ws_send_frame_async(Server, Descriptor, &Frame); }
+        if(Descriptor != NoClient) { httpd_ws_send_frame_async(HttpServer, Descriptor, &Frame); }
     }
 } /* broadcastLine */
 
