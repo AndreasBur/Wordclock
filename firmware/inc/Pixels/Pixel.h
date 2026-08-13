@@ -80,8 +80,17 @@ class Pixel
 ******************************************************************************************************************************************************/
   public:
     constexpr Pixel() { }
-    constexpr Pixel(ColorType ColorRed, ColorType ColorGreen, ColorType ColorBlue)
-        : PixelRaw{ColorRed, ColorGreen, ColorBlue} { }
+    /* Goes through setPixel() rather than initialising the array in argument order,
+       which is what it used to do: the raw array is ordered by the ColorOffset
+       constants (green first, for the WS2812 wire order), so a positional initialiser
+       put red where getRed() does not look for it. Nothing visible came of it while
+       every colour built this way was grey or black, and the simulator could not have
+       shown it either - it renders brightness, not hue. On the strip it swaps red and
+       green. Keeping setPixel() as the only place that knows the layout is what stops
+       that from coming back. */
+    constexpr Pixel(ColorType ColorRed, ColorType ColorGreen, ColorType ColorBlue) {
+        setPixel(ColorRed, ColorGreen, ColorBlue);
+    }
     ~Pixel() { }
 
     // get methods
@@ -95,7 +104,9 @@ class Pixel
     void setBlue(ColorType Value) { PixelRaw[ColorOffsetBlue] = Value; }
     void setGreen(ColorType Value) { PixelRaw[ColorOffsetGreen] = Value; }
 
-    void setPixel(ColorType Red, ColorType Green, ColorType Blue) {
+    /* constexpr so the constructor can use it, and thereby be the only place in the
+       class that maps a colour name onto a raw index. */
+    constexpr void setPixel(ColorType Red, ColorType Green, ColorType Blue) {
          PixelRaw[ColorOffsetRed] = Red;
          PixelRaw[ColorOffsetBlue] = Blue;
          PixelRaw[ColorOffsetGreen] = Green;

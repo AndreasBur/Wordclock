@@ -6,7 +6,9 @@
  *
  *      \details    Covers DisplayManager's word-set latch and the two rules it rests on:
  *                  that the word set is a pure function of mode, hour and minute, and
- *                  that it changes exactly on the five-minute steps.
+ *                  that it changes exactly on the five-minute steps. Also pins down
+ *                  Pixel's colour channels, which no display here can reveal but the
+ *                  LED strip can.
  *
  *                  Nothing here needs a display: the pixel buffer lives in Pixels and
  *                  the window that renders it is a separate PixelsFrame, which is never
@@ -229,6 +231,36 @@ void testClockWordsComparison()
     expect(differentMinute != words, "a different minute word must compare unequal");
 }
 
+/* Guards a swap that this simulator cannot show: Pixel keeps its channels in the WS2812
+   wire order rather than in argument order, so a constructor that filled the raw array
+   positionally put red where getRed() does not look. Every colour built that way so far
+   was grey or black, which hides it, and the window renders brightness rather than hue,
+   which hides it again - it would first have appeared on the strip. */
+void testPixelColorChannels()
+{
+    const Pixel color(10u, 20u, 30u);
+
+    expect(color.getRed() == 10u, "the first constructor argument must be red");
+    expect(color.getGreen() == 20u, "the second constructor argument must be green");
+    expect(color.getBlue() == 30u, "the third constructor argument must be blue");
+
+    Pixel assigned;
+    assigned.setPixel(10u, 20u, 30u);
+    expect(assigned.getRed() == color.getRed() &&
+           assigned.getGreen() == color.getGreen() &&
+           assigned.getBlue() == color.getBlue(),
+           "setPixel and the constructor must place the channels alike");
+
+    Pixel individual;
+    individual.setRed(10u);
+    individual.setGreen(20u);
+    individual.setBlue(30u);
+    expect(individual.getRed() == color.getRed() &&
+           individual.getGreen() == color.getGreen() &&
+           individual.getBlue() == color.getBlue(),
+           "the per-channel setters must place the channels alike");
+}
+
 } // namespace
 
 /******************************************************************************************************************************************************
@@ -242,6 +274,7 @@ int main()
     testInvalidTimeIsRejected();
     testClockModes();
     testClockWordsComparison();
+    testPixelColorChannels();
 
     if(Failures == 0) {
         std::cout << "All Wordclock tests passed.\n";
