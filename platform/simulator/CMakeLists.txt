@@ -37,13 +37,14 @@ file(GLOB_RECURSE ARDUINO_SOURCES CONFIGURE_DEPENDS
 # files below are specific to the app; everything here is shared with the tests.
 set(SHIM_SOURCES
     src/Pixels.cpp
+    src/PixelsFrame.cpp
     src/Settings.cpp
     src/MessageCatalog.cpp
     src/MessageBuilder.cpp
     src/MessageDecoder.cpp
     src/SerialShim.cpp)
 
-# On Linux/macOS the window icon is loaded from the XPM array (see src/Pixels.cpp),
+# On Linux/macOS the window icon is loaded from the XPM array (see src/PixelsFrame.cpp),
 # gated behind the PIXELS define that the old Code::Blocks projects set.
 if(NOT WIN32)
     set(PIXELS_DEFINE PIXELS)

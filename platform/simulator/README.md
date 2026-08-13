@@ -8,8 +8,9 @@ hardware.
 The simulator compiles the **shared firmware core** from
 [firmware/](../../firmware/) and only supplies the hardware layer: the Arduino
 core is emulated by a small shim in [include/Arduino.h](include/Arduino.h)
-(`Serial`, `PROGMEM`, `pgm_read_byte`, `itoa`, …), and the LED matrix is drawn by
-[src/Pixels.cpp](src/Pixels.cpp). See
+(`Serial`, `PROGMEM`, `pgm_read_byte`, `itoa`, …), the pixel buffer lives in
+[src/Pixels.cpp](src/Pixels.cpp) and the matrix is drawn by
+[src/PixelsFrame.cpp](src/PixelsFrame.cpp). See
 [platform/hardware/README.md](../hardware/README.md) for the platform contract.
 
 ## What the window shows, and what it cannot
@@ -111,9 +112,11 @@ ctest --test-dir build --output-on-failure
 [tests/](tests/) holds regression tests for the firmware core. They build
 alongside the application and share its objects, so they add one translation
 unit and a link rather than a second build of the core; `-DWORDCLOCK_BUILD_TESTS=OFF`
-leaves them out. They deliberately touch nothing that reaches the display:
-`Display` gets at the pixels through `Pixels::getInstance()`, which constructs a
-`wxFrame` and would need a running application and a display.
+leaves them out.
+
+They run without a display, including the ones that drive `Display` and
+`DisplayManager`: `Pixels` is a plain buffer and the window that renders it,
+`PixelsFrame`, is simply never constructed.
 
 ### 3. Code::Blocks
 
@@ -135,7 +138,8 @@ firmware/                 shared, platform-agnostic core (../../firmware)
 platform/simulator/
 ├── include/              simulator-only HAL headers
 │   ├── sim/              simulator implementations
-│   │   ├── Pixels.h      wxWidgets LED-matrix frame
+│   │   ├── Pixels.h      the pixel buffer, free of wxWidgets
+│   │   ├── PixelsFrame.h the window that renders it
 │   │   ├── RealTimeClock.h   time source
 │   │   ├── BH1750.h      ambient-light sensor
 │   │   ├── SerialShim.h  the port Serial is bound to
@@ -164,7 +168,11 @@ overwritten on the next tick, exactly as a real RTC would. That is all this laye
 does: what reaches the display is decided by the firmware's `DisplayManager`, so
 the hardware backend will behave the same without repeating any of it.
 
-Every "LED" write ends up recolouring a `wxStaticText` cell in the matrix — lit
+An "LED" write goes into the `Pixels` buffer and marks it dirty; the window is a
+separate `PixelsFrame`, which the application repaints once per tick and only
+when something was written. Rendering therefore sits outside the write path,
+which is what keeps `Pixels` free of wxWidgets and the firmware drivable without
+a display. Repainting means recolouring a `wxStaticText` cell per letter — lit
 letters turn dark, unlit ones stay light grey. The right-hand console mirrors the
 device's serial output and lets you send commands back: `Serial` is bound to
 `SerialShim`, which writes into the two text controls the matrix window lays out

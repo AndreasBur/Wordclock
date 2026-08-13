@@ -9,15 +9,19 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       Pixels.h
- *      \brief      Simulator LED matrix window (replaces the WS2812 pixel strip)
+ *      \brief      Simulator pixel strip (replaces the WS2812 driver)
  *
- *      \details    wxWidgets frame that renders the 10x11 character grid as
- *                  coloured cells. Mirrors the public API of the hardware pixel
- *                  driver (get/set/clear pixel, brightness, show).
+ *      \details    Mirrors the public API of the hardware pixel driver - get/set/clear
+ *                  pixel, brightness, show - over a plain buffer, and nothing else.
  *
- *                  It also lays out the serial output and input controls, but only
- *                  lays them out: what they mean belongs to SerialShim, which they are
- *                  handed to.
+ *                  Deliberately free of wxWidgets: the window that renders this buffer
+ *                  is PixelsFrame. Nothing on the way from the firmware to a pixel
+ *                  constructs a window any more, which is what lets the tests in tests/
+ *                  drive Display and DisplayManager without a display.
+ *
+ *                  Serial still reaches wxWidgets through the Arduino shim, but
+ *                  SerialShim holds null controls until it is attached and checks for
+ *                  them, so printing headless is a no-op rather than a crash.
  *
 ******************************************************************************************************************************************************/
 #ifndef PIXELS_H
@@ -26,9 +30,6 @@
 /******************************************************************************************************************************************************
  * I N C L U D E S
 ******************************************************************************************************************************************************/
-#include <wx/wx.h>
-#include <wx/button.h>
-#include <cmath>
 #include "StandardTypes.h"
 #include "Pixel.h"
 
@@ -51,7 +52,7 @@
 /******************************************************************************************************************************************************
  *  C L A S S   P I X E L S
 ******************************************************************************************************************************************************/
-class Pixels : public wxFrame
+class Pixels
 {
 /******************************************************************************************************************************************************
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
@@ -63,86 +64,37 @@ class Pixels : public wxFrame
 # else
     using IndexType = uint16_t;
 # endif
-    using SizerCharactersType = std::array<wxBoxSizer*, PIXELS_DISPLAY_NUMBER_OF_ROWS>;
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    enum
-    {
-        ID_BUTTON_CLEAR = 1000,
-        ID_BUTTON_SEND,
-        ID_TEXT_CTRL_OUTPUT,
-        ID_TEXT_CTRL_INPUT,
-        ID_STATIC_BOX,
-        ID_BUTTON_CREATE,
-        /* No stock wx id fits the message builder, unlike Settings, About and Quit. */
-        ID_MENU_MESSAGE
-    };
-
-    wxStaticText* Characters[PIXELS_DISPLAY_NUMBER_OF_ROWS][PIXELS_DISPLAY_NUMBER_OF_COLUMNS];
-    PixelType PixelBuffer[PIXELS_DISPLAY_NUMBER_OF_ROWS][PIXELS_DISPLAY_NUMBER_OF_COLUMNS];
+    /* Zero-initialised, so the strip starts dark rather than at whatever the memory
+       held - the hardware driver starts from a defined state too. */
+    PixelType PixelBuffer[PIXELS_DISPLAY_NUMBER_OF_ROWS][PIXELS_DISPLAY_NUMBER_OF_COLUMNS]{};
     byte Pin{0};
     byte Brightness{255};
-
-    static constexpr byte IntensityMaxValue{255u};
-    static constexpr byte UnlitLevel{192u};             /* wxLIGHT_GREY */
-
-    DECLARE_EVENT_TABLE()
+    /* Whether the firmware touched buffer or brightness since the last render. It saves
+       the window a pass over all 110 cells on the ticks where nothing happened, and it
+       is what lets a test see whether a redraw was attempted at all - which is exactly
+       what DisplayManager's word-set latch promises not to do. Starts true so the first
+       pass establishes the window's colours. */
+    bool Dirty{true};
 
     // functions
-    /* The brightest channel decides how far the letter is pulled from the unlit colour
-       towards black. Colour itself cannot be shown on a light background — a white LED
-       at full would be invisible — so only the brightness is rendered. */
-    static byte getIntensity(PixelType Pixel) {
-        byte Intensity = Pixel.getRed();
-        if(Pixel.getGreen() > Intensity) { Intensity = Pixel.getGreen(); }
-        if(Pixel.getBlue() > Intensity) { Intensity = Pixel.getBlue(); }
-        return Intensity;
-    }
+    static constexpr byte toRow(byte Index) { return Index / PIXELS_DISPLAY_NUMBER_OF_COLUMNS; }
+    static constexpr byte toColumn(byte Index) { return Index % PIXELS_DISPLAY_NUMBER_OF_COLUMNS; }
 
-    /* Weighted rather than proportional. Unlit letters sit at UnlitLevel and not at
-       black, which leaves the dark end of the range squeezed: proportionally, a pixel at
-       3 percent would land five levels off the unlit colour and be invisible, while on
-       real LEDs it is clearly visible against LEDs that are truly off. The square root
-       spreads the low end, which is also closer to how the eye reads brightness. */
-    static byte getWeightedIntensity(byte Intensity) {
-        return static_cast<byte>(std::sqrt(static_cast<double>(Intensity) * IntensityMaxValue));
-    }
-
-    /* Grey level of the letter, which the weighted intensity pulls from UnlitLevel
-       towards black. */
-    static constexpr byte toLevel(byte WeightedIntensity) {
-        return static_cast<byte>(UnlitLevel - ((UnlitLevel * WeightedIntensity) / IntensityMaxValue));
-    }
-
-    Pixels(wxWindow*, const wxString&);
-    ~Pixels();
-    void OnClose(wxCloseEvent&);
-    void OnClear(wxCommandEvent&);
-    void OnAbout(wxCommandEvent&);
-    void OnSend(wxCommandEvent&);
-    void OnSettings(wxCommandEvent&);
-    void OnMessage(wxCommandEvent&);
-    void OnQuit(wxCommandEvent&);
-    void setPixels(wxColour);
-    wxColour toColour(PixelType) const;
-    void renderPixel(byte Row, byte Column);
-    void renderAllPixels();
-    wxMenuBar* createMenuBar();
-    wxBoxSizer* createSizerAll(wxWindow*);
-    wxBoxSizer* createSizerCharacters(wxWindow*);
-    wxBoxSizer* createSizerCharacter(wxWindow*, int Row);
-    wxBoxSizer* createSizerControl(wxWindow*);
+    Pixels() { }
+    ~Pixels() { }
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
     static Pixels& getInstance() {
-        static Pixels* pSingletonInstance = new Pixels(0L, _("Wordclock Pixels"));
-        return *pSingletonInstance;
+        static Pixels SingletonInstance;
+        return SingletonInstance;
     }
 
     // get methods
@@ -165,12 +117,17 @@ class Pixels : public wxFrame
     void init(byte sPin) { Pin = sPin; }
     void enablePixels() { setBrightness(255); }
     void disablePixels() { setBrightness(0); }
-    void clearPixels();
+    void clearPixels() { setPixels(PixelType(0u, 0u, 0u)); }
+    /* On the hardware this hands the buffer to the strip. Here it only asks for a
+       render, which PixelsFrame picks up on the next tick. */
     StdReturnType show() {
-        Refresh();
+        Dirty = true;
         return E_OK;
     }
 
+    // render interface, for PixelsFrame and the tests
+    bool isDirty() const { return Dirty; }
+    void clearDirty() { Dirty = false; }
 };
 
 #endif // PIXELS_H

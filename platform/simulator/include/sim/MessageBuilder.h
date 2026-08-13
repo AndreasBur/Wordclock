@@ -30,7 +30,7 @@
 #include <wx/wx.h>
 #include <array>
 #include "StandardTypes.h"
-#include "Pixels.h"
+#include "PixelsFrame.h"
 #include "MessageCatalog.h"
 
 /******************************************************************************************************************************************************
@@ -131,7 +131,7 @@ class MessageBuilder : public wxDialog
     /* Parented to the pixel matrix window, so closing that one takes this along and the
        application can exit. */
     static MessageBuilder& getInstance() {
-        static MessageBuilder* pSingletonInstance = new MessageBuilder(&Pixels::getInstance(), _("Wordclock Message"));
+        static MessageBuilder* pSingletonInstance = new MessageBuilder(&PixelsFrame::getInstance(), _("Wordclock Message"));
         return *pSingletonInstance;
     }
 

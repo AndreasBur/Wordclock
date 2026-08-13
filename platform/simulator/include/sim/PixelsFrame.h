@@ -1,0 +1,133 @@
+/******************************************************************************************************************************************************
+ *  COPYRIGHT
+ *  ---------------------------------------------------------------------------------------------------------------------------------------------------
+ *  \verbatim
+ *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
+ *
+ *  \endverbatim
+ *  ---------------------------------------------------------------------------------------------------------------------------------------------------
+ *  FILE DESCRIPTION
+ *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
+/**     \file       PixelsFrame.h
+ *      \brief      Simulator LED matrix window
+ *
+ *      \details    wxWidgets frame that renders the Pixels buffer as the 10x11
+ *                  character grid. It is the only part of the pixel stand-in that needs
+ *                  a GUI, which is why it is a class of its own: the firmware talks to
+ *                  Pixels, and Pixels knows nothing about this.
+ *
+ *                  It also lays out the serial output and input controls, but only
+ *                  lays them out: what they mean belongs to SerialShim, which they are
+ *                  handed to.
+ *
+******************************************************************************************************************************************************/
+#ifndef PIXELS_FRAME_H
+#define PIXELS_FRAME_H
+
+/******************************************************************************************************************************************************
+ * I N C L U D E S
+******************************************************************************************************************************************************/
+#include <wx/wx.h>
+#include <wx/button.h>
+#include <cmath>
+#include <array>
+#include "StandardTypes.h"
+#include "Pixels.h"
+
+/******************************************************************************************************************************************************
+ *  C L A S S   P I X E L S   F R A M E
+******************************************************************************************************************************************************/
+class PixelsFrame : public wxFrame
+{
+/******************************************************************************************************************************************************
+ *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
+******************************************************************************************************************************************************/
+  public:
+    using PixelType = Pixels::PixelType;
+    using SizerCharactersType = std::array<wxBoxSizer*, PIXELS_DISPLAY_NUMBER_OF_ROWS>;
+
+/******************************************************************************************************************************************************
+ *  P R I V A T E   D A T A   A N D   F U N C T I O N S
+******************************************************************************************************************************************************/
+  private:
+    enum
+    {
+        ID_BUTTON_CLEAR = 1000,
+        ID_BUTTON_SEND,
+        ID_TEXT_CTRL_OUTPUT,
+        ID_TEXT_CTRL_INPUT,
+        ID_STATIC_BOX,
+        ID_BUTTON_CREATE,
+        /* No stock wx id fits the message builder, unlike Settings, About and Quit. */
+        ID_MENU_MESSAGE
+    };
+
+    wxStaticText* Characters[PIXELS_DISPLAY_NUMBER_OF_ROWS][PIXELS_DISPLAY_NUMBER_OF_COLUMNS];
+
+    static constexpr byte IntensityMaxValue{255u};
+    static constexpr byte UnlitLevel{192u};             /* wxLIGHT_GREY */
+
+    DECLARE_EVENT_TABLE()
+
+    // functions
+    /* The brightest channel decides how far the letter is pulled from the unlit colour
+       towards black. Colour itself cannot be shown on a light background — a white LED
+       at full would be invisible — so only the brightness is rendered. */
+    static byte getIntensity(PixelType Pixel) {
+        byte Intensity = Pixel.getRed();
+        if(Pixel.getGreen() > Intensity) { Intensity = Pixel.getGreen(); }
+        if(Pixel.getBlue() > Intensity) { Intensity = Pixel.getBlue(); }
+        return Intensity;
+    }
+
+    /* Weighted rather than proportional. Unlit letters sit at UnlitLevel and not at
+       black, which leaves the dark end of the range squeezed: proportionally, a pixel at
+       3 percent would land five levels off the unlit colour and be invisible, while on
+       real LEDs it is clearly visible against LEDs that are truly off. The square root
+       spreads the low end, which is also closer to how the eye reads brightness. */
+    static byte getWeightedIntensity(byte Intensity) {
+        return static_cast<byte>(std::sqrt(static_cast<double>(Intensity) * IntensityMaxValue));
+    }
+
+    /* Grey level of the letter, which the weighted intensity pulls from UnlitLevel
+       towards black. */
+    static constexpr byte toLevel(byte WeightedIntensity) {
+        return static_cast<byte>(UnlitLevel - ((UnlitLevel * WeightedIntensity) / IntensityMaxValue));
+    }
+
+    PixelsFrame(wxWindow*, const wxString&);
+    ~PixelsFrame();
+    void OnClose(wxCloseEvent&);
+    void OnClear(wxCommandEvent&);
+    void OnAbout(wxCommandEvent&);
+    void OnSend(wxCommandEvent&);
+    void OnSettings(wxCommandEvent&);
+    void OnMessage(wxCommandEvent&);
+    void OnQuit(wxCommandEvent&);
+    wxColour toColour(PixelType) const;
+    void renderPixel(byte Row, byte Column);
+    void renderAllPixels();
+    wxMenuBar* createMenuBar();
+    wxBoxSizer* createSizerAll(wxWindow*);
+    wxBoxSizer* createSizerCharacters(wxWindow*);
+    wxBoxSizer* createSizerCharacter(wxWindow*, int Row);
+    wxBoxSizer* createSizerControl(wxWindow*);
+
+/******************************************************************************************************************************************************
+ *  P U B L I C   F U N C T I O N S
+******************************************************************************************************************************************************/
+  public:
+    static PixelsFrame& getInstance() {
+        static PixelsFrame* pSingletonInstance = new PixelsFrame(0L, _("Wordclock Pixels"));
+        return *pSingletonInstance;
+    }
+
+    // methods
+    void render();
+};
+
+#endif // PIXELS_FRAME_H
+
+/******************************************************************************************************************************************************
+ *  E N D   O F   F I L E
+******************************************************************************************************************************************************/

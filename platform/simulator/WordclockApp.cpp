@@ -1,5 +1,5 @@
 #include "WordclockApp.h"
-#include "sim/Pixels.h"
+#include "sim/PixelsFrame.h"
 
 IMPLEMENT_APP(WordclockApp);
 
@@ -15,7 +15,7 @@ WordclockApp::WordclockApp() : Timer(this, TIMER_ID)
 
 bool WordclockApp::OnInit()
 {
-    Pixels::getInstance().Show();
+    PixelsFrame::getInstance().Show();
     return true;
 }
 
@@ -28,5 +28,8 @@ void WordclockApp::OnClose(wxCloseEvent &event)
 void WordclockApp::OnTimer(wxTimerEvent& event)
 {
     Wordclock.task();
+    /* After the firmware, not from inside its pixel writes: the window shows whatever
+       the buffer holds once the whole pass over the tasks is done. */
+    PixelsFrame::getInstance().render();
     UNUSED(event);
 }

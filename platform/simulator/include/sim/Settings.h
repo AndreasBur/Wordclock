@@ -26,7 +26,7 @@
 ******************************************************************************************************************************************************/
 #include <wx/wx.h>
 #include "StandardTypes.h"
-#include "Pixels.h"
+#include "PixelsFrame.h"
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
@@ -83,7 +83,7 @@ class Settings : public wxDialog
 ******************************************************************************************************************************************************/
   public:
     static Settings& getInstance() {
-        static Settings* pSingletonInstance = new Settings(&Pixels::getInstance(), _("Wordclock Settings"));
+        static Settings* pSingletonInstance = new Settings(&PixelsFrame::getInstance(), _("Wordclock Settings"));
         return *pSingletonInstance;
     }
 
