@@ -72,8 +72,9 @@ cmake --build build          # -> build/bin/Wordclock
 ## Screenshotting the simulator
 
 A layout change can be checked directly instead of asking someone to look. The tools
-(`imagemagick`, `xdotool`, `x11-utils`) are in the dev container. Three things have to
-line up, and each one silently produces an empty window list when it does not:
+(`imagemagick`, `xdotool`, `x11-utils`) are in the dev container. Four things have to
+line up, and each one leaves an empty window list or an empty call behind when it does
+not — none of them says what went wrong:
 
 1. **Disable the tool sandbox** for the call. Inside the sandbox a GUI process started
    from the shell is invisible to `xdotool`/`import`, which still connect to the real X
@@ -84,13 +85,24 @@ line up, and each one silently produces an empty window list when it does not:
    Wayland by default and no X11 tool can see the window.
 3. **Start the app inside the same call**, as `(cmd &)`. A separate background call, or
    `setsid`/`nohup`/`disown`, gets killed with exit 144.
+4. **Kill it with `pkill -x Wordclock`, never `pkill -f 'bin/Wordclock'`.** `-f` matches
+   whole command lines, and the calling shell's own command line contains the pattern —
+   so the shell kills itself, the call ends at exit 144, and everything after the `pkill`
+   silently never runs. That also looks like the app never opened a window when the
+   `pkill` sits at the start of the call.
 
 ```bash
 (GDK_BACKEND=x11 ./build/bin/Wordclock > run.log 2>&1 &) && sleep 6
 WIN=$(xdotool search --name "Wordclock Pixels" | head -1)
-import -window "$WIN" shot.png
-xdotool getwindowgeometry "$WIN"      # window size, useful for layout checks
-pkill -f 'bin/Wordclock'
+# Guard the empty case: `import -window ""` waits for the user to click a window and
+# takes the call into its timeout instead of failing.
+if [ -n "$WIN" ]; then
+    import -window "$WIN" shot.png
+    xdotool getwindowgeometry "$WIN"  # window size, useful for layout checks
+else
+    cat run.log                       # an X error here means the app died, not that it is hidden
+fi
+pkill -x Wordclock
 ```
 
 Then read `shot.png`. Two limits: the window pops up on the user's real desktop, so keep
@@ -98,3 +110,9 @@ the runs short and kill the process afterwards; and menus cannot be driven synth
 — Weston's X11 window manager sets no `_NET_ACTIVE_WINDOW`, so `windowactivate`, key
 mnemonics and clicks on menu items do nothing. Anything behind a menu still has to be
 checked by hand.
+
+An X error in `run.log` — `BadAccess ... MIT-SHM` in particular — is worth a plain retry
+before it is taken as evidence against the change under test. It also comes out of a
+wedged X connection, for instance after an earlier `import` was left waiting for a click,
+and then disappears on the next run. Build the previous commit into a second directory and
+run that to tell the two apart.
