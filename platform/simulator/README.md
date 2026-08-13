@@ -141,11 +141,14 @@ platform/simulator/
 
 ## How it works
 
-`WordclockApp` starts a 10 ms `wxTimer` that calls `WordclockMain::task()`,
-which feeds the current wall-clock time into the firmware's `RealTimeClock` and
-runs the `Scheduler`. That is all this layer does: what reaches the display is
-decided by the firmware's `DisplayManager`, so the hardware backend will behave
-the same without repeating any of it.
+`WordclockApp` starts a `wxTimer` at `Scheduler::getTaskIntervalMs()` that calls
+`WordclockMain::task()`, which ticks the simulated `RealTimeClock` and then runs
+the `Scheduler`. The host clock is read once, when `WordclockMain` is
+constructed; from there the `RealTimeClock` advances itself off a monotonic
+clock, so a time set over the serial console keeps running instead of being
+overwritten on the next tick, exactly as a real RTC would. That is all this layer
+does: what reaches the display is decided by the firmware's `DisplayManager`, so
+the hardware backend will behave the same without repeating any of it.
 
 Every "LED" write ends up recolouring a `wxStaticText` cell in the matrix — lit
 letters turn dark, unlit ones stay light grey. The right-hand console mirrors the
