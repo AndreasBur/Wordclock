@@ -25,15 +25,18 @@
 /******************************************************************************************************************************************************
  * I N C L U D E S
 ******************************************************************************************************************************************************/
-#include "Arduino.h"
-
+/* The framework headers come first, ahead of this platform's Arduino.h: that one binds
+   Serial to WordclockSerial, and the macro would otherwise reach into them. */
 #include <WiFi.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 
+#include "Arduino.h"
+
 #include "Pixels.h"
 #include "RealTimeClock.h"
 #include "Scheduler.h"
+#include "WebInterface.h"
 #include "WordclockConfiguration.h"
 #include "WordclockMain.h"
 
@@ -123,6 +126,10 @@ void setup()
 
     startWifi();
     startTimeSync();
+    /* Before the network is up on purpose: the server listens on whatever address arrives
+       later, and starting it here keeps the order in setup() the same whether there is a
+       WiFi or not. */
+    WebInterface::getInstance().begin();
 
     LastWakeTime = xTaskGetTickCount();
 } /* setup */
@@ -144,6 +151,10 @@ void loop()
     /* After the firmware, not from inside its pixel writes: the strip gets whatever the
        buffer holds once the whole pass over the tasks is done. */
     Pixels::getInstance().render();
+
+    /* After the strip, so a watching browser is shown the frame that went out rather than
+       one the firmware is still assembling. */
+    WebInterface::getInstance().broadcastFrame();
 
     reportProgress();
 

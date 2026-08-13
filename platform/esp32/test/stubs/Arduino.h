@@ -1,0 +1,34 @@
+/* Stand-in for the ESP32 Arduino core, enough of it to compile and link the backend on
+   the host. Serial here is the *hardware* port: platform/esp32/include/Arduino.h shadows
+   this file, captures this object, and rebinds Serial to WordclockSerial. */
+#ifndef _ARDUINO_H_
+#define _ARDUINO_H_
+#include <stdint.h>
+#include <string.h>
+#include <stdlib.h>
+#include <string>
+#include <vector>
+typedef uint8_t byte;
+typedef bool boolean;
+#define PROGMEM
+#define F(x) reinterpret_cast<const __FlashStringHelper*>(x)
+#define pgm_read_byte(x) (*(x))
+#define memcpy_P(x,y,z) memcpy((x),(y),(z))
+#define bitRead(v,b) (((v) >> (b)) & 0x01)
+#define SDA 8
+#define SCL 9
+class __FlashStringHelper;
+char* itoa(int, char*, int);
+void configTzTime(const char*, const char*, const char* = nullptr);
+
+/* The test drives Incoming and inspects Written. */
+struct Stream {
+    std::string Incoming;
+    std::string Written;
+    void begin(unsigned long) {}
+    int available() { return static_cast<int>(Incoming.size()); }
+    int read() { if(Incoming.empty()) return -1; int c = static_cast<unsigned char>(Incoming[0]); Incoming.erase(0,1); return c; }
+    size_t write(uint8_t b) { Written.push_back(static_cast<char>(b)); return 1; }
+};
+extern Stream Serial;
+#endif

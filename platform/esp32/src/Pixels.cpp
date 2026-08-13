@@ -21,12 +21,12 @@
 /******************************************************************************************************************************************************
  * I N C L U D E S
 ******************************************************************************************************************************************************/
-#include "Pixels.h"
-
-#include "Arduino.h"
-
+/* The driver headers first, ahead of the Arduino.h that binds Serial to a macro. */
 #include <driver/rmt_tx.h>
 #include <esp_err.h>
+
+#include "Arduino.h"
+#include "Pixels.h"
 
 #include <cassert>
 

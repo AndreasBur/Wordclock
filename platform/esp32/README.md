@@ -1,9 +1,13 @@
 # ESP32 platform
 
-The on-device backend of the Wordclock firmware. It supplies the four headers the
-core reaches the hardware through — `Pixels.h`, `RealTimeClock.h`, `BH1750.h` and
-(from the Arduino core) `Arduino.h` — plus the application entry point. See
+The on-device backend of the Wordclock firmware. It supplies the headers the core
+reaches the hardware through — `Pixels.h`, `RealTimeClock.h`, `BH1750.h`, `Storage.h`
+and `Arduino.h` — plus the application entry point. See
 [../hardware/README.md](../hardware/README.md) for the contract these fulfil.
+
+Its `Arduino.h` is not a reimplementation: it includes the Arduino core's own and
+replaces exactly one thing, `Serial`. See *A second front end reaches the same port*
+below for why.
 
 The clock logic itself is not copied in here. `platformio.ini` compiles
 [`../../firmware/src`](../../firmware/src) directly and
@@ -19,23 +23,73 @@ pio run -t upload -d platform/esp32       # build and flash
 pio device monitor -d platform/esp32      # serial console, 115200 baud
 ```
 
+### PlatformIO in the dev container
+
+The container has no PlatformIO of its own yet. Installing it by hand:
+
+```bash
+sudo apt-get install -y --no-install-recommends python3 python3-venv
+python3 -m venv ~/.pio-venv && ~/.pio-venv/bin/pip install platformio
+export PATH="$HOME/.pio-venv/bin:$PATH"
+```
+
+Behind a TLS-intercepting proxy there is one trap worth knowing, because the error names
+neither the proxy nor the cause: PlatformIO downloads with `requests` and passes its own
+`certifi` bundle explicitly, so it ignores `REQUESTS_CA_BUNDLE` and fails with
+`CERTIFICATE_VERIFY_FAILED: self-signed certificate in certificate chain` while `curl`
+and `git` reach the same URL. Appending the container's trust store to that bundle fixes
+it without turning verification off:
+
+```bash
+cat /etc/ssl/certs/ca-certificates.crt | \
+    sudo tee -a "$(~/.pio-venv/bin/python -c 'import certifi;print(certifi.where())')" > /dev/null
+```
+
+The pioarduino platform builds a second virtual environment under
+`~/.platformio/penv` with its own copy, which needs the same treatment.
+
 CMake refuses this platform on purpose — `-DPLATFORM=esp32` prints the PlatformIO
 command instead.
 
 **Arduino core 3.x (ESP-IDF ≥ 5.1) is required**, because `Pixels.cpp` uses the IDF 5
-RMT driver `<driver/rmt_tx.h>`. Core 2.x ships IDF 4.4, which has only the older
-`<driver/rmt.h>` with different types, so the build fails on that include rather than
-misbehaving later. `platformio.ini` notes where a core 3.x platform comes from.
+RMT driver `<driver/rmt_tx.h>`. The registry's `espressif32` does **not** provide it —
+version 7.0.1 still ships `framework-arduinoespressif32@3.20017`, which is core 2.0.17 on
+IDF 4.4, and the build fails on exactly that include. `platformio.ini` therefore pins the
+pioarduino fork of the platform, which carries core 3.3.11. Both halves of that were
+measured, not assumed.
 
 ### Verification status
 
-This backend was written and checked without an ESP32 toolchain in reach. What has been
-verified: the firmware core plus all four translation units here compile clean under
-`-Wall -Wextra`, they link with no undefined symbols, and the frame `Pixels::render()`
-produces was checked byte for byte against a captured transmission — channel order,
-index-to-offset mapping, the dirty-flag suppression and the master brightness. What has
-**not** been run is the real toolchain, so the ESP-IDF API names and the timing on an
-actual strip are still unconfirmed.
+**Builds for real.** `pio run` produces a firmware image for the ESP32-S3 with **no
+warnings** from any file in this repository:
+
+```
+RAM:    10.8%  of 320 KB
+Flash:  17.5%  of 3.2 MB
+```
+
+Rounded on purpose: the exact byte count moves with every edit to the page, and a figure
+that rots on each commit is worse than none.
+
+A clean build takes about two minutes because it compiles the Arduino core alongside;
+changing one file of ours is about seven seconds.
+
+**And it is exercised**, by the host tests in [`test/`](test/README.md):
+
+```bash
+platform/esp32/test/run.sh              # build and run them
+platform/esp32/test/run.sh serve 8080   # the console on localhost, firmware behind it
+```
+
+Those compile the backend against stand-ins for the framework, so they reach everything
+above the peripherals: the frame `Pixels::render()` hands over, byte for byte; that an
+injected command takes the same path through `Communication` as one typed on the wire; and
+the handlers, driven through the same registration call the server makes. `serve` puts the
+real firmware behind the page on localhost, which is how the browser side is worked on
+without flashing.
+
+**What no test here can reach is the hardware itself**: the pulse timing on a real strip,
+whether the BH1750 answers on its bus, and whether SNTP arrives. Those need a board.
 
 ## Configuration
 
@@ -65,10 +119,10 @@ every other display parameter, and the backend takes what `Display::init()` hand
 | `RealTimeClock` | counts a host clock forward | reads the system clock, which SNTP sets |
 | `BH1750` | returns what a slider dialled in | reads the sensor over I²C |
 | `Storage` | a file in the working directory | one blob in the NVS partition |
-| `Serial` | routed into two text controls | UART0 over USB |
+| `Serial` | routed into two text controls | UART0, plus characters a second front end injects |
 | tick | wxTimer | `vTaskDelayUntil` in `loop()` |
 
-Three details are worth knowing before changing anything here.
+Four details are worth knowing before changing anything here.
 
 **The frame goes out once per tick, not from `show()`.** Several modules call
 `Display::show()` within a single tick — DisplayManager, Animations, Text, Clock and two
@@ -87,6 +141,57 @@ silence.
 `BH1750` private and its own `init()` is declared but never defined, so there is no
 place in the core to initialise the sensor from. Doing it lazily also retries, which is
 what a sensor that is not answering yet after power-on needs.
+
+**A second front end reaches the same port.** `Communication` reads its commands one
+character at a time out of `Serial`, and every answer goes back through it, so a web
+socket needs no protocol of its own - it needs to reach that object. This platform's
+`Arduino.h` therefore includes the core's and then binds `Serial` to `WordclockSerial`,
+which reads the UART first and injected characters second, and hands each finished line
+to a sink. Two consequences: the framework's own headers must be included **before** this
+`Arduino.h` in any platform source, or the macro reaches into them; and the core's header
+is reached through a path the build script passes in rather than through `include_next`,
+which re-finds this file and lets its include guard swallow the real one.
+
+## Web console
+
+The clock serves a page at `http://wordclock.local/` - a console that speaks the same
+commands as the wire, because its web socket is wired straight to the port `Communication`
+reads from. Nothing about the protocol is repeated in the browser.
+
+Above the log it shows the panel itself: the letters come from `GET /display`, which the
+clock generates from `DisplayCharacters`, and the colours arrive as binary frames on the
+same socket - 330 bytes in the strip's own byte order, at most every 50 ms and only when
+they changed. A client that connects to a standing display is sent the current frame at
+once, or it would wait for the next change; on a word clock that can be five minutes.
+
+Unlike the wx window this shows the **real colour**. That one renders a pixel's brightness
+as a grey level and drops the hue, which is why the colour swap in `Pixel` could hide there
+for as long as it did.
+
+It also carries a command builder, and that form is not written down in the page either:
+`GET /commands` serves `MessageCatalog` as JSON, and the page generates the dropdown, the
+option rows, the ranges and the named values from it. The same table the simulator's
+message builder derives its dialog from - so a command added there appears in both front
+ends and on the wire at once, with nothing to keep in step by hand. The built command goes
+into the input field rather than straight onto the wire, so it can still be corrected,
+exactly as the wx builder's Insert does.
+
+The page is [`web/index.html`](web/index.html), one self-contained file with its CSS and
+script inline: the clock has nowhere to fetch anything from. It is **not** uploaded
+separately. [`scripts/embed_web.py`](scripts/embed_web.py) gzips it at build time and emits
+it as an array **into the build directory**, so `pio run -t upload` ships page and firmware
+together and their versions cannot drift apart - the failure a second partition invites.
+The generated header is a build product on purpose; a checked-in one rots the moment
+someone edits the HTML and forgets to regenerate it. At the moment that is 18.5 KB of
+source, 6.0 KB compressed, and the default partition table is untouched.
+
+It follows the system's light or dark preference, with a button in the header that
+overrides it and remembers the choice. Light is the base: the clock's own look is amber on
+near-black, but the console is usually read next to other light windows.
+
+While the layout is being worked on there is no need to flash: open `web/index.html`
+straight from disk and it asks for the clock's address instead of using its own host. The
+edit cycle is then a browser reload.
 
 ## Hardware notes
 
@@ -112,4 +217,7 @@ what a sensor that is not answering yet after power-on needs.
 - **No time source without the network.** No RTC chip is read, so between power-on and the
   first SNTP answer the display holds its default date. A DS3231 on the same I²C bus is
   the fix for the stromless case.
-- **No web interface yet.** The serial command set works over UART0 only.
+- **No view of the letter grid yet.** The console shows the answers, not the display. The
+  pixel buffer over the same socket is the next step.
+- **No authentication.** Anyone on the network can send commands. Fine behind a home
+  router, not on an open network.
