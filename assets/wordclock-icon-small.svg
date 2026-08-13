@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <title>Wordclock</title>
+  <!-- The small step, for 32 pixels and below, where eleven columns are barely one
+       pixel each. Only the lit words survive, as bars in the positions they occupy
+       in the grid - so the silhouette is the same one the larger sizes show:
+       two short bars above, two long ones in the middle. -->
+  <rect width="256" height="256" rx="51.2" fill="#0E0E11"/>
+  <g fill="#FFB020">
+    <rect x="35.84" y="66.56" width="32.51" height="33.28" rx="16.64"/>  <!-- ES -->
+    <rect x="86.11" y="66.56" width="49.27" height="33.28" rx="16.64"/>  <!-- IST -->
+    <rect x="35.84" y="156.16" width="66.03" height="33.28" rx="16.64"/>  <!-- HALB -->
+    <rect x="119.62" y="156.16" width="82.78" height="33.28" rx="16.64"/>  <!-- ZWOELF -->
+  </g>
+</svg>
