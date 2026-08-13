@@ -23,6 +23,7 @@
 #include "Arduino.h"
 
 #include "Communication.h"
+#include "MessageCatalog.h"
 #include "WebInterface.h"
 #include "WebPage.h"
 
@@ -59,6 +60,131 @@ esp_err_t handleRoot(httpd_req_t* Request)
     httpd_resp_set_hdr(Request, "Content-Encoding", "gzip");
 
     return httpd_resp_send(Request, reinterpret_cast<const char*>(WebPageGzip), WebPageGzipSize);
+}
+
+
+/******************************************************************************************************************************************************
+  C H U N K   W R I T E R
+******************************************************************************************************************************************************/
+/* Collects the catalog's JSON in a small buffer and hands it over in chunks, so neither the
+   whole document nor any allocation is needed to serve it. */
+class ChunkWriter
+{
+  private:
+    static constexpr size_t Capacity{256u};
+
+    httpd_req_t* Request;
+    char Buffer[Capacity]{};
+    size_t Used{0u};
+
+    void flush() {
+        if(Used == 0u) { return; }
+
+        httpd_resp_send_chunk(Request, Buffer, Used);
+        Used = 0u;
+    }
+
+  public:
+    explicit ChunkWriter(httpd_req_t* sRequest) : Request(sRequest) { }
+
+    void put(char Character) {
+        if(Used == Capacity) { flush(); }
+
+        Buffer[Used++] = Character;
+    }
+
+    void put(const char* Text) {
+        if(Text == nullptr) { return; }
+
+        for(const char* Character = Text; *Character != '\0'; Character++) { put(*Character); }
+    }
+
+    void putNumber(uint16_t Number) {
+        char Digits[8]{};
+
+        snprintf(Digits, sizeof(Digits), "%u", static_cast<unsigned>(Number));
+        put(Digits);
+    }
+
+    /* Escaped, because a label is data: a quote in one would otherwise produce a document
+       the browser refuses whole, and that failure looks like a server fault. */
+    void putString(const char* Text) {
+        put('"');
+        for(const char* Character = Text; (Text != nullptr) && (*Character != '\0'); Character++) {
+            if((*Character == '"') || (*Character == '\\')) { put('\\'); }
+            put(*Character);
+        }
+        put('"');
+    }
+
+    /* The empty chunk is what ends a chunked response. */
+    void finish() {
+        flush();
+        httpd_resp_send_chunk(Request, nullptr, 0);
+    }
+};
+
+/******************************************************************************************************************************************************
+  handleCommands()
+******************************************************************************************************************************************************/
+/*! \brief          Serves the command catalog, so the page can build its own form
+ *  \details        Generated from MessageCatalog rather than written out a second time.
+ *                  That table is what the simulator's message builder derives its whole
+ *                  dialog from, down to the input hints; serving it here makes the browser
+ *                  a second renderer of the same description, so a command added to the
+ *                  catalog shows up in both front ends and on the wire at once.
+ *
+ *  \return         ESP_OK
+******************************************************************************************************************************************************/
+esp_err_t handleCommands(httpd_req_t* Request)
+{
+    httpd_resp_set_type(Request, "application/json");
+
+    ChunkWriter Writer(Request);
+    Writer.put('[');
+
+    for(byte Index = 0u; Index < MessageCatalog::getNumberOfCommands(); Index++) {
+        const MessageCatalog::CommandType& Command = MessageCatalog::getCommand(Index);
+
+        if(Index > 0u) { Writer.put(','); }
+        Writer.put("{\"number\":");
+        Writer.putNumber(Command.Number);
+        Writer.put(",\"label\":");
+        Writer.putString(Command.Label);
+        Writer.put(",\"options\":[");
+
+        for(byte OptionIndex = 0u; OptionIndex < Command.NumberOfOptions; OptionIndex++) {
+            const MessageCatalog::OptionType& Option = Command.Options[OptionIndex];
+
+            if(OptionIndex > 0u) { Writer.put(','); }
+            Writer.put("{\"short\":\"");
+            Writer.put(Option.ShortName);
+            Writer.put("\",\"label\":");
+            Writer.putString(Option.Label);
+            Writer.put(",\"type\":");
+            Writer.putNumber(static_cast<uint16_t>(Option.Argument));
+            Writer.put(",\"min\":");
+            Writer.putNumber(Option.Minimum);
+            Writer.put(",\"max\":");
+            Writer.putNumber(Option.Maximum);
+
+            if((Option.ValueNames != nullptr) && (Option.NumberOfValueNames > 0u)) {
+                Writer.put(",\"values\":[");
+                for(byte NameIndex = 0u; NameIndex < Option.NumberOfValueNames; NameIndex++) {
+                    if(NameIndex > 0u) { Writer.put(','); }
+                    Writer.putString(Option.ValueNames[NameIndex]);
+                }
+                Writer.put(']');
+            }
+            Writer.put('}');
+        }
+        Writer.put("]}");
+    }
+
+    Writer.put(']');
+    Writer.finish();
+
+    return ESP_OK;
 }
 
 
@@ -156,9 +282,11 @@ StdReturnType WebInterface::begin()
     }
 
     static const httpd_uri_t RootUri{"/", HTTP_GET, handleRoot, nullptr, false, false, nullptr};
+    static const httpd_uri_t CommandsUri{"/commands", HTTP_GET, handleCommands, nullptr, false, false, nullptr};
     static const httpd_uri_t SocketUri{"/ws", HTTP_GET, handleSocket, nullptr, true, false, nullptr};
 
     httpd_register_uri_handler(Server, &RootUri);
+    httpd_register_uri_handler(Server, &CommandsUri);
     httpd_register_uri_handler(Server, &SocketUri);
 
     /* Only now, so a line printed during startup cannot reach a half-built server. */

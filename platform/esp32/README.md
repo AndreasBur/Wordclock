@@ -45,7 +45,9 @@ brightness); and an injected command was driven through `Communication` to its a
 wire. The web socket handler was driven the same way, through the registration call
 the server makes: a frame carrying `3 -B200` reached the parser and `3 B=200 A=0 G=0` came
 back out over the socket, the page is served as a real gzip stream, and an oversized frame
-is refused rather than truncated into the parser. What has **not** been run is the real toolchain, so the ESP-IDF API names and the
+is refused rather than truncated into the parser. The catalog endpoint was checked the same way:
+it is a balanced JSON array of 11 commands in 4.2 KB, carrying the option short names, the
+ranges and the named values. What has **not** been run is the real toolchain, so the ESP-IDF API names and the
 timing on an actual strip are still unconfirmed.
 
 ## Configuration
@@ -115,14 +117,22 @@ The clock serves a page at `http://wordclock.local/` - a console that speaks the
 commands as the wire, because its web socket is wired straight to the port `Communication`
 reads from. Nothing about the protocol is repeated in the browser.
 
+It also carries a command builder, and that form is not written down in the page either:
+`GET /commands` serves `MessageCatalog` as JSON, and the page generates the dropdown, the
+option rows, the ranges and the named values from it. The same table the simulator's
+message builder derives its dialog from - so a command added there appears in both front
+ends and on the wire at once, with nothing to keep in step by hand. The built command goes
+into the input field rather than straight onto the wire, so it can still be corrected,
+exactly as the wx builder's Insert does.
+
 The page is [`web/index.html`](web/index.html), one self-contained file with its CSS and
 script inline: the clock has nowhere to fetch anything from. It is **not** uploaded
 separately. [`scripts/embed_web.py`](scripts/embed_web.py) gzips it at build time and emits
 it as an array **into the build directory**, so `pio run -t upload` ships page and firmware
 together and their versions cannot drift apart - the failure a second partition invites.
 The generated header is a build product on purpose; a checked-in one rots the moment
-someone edits the HTML and forgets to regenerate it. At the moment that is 4.8 KB of
-source, 2.0 KB compressed, and the default partition table is untouched.
+someone edits the HTML and forgets to regenerate it. At the moment that is 10.6 KB of
+source, 3.6 KB compressed, and the default partition table is untouched.
 
 While the layout is being worked on there is no need to flash: open `web/index.html`
 straight from disk and it asks for the clock's address instead of using its own host. The
@@ -152,7 +162,7 @@ edit cycle is then a browser reload.
 - **No time source without the network.** No RTC chip is read, so between power-on and the
   first SNTP answer the display holds its default date. A DS3231 on the same I²C bus is
   the fix for the stromless case.
-- **The web console has no command form yet.** Commands are typed as text; a form built
-  from `MessageCatalog`, and a view of the letter grid, are the next step.
+- **No view of the letter grid yet.** The console shows the answers, not the display. The
+  pixel buffer over the same socket is the next step.
 - **No authentication.** Anyone on the network can send commands. Fine behind a home
   router, not on an open network.

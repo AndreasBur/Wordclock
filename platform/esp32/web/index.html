@@ -58,7 +58,7 @@
         padding: 12px 18px;
         border-top: 1px solid var(--line);
     }
-    input, button {
+    input, button, select {
         font: inherit;
         color: inherit;
         background: #17171b;
@@ -67,8 +67,27 @@
         padding: 8px 12px;
     }
     input { flex: 1; min-width: 0; }
-    input:focus, button:focus { outline: 2px solid var(--lit); outline-offset: 1px; }
+    input:focus, button:focus, select:focus { outline: 2px solid var(--lit); outline-offset: 1px; }
     button { color: var(--lit); cursor: pointer; }
+
+    /* The builder. Collapsed by default: typing a command is the faster path once one
+       knows it, and the form is what makes it findable in the first place. */
+    details { border-top: 1px solid var(--line); }
+    summary { padding: 10px 18px; cursor: pointer; color: var(--lit); }
+    #builder { padding: 0 18px 12px; display: grid; gap: 8px; }
+    .row { display: grid; grid-template-columns: 22px 1fr 1fr; gap: 10px; align-items: center; }
+    .row label { color: var(--unlit); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .row input[type=checkbox] { flex: none; width: 16px; height: 16px; accent-color: var(--lit); }
+    #preview {
+        font-family: inherit;
+        color: var(--lit);
+        background: #17171b;
+        border: 1px dashed var(--line);
+        border-radius: 6px;
+        padding: 8px 12px;
+        min-height: 20px;
+        word-break: break-all;
+    }
 </style>
 
 <header>
@@ -77,6 +96,16 @@
 </header>
 
 <div id="log"></div>
+
+<details id="builderBox">
+    <summary>Build a command</summary>
+    <div id="builder">
+        <select id="commands"></select>
+        <div id="options"></div>
+        <div id="preview"></div>
+        <button type="button" id="use">Use</button>
+    </div>
+</details>
 
 <form id="entry">
     <input id="command" placeholder="command, e.g. 3 -B255" autocomplete="off" spellcheck="false" autofocus>
@@ -87,7 +116,7 @@
     const log = document.getElementById('log');
     const state = document.getElementById('state');
     const entry = document.getElementById('entry');
-    const command = document.getElementById('command');
+    const commandInput = document.getElementById('command');
 
     function append(text, kind) {
         const line = document.createElement('div');
@@ -133,14 +162,133 @@
         socket.onerror = () => append('connection failed', 'note');
     }
 
+    /* ---- the command builder ------------------------------------------------------
+       Everything below is generated from what /commands serves, which the clock in turn
+       generates from MessageCatalog. Nothing about the commands is written down here, so
+       a command added to that table appears in this form on its own. */
+    const TYPE_STRING = 2;   /* MessageCatalog::ARGUMENT_TYPE_STRING */
+
+    const commandsSelect = document.getElementById('commands');
+    const optionsBox = document.getElementById('options');
+    const preview = document.getElementById('preview');
+    let catalog = [];
+
+    function selectedCommand() {
+        return catalog[commandsSelect.selectedIndex];
+    }
+
+    /* "2 -R255 -G128" - the same shape the wx message builder produces, because it is the
+       shape the parser expects. */
+    function buildCommand() {
+        const command = selectedCommand();
+        if (!command) { return ''; }
+
+        let text = String(command.number);
+        for (const row of optionsBox.children) {
+            if (!row.querySelector('input[type=checkbox]').checked) { continue; }
+            const field = row.querySelector('[data-value]');
+            text += ' -' + row.dataset.short + (field ? field.value : '');
+        }
+        return text;
+    }
+
+    function refreshPreview() {
+        preview.textContent = buildCommand();
+    }
+
+    function optionField(option) {
+        /* Named values become a dropdown, so they are picked by name rather than by the
+           number the protocol carries - which is the whole point of the catalog. */
+        if (option.values) {
+            const select = document.createElement('select');
+            select.dataset.value = '';
+            option.values.forEach((name, index) => {
+                const item = document.createElement('option');
+                item.value = String(option.min + index);
+                item.textContent = (option.min + index) + '  ' + name;
+                select.appendChild(item);
+            });
+            return select;
+        }
+
+        const field = document.createElement('input');
+        field.dataset.value = '';
+        if (option.type === TYPE_STRING) {
+            field.placeholder = 'text';
+        } else {
+            field.type = 'number';
+            field.min = option.min;
+            field.max = option.max;
+            field.placeholder = option.min + '..' + option.max;
+        }
+        return field;
+    }
+
+    function showOptions() {
+        optionsBox.textContent = '';
+        const command = selectedCommand();
+        if (!command) { refreshPreview(); return; }
+
+        for (const option of command.options) {
+            const row = document.createElement('div');
+            row.className = 'row';
+            row.dataset.short = option.short;
+
+            const use = document.createElement('input');
+            use.type = 'checkbox';
+
+            const label = document.createElement('label');
+            label.textContent = '-' + option.short + '  ' + option.label;
+
+            row.append(use, label, optionField(option));
+            optionsBox.appendChild(row);
+        }
+        refreshPreview();
+    }
+
+    commandsSelect.addEventListener('change', showOptions);
+    optionsBox.addEventListener('input', refreshPreview);
+    optionsBox.addEventListener('change', refreshPreview);
+
+    /* Into the input field rather than straight onto the wire, so it can still be looked
+       over and corrected - the same thing the wx builder's Insert does. */
+    document.getElementById('use').addEventListener('click', () => {
+        commandInput.value = buildCommand();
+        document.getElementById('builderBox').open = false;
+        commandInput.focus();
+    });
+
+    /* Same fallback as the socket: opened from disk there is no own host to ask, so the
+       address the socket already stored is used. */
+    function catalogUrl() {
+        if (location.protocol === 'file:') {
+            const host = localStorage.getItem('wordclock-host');
+            return host ? 'http://' + host + '/commands' : 'commands';
+        }
+        return 'commands';
+    }
+
+    fetch(catalogUrl())
+        .then((response) => response.json())
+        .then((loaded) => {
+            catalog = loaded;
+            for (const entry of catalog) {
+                const item = document.createElement('option');
+                item.textContent = entry.number + '  ' + entry.label;
+                commandsSelect.appendChild(item);
+            }
+            showOptions();
+        })
+        .catch(() => append('the command catalog could not be loaded', 'note'));
+
     entry.addEventListener('submit', (event) => {
         event.preventDefault();
-        const text = command.value.trim();
+        const text = commandInput.value.trim();
         if (!text || !socket || socket.readyState !== WebSocket.OPEN) { return; }
 
         append(text, 'in');
         socket.send(text);
-        command.value = '';
+        commandInput.value = '';
     });
 
     connect();
