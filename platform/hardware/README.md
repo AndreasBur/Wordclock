@@ -37,6 +37,14 @@ implementation to mirror.
 | `BH1750.h` | Ambient-light driver exposing the illuminance reading the core consumes | BH1750 over I²C |
 | app entry point | Equivalent of the simulator's `WordclockApp` / `WordclockMain`: initialise, then repeatedly tick `Scheduler::task()` and update the `RealTimeClock` | AVR `main()` / `setup()` + `loop()` |
 
+The tick has to come every `Scheduler::getTaskIntervalMs()` milliseconds: every
+module's task cycle counts in that unit, so a tick at another rate silently
+rescales animation speed, the sensor's sampling interval and the serial poll rate
+alike. Read the value rather than repeating the number, as the simulator's timer
+does; a backend whose timer cannot be set that freely changes
+`SCHEDULER_TASK_INTERVAL_MS` instead. Note that the BH1750 needs roughly 120 ms
+per high-resolution conversion, which its task cycle must stay above.
+
 ## Suggested port path
 
 Reuse the concrete drivers already present in

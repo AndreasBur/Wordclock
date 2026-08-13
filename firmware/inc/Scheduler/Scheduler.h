@@ -28,6 +28,12 @@
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
+/* Scheduler configuration parameter */
+/* Milliseconds between two task() calls, and thereby the unit every module's task
+   cycle counts in. A platform whose tick comes from a timer it cannot set freely
+   overrides this; getTaskIntervalMs() is what the platform's tick source reads. */
+#define SCHEDULER_TASK_INTERVAL_MS          10u
+
 /******************************************************************************************************************************************************
  *  G L O B A L   F U N C T I O N   M A C R O S
 ******************************************************************************************************************************************************/
@@ -57,7 +63,7 @@ class Scheduler
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    static constexpr byte TaskIntervalMs{10u};
+    static constexpr byte TaskIntervalMs{SCHEDULER_TASK_INTERVAL_MS};
 
     using RemainingTicksType = byte;
     std::array<RemainingTicksType, TASK_ID_NUMBER_OF_TASKS> RemainingTicks{};
