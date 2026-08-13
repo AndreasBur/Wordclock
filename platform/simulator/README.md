@@ -148,6 +148,7 @@ platform/simulator/
 │   │   ├── BH1750.h      ambient-light sensor
 │   │   ├── SerialShim.h  the port Serial is bound to
 │   │   ├── Settings.h    stand-ins for absent hardware
+│   │   ├── Storage.h     settings store, backed by a file
 │   │   ├── MessageBuilder.h  puts a command together, from the command catalog
 │   │   └── MessageDecoder.h  reads an answer back into names
 │   ├── Arduino.h         Arduino-core shim (Serial, PROGMEM, itoa, …)
@@ -164,7 +165,10 @@ platform/simulator/
 
 `WordclockApp` starts a `wxTimer` at `Scheduler::getTaskIntervalMs()` that calls
 `WordclockMain::task()`, which ticks the simulated `RealTimeClock` and then runs
-the `Scheduler`. The host clock is read once, when `WordclockMain` is
+the `Scheduler`. Before the first tick, `WordclockMain` restores the stored
+settings, which `Storage` keeps in a `wordclock-settings.bin` in the working
+directory — a real file rather than a buffer, so the persistence path is exercised
+here rather than only on the device. The host clock is read once, when `WordclockMain` is
 constructed; from there the `RealTimeClock` advances itself off a monotonic
 clock, so a time set over the serial console keeps running instead of being
 overwritten on the next tick, exactly as a real RTC would. That is all this layer

@@ -41,7 +41,8 @@ set(SHIM_SOURCES
     src/Settings.cpp
     src/MessageBuilder.cpp
     src/MessageDecoder.cpp
-    src/SerialShim.cpp)
+    src/SerialShim.cpp
+    src/Storage.cpp)
 
 # On Linux/macOS the window icon is loaded from the XPM array (see src/PixelsFrame.cpp),
 # gated behind the PIXELS define that the old Code::Blocks projects set.

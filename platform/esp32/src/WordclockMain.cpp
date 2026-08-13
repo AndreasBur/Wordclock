@@ -19,6 +19,7 @@
 #include "WordclockMain.h"
 
 #include "Display.h"
+#include "Persistence.h"
 #include "RealTimeClock.h"
 
 /******************************************************************************************************************************************************
@@ -41,6 +42,10 @@
 void WordclockMain::init()
 {
     Display::getInstance().init();
+    /* After the display, because restoring the brightness recalculates what reaches the
+       LEDs, and before the first task, so the strip's first frame already carries the
+       stored colour. */
+    Persistence::getInstance().load();
 } /* init */
 
 

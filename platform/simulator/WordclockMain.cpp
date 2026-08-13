@@ -1,5 +1,6 @@
 #include "WordclockMain.h"
 
+#include "Persistence.h"
 #include "sim/RealTimeClock.h"
 
 namespace {
@@ -23,6 +24,9 @@ ClockDateTime getSystemDateTime()
 WordclockMain::WordclockMain()
 {
     RealTimeClock::getInstance().setDateTime(getSystemDateTime());
+    /* Before the first task, so the window's first paint already shows the restored
+       colour and mode rather than the defaults for a tick. */
+    Persistence::getInstance().load();
 }
 
 WordclockMain::~WordclockMain()

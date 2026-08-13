@@ -15,6 +15,9 @@ compile_commands.json
 # Network credentials of the ESP32 backend (local only, see WordclockConfiguration.h)
 WordclockSecrets.h
 
+# Settings the simulator persists next to wherever it was started
+wordclock-settings.bin
+
 # Code::Blocks generated artifacts
 *.depend
 *.layout

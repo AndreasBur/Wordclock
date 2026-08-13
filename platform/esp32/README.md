@@ -64,6 +64,7 @@ every other display parameter, and the backend takes what `Display::init()` hand
 | `Pixels` | writes into a window | WS2812 over the RMT peripheral, DMA-fed |
 | `RealTimeClock` | counts a host clock forward | reads the system clock, which SNTP sets |
 | `BH1750` | returns what a slider dialled in | reads the sensor over I²C |
+| `Storage` | a file in the working directory | one blob in the NVS partition |
 | `Serial` | routed into two text controls | UART0 over USB |
 | tick | wxTimer | `vTaskDelayUntil` in `loop()` |
 
@@ -104,9 +105,10 @@ what a sensor that is not answering yet after power-on needs.
 
 ## Known gaps
 
-- **Nothing is persisted.** The firmware core has no storage layer, so every setting made
-  over the serial interface is lost on a power cut. Until that exists, the clock comes up
-  on its defaults and waits for SNTP.
+- **The overlays are not persisted.** Colour, brightness, clock mode, animation selection
+  and speeds and the sensor calibration survive a restart; the overlay configuration and
+  its text do not, because the stored format has no variable-length field yet. The time
+  and date are not stored either — they come from the network.
 - **No time source without the network.** No RTC chip is read, so between power-on and the
   first SNTP answer the display holds its default date. A DS3231 on the same I²C bus is
   the fix for the stromless case.

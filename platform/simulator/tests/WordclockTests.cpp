@@ -13,7 +13,9 @@
  *                  Nothing here needs a display: the pixel buffer lives in Pixels and
  *                  the window that renders it is a separate PixelsFrame, which is never
  *                  constructed. testDisplayManagerLatch() runs first, because the latch
- *                  it checks is only unlatched before the first task.
+ *                  it checks is only unlatched before the first task, and testPersistence()
+ *                  runs last, because it leaves settings of its own behind and writes to
+ *                  the real store in the working directory.
  *
 ******************************************************************************************************************************************************/
 
@@ -21,6 +23,7 @@
  * I N C L U D E S
 ******************************************************************************************************************************************************/
 #include <array>
+#include <cstdio>
 #include <cstdlib>
 #include <iostream>
 
@@ -28,9 +31,12 @@
 #include "Clock.h"
 #include "DisplayCharacters.h"
 #include "DisplayManager.h"
+#include "Illuminance.h"
+#include "Persistence.h"
 #include "Pixels.h"
 #include "RealTimeClock.h"
 #include "Scheduler.h"
+#include "sim/Storage.h"
 
 /******************************************************************************************************************************************************
  *  L O C A L   F U N C T I O N S
@@ -305,6 +311,92 @@ void testDisplayCharacterLookup()
            "an index past the last one must be rejected");
 }
 
+/* Reaches around Storage on purpose, which nothing else may: damaging a stored blob is
+   the one thing the store's own interface will not do, and rejecting a damaged one is
+   what has to be shown. */
+bool damageStoredChecksum()
+{
+    std::array<byte, Storage::Capacity> blob{};
+    size_t size{0u};
+
+    std::FILE* file = std::fopen(STORAGE_FILE_NAME, "rb");
+    if(file == nullptr) { return false; }
+    size = std::fread(blob.data(), 1u, blob.size(), file);
+    std::fclose(file);
+
+    if(size == 0u) { return false; }
+
+    /* The last byte, which is behind every field the format names - so this flip leaves
+       magic and version intact and is caught only if the checksum really covers the whole
+       blob rather than the fields it happens to know about. */
+    blob[size - 1u] = static_cast<byte>(blob[size - 1u] + 1u);
+
+    file = std::fopen(STORAGE_FILE_NAME, "wb");
+    if(file == nullptr) { return false; }
+    const size_t written = std::fwrite(blob.data(), 1u, size, file);
+    std::fclose(file);
+
+    return written == size;
+}
+
+/* The whole persistence path, on the store the simulator really writes to. Runs last
+   because it leaves the clock and the display on values of its own, and it clears the
+   store afterwards so a second run starts where this one did. */
+void testPersistence()
+{
+    Storage& storage = Storage::getInstance();
+    Persistence& persistence = Persistence::getInstance();
+    Display& display = Display::getInstance();
+    Clock& clock = Clock::getInstance();
+
+    expect(storage.clear() == E_OK, "clearing an empty store must succeed");
+    expect(persistence.load() == E_NOT_OK, "an empty store must report that nothing was restored");
+
+    display.setColor(10u, 20u, 30u);
+    display.setBrightness(123u);
+    display.setBrightnessUseGammaCorrection(true);
+    clock.setModeFast(Clock::MODE_SCHWABEN);
+    Animations::getInstance().setTaskCycleFast(Animations::ANIMATION_ID_NONE, 42u);
+    Illuminance::getInstance().setCalibrationValuesMaxValue(4321u);
+
+    persistence.task();
+
+    /* Away from every stored value, so a restore that did nothing cannot pass. */
+    display.setColor(1u, 2u, 3u);
+    display.setBrightness(7u);
+    display.setBrightnessUseGammaCorrection(false);
+    clock.setModeFast(Clock::MODE_WESSI);
+    Animations::getInstance().setTaskCycleFast(Animations::ANIMATION_ID_NONE, 1u);
+    Illuminance::getInstance().setCalibrationValuesMaxValue(1u);
+
+    expect(persistence.load() == E_OK, "a stored configuration must be restored");
+    expect(display.getColorRed() == 10u && display.getColorGreen() == 20u && display.getColorBlue() == 30u,
+           "the colour must come back");
+    expect(display.getBrightness() == 123u, "the brightness must come back");
+    expect(display.getBrightnessUseGammaCorrection(), "the gamma correction switch must come back");
+    expect(clock.getMode() == Clock::MODE_SCHWABEN, "the clock mode must come back");
+    expect(Animations::getInstance().getTaskCycle(Animations::ANIMATION_ID_NONE) == 42u,
+           "an animation speed must come back");
+    expect(Illuminance::getInstance().getCalibrationValuesMaxValue() == 4321u,
+           "the sensor calibration must come back");
+
+    /* Nothing changed since that restore, so nothing may be written - which is the whole
+       reason there is no dirty flag to forget. */
+    expect(storage.clear() == E_OK, "clearing a written store must succeed");
+    persistence.task();
+    expect(persistence.load() == E_NOT_OK, "an unchanged configuration must not have been written");
+
+    /* And a blob whose checksum no longer fits must be refused rather than applied. */
+    display.setColor(11u, 22u, 33u);
+    persistence.task();
+    expect(damageStoredChecksum(), "the test must be able to damage the stored blob");
+    display.setColor(4u, 5u, 6u);
+    expect(persistence.load() == E_NOT_OK, "a blob with a wrong checksum must be refused");
+    expect(display.getColorRed() == 4u, "a refused blob must leave the settings alone");
+
+    expect(storage.clear() == E_OK, "the test must leave the store as it found it");
+}
+
 } // namespace
 
 /******************************************************************************************************************************************************
@@ -320,6 +412,7 @@ int main()
     testClockWordsComparison();
     testPixelColorChannels();
     testDisplayCharacterLookup();
+    testPersistence();
 
     if(Failures == 0) {
         std::cout << "All Wordclock tests passed.\n";

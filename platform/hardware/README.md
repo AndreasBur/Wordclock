@@ -20,6 +20,7 @@ include path:
 #include "Pixels.h"         // LED matrix
 #include "RealTimeClock.h"  // time source
 #include "BH1750.h"         // ambient light sensor
+#include "Storage.h"        // where the settings survive a restart
 ```
 
 A platform backend is simply a directory that provides these headers (plus an
@@ -39,7 +40,8 @@ implementation to mirror.
 | `Pixels.h` | `Pixels` singleton: `getInstance`, `setPixel(Fast)` / `clearPixel(Fast)` / `getPixel(Fast)`, `setBrightness`, `show`, `clearPixels`, `init(pin)`; also doubles as the serial console (`print`/`read`) | WS2812 LED driver + UART |
 | `RealTimeClock.h` | `RealTimeClock` singleton holding a `ClockDateTime`; the core only *reads* it via `getDateTime()` | Feed `setDateTime()` from an RTC chip (e.g. DS3231) |
 | `BH1750.h` | Ambient-light driver exposing the illuminance reading the core consumes | BH1750 over I²C |
-| app entry point | Equivalent of the simulator's `WordclockApp` / `WordclockMain`: initialise, then repeatedly tick `Scheduler::task()` and update the `RealTimeClock` | AVR `main()` / `setup()` + `loop()` |
+| `Storage.h` | `Storage` singleton with a `Capacity` and `read` / `write` / `clear` over one byte blob; `Persistence` owns the format inside it, so this only has to store what it is given and refuse a blob of another length | EEPROM, flash, or an NVS partition |
+| app entry point | Equivalent of the simulator's `WordclockApp` / `WordclockMain`: initialise, restore the settings with `Persistence::load()`, then repeatedly tick `Scheduler::task()` and update the `RealTimeClock` | AVR `main()` / `setup()` + `loop()` |
 
 The tick has to come every `Scheduler::getTaskIntervalMs()` milliseconds: every
 module's task cycle counts in that unit, so a tick at another rate silently
