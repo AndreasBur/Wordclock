@@ -1,9 +1,13 @@
 # ESP32 platform
 
-The on-device backend of the Wordclock firmware. It supplies the four headers the
-core reaches the hardware through — `Pixels.h`, `RealTimeClock.h`, `BH1750.h` and
-(from the Arduino core) `Arduino.h` — plus the application entry point. See
+The on-device backend of the Wordclock firmware. It supplies the headers the core
+reaches the hardware through — `Pixels.h`, `RealTimeClock.h`, `BH1750.h`, `Storage.h`
+and `Arduino.h` — plus the application entry point. See
 [../hardware/README.md](../hardware/README.md) for the contract these fulfil.
+
+Its `Arduino.h` is not a reimplementation: it includes the Arduino core's own and
+replaces exactly one thing, `Serial`. See *A second front end reaches the same port*
+below for why.
 
 The clock logic itself is not copied in here. `platformio.ini` compiles
 [`../../firmware/src`](../../firmware/src) directly and
@@ -30,12 +34,14 @@ misbehaving later. `platformio.ini` notes where a core 3.x platform comes from.
 ### Verification status
 
 This backend was written and checked without an ESP32 toolchain in reach. What has been
-verified: the firmware core plus all four translation units here compile clean under
-`-Wall -Wextra`, they link with no undefined symbols, and the frame `Pixels::render()`
-produces was checked byte for byte against a captured transmission — channel order,
-index-to-offset mapping, the dirty-flag suppression and the master brightness. What has
-**not** been run is the real toolchain, so the ESP-IDF API names and the timing on an
-actual strip are still unconfirmed.
+verified against stand-ins for the framework: every translation unit here plus the whole
+firmware core compiles clean under `-Wall -Wextra` and links with no undefined symbols;
+the frame `Pixels::render()` produces was checked byte for byte against a captured
+transmission (channel order, index-to-offset mapping, dirty-flag suppression, master
+brightness); and an injected command was driven through `Communication` to its answer,
+`3 B=255 A=0 G=0`, which is what proves a second front end takes the same path as the
+wire. What has **not** been run is the real toolchain, so the ESP-IDF API names and the
+timing on an actual strip are still unconfirmed.
 
 ## Configuration
 
@@ -65,10 +71,10 @@ every other display parameter, and the backend takes what `Display::init()` hand
 | `RealTimeClock` | counts a host clock forward | reads the system clock, which SNTP sets |
 | `BH1750` | returns what a slider dialled in | reads the sensor over I²C |
 | `Storage` | a file in the working directory | one blob in the NVS partition |
-| `Serial` | routed into two text controls | UART0 over USB |
+| `Serial` | routed into two text controls | UART0, plus characters a second front end injects |
 | tick | wxTimer | `vTaskDelayUntil` in `loop()` |
 
-Three details are worth knowing before changing anything here.
+Four details are worth knowing before changing anything here.
 
 **The frame goes out once per tick, not from `show()`.** Several modules call
 `Display::show()` within a single tick — DisplayManager, Animations, Text, Clock and two
@@ -87,6 +93,16 @@ silence.
 `BH1750` private and its own `init()` is declared but never defined, so there is no
 place in the core to initialise the sensor from. Doing it lazily also retries, which is
 what a sensor that is not answering yet after power-on needs.
+
+**A second front end reaches the same port.** `Communication` reads its commands one
+character at a time out of `Serial`, and every answer goes back through it, so a web
+socket needs no protocol of its own - it needs to reach that object. This platform's
+`Arduino.h` therefore includes the core's and then binds `Serial` to `WordclockSerial`,
+which reads the UART first and injected characters second, and hands each finished line
+to a sink. Two consequences: the framework's own headers must be included **before** this
+`Arduino.h` in any platform source, or the macro reaches into them; and the core's header
+is reached through a path the build script passes in rather than through `include_next`,
+which re-finds this file and lets its include guard swallow the real one.
 
 ## Hardware notes
 

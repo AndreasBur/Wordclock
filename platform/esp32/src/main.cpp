@@ -25,11 +25,13 @@
 /******************************************************************************************************************************************************
  * I N C L U D E S
 ******************************************************************************************************************************************************/
-#include "Arduino.h"
-
+/* The framework headers come first, ahead of this platform's Arduino.h: that one binds
+   Serial to WordclockSerial, and the macro would otherwise reach into them. */
 #include <WiFi.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
+
+#include "Arduino.h"
 
 #include "Pixels.h"
 #include "RealTimeClock.h"
