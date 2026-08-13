@@ -4,9 +4,11 @@
         "dockerfile": "../Dockerfile",
         "context": ".."
     },
+    // Extensions, CMake settings and the toolchain check live in ../shared.
     "features": {
         "./../shared": {}
     },
+    // WSLg exposes its X11, Wayland and PulseAudio sockets below /mnt/wslg.
     "containerEnv": {
         "DISPLAY": "${localEnv:DISPLAY}",
         "WAYLAND_DISPLAY": "${localEnv:WAYLAND_DISPLAY}",
@@ -15,7 +17,6 @@
     },
     "mounts": [
         "source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind",
-        "source=/mnt/wslg,target=/mnt/wslg,type=bind",
-        "source=wordclock-codex,target=/home/vscode/.codex,type=volume"
+        "source=/mnt/wslg,target=/mnt/wslg,type=bind"
     ]
 }

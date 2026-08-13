@@ -1,6 +1,16 @@
-FROM mcr.microsoft.com/devcontainers/cpp:ubuntu-24.04
+# Base image, overridable via build.args in a devcontainer.json variant so that
+# site-specific base images can be used without touching this file.
+ARG BASE_IMAGE=mcr.microsoft.com/devcontainers/cpp:ubuntu-24.04
+FROM ${BASE_IMAGE}
 
-# wxWidgets plus the tools used to build and visually inspect the simulator.
+# wxWidgets development libraries. Ubuntu 24.04 ships wxWidgets 3.2 (GTK build),
+# which satisfies the find_package(wxWidgets ...) call in CMakeLists.txt. Neither
+# build-essential nor gdb is listed: the base image carries both. wx-common is not
+# listed either, but for a different reason — libwxgtk3.2-dev depends on it, and it
+# is what puts the wx-config that find_package needs on the PATH.
+# imagemagick, xdotool and x11-utils are not needed to build or run the simulator.
+# They let an agent screenshot the running window to check a layout change instead of
+# having to ask; see "Screenshotting the simulator" in CLAUDE.md.
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && \
     apt-get install -y --no-install-recommends \
         cmake \
@@ -11,7 +21,10 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && \
         x11-utils && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Seed the Codex volume with the correct ownership on first use.
-RUN install -d -o vscode -g vscode -m 0700 /home/vscode/.codex
-
 ENV TZ=Europe/Berlin
+
+# Extensions, editor settings and lifecycle commands live in the local feature
+# in shared/, which every devcontainer.json variant references. A
+# devcontainer.metadata label set here would not work: clients read image
+# metadata from the image the final FROM points at, then overwrite the label on
+# the image they build from this file.
