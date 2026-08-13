@@ -19,7 +19,7 @@
 /******************************************************************************************************************************************************
  * I N C L U D E S
 ******************************************************************************************************************************************************/
-#include "sim/MessageCatalog.h"
+#include "MessageCatalog.h"
 /* The command numbers are taken from here rather than copied, so they cannot fall behind
    the firmware. Its OVERLAYS_SUPPORT_* switches reach the entries below through it too. */
 #include "MsgCmdParser.h"

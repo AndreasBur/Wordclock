@@ -11,10 +11,17 @@
 /**     \file       MessageCatalog.h
  *      \brief      What the serial commands are called and which options they take
  *
- *      \details    Readable names for the commands the firmware parses, so the message
- *                  builder can offer them instead of leaving them to be typed, and the
- *                  decoder can read an answer back through them. Simulator-only: it
- *                  adds nothing the firmware needs.
+ *      \details    Readable names for the commands the firmware parses, so a front end can
+ *                  offer them instead of leaving them to be typed, and read an answer back
+ *                  through them.
+ *
+ *                  It describes the firmware's command set, so it lives with the firmware
+ *                  rather than with one front end. The simulator's message builder is one
+ *                  renderer of this table - it derives its whole dialog from it, down to
+ *                  the input hints - and the intent is that a web interface becomes a
+ *                  second one, so that a command added here appears in every front end and
+ *                  on the serial interface at once. Nothing in the core reads it, so a
+ *                  target too small to carry it can leave the source out of its build.
  *
  *                  The command numbers are taken from MsgCmdParser::CommandType itself,
  *                  and the value lists of the enumerations sit behind the same support

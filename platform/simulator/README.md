@@ -148,8 +148,7 @@ platform/simulator/
 │   │   ├── BH1750.h      ambient-light sensor
 │   │   ├── SerialShim.h  the port Serial is bound to
 │   │   ├── Settings.h    stand-ins for absent hardware
-│   │   ├── MessageBuilder.h  puts a command together
-│   │   ├── MessageCatalog.h  what the commands are called
+│   │   ├── MessageBuilder.h  puts a command together, from the command catalog
 │   │   └── MessageDecoder.h  reads an answer back into names
 │   ├── Arduino.h         Arduino-core shim (Serial, PROGMEM, itoa, …)
 │   └── arduino/          split Arduino helper shims (types, bits, progmem, itoa)

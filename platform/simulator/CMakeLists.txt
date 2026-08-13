@@ -39,7 +39,6 @@ set(SHIM_SOURCES
     src/Pixels.cpp
     src/PixelsFrame.cpp
     src/Settings.cpp
-    src/MessageCatalog.cpp
     src/MessageBuilder.cpp
     src/MessageDecoder.cpp
     src/SerialShim.cpp)
