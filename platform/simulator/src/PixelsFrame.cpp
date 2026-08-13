@@ -3,23 +3,27 @@
 #include "sim/MessageBuilder.h"
 #include "sim/SerialShim.h"
 
+#include "DisplayCharacters.h"
+
 #if defined(PIXELS) && (defined(__APPLE__ ) || defined(__linux__))
 # include "WordclockIcon.xpm"
 #endif
 
-const wxString DisplayCharacters[][PIXELS_DISPLAY_NUMBER_OF_COLUMNS]
+namespace {
+
+/* Taken from the firmware rather than kept here. There used to be a second copy of the
+   letters in this file, which had to be edited alongside the firmware's table and the
+   CharacterIdType enumeration that names the same positions - three places, and a
+   mismatch shows up as one wrong letter on a panel nobody rereads.
+
+   The firmware's table stores one byte per letter, so the umlauts are Latin-1 and need
+   converting; wxString would otherwise read 0xDC as an invalid UTF-8 byte and drop it. */
+wxString toCharacterLabel(char Character)
 {
-    {wxT("E"),wxT("S"),wxT("K"),wxT("I"),wxT("S"),wxT("T"),wxT("L"),wxT("F"),wxT("Ü"),wxT("N"),wxT("F")},
-    {wxT("Z"),wxT("E"),wxT("H"),wxT("N"),wxT("Z"),wxT("W"),wxT("A"),wxT("N"),wxT("Z"),wxT("I"),wxT("G")},
-    {wxT("D"),wxT("R"),wxT("E"),wxT("I"),wxT("V"),wxT("I"),wxT("E"),wxT("R"),wxT("T"),wxT("E"),wxT("L")},
-    {wxT("T"),wxT("G"),wxT("N"),wxT("A"),wxT("C"),wxT("H"),wxT("V"),wxT("O"),wxT("R"),wxT("J"),wxT("M")},
-    {wxT("H"),wxT("A"),wxT("L"),wxT("B"),wxT("Q"),wxT("Z"),wxT("W"),wxT("Ö"),wxT("L"),wxT("F"),wxT("P")},
-    {wxT("Z"),wxT("W"),wxT("E"),wxT("I"),wxT("N"),wxT("S"),wxT("I"),wxT("E"),wxT("B"),wxT("E"),wxT("N")},
-    {wxT("K"),wxT("D"),wxT("R"),wxT("E"),wxT("I"),wxT("R"),wxT("H"),wxT("F"),wxT("Ü"),wxT("N"),wxT("F")},
-    {wxT("E"),wxT("L"),wxT("F"),wxT("N"),wxT("E"),wxT("U"),wxT("N"),wxT("V"),wxT("I"),wxT("E"),wxT("R")},
-    {wxT("W"),wxT("A"),wxT("C"),wxT("H"),wxT("T"),wxT("Z"),wxT("E"),wxT("H"),wxT("N"),wxT("R"),wxT("S")},
-    {wxT("B"),wxT("S"),wxT("E"),wxT("C"),wxT("H"),wxT("S"),wxT("F"),wxT("M"),wxT("U"),wxT("H"),wxT("R")}
-};
+    return wxString(&Character, wxCSConv(wxFONTENCODING_ISO8859_1), 1u);
+}
+
+} // namespace
 
 
 
@@ -116,8 +120,12 @@ wxBoxSizer* PixelsFrame::createSizerCharacter(wxWindow* Parent, int Row)
     // matrix instead of vertically-stretched columns.
     static constexpr int CellSize = 44;
 
+    const DisplayCharacters Letters;
+
     for(unsigned int Column = 0; Column < PIXELS_DISPLAY_NUMBER_OF_COLUMNS; Column++) {
-        Characters[Row][Column] = new wxStaticText(Parent, wxID_ANY, DisplayCharacters[Row][Column], wxDefaultPosition, wxSize(CellSize, CellSize), wxALIGN_CENTRE_HORIZONTAL);
+        const wxString Label = toCharacterLabel(Letters.getCharacterFast(static_cast<byte>(Column), static_cast<byte>(Row)));
+
+        Characters[Row][Column] = new wxStaticText(Parent, wxID_ANY, Label, wxDefaultPosition, wxSize(CellSize, CellSize), wxALIGN_CENTRE_HORIZONTAL);
         Characters[Row][Column]->SetFont(wxFont(wxSize(40,40), wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false));
         Characters[Row][Column]->SetForegroundColour(wxColour(*wxLIGHT_GREY));
         Characters[Row][Column]->SetMinSize(wxSize(CellSize, CellSize));

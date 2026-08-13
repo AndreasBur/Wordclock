@@ -177,7 +177,10 @@ separate `PixelsFrame`, which the application repaints once per tick and only
 when something was written. Rendering therefore sits outside the write path,
 which is what keeps `Pixels` free of wxWidgets and the firmware drivable without
 a display. Repainting means recolouring a `wxStaticText` cell per letter — lit
-letters turn dark, unlit ones stay light grey. The right-hand console mirrors the
+letters turn dark, unlit ones stay light grey. Which letter a cell carries comes
+from the firmware's `DisplayCharacters`, not from a table in this layer: that
+table stores one byte per letter, so the window converts the umlauts from Latin-1
+on its way into a `wxString`. The right-hand console mirrors the
 device's serial output and lets you send commands back: `Serial` is bound to
 `SerialShim`, which writes into the two text controls the matrix window lays out
 for it.
