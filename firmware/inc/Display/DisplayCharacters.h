@@ -177,9 +177,13 @@ class DisplayCharacters
     static const char DisplayCharactersTable[][DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS + 1u];
 
     // functions
+    /* Row first, because that is how the table is written - one string per row. It used
+       to be indexed the other way round, which every caller then compensated for by
+       swapping its arguments; the two that did not compensate read past the end of the
+       table for the last column. Nothing called any of them, so nothing showed it. */
     DisplayCharactersTableElementType getDisplayCharactersTableElement(byte Column, byte Row) const {
         DisplayCharactersTableElementType displayCharactersTableElement;
-        memcpy_P(&displayCharactersTableElement, &DisplayCharactersTable[Column][Row], sizeof(DisplayCharactersTableElementType));
+        memcpy_P(&displayCharactersTableElement, &DisplayCharactersTable[Row][Column], sizeof(DisplayCharactersTableElementType));
         return displayCharactersTableElement;
     }
     DisplayCharactersTableElementType getDisplayCharactersTableElement(byte Index) const {
@@ -210,7 +214,10 @@ class DisplayCharacters
     // methods
     static bool isCharacterIdValid(CharacterIdType CharacterId) { return CharacterId < DISPLAY_CHARACTERS_NUMBER_OF_CHARACTERS; };
     static bool isIndexValid(byte Index) { return Index < DISPLAY_CHARACTERS_NUMBER_OF_CHARACTERS; };
-    void indexToColumnAndRow(byte Index, byte& Row, byte& Column) const { Row = Index / DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS; Column = Index % DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS; }
+    /* Column before Row, matching both the name and Display's function of the same name.
+       They were the other way round here, so a caller that read the two classes side by
+       side got a silent swap. */
+    void indexToColumnAndRow(byte Index, byte& Column, byte& Row) const { Column = Index % DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS; Row = Index / DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS; }
     byte columnAndRowToIndex(byte Column, byte Row) const { return (Row * DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS) + Column; }
 
 };

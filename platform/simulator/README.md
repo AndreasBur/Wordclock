@@ -148,8 +148,8 @@ platform/simulator/
 │   │   ├── BH1750.h      ambient-light sensor
 │   │   ├── SerialShim.h  the port Serial is bound to
 │   │   ├── Settings.h    stand-ins for absent hardware
-│   │   ├── MessageBuilder.h  puts a command together
-│   │   ├── MessageCatalog.h  what the commands are called
+│   │   ├── Storage.h     settings store, backed by a file
+│   │   ├── MessageBuilder.h  puts a command together, from the command catalog
 │   │   └── MessageDecoder.h  reads an answer back into names
 │   ├── Arduino.h         Arduino-core shim (Serial, PROGMEM, itoa, …)
 │   └── arduino/          split Arduino helper shims (types, bits, progmem, itoa)
@@ -165,7 +165,10 @@ platform/simulator/
 
 `WordclockApp` starts a `wxTimer` at `Scheduler::getTaskIntervalMs()` that calls
 `WordclockMain::task()`, which ticks the simulated `RealTimeClock` and then runs
-the `Scheduler`. The host clock is read once, when `WordclockMain` is
+the `Scheduler`. Before the first tick, `WordclockMain` restores the stored
+settings, which `Storage` keeps in a `wordclock-settings.bin` in the working
+directory — a real file rather than a buffer, so the persistence path is exercised
+here rather than only on the device. The host clock is read once, when `WordclockMain` is
 constructed; from there the `RealTimeClock` advances itself off a monotonic
 clock, so a time set over the serial console keeps running instead of being
 overwritten on the next tick, exactly as a real RTC would. That is all this layer
@@ -177,7 +180,10 @@ separate `PixelsFrame`, which the application repaints once per tick and only
 when something was written. Rendering therefore sits outside the write path,
 which is what keeps `Pixels` free of wxWidgets and the firmware drivable without
 a display. Repainting means recolouring a `wxStaticText` cell per letter — lit
-letters turn dark, unlit ones stay light grey. The right-hand console mirrors the
+letters turn dark, unlit ones stay light grey. Which letter a cell carries comes
+from the firmware's `DisplayCharacters`, not from a table in this layer: that
+table stores one byte per letter, so the window converts the umlauts from Latin-1
+on its way into a `wxString`. The right-hand console mirrors the
 device's serial output and lets you send commands back: `Serial` is bound to
 `SerialShim`, which writes into the two text controls the matrix window lays out
 for it.

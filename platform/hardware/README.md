@@ -1,9 +1,13 @@
-# Hardware platform (interface contract — not yet implemented)
+# Hardware platform (interface contract — xmega, not implemented)
 
-This directory is a **placeholder** for the on-device backend of the Wordclock
-firmware. It is intentionally empty of code: the actual port must be built and
-tested on the real xmega hardware with the AVR toolchain, which is out of scope
-for the desktop tooling in this repo.
+This directory is a **placeholder** for an xmega backend of the Wordclock firmware.
+It is intentionally empty of code: that port would have to be built and tested on
+the real xmega hardware with the AVR toolchain, which is out of scope for the
+desktop tooling in this repo.
+
+The document below is still the description of the platform seam, and worth reading
+as such. For a backend that exists, see [`../esp32/`](../esp32/) — the xmega is no
+longer the intended target.
 
 ## How the platform seam works
 
@@ -16,6 +20,7 @@ include path:
 #include "Pixels.h"         // LED matrix
 #include "RealTimeClock.h"  // time source
 #include "BH1750.h"         // ambient light sensor
+#include "Storage.h"        // where the settings survive a restart
 ```
 
 A platform backend is simply a directory that provides these headers (plus an
@@ -35,7 +40,8 @@ implementation to mirror.
 | `Pixels.h` | `Pixels` singleton: `getInstance`, `setPixel(Fast)` / `clearPixel(Fast)` / `getPixel(Fast)`, `setBrightness`, `show`, `clearPixels`, `init(pin)`; also doubles as the serial console (`print`/`read`) | WS2812 LED driver + UART |
 | `RealTimeClock.h` | `RealTimeClock` singleton holding a `ClockDateTime`; the core only *reads* it via `getDateTime()` | Feed `setDateTime()` from an RTC chip (e.g. DS3231) |
 | `BH1750.h` | Ambient-light driver exposing the illuminance reading the core consumes | BH1750 over I²C |
-| app entry point | Equivalent of the simulator's `WordclockApp` / `WordclockMain`: initialise, then repeatedly tick `Scheduler::task()` and update the `RealTimeClock` | AVR `main()` / `setup()` + `loop()` |
+| `Storage.h` | `Storage` singleton with a `Capacity` and `read` / `write` / `clear` over one byte blob; `Persistence` owns the format inside it, so this only has to store what it is given and refuse a blob of another length | EEPROM, flash, or an NVS partition |
+| app entry point | Equivalent of the simulator's `WordclockApp` / `WordclockMain`: initialise, restore the settings with `Persistence::load()`, then repeatedly tick `Scheduler::task()` and update the `RealTimeClock` | AVR `main()` / `setup()` + `loop()` |
 
 The tick has to come every `Scheduler::getTaskIntervalMs()` milliseconds: every
 module's task cycle counts in that unit, so a tick at another rate silently
@@ -47,10 +53,16 @@ per high-resolution conversion, which its task cycle must stay above.
 
 ## Suggested port path
 
-Reuse the concrete drivers already present in
+For an **xmega** target: reuse the concrete drivers already present in
 [`../../Wordclock_xmegaForArduino/`](../../Wordclock_xmegaForArduino/) (WS2812,
 RTC, I²C, ArduinoCore) and adapt them to the interfaces above. That project
 currently builds an **older** firmware architecture; the work is to retarget its
 drivers at today's `firmware/` core, then build and flash with the AVR toolchain.
+
+That advice does not carry over to [`../esp32/`](../esp32/), which is why none of
+those three drivers appear there. The RMT peripheral generates the WS2812 pulses in
+hardware, so the xmega's 800-line USART-as-SPI bit pusher has no counterpart; the
+time comes from SNTP rather than from an RTC chip; and I²C comes with the Arduino
+core. Only the BH1750's register handling was worth carrying across.
 
 **Status:** contract only. Nothing here compiles or runs yet.

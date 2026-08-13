@@ -1,0 +1,242 @@
+/******************************************************************************************************************************************************
+ *  COPYRIGHT
+ *  ---------------------------------------------------------------------------------------------------------------------------------------------------
+ *  \verbatim
+ *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
+ *
+ *  \endverbatim
+ *  ---------------------------------------------------------------------------------------------------------------------------------------------------
+ *  FILE DESCRIPTION
+ *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
+/**     \file       Persistence.cpp
+ *      \brief      Keeps the configuration across a restart
+ *
+ *      \details    Holds the stored format: which settings it covers, how they are laid
+ *                  out, and how a blob that does not belong to this build is recognised.
+ *
+******************************************************************************************************************************************************/
+
+/******************************************************************************************************************************************************
+ * I N C L U D E S
+******************************************************************************************************************************************************/
+#include "Persistence.h"
+
+#include "Animations.h"
+#include "Clock.h"
+#include "Display.h"
+#include "Illuminance.h"
+#include "Storage.h"
+
+#include <string.h>
+
+/******************************************************************************************************************************************************
+ *  LOCAL DATA TYPES AND STRUCTURES
+******************************************************************************************************************************************************/
+namespace {
+
+/* Every two-byte field comes first, so the struct needs no padding between its members
+   and its layout follows from the declaration rather than from the compiler's alignment
+   rules. What padding remains at the end is covered by zero-initialising every instance,
+   which the checksum and the comparison both depend on. */
+struct SettingsType {
+    uint16_t Magic;
+    uint16_t AnimationFavourites;
+    uint16_t IlluminanceCalibrationMax;
+    uint16_t IlluminanceCalibrationMin;
+
+    byte Version;
+    byte ColourRed;
+    byte ColourGreen;
+    byte ColourBlue;
+    byte Brightness;
+    /* byte rather than bool: what a bool occupies in a stored blob is not worth relying
+       on, and the conversion is one comparison. */
+    byte BrightnessUseAutomatic;
+    byte BrightnessUseGammaCorrection;
+    byte ClockMode;
+    byte AnimationsMode;
+    byte AnimationId;
+    byte AnimationTaskCycles[Animations::ANIMATION_ID_NUMBER_OF_ANIMATIONS];
+    byte Checksum;
+};
+
+/* 'W' and 'C'. Together with the version it tells a blob of this format from whatever
+   else a store might hand back. */
+constexpr uint16_t SettingsMagic{0x5743u};
+constexpr byte SettingsVersion{1u};
+
+static_assert(sizeof(SettingsType) <= Storage::Capacity,
+              "Persistence: the settings no longer fit the store, please raise STORAGE_CAPACITY on every platform");
+
+/* What was last written, so task() can tell a changed setting from an unchanged one
+   without anything having to report the change. Kept here rather than as a member so the
+   format stays out of the header. */
+SettingsType LastSaved{};
+
+/******************************************************************************************************************************************************
+ *  LOCAL FUNCTIONS
+******************************************************************************************************************************************************/
+/* Sum of every byte but the checksum's own. It is there to catch a truncated or foreign
+   blob, not to detect tampering, and a sum does that for one byte of overhead.
+
+   Every other byte is walked, rather than stopping at the checksum's offset: whether the
+   struct ends in padding depends on how many animations there are, and a byte the sum did
+   not cover would be a byte a damaged blob could hide in. Zero-initialising every instance
+   is what makes the padding a defined value to sum over. */
+byte calcChecksum(const SettingsType& Settings)
+{
+    const byte* Bytes = reinterpret_cast<const byte*>(&Settings);
+    byte Checksum{0u};
+
+    for(size_t Index = 0u; Index < sizeof(SettingsType); Index++) {
+        if(Index == offsetof(SettingsType, Checksum)) { continue; }
+
+        Checksum = static_cast<byte>(Checksum + Bytes[Index]);
+    }
+    return Checksum;
+}
+
+bool isValid(const SettingsType& Settings)
+{
+    if(Settings.Magic != SettingsMagic) { return false; }
+    if(Settings.Version != SettingsVersion) { return false; }
+
+    return Settings.Checksum == calcChecksum(Settings);
+}
+
+/* Read from the modules that own the settings, never from a copy kept here - a second
+   copy is what would need keeping in step. */
+SettingsType gather()
+{
+    SettingsType Settings{};
+
+    Settings.Magic = SettingsMagic;
+    Settings.Version = SettingsVersion;
+
+    const Display& display = Display::getInstance();
+    Settings.ColourRed = display.getColorRed();
+    Settings.ColourGreen = display.getColorGreen();
+    Settings.ColourBlue = display.getColorBlue();
+    Settings.Brightness = display.getBrightness();
+    Settings.BrightnessUseAutomatic = display.getBrightnessUseAutomatic() ? 1u : 0u;
+    Settings.BrightnessUseGammaCorrection = display.getBrightnessUseGammaCorrection() ? 1u : 0u;
+
+    Settings.ClockMode = static_cast<byte>(Clock::getInstance().getMode());
+
+    const Animations& animations = Animations::getInstance();
+    Settings.AnimationsMode = static_cast<byte>(animations.getMode());
+    /* The selected animation, not the running one: a selecting mode changes what runs on
+       every word change, and storing that would mean a write every few minutes. */
+    Settings.AnimationId = static_cast<byte>(animations.getAnimation());
+
+    for(byte Index = 0u; Index < Animations::ANIMATION_ID_NUMBER_OF_ANIMATIONS; Index++) {
+        const Animations::AnimationIdType AnimationId = static_cast<Animations::AnimationIdType>(Index);
+
+        Settings.AnimationTaskCycles[Index] = animations.getTaskCycle(AnimationId);
+        if(animations.isFavourite(AnimationId)) {
+            Settings.AnimationFavourites = static_cast<uint16_t>(Settings.AnimationFavourites | (1u << Index));
+        }
+    }
+
+    const Illuminance& illuminance = Illuminance::getInstance();
+    Settings.IlluminanceCalibrationMax = illuminance.getCalibrationValuesMaxValue();
+    Settings.IlluminanceCalibrationMin = illuminance.getCalibrationValuesMinValue();
+
+    Settings.Checksum = calcChecksum(Settings);
+    return Settings;
+}
+
+void apply(const SettingsType& Settings)
+{
+    Display& display = Display::getInstance();
+    display.setColor(Settings.ColourRed, Settings.ColourGreen, Settings.ColourBlue);
+    display.setBrightnessUseAutomatic(Settings.BrightnessUseAutomatic != 0u);
+    display.setBrightnessUseGammaCorrection(Settings.BrightnessUseGammaCorrection != 0u);
+    /* After the two switches, because it is this call that recalculates what reaches the
+       LEDs, and it has to do so with both of them already in place. */
+    display.setBrightness(Settings.Brightness);
+
+    Clock::getInstance().setMode(static_cast<Clock::ModeType>(Settings.ClockMode));
+
+    Animations& animations = Animations::getInstance();
+
+    for(byte Index = 0u; Index < Animations::ANIMATION_ID_NUMBER_OF_ANIMATIONS; Index++) {
+        const Animations::AnimationIdType AnimationId = static_cast<Animations::AnimationIdType>(Index);
+        const bool IsFavourite = (Settings.AnimationFavourites & static_cast<uint16_t>(1u << Index)) != 0u;
+
+        animations.setFavourite(AnimationId, IsFavourite);
+        animations.setTaskCycle(AnimationId, Settings.AnimationTaskCycles[Index]);
+    }
+
+    /* The animation before the mode: setting the mode to MODE_FIXED starts the selected
+       animation, so it has to find the restored one rather than the default. */
+    animations.setAnimation(static_cast<Animations::AnimationIdType>(Settings.AnimationId));
+    animations.setMode(static_cast<Animations::ModeType>(Settings.AnimationsMode));
+
+    Illuminance& illuminance = Illuminance::getInstance();
+    illuminance.setCalibrationValuesMaxValue(Settings.IlluminanceCalibrationMax);
+    illuminance.setCalibrationValuesMinValue(Settings.IlluminanceCalibrationMin);
+}
+
+} // namespace
+
+/******************************************************************************************************************************************************
+ * P U B L I C   F U N C T I O N S
+******************************************************************************************************************************************************/
+
+/******************************************************************************************************************************************************
+  load()
+******************************************************************************************************************************************************/
+/*! \brief          Restores the stored configuration, if there is a usable one
+ *  \details        A blob that cannot be used is thrown away rather than left in place:
+ *                  it would otherwise be read and rejected on every start, and the store
+ *                  has nothing to offer that a fresh write does not. Nothing stored at all
+ *                  takes the same path, where clearing is a no-op.
+ *
+ *                  What is remembered as "last written" afterwards is what the modules
+ *                  actually hold, not what the blob said. A value one of them rejected
+ *                  therefore shows up as a difference on the next task and gets corrected
+ *                  in the store, instead of being read and rejected forever.
+ *
+ *  \return         E_OK if a stored configuration was applied
+******************************************************************************************************************************************************/
+StdReturnType Persistence::load()
+{
+    SettingsType Settings{};
+    StdReturnType ReturnValue{E_NOT_OK};
+
+    if(Storage::getInstance().read(reinterpret_cast<byte*>(&Settings), sizeof(Settings)) == E_OK) {
+        if(isValid(Settings)) {
+            apply(Settings);
+            ReturnValue = E_OK;
+        }
+    }
+
+    if(ReturnValue == E_NOT_OK) { Storage::getInstance().clear(); }
+
+    LastSaved = gather();
+    return ReturnValue;
+} /* load */
+
+
+/******************************************************************************************************************************************************
+  task()
+******************************************************************************************************************************************************/
+/*! \brief          Writes the configuration if it changed since the last write
+ *  \details        A failed write leaves LastSaved alone, so the next task tries again
+ *                  rather than treating the change as stored.
+******************************************************************************************************************************************************/
+void Persistence::task()
+{
+    const SettingsType Current = gather();
+
+    if(memcmp(&Current, &LastSaved, sizeof(Current)) == 0) { return; }
+
+    if(Storage::getInstance().write(reinterpret_cast<const byte*>(&Current), sizeof(Current)) == E_OK) {
+        LastSaved = Current;
+    }
+} /* task */
+
+/******************************************************************************************************************************************************
+ *  E N D   O F   F I L E
+******************************************************************************************************************************************************/

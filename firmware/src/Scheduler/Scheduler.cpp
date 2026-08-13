@@ -26,6 +26,7 @@
 #include "Illuminance.h"
 #include "Communication.h"
 #include "Overlays.h"
+#include "Persistence.h"
 #include "Text.h"
 
 /******************************************************************************************************************************************************
@@ -95,6 +96,9 @@ void Scheduler::triggerTasks()
     if(isDue(TASK_ID_COMMUNICATION, Communication::getInstance().getTaskCycle())) { Communication::getInstance().task(); }
     if(isDue(TASK_ID_OVERLAYS, Overlays::getInstance().getTaskCycle())) { Overlays::getInstance().task(); }
     if(isDue(TASK_ID_TEXT, Text::getInstance().getTaskCycle())) { Text::getInstance().task(true); }
+    /* last, so what it compares against the store is a settled state rather than one from
+       the middle of this tick's pass */
+    if(isDue(TASK_ID_PERSISTENCE, Persistence::getInstance().getTaskCycle())) { Persistence::getInstance().task(); }
 } /* triggerTasks */
 
 /******************************************************************************************************************************************************

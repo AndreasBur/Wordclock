@@ -19,7 +19,8 @@ the word tables have to cover.
 | [firmware/](firmware/) | **Single source of truth** for the clock logic — platform-agnostic (animations, clock, display, scheduler, overlays, communication). |
 | [docs/](docs/) | Reference documentation: the [serial command reference](docs/serial-commands.md) and the [font tables](docs/fonts.md). |
 | [platform/simulator/](platform/simulator/) | wxWidgets desktop backend: renders the matrix in a window so the firmware can be developed and debugged on a PC. |
-| [platform/hardware/](platform/hardware/) | On-device backend (Atmel xmega) — currently an [interface contract](platform/hardware/README.md), not yet implemented. |
+| [platform/esp32/](platform/esp32/) | On-device backend: WS2812 over the RMT peripheral, time from NTP. Built with PlatformIO — see its [README](platform/esp32/README.md). |
+| [platform/hardware/](platform/hardware/) | Atmel xmega backend — an [interface contract](platform/hardware/README.md) only, and no longer the intended target. |
 | [Wordclock_xmegaForArduino/](Wordclock_xmegaForArduino/) | Existing hardware project (older firmware); source for the eventual hardware port. |
 
 The tool that generates the bitmap font tables lives in its own repository,
@@ -29,7 +30,7 @@ The tool that generates the bitmap font tables lives in its own repository,
 ## Architecture
 
 The firmware core reaches the hardware **only through header names**
-(`Arduino.h`, `Pixels.h`, `RealTimeClock.h`, `BH1750.h`), resolved via the
+(`Arduino.h`, `Pixels.h`, `RealTimeClock.h`, `BH1750.h`, `Storage.h`), resolved via the
 include path. Each platform under `platform/` supplies those headers with its own
 implementation — a compile-time swap with no runtime cost. See
 [platform/hardware/README.md](platform/hardware/README.md) for the contract.
@@ -59,8 +60,15 @@ That way requires CMake ≥ 3.16, a C++17 compiler and wxWidgets 3.x (GTK on
 Linux). See the [simulator README](platform/simulator/README.md) for details and
 the Code::Blocks projects.
 
-The `hardware` platform is built with the AVR toolchain, not CMake (see its
-README).
+The on-device platforms are not built with CMake. The `esp32` platform uses
+PlatformIO:
+
+```bash
+pio run -t upload -d platform/esp32
+pio device monitor -d platform/esp32
+```
+
+The `hardware` (xmega) platform would use the AVR toolchain; see its README.
 
 ## History note
 

@@ -9,10 +9,16 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       DisplayCharacters.cpp
- *      \brief      
+ *      \brief      The letters on the front panel, one string per row
  *
- *      \details    
- *                  
+ *      \details    One byte per letter, so the umlauts are escapes rather than literals:
+ *                  \\xDC is U with an umlaut and \\xD6 is O with one, in Latin-1. Written
+ *                  as escapes so the table cannot be changed by whatever encoding an
+ *                  editor saves the file in, and read as Latin-1 by whoever displays it.
+ *
+ *                  This is the one table of the front panel's letters. It has to stay in
+ *                  step with the CharacterIdType enumeration in the header, which names
+ *                  the same 110 positions, and with the word positions in DisplayWords.
  *
 ******************************************************************************************************************************************************/
 #define _DISPLAY_CHARACTERS_SOURCE_
@@ -62,7 +68,7 @@ const DisplayCharacters::DisplayCharactersTableElementType DisplayCharacters::Di
 StdReturnType DisplayCharacters::getCharacter(byte Column, byte Row, char& Character) const
 {
     if(Row < DISPLAY_CHARACTERS_NUMBER_OF_ROWS && Column < DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS) {
-        Character =  getCharacterFast(Row, Column);
+        Character =  getCharacterFast(Column, Row);
         return E_OK;
     } else {
         return E_NOT_OK;
@@ -75,11 +81,8 @@ StdReturnType DisplayCharacters::getCharacter(byte Column, byte Row, char& Chara
   ****************************************************************************************************************************************************/
 StdReturnType DisplayCharacters::getCharacter(byte Index, char& Character) const
 {
-    byte row, column;
-    indexToColumnAndRow(Index, column, row);
-
     if(isIndexValid(Index)) {
-        Character =  getCharacterFast(row, column);
+        Character =  getCharacterFast(Index);
         return E_OK;
     } else {
         return E_NOT_OK;
@@ -92,9 +95,6 @@ StdReturnType DisplayCharacters::getCharacter(byte Index, char& Character) const
   ****************************************************************************************************************************************************/
 StdReturnType DisplayCharacters::getCharacter(CharacterIdType CharacterId, char& Character) const
 {
-    byte row, column;
-    indexToColumnAndRow(CharacterId, column, row);
-
     if(isCharacterIdValid(CharacterId)) {
         Character =  getCharacterFast(CharacterId);
         return E_OK;

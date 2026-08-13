@@ -9,6 +9,15 @@ CMakeFiles/
 cmake_install.cmake
 compile_commands.json
 
+# PlatformIO (ESP32 backend)
+.pio/
+
+# Network credentials of the ESP32 backend (local only, see WordclockConfiguration.h)
+WordclockSecrets.h
+
+# Settings the simulator persists next to wherever it was started
+wordclock-settings.bin
+
 # Code::Blocks generated artifacts
 *.depend
 *.layout
