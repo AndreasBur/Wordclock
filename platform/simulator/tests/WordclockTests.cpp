@@ -26,6 +26,7 @@
 
 #include "Animations.h"
 #include "Clock.h"
+#include "DisplayCharacters.h"
 #include "DisplayManager.h"
 #include "Pixels.h"
 #include "RealTimeClock.h"
@@ -261,6 +262,49 @@ void testPixelColorChannels()
            "the per-channel setters must place the channels alike");
 }
 
+/* The letter table has four entry points that all have to agree, and until now they did
+   not: two of them indexed the table transposed, which for the last column read past its
+   end. Nothing called any of them, so the simulator kept a second copy of the letters
+   instead - which is the duplication this pins down as unnecessary. */
+void testDisplayCharacterLookup()
+{
+    const DisplayCharacters characters;
+
+    /* First row is "ESKISTLF" then U with an umlaut, "NF". */
+    expect(characters.getCharacterFast(0u) == 'E', "index 0 must be the first letter of the first row");
+    expect(characters.getCharacterFast(2u) == 'K', "index 2 must be the third letter of the first row");
+    expect(characters.getCharacterFast(0u, 0u) == 'E', "column 0, row 0 must be the first letter");
+
+    /* Column 10 is the one a transposed lookup read past the end of the table for. */
+    expect(characters.getCharacterFast(10u, 0u) == 'F', "the last column of the first row must be reachable");
+    expect(characters.getCharacterFast(10u) == 'F', "index 10 must be the last letter of the first row");
+
+    /* Last row is "BSECHSFMUHR", so the very last letter is its R. */
+    constexpr byte lastIndex{DISPLAY_CHARACTERS_NUMBER_OF_CHARACTERS - 1u};
+    expect(characters.getCharacterFast(lastIndex) == 'R', "the last index must be the last letter");
+    expect(characters.getCharacterFast(DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS - 1u,
+                                      DISPLAY_CHARACTERS_NUMBER_OF_ROWS - 1u) == 'R',
+           "the last column of the last row must be the last letter");
+
+    /* Every position has to read the same whether it is asked for by index or by column
+       and row - that is what the two broken entry points disagreed on. */
+    bool allAgree = true;
+    for(byte index = 0u; index < DISPLAY_CHARACTERS_NUMBER_OF_CHARACTERS; index++) {
+        byte column, row;
+        characters.indexToColumnAndRow(index, column, row);
+
+        if(characters.getCharacterFast(index) != characters.getCharacterFast(column, row)) { allAgree = false; }
+        if(characters.columnAndRowToIndex(column, row) != index) { allAgree = false; }
+    }
+    expect(allAgree, "index and column/row lookups must agree on every position");
+
+    char character{'\0'};
+    expect(characters.getCharacter(DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS, 0u, character) == E_NOT_OK,
+           "a column past the last one must be rejected");
+    expect(characters.getCharacter(DISPLAY_CHARACTERS_NUMBER_OF_CHARACTERS, character) == E_NOT_OK,
+           "an index past the last one must be rejected");
+}
+
 } // namespace
 
 /******************************************************************************************************************************************************
@@ -275,6 +319,7 @@ int main()
     testClockModes();
     testClockWordsComparison();
     testPixelColorChannels();
+    testDisplayCharacterLookup();
 
     if(Failures == 0) {
         std::cout << "All Wordclock tests passed.\n";
