@@ -11,14 +11,33 @@
 #
 #   test/run.sh              build and run the tests
 #   test/run.sh serve [port] the same binaries, serving the console on localhost
+#   test/run.sh clean        throw the object cache away
+#
+# Every source is compiled once into an object cache under .pio/ and the binaries are
+# linked from those objects. It used to compile straight to executables, which meant the
+# whole firmware core - some thirty files - was compiled once per binary and again on
+# every run, because the binaries were built in a temporary directory that was deleted
+# afterwards. That was three quarters of a minute for a one-line change.
 #
 set -euo pipefail
 
 TEST_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PLATFORM_DIR="$(cd "$TEST_DIR/.." && pwd)"
 ROOT="$(cd "$PLATFORM_DIR/../.." && pwd)"
+
+# Objects survive a run; the linked binaries do not. Under .pio/ because that is where
+# this platform's build output lives and what .gitignore already covers.
+CACHE="$PLATFORM_DIR/.pio/host-tests"
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
+
+if [ "${1:-}" = "clean" ]; then
+    rm -rf "$CACHE"
+    echo "object cache removed"
+    exit
+fi
+
+mkdir -p "$CACHE"
 
 # The platform's own headers first: its Arduino.h shadows the stub and has to win.
 INCLUDES=(-I"$PLATFORM_DIR/include" -I"$TEST_DIR/stubs" -I"$ROOT/firmware/inc")
@@ -31,9 +50,22 @@ INCLUDES+=(-DWORDCLOCK_CORE_ARDUINO_H="\"$TEST_DIR/stubs/Arduino.h\"")
 FLAGS=(-std=gnu++17 -Wall -Wextra -Werror)
 
 # WebInterface serves a header the build generates from the page. Produced by the same
-# script PlatformIO calls, so the tests compile against what the device would carry.
-python3 "$PLATFORM_DIR/scripts/embed_web.py" "$PLATFORM_DIR/web/index.html" "$WORK"
-INCLUDES+=(-I"$WORK")
+# script PlatformIO calls, so the tests compile against what the device would carry. Into
+# the cache rather than into the temporary directory: the include path is part of what an
+# object was compiled with, and one that changed every run would invalidate the cache
+# every run. A changed page is noticed through the dependency file instead.
+python3 "$PLATFORM_DIR/scripts/embed_web.py" "$PLATFORM_DIR/web/index.html" "$CACHE"
+INCLUDES+=(-I"$CACHE")
+
+# What the objects were compiled with. Anything else means they cannot be reused, and the
+# cheapest correct answer to that is to throw them away.
+KEY_FILE="$CACHE/flags"
+KEY="${FLAGS[*]} ${INCLUDES[*]}"
+if [ ! -f "$KEY_FILE" ] || [ "$(cat "$KEY_FILE")" != "$KEY" ]; then
+    find "$CACHE" -name '*.o' -delete
+    find "$CACHE" -name '*.d' -delete
+    printf '%s' "$KEY" > "$KEY_FILE"
+fi
 
 CORE=()
 while IFS= read -r source; do CORE+=("$source"); done < <(find "$ROOT/firmware/src" -name '*.cpp')
@@ -54,19 +86,82 @@ WEB="$PLATFORM_DIR/src/WebInterface.cpp"
 
 SHARED=("$TEST_DIR/hardware_port.cpp" "$TEST_DIR/stubs.cpp")
 
-build() {   # name, then the sources that belong to it
-    local name="$1"; shift
-    echo "building $name"
-    g++ "${FLAGS[@]}" "${INCLUDES[@]}" -o "$WORK/$name" "$@" "${SHARED[@]}"
+# One object per source, named after the path it came from so that two files of the same
+# name - there are several - cannot land on each other.
+objectOf() {
+    local relative="${1#"$ROOT"/}"
+    printf '%s/%s.o' "$CACHE" "${relative//\//_}"
 }
+
+# An object is reusable while it is newer than every file the compiler recorded as its
+# input - the source and every header it reached, which is what the .d file lists.
+isUpToDate() {
+    local object="$1" dependency="${1%.o}.d"
+
+    [ -f "$object" ] && [ -f "$dependency" ] || return 1
+
+    local file
+    for file in $(sed -e 's/^.*://' -e 's/\\//g' "$dependency"); do
+        [ -e "$file" ] || return 1
+        [ "$file" -nt "$object" ] && return 1
+    done
+    return 0
+}
+
+compile() {
+    local source="$1" object; object="$(objectOf "$1")"
+
+    isUpToDate "$object" && return 0
+
+    echo "compiling ${source#"$ROOT"/}"
+    # A failure is recorded rather than raised: this runs as a background job, where a
+    # non-zero exit would end the job and nothing else.
+    g++ "${FLAGS[@]}" "${INCLUDES[@]}" -MMD -MF "${object%.o}.d" -c "$source" -o "$object" \
+        || touch "$CACHE/failed"
+}
+
+# Everything any of the binaries needs, compiled once and in parallel. The compiler is
+# single-threaded and there are more than thirty files, so this is where the wall clock
+# goes.
+compileAll() {
+    local jobs; jobs="$(nproc)"
+    local source
+
+    rm -f "$CACHE/failed"
+
+    for source in "$@"; do
+        compile "$source" &
+        while [ "$(jobs -rp | wc -l)" -ge "$jobs" ]; do wait -n; done
+    done
+    wait
+
+    if [ -f "$CACHE/failed" ]; then
+        rm -f "$CACHE/failed"
+        echo "compilation failed" >&2
+        exit 1
+    fi
+}
+
+link() {   # name, then the sources that belong to it
+    local name="$1"; shift
+    local objects=() source
+
+    for source in "$@" "${SHARED[@]}"; do objects+=("$(objectOf "$source")"); done
+
+    g++ "${FLAGS[@]}" -o "$WORK/$name" "${objects[@]}"
+}
+
+compileAll "${CORE[@]}" "${BACKEND[@]}" "${SHARED[@]}" "$WEB" \
+           "$TEST_DIR/frame_test.cpp" "$TEST_DIR/serial_test.cpp" "$TEST_DIR/ds3231_test.cpp" \
+           "$TEST_DIR/web_test.cpp" "$TEST_DIR/webhost.cpp" "$TEST_DIR/rmt_stubs.cpp"
 
 # frame_test brings its own RMT calls, because it keeps the frame that was transmitted. It
 # still needs WordclockSerial, which Pixels reports a failed channel through.
-build frame_test  "$TEST_DIR/frame_test.cpp" "$PLATFORM_DIR/src/Pixels.cpp" "$PLATFORM_DIR/src/WordclockSerial.cpp"
-build serial_test "$TEST_DIR/serial_test.cpp" "${BACKEND[@]}" "${CORE[@]}" "$TEST_DIR/rmt_stubs.cpp"
-build ds3231_test "$TEST_DIR/ds3231_test.cpp" "${BACKEND[@]}" "${CORE[@]}" "$TEST_DIR/rmt_stubs.cpp"
-build web_test    "$TEST_DIR/web_test.cpp" "$WEB" "${BACKEND[@]}" "${CORE[@]}" "$TEST_DIR/rmt_stubs.cpp"
-build webhost     "$TEST_DIR/webhost.cpp" "$WEB" "${BACKEND[@]}" "${CORE[@]}" "$TEST_DIR/rmt_stubs.cpp"
+link frame_test  "$TEST_DIR/frame_test.cpp" "$PLATFORM_DIR/src/Pixels.cpp" "$PLATFORM_DIR/src/WordclockSerial.cpp"
+link serial_test "$TEST_DIR/serial_test.cpp" "${BACKEND[@]}" "${CORE[@]}" "$TEST_DIR/rmt_stubs.cpp"
+link ds3231_test "$TEST_DIR/ds3231_test.cpp" "${BACKEND[@]}" "${CORE[@]}" "$TEST_DIR/rmt_stubs.cpp"
+link web_test    "$TEST_DIR/web_test.cpp" "$WEB" "${BACKEND[@]}" "${CORE[@]}" "$TEST_DIR/rmt_stubs.cpp"
+link webhost     "$TEST_DIR/webhost.cpp" "$WEB" "${BACKEND[@]}" "${CORE[@]}" "$TEST_DIR/rmt_stubs.cpp"
 
 if [ "${1:-}" = "serve" ]; then
     # Not exec'd: the binaries live in a temporary directory, and the trap that removes it
