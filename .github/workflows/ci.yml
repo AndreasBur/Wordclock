@@ -32,7 +32,7 @@ jobs:
     name: Simulator and core tests
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       # Pinned to the Ubuntu that carries wxWidgets 3.2, which is what
       # find_package(wxWidgets) expects; libwxgtk3.2-dev pulls in the wx-config it needs.
@@ -58,7 +58,7 @@ jobs:
     name: ESP32 backend on the host
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       # Needs nothing but g++, python3 and node, which the runner already carries. The
       # script compiles into an object cache under .pio/ and links from there.
@@ -69,7 +69,7 @@ jobs:
     name: ESP32 firmware
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - uses: actions/setup-python@v5
         with:
