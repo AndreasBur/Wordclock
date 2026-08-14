@@ -32,6 +32,38 @@ creation would fail on a docker error that never mentions SSH — an
 The WSLg variant does not mount anything: it uses VS Code's built-in SSH-agent
 forwarding.
 
+## GitHub CLI
+
+The image carries `gh`, so branches and pull requests can be tended from the
+container instead of by hand in a browser.
+
+It is a **pinned release `.deb`**, verified against its published SHA-256, rather
+than the `universe` package. Ubuntu ships 2.46, whose `gh pr edit` still requests
+the retired Projects-classic `projectCards` field and fails with a deprecation
+error on every call — half of what `gh` would be here for. The upstream apt
+repository would fix that as well, but adds a second source and its signing key to
+verify behind a TLS-intercepting proxy, whereas the checksum of one file is
+anchored in `Dockerfile` where it can be read. The cost is bumping `GH_VERSION`
+and the checksums by hand:
+
+```sh
+V=$(gh api repos/cli/cli/releases/latest --jq .tag_name | tr -d v)
+curl -sSL "https://github.com/cli/cli/releases/download/v$V/gh_${V}_checksums.txt" |
+    grep -E 'linux_(amd64|arm64)\.deb$'
+```
+
+Only `amd64` and `arm64` carry a pinned checksum; any other architecture fails the
+build with a message saying so rather than silently skipping `gh`.
+
+`gh auth login` has to run **in a terminal** — the browser and device flows both
+need to prompt. Choose SSH as the protocol for Git operations: the remote already
+speaks SSH over port 443, and HTTPS to `github.com` is blocked in some networks
+this is used from. `gh`'s own API calls go over HTTPS and honour `HTTPS_PROXY`,
+which is why they work where `git push` over HTTPS does not.
+
+The login lands in `~/.config/gh` and so does **not** survive a rebuild. It holds
+a credential, which puts persisting it in a local variant — see below.
+
 ## Shared editor configuration
 
 VS Code extensions, CMake settings and the toolchain sanity check live in the
