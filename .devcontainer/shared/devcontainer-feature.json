@@ -27,6 +27,9 @@
             }
         }
     },
+    "containerEnv": {
+        "GH_HOST": "github.com"
+    },
     "postCreateCommand": "wx-config --version && cmake --version && pio --version",
     "mounts": [
         {
