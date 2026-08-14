@@ -85,6 +85,11 @@ Checks: >
 #   are written in, and those tables are read far more often than the four bytes of
 #   padding are paid for - on the target they sit in flash.
 
+# A finding can be reported under several names at once - a bugprone- check and the CERT
+# rules that alias it - and which of them leads depends on the version. A NOLINT therefore
+# names all of them, or it silences nothing on the version that reports the other one. The
+# container carries a newer clang-tidy than the CI runner, so both are met in practice.
+#
 # Only what this repository owns. Header findings are reported through the source that
 # includes them, so the firmware's header-only classes are covered by their callers.
 HeaderFilterRegex: '(firmware|platform)/.*'
