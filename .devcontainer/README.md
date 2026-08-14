@@ -56,13 +56,59 @@ Only `amd64` and `arm64` carry a pinned checksum; any other architecture fails t
 build with a message saying so rather than silently skipping `gh`.
 
 `gh auth login` has to run **in a terminal** — the browser and device flows both
-need to prompt. Choose SSH as the protocol for Git operations: the remote already
-speaks SSH over port 443, and HTTPS to `github.com` is blocked in some networks
-this is used from. `gh`'s own API calls go over HTTPS and honour `HTTPS_PROXY`,
-which is why they work where `git push` over HTTPS does not.
+need to prompt.
+
+`gh` is pointed at `github.com` by the shared feature. The internal base image
+sets `GH_HOST` to the company's own GitHub, and every call for this repository
+would otherwise answer `HTTP 401` against a host that has never heard of it.
+
+Which protocol to pick for Git operations depends on the network, and both fail
+in ways that do not name the cause — see below.
 
 The login lands in `~/.config/gh` and so does **not** survive a rebuild. It holds
 a credential, which puts persisting it in a local variant — see below.
+
+## Reaching GitHub: which transport works
+
+Both transports exist and either can be the broken one, depending on the network
+the container runs in. Neither says so plainly when it fails:
+
+| Transport | What a failure looks like | What it means |
+|---|---|---|
+| SSH, port 22 | `ssh` hangs, `ssh-keyscan` prints a banner that is not GitHub's | the port is filtered |
+| SSH, port 443 | `Connection reset by 140.82.121.36 port 443` | something between here and GitHub cuts the session |
+| SSH, either port | `Host key verification failed` | only the known host key was missing — see below, this one is fixed |
+| HTTPS | `TLS`/certificate errors, or a proxy error page | the intercepting proxy, or no credential helper |
+
+Two commands tell them apart, and take a few seconds:
+
+```sh
+ssh -T -p 443 git@ssh.github.com          # "Hi <user>!" means SSH works
+git ls-remote https://github.com/AndreasBur/Wordclock.git | head -1
+```
+
+Switch the remote to whichever answered:
+
+```sh
+git remote set-url origin ssh://git@ssh.github.com:443/AndreasBur/Wordclock.git
+git remote set-url origin https://github.com/AndreasBur/Wordclock.git
+```
+
+HTTPS needs no separate login: `gh auth setup-git` installs `gh`'s credential
+helper, so `git` uses the token that is already there. `gh`'s own API calls go
+over HTTPS and honour `HTTPS_PROXY` either way, which is why `gh pr create` can
+work in a container whose `git push` does not.
+
+**The host key is in the image.** `~/.ssh` belongs to the container and is empty
+after every rebuild, so the first SSH operation used to fail with `Host key
+verification failed` — a message that reads like a missing permission and is
+not one. `Dockerfile` writes GitHub's published ed25519 key into
+`/etc/ssh/ssh_known_hosts` for `github.com`, `ssh.github.com` and
+`[ssh.github.com]:443`, since an entry is keyed by host *and* port. It is public
+data, not a secret: the fingerprint stands beside the key and `ssh-keygen -lf
+/etc/ssh/ssh_known_hosts` prints it back for comparison with what GitHub
+publishes. Fetching it with `ssh-keyscan` at build time would trust whatever
+answered through the proxy, which is the thing a known host key prevents.
 
 ## Shared editor configuration
 

@@ -78,6 +78,28 @@ RUN cat /etc/ssl/certs/ca-certificates.crt \
 # cannot write the ~1.5 GB of toolchain into it.
 RUN install -d -o vscode -g vscode -m 0755 /home/vscode/.platformio
 
+# GitHub's SSH host key, so that the first git operation in a fresh container verifies
+# against something rather than failing with "Host key verification failed" - which is
+# what it does today, because ~/.ssh belongs to the container and is empty after every
+# rebuild. System-wide rather than in the remote user's home for the same reason.
+#
+# Written out rather than fetched with ssh-keyscan at build time: a scan believes whatever
+# answers it, which is precisely what a known host key is there to prevent, and the answer
+# here would come through a proxy. What makes this line trustworthy instead is the
+# fingerprint below - GitHub publishes it under "GitHub's SSH key fingerprints", and
+# `ssh-keygen -lf /etc/ssh/ssh_known_hosts` prints it back out of the file.
+#
+# Three names for one key. github.com is the ordinary host; ssh.github.com serves SSH on
+# 443 for networks that block 22, which is the port the remotes here use; and the bracketed
+# form is the same host again, because an entry is keyed by host *and* port.
+ARG GITHUB_HOST_KEY="ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl"
+RUN printf '# SHA256:+DiY3wvvV6TuJJhbpZisF/zLDA0zPMSvHdkr4UvCOqU\n%s %s\n%s %s\n%s %s\n' \
+        'github.com' "${GITHUB_HOST_KEY}" \
+        'ssh.github.com' "${GITHUB_HOST_KEY}" \
+        '[ssh.github.com]:443' "${GITHUB_HOST_KEY}" \
+        >> /etc/ssh/ssh_known_hosts && \
+    chmod 0644 /etc/ssh/ssh_known_hosts
+
 ENV TZ=Europe/Berlin
 
 # Extensions, editor settings and lifecycle commands live in the local feature
