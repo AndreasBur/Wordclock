@@ -56,37 +56,29 @@ TickType_t LastWakeTime{0};
 /******************************************************************************************************************************************************
  *  LOCAL FUNCTIONS
 ******************************************************************************************************************************************************/
-/* An unset SSID is a configuration that was never filled in, not a network with an empty
-   name - checked at compile time because that is where the literal is. */
-constexpr bool isWifiConfigured()
-{
-    return sizeof(WORDCLOCK_WIFI_SSID) > 1u;
-}
-
-void startWifi()
-{
-    if(!isWifiConfigured()) {
-        Serial.println(F("WiFi: no SSID configured, running without network"));
-        return;
-    }
-
-    WiFi.mode(WIFI_STA);
-    /* Reconnecting is left to the core, so a router that reboots does not take the clock's
-       time source with it for good. */
-    WiFi.setAutoReconnect(true);
-    WiFi.setSleep(WORDCLOCK_WIFI_MODEM_SLEEP);
-    WiFi.begin(WORDCLOCK_WIFI_SSID, WORDCLOCK_WIFI_PASSWORD);
-
-    Serial.print(F("WiFi: joining "));
-    Serial.println(WORDCLOCK_WIFI_SSID);
-}
-
 /* Installs the zone rule together with the servers, which is what makes every conversion
    in RealTimeClock local time. Safe to do before the link is up: the request is repeated
    until an answer arrives. */
 void startTimeSync()
 {
     configTzTime(WORDCLOCK_TIMEZONE, WORDCLOCK_NTP_SERVER_PRIMARY, WORDCLOCK_NTP_SERVER_SECONDARY);
+}
+
+/* What the clock came up as, said once: the network it is joining, or the one it opened
+   because it has none. System does not print this itself - it also runs from the command
+   that changes the credentials, and a line printed there would land inside that command's
+   answer. */
+void reportNetwork()
+{
+    char Ssid[System::SsidStringLength]{};
+
+    if(System::getInstance().getNetworkSsid(Ssid) == E_OK) {
+        Serial.print(F("WiFi: joining "));
+        Serial.println(Ssid);
+    } else {
+        Serial.print(F("WiFi: no network configured, console on the access point "));
+        Serial.println(SYSTEM_ACCESS_POINT_SSID);
+    }
 }
 
 /* Reported from the tick rather than from setup(), because both of these finish long after
@@ -125,7 +117,12 @@ void setup()
 
     Wordclock.init();
 
-    startWifi();
+    /* Which network, and whether there is one at all, is System's answer now: what was
+       stored over the console, what was compiled in, or - when neither - an access point
+       of its own, so that the console the credentials are entered through can be reached
+       without a cable. */
+    System::getInstance().startNetwork();
+    reportNetwork();
     startTimeSync();
     /* Before the network is up on purpose: the server listens on whatever address arrives
        later, and starting it here keeps the order in setup() the same whether there is a

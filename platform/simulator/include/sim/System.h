@@ -42,6 +42,8 @@
 /* System parameter */
 #define SYSTEM_ADDRESS_STRING_LENGTH                    16u
 #define SYSTEM_LINK_QUALITY_STRING_LENGTH               5u
+#define SYSTEM_SSID_STRING_LENGTH                       33u
+#define SYSTEM_PASSWORD_STRING_LENGTH                   64u
 
 /******************************************************************************************************************************************************
  *  C L A S S   S Y S T E M
@@ -54,6 +56,8 @@ class System
   public:
     static constexpr byte AddressStringLength{SYSTEM_ADDRESS_STRING_LENGTH};
     static constexpr byte LinkQualityStringLength{SYSTEM_LINK_QUALITY_STRING_LENGTH};
+    static constexpr byte SsidStringLength{SYSTEM_SSID_STRING_LENGTH};
+    static constexpr byte PasswordStringLength{SYSTEM_PASSWORD_STRING_LENGTH};
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
@@ -88,6 +92,14 @@ class System
     StdReturnType getFreeMemoryInKibibytes(uint16_t& FreeMemory) const { UNUSED(FreeMemory); return E_NOT_OK; }
 
     StdReturnType getNetworkAddress(char* String) const { String[0u] = STD_NULL_CHARACTER; return E_NOT_OK; }
+
+    /* There is no network here to be on or to join, so the command that configures one
+       answers that it could not - which is the same answer a clock gives whose store
+       refused the pair, and the one the simulator has to be able to produce. */
+    StdReturnType getNetworkSsid(char* String) const { String[0u] = STD_NULL_CHARACTER; return E_NOT_OK; }
+    bool isNetworkConfigured() const { return false; }
+    StdReturnType setNetworkCredentials(const char* Ssid, const char* Password) { UNUSED(Ssid); UNUSED(Password); return E_NOT_OK; }
+    void startNetwork() { }
     StdReturnType getLinkQuality(char* String) const { String[0u] = STD_NULL_CHARACTER; return E_NOT_OK; }
 
     // methods

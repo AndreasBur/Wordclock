@@ -137,12 +137,13 @@ Three things it settled:
 
 From the comparison with wordclock24h, in the order they would change daily use.
 
-1. **WiFi provisioning and a configuration UI.** The SSID is compiled in
-   ([WordclockConfiguration.h](../platform/esp32/include/WordclockConfiguration.h)) and
-   the web interface is deliberately a console
-   ([WebInterface.h](../platform/esp32/include/WebInterface.h)), so a new network means
-   a new flash. An access point on first boot plus credentials in NVS is the single
-   biggest difference to a finished product.
+1. ~~**WiFi provisioning.**~~ **Done.** Credentials live in NVS and are set with command
+   13; a clock with none opens an access point and serves the console on it, which is where
+   the first pair is entered. What is left of this item is the *configuration UI*: the web
+   interface is deliberately a console
+   ([WebInterface.h](../platform/esp32/include/WebInterface.h)), so provisioning means
+   typing a command rather than filling in a form. The catalog already describes the
+   command, so a form over it is a page change rather than a firmware one.
 2. **Night switch-off / timer.** No equivalent at all today; the clock lights around
    the clock. A firmware module with its own command, and the first setting that needs
    a time of day rather than a value.

@@ -44,6 +44,7 @@ overlay is disabled at compile time.
 | 10 | Time | `-H<hour>` `-M<min>` `-S<sec>` | Sets RTC time |
 | 11 | Date | `-Y<year>` (uint16) `-M<month>` `-D<day>` | Sets RTC date |
 | 12 | Status | *(none)* | Read-only; version, uptime, illuminance, temperature, address, link quality, free memory |
+| 13 | Network | `-S<name>` `-P<pass phrase>` | Which network the clock joins. The pass phrase goes in and never comes back |
 
 ### Overlay options (shared)
 
@@ -218,6 +219,41 @@ still described in the
 [message catalog](../firmware/inc/Communication/MessageCatalog.h), marked read-only, which
 is how the simulator dialog and the web console put labels on an answer without offering
 the fields as inputs.
+
+### Network (`command 13`)
+
+Which network the clock joins, and the reason it no longer has to be flashed in.
+
+```
+13                              # -> 13 S=MyNetwork Error=0
+13 -SMyNetwork -Psecret         # store the pair and join
+13 -S -P                        # forget it, and open the access point again
+```
+
+Both halves or neither. A command carrying only one of them is refused with `Error=8`
+rather than joining a network with the previous pass phrase or keeping a pass phrase for
+the previous network — both of which are a clock that goes quiet with nothing to say why.
+
+**The pass phrase is never answered.** A console that echoed it would leave it in the
+scrollback of every browser watching the same clock.
+
+**A clock with no network opens one.** It comes up as an open access point named
+`Wordclock`, and the web console on it is where the credentials are entered — without that,
+"configurable at runtime" would still mean a cable for the first time. The access point is
+open on purpose: a pass phrase shared by every clock of this firmware protects nothing. It
+closes as soon as a network is stored, so the window is the time between unpacking and
+configuring.
+
+Two limits come from the wire format rather than from this command:
+
+- A value runs to the next `-`, so **neither the name nor the pass phrase may contain a
+  hyphen**. This is the same rule the text overlay lives under.
+- A value also carries the space that separates it from the next option, so a **trailing
+  space is stripped** — a name or pass phrase cannot end in one over this interface.
+
+What is stored lives beside the settings rather than in them: `1 -P30` (settings reset)
+leaves the network alone, because a reset that threw it away would leave a clock nobody can
+reach without a cable.
 
 ## RPC sub-commands (`command 1 -P<id>`)
 

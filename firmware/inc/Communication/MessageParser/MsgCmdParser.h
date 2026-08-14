@@ -68,7 +68,8 @@ class MsgCmdParser
         COMMAND_ANIMATION,
         COMMAND_TIME,
         COMMAND_DATE,
-        COMMAND_STATUS
+        COMMAND_STATUS,
+        COMMAND_NETWORK
     };
 
 /******************************************************************************************************************************************************

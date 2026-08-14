@@ -91,6 +91,16 @@ int main()
     check(answerTo("12\n") == "12 V=" WORDCLOCK_VERSION " U=3 I=1 T= A= Q= M=0",
           "the uptime is reported in minutes");
 
+    /* The network command, which is the one that used to be a reflash. What can be checked
+       on a host is the whole path except the radio: a pair goes in, the store keeps it, and
+       the answer names the network without ever carrying the pass phrase back. */
+    check(answerTo("13\n") == "13 S= Error=0", "a clock with no network names none");
+    check(answerTo("13 -SMyNetwork -Psecret\n") == "13 S=MyNetwork Error=0", "a pair is taken");
+    check(answerTo("13\n") == "13 S=MyNetwork Error=0", "and is what the clock answers with afterwards");
+    check(answerTo("13\n").find("secret") == std::string::npos, "the pass phrase never comes back");
+    check(answerTo("13 -SOther\n") == "13 S=MyNetwork Error=8", "half a pair is refused");
+    check(answerTo("13\n") == "13 S=MyNetwork Error=0", "and leaves the stored one alone");
+
     /* a full buffer refuses rather than overwriting a command in flight */
     std::string tooMuch(WORDCLOCK_SERIAL_INJECT_BUFFER_SIZE + 8u, 'x');
     check(port.inject(tooMuch.data(), tooMuch.size()) == E_NOT_OK, "an overlong injection is refused");
