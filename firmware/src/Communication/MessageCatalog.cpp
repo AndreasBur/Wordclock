@@ -307,7 +307,8 @@ constexpr MessageCatalog::OptionType StatusOptions[] {
 
 /* MsgCmdClockModeParser */
 constexpr MessageCatalog::OptionType ClockModeOptions[] {
-    {'M', "Mode",               ARGUMENT_TYPE_UINT8,  NAMED(0u, ClockModeValueNames)}
+    {'M', "Mode",               ARGUMENT_TYPE_UINT8,  NAMED(0u, ClockModeValueNames)},
+    {'I', "It is permanently",  ARGUMENT_TYPE_UINT8,  NAMED(0u, BooleanValueNames)}
 };
 
 /* MsgCmdAnimationParser */

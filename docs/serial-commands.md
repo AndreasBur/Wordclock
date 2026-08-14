@@ -39,7 +39,7 @@ overlay is disabled at compile time.
 | 5 | Overlay Date | `-P -E -M -D -V -A` | See overlay options |
 | 6 | Overlay Temperature | `-P -E -M -D -V -A` | See overlay options |
 | 7 | Overlay Text | `-P -E -M -D -V -T -S -F -A` | Text overlay adds text/speed/font |
-| 8 | Clock Mode | `-M<mode>` (uint8) | Sets the clock display mode |
+| 8 | Clock Mode | `-M<mode>` `-I<0\|1>` | Regional wording, and whether "es ist" stands permanently |
 | 9 | Animation | `-A<id>` `-M<mode>` `-S<speed>` `-F<0\|1>` | Animation id, selection mode, speed, favourite flag |
 | 10 | Time | `-H<hour>` `-M<min>` `-S<sec>` | Sets RTC time |
 | 11 | Date | `-Y<year>` (uint16) `-M<month>` `-D<day>` | Sets RTC date |
@@ -113,6 +113,17 @@ half hour. Everything else is identical between them.
 
 The quarters of Ossi and Schwaben name the hour they are counting towards, so
 "viertel fünf" is a quarter past four, not a quarter past five.
+
+`-I<0|1>` decides whether **ES IST** stands in every time or only in the two it is
+said in — `-I0` lights it at the full and the half hour alone, `-I1` at every time.
+It used to be a compile-time switch; the default is still what
+[`CLOCK_SHOW_IT_IS_PERMANENTLY`](../firmware/inc/Clock/Clock.h) says, and a clock
+that was never told otherwise comes up with it.
+
+```
+8 -M1 -I0             # Ossi, and "es ist" only where it is spoken
+8                     # query both (echoes M=.. I=..)
+```
 
 ### Animation ids (`command 9 -A<id>`)
 
