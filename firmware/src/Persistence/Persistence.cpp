@@ -238,5 +238,54 @@ void Persistence::task()
 } /* task */
 
 /******************************************************************************************************************************************************
+  save()
+******************************************************************************************************************************************************/
+/*! \brief          Writes the configuration now
+ *  \details        Unconditionally, unlike task(): a caller that asks for this is about to
+ *                  cut the power, and "nothing changed since the last write" is a state it
+ *                  cannot check for itself.
+ *
+ *  \return         E_OK if the store took the configuration
+******************************************************************************************************************************************************/
+StdReturnType Persistence::save()
+{
+    const SettingsType Current = gather();
+
+    if(Storage::getInstance().write(reinterpret_cast<const byte*>(&Current), sizeof(Current)) == E_NOT_OK) { return E_NOT_OK; }
+
+    LastSaved = Current;
+    return E_OK;
+} /* save */
+
+
+/******************************************************************************************************************************************************
+  reset()
+******************************************************************************************************************************************************/
+/*! \brief          Puts the configuration back to what a clock starts with
+ *  \details        Each module answers for its own defaults, the same way gather() reads
+ *                  from each of them rather than from a copy kept here - so a setting
+ *                  added to one of them is reset by the module that owns it and not
+ *                  forgotten in a list over here.
+ *
+ *                  What is remembered as "last written" afterwards is what the modules now
+ *                  hold, so the next task does not write the defaults straight back into
+ *                  the store that was just emptied.
+ *
+ *  \return         E_OK if the store was emptied
+******************************************************************************************************************************************************/
+StdReturnType Persistence::reset()
+{
+    Display::getInstance().resetToDefaults();
+    Clock::getInstance().resetToDefaults();
+    Animations::getInstance().resetToDefaults();
+    Illuminance::getInstance().resetToDefaults();
+
+    const StdReturnType ReturnValue = Storage::getInstance().clear();
+
+    LastSaved = gather();
+    return ReturnValue;
+} /* reset */
+
+/******************************************************************************************************************************************************
  *  E N D   O F   F I L E
 ******************************************************************************************************************************************************/

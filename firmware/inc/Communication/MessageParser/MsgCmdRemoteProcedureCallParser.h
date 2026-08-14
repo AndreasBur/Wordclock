@@ -27,6 +27,7 @@
 #include "Display.h"
 #include "DisplayManager.h"
 #include "Overlays.h"
+#include "Persistence.h"
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
@@ -86,6 +87,8 @@ class MsgCmdRemoteProcedureCallParser : public MsgParameterParser<MsgCmdRemotePr
         RPC_ID_OVERLAY_TEMPERATURE_SHOW,
         RPC_ID_OVERLAY_TEXT_SHOW,
         RPC_ID_OVERLAY_ABORT,
+        RPC_ID_SETTINGS_SAVE,
+        RPC_ID_SETTINGS_RESET,
         /* Only so that the names in the message catalog can be counted against the
            procedures; never sent, and anything from here on lands in the default case. */
         RPC_ID_NUMBER_OF_PROCEDURES
@@ -239,6 +242,12 @@ class MsgCmdRemoteProcedureCallParser : public MsgParameterParser<MsgCmdRemotePr
                 break;
             case RPC_ID_OVERLAY_ABORT :
                 ReturnValue = Overlays::getInstance().abort();
+                break;
+            case RPC_ID_SETTINGS_SAVE :
+                ReturnValue = Persistence::getInstance().save();
+                break;
+            case RPC_ID_SETTINGS_RESET :
+                ReturnValue = Persistence::getInstance().reset();
                 break;
             default:
                 // Unknown or missing RPC id (including RPC_ID_NONE): there is

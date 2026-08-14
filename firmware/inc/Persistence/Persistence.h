@@ -82,6 +82,16 @@ class Persistence
        restores reach the display through the modules' own setters. */
     StdReturnType load();
     void task();
+
+    /* Writes now rather than within the next period. What that period is there for is
+       rationing a burst of commands, which is exactly what a caller asking for this is
+       not doing - it is about to pull the plug. */
+    StdReturnType save();
+
+    /* Every module back to what it starts with, and the store emptied. Emptied rather
+       than written with the defaults: an empty store is what a clock that was never
+       configured has, and load() already treats the two the same. */
+    StdReturnType reset();
 };
 
 #endif // _PERSISTENCE_H_

@@ -202,14 +202,17 @@ From
 | 24 | Animation abort — end a running animation and put the time back |
 | 25 / 26 / 27 | Overlay date / temperature / text — show it now instead of at its next period |
 | 28 | Overlay abort — end the overlay that is showing |
+| 29 | Settings save — write the configuration to the store now instead of within the next two seconds |
+| 30 | Settings reset — every setting back to what a clock starts with, and the store emptied |
 
 The RPC answer is `RpcId=<id> Error=<code>`. An unknown or missing id (including
 `0`, e.g. when `-P` is omitted) is rejected with `Error=7`
 (`ERROR_RPC_ID_UNKNOWN`) instead of being silently accepted.
 
-Ids `22` to `28` are the ones that can be refused: they answer `Error=8`
-(`ERROR_UNKNOWN`, the general `E_NOT_OK`) when the display is busy with something
-else rather than doing it anyway. The clock cannot be refreshed and no animation
+Ids `22` to `30` are the ones that can be refused: they answer `Error=8`
+(`ERROR_UNKNOWN`, the general `E_NOT_OK`) when they could not be carried out —
+`29` and `30` when the store did not take the write, the rest when the display is busy
+with something else rather than doing it anyway. The clock cannot be refreshed and no animation
 started while an overlay owns the display; an overlay cannot be shown while another
 one is showing or while it is switched off (`-A0`); and aborting answers the same way
 when nothing was running. `22` and `24` are what brings the clock face back after a

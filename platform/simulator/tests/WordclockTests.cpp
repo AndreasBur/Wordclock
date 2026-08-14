@@ -492,6 +492,42 @@ void testPersistence()
     expect(storage.clear() == E_OK, "the test must leave the store as it found it");
 }
 
+/* The two procedures that reach the store directly. What they are for is what task()
+   cannot do: write before the plug is pulled rather than within the next period, and get
+   a clock back to what it left the factory as without erasing its flash over USB. */
+void testPersistenceSaveAndReset()
+{
+    Storage& storage = Storage::getInstance();
+    Persistence& persistence = Persistence::getInstance();
+    Display& display = Display::getInstance();
+    Clock& clock = Clock::getInstance();
+
+    display.setColor(1u, 2u, 3u);
+    clock.setModeFast(Clock::MODE_OSSI);
+    expect(persistence.save() == E_OK, "saving must write the configuration");
+
+    display.setColor(9u, 9u, 9u);
+    expect(persistence.load() == E_OK, "what was saved must come back");
+    expect(display.getColorRed() == 1u, "and it must be what was saved");
+
+    expect(persistence.reset() == E_OK, "resetting must empty the store");
+    expect(display.getColorRed() == 255u && display.getColorGreen() == 255u && display.getColorBlue() == 255u,
+           "the reset must put the colour back to white");
+    expect(display.getBrightness() == 255u, "the reset must put the brightness back");
+    /* Qualified because the macro expands to the bare enumerator, and asked through the
+       macro rather than through the mode it happens to name today. */
+    expect(clock.getMode() == Clock::CLOCK_INITIAL_MODE, "the reset must put the clock mode back");
+    expect(Animations::getInstance().getAnimation() == Animations::ANIMATION_ID_NONE,
+           "the reset must deselect the animation");
+
+    /* The store stays empty rather than being refilled with the defaults on the next
+       period - an empty store is what a clock that was never configured has. */
+    persistence.task();
+    expect(persistence.load() == E_NOT_OK, "the task after a reset must leave the store empty");
+
+    expect(storage.clear() == E_OK, "the test must leave the store as it found it");
+}
+
 } // namespace
 
 /******************************************************************************************************************************************************
@@ -510,6 +546,7 @@ int main()
     testPixelColorChannels();
     testDisplayCharacterLookup();
     testPersistence();
+    testPersistenceSaveAndReset();
 
     if(Failures == 0) {
         std::cout << "All Wordclock tests passed.\n";

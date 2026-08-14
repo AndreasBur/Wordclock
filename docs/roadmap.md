@@ -37,9 +37,10 @@ no payload field, so anything with a value to report is a command, not an RPC �
 The largest group of things the firmware does but no interface reaches. Ids continue
 at 22.
 
-**Done — ids 22 to 28**, see the RPC table in [serial-commands.md](serial-commands.md):
-clock refresh, animation start and abort, the three overlays shown on demand, and the
-overlay abort. Two things they run into are worth keeping in mind for what follows:
+**Done — ids 22 to 30**, see the RPC table in [serial-commands.md](serial-commands.md):
+clock refresh, animation start and abort, the three overlays shown on demand, the overlay
+abort, and saving and resetting the settings. Three things they ran into are worth keeping
+in mind for what follows:
 
 - The show timer lives in `Overlays`, not in the overlay
   ([Overlays.cpp](../firmware/src/Overlay/Overlays.cpp)), so the entry point belongs
@@ -47,13 +48,10 @@ overlay abort. Two things they run into are worth keeping in mind for what follo
 - The clock refresh clears `ClockWordsInitialized` rather than calling `Clock::refresh()`
   directly ([DisplayManager.h](../firmware/inc/DisplayManager/DisplayManager.h)), or the
   latch and the display disagree on what is drawn.
-
-Still open:
-
-| Id | RPC | What it calls | Why |
-|----|-----|---------------|-----|
-| 29 | Save settings now | force a `Persistence` write | Writes are rationed to one per two seconds ([Persistence.h](../firmware/inc/Persistence/Persistence.h)) — enough of a window to lose the last change when the plug is pulled. |
-| 30 | Reset settings | `Storage::clear()`, then apply defaults | Nothing currently gets a clock back to defaults short of erasing NVS over USB. |
+- The reset asks each module for its own defaults through a `resetToDefaults()`, the same
+  way `Persistence::gather()` reads the current values from each of them. A list of
+  defaults kept in `Persistence` would be the copy that falls behind, and the values it
+  would copy were literals in four different headers before this.
 
 ## 2. The temperature overlay
 
@@ -61,10 +59,9 @@ Still open:
 shell — command 6 configured it, the overlay switched state, and nothing was ever drawn.
 It now shows the reading, and the decisions it needed came out as follows:
 
-- **The sensor is a DS3231**, read for its temperature registers only
-  ([DS3231.cpp](../platform/esp32/src/DS3231.cpp)). It costs no pin on the I²C bus the
-  light sensor already runs, and it is the same chip that closes the RTC gap in the
-  backlog below — which is why it beat an SHT31 or a one-wire DS18B20. What it measures is
+- **The sensor is a DS3231** ([DS3231.cpp](../platform/esp32/src/DS3231.cpp)). It costs no
+  pin on the I²C bus the light sensor already runs, and it is the same chip that closes the
+  RTC gap — which is why it beat an SHT31 or a one-wire DS18B20. What it measures is
   its own die, so a closed case reads above the room by whatever that case adds.
 - **The core reaches it as `Temperature`**
   ([Temperature.h](../firmware/inc/Temperature/Temperature.h)), the same arrangement as
@@ -131,11 +128,13 @@ From the comparison with wordclock24h, in the order they would change daily use.
    the clock. A firmware module with its own command, and the first setting that needs
    a time of day rather than a value.
 3. **OTA update.** Cheap on the ESP32, and the natural companion to 1.
-4. **RTC with battery.** After a power cut the display holds its default date until
-   SNTP answers ([RealTimeClock.h](../platform/esp32/include/RealTimeClock.h)). The DS3231
-   that section 2 put on the bus is read for its temperature only; what is left is its
-   time registers and a `RealTimeClock::setDateTime()` from them — plus the decision when
-   the chip wins over SNTP and when it is written back from it.
+4. ~~**RTC with battery.**~~ **Done** with section 2's chip: the time registers are read
+   while the system clock holds nothing, and written back from it once an hour and after
+   every hand-set time ([RealTimeClock.cpp](../platform/esp32/src/RealTimeClock.cpp)). The
+   chip keeps UTC, because a chip keeping local time has nothing to say about the hour that
+   occurs twice when summer time ends. Which side wins was the decision: the chip is the
+   source of last resort and never overwrites a system clock that SNTP has set, since it
+   drifts a few seconds a month and SNTP does not.
 5. **Colour animations.** All fifteen animations are transitions; a slow colour cycle
    while the display stands still is a different mechanism and does not exist.
 6. **IR receiver**, after section 4.

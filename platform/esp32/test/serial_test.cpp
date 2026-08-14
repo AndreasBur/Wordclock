@@ -71,7 +71,7 @@ int main()
 
     check(answerTo("1 -P22\n") == "1 RpcId=22 Error=0", "the clock refresh is carried out");
     check(answerTo("1 -P28\n") == "1 RpcId=28 Error=8", "aborting with no overlay showing is refused");
-    check(answerTo("1 -P29\n") == "1 RpcId=29 Error=7", "an id past the last procedure is unknown");
+    check(answerTo("1 -P31\n") == "1 RpcId=31 Error=7", "an id past the last procedure is unknown");
 
     /* a full buffer refuses rather than overwriting a command in flight */
     std::string tooMuch(WORDCLOCK_SERIAL_INJECT_BUFFER_SIZE + 8u, 'x');

@@ -54,7 +54,11 @@ class DisplayColor
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    Pixel Color{255, 255, 255};
+    /* White, and named rather than written into the member below alone: it is also what
+       the reset puts back, and two literals could drift apart. */
+    static constexpr byte ColorInitValue{255u};
+
+    Pixel Color{ColorInitValue, ColorInitValue, ColorInitValue};
 
 #if (DISPLAY_COLOR_SUPPORT_DIMMING == STD_ON)
     Pixel ColorDimmed{Color};
@@ -96,6 +100,8 @@ class DisplayColor
     void setColorBlue(byte Blue) { Color.setBlue(Blue); }
 
 	// methods
+    void resetToDefaults() { setColor(Pixel(ColorInitValue, ColorInitValue, ColorInitValue)); }
+
     void incrementColorRed() { Color.incrementRed(); }
     void incrementColorGreen() { Color.incrementGreen(); }
     void incrementColorBlue() { Color.incrementBlue(); }

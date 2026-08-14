@@ -55,9 +55,15 @@ class DisplayBrightness
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    byte Brightness{255u};
-    bool UseAutomatic{false};
-    bool UseGammaCorrection{false};
+    /* What a clock starts with, and what the reset puts back - named once so the two
+       cannot drift apart. */
+    static constexpr byte BrightnessInitValue{255u};
+    static constexpr bool UseAutomaticInitValue{false};
+    static constexpr bool UseGammaCorrectionInitValue{false};
+
+    byte Brightness{BrightnessInitValue};
+    bool UseAutomatic{UseAutomaticInitValue};
+    bool UseGammaCorrection{UseGammaCorrectionInitValue};
     GammaCorrection GCorrection;
 
     static constexpr float AutomaticCorrectionFactor{1.0f};
@@ -101,6 +107,12 @@ class DisplayBrightness
     void setUseGammaCorrection(bool sUseGammaCorrection) { UseGammaCorrection = sUseGammaCorrection; }
 
 	// methods
+    void resetToDefaults() {
+        Brightness = BrightnessInitValue;
+        UseAutomatic = UseAutomaticInitValue;
+        UseGammaCorrection = UseGammaCorrectionInitValue;
+    }
+
     void enableAutomatic() { UseAutomatic = true; }
     void disableAutomatic() { UseAutomatic = false; }
     void enableGammaCorrection() { UseGammaCorrection = true; }

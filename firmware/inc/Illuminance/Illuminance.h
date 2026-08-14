@@ -82,6 +82,14 @@ class Illuminance
     void setCalibrationValues(CalibrationValuesType CalibrationValues) { Sensor.setCalibrationValues(CalibrationValues); }
 
     // methods
+    /* The calibration back to the sensor's full range, which is where a clock that was
+       never calibrated starts - the same two bounds the driver initialises from, so a
+       reset and a fresh chip agree. */
+    void resetToDefaults() {
+        setCalibrationValuesMaxValue(BH1750_ILLUMINANCE_MAX_LX_VALUE);
+        setCalibrationValuesMinValue(BH1750_ILLUMINANCE_MIN_LX_VALUE);
+    }
+
     StdReturnType init(ModeType);
     StdReturnType changeMeasurementTime(byte);
     void startCalibrationMaxValue() { Sensor.startCalibrationMaxValue(); }

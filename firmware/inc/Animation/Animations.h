@@ -335,6 +335,16 @@ class Animations
     }
 
     // methods
+    /* The same state the constructor leaves behind: every speed at its initial cycle,
+       every animation a favourite again, and nothing selected. Written out here rather
+       than by constructing a second instance, which a singleton cannot do. */
+    void resetToDefaults() {
+        TaskCycles.fill(TaskCycleInitValue);
+        Favourites = AllFavourites;
+        setAnimationFast(ANIMATION_ID_NONE);
+        setModeFast(MODE_FIXED);
+    }
+
     void task(bool=false);
     StdReturnType show() const;
     bool isAnimationValid(AnimationIdType AnimationId) const { return AnimationId < ANIMATION_ID_NUMBER_OF_ANIMATIONS; }

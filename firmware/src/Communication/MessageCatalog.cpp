@@ -135,7 +135,9 @@ constexpr const char* const RemoteProcedureValueNames[] {
     "Overlay date show",
     "Overlay temperature show",
     "Overlay text show",
-    "Overlay abort"
+    "Overlay abort",
+    "Settings save",
+    "Settings reset"
 };
 
 /* The command numbers and the value lists of the enumerations come out of the firmware
