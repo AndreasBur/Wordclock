@@ -95,9 +95,10 @@ class StringTools
 
     static char* itoa(int32_t Number, char* String)
     {
-        int32_t i, sign;
+        int32_t i;
+        const int32_t sign = Number;   /* record sign */
 
-        if ((sign = Number) < 0) { /* record sign */
+        if (sign < 0) {
             Number = -Number;          /* make n positive */
         }
         i = 0;

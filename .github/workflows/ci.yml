@@ -54,6 +54,30 @@ jobs:
       - name: Test
         run: ctest --test-dir build --output-on-failure
 
+  static-analysis:
+    name: Static analysis
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+
+      # wxWidgets is here for the same reason as in the job above: the simulator's compile
+      # database is what covers the firmware core, and it does not exist without the
+      # headers the backend includes.
+      - name: Install the toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends cmake ninja-build libwxgtk3.2-dev clang-tidy
+
+      # Configured, not built: clang-tidy compiles each translation unit itself and needs
+      # nothing from the build but compile_commands.json.
+      - name: Configure
+        run: cmake -S . -B build -G Ninja -DPLATFORM=simulator -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+
+      # Which checks, and why the rest are off, is in .clang-tidy. WarningsAsErrors is set
+      # there, so a finding fails this job.
+      - name: Analyse
+        run: run-clang-tidy -p build -quiet -j "$(nproc)" 'firmware/|platform/simulator/src'
+
   host-tests:
     name: ESP32 backend on the host
     runs-on: ubuntu-24.04

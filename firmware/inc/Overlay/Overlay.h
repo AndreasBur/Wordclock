@@ -70,14 +70,18 @@ template <typename Derived> class Overlay
   protected:
     StateType State{STATE_DISABLED};
 
-    // functions
-    constexpr Overlay() { }
-    ~Overlay() { }
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
+    /* Private rather than protected, and the one class that may use it named: a protected
+       constructor lets anything inherit from this template, and for a CRTP base that
+       means inheriting with somebody else's Derived. */
+    constexpr Overlay() { }
+    ~Overlay() { }
+    friend Derived;
+
     static constexpr SecondType SecondToStartShow{30u};
     MinuteType PeriodInMinutes{1u};
     SecondType EnduranceInSeconds{1u};

@@ -86,6 +86,10 @@ class MsgCmdParser
     }
 
     CommandType getCommand() const {
+        /* atoi cannot report a failure and does not have to: a message that is not a
+           number converts to zero, which is COMMAND_NONE and is answered with
+           ERROR_WRONG_COMMAND - the same answer strtol would lead to, over more code. */
+        // NOLINTNEXTLINE(cert-err34-c)
         return static_cast<CommandType>(atoi(IncomingMessage.getMessage()));
     }
 

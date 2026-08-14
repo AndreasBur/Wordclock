@@ -230,6 +230,11 @@ void Persistence::task()
 {
     const SettingsType Current = gather();
 
+    /* The padding is what makes this defined, and both sides are zero-initialised for
+       exactly that reason - see the struct's own comment. Comparing member by member is
+       what the check asks for, and is the copy that would fall behind the next setting
+       somebody adds. */
+    // NOLINTNEXTLINE(bugprone-suspicious-memory-comparison)
     if(memcmp(&Current, &LastSaved, sizeof(Current)) == 0) { return; }
 
     if(Storage::getInstance().write(reinterpret_cast<const byte*>(&Current), sizeof(Current)) == E_OK) {

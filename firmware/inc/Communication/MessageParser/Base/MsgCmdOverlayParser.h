@@ -65,16 +65,19 @@ template <typename Derived> class MsgCmdOverlayParser
 /******************************************************************************************************************************************************
  *  P R O T E C T E D   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
-  protected:
-    // functions
-    constexpr MsgCmdOverlayParser(const char* Parameter) : MsgParameterParserType(ParameterTable, Parameter) { }
-    ~MsgCmdOverlayParser() { }
-
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
     friend class MsgParameterParser<MsgCmdOverlayParser<Derived>, MSG_CMD_BASE_OVERLAY_PARSER_PARAMETER_TABLE_SIZE>;
+    friend Derived;
+
+    // functions
+    /* Private rather than protected, and the one class that may use it named: a protected
+       constructor lets anything inherit from this template, and for a CRTP base that
+       means inheriting with somebody else's Derived. */
+    constexpr MsgCmdOverlayParser(const char* Parameter) : MsgParameterParserType(ParameterTable, Parameter) { }
+    ~MsgCmdOverlayParser() { }
 
     // functions
     Derived& underlying() { return static_cast<Derived&>(*this); }

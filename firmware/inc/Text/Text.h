@@ -42,7 +42,7 @@
 #define TEXT_SUPPORT_FONT_10X10               STD_ON
 
 /* Text parameter */
-#define TEXT_ASCII_TABLE_OFFSET               -32
+#define TEXT_ASCII_TABLE_OFFSET               (-32)
 #define TEXT_ASCII_CHAR_MIN                    32
 #define TEXT_ASCII_CHAR_MAX                   127
 
