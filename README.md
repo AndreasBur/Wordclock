@@ -106,10 +106,9 @@ cppcheck reads `firmware/` only: without wxWidgets' own headers it stops at
 `DECLARE_EVENT_TABLE` in the simulator's window class, which is the half
 clang-tidy already covers through the compile database.
 
-The same commands are what to run before pushing; nothing in them needs a display
-or a board. The analysers are the ones that need a configured build directory
-rather than a built one, and `cppcheck` — unlike `clang-tidy` — is not in the dev
-container yet:
+The same commands are what to run before pushing; nothing in them needs a display,
+a board, or anything the dev container does not carry. The analysers are the ones
+that need a configured build directory rather than a built one:
 
 ```bash
 cmake -S . -B build -G Ninja -DPLATFORM=simulator -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
