@@ -29,6 +29,11 @@ devcontainer-lock.json
 # Site-specific dev container variant (local only)
 /.devcontainer/vector/
 
+# Working copies an agent checks out beside the repository. They are git worktrees, so
+# git offers to record them as a gitlink - which would commit a pointer to a checkout that
+# exists on one machine.
+/.claude/worktrees/
+
 # Personal Claude Code permission grants. Only the .local. tier: a committed
 # .claude/settings.json holds project conventions and stays tracked, whereas these
 # grants authorize pushing and closing pull requests as whoever is logged in here,

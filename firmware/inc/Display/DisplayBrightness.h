@@ -60,8 +60,12 @@ class DisplayBrightness
     static constexpr byte BrightnessInitValue{255u};
     static constexpr bool UseAutomaticInitValue{false};
     static constexpr bool UseGammaCorrectionInitValue{false};
+    /* What a fade scales the result by. Full means there is no fade, which is the state
+       everything but a running AnimationFade is in. */
+    static constexpr byte FadeLevelFull{255u};
 
     byte Brightness{BrightnessInitValue};
+    byte FadeLevel{FadeLevelFull};
     bool UseAutomatic{UseAutomaticInitValue};
     bool UseGammaCorrection{UseGammaCorrectionInitValue};
     GammaCorrection GCorrection;
@@ -85,6 +89,12 @@ class DisplayBrightness
 
         return automaticBrightness;
     }
+    /* The same shape as Pixel's own dimming: a level of 255 leaves the value alone, and
+       one less than that scales it down without ever reaching zero by rounding. */
+    static constexpr byte scaleByLevel(byte Value, byte Level) {
+        return static_cast<byte>((static_cast<uint16_t>(Value) * (Level + 1u)) >> 8u);
+    }
+
     byte calcBrightnessCorrected() const { return GCorrection.calcCorrectedValue(Brightness); }
     byte calcBrightnessAutomatic() const { return calcBrightnessAutomatic(Brightness); }
     byte calcBrightnessAutomaticCorrected() const { return calcBrightnessAutomatic(GCorrection.calcCorrectedValue(Brightness)); }
@@ -98,6 +108,15 @@ class DisplayBrightness
 
 	// get methods
     byte getBrightness() const { return Brightness; }
+    byte calcConfiguredBrightness() const {
+        if(UseGammaCorrection) {
+            if(UseAutomatic) { return calcBrightnessAutomaticCorrected(); }
+            else { return calcBrightnessCorrected(); }
+        } else {
+            if(UseAutomatic) { return calcBrightnessAutomatic(); }
+            else { return Brightness; }
+        }
+    }
     bool getUseAutomatic() const { return UseAutomatic; }
     bool getUseGammaCorrection() const { return UseGammaCorrection; }
 
@@ -120,15 +139,21 @@ class DisplayBrightness
     void incrementBrightness() { if(Brightness < BrightnessMaxValue) { Brightness++; }}
     void decrementBrightness() { if(Brightness > 0u) { Brightness--; }}
         
+    /* A fade scales whatever the setting, the gamma correction and the automatic arrived
+       at, rather than replacing it: what fades out is the display as it was configured,
+       and the automatic keeps following the room while it does. */
     byte calcBrightness() const {
-        if(UseGammaCorrection) {
-            if(UseAutomatic) { return calcBrightnessAutomaticCorrected(); }
-            else { return calcBrightnessCorrected(); }
-        } else {
-            if(UseAutomatic) { return calcBrightnessAutomatic(); }
-            else { return Brightness; }
-        }
+        if(FadeLevel == FadeLevelFull) { return calcConfiguredBrightness(); }
+
+        return scaleByLevel(calcConfiguredBrightness(), FadeLevel);
     }
+
+    /* How dark a fade has made the display, 255 being not at all. Kept here rather than in
+       the animation because applyBrightness() runs on every task and would otherwise undo
+       what the animation wrote on the previous one. */
+    byte getFadeLevel() const { return FadeLevel; }
+    void setFadeLevel(byte Level) { FadeLevel = Level; }
+    void clearFade() { FadeLevel = FadeLevelFull; }
         
 };
 

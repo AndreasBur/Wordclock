@@ -36,6 +36,7 @@
 #include "Illuminance.h"
 #include "Overlays.h"
 #include "Temperature.h"
+#include "Text.h"
 #include "sim/DS3231.h"
 #include "Persistence.h"
 #include "Pixels.h"
@@ -239,6 +240,302 @@ void testTemperatureOverlayWithoutSensor()
     overlays.setTemperatureIsActive(false);
     DS3231::clearSimulatedTemperature();
     Temperature::getInstance().task();
+}
+
+
+
+/* How much light the whole display is putting out, which is what a fade changes and a
+   redraw does not. */
+uint32_t totalIntensity(const PixelBufferType& Pixels)
+{
+    uint32_t Total = 0u;
+
+    for(byte index = 0u; index < PIXELS_NUMBER_OF_PIXELS; index++) {
+        Total += Pixels[index].getRed();
+        Total += Pixels[index].getGreen();
+        Total += Pixels[index].getBlue();
+    }
+    return Total;
+}
+
+/* Draws a time the way the clock does when no animation is selected: the reference every
+   animation has to arrive at. */
+PixelBufferType drawClockFace(byte Hour, byte Minute)
+{
+    Display& display = Display::getInstance();
+
+    display.clear();
+    Clock::getInstance().setTime(Hour, Minute);
+    display.show();
+    return readPixels();
+}
+
+/* The one promise every animation makes, and the one that is easy to break: whatever it
+   does in between, the display it leaves behind is the new time and nothing else.
+   Animation::finishWithClockWords() exists because that was got wrong once - an animation
+   that places letters itself can leave a pixel of the previous time lit, and on a word
+   clock that is a word nobody notices is wrong.
+   The second promise is that they end at all. Both are checked for every animation there
+   is, so an added one is covered by being added to the enumeration. */
+void testEveryAnimationEndsOnTheNewTime()
+{
+    /* A generous bound rather than a tight one: what it is here for is a runaway, not a
+       measurement. The longest of them walks all 110 pixels several times over. */
+    constexpr int TickLimit{5000};
+
+    Clock::getInstance().setModeFast(Clock::MODE_WESSI);
+    Animations& animations = Animations::getInstance();
+    animations.setModeFast(Animations::MODE_FIXED);
+
+    /* Two times whose word sets differ in every part: hour, minute and the "it is". */
+    const PixelBufferType Target = drawClockFace(10u, 35u);
+
+    for(byte Id = 1u; Id < Animations::ANIMATION_ID_NUMBER_OF_ANIMATIONS; Id++) {
+        const Animations::AnimationIdType AnimationId = static_cast<Animations::AnimationIdType>(Id);
+        char Description[64];
+
+        /* The display holds the previous time when a word change starts, which is what
+           the animations transition away from. */
+        drawClockFace(10u, 4u);
+        animations.setAnimationFast(AnimationId);
+        animations.setTime(10u, 35u);
+
+        int Ticks = 0;
+        while((animations.getState() == Animations::STATE_PENDING) && (Ticks < TickLimit)) {
+            animations.task(true);
+            Ticks++;
+        }
+
+        snprintf(Description, sizeof(Description), "animation %u must come to an end", Id);
+        expect(Ticks < TickLimit, Description);
+
+        snprintf(Description, sizeof(Description), "animation %u must leave the new time behind", Id);
+        expect(arePixelsEqual(readPixels(), Target), Description);
+    }
+
+    animations.setAnimationFast(Animations::ANIMATION_ID_NONE);
+}
+
+
+/* The fade's own promise, which the display it leaves behind cannot show: that it dims on
+   the way. It used to count a brightness nobody applied - the variable went down and up
+   and reached no pixel - so the animation was a pause with a hard change at the end of it.
+   The other half of this is what it must not touch: the brightness setting, which is what
+   Persistence writes to the store. A fade that dimmed by turning the setting down would
+   save its own half-way value as what the user asked for. */
+void testFadeDimsAndComesBack()
+{
+    Animations& animations = Animations::getInstance();
+    Display& display = Display::getInstance();
+
+    const PixelBufferType Target = drawClockFace(10u, 35u);
+    const byte BrightnessBefore = display.getBrightness();
+
+    drawClockFace(10u, 4u);
+    const uint32_t IntensityBefore = totalIntensity(readPixels());
+
+    animations.setAnimationFast(Animations::ANIMATION_ID_FADE);
+    animations.setTime(10u, 35u);
+
+    /* Far enough in to be measurable, far short of the swap: the level counts down one per
+       task from 255. */
+    for(int Tick = 0; Tick < 64; Tick++) { animations.task(true); }
+    expect(totalIntensity(readPixels()) < IntensityBefore, "the fade must dim what is on the display");
+
+    int Ticks = 0;
+    while((animations.getState() == Animations::STATE_PENDING) && (Ticks < 5000)) {
+        animations.task(true);
+        Ticks++;
+    }
+
+    expect(arePixelsEqual(readPixels(), Target), "the fade must come back to full brightness");
+    expect(display.getBrightness() == BrightnessBefore, "the fade must leave the brightness setting alone");
+
+    animations.setAnimationFast(Animations::ANIMATION_ID_NONE);
+}
+
+
+/* Which characters the text overlay can draw, checked through the one entry point that
+   says so: setChar() refuses what it cannot map to a glyph.
+   The font tables hold 102 entries - ASCII 0x20 to 0x7F, then the six umlauts - and the
+   conversion used to check only the lower bound. Where char is unsigned, which is what AVR
+   makes it, every other Latin-1 byte passed that check and indexed past the end of the
+   table. The host cannot show that: char is signed here, so those bytes come out negative
+   and are refused for the wrong reason. The case is checked anyway, because it is the one
+   a port would meet. */
+void testCharacterToGlyphMapping()
+{
+    Text& text = Text::getInstance();
+
+    for(char Character = ' '; Character < '\x7F'; Character++) {
+        if(text.setChar(0u, 0u, Character, Text::FONT_5X8) != E_OK) {
+            expect(false, "every printable character must have a glyph");
+            break;
+        }
+    }
+
+    expect(text.setChar(0u, 0u, '\n', Text::FONT_5X8) == E_NOT_OK, "a control character has no glyph");
+    expect(text.setChar(0u, 0u, '\x1F', Text::FONT_5X8) == E_NOT_OK, "and neither has the last one below the space");
+
+    /* The umlauts, which sit behind the ASCII range in every table. */
+    const char Umlauts[] = {'\xC4', '\xD6', '\xDC', '\xE4', '\xF6', '\xFC'};
+    for(const char Umlaut : Umlauts) {
+        if(text.setChar(0u, 0u, Umlaut, Text::FONT_5X8) != E_OK) {
+            expect(false, "every umlaut must have a glyph");
+            break;
+        }
+    }
+
+    expect(text.setChar(0u, 0u, '\xE0', Text::FONT_5X8) == E_NOT_OK,
+           "a Latin-1 byte that is not one of the six must be refused");
+
+    /* Every font carries the same character set, and a glyph nobody can see would be a
+       table read as the wrong packing. */
+    for(byte Font = 0u; Font < Text::FONT_NUMBER_OF_FONTS; Font++) {
+        const Text::FontType FontType = static_cast<Text::FontType>(Font);
+        char Description[64];
+
+        snprintf(Description, sizeof(Description), "font %u must have a width for a letter", Font);
+        expect(text.getFontCharWidth(FontType, 'A') > 0u, Description);
+
+        snprintf(Description, sizeof(Description), "font %u must be able to draw a letter", Font);
+        expect(text.setChar(0u, 0u, 'A', FontType) == E_OK, Description);
+    }
+
+    Display::getInstance().clear();
+}
+
+
+/* Whether a word is part of what the clock would light for a time, which is what the
+   regional wordings differ in. */
+bool wordsContain(const ClockWords& Words, DisplayWords::WordIdType Word)
+{
+    for(const DisplayWords::WordIdType Id : Words.getWordsList()) {
+        if(Id == Word) { return true; }
+    }
+    return false;
+}
+
+/* The four regional wordings, at the four times where they part company. This is the table
+   in docs/serial-commands.md, asserted rather than described: the modes differ in how the
+   quarters are said and in whether twenty past is counted from the hour or from the half
+   hour, and in nothing else.
+   What makes it worth pinning is that all four share one pair of tables, indexed by mode -
+   a row edited in the wrong one is a clock that is wrong in one region and right in the
+   other three. */
+void testRegionalWordings()
+{
+    Clock& clock = Clock::getInstance();
+
+    /* Quarter past four: named after the hour it is past, or after the one it counts
+       towards. */
+    clock.setModeFast(Clock::MODE_WESSI);
+    expect(wordsContain(wordsAt(4u, 15u), DisplayWords::WORD_NACH),
+           "Wessi says a quarter *past* four");
+    clock.setModeFast(Clock::MODE_OSSI);
+    expect(!wordsContain(wordsAt(4u, 15u), DisplayWords::WORD_NACH),
+           "Ossi says viertel five, with no past in it");
+    expect(wordsContain(wordsAt(4u, 15u), DisplayWords::WORD_VIERTEL),
+           "and it is still a quarter");
+
+    /* Quarter to five: the same difference, from the other side. */
+    clock.setModeFast(Clock::MODE_WESSI);
+    expect(wordsContain(wordsAt(4u, 45u), DisplayWords::WORD_VOR),
+           "Wessi says a quarter *to* five");
+    clock.setModeFast(Clock::MODE_SCHWABEN);
+    expect(wordsContain(wordsAt(4u, 45u), DisplayWords::WORD_DREIVIERTEL),
+           "Schwaben says three quarters five");
+    expect(!wordsContain(wordsAt(4u, 45u), DisplayWords::WORD_VOR),
+           "which has no to in it");
+
+    /* Twenty past four: counted from the hour, or as ten before half five. */
+    clock.setModeFast(Clock::MODE_RHEIN_RUHR);
+    expect(wordsContain(wordsAt(4u, 20u), DisplayWords::WORD_NACH),
+           "Rhein-Ruhr counts twenty past the hour");
+    expect(!wordsContain(wordsAt(4u, 20u), DisplayWords::WORD_HALB),
+           "and does not reach for the half hour");
+    clock.setModeFast(Clock::MODE_WESSI);
+    expect(wordsContain(wordsAt(4u, 20u), DisplayWords::WORD_HALB),
+           "Wessi counts ten before half five");
+    expect(wordsContain(wordsAt(4u, 20u), DisplayWords::WORD_VOR),
+           "which is a before");
+
+    /* Twenty to five, the mirror of it. */
+    clock.setModeFast(Clock::MODE_RHEIN_RUHR);
+    expect(wordsContain(wordsAt(4u, 40u), DisplayWords::WORD_VOR),
+           "Rhein-Ruhr counts twenty to the hour");
+    clock.setModeFast(Clock::MODE_WESSI);
+    expect(wordsContain(wordsAt(4u, 40u), DisplayWords::WORD_HALB),
+           "Wessi counts ten past half five");
+    expect(wordsContain(wordsAt(4u, 40u), DisplayWords::WORD_NACH),
+           "which is a past");
+
+    /* And what none of them differ in: the full hour and the half hour always say "it is".
+       Whether the times between them do is a compile-time switch, so the test asks what
+       the firmware was built with rather than assuming one of the two - which is the
+       mistake this line was written with the first time. */
+    clock.setModeFast(Clock::MODE_WESSI);
+    expect(wordsAt(4u, 0u).getShowItIs(), "the full hour says it is");
+    expect(wordsAt(4u, 30u).getShowItIs(), "and so does the half hour");
+#if (CLOCK_SHOW_IT_IS_PERMANENTLY == STD_ON)
+    expect(wordsAt(4u, 5u).getShowItIs(), "and so does five past, with it is set permanently");
+    expect(wordsAt(4u, 45u).getShowItIs(), "and a quarter to");
+#else
+    expect(!wordsAt(4u, 5u).getShowItIs(), "five past does not");
+    expect(!wordsAt(4u, 45u).getShowItIs(), "and neither does a quarter to");
+#endif
+
+    clock.setModeFast(Clock::MODE_WESSI);
+}
+
+/* When an overlay shows and for how long, which is the part of it no display can reveal:
+   the raster is a minute count and one particular second, and the endurance is counted in
+   the same task. Driven a second at a time, the way the clock does. */
+void testOverlayPeriodAndEndurance()
+{
+    Overlays& overlays = Overlays::getInstance();
+
+    /* Every fourth minute, for three seconds. */
+    expect(overlays.setDatePeriodInMinutes(4u) == E_OK, "the period must be accepted");
+    expect(overlays.setDateEnduranceInSeconds(3u) == E_OK, "the endurance must be accepted");
+    overlays.setDateMonth(0u);
+    overlays.setDateDay(0u);
+    overlays.setDateValidInDays(0u);
+    overlays.setDateIsActive(true);
+
+    /* A minute the raster covers, but before the second it starts on. */
+    setTime(10u, 8u, 29u);
+    overlays.task();
+    expect(overlays.getState() != Overlays::OverlayType::STATE_SHOW,
+           "an overlay must not start before its second");
+
+    setTime(10u, 8u, 30u);
+    overlays.task();
+    expect(overlays.getState() == Overlays::OverlayType::STATE_SHOW,
+           "an overlay must start on its second");
+
+    /* It ends by itself, and within the endurance it was given rather than whenever. */
+    int Seconds = 0;
+    for(byte Second = 31u; (Second < 59u) && (overlays.getState() == Overlays::OverlayType::STATE_SHOW); Second++) {
+        setTime(10u, 8u, Second);
+        overlays.task();
+        Seconds++;
+    }
+    expect(overlays.getState() != Overlays::OverlayType::STATE_SHOW, "an overlay must end by itself");
+    expect(Seconds <= 5, "and within the endurance it was given");
+
+    /* A minute the raster does not cover. */
+    setTime(10u, 9u, 30u);
+    overlays.task();
+    expect(overlays.getState() != Overlays::OverlayType::STATE_SHOW,
+           "an overlay must not start outside its period");
+
+    /* Switched off, it does not fire at all. */
+    overlays.setDateIsActive(false);
+    setTime(10u, 12u, 30u);
+    overlays.task();
+    expect(overlays.getState() != Overlays::OverlayType::STATE_SHOW,
+           "an overlay that is switched off must stay away");
 }
 
 /* Only the round trip. That speed 1 maps to cycle 255 and speed 255 to cycle 1 is
@@ -538,6 +835,11 @@ int main()
     testDisplayManagerLatch();
     testShowNowProcedures();
     testTemperatureOverlayWithoutSensor();
+    testEveryAnimationEndsOnTheNewTime();
+    testFadeDimsAndComesBack();
+    testCharacterToGlyphMapping();
+    testRegionalWordings();
+    testOverlayPeriodAndEndurance();
     testSchedulerSpeedRoundTrip();
     testWordsChangeOnFiveMinuteStepsOnly();
     testInvalidTimeIsRejected();
