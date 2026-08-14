@@ -32,7 +32,7 @@
 
 
 /* MsgCmdClockModeParser parameter */
-#define MSG_CMD_CLOCK_MODE_PARSER_PARAMETER_TABLE_SIZE           1u
+#define MSG_CMD_CLOCK_MODE_PARSER_PARAMETER_TABLE_SIZE           2u
 
 
 /******************************************************************************************************************************************************
@@ -58,9 +58,11 @@ class MsgCmdClockModeParser : public MsgParameterParser<MsgCmdClockModeParser, M
     friend class MsgParameterParser;
 
     static constexpr char ModeOptionShortName{'M'};
+    static constexpr char ShowItIsOptionShortName{'I'};
 
     static constexpr ParameterTableType ParameterTable PROGMEM {
-        ParameterTableElementType(ModeOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8)
+        ParameterTableElementType(ModeOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8),
+        ParameterTableElementType(ShowItIsOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8)
     };
 
     // functions
@@ -69,6 +71,9 @@ class MsgCmdClockModeParser : public MsgParameterParser<MsgCmdClockModeParser, M
     {
         if(ParameterShortName == ModeOptionShortName) {
             setMode(static_cast<ModeType>(Argument));
+        }
+        if(ParameterShortName == ShowItIsOptionShortName) {
+            Clock::getInstance().setShowItIsPermanently(Argument != 0u);
         }
     }
 
@@ -96,7 +101,12 @@ class MsgCmdClockModeParser : public MsgParameterParser<MsgCmdClockModeParser, M
     // set methods
 
     // methods
-    void sendAnswer() const { sendAnswerParameter(ModeOptionShortName, Clock::getInstance().getMode(), false); }
+    void sendAnswer() const {
+        sendAnswerParameter(ModeOptionShortName, Clock::getInstance().getMode());
+        /* Last field before the command parser's terminating println(), so no trailing
+           separator space. */
+        sendAnswerParameter(ShowItIsOptionShortName, static_cast<byte>(Clock::getInstance().getShowItIsPermanently() ? 1u : 0u), false);
+    }
 
     void process() const { show(); }
 };

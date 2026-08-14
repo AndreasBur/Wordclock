@@ -145,12 +145,10 @@ StdReturnType Clock::getClockWords(byte Hour, byte Minute, ClockWords& ClockWord
     /* ----- Implementation ----------------------------------------------- */
     if(Hour < CLOCK_NUMBER_OF_HOURS_PER_DAY && Minute < CLOCK_NUMBER_OF_MINUTES_PER_HOUR) {
         returnValue = E_OK;
-        /* show IT IS permanently or only to full and half hour */
-#if (CLOCK_SHOW_IT_IS_PERMANENTLY == STD_ON)
-        ClockWords.setShowItIs(true);
-#else
-        ClockWords.setShowItIs(calculateItIs(Minute));
-#endif
+        /* Show "it is" permanently, or only at the full and the half hour. The switch this
+           was is now the default of the setting; what a running clock does is asked here
+           rather than compiled in. */
+        ClockWords.setShowItIs(ShowItIsPermanently || calculateItIs(Minute));
         MinuteTableElementType MinutesTableElement = getMinutesTableElement(Minute);
         Hour = transform24hTo12hFormat(Hour);
         // correct the hour offset from the minutes and take care of overflow

@@ -54,6 +54,7 @@ struct SettingsType {
     byte BrightnessUseAutomatic;
     byte BrightnessUseGammaCorrection;
     byte ClockMode;
+    byte ClockShowItIsPermanently;
     byte AnimationsMode;
     byte AnimationId;
     byte AnimationTaskCycles[Animations::ANIMATION_ID_NUMBER_OF_ANIMATIONS];
@@ -63,7 +64,14 @@ struct SettingsType {
 /* 'W' and 'C'. Together with the version it tells a blob of this format from whatever
    else a store might hand back. */
 constexpr uint16_t SettingsMagic{0x5743u};
-constexpr byte SettingsVersion{1u};
+/* Raised whenever the struct above changes, which is what makes a blob written by another
+   build recognisable rather than read as this one. A raised version throws the stored
+   settings away on the next start - there is no converting an old blob into a new one
+   here, and a clock that comes up on its defaults says so more clearly than one that comes
+   up with a field read out of the wrong offset.
+     1  the first format
+     2  the "it is" rule, which used to be a compile-time switch */
+constexpr byte SettingsVersion{2u};
 
 static_assert(sizeof(SettingsType) <= Storage::Capacity,
               "Persistence: the settings no longer fit the store, please raise STORAGE_CAPACITY on every platform");
@@ -122,6 +130,7 @@ SettingsType gather()
     Settings.BrightnessUseGammaCorrection = display.getBrightnessUseGammaCorrection() ? 1u : 0u;
 
     Settings.ClockMode = static_cast<byte>(Clock::getInstance().getMode());
+    Settings.ClockShowItIsPermanently = Clock::getInstance().getShowItIsPermanently() ? 1u : 0u;
 
     const Animations& animations = Animations::getInstance();
     Settings.AnimationsMode = static_cast<byte>(animations.getMode());
@@ -157,6 +166,7 @@ void apply(const SettingsType& Settings)
     display.setBrightness(Settings.Brightness);
 
     Clock::getInstance().setMode(static_cast<Clock::ModeType>(Settings.ClockMode));
+    Clock::getInstance().setShowItIsPermanently(Settings.ClockShowItIsPermanently != 0u);
 
     Animations& animations = Animations::getInstance();
 

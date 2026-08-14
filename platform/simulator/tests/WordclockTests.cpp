@@ -471,19 +471,24 @@ void testRegionalWordings()
            "which is a past");
 
     /* And what none of them differ in: the full hour and the half hour always say "it is".
-       Whether the times between them do is a compile-time switch, so the test asks what
-       the firmware was built with rather than assuming one of the two - which is the
-       mistake this line was written with the first time. */
+       Whether the times between them do is the one thing about the wording that is a
+       setting, so both of its answers are asked here rather than whichever one the build
+       happens to carry. */
     clock.setModeFast(Clock::MODE_WESSI);
+    const bool ShowItIsPermanentlyBefore = clock.getShowItIsPermanently();
+
+    clock.setShowItIsPermanently(false);
     expect(wordsAt(4u, 0u).getShowItIs(), "the full hour says it is");
     expect(wordsAt(4u, 30u).getShowItIs(), "and so does the half hour");
-#if (CLOCK_SHOW_IT_IS_PERMANENTLY == STD_ON)
-    expect(wordsAt(4u, 5u).getShowItIs(), "and so does five past, with it is set permanently");
-    expect(wordsAt(4u, 45u).getShowItIs(), "and a quarter to");
-#else
     expect(!wordsAt(4u, 5u).getShowItIs(), "five past does not");
     expect(!wordsAt(4u, 45u).getShowItIs(), "and neither does a quarter to");
-#endif
+
+    clock.setShowItIsPermanently(true);
+    expect(wordsAt(4u, 5u).getShowItIs(), "with it is set permanently, five past says it too");
+    expect(wordsAt(4u, 45u).getShowItIs(), "and so does a quarter to");
+    expect(wordsAt(4u, 0u).getShowItIs(), "and the full hour still does");
+
+    clock.setShowItIsPermanently(ShowItIsPermanentlyBefore);
 
     clock.setModeFast(Clock::MODE_WESSI);
 }
@@ -801,11 +806,14 @@ void testPersistenceSaveAndReset()
 
     display.setColor(1u, 2u, 3u);
     clock.setModeFast(Clock::MODE_OSSI);
+    clock.setShowItIsPermanently(false);
     expect(persistence.save() == E_OK, "saving must write the configuration");
 
     display.setColor(9u, 9u, 9u);
+    clock.setShowItIsPermanently(true);
     expect(persistence.load() == E_OK, "what was saved must come back");
     expect(display.getColorRed() == 1u, "and it must be what was saved");
+    expect(!clock.getShowItIsPermanently(), "including the it is rule");
 
     expect(persistence.reset() == E_OK, "resetting must empty the store");
     expect(display.getColorRed() == 255u && display.getColorGreen() == 255u && display.getColorBlue() == 255u,

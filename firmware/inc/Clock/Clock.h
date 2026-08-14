@@ -99,7 +99,13 @@ class Clock
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
+    static constexpr bool ShowItIsPermanentlyInitValue{CLOCK_SHOW_IT_IS_PERMANENTLY == STD_ON};
+
     ModeType Mode{CLOCK_INITIAL_MODE};
+    /* Whether "es ist" stands in every time or only in the two it is said in. A setting
+       rather than the compile-time switch it was: both are ways German tells the time, the
+       clock can say either, and which one somebody wants is not a property of the build. */
+    bool ShowItIsPermanently{ShowItIsPermanentlyInitValue};
 
     static const HourType HoursTable[][CLOCK_NUMBER_OF_HOURS];
     static const MinuteType MinutesTable[][CLOCK_NUMBER_OF_MINUTE_STEPS];
@@ -145,10 +151,12 @@ class Clock
 
     // get methods
     ModeType getMode() const { return Mode; }
+    bool getShowItIsPermanently() const { return ShowItIsPermanently; }
     StdReturnType getClockWords(byte, byte, ClockWords&) const;
     StdReturnType getClockWords(byte, byte, ClockWordsListType&) const;
 
     // set methods
+    void setShowItIsPermanently(bool sShowItIsPermanently) { ShowItIsPermanently = sShowItIsPermanently; }
     void setModeFast(ModeType sMode) { Mode = sMode; }
     StdReturnType setMode(ModeType sMode)
     {
@@ -161,7 +169,10 @@ class Clock
     }
 
     // methods
-    void resetToDefaults() { setModeFast(CLOCK_INITIAL_MODE); }
+    void resetToDefaults() {
+        setModeFast(CLOCK_INITIAL_MODE);
+        ShowItIsPermanently = ShowItIsPermanentlyInitValue;
+    }
 
     static bool isModeValid(ModeType sMode) { return sMode < MODE_NUMBER_OF_MODES; }
     StdReturnType setTime(TimeType Time) const { return setTime(Time.Hour, Time.Minute); }
