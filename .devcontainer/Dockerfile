@@ -11,10 +11,14 @@ FROM ${BASE_IMAGE}
 # imagemagick, xdotool and x11-utils are not needed to build or run the simulator.
 # They let an agent screenshot the running window to check a layout change instead of
 # having to ask; see "Screenshotting the simulator" in CLAUDE.md.
+# clang-tidy comes with clangd because the checks it runs are the ones CI blocks a pull
+# request on; running them here is what keeps that from being a surprise. run-clang-tidy,
+# which walks the compile database in parallel, is part of the same package.
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && \
     apt-get install -y --no-install-recommends \
         cmake \
         clangd \
+        clang-tidy \
         ninja-build \
         libwxgtk3.2-dev \
         imagemagick \

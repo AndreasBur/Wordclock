@@ -56,7 +56,9 @@ char SerialShim::read()
     char FirstChar{' '};
 
     if(!SendBuffer.IsEmpty()) {
-        FirstChar = SendBuffer.at(0).GetValue();
+        /* The firmware's port is a byte wide, and what is typed into the console is
+           ASCII; the cast says that rather than leaving it to the conversion. */
+        FirstChar = static_cast<char>(SendBuffer.at(0).GetValue());
         SendBuffer.Remove(0, 1);
     }
 

@@ -106,7 +106,7 @@ wxBoxSizer* PixelsFrame::createSizerCharacters(wxWindow* Parent)
     for(unsigned int Row = 0; Row < PIXELS_DISPLAY_NUMBER_OF_ROWS; Row++) {
         // Proportion 0: rows keep their (square-cell) height instead of being
         // stretched vertically to fill the frame.
-        SizerCharacters->Add(createSizerCharacter(Parent, Row), 0, wxALIGN_CENTER);
+        SizerCharacters->Add(createSizerCharacter(Parent, static_cast<int>(Row)), 0, wxALIGN_CENTER);
     }
 
     return SizerCharacters;

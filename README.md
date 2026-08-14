@@ -76,22 +76,29 @@ The `hardware` (xmega) platform would use the AVR toolchain; see its README.
 ## Checks
 
 Every pull request runs [`.github/workflows/ci.yml`](.github/workflows/ci.yml),
-which is the three ways this repository can be built, because each of them breaks
-on its own:
+which is the three ways this repository can be built, each of which breaks on its
+own, plus what static analysis has to say about the result:
 
 | Job | What it does |
 |-----|--------------|
 | Simulator and core tests | Configures and builds the wxWidgets backend with `-Werror` and runs `ctest` |
+| Static analysis | `clang-tidy` over the firmware core and the simulator backend; which checks and why the others are off is in [`.clang-tidy`](.clang-tidy) |
 | ESP32 backend on the host | [`platform/esp32/test/run.sh`](platform/esp32/test/run.sh) — the backend against the stand-ins in `test/stubs`, no board needed |
 | ESP32 firmware | `pio run` for the board it actually runs on |
 
-The last one looks redundant next to the second and is not: the host tests compile
+The firmware job looks redundant next to the host tests and is not: those compile
 the same sources with the host's compiler and libc, so anything the target's
 toolchain has a different opinion about passes them. `timegm`, which newlib does
 not declare, broke the firmware while every host test stayed green.
 
-The same three commands are what to run before pushing; nothing in them needs a
-display or a board.
+The same commands are what to run before pushing; nothing in them needs a display
+or a board. The analysis is the one that needs a configured build directory rather
+than a built one:
+
+```bash
+cmake -S . -B build -G Ninja -DPLATFORM=simulator -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+run-clang-tidy -p build -quiet 'firmware/|platform/simulator/src'
+```
 
 ## History note
 

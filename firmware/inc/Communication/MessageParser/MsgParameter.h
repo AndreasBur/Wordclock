@@ -85,11 +85,11 @@ class MsgParameter
     constexpr MsgParameter() : OptionShortName(' '), ArgumentType(ARGUMENT_TYPE_NONE) { }
 
     // get methods
-    byte getOptionShortName() const { return OptionShortName; }
+    char getOptionShortName() const { return OptionShortName; }
     ArgumentTypeType getArgumentType() const { return ArgumentType; }
 
     // set methods
-    void setOptionShortName(byte sOptionShortName) { OptionShortName = sOptionShortName; }
+    void setOptionShortName(char sOptionShortName) { OptionShortName = sOptionShortName; }
     void setArgumentType(ArgumentTypeType sArgumentType) { ArgumentType = sArgumentType; }
 
     // methods

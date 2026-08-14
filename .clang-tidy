@@ -1,0 +1,96 @@
+# What static analysis is asked for here, and what it is not.
+#
+# The checks that are on are the ones that answer "is this wrong": the bug patterns, the
+# path-sensitive analyser, the CERT rules and the performance ones. The ones that are off
+# are off because they argue with decisions this project has already made, and a check that
+# is answered by "no, on purpose" a hundred times is a check nobody reads.
+#
+# Style is deliberately absent. The conventions are in CLAUDE.md and are not clang-tidy's
+# to have an opinion about: readability-identifier-naming would report every member in the
+# tree, and the modernize- family would report the configuration macros that every module
+# is configured through.
+#
+# Run over the simulator's compile database, which covers the whole firmware core:
+#
+#   cmake -S . -B build -G Ninja -DPLATFORM=simulator -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+#   run-clang-tidy -p build -quiet 'firmware/|platform/simulator/src'
+#
+Checks: >
+  -*,
+  bugprone-*,
+  cert-*,
+  clang-analyzer-*,
+  performance-*,
+  -bugprone-easily-swappable-parameters,
+  -bugprone-narrowing-conversions,
+  -bugprone-reserved-identifier,
+  -bugprone-suspicious-enum-usage,
+  -bugprone-too-small-loop-variable,
+  -cert-dcl37-c,
+  -cert-dcl51-cpp,
+  -cert-err58-cpp,
+  -cert-int09-c,
+  -cert-str34-c,
+  -clang-analyzer-optin.performance.Padding,
+  -performance-enum-size,
+  -performance-unnecessary-value-param
+
+# Why each of those is off:
+#
+# bugprone-easily-swappable-parameters
+#   Reports every setPixel(byte Column, byte Row). The answer would be a type per
+#   coordinate, which is not what this firmware is; the parameters are named and the call
+#   sites are two lines from the definition.
+#
+# bugprone-suspicious-enum-usage
+#   Reports every wxWidgets flag combination - wxLEFT | wxTOP is two enumerators of two
+#   enumerations, which is how that library is written. All fifteen findings were in the
+#   simulator's window code.
+#
+# bugprone-reserved-identifier, cert-dcl37-c, cert-dcl51-cpp
+#   Report the include guards. _DISPLAY_H_ is reserved to the implementation and the guards
+#   are named that way in all 112 headers; renaming them would be the largest diff in the
+#   repository for no behavioural gain.
+#
+# cert-err58-cpp
+#   Reports the singletons: a static object whose constructor could throw. Nothing here
+#   throws, and the whole design is static objects.
+#
+# performance-unnecessary-value-param
+#   Reports Pixel, ClockDate and ClockTime being passed by value. On a controller with
+#   two-byte pointers a three-byte value is cheaper by value than by reference, which is
+#   the opposite of what the check assumes.
+#
+# bugprone-narrowing-conversions, cert-str34-c
+#   183 findings, which is byte arithmetic itself: every b = b + 1 promotes to int and
+#   narrows back. The alternative is a cast on every line of the display and animation
+#   code, which would hide the few casts that mean something.
+#
+# bugprone-too-small-loop-variable
+#   A byte counting over a table of a hundred entries. The truncation it warns about needs
+#   a container larger than the loop variable can address, and every table here is fixed
+#   and small - the largest is 110 pixels.
+#
+# performance-enum-size
+#   Would put ": uint8_t" on some sixty enumerations. Several of them are members of
+#   structs that PROGMEM tables are memcpy_P'd out of, where the layout is the file format
+#   of those tables; the saving is not worth changing that by hand.
+#
+# cert-int09-c
+#   Reports enumerations whose first values are given and the rest counted, which is how
+#   a hardware command set is written down: BH1750::ModeType carries the chip's opcodes.
+#
+# clang-analyzer-optin.performance.Padding
+#   Reports the message catalog's two structs. Their field order is the order the tables
+#   are written in, and those tables are read far more often than the four bytes of
+#   padding are paid for - on the target they sit in flash.
+
+# A finding can be reported under several names at once - a bugprone- check and the CERT
+# rules that alias it - and which of them leads depends on the version. A NOLINT therefore
+# names all of them, or it silences nothing on the version that reports the other one. The
+# container carries a newer clang-tidy than the CI runner, so both are met in practice.
+#
+# Only what this repository owns. Header findings are reported through the source that
+# includes them, so the firmware's header-only classes are covered by their callers.
+HeaderFilterRegex: '(firmware|platform)/.*'
+WarningsAsErrors: '*'

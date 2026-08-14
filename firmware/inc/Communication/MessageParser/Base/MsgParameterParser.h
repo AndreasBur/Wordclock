@@ -26,6 +26,8 @@
 #include "ErrorMessage.h"
 #include "MsgParameter.h"
 #include "StringTools.h"
+
+#include <type_traits>
 #include "Communication.h"
 #include <array>
 
@@ -76,9 +78,19 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
     static constexpr char OptionArgumentDelimiter{'='};
     ErrorMessage Error;
 
+    /* Protected rather than private with the derived class as a friend, which is what
+       clang-tidy asks for: a friend would open this base's whole private side to it, where
+       protected opens only what is meant for it. What the private constructor would
+       prevent - somebody inheriting this template with another class's Derived - the
+       assertion catches instead, at the first point where Derived is a complete type. */
+    // NOLINTNEXTLINE(bugprone-crtp-constructor-accessibility)
     constexpr MsgParameterParser(const ParameterTableType& sParameterTable, const char* sParameter)
-    : Error(), ParameterBuffer(sParameter), ParameterTable(sParameterTable) { }
+    : Error(), ParameterBuffer(sParameter), ParameterTable(sParameterTable) {
+        static_assert(std::is_base_of<MsgParameterParser, Derived>::value,
+                      "MsgParameterParser is a CRTP base: Derived has to be the class that inherits it");
+    }
     ~MsgParameterParser() { }
+
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S

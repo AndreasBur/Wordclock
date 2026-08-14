@@ -230,6 +230,15 @@ void Persistence::task()
 {
     const SettingsType Current = gather();
 
+    /* The padding is what makes this defined, and both sides are zero-initialised for
+       exactly that reason - see the struct's own comment. Comparing member by member is
+       what the check asks for, and is the copy that would fall behind the next setting
+       somebody adds. */
+    /* All three names, because which of them a finding is reported under depends on the
+       clang-tidy version: 21 leads with the bugprone one and lists the CERT rules beside
+       it, 18 reports only the CERT rules - and a suppression that names the wrong one
+       silences nothing. */
+    // NOLINTNEXTLINE(bugprone-suspicious-memory-comparison,cert-exp42-c,cert-flp37-c)
     if(memcmp(&Current, &LastSaved, sizeof(Current)) == 0) { return; }
 
     if(Storage::getInstance().write(reinterpret_cast<const byte*>(&Current), sizeof(Current)) == E_OK) {

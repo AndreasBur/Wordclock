@@ -86,10 +86,10 @@ const char* const MessageDecoder::ApiValueNames[] {
 ******************************************************************************************************************************************************/
 wxString MessageDecoder::describe(const wxString& Line)
 {
-    const wxString Answer = describeAnswer(Line);
+    wxString Answer = describeAnswer(Line);
     if(!Answer.IsEmpty()) { return Answer; }
 
-    const wxString RemoteProcedureCall = describeRemoteProcedureCall(Line);
+    wxString RemoteProcedureCall = describeRemoteProcedureCall(Line);
     if(!RemoteProcedureCall.IsEmpty()) { return RemoteProcedureCall; }
 
     return describeError(Line);

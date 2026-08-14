@@ -43,9 +43,11 @@ StdReturnType Storage::read(byte* Buffer, size_t Size) const
 
     const size_t Read = std::fread(Buffer, 1u, Size, File);
     /* One byte more would mean the file outgrew what is being asked for, which is the
-       same mismatch as one byte less. */
-    const bool IsAtEnd = (std::fgetc(File) == EOF);
-    std::fclose(File);
+       same mismatch as one byte less. Only asked when the read delivered, because after a
+       failed one the standard stops saying where the position is. */
+    const bool IsAtEnd = (Read == Size) && (std::fgetc(File) == EOF);
+    /* Nothing to report from closing a stream that was only read. */
+    (void)std::fclose(File);
 
     if((Read != Size) || !IsAtEnd) { return E_NOT_OK; }
 
@@ -89,7 +91,7 @@ StdReturnType Storage::clear()
 {
     std::FILE* File = std::fopen(STORAGE_FILE_NAME, "rb");
     if(File == nullptr) { return E_OK; }
-    std::fclose(File);
+    (void)std::fclose(File);
 
     if(std::remove(STORAGE_FILE_NAME) != 0) { return E_NOT_OK; }
 

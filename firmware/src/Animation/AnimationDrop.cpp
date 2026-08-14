@@ -156,7 +156,10 @@ StdReturnType AnimationDrop::setNextActivePixelIndex()
 ******************************************************************************************************************************************************/
 StdReturnType AnimationDrop::setNextWordIndex()
 {
-    for(int8_t index = CurrentWordIndex - 1u; index >= 0; index--) {
+    /* int rather than int8_t: the loop has to be able to go below zero to end, and
+       initialising a signed byte from the unsigned expression on the right got there by
+       an implementation-defined conversion rather than by arithmetic. */
+    for(int index = static_cast<int>(CurrentWordIndex) - 1; index >= 0; index--) {
         if(ClockWordsTable[index] != DisplayWords::WORD_NONE) {
             CurrentWordIndex = index;
             return E_OK;

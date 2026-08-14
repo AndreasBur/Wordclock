@@ -218,6 +218,9 @@ class MsgCmdRemoteProcedureCallParser : public MsgParameterParser<MsgCmdRemotePr
             // be followed by a second show().
             //
             // Until the port exists the ids stay intentionally unimplemented.
+            // Both branches are empty until the port exists, and they are two ids rather
+            // than one because they will not stay empty.
+            // NOLINTNEXTLINE(bugprone-branch-clone)
             case RPC_ID_POWER_ON :
                 break;
             case RPC_ID_POWER_OFF :
