@@ -1,0 +1,97 @@
+# What a pull request is checked with. Three jobs, because the project has three ways of
+# building and each of them can break on its own:
+#
+#   simulator    the firmware core through the wxWidgets backend, plus its regression tests
+#   host-tests   the ESP32 backend compiled against the stand-ins in platform/esp32/test
+#   firmware     the ESP32 backend compiled for the board it actually runs on
+#
+# The last one looks redundant next to the second and is not. The host tests compile the
+# same sources with the host's compiler and libc, so anything the target's toolchain has a
+# different opinion about passes them - newlib not declaring timegm, for one, which broke
+# the target build while every host test stayed green.
+#
+# Not run through the dev container. devcontainers/ci would give exact parity with what a
+# developer has, at the price of building that image on every run; the packages below are
+# the same versions the image installs from the same Ubuntu, which is close enough for a
+# check that is meant to answer in minutes.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+
+# A second push to the same branch makes the first answer worthless, so it is cancelled
+# rather than left to occupy a runner.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  simulator:
+    name: Simulator and core tests
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+
+      # Pinned to the Ubuntu that carries wxWidgets 3.2, which is what
+      # find_package(wxWidgets) expects; libwxgtk3.2-dev pulls in the wx-config it needs.
+      - name: Install the toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends cmake ninja-build libwxgtk3.2-dev
+
+      # -Werror only here, not in the CMakeLists: a warning should stop a change from
+      # being merged without stopping somebody in the middle of debugging one.
+      - name: Configure
+        run: cmake -S . -B build -G Ninja -DPLATFORM=simulator -DCMAKE_CXX_FLAGS=-Werror
+
+      - name: Build
+        run: cmake --build build
+
+      # No display needed: the tests drive the firmware core and the pixel buffer, and the
+      # window that renders it is never constructed.
+      - name: Test
+        run: ctest --test-dir build --output-on-failure
+
+  host-tests:
+    name: ESP32 backend on the host
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+
+      # Needs nothing but g++, python3 and node, which the runner already carries. The
+      # script compiles into an object cache under .pio/ and links from there.
+      - name: Run the host tests
+        run: platform/esp32/test/run.sh
+
+  firmware:
+    name: ESP32 firmware
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+
+      # The platform, the Xtensa toolchain and the Arduino core are about 1.5 GB and are
+      # downloaded on first use. Restoring them costs a minute or two, which is still less
+      # than fetching them, and the key changes only when the build configuration does.
+      - name: Cache the PlatformIO packages
+        uses: actions/cache@v6
+        with:
+          path: |
+            ~/.platformio
+            ~/.cache/pip
+          key: platformio-${{ runner.os }}-${{ hashFiles('platform/esp32/platformio.ini') }}
+          restore-keys: platformio-${{ runner.os }}-
+
+      - name: Install PlatformIO
+        run: pip install --upgrade platformio
+
+      # WordclockSecrets.h is not in the repository, so this builds with the defaults in
+      # WordclockConfiguration.h - an empty SSID, which is a clock that runs without a
+      # network rather than a build that fails.
+      - name: Build the firmware
+        run: pio run -d platform/esp32

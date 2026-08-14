@@ -1,5 +1,7 @@
 # Wordclock
 
+[![CI](https://github.com/AndreasBur/Wordclock/actions/workflows/ci.yml/badge.svg)](https://github.com/AndreasBur/Wordclock/actions/workflows/ci.yml)
+
 A word clock based on Arduino: an 11×10 grid of letters that spells out the
 time in German ("ES IST FÜNF NACH ZEHN"), with animations, overlays (date,
 temperature, text) and a serial command interface.
@@ -70,6 +72,26 @@ pio device monitor -d platform/esp32
 ```
 
 The `hardware` (xmega) platform would use the AVR toolchain; see its README.
+
+## Checks
+
+Every pull request runs [`.github/workflows/ci.yml`](.github/workflows/ci.yml),
+which is the three ways this repository can be built, because each of them breaks
+on its own:
+
+| Job | What it does |
+|-----|--------------|
+| Simulator and core tests | Configures and builds the wxWidgets backend with `-Werror` and runs `ctest` |
+| ESP32 backend on the host | [`platform/esp32/test/run.sh`](platform/esp32/test/run.sh) — the backend against the stand-ins in `test/stubs`, no board needed |
+| ESP32 firmware | `pio run` for the board it actually runs on |
+
+The last one looks redundant next to the second and is not: the host tests compile
+the same sources with the host's compiler and libc, so anything the target's
+toolchain has a different opinion about passes them. `timegm`, which newlib does
+not declare, broke the firmware while every host test stayed green.
+
+The same three commands are what to run before pushing; nothing in them needs a
+display or a board.
 
 ## History note
 
