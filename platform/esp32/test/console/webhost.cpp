@@ -21,9 +21,9 @@
 #include <ESPmDNS.h>
 #include "Arduino.h"
 #include "Communication.h"
-#include "Persistence.h"
-#include "Scheduler.h"
+#include "Pixels.h"
 #include "WebInterface.h"
+#include "WordclockMain.h"
 
 #include <cstdio>
 #include <cstring>
@@ -85,16 +85,15 @@ int main()
 {
     WordclockSerial& Port = WordclockSerial::getInstance();
     WebInterface& Web = WebInterface::getInstance();
+    WordclockMain Wordclock;
 
-    /* Through WebInterface, so its own handlers and its own broadcast are what run. */
+    /* The same backend entry points and order as setup()/loop() on the board. */
+    Wordclock.init();
     Web.begin();
 
     /* One client, or the broadcast has nobody to gather a frame for. Node is that client. */
     Web.onClientOpened(1);
 
-    Persistence::getInstance().load();
-
-    Scheduler Tasks;
     std::string Pending;
 
     for(;;) {
@@ -129,7 +128,8 @@ int main()
             }
         }
 
-        Tasks.task();
+        Wordclock.task();
+        Pixels::getInstance().render();
         Web.broadcastFrame();
     }
     return 0;

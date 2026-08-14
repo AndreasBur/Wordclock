@@ -201,6 +201,22 @@ int main()
         printf("   frame: %zu bytes, one per %u ticks\n", SentBinary[0].size(), interval);
     }
 
+    SentBinary.clear();
+    Pixels::getInstance().disablePixels();
+    runInterval(1u);
+    const bool BrowserDark = !SentBinary.empty() &&
+        std::all_of(SentBinary[0].begin(), SentBinary[0].end(), [](char Value) { return Value == 0; });
+    check(BrowserDark, "disabling the display also blanks the browser frame");
+
+    SentBinary.clear();
+    Pixels::getInstance().enablePixels();
+    runInterval(1u);
+    check(!SentBinary.empty() &&
+          static_cast<unsigned char>(SentBinary[0][0]) == 20u &&
+          static_cast<unsigned char>(SentBinary[0][1]) == 10u &&
+          static_cast<unsigned char>(SentBinary[0][2]) == 30u,
+          "enabling the display restores the browser frame");
+
     /* A client arriving between two changes still has to be shown the panel - and every
        client that is already watching gets the same frame, which is why this counts by
        descriptor rather than by frames. */

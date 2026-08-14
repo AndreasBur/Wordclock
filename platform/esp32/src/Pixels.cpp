@@ -280,11 +280,11 @@ void Pixels::fillFrameBuffer() const
     byte* Target = FrameBuffer;
 
     for(byte Index = 0u; Index < PIXELS_NUMBER_OF_LEDS; Index++) {
-        const PixelType Pixel = PixelBuffer[toRow(Index)][toColumn(Index)];
+        const PixelType Pixel = getOutputPixelFast(Index);
 
-        *Target++ = scaleColour(Pixel.getGreen(), Brightness);
-        *Target++ = scaleColour(Pixel.getRed(), Brightness);
-        *Target++ = scaleColour(Pixel.getBlue(), Brightness);
+        *Target++ = Pixel.getGreen();
+        *Target++ = Pixel.getRed();
+        *Target++ = Pixel.getBlue();
     }
 } /* fillFrameBuffer */
 

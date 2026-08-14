@@ -33,6 +33,9 @@
         /* Darker than the panel's own amber, which on white would be barely legible. */
         --lit: #9a5b00;
         --unlit: #5f5f66;
+        --matrix-unlit: #c4c4c4;
+        --matrix-unlit-stroke: transparent;
+        --matrix-lit: #111116;
         --line: #dcdcd6;
         /* A console is read line by line, so it is capped rather than stretched: on a wide
            screen the full width leaves short lines floating in emptiness and pushes the
@@ -48,6 +51,9 @@
             /* The panel's amber, which is what the clock itself shows. */
             --lit: #ffb020;
             --unlit: #6a6a72;
+            --matrix-unlit: #303038;
+            --matrix-unlit-stroke: transparent;
+            --matrix-lit: #f2f2f4;
             --line: #26262b;
         }
     }
@@ -58,6 +64,9 @@
         --text: #d8d8de;
         --lit: #ffb020;
         --unlit: #6a6a72;
+        --matrix-unlit: #303038;
+        --matrix-unlit-stroke: transparent;
+        --matrix-lit: #f2f2f4;
         --line: #26262b;
     }
     * { box-sizing: border-box; }
@@ -111,7 +120,15 @@
        knows it, and the form is what makes it findable in the first place. */
     details { border-top: 1px solid var(--line); }
     summary { padding: 10px 18px; cursor: pointer; color: var(--lit); max-width: var(--content); margin-inline: auto; }
-    #builder { padding: 0 18px 12px; display: grid; gap: 8px; }
+    #builder {
+        padding: 0 18px 12px;
+        display: grid;
+        gap: 8px;
+        width: max-content;
+        min-width: min(100%, var(--content));
+        max-width: 100%;
+        margin-inline: auto;
+    }
     /* The button sits at its natural width on the right rather than spanning the column -
        a full-width button reads as the page's main action, which it is not. */
     #builder #use { justify-self: end; }
@@ -137,7 +154,7 @@
         gap: 2px;
         padding: 16px 18px 4px;
         width: 100%;
-        max-width: var(--content);
+        max-width: 720px;
         margin-inline: auto;
     }
     #panel span {
@@ -148,8 +165,14 @@
         /* Unlit letters stay faintly readable rather than vanishing. The panel itself hides
            them, but a view one reads wants the grid visible - the same choice the wx window
            makes with its light grey. */
-        color: var(--line);
+        color: var(--matrix-unlit);
+        -webkit-text-stroke: 1px var(--matrix-unlit-stroke);
+        font-size: clamp(15px, 2vw, 21px);
         transition: color 90ms linear;
+    }
+    #panel span.lit {
+        color: var(--matrix-lit);
+        -webkit-text-stroke-color: transparent;
     }
     #panel[hidden] { display: none; }
     #builderNote { color: var(--unlit); font-style: italic; padding: 0 18px 12px; max-width: var(--content); margin-inline: auto; }
@@ -317,10 +340,10 @@
         for (let index = 0; index < cells.length; index++) {
             const at = index * 3;
             const green = bytes[at], red = bytes[at + 1], blue = bytes[at + 2];
+            const lit = Boolean(red || green || blue);
 
-            cells[index].style.color = (red || green || blue)
-                ? `rgb(${red} ${green} ${blue})`
-                : '';
+            cells[index].classList.toggle('lit', lit);
+            cells[index].style.setProperty('--pixel-color', `rgb(${red} ${green} ${blue})`);
         }
     }
 
@@ -338,7 +361,16 @@
     const commandsSelect = document.getElementById('commands');
     const optionsBox = document.getElementById('options');
     const preview = document.getElementById('preview');
+    const builderBox = document.getElementById('builderBox');
     let catalog = [];
+
+    builderBox.addEventListener('toggle', () => {
+        if (!builderBox.open) { return; }
+        requestAnimationFrame(() => builderBox.scrollIntoView({
+            behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+            block: 'start'
+        }));
+    });
 
     function selectedCommand() {
         return catalog[commandsSelect.selectedIndex];
@@ -419,7 +451,13 @@
         refreshPreview();
     }
 
-    commandsSelect.addEventListener('change', showOptions);
+    commandsSelect.addEventListener('change', () => {
+        showOptions();
+        requestAnimationFrame(() => document.getElementById('use').scrollIntoView({
+            behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+            block: 'end'
+        }));
+    });
     optionsBox.addEventListener('input', refreshPreview);
     optionsBox.addEventListener('change', refreshPreview);
 

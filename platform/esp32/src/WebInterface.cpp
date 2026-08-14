@@ -429,7 +429,7 @@ void WebInterface::broadcastFrame()
     const Pixels& Strip = Pixels::getInstance();
 
     for(byte Index = 0u; Index < PIXELS_NUMBER_OF_LEDS; Index++) {
-        const Pixel Colour = Strip.getPixelFast(Index);
+        const Pixel Colour = Strip.getOutputPixelFast(Index);
 
         *Target++ = Colour.getGreen();
         *Target++ = Colour.getRed();
