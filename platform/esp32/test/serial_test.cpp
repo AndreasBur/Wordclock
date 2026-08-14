@@ -58,6 +58,21 @@ int main()
     check(!Lines.empty(), "the injected command produced an answer");
     if(!Lines.empty()) { printf("   answer: \"%s\"\n", Lines[0].c_str()); }
 
+    /* The procedures that act now rather than at the next word change. What of them
+       reaches the wire is the answer, and it says which of the two happened: the display
+       was free and the procedure ran, or it was busy and the procedure stepped aside. */
+    auto answerTo = [&](const char* Message) {
+        Lines.clear();
+        port.inject(Message, strlen(Message));
+        communication.task();               /* reads the characters */
+        communication.task();               /* parses the complete message */
+        return Lines.empty() ? std::string() : Lines[0];
+    };
+
+    check(answerTo("1 -P22\n") == "1 RpcId=22 Error=0", "the clock refresh is carried out");
+    check(answerTo("1 -P28\n") == "1 RpcId=28 Error=8", "aborting with no overlay showing is refused");
+    check(answerTo("1 -P29\n") == "1 RpcId=29 Error=7", "an id past the last procedure is unknown");
+
     /* a full buffer refuses rather than overwriting a command in flight */
     std::string tooMuch(WORDCLOCK_SERIAL_INJECT_BUFFER_SIZE + 8u, 'x');
     check(port.inject(tooMuch.data(), tooMuch.size()) == E_NOT_OK, "an overlong injection is refused");

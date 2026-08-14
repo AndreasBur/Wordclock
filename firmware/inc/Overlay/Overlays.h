@@ -143,6 +143,22 @@ class Overlays
     void taskIdle(ClockDate, ClockTime);
     void taskShow(ClockDate, ClockTime);
 
+    /* Shared by the three "show now" entry points below, which differ in nothing but the
+       overlay they name - a template rather than three copies of the two rules that
+       decide whether an overlay may start at all.
+
+       Switched off is a configuration and not a state to be talked out of, and only one
+       overlay may hold the display, because there is one show timer for all of them. */
+    template <typename OverlayClassType>
+    StdReturnType showNow(OverlayClassType& Overlay) {
+        if(!Overlay.getIsActive()) { return E_NOT_OK; }
+        if(isShow()) { return E_NOT_OK; }
+
+        ShowTimerInSeconds = Overlay.startShow(RealTimeClock::getInstance().getDate(),
+                                               RealTimeClock::getInstance().getTime());
+        return E_OK;
+    }
+
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
@@ -223,6 +239,20 @@ class Overlays
 
 	// methods
 	void task();
+
+    /* Show an overlay now instead of at its next period, and end the one that is
+       showing. Without these an overlay can only be watched by waiting for its raster,
+       which is also what makes one hard to develop against. */
+#if (OVERLAYS_SUPPORT_DATE == STD_ON)
+    StdReturnType showDateNow() { return showNow(Date); }
+#endif
+#if (OVERLAYS_SUPPORT_TEMPERATURE == STD_ON)
+    StdReturnType showTemperatureNow() { return showNow(Temperature); }
+#endif
+#if (OVERLAYS_SUPPORT_TEXT == STD_ON)
+    StdReturnType showTextNow() { return showNow(Text); }
+#endif
+    StdReturnType abort();
 };
 
 #endif

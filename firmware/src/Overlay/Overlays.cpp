@@ -75,6 +75,43 @@ void Overlays::task() {
 
 
 /******************************************************************************************************************************************************
+  abort()
+******************************************************************************************************************************************************/
+/*! \brief          ends the overlay that is showing
+ *  \details        Through the same transition the expired show timer takes, so the
+ *                  overlay stops its text and goes back to idle rather than being cut
+ *                  off mid-word. What brings the clock back afterwards is DisplayManager,
+ *                  which redraws once it sees that no overlay is showing any more.
+ *
+ *                  The timer is cleared here rather than left to run out: it is what
+ *                  taskIdle() reads to decide whether an overlay may start, so a
+ *                  leftover value would block the next one for as long as the aborted
+ *                  overlay had left.
+ *
+ *  \return         E_OK if an overlay was showing
+******************************************************************************************************************************************************/
+StdReturnType Overlays::abort() {
+    if(!isShow()) { return E_NOT_OK; }
+
+    ClockDate date = RealTimeClock::getInstance().getDate();
+    ClockTime time = RealTimeClock::getInstance().getTime();
+
+#if (OVERLAYS_SUPPORT_DATE == STD_ON)
+    if(Date.getState() == OverlayDate::STATE_SHOW) { Date.stopShow(date, time); }
+#endif
+#if (OVERLAYS_SUPPORT_TEMPERATURE == STD_ON)
+    if(Temperature.getState() == OverlayTemperature::STATE_SHOW) { Temperature.stopShow(date, time); }
+#endif
+#if (OVERLAYS_SUPPORT_TEXT == STD_ON)
+    if(Text.getState() == OverlayText::STATE_SHOW) { Text.stopShow(date, time); }
+#endif
+
+    ShowTimerInSeconds = 0u;
+    return E_OK;
+} /* abort */
+
+
+/******************************************************************************************************************************************************
  * P R I V A T E   F U N C T I O N S
 ******************************************************************************************************************************************************/
 

@@ -23,6 +23,9 @@
 /* The command numbers are taken from here rather than copied, so they cannot fall behind
    the firmware. Its OVERLAYS_SUPPORT_* switches reach the entries below through it too. */
 #include "MsgCmdParser.h"
+/* For RpcIdType alone, which the procedure names below are counted against - they are the
+   one list here that is written beside the firmware rather than derived from it. */
+#include "MsgCmdRemoteProcedureCallParser.h"
 /* Not for any type, only for the ANIMATIONS_SUPPORT_* and TEXT_SUPPORT_FONT_* switches:
    the value lists below are guarded by exactly the same ones as the enums they name, so
    they cannot end up naming the wrong value when one is switched off. */
@@ -125,8 +128,23 @@ constexpr const char* const RemoteProcedureValueNames[] {
     "Gamma correction on",
     "Gamma correction off",
     "Power on",
-    "Power off"
+    "Power off",
+    "Clock refresh",
+    "Animation start",
+    "Animation abort",
+    "Overlay date show",
+    "Overlay temperature show",
+    "Overlay text show",
+    "Overlay abort"
 };
+
+/* The command numbers and the value lists of the enumerations come out of the firmware
+   itself; this list does not, so it is the one that can fall behind. A procedure added to
+   RpcIdType without a name here would be offered as the name of the procedure before it.
+   RPC_ID_NONE has no name, hence the one. */
+static_assert(NUMBER_OF(RemoteProcedureValueNames) ==
+              MsgCmdRemoteProcedureCallParser::RPC_ID_NUMBER_OF_PROCEDURES - 1u,
+              "the remote procedure names have fallen behind MsgCmdRemoteProcedureCallParser::RpcIdType");
 
 /* Clock::ModeType */
 constexpr const char* const ClockModeValueNames[] {

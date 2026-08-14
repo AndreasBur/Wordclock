@@ -170,6 +170,21 @@ template <typename Derived> class Overlay
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
+    /* The two transitions the period raster makes on its own, opened up for a caller that
+       wants the overlay now - the "show now" remote procedure calls. They are the same
+       transitions and not a second path into the show state, so an overlay started by
+       hand ends through the show timer like any other.
+
+       Whether the overlay may start at all is not decided here: only Overlays knows
+       whether another one already holds the display, and it owns the timer this hands
+       back. */
+    SecondType startShow(ClockDate CurrentDate, ClockTime CurrentTime) {
+        return setStateToShow(CurrentDate, CurrentTime);
+    }
+    void stopShow(ClockDate CurrentDate, ClockTime CurrentTime) {
+        setStateToIdle(CurrentDate, CurrentTime);
+    }
+
 	// get methods
 	StateType getState() const { return State; }
     MinuteType getPeriodInMinutes() const { return PeriodInMinutes; }

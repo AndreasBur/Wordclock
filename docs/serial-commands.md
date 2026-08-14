@@ -182,10 +182,24 @@ From
 | 16 / 17 | Auto-brightness on / off |
 | 18 / 19 | Gamma correction on / off |
 | 20 / 21 | Power on / off — **reserved, not implemented yet.** These ids wait for the hardware switch that cuts the 5 V supply of the LED stripes via a controller port. They are accepted and answer `Error=0` without doing anything |
+| 22 | Clock refresh — draw the current time again, right now and without an animation |
+| 23 | Animation start — run the selected animation on the current time |
+| 24 | Animation abort — end a running animation and put the time back |
+| 25 / 26 / 27 | Overlay date / temperature / text — show it now instead of at its next period |
+| 28 | Overlay abort — end the overlay that is showing |
 
 The RPC answer is `RpcId=<id> Error=<code>`. An unknown or missing id (including
-`0`, e.g. when `-P` is omitted) is rejected with `Error=8`
+`0`, e.g. when `-P` is omitted) is rejected with `Error=7`
 (`ERROR_RPC_ID_UNKNOWN`) instead of being silently accepted.
+
+Ids `22` to `28` are the ones that can be refused: they answer `Error=8`
+(`ERROR_UNKNOWN`, the general `E_NOT_OK`) when the display is busy with something
+else rather than doing it anyway. The clock cannot be refreshed and no animation
+started while an overlay owns the display; an overlay cannot be shown while another
+one is showing or while it is switched off (`-A0`); and aborting answers the same way
+when nothing was running. `22` and `24` are what brings the clock face back after a
+display test (`-P7`) or a hand-set pixel (command 4), which otherwise stands until
+the next word change — up to five minutes.
 
 ## Error codes
 
@@ -201,8 +215,8 @@ Returned in the `Error=<code>` field
 | 4 | `ERROR_VALUE_OUT_OF_BOUNDS` | Value outside the allowed range |
 | 5 | `ERROR_NO_VALUE_GIVEN` | Option given without a value |
 | 6 | `ERROR_DISPLAY_PENDING` | Display busy / show still pending |
-| 7 | `ERROR_UNKNOWN` | Unspecified failure |
-| 8 | `ERROR_RPC_ID_UNKNOWN` | RPC command with an unknown/missing `-P<id>` |
+| 7 | `ERROR_RPC_ID_UNKNOWN` | RPC command with an unknown/missing `-P<id>` |
+| 8 | `ERROR_UNKNOWN` | Unspecified failure — what an `E_NOT_OK` from the firmware becomes |
 
 ## Examples
 

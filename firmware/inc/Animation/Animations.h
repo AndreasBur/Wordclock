@@ -341,6 +341,15 @@ class Animations
     static bool isModeValid(ModeType sMode) { return sMode < MODE_NUMBER_OF_MODES; }
     StdReturnType setTime(byte, byte);
 
+    /* Ends a running animation by initialising it, which is what every animation's own
+       init() already means: back to idle, and its progress reset. The selection and the
+       mode stay as they are, so the next word change animates again.
+
+       Whatever half-finished frame the animation left is still on the display, so the
+       caller has to draw something over it - DisplayManager::abortAnimation() is the
+       entry point that does both. */
+    void abort() { initCurrentAnimation(); }
+
 };
 
 

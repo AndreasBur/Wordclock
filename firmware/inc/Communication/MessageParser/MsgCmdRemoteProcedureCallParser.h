@@ -25,6 +25,8 @@
 #include "MsgParameterParser.h"
 #include "Illuminance.h"
 #include "Display.h"
+#include "DisplayManager.h"
+#include "Overlays.h"
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
@@ -74,6 +76,19 @@ class MsgCmdRemoteProcedureCallParser : public MsgParameterParser<MsgCmdRemotePr
         RPC_ID_DISPLAY_BRIGHTNESS_GAMMA_CORRECTION_OFF,
         RPC_ID_POWER_ON,
         RPC_ID_POWER_OFF,
+        /* Appended rather than sorted into the display group above: the ids are what a
+           front end, this repository's own documentation and anybody's notes have written
+           down, and inserting one would silently change what every id behind it does. */
+        RPC_ID_CLOCK_REFRESH,
+        RPC_ID_ANIMATION_START,
+        RPC_ID_ANIMATION_ABORT,
+        RPC_ID_OVERLAY_DATE_SHOW,
+        RPC_ID_OVERLAY_TEMPERATURE_SHOW,
+        RPC_ID_OVERLAY_TEXT_SHOW,
+        RPC_ID_OVERLAY_ABORT,
+        /* Only so that the names in the message catalog can be counted against the
+           procedures; never sent, and anything from here on lands in the default case. */
+        RPC_ID_NUMBER_OF_PROCEDURES
     };
 
 /******************************************************************************************************************************************************
@@ -199,6 +214,31 @@ class MsgCmdRemoteProcedureCallParser : public MsgParameterParser<MsgCmdRemotePr
             case RPC_ID_POWER_ON :
                 break;
             case RPC_ID_POWER_OFF :
+                break;
+            /* These seven answer E_NOT_OK where the display is busy with something else,
+               rather than doing it anyway: an overlay holding the display and an overlay
+               already showing are the two states in which "now" cannot be honoured, and a
+               caller that is told so can try again. */
+            case RPC_ID_CLOCK_REFRESH :
+                ReturnValue = DisplayManager::getInstance().refreshClock();
+                break;
+            case RPC_ID_ANIMATION_START :
+                ReturnValue = DisplayManager::getInstance().startAnimation();
+                break;
+            case RPC_ID_ANIMATION_ABORT :
+                ReturnValue = DisplayManager::getInstance().abortAnimation();
+                break;
+            case RPC_ID_OVERLAY_DATE_SHOW :
+                ReturnValue = Overlays::getInstance().showDateNow();
+                break;
+            case RPC_ID_OVERLAY_TEMPERATURE_SHOW :
+                ReturnValue = Overlays::getInstance().showTemperatureNow();
+                break;
+            case RPC_ID_OVERLAY_TEXT_SHOW :
+                ReturnValue = Overlays::getInstance().showTextNow();
+                break;
+            case RPC_ID_OVERLAY_ABORT :
+                ReturnValue = Overlays::getInstance().abort();
                 break;
             default:
                 // Unknown or missing RPC id (including RPC_ID_NONE): there is

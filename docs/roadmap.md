@@ -13,13 +13,15 @@ with most.
 
 ## Adding an RPC
 
-Three places have to move together, and nothing checks that they did:
+Three places have to move together:
 
 1. `RpcIdType` and the `switch` in
    [MsgCmdRemoteProcedureCallParser.h](../firmware/inc/Communication/MessageParser/MsgCmdRemoteProcedureCallParser.h)
 2. `RemoteProcedureValueNames` in
-   [MessageCatalog.cpp](../firmware/src/Communication/MessageCatalog.cpp) — mirrored
-   by hand, and read positionally, so the order is the contract
+   [MessageCatalog.cpp](../firmware/src/Communication/MessageCatalog.cpp) — written
+   beside the firmware rather than derived from it, and read positionally, so the order
+   is the contract. A `static_assert` counts the names against `RpcIdType`, so a missing
+   one does not compile; a *misordered* one still does.
 3. The RPC table in [serial-commands.md](serial-commands.md)
 
 New ids go at the **end** of the enum. They are not stored anywhere, so a shift
@@ -32,23 +34,26 @@ no payload field, so anything with a value to report is a command, not an RPC �
 
 ## 1. RPCs for what the clock can already do
 
-The largest group of things the firmware does but no interface reaches. Ids
-continue at 22.
+The largest group of things the firmware does but no interface reaches. Ids continue
+at 22.
+
+**Done — ids 22 to 28**, see the RPC table in [serial-commands.md](serial-commands.md):
+clock refresh, animation start and abort, the three overlays shown on demand, and the
+overlay abort. Two things they run into are worth keeping in mind for what follows:
+
+- The show timer lives in `Overlays`, not in the overlay
+  ([Overlays.cpp](../firmware/src/Overlay/Overlays.cpp)), so the entry point belongs
+  there and takes the endurance the overlay's `setStateToShow()` returns.
+- The clock refresh clears `ClockWordsInitialized` rather than calling `Clock::refresh()`
+  directly ([DisplayManager.h](../firmware/inc/DisplayManager/DisplayManager.h)), or the
+  latch and the display disagree on what is drawn.
+
+Still open:
 
 | Id | RPC | What it calls | Why |
 |----|-----|---------------|-----|
-| 22 | Clock refresh | invalidate the DisplayManager's word latch | The clock face is redrawn on a word change only ([DisplayManager.h](../firmware/inc/DisplayManager/DisplayManager.h)). After `1 -P7` or a few `4 -I..` the display keeps showing that for up to five minutes. Must clear `ClockWordsInitialized` rather than call `Clock::refresh()` directly, or the latch and the display disagree on what is drawn. |
-| 23 | Animation now | `Animations::setTime()` with the current time | Replays the selected animation on demand. Today an animation can only be watched by waiting for a word change or by re-selecting it with `9 -A<id>`, which is a different thing to mean. |
-| 24 | Animation abort | stop the running animation, draw the clock | At a low `-S` an animation runs for a long time, and both a mode change and a word change are ignored while it does. |
-| 25/26/27 | Overlay date / temperature / text now | `Overlays` starts the overlay | Overlays fire in their period raster only ([Overlay.h](../firmware/inc/Overlay/Overlay.h)). There is no way to say "show me the date now", which is also what makes an overlay hard to develop against. |
-| 28 | Overlay abort | state → idle, show timer 0 | The counterpart of the three above; matters most for a text overlay with a long endurance. |
 | 29 | Save settings now | force a `Persistence` write | Writes are rationed to one per two seconds ([Persistence.h](../firmware/inc/Persistence/Persistence.h)) — enough of a window to lose the last change when the plug is pulled. |
 | 30 | Reset settings | `Storage::clear()`, then apply defaults | Nothing currently gets a clock back to defaults short of erasing NVS over USB. |
-
-The overlay triggers cannot call the overlay directly: the show timer lives in
-`Overlays`, not in the overlay ([Overlays.cpp](../firmware/src/Overlay/Overlays.cpp)),
-so the entry point belongs there and takes the endurance the overlay's
-`setStateToShow()` returns.
 
 ## 2. Finish the temperature overlay
 

@@ -29,9 +29,11 @@
 
 #include "Animations.h"
 #include "Clock.h"
+#include "Display.h"
 #include "DisplayCharacters.h"
 #include "DisplayManager.h"
 #include "Illuminance.h"
+#include "Overlays.h"
 #include "Persistence.h"
 #include "Pixels.h"
 #include "RealTimeClock.h"
@@ -144,6 +146,67 @@ void testDisplayManagerLatch()
     expect(!pixels.isDirty(), "the rest of the step must not redraw either");
     expect(arePixelsEqual(readPixels(), afterChange),
            "the rest of the step must leave the letters as they were");
+}
+
+/* The procedures that act now rather than at the next word change. What makes them worth
+   testing is the state they are asked for in: the display has been written to by something
+   that is not the clock, and nothing in the firmware takes it back - the latch sees the
+   same word set and leaves the letters alone, for up to five minutes. */
+void testShowNowProcedures()
+{
+    Clock::getInstance().setModeFast(Clock::MODE_WESSI);
+    Animations& animations = Animations::getInstance();
+    animations.setModeFast(Animations::MODE_FIXED);
+    animations.setAnimationFast(Animations::ANIMATION_ID_NONE);
+
+    DisplayManager& displayManager = DisplayManager::getInstance();
+    Overlays& overlays = Overlays::getInstance();
+    Display& display = Display::getInstance();
+
+    setTime(10u, 4u, 0u);
+    displayManager.task();
+    const PixelBufferType clockFace = readPixels();
+
+    display.test();
+    expect(!arePixelsEqual(readPixels(), clockFace), "the display test must reach the letters");
+    displayManager.task();
+    expect(!arePixelsEqual(readPixels(), clockFace),
+           "a task inside the same word set must not undo the display test");
+    expect(displayManager.refreshClock() == E_OK, "the clock must be refreshable");
+    expect(arePixelsEqual(readPixels(), clockFace), "the refresh must put the clock face back");
+
+    animations.setAnimationFast(Animations::ANIMATION_ID_CURSOR);
+    expect(displayManager.startAnimation() == E_OK, "the selected animation must start on demand");
+    expect(animations.getState() == Animations::STATE_PENDING, "the started animation must be running");
+    expect(displayManager.abortAnimation() == E_OK, "a running animation must be abortable");
+    expect(animations.getState() == Animations::STATE_IDLE, "the aborted animation must be idle");
+    expect(arePixelsEqual(readPixels(), clockFace), "the abort must put the clock face back");
+    animations.setAnimationFast(Animations::ANIMATION_ID_NONE);
+
+    /* An overlay owns the display while it shows, so both clock procedures step aside
+       instead of drawing underneath it. */
+    overlays.setDateIsActive(true);
+    expect(overlays.showDateNow() == E_OK, "an active overlay must start on demand");
+    expect(overlays.getState() == Overlays::OverlayType::STATE_SHOW, "the started overlay must show");
+    expect(overlays.showDateNow() == E_NOT_OK, "a second overlay must not start while one shows");
+    expect(displayManager.refreshClock() == E_NOT_OK, "the clock must not be refreshed under an overlay");
+    expect(displayManager.startAnimation() == E_NOT_OK, "no animation must start under an overlay");
+
+    /* Stands in for what the overlay's text draws, which needs the scheduler this test
+       does not run: what matters here is that the clock comes back over it. */
+    displayManager.task();
+    display.test();
+
+    expect(overlays.abort() == E_OK, "a showing overlay must be abortable");
+    expect(overlays.getState() != Overlays::OverlayType::STATE_SHOW,
+           "the aborted overlay must stop showing");
+    expect(overlays.abort() == E_NOT_OK, "aborting with no overlay showing must be refused");
+
+    displayManager.task();
+    expect(arePixelsEqual(readPixels(), clockFace), "the end of an overlay must put the clock face back");
+
+    overlays.setDateIsActive(false);
+    expect(overlays.showDateNow() == E_NOT_OK, "a switched-off overlay must not be started");
 }
 
 /* Only the round trip. That speed 1 maps to cycle 255 and speed 255 to cycle 1 is
@@ -405,6 +468,7 @@ void testPersistence()
 int main()
 {
     testDisplayManagerLatch();
+    testShowNowProcedures();
     testSchedulerSpeedRoundTrip();
     testWordsChangeOnFiveMinuteStepsOnly();
     testInvalidTimeIsRejected();
