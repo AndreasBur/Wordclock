@@ -14,11 +14,17 @@ FROM ${BASE_IMAGE}
 # clang-tidy comes with clangd because the checks it runs are the ones CI blocks a pull
 # request on; running them here is what keeps that from being a surprise. run-clang-tidy,
 # which walks the compile database in parallel, is part of the same package.
+# cppcheck is the second analyser of that same workflow, and is here for the same reason.
+# It is the one whose version cannot be pinned - the runner's is older than this one, and
+# the difference has already cost a red badge over the format of the suppression file
+# rather than over any finding, so having it locally is what makes that visible before a
+# push rather than after.
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && \
     apt-get install -y --no-install-recommends \
         cmake \
         clangd \
         clang-tidy \
+        cppcheck \
         ninja-build \
         libwxgtk3.2-dev \
         imagemagick \

@@ -80,8 +80,9 @@ jobs:
       # rather than by widening .cppcheck-suppressions to a whole file.
       #
       # Unpinned, like clang-tidy: cppcheck has no versioned packages to pin to anyway, so a
-      # later runner image can report something new here. That is the same trade the
-      # container makes by carrying a newer clang-tidy than the runner.
+      # later runner image can report something new here. The dev container carries both
+      # analysers and both of its copies are newer than the runner's, which is the trade
+      # made deliberately - a developer sees the stricter answer first.
       - name: Analyse
         run: |
           INCLUDES=$(find firmware/inc -type d | sed 's/^/-I/')
