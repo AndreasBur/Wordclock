@@ -1,6 +1,7 @@
 # Wordclock
 
 [![CI](https://github.com/AndreasBur/Wordclock/actions/workflows/ci.yml/badge.svg)](https://github.com/AndreasBur/Wordclock/actions/workflows/ci.yml)
+[![static-analysis](https://github.com/AndreasBur/Wordclock/actions/workflows/static-analysis.yml/badge.svg)](https://github.com/AndreasBur/Wordclock/actions/workflows/static-analysis.yml)
 
 A word clock based on Arduino: an 11×10 grid of letters that spells out the
 time in German ("ES IST FÜNF NACH ZEHN"), with animations, overlays (date,
@@ -75,14 +76,15 @@ The `hardware` (xmega) platform would use the AVR toolchain; see its README.
 
 ## Checks
 
-Every pull request runs [`.github/workflows/ci.yml`](.github/workflows/ci.yml),
-which is the three ways this repository can be built, each of which breaks on its
-own, plus what static analysis has to say about the result:
+Every pull request runs two workflows, and the two badges above say separately
+whether the code builds and whether it reads clean.
+
+[`.github/workflows/ci.yml`](.github/workflows/ci.yml) is the three ways this
+repository can be built, each of which breaks on its own:
 
 | Job | What it does |
 |-----|--------------|
 | Simulator and core tests | Configures and builds the wxWidgets backend with `-Werror` and runs `ctest` |
-| Static analysis | `clang-tidy` over the firmware core and the simulator backend; which checks and why the others are off is in [`.clang-tidy`](.clang-tidy) |
 | ESP32 backend on the host | [`platform/esp32/test/run.sh`](platform/esp32/test/run.sh) — the backend against the stand-ins in `test/stubs`, no board needed |
 | ESP32 firmware | `pio run` for the board it actually runs on |
 
@@ -91,13 +93,32 @@ the same sources with the host's compiler and libc, so anything the target's
 toolchain has a different opinion about passes them. `timegm`, which newlib does
 not declare, broke the firmware while every host test stayed green.
 
+[`.github/workflows/static-analysis.yml`](.github/workflows/static-analysis.yml)
+is what reads the code rather than building it — two analysers, because they are
+good at different things:
+
+| Job | What it does |
+|-----|--------------|
+| clang-tidy | Over the firmware core and the simulator backend, seeing exactly what the compiler sees through `compile_commands.json`. Which checks and why the others are off is in [`.clang-tidy`](.clang-tidy) |
+| cppcheck | Parses the tree by itself, which is what reaches the template instantiations and container bounds the clang checks do not follow. Its two suppressions and their reasons are in [`.cppcheck-suppressions`](.cppcheck-suppressions) |
+
+cppcheck reads `firmware/` only: without wxWidgets' own headers it stops at
+`DECLARE_EVENT_TABLE` in the simulator's window class, which is the half
+clang-tidy already covers through the compile database.
+
 The same commands are what to run before pushing; nothing in them needs a display
-or a board. The analysis is the one that needs a configured build directory rather
-than a built one:
+or a board. The analysers are the ones that need a configured build directory
+rather than a built one, and `cppcheck` — unlike `clang-tidy` — is not in the dev
+container yet:
 
 ```bash
 cmake -S . -B build -G Ninja -DPLATFORM=simulator -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 run-clang-tidy -p build -quiet 'firmware/|platform/simulator/src'
+cppcheck --enable=warning,portability --std=c++17 --inline-suppr \
+    --suppressions-list=.cppcheck-suppressions \
+    $(find firmware/inc -type d | sed 's/^/-I/') \
+    -Iplatform/simulator/include/sim -Iplatform/simulator/include \
+    firmware/src firmware/inc
 ```
 
 ## History note

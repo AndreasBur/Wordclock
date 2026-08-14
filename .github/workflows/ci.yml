@@ -10,6 +10,10 @@
 # different opinion about passes them - newlib not declaring timegm, for one, which broke
 # the target build while every host test stayed green.
 #
+# What the code says rather than whether it builds is static-analysis.yml, which used to be
+# a fourth job here. It is its own workflow because a badge reports a workflow: the README
+# says separately that the builds pass and that the analysers are quiet.
+#
 # Not run through the dev container. devcontainers/ci would give exact parity with what a
 # developer has, at the price of building that image on every run; the packages below are
 # the same versions the image installs from the same Ubuntu, which is close enough for a
@@ -53,30 +57,6 @@ jobs:
       # window that renders it is never constructed.
       - name: Test
         run: ctest --test-dir build --output-on-failure
-
-  static-analysis:
-    name: Static analysis
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v7
-
-      # wxWidgets is here for the same reason as in the job above: the simulator's compile
-      # database is what covers the firmware core, and it does not exist without the
-      # headers the backend includes.
-      - name: Install the toolchain
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends cmake ninja-build libwxgtk3.2-dev clang-tidy
-
-      # Configured, not built: clang-tidy compiles each translation unit itself and needs
-      # nothing from the build but compile_commands.json.
-      - name: Configure
-        run: cmake -S . -B build -G Ninja -DPLATFORM=simulator -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-
-      # Which checks, and why the rest are off, is in .clang-tidy. WarningsAsErrors is set
-      # there, so a finding fails this job.
-      - name: Analyse
-        run: run-clang-tidy -p build -quiet -j "$(nproc)" 'firmware/|platform/simulator/src'
 
   host-tests:
     name: ESP32 backend on the host
