@@ -11,15 +11,16 @@
 /**     \file       DS3231.h
  *      \brief      Temperature of the DS3231 real time clock chip
  *
- *      \details    The DS3231 measures its own die temperature to compensate its crystal,
- *                  and hands that reading out in two registers. It is what the temperature
- *                  overlay shows.
+ *      \details    Two things the chip keeps for the clock: the time it counts on its
+ *                  battery, and the die temperature it measures to compensate its crystal.
+ *                  The first fills the gap between power-on and the first SNTP answer, the
+ *                  second is what the temperature overlay shows.
  *
- *                  Only the temperature, deliberately: the clock on this platform gets its
- *                  time from SNTP and keeps it in the system clock, so the chip's
- *                  time-keeping side has nothing to do here yet. It is what would close the
- *                  gap after a power cut, and the same chip on the same bus is then already
- *                  wired - see the roadmap.
+ *                  What is stored in the time registers is UTC, not the local time the
+ *                  display shows. A clock that stored local time would have nothing to say
+ *                  about the hour that occurs twice when summer time ends, and would be an
+ *                  hour wrong from a switch until the next SNTP answer. RealTimeClock does
+ *                  the conversion in both directions.
  *
  *                  A die temperature is not a room temperature. The chip sits in the case
  *                  next to whatever else is warm in there, so what it reads is a degree or
@@ -34,6 +35,7 @@
 ******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Arduino.h"
+#include "ClockDateTime.h"
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
@@ -61,6 +63,23 @@
 #define DS3231_TEMPERATURE_NUMBER_OF_BYTES              2u
 #define DS3231_TEMPERATURE_FRACTION_GM                  0b11u
 #define DS3231_TEMPERATURE_FRACTION_GP                  6u
+
+/* Time and date, seven registers in one block, every field in BCD. */
+#define DS3231_REG_SECONDS                              0x00u
+#define DS3231_DATE_TIME_NUMBER_OF_BYTES                7u
+
+/* The bits beside the value in the registers that carry one: the hours register selects
+   12-hour mode in bit 6 and holds the AM/PM or the tens bit in bit 5, and the month
+   register carries the century in bit 7. Both are masked off on the way in and left at
+   zero on the way out - the clock runs in 24-hour mode, and ClockDate covers 2000 to 2099,
+   which is exactly the century the chip counts in with that bit clear. */
+#define DS3231_HOURS_VALUE_MASK                         0b00111111u
+#define DS3231_MONTH_VALUE_MASK                         0b00011111u
+
+/* Status register, whose top bit says the oscillator stopped - which is how a chip that
+   ran out of battery says its time is not to be believed. */
+#define DS3231_REG_STATUS                               0x0Fu
+#define DS3231_STATUS_OSCILLATOR_STOPPED_MASK           0b10000000u
 
 /******************************************************************************************************************************************************
  *  C L A S S   D S 3 2 3 1
@@ -95,6 +114,11 @@ class DS3231
     StdReturnType startBus();
     StdReturnType readTemperature();
 
+    StdReturnType readRegisters(byte Register, byte* Values, byte Length);
+    StdReturnType writeRegisters(byte Register, const byte* Values, byte Length);
+    StdReturnType clearOscillatorStopped();
+    bool hasOscillatorStopped();
+
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
@@ -114,6 +138,12 @@ class DS3231
         return static_cast<TemperatureType>((Quarters * TenthsPerDegree) / QuartersPerDegree);
     }
 
+    /* The registers hold their fields in BCD, two decimal digits per byte. Public for the
+       same reason as toTenths(): it is checkable without a bus, and the assertions below
+       do it. */
+    static constexpr byte fromBcd(byte Value) { return static_cast<byte>(((Value >> 4u) * 10u) + (Value & 0x0Fu)); }
+    static constexpr byte toBcd(byte Value) { return static_cast<byte>(((Value / 10u) << 4u) | (Value % 10u)); }
+
     // get methods
     static constexpr byte getTaskCycle() { return TaskCycle; }
 
@@ -125,6 +155,17 @@ class DS3231
         sTemperature = Temperature;
         return E_OK;
     }
+
+    /* Reads what the chip counted, in UTC. E_NOT_OK when the chip does not answer, when it
+       reports that its oscillator stopped - a battery that ran out, so what it counted
+       since is nothing - or when the registers do not form a date, which is what an
+       unwritten chip and a botched transfer both look like. */
+    StdReturnType getDateTime(ClockDateTime&);
+
+    // set methods
+    /* Writes the time to the chip, in UTC, and clears the stopped flag with it: the value
+       just written is by definition believable again. */
+    StdReturnType setDateTime(const ClockDateTime&);
 
     // methods
     void task();
@@ -140,6 +181,12 @@ static_assert(DS3231::TenthsPerDegree == 10, "the conversion below is written in
 static_assert(DS3231::toTenths(0x19, 0x40u) == 252, "+25.25 degrees must read as 25.2");
 static_assert(DS3231::toTenths(static_cast<int8_t>(0xFE), 0x80u) == -15, "-1.5 degrees must read as -1.5");
 static_assert(DS3231::toTenths(0, 0x00u) == 0, "zero must stay zero");
+
+/* Both ends of what the registers carry, and the round trip in between. */
+static_assert(DS3231::fromBcd(0x59u) == 59u, "the tens digit sits in the upper nibble");
+static_assert(DS3231::toBcd(59u) == 0x59u, "and goes back there");
+static_assert(DS3231::fromBcd(DS3231::toBcd(0u)) == 0u, "zero must round-trip");
+static_assert(DS3231::fromBcd(DS3231::toBcd(99u)) == 99u, "the largest two-digit value must round-trip");
 
 #endif // _DS3231_H_
 

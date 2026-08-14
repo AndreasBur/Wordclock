@@ -116,7 +116,7 @@ every other display parameter, and the backend takes what `Display::init()` hand
 | | Simulator | ESP32 |
 |---|---|---|
 | `Pixels` | writes into a window | WS2812 over the RMT peripheral, DMA-fed |
-| `RealTimeClock` | counts a host clock forward | reads the system clock, which SNTP sets |
+| `RealTimeClock` | counts a host clock forward | reads the system clock, which SNTP sets and the DS3231 fills in for until it does |
 | `BH1750` | returns what a slider dialled in | reads the sensor over I²C |
 | `DS3231` | returns what a slider dialled in, and "no chip" until a box is ticked | reads the clock chip's temperature registers over I²C |
 | `Storage` | a file in the working directory | one blob in the NVS partition |
@@ -209,9 +209,14 @@ edit cycle is then a browser reload.
   neither — harmless in a stub that never opens a bus, but a sensor addressed that way
   stays silent.
 - **The clock chip shares that bus.** `DS3231_I2C_ADDR` is 0x68 and cannot be changed —
-  the chip has no address pins. It is read for its temperature only, which is what the
-  temperature overlay shows. Note that this is the chip's own die temperature: in a closed
-  case next to the supply it reads a degree or two above the room.
+  the chip has no address pins. It keeps the time over a power cut and measures a
+  temperature, and both need the backup cell in its holder: without one it comes up
+  reporting that its oscillator stopped, which is the firmware's signal to ignore what it
+  counted. Note that what it measures is its own die temperature: in a closed case next to
+  the supply it reads a degree or two above the room.
+- **The chip stores UTC**, not the local time on the display. That is what makes the hour
+  that occurs twice at the end of summer time unambiguous, and it means a chip read with
+  another tool shows an offset rather than the wall clock.
 
 ## Known gaps
 
@@ -219,10 +224,10 @@ edit cycle is then a browser reload.
   and speeds and the sensor calibration survive a restart; the overlay configuration and
   its text do not, because the stored format has no variable-length field yet. The time
   and date are not stored either — they come from the network.
-- **No time source without the network.** The DS3231 is read for its temperature but not
-  for its time, so between power-on and the first SNTP answer the display still holds its
-  default date. The chip and its bus are now wired for it, so what is left is reading the
-  time registers and feeding `RealTimeClock::setDateTime()` from them.
+- **A clock without a battery still comes up blank.** The DS3231 fills the gap between
+  power-on and the first SNTP answer — but only if it has one to fill it with: a chip
+  without a battery reports that its oscillator stopped, and its registers are then ignored
+  on purpose.
 - **No view of the letter grid yet.** The console shows the answers, not the display. The
   pixel buffer over the same socket is the next step.
 - **No authentication.** Anyone on the network can send commands. Fine behind a home

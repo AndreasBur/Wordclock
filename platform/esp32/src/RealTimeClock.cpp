@@ -44,6 +44,59 @@ void toDateTime(const struct tm& Local, ClockDateTime& DateTime)
     DateTime.setTimeSecond(static_cast<ClockDateTime::SecondType>(Local.tm_sec));
 }
 
+/* The chip keeps UTC, so the two conversions for it leave the zone rule out: gmtime_r and
+   timegm are what localtime_r and mktime are for the display's local time. */
+void toDateTimeUtc(const time_t& Seconds, ClockDateTime& DateTime)
+{
+    struct tm Utc{};
+
+    gmtime_r(&Seconds, &Utc);
+    toDateTime(Utc, DateTime);
+}
+
+constexpr int32_t SecondsPerMinute{60};
+constexpr int32_t SecondsPerHour{60 * SecondsPerMinute};
+constexpr int32_t SecondsPerDay{24 * SecondsPerHour};
+
+/* Days from 1970-01-01 to a civil date, by Howard Hinnant's days_from_civil: the year is
+   shifted so that it begins in March, which puts the leap day at the end of it and makes
+   the month lengths a repeating pattern rather than a table.
+
+   Written out rather than left to timegm(), which mktime's counterpart would be: newlib
+   does not declare it on this target, so a build against the ESP32 core does not compile
+   with it. The other way round - a local time to seconds - keeps using mktime, which is
+   there and which has to apply the zone rule anyway. */
+constexpr int32_t daysFromCivil(int32_t Year, int32_t Month, int32_t Day)
+{
+    Year -= (Month <= 2) ? 1 : 0;
+
+    const int32_t Era = ((Year >= 0) ? Year : (Year - 399)) / 400;
+    const int32_t YearOfEra = Year - (Era * 400);
+    const int32_t DayOfYear = (((153 * (Month + ((Month > 2) ? -3 : 9))) + 2) / 5) + Day - 1;
+    const int32_t DayOfEra = (YearOfEra * 365) + (YearOfEra / 4) - (YearOfEra / 100) + DayOfYear;
+
+    return (Era * 146097) + DayOfEra - 719468;
+}
+
+/* The epoch itself, the leap day that the shifted year is built around, and both ends of
+   what ClockDate covers. */
+static_assert(daysFromCivil(1970, 1, 1) == 0, "the epoch must be day zero");
+static_assert(daysFromCivil(2000, 3, 1) == 11017, "the day after a leap day must line up");
+static_assert(daysFromCivil(2026, 8, 14) == 20679, "an ordinary day must line up");
+static_assert(daysFromCivil(2099, 12, 31) == 47481, "the last day ClockDate accepts must line up");
+
+time_t toSecondsUtc(const ClockDateTime& DateTime)
+{
+    const int32_t Days = daysFromCivil(static_cast<int32_t>(DateTime.getDateYear()),
+                                       static_cast<int32_t>(DateTime.getDateMonth()),
+                                       static_cast<int32_t>(DateTime.getDateDay()));
+
+    return static_cast<time_t>((Days * SecondsPerDay) +
+                               (static_cast<int32_t>(DateTime.getTimeHour()) * SecondsPerHour) +
+                               (static_cast<int32_t>(DateTime.getTimeMinute()) * SecondsPerMinute) +
+                               static_cast<int32_t>(DateTime.getTimeSecond()));
+}
+
 void toTm(const ClockDateTime& DateTime, struct tm& Local)
 {
     Local = {};
@@ -89,6 +142,10 @@ void RealTimeClock::setDateTime(ClockDateTime sDateTime)
 {
     DateTime = sDateTime;
     writeSystemDateTime(DateTime);
+    /* A time set by hand is worth keeping over the next power cut as much as one from the
+       network, so the chip is written again on the next task rather than at the turn of
+       the hour it would otherwise wait for. */
+    HourWrittenToChip = NoHourWritten;
 } /* setDateTime */
 
 
@@ -121,6 +178,12 @@ void RealTimeClock::setDate(ClockDate Date)
  *  \details        Nothing is counted forward here, unlike on the simulator: SNTP keeps
  *                  the system clock right on its own, so counting would only add a
  *                  second source of truth that drifts away from it.
+ *
+ *                  The clock chip is the source of last resort rather than a second one:
+ *                  it is read only while the system clock holds nothing, and written back
+ *                  from the system clock afterwards. Which way round matters - the chip
+ *                  drifts a few seconds a month and SNTP does not, so a chip that could
+ *                  overwrite a synchronised clock would make the clock worse.
 ******************************************************************************************************************************************************/
 void RealTimeClock::task()
 {
@@ -129,9 +192,13 @@ void RealTimeClock::task()
     /* An unset clock is left alone rather than shown. Before the first SNTP answer the
        system clock sits in 1970, which ClockDate rejects outright - so the display would
        otherwise keep whatever the failed setters left behind. */
-    if(!readSystemDateTime(Current)) { return; }
+    if(!readSystemDateTime(Current)) {
+        readChip();
+        return;
+    }
 
     DateTime = Current;
+    writeChip();
 } /* task */
 
 
@@ -157,6 +224,65 @@ bool RealTimeClock::readSystemDateTime(ClockDateTime& Value)
     toDateTime(Local, Value);
     return true;
 } /* readSystemDateTime */
+
+
+/******************************************************************************************************************************************************
+  readChip()
+******************************************************************************************************************************************************/
+/*! \brief          Puts what the clock chip kept into the system clock
+ *  \details        Only ever called while the system clock holds nothing, so there is
+ *                  nothing here that could overwrite a synchronised time. Retried once a
+ *                  second until it works, which is what picks up a chip that answers late -
+ *                  and what keeps the retry off a bus the light sensor shares.
+ *
+ *  \return         E_OK if the chip had a time and the system clock took it
+******************************************************************************************************************************************************/
+StdReturnType RealTimeClock::readChip()
+{
+    if(ChipReadCountdown > 0u) { ChipReadCountdown--; return E_NOT_OK; }
+
+    ChipReadCountdown = ChipReadInterval;
+
+    ClockDateTime Utc;
+
+    if(Chip.getDateTime(Utc) == E_NOT_OK) { return E_NOT_OK; }
+
+    const struct timeval Time{toSecondsUtc(Utc), 0};
+    if(settimeofday(&Time, nullptr) != 0) { return E_NOT_OK; }
+
+    /* Not written back at once: what was just read is what the chip already holds, and the
+       hour it belongs to is what the next write is measured against. */
+    HourWrittenToChip = Utc.getTimeHour();
+    return E_OK;
+} /* readChip */
+
+
+/******************************************************************************************************************************************************
+  writeChip()
+******************************************************************************************************************************************************/
+/*! \brief          Keeps the clock chip in step with the system clock
+ *  \details        Once an hour, and once more whenever the time was set by hand. Once an
+ *                  hour because the chip is the more accurate of the two and needs no
+ *                  correcting - what the write is for is the case where SNTP has moved the
+ *                  system clock and the chip would otherwise keep an old time for the next
+ *                  power cut. The hour is remembered rather than a countdown kept, so a
+ *                  clock that was off for a while writes on its first hour and not a
+ *                  whole period later.
+ *
+ *                  A failed write is not retried within the hour: the next one comes
+ *                  anyway, and a chip that is not answering would otherwise be talked to
+ *                  on every single tick.
+******************************************************************************************************************************************************/
+void RealTimeClock::writeChip()
+{
+    if(DateTime.getTimeHour() == HourWrittenToChip) { return; }
+
+    ClockDateTime Utc;
+    toDateTimeUtc(time(nullptr), Utc);
+
+    Chip.setDateTime(Utc);
+    HourWrittenToChip = DateTime.getTimeHour();
+} /* writeChip */
 
 
 /******************************************************************************************************************************************************

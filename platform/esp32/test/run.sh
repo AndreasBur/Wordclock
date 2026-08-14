@@ -63,7 +63,7 @@ build() {   # name, then the sources that belong to it
 # still needs WordclockSerial, which Pixels reports a failed channel through.
 build frame_test  "$TEST_DIR/frame_test.cpp" "$PLATFORM_DIR/src/Pixels.cpp" "$PLATFORM_DIR/src/WordclockSerial.cpp"
 build serial_test "$TEST_DIR/serial_test.cpp" "${BACKEND[@]}" "${CORE[@]}" "$TEST_DIR/rmt_stubs.cpp"
-build temperature_test "$TEST_DIR/temperature_test.cpp" "${BACKEND[@]}" "${CORE[@]}" "$TEST_DIR/rmt_stubs.cpp"
+build ds3231_test "$TEST_DIR/ds3231_test.cpp" "${BACKEND[@]}" "${CORE[@]}" "$TEST_DIR/rmt_stubs.cpp"
 build web_test    "$TEST_DIR/web_test.cpp" "$WEB" "${BACKEND[@]}" "${CORE[@]}" "$TEST_DIR/rmt_stubs.cpp"
 build webhost     "$TEST_DIR/webhost.cpp" "$WEB" "${BACKEND[@]}" "${CORE[@]}" "$TEST_DIR/rmt_stubs.cpp"
 
@@ -75,7 +75,7 @@ if [ "${1:-}" = "serve" ]; then
 fi
 
 FAILED=0
-for name in frame_test serial_test temperature_test web_test; do
+for name in frame_test serial_test ds3231_test web_test; do
     echo
     echo "--- $name ---"
     "$WORK/$name" || FAILED=1
