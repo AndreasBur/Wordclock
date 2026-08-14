@@ -146,6 +146,7 @@ platform/simulator/
 │   │   ├── PixelsFrame.h the window that renders it
 │   │   ├── RealTimeClock.h   time source
 │   │   ├── BH1750.h      ambient-light sensor
+│   │   ├── DS3231.h      the clock chip's thermometer
 │   │   ├── SerialShim.h  the port Serial is bound to
 │   │   ├── Settings.h    stand-ins for absent hardware
 │   │   ├── Storage.h     settings store, backed by a file
@@ -189,5 +190,11 @@ device's serial output and lets you send commands back: `Serial` is bound to
 for it.
 
 The firmware still includes the historical header names (`Pixels.h`,
-`RealTimeClock.h`, `BH1750.h`), resolved by placing `include/sim` on the
+`RealTimeClock.h`, `BH1750.h`, `DS3231.h`), resolved by placing `include/sim` on the
 compiler include path before `include`.
+
+The settings window holds what a simulator has no hardware for: the light sensor's
+illuminance, and the clock chip's temperature behind a *Sensor connected* box. The box is
+not decoration — the temperature overlay stays away entirely while no reading has ever
+arrived, and that is the state a clock built without the chip is in for good, so it has to
+be reachable here.

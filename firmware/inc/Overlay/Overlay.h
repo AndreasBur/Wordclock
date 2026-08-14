@@ -147,6 +147,8 @@ template <typename Derived> class Overlay
     }
 
     SecondType idleTask(SecondType ShowTimerInSeconds, ClockDate CurrentDate, ClockTime CurrentTime) {
+        if(!canShow()) { return ShowTimerInSeconds; }
+
         if(isTimeMatching(CurrentTime.getMinute(), CurrentTime.getSecond())) {
             if(isDateSet()) { return checkDateAndSetStateToShow(ShowTimerInSeconds, CurrentDate, CurrentTime); }
             else { return setStateToShow(CurrentDate, CurrentTime); }
@@ -170,6 +172,33 @@ template <typename Derived> class Overlay
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
+    /* The two transitions the period raster makes on its own, opened up for a caller that
+       wants the overlay now - the "show now" remote procedure calls. They are the same
+       transitions and not a second path into the show state, so an overlay started by
+       hand ends through the show timer like any other.
+
+       Whether the overlay may start at all is not decided here: only Overlays knows
+       whether another one already holds the display, and it owns the timer this hands
+       back. */
+    SecondType startShow(ClockDate CurrentDate, ClockTime CurrentTime) {
+        return setStateToShow(CurrentDate, CurrentTime);
+    }
+    void stopShow(ClockDate CurrentDate, ClockTime CurrentTime) {
+        setStateToIdle(CurrentDate, CurrentTime);
+    }
+
+    /* Whether the overlay has anything to show at all, which is not the same as being
+       switched on: the temperature has nothing until a chip has answered, and a clock
+       built without one never will. Asked before every start, by the period raster and by
+       the "show now" call alike, so that an overlay with nothing to say does not hold the
+       display for its endurance. The date and the text always have something.
+
+       Named apart from the isReady() each overlay answers, rather than being the same name
+       in both places like setStateToShow(): a derived member of the same name would hide
+       this one, and a caller outside the overlays - Overlays itself - would then reach the
+       private hook instead of this. */
+    bool canShow() const { return underlying().isReady(); }
+
 	// get methods
 	StateType getState() const { return State; }
     MinuteType getPeriodInMinutes() const { return PeriodInMinutes; }

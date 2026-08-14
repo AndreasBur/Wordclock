@@ -17,7 +17,7 @@ the word tables have to cover.
 | Directory | Purpose |
 |-----------|---------|
 | [firmware/](firmware/) | **Single source of truth** for the clock logic — platform-agnostic (animations, clock, display, scheduler, overlays, communication). |
-| [docs/](docs/) | Reference documentation: the [serial command reference](docs/serial-commands.md) and the [font tables](docs/fonts.md). |
+| [docs/](docs/) | Reference documentation: the [serial command reference](docs/serial-commands.md), the [font tables](docs/fonts.md) and the [roadmap](docs/roadmap.md). |
 | [assets/](assets/) | The icon's SVG masters and the script that generates the `.ico`, the `.xpm` and `docs/images/logo.png` from them. |
 | [platform/simulator/](platform/simulator/) | wxWidgets desktop backend: renders the matrix in a window so the firmware can be developed and debugged on a PC. |
 | [platform/esp32/](platform/esp32/) | On-device backend: WS2812 over the RMT peripheral, time from NTP. Built with PlatformIO — see its [README](platform/esp32/README.md). |
@@ -31,7 +31,7 @@ The tool that generates the bitmap font tables lives in its own repository,
 ## Architecture
 
 The firmware core reaches the hardware **only through header names**
-(`Arduino.h`, `Pixels.h`, `RealTimeClock.h`, `BH1750.h`, `Storage.h`), resolved via the
+(`Arduino.h`, `Pixels.h`, `RealTimeClock.h`, `BH1750.h`, `DS3231.h`, `Storage.h`), resolved via the
 include path. Each platform under `platform/` supplies those headers with its own
 implementation — a compile-time swap with no runtime cost. See
 [platform/hardware/README.md](platform/hardware/README.md) for the contract.

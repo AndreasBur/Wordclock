@@ -27,6 +27,7 @@
 #include "Communication.h"
 #include "Overlays.h"
 #include "Persistence.h"
+#include "Temperature.h"
 #include "Text.h"
 
 /******************************************************************************************************************************************************
@@ -90,6 +91,9 @@ bool Scheduler::isDue(TaskIdType TaskId, byte Cycle) {
 void Scheduler::triggerTasks()
 {
     if(isDue(TASK_ID_ILLUMINANCE, Illuminance::getInstance().getTaskCycle())) { Illuminance::getInstance().task(); }
+    /* Beside the light sensor because it is one too, and nothing downstream is timed
+       against it: the overlay reads whatever the last pass left. */
+    if(isDue(TASK_ID_TEMPERATURE, Temperature::getInstance().getTaskCycle())) { Temperature::getInstance().task(); }
     /* after the sensor, so the brightness automatic works on a fresh reading */
     if(isDue(TASK_ID_DISPLAY_MANAGER, DisplayManager::getInstance().getTaskCycle())) { DisplayManager::getInstance().task(); }
     if(isDue(TASK_ID_ANIMATIONS, Animations::getInstance().getTaskCycle())) { Animations::getInstance().task(true); }

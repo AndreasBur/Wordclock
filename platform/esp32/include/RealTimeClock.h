@@ -34,6 +34,7 @@
 #include "StandardTypes.h"
 #include "Arduino.h"
 #include "ClockDateTime.h"
+#include "DS3231.h"
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
@@ -66,7 +67,27 @@ class RealTimeClock
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
+    /* No hour, so the first pass with a system time writes the chip. A byte the hours
+       cannot reach, rather than a second flag beside it. */
+    static constexpr byte NoHourWritten{0xFFu};
+
+    /* Ticks between two attempts to read the chip, so once a second. This runs from the
+       application's tick rather than through the scheduler, and a read is two transfers -
+       trying on every tick would put a hundred of them a second on a bus the light sensor
+       shares, for a value that only has to arrive before the display is worth looking at. */
+    static constexpr byte ChipReadInterval{100u};
+
     ClockDateTime DateTime;
+
+    /* An instance of its own, next to the one Temperature keeps. The chip has no state
+       that two readers could disturb, both open the same bus - which Wire.begin() allows
+       twice - and sharing one would mean either a singleton the simulator's stand-in would
+       have to grow too, or the time-keeping side reaching through the core's Temperature,
+       which knows nothing about time. */
+    DS3231 Chip;
+    byte HourWrittenToChip{NoHourWritten};
+    /* Zero, so the first tick without a system time asks the chip straight away. */
+    byte ChipReadCountdown{0u};
 
     // functions
     RealTimeClock() {}
@@ -74,6 +95,9 @@ class RealTimeClock
 
     static bool readSystemDateTime(ClockDateTime&);
     static StdReturnType writeSystemDateTime(const ClockDateTime&);
+
+    StdReturnType readChip();
+    void writeChip();
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S

@@ -171,6 +171,11 @@ esp_err_t handleCommands(httpd_req_t* Request)
             Writer.put(",\"max\":");
             Writer.putNumber(Option.Maximum);
 
+            /* Only where it is set, so the page's form stays as it was for every option
+               that can be sent, and the read-only fields it must not offer are the ones
+               that say so. */
+            if(Option.ReadOnly) { Writer.put(",\"readonly\":true"); }
+
             if((Option.ValueNames != nullptr) && (Option.NumberOfValueNames > 0u)) {
                 Writer.put(",\"values\":[");
                 for(byte NameIndex = 0u; NameIndex < Option.NumberOfValueNames; NameIndex++) {

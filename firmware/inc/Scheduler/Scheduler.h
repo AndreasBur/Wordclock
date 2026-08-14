@@ -51,6 +51,7 @@ class Scheduler
     /* One per task that triggerTasks() drives, and in the order it drives them. */
     enum TaskIdType {
         TASK_ID_ILLUMINANCE,
+        TASK_ID_TEMPERATURE,
         TASK_ID_DISPLAY_MANAGER,
         TASK_ID_ANIMATIONS,
         TASK_ID_COMMUNICATION,

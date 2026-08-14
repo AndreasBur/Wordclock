@@ -24,14 +24,19 @@
 ******************************************************************************************************************************************************/
 #include <array>
 #include <cstdio>
+#include <cstring>
 #include <cstdlib>
 #include <iostream>
 
 #include "Animations.h"
 #include "Clock.h"
+#include "Display.h"
 #include "DisplayCharacters.h"
 #include "DisplayManager.h"
 #include "Illuminance.h"
+#include "Overlays.h"
+#include "Temperature.h"
+#include "sim/DS3231.h"
 #include "Persistence.h"
 #include "Pixels.h"
 #include "RealTimeClock.h"
@@ -144,6 +149,96 @@ void testDisplayManagerLatch()
     expect(!pixels.isDirty(), "the rest of the step must not redraw either");
     expect(arePixelsEqual(readPixels(), afterChange),
            "the rest of the step must leave the letters as they were");
+}
+
+/* The procedures that act now rather than at the next word change. What makes them worth
+   testing is the state they are asked for in: the display has been written to by something
+   that is not the clock, and nothing in the firmware takes it back - the latch sees the
+   same word set and leaves the letters alone, for up to five minutes. */
+void testShowNowProcedures()
+{
+    Clock::getInstance().setModeFast(Clock::MODE_WESSI);
+    Animations& animations = Animations::getInstance();
+    animations.setModeFast(Animations::MODE_FIXED);
+    animations.setAnimationFast(Animations::ANIMATION_ID_NONE);
+
+    DisplayManager& displayManager = DisplayManager::getInstance();
+    Overlays& overlays = Overlays::getInstance();
+    Display& display = Display::getInstance();
+
+    setTime(10u, 4u, 0u);
+    displayManager.task();
+    const PixelBufferType clockFace = readPixels();
+
+    display.test();
+    expect(!arePixelsEqual(readPixels(), clockFace), "the display test must reach the letters");
+    displayManager.task();
+    expect(!arePixelsEqual(readPixels(), clockFace),
+           "a task inside the same word set must not undo the display test");
+    expect(displayManager.refreshClock() == E_OK, "the clock must be refreshable");
+    expect(arePixelsEqual(readPixels(), clockFace), "the refresh must put the clock face back");
+
+    animations.setAnimationFast(Animations::ANIMATION_ID_CURSOR);
+    expect(displayManager.startAnimation() == E_OK, "the selected animation must start on demand");
+    expect(animations.getState() == Animations::STATE_PENDING, "the started animation must be running");
+    expect(displayManager.abortAnimation() == E_OK, "a running animation must be abortable");
+    expect(animations.getState() == Animations::STATE_IDLE, "the aborted animation must be idle");
+    expect(arePixelsEqual(readPixels(), clockFace), "the abort must put the clock face back");
+    animations.setAnimationFast(Animations::ANIMATION_ID_NONE);
+
+    /* An overlay owns the display while it shows, so both clock procedures step aside
+       instead of drawing underneath it. */
+    overlays.setDateIsActive(true);
+    expect(overlays.showDateNow() == E_OK, "an active overlay must start on demand");
+    expect(overlays.getState() == Overlays::OverlayType::STATE_SHOW, "the started overlay must show");
+    expect(overlays.showDateNow() == E_NOT_OK, "a second overlay must not start while one shows");
+    expect(displayManager.refreshClock() == E_NOT_OK, "the clock must not be refreshed under an overlay");
+    expect(displayManager.startAnimation() == E_NOT_OK, "no animation must start under an overlay");
+
+    /* Stands in for what the overlay's text draws, which needs the scheduler this test
+       does not run: what matters here is that the clock comes back over it. */
+    displayManager.task();
+    display.test();
+
+    expect(overlays.abort() == E_OK, "a showing overlay must be abortable");
+    expect(overlays.getState() != Overlays::OverlayType::STATE_SHOW,
+           "the aborted overlay must stop showing");
+    expect(overlays.abort() == E_NOT_OK, "aborting with no overlay showing must be refused");
+
+    displayManager.task();
+    expect(arePixelsEqual(readPixels(), clockFace), "the end of an overlay must put the clock face back");
+
+    overlays.setDateIsActive(false);
+    expect(overlays.showDateNow() == E_NOT_OK, "a switched-off overlay must not be started");
+}
+
+/* The temperature overlay's one rule that is not about text: it shows nothing at all
+   until a reading exists. A clock built without the chip stays in that state for good, so
+   what is checked here is the state and not the string - the string is checked against a
+   real register pair in the ESP32 host tests, where there is a driver to read it with. */
+void testTemperatureOverlayWithoutSensor()
+{
+    Overlays& overlays = Overlays::getInstance();
+
+    DS3231::clearSimulatedTemperature();
+    Temperature::getInstance().task();
+
+    overlays.setTemperatureIsActive(true);
+    expect(overlays.showTemperatureNow() == E_NOT_OK,
+           "an overlay with no reading must not start");
+
+    DS3231::setSimulatedTemperature(215);
+    Temperature::getInstance().task();
+    expect(overlays.showTemperatureNow() == E_OK, "a reading must let the overlay start");
+    expect(strcmp(overlays.getTemperatureString(), "21.5C") == 0,
+           "the overlay must show the dialled-in reading");
+    expect(overlays.abort() == E_OK, "the overlay must end again");
+
+    /* Left as it was found: an active temperature overlay would take the display away
+       from whatever runs after this. */
+    overlays.setTemperatureIsActive(false);
+    DS3231::clearSimulatedTemperature();
+    Temperature::getInstance().task();
 }
 
 /* Only the round trip. That speed 1 maps to cycle 255 and speed 255 to cycle 1 is
@@ -397,6 +492,42 @@ void testPersistence()
     expect(storage.clear() == E_OK, "the test must leave the store as it found it");
 }
 
+/* The two procedures that reach the store directly. What they are for is what task()
+   cannot do: write before the plug is pulled rather than within the next period, and get
+   a clock back to what it left the factory as without erasing its flash over USB. */
+void testPersistenceSaveAndReset()
+{
+    Storage& storage = Storage::getInstance();
+    Persistence& persistence = Persistence::getInstance();
+    Display& display = Display::getInstance();
+    Clock& clock = Clock::getInstance();
+
+    display.setColor(1u, 2u, 3u);
+    clock.setModeFast(Clock::MODE_OSSI);
+    expect(persistence.save() == E_OK, "saving must write the configuration");
+
+    display.setColor(9u, 9u, 9u);
+    expect(persistence.load() == E_OK, "what was saved must come back");
+    expect(display.getColorRed() == 1u, "and it must be what was saved");
+
+    expect(persistence.reset() == E_OK, "resetting must empty the store");
+    expect(display.getColorRed() == 255u && display.getColorGreen() == 255u && display.getColorBlue() == 255u,
+           "the reset must put the colour back to white");
+    expect(display.getBrightness() == 255u, "the reset must put the brightness back");
+    /* Qualified because the macro expands to the bare enumerator, and asked through the
+       macro rather than through the mode it happens to name today. */
+    expect(clock.getMode() == Clock::CLOCK_INITIAL_MODE, "the reset must put the clock mode back");
+    expect(Animations::getInstance().getAnimation() == Animations::ANIMATION_ID_NONE,
+           "the reset must deselect the animation");
+
+    /* The store stays empty rather than being refilled with the defaults on the next
+       period - an empty store is what a clock that was never configured has. */
+    persistence.task();
+    expect(persistence.load() == E_NOT_OK, "the task after a reset must leave the store empty");
+
+    expect(storage.clear() == E_OK, "the test must leave the store as it found it");
+}
+
 } // namespace
 
 /******************************************************************************************************************************************************
@@ -405,6 +536,8 @@ void testPersistence()
 int main()
 {
     testDisplayManagerLatch();
+    testShowNowProcedures();
+    testTemperatureOverlayWithoutSensor();
     testSchedulerSpeedRoundTrip();
     testWordsChangeOnFiveMinuteStepsOnly();
     testInvalidTimeIsRejected();
@@ -413,6 +546,7 @@ int main()
     testPixelColorChannels();
     testDisplayCharacterLookup();
     testPersistence();
+    testPersistenceSaveAndReset();
 
     if(Failures == 0) {
         std::cout << "All Wordclock tests passed.\n";

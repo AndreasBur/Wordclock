@@ -128,6 +128,42 @@ class DisplayManager
 
 	// methods
     void task();
+
+    /* Draws the current time again, right now and without an animation. What asks for
+       this is a display that no longer shows the clock at all - a test pattern, a pixel
+       set by hand - and an animation would transition out of that rather than replace
+       it. The latch is updated with it, so the redraw does not repeat on the next task.
+
+       Refused while an overlay owns the display: the overlay would be overwritten for
+       one task and redraw itself on the next, which looks like a glitch rather than
+       like the refusal it is. */
+    StdReturnType refreshClock() {
+        if(isOverlayShowing()) { return E_NOT_OK; }
+
+        const ClockTime Time = RealTimeClock::getInstance().getTime();
+        updateClockWords(Time.getHour(), Time.getMinute());
+        showClock(Time.getHour(), Time.getMinute());
+        return E_OK;
+    }
+
+    /* Runs the selected animation on the current time, without waiting for the word
+       change that would otherwise be the only trigger. Selecting the animation again
+       with "9 -A<id>" shows it too, but it also means something else - it changes what
+       runs from now on. */
+    StdReturnType startAnimation() {
+        if(isOverlayShowing()) { return E_NOT_OK; }
+
+        const ClockTime Time = RealTimeClock::getInstance().getTime();
+        return Animations::getInstance().setTime(Time.getHour(), Time.getMinute());
+    }
+
+    /* Ends a running animation and puts the time back on the display. At a low speed an
+       animation runs for minutes, and both a word change and a mode change are ignored
+       while it does. */
+    StdReturnType abortAnimation() {
+        Animations::getInstance().abort();
+        return refreshClock();
+    }
 };
 
 #endif

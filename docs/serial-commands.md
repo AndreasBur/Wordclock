@@ -43,6 +43,7 @@ overlay is disabled at compile time.
 | 9 | Animation | `-A<id>` `-M<mode>` `-S<speed>` `-F<0\|1>` | Animation id, selection mode, speed, favourite flag |
 | 10 | Time | `-H<hour>` `-M<min>` `-S<sec>` | Sets RTC time |
 | 11 | Date | `-Y<year>` (uint16) `-M<month>` `-D<day>` | Sets RTC date |
+| 12 | Status | *(none)* | Read-only; version, uptime, illuminance, temperature, address, link quality, free memory |
 
 ### Overlay options (shared)
 
@@ -62,6 +63,21 @@ From
 | `-F` | Font |
 
 The Date and Temperature overlays ignore `-T` / `-S` / `-F`.
+
+### Temperature overlay (`command 6`)
+
+Shows the temperature of the DS3231 clock chip, as `23.4C` — one decimal, and the letter
+rather than a degree sign, which the font tables do not carry
+([`Text::convertCharToFontIndex`](../firmware/src/Text/Text.cpp) covers ASCII plus six
+umlauts). What is measured is the chip's own die, so in a closed case it reads above the
+room by whatever that case turns out to add.
+
+Until the chip has answered once the overlay stays away entirely — it does not start in
+its period, and `1 -P26` answers `Error=8`. A clock built without the chip therefore
+never shows it, rather than showing a zero that reads like a measurement. In the
+simulator the **Clock chip** group in the settings window stands in for it: the reading
+counts only while *Sensor connected* is ticked, which is also how the "no chip" state is
+reached again.
 
 ### Brightness (`command 3`)
 
@@ -161,6 +177,37 @@ is why the two run in opposite directions. The default task cycle of `10`
 (`ANIMATIONS_TASK_CYCLE_INIT_VALUE`) is reported as `S=246`. Every animation keeps its
 own speed, and modes 1 and 2 use the speed of whichever animation they picked.
 
+### Status (`command 12`)
+
+What a remote procedure call cannot answer: its answer is `RpcId=<id> Error=<code>` and
+carries no value, so the readings live in a command of their own.
+
+```
+12                    # -> 12 V=0.1.0 U=93 I=350 T=23.4C A=192.168.1.23 Q=-62 M=142
+```
+
+| field | Meaning |
+|-------|---------|
+| `V` | Firmware version, hand-kept in [`Version.h`](../firmware/inc/Version/Version.h) |
+| `U` | Minutes since the last start. A `uint16` of them, so it wraps after 45 days |
+| `I` | What the light sensor measures, in lux — the value the brightness automatic divides by its calibrated maximum |
+| `T` | What the clock chip measures, `23.4C`, and **empty** while no chip has answered |
+| `A` | The address to type into a browser, and **empty** while the clock has not joined a network |
+| `Q` | Received signal strength in dBm, negative, and **empty** without a network |
+| `M` | Free heap in KiB — the field that says whether a clock running for months is leaking |
+
+An empty field means there is nothing behind it, which is not the same as a zero: a clock
+built without the temperature chip answers `T=` for good, and one on the serial line alone
+answers `A=` and `Q=`. In the simulator `U` is real and `M`, `A` and `Q` are always empty —
+a host's free heap says nothing about the firmware.
+
+The command takes no options. Its parameter table is empty, so `12 -V1` is answered with
+`Error=3:V` (`ERROR_PARAMETER_UNKNOWN`) rather than silently accepted. The field names are
+still described in the
+[message catalog](../firmware/inc/Communication/MessageCatalog.h), marked read-only, which
+is how the simulator dialog and the web console put labels on an answer without offering
+the fields as inputs.
+
 ## RPC sub-commands (`command 1 -P<id>`)
 
 From
@@ -182,10 +229,30 @@ From
 | 16 / 17 | Auto-brightness on / off |
 | 18 / 19 | Gamma correction on / off |
 | 20 / 21 | Power on / off — **reserved, not implemented yet.** These ids wait for the hardware switch that cuts the 5 V supply of the LED stripes via a controller port. They are accepted and answer `Error=0` without doing anything |
+| 22 | Clock refresh — draw the current time again, right now and without an animation |
+| 23 | Animation start — run the selected animation on the current time |
+| 24 | Animation abort — end a running animation and put the time back |
+| 25 / 26 / 27 | Overlay date / temperature / text — show it now instead of at its next period |
+| 28 | Overlay abort — end the overlay that is showing |
+| 29 | Settings save — write the configuration to the store now instead of within the next two seconds |
+| 30 | Settings reset — every setting back to what a clock starts with, and the store emptied |
+| 31 | System restart — carried out on the next tick, so this command's answer still goes out |
+| 32 | Time resynchronise — ask the time server again, for the clock that came up while it was unreachable |
+| 33 | Network reconnect — join the network again |
 
 The RPC answer is `RpcId=<id> Error=<code>`. An unknown or missing id (including
-`0`, e.g. when `-P` is omitted) is rejected with `Error=8`
+`0`, e.g. when `-P` is omitted) is rejected with `Error=7`
 (`ERROR_RPC_ID_UNKNOWN`) instead of being silently accepted.
+
+Ids `22` to `30` are the ones that can be refused: they answer `Error=8`
+(`ERROR_UNKNOWN`, the general `E_NOT_OK`) when they could not be carried out —
+`29` and `30` when the store did not take the write, the rest when the display is busy
+with something else rather than doing it anyway. The clock cannot be refreshed and no animation
+started while an overlay owns the display; an overlay cannot be shown while another
+one is showing or while it is switched off (`-A0`); and aborting answers the same way
+when nothing was running. `22` and `24` are what brings the clock face back after a
+display test (`-P7`) or a hand-set pixel (command 4), which otherwise stands until
+the next word change — up to five minutes.
 
 ## Error codes
 
@@ -201,8 +268,8 @@ Returned in the `Error=<code>` field
 | 4 | `ERROR_VALUE_OUT_OF_BOUNDS` | Value outside the allowed range |
 | 5 | `ERROR_NO_VALUE_GIVEN` | Option given without a value |
 | 6 | `ERROR_DISPLAY_PENDING` | Display busy / show still pending |
-| 7 | `ERROR_UNKNOWN` | Unspecified failure |
-| 8 | `ERROR_RPC_ID_UNKNOWN` | RPC command with an unknown/missing `-P<id>` |
+| 7 | `ERROR_RPC_ID_UNKNOWN` | RPC command with an unknown/missing `-P<id>` |
+| 8 | `ERROR_UNKNOWN` | Unspecified failure — what an `E_NOT_OK` from the firmware becomes |
 
 ## Examples
 

@@ -23,6 +23,7 @@
 #include "StandardTypes.h"
 #include "Arduino.h"
 #include "Overlay.h"
+#include "Temperature.h"
 
 
 /******************************************************************************************************************************************************
@@ -57,9 +58,35 @@ class OverlayTemperature : public Overlay<OverlayTemperature>
   private:
     friend class Overlay;
 
+    /* Written when the overlay starts and left alone while it shows: the text scrolls out
+       of this buffer, and a reading that changed halfway through would swap a digit under
+       the letters that are already on their way across. */
+    char TemperatureString[Temperature::StringLength]{0u};
+
     // functions
-    void setStateToShow(ClockDate CurrentDate, ClockTime CurrentTime) { UNUSED(CurrentDate); UNUSED(CurrentTime); }
-    void setStateToIdle(ClockDate CurrentDate, ClockTime CurrentTime) { UNUSED(CurrentDate); UNUSED(CurrentTime); }
+    /* Only ever entered with a reading in hand: isReady() is what the overlay is started
+       through, and it is what says whether there is one. */
+    void setStateToShow(ClockDate CurrentDate, ClockTime CurrentTime) {
+        setTemperatureString();
+        setText();
+        UNUSED(CurrentDate);
+        UNUSED(CurrentTime);
+    }
+    void setStateToIdle(ClockDate CurrentDate, ClockTime CurrentTime) {
+        Text::getInstance().stop();
+        UNUSED(CurrentDate);
+        UNUSED(CurrentTime);
+    }
+
+    /* No reading, no overlay: a clock without the chip - and every clock until it has
+       answered once - would otherwise hold the display for the whole endurance to show
+       nothing, or show a zero that reads like a measurement. */
+    bool isReady() const { return Temperature::getInstance().isTemperatureAvailable(); }
+
+    void showTask() { if(Text::getInstance().getState() == Text::STATE_IDLE) { setText(); } }
+    void setText() { Text::getInstance().setTextWithShift(TemperatureString, getFont()); }
+
+    void setTemperatureString() { Temperature::getInstance().getTemperatureString(TemperatureString); }
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
@@ -69,12 +96,15 @@ class OverlayTemperature : public Overlay<OverlayTemperature>
     ~OverlayTemperature() { }
 
 	// get methods
-
+    const char* getTemperatureString() const { return TemperatureString; }
 
 	// set methods
 
 	// methods
-
+    SecondType task(SecondType ShowTimerInSeconds, ClockDate CurrentDate, ClockTime CurrentTime) {
+        if(State == STATE_SHOW) { showTask(); }
+        return Overlay::task(ShowTimerInSeconds, CurrentDate, CurrentTime);
+    }
 };
 
 #endif

@@ -71,6 +71,11 @@ class OverlayDate : public Overlay<OverlayDate>
         UNUSED(CurrentTime);
     }
 
+    /* The date is always there to be shown; only the temperature has to wait for a
+       reading. Answered here rather than defaulted in the base, so that adding an overlay
+       is a decision about this and not a silent inheritance of it. */
+    bool isReady() const { return true; }
+
     void showTask() { if(Text::getInstance().getState() == Text::STATE_IDLE) { setText(); } }
     void setText() { Text::getInstance().setTextWithShift(DateString, getFont()); }
 

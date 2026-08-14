@@ -258,6 +258,15 @@ class Display
 
     void applyBrightness();
 
+    /* Back to what a clock that was never configured shows. Each part answers for its own
+       defaults, so nothing here has to know what they are; the brightness is applied
+       afterwards, because that is what recalculates what reaches the LEDs. */
+    void resetToDefaults() {
+        Color.resetToDefaults();
+        Brightness.resetToDefaults();
+        applyBrightness();
+    }
+
     static void indexToColumnAndRow(IndexType Index, byte& Column, byte& Row) { Row = Index / DISPLAY_NUMBER_OF_COLUMNS; Column = Index % DISPLAY_NUMBER_OF_COLUMNS; }
     byte indexToColumn(IndexType Index) const { return Index % DISPLAY_NUMBER_OF_COLUMNS; }
     byte indexToRow(IndexType Index) const { return Index / DISPLAY_NUMBER_OF_COLUMNS; }
