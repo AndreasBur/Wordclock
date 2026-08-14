@@ -28,3 +28,9 @@ devcontainer-lock.json
 
 # Site-specific dev container variant (local only)
 /.devcontainer/vector/
+
+# Personal Claude Code permission grants. Only the .local. tier: a committed
+# .claude/settings.json holds project conventions and stays tracked, whereas these
+# grants authorize pushing and closing pull requests as whoever is logged in here,
+# which is not something a fresh clone should inherit without deciding it.
+/.claude/settings.local.json

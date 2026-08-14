@@ -22,6 +22,31 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && \
         x11-utils && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
+# gh, for the same reason as the screenshot tools: it turns branch and pull request
+# housekeeping into something doable from the container rather than by hand in a browser.
+# A pinned release .deb, not the universe package — that one is 2.46, whose `gh pr edit`
+# still asks for the retired Projects-classic `projectCards` field and therefore fails
+# outright, which is half of what it would be here for. The upstream apt repository would
+# fix that as well, at the price of a second source and its signing key behind a
+# TLS-intercepting proxy; one file with its published checksum keeps the trust anchored to
+# something visible in this file, at the cost of bumping the version by hand.
+# dpkg rather than apt because the package Depends on git alone, which the base image
+# carries — so this needs no package lists and the block above can keep discarding them.
+ARG GH_VERSION=2.97.0
+ARG GH_SHA256_AMD64=7c7fa3bb890db0934baf65910d97b8c0fa437b2e590f7f7daf6bdf82c5c486d7
+ARG GH_SHA256_ARM64=0ba7a76739c865d82ebde24667d875d9b8caa55db47c7597c24accdd4defd2bb
+RUN ARCH="$(dpkg --print-architecture)" && \
+    case "${ARCH}" in \
+        amd64) SHA256="${GH_SHA256_AMD64}" ;; \
+        arm64) SHA256="${GH_SHA256_ARM64}" ;; \
+        *) echo "gh: no pinned checksum for ${ARCH}; add one or drop gh" >&2; exit 1 ;; \
+    esac && \
+    curl -fsSL -o /tmp/gh.deb \
+        "https://github.com/cli/cli/releases/download/v${GH_VERSION}/gh_${GH_VERSION}_linux_${ARCH}.deb" && \
+    echo "${SHA256}  /tmp/gh.deb" | sha256sum -c - && \
+    dpkg -i /tmp/gh.deb && \
+    rm /tmp/gh.deb
+
 ENV TZ=Europe/Berlin
 
 # Extensions, editor settings and lifecycle commands live in the local feature
