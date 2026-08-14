@@ -31,7 +31,7 @@ The tool that generates the bitmap font tables lives in its own repository,
 ## Architecture
 
 The firmware core reaches the hardware **only through header names**
-(`Arduino.h`, `Pixels.h`, `RealTimeClock.h`, `BH1750.h`, `Storage.h`), resolved via the
+(`Arduino.h`, `Pixels.h`, `RealTimeClock.h`, `BH1750.h`, `DS3231.h`, `Storage.h`), resolved via the
 include path. Each platform under `platform/` supplies those headers with its own
 implementation — a compile-time swap with no runtime cost. See
 [platform/hardware/README.md](platform/hardware/README.md) for the contract.

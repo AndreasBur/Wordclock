@@ -152,6 +152,7 @@ class Overlays
     template <typename OverlayClassType>
     StdReturnType showNow(OverlayClassType& Overlay) {
         if(!Overlay.getIsActive()) { return E_NOT_OK; }
+        if(!Overlay.canShow()) { return E_NOT_OK; }
         if(isShow()) { return E_NOT_OK; }
 
         ShowTimerInSeconds = Overlay.startShow(RealTimeClock::getInstance().getDate(),
@@ -190,6 +191,9 @@ class Overlays
     DayType getTemperatureValidInDays() const { return Temperature.getValidInDays(); }
     byte getTemperatureSpeed() const { return Temperature.getSpeed(); }
     Text::FontType getTemperatureFont() const { return Temperature.getFont(); }
+    /* What the overlay would put on the display, which is the only way to read the
+       temperature back out of the firmware until there is a status command. */
+    const char* getTemperatureString() const { return Temperature.getTemperatureString(); }
     bool getTemperatureIsActive() const { return Temperature.getIsActive(); }
 #endif
 #if (OVERLAYS_SUPPORT_TEXT == STD_ON)

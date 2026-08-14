@@ -55,38 +55,36 @@ Still open:
 | 29 | Save settings now | force a `Persistence` write | Writes are rationed to one per two seconds ([Persistence.h](../firmware/inc/Persistence/Persistence.h)) — enough of a window to lose the last change when the plug is pulled. |
 | 30 | Reset settings | `Storage::clear()`, then apply defaults | Nothing currently gets a clock back to defaults short of erasing NVS over USB. |
 
-## 2. Finish the temperature overlay
+## 2. The temperature overlay
 
-[OverlayTemperature](../firmware/inc/Overlay/OverlayTemperature.h) is an empty shell:
-command 6 configures period, endurance, date and font, the overlay switches state,
-and nothing is ever drawn. It is the only part of the command set that answers as if
-it worked.
+**Done.** [OverlayTemperature](../firmware/inc/Overlay/OverlayTemperature.h) was an empty
+shell — command 6 configured it, the overlay switched state, and nothing was ever drawn.
+It now shows the reading, and the decisions it needed came out as follows:
 
-The overlay body itself is small — [OverlayDate](../firmware/inc/Overlay/OverlayDate.h)
-is the template to follow, with a formatted string handed to `Text::setTextWithShift()`.
-What has to be decided first is everything around it:
-
-- **Where the value comes from.** The core reaches hardware through header names
-  only, so this is a new one next to `BH1750.h` and `Storage.h` — `Temperature.h`,
-  with a reading and a "no sensor" answer, listed in the
+- **The sensor is a DS3231**, read for its temperature registers only
+  ([DS3231.cpp](../platform/esp32/src/DS3231.cpp)). It costs no pin on the I²C bus the
+  light sensor already runs, and it is the same chip that closes the RTC gap in the
+  backlog below — which is why it beat an SHT31 or a one-wire DS18B20. What it measures is
+  its own die, so a closed case reads above the room by whatever that case adds.
+- **The core reaches it as `Temperature`**
+  ([Temperature.h](../firmware/inc/Temperature/Temperature.h)), the same arrangement as
+  `Illuminance` and its `BH1750`, with `DS3231.h` added to the
   [platform contract](../platform/hardware/README.md).
-- **Which sensor.** The ESP32 already runs an I²C bus for the BH1750, so a second
-  device on it (SHT31, BME280) costs no pin; a DS18B20 costs a pin and a one-wire
-  driver. A DS3231 would bring a temperature reading *and* close the RTC gap in the
-  backlog below, which is why it is worth deciding these two together rather than
-  in sequence.
-- **The simulator's stand-in.** A slider next to the illuminance one in
-  [Settings](../platform/simulator/include/sim/Settings.h), for the same reason: the
-  overlay has to be developable without hardware.
-- **The degree sign.** The fonts carry ASCII 0x20–0x7F plus six umlauts
-  ([Text::convertCharToFontIndex](../firmware/src/Text/Text.cpp)); `°` is not in them.
-  Either all five tables are regenerated with it appended as index 102 (the generator
-  is [FontCreator](https://github.com/theAndreas/FontCreator), see
-  [fonts.md](fonts.md)), or the overlay writes `23C`. The first is the better display
-  and touches every font table; the second is free.
-- **What happens without a sensor.** A build with no `Temperature.h` implementation,
-  or a sensor that does not answer, must leave the overlay silent rather than show a
-  placeholder reading — a wrong temperature on the wall is worse than none.
+- **No reading, no overlay.** The reading comes with a return code rather than as a
+  number, because a build without the chip has to be told apart from a reading of zero
+  degrees. `Overlay::canShow()` asks before every start, so the overlay neither fires in
+  its period nor through `1 -P26` until the chip has answered once.
+- **The degree sign is still not in the fonts**, so the overlay writes `23.4C`. Adding it
+  means regenerating all five tables with [FontCreator](https://github.com/theAndreas/FontCreator)
+  (see [fonts.md](fonts.md)) — worth doing, but it is a font change rather than an overlay
+  one, and it now has a caller waiting for it.
+- **The simulator stands in with a slider and a *Sensor connected* box**
+  ([Settings](../platform/simulator/include/sim/Settings.h)). The box is what makes the
+  "no chip" state reachable without a chip to unplug.
+
+Left over: the overlay configuration is still not persisted, along with the other two
+overlays' — the stored format has no variable-length field for the text yet
+([Persistence.h](../firmware/inc/Persistence/Persistence.h)).
 
 ## 3. Status command
 
@@ -134,12 +132,16 @@ From the comparison with wordclock24h, in the order they would change daily use.
    a time of day rather than a value.
 3. **OTA update.** Cheap on the ESP32, and the natural companion to 1.
 4. **RTC with battery.** After a power cut the display holds its default date until
-   SNTP answers ([RealTimeClock.h](../platform/esp32/include/RealTimeClock.h)). See the
-   sensor decision in section 2 — a DS3231 answers both.
+   SNTP answers ([RealTimeClock.h](../platform/esp32/include/RealTimeClock.h)). The DS3231
+   that section 2 put on the bus is read for its temperature only; what is left is its
+   time registers and a `RealTimeClock::setDateTime()` from them — plus the decision when
+   the chip wins over SNTP and when it is written back from it.
 5. **Colour animations.** All fifteen animations are transitions; a slow colour cycle
    while the display stands still is a different mechanism and does not exist.
 6. **IR receiver**, after section 4.
 7. **Ambilight**, a second stripe with its own colour and timer.
+8. **The degree sign in the font tables**, which the temperature overlay is waiting for
+   (section 2).
 
 Deliberately not planned: weather reports, MP3 playback and alarms, games on the
 display. They are what wordclock24h grew over years, and none of them is a word

@@ -63,6 +63,21 @@ From
 
 The Date and Temperature overlays ignore `-T` / `-S` / `-F`.
 
+### Temperature overlay (`command 6`)
+
+Shows the temperature of the DS3231 clock chip, as `23.4C` — one decimal, and the letter
+rather than a degree sign, which the font tables do not carry
+([`Text::convertCharToFontIndex`](../firmware/src/Text/Text.cpp) covers ASCII plus six
+umlauts). What is measured is the chip's own die, so in a closed case it reads above the
+room by whatever that case turns out to add.
+
+Until the chip has answered once the overlay stays away entirely — it does not start in
+its period, and `1 -P26` answers `Error=8`. A clock built without the chip therefore
+never shows it, rather than showing a zero that reads like a measurement. In the
+simulator the **Clock chip** group in the settings window stands in for it: the reading
+counts only while *Sensor connected* is ticked, which is also how the "no chip" state is
+reached again.
+
 ### Brightness (`command 3`)
 
 `-B` sets the brightness that is *asked for*. What reaches the LEDs is that value

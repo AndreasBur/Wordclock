@@ -118,6 +118,7 @@ every other display parameter, and the backend takes what `Display::init()` hand
 | `Pixels` | writes into a window | WS2812 over the RMT peripheral, DMA-fed |
 | `RealTimeClock` | counts a host clock forward | reads the system clock, which SNTP sets |
 | `BH1750` | returns what a slider dialled in | reads the sensor over I²C |
+| `DS3231` | returns what a slider dialled in, and "no chip" until a box is ticked | reads the clock chip's temperature registers over I²C |
 | `Storage` | a file in the working directory | one blob in the NVS partition |
 | `Serial` | routed into two text controls | UART0, plus characters a second front end injects |
 | tick | wxTimer | `vTaskDelayUntil` in `loop()` |
@@ -207,6 +208,10 @@ edit cycle is then a browser reload.
   low (0x5C when high). Both the simulator stub and the xmega driver carry 0x76, which is
   neither — harmless in a stub that never opens a bus, but a sensor addressed that way
   stays silent.
+- **The clock chip shares that bus.** `DS3231_I2C_ADDR` is 0x68 and cannot be changed —
+  the chip has no address pins. It is read for its temperature only, which is what the
+  temperature overlay shows. Note that this is the chip's own die temperature: in a closed
+  case next to the supply it reads a degree or two above the room.
 
 ## Known gaps
 
@@ -214,9 +219,10 @@ edit cycle is then a browser reload.
   and speeds and the sensor calibration survive a restart; the overlay configuration and
   its text do not, because the stored format has no variable-length field yet. The time
   and date are not stored either — they come from the network.
-- **No time source without the network.** No RTC chip is read, so between power-on and the
-  first SNTP answer the display holds its default date. A DS3231 on the same I²C bus is
-  the fix for the stromless case.
+- **No time source without the network.** The DS3231 is read for its temperature but not
+  for its time, so between power-on and the first SNTP answer the display still holds its
+  default date. The chip and its bus are now wired for it, so what is left is reading the
+  time registers and feeding `RealTimeClock::setDateTime()` from them.
 - **No view of the letter grid yet.** The console shows the answers, not the display. The
   pixel buffer over the same socket is the next step.
 - **No authentication.** Anyone on the network can send commands. Fine behind a home

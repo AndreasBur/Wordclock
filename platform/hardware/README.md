@@ -20,6 +20,7 @@ include path:
 #include "Pixels.h"         // LED matrix
 #include "RealTimeClock.h"  // time source
 #include "BH1750.h"         // ambient light sensor
+#include "DS3231.h"         // temperature of the clock chip
 #include "Storage.h"        // where the settings survive a restart
 ```
 
@@ -40,6 +41,7 @@ implementation to mirror.
 | `Pixels.h` | `Pixels` singleton: `getInstance`, `setPixel(Fast)` / `clearPixel(Fast)` / `getPixel(Fast)`, `setBrightness`, `show`, `clearPixels`, `init(pin)`; also doubles as the serial console (`print`/`read`) | WS2812 LED driver + UART |
 | `RealTimeClock.h` | `RealTimeClock` singleton holding a `ClockDateTime`; the core only *reads* it via `getDateTime()` | Feed `setDateTime()` from an RTC chip (e.g. DS3231) |
 | `BH1750.h` | Ambient-light driver exposing the illuminance reading the core consumes | BH1750 over I²C |
+| `DS3231.h` | `DS3231` with `getTaskCycle`, `task`, and `getTemperature(TemperatureType&)` in tenths of a degree Celsius. The return code is the contract: `E_NOT_OK` until a reading has arrived, which is what a board without the chip keeps answering and what keeps the temperature overlay away | DS3231 temperature registers over I²C |
 | `Storage.h` | `Storage` singleton with a `Capacity` and `read` / `write` / `clear` over one byte blob; `Persistence` owns the format inside it, so this only has to store what it is given and refuse a blob of another length | EEPROM, flash, or an NVS partition |
 | app entry point | Equivalent of the simulator's `WordclockApp` / `WordclockMain`: initialise, restore the settings with `Persistence::load()`, then repeatedly tick `Scheduler::task()` and update the `RealTimeClock` | AVR `main()` / `setup()` + `loop()` |
 

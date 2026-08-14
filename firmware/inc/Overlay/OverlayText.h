@@ -61,6 +61,11 @@ class OverlayText : public Overlay<OverlayText>
     void setStateToShow(ClockDate CurrentDate, ClockTime CurrentTime) { setText(); UNUSED(CurrentDate); UNUSED(CurrentTime); }
     void setStateToIdle(ClockDate CurrentDate, ClockTime CurrentTime) { Text::getInstance().stop(); UNUSED(CurrentDate); UNUSED(CurrentTime); }
 
+    /* An empty text is still a text - it is what was configured, and shortening the
+       overlay because of it would hide the mistake rather than show it. Only the
+       temperature can have nothing to show. */
+    bool isReady() const { return true; }
+
     void showTask() { if(Text::getInstance().getState() == Text::STATE_IDLE) { setText(); } }
     void setText() { Text::getInstance().setTextWithShift(Text, getFont()); }
 

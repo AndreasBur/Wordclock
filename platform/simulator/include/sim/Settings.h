@@ -54,15 +54,25 @@ class Settings : public wxDialog
     enum
     {
         ID_SLIDER_ILLUMINANCE = 2000,
-        ID_STATIC_BOX_ILLUMINANCE
+        ID_STATIC_BOX_ILLUMINANCE,
+        ID_SLIDER_TEMPERATURE,
+        ID_CHECKBOX_TEMPERATURE_CONNECTED,
+        ID_STATIC_BOX_TEMPERATURE
     };
 
     wxSlider* IlluminanceSlider;
+    wxSlider* TemperatureSlider;
+    wxCheckBox* TemperatureConnectedCheckBox;
 
     static constexpr int IlluminancePercentMin{0};
     static constexpr int IlluminancePercentMax{100};
     /* Full daylight, which leaves the brightness automatic at its brightest. */
     static constexpr int IlluminancePercentInitial{100};
+    /* Whole degrees Celsius; the overlay shows a tenth, which the slider does not need to
+       reach for what it is here to try out. Well inside what the chip can measure. */
+    static constexpr int TemperatureCelsiusMin{-20};
+    static constexpr int TemperatureCelsiusMax{50};
+    static constexpr int TemperatureCelsiusInitial{21};
     static constexpr int SliderWidth{200};
     static constexpr int Border{10};
 
@@ -74,9 +84,14 @@ class Settings : public wxDialog
 
     void OnClose(wxCloseEvent&);
     void OnIlluminance(wxCommandEvent&);
+    void OnTemperature(wxCommandEvent&);
+    void OnTemperatureConnected(wxCommandEvent&);
+
+    void applyTemperature();
 
     wxBoxSizer* createSizerAll(wxWindow*);
     wxBoxSizer* createSizerIlluminance(wxWindow*);
+    wxBoxSizer* createSizerTemperature(wxWindow*);
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S

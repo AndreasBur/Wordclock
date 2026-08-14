@@ -8,44 +8,28 @@
  *  ---------------------------------------------------------------------------------------------------------------------------------------------------
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       Scheduler.cpp
- *      \brief
- *
- *      \details
- *
+/**     \file       DS3231.cpp
+ *      \brief      Temperature of the DS3231 real time clock chip
  *
 ******************************************************************************************************************************************************/
-#define _SCHEDULER_SOURCE_
 
 /******************************************************************************************************************************************************
  * I N C L U D E S
 ******************************************************************************************************************************************************/
-#include "Scheduler.h"
-#include "Animations.h"
-#include "DisplayManager.h"
-#include "Illuminance.h"
-#include "Communication.h"
-#include "Overlays.h"
-#include "Persistence.h"
-#include "Temperature.h"
-#include "Text.h"
+/* Ahead of DS3231.h, which pulls in the Arduino.h that binds Serial to a macro. */
+#include <Wire.h>
+
+#include "DS3231.h"
 
 /******************************************************************************************************************************************************
- *  L O C A L   C O N S T A N T   M A C R O S
+ *  LOCAL DATA
 ******************************************************************************************************************************************************/
+namespace {
 
+/* Wire reports zero from endTransmission() when the slave acknowledged. */
+constexpr uint8_t WireTransmissionSuccess{0u};
 
-/******************************************************************************************************************************************************
- *  L O C A L   F U N C T I O N   M A C R O S
-******************************************************************************************************************************************************/
-
-
-
-/******************************************************************************************************************************************************
- *  L O C A L   D A T A   T Y P E S   A N D   S T R U C T U R E S
-******************************************************************************************************************************************************/
-
-
+} // namespace
 
 /******************************************************************************************************************************************************
  * P U B L I C   F U N C T I O N S
@@ -54,9 +38,17 @@
 /******************************************************************************************************************************************************
   task()
 ******************************************************************************************************************************************************/
-void Scheduler::task()
+/*! \brief          Takes one reading from the chip
+ *  \details        Set up from here rather than from an init() call, the same way the light
+ *                  sensor is: there is no place in the core to call an init() from, and
+ *                  retrying from the task means a chip that is plugged in later, or a bus
+ *                  that was busy at boot, still comes up.
+******************************************************************************************************************************************************/
+void DS3231::task()
 {
-    triggerTasks();
+    if(startBus() == E_NOT_OK) { return; }
+
+    readTemperature();
 } /* task */
 
 
@@ -65,45 +57,56 @@ void Scheduler::task()
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  isDue()
+  startBus()
 ******************************************************************************************************************************************************/
-/*! \brief          Tells whether a task is due on this tick, and counts it down if not
- *  \details        A cycle of zero switches the task off. Its remaining ticks are
- *                  cleared along with it, so switching it back on runs it right away
- *                  instead of somewhere inside a period left over from before.
+/*! \brief          Opens the I2C bus, once
+ *  \details        Shared with the light sensor, and opening it twice is what the Wire
+ *                  library allows for - whichever of the two runs first does it.
  *
- *  \return         true if the task is to run on this tick
+ *  \return         E_OK if the bus is available
 ******************************************************************************************************************************************************/
-bool Scheduler::isDue(TaskIdType TaskId, byte Cycle) {
-    if(Cycle == 0u) { RemainingTicks[TaskId] = 0u; return false; }
-    if(RemainingTicks[TaskId] > 1u) { RemainingTicks[TaskId]--; return false; }
+StdReturnType DS3231::startBus()
+{
+    if(BusStarted) { return E_OK; }
 
-    /* Reloading here rather than on the previous run is what makes a cycle that changed
-       in between take effect. Starting from zero, every task is due on the first tick. */
-    RemainingTicks[TaskId] = Cycle;
-    return true;
-} /* isDue */
+    if(!Wire.begin(DS3231_I2C_PIN_SDA, DS3231_I2C_PIN_SCL, DS3231_I2C_FREQUENCY_HZ)) { return E_NOT_OK; }
+
+    BusStarted = true;
+    return E_OK;
+} /* startBus */
 
 
 /******************************************************************************************************************************************************
-  triggerTasks()
+  readTemperature()
 ******************************************************************************************************************************************************/
-void Scheduler::triggerTasks()
+/*! \brief          Reads the temperature register pair
+ *  \details        A chip that does not answer leaves the last reading in place, including
+ *                  its validity: the overlay would otherwise disappear for one period
+ *                  because of a single lost transfer, which is a worse answer than a
+ *                  value that is a few minutes old on something that changes as slowly as
+ *                  a room does.
+ *
+ *  \return         E_OK if both bytes arrived
+******************************************************************************************************************************************************/
+StdReturnType DS3231::readTemperature()
 {
-    if(isDue(TASK_ID_ILLUMINANCE, Illuminance::getInstance().getTaskCycle())) { Illuminance::getInstance().task(); }
-    /* Beside the light sensor because it is one too, and nothing downstream is timed
-       against it: the overlay reads whatever the last pass left. */
-    if(isDue(TASK_ID_TEMPERATURE, Temperature::getInstance().getTaskCycle())) { Temperature::getInstance().task(); }
-    /* after the sensor, so the brightness automatic works on a fresh reading */
-    if(isDue(TASK_ID_DISPLAY_MANAGER, DisplayManager::getInstance().getTaskCycle())) { DisplayManager::getInstance().task(); }
-    if(isDue(TASK_ID_ANIMATIONS, Animations::getInstance().getTaskCycle())) { Animations::getInstance().task(true); }
-    if(isDue(TASK_ID_COMMUNICATION, Communication::getInstance().getTaskCycle())) { Communication::getInstance().task(); }
-    if(isDue(TASK_ID_OVERLAYS, Overlays::getInstance().getTaskCycle())) { Overlays::getInstance().task(); }
-    if(isDue(TASK_ID_TEXT, Text::getInstance().getTaskCycle())) { Text::getInstance().task(true); }
-    /* last, so what it compares against the store is a settled state rather than one from
-       the middle of this tick's pass */
-    if(isDue(TASK_ID_PERSISTENCE, Persistence::getInstance().getTaskCycle())) { Persistence::getInstance().task(); }
-} /* triggerTasks */
+    Wire.beginTransmission(static_cast<uint8_t>(DS3231_I2C_ADDR));
+    Wire.write(static_cast<uint8_t>(DS3231_REG_TEMPERATURE_MSB));
+
+    if(Wire.endTransmission() != WireTransmissionSuccess) { return E_NOT_OK; }
+
+    if(Wire.requestFrom(static_cast<uint8_t>(DS3231_I2C_ADDR),
+                        static_cast<size_t>(DS3231_TEMPERATURE_NUMBER_OF_BYTES)) != DS3231_TEMPERATURE_NUMBER_OF_BYTES) {
+        return E_NOT_OK;
+    }
+
+    const int8_t Degrees = static_cast<int8_t>(Wire.read());
+    const byte FractionRegister = static_cast<byte>(Wire.read());
+
+    Temperature = toTenths(Degrees, FractionRegister);
+    TemperatureValid = true;
+    return E_OK;
+} /* readTemperature */
 
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E

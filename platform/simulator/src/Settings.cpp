@@ -22,6 +22,8 @@
 #include "sim/Settings.h"
 /* the simulated light sensor the illuminance slider feeds */
 #include "sim/BH1750.h"
+/* and the simulated clock chip behind the temperature overlay */
+#include "sim/DS3231.h"
 
 /******************************************************************************************************************************************************
  *  L O C A L   C O N S T A N T   M A C R O S
@@ -39,6 +41,8 @@
 BEGIN_EVENT_TABLE(Settings, wxDialog)
     EVT_CLOSE(Settings::OnClose)
     EVT_SLIDER(ID_SLIDER_ILLUMINANCE, Settings::OnIlluminance)
+    EVT_SLIDER(ID_SLIDER_TEMPERATURE, Settings::OnTemperature)
+    EVT_CHECKBOX(ID_CHECKBOX_TEMPERATURE_CONNECTED, Settings::OnTemperatureConnected)
 END_EVENT_TABLE()
 
 
@@ -86,6 +90,7 @@ wxBoxSizer* Settings::createSizerAll(wxWindow* Parent)
     wxBoxSizer* SizerAll = new wxBoxSizer(wxVERTICAL);
 
     SizerAll->Add(createSizerIlluminance(Parent), 0, wxALL | wxEXPAND, Border);
+    SizerAll->Add(createSizerTemperature(Parent), 0, wxALL | wxEXPAND, Border);
 
     return SizerAll;
 } /* createSizerAll */
@@ -115,6 +120,38 @@ wxBoxSizer* Settings::createSizerIlluminance(wxWindow* Parent)
 
 
 /******************************************************************************************************************************************************
+  createSizerTemperature()
+******************************************************************************************************************************************************/
+/*! \brief          Builds the group that stands in for the clock chip's thermometer
+ *  \details        The check box is what the slider alone could not express: a clock built
+ *                  without the chip, and every clock until the chip has answered once. The
+ *                  temperature overlay stays away in that state, which is the behaviour
+ *                  that has to be tryable here. It starts cleared for the same reason -
+ *                  the simulator has no chip until somebody says it has.
+******************************************************************************************************************************************************/
+wxBoxSizer* Settings::createSizerTemperature(wxWindow* Parent)
+{
+    wxStaticBox* StaticBox = new wxStaticBox(Parent, ID_STATIC_BOX_TEMPERATURE, _T("Clock chip"));
+    wxStaticBoxSizer* SizerTemperature = new wxStaticBoxSizer(StaticBox, wxVERTICAL);
+    wxStaticText* TemperatureLabel = new wxStaticText(Parent, wxID_ANY, _T("Temperature (°C)"));
+
+    TemperatureConnectedCheckBox = new wxCheckBox(Parent, ID_CHECKBOX_TEMPERATURE_CONNECTED, _T("Sensor connected"));
+    TemperatureConnectedCheckBox->SetValue(false);
+
+    TemperatureSlider = new wxSlider(Parent, ID_SLIDER_TEMPERATURE, TemperatureCelsiusInitial,
+                                     TemperatureCelsiusMin, TemperatureCelsiusMax,
+                                     wxDefaultPosition, wxSize(SliderWidth, -1),
+                                     wxSL_HORIZONTAL | wxSL_LABELS);
+
+    SizerTemperature->Add(TemperatureConnectedCheckBox, 0, wxLEFT | wxTOP, Border);
+    SizerTemperature->Add(TemperatureLabel, 0, wxLEFT | wxTOP, Border);
+    SizerTemperature->Add(TemperatureSlider, 0, wxALL | wxEXPAND, Border);
+
+    return SizerTemperature;
+} /* createSizerTemperature */
+
+
+/******************************************************************************************************************************************************
   OnClose()
 ******************************************************************************************************************************************************/
 void Settings::OnClose(wxCloseEvent &event)
@@ -138,6 +175,47 @@ void Settings::OnIlluminance(wxCommandEvent &event)
     BH1750::setSimulatedIlluminance(static_cast<BH1750::IlluminanceType>((Maximum / IlluminancePercentMax) * IlluminanceSlider->GetValue()));
     UNUSED(event);
 } /* OnIlluminance */
+
+
+/******************************************************************************************************************************************************
+  OnTemperature()
+******************************************************************************************************************************************************/
+void Settings::OnTemperature(wxCommandEvent &event)
+{
+    applyTemperature();
+    UNUSED(event);
+} /* OnTemperature */
+
+
+/******************************************************************************************************************************************************
+  OnTemperatureConnected()
+******************************************************************************************************************************************************/
+void Settings::OnTemperatureConnected(wxCommandEvent &event)
+{
+    applyTemperature();
+    UNUSED(event);
+} /* OnTemperatureConnected */
+
+
+/******************************************************************************************************************************************************
+  applyTemperature()
+******************************************************************************************************************************************************/
+/*! \brief          Hands the dialled-in reading to the simulated clock chip
+ *  \details        Both controls end here, because between them they describe one state:
+ *                  a chip that is there and reads this much, or no chip at all. Moving the
+ *                  slider while the box is cleared therefore changes nothing yet, and
+ *                  ticking the box afterwards puts that value in - which is the order
+ *                  somebody trying the overlay out will use it in.
+******************************************************************************************************************************************************/
+void Settings::applyTemperature()
+{
+    if(!TemperatureConnectedCheckBox->IsChecked()) {
+        DS3231::clearSimulatedTemperature();
+        return;
+    }
+
+    DS3231::setSimulatedTemperature(static_cast<DS3231::TemperatureType>(TemperatureSlider->GetValue() * DS3231::TenthsPerDegree));
+} /* applyTemperature */
 
 
 /******************************************************************************************************************************************************

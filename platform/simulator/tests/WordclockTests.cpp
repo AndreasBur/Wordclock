@@ -24,6 +24,7 @@
 ******************************************************************************************************************************************************/
 #include <array>
 #include <cstdio>
+#include <cstring>
 #include <cstdlib>
 #include <iostream>
 
@@ -34,6 +35,8 @@
 #include "DisplayManager.h"
 #include "Illuminance.h"
 #include "Overlays.h"
+#include "Temperature.h"
+#include "sim/DS3231.h"
 #include "Persistence.h"
 #include "Pixels.h"
 #include "RealTimeClock.h"
@@ -207,6 +210,35 @@ void testShowNowProcedures()
 
     overlays.setDateIsActive(false);
     expect(overlays.showDateNow() == E_NOT_OK, "a switched-off overlay must not be started");
+}
+
+/* The temperature overlay's one rule that is not about text: it shows nothing at all
+   until a reading exists. A clock built without the chip stays in that state for good, so
+   what is checked here is the state and not the string - the string is checked against a
+   real register pair in the ESP32 host tests, where there is a driver to read it with. */
+void testTemperatureOverlayWithoutSensor()
+{
+    Overlays& overlays = Overlays::getInstance();
+
+    DS3231::clearSimulatedTemperature();
+    Temperature::getInstance().task();
+
+    overlays.setTemperatureIsActive(true);
+    expect(overlays.showTemperatureNow() == E_NOT_OK,
+           "an overlay with no reading must not start");
+
+    DS3231::setSimulatedTemperature(215);
+    Temperature::getInstance().task();
+    expect(overlays.showTemperatureNow() == E_OK, "a reading must let the overlay start");
+    expect(strcmp(overlays.getTemperatureString(), "21.5C") == 0,
+           "the overlay must show the dialled-in reading");
+    expect(overlays.abort() == E_OK, "the overlay must end again");
+
+    /* Left as it was found: an active temperature overlay would take the display away
+       from whatever runs after this. */
+    overlays.setTemperatureIsActive(false);
+    DS3231::clearSimulatedTemperature();
+    Temperature::getInstance().task();
 }
 
 /* Only the round trip. That speed 1 maps to cycle 255 and speed 255 to cycle 1 is
@@ -469,6 +501,7 @@ int main()
 {
     testDisplayManagerLatch();
     testShowNowProcedures();
+    testTemperatureOverlayWithoutSensor();
     testSchedulerSpeedRoundTrip();
     testWordsChangeOnFiveMinuteStepsOnly();
     testInvalidTimeIsRejected();
