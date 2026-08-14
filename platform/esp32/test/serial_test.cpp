@@ -62,28 +62,38 @@ int main()
     /* The procedures that act now rather than at the next word change. What of them
        reaches the wire is the answer, and it says which of the two happened: the display
        was free and the procedure ran, or it was busy and the procedure stepped aside. */
+    /* Ticked until the answer appears rather than exactly twice: the task reads on one
+       call and parses on the next, and a message left over from an earlier check would
+       otherwise shift every answer by one. */
     auto answerTo = [&](const char* Message) {
         Lines.clear();
         port.inject(Message, strlen(Message));
-        communication.task();               /* reads the characters */
-        communication.task();               /* parses the complete message */
+        for(int Tick = 0; (Tick < 8) && Lines.empty(); Tick++) { communication.task(); }
         return Lines.empty() ? std::string() : Lines[0];
     };
 
     check(answerTo("1 -P22\n") == "1 RpcId=22 Error=0", "the clock refresh is carried out");
     check(answerTo("1 -P28\n") == "1 RpcId=28 Error=8", "aborting with no overlay showing is refused");
-    check(answerTo("1 -P31\n") == "1 RpcId=31 Error=7", "an id past the last procedure is unknown");
+    check(answerTo("1 -P34\n") == "1 RpcId=34 Error=7", "an id past the last procedure is unknown");
 
-    /* The status command answers with values and takes none. The illuminance is whatever
-       the sensor stand-in reports on a host with no bus, so the fields are checked rather
-       than the whole line - what matters is that all three come back and that the one
-       without a reading behind it comes back empty. */
-    const std::string Status = answerTo("12\n");
-    check(Status.rfind("12 V=" WORDCLOCK_VERSION " I=", 0u) == 0u, "the status answers with the version and the illuminance");
-    check(Status.size() >= 3u && Status.compare(Status.size() - 3u, 3u, " T=") == 0,
-          "and with an empty temperature while no chip has answered");
-    check(answerTo("12 -V1\n") == "12 Error=3:V V=" WORDCLOCK_VERSION " I=1 T=",
+    /* The two procedures that need a network, on a host that has none. Refusing is the
+       whole point: answering E_OK would tell a caller that the clock is on its way back
+       to a network it never had. */
+    check(answerTo("1 -P32\n") == "1 RpcId=32 Error=8", "resynchronising without a network is refused");
+    check(answerTo("1 -P33\n") == "1 RpcId=33 Error=8", "reconnecting without a configured network is refused");
+
+    /* The status command answers with values and takes none. Every field that has nothing
+       behind it comes back empty rather than as a zero that reads like a value - here the
+       temperature, with no chip on the bus, and the two network fields. */
+    check(answerTo("12\n") == "12 V=" WORDCLOCK_VERSION " U=0 I=1 T= A= Q= M=0",
+          "the status answers every field, and the ones with no answer empty");
+    check(answerTo("12 -V1\n") == "12 Error=3:V V=" WORDCLOCK_VERSION " U=0 I=1 T= A= Q= M=0",
           "a value sent to a read-only field is refused as an unknown option");
+
+    /* The uptime is the one of them a host can produce. */
+    TestMillis = 3u * 60u * 1000u;
+    check(answerTo("12\n") == "12 V=" WORDCLOCK_VERSION " U=3 I=1 T= A= Q= M=0",
+          "the uptime is reported in minutes");
 
     /* a full buffer refuses rather than overwriting a command in flight */
     std::string tooMuch(WORDCLOCK_SERIAL_INJECT_BUFFER_SIZE + 8u, 'x');

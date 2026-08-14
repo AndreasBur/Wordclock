@@ -137,7 +137,10 @@ constexpr const char* const RemoteProcedureValueNames[] {
     "Overlay text show",
     "Overlay abort",
     "Settings save",
-    "Settings reset"
+    "Settings reset",
+    "System restart",
+    "Time resynchronise",
+    "Network reconnect"
 };
 
 /* The command numbers and the value lists of the enumerations come out of the firmware
@@ -294,8 +297,12 @@ static_assert(OverlayOptions[NumberOfOverlayOptionsWithoutText].ShortName == 'T'
 
 constexpr MessageCatalog::OptionType StatusOptions[] {
     {'V', "Firmware version",   ARGUMENT_TYPE_STRING, READ_ONLY},
+    {'U', "Uptime (minutes)",   ARGUMENT_TYPE_UINT16, READ_ONLY},
     {'I', "Illuminance (lx)",   ARGUMENT_TYPE_UINT16, READ_ONLY},
-    {'T', "Temperature",        ARGUMENT_TYPE_STRING, READ_ONLY}
+    {'T', "Temperature",        ARGUMENT_TYPE_STRING, READ_ONLY},
+    {'A', "Address",            ARGUMENT_TYPE_STRING, READ_ONLY},
+    {'Q', "Link quality (dBm)", ARGUMENT_TYPE_STRING, READ_ONLY},
+    {'M', "Free memory (KiB)",  ARGUMENT_TYPE_UINT16, READ_ONLY}
 };
 
 /* MsgCmdClockModeParser */

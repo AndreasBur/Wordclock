@@ -29,6 +29,19 @@ struct Stream {
     int available() { return static_cast<int>(Incoming.size()); }
     int read() { if(Incoming.empty()) return -1; int c = static_cast<unsigned char>(Incoming[0]); Incoming.erase(0,1); return c; }
     size_t write(uint8_t b) { Written.push_back(static_cast<char>(b)); return 1; }
+    void flush() {}
 };
+
+/* What the backend asks the chip itself for. The test never restarts, so restart() only
+   has to be linkable. */
+struct EspClass {
+    uint32_t getFreeHeap() { return 0u; }
+    void restart() {}
+};
+extern EspClass ESP;
+
+/* Milliseconds since the start, which the test advances itself rather than measuring. */
+extern unsigned long TestMillis;
+unsigned long millis();
 extern Stream Serial;
 #endif

@@ -35,6 +35,7 @@
 #include "Arduino.h"
 #include "MsgParameterParser.h"
 #include "Illuminance.h"
+#include "System.h"
 #include "Temperature.h"
 #include "Version.h"
 
@@ -57,8 +58,12 @@ class MsgCmdStatusParser : public MsgParameterParser<MsgCmdStatusParser, MSG_CMD
     friend class MsgParameterParser;
 
     static constexpr char VersionShortName{'V'};
+    static constexpr char UptimeShortName{'U'};
     static constexpr char IlluminanceShortName{'I'};
     static constexpr char TemperatureShortName{'T'};
+    static constexpr char AddressShortName{'A'};
+    static constexpr char LinkQualityShortName{'Q'};
+    static constexpr char FreeMemoryShortName{'M'};
 
     static constexpr ParameterTableType ParameterTable PROGMEM { };
 
@@ -75,18 +80,44 @@ class MsgCmdStatusParser : public MsgParameterParser<MsgCmdStatusParser, MSG_CMD
     constexpr MsgCmdStatusParser(const char* Parameter) : MsgParameterParser(ParameterTable, Parameter) { }
     ~MsgCmdStatusParser() { }
 
+    /* Every field that can be absent is sent empty rather than as a zero that reads like a
+       value: no chip, no network, no answer. The getters write the terminator either way,
+       so what is sent after a refusal is the empty string. */
+    void sendAnswerNumber(char ShortName, StdReturnType ReturnValue, uint16_t Value, bool AppendSpace = true) const {
+        if(ReturnValue == E_OK) { sendAnswerParameter(ShortName, Value, AppendSpace); }
+        else { sendAnswerParameter(ShortName, "", AppendSpace); }
+    }
+
     // methods
     void sendAnswer() const {
+        const System& system = System::getInstance();
+
         char TemperatureString[Temperature::StringLength];
-        /* An empty field where there is no reading, rather than a zero that reads like
-           one. Temperature::getTemperatureString() writes the terminator either way. */
+        char AddressString[System::AddressStringLength];
+        char LinkQualityString[System::LinkQualityStringLength];
+        uint16_t Uptime{0u};
+        uint16_t FreeMemory{0u};
+
+        /* Every value is fetched before anything is sent, rather than inside the call that
+           sends it: an out parameter and the return code that says whether it was written
+           are two arguments of the same call, and which of them is evaluated first is not
+           the compiler's to be trusted with - it reported a zero uptime where a fetched
+           one was right beside it. */
         Temperature::getInstance().getTemperatureString(TemperatureString);
+        const StdReturnType UptimeReturn = system.getUptimeInMinutes(Uptime);
+        const StdReturnType FreeMemoryReturn = system.getFreeMemoryInKibibytes(FreeMemory);
+        const StdReturnType AddressReturn = system.getNetworkAddress(AddressString);
+        const StdReturnType LinkQualityReturn = system.getLinkQuality(LinkQualityString);
 
         sendAnswerParameter(VersionShortName, WORDCLOCK_VERSION);
+        sendAnswerNumber(UptimeShortName, UptimeReturn, Uptime);
         sendAnswerParameter(IlluminanceShortName, Illuminance::getInstance().getIlluminance());
+        sendAnswerParameter(TemperatureShortName, TemperatureString);
+        sendAnswerParameter(AddressShortName, (AddressReturn == E_OK) ? AddressString : "");
+        sendAnswerParameter(LinkQualityShortName, (LinkQualityReturn == E_OK) ? LinkQualityString : "");
         /* Last field before the command parser's terminating println(), so no trailing
            separator space. */
-        sendAnswerParameter(TemperatureShortName, TemperatureString, false);
+        sendAnswerNumber(FreeMemoryShortName, FreeMemoryReturn, FreeMemory, false);
     }
 
     void process() const { }

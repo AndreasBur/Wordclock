@@ -47,6 +47,7 @@ BACKEND=(
     "$PLATFORM_DIR/src/Pixels.cpp"
     "$PLATFORM_DIR/src/RealTimeClock.cpp"
     "$PLATFORM_DIR/src/Storage.cpp"
+    "$PLATFORM_DIR/src/System.cpp"
     "$PLATFORM_DIR/src/WordclockSerial.cpp"
 )
 WEB="$PLATFORM_DIR/src/WebInterface.cpp"

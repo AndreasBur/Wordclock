@@ -36,6 +36,7 @@
 #include "Pixels.h"
 #include "RealTimeClock.h"
 #include "Scheduler.h"
+#include "System.h"
 #include "WebInterface.h"
 #include "WordclockConfiguration.h"
 #include "WordclockMain.h"
@@ -157,6 +158,10 @@ void loop()
     WebInterface::getInstance().broadcastFrame();
 
     reportProgress();
+
+    /* Last, so a restart asked for by a command takes place once that command's answer has
+       reached both the wire and the browser. */
+    System::getInstance().performPendingRestart();
 
     vTaskDelayUntil(&LastWakeTime, TaskInterval);
 } /* loop */

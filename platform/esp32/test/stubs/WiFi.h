@@ -11,6 +11,8 @@ struct WiFiStub {
     void begin(const char*, const char*) {}
     int status() { return WL_IDLE_STATUS; }
     IPAddressStub localIP() { return {}; }
+    int RSSI() { return 0; }
+    bool reconnect() { return false; }
 };
 extern WiFiStub WiFi;
 #endif

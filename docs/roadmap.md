@@ -85,9 +85,9 @@ overlays' — the stored format has no variable-length field for the text yet
 
 ## 3. Status command
 
-**Done for what the core can reach** — command 12 answers the firmware version, the
-illuminance in lux and the temperature, see [serial-commands.md](serial-commands.md). Two
-things it settled:
+**Done** — command 12 answers the firmware version, the uptime, the illuminance in lux, the
+temperature, the address, the link quality and the free memory, see
+[serial-commands.md](serial-commands.md). Two things it settled:
 
 - **Read-only fields.** The command takes no options at all, so an option sent to it is
   answered with `ERROR_PARAMETER_UNKNOWN` by the base parser rather than ignored. The
@@ -99,9 +99,8 @@ things it settled:
   repository would mean build plumbing in two places; a macro that a build can override
   from the outside was the smaller answer.
 
-Still open, and waiting for the platform hook of section 5 rather than for this command:
-uptime, IP address, link quality, free heap. `millis()` is not in the simulator's Arduino
-shim either, so even the uptime needs a contract change.
+The fields that only the platform knows - uptime, address, link quality, free memory -
+came with `System.h` in section 5 and are in the answer too.
 
 ## 4. RPCs for a remote control
 
@@ -110,25 +109,29 @@ show a value. That set is incomplete for the same use:
 
 | Id | RPC |
 |----|-----|
-| 31/32 | Animation next / previous |
-| 33 | Clock mode next |
-| 34/35/36 | Display toggle / brightness automatic toggle / gamma correction toggle |
-| 37 | Colour reset (white) |
+| 34/35 | Animation next / previous |
+| 36 | Clock mode next |
+| 37/38/39 | Display toggle / brightness automatic toggle / gamma correction toggle |
+| 40 | Colour reset (white) |
 
 Worth doing before the IR receiver in the backlog, not after: the receiver then maps
 keys onto an interface that already exists and can be tested over the serial line.
 
 ## 5. Platform hooks
 
-| Id | RPC | Needs |
-|----|-----|-------|
-| 38 | System restart | a `System.h` in the platform contract; `esp_restart()` on the ESP32 |
-| 39 | Resynchronise time | `sntp_restart()`; today only a reset helps when the NTP server was unreachable at boot |
-| 40 | Reconnect WiFi | `WiFi.reconnect()` |
+**Done** — `System.h` is in the [contract](../platform/hardware/README.md), and with it the
+procedures 31 to 33 (restart, resynchronise the time, reconnect the network) and the four
+status fields that only the platform knows: uptime, address, link quality, free memory.
+Three things it settled:
 
-The same header is what the status command's remaining fields hang on — uptime, address,
-link quality and free heap are all things only the platform knows. Worth designing as one
-thing rather than as two.
+- **Every one of them can answer "no".** A clock with no network has no address, and a
+  simulator has no heap worth reporting, so all four getters carry a return code and the
+  status command sends an empty field rather than a zero that reads like a value.
+- **The restart is deferred.** A command's answer is sent after `process()` returns, so a
+  controller restarting inside the procedure would take that answer with it. `restart()`
+  asks; the application's tick carries it out, after the UART has been flushed.
+- **The time resynchronisation reuses the application's own `configTzTime()` call** rather
+  than reaching into SNTP, which keeps the zone rule in one place.
 
 ## Backlog
 

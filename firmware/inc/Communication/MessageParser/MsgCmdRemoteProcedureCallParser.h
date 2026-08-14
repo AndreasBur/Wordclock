@@ -28,6 +28,7 @@
 #include "DisplayManager.h"
 #include "Overlays.h"
 #include "Persistence.h"
+#include "System.h"
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
@@ -89,6 +90,9 @@ class MsgCmdRemoteProcedureCallParser : public MsgParameterParser<MsgCmdRemotePr
         RPC_ID_OVERLAY_ABORT,
         RPC_ID_SETTINGS_SAVE,
         RPC_ID_SETTINGS_RESET,
+        RPC_ID_SYSTEM_RESTART,
+        RPC_ID_TIME_RESYNCHRONISE,
+        RPC_ID_NETWORK_RECONNECT,
         /* Only so that the names in the message catalog can be counted against the
            procedures; never sent, and anything from here on lands in the default case. */
         RPC_ID_NUMBER_OF_PROCEDURES
@@ -248,6 +252,18 @@ class MsgCmdRemoteProcedureCallParser : public MsgParameterParser<MsgCmdRemotePr
                 break;
             case RPC_ID_SETTINGS_RESET :
                 ReturnValue = Persistence::getInstance().reset();
+                break;
+            /* Asks for a restart rather than carrying one out: the answer to this command
+               is sent after process() returns, and a controller that restarted in here
+               would take that answer with it. */
+            case RPC_ID_SYSTEM_RESTART :
+                ReturnValue = System::getInstance().restart();
+                break;
+            case RPC_ID_TIME_RESYNCHRONISE :
+                ReturnValue = System::getInstance().resynchroniseTime();
+                break;
+            case RPC_ID_NETWORK_RECONNECT :
+                ReturnValue = System::getInstance().reconnectNetwork();
                 break;
             default:
                 // Unknown or missing RPC id (including RPC_ID_NONE): there is

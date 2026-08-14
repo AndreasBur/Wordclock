@@ -145,6 +145,11 @@ class WordclockSerial
        firmware call lands on print(const char*) there. */
     void print(const __FlashStringHelper*);
     void println(const __FlashStringHelper*);
+
+    /* Waits for the UART to have sent what it was given. Only one caller so far, and it is
+       the one that matters: the restart, which would otherwise cut its own answer in half.
+       Says nothing about the web socket, whose frames leave from the server's task. */
+    void flush();
 };
 
 #endif // _WORDCLOCK_SERIAL_H_
