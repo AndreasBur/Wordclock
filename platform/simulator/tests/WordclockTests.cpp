@@ -405,6 +405,139 @@ void testCharacterToGlyphMapping()
     Display::getInstance().clear();
 }
 
+
+/* Whether a word is part of what the clock would light for a time, which is what the
+   regional wordings differ in. */
+bool wordsContain(const ClockWords& Words, DisplayWords::WordIdType Word)
+{
+    for(const DisplayWords::WordIdType Id : Words.getWordsList()) {
+        if(Id == Word) { return true; }
+    }
+    return false;
+}
+
+/* The four regional wordings, at the four times where they part company. This is the table
+   in docs/serial-commands.md, asserted rather than described: the modes differ in how the
+   quarters are said and in whether twenty past is counted from the hour or from the half
+   hour, and in nothing else.
+   What makes it worth pinning is that all four share one pair of tables, indexed by mode -
+   a row edited in the wrong one is a clock that is wrong in one region and right in the
+   other three. */
+void testRegionalWordings()
+{
+    Clock& clock = Clock::getInstance();
+
+    /* Quarter past four: named after the hour it is past, or after the one it counts
+       towards. */
+    clock.setModeFast(Clock::MODE_WESSI);
+    expect(wordsContain(wordsAt(4u, 15u), DisplayWords::WORD_NACH),
+           "Wessi says a quarter *past* four");
+    clock.setModeFast(Clock::MODE_OSSI);
+    expect(!wordsContain(wordsAt(4u, 15u), DisplayWords::WORD_NACH),
+           "Ossi says viertel five, with no past in it");
+    expect(wordsContain(wordsAt(4u, 15u), DisplayWords::WORD_VIERTEL),
+           "and it is still a quarter");
+
+    /* Quarter to five: the same difference, from the other side. */
+    clock.setModeFast(Clock::MODE_WESSI);
+    expect(wordsContain(wordsAt(4u, 45u), DisplayWords::WORD_VOR),
+           "Wessi says a quarter *to* five");
+    clock.setModeFast(Clock::MODE_SCHWABEN);
+    expect(wordsContain(wordsAt(4u, 45u), DisplayWords::WORD_DREIVIERTEL),
+           "Schwaben says three quarters five");
+    expect(!wordsContain(wordsAt(4u, 45u), DisplayWords::WORD_VOR),
+           "which has no to in it");
+
+    /* Twenty past four: counted from the hour, or as ten before half five. */
+    clock.setModeFast(Clock::MODE_RHEIN_RUHR);
+    expect(wordsContain(wordsAt(4u, 20u), DisplayWords::WORD_NACH),
+           "Rhein-Ruhr counts twenty past the hour");
+    expect(!wordsContain(wordsAt(4u, 20u), DisplayWords::WORD_HALB),
+           "and does not reach for the half hour");
+    clock.setModeFast(Clock::MODE_WESSI);
+    expect(wordsContain(wordsAt(4u, 20u), DisplayWords::WORD_HALB),
+           "Wessi counts ten before half five");
+    expect(wordsContain(wordsAt(4u, 20u), DisplayWords::WORD_VOR),
+           "which is a before");
+
+    /* Twenty to five, the mirror of it. */
+    clock.setModeFast(Clock::MODE_RHEIN_RUHR);
+    expect(wordsContain(wordsAt(4u, 40u), DisplayWords::WORD_VOR),
+           "Rhein-Ruhr counts twenty to the hour");
+    clock.setModeFast(Clock::MODE_WESSI);
+    expect(wordsContain(wordsAt(4u, 40u), DisplayWords::WORD_HALB),
+           "Wessi counts ten past half five");
+    expect(wordsContain(wordsAt(4u, 40u), DisplayWords::WORD_NACH),
+           "which is a past");
+
+    /* And what none of them differ in: the full hour and the half hour always say "it is".
+       Whether the times between them do is a compile-time switch, so the test asks what
+       the firmware was built with rather than assuming one of the two - which is the
+       mistake this line was written with the first time. */
+    clock.setModeFast(Clock::MODE_WESSI);
+    expect(wordsAt(4u, 0u).getShowItIs(), "the full hour says it is");
+    expect(wordsAt(4u, 30u).getShowItIs(), "and so does the half hour");
+#if (CLOCK_SHOW_IT_IS_PERMANENTLY == STD_ON)
+    expect(wordsAt(4u, 5u).getShowItIs(), "and so does five past, with it is set permanently");
+    expect(wordsAt(4u, 45u).getShowItIs(), "and a quarter to");
+#else
+    expect(!wordsAt(4u, 5u).getShowItIs(), "five past does not");
+    expect(!wordsAt(4u, 45u).getShowItIs(), "and neither does a quarter to");
+#endif
+
+    clock.setModeFast(Clock::MODE_WESSI);
+}
+
+/* When an overlay shows and for how long, which is the part of it no display can reveal:
+   the raster is a minute count and one particular second, and the endurance is counted in
+   the same task. Driven a second at a time, the way the clock does. */
+void testOverlayPeriodAndEndurance()
+{
+    Overlays& overlays = Overlays::getInstance();
+
+    /* Every fourth minute, for three seconds. */
+    expect(overlays.setDatePeriodInMinutes(4u) == E_OK, "the period must be accepted");
+    expect(overlays.setDateEnduranceInSeconds(3u) == E_OK, "the endurance must be accepted");
+    overlays.setDateMonth(0u);
+    overlays.setDateDay(0u);
+    overlays.setDateValidInDays(0u);
+    overlays.setDateIsActive(true);
+
+    /* A minute the raster covers, but before the second it starts on. */
+    setTime(10u, 8u, 29u);
+    overlays.task();
+    expect(overlays.getState() != Overlays::OverlayType::STATE_SHOW,
+           "an overlay must not start before its second");
+
+    setTime(10u, 8u, 30u);
+    overlays.task();
+    expect(overlays.getState() == Overlays::OverlayType::STATE_SHOW,
+           "an overlay must start on its second");
+
+    /* It ends by itself, and within the endurance it was given rather than whenever. */
+    int Seconds = 0;
+    for(byte Second = 31u; (Second < 59u) && (overlays.getState() == Overlays::OverlayType::STATE_SHOW); Second++) {
+        setTime(10u, 8u, Second);
+        overlays.task();
+        Seconds++;
+    }
+    expect(overlays.getState() != Overlays::OverlayType::STATE_SHOW, "an overlay must end by itself");
+    expect(Seconds <= 5, "and within the endurance it was given");
+
+    /* A minute the raster does not cover. */
+    setTime(10u, 9u, 30u);
+    overlays.task();
+    expect(overlays.getState() != Overlays::OverlayType::STATE_SHOW,
+           "an overlay must not start outside its period");
+
+    /* Switched off, it does not fire at all. */
+    overlays.setDateIsActive(false);
+    setTime(10u, 12u, 30u);
+    overlays.task();
+    expect(overlays.getState() != Overlays::OverlayType::STATE_SHOW,
+           "an overlay that is switched off must stay away");
+}
+
 /* Only the round trip. That speed 1 maps to cycle 255 and speed 255 to cycle 1 is
    asserted at compile time in Scheduler.h, so repeating those points here would test
    the compiler rather than the code. */
@@ -705,6 +838,8 @@ int main()
     testEveryAnimationEndsOnTheNewTime();
     testFadeDimsAndComesBack();
     testCharacterToGlyphMapping();
+    testRegionalWordings();
+    testOverlayPeriodAndEndurance();
     testSchedulerSpeedRoundTrip();
     testWordsChangeOnFiveMinuteStepsOnly();
     testInvalidTimeIsRejected();
