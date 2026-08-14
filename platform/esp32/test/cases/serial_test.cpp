@@ -4,6 +4,7 @@
 #include "Arduino.h"
 #include "Communication.h"
 #include "Version.h"
+#include "check.h"
 #include <cstdio>
 #include <cstring>
 #include <string>
@@ -13,11 +14,6 @@
 static std::vector<std::string> Lines;
 static void collectLine(const char* Line) { Lines.emplace_back(Line); }
 
-static int Failures = 0;
-static void check(bool Ok, const char* What) {
-    printf("%-56s %s\n", What, Ok ? "ok" : "FAIL");
-    if(!Ok) Failures++;
-}
 
 int main()
 {
@@ -98,7 +94,5 @@ int main()
     /* a full buffer refuses rather than overwriting a command in flight */
     std::string tooMuch(WORDCLOCK_SERIAL_INJECT_BUFFER_SIZE + 8u, 'x');
     check(port.inject(tooMuch.data(), tooMuch.size()) == E_NOT_OK, "an overlong injection is refused");
-
-    printf("\n%s\n", Failures == 0 ? "all checks passed" : "FAILURES");
-    return Failures == 0 ? 0 : 1;
+    return report();
 }

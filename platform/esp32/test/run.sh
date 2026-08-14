@@ -40,7 +40,7 @@ fi
 mkdir -p "$CACHE"
 
 # The platform's own headers first: its Arduino.h shadows the stub and has to win.
-INCLUDES=(-I"$PLATFORM_DIR/include" -I"$TEST_DIR/stubs" -I"$ROOT/firmware/inc")
+INCLUDES=(-I"$PLATFORM_DIR/include" -I"$TEST_DIR" -I"$TEST_DIR/stubs" -I"$ROOT/firmware/inc")
 while IFS= read -r directory; do INCLUDES+=(-I"$directory"); done < <(find "$ROOT/firmware/inc" -type d)
 
 # The path this platform's Arduino.h includes the core's own through. On the target the
@@ -84,7 +84,7 @@ BACKEND=(
 )
 WEB="$PLATFORM_DIR/src/WebInterface.cpp"
 
-SHARED=("$TEST_DIR/hardware_port.cpp" "$TEST_DIR/stubs.cpp")
+SHARED=("$TEST_DIR/stubs/hardware_port.cpp" "$TEST_DIR/stubs/stubs.cpp")
 
 # One object per source, named after the path it came from so that two files of the same
 # name - there are several - cannot land on each other.
@@ -152,21 +152,21 @@ link() {   # name, then the sources that belong to it
 }
 
 compileAll "${CORE[@]}" "${BACKEND[@]}" "${SHARED[@]}" "$WEB" \
-           "$TEST_DIR/frame_test.cpp" "$TEST_DIR/serial_test.cpp" "$TEST_DIR/ds3231_test.cpp" \
-           "$TEST_DIR/web_test.cpp" "$TEST_DIR/webhost.cpp" "$TEST_DIR/rmt_stubs.cpp"
+           "$TEST_DIR/cases/frame_test.cpp" "$TEST_DIR/cases/serial_test.cpp" "$TEST_DIR/cases/ds3231_test.cpp" \
+           "$TEST_DIR/cases/web_test.cpp" "$TEST_DIR/console/webhost.cpp" "$TEST_DIR/stubs/rmt_stubs.cpp"
 
 # frame_test brings its own RMT calls, because it keeps the frame that was transmitted. It
 # still needs WordclockSerial, which Pixels reports a failed channel through.
-link frame_test  "$TEST_DIR/frame_test.cpp" "$PLATFORM_DIR/src/Pixels.cpp" "$PLATFORM_DIR/src/WordclockSerial.cpp"
-link serial_test "$TEST_DIR/serial_test.cpp" "${BACKEND[@]}" "${CORE[@]}" "$TEST_DIR/rmt_stubs.cpp"
-link ds3231_test "$TEST_DIR/ds3231_test.cpp" "${BACKEND[@]}" "${CORE[@]}" "$TEST_DIR/rmt_stubs.cpp"
-link web_test    "$TEST_DIR/web_test.cpp" "$WEB" "${BACKEND[@]}" "${CORE[@]}" "$TEST_DIR/rmt_stubs.cpp"
-link webhost     "$TEST_DIR/webhost.cpp" "$WEB" "${BACKEND[@]}" "${CORE[@]}" "$TEST_DIR/rmt_stubs.cpp"
+link frame_test  "$TEST_DIR/cases/frame_test.cpp" "$PLATFORM_DIR/src/Pixels.cpp" "$PLATFORM_DIR/src/WordclockSerial.cpp"
+link serial_test "$TEST_DIR/cases/serial_test.cpp" "${BACKEND[@]}" "${CORE[@]}" "$TEST_DIR/stubs/rmt_stubs.cpp"
+link ds3231_test "$TEST_DIR/cases/ds3231_test.cpp" "${BACKEND[@]}" "${CORE[@]}" "$TEST_DIR/stubs/rmt_stubs.cpp"
+link web_test    "$TEST_DIR/cases/web_test.cpp" "$WEB" "${BACKEND[@]}" "${CORE[@]}" "$TEST_DIR/stubs/rmt_stubs.cpp"
+link webhost     "$TEST_DIR/console/webhost.cpp" "$WEB" "${BACKEND[@]}" "${CORE[@]}" "$TEST_DIR/stubs/rmt_stubs.cpp"
 
 if [ "${1:-}" = "serve" ]; then
     # Not exec'd: the binaries live in a temporary directory, and the trap that removes it
     # again only fires if this shell is still around to run it.
-    node "$TEST_DIR/serve.js" "$PLATFORM_DIR/web/index.html" "$WORK/webhost" "${2:-8080}"
+    node "$TEST_DIR/console/serve.js" "$PLATFORM_DIR/web/index.html" "$WORK/webhost" "${2:-8080}"
     exit
 fi
 
