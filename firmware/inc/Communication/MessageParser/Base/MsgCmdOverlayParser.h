@@ -65,19 +65,25 @@ template <typename Derived> class MsgCmdOverlayParser
 /******************************************************************************************************************************************************
  *  P R O T E C T E D   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
+  protected:
+    // functions
+    /* Protected rather than private with the derived class as a friend, which is what
+       clang-tidy asks for: a friend would open this base's whole private side to it, where
+       protected opens only what is meant for it. What the private constructor would
+       prevent - somebody inheriting this template with another class's Derived - the
+       assertion catches instead, at the first point where Derived is a complete type. */
+    // NOLINTNEXTLINE(bugprone-crtp-constructor-accessibility)
+    constexpr MsgCmdOverlayParser(const char* Parameter) : MsgParameterParserType(ParameterTable, Parameter) {
+        static_assert(std::is_base_of<MsgCmdOverlayParser, Derived>::value,
+                      "MsgCmdOverlayParser is a CRTP base: Derived has to be the class that inherits it");
+    }
+    ~MsgCmdOverlayParser() { }
+
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
     friend class MsgParameterParser<MsgCmdOverlayParser<Derived>, MSG_CMD_BASE_OVERLAY_PARSER_PARAMETER_TABLE_SIZE>;
-    friend Derived;
-
-    // functions
-    /* Private rather than protected, and the one class that may use it named: a protected
-       constructor lets anything inherit from this template, and for a CRTP base that
-       means inheriting with somebody else's Derived. */
-    constexpr MsgCmdOverlayParser(const char* Parameter) : MsgParameterParserType(ParameterTable, Parameter) { }
-    ~MsgCmdOverlayParser() { }
 
     // functions
     Derived& underlying() { return static_cast<Derived&>(*this); }

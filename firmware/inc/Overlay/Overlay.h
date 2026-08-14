@@ -26,6 +26,8 @@
 #include "Text.h"
 #include "Scheduler.h"
 
+#include <type_traits>
+
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
@@ -70,18 +72,24 @@ template <typename Derived> class Overlay
   protected:
     StateType State{STATE_DISABLED};
 
+    // functions
+    /* Protected rather than private with the derived class as a friend, which is what
+       clang-tidy asks for: a friend would open this base's whole private side to it, where
+       protected opens only what is meant for it. What the private constructor would
+       prevent - somebody inheriting this template with another class's Derived - the
+       assertion catches instead, at the first point where Derived is a complete type. */
+    // NOLINTNEXTLINE(bugprone-crtp-constructor-accessibility)
+    constexpr Overlay() {
+        static_assert(std::is_base_of<Overlay, Derived>::value,
+                      "Overlay is a CRTP base: Derived has to be the class that inherits it");
+    }
+    ~Overlay() { }
+
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    /* Private rather than protected, and the one class that may use it named: a protected
-       constructor lets anything inherit from this template, and for a CRTP base that
-       means inheriting with somebody else's Derived. */
-    constexpr Overlay() { }
-    ~Overlay() { }
-    friend Derived;
-
     static constexpr SecondType SecondToStartShow{30u};
     MinuteType PeriodInMinutes{1u};
     SecondType EnduranceInSeconds{1u};
