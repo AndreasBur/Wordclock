@@ -5,6 +5,7 @@
 
 #include "Arduino.h"
 #include "Pixels.h"
+#include "check.h"
 
 #include <cstdio>
 #include <cstring>
@@ -24,11 +25,6 @@ esp_err_t rmt_transmit(rmt_channel_handle_t, rmt_encoder_handle_t, const void* d
     return ESP_OK;
 }
 
-static int Failures = 0;
-static void check(bool Ok, const char* What) {
-    printf("%-52s %s\n", What, Ok ? "ok" : "FAIL");
-    if(!Ok) Failures++;
-}
 
 int main()
 {
@@ -58,7 +54,5 @@ int main()
     P.enablePixels();
     P.render();
     check(Captured[0] == 20u && Captured[1] == 10u && Captured[2] == 30u, "enablePixels restores it without a redraw");
-
-    printf("\n%s\n", Failures == 0 ? "all checks passed" : "FAILURES");
-    return Failures == 0 ? 0 : 1;
+    return report();
 }

@@ -6,6 +6,7 @@
 #include "Communication.h"
 #include "Pixels.h"
 #include "WebInterface.h"
+#include "check.h"
 #include <algorithm>
 #include <cstdio>
 #include <cstring>
@@ -84,14 +85,6 @@ static size_t framesSentTo(int descriptor)
     size_t count = 0u;
     for(const int to : SentBinaryTo) { if(to == descriptor) { count++; } }
     return count;
-}
-
-static int Failures = 0;
-
-static void check(bool Ok, const char* What)
-{
-    printf("%-58s %s\n", What, Ok ? "ok" : "FAIL");
-    if(!Ok) { Failures++; }
 }
 
 /* Enough of a parse to say the document is well formed: brackets balanced and no string
@@ -238,7 +231,5 @@ int main()
     /* an oversized frame must be refused whole rather than truncated into the parser */
     PendingFrame.assign(WEB_INTERFACE_MAX_FRAME_LENGTH + 10u, 'x');
     check(SocketHandler(&request) != ESP_OK, "an oversized frame is refused");
-
-    printf("\n%s\n", Failures == 0 ? "all checks passed" : "FAILURES");
-    return Failures == 0 ? 0 : 1;
+    return report();
 }

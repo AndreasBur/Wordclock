@@ -7,6 +7,7 @@
 #include "DS3231.h"
 #include "Overlays.h"
 #include "Temperature.h"
+#include "check.h"
 
 #include <Wire.h>
 
@@ -15,11 +16,6 @@
 #include <cstring>
 #include <vector>
 
-static int Failures = 0;
-static void check(bool Ok, const char* What) {
-    printf("%-56s %s\n", What, Ok ? "ok" : "FAIL");
-    if(!Ok) Failures++;
-}
 
 /* One temperature reading, handed over the way the chip would. */
 static void answerWith(uint8_t Degrees, uint8_t Fraction)
@@ -156,7 +152,5 @@ int main()
     testTemperature();
     testTimeRegisters();
     testWritingTheTime();
-
-    printf("\n%s\n", Failures == 0 ? "all checks passed" : "FAILURES");
-    return Failures == 0 ? 0 : 1;
+    return report();
 }
