@@ -91,6 +91,36 @@ clients read image metadata from the image the final `FROM` points at, and then
 overwrite the label on the image built from this file. Extensions declared that
 way are silently ignored.
 
+## PlatformIO for the ESP32 backend
+
+The image carries PlatformIO in a virtual environment under `/opt/platformio`, on the
+`PATH`, plus `python3` and `nodejs` — which is what
+[`platform/esp32/test/run.sh`](../platform/esp32/test/run.sh) needs for the page embedding
+and for the local web console. So `pio run -d platform/esp32` works with nothing to install.
+
+The **package cache is a named volume** at `~/.platformio`, declared by the shared feature.
+The platform, the Xtensa toolchain and the Arduino core are about 1.5 GB and are downloaded
+on first use; the volume is what keeps a container rebuild from fetching them again. An
+empty named volume takes its ownership from the path it covers, so the Dockerfile creates
+that path as the remote user first — otherwise PlatformIO cannot write into it.
+
+Behind a **TLS-intercepting proxy** there is one trap that names neither the proxy nor the
+cause. PlatformIO downloads with `requests` and hands it its own `certifi` bundle
+explicitly, so it ignores `REQUESTS_CA_BUNDLE` and fails with
+`CERTIFICATE_VERIFY_FAILED: self-signed certificate in certificate chain` on URLs that
+`curl` and `git` fetch without complaint. The image appends its own trust store to that
+bundle, which keeps verification on rather than turning it off.
+
+That fix has to happen twice, because the platform packages build a *second* virtual
+environment under `~/.platformio` at first use — and that one lives in the volume, not in
+the image. `platformio-trust-store`, installed by the shared feature and run as its
+`postStartCommand`, appends the store to any bundle under `~/.platformio` that does not
+already carry it.
+
+**Flashing is not covered.** The container can build; getting the USB serial adapter into
+it is another matter, and under WSL2 it needs `usbipd-win` on the Windows side before the
+container can see anything at all. Build here, flash from the host.
+
 ## Site-specific variants
 
 An additional configuration directory next to `linux/` and `wslg/` shows up as
