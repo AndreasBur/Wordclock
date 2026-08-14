@@ -1,0 +1,25 @@
+# What cppcheck is told not to report, and why. Passed with --suppressions-list by
+# .github/workflows/static-analysis.yml. The same rule as .clang-tidy: an entry says which
+# pattern the analysis cannot see through, and a finding nobody wants to read is not one.
+
+# Every comment line here carries text, and paragraphs are separated by empty lines rather
+# than by a line holding just "#". The runner's cppcheck skips a comment only when it is
+# longer than one character, so a bare "#" reaches the suppression parser and fails the run
+# with "Failed to add suppression. No id." - an empty line is skipped by every version.
+
+# The overlays wrap the base's task() rather than shadowing it: each one does its own step
+# and then calls Overlay::task() by name, which is the CRTP hand-off and the reason both
+# declare one. cppcheck reads the pair as an accidental redefinition.
+# Named one by one rather than as firmware/inc/Overlay/*.h, because how a wildcard in this
+# file is matched has changed between cppcheck versions - and a fourth overlay should have
+# to be added here by somebody who has looked at what the check says about it.
+duplInheritedMember:firmware/inc/Overlay/OverlayDate.h
+duplInheritedMember:firmware/inc/Overlay/OverlayTemperature.h
+duplInheritedMember:firmware/inc/Overlay/OverlayText.h
+
+# MsgCmdStatusParser is the one command without options, so it instantiates the parameter
+# parser with MSG_CMD_STATUS_PARSER_PARAMETER_TABLE_SIZE = 0 and its table is an empty
+# std::array. cppcheck then reports the indexing in getParameterTableElement() as out of
+# bounds for that instantiation. Its only caller is the loop over ParameterTable.size(),
+# which does not run for an empty table, so the index it complains about is never formed.
+containerOutOfBounds:firmware/inc/Communication/MessageParser/Base/MsgParameterParser.h

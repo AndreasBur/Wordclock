@@ -1,0 +1,99 @@
+# What a pull request is read with, next to what it is built with in ci.yml. The clang-tidy
+# job was a fourth job there and is the same job here, moved: a badge reports a workflow and
+# not a job, so this is what puts a static-analysis badge in the README beside the CI one.
+# CI is now the three builds and the tests, this is what reads the code, and neither answer
+# hides inside the other's.
+#
+# Two analysers, because they are good at different things. clang-tidy sees exactly what the
+# compiler sees - the real include paths and defines out of compile_commands.json - and
+# brings the path-sensitive clang-analyzer checks with it. cppcheck parses the tree by
+# itself, which is how it reaches template instantiations and container bounds that the
+# clang checks do not follow: it is the one that noticed the parameter parser being
+# instantiated with an empty table.
+#
+# Which checks are on, and why the rest are off, is in .clang-tidy and
+# .cppcheck-suppressions, not here.
+name: static-analysis
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+
+# A second push to the same branch makes the first answer worthless, so it is cancelled
+# rather than left to occupy a runner.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  clang-tidy:
+    name: clang-tidy
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+
+      # wxWidgets is here for the same reason as in the simulator job of ci.yml: the
+      # simulator's compile database is what covers the firmware core, and it does not
+      # exist without the headers the backend includes.
+      - name: Install the toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends cmake ninja-build libwxgtk3.2-dev clang-tidy
+
+      # Configured, not built: clang-tidy compiles each translation unit itself and needs
+      # nothing from the build but compile_commands.json.
+      - name: Configure
+        run: cmake -S . -B build -G Ninja -DPLATFORM=simulator -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+
+      # Which checks, and why the rest are off, is in .clang-tidy. WarningsAsErrors is set
+      # there, so a finding fails this job.
+      - name: Analyse
+        run: run-clang-tidy -p build -quiet -j "$(nproc)" 'firmware/|platform/simulator/src'
+
+  cppcheck:
+    name: cppcheck
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+
+      # No cmake, no wxWidgets, no compile database: cppcheck is given the include
+      # directories and works out the configurations itself, which for the firmware core is
+      # enough - it reports the same findings with and without compile_commands.json, and
+      # this way the job still answers when the simulator does not build.
+      - name: Install cppcheck
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends cppcheck
+
+      # firmware/ only, unlike the clang-tidy job above. Without wxWidgets' own headers
+      # cppcheck stops at DECLARE_EVENT_TABLE in the simulator's window class and asks to be
+      # told what the macro is; the backend is the half clang-tidy covers through the
+      # compile database, and this is the half that needs no toolchain to read.
+      #
+      # --enable: warning and portability, not style or performance. Those two are where
+      # "could be static", "could be const&" and "could return a reference" live - 270 of
+      # them, about how the code is written rather than what it does, and the same argument
+      # .clang-tidy makes for leaving the style checks out.
+      # --check-level=exhaustive costs nothing measurable at this size (~4 s either way).
+      # --inline-suppr so a one-off can be answered next to the code, with the reason there,
+      # rather than by widening .cppcheck-suppressions to a whole file.
+      #
+      # Unpinned, like clang-tidy: cppcheck has no versioned packages to pin to anyway, so a
+      # later runner image can report something new here. That is the same trade the
+      # container makes by carrying a newer clang-tidy than the runner.
+      - name: Analyse
+        run: |
+          INCLUDES=$(find firmware/inc -type d | sed 's/^/-I/')
+          cppcheck \
+            --enable=warning,portability \
+            --check-level=exhaustive \
+            --std=c++17 \
+            --inline-suppr \
+            --suppressions-list=.cppcheck-suppressions \
+            --error-exitcode=1 \
+            --quiet \
+            $INCLUDES \
+            -Iplatform/simulator/include/sim \
+            -Iplatform/simulator/include \
+            firmware/src firmware/inc
