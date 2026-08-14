@@ -65,7 +65,9 @@ StdReturnType AnimationFade::setTime(byte sHour, byte sMinute)
         Hour = sHour;
         Minute = sMinute;
         State = STATE_CLEAR_TIME;
-        DisplayBrightness = Display::getInstance().getBrightness();
+        /* From the display as it is configured, whatever that currently is - the fade
+           scales it rather than replacing it. */
+        Level = LevelFull;
         returnValue = E_OK;
     }
     return returnValue;
@@ -89,11 +91,17 @@ void AnimationFade::task()
 /******************************************************************************************************************************************************
   reset()
 ******************************************************************************************************************************************************/
+/*! \brief          Back to a display nobody is fading
+ *  \details        Called from init(), which is also what an aborted animation goes
+ *                  through - a fade that was cut off half way would otherwise leave the
+ *                  display dimmed with nothing left to undim it.
+******************************************************************************************************************************************************/
 void AnimationFade::reset()
 {
-    DisplayBrightness = 0u;
+    Level = LevelFull;
     Hour = 0u;
     Minute = 0u;
+    Display::getInstance().clearBrightnessFade();
 } /* reset */
 
 
@@ -102,8 +110,9 @@ void AnimationFade::reset()
 ******************************************************************************************************************************************************/
 void AnimationFade::clearTimeTask()
 {
-    if(DisplayBrightness > 0u) {
-        DisplayBrightness--;
+    if(Level > 0u) {
+        Level--;
+        Display::getInstance().setBrightnessFadeLevel(Level);
     } else {
         setStateToSetTime();
     }
@@ -115,9 +124,14 @@ void AnimationFade::clearTimeTask()
 ******************************************************************************************************************************************************/
 void AnimationFade::setTimeTask()
 {
-    if(DisplayBrightness < Display::getInstance().getBrightness()) {
-        DisplayBrightness++;
+    if(Level < LevelFull) {
+        Level++;
+        Display::getInstance().setBrightnessFadeLevel(Level);
     } else {
+        /* Cleared rather than left at full: a level that is set at all costs a comparison
+           on every applyBrightness(), and leaving it set would hide a fade that never
+           finished. */
+        Display::getInstance().clearBrightnessFade();
         State = STATE_IDLE;
     }
 } /* setTimeTask */
@@ -126,11 +140,18 @@ void AnimationFade::setTimeTask()
 /******************************************************************************************************************************************************
   setStateToSetTime()
 ******************************************************************************************************************************************************/
+/*! \brief          Swaps the time behind a display that is dark
+ *  \details        The clear is what was missing: setting the new time writes its letters,
+ *                  it does not take the previous ones away, so both were lit at once - and
+ *                  at the moment of the swap the display is black, which is the one moment
+ *                  where nobody can see it happen.
+******************************************************************************************************************************************************/
 void AnimationFade::setStateToSetTime()
 {
     State = STATE_SET_TIME;
+    Display::getInstance().clear();
     Clock::getInstance().setTime(Hour, Minute);
-    DisplayBrightness = 0u;
+    Level = 0u;
 } /* setStateToSetTime */
 
 

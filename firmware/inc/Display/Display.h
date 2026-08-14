@@ -258,6 +258,14 @@ class Display
 
     void applyBrightness();
 
+    /* What AnimationFade dims the display with while it runs. It goes through the display
+       rather than through the strip because applyBrightness() runs on every task and
+       would otherwise write the configured brightness back over it - and it is a level of
+       its own rather than the brightness setting, so that what a fade dims is never what
+       Persistence stores. */
+    void setBrightnessFadeLevel(byte Level) { Brightness.setFadeLevel(Level); applyBrightness(); }
+    void clearBrightnessFade() { Brightness.clearFade(); applyBrightness(); }
+
     /* Back to what a clock that was never configured shows. Each part answers for its own
        defaults, so nothing here has to know what they are; the brightness is applied
        afterwards, because that is what recalculates what reaches the LEDs. */
