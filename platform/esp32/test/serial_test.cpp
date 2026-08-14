@@ -3,6 +3,7 @@
    come out one line at a time. */
 #include "Arduino.h"
 #include "Communication.h"
+#include "Version.h"
 #include <cstdio>
 #include <cstring>
 #include <string>
@@ -72,6 +73,17 @@ int main()
     check(answerTo("1 -P22\n") == "1 RpcId=22 Error=0", "the clock refresh is carried out");
     check(answerTo("1 -P28\n") == "1 RpcId=28 Error=8", "aborting with no overlay showing is refused");
     check(answerTo("1 -P31\n") == "1 RpcId=31 Error=7", "an id past the last procedure is unknown");
+
+    /* The status command answers with values and takes none. The illuminance is whatever
+       the sensor stand-in reports on a host with no bus, so the fields are checked rather
+       than the whole line - what matters is that all three come back and that the one
+       without a reading behind it comes back empty. */
+    const std::string Status = answerTo("12\n");
+    check(Status.rfind("12 V=" WORDCLOCK_VERSION " I=", 0u) == 0u, "the status answers with the version and the illuminance");
+    check(Status.size() >= 3u && Status.compare(Status.size() - 3u, 3u, " T=") == 0,
+          "and with an empty temperature while no chip has answered");
+    check(answerTo("12 -V1\n") == "12 Error=3:V V=" WORDCLOCK_VERSION " I=1 T=",
+          "a value sent to a read-only field is refused as an unknown option");
 
     /* a full buffer refuses rather than overwriting a command in flight */
     std::string tooMuch(WORDCLOCK_SERIAL_INJECT_BUFFER_SIZE + 8u, 'x');

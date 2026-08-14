@@ -397,6 +397,12 @@
         if (!command) { refreshPreview(); return; }
 
         for (const option of command.options) {
+            /* A field that only ever comes back in an answer gets no row: the command
+               takes no such option, and the firmware answers one with "parameter
+               unknown". Its name is in the catalog so that the answer can be read
+               through it, not so that it can be sent. */
+            if (option.readonly) { continue; }
+
             const row = document.createElement('div');
             row.className = 'row';
             row.dataset.short = option.short;

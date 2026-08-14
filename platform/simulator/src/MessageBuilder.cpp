@@ -143,16 +143,24 @@ void MessageBuilder::showOptionsOfSelectedCommand()
     const MessageCatalog::CommandType& Command = getSelectedCommand();
 
     for(byte Index = 0u; Index < MESSAGE_CATALOG_MAX_NUMBER_OF_OPTIONS; Index++) {
-        const bool Used = Index < Command.NumberOfOptions;
+        const bool Exists = Index < Command.NumberOfOptions;
+        /* A read-only field is answered, never sent, so it gets no row of its own. Its
+           name is still in the catalog, which is what lets the decoder put a label on it
+           when the answer comes back. */
+        const bool Used = Exists && !Command.Options[Index].ReadOnly;
 
         bool Named = false;
+
+        /* Cleared for every option this command has, not only for the ones that get a row:
+           a checkbox left ticked from a previous command would otherwise put its option
+           into the message although nothing shows it. */
+        if(Exists) { OptionRows[Index].Use->SetValue(false); }
 
         if(Used) {
             const MessageCatalog::OptionType& Option = Command.Options[Index];
             Named = Option.ValueNames != nullptr;
 
             OptionRows[Index].Use->SetLabel(wxString::Format(wxT("-%c  %s"), Option.ShortName, Option.Label));
-            OptionRows[Index].Use->SetValue(false);
 
             if(Named) {
                 OptionRows[Index].Choice->Clear();

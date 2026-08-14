@@ -67,7 +67,8 @@ class MsgCmdParser
         COMMAND_CLOCK_MODE,
         COMMAND_ANIMATION,
         COMMAND_TIME,
-        COMMAND_DATE
+        COMMAND_DATE,
+        COMMAND_STATUS
     };
 
 /******************************************************************************************************************************************************

@@ -286,6 +286,18 @@ constexpr byte NumberOfOverlayOptionsWithoutText{static_cast<byte>(NUMBER_OF(Ove
 static_assert(OverlayOptions[NumberOfOverlayOptionsWithoutText].ShortName == 'T',
               "the text has to be the last of the overlay options, see NumberOfOverlayOptionsWithoutText");
 
+/* MsgCmdStatusParser. Every one of them read-only: the command takes no options at all,
+   and these names exist so that its answer can be read back through them. The bounds are
+   therefore left at zero - nothing offers these to be typed, so nothing has a range to
+   check against. */
+#define READ_ONLY                                       0u, 0u, nullptr, 0u, true
+
+constexpr MessageCatalog::OptionType StatusOptions[] {
+    {'V', "Firmware version",   ARGUMENT_TYPE_STRING, READ_ONLY},
+    {'I', "Illuminance (lx)",   ARGUMENT_TYPE_UINT16, READ_ONLY},
+    {'T', "Temperature",        ARGUMENT_TYPE_STRING, READ_ONLY}
+};
+
 /* MsgCmdClockModeParser */
 constexpr MessageCatalog::OptionType ClockModeOptions[] {
     {'M', "Mode",               ARGUMENT_TYPE_UINT8,  NAMED(0u, ClockModeValueNames)}
@@ -335,7 +347,8 @@ constexpr MessageCatalog::CommandType Commands[] {
     {MsgCmdParser::COMMAND_CLOCK_MODE,            "Clock mode",            ClockModeOptions,           NUMBER_OF(ClockModeOptions)},
     {MsgCmdParser::COMMAND_ANIMATION,             "Animation",             AnimationOptions,           NUMBER_OF(AnimationOptions)},
     {MsgCmdParser::COMMAND_TIME,                  "Time",                  TimeOptions,                NUMBER_OF(TimeOptions)},
-    {MsgCmdParser::COMMAND_DATE,                  "Date",                  DateOptions,                NUMBER_OF(DateOptions)}
+    {MsgCmdParser::COMMAND_DATE,                  "Date",                  DateOptions,                NUMBER_OF(DateOptions)},
+    {MsgCmdParser::COMMAND_STATUS,                "Status",                StatusOptions,              NUMBER_OF(StatusOptions)}
 };
 
 constexpr byte NumberOfCommands{NUMBER_OF(Commands)};

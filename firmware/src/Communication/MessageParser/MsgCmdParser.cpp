@@ -26,6 +26,7 @@
 #include "MsgCmdDisplayBrightnessParser.h"
 #include "MsgCmdDisplayPixelParser.h"
 #include "MsgCmdClockModeParser.h"
+#include "MsgCmdStatusParser.h"
 #include "MsgCmdAnimationParser.h"
 #include "MsgCmdTimeParser.h"
 #include "MsgCmdDateParser.h"
@@ -92,6 +93,7 @@ void MsgCmdParser::parse()
         case COMMAND_CLOCK_MODE:            dispatchCommand<MsgCmdClockModeParser>(parameter);           break;
         case COMMAND_TIME:                  dispatchCommand<MsgCmdTimeParser>(parameter);                break;
         case COMMAND_DATE:                  dispatchCommand<MsgCmdDateParser>(parameter);                break;
+        case COMMAND_STATUS:                dispatchCommand<MsgCmdStatusParser>(parameter);              break;
 #if (OVERLAYS_SUPPORT_DATE == STD_ON)
         case COMMAND_OVERLAY_DATE:          dispatchCommand<MsgCmdOverlayDateParser>(parameter);         break;
 #endif

@@ -85,11 +85,23 @@ overlays' — the stored format has no variable-length field for the text yet
 
 ## 3. Status command
 
-Everything an RPC cannot answer: illuminance raw value, IP address and link quality,
-uptime, firmware version, free heap. As a new command (12) with the query semantics
-the other commands already have, so it appears in the
-[MessageCatalog](../firmware/inc/Communication/MessageCatalog.h) and therefore in
-the simulator dialog and any future web UI without further work.
+**Done for what the core can reach** — command 12 answers the firmware version, the
+illuminance in lux and the temperature, see [serial-commands.md](serial-commands.md). Two
+things it settled:
+
+- **Read-only fields.** The command takes no options at all, so an option sent to it is
+  answered with `ERROR_PARAMETER_UNKNOWN` by the base parser rather than ignored. The
+  field names live in the [catalog](../firmware/inc/Communication/MessageCatalog.h) with a
+  `ReadOnly` flag, which is what lets both front ends label an answer without offering the
+  fields as inputs.
+- **The version is hand-kept** in [Version.h](../firmware/inc/Version/Version.h). Neither
+  platform's build has the working tree when it compiles, so deriving it from the
+  repository would mean build plumbing in two places; a macro that a build can override
+  from the outside was the smaller answer.
+
+Still open, and waiting for the platform hook of section 5 rather than for this command:
+uptime, IP address, link quality, free heap. `millis()` is not in the simulator's Arduino
+shim either, so even the uptime needs a contract change.
 
 ## 4. RPCs for a remote control
 
@@ -113,6 +125,10 @@ keys onto an interface that already exists and can be tested over the serial lin
 | 38 | System restart | a `System.h` in the platform contract; `esp_restart()` on the ESP32 |
 | 39 | Resynchronise time | `sntp_restart()`; today only a reset helps when the NTP server was unreachable at boot |
 | 40 | Reconnect WiFi | `WiFi.reconnect()` |
+
+The same header is what the status command's remaining fields hang on — uptime, address,
+link quality and free heap are all things only the platform knows. Worth designing as one
+thing rather than as two.
 
 ## Backlog
 

@@ -142,6 +142,9 @@ int main()
     check(Chunked.find("\"short\":\"B\"") != std::string::npos, "it carries an option short name");
     check(Chunked.find("\"max\":255") != std::string::npos, "it carries the ranges");
     check(Chunked.find("\"values\":[") != std::string::npos, "it carries named values for the enumerations");
+    /* Without this the page would offer the status fields as inputs, and a value typed
+       into one of them would come back as "parameter unknown". */
+    check(Chunked.find("\"readonly\":true") != std::string::npos, "it marks the fields that only appear in answers");
     size_t Commands = 0u;
     for(size_t At = Chunked.find("\"number\":"); At != std::string::npos; At = Chunked.find("\"number\":", At + 1u)) { Commands++; }
     printf("   catalog: %zu bytes, %zu commands\n", Chunked.size(), Commands);

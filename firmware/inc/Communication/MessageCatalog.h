@@ -87,6 +87,11 @@ class MessageCatalog
            of spelling out that it has no names. */
         const char* const* ValueNames{nullptr};
         byte NumberOfValueNames{0u};
+        /* A field that only ever appears in an answer. Its command takes no such option -
+           sending one is refused by the parser - but the name is described here so that a
+           front end can read the answer back through it without offering it as an input.
+           Defaulted, so the options that are settable say nothing about it. */
+        bool ReadOnly{false};
     };
 
     struct CommandType {

@@ -43,6 +43,7 @@ overlay is disabled at compile time.
 | 9 | Animation | `-A<id>` `-M<mode>` `-S<speed>` `-F<0\|1>` | Animation id, selection mode, speed, favourite flag |
 | 10 | Time | `-H<hour>` `-M<min>` `-S<sec>` | Sets RTC time |
 | 11 | Date | `-Y<year>` (uint16) `-M<month>` `-D<day>` | Sets RTC date |
+| 12 | Status | *(none)* | Read-only; answers `V=` version, `I=` illuminance in lux, `T=` temperature |
 
 ### Overlay options (shared)
 
@@ -175,6 +176,32 @@ map one-to-one to task cycles `255` through `1`; the scheduler counts those cycl
 is why the two run in opposite directions. The default task cycle of `10`
 (`ANIMATIONS_TASK_CYCLE_INIT_VALUE`) is reported as `S=246`. Every animation keeps its
 own speed, and modes 1 and 2 use the speed of whichever animation they picked.
+
+### Status (`command 12`)
+
+What a remote procedure call cannot answer: its answer is `RpcId=<id> Error=<code>` and
+carries no value, so the readings live in a command of their own.
+
+```
+12                    # -> 12 V=0.1.0 I=350 T=23.4C
+```
+
+| field | Meaning |
+|-------|---------|
+| `V` | Firmware version, hand-kept in [`Version.h`](../firmware/inc/Version/Version.h) |
+| `I` | What the light sensor measures, in lux — the value the brightness automatic divides by its calibrated maximum |
+| `T` | What the clock chip measures, `23.4C`, and **empty** while no chip has answered |
+
+The command takes no options. Its parameter table is empty, so `12 -V1` is answered with
+`Error=3:V` (`ERROR_PARAMETER_UNKNOWN`) rather than silently accepted. The three field
+names are still described in the
+[message catalog](../firmware/inc/Communication/MessageCatalog.h), marked read-only, which
+is how the simulator dialog and the web console put labels on an answer without offering
+the fields as inputs.
+
+Uptime, IP address, link quality and free heap are the other status fields worth having,
+and they wait for the platform hook that the restart and the time resynchronisation need
+too — see the [roadmap](roadmap.md).
 
 ## RPC sub-commands (`command 1 -P<id>`)
 
