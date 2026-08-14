@@ -218,6 +218,28 @@ edit cycle is then a browser reload.
   that occurs twice at the end of summer time unambiguous, and it means a chip read with
   another tool shows an offset rather than the wall clock.
 
+## The network
+
+The credentials are **not compiled in any more**. They live in their own NVS namespace and
+are set with command 13 over whichever console can reach the clock:
+
+```
+13 -SMyNetwork -Psecret
+```
+
+A clock with nothing stored opens an open access point named `Wordclock` and serves the web
+console on it, which is where the first pair is entered — 192.168.4.1 in a browser. The
+access point closes as soon as a network is stored.
+
+`WORDCLOCK_WIFI_SSID` in [`WordclockConfiguration.h`](include/WordclockConfiguration.h) and
+a local `WordclockSecrets.h` still work and are the fallback: what is stored wins over what
+was compiled in, because it is the later word. A clock flashed with credentials therefore
+comes up on the network as before, and can still be moved to another one without a reflash.
+
+The namespace is separate from the settings blob on purpose, so that a settings reset
+(`1 -P30`) leaves the network alone. A reset that took it away would leave a clock nobody
+can reach without a cable.
+
 ## Known gaps
 
 - **The overlays are not persisted.** Colour, brightness, clock mode, animation selection
@@ -231,4 +253,6 @@ edit cycle is then a browser reload.
 - **No view of the letter grid yet.** The console shows the answers, not the display. The
   pixel buffer over the same socket is the next step.
 - **No authentication.** Anyone on the network can send commands. Fine behind a home
-  router, not on an open network.
+  router, not on an open network — and the access point an unconfigured clock opens *is* an
+  open network. It closes with the first stored pair, which bounds the window rather than
+  removing it.

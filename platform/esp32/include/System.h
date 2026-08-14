@@ -44,6 +44,17 @@
 /* "-100" and its terminator. */
 #define SYSTEM_LINK_QUALITY_STRING_LENGTH               5u
 
+/* What 802.11 allows: 32 characters of network name, and 63 of a WPA2 pass phrase. Both
+   with room for the terminator, because they are handed over as strings. */
+#define SYSTEM_SSID_STRING_LENGTH                       33u
+#define SYSTEM_PASSWORD_STRING_LENGTH                   64u
+
+/* The network the clock opens when it has none to join, so that the console it is
+   configured through can be reached at all. Open, and only while there is nothing stored:
+   a pass phrase every clock of this firmware shares would protect nothing, and the window
+   closes as soon as the first network is entered. */
+#define SYSTEM_ACCESS_POINT_SSID                        "Wordclock"
+
 /******************************************************************************************************************************************************
  *  C L A S S   S Y S T E M
 ******************************************************************************************************************************************************/
@@ -55,6 +66,8 @@ class System
   public:
     static constexpr byte AddressStringLength{SYSTEM_ADDRESS_STRING_LENGTH};
     static constexpr byte LinkQualityStringLength{SYSTEM_LINK_QUALITY_STRING_LENGTH};
+    static constexpr byte SsidStringLength{SYSTEM_SSID_STRING_LENGTH};
+    static constexpr byte PasswordStringLength{SYSTEM_PASSWORD_STRING_LENGTH};
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
@@ -96,7 +109,26 @@ class System
        unsigned values. */
     StdReturnType getLinkQuality(char*) const;
 
+    /* The network the clock is configured for, into a buffer of SsidStringLength.
+       E_NOT_OK when there is none, which is what a clock that was never told answers - and
+       what the access point stands in for. The pass phrase is deliberately not readable:
+       it goes in and is never handed back out. */
+    StdReturnType getNetworkSsid(char*) const;
+    bool isNetworkConfigured() const;
+
+    // set methods
+    /* Stores what the clock is to join, and joins it. Kept apart from the settings the
+       core persists: those are what the clock shows, this is how it is reached, and a
+       settings reset that threw the network away would leave a clock nobody can talk to
+       without a cable. */
+    StdReturnType setNetworkCredentials(const char*, const char*);
+
     // methods
+    /* Brings the network up as configured: the stored credentials, or the access point
+       when there are none. Called once at start-up and again whenever the credentials
+       change. */
+    void startNetwork();
+
     /* Asks for a restart, which the application carries out on its next tick through
        performPendingRestart(). Deferred rather than done here so that the answer to the
        command that asked for it still goes out. */

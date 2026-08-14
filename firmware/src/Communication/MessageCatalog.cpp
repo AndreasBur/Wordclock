@@ -305,6 +305,13 @@ constexpr MessageCatalog::OptionType StatusOptions[] {
     {'M', "Free memory (KiB)",  ARGUMENT_TYPE_UINT16, READ_ONLY}
 };
 
+/* MsgCmdNetworkParser. The pass phrase is an input and never an answer, so it carries no
+   range and is never read back - see the parser for why. */
+constexpr MessageCatalog::OptionType NetworkOptions[] {
+    {'S', "Network name",       ARGUMENT_TYPE_STRING, 0u, 0u},
+    {'P', "Pass phrase",        ARGUMENT_TYPE_STRING, 0u, 0u}
+};
+
 /* MsgCmdClockModeParser */
 constexpr MessageCatalog::OptionType ClockModeOptions[] {
     {'M', "Mode",               ARGUMENT_TYPE_UINT8,  NAMED(0u, ClockModeValueNames)},
@@ -356,7 +363,8 @@ constexpr MessageCatalog::CommandType Commands[] {
     {MsgCmdParser::COMMAND_ANIMATION,             "Animation",             AnimationOptions,           NUMBER_OF(AnimationOptions)},
     {MsgCmdParser::COMMAND_TIME,                  "Time",                  TimeOptions,                NUMBER_OF(TimeOptions)},
     {MsgCmdParser::COMMAND_DATE,                  "Date",                  DateOptions,                NUMBER_OF(DateOptions)},
-    {MsgCmdParser::COMMAND_STATUS,                "Status",                StatusOptions,              NUMBER_OF(StatusOptions)}
+    {MsgCmdParser::COMMAND_STATUS,                "Status",                StatusOptions,              NUMBER_OF(StatusOptions)},
+    {MsgCmdParser::COMMAND_NETWORK,               "Network",               NetworkOptions,             NUMBER_OF(NetworkOptions)}
 };
 
 constexpr byte NumberOfCommands{NUMBER_OF(Commands)};
