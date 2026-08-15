@@ -91,11 +91,6 @@ class System
     }
 
     // get methods
-    /* Minutes since the last start. In minutes because that is the unit the question is
-       asked in - "has it been up since I flashed it" - and because a uint16 of them lasts
-       forty-five days, where seconds would wrap in eighteen hours. */
-    StdReturnType getUptimeInMinutes(uint16_t&) const;
-
     /* Kibibytes of free heap. Says whether the clock is leaking, which is the one thing a
        device that runs for months has to be watched for. */
     StdReturnType getFreeMemoryInKibibytes(uint16_t&) const;

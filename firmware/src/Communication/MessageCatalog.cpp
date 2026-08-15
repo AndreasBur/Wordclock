@@ -297,7 +297,13 @@ static_assert(OverlayOptions[NumberOfOverlayOptionsWithoutText].ShortName == 'T'
 
 constexpr MessageCatalog::OptionType StatusOptions[] {
     {'V', "Firmware version",   ARGUMENT_TYPE_STRING, READ_ONLY},
-    {'U', "Uptime (minutes)",   ARGUMENT_TYPE_UINT16, READ_ONLY},
+    /* Three fields rather than one count. A single number has to be in some unit, and
+       every unit that fits a uint16 runs out on a clock that is meant to hang on a wall
+       for years - minutes did, after 45 days. Days carry the range, hours and minutes the
+       resolution, and none of them has to be divided by a reader. */
+    {'U', "Uptime (days)",      ARGUMENT_TYPE_UINT16, READ_ONLY},
+    {'H', "Uptime (hours)",     ARGUMENT_TYPE_UINT8,  READ_ONLY},
+    {'N', "Uptime (minutes)",   ARGUMENT_TYPE_UINT8,  READ_ONLY},
     {'I', "Illuminance (lx)",   ARGUMENT_TYPE_UINT16, READ_ONLY},
     {'T', "Temperature",        ARGUMENT_TYPE_STRING, READ_ONLY},
     {'A', "Address",            ARGUMENT_TYPE_STRING, READ_ONLY},

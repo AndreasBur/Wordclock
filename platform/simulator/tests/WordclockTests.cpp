@@ -42,6 +42,7 @@
 #include "Pixels.h"
 #include "RealTimeClock.h"
 #include "Scheduler.h"
+#include "Uptime.h"
 #include "sim/Storage.h"
 
 /******************************************************************************************************************************************************
@@ -593,6 +594,39 @@ void testSchedulerSpeedRoundTrip()
     }
 }
 
+/* The uptime, driven through its own task rather than through the clock: the thing worth
+   proving is the carry, and a test that waited for it would take a day. Counting is what
+   replaced dividing a millisecond counter down, which ran out after 45 days on a field a
+   wall clock outlives - so the boundaries checked here are the three carries and the fact
+   that a day's worth of ticks lands exactly on one day, not near it. */
+void testUptimeCountsWithoutWrapping()
+{
+    Uptime& uptime = Uptime::getInstance();
+
+    expect(uptime.getDays() == 0u && uptime.getHours() == 0u && uptime.getMinutes() == 0u,
+           "a clock that just started has been up for no time at all");
+
+    for(unsigned int second = 0u; second < 59u; second++) { uptime.task(); }
+    expect(uptime.getMinutes() == 0u, "the minute must not turn before the sixtieth second");
+    uptime.task();
+    expect(uptime.getMinutes() == 1u, "and must turn on it");
+
+    /* On to the hour, from the one minute already counted. */
+    for(unsigned int second = 0u; second < 59u * 60u; second++) { uptime.task(); }
+    expect(uptime.getHours() == 1u && uptime.getMinutes() == 0u,
+           "sixty minutes must be one hour and no minutes");
+
+    for(unsigned int second = 0u; second < 23u * 60u * 60u; second++) { uptime.task(); }
+    expect(uptime.getDays() == 1u && uptime.getHours() == 0u && uptime.getMinutes() == 0u,
+           "twenty-four hours must be one day exactly");
+
+    /* A second day, because a carry that works once can still be a carry that only works
+       from zero. */
+    for(unsigned int second = 0u; second < 24u * 60u * 60u; second++) { uptime.task(); }
+    expect(uptime.getDays() == 2u && uptime.getHours() == 0u && uptime.getMinutes() == 0u,
+           "and the day after it must follow the same way");
+}
+
 /* The premise of driving the display off the word set instead of off the minute: a
    word change happens on every five-minute step and on none of the minutes between,
    over the whole day rather than at a few sample times. */
@@ -931,6 +965,7 @@ int main()
     testRegionalWordings();
     testOverlayPeriodAndEndurance();
     testSchedulerSpeedRoundTrip();
+    testUptimeCountsWithoutWrapping();
     testWordsChangeOnFiveMinuteStepsOnly();
     testInvalidTimeIsRejected();
     testClockModes();

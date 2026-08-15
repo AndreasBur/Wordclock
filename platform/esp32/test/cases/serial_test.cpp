@@ -3,6 +3,7 @@
    come out one line at a time. */
 #include "Arduino.h"
 #include "Communication.h"
+#include "Uptime.h"
 #include "Version.h"
 #include "check.h"
 #include <cstdio>
@@ -81,15 +82,17 @@ int main()
     /* The status command answers with values and takes none. Every field that has nothing
        behind it comes back empty rather than as a zero that reads like a value - here the
        temperature, with no chip on the bus, and the two network fields. */
-    check(answerTo("12\n") == "12 V=" WORDCLOCK_VERSION " U=0 I=1 T= A= Q= M=0",
+    check(answerTo("12\n") == "12 V=" WORDCLOCK_VERSION " U=0 H=0 N=0 I=1 T= A= Q= M=0",
           "the status answers every field, and the ones with no answer empty");
-    check(answerTo("12 -V1\n") == "12 Error=3:V V=" WORDCLOCK_VERSION " U=0 I=1 T= A= Q= M=0",
+    check(answerTo("12 -V1\n") == "12 Error=3:V V=" WORDCLOCK_VERSION " U=0 H=0 N=0 I=1 T= A= Q= M=0",
           "a value sent to a read-only field is refused as an unknown option");
 
-    /* The uptime is the one of them a host can produce. */
-    TestMillis = 3u * 60u * 1000u;
-    check(answerTo("12\n") == "12 V=" WORDCLOCK_VERSION " U=3 I=1 T= A= Q= M=0",
-          "the uptime is reported in minutes");
+    /* The uptime is the one of them a host can produce. Driven through the counter's own
+       task rather than by moving millis(), which is the point of the change: nothing
+       divides a millisecond count down any more, so nothing wraps when that count does. */
+    for(unsigned int Second = 0u; Second < 3u * 60u; Second++) { Uptime::getInstance().task(); }
+    check(answerTo("12\n") == "12 V=" WORDCLOCK_VERSION " U=0 H=0 N=3 I=1 T= A= Q= M=0",
+          "the uptime is reported as days, hours and minutes");
 
     /* The network command, which is the one that used to be a reflash. What can be checked
        on a host is the whole path except the radio: a pair goes in, the store keeps it, and

@@ -27,6 +27,7 @@
 #include "Communication.h"
 #include "Overlays.h"
 #include "Persistence.h"
+#include "Uptime.h"
 #include "Temperature.h"
 #include "Text.h"
 
@@ -103,6 +104,7 @@ void Scheduler::triggerTasks()
     /* last, so what it compares against the store is a settled state rather than one from
        the middle of this tick's pass */
     if(isDue(TASK_ID_PERSISTENCE, Persistence::getInstance().getTaskCycle())) { Persistence::getInstance().task(); }
+    if(isDue(TASK_ID_UPTIME, Uptime::getInstance().getTaskCycle())) { Uptime::getInstance().task(); }
 } /* triggerTasks */
 
 /******************************************************************************************************************************************************
