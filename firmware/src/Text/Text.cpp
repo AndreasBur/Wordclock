@@ -117,7 +117,7 @@ void Text::setCharFast(byte Column, byte Row, char Char, FontType Font)
 #if(TEXT_SUPPORT_FONT_9X10 == STD_ON)
     if(Font == FONT_9X10) {
         FontLucidaSans9x10::FontCharType FontChar = Font9x10.getCharFast(fontIndex);
-        setCharFontVertical(Column, Row, FontChar, FONT_LUCIDA_SANS_9X10_HEIGHT);
+        setCharFontVerticalFast(Column, Row, FontChar, FONT_LUCIDA_SANS_9X10_HEIGHT);
     }
 #endif
 #if(TEXT_SUPPORT_FONT_10X10 == STD_ON)

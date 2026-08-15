@@ -121,10 +121,15 @@ class Text
     ~Text() { }
 
 
+    /* Each of these four has a *Fast twin below that differs in nothing a reader sees, so
+       calling the checked one from the fast path costs its bounds checks and looks right.
+       That happened once, in setCharFast()'s 9x10 branch. [[nodiscard]] is what makes it
+       not happen again: the checked ones exist to answer, and the fast path has nothing to
+       do with an answer, so discarding one is the mistake itself rather than a symptom. */
     template <typename RowType, byte RowsSize>
-    StdReturnType setCharFontHorizontal(byte, byte, const FontCharHorizontal<RowType, RowsSize>&, byte);
+    [[nodiscard]] StdReturnType setCharFontHorizontal(byte, byte, const FontCharHorizontal<RowType, RowsSize>&, byte);
     template <typename RowType>
-    StdReturnType setCharRow(RowType, byte, byte, byte);
+    [[nodiscard]] StdReturnType setCharRow(RowType, byte, byte, byte);
 
     template <typename RowType, byte RowsSize>
     void setCharFontHorizontalFast(byte, byte, const FontCharHorizontal<RowType, RowsSize>&, byte);
@@ -132,9 +137,9 @@ class Text
     void setCharRowFast(RowType, byte, byte, byte);
 
     template <typename ColumnType, byte ColumnsSize>
-    StdReturnType setCharFontVertical(byte, byte, const FontCharVertical<ColumnType, ColumnsSize>&, byte);
+    [[nodiscard]] StdReturnType setCharFontVertical(byte, byte, const FontCharVertical<ColumnType, ColumnsSize>&, byte);
     template <typename ColumnType>
-    StdReturnType setCharColumn(ColumnType, byte, byte, byte);
+    [[nodiscard]] StdReturnType setCharColumn(ColumnType, byte, byte, byte);
 
     template <typename ColumnType, byte ColumnsSize>
     void setCharFontVerticalFast(byte, byte, const FontCharVertical<ColumnType, ColumnsSize>&, byte);
