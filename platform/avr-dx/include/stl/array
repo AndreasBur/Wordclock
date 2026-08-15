@@ -1,0 +1,87 @@
+/******************************************************************************************************************************************************
+ *  COPYRIGHT
+ *  ---------------------------------------------------------------------------------------------------------------------------------------------------
+ *  \verbatim
+ *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
+ *
+ *  \endverbatim
+ *  ---------------------------------------------------------------------------------------------------------------------------------------------------
+ *  FILE DESCRIPTION
+ *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
+/**     \file       array
+ *      \brief      std::array for a toolchain that ships no libstdc++, see stl/type_traits
+ *
+ *      \details    An aggregate holding one C array, which is what the standard's is too.
+ *                  That is load-bearing rather than incidental: the core writes
+ *                  PixelsBuffer{0u} and TaskCycles{}, and a class with a declared
+ *                  constructor would stop being brace-initialisable that way.
+ *
+ *                  No at(), because it throws and this backend is built with
+ *                  -fno-exceptions; the core does not call it.
+ *
+******************************************************************************************************************************************************/
+#ifndef _STL_ARRAY_
+#define _STL_ARRAY_
+
+#include <stddef.h>
+
+namespace std {
+
+template<class T, size_t N>
+struct array {
+    /* Public and named with the standard's underscore, because an aggregate has no other
+       way to hold its storage - the brace initialisers in the core reach it directly. */
+    T _M_elems[N];
+
+    using value_type = T;
+    using size_type = size_t;
+    using iterator = T*;
+    using const_iterator = const T*;
+
+    constexpr T& operator[](size_type Index) { return _M_elems[Index]; }
+    constexpr const T& operator[](size_type Index) const { return _M_elems[Index]; }
+
+    constexpr T* data() { return _M_elems; }
+    constexpr const T* data() const { return _M_elems; }
+
+    constexpr iterator begin() { return _M_elems; }
+    constexpr const_iterator begin() const { return _M_elems; }
+    constexpr iterator end() { return _M_elems + N; }
+    constexpr const_iterator end() const { return _M_elems + N; }
+
+    constexpr T& front() { return _M_elems[0]; }
+    constexpr const T& front() const { return _M_elems[0]; }
+    constexpr T& back() { return _M_elems[N - 1u]; }
+    constexpr const T& back() const { return _M_elems[N - 1u]; }
+
+    constexpr size_type size() const { return N; }
+    constexpr size_type max_size() const { return N; }
+    constexpr bool empty() const { return N == 0u; }
+
+    void fill(const T& Value) {
+        for(size_type Index = 0u; Index < N; Index++) { _M_elems[Index] = Value; }
+    }
+};
+
+template<class T, size_t N>
+constexpr bool operator==(const array<T, N>& Left, const array<T, N>& Right)
+{
+    for(size_t Index = 0u; Index < N; Index++) {
+        if(!(Left[Index] == Right[Index])) { return false; }
+    }
+    return true;
+}
+
+template<class T, size_t N>
+constexpr bool operator!=(const array<T, N>& Left, const array<T, N>& Right)
+{
+    return !(Left == Right);
+}
+
+} // namespace std
+
+#endif // _STL_ARRAY_
+
+/******************************************************************************************************************************************************
+ *  E N D   O F   F I L E
+******************************************************************************************************************************************************/

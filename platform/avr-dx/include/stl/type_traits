@@ -1,0 +1,104 @@
+/******************************************************************************************************************************************************
+ *  COPYRIGHT
+ *  ---------------------------------------------------------------------------------------------------------------------------------------------------
+ *  \verbatim
+ *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
+ *
+ *  \endverbatim
+ *  ---------------------------------------------------------------------------------------------------------------------------------------------------
+ *  FILE DESCRIPTION
+ *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
+/**     \file       type_traits
+ *      \brief      The traits the firmware core uses, for a toolchain that ships no libstdc++
+ *
+ *      \details    avr-gcc comes with avr-libc, which is a C library: there is no <array>,
+ *                  no <limits> and no <type_traits> behind it. The core needs a handful of
+ *                  names from each, so this directory supplies exactly those and nothing
+ *                  more.
+ *
+ *                  Written here rather than taken from the STL vendored in the old xmega
+ *                  project: that one predates C++11 in the places that matter. Its
+ *                  numeric_limits::max() is not constexpr, which the core calls in constant
+ *                  expressions, and it has no is_base_of at all, which the CRTP bases assert
+ *                  on. Both would have had to be patched, and a patched copy of a 2016 STL
+ *                  is harder to reason about than fifty lines that say what is needed.
+ *
+ *                  The traits below are the compiler's own built-ins wherever one exists,
+ *                  so they answer exactly what the language says rather than what a
+ *                  hand-written approximation would.
+ *
+******************************************************************************************************************************************************/
+#ifndef _STL_TYPE_TRAITS_
+#define _STL_TYPE_TRAITS_
+
+namespace std {
+
+template<class T, T v> struct integral_constant {
+    static constexpr T value{v};
+    using value_type = T;
+    using type = integral_constant;
+    constexpr operator value_type() const { return value; }
+};
+
+using true_type = integral_constant<bool, true>;
+using false_type = integral_constant<bool, false>;
+
+template<bool B, class T = void> struct enable_if { };
+template<class T> struct enable_if<true, T> { using type = T; };
+template<bool B, class T = void> using enable_if_t = typename enable_if<B, T>::type;
+
+template<class T> struct remove_cv { using type = T; };
+template<class T> struct remove_cv<const T> { using type = T; };
+template<class T> struct remove_cv<volatile T> { using type = T; };
+template<class T> struct remove_cv<const volatile T> { using type = T; };
+template<class T> using remove_cv_t = typename remove_cv<T>::type;
+
+template<class T, class U> struct is_same : false_type { };
+template<class T> struct is_same<T, T> : true_type { };
+
+/* __is_base_of rather than a hand-rolled conversion test: the built-in also answers
+   correctly for private and ambiguous bases, which is what the CRTP assertions are
+   guarding against in the first place. */
+template<class Base, class Derived> struct is_base_of : integral_constant<bool, __is_base_of(Base, Derived)> { };
+
+/* Listed out rather than asked of the compiler: GCC 14 has no __is_integral built-in for
+   this target, and enumerating the fundamental types is the portable answer. The list is
+   the language's, not the core's - a trait that only knew the types used today would
+   silently answer false for the next one. */
+template<class T> struct is_integral_helper : false_type { };
+template<> struct is_integral_helper<bool> : true_type { };
+template<> struct is_integral_helper<char> : true_type { };
+template<> struct is_integral_helper<signed char> : true_type { };
+template<> struct is_integral_helper<unsigned char> : true_type { };
+template<> struct is_integral_helper<wchar_t> : true_type { };
+template<> struct is_integral_helper<char16_t> : true_type { };
+template<> struct is_integral_helper<char32_t> : true_type { };
+template<> struct is_integral_helper<short> : true_type { };
+template<> struct is_integral_helper<unsigned short> : true_type { };
+template<> struct is_integral_helper<int> : true_type { };
+template<> struct is_integral_helper<unsigned int> : true_type { };
+template<> struct is_integral_helper<long> : true_type { };
+template<> struct is_integral_helper<unsigned long> : true_type { };
+template<> struct is_integral_helper<long long> : true_type { };
+template<> struct is_integral_helper<unsigned long long> : true_type { };
+template<class T> struct is_integral : is_integral_helper<remove_cv_t<T>> { };
+
+template<class T> struct is_floating_point_helper : false_type { };
+template<> struct is_floating_point_helper<float> : true_type { };
+template<> struct is_floating_point_helper<double> : true_type { };
+template<> struct is_floating_point_helper<long double> : true_type { };
+template<class T> struct is_floating_point : is_floating_point_helper<remove_cv_t<T>> { };
+
+/* Deliberately not __is_signed: that built-in answers true for floating-point types as
+   well, while the core pairs is_signed with is_integral to pick an integer conversion.
+   Comparing T(-1) against T(0) keeps the answer to what the parsers mean by it. */
+template<class T> struct is_signed : integral_constant<bool, is_integral<T>::value && (T(-1) < T(0))> { };
+template<class T> struct is_unsigned : integral_constant<bool, is_integral<T>::value && (T(0) < T(-1))> { };
+
+} // namespace std
+
+#endif // _STL_TYPE_TRAITS_
+
+/******************************************************************************************************************************************************
+ *  E N D   O F   F I L E
+******************************************************************************************************************************************************/

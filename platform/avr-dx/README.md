@@ -1,13 +1,12 @@
-# Hardware platform (interface contract — xmega, not implemented)
+# AVR Dx platform (AVR128DA48)
 
-This directory is a **placeholder** for an xmega backend of the Wordclock firmware.
-It is intentionally empty of code: that port would have to be built and tested on
-the real xmega hardware with the AVR toolchain, which is out of scope for the
-desktop tooling in this repo.
+The on-device backend the xmega project became. It runs the same
+[`../../firmware/`](../../firmware/) core as the simulator and the ESP32, on an
+AVR128DA48, and drives the strip the way the xmega did: the WS2812 pulse widths are
+made in hardware, not counted in software.
 
-The document below is still the description of the platform seam, and worth reading
-as such. For a backend that exists, see [`../esp32/`](../esp32/) — the xmega is no
-longer the intended target.
+This directory also carries the description of the platform seam, which is worth
+reading whatever backend you are working on.
 
 ## How the platform seam works
 
@@ -34,18 +33,18 @@ changes between platforms — this is a compile-time swap with zero runtime cost
 The simulator backend in [`../simulator/`](../simulator/) is the reference
 implementation to mirror.
 
-## What a hardware backend must provide
+## What a backend must provide
 
-| Header / unit | Contract | Hardware implementation |
-|---------------|----------|-------------------------|
-| `Arduino.h` | `byte`, `boolean`, `F()`, `PROGMEM`, `pgm_read_byte`, `memcpy_P`, `bitRead`, `itoa`, and a `Serial` object exposing `print` / `println` / `available` / `read` | The real Arduino/AVR core |
-| `Pixels.h` | `Pixels` singleton: `getInstance`, `setPixel(Fast)` / `clearPixel(Fast)` / `getPixel(Fast)`, `setBrightness`, `show`, `clearPixels`, `init(pin)`; also doubles as the serial console (`print`/`read`) | WS2812 LED driver + UART |
-| `RealTimeClock.h` | `RealTimeClock` singleton holding a `ClockDateTime`; the core only *reads* it via `getDateTime()` | Feed `setDateTime()` from an RTC chip (e.g. DS3231) |
-| `BH1750.h` | Ambient-light driver exposing the illuminance reading the core consumes | BH1750 over I²C |
-| `DS3231.h` | `DS3231` with `getTaskCycle`, `task`, and `getTemperature(TemperatureType&)` in tenths of a degree Celsius. The return code is the contract: `E_NOT_OK` until a reading has arrived, which is what a board without the chip keeps answering and what keeps the temperature overlay away | DS3231 temperature registers over I²C |
-| `Storage.h` | `Storage` singleton with a `Capacity` and `read` / `write` / `clear` over one byte blob; `Persistence` owns the format inside it, so this only has to store what it is given and refuse a blob of another length | EEPROM, flash, or an NVS partition |
-| `System.h` | `System` singleton: `getUptimeInMinutes`, `getFreeMemoryInKibibytes`, `getNetworkAddress`, `getLinkQuality` for the status command, and `restart` / `resynchroniseTime` / `reconnectNetwork` for the procedures. Every one of them may answer `E_NOT_OK`, and a backend that cannot do a thing has to — a clock with no network has no address, and the status command sends an empty field rather than a zero. `restart()` only asks; the application carries it out on its next tick, after the answer has gone out | The controller's own reset, the SNTP client and the WiFi driver |
-| app entry point | Equivalent of the simulator's `WordclockApp` / `WordclockMain`: initialise, restore the settings with `Persistence::load()`, then repeatedly tick `Scheduler::task()` and update the `RealTimeClock` | AVR `main()` / `setup()` + `loop()` |
+| Header / unit | Contract | Here |
+|---------------|----------|------|
+| `Arduino.h` | `byte`, `boolean`, `F()`, `PROGMEM`, `pgm_read_byte`, `memcpy_P`, `bitRead`, `itoa`, and a `Serial` object exposing `print` / `println` / `available` / `read` | avr-libc directly, plus a non-virtual `SerialPort` on USART1 |
+| `Pixels.h` | `Pixels` singleton: `getInstance`, `setPixel(Fast)` / `clearPixel(Fast)` / `getPixel(Fast)`, `setBrightness`, `show`, `clearPixels`, `init(pin)` | Buffer and brightness; `render()` hands the frame to `WS2812` |
+| `RealTimeClock.h` | `RealTimeClock` singleton holding a `ClockDateTime`; the core only *reads* it via `getDateTime()` | Read from the DS3231 once a second, written through on a command |
+| `BH1750.h` | Ambient-light driver exposing the illuminance reading the core consumes | BH1750 over TWI1 |
+| `DS3231.h` | `DS3231` with `getTaskCycle`, `task`, and `getTemperature(TemperatureType&)` in tenths of a degree Celsius. The return code is the contract: `E_NOT_OK` until a reading has arrived, which is what a board without the chip keeps answering and what keeps the temperature overlay away | DS3231 over TWI1, register handling shared with the ESP32 backend |
+| `Storage.h` | `Storage` singleton with a `Capacity` and `read` / `write` / `clear` over one byte blob; the core owns the format inside it, so this only has to store what it is given and refuse a blob of another length | On-chip EEPROM, length byte in front of the blob |
+| `System.h` | `System` singleton: `getUptimeInMinutes`, `getFreeMemoryInKibibytes`, `getNetworkAddress`, `getLinkQuality` for the status command, and `restart` / `resynchroniseTime` / `reconnectNetwork` for the procedures. Every one of them may answer `E_NOT_OK`, and a backend that cannot do a thing has to — a clock with no network has no address, and the status command sends an empty field rather than a zero. `restart()` only asks; the application carries it out on its next tick, after the answer has gone out | Uptime and free memory are real; everything about a network answers `E_NOT_OK` |
+| app entry point | Equivalent of the simulator's `WordclockApp` / `WordclockMain`: initialise, restore the settings with `Persistence::load()`, then repeatedly tick `Scheduler::task()` and update the `RealTimeClock` | `main()` in [`src/main.cpp`](src/main.cpp) |
 
 The tick has to come every `Scheduler::getTaskIntervalMs()` milliseconds: every
 module's task cycle counts in that unit, so a tick at another rate silently
@@ -55,18 +54,96 @@ does; a backend whose timer cannot be set that freely changes
 `SCHEDULER_TASK_INTERVAL_MS` instead. Note that the BH1750 needs roughly 120 ms
 per high-resolution conversion, which its task cycle must stay above.
 
-## Suggested port path
+## Building
 
-For an **xmega** target: reuse the concrete drivers already present in
-[`../../Wordclock_xmegaForArduino/`](../../Wordclock_xmegaForArduino/) (WS2812,
-RTC, I²C, ArduinoCore) and adapt them to the interfaces above. That project
-currently builds an **older** firmware architecture; the work is to retarget its
-drivers at today's `firmware/` core, then build and flash with the AVR toolchain.
+Debian's `gcc-avr` and `avr-libc` already know this device, so no Microchip device
+pack is needed:
 
-That advice does not carry over to [`../esp32/`](../esp32/), which is why none of
-those three drivers appear there. The RMT peripheral generates the WS2812 pulses in
-hardware, so the xmega's 800-line USART-as-SPI bit pusher has no counterpart; the
-time comes from SNTP rather than from an RTC chip; and I²C comes with the Arduino
-core. Only the BH1750's register handling was worth carrying across.
+```bash
+make -C platform/avr-dx
+make -C platform/avr-dx flash        # over UPDI, via pymcuprog
+```
 
-**Status:** contract only. Nothing here compiles or runs yet.
+For a Dx part avr-libc does not know, point `DFP` at an unpacked `.atpack`:
+
+```bash
+make -C platform/avr-dx DFP=/path/to/Microchip.AVR-Dx_DFP MCU=avr64dd32
+```
+
+Current size, of 128 KiB flash and 16 KiB RAM:
+
+```
+Program:   43950 bytes (34%)
+Data:       1549 bytes (9%)
+```
+
+`-flto` is on by default and worth 9 KiB of that: the same build without it is
+53 272 bytes. It fits either way here, but that margin is the difference between
+fitting and not on a smaller part.
+
+## The strip
+
+The interesting part, and the reason this is an AVR Dx rather than a bigger xmega.
+
+The xmega E5 shaped the WS2812 pulses with its XCL: a one-shot timer carrying both
+pulse widths in `PERCAPTL` and `CMPL`, and a LUT muxing them against the data line,
+fed by EDMA so the processor did nothing at all. XCL exists only in the E series,
+which stops at 32 KiB of flash — and today's core alone needs more than that.
+
+The AVR Dx has the LUT back, as CCL, so the idea survives:
+
+```
+USART0 (SPI host)   clocks the pixel bytes out at 800 kbit/s
+XCK edge            starts both one-shots through the event system
+TCB1                the short pulse, a zero bit
+TCB2                the long pulse, a one bit
+CCL LUT0            out = TXD ? TCB2 : TCB1, truth table 0xE4, output on PA3
+```
+
+Two timers rather than the E5's one, because a TCB carries a single compare value
+where the XCL carried two.
+
+What no AVR Dx has is DMA, so the bytes are fed by an interrupt — one per 10 µs,
+about 3.3 ms for a full frame. That is affordable precisely because the pulse
+shaping is in hardware: a late byte stretches the gap between bytes, it does not
+deform a pulse. The gap is the budget instead, and it has to stay under the WS2812's
+50 µs reset time, which is why the strip's interrupt is the one raised to
+`CPUINT.LVL1VEC` and why every other handler in this backend is kept short.
+
+### Pins
+
+| | |
+|---|---|
+| `PA0` | USART0 TXD, into the CCL — *not* the strip |
+| `PA2` | USART0 XCK, into the event system |
+| `PA3` | **CCL LUT0 output — the strip's data line** |
+| `PC0` / `PC1` | USART1 TXD / RXD, the console at 115200 baud |
+| `PF2` / `PF3` | TWI1 SDA / SCL, the DS3231 and the BH1750 |
+
+TWI1 rather than TWI0 is forced: TWI0 can only reach PA2 and PA3, which the strip
+already uses.
+
+## Status
+
+Everything here builds and links. **The timing has not been on an oscilloscope.**
+Before trusting a first board, check three things:
+
+1. the two pulse widths, 333 ns and 917 ns at 24 MHz;
+2. that the data bit is stable when the one-shots fire — `UCPHA` in
+   [`src/WS2812.cpp`](src/WS2812.cpp);
+3. whether the CCL sees the TCB waveforms without their pin outputs enabled. The
+   data sheet does not say, and it is the one register decision here that was not
+   derivable from it.
+
+## Notes for anyone reading the old xmega project
+
+[`../../Wordclock_xmegaForArduino/`](../../Wordclock_xmegaForArduino/) is the
+original, against an older firmware architecture. Two things in it no longer apply:
+
+- It builds with a GCC plugin, `avr-flash-vtbl`, to move C++ vtables out of RAM.
+  Not needed here: the core uses CRTP and has no virtual function anywhere, and
+  `SerialPort` deliberately has none either, so no vtable exists to move.
+- Its STL comes from the vendored copy under `ArduinoCore/include/util/STL`. This
+  backend brings its own minimal [`include/stl/`](include/stl/) instead — the
+  vendored `numeric_limits::max()` is not `constexpr`, which the core now requires,
+  and it has no `is_base_of` for the CRTP assertions.

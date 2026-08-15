@@ -14,7 +14,7 @@ enable_testing()
 # the firmware core.
 option(WORDCLOCK_BUILD_TESTS "Build the platform test executable" ON)
 
-set(PLATFORM simulator CACHE STRING "Target platform: simulator | esp32 | hardware")
+set(PLATFORM simulator CACHE STRING "Target platform: simulator | esp32 | avr-dx")
 
 if(PLATFORM STREQUAL "simulator")
     add_subdirectory(platform/simulator)
@@ -22,10 +22,10 @@ elseif(PLATFORM STREQUAL "esp32")
     message(FATAL_ERROR
         "The esp32 platform is built with PlatformIO, not CMake: "
         "pio run -t upload -d platform/esp32. See platform/esp32/README.md.")
-elseif(PLATFORM STREQUAL "hardware")
+elseif(PLATFORM STREQUAL "avr-dx")
     message(FATAL_ERROR
-        "The hardware platform is built with the AVR toolchain, not CMake. "
-        "See platform/hardware/README.md.")
+        "The avr-dx platform is built with the AVR toolchain, not CMake: "
+        "make -C platform/avr-dx. See platform/avr-dx/README.md.")
 else()
-    message(FATAL_ERROR "Unknown PLATFORM '${PLATFORM}' (expected: simulator | esp32 | hardware)")
+    message(FATAL_ERROR "Unknown PLATFORM '${PLATFORM}' (expected: simulator | esp32 | avr-dx)")
 endif()
