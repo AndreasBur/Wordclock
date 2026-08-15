@@ -76,6 +76,10 @@ class OverlayDate : public Overlay<OverlayDate>
        is a decision about this and not a silent inheritance of it. */
     bool isReady() const { return true; }
 
+    /* Nothing of its own: the string it shows is built from the current date on every
+       start, so there is no configuration here for a reset to undo. */
+    void resetOwnToDefaults() { }
+
     void showTask() { if(Text::getInstance().getState() == Text::STATE_IDLE) { setText(); } }
     void setText() { Text::getInstance().setTextWithShift(DateString, getFont()); }
 

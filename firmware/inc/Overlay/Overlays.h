@@ -242,6 +242,21 @@ class Overlays
 #endif
 
 	// methods
+    /* Every overlay back to what it starts with, the same way Display, Clock, Animations
+       and Illuminance answer Persistence::reset(). Here since the overlays are stored -
+       before that a reset had nothing of theirs to undo. */
+    void resetToDefaults() {
+#if (OVERLAYS_SUPPORT_DATE == STD_ON)
+        Date.resetToDefaults();
+#endif
+#if (OVERLAYS_SUPPORT_TEMPERATURE == STD_ON)
+        Temperature.resetToDefaults();
+#endif
+#if (OVERLAYS_SUPPORT_TEXT == STD_ON)
+        Text.resetToDefaults();
+#endif
+    }
+
 	void task();
 
     /* Show an overlay now instead of at its next period, and end the one that is

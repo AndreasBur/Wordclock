@@ -25,6 +25,7 @@
 #include "Clock.h"
 #include "Display.h"
 #include "Illuminance.h"
+#include "Overlays.h"
 #include "Storage.h"
 
 #include <string.h>
@@ -33,6 +34,30 @@
  *  LOCAL DATA TYPES AND STRUCTURES
 ******************************************************************************************************************************************************/
 namespace {
+
+/* What one overlay carries, which is the same set for all three - the base class owns it,
+   and only the text overlay adds anything on top. Every member is a byte, so this nests
+   into the struct below without disturbing its alignment. */
+struct OverlaySettingsType {
+    byte PeriodInMinutes;
+    byte EnduranceInSeconds;
+    byte Month;
+    byte Day;
+    byte ValidInDays;
+    byte Speed;
+    byte Font;
+    byte IsActive;
+};
+
+/* All three slots exist whether or not the build compiles the overlays in. Overlays'
+   own OverlayIdType is conditional and would have been the obvious index, which is
+   exactly why it is not used here: a layout that changed with OVERLAYS_SUPPORT_* would
+   let two builds write mutually unreadable blobs under the same version number, and the
+   version is the only thing that says which layout a blob has. */
+constexpr byte NumberOfOverlaySlots{3u};
+constexpr byte OverlaySlotDate{0u};
+constexpr byte OverlaySlotTemperature{1u};
+constexpr byte OverlaySlotText{2u};
 
 /* Every two-byte field comes first, so the struct needs no padding between its members
    and its layout follows from the declaration rather than from the compiler's alignment
@@ -58,6 +83,11 @@ struct SettingsType {
     byte AnimationsMode;
     byte AnimationId;
     byte AnimationTaskCycles[Animations::ANIMATION_ID_NUMBER_OF_ANIMATIONS];
+    OverlaySettingsType Overlays[NumberOfOverlaySlots];
+    /* The text overlay's own, and the only variable-length thing here - stored at its full
+       buffer size rather than length-prefixed, so the struct stays one fixed block that
+       memcmp and the checksum walk without knowing anything about its contents. */
+    char OverlayText[OVERLAY_TEXT_TEXT_SIZE];
     byte Checksum;
 };
 
@@ -70,8 +100,9 @@ constexpr uint16_t SettingsMagic{0x5743u};
    here, and a clock that comes up on its defaults says so more clearly than one that comes
    up with a field read out of the wrong offset.
      1  the first format
-     2  the "it is" rule, which used to be a compile-time switch */
-constexpr byte SettingsVersion{2u};
+     2  the "it is" rule, which used to be a compile-time switch
+     3  the three overlays and the text overlay's text */
+constexpr byte SettingsVersion{3u};
 
 static_assert(sizeof(SettingsType) <= Storage::Capacity,
               "Persistence: the settings no longer fit the store, please raise STORAGE_CAPACITY on every platform");
@@ -110,6 +141,97 @@ bool isValid(const SettingsType& Settings)
     if(Settings.Version != SettingsVersion) { return false; }
 
     return Settings.Checksum == calcChecksum(Settings);
+}
+
+/* One block per overlay rather than a loop: Overlays names its three flat, and the private
+   members a loop would need are not reachable from here. The blocks are guarded the same
+   way the accessors are, so a slot whose overlay is switched off stays at the zero the
+   struct was initialised with and reads back as a switched-off overlay. */
+void gatherOverlays(SettingsType& Settings)
+{
+    const Overlays& overlays = Overlays::getInstance();
+
+#if (OVERLAYS_SUPPORT_DATE == STD_ON)
+    OverlaySettingsType& Date = Settings.Overlays[OverlaySlotDate];
+    Date.PeriodInMinutes = overlays.getDatePeriodInMinutes();
+    Date.EnduranceInSeconds = overlays.getDateEnduranceInSeconds();
+    Date.Month = overlays.getDateMonth();
+    Date.Day = overlays.getDateDay();
+    Date.ValidInDays = overlays.getDateValidInDays();
+    Date.Speed = overlays.getDateSpeed();
+    Date.Font = static_cast<byte>(overlays.getDateFont());
+    Date.IsActive = overlays.getDateIsActive() ? 1u : 0u;
+#endif
+#if (OVERLAYS_SUPPORT_TEMPERATURE == STD_ON)
+    OverlaySettingsType& Temperature = Settings.Overlays[OverlaySlotTemperature];
+    Temperature.PeriodInMinutes = overlays.getTemperaturePeriodInMinutes();
+    Temperature.EnduranceInSeconds = overlays.getTemperatureEnduranceInSeconds();
+    Temperature.Month = overlays.getTemperatureMonth();
+    Temperature.Day = overlays.getTemperatureDay();
+    Temperature.ValidInDays = overlays.getTemperatureValidInDays();
+    Temperature.Speed = overlays.getTemperatureSpeed();
+    Temperature.Font = static_cast<byte>(overlays.getTemperatureFont());
+    Temperature.IsActive = overlays.getTemperatureIsActive() ? 1u : 0u;
+#endif
+#if (OVERLAYS_SUPPORT_TEXT == STD_ON)
+    OverlaySettingsType& Text = Settings.Overlays[OverlaySlotText];
+    Text.PeriodInMinutes = overlays.getTextPeriodInMinutes();
+    Text.EnduranceInSeconds = overlays.getTextEnduranceInSeconds();
+    Text.Month = overlays.getTextMonth();
+    Text.Day = overlays.getTextDay();
+    Text.ValidInDays = overlays.getTextValidInDays();
+    Text.Speed = overlays.getTextSpeed();
+    Text.Font = static_cast<byte>(overlays.getTextFont());
+    Text.IsActive = overlays.getTextIsActive() ? 1u : 0u;
+
+    StringTools::stringCopy(Settings.OverlayText, overlays.getTextText(), OVERLAY_TEXT_TEXT_SIZE);
+#endif
+}
+
+void applyOverlays(const SettingsType& Settings)
+{
+    Overlays& overlays = Overlays::getInstance();
+
+#if (OVERLAYS_SUPPORT_DATE == STD_ON)
+    const OverlaySettingsType& Date = Settings.Overlays[OverlaySlotDate];
+    overlays.setDateMonth(Date.Month);
+    overlays.setDateDay(Date.Day);
+    overlays.setDateValidInDays(Date.ValidInDays);
+    overlays.setDateSpeed(Date.Speed);
+    /* The three that validate what they are given are left to refuse a value the store
+       should never have held - the setting then stays at its default, which is the same
+       answer a blob from another build gets. */
+    (void)overlays.setDatePeriodInMinutes(Date.PeriodInMinutes);
+    (void)overlays.setDateEnduranceInSeconds(Date.EnduranceInSeconds);
+    (void)overlays.setDateFont(static_cast<Text::FontType>(Date.Font));
+    overlays.setDateIsActive(Date.IsActive != 0u);
+#endif
+#if (OVERLAYS_SUPPORT_TEMPERATURE == STD_ON)
+    const OverlaySettingsType& Temperature = Settings.Overlays[OverlaySlotTemperature];
+    overlays.setTemperatureMonth(Temperature.Month);
+    overlays.setTemperatureDay(Temperature.Day);
+    overlays.setTemperatureValidInDays(Temperature.ValidInDays);
+    overlays.setTemperatureSpeed(Temperature.Speed);
+    (void)overlays.setTemperaturePeriodInMinutes(Temperature.PeriodInMinutes);
+    (void)overlays.setTemperatureEnduranceInSeconds(Temperature.EnduranceInSeconds);
+    (void)overlays.setTemperatureFont(static_cast<Text::FontType>(Temperature.Font));
+    overlays.setTemperatureIsActive(Temperature.IsActive != 0u);
+#endif
+#if (OVERLAYS_SUPPORT_TEXT == STD_ON)
+    const OverlaySettingsType& Text = Settings.Overlays[OverlaySlotText];
+    overlays.setTextMonth(Text.Month);
+    overlays.setTextDay(Text.Day);
+    overlays.setTextValidInDays(Text.ValidInDays);
+    overlays.setTextSpeed(Text.Speed);
+    (void)overlays.setTextPeriodInMinutes(Text.PeriodInMinutes);
+    (void)overlays.setTextEnduranceInSeconds(Text.EnduranceInSeconds);
+    (void)overlays.setTextFont(static_cast<Text::FontType>(Text.Font));
+
+    /* The text before the switch, so an overlay that comes back active comes back with
+       what it is meant to show rather than with the previous run's text for one period. */
+    overlays.setTextText(Settings.OverlayText, OVERLAY_TEXT_TEXT_SIZE);
+    overlays.setTextIsActive(Text.IsActive != 0u);
+#endif
 }
 
 /* Read from the modules that own the settings, never from a copy kept here - a second
@@ -151,6 +273,8 @@ SettingsType gather()
     Settings.IlluminanceCalibrationMax = illuminance.getCalibrationValuesMaxValue();
     Settings.IlluminanceCalibrationMin = illuminance.getCalibrationValuesMinValue();
 
+    gatherOverlays(Settings);
+
     Settings.Checksum = calcChecksum(Settings);
     return Settings;
 }
@@ -186,6 +310,8 @@ void apply(const SettingsType& Settings)
     Illuminance& illuminance = Illuminance::getInstance();
     illuminance.setCalibrationValuesMaxValue(Settings.IlluminanceCalibrationMax);
     illuminance.setCalibrationValuesMinValue(Settings.IlluminanceCalibrationMin);
+
+    applyOverlays(Settings);
 }
 
 } // namespace
@@ -298,6 +424,7 @@ StdReturnType Persistence::reset()
     Clock::getInstance().resetToDefaults();
     Animations::getInstance().resetToDefaults();
     Illuminance::getInstance().resetToDefaults();
+    Overlays::getInstance().resetToDefaults();
 
     const StdReturnType ReturnValue = Storage::getInstance().clear();
 

@@ -84,9 +84,23 @@ It now shows the reading, and the decisions it needed came out as follows:
   ([Settings](../platform/simulator/include/sim/Settings.h)). The box is what makes the
   "no chip" state reachable without a chip to unplug.
 
-Left over: the overlay configuration is still not persisted, along with the other two
-overlays' — the stored format has no variable-length field for the text yet
-([Persistence.h](../firmware/inc/Persistence/Persistence.h)).
+~~Left over: the overlay configuration is still not persisted~~ **Done.** All three
+overlays are stored, the text included, at format version 3. What it settled:
+
+- **The text is a fixed field, not a length-prefixed one.** A variable field would have
+  saved some forty bytes and cost the property everything in
+  [Persistence.h](../firmware/inc/Persistence/Persistence.h) rests on: that the settings
+  are one fixed block, which `memcmp` compares and the checksum walks without knowing
+  what is in it.
+- **All three slots exist whether or not the build compiles the overlays in.**
+  `Overlays::OverlayIdType` is conditional and would have been the obvious index, which is
+  why it is not the one used — a layout that moved with `OVERLAYS_SUPPORT_*` would let two
+  builds write mutually unreadable blobs under the same version number.
+- **`STORAGE_CAPACITY` went to 256** on both platforms. The blob is 110 bytes, so the old
+  128 would still have held it, but only just.
+- **A reset now has overlays to undo**, so `Overlays::resetToDefaults()` joins the four
+  modules `Persistence::reset()` already asks. The defaults are named constants rather
+  than literals written twice, so the member initialisers and the reset cannot drift.
 
 ## 3. Status command
 
