@@ -11,7 +11,7 @@ core is emulated by a small shim in [include/Arduino.h](include/Arduino.h)
 (`Serial`, `PROGMEM`, `pgm_read_byte`, `itoa`, …), the pixel buffer lives in
 [src/Pixels.cpp](src/Pixels.cpp) and the matrix is drawn by
 [src/PixelsFrame.cpp](src/PixelsFrame.cpp). See
-[platform/hardware/README.md](../hardware/README.md) for the platform contract.
+[platform/avr-dx/README.md](../avr-dx/README.md) for the platform contract.
 
 ## What the window shows, and what it cannot
 

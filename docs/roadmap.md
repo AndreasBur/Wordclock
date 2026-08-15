@@ -66,7 +66,7 @@ It now shows the reading, and the decisions it needed came out as follows:
 - **The core reaches it as `Temperature`**
   ([Temperature.h](../firmware/inc/Temperature/Temperature.h)), the same arrangement as
   `Illuminance` and its `BH1750`, with `DS3231.h` added to the
-  [platform contract](../platform/hardware/README.md).
+  [platform contract](../platform/avr-dx/README.md).
 - **No reading, no overlay.** The reading comes with a return code rather than as a
   number, because a build without the chip has to be told apart from a reading of zero
   degrees. `Overlay::canShow()` asks before every start, so the overlay neither fires in
@@ -138,7 +138,7 @@ keys onto an interface that already exists and can be tested over the serial lin
 
 ## 5. Platform hooks
 
-**Done** — `System.h` is in the [contract](../platform/hardware/README.md), and with it the
+**Done** — `System.h` is in the [contract](../platform/avr-dx/README.md), and with it the
 procedures 31 to 33 (restart, resynchronise the time, reconnect the network) and the four
 status fields that only the platform knows: uptime, address, link quality, free memory.
 Three things it settled:

@@ -8,105 +8,103 @@
  *  ---------------------------------------------------------------------------------------------------------------------------------------------------
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       Scheduler.h
- *      \brief
+/**     \file       RealTimeClock.h
+ *      \brief      The time the core reads, kept by the clock chip
  *
- *      \details
+ *      \details    Simpler than the ESP32's counterpart, because there is nothing to
+ *                  reconcile: that backend has a network time and a chip and has to decide
+ *                  which of the two is right. Here the chip is the only source there is, so
+ *                  this reads it and hands on what it said.
+ *
+ *                  A command that sets the time writes through to the chip and keeps the
+ *                  value at once, rather than waiting for the next read to bring it back.
+ *                  Otherwise the answer to the command would still show the old time.
  *
 ******************************************************************************************************************************************************/
-#ifndef _SCHEDULER_H_
-#define _SCHEDULER_H_
+#ifndef _REAL_TIME_CLOCK_H_
+#define _REAL_TIME_CLOCK_H_
 
 /******************************************************************************************************************************************************
  * I N C L U D E S
 ******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Arduino.h"
-#include <array>
+#include "ClockDateTime.h"
+#include "DS3231.h"
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
-/* Scheduler configuration parameter */
-/* Milliseconds between two task() calls, and thereby the unit every module's task
-   cycle counts in. A platform whose tick comes from a timer it cannot set freely
-   overrides this; getTaskIntervalMs() is what the platform's tick source reads. */
-#define SCHEDULER_TASK_INTERVAL_MS          10u
+/* RealTimeClock configuration parameter */
+/* Application ticks between two reads of the chip, so once a second. A read is two
+   transfers on a bus the light sensor shares, and the display only ever shows minutes -
+   asking a hundred times a second would buy nothing. */
+#define REAL_TIME_CLOCK_CHIP_READ_INTERVAL              100u
 
 /******************************************************************************************************************************************************
- *  G L O B A L   F U N C T I O N   M A C R O S
+ *  C L A S S   R E A L   T I M E   C L O C K
 ******************************************************************************************************************************************************/
-
-
-/******************************************************************************************************************************************************
- *  C L A S S   S C H E D U L E R
-******************************************************************************************************************************************************/
-class Scheduler
+class RealTimeClock
 {
 /******************************************************************************************************************************************************
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-    /* One per task that triggerTasks() drives, and in the order it drives them. */
-    enum TaskIdType {
-        TASK_ID_ILLUMINANCE,
-        TASK_ID_TEMPERATURE,
-        TASK_ID_DISPLAY_MANAGER,
-        TASK_ID_ANIMATIONS,
-        TASK_ID_COMMUNICATION,
-        TASK_ID_OVERLAYS,
-        TASK_ID_TEXT,
-        TASK_ID_PERSISTENCE,
-        TASK_ID_NUMBER_OF_TASKS
-    };
+    using HourType = ClockDateTime::HourType;
+    using MinuteType = ClockDateTime::MinuteType;
+    using SecondType = ClockDateTime::SecondType;
+
+    using YearType = ClockDateTime::YearType;
+    using MonthType = ClockDateTime::MonthType;
+    using DayType = ClockDateTime::DayType;
+    using WeekdayType = ClockDateTime::WeekdayType;
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    static constexpr byte TaskIntervalMs{SCHEDULER_TASK_INTERVAL_MS};
+    static constexpr byte ChipReadInterval{REAL_TIME_CLOCK_CHIP_READ_INTERVAL};
 
-    using RemainingTicksType = byte;
-    std::array<RemainingTicksType, TASK_ID_NUMBER_OF_TASKS> RemainingTicks{};
+    ClockDateTime DateTime;
+    /* An instance of its own, next to the one the core's temperature side keeps. The chip
+       has no state that two readers could disturb, and both reach it through the same bus
+       driver. */
+    DS3231 Chip;
+    /* Zero, so the first tick asks the chip straight away rather than showing the default
+       date for a second. */
+    byte ChipReadCountdown{0u};
 
     // functions
-    bool isDue(TaskIdType, byte);
-    void triggerTasks();
+    RealTimeClock() {}
+    ~RealTimeClock() {}
+
+    StdReturnType readChip();
+    void writeChip();
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr Scheduler() { }
-    ~Scheduler() { }
+    static RealTimeClock& getInstance() {
+        static RealTimeClock SingletonInstance;
+        return SingletonInstance;
+    }
 
-	// get methods
-    static constexpr byte getTaskIntervalMs() { return TaskIntervalMs; }
+    // get methods
+    ClockDateTime getDateTime() const { return DateTime; }
+    ClockTime getTime() const { return DateTime.getTime(); }
+    ClockDate getDate() const { return DateTime.getDate(); }
 
-	// set methods
+    // set methods
+    void setDateTime(ClockDateTime sDateTime);
+    void setTime(ClockTime Time);
+    void setDate(ClockDate Date);
 
     // methods
     void task();
-    static constexpr byte convertSpeedToTaskCycle(byte Speed) {
-        if(Speed == 0u) { return 0u; }
-        return static_cast<byte>((UINT8_MAX - Speed) + 1u);
-    }
-    static constexpr byte convertTaskCycleToSpeed(byte TaskCycle) {
-        if(TaskCycle == 0u) { return 0u; }
-        return static_cast<byte>((UINT8_MAX - TaskCycle) + 1u);
-    }
-
 };
 
-static_assert(Scheduler::convertSpeedToTaskCycle(0u) == 0u, "Speed zero must stop the task");
-static_assert(Scheduler::convertSpeedToTaskCycle(1u) == UINT8_MAX, "Slowest speed must use the longest cycle");
-static_assert(Scheduler::convertSpeedToTaskCycle(UINT8_MAX - 1u) == 2u, "Second-fastest speed must use cycle two");
-static_assert(Scheduler::convertSpeedToTaskCycle(UINT8_MAX) == 1u, "Fastest speed must use cycle one");
-static_assert(Scheduler::convertTaskCycleToSpeed(0u) == 0u, "Cycle zero must report speed zero");
-static_assert(Scheduler::convertTaskCycleToSpeed(1u) == UINT8_MAX, "Cycle one must report the fastest speed");
-static_assert(Scheduler::convertTaskCycleToSpeed(UINT8_MAX) == 1u, "Longest cycle must report the slowest speed");
-
-#endif
+#endif // _REAL_TIME_CLOCK_H_
 
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E
