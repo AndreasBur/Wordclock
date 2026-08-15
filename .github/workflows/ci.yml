@@ -139,9 +139,12 @@ jobs:
 
       # The toolchain has to be named when the build directory is created: a compiler cannot
       # be swapped after project() has run, which is why -DPLATFORM=avr-dx alone refuses.
+      # -G Ninja for the same reason as the simulator job, and for one more: a plain Debian
+      # image has no make, so the generator CMake would otherwise default to is the one
+      # thing here that is not installed.
       - name: Configure
         run: |
-          cmake -B build-avr -S . -DPLATFORM=avr-dx \
+          cmake -B build-avr -S . -G Ninja -DPLATFORM=avr-dx \
                 -DCMAKE_TOOLCHAIN_FILE=platform/avr-dx/toolchain-avr.cmake
 
       # The size is printed by the link rule itself. It is the reason this part was chosen,
