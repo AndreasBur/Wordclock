@@ -401,8 +401,11 @@ void WebInterface::broadcastLine(const char* Line)
  *
  *                  Sent in the strip's own byte order, green first: it is what the buffer
  *                  already holds, and the page is told the shape by /display rather than
- *                  guessing it. Unlike the wx window, a browser can show the real colour -
- *                  that window renders brightness only.
+ *                  guessing it. Taken from the output pixel, so what goes out is dimmed the
+ *                  way the strip is - which is what lets the page blank itself when the
+ *                  display is switched off, without a redraw to tell it so. The page reads
+ *                  the bytes for that on/off state only and paints its own colour; the wx
+ *                  window is the colour-accurate view.
  *
  *  \return         -
 ******************************************************************************************************************************************************/

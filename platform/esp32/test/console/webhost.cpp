@@ -22,6 +22,7 @@
 #include "Arduino.h"
 #include "Communication.h"
 #include "Pixels.h"
+#include "Scheduler.h"
 #include "WebInterface.h"
 #include "WordclockMain.h"
 

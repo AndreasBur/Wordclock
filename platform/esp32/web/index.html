@@ -34,7 +34,6 @@
         --lit: #9a5b00;
         --unlit: #5f5f66;
         --matrix-unlit: #c4c4c4;
-        --matrix-unlit-stroke: transparent;
         --matrix-lit: #111116;
         --line: #dcdcd6;
         /* A console is read line by line, so it is capped rather than stretched: on a wide
@@ -52,7 +51,6 @@
             --lit: #ffb020;
             --unlit: #6a6a72;
             --matrix-unlit: #303038;
-            --matrix-unlit-stroke: transparent;
             --matrix-lit: #f2f2f4;
             --line: #26262b;
         }
@@ -65,7 +63,6 @@
         --lit: #ffb020;
         --unlit: #6a6a72;
         --matrix-unlit: #303038;
-        --matrix-unlit-stroke: transparent;
         --matrix-lit: #f2f2f4;
         --line: #26262b;
     }
@@ -166,13 +163,13 @@
            them, but a view one reads wants the grid visible - the same choice the wx window
            makes with its light grey. */
         color: var(--matrix-unlit);
-        -webkit-text-stroke: 1px var(--matrix-unlit-stroke);
         font-size: clamp(15px, 2vw, 21px);
         transition: color 90ms linear;
     }
+    /* Fixed rather than the pixel's own colour, so a word stays readable at every
+       brightness; see showFrame() for why the frame's colour is not painted. */
     #panel span.lit {
         color: var(--matrix-lit);
-        -webkit-text-stroke-color: transparent;
     }
     #panel[hidden] { display: none; }
     #builderNote { color: var(--unlit); font-style: italic; padding: 0 18px 12px; max-width: var(--content); margin-inline: auto; }
@@ -336,14 +333,19 @@
     }
 
     function showFrame(bytes) {
-        /* Green, red, blue - the strip's order, which is what the buffer holds. */
+        /* Green, red, blue - the strip's order, which is what the buffer holds.
+           Only whether a pixel is lit is taken from it, not its colour: the bytes arrive
+           already dimmed, so painting them would make a word at low brightness a dark
+           grey on a dark background - unreadable in exactly the case one opens this view
+           to read. The lit ones get a fixed high-contrast colour instead, and the wx
+           window stays the colour-accurate view. Brightness still shows here as the one
+           step that matters to a reader: at zero every byte is zero and the panel
+           blanks. */
         for (let index = 0; index < cells.length; index++) {
             const at = index * 3;
             const green = bytes[at], red = bytes[at + 1], blue = bytes[at + 2];
-            const lit = Boolean(red || green || blue);
 
-            cells[index].classList.toggle('lit', lit);
-            cells[index].style.setProperty('--pixel-color', `rgb(${red} ${green} ${blue})`);
+            cells[index].classList.toggle('lit', Boolean(red || green || blue));
         }
     }
 
