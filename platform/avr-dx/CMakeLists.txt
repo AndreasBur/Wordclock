@@ -11,8 +11,11 @@ set(AVR_MCU avr128da48 CACHE STRING "Target device")
 set(AVR_F_CPU 24000000 CACHE STRING "Peripheral clock in Hz, the timing constants are derived from it")
 # UPDI programmer for the flash target; pymcuprog names it, see its --help for the others.
 set(AVR_PROGRAMMER pkobn_updi CACHE STRING "pymcuprog tool name used by the flash target")
-# For a Dx part avr-libc does not know: an unpacked Microchip .atpack.
-set(AVR_DFP "" CACHE PATH "Optional Microchip device pack")
+# For a Dx part avr-libc does not know: an unpacked Microchip .atpack. Defaulted from the
+# environment so a container or a CI job can carry one without every build command having
+# to name it - which is not a nicety here, since the avr-gcc in Ubuntu 24.04 is 7.3 and does
+# not know avr128da48 at all.
+set(AVR_DFP "$ENV{AVR_DFP}" CACHE PATH "Optional Microchip device pack")
 
 set(FIRMWARE_DIR ${CMAKE_SOURCE_DIR}/firmware)
 

@@ -114,26 +114,41 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends cmake ninja-build gcc-avr avr-libc
 
-      # Asked before the build rather than discovered inside it. Whether a given avr-gcc
-      # knows this part is a property of its device-specs, and a build that runs into that
-      # fails somewhere in the middle with an error about a spec file - which reads like a
-      # broken checkout rather than a toolchain that is too old for the device. This runner
-      # carries gcc-avr 7.3 with Atmel's patches, against the 14.x a current dev container
-      # has, so the answer is not the same on both.
+      # This runner's avr-gcc is 7.3 with Atmel's patches, and it does not know this part:
+      # `avr-gcc -mmcu=avr128da48` answers "device-specs/specs-avr128da48: No such file or
+      # directory". A current dev container has 14.x, which does know it - so the device
+      # pack is not belt and braces here, it is what makes the job possible at all. Passed
+      # to CMake as AVR_DFP, the route platform/avr-dx/README.md documents for exactly this.
       #
-      # If this step is what goes red, the fix is in platform/avr-dx/README.md: point
-      # AVR_DFP at an unpacked Microchip .atpack and pass it to the configure step below.
+      # Pinned with its checksum rather than fetched latest, the same way the dev container
+      # takes gh: one file whose identity is visible in this file, at the cost of bumping
+      # the version by hand.
+      - name: Fetch the device pack
+        env:
+          DFP_VERSION: 2.8.343
+          DFP_SHA256: d81af59072e5ac188431e828461eee5c08e6d5f3ace32461328b4da0ec348746
+        run: |
+          curl -fsSL -o /tmp/dfp.atpack \
+            "https://packs.download.microchip.com/Microchip.AVR-Dx_DFP.${DFP_VERSION}.atpack"
+          echo "${DFP_SHA256}  /tmp/dfp.atpack" | sha256sum -c -
+          unzip -q /tmp/dfp.atpack -d /tmp/dfp
+
+      # Asked before the build rather than discovered inside it. Without the pack this is
+      # the line that says why; with it, it is the line that proves the pack took. A build
+      # that walks into a missing spec file instead stops in the middle with an error that
+      # reads like a broken checkout.
       - name: Check the toolchain knows the device
         run: |
           avr-gcc --version | head -1
-          avr-gcc -mmcu=avr128da48 -E -x c /dev/null -o /dev/null
+          avr-gcc -B /tmp/dfp/gcc/dev/avr128da48/ -mmcu=avr128da48 -E -x c /dev/null -o /dev/null
 
       # The toolchain has to be named when the build directory is created: a compiler cannot
       # be swapped after project() has run, which is why -DPLATFORM=avr-dx alone refuses.
       - name: Configure
         run: |
           cmake -B build-avr -S . -DPLATFORM=avr-dx \
-                -DCMAKE_TOOLCHAIN_FILE=platform/avr-dx/toolchain-avr.cmake
+                -DCMAKE_TOOLCHAIN_FILE=platform/avr-dx/toolchain-avr.cmake \
+                -DAVR_DFP=/tmp/dfp
 
       # The size is printed by the link rule itself. It is the reason this part was chosen,
       # so a change that stops fitting says so here rather than on somebody's bench.

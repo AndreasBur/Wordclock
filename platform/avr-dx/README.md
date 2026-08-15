@@ -69,9 +69,26 @@ cmake --build build-avr
 cmake --build build-avr --target flash     # over UPDI, via pymcuprog
 ```
 
-Debian's `gcc-avr` and `avr-libc` already know this device, so no Microchip device
-pack is needed. For a Dx part they do not know, point `AVR_DFP` at an unpacked
-`.atpack`:
+Whether the toolchain knows this device depends on how old it is, and the answer is
+not always yes. An `avr-gcc` from 12 onwards carries the specs — a current dev
+container has 14.x and needs nothing further. **Ubuntu 24.04 ships 7.3, which does
+not**, and says so like this:
+
+```
+avr-gcc: error: device-specs/specs-avr128da48: No such file or directory
+```
+
+That is worth asking before a build rather than meeting inside one, where it reads
+like a broken checkout:
+
+```bash
+avr-gcc -mmcu=avr128da48 -E -x c /dev/null -o /dev/null
+```
+
+When the answer is no, point `AVR_DFP` at an unpacked Microchip `.atpack`. The dev
+container carries one under `/opt/avr-dfp` and exports `AVR_DFP`, so the commands
+above work there as written; the CI job fetches the same pinned version. Setting it
+by hand looks like this, and is also how a Dx part other than this one is built:
 
 ```bash
 cmake -B build-avr -S . -DPLATFORM=avr-dx \
