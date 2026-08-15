@@ -56,30 +56,66 @@ per high-resolution conversion, which its task cycle must stay above.
 
 ## Building
 
+The same CMake as the simulator, with one difference: this backend cross-compiles,
+so its toolchain has to be named when the build directory is created. A compiler
+cannot be swapped afterwards, which is why `-DPLATFORM=avr-dx` on its own is not
+enough — and says so rather than failing later on a host compiler that does not
+know `-mmcu`.
+
+```bash
+cmake -B build-avr -S . -DPLATFORM=avr-dx \
+      -DCMAKE_TOOLCHAIN_FILE=platform/avr-dx/toolchain-avr.cmake
+cmake --build build-avr
+cmake --build build-avr --target flash     # over UPDI, via pymcuprog
+```
+
 Debian's `gcc-avr` and `avr-libc` already know this device, so no Microchip device
-pack is needed:
+pack is needed. For a Dx part they do not know, point `AVR_DFP` at an unpacked
+`.atpack`:
 
 ```bash
-make -C platform/avr-dx
-make -C platform/avr-dx flash        # over UPDI, via pymcuprog
+cmake -B build-avr -S . -DPLATFORM=avr-dx \
+      -DCMAKE_TOOLCHAIN_FILE=platform/avr-dx/toolchain-avr.cmake \
+      -DAVR_MCU=avr64dd32 -DAVR_DFP=/path/to/Microchip.AVR-Dx_DFP
 ```
 
-For a Dx part avr-libc does not know, point `DFP` at an unpacked `.atpack`:
-
-```bash
-make -C platform/avr-dx DFP=/path/to/Microchip.AVR-Dx_DFP MCU=avr64dd32
-```
-
-Current size, of 128 KiB flash and 16 KiB RAM:
+`AVR_F_CPU` and `AVR_PROGRAMMER` are cache variables too. The size is printed after
+every link rather than asked for, because the flash budget is the reason this part
+was chosen at all — currently, of 128 KiB flash and 16 KiB RAM:
 
 ```
-Program:   43950 bytes (34%)
+Program:   44016 bytes (34%)
 Data:       1549 bytes (9%)
 ```
 
 `-flto` is on by default and worth 9 KiB of that: the same build without it is
 53 272 bytes. It fits either way here, but that margin is the difference between
 fitting and not on a smaller part.
+
+## Debugging
+
+`-DCMAKE_BUILD_TYPE=Debug` builds with `-Og -g3` and without LTO — whole-program
+inlining leaves breakpoints on lines that no longer exist and locals the target
+cannot show, which is the opposite of what a debugger is for. `-g3` rather than
+`-g` so the configuration macros are visible too: most of the timing here is a
+macro derived from `F_CPU`.
+
+That image is 67 030 bytes, so it still fits with room to spare — 52 % of the
+flash rather than 34 %.
+
+The part debugs over UPDI. On an AVR128DA48 Curiosity Nano the on-board nEDBG is
+the debugger as well as the programmer, which is what `AVR_PROGRAMMER` defaults
+to; an Atmel-ICE or a PICkit 4 does the same job on a board of your own.
+
+Microchip Studio can debug the result without a project file of its own —
+**File → Open → Open Object File For Debugging**, pointed at
+`build-avr-dbg/platform/avr-dx/Wordclock.elf`. That keeps CMake as the single
+place the sources and include paths are listed. Importing the tree as a Studio
+project instead would mean maintaining those paths a second time, by hand, which
+is exactly what the old `.cproj` next door drifted on.
+
+*(Not verified here: Microchip Studio is Windows-only and no part of this
+container. The build and the debug information it needs are.)*
 
 ## The strip
 

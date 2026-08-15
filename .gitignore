@@ -2,6 +2,10 @@
 obj/
 bin/
 build/
+# A cross build needs its own directory, because the toolchain is fixed when that
+# directory is created and cannot be swapped afterwards - so avr-dx and the simulator
+# cannot share one.
+build-*/
 
 # CMake
 CMakeCache.txt

@@ -24,7 +24,7 @@ the word tables have to cover.
 | [assets/](assets/) | The icon's SVG masters and the script that generates the `.ico`, the `.xpm` and `docs/images/logo.png` from them. |
 | [platform/simulator/](platform/simulator/) | wxWidgets desktop backend: renders the matrix in a window so the firmware can be developed and debugged on a PC. |
 | [platform/esp32/](platform/esp32/) | On-device backend: WS2812 over the RMT peripheral, time from NTP. Built with PlatformIO — see its [README](platform/esp32/README.md). |
-| [platform/avr-dx/](platform/avr-dx/) | On-device backend for the AVR128DA48: WS2812 shaped by the CCL, time from a DS3231. Built with `make` — see its [README](platform/avr-dx/README.md). |
+| [platform/avr-dx/](platform/avr-dx/) | On-device backend for the AVR128DA48: WS2812 shaped by the CCL, time from a DS3231. Built with CMake and a cross toolchain file — see its [README](platform/avr-dx/README.md). |
 | [Wordclock_xmegaForArduino/](Wordclock_xmegaForArduino/) | The original xmega project (older firmware), kept as the reference the AVR Dx backend was ported from. |
 
 The tool that generates the bitmap font tables lives in its own repository,
@@ -72,11 +72,15 @@ pio run -t upload -d platform/esp32
 pio device monitor -d platform/esp32
 ```
 
-The `avr-dx` platform uses the AVR toolchain through a plain Makefile:
+The `avr-dx` platform uses the same CMake, but cross-compiles — so its toolchain
+has to be named when the build directory is created, because a compiler cannot be
+swapped afterwards:
 
 ```bash
-make -C platform/avr-dx
-make -C platform/avr-dx flash
+cmake -B build-avr -S . -DPLATFORM=avr-dx \
+      -DCMAKE_TOOLCHAIN_FILE=platform/avr-dx/toolchain-avr.cmake
+cmake --build build-avr
+cmake --build build-avr --target flash
 ```
 
 ## Checks
