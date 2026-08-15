@@ -79,10 +79,11 @@ and the second failure is the one that cannot be worked around:
   throughout. GCC 12 accepts them. Nothing short of making the core worse fixes
   that, so the answer is a newer compiler.
 
-Ubuntu 24.04 ships 7.3, so its `gcc-avr` will not do — **including in a dev container
-built from this repository's default base image**, which is that same Ubuntu. Debian
-trixie and Ubuntu 25.04 onwards carry 14.x, which is what CI uses and what this was
-developed against. One line says which one is in front of you:
+Ubuntu 24.04 ships 7.3, so its `gcc-avr` will not do. Debian trixie and Ubuntu 26.04
+carry 14.x, which is what CI uses and what this was developed against — and why the
+dev container's base image is `ubuntu26.04` rather than the `ubuntu-24.04` it started
+on. That container carries the toolchain, so nothing further is needed inside it. One
+line says which one is in front of you:
 
 ```bash
 avr-gcc --version | head -1

@@ -18,9 +18,14 @@
 # says separately that the builds pass and that the analysers are quiet.
 #
 # Not run through the dev container. devcontainers/ci would give exact parity with what a
-# developer has, at the price of building that image on every run; the packages below are
-# the same versions the image installs from the same Ubuntu, which is close enough for a
-# check that is meant to answer in minutes.
+# developer has, at the price of building that image on every run, and these jobs are meant
+# to answer in minutes.
+#
+# So the versions here are near what a developer has rather than equal to it, and the gap is
+# worth knowing: the runners are Ubuntu 24.04 where the dev container is 26.04, and the AVR
+# job is a Debian container for the reason given at that job. That gap has already reported
+# something true - cppcheck is older here than in the image, and the difference cost a red
+# badge over the format of the suppression file. Parity would have hidden it.
 name: CI
 
 on:
