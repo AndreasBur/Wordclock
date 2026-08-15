@@ -27,6 +27,7 @@
 #include "MessageCatalog.h"
 #include "WebInterface.h"
 #include "WebPage.h"
+#include "WordclockSerial.h"
 
 #include <string.h>
 #include <unistd.h>
@@ -50,6 +51,30 @@ void sendLineToClients(const char* Line)
 /******************************************************************************************************************************************************
  *  LOCAL FUNCTIONS
 ******************************************************************************************************************************************************/
+/* One Latin-1 byte as UTF-8, into Target, answering how many bytes that took. The whole of
+   Latin-1 widens by this one rule, so no table is needed: below 0x80 a byte is itself, and
+   above it becomes two.
+
+   Both ways out of here need it, for different reasons. The letters served by /display are
+   Latin-1 because the table holds one byte per letter, and JSON is UTF-8 - a raw 0xDC there
+   makes the whole document invalid rather than one letter wrong.
+
+   An answer line needs it for a harder reason: it leaves as a web socket *text* frame, and
+   RFC 6455 requires those to be valid UTF-8. A raw 0xF6 in one does not draw a wrong
+   character, it makes the browser close the connection. That is reachable rather than
+   theoretical - command 8 answers with the overlay text it was given, and an umlaut in that
+   text is exactly what the font tables carry umlauts for. */
+byte toUtf8(byte Latin1, char* Target)
+{
+    if(Latin1 < 0x80u) {
+        Target[0u] = static_cast<char>(Latin1);
+        return 1u;
+    }
+    Target[0u] = static_cast<char>(0xC0u | (Latin1 >> 6u));
+    Target[1u] = static_cast<char>(0x80u | (Latin1 & 0x3Fu));
+    return 2u;
+}
+
 /******************************************************************************************************************************************************
   handleRoot()
 ******************************************************************************************************************************************************/
@@ -225,15 +250,10 @@ esp_err_t handleDisplay(httpd_req_t* Request)
     Writer.put(",\"letters\":\"");
 
     for(byte Index = 0u; Index < DISPLAY_CHARACTERS_NUMBER_OF_CHARACTERS; Index++) {
-        const byte Letter = static_cast<byte>(Letters.getCharacterFast(Index));
+        char Utf8[2u];
+        const byte Length = toUtf8(static_cast<byte>(Letters.getCharacterFast(Index)), Utf8);
 
-        if(Letter < 0x80u) {
-            Writer.put(static_cast<char>(Letter));
-        } else {
-            /* The whole of Latin-1 widens by this rule, so the two umlauts need no table. */
-            Writer.put(static_cast<char>(0xC0u | (Letter >> 6u)));
-            Writer.put(static_cast<char>(0x80u | (Letter & 0x3Fu)));
-        }
+        for(byte Byte = 0u; Byte < Length; Byte++) { Writer.put(Utf8[Byte]); }
     }
 
     Writer.put("\"}");
@@ -376,10 +396,25 @@ void WebInterface::broadcastLine(const char* Line)
 {
     if((HttpServer == nullptr) || (Line == nullptr)) { return; }
 
+    /* Widened rather than sent as it stands - see toUtf8(). Two bytes per Latin-1 byte is
+       the worst case, so a line that is nothing but umlauts still fits and there is no
+       truncation to expect. Sized from the producer's own line length rather than from a
+       number of its own, because that is the buffer the line was assembled in.
+
+       The bound is still checked. Nothing longer can arrive today, but this takes a plain
+       pointer and the sink it is installed as is a function pointer - the day a second
+       producer appears, an assumption written only in a comment is the one that gives. */
+    char Payload[2u * WORDCLOCK_SERIAL_LINE_LENGTH];
+    size_t Used{0u};
+
+    for(const char* Character = Line; (*Character != '\0') && ((Used + 2u) <= sizeof(Payload)); Character++) {
+        Used += toUtf8(static_cast<byte>(*Character), &Payload[Used]);
+    }
+
     httpd_ws_frame_t Frame{};
     Frame.type = HTTPD_WS_TYPE_TEXT;
-    Frame.payload = reinterpret_cast<uint8_t*>(const_cast<char*>(Line));
-    Frame.len = strlen(Line);
+    Frame.payload = reinterpret_cast<uint8_t*>(Payload);
+    Frame.len = Used;
 
     if(Frame.len == 0u) { return; }
 
