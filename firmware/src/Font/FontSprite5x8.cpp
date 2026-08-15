@@ -141,6 +141,10 @@ const FontSprite5x8::FontTableType FontSprite5x8::FontTable PROGMEM
     FontTableElementType(4, {0b00100000, 0b01010110, 0b01010110, 0b01111000, 0b00000000}), // ä
     FontTableElementType(4, {0b00111000, 0b01000110, 0b01000110, 0b00111000, 0b00000000}), // ö
     FontTableElementType(4, {0b00111100, 0b01000010, 0b01000010, 0b01111100, 0b00000000}), // ü
+    /* Drawn by hand rather than regenerated: FontCreator rasterises the Windows faces this
+       table came from, so producing one new glyph with it would reproduce the other 102 as
+       whatever the host renders them - a diff over the whole file to add a ring. */
+    FontTableElementType(3, {0b00000010, 0b00000101, 0b00000010, 0b00000000, 0b00000000}), // °
 };
 
 

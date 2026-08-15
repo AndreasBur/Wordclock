@@ -59,7 +59,9 @@ static void testTemperature()
           "the read is addressed at the temperature register");
 
     check(overlays.showTemperatureNow() == E_OK, "with a reading the overlay starts");
-    check(strcmp(overlays.getTemperatureString(), "25.2C") == 0,
+    /* Split around the escape on purpose: "\xB0C" would swallow the C as a third hex digit
+       and stop compiling, which is the trap this string invites. */
+    check(strcmp(overlays.getTemperatureString(), "25.2\xB0" "C") == 0,
           "the overlay shows the reading with one decimal");
     check(overlays.abort() == E_OK, "the overlay ends again");
 
@@ -68,7 +70,7 @@ static void testTemperature()
        else in it. */
     answerWith(0xFEu, 0x80u);
     check(overlays.showTemperatureNow() == E_OK, "the overlay starts on a reading below zero");
-    check(strcmp(overlays.getTemperatureString(), "-1.5C") == 0,
+    check(strcmp(overlays.getTemperatureString(), "-1.5\xB0" "C") == 0,
           "a reading below zero carries exactly one minus");
     check(overlays.abort() == E_OK, "the overlay ends again");
 

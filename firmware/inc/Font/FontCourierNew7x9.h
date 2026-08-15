@@ -34,7 +34,7 @@
 /* FontCourierNew7x9 parameter */
 #define FONT_COURIER_NEW_7X9_WIDTH                       7u
 #define FONT_COURIER_NEW_7X9_HEIGHT                      9u
-#define FONT_COURIER_NEW_7X9_FONT_TABLE_SIZE             102u
+#define FONT_COURIER_NEW_7X9_FONT_TABLE_SIZE             103u
 
 
 /******************************************************************************************************************************************************

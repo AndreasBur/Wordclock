@@ -50,11 +50,19 @@ class Temperature
        makes: it measures from -40 to +85 degrees. */
     static constexpr byte StringLength{6u + 1u};
 
+    /* The shown form carries the degree sign as well, which is one byte more - it is
+       Latin-1 here, the same single-byte encoding the font tables are indexed by. */
+    static constexpr byte StringToShowLength{StringLength + 1u};
+
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
     static constexpr char DegreeUnit{'C'};
+    /* Latin-1 0xB0, which is what the font tables index by and what the letter table's
+       umlauts already are. It stays out of the reported form on purpose - see
+       getTemperatureString() below. */
+    static constexpr char DegreeSign{'\xB0'};
     static constexpr char DecimalPoint{'.'};
 
     constexpr Temperature() { }
@@ -76,6 +84,30 @@ class Temperature
     static constexpr TemperatureType absolute(TemperatureType Value) { return (Value < 0) ? static_cast<TemperatureType>(-Value) : Value; }
 
     static char* appendChar(char Char, char* String) { String[0u] = Char; return &String[1u]; }
+    static char* appendDegreeSign(bool Wanted, char* String) {
+        if(!Wanted) { return String; }
+
+        return appendChar(DegreeSign, String);
+    }
+
+    /* Both public forms come through here, so the digits cannot drift apart between what
+       is shown and what is reported - only the degree sign differs. */
+    StdReturnType appendReading(char* String, bool WithDegreeSign) const {
+        TemperatureType Tenths{0};
+
+        String[0u] = STD_NULL_CHARACTER;
+        if(getTemperature(Tenths) == E_NOT_OK) { return E_NOT_OK; }
+
+        char* Position = String;
+        Position = appendSign(Tenths, Position);
+        Position = appendNumber(wholeDegrees(Tenths), Position);
+        Position = appendChar(DecimalPoint, Position);
+        Position = appendNumber(tenthOfDegree(Tenths), Position);
+        Position = appendDegreeSign(WithDegreeSign, Position);
+        Position = appendChar(DegreeUnit, Position);
+        *Position = STD_NULL_CHARACTER;
+        return E_OK;
+    }
     static char* appendNumber(TemperatureType Value, char* String) {
         itoa(Value, String, 10u);
         return &String[digitsOfNumber(Value)];
@@ -102,27 +134,25 @@ class Temperature
         return getTemperature(Unused) == E_OK;
     }
 
-    /* The reading as it is shown and reported, "23.4C", into a buffer of StringLength.
-       Written by whoever displays it rather than kept here, because the overlay needs it
-       to stand still while its text scrolls, and the status command needs it once.
+    /* The reading as it is reported, "23.4C", into a buffer of StringLength. Written by
+       whoever needs it rather than kept here, because the overlay needs it to stand still
+       while its text scrolls, and the status command needs it once.
 
        An empty string when there is no reading - the degree it would otherwise print is
-       the one thing a reader must not mistake for a measurement. The letter stands in for
-       the degree sign, which the font tables do not carry. */
+       the one thing a reader must not mistake for a measurement.
+
+       No degree sign in this one, and that is the point of the split: this string travels
+       the serial line and the web socket, and a web socket text frame has to be valid
+       UTF-8. A raw Latin-1 0xB0 in it makes the browser close the connection with a
+       protocol error rather than draw one character oddly. */
     StdReturnType getTemperatureString(char* String) const {
-        TemperatureType Tenths{0};
+        return appendReading(String, false);
+    }
 
-        String[0u] = STD_NULL_CHARACTER;
-        if(getTemperature(Tenths) == E_NOT_OK) { return E_NOT_OK; }
-
-        char* Position = String;
-        Position = appendSign(Tenths, Position);
-        Position = appendNumber(wholeDegrees(Tenths), Position);
-        Position = appendChar(DecimalPoint, Position);
-        Position = appendNumber(tenthOfDegree(Tenths), Position);
-        Position = appendChar(DegreeUnit, Position);
-        *Position = STD_NULL_CHARACTER;
-        return E_OK;
+    /* The same reading as it is shown, "23.4°C", into a buffer of StringToShowLength. The
+       display indexes the font tables by Latin-1 byte, so the sign can be one here. */
+    StdReturnType getTemperatureStringToShow(char* String) const {
+        return appendReading(String, true);
     }
 
     // methods

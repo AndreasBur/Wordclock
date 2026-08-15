@@ -71,10 +71,15 @@ It now shows the reading, and the decisions it needed came out as follows:
   number, because a build without the chip has to be told apart from a reading of zero
   degrees. `Overlay::canShow()` asks before every start, so the overlay neither fires in
   its period nor through `1 -P26` until the chip has answered once.
-- **The degree sign is still not in the fonts**, so the overlay writes `23.4C`. Adding it
-  means regenerating all five tables with [FontCreator](https://github.com/theAndreas/FontCreator)
-  (see [fonts.md](fonts.md)) — worth doing, but it is a font change rather than an overlay
-  one, and it now has a caller waiting for it.
+- ~~**The degree sign is still not in the fonts**~~ **Done.** The overlay shows `23.4°C`.
+  Appended by hand as index 102 rather than regenerated with
+  [FontCreator](https://github.com/theAndreas/FontCreator), which rasterises the Windows
+  faces the tables came from and would have replaced the other 102 glyphs to add one; see
+  *Adding a single glyph* in [fonts.md](fonts.md). What it settled: **the sign goes to the
+  display only**. `getTemperatureString()` still reports `23.4C`, because that string
+  travels the web socket, and a text frame carrying a raw Latin-1 0xB0 is closed by the
+  browser as invalid UTF-8 rather than drawn — `getTemperatureStringToShow()` is the form
+  that carries the sign.
 - **The simulator stands in with a slider and a *Sensor connected* box**
   ([Settings](../platform/simulator/include/sim/Settings.h)). The box is what makes the
   "no chip" state reachable without a chip to unplug.
@@ -159,8 +164,7 @@ From the comparison with wordclock24h, in the order they would change daily use.
    while the display stands still is a different mechanism and does not exist.
 6. **IR receiver**, after section 4.
 7. **Ambilight**, a second stripe with its own colour and timer.
-8. **The degree sign in the font tables**, which the temperature overlay is waiting for
-   (section 2).
+8. ~~**The degree sign in the font tables**~~ **Done**, see section 2.
 
 Deliberately not planned: weather reports, MP3 playback and alarms, games on the
 display. They are what wordclock24h grew over years, and none of them is a word

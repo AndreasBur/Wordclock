@@ -61,7 +61,7 @@ class OverlayTemperature : public Overlay<OverlayTemperature>
     /* Written when the overlay starts and left alone while it shows: the text scrolls out
        of this buffer, and a reading that changed halfway through would swap a digit under
        the letters that are already on their way across. */
-    char TemperatureString[Temperature::StringLength]{0u};
+    char TemperatureString[Temperature::StringToShowLength]{0u};
 
     // functions
     /* Only ever entered with a reading in hand: isReady() is what the overlay is started
@@ -86,7 +86,7 @@ class OverlayTemperature : public Overlay<OverlayTemperature>
     void showTask() { if(Text::getInstance().getState() == Text::STATE_IDLE) { setText(); } }
     void setText() { Text::getInstance().setTextWithShift(TemperatureString, getFont()); }
 
-    void setTemperatureString() { Temperature::getInstance().getTemperatureString(TemperatureString); }
+    void setTemperatureString() { Temperature::getInstance().getTemperatureStringToShow(TemperatureString); }
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S

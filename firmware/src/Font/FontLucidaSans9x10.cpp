@@ -141,6 +141,7 @@ const FontLucidaSans9x10::FontTableType FontLucidaSans9x10::FontTable PROGMEM
     FontTableElementType(6, {0x0000, 0x0190, 0x0254, 0x0250, 0x03e4, 0x0200, 0x0000, 0x0000, 0x0000}),   // Code for char ä
     FontTableElementType(6, {0x0000, 0x01e0, 0x0214, 0x0210, 0x0214, 0x01e0, 0x0000, 0x0000, 0x0000}),   // Code for char ö
     FontTableElementType(6, {0x0000, 0x01f0, 0x0204, 0x0200, 0x0104, 0x03f0, 0x0000, 0x0000, 0x0000}),   // Code for char ü
+    FontTableElementType(6, {0x0000, 0x0004, 0x000a, 0x000a, 0x0004, 0x0000, 0x0000, 0x0000, 0x0000}),   // Code for char °
 };
 
 /******************************************************************************************************************************************************
