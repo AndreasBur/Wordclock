@@ -1,14 +1,17 @@
-# What a pull request is checked with. Three jobs, because the project has three ways of
+# What a pull request is checked with. Four jobs, because the project has four ways of
 # building and each of them can break on its own:
 #
 #   simulator    the firmware core through the wxWidgets backend, plus its regression tests
 #   host-tests   the ESP32 backend compiled against the stand-ins in platform/esp32/test
 #   firmware     the ESP32 backend compiled for the board it actually runs on
+#   avr-dx       the AVR128DA48 backend, cross-compiled
 #
-# The last one looks redundant next to the second and is not. The host tests compile the
-# same sources with the host's compiler and libc, so anything the target's toolchain has a
+# The third looks redundant next to the second and is not. The host tests compile the same
+# sources with the host's compiler and libc, so anything the target's toolchain has a
 # different opinion about passes them - newlib not declaring timegm, for one, which broke
-# the target build while every host test stayed green.
+# the target build while every host test stayed green. That argument carries further for
+# the fourth: an 8-bit freestanding target with its own -mmcu has more opinions than the
+# ESP32, not fewer, and nothing else in this file compiles a line of platform/avr-dx.
 #
 # What the code says rather than whether it builds is static-analysis.yml, which used to be
 # a fourth job here. It is its own workflow because a badge reports a workflow: the README
@@ -99,3 +102,52 @@ jobs:
       # network rather than a build that fails.
       - name: Build the firmware
         run: pio run -d platform/esp32
+
+  # The one job that does not use the runner's own packages, and the reason is the whole
+  # story of this job. ubuntu-24.04 carries avr-gcc 7.3, which fails this build twice over:
+  # it has no device-specs for avr128da48, and once handed those from a Microchip pack it
+  # rejects the core's constexpr constructors - "temporary of non-literal type ClockWords
+  # in a constant expression", which GCC 12 onwards accepts. Making the shared core worse
+  # to satisfy a compiler no developer here uses would be the wrong way round, so the job
+  # takes a distribution whose avr-gcc is the one platform/avr-dx/README.md asks for. That
+  # also removes the need for a device pack: from 12 onwards the specs are in the box.
+  avr-dx:
+    name: AVR Dx firmware
+    runs-on: ubuntu-24.04
+    container: debian:trixie
+    steps:
+      # Before the checkout, and with two packages the runner images have but a plain
+      # Debian does not: git, without which checkout falls back to the REST API, and
+      # ca-certificates, without which its fetch fails on "Problem with the SSL CA cert"
+      # rather than on anything to do with this repository.
+      - name: Install the toolchain
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends \
+            ca-certificates git cmake ninja-build gcc-avr avr-libc
+
+      - uses: actions/checkout@v7
+
+      # Asked before the build rather than met inside it. Whether an avr-gcc knows this part
+      # is a property of its device-specs, and a build that walks into a missing one stops
+      # halfway with an error that reads like a broken checkout rather than a toolchain that
+      # is too old. The version is printed beside it, because that is the thing that decides.
+      - name: Check the toolchain knows the device
+        run: |
+          avr-gcc --version | head -1
+          avr-gcc -mmcu=avr128da48 -E -x c /dev/null -o /dev/null
+
+      # The toolchain has to be named when the build directory is created: a compiler cannot
+      # be swapped after project() has run, which is why -DPLATFORM=avr-dx alone refuses.
+      # -G Ninja for the same reason as the simulator job, and for one more: a plain Debian
+      # image has no make, so the generator CMake would otherwise default to is the one
+      # thing here that is not installed.
+      - name: Configure
+        run: |
+          cmake -B build-avr -S . -G Ninja -DPLATFORM=avr-dx \
+                -DCMAKE_TOOLCHAIN_FILE=platform/avr-dx/toolchain-avr.cmake
+
+      # The size is printed by the link rule itself. It is the reason this part was chosen,
+      # so a change that stops fitting says so here rather than on somebody's bench.
+      - name: Build
+        run: cmake --build build-avr
