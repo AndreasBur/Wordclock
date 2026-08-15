@@ -16,12 +16,6 @@ FROM ${BASE_IMAGE}
 # clang-tidy comes with clangd because the checks it runs are the ones CI blocks a pull
 # request on; running them here is what keeps that from being a surprise. run-clang-tidy,
 # which walks the compile database in parallel, is part of the same package.
-# gcc-avr and avr-libc cross-compile the AVR Dx backend, which nothing else here can build -
-# the simulator uses the host compiler and the ESP32 brings its own toolchain through
-# PlatformIO. The version matters more than the presence: Ubuntu 24.04, which the default
-# base image above is, carries avr-gcc 7.3, and 7.3 does not know avr128da48 - it answers
-# "device-specs/specs-avr128da48: No such file or directory". Hence the device pack further
-# down, without which these two packages install a compiler that cannot build the target.
 # cppcheck is the second analyser of that same workflow, and is here for the same reason.
 # It is the one whose version cannot be pinned - the runner's is older than this one, and
 # the difference has already cost a red badge over the format of the suppression file
@@ -33,9 +27,6 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && \
         clangd \
         clang-tidy \
         cppcheck \
-        gcc-avr \
-        avr-libc \
-        unzip \
         ninja-build \
         libwxgtk3.2-dev \
         imagemagick \
@@ -67,24 +58,6 @@ RUN ARCH="$(dpkg --print-architecture)" && \
     echo "${SHA256}  /tmp/gh.deb" | sha256sum -c - && \
     dpkg -i /tmp/gh.deb && \
     rm /tmp/gh.deb
-
-# The device specs, headers and libraries for the AVR Dx parts, which the distribution's
-# avr-gcc 7.3 does not carry. Pinned with its published checksum for the same reason as gh
-# above: what makes this line trustworthy has to be visible in this file.
-#
-# AVR_DFP is exported so the build documented in platform/avr-dx/README.md works as written
-# in this container - the platform's CMakeLists takes its default from the environment, so
-# nobody has to discover the flag before the target compiles at all.
-ARG AVR_DFP_VERSION=2.8.343
-ARG AVR_DFP_SHA256=d81af59072e5ac188431e828461eee5c08e6d5f3ace32461328b4da0ec348746
-RUN curl -fsSL -o /tmp/dfp.atpack \
-        "https://packs.download.microchip.com/Microchip.AVR-Dx_DFP.${AVR_DFP_VERSION}.atpack" && \
-    echo "${AVR_DFP_SHA256}  /tmp/dfp.atpack" | sha256sum -c - && \
-    mkdir -p /opt/avr-dfp && \
-    unzip -q /tmp/dfp.atpack -d /opt/avr-dfp && \
-    rm /tmp/dfp.atpack
-
-ENV AVR_DFP=/opt/avr-dfp
 
 # PlatformIO for the ESP32 backend, plus what test/run.sh needs: python3 for the page
 # embedding, node for the local web console. In a virtual environment because Ubuntu 24.04

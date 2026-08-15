@@ -69,26 +69,30 @@ cmake --build build-avr
 cmake --build build-avr --target flash     # over UPDI, via pymcuprog
 ```
 
-Whether the toolchain knows this device depends on how old it is, and the answer is
-not always yes. An `avr-gcc` from 12 onwards carries the specs — a current dev
-container has 14.x and needs nothing further. **Ubuntu 24.04 ships 7.3, which does
-not**, and says so like this:
+**This needs `avr-gcc` 12 or newer.** Not a preference — an older one fails twice,
+and the second failure is the one that cannot be worked around:
 
-```
-avr-gcc: error: device-specs/specs-avr128da48: No such file or directory
-```
+- It has no device-specs for the part: `avr-gcc: error: device-specs/specs-avr128da48:
+  No such file or directory`. A Microchip device pack fixes that, see below.
+- It rejects the shared core: `temporary of non-literal type 'ClockWords' in a
+  constant expression`, from the `constexpr` constructors the firmware uses
+  throughout. GCC 12 accepts them. Nothing short of making the core worse fixes
+  that, so the answer is a newer compiler.
 
-That is worth asking before a build rather than meeting inside one, where it reads
-like a broken checkout:
+Ubuntu 24.04 ships 7.3, so its `gcc-avr` will not do — **including in a dev container
+built from this repository's default base image**, which is that same Ubuntu. Debian
+trixie and Ubuntu 25.04 onwards carry 14.x, which is what CI uses and what this was
+developed against. One line says which one is in front of you:
 
 ```bash
+avr-gcc --version | head -1
 avr-gcc -mmcu=avr128da48 -E -x c /dev/null -o /dev/null
 ```
 
-When the answer is no, point `AVR_DFP` at an unpacked Microchip `.atpack`. The dev
-container carries one under `/opt/avr-dfp` and exports `AVR_DFP`, so the commands
-above work there as written; the CI job fetches the same pinned version. Setting it
-by hand looks like this, and is also how a Dx part other than this one is built:
+From 12 onwards no device pack is needed. For a Dx part even a current `avr-libc`
+does not know, point `AVR_DFP` at an unpacked Microchip `.atpack` — it is also read
+from the environment, so a container or a CI job can carry one without every command
+naming it:
 
 ```bash
 cmake -B build-avr -S . -DPLATFORM=avr-dx \

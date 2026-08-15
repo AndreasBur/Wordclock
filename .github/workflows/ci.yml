@@ -103,52 +103,42 @@ jobs:
       - name: Build the firmware
         run: pio run -d platform/esp32
 
+  # The one job that does not use the runner's own packages, and the reason is the whole
+  # story of this job. ubuntu-24.04 carries avr-gcc 7.3, which fails this build twice over:
+  # it has no device-specs for avr128da48, and once handed those from a Microchip pack it
+  # rejects the core's constexpr constructors - "temporary of non-literal type ClockWords
+  # in a constant expression", which GCC 12 onwards accepts. Making the shared core worse
+  # to satisfy a compiler no developer here uses would be the wrong way round, so the job
+  # takes a distribution whose avr-gcc is the one platform/avr-dx/README.md asks for. That
+  # also removes the need for a device pack: from 12 onwards the specs are in the box.
   avr-dx:
     name: AVR Dx firmware
     runs-on: ubuntu-24.04
+    container: debian:trixie
     steps:
-      - uses: actions/checkout@v7
-
+      # git first, or checkout falls back to the REST API and lands without a repository.
       - name: Install the toolchain
         run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends cmake ninja-build gcc-avr avr-libc
+          apt-get update
+          apt-get install -y --no-install-recommends git cmake ninja-build gcc-avr avr-libc
 
-      # This runner's avr-gcc is 7.3 with Atmel's patches, and it does not know this part:
-      # `avr-gcc -mmcu=avr128da48` answers "device-specs/specs-avr128da48: No such file or
-      # directory". A current dev container has 14.x, which does know it - so the device
-      # pack is not belt and braces here, it is what makes the job possible at all. Passed
-      # to CMake as AVR_DFP, the route platform/avr-dx/README.md documents for exactly this.
-      #
-      # Pinned with its checksum rather than fetched latest, the same way the dev container
-      # takes gh: one file whose identity is visible in this file, at the cost of bumping
-      # the version by hand.
-      - name: Fetch the device pack
-        env:
-          DFP_VERSION: 2.8.343
-          DFP_SHA256: d81af59072e5ac188431e828461eee5c08e6d5f3ace32461328b4da0ec348746
-        run: |
-          curl -fsSL -o /tmp/dfp.atpack \
-            "https://packs.download.microchip.com/Microchip.AVR-Dx_DFP.${DFP_VERSION}.atpack"
-          echo "${DFP_SHA256}  /tmp/dfp.atpack" | sha256sum -c -
-          unzip -q /tmp/dfp.atpack -d /tmp/dfp
+      - uses: actions/checkout@v7
 
-      # Asked before the build rather than discovered inside it. Without the pack this is
-      # the line that says why; with it, it is the line that proves the pack took. A build
-      # that walks into a missing spec file instead stops in the middle with an error that
-      # reads like a broken checkout.
+      # Asked before the build rather than met inside it. Whether an avr-gcc knows this part
+      # is a property of its device-specs, and a build that walks into a missing one stops
+      # halfway with an error that reads like a broken checkout rather than a toolchain that
+      # is too old. The version is printed beside it, because that is the thing that decides.
       - name: Check the toolchain knows the device
         run: |
           avr-gcc --version | head -1
-          avr-gcc -B /tmp/dfp/gcc/dev/avr128da48/ -mmcu=avr128da48 -E -x c /dev/null -o /dev/null
+          avr-gcc -mmcu=avr128da48 -E -x c /dev/null -o /dev/null
 
       # The toolchain has to be named when the build directory is created: a compiler cannot
       # be swapped after project() has run, which is why -DPLATFORM=avr-dx alone refuses.
       - name: Configure
         run: |
           cmake -B build-avr -S . -DPLATFORM=avr-dx \
-                -DCMAKE_TOOLCHAIN_FILE=platform/avr-dx/toolchain-avr.cmake \
-                -DAVR_DFP=/tmp/dfp
+                -DCMAKE_TOOLCHAIN_FILE=platform/avr-dx/toolchain-avr.cmake
 
       # The size is printed by the link rule itself. It is the reason this part was chosen,
       # so a change that stops fitting says so here rather than on somebody's bench.
