@@ -116,11 +116,15 @@ jobs:
     runs-on: ubuntu-24.04
     container: debian:trixie
     steps:
-      # git first, or checkout falls back to the REST API and lands without a repository.
+      # Before the checkout, and with two packages the runner images have but a plain
+      # Debian does not: git, without which checkout falls back to the REST API, and
+      # ca-certificates, without which its fetch fails on "Problem with the SSL CA cert"
+      # rather than on anything to do with this repository.
       - name: Install the toolchain
         run: |
           apt-get update
-          apt-get install -y --no-install-recommends git cmake ninja-build gcc-avr avr-libc
+          apt-get install -y --no-install-recommends \
+            ca-certificates git cmake ninja-build gcc-avr avr-libc
 
       - uses: actions/checkout@v7
 
