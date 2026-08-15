@@ -38,7 +38,6 @@ constexpr const char* NetworkNamespace{"wc-network"};
 constexpr const char* SsidKey{"ssid"};
 constexpr const char* PasswordKey{"password"};
 
-constexpr uint32_t MillisecondsPerMinute{60u * 1000u};
 constexpr uint32_t BytesPerKibibyte{1024u};
 
 bool isNetworkJoined()
@@ -87,25 +86,6 @@ StdReturnType copyIfItFits(const char* Value, char* String, size_t Capacity)
 /******************************************************************************************************************************************************
  * P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
-
-/******************************************************************************************************************************************************
-  getUptimeInMinutes()
-******************************************************************************************************************************************************/
-/*! \brief          Minutes since the last start
- *  \details        millis() wraps after forty-nine days, and the minutes after
- *                  forty-five - so the clock that has been up longest reports the least.
- *                  Left as it is rather than carried in a wider counter: a word clock that
- *                  has run for a month and a half has answered the question this field is
- *                  asked for.
- *
- *  \return         E_OK
-******************************************************************************************************************************************************/
-StdReturnType System::getUptimeInMinutes(uint16_t& Uptime) const
-{
-    Uptime = static_cast<uint16_t>(millis() / MillisecondsPerMinute);
-    return E_OK;
-} /* getUptimeInMinutes */
-
 
 /******************************************************************************************************************************************************
   getFreeMemoryInKibibytes()

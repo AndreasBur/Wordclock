@@ -43,7 +43,7 @@ overlay is disabled at compile time.
 | 9 | Animation | `-A<id>` `-M<mode>` `-S<speed>` `-F<0\|1>` | Animation id, selection mode, speed, favourite flag |
 | 10 | Time | `-H<hour>` `-M<min>` `-S<sec>` | Sets RTC time |
 | 11 | Date | `-Y<year>` (uint16) `-M<month>` `-D<day>` | Sets RTC date |
-| 12 | Status | *(none)* | Read-only; version, uptime, illuminance, temperature, address, link quality, free memory |
+| 12 | Status | *(none)* | Read-only; version, uptime as days/hours/minutes, illuminance, temperature, address, link quality, free memory |
 | 13 | Network | `-S<name>` `-P<pass phrase>` | Which network the clock joins. The pass phrase goes in and never comes back |
 
 ### Overlay options (shared)
@@ -195,7 +195,7 @@ What a remote procedure call cannot answer: its answer is `RpcId=<id> Error=<cod
 carries no value, so the readings live in a command of their own.
 
 ```
-12                    # -> 12 V=0.1.0 U=93 I=350 T=23.4C A=192.168.1.23 Q=-62 M=142
+12                    # -> 12 V=0.1.0 U=0 H=1 N=33 I=350 T=23.4C A=192.168.1.23 Q=-62 M=142
 ```
 
 | field | Meaning |

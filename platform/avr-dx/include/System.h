@@ -41,7 +41,6 @@
 #define SYSTEM_PASSWORD_STRING_LENGTH                   64u
 
 /* System parameter */
-#define SYSTEM_MILLISECONDS_PER_MINUTE                  60000uL
 
 /******************************************************************************************************************************************************
  *  C L A S S   S Y S T E M
@@ -61,11 +60,6 @@ class System
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    /* Taken when the singleton is first asked for, which is the first status command rather
-       than the start of the application - close enough for a field that answers "has this
-       been running since I started it". */
-    const uint32_t Started{millis()};
-
     bool RestartPending{false};
 
     System() { }
@@ -81,11 +75,6 @@ class System
     }
 
     // get methods
-    StdReturnType getUptimeInMinutes(uint16_t& Uptime) const {
-        Uptime = static_cast<uint16_t>((millis() - Started) / SYSTEM_MILLISECONDS_PER_MINUTE);
-        return E_OK;
-    }
-
     StdReturnType getFreeMemoryInKibibytes(uint16_t&) const;
 
     /* No network, so no address, no name and no quality to report. E_NOT_OK is the answer

@@ -34,7 +34,6 @@
 #include "StandardTypes.h"
 #include "Arduino.h"
 
-#include <chrono>
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
@@ -63,12 +62,6 @@ class System
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    /* Taken when the singleton is first asked for, which is the first status command
-       rather than the start of the application - close enough for a field that answers
-       "has this been running since I started it". A steady clock, so a host whose wall
-       clock is corrected does not move the uptime with it. */
-    const std::chrono::steady_clock::time_point Started{std::chrono::steady_clock::now()};
-
     System() { }
     ~System() { }
 
@@ -82,13 +75,6 @@ class System
     }
 
     // get methods
-    StdReturnType getUptimeInMinutes(uint16_t& Uptime) const {
-        const auto Minutes = std::chrono::duration_cast<std::chrono::minutes>(std::chrono::steady_clock::now() - Started);
-
-        Uptime = static_cast<uint16_t>(Minutes.count());
-        return E_OK;
-    }
-
     StdReturnType getFreeMemoryInKibibytes(uint16_t& FreeMemory) const { UNUSED(FreeMemory); return E_NOT_OK; }
 
     StdReturnType getNetworkAddress(char* String) const { String[0u] = STD_NULL_CHARACTER; return E_NOT_OK; }

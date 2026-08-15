@@ -37,6 +37,7 @@
 #include "Illuminance.h"
 #include "System.h"
 #include "Temperature.h"
+#include "Uptime.h"
 #include "Version.h"
 
 /******************************************************************************************************************************************************
@@ -58,7 +59,9 @@ class MsgCmdStatusParser : public MsgParameterParser<MsgCmdStatusParser, MSG_CMD
     friend class MsgParameterParser;
 
     static constexpr char VersionShortName{'V'};
-    static constexpr char UptimeShortName{'U'};
+    static constexpr char UptimeDaysShortName{'U'};
+    static constexpr char UptimeHoursShortName{'H'};
+    static constexpr char UptimeMinutesShortName{'N'};
     static constexpr char IlluminanceShortName{'I'};
     static constexpr char TemperatureShortName{'T'};
     static constexpr char AddressShortName{'A'};
@@ -95,7 +98,6 @@ class MsgCmdStatusParser : public MsgParameterParser<MsgCmdStatusParser, MSG_CMD
         char TemperatureString[Temperature::StringLength];
         char AddressString[System::AddressStringLength];
         char LinkQualityString[System::LinkQualityStringLength];
-        uint16_t Uptime{0u};
         uint16_t FreeMemory{0u};
 
         /* Every value is fetched before anything is sent, rather than inside the call that
@@ -104,13 +106,17 @@ class MsgCmdStatusParser : public MsgParameterParser<MsgCmdStatusParser, MSG_CMD
            the compiler's to be trusted with - it reported a zero uptime where a fetched
            one was right beside it. */
         Temperature::getInstance().getTemperatureString(TemperatureString);
-        const StdReturnType UptimeReturn = system.getUptimeInMinutes(Uptime);
         const StdReturnType FreeMemoryReturn = system.getFreeMemoryInKibibytes(FreeMemory);
         const StdReturnType AddressReturn = system.getNetworkAddress(AddressString);
         const StdReturnType LinkQualityReturn = system.getLinkQuality(LinkQualityString);
 
         sendAnswerParameter(VersionShortName, WORDCLOCK_VERSION);
-        sendAnswerNumber(UptimeShortName, UptimeReturn, Uptime);
+        /* Counted in the core rather than asked of the platform, so there is no return code
+           to weigh: every build has an uptime, and it is always an answer. */
+        const Uptime& uptime = Uptime::getInstance();
+        sendAnswerParameter(UptimeDaysShortName, uptime.getDays());
+        sendAnswerParameter(UptimeHoursShortName, uptime.getHours());
+        sendAnswerParameter(UptimeMinutesShortName, uptime.getMinutes());
         sendAnswerParameter(IlluminanceShortName, Illuminance::getInstance().getIlluminance());
         sendAnswerParameter(TemperatureShortName, TemperatureString);
         sendAnswerParameter(AddressShortName, (AddressReturn == E_OK) ? AddressString : "");

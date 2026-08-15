@@ -57,6 +57,7 @@ class Scheduler
         TASK_ID_OVERLAYS,
         TASK_ID_TEXT,
         TASK_ID_PERSISTENCE,
+        TASK_ID_UPTIME,
         TASK_ID_NUMBER_OF_TASKS
     };
 
