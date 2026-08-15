@@ -16,6 +16,12 @@ FROM ${BASE_IMAGE}
 # clang-tidy comes with clangd because the checks it runs are the ones CI blocks a pull
 # request on; running them here is what keeps that from being a surprise. run-clang-tidy,
 # which walks the compile database in parallel, is part of the same package.
+# gcc-avr and avr-libc cross-compile the AVR Dx backend, which nothing else here can build -
+# the simulator uses the host compiler and the ESP32 brings its own toolchain through
+# PlatformIO. Which devices a given pair knows is the thing to watch: this needs specs for
+# avr128da48, which the 14.x in a current Ubuntu carries and the 7.3 on the CI runner may
+# not. `avr-gcc -mmcu=avr128da48 -E -x c /dev/null -o /dev/null` answers that in one line,
+# and platform/avr-dx/README.md says what to do when the answer is no.
 # cppcheck is the second analyser of that same workflow, and is here for the same reason.
 # It is the one whose version cannot be pinned - the runner's is older than this one, and
 # the difference has already cost a red badge over the format of the suppression file
@@ -27,6 +33,8 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && \
         clangd \
         clang-tidy \
         cppcheck \
+        gcc-avr \
+        avr-libc \
         ninja-build \
         libwxgtk3.2-dev \
         imagemagick \

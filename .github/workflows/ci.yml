@@ -1,14 +1,17 @@
-# What a pull request is checked with. Three jobs, because the project has three ways of
+# What a pull request is checked with. Four jobs, because the project has four ways of
 # building and each of them can break on its own:
 #
 #   simulator    the firmware core through the wxWidgets backend, plus its regression tests
 #   host-tests   the ESP32 backend compiled against the stand-ins in platform/esp32/test
 #   firmware     the ESP32 backend compiled for the board it actually runs on
+#   avr-dx       the AVR128DA48 backend, cross-compiled
 #
-# The last one looks redundant next to the second and is not. The host tests compile the
-# same sources with the host's compiler and libc, so anything the target's toolchain has a
+# The third looks redundant next to the second and is not. The host tests compile the same
+# sources with the host's compiler and libc, so anything the target's toolchain has a
 # different opinion about passes them - newlib not declaring timegm, for one, which broke
-# the target build while every host test stayed green.
+# the target build while every host test stayed green. That argument carries further for
+# the fourth: an 8-bit freestanding target with its own -mmcu has more opinions than the
+# ESP32, not fewer, and nothing else in this file compiles a line of platform/avr-dx.
 #
 # What the code says rather than whether it builds is static-analysis.yml, which used to be
 # a fourth job here. It is its own workflow because a badge reports a workflow: the README
@@ -99,3 +102,40 @@ jobs:
       # network rather than a build that fails.
       - name: Build the firmware
         run: pio run -d platform/esp32
+
+  avr-dx:
+    name: AVR Dx firmware
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install the toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends cmake ninja-build gcc-avr avr-libc
+
+      # Asked before the build rather than discovered inside it. Whether a given avr-gcc
+      # knows this part is a property of its device-specs, and a build that runs into that
+      # fails somewhere in the middle with an error about a spec file - which reads like a
+      # broken checkout rather than a toolchain that is too old for the device. This runner
+      # carries gcc-avr 7.3 with Atmel's patches, against the 14.x a current dev container
+      # has, so the answer is not the same on both.
+      #
+      # If this step is what goes red, the fix is in platform/avr-dx/README.md: point
+      # AVR_DFP at an unpacked Microchip .atpack and pass it to the configure step below.
+      - name: Check the toolchain knows the device
+        run: |
+          avr-gcc --version | head -1
+          avr-gcc -mmcu=avr128da48 -E -x c /dev/null -o /dev/null
+
+      # The toolchain has to be named when the build directory is created: a compiler cannot
+      # be swapped after project() has run, which is why -DPLATFORM=avr-dx alone refuses.
+      - name: Configure
+        run: |
+          cmake -B build-avr -S . -DPLATFORM=avr-dx \
+                -DCMAKE_TOOLCHAIN_FILE=platform/avr-dx/toolchain-avr.cmake
+
+      # The size is printed by the link rule itself. It is the reason this part was chosen,
+      # so a change that stops fitting says so here rather than on somebody's bench.
+      - name: Build
+        run: cmake --build build-avr
