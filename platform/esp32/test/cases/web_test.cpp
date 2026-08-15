@@ -172,6 +172,21 @@ int main()
     check(Found, "the answer came back over the socket");
     for(const auto& Line : Sent) { printf("   sent: \"%s\"\n", Line.c_str()); }
 
+    /* An answer carrying a Latin-1 byte, which is what the overlay text command answers with
+       once somebody sets a text with an umlaut in it - the thing the font tables carry
+       umlauts for. A web socket text frame has to be valid UTF-8, so a raw 0xFC here does
+       not draw one character wrong, it makes the browser close the connection.
+
+       The strings are split around the escapes on purpose: "\xFCck" would swallow the c as a
+       further hex digit and stop compiling. */
+    Sent.clear();
+    WebInterface::getInstance().broadcastLine("T=Gl\xFC" "ck");
+    check(!Sent.empty(), "an answer with an umlaut is sent at all");
+    check(!Sent.empty() && Sent.back() == "T=Gl\xC3\xBC" "ck",
+          "a Latin-1 byte in an answer leaves as UTF-8");
+    check(!Sent.empty() && Sent.back().find('\xFC') == std::string::npos,
+          "and no raw Latin-1 byte survives into the frame");
+
     /* the display frame */
     WebInterface& web = WebInterface::getInstance();
     const unsigned interval = WEB_INTERFACE_FRAME_INTERVAL_TICKS;
