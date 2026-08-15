@@ -223,8 +223,19 @@ Before trusting a first board, check three things:
 
 ## Notes for anyone reading the old xmega project
 
-[`../../Wordclock_xmegaForArduino/`](../../Wordclock_xmegaForArduino/) is the
-original, against an older firmware architecture. Two things in it no longer apply:
+The original lived under `Wordclock_xmegaForArduino/` until this backend replaced it.
+It was removed once the port was done rather than kept as a reference: git keeps it,
+and a dead Atmel Studio solution in the tree is one more thing a reader has to be told
+to ignore. `git log -- Wordclock_xmegaForArduino` finds it, and
+
+```bash
+git ls-tree -r --name-only d6e356d -- Wordclock_xmegaForArduino
+git show d6e356d:Wordclock_xmegaForArduino/Wordclock/ArduinoCore/library.cpp
+```
+
+reads a file out of it without checking anything out.
+
+Two things in it no longer apply, which is most of why it is not needed:
 
 - It builds with a GCC plugin, `avr-flash-vtbl`, to move C++ vtables out of RAM.
   Not needed here: the core uses CRTP and has no virtual function anywhere, and

@@ -25,7 +25,6 @@ the word tables have to cover.
 | [platform/simulator/](platform/simulator/) | wxWidgets desktop backend: renders the matrix in a window so the firmware can be developed and debugged on a PC. |
 | [platform/esp32/](platform/esp32/) | On-device backend: WS2812 over the RMT peripheral, time from NTP. Built with PlatformIO — see its [README](platform/esp32/README.md). |
 | [platform/avr-dx/](platform/avr-dx/) | On-device backend for the AVR128DA48: WS2812 shaped by the CCL, time from a DS3231. Built with CMake and a cross toolchain file — see its [README](platform/avr-dx/README.md). |
-| [Wordclock_xmegaForArduino/](Wordclock_xmegaForArduino/) | The original xmega project (older firmware), kept as the reference the AVR Dx backend was ported from. |
 
 The tool that generates the bitmap font tables lives in its own repository,
 [theAndreas/FontCreator](https://github.com/theAndreas/FontCreator) — see
