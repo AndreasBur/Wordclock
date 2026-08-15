@@ -83,6 +83,10 @@ class OverlayTemperature : public Overlay<OverlayTemperature>
        nothing, or show a zero that reads like a measurement. */
     bool isReady() const { return Temperature::getInstance().isTemperatureAvailable(); }
 
+    /* Nothing of its own: the string it shows comes from the chip on every start, so
+       there is no configuration here for a reset to undo. */
+    void resetOwnToDefaults() { }
+
     void showTask() { if(Text::getInstance().getState() == Text::STATE_IDLE) { setText(); } }
     void setText() { Text::getInstance().setTextWithShift(TemperatureString, getFont()); }
 

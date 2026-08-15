@@ -55,7 +55,11 @@ class OverlayText : public Overlay<OverlayText>
 ******************************************************************************************************************************************************/
   private:
     friend class Overlay;
-    char Text[OVERLAY_TEXT_TEXT_SIZE];
+    /* Initialised like the other two overlays' string buffers rather than left to the
+       singleton's static storage to zero. Persistence reads this one before anything has
+       written it, and a terminator that holds only because of where the object lives is
+       one refactor away from not holding. */
+    char Text[OVERLAY_TEXT_TEXT_SIZE]{0u};
 
     // functions
     void setStateToShow(ClockDate CurrentDate, ClockTime CurrentTime) { setText(); UNUSED(CurrentDate); UNUSED(CurrentTime); }
@@ -65,6 +69,11 @@ class OverlayText : public Overlay<OverlayText>
        overlay because of it would hide the mistake rather than show it. Only the
        temperature can have nothing to show. */
     bool isReady() const { return true; }
+
+    /* The only overlay with anything of its own to reset. An empty text rather than the
+       previous one, so a reset clock shows nothing rather than whatever the last owner
+       configured. */
+    void resetOwnToDefaults() { Text[0u] = STD_NULL_CHARACTER; }
 
     void showTask() { if(Text::getInstance().getState() == Text::STATE_IDLE) { setText(); } }
     void setText() { Text::getInstance().setTextWithShift(Text, getFont()); }

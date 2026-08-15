@@ -42,9 +42,12 @@
 #define STORAGE_FILE_NAME                               "wordclock-settings.bin"
 
 /* Storage parameter */
-/* What one store() may hold. Well above what Persistence writes today, so the overlay
-   settings can follow without the platforms having to change together. */
-#define STORAGE_CAPACITY                                128u
+/* What one store() may hold. The overlay settings this was held open for have landed and
+   take the blob to 110 bytes, which 128 would still have covered - but only just, and the
+   next setting would have moved both platforms again. Raised once, with room, rather than
+   by the byte: the store is a file here, so the unused part costs nothing. Keep this the
+   same on every platform, or a blob written by one is refused by the other. */
+#define STORAGE_CAPACITY                                256u
 
 /******************************************************************************************************************************************************
  *  C L A S S   S T O R A G E

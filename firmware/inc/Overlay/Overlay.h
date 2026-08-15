@@ -91,13 +91,25 @@ template <typename Derived> class Overlay
 ******************************************************************************************************************************************************/
   private:
     static constexpr SecondType SecondToStartShow{30u};
-    MinuteType PeriodInMinutes{1u};
-    SecondType EnduranceInSeconds{1u};
-    MonthType Month{0u};
-    DayType Day{0u};
-    DayType ValidInDays{0u};
-    byte Speed{1u};
-    FontType Font{Text::FONT_10X10};
+
+    /* Named rather than written twice, so the initialisers below and resetToDefaults()
+       cannot fall apart - a reset that put different values in than a clock starts with
+       would be a second set of defaults to keep in step. */
+    static constexpr MinuteType PeriodInMinutesInitValue{1u};
+    static constexpr SecondType EnduranceInSecondsInitValue{1u};
+    static constexpr MonthType MonthInitValue{0u};
+    static constexpr DayType DayInitValue{0u};
+    static constexpr DayType ValidInDaysInitValue{0u};
+    static constexpr byte SpeedInitValue{1u};
+    static constexpr FontType FontInitValue{Text::FONT_10X10};
+
+    MinuteType PeriodInMinutes{PeriodInMinutesInitValue};
+    SecondType EnduranceInSeconds{EnduranceInSecondsInitValue};
+    MonthType Month{MonthInitValue};
+    DayType Day{DayInitValue};
+    DayType ValidInDays{ValidInDaysInitValue};
+    byte Speed{SpeedInitValue};
+    FontType Font{FontInitValue};
 
     // functions
     Derived& underlying() { return static_cast<Derived&>(*this); }
@@ -254,6 +266,24 @@ template <typename Derived> class Overlay
     void setIsActive(bool sIsActive) { if(sIsActive) { enableIsActive(); } else { disableIsActive(); } }
 
 	// methods
+    /* Back to what a clock that was never configured has, now that the overlays are
+       stored and a reset has something to undo.
+
+       The derived hook is named apart from this for the reason canShow() gives: a
+       resetToDefaults() in an overlay would hide this one, and everything the base owns
+       would then quietly survive the reset. */
+    void resetToDefaults() {
+        PeriodInMinutes = PeriodInMinutesInitValue;
+        EnduranceInSeconds = EnduranceInSecondsInitValue;
+        Month = MonthInitValue;
+        Day = DayInitValue;
+        ValidInDays = ValidInDaysInitValue;
+        Speed = SpeedInitValue;
+        Font = FontInitValue;
+        State = STATE_DISABLED;
+        underlying().resetOwnToDefaults();
+    }
+
     void enableIsActive() { if(State == STATE_DISABLED) { State = STATE_IDLE; } }
     void disableIsActive() { State = STATE_DISABLED; }
 

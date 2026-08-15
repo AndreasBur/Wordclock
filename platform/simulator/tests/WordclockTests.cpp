@@ -815,7 +815,52 @@ void testPersistenceSaveAndReset()
     expect(display.getColorRed() == 1u, "and it must be what was saved");
     expect(!clock.getShowItIsPermanently(), "including the it is rule");
 
+    /* The overlays, which used to be the one configured thing a power cut took away. The
+       text goes through the store as a whole buffer, so a shorter one written after a
+       longer one must not leave the tail of the longer behind. */
+    Overlays& overlays = Overlays::getInstance();
+
+    overlays.setTextText("Herzlichen Glueckwunsch", 24u);
+    (void)overlays.setTextPeriodInMinutes(17u);
+    (void)overlays.setTextEnduranceInSeconds(9u);
+    overlays.setTextMonth(7u);
+    overlays.setTextDay(23u);
+    overlays.setTextValidInDays(3u);
+    overlays.setTextSpeed(4u);
+    (void)overlays.setTextFont(Text::FONT_5X8);
+    overlays.setTextIsActive(true);
+    (void)overlays.setDatePeriodInMinutes(5u);
+    overlays.setDateIsActive(true);
+
+    expect(persistence.save() == E_OK, "saving must write the overlays too");
+
+    overlays.setTextText("x", 2u);
+    (void)overlays.setTextPeriodInMinutes(1u);
+    overlays.setTextMonth(0u);
+    overlays.setTextSpeed(1u);
+    (void)overlays.setTextFont(Text::FONT_10X10);
+    overlays.setTextIsActive(false);
+    overlays.setDateIsActive(false);
+
+    expect(persistence.load() == E_OK, "the stored overlays must come back");
+    expect(strcmp(overlays.getTextText(), "Herzlichen Glueckwunsch") == 0,
+           "the overlay text must come back whole");
+    expect(overlays.getTextPeriodInMinutes() == 17u, "and its period");
+    expect(overlays.getTextEnduranceInSeconds() == 9u, "and its endurance");
+    expect(overlays.getTextMonth() == 7u && overlays.getTextDay() == 23u, "and its date");
+    expect(overlays.getTextValidInDays() == 3u, "and how long that date stays valid");
+    expect(overlays.getTextSpeed() == 4u, "and its speed");
+    expect(overlays.getTextFont() == Text::FONT_5X8, "and its font");
+    expect(overlays.getTextIsActive(), "and whether it is switched on");
+    expect(overlays.getDatePeriodInMinutes() == 5u && overlays.getDateIsActive(),
+           "a second overlay must not have been read out of the first one's slot");
+
     expect(persistence.reset() == E_OK, "resetting must empty the store");
+    expect(overlays.getTextText()[0] == '\0', "the reset must empty the overlay text");
+    expect(overlays.getTextPeriodInMinutes() == 1u && overlays.getTextSpeed() == 1u,
+           "the reset must put the overlay settings back");
+    expect(!overlays.getTextIsActive() && !overlays.getDateIsActive(),
+           "the reset must switch every overlay off again");
     expect(display.getColorRed() == 255u && display.getColorGreen() == 255u && display.getColorBlue() == 255u,
            "the reset must put the colour back to white");
     expect(display.getBrightness() == 255u, "the reset must put the brightness back");

@@ -24,8 +24,14 @@
  *                  computes is never stored back into the setting it computes from.
  *
  *                  Not stored, and deliberately: the time and the date, which come from
- *                  the network, and the overlay configuration including its text, which
- *                  needs a variable-length field the format does not have yet.
+ *                  the network.
+ *
+ *                  The overlay configuration is stored, its text included. The text is
+ *                  kept at its full buffer size rather than length-prefixed: a variable
+ *                  field would have bought some forty bytes at the price of the one
+ *                  property everything here rests on - that the settings are a single
+ *                  fixed block, which memcmp compares and the checksum walks without
+ *                  knowing what is in it.
  *
  *                  The format itself - the struct, its version and its checksum - lives
  *                  in the source, so that adding a field cannot silently change what the
