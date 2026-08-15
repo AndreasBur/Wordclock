@@ -1,0 +1,63 @@
+/******************************************************************************************************************************************************
+ *  FILE DESCRIPTION
+ *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
+/**     \file       animation_test.cpp
+ *      \brief      That every animation ends on the time it was started for
+******************************************************************************************************************************************************/
+
+
+#include "check.h"
+#include "cases.h"
+
+#include "Animations.h"
+#include "Clock.h"
+#include "Display.h"
+#include "DisplayManager.h"
+#include "Pixels.h"
+#include "RealTimeClock.h"
+
+/* The one promise every animation makes, and the one that is easy to break: whatever it
+   does in between, the display it leaves behind is the new time and nothing else.
+   Animation::finishWithClockWords() exists because that was got wrong once - an animation
+   that places letters itself can leave a pixel of the previous time lit, and on a word
+   clock that is a word nobody notices is wrong.
+   The second promise is that they end at all. Both are checked for every animation there
+   is, so an added one is covered by being added to the enumeration. */
+void testEveryAnimationEndsOnTheNewTime()
+{
+    /* A generous bound rather than a tight one: what it is here for is a runaway, not a
+       measurement. The longest of them walks all 110 pixels several times over. */
+    constexpr int TickLimit{5000};
+
+    Clock::getInstance().setModeFast(Clock::MODE_WESSI);
+    Animations& animations = Animations::getInstance();
+    animations.setModeFast(Animations::MODE_FIXED);
+
+    /* Two times whose word sets differ in every part: hour, minute and the "it is". */
+    const PixelBufferType Target = drawClockFace(10u, 35u);
+
+    for(byte Id = 1u; Id < Animations::ANIMATION_ID_NUMBER_OF_ANIMATIONS; Id++) {
+        const Animations::AnimationIdType AnimationId = static_cast<Animations::AnimationIdType>(Id);
+        char Description[64];
+
+        /* The display holds the previous time when a word change starts, which is what
+           the animations transition away from. */
+        drawClockFace(10u, 4u);
+        animations.setAnimationFast(AnimationId);
+        animations.setTime(10u, 35u);
+
+        int Ticks = 0;
+        while((animations.getState() == Animations::STATE_PENDING) && (Ticks < TickLimit)) {
+            animations.task(true);
+            Ticks++;
+        }
+
+        snprintf(Description, sizeof(Description), "animation %u must come to an end", Id);
+        expect(Ticks < TickLimit, Description);
+
+        snprintf(Description, sizeof(Description), "animation %u must leave the new time behind", Id);
+        expect(arePixelsEqual(readPixels(), Target), Description);
+    }
+
+    animations.setAnimationFast(Animations::ANIMATION_ID_NONE);
+}

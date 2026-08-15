@@ -119,7 +119,11 @@ target_link_libraries(Wordclock PRIVATE WordclockCore WordclockShims)
 # Tests
 # --------------------------------------------------------------------------
 if(WORDCLOCK_BUILD_TESTS)
-    add_executable(WordclockTests tests/WordclockTests.cpp)
+    # One binary out of several files, not one binary per file: the ESP32 side went that
+    # way and had to build an object cache to stop compiling the core once per executable.
+    file(GLOB TEST_CASES CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/tests/cases/*.cpp)
+    add_executable(WordclockTests tests/WordclockTests.cpp ${TEST_CASES})
+    target_include_directories(WordclockTests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/tests)
     target_link_libraries(WordclockTests PRIVATE WordclockCore WordclockShims)
     add_test(NAME WordclockTests COMMAND WordclockTests)
 endif()
