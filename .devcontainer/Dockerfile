@@ -1,10 +1,19 @@
 # Base image, overridable via build.args in a devcontainer.json variant so that
 # site-specific base images can be used without touching this file.
-ARG BASE_IMAGE=mcr.microsoft.com/devcontainers/cpp:ubuntu-24.04
+#
+# 26.04 rather than 24.04, and the reason is the AVR Dx backend: 24.04 carries avr-gcc 7.3,
+# which cannot build it twice over - no device-specs for avr128da48, and, once handed those
+# from a Microchip pack, a refusal of the core's constexpr constructors that GCC 12 onwards
+# accepts. A container on 24.04 could build three of this project's four platforms.
+#
+# Note the tag has no hyphen. devcontainers/cpp publishes ubuntu-24.04 and ubuntu24.04 both,
+# but from 26.04 only the unhyphenated form exists, so the older spelling looks like the
+# newest release when it is not.
+ARG BASE_IMAGE=mcr.microsoft.com/devcontainers/cpp:ubuntu26.04
 FROM ${BASE_IMAGE}
 
-# wxWidgets development libraries. Ubuntu 24.04 ships wxWidgets 3.2 (GTK build),
-# which satisfies the find_package(wxWidgets ...) call in CMakeLists.txt. Neither
+# wxWidgets development libraries. Ubuntu 26.04 still ships wxWidgets 3.2 (3.2.9, GTK
+# build), which satisfies the find_package(wxWidgets ...) call in CMakeLists.txt. Neither
 # build-essential nor gdb is listed: the base image carries both — which is also where
 # the ESP32 host-side test harness gets its g++. Its python3 and node come from the
 # PlatformIO block below, which installs them for the same two jobs. wx-common is not
@@ -21,12 +30,18 @@ FROM ${BASE_IMAGE}
 # the difference has already cost a red badge over the format of the suppression file
 # rather than over any finding, so having it locally is what makes that visible before a
 # push rather than after.
+# gcc-avr and avr-libc cross-compile the AVR Dx backend, which nothing else here can build:
+# the simulator uses the host compiler and the ESP32 brings its own through PlatformIO. They
+# are only worth installing on a base new enough for them to work - see the note on the tag
+# above - and platform/avr-dx/README.md says how to ask a given one whether it is.
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && \
     apt-get install -y --no-install-recommends \
         cmake \
         clangd \
         clang-tidy \
         cppcheck \
+        gcc-avr \
+        avr-libc \
         ninja-build \
         libwxgtk3.2-dev \
         imagemagick \
