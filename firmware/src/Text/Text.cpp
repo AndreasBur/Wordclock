@@ -494,6 +494,9 @@ StdReturnType Text::convertCharToFontIndex(char Char, byte& Index) const
     else if('\xE4' == Char) { Index = 99u; returnValue = E_OK; }
     else if('\xF6' == Char) { Index = 100u; returnValue = E_OK; }
     else if('\xFC' == Char) { Index = 101u; returnValue = E_OK; }
+    /* The degree sign sits with them for the same reason: Latin-1 0xB0 is nowhere near the
+       ASCII run, so it is appended past its end rather than shifting every index after it. */
+    else if('\xB0' == Char) { Index = 102u; returnValue = E_OK; }
     /* For all others only add the offset - within both bounds, and compared as a byte.
        Whether char is signed is the platform's decision: where it is not, and AVR is one
        of those, every Latin-1 byte above the six umlauts passes a lower bound on its own
@@ -529,6 +532,7 @@ byte Text::convertCharToFontIndexFast(char Char) const
     else if('\xE4' == Char) return 99u;
     else if('\xF6' == Char) return 100u;
     else if('\xFC' == Char) return 101u;
+    else if('\xB0' == Char) return 102u;
     /* for all others only add the offset, within both bounds - see the checked version */
     const byte Value = static_cast<byte>(Char);
 

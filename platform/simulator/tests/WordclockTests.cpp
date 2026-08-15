@@ -231,8 +231,18 @@ void testTemperatureOverlayWithoutSensor()
     DS3231::setSimulatedTemperature(215);
     Temperature::getInstance().task();
     expect(overlays.showTemperatureNow() == E_OK, "a reading must let the overlay start");
-    expect(strcmp(overlays.getTemperatureString(), "21.5C") == 0,
+    /* Split around the escape on purpose: "\xB0C" would swallow the C as a third hex digit
+       and stop compiling, which is the trap this string invites. */
+    expect(strcmp(overlays.getTemperatureString(), "21.5\xB0" "C") == 0,
            "the overlay must show the dialled-in reading");
+
+    /* The reported form must stay free of the degree sign: it travels the web socket, and
+       a text frame carrying a raw Latin-1 byte is closed by the browser as invalid UTF-8
+       rather than drawn. This is the one assertion standing between that and a regression. */
+    char Reported[Temperature::StringLength]{0};
+    expect(Temperature::getInstance().getTemperatureString(Reported) == E_OK
+               && strcmp(Reported, "21.5C") == 0,
+           "the reported reading must carry no degree sign");
     expect(overlays.abort() == E_OK, "the overlay must end again");
 
     /* Left as it was found: an active temperature overlay would take the display away
@@ -357,8 +367,8 @@ void testFadeDimsAndComesBack()
 
 /* Which characters the text overlay can draw, checked through the one entry point that
    says so: setChar() refuses what it cannot map to a glyph.
-   The font tables hold 102 entries - ASCII 0x20 to 0x7F, then the six umlauts - and the
-   conversion used to check only the lower bound. Where char is unsigned, which is what AVR
+   The font tables hold 103 entries - ASCII 0x20 to 0x7F, then the six umlauts and the
+   degree sign - and the conversion used to check only the lower bound. Where char is unsigned, which is what AVR
    makes it, every other Latin-1 byte passed that check and indexed past the end of the
    table. The host cannot show that: char is signed here, so those bytes come out negative
    and are refused for the wrong reason. The case is checked anyway, because it is the one
@@ -387,7 +397,34 @@ void testCharacterToGlyphMapping()
     }
 
     expect(text.setChar(0u, 0u, '\xE0', Text::FONT_5X8) == E_NOT_OK,
-           "a Latin-1 byte that is not one of the six must be refused");
+           "a Latin-1 byte that is none of the seven must be refused");
+
+    /* The degree sign, appended past the umlauts so the temperature overlay can show a
+       reading rather than spell its unit out. Checked by what reaches the display rather
+       than by the width: an unmapped byte falls back to the space, and in the 5x8 table the
+       space is exactly as wide as the sign, so a width test would pass on the fallback. */
+    for(byte Font = 0u; Font < Text::FONT_NUMBER_OF_FONTS; Font++) {
+        const Text::FontType FontType = static_cast<Text::FontType>(Font);
+        char Description[64];
+
+        Display::getInstance().clear();
+        snprintf(Description, sizeof(Description), "font %u must draw the degree sign", Font);
+        expect(text.setChar(0u, 0u, '\xB0', FontType) == E_OK && isAnyPixelLit(readPixels()), Description);
+    }
+
+    /* The scrolling text the overlay actually uses goes through the fast conversion, which
+       answers with the space instead of a return code when it cannot map a byte. So the
+       sign has to be checked there as well, and against the space rather than against an
+       empty display - a fallback would light nothing and look like a blank glyph. */
+    Display::getInstance().clear();
+    text.setCharFast(0u, 0u, '\xB0', Text::FONT_5X8);
+    const PixelBufferType Sign = readPixels();
+
+    Display::getInstance().clear();
+    text.setCharFast(0u, 0u, ' ', Text::FONT_5X8);
+    const PixelBufferType Space = readPixels();
+
+    expect(!arePixelsEqual(Sign, Space), "the fast conversion must not fall back to the space");
 
     /* Every font carries the same character set, and a glyph nobody can see would be a
        table read as the wrong packing. */

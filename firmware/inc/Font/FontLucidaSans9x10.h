@@ -34,7 +34,7 @@
 /* FontLucidaSans9x10 parameter */
 #define FONT_LUCIDA_SANS_9X10_WIDTH                      9u
 #define FONT_LUCIDA_SANS_9X10_HEIGHT                     10u
-#define FONT_LUCIDA_SANS_9X10_FONT_TABLE_SIZE            102u
+#define FONT_LUCIDA_SANS_9X10_FONT_TABLE_SIZE            103u
 
 /******************************************************************************************************************************************************
  *  G L O B A L   F U N C T I O N   M A C R O S

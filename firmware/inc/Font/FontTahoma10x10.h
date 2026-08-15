@@ -34,7 +34,7 @@
 /* FontTahoma10x10 parameter */
 #define FONT_TAHOMA_10X10_WIDTH                    10u
 #define FONT_TAHOMA_10X10_HEIGHT                   10u
-#define FONT_TAHOMA_10X10_FONT_TABLE_SIZE          102u
+#define FONT_TAHOMA_10X10_FONT_TABLE_SIZE          103u
 
 
 /******************************************************************************************************************************************************
