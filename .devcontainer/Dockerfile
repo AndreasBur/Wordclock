@@ -5,7 +5,9 @@ FROM ${BASE_IMAGE}
 
 # wxWidgets development libraries. Ubuntu 24.04 ships wxWidgets 3.2 (GTK build),
 # which satisfies the find_package(wxWidgets ...) call in CMakeLists.txt. Neither
-# build-essential nor gdb is listed: the base image carries both. wx-common is not
+# build-essential nor gdb is listed: the base image carries both — which is also where
+# the ESP32 host-side test harness gets its g++. Its python3 and node come from the
+# PlatformIO block below, which installs them for the same two jobs. wx-common is not
 # listed either, but for a different reason — libwxgtk3.2-dev depends on it, and it
 # is what puts the wx-config that find_package needs on the PATH.
 # imagemagick, xdotool and x11-utils are not needed to build or run the simulator.

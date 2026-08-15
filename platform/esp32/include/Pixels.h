@@ -85,13 +85,6 @@ class Pixels
     static constexpr byte toRow(byte Index) { return Index / PIXELS_DISPLAY_NUMBER_OF_COLUMNS; }
     static constexpr byte toColumn(byte Index) { return Index % PIXELS_DISPLAY_NUMBER_OF_COLUMNS; }
 
-    /* Same arithmetic as Pixel::dimmColor, kept separate because this one scales the
-       whole frame on the way out and must not touch the buffer: switching the master
-       output back on has to restore the picture without the firmware redrawing it. */
-    static constexpr Pixel::ColorType scaleColour(Pixel::ColorType Colour, byte Level) {
-        return static_cast<Pixel::ColorType>((static_cast<uint16_t>(Colour) * (Level + 1u)) >> 8u);
-    }
-
     StdReturnType transmitFrame();
     void fillFrameBuffer() const;
 
@@ -111,6 +104,11 @@ class Pixels
     byte getBrightness() const { return Brightness; }
     StdReturnType getPixel(byte, PixelType&) const;
     PixelType getPixelFast(byte) const;
+    PixelType getOutputPixelFast(byte Index) const {
+        PixelType Pixel = getPixelFast(Index);
+        Pixel.dimmPixel(Brightness);
+        return Pixel;
+    }
 
     // set methods
     void setPixels(PixelType);
