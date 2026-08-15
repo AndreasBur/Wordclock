@@ -117,6 +117,35 @@ is exactly what the old `.cproj` next door drifted on.
 *(Not verified here: Microchip Studio is Windows-only and no part of this
 container. The build and the debug information it needs are.)*
 
+## Everything in `PROGMEM` has to stay under 64 KiB
+
+This is an 8-bit core with 128 KiB of flash — more than a pointer can address. On
+this part `pgm_read_byte` compiles to a plain `lpm` through the 16-bit Z register:
+
+```asm
+ldi r30, 0xE8      ; Z = &Table
+ldi r31, 0x00
+lpm r24, Z         ; 16-bit Z, RAMPZ not involved
+```
+
+So **every table read that way has to live below 65 536** — the five fonts, the
+word tables, the gamma table, the message catalog. Past that boundary the reads do
+not fail, they wrap: the wrong bytes come back, and on a display that means wrong
+pixels rather than an error.
+
+There is room, and the linker helps by putting the read-only tables at the very
+front — the fonts occupy `0xe8` to `0x1b9a`, 6.8 KiB of the total:
+
+| | |
+|---|---|
+| highest flash symbol | 43 684 |
+| ceiling for `lpm` | 65 536 |
+
+Worth knowing before adding a sixth font, because nothing in the code says it. If
+the image ever does grow past the boundary, the way out is `PROGMEM_FAR` and
+`pgm_read_byte_far`, which carry the extra address bits in RAMPZ — at the cost of
+a slower read on every access that uses them.
+
 ## The strip
 
 The interesting part, and the reason this is an AVR Dx rather than a bigger xmega.
