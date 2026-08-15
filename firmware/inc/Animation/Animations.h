@@ -244,9 +244,13 @@ class Animations
     static_assert(ANIMATION_ID_NUMBER_OF_ANIMATIONS <= 16u,
                   "Animations: too many animations for the favourites bit mask, please widen it");
 
-    /* one bit per animation id, bit 0 of ANIMATION_ID_NONE stays unused */
+    /* one bit per animation id, bit 0 of ANIMATION_ID_NONE stays unused.
+       Shifted in an unsigned long rather than an unsigned int: there are sixteen
+       animations, and on a target whose int is 16 bits wide - every AVR - 1u shifted by
+       sixteen is undefined and the mask comes out empty, which silently leaves no
+       animation a favourite. */
     static constexpr uint16_t AllFavourites{
-        static_cast<uint16_t>(((1u << ANIMATION_ID_NUMBER_OF_ANIMATIONS) - 1u) & ~((1u << FirstAnimation) - 1u))
+        static_cast<uint16_t>(((1uL << ANIMATION_ID_NUMBER_OF_ANIMATIONS) - 1uL) & ~((1uL << FirstAnimation) - 1uL))
     };
 
     std::array<byte, ANIMATION_ID_NUMBER_OF_ANIMATIONS> TaskCycles;
