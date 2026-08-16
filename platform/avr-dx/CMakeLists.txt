@@ -23,8 +23,20 @@ file(GLOB PLATFORM_SOURCES CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/src/*.c
 
 # Every directory under the core's include tree, because its headers include each other
 # by bare name rather than by path.
-file(GLOB_RECURSE FIRMWARE_INCLUDE_DIRS LIST_DIRECTORIES true ${FIRMWARE_DIR}/inc/*)
-list(FILTER FIRMWARE_INCLUDE_DIRS EXCLUDE REGEX "\\.[hc]pp?$")
+#
+# Asked whether each entry is a directory, the way platform/simulator does it, rather than
+# filtered by extension. The extension list this replaces was "\\.[hc]pp?$", which matches
+# .hpp and .cpp and not .h - and inc/ holds nothing but .h, so all seventy-eight headers
+# were handed to the compiler as include directories. That is 3666 "not a directory"
+# warnings in one build, and it survived because a list of extensions is only ever as
+# complete as whoever wrote it; asking what a thing is cannot go out of date that way.
+file(GLOB_RECURSE FIRMWARE_INCLUDE_ENTRIES LIST_DIRECTORIES true ${FIRMWARE_DIR}/inc/*)
+set(FIRMWARE_INCLUDE_DIRS "")
+foreach(Entry ${FIRMWARE_INCLUDE_ENTRIES})
+    if(IS_DIRECTORY "${Entry}")
+        list(APPEND FIRMWARE_INCLUDE_DIRS "${Entry}")
+    endif()
+endforeach()
 
 add_executable(Wordclock ${PLATFORM_SOURCES} ${FIRMWARE_SOURCES})
 
