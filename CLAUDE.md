@@ -106,10 +106,12 @@ pkill -x Wordclock
 ```
 
 Then read `shot.png`. Two limits: the window pops up on the user's real desktop, so keep
-the runs short and kill the process afterwards; and menus cannot be driven synthetically
-— Weston's X11 window manager sets no `_NET_ACTIVE_WINDOW`, so `windowactivate`, key
-mnemonics and clicks on menu items do nothing. Anything behind a menu still has to be
-checked by hand.
+the runs short and kill the process afterwards; and **nothing in the window can be driven
+synthetically** — Weston's X11 window manager sets no `_NET_ACTIVE_WINDOW`, so
+`windowactivate`, key mnemonics and `xdotool click` all do nothing. Not only menus:
+clicking a plain `wxButton` at its computed screen position does not open the dialog it
+owns either, which is worth knowing before spending a run finding out. Anything that is
+not on screen the moment the window opens has to be checked by hand.
 
 An X error in `run.log` — `BadAccess ... MIT-SHM` in particular — is worth a plain retry
 before it is taken as evidence against the change under test. It also comes out of a
