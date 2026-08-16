@@ -311,6 +311,17 @@ constexpr MessageCatalog::OptionType StatusOptions[] {
     {'M', "Free memory (KiB)",  ARGUMENT_TYPE_UINT16, READ_ONLY}
 };
 
+/* MsgCmdNightSwitchParser. Brightness zero is the display switched off rather than a
+   dimming of nothing, which is what lets one field carry both wishes. */
+constexpr MessageCatalog::OptionType NightSwitchOptions[] {
+    {'A', "Active (0/1)",       ARGUMENT_TYPE_UINT8,  0u, 1u},
+    {'H', "Start hour",         ARGUMENT_TYPE_UINT8,  0u, 23u},
+    {'M', "Start minute",       ARGUMENT_TYPE_UINT8,  0u, 59u},
+    {'E', "End hour",           ARGUMENT_TYPE_UINT8,  0u, 23u},
+    {'N', "End minute",         ARGUMENT_TYPE_UINT8,  0u, 59u},
+    {'B', "Night brightness",   ARGUMENT_TYPE_UINT8,  0u, BYTE_MAX}
+};
+
 /* MsgCmdNetworkParser. The pass phrase is an input and never an answer, so it carries no
    range and is never read back - see the parser for why. */
 constexpr MessageCatalog::OptionType NetworkOptions[] {
@@ -370,7 +381,8 @@ constexpr MessageCatalog::CommandType Commands[] {
     {MsgCmdParser::COMMAND_TIME,                  "Time",                  TimeOptions,                NUMBER_OF(TimeOptions)},
     {MsgCmdParser::COMMAND_DATE,                  "Date",                  DateOptions,                NUMBER_OF(DateOptions)},
     {MsgCmdParser::COMMAND_STATUS,                "Status",                StatusOptions,              NUMBER_OF(StatusOptions)},
-    {MsgCmdParser::COMMAND_NETWORK,               "Network",               NetworkOptions,             NUMBER_OF(NetworkOptions)}
+    {MsgCmdParser::COMMAND_NETWORK,               "Network",               NetworkOptions,             NUMBER_OF(NetworkOptions)},
+    {MsgCmdParser::COMMAND_NIGHT_SWITCH,          "Night switch",          NightSwitchOptions,         NUMBER_OF(NightSwitchOptions)}
 };
 
 constexpr byte NumberOfCommands{NUMBER_OF(Commands)};

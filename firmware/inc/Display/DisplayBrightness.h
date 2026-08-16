@@ -66,6 +66,10 @@ class DisplayBrightness
 
     byte Brightness{BrightnessInitValue};
     byte FadeLevel{FadeLevelFull};
+    /* The night switch's own scaling, kept apart from FadeLevel although it does the same
+       arithmetic. A fade belongs to a running animation, which clears it when it ends -
+       and an animation ending in the small hours would take the night dimming with it. */
+    byte NightLevel{FadeLevelFull};
     bool UseAutomatic{UseAutomaticInitValue};
     bool UseGammaCorrection{UseGammaCorrectionInitValue};
     GammaCorrection GCorrection;
@@ -130,6 +134,7 @@ class DisplayBrightness
         Brightness = BrightnessInitValue;
         UseAutomatic = UseAutomaticInitValue;
         UseGammaCorrection = UseGammaCorrectionInitValue;
+        NightLevel = FadeLevelFull;
     }
 
     void enableAutomatic() { UseAutomatic = true; }
@@ -143,9 +148,12 @@ class DisplayBrightness
        at, rather than replacing it: what fades out is the display as it was configured,
        and the automatic keeps following the room while it does. */
     byte calcBrightness() const {
-        if(FadeLevel == FadeLevelFull) { return calcConfiguredBrightness(); }
+        byte Value = calcConfiguredBrightness();
 
-        return scaleByLevel(calcConfiguredBrightness(), FadeLevel);
+        if(NightLevel != FadeLevelFull) { Value = scaleByLevel(Value, NightLevel); }
+        if(FadeLevel != FadeLevelFull) { Value = scaleByLevel(Value, FadeLevel); }
+
+        return Value;
     }
 
     /* How dark a fade has made the display, 255 being not at all. Kept here rather than in
@@ -154,6 +162,14 @@ class DisplayBrightness
     byte getFadeLevel() const { return FadeLevel; }
     void setFadeLevel(byte Level) { FadeLevel = Level; }
     void clearFade() { FadeLevel = FadeLevelFull; }
+
+    /* How dark the night switch has made the display, 255 being not at all. Scaling rather
+       than replacing for the same reason a fade does: what is dimmed is the display as it
+       was configured, so the brightness the owner set is still what daylight returns to and
+       is still what Persistence stores. */
+    byte getNightLevel() const { return NightLevel; }
+    void setNightLevel(byte Level) { NightLevel = Level; }
+    void clearNight() { NightLevel = FadeLevelFull; }
         
 };
 

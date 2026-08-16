@@ -52,6 +52,9 @@ int main()
     testClockWordsComparison();
     testPixelColorChannels();
     testDisplayCharacterLookup();
+    testNightWindowIncludesMidnight();
+    testNightSwitchDimsWithoutLosingTheSetting();
+    testNightSwitchActsOnTheCrossingOnly();
     testPersistence();
     testPersistenceSaveAndReset();
 

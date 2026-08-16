@@ -37,6 +37,11 @@ void testClockWordsComparison();
 void testSchedulerSpeedRoundTrip();
 void testUptimeCountsWithoutWrapping();
 
+/* nightswitch_test.cpp */
+void testNightWindowIncludesMidnight();
+void testNightSwitchDimsWithoutLosingTheSetting();
+void testNightSwitchActsOnTheCrossingOnly();
+
 /* persistence_test.cpp */
 void testPersistence();
 void testPersistenceSaveAndReset();

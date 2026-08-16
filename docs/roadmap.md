@@ -163,9 +163,22 @@ From the comparison with wordclock24h, in the order they would change daily use.
    ([WebInterface.h](../platform/esp32/include/WebInterface.h)), so provisioning means
    typing a command rather than filling in a form. The catalog already describes the
    command, so a form over it is a page change rather than a firmware one.
-2. **Night switch-off / timer.** No equivalent at all today; the clock lights around
-   the clock. A firmware module with its own command, and the first setting that needs
-   a time of day rather than a value.
+2. ~~**Night switch-off / timer.**~~ **Done** — command 14, and
+   [NightSwitch](../firmware/inc/NightSwitch/NightSwitch.h) in the core. What it settled:
+
+   - **One brightness field, where zero is off.** "Off" and "very dim" are the same wish at
+     different strengths, and two settings would have needed a rule for what they mean
+     together.
+   - **The dimming is its own level, not the fade.** A fade belongs to a running animation
+     and is cleared when it ends — an animation finishing in the small hours would have
+     taken the night dimming with it. Both scale what the setting arrived at rather than
+     replacing it, so the brightness its owner chose is what morning returns to and what
+     `Persistence` keeps storing.
+   - **It acts on the crossing, not on the state.** A clock switched on by hand at two in
+     the morning stays on until the window's next edge. Re-asserting on every tick would
+     make a hand-switched display go dark a second later, which reads as a fault.
+   - **An empty window is no window**, not a whole day — that is what an unconfigured
+     clock has.
 3. **OTA update.** Cheap on the ESP32, and the natural companion to 1.
 4. ~~**RTC with battery.**~~ **Done** with section 2's chip: the time registers are read
    while the system clock holds nothing, and written back from it once an hour and after
