@@ -266,6 +266,12 @@ class Display
     void setBrightnessFadeLevel(byte Level) { Brightness.setFadeLevel(Level); applyBrightness(); }
     void clearBrightnessFade() { Brightness.clearFade(); applyBrightness(); }
 
+    /* The night switch's dimming, which scales what the setting arrived at instead of
+       replacing it - so the brightness the owner chose is what morning returns to. */
+    byte getBrightnessNightLevel() const { return Brightness.getNightLevel(); }
+    void setBrightnessNightLevel(byte Level) { Brightness.setNightLevel(Level); applyBrightness(); }
+    void clearBrightnessNight() { Brightness.clearNight(); applyBrightness(); }
+
     /* Back to what a clock that was never configured shows. Each part answers for its own
        defaults, so nothing here has to know what they are; the brightness is applied
        afterwards, because that is what recalculates what reaches the LEDs. */

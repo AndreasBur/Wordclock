@@ -69,7 +69,8 @@ class MsgCmdParser
         COMMAND_TIME,
         COMMAND_DATE,
         COMMAND_STATUS,
-        COMMAND_NETWORK
+        COMMAND_NETWORK,
+        COMMAND_NIGHT_SWITCH
     };
 
 /******************************************************************************************************************************************************

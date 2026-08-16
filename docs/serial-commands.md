@@ -45,6 +45,7 @@ overlay is disabled at compile time.
 | 11 | Date | `-Y<year>` (uint16) `-M<month>` `-D<day>` | Sets RTC date |
 | 12 | Status | *(none)* | Read-only; version, uptime as days/hours/minutes, illuminance, temperature, address, link quality, free memory |
 | 13 | Network | `-S<name>` `-P<pass phrase>` | Which network the clock joins. The pass phrase goes in and never comes back |
+| 14 | Night switch | `-A<0/1>` `-H<hour>` `-M<min>` `-E<hour>` `-N<min>` `-B<brightness>` | When the clock takes the night off. `-H`/`-M` start it, `-E`/`-N` end it, `-B` is how bright it stays — **0 switches the display off**. The window may cross midnight. Every option is optional; what is not sent stays as it was |
 
 ### Overlay options (shared)
 
@@ -196,6 +197,9 @@ carries no value, so the readings live in a command of their own.
 
 ```
 12                    # -> 12 V=0.1.0 U=0 H=1 N=33 I=350 T=23.4C A=192.168.1.23 Q=-62 M=142
+14 -A1 -H23 -E6        # -> 14 A=1 H=23 M=0 E=6 N=0 B=0    dark from 23:00 to 06:00
+14 -B16               # -> 14 A=1 H=23 M=0 E=6 N=0 B=16   dimmed rather than off
+14                    # -> 14 A=1 H=23 M=0 E=6 N=0 B=16   asked without changing anything
 ```
 
 | field | Meaning |

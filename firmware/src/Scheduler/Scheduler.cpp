@@ -27,6 +27,7 @@
 #include "Communication.h"
 #include "Overlays.h"
 #include "Persistence.h"
+#include "NightSwitch.h"
 #include "Uptime.h"
 #include "Temperature.h"
 #include "Text.h"
@@ -105,6 +106,7 @@ void Scheduler::triggerTasks()
        the middle of this tick's pass */
     if(isDue(TASK_ID_PERSISTENCE, Persistence::getInstance().getTaskCycle())) { Persistence::getInstance().task(); }
     if(isDue(TASK_ID_UPTIME, Uptime::getInstance().getTaskCycle())) { Uptime::getInstance().task(); }
+    if(isDue(TASK_ID_NIGHT_SWITCH, NightSwitch::getInstance().getTaskCycle())) { NightSwitch::getInstance().task(); }
 } /* triggerTasks */
 
 /******************************************************************************************************************************************************
