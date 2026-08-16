@@ -39,6 +39,7 @@ int main()
     testShowNowProcedures();
     testTemperatureOverlayWithoutSensor();
     testEveryAnimationEndsOnTheNewTime();
+    testFlickerLeavesTheDisplayOn();
     testFadeDimsAndComesBack();
     testCharacterToGlyphMapping();
     testRegionalWordings();
