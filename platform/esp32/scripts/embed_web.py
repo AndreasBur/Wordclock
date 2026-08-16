@@ -14,6 +14,7 @@ regenerate it; as a build product that cannot happen.
 """
 
 import gzip
+import re
 import sys
 from pathlib import Path
 
@@ -28,6 +29,32 @@ except NameError:
 
 
 HEADER_NAME = "WebPage.h"
+
+
+def strip_comments(text):
+    """Takes the page's comments out on the way into flash, leaving them in the source.
+
+    They are 58% of index.html and 6 KiB of the 10 KiB it compresses to - which is 0.2% of
+    the ESP32's flash and worth nothing there, but the page is also the place where the
+    reasoning is worth the most, because CSS decisions read as arbitrary without it. So the
+    explanation stays where it is read and stops being shipped.
+
+    Only block comments, and that is what makes this safe rather than clever: the page uses
+    /* */ throughout, which is this project's style everywhere, so there is no // form to
+    remove - and // is exactly what a naive stripper would take out of ws:// and http://.
+    The check below is what keeps that assumption from going quiet if it ever stops holding.
+    """
+    if re.search(r"^\s*//", text, flags=re.M):
+        raise SystemExit(
+            "embed_web.py: index.html has a // comment. Only /* */ is removed here, because "
+            "// cannot be told from the one in ws:// without parsing the page. Use /* */."
+        )
+
+    text = re.sub(r"<!--.*?-->", "", text, flags=re.S)
+    text = re.sub(r"/\*.*?\*/", "", text, flags=re.S)
+    # The blank lines the comments leave behind, and the trailing spaces with them.
+    text = re.sub(r"[ \t]+$", "", text, flags=re.M)
+    return re.sub(r"\n{3,}", "\n\n", text)
 
 
 def render(compressed):
@@ -66,7 +93,8 @@ def embed(source, build_dir):
 
     # mtime=0 so the same page always yields the same bytes, which keeps a rebuild from
     # looking like a change.
-    compressed = gzip.compress(page.read_bytes(), compresslevel=9, mtime=0)
+    source = strip_comments(page.read_text(encoding="utf-8"))
+    compressed = gzip.compress(source.encode("utf-8"), compresslevel=9, mtime=0)
 
     target = Path(build_dir) / HEADER_NAME
     target.parent.mkdir(parents=True, exist_ok=True)
@@ -77,7 +105,9 @@ def embed(source, build_dir):
     if not target.is_file() or target.read_text() != rendered:
         target.write_text(rendered)
 
-    print(f"embed_web.py: {page.name} -> {target} ({page.stat().st_size} -> {len(compressed)} bytes)")
+    print(f"embed_web.py: {page.name} -> {target} "
+          f"({page.stat().st_size} -> {len(source.encode('utf-8'))} without comments "
+          f"-> {len(compressed)} bytes)")
     return target.parent
 
 

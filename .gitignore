@@ -43,3 +43,7 @@ devcontainer-lock.json
 # grants authorize pushing and closing pull requests as whoever is logged in here,
 # which is not something a fresh clone should inherit without deciding it.
 /.claude/settings.local.json
+
+# The embed script is imported directly when its comment stripping is being checked, and
+# CPython leaves this behind whenever that happens.
+__pycache__/

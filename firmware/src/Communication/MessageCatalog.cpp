@@ -314,7 +314,7 @@ constexpr MessageCatalog::OptionType StatusOptions[] {
 /* MsgCmdNightSwitchParser. Brightness zero is the display switched off rather than a
    dimming of nothing, which is what lets one field carry both wishes. */
 constexpr MessageCatalog::OptionType NightSwitchOptions[] {
-    {'A', "Active (0/1)",       ARGUMENT_TYPE_UINT8,  0u, 1u},
+    {'A', "Active",             ARGUMENT_TYPE_UINT8,  NAMED(0u, BooleanValueNames)},
     {'H', "Start hour",         ARGUMENT_TYPE_UINT8,  0u, 23u},
     {'M', "Start minute",       ARGUMENT_TYPE_UINT8,  0u, 59u},
     {'E', "End hour",           ARGUMENT_TYPE_UINT8,  0u, 23u},
