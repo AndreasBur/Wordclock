@@ -179,6 +179,23 @@ From the comparison with wordclock24h, in the order they would change daily use.
 6. **IR receiver**, after section 4.
 7. **Ambilight**, a second stripe with its own colour and timer.
 8. ~~**The degree sign in the font tables**~~ **Done**, see section 2.
+9. **Is the checked/`Fast` accessor pair worth what it costs?** Every platform accessor
+   comes in two forms: one that validates its index and answers `StdReturnType`, one that
+   trusts the caller and answers the value. The justification is real for this target — a
+   freestanding 8-bit part built with `-Os` and a loop over 110 pixels per frame, where a
+   bounds check per pixel is time rather than a formality.
+
+   What put this on the list is that `getOutputPixel` existed for its whole life with only
+   the `Fast` half, on all three backends, and nothing noticed. A pattern in two parts
+   whose second part nothing enforces loses its second part.
+
+   Two things to settle, in this order. **Measure first**: build the AVR image once with
+   the checked forms used throughout and read the flash difference. If it is small, the
+   pair is an upkeep cost with no return and the answer is to drop one half rather than to
+   guard it. **If it is not small**, make forgetting impossible — a platform-contract
+   test that instantiates both forms of every accessor turns a missing half into a compile
+   error, and costs nothing at runtime, which suits a project that already guards its
+   option counts with `static_assert`.
 
 Deliberately not planned: weather reports, MP3 playback and alarms, games on the
 display. They are what wordclock24h grew over years, and none of them is a word
