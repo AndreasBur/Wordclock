@@ -28,6 +28,7 @@
  * I N C L U D E S
 ******************************************************************************************************************************************************/
 #include <wx/wx.h>
+#include <wx/odcombo.h>
 #include <array>
 #include "StandardTypes.h"
 #include "PixelsFrame.h"
@@ -81,10 +82,10 @@ class MessageBuilder : public wxDialog
     struct OptionRowType {
         wxCheckBox* Use;
         wxTextCtrl* Value;
-        wxChoice* Choice;
+        wxOwnerDrawnComboBox* Choice;
     };
 
-    wxChoice* CommandChoice;
+    wxOwnerDrawnComboBox* CommandChoice;
     std::array<OptionRowType, MESSAGE_CATALOG_MAX_NUMBER_OF_OPTIONS> OptionRows;
     wxTextCtrl* Preview;
 
@@ -92,6 +93,14 @@ class MessageBuilder : public wxDialog
     /* Wider than the plain value field: it has to hold names like "Illuminance
        calibration maximum". */
     static constexpr int ChoiceWidth{240};
+    /* What a popup may grow to before it scrolls instead. wxChoice had no such knob: its
+       popup is a GTK one, and GTK decides when to switch on its scroll arrows from the
+       monitor's work area - which is right on a normal desktop and wrong under WSLg, where
+       the list simply ran off the bottom of the screen and the entries past it could not be
+       reached at all. wxOwnerDrawnComboBox draws its own popup, so this is a number rather
+       than a hope. Ten rows or so, which is the RPC list's thirty-three in three screens
+       rather than one screen and a cliff. */
+    static constexpr int PopupMaxHeight{240};
     static constexpr int PreviewWidth{300};
     static constexpr int Border{10};
 

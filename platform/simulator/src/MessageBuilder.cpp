@@ -37,12 +37,12 @@
 ******************************************************************************************************************************************************/
 BEGIN_EVENT_TABLE(MessageBuilder, wxDialog)
     EVT_CLOSE(MessageBuilder::OnClose)
-    EVT_CHOICE(ID_CHOICE_COMMAND, MessageBuilder::OnCommand)
+    EVT_COMBOBOX(ID_CHOICE_COMMAND, MessageBuilder::OnCommand)
     EVT_BUTTON(ID_BUTTON_INSERT, MessageBuilder::OnInsert)
     /* All option rows share one handler; the preview does not care which of them moved. */
     EVT_COMMAND_RANGE(ID_CHECKBOX_OPTION_FIRST, ID_CHECKBOX_OPTION_LAST, wxEVT_CHECKBOX, MessageBuilder::OnOptionUsed)
     EVT_COMMAND_RANGE(ID_TEXT_OPTION_FIRST, ID_TEXT_OPTION_LAST, wxEVT_TEXT, MessageBuilder::OnOptionChanged)
-    EVT_COMMAND_RANGE(ID_CHOICE_OPTION_FIRST, ID_CHOICE_OPTION_LAST, wxEVT_CHOICE, MessageBuilder::OnOptionChanged)
+    EVT_COMMAND_RANGE(ID_CHOICE_OPTION_FIRST, ID_CHOICE_OPTION_LAST, wxEVT_COMBOBOX, MessageBuilder::OnOptionChanged)
 END_EVENT_TABLE()
 
 
@@ -86,7 +86,12 @@ wxBoxSizer* MessageBuilder::createSizerAll(wxWindow* Parent)
     wxStaticBox* StaticBox = new wxStaticBox(Parent, ID_STATIC_BOX_MESSAGE, _T("Command"));
     wxStaticBoxSizer* SizerAll = new wxStaticBoxSizer(StaticBox, wxVERTICAL);
 
-    CommandChoice = new wxChoice(Parent, ID_CHOICE_COMMAND);
+    /* wxCB_READONLY so it behaves as the wxChoice it replaces: pick from the list, do not
+       type into it. */
+    CommandChoice = new wxOwnerDrawnComboBox(Parent, ID_CHOICE_COMMAND, wxEmptyString,
+                                             wxDefaultPosition, wxDefaultSize,
+                                             0, nullptr, wxCB_READONLY);
+    CommandChoice->SetPopupMaxHeight(PopupMaxHeight);
     for(byte Index = 0u; Index < MessageCatalog::getNumberOfCommands(); Index++) {
         const MessageCatalog::CommandType& Command = MessageCatalog::getCommand(Index);
         CommandChoice->Append(wxString::Format(wxT("%u  %s"), Command.Number, Command.Label));
@@ -104,8 +109,11 @@ wxBoxSizer* MessageBuilder::createSizerAll(wxWindow* Parent)
         OptionRows[Index].Use = new wxCheckBox(Parent, ID_CHECKBOX_OPTION_FIRST + Index, _T(""));
         OptionRows[Index].Value = new wxTextCtrl(Parent, ID_TEXT_OPTION_FIRST + Index, _T(""),
                                                  wxDefaultPosition, wxSize(ValueWidth, -1));
-        OptionRows[Index].Choice = new wxChoice(Parent, ID_CHOICE_OPTION_FIRST + Index,
-                                                wxDefaultPosition, wxSize(ChoiceWidth, -1));
+        OptionRows[Index].Choice = new wxOwnerDrawnComboBox(Parent, ID_CHOICE_OPTION_FIRST + Index,
+                                                            wxEmptyString, wxDefaultPosition,
+                                                            wxSize(ChoiceWidth, -1),
+                                                            0, nullptr, wxCB_READONLY);
+        OptionRows[Index].Choice->SetPopupMaxHeight(PopupMaxHeight);
 
         SizerOption->Add(OptionRows[Index].Use, 1, wxALIGN_CENTER_VERTICAL);
         SizerOption->Add(OptionRows[Index].Value, 0, wxALIGN_CENTER_VERTICAL);
