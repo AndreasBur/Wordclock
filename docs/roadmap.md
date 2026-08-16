@@ -121,7 +121,7 @@ temperature, the address, the link quality and the free memory, see
 The fields that only the platform knows - uptime, address, link quality, free memory -
 came with `System.h` in section 5 and are in the answer too.
 
-## 4. RPCs for a remote control
+## 4. RPCs for controls that hold no state
 
 The eight increment/decrement ids are shaped for a button that has no display to
 show a value. That set is incomplete for the same use:
@@ -133,8 +133,19 @@ show a value. That set is incomplete for the same use:
 | 37/38/39 | Display toggle / brightness automatic toggle / gamma correction toggle |
 | 40 | Colour reset (white) |
 
-Worth doing before the IR receiver in the backlog, not after: the receiver then maps
-keys onto an interface that already exists and can be tested over the serial line.
+These are not for a phone. A phone knows the state, offers a list and sends the value
+it wants - `2 -A7`, and no "next" is needed. What cannot know the state is a knob or a
+button on the case, which can only ever say "one further"; that is what the existing
+eight are for and what these seven complete.
+
+The reason to have such a control at all is the one thing no phone gives: a guest can
+dim the clock. No app, no network password, nobody hunting for a phone - and it is the
+only way in that survives the WiFi being down.
+
+This used to be written as preparation for the IR receiver, which is now in the "not
+planned" list. The interface outlived its first reason: a rotary encoder needs exactly
+the same calls, and can be developed against them over the serial line before any
+hardware exists.
 
 ## 5. Platform hooks
 
@@ -189,7 +200,16 @@ From the comparison with wordclock24h, in the order they would change daily use.
    drifts a few seconds a month and SNTP does not.
 5. **Colour animations.** All fifteen animations are transitions; a slow colour cycle
    while the display stands still is a different mechanism and does not exist.
-6. **IR receiver**, after section 4.
+6. **Make the console installable.** It is already the phone app in every way that
+   matters: served by the clock itself, `width=device-width` since it was written, and
+   sized to a narrow screen since the panel learned to fit. What it lacks against a
+   native one is an icon on the home screen and a start without an address bar, and a
+   web app manifest is both - some twenty lines of JSON and an icon that
+   [assets/](../assets/) already holds.
+
+   A native app would cost two platforms, two stores, signing and an update whenever
+   either OS moves, and would end up sending the same commands over the same web socket.
+   For something configured three times a year that is the wrong trade.
 7. **Ambilight**, a second stripe with its own colour and timer.
 8. ~~**The degree sign in the font tables**~~ **Done**, see section 2.
 9. **Is the checked/`Fast` accessor pair worth what it costs?** Every platform accessor
@@ -211,8 +231,11 @@ From the comparison with wordclock24h, in the order they would change daily use.
    option counts with `static_assert`.
 
 Deliberately not planned: weather reports, MP3 playback and alarms, games on the
-display. They are what wordclock24h grew over years, and none of them is a word
-clock.
+display, and an **IR receiver**. The first four are what wordclock24h grew over years and
+none of them is a word clock. The receiver is a different kind of no: a handset is a
+thing to lose, with a flat battery when it is found and a line of sight to keep, in front
+of a clock that is on the network anyway. What it was wanted for - control without a
+phone - is better answered by a knob on the case, which section 4 now serves.
 
 ## Where this project is ahead
 
