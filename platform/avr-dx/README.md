@@ -35,10 +35,15 @@ implementation to mirror.
 
 ## What a backend must provide
 
+Where the table writes `getPixel(Fast)` it means two calls, not one: a checked form
+answering `StdReturnType` and a `*Fast` form that answers the value and trusts its
+caller. Both, always — the core uses whichever fits, and a backend that supplies only
+one of a pair compiles until the day something reaches for the other.
+
 | Header / unit | Contract | Here |
 |---------------|----------|------|
 | `Arduino.h` | `byte`, `boolean`, `F()`, `PROGMEM`, `pgm_read_byte`, `memcpy_P`, `bitRead`, `itoa`, and a `Serial` object exposing `print` / `println` / `available` / `read` | avr-libc directly, plus a non-virtual `SerialPort` on USART1 |
-| `Pixels.h` | `Pixels` singleton: `getInstance`, `setPixel(Fast)` / `clearPixel(Fast)` / `getPixel(Fast)`, `setBrightness`, `show`, `clearPixels`, `init(pin)` | Buffer and brightness; `render()` hands the frame to `WS2812` |
+| `Pixels.h` | `Pixels` singleton: `getInstance`, `setPixel(Fast)` / `clearPixel(Fast)` / `getPixel(Fast)` / `getOutputPixel(Fast)`, `setBrightness`, `show`, `clearPixels`, `init(pin)` | Buffer and brightness; `render()` hands the frame to `WS2812` |
 | `RealTimeClock.h` | `RealTimeClock` singleton holding a `ClockDateTime`; the core only *reads* it via `getDateTime()` | Read from the DS3231 once a second, written through on a command |
 | `BH1750.h` | Ambient-light driver exposing the illuminance reading the core consumes | BH1750 over TWI1 |
 | `DS3231.h` | `DS3231` with `getTaskCycle`, `task`, and `getTemperature(TemperatureType&)` in tenths of a degree Celsius. The return code is the contract: `E_NOT_OK` until a reading has arrived, which is what a board without the chip keeps answering and what keeps the temperature overlay away | DS3231 over TWI1, register handling shared with the ESP32 backend |

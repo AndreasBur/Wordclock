@@ -101,6 +101,17 @@ class Pixels
     byte getBrightness() const { return Brightness; }
     StdReturnType getPixel(byte, PixelType&) const;
     PixelType getPixelFast(byte) const;
+    StdReturnType getOutputPixel(byte Index, PixelType& Pixel) const {
+        if(getPixel(Index, Pixel) == E_NOT_OK) { return E_NOT_OK; }
+
+        Pixel.dimmPixel(Brightness);
+        return E_OK;
+    }
+    PixelType getOutputPixelFast(byte Index) const {
+        PixelType Pixel = getPixelFast(Index);
+        Pixel.dimmPixel(Brightness);
+        return Pixel;
+    }
 
     // set methods
     void setPixels(PixelType);

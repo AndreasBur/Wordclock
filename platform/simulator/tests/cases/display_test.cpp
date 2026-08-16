@@ -121,6 +121,34 @@ void testFadeDimsAndComesBack()
    positionally put red where getRed() does not look. Every colour built that way so far
    was grey or black, which hides it, and the window renders brightness rather than hue,
    which hides it again - it would first have appeared on the strip. */
+/* Switching the display off and on again, seen where it happens: the output rather than
+   the buffer. disable() leaves every colour in the buffer where it was and takes the
+   brightness to zero, so a check on the buffer alone would call a dark clock lit. */
+void testDisplayOffAndOnAgain()
+{
+    Display& display = Display::getInstance();
+
+    /* Switched on first rather than assumed on: the flicker animation leaves it off, and
+       until this test there was nothing that could notice. */
+    display.enable();
+    display.setBrightness(120u);
+    Clock::getInstance().setTime(10u, 5u);
+    expect(display.show() == E_OK, "the clock face must reach the strip");
+    expect(isAnyOutputPixelLit(), "a display that is on must put something out");
+
+    const PixelBufferType Lit = readPixels();
+
+    display.disable();
+    expect(!isAnyOutputPixelLit(), "a display that is off must put nothing out");
+    expect(arePixelsEqual(readPixels(), Lit),
+           "and must leave the buffer alone, so switching back on needs no redraw");
+
+    display.enable();
+    expect(isAnyOutputPixelLit(), "switching back on must put something out again");
+    expect(display.getBrightness() == 120u,
+           "and must come back on the brightness that was set, not on full");
+}
+
 void testPixelColorChannels()
 {
     const Pixel color(10u, 20u, 30u);
