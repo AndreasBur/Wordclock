@@ -20,6 +20,7 @@ void testTemperatureOverlayWithoutSensor();
 void testOverlayPeriodAndEndurance();
 
 /* animation_test.cpp */
+void testFlickerLeavesTheDisplayOn();
 void testEveryAnimationEndsOnTheNewTime();
 
 /* text_test.cpp */
@@ -35,6 +36,11 @@ void testClockWordsComparison();
 /* scheduler_test.cpp */
 void testSchedulerSpeedRoundTrip();
 void testUptimeCountsWithoutWrapping();
+
+/* nightswitch_test.cpp */
+void testNightWindowIncludesMidnight();
+void testNightSwitchDimsWithoutLosingTheSetting();
+void testNightSwitchActsOnTheCrossingOnly();
 
 /* persistence_test.cpp */
 void testPersistence();

@@ -39,6 +39,7 @@ int main()
     testShowNowProcedures();
     testTemperatureOverlayWithoutSensor();
     testEveryAnimationEndsOnTheNewTime();
+    testFlickerLeavesTheDisplayOn();
     testFadeDimsAndComesBack();
     testCharacterToGlyphMapping();
     testRegionalWordings();
@@ -51,6 +52,9 @@ int main()
     testClockWordsComparison();
     testPixelColorChannels();
     testDisplayCharacterLookup();
+    testNightWindowIncludesMidnight();
+    testNightSwitchDimsWithoutLosingTheSetting();
+    testNightSwitchActsOnTheCrossingOnly();
     testPersistence();
     testPersistenceSaveAndReset();
 

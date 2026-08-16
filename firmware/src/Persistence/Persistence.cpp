@@ -25,6 +25,7 @@
 #include "Clock.h"
 #include "Display.h"
 #include "Illuminance.h"
+#include "NightSwitch.h"
 #include "Overlays.h"
 #include "Storage.h"
 
@@ -88,6 +89,14 @@ struct SettingsType {
        buffer size rather than length-prefixed, so the struct stays one fixed block that
        memcmp and the checksum walk without knowing anything about its contents. */
     char OverlayText[OVERLAY_TEXT_TEXT_SIZE];
+
+    byte NightSwitchIsActive;
+    byte NightSwitchStartHour;
+    byte NightSwitchStartMinute;
+    byte NightSwitchEndHour;
+    byte NightSwitchEndMinute;
+    byte NightSwitchBrightness;
+
     byte Checksum;
 };
 
@@ -101,8 +110,9 @@ constexpr uint16_t SettingsMagic{0x5743u};
    up with a field read out of the wrong offset.
      1  the first format
      2  the "it is" rule, which used to be a compile-time switch
-     3  the three overlays and the text overlay's text */
-constexpr byte SettingsVersion{3u};
+     3  the three overlays and the text overlay's text
+     4  the night switch */
+constexpr byte SettingsVersion{4u};
 
 static_assert(sizeof(SettingsType) <= Storage::Capacity,
               "Persistence: the settings no longer fit the store, please raise STORAGE_CAPACITY on every platform");
@@ -273,6 +283,14 @@ SettingsType gather()
     Settings.IlluminanceCalibrationMax = illuminance.getCalibrationValuesMaxValue();
     Settings.IlluminanceCalibrationMin = illuminance.getCalibrationValuesMinValue();
 
+    const NightSwitch& nightSwitch = NightSwitch::getInstance();
+    Settings.NightSwitchIsActive = nightSwitch.getIsActive() ? 1u : 0u;
+    Settings.NightSwitchStartHour = nightSwitch.getStartHour();
+    Settings.NightSwitchStartMinute = nightSwitch.getStartMinute();
+    Settings.NightSwitchEndHour = nightSwitch.getEndHour();
+    Settings.NightSwitchEndMinute = nightSwitch.getEndMinute();
+    Settings.NightSwitchBrightness = nightSwitch.getNightBrightness();
+
     gatherOverlays(Settings);
 
     Settings.Checksum = calcChecksum(Settings);
@@ -310,6 +328,16 @@ void apply(const SettingsType& Settings)
     Illuminance& illuminance = Illuminance::getInstance();
     illuminance.setCalibrationValuesMaxValue(Settings.IlluminanceCalibrationMax);
     illuminance.setCalibrationValuesMinValue(Settings.IlluminanceCalibrationMin);
+
+    NightSwitch& nightSwitch = NightSwitch::getInstance();
+    nightSwitch.setStartHour(Settings.NightSwitchStartHour);
+    nightSwitch.setStartMinute(Settings.NightSwitchStartMinute);
+    nightSwitch.setEndHour(Settings.NightSwitchEndHour);
+    nightSwitch.setEndMinute(Settings.NightSwitchEndMinute);
+    nightSwitch.setNightBrightness(Settings.NightSwitchBrightness);
+    /* Last of the five, because switching it on is what makes the next tick an edge - and
+       an edge acting on a half-restored window would use yesterday's times. */
+    nightSwitch.setIsActive(Settings.NightSwitchIsActive != 0u);
 
     applyOverlays(Settings);
 }
@@ -425,6 +453,7 @@ StdReturnType Persistence::reset()
     Animations::getInstance().resetToDefaults();
     Illuminance::getInstance().resetToDefaults();
     Overlays::getInstance().resetToDefaults();
+    NightSwitch::getInstance().resetToDefaults();
 
     const StdReturnType ReturnValue = Storage::getInstance().clear();
 
