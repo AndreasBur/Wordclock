@@ -10,6 +10,7 @@
 /* display_test.cpp */
 void testDisplayManagerLatch();
 void testFadeDimsAndComesBack();
+void testDisplayOffAndOnAgain();
 void testPixelColorChannels();
 void testDisplayCharacterLookup();
 

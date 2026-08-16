@@ -68,6 +68,19 @@ inline bool isAnyPixelLit(const PixelBufferType& Pixels)
     return false;
 }
 
+/* What would reach the LEDs, which is not what readPixels() shows: that reads the buffer,
+   and the brightness is folded in on the way out. The difference is the whole of what
+   switching the display off does, so a test that asked the buffer would see nothing. */
+inline bool isAnyOutputPixelLit()
+{
+    for(byte index = 0u; index < PIXELS_NUMBER_OF_PIXELS; index++) {
+        const Pixels::PixelType Pixel = Pixels::getInstance().getOutputPixelFast(index);
+
+        if(Pixel.getRed() != 0u || Pixel.getGreen() != 0u || Pixel.getBlue() != 0u) { return true; }
+    }
+    return false;
+}
+
 inline void setTime(byte Hour, byte Minute, byte Second)
 {
     RealTimeClock::getInstance().setTime(ClockTime(Hour, Minute, Second));
