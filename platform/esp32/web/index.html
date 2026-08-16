@@ -27,13 +27,17 @@
        follow rather than staying light on a dark page. */
     :root, :root[data-theme="light"] {
         color-scheme: light;
-        --panel: #f6f6f3;
+        /* Neutral rather than the beige it was. Three near-black cards on a warm off-white
+           read as a compromise between two ideas; on a grey they read as an instrument on a
+           desk. */
+        --panel: #eeeef1;
         --field: #ffffff;
         --text: #1e1e22;
-        /* Darker than the panel's own amber, which on white would be barely legible. */
-        --lit: #9a5b00;
+        /* The surfaces' amber taken down until it holds on white - the same hue, so the page
+           and the instrument are not two different oranges. */
+        --lit: #b06a00;
         --unlit: #5f5f66;
-        --line: #dcdcd6;
+        --line: #d9d9df;
         /* A console is read line by line, so it is capped rather than stretched: on a wide
            screen the full width leaves short lines floating in emptiness and pushes the
            send button a screen away from the field it belongs to. */
@@ -48,7 +52,9 @@
     @media (prefers-color-scheme: dark) {
         :root:not([data-theme="light"]) {
             color-scheme: dark;
-            --panel: #0e0e11;
+            /* Below the surfaces rather than beside them: at #0e0e11 the page and the cards
+               were within a few values of each other and only the borders separated them. */
+            --panel: #08080b;
             --field: #17171b;
             --text: #d8d8de;
             /* The panel's amber, which is what the clock itself shows. */
@@ -59,7 +65,7 @@
     }
     :root[data-theme="dark"] {
         color-scheme: dark;
-        --panel: #0e0e11;
+        --panel: #08080b;
         --field: #17171b;
         --text: #d8d8de;
         --lit: #ffb020;
@@ -88,9 +94,11 @@
     .bar { width: 100%; max-width: var(--content); margin-inline: auto; }
     body {
         margin: 0;
-        /* Exactly the viewport rather than at least it, so #log's flex:1 shares out what is
-           left instead of the page growing past the bottom of the screen. */
-        height: 100vh;
+        /* At least the viewport, and more when what is on it needs more. Exactly 100vh was
+           right while everything below the clock had a fixed height; it stopped being right
+           when the clock was allowed to shrink, because then there was no point at which the
+           page had to grow instead. */
+        min-height: 100vh;
         background: var(--panel);
         color: var(--unlit);
         font: 15px/1.5 ui-monospace, "DejaVu Sans Mono", monospace;
@@ -144,19 +152,34 @@
         flex: none;
         width: 100%;
         max-width: var(--content);
-        margin: 0 auto var(--gap-l);
+        margin: 0 auto var(--gap);
         overflow: hidden;
     }
     /* One line, scrolled rather than grown: what a reader wants is the answer that just
        came back, and append() already brings it into view. Every pixel beyond that line was
        one the clock could have had. */
     #log {
-        height: calc(1.5em + 2 * var(--gap));
-        padding: var(--gap) 14px;
+        /* A field of its own beside the input's, same border, same background, same height:
+           40 outside, 38 inside, which is what the input comes to with its own border and
+           padding.
+
+           The line is centred by line-height rather than by padding, and that is the whole
+           trick: padding on a scroll container belongs to the scrollport, so a one-line field
+           with padding shows one line and a sliver of the one above it. A line-height that
+           fills the box leaves exactly one line visible and scrolls by exactly one. */
+        height: 40px;
+        line-height: 38px;
+        margin: 6px 6px 0;
+        padding: 0 12px;
+        background: var(--field);
+        border: 1px solid var(--line);
+        border-radius: 6px;
         overflow-y: auto;
         white-space: pre-wrap;
         word-break: break-word;
         color: var(--text);
+        scrollbar-width: thin;
+        scrollbar-color: var(--unlit) transparent;
     }
     #log:empty::before { content: 'no output yet'; color: var(--unlit); font-style: italic; }
     #log .out { color: var(--text); }
@@ -164,12 +187,36 @@
     #log .note { color: var(--unlit); font-style: italic; }
 
     /* Inside the card, so the input carries no frame of its own - the card is the frame. */
-    #entry { display: flex; gap: var(--gap); padding: var(--gap); border-top: 1px solid var(--line); }
+    /* align-items:center rather than the default stretch, and the same padding as the
+       button, so the two are one height centred on one line. The focus ring sits flush
+       instead of a pixel proud, which is what made the field look taller than Send. */
+    #entry {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        /* A form carries a bottom margin of its own unless it is told not to, which put more
+           air under the row than over it - the row sat low in its strip rather than in the
+           middle of it, and no amount of align-items was going to fix that. */
+        margin: 0;
+        padding: 6px;
+    }
     /* Frameless until it is focused, and then the ring is the input's own - an inset shadow
        on the row was square, because the row has no radius, and reached around the Send
        button, because the button is in the row too. The radius is kept even with no border
        so the outline has something to follow. */
-    #entry input { border: none; background: none; border-radius: 6px; padding: 6px 10px; }
+    /* No override at all: the shared input/button/select rule already gives the field the
+       button's border, background, radius and padding, which is exactly what makes the two
+       read as a pair. Making it frameless "because the card is the frame" was a nice idea
+       that left one of the two looking like the odd one out. */
+    /* The ring inside the box, not around it. An outline is drawn outside the border box, so
+       a focused field stood four pixels taller than the button beside it however carefully
+       the two were matched. Border plus an inset shadow gives the same two pixels of amber
+       and changes no height at all. */
+    #entry input:focus {
+        outline: none;
+        border-color: var(--lit);
+        box-shadow: inset 0 0 0 1px var(--lit);
+    }
 
     /* The builder. Collapsed by default: typing a command is the faster path once one
        knows it, and the form is what makes it findable in the first place. In the same
@@ -178,19 +225,40 @@
         flex: none;
         width: 100%;
         max-width: var(--content);
-        margin: 0 auto var(--gap-l);
+        margin: 0 auto var(--gap);
         overflow: hidden;
     }
-    summary { padding: 10px 14px; cursor: pointer; color: var(--lit); font-size: 13px; }
+    /* Three insets down the whole page, and only three: a card edge at 0, a control box at
+       6, and text at 19 - which is the 6 plus a control's own border and padding. The two
+       cards had 6 and 14 and nothing lined up with anything vertically. */
+    summary { padding: 10px 19px; cursor: pointer; color: var(--lit); font-size: 13px; }
+    /* Two columns, so the preview and the button that takes it sit on one line the way the
+       console's input and Send do. Everything above them spans both: the command and its
+       options are the form, the last row is what you do with it. */
     #builder {
-        padding: 0 14px var(--gap-l);
+        padding: 0 6px 6px;
         display: grid;
+        grid-template-columns: 1fr auto;
         gap: var(--gap);
+        align-items: center;
     }
+    #builder > #commands,
+    #builder > #options { grid-column: 1 / -1; }
     #builder #use { justify-self: end; }
     #builder[hidden] { display: none; }
     .row { display: grid; grid-template-columns: 22px 1fr 1fr; gap: 10px; align-items: center; }
+    /* Ticked or not, said in one colour rather than in opacity. Opacity was the first
+       attempt and it does not work here: it scales everything by the same factor, so a
+       select showing a real value stayed brighter than an input showing a placeholder, which
+       is the very difference that was meant to disappear.
+
+       A select cannot be empty, so an unticked one is dimmed to the same token a placeholder
+       uses - and both say the same thing, that nothing here is going into the command. */
     .row label { color: var(--unlit); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    #builder ::placeholder { color: var(--unlit); opacity: 1; }
+    .row:not(:has(input[type=checkbox]:checked)) select { color: var(--unlit); }
+    .row:has(input[type=checkbox]:checked) label { color: var(--text); }
+    .row select { transition: color 90ms linear; }
     .row input[type=checkbox] { flex: none; width: 16px; height: 16px; accent-color: var(--lit); }
     #preview {
         font-family: inherit;
@@ -231,8 +299,11 @@
            So the clock takes what the flex column has left and gives it back when the
            builder wants it: flex sets the height, the shape derives the width from it, and
            min-height:0 is what allows the shrink at all. */
+        /* Shrinks to give the builder room, but not past the point of being a clock. Without
+           a floor it went to a postage stamp the moment nine option rows opened below it -
+           which is the sort of obedience nobody asked for. Past this, the page scrolls. */
         flex: 1 1 auto;
-        min-height: 0;
+        min-height: 200px;
         align-self: center;
         height: auto;
 
@@ -281,7 +352,7 @@
         text-shadow: 0 0 10px rgba(255, 176, 32, 0.45);
     }
     #panel[hidden] { display: none; }
-    #builderNote { color: var(--unlit); font-style: italic; padding: 0 18px 12px; max-width: var(--content); margin-inline: auto; }
+    #builderNote { color: var(--unlit); font-style: italic; padding: 0 19px 12px; max-width: var(--content); margin-inline: auto; }
 </style>
 
 <header>
