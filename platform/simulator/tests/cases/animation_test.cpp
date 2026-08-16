@@ -23,6 +23,29 @@
    clock that is a word nobody notices is wrong.
    The second promise is that they end at all. Both are checked for every animation there
    is, so an added one is covered by being added to the enumeration. */
+/* The flicker makes its effect by switching the display off and on, and it used to end on
+   an off: the toggle happens before the decision to stop, so the last one always darkened.
+   Asked at the output rather than at the buffer, which is where it hid - the words are in
+   the buffer either way, and every existing check looked there. */
+void testFlickerLeavesTheDisplayOn()
+{
+    Display& display = Display::getInstance();
+    Animations& animations = Animations::getInstance();
+
+    display.enable();
+    animations.setModeFast(Animations::MODE_FIXED);
+    animations.setAnimationFast(Animations::ANIMATION_ID_FLICKER);
+
+    setTime(10u, 5u, 0u);
+    DisplayManager::getInstance().task();
+    /* Well past the flicker's own count, so the animation has certainly finished. */
+    for(byte Tick = 0u; Tick < 64u; Tick++) { animations.task(true); }
+
+    expect(isAnyOutputPixelLit(), "a finished flicker must leave the display switched on");
+
+    animations.setAnimationFast(Animations::ANIMATION_ID_NONE);
+}
+
 void testEveryAnimationEndsOnTheNewTime()
 {
     /* A generous bound rather than a tight one: what it is here for is a runaway, not a

@@ -20,6 +20,7 @@ void testTemperatureOverlayWithoutSensor();
 void testOverlayPeriodAndEndurance();
 
 /* animation_test.cpp */
+void testFlickerLeavesTheDisplayOn();
 void testEveryAnimationEndsOnTheNewTime();
 
 /* text_test.cpp */

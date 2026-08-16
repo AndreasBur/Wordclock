@@ -90,6 +90,16 @@ void AnimationFlicker::task()
 ******************************************************************************************************************************************************/
 void AnimationFlicker::reset()
 {
+    /* The flicker is made by switching the display off and on, and it ends on an off:
+       clearTimeTask() toggles first and only then decides whether it was the last run, so
+       the final toggle is always the one that darkens. Nothing switched it back, which
+       left a clock that had shown this animation dark until something else happened to
+       turn it on.
+
+       Here rather than at the end of the animation, because reset() is also where an
+       abort lands - a flicker cut short in the middle had the same ending. */
+    Display::getInstance().enable();
+
     Minute = 0u;
     Hour = 0u;
     IsClockSet = false;
