@@ -144,17 +144,14 @@
     }
     input { flex: 1; min-width: 0; }
     input:focus, button:focus, select:focus { outline: 2px solid var(--lit); outline-offset: 1px; }
-    button { color: var(--lit); cursor: pointer; }
+    button { cursor: pointer; }
+    /* The two that do the thing the page is open for: send what was typed, and take the
+       built command. Everything else that is a button is a way of getting to those. */
+    #entry button[type=submit], #use { color: var(--lit); }
 
     /* The console. One card so that the answer and the question sit in the same object -
        and so the page is a column of three things rather than a stack of bands. */
-    #console {
-        flex: none;
-        width: 100%;
-        max-width: var(--content);
-        margin: 0 auto var(--gap);
-        overflow: hidden;
-    }
+    #console { overflow: hidden; }
     /* One line, scrolled rather than grown: what a reader wants is the answer that just
        came back, and append() already brings it into view. Every pixel beyond that line was
        one the clock could have had. */
@@ -218,20 +215,60 @@
         box-shadow: inset 0 0 0 1px var(--lit);
     }
 
+    /* One card per command, and inside it a label-and-field grid on the same three insets
+       as everything else. The fields are the builder's own optionField(), so a dropdown
+       here is a dropdown there and neither knows about the other's page. */
+    /* The clock keeps its own column instead of a slot in the stack. Stacked, it and the
+       settings drew from one pot of height, so every group opened took the clock a size
+       smaller - and shrinking is not what a clock should do when you look at something
+       else. --clock is the column's width and the one number to turn. */
+    #stage {
+        /* The two widths of the page. --menu rather than --content, which stays what it
+           always was - the width a line of console output is read at - because the settings
+           want a narrower column than a log does and the header follows --content too. */
+        --menu: 560px;
+        --clock: clamp(280px, 42vw, 620px);
+        flex: 1;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) var(--clock);
+        gap: var(--gap-l);
+        width: 100%;
+        max-width: calc(var(--menu) + var(--clock) + var(--gap-l));
+        margin-inline: auto;
+        padding: var(--gap-l) var(--pad);
+    }
+    #controls { min-width: 0; display: grid; gap: var(--gap); align-content: start; }
+    #settings { display: contents; }
+    .group { width: 100%; }
+    .group-body {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--gap);
+        align-items: center;
+        padding: 0 6px 6px;
+    }
+    .group-body label { color: var(--unlit); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    /* The button on its own line at the natural width, right, the way the builder's Use is. */
+    .group-body button { grid-column: 2; justify-self: end; }
+    .group-body :disabled { color: var(--unlit); }
+
+    /* Below this the two columns are one, and the clock goes first: on a phone it is the
+       thing you glance at, and the settings are what you scroll to. */
+    @media (max-width: 800px) {
+        #stage { grid-template-columns: 1fr; }
+        #panel { order: -1; position: static; max-width: 340px; margin-inline: auto; }
+    }
+
     /* The builder. Collapsed by default: typing a command is the faster path once one
        knows it, and the form is what makes it findable in the first place. In the same
        column as the console rather than a band across the page. */
-    details {
-        flex: none;
-        width: 100%;
-        max-width: var(--content);
-        margin: 0 auto var(--gap);
-        overflow: hidden;
-    }
+    details { width: 100%; overflow: hidden; }
     /* Three insets down the whole page, and only three: a card edge at 0, a control box at
        6, and text at 19 - which is the 6 plus a control's own border and padding. The two
        cards had 6 and 14 and nothing lined up with anything vertically. */
-    summary { padding: 10px 19px; cursor: pointer; color: var(--lit); font-size: 13px; }
+    /* Not the accent. Fourteen headings in it is not an accent, it is the colour of the
+       page - and an accent works by being rare. */
+    summary { padding: 10px 19px; cursor: pointer; color: var(--text); font-size: 13px; }
     /* Two columns, so the preview and the button that takes it sit on one line the way the
        console's input and Send do. Everything above them spans both: the command and its
        options are the form, the last row is what you do with it. */
@@ -299,13 +336,23 @@
            So the clock takes what the flex column has left and gives it back when the
            builder wants it: flex sets the height, the shape derives the width from it, and
            min-height:0 is what allows the shrink at all. */
-        /* Shrinks to give the builder room, but not past the point of being a clock. Without
-           a floor it went to a postage stamp the moment nine option rows opened below it -
-           which is the sort of obedience nobody asked for. Past this, the page scrolls. */
-        flex: 1 1 auto;
-        min-height: 200px;
-        align-self: center;
-        height: auto;
+        /* Width first now, because the column gives it a definite one and the page scrolls
+           anyway - which is what makes all the shrinking machinery this used to need
+           unnecessary. Sticky, so it is still there when the settings are scrolled. */
+        /* Top of its column and sticky. Centring it there was tried and does not combine
+           with sticky the way it sounds: the clock starts halfway down a nine-hundred-pixel
+           row, so it scrolls upward for half the list before it ever reaches the edge it is
+           meant to stop at - which from the outside is indistinguishable from not sticking.
+           With fourteen groups the column is always long, so the case centring was for is
+           the case that never happens. */
+        align-self: start;
+        position: sticky;
+        top: var(--gap-l);
+        /* As wide as its column allows, or as wide as the screen is tall - whichever is
+           less. Without the second term the clock grew past the bottom of the window as
+           soon as it was both large and centred in a long list: two wishes that are fine
+           apart and make a third problem together. */
+        width: min(100%, calc((100vh - 150px) * var(--ratio, 1.1)));
 
         /* content-box against the global border-box, on purpose: aspect-ratio applies to
            whichever box that names, and with the padding counted in, the cells would be
@@ -321,10 +368,7 @@
         container-type: size;
         overflow: hidden;
         aspect-ratio: var(--shape, 11 / 10);
-        width: auto;
-        max-width: 100%;
-        margin: var(--gap-l) auto;
-        padding: var(--gap-l) var(--pad);
+        padding: var(--gap) var(--gap-l);
     }
     #panel span {
         /* No ratio of its own: the panel carries the shape and the tracks are equal
@@ -363,29 +407,42 @@
     </div>
 </header>
 
-<div id="panel" class="surface" hidden></div>
+<!-- Two columns on a wide screen: what you operate on the left, what it does on the right.
+     They used to be stacked, and then the settings and the clock competed for the same
+     height - every group opened took the clock a size smaller. -->
+<main id="stage">
+    <div id="controls">
+        <!-- What the clock is set to, one group per command, generated from the catalog
+             exactly as the builder's form is. -->
+        <section id="settings"></section>
 
-<!-- One card, because they are one thing: what was asked and what came back. They used to
-     be a bare strip and a separate field with the command builder wedged between them, which
-     read as three unrelated bands down the page. -->
-<section id="console" class="surface">
-    <div id="log"></div>
-    <form id="entry">
-        <input id="command" placeholder="command, e.g. 3 -B255" autocomplete="off" spellcheck="false" autofocus>
-        <button type="submit">Send</button>
-    </form>
-</section>
+        <details id="builderBox" class="surface">
+            <summary>Build a command</summary>
+            <div id="builderNote" hidden></div>
+            <div id="builder">
+                <select id="commands"></select>
+                <div id="options"></div>
+                <div id="preview"></div>
+                <button type="button" id="use">Use</button>
+            </div>
+        </details>
 
-<details id="builderBox" class="surface">
-    <summary>Build a command</summary>
-    <div id="builderNote" hidden></div>
-    <div id="builder">
-        <select id="commands"></select>
-        <div id="options"></div>
-        <div id="preview"></div>
-        <button type="button" id="use">Use</button>
+        <!-- Folded away rather than gone: typing is the faster path once the protocol is
+             known, and this is the only view that shows what went over the wire. -->
+        <details id="consoleBox" class="surface">
+            <summary>Console</summary>
+            <div id="console">
+                <div id="log"></div>
+                <form id="entry">
+                    <input id="command" placeholder="command, e.g. 3 -B255" autocomplete="off" spellcheck="false">
+                    <button type="submit">Send</button>
+                </form>
+            </div>
+        </details>
     </div>
-</details>
+
+    <div id="panel" class="surface" hidden></div>
+</main>
 
 <script>
     const log = document.getElementById('log');
@@ -474,10 +531,17 @@
             attempts = 0;
             state.textContent = 'connected';
             state.classList.add('up');
+            /* The catalog arrives over HTTP and the socket opens on its own schedule, so
+               whichever is second has to be the one that asks. This is also what refills
+               the page after a reconnect, when the clock may have been set from elsewhere. */
+            refreshSettings();
         };
         socket.binaryType = 'arraybuffer';
         socket.onmessage = (event) => {
-            if (typeof event.data === 'string') { append(event.data, 'out'); return; }
+            if (typeof event.data === 'string') {
+                if (!absorbAnswer(event.data)) { append(event.data, 'out'); }
+                return;
+            }
             showFrame(new Uint8Array(event.data));
         };
         socket.onclose = () => {
@@ -511,6 +575,10 @@
         panel.style.gridTemplateRows = `repeat(${shape.rows}, minmax(0, 1fr))`;
         panel.style.setProperty('--rows', shape.rows);
         panel.style.setProperty('--shape', `${shape.columns} / ${shape.rows}`);
+        /* The same shape as a plain number, which --shape cannot be: a ratio is what
+           aspect-ratio wants and a factor is what the width cap needs to turn a height
+           into a width. */
+        panel.style.setProperty('--ratio', String(shape.columns / shape.rows));
         panel.textContent = '';
         cells = [...shape.letters].map((letter) => {
             const cell = document.createElement('span');
@@ -670,6 +738,8 @@
                 commandsSelect.appendChild(item);
             }
             showOptions();
+            buildSettings();
+            refreshSettings();
         })
         .catch(() => {
             /* An empty dropdown over an empty option list is worse than no form at all: it
@@ -682,6 +752,134 @@
             note.hidden = false;
             document.getElementById('builder').hidden = true;
         });
+
+    /* ---- the settings ---------------------------------------------------------------
+       One group per command, built from the same catalog the builder uses - so a command
+       added to the firmware appears here too, with its labels, its ranges and its value
+       names, and nothing about it is written down twice.
+
+       The values come from the clock rather than from a guess: every command answers with
+       its own current state when it is sent without options, which is what makes a page
+       like this possible without a second protocol. */
+
+    const settingsBox = document.getElementById('settings');
+    /* Commands whose answer belongs to this page rather than to the log. A set and not a
+       flag, because fourteen of them are in flight at once when the page opens. */
+    const pending = new Set();
+    const groups = new Map();
+
+    function send(text) {
+        if (!socket || socket.readyState !== WebSocket.OPEN) { return false; }
+
+        socket.send(text);
+        return true;
+    }
+
+    /* True when the line was an answer to something this page asked for, and has therefore
+       been used rather than shown. Matched on the command number the answer opens with:
+       fourteen replies scrolling past on load is a wall nobody reads, and what the log is
+       for is what somebody typed. */
+    function absorbAnswer(line) {
+        const number = Number.parseInt(line, 10);
+
+        if (!pending.has(number)) { return false; }
+        pending.delete(number);
+        fillGroup(number, line);
+        return true;
+    }
+
+    function readValues(line) {
+        const values = new Map();
+        /* "-B255" going out, "B=255" coming back. Everything after the first space is a
+           run of those, and a field with nothing behind it - T= with no chip - is empty
+           rather than absent. */
+        for (const [, short, value] of line.matchAll(/(?:^|\s)([A-Z])=(\S*)/g)) {
+            values.set(short, value);
+        }
+        return values;
+    }
+
+    function fillGroup(number, line) {
+        const group = groups.get(number);
+
+        if (!group) { return; }
+
+        const values = readValues(line);
+        for (const [short, field] of group.fields) {
+            const value = values.get(short);
+            if (value !== undefined) { field.value = value; }
+        }
+    }
+
+    function askFor(command) {
+        pending.add(command.number);
+        if (!send(String(command.number))) { pending.delete(command.number); }
+    }
+
+    /* Every writable option at once, which is what a settings page means by Set - the
+       command carries them all anyway, and a per-row button would send thirteen commands
+       to change thirteen things. */
+    function applyGroup(command, fields) {
+        let text = String(command.number);
+
+        for (const [short, field] of fields) {
+            if (field.value === '') { continue; }
+            text += ' -' + short + field.value;
+        }
+        if (send(text)) { askFor(command); }
+    }
+
+    function buildSettings() {
+        settingsBox.textContent = '';
+
+        for (const command of catalog) {
+            const writable = command.options.filter((option) => !option.readonly);
+            const shown = command.options;
+
+            if (shown.length === 0) { continue; }
+
+            const group = document.createElement('details');
+            group.className = 'surface group';
+            const title = document.createElement('summary');
+            title.textContent = command.number + '  ' + command.label;
+            group.appendChild(title);
+
+            const body = document.createElement('div');
+            body.className = 'group-body';
+            const fields = new Map();
+
+            for (const option of shown) {
+                const label = document.createElement('label');
+                label.textContent = option.label;
+
+                const field = optionField(option);
+                /* An answer-only field is shown and not offered: the firmware refuses one
+                   sent to it, so an input here would be a promise the clock breaks. */
+                if (option.readonly) { field.disabled = true; }
+
+                fields.set(option.short, field);
+                body.append(label, field);
+            }
+
+            if (writable.length > 0) {
+                const set = document.createElement('button');
+                set.type = 'button';
+                set.textContent = 'Set';
+                set.addEventListener('click', () => applyGroup(command, fields));
+                body.appendChild(set);
+            }
+
+            group.appendChild(body);
+            settingsBox.appendChild(group);
+            groups.set(command.number, { fields });
+        }
+    }
+
+    function refreshSettings() {
+        for (const command of catalog) {
+            if (groups.has(command.number)) { askFor(command); }
+        }
+    }
 
     entry.addEventListener('submit', (event) => {
         event.preventDefault();
