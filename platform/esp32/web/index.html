@@ -165,9 +165,11 @@
 
     /* Inside the card, so the input carries no frame of its own - the card is the frame. */
     #entry { display: flex; gap: var(--gap); padding: var(--gap); border-top: 1px solid var(--line); }
-    #entry input { border: none; background: none; padding: 6px 8px; }
-    #entry input:focus { outline: none; }
-    #entry:focus-within { box-shadow: inset 0 0 0 2px var(--lit); }
+    /* Frameless until it is focused, and then the ring is the input's own - an inset shadow
+       on the row was square, because the row has no radius, and reached around the Send
+       button, because the button is in the row too. The radius is kept even with no border
+       so the outline has something to follow. */
+    #entry input { border: none; background: none; border-radius: 6px; padding: 6px 10px; }
 
     /* The builder. Collapsed by default: typing a command is the faster path once one
        knows it, and the form is what makes it findable in the first place. In the same
