@@ -145,7 +145,14 @@ function sendFrame(socket, data) {
 const server = http.createServer(async (request, response) => {
     if (request.url === '/' || request.url === '/index.html') {
         /* Read per request, so a saved edit needs a reload and nothing else. */
-        response.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+        /* Never cached. This server exists to look at a page being changed, and a browser
+           deciding on its own how long to keep the last one is the whole cost of that: an
+           edit that appears not to have worked is indistinguishable from one that did not.
+           The clock itself serves the page from flash and has no such problem. */
+        response.writeHead(200, {
+            'Content-Type': 'text/html; charset=utf-8',
+            'Cache-Control': 'no-store',
+        });
         response.end(fs.readFileSync(pagePath));
         return;
     }
