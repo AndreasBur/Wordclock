@@ -279,7 +279,7 @@ From
 | 14 / 15 | Brightness increment / decrement |
 | 16 / 17 | Auto-brightness on / off |
 | 18 / 19 | Gamma correction on / off |
-| 20 / 21 | Power on / off — **reserved, not implemented yet.** These ids wait for the hardware switch that cuts the 5 V supply of the LED stripes via a controller port. They are accepted and answer `Error=0` without doing anything |
+| 20 / 21 | Power on / off — **reserved, not implemented yet.** These ids wait for the hardware switch that cuts the 5 V supply of the LED stripes via a controller port; the circuit is in [the ESP32 backend's hardware notes](../platform/esp32/README.md#switching-the-strips-supply) and what the two have to do in which order is in [roadmap.md](roadmap.md). They are accepted and answer `Error=0` without doing anything |
 | 22 | Clock refresh — draw the current time again, right now and without an animation |
 | 23 | Animation start — run the selected animation on the current time |
 | 24 | Animation abort — end a running animation and put the time back |

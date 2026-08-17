@@ -163,6 +163,47 @@ Three things it settled:
 - **The time resynchronisation reuses the application's own `configTzTime()` call** rather
   than reaching into SNTP, which keeps the zone rule in one place.
 
+## 6. Cutting the strip's supply
+
+Ids 20 and 21 have been reserved since the enum was written and are the only two that accept
+a call and answer `Error=0` without doing anything. What they were waiting for is a circuit,
+and there is a published one — the WC MiniDev Shield v5 switches the strip's 5 V with a
+single active-high port, and its hardware end is now written down in [the ESP32 backend's
+notes](../platform/esp32/README.md#switching-the-strips-supply).
+
+What the clock gains is the night. A strip told to be dark is still a strip drawing its
+quiescent current: some 1 mA per WS2812, so about 110 mA and half a watt for this display,
+all night and every night, for a wall that shows nothing. That is the whole return, and it is
+also the reason this is worth less than it looks on a clock nobody dims.
+
+Four things to settle, and the first is why "it is just a port" is not the whole job:
+
+- **The two ids are a sequence, not a write.** Data arriving at DIN while the rail is down
+  pushes current into it through the strip's own protection diode, so `POWER_OFF` has to
+  blank the strips, wait for that frame to *leave the wire*, and only then drop the port.
+  `Pixels::render()` runs on the application's tick and the transmission outlives the call
+  that started it, so none of this can happen inside `process()`. It is `System::restart()`'s
+  problem again and wants the same shape: the RPC asks, the tick carries it out.
+- **`disable()` is not `POWER_OFF`.** Ids 3 and 4 already enable and disable the display, and
+  they set the brightness to zero — which is a frame of black pixels, with the strip powered
+  and drawing exactly the current this item is about. Both pairs are worth having and the ids
+  must not be collapsed into one; what has to be decided is whether 21 implies 4.
+- **The port is optional hardware.** The reference board's own note says the switch may be
+  left unbuilt with the P-MOSFET bridged, so a backend wants a `STD_ON`/`STD_OFF` beside the
+  pin the way `PIXELS_SUPPORT_DIMMING` is one. A board without the switch then has to answer
+  something honest rather than `Error=0`, which is the first time an RPC's availability
+  depends on the hardware rather than on the platform.
+- **Who owns the sequence.** `Display` holds the strip and is the obvious place, but the
+  waiting is a platform matter — only the backend knows when its transfer has finished, and
+  the simulator has no transfer at all. The seam that already answers this shape of question
+  is `System.h` from section 5.
+
+An obvious follow-up, worth naming so it is not mistaken for part of this item:
+[NightSwitch](../firmware/inc/NightSwitch/NightSwitch.h) is what would use it, since a night
+brightness of zero is exactly the state that should cut the supply. It acts on the crossing
+rather than on the state, though, so a display switched on by hand at two in the morning must
+still find its supply — which makes it a change to the night switch, after the ids work.
+
 ## Backlog
 
 From the comparison with wordclock24h, in the order they would change daily use.
