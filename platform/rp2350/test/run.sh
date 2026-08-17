@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 #
-# Builds and runs the host tests for the ESP32 backend, and optionally the local web
-# console that serves the page with the firmware behind it.
+# Builds and runs the host tests for the RP2350 backend.
 #
 # The backend is compiled with the host compiler against the stand-ins in stubs/ rather
 # than the real framework. That leaves the hardware out of reach - the pulse timing, the
@@ -10,8 +9,10 @@
 # back. Those are the parts a board would not show any more clearly.
 #
 #   test/run.sh              build and run the tests
-#   test/run.sh serve [port] the same binaries, serving the console on localhost
 #   test/run.sh clean        throw the object cache away
+#
+# There is no `serve` here. The page is shared with the ESP32 backend, so the host that puts
+# a browser in front of it only has to exist once - platform/esp32/test/run.sh serve.
 #
 # Every source is compiled once into an object cache under .pio/ and the binaries are
 # linked from those objects. It used to compile straight to executables, which meant the
@@ -86,6 +87,7 @@ BACKEND=(
     "$PLATFORM_DIR/src/System.cpp"
     "$PLATFORM_DIR/src/WordclockMain.cpp"
     "$PLATFORM_DIR/src/WordclockSerial.cpp"
+    "$PLATFORM_DIR/src/WS2812Pio.cpp"
 )
 WEB="$PLATFORM_DIR/src/WebInterface.cpp"
 
@@ -158,22 +160,18 @@ link() {   # name, then the sources that belong to it
 
 compileAll "${CORE[@]}" "${BACKEND[@]}" "${SHARED[@]}" "$WEB" \
            "$TEST_DIR/cases/frame_test.cpp" "$SHARED_TEST_DIR/cases/serial_test.cpp" "$SHARED_TEST_DIR/cases/ds3231_test.cpp" \
-           "$TEST_DIR/cases/web_test.cpp" "$TEST_DIR/console/webhost.cpp" "$TEST_DIR/stubs/rmt_stubs.cpp"
+           "$TEST_DIR/cases/web_test.cpp" "$TEST_DIR/stubs/pio_stubs.cpp"
 
-# frame_test brings its own RMT calls, because it keeps the frame that was transmitted. It
-# still needs WordclockSerial, which Pixels reports a failed channel through.
-link frame_test  "$TEST_DIR/cases/frame_test.cpp" "$PLATFORM_DIR/src/Pixels.cpp" "$PLATFORM_DIR/src/WordclockSerial.cpp"
-link serial_test "$SHARED_TEST_DIR/cases/serial_test.cpp" "${BACKEND[@]}" "${CORE[@]}" "$TEST_DIR/stubs/rmt_stubs.cpp"
-link ds3231_test "$SHARED_TEST_DIR/cases/ds3231_test.cpp" "${BACKEND[@]}" "${CORE[@]}" "$TEST_DIR/stubs/rmt_stubs.cpp"
-link web_test    "$TEST_DIR/cases/web_test.cpp" "$WEB" "${BACKEND[@]}" "${CORE[@]}" "$TEST_DIR/stubs/rmt_stubs.cpp"
-link webhost     "$TEST_DIR/console/webhost.cpp" "$WEB" "${BACKEND[@]}" "${CORE[@]}" "$TEST_DIR/stubs/rmt_stubs.cpp"
-
-if [ "${1:-}" = "serve" ]; then
-    # Not exec'd: the binaries live in a temporary directory, and the trap that removes it
-    # again only fires if this shell is still around to run it.
-    node "$TEST_DIR/console/serve.js" "$ROOT/web/index.html" "$WORK/webhost" "${2:-8080}"
-    exit
-fi
+# frame_test brings its own PIO and DMA calls, because it keeps the frame that was handed
+# over. It still needs WordclockSerial, which Pixels reports a failed driver through.
+link frame_test  "$TEST_DIR/cases/frame_test.cpp" "$PLATFORM_DIR/src/Pixels.cpp" \
+                 "$PLATFORM_DIR/src/WS2812Pio.cpp" "$PLATFORM_DIR/src/WordclockSerial.cpp"
+link serial_test "$SHARED_TEST_DIR/cases/serial_test.cpp" "${BACKEND[@]}" "${CORE[@]}" "$TEST_DIR/stubs/pio_stubs.cpp"
+link ds3231_test "$SHARED_TEST_DIR/cases/ds3231_test.cpp" "${BACKEND[@]}" "${CORE[@]}" "$TEST_DIR/stubs/pio_stubs.cpp"
+link web_test    "$TEST_DIR/cases/web_test.cpp" "$WEB" "${BACKEND[@]}" "${CORE[@]}" "$TEST_DIR/stubs/pio_stubs.cpp"
+# No `serve` here. The page is shared with the ESP32 backend now, so the host that puts a
+# browser in front of it only has to exist once - see platform/esp32/test/run.sh, which
+# serves the same file.
 
 FAILED=0
 for name in frame_test serial_test ds3231_test web_test; do

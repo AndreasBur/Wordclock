@@ -3,8 +3,9 @@
 The Wordclock on a Raspberry Pi Pico 2 W. The firmware core is not copied here: this
 directory holds only the headers the core reaches for by name — `Pixels.h`,
 `RealTimeClock.h`, `BH1750.h`, `DS3231.h`, `Storage.h`, `System.h` and the `Arduino.h`
-shim — and the sources behind them. See [`../hardware/README.md`](../hardware/README.md)
-for the contract these fulfil, and [`../esp32/README.md`](../esp32/README.md) for the
+shim — and the sources behind them. See
+[`../avr-dx/README.md`](../avr-dx/README.md#what-a-backend-must-provide) for the contract
+these fulfil, and [`../esp32/README.md`](../esp32/README.md) for the
 backend this one was derived from.
 
 ## Building
@@ -112,13 +113,30 @@ where it belongs, the capacitors and the supply sizing. See
 One thing is easier: every GPIO on this part reaches a PIO block, so there is no range
 reserved for the flash chip to route around.
 
+## And it is exercised
+
+By the host tests in [`test/`](test/run.sh):
+
+```bash
+platform/rp2350/test/run.sh
+```
+
+Those compile the backend against stand-ins for the core, so they reach everything above
+the peripherals: the frame `Pixels::render()` hands to DMA, word for word; that an injected
+command takes the same path through `Communication` as one typed on the wire; and the
+handlers, driven through the same registration call the server makes.
+
+Two of the four case files are not here but in [`../test/`](../test/), shared with the ESP32
+backend. Nothing in `ds3231_test.cpp` or `serial_test.cpp` is about either platform - they
+compile whichever backend is being tested against whichever stubs it brings - so they live
+once.
+
+There is no `serve` mode here. The page is shared, so the host that puts a browser in front
+of it only has to exist once: `platform/esp32/test/run.sh serve`.
+
 ## Gaps
 
-- **No host tests.** The ESP32 backend compiles itself against stand-ins for the framework
-  and exercises everything above the peripherals; this one has nothing equivalent yet. Two
-  of that harness's four case files are platform-independent and want sharing rather than
-  copying, which is a change to a working harness and has not been made.
-- **No CI job**, for the same reason plus the 1.5 GB clone, which wants a cached toolchain
-  before it is run on every push.
-- **No `WordclockSecrets.h` handling difference**: the credentials work as on the ESP32,
-  but that path has only been compiled, not run.
+- **The `WordclockSecrets.h` path has only been compiled, not run.** The credentials work
+  as on the ESP32 as far as the tests reach, which is up to but not including a radio.
+- **The first CI run of the firmware job will be slow**, because the 1.5 GB clone has to
+  happen before there is a cache to restore.
