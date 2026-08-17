@@ -290,6 +290,19 @@ From
 | 31 | System restart — carried out on the next tick, so this command's answer still goes out |
 | 32 | Time resynchronise — ask the time server again, for the clock that came up while it was unreachable |
 | 33 | Network reconnect — join the network again |
+| 34 / 35 | Animation next / previous — one further through the list and one back, wrapping at both ends. They step the *selection*, so they mean what `9 -A<id>` means: the animation runs at the next word change, not now. "No animation" is part of the round rather than skipped, because a knob is the only way back to it for somebody with no phone |
+| 36 | Clock mode next — one wording further, wrapping after the fourth. It draws nothing itself: the new wording's words differ from the ones on the display, which is what the clock already redraws for, so the change arrives with the selected animation within a task. Where two wordings say the same thing at the current time, nothing happens — there is nothing different to show |
+| 37 | Display toggle — off if it is on, on if it is off. The same switch as ids 3 and 4, and it follows them: a display switched off from a phone is switched on by this |
+| 38 / 39 | Auto-brightness toggle / gamma correction toggle — the other way round from whatever the setting is now |
+| 40 | Colour reset — white again, the colour a clock starts with and the one `1 -P30` puts back |
+
+Ids `34` to `40` are for a control that cannot name a value — a knob or a button on the
+case, which can only ever say "one further" and has no display to read the state off.
+They complete the eight increment and decrement ids `8` to `15`, which are the same idea
+for the colour and the brightness. A phone needs none of them: it knows the state, offers
+a list and sends the value it wants. What they are for is the one thing no phone gives —
+a guest dimming the clock with no app, no network password and nothing to find, and the
+only way in that survives the WiFi being down.
 
 The RPC answer is `RpcId=<id> Error=<code>`. An unknown or missing id (including
 `0`, e.g. when `-P` is omitted) is rejected with `Error=7`
@@ -304,6 +317,10 @@ one is showing or while it is switched off (`-A0`); and aborting answers the sam
 when nothing was running. `22` and `24` are what brings the clock face back after a
 display test (`-P7`) or a hand-set pixel (command 4), which otherwise stands until
 the next word change — up to five minutes.
+
+Ids `34` to `40` are at the other end of that: none of them can be refused, and all of
+them answer `Error=0`. Each one moves a setting to its neighbour, and there is no state a
+setting can be in that makes the next one unreachable.
 
 ## Error codes
 

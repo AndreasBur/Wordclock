@@ -78,14 +78,32 @@ void Display::applyBrightness()
 #if (DISPLAY_USE_PIXELS_DIMMING == STD_ON)
     PixelStripe.setBrightness(brightness);
 #else
-    Color.dimmColors(brightness);
+    applyColor();
+#endif
+} /* applyBrightness */
+
+
+/******************************************************************************************************************************************************
+  applyColor()
+******************************************************************************************************************************************************/
+/* The dimmed color is derived from the color and the brightness, and what the pixels carry
+   is the dimmed one - so a write to either invalidates both. applyBrightness() above has
+   always done this for its own half; the color setters did not, which left a color change
+   invisible until the brightness happened to move, redraw or no redraw.
+
+   Nothing to do where the strip does the dimming: there the pixels carry the color itself,
+   and the next redraw picks a new one up on its own. */
+void Display::applyColor()
+{
+#if (DISPLAY_USE_PIXELS_DIMMING == STD_OFF)
+    Color.dimmColors(AppliedBrightness);
 
     /* the pixels already on the display still carry the previous color */
     for(IndexType Index = 0; Index < DISPLAY_NUMBER_OF_PIXELS; Index++) {
         if(getPixelFast(Index)) { setPixelFast(Index); }
     }
 #endif
-} /* applyBrightness */
+} /* applyColor */
 
 /******************************************************************************************************************************************************
   setWord()

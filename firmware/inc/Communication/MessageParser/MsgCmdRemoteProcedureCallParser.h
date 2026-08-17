@@ -24,6 +24,8 @@
 #include "Arduino.h"
 #include "MsgParameterParser.h"
 #include "Illuminance.h"
+#include "Animations.h"
+#include "Clock.h"
 #include "Display.h"
 #include "DisplayManager.h"
 #include "Overlays.h"
@@ -94,6 +96,16 @@ class MsgCmdRemoteProcedureCallParser : public MsgParameterParser<MsgCmdRemotePr
         RPC_ID_SYSTEM_RESTART,
         RPC_ID_TIME_RESYNCHRONISE,
         RPC_ID_NETWORK_RECONNECT,
+        /* For a control that cannot name a value, only ask for one further - see the
+           increment and decrement pairs above, which are the same eight for the colour
+           and the brightness. */
+        RPC_ID_ANIMATION_NEXT,
+        RPC_ID_ANIMATION_PREVIOUS,
+        RPC_ID_CLOCK_MODE_NEXT,
+        RPC_ID_DISPLAY_TOGGLE,
+        RPC_ID_DISPLAY_BRIGHTNESS_AUTOMATIC_TOGGLE,
+        RPC_ID_DISPLAY_BRIGHTNESS_GAMMA_CORRECTION_TOGGLE,
+        RPC_ID_DISPLAY_COLOR_RESET,
         /* Only so that the names in the message catalog can be counted against the
            procedures; never sent, and anything from here on lands in the default case. */
         RPC_ID_NUMBER_OF_PROCEDURES
@@ -269,6 +281,33 @@ class MsgCmdRemoteProcedureCallParser : public MsgParameterParser<MsgCmdRemotePr
                 break;
             case RPC_ID_NETWORK_RECONNECT :
                 ReturnValue = System::getInstance().reconnectNetwork();
+                break;
+            /* These seven cannot be refused, which is why none of them takes a return
+               value: every one of them is a setting moved to its neighbour, and a setting
+               has no state it can be in that makes the next one unreachable. What they
+               ask of the display is left to the display - the clock's wording redraws
+               through DisplayManager's latch on the next task, and the selected animation
+               runs at the next word change, the same as if a phone had sent the value. */
+            case RPC_ID_ANIMATION_NEXT :
+                Animations::getInstance().nextAnimation();
+                break;
+            case RPC_ID_ANIMATION_PREVIOUS :
+                Animations::getInstance().previousAnimation();
+                break;
+            case RPC_ID_CLOCK_MODE_NEXT :
+                Clock::getInstance().nextMode();
+                break;
+            case RPC_ID_DISPLAY_TOGGLE :
+                Display::getInstance().toggle();
+                break;
+            case RPC_ID_DISPLAY_BRIGHTNESS_AUTOMATIC_TOGGLE :
+                Display::getInstance().toggleBrightnessAutomatic();
+                break;
+            case RPC_ID_DISPLAY_BRIGHTNESS_GAMMA_CORRECTION_TOGGLE :
+                Display::getInstance().toggleBrightnessGammaCorrection();
+                break;
+            case RPC_ID_DISPLAY_COLOR_RESET :
+                Display::getInstance().resetColor();
                 break;
             default:
                 // Unknown or missing RPC id (including RPC_ID_NONE): there is

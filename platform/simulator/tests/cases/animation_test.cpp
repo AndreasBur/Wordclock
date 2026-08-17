@@ -84,3 +84,49 @@ void testEveryAnimationEndsOnTheNewTime()
 
     animations.setAnimationFast(Animations::ANIMATION_ID_NONE);
 }
+
+/* Stepping the selection, which is the only way a control with no list reaches an
+   animation. Three things have to hold, and the third is why this does not reuse the walk
+   MODE_SEQUENCE already had: that one visits the favourites only, and a knob has to reach
+   an animation that is not one. */
+void testAnimationStepsThroughEveryOne()
+{
+    Animations& animations = Animations::getInstance();
+    animations.setModeFast(Animations::MODE_FIXED);
+    animations.setAnimationFast(Animations::ANIMATION_ID_NONE);
+
+    /* The round closes, and "no animation" is part of it - a knob is the only way back to
+       it for somebody without a phone. */
+    bool seen[Animations::ANIMATION_ID_NUMBER_OF_ANIMATIONS]{};
+    for(byte Step = 0u; Step < Animations::ANIMATION_ID_NUMBER_OF_ANIMATIONS; Step++) {
+        seen[animations.getAnimation()] = true;
+        animations.nextAnimation();
+    }
+
+    bool allSeen = true;
+    for(const bool Seen : seen) { if(!Seen) { allSeen = false; } }
+    expect(allSeen, "stepping must reach every animation, and \"none\" among them");
+    expect(animations.getAnimation() == Animations::ANIMATION_ID_NONE,
+           "and must wrap back to the one it started on");
+
+    /* One back is one forward undone, at the end where the wrapping happens. */
+    animations.previousAnimation();
+    expect(animations.getAnimation() == Animations::ANIMATION_ID_NUMBER_OF_ANIMATIONS - 1u,
+           "one back from \"none\" must be the last animation");
+    animations.nextAnimation();
+    expect(animations.getAnimation() == Animations::ANIMATION_ID_NONE,
+           "and one forward again must undo it");
+
+    /* An animation that no mode would pick has to be reachable by hand. */
+    const Animations::AnimationIdType NotAFavourite = Animations::ANIMATION_ID_CURSOR;
+    expect(animations.setFavourite(NotAFavourite, false) == E_OK,
+           "dropping one favourite of many must be allowed");
+
+    animations.setAnimationFast(Animations::ANIMATION_ID_NONE);
+    animations.nextAnimation();
+    expect(animations.getAnimation() == NotAFavourite,
+           "stepping must reach an animation that is not a favourite");
+
+    expect(animations.setFavourite(NotAFavourite, true) == E_OK, "and it must go back to being one");
+    animations.setAnimationFast(Animations::ANIMATION_ID_NONE);
+}

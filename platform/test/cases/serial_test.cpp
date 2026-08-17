@@ -3,6 +3,7 @@
    come out one line at a time. */
 #include "Arduino.h"
 #include "Communication.h"
+#include "MsgCmdRemoteProcedureCallParser.h"
 #include "Uptime.h"
 #include "Version.h"
 #include "check.h"
@@ -71,7 +72,18 @@ int main()
 
     check(answerTo("1 -P22\n") == "1 RpcId=22 Error=0", "the clock refresh is carried out");
     check(answerTo("1 -P28\n") == "1 RpcId=28 Error=8", "aborting with no overlay showing is refused");
-    check(answerTo("1 -P34\n") == "1 RpcId=34 Error=7", "an id past the last procedure is unknown");
+
+    /* Derived from the enumeration rather than written down: this used to name id 34, and
+       the day 34 became a procedure the check went on passing for a procedure that ran. */
+    {
+        char Message[16];
+        char Expected[32];
+        const unsigned PastTheLast = MsgCmdRemoteProcedureCallParser::RPC_ID_NUMBER_OF_PROCEDURES;
+
+        snprintf(Message, sizeof(Message), "1 -P%u\n", PastTheLast);
+        snprintf(Expected, sizeof(Expected), "1 RpcId=%u Error=7", PastTheLast);
+        check(answerTo(Message) == Expected, "an id past the last procedure is unknown");
+    }
 
     /* The two procedures that need a network, on a host that has none. Refusing is the
        whole point: answering E_OK would tell a caller that the clock is on its way back

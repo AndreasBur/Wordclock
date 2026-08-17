@@ -124,14 +124,7 @@ came with `System.h` in section 5 and are in the answer too.
 ## 4. RPCs for controls that hold no state
 
 The eight increment/decrement ids are shaped for a button that has no display to
-show a value. That set is incomplete for the same use:
-
-| Id | RPC |
-|----|-----|
-| 34/35 | Animation next / previous |
-| 36 | Clock mode next |
-| 37/38/39 | Display toggle / brightness automatic toggle / gamma correction toggle |
-| 40 | Colour reset (white) |
+show a value. That set was incomplete for the same use.
 
 These are not for a phone. A phone knows the state, offers a list and sends the value
 it wants - `2 -A7`, and no "next" is needed. What cannot know the state is a knob or a
@@ -146,6 +139,53 @@ This used to be written as preparation for the IR receiver, which is now in the 
 planned" list. The interface outlived its first reason: a rotary encoder needs exactly
 the same calls, and can be developed against them over the serial line before any
 hardware exists.
+
+**Done — ids 34 to 40**, see the RPC table in [serial-commands.md](serial-commands.md):
+animation next and previous, clock mode next, the three toggles and the colour reset. What
+they settled:
+
+- **The step lives in the module that owns the setting**, not in the parser's `switch`:
+  `Animations::nextAnimation()`, `Clock::nextMode()`, `Display::toggle()`. The encoder
+  driver this is for is not written yet, and when it is it must not re-derive where the
+  list wraps - it has one caller's worth of distance from the serial line, and that is the
+  whole reason to build the interface before the hardware.
+- **A knob's round is not `MODE_SEQUENCE`'s round.** `Animations` already had a walk to the
+  next animation and it is the wrong one: `calcNextAnimation()` skips everything but the
+  favourites, because that is what the mode picking among them needs. Stepping by hand has
+  to reach an animation that is not a favourite, and `ANIMATION_ID_NONE` with it - "no
+  animation" is a setting, and a knob is the only way somebody without a phone gets back to
+  it.
+- **Clock mode next draws nothing.** The wording it switches to says different words, and
+  a different word set is exactly what
+  [DisplayManager](../firmware/inc/DisplayManager/DisplayManager.h)'s latch already
+  redraws for - with the selected animation, which `8 -M<id>` does not do. Where two
+  wordings happen to agree at the current time nothing is drawn, which is the right answer
+  rather than a missed one.
+- **None of the seven can be refused**, so none of them takes a return value and all seven
+  answer `Error=0`. A setting has no state it can be in that makes its neighbour
+  unreachable - which is the opposite end from ids 22 to 30, and worth saying in the
+  documentation next to them.
+- **The display toggle needed a state that was not being kept.** `enable()` and `disable()`
+  wrote the strip's master brightness and nothing else, and under
+  `DISPLAY_USE_PIXELS_DIMMING` that same register carries the brightness setting - so
+  reading a zero back there answers "dark", not "somebody switched this off". A flag in
+  `Display` is what the toggle asks, and ids 3 and 4 keep it, so a display switched off
+  from a phone is switched on by the knob.
+
+Two things it turned up on the way, both older than this section:
+
+- **A colour change never reached the strip.** The pixels carry the colour already dimmed
+  by the brightness, and that dimmed copy was recomputed in one place only:
+  `applyBrightness()`, behind its early return for a brightness that has not moved. So
+  every colour change - command 2, the six increment procedures, and the reset this
+  section adds - stayed invisible until something else happened to move the brightness, and
+  a redraw did not help because it wrote the same stale copy. `Display::applyColor()` is
+  now what both halves go through, and `testColourChangesReachTheStrip()` fails if either
+  one stops.
+- **`testDisplayOffAndOnAgain()` was written, declared and never called.** It sat in
+  `cases.h` and not in the runner, which is the same failure mode as the `getOutputPixel`
+  entry in backlog item 9: a list nothing enforces loses an entry and nobody hears about it.
+  It is in the runner now, and it passes.
 
 ## 5. Platform hooks
 

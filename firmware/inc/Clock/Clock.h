@@ -140,6 +140,10 @@ class Clock
         return Hour % CLOCK_NUMBER_OF_HOURS;
     }
 
+    static constexpr ModeType toNextMode(ModeType sMode) {
+        return (sMode + 1u >= MODE_NUMBER_OF_MODES) ? MODE_WESSI : static_cast<ModeType>(sMode + 1u);
+    }
+
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
@@ -169,6 +173,14 @@ class Clock
     }
 
     // methods
+    /* One wording further, wrapping at the last, for a control that cannot name a mode.
+       It draws nothing: the words of the new wording differ from the ones DisplayManager
+       has latched, so its next task finds the change and puts them up the way it does
+       for every other one - with the selected animation, which "8 -M<id>" does not do.
+       Where two wordings say the same thing at the current time there is nothing to
+       redraw, and nothing happens, which is the right answer rather than a missed one. */
+    void nextMode() { setModeFast(toNextMode(Mode)); }
+
     void resetToDefaults() {
         setModeFast(CLOCK_INITIAL_MODE);
         ShowItIsPermanently = ShowItIsPermanentlyInitValue;

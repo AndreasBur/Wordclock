@@ -49,7 +49,13 @@ int main()
     testWordsChangeOnFiveMinuteStepsOnly();
     testInvalidTimeIsRejected();
     testClockModes();
+    testClockModeStepsThroughEveryWording();
     testClockWordsComparison();
+    testAnimationStepsThroughEveryOne();
+    testDisplayOffAndOnAgain();
+    testDisplayToggleFollowsTheState();
+    testBrightnessTogglesInvertTheSetting();
+    testColourChangesReachTheStrip();
     testPixelColorChannels();
     testDisplayCharacterLookup();
     testNightWindowIncludesMidnight();

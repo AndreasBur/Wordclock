@@ -112,6 +112,12 @@ class Display
   private:
     static constexpr byte WordLengthUnlimited{0u};
     StateType State{STATE_NONE};
+    /* Whether the display was last asked to be on, true because a strip comes up lit. Kept
+       here rather than read back from the strip's master brightness, which is what enable()
+       and disable() write: under DISPLAY_USE_PIXELS_DIMMING that same register carries the
+       brightness setting, so a zero in it would answer "dark" where the question is
+       "switched off". */
+    bool Enabled{true};
     /* brightness the pixels on the display were last written with. Zero rather than the
        initial brightness, so the first task establishes a defined state; the display is
        still empty then, which makes that first pass free. */
@@ -132,6 +138,8 @@ class Display
 
     byte transformToSerpentine(byte, byte) const;
     byte transformToSerpentine(byte) const;
+
+    void applyColor();
 
     Pixel getColorDimmed(byte);
 
@@ -168,11 +176,12 @@ class Display
         Brightness.setUseGammaCorrection(BrightnessUseGammaCorrection);
         applyBrightness();
     }
-    void setColor(Pixel sColor) { Color.setColor(sColor); }
-    void setColor(ColorType Red, ColorType Green, ColorType Blue) { Color.setColorRed(Red); Color.setColorGreen(Green); Color.setColorBlue(Blue); }
-    void setColorRed(ColorType Red) { Color.setColorRed(Red); }
-    void setColorGreen(ColorType Green) { Color.setColorGreen(Green); }
-    void setColorBlue(ColorType Blue) { Color.setColorBlue(Blue); }
+    /* Every one of them applies what it set, for the reason applyColor() gives. */
+    void setColor(Pixel sColor) { Color.setColor(sColor); applyColor(); }
+    void setColor(ColorType Red, ColorType Green, ColorType Blue) { Color.setColorRed(Red); Color.setColorGreen(Green); Color.setColorBlue(Blue); applyColor(); }
+    void setColorRed(ColorType Red) { Color.setColorRed(Red); applyColor(); }
+    void setColorGreen(ColorType Green) { Color.setColorGreen(Green); applyColor(); }
+    void setColorBlue(ColorType Blue) { Color.setColorBlue(Blue); applyColor(); }
 
     /* Takes the brightness the user asked for. What reaches the LEDs is
        calcBrightness(), which folds in gamma correction and the light sensor. */
@@ -236,8 +245,13 @@ class Display
     // methods
     void init();
     StdReturnType show() { return PixelStripe.show(); }
-    void enable() { PixelStripe.enablePixels(); }
-    void disable() { PixelStripe.disablePixels(); }
+    void enable() { Enabled = true; PixelStripe.enablePixels(); }
+    void disable() { Enabled = false; PixelStripe.disablePixels(); }
+    bool isEnabled() const { return Enabled; }
+    /* The other way round from whatever it is now, for a button that has nothing to read
+       the state off. The three toggles below are the same idea for the two settings that
+       are a yes or a no. */
+    void toggle() { if(isEnabled()) { disable(); } else { enable(); } }
 
     /* The strip as a wire rather than as a picture, for the supply switch: whether a frame
        is still waiting to go out, whether one is still going out, and the gate that stops
@@ -258,19 +272,28 @@ class Display
     void disableBrightnessAutomatic() { Brightness.disableAutomatic(); }
     void enableBrightnessGammaCorrection() { Brightness.enableGammaCorrection(); }
     void disableBrightnessGammaCorrection() { Brightness.disableGammaCorrection(); }
+    /* Through the setters rather than through the enable/disable pair above, which is the
+       half of it that leaves applyBrightness() to the next task: a knob turned once should
+       show what it did, not a tick later. */
+    void toggleBrightnessAutomatic() { setBrightnessUseAutomatic(!getBrightnessUseAutomatic()); }
+    void toggleBrightnessGammaCorrection() { setBrightnessUseGammaCorrection(!getBrightnessUseGammaCorrection()); }
     void test() { PixelStripe.setPixels(Color.getColorDimmed()); }
     void clear() { PixelStripe.clearPixels(); }
     bool isCleared() { for(byte Index = 0; Index < DISPLAY_NUMBER_OF_PIXELS; Index++) { if(getPixelFast(Index)) return false; } return true; }
 
-    void incrementColorRed() { Color.incrementColorRed(); }
-    void incrementColorGreen() {  Color.incrementColorGreen(); }
-    void incrementColorBlue() { Color.incrementColorBlue(); }
+    void incrementColorRed() { Color.incrementColorRed(); applyColor(); }
+    void incrementColorGreen() {  Color.incrementColorGreen(); applyColor(); }
+    void incrementColorBlue() { Color.incrementColorBlue(); applyColor(); }
     void incrementBrightness() { Brightness.incrementBrightness(); applyBrightness(); }
 
-    void decrementColorRed() { Color.decrementColorRed(); }
-    void decrementColorGreen() { Color.decrementColorGreen(); }
-    void decrementColorBlue() { Color.decrementColorBlue(); }
+    void decrementColorRed() { Color.decrementColorRed(); applyColor(); }
+    void decrementColorGreen() { Color.decrementColorGreen(); applyColor(); }
+    void decrementColorBlue() { Color.decrementColorBlue(); applyColor(); }
     void decrementBrightness() { Brightness.decrementBrightness(); applyBrightness(); }
+
+    /* White again, and through DisplayColor's own reset so that what this puts back is the
+       one named value the settings reset and the member initialiser already use. */
+    void resetColor() { Color.resetToDefaults(); applyColor(); }
 
     void applyBrightness();
 
@@ -295,6 +318,9 @@ class Display
         Color.resetToDefaults();
         Brightness.resetToDefaults();
         applyBrightness();
+        /* After the brightness, not instead of it: applyBrightness() does nothing where the
+           brightness was already at its default, and the colour would stay behind. */
+        applyColor();
     }
 
     static void indexToColumnAndRow(IndexType Index, byte& Column, byte& Row) { Row = Index / DISPLAY_NUMBER_OF_COLUMNS; Column = Index % DISPLAY_NUMBER_OF_COLUMNS; }

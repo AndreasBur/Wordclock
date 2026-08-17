@@ -277,6 +277,19 @@ class Animations
     AnimationIdType calcNextAnimation() const;
     byte numberOfFavourites() const;
 
+    /* The round a knob walks, which is not the one calcNextAnimation() walks: that one
+       skips everything but the favourites, because MODE_SEQUENCE picks among those.
+       Stepping the selection by hand may reach every animation, favourite or not. */
+    static constexpr AnimationIdType toNextAnimation(AnimationIdType sAnimationId) {
+        return (sAnimationId + 1u >= ANIMATION_ID_NUMBER_OF_ANIMATIONS)
+             ? ANIMATION_ID_NONE : static_cast<AnimationIdType>(sAnimationId + 1u);
+    }
+    static constexpr AnimationIdType toPreviousAnimation(AnimationIdType sAnimationId) {
+        return (sAnimationId == ANIMATION_ID_NONE)
+             ? static_cast<AnimationIdType>(ANIMATION_ID_NUMBER_OF_ANIMATIONS - 1u)
+             : static_cast<AnimationIdType>(sAnimationId - 1u);
+    }
+
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
@@ -348,6 +361,17 @@ class Animations
         setAnimationFast(ANIMATION_ID_NONE);
         setModeFast(MODE_FIXED);
     }
+
+    /* One animation further and one back, wrapping at both ends, for a control that has
+       no list to pick from. ANIMATION_ID_NONE is part of that round rather than skipped:
+       "no animation" is a setting like any other, and a knob is the only way somebody
+       without a phone gets back to it.
+
+       They step the selection, so they mean what "9 -A<id>" means and not what
+       RPC_ID_ANIMATION_START means - the animation runs at the next word change, and in
+       a mode that picks its own the selection is what MODE_FIXED would return to. */
+    void nextAnimation() { setAnimationFast(toNextAnimation(AnimationId)); }
+    void previousAnimation() { setAnimationFast(toPreviousAnimation(AnimationId)); }
 
     void task(bool=false);
     StdReturnType show() const;
