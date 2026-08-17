@@ -54,7 +54,7 @@ FLAGS=(-std=gnu++17 -Wall -Wextra -Werror)
 # the cache rather than into the temporary directory: the include path is part of what an
 # object was compiled with, and one that changed every run would invalidate the cache
 # every run. A changed page is noticed through the dependency file instead.
-python3 "$PLATFORM_DIR/scripts/embed_web.py" "$PLATFORM_DIR/web/index.html" "$CACHE"
+python3 "$PLATFORM_DIR/scripts/embed_web.py" "$ROOT/web/index.html" "$CACHE"
 INCLUDES+=(-I"$CACHE")
 
 # What the objects were compiled with. Anything else means they cannot be reused, and the
@@ -167,7 +167,7 @@ link webhost     "$TEST_DIR/console/webhost.cpp" "$WEB" "${BACKEND[@]}" "${CORE[
 if [ "${1:-}" = "serve" ]; then
     # Not exec'd: the binaries live in a temporary directory, and the trap that removes it
     # again only fires if this shell is still around to run it.
-    node "$TEST_DIR/console/serve.js" "$PLATFORM_DIR/web/index.html" "$WORK/webhost" "${2:-8080}"
+    node "$TEST_DIR/console/serve.js" "$ROOT/web/index.html" "$WORK/webhost" "${2:-8080}"
     exit
 fi
 
