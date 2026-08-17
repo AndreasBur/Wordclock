@@ -213,9 +213,18 @@ class MsgCmdRemoteProcedureCallParser : public MsgParameterParser<MsgCmdRemotePr
             // DIN while the supply is off. So POWER_OFF has to blank the stripes
             // over the data line first, wait for that transfer to complete, and
             // only then switch the supply off; POWER_ON switches the supply on and
-            // resumes data output afterwards. Note that disable() already starts a
-            // DMA transfer of its own (see WS2812::disablePixels), so it must not
-            // be followed by a second show().
+            // resumes data output afterwards.
+            //
+            // That waiting cannot happen in here. disable() reaches
+            // Pixels::disablePixels(), which only sets the brightness to zero and
+            // marks the buffer dirty - on every backend. Nothing is transmitted
+            // until the application's next tick calls Pixels::render(), and the
+            // transfer then outlives that call too. So the port cannot be dropped
+            // from this switch at all; these two ids can only ask, the way
+            // SYSTEM_RESTART does, and a tick has to carry it out.
+            //
+            // The circuit these ids are shaped for is written down in
+            // platform/esp32/README.md, under "Switching the strip's supply".
             //
             // Until the port exists the ids stay intentionally unimplemented.
             // Both branches are empty until the port exists, and they are two ids rather

@@ -239,6 +239,53 @@ Dropping the strip to 4.5 V with a series diode is the one real alternative — 
 3.3 V inside spec at the cost of brightness. The "sacrificial first LED" is not one,
 since that LED still receives the marginal level itself.
 
+### Switching the strip's supply
+
+RPC ids 20 and 21 are reserved for a switch that cuts the strip's 5 V, and the circuit they
+wait for does not have to be invented. The [WC MiniDev Shield
+v5](https://www.mikrocontroller.net/wikifiles/e/ea/WC_MiniDev_Shield_v5_Schaltplan.png) carries
+one and everything below is read off it — a board for an STM32F103, so the pin is worth
+nothing here and the topology is worth all of it.
+
+One controller port, active high. It drives the gate of an N-channel BS170 through 82 Ω, and
+the BS170's drain pulls the gate of a P-channel IRF9310 — high side, source on the incoming
+5 V — down through 3k3. The 100 kΩ from the BS170's gate to ground is what makes that
+polarity worth having: while the port is an input, which is what it is from reset until the
+firmware has configured it, the BS170 is held off, the IRF9310's gate sits at 5 V and the
+strip has no supply at all. A clock therefore comes up dark rather than in whatever the
+strip's registers happened to hold.
+
+The BS170 is there because 3.3 V logic cannot switch a P-channel high side on its own. Not
+turning it on — a port pulled to ground gives the full −5 V — but turning it **off**, which
+needs the gate at 5 V and is 1.7 V short of it. That lands inside the part's threshold band
+rather than clear of it, so the MOSFET would be neither on nor off but dissipating somewhere
+between, and which of the two depends on the sample. The port therefore does not drive the
+gate; it drives a stage whose own supply is the rail the gate has to reach. The 3k3 carries
+about 1.5 mA, which is also why the BS170's threshold does not have to be met properly, and
+it is deliberately weak: a P-MOSFET that opens slowly hands the strip's inrush to the supply
+over microseconds instead of at once.
+
+The data line then wants a diode. A BAT43 with its anode on the data line and its cathode on
+the **switched** rail bounds how far DIN can sit above the supply the strip itself is on.
+That is the failure the 330 Ω above only limits: with the rail down, current arriving at DIN
+leaves through the WS2812's internal protection diode into a rail that cannot take it. The
+Schottky's 0.3 V undercuts that diode's 0.6 V, so the BAT43 carries it and the strip's own
+does not. What it buys is independence from software order — blank the strips, wait for the
+frame to leave the wire, then cut the supply is what the firmware has to do, and a watchdog
+or a reset keeps no such order. A second BAT43, cathode on the data line and anode on ground,
+is optional on that board and answers the other direction: undershoot from a reflection on a
+long cable.
+
+The switched rail leaves on a 16-pin header, odd pins on 5 V and even pins on ground, eight
+of each — the inrush note below applied to contact resistance rather than to wire.
+
+Two things not to copy. That board level-shifts its data line with a 1k8 pull-up to 5 V
+against an open-drain port, which is the mechanism already rejected above at 10 kΩ and about
+five times quicker; it still leaves a weak pull-up shaping the rising edge of a line that
+wants a push-pull driver, so the `SN74AHCT125N` stays the answer. And its own note says the
+whole switch may be left unbuilt with the IRF9310's drain and source bridged, which is a
+reason to keep it optional in the firmware rather than a reason to skip it.
+
 ### Supply
 
 - **Brown-out on inrush.** The classic failure is a reset when the strip's inrush sags
