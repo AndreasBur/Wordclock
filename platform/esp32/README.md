@@ -244,8 +244,13 @@ since that LED still receives the marginal level itself.
 - **Brown-out on inrush.** The classic failure is a reset when the strip's inrush sags
   the 5 V rail while WiFi is transmitting. Star wiring for the 5 V, and 470 µF at the
   module.
-- **Supply sizing.** 110 LEDs at full white would draw 6.6 A, which a word clock never
-  does. With a brightness cap 5 V / 3 A is comfortable.
+- **Supply sizing.** A word clock lights twenty to thirty letters at once, so it draws a
+  few hundred mA in amber at a living-room brightness and some 2 A in white at full. The
+  6.6 A that all 110 at full white would take is reachable all the same, and with three
+  commands: `test()` sets every pixel at once and `BrightnessMaxValue` is 255, so nothing
+  in the firmware caps it. Size for the 6.6 A rather than for the display — 5 V / 10 A
+  puts a supply at two thirds of its rating, which is where it belongs once it has aged
+  and warmed up.
 - **1000 µF at the strip's supply**, beside the 470 µF at the module — the same inrush,
   answered at the end that causes it.
 
