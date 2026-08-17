@@ -22,6 +22,7 @@ include path:
 #include "DS3231.h"         // temperature of the clock chip
 #include "Storage.h"        // where the settings survive a restart
 #include "System.h"         // the machine itself: uptime, network, restart
+#include "PowerSwitch.h"    // the port that switches the strip's 5 V
 ```
 
 A platform backend is simply a directory that provides these headers (plus an
@@ -43,12 +44,13 @@ one of a pair compiles until the day something reaches for the other.
 | Header / unit | Contract | Here |
 |---------------|----------|------|
 | `Arduino.h` | `byte`, `boolean`, `F()`, `PROGMEM`, `pgm_read_byte`, `memcpy_P`, `bitRead`, `itoa`, and a `Serial` object exposing `print` / `println` / `available` / `read` | avr-libc directly, plus a non-virtual `SerialPort` on USART1 |
-| `Pixels.h` | `Pixels` singleton: `getInstance`, `setPixel(Fast)` / `clearPixel(Fast)` / `getPixel(Fast)` / `getOutputPixel(Fast)`, `setBrightness`, `show`, `clearPixels`, `init(pin)` | Buffer and brightness; `render()` hands the frame to `WS2812` |
+| `Pixels.h` | `Pixels` singleton: `getInstance`, `setPixel(Fast)` / `clearPixel(Fast)` / `getPixel(Fast)` / `getOutputPixel(Fast)`, `setBrightness`, `show`, `clearPixels`, `init(pin)`. Plus the output gate the supply switch needs: `isDirty`, `isFrameOnTheWire`, `suspendOutput` / `resumeOutput` / `isOutputSuspended`, where a suspended output must make the render a no-op **without** clearing the dirty mark, and resuming must set it — the LEDs lose their registers with their supply, so coming back is a redraw | Buffer and brightness; `render()` hands the frame to `WS2812`, and `isFrameOnTheWire()` is that driver's `isBusy()` |
 | `RealTimeClock.h` | `RealTimeClock` singleton holding a `ClockDateTime`; the core only *reads* it via `getDateTime()` | Read from the DS3231 once a second, written through on a command |
 | `BH1750.h` | Ambient-light driver exposing the illuminance reading the core consumes | BH1750 over TWI1 |
 | `DS3231.h` | `DS3231` with `getTaskCycle`, `task`, and `getTemperature(TemperatureType&)` in tenths of a degree Celsius. The return code is the contract: `E_NOT_OK` until a reading has arrived, which is what a board without the chip keeps answering and what keeps the temperature overlay away | DS3231 over TWI1, register handling shared with the ESP32 backend |
 | `Storage.h` | `Storage` singleton with a `Capacity` and `read` / `write` / `clear` over one byte blob; the core owns the format inside it, so this only has to store what it is given and refuse a blob of another length | On-chip EEPROM, length byte in front of the blob |
 | `System.h` | `System` singleton: `getFreeMemoryInKibibytes`, `getNetworkAddress`, `getLinkQuality` for the status command, and `restart` / `resynchroniseTime` / `reconnectNetwork` for the procedures. Every one of them may answer `E_NOT_OK`, and a backend that cannot do a thing has to — a clock with no network has no address, and the status command sends an empty field rather than a zero. `restart()` only asks; the application carries it out on its next tick, after the answer has gone out | Free memory is real; everything about a network answers `E_NOT_OK`. The uptime is not here: the core counts it in `Uptime`, off the scheduler's tick, because a backend dividing its own millisecond counter down is what used to wrap |
+| `PowerSwitch.h` | `PowerSwitch` singleton: `isFitted` as a compile-time answer, `isSupplyOn`, `init`, `switchSupplyOn` / `switchSupplyOff`. Three things are the contract rather than the port. `isFitted()` may be false — the switch is optional hardware, and a backend that says so keeps the two procedures from pretending. `isSupplyOn()` must then answer **true** anyway, because a board without the switch has the high side bridged and its strip cannot be unpowered. And `init()` has to switch the supply *on*: the reset leaves it off, and it must run before `Pixels::init()` claims the data line | `PORTD` through `DIRSET`/`OUTSET`, and declared not fitted until a pin is confirmed |
 | app entry point | Equivalent of the simulator's `WordclockApp` / `WordclockMain`: initialise, restore the settings with `Persistence::load()`, then repeatedly tick `Scheduler::task()` and update the `RealTimeClock` | `main()` in [`src/main.cpp`](src/main.cpp) |
 
 The tick has to come every `Scheduler::getTaskIntervalMs()` milliseconds: every

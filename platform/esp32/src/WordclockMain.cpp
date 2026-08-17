@@ -20,6 +20,7 @@
 
 #include "Display.h"
 #include "Persistence.h"
+#include "PowerSwitch.h"
 #include "RealTimeClock.h"
 
 /******************************************************************************************************************************************************
@@ -41,6 +42,11 @@
 ******************************************************************************************************************************************************/
 void WordclockMain::init()
 {
+    /* Before the display, and that order is the hardware's rather than a preference: the call
+       below claims the strip's data line, and a frame reaching DIN before the 5 V is up pushes
+       current into a dead rail through the LED's own protection diode. The reset leaves the
+       supply off, so this is the call that asks for it. */
+    PowerSwitch::getInstance().init();
     Display::getInstance().init();
     /* After the display, because restoring the brightness recalculates what reaches the
        LEDs, and before the first task, so the strip's first frame already carries the

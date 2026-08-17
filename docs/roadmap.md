@@ -165,10 +165,10 @@ Three things it settled:
 
 ## 6. Cutting the strip's supply
 
-Ids 20 and 21 have been reserved since the enum was written and are the only two that accept
-a call and answer `Error=0` without doing anything. What they were waiting for is a circuit,
+Ids 20 and 21 had been reserved since the enum was written and were the only two that accepted
+a call and answered `Error=0` without doing anything. What they were waiting for was a circuit,
 and there is a published one — the WC MiniDev Shield v5 switches the strip's 5 V with a
-single active-high port, and its hardware end is now written down in [the ESP32 backend's
+single active-high port, and its hardware end is written down in [the ESP32 backend's
 notes](../platform/esp32/README.md#switching-the-strips-supply).
 
 What the clock gains is the night. A strip told to be dark is still a strip drawing its
@@ -176,33 +176,49 @@ quiescent current: some 1 mA per WS2812, so about 110 mA and half a watt for thi
 all night and every night, for a wall that shows nothing. That is the whole return, and it is
 also the reason this is worth less than it looks on a clock nobody dims.
 
-Four things to settle, and the first is why "it is just a port" is not the whole job:
+**Done** — [Power](../firmware/inc/Power/Power.h) in the core, a `PowerSwitch` in each of the
+four backends, and ids 20 and 21 answering for real. Five things it settled:
 
 - **The two ids are a sequence, not a write.** Data arriving at DIN while the rail is down
-  pushes current into it through the strip's own protection diode, so `POWER_OFF` has to
-  blank the strips, wait for that frame to *leave the wire*, and only then drop the port.
-  `Pixels::render()` runs on the application's tick and the transmission outlives the call
-  that started it, so none of this can happen inside `process()`. It is `System::restart()`'s
-  problem again and wants the same shape: the RPC asks, the tick carries it out.
-- **`disable()` is not `POWER_OFF`.** Ids 3 and 4 already enable and disable the display, and
-  they set the brightness to zero — which is a frame of black pixels, with the strip powered
-  and drawing exactly the current this item is about. Both pairs are worth having and the ids
-  must not be collapsed into one; what has to be decided is whether 21 implies 4.
-- **The port is optional hardware.** The reference board's own note says the switch may be
-  left unbuilt with the P-MOSFET bridged, so a backend wants a `STD_ON`/`STD_OFF` beside the
-  pin the way `PIXELS_SUPPORT_DIMMING` is one. A board without the switch then has to answer
-  something honest rather than `Error=0`, which is the first time an RPC's availability
-  depends on the hardware rather than on the platform.
-- **Who owns the sequence.** `Display` holds the strip and is the obvious place, but the
-  waiting is a platform matter — only the backend knows when its transfer has finished, and
-  the simulator has no transfer at all. The seam that already answers this shape of question
-  is `System.h` from section 5.
+  pushes current into it through the strip's own protection diode, so switching off blanks the
+  strips, waits for that frame to *leave the wire*, and only then drops the port.
+  `Pixels::render()` runs on the application's tick and the transmission outlives the call that
+  started it, so none of it can happen inside `process()` — the procedure asks and a task
+  carries it out, the way `System::restart()` does. Switching on is the same order backwards,
+  the port a tick ahead of the data line, so the strip has its rail before the first frame.
+- **Blanking is not enough to keep the line quiet.** This is what the plan above missed. The
+  clock keeps running with the supply off, every pixel written marks the buffer, and the next
+  tick would transmit again — so the output is *gated* rather than only darkened, and the gate
+  is what the new `suspendOutput` / `resumeOutput` on the platform seam is for. Resuming has to
+  mark the buffer as well: the LEDs lose their registers with their supply, so what comes back
+  is a redraw and not a resume.
+- **`disable()` is not `POWER_OFF`.** Ids 3 and 4 stayed exactly what they were, and 21 does
+  not imply 4: it uses the same darkening as its first step, but a caller asking for one of
+  them is not asking for the other, and only one of them saves any current. A test says so, so
+  that collapsing them later fails rather than passes.
+- **`isFitted()` is false on all three hardware backends, and true on the simulator.** The
+  switch is optional hardware and the pin is not confirmed on any board, so what ships is a
+  compile-time `STD_OFF` and an honest answer: `Error=9`, `ERROR_POWER_SWITCH_ABSENT`, rather
+  than the `Error=8` that would have said "something went wrong". Two consequences worth
+  keeping: the code behind the flag is still compiled rather than `#if`-ed out, because a
+  branch that has never been compiled is not code; and `isSupplyOn()` answers **true** where
+  the switch is absent, since that board has the high side bridged and its strip cannot be
+  unpowered. A flag-based answer there would have reported a dark strip that is in fact lit.
+- **The waiting sits in the core, the port in the backend.** Only a backend knows when its
+  peripheral has finished, so `isFrameOnTheWire()` joined the seam; the state machine that uses
+  it is written once. `Display` forwards both, so the module driving the switch has one
+  collaborator rather than two.
 
-An obvious follow-up, worth naming so it is not mistaken for part of this item:
+One thing deliberately left: an animation still running keeps the buffer dirty and postpones
+the cut by a tick each time. The display is dark from the first step, so what a longer wait
+costs is the current the switch saves and not the darkness somebody asked for — which is not
+worth a mechanism to cut short.
+
+The obvious follow-up, and still not part of this:
 [NightSwitch](../firmware/inc/NightSwitch/NightSwitch.h) is what would use it, since a night
 brightness of zero is exactly the state that should cut the supply. It acts on the crossing
 rather than on the state, though, so a display switched on by hand at two in the morning must
-still find its supply — which makes it a change to the night switch, after the ids work.
+still find its supply — which makes it a change to the night switch rather than to this.
 
 ## Backlog
 

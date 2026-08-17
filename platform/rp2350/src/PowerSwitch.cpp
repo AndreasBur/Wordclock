@@ -8,65 +8,72 @@
  *  ---------------------------------------------------------------------------------------------------------------------------------------------------
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       WordclockMain.cpp
- *      \brief      The firmware, brought up and ticked, see WordclockMain.h
+/**     \file       PowerSwitch.cpp
+ *      \brief      The supply port, driven through the SDK's GPIO calls, see PowerSwitch.h
+ *
+ *      \details    The SDK rather than the core's pinMode and digitalWrite, for the reason the
+ *                  strip's driver uses it: this backend talks to the hardware directly
+ *                  everywhere else, and one pin reached through the Arduino layer would be the
+ *                  odd one out.
  *
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
  * I N C L U D E S
 ******************************************************************************************************************************************************/
+#include <hardware/gpio.h>
+
 #include "Arduino.h"
-#include "Display.h"
-#include "Persistence.h"
 #include "PowerSwitch.h"
-#include "RealTimeClock.h"
-#include "WordclockMain.h"
 
 /******************************************************************************************************************************************************
- *  P U B L I C   F U N C T I O N S
+ * P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
   init()
 ******************************************************************************************************************************************************/
-/*! \brief          Brings the supply and the display up and restores what was stored
- *  \details        The supply switch before the display, and that order is the hardware's
- *                  rather than a preference: the display's init() claims the strip's data
- *                  line, and a frame reaching DIN before the 5 V is up pushes current into a
- *                  dead rail through the LED's own protection diode. The reset leaves the
- *                  supply off, so this is the call that asks for it.
+/*! \brief          Makes the port an output and brings the supply up
+ *  \details        Switched on rather than left where the reset found it, because the reset
+ *                  found it off: the pull down at the gate holds the stage off while the port
+ *                  is still an input. A clock whose strip never gets its 5 V shows nothing at
+ *                  all, so coming up means asking for it.
  *
- *                  The display next, because it is what claims the strip; the settings after
- *                  it, because restoring the brightness recalculates what reaches the LEDs,
- *                  and before the first task, so the strip's first frame already carries the
- *                  stored colour.
+ *                  Has to run before the strip's data line is set up, which is why the
+ *                  application calls it first: a frame reaching DIN before the supply is up
+ *                  pushes current into a dead rail through the LED's own protection diode.
  *
- *                  The light sensor and the clock chip are not initialised here: the core
- *                  keeps both inside singletons of its own with no defined init(), and each
- *                  driver sets itself up from its first task.
+ *                  Does nothing where the switch is not fitted. The pin then belongs to
+ *                  whatever else the board put there, and driving it would be the one way this
+ *                  can do damage rather than nothing.
 ******************************************************************************************************************************************************/
-void WordclockMain::init()
+void PowerSwitch::init()
 {
-    PowerSwitch::getInstance().init();
-    Display::getInstance().init();
-    Persistence::getInstance().load();
+    if(!isFitted()) { return; }
+
+    gpio_init(POWER_SWITCH_PIN);
+    gpio_set_dir(POWER_SWITCH_PIN, GPIO_OUT);
+    switchSupplyOn();
 } /* init */
 
 
 /******************************************************************************************************************************************************
-  task()
+ * P R I V A T E   F U N C T I O N S
 ******************************************************************************************************************************************************/
-/*! \brief          One pass over the firmware
- *  \details        The clock before the scheduler, so that everything the tasks read in this
- *                  pass sees one and the same time rather than one that changes half way
- *                  through it.
+
+/******************************************************************************************************************************************************
+  driveSupply()
 ******************************************************************************************************************************************************/
-void WordclockMain::task()
+/*! \brief          Puts the port high or low
+ *  \details        Active high, so on is high - the level reaches the gate of the small-signal
+ *                  MOSFET, not the high side one, which is why the sense is not inverted here.
+******************************************************************************************************************************************************/
+void PowerSwitch::driveSupply(bool On)
 {
-    RealTimeClock::getInstance().task();
-    wcScheduler.task();
-} /* task */
+    if(!isFitted()) { return; }
+
+    gpio_put(POWER_SWITCH_PIN, On);
+} /* driveSupply */
 
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E

@@ -17,6 +17,14 @@ typedef bool boolean;
 #define bitRead(v,b) (((v) >> (b)) & 0x01)
 #define SDA 8
 #define SCL 9
+/* Enough of the core's digital IO for the supply switch to link. The test never reads a pin
+   back, so what a write did is not recorded: the switch's own state is kept in PowerSwitch and
+   that is what a case would ask. */
+#define OUTPUT 1
+#define HIGH 1
+#define LOW 0
+void pinMode(uint8_t, uint8_t);
+void digitalWrite(uint8_t, uint8_t);
 class __FlashStringHelper;
 char* itoa(int, char*, int);
 void configTzTime(const char*, const char*, const char* = nullptr);

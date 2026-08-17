@@ -80,6 +80,12 @@ class Pixels
        what DisplayManager's word-set latch promises not to do. Starts true so the first
        pass establishes the window's colours. */
     bool Dirty{true};
+    /* Whether anything may reach the strip at all. Separate from a brightness of zero,
+       which still sends a frame of black pixels: this is for the state in which the strip
+       has no supply, and a frame arriving then pushes current into a dead rail through the
+       LED's own protection diode. Starts false, because a strip that is powered is what
+       every backend comes up with. */
+    bool OutputSuspended{false};
 
     // functions
     static constexpr byte toRow(byte Index) { return Index / PIXELS_DISPLAY_NUMBER_OF_COLUMNS; }
@@ -139,6 +145,18 @@ class Pixels
     // render interface, for PixelsFrame and the tests
     bool isDirty() const { return Dirty; }
     void clearDirty() { Dirty = false; }
+
+    // output gate, for the supply switch
+    /* Nothing is on a wire here, so a frame is never still going out. The hardware
+       backends ask their peripheral, and answering false is what lets the sequence that
+       waits for a frame be tested without one. */
+    static constexpr bool isFrameOnTheWire() { return false; }
+    bool isOutputSuspended() const { return OutputSuspended; }
+    void suspendOutput() { OutputSuspended = true; }
+    /* Marks the buffer, so what comes back is a redraw and not the window's last state:
+       the LEDs lose their registers along with their supply, so on hardware there is
+       nothing left up there to keep showing. */
+    void resumeOutput() { OutputSuspended = false; Dirty = true; }
 };
 
 #endif // PIXELS_H

@@ -42,6 +42,12 @@ void testNightWindowIncludesMidnight();
 void testNightSwitchDimsWithoutLosingTheSetting();
 void testNightSwitchActsOnTheCrossingOnly();
 
+/* power_test.cpp */
+void testSupplyCutWaitsForTheBlankedFrame();
+void testSupplyReturnsBeforeTheDataLine();
+void testSupplyOffIsNotDisplayDisable();
+void testSupplyRequestsAreReversible();
+
 /* persistence_test.cpp */
 void testPersistence();
 void testPersistenceSaveAndReset();

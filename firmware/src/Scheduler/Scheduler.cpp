@@ -28,6 +28,7 @@
 #include "Overlays.h"
 #include "Persistence.h"
 #include "NightSwitch.h"
+#include "Power.h"
 #include "Uptime.h"
 #include "Temperature.h"
 #include "Text.h"
@@ -107,6 +108,12 @@ void Scheduler::triggerTasks()
     if(isDue(TASK_ID_PERSISTENCE, Persistence::getInstance().getTaskCycle())) { Persistence::getInstance().task(); }
     if(isDue(TASK_ID_UPTIME, Uptime::getInstance().getTaskCycle())) { Uptime::getInstance().task(); }
     if(isDue(TASK_ID_NIGHT_SWITCH, NightSwitch::getInstance().getTaskCycle())) { NightSwitch::getInstance().task(); }
+    /* Last of all, and after the night switch in particular: everything above may still
+       write pixels in this pass, and what this one waits for is the pass being over - a
+       supply cut before the last writer would leave the strip holding a frame nobody
+       finished. The application renders after this returns, which is the transmission this
+       task is watching for on its next run. */
+    if(isDue(TASK_ID_POWER, Power::getInstance().getTaskCycle())) { Power::getInstance().task(); }
 } /* triggerTasks */
 
 /******************************************************************************************************************************************************

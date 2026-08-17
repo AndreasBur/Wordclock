@@ -11,4 +11,10 @@ Stream Serial;
 
 void configTzTime(const char*, const char*, const char*) { }
 
+/* The supply switch's two calls. Empty rather than recording: a host has no port to drive, and
+   what the tests ask about is the state the switch keeps, not the write that would have gone
+   out. */
+void pinMode(uint8_t, uint8_t) { }
+void digitalWrite(uint8_t, uint8_t) { }
+
 char* itoa(int Value, char* Buffer, int) { snprintf(Buffer, 12, "%d", Value); return Buffer; }

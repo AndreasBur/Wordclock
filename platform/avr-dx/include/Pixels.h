@@ -70,6 +70,11 @@ class Pixels
        so the first render establishes the strip's state. */
     bool Dirty{true};
     bool Initialised{false};
+    /* Whether anything may go out on the wire at all. Not the same as a brightness of zero,
+       which still transmits a frame of black pixels: this is for the state in which the strip
+       has no supply, and a frame arriving then pushes current into a dead rail through the
+       LED's own protection diode. */
+    bool OutputSuspended{false};
 
     // functions
     static constexpr byte toRow(byte Index) { return Index / PIXELS_DISPLAY_NUMBER_OF_COLUMNS; }
@@ -132,6 +137,17 @@ class Pixels
     // render interface, for the application's tick
     bool isDirty() const { return Dirty; }
     StdReturnType render();
+
+    // output gate, for the supply switch
+    /* Whether the last frame is still going out. Asked before the supply is cut: the driver
+       hands one byte at a time to an interrupt and the frame outlives the call that started
+       it, so a port dropped on the tick that started it lands in the middle of one. */
+    bool isFrameOnTheWire() const;
+    bool isOutputSuspended() const { return OutputSuspended; }
+    void suspendOutput() { OutputSuspended = true; }
+    /* Marks the buffer, because the LEDs lose their registers along with their supply: what
+       was up there is gone, so coming back is a redraw rather than a resume. */
+    void resumeOutput() { OutputSuspended = false; Dirty = true; }
 };
 
 #endif // _PIXELS_H_

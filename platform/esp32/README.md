@@ -242,8 +242,8 @@ since that LED still receives the marginal level itself.
 
 ### Switching the strip's supply
 
-RPC ids 20 and 21 are reserved for a switch that cuts the strip's 5 V, and the circuit they
-wait for does not have to be invented. The [WC MiniDev Shield
+RPC ids 20 and 21 switch the strip's 5 V, and the circuit they were written for did not have to
+be invented. The [WC MiniDev Shield
 v5](https://www.mikrocontroller.net/wikifiles/e/ea/WC_MiniDev_Shield_v5_Schaltplan.png) carries
 one and everything below is read off it — a board for an STM32F103, so the pin is worth
 nothing here and the topology is worth all of it.
@@ -286,6 +286,13 @@ five times quicker; it still leaves a weak pull-up shaping the rising edge of a 
 wants a push-pull driver, so the `SN74AHCT125N` stays the answer. And its own note says the
 whole switch may be left unbuilt with the IRF9310's drain and source bridged, which is a
 reason to keep it optional in the firmware rather than a reason to skip it.
+
+The firmware side is built and `POWER_SWITCH_IS_FITTED` in
+[`include/PowerSwitch.h`](include/PowerSwitch.h) is what turns it on, together with the pin
+beside it — `STD_OFF` and GPIO 11 until somebody confirms both against a board. Until then ids
+20 and 21 answer `Error=9` rather than pretending, and the port is never driven, which is the
+one thing a wrong pin here could do damage with. What the sequence behind those ids has to do,
+and why it takes two ticks, is in [`Power.h`](../../firmware/inc/Power/Power.h).
 
 ### Supply
 
