@@ -1,6 +1,7 @@
 #include "WordclockMain.h"
 
 #include "Persistence.h"
+#include "sim/PowerSwitch.h"
 #include "sim/RealTimeClock.h"
 
 namespace {
@@ -24,6 +25,10 @@ ClockDateTime getSystemDateTime()
 WordclockMain::WordclockMain()
 {
     RealTimeClock::getInstance().setDateTime(getSystemDateTime());
+    /* Nothing to set up here - there is no port - but the call is made anyway, so that the
+       one backend the others are mirrored from shows where it belongs. On hardware it is what
+       brings the strip's 5 V up, and it has to come before the data line is claimed. */
+    PowerSwitch::getInstance().init();
     /* Before the first task, so the window's first paint already shows the restored
        colour and mode rather than the defaults for a tick. */
     Persistence::getInstance().load();

@@ -238,6 +238,22 @@ class Display
     StdReturnType show() { return PixelStripe.show(); }
     void enable() { PixelStripe.enablePixels(); }
     void disable() { PixelStripe.disablePixels(); }
+
+    /* The strip as a wire rather than as a picture, for the supply switch: whether a frame
+       is still waiting to go out, whether one is still going out, and the gate that stops
+       any from going out at all. Forwarded here rather than reached through Pixels directly
+       so that the module driving the switch needs one collaborator instead of two - and so
+       the rule stays where the rest of the strip's handling is.
+
+       isDirty() and isFrameOnTheWire() are two different waits and both are needed: the
+       first says the blanked frame has not been handed over yet, the second that it has and
+       is still on the wire. Cutting the supply at either point leaves the strip holding
+       half a frame with nothing to latch it. */
+    bool isDirty() const { return PixelStripe.isDirty(); }
+    bool isFrameOnTheWire() const { return PixelStripe.isFrameOnTheWire(); }
+    bool isOutputSuspended() const { return PixelStripe.isOutputSuspended(); }
+    void suspendOutput() { PixelStripe.suspendOutput(); }
+    void resumeOutput() { PixelStripe.resumeOutput(); }
     void enableBrightnessAutomatic() { Brightness.enableAutomatic(); }
     void disableBrightnessAutomatic() { Brightness.disableAutomatic(); }
     void enableBrightnessGammaCorrection() { Brightness.enableGammaCorrection(); }

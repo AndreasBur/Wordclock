@@ -58,6 +58,11 @@ class ErrorMessage
         ERROR_DISPLAY_PENDING,
         ERROR_RPC_ID_UNKNOWN,
         ERROR_UNKNOWN,
+        /* Appended behind ERROR_UNKNOWN rather than sorted in beside its neighbours, for the
+           reason the remote procedure ids are appended too: these numbers are what an answer
+           carries and what this repository's own documentation writes down, and inserting one
+           would silently change what every code behind it means. */
+        ERROR_POWER_SWITCH_ABSENT,
     };
 
     enum ApiType {

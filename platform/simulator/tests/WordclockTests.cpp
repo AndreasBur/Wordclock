@@ -55,6 +55,10 @@ int main()
     testNightWindowIncludesMidnight();
     testNightSwitchDimsWithoutLosingTheSetting();
     testNightSwitchActsOnTheCrossingOnly();
+    testSupplyCutWaitsForTheBlankedFrame();
+    testSupplyReturnsBeforeTheDataLine();
+    testSupplyOffIsNotDisplayDisable();
+    testSupplyRequestsAreReversible();
     testPersistence();
     testPersistenceSaveAndReset();
 

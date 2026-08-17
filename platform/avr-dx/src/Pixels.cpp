@@ -114,6 +114,11 @@ void Pixels::init(byte sPin)
 ******************************************************************************************************************************************************/
 StdReturnType Pixels::render()
 {
+    /* Before the dirty check, and the buffer is left marked on purpose: while the strip has
+       no supply nothing may reach DIN, and the supply coming back has to find a frame still
+       owed rather than a buffer that looks up to date. */
+    if(OutputSuspended) { return E_OK; }
+
     if(!Dirty) { return E_OK; }
     if(!Initialised) { return E_NOT_OK; }
 
@@ -124,6 +129,21 @@ StdReturnType Pixels::render()
 
     return Result;
 } /* render */
+
+
+/******************************************************************************************************************************************************
+  isFrameOnTheWire()
+******************************************************************************************************************************************************/
+/*! \brief          Whether the previous frame is still being transmitted
+ *  \details        The driver's own answer rather than a flag kept here: it knows both halves
+ *                  of it, the queue and the byte still sitting in the shift register.
+ *
+ *  \return         true while a frame is still going out
+******************************************************************************************************************************************************/
+bool Pixels::isFrameOnTheWire() const
+{
+    return WS2812::getInstance().isBusy();
+} /* isFrameOnTheWire */
 
 
 /******************************************************************************************************************************************************

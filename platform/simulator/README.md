@@ -147,6 +147,7 @@ platform/simulator/
 │   │   ├── RealTimeClock.h   time source
 │   │   ├── BH1750.h      ambient-light sensor
 │   │   ├── DS3231.h      the clock chip's thermometer
+│   │   ├── PowerSwitch.h the switch in the strip's 5 V, as a flag
 │   │   ├── SerialShim.h  the port Serial is bound to
 │   │   ├── Settings.h    stand-ins for absent hardware
 │   │   ├── Storage.h     settings store, backed by a file

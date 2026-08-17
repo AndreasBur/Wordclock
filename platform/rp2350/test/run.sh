@@ -82,6 +82,7 @@ BACKEND=(
     "$PLATFORM_DIR/src/BH1750.cpp"
     "$PLATFORM_DIR/src/DS3231.cpp"
     "$PLATFORM_DIR/src/Pixels.cpp"
+    "$PLATFORM_DIR/src/PowerSwitch.cpp"
     "$PLATFORM_DIR/src/RealTimeClock.cpp"
     "$PLATFORM_DIR/src/Storage.cpp"
     "$PLATFORM_DIR/src/System.cpp"

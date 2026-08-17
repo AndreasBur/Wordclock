@@ -156,6 +156,11 @@ void Pixels::init(byte sPin)
 ******************************************************************************************************************************************************/
 StdReturnType Pixels::render()
 {
+    /* Before the dirty check, and the buffer is left marked on purpose: while the strip has
+       no supply nothing may reach DIN, and the supply coming back has to find a frame still
+       owed rather than a buffer that looks up to date. */
+    if(OutputSuspended) { return E_OK; }
+
     if(!Dirty) { return E_OK; }
     if(RmtChannel == nullptr) { return E_NOT_OK; }
 
@@ -165,6 +170,29 @@ StdReturnType Pixels::render()
     Dirty = false;
     return Result;
 } /* render */
+
+
+/******************************************************************************************************************************************************
+  isFrameOnTheWire()
+******************************************************************************************************************************************************/
+/*! \brief          Whether the previous frame is still being transmitted
+ *  \details        The same call transmitFrame() waits on, with a timeout of nothing: this is
+ *                  a question and not a wait, and it is asked from a task that has a clock to
+ *                  keep. ESP_ERR_TIMEOUT is therefore the ordinary "still busy" answer rather
+ *                  than a fault.
+ *
+ *                  A channel that was never opened has nothing going out, which is not the
+ *                  same as what the driver would answer for a null handle - and reporting a
+ *                  frame that cannot exist would stall the switch-off for good.
+ *
+ *  \return         true while a frame is still going out
+******************************************************************************************************************************************************/
+bool Pixels::isFrameOnTheWire() const
+{
+    if(RmtChannel == nullptr) { return false; }
+
+    return rmt_tx_wait_all_done(RmtChannel, 0) != ESP_OK;
+} /* isFrameOnTheWire */
 
 
 /******************************************************************************************************************************************************

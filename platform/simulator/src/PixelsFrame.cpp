@@ -252,6 +252,12 @@ void PixelsFrame::render()
 {
     Pixels& pixels = Pixels::getInstance();
 
+    /* Before the dirty check rather than after it: while the strip has no supply nothing
+       may be drawn, and the buffer has to stay dirty so that the supply coming back
+       redraws it. What stands in the window until then is the black frame the switch-off
+       sequence sends on purpose, which is also what the wall would show. */
+    if(pixels.isOutputSuspended()) { return; }
+
     if(!pixels.isDirty()) { return; }
     pixels.clearDirty();
 

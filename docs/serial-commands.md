@@ -279,7 +279,7 @@ From
 | 14 / 15 | Brightness increment / decrement |
 | 16 / 17 | Auto-brightness on / off |
 | 18 / 19 | Gamma correction on / off |
-| 20 / 21 | Power on / off — **reserved, not implemented yet.** These ids wait for the hardware switch that cuts the 5 V supply of the LED stripes via a controller port; the circuit is in [the ESP32 backend's hardware notes](../platform/esp32/README.md#switching-the-strips-supply) and what the two have to do in which order is in [roadmap.md](roadmap.md). They are accepted and answer `Error=0` without doing anything |
+| 20 / 21 | Power on / off — switches the 5 V supply of the LED stripes, which is **not** ids 3 and 4: those darken a strip that stays powered and keeps drawing its quiescent current, about 110 mA for this display. Both are asks rather than acts, and take two ticks: switching off blanks the stripes over the data line, waits for that frame to be gone and only then drops the port, because data reaching DIN with the rail down pushes current into it through the LED's own protection diode. Switching on is that order backwards. **Answers `Error=9` on a clock whose switch was not built** — it is optional hardware, and only the simulator declares it fitted so far. Circuit in [the ESP32 backend's hardware notes](../platform/esp32/README.md#switching-the-strips-supply), sequence in [Power.h](../firmware/inc/Power/Power.h) |
 | 22 | Clock refresh — draw the current time again, right now and without an animation |
 | 23 | Animation start — run the selected animation on the current time |
 | 24 | Animation abort — end a running animation and put the time back |
@@ -321,6 +321,7 @@ Returned in the `Error=<code>` field
 | 6 | `ERROR_DISPLAY_PENDING` | Display busy / show still pending |
 | 7 | `ERROR_RPC_ID_UNKNOWN` | RPC command with an unknown/missing `-P<id>` |
 | 8 | `ERROR_UNKNOWN` | Unspecified failure — what an `E_NOT_OK` from the firmware becomes |
+| 9 | `ERROR_POWER_SWITCH_ABSENT` | Ids 20 and 21 on a clock whose supply switch was not built. Appended behind `ERROR_UNKNOWN` rather than sorted in beside its neighbours, for the reason the RPC ids are appended too: inserting one would silently change every code behind it |
 
 ## Examples
 

@@ -28,6 +28,7 @@
 #include "DisplayManager.h"
 #include "Overlays.h"
 #include "Persistence.h"
+#include "Power.h"
 #include "System.h"
 
 /******************************************************************************************************************************************************
@@ -203,36 +204,28 @@ class MsgCmdRemoteProcedureCallParser : public MsgParameterParser<MsgCmdRemotePr
             case RPC_ID_DISPLAY_TEST :
                 Display::getInstance().test();
                 break;
-            // POWER_ON and POWER_OFF are reserved for the planned hardware switch
-            // that cuts the 5 V supply of the LED stripes via a microcontroller
-            // port (high side P-MOSFET, driven through an N-MOSFET, so the port is
-            // active high and the pull down leaves the supply off after reset).
-            // These ids are not display enable/disable, which have their own ids.
-            //
-            // The order matters once the port exists: data pulses must not reach
-            // DIN while the supply is off. So POWER_OFF has to blank the stripes
-            // over the data line first, wait for that transfer to complete, and
-            // only then switch the supply off; POWER_ON switches the supply on and
-            // resumes data output afterwards.
-            //
-            // That waiting cannot happen in here. disable() reaches
-            // Pixels::disablePixels(), which only sets the brightness to zero and
-            // marks the buffer dirty - on every backend. Nothing is transmitted
-            // until the application's next tick calls Pixels::render(), and the
-            // transfer then outlives that call too. So the port cannot be dropped
-            // from this switch at all; these two ids can only ask, the way
-            // SYSTEM_RESTART does, and a tick has to carry it out.
-            //
-            // The circuit these ids are shaped for is written down in
-            // platform/esp32/README.md, under "Switching the strip's supply".
-            //
-            // Until the port exists the ids stay intentionally unimplemented.
-            // Both branches are empty until the port exists, and they are two ids rather
-            // than one because they will not stay empty.
-            // NOLINTNEXTLINE(bugprone-branch-clone)
+            /* The switch in the strip's 5 V, not the display's enable and disable on ids 3
+               and 4 - those set the brightness to zero and leave a powered strip drawing its
+               quiescent current. Both pairs exist and neither stands in for the other.
+
+               Only asked for here. Cutting the supply means blanking the strip over the data
+               line and waiting for that frame to be gone, and the frame is not gone when this
+               returns: nothing is transmitted until the application's tick renders, and the
+               transmission outlives that call as well. Power carries the order out over the
+               ticks that follow, the way SYSTEM_RESTART leaves the restart to one.
+
+               A board built without the switch has the high side MOSFET bridged and nothing
+               to act on, which is its own answer rather than E_NOT_OK: the caller asked for
+               something this clock does not have, and "unknown" would not say so. The circuit
+               is written down in platform/esp32/README.md, under "Switching the strip's
+               supply". */
             case RPC_ID_POWER_ON :
+                if(!Power::isSwitchFitted()) { AnswerError = ErrorMessage::ERROR_POWER_SWITCH_ABSENT; }
+                else { ReturnValue = Power::getInstance().switchSupplyOn(); }
                 break;
             case RPC_ID_POWER_OFF :
+                if(!Power::isSwitchFitted()) { AnswerError = ErrorMessage::ERROR_POWER_SWITCH_ABSENT; }
+                else { ReturnValue = Power::getInstance().switchSupplyOff(); }
                 break;
             /* These seven answer E_NOT_OK where the display is busy with something else,
                rather than doing it anyway: an overlay holding the display and an overlay
