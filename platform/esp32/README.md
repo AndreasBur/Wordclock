@@ -196,14 +196,61 @@ edit cycle is then a browser reload.
 
 ## Hardware notes
 
-- **Level shifting.** The ESP32's 3.3 V data line drives a 5 V WS2812 out of spec. It
-  often works and then fails with temperature or a longer cable; a 74AHCT125 on the data
-  line is the fix. 330–470 Ω in series and 1000 µF at the strip's supply belong there too.
+### The LED data line
+
+The ESP32's 3.3 V output drives a 5 V WS2812 out of spec: the datasheet asks for
+0.7 × VDD, so 3.5 V, and 200 mV are missing. It works on the bench anyway, because the
+input in fact switches around 2.7 V — and then fails with temperature, a longer cable or
+the next batch of strips. An `SN74AHCT125N` on the data line closes the gap.
+
+The T is the whole point. The HCT family kept the old TTL threshold of 2.0 V while
+running off 5 V, so it reads 3.3 V logic and emits 5 V logic. A 74**HC**125 in the same
+socket has CMOS thresholds and changes nothing.
+
+| Pin | Connect to |
+|-----|------------|
+| 1 `1OE`  | GND — an open enable leaves the channel silent |
+| 2 `1A`   | ESP32 data pin |
+| 3 `1Y`   | 330 Ω, then the strip's DIN |
+| 7 `GND`  | GND, common with the ESP32 and the strip |
+| 14 `VCC` | **5 V**, not 3.3 |
+
+100 nF across pins 14 and 7, as close to the package as it will go: at 5 ns edges the
+output takes its current in spikes too short for the supply wire to deliver. The three
+unused channels want their inputs tied rather than left floating — 5, 9 and 12 to GND,
+4, 10 and 13 to 5 V — because a floating CMOS input draws current and can oscillate into
+the channel that is doing the work.
+
+The series resistor answers two problems, which is why it belongs at the driver's end
+rather than at the strip. Fast edges see even 20 cm of wire as a transmission line, and
+330 Ω at the source absorbs the reflection instead of letting it ring at DIN; that one
+only costs wrong colours. The other can destroy something: data arriving while the strip
+has no 5 V pushes current through DIN's protection diode into the unpowered rail.
+[`../../firmware/inc/Communication/MessageParser/MsgCmdRemoteProcedureCallParser.h`](../../firmware/inc/Communication/MessageParser/MsgCmdRemoteProcedureCallParser.h)
+already orders `POWER_OFF` to blank the strips before cutting the supply, but a reset or
+a watchdog keeps no such order, and the resistor is what holds in that case.
+
+Rejected on the way here: the cheap bidirectional boards are the wrong family. BSS138
+pulls up through 10 kΩ, so the rising edge takes some 350 ns against a 400 ns "0" pulse,
+and TXS0108E drives hard for a 30 ns one-shot before letting the same weak pull-up
+finish, with 70 pF of rated load that a wire to the strip already exceeds. Both are built
+for bidirectional buses, while this line runs one way and wants a push-pull driver.
+Dropping the strip to 4.5 V with a series diode is the one real alternative — it puts
+3.3 V inside spec at the cost of brightness. The "sacrificial first LED" is not one,
+since that LED still receives the marginal level itself.
+
+### Supply
+
 - **Brown-out on inrush.** The classic failure is a reset when the strip's inrush sags
   the 5 V rail while WiFi is transmitting. Star wiring for the 5 V, and 470 µF at the
   module.
 - **Supply sizing.** 110 LEDs at full white would draw 6.6 A, which a word clock never
   does. With a brightness cap 5 V / 3 A is comfortable.
+- **1000 µF at the strip's supply**, beside the 470 µF at the module — the same inrush,
+  answered at the end that causes it.
+
+### The I²C devices
+
 - **I²C address.** `BH1750_I2C_ADDR` is 0x23 here, the datasheet's address for ADDR tied
   low (0x5C when high). Both the simulator stub and the xmega driver carry 0x76, which is
   neither — harmless in a stub that never opens a bus, but a sensor addressed that way
