@@ -327,6 +327,24 @@ From the comparison with wordclock24h, in the order they would change daily use.
    error, and costs nothing at runtime, which suits a project that already guards its
    option counts with `static_assert`.
 
+10. **Feed the ESP32's RMT channel by DMA.** Today the frame is refilled from the driver's
+    interrupt, so the strip's timing depends on that interrupt being served: a block holds
+    48 symbols, about 58 µs of output, and the part is running WiFi at the same time. A
+    missed refill stalls the data line, and a WS2812 reads a long enough gap as the end of a
+    frame — which shows up as a display latching a picture shifted by a pixel, the failure
+    that reads like a wiring fault.
+
+    `flags.with_dma` in [Pixels.cpp](../platform/esp32/src/Pixels.cpp) is the whole change,
+    and it takes the deadline away rather than widening it. Two reasons it is not just done:
+    **only the S3 can do it** — `SOC_RMT_SUPPORT_DMA` is absent on the classic ESP32, the S2,
+    the C3 and the C6 — so it needs a case distinction rather than a flag, and
+    `mem_block_symbols` stops meaning blocks and starts meaning a DMA buffer, so the constant
+    beside it has to be reconsidered at the same time.
+
+    What settles it is not a build. Nothing in this backend has ever driven a strip, so the
+    interrupt that this would remove has never been observed missing a deadline; the honest
+    order is a first board and an oscilloscope, then this.
+
 Deliberately not planned: weather reports, MP3 playback and alarms, games on the
 display, and an **IR receiver**. The first four are what wordclock24h grew over years and
 none of them is a word clock. The receiver is a different kind of no: a handset is a
