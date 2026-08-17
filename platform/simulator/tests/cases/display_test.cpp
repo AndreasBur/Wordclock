@@ -116,11 +116,6 @@ void testFadeDimsAndComesBack()
     animations.setAnimationFast(Animations::ANIMATION_ID_NONE);
 }
 
-/* Guards a swap that this simulator cannot show: Pixel keeps its channels in the WS2812
-   wire order rather than in argument order, so a constructor that filled the raw array
-   positionally put red where getRed() does not look. Every colour built that way so far
-   was grey or black, which hides it, and the window renders brightness rather than hue,
-   which hides it again - it would first have appeared on the strip. */
 /* Switching the display off and on again, seen where it happens: the output rather than
    the buffer. disable() leaves every colour in the buffer where it was and takes the
    brightness to zero, so a check on the buffer alone would call a dark clock lit. */
@@ -149,6 +144,108 @@ void testDisplayOffAndOnAgain()
            "and must come back on the brightness that was set, not on full");
 }
 
+/* What "one further" means for a switch: the other one. The toggle is the whole of what a
+   button on the case can send, so it has to agree with the enable and disable a phone
+   sends - a toggle that only tracked its own calls would drift apart from ids 3 and 4 the
+   first time both were used. */
+void testDisplayToggleFollowsTheState()
+{
+    Display& display = Display::getInstance();
+    const byte BrightnessBefore = display.getBrightness();
+
+    display.enable();
+    display.setBrightness(120u);
+    Clock::getInstance().setTime(10u, 5u);
+    display.show();
+    expect(display.isEnabled(), "a display that was enabled must say so");
+
+    display.toggle();
+    expect(!display.isEnabled(), "a toggle must switch an enabled display off");
+    expect(!isAnyOutputPixelLit(), "and must reach the strip, not only the flag");
+
+    display.toggle();
+    expect(display.isEnabled(), "a second toggle must switch it back on");
+    expect(isAnyOutputPixelLit(), "and must put something out again");
+
+    /* The other direction: a phone switching it off, a knob switching it back on. */
+    display.disable();
+    expect(!display.isEnabled(), "disable must be visible to the toggle too");
+    display.toggle();
+    expect(display.isEnabled() && isAnyOutputPixelLit(),
+           "a toggle after a disable must switch the display on");
+
+    display.setBrightness(BrightnessBefore);
+}
+
+/* The two settings that are a yes or a no, turned round by a control that cannot read
+   them. Both go through the setters that apply what they set, so this also says that a
+   toggle does not need a task to take effect. */
+void testBrightnessTogglesInvertTheSetting()
+{
+    Display& display = Display::getInstance();
+
+    display.setBrightnessUseAutomatic(false);
+    display.toggleBrightnessAutomatic();
+    expect(display.getBrightnessUseAutomatic(), "a toggle must switch the automatic on");
+    display.toggleBrightnessAutomatic();
+    expect(!display.getBrightnessUseAutomatic(), "and the next one must switch it off again");
+
+    display.setBrightnessUseGammaCorrection(false);
+    display.toggleBrightnessGammaCorrection();
+    expect(display.getBrightnessUseGammaCorrection(), "a toggle must switch the gamma correction on");
+    display.toggleBrightnessGammaCorrection();
+    expect(!display.getBrightnessUseGammaCorrection(), "and the next one must switch it off again");
+}
+
+/* What the colour reset needs to be worth having, and what it did not have: a colour that
+   reaches the strip. The pixels carry the colour already dimmed by the brightness, and that
+   dimmed copy used to be recomputed only when the brightness moved - so every colour change,
+   the reset and the six increment procedures alike, stayed invisible until something else
+   happened to touch the brightness. A redraw did not help: it wrote the same stale copy. */
+void testColourChangesReachTheStrip()
+{
+    Display& display = Display::getInstance();
+    const byte BrightnessBefore = display.getBrightness();
+
+    display.enable();
+    display.setBrightness(200u);
+    display.resetColor();
+    const PixelBufferType White = drawClockFace(10u, 5u);
+    expect(isAnyPixelLit(White), "a clock face must light some letters to compare");
+
+    /* No brightness change anywhere between here and the check, which is the whole point. */
+    display.setColor(255u, 0u, 0u);
+    expect(!arePixelsEqual(readPixels(), White),
+           "a colour change must reach the letters that are already lit");
+
+    /* Red, and the other two channels as far down as they go: DisplayColor's dimming
+       rounds a channel up to one rather than to nothing, so "off" is a one here. */
+    const PixelBufferType Red = readPixels();
+    bool anyLitPixelIsRed = false;
+    bool everyLitPixelIsRed = true;
+    for(byte index = 0u; index < PIXELS_NUMBER_OF_PIXELS; index++) {
+        if(Red[index].getRed() <= 1u) { continue; }
+
+        anyLitPixelIsRed = true;
+        if(Red[index].getGreen() > 1u || Red[index].getBlue() > 1u) { everyLitPixelIsRed = false; }
+    }
+    expect(anyLitPixelIsRed && everyLitPixelIsRed,
+           "a red display must have nothing but the rounding left in the other two channels");
+
+    display.resetColor();
+    expect(arePixelsEqual(readPixels(), White),
+           "the colour reset must put white back, on the strip and not only in the setting");
+    expect(display.getColorRed() == 255u && display.getColorGreen() == 255u &&
+           display.getColorBlue() == 255u, "and must reach all three channels");
+
+    display.setBrightness(BrightnessBefore);
+}
+
+/* Guards a swap that this simulator cannot show: Pixel keeps its channels in the WS2812
+   wire order rather than in argument order, so a constructor that filled the raw array
+   positionally put red where getRed() does not look. Every colour built that way so far
+   was grey or black, which hides it, and the window renders brightness rather than hue,
+   which hides it again - it would first have appeared on the strip. */
 void testPixelColorChannels()
 {
     const Pixel color(10u, 20u, 30u);

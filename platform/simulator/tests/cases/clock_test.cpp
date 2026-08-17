@@ -154,6 +154,33 @@ void testClockModes()
            "the same mode and time must produce the same words again");
 }
 
+/* One wording further, which is all a knob can ask for. The round has to close: a walk of
+   as many steps as there are wordings must arrive back where it started, or a control with
+   no list in front of it can reach a mode and never leave it. */
+void testClockModeStepsThroughEveryWording()
+{
+    Clock& clock = Clock::getInstance();
+    clock.setModeFast(Clock::MODE_WESSI);
+
+    bool seen[Clock::MODE_NUMBER_OF_MODES]{};
+    for(byte Step = 0u; Step < Clock::MODE_NUMBER_OF_MODES; Step++) {
+        seen[clock.getMode()] = true;
+        clock.nextMode();
+    }
+
+    bool allSeen = true;
+    for(const bool Seen : seen) { if(!Seen) { allSeen = false; } }
+    expect(allSeen, "stepping must reach every wording");
+    expect(clock.getMode() == Clock::MODE_WESSI, "and must wrap back to the one it started on");
+
+    /* The step itself, said once outright: the mode after the last is the first again. */
+    clock.setModeFast(Clock::MODE_SCHWABEN);
+    clock.nextMode();
+    expect(clock.getMode() == Clock::MODE_WESSI, "the wording after the last must be the first");
+
+    clock.setModeFast(Clock::MODE_WESSI);
+}
+
 /* The comparison the display update hangs on: it has to notice a difference in each
    of the three fields, or a word change goes unnoticed and the display stays behind. */
 void testClockWordsComparison()

@@ -140,7 +140,14 @@ constexpr const char* const RemoteProcedureValueNames[] {
     "Settings reset",
     "System restart",
     "Time resynchronise",
-    "Network reconnect"
+    "Network reconnect",
+    "Animation next",
+    "Animation previous",
+    "Clock mode next",
+    "Display toggle",
+    "Brightness automatic toggle",
+    "Gamma correction toggle",
+    "Colour reset"
 };
 
 /* The command numbers and the value lists of the enumerations come out of the firmware

@@ -11,6 +11,9 @@
 void testDisplayManagerLatch();
 void testFadeDimsAndComesBack();
 void testDisplayOffAndOnAgain();
+void testDisplayToggleFollowsTheState();
+void testBrightnessTogglesInvertTheSetting();
+void testColourChangesReachTheStrip();
 void testPixelColorChannels();
 void testDisplayCharacterLookup();
 
@@ -22,6 +25,7 @@ void testOverlayPeriodAndEndurance();
 /* animation_test.cpp */
 void testFlickerLeavesTheDisplayOn();
 void testEveryAnimationEndsOnTheNewTime();
+void testAnimationStepsThroughEveryOne();
 
 /* text_test.cpp */
 void testCharacterToGlyphMapping();
@@ -31,6 +35,7 @@ void testRegionalWordings();
 void testWordsChangeOnFiveMinuteStepsOnly();
 void testInvalidTimeIsRejected();
 void testClockModes();
+void testClockModeStepsThroughEveryWording();
 void testClockWordsComparison();
 
 /* scheduler_test.cpp */
