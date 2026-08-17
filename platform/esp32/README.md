@@ -26,28 +26,21 @@ pio device monitor -d platform/esp32      # serial console, 115200 baud
 
 ### PlatformIO in the dev container
 
-The container has no PlatformIO of its own yet. Installing it by hand:
+The image carries it, in a virtual environment under `/opt/platformio` that is already on
+the path, so `pio run -d platform/esp32` works in a fresh container with nothing installed
+by hand. The package cache is a named volume at `~/.platformio`: the roughly 1.5 GB of
+toolchain survives a rebuild, and only the first run pays for fetching it.
 
-```bash
-sudo apt-get install -y --no-install-recommends python3 python3-venv
-python3 -m venv ~/.pio-venv && ~/.pio-venv/bin/pip install platformio
-export PATH="$HOME/.pio-venv/bin:$PATH"
-```
-
-Behind a TLS-intercepting proxy there is one trap worth knowing, because the error names
-neither the proxy nor the cause: PlatformIO downloads with `requests` and passes its own
-`certifi` bundle explicitly, so it ignores `REQUESTS_CA_BUNDLE` and fails with
-`CERTIFICATE_VERIFY_FAILED: self-signed certificate in certificate chain` while `curl`
-and `git` reach the same URL. Appending the container's trust store to that bundle fixes
-it without turning verification off:
-
-```bash
-cat /etc/ssl/certs/ca-certificates.crt | \
-    sudo tee -a "$(~/.pio-venv/bin/python -c 'import certifi;print(certifi.where())')" > /dev/null
-```
-
-The pioarduino platform builds a second virtual environment under
-`~/.platformio/penv` with its own copy, which needs the same treatment.
+Behind a TLS-intercepting proxy there is one trap worth knowing about, because the error
+names neither the proxy nor the cause: PlatformIO downloads with `requests` and passes its
+own `certifi` bundle explicitly, so it ignores `REQUESTS_CA_BUNDLE` and fails with
+`CERTIFICATE_VERIFY_FAILED: self-signed certificate in certificate chain` while `curl` and
+`git` reach the same URL. Both halves of it are already answered, which is why nothing here
+has to be done about it: the image appends its own trust store to the bundle it ships, and
+`platformio-trust-store` does the same on every start for the second environment the
+platform packages build inside the volume at first use. The arrangement is described in
+[`../../.devcontainer/README.md`](../../.devcontainer/README.md#platformio-for-the-esp32-backend),
+which is where it belongs rather than as a second copy here.
 
 CMake refuses this platform on purpose — `-DPLATFORM=esp32` prints the PlatformIO
 command instead.
