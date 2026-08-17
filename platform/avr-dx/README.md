@@ -217,6 +217,12 @@ deform a pulse. The gap is the budget instead, and it has to stay under the WS28
 TWI1 rather than TWI0 is forced: TWI0 can only reach PA2 and PA3, which the strip
 already uses.
 
+`DISPLAY_DATA_PIN` does not reach any of this. `Pixels::init()` takes it and stores it, and
+`WS2812::init()` is then called without it: the output is LUT0's own pin and the CCL decides
+where it appears, not a number the firmware passes down. Overriding the macro for this
+backend would therefore change nothing — on the two backends that drive an ordinary GPIO,
+the ESP32's RMT and the RP2350's PIO, it is the pin.
+
 ## Status
 
 Everything here builds and links. **The timing has not been on an oscilloscope.**

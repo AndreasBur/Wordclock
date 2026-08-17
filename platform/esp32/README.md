@@ -105,6 +105,20 @@ The LED data pin is **not** configured here. It comes from `DISPLAY_DATA_PIN` in
 [`../../firmware/inc/Display/Display.h`](../../firmware/inc/Display/Display.h), like
 every other display parameter, and the backend takes what `Display::init()` hands it.
 
+Its default of GPIO 10 is chosen for the S3, where that pin is free. It is **not** free on
+a classic ESP32-WROOM — GPIO 6 to 11 are wired to the flash chip there — so a board that
+needs another pin says so in its own build rather than in the core header, which every
+target shares:
+
+```ini
+build_flags =
+    -DDISPLAY_DATA_PIN=13u
+```
+
+GPIO 13 because it has no strapping role, is not on UART0 (1 and 3) or the I²C bus (21 and
+22), and can drive an output, which GPIO 34 to 39 cannot. Nothing in this repository sets
+the flag — every board it has been built for has GPIO 10.
+
 ## What the backend does differently from the simulator
 
 | | Simulator | ESP32 |
