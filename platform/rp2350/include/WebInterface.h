@@ -69,7 +69,6 @@ class WebInterface
 ******************************************************************************************************************************************************/
   private:
     static constexpr size_t MaxClients{WEB_INTERFACE_MAX_CLIENTS};
-    static constexpr int NoClient{-1};
 
     static constexpr size_t FrameSize{PIXELS_NUMBER_OF_LEDS * Pixel::getNumberOfColors()};
 
@@ -82,22 +81,16 @@ class WebInterface
     byte FrameCountdown{0u};
     /* Set when a client arrives, so the next frame goes out even though nothing changed. A
        browser that connects to a standing display would otherwise wait for the next change -
-       on a word clock, up to five minutes of empty panel. Written by the server's task and
-       cleared by the firmware's; a byte either way, so a lost race costs one interval. */
+       on a word clock, up to five minutes of empty panel. Written by the server's callback
+       and cleared by the firmware's tick; a byte either way, so a lost race costs one
+       interval.
+
+       The list of clients itself is not kept here, unlike on the ESP32: AsyncWebSocket owns
+       it, counts it and broadcasts to it, so a second copy could only ever disagree with
+       the first. */
     std::atomic<bool> ForceFrame{false};
 
-    /* Written only by the HTTP server's task - on a handshake and on a close - and read
-       only by the firmware's task when it broadcasts. One writer is what makes the plain
-       atomics enough here, the same reasoning as for WordclockSerial's ring buffer. */
-    std::atomic<int> Clients[MaxClients];
-
-    // functions
-    void addClient(int);
-    void removeClient(int);
-
-    WebInterface() {
-        for(size_t Slot = 0u; Slot < MaxClients; Slot++) { Clients[Slot].store(NoClient); }
-    }
+    WebInterface() { }
     ~WebInterface() { }
 
 /******************************************************************************************************************************************************
@@ -125,9 +118,10 @@ class WebInterface
        application's tick, after the display has been handed to the strip. */
     void broadcastFrame();
 
-    /* For the socket handler, which runs in the server's task. */
-    void onClientOpened(int Descriptor) { addClient(Descriptor); }
-    void onClientClosed(int Descriptor) { removeClient(Descriptor); }
+    /* For the socket callback, which runs in the network stack's context rather than the
+       firmware's tick. Only the force flag is touched from there; who is connected is the
+       socket's own business. */
+    void onClientOpened() { ForceFrame.store(true, std::memory_order_release); }
 };
 
 #endif // _WEB_INTERFACE_H_
