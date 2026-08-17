@@ -11,8 +11,9 @@ compiled against the stand-ins in [`stubs/`](stubs/) instead of the real framewo
 ```
 test/
 ├── run.sh      builds everything once into an object cache under .pio/, links, runs
-├── check.h     the one assertion the tests share, and the tally main() returns
-├── cases/      one binary each, named after what it pins down
+├── cases/      one binary each, named after what it pins down. Two more come from
+│            ../../test/, shared with the RP2350 backend - see its README for the rule
+│            that decides which of the two places a case belongs in
 ├── stubs/      the framework as far as the backend touches it, plus the three
 │               translation units that define what nobody inspects
 └── console/    not a test: the firmware as a host process, with a page in front of it
@@ -36,8 +37,8 @@ answers on its bus, whether SNTP arrives.
 | | |
 |---|---|
 [`cases/frame_test.cpp`](cases/frame_test.cpp) | the bytes `Pixels::render()` hands the peripheral — channel order, index to offset, that an unchanged frame is not retransmitted, and that the master brightness blanks without touching the buffer |
-[`cases/serial_test.cpp`](cases/serial_test.cpp) | that an injected command takes the same path as one typed on the wire, that the UART is served first, and that a line reaches the sink once per `println()` |
-[`cases/ds3231_test.cpp`](cases/ds3231_test.cpp) | the clock chip in both directions: which register a read is aimed at, the temperature the overlay shows, the time block as BCD, and the two states — a stopped oscillator, a chip that was never written — that count as no time rather than as data |
+[`../../test/cases/serial_test.cpp`](../../test/cases/serial_test.cpp) | that an injected command takes the same path as one typed on the wire, that the UART is served first, and that a line reaches the sink once per `println()` |
+[`../../test/cases/ds3231_test.cpp`](../../test/cases/ds3231_test.cpp) | the clock chip in both directions: which register a read is aimed at, the temperature the overlay shows, the time block as BCD, and the two states — a stopped oscillator, a chip that was never written — that count as no time rather than as data |
 [`cases/web_test.cpp`](cases/web_test.cpp) | the handlers, reached through the same registration call the server makes: a frame in, an answer out, the page as a gzip stream, the catalog as valid JSON, an oversized frame refused |
 
 `run.sh` builds with `-Wall -Wextra -Werror`, so a warning fails the run.

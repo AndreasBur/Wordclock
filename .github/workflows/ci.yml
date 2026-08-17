@@ -108,6 +108,50 @@ jobs:
       - name: Build the firmware
         run: pio run -d platform/esp32
 
+  host-tests-rp2350:
+    name: RP2350 backend on the host
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+
+      # Same as the ESP32's: nothing but g++ and python3, because the backend is compiled
+      # against the stand-ins in test/stubs rather than the real core. Two of the four case
+      # files are the ones under platform/test, shared with that job.
+      - name: Run the host tests
+        run: platform/rp2350/test/run.sh
+
+  firmware-rp2350:
+    name: RP2350 firmware
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+
+      # Larger and slower to fetch than the ESP32's, because this platform clones
+      # earlephilhower/arduino-pico recursively rather than downloading a package: around
+      # 1.5 GB with the Pico SDK and its submodules, and several minutes. Its own cache key
+      # rather than a shared one, so a change to either platformio.ini does not throw the
+      # other's toolchain away.
+      - name: Cache the PlatformIO packages
+        uses: actions/cache@v6
+        with:
+          path: |
+            ~/.platformio
+            ~/.cache/pip
+          key: platformio-rp2350-${{ runner.os }}-${{ hashFiles('platform/rp2350/platformio.ini') }}
+          restore-keys: platformio-rp2350-${{ runner.os }}-
+
+      - name: Install PlatformIO
+        run: pip install --upgrade platformio
+
+      # As on the ESP32: no WordclockSecrets.h in the repository, so this builds with the
+      # empty SSID that leaves a clock running without a network.
+      - name: Build the firmware
+        run: pio run -d platform/rp2350
+
   # The one job that does not use the runner's own packages, and the reason is the whole
   # story of this job. ubuntu-24.04 carries avr-gcc 7.3, which fails this build twice over:
   # it has no device-specs for avr128da48, and once handed those from a Microchip pack it

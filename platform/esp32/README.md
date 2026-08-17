@@ -3,7 +3,8 @@
 The on-device backend of the Wordclock firmware. It supplies the headers the core
 reaches the hardware through — `Pixels.h`, `RealTimeClock.h`, `BH1750.h`, `Storage.h`
 and `Arduino.h` — plus the application entry point. See
-[../hardware/README.md](../hardware/README.md) for the contract these fulfil.
+[../avr-dx/README.md](../avr-dx/README.md#what-a-backend-must-provide) for the
+contract these fulfil.
 
 Its `Arduino.h` is not a reimplementation: it includes the Arduino core's own and
 replaces exactly one thing, `Serial`. See *A second front end reaches the same port*
