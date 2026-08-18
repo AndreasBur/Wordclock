@@ -34,8 +34,17 @@
 #define BH1750_TASK_CYCLE                               100u
 
 /* BH1750 parameter */
+/* The sensor's own range, not what the brightness automatic spreads between - see the two
+   calibration defaults below, which the hardware headers carry with the same reasoning. */
 #define BH1750_ILLUMINANCE_MAX_LX_VALUE                 65535u
 #define BH1750_ILLUMINANCE_MIN_LX_VALUE                 1u
+
+/* What an uncalibrated clock spreads its brightness between: a dim room and a bright day at
+   a window. Deliberately not the sensor's range, where every indoor reading would sit at the
+   very bottom and hold the display at its floor. */
+#define BH1750_CALIBRATION_MAX_DEFAULT_LX_VALUE         1000u
+#define BH1750_CALIBRATION_MIN_DEFAULT_LX_VALUE         1u
+
 #define BH1750_REG_MT_MIN_VALUE                         31u
 #define BH1750_REG_MT_MAX_VALUE                         254u
 #define BH1750_REG_MT_DEFAULT_VALUE                     69u
@@ -95,7 +104,7 @@ class BH1750
     static constexpr byte TaskCycle{BH1750_TASK_CYCLE};
     ModeType Mode{MODE_NONE};
     IlluminanceType Illuminance{BH1750_ILLUMINANCE_MIN_LX_VALUE};
-    CalibrationValuesType CalibrationValues{BH1750_ILLUMINANCE_MAX_LX_VALUE, BH1750_ILLUMINANCE_MIN_LX_VALUE};
+    CalibrationValuesType CalibrationValues{BH1750_CALIBRATION_MAX_DEFAULT_LX_VALUE, BH1750_CALIBRATION_MIN_DEFAULT_LX_VALUE};
 
     // functions
     StdReturnType readIlluminance();
@@ -131,13 +140,17 @@ class BH1750
     // methods
     StdReturnType init(ModeType);
     StdReturnType changeMeasurementTime(byte);
-    void startCalibrationMaxValue() {
+    /* Always succeeds, unlike on hardware: what the window dialled in is available from
+       the first call, so there is no not-set-up state for the calibration to refuse. */
+    StdReturnType startCalibrationMaxValue() {
         task();
         CalibrationValues.MaxValue = Illuminance;
+        return E_OK;
     }
-    void startCalibrationMinValue() {
+    StdReturnType startCalibrationMinValue() {
         task();
         CalibrationValues.MinValue = Illuminance;
+        return E_OK;
     }
 
     /* On hardware this reads the sensor. Here it takes what the window dialled in, so
@@ -151,8 +164,9 @@ class BH1750
 
   private:
     /* a bright room by default, so switching the automatic on does not darken the
-       display before anything was dialled in */
-    static inline IlluminanceType SimulatedIlluminance{BH1750_ILLUMINANCE_MAX_LX_VALUE};
+       display before anything was dialled in - the calibrated maximum rather than the
+       sensor's, which is the top of the slider's range in Settings */
+    static inline IlluminanceType SimulatedIlluminance{BH1750_CALIBRATION_MAX_DEFAULT_LX_VALUE};
 };
 
 #endif

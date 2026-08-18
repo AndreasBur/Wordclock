@@ -160,10 +160,10 @@ class MsgCmdRemoteProcedureCallParser : public MsgParameterParser<MsgCmdRemotePr
     {
         switch(RpcId) {
             case RPC_ID_ILLUMINANCE_CALIBRATION_MAX_VALUE :
-                Illuminance::getInstance().startCalibrationMaxValue();
+                ReturnValue = Illuminance::getInstance().startCalibrationMaxValue();
                 break;
             case RPC_ID_ILLUMINANCE_CALIBRATION_MIN_VALUE :
-                Illuminance::getInstance().startCalibrationMinValue();
+                ReturnValue = Illuminance::getInstance().startCalibrationMinValue();
                 break;
             case RPC_ID_DISPLAY_ENABLE :
                 Display::getInstance().enable();

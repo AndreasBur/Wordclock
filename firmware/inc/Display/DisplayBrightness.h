@@ -79,19 +79,37 @@ class DisplayBrightness
     static constexpr byte BrightnessAutomaticMinValue{8u};
         
     // function
+    /* The room's brightness, spread between the two calibrated bounds rather than divided
+       by the upper one alone. Dividing left the lower bound with no effect at all - the
+       procedure that calibrates it answered, Persistence stored it, and nothing ever read
+       it - and it put a living room at 100 lx a sixth of a percent up a scale that ends at
+       the sensor's 65535, so the automatic held every indoor clock at its floor. */
     byte calcBrightnessAutomatic(byte sBrightness) const {
-        IlluminanceType Illuminance = Illuminance::getInstance().getIlluminance();
-        IlluminanceType IlluminanceMax = Illuminance::getInstance().getCalibrationValuesMaxValue();
-
-        if(IlluminanceMax == 0u || Illuminance >= IlluminanceMax) { return sBrightness; }
-
-        float IlluminanceFactor = static_cast<float>(Illuminance) / IlluminanceMax;
-        byte automaticBrightness = static_cast<byte>(sBrightness * IlluminanceFactor * AutomaticCorrectionFactor);
+        const Illuminance& Sensor = Illuminance::getInstance();
 
         if(sBrightness < BrightnessAutomaticMinValue) { return sBrightness; }
-        if(automaticBrightness < BrightnessAutomaticMinValue) { return BrightnessAutomaticMinValue; }
 
-        return automaticBrightness;
+        return toAutomaticLevel(sBrightness, toIlluminanceFactor(Sensor.getIlluminance(),
+                                                                Sensor.getCalibrationValuesMinValue(),
+                                                                Sensor.getCalibrationValuesMaxValue()));
+    }
+    /* Where the reading sits between the bounds: 0 at the dark one, 1 at the bright one.
+       Bounds that are not in order are what a calibration in the wrong order stores, and
+       nothing rejects it - so they are answered with 1 here, which is the display the owner
+       set and the same thing the automatic did before it had a lower bound at all. */
+    static constexpr float toIlluminanceFactor(IlluminanceType Measured, IlluminanceType Dark, IlluminanceType Bright) {
+        if(Bright <= Dark) { return 1.0f; }
+        if(Measured <= Dark) { return 0.0f; }
+        if(Measured >= Bright) { return 1.0f; }
+
+        return static_cast<float>(Measured - Dark) / static_cast<float>(Bright - Dark);
+    }
+    /* Never darker than BrightnessAutomaticMinValue: a display the automatic took all the
+       way down reads as a clock that has failed, not as a dark room. */
+    static constexpr byte toAutomaticLevel(byte sBrightness, float IlluminanceFactor) {
+        const byte Level = static_cast<byte>(sBrightness * IlluminanceFactor * AutomaticCorrectionFactor);
+
+        return (Level < BrightnessAutomaticMinValue) ? BrightnessAutomaticMinValue : Level;
     }
     /* The same shape as Pixel's own dimming: a level of 255 leaves the value alone, and
        one less than that scales it down without ever reaching zero by rounding. */

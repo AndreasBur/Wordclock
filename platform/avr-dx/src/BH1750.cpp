@@ -43,13 +43,22 @@ StdReturnType BH1750::init(ModeType sMode)
 /******************************************************************************************************************************************************
   setMode()
 ******************************************************************************************************************************************************/
+/*! \brief          Puts the sensor into a measurement mode
+ *  \details        Mode is assigned only once the sensor has acknowledged, because it is
+ *                  also what isReady() reads to decide whether the sensor is set up.
+ *                  Assigning first marks a sensor that never took the command as ready, and
+ *                  the retry in task() then never runs again - which leaves the sensor
+ *                  powered on but converting nothing, and every later reading is the empty
+ *                  data register.
+******************************************************************************************************************************************************/
 StdReturnType BH1750::setMode(ModeType sMode)
 {
+    if(sMode == MODE_NONE) { return E_NOT_OK; }
+
+    if(sendCommand(sMode) == E_NOT_OK) { return E_NOT_OK; }
+
     Mode = sMode;
-
-    if(Mode == MODE_NONE) { return E_NOT_OK; }
-
-    return sendMode();
+    return E_OK;
 } /* setMode */
 
 
@@ -75,7 +84,13 @@ StdReturnType BH1750::changeMeasurementTime(byte MTRegValue)
 
     /* The mode has to be sent again: the sensor takes the new measurement time only with
        the next measurement command. */
-    return sendMode();
+    if(sendMode() == E_NOT_OK) { return E_NOT_OK; }
+
+    /* Kept last, and only once all three went through, because this is what
+       convertRawToLux() divides by: a value stored after a failed transfer would scale every
+       later reading by a measurement time the sensor is not using. */
+    MeasurementTime = MTRegValue;
+    return E_OK;
 } /* changeMeasurementTime */
 
 
@@ -90,11 +105,21 @@ StdReturnType BH1750::changeMeasurementTime(byte MTRegValue)
 ******************************************************************************************************************************************************/
 void BH1750::task()
 {
-    if(!BusStarted || (Mode == MODE_NONE)) {
-        if(init(BH1750_DEFAULT_MODE) == E_NOT_OK) { return; }
+    /* Nothing is read on the run that sets the sensor up: the first high-resolution
+       conversion needs 120 ms and the data register reads zero until it is over, so reading
+       on would hand the brightness automatic a darkness that was never measured. The next
+       run is a second away, which is well past that. */
+    if(!isReady()) {
+        init(BH1750_DEFAULT_MODE);
+        return;
     }
 
-    readIlluminance();
+    if(readIlluminance() == E_NOT_OK) {
+        countReadFailure();
+        return;
+    }
+
+    ReadFailures = 0u;
     sendModeForOneTimeMode();
 } /* task */
 
@@ -131,6 +156,12 @@ StdReturnType BH1750::sendCommand(byte Command)
 /******************************************************************************************************************************************************
   readIlluminance()
 ******************************************************************************************************************************************************/
+/*! \brief          Reads the last measurement and converts it to lux
+ *  \details        The reading is kept as it was when the sensor does not answer, rather
+ *                  than falling to zero: the brightness automatic works on this value, so a
+ *                  dropped reading would otherwise dim the display for a second. What bounds
+ *                  that is the caller - see countReadFailure().
+******************************************************************************************************************************************************/
 StdReturnType BH1750::readIlluminance()
 {
     byte RawValue[BH1750_ILLUMINANCE_RAW_VALUE_NUMBER_OF_BYTES]{};
@@ -148,12 +179,16 @@ StdReturnType BH1750::readIlluminance()
 ******************************************************************************************************************************************************/
 /*! \brief          Starts the next measurement when the sensor only makes one at a time
  *  \details        A one-time measurement leaves the sensor powered down, so the next task
- *                  would read the same value again unless the mode is sent afresh.
+ *                  would read the same value again unless the mode is sent afresh - and it
+ *                  takes the power-on command before it listens to that mode, which is the
+ *                  same departure from the xmega driver init() makes and which the other two
+ *                  backends make here.
 ******************************************************************************************************************************************************/
 void BH1750::sendModeForOneTimeMode()
 {
     if(!isOneTimeMode()) { return; }
 
+    sendCommand(BH1750_CMD_POWER_ON);
     sendMode();
 } /* sendModeForOneTimeMode */
 

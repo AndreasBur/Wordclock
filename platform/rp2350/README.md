@@ -55,8 +55,10 @@ first board, check these in order:
    left-aligned into bits 31..8 and shifted out from the top; if the shift direction is
    wrong, the display comes up in plausible but wrong colours rather than dark.
 3. **Whether the BH1750 and the DS3231 answer** on a bus opened through `setSDA`/`setSCL`
-   rather than through `begin()`'s arguments. The pin setters return a value that is
-   checked, so a refusal is reported — but a bus that opens and stays silent is not.
+   rather than through `begin()`'s arguments. Nothing here reports a refusal: a pin those
+   setters will not take ends in the SDK's `panic()`, which is noreturn, so what the ESP32
+   returns as an error halts the chip here instead. What holds is that both drivers name
+   the same two pins — and a bus that opens and stays silent is not reported either.
 4. **Whether SNTP arrives.** Time synchronisation is split here (see below), and the half
    that starts the servers runs from the tick rather than from `setup()`.
 

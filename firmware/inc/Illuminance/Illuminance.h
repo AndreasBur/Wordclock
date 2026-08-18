@@ -9,10 +9,15 @@
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
 /**     \file       Illuminance.h
- *      \brief      
+ *      \brief      The ambient light the display dims itself by
  *
- *      \details    
- *                  
+ *      \details    A thin owner around the platform's BH1750, so the core reaches the
+ *                  sensor without knowing which one it holds - the hardware driver or the
+ *                  simulator's stub.
+ *
+ *                  There is deliberately no init() here to match the other modules': the
+ *                  sensor is private and the scheduler only ever calls task(), so the
+ *                  driver sets itself up from its first one. See the platform's BH1750.h.
 ******************************************************************************************************************************************************/
 #ifndef _ILLUMINANCE_H_
 #define _ILLUMINANCE_H_
@@ -82,18 +87,19 @@ class Illuminance
     void setCalibrationValues(CalibrationValuesType CalibrationValues) { Sensor.setCalibrationValues(CalibrationValues); }
 
     // methods
-    /* The calibration back to the sensor's full range, which is where a clock that was
-       never calibrated starts - the same two bounds the driver initialises from, so a
-       reset and a fresh chip agree. */
+    /* The calibration back to the span an uncalibrated clock starts in - the same two
+       bounds the driver initialises from, so a reset and a fresh chip agree. Not the
+       sensor's full range: see the defaults in the platform's BH1750.h for why that one
+       leaves the automatic sitting at its floor in every room. */
     void resetToDefaults() {
-        setCalibrationValuesMaxValue(BH1750_ILLUMINANCE_MAX_LX_VALUE);
-        setCalibrationValuesMinValue(BH1750_ILLUMINANCE_MIN_LX_VALUE);
+        setCalibrationValuesMaxValue(BH1750_CALIBRATION_MAX_DEFAULT_LX_VALUE);
+        setCalibrationValuesMinValue(BH1750_CALIBRATION_MIN_DEFAULT_LX_VALUE);
     }
 
-    StdReturnType init(ModeType);
-    StdReturnType changeMeasurementTime(byte);
-    void startCalibrationMaxValue() { Sensor.startCalibrationMaxValue(); }
-    void startCalibrationMinValue() { Sensor.startCalibrationMinValue(); }
+    /* Both refuse while the sensor has nothing measured, so the answer to the procedure is
+       the sensor's rather than an unconditional success. */
+    StdReturnType startCalibrationMaxValue() { return Sensor.startCalibrationMaxValue(); }
+    StdReturnType startCalibrationMinValue() { return Sensor.startCalibrationMinValue(); }
 
     void task() { Sensor.task(); }
 };
