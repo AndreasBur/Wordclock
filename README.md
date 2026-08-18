@@ -138,16 +138,6 @@ cppcheck --enable=warning,portability --std=c++17 --inline-suppr \
     firmware/src firmware/inc
 ```
 
-## History note
-
-Several older, diverged copies of the firmware (`Wordclock/`,
-`Wordclock_xmega_Template/`, and a `.7z` archive) were removed during cleanup.
-They remain fully recoverable from the git tag `archive/legacy-forks`:
-
-```bash
-git checkout archive/legacy-forks -- <path>
-```
-
 ## License
 
 [MIT](LICENSE) — Copyright (c) 2017-2026 Andreas Burnickl. The dependencies the
