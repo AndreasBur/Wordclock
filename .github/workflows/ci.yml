@@ -32,6 +32,11 @@ on:
   pull_request:
   push:
     branches: [master]
+  # So release.yml can run this file rather than repeat it. A release is then by construction
+  # something the whole of CI has passed, and the binaries it publishes are the ones those
+  # jobs produced - not a second build of the same tag that could differ in a toolchain
+  # version nobody pinned.
+  workflow_call:
 
 # A second push to the same branch makes the first answer worthless, so it is cancelled
 # rather than left to occupy a runner.
@@ -108,6 +113,20 @@ jobs:
       - name: Build the firmware
         run: pio run -d platform/esp32
 
+      # Two files because they answer different questions. firmware.bin is the image an
+      # over-the-air update takes; firmware.factory.bin is the whole flash including the
+      # bootloader and the partition table, which is what somebody holding a bare board
+      # needs and the one that is useless to leave out. if-no-files-found: error because a
+      # renamed build output would otherwise publish an empty release and say nothing.
+      - name: Keep the firmware
+        uses: actions/upload-artifact@v7
+        with:
+          name: esp32-s3-firmware
+          path: |
+            platform/esp32/.pio/build/wordclock/firmware.bin
+            platform/esp32/.pio/build/wordclock/firmware.factory.bin
+          if-no-files-found: error
+
   host-tests-rp2350:
     name: RP2350 backend on the host
     runs-on: ubuntu-24.04
@@ -151,6 +170,18 @@ jobs:
       # empty SSID that leaves a clock running without a network.
       - name: Build the firmware
         run: pio run -d platform/rp2350
+
+      # The .uf2 first: the Pico mounts as a mass storage device and installing is copying
+      # that file onto it, with no tool to install and nothing to go wrong. The .bin is kept
+      # beside it for picotool and for an over-the-air update.
+      - name: Keep the firmware
+        uses: actions/upload-artifact@v7
+        with:
+          name: rp2350-firmware
+          path: |
+            platform/rp2350/.pio/build/wordclock/firmware.uf2
+            platform/rp2350/.pio/build/wordclock/firmware.bin
+          if-no-files-found: error
 
   # The one job that does not use the runner's own packages, and the reason is the whole
   # story of this job. ubuntu-24.04 carries avr-gcc 7.3, which fails this build twice over:
@@ -200,3 +231,15 @@ jobs:
       # so a change that stops fitting says so here rather than on somebody's bench.
       - name: Build
         run: cmake --build build-avr
+
+      # The .hex is what pymcuprog and avrdude write; the .elf goes with it because it is
+      # the only one of the two that still knows the symbols, and a report about a clock in
+      # somebody's living room is worth little without the binary it ran.
+      - name: Keep the firmware
+        uses: actions/upload-artifact@v7
+        with:
+          name: avr128da48-firmware
+          path: |
+            build-avr/platform/avr-dx/Wordclock.hex
+            build-avr/platform/avr-dx/Wordclock.elf
+          if-no-files-found: error

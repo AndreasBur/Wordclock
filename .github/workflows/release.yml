@@ -1,0 +1,102 @@
+# What turns a tag into something a stranger can install. Until now the CI built all three
+# firmwares on every push and threw them away, so the only way to get a Wordclock onto a
+# board was to install a toolchain and build it - which asks a lot of somebody who wants a
+# clock rather than a compiler.
+#
+# The build is not repeated here. This workflow calls ci.yml, waits for every one of its jobs
+# including the tests and the analysers' sibling workflow's subject matter, and publishes the
+# artefacts those jobs uploaded. Two things follow from that and both are the point: a tag
+# whose CI is red produces no release at all, and the file a user downloads is byte-for-byte
+# the file that was checked, not a second build of the same commit that could pick up a
+# different toolchain version.
+#
+# Triggered by the tag rather than by hand, because the tag is the decision. Pushing v1.2.0
+# is the act of releasing 1.2.0; a workflow_dispatch would only add a second place to say the
+# same thing and a way for the two to disagree.
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+# Only the publishing job writes anything, and it needs exactly this: creating a release and
+# attaching files to it. Declared at the top rather than per job because a called workflow
+# cannot be granted more than its caller has.
+permissions:
+  contents: write
+
+jobs:
+  # Not "build". The name says what a failure here means: the tag did not pass, so nothing
+  # is published.
+  checks:
+    name: Checks
+    uses: ./.github/workflows/ci.yml
+
+  publish:
+    name: Publish the release
+    needs: checks
+    runs-on: ubuntu-24.04
+    steps:
+      # For LICENSE and the notes below, nothing else - the binaries come from the artefacts.
+      - uses: actions/checkout@v7
+
+      # No name filter: every artefact of this run, which is the three firmware jobs' output.
+      # A fourth target added to ci.yml then appears here without this file changing, and the
+      # rename step below is what decides how it is called.
+      - name: Collect what the checks built
+        uses: actions/download-artifact@v8
+        with:
+          path: artefacts
+
+      # firmware.bin says nothing once it is out of its build directory and sitting in a
+      # downloads folder next to two other firmware.bin. The target and the version go into
+      # the name so that the file still identifies itself a year later, on a machine that has
+      # long forgotten which release page it came from.
+      - name: Name the files after their target and version
+        run: |
+          Version="${{ github.ref_name }}"
+          mkdir release
+
+          cp artefacts/esp32-s3-firmware/firmware.factory.bin \
+             "release/Wordclock-ESP32-S3-${Version}.factory.bin"
+          cp artefacts/esp32-s3-firmware/firmware.bin \
+             "release/Wordclock-ESP32-S3-${Version}.ota.bin"
+          cp artefacts/rp2350-firmware/firmware.uf2 \
+             "release/Wordclock-RP2350-${Version}.uf2"
+          cp artefacts/rp2350-firmware/firmware.bin \
+             "release/Wordclock-RP2350-${Version}.ota.bin"
+          cp artefacts/avr128da48-firmware/Wordclock.hex \
+             "release/Wordclock-AVR128DA48-${Version}.hex"
+
+          ls -l release
+
+      # The notes are prepended to the ones GitHub generates from the merged pull requests,
+      # so the commit list still appears below them. What GitHub cannot generate is which of
+      # five files a given board wants, and that is the question somebody arriving at a
+      # release page actually has.
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          Version="${{ github.ref_name }}"
+          Notes=$(cat <<'EOF'
+          ### Which file
+
+          | Board | File | How to install |
+          |-------|------|----------------|
+          | ESP32-S3 | `…-ESP32-S3-*.factory.bin` | First install: `esptool.py write_flash 0x0 <file>`. Contains the bootloader and partition table. |
+          | ESP32-S3 | `…-ESP32-S3-*.ota.bin` | Update of a clock that already runs this firmware. |
+          | Raspberry Pi Pico 2 W | `…-RP2350-*.uf2` | Hold BOOTSEL while plugging in, then copy the file onto the drive that appears. |
+          | Raspberry Pi Pico 2 W | `…-RP2350-*.ota.bin` | For `picotool load`, or an update of a running clock. |
+          | AVR128DA48 | `…-AVR128DA48-*.hex` | `pymcuprog write -d avr128da48 -t uart -f <file> --erase --verify`, see [platform/avr-dx/README.md](platform/avr-dx/README.md). |
+
+          The firmware is built without WLAN credentials, so a clock flashed from these files
+          comes up without a network and is set up over the serial interface - see the
+          [serial command reference](docs/serial-commands.md).
+          EOF
+          )
+          gh release create "$Version" \
+              --title "$Version" \
+              --generate-notes \
+              --notes "$Notes" \
+              release/*
