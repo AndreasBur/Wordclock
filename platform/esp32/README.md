@@ -105,11 +105,71 @@ The LED data pin is **not** configured here. It comes from `DISPLAY_DATA_PIN` in
 [`../../firmware/inc/Display/Display.h`](../../firmware/inc/Display/Display.h), like
 every other display parameter, and the backend takes what `Display::init()` hands it.
 
+Its default of GPIO 10 is chosen for the S3, where that pin is free. It is **not** free on
+a classic ESP32-WROOM — GPIO 6 to 11 are wired to the flash chip there — so a board that
+needs another pin says so in its own build rather than in the core header, which every
+target shares:
+
+```ini
+build_flags =
+    -DDISPLAY_DATA_PIN=13u
+```
+
+GPIO 13 because it has no strapping role, is not on UART0 (1 and 3) or the I²C bus (21 and
+22), and can drive an output, which GPIO 34 to 39 cannot. Nothing in this repository sets
+the flag — every board it has been built for has GPIO 10.
+
+## Which ESP32 this needs
+
+Written down because the question comes up with every board somebody already owns, and
+because the answer is shorter than it looks: **the architecture is irrelevant**. There is no
+Xtensa in the core or in this backend — no inline assembly, no intrinsics, plain C++17 — so
+RISC-V parts are not a different case. Two things decide it:
+
+- **WiFi**, for SNTP, the web console and the access point a clock with no credentials opens.
+- **One RMT transmit channel**, for the strip.
+
+| Part | WiFi | RMT TX × words | Verdict |
+|---|---|---|---|
+| ESP32-S3 | yes | 4 × 48 | what this backend targets — image at 31 % of a 3.19 MB app slot |
+| ESP32 (classic) | yes | 8 × 64 | builds; GPIO 6 to 11 are flash, so the data pin has to move |
+| ESP32-S2 | yes | 4 × 64 | never built, nothing known against it |
+| ESP32-C3 / C6 | yes | 2 × 48 | builds; both transmit channels go to the strip, see `RmtMemoryBlockSymbols` |
+| ESP32-C5 | yes | 2 × 48 | never built, nothing known against it |
+| ESP32-C2 | — | — | the pinned platform ships no C2 libraries, so it does not build here |
+| ESP32-H2 | **no** | 2 × 48 | out. 802.15.4 only |
+| ESP32-P4 | **no** | 4 × 48 | out. Radio would be a companion chip |
+
+The WiFi column is `SOC_WIFI_SUPPORTED` in the IDF's `soc_caps.h`, which H2 and P4 do not
+define; the channel counts are `SOC_RMT_TX_CANDIDATES_PER_GROUP` and
+`SOC_RMT_MEM_WORDS_PER_CHANNEL` from the same headers.
+
+**Flash is the one number that separates the parts that work.** The image is about 1.05 MB,
+and what it has to fit in is the *app slot*, not the chip:
+
+| Board | App slot | Used |
+|---|---|---|
+| `esp32-s3-devkitc-1` (8 MB layout) | 3.19 MB | 31 % |
+| `esp32dev`, default table | 1.25 MB | 83 % |
+| `esp32dev`, `min_spiffs.csv` | 1.92 MB | 55 % |
+
+So a 4 MB board is not short of flash, its default partition table is: it reserves 1.5 MB
+for a SPIFFS this firmware never mounts. The web page is compiled into the image by
+`scripts/embed_web.py` and the settings live in NVS, so there is no filesystem to keep, and
+one line moves it:
+
+```ini
+board_build.partitions = min_spiffs.csv
+```
+
+**None of this has been on hardware.** "Builds" here means the image links and the pins are
+free, which is the same reservation the rest of this README carries.
+
 ## What the backend does differently from the simulator
 
 | | Simulator | ESP32 |
 |---|---|---|
-| `Pixels` | writes into a window | WS2812 over the RMT peripheral, DMA-fed |
+| `Pixels` | writes into a window | WS2812 over the RMT peripheral, refilled from its interrupt |
 | `RealTimeClock` | counts a host clock forward | reads the system clock, which SNTP sets and the DS3231 fills in for until it does |
 | `BH1750` | returns what a slider dialled in | reads the sensor over I²C |
 | `DS3231` | returns what a slider dialled in, and "no chip" until a box is ticked | reads the clock chip's temperature registers over I²C |

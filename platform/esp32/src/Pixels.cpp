@@ -24,6 +24,9 @@
 /* The driver headers first, ahead of the Arduino.h that binds Serial to a macro. */
 #include <driver/rmt_tx.h>
 #include <esp_err.h>
+/* For SOC_RMT_MEM_WORDS_PER_CHANNEL. rmt_tx.h already pulls it in, but the memory block
+   below is sized from it, and a transitive include is not a promise. */
+#include <soc/soc_caps.h>
 
 #include "Arduino.h"
 #include "Pixels.h"
@@ -52,9 +55,18 @@ constexpr uint16_t Bit0LowTicks{8u};
 constexpr uint16_t Bit1HighTicks{8u};
 constexpr uint16_t Bit1LowTicks{4u};
 
-/* One block is the minimum the driver hands out; 110 LEDs are streamed through it, not
-   held in it, so a larger block would buy nothing. */
-constexpr size_t RmtMemoryBlockSymbols{64u};
+/* Two blocks, and deliberately rather than by rounding: the frame is streamed through this
+   memory and not held in it, so without DMA its depth is the deadline the driver's refill
+   interrupt has to meet. 110 LEDs are 2640 symbols and one block holds 48 of them, about
+   58 us of output at 1.2 us a bit - halving that to save a channel would be trading the
+   margin that keeps a frame whole on a part that is also running WiFi.
+
+   Derived rather than written as a number because a block is not the same size everywhere:
+   48 words on this part, 64 on a classic ESP32. The 64 that stood here was one block on the
+   chip that number came from and two on the S3, which is the right amount for the wrong
+   stated reason. On a part with only two transmit channels - C3, C6 - this is both of them,
+   which is affordable exactly as long as nothing else wants RMT. */
+constexpr size_t RmtMemoryBlockSymbols{2u * SOC_RMT_MEM_WORDS_PER_CHANNEL};
 
 /* Only ever one frame in flight - see render(), which waits for the previous one. A
    deeper queue would let two frames go out back to back and lose the reset gap. */

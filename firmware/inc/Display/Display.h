@@ -32,7 +32,15 @@
  *  GLOBAL CONSTANT MACROS
 ******************************************************************************************************************************************************/
 /* Display configuration parameter */
-#define DISPLAY_DATA_PIN                            10u
+/* The one display parameter that is a property of the board rather than of the display:
+   which pin is free is decided by the part, not by the strip. So a board that cannot use
+   this one overrides it from its own build instead of editing here - the way
+   WORDCLOCK_VERSION is overridden - because every target shares this header, and editing
+   the line would move the pin for all four of them at once. Which pin each backend needs is
+   in its own README. */
+#ifndef DISPLAY_DATA_PIN
+# define DISPLAY_DATA_PIN                           10u
+#endif
 #define DISPLAY_LED_STRIPE_SERPENTINE               STD_OFF
 #if (DISPLAY_COLOR_SUPPORT_DIMMING == STD_ON)
 # define DISPLAY_USE_PIXELS_DIMMING                 STD_OFF
