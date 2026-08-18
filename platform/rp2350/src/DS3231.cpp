@@ -155,19 +155,19 @@ StdReturnType DS3231::setDateTime(const ClockDateTime& DateTime)
  *  \details        Shared with the light sensor, and opening it twice is what the Wire
  *                  library allows for - whichever of the two runs first does it.
  *
- *  \return         E_OK if the bus is available
+ *  \return         E_OK, which is all this core can tell us
 ******************************************************************************************************************************************************/
 StdReturnType DS3231::startBus()
 {
     if(BusStarted) { return E_OK; }
 
-    /* Three calls where the ESP32 has one: this core's begin() takes no arguments and
-       returns nothing. The pins are what can be refused - setSDA() and setSCL() fail if
-       the bus is already running or the pin cannot carry that signal - so they carry the
-       check that begin()'s return value carries there. The clock rate is set afterwards
-       because begin() would otherwise put the default back over it. */
-    if(!Wire.setSDA(DS3231_I2C_PIN_SDA)) { return E_NOT_OK; }
-    if(!Wire.setSCL(DS3231_I2C_PIN_SCL)) { return E_NOT_OK; }
+    /* Four calls where the ESP32 has one: this core's begin() takes no arguments and
+       returns nothing, and the clock rate is set afterwards because begin() would otherwise
+       put the default back over it. The pin setters are not the check that replaces
+       begin()'s return value, although they read like one - see BH1750::startBus() for why
+       an E_NOT_OK branch on them cannot be reached, and what carries the case instead. */
+    Wire.setSDA(DS3231_I2C_PIN_SDA);
+    Wire.setSCL(DS3231_I2C_PIN_SCL);
 
     Wire.begin();
     Wire.setClock(DS3231_I2C_FREQUENCY_HZ);

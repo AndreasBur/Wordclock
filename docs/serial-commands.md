@@ -87,10 +87,18 @@ reached again.
 after gamma correction (`-G1`) and the light sensor (`-A1`), recalculated by the
 display task, so the automatic follows the room without any command being sent.
 
-The automatic scales the brightness by the sensor reading divided by the calibrated
-maximum, which is why it needs a calibration first — RPC `1` with the sensor in the
-brightest light it should ever see, RPC `2` in the darkest. Without it the maximum is
-the sensor's full range and the display stays dim in a normal room.
+The automatic spreads the sensor reading between the two calibrated bounds: at or below
+the lower one the display sits on its floor, at or above the upper one it is exactly what
+`-B` asked for, and in between it moves in proportion. Calibrating is RPC `1` with the
+sensor in the brightest light it should ever see and RPC `2` in the darkest; both are
+refused while the sensor has measured nothing yet, so a clock with no sensor on the bus
+cannot store a bound it never saw.
+
+Uncalibrated it spreads between 1 lx and 1000 lx — a dim room and a bright day at a
+window — which is the span a clock on a wall moves in. Deliberately not the sensor's own
+range: 65535 lx is direct sunlight, and against that a living room at 100 lx is a tenth of
+a percent, which held the display at its floor in every room. The two defaults are in the
+platform's `BH1750.h`.
 
 Two bounds keep it usable: the automatic never dims below a floor, so a dark room
 does not make the clock disappear, and it never brightens beyond what `-B` asked
@@ -206,7 +214,7 @@ carries no value, so the readings live in a command of their own.
 |-------|---------|
 | `V` | Firmware version, hand-kept in [`Version.h`](../firmware/inc/Version/Version.h) |
 | `U` | Minutes since the last start. A `uint16` of them, so it wraps after 45 days |
-| `I` | What the light sensor measures, in lux — the value the brightness automatic divides by its calibrated maximum |
+| `I` | What the light sensor measures, in lux — the value the brightness automatic spreads between its two calibrated bounds |
 | `T` | What the clock chip measures, `23.4C`, and **empty** while no chip has answered |
 | `A` | The address to type into a browser, and **empty** while the clock has not joined a network |
 | `Q` | Received signal strength in dBm, negative, and **empty** without a network |
@@ -267,8 +275,8 @@ From
 | id | Action |
 |----|--------|
 | 0 | *(none)* |
-| 1 | Illuminance calibration — set max value |
-| 2 | Illuminance calibration — set min value |
+| 1 | Illuminance calibration — take the room in front of the clock as the bright bound. **Refused while the sensor has measured nothing**, so a missing or silent sensor cannot store a bound it never saw |
+| 2 | Illuminance calibration — the same for the dark bound |
 | 3 | Display enable |
 | 4 | Display disable |
 | 5 | Display show |
@@ -308,9 +316,10 @@ The RPC answer is `RpcId=<id> Error=<code>`. An unknown or missing id (including
 `0`, e.g. when `-P` is omitted) is rejected with `Error=7`
 (`ERROR_RPC_ID_UNKNOWN`) instead of being silently accepted.
 
-Ids `22` to `30` are the ones that can be refused: they answer `Error=8`
+Ids `1`, `2` and `22` to `30` are the ones that can be refused: they answer `Error=8`
 (`ERROR_UNKNOWN`, the general `E_NOT_OK`) when they could not be carried out —
-`29` and `30` when the store did not take the write, the rest when the display is busy
+`1` and `2` while the light sensor has not measured anything yet, `29` and `30` when the
+store did not take the write, the rest when the display is busy
 with something else rather than doing it anyway. The clock cannot be refreshed and no animation
 started while an overlay owns the display; an overlay cannot be shown while another
 one is showing or while it is switched off (`-A0`); and aborting answers the same way

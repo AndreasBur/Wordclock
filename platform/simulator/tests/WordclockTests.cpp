@@ -65,6 +65,8 @@ int main()
     testSupplyReturnsBeforeTheDataLine();
     testSupplyOffIsNotDisplayDisable();
     testSupplyRequestsAreReversible();
+    testAutomaticDefaultsSuitARoom();
+    testAutomaticSpreadsBetweenBothBounds();
     testPersistence();
     testPersistenceSaveAndReset();
 

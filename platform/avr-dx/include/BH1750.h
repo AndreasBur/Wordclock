@@ -14,7 +14,8 @@
  *      \details    Sets itself up from its first task() rather than from an init() call: the
  *                  core keeps its sensor private and never calls one, so a driver that waited
  *                  to be initialised would never measure anything. The attempt is repeated on
- *                  every task, which also picks up a sensor that was not answering earlier.
+ *                  every task, which also picks up a sensor that was not answering earlier -
+ *                  and, through ReadFailuresBeforeReinit, one that stops answering later.
  *
  *                  The bus is shared with the clock chip, and neither driver owns it - see
  *                  Twi.h.
@@ -44,9 +45,21 @@
 #define BH1750_DEFAULT_MODE                             MODE_CONTINUOUS_HIGH_RES_MODE
 
 /* BH1750 parameter */
+/* The sensor's own range, which is what a reading is clamped to - not what the brightness
+   automatic spreads between, see the two calibration defaults below. */
 #define BH1750_ILLUMINANCE_MAX_LX_VALUE                 65535u
 #define BH1750_ILLUMINANCE_MIN_LX_VALUE                 1u
 #define BH1750_ILLUMINANCE_RAW_VALUE_NUMBER_OF_BYTES    2u
+
+/* What an uncalibrated clock spreads its brightness between, and deliberately not the
+   sensor's range: 65535 lx is direct sunlight, so a living room at 100 lx would sit at the
+   very bottom of it and the automatic would hold the display at its floor everywhere
+   indoors - which reads as a broken sensor rather than as a default. These two are a dim
+   room and a bright day at a window, the span a clock on a wall actually moves in. Both
+   are starting points only; the two calibration procedures replace them with what the room
+   in front of this clock does. */
+#define BH1750_CALIBRATION_MAX_DEFAULT_LX_VALUE         1000u
+#define BH1750_CALIBRATION_MIN_DEFAULT_LX_VALUE         1u
 
 #define BH1750_REG_MT_MIN_VALUE                         31u
 #define BH1750_REG_MT_MAX_VALUE                         254u
@@ -103,10 +116,20 @@ class BH1750
 ******************************************************************************************************************************************************/
   private:
     static constexpr byte TaskCycle{BH1750_TASK_CYCLE};
+    /* Readings in a row that may fail before the driver sets the sensor up again, so five
+       seconds at TaskCycle. Long enough that one disturbed transfer keeps the last value,
+       which is what readIlluminance() is written for, and short enough that a sensor which
+       came back is picked up while the room still looks the same. */
+    static constexpr byte ReadFailuresBeforeReinit{5u};
+    /* The count means half a lux in the two mode 2 variants rather than a whole one, so a
+       reading in them has to be divided by twice as much. */
+    static constexpr float HighResMode2Divider{2.0f};
 
     ModeType Mode{MODE_NONE};
     IlluminanceType Illuminance{BH1750_ILLUMINANCE_MIN_LX_VALUE};
-    CalibrationValuesType CalibrationValues{BH1750_ILLUMINANCE_MAX_LX_VALUE, BH1750_ILLUMINANCE_MIN_LX_VALUE};
+    CalibrationValuesType CalibrationValues{BH1750_CALIBRATION_MAX_DEFAULT_LX_VALUE, BH1750_CALIBRATION_MIN_DEFAULT_LX_VALUE};
+    byte MeasurementTime{BH1750_REG_MT_DEFAULT_VALUE};
+    byte ReadFailures{0u};
     bool BusStarted{false};
 
     // functions
@@ -115,11 +138,42 @@ class BH1750
     void sendModeForOneTimeMode();
     static StdReturnType sendCommand(byte);
     StdReturnType sendMode() { return sendCommand(Mode); }
-    IlluminanceType convertRawToLux(IlluminanceType IlluminanceRaw) const { return IlluminanceRaw / BH1750_ILLUMINANCE_RAW_VALUE_DIVIDER; }
+    /* Both halves of what task() checks before it reads: a bus that was opened, and a mode
+       the sensor acknowledged. Clearing either one puts the set-up back on the next run. */
+    bool isReady() const { return BusStarted && (Mode != MODE_NONE); }
+
+    /* The datasheet's conversion, which is not the constant it looks like: the divider
+       moves with the mode and with the measurement time. A fixed 1.2 is right only at the
+       default of both - which is what the sensor starts in, and why this went unnoticed. */
+    float toLuxDivider() const { return BH1750_ILLUMINANCE_RAW_VALUE_DIVIDER * toModeDivider() * toMeasurementTimeFactor(); }
+    float toModeDivider() const { return isHighResMode2() ? HighResMode2Divider : 1.0f; }
+    /* A longer integration counts more for the same light, so the register's distance from
+       its reset value scales the reading back out again. */
+    float toMeasurementTimeFactor() const { return static_cast<float>(MeasurementTime) / BH1750_REG_MT_DEFAULT_VALUE; }
+    bool isHighResMode2() const { return (Mode == MODE_CONTINUOUS_HIGH_RES_MODE_2) || (Mode == MODE_ONE_TIME_HIGH_RES_MODE_2); }
+
+    /* Clamped rather than cast straight: the shortest measurement time divides by about
+       0.54, which takes a full-scale count past what IlluminanceType holds - and a float
+       that does not fit the integer it is cast to is undefined behaviour, not a wrap. */
+    IlluminanceType convertRawToLux(IlluminanceType IlluminanceRaw) const {
+        const float Lux = static_cast<float>(IlluminanceRaw) / toLuxDivider();
+        if(Lux >= static_cast<float>(BH1750_ILLUMINANCE_MAX_LX_VALUE)) { return BH1750_ILLUMINANCE_MAX_LX_VALUE; }
+        return static_cast<IlluminanceType>(Lux);
+    }
     IlluminanceType combineRawValueParts(byte HighByte, byte LowByte) const { return static_cast<uint16_t>(HighByte) << 8u | LowByte; }
     bool isMTRegValueInRange(byte MTRegValue) const { return ((MTRegValue <= BH1750_REG_MT_MAX_VALUE) && (MTRegValue >= BH1750_REG_MT_MIN_VALUE)); }
     bool isOneTimeMode() const {
         return (Mode == MODE_ONE_TIME_HIGH_RES_MODE) || (Mode == MODE_ONE_TIME_HIGH_RES_MODE_2) || (Mode == MODE_ONE_TIME_LOW_RES_MODE);
+    }
+
+    /* One dropped reading keeps the last value on purpose - see readIlluminance(). A sensor
+       that stops answering altogether is the other case: that value would otherwise stand
+       for good and the automatic would follow a room it can no longer see. Enough failures
+       therefore drop the mode, which is what puts task() back to setting the sensor up. */
+    void countReadFailure() {
+        if(++ReadFailures < ReadFailuresBeforeReinit) { return; }
+        ReadFailures = 0u;
+        Mode = MODE_NONE;
     }
 
 /******************************************************************************************************************************************************
@@ -146,13 +200,21 @@ class BH1750
     // methods
     StdReturnType init(ModeType);
     StdReturnType changeMeasurementTime(byte);
-    void startCalibrationMaxValue() {
+    /* Refused while the sensor is not set up, rather than storing whatever Illuminance
+       happens to hold: a clock calibrated in that state would keep a bound the sensor never
+       measured, Persistence would save it, and a stored zero maximum switches the automatic
+       off for good. The caller reports the refusal, so it is visible instead of silent. */
+    StdReturnType startCalibrationMaxValue() {
+        if(!isReady()) { return E_NOT_OK; }
         task();
         CalibrationValues.MaxValue = Illuminance;
+        return E_OK;
     }
-    void startCalibrationMinValue() {
+    StdReturnType startCalibrationMinValue() {
+        if(!isReady()) { return E_NOT_OK; }
         task();
         CalibrationValues.MinValue = Illuminance;
+        return E_OK;
     }
     void task();
 };

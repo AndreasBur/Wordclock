@@ -36,7 +36,9 @@ stops it altogether. Give the overlay enough `-E` seconds for a full pass.
 
 **File → Settings** holds what stands in for hardware the PC does not have. So far
 that is the **Illuminance** slider for the light sensor, which has nothing to
-measure here; it only takes effect while the brightness automatic is on (`3 -A1`).
+measure here; it only takes effect while the brightness automatic is on (`3 -A1`). Its
+full travel is the calibration maximum an uncalibrated clock starts with, so the slider
+covers the span the automatic actually works in rather than the sensor's whole range.
 
 **File → Message**, or the **Create** button, puts a command together instead of
 leaving it to be typed: pick it by name, tick the options it should carry, and

@@ -169,9 +169,10 @@ void Settings::OnClose(wxCloseEvent &event)
 ******************************************************************************************************************************************************/
 void Settings::OnIlluminance(wxCommandEvent &event)
 {
-    /* The slider is a percentage of the calibration maximum, which is what the
-       brightness automatic divides by */
-    const BH1750::IlluminanceType Maximum = BH1750_ILLUMINANCE_MAX_LX_VALUE;
+    /* The slider is a percentage of the calibration maximum, which is the top of what the
+       brightness automatic spreads between. The sensor's own range would put every useful
+       room in the bottom percent of the slider. */
+    const BH1750::IlluminanceType Maximum = BH1750_CALIBRATION_MAX_DEFAULT_LX_VALUE;
     BH1750::setSimulatedIlluminance(static_cast<BH1750::IlluminanceType>((Maximum / IlluminancePercentMax) * IlluminanceSlider->GetValue()));
     UNUSED(event);
 } /* OnIlluminance */

@@ -53,6 +53,10 @@ void testSupplyReturnsBeforeTheDataLine();
 void testSupplyOffIsNotDisplayDisable();
 void testSupplyRequestsAreReversible();
 
+/* illuminance_test.cpp */
+void testAutomaticDefaultsSuitARoom();
+void testAutomaticSpreadsBetweenBothBounds();
+
 /* persistence_test.cpp */
 void testPersistence();
 void testPersistenceSaveAndReset();

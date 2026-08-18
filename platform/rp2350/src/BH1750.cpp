@@ -62,13 +62,24 @@ StdReturnType BH1750::init(ModeType sMode)
 /******************************************************************************************************************************************************
   setMode()
 ******************************************************************************************************************************************************/
+/*! \brief          Puts the sensor into a measurement mode
+ *  \details        Mode is assigned only once the sensor has acknowledged, because it is
+ *                  also what isReady() reads to decide whether the sensor is set up.
+ *                  Assigning first marks a sensor that never took the command as ready,
+ *                  and the retry in task() then never runs again - which leaves the sensor
+ *                  powered on but converting nothing, and every later reading is the empty
+ *                  data register.
+ *
+ *  \return         E_OK if the sensor acknowledged the mode
+******************************************************************************************************************************************************/
 StdReturnType BH1750::setMode(ModeType sMode)
 {
+    if(sMode == MODE_NONE) { return E_NOT_OK; }
+
+    if(sendCommand(sMode) == E_NOT_OK) { return E_NOT_OK; }
+
     Mode = sMode;
-
-    if(Mode == MODE_NONE) { return E_NOT_OK; }
-
-    return sendMode();
+    return E_OK;
 } /* setMode */
 
 
@@ -80,7 +91,7 @@ StdReturnType BH1750::setMode(ModeType sMode)
  *                  value bits sit below the opcode bits - so the value is ORed in rather
  *                  than shifted into place.
  *
- *  \return         E_OK if the value was in range and the sensor took both halves
+ *  \return         E_OK if the value was in range and the sensor took all three commands
 ******************************************************************************************************************************************************/
 StdReturnType BH1750::changeMeasurementTime(byte MTRegValue)
 {
@@ -89,14 +100,16 @@ StdReturnType BH1750::changeMeasurementTime(byte MTRegValue)
     const byte HighBits = READ_BIT_GROUP(MTRegValue, BH1750_MT_REG_VALUE_HIGH_BITS_GM, BH1750_MT_REG_VALUE_HIGH_BITS_GP);
     const byte LowBits = READ_BIT_GROUP(MTRegValue, BH1750_MT_REG_VALUE_LOW_BITS_GM, BH1750_MT_REG_VALUE_LOW_BITS_GP);
 
-    StdReturnType ReturnValue = E_OK;
-
-    if(sendCommand(BH1750_CMD_CHANGE_MEASUREMENT_TIME_HIGH_BITS | HighBits) == E_NOT_OK) { ReturnValue = E_NOT_OK; }
-    if(sendCommand(BH1750_CMD_CHANGE_MEASUREMENT_TIME_LOW_BITS | LowBits) == E_NOT_OK) { ReturnValue = E_NOT_OK; }
+    if(sendCommand(BH1750_CMD_CHANGE_MEASUREMENT_TIME_HIGH_BITS | HighBits) == E_NOT_OK) { return E_NOT_OK; }
+    if(sendCommand(BH1750_CMD_CHANGE_MEASUREMENT_TIME_LOW_BITS | LowBits) == E_NOT_OK) { return E_NOT_OK; }
     /* The measurement time only takes effect with the next mode command. */
-    if(sendMode() == E_NOT_OK) { ReturnValue = E_NOT_OK; }
+    if(sendMode() == E_NOT_OK) { return E_NOT_OK; }
 
-    return ReturnValue;
+    /* Kept last, and only once all three went through, because this is what
+       convertRawToLux() divides by: a value stored after a failed transfer would scale
+       every later reading by a measurement time the sensor is not using. */
+    MeasurementTime = MTRegValue;
+    return E_OK;
 } /* changeMeasurementTime */
 
 
@@ -116,12 +129,22 @@ StdReturnType BH1750::changeMeasurementTime(byte MTRegValue)
 void BH1750::task()
 {
     /* Set up from here rather than from an init() call, and retried until it works: see
-       the file's header for why there is no place in the core to call init() from. */
-    if(!BusStarted || (Mode == MODE_NONE)) {
-        if(init(BH1750_DEFAULT_MODE) == E_NOT_OK) { return; }
+       the file's header for why there is no place in the core to call init() from.
+       Nothing is read on the run that does it - the first high-resolution conversion needs
+       120 ms and the data register reads zero until it is over, so reading on would hand
+       the brightness automatic a darkness that was never measured. The next run is a
+       second away, which is well past that. */
+    if(!isReady()) {
+        init(BH1750_DEFAULT_MODE);
+        return;
     }
 
-    readIlluminance();
+    if(readIlluminance() == E_NOT_OK) {
+        countReadFailure();
+        return;
+    }
+
+    ReadFailures = 0u;
     sendModeForOneTimeMode();
 } /* task */
 
@@ -134,17 +157,28 @@ void BH1750::task()
   startBus()
 ******************************************************************************************************************************************************/
 /*! \brief          Opens the I2C bus, once
+ *  \details        Four calls where the ESP32 has one: this core's begin() takes no
+ *                  arguments and returns nothing, and the clock rate is set afterwards
+ *                  because begin() would otherwise put the default back over it.
  *
- *  \return         E_OK if the bus is available
+ *                  The pin setters look like the check that replaces begin()'s return
+ *                  value. They are not one: a pin they will not take ends in the SDK's
+ *                  panic(), which is declared noreturn, so an E_NOT_OK branch on them
+ *                  cannot be reached and only reads as if the case were handled. What
+ *                  makes the call safe instead is that both drivers on this bus name the
+ *                  same two pins - the second one through hits setSDA()'s "already this
+ *                  pin" case, and begin() returns early on a bus that is running. Giving
+ *                  one driver another pin without the other therefore does not fail here,
+ *                  it halts the chip, and see DS3231.cpp for the same note.
+ *
+ *  \return         E_OK, which is all this core can tell us
 ******************************************************************************************************************************************************/
 StdReturnType BH1750::startBus()
 {
     if(BusStarted) { return E_OK; }
 
-    /* See the same place in DS3231.cpp: this core splits what the ESP32's begin() takes
-       in one call, and the pin setters are what can refuse. */
-    if(!Wire.setSDA(BH1750_I2C_PIN_SDA)) { return E_NOT_OK; }
-    if(!Wire.setSCL(BH1750_I2C_PIN_SCL)) { return E_NOT_OK; }
+    Wire.setSDA(BH1750_I2C_PIN_SDA);
+    Wire.setSCL(BH1750_I2C_PIN_SCL);
 
     Wire.begin();
     Wire.setClock(BH1750_I2C_FREQUENCY_HZ);
@@ -160,7 +194,8 @@ StdReturnType BH1750::startBus()
 /*! \brief          Reads the last measurement and converts it to lux
  *  \details        The reading is kept as it was when the sensor does not answer, rather
  *                  than falling to zero: the brightness automatic works on this value, so
- *                  a dropped reading would otherwise dim the display for a second.
+ *                  a dropped reading would otherwise dim the display for a second. What
+ *                  bounds that is the caller - see countReadFailure().
  *
  *  \return         E_OK if both bytes arrived
 ******************************************************************************************************************************************************/
