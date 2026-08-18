@@ -67,6 +67,11 @@ void Display::setBrightness(byte sBrightness)
 ******************************************************************************************************************************************************/
 void Display::applyBrightness()
 {
+    /* Before the shortcut below and on every run, because what the cap depends on moves
+       without the setting moving: a clock face that lights more letters than the last one
+       draws more current at the same brightness. This task is the only place that notices. */
+    applyCurrentLimit();
+
     const byte brightness = Brightness.calcBrightness();
 
     /* Nothing to do while the calculated value stays put, which is the normal case: only
@@ -76,7 +81,12 @@ void Display::applyBrightness()
     AppliedBrightness = brightness;
 
 #if (DISPLAY_USE_PIXELS_DIMMING == STD_ON)
-    PixelStripe.setBrightness(brightness);
+    /* Where the strip does all of the dimming, the master carries the setting and the cap at
+       once, so the two are combined here rather than kept apart as applyCurrentLimit() does
+       for the other path. */
+    const byte Limit = getCurrentLimit();
+    PixelStripe.setBrightness((brightness < Limit) ? brightness : Limit);
+    AppliedCurrentLimit = Limit;
 #else
     applyColor();
 #endif
@@ -104,6 +114,94 @@ void Display::applyColor()
     }
 #endif
 } /* applyColor */
+
+
+/******************************************************************************************************************************************************
+  applyColorAndCurrentLimit()
+*******************************************************************************************************************************************************/
+/* The colour reaches the pixels, and then the cap is recomputed for it: white at the same
+   brightness draws three times what amber does, so a colour change moves the current as much
+   as a brightness change and must not wait for the next task run to be noticed. */
+void Display::applyColorAndCurrentLimit()
+{
+    applyColor();
+    applyCurrentLimit();
+} /* applyColorAndCurrentLimit */
+
+
+/******************************************************************************************************************************************************
+  getNumberOfLitPixels()
+*******************************************************************************************************************************************************/
+/* Counted from the strip's buffer rather than kept as a running total beside it. The
+   animations and setPixelFast() write there directly, so a counter would be the copy that
+   falls behind - the same argument Persistence::gather() is built on. One pass over the
+   display per task run, next to the pass applyColor() already makes. */
+byte Display::getNumberOfLitPixels() const
+{
+    static_assert(DISPLAY_NUMBER_OF_PIXELS <= 255u, "Display: a larger display needs a wider lit count");
+    byte Count{0u};
+
+    for(IndexType Index = 0u; Index < DISPLAY_NUMBER_OF_PIXELS; Index++) {
+        if(getPixelFast(Index)) { Count++; }
+    }
+    return Count;
+} /* getNumberOfLitPixels */
+
+
+/******************************************************************************************************************************************************
+  getCurrentLimit()
+******************************************************************************************************************************************************/
+/* Built from the colour and a count rather than from the pixel values, and that is not a
+   shortcut: which dimming path is compiled decides whether the buffer holds the dimmed colour
+   or the plain one, and only the plain one says what the strip would draw at full brightness.
+   Every lit pixel carries the same colour, so a count is all the buffer has to give.
+
+   An upper bound on purpose. setPixelFast() with its own brightness leaves a pixel dimmer than
+   the colour, and a limiter that guessed low would be one that does not protect. */
+byte Display::getCurrentLimit() const
+{
+    const uint16_t ChannelSum = DisplayCurrentLimit::toChannelSum(Color.getColorRed(), Color.getColorGreen(), Color.getColorBlue());
+
+    return DisplayCurrentLimit::toBrightnessLimit(DISPLAY_NUMBER_OF_PIXELS, getNumberOfLitPixels(), ChannelSum);
+} /* getCurrentLimit */
+
+
+/******************************************************************************************************************************************************
+  applyCurrentLimit()
+******************************************************************************************************************************************************/
+/* The cap rides on the strip's own master rather than on the colour written into the buffer,
+   and that placement is the whole reason this is cheap. The buffer keeps the colour somebody
+   asked for at the brightness they asked for; the master says how much of it the supply lets
+   out. So a cap that moves needs no redraw, and a clock face restored after a full display
+   comes back at the brightness it had rather than at the one the full display was held to.
+
+   Writing the master marks the frame dirty, which is why the remembered value is compared
+   first: without that, every task run would queue a transmission that changes nothing. */
+void Display::applyCurrentLimit()
+{
+    /* Off stays off - the master is also what disable() uses. enable() asks for the cap again
+       on its way back, so nothing is lost by leaving it alone here. */
+    if(!Enabled) { return; }
+
+    const byte Limit = getCurrentLimit();
+
+    if(Limit == AppliedCurrentLimit) { return; }
+    AppliedCurrentLimit = Limit;
+    PixelStripe.setBrightness(Limit);
+} /* applyCurrentLimit */
+
+
+/******************************************************************************************************************************************************
+  resumeAtCurrentLimit()
+******************************************************************************************************************************************************/
+/* What enable() uses instead of enablePixels(). The remembered value is set from the same
+   computation that is written, so the guard in applyCurrentLimit() agrees with the strip
+   afterwards. */
+void Display::resumeAtCurrentLimit()
+{
+    AppliedCurrentLimit = getCurrentLimit();
+    PixelStripe.setBrightness(AppliedCurrentLimit);
+} /* resumeAtCurrentLimit */
 
 /******************************************************************************************************************************************************
   setWord()

@@ -27,6 +27,7 @@
 #include "DisplayWords.h"
 #include "DisplayBrightness.h"
 #include "DisplayColor.h"
+#include "DisplayCurrentLimit.h"
 
 /******************************************************************************************************************************************************
  *  GLOBAL CONSTANT MACROS
@@ -130,6 +131,10 @@ class Display
        initial brightness, so the first task establishes a defined state; the display is
        still empty then, which makes that first pass free. */
     byte AppliedBrightness{0u};
+    /* master the strip was last handed. Full, because that is where Pixels starts - and
+       because writing it marks the frame dirty, so this exists to write it only when the cap
+       has actually moved rather than on every task run. */
+    byte AppliedCurrentLimit{DisplayCurrentLimit::NoLimit};
 # if (PIXELS_IS_SINGLETON == STD_OFF)
     Pixels PixelStripe;
 # else
@@ -148,6 +153,16 @@ class Display
     byte transformToSerpentine(byte) const;
 
     void applyColor();
+    /* A colour change moves the current as much as a brightness change does - white draws
+       three times what amber at the same brightness does - so both have to go past the
+       limit. This is what the colour setters call instead of applyColor() alone. */
+    void applyColorAndCurrentLimit();
+
+    void applyCurrentLimit();
+    void resumeAtCurrentLimit();
+
+    byte getNumberOfLitPixels() const;
+    byte getCurrentLimit() const;
 
     Pixel getColorDimmed(byte);
 
@@ -170,11 +185,13 @@ class Display
     ColorType getColorGreen() const { return Color.getColorGreen(); }
     ColorType getColorBlue() const { return Color.getColorBlue(); }
 
-# if (DISPLAY_USE_PIXELS_DIMMING == STD_ON)
-    byte getBrightness() const { return PixelStripe.getBrightness(); }
-# else
+    /* The brightness that was asked for, not the one on the strip. The two used to differ by
+       which dimming path was compiled, and now they differ for a second reason: the current
+       limit can cap what reaches the LEDs. Both callers - Persistence and the brightness
+       command's answer - want the setting. A saved configuration that came back one part
+       dimmer for having been saved on a hot afternoon would be the alternative, and the
+       command would report a number nobody typed. */
     byte getBrightness() const { return Brightness.getBrightness(); }
-# endif
 
     void setBrightnessUseAutomatic(bool BrightnessUseAutomatic) {
         Brightness.setUseAutomatic(BrightnessUseAutomatic);
@@ -185,11 +202,11 @@ class Display
         applyBrightness();
     }
     /* Every one of them applies what it set, for the reason applyColor() gives. */
-    void setColor(Pixel sColor) { Color.setColor(sColor); applyColor(); }
-    void setColor(ColorType Red, ColorType Green, ColorType Blue) { Color.setColorRed(Red); Color.setColorGreen(Green); Color.setColorBlue(Blue); applyColor(); }
-    void setColorRed(ColorType Red) { Color.setColorRed(Red); applyColor(); }
-    void setColorGreen(ColorType Green) { Color.setColorGreen(Green); applyColor(); }
-    void setColorBlue(ColorType Blue) { Color.setColorBlue(Blue); applyColor(); }
+    void setColor(Pixel sColor) { Color.setColor(sColor); applyColorAndCurrentLimit(); }
+    void setColor(ColorType Red, ColorType Green, ColorType Blue) { Color.setColorRed(Red); Color.setColorGreen(Green); Color.setColorBlue(Blue); applyColorAndCurrentLimit(); }
+    void setColorRed(ColorType Red) { Color.setColorRed(Red); applyColorAndCurrentLimit(); }
+    void setColorGreen(ColorType Green) { Color.setColorGreen(Green); applyColorAndCurrentLimit(); }
+    void setColorBlue(ColorType Blue) { Color.setColorBlue(Blue); applyColorAndCurrentLimit(); }
 
     /* Takes the brightness the user asked for. What reaches the LEDs is
        calcBrightness(), which folds in gamma correction and the light sensor. */
@@ -253,7 +270,9 @@ class Display
     // methods
     void init();
     StdReturnType show() { return PixelStripe.show(); }
-    void enable() { Enabled = true; PixelStripe.enablePixels(); }
+    /* Not enablePixels(): that puts the master back at full, which is the one value the
+       supply may not allow. The way back on goes through the cap instead. */
+    void enable() { Enabled = true; resumeAtCurrentLimit(); }
     void disable() { Enabled = false; PixelStripe.disablePixels(); }
     bool isEnabled() const { return Enabled; }
     /* The other way round from whatever it is now, for a button that has nothing to read
@@ -285,7 +304,9 @@ class Display
        show what it did, not a tick later. */
     void toggleBrightnessAutomatic() { setBrightnessUseAutomatic(!getBrightnessUseAutomatic()); }
     void toggleBrightnessGammaCorrection() { setBrightnessUseGammaCorrection(!getBrightnessUseGammaCorrection()); }
-    void test() { PixelStripe.setPixels(Color.getColorDimmed()); }
+    /* The one call that reaches every LED at once, and the reason the README names it when it
+       sizes a supply. So it asks for the cap itself rather than leaving a task to notice. */
+    void test() { PixelStripe.setPixels(Color.getColorDimmed()); applyCurrentLimit(); }
     void clear() { PixelStripe.clearPixels(); }
     bool isCleared() { for(byte Index = 0; Index < DISPLAY_NUMBER_OF_PIXELS; Index++) { if(getPixelFast(Index)) return false; } return true; }
 

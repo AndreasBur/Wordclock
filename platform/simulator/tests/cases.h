@@ -57,6 +57,12 @@ void testSupplyRequestsAreReversible();
 void testAutomaticDefaultsSuitARoom();
 void testAutomaticSpreadsBetweenBothBounds();
 
+/* current_limit_test.cpp */
+void testCurrentLimitFitsTheBudgetAtEveryLitCount();
+void testCurrentLimitFollowsTheColour();
+void testCurrentLimitLeavesTheRestoredFaceAlone();
+void testCurrentLimitDoesNotSwitchTheDisplayOn();
+
 /* persistence_test.cpp */
 void testPersistence();
 void testPersistenceSaveAndReset();

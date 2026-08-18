@@ -355,10 +355,22 @@ and why it takes two ticks, is in [`Power.h`](../../firmware/inc/Power/Power.h).
 - **Supply sizing.** A word clock lights twenty to thirty letters at once, so it draws a
   few hundred mA in amber at a living-room brightness and some 2 A in white at full. The
   6.6 A that all 110 at full white would take is reachable all the same, and with three
-  commands: `test()` sets every pixel at once and `BrightnessMaxValue` is 255, so nothing
-  in the firmware caps it. Size for the 6.6 A rather than for the display — 5 V / 10 A
-  puts a supply at two thirds of its rating, which is where it belongs once it has aged
-  and warmed up.
+  commands: `test()` sets every pixel at once and `BrightnessMaxValue` is 255. Size for the
+  6.6 A rather than for the display — 5 V / 10 A puts a supply at two thirds of its rating,
+  which is where it belongs once it has aged and warmed up.
+- **What the firmware will not let it draw.**
+  [DisplayCurrentLimit](../../firmware/inc/Display/DisplayCurrentLimit.h) holds the display to
+  `DISPLAY_CURRENT_LIMIT_BUDGET_MILLI_AMPS`, which defaults to the 2500 mA a 5 V / 3 A supply
+  can be asked for. It estimates from the number of lit letters and the colour — 20 mA per
+  channel at full and 1 mA idle per LED, the numbers the 6.6 A above is itself made of — and
+  scales the strip's master down until the estimate fits. On this display and that budget the
+  clock face costs 1190 mA in white and is left alone; `test()` in white asks 6710 mA and is
+  held to 92 of 255, which is 2481 mA.
+
+  This is a floor under a mistake, not a substitute for a supply: it cannot know what the rail
+  actually does, it estimates high on purpose, and a display told to be dark still draws its
+  110 mA of idle current. Set the budget from the supply that is fitted — the number belongs to
+  the build, which is why no command can raise it.
 - **1000 µF at the strip's supply**, beside the 470 µF at the module — the same inrush,
   answered at the end that causes it.
 

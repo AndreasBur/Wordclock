@@ -67,6 +67,10 @@ int main()
     testSupplyRequestsAreReversible();
     testAutomaticDefaultsSuitARoom();
     testAutomaticSpreadsBetweenBothBounds();
+    testCurrentLimitFitsTheBudgetAtEveryLitCount();
+    testCurrentLimitFollowsTheColour();
+    testCurrentLimitLeavesTheRestoredFaceAlone();
+    testCurrentLimitDoesNotSwitchTheDisplayOn();
     testPersistence();
     testPersistenceSaveAndReset();
 
