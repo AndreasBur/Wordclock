@@ -1,7 +1,16 @@
 # Wordclock
 
-[![CI](https://github.com/AndreasBur/Wordclock/actions/workflows/ci.yml/badge.svg)](https://github.com/AndreasBur/Wordclock/actions/workflows/ci.yml)
-[![static-analysis](https://github.com/AndreasBur/Wordclock/actions/workflows/static-analysis.yml/badge.svg)](https://github.com/AndreasBur/Wordclock/actions/workflows/static-analysis.yml)
+[![CI](https://img.shields.io/github/actions/workflow/status/AndreasBur/Wordclock/ci.yml?branch=master&label=CI&logo=github)](https://github.com/AndreasBur/Wordclock/actions/workflows/ci.yml)
+[![static analysis](https://img.shields.io/github/actions/workflow/status/AndreasBur/Wordclock/static-analysis.yml?branch=master&label=static%20analysis&logo=github)](https://github.com/AndreasBur/Wordclock/actions/workflows/static-analysis.yml)
+[![Last commit](https://img.shields.io/github/last-commit/AndreasBur/Wordclock?logo=github)](https://github.com/AndreasBur/Wordclock/commits/master)
+[![Contributors](https://img.shields.io/github/contributors/AndreasBur/Wordclock?logo=github)](https://github.com/AndreasBur/Wordclock/graphs/contributors)
+
+[![Platforms](https://img.shields.io/badge/platform-ESP32--S3%20%7C%20RP2350%20%7C%20AVR128DA48%20%7C%20Simulator-blue)](platform/)
+![C++17](https://img.shields.io/badge/C%2B%2B-17-00599C?logo=cplusplus&logoColor=white)
+[![CMake](https://img.shields.io/badge/CMake-064F8C?logo=cmake&logoColor=white)](CMakeLists.txt)
+[![PlatformIO](https://img.shields.io/badge/PlatformIO-FF7F00?logo=platformio&logoColor=white)](platform/esp32/platformio.ini)
+![Code size](https://img.shields.io/github/languages/code-size/AndreasBur/Wordclock)
+[![License](https://img.shields.io/github/license/AndreasBur/Wordclock)](LICENSE)
 
 A word clock based on Arduino: an 11×10 grid of letters that spells out the
 time in German ("ES IST FÜNF NACH ZEHN"), with animations, overlays (date,
@@ -24,6 +33,7 @@ the word tables have to cover.
 | [assets/](assets/) | The icon's SVG masters and the script that generates the `.ico`, the `.xpm` and `docs/images/logo.png` from them. |
 | [platform/simulator/](platform/simulator/) | wxWidgets desktop backend: renders the matrix in a window so the firmware can be developed and debugged on a PC. |
 | [platform/esp32/](platform/esp32/) | On-device backend: WS2812 over the RMT peripheral, time from NTP. Built with PlatformIO — see its [README](platform/esp32/README.md). |
+| [platform/rp2350/](platform/rp2350/) | On-device backend for the Raspberry Pi Pico 2 W, derived from the ESP32 one. Built with PlatformIO — see its [README](platform/rp2350/README.md). |
 | [platform/avr-dx/](platform/avr-dx/) | On-device backend for the AVR128DA48: WS2812 shaped by the CCL, time from a DS3231. Built with CMake and a cross toolchain file — see its [README](platform/avr-dx/README.md). |
 
 The tool that generates the bitmap font tables lives in its own repository,
@@ -137,3 +147,11 @@ They remain fully recoverable from the git tag `archive/legacy-forks`:
 ```bash
 git checkout archive/legacy-forks -- <path>
 ```
+
+## License
+
+[MIT](LICENSE) — Copyright (c) 2017-2026 Andreas Burnickl. The dependencies the
+firmware links against keep their own licences: the Arduino cores are LGPL-2.1,
+ESPAsyncWebServer is LGPL-3.0-or-later and wxWidgets carries the wxWindows
+Licence. None of them is redistributed here; PlatformIO and CMake fetch them at
+build time.
