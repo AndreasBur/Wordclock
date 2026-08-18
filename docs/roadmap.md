@@ -11,6 +11,16 @@ The comparison that shaped the backlog is with
 the most complete of the published word clocks and the one this project overlaps
 with most.
 
+Two more were read later and are named where they contributed. ESPWortuhr's
+[Multilayout-ESP-Wordclock](https://github.com/ESPWortuhr/Multilayout-ESP-Wordclock)
+is the one to measure a configuration page against, and the one that ships a
+flashable file per chip per release.
+[ednieuw's Arduino-ESP32-Nano-Wordclock](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock)
+contributed its *transports* rather than its structure: it reaches the same command
+set over serial, Bluetooth, a browser and an SD card log through one pair of
+functions. Its structure is the opposite of this one - a single `.ino` with global
+state and clock faces chosen by `#define` - and nothing here should move towards it.
+
 ## Adding an RPC
 
 Three places have to move together:
@@ -271,6 +281,31 @@ From the comparison with wordclock24h, in the order they would change daily use.
    ([WebInterface.h](../platform/esp32/include/WebInterface.h)), so provisioning means
    typing a command rather than filling in a form. The catalog already describes the
    command, so a form over it is a page change rather than a firmware one.
+
+   What that page should look like is worth writing down now that there is something to
+   compare against. ESPWortuhr serves a sidebar of task pages - colours, functions, view
+   options, settings - with a colour wheel, two sliders and eight preset swatches, and at
+   the one thing somebody does often it is plainly better than typing a command with three
+   numbers. Four notes from looking at it:
+
+   - **The presets carry the weight, not the wheel.** Nobody picks a colour twice. They pick
+     the one they had last month, and eight swatches are that in one tap.
+   - **A numeric field belongs beside the wheel.** Theirs has none, so a colour found by
+     dragging cannot be written down, passed to somebody else or restored after a reset.
+     That is what a wheel costs when it is the only way in.
+   - **Two unlabelled sliders are one too many.** Theirs run brightness and, apparently,
+     white balance, and nothing on the page says which is which.
+   - **The clock face can be drawn in the page**, which theirs does not do, and half of it
+     already exists: `/display` answers with the letter grid as JSON
+     ([WebInterface.cpp](../platform/rp2350/src/WebInterface.cpp)). What it does *not*
+     carry is which letters are lit - that is the missing half, either a second endpoint or
+     a push over the `/ws` socket that is already open for the console. Worth the work,
+     because it is the difference between changing a colour and walking into the other room
+     to see what it did.
+
+   The console stays either way. It is what the simulator dialog and the serial line use,
+   and a page that replaced it would have to grow a control for every command before it
+   could.
 2. ~~**Night switch-off / timer.**~~ **Done** — command 14, and
    [NightSwitch](../firmware/inc/NightSwitch/NightSwitch.h) in the core. What it settled:
 
@@ -287,7 +322,12 @@ From the comparison with wordclock24h, in the order they would change daily use.
      make a hand-switched display go dark a second later, which reads as a fault.
    - **An empty window is no window**, not a whole day — that is what an unconfigured
      clock has.
-3. **OTA update.** Cheap on the ESP32, and the natural companion to 1.
+3. **OTA update.** Cheap on the ESP32, and the natural companion to 1. What it lacked has
+   since arrived: a `v*` tag publishes a flashable file per target
+   ([release.yml](../.github/workflows/release.yml)), so an update has something to install
+   other than a build the owner made themselves. Both comparison projects put the upload
+   form in the web interface, which is the right place - a clock on a wall is reachable by
+   browser and not by cable.
 4. ~~**RTC with battery.**~~ **Done** with section 2's chip: the time registers are read
    while the system clock holds nothing, and written back from it once an hour and after
    every hand-set time ([RealTimeClock.cpp](../platform/esp32/src/RealTimeClock.cpp)). The
@@ -344,6 +384,56 @@ From the comparison with wordclock24h, in the order they would change daily use.
     What settles it is not a build. Nothing in this backend has ever driven a strip, so the
     interrupt that this would remove has never been observed missing a deadline; the honest
     order is a first board and an oscilloscope, then this.
+
+11. **A Bluetooth transport for the command set.** ednieuw's clock is reachable over the
+    Nordic UART service with NimBLE, from a phone and from a browser terminal, and the same
+    single-letter commands arrive over it as over the serial line. Here that is a fourth
+    consumer of a command set that already has three, so the parser and the catalog would not
+    move at all.
+
+    What it is *not* is first-boot provisioning - item 1 settled that with an access point,
+    and a clock that already serves its console over WiFi gains nothing from a second way to
+    do the same thing. Its value is the clock that is **already on the wall**: no cable
+    reaches it, and a WiFi it can no longer join is exactly the fault that leaves no way in.
+    Bluetooth answers when the network does not.
+
+    It belongs on the platform seam rather than in the core, with the same honesty as the
+    power switch: the ESP32-S3 and the Pico 2 W have a radio, the AVR128DA48 has none, and
+    the simulator would have to fake one - so a backend that cannot do it says so rather
+    than being compiled out.
+
+12. **A second language in the word tables.** ESPWortuhr carries 35 layouts across 13
+    languages, as one header per layout under `include/WordClockTypes/` with a generated
+    `ClockType.gen.h` collecting them, chosen from a dropdown at runtime. That is the shape
+    to copy if this is ever wanted, and the mechanism it needs is half here already: four
+    German wordings switch at runtime through `Clock::ModeType`
+    ([Clock.h](../firmware/inc/Clock/Clock.h)), so "several ways to say the time, chosen
+    while running" is a solved problem rather than a new one.
+
+    What is German is deeper than the tables, though, and that is the reason this is an idea
+    and not a plan. `DisplayWords::WordIdType` names its entries `WORD_FUENF` and
+    `WORD_HOUR_ZWOELF`, which is cosmetic; the letter grid in `DisplayCharacters` is not,
+    because it *is* the front plate. A second language is therefore a second front plate,
+    and its size need not be 11×10 - which turns this from a table into a layout
+    abstraction, with the column and row counts becoming values instead of the compile-time
+    constants they are today.
+
+    So the honest order is the same as the DMA item's: this is worth doing when a second
+    plate exists to justify it, and guessing at the abstraction beforehand would fix the
+    wrong things. The AVR128DA48 also has a say - runtime-switchable layouts cost flash that
+    the part may not have to spare, and it may end up carrying one layout where the ESP32
+    carries several.
+
+13. **MQTT and Home Assistant discovery.** Both comparison projects have it, ednieuw's over
+    the JSON light schema, and it is the one feature of theirs a user would notice missing:
+    a clock that dims with the rest of the house rather than on its own schedule.
+
+    It fits the architecture better than its size suggests - another transport onto the
+    existing command set, like item 11 - but it is not free the way that one is: it needs a
+    broker to talk to, a reconnect policy for when the broker is the thing that is down, and
+    a discovery payload that has to keep agreeing with what Home Assistant expects across
+    its releases. That last part is the real cost, because it is upkeep rather than work.
+    Wanted, but after 11 and only if the house it joins actually runs one.
 
 Deliberately not planned: weather reports, MP3 playback and alarms, games on the
 display, and an **IR receiver**. The first four are what wordclock24h grew over years and
