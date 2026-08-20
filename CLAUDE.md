@@ -91,6 +91,26 @@ repeats the diff is worth nothing to a reviewer; the numbers - flash on the AVR,
 targets were built, which cases were made to fail on purpose - are the part nobody can
 reconstruct from the code.
 
+## Sizes in prose
+
+Every size written in this repository has been wrong at least once, always the same way: the
+code grew and the sentence did not. So a number that describes **the artefact as it is now**
+is enforced rather than remembered — `tools/documented-sizes.py` compares the documentation
+against a build, the AVR CI job runs it, and `--fix` writes the measured values in:
+
+```bash
+tools/documented-sizes.py --elf build-avr/platform/avr-dx/Wordclock.elf        # check
+tools/documented-sizes.py --elf build-avr/platform/avr-dx/Wordclock.elf --fix  # write
+```
+
+Adding a sentence with a size in it means adding a check to that script, or writing the
+sentence so it needs none. Two kinds of number deliberately have none:
+
+- **A size that describes a past change** — "82 bytes of flash for the night switch" — is
+  history. It was true when it was measured and updating it would make it a lie.
+- **A comparative claim** is written as the difference and not as both absolutes: "`-flto` is
+  worth 10 KiB" needs no second build to stay true, where "58 778 bytes without it" would.
+
 ## Looking at the web console
 
 `web/index.html` is the one part of this project the simulator cannot show, and unlike the
