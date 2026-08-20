@@ -46,6 +46,7 @@ overlay is disabled at compile time.
 | 12 | Status | *(none)* | Read-only; version, uptime as days/hours/minutes, illuminance, temperature, address, link quality, free memory |
 | 13 | Network | `-S<name>` `-P<pass phrase>` | Which network the clock joins. The pass phrase goes in and never comes back |
 | 14 | Night switch | `-A<0/1>` `-H<hour>` `-M<min>` `-E<hour>` `-N<min>` `-B<brightness>` | When the clock takes the night off. `-H`/`-M` start it, `-E`/`-N` end it, `-B` is how bright it stays — **0 switches the display off**, and cuts the strip's supply where a switch is fitted. The window may cross midnight. Every option is optional; what is not sent stays as it was |
+| 15 | Colour cycle | `-A<0/1>` `-S<speed>` | Walks the display's colour round the wheel while the words stand still. `-S` is scheduler ticks per step of hue, the same kind of number as the animation speed, so 100 is a step a second and a round in a little over four minutes; **0 leaves the wheel standing** where it is. `-H` is answered and not accepted — it is where the wheel has got to. The cycle does **not** change the colour set with command 2: that one is still what is answered and stored, and switching the cycle off puts it back |
 
 ### Overlay options (shared)
 

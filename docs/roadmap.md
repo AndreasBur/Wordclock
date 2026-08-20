@@ -376,8 +376,37 @@ From the comparison with wordclock24h, in the order they would change daily use.
    occurs twice when summer time ends. Which side wins was the decision: the chip is the
    source of last resort and never overwrites a system clock that SNTP has set, since it
    drifts a few seconds a month and SNTP does not.
-5. **Colour animations.** All fifteen animations are transitions; a slow colour cycle
-   while the display stands still is a different mechanism and does not exist.
+5. ~~**Colour animations.**~~ **Done** — [ColorCycle](../firmware/inc/ColorCycle/ColorCycle.h)
+   and command 15. All fifteen animations are transitions, so the clock had nothing at all
+   for the five minutes between two word changes; this is what happens during them. 1192
+   bytes of flash on the AVR and 18 of RAM. Four things it settled:
+
+   - **Not an animation id.** An id would put it in the list a word change picks from, where
+     it has nothing to do - it neither begins nor ends with a transition. The favourites mask
+     is exactly full at sixteen ids as well, so it could not have gone there without widening
+     that first, which would have been the wrong reason to widen it.
+   - **A level of its own, not a write to the colour.** `DisplayColor` decides in one place
+     what reaches the strip, so the colour somebody chose is still what command 2 answers and
+     what Persistence stores - and switching the cycle off needs no remembered copy to put
+     back, because nothing was overwritten. The same arrangement the night brightness has.
+   - **The current limit had to follow it.** The cap is computed from a colour, and with the
+     cycle running the colour on the strip is not the one in the setting - so the limiter now
+     asks what is *shown*. Without that a saturated hue on a full display would be budgeted
+     as whatever pale value sits underneath it, which is a guess in the one direction this
+     must never guess. A case fails if it goes back to reading the setting.
+   - **The hue is not stored.** Persistence writes when the blob differs from the live
+     settings, so a stored hue would be a flash write per step - hundreds of thousands a day
+     on a part rated for a hundred thousand. Whether the cycle runs and how fast is stored;
+     where the wheel was is nobody's business after a restart.
+
+   The stored format therefore goes to **version 5**, which throws the saved settings away
+   once on the update - there is no converting an old blob here, and that is the price of
+   the two fields.
+
+   What it does not do is animate the colour *per pixel* - a rainbow across the letters, or
+   a wave running along a word. That needs a colour per pixel rather than one for the
+   display, which is a different thing from this and a much larger one: every animation, the
+   current limit and the strip's own byte order all assume a single colour today.
 6. ~~**Make the console installable.**~~ **Done**, with one limit that was not visible when
    this was written and is the more interesting half of the answer.
    [manifest.webmanifest](../web/manifest.webmanifest) is served beside the page, with the

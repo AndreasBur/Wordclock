@@ -63,6 +63,10 @@ int main()
     testNightSwitchActsOnTheCrossingOnly();
     testNightWithNoBrightnessCutsTheSupply();
     testDisplaySwitchedOnAtNightGetsItsSupplyBack();
+    testColourCycleLeavesTheChosenColourAlone();
+    testColourCycleWalksTheWholeWheel();
+    testColourCycleStandsStillOnADarkDisplay();
+    testColourCycleBudgetsTheColourItShows();
     testSupplyCutWaitsForTheBlankedFrame();
     testSupplyReturnsBeforeTheDataLine();
     testSupplyOffIsNotDisplayDisable();

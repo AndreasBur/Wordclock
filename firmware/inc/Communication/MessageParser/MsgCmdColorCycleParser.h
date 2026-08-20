@@ -8,120 +8,95 @@
  *  ---------------------------------------------------------------------------------------------------------------------------------------------------
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       MsgCmdParser.h
- *      \brief
+/**     \file       MsgCmdColorCycleParser.h
+ *      \brief      Switches the colour cycle on and off, and says how fast it walks
  *
- *      \details
+ *      \details    Two settings and one reading. The speed is the same kind of number the
+ *                  animation speed is - scheduler ticks per step - so a clock's two speed
+ *                  settings mean the same thing rather than each meaning something.
+ *
+ *                  The hue is answered but cannot be set. It is where the wheel happens to
+ *                  be, which makes it worth reading back while somebody is watching a
+ *                  colour they cannot name; setting it would be command 2's job, and that
+ *                  one already sets a colour properly.
  *
 ******************************************************************************************************************************************************/
-#ifndef _MSG_CMD_PARSER_H_
-#define _MSG_CMD_PARSER_H_
+#ifndef _MSG_CMD_COLOR_CYCLE_PARSER_H_
+#define _MSG_CMD_COLOR_CYCLE_PARSER_H_
 
 /******************************************************************************************************************************************************
  * I N C L U D E S
 ******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Arduino.h"
-#include "Message.h"
-#include "ErrorMessage.h"
-#include "Overlays.h"
+#include "MsgParameterParser.h"
+#include "ColorCycle.h"
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
-/* MsgCmdParser configuration parameter */
-
-
-/* MsgCmdParser parameter */
-# define MSG_COMMAND_NONE_NUMBER        0u
+#define MSG_CMD_COLOR_CYCLE_PARSER_PARAMETER_TABLE_SIZE         2u
 
 /******************************************************************************************************************************************************
- *  G L O B A L   F U N C T I O N   M A C R O S
+ *  C L A S S   M S G   C M D   C O L O R   C Y C L E   P A R S E R
 ******************************************************************************************************************************************************/
-
-
-/******************************************************************************************************************************************************
- *  C L A S S   M S G   C M D   P A R S E R
-******************************************************************************************************************************************************/
-class MsgCmdParser
+class MsgCmdColorCycleParser : public MsgParameterParser<MsgCmdColorCycleParser, MSG_CMD_COLOR_CYCLE_PARSER_PARAMETER_TABLE_SIZE>
 {
-/******************************************************************************************************************************************************
- *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
-******************************************************************************************************************************************************/
-  public:
-    enum CommandType {
-        COMMAND_NONE = MSG_COMMAND_NONE_NUMBER,
-        COMMAND_REMOTE_PROCEDURE_CALL,
-        COMMAND_DISPLAY_COLOR,
-        COMMAND_DISPLAY_BRIGHTNESS,
-        COMMAND_DISPLAY_PIXEL,
-#if (OVERLAYS_SUPPORT_DATE == STD_ON)
-        COMMAND_OVERLAY_DATE,
-#endif
-#if (OVERLAYS_SUPPORT_TEMPERATURE == STD_ON)
-        COMMAND_OVERLAY_TEMPERATURE,
-#endif
-#if (OVERLAYS_SUPPORT_TEXT == STD_ON)
-        COMMAND_OVERLAY_TEXT,
-#endif
-        COMMAND_CLOCK_MODE,
-        COMMAND_ANIMATION,
-        COMMAND_TIME,
-        COMMAND_DATE,
-        COMMAND_STATUS,
-        COMMAND_NETWORK,
-        COMMAND_NIGHT_SWITCH,
-        COMMAND_COLOR_CYCLE
-    };
-
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    static const char CommandParameterDelimiter{' '};
-    ErrorMessage Error;
-    const Message& IncomingMessage;
+    friend class MsgParameterParser;
 
-    //private functions
-    void sendAnswer(CommandType Command) const {
-        Serial.print(Command);
-        Serial.print(CommandParameterDelimiter);
+    static constexpr char ActiveShortName{'A'};
+    static constexpr char SpeedShortName{'S'};
+    static constexpr char HueShortName{'H'};
+
+    static constexpr ParameterTableType ParameterTable PROGMEM {
+        ParameterTableElementType(ActiveShortName, MsgParameter::ARGUMENT_TYPE_UINT8),
+        ParameterTableElementType(SpeedShortName,  MsgParameter::ARGUMENT_TYPE_UINT8)
+    };
+
+    /* Collected rather than applied where it arrives, and applied after the speed: switching
+       the cycle on puts a colour on the strip at once, and doing that before the speed of the
+       same command has landed would start the wheel at the old rate for one step. */
+    bool Active{false};
+    bool ActiveGiven{false};
+
+    // functions
+    void handleParameter(char ParameterShortName, const char* Argument, PositionType Length) {
+        UNUSED(ParameterShortName); UNUSED(Argument); UNUSED(Length);
     }
-
-    CommandType getCommand() const {
-        /* atoi cannot report a failure and does not have to: a message that is not a
-           number converts to zero, which is COMMAND_NONE and is answered with
-           ERROR_WRONG_COMMAND - the same answer strtol would lead to, over more code. */
-        // NOLINTNEXTLINE(cert-err34-c)
-        return static_cast<CommandType>(atoi(IncomingMessage.getMessage()));
-    }
-
-    const char* getParameter() const {
-        const char* message = IncomingMessage.getMessage();
-        size_t valuePos = IncomingMessage.find(CommandParameterDelimiter);
-
-        if(valuePos == Message::npos) { return &message[IncomingMessage.length() - 1u]; }
-        else { return &message[valuePos]; }
+    void handleParameter(char ParameterShortName, byte Argument)
+    {
+        if(ParameterShortName == ActiveShortName) { Active = (Argument != 0u); ActiveGiven = true; }
+        if(ParameterShortName == SpeedShortName)  { ColorCycle::getInstance().setTaskCycle(Argument); }
     }
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr MsgCmdParser(const Message& sMessage) : Error(), IncomingMessage(sMessage)  { }
-    ~MsgCmdParser() { }
-
-    // get methods
-
-
-    // set methods
+    constexpr MsgCmdColorCycleParser(const char* Parameter) : MsgParameterParser(ParameterTable, Parameter) { }
+    ~MsgCmdColorCycleParser() { }
 
     // methods
-    void parse();
+    void sendAnswer() const {
+        const ColorCycle& colorCycle = ColorCycle::getInstance();
 
+        sendAnswerParameter(ActiveShortName, static_cast<byte>(colorCycle.getIsActive() ? 1u : 0u));
+        sendAnswerParameter(SpeedShortName, colorCycle.getTaskCycle());
+        /* Last field before the command parser's terminating println(), so no trailing
+           separator space. */
+        sendAnswerParameter(HueShortName, colorCycle.getHue(), false);
+    }
+
+    void process() const {
+        if(ActiveGiven) { ColorCycle::getInstance().setIsActive(Active); }
+    }
 };
 
-#endif
+#endif // _MSG_CMD_COLOR_CYCLE_PARSER_H_
 
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E

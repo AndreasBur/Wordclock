@@ -25,6 +25,7 @@
 #include "Clock.h"
 #include "Display.h"
 #include "Illuminance.h"
+#include "ColorCycle.h"
 #include "NightSwitch.h"
 #include "Overlays.h"
 #include "Storage.h"
@@ -97,6 +98,13 @@ struct SettingsType {
     byte NightSwitchEndMinute;
     byte NightSwitchBrightness;
 
+    /* The cycle's two settings, and deliberately not its hue: this blob is written whenever
+       it differs from the live settings, so a stored hue would be one flash write per step
+       of the wheel - a few hundred thousand a day on a part rated for a hundred thousand
+       cycles. Where the wheel had got to matters to nobody after a restart. */
+    byte ColorCycleIsActive;
+    byte ColorCycleTaskCycle;
+
     byte Checksum;
 };
 
@@ -111,8 +119,9 @@ constexpr uint16_t SettingsMagic{0x5743u};
      1  the first format
      2  the "it is" rule, which used to be a compile-time switch
      3  the three overlays and the text overlay's text
-     4  the night switch */
-constexpr byte SettingsVersion{4u};
+     4  the night switch
+     5  the colour cycle */
+constexpr byte SettingsVersion{5u};
 
 static_assert(sizeof(SettingsType) <= Storage::Capacity,
               "Persistence: the settings no longer fit the store, please raise STORAGE_CAPACITY on every platform");
@@ -291,6 +300,10 @@ SettingsType gather()
     Settings.NightSwitchEndMinute = nightSwitch.getEndMinute();
     Settings.NightSwitchBrightness = nightSwitch.getNightBrightness();
 
+    const ColorCycle& colorCycle = ColorCycle::getInstance();
+    Settings.ColorCycleIsActive = colorCycle.getIsActive() ? 1u : 0u;
+    Settings.ColorCycleTaskCycle = colorCycle.getTaskCycle();
+
     gatherOverlays(Settings);
 
     Settings.Checksum = calcChecksum(Settings);
@@ -338,6 +351,13 @@ void apply(const SettingsType& Settings)
     /* Last of the five, because switching it on is what makes the next tick an edge - and
        an edge acting on a half-restored window would use yesterday's times. */
     nightSwitch.setIsActive(Settings.NightSwitchIsActive != 0u);
+
+    ColorCycle& colorCycle = ColorCycle::getInstance();
+    colorCycle.setTaskCycle(Settings.ColorCycleTaskCycle);
+    /* After the speed, for the night switch's reason read across: switching it on puts a
+       colour on the strip there and then, and doing that before the speed has landed would
+       start the wheel at whatever rate the defaults left behind. */
+    colorCycle.setIsActive(Settings.ColorCycleIsActive != 0u);
 
     applyOverlays(Settings);
 }
@@ -454,6 +474,7 @@ StdReturnType Persistence::reset()
     Illuminance::getInstance().resetToDefaults();
     Overlays::getInstance().resetToDefaults();
     NightSwitch::getInstance().resetToDefaults();
+    ColorCycle::getInstance().resetToDefaults();
 
     const StdReturnType ReturnValue = Storage::getInstance().clear();
 
