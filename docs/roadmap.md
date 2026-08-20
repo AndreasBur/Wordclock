@@ -309,13 +309,17 @@ From the comparison with wordclock24h, in the order they would change daily use.
      That is what a wheel costs when it is the only way in.
    - **Two unlabelled sliders are one too many.** Theirs run brightness and, apparently,
      white balance, and nothing on the page says which is which.
-   - **The clock face can be drawn in the page**, which theirs does not do, and half of it
-     already exists: `/display` answers with the letter grid as JSON
-     ([WebInterface.cpp](../platform/rp2350/src/WebInterface.cpp)). What it does *not*
-     carry is which letters are lit - that is the missing half, either a second endpoint or
-     a push over the `/ws` socket that is already open for the console. Worth the work,
-     because it is the difference between changing a colour and walking into the other room
-     to see what it did.
+   - ~~**The clock face can be drawn in the page**~~ **Done**, and it was done before this
+     item was written down: `/display` answers with the letter grid as JSON
+     ([WebInterface.cpp](../platform/rp2350/src/WebInterface.cpp)), and the lit letters
+     arrive as binary frames on the `/ws` socket the console already holds open, which
+     `showFrame()` in [index.html](../web/index.html) paints. So the page shows what the
+     wall shows, which is the difference between changing a colour and walking into the
+     other room to see what it did. One decision inside it worth keeping: only *whether* a
+     pixel is lit is taken from the frame, not its colour, because the bytes arrive already
+     dimmed and a word at low brightness would be painted a dark grey on a dark background -
+     unreadable in the case one opens the view for. The wx window stays the colour-accurate
+     view.
 
    The console stays either way. It is what the simulator dialog and the serial line use,
    and a page that replaced it would have to grow a control for every command before it
