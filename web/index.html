@@ -10,6 +10,11 @@
   of being flashed: the socket address then falls back to the prompt below rather than to
   the page's own host.
 -->
+<!-- The one tag this file opens with. English rather than German: every label the page
+     draws is English, and the letters on the panel come from the clock as data rather than
+     as prose. Without it a screen reader reads the whole page in whatever voice it
+     defaulted to, and "Wordclock" is not the word to find that out on. -->
+<html lang="en">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Wordclock</title>
@@ -273,7 +278,9 @@
     .group { width: 100%; }
     .group-body {
         display: grid;
-        grid-template-columns: 1fr 1fr;
+        /* minmax rather than 1fr, see .row below: the remote procedure call group carries the
+           same long-labelled select and overflowed its card by 11 px without it. */
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
         gap: var(--gap);
         align-items: center;
         padding: 0 6px 6px;
@@ -287,7 +294,17 @@
        thing you glance at, and the settings are what you scroll to. */
     @media (max-width: 800px) {
         #stage { grid-template-columns: 1fr; }
-        #panel { order: -1; position: static; max-width: 340px; margin-inline: auto; }
+        /* The frame comes off the cap, because this element is content-box on purpose (see
+           the panel's own rule): a max-width of 340 is 340 for the letter grid and the
+           padding and border are added on top of it, which put the clock four pixels past
+           the screen on a 390 px phone - sideways scroll on the one width this page is
+           written for. */
+        #panel {
+            order: -1;
+            position: static;
+            max-width: min(340px, calc(100% - 2 * var(--gap-l) - 2px));
+            margin-inline: auto;
+        }
     }
 
     /* The builder. Collapsed by default: typing a command is the faster path once one
@@ -314,7 +331,13 @@
     #builder > #options { grid-column: 1 / -1; }
     #builder #use { justify-self: end; }
     #builder[hidden] { display: none; }
-    .row { display: grid; grid-template-columns: 22px 1fr 1fr; gap: 10px; align-items: center; }
+    /* minmax(0, 1fr) for the reason the panel's own grid gives above: a plain fr track floors
+       at its content, and a select's content is its longest option - "1 Illuminance
+       calibration maximum" here, which pushed this row 45 px past the card it sits in at
+       phone width. The select needs its own min-width for the same reason, being a
+       replaced element with an intrinsic width of its own. */
+    .row { display: grid; grid-template-columns: 22px minmax(0, 1fr) minmax(0, 1fr); gap: 10px; align-items: center; }
+    .row select, .group-body select { min-width: 0; }
     /* Ticked or not, said in one colour rather than in opacity. Opacity was the first
        attempt and it does not work here: it scales everything by the same factor, so a
        select showing a real value stayed brighter than an input showing a placeholder, which
@@ -383,7 +406,11 @@
            less. Without the second term the clock grew past the bottom of the window as
            soon as it was both large and centred in a long list: two wishes that are fine
            apart and make a third problem together. */
-        width: min(100%, calc((100vh - 150px) * var(--ratio, 1.1)));
+        /* Both terms carry the frame, because this box is content-box: a plain 100% is 100%
+           for the letter grid and then the padding and border go on top of it, which pushed
+           the column fourteen pixels wider than the page on a desktop. The subtraction is
+           the frame itself - the same two values the padding above is written with. */
+        width: min(calc(100% - 2 * var(--gap-l) - 2px), calc((100vh - 150px) * var(--ratio, 1.1)));
 
         /* content-box against the global border-box, on purpose: aspect-ratio applies to
            whichever box that names, and with the padding counted in, the cells would be
@@ -434,6 +461,29 @@
     #updateNote { color: var(--unlit); margin: 0 0 10px; }
     #updateNote code { color: var(--text); }
     #updateForm { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin: 0; }
+    /* The file picker's own button is drawn by the browser and reached by nothing above:
+       ::file-selector-button is the only selector that gets to it, so without this rule it
+       arrives as a light grey system button in the middle of a dark card - which is what it
+       did. Styled to the page's buttons rather than hidden behind a label of our own, since
+       a real file input is what a phone opens its picker from. */
+    /* Its own line, with Install under it. Beside the button - which is what it was, and what
+       every other form on this page does - the name is squeezed into what is left after the
+       browser's own "Choose File", and a release file name is thirty characters: it came out
+       as "No f...hosen" before anything had even been picked. The column is under 400 px wide
+       on a desktop too, so this is not a phone-only case and there is nothing to win by
+       keeping the two side by side. */
+    #image { flex: 1 1 100%; }
+    #install { margin-left: auto; }
+    #image::file-selector-button {
+        font: inherit;
+        color: var(--lit);
+        background: var(--field);
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        padding: 6px 10px;
+        margin-right: 10px;
+        cursor: pointer;
+    }
     /* Italic like the log's notes while it is only saying what is happening, upright and
        amber once it is the answer - so a finished update does not read as commentary. */
     #updateState { font-style: italic; color: var(--unlit); min-height: 1.2em; margin-top: 8px; }
@@ -462,7 +512,7 @@
             <summary>Build a command</summary>
             <div id="builderNote" hidden></div>
             <div id="builder">
-                <select id="commands"></select>
+                <select id="commands" aria-label="command to build"></select>
                 <div id="options"></div>
                 <div id="preview"></div>
                 <button type="button" id="use">Use</button>
@@ -474,9 +524,13 @@
         <details id="consoleBox" class="surface">
             <summary>Console</summary>
             <div id="console">
-                <div id="log"></div>
+                <!-- polite, not assertive: an answer is worth reading out when the reader
+                     has finished the sentence it is in, not on top of it. -->
+                <div id="log" role="log" aria-live="polite"></div>
                 <form id="entry">
-                    <input id="command" placeholder="command, e.g. 3 -B255" autocomplete="off" spellcheck="false">
+                    <!-- A placeholder is not a name: it goes away as soon as anything is
+                         typed, and some readers never announce it at all. -->
+                    <input id="command" aria-label="command to send" placeholder="command, e.g. 3 -B255" autocomplete="off" spellcheck="false">
                     <button type="submit">Send</button>
                 </form>
             </div>
@@ -495,7 +549,7 @@
                     arrived whole; only then does it restart into the new one.
                 </p>
                 <form id="updateForm">
-                    <input type="file" id="image" accept=".bin,application/octet-stream">
+                    <input type="file" id="image" aria-label="firmware image" accept=".bin,application/octet-stream">
                     <button type="submit" id="install">Install</button>
                 </form>
                 <div id="updateState" class="note"></div>
@@ -762,11 +816,22 @@
 
             const use = document.createElement('input');
             use.type = 'checkbox';
+            /* Its own name, because the label beside it belongs to the field: what this box
+               says is whether the option goes into the command, which is not what the label
+               reads out. */
+            use.setAttribute('aria-label', 'include ' + option.label);
+
+            const field = optionField(option);
+            /* for/id rather than a label that merely sits next to the field. Without it a
+               screen reader announces an unnamed combobox, and clicking the text does
+               nothing - which on a phone is the larger of the two losses. */
+            field.id = 'builder-' + option.short;
 
             const label = document.createElement('label');
             label.textContent = '-' + option.short + '  ' + option.label;
+            label.htmlFor = field.id;
 
-            row.append(use, label, optionField(option));
+            row.append(use, label, field);
             optionsBox.appendChild(row);
         }
         refreshPreview();
@@ -915,6 +980,10 @@
                 label.textContent = option.label;
 
                 const field = optionField(option);
+                /* Unique across the page, which is why the command number is in it: every
+                   group draws its own rows and several of them carry an option called -A. */
+                field.id = 'set-' + command.number + '-' + option.short;
+                label.htmlFor = field.id;
                 /* An answer-only field is shown and not offered: the firmware refuses one
                    sent to it, so an input here would be a promise the clock breaks. */
                 if (option.readonly) { field.disabled = true; }
