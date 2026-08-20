@@ -233,12 +233,22 @@ exactly as the wx builder's Insert does.
 
 The page is [`web/index.html`](web/index.html), one self-contained file with its CSS and
 script inline: the clock has nowhere to fetch anything from. It is **not** uploaded
-separately. [`scripts/embed_web.py`](scripts/embed_web.py) gzips it at build time and emits
-it as an array **into the build directory**, so `pio run -t upload` ships page and firmware
-together and their versions cannot drift apart - the failure a second partition invites.
-The generated header is a build product on purpose; a checked-in one rots the moment
-someone edits the HTML and forgets to regenerate it. At the moment that is 18.5 KB of
-source, 6.0 KB compressed, and the default partition table is untouched.
+separately. [`scripts/embed_web.py`](scripts/embed_web.py) walks `web/` at build time and
+emits every file in it as an array **into the build directory**, so `pio run -t upload`
+ships page and firmware together and their versions cannot drift apart - the failure a
+second partition invites. The generated header is a build product on purpose; a checked-in
+one rots the moment someone edits the HTML and forgets to regenerate it. At the moment the
+page is 43 KB of source and 5.6 KB compressed, and the default partition table is
+untouched.
+
+Three of those files are not the console but the **home screen icon**:
+`manifest.webmanifest` at `GET /manifest.webmanifest` and two PNGs at `GET /icon-192.png`
+and `GET /icon-512.png`, 14 KB of flash between them. They are what makes the console
+installable - an icon to tap and a start without an address bar. With one limit worth
+knowing before looking for it: Chromium installs only from `https` or `localhost`, and the
+clock answers on plain `http`, so today that install works on iOS and on the local
+development server and nowhere else. The manifest is served uncompressed, being 485 bytes,
+and the icons are as well, a PNG being deflated already.
 
 It follows the system's light or dark preference, with a button in the header that
 overrides it and remembers the choice. Light is the base: the clock's own look is amber on
