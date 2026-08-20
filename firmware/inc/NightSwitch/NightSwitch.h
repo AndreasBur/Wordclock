@@ -27,10 +27,23 @@
  *                  remembered, and Persistence keeps storing that same chosen value instead
  *                  of whatever the clock happened to be showing at the moment it wrote.
  *
+ *                  A night brightness of zero also takes the strip's supply away where there
+ *                  is a switch to do it with. That is the state the switch was built for:
+ *                  a display that is off still draws its quiescent current, some 110 mA for
+ *                  this strip, and a night is the longest stretch in which nobody is looking
+ *                  at what it buys. Power is asked rather than the port written, because the
+ *                  cut is a sequence over several ticks and not a write.
+ *
  *                  It acts on the crossing and not on the state. A clock switched on by
  *                  hand at two in the morning stays on until the window's next edge, rather
  *                  than going dark again a second later - which looks like a fault, and is
  *                  the behaviour that makes people stop using a timer.
+ *
+ *                  The supply is the one exception, and it is one because a cut rail turns
+ *                  "on" into a switch that does nothing: the display would be enabled, the
+ *                  data line gated and the wall still dark. So a hand that switches the
+ *                  clock on inside the window gets the supply back, which is the crossing
+ *                  rule kept rather than broken - the display stays where the hand put it.
  *
 ******************************************************************************************************************************************************/
 #ifndef _NIGHT_SWITCH_H_
@@ -43,6 +56,7 @@
 #include "Arduino.h"
 #include "ClockTime.h"
 #include "Display.h"
+#include "Power.h"
 #include "RealTimeClock.h"
 
 /******************************************************************************************************************************************************
@@ -98,6 +112,13 @@ class NightSwitch
        up inside the window gets its first tick as an edge and switches straight away. */
     bool WasNight{false};
 
+    /* Whether it was the night that took the supply down. What it guards is the tick that
+       watches for a hand: without it a supply cut by hand at noon would be handed straight
+       back on the next tick, because the display is enabled the whole time. A window's edge
+       is another matter and gives it back either way - the same rule that already re-enables
+       a display somebody switched off. */
+    bool SupplyCutForNight{false};
+
     NightSwitch() { }
     ~NightSwitch() { }
 
@@ -122,17 +143,58 @@ class NightSwitch
 
     static bool isDisplayOffAtNight(byte Brightness) { return Brightness == NightBrightnessOff; }
 
-    void applyNight() const {
-        if(isDisplayOffAtNight(NightBrightness)) { Display::getInstance().disable(); }
+    /* Power is asked rather than the port written: it darkens the strip over the data line
+       first and waits for that frame to leave the wire, so the rail is still up when this
+       returns and the sequence finishes on the ticks after it.
+
+       Where no switch is fitted the display is darkened the way it always was, and the strip
+       keeps its current because on that board it cannot do otherwise - which is the same
+       answer the procedures give, rather than a night that quietly does less than it says. */
+    void cutSupplyForTheNight() {
+        if(!Power::isSwitchFitted()) { Display::getInstance().disable(); return; }
+
+        Power::getInstance().switchSupplyOff();
+        SupplyCutForNight = true;
+    }
+
+    /* Ahead of the enable and not after it, because the rail has to be up before a frame
+       goes out - Power keeps the data line gated until it is, and releases it a tick later. */
+    void restoreSupplyAfterTheNight() {
+        if(!SupplyCutForNight) { return; }
+
+        Power::getInstance().switchSupplyOn();
+        SupplyCutForNight = false;
+    }
+
+    void applyNight() {
+        if(isDisplayOffAtNight(NightBrightness)) { cutSupplyForTheNight(); }
         else                                     { Display::getInstance().setBrightnessNightLevel(NightBrightness); }
     }
 
     /* Both undone rather than only the one that was applied: the night brightness may have
        been changed while the window was open, and then the morning has to put back
        whichever of the two the evening happened to use. */
-    void applyDay() const {
+    void applyDay() {
         Display::getInstance().clearBrightnessNight();
+        restoreSupplyAfterTheNight();
         Display::getInstance().enable();
+    }
+
+    /* The one thing watched as a state rather than as an edge, and only because a cut rail
+       makes it a different question. Between two crossings the display is whatever anybody
+       last made it - but where the night took the supply away, switching the clock on reaches
+       a gated data line and an unpowered strip, so the wall stays dark and the switch reads
+       as broken. Giving the rail back is what makes that hand mean something at two in the
+       morning; it is the crossing rule kept rather than an exception to it.
+
+       Nothing here cuts the supply again. A display switched off by hand a minute later keeps
+       its rail until the window's next edge, for the same reason the rest of this module acts
+       on crossings: a clock that undid what a hand just did would read as a fault. */
+    void followTheDisplayBackOn() {
+        if(!SupplyCutForNight) { return; }
+        if(!Display::getInstance().isEnabled()) { return; }
+
+        restoreSupplyAfterTheNight();
     }
 
 /******************************************************************************************************************************************************
@@ -191,13 +253,15 @@ class NightSwitch
     }
 
     /* Acts on the crossing, not on the state: between two edges the display is whatever
-       anybody last made it, so switching it on by hand at night keeps it on. */
+       anybody last made it, so switching it on by hand at night keeps it on - which is what
+       the tick between two edges is for, since a hand that switched it on has a supply to
+       get back. */
     void task() {
         if(!IsActive) { return; }
 
         const bool IsNightNow = isNight();
 
-        if(IsNightNow == WasNight) { return; }
+        if(IsNightNow == WasNight) { followTheDisplayBackOn(); return; }
         WasNight = IsNightNow;
 
         if(IsNightNow) { applyNight(); }

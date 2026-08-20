@@ -264,11 +264,25 @@ the cut by a tick each time. The display is dark from the first step, so what a 
 costs is the current the switch saves and not the darkness somebody asked for — which is not
 worth a mechanism to cut short.
 
-The obvious follow-up, and still not part of this:
-[NightSwitch](../firmware/inc/NightSwitch/NightSwitch.h) is what would use it, since a night
-brightness of zero is exactly the state that should cut the supply. It acts on the crossing
-rather than on the state, though, so a display switched on by hand at two in the morning must
-still find its supply — which makes it a change to the night switch rather than to this.
+The follow-up is **done** as well, and it is the one that turns the switch into something a
+clock uses on its own rather than something a command asks for:
+[NightSwitch](../firmware/inc/NightSwitch/NightSwitch.h) cuts the supply when the night
+brightness is zero, and gives it back in the morning. 82 bytes of flash on the AVR and one of
+RAM. Two things it settled:
+
+- **The night asks Power rather than the port**, and the display it darkens is Power's own
+  first step, so the sequence and its waits are written once. Where no switch is fitted the
+  night darkens the display the way it always did and says nothing about a rail it cannot
+  move — the same honesty the procedures answer with.
+- **The hand at two in the morning is watched as a state, and it is the only thing that is.**
+  A cut rail turns "display on" into a switch that does nothing: enabled, gated, and a wall
+  that is still dark. So a tick that finds the display enabled inside a window it took the
+  supply away for hands the rail back — which keeps the crossing rule rather than breaking
+  it, since what the tick does is let the hand win. What it does *not* do is the reverse: a
+  display switched off by hand keeps its rail until the next edge, because a clock that undid
+  what somebody just did is the behaviour this module exists to avoid. Only a cut the night
+  made is given back, or a supply somebody dropped by hand at noon would be undone a second
+  later.
 
 ## Backlog
 

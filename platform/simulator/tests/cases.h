@@ -46,6 +46,8 @@ void testUptimeCountsWithoutWrapping();
 void testNightWindowIncludesMidnight();
 void testNightSwitchDimsWithoutLosingTheSetting();
 void testNightSwitchActsOnTheCrossingOnly();
+void testNightWithNoBrightnessCutsTheSupply();
+void testDisplaySwitchedOnAtNightGetsItsSupplyBack();
 
 /* power_test.cpp */
 void testSupplyCutWaitsForTheBlankedFrame();

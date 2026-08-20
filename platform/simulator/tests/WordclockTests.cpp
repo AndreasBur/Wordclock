@@ -61,6 +61,8 @@ int main()
     testNightWindowIncludesMidnight();
     testNightSwitchDimsWithoutLosingTheSetting();
     testNightSwitchActsOnTheCrossingOnly();
+    testNightWithNoBrightnessCutsTheSupply();
+    testDisplaySwitchedOnAtNightGetsItsSupplyBack();
     testSupplyCutWaitsForTheBlankedFrame();
     testSupplyReturnsBeforeTheDataLine();
     testSupplyOffIsNotDisplayDisable();
