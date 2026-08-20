@@ -254,9 +254,26 @@ It follows the system's light or dark preference, with a button in the header th
 overrides it and remembers the choice. Light is the base: the clock's own look is amber on
 near-black, but the console is usually read next to other light windows.
 
+**Updating the firmware** is the last panel in the page, folded away like the console. It
+takes the `.ota.bin` from a release - not the `.factory.bin`, which carries the bootloader
+and is for a bare board - and sends it to `POST /update` as the request body. Not as a form:
+a multipart parser in flash would exist only to undo what a `<form>` did on the way out, and
+`curl --data-binary @Wordclock-ESP32-S3-1.2.3.ota.bin http://wordclock.local/update` is
+therefore a first-class way in, which matters on the day the page is the thing that broke.
+
+The image is written to whichever of `app0` and `app1` is not running, and the bootloader is
+pointed at it only once the last byte has arrived - so an upload that stops halfway leaves
+the clock running exactly what it was running, and the panel says so rather than reporting a
+failure. The partition table needs no change for this: the board's default already carries
+two app slots of 3264 KB each with an `otadata` beside them, and the firmware uses a third
+of one. The restart is asked for, not taken, so the answer reaches the browser first - the
+same deferral RPC 31 uses.
+
 While the layout is being worked on there is no need to flash: open `web/index.html`
 straight from disk and it asks for the clock's address instead of using its own host. The
-edit cycle is then a browser reload.
+edit cycle is then a browser reload. `test/run.sh serve` goes further and answers `/update`
+itself, since a host process has no second partition to write - which makes it the only
+place the panel's progress and both of its answers can be tried without a board.
 
 ## Hardware notes
 
@@ -424,17 +441,17 @@ can reach without a cable.
 
 ## Known gaps
 
-- **The overlays are not persisted.** Colour, brightness, clock mode, animation selection
-  and speeds and the sensor calibration survive a restart; the overlay configuration and
-  its text do not, because the stored format has no variable-length field yet. The time
-  and date are not stored either — they come from the network.
 - **A clock without a battery still comes up blank.** The DS3231 fills the gap between
   power-on and the first SNTP answer — but only if it has one to fill it with: a chip
   without a battery reports that its oscillator stopped, and its registers are then ignored
   on purpose.
-- **No view of the letter grid yet.** The console shows the answers, not the display. The
-  pixel buffer over the same socket is the next step.
-- **No authentication.** Anyone on the network can send commands. Fine behind a home
-  router, not on an open network — and the access point an unconfigured clock opens *is* an
-  open network. It closes with the first stored pair, which bounds the window rather than
-  removing it.
+- **No authentication**, and `POST /update` is what makes that worth reading twice. Anyone
+  on the network can send commands, and can now also install a firmware image — which is
+  not a bigger hole than the credentials command already was, but it is a different kind of
+  one: the others change what the clock shows, this one changes what it *is*. Fine behind a
+  home router, not on an open network — and the access point an unconfigured clock opens
+  *is* an open network. It closes with the first stored pair, which bounds the window rather
+  than removing it. Anything better needs somewhere to keep a secret and a way to set the
+  first one, which is its own piece of work rather than a flag.
+- **The time and date are not stored**, because they come from the network. Everything else
+  the clock is set to survives a restart, the overlays and their text included.

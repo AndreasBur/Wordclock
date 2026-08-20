@@ -5,6 +5,8 @@
 #include "Arduino.h"
 #include "Communication.h"
 #include "Pixels.h"
+#include "System.h"
+#include "Update.h"
 #include "WebInterface.h"
 #include "check.h"
 #include <algorithm>
@@ -21,7 +23,14 @@ static httpd_handler_t DisplayHandler = nullptr;
 static httpd_handler_t ManifestHandler = nullptr;
 static httpd_handler_t Icon192Handler = nullptr;
 static httpd_handler_t Icon512Handler = nullptr;
+static httpd_handler_t UpdateHandler = nullptr;
 static std::string SentType;
+static std::string SentStatus;
+/* The body the next upload is to be fed, and how much of it the stub is willing to hand
+   over - short of the announced length is a connection that went away mid-upload. */
+static std::string Body;
+static size_t BodyOffset = 0u;
+static size_t BodyLimit = 0u;
 static std::string PendingFrame;
 static std::vector<std::string> Sent;
 static std::string RootBody;
@@ -38,6 +47,7 @@ esp_err_t httpd_register_uri_handler(httpd_handle_t, const httpd_uri_t* u)
     else if(strcmp(u->uri, "/manifest.webmanifest") == 0) { ManifestHandler = u->handler; }
     else if(strcmp(u->uri, "/icon-192.png") == 0) { Icon192Handler = u->handler; }
     else if(strcmp(u->uri, "/icon-512.png") == 0) { Icon512Handler = u->handler; }
+    else if(strcmp(u->uri, "/update") == 0)   { UpdateHandler = u->handler; }
     else                                      { RootHandler = u->handler; }
     return ESP_OK;
 }
@@ -50,10 +60,28 @@ esp_err_t httpd_resp_set_hdr(httpd_req_t*, const char* k, const char* v)
     return ESP_OK;
 }
 
+esp_err_t httpd_resp_set_status(httpd_req_t*, const char* s) { SentStatus = s; return ESP_OK; }
+
 esp_err_t httpd_resp_send(httpd_req_t*, const char* b, ssize_t n)
 {
-    RootBody.assign(b, static_cast<size_t>(n));
+    /* The update route answers with the framework's "until the terminator" sentinel, the
+       others with a length - and a body of bytes may hold a zero, so the two cannot be
+       collapsed into strlen(). */
+    RootBody.assign(b, (n == HTTPD_RESP_USE_STRLEN) ? strlen(b) : static_cast<size_t>(n));
     return ESP_OK;
+}
+
+/* Hands over the prepared body a chunk at a time, and stops at BodyLimit rather than at its
+   end - which is how a dropped connection is reached without a socket to drop. */
+int httpd_req_recv(httpd_req_t*, char* Target, size_t Max)
+{
+    if(BodyOffset >= BodyLimit) { return 0; }
+
+    const size_t Take = std::min(Max, BodyLimit - BodyOffset);
+    memcpy(Target, Body.data() + BodyOffset, Take);
+    BodyOffset += Take;
+
+    return static_cast<int>(Take);
 }
 
 esp_err_t httpd_resp_send_chunk(httpd_req_t*, const char* b, ssize_t n)
@@ -124,8 +152,9 @@ int main()
           && (DisplayHandler != nullptr), "all four handlers were registered");
     /* Separately, because the server's own handler limit is what would drop these: it is a
        number in the configuration, and one route past it is refused rather than reported. */
-    check((ManifestHandler != nullptr) && (Icon192Handler != nullptr) && (Icon512Handler != nullptr),
-          "and the three the home screen needs fit under the handler limit as well");
+    check((ManifestHandler != nullptr) && (Icon192Handler != nullptr) && (Icon512Handler != nullptr)
+          && (UpdateHandler != nullptr),
+          "and the four added since fit under the handler limit as well");
 
     httpd_req_t request{};
     request.method = HTTP_GET;
@@ -299,5 +328,84 @@ int main()
     /* an oversized frame must be refused whole rather than truncated into the parser */
     PendingFrame.assign(WEB_INTERFACE_MAX_FRAME_LENGTH + 10u, 'x');
     check(SocketHandler(&request) != ESP_OK, "an oversized frame is refused");
+
+    /* ---- the firmware update ----------------------------------------------------------
+       What a host can say about this is the sequence: begun with the size the request
+       announced, written what arrived, ended only when all of it did, and the reboot asked
+       for afterwards rather than taken inside the handler. Whether the bytes land in the
+       other partition is the framework's business and no test here can speak to it. */
+    auto upload = [](const std::string& Image, size_t Deliver) {
+        Update.forget();
+        Body = Image;
+        BodyOffset = 0u;
+        BodyLimit = Deliver;
+        SentStatus.clear();
+
+        httpd_req_t post{};
+        post.method = HTTP_POST;
+        post.content_len = Image.size();
+        UpdateHandler(&post);
+    };
+
+    /* An image of no particular content: what is being checked is the byte count, and the
+       header the real Update would insist on is the framework's check rather than this. */
+    const std::string Image(4096u, '\xe9');
+
+    upload(Image, Image.size());
+    check(SentStatus == "200 OK", "a complete image is accepted");
+    check(RootBody == "{\"ok\":true}", "and answered so the page can say it landed");
+    check(Update.Announced == Image.size(), "the partition is claimed for the size the request announced");
+    check(Update.Written == Image.size(), "every byte that arrived was written");
+    check(Update.Ended && !Update.Aborted, "and the image was finished rather than abandoned");
+
+    /* The reboot is the point of the deferral: asked for here, carried out by the tick after
+       the answer has gone out. A handler that restarted on the spot would send nothing. */
+    check(!ESP.Restarted, "the handler does not restart the controller itself");
+    System::getInstance().performPendingRestart();
+    check(ESP.Restarted, "the tick after the answer does");
+
+    /* Half an image, which is what a connection that goes away mid-upload leaves. The clock
+       has to keep running what it was running, so nothing may be finished and the partition
+       has to be given back. */
+    upload(Image, Image.size() / 2u);
+    check(SentStatus == "400 Bad Request", "an upload that stops halfway is refused");
+    check(!Update.Ended, "nothing is finished on a partial image");
+    check(Update.Aborted, "and the partition is released rather than left claimed");
+    check(RootBody.find("stopped before") != std::string::npos,
+          "with a reason that says what happened rather than that something did");
+
+    /* Refused before a byte is written, which is what an image too large for the partition
+       does - the factory file instead of the OTA one, most likely. The reason is the
+       framework's own text, because it is the one that names which limit was hit. */
+    Update.forget();
+    Update.RefuseBegin = true;
+    Update.Error = "Not Enough Space";
+    Body = Image;
+    BodyOffset = 0u;
+    BodyLimit = Image.size();
+    SentStatus.clear();
+    {
+        httpd_req_t post{};
+        post.method = HTTP_POST;
+        post.content_len = Image.size();
+        UpdateHandler(&post);
+    }
+    check(SentStatus == "400 Bad Request", "an image the partition cannot hold is refused");
+    check(Update.Written == 0u, "before anything is written");
+    check(RootBody.find("Not Enough Space") != std::string::npos, "and the framework's reason is passed on");
+
+    /* No body at all, which is what an empty file picker sends. Refused without claiming the
+       partition, or a mis-click would take the running firmware's spare with it. */
+    Update.forget();
+    SentStatus.clear();
+    {
+        httpd_req_t post{};
+        post.method = HTTP_POST;
+        post.content_len = 0u;
+        UpdateHandler(&post);
+    }
+    check(SentStatus == "400 Bad Request", "a request with no image is refused");
+    check(!Update.Begun, "and does not claim the partition to find that out");
+
     return report();
 }

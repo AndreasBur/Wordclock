@@ -178,6 +178,26 @@ const server = http.createServer(async (request, response) => {
         response.end(fs.readFileSync(path.join(path.dirname(pagePath), request.url)));
         return;
     }
+    /* The update route, answered here rather than by the firmware behind this server: the
+       real one writes the other flash partition, which a host process has neither of. What
+       this stands in for is everything the panel does - the progress on the way up, the two
+       answers, and the shapes they arrive in - so the one part that cannot be tried on a
+       device from a desk can at least be tried against something. */
+    if (request.url === '/update' && request.method === 'POST') {
+        let received = 0;
+
+        request.on('data', (chunk) => { received += chunk.length; });
+        request.on('end', () => {
+            /* Refused below a size no real image is, so both answers are reachable: pick a
+               small file to see the failing path, the .ota.bin to see the other. */
+            const ok = received >= 64 * 1024;
+            console.log(`update: ${received} bytes, ${ok ? 'accepted' : 'refused'} (nothing was written)`);
+            response.writeHead(ok ? 200 : 400, { 'Content-Type': 'application/json' });
+            response.end(ok ? '{"ok":true}'
+                            : `{"ok":false,"error":"${received} bytes is too small to be a firmware image"}`);
+        });
+        return;
+    }
     if (request.url === '/commands' || request.url === '/display') {
         response.writeHead(200, { 'Content-Type': 'application/json' });
         response.end(await describe(request.url.slice(1)));

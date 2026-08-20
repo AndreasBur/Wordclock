@@ -428,6 +428,17 @@
     }
     #panel[hidden] { display: none; }
     #builderNote { color: var(--unlit); font-style: italic; padding: 0 19px 12px; max-width: var(--content); margin-inline: auto; }
+    /* The same measure as the builder's note above, which is what keeps the two cards from
+       reading as different kinds of thing. */
+    #update { padding: 0 19px 12px; max-width: var(--content); margin-inline: auto; }
+    #updateNote { color: var(--unlit); margin: 0 0 10px; }
+    #updateNote code { color: var(--text); }
+    #updateForm { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin: 0; }
+    /* Italic like the log's notes while it is only saying what is happening, upright and
+       amber once it is the answer - so a finished update does not read as commentary. */
+    #updateState { font-style: italic; color: var(--unlit); min-height: 1.2em; margin-top: 8px; }
+    #updateState.done { font-style: normal; color: var(--lit); }
+    #updateState.failed { font-style: normal; color: var(--text); }
 </style>
 
 <header>
@@ -468,6 +479,26 @@
                     <input id="command" placeholder="command, e.g. 3 -B255" autocomplete="off" spellcheck="false">
                     <button type="submit">Send</button>
                 </form>
+            </div>
+        </details>
+
+        <!-- Folded away like the console, and for a stronger version of the same reason: a
+             clock is updated when there is a release to update to, which is not often.
+             Last of the three, because it is the one thing here that is not a setting. -->
+        <details id="updateBox" class="surface">
+            <summary>Update the firmware</summary>
+            <div id="update">
+                <p id="updateNote">
+                    Pick the <code>.ota.bin</code> from a release, not the
+                    <code>.factory.bin</code> — that one carries the bootloader and is for a
+                    bare board. The clock keeps running on what it has until the image has
+                    arrived whole; only then does it restart into the new one.
+                </p>
+                <form id="updateForm">
+                    <input type="file" id="image" accept=".bin,application/octet-stream">
+                    <button type="submit" id="install">Install</button>
+                </form>
+                <div id="updateState" class="note"></div>
             </div>
         </details>
     </div>
@@ -920,6 +951,83 @@
         append(text, 'in');
         socket.send(text);
         commandInput.value = '';
+    });
+
+    /* ---- the firmware update --------------------------------------------------------
+       The file goes up as the request body, not as a form: a multipart parser on the clock
+       would exist only to undo what a <form> did on the way out, and the flash it would
+       take is flash the image itself needs.
+
+       XMLHttpRequest rather than fetch, which is the one place in this page that is not the
+       newer of two APIs. fetch cannot report how far an upload has got - there is no
+       progress on a request body - and a megabyte over a house's WiFi is long enough that a
+       page saying nothing looks like a page that has hung. Somebody who then pulls the plug
+       is exactly the reader this panel is written for. */
+    const updateForm = document.getElementById('updateForm');
+    const imageInput = document.getElementById('image');
+    const installButton = document.getElementById('install');
+    const updateState = document.getElementById('updateState');
+
+    function say(text, outcome) {
+        updateState.textContent = text;
+        updateState.className = outcome || '';
+    }
+
+    /* What the clock answered, which is JSON on both paths and a sentence on the failing
+       one. A body that will not parse is still a failure worth naming: a proxy or a captive
+       portal in the way answers with HTML, and "unexpected token" would send somebody
+       looking at the clock instead of at their network. */
+    function reasonFrom(request) {
+        try {
+            const answer = JSON.parse(request.responseText);
+            if (answer.error) { return answer.error; }
+        } catch (ignored) {
+            return 'the answer was not from the clock (HTTP ' + request.status + ')';
+        }
+        return 'HTTP ' + request.status;
+    }
+
+    updateForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const image = imageInput.files[0];
+        if (!image) { say('no file picked'); return; }
+
+        const request = new XMLHttpRequest();
+
+        installButton.disabled = true;
+        imageInput.disabled = true;
+        say('sending ' + Math.round(image.size / 1024) + ' kB…');
+
+        request.upload.onprogress = (progress) => {
+            if (!progress.lengthComputable) { return; }
+            say('sending… ' + Math.round((progress.loaded / progress.total) * 100) + '%');
+        };
+        /* Deliberately not re-enabling the button on success: what follows is a restart, and
+           the page that comes back after it is the one to install anything else from. The
+           socket reconnects on its own, so the clock coming back is visible in the header. */
+        request.onload = () => {
+            if (request.status === 200) {
+                say('installed - the clock is restarting into it', 'done');
+                return;
+            }
+            say(reasonFrom(request), 'failed');
+            installButton.disabled = false;
+            imageInput.disabled = false;
+        };
+        /* A restart *is* what success looks like from here, but only after the answer has
+           arrived. One before that is the connection going away mid-upload, and the clock is
+           then still running what it was running - which is the thing worth saying, because
+           the safe outcome and the alarming message would otherwise be the same event. */
+        request.onerror = () => {
+            say('the upload did not finish - the clock is still running the firmware it had',
+                'failed');
+            installButton.disabled = false;
+            imageInput.disabled = false;
+        };
+
+        request.open('POST', endpoint('update'));
+        request.setRequestHeader('Content-Type', 'application/octet-stream');
+        request.send(image);
     });
 
     connect();

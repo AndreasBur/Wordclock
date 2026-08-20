@@ -18,6 +18,7 @@
 ******************************************************************************************************************************************************/
 /* The framework's headers first, ahead of the Arduino.h that binds Serial to a macro. */
 #include <ESPmDNS.h>
+#include <Update.h>
 #include <esp_http_server.h>
 
 #include "Arduino.h"
@@ -25,6 +26,7 @@
 #include "Communication.h"
 #include "DisplayCharacters.h"
 #include "MessageCatalog.h"
+#include "System.h"
 #include "WebInterface.h"
 #include "WebPage.h"
 #include "WordclockSerial.h"
@@ -107,6 +109,110 @@ esp_err_t handleManifest(httpd_req_t* Request)
     httpd_resp_set_type(Request, "application/manifest+json");
 
     return httpd_resp_send(Request, reinterpret_cast<const char*>(WebManifest), WebManifestSize);
+}
+
+
+/******************************************************************************************************************************************************
+  sendUpdateResult()
+******************************************************************************************************************************************************/
+/*! \brief          Answers the update route, in the one shape the page reads
+ *  \details        JSON like the other two routes that answer data, and the HTTP status set
+ *                  with it - so the page can branch on the status and still have a sentence
+ *                  to show. The reason travels as text on purpose: what goes wrong here is
+ *                  a wrong file or a dropped connection, and a number for that would only
+ *                  have to be translated back somewhere.
+******************************************************************************************************************************************************/
+esp_err_t sendUpdateResult(httpd_req_t* Request, bool Ok, const char* Reason)
+{
+    char Body[192u];
+
+    httpd_resp_set_type(Request, "application/json");
+
+    if(Ok) {
+        httpd_resp_set_status(Request, "200 OK");
+        snprintf(Body, sizeof(Body), "{\"ok\":true}");
+    } else {
+        httpd_resp_set_status(Request, "400 Bad Request");
+        /* %.120s, because errorString() is the framework's text and the buffer is ours. */
+        snprintf(Body, sizeof(Body), "{\"ok\":false,\"error\":\"%.120s\"}", Reason);
+        Serial.print(F("Web: update refused - "));
+        Serial.println(Reason);
+    }
+
+    return httpd_resp_send(Request, Body, HTTPD_RESP_USE_STRLEN);
+}
+
+
+/******************************************************************************************************************************************************
+  handleUpdate()
+******************************************************************************************************************************************************/
+/*! \brief          Takes a new firmware image over HTTP and reboots into it
+ *
+ *  \return         ESP_OK once an answer has been sent, whichever answer that was
+ *
+ *  \details        The body is the image itself, not a form: a multipart parser in flash
+ *                  would exist to undo something the browser only does because a <form>
+ *                  asked it to, and the page sends the file as the request body instead.
+ *                  That is also what makes `curl --data-binary` a first-class way in, which
+ *                  is the one that works when the page is the thing that broke.
+ *
+ *                  The image goes to the partition the running one is not in, and the
+ *                  bootloader is pointed at it only by end() - so an upload that stops
+ *                  halfway leaves the clock running what it was running. That is the whole
+ *                  safety argument for doing this at all, and it is the framework's rather
+ *                  than ours.
+ *
+ *                  The reboot is asked for and not carried out: this handler's answer is
+ *                  still in the server's buffer, and a controller that restarts here sends
+ *                  the browser nothing at all - which reads as a failed update rather than
+ *                  a finished one. System::restart() already defers to the application's
+ *                  tick for exactly this reason, so it is what carries it out.
+******************************************************************************************************************************************************/
+esp_err_t handleUpdate(httpd_req_t* Request)
+{
+    /* Announced rather than measured, and it has to be: Update needs the size before the
+       first byte, to know which partition can hold it and to erase it. A body that then
+       turns out shorter is caught by end() below, which refuses to finish an image that is
+       not all there. */
+    const size_t Announced = Request->content_len;
+
+    if(Announced == 0u) { return sendUpdateResult(Request, false, "no image in the request body"); }
+
+    if(!Update.begin(Announced)) {
+        /* The usual one is an image larger than the partition, which is worth saying as
+           itself rather than as "update failed": it means the wrong file was picked - the
+           factory image instead of the plain one, most likely. */
+        return sendUpdateResult(Request, false, Update.errorString());
+    }
+
+    /* One kilobyte at a time, on the server's own task. Larger buffers buy nothing here:
+       the flash write is what takes the time, and this runs beside the clock rather than
+       inside its tick, so the display keeps its frames throughout. */
+    char Chunk[1024u];
+    size_t Received = 0u;
+
+    while(Received < Announced) {
+        const int Read = httpd_req_recv(Request, Chunk, sizeof(Chunk));
+
+        /* A dropped connection halfway through, which is the case the abort exists for:
+           without it the next attempt would find the partition still claimed. */
+        if(Read <= 0) {
+            Update.abort();
+            return sendUpdateResult(Request, false, "the upload stopped before the image was complete");
+        }
+        if(Update.write(reinterpret_cast<uint8_t*>(Chunk), static_cast<size_t>(Read)) != static_cast<size_t>(Read)) {
+            const char* Reason = Update.errorString();
+            Update.abort();
+            return sendUpdateResult(Request, false, Reason);
+        }
+        Received += static_cast<size_t>(Read);
+    }
+
+    if(!Update.end(true)) { return sendUpdateResult(Request, false, Update.errorString()); }
+
+    System::getInstance().restart();
+
+    return sendUpdateResult(Request, true, "");
 }
 
 
@@ -389,12 +495,12 @@ StdReturnType WebInterface::begin()
     /* The sockets the server keeps have to cover the console clients plus the ones fetching
        the page, or a reload can push a console off. */
     Config.max_open_sockets = WEB_INTERFACE_MAX_CLIENTS + 2u;
-    /* Said rather than left to the default, which is 8 and was two spare until the manifest
-       and the icons took the count to seven. A route past the limit is refused by the
-       registration below and nothing here reads that answer, so the failure would be one
-       route quietly missing - and the test that counts them is what would find it, on a
-       host, rather than a browser on somebody's wall. */
-    Config.max_uri_handlers = 7u;
+    /* Said rather than left to the default, which is also 8 and is now exactly the count.
+       A route past the limit is refused by the registration below and nothing here reads
+       that answer, so the failure would be one route quietly missing - and the test that
+       counts them is what would find it, on a host, rather than a browser on somebody's
+       wall. The next route to be added has to raise this number with it. */
+    Config.max_uri_handlers = 8u;
     Config.close_fn = onSocketClosed;
     /* Its own task, so nothing here runs inside the firmware's tick. */
     Config.core_id = 0;
@@ -411,6 +517,7 @@ StdReturnType WebInterface::begin()
     static const httpd_uri_t ManifestUri{"/manifest.webmanifest", HTTP_GET, handleManifest, nullptr, false, false, nullptr};
     static const httpd_uri_t Icon192Uri{"/icon-192.png", HTTP_GET, handleIcon192, nullptr, false, false, nullptr};
     static const httpd_uri_t Icon512Uri{"/icon-512.png", HTTP_GET, handleIcon512, nullptr, false, false, nullptr};
+    static const httpd_uri_t UpdateUri{"/update", HTTP_POST, handleUpdate, nullptr, false, false, nullptr};
     static const httpd_uri_t SocketUri{"/ws", HTTP_GET, handleSocket, nullptr, true, false, nullptr};
 
     httpd_register_uri_handler(HttpServer, &RootUri);
@@ -419,6 +526,7 @@ StdReturnType WebInterface::begin()
     httpd_register_uri_handler(HttpServer, &ManifestUri);
     httpd_register_uri_handler(HttpServer, &Icon192Uri);
     httpd_register_uri_handler(HttpServer, &Icon512Uri);
+    httpd_register_uri_handler(HttpServer, &UpdateUri);
     httpd_register_uri_handler(HttpServer, &SocketUri);
 
     /* Only now, so a line printed during startup cannot reach a half-built server. */

@@ -48,7 +48,12 @@ esp_err_t httpd_register_uri_handler(httpd_handle_t, const httpd_uri_t* u)
 }
 esp_err_t httpd_resp_set_type(httpd_req_t*, const char*) { return ESP_OK; }
 esp_err_t httpd_resp_set_hdr(httpd_req_t*, const char*, const char*) { return ESP_OK; }
+esp_err_t httpd_resp_set_status(httpd_req_t*, const char*) { return ESP_OK; }
 esp_err_t httpd_resp_send(httpd_req_t*, const char*, ssize_t) { return ESP_OK; }
+/* Linkable and nothing more: this process serves the console for looking at the page, and
+   nothing here uploads a firmware image to a host binary. serve.js answers /update itself,
+   so the panel can still be driven. */
+int httpd_req_recv(httpd_req_t*, char*, size_t) { return 0; }
 esp_err_t httpd_resp_send_chunk(httpd_req_t*, const char* b, ssize_t n)
 {
     if(b != nullptr) { Described.append(b, static_cast<size_t>(n)); }

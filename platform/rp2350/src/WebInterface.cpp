@@ -113,6 +113,40 @@ void handleManifest(AsyncWebServerRequest* Request)
 
 
 /******************************************************************************************************************************************************
+  handleUpdate()
+******************************************************************************************************************************************************/
+/*! \brief          Answers the update route with the reason this board has none
+ *
+ *  \details        The page is shared with the ESP32 backend, so its update panel is on this
+ *                  clock's own page as well - and a route that simply was not registered
+ *                  would answer 404, which reads as a broken clock rather than a board that
+ *                  cannot do this. The same choice the power switch makes: a backend that
+ *                  cannot do something says so instead of being compiled out.
+ *
+ *                  Why it cannot, in one line, because that is the question somebody reading
+ *                  this answer has: this core has no second app partition. An update here
+ *                  means writing the image into LittleFS and letting its bootloader apply it
+ *                  on the next boot, and the filesystem is 64 KB against an image of some
+ *                  470 KB - so it is a flash-layout change with the settings living in the
+ *                  region that would move, not a handler. Item 3 of the roadmap has the cost.
+ *
+ *                  501 rather than 400: nothing is wrong with the request, and a clock that
+ *                  blamed the file for this would send somebody looking for a better one.
+******************************************************************************************************************************************************/
+void handleUpdate(AsyncWebServerRequest* Request)
+{
+    static const char Refusal[] =
+        "{\"ok\":false,\"error\":\"this board has no network update - install the .uf2 over USB\"}";
+
+    /* Through beginResponse like every other route here, rather than the library's
+       send(code, type, text): one way of answering per file is worth more than the shorter
+       call, and it is the form the backend's stub already stands in for. */
+    Request->send(Request->beginResponse(501, "application/json",
+                                        reinterpret_cast<const uint8_t*>(Refusal), sizeof(Refusal) - 1u));
+}
+
+
+/******************************************************************************************************************************************************
   handleIcon192() / handleIcon512()
 ******************************************************************************************************************************************************/
 /*! \brief          Serves the home screen icons
@@ -359,6 +393,7 @@ StdReturnType WebInterface::begin()
     HttpServer.on("/manifest.webmanifest", HTTP_GET, handleManifest);
     HttpServer.on("/icon-192.png", HTTP_GET, handleIcon192);
     HttpServer.on("/icon-512.png", HTTP_GET, handleIcon512);
+    HttpServer.on("/update", HTTP_POST, handleUpdate);
 
     /* No failure to report: this library's begin() returns nothing and starts listening on
        whatever address arrives later. Where the ESP32 backend can find its server refusing

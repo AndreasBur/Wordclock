@@ -4,12 +4,14 @@
 #include <Arduino.h>
 #include <ESPmDNS.h>
 #include <Preferences.h>
+#include <Update.h>
 #include <WiFi.h>
 #include <Wire.h>
 #include <freertos/task.h>
 
 TwoWire Wire;
 EspClass ESP;
+UpdateClass Update;
 
 unsigned long TestMillis = 0u;
 unsigned long millis() { return TestMillis; }

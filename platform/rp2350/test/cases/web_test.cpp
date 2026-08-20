@@ -89,6 +89,10 @@ int main()
           && (webStubState().Routes.count("/icon-192.png") == 1u)
           && (webStubState().Routes.count("/icon-512.png") == 1u),
           "and the three the home screen needs with them");
+    /* Registered although this board cannot update over the network: the page is shared with
+       the ESP32 and carries the panel either way, and a 404 there would read as a broken
+       clock rather than as a board that cannot do it. */
+    check(webStubState().Routes.count("/update") == 1u, "and the update route that answers why not");
 
     /* the page: gzipped, and announced as such */
     std::string Encoding;
@@ -115,6 +119,11 @@ int main()
     const std::string LargeIcon = fetch("/icon-512.png");
     check(LargeIcon.size() > SmallIcon.size() && LargeIcon.compare(1u, 3u, "PNG") == 0,
           "the large icon is a PNG too, and the larger of the two");
+
+    const std::string Refusal = fetch("/update");
+    check(isBalancedJson(Refusal), "the update refusal is well formed JSON");
+    check(Refusal.find("\"ok\":false") != std::string::npos, "and says the update did not happen");
+    check(Refusal.find("USB") != std::string::npos, "and says what to do instead");
 
     /* the catalog, generated from the real table */
     const std::string Catalog = fetch("/commands");

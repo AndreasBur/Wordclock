@@ -340,12 +340,35 @@ From the comparison with wordclock24h, in the order they would change daily use.
      make a hand-switched display go dark a second later, which reads as a fault.
    - **An empty window is no window**, not a whole day — that is what an unconfigured
      clock has.
-3. **OTA update.** Cheap on the ESP32, and the natural companion to 1. What it lacked has
-   since arrived: a `v*` tag publishes a flashable file per target
-   ([release.yml](../.github/workflows/release.yml)), so an update has something to install
-   other than a build the owner made themselves. Both comparison projects put the upload
-   form in the web interface, which is the right place - a clock on a wall is reachable by
-   browser and not by cable.
+3. **OTA update.** **Done on the ESP32**, which is where this item said it was cheap:
+   `POST /update` takes the image as the request body and the console's last panel sends it,
+   16 KB of flash for the handler and 0.9 KB for the panel. The default partition table
+   already carried two app slots and an `otadata`, so nothing about the layout moved - which
+   is what made it cheap, and would have been the expensive part. Three things it settled:
+
+   - **The body, not a form.** A multipart parser in flash would exist only to undo what a
+     `<form>` did on the way out. What that buys is `curl --data-binary` as a first-class
+     way in, which is the one that still works on the day the page is the thing that broke.
+   - **Halfway is safe and has to read that way.** The bootloader is pointed at the new
+     image only by the last byte, so an interrupted upload leaves the clock running what it
+     was running. The panel says exactly that instead of reporting a failure, because the
+     safe outcome and the alarming message would otherwise be the same event.
+   - **The reboot is asked for, not taken**, the same deferral RPC 31 uses: a controller that
+     restarts inside the handler sends the browser nothing, which reads as a failed update.
+
+   **Not done on the RP2350**, and the reason is worth writing down rather than rediscovering.
+   That core has no second app partition: OTA there means writing the image as a *file* into
+   LittleFS and letting its bootloader apply it on the next reboot. The filesystem is
+   [64 KB](../platform/rp2350/platformio.ini) and the image is some 470 KB, so it would have
+   to grow past the image - which moves the region the settings live in, so the update that
+   introduces updates costs one settings reset and has to go over USB anyway. Worth doing,
+   but it is a flash-layout change with a migration in it rather than a handler.
+
+   What is still missing on both is **authentication**. Anyone on the network could already
+   send commands; now they can install firmware. Not a bigger hole than the credentials
+   command, but a different kind - the others change what the clock shows, this one changes
+   what it is. It needs somewhere to keep a secret and a way to set the first one, which is
+   its own item rather than a flag on this one.
 4. ~~**RTC with battery.**~~ **Done** with section 2's chip: the time registers are read
    while the system clock holds nothing, and written back from it once an hour and after
    every hand-set time ([RealTimeClock.cpp](../platform/esp32/src/RealTimeClock.cpp)). The

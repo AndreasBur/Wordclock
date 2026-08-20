@@ -40,11 +40,14 @@ struct Stream {
     void flush() {}
 };
 
-/* What the backend asks the chip itself for. The test never restarts, so restart() only
-   has to be linkable. */
+/* What the backend asks the chip itself for. restart() records rather than restarts: a
+   finished firmware update ends in one, and the case for it wants to see that the reboot was
+   asked for on the tick after the answer went out - which is the whole of why the restart is
+   deferred and not done in the handler. */
 struct EspClass {
+    bool Restarted{false};
     uint32_t getFreeHeap() { return 0u; }
-    void restart() {}
+    void restart() { Restarted = true; }
 };
 extern EspClass ESP;
 
