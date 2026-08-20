@@ -93,34 +93,59 @@ reconstruct from the code.
 
 ## Looking at the web console
 
-The page in `web/` is the one part of this project the simulator cannot show, and it can be
-driven rather than only photographed - synthetic clicks work here, which is the opposite of
-the wx window below. Playwright's own Chromium is how: `apt` on this base offers only a snap
-stub for `chromium-browser`, which does not work in a container.
+`web/index.html` is the one part of this project the simulator cannot show, and unlike the
+wx window below it can be **driven**: clicks, typing and file pickers all work. The dev
+container ships Playwright with its own Chromium for that — `apt` on this base offers only a
+snap stub, which does not run in a container. It is headless, so none of the display
+plumbing the next section works around applies here.
 
 ```bash
-python3 -m venv "$SCRATCH/venv" && "$SCRATCH/venv/bin/pip" install playwright
-"$SCRATCH/venv/bin/playwright" install --with-deps chromium   # ~115 MB, once
+# the browser the image provides; PLAYWRIGHT_BROWSERS_PATH is already set by the image
+/opt/playwright/bin/python shot.py
 ```
 
 The page needs the firmware behind it, which `platform/esp32/test/run.sh serve <port>`
-provides. Three things make the difference between a screenshot and a wasted run:
+provides: it serves the page from disk and answers `/commands`, `/display` and the web
+socket from a host build of the real backend, so what the browser sees is what a clock would
+send. Four things have to line up, and three of them fail as a timeout that says nothing:
 
-1. **Start the server so the launching shell stays alive** - a background Bash call that the
-   harness tracks, not `( ... &)`. `run.sh` keeps its binaries in a temporary directory and
-   removes them in a trap when its shell exits, so a detached server answers `/` from disk
-   and then hangs forever on `/display` and `/commands`, which is where the panel comes from.
-2. **Never wait for `networkidle`.** The console holds a web socket open, so it never goes
-   idle and `page.goto` times out at 30 s. Use `wait_until="load"`, then wait for
-   `#panel:not([hidden])` - that selector appearing means `/display` answered.
-3. The header's state text reads *connected*, so a wait for "not connecting" matches it.
-   Wait on the panel or on `#panel span.lit` instead.
+1. **Start the server as a tracked background call**, not as `( ... &)`. `run.sh` keeps its
+   binaries in a temporary directory and deletes them in a trap when its own shell exits, so
+   a detached server still answers `/` from disk and then hangs forever on `/display` and
+   `/commands` — which is where the panel and every settings row come from.
+2. **Never wait for `networkidle`.** The console holds a web socket open, so the page never
+   goes idle and `page.goto` dies at its 30 s timeout. Use `wait_until="load"`, then wait for
+   `#panel:not([hidden])`: that selector appearing *is* `/display` having answered.
+3. **The header reads "connected"**, so a wait for the absence of "connecting" matches it and
+   never fires. Wait on the panel, or on `#panel span.lit` for the first frame off the socket.
+4. **Give it a real width.** The page is a two-column desktop layout above 800 px and one
+   column below, and the phone case is the one it exists for — 390 px is worth checking
+   before 1280.
 
-What it is good for is **layout, and behaviour that needs input**: `set_input_files` on the
-update panel's picker plus a click on Install exercises the whole upload, both answers
-included. What it is *not* good for is colour - the page paints lit letters in a fixed
-contrast colour and drops the frame's own, exactly as the wx window drops the hue. A hue is
-checked by reading the bytes in a test, not by looking at either front end.
+```python
+page = browser.new_page(viewport={"width": 390, "height": 900}, color_scheme="dark")
+page.goto(URL, wait_until="load")
+page.wait_for_selector("#panel:not([hidden])", timeout=20000)
+page.evaluate("document.querySelectorAll('details').forEach(d => d.open = true)")
+page.screenshot(path="shot.png", full_page=True)
+```
+
+Two things it is good for beyond a screenshot. **Measuring**, which is how the layout bugs
+were found rather than by looking: `scrollWidth > clientWidth` per element finds what
+overflows its card, and a page that scrolls sideways at 390 px is a bug however good it
+looks. And **behaviour that needs input** — `set_input_files` on the update panel's picker
+plus a click on Install exercises the whole upload, both answers included.
+
+What it cannot show is **colour**. The page takes only *whether* a pixel is lit from the
+frame and paints the lit ones a fixed high-contrast colour, exactly as the wx window renders
+brightness as a grey level and drops the hue. Neither front end shows a hue, so a colour is
+checked by reading the bytes in a test.
+
+Two screenshot artefacts worth knowing: `full_page=True` renders a `position: sticky`
+element at its scrolled position, so the clock panel appears halfway down the image on a
+desktop width — it is not misplaced. And an enormous full-page image is downscaled to
+illegibility on the way into a reply; shoot the viewport, or a single element with
+`locator.screenshot()`, when something has to be read.
 
 ## Screenshotting the simulator
 

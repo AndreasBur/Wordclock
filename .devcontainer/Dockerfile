@@ -105,6 +105,25 @@ ENV PATH="/opt/platformio/bin:${PATH}"
 RUN cat /etc/ssl/certs/ca-certificates.crt \
         >> "$(/opt/platformio/bin/python -c 'import certifi; print(certifi.where())')"
 
+# Playwright with its own Chromium, which is what looks at web/index.html - the one part of
+# this project the simulator cannot show, and the only front end whose layout has to be
+# checked by looking. Its own, because apt on this base offers `chromium-browser` as a snap
+# stub and snap does not run in a container: the browser Playwright brings is a plain
+# tarball under the path below.
+#
+# PLAYWRIGHT_BROWSERS_PATH is what keeps it out of ~/.cache, which a volume replaces - the
+# same reason the venv above lives under /opt. --with-deps pulls the ~30 libraries a
+# headless Chromium links against, so this layer is the expensive one in the image: about
+# 650 MB of browser and libraries. It runs headless, so it needs no X server and none of
+# the display plumbing "Screenshotting the simulator" in CLAUDE.md has to work around.
+ENV PLAYWRIGHT_BROWSERS_PATH=/opt/ms-playwright
+RUN python3 -m venv /opt/playwright && \
+    /opt/playwright/bin/pip install --no-cache-dir --upgrade pip && \
+    /opt/playwright/bin/pip install --no-cache-dir playwright && \
+    /opt/playwright/bin/playwright install --with-deps chromium && \
+    chmod -R a+rX /opt/ms-playwright && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+
 # The package cache is a named volume, and an empty one takes its ownership from the path
 # it covers - so the path has to exist and belong to the remote user first, or PlatformIO
 # cannot write the ~1.5 GB of toolchain into it.
