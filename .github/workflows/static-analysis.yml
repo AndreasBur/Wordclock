@@ -13,6 +13,9 @@
 #
 # Which checks are on, and why the rest are off, is in .clang-tidy and
 # .cppcheck-suppressions, not here.
+# timeout-minutes on both jobs for the reason ci.yml gives, and generous on clang-tidy: it
+# reads every translation unit of the simulator build and takes ten minutes when nothing at
+# all is wrong.
 name: static-analysis
 
 on:
@@ -30,6 +33,7 @@ jobs:
   clang-tidy:
     name: clang-tidy
     runs-on: ubuntu-24.04
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v7
 
@@ -54,6 +58,7 @@ jobs:
   cppcheck:
     name: cppcheck
     runs-on: ubuntu-24.04
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v7
 

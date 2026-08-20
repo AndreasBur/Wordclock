@@ -36,6 +36,9 @@ jobs:
     name: Publish the release
     needs: checks
     runs-on: ubuntu-24.04
+    # For the reason ci.yml gives. This job only downloads the artifacts CI produced and
+    # writes the release, so anything approaching this number is something stuck.
+    timeout-minutes: 20
     steps:
       # For LICENSE and the notes below, nothing else - the binaries come from the artefacts.
       - uses: actions/checkout@v7
