@@ -55,10 +55,14 @@ ASSETS = (
 def strip_comments(text):
     """Takes the page's comments out on the way into flash, leaving them in the source.
 
-    They are 58% of index.html and 6 KiB of the 10 KiB it compresses to - which is 0.2% of
-    the ESP32's flash and worth nothing there, but the page is also the place where the
-    reasoning is worth the most, because CSS decisions read as arbitrary without it. So the
-    explanation stays where it is read and stops being shipped.
+    They are half of index.html and, compressed, 10 KiB of the 16.5 KiB the page would come
+    to with them - which is 0.3% of the ESP32's flash and worth nothing there, but the page is
+    also the place where the reasoning is worth the most, because CSS decisions read as
+    arbitrary without it. So the explanation stays where it is read and stops being shipped.
+
+    The numbers move with the page, and two of them were wrong here for a while; what does
+    not move is the ratio. Anything that says a size in this repository is worth measuring
+    before it is trusted.
 
     Only block comments, and that is what makes this safe rather than clever: the page uses
     /* */ throughout, which is this project's style everywhere, so there is no // form to

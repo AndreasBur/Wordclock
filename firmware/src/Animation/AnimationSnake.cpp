@@ -83,7 +83,6 @@ void AnimationSnake::task()
         if((SnakeBeginIndex - SnakeEndIndex) == ANIMATION_SNAKE_LENGTH ||
            (SnakeBeginIndex >= DISPLAY_NUMBER_OF_LEDS - 1u && SnakeEndIndex < DISPLAY_NUMBER_OF_LEDS))
         {
-            //Display::getInstance().clearPixelFast(SnakeEndIndexTrans);
             if(isPixelPartOfClockWords(ClockWordsTable, snakeEndIndexTrans) == false) Display::getInstance().clearPixelFast(snakeEndIndexTrans);
             SnakeEndIndex++;
         }

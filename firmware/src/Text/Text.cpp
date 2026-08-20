@@ -300,7 +300,6 @@ void Text::stringShiftTask()
         } else { /* otherwise task has finished */
             if(State == STATE_TEXT_SHIFT) State = STATE_IDLE;
             wcTransformation.shiftLeft();
-            //wcTransformation.shiftLeftFast();
         }
     } else {
         /* go on shifting char */
@@ -324,7 +323,6 @@ void Text::charShiftTask()
             byte Column = DISPLAY_NUMBER_OF_COLUMNS - Shift.CharWidth + Shift.Counter;
             byte Row = getRowCenter(Shift.Font);
             setChar(Column, Row, Shift.Char, Shift.Font);
-            //setCharFast(Column, Row, Shift.Char, Shift.Font);
         }
     }
 } /* charShiftTask */
@@ -479,7 +477,7 @@ void Text::setCharColumnFast(ColumnType CharColumn, byte ColumnAbs, byte Row, by
  *  \details        this function converts the ASCII char to sprite index
  *
  *  \param[in]      Char            char to convert to sprite
- *  \param[out]     SpriteIndex     appropriate sprite
+ *  \param[out]     Index           appropriate sprite
  *  \return         E_OK
  *                  E_NOT_OK
  *****************************************************************************************************************************************************/

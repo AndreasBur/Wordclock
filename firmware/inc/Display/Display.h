@@ -49,9 +49,6 @@
 # define DISPLAY_USE_PIXELS_DIMMING                 STD_ON
 #endif
 
-//# if (PIXELS_IS_SINGLETON == STD_ON)
-//#  define Pixels                              Pixels::getInstance()
-//# endif
 
 # if (DISPLAY_USE_PIXELS_DIMMING == STD_ON) && (PIXELS_SUPPORT_DIMMING == STD_OFF)
 #  error "Display: Please activate Pixels dimming support"

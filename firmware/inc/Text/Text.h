@@ -63,7 +63,6 @@ class Text
   public:
     enum StateType {
         STATE_IDLE,
-        //STATE_PAUSE,
         STATE_TEXT_SHIFT,
         STATE_CHAR_SHIFT
     };

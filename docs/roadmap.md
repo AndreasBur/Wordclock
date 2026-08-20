@@ -106,8 +106,9 @@ overlays are stored, the text included, at format version 3. What it settled:
   `Overlays::OverlayIdType` is conditional and would have been the obvious index, which is
   why it is not the one used — a layout that moved with `OVERLAYS_SUPPORT_*` would let two
   builds write mutually unreadable blobs under the same version number.
-- **`STORAGE_CAPACITY` went to 256** on both platforms. The blob is 110 bytes, so the old
-  128 would still have held it, but only just.
+- **`STORAGE_CAPACITY` went to 256** on both platforms. The blob was 110 bytes then and is
+  118 with the night switch and the colour cycle in it, so the old 128 would still have held
+  it - but only just, which is the whole reason for the headroom.
 - **A reset now has overlays to undo**, so `Overlays::resetToDefaults()` joins the four
   modules `Persistence::reset()` already asks. The defaults are named constants rather
   than literals written twice, so the member initialisers and the reset cannot drift.
