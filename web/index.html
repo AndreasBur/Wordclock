@@ -70,8 +70,13 @@
         --field: #ffffff;
         --text: #1e1e22;
         /* The surfaces' amber taken down until it holds on white - the same hue, so the page
-           and the instrument are not two different oranges. */
-        --lit: #b06a00;
+           and the instrument are not two different oranges. Down once more, from #b06a00 to
+           4.67:1: the wordmark and the connection state are drawn in it at 13 and 14 px,
+           which is normal-size text and needs 4.5. The hue is the one the panel shows, still,
+           because it was taken down in lightness alone. Inside a card this token is
+           redefined to the panel's full #ffb020, which on that dark field is 8:1 and needs
+           no help. */
+        --lit: #995c00;
         --unlit: #5f5f66;
         --line: #d9d9df;
         /* A console is read line by line, so it is capped rather than stretched: on a wide
@@ -95,7 +100,10 @@
             --text: #d8d8de;
             /* The panel's amber, which is what the clock itself shows. */
             --lit: #ffb020;
-            --unlit: #6a6a72;
+            /* 4.7:1 on --field, which is where this one is actually read: the theme button
+               in the header. At #6a6a72 it was 3.33:1, the worst pair on the page that is
+               text. */
+            --unlit: #82828a;
             --line: #26262b;
         }
     }
@@ -118,7 +126,12 @@
     .surface {
         --field: #1b1b22;
         --text: #e6e6ea;
-        --unlit: #7a7a86;
+        /* 4.7:1 on this card's background. It was #7a7a86 and 4.33:1, which is under the
+           4.5 that normal-size text needs - and every one of the sixty-four field labels is
+           drawn in it, so it was the most-read colour on the page and the one furthest from
+           passing. Three values of lightness, same hue and saturation: the difference is
+           invisible beside the reason for it. */
+        --unlit: #80808b;
         --line: #2b2b34;
         --lit: #ffb020;
         background: #14141a;
@@ -379,6 +392,11 @@
            them - the console around it goes on following whatever theme is chosen. */
         --matrix-unlit: #2f2f39;
         --matrix-lit: #f4f4f6;
+        /* These two are exempt from the contrast rules the rest of the page follows, and it
+           is worth saying so where an audit will find them: an unlit letter is 1.4:1 against
+           the panel and has to be. It is not text being displayed, it is an LED that is off,
+           and a word clock whose unlit letters could be read would be a word clock showing
+           the wrong time. The lit ones are 12:1 on the same background. */
         /* Defined here and nowhere else: they used to sit at :root once per theme, which
            stopped meaning anything the moment the clock kept one face in both. */
         /* No height of its own, and deliberately no arithmetic either. Both a fraction of
