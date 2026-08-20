@@ -242,7 +242,7 @@ emits every file in it as an array **into the build directory**, so `pio run -t 
 ships page and firmware together and their versions cannot drift apart - the failure a
 second partition invites. The generated header is a build product on purpose; a checked-in
 one rots the moment someone edits the HTML and forgets to regenerate it. At the moment the
-page is 54 KB of source and 6.7 KB compressed, and the default partition table is
+page is 54 KB of source and 6.6 KB compressed, and the default partition table is
 untouched.
 
 Three of those files are not the console but the **home screen icon**:

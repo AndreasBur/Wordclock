@@ -217,7 +217,7 @@ jobs:
         run: |
           apt-get update
           apt-get install -y --no-install-recommends \
-            ca-certificates git cmake ninja-build gcc-avr avr-libc
+            ca-certificates git cmake ninja-build gcc-avr avr-libc python3
 
       - uses: actions/checkout@v7
 
@@ -244,6 +244,14 @@ jobs:
       # so a change that stops fitting says so here rather than on somebody's bench.
       - name: Build
         run: cmake --build build-avr
+
+      # And the size written in the documentation is compared against the one just built.
+      # Every size in this repository has been wrong at least once, always the same way - the
+      # code grew and the sentence did not - and twice a corrected number was made wrong again
+      # by the next change within a day. This is the only moment that is cheap to fix: the
+      # pull request that moved it. python3 is installed above for this step alone.
+      - name: Check the documented sizes
+        run: python3 tools/documented-sizes.py --elf build-avr/platform/avr-dx/Wordclock.elf
 
       # The .hex is what pymcuprog and avrdude write; the .elf goes with it because it is
       # the only one of the two that still knows the symbols, and a report about a clock in

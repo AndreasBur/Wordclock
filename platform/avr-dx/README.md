@@ -117,9 +117,19 @@ Program:   48664 bytes (37%)
 Data:       1700 bytes (10%)
 ```
 
-`-flto` is on by default and worth 10 KiB of that: the same build without it is
-58 778 bytes. It fits either way here, but that margin is the difference between
-fitting and not on a smaller part.
+That is what the toolchain in the dev container prints, and it is a sample rather than a
+promise: CI's Debian one lands a couple of hundred bytes lower for the same source. So the
+sentence that is *checked* says **37 % of the flash and 10 % of the RAM**, because a byte
+count is a property of the compiler in front of you and not of this repository, where a
+percentage is what both agree on - and is also the question being asked of it, which is how
+close to the ceiling this part is. `tools/documented-sizes.py` enforces the percentages and
+refreshes the sample above without enforcing it.
+
+`-flto` is on by default and worth some 10 KiB of that. Said as a difference rather
+than as a second byte count on purpose: the two absolutes would need two builds to
+stay true, and the one that is not built here is the one that would quietly go stale.
+It fits either way on this part, but that margin is the difference between fitting and
+not on a smaller one.
 
 ## Debugging
 
@@ -129,8 +139,8 @@ cannot show, which is the opposite of what a debugger is for. `-g3` rather than
 `-g` so the configuration macros are visible too: most of the timing here is a
 macro derived from `F_CPU`.
 
-That image is 74 248 bytes, so it still fits with room to spare — 57 % of the
-flash rather than 37 %.
+That image is half again as large and still fits with room to spare — a little over
+half the flash rather than a little over a third of it.
 
 The part debugs over UPDI. On an AVR128DA48 Curiosity Nano the on-board nEDBG is
 the debugger as well as the programmer, which is what `AVR_PROGRAMMER` defaults
