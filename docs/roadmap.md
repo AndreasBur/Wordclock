@@ -449,13 +449,50 @@ From the comparison with wordclock24h, in the order they would change daily use.
    the `Fast` half, on all three backends, and nothing noticed. A pattern in two parts
    whose second part nothing enforces loses its second part.
 
-   Two things to settle, in this order. **Measure first**: build the AVR image once with
-   the checked forms used throughout and read the flash difference. If it is small, the
-   pair is an upkeep cost with no return and the answer is to drop one half rather than to
-   guard it. **If it is not small**, make forgetting impossible — a platform-contract
-   test that instantiates both forms of every accessor turns a missing half into a compile
-   error, and costs nothing at runtime, which suits a project that already guards its
-   option counts with `static_assert`.
+   **Measured, and the justification does not survive it.** The bounds check was put inside
+   the platform seam's `Fast` forms, so that every one of the three hundred call sites pays for
+   it without a single one being rewritten, and the AVR image was built either way:
+
+   | | text |
+   |---|---|
+   | as it is | 48 210 |
+   | with the seam checking every access | **48 114** |
+
+   The checked build is **96 bytes smaller**, and the reason is worth more than the number.
+   Per symbol, `Pixels::setPixelFast` grew by 66 bytes and then stopped being inlined, which
+   took 48 bytes off `Display::setPixel`, 46 off `Display::setPixelFast`, 42 off
+   `AnimationMatrix::setTimeTask` and 48 off the RPC dispatcher. So what the difference
+   measures is an inlining threshold, not the cost of a comparison — and a flash argument that
+   turns on the inliner's mood is not an argument.
+
+   **Two things the measurement turned up that the item did not anticipate.**
+
+   The pair is invisible to the linker almost everywhere. Of 45 declared pairs, **35 appear in
+   the image as neither half** - fully inlined or dropped - and only three (`getPixel`,
+   `setPixel`, `writePixel`) exist as both. So for most of the pattern there is no runtime
+   object to be cheap or expensive about; it is upkeep and nothing else, which is exactly what
+   this item suspected.
+
+   And in the core, `Fast` does not mean unchecked. `Display::setPixel(Column, Row)` validates
+   nothing itself: it computes an index and hands it to `Pixels::setPixel`, which is where the
+   only check in the chain lives. The two halves in `Display` differ in whether the caller is
+   *told*, not in whether anything is verified — so half the pattern is not a safety mechanism
+   at all.
+
+   **The time argument, which no host can measure, comes out negligible by arithmetic.** The
+   frame path is 110 accesses, and `render()` returns early unless the buffer is dirty, so the
+   worst case is a display changing on every 10 ms tick: 11 000 checks a second. At a generous
+   four cycles each that is 44 000 of 24 000 000, **0.18 % of the part**, and a clock showing a
+   settled face pays none of it.
+
+   So by this item's own rule the answer is to drop one half rather than to guard it - with one
+   wrinkle worth deciding before anyone starts. The halves are not symmetrical for *getters*:
+   `getPixelFast(Index)` answers the value, `getPixel(Index, Pixel)` answers a code through an
+   out-parameter, and dropping the first would make every reader of a pixel worse to read. The
+   honest options are therefore to drop the `Fast` half for setters only, or to move the check
+   into the single implementation and let `Fast` mean "answers the value" rather than "trusts
+   you" - which is what the measurement build already does, and which would want the whole
+   pattern renamed.
 
 10. **Feed the ESP32's RMT channel by DMA.** Today the frame is refilled from the driver's
     interrupt, so the strip's timing depends on that interrupt being served: a block holds
