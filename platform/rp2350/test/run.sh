@@ -54,12 +54,13 @@ INCLUDES+=(-DWORDCLOCK_CORE_ARDUINO_H="\"$TEST_DIR/stubs/Arduino.h\"")
 
 FLAGS=(-std=gnu++17 -Wall -Wextra -Werror)
 
-# WebInterface serves a header the build generates from the page. Produced by the same
-# script PlatformIO calls, so the tests compile against what the device would carry. Into
-# the cache rather than into the temporary directory: the include path is part of what an
-# object was compiled with, and one that changed every run would invalidate the cache
-# every run. A changed page is noticed through the dependency file instead.
-python3 "$PLATFORM_DIR/scripts/embed_web.py" "$ROOT/web/index.html" "$CACHE"
+# WebInterface serves a header the build generates from web/ - the page, the manifest and
+# the two home screen icons. Produced by the same script PlatformIO calls, so the tests
+# compile against what the device would carry. Into the cache rather than into the temporary
+# directory: the include path is part of what an object was compiled with, and one that
+# changed every run would invalidate the cache every run. A changed page is noticed through
+# the dependency file instead.
+python3 "$PLATFORM_DIR/scripts/embed_web.py" "$ROOT/web" "$CACHE"
 INCLUDES+=(-I"$CACHE")
 
 # What the objects were compiled with. Anything else means they cannot be reused, and the

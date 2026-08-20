@@ -92,6 +92,49 @@ esp_err_t handleRoot(httpd_req_t* Request)
 
 
 /******************************************************************************************************************************************************
+  handleManifest()
+******************************************************************************************************************************************************/
+/*! \brief          Serves the web app manifest, which is what makes the console installable
+ *  \details        Nothing on the clock reads it - a browser does, to put the console on a
+ *                  home screen with an icon and start it without an address bar. Sent as it
+ *                  is, unlike the page: it is 485 bytes, and compressing it would save
+ *                  fewer than 250 of them for a header on the wire and an inflate in
+ *                  anything that wants to read it - curl and this backend's own test
+ *                  included.
+******************************************************************************************************************************************************/
+esp_err_t handleManifest(httpd_req_t* Request)
+{
+    httpd_resp_set_type(Request, "application/manifest+json");
+
+    return httpd_resp_send(Request, reinterpret_cast<const char*>(WebManifest), WebManifestSize);
+}
+
+
+/******************************************************************************************************************************************************
+  handleIcon192() / handleIcon512()
+******************************************************************************************************************************************************/
+/*! \brief          Serves the home screen icons
+ *  \details        Two sizes because that is what a manifest is asked for: the small one is
+ *                  the icon itself and what iOS takes, the large one is what Android draws
+ *                  the splash screen from. Sent as they are - a PNG is already deflated, so
+ *                  gzipping one would add a header and save nothing.
+******************************************************************************************************************************************************/
+esp_err_t handleIcon192(httpd_req_t* Request)
+{
+    httpd_resp_set_type(Request, "image/png");
+
+    return httpd_resp_send(Request, reinterpret_cast<const char*>(WebIcon192), WebIcon192Size);
+}
+
+esp_err_t handleIcon512(httpd_req_t* Request)
+{
+    httpd_resp_set_type(Request, "image/png");
+
+    return httpd_resp_send(Request, reinterpret_cast<const char*>(WebIcon512), WebIcon512Size);
+}
+
+
+/******************************************************************************************************************************************************
   C H U N K   W R I T E R
 ******************************************************************************************************************************************************/
 /* Collects the catalog's JSON in a small buffer and hands it over in chunks, so neither the
@@ -346,6 +389,12 @@ StdReturnType WebInterface::begin()
     /* The sockets the server keeps have to cover the console clients plus the ones fetching
        the page, or a reload can push a console off. */
     Config.max_open_sockets = WEB_INTERFACE_MAX_CLIENTS + 2u;
+    /* Said rather than left to the default, which is 8 and was two spare until the manifest
+       and the icons took the count to seven. A route past the limit is refused by the
+       registration below and nothing here reads that answer, so the failure would be one
+       route quietly missing - and the test that counts them is what would find it, on a
+       host, rather than a browser on somebody's wall. */
+    Config.max_uri_handlers = 7u;
     Config.close_fn = onSocketClosed;
     /* Its own task, so nothing here runs inside the firmware's tick. */
     Config.core_id = 0;
@@ -359,11 +408,17 @@ StdReturnType WebInterface::begin()
     static const httpd_uri_t RootUri{"/", HTTP_GET, handleRoot, nullptr, false, false, nullptr};
     static const httpd_uri_t CommandsUri{"/commands", HTTP_GET, handleCommands, nullptr, false, false, nullptr};
     static const httpd_uri_t DisplayUri{"/display", HTTP_GET, handleDisplay, nullptr, false, false, nullptr};
+    static const httpd_uri_t ManifestUri{"/manifest.webmanifest", HTTP_GET, handleManifest, nullptr, false, false, nullptr};
+    static const httpd_uri_t Icon192Uri{"/icon-192.png", HTTP_GET, handleIcon192, nullptr, false, false, nullptr};
+    static const httpd_uri_t Icon512Uri{"/icon-512.png", HTTP_GET, handleIcon512, nullptr, false, false, nullptr};
     static const httpd_uri_t SocketUri{"/ws", HTTP_GET, handleSocket, nullptr, true, false, nullptr};
 
     httpd_register_uri_handler(HttpServer, &RootUri);
     httpd_register_uri_handler(HttpServer, &CommandsUri);
     httpd_register_uri_handler(HttpServer, &DisplayUri);
+    httpd_register_uri_handler(HttpServer, &ManifestUri);
+    httpd_register_uri_handler(HttpServer, &Icon192Uri);
+    httpd_register_uri_handler(HttpServer, &Icon512Uri);
     httpd_register_uri_handler(HttpServer, &SocketUri);
 
     /* Only now, so a line printed during startup cannot reach a half-built server. */

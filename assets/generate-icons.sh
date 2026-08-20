@@ -8,13 +8,15 @@
 # and all three keep the same lit words - "ES IST HALB ZWOELF", taken from the real
 # word table - so the silhouette stays recognisable across every size:
 #
-#   wordclock-icon.svg        128, 256   the grid with its letters
-#   wordclock-icon-dots.svg    48,  64   the same grid, letterforms dropped
-#   wordclock-icon-small.svg   16,  32   only the lit words, as bars
+#   wordclock-icon.svg        128, 192, 256, 512   the grid with its letters
+#   wordclock-icon-dots.svg    48,  64              the same grid, letterforms dropped
+#   wordclock-icon-small.svg   16,  32              only the lit words, as bars
 #
-# Rasterising needs ImageMagick, and the letter master needs DejaVu Sans Bold - both
-# are in the dev container. Everything this writes is checked in, so the script only
-# has to run when the design changes.
+# Rasterising needs ImageMagick *and* librsvg2-bin, which is the part that is easy to
+# miss: ImageMagick does not draw SVG itself, it hands the file to rsvg-convert. The
+# letter master also needs DejaVu Sans Bold. All three are in the dev container.
+# Everything this writes is checked in, so the script only has to run when the design
+# changes.
 #
 # Usage: assets/generate-icons.sh
 
@@ -25,6 +27,7 @@ ROOT="$(cd "$ASSETS/.." && pwd)"
 
 SIMULATOR="$ROOT/platform/simulator"
 DOCS="$ROOT/docs/images"
+WEB="$ROOT/web"
 
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
@@ -61,7 +64,22 @@ fi
 mkdir -p "$DOCS"
 cp "$WORK/256.png" "$DOCS/logo.png"
 
+# The home screen icon, in the two sizes a browser asks a web app manifest for. These are
+# the only outputs that end up in the firmware's flash, which is why they are the only ones
+# written with a palette: at 512 the picture is two colours and some smoothed edges, and
+# 32-bit RGBA spends 65 kB of a clock's flash on that where 16 colours spend 11 kB. Both
+# come from the letter master - a home screen icon is never small enough to need the others.
+pwa_icon() {    # size outfile
+    magick "$ASSETS/wordclock-icon.svg" -background none -resize "${1}x${1}" \
+        -colors 16 -strip -define png:compression-level=9 "PNG8:$WEB/$2"
+}
+
+pwa_icon 192 icon-192.png
+pwa_icon 512 icon-512.png
+
 echo "wrote:"
 echo "  $SIMULATOR/Wordclock.ico"
 echo "  $SIMULATOR/WordclockIcon.xpm"
 echo "  $DOCS/logo.png"
+echo "  $WEB/icon-192.png"
+echo "  $WEB/icon-512.png"

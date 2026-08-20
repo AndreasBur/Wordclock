@@ -22,6 +22,10 @@ FROM ${BASE_IMAGE}
 # imagemagick, xdotool and x11-utils are not needed to build or run the simulator.
 # They let an agent screenshot the running window to check a layout change instead of
 # having to ask; see "Screenshotting the simulator" in CLAUDE.md.
+# librsvg2-bin is what assets/generate-icons.sh actually rasterises with. ImageMagick does
+# not draw SVG itself - it hands the file to rsvg-convert, which is a separate package that
+# librsvg2-2 does not bring - so without this the script fails with "delegate failed" and a
+# missing temporary file, which reads like a broken script rather than a missing program.
 # clang-tidy comes with clangd because the checks it runs are the ones CI blocks a pull
 # request on; running them here is what keeps that from being a surprise. run-clang-tidy,
 # which walks the compile database in parallel, is part of the same package.
@@ -45,6 +49,7 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && \
         ninja-build \
         libwxgtk3.2-dev \
         imagemagick \
+        librsvg2-bin \
         xdotool \
         x11-utils && \
     apt-get clean && rm -rf /var/lib/apt/lists/*

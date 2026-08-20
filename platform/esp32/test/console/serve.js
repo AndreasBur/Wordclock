@@ -13,6 +13,7 @@
 const http = require('http');
 const crypto = require('crypto');
 const fs = require('fs');
+const path = require('path');
 const { spawn } = require('child_process');
 
 const [pagePath, hostPath, portArg] = process.argv.slice(2);
@@ -142,6 +143,18 @@ function sendFrame(socket, data) {
 }
 
 /* ---- HTTP -------------------------------------------------------------------------- */
+/* The page's siblings, served from beside it. They are what an install reads rather than
+   what the console needs, so leaving them out would still give a working page - and a
+   manifest that 404s reads as a manifest that is wrong, which is the more expensive
+   failure. Worth having here for a second reason: this server answers on localhost, which
+   is a secure context, so it is the one place the install can be tried at all - the clock
+   itself is reached over plain http and Chromium will not offer it there. */
+const SIBLINGS = {
+    '/manifest.webmanifest': 'application/manifest+json',
+    '/icon-192.png': 'image/png',
+    '/icon-512.png': 'image/png',
+};
+
 const server = http.createServer(async (request, response) => {
     if (request.url === '/' || request.url === '/index.html') {
         /* Read per request, so a saved edit needs a reload and nothing else. */
@@ -154,6 +167,15 @@ const server = http.createServer(async (request, response) => {
             'Cache-Control': 'no-store',
         });
         response.end(fs.readFileSync(pagePath));
+        return;
+    }
+    if (SIBLINGS[request.url]) {
+        /* Per request and uncached, for the reason the page above gives. */
+        response.writeHead(200, {
+            'Content-Type': SIBLINGS[request.url],
+            'Cache-Control': 'no-store',
+        });
+        response.end(fs.readFileSync(path.join(path.dirname(pagePath), request.url)));
         return;
     }
     if (request.url === '/commands' || request.url === '/display') {

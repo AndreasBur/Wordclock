@@ -14,6 +14,37 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Wordclock</title>
 
+<!--
+  What turns this page into something with an icon on a home screen, opened without an
+  address bar. There is no service worker and there is nothing to add: one would need a
+  secure context, and the clock is reached over plain http on a house's own network. That
+  is also what bounds this - Chromium installs only from https or localhost, so what the
+  manifest buys today is iOS, where Add to Home Screen is not gated on the scheme. On
+  everything else it is what makes the page installable the day it is reached over https.
+
+  The manifest itself carries no comments, JSON having none, so its choices are here.
+  start_url and scope are relative, because the clock answers on whatever address or
+  .local name it was given and an absolute one would name the wrong clock. display is
+  standalone rather than fullscreen: the console is a page of fields, and a status bar
+  showing the time is the last thing to hide on a clock.
+
+  theme-color is here rather than only in the manifest because it is the one that can
+  follow the scheme. The manifest carries a single value, and these two override it per
+  scheme, so the toolbar matches the panel the page actually drew instead of the other one.
+
+  mobile-web-app-capable twice, which is one of the few places worth repeating oneself:
+  the apple- form is what iOS has read for fifteen years and still reads, the unprefixed
+  one is what replaced it and what Chromium warns about the absence of.
+-->
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#eeeef1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#08080b" media="(prefers-color-scheme: dark)">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Wordclock">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" href="icon-192.png" type="image/png">
+
 <style>
     /* Light is the base, dark the alternative. The clock's own look is amber on a
        near-black panel, but the console is usually read next to other light windows - and a

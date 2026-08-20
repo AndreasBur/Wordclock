@@ -11,8 +11,11 @@ typedef esp_err_t (*httpd_handler_t)(httpd_req_t*);
 typedef void (*httpd_close_func_t)(httpd_handle_t, int);
 typedef struct { const char* uri; httpd_method_t method; httpd_handler_t handler; void* user_ctx;
                  bool is_websocket; bool handle_ws_control_frames; const char* supported_subprotocol; } httpd_uri_t;
-typedef struct { uint16_t server_port; uint16_t max_open_sockets; httpd_close_func_t close_fn; int core_id; } httpd_config_t;
-#define HTTPD_DEFAULT_CONFIG() httpd_config_t{80, 7, nullptr, 0}
+typedef struct { uint16_t server_port; uint16_t max_open_sockets; uint16_t max_uri_handlers;
+                 httpd_close_func_t close_fn; int core_id; } httpd_config_t;
+/* The 8 is the framework's own default for max_uri_handlers, kept here because it is the
+   number the backend raises the count against. */
+#define HTTPD_DEFAULT_CONFIG() httpd_config_t{80, 7, 8, nullptr, 0}
 typedef enum { HTTPD_WS_TYPE_CONTINUE=0, HTTPD_WS_TYPE_TEXT=1, HTTPD_WS_TYPE_BINARY=2, HTTPD_WS_TYPE_CLOSE=8 } httpd_ws_type_t;
 typedef struct { bool final; bool fragmented; httpd_ws_type_t type; uint8_t* payload; size_t len; } httpd_ws_frame_t;
 esp_err_t httpd_start(httpd_handle_t*, const httpd_config_t*);

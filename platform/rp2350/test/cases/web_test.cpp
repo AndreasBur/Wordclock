@@ -85,6 +85,10 @@ int main()
           && (webStubState().Routes.count("/commands") == 1u)
           && (webStubState().Routes.count("/display") == 1u),
           "all four handlers were registered");
+    check((webStubState().Routes.count("/manifest.webmanifest") == 1u)
+          && (webStubState().Routes.count("/icon-192.png") == 1u)
+          && (webStubState().Routes.count("/icon-512.png") == 1u),
+          "and the three the home screen needs with them");
 
     /* the page: gzipped, and announced as such */
     std::string Encoding;
@@ -93,6 +97,24 @@ int main()
     check((Page.size() > 100u) && (static_cast<unsigned char>(Page[0]) == 0x1fu)
                                && (static_cast<unsigned char>(Page[1]) == 0x8bu),
           "the page really is a gzip stream");
+
+    /* the manifest and the icons, which nothing on the clock reads and a browser does */
+    const std::string Manifest = fetch("/manifest.webmanifest", &Encoding);
+    check(Encoding.empty(), "the manifest is sent as it is, not gzipped");
+    check(isBalancedJson(Manifest), "and is well formed JSON");
+    check(Manifest.find("standalone") != std::string::npos, "it asks to start without an address bar");
+    check(Manifest.find("icon-192.png") != std::string::npos
+          && Manifest.find("icon-512.png") != std::string::npos, "it names both icons");
+    /* Relative, because the clock answers on whatever address it was given: an absolute
+       start_url baked in here would send an installed console to a different clock. */
+    check(Manifest.find("\"start_url\": \".\"") != std::string::npos, "and starts at a relative URL");
+
+    const std::string SmallIcon = fetch("/icon-192.png", &Encoding);
+    check(Encoding.empty(), "an icon is not gzipped either, a PNG being deflated already");
+    check(SmallIcon.size() > 500u && SmallIcon.compare(1u, 3u, "PNG") == 0, "and really is a PNG");
+    const std::string LargeIcon = fetch("/icon-512.png");
+    check(LargeIcon.size() > SmallIcon.size() && LargeIcon.compare(1u, 3u, "PNG") == 0,
+          "the large icon is a PNG too, and the larger of the two");
 
     /* the catalog, generated from the real table */
     const std::string Catalog = fetch("/commands");

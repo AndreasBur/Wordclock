@@ -96,6 +96,43 @@ void handleRoot(AsyncWebServerRequest* Request)
 
 
 /******************************************************************************************************************************************************
+  handleManifest()
+******************************************************************************************************************************************************/
+/*! \brief          Serves the web app manifest, which is what makes the console installable
+ *  \details        Nothing on the clock reads it - a browser does, to put the console on a
+ *                  home screen with an icon and start it without an address bar. Sent as it
+ *                  is, unlike the page: it is 485 bytes, and compressing it would save
+ *                  fewer than 250 of them for a header on the wire and an inflate in
+ *                  anything that wants to read it - curl and this backend's own test
+ *                  included.
+******************************************************************************************************************************************************/
+void handleManifest(AsyncWebServerRequest* Request)
+{
+    Request->send(Request->beginResponse(200, "application/manifest+json", WebManifest, WebManifestSize));
+}
+
+
+/******************************************************************************************************************************************************
+  handleIcon192() / handleIcon512()
+******************************************************************************************************************************************************/
+/*! \brief          Serves the home screen icons
+ *  \details        Two sizes because that is what a manifest is asked for: the small one is
+ *                  the icon itself and what iOS takes, the large one is what Android draws
+ *                  the splash screen from. Sent as they are - a PNG is already deflated, so
+ *                  gzipping one would add a header and save nothing.
+******************************************************************************************************************************************************/
+void handleIcon192(AsyncWebServerRequest* Request)
+{
+    Request->send(Request->beginResponse(200, "image/png", WebIcon192, WebIcon192Size));
+}
+
+void handleIcon512(AsyncWebServerRequest* Request)
+{
+    Request->send(Request->beginResponse(200, "image/png", WebIcon512, WebIcon512Size));
+}
+
+
+/******************************************************************************************************************************************************
   C H U N K   W R I T E R
 ******************************************************************************************************************************************************/
 /* Writes the catalog's JSON into the response stream the server hands out. The ESP32
@@ -319,6 +356,9 @@ StdReturnType WebInterface::begin()
     HttpServer.on("/", HTTP_GET, handleRoot);
     HttpServer.on("/commands", HTTP_GET, handleCommands);
     HttpServer.on("/display", HTTP_GET, handleDisplay);
+    HttpServer.on("/manifest.webmanifest", HTTP_GET, handleManifest);
+    HttpServer.on("/icon-192.png", HTTP_GET, handleIcon192);
+    HttpServer.on("/icon-512.png", HTTP_GET, handleIcon512);
 
     /* No failure to report: this library's begin() returns nothing and starts listening on
        whatever address arrives later. Where the ESP32 backend can find its server refusing

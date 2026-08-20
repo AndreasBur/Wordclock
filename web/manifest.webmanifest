@@ -1,0 +1,15 @@
+{
+    "name": "Wordclock",
+    "short_name": "Wordclock",
+    "description": "The clock's own console: the serial command set over a web socket",
+    "start_url": ".",
+    "scope": ".",
+    "display": "standalone",
+    "orientation": "portrait",
+    "background_color": "#eeeef1",
+    "theme_color": "#eeeef1",
+    "icons": [
+        { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+        { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
+    ]
+}

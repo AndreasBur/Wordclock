@@ -351,16 +351,35 @@ From the comparison with wordclock24h, in the order they would change daily use.
    drifts a few seconds a month and SNTP does not.
 5. **Colour animations.** All fifteen animations are transitions; a slow colour cycle
    while the display stands still is a different mechanism and does not exist.
-6. **Make the console installable.** It is already the phone app in every way that
-   matters: served by the clock itself, `width=device-width` since it was written, and
-   sized to a narrow screen since the panel learned to fit. What it lacks against a
-   native one is an icon on the home screen and a start without an address bar, and a
-   web app manifest is both - some twenty lines of JSON and an icon that
-   [assets/](../assets/) already holds.
+6. ~~**Make the console installable.**~~ **Done**, with one limit that was not visible when
+   this was written and is the more interesting half of the answer.
+   [manifest.webmanifest](../web/manifest.webmanifest) is served beside the page, with the
+   two home screen icons [generate-icons.sh](../assets/generate-icons.sh) now rasterises
+   from the letter master. 14.4 kB of flash on both network backends, almost all of it the
+   512-pixel icon.
 
-   A native app would cost two platforms, two stores, signing and an update whenever
+   A native app would still cost two platforms, two stores, signing and an update whenever
    either OS moves, and would end up sending the same commands over the same web socket.
-   For something configured three times a year that is the wrong trade.
+   For something configured three times a year that remains the wrong trade.
+
+   **The limit: Chromium installs only from `https` or `localhost`**, and the clock is
+   reached over plain `http` on a house's own network. So on Android and on the desktop the
+   manifest buys nothing today - "Add to Home screen" there makes a shortcut that still
+   opens in a browser with its address bar. Where it does work is iOS, whose Add to Home
+   Screen is not gated on the scheme, and the local development server, which answers on
+   `localhost` and is therefore the one place the install can be tried at all. The rest is
+   waiting on `https`, not on the page.
+
+   That also settles what *not* to add: there is no service worker and there is no point in
+   one, since it needs the same secure context. Offline is not what this page wants anyway -
+   a console whose clock is unreachable has nothing to show.
+
+   Two smaller things it settled. The manifest is served **uncompressed** while the page is
+   gzipped: it is 485 bytes, and the 228 that compressing saves buys a header on the wire
+   and an inflate in everything that wants to read it, `curl` and the backends' own tests
+   included. And the icons are **16-colour palette PNGs** - the picture is two colours and
+   some smoothed edges, and at 512 pixels the difference between a palette and 32-bit RGBA
+   is 11 kB against 65 kB of a clock's flash.
 7. **Ambilight**, a second stripe with its own colour and timer.
 8. ~~**The degree sign in the font tables**~~ **Done**, see section 2.
 9. **Is the checked/`Fast` accessor pair worth what it costs?** Every platform accessor

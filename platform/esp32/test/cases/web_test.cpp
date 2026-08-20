@@ -18,6 +18,10 @@ static httpd_handler_t SocketHandler = nullptr;
 static httpd_handler_t RootHandler = nullptr;
 static httpd_handler_t CommandsHandler = nullptr;
 static httpd_handler_t DisplayHandler = nullptr;
+static httpd_handler_t ManifestHandler = nullptr;
+static httpd_handler_t Icon192Handler = nullptr;
+static httpd_handler_t Icon512Handler = nullptr;
+static std::string SentType;
 static std::string PendingFrame;
 static std::vector<std::string> Sent;
 static std::string RootBody;
@@ -31,11 +35,14 @@ esp_err_t httpd_register_uri_handler(httpd_handle_t, const httpd_uri_t* u)
     if(strcmp(u->uri, "/ws") == 0)            { SocketHandler = u->handler; }
     else if(strcmp(u->uri, "/commands") == 0) { CommandsHandler = u->handler; }
     else if(strcmp(u->uri, "/display") == 0)  { DisplayHandler = u->handler; }
+    else if(strcmp(u->uri, "/manifest.webmanifest") == 0) { ManifestHandler = u->handler; }
+    else if(strcmp(u->uri, "/icon-192.png") == 0) { Icon192Handler = u->handler; }
+    else if(strcmp(u->uri, "/icon-512.png") == 0) { Icon512Handler = u->handler; }
     else                                      { RootHandler = u->handler; }
     return ESP_OK;
 }
 
-esp_err_t httpd_resp_set_type(httpd_req_t*, const char*) { return ESP_OK; }
+esp_err_t httpd_resp_set_type(httpd_req_t*, const char* t) { SentType = t; return ESP_OK; }
 
 esp_err_t httpd_resp_set_hdr(httpd_req_t*, const char* k, const char* v)
 {
@@ -115,6 +122,10 @@ int main()
     check(WebInterface::getInstance().begin() == E_OK, "the server starts and registers its handlers");
     check((SocketHandler != nullptr) && (RootHandler != nullptr) && (CommandsHandler != nullptr)
           && (DisplayHandler != nullptr), "all four handlers were registered");
+    /* Separately, because the server's own handler limit is what would drop these: it is a
+       number in the configuration, and one route past it is refused rather than reported. */
+    check((ManifestHandler != nullptr) && (Icon192Handler != nullptr) && (Icon512Handler != nullptr),
+          "and the three the home screen needs fit under the handler limit as well");
 
     httpd_req_t request{};
     request.method = HTTP_GET;
@@ -125,6 +136,32 @@ int main()
     check((RootBody.size() > 100u) && (static_cast<unsigned char>(RootBody[0]) == 0x1fu)
                                    && (static_cast<unsigned char>(RootBody[1]) == 0x8bu),
           "the page really is a gzip stream");
+
+    /* the manifest: a browser reads it, so the type is part of the answer and not decoration */
+    RootEncoding.clear();
+    ManifestHandler(&request);
+    check(SentType == "application/manifest+json", "the manifest is announced as a manifest");
+    check(RootEncoding.empty(), "and sent as it is, not gzipped");
+    const std::string Manifest = RootBody;
+    check(isBalancedJson(Manifest), "the manifest is well formed JSON");
+    check(Manifest.find("\"display\"") != std::string::npos
+          && Manifest.find("standalone") != std::string::npos, "it asks to start without an address bar");
+    check(Manifest.find("icon-192.png") != std::string::npos
+          && Manifest.find("icon-512.png") != std::string::npos, "it names both icons");
+    /* Relative, because the clock answers on whatever address it was given: an absolute
+       start_url baked in here would send an installed console to a different clock. */
+    check(Manifest.find("\"start_url\": \".\"") != std::string::npos, "and starts at a relative URL");
+
+    /* the icons: sent as they are, which is what a PNG wants */
+    RootEncoding.clear();
+    Icon192Handler(&request);
+    check(SentType == "image/png", "the small icon is announced as a PNG");
+    check(RootEncoding.empty(), "and not as gzip, a PNG being deflated already");
+    check(RootBody.size() > 500u && RootBody.compare(1u, 3u, "PNG") == 0, "and really is one");
+
+    Icon512Handler(&request);
+    check(RootBody.size() > 5000u && RootBody.compare(1u, 3u, "PNG") == 0,
+          "the large icon is a PNG too, and the larger of the two");
 
     /* the catalog, generated from the real table */
     CommandsHandler(&request);
