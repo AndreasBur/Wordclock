@@ -73,17 +73,12 @@ class ErrorMessage
         API_CLOCK_SHOW,
         API_ANIMATION_SET_ANIMATION,
         API_ANIMATION_SET_CLOCK_TASK_CYCLE,
-        //API_CLOCK_SET_MODE,
-        //API_OVERLAY_SET_PERIOD,
-        //API_OVERLAY_SET_ENDURANCE
     };
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    //static constexpr char ErrorOptionCharDelimiter{':'};
-
     // functions
     void sendSpace() const { Serial.print(' '); }
     void sendColon() const { Serial.print(':'); }
@@ -135,13 +130,6 @@ class ErrorMessage
         if(ReturnValue == E_OK) { send(ERROR_NO_ERROR, AppendSpace); }
         else { send(ERROR_UNKNOWN, AppendSpace); }
     }
-
-//    void send(ApiType Api, StdReturnType ReturnValue, bool AppendSpace = true) const
-//    {
-//        Serial.print(':');
-//        send(ReturnValue);
-//        if(AppendSpace) { sendSpace(); }
-//    }
 
     void checkReturnValueAndSend(ApiType Api, StdReturnType ReturnValue, ErrorType Error, bool AppendSpace = true) const
     {

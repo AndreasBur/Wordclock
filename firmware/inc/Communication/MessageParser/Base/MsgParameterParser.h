@@ -34,7 +34,7 @@
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
-/* MsgParser configuration parameter */
+/* MsgParameterParser configuration parameter */
 #define MSG_PARAMETER_PARSER_ARGUMENT_TYPE_CHAR                     STD_OFF
 #define MSG_PARAMETER_PARSER_ARGUMENT_TYPE_UINT8                    STD_ON
 #define MSG_PARAMETER_PARSER_ARGUMENT_TYPE_UINT16                   STD_ON
