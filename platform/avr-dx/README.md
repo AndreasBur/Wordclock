@@ -117,6 +117,14 @@ Program:   48664 bytes (37%)
 Data:       1700 bytes (10%)
 ```
 
+That is what the toolchain in the dev container prints, and it is a sample rather than a
+promise: CI's Debian one lands a couple of hundred bytes lower for the same source. So the
+sentence that is *checked* says **37 % of the flash and 10 % of the RAM**, because a byte
+count is a property of the compiler in front of you and not of this repository, where a
+percentage is what both agree on - and is also the question being asked of it, which is how
+close to the ceiling this part is. `tools/documented-sizes.py` enforces the percentages and
+refreshes the sample above without enforcing it.
+
 `-flto` is on by default and worth some 10 KiB of that. Said as a difference rather
 than as a second byte count on purpose: the two absolutes would need two builds to
 stay true, and the one that is not built here is the one that would quietly go stale.
