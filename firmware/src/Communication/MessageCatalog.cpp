@@ -329,6 +329,16 @@ constexpr MessageCatalog::OptionType NightSwitchOptions[] {
     {'B', "Night brightness",   ARGUMENT_TYPE_UINT8,  0u, BYTE_MAX}
 };
 
+/* MsgCmdColorCycleParser. The hue is read-only: it is where the wheel has got to, which is
+   worth seeing and not worth setting - command 2 is how a colour is chosen. Speed is the same
+   kind of number as the animation speed above, scheduler ticks per step, and zero there is a
+   cycle standing still rather than a value to refuse. */
+constexpr MessageCatalog::OptionType ColorCycleOptions[] {
+    {'A', "Active",             ARGUMENT_TYPE_UINT8,  NAMED(0u, BooleanValueNames)},
+    {'S', "Speed",              ARGUMENT_TYPE_UINT8,  0u, BYTE_MAX},
+    {'H', "Hue",                ARGUMENT_TYPE_UINT8,  READ_ONLY}
+};
+
 /* MsgCmdNetworkParser. The pass phrase is an input and never an answer, so it carries no
    range and is never read back - see the parser for why. */
 constexpr MessageCatalog::OptionType NetworkOptions[] {
@@ -389,7 +399,8 @@ constexpr MessageCatalog::CommandType Commands[] {
     {MsgCmdParser::COMMAND_DATE,                  "Date",                  DateOptions,                NUMBER_OF(DateOptions)},
     {MsgCmdParser::COMMAND_STATUS,                "Status",                StatusOptions,              NUMBER_OF(StatusOptions)},
     {MsgCmdParser::COMMAND_NETWORK,               "Network",               NetworkOptions,             NUMBER_OF(NetworkOptions)},
-    {MsgCmdParser::COMMAND_NIGHT_SWITCH,          "Night switch",          NightSwitchOptions,         NUMBER_OF(NightSwitchOptions)}
+    {MsgCmdParser::COMMAND_NIGHT_SWITCH,          "Night switch",          NightSwitchOptions,         NUMBER_OF(NightSwitchOptions)},
+    {MsgCmdParser::COMMAND_COLOR_CYCLE,           "Colour cycle",          ColorCycleOptions,          NUMBER_OF(ColorCycleOptions)}
 };
 
 constexpr byte NumberOfCommands{NUMBER_OF(Commands)};

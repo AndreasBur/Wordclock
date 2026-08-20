@@ -28,6 +28,7 @@
 #include "Overlays.h"
 #include "Persistence.h"
 #include "NightSwitch.h"
+#include "ColorCycle.h"
 #include "Power.h"
 #include "Uptime.h"
 #include "Temperature.h"
@@ -108,6 +109,10 @@ void Scheduler::triggerTasks()
     if(isDue(TASK_ID_PERSISTENCE, Persistence::getInstance().getTaskCycle())) { Persistence::getInstance().task(); }
     if(isDue(TASK_ID_UPTIME, Uptime::getInstance().getTaskCycle())) { Uptime::getInstance().task(); }
     if(isDue(TASK_ID_NIGHT_SWITCH, NightSwitch::getInstance().getTaskCycle())) { NightSwitch::getInstance().task(); }
+    /* After the night switch, which is what may have switched the display off this tick: a
+       cycle stepping after that would mark the buffer for a display that is meant to be
+       dark, and the supply switch below waits for a buffer that has settled. */
+    if(isDue(TASK_ID_COLOR_CYCLE, ColorCycle::getInstance().getTaskCycle())) { ColorCycle::getInstance().task(); }
     /* Last of all, and after the night switch in particular: everything above may still
        write pixels in this pass, and what this one waits for is the pass being over - a
        supply cut before the last writer would leave the strip holding a frame nobody

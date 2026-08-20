@@ -320,6 +320,15 @@ class Display
     void decrementColorBlue() { Color.decrementColorBlue(); applyColor(); }
     void decrementBrightness() { Brightness.decrementBrightness(); applyBrightness(); }
 
+    /* The colour cycle's level, which ColorCycle drives. Through the current limit like every
+       other colour change and for the same reason: white draws three times what a saturated
+       hue does, so a wheel stepping without recomputing the cap would be a wheel walking past
+       the supply's budget on one segment and leaving it unused on the next. */
+    void setColorCycle(Pixel sCycleColor) { Color.setCycleColor(sCycleColor); applyColorAndCurrentLimit(); }
+    void clearColorCycle() { Color.clearCycle(); applyColorAndCurrentLimit(); }
+    bool isColorCycleActive() const { return Color.isCycleActive(); }
+    Pixel getColorCycle() const { return Color.getCycleColor(); }
+
     /* White again, and through DisplayColor's own reset so that what this puts back is the
        one named value the settings reset and the member initialiser already use. */
     void resetColor() { Color.resetToDefaults(); applyColor(); }

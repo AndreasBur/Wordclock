@@ -49,6 +49,12 @@ void testNightSwitchActsOnTheCrossingOnly();
 void testNightWithNoBrightnessCutsTheSupply();
 void testDisplaySwitchedOnAtNightGetsItsSupplyBack();
 
+/* colorcycle_test.cpp */
+void testColourCycleLeavesTheChosenColourAlone();
+void testColourCycleWalksTheWholeWheel();
+void testColourCycleStandsStillOnADarkDisplay();
+void testColourCycleBudgetsTheColourItShows();
+
 /* power_test.cpp */
 void testSupplyCutWaitsForTheBlankedFrame();
 void testSupplyReturnsBeforeTheDataLine();

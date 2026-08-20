@@ -157,10 +157,16 @@ byte Display::getNumberOfLitPixels() const
    Every lit pixel carries the same colour, so a count is all the buffer has to give.
 
    An upper bound on purpose. setPixelFast() with its own brightness leaves a pixel dimmer than
-   the colour, and a limiter that guessed low would be one that does not protect. */
+   the colour, and a limiter that guessed low would be one that does not protect.
+
+   The colour it asks for is the one being *shown*, not the one that was set: with the colour
+   cycle running those are different, and reading the setting would let a saturated hue on the
+   strip be budgeted as whatever pale colour happens to be stored underneath it - which is a
+   guess in the one direction this must never guess. */
 byte Display::getCurrentLimit() const
 {
-    const uint16_t ChannelSum = DisplayCurrentLimit::toChannelSum(Color.getColorRed(), Color.getColorGreen(), Color.getColorBlue());
+    const Pixel Shown = Color.getColorToShow();
+    const uint16_t ChannelSum = DisplayCurrentLimit::toChannelSum(Shown.getRed(), Shown.getGreen(), Shown.getBlue());
 
     return DisplayCurrentLimit::toBrightnessLimit(DISPLAY_NUMBER_OF_PIXELS, getNumberOfLitPixels(), ChannelSum);
 } /* getCurrentLimit */
