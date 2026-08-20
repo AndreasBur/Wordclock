@@ -69,6 +69,28 @@ cmake -S . -B build -G Ninja -DPLATFORM=simulator
 cmake --build build          # -> build/bin/Wordclock
 ```
 
+## Delivering a change
+
+Anything more than a trivial fix goes on a branch and arrives as a pull request, rather
+than as a commit on `master`. `gh` is in the dev container for that, so opening one costs
+a command:
+
+```bash
+git switch -c <branch>
+# commit there, then
+git push -u origin <branch>
+gh pr create --fill
+```
+
+A stale line in a document, a typo, a comment that no longer matches its code — those may
+still go straight to `master`. Anything that changes behaviour does not.
+
+What the pull request body has to carry is what the commits already argue: what moved,
+why that way rather than the obvious alternative, and what was measured. A body that
+repeats the diff is worth nothing to a reviewer; the numbers - flash on the AVR, which
+targets were built, which cases were made to fail on purpose - are the part nobody can
+reconstruct from the code.
+
 ## Screenshotting the simulator
 
 A layout change can be checked directly instead of asking someone to look. The tools
