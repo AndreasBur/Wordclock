@@ -25,6 +25,7 @@
 #include "Communication.h"
 #include "DisplayCharacters.h"
 #include "MessageCatalog.h"
+#include "System.h"
 #include "WebInterface.h"
 #include "WebPage.h"
 #include "WordclockSerial.h"
@@ -51,6 +52,11 @@ void sendLineToClients(const char* Line)
 {
     WebInterface::getInstance().broadcastLine(Line);
 }
+
+/* Fixed, and named in the realm so nobody has to guess it. Not a secret: what is secret is
+   the password beside it. */
+constexpr char ConsoleUserName[]{"wordclock"};
+constexpr char ConsoleRealm[]{"Wordclock, user wordclock"};
 
 /******************************************************************************************************************************************************
  *  LOCAL FUNCTIONS
@@ -80,6 +86,45 @@ byte toUtf8(byte Latin1, char* Target)
 }
 
 /******************************************************************************************************************************************************
+  isRequestAuthorised()
+******************************************************************************************************************************************************/
+/*! \brief          Whether this request may be answered, and the 401 when it may not
+ *
+ *  \return         true when the handler may go on
+ *
+ *  \details        Basic authentication, and what it is worth saying plainly: the credential
+ *                  travels base64-encoded over plain http, which is not encryption. What this
+ *                  keeps out is a guest who opens the page and starts sending commands. It
+ *                  keeps out nobody who can watch the traffic, and that would need https,
+ *                  which a clock cannot offer credibly.
+ *
+ *                  Off unless a password was stored, so an update locks nobody out of a clock
+ *                  that is already on a wall.
+ *
+ *                  The library compares for us here, which is why System hands over the
+ *                  password rather than checking a blob the way the ESP32's does - that core
+ *                  can encode base64 and not decode it, and this one has a server that needs
+ *                  neither.
+******************************************************************************************************************************************************/
+bool isRequestAuthorised(AsyncWebServerRequest* Request)
+{
+    System& system = System::getInstance();
+
+    if(!system.isConsoleProtected()) { return true; }
+
+    char Password[SYSTEM_PASSWORD_STRING_LENGTH]{};
+    if(system.getConsolePassword(Password, sizeof(Password)) == E_NOT_OK) { return true; }
+
+    /* Basic and not digest: what a browser sends for digest is a hash of a nonce this server
+       would have to keep, and over plain http the two are worth the same anyway. */
+    if(Request->authenticate(ConsoleUserName, Password)) { return true; }
+
+    Request->requestAuthentication(AsyncAuthType::AUTH_BASIC, ConsoleRealm);
+    return false;
+}
+
+
+/******************************************************************************************************************************************************
   handleRoot()
 ******************************************************************************************************************************************************/
 /*! \brief          Serves the console page straight out of flash
@@ -88,6 +133,8 @@ byte toUtf8(byte Latin1, char* Target)
 ******************************************************************************************************************************************************/
 void handleRoot(AsyncWebServerRequest* Request)
 {
+    if(!isRequestAuthorised(Request)) { return; }
+
     AsyncWebServerResponse* Response = Request->beginResponse(200, "text/html", WebPageGzip, WebPageGzipSize);
 
     Response->addHeader("Content-Encoding", "gzip");
@@ -108,6 +155,8 @@ void handleRoot(AsyncWebServerRequest* Request)
 ******************************************************************************************************************************************************/
 void handleManifest(AsyncWebServerRequest* Request)
 {
+    if(!isRequestAuthorised(Request)) { return; }
+
     Request->send(Request->beginResponse(200, "application/manifest+json", WebManifest, WebManifestSize));
 }
 
@@ -135,6 +184,8 @@ void handleManifest(AsyncWebServerRequest* Request)
 ******************************************************************************************************************************************************/
 void handleUpdate(AsyncWebServerRequest* Request)
 {
+    if(!isRequestAuthorised(Request)) { return; }
+
     static const char Refusal[] =
         "{\"ok\":false,\"error\":\"this board has no network update - install the .uf2 over USB\"}";
 
@@ -157,11 +208,15 @@ void handleUpdate(AsyncWebServerRequest* Request)
 ******************************************************************************************************************************************************/
 void handleIcon192(AsyncWebServerRequest* Request)
 {
+    if(!isRequestAuthorised(Request)) { return; }
+
     Request->send(Request->beginResponse(200, "image/png", WebIcon192, WebIcon192Size));
 }
 
 void handleIcon512(AsyncWebServerRequest* Request)
 {
+    if(!isRequestAuthorised(Request)) { return; }
+
     Request->send(Request->beginResponse(200, "image/png", WebIcon512, WebIcon512Size));
 }
 
@@ -229,6 +284,8 @@ class ChunkWriter
 ******************************************************************************************************************************************************/
 void handleCommands(AsyncWebServerRequest* Request)
 {
+    if(!isRequestAuthorised(Request)) { return; }
+
     AsyncResponseStream* Stream = Request->beginResponseStream("application/json");
     ChunkWriter Writer(Stream);
     Writer.put('[');
@@ -300,6 +357,8 @@ void handleCommands(AsyncWebServerRequest* Request)
 ******************************************************************************************************************************************************/
 void handleDisplay(AsyncWebServerRequest* Request)
 {
+    if(!isRequestAuthorised(Request)) { return; }
+
     AsyncResponseStream* Stream = Request->beginResponseStream("application/json");
 
     const DisplayCharacters Letters;

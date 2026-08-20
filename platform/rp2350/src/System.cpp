@@ -39,6 +39,10 @@ namespace {
 constexpr const char* NetworkNamespace{"wc-network"};
 constexpr const char* SsidKey{"ssid"};
 constexpr const char* PasswordKey{"password"};
+/* Beside the network's own keys and in the same directory: this is how the clock is reached
+   as well, which is what that namespace holds and what keeps it out of the settings blob the
+   core persists. */
+constexpr const char* ConsolePasswordKey{"console-pass"};
 /* Two names, two separators and the terminator, which the longest of the pair fits in
    several times over. */
 constexpr size_t CredentialPathLength{32u};
@@ -358,6 +362,61 @@ StdReturnType System::reconnectNetwork()
 
     return E_OK;
 } /* reconnectNetwork */
+
+/******************************************************************************************************************************************************
+  isConsoleProtected() / getConsolePassword() / setConsolePassword()
+******************************************************************************************************************************************************/
+/*! \brief          The password the console asks for
+ *
+ *  \details        Handed out rather than compared here, because the server library on this
+ *                  backend does the comparison itself - which is the whole reason this pair
+ *                  looks different from the ESP32's, where the check is a base64 compare in
+ *                  System because that core cannot decode.
+ *
+ *                  Read from the filesystem on every request rather than cached: a request is
+ *                  a network round trip and this is a small file, so a copy that could fall
+ *                  behind is not worth having, and a password changed by command takes effect
+ *                  on the next request instead of on the next restart.
+******************************************************************************************************************************************************/
+bool System::isConsoleProtected() const
+{
+    char Password[PasswordStringLength]{};
+
+    return readStoredString(ConsolePasswordKey, Password, PasswordStringLength) == E_OK;
+}
+
+
+StdReturnType System::getConsolePassword(char* Password, size_t Capacity) const
+{
+    if(Password == nullptr) { return E_NOT_OK; }
+
+    return readStoredString(ConsolePasswordKey, Password, Capacity);
+}
+
+
+StdReturnType System::setConsolePassword(const char* Password)
+{
+    if(Password == nullptr) { return E_NOT_OK; }
+    if(strlen(Password) >= PasswordStringLength) { return E_NOT_OK; }
+
+    /* An empty password removes the file rather than writing an empty one, so that
+       isConsoleProtected() has one state to recognise instead of two - and readStoredString()
+       answers E_NOT_OK for an empty file as well as for a missing one, which would otherwise
+       make the two indistinguishable by accident rather than on purpose. */
+    if(Password[0u] == STD_NULL_CHARACTER) {
+        if(!isCredentialStoreReady()) { return E_NOT_OK; }
+
+        char Path[CredentialPathLength]{};
+        buildCredentialPath(ConsolePasswordKey, Path, sizeof(Path));
+        /* A file that was never there is the state being asked for, so its absence is not a
+           failure to report. */
+        LittleFS.remove(Path);
+        return E_OK;
+    }
+
+    return writeStoredString(ConsolePasswordKey, Password) ? E_OK : E_NOT_OK;
+} /* setConsolePassword */
+
 
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E

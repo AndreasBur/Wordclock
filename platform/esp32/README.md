@@ -449,13 +449,22 @@ can reach without a cable.
   power-on and the first SNTP answer — but only if it has one to fill it with: a chip
   without a battery reports that its oscillator stopped, and its registers are then ignored
   on purpose.
-- **No authentication**, and `POST /update` is what makes that worth reading twice. Anyone
-  on the network can send commands, and can now also install a firmware image — which is
-  not a bigger hole than the credentials command already was, but it is a different kind of
-  one: the others change what the clock shows, this one changes what it *is*. Fine behind a
-  home router, not on an open network — and the access point an unconfigured clock opens
-  *is* an open network. It closes with the first stored pair, which bounds the window rather
-  than removing it. Anything better needs somewhere to keep a secret and a way to set the
-  first one, which is its own piece of work rather than a flag.
+- **Authentication is optional and is off until a password is set** — command 16, stored in
+  NVS beside the WiFi credentials. With one set, every route asks for it: the page, the
+  catalog, the panel, `POST /update` and the web socket's handshake, because a console that
+  asked for a password and then took commands on an unchecked socket would be a lock on the
+  wrong door. Without one, the clock answers everybody, which is what a clock already on a
+  wall keeps doing after an update.
+
+  What it is worth is worth stating exactly. **Basic authentication over plain http is not
+  encryption**: the credential is base64 of `wordclock:<password>` and travels in the clear.
+  It keeps out a guest who opens the page and starts sending commands or installing firmware.
+  It keeps out nobody who can watch the traffic — that needs https, which a clock on a house
+  network cannot offer credibly. And the access point an unconfigured clock opens *is* an
+  open network, which is the window a first setup happens in either way.
+
+  A forgotten password is cleared by sending command 16 with no option over the **serial
+  line** — the one way in that does not go through the console it locks. That needs the
+  cable, which is the price of the lock.
 - **The time and date are not stored**, because they come from the network. Everything else
   the clock is set to survives a restart, the overlays and their text included.

@@ -11,6 +11,7 @@
 #include "Arduino.h"
 #include "Communication.h"
 #include "Pixels.h"
+#include "System.h"
 #include "WebInterface.h"
 #include "check.h"
 
@@ -45,14 +46,22 @@ static bool isBalancedJson(const std::string& Text)
 
 /* Runs one route and hands back what it produced. The request owns its response, so it
    outlives neither - hence the copy out. */
+/* Whether the next fetch() arrives with a credential the library would accept. The library
+   does the comparing on the target, so what a case here decides is its answer. */
+static bool RequestAuthorised = true;
+static bool AuthenticationWasRequested = false;
+
 static std::string fetch(const char* Route, std::string* ContentEncoding = nullptr)
 {
     AsyncWebServerRequest Request;
+    Request.Authorised = RequestAuthorised;
     const auto Found = webStubState().Routes.find(Route);
 
     if(Found == webStubState().Routes.end()) { return ""; }
 
     Found->second(&Request);
+
+    AuthenticationWasRequested = Request.AuthenticationRequested;
 
     if(Request.Response == nullptr) { return ""; }
     if(ContentEncoding != nullptr) {
@@ -272,6 +281,35 @@ int main()
     communication.task();
     communication.task();
     check(webStubState().Text.empty(), "and so is a split one");
+
+
+    /* ---- the console password --------------------------------------------------------
+       The gate, and only the gate: the credential itself is compared by the server library on
+       the target, so what a host can check is who is asked and what happens when the answer is
+       no. Base64 over plain http is not encryption either way, and this backend's notes say so.
+    */
+    check(!System::getInstance().isConsoleProtected(), "a clock with no password is not protected");
+    RequestAuthorised = false;
+    check(!fetch("/display").empty(), "and answers a request that carries no credential");
+
+    check(System::getInstance().setConsolePassword("hunter2") == E_OK, "a password can be stored");
+    check(System::getInstance().isConsoleProtected(), "which is what protected means");
+
+    for(const char* Route : {"/", "/commands", "/display", "/manifest.webmanifest", "/icon-192.png", "/update"}) {
+        AuthenticationWasRequested = false;
+        const std::string Body = fetch(Route);
+        check(Body.empty() && AuthenticationWasRequested, Route);
+    }
+
+    RequestAuthorised = true;
+    check(!fetch("/display").empty(), "the right credential is let through");
+
+    /* And the way back for a clock nobody can log into any more. */
+    check(System::getInstance().setConsolePassword("") == E_OK, "the password can be cleared");
+    check(!System::getInstance().isConsoleProtected(), "which unprotects the console");
+    RequestAuthorised = false;
+    check(!fetch("/display").empty(), "and answers everybody again");
+    RequestAuthorised = true;
 
     return report();
 }

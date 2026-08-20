@@ -8,121 +8,87 @@
  *  ---------------------------------------------------------------------------------------------------------------------------------------------------
  *  FILE DESCRIPTION
  *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       MsgCmdParser.h
- *      \brief
+/**     \file       MsgCmdConsoleParser.h
+ *      \brief      Sets the password the web console asks for, or takes it away
  *
- *      \details
+ *      \details    One option in, one answer out, and they are not the same field. The
+ *                  password goes in and is never read back, exactly as the WiFi pass phrase
+ *                  is not - what comes back is whether one is set at all, which is the only
+ *                  thing somebody needs to know from the outside.
+ *
+ *                  Sent without a password, the command clears it and the console answers
+ *                  everybody again. That is the way back for a clock whose password was
+ *                  forgotten, and it is why this command is worth having on the serial line
+ *                  rather than only in the console it locks: the console would ask for the
+ *                  very password that is missing.
  *
 ******************************************************************************************************************************************************/
-#ifndef _MSG_CMD_PARSER_H_
-#define _MSG_CMD_PARSER_H_
+#ifndef _MSG_CMD_CONSOLE_PARSER_H_
+#define _MSG_CMD_CONSOLE_PARSER_H_
 
 /******************************************************************************************************************************************************
  * I N C L U D E S
 ******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Arduino.h"
-#include "Message.h"
-#include "ErrorMessage.h"
-#include "Overlays.h"
+#include "MsgParameterParser.h"
+#include "System.h"
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
-/* MsgCmdParser configuration parameter */
-
-
-/* MsgCmdParser parameter */
-# define MSG_COMMAND_NONE_NUMBER        0u
+#define MSG_CMD_CONSOLE_PARSER_PARAMETER_TABLE_SIZE             1u
 
 /******************************************************************************************************************************************************
- *  G L O B A L   F U N C T I O N   M A C R O S
+ *  C L A S S   M S G   C M D   C O N S O L E   P A R S E R
 ******************************************************************************************************************************************************/
-
-
-/******************************************************************************************************************************************************
- *  C L A S S   M S G   C M D   P A R S E R
-******************************************************************************************************************************************************/
-class MsgCmdParser
+class MsgCmdConsoleParser : public MsgParameterParser<MsgCmdConsoleParser, MSG_CMD_CONSOLE_PARSER_PARAMETER_TABLE_SIZE>
 {
-/******************************************************************************************************************************************************
- *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
-******************************************************************************************************************************************************/
-  public:
-    enum CommandType {
-        COMMAND_NONE = MSG_COMMAND_NONE_NUMBER,
-        COMMAND_REMOTE_PROCEDURE_CALL,
-        COMMAND_DISPLAY_COLOR,
-        COMMAND_DISPLAY_BRIGHTNESS,
-        COMMAND_DISPLAY_PIXEL,
-#if (OVERLAYS_SUPPORT_DATE == STD_ON)
-        COMMAND_OVERLAY_DATE,
-#endif
-#if (OVERLAYS_SUPPORT_TEMPERATURE == STD_ON)
-        COMMAND_OVERLAY_TEMPERATURE,
-#endif
-#if (OVERLAYS_SUPPORT_TEXT == STD_ON)
-        COMMAND_OVERLAY_TEXT,
-#endif
-        COMMAND_CLOCK_MODE,
-        COMMAND_ANIMATION,
-        COMMAND_TIME,
-        COMMAND_DATE,
-        COMMAND_STATUS,
-        COMMAND_NETWORK,
-        COMMAND_NIGHT_SWITCH,
-        COMMAND_COLOR_CYCLE,
-        COMMAND_CONSOLE
-    };
-
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    static const char CommandParameterDelimiter{' '};
-    ErrorMessage Error;
-    const Message& IncomingMessage;
+    friend class MsgParameterParser;
 
-    //private functions
-    void sendAnswer(CommandType Command) const {
-        Serial.print(Command);
-        Serial.print(CommandParameterDelimiter);
+    static constexpr char PasswordShortName{'P'};
+    static constexpr char ProtectedShortName{'A'};
+
+    static constexpr ParameterTableType ParameterTable PROGMEM {
+        ParameterTableElementType(PasswordShortName, MsgParameter::ARGUMENT_TYPE_STRING)
+    };
+
+    // functions
+    void handleParameter(char ParameterShortName, byte Argument) {
+        UNUSED(ParameterShortName); UNUSED(Argument);
     }
+    void handleParameter(char ParameterShortName, const char* Argument, PositionType Length)
+    {
+        UNUSED(Length);
 
-    CommandType getCommand() const {
-        /* atoi cannot report a failure and does not have to: a message that is not a
-           number converts to zero, which is COMMAND_NONE and is answered with
-           ERROR_WRONG_COMMAND - the same answer strtol would lead to, over more code. */
-        // NOLINTNEXTLINE(cert-err34-c)
-        return static_cast<CommandType>(atoi(IncomingMessage.getMessage()));
-    }
-
-    const char* getParameter() const {
-        const char* message = IncomingMessage.getMessage();
-        size_t valuePos = IncomingMessage.find(CommandParameterDelimiter);
-
-        if(valuePos == Message::npos) { return &message[IncomingMessage.length() - 1u]; }
-        else { return &message[valuePos]; }
+        if(ParameterShortName == PasswordShortName) { System::getInstance().setConsolePassword(Argument); }
     }
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr MsgCmdParser(const Message& sMessage) : Error(), IncomingMessage(sMessage)  { }
-    ~MsgCmdParser() { }
-
-    // get methods
-
-
-    // set methods
+    constexpr MsgCmdConsoleParser(const char* Parameter) : MsgParameterParser(ParameterTable, Parameter) { }
+    ~MsgCmdConsoleParser() { }
 
     // methods
-    void parse();
+    /* Whether a password is set, and never which one. Last field before the command parser's
+       terminating println(), so no trailing separator space. */
+    void sendAnswer() const {
+        sendAnswerParameter(ProtectedShortName,
+                            static_cast<byte>(System::getInstance().isConsoleProtected() ? 1u : 0u), false);
+    }
 
+    /* Nothing deferred: the password is stored where it arrives, since there is no second
+       field it has to agree with. */
+    void process() const { }
 };
 
-#endif
+#endif // _MSG_CMD_CONSOLE_PARSER_H_
 
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E

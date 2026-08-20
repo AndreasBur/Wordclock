@@ -29,6 +29,7 @@
 #include "MsgCmdStatusParser.h"
 #include "MsgCmdNetworkParser.h"
 #include "MsgCmdColorCycleParser.h"
+#include "MsgCmdConsoleParser.h"
 #include "MsgCmdNightSwitchParser.h"
 #include "MsgCmdAnimationParser.h"
 #include "MsgCmdTimeParser.h"
@@ -100,6 +101,7 @@ void MsgCmdParser::parse()
         case COMMAND_NETWORK:               dispatchCommand<MsgCmdNetworkParser>(parameter);             break;
         case COMMAND_NIGHT_SWITCH:          dispatchCommand<MsgCmdNightSwitchParser>(parameter);         break;
         case COMMAND_COLOR_CYCLE:           dispatchCommand<MsgCmdColorCycleParser>(parameter);          break;
+        case COMMAND_CONSOLE:               dispatchCommand<MsgCmdConsoleParser>(parameter);             break;
 #if (OVERLAYS_SUPPORT_DATE == STD_ON)
         case COMMAND_OVERLAY_DATE:          dispatchCommand<MsgCmdOverlayDateParser>(parameter);         break;
 #endif

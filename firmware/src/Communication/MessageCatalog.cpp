@@ -339,6 +339,14 @@ constexpr MessageCatalog::OptionType ColorCycleOptions[] {
     {'H', "Hue",                ARGUMENT_TYPE_UINT8,  READ_ONLY}
 };
 
+/* MsgCmdConsoleParser. The password is an input and never an answer, the same as the pass
+   phrase below; what is read back is whether one is set. Sending the command with no password
+   at all clears it, which is the way back for a clock nobody can log into any more. */
+constexpr MessageCatalog::OptionType ConsoleOptions[] {
+    {'P', "Console password",   ARGUMENT_TYPE_STRING, 0u, 0u},
+    {'A', "Protected",          ARGUMENT_TYPE_UINT8,  READ_ONLY}
+};
+
 /* MsgCmdNetworkParser. The pass phrase is an input and never an answer, so it carries no
    range and is never read back - see the parser for why. */
 constexpr MessageCatalog::OptionType NetworkOptions[] {
@@ -400,7 +408,8 @@ constexpr MessageCatalog::CommandType Commands[] {
     {MsgCmdParser::COMMAND_STATUS,                "Status",                StatusOptions,              NUMBER_OF(StatusOptions)},
     {MsgCmdParser::COMMAND_NETWORK,               "Network",               NetworkOptions,             NUMBER_OF(NetworkOptions)},
     {MsgCmdParser::COMMAND_NIGHT_SWITCH,          "Night switch",          NightSwitchOptions,         NUMBER_OF(NightSwitchOptions)},
-    {MsgCmdParser::COMMAND_COLOR_CYCLE,           "Colour cycle",          ColorCycleOptions,          NUMBER_OF(ColorCycleOptions)}
+    {MsgCmdParser::COMMAND_COLOR_CYCLE,           "Colour cycle",          ColorCycleOptions,          NUMBER_OF(ColorCycleOptions)},
+    {MsgCmdParser::COMMAND_CONSOLE,               "Console access",        ConsoleOptions,             NUMBER_OF(ConsoleOptions)}
 };
 
 constexpr byte NumberOfCommands{NUMBER_OF(Commands)};

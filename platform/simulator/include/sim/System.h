@@ -85,6 +85,11 @@ class System
     StdReturnType getNetworkSsid(char* String) const { String[0u] = STD_NULL_CHARACTER; return E_NOT_OK; }
     bool isNetworkConfigured() const { return false; }
     StdReturnType setNetworkCredentials(const char* Ssid, const char* Password) { UNUSED(Ssid); UNUSED(Password); return E_NOT_OK; }
+    /* No console to protect: this build has no web interface, so the password has nowhere to
+       be asked for and the answer is the same "no" the network methods above give. */
+    bool isConsoleProtected() const { return false; }
+    StdReturnType setConsolePassword(const char* Password) { UNUSED(Password); return E_NOT_OK; }
+
     void startNetwork() { }
     StdReturnType getLinkQuality(char* String) const { String[0u] = STD_NULL_CHARACTER; return E_NOT_OK; }
 

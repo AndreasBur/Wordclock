@@ -365,11 +365,14 @@ From the comparison with wordclock24h, in the order they would change daily use.
    introduces updates costs one settings reset and has to go over USB anyway. Worth doing,
    but it is a flash-layout change with a migration in it rather than a handler.
 
-   What is still missing on both is **authentication**. Anyone on the network could already
-   send commands; now they can install firmware. Not a bigger hole than the credentials
-   command, but a different kind - the others change what the clock shows, this one changes
-   what it is. It needs somewhere to keep a secret and a way to set the first one, which is
-   its own item rather than a flag on this one.
+   ~~What is still missing on both is **authentication**.~~ **Done**, on both backends, with
+   command 16: a password in NVS beside the WiFi credentials, off until one is set, and every
+   route behind it - the socket's handshake included, since a console that asked for a password
+   and then took commands on an unchecked socket would be a lock on the wrong door. What it is
+   worth is stated where somebody will read it rather than assumed: Basic over plain http is
+   not encryption, it keeps out a guest who opens the page and not anybody who can watch the
+   traffic. A forgotten password is cleared from the serial line, which is the one way in that
+   does not go through the console it locks.
 4. ~~**RTC with battery.**~~ **Done** with section 2's chip: the time registers are read
    while the system clock holds nothing, and written back from it once an hour and after
    every hand-set time ([RealTimeClock.cpp](../platform/esp32/src/RealTimeClock.cpp)). The

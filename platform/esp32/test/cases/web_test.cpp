@@ -12,6 +12,7 @@
 #include <algorithm>
 #include <cstdio>
 #include <cstring>
+#include <map>
 #include <string>
 #include <vector>
 
@@ -26,6 +27,8 @@ static httpd_handler_t Icon512Handler = nullptr;
 static httpd_handler_t UpdateHandler = nullptr;
 static std::string SentType;
 static std::string SentStatus;
+/* Every header a handler set, by name - the gate's WWW-Authenticate is read out of here. */
+static std::map<std::string, std::string> SentHeaders;
 /* The body the next upload is to be fed, and how much of it the stub is willing to hand
    over - short of the announced length is a connection that went away mid-upload. */
 static std::string Body;
@@ -57,10 +60,23 @@ esp_err_t httpd_resp_set_type(httpd_req_t*, const char* t) { SentType = t; retur
 esp_err_t httpd_resp_set_hdr(httpd_req_t*, const char* k, const char* v)
 {
     if(strcmp(k, "Content-Encoding") == 0) { RootEncoding = v; }
+    SentHeaders[k] = v;
     return ESP_OK;
 }
 
 esp_err_t httpd_resp_set_status(httpd_req_t*, const char* s) { SentStatus = s; return ESP_OK; }
+
+/* The Authorization header the next request is to carry, empty for a request without one. */
+static std::string Authorization;
+
+esp_err_t httpd_req_get_hdr_value_str(httpd_req_t*, const char* Field, char* Target, size_t Capacity)
+{
+    if((strcmp(Field, "Authorization") != 0) || Authorization.empty()) { return ESP_FAIL; }
+    if(Authorization.size() >= Capacity) { return ESP_FAIL; }
+
+    memcpy(Target, Authorization.c_str(), Authorization.size() + 1u);
+    return ESP_OK;
+}
 
 esp_err_t httpd_resp_send(httpd_req_t*, const char* b, ssize_t n)
 {
@@ -406,6 +422,79 @@ int main()
     }
     check(SentStatus == "400 Bad Request", "a request with no image is refused");
     check(!Update.Begun, "and does not claim the partition to find that out");
+
+
+    /* ---- the console password --------------------------------------------------------
+       What this can say on a host is the gate: who is refused, who is let through, and that
+       every route goes through the same door. What it cannot say is whether base64 over plain
+       http is worth anything - it is not encryption, and the backend's notes say so. */
+    auto fetchRoot = [](const char* Header) {
+        Authorization = (Header == nullptr) ? "" : Header;
+        SentStatus.clear();
+        RootBody.clear();
+        httpd_req_t get{};
+        get.method = HTTP_GET;
+        RootHandler(&get);
+    };
+
+    /* Nothing stored: the state a clock ships in, and the one an update must not change. */
+    check(!System::getInstance().isConsoleProtected(), "a clock with no password is not protected");
+    fetchRoot(nullptr);
+    check(SentStatus.empty(), "and answers a request that carries no credential");
+
+    check(System::getInstance().setConsolePassword("hunter2") == E_OK, "a password can be stored");
+    check(System::getInstance().isConsoleProtected(), "which is what protected means");
+
+    fetchRoot(nullptr);
+    check(SentStatus == "401 Unauthorized", "a request without a credential is refused");
+    check(SentHeaders["WWW-Authenticate"].find("Basic") != std::string::npos,
+          "with the scheme a browser needs to prompt");
+    check(SentHeaders["WWW-Authenticate"].find("wordclock") != std::string::npos,
+          "and the user name, which is the one field a browser cannot guess");
+
+    /* base64("wordclock:hunter2"), which is what a browser sends. */
+    fetchRoot("Basic d29yZGNsb2NrOmh1bnRlcjI=");
+    check(SentStatus.empty(), "the right credential is let through");
+    check(RootBody.size() > 100u, "and gets the page");
+
+    fetchRoot("Basic d29yZGNsb2NrOmh1bnRlcjM=");
+    check(SentStatus == "401 Unauthorized", "a wrong password is refused");
+
+    /* A prefix of the right credential, which is the one comparison that must not be lenient:
+       a length-blind strncmp would accept this. */
+    fetchRoot("Basic d29yZGNsb2NrOmh1bnRlcj");
+    check(SentStatus == "401 Unauthorized", "and so is a prefix of the right one");
+
+    fetchRoot("d29yZGNsb2NrOmh1bnRlcjI=");
+    check(SentStatus == "401 Unauthorized", "a credential without the scheme is refused");
+
+    /* Every route, not just the page: a console that asked for a password and then took
+       commands on an unchecked socket would be a lock on the wrong door. */
+    Authorization.clear();
+    for(const auto& Route : {std::make_pair("commands", CommandsHandler), std::make_pair("display", DisplayHandler),
+                             std::make_pair("manifest", ManifestHandler), std::make_pair("icon", Icon192Handler),
+                             std::make_pair("socket handshake", SocketHandler)}) {
+        SentStatus.clear();
+        httpd_req_t get{};
+        get.method = HTTP_GET;
+        Route.second(&get);
+        check(SentStatus == "401 Unauthorized", Route.first);
+    }
+    {
+        SentStatus.clear();
+        httpd_req_t post{};
+        post.method = HTTP_POST;
+        post.content_len = 4096u;
+        UpdateHandler(&post);
+        check(SentStatus == "401 Unauthorized", "update");
+        check(!Update.Begun, "and an unauthorised update never claims the partition");
+    }
+
+    /* And the way back for a clock nobody can log into any more. */
+    check(System::getInstance().setConsolePassword("") == E_OK, "the password can be cleared");
+    check(!System::getInstance().isConsoleProtected(), "which unprotects the console");
+    fetchRoot(nullptr);
+    check(SentStatus.empty(), "and answers everybody again");
 
     return report();
 }
