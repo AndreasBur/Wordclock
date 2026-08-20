@@ -91,6 +91,37 @@ repeats the diff is worth nothing to a reviewer; the numbers - flash on the AVR,
 targets were built, which cases were made to fail on purpose - are the part nobody can
 reconstruct from the code.
 
+## Looking at the web console
+
+The page in `web/` is the one part of this project the simulator cannot show, and it can be
+driven rather than only photographed - synthetic clicks work here, which is the opposite of
+the wx window below. Playwright's own Chromium is how: `apt` on this base offers only a snap
+stub for `chromium-browser`, which does not work in a container.
+
+```bash
+python3 -m venv "$SCRATCH/venv" && "$SCRATCH/venv/bin/pip" install playwright
+"$SCRATCH/venv/bin/playwright" install --with-deps chromium   # ~115 MB, once
+```
+
+The page needs the firmware behind it, which `platform/esp32/test/run.sh serve <port>`
+provides. Three things make the difference between a screenshot and a wasted run:
+
+1. **Start the server so the launching shell stays alive** - a background Bash call that the
+   harness tracks, not `( ... &)`. `run.sh` keeps its binaries in a temporary directory and
+   removes them in a trap when its shell exits, so a detached server answers `/` from disk
+   and then hangs forever on `/display` and `/commands`, which is where the panel comes from.
+2. **Never wait for `networkidle`.** The console holds a web socket open, so it never goes
+   idle and `page.goto` times out at 30 s. Use `wait_until="load"`, then wait for
+   `#panel:not([hidden])` - that selector appearing means `/display` answered.
+3. The header's state text reads *connected*, so a wait for "not connecting" matches it.
+   Wait on the panel or on `#panel span.lit` instead.
+
+What it is good for is **layout, and behaviour that needs input**: `set_input_files` on the
+update panel's picker plus a click on Install exercises the whole upload, both answers
+included. What it is *not* good for is colour - the page paints lit letters in a fixed
+contrast colour and drops the frame's own, exactly as the wx window drops the hue. A hue is
+checked by reading the bytes in a test, not by looking at either front end.
+
 ## Screenshotting the simulator
 
 A layout change can be checked directly instead of asking someone to look. The tools

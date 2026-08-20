@@ -434,6 +434,29 @@
     #updateNote { color: var(--unlit); margin: 0 0 10px; }
     #updateNote code { color: var(--text); }
     #updateForm { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin: 0; }
+    /* The file picker's own button is drawn by the browser and reached by nothing above:
+       ::file-selector-button is the only selector that gets to it, so without this rule it
+       arrives as a light grey system button in the middle of a dark card - which is what it
+       did. Styled to the page's buttons rather than hidden behind a label of our own, since
+       a real file input is what a phone opens its picker from. */
+    /* Its own line, with Install under it. Beside the button - which is what it was, and what
+       every other form on this page does - the name is squeezed into what is left after the
+       browser's own "Choose File", and a release file name is thirty characters: it came out
+       as "No f...hosen" before anything had even been picked. The column is under 400 px wide
+       on a desktop too, so this is not a phone-only case and there is nothing to win by
+       keeping the two side by side. */
+    #image { flex: 1 1 100%; }
+    #install { margin-left: auto; }
+    #image::file-selector-button {
+        font: inherit;
+        color: var(--lit);
+        background: var(--field);
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        padding: 6px 10px;
+        margin-right: 10px;
+        cursor: pointer;
+    }
     /* Italic like the log's notes while it is only saying what is happening, upright and
        amber once it is the answer - so a finished update does not read as commentary. */
     #updateState { font-style: italic; color: var(--unlit); min-height: 1.2em; margin-top: 8px; }

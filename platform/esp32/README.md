@@ -219,9 +219,13 @@ same socket - 330 bytes in the strip's own byte order, at most every 50 ms and o
 they changed. A client that connects to a standing display is sent the current frame at
 once, or it would wait for the next change; on a word clock that can be five minutes.
 
-Unlike the wx window this shows the **real colour**. That one renders a pixel's brightness
-as a grey level and drops the hue, which is why the colour swap in `Pixel` could hide there
-for as long as it did.
+**Neither front end shows the colour**, which is worth saying because this paragraph used to
+claim the page did. The wx window renders a pixel's brightness as a grey level and drops the
+hue - which is why the colour swap in `Pixel` could hide there for as long as it did - and
+the page takes only *whether* a pixel is lit from the frame, painting the lit ones a fixed
+high-contrast colour: the bytes arrive already dimmed, so a word at low brightness would be
+a dark grey on a dark background, unreadable in exactly the case somebody opens the view for.
+So a hue is checked by reading the bytes, which the tests do, and not by looking.
 
 It also carries a command builder, and that form is not written down in the page either:
 `GET /commands` serves `MessageCatalog` as JSON, and the page generates the dropdown, the
