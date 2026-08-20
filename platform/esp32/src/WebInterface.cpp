@@ -78,6 +78,53 @@ byte toUtf8(byte Latin1, char* Target)
 }
 
 /******************************************************************************************************************************************************
+  isRequestAuthorised()
+******************************************************************************************************************************************************/
+/*! \brief          Whether this request may be answered, and the 401 when it may not
+ *
+ *  \return         true when the handler may go on
+ *
+ *  \details        Basic authentication, and what it is worth saying plainly: the credential
+ *                  travels base64-encoded over plain http, which is not encryption. What this
+ *                  keeps out is a guest who opens the page and starts sending commands, or
+ *                  installing firmware. It keeps out nobody who can watch the traffic, and
+ *                  that would need https, which a clock cannot offer credibly.
+ *
+ *                  Off unless a password was stored, so an update locks nobody out of a clock
+ *                  that is already on a wall, and the access point of a first setup still
+ *                  answers.
+ *
+ *                  Every route goes through this, the web socket's handshake included - a
+ *                  console that asked for a password and then took commands on an unchecked
+ *                  socket would be a lock on the wrong door.
+******************************************************************************************************************************************************/
+bool isRequestAuthorised(httpd_req_t* Request)
+{
+    if(!System::getInstance().isConsoleProtected()) { return true; }
+
+    /* "Basic " and the blob. Sized for the longest credential the store can hold, and a
+        header longer than that cannot be one this clock would accept. */
+    char Header[SYSTEM_PASSWORD_STRING_LENGTH + 128u]{};
+    static constexpr char Scheme[]{"Basic "};
+
+    if(httpd_req_get_hdr_value_str(Request, "Authorization", Header, sizeof(Header)) == ESP_OK) {
+        if(strncmp(Header, Scheme, sizeof(Scheme) - 1u) == 0) {
+            if(System::getInstance().isConsoleCredentialValid(&Header[sizeof(Scheme) - 1u])) { return true; }
+        }
+    }
+
+    /* The realm carries the user name, because it is the one field a browser cannot guess and
+       it is not a secret - the password beside it is. */
+    httpd_resp_set_status(Request, "401 Unauthorized");
+    httpd_resp_set_hdr(Request, "WWW-Authenticate", "Basic realm=\"Wordclock, user wordclock\"");
+    httpd_resp_set_type(Request, "text/plain");
+    httpd_resp_send(Request, "this clock asks for a password\n", HTTPD_RESP_USE_STRLEN);
+
+    return false;
+}
+
+
+/******************************************************************************************************************************************************
   handleRoot()
 ******************************************************************************************************************************************************/
 /*! \brief          Serves the console page straight out of flash
@@ -86,6 +133,8 @@ byte toUtf8(byte Latin1, char* Target)
 ******************************************************************************************************************************************************/
 esp_err_t handleRoot(httpd_req_t* Request)
 {
+    if(!isRequestAuthorised(Request)) { return ESP_OK; }
+
     httpd_resp_set_type(Request, "text/html");
     httpd_resp_set_hdr(Request, "Content-Encoding", "gzip");
 
@@ -106,6 +155,8 @@ esp_err_t handleRoot(httpd_req_t* Request)
 ******************************************************************************************************************************************************/
 esp_err_t handleManifest(httpd_req_t* Request)
 {
+    if(!isRequestAuthorised(Request)) { return ESP_OK; }
+
     httpd_resp_set_type(Request, "application/manifest+json");
 
     return httpd_resp_send(Request, reinterpret_cast<const char*>(WebManifest), WebManifestSize);
@@ -170,6 +221,8 @@ esp_err_t sendUpdateResult(httpd_req_t* Request, bool Ok, const char* Reason)
 ******************************************************************************************************************************************************/
 esp_err_t handleUpdate(httpd_req_t* Request)
 {
+    if(!isRequestAuthorised(Request)) { return ESP_OK; }
+
     /* Announced rather than measured, and it has to be: Update needs the size before the
        first byte, to know which partition can hold it and to erase it. A body that then
        turns out shorter is caught by end() below, which refuses to finish an image that is
@@ -227,6 +280,8 @@ esp_err_t handleUpdate(httpd_req_t* Request)
 ******************************************************************************************************************************************************/
 esp_err_t handleIcon192(httpd_req_t* Request)
 {
+    if(!isRequestAuthorised(Request)) { return ESP_OK; }
+
     httpd_resp_set_type(Request, "image/png");
 
     return httpd_resp_send(Request, reinterpret_cast<const char*>(WebIcon192), WebIcon192Size);
@@ -234,6 +289,8 @@ esp_err_t handleIcon192(httpd_req_t* Request)
 
 esp_err_t handleIcon512(httpd_req_t* Request)
 {
+    if(!isRequestAuthorised(Request)) { return ESP_OK; }
+
     httpd_resp_set_type(Request, "image/png");
 
     return httpd_resp_send(Request, reinterpret_cast<const char*>(WebIcon512), WebIcon512Size);
@@ -315,6 +372,8 @@ class ChunkWriter
 ******************************************************************************************************************************************************/
 esp_err_t handleCommands(httpd_req_t* Request)
 {
+    if(!isRequestAuthorised(Request)) { return ESP_OK; }
+
     httpd_resp_set_type(Request, "application/json");
 
     ChunkWriter Writer(Request);
@@ -387,6 +446,8 @@ esp_err_t handleCommands(httpd_req_t* Request)
 ******************************************************************************************************************************************************/
 esp_err_t handleDisplay(httpd_req_t* Request)
 {
+    if(!isRequestAuthorised(Request)) { return ESP_OK; }
+
     httpd_resp_set_type(Request, "application/json");
 
     const DisplayCharacters Letters;
@@ -428,6 +489,13 @@ esp_err_t handleDisplay(httpd_req_t* Request)
 ******************************************************************************************************************************************************/
 esp_err_t handleSocket(httpd_req_t* Request)
 {
+    /* The handshake only. A frame arriving later has no headers to carry a credential, so
+       the check belongs at the one moment the browser does send them - which is the GET the
+       server calls this handler with before the socket exists. */
+    if(Request->method == HTTP_GET) {
+        if(!isRequestAuthorised(Request)) { return ESP_OK; }
+    }
+
     if(Request->method == HTTP_GET) {
         WebInterface::getInstance().onClientOpened(httpd_req_to_sockfd(Request));
         return ESP_OK;

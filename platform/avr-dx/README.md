@@ -113,12 +113,12 @@ every link rather than asked for, because the flash budget is the reason this pa
 was chosen at all — currently, of 128 KiB flash and 16 KiB RAM:
 
 ```
-Program:   48346 bytes (37%)
+Program:   48664 bytes (37%)
 Data:       1700 bytes (10%)
 ```
 
 `-flto` is on by default and worth 10 KiB of that: the same build without it is
-58 358 bytes. It fits either way here, but that margin is the difference between
+58 778 bytes. It fits either way here, but that margin is the difference between
 fitting and not on a smaller part.
 
 ## Debugging
@@ -129,7 +129,7 @@ cannot show, which is the opposite of what a debugger is for. `-g3` rather than
 `-g` so the configuration macros are visible too: most of the timing here is a
 macro derived from `F_CPU`.
 
-That image is 73 374 bytes, so it still fits with room to spare — 56 % of the
+That image is 74 248 bytes, so it still fits with room to spare — 57 % of the
 flash rather than 37 %.
 
 The part debugs over UPDI. On an AVR128DA48 Curiosity Nano the on-board nEDBG is

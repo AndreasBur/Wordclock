@@ -118,6 +118,31 @@ class System
        without a cable. */
     StdReturnType setNetworkCredentials(const char*, const char*);
 
+    /* Whether the console asks for a password before it answers, and whether a candidate
+       matches. The password itself is never handed back out, the same way the WiFi pass
+       phrase is not: what a caller may learn is yes or no.
+
+       The candidate is the base64 blob out of an Authorization header, not the password -
+       and that is a decision about flash rather than about layering. Basic sends
+       base64("user:password"), the ESP32 core can only *encode*, and encoding the expected
+       value once to compare strings is a decoder's worth of code less than decoding what
+       arrived. The user name is therefore fixed and is not a secret; the realm in the 401
+       says which one to type. */
+    bool isConsoleProtected() const;
+
+    /* Not in the platform contract, and deliberately: the core has no business checking a
+       credential, it only needs to answer whether one is asked for. This is between System
+       and this backend's own WebInterface, which is why the Pico's has a different shape -
+       its server library does the comparison itself and wants the password, not a blob. */
+    bool isConsoleCredentialValid(const char*) const;
+
+    /* Stores the password the console is to ask for, or clears it when given an empty
+       string - which is the state a clock ships in, so an update introduces no lock and the
+       access point of a first setup still answers. A password that is forgotten is undone
+       from the serial line, which is the one way in that does not go through the console. */
+    StdReturnType setConsolePassword(const char*);
+
+
     // methods
     /* Brings the network up as configured: the stored credentials, or the access point
        when there are none. Called once at start-up and again whenever the credentials

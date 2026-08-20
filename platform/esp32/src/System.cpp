@@ -37,6 +37,13 @@ namespace {
 constexpr const char* NetworkNamespace{"wc-network"};
 constexpr const char* SsidKey{"ssid"};
 constexpr const char* PasswordKey{"password"};
+/* Beside the network's own keys, in the same namespace: this is how the clock is reached as
+   well, which is what that namespace holds and what keeps it out of the settings blob the
+   core persists. */
+constexpr const char* ConsolePasswordKey{"console-pass"};
+/* Fixed, and printed in the 401's realm so nobody has to guess it. Not a secret: what is
+   secret is the password beside it. */
+constexpr char ConsoleUserName[]{"wordclock"};
 
 constexpr uint32_t BytesPerKibibyte{1024u};
 
@@ -47,6 +54,36 @@ bool isNetworkJoined()
 
 /* Reads one stored string into a buffer that has room for it, terminator included. An
    empty answer and a missing key are the same thing here: a network nobody entered. */
+/* Base64, written here rather than taken from the core's own. Two reasons, and the second is
+   the better one: the core offers only an encoder anyway, and its encoder answers an Arduino
+   String - a heap allocation on a path that runs once per HTTP request, for twenty bytes that
+   fit on the stack. Encoding is also all this needs, since what it compares against is what a
+   browser would have sent.
+
+   Padding included, because a browser's header carries it and a comparison of the two has to
+   see the same string. */
+void toBase64(const char* Plain, size_t Length, char* Target, size_t Capacity)
+{
+    static constexpr char Alphabet[]{"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"};
+    size_t Out = 0u;
+
+    for(size_t In = 0u; In < Length; In += 3u) {
+        const uint32_t Byte0 = static_cast<uint8_t>(Plain[In]);
+        const uint32_t Byte1 = ((In + 1u) < Length) ? static_cast<uint8_t>(Plain[In + 1u]) : 0u;
+        const uint32_t Byte2 = ((In + 2u) < Length) ? static_cast<uint8_t>(Plain[In + 2u]) : 0u;
+        const uint32_t Triple = (Byte0 << 16u) | (Byte1 << 8u) | Byte2;
+
+        if((Out + 4u) >= Capacity) { break; }
+
+        Target[Out++] = Alphabet[(Triple >> 18u) & 0x3Fu];
+        Target[Out++] = Alphabet[(Triple >> 12u) & 0x3Fu];
+        Target[Out++] = ((In + 1u) < Length) ? Alphabet[(Triple >> 6u) & 0x3Fu] : '=';
+        Target[Out++] = ((In + 2u) < Length) ? Alphabet[Triple & 0x3Fu] : '=';
+    }
+    Target[Out] = STD_NULL_CHARACTER;
+}
+
+
 StdReturnType readStoredString(const char* Key, char* String, size_t Capacity)
 {
     String[0u] = STD_NULL_CHARACTER;
@@ -299,6 +336,70 @@ StdReturnType System::reconnectNetwork()
 
     return E_OK;
 } /* reconnectNetwork */
+
+/******************************************************************************************************************************************************
+  isConsoleProtected() / isConsoleCredentialValid() / setConsolePassword()
+******************************************************************************************************************************************************/
+/*! \brief          The password the console asks for, and whether what arrived matches
+ *
+ *  \details        Encoded once and compared as a string, because the core here can encode
+ *                  base64 and not decode it - so the cheaper direction is to build the value
+ *                  a browser would send and compare that, rather than to unpack what it did
+ *                  send. The user name is fixed by the same decision and is not a secret.
+ *
+ *                  Read from the store on every request rather than cached. A request is a
+ *                  network round trip and this is a flash read of sixty bytes, so the copy
+ *                  that could fall behind is not worth having - and a password changed by
+ *                  command takes effect on the next request rather than on the next restart.
+******************************************************************************************************************************************************/
+bool System::isConsoleProtected() const
+{
+    char Password[PasswordStringLength]{};
+
+    return readStoredString(ConsolePasswordKey, Password, PasswordStringLength) == E_OK;
+}
+
+
+bool System::isConsoleCredentialValid(const char* Credential) const
+{
+    if(Credential == nullptr) { return false; }
+
+    char Password[PasswordStringLength]{};
+    if(readStoredString(ConsolePasswordKey, Password, PasswordStringLength) == E_NOT_OK) { return true; }
+
+    char Expected[PasswordStringLength + sizeof(ConsoleUserName) + 1u]{};
+    const int Length = snprintf(Expected, sizeof(Expected), "%s:%s", ConsoleUserName, Password);
+    if(Length <= 0) { return false; }
+
+    char Encoded[(sizeof(Expected) + 2u) / 3u * 4u + 1u]{};
+    toBase64(Expected, static_cast<size_t>(Length), Encoded, sizeof(Encoded));
+
+    /* Same length first, then the whole of it: strncmp on the shorter of two strings would
+       accept a prefix, which for a password is the one comparison that must not be lenient. */
+    if(strlen(Credential) != strlen(Encoded)) { return false; }
+
+    return strcmp(Credential, Encoded) == 0;
+}
+
+
+StdReturnType System::setConsolePassword(const char* Password)
+{
+    if(Password == nullptr) { return E_NOT_OK; }
+    if(strlen(Password) >= PasswordStringLength) { return E_NOT_OK; }
+
+    Preferences Store;
+    if(!Store.begin(NetworkNamespace, false)) { return E_NOT_OK; }
+
+    /* An empty password removes the key rather than storing nothing under it, so that
+       isConsoleProtected() has one state to recognise instead of two. */
+    const bool Stored = (Password[0u] == STD_NULL_CHARACTER)
+                      ? Store.remove(ConsolePasswordKey)
+                      : (Store.putString(ConsolePasswordKey, Password) == strlen(Password));
+    Store.end();
+
+    return Stored ? E_OK : E_NOT_OK;
+} /* setConsolePassword */
+
 
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E

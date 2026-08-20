@@ -30,6 +30,9 @@ esp_err_t httpd_resp_send(httpd_req_t*, const char*, ssize_t);
 /* Answers a piece of the request body, or 0 for a connection that went away and a negative
    value for an error - which is the distinction the update route acts on. */
 int httpd_req_recv(httpd_req_t*, char*, size_t);
+/* One request header by name, ESP_OK when it was there. What the authorisation gate reads,
+   and the only header this backend asks for. */
+esp_err_t httpd_req_get_hdr_value_str(httpd_req_t*, const char*, char*, size_t);
 esp_err_t httpd_resp_send_chunk(httpd_req_t*, const char*, ssize_t);
 int httpd_req_to_sockfd(httpd_req_t*);
 esp_err_t httpd_ws_recv_frame(httpd_req_t*, httpd_ws_frame_t*, size_t);

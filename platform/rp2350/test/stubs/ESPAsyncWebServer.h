@@ -58,8 +58,19 @@ class AsyncResponseStream : public AsyncWebServerResponse {
     size_t write(const uint8_t* Data, size_t Length) { Body.append(reinterpret_cast<const char*>(Data), Length); return Length; }
 };
 
+enum class AsyncAuthType { AUTH_NONE, AUTH_BASIC, AUTH_DIGEST };
+
 class AsyncWebServerRequest {
   public:
+    /* What the backend asks about a credential, and what it does when there is none. The
+       comparison itself is the library's on the target, so the stub only has to say which
+       answer a case wants and record that the 401 went out. */
+    bool Authorised{true};
+    bool AuthenticationRequested{false};
+
+    bool authenticate(const char*, const char*) { return Authorised; }
+    void requestAuthentication(AsyncAuthType, const char*) { AuthenticationRequested = true; }
+
     /* What the handler produced, for the test to look at. Owned here and freed with the
        request, which is what the server does on the target. */
     AsyncWebServerResponse* Response{nullptr};
