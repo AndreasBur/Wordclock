@@ -155,7 +155,7 @@ and what it has to fit in is the *app slot*, not the chip:
 
 So a 4 MB board is not short of flash, its default partition table is: it reserves 1.5 MB
 for a SPIFFS this firmware never mounts. The web page is compiled into the image by
-`scripts/embed_web.py` and the settings live in NVS, so there is no filesystem to keep, and
+`../scripts/embed_web.py` and the settings live in NVS, so there is no filesystem to keep, and
 one line moves it:
 
 ```ini
@@ -237,7 +237,7 @@ exactly as the wx builder's Insert does.
 
 The page is [`web/index.html`](web/index.html), one self-contained file with its CSS and
 script inline: the clock has nowhere to fetch anything from. It is **not** uploaded
-separately. [`scripts/embed_web.py`](scripts/embed_web.py) walks `web/` at build time and
+separately. [`../scripts/embed_web.py`](../scripts/embed_web.py) walks `web/` at build time and
 emits every file in it as an array **into the build directory**, so `pio run -t upload`
 ships page and firmware together and their versions cannot drift apart - the failure a
 second partition invites. The generated header is a build product on purpose; a checked-in

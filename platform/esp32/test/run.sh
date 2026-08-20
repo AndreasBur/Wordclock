@@ -59,7 +59,7 @@ FLAGS=(-std=gnu++17 -Wall -Wextra -Werror)
 # directory: the include path is part of what an object was compiled with, and one that
 # changed every run would invalidate the cache every run. A changed page is noticed through
 # the dependency file instead.
-python3 "$PLATFORM_DIR/scripts/embed_web.py" "$ROOT/web" "$CACHE"
+python3 "$ROOT/platform/scripts/embed_web.py" "$ROOT/web" "$CACHE"
 INCLUDES+=(-I"$CACHE")
 
 # What the objects were compiled with. Anything else means they cannot be reused, and the

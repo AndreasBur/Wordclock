@@ -24,6 +24,10 @@ from pathlib import Path
 # Called two ways: by PlatformIO as an extra script, where SCons injects Import, and from
 # the command line by test/run.sh, which needs the same header to compile the backend on
 # the host. One generator either way - a second one would drift from this.
+#
+# And one copy for both backends, which is why this lives above them rather than in either
+# one's scripts/ directory. It was two byte-identical files until they were shared; nothing
+# in here names a platform, and what the header holds is the same on both.
 try:
     Import("env")  # noqa: F821
     FROM_PLATFORMIO = True
