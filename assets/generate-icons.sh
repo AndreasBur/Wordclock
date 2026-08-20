@@ -16,7 +16,13 @@
 # miss: ImageMagick does not draw SVG itself, it hands the file to rsvg-convert. The
 # letter master also needs DejaVu Sans Bold. All three are in the dev container.
 # Everything this writes is checked in, so the script only has to run when the design
-# changes.
+# changes - and running it twice in a row now yields the same bytes, which is what makes
+# such a diff mean something.
+#
+# It yields the same bytes *here*. What comes out still depends on the versions of
+# ImageMagick and librsvg in front of it - the checked-in files were regenerated when this
+# was found precisely because an older pair had produced them - which is the other reason
+# the outputs live in the repository rather than being built on demand.
 #
 # Usage: assets/generate-icons.sh
 
@@ -32,8 +38,12 @@ WEB="$ROOT/web"
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 
+# -strip, and it is not cosmetic: without it ImageMagick writes the wall-clock time into
+# three tEXt chunks - date:create, date:modify and date:timestamp - so every run of this
+# script produced a different logo.png for the same drawing. The outputs are checked in, so
+# that turned "the design changed" and "somebody ran the script" into the same diff.
 rasterise() {   # master size outfile
-    magick "$ASSETS/$1" -background none -resize "${2}x${2}" "png32:$WORK/$3"
+    magick "$ASSETS/$1" -background none -resize "${2}x${2}" -strip "png32:$WORK/$3"
 }
 
 rasterise wordclock-icon-small.svg  16 16.png
