@@ -11,8 +11,11 @@
 #   test/run.sh              build and run the tests
 #   test/run.sh clean        throw the object cache away
 #
-# There is no `serve` here. The page is shared with the ESP32 backend, so the host that puts
-# a browser in front of it only has to exist once - platform/esp32/test/run.sh serve.
+# There is no `serve` here. Not only because the pages are shared: in the ESP32's harness the
+# HTTP and web socket side is node, and what sits behind it is the firmware core plus that
+# backend's JSON and broadcast - so `serve` is a harness for the pages rather than for a
+# server. This backend's own routes are covered by web_test.cpp instead, which calls the
+# handlers through the registration call the server makes.
 #
 # Every source is compiled once into an object cache under .pio/ and the binaries are
 # linked from those objects. It used to compile straight to executables, which meant the
@@ -171,9 +174,10 @@ link frame_test  "$TEST_DIR/cases/frame_test.cpp" "$PLATFORM_DIR/src/Pixels.cpp"
 link serial_test "$SHARED_TEST_DIR/cases/serial_test.cpp" "${BACKEND[@]}" "${CORE[@]}" "$TEST_DIR/stubs/pio_stubs.cpp"
 link ds3231_test "$SHARED_TEST_DIR/cases/ds3231_test.cpp" "${BACKEND[@]}" "${CORE[@]}" "$TEST_DIR/stubs/pio_stubs.cpp"
 link web_test    "$TEST_DIR/cases/web_test.cpp" "$WEB" "${BACKEND[@]}" "${CORE[@]}" "$TEST_DIR/stubs/pio_stubs.cpp"
-# No `serve` here. The page is shared with the ESP32 backend now, so the host that puts a
-# browser in front of it only has to exist once - see platform/esp32/test/run.sh, which
-# serves the same file.
+# No `serve` here, for the reason at the top of this file: the pages are shared and the browser
+# harness is about the pages. What is not covered anywhere is a browser against a real /update -
+# node answers that route itself - and this is the backend where that could be closed, its
+# filesystem and loader being stand-ins in memory.
 
 FAILED=0
 for name in frame_test serial_test ds3231_test web_test; do

@@ -31,11 +31,16 @@ own reason.
 in this repository:
 
 ```
-RAM:    14.5%  of 512 KB
-Flash:  11.3%  of 4 MB
+RAM:     15 %  of 512 KB
+Flash:   16 %  of the 3 MB the sketch is left
 ```
 
-Rounded on purpose: the exact byte count moves with every edit to the page.
+Percentages and not byte counts, and checked rather than remembered: `tools/documented-sizes.py
+--rp2350-elf` measures them off the image the firmware job just built, with a point of slack,
+which is the same shape the AVR's figure has and for the same reason - a byte count belongs to
+the compiler in front of you. The flash is 3 MB and not the part's 4 because the network update
+needed a megabyte of filesystem to write an image into; a percentage of the whole part would
+flatter it.
 
 The warnings are worth a note. On the ESP32 the HTTP server comes with the framework and is
 built separately, so `-Wall -Wextra` never reaches it. Here the server is a `lib_deps` entry

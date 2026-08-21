@@ -1,10 +1,10 @@
 # ESP32 platform
 
-The on-device backend of the Wordclock firmware. It supplies the headers the core
-reaches the hardware through — `Pixels.h`, `RealTimeClock.h`, `BH1750.h`, `Storage.h`
-and `Arduino.h` — plus the application entry point. See
-[../avr-dx/README.md](../avr-dx/README.md#what-a-backend-must-provide) for the
-contract these fulfil.
+The on-device backend of the Wordclock firmware. It supplies every header the core reaches the
+hardware through, plus the application entry point. Which headers those are, and what each owes
+the core, is the contract in
+[../avr-dx/README.md](../avr-dx/README.md#what-a-backend-must-provide) — named there once rather
+than listed again here, where a list drifts as the seam grows.
 
 Its `Arduino.h` is not a reimplementation: it includes the Arduino core's own and
 replaces exactly one thing, `Serial`. See *A second front end reaches the same port*
@@ -78,9 +78,11 @@ platform/esp32/test/run.sh serve 8080   # the console on localhost, firmware beh
 Those compile the backend against stand-ins for the framework, so they reach everything
 above the peripherals: the frame `Pixels::render()` hands over, byte for byte; that an
 injected command takes the same path through `Communication` as one typed on the wire; and
-the handlers, driven through the same registration call the server makes. `serve` puts the
-real firmware behind both pages on localhost, which is how the browser side is worked on
-without flashing.
+the handlers, driven through the same registration call the server makes. `serve` puts the real
+firmware behind both pages on localhost, which is how the browser side is worked on without
+flashing - node is the HTTP and web socket half of it, and the host process contributes the
+core, the catalog and the broadcast, so what it proves is about the pages rather than about
+this backend's server.
 
 **What no test here can reach is the hardware itself**: the pulse timing on a real strip,
 whether the BH1750 answers on its bus, and whether SNTP arrives. Those need a board.
@@ -492,7 +494,7 @@ The namespace is separate from the settings blob on purpose, so that a settings 
 (`1 -P30`) leaves the network alone. A reset that took it away would leave a clock nobody
 can reach without a cable.
 
-## Known gaps
+## Gaps
 
 - **A clock without a battery still comes up blank.** The DS3231 fills the gap between
   power-on and the first SNTP answer — but only if it has one to fill it with: a chip

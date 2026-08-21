@@ -240,7 +240,7 @@ where it appears, not a number the firmware passes down. Overriding the macro fo
 backend would therefore change nothing — on the two backends that drive an ordinary GPIO,
 the ESP32's RMT and the RP2350's PIO, it is the pin.
 
-## Status
+## Gaps
 
 Everything here builds and links. **The timing has not been on an oscilloscope.**
 Before trusting a first board, check three things:

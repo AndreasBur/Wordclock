@@ -192,3 +192,22 @@ illuminance, and the clock chip's temperature behind a *Sensor connected* box. T
 not decoration — the temperature overlay stays away entirely while no reading has ever
 arrived, and that is the state a clock built without the chip is in for good, so it has to
 be reachable here.
+
+## Gaps
+
+The other three backends end with this section; so does this one, because a backend that stands
+in for hardware has a particular way of being wrong.
+
+- **The window shows no hue.** A lit letter is drawn dark and an unlit one light grey, so the
+  colour swap in `Pixel` — red where green should have been — hid here for as long as it did.
+  A colour is checked by reading the bytes in a test, which is what `display_test.cpp` does.
+- **Nothing in the window can be driven synthetically.** Weston's X11 window manager sets no
+  `_NET_ACTIVE_WINDOW`, so `xdotool click`, key mnemonics and `windowactivate` all do nothing —
+  not only for menus: clicking a plain `wxButton` at its computed position does not open the
+  dialog it owns either. Whatever is not on screen the moment the window opens has to be
+  checked by hand.
+- **No timing is real.** The task runs on a `wxTimer` at the scheduler's interval, which a
+  desktop keeps to when it feels like it, and `Pixels` never puts a frame on a wire. Every
+  question about the pulse shape belongs to a board and an oscilloscope.
+- **The two sensors are sliders.** What they cannot reproduce is a bus that answers late or
+  not at all: `Illuminance` and `Temperature` see a value here where a clock sees a device.

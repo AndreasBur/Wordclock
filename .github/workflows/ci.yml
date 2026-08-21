@@ -185,6 +185,14 @@ jobs:
       - name: Build the firmware
         run: pio run -d platform/rp2350
 
+      # And the two percentages this backend's notes claim are compared against the image that
+      # was just built - the same arrangement the AVR job has, and for the same reason: the
+      # number in the notes was 11.3 % of 4 MB long after the filesystem took a megabyte of it.
+      # python3 comes from setup-python above, and the size tool from the toolchain PlatformIO
+      # just fetched.
+      - name: Check the documented sizes
+        run: python3 tools/documented-sizes.py --rp2350-elf platform/rp2350/.pio/build/wordclock/firmware.elf
+
       # The .uf2 first: the Pico mounts as a mass storage device and installing is copying
       # that file onto it, with no tool to install and nothing to go wrong. The .bin is kept
       # beside it for picotool and for an over-the-air update.
