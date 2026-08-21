@@ -327,9 +327,14 @@ From the comparison with wordclock24h, in the order they would change daily use.
      unreadable in the case one opens the view for. The wx window stays the colour-accurate
      view.
 
-   **Done**, and the shape it took is worth keeping. What the page grew is *one* card above
-   the generated groups, for the colour and the brightness - 1.6 KB of compressed flash on
-   both network backends - and not a sidebar of task pages. Four things it settled:
+   **Done twice over, and the second time is the one that answers this item.** The first was
+   one card above the console's generated groups for the colour and the brightness, 1.6 KB of
+   compressed flash. Then the console got a page beside it: `/` is a **panel** of six task
+   pages - colour, display, animation, overlays, night, system - and `/console` is where the
+   generated groups stayed. Some 10 KB of compressed flash on top of the console, and the shape
+   is ESPWortuhr's after all, arrived at from the other end.
+
+   Four things the *card* settled, and they carried over:
 
    - **A purpose-built control cannot be generated, and that is the whole reason for the
      card.** The catalog says "three numbers called Red, Green and Blue, 0 to 255", which is
@@ -349,11 +354,35 @@ From the comparison with wordclock24h, in the order they would change daily use.
      clock that disagree are worse than one view. What still depends on who asked is whether
      the line is *printed*: the fourteen answers a page collects on load would bury the log.
 
-   The console stays either way. It is what the simulator dialog and the serial line use,
-   and a page that replaced it would have to grow a control for every command before it
-   could. What is left of this item is the settings that are *not* colour and brightness -
-   they have their generated group and no card, which is the right order of work: a control
-   per command is what the groups already are.
+   The console stays either way, and now demonstrably: it is what the simulator dialog and the
+   serial line use, and a page that replaced it would have to grow a control for every command
+   before it could. So the panel is hand-made and incomplete on purpose, the console is
+   generated and complete by construction, and the link in each header is what makes that a
+   division of labour rather than a gap.
+
+   Five things the *panel* settled that the card could not:
+
+   - **A hand-made page cannot find its commands by number.** `MsgCmdParser::CommandType` is
+     conditional, so a build without the date overlay gives every command after it a different
+     number - the card got away with 2 and 3 only because colour and brightness sit ahead of
+     every `#if`. The panel looks its commands up by catalog *label*, and a card whose command
+     is missing takes itself off the page.
+   - **Only what changed goes out.** `MsgCmdAnimationParser` preloads itself with the clock's
+     current settings so a line may set one option without resetting the others, and its `-F`
+     and `-S` address whatever `-A` selects. A line carrying every field therefore handed the
+     animation being selected the *previous* one's speed and favourite - which is what an early
+     version did, and how it silently took Matrix out of the favourites.
+   - **The protocol shaped the animation card.** Command 9 answers the speed and the favourite
+     of the selected animation only, so what the page shows is a list to pick from with those
+     two below it, belonging to the pick. Sixteen sliders would have been fifteen guesses.
+   - **A window is two times to a reader and four numbers to the protocol.** The night card
+     shows two `<input type="time">` and takes `-H -M -E -N` apart itself, which is the side of
+     that difference a page should carry.
+   - **The letters and the frames race.** The letters come over HTTP and the frames over the
+     socket, so whichever is second has to be the one that paints - a frame that arrived first
+     was dropped, and the next one comes with the next word change, which is up to five minutes
+     of an empty plate. The console had the same bug for as long as it has existed and got away
+     with it on timing; the panel found it, and both keep the last frame now.
 2. ~~**Night switch-off / timer.**~~ **Done** — command 14, and
    [NightSwitch](../firmware/inc/NightSwitch/NightSwitch.h) in the core. What it settled:
 

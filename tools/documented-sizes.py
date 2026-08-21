@@ -59,17 +59,20 @@ def avr_sizes(elf):
     return int(program.group(1)), int(data.group(1))
 
 
-def page_sizes():
-    """The console page as it is served: its source, and what it compresses to.
+def page_sizes(name):
+    """One page as it is served: its source, and what it compresses to.
 
     Through embed_web.py's own comment stripper, so that "without comments" means here what
     it means in the build rather than something similar.
+
+    Named rather than fixed, because a clock serves two pages now - the one at "/" and the
+    console behind it - and a sentence about the flash they cost has to be about both.
     """
     spec = importlib.util.spec_from_file_location('embed_web', ROOT / 'platform' / 'scripts' / 'embed_web.py')
     embed_web = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(embed_web)
 
-    page = ROOT / 'web' / 'index.html'
+    page = ROOT / 'web' / name
     source = page.read_text(encoding='utf-8')
     compressed = gzip.compress(embed_web.strip_comments(source).encode('utf-8'), compresslevel=9, mtime=0)
 
@@ -136,10 +139,13 @@ def checks(elf):
                             str(data), f'{round(100 * data / AVR_RAM_BYTES)}'),
                            enforce=False))
 
-    source, compressed = page_sizes()
+    appSource, appCompressed = page_sizes('app.html')
+    consoleSource, consoleCompressed = page_sizes('index.html')
     found.append(Check('platform/esp32/README.md',
-                       r'page is (\d+) KB of source and ([\d.]+) KB compressed',
-                       (kilobytes(source), kilobytes(compressed))))
+                       r'panel is (\d+) KB of source and ([\d.]+) KB compressed, the console '
+                       r'(\d+) and ([\d.]+)',
+                       (kilobytes(appSource), kilobytes(appCompressed),
+                        kilobytes(consoleSource), kilobytes(consoleCompressed))))
 
     return found
 

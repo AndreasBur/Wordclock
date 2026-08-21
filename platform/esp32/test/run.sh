@@ -10,7 +10,7 @@
 # back. Those are the parts a board would not show any more clearly.
 #
 #   test/run.sh              build and run the tests
-#   test/run.sh serve [port] the same binaries, serving the console on localhost
+#   test/run.sh serve [port] the same binaries, serving both pages on localhost
 #   test/run.sh clean        throw the object cache away
 #
 # Every source is compiled once into an object cache under .pio/ and the binaries are
@@ -173,7 +173,7 @@ link webhost     "$TEST_DIR/console/webhost.cpp" "$WEB" "${BACKEND[@]}" "${CORE[
 if [ "${1:-}" = "serve" ]; then
     # Not exec'd: the binaries live in a temporary directory, and the trap that removes it
     # again only fires if this shell is still around to run it.
-    node "$TEST_DIR/console/serve.js" "$ROOT/web/index.html" "$WORK/webhost" "${2:-8080}"
+    node "$TEST_DIR/console/serve.js" "$ROOT/web/app.html" "$WORK/webhost" "${2:-8080}"
     exit
 fi
 

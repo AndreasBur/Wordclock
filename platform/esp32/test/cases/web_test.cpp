@@ -25,6 +25,7 @@ static httpd_handler_t ManifestHandler = nullptr;
 static httpd_handler_t Icon192Handler = nullptr;
 static httpd_handler_t Icon512Handler = nullptr;
 static httpd_handler_t UpdateHandler = nullptr;
+static httpd_handler_t ConsoleHandler = nullptr;
 static std::string SentType;
 static std::string SentStatus;
 /* Every header a handler set, by name - the gate's WWW-Authenticate is read out of here. */
@@ -51,6 +52,7 @@ esp_err_t httpd_register_uri_handler(httpd_handle_t, const httpd_uri_t* u)
     else if(strcmp(u->uri, "/icon-192.png") == 0) { Icon192Handler = u->handler; }
     else if(strcmp(u->uri, "/icon-512.png") == 0) { Icon512Handler = u->handler; }
     else if(strcmp(u->uri, "/update") == 0)   { UpdateHandler = u->handler; }
+    else if(strcmp(u->uri, "/console") == 0)  { ConsoleHandler = u->handler; }
     else                                      { RootHandler = u->handler; }
     return ESP_OK;
 }
@@ -171,16 +173,29 @@ int main()
     check((ManifestHandler != nullptr) && (Icon192Handler != nullptr) && (Icon512Handler != nullptr)
           && (UpdateHandler != nullptr),
           "and the four added since fit under the handler limit as well");
+    /* The ninth, which is the one that pushed the limit past its default: "/" is the panel and
+       the console moved here, so a missing registration would answer 404 on the page that
+       everything the panel does not cover goes through. */
+    check(ConsoleHandler != nullptr, "and the console's own route fits too");
 
     httpd_req_t request{};
     request.method = HTTP_GET;
 
-    /* the page: gzipped, and announced as such */
+    /* the two pages: both gzipped, both announced as such, and not the same bytes - "/" is
+       the panel and "/console" the generated console. Told apart by their titles, because
+       that is what a browser would show and what a swapped pair of pointers would get
+       wrong while every other check here still passed. */
+    ConsoleHandler(&request);
+    const std::string Console = RootBody;
+    check(RootEncoding == "gzip", "the console is announced as gzip");
+    check(Console.size() > 100u, "and is a page");
+
     RootHandler(&request);
     check(RootEncoding == "gzip", "the page is announced as gzip");
     check((RootBody.size() > 100u) && (static_cast<unsigned char>(RootBody[0]) == 0x1fu)
                                    && (static_cast<unsigned char>(RootBody[1]) == 0x8bu),
           "the page really is a gzip stream");
+    check(RootBody != Console, "and the two routes are two different pages");
 
     /* the manifest: a browser reads it, so the type is part of the answer and not decoration */
     RootEncoding.clear();
@@ -436,11 +451,25 @@ int main()
         get.method = HTTP_GET;
         RootHandler(&get);
     };
+    /* The console goes through the same door, and it is worth asking separately: both pages
+       come out of one sendPage(), and a gate that had stayed in the old handler would now be
+       in one of the two callers and not in the other. */
+    auto fetchConsole = [](const char* Header) {
+        Authorization = (Header == nullptr) ? "" : Header;
+        SentStatus.clear();
+        RootBody.clear();
+        httpd_req_t get{};
+        get.method = HTTP_GET;
+        ConsoleHandler(&get);
+    };
 
     /* Nothing stored: the state a clock ships in, and the one an update must not change. */
     check(!System::getInstance().isConsoleProtected(), "a clock with no password is not protected");
     fetchRoot(nullptr);
     check(SentStatus.empty(), "and answers a request that carries no credential");
+
+    fetchConsole(nullptr);
+    check(SentStatus.empty(), "and so does the console");
 
     check(System::getInstance().setConsolePassword("hunter2") == E_OK, "a password can be stored");
     check(System::getInstance().isConsoleProtected(), "which is what protected means");

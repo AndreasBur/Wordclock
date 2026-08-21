@@ -125,20 +125,50 @@ bool isRequestAuthorised(httpd_req_t* Request)
 
 
 /******************************************************************************************************************************************************
-  handleRoot()
+  sendPage()
 ******************************************************************************************************************************************************/
-/*! \brief          Serves the console page straight out of flash
- *  \details        Sent compressed, which is how it is stored: the page was gzipped at
- *                  build time, so this only pushes the bytes and the browser unpacks them.
+/*! \brief          Serves one of the two pages straight out of flash
+ *  \details        Sent compressed, which is how it is stored: the pages were gzipped at build
+ *                  time, so this only pushes the bytes and the browser unpacks them.
 ******************************************************************************************************************************************************/
-esp_err_t handleRoot(httpd_req_t* Request)
+esp_err_t sendPage(httpd_req_t* Request, const uint8_t* Page, size_t Size)
 {
     if(!isRequestAuthorised(Request)) { return ESP_OK; }
 
     httpd_resp_set_type(Request, "text/html");
     httpd_resp_set_hdr(Request, "Content-Encoding", "gzip");
 
-    return httpd_resp_send(Request, reinterpret_cast<const char*>(WebPageGzip), WebPageGzipSize);
+    return httpd_resp_send(Request, reinterpret_cast<const char*>(Page), Size);
+}
+
+
+/******************************************************************************************************************************************************
+  handleRoot()
+******************************************************************************************************************************************************/
+/*! \brief          Serves the page a clock hands out at "/"
+ *  \details        The one made for what somebody changes: a colour, a brightness, an
+ *                  animation. Nobody types a path - they type the clock's address and take
+ *                  what comes - so what comes is the page for the frequent things, and the
+ *                  console is one link away.
+******************************************************************************************************************************************************/
+esp_err_t handleRoot(httpd_req_t* Request)
+{
+    return sendPage(Request, WebAppGzip, WebAppGzipSize);
+}
+
+
+/******************************************************************************************************************************************************
+  handleConsole()
+******************************************************************************************************************************************************/
+/*! \brief          Serves the console at "/console"
+ *  \details        Everything the page at "/" does not cover, which is most of the command
+ *                  set: it draws a group per command out of the catalog, so a command added to
+ *                  the firmware appears there without a page being touched. That is why it
+ *                  moved rather than being replaced.
+******************************************************************************************************************************************************/
+esp_err_t handleConsole(httpd_req_t* Request)
+{
+    return sendPage(Request, WebPageGzip, WebPageGzipSize);
 }
 
 
@@ -563,12 +593,12 @@ StdReturnType WebInterface::begin()
     /* The sockets the server keeps have to cover the console clients plus the ones fetching
        the page, or a reload can push a console off. */
     Config.max_open_sockets = WEB_INTERFACE_MAX_CLIENTS + 2u;
-    /* Said rather than left to the default, which is also 8 and is now exactly the count.
-       A route past the limit is refused by the registration below and nothing here reads
-       that answer, so the failure would be one route quietly missing - and the test that
-       counts them is what would find it, on a host, rather than a browser on somebody's
-       wall. The next route to be added has to raise this number with it. */
-    Config.max_uri_handlers = 8u;
+    /* Said rather than left to the default, which is 8 and was exactly the count until the
+       console moved to its own route. A route past the limit is refused by the registration
+       below and nothing here reads that answer, so the failure would be one route quietly
+       missing - and the test that counts them is what would find it, on a host, rather than a
+       browser on somebody's wall. The next route to be added has to raise this number with it. */
+    Config.max_uri_handlers = 9u;
     Config.close_fn = onSocketClosed;
     /* Its own task, so nothing here runs inside the firmware's tick. */
     Config.core_id = 0;
@@ -580,6 +610,7 @@ StdReturnType WebInterface::begin()
     }
 
     static const httpd_uri_t RootUri{"/", HTTP_GET, handleRoot, nullptr, false, false, nullptr};
+    static const httpd_uri_t ConsoleUri{"/console", HTTP_GET, handleConsole, nullptr, false, false, nullptr};
     static const httpd_uri_t CommandsUri{"/commands", HTTP_GET, handleCommands, nullptr, false, false, nullptr};
     static const httpd_uri_t DisplayUri{"/display", HTTP_GET, handleDisplay, nullptr, false, false, nullptr};
     static const httpd_uri_t ManifestUri{"/manifest.webmanifest", HTTP_GET, handleManifest, nullptr, false, false, nullptr};
@@ -589,6 +620,7 @@ StdReturnType WebInterface::begin()
     static const httpd_uri_t SocketUri{"/ws", HTTP_GET, handleSocket, nullptr, true, false, nullptr};
 
     httpd_register_uri_handler(HttpServer, &RootUri);
+    httpd_register_uri_handler(HttpServer, &ConsoleUri);
     httpd_register_uri_handler(HttpServer, &CommandsUri);
     httpd_register_uri_handler(HttpServer, &DisplayUri);
     httpd_register_uri_handler(HttpServer, &ManifestUri);

@@ -117,10 +117,11 @@ sentence so it needs none. Two kinds of number deliberately have none:
 - **A comparative claim** is written as the difference and not as both absolutes: "`-flto` is
   worth 10 KiB" needs no second build to stay true, where "58 778 bytes without it" would.
 
-## Looking at the web console
+## Looking at the two web pages
 
-`web/index.html` is the one part of this project the simulator cannot show, and unlike the
-wx window below it can be **driven**: clicks, typing and file pickers all work. The dev
+`web/app.html` — the **panel**, served at `/` — and `web/index.html` — the **console**, at
+`/console` — are the one part of this project the simulator cannot show, and unlike the
+wx window below they can be **driven**: clicks, typing and file pickers all work. The dev
 container ships Playwright with its own Chromium for that — `apt` on this base offers only a
 snap stub, which does not run in a container. It is headless, so none of the display
 plumbing the next section works around applies here.
@@ -130,29 +131,36 @@ plumbing the next section works around applies here.
 /opt/playwright/bin/python shot.py
 ```
 
-The page needs the firmware behind it, which `platform/esp32/test/run.sh serve <port>`
-provides: it serves the page from disk and answers `/commands`, `/display` and the web
-socket from a host build of the real backend, so what the browser sees is what a clock would
-send. Four things have to line up, and three of them fail as a timeout that says nothing:
+They need the firmware behind them, which `platform/esp32/test/run.sh serve <port>`
+provides: it serves both pages from disk — the panel at `/`, the console at `/console`, the
+same way a clock does — and answers `/commands`, `/display` and the web socket from a host
+build of the real backend, so what the browser sees is what a clock would send. Five things
+have to line up, and four of them fail as a timeout that says nothing:
 
 1. **Start the server as a tracked background call**, not as `( ... &)`. `run.sh` keeps its
    binaries in a temporary directory and deletes them in a trap when its own shell exits, so
    a detached server still answers `/` from disk and then hangs forever on `/display` and
    `/commands` — which is where the panel and every settings row come from.
-2. **Never wait for `networkidle`.** The console holds a web socket open, so the page never
-   goes idle and `page.goto` dies at its 30 s timeout. Use `wait_until="load"`, then wait for
-   `#panel:not([hidden])`: that selector appearing *is* `/display` having answered.
+2. **Never wait for `networkidle`.** Both pages hold a web socket open, so neither ever goes
+   idle and `page.goto` dies at its 30 s timeout. Use `wait_until="load"`, then wait for
+   `#plate:not([hidden])` on the panel or `#panel:not([hidden])` on the console: that selector
+   appearing *is* `/display` having answered.
 3. **The header reads "connected"**, so a wait for the absence of "connecting" matches it and
-   never fires. Wait on the panel, or on `#panel span.lit` for the first frame off the socket.
-4. **Give it a real width.** The page is a two-column desktop layout above 800 px and one
-   column below, and the phone case is the one it exists for — 390 px is worth checking
-   before 1280.
+   never fires. Wait on the plate, or on `.lit` inside it for the first frame off the socket.
+4. **Waiting for the plate is not waiting for the values.** The letters come from `/display`
+   and every field from the catalog and then a round of answers over the socket, so a script
+   that reads a slider a second after the plate appeared reads its unfilled default — 128 for
+   a range, black for a colour. Two seconds is enough here; better still, wait for the field
+   to hold something.
+5. **Give it a real width.** The panel is a two-column desktop layout above 960 px and one
+   column below, the console above 800, and the phone case is the one they exist for — 390 px
+   is worth checking before 1280.
 
 ```python
 page = browser.new_page(viewport={"width": 390, "height": 900}, color_scheme="dark")
 page.goto(URL, wait_until="load")
-page.wait_for_selector("#panel:not([hidden])", timeout=20000)
-page.evaluate("document.querySelectorAll('details').forEach(d => d.open = true)")
+page.wait_for_selector("#plate:not([hidden])", timeout=20000)   # "#panel" on the console
+page.wait_for_timeout(2000)                                     # the answers, see 4 above
 page.screenshot(path="shot.png", full_page=True)
 ```
 
@@ -162,10 +170,12 @@ overflows its card, and a page that scrolls sideways at 390 px is a bug however 
 looks. And **behaviour that needs input** — `set_input_files` on the update panel's picker
 plus a click on Install exercises the whole upload, both answers included.
 
-What it cannot show is **colour**. The page takes only *whether* a pixel is lit from the
-frame and paints the lit ones a fixed high-contrast colour, exactly as the wx window renders
-brightness as a grey level and drops the hue. Neither front end shows a hue, so a colour is
-checked by reading the bytes in a test.
+What none of them shows is **the colour that went to the strip**. Both pages take only
+*whether* a pixel is lit from the frame — the bytes arrive already dimmed, and a word at low
+brightness would be a dark grey on a dark ground — and the wx window renders brightness as a
+grey level and drops the hue. The panel does paint its plate in a hue, but that hue is the
+*setting* it read back from command 2 and not the frame, so it says what the clock was told
+rather than what it sent. A colour is therefore still checked by reading the bytes in a test.
 
 Two screenshot artefacts worth knowing: `full_page=True` renders a `position: sticky`
 element at its scrolled position, so the clock panel appears halfway down the image on a

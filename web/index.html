@@ -177,7 +177,19 @@
     }
     #state.up::before { background: var(--lit); }
     #state.up { color: var(--lit); }
-    #theme { margin-left: auto; padding: 5px 12px; font-size: 13px; }
+    #theme { padding: 5px 12px; font-size: 13px; min-width: 62px; }
+    #app {
+        margin-left: auto;
+        font: inherit;
+        font-size: 13px;
+        color: var(--unlit);
+        background: var(--field);
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        padding: 5px 12px;
+        text-decoration: none;
+    }
+    #app:hover { color: var(--text); }
 
     /* The shared look of every control, which the console card then overrides for the one
        input that lives inside it. Cut out by accident when the console was rebuilt, which
@@ -565,7 +577,11 @@
     <div class="bar">
         <h1>WORDCLOCK</h1>
         <span id="state">connecting…</span>
-        <button type="button" id="theme" title="Switch between the dark and the light theme"></button>
+        <!-- Back to the page a clock hands out at "/", which is where somebody arrives and
+             where the colour and the brightness now live. Relative, because the clock answers
+             on whatever address it was given. -->
+        <a href="." id="app">Panel</a>
+        <button type="button" id="theme" title="Follow the system, or choose light or dark"></button>
     </div>
 </header>
 
@@ -671,37 +687,38 @@
     const commandInput = document.getElementById('command');
 
     /* ---- theme ---------------------------------------------------------------------
-       Nothing is stored until the button is pressed: without a stored choice the page
-       follows the system, which the stylesheet already does on its own. The button then
-       overrides it, and says what it would switch to rather than what is showing. */
+       Nothing is stamped on the root until the button is pressed: without a stored choice the
+       page follows the system, which the stylesheet already does on its own. */
     const themeButton = document.getElementById('theme');
 
-    function systemTheme() {
-        return matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-    }
-
-    function currentTheme() {
-        return document.documentElement.dataset.theme || systemTheme();
-    }
+    /* Three states and not two. The button used to say what it would switch *to* and only
+       ever swapped light for dark, so the state a page is served in - following the system -
+       could not be got back to once anything had been pressed. It now says what is in force,
+       and "system" is one of the three it walks through. */
+    const THEMES = ['system', 'light', 'dark'];
 
     function showTheme() {
-        themeButton.textContent = currentTheme() === 'dark' ? 'light' : 'dark';
+        themeButton.textContent = document.documentElement.dataset.theme || 'system';
+    }
+
+    function setTheme(name) {
+        if (name === 'system') { delete document.documentElement.dataset.theme; }
+        else { document.documentElement.dataset.theme = name; }
+        try { localStorage.setItem('wordclock-theme', name); } catch (ignored) { /* private window */ }
+        showTheme();
     }
 
     themeButton.addEventListener('click', () => {
-        const next = currentTheme() === 'dark' ? 'light' : 'dark';
-        document.documentElement.dataset.theme = next;
-        localStorage.setItem('wordclock-theme', next);
-        showTheme();
+        setTheme(THEMES[(THEMES.indexOf(themeButton.textContent) + 1) % THEMES.length]);
     });
 
     /* Follows the system while nothing was chosen by hand, so a machine switching at dusk
        takes the page with it. */
     matchMedia('(prefers-color-scheme: dark)').addEventListener('change', showTheme);
 
-    const storedTheme = localStorage.getItem('wordclock-theme');
-    if (storedTheme) { document.documentElement.dataset.theme = storedTheme; }
-    showTheme();
+    let storedTheme = null;
+    try { storedTheme = localStorage.getItem('wordclock-theme'); } catch (ignored) { /* private window */ }
+    setTheme(THEMES.includes(storedTheme) ? storedTheme : 'system');
 
     function append(text, kind) {
         const line = document.createElement('div');
@@ -807,9 +824,20 @@
             return cell;
         });
         panel.hidden = cells.length === 0;
+        /* A frame that arrived before the letters did would otherwise be dropped, and the next
+           one comes with the next word change - which on a word clock is up to five minutes of
+           an empty panel. It has happened; the panel page found it. */
+        if (lastFrame) { showFrame(lastFrame); }
     }
 
+    /* The last frame, for the reason buildPanel() gives: the letters come over HTTP and the
+       frames over the socket, and whichever is second is the one that has to paint. */
+    let lastFrame = null;
+
     function showFrame(bytes) {
+        lastFrame = bytes;
+        if (cells.length === 0) { return; }
+
         /* Green, red, blue - the strip's order, which is what the buffer holds.
            Only whether a pixel is lit is taken from it, not its colour: the bytes arrive
            already dimmed, so painting them would make a word at low brightness a dark
