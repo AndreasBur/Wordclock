@@ -30,6 +30,7 @@ Usage:
 import argparse
 import gzip
 import importlib.util
+import os
 import re
 import subprocess
 import sys
@@ -57,6 +58,50 @@ def avr_sizes(elf):
         raise SystemExit(f'documented-sizes.py: avr-size said something unexpected:\n{out}')
 
     return int(program.group(1)), int(data.group(1))
+
+
+# What the Pico's sketch has after the filesystem took its megabyte, and the part's RAM. Both
+# are what the linker was given rather than what the chip has: the flash region shrank when the
+# network update needed room for an image, and a percentage of the whole part would flatter it.
+RP2350_FLASH_BYTES = 3141632
+RP2350_RAM_BYTES = 512 * 1024
+
+
+def rp2350_sizes(elf):
+    """Flash and RAM as the sections say, which is the only reading this script can defend.
+
+    Not PlatformIO's own two numbers: those come out of its build, this runs on an image, and
+    the two disagree by a few hundred bytes for reasons that belong to the builder. So what the
+    notes carry is a percentage of each region, measured here, with a point of slack - the same
+    shape the AVR's figure has and for the same reason.
+
+    Flash is every section the linker put at an XIP address, RAM the three that live in it.
+    """
+    size = os.environ.get('RP2350_SIZE') or _find_pico_size()
+    out = subprocess.run([size, '-A', str(elf)], capture_output=True, text=True, check=True).stdout
+
+    flash = 0
+    ram = 0
+    for line in out.splitlines():
+        parts = line.split()
+        if len(parts) != 3:
+            continue
+        name, length, address = parts[0], parts[1], parts[2]
+        if not length.isdigit() or not address.isdigit():
+            continue
+        if int(address) >= 0x10000000 and int(address) < 0x20000000:
+            flash += int(length)
+        elif name in ('.ram_vector_table', '.data', '.bss'):
+            ram += int(length)
+    return flash, ram
+
+
+def _find_pico_size():
+    """The Pico toolchain's size, wherever PlatformIO put it."""
+    candidates = sorted(Path.home().glob('.platformio/packages/toolchain-rp2040-*/bin/arm-none-eabi-size'))
+    if not candidates:
+        raise SystemExit('documented-sizes.py: no arm-none-eabi-size found; set RP2350_SIZE')
+    return str(candidates[-1])
 
 
 def page_sizes(name):
@@ -117,7 +162,7 @@ class Check:
         return True
 
 
-def checks(elf):
+def checks(elf, rp2350Elf=None):
     """Every documented size, with the pattern that finds it and the value it should be.
 
     A pattern must capture exactly what is to be replaced, and nothing that moves for
@@ -139,6 +184,14 @@ def checks(elf):
                             str(data), f'{round(100 * data / AVR_RAM_BYTES)}'),
                            enforce=False))
 
+    if rp2350Elf is not None:
+        flash, ram = rp2350_sizes(rp2350Elf)
+        found.append(Check('platform/rp2350/README.md',
+                           r'RAM:\s+(\d+) %\s+of 512 KB\nFlash:\s+(\d+) %\s+of the 3 MB',
+                           (f'{round(100 * ram / RP2350_RAM_BYTES)}',
+                            f'{round(100 * flash / RP2350_FLASH_BYTES)}'),
+                           tolerance=(1, 1)))
+
     appSource, appCompressed = page_sizes('app.html')
     consoleSource, consoleCompressed = page_sizes('index.html')
     found.append(Check('platform/esp32/README.md',
@@ -153,11 +206,13 @@ def checks(elf):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--elf', type=Path, help='an AVR image to measure; its checks are skipped without one')
+    parser.add_argument('--rp2350-elf', type=Path, dest='rp2350Elf',
+                        help='an RP2350 image to measure; its checks are skipped without one')
     parser.add_argument('--fix', action='store_true', help='write the measured values into the documentation')
     arguments = parser.parse_args()
 
     stale = 0
-    for check in checks(arguments.elf):
+    for check in checks(arguments.elf, arguments.rp2350Elf):
         path = ROOT / check.document
         text = path.read_text(encoding='utf-8')
         match = re.search(check.pattern, text)
