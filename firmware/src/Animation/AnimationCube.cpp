@@ -158,21 +158,21 @@ void AnimationCube::clearBorderPixelsWithoutClockPixels()
     for(byte Column = Border.ColumnStart; Column <= Border.ColumnEnd; Column++) {
         if(isPixelPartOfClockWords(ClockWordsTable, Column, Border.RowStart) == false) {
             // clear border top
-            Display::getInstance().clearPixelFast(Column, Border.RowStart);
+            Display::getInstance().clearPixel(Column, Border.RowStart);
         }
         if(isPixelPartOfClockWords(ClockWordsTable, Column, Border.RowEnd) == false) {
             // clear border bottom
-            Display::getInstance().clearPixelFast(Column, Border.RowEnd);
+            Display::getInstance().clearPixel(Column, Border.RowEnd);
         }
     }
     for(byte Row = Border.RowStart; Row <= Border.RowEnd; Row++) {
         if(isPixelPartOfClockWords(ClockWordsTable, Border.ColumnStart, Row) == false) {
             // clear border left
-            Display::getInstance().clearPixelFast(Border.ColumnStart, Row);
+            Display::getInstance().clearPixel(Border.ColumnStart, Row);
         }
         if(isPixelPartOfClockWords(ClockWordsTable, Border.ColumnEnd, Row) == false) {
             // clear border right
-            Display::getInstance().clearPixelFast(Border.ColumnEnd, Row);
+            Display::getInstance().clearPixel(Border.ColumnEnd, Row);
         }
     }
 } /* writeBorderPixels */
@@ -185,15 +185,15 @@ void AnimationCube::writeBorderPixels(bool Value)
 {
     for(byte Column = Border.ColumnStart; Column <= Border.ColumnEnd; Column++) {
         // set border top
-        Display::getInstance().writePixelFast(Column, Border.RowStart, Value);
+        Display::getInstance().writePixel(Column, Border.RowStart, Value);
         // set border bottom
-        Display::getInstance().writePixelFast(Column, Border.RowEnd, Value);
+        Display::getInstance().writePixel(Column, Border.RowEnd, Value);
     }
     for(byte Row = Border.RowStart; Row <= Border.RowEnd; Row++) {
         // set border left
-        Display::getInstance().writePixelFast(Border.ColumnStart, Row, Value);
+        Display::getInstance().writePixel(Border.ColumnStart, Row, Value);
         // set border right
-        Display::getInstance().writePixelFast(Border.ColumnEnd, Row, Value);
+        Display::getInstance().writePixel(Border.ColumnEnd, Row, Value);
     }
 } /* writeBorderPixels */
 

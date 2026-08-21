@@ -199,12 +199,24 @@ class DisplayCharacters
     constexpr DisplayCharacters() { }
     ~DisplayCharacters() { }
 
-    // get methods fast
-    char getCharacterFast(byte Column, byte Row) const { return getDisplayCharactersTableElement(Column, Row); }
-    char getCharacterFast(byte Index) const { return getDisplayCharactersTableElement(Index); }
-    char getCharacterFast(CharacterIdType CharacterId) const { return getDisplayCharactersTableElement(CharacterId); }
-    
+    /* Two forms of every reader, and the argument list says which: the one taking a
+       reference answers whether the character was there, the one taking none answers the
+       character. Both check, and the unchecked read is the private table element above -
+       a plate has no character outside its grid, so STD_NULL_CHARACTER is the honest
+       answer where a read past the table used to be. */
     // get methods
+    char getCharacter(byte Column, byte Row) const {
+        if(!isColumnAndRowValid(Column, Row)) { return STD_NULL_CHARACTER; }
+        return getDisplayCharactersTableElement(Column, Row);
+    }
+    char getCharacter(byte Index) const {
+        if(!isIndexValid(Index)) { return STD_NULL_CHARACTER; }
+        return getDisplayCharactersTableElement(Index);
+    }
+    char getCharacter(CharacterIdType CharacterId) const {
+        if(!isCharacterIdValid(CharacterId)) { return STD_NULL_CHARACTER; }
+        return getDisplayCharactersTableElement(CharacterId);
+    }
     StdReturnType getCharacter(byte, byte, char&) const;
     StdReturnType getCharacter(byte, char&) const;
     StdReturnType getCharacter(CharacterIdType, char&) const;
@@ -214,6 +226,9 @@ class DisplayCharacters
     // methods
     static bool isCharacterIdValid(CharacterIdType CharacterId) { return CharacterId < DISPLAY_CHARACTERS_NUMBER_OF_CHARACTERS; };
     static bool isIndexValid(byte Index) { return Index < DISPLAY_CHARACTERS_NUMBER_OF_CHARACTERS; };
+    static constexpr bool isColumnAndRowValid(byte Column, byte Row) {
+        return (Column < DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS) && (Row < DISPLAY_CHARACTERS_NUMBER_OF_ROWS);
+    }
     /* Column before Row, matching both the name and Display's function of the same name.
        They were the other way round here, so a caller that read the two classes side by
        side got a silent swap. */

@@ -53,7 +53,7 @@ bool Animation::isPixelPartOfClockWords(const ClockWords::WordsListType ClockWor
 
     for(uint8_t wordIndex = 0u; wordIndex < ClockWordsTable.size(); wordIndex++) {
         if(ClockWordsTable[wordIndex] == DisplayWords::WORD_NONE) { break; }
-        DisplayWord Word = words.getDisplayWordFast(ClockWordsTable[wordIndex]);
+        DisplayWord Word = words.getDisplayWord(ClockWordsTable[wordIndex]);
         if(Word.getRow() == Row) { if((Column >= Word.getColumn()) && (Column < Word.getColumn() + Word.getLength())) { return true; } }
     }
     return false;

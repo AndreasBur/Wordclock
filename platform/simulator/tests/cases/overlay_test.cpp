@@ -25,10 +25,10 @@
    same word set and leaves the letters alone, for up to five minutes. */
 void testShowNowProcedures()
 {
-    Clock::getInstance().setModeFast(Clock::MODE_WESSI);
+    Clock::getInstance().setMode(Clock::MODE_WESSI);
     Animations& animations = Animations::getInstance();
-    animations.setModeFast(Animations::MODE_FIXED);
-    animations.setAnimationFast(Animations::ANIMATION_ID_NONE);
+    animations.setMode(Animations::MODE_FIXED);
+    animations.setAnimation(Animations::ANIMATION_ID_NONE);
 
     DisplayManager& displayManager = DisplayManager::getInstance();
     Overlays& overlays = Overlays::getInstance();
@@ -46,13 +46,13 @@ void testShowNowProcedures()
     expect(displayManager.refreshClock() == E_OK, "the clock must be refreshable");
     expect(arePixelsEqual(readPixels(), clockFace), "the refresh must put the clock face back");
 
-    animations.setAnimationFast(Animations::ANIMATION_ID_CURSOR);
+    animations.setAnimation(Animations::ANIMATION_ID_CURSOR);
     expect(displayManager.startAnimation() == E_OK, "the selected animation must start on demand");
     expect(animations.getState() == Animations::STATE_PENDING, "the started animation must be running");
     expect(displayManager.abortAnimation() == E_OK, "a running animation must be abortable");
     expect(animations.getState() == Animations::STATE_IDLE, "the aborted animation must be idle");
     expect(arePixelsEqual(readPixels(), clockFace), "the abort must put the clock face back");
-    animations.setAnimationFast(Animations::ANIMATION_ID_NONE);
+    animations.setAnimation(Animations::ANIMATION_ID_NONE);
 
     /* An overlay owns the display while it shows, so both clock procedures step aside
        instead of drawing underneath it. */

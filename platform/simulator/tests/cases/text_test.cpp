@@ -60,19 +60,20 @@ void testCharacterToGlyphMapping()
         expect(text.setChar(0u, 0u, '\xB0', FontType) == E_OK && isAnyPixelLit(readPixels()), Description);
     }
 
-    /* The scrolling text the overlay actually uses goes through the fast conversion, which
-       answers with the space instead of a return code when it cannot map a byte. So the
-       sign has to be checked there as well, and against the space rather than against an
-       empty display - a fallback would light nothing and look like a blank glyph. */
+    /* The scrolling text the overlay actually uses goes through the form of the conversion
+       that answers an index rather than a code, and substitutes the space where it cannot
+       map a byte. So the sign has to be checked there as well, and against the space rather
+       than against an empty display - a fallback would light nothing and look like a blank
+       glyph. */
     Display::getInstance().clear();
-    text.setCharFast(0u, 0u, '\xB0', Text::FONT_5X8);
+    text.setChar(0u, 0u, '\xB0', Text::FONT_5X8);
     const PixelBufferType Sign = readPixels();
 
     Display::getInstance().clear();
-    text.setCharFast(0u, 0u, ' ', Text::FONT_5X8);
+    text.setChar(0u, 0u, ' ', Text::FONT_5X8);
     const PixelBufferType Space = readPixels();
 
-    expect(!arePixelsEqual(Sign, Space), "the fast conversion must not fall back to the space");
+    expect(!arePixelsEqual(Sign, Space), "the substituting conversion must not fall back to the space");
 
     /* Every font carries the same character set, and a glyph nobody can see would be a
        table read as the wrong packing. */
@@ -88,4 +89,46 @@ void testCharacterToGlyphMapping()
     }
 
     Display::getInstance().clear();
+}
+
+
+/* The scrolling path draws every character, including the ones setChar() refuses. It used
+   to reach a second entry point that substituted the space silently; there is one entry
+   point now, so the substitution is where the scrolling task can be read to make it -
+   and it has to keep happening, because the space is the blank glyph and drawing it is
+   what clears the cells the previous shift step wrote. Leaving the character out would
+   smear those pixels along the display for as long as the text runs.
+
+   Checked against the space over a lit display rather than an empty one: on a dark display
+   drawing a blank glyph and drawing nothing at all are the same picture. */
+void testUndrawableCharacterShiftsAsASpace()
+{
+    Text& text = Text::getInstance();
+    Display& display = Display::getInstance();
+
+    const auto shiftOver = [&](char Character) {
+        text.stop();
+        display.clear();
+        /* Something to clear, in every pixel the glyph could touch. */
+        display.test();
+        text.setCharWithShift(Character, Text::FONT_5X8);
+
+        for(byte Step = 0u; Step < DISPLAY_NUMBER_OF_COLUMNS && text.getState() != Text::STATE_IDLE; Step++) {
+            text.task();
+        }
+        return readPixels();
+    };
+
+    const PixelBufferType Unmapped = shiftOver('\xE0');
+    const PixelBufferType Space = shiftOver(' ');
+    const PixelBufferType Letter = shiftOver('A');
+
+    expect(arePixelsEqual(Unmapped, Space), "a character with no glyph must shift through as the space");
+    /* Otherwise the case above would also pass on a display the shift left dark, which is
+       the one picture that says nothing about what was drawn into it. */
+    expect(!arePixelsEqual(Letter, Space), "while a letter must not leave the same picture as the space");
+    expect(isAnyPixelLit(Space), "and the shift must leave something lit to have cleared around");
+
+    text.stop();
+    display.clear();
 }

@@ -104,7 +104,7 @@ void AnimationWipe::clearTimeTask()
     Display::getInstance().indexToColumnAndRow(Index, column, row);
 
     do {
-        if(Display::getInstance().getPixelFast(column, row)) {
+        if(Display::getInstance().getPixel(column, row)) {
             if(SetPixelState == SET_PIXEL_STATE_DOWN) { setPixelDown(column, row); }
             else { setPixelRight(column, row); }
         }
@@ -131,7 +131,7 @@ void AnimationWipe::setTimeTask()
 
     do {
         if(isPixelPartOfClockWords(ClockWordsTable, column, row)) {
-            Display::getInstance().setPixelFast(column, row);
+            Display::getInstance().setPixel(column, row);
         }
     } while(column-- != 0u && row++ < DISPLAY_NUMBER_OF_ROWS - 1u);
 
@@ -165,11 +165,11 @@ StdReturnType AnimationWipe::setNextIndex()
 ******************************************************************************************************************************************************/
 void AnimationWipe::setPixelDown(byte Column, byte Row)
 {
-    Display::getInstance().clearPixelFast(Column, Row);
+    Display::getInstance().clearPixel(Column, Row);
 
     for(byte rowNext = Row + 1u; rowNext < DISPLAY_NUMBER_OF_ROWS; rowNext++) {
-        if(Display::getInstance().getPixelFast(Column, rowNext) == false) {
-            Display::getInstance().setPixelFast(Column, rowNext);
+        if(Display::getInstance().getPixel(Column, rowNext) == false) {
+            Display::getInstance().setPixel(Column, rowNext);
             break;
         }
     }
@@ -181,11 +181,11 @@ void AnimationWipe::setPixelDown(byte Column, byte Row)
 ******************************************************************************************************************************************************/
 void AnimationWipe::setPixelRight(byte Column, byte Row)
 {
-    Display::getInstance().clearPixelFast(Column, Row);
+    Display::getInstance().clearPixel(Column, Row);
 
     for(byte columnNext = Column + 1u; columnNext < DISPLAY_NUMBER_OF_COLUMNS; columnNext++) {
-        if(Display::getInstance().getPixelFast(columnNext, Row) == false) {
-            Display::getInstance().setPixelFast(columnNext, Row);
+        if(Display::getInstance().getPixel(columnNext, Row) == false) {
+            Display::getInstance().setPixel(columnNext, Row);
             break;
         }
     }

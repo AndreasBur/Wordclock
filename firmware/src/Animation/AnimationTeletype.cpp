@@ -65,7 +65,7 @@ StdReturnType AnimationTeletype::setTime(byte Hour, byte Minute)
         returnValue = E_OK;
         CurrentWordIndex = 0u;
         CurrentCharIndex = 0u;
-        CurrentWordLength = Words.getDisplayWordLengthFast(ClockWordsTable[CurrentWordIndex]);
+        CurrentWordLength = Words.getDisplayWordLength(ClockWordsTable[CurrentWordIndex]);
         State = STATE_SET_TIME;
     }
     return returnValue;
@@ -84,10 +84,10 @@ void AnimationTeletype::task()
                 return;
             }
             CurrentCharIndex = 0u;
-            CurrentWordLength = Words.getDisplayWordLengthFast(ClockWordsTable[CurrentWordIndex]);
+            CurrentWordLength = Words.getDisplayWordLength(ClockWordsTable[CurrentWordIndex]);
         }
         CurrentCharIndex++;
-        Display::getInstance().setWordFast(ClockWordsTable[CurrentWordIndex], CurrentCharIndex);
+        Display::getInstance().setWord(ClockWordsTable[CurrentWordIndex], CurrentCharIndex);
     }
 } /* task */
 

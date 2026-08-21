@@ -110,7 +110,7 @@ void Display::applyColor()
 
     /* the pixels already on the display still carry the previous color */
     for(IndexType Index = 0; Index < DISPLAY_NUMBER_OF_PIXELS; Index++) {
-        if(getPixelFast(Index)) { setPixelFast(Index); }
+        if(getPixel(Index)) { setPixel(Index); }
     }
 #endif
 } /* applyColor */
@@ -133,7 +133,7 @@ void Display::applyColorAndCurrentLimit()
   getNumberOfLitPixels()
 *******************************************************************************************************************************************************/
 /* Counted from the strip's buffer rather than kept as a running total beside it. The
-   animations and setPixelFast() write there directly, so a counter would be the copy that
+   animations and setPixel() write there directly, so a counter would be the copy that
    falls behind - the same argument Persistence::gather() is built on. One pass over the
    display per task run, next to the pass applyColor() already makes. */
 byte Display::getNumberOfLitPixels() const
@@ -142,7 +142,7 @@ byte Display::getNumberOfLitPixels() const
     byte Count{0u};
 
     for(IndexType Index = 0u; Index < DISPLAY_NUMBER_OF_PIXELS; Index++) {
-        if(getPixelFast(Index)) { Count++; }
+        if(getPixel(Index)) { Count++; }
     }
     return Count;
 } /* getNumberOfLitPixels */
@@ -156,7 +156,7 @@ byte Display::getNumberOfLitPixels() const
    or the plain one, and only the plain one says what the strip would draw at full brightness.
    Every lit pixel carries the same colour, so a count is all the buffer has to give.
 
-   An upper bound on purpose. setPixelFast() with its own brightness leaves a pixel dimmer than
+   An upper bound on purpose. setPixel() with its own brightness leaves a pixel dimmer than
    the colour, and a limiter that guessed low would be one that does not protect.
 
    The colour it asks for is the one being *shown*, not the one that was set: with the colour
@@ -219,7 +219,7 @@ StdReturnType Display::setWord(WordIdType WordId, byte MaxLength)
 
     if(WordId < DisplayWords::WORD_NUMBER_OF_WORDS) {
         returnValue = E_OK;
-        DisplayWord word = Words.getDisplayWordFast(WordId);
+        DisplayWord word = Words.getDisplayWord(WordId);
         byte WordLength = word.getLength();
 
         if(MaxLength == WordLengthUnlimited || MaxLength >= WordLength) { length = WordLength; }
@@ -236,21 +236,6 @@ StdReturnType Display::setWord(WordIdType WordId, byte MaxLength)
 
 
 /******************************************************************************************************************************************************
-  setWordFast()
-******************************************************************************************************************************************************/
-void Display::setWordFast(WordIdType WordId, byte MaxLength)
-{
-    byte length;
-    DisplayWord word = Words.getDisplayWordFast(WordId);
-
-    if(MaxLength == WordLengthUnlimited) length = word.getLength();
-    else length = MaxLength;
-
-    for(IndexType Index = 0; Index < length; Index++) { setPixelFast(word.getColumn() + Index,  word.getRow()); }
-} /* setWordFast */
-
-
-/******************************************************************************************************************************************************
   clearWord()
 ******************************************************************************************************************************************************/
 StdReturnType Display::clearWord(WordIdType WordId)
@@ -259,7 +244,7 @@ StdReturnType Display::clearWord(WordIdType WordId)
 
     if(WordId < DisplayWords::WORD_NUMBER_OF_WORDS) {
         returnValue = E_OK;
-        DisplayWord Word = Words.getDisplayWordFast(WordId);
+        DisplayWord Word = Words.getDisplayWord(WordId);
 
         for(IndexType Index = 0; Index < Word.getLength(); Index++) {
             if(clearPixel(Word.getColumn() + Index,  Word.getRow()) == E_NOT_OK) returnValue = E_NOT_OK;
@@ -269,19 +254,6 @@ StdReturnType Display::clearWord(WordIdType WordId)
     }
     return returnValue;
 } /* clearWord */
-
-
-/******************************************************************************************************************************************************
-  clearWordFast()
-******************************************************************************************************************************************************/
-void Display::clearWordFast(WordIdType WordId)
-{
-    DisplayWord word = Words.getDisplayWordFast(WordId);
-
-    for(IndexType index = 0; index < word.getLength(); index++) {
-        clearPixelFast(word.getColumn() + index,  word.getRow());
-    }
-} /* clearWordFast */
 
 
 /******************************************************************************************************************************************************
@@ -299,15 +271,6 @@ StdReturnType Display::clearWords()
 
 
 /******************************************************************************************************************************************************
-  clearAllWordsFast()
-******************************************************************************************************************************************************/
-void Display::clearWordsFast()
-{
-    for(byte i = DisplayWords::WORD_ES; i < DisplayWords::WORD_NUMBER_OF_WORDS; i++) clearWordFast((WordIdType) i);
-} /* clearAllWordsFast */
-
-
-/******************************************************************************************************************************************************
   getPixel()
 ******************************************************************************************************************************************************/
 StdReturnType Display::getPixel(IndexType Index, PixelValueType& Value) const
@@ -319,14 +282,14 @@ StdReturnType Display::getPixel(IndexType Index, PixelValueType& Value) const
 
 
 /******************************************************************************************************************************************************
-  getPixelFast()
+  getPixel()
 ******************************************************************************************************************************************************/
-Display::PixelValueType Display::getPixelFast(IndexType Index) const
+Display::PixelValueType Display::getPixel(IndexType Index) const
 {
     byte row, column;
     indexToColumnAndRow(Index, column, row);
-    return getPixelFast(column, row);
-} /* getPixelFast */
+    return getPixel(column, row);
+} /* getPixel */
 
 
 /******************************************************************************************************************************************************
@@ -334,39 +297,25 @@ Display::PixelValueType Display::getPixelFast(IndexType Index) const
 ******************************************************************************************************************************************************/
 StdReturnType Display::getPixel(byte Column, byte Row, PixelValueType& Value)  const
 {
-    StdReturnType returnValue{E_NOT_OK};
-    Pixel pixel;
+    if(!isColumnAndRowValid(Column, Row)) { return E_NOT_OK; }
 
-#if (DISPLAY_LED_STRIPE_SERPENTINE == STD_ON)
-    
-    returnValue = PixelStripe.getPixel(transformToSerpentine(Column,  Row), pixel);
-#else
-    returnValue = PixelStripe.getPixel((Row * DISPLAY_NUMBER_OF_COLUMNS) + Column, pixel);
-#endif
-    if(returnValue == E_OK) {
-        /* Pixel is only off when all colors are zero */
-        if(pixel.getRed() == 0 && pixel.getGreen() == 0 && pixel.getBlue() == 0) Value = false;
-        else Value = true;
-    }
-    return returnValue;
+    Value = getPixel(Column, Row);
+    return E_OK;
 } /* getPixel */
 
 
 /******************************************************************************************************************************************************
-  getPixelFast()
+  getPixel()
 ******************************************************************************************************************************************************/
-Display::PixelValueType Display::getPixelFast(byte Column, byte Row)  const
+Display::PixelValueType Display::getPixel(byte Column, byte Row)  const
 {
-    Pixel pixel;
+    if(!isColumnAndRowValid(Column, Row)) { return false; }
 
-#if (DISPLAY_LED_STRIPE_SERPENTINE == STD_ON)
-    pixel = PixelStripe.getPixelFast(transformToSerpentine(Column,  Row));
-#else
-    pixel = PixelStripe.getPixelFast((Row * DISPLAY_NUMBER_OF_COLUMNS) + Column);
-#endif
-    if(pixel.getRed() == 0u && pixel.getGreen() == 0u && pixel.getBlue() == 0u) return false;
-    else return true;
-} /* getPixelFast */
+    const Pixel pixel = PixelStripe.getPixel(toIndex(Column, Row));
+
+    /* Pixel is only off when all colors are zero */
+    return !(pixel.getRed() == 0u && pixel.getGreen() == 0u && pixel.getBlue() == 0u);
+} /* getPixel */
 
 
 /******************************************************************************************************************************************************
@@ -374,43 +323,14 @@ Display::PixelValueType Display::getPixelFast(byte Column, byte Row)  const
 ******************************************************************************************************************************************************/
 StdReturnType Display::setPixel(byte Column, byte Row)
 {
-#if (DISPLAY_LED_STRIPE_SERPENTINE == STD_ON)
-    /* if led stripe is snake or serpentine the odd row: count from right to left */
-# if (DISPLAY_USE_PIXELS_DIMMING == STD_ON)
-    return PixelStripe.setPixel(transformToSerpentine(Column,  Row), Color);
-# else
-    return PixelStripe.setPixel(transformToSerpentine(Column,  Row), Color.getColorDimmed());
-# endif
+    if(!isColumnAndRowValid(Column, Row)) { return E_NOT_OK; }
+
+#if (DISPLAY_USE_PIXELS_DIMMING == STD_ON)
+    return PixelStripe.setPixel(toIndex(Column, Row), Color);
 #else
-# if (DISPLAY_USE_PIXELS_DIMMING == STD_ON)
-    return PixelStripe.setPixel((Row * DISPLAY_NUMBER_OF_COLUMNS) + Column, Color);
-# else
-    return PixelStripe.setPixel((Row * DISPLAY_NUMBER_OF_COLUMNS) + Column, Color.getColorDimmed());
-# endif
+    return PixelStripe.setPixel(toIndex(Column, Row), Color.getColorDimmed());
 #endif
 } /* setPixel */
-
-
-/******************************************************************************************************************************************************
-  setPixelFast()
-******************************************************************************************************************************************************/
-void Display::setPixelFast(byte Column, byte Row)
-{
-#if (DISPLAY_LED_STRIPE_SERPENTINE == STD_ON)
-    /* if led stripe is snake or serpentine the odd row: count from right to left */
-# if (DISPLAY_USE_PIXELS_DIMMING == STD_ON)
-    PixelStripe.setPixelFast(transformToSerpentine(Column,  Row), Color);
-# else
-    PixelStripe.setPixelFast(transformToSerpentine(Column,  Row), Color.getColorDimmed());
-# endif
-#else
-# if (DISPLAY_USE_PIXELS_DIMMING == STD_ON)
-    PixelStripe.setPixelFast((Row * DISPLAY_NUMBER_OF_COLUMNS) + Column, Color);
-# else
-    PixelStripe.setPixelFast((Row * DISPLAY_NUMBER_OF_COLUMNS) + Column, Color.getColorDimmed());
-# endif
-#endif
-} /* setPixelFast */
 
 
 /******************************************************************************************************************************************************
@@ -436,25 +356,10 @@ Pixel Display::getColorDimmed(byte Brightness)
 ******************************************************************************************************************************************************/
 StdReturnType Display::setPixel(byte Column, byte Row, byte Brightness)
 {
-#if (DISPLAY_LED_STRIPE_SERPENTINE == STD_ON)
-    return PixelStripe.setPixel(transformToSerpentine(Column,  Row), getColorDimmed(Brightness));
-#else
-    return PixelStripe.setPixel((Row * DISPLAY_NUMBER_OF_COLUMNS) + Column, getColorDimmed(Brightness));
-#endif
+    if(!isColumnAndRowValid(Column, Row)) { return E_NOT_OK; }
+
+    return PixelStripe.setPixel(toIndex(Column, Row), getColorDimmed(Brightness));
 } /* setPixel */
-
-
-/******************************************************************************************************************************************************
-  setPixelFast()
-******************************************************************************************************************************************************/
-void Display::setPixelFast(byte Column, byte Row, byte Brightness)
-{
-#if (DISPLAY_LED_STRIPE_SERPENTINE == STD_ON)
-    PixelStripe.setPixelFast(transformToSerpentine(Column,  Row), getColorDimmed(Brightness));
-#else
-    PixelStripe.setPixelFast((Row * DISPLAY_NUMBER_OF_COLUMNS) + Column, getColorDimmed(Brightness));
-#endif
-} /* setPixelFast */
 
 
 /******************************************************************************************************************************************************
@@ -469,40 +374,14 @@ StdReturnType Display::setPixel(IndexType Index)
 
 
 /******************************************************************************************************************************************************
-  setPixelFast()
-******************************************************************************************************************************************************/
-void Display::setPixelFast(IndexType Index)
-{
-    byte row, column;
-    indexToColumnAndRow(Index, column, row);
-    setPixelFast(column,  row);
-} /* setPixelFast */
-
-
-/******************************************************************************************************************************************************
   clearPixel()
 ******************************************************************************************************************************************************/
 StdReturnType Display::clearPixel(byte Column, byte Row)
 {
-#if (DISPLAY_LED_STRIPE_SERPENTINE == STD_ON)
-    return PixelStripe.clearPixel(transformToSerpentine(Column,  Row));
-#else
-    return PixelStripe.clearPixel((Row * DISPLAY_NUMBER_OF_COLUMNS) + Column);
-#endif
+    if(!isColumnAndRowValid(Column, Row)) { return E_NOT_OK; }
+
+    return PixelStripe.clearPixel(toIndex(Column, Row));
 } /* clearPixel */
-
-
-/******************************************************************************************************************************************************
-  clearPixelFast()
-******************************************************************************************************************************************************/
-void Display::clearPixelFast(byte Column, byte Row)
-{
-#if (DISPLAY_LED_STRIPE_SERPENTINE == STD_ON)
-    PixelStripe.clearPixelFast(transformToSerpentine(Column,  Row));
-#else
-    PixelStripe.clearPixelFast((Row * DISPLAY_NUMBER_OF_COLUMNS) + Column);
-#endif
-} /* clearPixelFast */
 
 
 /******************************************************************************************************************************************************
@@ -517,52 +396,21 @@ StdReturnType Display::clearPixel(IndexType Index)
 
 
 /******************************************************************************************************************************************************
-  clearPixelFast()
-******************************************************************************************************************************************************/
-void Display::clearPixelFast(IndexType Index)
-{
-    byte row, column;
-    indexToColumnAndRow(Index, column, row);
-    clearPixelFast(column,  row);
-} /* clearPixelFast */
-
-
-/******************************************************************************************************************************************************
   togglePixel()
 ******************************************************************************************************************************************************/
 StdReturnType Display::togglePixel(byte Column, byte Row)
 {
-    PixelValueType pixelValue{false};
+    if(!isColumnAndRowValid(Column, Row)) { return E_NOT_OK; }
 
-#if (DISPLAY_LED_STRIPE_SERPENTINE == STD_ON)
-    byte index = transformToSerpentine(Column,  Row);
-    getPixel(index, &pixelValue);
-    if(pixelValue) { return clearPixel(index); }
-    else { return setPixel(index); }
-#else
-    byte index = (Row * DISPLAY_NUMBER_OF_COLUMNS) + Column;
-    getPixel(index, pixelValue);
-    if(pixelValue) { return clearPixel(index); }
-    else { return setPixel(index); }
-#endif
+    /* The column and the row are what is toggled, not the index they map to: the serpentine
+       branch used to transform them into an index and hand that to functions which transform
+       it a second time, so on an odd row it toggled the pixel mirrored about the middle of
+       the display. Nothing showed it, because nothing here is built with the serpentine
+       wiring - and the same branch passed a pointer where a reference was expected, so it
+       would not have compiled if anything had. */
+    if(getPixel(Column, Row)) { return clearPixel(Column, Row); }
+    else { return setPixel(Column, Row); }
 } /* togglePixel */
-
-
-/******************************************************************************************************************************************************
-  togglePixelFast()
-******************************************************************************************************************************************************/
-void Display::togglePixelFast(byte Column, byte Row)
-{
-#if (DISPLAY_LED_STRIPE_SERPENTINE == STD_ON)
-    byte index = transformToSerpentine(Column,  Row);
-    if(getPixelFast(index)) clearPixelFast(index);
-    else setPixelFast(index);
-#else
-    byte index = (Row * DISPLAY_NUMBER_OF_COLUMNS) + Column;
-    if(getPixelFast(index)) clearPixelFast(index);
-    else setPixelFast(index);
-#endif
-} /* togglePixelFast */
 
 
 /******************************************************************************************************************************************************
@@ -574,17 +422,6 @@ StdReturnType Display::togglePixel(IndexType Index)
     indexToColumnAndRow(Index, column, row);
     return togglePixel(column,  row);
 } /* togglePixel */
-
-
-/******************************************************************************************************************************************************
-  togglePixelFast()
-******************************************************************************************************************************************************/
-void Display::togglePixelFast(IndexType Index)
-{
-    byte row, column;
-    indexToColumnAndRow(Index, column, row);
-    togglePixelFast(column, row);
-} /* togglePixelFast */
 
 
 /******************************************************************************************************************************************************
@@ -607,17 +444,17 @@ StdReturnType Display::getPixelRow(byte Row, PixelRowType& PixelRow) const
 
 
 /******************************************************************************************************************************************************
-  getPixelRowFast()
+  getPixelRow()
 ******************************************************************************************************************************************************/
-Display::PixelRowType Display::getPixelRowFast(byte Row)  const
+Display::PixelRowType Display::getPixelRow(byte Row)  const
 {
     PixelRowType pixelRow{0};
 
     for(byte column = 0; column < DISPLAY_NUMBER_OF_COLUMNS; column++) {
-        WRITE_BIT(pixelRow, column, getPixelFast(column, Row));
+        WRITE_BIT(pixelRow, column, getPixel(column, Row));
     }
     return pixelRow;
-} /* getPixelRowFast */
+} /* getPixelRow */
 
 
 /******************************************************************************************************************************************************
@@ -640,17 +477,17 @@ StdReturnType Display::getPixelColumn(byte Column, PixelRowType& PixelColumn)  c
 
 
 /******************************************************************************************************************************************************
-  getPixelColumnFast()
+  getPixelColumn()
 ******************************************************************************************************************************************************/
-Display::PixelColumnType Display::getPixelColumnFast(byte Column)  const
+Display::PixelColumnType Display::getPixelColumn(byte Column)  const
 {
     Display::PixelColumnType pixelColumn{0};
 
     for(byte row = 0; row < DISPLAY_NUMBER_OF_ROWS; row++) {
-        WRITE_BIT(pixelColumn, row, getPixelFast(Column, row));
+        WRITE_BIT(pixelColumn, row, getPixel(Column, row));
     }
     return pixelColumn;
-} /* getPixelColumnFast */
+} /* getPixelColumn */
 
 
 /******************************************************************************************************************************************************
@@ -668,17 +505,6 @@ StdReturnType Display::setPixelRow(byte Row, PixelRowType PixelRow)
 
 
 /******************************************************************************************************************************************************
-  setPixelRowFast()
-******************************************************************************************************************************************************/
-void Display::setPixelRowFast(byte Row, PixelRowType PixelRow)
-{
-    for(byte column = 0; column < DISPLAY_NUMBER_OF_COLUMNS; column++) {
-        writePixelFast(column, Row, READ_BIT(PixelRow, column));
-    }
-} /* setPixelRowFast */
-
-
-/******************************************************************************************************************************************************
   setPixelColumn()
 ******************************************************************************************************************************************************/
 StdReturnType Display::setPixelColumn(byte Column, PixelRowType PixelColumn)
@@ -689,17 +515,6 @@ StdReturnType Display::setPixelColumn(byte Column, PixelRowType PixelColumn)
     }
     return returnValue;
 } /* setPixelColumn */
-
-
-/******************************************************************************************************************************************************
-  setPixelColumnFast()
-******************************************************************************************************************************************************/
-void Display::setPixelColumnFast(byte Column, PixelRowType PixelColumn)
-{
-    for(byte row = 0; row < DISPLAY_NUMBER_OF_ROWS; row++) {
-        writePixelFast(Column, row, READ_BIT(PixelColumn, row));
-    }
-} /* setPixelColumnFast */
 
 
 /******************************************************************************************************************************************************

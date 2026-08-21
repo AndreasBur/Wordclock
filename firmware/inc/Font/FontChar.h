@@ -103,10 +103,16 @@ template <typename RowType, byte RowsSize> class FontCharHorizontal : public Fon
     constexpr FontCharHorizontal(byte sWidth, std::array<RowType, RowsSize> sRows) : FontChar(sWidth), Rows(sRows) { }
     constexpr FontCharHorizontal() : FontChar(0u), Rows{} { }
 
+    /* Two forms of the reader, and the argument list says which: the one taking a reference
+       answers whether the row is part of the glyph, the one taking none answers the row -
+       and a row outside the glyph is empty, which draws nothing. */
     // get methods
-    RowType getRowFast(byte Index) const { return Rows[Index]; }
+    RowType getRow(byte Index) const {
+        if(!isIndexValid(Index)) { return RowType{}; }
+        return Rows[Index];
+    }
     StdReturnType getRow(byte Index, RowType& Row) const {
-        if(Index < RowsSize) {
+        if(isIndexValid(Index)) {
             Row = Rows[Index];
             return E_OK;
         } else {
@@ -116,9 +122,8 @@ template <typename RowType, byte RowsSize> class FontCharHorizontal : public Fon
     RowsType getRows() const { return Rows; }
 
     // set methods
-    void setRowFast(byte Index, RowType Row) { Rows[Index] = Row; }
-    StdReturnType setRow(byte Index, RowType Row) const {
-        if(Index < RowsSize) {
+    StdReturnType setRow(byte Index, RowType Row) {
+        if(isIndexValid(Index)) {
             Rows[Index] = Row;
             return E_OK;
         } else {
@@ -128,6 +133,7 @@ template <typename RowType, byte RowsSize> class FontCharHorizontal : public Fon
     void setRows(RowsType sRows) { Rows = sRows; }
 
     // methods
+    static constexpr bool isIndexValid(byte Index) { return Index < RowsSize; }
 
 };
 
@@ -158,10 +164,15 @@ template <typename ColumnType, byte ColumnsSize> class FontCharVertical : public
 
     constexpr FontCharVertical() : FontChar(0), Columns{} { }
 
+    /* The same two forms as the horizontal glyph above, for the same reason: a column
+       outside the glyph is empty rather than whatever follows it in memory. */
     // get methods
-    ColumnType getColumnFast(byte Index) const { return Columns[Index]; }
+    ColumnType getColumn(byte Index) const {
+        if(!isIndexValid(Index)) { return ColumnType{}; }
+        return Columns[Index];
+    }
     StdReturnType getColumn(byte Index, ColumnType& Column) const {
-        if(Index < ColumnsSize) {
+        if(isIndexValid(Index)) {
             Column = Columns[Index];
             return E_OK;
         } else {
@@ -171,9 +182,8 @@ template <typename ColumnType, byte ColumnsSize> class FontCharVertical : public
     ColumnsType getColumns() const { return Columns; }
 
     // set methods
-    void setColumnFast(byte Index, ColumnType Column) { Columns[Index] = Column; }
-    StdReturnType setColumn(byte Index, ColumnType Column) const {
-        if(Index < ColumnsSize) {
+    StdReturnType setColumn(byte Index, ColumnType Column) {
+        if(isIndexValid(Index)) {
             Columns[Index] = Column;
             return E_OK;
         } else {
@@ -183,6 +193,7 @@ template <typename ColumnType, byte ColumnsSize> class FontCharVertical : public
     void setColumns(ColumnsType sColumns) { Columns = sColumns; }
 
     // methods
+    static constexpr bool isIndexValid(byte Index) { return Index < ColumnsSize; }
 
 };
 

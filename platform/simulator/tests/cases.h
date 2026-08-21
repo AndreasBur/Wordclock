@@ -29,6 +29,12 @@ void testAnimationStepsThroughEveryOne();
 
 /* text_test.cpp */
 void testCharacterToGlyphMapping();
+void testUndrawableCharacterShiftsAsASpace();
+
+/* accessor_test.cpp */
+void testReadingPastTheEndIsEmpty();
+void testWritingPastTheEndIsRefused();
+void testGlyphAccessorsCheckBothWays();
 
 /* clock_test.cpp */
 void testRegionalWordings();

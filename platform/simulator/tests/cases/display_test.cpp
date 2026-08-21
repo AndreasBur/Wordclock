@@ -37,11 +37,11 @@ uint32_t totalIntensity(const PixelBufferType& Pixels)
    words. Must run before any other test touches DisplayManager. */
 void testDisplayManagerLatch()
 {
-    Clock::getInstance().setModeFast(Clock::MODE_WESSI);
+    Clock::getInstance().setMode(Clock::MODE_WESSI);
     /* Without an animation the word change draws straight to the buffer, so what the
        latch decided is visible in the same task. */
-    Animations::getInstance().setModeFast(Animations::MODE_FIXED);
-    Animations::getInstance().setAnimationFast(Animations::ANIMATION_ID_NONE);
+    Animations::getInstance().setMode(Animations::MODE_FIXED);
+    Animations::getInstance().setAnimation(Animations::ANIMATION_ID_NONE);
 
     Pixels& pixels = Pixels::getInstance();
     DisplayManager& displayManager = DisplayManager::getInstance();
@@ -96,7 +96,7 @@ void testFadeDimsAndComesBack()
     drawClockFace(10u, 4u);
     const uint32_t IntensityBefore = totalIntensity(readPixels());
 
-    animations.setAnimationFast(Animations::ANIMATION_ID_FADE);
+    animations.setAnimation(Animations::ANIMATION_ID_FADE);
     animations.setTime(10u, 35u);
 
     /* Far enough in to be measurable, far short of the swap: the level counts down one per
@@ -113,7 +113,7 @@ void testFadeDimsAndComesBack()
     expect(arePixelsEqual(readPixels(), Target), "the fade must come back to full brightness");
     expect(display.getBrightness() == BrightnessBefore, "the fade must leave the brightness setting alone");
 
-    animations.setAnimationFast(Animations::ANIMATION_ID_NONE);
+    animations.setAnimation(Animations::ANIMATION_ID_NONE);
 }
 
 /* Switching the display off and on again, seen where it happens: the output rather than
@@ -280,18 +280,18 @@ void testDisplayCharacterLookup()
     const DisplayCharacters characters;
 
     /* First row is "ESKISTLF" then U with an umlaut, "NF". */
-    expect(characters.getCharacterFast(0u) == 'E', "index 0 must be the first letter of the first row");
-    expect(characters.getCharacterFast(2u) == 'K', "index 2 must be the third letter of the first row");
-    expect(characters.getCharacterFast(0u, 0u) == 'E', "column 0, row 0 must be the first letter");
+    expect(characters.getCharacter(0u) == 'E', "index 0 must be the first letter of the first row");
+    expect(characters.getCharacter(2u) == 'K', "index 2 must be the third letter of the first row");
+    expect(characters.getCharacter(0u, 0u) == 'E', "column 0, row 0 must be the first letter");
 
     /* Column 10 is the one a transposed lookup read past the end of the table for. */
-    expect(characters.getCharacterFast(10u, 0u) == 'F', "the last column of the first row must be reachable");
-    expect(characters.getCharacterFast(10u) == 'F', "index 10 must be the last letter of the first row");
+    expect(characters.getCharacter(10u, 0u) == 'F', "the last column of the first row must be reachable");
+    expect(characters.getCharacter(10u) == 'F', "index 10 must be the last letter of the first row");
 
     /* Last row is "BSECHSFMUHR", so the very last letter is its R. */
     constexpr byte lastIndex{DISPLAY_CHARACTERS_NUMBER_OF_CHARACTERS - 1u};
-    expect(characters.getCharacterFast(lastIndex) == 'R', "the last index must be the last letter");
-    expect(characters.getCharacterFast(DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS - 1u,
+    expect(characters.getCharacter(lastIndex) == 'R', "the last index must be the last letter");
+    expect(characters.getCharacter(DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS - 1u,
                                       DISPLAY_CHARACTERS_NUMBER_OF_ROWS - 1u) == 'R',
            "the last column of the last row must be the last letter");
 
@@ -302,7 +302,7 @@ void testDisplayCharacterLookup()
         byte column, row;
         characters.indexToColumnAndRow(index, column, row);
 
-        if(characters.getCharacterFast(index) != characters.getCharacterFast(column, row)) { allAgree = false; }
+        if(characters.getCharacter(index) != characters.getCharacter(column, row)) { allAgree = false; }
         if(characters.columnAndRowToIndex(column, row) != index) { allAgree = false; }
     }
     expect(allAgree, "index and column/row lookups must agree on every position");

@@ -165,7 +165,7 @@ void AnimationExplodePixels::shiftQuadrantUpperLeft()
 {
     for(int8_t column = ColumnCenter; column >= 0; column--) {
         for(int8_t row = RowCenter; row >= 0; row--) {
-            if(Display::getInstance().getPixelFast(column, row)) { shiftDownRight(column, row); }
+            if(Display::getInstance().getPixel(column, row)) { shiftDownRight(column, row); }
         }
     }
 }
@@ -189,7 +189,7 @@ void AnimationExplodePixels::shiftQuadrantUpperRight()
 {
     for(uint8_t column = ColumnCenter + 1u; column < DISPLAY_NUMBER_OF_COLUMNS; column++) {
         for(int8_t row = RowCenter - 1u; row >= 0; row--) {
-            if(Display::getInstance().getPixelFast(column, row)) { shiftDownLeft(column, row); }
+            if(Display::getInstance().getPixel(column, row)) { shiftDownLeft(column, row); }
         }
     }
 }
@@ -213,7 +213,7 @@ void AnimationExplodePixels::shiftQuadrantLowerLeft()
 {
     for(int8_t column = ColumnCenter - 1u; column >= 0; column--) {
         for(int8_t row = RowCenter + 1u; row < static_cast<int8_t>(DISPLAY_NUMBER_OF_ROWS); row++) {
-            if(Display::getInstance().getPixelFast(column, row)) { shiftUpRight(column, row); }
+            if(Display::getInstance().getPixel(column, row)) { shiftUpRight(column, row); }
         }
     }
 }
@@ -237,7 +237,7 @@ void AnimationExplodePixels::shiftQuadrantLowerRight()
 {
     for(uint8_t column = ColumnCenter; column < DISPLAY_NUMBER_OF_COLUMNS; column++) {
         for(int8_t row = RowCenter; row < static_cast<int8_t>(DISPLAY_NUMBER_OF_ROWS); row++) {
-            if(Display::getInstance().getPixelFast(column, row)) { shiftUpLeft(column, row); }
+            if(Display::getInstance().getPixel(column, row)) { shiftUpLeft(column, row); }
         }
     }
 }
@@ -261,8 +261,8 @@ void AnimationExplodePixels::clearOldAndSetNewPixel(byte ColumnOld, byte RowOld,
 {
     if((ColumnOld != ColumnNew) || (RowOld != RowNew))
     {
-        Display::getInstance().clearPixelFast(ColumnOld, RowOld);
-        Display::getInstance().setPixelFast(ColumnNew, RowNew);
+        Display::getInstance().clearPixel(ColumnOld, RowOld);
+        Display::getInstance().setPixel(ColumnNew, RowNew);
     }
 }
 

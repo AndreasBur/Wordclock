@@ -86,12 +86,20 @@ template <typename FontCharType, size_t FontTableSize> class Font
     constexpr Font(const FontTableType& sFontTable) : FontTable(sFontTable) { }
     ~Font() { }
 
+    /* Two forms of every reader, and the argument list says which: the one taking a
+       reference answers whether the glyph is in the table, the one taking none answers the
+       glyph. Both check, and the unchecked read is the private table element above - a
+       glyph outside the table is the default one, which is zero columns wide and therefore
+       draws nothing. */
     // get methods
-    FontCharType getCharFast(byte Index) const { return getFontTableElement(Index); }
-    byte getCharWidthFast(byte Index) const { return getFontTableElement(Index).getWidth(); }
+    FontCharType getChar(byte Index) const {
+        if(!isIndexValid(Index)) { return FontCharType{}; }
+        return getFontTableElement(Index);
+    }
+    byte getCharWidth(byte Index) const { return getChar(Index).getWidth(); }
 
     StdReturnType getChar(byte Index, FontCharType& FontChar) const {
-        if(Index < FontTableSize) {
+        if(isIndexValid(Index)) {
             FontChar = getFontTableElement(Index);
             return E_OK;
         } else {
@@ -100,7 +108,7 @@ template <typename FontCharType, size_t FontTableSize> class Font
     }
 
     StdReturnType getCharWidth(byte Index, byte& Width) const {
-        if(Index < FontTableSize) {
+        if(isIndexValid(Index)) {
             Width = getFontTableElement(Index).getWidth();
             return E_OK;
         } else {
@@ -111,6 +119,7 @@ template <typename FontCharType, size_t FontTableSize> class Font
     // set methods
 
     // methods
+    static constexpr bool isIndexValid(byte Index) { return Index < FontTableSize; }
 
 };
 

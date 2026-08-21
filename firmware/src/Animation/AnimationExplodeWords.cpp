@@ -142,7 +142,7 @@ StdReturnType AnimationExplodeWords::shiftWord(byte FinalColum, byte FinalRow)
 void AnimationExplodeWords::toggleWordOnDisplay()
 {
     for(byte columnIndex = CurrentColumn; columnIndex < CurrentColumn + CurrentWordLength; columnIndex++) {
-        Display::getInstance().togglePixelFast(columnIndex, CurrentRow);
+        Display::getInstance().togglePixel(columnIndex, CurrentRow);
     }
 } /* toggleWordOnDisplay */
 
@@ -152,7 +152,7 @@ void AnimationExplodeWords::toggleWordOnDisplay()
 void AnimationExplodeWords::setWordOnDisplay()
 {
     for(byte columnIndex = CurrentColumn; columnIndex < CurrentColumn + CurrentWordLength; columnIndex++) {
-        Display::getInstance().setPixelFast(columnIndex, CurrentRow);
+        Display::getInstance().setPixel(columnIndex, CurrentRow);
     }
 } /* setWordOnDisplay */
 
@@ -178,7 +178,7 @@ StdReturnType AnimationExplodeWords::setNextWordToClear()
 StdReturnType AnimationExplodeWords::setNextWordToClearInColumn()
 {
     for(; CurrentColumn < DISPLAY_NUMBER_OF_COLUMNS; CurrentColumn++) {
-        if(Display::getInstance().getPixelFast(CurrentColumn, CurrentRow)) {
+        if(Display::getInstance().getPixel(CurrentColumn, CurrentRow)) {
             CurrentWordIndex = Display::getInstance().columnAndRowToIndex(CurrentColumn, CurrentRow);
             setWordLength();
             return E_OK;
@@ -222,7 +222,7 @@ StdReturnType AnimationExplodeWords::setNextWordToSet()
 void AnimationExplodeWords::setWordToSet(DisplayWords::WordIdType WordId)
 {
     setWordIndex(WordId);
-    CurrentWordLength = Words.getDisplayWordLengthFast(WordId);
+    CurrentWordLength = Words.getDisplayWordLength(WordId);
     CurrentColumn = getClearFinalColumn();
     CurrentRow = getClearFinalRow();
 } /* setWordToSet */
@@ -232,8 +232,8 @@ void AnimationExplodeWords::setWordToSet(DisplayWords::WordIdType WordId)
 ******************************************************************************************************************************************************/
 void AnimationExplodeWords::setWordIndex(DisplayWords::WordIdType WordId)
 {
-    byte column = Words.getDisplayWordColumnFast(WordId);
-    byte row = Words.getDisplayWordRowFast(WordId);
+    byte column = Words.getDisplayWordColumn(WordId);
+    byte row = Words.getDisplayWordRow(WordId);
     CurrentWordIndex = Display::getInstance().columnAndRowToIndex(column, row);
 } /* setWordIndex */
 
@@ -245,7 +245,7 @@ void AnimationExplodeWords::setWordLength()
     CurrentWordLength = 1u;
 
     for(byte index = CurrentWordIndex + 1u; index < DISPLAY_NUMBER_OF_PIXELS; index++) {
-        if(Display::getInstance().getPixelFast(index)) {
+        if(Display::getInstance().getPixel(index)) {
             CurrentWordLength++;
         } else {
             break;

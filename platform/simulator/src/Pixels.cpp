@@ -1,22 +1,25 @@
 #include "sim/Pixels.h"
-#include <cassert>
 
 StdReturnType Pixels::getPixel(byte Index, PixelType& Pixel) const
 {
-    if(Index >= PIXELS_NUMBER_OF_LEDS) { return E_NOT_OK; }
+    if(!isIndexValid(Index)) { return E_NOT_OK; }
 
     Pixel = PixelBuffer[toRow(Index)][toColumn(Index)];
     return E_OK;
 }
 
-Pixels::PixelType Pixels::getPixelFast(byte Index) const
+Pixels::PixelType Pixels::getPixel(byte Index) const
 {
+    /* An index that is not on the strip has no pixel, and an unlit one is the answer no
+       caller can mistake for an LED that is on. */
+    if(!isIndexValid(Index)) { return PixelType{}; }
+
     return PixelBuffer[toRow(Index)][toColumn(Index)];
 }
 
 StdReturnType Pixels::setPixel(byte Index, PixelType Pixel)
 {
-    if(Index >= PIXELS_NUMBER_OF_LEDS) { return E_NOT_OK; }
+    if(!isIndexValid(Index)) { return E_NOT_OK; }
 
     PixelBuffer[toRow(Index)][toColumn(Index)] = Pixel;
     Dirty = true;
@@ -26,21 +29,6 @@ StdReturnType Pixels::setPixel(byte Index, PixelType Pixel)
 StdReturnType Pixels::setPixel(byte Index, byte Red, byte Green, byte Blue)
 {
     return setPixel(Index, PixelType(Red, Green, Blue));
-}
-
-/* assert rather than wxASSERT, which would pop a dialog - and there is no GUI here to
-   pop it in. Set a breakpoint on it to find the caller that ran off the end. */
-void Pixels::setPixelFast(byte Index, PixelType Pixel)
-{
-    assert(Index < PIXELS_NUMBER_OF_LEDS);
-
-    PixelBuffer[toRow(Index)][toColumn(Index)] = Pixel;
-    Dirty = true;
-}
-
-void Pixels::setPixelFast(byte Index, byte Red, byte Green, byte Blue)
-{
-    setPixelFast(Index, PixelType(Red, Green, Blue));
 }
 
 void Pixels::setPixels(PixelType Pixel)

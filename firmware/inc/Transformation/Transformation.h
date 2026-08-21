@@ -82,16 +82,6 @@ class Transformation
     StdReturnType shiftRowRight(byte, bool = false) const;
     StdReturnType shiftColumnUp(byte, bool = false) const;
     StdReturnType shiftColumnDown(byte, bool = false) const;
-
-    void shiftLeftFast(bool = false) const;
-    void shiftRightFast(bool = false) const;
-    void shiftUpFast(bool = false) const;
-    void shiftDownFast(bool = false) const;
-
-    void shiftRowLeftFast(byte, bool = false) const;
-    void shiftRowRightFast(byte, bool = false) const;
-    void shiftColumnUpFast(byte, bool = false) const;
-    void shiftColumnDownFast(byte, bool = false) const;
 };
 
 

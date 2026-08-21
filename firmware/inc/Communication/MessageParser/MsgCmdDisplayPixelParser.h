@@ -100,12 +100,12 @@ class MsgCmdDisplayPixelParser : public MsgParameterParser<MsgCmdDisplayPixelPar
 
     StateType getPixelState(byte Index) const
     {
-        bool pixelValue;
-        if(Display::getInstance().getPixel(Index, pixelValue) == E_OK) {
-            return getPixelState(pixelValue);
-        } else {
-            return STATE_NONE;
-        }
+        /* Asked before reading rather than read and then judged by a return code: the pixel
+           itself is what this answers with, and an index that is not on the display has no
+           state rather than a false one. */
+        if(!Display::getInstance().isIndexValid(Index)) { return STATE_NONE; }
+
+        return getPixelState(Display::getInstance().getPixel(Index));
     }
 
     StateType getPixelState(bool PixelValue) const { return PixelValue ? STATE_ON : STATE_OFF; }
@@ -115,10 +115,10 @@ class MsgCmdDisplayPixelParser : public MsgParameterParser<MsgCmdDisplayPixelPar
         sendAnswerParameter(IndexOptionShortName, Index, AppendSpace);
     }
     void sendAnswerState(bool AppendSpace) const {
-        sendAnswerParameter(StateOptionShortName, Display::getInstance().getPixelFast(Index), AppendSpace);
+        sendAnswerParameter(StateOptionShortName, Display::getInstance().getPixel(Index), AppendSpace);
     }
 
-    void setPixel() const { if(State != STATE_NONE) { Display::getInstance().writePixelFast(Index, getPixelValue(State)); }}
+    void setPixel() const { if(State != STATE_NONE) { Display::getInstance().writePixel(Index, getPixelValue(State)); }}
 
     void show() const
     {

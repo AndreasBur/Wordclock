@@ -106,17 +106,24 @@ class DisplayWords
     constexpr DisplayWords() { }
     ~DisplayWords() { }
 
+    /* Two forms of every reader, and the argument list says which: the one taking a
+       reference answers whether the word exists, the one taking none answers the word.
+       Both check, and the unchecked read is the private table element above - a word that
+       is not in the table has no place on the plate, which is what a length of zero says,
+       and a word of zero length lights nothing. */
     // get methods
     StdReturnType getDisplayWord(WordIdType, DisplayWord&) const;
     StdReturnType getDisplayWordLength(WordIdType, byte&) const;
     StdReturnType getDisplayWordColumn(WordIdType, byte&) const;
     StdReturnType getDisplayWordRow(WordIdType, byte&) const;
 
-    // get methods fast
-    DisplayWord getDisplayWordFast(WordIdType WordId) const { return getDisplayWordsTableElement(WordId); }
-    byte getDisplayWordRowFast(WordIdType WordId) const { return getDisplayWordsTableElement(WordId).getRow(); }
-    byte getDisplayWordColumnFast(WordIdType WordId) const { return getDisplayWordsTableElement(WordId).getColumn(); }
-    byte getDisplayWordLengthFast(WordIdType WordId) const { return getDisplayWordsTableElement(WordId).getLength(); }
+    DisplayWord getDisplayWord(WordIdType WordId) const {
+        if(!isWordIdValid(WordId)) { return DisplayWord{}; }
+        return getDisplayWordsTableElement(WordId);
+    }
+    byte getDisplayWordRow(WordIdType WordId) const { return getDisplayWord(WordId).getRow(); }
+    byte getDisplayWordColumn(WordIdType WordId) const { return getDisplayWord(WordId).getColumn(); }
+    byte getDisplayWordLength(WordIdType WordId) const { return getDisplayWord(WordId).getLength(); }
 
     // set methods
 

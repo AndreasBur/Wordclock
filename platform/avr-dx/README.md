@@ -36,15 +36,22 @@ implementation to mirror.
 
 ## What a backend must provide
 
-Where the table writes `getPixel(Fast)` it means two calls, not one: a checked form
-answering `StdReturnType` and a `*Fast` form that answers the value and trusts its
-caller. Both, always — the core uses whichever fits, and a backend that supplies only
-one of a pair compiles until the day something reaches for the other.
+Where the table writes `getPixel` twice it means two overloads, and the argument list
+says which is which: `getPixel(Index, Pixel)` answers `StdReturnType` and `getPixel(Index)`
+answers the pixel. Both check the index; the second one answers an unlit pixel where the
+first answers `E_NOT_OK`. Writers have one form, which answers a code that a caller with
+nothing to do with it ignores.
+
+This used to be a checked form beside a `*Fast` form that trusted its caller, and the
+measurement that ended it is in the roadmap's backlog item 9: the checked build was the
+smaller one. What is left of the argument is that a backend supplying only one overload of
+a pair compiles until something reaches for the other, which is how `getOutputPixel` went
+through three backends with only its unchecked half.
 
 | Header / unit | Contract | Here |
 |---------------|----------|------|
 | `Arduino.h` | `byte`, `boolean`, `F()`, `PROGMEM`, `pgm_read_byte`, `memcpy_P`, `bitRead`, `itoa`, and a `Serial` object exposing `print` / `println` / `available` / `read` | avr-libc directly, plus a non-virtual `SerialPort` on USART1 |
-| `Pixels.h` | `Pixels` singleton: `getInstance`, `setPixel(Fast)` / `clearPixel(Fast)` / `getPixel(Fast)` / `getOutputPixel(Fast)`, `setBrightness`, `show`, `clearPixels`, `init(pin)`. Plus the output gate the supply switch needs: `isDirty`, `isFrameOnTheWire`, `suspendOutput` / `resumeOutput` / `isOutputSuspended`, where a suspended output must make the render a no-op **without** clearing the dirty mark, and resuming must set it — the LEDs lose their registers with their supply, so coming back is a redraw | Buffer and brightness; `render()` hands the frame to `WS2812`, and `isFrameOnTheWire()` is that driver's `isBusy()` |
+| `Pixels.h` | `Pixels` singleton: `getInstance`, `setPixel` / `clearPixel` / `getPixel` (both overloads) / `getOutputPixel` (both overloads), `setBrightness`, `show`, `clearPixels`, `init(pin)`. Plus the output gate the supply switch needs: `isDirty`, `isFrameOnTheWire`, `suspendOutput` / `resumeOutput` / `isOutputSuspended`, where a suspended output must make the render a no-op **without** clearing the dirty mark, and resuming must set it — the LEDs lose their registers with their supply, so coming back is a redraw | Buffer and brightness; `render()` hands the frame to `WS2812`, and `isFrameOnTheWire()` is that driver's `isBusy()` |
 | `RealTimeClock.h` | `RealTimeClock` singleton holding a `ClockDateTime`; the core only *reads* it via `getDateTime()` | Read from the DS3231 once a second, written through on a command |
 | `BH1750.h` | Ambient-light driver exposing the illuminance reading the core consumes | BH1750 over TWI1 |
 | `DS3231.h` | `DS3231` with `getTaskCycle`, `task`, and `getTemperature(TemperatureType&)` in tenths of a degree Celsius. The return code is the contract: `E_NOT_OK` until a reading has arrived, which is what a board without the chip keeps answering and what keeps the temperature overlay away | DS3231 over TWI1, register handling shared with the ESP32 backend |
@@ -113,7 +120,7 @@ every link rather than asked for, because the flash budget is the reason this pa
 was chosen at all — currently, of 128 KiB flash and 16 KiB RAM:
 
 ```
-Program:   48664 bytes (37%)
+Program:   48078 bytes (37%)
 Data:       1700 bytes (10%)
 ```
 
