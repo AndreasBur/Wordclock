@@ -327,9 +327,12 @@ From the comparison with wordclock24h, in the order they would change daily use.
      unreadable in the case one opens the view for. The wx window stays the colour-accurate
      view.
 
-   **Done twice over, and the second time is the one that answers this item.** The first was
-   one card above the console's generated groups for the colour and the brightness, 1.6 KB of
-   compressed flash. Then the console got a page beside it: `/` is a **panel** of six task
+   **Done twice over, and the second time is the one that answers this item** - the first is no
+   longer in the tree. It was one card above the console's generated groups for the colour and
+   the brightness, 1.6 KB of compressed flash, and it came out again once the panel existed:
+   the same controls in two places are two places to keep in step, and the console's worth is
+   that nothing in it is kept by hand. What it settled stayed, though, which is why it is still
+   written down below. Then the console got a page beside it: `/` is a **panel** of six task
    pages - colour, display, animation, overlays, night, system - and `/console` is where the
    generated groups stayed. Some 10 KB of compressed flash on top of the console, and the shape
    is ESPWortuhr's after all, arrived at from the other end.
