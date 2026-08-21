@@ -124,21 +124,21 @@ void AnimationSqueeze::clearRow(byte Row)
        all words of the row get shorter at the same time. */
     if(Direction == DIRECTION_FROM_LEFT) {
         for(byte column = 0u; column < DISPLAY_NUMBER_OF_COLUMNS; column++) {
-            if(Display::getInstance().getPixelFast(column, Row)) {
-                Display::getInstance().clearPixelFast(column, Row);
+            if(Display::getInstance().getPixel(column, Row)) {
+                Display::getInstance().clearPixel(column, Row);
 
                 /* skip the rest of this block, only its first letter goes this frame */
                 while((column + 1u < DISPLAY_NUMBER_OF_COLUMNS) &&
-                      Display::getInstance().getPixelFast(column + 1u, Row)) { column++; }
+                      Display::getInstance().getPixel(column + 1u, Row)) { column++; }
             }
         }
     } else {
         for(int8_t column = DISPLAY_NUMBER_OF_COLUMNS - 1; column >= 0; column--) {
-            if(Display::getInstance().getPixelFast(static_cast<byte>(column), Row)) {
-                Display::getInstance().clearPixelFast(static_cast<byte>(column), Row);
+            if(Display::getInstance().getPixel(static_cast<byte>(column), Row)) {
+                Display::getInstance().clearPixel(static_cast<byte>(column), Row);
 
                 while((column - 1 >= 0) &&
-                      Display::getInstance().getPixelFast(static_cast<byte>(column - 1), Row)) { column--; }
+                      Display::getInstance().getPixel(static_cast<byte>(column - 1), Row)) { column--; }
             }
         }
     }
@@ -160,7 +160,7 @@ void AnimationSqueeze::setMaxWordLength()
 {
     for(byte index = 0u; index < ClockWordsTable.size(); index++)
     {
-        byte CurrentWordLength = Words.getDisplayWordLengthFast(ClockWordsTable[index]);
+        byte CurrentWordLength = Words.getDisplayWordLength(ClockWordsTable[index]);
         if(CurrentWordLength > MaxWordLength) {
             MaxWordLength = CurrentWordLength;
         }

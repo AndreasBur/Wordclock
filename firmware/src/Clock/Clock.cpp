@@ -208,28 +208,6 @@ StdReturnType Clock::setTime(byte Hour, byte Minute) const
 
 
 /******************************************************************************************************************************************************
-  setTimeFast()
-******************************************************************************************************************************************************/
-void Clock::setTimeFast(byte Hour, byte Minute) const
-{
-    ClockWords clockWords;
-
-    if(getClockWords(Hour, Minute, clockWords) == E_OK) {
-        if(clockWords.getShowItIs()) {
-            Display::getInstance().setWordFast(DisplayWords::WORD_ES);
-            Display::getInstance().setWordFast(DisplayWords::WORD_IST);
-        }
-        for(byte Index = 0u; Index < clockWords.getHourWords().size() && clockWords.getHourWord(Index) != DisplayWords::WORD_NONE; Index++) {
-            Display::getInstance().setWordFast(clockWords.getHourWord(Index));
-        }
-        for(byte Index = 0u; Index < clockWords.getMinuteWords().size() && clockWords.getMinuteWord(Index) != DisplayWords::WORD_NONE; Index++) {
-            Display::getInstance().setWordFast(clockWords.getMinuteWord(Index));
-        }
-    }
-} /* setTimeFast */
-
-
-/******************************************************************************************************************************************************
  * P R I V A T E   F U N C T I O N S
  *****************************************************************************************************************************************************/
 

@@ -43,7 +43,7 @@ inline PixelBufferType readPixels()
     PixelBufferType pixels;
 
     for(byte index = 0u; index < PIXELS_NUMBER_OF_PIXELS; index++) {
-        pixels[index] = Pixels::getInstance().getPixelFast(index);
+        pixels[index] = Pixels::getInstance().getPixel(index);
     }
     return pixels;
 }
@@ -74,7 +74,7 @@ inline bool isAnyPixelLit(const PixelBufferType& Pixels)
 inline bool isAnyOutputPixelLit()
 {
     for(byte index = 0u; index < PIXELS_NUMBER_OF_PIXELS; index++) {
-        const Pixels::PixelType Pixel = Pixels::getInstance().getOutputPixelFast(index);
+        const Pixels::PixelType Pixel = Pixels::getInstance().getOutputPixel(index);
 
         if(Pixel.getRed() != 0u || Pixel.getGreen() != 0u || Pixel.getBlue() != 0u) { return true; }
     }

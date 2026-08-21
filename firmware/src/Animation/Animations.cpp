@@ -93,7 +93,7 @@ StdReturnType Animations::show() const
 StdReturnType Animations::setTaskCycle(AnimationIdType AnimationId, byte Cycle)
 {
     if(isAnimationValid(AnimationId)) {
-        setTaskCycleFast(AnimationId, Cycle);
+        TaskCycles[AnimationId] = Cycle;
         return E_OK;
     } else {
         return E_NOT_OK;
@@ -103,22 +103,27 @@ StdReturnType Animations::setTaskCycle(AnimationIdType AnimationId, byte Cycle)
 /******************************************************************************************************************************************************
   setAnimation()
 ******************************************************************************************************************************************************/
-void Animations::setAnimationFast(AnimationIdType sAnimationId)
+StdReturnType Animations::setAnimation(AnimationIdType sAnimationId)
 {
+    if(!isAnimationValid(sAnimationId)) { return E_NOT_OK; }
+
     AnimationId = sAnimationId;
     /* shows the selected animation right away, even in a mode that selects on its own;
        that mode takes over again on the next word change */
     CurrentAnimationId = AnimationId;
 
     initCurrentAnimation();
-} /* setAnimationFast */
+    return E_OK;
+} /* setAnimation */
 
 
 /******************************************************************************************************************************************************
-  setModeFast()
+  setMode()
 ******************************************************************************************************************************************************/
-void Animations::setModeFast(ModeType sMode)
+StdReturnType Animations::setMode(ModeType sMode)
 {
+    if(!isModeValid(sMode)) { return E_NOT_OK; }
+
     Mode = sMode;
 
     /* Back to the selected animation. The selecting modes leave the current animation
@@ -127,7 +132,8 @@ void Animations::setModeFast(ModeType sMode)
         CurrentAnimationId = AnimationId;
         initCurrentAnimation();
     }
-} /* setModeFast */
+    return E_OK;
+} /* setMode */
 
 
 /******************************************************************************************************************************************************

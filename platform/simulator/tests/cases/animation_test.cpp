@@ -33,8 +33,8 @@ void testFlickerLeavesTheDisplayOn()
     Animations& animations = Animations::getInstance();
 
     display.enable();
-    animations.setModeFast(Animations::MODE_FIXED);
-    animations.setAnimationFast(Animations::ANIMATION_ID_FLICKER);
+    animations.setMode(Animations::MODE_FIXED);
+    animations.setAnimation(Animations::ANIMATION_ID_FLICKER);
 
     setTime(10u, 5u, 0u);
     DisplayManager::getInstance().task();
@@ -43,7 +43,7 @@ void testFlickerLeavesTheDisplayOn()
 
     expect(isAnyOutputPixelLit(), "a finished flicker must leave the display switched on");
 
-    animations.setAnimationFast(Animations::ANIMATION_ID_NONE);
+    animations.setAnimation(Animations::ANIMATION_ID_NONE);
 }
 
 void testEveryAnimationEndsOnTheNewTime()
@@ -52,9 +52,9 @@ void testEveryAnimationEndsOnTheNewTime()
        measurement. The longest of them walks all 110 pixels several times over. */
     constexpr int TickLimit{5000};
 
-    Clock::getInstance().setModeFast(Clock::MODE_WESSI);
+    Clock::getInstance().setMode(Clock::MODE_WESSI);
     Animations& animations = Animations::getInstance();
-    animations.setModeFast(Animations::MODE_FIXED);
+    animations.setMode(Animations::MODE_FIXED);
 
     /* Two times whose word sets differ in every part: hour, minute and the "it is". */
     const PixelBufferType Target = drawClockFace(10u, 35u);
@@ -66,7 +66,7 @@ void testEveryAnimationEndsOnTheNewTime()
         /* The display holds the previous time when a word change starts, which is what
            the animations transition away from. */
         drawClockFace(10u, 4u);
-        animations.setAnimationFast(AnimationId);
+        animations.setAnimation(AnimationId);
         animations.setTime(10u, 35u);
 
         int Ticks = 0;
@@ -82,7 +82,7 @@ void testEveryAnimationEndsOnTheNewTime()
         expect(arePixelsEqual(readPixels(), Target), Description);
     }
 
-    animations.setAnimationFast(Animations::ANIMATION_ID_NONE);
+    animations.setAnimation(Animations::ANIMATION_ID_NONE);
 }
 
 /* Stepping the selection, which is the only way a control with no list reaches an
@@ -92,8 +92,8 @@ void testEveryAnimationEndsOnTheNewTime()
 void testAnimationStepsThroughEveryOne()
 {
     Animations& animations = Animations::getInstance();
-    animations.setModeFast(Animations::MODE_FIXED);
-    animations.setAnimationFast(Animations::ANIMATION_ID_NONE);
+    animations.setMode(Animations::MODE_FIXED);
+    animations.setAnimation(Animations::ANIMATION_ID_NONE);
 
     /* The round closes, and "no animation" is part of it - a knob is the only way back to
        it for somebody without a phone. */
@@ -122,11 +122,11 @@ void testAnimationStepsThroughEveryOne()
     expect(animations.setFavourite(NotAFavourite, false) == E_OK,
            "dropping one favourite of many must be allowed");
 
-    animations.setAnimationFast(Animations::ANIMATION_ID_NONE);
+    animations.setAnimation(Animations::ANIMATION_ID_NONE);
     animations.nextAnimation();
     expect(animations.getAnimation() == NotAFavourite,
            "stepping must reach an animation that is not a favourite");
 
     expect(animations.setFavourite(NotAFavourite, true) == E_OK, "and it must go back to being one");
-    animations.setAnimationFast(Animations::ANIMATION_ID_NONE);
+    animations.setAnimation(Animations::ANIMATION_ID_NONE);
 }

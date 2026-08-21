@@ -104,17 +104,21 @@ class Pixels
     }
 
     // get methods
+    /* Two forms of the reader, and the argument list says which: the one taking a reference
+       answers whether the index is on the strip, the one taking none answers the pixel and
+       leaves an unlit one where the index is not. Both check. Writers have a single form,
+       which answers, and a caller that has nothing to do with the answer ignores it. */
     byte getBrightness() const { return Brightness; }
     StdReturnType getPixel(byte, PixelType&) const;
-    PixelType getPixelFast(byte) const;
+    PixelType getPixel(byte) const;
     StdReturnType getOutputPixel(byte Index, PixelType& Pixel) const {
         if(getPixel(Index, Pixel) == E_NOT_OK) { return E_NOT_OK; }
 
         Pixel.dimmPixel(Brightness);
         return E_OK;
     }
-    PixelType getOutputPixelFast(byte Index) const {
-        PixelType Pixel = getPixelFast(Index);
+    PixelType getOutputPixel(byte Index) const {
+        PixelType Pixel = getPixel(Index);
         Pixel.dimmPixel(Brightness);
         return Pixel;
     }
@@ -125,9 +129,6 @@ class Pixels
     StdReturnType setPixel(byte, PixelType);
     StdReturnType setPixel(byte, byte, byte, byte);
     StdReturnType clearPixel(byte Index) { return setPixel(Index, 0, 0, 0); }
-    void setPixelFast(byte, PixelType);
-    void setPixelFast(byte, byte, byte, byte);
-    void clearPixelFast(byte Index) { setPixelFast(Index, 0, 0, 0); }
 
     // methods
     bool isIndexValid(IndexType Index) const { return Index < PIXELS_NUMBER_OF_PIXELS; }

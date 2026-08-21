@@ -314,32 +314,9 @@ class Animations
     byte getTaskCycle() const { return TaskCycles[CurrentAnimationId]; }
 
     // set methods
-    void setTaskCycleFast(AnimationIdType AnimationId, byte Cycle) { TaskCycles[AnimationId] = Cycle; }
     StdReturnType setTaskCycle(AnimationIdType, byte);
-    void setAnimationFast(AnimationIdType);
-    StdReturnType setAnimation(AnimationIdType AnimationId) {
-        if(isAnimationValid(AnimationId)) {
-            setAnimationFast(AnimationId);
-            return E_OK;
-        } else {
-            return E_NOT_OK;
-        }
-    }
-
-    void setModeFast(ModeType);
-    StdReturnType setMode(ModeType sMode) {
-        if(isModeValid(sMode)) {
-            setModeFast(sMode);
-            return E_OK;
-        } else {
-            return E_NOT_OK;
-        }
-    }
-
-    void setFavouriteFast(AnimationIdType sAnimationId, bool Favourite) {
-        if(Favourite) { Favourites |= static_cast<uint16_t>(1u << sAnimationId); }
-        else { Favourites &= static_cast<uint16_t>(~(1u << sAnimationId)); }
-    }
+    StdReturnType setAnimation(AnimationIdType);
+    StdReturnType setMode(ModeType);
     StdReturnType setFavourite(AnimationIdType sAnimationId, bool Favourite) {
         /* ANIMATION_ID_NONE is no animation and cannot be a favourite */
         if(sAnimationId < FirstAnimation || !isAnimationValid(sAnimationId)) { return E_NOT_OK; }
@@ -347,7 +324,8 @@ class Animations
            with nothing to pick */
         if(!Favourite && isFavourite(sAnimationId) && numberOfFavourites() <= 1u) { return E_NOT_OK; }
 
-        setFavouriteFast(sAnimationId, Favourite);
+        if(Favourite) { Favourites |= static_cast<uint16_t>(1u << sAnimationId); }
+        else { Favourites &= static_cast<uint16_t>(~(1u << sAnimationId)); }
         return E_OK;
     }
 
@@ -358,8 +336,10 @@ class Animations
     void resetToDefaults() {
         TaskCycles.fill(TaskCycleInitValue);
         Favourites = AllFavourites;
-        setAnimationFast(ANIMATION_ID_NONE);
-        setModeFast(MODE_FIXED);
+        /* Both are valid by construction, so neither answer can say anything a caller of
+           resetToDefaults() could act on. */
+        setAnimation(ANIMATION_ID_NONE);
+        setMode(MODE_FIXED);
     }
 
     /* One animation further and one back, wrapping at both ends, for a control that has
@@ -370,8 +350,8 @@ class Animations
        They step the selection, so they mean what "9 -A<id>" means and not what
        RPC_ID_ANIMATION_START means - the animation runs at the next word change, and in
        a mode that picks its own the selection is what MODE_FIXED would return to. */
-    void nextAnimation() { setAnimationFast(toNextAnimation(AnimationId)); }
-    void previousAnimation() { setAnimationFast(toPreviousAnimation(AnimationId)); }
+    void nextAnimation() { setAnimation(toNextAnimation(AnimationId)); }
+    void previousAnimation() { setAnimation(toPreviousAnimation(AnimationId)); }
 
     void task(bool=false);
     StdReturnType show() const;

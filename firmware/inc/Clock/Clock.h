@@ -161,7 +161,6 @@ class Clock
 
     // set methods
     void setShowItIsPermanently(bool sShowItIsPermanently) { ShowItIsPermanently = sShowItIsPermanently; }
-    void setModeFast(ModeType sMode) { Mode = sMode; }
     StdReturnType setMode(ModeType sMode)
     {
         if(isModeValid(sMode)) {
@@ -179,10 +178,10 @@ class Clock
        for every other one - with the selected animation, which "8 -M<id>" does not do.
        Where two wordings say the same thing at the current time there is nothing to
        redraw, and nothing happens, which is the right answer rather than a missed one. */
-    void nextMode() { setModeFast(toNextMode(Mode)); }
+    void nextMode() { setMode(toNextMode(Mode)); }
 
     void resetToDefaults() {
-        setModeFast(CLOCK_INITIAL_MODE);
+        setMode(CLOCK_INITIAL_MODE);
         ShowItIsPermanently = ShowItIsPermanentlyInitValue;
     }
 
@@ -198,8 +197,6 @@ class Clock
         }
     }
 
-    void setTimeFast(TimeType Time) const { setTimeFast(Time.Hour, Time.Minute); }
-    void setTimeFast(byte, byte) const;
     StdReturnType show() const { return Display::getInstance().show(); }
     StdReturnType refresh(byte Hour, byte Minute) const {
         StdReturnType returnValue{E_OK};

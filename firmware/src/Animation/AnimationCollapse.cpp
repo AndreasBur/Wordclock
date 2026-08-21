@@ -132,21 +132,21 @@ bool AnimationCollapse::collapseRow(byte Row)
        instead of collapsing into a single pixel. */
     if(Direction == DIRECTION_TO_LEFT) {
         for(byte column = 1u; column < DISPLAY_NUMBER_OF_COLUMNS; column++) {
-            if(Display::getInstance().getPixelFast(column, Row) &&
-               !Display::getInstance().getPixelFast(column - 1u, Row))
+            if(Display::getInstance().getPixel(column, Row) &&
+               !Display::getInstance().getPixel(column - 1u, Row))
             {
-                Display::getInstance().clearPixelFast(column, Row);
-                Display::getInstance().setPixelFast(column - 1u, Row);
+                Display::getInstance().clearPixel(column, Row);
+                Display::getInstance().setPixel(column - 1u, Row);
                 moved = true;
             }
         }
     } else {
         for(int8_t column = DISPLAY_NUMBER_OF_COLUMNS - 2; column >= 0; column--) {
-            if(Display::getInstance().getPixelFast(static_cast<byte>(column), Row) &&
-               !Display::getInstance().getPixelFast(static_cast<byte>(column + 1), Row))
+            if(Display::getInstance().getPixel(static_cast<byte>(column), Row) &&
+               !Display::getInstance().getPixel(static_cast<byte>(column + 1), Row))
             {
-                Display::getInstance().clearPixelFast(static_cast<byte>(column), Row);
-                Display::getInstance().setPixelFast(static_cast<byte>(column + 1), Row);
+                Display::getInstance().clearPixel(static_cast<byte>(column), Row);
+                Display::getInstance().setPixel(static_cast<byte>(column + 1), Row);
                 moved = true;
             }
         }
@@ -169,7 +169,7 @@ void AnimationCollapse::setTimeTask()
 
         for(byte column = 0u; column < DISPLAY_NUMBER_OF_COLUMNS; column++) {
             if(isPixelPartOfClockWords(ClockWordsTable, column, row)) {
-                Display::getInstance().setPixelFast(calcColumn(column, calcBlockColumn(letterIndex, lettersOfRow)), row);
+                Display::getInstance().setPixel(calcColumn(column, calcBlockColumn(letterIndex, lettersOfRow)), row);
                 letterIndex++;
             }
         }

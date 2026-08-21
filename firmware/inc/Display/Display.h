@@ -148,6 +148,16 @@ class Display
 
     byte transformToSerpentine(byte, byte) const;
     byte transformToSerpentine(byte) const;
+    /* The one place a column and a row become an index on the strip, so the wiring is
+       written once instead of as a #if in every entry point that takes a column. */
+    byte toIndex(byte Column, byte Row) const {
+#if (DISPLAY_LED_STRIPE_SERPENTINE == STD_ON)
+        /* if led stripe is snake or serpentine the odd row: count from right to left */
+        return transformToSerpentine(Column, Row);
+#else
+        return columnAndRowToIndex(Column, Row);
+#endif
+    }
 
     void applyColor();
     /* A colour change moves the current as much as a brightness change does - white draws
@@ -213,22 +223,17 @@ class Display
     StdReturnType setCharacter(CharacterIdType CharacterId) { return setPixel(CharacterId); }
     StdReturnType clearCharacter(CharacterIdType CharacterId) { return clearPixel(CharacterId); }
     StdReturnType getCharacter(CharacterIdType CharacterId, PixelValueType& Value) const { return getPixel(CharacterId, Value); }
-
-    // char methods fast
-    void setCharacterFast(CharacterIdType CharacterId) { setPixelFast(CharacterId); }
-    void clearCharacterFast(CharacterIdType CharacterId) { clearPixelFast(CharacterId); }
-    bool getCharacterFast(CharacterIdType CharacterId) const { return getPixelFast(CharacterId); }
+    PixelValueType getCharacter(CharacterIdType CharacterId) const { return getPixel(CharacterId); }
 
     // word methods
     StdReturnType setWord(WordIdType, byte MaxLength = WordLengthUnlimited);
     StdReturnType clearWord(WordIdType);
     StdReturnType clearWords();
 
-    // word methods fast
-    void setWordFast(WordIdType, byte MaxLength = WordLengthUnlimited);
-    void clearWordFast(WordIdType);
-    void clearWordsFast();
-
+    /* Two forms of a reader, and the argument list says which: the one taking a reference
+       answers whether the index was there, the one taking none answers the pixel and leaves
+       an unlit one where it was not. Writers have a single form, since a caller who ignores
+       what it answers is written the same way as one that never asked. */
     // pixel methods
     StdReturnType writePixel(byte Column, byte Row, PixelValueType Value) { if(Value) return setPixel(Column, Row); else return clearPixel(Column, Row); }
     StdReturnType writePixel(IndexType Index, PixelValueType Value) { if(Value) return setPixel(Index); else return clearPixel(Index); }
@@ -241,28 +246,22 @@ class Display
     StdReturnType togglePixel(IndexType);
     StdReturnType getPixel(byte, byte, PixelValueType&) const;
     StdReturnType getPixel(IndexType, PixelValueType&) const;
+    PixelValueType getPixel(byte, byte) const;
+    PixelValueType getPixel(IndexType) const;
     StdReturnType getPixelRow(byte, PixelRowType&) const;
+    PixelRowType getPixelRow(byte) const;
     StdReturnType getPixelColumn(byte, PixelColumnType&) const;
+    PixelColumnType getPixelColumn(byte) const;
     StdReturnType setPixelRow(byte, PixelRowType);
     StdReturnType setPixelColumn(byte, PixelColumnType);
 
-    // pixel methods fast
     bool isIndexValid(IndexType Index) { return PixelStripe.isIndexValid(Index); }
-    void writePixelFast(byte Column, byte Row, PixelValueType Value) { if(Value) setPixelFast(Column, Row); else clearPixelFast(Column, Row); }
-    void writePixelFast(IndexType Index, PixelValueType Value) { if(Value) setPixelFast(Index); else clearPixelFast(Index); }
-    void setPixelFast(byte, byte);
-    void setPixelFast(byte);
-    void setPixelFast(byte, byte, byte);
-    void clearPixelFast(byte, byte);
-    void clearPixelFast(byte);
-    void togglePixelFast(byte, byte);
-    void togglePixelFast(byte);
-    PixelValueType getPixelFast(byte, byte) const;
-    PixelValueType getPixelFast(byte) const;
-    PixelRowType getPixelRowFast(byte) const;
-    PixelColumnType getPixelColumnFast(byte) const;
-    void setPixelRowFast(byte, PixelRowType);
-    void setPixelColumnFast(byte, PixelColumnType);
+    /* Asked by every entry point taking a column and a row, because the index they map to
+       is a valid one for the next row: a column past the last one used to light the first
+       letter of the row below rather than being refused. */
+    static constexpr bool isColumnAndRowValid(byte Column, byte Row) {
+        return (Column < DISPLAY_NUMBER_OF_COLUMNS) && (Row < DISPLAY_NUMBER_OF_ROWS);
+    }
 
     // methods
     void init();
@@ -305,7 +304,7 @@ class Display
        sizes a supply. So it asks for the cap itself rather than leaving a task to notice. */
     void test() { PixelStripe.setPixels(Color.getColorDimmed()); applyCurrentLimit(); }
     void clear() { PixelStripe.clearPixels(); }
-    bool isCleared() { for(byte Index = 0; Index < DISPLAY_NUMBER_OF_PIXELS; Index++) { if(getPixelFast(Index)) return false; } return true; }
+    bool isCleared() { for(byte Index = 0; Index < DISPLAY_NUMBER_OF_PIXELS; Index++) { if(getPixel(Index)) return false; } return true; }
 
     void incrementColorRed() { Color.incrementColorRed(); applyColor(); }
     void incrementColorGreen() {  Color.incrementColorGreen(); applyColor(); }

@@ -94,6 +94,9 @@ class Text
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
+    /* The first glyph of every table is the space, which is what a character with no glyph
+       of its own is drawn as. */
+    static constexpr byte SpaceFontIndex{0u};
     Transformation wcTransformation;
     ShiftType Shift;
     byte TaskCycle{TEXT_TASK_CYCLE_INIT_VALUE};
@@ -120,33 +123,23 @@ class Text
     ~Text() { }
 
 
-    /* Each of these four has a *Fast twin below that differs in nothing a reader sees, so
-       calling the checked one from the fast path costs its bounds checks and looks right.
-       That happened once, in setCharFast()'s 9x10 branch. [[nodiscard]] is what makes it
-       not happen again: the checked ones exist to answer, and the fast path has nothing to
-       do with an answer, so discarding one is the mistake itself rather than a symptom. */
+    /* Each of these four had a twin that differed in nothing a reader sees - it dropped the
+       answer instead of passing it on - and calling the wrong one of the pair from the wrong
+       place cost bounds checks and looked right. That happened once, in setChar()'s 9x10
+       branch. There is one of each now, so the mistake has nowhere left to happen, and the
+       [[nodiscard]] that used to police it is gone with the twins. */
     template <typename RowType, byte RowsSize>
-    [[nodiscard]] StdReturnType setCharFontHorizontal(byte, byte, const FontCharHorizontal<RowType, RowsSize>&, byte);
+    StdReturnType setCharFontHorizontal(byte, byte, const FontCharHorizontal<RowType, RowsSize>&, byte);
     template <typename RowType>
-    [[nodiscard]] StdReturnType setCharRow(RowType, byte, byte, byte);
-
-    template <typename RowType, byte RowsSize>
-    void setCharFontHorizontalFast(byte, byte, const FontCharHorizontal<RowType, RowsSize>&, byte);
-    template <typename RowType>
-    void setCharRowFast(RowType, byte, byte, byte);
+    StdReturnType setCharRow(RowType, byte, byte, byte);
 
     template <typename ColumnType, byte ColumnsSize>
-    [[nodiscard]] StdReturnType setCharFontVertical(byte, byte, const FontCharVertical<ColumnType, ColumnsSize>&, byte);
+    StdReturnType setCharFontVertical(byte, byte, const FontCharVertical<ColumnType, ColumnsSize>&, byte);
     template <typename ColumnType>
-    [[nodiscard]] StdReturnType setCharColumn(ColumnType, byte, byte, byte);
-
-    template <typename ColumnType, byte ColumnsSize>
-    void setCharFontVerticalFast(byte, byte, const FontCharVertical<ColumnType, ColumnsSize>&, byte);
-    template <typename ColumnType>
-    void setCharColumnFast(ColumnType, byte, byte, byte);
+    StdReturnType setCharColumn(ColumnType, byte, byte, byte);
 
     StdReturnType convertCharToFontIndex(char, byte&) const;
-    byte convertCharToFontIndexFast(char) const;
+    byte convertCharToFontIndex(char) const;
     void stringShiftTask();
     void charShiftTask();
     byte getColumnCenter(FontType Font) const { return (DISPLAY_NUMBER_OF_COLUMNS / 2u) - (getFontWidth(Font) / 2u); }
@@ -176,7 +169,6 @@ class Text
     void task(bool=false);
     void stop();
     StdReturnType setChar(byte, byte, char, FontType);
-    void setCharFast(byte, byte, char, FontType);
     void setCharWithShift(char, FontType);
     void setText(const char*, FontType);
     void setTextWithShift(const char*, FontType);

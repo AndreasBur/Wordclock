@@ -90,46 +90,6 @@ StdReturnType Text::setChar(byte Column, byte Row, char Char, FontType Font)
 
 
 /******************************************************************************************************************************************************
-  setCharFast()
-******************************************************************************************************************************************************/
-void Text::setCharFast(byte Column, byte Row, char Char, FontType Font)
-{
-    byte fontIndex = convertCharToFontIndexFast(Char);
-
-#if(TEXT_SUPPORT_FONT_5X8 == STD_ON)
-    if(Font == FONT_5X8) {
-        FontSprite5x8::FontCharType FontChar = Font5x8.getCharFast(fontIndex);
-        setCharFontVerticalFast(Column, Row, FontChar, FONT_SPRITE_5X8_HEIGHT);
-    }
-#endif
-#if(TEXT_SUPPORT_FONT_7X9 == STD_ON)
-    if(Font == FONT_7X9) {
-        FontCourierNew7x9::FontCharType FontChar = Font7x9.getCharFast(fontIndex);
-        setCharFontHorizontalFast(Column, Row, FontChar, FONT_COURIER_NEW_7X9_HEIGHT);
-    }
-#endif
-#if(TEXT_SUPPORT_FONT_7X10 == STD_ON)
-    if(Font == FONT_7X10) {
-        FontCourierNew7x10::FontCharType FontChar = Font7x10.getCharFast(fontIndex);
-        setCharFontHorizontalFast(Column, Row, FontChar, FONT_COURIER_NEW_7X10_HEIGHT);
-    }
-#endif
-#if(TEXT_SUPPORT_FONT_9X10 == STD_ON)
-    if(Font == FONT_9X10) {
-        FontLucidaSans9x10::FontCharType FontChar = Font9x10.getCharFast(fontIndex);
-        setCharFontVerticalFast(Column, Row, FontChar, FONT_LUCIDA_SANS_9X10_HEIGHT);
-    }
-#endif
-#if(TEXT_SUPPORT_FONT_10X10 == STD_ON)
-    if(Font == FONT_10X10) {
-        FontTahoma10x10::FontCharType FontChar = Font10x10.getCharFast(fontIndex);
-        setCharFontHorizontalFast(Column, Row, FontChar, FONT_TAHOMA_10X10_HEIGHT);
-    }
-#endif
-} /* setCharFast */
-
-
-/******************************************************************************************************************************************************
   setCharWithShift()
 ******************************************************************************************************************************************************/
 void Text::setCharWithShift(char Char, FontType Font)
@@ -234,22 +194,22 @@ byte Text::getFontWidth(FontType Font) const
 ******************************************************************************************************************************************************/
 byte Text::getFontCharWidth(FontType Font, char Char) const
 {
-    byte index = convertCharToFontIndexFast(Char);
+    byte index = convertCharToFontIndex(Char);
 
 #if(TEXT_SUPPORT_FONT_5X8 == STD_ON)
-    if(Font == FONT_5X8) return Font5x8.getCharWidthFast(index);
+    if(Font == FONT_5X8) return Font5x8.getCharWidth(index);
 #endif
 #if(TEXT_SUPPORT_FONT_7X9 == STD_ON)
-    if(Font == FONT_7X9) return Font7x9.getCharWidthFast(index);
+    if(Font == FONT_7X9) return Font7x9.getCharWidth(index);
 #endif
 #if(TEXT_SUPPORT_FONT_7X10 == STD_ON)
-    if(Font == FONT_7X10) return Font7x10.getCharWidthFast(index);
+    if(Font == FONT_7X10) return Font7x10.getCharWidth(index);
 #endif
 #if(TEXT_SUPPORT_FONT_9X10 == STD_ON)
-    if(Font == FONT_9X10) return Font9x10.getCharWidthFast(index);
+    if(Font == FONT_9X10) return Font9x10.getCharWidth(index);
 #endif
 #if(TEXT_SUPPORT_FONT_10X10 == STD_ON)
-    if(Font == FONT_10X10) return Font10x10.getCharWidthFast(index);
+    if(Font == FONT_10X10) return Font10x10.getCharWidth(index);
 #endif
     return 0;
 } /* getFontCharWidth */
@@ -322,7 +282,13 @@ void Text::charShiftTask()
             Shift.Counter--;
             byte Column = DISPLAY_NUMBER_OF_COLUMNS - Shift.CharWidth + Shift.Counter;
             byte Row = getRowCenter(Shift.Font);
-            setChar(Column, Row, Shift.Char, Shift.Font);
+            /* A character setChar refuses is shifted through as a space, which is the blank
+               glyph and therefore clears the cells the previous step wrote. Leaving it out
+               instead would smear those pixels across the display for as long as the text
+               runs. The width was already taken from the same substitute. */
+            if(setChar(Column, Row, Shift.Char, Shift.Font) == E_NOT_OK) {
+                setChar(Column, Row, ' ', Shift.Font);
+            }
         }
     }
 } /* charShiftTask */
@@ -367,39 +333,6 @@ StdReturnType Text::setCharRow(RowType CharRow, byte Column, byte RowAbs, byte F
 
 
 /******************************************************************************************************************************************************
-  setCharFontHorizontalFast()
-******************************************************************************************************************************************************/
-template <typename RowType, byte RowsSize>
-void Text::setCharFontHorizontalFast(byte Column, byte Row, const FontCharHorizontal<RowType, RowsSize>& FontChar, byte FontHeight)
-{
-    for(byte fontRow = 0u; fontRow < FontHeight; fontRow++)
-    {
-        RowType CharRow = FontChar.getRowFast(fontRow);
-        byte RowAbs = Row + fontRow;
-        setCharRowFast(CharRow, Column, RowAbs, FontChar.getWidth());
-    }
-} /* setCharFontHorizontalFast */
-
-
-/******************************************************************************************************************************************************
-  setCharRowFast()
-******************************************************************************************************************************************************/
-template <typename RowType>
-void Text::setCharRowFast(RowType CharRow, byte Column, byte RowAbs, byte FontWidth)
-{
-    for(byte fontColumn = 0u; fontColumn < FontWidth; fontColumn++)
-    {
-        byte ColumnAbs = Column + fontColumn;
-        if(ColumnAbs < DISPLAY_NUMBER_OF_COLUMNS && RowAbs < DISPLAY_NUMBER_OF_ROWS) {
-            Display::getInstance().writePixelFast(ColumnAbs, RowAbs, bitRead(CharRow, fontColumn));
-        } else {
-            break;
-        }
-    }
-} /* setCharRowFast */
-
-
-/******************************************************************************************************************************************************
   setCharFontVertical()
 ******************************************************************************************************************************************************/
 template <typename ColumnType, byte ColumnsSize>
@@ -435,39 +368,6 @@ StdReturnType Text::setCharColumn(ColumnType CharColumn, byte ColumnAbs, byte Ro
     }
     return returnValue;
 } /* setCharColumn */
-
-
-/******************************************************************************************************************************************************
-  setCharFontVerticalFast()
-******************************************************************************************************************************************************/
-template <typename ColumnType, byte ColumnsSize>
-void Text::setCharFontVerticalFast(byte Column, byte Row, const FontCharVertical<ColumnType, ColumnsSize>& FontChar, byte FontHeight)
-{
-    for(byte fontColumn = 0u; fontColumn < FontChar.getWidth(); fontColumn++)
-    {
-        ColumnType CharColumn = FontChar.getColumnFast(fontColumn);
-        byte ColumnAbs = Column + fontColumn;
-        setCharColumnFast(CharColumn, ColumnAbs, Row, FontHeight);
-    }
-} /* setCharFontVerticalFast */
-
-
-/******************************************************************************************************************************************************
-  setCharColumnFast()
-******************************************************************************************************************************************************/
-template <typename ColumnType>
-void Text::setCharColumnFast(ColumnType CharColumn, byte ColumnAbs, byte Row, byte FontHeight)
-{
-    for(byte fontRow = 0u; fontRow < FontHeight; fontRow++)
-    {
-        byte rowAbs = Row + fontRow;
-        if(ColumnAbs < DISPLAY_NUMBER_OF_COLUMNS && rowAbs < DISPLAY_NUMBER_OF_ROWS) {
-            Display::getInstance().writePixelFast(ColumnAbs, rowAbs, bitRead(CharColumn, fontRow));
-        } else {
-            break;
-        }
-    }
-} /* setCharColumnFast */
 
 
 /******************************************************************************************************************************************************
@@ -521,25 +421,18 @@ StdReturnType Text::convertCharToFontIndex(char Char, byte& Index) const
  *  \return         E_OK
  *                  E_NOT_OK
  *****************************************************************************************************************************************************/
-byte Text::convertCharToFontIndexFast(char Char) const
+byte Text::convertCharToFontIndex(char Char) const
 {
-    /* for umlauts we need a special treatment */
-    if('\xC4' == Char)  return 96u;
-    else if('\xD6' == Char) return 97u;
-    else if('\xDC' == Char) return 98u;
-    else if('\xE4' == Char) return 99u;
-    else if('\xF6' == Char) return 100u;
-    else if('\xFC' == Char) return 101u;
-    else if('\xB0' == Char) return 102u;
-    /* for all others only add the offset, within both bounds - see the checked version */
-    const byte Value = static_cast<byte>(Char);
+    byte Index;
 
-    if((Value >= TEXT_ASCII_CHAR_MIN) && (Value <= TEXT_ASCII_CHAR_MAX)) {
-        return static_cast<byte>(Value + TEXT_ASCII_TABLE_OFFSET);
+    /* The mapping is written once, above. It used to be written here as well, which made
+       adding a glyph a change in two branches that had to agree - see fonts.md. */
+    if(convertCharToFontIndex(Char, Index) == E_NOT_OK) {
+        /* The space, which is the first glyph: a character that cannot be drawn leaves a gap
+           rather than whatever byte sits past the end of the table. */
+        return SpaceFontIndex;
     }
-    /* The space, which is the first glyph: a character that cannot be drawn leaves a gap
-       rather than whatever byte sits past the end of the table. */
-    return 0u;
+    return Index;
 } /* convertCharToFontIndex */
 
 

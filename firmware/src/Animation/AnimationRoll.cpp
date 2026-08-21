@@ -125,17 +125,17 @@ void AnimationRoll::rollHorizontal()
        column entering in step n is the one that ends up n columns away from the edge
        it entered at. */
     if(Direction == DIRECTION_RIGHT) {
-        wcTransformation.shiftRightFast();
+        wcTransformation.shiftRight();
         for(byte row = 0u; row < DISPLAY_NUMBER_OF_ROWS; row++) {
             if(isPixelPartOfClockWords(ClockWordsTable, DISPLAY_NUMBER_OF_COLUMNS - Step - 1u, row)) {
-                Display::getInstance().setPixelFast(0u, row);
+                Display::getInstance().setPixel(0u, row);
             }
         }
     } else {
-        wcTransformation.shiftLeftFast();
+        wcTransformation.shiftLeft();
         for(byte row = 0u; row < DISPLAY_NUMBER_OF_ROWS; row++) {
             if(isPixelPartOfClockWords(ClockWordsTable, Step, row)) {
-                Display::getInstance().setPixelFast(DISPLAY_NUMBER_OF_COLUMNS - 1u, row);
+                Display::getInstance().setPixel(DISPLAY_NUMBER_OF_COLUMNS - 1u, row);
             }
         }
     }
@@ -149,17 +149,17 @@ void AnimationRoll::rollVertical()
 {
     /* same as rollHorizontal(), with rows instead of columns */
     if(Direction == DIRECTION_DOWN) {
-        wcTransformation.shiftDownFast();
+        wcTransformation.shiftDown();
         for(byte column = 0u; column < DISPLAY_NUMBER_OF_COLUMNS; column++) {
             if(isPixelPartOfClockWords(ClockWordsTable, column, DISPLAY_NUMBER_OF_ROWS - Step - 1u)) {
-                Display::getInstance().setPixelFast(column, 0u);
+                Display::getInstance().setPixel(column, 0u);
             }
         }
     } else {
-        wcTransformation.shiftUpFast();
+        wcTransformation.shiftUp();
         for(byte column = 0u; column < DISPLAY_NUMBER_OF_COLUMNS; column++) {
             if(isPixelPartOfClockWords(ClockWordsTable, column, Step)) {
-                Display::getInstance().setPixelFast(column, DISPLAY_NUMBER_OF_ROWS - 1u);
+                Display::getInstance().setPixel(column, DISPLAY_NUMBER_OF_ROWS - 1u);
             }
         }
     }

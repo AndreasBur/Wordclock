@@ -42,6 +42,10 @@ int main()
     testFlickerLeavesTheDisplayOn();
     testFadeDimsAndComesBack();
     testCharacterToGlyphMapping();
+    testUndrawableCharacterShiftsAsASpace();
+    testReadingPastTheEndIsEmpty();
+    testWritingPastTheEndIsRefused();
+    testGlyphAccessorsCheckBothWays();
     testRegionalWordings();
     testOverlayPeriodAndEndurance();
     testSchedulerSpeedRoundTrip();

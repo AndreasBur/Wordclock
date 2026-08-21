@@ -126,7 +126,7 @@ void AnimationMatrix::setTimeTask()
 void AnimationMatrix::drawColumn(byte Column, byte Head)
 {
     /* the head is the brightest pixel of a drop, it may already have left the display */
-    if(Head < DISPLAY_NUMBER_OF_ROWS) { Display::getInstance().setPixelFast(Column, Head); }
+    if(Head < DISPLAY_NUMBER_OF_ROWS) { Display::getInstance().setPixel(Column, Head); }
 
     /* Everything above the head is the trail. Two rows share one fade step, so the
        trail is twice as long as there are intensity steps, and the intensity falls
@@ -139,12 +139,12 @@ void AnimationMatrix::drawColumn(byte Column, byte Head)
         if(isPixelPartOfClockWords(ClockWordsTable, Column, row) && fadeStep > RevealFadeStep) {
             /* letter of the new time, deep enough in the trail: it stays from now on
                because it is drawn without a brightness in every following frame */
-            Display::getInstance().setPixelFast(Column, row);
+            Display::getInstance().setPixel(Column, row);
         } else if(fadeStep > TrailFadeSteps) {
             /* end of the trail, everything above the drop is dark again */
-            Display::getInstance().clearPixelFast(Column, row);
+            Display::getInstance().clearPixel(Column, row);
         } else {
-            Display::getInstance().setPixelFast(Column, row, static_cast<byte>(TrailBrightness / fadeStep));
+            Display::getInstance().setPixel(Column, row, static_cast<byte>(TrailBrightness / fadeStep));
         }
     }
 } /* drawColumn */

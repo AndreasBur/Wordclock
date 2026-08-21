@@ -461,7 +461,7 @@ esp_err_t handleDisplay(httpd_req_t* Request)
 
     for(byte Index = 0u; Index < DISPLAY_CHARACTERS_NUMBER_OF_CHARACTERS; Index++) {
         char Utf8[2u];
-        const byte Length = toUtf8(static_cast<byte>(Letters.getCharacterFast(Index)), Utf8);
+        const byte Length = toUtf8(static_cast<byte>(Letters.getCharacter(Index)), Utf8);
 
         for(byte Byte = 0u; Byte < Length; Byte++) { Writer.put(Utf8[Byte]); }
     }
@@ -698,7 +698,7 @@ void WebInterface::broadcastFrame()
     const Pixels& Strip = Pixels::getInstance();
 
     for(byte Index = 0u; Index < PIXELS_NUMBER_OF_LEDS; Index++) {
-        const Pixel Colour = Strip.getOutputPixelFast(Index);
+        const Pixel Colour = Strip.getOutputPixel(Index);
 
         *Target++ = Colour.getGreen();
         *Target++ = Colour.getRed();

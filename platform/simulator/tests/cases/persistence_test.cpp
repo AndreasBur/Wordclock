@@ -62,8 +62,8 @@ void testPersistence()
     display.setColor(10u, 20u, 30u);
     display.setBrightness(123u);
     display.setBrightnessUseGammaCorrection(true);
-    clock.setModeFast(Clock::MODE_SCHWABEN);
-    Animations::getInstance().setTaskCycleFast(Animations::ANIMATION_ID_NONE, 42u);
+    clock.setMode(Clock::MODE_SCHWABEN);
+    Animations::getInstance().setTaskCycle(Animations::ANIMATION_ID_NONE, 42u);
     Illuminance::getInstance().setCalibrationValuesMaxValue(4321u);
 
     persistence.task();
@@ -72,8 +72,8 @@ void testPersistence()
     display.setColor(1u, 2u, 3u);
     display.setBrightness(7u);
     display.setBrightnessUseGammaCorrection(false);
-    clock.setModeFast(Clock::MODE_WESSI);
-    Animations::getInstance().setTaskCycleFast(Animations::ANIMATION_ID_NONE, 1u);
+    clock.setMode(Clock::MODE_WESSI);
+    Animations::getInstance().setTaskCycle(Animations::ANIMATION_ID_NONE, 1u);
     Illuminance::getInstance().setCalibrationValuesMaxValue(1u);
 
     expect(persistence.load() == E_OK, "a stored configuration must be restored");
@@ -115,7 +115,7 @@ void testPersistenceSaveAndReset()
     Clock& clock = Clock::getInstance();
 
     display.setColor(1u, 2u, 3u);
-    clock.setModeFast(Clock::MODE_OSSI);
+    clock.setMode(Clock::MODE_OSSI);
     clock.setShowItIsPermanently(false);
     expect(persistence.save() == E_OK, "saving must write the configuration");
 

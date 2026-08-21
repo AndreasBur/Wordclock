@@ -56,13 +56,14 @@ A glyph appended by hand costs three edits, which is the path the degree sign to
    readable: `0b` bits for the 5×8 table, hex for the rest, LSB first in both
    packings — bit 0 is the top row of a column, or the leftmost pixel of a row.
 2. `*_FONT_TABLE_SIZE` in the matching header, raised by one.
-3. A branch in both `convertCharToFontIndex` and `convertCharToFontIndexFast`
+3. One branch in `convertCharToFontIndex`
    ([Text.cpp](../firmware/src/Text/Text.cpp)), mapping the Latin-1 byte to the new
    index. Past the ASCII run rather than inside it, the same way the six umlauts sit
    at 96 to 101 — a character inserted into the run would shift every index after it.
+   This used to be two branches that had to agree, in a second conversion that answered
+   the index instead of a code; that one now asks this one.
 
-The fast conversion answers with the space rather than a return code for a byte it
-cannot map, so a missing branch there draws a blank instead of failing. That is what
-the degree sign's check in
+The form that answers the index substitutes the space for a byte it cannot map, so a
+missing branch draws a blank instead of failing. That is what the degree sign's check in
 [WordclockTests.cpp](../platform/simulator/tests/WordclockTests.cpp) compares
 against: the space, not an empty display.

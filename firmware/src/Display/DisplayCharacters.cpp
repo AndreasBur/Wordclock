@@ -67,8 +67,8 @@ const DisplayCharacters::DisplayCharactersTableElementType DisplayCharacters::Di
 ******************************************************************************************************************************************************/
 StdReturnType DisplayCharacters::getCharacter(byte Column, byte Row, char& Character) const
 {
-    if(Row < DISPLAY_CHARACTERS_NUMBER_OF_ROWS && Column < DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS) {
-        Character =  getCharacterFast(Column, Row);
+    if(isColumnAndRowValid(Column, Row)) {
+        Character =  getDisplayCharactersTableElement(Column, Row);
         return E_OK;
     } else {
         return E_NOT_OK;
@@ -82,7 +82,7 @@ StdReturnType DisplayCharacters::getCharacter(byte Column, byte Row, char& Chara
 StdReturnType DisplayCharacters::getCharacter(byte Index, char& Character) const
 {
     if(isIndexValid(Index)) {
-        Character =  getCharacterFast(Index);
+        Character =  getDisplayCharactersTableElement(Index);
         return E_OK;
     } else {
         return E_NOT_OK;
@@ -96,7 +96,7 @@ StdReturnType DisplayCharacters::getCharacter(byte Index, char& Character) const
 StdReturnType DisplayCharacters::getCharacter(CharacterIdType CharacterId, char& Character) const
 {
     if(isCharacterIdValid(CharacterId)) {
-        Character =  getCharacterFast(CharacterId);
+        Character =  getDisplayCharactersTableElement(CharacterId);
         return E_OK;
     } else {
         return E_NOT_OK;

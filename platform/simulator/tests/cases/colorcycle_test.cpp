@@ -22,7 +22,7 @@ namespace {
 Pixel firstLitPixel()
 {
     for(byte Index = 0u; Index < PIXELS_NUMBER_OF_PIXELS; Index++) {
-        const Pixel Candidate = Pixels::getInstance().getPixelFast(Index);
+        const Pixel Candidate = Pixels::getInstance().getPixel(Index);
 
         if(Candidate.getRed() || Candidate.getGreen() || Candidate.getBlue()) { return Candidate; }
     }

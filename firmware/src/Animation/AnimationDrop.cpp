@@ -102,12 +102,12 @@ void AnimationDrop::reset()
 void AnimationDrop::clearTimeTask()
 {
     // toggle current Pixel
-    if(Row < DISPLAY_NUMBER_OF_ROWS && Column < DISPLAY_NUMBER_OF_COLUMNS) { Display::getInstance().togglePixelFast(Column, Row); }
+    if(Row < DISPLAY_NUMBER_OF_ROWS && Column < DISPLAY_NUMBER_OF_COLUMNS) { Display::getInstance().togglePixel(Column, Row); }
     // increment row and check for out of bounds
     if(Row + 1u < DISPLAY_NUMBER_OF_ROWS) {
         // toggle Pixel in next row
         Row++;
-        Display::getInstance().togglePixelFast(Column, Row);
+        Display::getInstance().togglePixel(Column, Row);
     } else {
         // no more active pixels available
         if(setNextActivePixelIndex() == E_NOT_OK) { setStateToSetTime(); }
@@ -120,11 +120,11 @@ void AnimationDrop::clearTimeTask()
 ******************************************************************************************************************************************************/
 void AnimationDrop::setTimeTask()
 {
-    DisplayWord currentWord = Words.getDisplayWordFast(ClockWordsTable[CurrentWordIndex]);
-    const byte maxColumn = Words.getDisplayWordColumnFast(ClockWordsTable[CurrentWordIndex]) + currentWord.getLength() - 1u;
+    DisplayWord currentWord = Words.getDisplayWord(ClockWordsTable[CurrentWordIndex]);
+    const byte maxColumn = Words.getDisplayWordColumn(ClockWordsTable[CurrentWordIndex]) + currentWord.getLength() - 1u;
 
     if(setNextRow(currentWord.getRow()) == E_OK) {
-        Display::getInstance().clearPixelFast(Column, Row - 1u);
+        Display::getInstance().clearPixel(Column, Row - 1u);
     } else {
         if(setNextColumn(maxColumn) == E_NOT_OK) {
             finishWithClockWords(ClockWordsTable);
@@ -132,7 +132,7 @@ void AnimationDrop::setTimeTask()
             return;
         }
     }
-    Display::getInstance().setPixelFast(Column, Row);
+    Display::getInstance().setPixel(Column, Row);
 } /* setTimeTask */
 
 
@@ -142,7 +142,7 @@ void AnimationDrop::setTimeTask()
 StdReturnType AnimationDrop::setNextActivePixelIndex()
 {
     for(int16_t index = DISPLAY_NUMBER_OF_PIXELS - 1u; index >= 0; index--) {
-        if(Display::getInstance().getPixelFast(index)) {
+        if(Display::getInstance().getPixel(index)) {
             Display::getInstance().indexToColumnAndRow(index, Column, Row);
             return E_OK;
         }
@@ -175,8 +175,8 @@ StdReturnType AnimationDrop::setNextWordIndex()
 void AnimationDrop::setStateToSetTime()
 {
     Row = 0u;
-    Column = Words.getDisplayWordColumnFast(ClockWordsTable[CurrentWordIndex]);
-    Display::getInstance().setPixelFast(Column, Row);
+    Column = Words.getDisplayWordColumn(ClockWordsTable[CurrentWordIndex]);
+    Display::getInstance().setPixel(Column, Row);
     State = STATE_SET_TIME;
 } /* setStateToSetTime */
 
@@ -202,7 +202,7 @@ StdReturnType AnimationDrop::setNextColumn(byte MaxColumn)
 {
     if(Column >= MaxColumn) {
          if(setNextWordIndex() == E_OK) {
-            Column = Words.getDisplayWordColumnFast(ClockWordsTable[CurrentWordIndex]);
+            Column = Words.getDisplayWordColumn(ClockWordsTable[CurrentWordIndex]);
             Row = 0u;
             return E_OK;
         } else {

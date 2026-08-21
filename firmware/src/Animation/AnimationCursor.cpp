@@ -74,10 +74,10 @@ StdReturnType AnimationCursor::setTime(byte Hour, byte Minute)
 void AnimationCursor::task()
 {
     if(State == STATE_SET_TIME) {
-        if(CurrentPixelIndex < DISPLAY_NUMBER_OF_PIXELS) { Display::getInstance().setPixelFast(CurrentPixelIndex); }
+        if(CurrentPixelIndex < DISPLAY_NUMBER_OF_PIXELS) { Display::getInstance().setPixel(CurrentPixelIndex); }
         if(CurrentPixelIndex > 0u) {
             if(isPixelPartOfClockWords(ClockWordsTable, CurrentPixelIndex - 1u) == false) {
-                Display::getInstance().clearPixelFast(CurrentPixelIndex - 1u);
+                Display::getInstance().clearPixel(CurrentPixelIndex - 1u);
             }
         }
         if(CurrentPixelIndex >= DISPLAY_NUMBER_OF_PIXELS) {

@@ -123,7 +123,7 @@ wxBoxSizer* PixelsFrame::createSizerCharacter(wxWindow* Parent, int Row)
     const DisplayCharacters Letters;
 
     for(unsigned int Column = 0; Column < PIXELS_DISPLAY_NUMBER_OF_COLUMNS; Column++) {
-        const wxString Label = toCharacterLabel(Letters.getCharacterFast(static_cast<byte>(Column), static_cast<byte>(Row)));
+        const wxString Label = toCharacterLabel(Letters.getCharacter(static_cast<byte>(Column), static_cast<byte>(Row)));
 
         Characters[Row][Column] = new wxStaticText(Parent, wxID_ANY, Label, wxDefaultPosition, wxSize(CellSize, CellSize), wxALIGN_CENTRE_HORIZONTAL);
         Characters[Row][Column]->SetFont(wxFont(wxSize(40,40), wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false));
@@ -226,7 +226,7 @@ void PixelsFrame::renderPixel(byte Row, byte Column)
     const Pixels& pixels = Pixels::getInstance();
     const byte Index = static_cast<byte>((Row * PIXELS_DISPLAY_NUMBER_OF_COLUMNS) + Column);
     const wxColour Colour = (pixels.getBrightness() == 0u) ? wxColour(*wxLIGHT_GREY)
-                                                           : toColour(pixels.getPixelFast(Index));
+                                                           : toColour(pixels.getPixel(Index));
 
     /* SetForegroundColour marks the label for repaint even when the colour does not
        change. Rendering now walks the whole grid instead of only the pixel that was

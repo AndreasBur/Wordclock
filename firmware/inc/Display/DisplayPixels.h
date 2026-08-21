@@ -85,7 +85,7 @@ class DisplayPixels
 	void writePixel(byte Column, byte Row, bool Value) { PixelsBuffer[Row] = writeBit(PixelsBuffer[Row], Column, Value); }
 
 	void setWord(WordIdType WordId) {
-        DisplayWord word = Words.getDisplayWordFast(WordId);
+        DisplayWord word = Words.getDisplayWord(WordId);
         for(IndexType Index = 0u; Index < word.getLength(); Index++) { setPixel(word.getColumn() + Index,  word.getRow()); }
     }
 
@@ -102,7 +102,7 @@ class DisplayPixels
 	{
         for(byte Column = 0u; Column < DISPLAY_NUMBER_OF_COLUMNS; Column++) {
             for(byte Row = 0u; Row < DISPLAY_NUMBER_OF_ROWS; Row++) {
-                PixelsBuffer[Row] = writeBit(PixelsBuffer[Row], Column, Display::getInstance().getPixelFast(Column, Row));
+                PixelsBuffer[Row] = writeBit(PixelsBuffer[Row], Column, Display::getInstance().getPixel(Column, Row));
             }
         }
 	}

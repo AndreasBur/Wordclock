@@ -38,42 +38,42 @@ void testRegionalWordings()
 
     /* Quarter past four: named after the hour it is past, or after the one it counts
        towards. */
-    clock.setModeFast(Clock::MODE_WESSI);
+    clock.setMode(Clock::MODE_WESSI);
     expect(wordsContain(wordsAt(4u, 15u), DisplayWords::WORD_NACH),
            "Wessi says a quarter *past* four");
-    clock.setModeFast(Clock::MODE_OSSI);
+    clock.setMode(Clock::MODE_OSSI);
     expect(!wordsContain(wordsAt(4u, 15u), DisplayWords::WORD_NACH),
            "Ossi says viertel five, with no past in it");
     expect(wordsContain(wordsAt(4u, 15u), DisplayWords::WORD_VIERTEL),
            "and it is still a quarter");
 
     /* Quarter to five: the same difference, from the other side. */
-    clock.setModeFast(Clock::MODE_WESSI);
+    clock.setMode(Clock::MODE_WESSI);
     expect(wordsContain(wordsAt(4u, 45u), DisplayWords::WORD_VOR),
            "Wessi says a quarter *to* five");
-    clock.setModeFast(Clock::MODE_SCHWABEN);
+    clock.setMode(Clock::MODE_SCHWABEN);
     expect(wordsContain(wordsAt(4u, 45u), DisplayWords::WORD_DREIVIERTEL),
            "Schwaben says three quarters five");
     expect(!wordsContain(wordsAt(4u, 45u), DisplayWords::WORD_VOR),
            "which has no to in it");
 
     /* Twenty past four: counted from the hour, or as ten before half five. */
-    clock.setModeFast(Clock::MODE_RHEIN_RUHR);
+    clock.setMode(Clock::MODE_RHEIN_RUHR);
     expect(wordsContain(wordsAt(4u, 20u), DisplayWords::WORD_NACH),
            "Rhein-Ruhr counts twenty past the hour");
     expect(!wordsContain(wordsAt(4u, 20u), DisplayWords::WORD_HALB),
            "and does not reach for the half hour");
-    clock.setModeFast(Clock::MODE_WESSI);
+    clock.setMode(Clock::MODE_WESSI);
     expect(wordsContain(wordsAt(4u, 20u), DisplayWords::WORD_HALB),
            "Wessi counts ten before half five");
     expect(wordsContain(wordsAt(4u, 20u), DisplayWords::WORD_VOR),
            "which is a before");
 
     /* Twenty to five, the mirror of it. */
-    clock.setModeFast(Clock::MODE_RHEIN_RUHR);
+    clock.setMode(Clock::MODE_RHEIN_RUHR);
     expect(wordsContain(wordsAt(4u, 40u), DisplayWords::WORD_VOR),
            "Rhein-Ruhr counts twenty to the hour");
-    clock.setModeFast(Clock::MODE_WESSI);
+    clock.setMode(Clock::MODE_WESSI);
     expect(wordsContain(wordsAt(4u, 40u), DisplayWords::WORD_HALB),
            "Wessi counts ten past half five");
     expect(wordsContain(wordsAt(4u, 40u), DisplayWords::WORD_NACH),
@@ -83,7 +83,7 @@ void testRegionalWordings()
        Whether the times between them do is the one thing about the wording that is a
        setting, so both of its answers are asked here rather than whichever one the build
        happens to carry. */
-    clock.setModeFast(Clock::MODE_WESSI);
+    clock.setMode(Clock::MODE_WESSI);
     const bool ShowItIsPermanentlyBefore = clock.getShowItIsPermanently();
 
     clock.setShowItIsPermanently(false);
@@ -99,7 +99,7 @@ void testRegionalWordings()
 
     clock.setShowItIsPermanently(ShowItIsPermanentlyBefore);
 
-    clock.setModeFast(Clock::MODE_WESSI);
+    clock.setMode(Clock::MODE_WESSI);
 }
 
 /* The premise of driving the display off the word set instead of off the minute: a
@@ -107,7 +107,7 @@ void testRegionalWordings()
    over the whole day rather than at a few sample times. */
 void testWordsChangeOnFiveMinuteStepsOnly()
 {
-    Clock::getInstance().setModeFast(Clock::MODE_WESSI);
+    Clock::getInstance().setMode(Clock::MODE_WESSI);
 
     ClockWords previousWords = wordsAt(0u, 0u);
 
@@ -142,14 +142,14 @@ void testInvalidTimeIsRejected()
 void testClockModes()
 {
     Clock& clock = Clock::getInstance();
-    clock.setModeFast(Clock::MODE_WESSI);
+    clock.setMode(Clock::MODE_WESSI);
     const ClockWords wessiWords = wordsAt(10u, 15u);
 
-    clock.setModeFast(Clock::MODE_OSSI);
+    clock.setMode(Clock::MODE_OSSI);
     expect(wessiWords != wordsAt(10u, 15u),
            "changing the clock mode must change the words where modes differ");
 
-    clock.setModeFast(Clock::MODE_WESSI);
+    clock.setMode(Clock::MODE_WESSI);
     expect(wessiWords == wordsAt(10u, 15u),
            "the same mode and time must produce the same words again");
 }
@@ -160,7 +160,7 @@ void testClockModes()
 void testClockModeStepsThroughEveryWording()
 {
     Clock& clock = Clock::getInstance();
-    clock.setModeFast(Clock::MODE_WESSI);
+    clock.setMode(Clock::MODE_WESSI);
 
     bool seen[Clock::MODE_NUMBER_OF_MODES]{};
     for(byte Step = 0u; Step < Clock::MODE_NUMBER_OF_MODES; Step++) {
@@ -174,11 +174,11 @@ void testClockModeStepsThroughEveryWording()
     expect(clock.getMode() == Clock::MODE_WESSI, "and must wrap back to the one it started on");
 
     /* The step itself, said once outright: the mode after the last is the first again. */
-    clock.setModeFast(Clock::MODE_SCHWABEN);
+    clock.setMode(Clock::MODE_SCHWABEN);
     clock.nextMode();
     expect(clock.getMode() == Clock::MODE_WESSI, "the wording after the last must be the first");
 
-    clock.setModeFast(Clock::MODE_WESSI);
+    clock.setMode(Clock::MODE_WESSI);
 }
 
 /* The comparison the display update hangs on: it has to notice a difference in each

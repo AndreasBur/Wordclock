@@ -78,12 +78,12 @@ void AnimationSnake::task()
 {
     if(State == STATE_SET_TIME) {
         byte snakeEndIndexTrans = transformToSerpentine(SnakeEndIndex);
-        Display::getInstance().setPixelFast(transformToSerpentine(SnakeBeginIndex));
+        Display::getInstance().setPixel(transformToSerpentine(SnakeBeginIndex));
 
         if((SnakeBeginIndex - SnakeEndIndex) == ANIMATION_SNAKE_LENGTH ||
            (SnakeBeginIndex >= DISPLAY_NUMBER_OF_LEDS - 1u && SnakeEndIndex < DISPLAY_NUMBER_OF_LEDS))
         {
-            if(isPixelPartOfClockWords(ClockWordsTable, snakeEndIndexTrans) == false) Display::getInstance().clearPixelFast(snakeEndIndexTrans);
+            if(isPixelPartOfClockWords(ClockWordsTable, snakeEndIndexTrans) == false) Display::getInstance().clearPixel(snakeEndIndexTrans);
             SnakeEndIndex++;
         }
         if(SnakeBeginIndex < DISPLAY_NUMBER_OF_LEDS - 1u) SnakeBeginIndex++;

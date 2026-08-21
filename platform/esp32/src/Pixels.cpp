@@ -31,7 +31,6 @@
 #include "Arduino.h"
 #include "Pixels.h"
 
-#include <cassert>
 
 /******************************************************************************************************************************************************
  *  LOCAL CONSTANT MACROS
@@ -212,7 +211,7 @@ bool Pixels::isFrameOnTheWire() const
 ******************************************************************************************************************************************************/
 StdReturnType Pixels::getPixel(byte Index, PixelType& Pixel) const
 {
-    if(Index >= PIXELS_NUMBER_OF_LEDS) { return E_NOT_OK; }
+    if(!isIndexValid(Index)) { return E_NOT_OK; }
 
     Pixel = PixelBuffer[toRow(Index)][toColumn(Index)];
     return E_OK;
@@ -220,12 +219,16 @@ StdReturnType Pixels::getPixel(byte Index, PixelType& Pixel) const
 
 
 /******************************************************************************************************************************************************
-  getPixelFast()
+  getPixel()
 ******************************************************************************************************************************************************/
-Pixels::PixelType Pixels::getPixelFast(byte Index) const
+Pixels::PixelType Pixels::getPixel(byte Index) const
 {
+    /* An index that is not on the strip has no pixel, and an unlit one is the answer no
+       caller can mistake for an LED that is on. */
+    if(!isIndexValid(Index)) { return PixelType{}; }
+
     return PixelBuffer[toRow(Index)][toColumn(Index)];
-} /* getPixelFast */
+} /* getPixel */
 
 
 /******************************************************************************************************************************************************
@@ -233,7 +236,7 @@ Pixels::PixelType Pixels::getPixelFast(byte Index) const
 ******************************************************************************************************************************************************/
 StdReturnType Pixels::setPixel(byte Index, PixelType Pixel)
 {
-    if(Index >= PIXELS_NUMBER_OF_LEDS) { return E_NOT_OK; }
+    if(!isIndexValid(Index)) { return E_NOT_OK; }
 
     PixelBuffer[toRow(Index)][toColumn(Index)] = Pixel;
     Dirty = true;
@@ -248,29 +251,6 @@ StdReturnType Pixels::setPixel(byte Index, byte Red, byte Green, byte Blue)
 {
     return setPixel(Index, PixelType(Red, Green, Blue));
 } /* setPixel */
-
-
-/******************************************************************************************************************************************************
-  setPixelFast()
-******************************************************************************************************************************************************/
-/* assert rather than a silent clamp, matching the simulator: an index past the end is a
-   firmware bug, and this is the build where it can still be caught. */
-void Pixels::setPixelFast(byte Index, PixelType Pixel)
-{
-    assert(Index < PIXELS_NUMBER_OF_LEDS);
-
-    PixelBuffer[toRow(Index)][toColumn(Index)] = Pixel;
-    Dirty = true;
-} /* setPixelFast */
-
-
-/******************************************************************************************************************************************************
-  setPixelFast()
-******************************************************************************************************************************************************/
-void Pixels::setPixelFast(byte Index, byte Red, byte Green, byte Blue)
-{
-    setPixelFast(Index, PixelType(Red, Green, Blue));
-} /* setPixelFast */
 
 
 /******************************************************************************************************************************************************
@@ -320,7 +300,7 @@ void Pixels::fillFrameBuffer() const
     byte* Target = FrameBuffer;
 
     for(byte Index = 0u; Index < PIXELS_NUMBER_OF_LEDS; Index++) {
-        const PixelType Pixel = getOutputPixelFast(Index);
+        const PixelType Pixel = getOutputPixel(Index);
 
         *Target++ = Pixel.getGreen();
         *Target++ = Pixel.getRed();

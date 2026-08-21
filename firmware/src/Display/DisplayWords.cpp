@@ -79,7 +79,7 @@ StdReturnType DisplayWords::getDisplayWord(WordIdType WordId, DisplayWord& Word)
     StdReturnType returnValue{E_NOT_OK};
 
     if(isWordIdValid(WordId)) {
-        Word = getDisplayWordFast(WordId);
+        Word = getDisplayWordsTableElement(WordId);
         returnValue = E_OK;
     } else {
         returnValue = E_NOT_OK;
@@ -96,7 +96,7 @@ StdReturnType DisplayWords::getDisplayWordLength(WordIdType WordId, byte& Length
     StdReturnType returnValue{E_NOT_OK};
 
     if(isWordIdValid(WordId)) {
-        Length = getDisplayWordLengthFast(WordId);
+        Length = getDisplayWordsTableElement(WordId).getLength();
         returnValue = E_OK;
     } else {
         returnValue = E_NOT_OK;
@@ -113,7 +113,7 @@ StdReturnType DisplayWords::getDisplayWordColumn(WordIdType WordId, byte& Column
     StdReturnType returnValue{E_NOT_OK};
 
     if(isWordIdValid(WordId)) {
-        Column = getDisplayWordColumnFast(WordId);
+        Column = getDisplayWordsTableElement(WordId).getColumn();
         returnValue = E_OK;
     } else {
         returnValue = E_NOT_OK;
@@ -130,7 +130,7 @@ StdReturnType DisplayWords::getDisplayWordRow(WordIdType WordId, byte& Row) cons
     StdReturnType returnValue{E_NOT_OK};
 
     if(isWordIdValid(WordId)) {
-        Row = getDisplayWordRowFast(WordId);
+        Row = getDisplayWordsTableElement(WordId).getRow();
         returnValue = E_OK;
     } else {
         returnValue = E_NOT_OK;
