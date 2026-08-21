@@ -19,6 +19,10 @@
 /* The framework's headers first, ahead of the Arduino.h that binds Serial to a macro. */
 #include <LEAmDNS.h>
 #include <ESPAsyncWebServer.h>
+/* The two halves of an update on this core: the image goes into the filesystem, and PicoOTA
+   writes the command page that the loader at the front of the image reads on the next boot. */
+#include <LittleFS.h>
+#include <PicoOTA.h>
 
 #include "Arduino.h"
 
@@ -57,6 +61,30 @@ void sendLineToClients(const char* Line)
    the password beside it. */
 constexpr char ConsoleUserName[]{"wordclock"};
 constexpr char ConsoleRealm[]{"Wordclock, user wordclock"};
+
+/* Where the image waits for the loader. At the root of the filesystem and not beside the
+   settings, because it is not settings: this file is written by one update and gone from the
+   next one's point of view, and the loader is given the path as text. */
+constexpr char ImagePath[]{"/firmware.bin"};
+/* Kept free on top of the image itself: the loader's command page is a file of its own, and
+   LittleFS spends blocks on metadata before it spends them on content. Two blocks would
+   probably do; this is a filesystem sized for an image plus room, so the slack is cheaper
+   than finding out on a clock. */
+constexpr uint32_t FilesystemReserve{8u * 1024u};
+
+/* An upload in progress. Static because the body arrives in chunks across several calls and
+   the request object is not the place to hang a file on - what the answer needs afterwards is
+   whether it got that far, which is what Failure and IsCommitted say. */
+struct UploadType {
+    File Image;
+    uint32_t Written{0u};
+    bool IsOpen{false};
+    bool IsCommitted{false};
+    /* A literal, so the answer can name what went wrong without carrying a buffer for it.
+       nullptr means nothing has gone wrong *yet*, which is not the same as success. */
+    const char* Failure{nullptr};
+};
+UploadType Upload;
 
 /******************************************************************************************************************************************************
  *  LOCAL FUNCTIONS
@@ -125,6 +153,107 @@ bool isRequestAuthorised(AsyncWebServerRequest* Request)
 
 
 /******************************************************************************************************************************************************
+  abortImage()
+******************************************************************************************************************************************************/
+/*! \brief          Gives up on the image being written, and takes it off the filesystem
+ *
+ *  \details        Removed rather than left behind: what is on the filesystem after a failed
+ *                  upload is a file the loader will not read, and the next attempt needs the
+ *                  space more than anyone needs the wreckage.
+******************************************************************************************************************************************************/
+void abortImage(const char* Reason)
+{
+    if(Upload.IsOpen) { Upload.Image.close(); }
+    Upload.IsOpen = false;
+    LittleFS.remove(ImagePath);
+    Upload.Failure = Reason;
+}
+
+
+/******************************************************************************************************************************************************
+  beginImage()
+******************************************************************************************************************************************************/
+/*! \brief          Opens the file the image is written into, or says why it cannot be
+ *
+ *  \details        Announced rather than measured, and it has to be: the space is checked
+ *                  before the first byte is written, and the only size available then is the
+ *                  one the request declares. A body that then turns out shorter is caught at
+ *                  the end, where the length is compared again.
+ *
+ *                  The previous image is removed *before* the free space is measured, or a
+ *                  second update would be refused for the space the first one still holds.
+******************************************************************************************************************************************************/
+void beginImage(AsyncWebServerRequest* Request, size_t Announced)
+{
+    Upload = UploadType{};
+
+    if(!isRequestAuthorised(Request)) { Upload.Failure = "not authorised"; return; }
+    if(Announced == 0u) { Upload.Failure = "no image in the request body"; return; }
+    if(!LittleFS.begin()) { Upload.Failure = "the filesystem is not there to write into"; return; }
+
+    LittleFS.remove(ImagePath);
+
+    FSInfo Info{};
+    if(LittleFS.info(Info)) {
+        const uint64_t Free = Info.totalBytes - Info.usedBytes;
+
+        if(Free < static_cast<uint64_t>(Announced) + FilesystemReserve) {
+            /* Named as the filesystem's size and not as "too large": the image is the size it
+               is, and what is too small is the region this board keeps for it. */
+            Upload.Failure = "the image does not fit in the filesystem";
+            return;
+        }
+    }
+
+    Upload.Image = LittleFS.open(ImagePath, "w");
+    if(!Upload.Image) { Upload.Failure = "the image file could not be opened"; return; }
+    Upload.IsOpen = true;
+}
+
+
+/******************************************************************************************************************************************************
+  commitImage()
+******************************************************************************************************************************************************/
+/*! \brief          Closes the image and writes the loader's command page beside it
+ *
+ *  \details        The one irreversible step of an update, and the last: until this page is
+ *                  written the clock is running what it was running and would go on doing so
+ *                  after any number of interrupted uploads. Its own writing is guarded by a
+ *                  checksum the loader verifies, so a page that is itself half-written is a
+ *                  page the loader ignores.
+ *
+ *                  The length is compared once more against what was announced. A connection
+ *                  that stops mid-image ends without this call at all; one that stops between
+ *                  the last chunk and here leaves a file that is short, and a short image
+ *                  copied over the application is the one outcome this must not produce.
+******************************************************************************************************************************************************/
+void commitImage(size_t Announced)
+{
+    Upload.Image.close();
+    Upload.IsOpen = false;
+
+    if(Upload.Written != Announced) {
+        LittleFS.remove(ImagePath);
+        Upload.Failure = "the upload stopped before the image was complete";
+        return;
+    }
+
+    picoOTA.begin();
+    if(!picoOTA.addFile(ImagePath)) {
+        LittleFS.remove(ImagePath);
+        Upload.Failure = "the image could not be handed to the loader";
+        return;
+    }
+    if(!picoOTA.commit()) {
+        LittleFS.remove(ImagePath);
+        Upload.Failure = "the loader's command could not be written";
+        return;
+    }
+    Upload.IsCommitted = true;
+}
+
+
+/******************************************************************************************************************************************************
   handleRoot()
 ******************************************************************************************************************************************************/
 /*! \brief          Serves the console page straight out of flash
@@ -162,38 +291,102 @@ void handleManifest(AsyncWebServerRequest* Request)
 
 
 /******************************************************************************************************************************************************
+  sendUpdateResult()
+******************************************************************************************************************************************************/
+/*! \brief          Answers the update route, in the one shape the page reads
+ *
+ *  \details        The same two-field JSON the ESP32 backend answers with, because the panel
+ *                  reading it is one page serving both boards.
+ *
+ *                  Through beginResponse like every other route here, rather than the
+ *                  library's send(code, type, text): one way of answering per file is worth
+ *                  more than the shorter call, and it is the form the backend's stub already
+ *                  stands in for.
+******************************************************************************************************************************************************/
+void sendUpdateResult(AsyncWebServerRequest* Request, bool Ok, const char* Reason)
+{
+    char Answer[128];
+
+    if(Ok) {
+        strncpy(Answer, "{\"ok\":true}", sizeof(Answer) - 1u);
+    } else {
+        snprintf(Answer, sizeof(Answer), "{\"ok\":false,\"error\":\"%s\"}", Reason);
+        Serial.print(F("Web: update refused - "));
+        Serial.println(Reason);
+    }
+    Answer[sizeof(Answer) - 1u] = '\0';
+
+    Request->send(Request->beginResponse(Ok ? 200 : 400, "application/json",
+                                        reinterpret_cast<const uint8_t*>(Answer), strlen(Answer)));
+}
+
+
+/******************************************************************************************************************************************************
+  handleUpdateBody()
+******************************************************************************************************************************************************/
+/*! \brief          Takes the image out of the request body and into the filesystem
+ *
+ *  \details        This core has no second app partition, so an update here is not a write
+ *                  into a spare slot but a *file*: the image goes into LittleFS, a command
+ *                  page beside it names that file, and the OTA loader every image on this
+ *                  board already carries - ten kilobytes at the front of flash, ahead of the
+ *                  application - copies it into place on the next boot and clears the command
+ *                  afterwards, so it is done once and not on every boot.
+ *
+ *                  What that arrangement buys is the property the ESP32's second slot gives
+ *                  for free: the firmware being written is never the one running. Which is why
+ *                  the command page is written last, after the final chunk has arrived and the
+ *                  file measures what was announced - no command page, no update, and a
+ *                  half-written image is a file nobody reads.
+ *
+ *                  The body arrives *before* the request handler runs, so authorisation is
+ *                  asked here as well and not only there: a check that happened after the
+ *                  writing would have let an unauthorised upload fill the filesystem first.
+******************************************************************************************************************************************************/
+void handleUpdateBody(AsyncWebServerRequest* Request, uint8_t* Data, size_t Length, size_t Index, size_t Total)
+{
+    if(Index == 0u) { beginImage(Request, Total); }
+    if(!Upload.IsOpen) { return; }
+
+    if(Upload.Image.write(Data, Length) != Length) {
+        abortImage("the image could not be written to the filesystem");
+        return;
+    }
+    Upload.Written += Length;
+
+    if(Upload.Written >= Total) { commitImage(Total); }
+}
+
+
+/******************************************************************************************************************************************************
   handleUpdate()
 ******************************************************************************************************************************************************/
-/*! \brief          Answers the update route with the reason this board has none
+/*! \brief          Answers once the body has been taken, and asks for the restart
  *
- *  \details        The page is shared with the ESP32 backend, so its update panel is on this
- *                  clock's own page as well - and a route that simply was not registered
- *                  would answer 404, which reads as a broken clock rather than a board that
- *                  cannot do this. The same choice the power switch makes: a backend that
- *                  cannot do something says so instead of being compiled out.
+ *  \details        The restart is asked for rather than carried out, the same deferral RPC 31
+ *                  uses: a controller restarting inside the handler sends the browser nothing,
+ *                  which reads as a failed update. The application's tick does it, once this
+ *                  answer has left.
  *
- *                  Why it cannot, in one line, because that is the question somebody reading
- *                  this answer has: this core has no second app partition. An update here
- *                  means writing the image into LittleFS and letting its bootloader apply it
- *                  on the next boot, and the filesystem is 64 KB against an image of some
- *                  470 KB - so it is a flash-layout change with the settings living in the
- *                  region that would move, not a handler. Item 3 of the roadmap has the cost.
- *
- *                  501 rather than 400: nothing is wrong with the request, and a clock that
- *                  blamed the file for this would send somebody looking for a better one.
+ *                  A POST with no body never reaches the body handler at all, so "nothing was
+ *                  committed and nothing failed" is its own case and says so.
 ******************************************************************************************************************************************************/
 void handleUpdate(AsyncWebServerRequest* Request)
 {
     if(!isRequestAuthorised(Request)) { return; }
 
-    static const char Refusal[] =
-        "{\"ok\":false,\"error\":\"this board has no network update - install the .uf2 over USB\"}";
+    /* Still open here means the body ended before the length it announced - a client that
+       declared more than it sent. The image goes with it: an incomplete file is one no loader
+       will read, and the next attempt needs the room more than anybody needs the wreckage.
+       (A connection that simply dies never reaches this handler at all; what cleans up after
+       that one is the next upload, which removes the old image before it writes.) */
+    if(Upload.IsOpen) { abortImage("the upload stopped before the image was complete"); }
 
-    /* Through beginResponse like every other route here, rather than the library's
-       send(code, type, text): one way of answering per file is worth more than the shorter
-       call, and it is the form the backend's stub already stands in for. */
-    Request->send(Request->beginResponse(501, "application/json",
-                                        reinterpret_cast<const uint8_t*>(Refusal), sizeof(Refusal) - 1u));
+    if(Upload.Failure != nullptr) { sendUpdateResult(Request, false, Upload.Failure); return; }
+    if(!Upload.IsCommitted) { sendUpdateResult(Request, false, "no image in the request body"); return; }
+
+    sendUpdateResult(Request, true, "");
+    System::getInstance().restart();
 }
 
 
@@ -452,7 +645,12 @@ StdReturnType WebInterface::begin()
     HttpServer.on("/manifest.webmanifest", HTTP_GET, handleManifest);
     HttpServer.on("/icon-192.png", HTTP_GET, handleIcon192);
     HttpServer.on("/icon-512.png", HTTP_GET, handleIcon512);
-    HttpServer.on("/update", HTTP_POST, handleUpdate);
+    /* Four arguments, and the fourth is where the image arrives: the library hands a POST
+       body to that callback in chunks and calls the request handler afterwards. The third,
+       the upload handler, is for multipart forms and stays empty - the panel sends the file
+       as the body itself, so nothing here has to parse what a <form> would have wrapped it
+       in. */
+    HttpServer.on("/update", HTTP_POST, handleUpdate, nullptr, handleUpdateBody);
 
     /* No failure to report: this library's begin() returns nothing and starts listening on
        whatever address arrives later. Where the ESP32 backend can find its server refusing

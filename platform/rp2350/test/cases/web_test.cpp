@@ -7,6 +7,10 @@
    and when - rather than who received it. */
 #include <ESPAsyncWebServer.h>
 #include <LEAmDNS.h>
+/* The two the update path leaves its evidence in: the image is a file, and the command page
+   is what the loader would read on the next boot. */
+#include <LittleFS.h>
+#include <PicoOTA.h>
 
 #include "Arduino.h"
 #include "Communication.h"
@@ -71,6 +75,40 @@ static std::string fetch(const char* Route, std::string* ContentEncoding = nullp
     return Request.Response->Body;
 }
 
+/* An upload, in the order the library performs one: the body arrives in chunks through the
+   body handler, and only when it is through does the request handler answer. A test that
+   called the request handler alone would be testing the answer and not the update.
+
+   Chunked on purpose, and at a size that leaves a remainder, because the handler's arithmetic
+   is what decides when an image is complete. */
+struct UploadOutcome {
+    int Code{0};
+    std::string Body;
+};
+
+static UploadOutcome post(const char* Route, const std::string& Content, size_t Announced,
+                          size_t ChunkSize = 300u)
+{
+    AsyncWebServerRequest Request;
+    Request.Authorised = RequestAuthorised;
+
+    const auto Body = webStubState().BodyRoutes.find(Route);
+    const auto Handler = webStubState().Routes.find(Route);
+
+    if((Body == webStubState().BodyRoutes.end()) || (Handler == webStubState().Routes.end())) { return {}; }
+
+    for(size_t Index = 0u; Index < Content.size(); Index += ChunkSize) {
+        const size_t Length = std::min(ChunkSize, Content.size() - Index);
+        std::vector<uint8_t> Chunk(Content.begin() + Index, Content.begin() + Index + Length);
+        Body->second(&Request, Chunk.data(), Length, Index, Announced);
+    }
+    Handler->second(&Request);
+
+    AuthenticationWasRequested = Request.AuthenticationRequested;
+    if(Request.Response == nullptr) { return {}; }
+    return {Request.Response->Code, Request.Response->Body};
+}
+
 /* One text frame into the socket, the way the library reports one. */
 static void sendFrame(const std::string& Payload, bool Final = true)
 {
@@ -98,10 +136,10 @@ int main()
           && (webStubState().Routes.count("/icon-192.png") == 1u)
           && (webStubState().Routes.count("/icon-512.png") == 1u),
           "and the three the home screen needs with them");
-    /* Registered although this board cannot update over the network: the page is shared with
-       the ESP32 and carries the panel either way, and a 404 there would read as a broken
-       clock rather than as a board that cannot do it. */
-    check(webStubState().Routes.count("/update") == 1u, "and the update route that answers why not");
+    check(webStubState().Routes.count("/update") == 1u, "and the update route");
+    /* The body handler is the half that matters: without it the image would arrive nowhere
+       and the request handler would answer about an upload that never happened. */
+    check(webStubState().BodyRoutes.count("/update") == 1u, "with the body handler the image arrives through");
 
     /* the page: gzipped, and announced as such */
     std::string Encoding;
@@ -129,10 +167,79 @@ int main()
     check(LargeIcon.size() > SmallIcon.size() && LargeIcon.compare(1u, 3u, "PNG") == 0,
           "the large icon is a PNG too, and the larger of the two");
 
-    const std::string Refusal = fetch("/update");
-    check(isBalancedJson(Refusal), "the update refusal is well formed JSON");
-    check(Refusal.find("\"ok\":false") != std::string::npos, "and says the update did not happen");
-    check(Refusal.find("USB") != std::string::npos, "and says what to do instead");
+    /* ---- the update ------------------------------------------------------------------
+       This board has no second app partition, so an update is a file plus a command page that
+       the loader at the front of the image reads on the next boot. Which makes the interesting
+       question not "did it answer 200" but *what it left on the filesystem* - because that,
+       and only that, is what the next boot acts on.
+    */
+    const std::string Image(2000u, '\xa5');
+
+    /* Only the image is swept away between cases, never the whole store: the console password
+       is a file in this same filesystem, and a case that cleared it would unprotect the
+       console and then pass for the wrong reason - which is what the first version of the
+       authorisation case below did.
+
+       The failing cases come first, and that order is not cosmetic either. A restart that has
+       been asked for cannot be unasked - the flag is one-way, because on the target the call
+       that reads it does not return - so "no restart was asked for" can only be checked
+       before anything has asked for one. */
+    littleFsStore().erase("/firmware.bin");
+    picoOTA = PicoOtaStub{};
+    UploadOutcome Update = post("/update", Image.substr(0u, 900u), Image.size());
+    check(Update.Code == 400 && Update.Body.find("stopped before") != std::string::npos,
+          "an upload that stops short is refused, and says that is what happened");
+    check(picoOTA.Committed.empty(), "and nothing was handed to the loader");
+    check(littleFsStore().count("/firmware.bin") == 0u, "and leaves no image behind either");
+    System::getInstance().performPendingRestart();
+    check(!rp2040.Restarted, "and the clock is left running what it has");
+
+    /* An image that does not fit is refused before the first byte is written, so it cannot
+       fill the filesystem the settings live in. 64 KB is what this board's filesystem was
+       before it had to hold an image. */
+    littleFsStore().erase("/firmware.bin");
+    picoOTA = PicoOtaStub{};
+    LittleFS.Total = 64u * 1024u;
+    Update = post("/update", Image, 200u * 1024u);
+    check(Update.Code == 400 && Update.Body.find("does not fit") != std::string::npos,
+          "an image larger than the filesystem is refused, and says so");
+    check(littleFsStore().count("/firmware.bin") == 0u, "and never reaches the filesystem");
+    System::getInstance().performPendingRestart();
+    check(!rp2040.Restarted, "and asks for no restart");
+    LittleFS.Total = 1024u * 1024u;
+
+    /* A command page that will not write is a failed update, and it takes the image with it:
+       what is on the filesystem after a failure is a file nobody will read. */
+    littleFsStore().erase("/firmware.bin");
+    picoOTA = PicoOtaStub{};
+    picoOTA.CommitSucceeds = false;
+    Update = post("/update", Image, Image.size());
+    check(Update.Code == 400, "a command page that will not write is a failed update");
+    check(littleFsStore().count("/firmware.bin") == 0u, "and the image is taken off the filesystem");
+    picoOTA = PicoOtaStub{};
+
+    /* A POST that carries nothing never reaches the body handler at all, which is its own
+       case and not an empty success. */
+    littleFsStore().erase("/firmware.bin");
+    const std::string Nothing = fetch("/update");
+    check(Nothing.find("\"ok\":false") != std::string::npos, "a POST with no body is refused");
+    check(isBalancedJson(Nothing), "and the answer is well formed JSON");
+
+    /* And the one that works, last for the reason above. */
+    littleFsStore().erase("/firmware.bin");
+    picoOTA = PicoOtaStub{};
+    Update = post("/update", Image, Image.size());
+    check(Update.Code == 200 && Update.Body.find("\"ok\":true") != std::string::npos,
+          "a complete image is accepted");
+    check(littleFsStore().count("/firmware.bin") == 1u
+          && littleFsStore()["/firmware.bin"] == Image,
+          "and is on the filesystem, byte for byte");
+    check(picoOTA.Committed == "/firmware.bin", "the loader was told which file to install");
+    /* Asked for and not taken: a controller that restarted inside the handler would send the
+       browser nothing, which reads as a failed update. The application's tick carries it. */
+    check(!rp2040.Restarted, "the handler does not restart the controller itself");
+    System::getInstance().performPendingRestart();
+    check(rp2040.Restarted, "but the tick after it does");
 
     /* the catalog, generated from the real table */
     const std::string Catalog = fetch("/commands");
@@ -300,6 +407,20 @@ int main()
         const std::string Body = fetch(Route);
         check(Body.empty() && AuthenticationWasRequested, Route);
     }
+
+    /* The update again, through the path an image really takes: the body arrives before the
+       request handler runs, so a check that sat only in the handler would have let an
+       unauthorised upload write the filesystem first and refuse afterwards. */
+    littleFsStore().erase("/firmware.bin");
+    picoOTA = PicoOtaStub{};
+    const UploadOutcome Unauthorised = post("/update", Image, Image.size());
+    check(Unauthorised.Body.find("\"ok\":false") != std::string::npos || Unauthorised.Body.empty(),
+          "an unauthorised upload is not accepted");
+    check(littleFsStore().count("/firmware.bin") == 0u, "and never reaches the filesystem");
+    check(picoOTA.Committed.empty(), "and nothing was handed to the loader");
+    /* No restart assertion here: by this point a successful upload above has asked for one,
+       and that flag does not come back. What this case is about is the two lines above it -
+       that the filesystem was never touched by a request that had no business writing it. */
 
     RequestAuthorised = true;
     check(!fetch("/display").empty(), "the right credential is let through");
