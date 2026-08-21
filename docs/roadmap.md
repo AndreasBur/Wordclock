@@ -491,11 +491,50 @@ From the comparison with wordclock24h, in the order they would change daily use.
    So by this item's own rule the answer is to drop one half rather than to guard it - with one
    wrinkle worth deciding before anyone starts. The halves are not symmetrical for *getters*:
    `getPixelFast(Index)` answers the value, `getPixel(Index, Pixel)` answers a code through an
-   out-parameter, and dropping the first would make every reader of a pixel worse to read. The
-   honest options are therefore to drop the `Fast` half for setters only, or to move the check
-   into the single implementation and let `Fast` mean "answers the value" rather than "trusts
-   you" - which is what the measurement build already does, and which would want the whole
-   pattern renamed.
+   out-parameter, and dropping the first would make every reader of a pixel worse to read.
+
+   **Done**, by the second of the two options: the check moved into the single implementation
+   and the name went with the pattern. There is one accessor per operation now, and where a
+   reader has two forms the argument list says which - `getPixel(Index, Pixel)` answers a code,
+   `getPixel(Index)` answers the pixel, and **both check**. Writers have one form, which
+   answers; a caller with nothing to do with that answer ignores it. 440 mentions across the
+   core and all four backends, and the image came out **586 bytes smaller** - 48 664 bytes
+   before, 48 078 after, RAM unchanged to the byte. Six things it settled:
+
+   - **The wrinkle decided itself, and not by taste.** Two writers cannot differ in their
+     return type alone, so a writer's unchecked half had nowhere to go but out. Readers differ
+     in their argument list, so both of theirs live under one name - and the one answering a
+     value needs something to answer for an index that is not there. That is a default in every
+     case: an unlit pixel, a null character, a word of zero length, an empty glyph row. None of
+     them can be mistaken for something that is on the display, which is what makes the answer
+     honest rather than a zero that reads like data.
+   - **The unchecked read did not disappear, it went private.** `getDisplayCharactersTableElement`,
+     `getDisplayWordsTableElement`, `getFontTableElement` and the pixel buffer are the primitives
+     both public forms go through, so each path checks exactly once and the class keeps one place
+     that touches the table.
+   - **A column past the last one used to light the next row.** `Display::setPixel(Column, Row)`
+     computed an index and handed it to `Pixels`, where 11 on an 11-wide display is a perfectly
+     valid index - the first letter of the row below. So the write was neither refused nor put
+     where it was asked for. `isColumnAndRowValid` is asked by every entry point that takes a
+     column now, and the case that found it is in the tests; reading the code had not.
+   - **Two branches that had never compiled fell out.** `FontChar`'s checked `setRow` and
+     `setColumn` assigned a member from a `const` function, and `Display::togglePixel`'s
+     serpentine branch passed a pointer where a reference was expected. A template nobody
+     instantiates and a `#if` branch nobody selects are not code, which is this item's own thesis
+     arriving from the other side - and the glyph accessors are instantiated by a test now.
+   - **The duplication was worth more than the checks were.** That is where the 586 bytes come
+     from, and not from the bounds tests: `Text::setChar` existed as two 900-byte bodies inlined
+     into a caller each and is one function now, and six `#if` ladders in `Display` mapping a
+     column and a row onto an index became one `toIndex`. Of the 45 declared pairs, nine had both
+     halves in the image at 486 bytes; `Display::setPixel(Column, Row)` alone was 258 bytes of
+     pair and is 78 as one.
+   - **One substitution had to be moved rather than dropped.** The scrolling text relied on the
+     unchecked `setChar` drawing a space for a character it could not map, which is what clears
+     the cells the previous shift step wrote; the surviving `setChar` refuses, because a test
+     says it must. So the shift task substitutes the space itself, where it can be read - and a
+     case fails if it stops. The `[[nodiscard]]` that used to police the four `Text` twins went
+     with them, and so did the `assert` in three backends' unchecked writers: what they caught is
+     what the two new cases check, in CI rather than under a debugger.
 
 10. **Feed the ESP32's RMT channel by DMA.** Today the frame is refilled from the driver's
     interrupt, so the strip's timing depends on that interrupt being served: a block holds
