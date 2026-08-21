@@ -13,12 +13,14 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     set(CMAKE_BUILD_TYPE Debug CACHE STRING "Build type" FORCE)
 endif()
 
-# Put binaries next to where the old Code::Blocks projects placed them.
+# bin/ under the build directory, which is what the README and every note in this repository
+# tell a reader to run: build/bin/Wordclock.
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
 # --------------------------------------------------------------------------
-# wxWidgets  (replaces the per-platform `wx-config` / *.a handling
-#             that used to live in the three .cbp files)
+# wxWidgets, found once here rather than per platform: the three hand-kept IDE projects this
+# build replaced each carried their own `wx-config` or library path, and keeping three in step
+# is what CMake is for.
 # --------------------------------------------------------------------------
 find_package(wxWidgets REQUIRED COMPONENTS core base)
 include(${wxWidgets_USE_FILE})
@@ -44,8 +46,8 @@ set(SHIM_SOURCES
     src/SerialShim.cpp
     src/Storage.cpp)
 
-# On Linux/macOS the window icon is loaded from the XPM array (see src/PixelsFrame.cpp),
-# gated behind the PIXELS define that the old Code::Blocks projects set.
+# On Linux and macOS the window icon comes from the XPM array rather than from a resource file,
+# which is what PIXELS gates in src/PixelsFrame.cpp - Windows takes the .ico instead.
 if(NOT WIN32)
     set(PIXELS_DEFINE PIXELS)
 endif()
@@ -59,8 +61,9 @@ endif()
 add_library(WordclockBuildSettings INTERFACE)
 
 # The simulator's own headers, plus the project root (holds WordclockIcon.xpm).
-# Keep include/sim ahead of include so legacy includes like "Pixels.h" resolve
-# directly to simulator implementations even without compatibility wrappers.
+# Keep include/sim ahead of include so that the core's own includes - "Pixels.h" and the rest
+# of the platform seam, by name and never by path - resolve to this backend's implementations
+# without a wrapper header in between.
 target_include_directories(WordclockBuildSettings INTERFACE
     "${CMAKE_CURRENT_SOURCE_DIR}"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/sim"

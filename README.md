@@ -72,8 +72,7 @@ ctest --test-dir build --output-on-failure
 ```
 
 That way requires CMake ≥ 3.16, a C++17 compiler and wxWidgets 3.x (GTK on
-Linux). See the [simulator README](platform/simulator/README.md) for details and
-the Code::Blocks projects.
+Linux). See the [simulator README](platform/simulator/README.md) for details.
 
 The on-device platforms are not built with CMake. The `esp32` and `rp2350` platforms use
 PlatformIO:

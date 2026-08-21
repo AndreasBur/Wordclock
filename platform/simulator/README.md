@@ -66,7 +66,7 @@ nor an error passes through untouched.
 
 ## Building
 
-There are three ways to build, in order of preference.
+There are two ways to build, in order of preference.
 
 ### 1. Dev container (VS Code, recommended)
 
@@ -124,19 +124,6 @@ test see whether the firmware wrote anything at all, which is how
 a buffer that stayed equal would not tell a skipped redraw from one that rewrote
 the same words.
 
-### 3. Code::Blocks
-
-Per-platform projects live in [codeblocks/](codeblocks/):
-
-| File | Toolchain |
-|------|-----------|
-| `Wordclock_Linux.cbp`   | system `wx-config` |
-| `Wordclock_Windows.cbp` | wxWidgets 3.1 (`$(#wx31)` global variable) |
-| `Wordclock_MacOs.cbp`   | wxWidgets 3.0.3 (hard-coded path — adjust to your setup) |
-
-These were the original debugging projects and are kept for that workflow; the
-CMake build is otherwise authoritative.
-
 ## Layout
 
 ```
@@ -161,8 +148,7 @@ platform/simulator/
 ├── tests/                regression tests that run without a display
 ├── WordclockApp.*        wxApp entry point + 10 ms task timer
 ├── WordclockMain.*       wires the scheduler to the simulated real-time clock
-├── CMakeLists.txt        simulator build (pulled in by the root switch)
-└── codeblocks/           legacy Code::Blocks projects
+└── CMakeLists.txt        simulator build (pulled in by the root switch)
 ```
 
 ## How it works
@@ -192,9 +178,14 @@ device's serial output and lets you send commands back: `Serial` is bound to
 `SerialShim`, which writes into the two text controls the matrix window lays out
 for it.
 
-The firmware still includes the historical header names (`Pixels.h`,
-`RealTimeClock.h`, `BH1750.h`, `DS3231.h`), resolved by placing `include/sim` on the
-compiler include path before `include`.
+The core reaches all of this **by header name alone** - `#include "Pixels.h"`, never a path -
+which is what makes a backend a compile-time swap rather than a runtime one. Which names those
+are, and what each of them owes the core, is the contract in
+[`../avr-dx/README.md`](../avr-dx/README.md#what-a-backend-must-provide) rather than a second
+list here that would drift from it. They resolve to this backend because the include path
+carries `include/sim` ahead of `include`: the simulator's own implementations sit in the first,
+the Arduino shim in the second, and a name that existed in both would come from the
+simulator's.
 
 The settings window holds what a simulator has no hardware for: the light sensor's
 illuminance, and the clock chip's temperature behind a *Sensor connected* box. The box is

@@ -22,11 +22,6 @@ WordclockSecrets.h
 # Settings the simulator persists next to wherever it was started
 wordclock-settings.bin
 
-# Code::Blocks generated artifacts
-*.depend
-*.layout
-*.cscope_file_list
-
 # Dev container feature lock files (auto-generated)
 devcontainer-lock.json
 
