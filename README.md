@@ -31,6 +31,7 @@ the word tables have to cover.
 | [firmware/](firmware/) | **Single source of truth** for the clock logic — platform-agnostic (animations, clock, display, scheduler, overlays, communication). |
 | [docs/](docs/) | Reference documentation: the [serial command reference](docs/serial-commands.md), the [font tables](docs/fonts.md) and the [roadmap](docs/roadmap.md). |
 | [assets/](assets/) | The icon's SVG masters and the script that generates the `.ico`, the `.xpm` and `docs/images/logo.png` from them. |
+| [web/](web/) | The two pages a networked clock serves: the panel at `/` for what is changed often, the console at `/console` for every command. Compiled into the firmware by [platform/scripts/embed_web.py](platform/scripts/embed_web.py) — the clock has nowhere to fetch anything from. |
 | [platform/simulator/](platform/simulator/) | wxWidgets desktop backend: renders the matrix in a window so the firmware can be developed and debugged on a PC. |
 | [platform/esp32/](platform/esp32/) | On-device backend: WS2812 over the RMT peripheral, time from NTP. Built with PlatformIO — see its [README](platform/esp32/README.md). |
 | [platform/rp2350/](platform/rp2350/) | On-device backend for the Raspberry Pi Pico 2 W, derived from the ESP32 one. Built with PlatformIO — see its [README](platform/rp2350/README.md). |
@@ -73,12 +74,14 @@ That way requires CMake ≥ 3.16, a C++17 compiler and wxWidgets 3.x (GTK on
 Linux). See the [simulator README](platform/simulator/README.md) for details and
 the Code::Blocks projects.
 
-The on-device platforms are not built with CMake. The `esp32` platform uses
+The on-device platforms are not built with CMake. The `esp32` and `rp2350` platforms use
 PlatformIO:
 
 ```bash
 pio run -t upload -d platform/esp32
 pio device monitor -d platform/esp32
+
+pio run -t upload -d platform/rp2350     # hold BOOTSEL on the first upload
 ```
 
 The `avr-dx` platform uses the same CMake, but cross-compiles — so its toolchain
@@ -91,6 +94,24 @@ cmake -B build-avr -S . -DPLATFORM=avr-dx \
 cmake --build build-avr
 cmake --build build-avr --target flash
 ```
+
+### The two web pages
+
+The pages in [web/](web/) are the one part of this project the simulator window cannot show,
+and they need a clock behind them to show anything. That clock can be a host process:
+
+```bash
+platform/esp32/test/run.sh serve 8080
+```
+
+This compiles the ESP32 backend against the stand-ins in `platform/esp32/test/stubs/` and puts
+a small server in front of it, so `http://localhost:8080/` is the panel and `/console` the
+console — both read from `web/` on every request, so an edit is a browser reload — while
+`/commands`, `/display`, `/update` and the web socket are answered by the real firmware core.
+What the browser sees is therefore what a clock would send, without a clock.
+
+The port is optional and defaults to 8080. Without the `serve` argument the same script builds
+and runs the backend's host tests instead.
 
 ## Checks
 
