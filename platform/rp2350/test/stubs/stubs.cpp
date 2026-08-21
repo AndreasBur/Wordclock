@@ -4,6 +4,7 @@
 #include <Arduino.h>
 #include <LEAmDNS.h>
 #include <LittleFS.h>
+#include <PicoOTA.h>
 #include <WiFi.h>
 #include <WiFiNTP.h>
 #include <Wire.h>
@@ -17,3 +18,4 @@ MDNSStub MDNS;
 WiFiStub WiFi;
 NTPClassStub NTP;
 LittleFSStub LittleFS;
+PicoOtaStub picoOTA;

@@ -87,6 +87,41 @@ The console is the same page and a third less code. `AsyncWebSocket` owns its cl
 counts it and broadcasts to it, so the descriptor array, its atomics and the walk over them
 at every send are gone — `textAll()` is the whole of what they did.
 
+## Updating over the network
+
+`POST /update` takes the firmware as the request body, the same route the ESP32 answers and
+the same panel in the page. What happens underneath is not the same at all, because this part
+has no second app partition to write into:
+
+1. The image is written into LittleFS as `/firmware.bin`.
+2. `PicoOTA` writes a command page beside it, naming that file and carrying a checksum.
+3. The clock restarts, and the **OTA loader that sits at the front of every image built here**
+   — 10 028 bytes of `.ota` section ahead of the application, put there by the core's default
+   linker script rather than by anything in this repository — copies the file into application
+   flash, erases the command and reboots into what it just wrote.
+
+What that buys is the property the ESP32's second slot gives for free: **the firmware being
+written is never the firmware running**. So the command page is written last and only once, on
+the chunk that completes the image and only if the file measures what the request announced.
+No command page, no update — an interrupted upload leaves a file nobody reads and a clock that
+comes back up on what it had. An upload that ends *short of its own Content-Length* is the one
+case that can be cleaned up on the spot, and is: the image is removed and the answer says the
+upload stopped.
+
+**The filesystem is 1 MB for this, and it used to be 64 KB.** The image is some 490 KB, so
+`board_build.filesystem_size` had to hold that with room to grow; 3 MB of the part's 4 are
+left for the sketch, which uses 16 % of them. The region grows downwards from the end of
+flash, which is the part worth knowing before installing this version: **its start moves, the
+filesystem mounted at the old start is not found at the new one, and the settings go with
+it.** So the release that introduces network updates is the one that has to be installed over
+USB and resets the clock's settings once. Every update after it keeps them, and the reason
+this is stated in three places — here, [`platformio.ini`](platformio.ini) and the release
+notes — is that it cannot be undone by trying again.
+
+What is *not* checked on a board: any of it. The handler and its refusals are exercised on the
+host against stand-ins for LittleFS and PicoOTA, which is where the loader's own behaviour
+stops being reachable — nothing here has watched a Pico boot into an image it was sent.
+
 ## The waveform
 
 `WS2812Pio` is to this backend what the RMT channel is to the ESP32 and what the timers and
@@ -142,3 +177,7 @@ of it only has to exist once: `platform/esp32/test/run.sh serve`.
   as on the ESP32 as far as the tests reach, which is up to but not including a radio.
 - **The first CI run of the firmware job will be slow**, because the 1.5 GB clone has to
   happen before there is a cache to restore.
+- **The network update has never applied an image.** Everything up to the command page is
+  checked on the host; the loader that reads it lives at the front of the image and has not
+  been watched doing so. What that would take is one board, one USB install of a build with
+  the 1 MB filesystem, and a second image sent to it over the network.

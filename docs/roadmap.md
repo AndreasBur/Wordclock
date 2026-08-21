@@ -357,13 +357,36 @@ From the comparison with wordclock24h, in the order they would change daily use.
    - **The reboot is asked for, not taken**, the same deferral RPC 31 uses: a controller that
      restarts inside the handler sends the browser nothing, which reads as a failed update.
 
-   **Not done on the RP2350**, and the reason is worth writing down rather than rediscovering.
-   That core has no second app partition: OTA there means writing the image as a *file* into
-   LittleFS and letting its bootloader apply it on the next reboot. The filesystem is
-   [64 KB](../platform/rp2350/platformio.ini) and the image is some 470 KB, so it would have
-   to grow past the image - which moves the region the settings live in, so the update that
-   introduces updates costs one settings reset and has to go over USB anyway. Worth doing,
-   but it is a flash-layout change with a migration in it rather than a handler.
+   **Done on the RP2350 too**, and the estimate above was right about the cost and wrong about
+   one thing that made it cheaper: the loader is already there. Every image this build produces
+   carries the core's OTA loader in a 10 028-byte `.ota` section at the front, put there by the
+   default linker script - so what was missing was room and a handler, not a bootloader.
+
+   The rest went as predicted. `POST /update` writes the image into LittleFS, `PicoOTA` writes
+   the command page that names it, and the loader copies it into place on the next boot. The
+   filesystem went from 64 KB to
+   [1 MB](../platform/rp2350/platformio.ini) to hold an image of some 490 KB with room to
+   grow, which leaves 3 MB of the part's 4 for a sketch using 16 % of them. And the migration
+   is the one that was foreseen: the region grows downwards, its start moves, the filesystem is
+   not found at the new start, and the settings go with it - so the first release carrying this
+   is installed over USB and resets the settings once. Three things it settled:
+
+   - **The safety comes from the order, not from a second slot.** The command page is written
+     last, once the image is complete and measures what the request announced. No command page,
+     no update - so an interrupted upload leaves a file nobody reads and a clock still running
+     what it had, which is the same promise the ESP32's two slots make by construction.
+   - **The body handler needs its own authorisation check.** The library hands over the body
+     *before* it calls the request handler, so a check that sat only in the handler would have
+     let an unauthorised upload fill the filesystem and be refused afterwards. A case fails if
+     that check is taken out again.
+   - **An upload that ends short of its own Content-Length is cleaned up; one whose connection
+     dies is not.** The second never reaches the handler at all, so what removes its remains is
+     the next upload, which deletes the old image before it writes - which is also why the free
+     space is measured after that deletion and not before.
+
+   What none of it has done is apply an image on a board. The handler and its five refusals are
+   exercised on the host against stand-ins for LittleFS and PicoOTA; the loader itself has not
+   been watched booting into something it was sent.
 
    ~~What is still missing on both is **authentication**.~~ **Done**, on both backends, with
    command 16: a password in NVS beside the WiFi credentials, off until one is set, and every

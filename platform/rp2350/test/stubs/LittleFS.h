@@ -53,10 +53,30 @@ class File {
     void close() { Valid = false; }
 };
 
+/* What the core's FS.h carries, in the two fields the backend reads. */
+struct FSInfo {
+    uint64_t totalBytes;
+    uint64_t usedBytes;
+    size_t blockSize;
+    size_t pageSize;
+    size_t maxOpenFiles;
+    size_t maxPathLength;
+};
+
 struct LittleFSStub {
     bool Mounted{true};
+    /* The region the platformio.ini asks for. A case that wants an image refused for want of
+       space sets this to what the board used to have. */
+    uint64_t Total{1024u * 1024u};
 
     bool begin() { return Mounted; }
+
+    bool info(FSInfo& Info) {
+        size_t Used = 0u;
+        for(const auto& Entry : littleFsStore()) { Used += Entry.second.size(); }
+        Info = FSInfo{Total, Used, 4096u, 256u, 4u, 32u};
+        return true;
+    }
     bool mkdir(const char*) { return true; }
     bool exists(const char* Path) { return littleFsStore().count(Path) > 0u; }
     bool remove(const char* Path) { return littleFsStore().erase(Path) > 0u; }

@@ -89,8 +89,8 @@ jobs:
           |-------|------|----------------|
           | ESP32-S3 | `…-ESP32-S3-*.factory.bin` | First install: `esptool.py write_flash 0x0 <file>`. Contains the bootloader and partition table. |
           | ESP32-S3 | `…-ESP32-S3-*.ota.bin` | Update over the network: the *Update the firmware* panel in the clock's own page, or `curl --data-binary @<file> http://wordclock.local/update`. No cable. |
-          | Raspberry Pi Pico 2 W | `…-RP2350-*.uf2` | Hold BOOTSEL while plugging in, then copy the file onto the drive that appears. |
-          | Raspberry Pi Pico 2 W | `…-RP2350-*.ota.bin` | For `picotool load` over USB. This board has no network update yet — see item 3 of the [roadmap](docs/roadmap.md) for what it would cost. |
+          | Raspberry Pi Pico 2 W | `…-RP2350-*.uf2` | Hold BOOTSEL while plugging in, then copy the file onto the drive that appears. **The first release carrying the network update resets the clock's settings once**, the filesystem having moved to make room for the image a network update is written as. |
+          | Raspberry Pi Pico 2 W | `…-RP2350-*.ota.bin` | Update over the network: the *Update the firmware* panel in the clock's own page, or `curl --data-binary @<file> http://wordclock.local/update`. Also what `picotool load` takes over USB. |
           | AVR128DA48 | `…-AVR128DA48-*.hex` | `pymcuprog write -d avr128da48 -t uart -f <file> --erase --verify`, see [platform/avr-dx/README.md](platform/avr-dx/README.md). |
 
           The firmware is built without WLAN credentials, so a clock flashed from these files

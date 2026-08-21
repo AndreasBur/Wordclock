@@ -37,10 +37,14 @@ struct Stream {
 };
 
 /* What the backend asks the chip itself for. Named after the part on this core, where the
-   ESP32's is named ESP. The test never restarts, so restart() only has to be linkable. */
+   ESP32's is named ESP. Recorded rather than only linkable since the update path exists: what
+   a case there has to tell apart is a restart *asked for* from one taken inside the handler,
+   and the second one would have sent the browser nothing. */
 struct Rp2040Class {
+    bool Restarted{false};
+
     uint32_t getFreeHeap() { return 0u; }
-    void restart() {}
+    void restart() { Restarted = true; }
 };
 extern Rp2040Class rp2040;
 
