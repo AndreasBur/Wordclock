@@ -1,12 +1,14 @@
-# What a pull request is checked with. Four jobs, because the project has four ways of
+# What a pull request is checked with. Six jobs, because the project has six ways of
 # building and each of them can break on its own:
 #
-#   simulator    the firmware core through the wxWidgets backend, plus its regression tests
-#   host-tests   the ESP32 backend compiled against the stand-ins in platform/esp32/test
-#   firmware     the ESP32 backend compiled for the board it actually runs on
-#   avr-dx       the AVR128DA48 backend, cross-compiled
+#   simulator      the firmware core through the wxWidgets backend, plus its regression tests
+#   host-tests     the ESP32 backend compiled against the stand-ins in platform/esp32/test
+#   rp2350-host    the same arrangement for the Pico's backend, stubs and all
+#   firmware       the ESP32 backend compiled for the board it actually runs on
+#   rp2350         the Pico 2 W's firmware, which is where the flash layout is checked
+#   avr-dx         the AVR128DA48 backend, cross-compiled, plus tools/documented-sizes.py
 #
-# The third looks redundant next to the second and is not. The host tests compile the same
+# A firmware job looks redundant next to its host tests and is not. The host tests compile the same
 # sources with the host's compiler and libc, so anything the target's toolchain has a
 # different opinion about passes them - newlib not declaring timegm, for one, which broke
 # the target build while every host test stayed green. That argument carries further for

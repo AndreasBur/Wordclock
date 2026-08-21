@@ -36,6 +36,7 @@ the word tables have to cover.
 | [platform/esp32/](platform/esp32/) | On-device backend: WS2812 over the RMT peripheral, time from NTP. Built with PlatformIO — see its [README](platform/esp32/README.md). |
 | [platform/rp2350/](platform/rp2350/) | On-device backend for the Raspberry Pi Pico 2 W, derived from the ESP32 one. Built with PlatformIO — see its [README](platform/rp2350/README.md). |
 | [platform/avr-dx/](platform/avr-dx/) | On-device backend for the AVR128DA48: WS2812 shaped by the CCL, time from a DS3231. Built with CMake and a cross toolchain file — see its [README](platform/avr-dx/README.md). |
+| [tools/](tools/) | [documented-sizes.py](tools/documented-sizes.py), which compares every size this repository claims against a build and fails the pull request that made one stale. |
 
 The tool that generates the bitmap font tables lives in its own repository,
 [theAndreas/FontCreator](https://github.com/theAndreas/FontCreator) — see
@@ -44,8 +45,8 @@ The tool that generates the bitmap font tables lives in its own repository,
 ## Architecture
 
 The firmware core reaches the hardware **only through header names**
-(`Arduino.h`, `Pixels.h`, `RealTimeClock.h`, `BH1750.h`, `DS3231.h`, `Storage.h`), resolved via the
-include path. Each platform under `platform/` supplies those headers with its own
+(`Arduino.h`, `Pixels.h`, `RealTimeClock.h`, `BH1750.h`, `DS3231.h`, `Storage.h`, `System.h`,
+`PowerSwitch.h`), resolved via the include path. Each platform under `platform/` supplies those headers with its own
 implementation — a compile-time swap with no runtime cost. See
 [platform/avr-dx/README.md](platform/avr-dx/README.md) for the contract.
 
@@ -118,19 +119,24 @@ and runs the backend's host tests instead.
 Every pull request runs two workflows, and the two badges above say separately
 whether the code builds and whether it reads clean.
 
-[`.github/workflows/ci.yml`](.github/workflows/ci.yml) is the three ways this
+[`.github/workflows/ci.yml`](.github/workflows/ci.yml) is the six ways this
 repository can be built, each of which breaks on its own:
 
 | Job | What it does |
 |-----|--------------|
 | Simulator and core tests | Configures and builds the wxWidgets backend with `-Werror` and runs `ctest` |
 | ESP32 backend on the host | [`platform/esp32/test/run.sh`](platform/esp32/test/run.sh) — the backend against the stand-ins in `test/stubs`, no board needed |
+| RP2350 backend on the host | [`platform/rp2350/test/run.sh`](platform/rp2350/test/run.sh) — the same arrangement for the Pico's backend |
 | ESP32 firmware | `pio run` for the board it actually runs on |
+| RP2350 firmware | `pio run` for the Pico 2 W |
+| AVR Dx firmware | The cross build, plus [`tools/documented-sizes.py`](tools/documented-sizes.py) against the image it just produced |
 
-The firmware job looks redundant next to the host tests and is not: those compile
+A firmware job looks redundant next to its host tests and is not: those compile
 the same sources with the host's compiler and libc, so anything the target's
 toolchain has a different opinion about passes them. `timegm`, which newlib does
-not declare, broke the firmware while every host test stayed green.
+not declare, broke the firmware while every host test stayed green. That argument
+carries furthest for the AVR, an 8-bit freestanding target with more opinions than
+either of the others.
 
 [`.github/workflows/static-analysis.yml`](.github/workflows/static-analysis.yml)
 is what reads the code rather than building it — two analysers, because they are

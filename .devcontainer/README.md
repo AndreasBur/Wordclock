@@ -142,7 +142,7 @@ way are silently ignored.
 The image carries PlatformIO in a virtual environment under `/opt/platformio`, on the
 `PATH`, plus `python3` and `nodejs` — which is what
 [`platform/esp32/test/run.sh`](../platform/esp32/test/run.sh) needs for the page embedding
-and for the local web console. So `pio run -d platform/esp32` works with nothing to install.
+and for the local server that puts both pages in front of it. So `pio run -d platform/esp32` works with nothing to install.
 
 The **package cache is a named volume** at `~/.platformio`, declared by the shared feature.
 The platform, the Xtensa toolchain and the Arduino core are about 1.5 GB and are downloaded

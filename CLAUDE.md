@@ -103,7 +103,7 @@ tools/documented-sizes.py --elf build-avr/platform/avr-dx/Wordclock.elf        #
 tools/documented-sizes.py --elf build-avr/platform/avr-dx/Wordclock.elf --fix  # write
 ```
 
-What may be enforced is decided by **what the number is a property of**. The console page's
+What may be enforced is decided by **what the number is a property of**. The two pages'
 sizes are exact, because nothing but this repository's own bytes decides them. The AVR image
 is a percentage with a point of slack, because the byte count belongs to the compiler in front
 of you: 48 346 here, 48 152 in CI, for the same source - the first version of the script

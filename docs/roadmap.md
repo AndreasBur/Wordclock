@@ -290,7 +290,7 @@ RAM. Two things it settled:
 From the comparison with wordclock24h, in the order they would change daily use.
 
 1. ~~**WiFi provisioning.**~~ **Done.** Credentials live in NVS and are set with command
-   13; a clock with none opens an access point and serves the console on it, which is where
+   13; a clock with none opens an access point and serves its pages on it, which is where
    the first pair is entered. What is left of this item is the *configuration UI*: the web
    interface is deliberately a console
    ([WebInterface.h](../platform/esp32/include/WebInterface.h)), so provisioning means
@@ -355,7 +355,7 @@ From the comparison with wordclock24h, in the order they would change daily use.
    - **Every answer feeds the page, not only the ones it asked for.** A colour typed into the
      console below, or set over the serial line, moves the card with it - two views of one
      clock that disagree are worse than one view. What still depends on who asked is whether
-     the line is *printed*: the fourteen answers a page collects on load would bury the log.
+     the line is *printed*: the sixteen answers a page collects on load would bury the log.
 
    The console stays either way, and now demonstrably: it is what the simulator dialog and the
    serial line use, and a page that replaced it would have to grow a control for every command

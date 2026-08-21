@@ -428,7 +428,7 @@
            with sticky the way it sounds: the clock starts halfway down a nine-hundred-pixel
            row, so it scrolls upward for half the list before it ever reaches the edge it is
            meant to stop at - which from the outside is indistinguishable from not sticking.
-           With fourteen groups the column is always long, so the case centring was for is
+           With sixteen groups the column is always long, so the case centring was for is
            the case that never happens. */
         align-self: start;
         position: sticky;
@@ -938,7 +938,7 @@
 
     const settingsBox = document.getElementById('settings');
     /* Commands whose answer belongs to this page rather than to the log. A set and not a
-       flag, because fourteen of them are in flight at once when the page opens. */
+       flag, because sixteen of them are in flight at once when the page opens. */
     const pending = new Set();
     const groups = new Map();
 

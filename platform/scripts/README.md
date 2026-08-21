@@ -7,13 +7,14 @@ once.
 
 ```
 platform/scripts/
-└── embed_web.py    web/ -> a C++ header the firmware serves out of flash
+└── embed_web.py    web/ -> a C++ header the firmware serves out of flash: both pages, the
+                    manifest and the two icons
 ```
 
 The rule for what belongs here is the one [`platform/test/`](../test/README.md) uses, read
 across: **a script belongs here when its own source names neither platform.** `embed_web.py`
-passes — it reads files, compresses one of them and writes arrays, and nothing in it knows
-which controller will serve them.
+passes — it reads files, compresses the two pages among them and writes arrays, and nothing in
+it knows which controller will serve them.
 
 `firmware_includes.py` fails it and stays with its platform, twice. The two copies look alike
 and are not: one looks for `cores/esp32/Arduino.h` under `framework-arduinoespressif32`, the

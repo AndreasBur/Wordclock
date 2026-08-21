@@ -62,7 +62,7 @@ RAM:    10.8%  of 320 KB
 Flash:  17.5%  of 3.2 MB
 ```
 
-Rounded on purpose: the exact byte count moves with every edit to the page, and a figure
+Rounded on purpose: the exact byte count moves with every edit to either page, and a figure
 that rots on each commit is worse than none.
 
 A clean build takes about two minutes because it compiles the Arduino core alongside;
@@ -79,7 +79,7 @@ Those compile the backend against stand-ins for the framework, so they reach eve
 above the peripherals: the frame `Pixels::render()` hands over, byte for byte; that an
 injected command takes the same path through `Communication` as one typed on the wire; and
 the handlers, driven through the same registration call the server makes. `serve` puts the
-real firmware behind the page on localhost, which is how the browser side is worked on
+real firmware behind both pages on localhost, which is how the browser side is worked on
 without flashing.
 
 **What no test here can reach is the hardware itself**: the pulse timing on a real strip,
@@ -236,13 +236,16 @@ same socket - 330 bytes in the strip's own byte order, at most every 50 ms and o
 they changed. A client that connects to a standing display is sent the current frame at
 once, or it would wait for the next change; on a word clock that can be five minutes.
 
-**Neither front end shows the colour**, which is worth saying because this paragraph used to
-claim the page did. The wx window renders a pixel's brightness as a grey level and drops the
-hue - which is why the colour swap in `Pixel` could hide there for as long as it did - and
-the page takes only *whether* a pixel is lit from the frame, painting the lit ones a fixed
-high-contrast colour: the bytes arrive already dimmed, so a word at low brightness would be
-a dark grey on a dark background, unreadable in exactly the case somebody opens the view for.
-So a hue is checked by reading the bytes, which the tests do, and not by looking.
+**Nothing shows the colour that went to the strip**, which is worth saying because this
+paragraph once claimed the page did and later that nothing could. The wx window renders a
+pixel's brightness as a grey level and drops the hue - which is why the colour swap in `Pixel`
+could hide there for as long as it did - and both pages take only *whether* a pixel is lit from
+the frame: the bytes arrive already dimmed, so a word at low brightness would be a dark grey on
+a dark background, unreadable in exactly the case somebody opens the view for. The console
+therefore paints every lit pixel one fixed high-contrast colour, and the panel paints its plate
+in the colour it *set* - which is the setting read back from command 2 and not the frame. So a
+hue that actually left the controller is checked by reading the bytes, which the tests do, and
+not by looking.
 
 What the panel can do and the console cannot is show the colour: it knows what it *set*,
 where the console only learns from the frame which pixels are lit. So the panel's plate is
@@ -275,7 +278,7 @@ who is already typing commands expects. The panel is one link away in the header
 
 Every answer the socket carries is read into the groups' fields, whether this page asked for it
 or not - so a colour set on the panel, by hand below, or over the serial line moves them all.
-What depends on who asked is only whether the line is *printed*: the fourteen answers a page
+What depends on who asked is only whether the line is *printed*: the sixteen answers a page
 collects on load would bury the log it keeps for what somebody typed.
 
 The pages are [`web/app.html`](web/app.html) and [`web/index.html`](web/index.html), each one
@@ -304,8 +307,8 @@ It follows the system's light or dark preference, with a button in the header th
 overrides it and remembers the choice. Light is the base: the clock's own look is amber on
 near-black, but the console is usually read next to other light windows.
 
-**Updating the firmware** is the last panel in the page, folded away like the console. It
-takes the `.ota.bin` from a release - not the `.factory.bin`, which carries the bootloader
+**Updating the firmware** is reachable from both pages - the console's last folded panel, and
+the panel's System tab. It takes the `.ota.bin` from a release - not the `.factory.bin`, which carries the bootloader
 and is for a bare board - and sends it to `POST /update` as the request body. Not as a form:
 a multipart parser in flash would exist only to undo what a `<form>` did on the way out, and
 `curl --data-binary @Wordclock-ESP32-S3-1.2.3.ota.bin http://wordclock.local/update` is
