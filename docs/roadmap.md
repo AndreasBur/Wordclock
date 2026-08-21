@@ -303,13 +303,18 @@ From the comparison with wordclock24h, in the order they would change daily use.
    the one thing somebody does often it is plainly better than typing a command with three
    numbers. Four notes from looking at it:
 
-   - **The presets carry the weight, not the wheel.** Nobody picks a colour twice. They pick
-     the one they had last month, and eight swatches are that in one tap.
-   - **A numeric field belongs beside the wheel.** Theirs has none, so a colour found by
-     dragging cannot be written down, passed to somebody else or restored after a reset.
-     That is what a wheel costs when it is the only way in.
-   - **Two unlabelled sliders are one too many.** Theirs run brightness and, apparently,
-     white balance, and nothing on the page says which is which.
+   - ~~**The presets carry the weight, not the wheel.**~~ **Done.** Nobody picks a colour
+     twice. They pick the one they had last month, and eight swatches are that in one tap.
+     Fixed eight rather than remembered ones: this page is opened from whichever phone is to
+     hand, and a remembered list is empty on the one you are holding.
+   - ~~**A numeric field belongs beside the wheel.**~~ **Done**, as `#RRGGBB` next to the
+     picker and typable back into it. Theirs has none, so a colour found by dragging cannot
+     be written down, passed to somebody else or restored after a reset. That is what a wheel
+     costs when it is the only way in.
+   - ~~**Two unlabelled sliders are one too many.**~~ **Done**, and it did not need saying
+     twice: the one slider here is labelled, and the automatic that overrides it sits under
+     it - a slider that does nothing reads as broken, and theirs gives no way to tell which
+     of the two states you are in.
    - ~~**The clock face can be drawn in the page**~~ **Done**, and it was done before this
      item was written down: `/display` answers with the letter grid as JSON
      ([WebInterface.cpp](../platform/rp2350/src/WebInterface.cpp)), and the lit letters
@@ -322,9 +327,33 @@ From the comparison with wordclock24h, in the order they would change daily use.
      unreadable in the case one opens the view for. The wx window stays the colour-accurate
      view.
 
+   **Done**, and the shape it took is worth keeping. What the page grew is *one* card above
+   the generated groups, for the colour and the brightness - 1.6 KB of compressed flash on
+   both network backends - and not a sidebar of task pages. Four things it settled:
+
+   - **A purpose-built control cannot be generated, and that is the whole reason for the
+     card.** The catalog says "three numbers called Red, Green and Blue, 0 to 255", which is
+     what a colour *is*; that it deserves eight swatches and a picker is a judgement about
+     what somebody does often. So the card is the one place in the page that names a command
+     by its number, and it hides itself where the catalog does not carry them - a firmware
+     built without the colour command shows the groups it does have rather than a dead card.
+   - **The picker is the browser's own.** A wheel drawn here would be a canvas, a pointer
+     handler and a hue conversion in a page the clock holds in its flash, and the phone's own
+     picker is the one its owner already knows.
+   - **Nothing is shown before the clock has said it.** A range input with no value sits at
+     the middle of its range and a colour input at black, so a card drawn on load would
+     claim a brightness of 128 and an unlit display. It appears with the first answer
+     instead. The generated groups need none of this: an empty field reads as empty.
+   - **Every answer feeds the page, not only the ones it asked for.** A colour typed into the
+     console below, or set over the serial line, moves the card with it - two views of one
+     clock that disagree are worse than one view. What still depends on who asked is whether
+     the line is *printed*: the fourteen answers a page collects on load would bury the log.
+
    The console stays either way. It is what the simulator dialog and the serial line use,
    and a page that replaced it would have to grow a control for every command before it
-   could.
+   could. What is left of this item is the settings that are *not* colour and brightness -
+   they have their generated group and no card, which is the right order of work: a control
+   per command is what the groups already are.
 2. ~~**Night switch-off / timer.**~~ **Done** — command 14, and
    [NightSwitch](../firmware/inc/NightSwitch/NightSwitch.h) in the core. What it settled:
 

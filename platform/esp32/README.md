@@ -235,6 +235,24 @@ ends and on the wire at once, with nothing to keep in step by hand. The built co
 into the input field rather than straight onto the wire, so it can still be corrected,
 exactly as the wx builder's Insert does.
 
+One card is deliberately **not** generated: the colour and the brightness, above the groups.
+Eight preset swatches, the browser's own colour picker, the same colour as `#RRGGBB` text
+beside it, a brightness slider, and the automatic that overrides that slider - which is on
+the card for exactly that reason, since a slider that does nothing reads as a broken one. The
+swatches carry more of it than the picker does: nobody chooses a colour twice, they choose the
+one they had last month, and eight of them are that in one tap. This is also the one place in
+the page that knows a command by its number, and it has to be - a catalog entry saying "three
+numbers called Red, Green and Blue, 0 to 255" describes what a colour *is*, not that it
+deserves a picker. So the card takes itself off the page when the catalog does not carry those
+commands, and stays off until the clock has answered for them: a range input with no value
+sits at the middle of its range, and a card claiming a brightness nobody set would be worse
+than no card.
+
+Every answer the socket carries is read into those fields, whether this page asked for it or
+not - so a colour set by hand in the console below, or over the serial line, moves the card
+with it. What depends on who asked is only whether the line is *printed*: the fourteen
+answers a page collects on load would bury the log it keeps for what somebody typed.
+
 The page is [`web/index.html`](web/index.html), one self-contained file with its CSS and
 script inline: the clock has nowhere to fetch anything from. It is **not** uploaded
 separately. [`../scripts/embed_web.py`](../scripts/embed_web.py) walks `web/` at build time and
@@ -242,7 +260,7 @@ emits every file in it as an array **into the build directory**, so `pio run -t 
 ships page and firmware together and their versions cannot drift apart - the failure a
 second partition invites. The generated header is a build product on purpose; a checked-in
 one rots the moment someone edits the HTML and forgets to regenerate it. At the moment the
-page is 54 KB of source and 6.6 KB compressed, and the default partition table is
+page is 68 KB of source and 8.2 KB compressed, and the default partition table is
 untouched.
 
 Three of those files are not the console but the **home screen icon**:

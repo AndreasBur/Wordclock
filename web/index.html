@@ -303,6 +303,58 @@
     .group-body button { grid-column: 2; justify-self: end; }
     .group-body :disabled { color: var(--unlit); }
 
+    /* The two things somebody changes often, given controls of their own above the groups.
+       Same grid as a group body, so the labels line up down the whole column and this card
+       does not read as a different page. */
+    #quick-body { display: grid; gap: var(--gap); padding: 0 6px 6px; }
+    .quick-row {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: var(--gap);
+        align-items: center;
+    }
+    /* For the row whose second column is a checkbox rather than a field: half a card for a
+       box 18 px wide leaves its label wrapping in the other half. */
+    .quick-row.tight { grid-template-columns: minmax(0, 1fr) auto; }
+    .quick-row label, .quick-row output { color: var(--unlit); }
+    /* Eight fixed columns rather than a wrapping row: eight swatches at a tappable size do
+       not fit half a card, and letting them wrap on their own puts seven on one line and the
+       eighth alone underneath at every width this page is read at. */
+    #presets {
+        grid-column: 1 / -1;
+        display: grid;
+        grid-template-columns: repeat(8, minmax(0, 1fr));
+        gap: 6px;
+    }
+    #presets button {
+        height: 32px;
+        padding: 0;
+        /* The colour is the label, so the swatch shows it edge to edge and says its name to
+           a screen reader instead. */
+        background: var(--swatch);
+    }
+    /* Native, and deliberately: a wheel drawn here would be a canvas, a pointer handler and
+       a hue-to-RGB conversion in a page the clock has to hold in its flash - and the one the
+       phone already has is the one its owner already knows. Across the card, because what it
+       shows is the colour the clock is set to and a nine-column swatch is easier to read than
+       a ninth small one. */
+    #wheel { grid-column: 1 / -1; width: 100%; height: 40px; padding: 4px; }
+    #hex { font-family: ui-monospace, monospace; text-transform: uppercase; }
+    #brightness {
+        grid-column: 1 / -1;
+        padding: 0;
+        accent-color: var(--lit);
+        background: none;
+        border: 0;
+    }
+    #brightness-value { text-align: right; font-variant-numeric: tabular-nums; }
+    .quick-row input[type=checkbox] {
+        flex: none;
+        width: 18px;
+        height: 18px;
+        accent-color: var(--lit);
+    }
+
     /* Below this the two columns are one, and the clock goes first: on a phone it is the
        thing you glance at, and the settings are what you scroll to. */
     @media (max-width: 800px) {
@@ -522,6 +574,40 @@
      height - every group opened took the clock a size smaller. -->
 <main id="stage">
     <div id="controls">
+        <!-- The colour and the brightness, which are what somebody opens this page for.
+             Everything else the clock can be told is below, one generated group per command;
+             these two are the ones worth a control that fits them rather than a number field
+             that fits everything. Hidden until the catalog says the clock has them, so a
+             firmware built without them shows the groups and no empty card.
+
+             The presets carry more of this than the picker does. Nobody chooses a colour
+             twice - they choose the one they had last month, and eight swatches are that in
+             one tap. The picker is for the ninth. -->
+        <section id="quick" class="surface" hidden>
+            <div id="quick-body">
+                <div class="quick-row">
+                    <label for="wheel">Colour</label>
+                    <!-- Beside the picker, not instead of it: a colour found by dragging can
+                         be written down, sent to somebody or typed back after a reset only
+                         if it is somewhere as text. -->
+                    <input id="hex" aria-label="colour as hex" spellcheck="false" autocomplete="off" maxlength="7">
+                    <div id="presets" role="group" aria-label="colour presets"></div>
+                    <input type="color" id="wheel" aria-label="colour picker">
+                </div>
+                <div class="quick-row">
+                    <label for="brightness">Brightness</label>
+                    <output id="brightness-value" for="brightness"></output>
+                    <input type="range" id="brightness" min="0" max="255" step="1">
+                </div>
+                <!-- Here because the slider above means nothing while this is on, and a
+                     control that looks broken is worse than one that is missing. -->
+                <div class="quick-row tight">
+                    <label for="automatic">Brightness from the room</label>
+                    <input type="checkbox" id="automatic">
+                </div>
+            </div>
+        </section>
+
         <!-- What the clock is set to, one group per command, generated from the catalog
              exactly as the builder's form is. -->
         <section id="settings"></section>
@@ -884,6 +970,9 @@
             }
             showOptions();
             buildSettings();
+            /* After the groups, whose fields it writes into, and before the first round of
+               questions, whose answers it is filled by. */
+            buildQuick();
             refreshSettings();
         })
         .catch(() => {
@@ -920,17 +1009,22 @@
         return true;
     }
 
-    /* True when the line was an answer to something this page asked for, and has therefore
-       been used rather than shown. Matched on the command number the answer opens with:
-       fourteen replies scrolling past on load is a wall nobody reads, and what the log is
-       for is what somebody typed. */
+    /* Every answer is read into what the page shows, and only whether the line is also
+       *shown* depends on who asked for it. Both halves matter and they are different
+       questions: a colour set by hand in the console below, or over the serial line, is the
+       clock's colour too, and a page still showing the previous one would be disagreeing
+       with the clock it is connected to. Fourteen replies scrolling through the log on load,
+       on the other hand, are a wall nobody reads - so those are used and not printed, and
+       what the log keeps is what somebody typed.
+
+       True therefore means "this page asked for it", which is what the caller decides the
+       logging by. A line that is not an answer at all leaves both halves alone. */
     function absorbAnswer(line) {
         const number = Number.parseInt(line, 10);
 
-        if (!pending.has(number)) { return false; }
-        pending.delete(number);
+        if (Number.isNaN(number)) { return false; }
         fillGroup(number, line);
-        return true;
+        return pending.delete(number);
     }
 
     function readValues(line) {
@@ -954,6 +1048,7 @@
             const value = values.get(short);
             if (value !== undefined) { field.value = value; }
         }
+        syncQuick(number);
     }
 
     function askFor(command) {
@@ -1028,6 +1123,207 @@
         for (const command of catalog) {
             if (groups.has(command.number)) { askFor(command); }
         }
+    }
+
+    /* ---- the colour and the brightness ----------------------------------------------
+       The one place in this page that knows a command by its number. Everything else is
+       generated, and this cannot be: a table saying "three numbers called Red, Green and
+       Blue, 0 to 255" is what a colour *is*, not that it deserves a picker and eight
+       swatches. So the two numbers are written here, once, and the card takes itself off
+       the page if the clock's catalog does not carry them - a firmware built without the
+       colour command then shows what it does have instead of an empty card.
+
+       Nothing is sent from here that the groups below could not send. The controls write
+       into the group's own fields and go out through applyGroup(), so there is one path to
+       the clock and one answer coming back to fill both views. */
+    const QuickColour = { number: 2, red: 'R', green: 'G', blue: 'B' };
+    const QuickBrightness = { number: 3, level: 'B', automatic: 'A' };
+    /* Warm white first, because a clock on a wall is lit rather than coloured, and the LEDs'
+       own white is the blue-ish one further along. The rest are one per direction of the
+       wheel, so the eight cover it rather than crowding one corner - and the amber is the
+       one this page is drawn in. */
+    const ColourPresets = [
+        { name: 'warm white', rgb: [255, 170, 90] },
+        { name: 'white', rgb: [255, 255, 255] },
+        { name: 'amber', rgb: [255, 176, 32] },
+        { name: 'red', rgb: [255, 0, 0] },
+        { name: 'green', rgb: [0, 255, 0] },
+        { name: 'cyan', rgb: [0, 200, 255] },
+        { name: 'blue', rgb: [0, 64, 255] },
+        { name: 'magenta', rgb: [255, 0, 160] }
+    ];
+
+    /* The commands the card ended up showing, and which of them have answered. Both are
+       needed to decide when it is worth showing at all - see revealQuick(). */
+    const quickCommands = new Set();
+    const quickAnswered = new Set();
+
+    const quickBox = document.getElementById('quick');
+    const presetsBox = document.getElementById('presets');
+    const wheel = document.getElementById('wheel');
+    const hexField = document.getElementById('hex');
+    const brightnessSlider = document.getElementById('brightness');
+    const brightnessValue = document.getElementById('brightness-value');
+    const automaticBox = document.getElementById('automatic');
+
+    function commandInCatalog(number, shorts) {
+        const command = catalog.find((entry) => entry.number === number);
+
+        if (!command) { return null; }
+        /* An option missing is the same case as the command missing: a card that offers a
+           control the clock will refuse is worse than one that is not there. */
+        return shorts.every((short) => command.options.some((option) => option.short === short))
+            ? command
+            : null;
+    }
+
+    function toHex(rgb) {
+        return '#' + rgb.map((value) => value.toString(16).padStart(2, '0')).join('');
+    }
+
+    /* Undefined for anything that is not six hex digits, so a half-typed colour is left
+       alone rather than sent as whatever it parses to. */
+    function fromHex(text) {
+        const match = /^#?([0-9a-f]{6})$/i.exec(text.trim());
+
+        if (!match) { return undefined; }
+        const value = Number.parseInt(match[1], 16);
+        return [(value >> 16) & 0xff, (value >> 8) & 0xff, value & 0xff];
+    }
+
+    function fieldsOf(number) {
+        const group = groups.get(number);
+        return group ? group.fields : null;
+    }
+
+    function currentColour() {
+        const fields = fieldsOf(QuickColour.number);
+
+        if (!fields) { return undefined; }
+        const rgb = [QuickColour.red, QuickColour.green, QuickColour.blue]
+            .map((short) => Number.parseInt(fields.get(short).value, 10));
+        return rgb.some(Number.isNaN) ? undefined : rgb;
+    }
+
+    /* From the clock towards the page, and it answers whether it had anything to show.
+       Called for every answer, so a colour set from the console or over the serial line
+       arrives here too. */
+    function showColour(rgb) {
+        if (!rgb) { return false; }
+        wheel.value = toHex(rgb);
+        hexField.value = toHex(rgb).toUpperCase();
+        return true;
+    }
+
+    function showBrightness(fields) {
+        const level = fields.get(QuickBrightness.level).value;
+        const automatic = fields.get(QuickBrightness.automatic).value;
+
+        if (level === '') { return false; }
+        brightnessSlider.value = level;
+        brightnessValue.value = level;
+        if (automatic !== '') { automaticBox.checked = automatic !== '0'; }
+        return true;
+    }
+
+    /* Shown only once every control on it stands for something the clock said. A range
+       input with no value of its own sits at the middle of its range and a colour input at
+       black, so a card drawn before the first answer would claim a brightness of 128 and an
+       unlit display - two things nobody set. The generated groups have nothing to hide: an
+       empty field reads as empty.
+
+       Which means a page that cannot reach a clock shows the groups and no card, the same
+       way the builder shows its note instead of a form. */
+    function revealQuick() {
+        for (const number of quickCommands) {
+            if (!quickAnswered.has(number)) { return; }
+        }
+        quickBox.hidden = false;
+    }
+
+    function syncQuick(number) {
+        const fields = quickCommands.has(number) ? fieldsOf(number) : null;
+
+        if (!fields) { return; }
+        const shown = number === QuickColour.number
+            ? showColour(currentColour())
+            : showBrightness(fields);
+
+        if (shown) {
+            quickAnswered.add(number);
+            revealQuick();
+        }
+    }
+
+    /* Towards the clock. Writing the group's fields first is what keeps the two views from
+       disagreeing while the answer is on its way, and it is also what makes the command
+       complete: the protocol carries every option of a command in one line, so brightness
+       goes out with the automatic flag it was already set to. */
+    function setThrough(number, values) {
+        const command = catalog.find((entry) => entry.number === number);
+        const fields = fieldsOf(number);
+
+        if (!command || !fields) { return; }
+        for (const [short, value] of Object.entries(values)) {
+            fields.get(short).value = String(value);
+        }
+        applyGroup(command, fields);
+    }
+
+    function setColour(rgb) {
+        showColour(rgb);
+        setThrough(QuickColour.number, {
+            [QuickColour.red]: rgb[0],
+            [QuickColour.green]: rgb[1],
+            [QuickColour.blue]: rgb[2]
+        });
+    }
+
+    function buildQuick() {
+        const colour = commandInCatalog(QuickColour.number,
+                                        [QuickColour.red, QuickColour.green, QuickColour.blue]);
+        const brightness = commandInCatalog(QuickBrightness.number,
+                                            [QuickBrightness.level, QuickBrightness.automatic]);
+
+        if (!colour && !brightness) { return; }
+        if (colour) { quickCommands.add(colour.number); }
+        if (brightness) { quickCommands.add(brightness.number); }
+
+        for (const preset of ColourPresets) {
+            const swatch = document.createElement('button');
+            swatch.type = 'button';
+            swatch.style.setProperty('--swatch', toHex(preset.rgb));
+            swatch.title = preset.name;
+            swatch.setAttribute('aria-label', preset.name);
+            swatch.addEventListener('click', () => setColour(preset.rgb));
+            presetsBox.appendChild(swatch);
+        }
+
+        /* input while dragging, change when the picker closes. A frame per drag step would
+           be a command per drag step, and the socket carries them to a parser on an 8-bit
+           part - so dragging moves the page and letting go moves the clock. */
+        wheel.addEventListener('input', () => { hexField.value = wheel.value.toUpperCase(); });
+        wheel.addEventListener('change', () => {
+            const rgb = fromHex(wheel.value);
+            if (rgb) { setColour(rgb); }
+        });
+        /* change and not input, so a colour is sent when it has been typed out rather than
+           at the third digit; Enter counts as change in every browser that has a field. */
+        hexField.addEventListener('change', () => {
+            const rgb = fromHex(hexField.value);
+            if (rgb) { setColour(rgb); } else { showColour(currentColour()); }
+        });
+
+        brightnessSlider.addEventListener('input', () => {
+            brightnessValue.value = brightnessSlider.value;
+        });
+        brightnessSlider.addEventListener('change', () => {
+            setThrough(QuickBrightness.number, { [QuickBrightness.level]: brightnessSlider.value });
+        });
+        automaticBox.addEventListener('change', () => {
+            setThrough(QuickBrightness.number,
+                       { [QuickBrightness.automatic]: automaticBox.checked ? 1 : 0 });
+        });
     }
 
     entry.addEventListener('submit', (event) => {
