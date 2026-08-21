@@ -128,6 +128,10 @@ int main()
 {
     check(WebInterface::getInstance().begin() == E_OK, "the server starts and registers its handlers");
     check(webStubState().Listening, "and it is listening");
+    /* "/" is the panel and the console has its own route, so both have to be there: a missing
+       registration would answer 404 on the page everything the panel does not cover goes
+       through. */
+    check(webStubState().Routes.count("/console") == 1u, "the console has a route of its own");
     check((webStubState().SocketHandler != nullptr) && (webStubState().Routes.count("/") == 1u)
           && (webStubState().Routes.count("/commands") == 1u)
           && (webStubState().Routes.count("/display") == 1u),
@@ -141,13 +145,18 @@ int main()
        and the request handler would answer about an upload that never happened. */
     check(webStubState().BodyRoutes.count("/update") == 1u, "with the body handler the image arrives through");
 
-    /* the page: gzipped, and announced as such */
+    /* both pages: gzipped, announced as such, and not the same bytes - a swapped pair of
+       pointers would pass every other check here. */
     std::string Encoding;
     const std::string Page = fetch("/", &Encoding);
     check(Encoding == "gzip", "the page is announced as gzip");
     check((Page.size() > 100u) && (static_cast<unsigned char>(Page[0]) == 0x1fu)
                                && (static_cast<unsigned char>(Page[1]) == 0x8bu),
           "the page really is a gzip stream");
+
+    const std::string Console = fetch("/console", &Encoding);
+    check(Encoding == "gzip", "the console is announced as gzip");
+    check(Console.size() > 100u && Console != Page, "and is a different page from the panel");
 
     /* the manifest and the icons, which nothing on the clock reads and a browser does */
     const std::string Manifest = fetch("/manifest.webmanifest", &Encoding);
@@ -402,7 +411,7 @@ int main()
     check(System::getInstance().setConsolePassword("hunter2") == E_OK, "a password can be stored");
     check(System::getInstance().isConsoleProtected(), "which is what protected means");
 
-    for(const char* Route : {"/", "/commands", "/display", "/manifest.webmanifest", "/icon-192.png", "/update"}) {
+    for(const char* Route : {"/", "/console", "/commands", "/display", "/manifest.webmanifest", "/icon-192.png", "/update"}) {
         AuthenticationWasRequested = false;
         const std::string Body = fetch(Route);
         check(Body.empty() && AuthenticationWasRequested, Route);

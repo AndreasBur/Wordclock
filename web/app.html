@@ -1,0 +1,1542 @@
+<!--
+  The clock's own page: what somebody opens when they type the clock's address. Six task
+  pages beside the letter plate, for the handful of things a word clock is actually set to -
+  and no console. The console is still there, at /console, and is what everything the page
+  does not cover goes through: it draws a group per command out of the catalog, so a command
+  added to the firmware appears there without anybody touching a page.
+
+  Why two pages rather than one that does both. This one is hand-made: that a colour deserves
+  eight swatches and a picker, and a brightness a slider, is a judgement about what somebody
+  does often, and no table can carry it - the catalog says "three numbers called Red, Green
+  and Blue, 0 to 255", which is what a colour *is*. The console is generated: it cannot be
+  pretty and does not need to be, and it is complete by construction. Trying to be both in
+  one file is how a page ends up neither.
+
+  One self-contained file, like the console: no external stylesheet, script or font, because
+  the clock serves it from its own flash and has nowhere to fetch anything from. That is also
+  why the type here is the system's own and not a face this page would like - a downloaded
+  font is a request to a host the clock is not.
+
+  Opened from disk while the layout is worked on, it asks for the clock's address the same
+  way the console does, and keeps it in localStorage under the same key - so the two pages
+  are set up once between them.
+-->
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wordclock</title>
+
+<!-- The same home screen entry the console had, and now the one that matters: the manifest
+     starts at ".", which is this page. Its reasoning is written down in index.html and is
+     not repeated here; what changed is only which page the icon opens. -->
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#e8e8ee" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#07070a" media="(prefers-color-scheme: dark)">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Wordclock">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" href="icon-192.png" type="image/png">
+
+<style>
+    /* Tokens in three sets. The page and the cards follow the viewer's theme; the plate does
+       not, because it is a display rather than a surface - a lit letter is lit against
+       something dark, and amber on white is a brown letter on paper.
+
+       That last part is where this page parts from the console, which keeps its cards dark in
+       both themes: there they are three folded panels beside a clock, here they are what one
+       reads, and a dark card on a light ground turns the light theme into a pale frame around
+       a dark app.
+
+       Three states and not two, the same as the console's: an explicit choice stamps
+       data-theme on the root, and the default - nothing stamped - follows the system. */
+    :root, :root[data-theme="light"] {
+        color-scheme: light;
+        --ground: #e8e8ee;
+        --ground-2: #f4f4f8;
+        --ink: #17171b;
+        --ink-dim: #5c5c66;
+        --rule: #d3d3dc;
+        /* The clock's amber taken down until it holds on a light ground: same hue, less
+           lightness, because the wordmark and the card headings are normal-size text and
+           need 4.5:1. */
+        --amber-ink: #8f5600;
+        --card: #ffffff;
+        --card-2: #f1f1f6;
+        --card-line: #dcdce4;
+        --card-ink: #17171b;
+        --card-dim: #61616b;
+        --card-amber: #8f5600;
+    }
+    @media (prefers-color-scheme: dark) {
+        :root:not([data-theme="light"]) {
+            color-scheme: dark;
+            --ground: #07070a;
+            --ground-2: #101015;
+            --ink: #d9d9df;
+            --ink-dim: #83838d;
+            --rule: #22222a;
+            --amber-ink: #ffb020;
+            --card: #14141a;
+            --card-2: #1b1b22;
+            --card-line: #262630;
+            --card-ink: #e6e6ea;
+            --card-dim: #80808b;
+            --card-amber: #ffb020;
+        }
+    }
+    :root[data-theme="dark"] {
+        color-scheme: dark;
+        --ground: #07070a;
+        --ground-2: #101015;
+        --ink: #d9d9df;
+        --ink-dim: #83838d;
+        --rule: #22222a;
+        --amber-ink: #ffb020;
+        --card: #14141a;
+        --card-2: #1b1b22;
+        --card-line: #262630;
+        --card-ink: #e6e6ea;
+        --card-dim: #80808b;
+        --card-amber: #ffb020;
+    }
+    :root {
+        /* The plate, in both themes. */
+        --plate: #14141a;
+        --plate-line: #262630;
+        --plate-dim: #80808b;
+        --amber: #ffb020;
+        /* Semantic, and deliberately not the accent: the accent is the colour the clock
+           shows, and a green that means "connected" must not be mistaken for it. */
+        --ok: #3d9d70;
+        --warn: #c98600;
+        --bad: #cf4b5c;
+
+        --step-0: 13px;
+        --step-1: 15px;
+        --step-2: 18px;
+        --gap: 8px;
+        --gap-l: 16px;
+        --pad: 20px;
+
+        /* The system's own, because a downloaded face is a request to a host this clock is
+           not. Monospace wherever something is read as data - the plate, every number, every
+           small label - which is also what ties this page to the console, where everything
+           is monospace. */
+        --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        --mono: ui-monospace, "DejaVu Sans Mono", monospace;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+        margin: 0;
+        background: var(--ground);
+        color: var(--ink);
+        font: 400 var(--step-1)/1.5 var(--sans);
+    }
+
+    /* ---- header ---- */
+    header {
+        position: sticky;
+        top: 0;
+        z-index: 5;
+        background: var(--ground);
+        border-bottom: 1px solid var(--rule);
+    }
+    .bar {
+        max-width: 1080px;
+        margin-inline: auto;
+        padding: 10px var(--pad);
+        display: flex;
+        /* Wraps rather than squeezes: the wordmark, the state and the two buttons are 430 px of
+           content, and a phone is 390 - so the buttons take a second line together instead of
+           the last one hanging over the edge. */
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 6px var(--gap);
+    }
+    /* One group, so the two keep together at the right on a wide screen and wrap as a pair on
+       a narrow one - two auto margins would split the slack between them instead. */
+    .tools { margin-left: auto; display: flex; gap: 6px; }
+    h1 {
+        margin: 0;
+        font: 600 var(--step-1)/1 var(--sans);
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--amber-ink);
+    }
+    #state {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-left: auto;
+        font: 400 var(--step-0)/1 var(--mono);
+        color: var(--ink-dim);
+    }
+    #state::before {
+        content: "";
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--ink-dim);
+        flex: none;
+    }
+    #state.up::before { background: var(--ok); }
+    .bar a, .bar button {
+        font: 400 var(--step-0)/1 var(--mono);
+        color: var(--ink-dim);
+        background: none;
+        border: 1px solid var(--rule);
+        border-radius: 4px;
+        padding: 6px 9px;
+        text-decoration: none;
+        cursor: pointer;
+        white-space: nowrap;
+    }
+    .bar a:hover, .bar button:hover { color: var(--ink); border-color: var(--ink-dim); }
+    #theme { min-width: 66px; }
+
+    /* ---- layout ---- */
+    .wrap { max-width: 1080px; margin-inline: auto; padding: var(--gap-l) var(--pad) 40px; }
+    /* minmax(0, …) on every column here and in the rows inside the cards: an implicit auto
+       column is sized to its widest content, and the task rail is wider than a phone - so its
+       own overflow-x never comes into play and the whole page scrolls sideways instead. */
+    #stage {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        gap: var(--gap-l);
+        align-items: start;
+    }
+    #stage > * { min-width: 0; }
+    /* Two columns only where there is slack for them: at the narrower breakpoint the plate's
+       column is exactly as wide as its own footer needs, and everything in it ends flush
+       against the card's edge. */
+    @media (min-width: 960px) {
+        #stage { grid-template-columns: minmax(0, 1fr) 400px; }
+        #plate-wrap { position: sticky; top: 60px; order: 2; }
+    }
+
+    /* ---- the plate: the object the page is about ---- */
+    #plate-wrap { display: grid; gap: var(--gap); }
+    #plate {
+        background: var(--plate);
+        border: 1px solid var(--plate-line);
+        border-radius: 6px;
+        padding: 16px;
+        /* An inset hairline reads as a plate in a frame rather than as a table of letters. */
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    }
+    #plate[hidden] { display: none; }
+    #grid {
+        display: grid;
+        gap: 2px 1px;
+        font: 500 clamp(12px, 2.6vw, 17px)/1.7 var(--mono);
+        text-align: center;
+    }
+    #grid span {
+        color: var(--plate-dim);
+        opacity: 0.42;
+        transition: color 160ms ease, opacity 160ms ease, text-shadow 160ms ease;
+    }
+    /* Lit-ness comes from the frame, the hue from the colour command and the level from the
+       brightness one - which is the one thing this page can do and the console cannot. The
+       console paints every lit pixel one fixed colour, because all it has is the frame, and
+       the bytes in it arrive already dimmed: a word at low brightness would be a dark grey on
+       a dark ground, unreadable in exactly the case somebody opens the view for. */
+    #grid span.lit {
+        color: var(--lit-colour, var(--amber));
+        opacity: calc(0.35 + 0.65 * var(--lit-level, 1));
+        text-shadow: 0 0 calc(11px * var(--lit-level, 1)) color-mix(in srgb, var(--lit-colour, var(--amber)) 55%, transparent);
+    }
+    #plate-foot {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 4px var(--gap);
+        font: 400 var(--step-0)/1.4 var(--mono);
+        color: var(--ink-dim);
+    }
+    #plate-time { color: var(--ink); font-variant-numeric: tabular-nums; }
+
+    /* ---- the task rail ---- */
+    #rail {
+        display: flex;
+        gap: 2px;
+        overflow-x: auto;
+        scrollbar-width: none;
+        border-bottom: 1px solid var(--rule);
+    }
+    #rail::-webkit-scrollbar { display: none; }
+    #rail button {
+        flex: none;
+        background: none;
+        border: 0;
+        border-bottom: 2px solid transparent;
+        padding: 9px 11px;
+        font: 600 var(--step-1)/1 var(--sans);
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--ink-dim);
+        cursor: pointer;
+    }
+    #rail button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--amber-ink); }
+    #rail button:hover { color: var(--ink); }
+
+    /* ---- cards ---- */
+    .pane { display: grid; gap: var(--gap-l); margin-top: var(--gap-l); }
+    .card {
+        background: var(--card);
+        border: 1px solid var(--card-line);
+        border-radius: 6px;
+        color: var(--card-ink);
+        padding: 14px;
+        display: grid;
+        gap: 12px;
+    }
+    .card > h2 {
+        margin: 0;
+        font: 600 var(--step-0)/1 var(--sans);
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--card-amber);
+    }
+    .card p { margin: 0; font-size: var(--step-0); color: var(--card-dim); }
+    .row {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+        gap: var(--gap);
+        align-items: center;
+    }
+    .row.tight { grid-template-columns: minmax(0, 1fr) auto; }
+    .row.wide > * { grid-column: 1 / -1; }
+    .row > label { font-size: var(--step-0); color: var(--card-dim); }
+    .value { font: 500 var(--step-0)/1 var(--mono); text-align: right; font-variant-numeric: tabular-nums; }
+
+    input, select, button.act {
+        font: inherit;
+        font-size: var(--step-0);
+        color: var(--card-ink);
+        background: var(--card-2);
+        border: 1px solid var(--card-line);
+        border-radius: 4px;
+        padding: 7px 9px;
+        min-width: 0;
+    }
+    input[type="range"] {
+        padding: 0;
+        border: 0;
+        background: none;
+        accent-color: var(--card-amber);
+        width: 100%;
+    }
+    input[type="checkbox"] {
+        width: 17px;
+        height: 17px;
+        accent-color: var(--card-amber);
+        justify-self: end;
+    }
+    input[type="color"] { padding: 3px; height: 38px; width: 100%; }
+    #hex { font-family: var(--mono); text-transform: uppercase; }
+    button.act { cursor: pointer; }
+    button.act.primary { color: var(--card-amber); border-color: color-mix(in srgb, var(--card-amber) 40%, var(--card-line)); }
+    :focus-visible { outline: 2px solid var(--card-amber); outline-offset: 2px; }
+    :disabled { color: var(--card-dim); }
+
+    /* A real file input rather than a label over a hidden one, because that is what a phone
+       opens its own picker from - but its button comes from the browser and has to be dressed
+       to match. And it takes the whole row: beside a button the file name is squeezed into
+       what is left, and a release file is called Wordclock-ESP32-S3-v0.1.0.ota.bin. */
+    input[type="file"] { width: 100%; padding: 5px; color: var(--card-dim); font-size: var(--step-0); }
+    input[type="file"]::file-selector-button {
+        font: 500 var(--step-0)/1 var(--sans);
+        color: var(--card-amber);
+        background: var(--card-2);
+        border: 1px solid var(--card-line);
+        border-radius: 4px;
+        padding: 6px 9px;
+        margin-right: 9px;
+        cursor: pointer;
+    }
+    /* minmax(0, 1fr) and not the default auto: a file input's natural width is the whole of
+       "Choose file  No file chosen", and an auto column takes that as its size. */
+    .stack { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--gap); }
+    .stack > button { justify-self: end; }
+
+    /* ---- swatches ---- */
+    #presets {
+        display: grid;
+        grid-template-columns: repeat(8, minmax(0, 1fr));
+        gap: 6px;
+        grid-column: 1 / -1;
+    }
+    #presets button {
+        height: 30px;
+        padding: 0;
+        border-radius: 4px;
+        /* Drawn from the ink rather than from the card's own hairline: on a light card the
+           white swatch was #dcdce4 around #ffffff, which reads as a hole in the row and not
+           as the colour it offers. */
+        border: 1px solid color-mix(in srgb, var(--card-ink) 22%, transparent);
+        background: var(--swatch);
+        cursor: pointer;
+    }
+    #presets button[aria-pressed="true"] { outline: 2px solid var(--card-ink); outline-offset: 1px; }
+
+    /* ---- the animation list ---- */
+    #animations {
+        display: grid;
+        gap: 2px;
+        max-height: 260px;
+        overflow-y: auto;
+        /* Framed, because a list that is cut off in the middle of a card reads as a card that
+           ends there: the frame is what says the rest is below. */
+        border: 1px solid var(--card-line);
+        border-radius: 4px;
+        padding: 4px;
+    }
+    .animation {
+        display: grid;
+        grid-template-columns: 22px minmax(0, 1fr);
+        gap: var(--gap);
+        align-items: center;
+        padding: 5px 4px;
+        border-radius: 4px;
+        font-size: var(--step-0);
+    }
+    .animation:hover { background: var(--card-2); }
+    .animation[aria-current="true"] { background: color-mix(in srgb, var(--card-amber) 12%, var(--card)); }
+
+    /* ---- status ---- */
+    #stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: var(--gap); margin: 0; }
+    .stat {
+        background: var(--card-2);
+        border: 1px solid var(--card-line);
+        border-radius: 4px;
+        padding: 8px 9px;
+        display: grid;
+        gap: 2px;
+    }
+    .stat dt {
+        font: 500 11px/1 var(--mono);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--card-dim);
+    }
+    .stat dd { margin: 0; font: 500 var(--step-2)/1.1 var(--mono); font-variant-numeric: tabular-nums; }
+    .pill {
+        display: inline-flex;
+        align-items: center;
+        font: 500 11px/1 var(--mono);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        padding: 4px 7px;
+        border-radius: 999px;
+        border: 1px solid currentColor;
+        justify-self: end;
+    }
+    .pill.ok { color: var(--ok); }
+    .pill.off { color: var(--card-dim); }
+
+    .note { font-size: var(--step-0); color: var(--card-dim); min-height: 1.2em; }
+    .note.done { color: var(--card-amber); }
+    .note.failed { color: var(--card-ink); }
+
+    [hidden] { display: none !important; }
+
+    @media (prefers-reduced-motion: reduce) {
+        * { transition: none !important; }
+    }
+</style>
+
+<header>
+    <div class="bar">
+        <h1>Wordclock</h1>
+        <span id="state">connecting…</span>
+        <!-- Everything this page does not cover, which is most of the command set. -->
+        <span class="tools">
+            <a href="console" id="console-link">Console</a>
+            <button type="button" id="theme" title="Follow the system, or choose light or dark"></button>
+        </span>
+    </div>
+</header>
+
+<div class="wrap">
+    <div id="stage">
+        <div id="plate-wrap">
+            <div id="plate" hidden>
+                <div id="grid" aria-hidden="true"></div>
+            </div>
+            <div id="plate-foot">
+                <span id="plate-words">—</span>
+                <span id="plate-time"></span>
+            </div>
+        </div>
+
+        <div>
+            <div id="rail" role="tablist" aria-label="What to set"></div>
+
+            <!-- ---------------- colour ---------------- -->
+            <div class="pane" data-pane="colour">
+                <section class="card" data-card="colour" hidden>
+                    <h2>Colour</h2>
+                    <div class="row">
+                        <div id="presets" role="group" aria-label="colour presets"></div>
+                        <input type="color" id="wheel" aria-label="colour picker">
+                        <input type="text" id="hex" aria-label="colour as hex" spellcheck="false"
+                               autocomplete="off" maxlength="7" placeholder="#RRGGBB">
+                    </div>
+                </section>
+
+                <section class="card" data-card="cycle" hidden>
+                    <h2>Colour cycle</h2>
+                    <div class="row tight">
+                        <label for="cycle-active">Walk the wheel while the words stand still</label>
+                        <input type="checkbox" id="cycle-active">
+                    </div>
+                    <div class="row">
+                        <label for="cycle-speed">Speed</label>
+                        <output class="value" id="cycle-speed-value"></output>
+                        <input type="range" id="cycle-speed" min="0" max="255" step="1">
+                    </div>
+                </section>
+            </div>
+
+            <!-- ---------------- display ---------------- -->
+            <div class="pane" data-pane="display" hidden>
+                <section class="card" data-card="brightness" hidden>
+                    <h2>Brightness</h2>
+                    <div class="row">
+                        <label for="brightness">Level</label>
+                        <output class="value" id="brightness-value"></output>
+                        <input type="range" id="brightness" min="0" max="255" step="1">
+                    </div>
+                    <div class="row tight">
+                        <label for="automatic">Follow the room's light</label>
+                        <input type="checkbox" id="automatic">
+                    </div>
+                    <div class="row tight">
+                        <label for="gamma">Gamma correction</label>
+                        <input type="checkbox" id="gamma">
+                    </div>
+                    <p id="brightness-note"></p>
+                </section>
+
+                <section class="card" data-card="clock" hidden>
+                    <h2>Words</h2>
+                    <div class="row">
+                        <label for="wording">Regional wording</label>
+                        <select id="wording"></select>
+                    </div>
+                    <div class="row tight">
+                        <label for="it-is">Show “ES IST” permanently</label>
+                        <input type="checkbox" id="it-is">
+                    </div>
+                </section>
+            </div>
+
+            <!-- ---------------- animation ---------------- -->
+            <div class="pane" data-pane="animation" hidden>
+                <section class="card" data-card="animation" hidden>
+                    <h2>How the words change</h2>
+                    <div class="row">
+                        <label for="animation-mode">Picking</label>
+                        <select id="animation-mode"></select>
+                    </div>
+                    <p id="picking-note"></p>
+                    <div id="animations" role="radiogroup" aria-label="animation"></div>
+                    <div class="row">
+                        <label for="animation-speed" id="speed-label">Speed</label>
+                        <output class="value" id="animation-speed-value"></output>
+                        <input type="range" id="animation-speed" min="1" max="255" step="1">
+                    </div>
+                    <div class="row tight">
+                        <label for="favourite" id="favourite-label">Favourite</label>
+                        <input type="checkbox" id="favourite">
+                    </div>
+                    <!-- Command 9 answers the speed and the favourite of the *selected*
+                         animation only, so those two rows belong to whatever is picked above
+                         rather than to a column of sixteen. A list of sixteen sliders would be
+                         fifteen guesses. -->
+                    <p>Speed and favourite belong to the animation selected above — the clock
+                        answers with those two for the selected one.</p>
+                </section>
+            </div>
+
+            <!-- ---------------- overlays ---------------- -->
+            <div class="pane" data-pane="overlays" hidden>
+                <section class="card" data-card="date" hidden>
+                    <h2>Date</h2>
+                    <div class="row tight">
+                        <label for="date-active">Show it now and then</label>
+                        <input type="checkbox" id="date-active">
+                    </div>
+                    <div class="row">
+                        <label for="date-period">Every … minutes</label>
+                        <input type="number" id="date-period" min="1" max="255">
+                    </div>
+                    <div class="row">
+                        <label for="date-endurance">For … seconds</label>
+                        <input type="number" id="date-endurance" min="1" max="255">
+                    </div>
+                </section>
+
+                <section class="card" data-card="temperature" hidden>
+                    <h2>Temperature</h2>
+                    <div class="row tight">
+                        <label for="temperature-active">Show it now and then</label>
+                        <input type="checkbox" id="temperature-active">
+                    </div>
+                    <div class="row">
+                        <label for="temperature-period">Every … minutes</label>
+                        <input type="number" id="temperature-period" min="1" max="255">
+                    </div>
+                    <div class="row">
+                        <label for="temperature-endurance">For … seconds</label>
+                        <input type="number" id="temperature-endurance" min="1" max="255">
+                    </div>
+                    <p id="temperature-note"></p>
+                </section>
+
+                <section class="card" data-card="text" hidden>
+                    <h2>Text</h2>
+                    <div class="row">
+                        <label for="text-text">What it says</label>
+                        <input type="text" id="text-text" maxlength="32">
+                    </div>
+                    <div class="row">
+                        <label for="text-font">Font</label>
+                        <select id="text-font"></select>
+                    </div>
+                    <div class="row tight">
+                        <label for="text-active">Scroll it now and then</label>
+                        <input type="checkbox" id="text-active">
+                    </div>
+                    <div class="row">
+                        <label for="text-period">Every … minutes</label>
+                        <input type="number" id="text-period" min="1" max="255">
+                    </div>
+                    <div class="row">
+                        <label for="text-endurance">For … seconds</label>
+                        <input type="number" id="text-endurance" min="1" max="255">
+                    </div>
+                </section>
+            </div>
+
+            <!-- ---------------- night ---------------- -->
+            <div class="pane" data-pane="night" hidden>
+                <section class="card" data-card="night" hidden>
+                    <h2>Night</h2>
+                    <div class="row tight">
+                        <label for="night-active">Dim it at night</label>
+                        <input type="checkbox" id="night-active">
+                    </div>
+                    <div class="row">
+                        <label for="night-from">From</label>
+                        <input type="time" id="night-from">
+                    </div>
+                    <div class="row">
+                        <label for="night-to">Until</label>
+                        <input type="time" id="night-to">
+                    </div>
+                    <div class="row">
+                        <label for="night-level">Brightness then</label>
+                        <output class="value" id="night-level-value"></output>
+                        <input type="range" id="night-level" min="0" max="255" step="1">
+                    </div>
+                    <p id="night-note"></p>
+                </section>
+            </div>
+
+            <!-- ---------------- system ---------------- -->
+            <div class="pane" data-pane="system" hidden>
+                <section class="card" data-card="status" hidden>
+                    <h2>Status</h2>
+                    <dl id="stats"></dl>
+                </section>
+
+                <section class="card" data-card="network" hidden>
+                    <h2>Network</h2>
+                    <div class="row">
+                        <label for="ssid">Network</label>
+                        <input type="text" id="ssid" autocomplete="off">
+                    </div>
+                    <div class="row">
+                        <label for="passphrase">Pass phrase</label>
+                        <input type="password" id="passphrase" autocomplete="new-password"
+                               placeholder="unchanged">
+                    </div>
+                    <!-- Stored on a button and not on every keystroke: this one joins a network,
+                         and half a network name is a clock that has left the one it was on. -->
+                    <div class="stack">
+                        <button class="act primary" type="button" id="join">Store and join</button>
+                    </div>
+                    <p id="network-note"></p>
+                </section>
+
+                <section class="card" data-card="access" hidden>
+                    <h2>Console access</h2>
+                    <div class="row tight">
+                        <label>Password</label>
+                        <span class="pill off" id="protected">not set</span>
+                    </div>
+                    <div class="row">
+                        <label for="password">New password</label>
+                        <input type="password" id="password" autocomplete="new-password"
+                               placeholder="empty clears it">
+                    </div>
+                    <div class="stack">
+                        <button class="act primary" type="button" id="store-password">Store</button>
+                    </div>
+                    <p id="access-note">Basic authentication over plain http is not encryption: it
+                        keeps out a guest who opens the page, not anybody who can watch the traffic.
+                        A forgotten one is cleared from the serial line.</p>
+                </section>
+
+                <section class="card" data-card="update">
+                    <h2>Update the firmware</h2>
+                    <p>Takes the <code>.ota.bin</code> from a release. The clock keeps running on what
+                        it has until the image has arrived whole; only then does it restart into it.</p>
+                    <div class="stack">
+                        <input type="file" id="image" aria-label="firmware image"
+                               accept=".bin,application/octet-stream">
+                        <button class="act primary" type="button" id="install">Install</button>
+                    </div>
+                    <p class="note" id="update-note"></p>
+                </section>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    "use strict";
+
+    /* ---- reaching the clock ---------------------------------------------------------
+       The same two fallbacks the console has, and the same stored key, so a page opened
+       from disk is set up once for both. */
+    function endpoint(path) {
+        if (location.protocol === "file:") {
+            const host = localStorage.getItem("wordclock-host");
+            return host ? "http://" + host + "/" + path : path;
+        }
+        return path;
+    }
+
+    function socketUrl() {
+        if (location.protocol === "file:") {
+            const host = localStorage.getItem("wordclock-host")
+                      || prompt("Address of the clock", "wordclock.local");
+            if (!host) { return null; }
+            localStorage.setItem("wordclock-host", host);
+            return "ws://" + host + "/ws";
+        }
+        return (location.protocol === "https:" ? "wss://" : "ws://") + location.host + "/ws";
+    }
+
+    const RETRY_MS = 2000;
+    const state = document.getElementById("state");
+    let socket = null;
+    let attempts = 0;
+
+    /* ---- what the page knows about the clock ----------------------------------------
+       Commands are found by their catalog *label* and not by their number, because the
+       numbers are not fixed: the enum they come from is conditional, so a build without the
+       date overlay gives every command after it a different number. A label that changes
+       hides a card, which is loud; a number that shifts would wire a control to the wrong
+       command, which is not. */
+    const CARD_COMMANDS = {
+        colour: "Display colour",
+        brightness: "Display brightness",
+        clock: "Clock mode",
+        animation: "Animation",
+        date: "Overlay date",
+        temperature: "Overlay temperature",
+        text: "Overlay text",
+        night: "Night switch",
+        cycle: "Colour cycle",
+        status: "Status",
+        network: "Network",
+        access: "Console access",
+        time: "Time"
+    };
+
+    let catalog = [];
+    /* Per command number: the fields bound to it, keyed by option short name. What fills
+       them is an answer, what they build is the next line sent. */
+    const bound = new Map();
+    /* The command numbers this page asked for and has not seen an answer to. */
+    const pending = new Set();
+
+    function commandFor(card) {
+        const label = CARD_COMMANDS[card];
+        return catalog.find((entry) => entry.label === label) || null;
+    }
+
+    function optionOf(command, short) {
+        return command ? command.options.find((option) => option.short === short) || null : null;
+    }
+
+    function send(text) {
+        if (!socket || socket.readyState !== WebSocket.OPEN) { return false; }
+        socket.send(text);
+        return true;
+    }
+
+    /* "-B255" going out, "B=255" coming back. A field with nothing behind it - T= with no
+       chip - is empty rather than absent, which is a value and not a gap. */
+    function readValues(line) {
+        const values = new Map();
+        for (const [, short, value] of line.matchAll(/(?:^|\s)([A-Z])=(\S*)/g)) {
+            values.set(short, value);
+        }
+        return values;
+    }
+
+    /* Only what changed, and this is not tidiness: MsgCmdAnimationParser preloads itself with
+       the clock's current settings so that "a command may set single options without resetting
+       the others", and its -F and -S address whichever animation -A selects. A line carrying
+       every field would therefore hand the animation being selected the *previous* one's speed
+       and favourite - which is what an early version of this page did, and how it silently
+       took Matrix out of the favourites.
+
+       So a control sends its own option, and the ones that are one value to a reader send
+       theirs together: a colour is three numbers, a time is two. */
+    function sendFields(number, shorts) {
+        const fields = bound.get(number);
+        if (!fields) { return; }
+
+        let text = String(number);
+        for (const short of shorts) {
+            const field = fields.get(short);
+            if (!field) { continue; }
+            const value = field.read();
+            if (value === null) { continue; }
+            text += " -" + short + value;
+        }
+        if (send(text)) { ask(number); }
+    }
+
+    function ask(number) {
+        pending.add(number);
+        if (!send(String(number))) { pending.delete(number); }
+    }
+
+    /* A control and the option it stands for. `read` is what goes out, `fill` is what an
+       answer puts in; both are per kind, so the rest of the page says what a control means
+       rather than how it is serialised. */
+    function bind(number, short, element, kind, options) {
+        if (!bound.has(number)) { bound.set(number, new Map()); }
+
+        const settings = options || {};
+        const field = {
+            element,
+            read() {
+                if (kind === "flag") { return element.checked ? "1" : "0"; }
+                if (kind === "text") { return element.value; }
+                if (kind === "readonly") { return null; }
+                return element.value === "" ? null : element.value;
+            },
+            fill(value) {
+                if (kind === "flag") { element.checked = value !== "0"; }
+                else if (kind === "readonly") { settings.show(value); }
+                else if (kind === "text") { if (document.activeElement !== element) { element.value = value; } }
+                else { element.value = value; }
+                if (settings.after) { settings.after(value); }
+            }
+        };
+
+        bound.get(number).set(short, field);
+        if (kind !== "readonly" && !settings.silent) {
+            /* change and not input: a slider dragged across its range would be a command per
+               step, and the socket carries them into a parser on an 8-bit part. Dragging moves
+               the page, letting go moves the clock. */
+            element.addEventListener("change", () => sendFields(number, settings.with || [short]));
+        }
+        return field;
+    }
+
+    function fill(number, line) {
+        const fields = bound.get(number);
+        if (!fields) { return; }
+
+        const values = readValues(line);
+        for (const [short, field] of fields) {
+            const value = values.get(short);
+            if (value !== undefined) { field.fill(value); }
+        }
+    }
+
+    /* ---- the plate ------------------------------------------------------------------ */
+    const plate = document.getElementById("plate");
+    const grid = document.getElementById("grid");
+    const plateWords = document.getElementById("plate-words");
+    const plateTime = document.getElementById("plate-time");
+    let cells = [];
+
+    let columns = 0;
+    /* The last frame the socket delivered, kept for one reason: the letters arrive over HTTP
+       and the frames over the socket, so whichever is second has to be the one that paints.
+       A frame that arrived first used to be dropped, and the next one comes with the next word
+       change - which on a word clock is up to five minutes of an empty plate. */
+    let lastFrame = null;
+
+    function buildPlate(shape) {
+        columns = shape.columns;
+        grid.style.gridTemplateColumns = `repeat(${shape.columns}, minmax(0, 1fr))`;
+        grid.textContent = "";
+        cells = [...shape.letters].map((letter) => {
+            const cell = document.createElement("span");
+            cell.textContent = letter;
+            grid.appendChild(cell);
+            return cell;
+        });
+        plate.hidden = cells.length === 0;
+        if (lastFrame) { showFrame(lastFrame); }
+    }
+
+    /* Green, red, blue - the strip's own order, which is what the buffer holds. Only whether
+       a pixel is lit is taken from it; the colour comes from the setting, see the stylesheet. */
+    function showFrame(bytes) {
+        lastFrame = bytes;
+        if (cells.length === 0) { return; }
+
+        const words = [];
+        let word = "";
+
+        for (let index = 0; index < cells.length; index++) {
+            const at = index * 3;
+            const isLit = Boolean(bytes[at] || bytes[at + 1] || bytes[at + 2]);
+
+            cells[index].classList.toggle("lit", isLit);
+            /* A run of lit letters is a word, and a row's end ends one: the words themselves
+               live in the firmware's table and are not served, so this is as close to the
+               sentence on the wall as the page can get - and it is close enough to read. */
+            if (isLit) { word += cells[index].textContent; }
+            if (!isLit || ((index + 1) % columns === 0)) {
+                if (word !== "") { words.push(word); }
+                word = "";
+            }
+        }
+        if (word !== "") { words.push(word); }
+        plateWords.textContent = words.length > 0 ? words.join(" ") : "dark";
+    }
+
+    /* ---- colour --------------------------------------------------------------------- */
+    /* Neutral first, then warmth, then once around the wheel: the row reads as "how much
+       colour do you want", and the three a wall clock is most often set to are the three the
+       thumb reaches first. Fixed eight rather than remembered ones - this page is opened from
+       whichever phone is to hand, and a remembered list is empty on the one you are holding. */
+    const PRESETS = [
+        ["white", [255, 255, 255]],
+        ["warm white", [255, 170, 90]],
+        ["amber", [255, 176, 32]],
+        ["red", [255, 0, 0]],
+        ["green", [0, 255, 0]],
+        ["cyan", [0, 200, 255]],
+        ["blue", [0, 64, 255]],
+        ["magenta", [255, 0, 160]]
+    ];
+
+    const presetsBox = document.getElementById("presets");
+    const wheel = document.getElementById("wheel");
+    const hexField = document.getElementById("hex");
+
+    function toHex(rgb) {
+        return "#" + rgb.map((value) => value.toString(16).padStart(2, "0")).join("");
+    }
+
+    /* Undefined for anything that is not six hex digits, so a half-typed colour is left alone
+       rather than sent as whatever it parses to. */
+    function fromHex(text) {
+        const match = /^#?([0-9a-f]{6})$/i.exec(text.trim());
+        if (!match) { return undefined; }
+        const value = Number.parseInt(match[1], 16);
+        return [(value >> 16) & 0xff, (value >> 8) & 0xff, value & 0xff];
+    }
+
+    function setupColour() {
+        const command = commandFor("colour");
+        if (!command) { return; }
+
+        document.querySelector('[data-card="colour"]').hidden = false;
+
+        const shorts = ["R", "G", "B"];
+        const fields = shorts.map((short) => bind(command.number, short,
+            document.createElement("input"), "number", { silent: true }));
+
+        function current() {
+            const rgb = fields.map((field) => Number.parseInt(field.element.value, 10));
+            return rgb.some(Number.isNaN) ? undefined : rgb;
+        }
+
+        function show(rgb) {
+            if (!rgb) { return; }
+            wheel.value = toHex(rgb);
+            hexField.value = toHex(rgb).toUpperCase();
+            document.documentElement.style.setProperty("--lit-colour", toHex(rgb));
+            for (const button of presetsBox.children) {
+                button.setAttribute("aria-pressed", String(button.dataset.value === toHex(rgb)));
+            }
+        }
+
+        function apply(rgb) {
+            fields.forEach((field, index) => { field.element.value = String(rgb[index]); });
+            show(rgb);
+            sendFields(command.number, ["R", "G", "B"]);
+        }
+
+        fields.forEach((field) => { field.after = () => show(current()); });
+        /* The three hidden number fields are what the answer fills, and this is what turns
+           that into the picker's state - one place, so a colour set from the console or over
+           the serial line moves this page too. */
+        bound.get(command.number).forEach((field) => {
+            const inner = field.fill;
+            field.fill = (value) => { inner(value); show(current()); };
+        });
+
+        PRESETS.forEach(([name, rgb]) => {
+            const button = document.createElement("button");
+            button.type = "button";
+            button.title = name;
+            button.setAttribute("aria-label", name);
+            button.dataset.value = toHex(rgb);
+            button.style.setProperty("--swatch", toHex(rgb));
+            button.addEventListener("click", () => apply(rgb));
+            presetsBox.appendChild(button);
+        });
+
+        wheel.addEventListener("input", () => { hexField.value = wheel.value.toUpperCase(); });
+        wheel.addEventListener("change", () => {
+            const rgb = fromHex(wheel.value);
+            if (rgb) { apply(rgb); }
+        });
+        hexField.addEventListener("change", () => {
+            const rgb = fromHex(hexField.value);
+            if (rgb) { apply(rgb); } else { show(current()); }
+        });
+    }
+
+    /* ---- brightness ----------------------------------------------------------------- */
+    function setupBrightness() {
+        const command = commandFor("brightness");
+        if (!command) { return; }
+
+        document.querySelector('[data-card="brightness"]').hidden = false;
+        const level = document.getElementById("brightness");
+        const value = document.getElementById("brightness-value");
+        const automatic = document.getElementById("automatic");
+        const note = document.getElementById("brightness-note");
+
+        bind(command.number, "B", level, "number", {
+            after: (shown) => {
+                value.value = shown;
+                document.documentElement.style.setProperty("--lit-level", (Number(shown) / 255).toFixed(3));
+            }
+        });
+        bind(command.number, "A", automatic, "flag", {
+            after: () => {
+                note.textContent = automatic.checked
+                    ? "The level above is the ceiling the sensor works up to."
+                    : "";
+            }
+        });
+        bind(command.number, "G", document.getElementById("gamma"), "flag");
+
+        level.addEventListener("input", () => {
+            value.value = level.value;
+            document.documentElement.style.setProperty("--lit-level", (Number(level.value) / 255).toFixed(3));
+        });
+    }
+
+    /* ---- named values, which the catalog carries ------------------------------------ */
+    function fillSelect(select, option) {
+        select.textContent = "";
+        option.values.forEach((name, index) => {
+            const item = document.createElement("option");
+            item.value = String(option.min + index);
+            item.textContent = name;
+            select.appendChild(item);
+        });
+    }
+
+    function setupClock() {
+        const command = commandFor("clock");
+        if (!command) { return; }
+
+        document.querySelector('[data-card="clock"]').hidden = false;
+        const wording = document.getElementById("wording");
+        const mode = optionOf(command, "M");
+
+        if (mode && mode.values) { fillSelect(wording, mode); }
+        bind(command.number, "M", wording, "number");
+        bind(command.number, "I", document.getElementById("it-is"), "flag");
+    }
+
+    /* ---- animations ---------------------------------------------------------------- */
+    function setupAnimations() {
+        const command = commandFor("animation");
+        if (!command) { return; }
+
+        document.querySelector('[data-card="animation"]').hidden = false;
+        const list = document.getElementById("animations");
+        const modeSelect = document.getElementById("animation-mode");
+        const speed = document.getElementById("animation-speed");
+        const speedValue = document.getElementById("animation-speed-value");
+        const speedLabel = document.getElementById("speed-label");
+        const favourite = document.getElementById("favourite");
+        const favouriteLabel = document.getElementById("favourite-label");
+        const note = document.getElementById("picking-note");
+
+        const animation = optionOf(command, "A");
+        const mode = optionOf(command, "M");
+        if (mode && mode.values) { fillSelect(modeSelect, mode); }
+
+        const radios = new Map();
+        if (animation && animation.values) {
+            animation.values.forEach((name, index) => {
+                const row = document.createElement("div");
+                row.className = "animation";
+                const radio = document.createElement("input");
+                radio.type = "radio";
+                radio.name = "animation";
+                radio.value = String(animation.min + index);
+                radio.setAttribute("aria-label", name);
+                const label = document.createElement("span");
+                label.textContent = name;
+
+                radio.addEventListener("change", () => {
+                    if (!radio.checked) { return; }
+                    /* Selecting one is the same command as setting its speed, so the two rows
+                       below have to stop showing the previous animation's answer before this
+                       one arrives - hence the labels move first and the values follow. */
+                    showSelected(radio.value);
+                    sendFields(command.number, ["A"]);
+                });
+                row.append(radio, label);
+                list.appendChild(row);
+                radios.set(radio.value, { row, radio, name });
+            });
+        }
+
+        function showSelected(value) {
+            for (const [id, entry] of radios) {
+                const chosen = id === value;
+                entry.radio.checked = chosen;
+                entry.row.setAttribute("aria-current", String(chosen));
+                if (chosen) {
+                    /* Sixteen animations do not fit the card, so the list scrolls - and a
+                       selection the clock reports has to be brought into view or the card looks
+                       as though nothing were selected at all. */
+                    entry.row.scrollIntoView({ block: "nearest" });
+                    speedLabel.textContent = "Speed of " + entry.name;
+                    favouriteLabel.textContent = entry.name + " is a favourite";
+                    /* "None" is no animation, so it has neither a speed nor a place in the
+                       round the picking modes walk. */
+                    const none = Number(id) === (animation ? animation.min : 0);
+                    speed.disabled = none;
+                    favourite.disabled = none;
+                }
+            }
+        }
+
+        bind(command.number, "A", { value: "", checked: false }, "number", { silent: true });
+        /* The selection is not a field of its own: it is whichever radio is checked, so the
+           bound field reads that and an answer moves it. */
+        const selection = bound.get(command.number).get("A");
+        selection.read = () => {
+            for (const [id, entry] of radios) { if (entry.radio.checked) { return id; } }
+            return null;
+        };
+        selection.fill = (value) => showSelected(value);
+
+        bind(command.number, "M", modeSelect, "number", {
+            after: () => {
+                const fixed = modeSelect.selectedOptions.length > 0
+                           && modeSelect.selectedOptions[0].textContent === "Fixed";
+                note.textContent = fixed
+                    ? "Fixed shows the animation selected below, so the favourites decide nothing."
+                    : modeSelect.selectedOptions[0].textContent
+                      + " picks among the favourites at every word change. The selection below is"
+                      + " what Fixed would return to.";
+            }
+        });
+        bind(command.number, "S", speed, "number", { after: (shown) => { speedValue.value = shown; } });
+        bind(command.number, "F", favourite, "flag");
+
+        speed.addEventListener("input", () => { speedValue.value = speed.value; });
+    }
+
+    /* ---- the three overlays, which share one option set ----------------------------- */
+    function setupOverlay(card, ids) {
+        const command = commandFor(card);
+        if (!command) { return; }
+
+        document.querySelector(`[data-card="${card}"]`).hidden = false;
+        bind(command.number, "A", document.getElementById(ids.active), "flag");
+        bind(command.number, "P", document.getElementById(ids.period), "number");
+        bind(command.number, "E", document.getElementById(ids.endurance), "number");
+        if (ids.text) {
+            bind(command.number, "T", document.getElementById(ids.text), "text");
+            const font = optionOf(command, "F");
+            const select = document.getElementById(ids.font);
+            if (font && font.values) { fillSelect(select, font); }
+            bind(command.number, "F", select, "number");
+        }
+    }
+
+    /* ---- night --------------------------------------------------------------------- */
+    function setupNight() {
+        const command = commandFor("night");
+        if (!command) { return; }
+
+        document.querySelector('[data-card="night"]').hidden = false;
+        const from = document.getElementById("night-from");
+        const to = document.getElementById("night-to");
+        const level = document.getElementById("night-level");
+        const value = document.getElementById("night-level-value");
+        const note = document.getElementById("night-note");
+
+        /* Two fields for four options: a window is two times to a reader and four numbers to
+           the protocol, and the page is the side that should carry that difference. */
+        function bindTime(element, hourShort, minuteShort) {
+            const hour = { value: "" };
+            const minute = { value: "" };
+
+            const hourField = bind(command.number, hourShort, hour, "number", { silent: true });
+            const minuteField = bind(command.number, minuteShort, minute, "number", { silent: true });
+
+            hourField.read = () => (element.value === "" ? null : String(Number(element.value.slice(0, 2))));
+            minuteField.read = () => (element.value === "" ? null : String(Number(element.value.slice(3, 5))));
+            hourField.fill = (shown) => { hour.value = shown; showTime(); };
+            minuteField.fill = (shown) => { minute.value = shown; showTime(); };
+
+            function showTime() {
+                if (hour.value === "" || minute.value === "") { return; }
+                element.value = String(hour.value).padStart(2, "0") + ":" + String(minute.value).padStart(2, "0");
+            }
+            element.addEventListener("change", () => sendFields(command.number, [hourShort, minuteShort]));
+        }
+
+        bind(command.number, "A", document.getElementById("night-active"), "flag");
+        bindTime(from, "H", "M");
+        bindTime(to, "E", "N");
+        bind(command.number, "B", level, "number", {
+            after: (shown) => {
+                value.value = shown;
+                note.textContent = Number(shown) === 0
+                    ? "At zero the strip's supply is switched off where a switch is fitted, not just darkened."
+                    : "";
+            }
+        });
+        level.addEventListener("input", () => { value.value = level.value; });
+    }
+
+    /* ---- colour cycle -------------------------------------------------------------- */
+    function setupCycle() {
+        const command = commandFor("cycle");
+        if (!command) { return; }
+
+        document.querySelector('[data-card="cycle"]').hidden = false;
+        const speed = document.getElementById("cycle-speed");
+        const value = document.getElementById("cycle-speed-value");
+
+        bind(command.number, "A", document.getElementById("cycle-active"), "flag");
+        bind(command.number, "S", speed, "number", { after: (shown) => { value.value = shown; } });
+        speed.addEventListener("input", () => { value.value = speed.value; });
+    }
+
+    /* ---- status, which is read and never set --------------------------------------- */
+    const STATUS_FIELDS = [
+        ["V", "Firmware"],
+        ["U", "Days up"],
+        ["I", "Light", "lx"],
+        ["T", "Chip"],
+        ["Q", "Link", "dBm"],
+        ["M", "Memory", "KiB"]
+    ];
+
+    function setupStatus() {
+        const command = commandFor("status");
+        if (!command) { return; }
+
+        document.querySelector('[data-card="status"]').hidden = false;
+        const stats = document.getElementById("stats");
+
+        STATUS_FIELDS.forEach(([short, label, unit]) => {
+            const wrap = document.createElement("div");
+            wrap.className = "stat";
+            const name = document.createElement("dt");
+            name.textContent = label;
+            const shown = document.createElement("dd");
+            shown.textContent = "—";
+            wrap.append(name, shown);
+            stats.appendChild(wrap);
+
+            /* An empty field means there is nothing behind it, which is not a zero: a build
+               without the temperature chip answers T= for good, and a clock on the serial line
+               alone answers A= and Q=. */
+            bind(command.number, short, shown, "readonly", {
+                show: (value) => {
+                    shown.textContent = value === "" ? "—" : (unit ? value + " " + unit : value);
+                }
+            });
+        });
+    }
+
+    function setupTime() {
+        const command = commandFor("time");
+        if (!command) { return; }
+
+        const hour = { value: "" };
+        const minute = { value: "" };
+
+        function show() {
+            if (hour.value === "" || minute.value === "") { return; }
+            plateTime.textContent = String(hour.value).padStart(2, "0") + ":"
+                                  + String(minute.value).padStart(2, "0");
+        }
+        bind(command.number, "H", hour, "readonly", { show: (value) => { hour.value = value; show(); } });
+        bind(command.number, "M", minute, "readonly", { show: (value) => { minute.value = value; show(); } });
+    }
+
+    /* ---- network and the console's password ---------------------------------------- */
+    function setupNetwork() {
+        const command = commandFor("network");
+        if (!command) { return; }
+
+        document.querySelector('[data-card="network"]').hidden = false;
+        const ssid = document.getElementById("ssid");
+        const passphrase = document.getElementById("passphrase");
+        const note = document.getElementById("network-note");
+
+        bind(command.number, "S", ssid, "text", { silent: true });
+        bind(command.number, "P", passphrase, "text", { silent: true });
+        /* Never filled from an answer: the clock does not send a pass phrase back, and a field
+           that looked filled would invite somebody to press Store with the placeholder in it. */
+        bound.get(command.number).get("P").fill = () => { /* nothing comes back */ };
+
+        document.getElementById("join").addEventListener("click", () => {
+            sendFields(command.number, ["S", "P"]);
+            note.textContent = "Joining " + (ssid.value || "the network") + "…";
+            passphrase.value = "";
+        });
+    }
+
+    function setupAccess() {
+        const command = commandFor("access");
+        if (!command) { return; }
+
+        document.querySelector('[data-card="access"]').hidden = false;
+        const password = document.getElementById("password");
+        const shown = document.getElementById("protected");
+
+        bind(command.number, "A", shown, "readonly", {
+            show: (value) => {
+                const on = value !== "0" && value !== "";
+                shown.textContent = on ? "set" : "not set";
+                shown.className = "pill " + (on ? "ok" : "off");
+            }
+        });
+        bind(command.number, "P", password, "text", { silent: true });
+        bound.get(command.number).get("P").fill = () => { /* never comes back */ };
+
+        document.getElementById("store-password").addEventListener("click", () => {
+            /* An empty field clears it, which is the way back into a clock nobody can log into
+               any more - so an empty value has to go out where every other one is skipped. */
+            if (send(String(command.number) + " -P" + password.value)) { ask(command.number); }
+            password.value = "";
+        });
+    }
+
+    /* ---- the task rail, built from the cards that survived -------------------------- */
+    function setupRail() {
+        const rail = document.getElementById("rail");
+        const panes = [...document.querySelectorAll(".pane")];
+
+        panes.forEach((pane, index) => {
+            const cards = [...pane.querySelectorAll(".card")];
+            /* A pane whose every card is hidden has nothing to show, and a tab that leads to
+               an empty page is worse than one that is not there. */
+            if (cards.every((card) => card.hidden)) {
+                pane.remove();
+                return;
+            }
+            const button = document.createElement("button");
+            button.type = "button";
+            button.setAttribute("role", "tab");
+            button.setAttribute("aria-selected", String(index === 0));
+            button.textContent = pane.dataset.pane;
+            button.addEventListener("click", () => {
+                for (const other of rail.children) {
+                    other.setAttribute("aria-selected", String(other === button));
+                }
+                for (const other of document.querySelectorAll(".pane")) {
+                    other.hidden = other !== pane;
+                }
+                /* A list inside a hidden pane has no height, so scrolling its selection into
+                   view does nothing while it is folded away - the pane becoming visible is the
+                   moment that has to be done again. */
+                for (const current of pane.querySelectorAll('[aria-current="true"]')) {
+                    current.scrollIntoView({ block: "nearest" });
+                }
+            });
+            rail.appendChild(button);
+            pane.hidden = rail.children.length > 1;
+        });
+    }
+
+    /* ---- the update, which is the one thing here that is not a command -------------- */
+    const updateNote = document.getElementById("update-note");
+    const imageInput = document.getElementById("image");
+    const install = document.getElementById("install");
+
+    function say(text, outcome) {
+        updateNote.textContent = text;
+        updateNote.className = "note " + (outcome || "");
+    }
+
+    /* XMLHttpRequest and not fetch, the one place in this page that is not the newer of two
+       APIs: fetch cannot report how far an upload has got, and a megabyte over a house's WiFi
+       is long enough that a page saying nothing looks like a page that has hung. */
+    install.addEventListener("click", () => {
+        const image = imageInput.files[0];
+        if (!image) { say("no file picked"); return; }
+
+        const request = new XMLHttpRequest();
+
+        install.disabled = true;
+        imageInput.disabled = true;
+        say("sending " + Math.round(image.size / 1024) + " kB…");
+
+        request.upload.onprogress = (progress) => {
+            if (!progress.lengthComputable) { return; }
+            say("sending… " + Math.round((progress.loaded / progress.total) * 100) + "%");
+        };
+        request.onload = () => {
+            if (request.status === 200) {
+                say("installed — the clock is restarting into it", "done");
+                return;
+            }
+            let reason = "HTTP " + request.status;
+            try {
+                const answer = JSON.parse(request.responseText);
+                if (answer.error) { reason = answer.error; }
+            } catch (ignored) {
+                reason = "the answer was not from the clock (HTTP " + request.status + ")";
+            }
+            say(reason, "failed");
+            install.disabled = false;
+            imageInput.disabled = false;
+        };
+        /* A restart is what success looks like from here, but only after the answer has
+           arrived. One before that is the connection going away mid-upload, and the clock is
+           then still running what it was running - which is the thing worth saying, because
+           the safe outcome and the alarming message would otherwise be the same event. */
+        request.onerror = () => {
+            say("the upload did not finish — the clock is still running the firmware it had", "failed");
+            install.disabled = false;
+            imageInput.disabled = false;
+        };
+        request.open("POST", endpoint("update"));
+        request.setRequestHeader("Content-Type", "application/octet-stream");
+        request.send(image);
+    });
+
+    /* ---- the theme ----------------------------------------------------------------- */
+    const THEMES = ["system", "light", "dark"];
+    const themeButton = document.getElementById("theme");
+
+    function showTheme(name) {
+        if (name === "system") { document.documentElement.removeAttribute("data-theme"); }
+        else { document.documentElement.dataset.theme = name; }
+        themeButton.textContent = name;
+        try { localStorage.setItem("wordclock-theme", name); } catch (ignored) { /* private window */ }
+    }
+
+    themeButton.addEventListener("click", () => {
+        showTheme(THEMES[(THEMES.indexOf(themeButton.textContent) + 1) % THEMES.length]);
+    });
+
+    let stored = null;
+    try { stored = localStorage.getItem("wordclock-theme"); } catch (ignored) { /* private window */ }
+    showTheme(THEMES.includes(stored) ? stored : "system");
+
+    /* ---- and the connection that all of it hangs on -------------------------------- */
+    function askForEverything() {
+        for (const number of bound.keys()) { ask(number); }
+    }
+
+    function connect() {
+        const url = socketUrl();
+        if (!url) { state.textContent = "no address"; return; }
+
+        socket = new WebSocket(url);
+        socket.binaryType = "arraybuffer";
+
+        socket.onopen = () => {
+            attempts = 0;
+            state.textContent = "connected";
+            state.classList.add("up");
+            /* The catalog arrives over HTTP and the socket opens on its own schedule, so
+               whichever is second is the one that asks. This is also what refills the page
+               after a reconnect, when the clock may have been set from elsewhere. */
+            askForEverything();
+        };
+        socket.onmessage = (event) => {
+            if (typeof event.data === "string") {
+                const number = Number.parseInt(event.data, 10);
+                if (!Number.isNaN(number)) {
+                    /* Every answer is read, whether this page asked for it or not: a colour set
+                       in the console or over the serial line is the clock's colour too, and a
+                       page still showing the previous one would be disagreeing with the clock
+                       it is connected to. */
+                    fill(number, event.data);
+                    pending.delete(number);
+                }
+                return;
+            }
+            showFrame(new Uint8Array(event.data));
+        };
+        socket.onclose = () => {
+            attempts++;
+            state.classList.remove("up");
+            state.textContent = "reconnecting… (" + attempts + ")";
+            setTimeout(connect, RETRY_MS);
+        };
+    }
+
+    fetch(endpoint("display"))
+        .then((response) => response.json())
+        .then(buildPlate)
+        .catch(() => { /* No plate then; the cards are the half that sets anything. */ });
+
+    fetch(endpoint("commands"))
+        .then((response) => response.json())
+        .then((loaded) => {
+            catalog = loaded;
+            setupColour();
+            setupCycle();
+            setupBrightness();
+            setupClock();
+            setupAnimations();
+            setupOverlay("date", { active: "date-active", period: "date-period", endurance: "date-endurance" });
+            setupOverlay("temperature", { active: "temperature-active", period: "temperature-period",
+                                          endurance: "temperature-endurance" });
+            setupOverlay("text", { active: "text-active", period: "text-period", endurance: "text-endurance",
+                                   text: "text-text", font: "text-font" });
+            setupNight();
+            setupStatus();
+            setupTime();
+            setupNetwork();
+            setupAccess();
+            setupRail();
+            askForEverything();
+        })
+        .catch(() => {
+            state.textContent = "no catalog";
+        });
+
+    connect();
+</script>

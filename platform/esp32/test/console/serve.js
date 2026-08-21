@@ -7,6 +7,7 @@
  * The web socket is implemented here rather than pulled in, so this needs nothing installed.
  *
  * Usage: node serve.js <page.html> <webhost binary> [port]
+ *        <page.html> is the page at "/"; the console is served beside it at "/console".
  */
 'use strict';
 
@@ -155,18 +156,27 @@ const SIBLINGS = {
     '/icon-512.png': 'image/png',
 };
 
+/* The two pages, at the addresses the clock hands them out at: the panel at "/" and the
+   console behind it. Both come off disk beside each other, so a saved edit to either is a
+   browser reload - and so is following the link between them. */
+const PAGES = {
+    '/': pagePath,
+    '/index.html': pagePath,
+    '/console': path.join(path.dirname(pagePath), 'index.html'),
+};
+
 const server = http.createServer(async (request, response) => {
-    if (request.url === '/' || request.url === '/index.html') {
+    if (PAGES[request.url]) {
         /* Read per request, so a saved edit needs a reload and nothing else. */
         /* Never cached. This server exists to look at a page being changed, and a browser
            deciding on its own how long to keep the last one is the whole cost of that: an
            edit that appears not to have worked is indistinguishable from one that did not.
-           The clock itself serves the page from flash and has no such problem. */
+           The clock itself serves the pages from flash and has no such problem. */
         response.writeHead(200, {
             'Content-Type': 'text/html; charset=utf-8',
             'Cache-Control': 'no-store',
         });
-        response.end(fs.readFileSync(pagePath));
+        response.end(fs.readFileSync(PAGES[request.url]));
         return;
     }
     if (SIBLINGS[request.url]) {

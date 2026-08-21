@@ -254,20 +254,50 @@ void commitImage(size_t Announced)
 
 
 /******************************************************************************************************************************************************
-  handleRoot()
+  sendPage()
 ******************************************************************************************************************************************************/
-/*! \brief          Serves the console page straight out of flash
- *  \details        Sent compressed, which is how it is stored: the page was gzipped at
- *                  build time, so this only pushes the bytes and the browser unpacks them.
+/*! \brief          Serves one of the two pages straight out of flash
+ *  \details        Sent compressed, which is how it is stored: the pages were gzipped at build
+ *                  time, so this only pushes the bytes and the browser unpacks them.
 ******************************************************************************************************************************************************/
-void handleRoot(AsyncWebServerRequest* Request)
+void sendPage(AsyncWebServerRequest* Request, const uint8_t* Page, size_t Size)
 {
     if(!isRequestAuthorised(Request)) { return; }
 
-    AsyncWebServerResponse* Response = Request->beginResponse(200, "text/html", WebPageGzip, WebPageGzipSize);
+    AsyncWebServerResponse* Response = Request->beginResponse(200, "text/html", Page, Size);
 
     Response->addHeader("Content-Encoding", "gzip");
     Request->send(Response);
+}
+
+
+/******************************************************************************************************************************************************
+  handleRoot()
+******************************************************************************************************************************************************/
+/*! \brief          Serves the page a clock hands out at "/"
+ *  \details        The one made for what somebody changes: a colour, a brightness, an
+ *                  animation. Nobody types a path - they type the clock's address and take what
+ *                  comes - so what comes is the page for the frequent things, and the console is
+ *                  one link away at "/console".
+******************************************************************************************************************************************************/
+void handleRoot(AsyncWebServerRequest* Request)
+{
+    sendPage(Request, WebAppGzip, WebAppGzipSize);
+}
+
+
+/******************************************************************************************************************************************************
+  handleConsole()
+******************************************************************************************************************************************************/
+/*! \brief          Serves the console at "/console"
+ *  \details        Everything the page at "/" does not cover, which is most of the command set:
+ *                  it draws a group per command out of the catalog, so a command added to the
+ *                  firmware appears there without a page being touched. That is why it moved
+ *                  rather than being replaced.
+******************************************************************************************************************************************************/
+void handleConsole(AsyncWebServerRequest* Request)
+{
+    sendPage(Request, WebPageGzip, WebPageGzipSize);
 }
 
 
@@ -640,6 +670,7 @@ StdReturnType WebInterface::begin()
     HttpServer.addHandler(&Socket);
 
     HttpServer.on("/", HTTP_GET, handleRoot);
+    HttpServer.on("/console", HTTP_GET, handleConsole);
     HttpServer.on("/commands", HTTP_GET, handleCommands);
     HttpServer.on("/display", HTTP_GET, handleDisplay);
     HttpServer.on("/manifest.webmanifest", HTTP_GET, handleManifest);

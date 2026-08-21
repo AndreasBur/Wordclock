@@ -207,11 +207,28 @@ to a sink. Two consequences: the framework's own headers must be included **befo
 is reached through a path the build script passes in rather than through `include_next`,
 which re-finds this file and lets its include guard swallow the real one.
 
-## Web console
+## The two pages
 
-The clock serves a page at `http://wordclock.local/` - a console that speaks the same
-commands as the wire, because its web socket is wired straight to the port `Communication`
-reads from. Nothing about the protocol is repeated in the browser.
+The clock serves **two** pages, and which one it hands out at which address is the whole
+arrangement: `http://wordclock.local/` is the **panel**, made for the handful of settings
+somebody changes, and `http://wordclock.local/console` is the **console**, which reaches
+everything else. Nobody types a path - they type the clock's address and take what comes - so
+what comes is the page for the frequent things, with a link to the other one in its header.
+
+Both speak the same commands as the wire, because their web socket is wired straight to the
+port `Communication` reads from. Nothing about the protocol is repeated in the browser.
+
+Why two and not one. The panel is **hand-made**: that a colour deserves eight swatches and a
+picker, and a brightness a slider, is a judgement about what somebody does often, and no table
+carries it - the catalog says "three numbers called Red, Green and Blue, 0 to 255", which is
+what a colour *is*. The console is **generated**, and therefore complete by construction: a
+command added to the firmware appears in it without a page being touched. One file trying to be
+both is how a page ends up neither.
+
+The panel finds its commands by their catalog **label** and not by their number, and that is
+not fussiness: `MsgCmdParser::CommandType` is conditional, so a build without the date overlay
+gives every command after it a different number. A label that changes hides a card, which is
+loud; a number that shifted would wire a slider to the wrong command, which is not.
 
 Above the log it shows the panel itself: the letters come from `GET /display`, which the
 clock generates from `DisplayCharacters`, and the colours arrive as binary frames on the
@@ -227,7 +244,21 @@ high-contrast colour: the bytes arrive already dimmed, so a word at low brightne
 a dark grey on a dark background, unreadable in exactly the case somebody opens the view for.
 So a hue is checked by reading the bytes, which the tests do, and not by looking.
 
-It also carries a command builder, and that form is not written down in the page either:
+What the panel can do and the console cannot is show the colour: it knows what it *set*,
+where the console only learns from the frame which pixels are lit. So the panel's plate is
+painted in the chosen colour, dimmed by the chosen brightness, and the console's stays one
+fixed high-contrast colour.
+
+Two things the panel had to be shaped by rather than shape:
+
+- **Command 9 answers the speed and the favourite of the *selected* animation only.** So the
+  animation card is a list to pick from with those two below it, belonging to whatever is
+  picked - a column of sixteen sliders would have been fifteen guesses.
+- **A window is two times to a reader and four numbers to the protocol.** The night card shows
+  two `<input type="time">` and takes the four `-H -M -E -N` apart itself, which is the side of
+  that difference the page should carry.
+
+The console also carries a command builder, and that form is not written down in the page either:
 `GET /commands` serves `MessageCatalog` as JSON, and the page generates the dropdown, the
 option rows, the ranges and the named values from it. The same table the simulator's
 message builder derives its dialog from - so a command added there appears in both front
@@ -253,17 +284,20 @@ not - so a colour set by hand in the console below, or over the serial line, mov
 with it. What depends on who asked is only whether the line is *printed*: the fourteen
 answers a page collects on load would bury the log it keeps for what somebody typed.
 
-The page is [`web/index.html`](web/index.html), one self-contained file with its CSS and
-script inline: the clock has nowhere to fetch anything from. It is **not** uploaded
-separately. [`../scripts/embed_web.py`](../scripts/embed_web.py) walks `web/` at build time and
+The pages are [`web/app.html`](web/app.html) and [`web/index.html`](web/index.html), each one
+self-contained with its CSS and script inline: the clock has nowhere to fetch anything from.
+Which is also why neither uses a downloaded typeface - the panel is the system's own sans with
+monospace wherever something is read as data, the console is monospace throughout. They are
+**not** uploaded separately. [`../scripts/embed_web.py`](../scripts/embed_web.py) walks `web/` at build time and
 emits every file in it as an array **into the build directory**, so `pio run -t upload`
 ships page and firmware together and their versions cannot drift apart - the failure a
 second partition invites. The generated header is a build product on purpose; a checked-in
 one rots the moment someone edits the HTML and forgets to regenerate it. At the moment the
-page is 68 KB of source and 8.2 KB compressed, and the default partition table is
+panel is 65 KB of source and 11 KB compressed, the console 70 and 8.4 - so the panel costs
+some 10 KB of flash on top of what the console alone did, and the default partition table is
 untouched.
 
-Three of those files are not the console but the **home screen icon**:
+Three of those files are neither page but the **home screen icon**:
 `manifest.webmanifest` at `GET /manifest.webmanifest` and two PNGs at `GET /icon-192.png`
 and `GET /icon-512.png`, 14 KB of flash between them. They are what makes the console
 installable - an icon to tap and a start without an address bar. With one limit worth
