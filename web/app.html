@@ -651,6 +651,21 @@
 
             <!-- ---------------- system ---------------- -->
             <div class="pane" data-pane="system" hidden>
+                <section class="card" data-card="time" hidden>
+                    <h2>Time</h2>
+                    <div class="row">
+                        <label for="time-of-day">The clock's time</label>
+                        <input type="time" id="time-of-day">
+                    </div>
+                    <div class="stack">
+                        <button class="act" type="button" id="time-now">Take this device's time</button>
+                    </div>
+                    <p>A clock that reached a network sets itself from it and needs nothing here.
+                        This is for one that has not — the field takes an hour and a minute typed
+                        in, the button takes both from whatever you are reading this on, which
+                        is the one device in the room known to be right.</p>
+                </section>
+
                 <section class="card" data-card="status" hidden>
                     <h2>Status</h2>
                     <dl id="stats"></dl>
@@ -736,6 +751,10 @@
     }
 
     const RETRY_MS = 2000;
+    /* Half a minute, which is what the shown time is worst case behind the clock's. The other
+       cards are answered when they are changed and need no poll; a running clock is the one
+       value here that goes stale on its own. */
+    const TIME_POLL_MS = 30000;
     const state = document.getElementById("state");
     let socket = null;
     let attempts = 0;
@@ -865,6 +884,34 @@
         for (const [short, field] of fields) {
             const value = values.get(short);
             if (value !== undefined) { field.fill(value); }
+        }
+    }
+
+    /* Two options behind one control: a time is one thing to a reader and two numbers to the
+       protocol, and the page is the side that should carry that difference. The shorts are
+       given rather than assumed because the night window is two of these on one command -
+       H/M for its start and E/N for its end.
+
+       `shown` is where the assembled "HH:MM" goes. Without one it goes into the field itself,
+       which is all the night window wants; the clock's own time also feeds the plate's foot
+       and has to keep its hands off a field somebody is typing in. Sending is left to the
+       caller for the same reason: one of the two sends a third option with it. */
+    function bindTime(number, element, hourShort, minuteShort, shown) {
+        const hour = { value: "" };
+        const minute = { value: "" };
+
+        const hourField = bind(number, hourShort, hour, "number", { silent: true });
+        const minuteField = bind(number, minuteShort, minute, "number", { silent: true });
+
+        hourField.read = () => (element.value === "" ? null : String(Number(element.value.slice(0, 2))));
+        minuteField.read = () => (element.value === "" ? null : String(Number(element.value.slice(3, 5))));
+        hourField.fill = (value) => { hour.value = value; show(); };
+        minuteField.fill = (value) => { minute.value = value; show(); };
+
+        function show() {
+            if (hour.value === "" || minute.value === "") { return; }
+            const text = String(hour.value).padStart(2, "0") + ":" + String(minute.value).padStart(2, "0");
+            if (shown) { shown(text); } else { element.value = text; }
         }
     }
 
@@ -1198,30 +1245,16 @@
         const value = document.getElementById("night-level-value");
         const note = document.getElementById("night-note");
 
-        /* Two fields for four options: a window is two times to a reader and four numbers to
-           the protocol, and the page is the side that should carry that difference. */
-        function bindTime(element, hourShort, minuteShort) {
-            const hour = { value: "" };
-            const minute = { value: "" };
-
-            const hourField = bind(command.number, hourShort, hour, "number", { silent: true });
-            const minuteField = bind(command.number, minuteShort, minute, "number", { silent: true });
-
-            hourField.read = () => (element.value === "" ? null : String(Number(element.value.slice(0, 2))));
-            minuteField.read = () => (element.value === "" ? null : String(Number(element.value.slice(3, 5))));
-            hourField.fill = (shown) => { hour.value = shown; showTime(); };
-            minuteField.fill = (shown) => { minute.value = shown; showTime(); };
-
-            function showTime() {
-                if (hour.value === "" || minute.value === "") { return; }
-                element.value = String(hour.value).padStart(2, "0") + ":" + String(minute.value).padStart(2, "0");
-            }
+        /* Two fields for four options, and each window sends its own two: a start moved
+           without its end is a window the clock still understands. */
+        function bindWindow(element, hourShort, minuteShort) {
+            bindTime(command.number, element, hourShort, minuteShort);
             element.addEventListener("change", () => sendFields(command.number, [hourShort, minuteShort]));
         }
 
         bind(command.number, "A", document.getElementById("night-active"), "flag");
-        bindTime(from, "H", "M");
-        bindTime(to, "E", "N");
+        bindWindow(from, "H", "M");
+        bindWindow(to, "E", "N");
         bind(command.number, "B", level, "number", {
             after: (shown) => {
                 value.value = shown;
@@ -1285,20 +1318,49 @@
         });
     }
 
+    /* ---- the clock's own time, which is shown on the plate and set here ------------- */
     function setupTime() {
         const command = commandFor("time");
         if (!command) { return; }
 
-        const hour = { value: "" };
-        const minute = { value: "" };
+        document.querySelector('[data-card="time"]').hidden = false;
+        const field = document.getElementById("time-of-day");
+        /* Not a control of its own: nobody sets a wall clock to the second, but every send
+           from here carries one, so it is a value the page decides rather than a field. */
+        const second = { value: "0" };
 
-        function show() {
-            if (hour.value === "" || minute.value === "") { return; }
-            plateTime.textContent = String(hour.value).padStart(2, "0") + ":"
-                                  + String(minute.value).padStart(2, "0");
+        function show(text) {
+            plateTime.textContent = text;
+            /* Left alone while it has the focus. The poll below keeps answering, and a field
+               that refilled itself under a thumb would put the clock's own time back over the
+               one being typed - which on a phone's picker is the whole of the interaction. */
+            if (document.activeElement !== field) { field.value = text; }
         }
-        bind(command.number, "H", hour, "readonly", { show: (value) => { hour.value = value; show(); } });
-        bind(command.number, "M", minute, "readonly", { show: (value) => { minute.value = value; show(); } });
+
+        bindTime(command.number, field, "H", "M", show);
+        bind(command.number, "S", second, "number", { silent: true });
+
+        function sendTime(seconds) {
+            second.value = String(seconds);
+            sendFields(command.number, ["H", "M", "S"]);
+        }
+
+        /* A time typed in means the top of that minute: the seconds still running behind it
+           belong to whenever the clock was last right, and keeping them would leave it up to
+           a minute out for no reason. The device's own time is exact and sends its own. */
+        field.addEventListener("change", () => sendTime(0));
+        document.getElementById("time-now").addEventListener("click", () => {
+            const now = new Date();
+            field.value = String(now.getHours()).padStart(2, "0") + ":"
+                        + String(now.getMinutes()).padStart(2, "0");
+            sendTime(now.getSeconds());
+        });
+
+        /* The clock answers when it is asked and not when its minute turns, so what the foot
+           shows is as old as the last answer - which before this was the moment the socket
+           opened, and an hour later still said so. One line every half minute keeps both the
+           foot and the field within a minute of the clock. */
+        setInterval(() => ask(command.number), TIME_POLL_MS);
     }
 
     /* ---- network and the console's password ---------------------------------------- */
