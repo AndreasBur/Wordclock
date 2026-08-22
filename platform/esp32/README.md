@@ -261,7 +261,14 @@ Two things the panel had to be shaped by rather than shape:
   picked - a column of sixteen sliders would have been fifteen guesses.
 - **A window is two times to a reader and four numbers to the protocol.** The night card shows
   two `<input type="time">` and takes the four `-H -M -E -N` apart itself, which is the side of
-  that difference the page should carry.
+  that difference the page should carry. The time card is a third of them, on command 4, so the
+  taking-apart is one function both use rather than one each.
+- **The clock answers when it is asked and not when its minute turns.** Every other card is
+  answered because something changed it, so nothing on the page polls - except the time, which
+  goes stale on its own and did: the foot under the plate used to show the minute the socket
+  opened in, for as long as the page stayed open. It is asked for every half minute now, and
+  the field that shows it is left alone while it has the focus, or a poll would put the clock's
+  time back over the one being typed in.
 
 The console also carries a command builder, and that form is not written down in the page either:
 `GET /commands` serves `MessageCatalog` as JSON, and the page generates the dropdown, the
@@ -300,7 +307,7 @@ emits every file in it as an array **into the build directory**, so `pio run -t 
 ships page and firmware together and their versions cannot drift apart - the failure a
 second partition invites. The generated header is a build product on purpose; a checked-in
 one rots the moment someone edits the HTML and forgets to regenerate it. At the moment the
-panel is 65 KB of source and 11 KB compressed, the console 57 and 6.7 - so the panel costs
+panel is 69 KB of source and 11 KB compressed, the console 57 and 6.7 - so the panel costs
 some 10 KB of flash on top of what the console alone did, and the default partition table is
 untouched.
 
