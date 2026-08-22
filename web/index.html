@@ -116,10 +116,10 @@
         --unlit: #6a6a72;
         --line: #26262b;
     }
-    /* The three surfaces - clock, console, builder - carry one face, and the same one in
-       both themes. What varies with the theme is the page they sit on; what they are made of
-       does not, because they are one instrument and a white console beside a black clock read
-       as two unrelated things.
+    /* The surfaces - the clock, the two folded tiles and every settings group - carry one
+       face, and the same one in both themes. What varies with the theme is the page they sit
+       on; what they are made of does not, because they are one instrument and a white console
+       beside a black clock read as two unrelated things.
 
        Redefining the page's own tokens inside them is what makes this cheap: every input,
        select and button in there follows without a rule of its own. */
@@ -210,8 +210,9 @@
        built command. Everything else that is a button is a way of getting to those. */
     #entry button[type=submit], #use { color: var(--lit); }
 
-    /* The console. One card so that the answer and the question sit in the same object -
-       and so the page is a column of three things rather than a stack of bands. */
+    /* The console half of the commands tile: the form builds a line, this is where it is
+       sent and answered. One card for all three, so that a command, what came back and the
+       thing that assembled it are one object rather than a stack of bands. */
     #console { overflow: hidden; }
     /* One line, scrolled rather than grown: what a reader wants is the answer that just
        came back, and append() already brings it into view. Every pixel beyond that line was
@@ -333,9 +334,9 @@
         }
     }
 
-    /* The builder. Collapsed by default: typing a command is the faster path once one
-       knows it, and the form is what makes it findable in the first place. In the same
-       column as the console rather than a band across the page. */
+    /* The tiles. Collapsed by default: typing a command is the faster path once one knows
+       it, and the form above the input is what makes it findable in the first place. In the
+       same column as the settings rather than a band across the page. */
     details { width: 100%; overflow: hidden; }
     /* Three insets down the whole page, and only three: a card edge at 0, a control box at
        6, and text at 19 - which is the 6 plus a control's own border and padding. The two
@@ -543,8 +544,18 @@
              exactly as the builder's form is. -->
         <section id="settings"></section>
 
-        <details id="builderBox" class="surface">
-            <summary>Build a command</summary>
+        <!-- Building a command and sending it are one tile, and that is not tidiness. They
+             were two, and Use put the built line into the input of the *other* one - which
+             is folded shut by default, so everything pressing it did happened out of sight:
+             the builder closed, nothing appeared, and the line was waiting in a field nobody
+             could see. From the outside that is a button that does nothing.
+
+             Folded away as a whole, though, and for the reason it always was: typing is the
+             faster path once the protocol is known, and the settings above are what most of
+             the page-loads are for. This is also the only view that shows what went over the
+             wire. -->
+        <details id="consoleBox" class="surface">
+            <summary>Commands</summary>
             <div id="builderNote" hidden></div>
             <div id="builder">
                 <select id="commands" aria-label="command to build"></select>
@@ -552,12 +563,6 @@
                 <div id="preview"></div>
                 <button type="button" id="use">Use</button>
             </div>
-        </details>
-
-        <!-- Folded away rather than gone: typing is the faster path once the protocol is
-             known, and this is the only view that shows what went over the wire. -->
-        <details id="consoleBox" class="surface">
-            <summary>Console</summary>
             <div id="console">
                 <!-- polite, not assertive: an answer is worth reading out when the reader
                      has finished the sentence it is in, not on top of it. -->
@@ -571,9 +576,9 @@
             </div>
         </details>
 
-        <!-- Folded away like the console, and for a stronger version of the same reason: a
-             clock is updated when there is a release to update to, which is not often.
-             Last of the three, because it is the one thing here that is not a setting. -->
+        <!-- Folded away like the commands, and for a stronger version of the same reason: a
+             clock is updated when there is a release to update to, which is not often. Last,
+             because it is the one thing here that is not a setting. -->
         <details id="updateBox" class="surface">
             <summary>Update the firmware</summary>
             <div id="update">
@@ -783,12 +788,12 @@
     const commandsSelect = document.getElementById('commands');
     const optionsBox = document.getElementById('options');
     const preview = document.getElementById('preview');
-    const builderBox = document.getElementById('builderBox');
+    const consoleBox = document.getElementById('consoleBox');
     let catalog = [];
 
-    builderBox.addEventListener('toggle', () => {
-        if (!builderBox.open) { return; }
-        requestAnimationFrame(() => builderBox.scrollIntoView({
+    consoleBox.addEventListener('toggle', () => {
+        if (!consoleBox.open) { return; }
+        requestAnimationFrame(() => consoleBox.scrollIntoView({
             behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
             block: 'start'
         }));
@@ -895,10 +900,11 @@
     optionsBox.addEventListener('change', refreshPreview);
 
     /* Into the input field rather than straight onto the wire, so it can still be looked
-       over and corrected - the same thing the wx builder's Insert does. */
+       over and corrected - the same thing the wx builder's Insert does. The field is the one
+       two rows below in the same tile, which is what makes that a step somebody can see; it
+       used to be in the tile below and this closed the builder on top of it. */
     document.getElementById('use').addEventListener('click', () => {
         commandInput.value = buildCommand();
-        document.getElementById('builderBox').open = false;
         commandInput.focus();
     });
 

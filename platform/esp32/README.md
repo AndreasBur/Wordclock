@@ -269,6 +269,14 @@ ends and on the wire at once, with nothing to keep in step by hand. The built co
 into the input field rather than straight onto the wire, so it can still be corrected,
 exactly as the wx builder's Insert does.
 
+The form and that input are **one tile**, which they were not at first, and the split is worth
+recording because it read as harmless: the builder was a folded panel of its own and Use wrote
+into the console's, which is folded shut until somebody opens it. So pressing Use closed the
+builder, put the line into a field that was not on screen, and moved the focus there - three
+things, none of them visible. A button that appears to do nothing is worse than one that is not
+offered, so the two are one panel now, in the order somebody works in: pick a command, see what
+it builds, take it into the line, send it, read the answer above it.
+
 The console is **only** that, and deliberately so. It carried a hand-made card for the colour
 and the brightness for a while - eight swatches, a picker and a slider above the groups - and
 that card came out again when the panel arrived: the same controls in two places are two places
@@ -290,7 +298,7 @@ emits every file in it as an array **into the build directory**, so `pio run -t 
 ships page and firmware together and their versions cannot drift apart - the failure a
 second partition invites. The generated header is a build product on purpose; a checked-in
 one rots the moment someone edits the HTML and forgets to regenerate it. At the moment the
-panel is 65 KB of source and 11 KB compressed, the console 56 and 6.8 - so the panel costs
+panel is 65 KB of source and 11 KB compressed, the console 57 and 6.7 - so the panel costs
 some 10 KB of flash on top of what the console alone did, and the default partition table is
 untouched.
 
