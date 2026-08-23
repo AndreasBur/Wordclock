@@ -129,6 +129,11 @@ RUN python3 -m venv /opt/playwright && \
 # cannot write the ~1.5 GB of toolchain into it.
 RUN install -d -o vscode -g vscode -m 0755 /home/vscode/.platformio
 
+# Codex keeps its login and local configuration here. The devcontainer variants mount a
+# named volume over this path so those files survive a rebuild. Seed its ownership from
+# the image; otherwise a newly created Docker/Podman volume is owned by root.
+RUN install -d -o vscode -g vscode -m 0700 /home/vscode/.codex
+
 # GitHub's SSH host key, so that the first git operation in a fresh container verifies
 # against something rather than failing with "Host key verification failed" - which is
 # what it does today, because ~/.ssh belongs to the container and is empty after every

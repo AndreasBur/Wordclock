@@ -11,6 +11,13 @@ Choose the configuration matching the host. Keeping the WSLg mount in its own
 configuration prevents native Linux container startup from failing when
 `/mnt/wslg` does not exist.
 
+## Persistent Codex login
+
+Both configurations mount the named `wordclock-codex` volume at
+`/home/vscode/.codex`. This preserves the Codex login and local configuration
+when the development container is rebuilt. The volume contains credentials; do
+not share, export or remove it unless the saved login should be discarded.
+
 ## SSH agent on Linux
 
 The Linux variant mounts the host's `SSH_AUTH_SOCK` at the fixed path
@@ -185,10 +192,9 @@ be committed (internal base images, registry-hosted features, credentials). The
 Add such a directory to `.gitignore` to keep it local; `/.devcontainer/vector/`
 is already listed there.
 
-Anything that persists credentials belongs in such a variant rather than in the
-committed ones. Persisting a tool's login across rebuilds, for instance, takes a
-named volume plus one `chown`, because a volume whose target does not exist in
-the image is created owned by root:
+Persisting another tool's login across rebuilds takes a named volume plus one
+`chown`, because a volume whose target does not exist in the image is created
+owned by root:
 
 ```jsonc
 "mounts": [
