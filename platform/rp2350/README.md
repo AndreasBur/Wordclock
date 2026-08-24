@@ -88,8 +88,9 @@ The two are the same program above the peripherals. Five things underneath are n
   the servers are resolved by name and can only be started once there is a link.
   `TimeSync.h` holds the pair so that neither call site does half of it.
 
-The two pages are the same as the ESP32 backend's - the panel at `/`, the console at
-`/console` - and a third less code here. `AsyncWebSocket` owns its client list,
+The two pages are the shared ones, described in
+[`../../web/README.md`](../../web/README.md) - the panel at `/`, the console at
+`/console` - and serving them is a third less code here. `AsyncWebSocket` owns its client list,
 counts it and broadcasts to it, so the descriptor array, its atomics and the walk over them
 at every send are gone — `textAll()` is the whole of what they did.
 

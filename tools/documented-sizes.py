@@ -194,7 +194,7 @@ def checks(elf, rp2350Elf=None):
 
     appSource, appCompressed = page_sizes('app.html')
     consoleSource, consoleCompressed = page_sizes('index.html')
-    found.append(Check('platform/esp32/README.md',
+    found.append(Check('web/README.md',
                        r'panel is (\d+) KB of source and ([\d.]+) KB compressed, the console '
                        r'(\d+) and ([\d.]+)',
                        (kilobytes(appSource), kilobytes(appCompressed),
