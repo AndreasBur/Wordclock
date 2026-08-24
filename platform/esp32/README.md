@@ -91,11 +91,13 @@ platform/esp32/test/run.sh              # build and run them
 Those compile the backend against stand-ins for the framework, so they reach everything
 above the peripherals: the frame `Pixels::render()` hands over, byte for byte; that an
 injected command takes the same path through `Communication` as one typed on the wire; and
-the handlers, driven through the same registration call the server makes. `serve` puts the real
-firmware behind both pages on localhost, which is how the browser side is worked on without
-flashing - node is the HTTP and web socket half of it, and the host process contributes the
-core, the catalog and the broadcast, so what it proves is about the pages rather than about
-this backend's server.
+the handlers, driven through the same registration call the server makes - which is where this
+backend's own routes and its password are pinned down.
+
+Looking at the *pages* is not here. There was a `serve` mode that put node in front of a host
+build of this backend, and it went when the simulator learned to serve them: node owned every
+socket there, so what it proved was about the pages and never about this server. See
+[`../simulator/README.md`](../simulator/README.md).
 
 **What no test here can reach is the hardware itself**: the pulse timing on a real strip,
 whether the BH1750 answers on its bus, and whether SNTP arrives. Those need a board.
