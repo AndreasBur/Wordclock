@@ -17,15 +17,34 @@
 #include <vector>
 
 
-static httpd_handler_t SocketHandler = nullptr;
-static httpd_handler_t RootHandler = nullptr;
-static httpd_handler_t CommandsHandler = nullptr;
-static httpd_handler_t DisplayHandler = nullptr;
-static httpd_handler_t ManifestHandler = nullptr;
-static httpd_handler_t Icon192Handler = nullptr;
-static httpd_handler_t Icon512Handler = nullptr;
-static httpd_handler_t UpdateHandler = nullptr;
-static httpd_handler_t ConsoleHandler = nullptr;
+/* A registered route as the server keeps it: the handler and the context handed back with
+   it. The context matters since the five files served unchanged share one handler and tell
+   each other apart by it - so a route is called through here rather than as a bare function
+   pointer, or every asset would answer as whichever was registered last. */
+struct RouteType {
+    httpd_handler_t Handler = nullptr;
+    void* Context = nullptr;
+
+    esp_err_t operator()(httpd_req_t* Request) const {
+        Request->user_ctx = Context;
+        return Handler(Request);
+    }
+
+    /* So a case can still ask whether a route was registered at all, which is what the
+       nullptr comparisons below are for. */
+    bool operator!=(std::nullptr_t) const { return Handler != nullptr; }
+    bool operator==(std::nullptr_t) const { return Handler == nullptr; }
+};
+
+static RouteType SocketHandler;
+static RouteType RootHandler;
+static RouteType CommandsHandler;
+static RouteType DisplayHandler;
+static RouteType ManifestHandler;
+static RouteType Icon192Handler;
+static RouteType Icon512Handler;
+static RouteType UpdateHandler;
+static RouteType ConsoleHandler;
 static std::string SentType;
 static std::string SentStatus;
 /* Every header a handler set, by name - the gate's WWW-Authenticate is read out of here. */
@@ -45,15 +64,17 @@ esp_err_t httpd_start(httpd_handle_t* h, const httpd_config_t*) { *h = (httpd_ha
 
 esp_err_t httpd_register_uri_handler(httpd_handle_t, const httpd_uri_t* u)
 {
-    if(strcmp(u->uri, "/ws") == 0)            { SocketHandler = u->handler; }
-    else if(strcmp(u->uri, "/commands") == 0) { CommandsHandler = u->handler; }
-    else if(strcmp(u->uri, "/display") == 0)  { DisplayHandler = u->handler; }
-    else if(strcmp(u->uri, "/manifest.webmanifest") == 0) { ManifestHandler = u->handler; }
-    else if(strcmp(u->uri, "/icon-192.png") == 0) { Icon192Handler = u->handler; }
-    else if(strcmp(u->uri, "/icon-512.png") == 0) { Icon512Handler = u->handler; }
-    else if(strcmp(u->uri, "/update") == 0)   { UpdateHandler = u->handler; }
-    else if(strcmp(u->uri, "/console") == 0)  { ConsoleHandler = u->handler; }
-    else                                      { RootHandler = u->handler; }
+    const RouteType Route{u->handler, u->user_ctx};
+
+    if(strcmp(u->uri, "/ws") == 0)            { SocketHandler = Route; }
+    else if(strcmp(u->uri, "/commands") == 0) { CommandsHandler = Route; }
+    else if(strcmp(u->uri, "/display") == 0)  { DisplayHandler = Route; }
+    else if(strcmp(u->uri, "/manifest.webmanifest") == 0) { ManifestHandler = Route; }
+    else if(strcmp(u->uri, "/icon-192.png") == 0) { Icon192Handler = Route; }
+    else if(strcmp(u->uri, "/icon-512.png") == 0) { Icon512Handler = Route; }
+    else if(strcmp(u->uri, "/update") == 0)   { UpdateHandler = Route; }
+    else if(strcmp(u->uri, "/console") == 0)  { ConsoleHandler = Route; }
+    else                                      { RootHandler = Route; }
     return ESP_OK;
 }
 

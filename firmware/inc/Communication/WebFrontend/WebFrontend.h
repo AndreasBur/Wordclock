@@ -74,6 +74,26 @@
 ******************************************************************************************************************************************************/
 class WebFrontend
 {
+  public:
+    /* One file a clock hands out unchanged: the two pages, the manifest and the two icons.
+       Everything a backend needs in order to answer for it, and nothing about how - which is
+       why this is a table and not five handlers. It was five handlers, twice, and the ten
+       differed only in a blob, a content type and whether a header went out with it.
+
+       The bytes live in the generated WebPage.h, which only WebFrontend.cpp includes: the
+       generated arrays have internal linkage, so a second includer would put a second copy
+       of both pages in flash. */
+    struct AssetType {
+        const char* Path;
+        const uint8_t* Bytes;
+        size_t Size;
+        const char* ContentType;
+        /* Stored compressed and sent compressed, so the backend has to say so in a header
+           and the browser unpacks it. False for the manifest, which is 485 bytes, and for
+           the icons, a PNG being deflated already. */
+        bool IsGzipped;
+    };
+
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
@@ -107,6 +127,17 @@ class WebFrontend
     }
 
     // methods
+    /* What a backend may size a static array of routes with, since the count itself is only
+       known in the source. A static_assert there holds the two together, so a file added to
+       the table without raising this fails the build rather than one registration. */
+    static constexpr byte MaxAssets{5u};
+
+    /* The files a clock serves unchanged, for a backend to register a route per entry and
+       answer it from the table. Walked rather than named one by one, so a file added to
+       web/ reaches both backends by appearing here. */
+    static byte getNumberOfAssets();
+    static const AssetType& getAsset(byte Index);
+
     /* The command catalog as JSON, so a page can build its own form from it, and the panel's
        shape and letters. Both take the body a backend's route handler opened, which is the
        only thing about them that is a backend's business. */

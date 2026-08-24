@@ -29,7 +29,6 @@
 #include "System.h"
 #include "WebFrontend.h"
 #include "WebInterface.h"
-#include "WebPage.h"
 #include "WebTransport.h"
 #include "WordclockSerial.h"
 
@@ -229,69 +228,26 @@ void commitImage(size_t Announced)
 
 
 /******************************************************************************************************************************************************
-  sendPage()
+  handleAsset()
 ******************************************************************************************************************************************************/
-/*! \brief          Serves one of the two pages straight out of flash
- *  \details        Sent compressed, which is how it is stored: the pages were gzipped at build
- *                  time, so this only pushes the bytes and the browser unpacks them.
+/*! \brief          Serves one of the files the clock hands out unchanged
+ *
+ *  \details        One handler for all five - the two pages, the manifest and the two icons -
+ *                  because what separates them is data and the data is WebFrontend's table.
+ *                  Where the IDF's server carries a user context per route, this library takes
+ *                  a std::function, so the entry is captured instead.
+ *
+ *                  A gzipped asset is sent as it is stored and the browser unpacks it; that
+ *                  is the whole of what the header does here, and the table says which.
 ******************************************************************************************************************************************************/
-void sendPage(AsyncWebServerRequest* Request, const uint8_t* Page, size_t Size)
+void handleAsset(AsyncWebServerRequest* Request, const WebFrontend::AssetType& Asset)
 {
     if(!isRequestAuthorised(Request)) { return; }
 
-    AsyncWebServerResponse* Response = Request->beginResponse(200, "text/html", Page, Size);
+    AsyncWebServerResponse* Response = Request->beginResponse(200, Asset.ContentType, Asset.Bytes, Asset.Size);
 
-    Response->addHeader("Content-Encoding", "gzip");
+    if(Asset.IsGzipped) { Response->addHeader("Content-Encoding", "gzip"); }
     Request->send(Response);
-}
-
-
-/******************************************************************************************************************************************************
-  handleRoot()
-******************************************************************************************************************************************************/
-/*! \brief          Serves the page a clock hands out at "/"
- *  \details        The one made for what somebody changes: a colour, a brightness, an
- *                  animation. Nobody types a path - they type the clock's address and take what
- *                  comes - so what comes is the page for the frequent things, and the console is
- *                  one link away at "/console".
-******************************************************************************************************************************************************/
-void handleRoot(AsyncWebServerRequest* Request)
-{
-    sendPage(Request, WebAppGzip, WebAppGzipSize);
-}
-
-
-/******************************************************************************************************************************************************
-  handleConsole()
-******************************************************************************************************************************************************/
-/*! \brief          Serves the console at "/console"
- *  \details        Everything the page at "/" does not cover, which is most of the command set:
- *                  it draws a group per command out of the catalog, so a command added to the
- *                  firmware appears there without a page being touched. That is why it moved
- *                  rather than being replaced.
-******************************************************************************************************************************************************/
-void handleConsole(AsyncWebServerRequest* Request)
-{
-    sendPage(Request, WebPageGzip, WebPageGzipSize);
-}
-
-
-/******************************************************************************************************************************************************
-  handleManifest()
-******************************************************************************************************************************************************/
-/*! \brief          Serves the web app manifest, which is what makes the console installable
- *  \details        Nothing on the clock reads it - a browser does, to put the console on a
- *                  home screen with an icon and start it without an address bar. Sent as it
- *                  is, unlike the page: it is 485 bytes, and compressing it would save
- *                  fewer than 250 of them for a header on the wire and an inflate in
- *                  anything that wants to read it - curl and this backend's own test
- *                  included.
-******************************************************************************************************************************************************/
-void handleManifest(AsyncWebServerRequest* Request)
-{
-    if(!isRequestAuthorised(Request)) { return; }
-
-    Request->send(Request->beginResponse(200, "application/manifest+json", WebManifest, WebManifestSize));
 }
 
 
@@ -396,30 +352,6 @@ void handleUpdate(AsyncWebServerRequest* Request)
 
 
 /******************************************************************************************************************************************************
-  handleIcon192() / handleIcon512()
-******************************************************************************************************************************************************/
-/*! \brief          Serves the home screen icons
- *  \details        Two sizes because that is what a manifest is asked for: the small one is
- *                  the icon itself and what iOS takes, the large one is what Android draws
- *                  the splash screen from. Sent as they are - a PNG is already deflated, so
- *                  gzipping one would add a header and save nothing.
-******************************************************************************************************************************************************/
-void handleIcon192(AsyncWebServerRequest* Request)
-{
-    if(!isRequestAuthorised(Request)) { return; }
-
-    Request->send(Request->beginResponse(200, "image/png", WebIcon192, WebIcon192Size));
-}
-
-void handleIcon512(AsyncWebServerRequest* Request)
-{
-    if(!isRequestAuthorised(Request)) { return; }
-
-    Request->send(Request->beginResponse(200, "image/png", WebIcon512, WebIcon512Size));
-}
-
-
-/******************************************************************************************************************************************************
   handleCommands() / handleDisplay()
 ******************************************************************************************************************************************************/
 /*! \brief          Serves the command catalog and the panel's letters
@@ -509,13 +441,18 @@ StdReturnType WebInterface::begin()
     Socket.onEvent(onSocketEvent);
     HttpServer.addHandler(&Socket);
 
-    HttpServer.on("/", HTTP_GET, handleRoot);
-    HttpServer.on("/console", HTTP_GET, handleConsole);
+    /* The files served unchanged, one route per entry of WebFrontend's table, so a file added
+       to web/ needs no edit here. The entry is captured by reference and outlives the lambda:
+       the table has static storage duration. */
+    for(byte Index = 0u; Index < WebFrontend::getNumberOfAssets(); Index++) {
+        const WebFrontend::AssetType& Asset = WebFrontend::getAsset(Index);
+
+        HttpServer.on(Asset.Path, HTTP_GET,
+                      [&Asset](AsyncWebServerRequest* Request) { handleAsset(Request, Asset); });
+    }
+
     HttpServer.on("/commands", HTTP_GET, handleCommands);
     HttpServer.on("/display", HTTP_GET, handleDisplay);
-    HttpServer.on("/manifest.webmanifest", HTTP_GET, handleManifest);
-    HttpServer.on("/icon-192.png", HTTP_GET, handleIcon192);
-    HttpServer.on("/icon-512.png", HTTP_GET, handleIcon512);
     /* Four arguments, and the fourth is where the image arrives: the library hands a POST
        body to that callback in chunks and calls the request handler afterwards. The third,
        the upload handler, is for multipart forms and stays empty - the panel sends the file
