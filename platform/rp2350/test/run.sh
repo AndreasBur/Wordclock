@@ -183,11 +183,20 @@ link serial_test "$SHARED_TEST_DIR/cases/serial_test.cpp" "${BACKEND[@]}" "${COR
 link ds3231_test "$SHARED_TEST_DIR/cases/ds3231_test.cpp" "${BACKEND[@]}" "${CORE[@]}" "$TEST_DIR/stubs/pio_stubs.cpp"
 link web_test    "$TEST_DIR/cases/web_test.cpp" "${WEB[@]}" "${BACKEND[@]}" "${CORE[@]}" "$TEST_DIR/stubs/pio_stubs.cpp"
 # No `serve` here, and none in the ESP32's harness either any more - the simulator serves the
-# pages itself. What is still not covered anywhere is a *browser* against a real /update: the
-# simulator's answers that route without installing anything, having no partition to install
-# into. This is the backend where that gap could be closed, its filesystem and loader being
-# stand-ins in memory, so the handler below already runs for real on the host - what is missing
-# is only somebody pointing a browser at it.
+# pages itself.
+#
+# A browser against this backend's real /update is not the gap it looks like, which is worth
+# writing down because it invites work that buys nothing. Three things make up that path and
+# two are already covered: the handler's own arithmetic, by web_test below, which drives the
+# real body handler in chunks that leave a remainder against a filesystem and a loader that
+# are working stand-ins rather than empty ones; and the panel's rendering of the progress and
+# the two answers, by the simulator, which produces the same two shapes. The third is a real
+# body being chunked into the handler - and a host server would chunk it differently from
+# ESPAsyncWebServer, so that would be a third stand-in and not the truth.
+#
+# What is genuinely untested therefore needs a board and not a browser: the library's own
+# chunking, the flash write, and the loader booting an image it was sent. That is stated where
+# it belongs, under Gaps in this platform's README.
 
 FAILED=0
 for name in frame_test serial_test ds3231_test web_test; do
