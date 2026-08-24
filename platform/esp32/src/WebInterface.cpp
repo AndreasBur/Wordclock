@@ -26,7 +26,6 @@
 #include "System.h"
 #include "WebFrontend.h"
 #include "WebInterface.h"
-#include "WebPage.h"
 #include "WebTransport.h"
 #include "WordclockSerial.h"
 
@@ -150,71 +149,30 @@ bool isRequestAuthorised(httpd_req_t* Request)
 
 
 /******************************************************************************************************************************************************
-  sendPage()
+  handleAsset()
 ******************************************************************************************************************************************************/
-/*! \brief          Serves one of the two pages straight out of flash
- *  \details        Sent compressed, which is how it is stored: the pages were gzipped at build
- *                  time, so this only pushes the bytes and the browser unpacks them.
+/*! \brief          Serves one of the files the clock hands out unchanged
+ *
+ *  \details        One handler for all five - the two pages, the manifest and the two icons -
+ *                  because what separates them is data and the data is WebFrontend's table.
+ *                  Which entry this request is for arrives in the server's own user context,
+ *                  which is what that field exists for.
+ *
+ *                  A gzipped asset is sent as it is stored and the browser unpacks it; that
+ *                  is the whole of what the header does here, and the table says which.
+ *
+ *  \return         ESP_OK
 ******************************************************************************************************************************************************/
-esp_err_t sendPage(httpd_req_t* Request, const uint8_t* Page, size_t Size)
+esp_err_t handleAsset(httpd_req_t* Request)
 {
     if(!isRequestAuthorised(Request)) { return ESP_OK; }
 
-    httpd_resp_set_type(Request, "text/html");
-    httpd_resp_set_hdr(Request, "Content-Encoding", "gzip");
+    const WebFrontend::AssetType& Asset = *static_cast<const WebFrontend::AssetType*>(Request->user_ctx);
 
-    return httpd_resp_send(Request, reinterpret_cast<const char*>(Page), Size);
-}
+    httpd_resp_set_type(Request, Asset.ContentType);
+    if(Asset.IsGzipped) { httpd_resp_set_hdr(Request, "Content-Encoding", "gzip"); }
 
-
-/******************************************************************************************************************************************************
-  handleRoot()
-******************************************************************************************************************************************************/
-/*! \brief          Serves the page a clock hands out at "/"
- *  \details        The one made for what somebody changes: a colour, a brightness, an
- *                  animation. Nobody types a path - they type the clock's address and take
- *                  what comes - so what comes is the page for the frequent things, and the
- *                  console is one link away.
-******************************************************************************************************************************************************/
-esp_err_t handleRoot(httpd_req_t* Request)
-{
-    return sendPage(Request, WebAppGzip, WebAppGzipSize);
-}
-
-
-/******************************************************************************************************************************************************
-  handleConsole()
-******************************************************************************************************************************************************/
-/*! \brief          Serves the console at "/console"
- *  \details        Everything the page at "/" does not cover, which is most of the command
- *                  set: it draws a group per command out of the catalog, so a command added to
- *                  the firmware appears there without a page being touched. That is why it
- *                  moved rather than being replaced.
-******************************************************************************************************************************************************/
-esp_err_t handleConsole(httpd_req_t* Request)
-{
-    return sendPage(Request, WebPageGzip, WebPageGzipSize);
-}
-
-
-/******************************************************************************************************************************************************
-  handleManifest()
-******************************************************************************************************************************************************/
-/*! \brief          Serves the web app manifest, which is what makes the console installable
- *  \details        Nothing on the clock reads it - a browser does, to put the console on a
- *                  home screen with an icon and start it without an address bar. Sent as it
- *                  is, unlike the page: it is 485 bytes, and compressing it would save
- *                  fewer than 250 of them for a header on the wire and an inflate in
- *                  anything that wants to read it - curl and this backend's own test
- *                  included.
-******************************************************************************************************************************************************/
-esp_err_t handleManifest(httpd_req_t* Request)
-{
-    if(!isRequestAuthorised(Request)) { return ESP_OK; }
-
-    httpd_resp_set_type(Request, "application/manifest+json");
-
-    return httpd_resp_send(Request, reinterpret_cast<const char*>(WebManifest), WebManifestSize);
+    return httpd_resp_send(Request, reinterpret_cast<const char*>(Asset.Bytes), Asset.Size);
 }
 
 
@@ -324,32 +282,6 @@ esp_err_t handleUpdate(httpd_req_t* Request)
 }
 
 
-/******************************************************************************************************************************************************
-  handleIcon192() / handleIcon512()
-******************************************************************************************************************************************************/
-/*! \brief          Serves the home screen icons
- *  \details        Two sizes because that is what a manifest is asked for: the small one is
- *                  the icon itself and what iOS takes, the large one is what Android draws
- *                  the splash screen from. Sent as they are - a PNG is already deflated, so
- *                  gzipping one would add a header and save nothing.
-******************************************************************************************************************************************************/
-esp_err_t handleIcon192(httpd_req_t* Request)
-{
-    if(!isRequestAuthorised(Request)) { return ESP_OK; }
-
-    httpd_resp_set_type(Request, "image/png");
-
-    return httpd_resp_send(Request, reinterpret_cast<const char*>(WebIcon192), WebIcon192Size);
-}
-
-esp_err_t handleIcon512(httpd_req_t* Request)
-{
-    if(!isRequestAuthorised(Request)) { return ESP_OK; }
-
-    httpd_resp_set_type(Request, "image/png");
-
-    return httpd_resp_send(Request, reinterpret_cast<const char*>(WebIcon512), WebIcon512Size);
-}
 
 
 /******************************************************************************************************************************************************
@@ -491,23 +423,28 @@ StdReturnType WebInterface::begin()
         return E_NOT_OK;
     }
 
-    static const httpd_uri_t RootUri{"/", HTTP_GET, handleRoot, nullptr, false, false, nullptr};
-    static const httpd_uri_t ConsoleUri{"/console", HTTP_GET, handleConsole, nullptr, false, false, nullptr};
+    /* The files served unchanged, one route per entry of WebFrontend's table. The array is
+       static because httpd keeps the pointer it is registered with rather than a copy, and
+       sized from the table so that a file added to web/ needs no edit here - only
+       max_uri_handlers above has to still be large enough, which is why that number is said
+       out loud rather than left at its default. */
+    static httpd_uri_t AssetUris[WebFrontend::MaxAssets]{};
+
+    for(byte Index = 0u; Index < WebFrontend::getNumberOfAssets(); Index++) {
+        const WebFrontend::AssetType& Asset = WebFrontend::getAsset(Index);
+
+        AssetUris[Index] = httpd_uri_t{Asset.Path, HTTP_GET, handleAsset, const_cast<WebFrontend::AssetType*>(&Asset),
+                                       false, false, nullptr};
+        httpd_register_uri_handler(HttpServer, &AssetUris[Index]);
+    }
+
     static const httpd_uri_t CommandsUri{"/commands", HTTP_GET, handleCommands, nullptr, false, false, nullptr};
     static const httpd_uri_t DisplayUri{"/display", HTTP_GET, handleDisplay, nullptr, false, false, nullptr};
-    static const httpd_uri_t ManifestUri{"/manifest.webmanifest", HTTP_GET, handleManifest, nullptr, false, false, nullptr};
-    static const httpd_uri_t Icon192Uri{"/icon-192.png", HTTP_GET, handleIcon192, nullptr, false, false, nullptr};
-    static const httpd_uri_t Icon512Uri{"/icon-512.png", HTTP_GET, handleIcon512, nullptr, false, false, nullptr};
     static const httpd_uri_t UpdateUri{"/update", HTTP_POST, handleUpdate, nullptr, false, false, nullptr};
     static const httpd_uri_t SocketUri{"/ws", HTTP_GET, handleSocket, nullptr, true, false, nullptr};
 
-    httpd_register_uri_handler(HttpServer, &RootUri);
-    httpd_register_uri_handler(HttpServer, &ConsoleUri);
     httpd_register_uri_handler(HttpServer, &CommandsUri);
     httpd_register_uri_handler(HttpServer, &DisplayUri);
-    httpd_register_uri_handler(HttpServer, &ManifestUri);
-    httpd_register_uri_handler(HttpServer, &Icon192Uri);
-    httpd_register_uri_handler(HttpServer, &Icon512Uri);
     httpd_register_uri_handler(HttpServer, &UpdateUri);
     httpd_register_uri_handler(HttpServer, &SocketUri);
 

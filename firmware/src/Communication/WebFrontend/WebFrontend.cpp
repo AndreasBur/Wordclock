@@ -24,6 +24,10 @@
 #include "DisplayCharacters.h"
 #include "MessageCatalog.h"
 #include "Pixels.h"
+/* The build generates this from web/. Included here and nowhere else: its arrays have
+   internal linkage, so every further includer would be a second copy of both pages in
+   flash. */
+#include "WebPage.h"
 #include "WordclockSerial.h"
 
 #include <stdio.h>
@@ -131,8 +135,62 @@ class ChunkWriter
 } // namespace
 
 /******************************************************************************************************************************************************
+ *  L O C A L   D A T A
+******************************************************************************************************************************************************/
+namespace {
+
+/* Every file a clock hands out unchanged, at the path it hands it out at.
+ *
+ * "/" is the panel and "/console" the console, which is the whole arrangement rather than a
+ * detail: nobody types a path, they type the clock's address and take what comes, so what
+ * comes is the page for the things somebody changes often, with a link to the other one in
+ * its header.
+ *
+ * The three that follow are neither page but the home screen icon - a manifest and two PNGs -
+ * which is what lets the console be installed with an icon to tap and a start without an
+ * address bar.
+ */
+constexpr WebFrontend::AssetType Assets[]{
+    {"/",                      WebAppGzip,   WebAppGzipSize,   "text/html",                 true},
+    {"/console",               WebPageGzip,  WebPageGzipSize,  "text/html",                 true},
+    {"/manifest.webmanifest",  WebManifest,  WebManifestSize,  "application/manifest+json", false},
+    {"/icon-192.png",          WebIcon192,   WebIcon192Size,   "image/png",                 false},
+    {"/icon-512.png",          WebIcon512,   WebIcon512Size,   "image/png",                 false},
+};
+
+/* A backend sizes its route array with MaxAssets, which it can see and this count it cannot.
+   Adding a file here without raising that fails the build, rather than quietly registering
+   the first five of six. */
+static_assert((sizeof(Assets) / sizeof(Assets[0])) <= WebFrontend::MaxAssets,
+              "WebFrontend::MaxAssets has to grow with the asset table");
+
+} // namespace
+
+/******************************************************************************************************************************************************
  * P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
+
+/******************************************************************************************************************************************************
+  getNumberOfAssets() / getAsset()
+******************************************************************************************************************************************************/
+/*! \brief          The files a clock serves unchanged, for a backend to register routes from
+ *
+ *  \details        A table rather than a handler per file, because that is what the ten
+ *                  handlers this replaces actually were: each one set a content type, set a
+ *                  Content-Encoding header or did not, and pushed a blob. The difference
+ *                  between them was data, and the sameness between the two backends was
+ *                  complete.
+******************************************************************************************************************************************************/
+byte WebFrontend::getNumberOfAssets()
+{
+    return static_cast<byte>(sizeof(Assets) / sizeof(Assets[0]));
+}
+
+const WebFrontend::AssetType& WebFrontend::getAsset(byte Index)
+{
+    return Assets[Index];
+}
+
 
 /******************************************************************************************************************************************************
   writeCommands()
