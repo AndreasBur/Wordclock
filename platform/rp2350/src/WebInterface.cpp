@@ -26,12 +26,11 @@
 
 #include "Arduino.h"
 
-#include "Communication.h"
-#include "DisplayCharacters.h"
-#include "MessageCatalog.h"
 #include "System.h"
+#include "WebFrontend.h"
 #include "WebInterface.h"
 #include "WebPage.h"
+#include "WebTransport.h"
 #include "WordclockSerial.h"
 
 #include <string.h>
@@ -89,30 +88,6 @@ UploadType Upload;
 /******************************************************************************************************************************************************
  *  LOCAL FUNCTIONS
 ******************************************************************************************************************************************************/
-/* One Latin-1 byte as UTF-8, into Target, answering how many bytes that took. The whole of
-   Latin-1 widens by this one rule, so no table is needed: below 0x80 a byte is itself, and
-   above it becomes two.
-
-   Both ways out of here need it, for different reasons. The letters served by /display are
-   Latin-1 because the table holds one byte per letter, and JSON is UTF-8 - a raw 0xDC there
-   makes the whole document invalid rather than one letter wrong.
-
-   An answer line needs it for a harder reason: it leaves as a web socket *text* frame, and
-   RFC 6455 requires those to be valid UTF-8. A raw 0xF6 in one does not draw a wrong
-   character, it makes the browser close the connection. That is reachable rather than
-   theoretical - command 8 answers with the overlay text it was given, and an umlaut in that
-   text is exactly what the font tables carry umlauts for. */
-byte toUtf8(byte Latin1, char* Target)
-{
-    if(Latin1 < 0x80u) {
-        Target[0u] = static_cast<char>(Latin1);
-        return 1u;
-    }
-    Target[0u] = static_cast<char>(0xC0u | (Latin1 >> 6u));
-    Target[1u] = static_cast<char>(0x80u | (Latin1 & 0x3Fu));
-    return 2u;
-}
-
 /******************************************************************************************************************************************************
   isRequestAuthorised()
 ******************************************************************************************************************************************************/
@@ -445,165 +420,33 @@ void handleIcon512(AsyncWebServerRequest* Request)
 
 
 /******************************************************************************************************************************************************
-  C H U N K   W R I T E R
+  handleCommands() / handleDisplay()
 ******************************************************************************************************************************************************/
-/* Writes the catalog's JSON into the response stream the server hands out. The ESP32
-   backend collects it in a buffer of its own and pushes chunks, because the IDF's server
-   wants to be pushed to; this one is pulled from, and the stream is the pull side.
-
-   It grows on the heap as it is written, which the ESP32 version deliberately avoids. Not
-   worth avoiding here: this library builds every response, header and socket frame out of
-   String and std::list, so a buffer of our own would save nothing measurable while making
-   the two handlers below read differently from their counterparts. */
-class ChunkWriter
-{
-  private:
-    AsyncResponseStream* Stream;
-
-  public:
-    explicit ChunkWriter(AsyncResponseStream* sStream) : Stream(sStream) { }
-
-    void put(char Character) { Stream->write(Character); }
-
-    void put(const char* Text) {
-        if(Text == nullptr) { return; }
-
-        for(const char* Character = Text; *Character != '\0'; Character++) { put(*Character); }
-    }
-
-    void putNumber(uint16_t Number) {
-        char Digits[8]{};
-
-        snprintf(Digits, sizeof(Digits), "%u", static_cast<unsigned>(Number));
-        put(Digits);
-    }
-
-    /* Escaped, because a label is data: a quote in one would otherwise produce a document
-       the browser refuses whole, and that failure looks like a server fault. */
-    void putString(const char* Text) {
-        put('"');
-        for(const char* Character = Text; (Text != nullptr) && (*Character != '\0'); Character++) {
-            if((*Character == '"') || (*Character == '\\')) { put('\\'); }
-            put(*Character);
-        }
-        put('"');
-    }
-
-    /* Nothing to terminate: the server sends the stream once the handler returns it. */
-    void finish() { }
-};
-
-/******************************************************************************************************************************************************
-  handleCommands()
-******************************************************************************************************************************************************/
-/*! \brief          Serves the command catalog, so the page can build its own form
- *  \details        Generated from MessageCatalog rather than written out a second time.
- *                  That table is what the simulator's message builder derives its whole
- *                  dialog from, down to the input hints; serving it here makes the browser
- *                  a second renderer of the same description, so a command added to the
- *                  catalog shows up in both front ends and on the wire at once.
+/*! \brief          Serves the command catalog and the panel's letters
  *
- *  \return         ESP_OK
+ *  \details        Both documents are written by WebFrontend, shared with the ESP32 backend:
+ *                  what a page is sent is a property of the catalog and the letter table, not
+ *                  of a controller. They were generated here once, and identically in the
+ *                  other backend - two functions that had to be kept the same by hand and
+ *                  whose divergence would have surfaced in a browser rather than in a test.
+ *
+ *                  What is left here is what is genuinely this server's: the password, the
+ *                  content type, and a body to write into.
 ******************************************************************************************************************************************************/
 void handleCommands(AsyncWebServerRequest* Request)
 {
     if(!isRequestAuthorised(Request)) { return; }
 
-    AsyncResponseStream* Stream = Request->beginResponseStream("application/json");
-    ChunkWriter Writer(Stream);
-    Writer.put('[');
-
-    for(byte Index = 0u; Index < MessageCatalog::getNumberOfCommands(); Index++) {
-        const MessageCatalog::CommandType& Command = MessageCatalog::getCommand(Index);
-
-        if(Index > 0u) { Writer.put(','); }
-        Writer.put("{\"number\":");
-        Writer.putNumber(Command.Number);
-        Writer.put(",\"label\":");
-        Writer.putString(Command.Label);
-        Writer.put(",\"options\":[");
-
-        for(byte OptionIndex = 0u; OptionIndex < Command.NumberOfOptions; OptionIndex++) {
-            const MessageCatalog::OptionType& Option = Command.Options[OptionIndex];
-
-            if(OptionIndex > 0u) { Writer.put(','); }
-            Writer.put("{\"short\":\"");
-            Writer.put(Option.ShortName);
-            Writer.put("\",\"label\":");
-            Writer.putString(Option.Label);
-            Writer.put(",\"type\":");
-            Writer.putNumber(static_cast<uint16_t>(Option.Argument));
-            Writer.put(",\"min\":");
-            Writer.putNumber(Option.Minimum);
-            Writer.put(",\"max\":");
-            Writer.putNumber(Option.Maximum);
-
-            /* Only where it is set, so the page's form stays as it was for every option
-               that can be sent, and the read-only fields it must not offer are the ones
-               that say so. */
-            if(Option.ReadOnly) { Writer.put(",\"readonly\":true"); }
-
-            if((Option.ValueNames != nullptr) && (Option.NumberOfValueNames > 0u)) {
-                Writer.put(",\"values\":[");
-                for(byte NameIndex = 0u; NameIndex < Option.NumberOfValueNames; NameIndex++) {
-                    if(NameIndex > 0u) { Writer.put(','); }
-                    Writer.putString(Option.ValueNames[NameIndex]);
-                }
-                Writer.put(']');
-            }
-            Writer.put('}');
-        }
-        Writer.put("]}");
-    }
-
-    Writer.put(']');
-    Writer.finish();
-
-    Request->send(Stream);
+    WebResponseBody Body(Request, "application/json");
+    WebFrontend::writeCommands(Body);
 }
 
-
-/******************************************************************************************************************************************************
-  handleDisplay()
-******************************************************************************************************************************************************/
-/*! \brief          Serves the panel's shape and its letters
- *  \details        The page draws a grid of letters and has to know which, and there is
- *                  exactly one table of them - DisplayCharacters in the firmware. Serving
- *                  it keeps the browser from carrying a second copy, which is the
- *                  duplication the simulator used to have and no longer does.
- *
- *                  The table stores one byte per letter, so the umlauts are Latin-1 and are
- *                  widened to UTF-8 on the way out: JSON is UTF-8, and a raw 0xDC makes the
- *                  whole document invalid rather than one letter wrong.
- *
- *  \return         ESP_OK
-******************************************************************************************************************************************************/
 void handleDisplay(AsyncWebServerRequest* Request)
 {
     if(!isRequestAuthorised(Request)) { return; }
 
-    AsyncResponseStream* Stream = Request->beginResponseStream("application/json");
-
-    const DisplayCharacters Letters;
-    ChunkWriter Writer(Stream);
-
-    Writer.put("{\"columns\":");
-    Writer.putNumber(DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS);
-    Writer.put(",\"rows\":");
-    Writer.putNumber(DISPLAY_CHARACTERS_NUMBER_OF_ROWS);
-    Writer.put(",\"letters\":\"");
-
-    for(byte Index = 0u; Index < DISPLAY_CHARACTERS_NUMBER_OF_CHARACTERS; Index++) {
-        char Utf8[2u];
-        const byte Length = toUtf8(static_cast<byte>(Letters.getCharacter(Index)), Utf8);
-
-        for(byte Byte = 0u; Byte < Length; Byte++) { Writer.put(Utf8[Byte]); }
-    }
-
-    Writer.put("\"}");
-    Writer.finish();
-
-    Request->send(Stream);
+    WebResponseBody Body(Request, "application/json");
+    WebFrontend::writeDisplay(Body);
 }
 
 
@@ -640,15 +483,12 @@ void onSocketEvent(AsyncWebSocket*, AsyncWebSocketClient*, AwsEventType Type,
     const AwsFrameInfo* Frame = static_cast<const AwsFrameInfo*>(Argument);
 
     if((Frame == nullptr) || (!Frame->final) || (Frame->index != 0u) || (Frame->len != Length)) { return; }
-    if((Frame->opcode != WS_TEXT) || (Length == 0u) || (Length > WEB_INTERFACE_MAX_FRAME_LENGTH)) { return; }
+    if(Frame->opcode != WS_TEXT) { return; }
 
-    WordclockSerial& Port = WordclockSerial::getInstance();
-    Port.inject(reinterpret_cast<const char*>(Payload), Length);
-
-    if(Payload[Length - 1u] != Communication::getEndOfMessageChar()) {
-        const char Terminator = Communication::getEndOfMessageChar();
-        Port.inject(&Terminator, 1u);
-    }
+    /* The length bound, the terminator and the empty-frame case are WebFrontend's, so that a
+       command coming off a socket reaches the parser the same way on either backend. What
+       stays here is the framing, which is this library's shape and not the other's. */
+    WebFrontend::injectCommand(reinterpret_cast<const char*>(Payload), Length);
 }
 
 } // namespace
@@ -711,35 +551,13 @@ StdReturnType WebInterface::begin()
   broadcastLine()
 ******************************************************************************************************************************************************/
 /*! \brief          Sends one finished line to every open socket
- *  \details        Runs in the firmware's task, which is allowed to send asynchronously into
- *                  the server. A send that fails is not retried and the client is not
- *                  dropped here - the server's close hook owns that, and dropping a client
- *                  from this side would race with it.
+ *  \details        The widening to UTF-8 and the bound on it are WebFrontend's, shared with
+ *                  the other backend; what is this file's is the one call in sendText()
+ *                  below, where the IDF needs a walk over descriptors.
 ******************************************************************************************************************************************************/
 void WebInterface::broadcastLine(const char* Line)
 {
-    if(!IsListening || (Line == nullptr)) { return; }
-
-    /* Widened rather than sent as it stands - see toUtf8(). Two bytes per Latin-1 byte is
-       the worst case, so a line that is nothing but umlauts still fits and there is no
-       truncation to expect. Sized from the producer's own line length rather than from a
-       number of its own, because that is the buffer the line was assembled in.
-
-       The bound is still checked. Nothing longer can arrive today, but this takes a plain
-       pointer and the sink it is installed as is a function pointer - the day a second
-       producer appears, an assumption written only in a comment is the one that gives. */
-    char Payload[2u * WORDCLOCK_SERIAL_LINE_LENGTH];
-    size_t Used{0u};
-
-    for(const char* Character = Line; (*Character != '\0') && ((Used + 2u) <= sizeof(Payload)); Character++) {
-        Used += toUtf8(static_cast<byte>(*Character), &Payload[Used]);
-    }
-
-    if(Used == 0u) { return; }
-
-    /* One call where the IDF needs a walk over the descriptors: the socket knows who is
-       connected, so there is no list here to fall out of step with it. */
-    Socket.textAll(Payload, Used);
+    WebFrontend::getInstance().broadcastLine(Line);
 } /* broadcastLine */
 
 
@@ -747,51 +565,75 @@ void WebInterface::broadcastLine(const char* Line)
   broadcastFrame()
 ******************************************************************************************************************************************************/
 /*! \brief          Sends the pixel buffer to every open socket, when it changed
- *  \details        Rate limited first and compared second, so a display that changes on
- *                  every tick still costs one frame per interval, and one that stands still
- *                  costs a comparison.
- *
- *                  Sent in the strip's own byte order, green first: it is what the buffer
- *                  already holds, and the page is told the shape by /display rather than
- *                  guessing it. Taken from the output pixel, so what goes out is dimmed the
- *                  way the strip is - which is what lets the page blank itself when the
- *                  display is switched off, without a redraw to tell it so. The page reads
- *                  the bytes for that on/off state only and paints its own colour; the wx
- *                  window is the colour-accurate view.
+ *  \details        The rate limit, the gathering and the comparison against the last frame
+ *                  are WebFrontend's, shared with the other backend - none of the three has
+ *                  anything to do with which server is underneath. What is this file's is
+ *                  sendBinary() below.
  *
  *  \return         -
 ******************************************************************************************************************************************************/
 void WebInterface::broadcastFrame()
 {
-    if(!IsListening) { return; }
-
-    const bool Forced = ForceFrame.exchange(false, std::memory_order_acq_rel);
-
-    if(!Forced) {
-        if(FrameCountdown > 0u) { FrameCountdown--; return; }
-    }
-    FrameCountdown = WEB_INTERFACE_FRAME_INTERVAL_TICKS - 1u;
-
-    /* Nothing to send to, so nothing is even gathered. */
-    if(Socket.count() == 0u) { return; }
-
-    byte Frame[FrameSize];
-    byte* Target = Frame;
-    const Pixels& Strip = Pixels::getInstance();
-
-    for(byte Index = 0u; Index < PIXELS_NUMBER_OF_LEDS; Index++) {
-        const Pixel Colour = Strip.getOutputPixel(Index);
-
-        *Target++ = Colour.getGreen();
-        *Target++ = Colour.getRed();
-        *Target++ = Colour.getBlue();
-    }
-
-    if(!Forced && (memcmp(Frame, LastFrame, FrameSize) == 0)) { return; }
-    memcpy(LastFrame, Frame, FrameSize);
-
-    Socket.binaryAll(reinterpret_cast<const char*>(Frame), FrameSize);
+    WebFrontend::getInstance().broadcastFrame();
 } /* broadcastFrame */
+
+
+/******************************************************************************************************************************************************
+ *  W E B   T R A N S P O R T
+******************************************************************************************************************************************************/
+/* This backend's half of the contract WebFrontend.h states. Defined here rather than in a
+   source of its own because what it reaches - the server and its web socket - is this file's
+   and stays this file's. */
+
+WebTransport& WebTransport::getInstance()
+{
+    static WebTransport SingletonInstance;
+    return SingletonInstance;
+}
+
+bool WebTransport::isListening() const
+{
+    return IsListening;
+}
+
+bool WebTransport::hasClients() const
+{
+    /* The socket's own count, not a table of ours: it owns the list, so there is nothing here
+       that could fall out of step with it. */
+    return Socket.count() > 0u;
+}
+
+void WebTransport::sendText(const char* Text, size_t Length)
+{
+    Socket.textAll(Text, Length);
+}
+
+void WebTransport::sendBinary(const byte* Bytes, size_t Length)
+{
+    Socket.binaryAll(reinterpret_cast<const char*>(Bytes), Length);
+}
+
+
+/******************************************************************************************************************************************************
+ *  W E B   R E S P O N S E   B O D Y
+******************************************************************************************************************************************************/
+/* A response this server is pulled from rather than pushed to: the stream collects what is
+   written and finish() hands it to the request, which is when the library sends it. */
+
+WebResponseBody::WebResponseBody(AsyncWebServerRequest* sRequest, const char* ContentType)
+    : Request(sRequest), Stream(sRequest->beginResponseStream(ContentType))
+{
+}
+
+void WebResponseBody::write(const char* Data, size_t Length)
+{
+    Stream->write(reinterpret_cast<const uint8_t*>(Data), Length);
+}
+
+void WebResponseBody::finish()
+{
+    Request->send(Stream);
+}
 
 
 /******************************************************************************************************************************************************

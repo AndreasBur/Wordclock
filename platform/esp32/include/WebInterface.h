@@ -31,9 +31,10 @@
 ******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 
-#include "Pixels.h"
+/* What a browser is *sent* lives there, together with the frame rate limit and the longest
+   command a socket frame may carry - shared with the RP2350 backend rather than kept twice. */
+#include "WebFrontend.h"
 
-#include <atomic>
 #include <stddef.h>
 
 /******************************************************************************************************************************************************
@@ -44,17 +45,7 @@
    a wall clock does not need more, and the server's own limit has to be at least this. */
 #define WEB_INTERFACE_MAX_CLIENTS                       4u
 
-/* The longest command a frame may carry. Longer frames are refused rather than split, so
-   half a command can never reach the parser. Well above the longest command in the
-   reference, whose text overlay is the only one that comes close. */
-#define WEB_INTERFACE_MAX_FRAME_LENGTH                  192u
-
 #define WEB_INTERFACE_PORT                              80u
-
-/* In scheduler ticks, so 5 * 10 ms is twenty frames a second. The buffer is 330 bytes, so
-   that is under 7 KB/s and only while somebody is watching - sending on every tick would be
-   five times that for a display that changes far more slowly. */
-#define WEB_INTERFACE_FRAME_INTERVAL_TICKS              5u
 
 /* What the clock answers to on the local network, so no address has to be looked up. */
 #define WEB_INTERFACE_HOSTNAME                          "wordclock"
@@ -68,36 +59,13 @@ class WebInterface
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    static constexpr size_t MaxClients{WEB_INTERFACE_MAX_CLIENTS};
-    static constexpr int NoClient{-1};
-
-    static constexpr size_t FrameSize{PIXELS_NUMBER_OF_LEDS * Pixel::getNumberOfColors()};
-
-    /* What was last sent, so an unchanged display costs a comparison rather than a frame.
-       Same shape as Persistence, and for the same reason: nothing has to remember to report
-       a change, so nothing can forget. Pixels' own dirty flag cannot serve here - render()
-       clears it on its way to the strip, and a client that was not due on that tick would
-       never learn of the change. */
-    byte LastFrame[FrameSize]{};
-    byte FrameCountdown{0u};
-    /* Set when a client arrives, so the next frame goes out even though nothing changed. A
-       browser that connects to a standing display would otherwise wait for the next change -
-       on a word clock, up to five minutes of empty panel. Written by the server's task and
-       cleared by the firmware's; a byte either way, so a lost race costs one interval. */
-    std::atomic<bool> ForceFrame{false};
-
-    /* Written only by the HTTP server's task - on a handshake and on a close - and read
-       only by the firmware's task when it broadcasts. One writer is what makes the plain
-       atomics enough here, the same reasoning as for WordclockSerial's ring buffer. */
-    std::atomic<int> Clients[MaxClients];
-
-    // functions
-    void addClient(int);
-    void removeClient(int);
-
-    WebInterface() {
-        for(size_t Slot = 0u; Slot < MaxClients; Slot++) { Clients[Slot].store(NoClient); }
-    }
+    /* The table of socket descriptors this server hands out is not here but in the anonymous
+       namespace of WebInterface.cpp, beside the server handle it is used with and beside
+       WebTransport, which is the only thing that reads it. Keeping it a member would have
+       meant naming httpd's frame type in this header, and this header is reached from sources
+       that have not included the framework's own first - the ordering this backend's
+       Arduino.h depends on. */
+    WebInterface() { }
     ~WebInterface() { }
 
 /******************************************************************************************************************************************************
@@ -117,17 +85,19 @@ class WebInterface
     StdReturnType begin();
 
     /* Sends one finished line to every open socket. Called from the firmware's task through
-       WordclockSerial's line sink, not from the server's. */
+       WordclockSerial's line sink, not from the server's. Both of these forward into
+       WebFrontend, which is where the widening, the rate limit and the comparison live; they
+       stay on this class because the application and the line sink call them by this name. */
     void broadcastLine(const char*);
 
     /* Sends the pixel buffer as one binary frame, at most every
-       WEB_INTERFACE_FRAME_INTERVAL_TICKS and only when it changed. Called from the
+       WEB_FRONTEND_FRAME_INTERVAL_TICKS and only when it changed. Called from the
        application's tick, after the display has been handed to the strip. */
     void broadcastFrame();
 
     /* For the socket handler, which runs in the server's task. */
-    void onClientOpened(int Descriptor) { addClient(Descriptor); }
-    void onClientClosed(int Descriptor) { removeClient(Descriptor); }
+    void onClientOpened(int Descriptor);
+    void onClientClosed(int Descriptor);
 };
 
 #endif // _WEB_INTERFACE_H_

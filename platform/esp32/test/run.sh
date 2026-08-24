@@ -53,6 +53,11 @@ INCLUDES+=(-DWORDCLOCK_CORE_ARDUINO_H="\"$TEST_DIR/stubs/Arduino.h\"")
 
 FLAGS=(-std=gnu++17 -Wall -Wextra -Werror)
 
+# The firmware's web front end is compiled into every target that asks for it and out of the
+# ones that do not - the AVR-Dx has no radio to serve anything over, and firmware/src is
+# compiled whole. This backend asks, the same way platformio.ini does for the real build.
+FLAGS+=(-DWEB_FRONTEND_SUPPORT=STD_ON)
+
 # WebInterface serves a header the build generates from web/ - the page, the manifest and
 # the two home screen icons. Produced by the same script PlatformIO calls, so the tests
 # compile against what the device would carry. Into the cache rather than into the temporary
@@ -72,8 +77,12 @@ if [ ! -f "$KEY_FILE" ] || [ "$(cat "$KEY_FILE")" != "$KEY" ]; then
     printf '%s' "$KEY" > "$KEY_FILE"
 fi
 
+# WebFrontend.cpp is left out here and picked up with the backend's own web source below: it
+# calls into WebTransport, which this platform defines in WebInterface.cpp, so a binary
+# linking one without the other does not resolve. That is the same split the WEB entry below
+# already makes, now that half of what it served lives in the firmware.
 CORE=()
-while IFS= read -r source; do CORE+=("$source"); done < <(find "$ROOT/firmware/src" -name '*.cpp')
+while IFS= read -r source; do CORE+=("$source"); done < <(find "$ROOT/firmware/src" -name '*.cpp' -not -name 'WebFrontend.cpp')
 
 # WebInterface is not in here: it needs the HTTP server, and the two tests that want it
 # bring their own so they can see what it sends. A test that has no business with HTTP
@@ -89,7 +98,7 @@ BACKEND=(
     "$PLATFORM_DIR/src/WordclockMain.cpp"
     "$PLATFORM_DIR/src/WordclockSerial.cpp"
 )
-WEB="$PLATFORM_DIR/src/WebInterface.cpp"
+WEB=("$PLATFORM_DIR/src/WebInterface.cpp" "$ROOT/firmware/src/Communication/WebFrontend/WebFrontend.cpp")
 
 SHARED=("$TEST_DIR/stubs/hardware_port.cpp" "$TEST_DIR/stubs/stubs.cpp")
 
@@ -158,7 +167,7 @@ link() {   # name, then the sources that belong to it
     g++ "${FLAGS[@]}" -o "$WORK/$name" "${objects[@]}"
 }
 
-compileAll "${CORE[@]}" "${BACKEND[@]}" "${SHARED[@]}" "$WEB" \
+compileAll "${CORE[@]}" "${BACKEND[@]}" "${SHARED[@]}" "${WEB[@]}" \
            "$TEST_DIR/cases/frame_test.cpp" "$SHARED_TEST_DIR/cases/serial_test.cpp" "$SHARED_TEST_DIR/cases/ds3231_test.cpp" \
            "$TEST_DIR/cases/web_test.cpp" "$TEST_DIR/console/webhost.cpp" "$TEST_DIR/stubs/rmt_stubs.cpp"
 
@@ -167,8 +176,8 @@ compileAll "${CORE[@]}" "${BACKEND[@]}" "${SHARED[@]}" "$WEB" \
 link frame_test  "$TEST_DIR/cases/frame_test.cpp" "$PLATFORM_DIR/src/Pixels.cpp" "$PLATFORM_DIR/src/WordclockSerial.cpp"
 link serial_test "$SHARED_TEST_DIR/cases/serial_test.cpp" "${BACKEND[@]}" "${CORE[@]}" "$TEST_DIR/stubs/rmt_stubs.cpp"
 link ds3231_test "$SHARED_TEST_DIR/cases/ds3231_test.cpp" "${BACKEND[@]}" "${CORE[@]}" "$TEST_DIR/stubs/rmt_stubs.cpp"
-link web_test    "$TEST_DIR/cases/web_test.cpp" "$WEB" "${BACKEND[@]}" "${CORE[@]}" "$TEST_DIR/stubs/rmt_stubs.cpp"
-link webhost     "$TEST_DIR/console/webhost.cpp" "$WEB" "${BACKEND[@]}" "${CORE[@]}" "$TEST_DIR/stubs/rmt_stubs.cpp"
+link web_test    "$TEST_DIR/cases/web_test.cpp" "${WEB[@]}" "${BACKEND[@]}" "${CORE[@]}" "$TEST_DIR/stubs/rmt_stubs.cpp"
+link webhost     "$TEST_DIR/console/webhost.cpp" "${WEB[@]}" "${BACKEND[@]}" "${CORE[@]}" "$TEST_DIR/stubs/rmt_stubs.cpp"
 
 if [ "${1:-}" = "serve" ]; then
     # Not exec'd: the binaries live in a temporary directory, and the trap that removes it

@@ -286,7 +286,7 @@ int main()
 
     /* the display frame */
     WebInterface& web = WebInterface::getInstance();
-    const unsigned interval = WEB_INTERFACE_FRAME_INTERVAL_TICKS;
+    const unsigned interval = WEB_FRONTEND_FRAME_INTERVAL_TICKS;
     auto runInterval = [&web, interval](unsigned count) {
         for(unsigned tick = 0u; tick < (count * interval); tick++) { web.broadcastFrame(); }
     };
@@ -357,7 +357,7 @@ int main()
     check(framesSentTo(9) == 4u, "a display changing every tick still sends one per interval");
 
     /* an oversized frame must be refused whole rather than truncated into the parser */
-    PendingFrame.assign(WEB_INTERFACE_MAX_FRAME_LENGTH + 10u, 'x');
+    PendingFrame.assign(WEB_FRONTEND_MAX_FRAME_LENGTH + 10u, 'x');
     check(SocketHandler(&request) != ESP_OK, "an oversized frame is refused");
 
     /* ---- the firmware update ----------------------------------------------------------

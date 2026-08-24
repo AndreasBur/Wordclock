@@ -90,9 +90,15 @@ The two are the same program above the peripherals. Five things underneath are n
 
 The two pages are the shared ones, described in
 [`../../web/README.md`](../../web/README.md) - the panel at `/`, the console at
-`/console` - and serving them is a third less code here. `AsyncWebSocket` owns its client list,
-counts it and broadcasts to it, so the descriptor array, its atomics and the walk over them
-at every send are gone — `textAll()` is the whole of what they did.
+`/console` - and so is most of what is sent over them: the command catalog, the letter grid
+and the frame broadcast are
+[`WebFrontend`](../../firmware/inc/Communication/WebFrontend/WebFrontend.h) in the firmware,
+reached through the `WebTransport.h` this backend provides. What is left in `WebInterface.cpp`
+is the server, the password and the update.
+
+Of that remainder this backend has less than the ESP32's, for one reason: `AsyncWebSocket`
+owns its client list, counts it and broadcasts to it, so the descriptor array, its atomics
+and the walk over them at every send are gone — `textAll()` is the whole of what they did.
 
 ## Updating over the network
 

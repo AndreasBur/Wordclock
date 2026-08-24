@@ -31,30 +31,21 @@
 ******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 
-#include "Pixels.h"
+/* What a browser is *sent* lives there, together with the frame rate limit and the longest
+   command a socket frame may carry - shared with the ESP32 backend rather than kept twice. */
+#include "WebFrontend.h"
 
-#include <atomic>
 #include <stddef.h>
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
 /* WebInterface configuration parameter */
-/* How many browsers may watch at once. Each costs a socket in the server and a slot here;
-   a wall clock does not need more, and the server's own limit has to be at least this. */
-#define WEB_INTERFACE_MAX_CLIENTS                       4u
-
-/* The longest command a frame may carry. Longer frames are refused rather than split, so
-   half a command can never reach the parser. Well above the longest command in the
-   reference, whose text overlay is the only one that comes close. */
-#define WEB_INTERFACE_MAX_FRAME_LENGTH                  192u
-
+/* There is no client limit here, and the one that used to stand in this place was never one:
+   it sized a constant nothing read, because AsyncWebSocket owns the list and enforces its own
+   ceiling. The ESP32 keeps its WEB_INTERFACE_MAX_CLIENTS because a table there really is that
+   long and its server is told the same number. */
 #define WEB_INTERFACE_PORT                              80u
-
-/* In scheduler ticks, so 5 * 10 ms is twenty frames a second. The buffer is 330 bytes, so
-   that is under 7 KB/s and only while somebody is watching - sending on every tick would be
-   five times that for a display that changes far more slowly. */
-#define WEB_INTERFACE_FRAME_INTERVAL_TICKS              5u
 
 /* What the clock answers to on the local network, so no address has to be looked up. */
 #define WEB_INTERFACE_HOSTNAME                          "wordclock"
@@ -68,28 +59,10 @@ class WebInterface
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    static constexpr size_t MaxClients{WEB_INTERFACE_MAX_CLIENTS};
-
-    static constexpr size_t FrameSize{PIXELS_NUMBER_OF_LEDS * Pixel::getNumberOfColors()};
-
-    /* What was last sent, so an unchanged display costs a comparison rather than a frame.
-       Same shape as Persistence, and for the same reason: nothing has to remember to report
-       a change, so nothing can forget. Pixels' own dirty flag cannot serve here - render()
-       clears it on its way to the strip, and a client that was not due on that tick would
-       never learn of the change. */
-    byte LastFrame[FrameSize]{};
-    byte FrameCountdown{0u};
-    /* Set when a client arrives, so the next frame goes out even though nothing changed. A
-       browser that connects to a standing display would otherwise wait for the next change -
-       on a word clock, up to five minutes of empty panel. Written by the server's callback
-       and cleared by the firmware's tick; a byte either way, so a lost race costs one
-       interval.
-
-       The list of clients itself is not kept here, unlike on the ESP32: AsyncWebSocket owns
-       it, counts it and broadcasts to it, so a second copy could only ever disagree with
-       the first. */
-    std::atomic<bool> ForceFrame{false};
-
+    /* Nothing is kept here at all any more. The list of clients never was - AsyncWebSocket
+       owns it, counts it and broadcasts to it, so a second copy could only ever disagree with
+       the first - and the frame bookkeeping that used to sit beside it is WebFrontend's now,
+       a rate limit and a comparison being the same on any backend. */
     WebInterface() { }
     ~WebInterface() { }
 
@@ -110,18 +83,20 @@ class WebInterface
     StdReturnType begin();
 
     /* Sends one finished line to every open socket. Called from the firmware's task through
-       WordclockSerial's line sink, not from the server's. */
+       WordclockSerial's line sink, not from the server's. Both of these forward into
+       WebFrontend, which is where the widening, the rate limit and the comparison live; they
+       stay on this class because the application and the line sink call them by this name. */
     void broadcastLine(const char*);
 
     /* Sends the pixel buffer as one binary frame, at most every
-       WEB_INTERFACE_FRAME_INTERVAL_TICKS and only when it changed. Called from the
+       WEB_FRONTEND_FRAME_INTERVAL_TICKS and only when it changed. Called from the
        application's tick, after the display has been handed to the strip. */
     void broadcastFrame();
 
     /* For the socket callback, which runs in the network stack's context rather than the
        firmware's tick. Only the force flag is touched from there; who is connected is the
        socket's own business. */
-    void onClientOpened() { ForceFrame.store(true, std::memory_order_release); }
+    void onClientOpened() { WebFrontend::getInstance().onClientOpened(); }
 };
 
 #endif // _WEB_INTERFACE_H_
