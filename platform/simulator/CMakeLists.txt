@@ -78,10 +78,13 @@ foreach(dir ${ARDUINO_INC_DIRS})
         target_include_directories(WordclockBuildSettings INTERFACE "${dir}")
     endif()
 endforeach()
-# Nested Communication/MessageParser dirs are not caught by the glob above.
+# Nested Communication/* dirs are not caught by the glob above.
 target_include_directories(WordclockBuildSettings INTERFACE
     "${FIRMWARE_DIR}/inc/Communication/MessageParser"
-    "${FIRMWARE_DIR}/inc/Communication/MessageParser/Base")
+    "${FIRMWARE_DIR}/inc/Communication/MessageParser/Base"
+    # WebFrontend compiles to nothing here - this build never defines WEB_FRONTEND_SUPPORT -
+    # but its header still has to be findable, because firmware/src is globbed whole.
+    "${FIRMWARE_DIR}/inc/Communication/WebFrontend")
 
 if(MSVC)
     target_compile_options(WordclockBuildSettings INTERFACE /W4)

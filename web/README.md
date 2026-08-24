@@ -69,6 +69,13 @@ ends and on the wire at once, with nothing to keep in step by hand. The built co
 into the input field rather than straight onto the wire, so it can still be corrected,
 exactly as the wx builder's Insert does.
 
+That JSON is written by
+[`WebFrontend`](../firmware/inc/Communication/WebFrontend/WebFrontend.h) in the firmware, once
+for every backend. It used to be written by each of them, in two functions that were identical
+down to their comments - and since a page parses what they produced, a divergence between them
+would have shown up in a browser rather than in either backend's tests, which check the bytes a
+route answered and not what the page makes of them.
+
 The form and that input are **one tile**, which they were not at first, and the split is worth
 recording because it read as harmless: the builder was a folded panel of its own and Use wrote
 into the console's, which is folded shut until somebody opens it. So pressing Use closed the

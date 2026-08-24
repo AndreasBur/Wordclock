@@ -23,14 +23,14 @@
 
 #include "Arduino.h"
 
-#include "Communication.h"
-#include "DisplayCharacters.h"
-#include "MessageCatalog.h"
 #include "System.h"
+#include "WebFrontend.h"
 #include "WebInterface.h"
 #include "WebPage.h"
+#include "WebTransport.h"
 #include "WordclockSerial.h"
 
+#include <atomic>
 #include <string.h>
 #include <unistd.h>
 
@@ -43,6 +43,55 @@ namespace {
    namespace, and an unqualified Server here is then ambiguous. */
 httpd_handle_t HttpServer{nullptr};
 
+constexpr size_t MaxClients{WEB_INTERFACE_MAX_CLIENTS};
+constexpr int NoClient{-1};
+
+/* The descriptors this server hands out, which it expects to be kept: unlike a library that
+   owns its client list, the IDF's server reports a handshake and a close and leaves the
+   bookkeeping here.
+
+   Written only by the HTTP server's task - on a handshake and on a close - and read only by
+   the firmware's task when it broadcasts. One writer is what makes the plain atomics enough,
+   the same reasoning as for WordclockSerial's ring buffer.
+
+   Reached through a function rather than left as an object with static storage duration,
+   because the slots start at NoClient and not at zero, and zero is a descriptor a socket can
+   actually be given. Initialising on first use is also what the singleton it used to live on
+   did. */
+struct ClientTableType {
+    std::atomic<int> Slots[MaxClients];
+
+    ClientTableType() {
+        for(size_t Slot = 0u; Slot < MaxClients; Slot++) { Slots[Slot].store(NoClient); }
+    }
+};
+
+ClientTableType& clientTable()
+{
+    static ClientTableType Table;
+    return Table;
+}
+
+/* One frame to everybody, which is what both of WebTransport's send calls come down to - the
+   type and the payload are all that differ between a line and a display frame. A send that
+   fails is not retried and the client is not dropped here: the server's close hook owns that,
+   and dropping a client from this side would race with it. */
+void sendToEveryClient(httpd_ws_type_t Type, uint8_t* Payload, size_t Length)
+{
+    if((HttpServer == nullptr) || (Length == 0u)) { return; }
+
+    httpd_ws_frame_t Frame{};
+    Frame.type = Type;
+    Frame.payload = Payload;
+    Frame.len = Length;
+
+    for(size_t Slot = 0u; Slot < MaxClients; Slot++) {
+        const int Descriptor = clientTable().Slots[Slot].load(std::memory_order_acquire);
+
+        if(Descriptor != NoClient) { httpd_ws_send_frame_async(HttpServer, Descriptor, &Frame); }
+    }
+}
+
 /* Handed to WordclockSerial, which takes a plain function pointer - so the singleton is
    reached from here rather than carried along. */
 void sendLineToClients(const char* Line)
@@ -53,30 +102,6 @@ void sendLineToClients(const char* Line)
 /******************************************************************************************************************************************************
  *  LOCAL FUNCTIONS
 ******************************************************************************************************************************************************/
-/* One Latin-1 byte as UTF-8, into Target, answering how many bytes that took. The whole of
-   Latin-1 widens by this one rule, so no table is needed: below 0x80 a byte is itself, and
-   above it becomes two.
-
-   Both ways out of here need it, for different reasons. The letters served by /display are
-   Latin-1 because the table holds one byte per letter, and JSON is UTF-8 - a raw 0xDC there
-   makes the whole document invalid rather than one letter wrong.
-
-   An answer line needs it for a harder reason: it leaves as a web socket *text* frame, and
-   RFC 6455 requires those to be valid UTF-8. A raw 0xF6 in one does not draw a wrong
-   character, it makes the browser close the connection. That is reachable rather than
-   theoretical - command 8 answers with the overlay text it was given, and an umlaut in that
-   text is exactly what the font tables carry umlauts for. */
-byte toUtf8(byte Latin1, char* Target)
-{
-    if(Latin1 < 0x80u) {
-        Target[0u] = static_cast<char>(Latin1);
-        return 1u;
-    }
-    Target[0u] = static_cast<char>(0xC0u | (Latin1 >> 6u));
-    Target[1u] = static_cast<char>(0x80u | (Latin1 & 0x3Fu));
-    return 2u;
-}
-
 /******************************************************************************************************************************************************
   isRequestAuthorised()
 ******************************************************************************************************************************************************/
@@ -328,75 +353,18 @@ esp_err_t handleIcon512(httpd_req_t* Request)
 
 
 /******************************************************************************************************************************************************
-  C H U N K   W R I T E R
+  handleCommands() / handleDisplay()
 ******************************************************************************************************************************************************/
-/* Collects the catalog's JSON in a small buffer and hands it over in chunks, so neither the
-   whole document nor any allocation is needed to serve it. */
-class ChunkWriter
-{
-  private:
-    static constexpr size_t Capacity{256u};
-
-    httpd_req_t* Request;
-    char Buffer[Capacity]{};
-    size_t Used{0u};
-
-    void flush() {
-        if(Used == 0u) { return; }
-
-        httpd_resp_send_chunk(Request, Buffer, Used);
-        Used = 0u;
-    }
-
-  public:
-    explicit ChunkWriter(httpd_req_t* sRequest) : Request(sRequest) { }
-
-    void put(char Character) {
-        if(Used == Capacity) { flush(); }
-
-        Buffer[Used++] = Character;
-    }
-
-    void put(const char* Text) {
-        if(Text == nullptr) { return; }
-
-        for(const char* Character = Text; *Character != '\0'; Character++) { put(*Character); }
-    }
-
-    void putNumber(uint16_t Number) {
-        char Digits[8]{};
-
-        snprintf(Digits, sizeof(Digits), "%u", static_cast<unsigned>(Number));
-        put(Digits);
-    }
-
-    /* Escaped, because a label is data: a quote in one would otherwise produce a document
-       the browser refuses whole, and that failure looks like a server fault. */
-    void putString(const char* Text) {
-        put('"');
-        for(const char* Character = Text; (Text != nullptr) && (*Character != '\0'); Character++) {
-            if((*Character == '"') || (*Character == '\\')) { put('\\'); }
-            put(*Character);
-        }
-        put('"');
-    }
-
-    /* The empty chunk is what ends a chunked response. */
-    void finish() {
-        flush();
-        httpd_resp_send_chunk(Request, nullptr, 0);
-    }
-};
-
-/******************************************************************************************************************************************************
-  handleCommands()
-******************************************************************************************************************************************************/
-/*! \brief          Serves the command catalog, so the page can build its own form
- *  \details        Generated from MessageCatalog rather than written out a second time.
- *                  That table is what the simulator's message builder derives its whole
- *                  dialog from, down to the input hints; serving it here makes the browser
- *                  a second renderer of the same description, so a command added to the
- *                  catalog shows up in both front ends and on the wire at once.
+/*! \brief          Serves the command catalog and the panel's letters
+ *
+ *  \details        Both documents are written by WebFrontend, shared with the RP2350 backend:
+ *                  what a page is sent is a property of the catalog and the letter table, not
+ *                  of a controller. They were generated here once, and identically in the
+ *                  other backend - two functions that had to be kept the same by hand and
+ *                  whose divergence would have surfaced in a browser rather than in a test.
+ *
+ *                  What is left here is what is genuinely this server's: the password, the
+ *                  content type, and a body to write into.
  *
  *  \return         ESP_OK
 ******************************************************************************************************************************************************/
@@ -404,100 +372,18 @@ esp_err_t handleCommands(httpd_req_t* Request)
 {
     if(!isRequestAuthorised(Request)) { return ESP_OK; }
 
-    httpd_resp_set_type(Request, "application/json");
-
-    ChunkWriter Writer(Request);
-    Writer.put('[');
-
-    for(byte Index = 0u; Index < MessageCatalog::getNumberOfCommands(); Index++) {
-        const MessageCatalog::CommandType& Command = MessageCatalog::getCommand(Index);
-
-        if(Index > 0u) { Writer.put(','); }
-        Writer.put("{\"number\":");
-        Writer.putNumber(Command.Number);
-        Writer.put(",\"label\":");
-        Writer.putString(Command.Label);
-        Writer.put(",\"options\":[");
-
-        for(byte OptionIndex = 0u; OptionIndex < Command.NumberOfOptions; OptionIndex++) {
-            const MessageCatalog::OptionType& Option = Command.Options[OptionIndex];
-
-            if(OptionIndex > 0u) { Writer.put(','); }
-            Writer.put("{\"short\":\"");
-            Writer.put(Option.ShortName);
-            Writer.put("\",\"label\":");
-            Writer.putString(Option.Label);
-            Writer.put(",\"type\":");
-            Writer.putNumber(static_cast<uint16_t>(Option.Argument));
-            Writer.put(",\"min\":");
-            Writer.putNumber(Option.Minimum);
-            Writer.put(",\"max\":");
-            Writer.putNumber(Option.Maximum);
-
-            /* Only where it is set, so the page's form stays as it was for every option
-               that can be sent, and the read-only fields it must not offer are the ones
-               that say so. */
-            if(Option.ReadOnly) { Writer.put(",\"readonly\":true"); }
-
-            if((Option.ValueNames != nullptr) && (Option.NumberOfValueNames > 0u)) {
-                Writer.put(",\"values\":[");
-                for(byte NameIndex = 0u; NameIndex < Option.NumberOfValueNames; NameIndex++) {
-                    if(NameIndex > 0u) { Writer.put(','); }
-                    Writer.putString(Option.ValueNames[NameIndex]);
-                }
-                Writer.put(']');
-            }
-            Writer.put('}');
-        }
-        Writer.put("]}");
-    }
-
-    Writer.put(']');
-    Writer.finish();
+    WebResponseBody Body(Request, "application/json");
+    WebFrontend::writeCommands(Body);
 
     return ESP_OK;
 }
 
-
-/******************************************************************************************************************************************************
-  handleDisplay()
-******************************************************************************************************************************************************/
-/*! \brief          Serves the panel's shape and its letters
- *  \details        The page draws a grid of letters and has to know which, and there is
- *                  exactly one table of them - DisplayCharacters in the firmware. Serving
- *                  it keeps the browser from carrying a second copy, which is the
- *                  duplication the simulator used to have and no longer does.
- *
- *                  The table stores one byte per letter, so the umlauts are Latin-1 and are
- *                  widened to UTF-8 on the way out: JSON is UTF-8, and a raw 0xDC makes the
- *                  whole document invalid rather than one letter wrong.
- *
- *  \return         ESP_OK
-******************************************************************************************************************************************************/
 esp_err_t handleDisplay(httpd_req_t* Request)
 {
     if(!isRequestAuthorised(Request)) { return ESP_OK; }
 
-    httpd_resp_set_type(Request, "application/json");
-
-    const DisplayCharacters Letters;
-    ChunkWriter Writer(Request);
-
-    Writer.put("{\"columns\":");
-    Writer.putNumber(DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS);
-    Writer.put(",\"rows\":");
-    Writer.putNumber(DISPLAY_CHARACTERS_NUMBER_OF_ROWS);
-    Writer.put(",\"letters\":\"");
-
-    for(byte Index = 0u; Index < DISPLAY_CHARACTERS_NUMBER_OF_CHARACTERS; Index++) {
-        char Utf8[2u];
-        const byte Length = toUtf8(static_cast<byte>(Letters.getCharacter(Index)), Utf8);
-
-        for(byte Byte = 0u; Byte < Length; Byte++) { Writer.put(Utf8[Byte]); }
-    }
-
-    Writer.put("\"}");
-    Writer.finish();
+    WebResponseBody Body(Request, "application/json");
+    WebFrontend::writeDisplay(Body);
 
     return ESP_OK;
 }
@@ -531,29 +417,25 @@ esp_err_t handleSocket(httpd_req_t* Request)
         return ESP_OK;
     }
 
-    uint8_t Payload[WEB_INTERFACE_MAX_FRAME_LENGTH + 1u]{};
+    uint8_t Payload[WEB_FRONTEND_MAX_FRAME_LENGTH + 1u]{};
     httpd_ws_frame_t Frame{};
     Frame.type = HTTPD_WS_TYPE_TEXT;
     Frame.payload = Payload;
 
     /* Asking with the buffer's size rather than in two steps: a frame that does not fit is
        refused whole, so half a command can never reach the parser. */
-    const esp_err_t Result = httpd_ws_recv_frame(Request, &Frame, WEB_INTERFACE_MAX_FRAME_LENGTH);
+    const esp_err_t Result = httpd_ws_recv_frame(Request, &Frame, WEB_FRONTEND_MAX_FRAME_LENGTH);
     if(Result != ESP_OK) { return Result; }
 
     if(Frame.type == HTTPD_WS_TYPE_CLOSE) {
         WebInterface::getInstance().onClientClosed(httpd_req_to_sockfd(Request));
         return ESP_OK;
     }
-    if((Frame.type != HTTPD_WS_TYPE_TEXT) || (Frame.len == 0u)) { return ESP_OK; }
+    if(Frame.type != HTTPD_WS_TYPE_TEXT) { return ESP_OK; }
 
-    WordclockSerial& Port = WordclockSerial::getInstance();
-    Port.inject(reinterpret_cast<const char*>(Payload), Frame.len);
-
-    if(Payload[Frame.len - 1u] != Communication::getEndOfMessageChar()) {
-        const char Terminator = Communication::getEndOfMessageChar();
-        Port.inject(&Terminator, 1u);
-    }
+    /* The terminator and the empty-frame case are WebFrontend's, so that a command coming off
+       a socket reaches the parser the same way on either backend. */
+    WebFrontend::injectCommand(reinterpret_cast<const char*>(Payload), Frame.len);
 
     return ESP_OK;
 }
@@ -650,42 +532,13 @@ StdReturnType WebInterface::begin()
   broadcastLine()
 ******************************************************************************************************************************************************/
 /*! \brief          Sends one finished line to every open socket
- *  \details        Runs in the firmware's task, which is allowed to send asynchronously into
- *                  the server. A send that fails is not retried and the client is not
- *                  dropped here - the server's close hook owns that, and dropping a client
- *                  from this side would race with it.
+ *  \details        The widening to UTF-8 and the bound on it are WebFrontend's, shared with
+ *                  the other backend; what is this file's is the walk over the descriptors,
+ *                  in sendText() below.
 ******************************************************************************************************************************************************/
 void WebInterface::broadcastLine(const char* Line)
 {
-    if((HttpServer == nullptr) || (Line == nullptr)) { return; }
-
-    /* Widened rather than sent as it stands - see toUtf8(). Two bytes per Latin-1 byte is
-       the worst case, so a line that is nothing but umlauts still fits and there is no
-       truncation to expect. Sized from the producer's own line length rather than from a
-       number of its own, because that is the buffer the line was assembled in.
-
-       The bound is still checked. Nothing longer can arrive today, but this takes a plain
-       pointer and the sink it is installed as is a function pointer - the day a second
-       producer appears, an assumption written only in a comment is the one that gives. */
-    char Payload[2u * WORDCLOCK_SERIAL_LINE_LENGTH];
-    size_t Used{0u};
-
-    for(const char* Character = Line; (*Character != '\0') && ((Used + 2u) <= sizeof(Payload)); Character++) {
-        Used += toUtf8(static_cast<byte>(*Character), &Payload[Used]);
-    }
-
-    httpd_ws_frame_t Frame{};
-    Frame.type = HTTPD_WS_TYPE_TEXT;
-    Frame.payload = reinterpret_cast<uint8_t*>(Payload);
-    Frame.len = Used;
-
-    if(Frame.len == 0u) { return; }
-
-    for(size_t Slot = 0u; Slot < MaxClients; Slot++) {
-        const int Descriptor = Clients[Slot].load(std::memory_order_acquire);
-
-        if(Descriptor != NoClient) { httpd_ws_send_frame_async(HttpServer, Descriptor, &Frame); }
-    }
+    WebFrontend::getInstance().broadcastLine(Line);
 } /* broadcastLine */
 
 
@@ -693,113 +546,124 @@ void WebInterface::broadcastLine(const char* Line)
   broadcastFrame()
 ******************************************************************************************************************************************************/
 /*! \brief          Sends the pixel buffer to every open socket, when it changed
- *  \details        Rate limited first and compared second, so a display that changes on
- *                  every tick still costs one frame per interval, and one that stands still
- *                  costs a comparison.
- *
- *                  Sent in the strip's own byte order, green first: it is what the buffer
- *                  already holds, and the page is told the shape by /display rather than
- *                  guessing it. Taken from the output pixel, so what goes out is dimmed the
- *                  way the strip is - which is what lets the page blank itself when the
- *                  display is switched off, without a redraw to tell it so. The page reads
- *                  the bytes for that on/off state only and paints its own colour; the wx
- *                  window is the colour-accurate view.
+ *  \details        The rate limit, the gathering and the comparison against the last frame
+ *                  are WebFrontend's, shared with the other backend - none of the three has
+ *                  anything to do with which server is underneath. What is this file's is
+ *                  sendBinary() below.
  *
  *  \return         -
 ******************************************************************************************************************************************************/
 void WebInterface::broadcastFrame()
 {
-    if(HttpServer == nullptr) { return; }
-
-    const bool Forced = ForceFrame.exchange(false, std::memory_order_acq_rel);
-
-    if(!Forced) {
-        if(FrameCountdown > 0u) { FrameCountdown--; return; }
-    }
-    FrameCountdown = WEB_INTERFACE_FRAME_INTERVAL_TICKS - 1u;
-
-    /* Nothing to send to, so nothing is even gathered. */
-    bool HasClient = false;
-    for(size_t Slot = 0u; Slot < MaxClients; Slot++) {
-        if(Clients[Slot].load(std::memory_order_acquire) != NoClient) { HasClient = true; }
-    }
-    if(!HasClient) { return; }
-
-    byte Frame[FrameSize];
-    byte* Target = Frame;
-    const Pixels& Strip = Pixels::getInstance();
-
-    for(byte Index = 0u; Index < PIXELS_NUMBER_OF_LEDS; Index++) {
-        const Pixel Colour = Strip.getOutputPixel(Index);
-
-        *Target++ = Colour.getGreen();
-        *Target++ = Colour.getRed();
-        *Target++ = Colour.getBlue();
-    }
-
-    if(!Forced && (memcmp(Frame, LastFrame, FrameSize) == 0)) { return; }
-    memcpy(LastFrame, Frame, FrameSize);
-
-    httpd_ws_frame_t WsFrame{};
-    WsFrame.type = HTTPD_WS_TYPE_BINARY;
-    WsFrame.payload = Frame;
-    WsFrame.len = FrameSize;
-
-    for(size_t Slot = 0u; Slot < MaxClients; Slot++) {
-        const int Descriptor = Clients[Slot].load(std::memory_order_acquire);
-
-        if(Descriptor != NoClient) { httpd_ws_send_frame_async(HttpServer, Descriptor, &WsFrame); }
-    }
+    WebFrontend::getInstance().broadcastFrame();
 } /* broadcastFrame */
 
 
 /******************************************************************************************************************************************************
- * P R I V A T E   F U N C T I O N S
+ *  W E B   T R A N S P O R T
 ******************************************************************************************************************************************************/
+/* This backend's half of the contract WebFrontend.h states. Defined here rather than in a
+   source of its own because what it reads is this file's: the server handle above and the
+   descriptor table on WebInterface. */
+
+WebTransport& WebTransport::getInstance()
+{
+    static WebTransport SingletonInstance;
+    return SingletonInstance;
+}
+
+bool WebTransport::isListening() const
+{
+    return HttpServer != nullptr;
+}
+
+bool WebTransport::hasClients() const
+{
+    for(size_t Slot = 0u; Slot < MaxClients; Slot++) {
+        if(clientTable().Slots[Slot].load(std::memory_order_acquire) != NoClient) { return true; }
+    }
+    return false;
+}
+
+void WebTransport::sendText(const char* Text, size_t Length)
+{
+    /* const_cast because httpd's frame struct is the same type used for receiving, where the
+       payload is written into. Nothing on the sending path writes through it. */
+    sendToEveryClient(HTTPD_WS_TYPE_TEXT, reinterpret_cast<uint8_t*>(const_cast<char*>(Text)), Length);
+}
+
+void WebTransport::sendBinary(const byte* Bytes, size_t Length)
+{
+    sendToEveryClient(HTTPD_WS_TYPE_BINARY, const_cast<uint8_t*>(Bytes), Length);
+}
+
 
 /******************************************************************************************************************************************************
-  addClient()
+ *  W E B   R E S P O N S E   B O D Y
+******************************************************************************************************************************************************/
+/* A chunked response, which is what this server offers: a chunk handed over is a chunk on the
+   wire, and the empty one at the end is what closes it. */
+
+WebResponseBody::WebResponseBody(struct httpd_req* sRequest, const char* ContentType)
+    : Request(sRequest)
+{
+    httpd_resp_set_type(Request, ContentType);
+}
+
+void WebResponseBody::write(const char* Data, size_t Length)
+{
+    httpd_resp_send_chunk(Request, Data, static_cast<ssize_t>(Length));
+}
+
+void WebResponseBody::finish()
+{
+    httpd_resp_send_chunk(Request, nullptr, 0);
+}
+
+
+/******************************************************************************************************************************************************
+  onClientOpened()
 ******************************************************************************************************************************************************/
 /*! \brief          Remembers a socket to broadcast to
  *  \details        A full table drops the newcomer rather than an established console, and
  *                  says so on the UART - silently serving a page whose socket then never
  *                  answers is the more confusing failure.
 ******************************************************************************************************************************************************/
-void WebInterface::addClient(int Descriptor)
+void WebInterface::onClientOpened(int Descriptor)
 {
-    /* Set before the table is even looked at: either way a client just arrived, and it has to
+    /* Told before the table is even looked at: either way a client just arrived, and it has to
        be shown the display as it stands rather than as it next changes. That includes the
        descriptor already being in the table - the system reuses them, so the same number
        coming back is a new client rather than the old one. */
-    ForceFrame.store(true, std::memory_order_release);
+    WebFrontend::getInstance().onClientOpened();
 
     for(size_t Slot = 0u; Slot < MaxClients; Slot++) {
-        if(Clients[Slot].load(std::memory_order_relaxed) == Descriptor) { return; }
+        if(clientTable().Slots[Slot].load(std::memory_order_relaxed) == Descriptor) { return; }
     }
 
     for(size_t Slot = 0u; Slot < MaxClients; Slot++) {
-        if(Clients[Slot].load(std::memory_order_relaxed) == NoClient) {
-            Clients[Slot].store(Descriptor, std::memory_order_release);
+        if(clientTable().Slots[Slot].load(std::memory_order_relaxed) == NoClient) {
+            clientTable().Slots[Slot].store(Descriptor, std::memory_order_release);
             return;
         }
     }
 
     Serial.println(F("Web: too many consoles, this one gets no answers"));
-} /* addClient */
+} /* onClientOpened */
 
 
 /******************************************************************************************************************************************************
-  removeClient()
+  onClientClosed()
 ******************************************************************************************************************************************************/
-void WebInterface::removeClient(int Descriptor)
+void WebInterface::onClientClosed(int Descriptor)
 {
     for(size_t Slot = 0u; Slot < MaxClients; Slot++) {
-        if(Clients[Slot].load(std::memory_order_relaxed) == Descriptor) {
-            Clients[Slot].store(NoClient, std::memory_order_release);
+        if(clientTable().Slots[Slot].load(std::memory_order_relaxed) == Descriptor) {
+            clientTable().Slots[Slot].store(NoClient, std::memory_order_release);
             return;
         }
     }
-} /* removeClient */
+} /* onClientClosed */
 
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E
