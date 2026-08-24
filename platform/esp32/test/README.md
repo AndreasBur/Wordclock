@@ -2,11 +2,10 @@
 
 ```bash
 platform/esp32/test/run.sh              # build and run the tests
-platform/esp32/test/run.sh serve 8080   # serve the console on localhost, firmware behind it
 ```
 
-Needs `g++`, `python3` and — for `serve` — `node`. No ESP32 toolchain: the backend is
-compiled against the stand-ins in [`stubs/`](stubs/) instead of the real framework.
+Needs `g++` and `python3`. No ESP32 toolchain: the backend is compiled against the stand-ins
+in [`stubs/`](stubs/) instead of the real framework.
 
 ```
 test/
@@ -43,21 +42,17 @@ answers on its bus, whether SNTP arrives.
 
 `run.sh` builds with `-Wall -Wextra -Werror`, so a warning fails the run.
 
-## The local console
+## Looking at the pages is not here any more
 
-`run.sh serve` puts the real firmware behind the page:
+There used to be a `serve` mode in `run.sh`, and a `console/` beside this file holding a host
+build of the backend plus a node server to put in front of it. Both are gone. node did the
+HTTP and the web socket there, and the host binary answered a line protocol, so nothing about
+*this* backend's server was ever exercised by pointing a browser at it - what was, is what
+`cases/web_test.cpp` drives directly.
 
-- `/` serves [`../web/index.html`](../web/index.html) **from disk**, so editing it is a
-  browser reload rather than a flash
-- `/commands` is answered by the platform's own handler, so the browser gets what the
-  device would send
-- the web socket goes into `WordclockSerial::inject()`, and the answers come back out of
-  the firmware's own line sink
-
-[`console/webhost.cpp`](console/webhost.cpp) is the clock as a host process: it runs the whole firmware
-core at the scheduler's real interval and speaks a line protocol on stdio.
-[`console/serve.js`](console/serve.js) does HTTP and the web socket, framing included, so nothing has to
-be installed for it.
+The pages themselves are served by the simulator now, which needs no second process and no
+node: `./build/bin/Wordclock` answers `http://localhost:8080/`. See
+[`../../simulator/README.md`](../../simulator/README.md).
 
 ## The stand-ins
 
@@ -66,8 +61,8 @@ names it includes them by. Two rules kept them honest:
 
 - **A test that wants to see what the backend sent defines that call itself.** The RMT
   functions live in `cases/frame_test.cpp` because it keeps the frame; the HTTP functions live in
-  `cases/web_test.cpp` and `console/webhost.cpp` because they capture what was served. `stubs/stubs.cpp` has
-  only what nobody inspects.
+  `cases/web_test.cpp` because it captures what was served. `stubs/stubs.cpp` has only what
+  nobody inspects.
 - **The hardware port is defined away from the platform's `Arduino.h`.** There the name
   `Serial` is the multiplexer, so [`stubs/hardware_port.cpp`](stubs/hardware_port.cpp) includes the
   stub directly, through the same define the real build passes in.

@@ -91,8 +91,9 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      # Needs nothing but g++, python3 and node, which the runner already carries. The
-      # script compiles into an object cache under .pio/ and links from there.
+      # Needs nothing but g++ and python3, which the runner already carries - node went with
+      # the `serve` mode, the pages being the simulator's to serve now. The script compiles
+      # into an object cache under .pio/ and links from there.
       - name: Run the host tests
         run: platform/esp32/test/run.sh
 

@@ -115,11 +115,19 @@ void SerialShim::appendOutput(const wxString& Text)
 ******************************************************************************************************************************************************/
 void SerialShim::finishOutputLine()
 {
-    if(!isAttached()) { return; }
+    /* The browsers first, and outside the attached check: they are watching whether or not a
+       window has handed its controls over, and an answer that reached one front end and not
+       the other is the confusing half. */
+    if(LineSink != nullptr) { LineSink(OutputLine.utf8_str()); }
 
-    Output->AppendText(_T("\n"));
-    Output->AppendText(MessageDecoder::describe(OutputLine));
+    if(isAttached()) {
+        Output->AppendText(_T("\n"));
+        Output->AppendText(MessageDecoder::describe(OutputLine));
+    }
 
+    /* Cleared whether or not anything displayed it. It used to be cleared only on the way
+       past the controls, so a run with none would have grown one line for the length of it -
+       harmless while nothing else read the line, and not once a socket does. */
     OutputLine.Clear();
 } /* finishOutputLine */
 

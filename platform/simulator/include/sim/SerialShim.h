@@ -60,6 +60,10 @@ class SerialShim
     wxTextCtrl* Output{nullptr};
     wxTextCtrl* Input{nullptr};
 
+    /* Nothing until the web front end installs itself, which is a clock with no browsers
+       watching and the case the simulator ran in until now. */
+    void (*LineSink)(const char*){nullptr};
+
     // functions
     /* Not constexpr, unlike the firmware's singletons: wxString has no constexpr
        constructor. */
@@ -111,6 +115,23 @@ class SerialShim
 
     bool available() const { return !SendBuffer.IsEmpty(); }
     char read();
+
+    /* The second front end, the same arrangement the two networked backends have: a browser
+       sends command text over a web socket and it arrives here as though it had been typed.
+       Appended rather than assigned, unlike sendInput() below - what is typed can wait for
+       the field to clear, but a command already on the wire has nowhere to wait.
+
+       Called from the firmware's tick, because the simulator's server is polled from the same
+       timer rather than run in a task of its own. That is what lets this be a wxString at all:
+       on hardware the equivalent buffer is lock-free because a second task writes it. */
+    void inject(const char* Text, size_t Length) {
+        SendBuffer += wxString::FromUTF8(Text, Length);
+    }
+
+    /* Where a finished output line goes besides the text control. Set by the web front end so
+       every answer reaches the browsers too; a plain function pointer, as on hardware. */
+    using LineSinkType = void (*)(const char*);
+    void setLineSink(LineSinkType sLineSink) { LineSink = sLineSink; }
 
     /* The window side */
     void sendInput();

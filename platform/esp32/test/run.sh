@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 #
-# Builds and runs the host tests for the ESP32 backend, and optionally the local web
-# console that serves the page with the firmware behind it.
+# Builds and runs the host tests for the ESP32 backend.
 #
 # The backend is compiled with the host compiler against the stand-ins in stubs/ rather
 # than the real framework. That leaves the hardware out of reach - the pulse timing, the
@@ -10,8 +9,12 @@
 # back. Those are the parts a board would not show any more clearly.
 #
 #   test/run.sh              build and run the tests
-#   test/run.sh serve [port] the same binaries, serving both pages on localhost
 #   test/run.sh clean        throw the object cache away
+#
+# There used to be a `serve` here, which put node in front of a host build of this backend so
+# a browser could be pointed at the pages. The simulator serves them itself now - one binary,
+# a real HTTP server and a real web socket - so what this kept alive was a second way to do
+# the same thing, with more parts. See platform/simulator/README.md.
 #
 # Every source is compiled once into an object cache under .pio/ and the binaries are
 # linked from those objects. It used to compile straight to executables, which meant the
@@ -169,7 +172,7 @@ link() {   # name, then the sources that belong to it
 
 compileAll "${CORE[@]}" "${BACKEND[@]}" "${SHARED[@]}" "${WEB[@]}" \
            "$TEST_DIR/cases/frame_test.cpp" "$SHARED_TEST_DIR/cases/serial_test.cpp" "$SHARED_TEST_DIR/cases/ds3231_test.cpp" \
-           "$TEST_DIR/cases/web_test.cpp" "$TEST_DIR/console/webhost.cpp" "$TEST_DIR/stubs/rmt_stubs.cpp"
+           "$TEST_DIR/cases/web_test.cpp" "$TEST_DIR/stubs/rmt_stubs.cpp"
 
 # frame_test brings its own RMT calls, because it keeps the frame that was transmitted. It
 # still needs WordclockSerial, which Pixels reports a failed channel through.
@@ -177,15 +180,6 @@ link frame_test  "$TEST_DIR/cases/frame_test.cpp" "$PLATFORM_DIR/src/Pixels.cpp"
 link serial_test "$SHARED_TEST_DIR/cases/serial_test.cpp" "${BACKEND[@]}" "${CORE[@]}" "$TEST_DIR/stubs/rmt_stubs.cpp"
 link ds3231_test "$SHARED_TEST_DIR/cases/ds3231_test.cpp" "${BACKEND[@]}" "${CORE[@]}" "$TEST_DIR/stubs/rmt_stubs.cpp"
 link web_test    "$TEST_DIR/cases/web_test.cpp" "${WEB[@]}" "${BACKEND[@]}" "${CORE[@]}" "$TEST_DIR/stubs/rmt_stubs.cpp"
-link webhost     "$TEST_DIR/console/webhost.cpp" "${WEB[@]}" "${BACKEND[@]}" "${CORE[@]}" "$TEST_DIR/stubs/rmt_stubs.cpp"
-
-if [ "${1:-}" = "serve" ]; then
-    # Not exec'd: the binaries live in a temporary directory, and the trap that removes it
-    # again only fires if this shell is still around to run it.
-    node "$TEST_DIR/console/serve.js" "$ROOT/web/app.html" "$WORK/webhost" "${2:-8080}"
-    exit
-fi
-
 FAILED=0
 for name in frame_test serial_test ds3231_test web_test; do
     echo

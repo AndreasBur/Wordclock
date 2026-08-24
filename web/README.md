@@ -7,11 +7,13 @@ reaches everything else. Nobody types a path - they type the clock's address and
 comes - so what comes is the page for the frequent things, with a link to the other one in
 its header.
 
-Every backend with a radio serves them - the [ESP32](../platform/esp32/README.md) and the
-[RP2350](../platform/rp2350/README.md), each through its own `WebInterface.cpp` - and the
-AVR-Dx, having no radio, does not. This directory is what the two servers share, which is
-why it sits beside `firmware/` rather than inside either platform: nothing a browser sees
-depends on which controller is behind it.
+Three backends serve them: the [ESP32](../platform/esp32/README.md) and the
+[RP2350](../platform/rp2350/README.md) on a wall, and the
+[simulator](../platform/simulator/README.md) on a desk, at `http://localhost:8080/`. The
+AVR-Dx, having no radio, does not. This directory sits beside `firmware/` rather than inside
+any one of them because nothing a browser sees depends on which controller is behind it -
+which is the same reason all three answer out of one
+[`WebFrontend`](../firmware/inc/Communication/WebFrontend/WebFrontend.h).
 
 Both speak the same commands as the wire, because their web socket is wired straight to the
 port `Communication` reads from. Nothing about the protocol is repeated in the browser.
@@ -137,8 +139,17 @@ the panel says so rather than reporting a failure.
 
 While the layout is being worked on there is no need to flash: open either page straight from
 disk and it asks for the clock's address instead of using its own host. The edit cycle is then
-a browser reload. `platform/esp32/test/run.sh serve` goes further and needs no clock at all:
-it serves both pages from disk and answers `/commands`, `/display` and the web socket from a
-host build of the real backend. It exists once, in the ESP32 test tree, precisely because this
-directory is shared - and since it answers `/update` itself, it is also the only place the
-update panel's progress and both of its answers can be tried without a board.
+a browser reload.
+
+**The simulator serves them too**, which is the shortest way to see a page with a working
+clock behind it: `./build/bin/Wordclock` opens `http://localhost:8080/` beside its window, and
+both are the same clock. It answers everything on this page except `/update` - a host process
+has no second partition to write an image into.
+
+It answers `/update` as well, and honestly: nothing is installed, because a desktop has no
+second partition. What it stands in for is the panel's progress and its two outcomes, which is
+the part of that card nothing else reaches without a board.
+
+There used to be a second way - node in front of a host build of the ESP32 backend - and it is
+gone. node did all the HTTP and the web socket there, so what it proved was about these pages
+and the firmware core, which is exactly what the simulator now does with one binary.

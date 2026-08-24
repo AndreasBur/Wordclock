@@ -13,6 +13,37 @@ core is emulated by a small shim in [include/Arduino.h](include/Arduino.h)
 [src/PixelsFrame.cpp](src/PixelsFrame.cpp). See
 [platform/avr-dx/README.md](../avr-dx/README.md) for the platform contract.
 
+## It serves the clock's two pages as well
+
+Running it opens `http://localhost:8080/` beside the window: the panel at `/` and the console
+at `/console`, the same two pages a clock hands out, answered out of the same
+[`WebFrontend`](../../firmware/inc/Communication/WebFrontend/WebFrontend.h). What used to need
+a board or a host process built out of the ESP32 backend now needs neither.
+
+The two views are worth having together rather than apart, because each shows what the other
+cannot: the window renders brightness as a grey and drops the hue, and the pages take only
+*whether* a pixel is lit — so a colour is still checked by reading bytes in a test, but
+everything about layout, wording and what a control does is now one binary away.
+
+[src/WebHost.cpp](src/WebHost.cpp) is the server, and it is written out rather than pulled in:
+a desktop build has no framework to ask for one, and what a browser needs is a socket, a
+little HTTP and RFC 6455's handshake. Three things about it are deliberate:
+
+- **It is polled from the wxTimer, not run in a thread.** Both hardware backends give their
+  server a task of its own and pay for it with a lock-free buffer to the firmware. Here
+  `task()` runs on the tick, so a browser's command is injected on the thread that reads it -
+  which is what lets the port stay a `wxString`. What it costs is that a write blocks the
+  tick; everything written goes to loopback, where the largest of them fits in the socket
+  buffer many times over.
+- **Loopback only, and port 8080.** This serves a console with no password on it, and a
+  desktop is not the place to open that to a network. 8080 rather than 80 because a desktop
+  needs root for 80, and a port already in use is not fatal - it says so and the window runs
+  on without a browser.
+- **`/update` answers but installs nothing.** A host process has no second partition and no
+  filesystem an image belongs in, so the honest thing is to say how much arrived and refuse
+  anything too small to be an image. What that stands in for is the panel's progress and its
+  two outcomes - the part of that card nothing else reaches without a board.
+
 ## What the window shows, and what it cannot
 
 A lit letter is drawn as a grey between the unlit letter colour and black, so its

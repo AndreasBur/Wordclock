@@ -97,21 +97,27 @@ cmake --build build-avr --target flash
 
 ### The two web pages
 
-The pages in [web/](web/) are the one part of this project the simulator window cannot show,
-and they need a clock behind them to show anything. That clock can be a host process:
+The pages in [web/](web/) need a clock behind them to show anything, and **the simulator is
+one**: it serves them itself, on localhost, from the binary that draws the window.
 
 ```bash
-platform/esp32/test/run.sh serve 8080
+cmake --build build && ./build/bin/Wordclock     # http://localhost:8080/
 ```
 
-This compiles the ESP32 backend against the stand-ins in `platform/esp32/test/stubs/` and puts
-a small server in front of it, so `http://localhost:8080/` is the panel and `/console` the
-console — both read from `web/` on every request, so an edit is a browser reload — while
-`/commands`, `/display`, `/update` and the web socket are answered by the real firmware core.
-What the browser sees is therefore what a clock would send, without a clock.
+The panel is at `/` and the console at `/console`, answered out of the same
+[`WebFrontend`](firmware/inc/Communication/WebFrontend/WebFrontend.h) a clock answers them
+from — so what the browser sees is what a clock would send, with no board and no second
+process. The window and the browser then show the same clock, which is worth more than either
+alone: the window is colour-accurate, the pages are what somebody actually uses.
 
-The port is optional and defaults to 8080. Without the `serve` argument the same script builds
-and runs the backend's host tests instead.
+`/update` is answered too, and honestly: nothing is installed, because a desktop has no second
+partition — what it stands in for is the panel's progress and its two outcomes, which is the
+part of that card nothing else can reach without a board.
+
+There used to be a second way, `platform/esp32/test/run.sh serve`, which put node in front of
+a host build of the ESP32 backend. It is gone: node did all the HTTP and the web socket there,
+so what it exercised was the pages and the firmware core — exactly what the simulator now does
+with one binary and a real server.
 
 ## Checks
 
