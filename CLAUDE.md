@@ -96,12 +96,21 @@ reconstruct from the code.
 Every size written in this repository has been wrong at least once, always the same way: the
 code grew and the sentence did not. So a number that describes **the artefact as it is now**
 is enforced rather than remembered — `tools/documented-sizes.py` compares the documentation
-against a build, the AVR CI job runs it, and `--fix` writes the measured values in:
+against a build, each firmware CI job runs it for its own target, and `--fix` writes the
+measured values in. One flag per target, and a target left out is simply skipped:
 
 ```bash
 tools/documented-sizes.py --elf build-avr/platform/avr-dx/Wordclock.elf        # check
 tools/documented-sizes.py --elf build-avr/platform/avr-dx/Wordclock.elf --fix  # write
+tools/documented-sizes.py --rp2350-elf platform/rp2350/.pio/build/wordclock/firmware.elf
+tools/documented-sizes.py --esp32-bin  platform/esp32/.pio/build/wordclock/firmware.bin \
+                          --esp32-elf  platform/esp32/.pio/build/wordclock/firmware.elf
 ```
+
+The ESP32 takes two paths because its flash figure is the size of `firmware.bin` while its
+RAM figure comes off the ELF. That is not an inconsistency to tidy away: adding the S3's
+sections up counts `.ext_ram.dummy` and two other padding sections as real, which is more
+than a megabyte that is not in the image.
 
 What may be enforced is decided by **what the number is a property of**. The two pages'
 sizes are exact, because nothing but this repository's own bytes decides them. The AVR image

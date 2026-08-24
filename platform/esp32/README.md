@@ -58,12 +58,26 @@ measured, not assumed.
 warnings** from any file in this repository:
 
 ```
-RAM:    10.8%  of 320 KB
-Flash:  17.5%  of 3.2 MB
+RAM:     16 %  of 320 KB
+Flash:   33 %  of the 3.19 MB app slot
 ```
 
-Rounded on purpose: the exact byte count moves with every edit to either page, and a figure
-that rots on each commit is worse than none.
+Percentages and not byte counts, and checked rather than remembered: `tools/documented-sizes.py
+--esp32-bin --esp32-elf` measures them off the image the build just produced, with a point of
+slack, which is the same shape the AVR and RP2350 figures have and for the same reason - a byte
+count belongs to the compiler in front of you.
+
+It had to become a checked number. These two read 10.8 % and 17.5 % for a long time, from a
+build before the two pages and the network update existed, while the app slot table further
+down the same file put the image at three times that share - the two halves of one file
+disagreeing by a factor of two. Nothing caught it, because the ESP32 was the one target whose
+figures no check covered.
+
+Flash is measured as the size of `firmware.bin` rather than by adding sections up, which is a
+trap here specifically: the S3's ELF carries `.ext_ram.dummy`, `.flash_rodata_dummy` and
+`.dram0.dummy`, padding and aliases that the loader never writes and that a naive sum counts as
+more than a megabyte that is not there. The image file is not a reconstruction of the artefact,
+it *is* the artefact.
 
 A clean build takes about two minutes because it compiles the Arduino core alongside;
 changing one file of ours is about seven seconds.
@@ -133,7 +147,7 @@ RISC-V parts are not a different case. Two things decide it:
 
 | Part | WiFi | RMT TX × words | Verdict |
 |---|---|---|---|
-| ESP32-S3 | yes | 4 × 48 | what this backend targets — image at 31 % of a 3.19 MB app slot |
+| ESP32-S3 | yes | 4 × 48 | what this backend targets — see the app slot table below |
 | ESP32 (classic) | yes | 8 × 64 | builds; GPIO 6 to 11 are flash, so the data pin has to move |
 | ESP32-S2 | yes | 4 × 64 | never built, nothing known against it |
 | ESP32-C3 / C6 | yes | 2 × 48 | builds; both transmit channels go to the strip, see `RmtMemoryBlockSymbols` |
@@ -146,14 +160,16 @@ The WiFi column is `SOC_WIFI_SUPPORTED` in the IDF's `soc_caps.h`, which H2 and 
 define; the channel counts are `SOC_RMT_TX_CANDIDATES_PER_GROUP` and
 `SOC_RMT_MEM_WORDS_PER_CHANNEL` from the same headers.
 
-**Flash is the one number that separates the parts that work.** The image is about 1.05 MB,
-and what it has to fit in is the *app slot*, not the chip:
+**Flash is the one number that separates the parts that work.** What the image has to fit in
+is the *app slot*, not the chip, and the same image is a very different fraction of each - the
+percentages below are one build weighed three ways, and they are what
+`tools/documented-sizes.py --esp32-bin` keeps honest:
 
 | Board | App slot | Used |
 |---|---|---|
-| `esp32-s3-devkitc-1` (8 MB layout) | 3.19 MB | 31 % |
-| `esp32dev`, default table | 1.25 MB | 83 % |
-| `esp32dev`, `min_spiffs.csv` | 1.92 MB | 55 % |
+| `esp32-s3-devkitc-1` (8 MB layout) | 3.19 MB | 33 % |
+| `esp32dev`, default table | 1.25 MB | 85 % |
+| `esp32dev`, `min_spiffs.csv` | 1.92 MB | 57 % |
 
 So a 4 MB board is not short of flash, its default partition table is: it reserves 1.5 MB
 for a SPIFFS this firmware never mounts. The web page is compiled into the image by
