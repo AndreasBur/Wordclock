@@ -140,16 +140,23 @@ plumbing the next section works around applies here.
 /opt/playwright/bin/python shot.py
 ```
 
-They need the firmware behind them, which `platform/esp32/test/run.sh serve <port>`
-provides: it serves both pages from disk — the panel at `/`, the console at `/console`, the
-same way a clock does — and answers `/commands`, `/display` and the web socket from a host
-build of the real backend, so what the browser sees is what a clock would send. Five things
-have to line up, and four of them fail as a timeout that says nothing:
+They need the firmware behind them, and there are two ways to put it there.
 
-1. **Start the server as a tracked background call**, not as `( ... &)`. `run.sh` keeps its
+**The simulator serves them itself** — `./build/bin/Wordclock` answers
+`http://localhost:8080/`. Shortest path to a working page, and the only one that needs no
+second process; it is started the way the section below starts it, `( ... &)` and all, and
+killed with `pkill -x Wordclock`. It answers everything except `/update`.
+
+**`platform/esp32/test/run.sh serve <port>`** is the other, and what `/update` needs: it
+serves both pages from disk and answers `/commands`, `/display` and the web socket from a
+host build of the ESP32 backend, with node in front. Five things have to line up, and four of
+them fail as a timeout that says nothing:
+
+1. **Start that one as a tracked background call**, not as `( ... &)`. `run.sh` keeps its
    binaries in a temporary directory and deletes them in a trap when its own shell exits, so
    a detached server still answers `/` from disk and then hangs forever on `/display` and
-   `/commands` — which is where the panel and every settings row come from.
+   `/commands` — which is where the panel and every settings row come from. (The simulator has
+   no such trap and is the opposite case: it must be started inside the call.)
 2. **Never wait for `networkidle`.** Both pages hold a web socket open, so neither ever goes
    idle and `page.goto` dies at its 30 s timeout. Use `wait_until="load"`, then wait for
    `#plate:not([hidden])` on the panel or `#panel:not([hidden])` on the console: that selector

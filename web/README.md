@@ -137,8 +137,14 @@ the panel says so rather than reporting a failure.
 
 While the layout is being worked on there is no need to flash: open either page straight from
 disk and it asks for the clock's address instead of using its own host. The edit cycle is then
-a browser reload. `platform/esp32/test/run.sh serve` goes further and needs no clock at all:
-it serves both pages from disk and answers `/commands`, `/display` and the web socket from a
-host build of the real backend. It exists once, in the ESP32 test tree, precisely because this
-directory is shared - and since it answers `/update` itself, it is also the only place the
-update panel's progress and both of its answers can be tried without a board.
+a browser reload.
+
+**The simulator serves them too**, which is the shortest way to see a page with a working
+clock behind it: `./build/bin/Wordclock` opens `http://localhost:8080/` beside its window, and
+both are the same clock. It answers everything on this page except `/update` - a host process
+has no second partition to write an image into.
+
+`platform/esp32/test/run.sh serve` is the older way and is what that one exception needs: it
+answers `/update` itself, so the update panel's progress and both of its answers can be tried
+there. Where the simulator runs its own transport, that harness runs the ESP32 backend's
+server against stand-ins, with node in front of it.

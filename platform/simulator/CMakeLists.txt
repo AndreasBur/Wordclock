@@ -35,6 +35,29 @@ set(FIRMWARE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../firmware")
 file(GLOB_RECURSE ARDUINO_SOURCES CONFIGURE_DEPENDS
     "${FIRMWARE_DIR}/src/*.cpp")
 
+# --------------------------------------------------------------------------
+# The two pages, as an array in a generated header - the same step both PlatformIO builds run
+# as a pre-action and both host-test harnesses run by hand. Here it is a build rule so that an
+# edit to web/ is a rebuild rather than something to remember: the sources listed as its
+# dependencies are exactly the assets embed_web.py reads.
+# --------------------------------------------------------------------------
+set(WEB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../web")
+set(EMBED_WEB "${CMAKE_CURRENT_SOURCE_DIR}/../scripts/embed_web.py")
+set(WEB_PAGE_HEADER "${CMAKE_CURRENT_BINARY_DIR}/generated/WebPage.h")
+
+file(GLOB WEB_ASSETS CONFIGURE_DEPENDS
+    "${WEB_DIR}/*.html" "${WEB_DIR}/*.webmanifest" "${WEB_DIR}/*.png")
+
+add_custom_command(
+    OUTPUT "${WEB_PAGE_HEADER}"
+    COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_CURRENT_BINARY_DIR}/generated"
+    COMMAND python3 "${EMBED_WEB}" "${WEB_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/generated"
+    DEPENDS ${WEB_ASSETS} "${EMBED_WEB}"
+    COMMENT "Embedding web/ into WebPage.h"
+    VERBATIM)
+
+add_custom_target(WordclockWebPage DEPENDS "${WEB_PAGE_HEADER}")
+
 # ...plus the wxWidgets stand-ins for the hardware. Only the two entry-point
 # files below are specific to the app; everything here is shared with the tests.
 set(SHIM_SOURCES
@@ -44,7 +67,8 @@ set(SHIM_SOURCES
     src/MessageBuilder.cpp
     src/MessageDecoder.cpp
     src/SerialShim.cpp
-    src/Storage.cpp)
+    src/Storage.cpp
+    src/WebHost.cpp)
 
 # On Linux and macOS the window icon comes from the XPM array rather than from a resource file,
 # which is what PIXELS gates in src/PixelsFrame.cpp - Windows takes the .ico instead.
@@ -82,9 +106,9 @@ endforeach()
 target_include_directories(WordclockBuildSettings INTERFACE
     "${FIRMWARE_DIR}/inc/Communication/MessageParser"
     "${FIRMWARE_DIR}/inc/Communication/MessageParser/Base"
-    # WebFrontend compiles to nothing here - this build never defines WEB_FRONTEND_SUPPORT -
-    # but its header still has to be findable, because firmware/src is globbed whole.
-    "${FIRMWARE_DIR}/inc/Communication/WebFrontend")
+    "${FIRMWARE_DIR}/inc/Communication/WebFrontend"
+    # Where the rule above puts WebPage.h.
+    "${CMAKE_CURRENT_BINARY_DIR}/generated")
 
 if(MSVC)
     target_compile_options(WordclockBuildSettings INTERFACE /W4)
@@ -93,6 +117,17 @@ else()
 endif()
 
 target_compile_definitions(WordclockBuildSettings INTERFACE ${PIXELS_DEFINE})
+
+# The firmware's web front end, compiled in. This backend serves the same two pages a clock
+# does - which is the whole point of it being here rather than only on the boards: the pages
+# can be opened from the binary that already draws the window, with no board and no separate
+# host process behind them.
+target_compile_definitions(WordclockBuildSettings INTERFACE WEB_FRONTEND_SUPPORT=STD_ON)
+
+# Winsock, which is not linked by default the way the POSIX sockets are.
+if(WIN32)
+    target_link_libraries(WordclockBuildSettings INTERFACE ws2_32)
+endif()
 target_link_libraries(WordclockBuildSettings INTERFACE ${wxWidgets_LIBRARIES})
 
 # --------------------------------------------------------------------------
@@ -102,9 +137,12 @@ target_link_libraries(WordclockBuildSettings INTERFACE ${wxWidgets_LIBRARIES})
 # reused by both executables instead of once per executable.
 add_library(WordclockCore OBJECT ${ARDUINO_SOURCES})
 target_link_libraries(WordclockCore PUBLIC WordclockBuildSettings)
+# WebFrontend.cpp is in here and includes the generated header, so it has to exist first.
+add_dependencies(WordclockCore WordclockWebPage)
 
 add_library(WordclockShims OBJECT ${SHIM_SOURCES})
 target_link_libraries(WordclockShims PUBLIC WordclockBuildSettings)
+add_dependencies(WordclockShims WordclockWebPage)
 
 # --------------------------------------------------------------------------
 # Simulator application
