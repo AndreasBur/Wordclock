@@ -50,6 +50,14 @@ jobs:
       - name: Configure
         run: cmake -S . -B build -G Ninja -DPLATFORM=simulator -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 
+      # The one exception to "not built". WebPage.h holds the two pages as arrays and is
+      # generated rather than checked in, so a translation unit that includes it does not
+      # compile until the rule has run - and clang-tidy reports that as the file being
+      # missing, which reads like a bad include path rather than a build step that was
+      # skipped. It is the python script and nothing else, so it costs no build time.
+      - name: Generate the embedded pages
+        run: cmake --build build --target WordclockWebPage
+
       # Which checks, and why the rest are off, is in .clang-tidy. WarningsAsErrors is set
       # there, so a finding fails this job.
       - name: Analyse

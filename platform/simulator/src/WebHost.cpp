@@ -369,7 +369,7 @@ bool answerRequest(SocketType Socket, const std::string& Request)
 ******************************************************************************************************************************************************/
 void answerUpdate(SocketType Socket, size_t Received)
 {
-    static constexpr size_t SmallestPlausibleImage{64u * 1024u};
+    static constexpr size_t SmallestPlausibleImage{size_t{64u} * 1024u};
 
     if(Received >= SmallestPlausibleImage) {
         static constexpr char Accepted[]{"{\"ok\":true}"};

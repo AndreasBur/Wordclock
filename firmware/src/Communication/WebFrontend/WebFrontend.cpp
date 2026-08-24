@@ -108,9 +108,14 @@ class ChunkWriter
 
     void putNumber(uint16_t Number) {
         char Digits[8]{};
+        /* Taken rather than dropped, and then used: it is the length, so the digits go out
+           without a second walk to find their terminator. Negative is snprintf's encoding
+           failure, which cannot happen for "%u" and is refused rather than trusted. */
+        const int Length = snprintf(Digits, sizeof(Digits), "%u", static_cast<unsigned>(Number));
 
-        snprintf(Digits, sizeof(Digits), "%u", static_cast<unsigned>(Number));
-        put(Digits);
+        if(Length <= 0) { return; }
+
+        for(int Index = 0; Index < Length; Index++) { put(Digits[Index]); }
     }
 
     /* Escaped, because a label is data: a quote in one would otherwise produce a document

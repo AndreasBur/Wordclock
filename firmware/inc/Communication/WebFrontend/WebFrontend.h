@@ -98,7 +98,10 @@ class WebFrontend
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    static constexpr size_t FrameSize{PIXELS_NUMBER_OF_LEDS * Pixel::getNumberOfColors()};
+    /* size_t on the left so the multiplication happens there too. Both operands are small
+       enough that an int product could not overflow, but the analyser cannot know the
+       display's size and is right to ask rather than to work it out. */
+    static constexpr size_t FrameSize{static_cast<size_t>(PIXELS_NUMBER_OF_LEDS) * Pixel::getNumberOfColors()};
 
     /* What was last sent, so an unchanged display costs a comparison rather than a frame.
        Same shape as Persistence, and for the same reason: nothing has to remember to report
