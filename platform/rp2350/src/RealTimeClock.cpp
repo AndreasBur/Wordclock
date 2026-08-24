@@ -64,8 +64,9 @@ constexpr int32_t SecondsPerDay{24 * SecondsPerHour};
 
    Written out rather than left to timegm(), which mktime's counterpart would be: newlib
    declares it on neither of the two cores this firmware is built against, so writing it
-   out is what keeps one source serving both. The other way round - a local time to seconds - keeps using mktime, which is
-   there and which has to apply the zone rule anyway. */
+   out is what keeps one source serving both. The other way round - a local time to
+   seconds - keeps using mktime, which is there and which has to apply the zone rule
+   anyway. */
 constexpr int32_t daysFromCivil(int32_t Year, int32_t Month, int32_t Day)
 {
     Year -= (Month <= 2) ? 1 : 0;
