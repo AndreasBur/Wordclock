@@ -6,7 +6,10 @@
 #   rp2350-host    the same arrangement for the Pico's backend, stubs and all
 #   firmware       the ESP32 backend compiled for the board it actually runs on
 #   rp2350         the Pico 2 W's firmware, which is where the flash layout is checked
-#   avr-dx         the AVR128DA48 backend, cross-compiled, plus tools/documented-sizes.py
+#   avr-dx         the AVR128DA48 backend, cross-compiled
+#
+# Each of the last three also runs tools/documented-sizes.py against the image it just built,
+# which is the only moment the sizes in that backend's README can be checked at all.
 #
 # A firmware job looks redundant next to its host tests and is not. The host tests compile the same
 # sources with the host's compiler and libc, so anything the target's toolchain has a
@@ -124,6 +127,15 @@ jobs:
       # network rather than a build that fails.
       - name: Build the firmware
         run: pio run -d platform/esp32
+
+      # The sizes this backend's README states, against the image that was just built. Added
+      # after those two numbers sat at half the truth for long enough that the same file
+      # contradicted itself: the ESP32 was the one target no check covered.
+      - name: Check the documented sizes
+        run: |
+          python3 tools/documented-sizes.py \
+            --esp32-bin platform/esp32/.pio/build/wordclock/firmware.bin \
+            --esp32-elf platform/esp32/.pio/build/wordclock/firmware.elf
 
       # Two files because they answer different questions. firmware.bin is the image an
       # over-the-air update takes; firmware.factory.bin is the whole flash including the

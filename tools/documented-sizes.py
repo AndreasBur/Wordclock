@@ -104,6 +104,52 @@ def _find_pico_size():
     return str(candidates[-1])
 
 
+# The app slot of the 8 MB S3 layout this backend targets, and the part's internal SRAM. The
+# slot and not the chip, for the reason the README's own table gives: what decides whether a
+# board works is the partition it may write, and there are two of those for the update to
+# alternate between.
+ESP32_APP_SLOT_BYTES = 3342336
+ESP32_RAM_BYTES = 320 * 1024
+
+
+def esp32_sizes(image, elf):
+    """Flash off the image, RAM off two sections - and flash is deliberately not the sections.
+
+    This is the one target where adding sections up is a trap rather than a shortcut. The S3's
+    ELF carries .ext_ram.dummy, .flash_rodata_dummy and .dram0.dummy, which are padding and
+    aliases the loader never writes: summing what sits at a flash address counts more than a
+    megabyte that is not there. So flash is the size of firmware.bin, which is not a
+    reconstruction of the artefact but the artefact - the bytes esptool wrote and the bytes the
+    app partition receives.
+
+    That is the same lesson the AVR figure above carries, where asking avr-size replaced adding
+    up .text and .data and being wrong by six bytes.
+
+    RAM has no such trap once the dummy is left out: .dram0.data and .dram0.bss are what static
+    use means, and they land within two bytes of what PlatformIO prints.
+    """
+    size = os.environ.get('ESP32_SIZE') or _find_esp32_size()
+    out = subprocess.run([size, '-A', str(elf)], capture_output=True, text=True, check=True).stdout
+
+    ram = 0
+    for line in out.splitlines():
+        parts = line.split()
+        if len(parts) != 3:
+            continue
+        if parts[0] in ('.dram0.data', '.dram0.bss') and parts[1].isdigit():
+            ram += int(parts[1])
+
+    return os.path.getsize(image), ram
+
+
+def _find_esp32_size():
+    """The Xtensa toolchain's size, wherever PlatformIO put it."""
+    candidates = sorted(Path.home().glob('.platformio/**/toolchain-xtensa-esp-elf/bin/xtensa-esp32s3-elf-size'))
+    if not candidates:
+        raise SystemExit('documented-sizes.py: no xtensa-esp32s3-elf-size found; set ESP32_SIZE')
+    return str(candidates[-1])
+
+
 def page_sizes(name):
     """One page as it is served: its source, and what it compresses to.
 
@@ -162,7 +208,7 @@ class Check:
         return True
 
 
-def checks(elf, rp2350Elf=None):
+def checks(elf, rp2350Elf=None, esp32Image=None, esp32Elf=None):
     """Every documented size, with the pattern that finds it and the value it should be.
 
     A pattern must capture exactly what is to be replaced, and nothing that moves for
@@ -183,6 +229,24 @@ def checks(elf, rp2350Elf=None):
                            (str(program), f'{round(100 * program / AVR_FLASH_BYTES)}',
                             str(data), f'{round(100 * data / AVR_RAM_BYTES)}'),
                            enforce=False))
+
+    if esp32Image is not None:
+        flash, ram = esp32_sizes(esp32Image, esp32Elf)
+        found.append(Check('platform/esp32/README.md',
+                           r'RAM:\s+(\d+) %\s+of 320 KB\nFlash:\s+(\d+) %\s+of the 3\.19 MB app slot',
+                           (f'{round(100 * ram / ESP32_RAM_BYTES)}',
+                            f'{round(100 * flash / ESP32_APP_SLOT_BYTES)}'),
+                           tolerance=(1, 1)))
+        # The same image against the three slots the parts table weighs it in, which is what
+        # makes that table a claim about this build rather than a memory of an older one.
+        found.append(Check('platform/esp32/README.md',
+                           r'\| `esp32-s3-devkitc-1` \(8 MB layout\) \| 3\.19 MB \| (\d+) % \|\n'
+                           r'\| `esp32dev`, default table \| 1\.25 MB \| (\d+) % \|\n'
+                           r'\| `esp32dev`, `min_spiffs\.csv` \| 1\.92 MB \| (\d+) % \|',
+                           (f'{round(100 * flash / ESP32_APP_SLOT_BYTES)}',
+                            f'{round(100 * flash / (1280 * 1024))}',
+                            f'{round(100 * flash / (1920 * 1024))}'),
+                           tolerance=(1, 1, 1)))
 
     if rp2350Elf is not None:
         flash, ram = rp2350_sizes(rp2350Elf)
@@ -208,11 +272,19 @@ def main():
     parser.add_argument('--elf', type=Path, help='an AVR image to measure; its checks are skipped without one')
     parser.add_argument('--rp2350-elf', type=Path, dest='rp2350Elf',
                         help='an RP2350 image to measure; its checks are skipped without one')
+    parser.add_argument('--esp32-bin', type=Path, dest='esp32Image',
+                        help='an ESP32 firmware.bin to measure; its checks are skipped without one')
+    parser.add_argument('--esp32-elf', type=Path, dest='esp32Elf',
+                        help='the ELF beside that image, for the RAM figure')
     parser.add_argument('--fix', action='store_true', help='write the measured values into the documentation')
     arguments = parser.parse_args()
 
+    if (arguments.esp32Image is None) != (arguments.esp32Elf is None):
+        raise SystemExit('documented-sizes.py: --esp32-bin and --esp32-elf go together - '
+                         'the image carries the flash figure, the ELF the RAM one')
+
     stale = 0
-    for check in checks(arguments.elf, arguments.rp2350Elf):
+    for check in checks(arguments.elf, arguments.rp2350Elf, arguments.esp32Image, arguments.esp32Elf):
         path = ROOT / check.document
         text = path.read_text(encoding='utf-8')
         match = re.search(check.pattern, text)
