@@ -86,7 +86,6 @@ changing one file of ours is about seven seconds.
 
 ```bash
 platform/esp32/test/run.sh              # build and run them
-platform/esp32/test/run.sh serve 8080   # the console on localhost, firmware behind it
 ```
 
 Those compile the backend against stand-ins for the framework, so they reach everything

@@ -39,9 +39,10 @@ little HTTP and RFC 6455's handshake. Three things about it are deliberate:
   desktop is not the place to open that to a network. 8080 rather than 80 because a desktop
   needs root for 80, and a port already in use is not fatal - it says so and the window runs
   on without a browser.
-- **No `/update`.** A host process has no second partition and no filesystem an image belongs
-  in. The one place that route can be tried without a board is still
-  `platform/esp32/test/run.sh serve`.
+- **`/update` answers but installs nothing.** A host process has no second partition and no
+  filesystem an image belongs in, so the honest thing is to say how much arrived and refuse
+  anything too small to be an image. What that stands in for is the panel's progress and its
+  two outcomes - the part of that card nothing else reaches without a board.
 
 ## What the window shows, and what it cannot
 

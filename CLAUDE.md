@@ -129,8 +129,8 @@ sentence so it needs none. Two kinds of number deliberately have none:
 ## Looking at the two web pages
 
 `web/app.html` — the **panel**, served at `/` — and `web/index.html` — the **console**, at
-`/console` — are the one part of this project the simulator cannot show, and unlike the
-wx window below they can be **driven**: clicks, typing and file pickers all work. The dev
+`/console` — are what a clock hands out to a browser, and unlike the wx window below they can
+be **driven**: clicks, typing and file pickers all work. The dev
 container ships Playwright with its own Chromium for that — `apt` on this base offers only a
 snap stub, which does not run in a container. It is headless, so none of the display
 plumbing the next section works around applies here.
@@ -140,35 +140,28 @@ plumbing the next section works around applies here.
 /opt/playwright/bin/python shot.py
 ```
 
-They need the firmware behind them, and there are two ways to put it there.
+They need the firmware behind them, and **the simulator is it**: `./build/bin/Wordclock`
+answers `http://localhost:8080/` — the panel at `/`, the console at `/console`, `/commands`,
+`/display`, the web socket and an honest `/update` that installs nothing. It is started the
+way the section below starts the window, `( ... &)` inside the call, and killed with
+`pkill -x Wordclock`; the same X11 rules apply, because it is the same binary.
 
-**The simulator serves them itself** — `./build/bin/Wordclock` answers
-`http://localhost:8080/`. Shortest path to a working page, and the only one that needs no
-second process; it is started the way the section below starts it, `( ... &)` and all, and
-killed with `pkill -x Wordclock`. It answers everything except `/update`.
+Four things have to line up, and each fails as a timeout that says nothing:
 
-**`platform/esp32/test/run.sh serve <port>`** is the other, and what `/update` needs: it
-serves both pages from disk and answers `/commands`, `/display` and the web socket from a
-host build of the ESP32 backend, with node in front. Five things have to line up, and four of
-them fail as a timeout that says nothing:
-
-1. **Start that one as a tracked background call**, not as `( ... &)`. `run.sh` keeps its
-   binaries in a temporary directory and deletes them in a trap when its own shell exits, so
-   a detached server still answers `/` from disk and then hangs forever on `/display` and
-   `/commands` — which is where the panel and every settings row come from. (The simulator has
-   no such trap and is the opposite case: it must be started inside the call.)
-2. **Never wait for `networkidle`.** Both pages hold a web socket open, so neither ever goes
+1. **Never wait for `networkidle`.** Both pages hold a web socket open, so neither ever goes
    idle and `page.goto` dies at its 30 s timeout. Use `wait_until="load"`, then wait for
    `#plate:not([hidden])` on the panel or `#panel:not([hidden])` on the console: that selector
-   appearing *is* `/display` having answered.
-3. **The header reads "connected"**, so a wait for the absence of "connecting" matches it and
+   appearing *is* `/display` having answered. The very first load after the server starts can
+   miss even a 20 s wait on that selector and every load after it be instant — retry once
+   before reading anything into it, the way the MIT-SHM error below is retried.
+2. **The header reads "connected"**, so a wait for the absence of "connecting" matches it and
    never fires. Wait on the plate, or on `.lit` inside it for the first frame off the socket.
-4. **Waiting for the plate is not waiting for the values.** The letters come from `/display`
+3. **Waiting for the plate is not waiting for the values.** The letters come from `/display`
    and every field from the catalog and then a round of answers over the socket, so a script
    that reads a slider a second after the plate appeared reads its unfilled default — 128 for
    a range, black for a colour. Two seconds is enough here; better still, wait for the field
    to hold something.
-5. **Give it a real width.** The panel is a two-column desktop layout above 960 px and one
+4. **Give it a real width.** The panel is a two-column desktop layout above 960 px and one
    column below, the console above 800, and the phone case is the one they exist for — 390 px
    is worth checking before 1280.
 

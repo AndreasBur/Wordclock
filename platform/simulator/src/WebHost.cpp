@@ -346,12 +346,63 @@ bool answerRequest(SocketType Socket, const std::string& Request)
         }
     }
 
-    /* No /update here, and that is not an omission: this backend has no second partition and
-       no filesystem an image belongs in. A clock's panel offers the button; a simulator
-       answers that it has nowhere to put one. */
     static constexpr char NotFound[]{"no such route on the simulator\n"};
     sendSimpleResponse(Socket, "404 Not Found", "text/plain", NotFound, sizeof(NotFound) - 1u, false);
     return false;
+}
+
+
+/******************************************************************************************************************************************************
+  answerUpdate()
+******************************************************************************************************************************************************/
+/*! \brief          Answers POST /update, in the two shapes the panel reads
+ *
+ *  \details        Nothing is installed and nothing is written, and that is not a shortcut
+ *                  being taken: there is no second partition here and no filesystem an image
+ *                  belongs in, so an honest answer is the most this can be. What it stands in
+ *                  for is the whole of what the panel does - the progress on the way up, the
+ *                  two outcomes and the shapes they arrive in - which is the one part of that
+ *                  card that cannot otherwise be tried without a board.
+ *
+ *                  Refused below a size no real image is, so both answers are reachable: pick
+ *                  a small file to see the failing path, a release image to see the other.
+******************************************************************************************************************************************************/
+void answerUpdate(SocketType Socket, size_t Received)
+{
+    static constexpr size_t SmallestPlausibleImage{64u * 1024u};
+
+    if(Received >= SmallestPlausibleImage) {
+        static constexpr char Accepted[]{"{\"ok\":true}"};
+
+        Serial.print("Web: update of ");
+        Serial.print(static_cast<int>(Received / 1024u));
+        Serial.println(" kB accepted - nothing was written, this is the simulator");
+        sendSimpleResponse(Socket, "200 OK", "application/json", Accepted, sizeof(Accepted) - 1u, false);
+        return;
+    }
+
+    char Refused[160];
+    const int Written = snprintf(Refused, sizeof(Refused),
+                                 "{\"ok\":false,\"error\":\"%zu bytes is too small to be a firmware image\"}",
+                                 Received);
+
+    sendSimpleResponse(Socket, "400 Bad Request", "application/json", Refused, static_cast<size_t>(Written), false);
+}
+
+
+/* What the request announced it would send, so a body can be read to its end rather than to
+   whatever arrived in the first packet. Absent means nothing follows the headers. */
+size_t announcedLength(const std::string& Request)
+{
+    static constexpr char Header[]{"content-length:"};
+
+    std::string Lowered(Request);
+    for(char& Character : Lowered) { Character = static_cast<char>(tolower(Character)); }
+
+    const size_t Found = Lowered.find(Header);
+    if(Found == std::string::npos) { return 0u; }
+
+    return static_cast<size_t>(strtoul(&Request[Found + sizeof(Header) - 1u], nullptr, 10));
 }
 
 /* Handed to SerialShim, which takes a plain function pointer. */
@@ -459,16 +510,41 @@ void WebHost::task()
            sends half a request and stops is a case this tool need not survive gracefully. */
         std::string Request;
         char Chunk[4096];
+        size_t HeaderEnd{std::string::npos};
 
         for(;;) {
             const int Read = static_cast<int>(recv(Accepted, Chunk, sizeof(Chunk), 0));
 
             if(Read <= 0) { break; }
             Request.append(Chunk, static_cast<size_t>(Read));
-            if(Request.find("\r\n\r\n") != std::string::npos) { break; }
+
+            HeaderEnd = Request.find("\r\n\r\n");
+            if(HeaderEnd != std::string::npos) { break; }
         }
 
-        if(Request.empty() || !answerRequest(Accepted, Request)) {
+        if(Request.empty()) { closeSocket(Accepted); continue; }
+
+        /* An image is the one body that arrives here, and it comes in many packets rather
+           than the one every other request fits in. Drained rather than parsed: what the
+           panel needs answered is how much of it turned up. Asked of the route and not only
+           of the header, so that a body on any other request is not mistaken for one. */
+        const size_t Announced = (Request.compare(0, 13, "POST /update ") == 0) ? announcedLength(Request) : 0u;
+
+        if(Announced > 0u) {
+            size_t Received = (HeaderEnd == std::string::npos) ? 0u : (Request.size() - HeaderEnd - 4u);
+
+            while(Received < Announced) {
+                const int Read = static_cast<int>(recv(Accepted, Chunk, sizeof(Chunk), 0));
+
+                if(Read <= 0) { break; }
+                Received += static_cast<size_t>(Read);
+            }
+            answerUpdate(Accepted, Received);
+            closeSocket(Accepted);
+            continue;
+        }
+
+        if(!answerRequest(Accepted, Request)) {
             closeSocket(Accepted);
             continue;
         }

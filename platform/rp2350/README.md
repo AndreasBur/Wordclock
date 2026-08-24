@@ -181,8 +181,9 @@ backend. Nothing in `ds3231_test.cpp` or `serial_test.cpp` is about either platf
 compile whichever backend is being tested against whichever stubs it brings - so they live
 once.
 
-There is no `serve` mode here. The page is shared, so the host that puts a browser in front
-of it only has to exist once: `platform/esp32/test/run.sh serve`.
+There is no `serve` mode here, and none in the ESP32's harness either any more: the pages are
+shared and the simulator serves them itself, which is one binary instead of node in front of a
+host build. See [`../simulator/README.md`](../simulator/README.md).
 
 ## Gaps
 

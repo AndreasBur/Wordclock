@@ -110,16 +110,14 @@ from — so what the browser sees is what a clock would send, with no board and 
 process. The window and the browser then show the same clock, which is worth more than either
 alone: the window is colour-accurate, the pages are what somebody actually uses.
 
-There is a second way, older and still there, which puts the **ESP32 backend's own** server
-behind the pages instead:
+`/update` is answered too, and honestly: nothing is installed, because a desktop has no second
+partition — what it stands in for is the panel's progress and its two outcomes, which is the
+part of that card nothing else can reach without a board.
 
-```bash
-platform/esp32/test/run.sh serve 8080
-```
-
-That one compiles that backend against the stand-ins in `platform/esp32/test/stubs/` and puts
-node in front of it. What it can do that the simulator cannot is answer `/update`, which needs
-a second partition the simulator has nowhere to keep.
+There used to be a second way, `platform/esp32/test/run.sh serve`, which put node in front of
+a host build of the ESP32 backend. It is gone: node did all the HTTP and the web socket there,
+so what it exercised was the pages and the firmware core — exactly what the simulator now does
+with one binary and a real server.
 
 ## Checks
 
