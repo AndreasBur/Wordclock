@@ -129,10 +129,12 @@ RUN python3 -m venv /opt/playwright && \
 # cannot write the ~1.5 GB of toolchain into it.
 RUN install -d -o vscode -g vscode -m 0755 /home/vscode/.platformio
 
-# Codex keeps its login and local configuration here. The devcontainer variants mount a
-# named volume over this path so those files survive a rebuild. Seed its ownership from
-# the image; otherwise a newly created Docker/Podman volume is owned by root.
-RUN install -d -o vscode -g vscode -m 0700 /home/vscode/.codex
+# The same arrangement for the two logins a rebuild would otherwise throw away: Codex, whose
+# extension the shared feature installs into every variant, and gh, which every push and
+# every pull request goes through. Mode 0700 rather than 0755, because what these hold is a
+# credential and not a cache - and gh refuses to read a config directory others can enter.
+RUN install -d -o vscode -g vscode -m 0700 /home/vscode/.codex && \
+    install -d -o vscode -g vscode -m 0700 /home/vscode/.config/gh
 
 # GitHub's SSH host key, so that the first git operation in a fresh container verifies
 # against something rather than failing with "Host key verification failed" - which is

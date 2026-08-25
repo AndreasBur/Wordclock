@@ -11,12 +11,22 @@ Choose the configuration matching the host. Keeping the WSLg mount in its own
 configuration prevents native Linux container startup from failing when
 `/mnt/wslg` does not exist.
 
-## Persistent Codex login
+## Logins that survive a rebuild
 
-Both configurations mount the named `wordclock-codex` volume at
-`/home/vscode/.codex`. This preserves the Codex login and local configuration
-when the development container is rebuilt. The volume contains credentials; do
-not share, export or remove it unless the saved login should be discarded.
+Two named volumes carry a login across a rebuild: `wordclock-codex` at `/home/vscode/.codex`
+and `wordclock-gh` at `/home/vscode/.config/gh`. Without them both have to be entered again
+by hand every time the container is built.
+
+They are declared by the **shared feature**, so every variant gets them, because both tools
+belong to every variant: the Codex extension is in the shared extension list, and every push
+and pull request goes through `gh`. The `Dockerfile` creates both directories as the remote
+user at mode 0700 first — an empty named volume takes its ownership from the path it covers,
+so a path that does not exist in the image yields a volume owned by root that the tool cannot
+write. 0700 rather than the package cache's 0755, because a credential is not a cache, and
+`gh` refuses to read a config directory that others can enter.
+
+Both volumes hold credentials: do not share, export or remove one unless the saved login
+should be discarded.
 
 ## SSH agent on Linux
 
@@ -192,9 +202,17 @@ be committed (internal base images, registry-hosted features, credentials). The
 Add such a directory to `.gitignore` to keep it local; `/.devcontainer/vector/`
 is already listed there.
 
-Persisting another tool's login across rebuilds takes a named volume plus one
-`chown`, because a volume whose target does not exist in the image is created
-owned by root:
+What must stay local is a **secret or an internal address** — a registry-hosted feature, an
+internal base image, a token written into the file. A *mount* that persists a login is
+neither: the line names a volume, the volume lives on the machine that created it, and
+nothing about it reaches the repository. That is why the two login volumes above are in the
+committed shared feature, where every variant gets them, rather than in a variant somebody
+has to build for themselves.
+
+Persisting a further tool's login is therefore one mount beside them and one line in the
+`Dockerfile`, the way `~/.codex` and `~/.config/gh` are done. In a variant that cannot
+change the image, the ownership is fixed after creation instead, because a volume whose
+target does not exist in the image is created owned by root:
 
 ```jsonc
 "mounts": [
