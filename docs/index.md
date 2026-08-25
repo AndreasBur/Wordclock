@@ -15,7 +15,11 @@ before half five, the kind of wording the word tables have to cover.
 - [Serial command reference](serial-commands.md) — every command the clock
   answers, over the serial port and over the web console alike.
 - [Fonts](fonts.md) — the bitmap font table format, and how to regenerate one.
-- [Roadmap](roadmap.md) — what is planned, why, and what each item touches.
+- [Roadmap](roadmap.md) — what is still open, and what settles each item.
+- [Comparison](comparison.md) — the other published word clocks this one was
+  measured against, and where it ended up ahead.
+- [Measured decisions](decisions.md) — a pattern that spanned the whole tree, and
+  the build that decided it.
 
 ## Auf Deutsch
 

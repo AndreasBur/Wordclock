@@ -364,3 +364,29 @@ Returned in the `Error=<code>` field
 10 -H14 -M30 -S0      # set time to 14:30:00
 10                    # query current time (echoes H=.. M=.. S=..)
 ```
+
+## Adding an RPC
+
+Three places have to move together:
+
+1. `RpcIdType` and the `switch` in
+   [MsgCmdRemoteProcedureCallParser.h](../firmware/inc/Communication/MessageParser/MsgCmdRemoteProcedureCallParser.h)
+2. `RemoteProcedureValueNames` in
+   [MessageCatalog.cpp](../firmware/src/Communication/MessageCatalog.cpp) — written
+   beside the firmware rather than derived from it, and read positionally, so the order
+   is the contract. A `static_assert` counts the names against `RpcIdType`, so a missing
+   one does not compile; a *misordered* one still does.
+3. The RPC table above
+
+New ids go at the **end** of the enum. They are not stored anywhere, so a shift would
+not corrupt a saved configuration, but it would silently change what every written-down
+`-P<id>` does, including the ones in this repository's own docs.
+
+An RPC is a fire-and-forget action. Its answer is `RpcId=<id> Error=<code>` and has no
+payload field, so anything with a value to report is a command, not an RPC — command 12
+is the shape for that.
+
+Two things the existing ids are worth knowing for. Ids 22 to 30 can each be refused, and
+carry a return value that says so. Ids 34 to 40 — the increment and decrement pair for a
+control with no display — cannot: a setting has no state that makes its neighbour
+unreachable, so all seven answer `Error=0`.
