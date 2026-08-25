@@ -43,8 +43,8 @@ first answers `E_NOT_OK`. Writers have one form, which answers a code that a cal
 nothing to do with it ignores.
 
 This used to be a checked form beside a `*Fast` form that trusted its caller, and the
-measurement that ended it is in the roadmap's backlog item 9: the checked build was the
-smaller one. What is left of the argument is that a backend supplying only one overload of
+measurement that ended it is in [decisions.md](../../docs/decisions.md#the-fast-accessor-pair):
+the checked build was the smaller one. What is left of the argument is that a backend supplying only one overload of
 a pair compiles until something reaches for the other, which is how `getOutputPixel` went
 through three backends with only its unchecked half.
 
