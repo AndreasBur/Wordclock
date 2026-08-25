@@ -1,0 +1,15 @@
+# GitHub Pages serves this directory as the project site. The theme is the one
+# GitHub hosts itself: a remote_theme would need a Gemfile and a build step, and
+# nothing here wants a Ruby toolchain in the repository.
+theme: jekyll-theme-primer
+
+title: Wordclock — a German word clock (Wortuhr)
+description: >-
+  Word clock firmware for ESP32-S3, RP2350 and AVR128DA48. An 11x10 German
+  letter grid on WS2812 LEDs, configured from a phone over WiFi, with NTP time,
+  automatic brightness and updates over the air.
+
+# The pages under images/ are assets, not documents, and the repository's own
+# READMEs are reached through GitHub rather than through the site.
+exclude:
+  - README.md
