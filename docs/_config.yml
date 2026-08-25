@@ -4,10 +4,17 @@
 theme: jekyll-theme-primer
 
 title: Wordclock — a German word clock (Wortuhr)
+# jekyll-seo-tag builds the <title> as "title | tagline", and falls back to the
+# description when there is no tagline - which produced a 250-character title
+# that a search engine cuts off mid-name. The tagline keeps the title inside the
+# roughly 60 characters that get shown; the description stays long, because it
+# is rendered into <meta name="description"> where about 155 are read.
+tagline: ESP32, RP2350, AVR
+
 description: >-
-  Word clock firmware for ESP32-S3, RP2350 and AVR128DA48. An 11x10 German
-  letter grid on WS2812 LEDs, configured from a phone over WiFi, with NTP time,
-  automatic brightness and updates over the air.
+  Word clock firmware for ESP32-S3, RP2350 and AVR128DA48: an 11x10 German
+  letter grid on WS2812 LEDs, configured from a phone over WiFi, with NTP time
+  and updates over the air.
 
 # The pages under images/ are assets, not documents, and the repository's own
 # READMEs are reached through GitHub rather than through the site.
