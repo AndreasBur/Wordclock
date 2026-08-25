@@ -32,16 +32,19 @@ the word tables have to cover.
 
 ## What it does
 
-| | |
-|---|---|
-| **Time in words** | An 11×10 German letter matrix, driven from a font table the clock reads at runtime |
-| **Boards** | ESP32-S3, Raspberry Pi Pico 2 W (RP2350), AVR128DA48 — one firmware, one core, three backends |
-| **LEDs** | WS2812 / NeoPixel, shaped by the RMT peripheral on the ESP32 and by the CCL on the AVR |
-| **Configuration** | A web panel and a command console the clock serves itself over WiFi, plus the same commands over the serial port |
-| **Time source** | NTP with a time zone on the networked boards, a DS3231 on the AVR |
-| **Brightness** | Automatic, from a BH1750 light sensor, with a night switch |
-| **Updates** | Over the air, from the panel, on the networked boards |
-| **No hardware needed** | The simulator runs the whole firmware on a PC and serves the same pages |
+- **Time in words** — an 11×10 German letter matrix, driven from a font table the
+  clock reads at runtime.
+- **Boards** — ESP32-S3, Raspberry Pi Pico 2 W (RP2350), AVR128DA48: one firmware,
+  one core, three backends.
+- **LEDs** — WS2812 / NeoPixel, shaped by the RMT peripheral on the ESP32 and by
+  the CCL on the AVR.
+- **Configuration** — a web panel and a command console the clock serves itself
+  over WiFi, and the same commands over the serial port.
+- **Time source** — NTP with a time zone on the networked boards, a DS3231 on the AVR.
+- **Brightness** — automatic, from a BH1750 light sensor, with a night switch.
+- **Updates** — over the air, from the panel, on the networked boards.
+- **No hardware needed** — the simulator runs the whole firmware on a PC and serves
+  the same pages a clock does.
 
 ## Auf Deutsch
 
