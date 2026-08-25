@@ -1,4 +1,4 @@
-# Wordclock
+# Wordclock — a German word clock (Wortuhr)
 
 [![CI](https://img.shields.io/github/actions/workflow/status/AndreasBur/Wordclock/ci.yml?branch=master&label=CI&logo=github)](https://github.com/AndreasBur/Wordclock/actions/workflows/ci.yml)
 [![static analysis](https://img.shields.io/github/actions/workflow/status/AndreasBur/Wordclock/static-analysis.yml?branch=master&label=static%20analysis&logo=github)](https://github.com/AndreasBur/Wordclock/actions/workflows/static-analysis.yml)
@@ -12,9 +12,15 @@
 ![Code size](https://img.shields.io/github/languages/code-size/AndreasBur/Wordclock)
 [![License](https://img.shields.io/github/license/AndreasBur/Wordclock)](LICENSE)
 
-A word clock based on Arduino: an 11×10 grid of letters that spells out the
-time in German ("ES IST FÜNF NACH ZEHN"), with animations, overlays (date,
-temperature, text) and a serial command interface.
+A word clock based on Arduino — a *Wortuhr*, which is what the German builds of
+this idea are called: an 11×10 grid of letters that spells out the time in German
+("ES IST FÜNF NACH ZEHN"), with animations, overlays (date, temperature, text)
+and a serial command interface.
+
+The same firmware drives WS2812 LEDs from an ESP32-S3, a Raspberry Pi Pico 2 W
+(RP2350) or an AVR128DA48, and on the first two a phone configures it over WiFi:
+two pages the clock serves itself, NTP time with a time zone, automatic
+brightness from a light sensor, and firmware updates over the air.
 
 ![The simulator window, showing 16:20 as "ES IST ZEHN VOR HALB FÜNF"](docs/images/simulator.png)
 
@@ -23,6 +29,27 @@ window and routes the serial interface to the text boxes beside it, so commands
 can be sent and answers read without any hardware. Above it shows 16:20, which
 German says as *zehn vor halb fünf* — ten before half five, the kind of wording
 the word tables have to cover.
+
+## What it does
+
+| | |
+|---|---|
+| **Time in words** | An 11×10 German letter matrix, driven from a font table the clock reads at runtime |
+| **Boards** | ESP32-S3, Raspberry Pi Pico 2 W (RP2350), AVR128DA48 — one firmware, one core, three backends |
+| **LEDs** | WS2812 / NeoPixel, shaped by the RMT peripheral on the ESP32 and by the CCL on the AVR |
+| **Configuration** | A web panel and a command console the clock serves itself over WiFi, plus the same commands over the serial port |
+| **Time source** | NTP with a time zone on the networked boards, a DS3231 on the AVR |
+| **Brightness** | Automatic, from a BH1750 light sensor, with a night switch |
+| **Updates** | Over the air, from the panel, on the networked boards |
+| **No hardware needed** | The simulator runs the whole firmware on a PC and serves the same pages |
+
+## Auf Deutsch
+
+Eine Wortuhr, die die Zeit in deutschen Worten anzeigt — 11×10 Buchstaben,
+WS2812-LEDs, Konfiguration per Handy über WLAN, Update over the air. Die
+Firmware läuft auf ESP32-S3, Raspberry Pi Pico 2 W und AVR128DA48, und ohne
+Hardware im Simulator auf dem PC. Die Dokumentation ist englisch, die Uhr
+spricht deutsch.
 
 ## Repository layout
 
