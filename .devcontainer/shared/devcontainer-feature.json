@@ -36,6 +36,16 @@
             "source": "wordclock-platformio",
             "target": "/home/vscode/.platformio",
             "type": "volume"
+        },
+        {
+            "source": "wordclock-codex",
+            "target": "/home/vscode/.codex",
+            "type": "volume"
+        },
+        {
+            "source": "wordclock-gh",
+            "target": "/home/vscode/.config/gh",
+            "type": "volume"
         }
     ],
     "postStartCommand": "platformio-trust-store"
