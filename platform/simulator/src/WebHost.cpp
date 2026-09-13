@@ -436,6 +436,11 @@ WebHost& WebHost::getInstance()
  *                  so and runs on, which is the same shape the ESP32 backend's server failure
  *                  has - fall back to what works rather than refuse to start.
 ******************************************************************************************************************************************************/
+/* Not static, though nothing in them reads a member: these stand in for the backends the
+   clock really runs on, and there the same call reaches a peripheral through instance
+   state. A stand-in that answered the check would have a different API from the thing it
+   stands in for, which is the one property it exists to keep. */
+// NOLINTBEGIN(readability-convert-member-functions-to-static)
 StdReturnType WebHost::begin()
 {
 #ifdef _WIN32
@@ -644,6 +649,7 @@ void WebTransport::sendBinary(const byte* Bytes, size_t Length)
 {
     WebHost::getInstance().sendToEveryClient(true, reinterpret_cast<const char*>(Bytes), Length);
 }
+// NOLINTEND(readability-convert-member-functions-to-static)
 
 
 /******************************************************************************************************************************************************

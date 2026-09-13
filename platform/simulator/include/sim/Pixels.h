@@ -131,6 +131,9 @@ class Pixels
     StdReturnType clearPixel(byte Index) { return setPixel(Index, 0, 0, 0); }
 
     // methods
+    /* Not static, for the reason sim/System.h gives: a stand-in keeps the API of the
+       backend it stands in for, where the strip's length is instance state. */
+    // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
     bool isIndexValid(IndexType Index) const { return Index < PIXELS_NUMBER_OF_PIXELS; }
     void init(byte sPin) { Pin = sPin; }
     void enablePixels() { setBrightness(255); }

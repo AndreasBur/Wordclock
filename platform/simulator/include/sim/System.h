@@ -75,6 +75,11 @@ class System
     }
 
     // get methods
+    /* Not static, though nothing in them reads a member: these stand in for the backends the
+       clock really runs on, and there the same call reaches a peripheral through instance
+       state. A stand-in that answered the check would have a different API from the thing it
+       stands in for, which is the one property it exists to keep. */
+    // NOLINTBEGIN(readability-convert-member-functions-to-static)
     StdReturnType getFreeMemoryInKibibytes(uint16_t& FreeMemory) const { UNUSED(FreeMemory); return E_NOT_OK; }
 
     StdReturnType getNetworkAddress(char* String) const { String[0u] = STD_NULL_CHARACTER; return E_NOT_OK; }
@@ -97,6 +102,7 @@ class System
     StdReturnType restart() { return E_NOT_OK; }
     StdReturnType resynchroniseTime() { return E_NOT_OK; }
     StdReturnType reconnectNetwork() { return E_NOT_OK; }
+    // NOLINTEND(readability-convert-member-functions-to-static)
 };
 
 #endif // _SYSTEM_H_

@@ -1,0 +1,136 @@
+Running clang-tidy for 45 files out of 61 in compilation database ...
+[ 1/45][11.8s] clang-tidy-21 -p=build-ct -quiet /tmp/claude-1000/-workspaces-Wordclock/cf623683-f79f-4bf2-862a-dbe55ab3b0de/scratchpad/wt/platform/simulator/src/Storage.cpp
+558 warnings generated.
+
+[ 2/45][11.8s] clang-tidy-21 -p=build-ct -quiet /tmp/claude-1000/-workspaces-Wordclock/cf623683-f79f-4bf2-862a-dbe55ab3b0de/scratchpad/wt/firmware/src/Animation/AnimationFade.cpp
+558 warnings generated.
+
+[ 3/45][11.9s] clang-tidy-21 -p=build-ct -quiet /tmp/claude-1000/-workspaces-Wordclock/cf623683-f79f-4bf2-862a-dbe55ab3b0de/scratchpad/wt/firmware/src/Animation/AnimationTeletype.cpp
+558 warnings generated.
+
+[ 4/45][12.1s] clang-tidy-21 -p=build-ct -quiet /tmp/claude-1000/-workspaces-Wordclock/cf623683-f79f-4bf2-862a-dbe55ab3b0de/scratchpad/wt/firmware/src/Animation/Animation.cpp
+558 warnings generated.
+
+[ 5/45][12.3s] clang-tidy-21 -p=build-ct -quiet /tmp/claude-1000/-workspaces-Wordclock/cf623683-f79f-4bf2-862a-dbe55ab3b0de/scratchpad/wt/platform/simulator/src/Pixels.cpp
+558 warnings generated.
+
+[ 6/45][12.4s] clang-tidy-21 -p=build-ct -quiet /tmp/claude-1000/-workspaces-Wordclock/cf623683-f79f-4bf2-862a-dbe55ab3b0de/scratchpad/wt/firmware/src/Animation/AnimationSqueeze.cpp
+558 warnings generated.
+
+[ 7/45][12.4s] clang-tidy-21 -p=build-ct -quiet /tmp/claude-1000/-workspaces-Wordclock/cf623683-f79f-4bf2-862a-dbe55ab3b0de/scratchpad/wt/firmware/src/Font/FontTahoma10x10.cpp
+558 warnings generated.
+
+[ 8/45][12.7s] clang-tidy-21 -p=build-ct -quiet /tmp/claude-1000/-workspaces-Wordclock/cf623683-f79f-4bf2-862a-dbe55ab3b0de/scratchpad/wt/platform/simulator/src/PixelsFrame.cpp
+558 warnings generated.
+
+[ 9/45][12.9s] clang-tidy-21 -p=build-ct -quiet /tmp/claude-1000/-workspaces-Wordclock/cf623683-f79f-4bf2-862a-dbe55ab3b0de/scratchpad/wt/firmware/src/DisplayManager/DisplayManager.cpp
+558 warnings generated.
+
+[10/45][12.9s] clang-tidy-21 -p=build-ct -quiet /tmp/claude-1000/-workspaces-Wordclock/cf623683-f79f-4bf2-862a-dbe55ab3b0de/scratchpad/wt/firmware/src/Animation/AnimationWipe.cpp
+558 warnings generated.
+
+[11/45][13.1s] clang-tidy-21 -p=build-ct -quiet /tmp/claude-1000/-workspaces-Wordclock/cf623683-f79f-4bf2-862a-dbe55ab3b0de/scratchpad/wt/firmware/src/Animation/AnimationCube.cpp
+558 warnings generated.
+
+[12/45][13.6s] clang-tidy-21 -p=build-ct -quiet /tmp/claude-1000/-workspaces-Wordclock/cf623683-f79f-4bf2-862a-dbe55ab3b0de/scratchpad/wt/firmware/src/Animation/AnimationExplodeWords.cpp
+558 warnings generated.
+
+[13/45][13.8s] clang-tidy-21 -p=build-ct -quiet /tmp/claude-1000/-workspaces-Wordclock/cf623683-f79f-4bf2-862a-dbe55ab3b0de/scratchpad/wt/firmware/src/Communication/MessageCatalog.cpp
+558 warnings generated.
+
+[14/45][15.4s] clang-tidy-21 -p=build-ct -quiet /tmp/claude-1000/-workspaces-Wordclock/cf623683-f79f-4bf2-862a-dbe55ab3b0de/scratchpad/wt/firmware/src/Animation/Animations.cpp
+558 warnings generated.
+
+[15/45][16.3s] clang-tidy-21 -p=build-ct -quiet /tmp/claude-1000/-workspaces-Wordclock/cf623683-f79f-4bf2-862a-dbe55ab3b0de/scratchpad/wt/firmware/src/Text/Text.cpp
+558 warnings generated.
+
+[16/45][18.4s] clang-tidy-21 -p=build-ct -quiet /tmp/claude-1000/-workspaces-Wordclock/cf623683-f79f-4bf2-862a-dbe55ab3b0de/scratchpad/wt/platform/simulator/src/WebHost.cpp
+569 warnings generated.
+
+[17/45][11.9s] clang-tidy-21 -p=build-ct -quiet /tmp/claude-1000/-workspaces-Wordclock/cf623683-f79f-4bf2-862a-dbe55ab3b0de/scratchpad/wt/firmware/src/Animation/AnimationFlicker.cpp
+558 warnings generated.
+
+[18/45][12.0s] clang-tidy-21 -p=build-ct -quiet /tmp/claude-1000/-workspaces-Wordclock/cf623683-f79f-4bf2-862a-dbe55ab3b0de/scratchpad/wt/firmware/src/Font/FontSprite5x8.cpp
+558 warnings generated.
+
+[19/45][12.1s] clang-tidy-21 -p=build-ct -quiet /tmp/claude-1000/-workspaces-Wordclock/cf623683-f79f-4bf2-862a-dbe55ab3b0de/scratchpad/wt/platform/simulator/src/SerialShim.cpp
+558 warnings generated.
+
+[20/45][12.0s] clang-tidy-21 -p=build-ct -quiet /tmp/claude-1000/-workspaces-Wordclock/cf623683-f79f-4bf2-862a-dbe55ab3b0de/scratchpad/wt/firmware/src/Font/FontCourierNew7x10.cpp
+558 warnings generated.
+
+[21/45][12.0s] clang-tidy-21 -p=build-ct -quiet /tmp/claude-1000/-workspaces-Wordclock/cf623683-f79f-4bf2-862a-dbe55ab3b0de/scratchpad/wt/firmware/src/Font/FontCourierNew7x9.cpp
+558 warnings generated.
+
+[22/45][12.3s] clang-tidy-21 -p=build-ct -quiet /tmp/claude-1000/-workspaces-Wordclock/cf623683-f79f-4bf2-862a-dbe55ab3b0de/scratchpad/wt/firmware/src/Font/FontLucidaSans9x10.cpp
+558 warnings generated.
+
+[23/45][12.6s] clang-tidy-21 -p=build-ct -quiet /tmp/claude-1000/-workspaces-Wordclock/cf623683-f79f-4bf2-862a-dbe55ab3b0de/scratchpad/wt/platform/simulator/src/Settings.cpp
+558 warnings generated.
+
+[24/45][13.4s] clang-tidy-21 -p=build-ct -quiet /tmp/claude-1000/-workspaces-Wordclock/cf623683-f79f-4bf2-862a-dbe55ab3b0de/scratchpad/wt/firmware/src/Overlay/Overlays.cpp
+558 warnings generated.
+
+[25/45][12.1s] clang-tidy-21 -p=build-ct -quiet /tmp/claude-1000/-workspaces-Wordclock/cf623683-f79f-4bf2-862a-dbe55ab3b0de/scratchpad/wt/firmware/src/Clock/ClockWords.cpp
+558 warnings generated.
+
+[26/45][16.2s] clang-tidy-21 -p=build-ct -quiet /tmp/claude-1000/-workspaces-Wordclock/cf623683-f79f-4bf2-862a-dbe55ab3b0de/scratchpad/wt/firmware/src/Display/Display.cpp
+558 warnings generated.
+
+[27/45][18.5s] clang-tidy-21 -p=build-ct -quiet /tmp/claude-1000/-workspaces-Wordclock/cf623683-f79f-4bf2-862a-dbe55ab3b0de/scratchpad/wt/firmware/src/Communication/WebFrontend/WebFrontend.cpp
+568 warnings generated.
+
+[28/45][14.4s] clang-tidy-21 -p=build-ct -quiet /tmp/claude-1000/-workspaces-Wordclock/cf623683-f79f-4bf2-862a-dbe55ab3b0de/scratchpad/wt/firmware/src/Communication/Communication.cpp
+558 warnings generated.
+
+[29/45][19.0s] clang-tidy-21 -p=build-ct -quiet /tmp/claude-1000/-workspaces-Wordclock/cf623683-f79f-4bf2-862a-dbe55ab3b0de/scratchpad/wt/platform/simulator/src/MessageDecoder.cpp
+558 warnings generated.
+
+[30/45][13.2s] clang-tidy-21 -p=build-ct -quiet /tmp/claude-1000/-workspaces-Wordclock/cf623683-f79f-4bf2-862a-dbe55ab3b0de/scratchpad/wt/firmware/src/Animation/AnimationDrop.cpp
+558 warnings generated.
+
+[31/45][20.6s] clang-tidy-21 -p=build-ct -quiet /tmp/claude-1000/-workspaces-Wordclock/cf623683-f79f-4bf2-862a-dbe55ab3b0de/scratchpad/wt/platform/simulator/src/MessageBuilder.cpp
+558 warnings generated.
+
+[32/45][12.3s] clang-tidy-21 -p=build-ct -quiet /tmp/claude-1000/-workspaces-Wordclock/cf623683-f79f-4bf2-862a-dbe55ab3b0de/scratchpad/wt/firmware/src/Animation/AnimationRoll.cpp
+558 warnings generated.
+
+[33/45][11.9s] clang-tidy-21 -p=build-ct -quiet /tmp/claude-1000/-workspaces-Wordclock/cf623683-f79f-4bf2-862a-dbe55ab3b0de/scratchpad/wt/firmware/src/Animation/AnimationCursor.cpp
+558 warnings generated.
+
+[34/45][12.3s] clang-tidy-21 -p=build-ct -quiet /tmp/claude-1000/-workspaces-Wordclock/cf623683-f79f-4bf2-862a-dbe55ab3b0de/scratchpad/wt/firmware/src/Display/DisplayWords.cpp
+558 warnings generated.
+
+[35/45][11.9s] clang-tidy-21 -p=build-ct -quiet /tmp/claude-1000/-workspaces-Wordclock/cf623683-f79f-4bf2-862a-dbe55ab3b0de/scratchpad/wt/firmware/src/Animation/AnimationSnake.cpp
+558 warnings generated.
+
+[36/45][11.9s] clang-tidy-21 -p=build-ct -quiet /tmp/claude-1000/-workspaces-Wordclock/cf623683-f79f-4bf2-862a-dbe55ab3b0de/scratchpad/wt/firmware/src/Display/DisplayCharacters.cpp
+558 warnings generated.
+
+[37/45][11.7s] clang-tidy-21 -p=build-ct -quiet /tmp/claude-1000/-workspaces-Wordclock/cf623683-f79f-4bf2-862a-dbe55ab3b0de/scratchpad/wt/firmware/src/Animation/AnimationShift.cpp
+558 warnings generated.
+
+[38/45][13.8s] clang-tidy-21 -p=build-ct -quiet /tmp/claude-1000/-workspaces-Wordclock/cf623683-f79f-4bf2-862a-dbe55ab3b0de/scratchpad/wt/firmware/src/Animation/AnimationExplodePixels.cpp
+558 warnings generated.
+
+[39/45][10.5s] clang-tidy-21 -p=build-ct -quiet /tmp/claude-1000/-workspaces-Wordclock/cf623683-f79f-4bf2-862a-dbe55ab3b0de/scratchpad/wt/firmware/src/Clock/Clock.cpp
+558 warnings generated.
+
+[40/45][15.8s] clang-tidy-21 -p=build-ct -quiet /tmp/claude-1000/-workspaces-Wordclock/cf623683-f79f-4bf2-862a-dbe55ab3b0de/scratchpad/wt/firmware/src/Scheduler/Scheduler.cpp
+558 warnings generated.
+
+[41/45][10.0s] clang-tidy-21 -p=build-ct -quiet /tmp/claude-1000/-workspaces-Wordclock/cf623683-f79f-4bf2-862a-dbe55ab3b0de/scratchpad/wt/firmware/src/Transformation/Transformation.cpp
+558 warnings generated.
+
+[42/45][10.0s] clang-tidy-21 -p=build-ct -quiet /tmp/claude-1000/-workspaces-Wordclock/cf623683-f79f-4bf2-862a-dbe55ab3b0de/scratchpad/wt/firmware/src/Animation/AnimationCollapse.cpp
+558 warnings generated.
+
+[43/45][28.3s] clang-tidy-21 -p=build-ct -quiet /tmp/claude-1000/-workspaces-Wordclock/cf623683-f79f-4bf2-862a-dbe55ab3b0de/scratchpad/wt/firmware/src/Communication/MessageParser/MsgCmdParser.cpp
+558 warnings generated.
+
+[44/45][14.6s] clang-tidy-21 -p=build-ct -quiet /tmp/claude-1000/-workspaces-Wordclock/cf623683-f79f-4bf2-862a-dbe55ab3b0de/scratchpad/wt/firmware/src/Persistence/Persistence.cpp
+558 warnings generated.
+
+[45/45][12.9s] clang-tidy-21 -p=build-ct -quiet /tmp/claude-1000/-workspaces-Wordclock/cf623683-f79f-4bf2-862a-dbe55ab3b0de/scratchpad/wt/firmware/src/Animation/AnimationMatrix.cpp
+558 warnings generated.
+
