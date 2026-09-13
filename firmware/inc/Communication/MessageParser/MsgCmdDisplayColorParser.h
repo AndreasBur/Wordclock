@@ -66,17 +66,17 @@ class MsgCmdDisplayColorParser : public MsgParameterParser<MsgCmdDisplayColorPar
     };
 
     // functions
-    void handleParameter(char ParameterShortName, const char* Argument, PositionType Length) { UNUSED(ParameterShortName); UNUSED(Argument); UNUSED(Length); }
-    void handleParameter(char ParameterShortName, byte Argument)
+    static void handleParameter(char ParameterShortName, const char* Argument, PositionType Length) { UNUSED(ParameterShortName); UNUSED(Argument); UNUSED(Length); }
+    static void handleParameter(char ParameterShortName, byte Argument)
     {
         if(ParameterShortName == RedOptionShortName) { Display::getInstance().setColorRed(Argument); }
         if(ParameterShortName == GreenOptionShortName) { Display::getInstance().setColorGreen(Argument); }
         if(ParameterShortName == BlueOptionShortName) { Display::getInstance().setColorBlue(Argument); }
     }
 
-    void sendAnswerRed(bool AppendSpace) const { sendAnswerParameter(RedOptionShortName, Display::getInstance().getColorRed(), AppendSpace); }
-    void sendAnswerGreen(bool AppendSpace) const { sendAnswerParameter(GreenOptionShortName, Display::getInstance().getColorGreen(), AppendSpace); }
-    void sendAnswerBlue(bool AppendSpace) const { sendAnswerParameter(BlueOptionShortName, Display::getInstance().getColorBlue(), AppendSpace); }
+    static void sendAnswerRed(bool AppendSpace) { sendAnswerParameter(RedOptionShortName, Display::getInstance().getColorRed(), AppendSpace); }
+    static void sendAnswerGreen(bool AppendSpace) { sendAnswerParameter(GreenOptionShortName, Display::getInstance().getColorGreen(), AppendSpace); }
+    static void sendAnswerBlue(bool AppendSpace) { sendAnswerParameter(BlueOptionShortName, Display::getInstance().getColorBlue(), AppendSpace); }
 
     void show() const
     {
@@ -96,7 +96,7 @@ class MsgCmdDisplayColorParser : public MsgParameterParser<MsgCmdDisplayColorPar
     // set methods
 
     // methods
-    void sendAnswer() const
+    static void sendAnswer()
     {
         sendAnswerRed(true);
         sendAnswerGreen(true);

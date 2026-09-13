@@ -142,7 +142,7 @@ class Power
     /* What the status of the supply is, rather than which step the sequence is on: a switch
        that is on its way off still has its supply up, and the two ticks it takes to get
        there are nobody else's business. */
-    bool isSupplyOn() const { return getSwitch().isSupplyOn(); }
+    static bool isSupplyOn() { return getSwitch().isSupplyOn(); }
 
     /* Whether there is a switch to ask at all. A board that was built without one has the
        high side MOSFET bridged, and then these procedures have nothing to act on. */
@@ -153,7 +153,7 @@ class Power
        already the case, or already under way, is honoured rather than refused, because a
        caller that says "off" twice means the same thing both times. */
     StdReturnType switchSupplyOn() {
-        if(!isSwitchFitted()) { return E_NOT_OK; }
+        if constexpr (!isSwitchFitted()) { return E_NOT_OK; }
 
         switch(State) {
             case STATE_SUPPLY_OFF :
@@ -175,7 +175,7 @@ class Power
     }
 
     StdReturnType switchSupplyOff() {
-        if(!isSwitchFitted()) { return E_NOT_OK; }
+        if constexpr (!isSwitchFitted()) { return E_NOT_OK; }
 
         switch(State) {
             case STATE_SUPPLY_ON :

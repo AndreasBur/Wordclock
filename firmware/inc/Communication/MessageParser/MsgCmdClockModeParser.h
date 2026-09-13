@@ -66,7 +66,7 @@ class MsgCmdClockModeParser : public MsgParameterParser<MsgCmdClockModeParser, M
     };
 
     // functions
-    void handleParameter(char ParameterShortName, const char* Argument, PositionType Length) { UNUSED(ParameterShortName); UNUSED(Argument); UNUSED(Length); }
+    static void handleParameter(char ParameterShortName, const char* Argument, PositionType Length) { UNUSED(ParameterShortName); UNUSED(Argument); UNUSED(Length); }
     void handleParameter(char ParameterShortName, byte Argument)
     {
         if(ParameterShortName == ModeOptionShortName) {
@@ -101,7 +101,7 @@ class MsgCmdClockModeParser : public MsgParameterParser<MsgCmdClockModeParser, M
     // set methods
 
     // methods
-    void sendAnswer() const {
+    static void sendAnswer() {
         sendAnswerParameter(ModeOptionShortName, Clock::getInstance().getMode());
         /* Last field before the command parser's terminating println(), so no trailing
            separator space. */

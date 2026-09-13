@@ -89,7 +89,7 @@ class Animation
         Clock::getInstance().setTime(Hour, Minute);
         State = STATE_IDLE;
     }
-    byte selectByTime(byte, byte, byte) const;
+    static byte selectByTime(byte, byte, byte);
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
@@ -104,9 +104,9 @@ class Animation
     // set methods
 
     // methods
-    StdReturnType show() const { return Display::getInstance().show(); }
-    bool isPixelPartOfClockWords(ClockWords::WordsListType, byte, byte) const;
-    bool isPixelPartOfClockWords(ClockWords::WordsListType, byte) const;
+    static StdReturnType show() { return Display::getInstance().show(); }
+    static bool isPixelPartOfClockWords(ClockWords::WordsListType, byte, byte);
+    static bool isPixelPartOfClockWords(ClockWords::WordsListType, byte);
 };
 
 

@@ -70,7 +70,7 @@ class MsgCmdNightSwitchParser : public MsgParameterParser<MsgCmdNightSwitchParse
     bool ActiveGiven{false};
 
     // functions
-    void handleParameter(char ParameterShortName, const char* Argument, PositionType Length) {
+    static void handleParameter(char ParameterShortName, const char* Argument, PositionType Length) {
         UNUSED(ParameterShortName); UNUSED(Argument); UNUSED(Length);
     }
     void handleParameter(char ParameterShortName, byte Argument)
@@ -93,7 +93,7 @@ class MsgCmdNightSwitchParser : public MsgParameterParser<MsgCmdNightSwitchParse
     ~MsgCmdNightSwitchParser() { }
 
     // methods
-    void sendAnswer() const {
+    static void sendAnswer() {
         const NightSwitch& nightSwitch = NightSwitch::getInstance();
 
         sendAnswerParameter(ActiveShortName, static_cast<byte>(nightSwitch.getIsActive() ? 1u : 0u));

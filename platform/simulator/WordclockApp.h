@@ -9,7 +9,7 @@ class WordclockApp : public wxApp
 {
     public:
         WordclockApp();
-        virtual bool OnInit();
+        bool OnInit() override;
         void OnTimer(wxTimerEvent& event);
         void OnClose(wxCloseEvent& event);
 

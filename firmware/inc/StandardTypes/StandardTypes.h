@@ -261,7 +261,7 @@ uint8_t digitsOfNumber(T Number, unsigned Base)
 {
     T numberOfDigits = 0u;
 
-    do { Number /= Base; numberOfDigits++; }
+    do { Number /= Base; ++numberOfDigits; }
     while (Number != 0u);
 
     return numberOfDigits;

@@ -81,7 +81,7 @@ class AnimationCube : public Animation
     void setBorderPixels() { writeBorderPixels(true); }
     void clearBorderPixels() { writeBorderPixels(false); }
     void clearBorderPixelsWithoutClockPixels();
-    void writeBorderPixels(bool);
+    void writeBorderPixels(bool) const;
     StdReturnType increaseBorder();
     StdReturnType decreaseBorder();
     void clearTimeTask();

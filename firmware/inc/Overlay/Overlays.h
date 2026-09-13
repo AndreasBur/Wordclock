@@ -170,7 +170,7 @@ class Overlays
     }
 
 	// get methods
-    byte getTaskCycle() const { return TaskCycle; }
+    static byte getTaskCycle() { return TaskCycle; }
     StateType getState() const;
 
 #if (OVERLAYS_SUPPORT_DATE == STD_ON)

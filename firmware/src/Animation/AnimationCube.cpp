@@ -181,7 +181,7 @@ void AnimationCube::clearBorderPixelsWithoutClockPixels()
 /******************************************************************************************************************************************************
   writeBorderPixels()
 ******************************************************************************************************************************************************/
-void AnimationCube::writeBorderPixels(bool Value)
+void AnimationCube::writeBorderPixels(bool Value) const
 {
     for(byte Column = Border.ColumnStart; Column <= Border.ColumnEnd; Column++) {
         // set border top

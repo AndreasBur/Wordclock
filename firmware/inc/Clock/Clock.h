@@ -120,13 +120,13 @@ class Clock
         return minutesTableElement;
     }
 
-    HourTableElementType getHoursTableElement(HourModeType HourMode, byte Hour) const {
+    static HourTableElementType getHoursTableElement(HourModeType HourMode, byte Hour) {
         HourTableElementType hoursTableElement;
         memcpy_P(&hoursTableElement, &HoursTable[HourMode][Hour], sizeof(HourTableElementType));
         return hoursTableElement;
     }
 
-    bool calculateItIs(byte Minute) const {
+    static bool calculateItIs(byte Minute) {
         byte minuteSteps = Minute / CLOCK_MINUTE_STEP_IN_MINUTES;
         // show "it is" only to full and half hour
         if(minuteSteps == 0u || minuteSteps == (CLOCK_NUMBER_OF_MINUTE_STEPS / 2u)) {
@@ -136,7 +136,7 @@ class Clock
         }
     }
 
-    byte transform24hTo12hFormat(byte Hour) const {
+    static byte transform24hTo12hFormat(byte Hour) {
         return Hour % CLOCK_NUMBER_OF_HOURS;
     }
 
@@ -188,16 +188,16 @@ class Clock
     static bool isModeValid(ModeType sMode) { return sMode < MODE_NUMBER_OF_MODES; }
     StdReturnType setTime(TimeType Time) const { return setTime(Time.Hour, Time.Minute); }
     StdReturnType setTime(byte, byte) const;
-    void setTime(ClockWords::WordsListType ClockWordsTable) const {
+    static void setTime(ClockWords::WordsListType ClockWordsTable) {
         setTime(ClockWordsTable, 0u);
     }
-    void setTime(ClockWords::WordsListType ClockWordsTable, byte MaxLength) const {
+    static void setTime(ClockWords::WordsListType ClockWordsTable, byte MaxLength) {
         for(byte index = 0u; index < ClockWordsTable.size(); index++) {
             Display::getInstance().setWord(ClockWordsTable[index], MaxLength);
         }
     }
 
-    StdReturnType show() const { return Display::getInstance().show(); }
+    static StdReturnType show() { return Display::getInstance().show(); }
     StdReturnType refresh(byte Hour, byte Minute) const {
         StdReturnType returnValue{E_OK};
         if(setTime(Hour, Minute) == E_NOT_OK) { returnValue = E_NOT_OK; }

@@ -68,10 +68,10 @@ class FontTahoma10x10 : public Font<FontCharHorizontal<uint16_t, FONT_TAHOMA_10X
     ~FontTahoma10x10() { }
 
     // get methods
-    byte getWidth() const { return FONT_TAHOMA_10X10_WIDTH; }
-    byte getHeight() const { return FONT_TAHOMA_10X10_HEIGHT; }
-    Orientation getOrientation() const { return Orientation::ORIENTATION_HORIZONTAL; }
-    const FontTableType& getFontTable() const { return FontTable; }
+    static byte getWidth() { return FONT_TAHOMA_10X10_WIDTH; }
+    static byte getHeight() { return FONT_TAHOMA_10X10_HEIGHT; }
+    static Orientation getOrientation() { return Orientation::ORIENTATION_HORIZONTAL; }
+    static const FontTableType& getFontTable() { return FontTable; }
 
     // set methods
 

@@ -58,10 +58,10 @@ class MsgCmdConsoleParser : public MsgParameterParser<MsgCmdConsoleParser, MSG_C
     };
 
     // functions
-    void handleParameter(char ParameterShortName, byte Argument) {
+    static void handleParameter(char ParameterShortName, byte Argument) {
         UNUSED(ParameterShortName); UNUSED(Argument);
     }
-    void handleParameter(char ParameterShortName, const char* Argument, PositionType Length)
+    static void handleParameter(char ParameterShortName, const char* Argument, PositionType Length)
     {
         UNUSED(Length);
 
@@ -78,14 +78,14 @@ class MsgCmdConsoleParser : public MsgParameterParser<MsgCmdConsoleParser, MSG_C
     // methods
     /* Whether a password is set, and never which one. Last field before the command parser's
        terminating println(), so no trailing separator space. */
-    void sendAnswer() const {
+    static void sendAnswer() {
         sendAnswerParameter(ProtectedShortName,
                             static_cast<byte>(System::getInstance().isConsoleProtected() ? 1u : 0u), false);
     }
 
     /* Nothing deferred: the password is stored where it arrives, since there is no second
        field it has to agree with. */
-    void process() const { }
+    static void process() { }
 };
 
 #endif // _MSG_CMD_CONSOLE_PARSER_H_

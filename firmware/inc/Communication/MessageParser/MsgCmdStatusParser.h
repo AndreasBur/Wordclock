@@ -73,8 +73,8 @@ class MsgCmdStatusParser : public MsgParameterParser<MsgCmdStatusParser, MSG_CMD
     // functions
     /* Never called - the table above has nothing to match an option against - but the base
        parser instantiates both, so both have to exist. */
-    void handleParameter(char ParameterShortName, const char* Argument, PositionType Length) { UNUSED(ParameterShortName); UNUSED(Argument); UNUSED(Length); }
-    void handleParameter(char ParameterShortName, byte Argument) { UNUSED(ParameterShortName); UNUSED(Argument); }
+    static void handleParameter(char ParameterShortName, const char* Argument, PositionType Length) { UNUSED(ParameterShortName); UNUSED(Argument); UNUSED(Length); }
+    static void handleParameter(char ParameterShortName, byte Argument) { UNUSED(ParameterShortName); UNUSED(Argument); }
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
@@ -86,13 +86,13 @@ class MsgCmdStatusParser : public MsgParameterParser<MsgCmdStatusParser, MSG_CMD
     /* Every field that can be absent is sent empty rather than as a zero that reads like a
        value: no chip, no network, no answer. The getters write the terminator either way,
        so what is sent after a refusal is the empty string. */
-    void sendAnswerNumber(char ShortName, StdReturnType ReturnValue, uint16_t Value, bool AppendSpace = true) const {
+    static void sendAnswerNumber(char ShortName, StdReturnType ReturnValue, uint16_t Value, bool AppendSpace = true) {
         if(ReturnValue == E_OK) { sendAnswerParameter(ShortName, Value, AppendSpace); }
         else { sendAnswerParameter(ShortName, "", AppendSpace); }
     }
 
     // methods
-    void sendAnswer() const {
+    static void sendAnswer() {
         const System& system = System::getInstance();
 
         char TemperatureString[Temperature::StringLength];
@@ -126,7 +126,7 @@ class MsgCmdStatusParser : public MsgParameterParser<MsgCmdStatusParser, MSG_CMD
         sendAnswerNumber(FreeMemoryShortName, FreeMemoryReturn, FreeMemory, false);
     }
 
-    void process() const { }
+    static void process() { }
 };
 
 #endif // _MSG_CMD_STATUS_PARSER_H_

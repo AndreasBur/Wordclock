@@ -67,36 +67,35 @@ class AnimationExplodePixels : public Animation
 
     // functions
     void reset();
-    void clearTimeTask();
+    static void clearTimeTask();
     void setTimeTask();
     void setStateToSetTime();
-    void shiftQuadrants();
 
-    void shiftQuadrants(DisplayPixels&, byte);
+    static void shiftQuadrants(DisplayPixels&, byte);
 
-    void shiftQuadrantUpperLeft();
-    void shiftQuadrantUpperRight();
-    void shiftQuadrantLowerLeft();
-    void shiftQuadrantLowerRight();
+    static void shiftQuadrantUpperLeft();
+    static void shiftQuadrantUpperRight();
+    static void shiftQuadrantLowerLeft();
+    static void shiftQuadrantLowerRight();
 
-    void shiftDownRight(byte, byte);
-    void shiftDownLeft(byte, byte);
-    void shiftUpRight(byte, byte);
-    void shiftUpLeft(byte, byte);
+    static void shiftDownRight(byte, byte);
+    static void shiftDownLeft(byte, byte);
+    static void shiftUpRight(byte, byte);
+    static void shiftUpLeft(byte, byte);
 
-    void clearOldAndSetNewPixel(byte, byte, byte, byte);
-    void setNewPixel(byte, byte, byte, byte);
+    static void clearOldAndSetNewPixel(byte, byte, byte, byte);
+    static void setNewPixel(byte, byte, byte, byte);
 
-    byte shiftLeft(byte Column, byte NumberOfShifts) {
+    static byte shiftLeft(byte Column, byte NumberOfShifts) {
          return (static_cast<int16_t>(Column) - NumberOfShifts > ColumnCenter) ? (Column - NumberOfShifts) : ColumnCenter;
     }
-    byte shiftRight(byte Column, byte NumberOfShifts) {
+    static byte shiftRight(byte Column, byte NumberOfShifts) {
          return (static_cast<uint16_t>(Column) + NumberOfShifts < ColumnCenter) ? (Column + NumberOfShifts) : ColumnCenter;
     }
-    byte shiftUp(byte Row, byte NumberOfShifts) {
+    static byte shiftUp(byte Row, byte NumberOfShifts) {
          return (static_cast<int16_t>(Row) - NumberOfShifts > RowCenter) ? (Row - NumberOfShifts) : RowCenter;
     }
-    byte shiftDown(byte Row, byte NumberOfShifts) {
+    static byte shiftDown(byte Row, byte NumberOfShifts) {
          return (static_cast<uint16_t>(Row) + NumberOfShifts < RowCenter) ? (Row + NumberOfShifts) : RowCenter;
     }
 

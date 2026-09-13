@@ -86,7 +86,7 @@ class AnimationRoll : public Animation
     void rollHorizontal();
     void rollVertical();
     byte numberOfSteps() const;
-    DirectionType calcDirection(byte, byte) const;
+    static DirectionType calcDirection(byte, byte);
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S

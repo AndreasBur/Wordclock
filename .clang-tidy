@@ -5,7 +5,8 @@
 # are off because they argue with decisions this project has already made, and a check that
 # is answered by "no, on purpose" a hundred times is a check nobody reads.
 #
-# Style is deliberately absent. The conventions are in CLAUDE.md and are not clang-tidy's
+# Style checks identify member functions that can be static or const.
+# The conventions are in CLAUDE.md and are not clang-tidy's
 # to have an opinion about: readability-identifier-naming would report every member in the
 # tree, and the modernize- family would report the configuration macros that every module
 # is configured through.
@@ -21,6 +22,8 @@ Checks: >
   cert-*,
   clang-analyzer-*,
   performance-*,
+  readability-convert-member-functions-to-static,
+  readability-make-member-function-const,
   -bugprone-easily-swappable-parameters,
   -bugprone-narrowing-conversions,
   -bugprone-reserved-identifier,

@@ -84,7 +84,7 @@ class DisplayBrightness
        procedure that calibrates it answered, Persistence stored it, and nothing ever read
        it - and it put a living room at 100 lx a sixth of a percent up a scale that ends at
        the sensor's 65535, so the automatic held every indoor clock at its floor. */
-    byte calcBrightnessAutomatic(byte sBrightness) const {
+    static byte calcBrightnessAutomatic(byte sBrightness) {
         const Illuminance& Sensor = Illuminance::getInstance();
 
         if(sBrightness < BrightnessAutomaticMinValue) { return sBrightness; }

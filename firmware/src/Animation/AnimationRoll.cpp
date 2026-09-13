@@ -180,7 +180,7 @@ byte AnimationRoll::numberOfSteps() const
 /******************************************************************************************************************************************************
   calcDirection()
 ******************************************************************************************************************************************************/
-AnimationRoll::DirectionType AnimationRoll::calcDirection(byte Hour, byte Minute) const
+AnimationRoll::DirectionType AnimationRoll::calcDirection(byte Hour, byte Minute)
 {
     return static_cast<DirectionType>(selectByTime(Hour, Minute, DIRECTION_NUMBER_OF_DIRECTIONS));
 } /* calcDirection */

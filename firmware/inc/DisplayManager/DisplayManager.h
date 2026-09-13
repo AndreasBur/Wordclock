@@ -78,17 +78,17 @@ class DisplayManager
     constexpr DisplayManager() { }
     ~DisplayManager() { }
 
-    bool isOverlayShowing() const {
+    static bool isOverlayShowing() {
         return Overlays::getInstance().getState() == Overlays::OverlayType::STATE_SHOW;
     }
 
-    void showClock(HourType Hour, MinuteType Minute) const {
+    static void showClock(HourType Hour, MinuteType Minute) {
         Display::getInstance().clear();
         Clock::getInstance().setTime(Hour, Minute);
         Display::getInstance().show();
     }
 
-    void taskClockWordsChange(HourType Hour, MinuteType Minute) const {
+    static void taskClockWordsChange(HourType Hour, MinuteType Minute) {
         Animations& animations = Animations::getInstance();
         if(animations.getAnimation() == Animations::ANIMATION_ID_NONE) {
             showClock(Hour, Minute);
@@ -150,7 +150,7 @@ class DisplayManager
        change that would otherwise be the only trigger. Selecting the animation again
        with "9 -A<id>" shows it too, but it also means something else - it changes what
        runs from now on. */
-    StdReturnType startAnimation() {
+    static StdReturnType startAnimation() {
         if(isOverlayShowing()) { return E_NOT_OK; }
 
         const ClockTime Time = RealTimeClock::getInstance().getTime();

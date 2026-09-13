@@ -69,28 +69,28 @@ class MsgCmdOverlayTextParser : public MsgCmdOverlayParser<MsgCmdOverlayTextPars
     // set methods
 
     // methods
-    MinuteType getPeriodInMinutes() const { return Overlays::getInstance().getTextPeriodInMinutes(); }
-    SecondType getEnduranceInSeconds() const { return Overlays::getInstance().getTextEnduranceInSeconds(); }
-    MonthType getMonth() const { return Overlays::getInstance().getTextMonth(); }
-    DayType getDay() const { return Overlays::getInstance().getTextDay(); }
-    DayType getValidInDays() const { return Overlays::getInstance().getTextValidInDays(); }
-    byte getSpeed() const { return Overlays::getInstance().getTextSpeed(); }
-    FontType getFont() const {return Overlays::getInstance().getTextFont(); }
-    bool getIsActive() const { return Overlays::getInstance().getTextIsActive(); }
-    const char* getText() const { return Overlays::getInstance().getTextText(); }
+    static MinuteType getPeriodInMinutes() { return Overlays::getInstance().getTextPeriodInMinutes(); }
+    static SecondType getEnduranceInSeconds() { return Overlays::getInstance().getTextEnduranceInSeconds(); }
+    static MonthType getMonth() { return Overlays::getInstance().getTextMonth(); }
+    static DayType getDay() { return Overlays::getInstance().getTextDay(); }
+    static DayType getValidInDays() { return Overlays::getInstance().getTextValidInDays(); }
+    static byte getSpeed() { return Overlays::getInstance().getTextSpeed(); }
+    static FontType getFont() {return Overlays::getInstance().getTextFont(); }
+    static bool getIsActive() { return Overlays::getInstance().getTextIsActive(); }
+    static const char* getText() { return Overlays::getInstance().getTextText(); }
 
-    StdReturnType setPeriodInMinutes(MinuteType PeriodInMinutes) { return Overlays::getInstance().setTextPeriodInMinutes(PeriodInMinutes); }
-    StdReturnType setEnduranceInSeconds(SecondType EnduranceInSeconds) { return Overlays::getInstance().setTextEnduranceInSeconds(EnduranceInSeconds); }
-    void setMonth(MonthType Month) { Overlays::getInstance().setTextMonth(Month); }
-    void setDay(DayType Day) { Overlays::getInstance().setTextDay(Day); }
-    void setValidInDays(DayType ValidInDays) { Overlays::getInstance().setTextValidInDays(ValidInDays); }
-    void setSpeed(byte Speed) { Overlays::getInstance().setTextSpeed(Speed); }
-    StdReturnType setFont(FontType Font) { return Overlays::getInstance().setTextFont(Font); }
-    void setIsActive(bool IsActive) { Overlays::getInstance().setTextIsActive(IsActive); }
-    void setText(const char* Text, LengthType Length) { Overlays::getInstance().setTextText(Text, Length); }
+    static StdReturnType setPeriodInMinutes(MinuteType PeriodInMinutes) { return Overlays::getInstance().setTextPeriodInMinutes(PeriodInMinutes); }
+    static StdReturnType setEnduranceInSeconds(SecondType EnduranceInSeconds) { return Overlays::getInstance().setTextEnduranceInSeconds(EnduranceInSeconds); }
+    static void setMonth(MonthType Month) { Overlays::getInstance().setTextMonth(Month); }
+    static void setDay(DayType Day) { Overlays::getInstance().setTextDay(Day); }
+    static void setValidInDays(DayType ValidInDays) { Overlays::getInstance().setTextValidInDays(ValidInDays); }
+    static void setSpeed(byte Speed) { Overlays::getInstance().setTextSpeed(Speed); }
+    static StdReturnType setFont(FontType Font) { return Overlays::getInstance().setTextFont(Font); }
+    static void setIsActive(bool IsActive) { Overlays::getInstance().setTextIsActive(IsActive); }
+    static void setText(const char* Text, LengthType Length) { Overlays::getInstance().setTextText(Text, Length); }
 
-    void sendAnswerText(bool AppendSpace) const { sendAnswerParameter(TextOptionShortName, getText(), AppendSpace); }
-    void sendAnswerSpeed(bool AppendSpace) const { sendAnswerParameter(SpeedOptionShortName, getSpeed(), AppendSpace); }
+    static void sendAnswerText(bool AppendSpace) { sendAnswerParameter(TextOptionShortName, getText(), AppendSpace); }
+    static void sendAnswerSpeed(bool AppendSpace) { sendAnswerParameter(SpeedOptionShortName, getSpeed(), AppendSpace); }
 
 };
 

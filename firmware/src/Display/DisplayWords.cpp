@@ -74,7 +74,7 @@ const DisplayWord DisplayWords::DisplayWordsTable[] PROGMEM
 /******************************************************************************************************************************************************
   getDisplayWord()
 ******************************************************************************************************************************************************/
-StdReturnType DisplayWords::getDisplayWord(WordIdType WordId, DisplayWord& Word) const
+StdReturnType DisplayWords::getDisplayWord(WordIdType WordId, DisplayWord& Word)
 {
     StdReturnType returnValue{E_NOT_OK};
 
@@ -91,7 +91,7 @@ StdReturnType DisplayWords::getDisplayWord(WordIdType WordId, DisplayWord& Word)
 /******************************************************************************************************************************************************
   getDisplayWordLength()
 ******************************************************************************************************************************************************/
-StdReturnType DisplayWords::getDisplayWordLength(WordIdType WordId, byte& Length) const
+StdReturnType DisplayWords::getDisplayWordLength(WordIdType WordId, byte& Length)
 {
     StdReturnType returnValue{E_NOT_OK};
 
@@ -108,7 +108,7 @@ StdReturnType DisplayWords::getDisplayWordLength(WordIdType WordId, byte& Length
 /******************************************************************************************************************************************************
   getDisplayWordColumn()
 ******************************************************************************************************************************************************/
-StdReturnType DisplayWords::getDisplayWordColumn(WordIdType WordId, byte& Column) const
+StdReturnType DisplayWords::getDisplayWordColumn(WordIdType WordId, byte& Column)
 {
     StdReturnType returnValue{E_NOT_OK};
 
@@ -125,7 +125,7 @@ StdReturnType DisplayWords::getDisplayWordColumn(WordIdType WordId, byte& Column
 /******************************************************************************************************************************************************
   getDisplayWordRow()
 ******************************************************************************************************************************************************/
-StdReturnType DisplayWords::getDisplayWordRow(WordIdType WordId, byte& Row) const
+StdReturnType DisplayWords::getDisplayWordRow(WordIdType WordId, byte& Row)
 {
     StdReturnType returnValue{E_NOT_OK};
 

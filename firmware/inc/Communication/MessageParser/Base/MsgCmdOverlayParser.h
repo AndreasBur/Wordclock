@@ -153,7 +153,7 @@ template <typename Derived> class MsgCmdOverlayParser
         sendAnswerActive(false);
     }
 
-    void process() const {  }
+    static void process() {  }
 
 };
 

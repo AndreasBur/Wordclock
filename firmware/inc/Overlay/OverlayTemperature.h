@@ -72,7 +72,7 @@ class OverlayTemperature : public Overlay<OverlayTemperature>
         UNUSED(CurrentDate);
         UNUSED(CurrentTime);
     }
-    void setStateToIdle(ClockDate CurrentDate, ClockTime CurrentTime) {
+    static void setStateToIdle(ClockDate CurrentDate, ClockTime CurrentTime) {
         Text::getInstance().stop();
         UNUSED(CurrentDate);
         UNUSED(CurrentTime);
@@ -81,11 +81,11 @@ class OverlayTemperature : public Overlay<OverlayTemperature>
     /* No reading, no overlay: a clock without the chip - and every clock until it has
        answered once - would otherwise hold the display for the whole endurance to show
        nothing, or show a zero that reads like a measurement. */
-    bool isReady() const { return Temperature::getInstance().isTemperatureAvailable(); }
+    static bool isReady() { return Temperature::getInstance().isTemperatureAvailable(); }
 
     /* Nothing of its own: the string it shows comes from the chip on every start, so
        there is no configuration here for a reset to undo. */
-    void resetOwnToDefaults() { }
+    static void resetOwnToDefaults() { }
 
     void showTask() { if(Text::getInstance().getState() == Text::STATE_IDLE) { setText(); } }
     void setText() { Text::getInstance().setTextWithShift(TemperatureString, getFont()); }

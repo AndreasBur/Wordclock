@@ -80,11 +80,11 @@ class ErrorMessage
 ******************************************************************************************************************************************************/
   private:
     // functions
-    void sendSpace() const { Serial.print(' '); }
-    void sendColon() const { Serial.print(':'); }
-    void sendEqual() const { Serial.print('='); }
+    static void sendSpace() { Serial.print(' '); }
+    static void sendColon() { Serial.print(':'); }
+    static void sendEqual() { Serial.print('='); }
 
-    void send(ApiType Api) const
+    static void send(ApiType Api)
     {
         Serial.print(F("Api"));
         sendEqual();
@@ -104,7 +104,7 @@ class ErrorMessage
     // set methods
 
     // methods
-    void send(ErrorType Error, bool AppendSpace = true) const
+    static void send(ErrorType Error, bool AppendSpace = true)
     {
         Serial.print(F("Error"));
         sendEqual();
@@ -112,7 +112,7 @@ class ErrorMessage
         if(AppendSpace) { sendSpace(); }
     }
 
-    void send(char OptionShortName, ErrorType Error, bool AppendSpace = true) const
+    static void send(char OptionShortName, ErrorType Error, bool AppendSpace = true)
     {
         send(Error, false);
         sendColon();
@@ -120,18 +120,18 @@ class ErrorMessage
         if(AppendSpace) { sendSpace(); }
     }
 
-    void send(MsgParameter Parameter, ErrorType Error, bool AppendSpace = true) const
+    static void send(MsgParameter Parameter, ErrorType Error, bool AppendSpace = true)
     {
         send(Parameter.getOptionShortName(), Error, AppendSpace);
     }
 
-    void send(StdReturnType ReturnValue, bool AppendSpace = true) const
+    static void send(StdReturnType ReturnValue, bool AppendSpace = true)
     {
         if(ReturnValue == E_OK) { send(ERROR_NO_ERROR, AppendSpace); }
         else { send(ERROR_UNKNOWN, AppendSpace); }
     }
 
-    void checkReturnValueAndSend(ApiType Api, StdReturnType ReturnValue, ErrorType Error, bool AppendSpace = true) const
+    static void checkReturnValueAndSend(ApiType Api, StdReturnType ReturnValue, ErrorType Error, bool AppendSpace = true)
     {
         if(ReturnValue == E_NOT_OK) {
             send(Api);
@@ -141,7 +141,7 @@ class ErrorMessage
         }
     }
 
-        void checkReturnValueAndSend(char OptionShortName, StdReturnType ReturnValue, ErrorType Error, bool AppendSpace = true) const
+        static void checkReturnValueAndSend(char OptionShortName, StdReturnType ReturnValue, ErrorType Error, bool AppendSpace = true)
     {
         if(ReturnValue == E_NOT_OK) {
             send(OptionShortName, Error, AppendSpace);

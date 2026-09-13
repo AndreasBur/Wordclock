@@ -64,7 +64,7 @@ class OverlayDate : public Overlay<OverlayDate>
         setText();
         UNUSED(CurrentTime);
     }
-    void setStateToIdle(ClockDate CurrentDate, ClockTime CurrentTime) {
+    static void setStateToIdle(ClockDate CurrentDate, ClockTime CurrentTime) {
         Text::getInstance().stop();
         UNUSED(CurrentDate);
         UNUSED(CurrentTime);
@@ -73,11 +73,11 @@ class OverlayDate : public Overlay<OverlayDate>
     /* The date is always there to be shown; only the temperature has to wait for a
        reading. Answered here rather than defaulted in the base, so that adding an overlay
        is a decision about this and not a silent inheritance of it. */
-    bool isReady() const { return true; }
+    static bool isReady() { return true; }
 
     /* Nothing of its own: the string it shows is built from the current date on every
        start, so there is no configuration here for a reset to undo. */
-    void resetOwnToDefaults() { }
+    static void resetOwnToDefaults() { }
 
     void showTask() { if(Text::getInstance().getState() == Text::STATE_IDLE) { setText(); } }
     void setText() { Text::getInstance().setTextWithShift(DateString, getFont()); }
@@ -91,8 +91,8 @@ class OverlayDate : public Overlay<OverlayDate>
         itoa(CurrentDate.getYear(), tmp, 10u);
     }
 
-    char* appendDot(char* String) { String[0u] = '.'; return &String[1u]; }
-    char* checkDigitsAndAppendDot(uint16_t Value, char* String) { return appendDot(&String[digitsOfNumber(Value)]); }
+    static char* appendDot(char* String) { String[0u] = '.'; return &String[1u]; }
+    static char* checkDigitsAndAppendDot(uint16_t Value, char* String) { return appendDot(&String[digitsOfNumber(Value)]); }
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S

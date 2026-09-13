@@ -149,7 +149,7 @@ class WebFrontend
 
     /* Sends one finished line to whoever is connected. Called from the firmware's task
        through WordclockSerial's line sink, not from a server's. */
-    void broadcastLine(const char*);
+    static void broadcastLine(const char*);
 
     /* Sends the pixel buffer as one binary frame, at most every
        WEB_FRONTEND_FRAME_INTERVAL_TICKS and only when it changed. Called from the
