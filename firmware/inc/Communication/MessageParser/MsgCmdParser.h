@@ -84,24 +84,46 @@ class MsgCmdParser
     const Message& IncomingMessage;
 
     //private functions
-    void sendAnswer(CommandType Command) const {
+    static void sendAnswer(CommandType Command) {
         Serial.print(Command);
         Serial.print(CommandParameterDelimiter);
     }
 
-    CommandType getCommand() const {
-        /* atoi cannot report a failure and does not have to: a message that is not a
-           number converts to zero, which is COMMAND_NONE and is answered with
-           ERROR_WRONG_COMMAND - the same answer strtol would lead to, over more code. */
-        // NOLINTNEXTLINE(cert-err34-c)
-        return static_cast<CommandType>(atoi(IncomingMessage.getMessage()));
+    static bool isDecimalDigit(char Char) { return (Char >= '0') && (Char <= '9'); }
+    static byte toDigitValue(char Char) { return static_cast<byte>(Char - '0'); }
+
+    /* Counted up digit by digit, and refused the moment the running number passes the
+       last command rather than after the whole run: atoi returns an int, so on the AVR
+       "65537" wrapped into 1 and was answered as a valid command. strtol reports that
+       overflow and was what this did first, at 566 bytes of flash for a routine that
+       parses bases, signs and a long - where a command number is one of seventeen. */
+    static CommandType toCommand(const char* Message) {
+        uint16_t number{0u};
+        const char* digit = Message;
+
+        while(isDecimalDigit(*digit)) {
+            number = static_cast<uint16_t>((number * 10u) + toDigitValue(*digit));
+            if(number > COMMAND_CONSOLE) { return COMMAND_NONE; }
+            digit++;
+        }
+        /* Not one digit read: a message that is not a number at all, which is the same
+           COMMAND_NONE that a zero converts to on its own. */
+        if(digit == Message) { return COMMAND_NONE; }
+
+        return static_cast<CommandType>(number);
     }
 
+    CommandType getCommand() const { return toCommand(IncomingMessage.getMessage()); }
+
+    /* A command without a delimiter has no parameter, and the terminator is where that
+       empty string lives. It used to be the last character instead, so "12" handed the
+       parameter parser a "2" to read options out of - and an empty message asked for
+       index length() - 1, which is a strlen of zero minus one and not a position at all. */
     const char* getParameter() const {
         const char* message = IncomingMessage.getMessage();
         size_t valuePos = IncomingMessage.find(CommandParameterDelimiter);
 
-        if(valuePos == Message::npos) { return &message[IncomingMessage.length() - 1u]; }
+        if(valuePos == Message::npos) { return &message[IncomingMessage.length()]; }
         else { return &message[valuePos]; }
     }
 

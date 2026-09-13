@@ -29,9 +29,10 @@ bool damageStoredChecksum()
     std::FILE* file = std::fopen(STORAGE_FILE_NAME, "rb");
     if(file == nullptr) { return false; }
     size = std::fread(blob.data(), 1u, blob.size(), file);
-    std::fclose(file);
+    const bool readFailed = std::ferror(file) != 0;
+    const int readCloseResult = std::fclose(file);
 
-    if(size == 0u) { return false; }
+    if(readFailed || readCloseResult != 0 || size == 0u) { return false; }
 
     /* The last byte, which is behind every field the format names - so this flip leaves
        magic and version intact and is caught only if the checksum really covers the whole
@@ -41,9 +42,9 @@ bool damageStoredChecksum()
     file = std::fopen(STORAGE_FILE_NAME, "wb");
     if(file == nullptr) { return false; }
     const size_t written = std::fwrite(blob.data(), 1u, size, file);
-    std::fclose(file);
+    const int writeCloseResult = std::fclose(file);
 
-    return written == size;
+    return written == size && writeCloseResult == 0;
 }
 
 /* The whole persistence path, on the store the simulator really writes to. Runs last

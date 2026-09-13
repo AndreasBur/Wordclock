@@ -33,7 +33,7 @@ void startFromRunningClock()
 
     display.resumeOutput();
     display.enable();
-    Clock::getInstance().setTime(10u, 5u);
+    expect(Clock::getInstance().setTime(10u, 5u) == E_OK, "test clock time must be accepted");
     display.show();
     renderOnce();
 }

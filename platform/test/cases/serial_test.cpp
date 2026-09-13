@@ -4,6 +4,7 @@
 #include "Arduino.h"
 #include "Communication.h"
 #include "MsgCmdRemoteProcedureCallParser.h"
+#include "MsgCmdParser.h"
 #include "Uptime.h"
 #include "Version.h"
 #include "check.h"
@@ -21,6 +22,25 @@ int main()
 {
     WordclockSerial& port = WordclockSerial::getInstance();
     port.setLineSink(collectLine);
+
+    /* Exercise the parser directly as well: Communication filters empty messages, but
+       the parser must still be safe for an empty buffer and out-of-range numbers. */
+    const std::string wrongCommand = "Error=" + std::to_string(ErrorMessage::ERROR_WRONG_COMMAND);
+    const char* invalidCommands[]{
+        "", " ", "abc", "0", "-1", "17", "65537", "4294967297",
+        "9999999999999999999999999999999999999999999999999",
+        "-999999999999999999999999999999999999999999999999"
+    };
+    for(const char* command : invalidCommands) {
+        Message message;
+        for(const char* character = command; *character != '\0'; ++character) {
+            check(message.addChar(*character) == E_OK, "the command fixture fits the buffer");
+        }
+        Lines.clear();
+        MsgCmdParser(message).parse();
+        check(Lines.size() == 1u && Lines[0] == wrongCommand,
+              "invalid command numbers are refused without overflow or wraparound");
+    }
 
     /* the wire is served first, so a network client cannot starve it */
     WordclockPlatform::hardwarePort().Incoming = "AB";
@@ -98,6 +118,9 @@ int main()
           "the status answers every field, and the ones with no answer empty");
     check(answerTo("12 -V1\n") == "12 Error=3:V V=" WORDCLOCK_VERSION " U=0 H=0 N=0 I=1 T= A= Q= M=0",
           "a value sent to a read-only field is refused as an unknown option");
+
+    check(answerTo("00012\n").find("12 ") == 0u, "commands with leading zeroes remain decimal");
+    check(answerTo("16\n").find("16 ") == 0u, "the highest command number is accepted");
 
     /* The uptime is the one of them a host can produce. Driven through the counter's own
        task rather than by moving millis(), which is the point of the change: nothing

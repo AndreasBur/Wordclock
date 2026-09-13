@@ -65,15 +65,15 @@ class AnimationSnake : public Animation
 
     // functions
     void reset();
-    byte transformToSerpentine(byte, byte) const;
-    byte transformToSerpentine(byte) const;
+    static byte transformToSerpentine(byte, byte);
+    static byte transformToSerpentine(byte);
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
     constexpr AnimationSnake() { }
-    ~AnimationSnake();
+    ~AnimationSnake() = default;
 
     // get methods
 

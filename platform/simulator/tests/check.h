@@ -95,7 +95,7 @@ inline PixelBufferType drawClockFace(byte Hour, byte Minute)
     Display& display = Display::getInstance();
 
     display.clear();
-    Clock::getInstance().setTime(Hour, Minute);
+    expect(Clock::getInstance().setTime(Hour, Minute) == E_OK, "clock face time must be accepted");
     display.show();
     return readPixels();
 }

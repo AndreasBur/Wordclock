@@ -20,7 +20,9 @@
 /******************************************************************************************************************************************************
  * I N C L U D E S
 ******************************************************************************************************************************************************/
-
+#include  <cstdint>
+#include  <cstddef>
+#include  <climits>
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
@@ -93,7 +95,7 @@ class Bit
 	// methods
     size_t numberOfDigits(unsigned Base) { return numberOfDigits(Value, Base); }
     bool readBit(size_t BitPos) const { return readBit(Value, BitPos); }
-    T readBitsValue(T BitMask, size_t BitPos) const { return readBitsValue(Value, BitPos); }
+    T readBitsValue(T BitMask, size_t BitPos) const { return readBitsValue(Value, BitMask, BitPos); }
     T readBits(T BitMask) const { return readBits(Value, BitMask); }
 
     bool isBitSet(size_t BitPos) const { return isBitSet(Value, BitPos); }
@@ -131,7 +133,7 @@ class Bit
     // static methods
     static uint64_t bitValue(size_t BitPos) { return UINT64_C(1) << BitPos; }
     static uint64_t bitMask(size_t Length) { return bitValue(Length) - 1u; }
-    template <typename Type> size_t numberOfBits() { return sizeof(Type) * CHAR_BIT; }
+    template <typename Type> static size_t numberOfBits() { return sizeof(Type) * CHAR_BIT; }
 
     template <typename NumberType> static size_t numberOfDigits(NumberType Number, unsigned Base)
     {

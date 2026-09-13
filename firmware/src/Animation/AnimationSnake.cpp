@@ -110,7 +110,7 @@ void AnimationSnake::reset()
 /******************************************************************************************************************************************************
   transformToSerpentine()
 ******************************************************************************************************************************************************/
-byte AnimationSnake::transformToSerpentine(byte Column, byte Row) const
+byte AnimationSnake::transformToSerpentine(byte Column, byte Row)
 {
     byte index;
 
@@ -124,7 +124,7 @@ byte AnimationSnake::transformToSerpentine(byte Column, byte Row) const
 /******************************************************************************************************************************************************
   transformToSerpentine()
 ******************************************************************************************************************************************************/
-byte AnimationSnake::transformToSerpentine(byte Index) const
+byte AnimationSnake::transformToSerpentine(byte Index)
 {
     byte column = Display::getInstance().indexToColumn(Index);
     byte row = Display::getInstance().indexToRow(Index);

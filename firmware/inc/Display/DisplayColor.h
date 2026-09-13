@@ -74,10 +74,12 @@ class DisplayColor
 
     // functions
 #if (DISPLAY_COLOR_SUPPORT_DIMMING == STD_ON)
-    byte dimmColor(byte Color, byte Brightness) const {
-        byte dimmedColor = (Color * Brightness) >> 8u;
-        if(dimmedColor == 0u) { return 1u; }
-        else { return dimmedColor; }
+    static constexpr byte dimmColor(byte Color, byte Brightness) {
+        /* One operand widened before the multiply: two bytes promote to a signed 16-bit
+           int on the AVR, and 255 * 255 does not fit in one. */
+        const byte DimmedColor = (static_cast<uint16_t>(Color) * Brightness) >> 8u;
+        if(DimmedColor == 0u) { return 1u; }
+        else { return DimmedColor; }
     }
 #endif
 
@@ -100,10 +102,10 @@ class DisplayColor
     byte getColorBlue() const { return Color.getBlue(); }
         
 #if (DISPLAY_COLOR_SUPPORT_DIMMING == STD_ON)
-    Pixel getColorDimmed() { return ColorDimmed; }
-    byte getColorRedDimmed() { return ColorDimmed.getRed(); }
-    byte getColorGreenDimmed() { return ColorDimmed.getGreen(); }
-    byte getColorBlueDimmed() { return ColorDimmed.getBlue(); }
+    Pixel getColorDimmed() const { return ColorDimmed; }
+    byte getColorRedDimmed() const { return ColorDimmed.getRed(); }
+    byte getColorGreenDimmed() const { return ColorDimmed.getGreen(); }
+    byte getColorBlueDimmed() const { return ColorDimmed.getBlue(); }
 #endif
 
 	// set methods
