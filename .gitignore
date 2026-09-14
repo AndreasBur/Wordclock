@@ -42,3 +42,11 @@ devcontainer-lock.json
 # The embed script is imported directly when its comment stripping is being checked, and
 # CPython leaves this behind whenever that happens.
 __pycache__/
+
+# CLion writes a whole project directory here, and all of it but one file is derivable from
+# CMakeLists.txt and rewritten whenever the IDE feels like it. The exception is editor.xml,
+# which is where the three inspections this project switches off are actually switched off
+# - docs/code-inspections.md says which three and why, and would otherwise name a file that
+# is not there. So the directory is ignored and that one file is excepted back in.
+/.idea/*
+!/.idea/editor.xml

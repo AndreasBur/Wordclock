@@ -13,9 +13,28 @@
 #include "Clock.h"
 #include "Display.h"
 #include "DisplayCharacters.h"
+#include "DisplayColor.h"
 #include "DisplayManager.h"
 #include "Pixels.h"
 #include "RealTimeClock.h"
+
+void testColourDimmingAcrossByteRange()
+{
+    DisplayColor color;
+    bool allMatch = true;
+    for(unsigned channel = 0u; channel <= 255u; ++channel) {
+        color.setColor(Pixel(channel, channel, channel));
+        for(unsigned brightness = 0u; brightness <= 255u; ++brightness) {
+            color.dimmColors(brightness);
+            const uint32_t scaled = (static_cast<uint32_t>(channel) * brightness) / 256u;
+            const byte expected = scaled == 0u ? 1u : static_cast<byte>(scaled);
+            allMatch = allMatch && color.getColorRedDimmed() == expected
+                && color.getColorGreenDimmed() == expected && color.getColorBlueDimmed() == expected;
+        }
+    }
+    expect(allMatch, "dimming must scale every byte pair without overflow and retain the minimum level");
+    expect(color.getColorRed() == 255u, "dimming must preserve the configured colour");
+}
 
 /* How much light the whole display is putting out, which is what a fade changes and a
    redraw does not. */
@@ -127,7 +146,7 @@ void testDisplayOffAndOnAgain()
        until this test there was nothing that could notice. */
     display.enable();
     display.setBrightness(120u);
-    Clock::getInstance().setTime(10u, 5u);
+    expect(Clock::getInstance().setTime(10u, 5u) == E_OK, "test clock time must be accepted");
     expect(display.show() == E_OK, "the clock face must reach the strip");
     expect(isAnyOutputPixelLit(), "a display that is on must put something out");
 
@@ -155,7 +174,7 @@ void testDisplayToggleFollowsTheState()
 
     display.enable();
     display.setBrightness(120u);
-    Clock::getInstance().setTime(10u, 5u);
+    expect(Clock::getInstance().setTime(10u, 5u) == E_OK, "test clock time must be accepted");
     display.show();
     expect(display.isEnabled(), "a display that was enabled must say so");
 

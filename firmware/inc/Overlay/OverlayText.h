@@ -63,12 +63,12 @@ class OverlayText : public Overlay<OverlayText>
 
     // functions
     void setStateToShow(ClockDate CurrentDate, ClockTime CurrentTime) { setText(); UNUSED(CurrentDate); UNUSED(CurrentTime); }
-    void setStateToIdle(ClockDate CurrentDate, ClockTime CurrentTime) { Text::getInstance().stop(); UNUSED(CurrentDate); UNUSED(CurrentTime); }
+    static void setStateToIdle(ClockDate CurrentDate, ClockTime CurrentTime) { Text::getInstance().stop(); UNUSED(CurrentDate); UNUSED(CurrentTime); }
 
     /* An empty text is still a text - it is what was configured, and shortening the
        overlay because of it would hide the mistake rather than show it. Only the
        temperature can have nothing to show. */
-    bool isReady() const { return true; }
+    static bool isReady() { return true; }
 
     /* The only overlay with anything of its own to reset. An empty text rather than the
        previous one, so a reset clock shows nothing rather than whatever the last owner

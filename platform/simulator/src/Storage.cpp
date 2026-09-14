@@ -34,6 +34,11 @@
  *
  *  \return         E_OK if exactly Size bytes were read
 ******************************************************************************************************************************************************/
+/* Not static, though nothing in them reads a member: these stand in for the backends the
+   clock really runs on, and there the same call reaches a peripheral through instance
+   state. A stand-in that answered the check would have a different API from the thing it
+   stands in for, which is the one property it exists to keep. */
+// NOLINTBEGIN(readability-convert-member-functions-to-static)
 StdReturnType Storage::read(byte* Buffer, size_t Size) const
 {
     if((Buffer == nullptr) || (Size == 0u) || (Size > Capacity)) { return E_NOT_OK; }
@@ -97,6 +102,7 @@ StdReturnType Storage::clear()
 
     return E_OK;
 } /* clear */
+// NOLINTEND(readability-convert-member-functions-to-static)
 
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E

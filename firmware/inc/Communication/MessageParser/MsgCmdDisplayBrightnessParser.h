@@ -67,8 +67,8 @@ class MsgCmdDisplayBrightnessParser : public MsgParameterParser<MsgCmdDisplayBri
     };
 
     // functions
-    void handleParameter(char ParameterShortName, const char* Argument, PositionType Length) { UNUSED(ParameterShortName); UNUSED(Argument); UNUSED(Length); }
-    void handleParameter(char ParameterShortName, byte Argument)
+    static void handleParameter(char ParameterShortName, const char* Argument, PositionType Length) { UNUSED(ParameterShortName); UNUSED(Argument); UNUSED(Length); }
+    static void handleParameter(char ParameterShortName, byte Argument)
     {
         if(ParameterShortName == BrightnessOptionShortName) {
             Display::getInstance().setBrightness(Argument);
@@ -81,9 +81,9 @@ class MsgCmdDisplayBrightnessParser : public MsgParameterParser<MsgCmdDisplayBri
         }
     }
 
-     void sendAnswerBrightness(bool AppendSpace) const { sendAnswerParameter(BrightnessOptionShortName, Display::getInstance().getBrightness(), AppendSpace); }
-     void sendAnswerAutomatic(bool AppendSpace) const { sendAnswerParameter(UseAutomaticOptionShortName, Display::getInstance().getBrightnessUseAutomatic(), AppendSpace); }
-     void sendAnswerGammaCorrection(bool AppendSpace) const { sendAnswerParameter(UseGammaCorrectionOptionShortName, Display::getInstance().getBrightnessUseGammaCorrection(), AppendSpace); }
+     static void sendAnswerBrightness(bool AppendSpace) { sendAnswerParameter(BrightnessOptionShortName, Display::getInstance().getBrightness(), AppendSpace); }
+     static void sendAnswerAutomatic(bool AppendSpace) { sendAnswerParameter(UseAutomaticOptionShortName, Display::getInstance().getBrightnessUseAutomatic(), AppendSpace); }
+     static void sendAnswerGammaCorrection(bool AppendSpace) { sendAnswerParameter(UseGammaCorrectionOptionShortName, Display::getInstance().getBrightnessUseGammaCorrection(), AppendSpace); }
 
     void show() const
     {
@@ -103,7 +103,7 @@ class MsgCmdDisplayBrightnessParser : public MsgParameterParser<MsgCmdDisplayBri
     // set methods
 
     // methods
-    void sendAnswer()
+    static void sendAnswer()
     {
         sendAnswerBrightness(true);
         sendAnswerAutomatic(true);

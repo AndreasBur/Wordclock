@@ -67,8 +67,8 @@ class AnimationWipe : public Animation
     void clearTimeTask();
     void setTimeTask();
     StdReturnType setNextIndex();
-    void setPixelDown(byte, byte);
-    void setPixelRight(byte, byte);
+    static void setPixelDown(byte, byte);
+    static void setPixelRight(byte, byte);
 
 
 /******************************************************************************************************************************************************

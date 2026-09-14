@@ -336,7 +336,7 @@ StdReturnType Display::setPixel(byte Column, byte Row)
 /******************************************************************************************************************************************************
   getColorDimmed()
 ******************************************************************************************************************************************************/
-Pixel Display::getColorDimmed(byte Brightness)
+Pixel Display::getColorDimmed(byte Brightness) const
 {
     /* the display color stays the only color, the brightness just dimms it. It comes
        on top of the display brightness, which is already part of the color here. */
@@ -568,7 +568,7 @@ Display::~Display()
 /******************************************************************************************************************************************************
   transformToSerpentine()
 ******************************************************************************************************************************************************/
-byte Display::transformToSerpentine(byte Column, byte Row) const
+byte Display::transformToSerpentine(byte Column, byte Row)
 {
     byte index;
 
@@ -582,7 +582,7 @@ byte Display::transformToSerpentine(byte Column, byte Row) const
 /******************************************************************************************************************************************************
   transformToSerpentine()
 ******************************************************************************************************************************************************/
-byte Display::transformToSerpentine(IndexType Index) const
+byte Display::transformToSerpentine(IndexType Index)
 {
     byte column = indexToColumn(Index);
     byte row = indexToRow(Index);

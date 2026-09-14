@@ -20,7 +20,6 @@
 /******************************************************************************************************************************************************
  * I N C L U D E S
 ******************************************************************************************************************************************************/
-#include "StandardTypes.h"
 #include "Arduino.h"
 #include "Font.h"
 #include "FontChar.h"
@@ -68,10 +67,10 @@ class FontCourierNew7x10 : public Font<FontCharHorizontal<byte, FONT_COURIER_NEW
     ~FontCourierNew7x10() { }
 
     // get methods
-    byte getWidth() const { return FONT_COURIER_NEW_7X10_WIDTH; }
-    byte getHeight() const { return FONT_COURIER_NEW_7X10_HEIGHT; }
-    Orientation getOrientation() const { return Orientation::ORIENTATION_HORIZONTAL; }
-    const FontTableType& getFontTable() const { return FontTable; }
+    static byte getWidth() { return FONT_COURIER_NEW_7X10_WIDTH; }
+    static byte getHeight() { return FONT_COURIER_NEW_7X10_HEIGHT; }
+    static Orientation getOrientation() { return Orientation::ORIENTATION_HORIZONTAL; }
+    static const FontTableType& getFontTable() { return FontTable; }
         
     // set methods
 

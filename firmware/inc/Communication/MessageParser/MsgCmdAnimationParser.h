@@ -86,7 +86,7 @@ class MsgCmdAnimationParser : public MsgParameterParser<MsgCmdAnimationParser, M
     };
 
     // functions
-    void handleParameter(char ParameterShortName, const char* Argument, PositionType Length) { UNUSED(ParameterShortName); UNUSED(Argument); UNUSED(Length); }
+    static void handleParameter(char ParameterShortName, const char* Argument, PositionType Length) { UNUSED(ParameterShortName); UNUSED(Argument); UNUSED(Length); }
     void handleParameter(char ParameterShortName, byte Argument)
     {
         if(ParameterShortName == AnimationOptionShortName) {
@@ -107,15 +107,15 @@ class MsgCmdAnimationParser : public MsgParameterParser<MsgCmdAnimationParser, M
         }
     }
 
-    void sendAnswerAnimation(bool AppendSpace) const {
+    static void sendAnswerAnimation(bool AppendSpace) {
         sendAnswerParameter(AnimationOptionShortName, Animations::getInstance().getAnimation(), AppendSpace);
     }
 
-    void sendAnswerMode(bool AppendSpace) const {
+    static void sendAnswerMode(bool AppendSpace) {
         sendAnswerParameter(ModeOptionShortName, Animations::getInstance().getMode(), AppendSpace);
     }
 
-    void sendAnswerSpeed(bool AppendSpace) const {
+    static void sendAnswerSpeed(bool AppendSpace) {
         AnimationIdType animation = Animations::getInstance().getAnimation();
         byte taskCycle = Animations::getInstance().getTaskCycle(animation);
         sendAnswerParameter(SpeedOptionShortName, Scheduler::convertTaskCycleToSpeed(taskCycle), AppendSpace);
@@ -133,7 +133,7 @@ class MsgCmdAnimationParser : public MsgParameterParser<MsgCmdAnimationParser, M
         Error.checkReturnValueAndSend(ModeOptionShortName, returnValue, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNDS);
     }
 
-    void sendAnswerFavourite(bool AppendSpace) const {
+    static void sendAnswerFavourite(bool AppendSpace) {
         /* the flag of the selected animation, not of the one a mode is running */
         AnimationIdType animation = Animations::getInstance().getAnimation();
         byte favourite = Animations::getInstance().isFavourite(animation) ? 1u : 0u;
@@ -174,7 +174,7 @@ class MsgCmdAnimationParser : public MsgParameterParser<MsgCmdAnimationParser, M
     // set methods
 
     // methods
-    void sendAnswer() const
+    static void sendAnswer()
     {
         sendAnswerAnimation(true);
         sendAnswerMode(true);

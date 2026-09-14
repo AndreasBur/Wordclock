@@ -52,7 +52,6 @@
 /******************************************************************************************************************************************************
  * I N C L U D E S
 ******************************************************************************************************************************************************/
-#include "StandardTypes.h"
 #include "Arduino.h"
 #include "ClockTime.h"
 #include "Display.h"
@@ -151,7 +150,7 @@ class NightSwitch
        keeps its current because on that board it cannot do otherwise - which is the same
        answer the procedures give, rather than a night that quietly does less than it says. */
     void cutSupplyForTheNight() {
-        if(!Power::isSwitchFitted()) { Display::getInstance().disable(); return; }
+        if constexpr (!Power::isSwitchFitted()) { Display::getInstance().disable(); return; }
 
         Power::getInstance().switchSupplyOff();
         SupplyCutForNight = true;

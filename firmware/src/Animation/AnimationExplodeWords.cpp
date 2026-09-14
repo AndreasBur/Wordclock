@@ -139,7 +139,7 @@ StdReturnType AnimationExplodeWords::shiftWord(byte FinalColum, byte FinalRow)
 /******************************************************************************************************************************************************
   toggleWordOnDisplay()
 ******************************************************************************************************************************************************/
-void AnimationExplodeWords::toggleWordOnDisplay()
+void AnimationExplodeWords::toggleWordOnDisplay() const
 {
     for(byte columnIndex = CurrentColumn; columnIndex < CurrentColumn + CurrentWordLength; columnIndex++) {
         Display::getInstance().togglePixel(columnIndex, CurrentRow);
@@ -149,7 +149,7 @@ void AnimationExplodeWords::toggleWordOnDisplay()
 /******************************************************************************************************************************************************
   setWordOnDisplay()
 ******************************************************************************************************************************************************/
-void AnimationExplodeWords::setWordOnDisplay()
+void AnimationExplodeWords::setWordOnDisplay() const
 {
     for(byte columnIndex = CurrentColumn; columnIndex < CurrentColumn + CurrentWordLength; columnIndex++) {
         Display::getInstance().setPixel(columnIndex, CurrentRow);

@@ -49,7 +49,7 @@ void startFromWhiteClockFace()
     display.enable();
     display.setBrightness(255u);
     display.setColor(255u, 255u, 255u);
-    Clock::getInstance().setTime(10u, 5u);
+    expect(Clock::getInstance().setTime(10u, 5u) == E_OK, "test clock time must be accepted");
     expect(display.show() == E_OK, "the clock face must reach the strip");
 }
 

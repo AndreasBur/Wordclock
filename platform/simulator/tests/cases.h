@@ -7,7 +7,9 @@
 #ifndef _CASES_H_
 #define _CASES_H_
 
+
 /* display_test.cpp */
+void testColourDimmingAcrossByteRange();
 void testDisplayManagerLatch();
 void testFadeDimsAndComesBack();
 void testDisplayOffAndOnAgain();
@@ -23,6 +25,7 @@ void testTemperatureOverlayWithoutSensor();
 void testOverlayPeriodAndEndurance();
 
 /* animation_test.cpp */
+void testSnakeLifetime();
 void testFlickerLeavesTheDisplayOn();
 void testEveryAnimationEndsOnTheNewTime();
 void testAnimationStepsThroughEveryOne();

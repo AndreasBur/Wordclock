@@ -10,6 +10,7 @@
 #include "cases.h"
 
 #include "Animations.h"
+#include "AnimationSnake.h"
 #include "Clock.h"
 #include "Display.h"
 #include "DisplayManager.h"
@@ -75,10 +76,18 @@ void testEveryAnimationEndsOnTheNewTime()
             Ticks++;
         }
 
-        snprintf(Description, sizeof(Description), "animation %u must come to an end", Id);
+        {
+            const int length = snprintf(Description, sizeof(Description), "animation %u must come to an end", Id);
+            expect(length >= 0 && static_cast<size_t>(length) < sizeof(Description),
+                   "test description must fit its buffer");
+        }
         expect(Ticks < TickLimit, Description);
 
-        snprintf(Description, sizeof(Description), "animation %u must leave the new time behind", Id);
+        {
+            const int length = snprintf(Description, sizeof(Description), "animation %u must leave the new time behind", Id);
+            expect(length >= 0 && static_cast<size_t>(length) < sizeof(Description),
+                   "test description must fit its buffer");
+        }
         expect(arePixelsEqual(readPixels(), Target), Description);
     }
 
@@ -129,4 +138,13 @@ void testAnimationStepsThroughEveryOne()
 
     expect(animations.setFavourite(NotAFavourite, true) == E_OK, "and it must go back to being one");
     animations.setAnimation(Animations::ANIMATION_ID_NONE);
+}
+
+void testSnakeLifetime()
+{
+    /* Automatic storage exercises the destructor that the long-lived animation pool
+       does not call during a normal firmware run. */
+    AnimationSnake snake;
+    snake.init();
+    expect(snake.getState() == Animation::STATE_IDLE, "a fresh snake animation must be idle");
 }

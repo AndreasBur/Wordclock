@@ -97,7 +97,7 @@ class ClockDateTime
     StdReturnType setDateDay(DayType Day) { return Date.setDay(Day); }
 
 	// methods
-    DayType getDaysOfMonth(MonthType Month, YearType Year) { return Date.getDaysOfMonth(Month, Year); }
+    static DayType getDaysOfMonth(MonthType Month, YearType Year) { return ClockDate::getDaysOfMonth(Month, Year); }
 };
 
 #endif

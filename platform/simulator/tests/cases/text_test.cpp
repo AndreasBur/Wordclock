@@ -56,7 +56,11 @@ void testCharacterToGlyphMapping()
         char Description[64];
 
         Display::getInstance().clear();
-        snprintf(Description, sizeof(Description), "font %u must draw the degree sign", Font);
+        {
+            const int length = snprintf(Description, sizeof(Description), "font %u must draw the degree sign", Font);
+            expect(length >= 0 && static_cast<size_t>(length) < sizeof(Description),
+                   "test description must fit its buffer");
+        }
         expect(text.setChar(0u, 0u, '\xB0', FontType) == E_OK && isAnyPixelLit(readPixels()), Description);
     }
 
@@ -81,10 +85,18 @@ void testCharacterToGlyphMapping()
         const Text::FontType FontType = static_cast<Text::FontType>(Font);
         char Description[64];
 
-        snprintf(Description, sizeof(Description), "font %u must have a width for a letter", Font);
+        {
+            const int length = snprintf(Description, sizeof(Description), "font %u must have a width for a letter", Font);
+            expect(length >= 0 && static_cast<size_t>(length) < sizeof(Description),
+                   "test description must fit its buffer");
+        }
         expect(text.getFontCharWidth(FontType, 'A') > 0u, Description);
 
-        snprintf(Description, sizeof(Description), "font %u must be able to draw a letter", Font);
+        {
+            const int length = snprintf(Description, sizeof(Description), "font %u must be able to draw a letter", Font);
+            expect(length >= 0 && static_cast<size_t>(length) < sizeof(Description),
+                   "test description must fit its buffer");
+        }
         expect(text.setChar(0u, 0u, 'A', FontType) == E_OK, Description);
     }
 

@@ -104,14 +104,14 @@ class PixelsFrame : public wxFrame
     void OnSettings(wxCommandEvent&);
     void OnMessage(wxCommandEvent&);
     void OnQuit(wxCommandEvent&);
-    wxColour toColour(PixelType) const;
+    static wxColour toColour(PixelType);
     void renderPixel(byte Row, byte Column);
     void renderAllPixels();
-    wxMenuBar* createMenuBar();
+    static wxMenuBar* createMenuBar();
     wxBoxSizer* createSizerAll(wxWindow*);
     wxBoxSizer* createSizerCharacters(wxWindow*);
     wxBoxSizer* createSizerCharacter(wxWindow*, int Row);
-    wxBoxSizer* createSizerControl(wxWindow*);
+    static wxBoxSizer* createSizerControl(wxWindow*);
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S

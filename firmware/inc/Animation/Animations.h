@@ -355,7 +355,7 @@ class Animations
 
     void task(bool=false);
     StdReturnType show() const;
-    bool isAnimationValid(AnimationIdType AnimationId) const { return AnimationId < ANIMATION_ID_NUMBER_OF_ANIMATIONS; }
+    static bool isAnimationValid(AnimationIdType AnimationId) { return AnimationId < ANIMATION_ID_NUMBER_OF_ANIMATIONS; }
     static bool isModeValid(ModeType sMode) { return sMode < MODE_NUMBER_OF_MODES; }
     StdReturnType setTime(byte, byte);
 

@@ -113,7 +113,7 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
     Derived& underlying() { return static_cast<Derived&>(*this); }
     Derived const& underlying() const { return static_cast<Derived const&>(*this); }
 
-    bool isEndOfStringReached(char Char) {
+    static bool isEndOfStringReached(char Char) {
         return (Char == STD_NULL_CHARACTER) ||
                (Char == Communication::getEndOfMessageChar() ||
                (Char == OptionStartChar));
@@ -236,7 +236,7 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
         }
     }
 
-    template <typename T> void sendAnswerParameter(char OptionShortName, T Value, bool AppendSpace = true) const
+    template <typename T> static void sendAnswerParameter(char OptionShortName, T Value, bool AppendSpace = true)
     {
         Serial.print(OptionShortName);
         Serial.print(OptionArgumentDelimiter);

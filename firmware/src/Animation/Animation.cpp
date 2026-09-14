@@ -47,7 +47,7 @@
 /******************************************************************************************************************************************************
   isPixelPartOfClockWords()
 ******************************************************************************************************************************************************/
-bool Animation::isPixelPartOfClockWords(const ClockWords::WordsListType ClockWordsTable, byte Column, byte Row) const
+bool Animation::isPixelPartOfClockWords(const ClockWords::WordsListType ClockWordsTable, byte Column, byte Row)
 {
     DisplayWords words;
 
@@ -62,7 +62,7 @@ bool Animation::isPixelPartOfClockWords(const ClockWords::WordsListType ClockWor
 /******************************************************************************************************************************************************
   isPixelPartOfClockWords()
 ******************************************************************************************************************************************************/
-bool Animation::isPixelPartOfClockWords(const ClockWords::WordsListType ClockWordsTable, byte Index) const
+bool Animation::isPixelPartOfClockWords(const ClockWords::WordsListType ClockWordsTable, byte Index)
 {
     byte row = Index / DISPLAY_NUMBER_OF_COLUMNS;
     byte column = Index % DISPLAY_NUMBER_OF_COLUMNS;
@@ -74,7 +74,7 @@ bool Animation::isPixelPartOfClockWords(const ClockWords::WordsListType ClockWor
 /******************************************************************************************************************************************************
   selectByTime()
 ******************************************************************************************************************************************************/
-byte Animation::selectByTime(byte Hour, byte Minute, byte NumberOfValues) const
+byte Animation::selectByTime(byte Hour, byte Minute, byte NumberOfValues)
 {
     /* Lets an animation vary from minute to minute without keeping a random generator
        of its own. A plain modulo of the minute would not do, because it walks through

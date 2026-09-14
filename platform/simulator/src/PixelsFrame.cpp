@@ -177,24 +177,32 @@ void PixelsFrame::OnClose(wxCloseEvent &event)
     UNUSED(event);
 }
 
+// wxWidgets event tables require a non-static member function.
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 void PixelsFrame::OnSend(wxCommandEvent &event)
 {
     SerialShim::getInstance().sendInput();
     UNUSED(event);
 }
 
+// wxWidgets event tables require a non-static member function.
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 void PixelsFrame::OnClear(wxCommandEvent &event)
 {
     SerialShim::getInstance().clearOutput();
     UNUSED(event);
 }
 
+// wxWidgets event tables require a non-static member function.
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 void PixelsFrame::OnSettings(wxCommandEvent &event)
 {
     Settings::getInstance().reveal();
     UNUSED(event);
 }
 
+// wxWidgets event tables require a non-static member function.
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 void PixelsFrame::OnMessage(wxCommandEvent &event)
 {
     MessageBuilder::getInstance().reveal();
@@ -207,13 +215,15 @@ void PixelsFrame::OnQuit(wxCommandEvent &event)
     UNUSED(event);
 }
 
+// wxWidgets event tables require a non-static member function.
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 void PixelsFrame::OnAbout(wxCommandEvent &event)
 {
     wxMessageBox(_("Copyright Andreas Burnickl\nWordclock Simulator"));
     UNUSED(event);
 }
 
-wxColour PixelsFrame::toColour(PixelType Pixel) const
+wxColour PixelsFrame::toColour(PixelType Pixel)
 {
     /* Only a pixel's brightness is rendered, as the grey level of its letter. */
     const byte Level = toLevel(getWeightedIntensity(getIntensity(Pixel)));

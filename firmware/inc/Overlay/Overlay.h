@@ -115,8 +115,8 @@ template <typename Derived> class Overlay
     Derived& underlying() { return static_cast<Derived&>(*this); }
     Derived const& underlying() const { return static_cast<Derived const&>(*this); }
 
-    bool isPeriodValid(MinuteType Period) const { return Period > 0u; }
-    bool isEnduranceValid(SecondType Endurance) const { return Endurance > 0u; }
+    static bool isPeriodValid(MinuteType Period) { return Period > 0u; }
+    static bool isEnduranceValid(SecondType Endurance) { return Endurance > 0u; }
     bool isDateSet() const { return (Month != 0u) || (Day != 0u); }
     bool isDayAndMonthSet() const { return isDaySet() && isMonthSet(); }
     bool isMonthMatching(MonthType CurrentMonth) const { return CurrentMonth == Month; }
@@ -125,7 +125,7 @@ template <typename Derived> class Overlay
     bool isDateMatchingMonthSet(MonthType CurrentMonth) const { return CurrentMonth == Month; }
     bool isDateMatchingDaySet(DayType CurrentDay) const { return CurrentDay == Day; }
     bool isMinuteMatching(MinuteType CurrentMinute) const { return !(CurrentMinute % PeriodInMinutes); }
-    bool isSecondMatching(SecondType CurrentSecond) const { return CurrentSecond == SecondToStartShow; }
+    static bool isSecondMatching(SecondType CurrentSecond) { return CurrentSecond == SecondToStartShow; }
     bool isDaySet() const { return Day != 0u; }
     bool isMonthSet() const { return Month != 0u; }
     bool isValidInDaysSet() const { return ValidInDays != 0; }
@@ -185,8 +185,8 @@ template <typename Derived> class Overlay
         return showTimerTask(ShowTimerInSeconds);
     }
 
-    bool isShowTimerExpired(SecondType ShowTimerInSeconds) const { return ShowTimerInSeconds == 0u; }
-    SecondType decrementShowTimer(SecondType ShowTimerInSeconds) {
+    static bool isShowTimerExpired(SecondType ShowTimerInSeconds) { return ShowTimerInSeconds == 0u; }
+    static SecondType decrementShowTimer(SecondType ShowTimerInSeconds) {
         if(ShowTimerInSeconds > 0u) { return ShowTimerInSeconds - 1u; }
         else { return 0u; }
     }

@@ -131,15 +131,15 @@ class Text
     template <typename RowType, byte RowsSize>
     StdReturnType setCharFontHorizontal(byte, byte, const FontCharHorizontal<RowType, RowsSize>&, byte);
     template <typename RowType>
-    StdReturnType setCharRow(RowType, byte, byte, byte);
+    static StdReturnType setCharRow(RowType, byte, byte, byte);
 
     template <typename ColumnType, byte ColumnsSize>
     StdReturnType setCharFontVertical(byte, byte, const FontCharVertical<ColumnType, ColumnsSize>&, byte);
     template <typename ColumnType>
-    StdReturnType setCharColumn(ColumnType, byte, byte, byte);
+    static StdReturnType setCharColumn(ColumnType, byte, byte, byte);
 
-    StdReturnType convertCharToFontIndex(char, byte&) const;
-    byte convertCharToFontIndex(char) const;
+    static StdReturnType convertCharToFontIndex(char, byte&);
+    static byte convertCharToFontIndex(char);
     void stringShiftTask();
     void charShiftTask();
     byte getColumnCenter(FontType Font) const { return (DISPLAY_NUMBER_OF_COLUMNS / 2u) - (getFontWidth(Font) / 2u); }
@@ -165,12 +165,11 @@ class Text
 
     // methods
     static bool isFontValid(FontType sFont) { return sFont < FONT_NUMBER_OF_FONTS; }
-    StdReturnType show() const { return Display::getInstance().show(); }
+    static StdReturnType show() { return Display::getInstance().show(); }
     void task(bool=false);
     void stop();
     StdReturnType setChar(byte, byte, char, FontType);
     void setCharWithShift(char, FontType);
-    void setText(const char*, FontType);
     void setTextWithShift(const char*, FontType);
     void setTextWithShift(const char* Text) { setTextWithShift(Text, Shift.Font); }
     byte getFontHeight(FontType) const;

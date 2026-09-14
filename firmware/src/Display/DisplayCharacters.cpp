@@ -65,7 +65,7 @@ const DisplayCharacters::DisplayCharactersTableElementType DisplayCharacters::Di
 /******************************************************************************************************************************************************
   getCharacter()
 ******************************************************************************************************************************************************/
-StdReturnType DisplayCharacters::getCharacter(byte Column, byte Row, char& Character) const
+StdReturnType DisplayCharacters::getCharacter(byte Column, byte Row, char& Character)
 {
     if(isColumnAndRowValid(Column, Row)) {
         Character =  getDisplayCharactersTableElement(Column, Row);
@@ -79,7 +79,7 @@ StdReturnType DisplayCharacters::getCharacter(byte Column, byte Row, char& Chara
 /******************************************************************************************************************************************************
   getCharacter()
   ****************************************************************************************************************************************************/
-StdReturnType DisplayCharacters::getCharacter(byte Index, char& Character) const
+StdReturnType DisplayCharacters::getCharacter(byte Index, char& Character)
 {
     if(isIndexValid(Index)) {
         Character =  getDisplayCharactersTableElement(Index);
@@ -93,7 +93,7 @@ StdReturnType DisplayCharacters::getCharacter(byte Index, char& Character) const
 /******************************************************************************************************************************************************
   getCharacter()
   ****************************************************************************************************************************************************/
-StdReturnType DisplayCharacters::getCharacter(CharacterIdType CharacterId, char& Character) const
+StdReturnType DisplayCharacters::getCharacter(CharacterIdType CharacterId, char& Character)
 {
     if(isCharacterIdValid(CharacterId)) {
         Character =  getDisplayCharactersTableElement(CharacterId);

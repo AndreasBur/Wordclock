@@ -71,7 +71,7 @@ class MsgCmdNetworkParser : public MsgParameterParser<MsgCmdNetworkParser, MSG_C
     StdReturnType ReturnValue{E_OK};
 
     // functions
-    void handleParameter(char ParameterShortName, byte Argument) { UNUSED(ParameterShortName); UNUSED(Argument); }
+    static void handleParameter(char ParameterShortName, byte Argument) { UNUSED(ParameterShortName); UNUSED(Argument); }
     void handleParameter(char ParameterShortName, const char* Argument, PositionType Length)
     {
         if(ParameterShortName == SsidShortName) {

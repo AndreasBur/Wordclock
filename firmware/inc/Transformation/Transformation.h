@@ -22,7 +22,6 @@
 ******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Arduino.h"
-#include "Display.h"
 
 /******************************************************************************************************************************************************
  *  GLOBAL CONSTANT MACROS
@@ -73,15 +72,15 @@ class Transformation
     // set methods
 
     // methods
-    StdReturnType shiftLeft(bool = false) const;
-    StdReturnType shiftRight(bool = false) const;
-    StdReturnType shiftUp(bool = false) const;
-    StdReturnType shiftDown(bool = false) const;
+    static StdReturnType shiftLeft(bool = false);
+    static StdReturnType shiftRight(bool = false);
+    static StdReturnType shiftUp(bool = false);
+    static StdReturnType shiftDown(bool = false);
 
-    StdReturnType shiftRowLeft(byte, bool = false) const;
-    StdReturnType shiftRowRight(byte, bool = false) const;
-    StdReturnType shiftColumnUp(byte, bool = false) const;
-    StdReturnType shiftColumnDown(byte, bool = false) const;
+    static StdReturnType shiftRowLeft(byte, bool = false);
+    static StdReturnType shiftRowRight(byte, bool = false);
+    static StdReturnType shiftColumnUp(byte, bool = false);
+    static StdReturnType shiftColumnDown(byte, bool = false);
 };
 
 

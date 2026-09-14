@@ -60,7 +60,7 @@ class GammaCorrection
     };
 
     // functions
-    Gamma7TableElementType getGamma7TableElement(byte Index) const {
+    static Gamma7TableElementType getGamma7TableElement(byte Index) {
         Gamma7TableElementType Gamma7TableElement;
         memcpy_P(&Gamma7TableElement, &Gamma7Table[Index], sizeof(Gamma7TableElementType));
         return Gamma7TableElement;
@@ -75,7 +75,7 @@ class GammaCorrection
      *  param[in]       ValueLinear    7 bit unsigned (0..127)
      *  \return         exponential value (approx. 1.0443^x) (1..255)
      *************************************************************************************************************************************************/
-    byte calcGamma7CorrectionValue(byte ValueLinear) const {
+    static byte calcGamma7CorrectionValue(byte ValueLinear) {
         Gamma7TableElementType exponent{getGamma7TableElement(ValueLinear % Gamma7TableNumberOfValues)};
         byte Log2OfResolution = numberOfBits<byte>();
         return exponent >> ((Log2OfResolution - 1u) - (ValueLinear / Gamma7TableNumberOfValues));
@@ -93,7 +93,7 @@ class GammaCorrection
     // set methods
 
     // methods
-    byte calcCorrectedValue(byte ValueLinear) const { return calcGamma7CorrectionValue(ValueLinear / 2u); }
+    static byte calcCorrectedValue(byte ValueLinear) { return calcGamma7CorrectionValue(ValueLinear / 2u); }
 };
 
 #endif

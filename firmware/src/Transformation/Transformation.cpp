@@ -21,6 +21,7 @@
  * INCLUDES
 ******************************************************************************************************************************************************/
 #include "Transformation.h"
+#include "Display.h"
 
 
 /******************************************************************************************************************************************************
@@ -48,7 +49,7 @@
 /******************************************************************************************************************************************************
   shiftLeft()
 ******************************************************************************************************************************************************/
-StdReturnType Transformation::shiftLeft(bool Rotate) const
+StdReturnType Transformation::shiftLeft(bool Rotate)
 {
     StdReturnType returnValue{E_OK};
 
@@ -62,7 +63,7 @@ StdReturnType Transformation::shiftLeft(bool Rotate) const
 /******************************************************************************************************************************************************
   shiftRowLeft()
 ******************************************************************************************************************************************************/
-StdReturnType Transformation::shiftRowLeft(byte Row, bool Rotate) const
+StdReturnType Transformation::shiftRowLeft(byte Row, bool Rotate)
 {
     Display::PixelValueType firstPixelValue;
     Display::PixelValueType pixelValue;
@@ -84,7 +85,7 @@ StdReturnType Transformation::shiftRowLeft(byte Row, bool Rotate) const
 /******************************************************************************************************************************************************
   shiftRight()
 ******************************************************************************************************************************************************/
-StdReturnType Transformation::shiftRight(bool Rotate) const
+StdReturnType Transformation::shiftRight(bool Rotate)
 {
     StdReturnType returnValue = E_OK;
 
@@ -98,7 +99,7 @@ StdReturnType Transformation::shiftRight(bool Rotate) const
 /******************************************************************************************************************************************************
   shiftRowRight()
 ******************************************************************************************************************************************************/
-StdReturnType Transformation::shiftRowRight(byte Row, bool Rotate) const
+StdReturnType Transformation::shiftRowRight(byte Row, bool Rotate)
 {
     Display::PixelValueType lastPixelValue;
     Display::PixelValueType pixelValue;
@@ -120,7 +121,7 @@ StdReturnType Transformation::shiftRowRight(byte Row, bool Rotate) const
 /******************************************************************************************************************************************************
   shiftUp()
 ******************************************************************************************************************************************************/
-StdReturnType Transformation::shiftUp(bool Rotate) const
+StdReturnType Transformation::shiftUp(bool Rotate)
 {
     StdReturnType returnValue{E_OK};
 
@@ -134,7 +135,7 @@ StdReturnType Transformation::shiftUp(bool Rotate) const
 /******************************************************************************************************************************************************
   shiftColumnUp()
 ******************************************************************************************************************************************************/
-StdReturnType Transformation::shiftColumnUp(byte Column, bool Rotate) const
+StdReturnType Transformation::shiftColumnUp(byte Column, bool Rotate)
 {
     Display::PixelValueType firstPixelValue;
     Display::PixelValueType pixelValue;
@@ -156,7 +157,7 @@ StdReturnType Transformation::shiftColumnUp(byte Column, bool Rotate) const
 /******************************************************************************************************************************************************
   shiftDown()
 ******************************************************************************************************************************************************/
-StdReturnType Transformation::shiftDown(bool Rotate) const
+StdReturnType Transformation::shiftDown(bool Rotate)
 {
     StdReturnType returnValue{E_OK};
 
@@ -170,7 +171,7 @@ StdReturnType Transformation::shiftDown(bool Rotate) const
 /******************************************************************************************************************************************************
   shiftColumnDown()
 ******************************************************************************************************************************************************/
-StdReturnType Transformation::shiftColumnDown(byte Column, bool Rotate) const
+StdReturnType Transformation::shiftColumnDown(byte Column, bool Rotate)
 {
     Display::PixelValueType lastPixelValue;
     Display::PixelValueType pixelValue;

@@ -93,7 +93,7 @@ class DisplayWords
     static const DisplayWord DisplayWordsTable[];
 
     // functions
-    DisplayWordsTableElementType getDisplayWordsTableElement(byte WordId) const {
+    static DisplayWordsTableElementType getDisplayWordsTableElement(byte WordId) {
         DisplayWordsTableElementType displayWordsTableElement;
         memcpy_P(&displayWordsTableElement, &DisplayWordsTable[WordId], sizeof(DisplayWordsTableElementType));
         return displayWordsTableElement;
@@ -112,23 +112,23 @@ class DisplayWords
        is not in the table has no place on the plate, which is what a length of zero says,
        and a word of zero length lights nothing. */
     // get methods
-    StdReturnType getDisplayWord(WordIdType, DisplayWord&) const;
-    StdReturnType getDisplayWordLength(WordIdType, byte&) const;
-    StdReturnType getDisplayWordColumn(WordIdType, byte&) const;
-    StdReturnType getDisplayWordRow(WordIdType, byte&) const;
+    static StdReturnType getDisplayWord(WordIdType, DisplayWord&);
+    static StdReturnType getDisplayWordLength(WordIdType, byte&);
+    static StdReturnType getDisplayWordColumn(WordIdType, byte&);
+    static StdReturnType getDisplayWordRow(WordIdType, byte&);
 
-    DisplayWord getDisplayWord(WordIdType WordId) const {
+    static DisplayWord getDisplayWord(WordIdType WordId) {
         if(!isWordIdValid(WordId)) { return DisplayWord{}; }
         return getDisplayWordsTableElement(WordId);
     }
-    byte getDisplayWordRow(WordIdType WordId) const { return getDisplayWord(WordId).getRow(); }
-    byte getDisplayWordColumn(WordIdType WordId) const { return getDisplayWord(WordId).getColumn(); }
-    byte getDisplayWordLength(WordIdType WordId) const { return getDisplayWord(WordId).getLength(); }
+    static byte getDisplayWordRow(WordIdType WordId) { return getDisplayWord(WordId).getRow(); }
+    static byte getDisplayWordColumn(WordIdType WordId) { return getDisplayWord(WordId).getColumn(); }
+    static byte getDisplayWordLength(WordIdType WordId) { return getDisplayWord(WordId).getLength(); }
 
     // set methods
 
     // methods
-    bool isWordIdValid(WordIdType WordId) const { return WordId < WORD_NUMBER_OF_WORDS; }
+    static bool isWordIdValid(WordIdType WordId) { return WordId < WORD_NUMBER_OF_WORDS; }
 };
 
 

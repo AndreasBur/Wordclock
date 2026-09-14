@@ -112,9 +112,15 @@ class BH1750
     StdReturnType sendCommand(byte);
 
     StdReturnType sendMode() { return sendCommand(Mode); }
+    /* Not static, though nothing in them reads a member: these stand in for the backends the
+       clock really runs on, and there the same call reaches a peripheral through instance
+       state. A stand-in that answered the check would have a different API from the thing it
+       stands in for, which is the one property it exists to keep. */
+    // NOLINTBEGIN(readability-convert-member-functions-to-static)
     IlluminanceType convertRawToLux(IlluminanceType IlluminanceRaw) const { return IlluminanceRaw / BH1750_ILLUMINANCE_RAW_VALUE_DIVIDER; }
     IlluminanceType combineRawValueParts(byte HighByte, byte LowByte) const { return static_cast<uint16_t>(HighByte) << 8u | LowByte; }
     bool isMTRegValueInRange(byte MTRegValue) const { return ((MTRegValue <= BH1750_REG_MT_MAX_VALUE) && (MTRegValue >= BH1750_REG_MT_MIN_VALUE)); }
+    // NOLINTEND(readability-convert-member-functions-to-static)
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N   S

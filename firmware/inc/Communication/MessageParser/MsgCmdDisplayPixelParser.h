@@ -79,7 +79,7 @@ class MsgCmdDisplayPixelParser : public MsgParameterParser<MsgCmdDisplayPixelPar
     };
 
     // functions
-    void handleParameter(char ParameterShortName, const char* Argument, PositionType Length) { UNUSED(ParameterShortName); UNUSED(Argument); UNUSED(Length); }
+    static void handleParameter(char ParameterShortName, const char* Argument, PositionType Length) { UNUSED(ParameterShortName); UNUSED(Argument); UNUSED(Length); }
     void handleParameter(char ParameterShortName, byte Argument)
     {
         if(ParameterShortName == IndexOptionShortName) { handleParameterIndex(Argument); }
@@ -98,7 +98,7 @@ class MsgCmdDisplayPixelParser : public MsgParameterParser<MsgCmdDisplayPixelPar
         State = getPixelState(pixelValue);
     }
 
-    StateType getPixelState(byte Index) const
+    static StateType getPixelState(byte Index)
     {
         /* Asked before reading rather than read and then judged by a return code: the pixel
            itself is what this answers with, and an index that is not on the display has no
@@ -108,8 +108,8 @@ class MsgCmdDisplayPixelParser : public MsgParameterParser<MsgCmdDisplayPixelPar
         return getPixelState(Display::getInstance().getPixel(Index));
     }
 
-    StateType getPixelState(bool PixelValue) const { return PixelValue ? STATE_ON : STATE_OFF; }
-    bool getPixelValue(StateType PixelState) const { return PixelState == STATE_ON; }
+    static StateType getPixelState(bool PixelValue) { return PixelValue ? STATE_ON : STATE_OFF; }
+    static bool getPixelValue(StateType PixelState) { return PixelState == STATE_ON; }
 
     void sendAnswerIndex(bool AppendSpace) const {
         sendAnswerParameter(IndexOptionShortName, Index, AppendSpace);

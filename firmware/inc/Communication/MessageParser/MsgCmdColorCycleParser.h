@@ -64,7 +64,7 @@ class MsgCmdColorCycleParser : public MsgParameterParser<MsgCmdColorCycleParser,
     bool ActiveGiven{false};
 
     // functions
-    void handleParameter(char ParameterShortName, const char* Argument, PositionType Length) {
+    static void handleParameter(char ParameterShortName, const char* Argument, PositionType Length) {
         UNUSED(ParameterShortName); UNUSED(Argument); UNUSED(Length);
     }
     void handleParameter(char ParameterShortName, byte Argument)
@@ -81,7 +81,7 @@ class MsgCmdColorCycleParser : public MsgParameterParser<MsgCmdColorCycleParser,
     ~MsgCmdColorCycleParser() { }
 
     // methods
-    void sendAnswer() const {
+    static void sendAnswer() {
         const ColorCycle& colorCycle = ColorCycle::getInstance();
 
         sendAnswerParameter(ActiveShortName, static_cast<byte>(colorCycle.getIsActive() ? 1u : 0u));

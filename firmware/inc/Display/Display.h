@@ -146,11 +146,11 @@ class Display
     Display(byte, byte, byte);
     ~Display();
 
-    byte transformToSerpentine(byte, byte) const;
-    byte transformToSerpentine(byte) const;
+    static byte transformToSerpentine(byte, byte);
+    static byte transformToSerpentine(byte);
     /* The one place a column and a row become an index on the strip, so the wiring is
        written once instead of as a #if in every entry point that takes a column. */
-    byte toIndex(byte Column, byte Row) const {
+    static byte toIndex(byte Column, byte Row) {
 #if (DISPLAY_LED_STRIPE_SERPENTINE == STD_ON)
         /* if led stripe is snake or serpentine the odd row: count from right to left */
         return transformToSerpentine(Column, Row);
@@ -171,7 +171,7 @@ class Display
     byte getNumberOfLitPixels() const;
     byte getCurrentLimit() const;
 
-    Pixel getColorDimmed(byte);
+    Pixel getColorDimmed(byte) const;
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
@@ -255,7 +255,7 @@ class Display
     StdReturnType setPixelRow(byte, PixelRowType);
     StdReturnType setPixelColumn(byte, PixelColumnType);
 
-    bool isIndexValid(IndexType Index) { return PixelStripe.isIndexValid(Index); }
+    bool isIndexValid(IndexType Index) const { return PixelStripe.isIndexValid(Index); }
     /* Asked by every entry point taking a column and a row, because the index they map to
        is a valid one for the next row: a column past the last one used to light the first
        letter of the row below rather than being refused. */
@@ -304,7 +304,7 @@ class Display
        sizes a supply. So it asks for the cap itself rather than leaving a task to notice. */
     void test() { PixelStripe.setPixels(Color.getColorDimmed()); applyCurrentLimit(); }
     void clear() { PixelStripe.clearPixels(); }
-    bool isCleared() { for(byte Index = 0; Index < DISPLAY_NUMBER_OF_PIXELS; Index++) { if(getPixel(Index)) return false; } return true; }
+    bool isCleared() const { for(byte Index = 0; Index < DISPLAY_NUMBER_OF_PIXELS; Index++) { if(getPixel(Index)) return false; } return true; }
 
     void incrementColorRed() { Color.incrementColorRed(); applyColor(); }
     void incrementColorGreen() {  Color.incrementColorGreen(); applyColor(); }
@@ -358,9 +358,9 @@ class Display
     }
 
     static void indexToColumnAndRow(IndexType Index, byte& Column, byte& Row) { Row = Index / DISPLAY_NUMBER_OF_COLUMNS; Column = Index % DISPLAY_NUMBER_OF_COLUMNS; }
-    byte indexToColumn(IndexType Index) const { return Index % DISPLAY_NUMBER_OF_COLUMNS; }
-    byte indexToRow(IndexType Index) const { return Index / DISPLAY_NUMBER_OF_COLUMNS; }
-    byte columnAndRowToIndex(byte Column, byte Row) const { return (Row * DISPLAY_NUMBER_OF_COLUMNS) + Column; }
+    static byte indexToColumn(IndexType Index) { return Index % DISPLAY_NUMBER_OF_COLUMNS; }
+    static byte indexToRow(IndexType Index) { return Index / DISPLAY_NUMBER_OF_COLUMNS; }
+    static byte columnAndRowToIndex(byte Column, byte Row) { return (Row * DISPLAY_NUMBER_OF_COLUMNS) + Column; }
 
 };
 

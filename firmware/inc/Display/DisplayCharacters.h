@@ -181,12 +181,12 @@ class DisplayCharacters
        to be indexed the other way round, which every caller then compensated for by
        swapping its arguments; the two that did not compensate read past the end of the
        table for the last column. Nothing called any of them, so nothing showed it. */
-    DisplayCharactersTableElementType getDisplayCharactersTableElement(byte Column, byte Row) const {
+    static DisplayCharactersTableElementType getDisplayCharactersTableElement(byte Column, byte Row) {
         DisplayCharactersTableElementType displayCharactersTableElement;
         memcpy_P(&displayCharactersTableElement, &DisplayCharactersTable[Row][Column], sizeof(DisplayCharactersTableElementType));
         return displayCharactersTableElement;
     }
-    DisplayCharactersTableElementType getDisplayCharactersTableElement(byte Index) const {
+    static DisplayCharactersTableElementType getDisplayCharactersTableElement(byte Index) {
         byte column, row;
         indexToColumnAndRow(Index, column, row);
         return getDisplayCharactersTableElement(column, row);
@@ -205,21 +205,21 @@ class DisplayCharacters
        a plate has no character outside its grid, so STD_NULL_CHARACTER is the honest
        answer where a read past the table used to be. */
     // get methods
-    char getCharacter(byte Column, byte Row) const {
+    static char getCharacter(byte Column, byte Row) {
         if(!isColumnAndRowValid(Column, Row)) { return STD_NULL_CHARACTER; }
         return getDisplayCharactersTableElement(Column, Row);
     }
-    char getCharacter(byte Index) const {
+    static char getCharacter(byte Index) {
         if(!isIndexValid(Index)) { return STD_NULL_CHARACTER; }
         return getDisplayCharactersTableElement(Index);
     }
-    char getCharacter(CharacterIdType CharacterId) const {
+    static char getCharacter(CharacterIdType CharacterId) {
         if(!isCharacterIdValid(CharacterId)) { return STD_NULL_CHARACTER; }
         return getDisplayCharactersTableElement(CharacterId);
     }
-    StdReturnType getCharacter(byte, byte, char&) const;
-    StdReturnType getCharacter(byte, char&) const;
-    StdReturnType getCharacter(CharacterIdType, char&) const;
+    static StdReturnType getCharacter(byte, byte, char&);
+    static StdReturnType getCharacter(byte, char&);
+    static StdReturnType getCharacter(CharacterIdType, char&);
 
     // set methods
 
@@ -232,8 +232,8 @@ class DisplayCharacters
     /* Column before Row, matching both the name and Display's function of the same name.
        They were the other way round here, so a caller that read the two classes side by
        side got a silent swap. */
-    void indexToColumnAndRow(byte Index, byte& Column, byte& Row) const { Column = Index % DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS; Row = Index / DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS; }
-    byte columnAndRowToIndex(byte Column, byte Row) const { return (Row * DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS) + Column; }
+    static void indexToColumnAndRow(byte Index, byte& Column, byte& Row) { Column = Index % DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS; Row = Index / DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS; }
+    static byte columnAndRowToIndex(byte Column, byte Row) { return (Row * DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS) + Column; }
 
 };
 

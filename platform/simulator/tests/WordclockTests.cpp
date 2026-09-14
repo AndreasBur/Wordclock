@@ -35,6 +35,8 @@
 ******************************************************************************************************************************************************/
 int main()
 {
+    testColourDimmingAcrossByteRange();
+    testSnakeLifetime();
     testDisplayManagerLatch();
     testShowNowProcedures();
     testTemperatureOverlayWithoutSensor();

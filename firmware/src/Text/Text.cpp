@@ -381,7 +381,7 @@ StdReturnType Text::setCharColumn(ColumnType CharColumn, byte ColumnAbs, byte Ro
  *  \return         E_OK
  *                  E_NOT_OK
  *****************************************************************************************************************************************************/
-StdReturnType Text::convertCharToFontIndex(char Char, byte& Index) const
+StdReturnType Text::convertCharToFontIndex(char Char, byte& Index)
 {
     StdReturnType returnValue = E_NOT_OK;
 
@@ -421,7 +421,7 @@ StdReturnType Text::convertCharToFontIndex(char Char, byte& Index) const
  *  \return         E_OK
  *                  E_NOT_OK
  *****************************************************************************************************************************************************/
-byte Text::convertCharToFontIndex(char Char) const
+byte Text::convertCharToFontIndex(char Char)
 {
     byte Index;
 

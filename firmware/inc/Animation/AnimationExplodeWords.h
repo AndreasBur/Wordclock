@@ -81,11 +81,11 @@ class AnimationExplodeWords : public Animation
     void setWordIndex(DisplayWords::WordIdType);
     void setWordLength();
     StdReturnType shiftWord(byte, byte);
-    void toggleWordOnDisplay();
-    void setWordOnDisplay();
+    void toggleWordOnDisplay() const;
+    void setWordOnDisplay() const;
 
     //byte getFinalIndex() const { return Display::getInstance().columnAndRowToIndex(getFinalColumn(), getFinalRow()); }
-    byte getClearFinalRow() const { return RowCenter; }
+    static byte getClearFinalRow() { return RowCenter; }
     byte getSetFinalRow() const { return Display::getInstance().indexToRow(CurrentWordIndex); }
     byte getClearFinalColumn() const { return ColumnCenter - (CurrentWordLength / 2u); }
     byte getSetFinalColumn() const { return Display::getInstance().indexToColumn(CurrentWordIndex); }

@@ -126,7 +126,7 @@ class MsgCmdRemoteProcedureCallParser : public MsgParameterParser<MsgCmdRemotePr
     };
 
     // functions
-    void handleParameter(char ParameterShortName, const char* Argument, PositionType Length) { UNUSED(ParameterShortName); UNUSED(Argument); UNUSED(Length); }
+    static void handleParameter(char ParameterShortName, const char* Argument, PositionType Length) { UNUSED(ParameterShortName); UNUSED(Argument); UNUSED(Length); }
     void handleParameter(char ParameterShortName, byte Argument)
     {
         if(ParameterShortName == RemoteProcedureShortName) { RpcId = static_cast<RpcIdType>(Argument); }
