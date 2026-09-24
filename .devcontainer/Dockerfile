@@ -30,10 +30,8 @@ FROM ${BASE_IMAGE}
 # request on; running them here is what keeps that from being a surprise. run-clang-tidy,
 # which walks the compile database in parallel, is part of the same package.
 # cppcheck is the second analyser of that same workflow, and is here for the same reason.
-# It is the one whose version cannot be pinned - the runner's is older than this one, and
-# the difference has already cost a red badge over the format of the suppression file
-# rather than over any finding, so having it locally is what makes that visible before a
-# push rather than after.
+# CI uses the same Ubuntu release for both analysers; rebuild this image to pick up
+# package updates when a newer CI image reports a finding that is not reproducible locally.
 # gcc-avr and avr-libc cross-compile the AVR Dx backend, which nothing else here can build:
 # the simulator uses the host compiler and the ESP32 brings its own through PlatformIO. They
 # are only worth installing on a base new enough for them to work - see the note on the tag

@@ -32,7 +32,7 @@ concurrency:
 jobs:
   clang-tidy:
     name: clang-tidy
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v7
@@ -65,7 +65,7 @@ jobs:
 
   cppcheck:
     name: cppcheck
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v7
@@ -92,10 +92,8 @@ jobs:
       # --inline-suppr so a one-off can be answered next to the code, with the reason there,
       # rather than by widening .cppcheck-suppressions to a whole file.
       #
-      # Unpinned, like clang-tidy: cppcheck has no versioned packages to pin to anyway, so a
-      # later runner image can report something new here. The dev container carries both
-      # analysers and both of its copies are newer than the runner's, which is the trade
-      # made deliberately - a developer sees the stricter answer first.
+      # Both analysers use Ubuntu 26.04 packages, as in the dev container. Package
+      # updates can still introduce new findings between image rebuilds.
       - name: Analyse
         run: |
           INCLUDES=$(find firmware/inc -type d | sed 's/^/-I/')

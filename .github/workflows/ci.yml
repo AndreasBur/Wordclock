@@ -26,11 +26,9 @@
 # developer has, at the price of building that image on every run, and these jobs are meant
 # to answer in minutes.
 #
-# So the versions here are near what a developer has rather than equal to it, and the gap is
-# worth knowing: the runners are Ubuntu 24.04 where the dev container is 26.04, and the AVR
-# job is a Debian container for the reason given at that job. That gap has already reported
-# something true - cppcheck is older here than in the image, and the difference cost a red
-# badge over the format of the suppression file. Parity would have hidden it.
+# Use Ubuntu 26.04 in both CI and the dev container so distribution packages come
+# from the same release. The hosted runner avoids rebuilding the full development image;
+# its preinstalled tools and package update dates can still differ from a local image.
 # Every job carries a timeout-minutes, set well above what it takes rather than close to it:
 # they are there for a job that has stopped making progress, not for one that is slow. A
 # README-only commit once hung twice - apt-get update on the simulator job, and the cppcheck
@@ -59,7 +57,7 @@ concurrency:
 jobs:
   simulator:
     name: Simulator and core tests
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
@@ -86,7 +84,7 @@ jobs:
 
   host-tests:
     name: ESP32 backend on the host
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
@@ -99,7 +97,7 @@ jobs:
 
   firmware:
     name: ESP32 firmware
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v7
@@ -154,7 +152,7 @@ jobs:
 
   host-tests-rp2350:
     name: RP2350 backend on the host
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
@@ -167,7 +165,7 @@ jobs:
 
   firmware-rp2350:
     name: RP2350 firmware
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v7
@@ -218,31 +216,20 @@ jobs:
             platform/rp2350/.pio/build/wordclock/firmware.bin
           if-no-files-found: error
 
-  # The one job that does not use the runner's own packages, and the reason is the whole
-  # story of this job. ubuntu-24.04 carries avr-gcc 7.3, which fails this build twice over:
-  # it has no device-specs for avr128da48, and once handed those from a Microchip pack it
-  # rejects the core's constexpr constructors - "temporary of non-literal type ClockWords
-  # in a constant expression", which GCC 12 onwards accepts. Making the shared core worse
-  # to satisfy a compiler no developer here uses would be the wrong way round, so the job
-  # takes a distribution whose avr-gcc is the one platform/avr-dx/README.md asks for. That
-  # also removes the need for a device pack: from 12 onwards the specs are in the box.
+  # Ubuntu 26.04 provides the AVR compiler and device-specs required by this backend,
+  # so it can use the same runner as the other builds and the dev container's packages.
   avr-dx:
     name: AVR Dx firmware
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 20
-    container: debian:trixie
     steps:
-      # Before the checkout, and with two packages the runner images have but a plain
-      # Debian does not: git, without which checkout falls back to the REST API, and
-      # ca-certificates, without which its fetch fails on "Problem with the SSL CA cert"
-      # rather than on anything to do with this repository.
+      - uses: actions/checkout@v7
+
       - name: Install the toolchain
         run: |
-          apt-get update
-          apt-get install -y --no-install-recommends \
-            ca-certificates git cmake ninja-build gcc-avr avr-libc python3
-
-      - uses: actions/checkout@v7
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            cmake ninja-build gcc-avr avr-libc python3
 
       # Asked before the build rather than met inside it. Whether an avr-gcc knows this part
       # is a property of its device-specs, and a build that walks into a missing one stops
@@ -255,9 +242,6 @@ jobs:
 
       # The toolchain has to be named when the build directory is created: a compiler cannot
       # be swapped after project() has run, which is why -DPLATFORM=avr-dx alone refuses.
-      # -G Ninja for the same reason as the simulator job, and for one more: a plain Debian
-      # image has no make, so the generator CMake would otherwise default to is the one
-      # thing here that is not installed.
       - name: Configure
         run: |
           cmake -B build-avr -S . -G Ninja -DPLATFORM=avr-dx \
