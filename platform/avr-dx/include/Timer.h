@@ -195,7 +195,7 @@ class Timer
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    /* Both of the following are relied on by the shift and the pointer arithmetic further down,
+    /* The following are relied on by the shift and the pointer arithmetic further down,
      * which is cheaper than a per-channel table but only holds while the registers stay laid out
      * the way they are. The xmega version had the equivalent pair of assertions about TC4 and TC5
      * sharing a bit layout. */
@@ -205,12 +205,26 @@ class Timer
     static_assert(offsetof(TCA_SINGLE_t, CMP1BUF) - offsetof(TCA_SINGLE_t, CMP0BUF) == sizeof(uint16_t) &&
                   offsetof(TCA_SINGLE_t, CMP2BUF) - offsetof(TCA_SINGLE_t, CMP1BUF) == sizeof(uint16_t),
                   "compare buffer registers are not consecutive");
+    static_assert(offsetof(TCA_SINGLE_t, CMP1) - offsetof(TCA_SINGLE_t, CMP0) == sizeof(uint16_t) &&
+                  offsetof(TCA_SINGLE_t, CMP2) - offsetof(TCA_SINGLE_t, CMP1) == sizeof(uint16_t),
+                  "compare registers are not consecutive");
+
+    /* setPeriod() and read() convert with whole timer cycles per half and per whole microsecond */
+    static_assert(F_CPU % 2000000uL == 0u, "F_CPU has to be a multiple of 2 MHz");
+
+    static constexpr uint8_t PwmDutyBits{10u};
 
     StateType State;
     TimerClockSelectType ClockSelectBitGroup;
     TimerIsrCallbackF_void TimerOverflowCallback;
+    /* What PER and the compare channels are meant to hold. Kept here rather than read back from the
+     * registers, because a value on its way through a buffer register is not in them until BOTTOM,
+     * and because a duty is a fraction of the period that has to be applied again when it changes.
+     * Top starts at PER's reset value, which is what an init() with a refused period leaves. */
+    uint16_t Top;
+    uint16_t PwmDuty[TimerTraits::NumberOfChannels];
 
-    constexpr Timer() : State(STATE_NONE), ClockSelectBitGroup(TIMER_REG_CS_NO_PRESCALER), TimerOverflowCallback(nullptr) { }
+    constexpr Timer() : State(STATE_NONE), ClockSelectBitGroup(TIMER_REG_CS_NO_PRESCALER), TimerOverflowCallback(nullptr), Top(0xFFFFu), PwmDuty{} { }
 
     // functions
     static typename TimerTraits::RegisterType& getTimer() { return TimerTraits::getTimer(); }
@@ -220,6 +234,15 @@ class Timer
     }
     static constexpr uint8_t toChannelEnableMask(TimerChannelType Channel) {
         return static_cast<uint8_t>(TCA_SINGLE_CMP0EN_bm << Channel);
+    }
+    static constexpr uint16_t toCompareValue(uint16_t sTop, uint16_t Duty) {
+        return static_cast<uint16_t>((static_cast<uint32_t>(sTop) * Duty) >> PwmDutyBits);
+    }
+    /* Shifted before it is divided: the other way round the truncation is scaled up by the
+     * prescaler, and at 1024 read() moved in steps of 1024 us where a tick is 43 us.
+     * 2 * 0xFFFF << 10 is still well inside 32 bit. */
+    static constexpr uint32_t toMicroseconds(uint32_t TimerCycles, TimerClockSelectType ClockSelect) {
+        return (TimerCycles << toPrescalerShift(ClockSelect)) / (F_CPU / 1000000uL);
     }
     static constexpr uint8_t toPrescalerShift(TimerClockSelectType ClockSelect) {
         switch(ClockSelect) {
@@ -237,6 +260,8 @@ class Timer
     TimerCountDirection getCountingDirection();
     void setClockSelect(TimerClockSelectType);
     void setRunning(bool);
+    void setCompareBuffer(TimerChannelType);
+    void loadPeriodAndCompare();
     StdReturnType enablePwmChannel(TimerChannelType, uint16_t);
     StdReturnType disablePwmChannel(TimerChannelType);
     StdReturnType setPwmDutyChannel(TimerChannelType, uint16_t);

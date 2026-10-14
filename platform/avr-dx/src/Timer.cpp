@@ -31,7 +31,8 @@
 #define TIMER_NUMBER_OF_BITS                        16u
 #define TIMER_RESOLUTION                            (1uL << TIMER_NUMBER_OF_BITS)
 #define TIMER_MAX_PRESCALER                         1024u
-#define TIMER_PWM_DUTY_BITS                         10u
+/* the longest period a 16-bit TOP reaches at the largest prescaler, counted up and down again */
+#define TIMER_MAX_PERIOD                            ((TIMER_RESOLUTION / (F_CPU / 1000000uL)) * TIMER_MAX_PRESCALER * 2u)
 
 /******************************************************************************************************************************************************
  * P U B L I C   F U N C T I O N S
@@ -93,8 +94,8 @@ StdReturnType Timer<TimerTraits>::setPeriod(uint32_t Microseconds)
 {
     StdReturnType returnValue{E_NOT_OK};
 
-    /* was request out of bounds? */
-    if(Microseconds < ((TIMER_RESOLUTION / (F_CPU / 1000000uL)) * TIMER_MAX_PRESCALER * 2u)) {
+    /* was request out of bounds? An out of range period is refused and changes nothing */
+    if((Microseconds > 0u) && (Microseconds < TIMER_MAX_PERIOD)) {
         returnValue = E_OK;
         /* calculate timer cycles to reach timer period, counter runs backwards after TOP, interrupt is at BOTTOM so divide microseconds by 2 */
         uint32_t timerCycles = (F_CPU / 2000000uL) * Microseconds;
@@ -106,22 +107,25 @@ StdReturnType Timer<TimerTraits>::setPeriod(uint32_t Microseconds)
         else if((timerCycles >>= 1) < TIMER_RESOLUTION) ClockSelectBitGroup = TIMER_REG_CS_PRESCALE_16;
         else if((timerCycles >>= 2) < TIMER_RESOLUTION) ClockSelectBitGroup = TIMER_REG_CS_PRESCALE_64;
         else if((timerCycles >>= 2) < TIMER_RESOLUTION) ClockSelectBitGroup = TIMER_REG_CS_PRESCALE_256;
-        else if((timerCycles >>= 2) < TIMER_RESOLUTION) ClockSelectBitGroup = TIMER_REG_CS_PRESCALE_1024;
-        else {
-            /* request was out of bounds, set to maximum */
-            timerCycles = TIMER_RESOLUTION - 1u;
-            ClockSelectBitGroup = TIMER_REG_CS_PRESCALE_1024;
-            returnValue = E_NOT_OK;
-        }
+        /* TIMER_MAX_PERIOD above is what keeps this one inside 16 bit */
+        else { timerCycles >>= 2;                         ClockSelectBitGroup = TIMER_REG_CS_PRESCALE_1024; }
+
         /* A 16-bit access goes through the timer's shared TEMP register, so an ISR touching another
            16-bit register of this timer must not get in between.
-           Through the buffer while the timer is running, where the xmega version wrote PER outright:
-           a TOP that lands below the counter mid-period is not picked up until the counter has gone
-           all the way round 0xFFFF, which is one period of several hundred milliseconds in the wrong
-           place. PERBUF is taken over at BOTTOM, where the counter is below any legal TOP. */
+           Through the buffer rather than PER: a TOP that lands below the counter mid-period is not
+           picked up until the counter has gone all the way round 0xFFFF, which is one period of
+           several hundred milliseconds in the wrong place. PERBUF is taken over at BOTTOM, where
+           the counter is below any legal TOP - and that holds for a stopped timer as much as for a
+           running one, since resume() continues mid-period. A timer not yet started has its
+           registers loaded by start().
+           The compare values go along, recomputed from their duty, so the PWM keeps its ratio
+           across the change and takes the new period at the same BOTTOM. */
         ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-            if(STATE_RUNNING == State) { getTimer().PERBUF = timerCycles; }
-            else                       { getTimer().PER = timerCycles; }
+            Top = static_cast<uint16_t>(timerCycles);
+            getTimer().PERBUF = Top;
+            for(uint8_t Channel = 0u; Channel < TimerTraits::NumberOfChannels; Channel++) {
+                setCompareBuffer(static_cast<TimerChannelType>(Channel));
+            }
         }
 
         if(STATE_RUNNING == State) { setClockSelect(ClockSelectBitGroup); }
@@ -144,6 +148,8 @@ StdReturnType Timer<TimerTraits>::start()
 
     if(STATE_READY == State || STATE_RUNNING == State || STATE_STOPPED == State) {
         returnValue = E_OK;
+        setRunning(false);
+        loadPeriodAndCompare();
         setClockSelect(ClockSelectBitGroup);
         /* RESTART clears the counter and the direction, so the first period is a whole one */
         getTimer().CTRLESET = TCA_SINGLE_CMD_RESTART_gc;
@@ -160,8 +166,11 @@ StdReturnType Timer<TimerTraits>::start()
 template <typename TimerTraits>
 void Timer<TimerTraits>::stop()
 {
-    setRunning(false);
-    if(STATE_RUNNING == State) { State = STATE_STOPPED; }
+    /* before init() the timer is not this class's to stop */
+    if(STATE_NONE != State) {
+        setRunning(false);
+        if(STATE_RUNNING == State) { State = STATE_STOPPED; }
+    }
 } /* stop */
 
 
@@ -208,6 +217,10 @@ StdReturnType Timer<TimerTraits>::attachInterrupt(TimerIsrCallbackF_void sTimerO
     if(sTimerOverflowCallback != nullptr) {
         returnValue = E_OK;
         ATOMIC_BLOCK(ATOMIC_RESTORESTATE) { TimerOverflowCallback = sTimerOverflowCallback; }
+        /* The flag is set at every BOTTOM whether the interrupt is on or not, so one left over from
+           while it was off would call the new callback at once. Only then: with the interrupt
+           already on, a set flag is a real overflow about to be served. */
+        if(!(getTimer().INTCTRL & TCA_SINGLE_OVF_bm)) { getTimer().INTFLAGS = TCA_SINGLE_OVF_bm; }
         getTimer().INTCTRL |= TCA_SINGLE_OVF_bm;
     }
     return returnValue;
@@ -257,8 +270,7 @@ StdReturnType Timer<TimerTraits>::read(uint32_t& Microseconds)
         /* if counter counting down, add top value to current value */
         if(direction == TIMER_COUNT_DIRECTION_DOWN) { counterValue = (topValue - counterValue) + topValue; }
 
-        /* transform counter value to microseconds in an efficient way */
-        Microseconds = ((counterValue * 1000uL) / (F_CPU / 1000uL)) << toPrescalerShift(ClockSelectBitGroup);
+        Microseconds = toMicroseconds(counterValue, ClockSelectBitGroup);
     }
     return returnValue;
 } /* read */
@@ -324,6 +336,44 @@ void Timer<TimerTraits>::setRunning(bool Running)
 
 
 /******************************************************************************************************************************************************
+  setCompareBuffer
+******************************************************************************************************************************************************/
+/*! \pre            called with interrupts off, the write goes through the TEMP register
+ *****************************************************************************************************************************************************/
+template <typename TimerTraits>
+void Timer<TimerTraits>::setCompareBuffer(TimerChannelType Channel)
+{
+    /* CMP0BUF..CMP2BUF are consecutive, which Timer.h asserts; the channel was range checked at
+       compile time */
+    (&getTimer().CMP0BUF)[Channel] = toCompareValue(Top, PwmDuty[Channel]);
+} /* setCompareBuffer */
+
+
+/******************************************************************************************************************************************************
+  loadPeriodAndCompare
+******************************************************************************************************************************************************/
+/*! \details        Straight into PER and CMPn, past the buffers, which is only safe while the timer is
+ *                  disabled. Without it the first period after start() would run on whatever the
+ *                  registers held: the buffers are taken over at BOTTOM, and the first BOTTOM after
+ *                  RESTART is a whole period away - with CMPn at the 0 init()'s RESET left there.
+ *                  Not a forced UPDATE before the RESTART instead: both are written to CTRLESET,
+ *                  and an UPDATE still pending there ORed with RESTART reads as RESET.
+ *  \pre            timer disabled
+ *****************************************************************************************************************************************************/
+template <typename TimerTraits>
+void Timer<TimerTraits>::loadPeriodAndCompare()
+{
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+        getTimer().PER = Top;
+        for(uint8_t Channel = 0u; Channel < TimerTraits::NumberOfChannels; Channel++) {
+            /* CMP0..CMP2 are consecutive like their buffers, which Timer.h asserts as well */
+            (&getTimer().CMP0)[Channel] = toCompareValue(Top, PwmDuty[Channel]);
+        }
+    }
+} /* loadPeriodAndCompare */
+
+
+/******************************************************************************************************************************************************
   enablePwmChannel
 ******************************************************************************************************************************************************/
 template <typename TimerTraits>
@@ -366,10 +416,8 @@ StdReturnType Timer<TimerTraits>::setPwmDutyChannel(TimerChannelType Channel, ui
     if(Duty <= PwmDutyMax) {
         returnValue = E_OK;
         ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-            const uint32_t compareValue = (static_cast<uint32_t>(getTimer().PER) * Duty) >> TIMER_PWM_DUTY_BITS;
-            /* CMP0BUF..CMP2BUF are consecutive, which Timer.h asserts; the channel was range checked
-               at compile time */
-            (&getTimer().CMP0BUF)[Channel] = static_cast<uint16_t>(compareValue);
+            PwmDuty[Channel] = Duty;
+            setCompareBuffer(Channel);
         }
     }
     return returnValue;

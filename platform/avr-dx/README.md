@@ -249,7 +249,7 @@ the ESP32's RMT and the RP2350's PIO, it is the pin.
 and the strip's timing belongs to TCB1/TCB2 and the CCL, so this is a driver sitting ready rather
 than a new time base. Adding it cost 12 bytes of flash: with no caller, LTO folds the callback to
 `nullptr` and keeps nothing but the empty ISR. Linked against a program that drives the whole API
-it measured about 1.8 KiB.
+it measured about 2 KiB.
 
 Three things changed on the way across, and those three are the part worth knowing.
 
@@ -272,11 +272,14 @@ two levels, and `WS2812::init()` has already given it to `USART0_DRE` — the ha
 bytes flowing inside the strip's reset gap. So the overflow stays at level 0, and a callback that
 runs long delays everything else. Keep it short.
 
-**A period change while running goes through `PERBUF`.** The xmega version wrote `PER` outright,
-which in dual-slope mode can leave the counter above the new TOP; it then runs all the way to
-`0xFFFF` before wrapping, putting one period of several hundred milliseconds exactly where a
-shorter one was asked for. `PERBUF` is taken over at BOTTOM, where the counter is below any legal
-TOP.
+**A period change goes through `PERBUF`, and the PWM goes with it.** The xmega version wrote `PER`
+outright when this was ported, which in dual-slope mode can leave the counter above the new TOP; it
+then runs all the way to `0xFFFF` before wrapping, putting one period of several hundred
+milliseconds exactly where a shorter one was asked for. `PERBUF` is taken over at BOTTOM, where the
+counter is below any legal TOP. A duty is a fraction of the period, so `setPeriod()` recomputes
+every channel's `CMPnBUF` alongside and the new period starts with a PWM that fits it. `start()`
+loads `PER` and the compare registers directly while the timer is disabled, so the first period is
+already the configured one.
 
 The prescaler gained a step as well — the Dx has a 16 between the 8 and the 64 — so a period that
 used to round up to the 64 keeps four times the resolution.
