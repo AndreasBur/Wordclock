@@ -41,46 +41,98 @@
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
 /* Timer configuration parameter: which timers get an instance and an overflow ISR.
- * Both are free on this part - unlike on the xmega, where the core owned TCD5 for millis() and
- * drove analogWrite() from TCC4 - so the choice here is only about the flash an unused ISR costs. */
+ * Both are free here - unlike on the xmega, where the core owned TCD5 for millis() and drove
+ * analogWrite() from TCC4 - so the choice is only about the flash an unused ISR costs. TCA1 is
+ * fitted to the 48- and 64-pin derivatives alone. */
 #define TIMER_USE_TCA0                          STD_ON
 #define TIMER_USE_TCA1                          STD_OFF
+
+/* Which port carries the waveform outputs, named by its letter alone: WO0..WO2 are pins 0..2 of
+ * that port, and both the PORT_t and the PORTMUX group config below are pasted from the letter.
+ * One letter rather than the two of them written side by side, because they are a single decision
+ * and two macros are two things that can be made to disagree.
+ *
+ * PORTB, and not the PORTA the route comes up on from reset: PA0 carries USART0 TXD into the CCL
+ * and PA2 its XCK into the event system, which is how the strip gets its pulse widths (WS2812.h).
+ * A timer left on its default route would drive both of them. PORTD is left alone because
+ * PowerSwitch.h claims it, and PORTC and PORTF are the console and the two-wire bus.
+ *
+ * The 28- and 32-pin derivatives have no PORTB, and of the four ports they do have - A, C, D and
+ * F - every one is spoken for already. So there is no default left to pick for them and they stop
+ * here, with a sentence, rather than thirty lines further down in a handful of errors about names
+ * that were never declared. Naming the letter beforehand is the way past it: PORTD once the supply
+ * switch is known not to be fitted, or any port a particular board has kept free. */
+#if (TIMER_USE_TCA0 == STD_ON) && !defined(TIMER_TCA0_ROUTE_PORT)
+    #if defined(PORTB)
+        #define TIMER_TCA0_ROUTE_PORT           B
+    #else
+        #error "Timer.h: this derivative has no PORTB for TCA0 to drive. Define TIMER_TCA0_ROUTE_PORT as the letter of a port this board keeps free, or set TIMER_USE_TCA0 to STD_OFF."
+    #endif
+#endif
+
+#if (TIMER_USE_TCA1 == STD_ON)
+    #if !defined(TCA1)
+        #error "Timer.h: this derivative has no TCA1 - it is fitted to the 48- and 64-pin parts only. Set TIMER_USE_TCA1 to STD_OFF."
+    #endif
+    #if !defined(TIMER_TCA1_ROUTE_PORT)
+        #define TIMER_TCA1_ROUTE_PORT           B
+    #endif
+#endif
+
+
+/******************************************************************************************************************************************************
+ *  G L O B A L   F U N C T I O N   M A C R O S
+******************************************************************************************************************************************************/
+/* The letter above turned into the two names it stands for. Two steps each, because the letter is
+ * itself a macro and has to be expanded before it is pasted rather than after.
+ *
+ * One route macro per timer, where one taking the timer as a second argument would read better:
+ * an argument is expanded on the way through, and TCA0 is a macro of its own - so it arrives as
+ * "(*(TCA_t *) 0x0A00)" and pasting PORTMUX_ onto an opening bracket is where it stops. Spelled
+ * into the macro body instead, the timer is plain text and never expanded at all. */
+#define TIMER_PORT(Letter)                      TIMER_PORT_PASTED(Letter)
+#define TIMER_PORT_PASTED(Letter)               PORT##Letter
+#define TIMER_ROUTE_TCA0(Letter)                TIMER_ROUTE_TCA0_PASTED(Letter)
+#define TIMER_ROUTE_TCA0_PASTED(Letter)         PORTMUX_TCA0_PORT##Letter##_gc
+#define TIMER_ROUTE_TCA1(Letter)                TIMER_ROUTE_TCA1_PASTED(Letter)
+#define TIMER_ROUTE_TCA1_PASTED(Letter)         PORTMUX_TCA1_PORT##Letter##_gc
 
 
 /******************************************************************************************************************************************************
  *  T I M E R   T R A I T S
 ******************************************************************************************************************************************************/
-/* The waveform outputs WO0..WO2 are pins 0..2 of whichever port PORTMUX.TCAROUTEA names, so the
- * port and the route below are one decision written twice and have to agree.
- *
- * PORTB, and not the PORTA the route defaults to from reset: PA0 carries USART0 TXD into the CCL
- * and PA2 its XCK into the event system, which is how the strip gets its pulse widths (WS2812.h).
- * A timer that came up on its default route would drive both of them. PORTD is left alone because
- * PowerSwitch.h claims it, and PORTC and PORTF are the console and the two-wire bus. */
+#if (TIMER_USE_TCA0 == STD_ON)
 struct TimerA0
 {
     using RegisterType = TCA_SINGLE_t;
     static RegisterType& getTimer() { return TCA0.SINGLE; }
-    static PORT_t& getPort() { return PORTB; }
+    static PORT_t& getPort() { return TIMER_PORT(TIMER_TCA0_ROUTE_PORT); }
     static constexpr uint8_t RouteMask{PORTMUX_TCA0_gm};
-    static constexpr uint8_t RouteGroup{PORTMUX_TCA0_PORTB_gc};
+    static constexpr uint8_t RouteGroup{TIMER_ROUTE_TCA0(TIMER_TCA0_ROUTE_PORT)};
     static constexpr uint8_t NumberOfChannels{3u};
     static constexpr uint8_t FirstPin{0u};
 };
+#endif
 
-/* TCA1 reaches PORTB and PORTC and nothing else, and PC0/PC1 are the console - so PORTB is its only
- * free route, the same one TCA0 is given above. Turning both on therefore means moving TCA0 to
- * PORTE first; that is why TIMER_USE_TCA1 is off rather than the pair being enabled by default. */
+/* Guarded, and not only the instantiation down in the .cpp: these member bodies are compiled wherever
+ * the header is read, so a TCA1 the derivative has never heard of is an error on a part that was
+ * never asked to use one. That is what the first cut of this file got wrong.
+ *
+ * TCA1 reaches PORTB and PORTC and nothing else, and PC0/PC1 are the console - so PORTB is its only
+ * free route, the very one TCA0 is given above. Having both therefore means moving one of the two,
+ * which is what the letters are for; that is why this is off rather than the pair being on. */
+#if (TIMER_USE_TCA1 == STD_ON)
 struct TimerA1
 {
     using RegisterType = TCA_SINGLE_t;
     static RegisterType& getTimer() { return TCA1.SINGLE; }
-    static PORT_t& getPort() { return PORTB; }
+    static PORT_t& getPort() { return TIMER_PORT(TIMER_TCA1_ROUTE_PORT); }
     static constexpr uint8_t RouteMask{PORTMUX_TCA1_gm};
-    static constexpr uint8_t RouteGroup{PORTMUX_TCA1_PORTB_gc};
+    static constexpr uint8_t RouteGroup{TIMER_ROUTE_TCA1(TIMER_TCA1_ROUTE_PORT)};
     static constexpr uint8_t NumberOfChannels{3u};
     static constexpr uint8_t FirstPin{0u};
 };
+#endif
 
 
 /******************************************************************************************************************************************************

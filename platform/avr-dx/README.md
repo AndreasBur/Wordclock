@@ -258,6 +258,14 @@ already carry the strip's USART into the CCL — a timer left on its default rou
 of them. `PORTMUX.TCAROUTEA` is therefore set in `init()`, before any channel can reach a pin.
 PORTD is left to `PowerSwitch.h`, and PORTC and PORTF are the console and the two-wire bus.
 
+The port is named by its letter, in `TIMER_TCA0_ROUTE_PORT`, and the `PORT_t` and the PORTMUX
+group config are both pasted from it — one decision rather than two macros that can be made to
+disagree. It matters because the port is the one thing here that does not survive a change of
+derivative: **the 28- and 32-pin parts have no PORTB**, and of the four ports they do have, A, C,
+D and F, every one is already spoken for. So on those the header stops with a sentence saying to
+name a free port, instead of further down in a pile of undeclared names. `-DTIMER_TCA0_ROUTE_PORT=D`
+builds for an AVR128DA28 today, the supply switch not being fitted.
+
 **The callback cannot be interrupted.** On the xmega the overflow sat on the PMIC's low level so
 that the core's `millis()` could preempt it. The Dx has one `CPUINT.LVL1VEC` where the xmega had
 two levels, and `WS2812::init()` has already given it to `USART0_DRE` — the handler that keeps
@@ -275,6 +283,9 @@ used to round up to the 64 keeps four times the resolution.
 
 `TIMER_USE_TCA1` turns on a second instance. It is off because TCA1 reaches only PORTB and PORTC,
 PORTC is the console, and PORTB is where TCA0 already sits: having both means moving one first.
+TCA1 is also fitted to the 48- and 64-pin derivatives alone, so turning it on elsewhere stops at
+an `#error` that says as much — the traits are behind the same switch for that reason, since a
+member body is compiled wherever the header is read and not only where the class is instantiated.
 
 ## Gaps
 
