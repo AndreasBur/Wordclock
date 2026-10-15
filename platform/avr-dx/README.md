@@ -121,7 +121,7 @@ every link rather than asked for, because the flash budget is the reason this pa
 was chosen at all — currently, of 128 KiB flash and 16 KiB RAM:
 
 ```
-Program:   48078 bytes (37%)
+Program:   48090 bytes (37%)
 Data:       1700 bytes (10%)
 ```
 
@@ -231,6 +231,7 @@ deform a pulse. The gap is the budget instead, and it has to stay under the WS28
 | `PA3` | **CCL LUT0 output — the strip's data line** |
 | `PC0` / `PC1` | USART1 TXD / RXD, the console at 115200 baud |
 | `PF2` / `PF3` | TWI1 SDA / SCL, the DS3231 and the BH1750 |
+| `PB0` – `PB2` | TCA0 WO0 – WO2, and only once a PWM channel is enabled — see below |
 
 TWI1 rather than TWI0 is forced: TWI0 can only reach PA2 and PA3, which the strip
 already uses.
@@ -240,6 +241,54 @@ already uses.
 where it appears, not a number the firmware passes down. Overriding the macro for this
 backend would therefore change nothing — on the two backends that drive an ordinary GPIO,
 the ESP32's RMT and the RP2350's PIO, it is the pin.
+
+## The timer
+
+[`include/Timer.h`](include/Timer.h) is the xmega E5's TC4/TC5 driver brought over to TCA0.
+**Nothing calls it.** The clock's tick is polled off `millis()` in [`src/main.cpp`](src/main.cpp)
+and the strip's timing belongs to TCB1/TCB2 and the CCL, so this is a driver sitting ready rather
+than a new time base. Adding it cost 12 bytes of flash: with no caller, LTO folds the callback to
+`nullptr` and keeps nothing but the empty ISR. Linked against a program that drives the whole API
+it measured about 2 KiB.
+
+Three things changed on the way across, and those three are the part worth knowing.
+
+**It runs on TCA0, routed to PORTB.** TCA0 comes out of reset routed to PORTA, where PA0 and PA2
+already carry the strip's USART into the CCL — a timer left on its default route would drive both
+of them. `PORTMUX.TCAROUTEA` is therefore set in `init()`, before any channel can reach a pin.
+PORTD is left to `PowerSwitch.h`, and PORTC and PORTF are the console and the two-wire bus.
+
+The port is named by its letter, in `TIMER_TCA0_ROUTE_PORT`, and the `PORT_t` and the PORTMUX
+group config are both pasted from it — one decision rather than two macros that can be made to
+disagree. It matters because the port is the one thing here that does not survive a change of
+derivative: **the 28- and 32-pin parts have no PORTB**, and of the four ports they do have, A, C,
+D and F, every one is already spoken for. So on those the header stops with a sentence saying to
+name a free port, instead of further down in a pile of undeclared names. `-DTIMER_TCA0_ROUTE_PORT=D`
+builds for an AVR128DA28 today, the supply switch not being fitted.
+
+**The callback cannot be interrupted.** On the xmega the overflow sat on the PMIC's low level so
+that the core's `millis()` could preempt it. The Dx has one `CPUINT.LVL1VEC` where the xmega had
+two levels, and `WS2812::init()` has already given it to `USART0_DRE` — the handler that keeps
+bytes flowing inside the strip's reset gap. So the overflow stays at level 0, and a callback that
+runs long delays everything else. Keep it short.
+
+**A period change goes through `PERBUF`, and the PWM goes with it.** The xmega version wrote `PER`
+outright when this was ported, which in dual-slope mode can leave the counter above the new TOP; it
+then runs all the way to `0xFFFF` before wrapping, putting one period of several hundred
+milliseconds exactly where a shorter one was asked for. `PERBUF` is taken over at BOTTOM, where the
+counter is below any legal TOP. A duty is a fraction of the period, so `setPeriod()` recomputes
+every channel's `CMPnBUF` alongside and the new period starts with a PWM that fits it. `start()`
+loads `PER` and the compare registers directly while the timer is disabled, so the first period is
+already the configured one.
+
+The prescaler gained a step as well — the Dx has a 16 between the 8 and the 64 — so a period that
+used to round up to the 64 keeps four times the resolution.
+
+`TIMER_USE_TCA1` turns on a second instance. It is off because TCA1 reaches only PORTB and PORTC,
+PORTC is the console, and PORTB is where TCA0 already sits: having both means moving one first.
+TCA1 is also fitted to the 48- and 64-pin derivatives alone, so turning it on elsewhere stops at
+an `#error` that says as much — the traits are behind the same switch for that reason, since a
+member body is compiled wherever the header is read and not only where the class is instantiated.
 
 ## Gaps
 
@@ -252,6 +301,16 @@ Before trusting a first board, check three things:
 3. whether the CCL sees the TCB waveforms without their pin outputs enabled. The
    data sheet does not say, and it is the one register decision here that was not
    derivable from it.
+
+The timer above has not run on hardware either, and its registers were checked by reading the
+disassembly rather than by watching a pin. On paper the configuration agrees with Microchip's own:
+TB3217 runs TCA0 in `DSBOTTOM` too, documents its overflow at BOTTOM, and gets 1 kHz out of
+`PER = 500` at a 1 MHz timer clock - the same factor 2 `setPeriod()` divides by. What a scope
+would still have to show is two separate things. That the overflows come one period apart and not
+half of one, which is what a mode overflowing at both ends, or counting single-slope, would give.
+And that the first one after `start()` comes a whole period late and not half: an overflow at TOP
+would keep the period but shift its phase, and `read()` - which counts from BOTTOM - would then be
+half a period off.
 
 ## Notes for anyone reading the old xmega project
 
