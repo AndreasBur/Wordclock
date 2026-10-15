@@ -303,9 +303,14 @@ Before trusting a first board, check three things:
    derivable from it.
 
 The timer above has not run on hardware either, and its registers were checked by reading the
-disassembly rather than by watching a pin. What that cannot show is the one thing a scope would:
-that the overflow really arrives at BOTTOM and not at TOP, which is the difference between the
-period asked for and twice it.
+disassembly rather than by watching a pin. On paper the configuration agrees with Microchip's own:
+TB3217 runs TCA0 in `DSBOTTOM` too, documents its overflow at BOTTOM, and gets 1 kHz out of
+`PER = 500` at a 1 MHz timer clock - the same factor 2 `setPeriod()` divides by. What a scope
+would still have to show is two separate things. That the overflows come one period apart and not
+half of one, which is what a mode overflowing at both ends, or counting single-slope, would give.
+And that the first one after `start()` comes a whole period late and not half: an overflow at TOP
+would keep the period but shift its phase, and `read()` - which counts from BOTTOM - would then be
+half a period off.
 
 ## Notes for anyone reading the old xmega project
 
