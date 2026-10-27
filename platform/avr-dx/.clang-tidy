@@ -1,0 +1,11 @@
+# The root .clang-tidy, less the one check that cannot be answered on a microcontroller.
+#
+# clang-analyzer-core.FixedAddressDereference
+#   Reports every access to a peripheral register - PORTA.DIR, TCA0.SINGLE.CTRLA - because
+#   avr-libc defines each one as a dereferenced constant address. That is what a
+#   memory-mapped register is; there is no other way to write to one.
+#
+# Header findings take the configuration of the source that includes them, so this also
+# covers writeBitGroup() in StandardTypes.h when the AVR backend hands it a register.
+InheritParentConfig: true
+Checks: '-clang-analyzer-core.FixedAddressDereference'

@@ -25,6 +25,9 @@
 
 #include <stddef.h>
 
+/* On this toolchain these headers are the standard library, see type_traits, so declaring
+   into std is what they exist to do. */
+// NOLINTBEGIN(cert-dcl58-cpp)
 namespace std {
 
 template<class T, size_t N>
@@ -79,6 +82,7 @@ constexpr bool operator!=(const array<T, N>& Left, const array<T, N>& Right)
 }
 
 } // namespace std
+// NOLINTEND(cert-dcl58-cpp)
 
 #endif // _STL_ARRAY_
 

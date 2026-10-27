@@ -15,6 +15,11 @@ than a document: `readability-convert-member-functions-to-static` and
 every pull request. Functions that need no instance state can be static, and functions
 that only read it can be const.
 
+CI reads four builds with the same checks: the simulator's, and each hardware backend's
+through `tools/cross-clang-tidy.py`, which rewrites a GCC cross build's compile database so
+that clang can follow it. The firmware core is read in every one of them, as each compiler
+sees it.
+
 A function using a mutable referenced object is still reviewed for its meaning: compiling
 with const does not by itself make a setter a read-only operation.
 
@@ -28,23 +33,32 @@ Three CLion suggestions are disabled in `.idea/editor.xml`:
   value on the AVR. Review large copies individually.
 - `CppUseDesignatedInitializers`: the project builds as C++17.
 
-Two clang-tidy suppressions sit in the code rather than in `.clang-tidy`, because they are
-about particular classes and not about the check:
+These clang-tidy suppressions sit in the code rather than in `.clang-tidy`, because they
+are about particular classes and not about the check:
 
 - The wxWidgets event handlers in `platform/simulator/src/PixelsFrame.cpp` stay non-static
   because the event tables require member-function pointers.
-- The stand-ins in `platform/simulator/` stay non-static because they mirror the API of the
-  backends the clock really runs on, where the same call reaches a peripheral through
-  instance state. `BH1750`, `Pixels`, `Storage` and `System` hold these methods byte for
-  byte as the avr-dx, esp32 and rp2350 headers do, and clang-tidy only ever sees the
-  simulator - so following it here would have made the simulator the one backend out of
-  four with a different shape.
+- The interface the firmware core calls through `getInstance()` - `Storage`, `System`,
+  `Pixels`, the web interface, the clock chip - stays made of instance methods in every
+  backend, although many implementations read no member. Whether one backend needs its
+  members for a call is that backend's detail; answering the check would carry it into the
+  interface. The simulator's stand-ins keep the same shape for the same reason. Private
+  helpers are not covered by this: one that reads no member is `static` - except the AVR's
+  `SerialPort::write`, which cost 72 bytes of flash as one.
+- Methods that drive hardware - `Twi::write`, `WS2812::send`, `performPendingRestart()` and
+  their kind - stay non-const. Nothing in them writes a member, but a const would say they
+  change nothing.
+- The STL headers in `platform/avr-dx/include/stl/` are the standard library on a
+  toolchain that ships none, so declaring into `namespace std` is their purpose and
+  `cert-dcl58-cpp` is suppressed around each namespace. In the code rather than in a
+  `.clang-tidy` of that directory, because clang-tidy configures a header by the source that
+  includes it: a directory's configuration reaches the editor, which opens the header on its
+  own, but not a run over the build.
 
-One check is off for a single directory, in a `.clang-tidy` of its own:
-`cert-dcl58-cpp` in `platform/avr-dx/include/stl/`. Those headers are the standard library
-on a toolchain that ships none, so declaring into `namespace std` is their purpose. A
-`NOLINT` on the `namespace std` line would not have done it, because the check reports
-every declaration inside the namespace, not the line that opens it.
+Two backends switch one check off in a `.clang-tidy` of their own:
+`clang-analyzer-core.FixedAddressDereference` in `platform/avr-dx/` and `platform/rp2350/`.
+A peripheral register is a dereferenced constant address, and there is no other way to
+write to one.
 
 ## Read and not acted on
 
