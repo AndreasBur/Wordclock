@@ -48,9 +48,9 @@ jobs:
       # simulator's compile database is what covers the firmware core, and it does not
       # exist without the headers the backend includes.
       - name: Install the toolchain
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends cmake ninja-build libwxgtk3.2-dev clang-tidy
+        uses: ./.github/actions/apt-install
+        with:
+          packages: cmake ninja-build libwxgtk3.2-dev clang-tidy
 
       # Configured, not built: clang-tidy compiles each translation unit itself and needs
       # nothing from the build but compile_commands.json.
@@ -80,10 +80,9 @@ jobs:
       # The cross compiler is installed although nothing is compiled with it: the tool asks it
       # where avr-libc's headers are, and clang reads those instead of the host's.
       - name: Install the toolchain
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends \
-            cmake ninja-build gcc-avr avr-libc clang-tidy python3
+        uses: ./.github/actions/apt-install
+        with:
+          packages: cmake ninja-build gcc-avr avr-libc clang-tidy python3
 
       # Configured, not built, as above. The toolchain file for the same reason ci.yml names
       # it: the database records whichever compiler project() found.
@@ -127,11 +126,13 @@ jobs:
           key: ${{ matrix.cache }}-${{ runner.os }}-${{ hashFiles(format('platform/{0}/platformio.ini', matrix.backend)) }}
           restore-keys: ${{ matrix.cache }}-${{ runner.os }}-
 
-      - name: Install PlatformIO and clang-tidy
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends clang-tidy
-          pip install --upgrade platformio
+      - name: Install clang-tidy
+        uses: ./.github/actions/apt-install
+        with:
+          packages: clang-tidy
+
+      - name: Install PlatformIO
+        run: pip install --upgrade platformio
 
       # compiledb rather than a build: it fetches the platform, runs the pre-scripts - which
       # is what writes WebPage.h - and writes the database, and compiles nothing.
@@ -153,9 +154,9 @@ jobs:
       # enough - it reports the same findings with and without compile_commands.json, and
       # this way the job still answers when the simulator does not build.
       - name: Install cppcheck
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends cppcheck
+        uses: ./.github/actions/apt-install
+        with:
+          packages: cppcheck
 
       # firmware/ only, unlike the clang-tidy job above. Without wxWidgets' own headers
       # cppcheck stops at DECLARE_EVENT_TABLE in the simulator's window class and asks to be

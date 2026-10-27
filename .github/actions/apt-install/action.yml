@@ -1,0 +1,85 @@
+# apt-get install for a CI job, made to survive the Ubuntu mirror having a bad hour.
+#
+# What it guards against was read out of a job that sat in its install step until the job's
+# timeout cancelled it: apt-get update fetched its indices at 13 MB/s, and then the package
+# downloads crawled - cmake's 14 MB took five minutes, and gcc-avr's 57 MB was still coming
+# thirteen minutes later. A connection that trickles is not a connection that has died, so
+# apt never gives up on it, and the step ran into the job's timeout-minutes, which reports as
+# a cancellation and says nothing about why.
+#
+# So, in that order:
+#
+# - The .deb files are cached, keyed by exactly the versions this run would fetch. A run whose
+#   packages have not changed downloads nothing from the mirror at all; a new version in the
+#   archive is a new key, so the cache follows the archive by itself instead of going stale.
+# - What is still missing is downloaded with --download-only under a timeout, and retried on a
+#   fresh connection when the timeout fires. Generous next to a normal run, which fetches all
+#   of it in seconds.
+# - Only then is it installed, from the cache and with no timeout: the downloading is over by
+#   then, and a timeout that killed dpkg halfway through unpacking would leave the runner
+#   broken rather than slow.
+name: Install Ubuntu packages
+description: apt-get install with the downloads cached, and a stalled mirror retried rather than waited out
+
+inputs:
+  packages:
+    description: The packages to install, separated by spaces
+    required: true
+
+runs:
+  using: composite
+  steps:
+    # The index is normally fast even when the archive is not, and the key below needs it. It
+    # gets the same timeout and retry all the same: ci.yml records an apt-get update that hung.
+    # --print-uris lists every .deb the install would fetch. Only the file name goes into the
+    # key: it carries the version, so the key changes exactly when a download would, while the
+    # URL in front of it names whichever mirror this runner was given.
+    - name: Work out what would be downloaded
+      id: plan
+      shell: bash
+      run: |
+        for Attempt in 1 2 3; do
+          if timeout 120 sudo apt-get update -q; then break; fi
+          if [ "$Attempt" -eq 3 ]; then
+            echo "::error::apt-get update did not finish in three attempts"
+            exit 1
+          fi
+          echo "::warning::apt-get update attempt $Attempt stalled or failed; retrying"
+        done
+        KEY=$(apt-get install --print-uris -qq --no-install-recommends ${{ inputs.packages }} | cut -d' ' -f2 | sha256sum | cut -c1-16)
+        echo "key=$KEY" >> "$GITHUB_OUTPUT"
+
+    - name: Restore the downloaded packages
+      uses: actions/cache@v6
+      with:
+        path: ~/apt-archives
+        key: apt-${{ runner.os }}-${{ steps.plan.outputs.key }}
+        # An older set still holds most of the files; apt fetches only what differs.
+        restore-keys: apt-${{ runner.os }}-
+
+    # apt downloads into ~/apt-archives as root and warns that it cannot hand the job to its
+    # _apt sandbox user there. That is a warning, the download is the same; the chown
+    # afterwards is what lets the cache step read the files back to save them.
+    - name: Download, retrying a stalled mirror
+      shell: bash
+      run: |
+        mkdir -p ~/apt-archives/partial
+        for Attempt in 1 2 3 4; do
+          if timeout 240 sudo apt-get -q -o Dir::Cache::Archives="$HOME/apt-archives" -o APT::Keep-Downloaded-Packages=true \
+               install -y --no-install-recommends --download-only ${{ inputs.packages }}; then
+            break
+          fi
+          if [ "$Attempt" -eq 4 ]; then
+            echo "::error::apt could not download the packages in four attempts"
+            exit 1
+          fi
+          echo "::warning::apt download attempt $Attempt stalled or failed; retrying on a new connection"
+        done
+        sudo chown -R "$(id -u):$(id -g)" ~/apt-archives
+
+    - name: Install
+      shell: bash
+      run: |
+        sudo apt-get -q -o Dir::Cache::Archives="$HOME/apt-archives" -o APT::Keep-Downloaded-Packages=true \
+             install -y --no-install-recommends ${{ inputs.packages }}
+        sudo chown -R "$(id -u):$(id -g)" ~/apt-archives
