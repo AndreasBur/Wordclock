@@ -40,6 +40,12 @@ about particular classes and not about the check:
   simulator - so following it here would have made the simulator the one backend out of
   four with a different shape.
 
+One check is off for a single directory, in a `.clang-tidy` of its own:
+`cert-dcl58-cpp` in `platform/avr-dx/include/stl/`. Those headers are the standard library
+on a toolchain that ships none, so declaring into `namespace std` is their purpose. A
+`NOLINT` on the `namespace std` line would not have done it, because the check reports
+every declaration inside the namespace, not the line that opens it.
+
 ## Read and not acted on
 
 - `optionShortName` in `MsgParameterParser::parse` is assigned in `STATE_OPTION_CHAR`

@@ -1,0 +1,8 @@
+# These headers are the standard library for a toolchain that ships none - avr-libc is a C
+# library, see type_traits - so declaring into namespace std is what this directory is for.
+# cert-dcl58-cpp would report every declaration in it.
+#
+# Only the editor meets this file: CI runs clang-tidy over the simulator, which takes the
+# real libstdc++ and never includes these headers.
+InheritParentConfig: true
+Checks: '-cert-dcl58-cpp'
