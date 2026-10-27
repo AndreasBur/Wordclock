@@ -77,6 +77,10 @@ class System
     // get methods
     StdReturnType getFreeMemoryInKibibytes(uint16_t&) const;
 
+    /* Instance methods, though none of the stubs below reads a member: they are the
+       interface the firmware core calls through getInstance(), and the backends that have a
+       network answer them from instance state. A backend without one keeps the shape. */
+    // NOLINTBEGIN(readability-convert-member-functions-to-static)
     /* No network, so no address, no name and no quality to report. E_NOT_OK is the answer
        the command is built to receive, not a gap. */
     StdReturnType getNetworkAddress(char* String) const { String[0u] = STD_NULL_CHARACTER; return E_NOT_OK; }
@@ -99,6 +103,7 @@ class System
     /* The clock chip is the time source here and needs no synchronising - it is asked
        afresh once a second anyway. */
     StdReturnType resynchroniseTime() { return E_NOT_OK; }
+    // NOLINTEND(readability-convert-member-functions-to-static)
 
     /* Only asks. The application carries it out on its next tick, once the command's answer
        has reached the wire - a reset from here would cut the answer off mid-sentence. */

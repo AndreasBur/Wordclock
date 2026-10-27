@@ -39,6 +39,13 @@ constexpr uint16_t BytesPerKibibyte{1024u};
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
 
+/* Instance methods, though some of them read no member: they are the interface the
+   firmware core calls through getInstance(), and every backend - the simulator's
+   stand-ins included - offers it that way. Whether this backend's implementation
+   happens to need a member is its own detail, and answering the check would carry
+   that detail into the interface.
+   The ones it would make const drive the hardware, which a const would deny. */
+// NOLINTBEGIN(readability-convert-member-functions-to-static, readability-make-member-function-const)
 /******************************************************************************************************************************************************
   getFreeMemoryInKibibytes()
 ******************************************************************************************************************************************************/
@@ -55,11 +62,15 @@ constexpr uint16_t BytesPerKibibyte{1024u};
 StdReturnType System::getFreeMemoryInKibibytes(uint16_t& FreeMemory) const
 {
     char StackMark;
-    const char* LowerEdge = (__brkval == nullptr) ? &__heap_start : __brkval;
+    /* As addresses rather than pointers: the stack and the heap are not one array, and
+       comparing or subtracting pointers into two different objects is undefined - an
+       optimiser is entitled to fold the comparison away. Integers have no such rule. */
+    const uintptr_t StackAddress = reinterpret_cast<uintptr_t>(&StackMark);
+    const uintptr_t LowerEdge = reinterpret_cast<uintptr_t>((__brkval == nullptr) ? &__heap_start : __brkval);
 
-    if(&StackMark < LowerEdge) { return E_NOT_OK; }
+    if(StackAddress < LowerEdge) { return E_NOT_OK; }
 
-    FreeMemory = static_cast<uint16_t>(static_cast<uint16_t>(&StackMark - LowerEdge) / BytesPerKibibyte);
+    FreeMemory = static_cast<uint16_t>(static_cast<uint16_t>(StackAddress - LowerEdge) / BytesPerKibibyte);
 
     return E_OK;
 } /* getFreeMemoryInKibibytes */
@@ -84,6 +95,7 @@ void System::performPendingRestart()
        device runs. */
     _PROTECTED_WRITE(RSTCTRL.SWRR, RSTCTRL_SWRST_bm);
 } /* performPendingRestart */
+// NOLINTEND(readability-convert-member-functions-to-static, readability-make-member-function-const)
 
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E

@@ -44,9 +44,12 @@
 #include <stdint.h>
 
 /* Only ever used as a pointer, so the declaration is enough - and it has to be made here
-   rather than taken from a header, see the note about the include circle above. The core
-   declares it the same way. */
-class __FlashStringHelper;
+   rather than taken from a header, see the note about the include circle above. In the
+   core's namespace and brought out with the core's own using-declaration, because this core
+   is ArduinoCore-API: a class of the same name declared at global scope is a second class
+   that conflicts with that using-declaration. GCC let it pass; clang refuses it. */
+namespace arduino { class __FlashStringHelper; }
+using arduino::__FlashStringHelper;
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S

@@ -31,6 +31,9 @@
 #ifndef _STL_TYPE_TRAITS_
 #define _STL_TYPE_TRAITS_
 
+/* On this toolchain these headers are the standard library, see type_traits, so declaring
+   into std is what they exist to do. */
+// NOLINTBEGIN(cert-dcl58-cpp)
 namespace std {
 
 template<class T, T v> struct integral_constant {
@@ -96,6 +99,7 @@ template<class T> struct is_signed : integral_constant<bool, is_integral<T>::val
 template<class T> struct is_unsigned : integral_constant<bool, is_integral<T>::value && (T(0) < T(-1))> { };
 
 } // namespace std
+// NOLINTEND(cert-dcl58-cpp)
 
 #endif // _STL_TYPE_TRAITS_
 

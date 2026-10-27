@@ -36,6 +36,9 @@ constexpr uint16_t DataAddress{STORAGE_EEPROM_ADDRESS + 1u};
 static_assert((STORAGE_EEPROM_ADDRESS + 1u + STORAGE_CAPACITY) <= EEPROM_SIZE,
               "Storage: the capacity does not fit in this device's EEPROM");
 
+/* avr-libc's EEPROM functions take the offset into the EEPROM in a pointer's clothes; it
+   never points at RAM and is never dereferenced as such, so the cast is the interface. */
+// NOLINTNEXTLINE(performance-no-int-to-ptr)
 byte* toEepromAddress(uint16_t Offset) { return reinterpret_cast<byte*>(Offset); }
 
 } // namespace
@@ -44,6 +47,12 @@ byte* toEepromAddress(uint16_t Offset) { return reinterpret_cast<byte*>(Offset);
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
 
+/* Instance methods, though some of them read no member: they are the interface the
+   firmware core calls through getInstance(), and every backend - the simulator's
+   stand-ins included - offers it that way. Whether this backend's implementation
+   happens to need a member is its own detail, and answering the check would carry
+   that detail into the interface. */
+// NOLINTBEGIN(readability-convert-member-functions-to-static)
 /******************************************************************************************************************************************************
   read()
 ******************************************************************************************************************************************************/
@@ -105,6 +114,7 @@ StdReturnType Storage::clear()
 
     return E_OK;
 } /* clear */
+// NOLINTEND(readability-convert-member-functions-to-static)
 
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E

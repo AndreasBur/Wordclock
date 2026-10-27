@@ -16,6 +16,13 @@
 #   cmake -S . -B build -G Ninja -DPLATFORM=simulator -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 #   run-clang-tidy -p build -quiet 'firmware/|platform/simulator/src'
 #
+# and over each hardware backend's, through tools/cross-clang-tidy.py - the same checks, with
+# the database rewritten so that clang can read what a GCC cross compiler was told:
+#
+#   tools/cross-clang-tidy.py build-avr       'firmware/|platform/avr-dx/src'
+#   tools/cross-clang-tidy.py platform/esp32  'firmware/|platform/esp32/src'
+#   tools/cross-clang-tidy.py platform/rp2350 'firmware/|platform/rp2350/src'
+#
 Checks: >
   -*,
   bugprone-*,
@@ -24,6 +31,7 @@ Checks: >
   performance-*,
   readability-convert-member-functions-to-static,
   readability-make-member-function-const,
+  -bugprone-dynamic-static-initializers,
   -bugprone-easily-swappable-parameters,
   -bugprone-narrowing-conversions,
   -bugprone-reserved-identifier,
@@ -39,6 +47,13 @@ Checks: >
   -performance-unnecessary-value-param
 
 # Why each of those is off:
+#
+# bugprone-dynamic-static-initializers
+#   Only ever reports on the AVR, which builds with -fno-threadsafe-statics, and there it
+#   reports every singleton and every static table - declarations without an initialiser
+#   included. The hazard behind it is a first call from an interrupt racing the first call
+#   from the main loop, and the one singleton an interrupt reaches is the timer, whose
+#   overflow interrupt is enabled by its own init() and so after it has been constructed.
 #
 # bugprone-easily-swappable-parameters
 #   Reports every setPixel(byte Column, byte Row). The answer would be a type per
@@ -95,5 +110,10 @@ Checks: >
 #
 # Only what this repository owns. Header findings are reported through the source that
 # includes them, so the firmware's header-only classes are covered by their callers.
-HeaderFilterRegex: '(firmware|platform)/.*'
+#
+# The leading slash is load-bearing: without it the Pico SDK's pico_platform/ matched, and
+# its register accessors were reported as this repository's. The libraries PlatformIO
+# fetches sit inside platform/<backend>/.pio, which is why that is excluded by name.
+HeaderFilterRegex: '/(firmware|platform)/'
+ExcludeHeaderFilterRegex: '/\.pio/'
 WarningsAsErrors: '*'

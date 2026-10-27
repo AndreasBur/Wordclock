@@ -13,7 +13,14 @@
 #
 # Which checks are on, and why the rest are off, is in .clang-tidy and
 # .cppcheck-suppressions, not here.
-# timeout-minutes on both jobs for the reason ci.yml gives, and generous on clang-tidy: it
+# clang-tidy reads four builds, not one. The simulator's covers the firmware core as the
+# host compiler sees it; each hardware backend is only ever compiled by its own cross
+# compiler, so it is read through that build's database - rewritten by
+# tools/cross-clang-tidy.py so that clang can follow what GCC was told. The core is read
+# again in each of them, which is the point: an int is 16 bit on the AVR, and a check that
+# only ever saw the host would never meet the code the way that target does.
+#
+# timeout-minutes on every job for the reason ci.yml gives, and generous on clang-tidy: it
 # reads every translation unit of the simulator build and takes ten minutes when nothing at
 # all is wrong.
 name: static-analysis
@@ -62,6 +69,77 @@ jobs:
       # there, so a finding fails this job.
       - name: Analyse
         run: run-clang-tidy -p build -quiet -j "$(nproc)" 'firmware/|platform/simulator/src'
+
+  clang-tidy-avr:
+    name: clang-tidy (AVR Dx)
+    runs-on: ubuntu-26.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+
+      # The cross compiler is installed although nothing is compiled with it: the tool asks it
+      # where avr-libc's headers are, and clang reads those instead of the host's.
+      - name: Install the toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            cmake ninja-build gcc-avr avr-libc clang-tidy python3
+
+      # Configured, not built, as above. The toolchain file for the same reason ci.yml names
+      # it: the database records whichever compiler project() found.
+      - name: Configure
+        run: |
+          cmake -B build-avr -S . -G Ninja -DPLATFORM=avr-dx \
+                -DCMAKE_TOOLCHAIN_FILE=platform/avr-dx/toolchain-avr.cmake \
+                -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+
+      - name: Analyse
+        run: python3 tools/cross-clang-tidy.py build-avr 'firmware/|platform/avr-dx/src'
+
+  clang-tidy-platformio:
+    name: clang-tidy (${{ matrix.backend }})
+    runs-on: ubuntu-26.04
+    timeout-minutes: 45
+    strategy:
+      # One backend's findings say nothing about the other's, so both are reported.
+      fail-fast: false
+      matrix:
+        include:
+          - backend: esp32
+            cache: platformio
+          - backend: rp2350
+            cache: platformio-rp2350
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+
+      # The same keys as the firmware jobs in ci.yml, so whichever of the two runs first
+      # fills the cache for the other - the toolchains are the slow part of this job too.
+      - name: Cache the PlatformIO packages
+        uses: actions/cache@v6
+        with:
+          path: |
+            ~/.platformio
+            ~/.cache/pip
+          key: ${{ matrix.cache }}-${{ runner.os }}-${{ hashFiles(format('platform/{0}/platformio.ini', matrix.backend)) }}
+          restore-keys: ${{ matrix.cache }}-${{ runner.os }}-
+
+      - name: Install PlatformIO and clang-tidy
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends clang-tidy
+          pip install --upgrade platformio
+
+      # compiledb rather than a build: it fetches the platform, runs the pre-scripts - which
+      # is what writes WebPage.h - and writes the database, and compiles nothing.
+      - name: Write the compile database
+        run: pio run -d platform/${{ matrix.backend }} -t compiledb
+
+      - name: Analyse
+        run: python3 tools/cross-clang-tidy.py platform/${{ matrix.backend }} 'firmware/|platform/${{ matrix.backend }}/src'
 
   cppcheck:
     name: cppcheck

@@ -86,15 +86,26 @@ static_assert(daysFromCivil(2000, 3, 1) == 11017, "the day after a leap day must
 static_assert(daysFromCivil(2026, 8, 14) == 20679, "an ordinary day must line up");
 static_assert(daysFromCivil(2099, 12, 31) == 47481, "the last day ClockDate accepts must line up");
 
+/* Widened before the multiplication, not after it: in 32 bit the days alone overflow on
+   2038-01-19, and ClockDate runs to 2099. */
+constexpr time_t toSecondsSinceEpoch(int32_t Days, int32_t Hour, int32_t Minute, int32_t Second)
+{
+    return (static_cast<time_t>(Days) * SecondsPerDay) + (static_cast<time_t>(Hour) * SecondsPerHour) +
+           (static_cast<time_t>(Minute) * SecondsPerMinute) + Second;
+}
+
+static_assert(toSecondsSinceEpoch(daysFromCivil(2099, 12, 31), 23, 59, 59) == 4102444799,
+              "the last second ClockDate accepts must not overflow");
+
 time_t toSecondsUtc(const ClockDateTime& DateTime)
 {
     const int32_t Days = daysFromCivil(static_cast<int32_t>(DateTime.getDateYear()),
                                        static_cast<int32_t>(DateTime.getDateMonth()),
                                        static_cast<int32_t>(DateTime.getDateDay()));
 
-    return static_cast<time_t>((Days * SecondsPerDay) +
-                               (static_cast<int32_t>(DateTime.getTimeHour()) * SecondsPerHour) +
-                               (static_cast<int32_t>(DateTime.getTimeMinute()) * SecondsPerMinute) +
+    return toSecondsSinceEpoch(Days,
+                               static_cast<int32_t>(DateTime.getTimeHour()),
+                               static_cast<int32_t>(DateTime.getTimeMinute()),
                                static_cast<int32_t>(DateTime.getTimeSecond()));
 }
 

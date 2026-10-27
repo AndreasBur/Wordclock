@@ -33,6 +33,9 @@
 
 #include "type_traits"
 
+/* On this toolchain these headers are the standard library, see type_traits, so declaring
+   into std is what they exist to do. */
+// NOLINTBEGIN(cert-dcl58-cpp)
 namespace std {
 
 /* The integral case, worked out from the type itself: everything the core measures against
@@ -76,6 +79,7 @@ template<> struct numeric_limits<long double> {
 };
 
 } // namespace std
+// NOLINTEND(cert-dcl58-cpp)
 
 #endif // _STL_LIMITS_
 

@@ -22,7 +22,9 @@ typedef bool boolean;
 #define SDA 4
 #define SCL 5
 
-class __FlashStringHelper;
+/* Where the core puts it, see WordclockSerial.h - a global one would be a second class. */
+namespace arduino { class __FlashStringHelper; }
+using arduino::__FlashStringHelper;
 char* itoa(int, char*, int);
 
 /* The test drives Incoming and inspects Written. */

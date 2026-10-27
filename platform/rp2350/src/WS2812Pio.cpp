@@ -150,6 +150,9 @@ bool WS2812Pio::isBusy() const
 } /* isBusy */
 
 
+/* Not const, though nothing here writes a member: it drives the hardware, and a const
+   would say it changes nothing. */
+// NOLINTBEGIN(readability-make-member-function-const)
 /******************************************************************************************************************************************************
   transmit()
 ******************************************************************************************************************************************************/
@@ -179,6 +182,7 @@ StdReturnType WS2812Pio::transmit(const WordType* Frame, size_t Count)
 
     return E_OK;
 } /* transmit */
+// NOLINTEND(readability-make-member-function-const)
 
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E

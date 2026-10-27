@@ -1,0 +1,8 @@
+# The root .clang-tidy, less the one check that cannot be answered on a microcontroller.
+#
+# clang-analyzer-core.FixedAddressDereference
+#   Reports the Pico SDK's register accessors where this backend calls them - the PIO block
+#   that drives the strip is a constant address, and so is every peripheral behind it. The
+#   AVR backend switches it off for the same reason.
+InheritParentConfig: true
+Checks: '-clang-analyzer-core.FixedAddressDereference'

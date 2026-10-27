@@ -33,6 +33,12 @@
  * P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
 
+/* Instance methods, though some of them read no member: they are the interface the
+   firmware core calls through getInstance(), and every backend - the simulator's
+   stand-ins included - offers it that way. Whether this backend's implementation
+   happens to need a member is its own detail, and answering the check would carry
+   that detail into the interface. */
+// NOLINTBEGIN(readability-convert-member-functions-to-static)
 /******************************************************************************************************************************************************
   read()
 ******************************************************************************************************************************************************/
@@ -110,6 +116,7 @@ StdReturnType Storage::clear()
 
     return E_OK;
 } /* clear */
+// NOLINTEND(readability-convert-member-functions-to-static)
 
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E

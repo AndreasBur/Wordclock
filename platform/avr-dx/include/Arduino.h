@@ -110,6 +110,9 @@ class SerialPort
     SerialPort() { }
     ~SerialPort() { }
 
+    /* Reads no member, and is still not static: made static it cost 72 bytes of flash, as
+       GCC then compiles it and the print() overloads built on it differently. The check is
+       answered where it is defined, in Arduino.cpp. */
     void write(char);
     void printNumber(int32_t);
     void printUnsignedNumber(uint32_t);
