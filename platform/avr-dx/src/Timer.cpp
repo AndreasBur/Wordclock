@@ -80,6 +80,31 @@ StdReturnType Timer<TimerTraits>::init(uint32_t Microseconds, TimerIsrCallbackF_
 
 
 /******************************************************************************************************************************************************
+  toClockSelect()
+******************************************************************************************************************************************************/
+/*! \brief          The smallest prescaler that brings a period inside the counter
+ *  \details        Smallest, because every step up halves the resolution of TOP and of the
+ *                  compare values derived from it. Each test shifts the undivided count, so
+ *                  no step depends on what the one before it did to it.
+ *  \param[in]      TimerCycles                 the period in undivided timer cycles
+ *  \return         the clock select bit group
+ *****************************************************************************************************************************************************/
+template <typename TimerTraits>
+typename Timer<TimerTraits>::TimerClockSelectType Timer<TimerTraits>::toClockSelect(uint32_t TimerCycles)
+{
+    if(TimerCycles < TIMER_RESOLUTION)          { return TIMER_REG_CS_NO_PRESCALER; }
+    if((TimerCycles >> 1u) < TIMER_RESOLUTION)  { return TIMER_REG_CS_PRESCALE_2; }
+    if((TimerCycles >> 2u) < TIMER_RESOLUTION)  { return TIMER_REG_CS_PRESCALE_4; }
+    if((TimerCycles >> 3u) < TIMER_RESOLUTION)  { return TIMER_REG_CS_PRESCALE_8; }
+    if((TimerCycles >> 4u) < TIMER_RESOLUTION)  { return TIMER_REG_CS_PRESCALE_16; }
+    if((TimerCycles >> 6u) < TIMER_RESOLUTION)  { return TIMER_REG_CS_PRESCALE_64; }
+    if((TimerCycles >> 8u) < TIMER_RESOLUTION)  { return TIMER_REG_CS_PRESCALE_256; }
+    /* TIMER_MAX_PERIOD in setPeriod() is what keeps this one inside 16 bit */
+    return TIMER_REG_CS_PRESCALE_1024;
+} /* toClockSelect */
+
+
+/******************************************************************************************************************************************************
   setPeriod()
 ******************************************************************************************************************************************************/
 /*! \brief          set period of the timer overflow interrupt
@@ -99,16 +124,8 @@ StdReturnType Timer<TimerTraits>::setPeriod(uint32_t Microseconds)
         returnValue = E_OK;
         /* calculate timer cycles to reach timer period, counter runs backwards after TOP, interrupt is at BOTTOM so divide microseconds by 2 */
         uint32_t timerCycles = (F_CPU / 2000000uL) * Microseconds;
-        /* calculate timer prescaler */
-        if(timerCycles < TIMER_RESOLUTION)              ClockSelectBitGroup = TIMER_REG_CS_NO_PRESCALER;
-        else if((timerCycles >>= 1) < TIMER_RESOLUTION) ClockSelectBitGroup = TIMER_REG_CS_PRESCALE_2;
-        else if((timerCycles >>= 1) < TIMER_RESOLUTION) ClockSelectBitGroup = TIMER_REG_CS_PRESCALE_4;
-        else if((timerCycles >>= 1) < TIMER_RESOLUTION) ClockSelectBitGroup = TIMER_REG_CS_PRESCALE_8;
-        else if((timerCycles >>= 1) < TIMER_RESOLUTION) ClockSelectBitGroup = TIMER_REG_CS_PRESCALE_16;
-        else if((timerCycles >>= 2) < TIMER_RESOLUTION) ClockSelectBitGroup = TIMER_REG_CS_PRESCALE_64;
-        else if((timerCycles >>= 2) < TIMER_RESOLUTION) ClockSelectBitGroup = TIMER_REG_CS_PRESCALE_256;
-        /* TIMER_MAX_PERIOD above is what keeps this one inside 16 bit */
-        else { timerCycles >>= 2;                         ClockSelectBitGroup = TIMER_REG_CS_PRESCALE_1024; }
+        ClockSelectBitGroup = toClockSelect(timerCycles);
+        timerCycles >>= toPrescalerShift(ClockSelectBitGroup);
 
         /* A 16-bit access goes through the timer's shared TEMP register, so an ISR touching another
            16-bit register of this timer must not get in between.

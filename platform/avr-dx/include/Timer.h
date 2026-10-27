@@ -257,6 +257,7 @@ class Timer
         }
     }
 
+    static TimerClockSelectType toClockSelect(uint32_t);
     TimerCountDirection getCountingDirection();
     void setClockSelect(TimerClockSelectType);
     void setRunning(bool);
