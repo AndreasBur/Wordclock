@@ -15,6 +15,7 @@
 #include "DisplayCharacters.h"
 #include "DisplayColor.h"
 #include "DisplayManager.h"
+#include "GammaCorrection.h"
 #include "Pixels.h"
 #include "RealTimeClock.h"
 
@@ -34,6 +35,27 @@ void testColourDimmingAcrossByteRange()
     }
     expect(allMatch, "dimming must scale every byte pair without overflow and retain the minimum level");
     expect(color.getColorRed() == 255u, "dimming must preserve the configured colour");
+}
+
+/* The curve's ends, its shape and a value from each end of the shift range. The middle
+   ones are what the construction gives directly: one stored value, shifted once per
+   doubling below the top. */
+void testGammaCorrectionCurve()
+{
+    expect(GammaCorrection::calcCorrectedValue(0u) == 0u, "a setting of 0 must stay 0, not the faintest light");
+    expect(GammaCorrection::calcCorrectedValue(1u) == 1u, "the first step above 0 must be the faintest light there is");
+    expect(GammaCorrection::calcCorrectedValue(255u) == 255u, "the full setting must stay full");
+
+    bool rising = true;
+    for(unsigned value = 1u; value <= 255u; ++value) {
+        rising = rising && GammaCorrection::calcCorrectedValue(static_cast<byte>(value - 1u)) <= GammaCorrection::calcCorrectedValue(static_cast<byte>(value));
+    }
+    expect(rising, "the curve must never fall, not even where one doubling hands over to the next");
+
+    expect(GammaCorrection::calcCorrectedValue(31u) == 1u && GammaCorrection::calcCorrectedValue(32u) == 2u,
+           "the first doubling must end at setting 31 and the second begin at 32");
+    expect(GammaCorrection::calcCorrectedValue(128u) == 16u, "half the setting must be 133 shifted down three doublings");
+    expect(GammaCorrection::calcCorrectedValue(254u) == 255u, "the last step must be the top of the stored doubling, unshifted");
 }
 
 /* How much light the whole display is putting out, which is what a fade changes and a
