@@ -34,7 +34,9 @@
 # README-only commit once hung twice - apt-get update on the simulator job, and the cppcheck
 # job before its first step ran at all - and without a timeout the two sat there until
 # GitHub's own six-hour limit cancelled them, which reports as a red badge six hours after
-# anyone would have looked. The numbers differ per job because the cold-cache cost does: the
+# anyone would have looked. The apt installs themselves go through
+# .github/actions/apt-install, which caches the packages and retries a mirror that has
+# slowed to a trickle, rather than leaving that to these timeouts. The numbers differ per job because the cold-cache cost does: the
 # RP2350 firmware clones arduino-pico with the Pico SDK, and that alone is several minutes.
 name: CI
 
@@ -65,9 +67,9 @@ jobs:
       # Pinned to the Ubuntu that carries wxWidgets 3.2, which is what
       # find_package(wxWidgets) expects; libwxgtk3.2-dev pulls in the wx-config it needs.
       - name: Install the toolchain
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends cmake ninja-build libwxgtk3.2-dev
+        uses: ./.github/actions/apt-install
+        with:
+          packages: cmake ninja-build libwxgtk3.2-dev
 
       # -Werror only here, not in the CMakeLists: a warning should stop a change from
       # being merged without stopping somebody in the middle of debugging one.
@@ -226,10 +228,9 @@ jobs:
       - uses: actions/checkout@v7
 
       - name: Install the toolchain
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends \
-            cmake ninja-build gcc-avr avr-libc python3
+        uses: ./.github/actions/apt-install
+        with:
+          packages: cmake ninja-build gcc-avr avr-libc python3
 
       # Asked before the build rather than met inside it. Whether an avr-gcc knows this part
       # is a property of its device-specs, and a build that walks into a missing one stops
