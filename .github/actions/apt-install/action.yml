@@ -12,9 +12,12 @@
 # - The .deb files are cached, keyed by exactly the versions this run would fetch. A run whose
 #   packages have not changed downloads nothing from the mirror at all; a new version in the
 #   archive is a new key, so the cache follows the archive by itself instead of going stale.
-# - What is still missing is downloaded with --download-only under a timeout, and retried on a
-#   fresh connection when the timeout fires. Generous next to a normal run, which fetches all
-#   of it in seconds.
+# - What is still missing is downloaded with --download-only under a timeout, generous next
+#   to a normal run, which fetches all of it in seconds. A retry goes to a different mirror:
+#   the first version of this retried on a new connection, and all four attempts met the same
+#   crawl on the same file - the runner's apt-mirrors.txt lists Azure's mirror first and
+#   archive.ubuntu.com second, but apt moves down that list on an error, never on slowness.
+#   So from the second attempt on, Azure's line is taken out of the list.
 # - Only then is it installed, from the cache and with no timeout: the downloading is over by
 #   then, and a timeout that killed dpkg halfway through unpacking would leave the runner
 #   broken rather than slow.
@@ -39,7 +42,7 @@ runs:
       shell: bash
       run: |
         for Attempt in 1 2 3; do
-          if timeout 120 sudo apt-get update -q; then break; fi
+          if sudo timeout 120 apt-get update -q; then break; fi
           if [ "$Attempt" -eq 3 ]; then
             echo "::error::apt-get update did not finish in three attempts"
             exit 1
@@ -60,12 +63,17 @@ runs:
     # apt downloads into ~/apt-archives as root and warns that it cannot hand the job to its
     # _apt sandbox user there. That is a warning, the download is the same; the chown
     # afterwards is what lets the cache step read the files back to save them.
+    # timeout runs under sudo rather than around it, so that its signal reaches apt itself.
     - name: Download, retrying a stalled mirror
       shell: bash
       run: |
         mkdir -p ~/apt-archives/partial
         for Attempt in 1 2 3 4; do
-          if timeout 240 sudo apt-get -q -o Dir::Cache::Archives="$HOME/apt-archives" -o APT::Keep-Downloaded-Packages=true \
+          if [ "$Attempt" -eq 2 ] && grep -q 'azure\.archive\.ubuntu\.com' /etc/apt/apt-mirrors.txt 2>/dev/null; then
+            echo "::warning::moving off azure.archive.ubuntu.com to the next mirror in /etc/apt/apt-mirrors.txt"
+            sudo sed -i '/azure\.archive\.ubuntu\.com/d' /etc/apt/apt-mirrors.txt
+          fi
+          if sudo timeout 240 apt-get -q -o Dir::Cache::Archives="$HOME/apt-archives" -o APT::Keep-Downloaded-Packages=true \
                install -y --no-install-recommends --download-only ${{ inputs.packages }}; then
             break
           fi
@@ -73,7 +81,7 @@ runs:
             echo "::error::apt could not download the packages in four attempts"
             exit 1
           fi
-          echo "::warning::apt download attempt $Attempt stalled or failed; retrying on a new connection"
+          echo "::warning::apt download attempt $Attempt stalled or failed; retrying"
         done
         sudo chown -R "$(id -u):$(id -g)" ~/apt-archives
 
