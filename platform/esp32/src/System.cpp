@@ -112,9 +112,10 @@ StdReturnType copyIfItFits(const char* Value, char* String, size_t Capacity)
 {
     String[0u] = STD_NULL_CHARACTER;
 
-    if(strlen(Value) >= Capacity) { return E_NOT_OK; }
+    const size_t Length = strlen(Value);
+    if(Length >= Capacity) { return E_NOT_OK; }
 
-    strcpy(String, Value);
+    memcpy(String, Value, Length + 1u);
     return E_OK;
 }
 
@@ -124,6 +125,13 @@ StdReturnType copyIfItFits(const char* Value, char* String, size_t Capacity)
  * P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
 
+/* Instance methods, though some of them read no member: they are the interface the
+   firmware core calls through getInstance(), and every backend - the simulator's
+   stand-ins included - offers it that way. Whether this backend's implementation
+   happens to need a member is its own detail, and answering the check would carry
+   that detail into the interface.
+   The ones it would make const drive the hardware, which a const would deny. */
+// NOLINTBEGIN(readability-convert-member-functions-to-static, readability-make-member-function-const)
 /******************************************************************************************************************************************************
   getFreeMemoryInKibibytes()
 ******************************************************************************************************************************************************/
@@ -399,6 +407,7 @@ StdReturnType System::setConsolePassword(const char* Password)
 
     return Stored ? E_OK : E_NOT_OK;
 } /* setConsolePassword */
+// NOLINTEND(readability-convert-member-functions-to-static, readability-make-member-function-const)
 
 
 /******************************************************************************************************************************************************

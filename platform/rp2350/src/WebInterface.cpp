@@ -271,7 +271,10 @@ void sendUpdateResult(AsyncWebServerRequest* Request, bool Ok, const char* Reaso
     if(Ok) {
         strncpy(Answer, "{\"ok\":true}", sizeof(Answer) - 1u);
     } else {
-        snprintf(Answer, sizeof(Answer), "{\"ok\":false,\"error\":\"%s\"}", Reason);
+        /* %.100s, as on the ESP32: an unbounded reason would be cut off together with the
+           closing brace, and the page would get an answer that is not JSON at all. 100 is
+           what the buffer holds beside the frame. */
+        (void)snprintf(Answer, sizeof(Answer), "{\"ok\":false,\"error\":\"%.100s\"}", Reason);
         Serial.print(F("Web: update refused - "));
         Serial.println(Reason);
     }
@@ -429,6 +432,12 @@ void onSocketEvent(AsyncWebSocket*, AsyncWebSocketClient*, AwsEventType Type,
  * P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
 
+/* Instance methods, though some of them read no member: they are the interface the
+   firmware core calls through getInstance(), and every backend - the simulator's
+   stand-ins included - offers it that way. Whether this backend's implementation
+   happens to need a member is its own detail, and answering the check would carry
+   that detail into the interface. */
+// NOLINTBEGIN(readability-convert-member-functions-to-static)
 /******************************************************************************************************************************************************
   begin()
 ******************************************************************************************************************************************************/
@@ -549,6 +558,7 @@ void WebTransport::sendBinary(const byte* Bytes, size_t Length)
 {
     Socket.binaryAll(reinterpret_cast<const char*>(Bytes), Length);
 }
+// NOLINTEND(readability-convert-member-functions-to-static)
 
 
 /******************************************************************************************************************************************************

@@ -155,7 +155,7 @@ class BH1750
     StdReturnType startBus();
     StdReturnType readIlluminance();
     void sendModeForOneTimeMode();
-    StdReturnType sendCommand(byte);
+    static StdReturnType sendCommand(byte);
 
     StdReturnType sendMode() { return sendCommand(Mode); }
     /* Both halves of what task() checks before it reads: a bus that was opened, and a mode
@@ -180,8 +180,8 @@ class BH1750
         if(Lux >= static_cast<float>(BH1750_ILLUMINANCE_MAX_LX_VALUE)) { return BH1750_ILLUMINANCE_MAX_LX_VALUE; }
         return static_cast<IlluminanceType>(Lux);
     }
-    IlluminanceType combineRawValueParts(byte HighByte, byte LowByte) const { return static_cast<uint16_t>(HighByte) << 8u | LowByte; }
-    bool isMTRegValueInRange(byte MTRegValue) const { return ((MTRegValue <= BH1750_REG_MT_MAX_VALUE) && (MTRegValue >= BH1750_REG_MT_MIN_VALUE)); }
+    static constexpr IlluminanceType combineRawValueParts(byte HighByte, byte LowByte) { return static_cast<uint16_t>(HighByte) << 8u | LowByte; }
+    static constexpr bool isMTRegValueInRange(byte MTRegValue) { return ((MTRegValue <= BH1750_REG_MT_MAX_VALUE) && (MTRegValue >= BH1750_REG_MT_MIN_VALUE)); }
     bool isOneTimeMode() const {
         return (Mode == MODE_ONE_TIME_HIGH_RES_MODE) || (Mode == MODE_ONE_TIME_HIGH_RES_MODE_2) || (Mode == MODE_ONE_TIME_LOW_RES_MODE);
     }

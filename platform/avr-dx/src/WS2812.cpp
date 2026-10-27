@@ -172,6 +172,13 @@ void WS2812::initLookUpTable()
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
 
+/* Instance methods, though some of them read no member: they are the interface the
+   firmware core calls through getInstance(), and every backend - the simulator's
+   stand-ins included - offers it that way. Whether this backend's implementation
+   happens to need a member is its own detail, and answering the check would carry
+   that detail into the interface.
+   The ones it would make const drive the hardware, which a const would deny. */
+// NOLINTBEGIN(readability-convert-member-functions-to-static, readability-make-member-function-const)
 /******************************************************************************************************************************************************
   init()
 ******************************************************************************************************************************************************/
@@ -235,6 +242,7 @@ StdReturnType WS2812::send(const byte* Frame, uint16_t Length)
 
     return E_OK;
 } /* send */
+// NOLINTEND(readability-convert-member-functions-to-static, readability-make-member-function-const)
 
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E

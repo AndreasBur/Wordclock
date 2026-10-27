@@ -114,10 +114,10 @@ class DS3231
     StdReturnType startBus();
     StdReturnType readTemperature();
 
-    StdReturnType readRegisters(byte Register, byte* Values, byte Length);
-    StdReturnType writeRegisters(byte Register, const byte* Values, byte Length);
-    StdReturnType clearOscillatorStopped();
-    bool hasOscillatorStopped();
+    static StdReturnType readRegisters(byte Register, byte* Values, byte Length);
+    static StdReturnType writeRegisters(byte Register, const byte* Values, byte Length);
+    static StdReturnType clearOscillatorStopped();
+    static bool hasOscillatorStopped();
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S

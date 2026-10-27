@@ -121,6 +121,9 @@ void Twi::init()
 } /* init */
 
 
+/* Not const, though nothing here writes a member: these drive the hardware, and a
+   const would say they change nothing. */
+// NOLINTBEGIN(readability-make-member-function-const)
 /******************************************************************************************************************************************************
   write()
 ******************************************************************************************************************************************************/
@@ -180,6 +183,7 @@ StdReturnType Twi::read(byte Address, byte* Data, byte Length)
     TWI_PERIPHERAL.MCTRLB = TWI_ACKACT_NACK_gc | TWI_MCMD_STOP_gc;
     return E_OK;
 } /* read */
+// NOLINTEND(readability-make-member-function-const)
 
 
 /******************************************************************************************************************************************************

@@ -133,7 +133,7 @@ class Pixels
     StdReturnType clearPixel(byte Index) { return setPixel(Index, 0, 0, 0); }
 
     // methods
-    bool isIndexValid(IndexType Index) const { return Index < PIXELS_NUMBER_OF_PIXELS; }
+    static constexpr bool isIndexValid(IndexType Index) { return Index < PIXELS_NUMBER_OF_PIXELS; }
     void init(byte sPin);
     void enablePixels() { setBrightness(255); }
     void disablePixels() { setBrightness(0); }

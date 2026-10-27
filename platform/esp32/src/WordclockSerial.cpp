@@ -29,6 +29,12 @@
  * P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
 
+/* Instance methods, though some of them read no member: they are the interface the
+   firmware core calls through getInstance(), and every backend - the simulator's
+   stand-ins included - offers it that way. Whether this backend's implementation
+   happens to need a member is its own detail, and answering the check would carry
+   that detail into the interface. */
+// NOLINTBEGIN(readability-convert-member-functions-to-static)
 /******************************************************************************************************************************************************
   begin()
 ******************************************************************************************************************************************************/
@@ -137,7 +143,8 @@ void WordclockSerial::print(int Number)
 {
     char Digits[12]{};
 
-    snprintf(Digits, sizeof(Digits), "%d", Number);
+    /* Ten digits and a sign are the most an int can print to; nothing to truncate. */
+    (void)snprintf(Digits, sizeof(Digits), "%d", Number);
     print(Digits);
 } /* print */
 
@@ -211,6 +218,7 @@ void WordclockSerial::flush()
 {
     WordclockPlatform::hardwarePort().flush();
 } /* flush */
+// NOLINTEND(readability-convert-member-functions-to-static)
 
 
 /******************************************************************************************************************************************************

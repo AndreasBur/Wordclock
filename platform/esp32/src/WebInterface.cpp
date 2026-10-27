@@ -194,11 +194,12 @@ esp_err_t sendUpdateResult(httpd_req_t* Request, bool Ok, const char* Reason)
 
     if(Ok) {
         httpd_resp_set_status(Request, "200 OK");
-        snprintf(Body, sizeof(Body), "{\"ok\":true}");
+        (void)snprintf(Body, sizeof(Body), "{\"ok\":true}");
     } else {
         httpd_resp_set_status(Request, "400 Bad Request");
-        /* %.120s, because errorString() is the framework's text and the buffer is ours. */
-        snprintf(Body, sizeof(Body), "{\"ok\":false,\"error\":\"%.120s\"}", Reason);
+        /* %.120s, because errorString() is the framework's text and the buffer is ours - and
+           with it the answer cannot be cut short, so the length snprintf returns says nothing. */
+        (void)snprintf(Body, sizeof(Body), "{\"ok\":false,\"error\":\"%.120s\"}", Reason);
         Serial.print(F("Web: update refused - "));
         Serial.println(Reason);
     }
@@ -393,6 +394,12 @@ void onSocketClosed(httpd_handle_t, int Descriptor)
  * P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
 
+/* Instance methods, though some of them read no member: they are the interface the
+   firmware core calls through getInstance(), and every backend - the simulator's
+   stand-ins included - offers it that way. Whether this backend's implementation
+   happens to need a member is its own detail, and answering the check would carry
+   that detail into the interface. */
+// NOLINTBEGIN(readability-convert-member-functions-to-static)
 /******************************************************************************************************************************************************
   begin()
 ******************************************************************************************************************************************************/
@@ -601,6 +608,7 @@ void WebInterface::onClientClosed(int Descriptor)
         }
     }
 } /* onClientClosed */
+// NOLINTEND(readability-convert-member-functions-to-static)
 
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E

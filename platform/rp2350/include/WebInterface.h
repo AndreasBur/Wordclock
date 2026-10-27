@@ -95,7 +95,9 @@ class WebInterface
 
     /* For the socket callback, which runs in the network stack's context rather than the
        firmware's tick. Only the force flag is touched from there; who is connected is the
-       socket's own business. */
+       socket's own business. An instance method like the rest of this interface, for the
+       reason WebInterface.cpp gives. */
+    // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
     void onClientOpened() { WebFrontend::getInstance().onClientOpened(); }
 };
 
