@@ -36,6 +36,7 @@
 int main()
 {
     testColourDimmingAcrossByteRange();
+    testGammaCorrectionCurve();
     testSnakeLifetime();
     testDisplayManagerLatch();
     testShowNowProcedures();

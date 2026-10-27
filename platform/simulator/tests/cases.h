@@ -10,6 +10,7 @@
 
 /* display_test.cpp */
 void testColourDimmingAcrossByteRange();
+void testGammaCorrectionCurve();
 void testDisplayManagerLatch();
 void testFadeDimsAndComesBack();
 void testDisplayOffAndOnAgain();
