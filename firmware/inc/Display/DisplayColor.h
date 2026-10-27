@@ -74,7 +74,13 @@ class DisplayColor
 
     // functions
 #if (DISPLAY_COLOR_SUPPORT_DIMMING == STD_ON)
+    /* Never rounds a channel the colour has down to nothing: a lit word whose channels all
+       reached 0 would read as unlit at a low brightness. A channel the colour does not have
+       is the other way round - lifting it to 1 like the rest put a trace of green and blue
+       into a pure red, which is a different colour rather than a dimmer one. */
     static constexpr byte dimmColor(byte Color, byte Brightness) {
+        if(Color == 0u) { return 0u; }
+
         /* One operand widened before the multiply: two bytes promote to a signed 16-bit
            int on the AVR, and 255 * 255 does not fit in one. */
         const byte DimmedColor = (static_cast<uint16_t>(Color) * Brightness) >> 8u;

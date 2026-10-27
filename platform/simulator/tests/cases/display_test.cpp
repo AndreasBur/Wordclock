@@ -27,13 +27,23 @@ void testColourDimmingAcrossByteRange()
         for(unsigned brightness = 0u; brightness <= 255u; ++brightness) {
             color.dimmColors(brightness);
             const uint32_t scaled = (static_cast<uint32_t>(channel) * brightness) / 256u;
-            const byte expected = scaled == 0u ? 1u : static_cast<byte>(scaled);
+            const byte expected = (channel == 0u) ? 0u : ((scaled == 0u) ? 1u : static_cast<byte>(scaled));
             allMatch = allMatch && color.getColorRedDimmed() == expected
                 && color.getColorGreenDimmed() == expected && color.getColorBlueDimmed() == expected;
         }
     }
     expect(allMatch, "dimming must scale every byte pair without overflow and retain the minimum level");
     expect(color.getColorRed() == 255u, "dimming must preserve the configured colour");
+
+    /* The case the loop above walks only on the diagonal: a colour with a channel at 0. */
+    color.setColor(Pixel(255u, 0u, 0u));
+    color.dimmColors(0u);
+    expect(color.getColorRedDimmed() == 1u, "a pure red at the lowest brightness must keep its red at the minimum");
+    expect(color.getColorGreenDimmed() == 0u && color.getColorBlueDimmed() == 0u,
+           "and must not gain the green and blue it does not have");
+    color.dimmColors(128u);
+    expect(color.getColorGreenDimmed() == 0u && color.getColorBlueDimmed() == 0u,
+           "at any brightness");
 }
 
 /* How much light the whole display is putting out, which is what a fade changes and a
