@@ -75,9 +75,19 @@ build with a message saying so rather than silently skipping `gh`.
 `gh auth login` has to run **in a terminal** — the browser and device flows both
 need to prompt.
 
-`gh` is pointed at `github.com` by the shared feature. The internal base image
-sets `GH_HOST` to the company's own GitHub, and every call for this repository
+`gh` is pointed at `github.com` by the shared feature. An internal base image may
+set `GH_HOST` to the company's own GitHub, and every call for this repository
 would otherwise answer `HTTP 401` against a host that has never heard of it.
+
+On such an image the shared feature's `containerEnv` is not enough: the VS Code
+server already starts with the image's value, so every terminal inherits it — the
+shells' own startup files are not what overrides it. A site-specific variant (see
+below) built on that image therefore repeats the setting as `remoteEnv`, which VS
+Code applies last:
+
+```jsonc
+"remoteEnv": { "GH_HOST": "github.com" }
+```
 
 Which protocol to pick for Git operations depends on the network, and both fail
 in ways that do not name the cause — see below.
