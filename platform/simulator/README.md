@@ -27,7 +27,10 @@ everything about layout, wording and what a control does is now one binary away.
 
 [src/WebHost.cpp](src/WebHost.cpp) is the server, and it is written out rather than pulled in:
 a desktop build has no framework to ask for one, and what a browser needs is a socket, a
-little HTTP and RFC 6455's handshake. Three things about it are deliberate:
+little HTTP and RFC 6455's handshake. The protocol half - handshake, frames, and the SHA-1
+and base64 the handshake needs - is [src/WebSocket.cpp](src/WebSocket.cpp), on strings only,
+so that the tests check it byte for byte without a socket. Three things about the server are
+deliberate:
 
 - **It is polled from the wxTimer, not run in a thread.** Both hardware backends give their
   server a task of its own and pay for it with a lock-free buffer to the firmware. Here

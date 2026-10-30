@@ -85,4 +85,10 @@ void testCurrentLimitDoesNotSwitchTheDisplayOn();
 void testPersistence();
 void testPersistenceSaveAndReset();
 
+/* websocket_test.cpp */
+void testWebSocketHashAndEncoding();
+void testWebSocketHandshake();
+void testWebSocketEncodesBothLengths();
+void testWebSocketDecodesWhatABrowserSends();
+
 #endif // _CASES_H_
