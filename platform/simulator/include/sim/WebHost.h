@@ -74,6 +74,8 @@ class WebHost
     static constexpr int Backlog{4};
     static constexpr size_t RequestChunkLength{4096u};
     static constexpr size_t FrameChunkLength{2048u};
+    static constexpr unsigned RequestTimeoutMs{100u};
+    static constexpr unsigned BodyTimeoutMs{2000u};
     static constexpr char WebSocketPath[]{"/ws"};
     static constexpr char UpdateRequestLine[]{"POST /update "};
     static constexpr char LengthHeader[]{"content-length:"};
@@ -103,6 +105,8 @@ class WebHost
     static size_t getArrivedBodyLength(const std::string&);
     static size_t drainBody(SocketType, size_t, size_t);
     static void setNonBlocking(SocketType);
+    static void setBlocking(SocketType);
+    static void setReceiveTimeout(SocketType, unsigned);
     static bool sendAll(SocketType, const char*, size_t);
     static void sendLineToClients(const char*);
 
