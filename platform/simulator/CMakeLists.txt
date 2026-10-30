@@ -125,9 +125,14 @@ target_compile_definitions(WordclockBuildSettings INTERFACE ${PIXELS_DEFINE})
 # host process behind them.
 target_compile_definitions(WordclockBuildSettings INTERFACE WEB_FRONTEND_SUPPORT=STD_ON)
 
-# Winsock, which is not linked by default the way the POSIX sockets are.
+# Winsock, which is not linked by default the way the POSIX sockets are. And the lean
+# windows.h, because the full one brings the RPC headers, whose `boolean` is an unsigned char
+# where arduino/Types.h has already made it a bool - WebHost.cpp included both and did not
+# compile. Set here rather than above the include in that file, so that it holds wherever
+# windows.h is first reached from.
 if(WIN32)
     target_link_libraries(WordclockBuildSettings INTERFACE ws2_32)
+    target_compile_definitions(WordclockBuildSettings INTERFACE WIN32_LEAN_AND_MEAN)
 endif()
 target_link_libraries(WordclockBuildSettings INTERFACE ${wxWidgets_LIBRARIES})
 
