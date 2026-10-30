@@ -90,6 +90,8 @@ int main()
     testWebSocketHandshake();
     testWebSocketEncodesBothLengths();
     testWebSocketDecodesWhatABrowserSends();
+    /* Last, because it hands the output lines to the host for the rest of the run. */
+    testWebHostOutlastsAnIdleConnection();
 
     if(Failures == 0) {
         std::cout << "All Wordclock tests passed.\n";

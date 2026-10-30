@@ -43,6 +43,7 @@
 # include <netinet/tcp.h>
 # include <poll.h>
 # include <sys/socket.h>
+# include <sys/time.h>
 # include <unistd.h>
 # define closeSocket close
 #endif
@@ -319,11 +320,13 @@ void WebHost::dropClient(size_t Slot)
 ******************************************************************************************************************************************************/
 bool WebHost::serveConnection(SocketType Socket)
 {
+    setReceiveTimeout(Socket, RequestTimeoutMs);
     const std::string Request = readRequest(Socket);
     if(Request.empty()) { return false; }
 
     const size_t Announced = isUpdateRequest(Request) ? getAnnouncedLength(Request) : 0u;
     if(Announced > 0u) {
+        setReceiveTimeout(Socket, BodyTimeoutMs);
         answerUpdate(Socket, drainBody(Socket, getArrivedBodyLength(Request), Announced));
         return false;
     }
@@ -479,8 +482,13 @@ WebHost::SocketType WebHost::openListener()
   readRequest()
 ******************************************************************************************************************************************************/
 /*! \brief          Reads an HTTP request up to the blank line after its headers
- *  \details        Read here and now. It is one packet on loopback, and a browser that sends
- *                  half a request and stops is a case this tool need not survive gracefully.
+ *  \details        Read here and now, because it is one packet on loopback - but never waited
+ *                  for without end. A connection that is opened and says nothing is not a
+ *                  broken browser but an ordinary one opening a socket ahead of the request
+ *                  it may never make, and every recv() here blocks the firmware's tick, so
+ *                  such a socket used to stop the window and every other client until the
+ *                  browser closed it. The receive timeout set before this call is what ends
+ *                  the wait; what has arrived by then is all there is.
  *
  *  \param[in]      Socket          the new connection
  *  \return         the request, or what arrived of it before the connection closed
@@ -581,7 +589,11 @@ size_t WebHost::getArrivedBodyLength(const std::string& Request)
 ******************************************************************************************************************************************************/
 /*! \brief          Reads the rest of a body and throws it away
  *  \details        Drained rather than parsed: what the panel needs answered is how much of it
- *                  turned up.
+ *                  turned up. Under its own, longer receive timeout than the request: an
+ *                  upload that has started may pause between packets on its way through a
+ *                  forwarded port, and cutting it short answers "too small" for an image
+ *                  that was not - while one that announced more than it sends must still
+ *                  not hold the tick for good.
  *
  *  \param[in]      Socket          the connection
  *  \param[in]      Received        what has arrived of the body so far
@@ -620,6 +632,31 @@ void WebHost::setNonBlocking(SocketType Socket)
     fcntl(Socket, F_SETFL, fcntl(Socket, F_GETFL, 0) | O_NONBLOCK);
 #endif
 } /* setNonBlocking */
+
+
+/******************************************************************************************************************************************************
+  setReceiveTimeout()
+******************************************************************************************************************************************************/
+/*! \brief          Lets recv() on a blocking socket give up after a while
+ *  \details        A timeout on the socket rather than a select() before every recv(): the
+ *                  read loops already end on a recv() that returns nothing, so they need no
+ *                  change to end on one that waited long enough.
+ *
+ *  \param[in]      Socket          the connection
+ *  \param[in]      Milliseconds    how long one recv() may wait for the next bytes
+ *  \return         -
+******************************************************************************************************************************************************/
+void WebHost::setReceiveTimeout(SocketType Socket, unsigned Milliseconds)
+{
+#ifdef _WIN32
+    const DWORD Timeout{Milliseconds};
+#else
+    timeval Timeout{};
+    Timeout.tv_sec = static_cast<time_t>(Milliseconds / 1000u);
+    Timeout.tv_usec = static_cast<suseconds_t>((Milliseconds % 1000u) * 1000u);
+#endif
+    setsockopt(Socket, SOL_SOCKET, SO_RCVTIMEO, reinterpret_cast<const char*>(&Timeout), sizeof(Timeout));
+} /* setReceiveTimeout */
 
 
 /******************************************************************************************************************************************************

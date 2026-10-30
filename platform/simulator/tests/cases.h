@@ -91,4 +91,7 @@ void testWebSocketHandshake();
 void testWebSocketEncodesBothLengths();
 void testWebSocketDecodesWhatABrowserSends();
 
+/* webhost_test.cpp */
+void testWebHostOutlastsAnIdleConnection();
+
 #endif // _CASES_H_
