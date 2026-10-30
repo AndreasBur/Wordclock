@@ -40,6 +40,8 @@
 #include "StandardTypes.h"
 
 #include <stddef.h>
+#include <stdint.h>
+#include <string>
 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
@@ -56,6 +58,57 @@
 ******************************************************************************************************************************************************/
 class WebHost
 {
+/******************************************************************************************************************************************************
+ *  P R I V A T E   D A T A   A N D   F U N C T I O N S
+******************************************************************************************************************************************************/
+  private:
+#ifdef _WIN32
+    /* What winsock2.h calls SOCKET, spelled out so that this header need not include it. */
+    using SocketType = uintptr_t;
+    static constexpr SocketType InvalidSocket{~SocketType{0u}};
+#else
+    using SocketType = int;
+    static constexpr SocketType InvalidSocket{-1};
+#endif
+
+    static constexpr int Backlog{4};
+    static constexpr size_t RequestChunkLength{4096u};
+    static constexpr size_t FrameChunkLength{2048u};
+    static constexpr char WebSocketPath[]{"/ws"};
+    static constexpr char UpdateRequestLine[]{"POST /update "};
+    static constexpr char LengthHeader[]{"content-length:"};
+
+    /* A slot holds a connection that has finished its handshake and is being broadcast to.
+       Anything before that is a request being read and is gone by the end of the tick that
+       read it. */
+    SocketType Listener{InvalidSocket};
+    SocketType Clients[WEB_HOST_MAX_CLIENTS];
+    std::string Pending[WEB_HOST_MAX_CLIENTS];
+
+    WebHost();
+
+    void acceptClients();
+    void readClient(size_t);
+    size_t findFreeSlot() const;
+    void dropClient(size_t);
+    static bool serveConnection(SocketType);
+    static bool answerRequest(SocketType, const std::string&);
+    static void answerUpdate(SocketType, size_t);
+    static StdReturnType sendAsset(SocketType, const std::string&);
+    static SocketType openListener();
+    static std::string readRequest(SocketType);
+    static StdReturnType getPath(const std::string&, std::string&);
+    static bool isUpdateRequest(const std::string&);
+    static size_t getAnnouncedLength(const std::string&);
+    static size_t getArrivedBodyLength(const std::string&);
+    static size_t drainBody(SocketType, size_t, size_t);
+    static void setNonBlocking(SocketType);
+    static bool sendAll(SocketType, const char*, size_t);
+    static void sendLineToClients(const char*);
+
+/******************************************************************************************************************************************************
+ *  P U B L I C   F U N C T I O N S
+******************************************************************************************************************************************************/
   public:
     static WebHost& getInstance();
 
@@ -74,6 +127,10 @@ class WebHost
     bool isListening() const;
     bool hasClients() const;
     void sendToEveryClient(bool IsBinary, const char* Payload, size_t Length);
+
+    /* What WebResponseBody is implemented in terms of. */
+    static void sendResponse(SocketType Socket, const char* Status, const char* ContentType,
+                             const char* Body, size_t Length, bool IsGzipped);
 };
 
 #endif // _WEB_HOST_H_

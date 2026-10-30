@@ -68,7 +68,8 @@ set(SHIM_SOURCES
     src/MessageDecoder.cpp
     src/SerialShim.cpp
     src/Storage.cpp
-    src/WebHost.cpp)
+    src/WebHost.cpp
+    src/WebSocket.cpp)
 
 # On Linux and macOS the window icon comes from the XPM array rather than from a resource file,
 # which is what PIXELS gates in src/PixelsFrame.cpp - Windows takes the .ico instead.

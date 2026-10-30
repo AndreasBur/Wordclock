@@ -86,6 +86,10 @@ int main()
     testCurrentLimitDoesNotSwitchTheDisplayOn();
     testPersistence();
     testPersistenceSaveAndReset();
+    testWebSocketHashAndEncoding();
+    testWebSocketHandshake();
+    testWebSocketEncodesBothLengths();
+    testWebSocketDecodesWhatABrowserSends();
 
     if(Failures == 0) {
         std::cout << "All Wordclock tests passed.\n";
