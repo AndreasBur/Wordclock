@@ -320,6 +320,7 @@ void WebHost::dropClient(size_t Slot)
 ******************************************************************************************************************************************************/
 bool WebHost::serveConnection(SocketType Socket)
 {
+    setBlocking(Socket);
     setReceiveTimeout(Socket, RequestTimeoutMs);
     const std::string Request = readRequest(Socket);
     if(Request.empty()) { return false; }
@@ -632,6 +633,31 @@ void WebHost::setNonBlocking(SocketType Socket)
     fcntl(Socket, F_SETFL, fcntl(Socket, F_GETFL, 0) | O_NONBLOCK);
 #endif
 } /* setNonBlocking */
+
+
+/******************************************************************************************************************************************************
+  setBlocking()
+******************************************************************************************************************************************************/
+/*! \brief          Lets a socket wait for its bytes
+ *  \details        For a connection fresh from accept(), which on Windows has the listener's
+ *                  properties - non-blocking among them - and on Linux has not. Left as it
+ *                  came, it made the first recv() on Windows fail at once whenever the request
+ *                  was still on its way, and the connection was closed unanswered; and the
+ *                  receive timeout, which only a blocking socket heeds, would not have applied
+ *                  there at all. Said on both platforms, so that both read the same way.
+ *
+ *  \param[in]      Socket          the socket
+ *  \return         -
+******************************************************************************************************************************************************/
+void WebHost::setBlocking(SocketType Socket)
+{
+#ifdef _WIN32
+    u_long Mode{0u};
+    ioctlsocket(Socket, FIONBIO, &Mode);
+#else
+    fcntl(Socket, F_SETFL, fcntl(Socket, F_GETFL, 0) & ~O_NONBLOCK);
+#endif
+} /* setBlocking */
 
 
 /******************************************************************************************************************************************************

@@ -105,6 +105,7 @@ class WebHost
     static size_t getArrivedBodyLength(const std::string&);
     static size_t drainBody(SocketType, size_t, size_t);
     static void setNonBlocking(SocketType);
+    static void setBlocking(SocketType);
     static void setReceiveTimeout(SocketType, unsigned);
     static bool sendAll(SocketType, const char*, size_t);
     static void sendLineToClients(const char*);
