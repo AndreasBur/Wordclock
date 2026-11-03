@@ -1,4 +1,4 @@
-/* What Pixels::render() puts on the wire, checked against a captured transfer. The DMA
+/* What Pixels::Render() puts on the wire, checked against a captured transfer. The DMA
    call is stubbed here rather than in pio_stubs.cpp because this test has to keep the frame
    the driver handed over - the shared stub throws it away.
 

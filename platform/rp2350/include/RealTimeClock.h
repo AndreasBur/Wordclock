@@ -21,7 +21,7 @@
  *                  reads, and no seconds are counted here.
  *
  *                  Nothing survives a power cut: the system clock starts at the epoch
- *                  and stays there until the first SNTP answer arrives. isSystemTimeSet()
+ *                  and stays there until the first SNTP answer arrives. IsSystemTimeSet()
  *                  is what tells the two states apart.
  *
 ******************************************************************************************************************************************************/
@@ -114,12 +114,12 @@ class RealTimeClock
     ClockDate GetDate() const { return date_time_.GetDate(); }
 
     /* Whether the system clock has been set at all, by SNTP or by a command. Until it
-       has, task() leaves the date and time at their defaults rather than handing the
+       has, Task() leaves the date and time at their defaults rather than handing the
        display the epoch, which ClockDate would reject anyway. */
     static bool IsSystemTimeSet();
 
     // set methods
-    /* Written through to the system clock, not just stored: task() reads the system
+    /* Written through to the system clock, not just stored: Task() reads the system
        clock back on the very next tick, so a value kept only here would be overwritten
        within 10 ms and the "time" command would look like it did nothing. */
     void SetDateTime(ClockDateTime date_time);

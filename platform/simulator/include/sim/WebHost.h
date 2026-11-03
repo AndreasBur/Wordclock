@@ -19,7 +19,7 @@
  *
  *                  **Polled, not threaded.** Every backend on hardware runs its server in a
  *                  task of its own and pays for that with a lock-free buffer between the two.
- *                  Here task() is called from the same wxTimer that ticks the firmware, so a
+ *                  Here Task() is called from the same wxTimer that ticks the firmware, so a
  *                  browser's command is injected on the thread that reads it and a frame goes
  *                  out on the thread that gathered it. No second thread, and therefore nothing
  *                  to make thread-safe - which is what lets the port stay a wxString.
@@ -116,7 +116,7 @@ class WebHost
   public:
     static WebHost& GetInstance();
 
-    /* Opens the listening socket and takes over the output lines. Answers E_NOT_OK when the
+    /* Opens the listening socket and takes over the output lines. Answers kENotOk when the
        port is taken, which leaves the simulator running exactly as it did before - a window
        and no browsers, which is what it was until now. */
     StdReturnType Begin();

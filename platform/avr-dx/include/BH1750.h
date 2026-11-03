@@ -11,11 +11,11 @@
 /**     \file       BH1750.h
  *      \brief      The ambient-light sensor the display dims itself by
  *
- *      \details    Sets itself up from its first task() rather than from an init() call: the
+ *      \details    Sets itself up from its first Task() rather than from an Init() call: the
  *                  core keeps its sensor private and never calls one, so a driver that waited
  *                  to be initialised would never measure anything. The attempt is repeated on
  *                  every task, which also picks up a sensor that was not answering earlier -
- *                  and, through ReadFailuresBeforeReinit, one that stops answering later.
+ *                  and, through kReadFailuresBeforeReinit, one that stops answering later.
  *
  *                  The bus is shared with the clock chip, and neither driver owns it - see
  *                  Twi.h.
@@ -39,7 +39,7 @@
 #define BH1750_I2C_ADDR_ALTERNATIVE                     0x5Cu
 
 /* In scheduler ticks, so 100 * 10 ms = 1 s between readings. Has to stay well above the
-   120 ms a high-resolution conversion takes, or task() reads a measurement that is not
+   120 ms a high-resolution conversion takes, or Task() reads a measurement that is not
    finished yet. */
 #define BH1750_TASK_CYCLE                               100u
 #define BH1750_DEFAULT_MODE                             kModeContinuousHighResMode
@@ -117,8 +117,8 @@ class BH1750
   private:
     static constexpr byte kTaskCycle{BH1750_TASK_CYCLE};
     /* Readings in a row that may fail before the driver sets the sensor up again, so five
-       seconds at TaskCycle. Long enough that one disturbed transfer keeps the last value,
-       which is what readIlluminance() is written for, and short enough that a sensor which
+       seconds at task_cycle_. Long enough that one disturbed transfer keeps the last value,
+       which is what ReadIlluminance() is written for, and short enough that a sensor which
        came back is picked up while the room still looks the same. */
     static constexpr byte kReadFailuresBeforeReinit{5u};
     /* The count means half a lux in the two mode 2 variants rather than a whole one, so a
@@ -138,7 +138,7 @@ class BH1750
     void SendModeForOneTimeMode();
     static StdReturnType SendCommand(byte);
     StdReturnType SendMode() { return SendCommand(mode_); }
-    /* Both halves of what task() checks before it reads: a bus that was opened, and a mode
+    /* Both halves of what Task() checks before it reads: a bus that was opened, and a mode
        the sensor acknowledged. Clearing either one puts the set-up back on the next run. */
     bool IsReady() const { return bus_started_ && (mode_ != kModeNone); }
 
@@ -166,10 +166,10 @@ class BH1750
         return (mode_ == kModeOneTimeHighResMode) || (mode_ == kModeOneTimeHighResMode2) || (mode_ == kModeOneTimeLowResMode);
     }
 
-    /* One dropped reading keeps the last value on purpose - see readIlluminance(). A sensor
+    /* One dropped reading keeps the last value on purpose - see ReadIlluminance(). A sensor
        that stops answering altogether is the other case: that value would otherwise stand
        for good and the automatic would follow a room it can no longer see. Enough failures
-       therefore drop the mode, which is what puts task() back to setting the sensor up. */
+       therefore drop the mode, which is what puts Task() back to setting the sensor up. */
     void CountReadFailure() {
         if(++read_failures_ < kReadFailuresBeforeReinit) { return; }
         read_failures_ = 0u;

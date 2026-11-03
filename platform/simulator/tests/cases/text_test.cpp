@@ -14,7 +14,7 @@
 #include "Text.h"
 
 /* Which characters the text overlay can draw, checked through the one entry point that
-   says so: setChar() refuses what it cannot map to a glyph.
+   says so: SetChar() refuses what it cannot map to a glyph.
    The font tables hold 103 entries - ASCII 0x20 to 0x7F, then the six umlauts and the
    degree sign - and the conversion used to check only the lower bound. Where char is unsigned, which is what AVR
    makes it, every other Latin-1 byte passed that check and indexed past the end of the
@@ -104,7 +104,7 @@ void TestCharacterToGlyphMapping()
 }
 
 
-/* The scrolling path draws every character, including the ones setChar() refuses. It used
+/* The scrolling path draws every character, including the ones SetChar() refuses. It used
    to reach a second entry point that substituted the space silently; there is one entry
    point now, so the substitution is where the scrolling task can be read to make it -
    and it has to keep happening, because the space is the blank glyph and drawing it is

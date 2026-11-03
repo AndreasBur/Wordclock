@@ -38,7 +38,7 @@
 ******************************************************************************************************************************************************/
 namespace {
 
-/* Named HttpServer rather than Server: the Arduino core has a class Server in the global
+/* Named http_server rather than Server: the Arduino core has a class Server in the global
    namespace, and an unqualified Server here is then ambiguous. */
 httpd_handle_t http_server{nullptr};
 
@@ -54,7 +54,7 @@ constexpr int kNoClient{-1};
    the same reasoning as for WordclockSerial's ring buffer.
 
    Reached through a function rather than left as an object with static storage duration,
-   because the slots start at NoClient and not at zero, and zero is a descriptor a socket can
+   because the slots start at kNoClient and not at zero, and zero is a descriptor a socket can
    actually be given. Initialising on first use is also what the singleton it used to live on
    did. */
 struct ClientTableType {
@@ -102,7 +102,7 @@ void SendLineToClients(const char* line)
  *  LOCAL FUNCTIONS
 ******************************************************************************************************************************************************/
 /******************************************************************************************************************************************************
-  isRequestAuthorised()
+  IsRequestAuthorised()
 ******************************************************************************************************************************************************/
 /*! \brief          Whether this request may be answered, and the 401 when it may not
  *
@@ -149,7 +149,7 @@ bool IsRequestAuthorised(httpd_req_t* request)
 
 
 /******************************************************************************************************************************************************
-  handleAsset()
+  HandleAsset()
 ******************************************************************************************************************************************************/
 /*! \brief          Serves one of the files the clock hands out unchanged
  *
@@ -177,7 +177,7 @@ esp_err_t HandleAsset(httpd_req_t* request)
 
 
 /******************************************************************************************************************************************************
-  sendUpdateResult()
+  SendUpdateResult()
 ******************************************************************************************************************************************************/
 /*! \brief          Answers the update route, in the one shape the page reads
  *  \details        JSON like the other two routes that answer data, and the HTTP status set
@@ -209,7 +209,7 @@ esp_err_t SendUpdateResult(httpd_req_t* request, bool ok, const char* reason)
 
 
 /******************************************************************************************************************************************************
-  handleUpdate()
+  HandleUpdate()
 ******************************************************************************************************************************************************/
 /*! \brief          Takes a new firmware image over HTTP and reboots into it
  *
@@ -230,7 +230,7 @@ esp_err_t SendUpdateResult(httpd_req_t* request, bool ok, const char* reason)
  *                  The reboot is asked for and not carried out: this handler's answer is
  *                  still in the server's buffer, and a controller that restarts here sends
  *                  the browser nothing at all - which reads as a failed update rather than
- *                  a finished one. System::restart() already defers to the application's
+ *                  a finished one. System::Restart() already defers to the application's
  *                  tick for exactly this reason, so it is what carries it out.
 ******************************************************************************************************************************************************/
 esp_err_t HandleUpdate(httpd_req_t* request)
@@ -286,7 +286,7 @@ esp_err_t HandleUpdate(httpd_req_t* request)
 
 
 /******************************************************************************************************************************************************
-  handleCommands() / handleDisplay()
+  HandleCommands() / HandleDisplay()
 ******************************************************************************************************************************************************/
 /*! \brief          Serves the command catalog and the panel's letters
  *
@@ -323,10 +323,10 @@ esp_err_t HandleDisplay(httpd_req_t* request)
 
 
 /******************************************************************************************************************************************************
-  handleSocket()
+  HandleSocket()
 ******************************************************************************************************************************************************/
 /*! \brief          Takes one web socket frame and injects it as typed characters
- *  \details        A GET is the handshake, and returning E_OK from it is what completes the
+ *  \details        A GET is the handshake, and returning kEOk from it is what completes the
  *                  upgrade - the frame handling below only ever sees later requests.
  *
  *                  The command is injected followed by the end-of-message character, unless
@@ -375,7 +375,7 @@ esp_err_t HandleSocket(httpd_req_t* request)
 
 
 /******************************************************************************************************************************************************
-  onSocketClosed()
+  OnSocketClosed()
 ******************************************************************************************************************************************************/
 /*! \brief          Drops a client the server has finished with
  *  \details        Registered as the server's close hook rather than guessed from a failing
@@ -395,17 +395,17 @@ void OnSocketClosed(httpd_handle_t, int descriptor)
 ******************************************************************************************************************************************************/
 
 /* Instance methods, though some of them read no member: they are the interface the
-   firmware core calls through getInstance(), and every backend - the simulator's
+   firmware core calls through GetInstance(), and every backend - the simulator's
    stand-ins included - offers it that way. Whether this backend's implementation
    happens to need a member is its own detail, and answering the check would carry
    that detail into the interface. */
 // NOLINTBEGIN(readability-convert-member-functions-to-static)
 /******************************************************************************************************************************************************
-  begin()
+  Begin()
 ******************************************************************************************************************************************************/
 /*! \brief          Starts the server and takes over the output lines
  *
- *  \return         E_OK if the server is listening
+ *  \return         kEOk if the server is listening
 ******************************************************************************************************************************************************/
 StdReturnType WebInterface::Begin()
 {
@@ -469,38 +469,38 @@ StdReturnType WebInterface::Begin()
     }
 
     return kEOk;
-} /* begin */
+} /* Begin */
 
 
 /******************************************************************************************************************************************************
-  broadcastLine()
+  BroadcastLine()
 ******************************************************************************************************************************************************/
 /*! \brief          Sends one finished line to every open socket
  *  \details        The widening to UTF-8 and the bound on it are WebFrontend's, shared with
  *                  the other backend; what is this file's is the walk over the descriptors,
- *                  in sendText() below.
+ *                  in SendText() below.
 ******************************************************************************************************************************************************/
 void WebInterface::BroadcastLine(const char* line)
 {
     WebFrontend::GetInstance().BroadcastLine(line);
-} /* broadcastLine */
+} /* BroadcastLine */
 
 
 /******************************************************************************************************************************************************
-  broadcastFrame()
+  BroadcastFrame()
 ******************************************************************************************************************************************************/
 /*! \brief          Sends the pixel buffer to every open socket, when it changed
  *  \details        The rate limit, the gathering and the comparison against the last frame
  *                  are WebFrontend's, shared with the other backend - none of the three has
  *                  anything to do with which server is underneath. What is this file's is
- *                  sendBinary() below.
+ *                  SendBinary() below.
  *
  *  \return         -
 ******************************************************************************************************************************************************/
 void WebInterface::BroadcastFrame()
 {
     WebFrontend::GetInstance().BroadcastFrame();
-} /* broadcastFrame */
+} /* BroadcastFrame */
 
 
 /******************************************************************************************************************************************************
@@ -566,7 +566,7 @@ void WebResponseBody::Finish()
 
 
 /******************************************************************************************************************************************************
-  onClientOpened()
+  OnClientOpened()
 ******************************************************************************************************************************************************/
 /*! \brief          Remembers a socket to broadcast to
  *  \details        A full table drops the newcomer rather than an established console, and
@@ -593,11 +593,11 @@ void WebInterface::OnClientOpened(int descriptor)
     }
 
     Serial.println(F("Web: too many consoles, this one gets no answers"));
-} /* onClientOpened */
+} /* OnClientOpened */
 
 
 /******************************************************************************************************************************************************
-  onClientClosed()
+  OnClientClosed()
 ******************************************************************************************************************************************************/
 void WebInterface::OnClientClosed(int descriptor)
 {
@@ -607,7 +607,7 @@ void WebInterface::OnClientClosed(int descriptor)
             return;
         }
     }
-} /* onClientClosed */
+} /* OnClientClosed */
 // NOLINTEND(readability-convert-member-functions-to-static)
 
 /******************************************************************************************************************************************************

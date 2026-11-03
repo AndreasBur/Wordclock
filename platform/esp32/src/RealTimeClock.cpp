@@ -130,7 +130,7 @@ void ToTm(const ClockDateTime& date_time, struct tm& local)
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  isSystemTimeSet()
+  IsSystemTimeSet()
 ******************************************************************************************************************************************************/
 /*! \brief          Tells whether the system clock holds a real date yet
  *  \details        Asked as "is the year one ClockDate accepts" rather than by querying
@@ -143,11 +143,11 @@ bool RealTimeClock::IsSystemTimeSet()
 {
     ClockDateTime unused;
     return ReadSystemDateTime(unused);
-} /* isSystemTimeSet */
+} /* IsSystemTimeSet */
 
 
 /******************************************************************************************************************************************************
-  setDateTime()
+  SetDateTime()
 ******************************************************************************************************************************************************/
 void RealTimeClock::SetDateTime(ClockDateTime date_time)
 {
@@ -157,33 +157,33 @@ void RealTimeClock::SetDateTime(ClockDateTime date_time)
        network, so the chip is written again on the next task rather than at the turn of
        the hour it would otherwise wait for. */
     hour_written_to_chip_ = kNoHourWritten;
-} /* setDateTime */
+} /* SetDateTime */
 
 
 /******************************************************************************************************************************************************
-  setTime()
+  SetTime()
 ******************************************************************************************************************************************************/
 void RealTimeClock::SetTime(ClockTime time)
 {
     ClockDateTime value = date_time_;
     value.SetTime(time);
     SetDateTime(value);
-} /* setTime */
+} /* SetTime */
 
 
 /******************************************************************************************************************************************************
-  setDate()
+  SetDate()
 ******************************************************************************************************************************************************/
 void RealTimeClock::SetDate(ClockDate date)
 {
     ClockDateTime value = date_time_;
     value.SetDate(date);
     SetDateTime(value);
-} /* setDate */
+} /* SetDate */
 
 
 /******************************************************************************************************************************************************
-  task()
+  Task()
 ******************************************************************************************************************************************************/
 /*! \brief          Takes the current local time from the system clock
  *  \details        Nothing is counted forward here, unlike on the simulator: SNTP keeps
@@ -210,7 +210,7 @@ void RealTimeClock::Task()
 
     date_time_ = current;
     WriteChip();
-} /* task */
+} /* Task */
 
 
 /******************************************************************************************************************************************************
@@ -218,7 +218,7 @@ void RealTimeClock::Task()
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  readSystemDateTime()
+  ReadSystemDateTime()
 ******************************************************************************************************************************************************/
 /*! \brief          Reads the system clock as local date and time
  *
@@ -234,11 +234,11 @@ bool RealTimeClock::ReadSystemDateTime(ClockDateTime& value)
 
     ToDateTime(local, value);
     return true;
-} /* readSystemDateTime */
+} /* ReadSystemDateTime */
 
 
 /******************************************************************************************************************************************************
-  readChip()
+  ReadChip()
 ******************************************************************************************************************************************************/
 /*! \brief          Puts what the clock chip kept into the system clock
  *  \details        Only ever called while the system clock holds nothing, so there is
@@ -246,7 +246,7 @@ bool RealTimeClock::ReadSystemDateTime(ClockDateTime& value)
  *                  second until it works, which is what picks up a chip that answers late -
  *                  and what keeps the retry off a bus the light sensor shares.
  *
- *  \return         E_OK if the chip had a time and the system clock took it
+ *  \return         kEOk if the chip had a time and the system clock took it
 ******************************************************************************************************************************************************/
 StdReturnType RealTimeClock::ReadChip()
 {
@@ -265,11 +265,11 @@ StdReturnType RealTimeClock::ReadChip()
        hour it belongs to is what the next write is measured against. */
     hour_written_to_chip_ = utc.GetTimeHour();
     return kEOk;
-} /* readChip */
+} /* ReadChip */
 
 
 /******************************************************************************************************************************************************
-  writeChip()
+  WriteChip()
 ******************************************************************************************************************************************************/
 /*! \brief          Keeps the clock chip in step with the system clock
  *  \details        Once an hour, and once more whenever the time was set by hand. Once an
@@ -293,15 +293,15 @@ void RealTimeClock::WriteChip()
 
     chip_.SetDateTime(utc);
     hour_written_to_chip_ = date_time_.GetTimeHour();
-} /* writeChip */
+} /* WriteChip */
 
 
 /******************************************************************************************************************************************************
-  writeSystemDateTime()
+  WriteSystemDateTime()
 ******************************************************************************************************************************************************/
 /*! \brief          Puts a date and time into the system clock
  *
- *  \return         E_OK if the system clock took the value
+ *  \return         kEOk if the system clock took the value
 ******************************************************************************************************************************************************/
 StdReturnType RealTimeClock::WriteSystemDateTime(const ClockDateTime& value)
 {
@@ -315,7 +315,7 @@ StdReturnType RealTimeClock::WriteSystemDateTime(const ClockDateTime& value)
     if(settimeofday(&time, nullptr) != 0) { return kENotOk; }
 
     return kEOk;
-} /* writeSystemDateTime */
+} /* WriteSystemDateTime */
 
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E

@@ -50,7 +50,7 @@ static bool IsBalancedJson(const std::string& text)
 
 /* Runs one route and hands back what it produced. The request owns its response, so it
    outlives neither - hence the copy out. */
-/* Whether the next fetch() arrives with a credential the library would accept. The library
+/* Whether the next Fetch() arrives with a credential the library would accept. The library
    does the comparing on the target, so what a case here decides is its answer. */
 static bool request_authorised = true;
 static bool authentication_was_requested = false;

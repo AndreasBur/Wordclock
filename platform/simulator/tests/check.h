@@ -1,6 +1,6 @@
 /* The assertion these tests share, its tally, and the fixtures more than one case needs.
 
-   Deliberately quiet on a pass, which is the opposite of the ESP32 tests' check() - and
+   Deliberately quiet on a pass, which is the opposite of the ESP32 tests' Check() - and
    for the reason given there: ctest wraps these and counts them, so a passing run has
    nothing to say, while nothing wraps the ESP32 binaries and a silent one would leave no
    evidence that anything ran.
@@ -68,7 +68,7 @@ inline bool IsAnyPixelLit(const PixelBufferType& pixels)
     return false;
 }
 
-/* What would reach the LEDs, which is not what readPixels() shows: that reads the buffer,
+/* What would reach the LEDs, which is not what ReadPixels() shows: that reads the buffer,
    and the brightness is folded in on the way out. The difference is the whole of what
    switching the display off does, so a test that asked the buffer would see nothing. */
 inline bool IsAnyOutputPixelLit()

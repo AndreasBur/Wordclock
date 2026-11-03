@@ -49,10 +49,10 @@ void AnimationExplodeWords::Init()
 {
     Animation::Init(kStateIdle);
     Reset();
-} /* init */
+} /* Init */
 
 /******************************************************************************************************************************************************
-  setTime()
+  SetTime()
 ******************************************************************************************************************************************************/
 StdReturnType AnimationExplodeWords::SetTime(byte hour, byte minute)
 {
@@ -64,16 +64,16 @@ StdReturnType AnimationExplodeWords::SetTime(byte hour, byte minute)
         else { state_ = kStateSetTime; }
     }
     return return_value;
-} /* setTime */
+} /* SetTime */
 
 /******************************************************************************************************************************************************
-  task()
+  Task()
 ******************************************************************************************************************************************************/
 void AnimationExplodeWords::Task()
 {
     if(state_ == kStateClearTime) ClearTimeTask();
     else if(state_ == kStateSetTime) SetTimeTask();
-} /* task */
+} /* Task */
 
 
 /******************************************************************************************************************************************************
@@ -81,7 +81,7 @@ void AnimationExplodeWords::Task()
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  reset()
+  Reset()
 ******************************************************************************************************************************************************/
 void AnimationExplodeWords::Reset()
 {
@@ -91,10 +91,10 @@ void AnimationExplodeWords::Reset()
     current_word_length_ = 0u;
     current_column_ = 0u;
     current_row_ = 0u;
-} /* reset */
+} /* Reset */
 
 /******************************************************************************************************************************************************
-  clearTimeTask()
+  ClearTimeTask()
 ******************************************************************************************************************************************************/
 void AnimationExplodeWords::ClearTimeTask()
 {
@@ -107,10 +107,10 @@ void AnimationExplodeWords::ClearTimeTask()
             state_ = kStateSetTime;
         }
     }
-} /* clearTimeTask */
+} /* ClearTimeTask */
 
 /******************************************************************************************************************************************************
-  setTimeTask()
+  SetTimeTask()
 ******************************************************************************************************************************************************/
 void AnimationExplodeWords::SetTimeTask()
 {
@@ -118,10 +118,10 @@ void AnimationExplodeWords::SetTimeTask()
         if(SetNextWordToSet() == kENotOk) { FinishWithClockWords(clock_words_table_); }
         else { ToggleWordOnDisplay(); }
     }
-} /* setTimeTask */
+} /* SetTimeTask */
 
 /******************************************************************************************************************************************************
-  shiftWord()
+  ShiftWord()
 ******************************************************************************************************************************************************/
 StdReturnType AnimationExplodeWords::ShiftWord(byte final_colum, byte final_row)
 {
@@ -134,30 +134,30 @@ StdReturnType AnimationExplodeWords::ShiftWord(byte final_colum, byte final_row)
     } else {
         return kENotOk;
     }
-} /* shiftWord */
+} /* ShiftWord */
 
 /******************************************************************************************************************************************************
-  toggleWordOnDisplay()
+  ToggleWordOnDisplay()
 ******************************************************************************************************************************************************/
 void AnimationExplodeWords::ToggleWordOnDisplay() const
 {
     for(byte column_index = current_column_; column_index < current_column_ + current_word_length_; column_index++) {
         Display::GetInstance().TogglePixel(column_index, current_row_);
     }
-} /* toggleWordOnDisplay */
+} /* ToggleWordOnDisplay */
 
 /******************************************************************************************************************************************************
-  setWordOnDisplay()
+  SetWordOnDisplay()
 ******************************************************************************************************************************************************/
 void AnimationExplodeWords::SetWordOnDisplay() const
 {
     for(byte column_index = current_column_; column_index < current_column_ + current_word_length_; column_index++) {
         Display::GetInstance().SetPixel(column_index, current_row_);
     }
-} /* setWordOnDisplay */
+} /* SetWordOnDisplay */
 
 /******************************************************************************************************************************************************
-  setNextWordToClear()
+  SetNextWordToClear()
 ******************************************************************************************************************************************************/
 StdReturnType AnimationExplodeWords::SetNextWordToClear()
 {
@@ -170,10 +170,10 @@ StdReturnType AnimationExplodeWords::SetNextWordToClear()
     } while(SetNextRowToClear() == kEOk);
 
     return kENotOk;
-} /* setNextWordToClear */
+} /* SetNextWordToClear */
 
 /******************************************************************************************************************************************************
-  setNextWordToClearInColumn()
+  SetNextWordToClearInColumn()
 ******************************************************************************************************************************************************/
 StdReturnType AnimationExplodeWords::SetNextWordToClearInColumn()
 {
@@ -185,7 +185,7 @@ StdReturnType AnimationExplodeWords::SetNextWordToClearInColumn()
         }
     }
     return kENotOk;
-} /* setNextWordToClearInColumn */
+} /* SetNextWordToClearInColumn */
 
 /******************************************************************************************************************************************************
   setRowNextToClear()
@@ -202,7 +202,7 @@ StdReturnType AnimationExplodeWords::SetNextRowToClear()
 } /* setRowNextToClear */
 
 /******************************************************************************************************************************************************
-  setNextWordToSet()
+  SetNextWordToSet()
 ******************************************************************************************************************************************************/
 StdReturnType AnimationExplodeWords::SetNextWordToSet()
 {
@@ -214,10 +214,10 @@ StdReturnType AnimationExplodeWords::SetNextWordToSet()
         }
     }
     return kENotOk;
-} /* setNextWordToSet */
+} /* SetNextWordToSet */
 
 /******************************************************************************************************************************************************
-  setWordToSet()
+  SetWordToSet()
 ******************************************************************************************************************************************************/
 void AnimationExplodeWords::SetWordToSet(DisplayWords::WordIdType word_id)
 {
@@ -225,20 +225,20 @@ void AnimationExplodeWords::SetWordToSet(DisplayWords::WordIdType word_id)
     current_word_length_ = words_.GetDisplayWordLength(word_id);
     current_column_ = GetClearFinalColumn();
     current_row_ = GetClearFinalRow();
-} /* setWordToSet */
+} /* SetWordToSet */
 
 /******************************************************************************************************************************************************
-  setWordIndex()
+  SetWordIndex()
 ******************************************************************************************************************************************************/
 void AnimationExplodeWords::SetWordIndex(DisplayWords::WordIdType word_id)
 {
     byte column = words_.GetDisplayWordColumn(word_id);
     byte row = words_.GetDisplayWordRow(word_id);
     current_word_index_ = Display::GetInstance().ColumnAndRowToIndex(column, row);
-} /* setWordIndex */
+} /* SetWordIndex */
 
 /******************************************************************************************************************************************************
-  setWordLength()
+  SetWordLength()
 ******************************************************************************************************************************************************/
 void AnimationExplodeWords::SetWordLength()
 {
@@ -251,7 +251,7 @@ void AnimationExplodeWords::SetWordLength()
             break;
         }
     }
-} /* setWordLength */
+} /* SetWordLength */
 
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E

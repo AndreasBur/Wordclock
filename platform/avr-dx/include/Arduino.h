@@ -88,7 +88,7 @@ using boolean = bool; // NOLINT(readability-identifier-naming)
    below is used, which is why main() calls it first. */
 void InitRuntime();
 
-/* Milliseconds since initRuntime(). Wraps after 49 days; every reader here takes a
+/* Milliseconds since InitRuntime(). Wraps after 49 days; every reader here takes a
    difference, which stays correct across the wrap as long as it is read more often than
    that. */
 uint32_t millis(); // NOLINT(readability-identifier-naming)
@@ -131,7 +131,7 @@ class SerialPort
     void begin(uint32_t baudrate); // NOLINT(readability-identifier-naming)
 
     /* The overload set is the simulator's, plus the flash-string one that F() needs.
-       byte and the smaller integers reach printNumber() through the int overload by
+       byte and the smaller integers reach PrintNumber() through the int overload by
        integral promotion, which is what makes a byte print as a number here and on the
        simulator alike rather than as a character. */
     void print(const __FlashStringHelper*); // NOLINT(readability-identifier-naming)

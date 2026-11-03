@@ -95,16 +95,16 @@ class System
        device that runs for months has to be watched for. */
     StdReturnType GetFreeMemoryInKibibytes(uint16_t&) const;
 
-    /* The address to type into a browser, into a buffer of AddressStringLength.
+    /* The address to type into a browser, into a buffer of kAddressStringLength.
        kENotOk while the clock has not joined a network, which is when there is none. */
     StdReturnType GetNetworkAddress(char*) const;
 
-    /* The received signal strength in dBm, into a buffer of LinkQualityStringLength. A
+    /* The received signal strength in dBm, into a buffer of kLinkQualityStringLength. A
        string rather than a number because it is negative, and the answer format carries
        unsigned values. */
     StdReturnType GetLinkQuality(char*) const;
 
-    /* The network the clock is configured for, into a buffer of SsidStringLength.
+    /* The network the clock is configured for, into a buffer of kSsidStringLength.
        kENotOk when there is none, which is what a clock that was never told answers - and
        what the access point stands in for. The pass phrase is deliberately not readable:
        it goes in and is never handed back out. */
@@ -150,7 +150,7 @@ class System
     void StartNetwork();
 
     /* Asks for a restart, which the application carries out on its next tick through
-       performPendingRestart(). Deferred rather than done here so that the answer to the
+       PerformPendingRestart(). Deferred rather than done here so that the answer to the
        command that asked for it still goes out. */
     StdReturnType Restart() { restart_pending_ = true; return kEOk; }
 

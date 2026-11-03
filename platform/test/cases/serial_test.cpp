@@ -69,7 +69,7 @@ int main()
     /* the real thing: an injected command must be parsed like a typed one */
     lines.clear();
     wordclock_platform::HardwarePort().Written.clear();
-    const char* command = "3 -B255\n";   /* terminated with EndOfMessageChar, as on the wire */
+    const char* command = "3 -B255\n";   /* terminated with kEndOfMessageChar, as on the wire */
     Check(port.Inject(command, strlen(command)) == kEOk, "a command fits the inject buffer");
     Communication& communication = Communication::GetInstance();
     communication.Task();                   /* reads the characters */

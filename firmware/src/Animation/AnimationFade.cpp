@@ -51,11 +51,11 @@ void AnimationFade::Init()
 {
     Animation::Init(kStateIdle);
     Reset();
-} /* init */
+} /* Init */
 
 
 /******************************************************************************************************************************************************
-  setTime()
+  SetTime()
 ******************************************************************************************************************************************************/
 StdReturnType AnimationFade::SetTime(byte hour, byte minute)
 {
@@ -71,17 +71,17 @@ StdReturnType AnimationFade::SetTime(byte hour, byte minute)
         return_value = kEOk;
     }
     return return_value;
-} /* setTime */
+} /* SetTime */
 
 
 /******************************************************************************************************************************************************
-  task()
+  Task()
 ******************************************************************************************************************************************************/
 void AnimationFade::Task()
 {
     if(state_ == kStateClearTime) { ClearTimeTask(); }
     else if(state_ == kStateSetTime) { SetTimeTask(); }
-} /* task */
+} /* Task */
 
 
 /******************************************************************************************************************************************************
@@ -89,10 +89,10 @@ void AnimationFade::Task()
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  reset()
+  Reset()
 ******************************************************************************************************************************************************/
 /*! \brief          Back to a display nobody is fading
- *  \details        Called from init(), which is also what an aborted animation goes
+ *  \details        Called from Init(), which is also what an aborted animation goes
  *                  through - a fade that was cut off half way would otherwise leave the
  *                  display dimmed with nothing left to undim it.
 ******************************************************************************************************************************************************/
@@ -102,11 +102,11 @@ void AnimationFade::Reset()
     hour_ = 0u;
     minute_ = 0u;
     Display::GetInstance().ClearBrightnessFade();
-} /* reset */
+} /* Reset */
 
 
 /******************************************************************************************************************************************************
-  clearTimeTask()
+  ClearTimeTask()
 ******************************************************************************************************************************************************/
 void AnimationFade::ClearTimeTask()
 {
@@ -116,11 +116,11 @@ void AnimationFade::ClearTimeTask()
     } else {
         SetStateToSetTime();
     }
-} /* clearTimeTask */
+} /* ClearTimeTask */
 
 
 /******************************************************************************************************************************************************
-  setTimeTask()
+  SetTimeTask()
 ******************************************************************************************************************************************************/
 void AnimationFade::SetTimeTask()
 {
@@ -129,16 +129,16 @@ void AnimationFade::SetTimeTask()
         Display::GetInstance().SetBrightnessFadeLevel(level_);
     } else {
         /* Cleared rather than left at full: a level that is set at all costs a comparison
-           on every applyBrightness(), and leaving it set would hide a fade that never
+           on every ApplyBrightness(), and leaving it set would hide a fade that never
            finished. */
         Display::GetInstance().ClearBrightnessFade();
         state_ = kStateIdle;
     }
-} /* setTimeTask */
+} /* SetTimeTask */
 
 
 /******************************************************************************************************************************************************
-  setStateToSetTime()
+  SetStateToSetTime()
 ******************************************************************************************************************************************************/
 /*! \brief          Swaps the time behind a display that is dark
  *  \details        The clear is what was missing: setting the new time writes its letters,
@@ -152,7 +152,7 @@ void AnimationFade::SetStateToSetTime()
     Display::GetInstance().Clear();
     Clock::GetInstance().SetTime(hour_, minute_);
     level_ = 0u;
-} /* setStateToSetTime */
+} /* SetStateToSetTime */
 
 
 /******************************************************************************************************************************************************

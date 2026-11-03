@@ -40,11 +40,11 @@ constexpr uint8_t kWireTransmissionSuccess{0u};
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  init()
+  Init()
 ******************************************************************************************************************************************************/
 /*! \brief          Opens the bus and puts the sensor into a measurement mode
  *
- *  \return         E_OK if the sensor acknowledged both commands
+ *  \return         kEOk if the sensor acknowledged both commands
 ******************************************************************************************************************************************************/
 StdReturnType BH1750::Init(ModeType mode)
 {
@@ -56,21 +56,21 @@ StdReturnType BH1750::Init(ModeType mode)
     if(SendCommand(BH1750_CMD_POWER_ON) == kENotOk) { return kENotOk; }
 
     return SetMode(mode);
-} /* init */
+} /* Init */
 
 
 /******************************************************************************************************************************************************
-  setMode()
+  SetMode()
 ******************************************************************************************************************************************************/
 /*! \brief          Puts the sensor into a measurement mode
  *  \details        Mode is assigned only once the sensor has acknowledged, because it is
- *                  also what isReady() reads to decide whether the sensor is set up.
+ *                  also what IsReady() reads to decide whether the sensor is set up.
  *                  Assigning first marks a sensor that never took the command as ready,
- *                  and the retry in task() then never runs again - which leaves the sensor
+ *                  and the retry in Task() then never runs again - which leaves the sensor
  *                  powered on but converting nothing, and every later reading is the empty
  *                  data register.
  *
- *  \return         E_OK if the sensor acknowledged the mode
+ *  \return         kEOk if the sensor acknowledged the mode
 ******************************************************************************************************************************************************/
 StdReturnType BH1750::SetMode(ModeType mode)
 {
@@ -80,18 +80,18 @@ StdReturnType BH1750::SetMode(ModeType mode)
 
     mode_ = mode;
     return kEOk;
-} /* setMode */
+} /* SetMode */
 
 
 /******************************************************************************************************************************************************
-  changeMeasurementTime()
+  ChangeMeasurementTime()
 ******************************************************************************************************************************************************/
 /*! \brief          Changes the sensor's measurement time register
  *  \details        The register is split over two commands, and in both of them the
  *                  value bits sit below the opcode bits - so the value is ORed in rather
  *                  than shifted into place.
  *
- *  \return         E_OK if the value was in range and the sensor took all three commands
+ *  \return         kEOk if the value was in range and the sensor took all three commands
 ******************************************************************************************************************************************************/
 StdReturnType BH1750::ChangeMeasurementTime(byte mt_reg_value)
 {
@@ -106,15 +106,15 @@ StdReturnType BH1750::ChangeMeasurementTime(byte mt_reg_value)
     if(SendMode() == kENotOk) { return kENotOk; }
 
     /* Kept last, and only once all three went through, because this is what
-       convertRawToLux() divides by: a value stored after a failed transfer would scale
+       ConvertRawToLux() divides by: a value stored after a failed transfer would scale
        every later reading by a measurement time the sensor is not using. */
     measurement_time_ = mt_reg_value;
     return kEOk;
-} /* changeMeasurementTime */
+} /* ChangeMeasurementTime */
 
 
 /******************************************************************************************************************************************************
-  task()
+  Task()
 ******************************************************************************************************************************************************/
 /*! \brief          Takes one reading from the sensor
  *  \details        Runs every BH1750_TASK_CYCLE ticks, so once a second. That is what
@@ -128,8 +128,8 @@ StdReturnType BH1750::ChangeMeasurementTime(byte mt_reg_value)
 ******************************************************************************************************************************************************/
 void BH1750::Task()
 {
-    /* Set up from here rather than from an init() call, and retried until it works: see
-       the file's header for why there is no place in the core to call init() from.
+    /* Set up from here rather than from an Init() call, and retried until it works: see
+       the file's header for why there is no place in the core to call Init() from.
        Nothing is read on the run that does it - the first high-resolution conversion needs
        120 ms and the data register reads zero until it is over, so reading on would hand
        the brightness automatic a darkness that was never measured. The next run is a
@@ -146,7 +146,7 @@ void BH1750::Task()
 
     read_failures_ = 0u;
     SendModeForOneTimeMode();
-} /* task */
+} /* Task */
 
 
 /******************************************************************************************************************************************************
@@ -154,11 +154,11 @@ void BH1750::Task()
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  startBus()
+  StartBus()
 ******************************************************************************************************************************************************/
 /*! \brief          Opens the I2C bus, once
  *
- *  \return         E_OK if the bus is available
+ *  \return         kEOk if the bus is available
 ******************************************************************************************************************************************************/
 StdReturnType BH1750::StartBus()
 {
@@ -168,19 +168,19 @@ StdReturnType BH1750::StartBus()
 
     bus_started_ = true;
     return kEOk;
-} /* startBus */
+} /* StartBus */
 
 
 /******************************************************************************************************************************************************
-  readIlluminance()
+  ReadIlluminance()
 ******************************************************************************************************************************************************/
 /*! \brief          Reads the last measurement and converts it to lux
  *  \details        The reading is kept as it was when the sensor does not answer, rather
  *                  than falling to zero: the brightness automatic works on this value, so
  *                  a dropped reading would otherwise dim the display for a second. What
- *                  bounds that is the caller - see countReadFailure().
+ *                  bounds that is the caller - see CountReadFailure().
  *
- *  \return         E_OK if both bytes arrived
+ *  \return         kEOk if both bytes arrived
 ******************************************************************************************************************************************************/
 StdReturnType BH1750::ReadIlluminance()
 {
@@ -194,11 +194,11 @@ StdReturnType BH1750::ReadIlluminance()
 
     illuminance_ = ConvertRawToLux(CombineRawValueParts(high_byte, low_byte));
     return kEOk;
-} /* readIlluminance */
+} /* ReadIlluminance */
 
 
 /******************************************************************************************************************************************************
-  sendModeForOneTimeMode()
+  SendModeForOneTimeMode()
 ******************************************************************************************************************************************************/
 /*! \brief          Starts the next conversion when the mode does not repeat by itself
  *  \details        A one-time measurement leaves the sensor powered down, so it takes the
@@ -210,15 +210,15 @@ void BH1750::SendModeForOneTimeMode()
 
     SendCommand(BH1750_CMD_POWER_ON);
     SendMode();
-} /* sendModeForOneTimeMode */
+} /* SendModeForOneTimeMode */
 
 
 /******************************************************************************************************************************************************
-  sendCommand()
+  SendCommand()
 ******************************************************************************************************************************************************/
 /*! \brief          Writes one command byte to the sensor
  *
- *  \return         E_OK if the sensor acknowledged
+ *  \return         kEOk if the sensor acknowledged
 ******************************************************************************************************************************************************/
 StdReturnType BH1750::SendCommand(byte command)
 {
@@ -228,7 +228,7 @@ StdReturnType BH1750::SendCommand(byte command)
     if(Wire.endTransmission() != kWireTransmissionSuccess) { return kENotOk; }
 
     return kEOk;
-} /* sendCommand */
+} /* SendCommand */
 
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E

@@ -19,7 +19,7 @@
  *                  pushing it back up to 5 V is what this chip's output cannot do.
  *
  *                  The 100 kohm at that gate is why the polarity is worth having: while the
- *                  port is an input, which is what it is from reset until init() runs, the
+ *                  port is an input, which is what it is from reset until Init() runs, the
  *                  stage is held off and the strip has no supply. Nothing lights before the
  *                  firmware says so - and nothing is left lit by a reset either.
  *
@@ -62,7 +62,7 @@ class PowerSwitch
   private:
     /* What the port was last driven to, rather than the port read back. A board with no
        switch fitted never has it driven at all, and then this is not what the answer is
-       taken from - see isSupplyOn(). */
+       taken from - see IsSupplyOn(). */
     bool supply_on_{false};
 
     PowerSwitch() { }

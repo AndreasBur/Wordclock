@@ -15,7 +15,7 @@
 
 #include "arduino/Progmem.h"    // PROGMEM, F, pgm_read_byte, memcpy_P
 #include "arduino/Bits.h"       // bitRead
-#include "arduino/Itoa.h"       // itoa()
+#include "arduino/Itoa.h"       // Itoa()
 
 /* -------------------------------------------------------------------------- */
 /*  Serial → simulator window                                                 */

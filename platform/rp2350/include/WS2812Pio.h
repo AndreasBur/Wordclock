@@ -97,7 +97,7 @@ class WS2812Pio
     }
 
     /* Claims the state machine and a DMA channel for the strip's data pin. Reports and
-       gives up rather than retrying: the contract's init() returns nothing, and a clock
+       gives up rather than retrying: the contract's Init() returns nothing, and a clock
        whose console still answers is more useful for finding a miswired pin than one that
        reboots. */
     void Init(uint8_t pin);

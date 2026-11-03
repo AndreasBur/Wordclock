@@ -56,7 +56,7 @@ class MessageDecoder
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    /* Mirrors MsgParameterParser::OptionArgumentDelimiter, which the parser keeps
+    /* Mirrors MsgParameterParser::kOptionArgumentDelimiter, which the parser keeps
        private. */
     static constexpr char kOptionArgumentDelimiter{'='};
     /* Where the delimiter sits in a "<short name>=<value>" token, and so what tells one

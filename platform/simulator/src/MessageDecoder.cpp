@@ -76,7 +76,7 @@ const char* const MessageDecoder::kApiValueNames[] {
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  describe()
+  Describe()
 ******************************************************************************************************************************************************/
 /*! \brief          reads a line from the firmware back into the names behind it
  *  \details        An answer first, an error line second; a line is never both, because
@@ -93,7 +93,7 @@ wxString MessageDecoder::Describe(const wxString& line)
     if(!remote_procedure_call.IsEmpty()) { return remote_procedure_call; }
 
     return DescribeError(line);
-} /* describe */
+} /* Describe */
 
 
 /******************************************************************************************************************************************************
@@ -101,7 +101,7 @@ wxString MessageDecoder::Describe(const wxString& line)
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  describeAnswer()
+  DescribeAnswer()
 ******************************************************************************************************************************************************/
 /*! \brief          reads an answer line back into the names behind it
  *  \details        Deliberately strict about the shape: the line has to start with the
@@ -135,11 +135,11 @@ wxString MessageDecoder::DescribeAnswer(const wxString& line)
     if(arguments.IsEmpty()) { return wxEmptyString; }
 
     return kCommandIndent + wxString(command->label) + _T("\n") + arguments;
-} /* describeAnswer */
+} /* DescribeAnswer */
 
 
 /******************************************************************************************************************************************************
-  describeArgument()
+  DescribeArgument()
 ******************************************************************************************************************************************************/
 /*! \brief          reads one "<short name>=<value>" of an answer back into names
  *  \details        A short name the command does not have is kept as it is rather than
@@ -159,11 +159,11 @@ wxString MessageDecoder::DescribeArgument(const MessageCatalog::CommandType& com
     if(option == nullptr) { return token; }
 
     return DescribeValue(option->label, value, option->value_names, option->number_of_value_names, option->minimum);
-} /* describeArgument */
+} /* DescribeArgument */
 
 
 /******************************************************************************************************************************************************
-  describeRemoteProcedureCall()
+  DescribeRemoteProcedureCall()
 ******************************************************************************************************************************************************/
 /*! \brief          reads the remote procedure call's answer back into names
  *  \details        It is the one answer that does not begin with its command number:
@@ -204,11 +204,11 @@ wxString MessageDecoder::DescribeRemoteProcedureCall(const wxString& line)
     }
 
     return described;
-} /* describeRemoteProcedureCall */
+} /* DescribeRemoteProcedureCall */
 
 
 /******************************************************************************************************************************************************
-  describeError()
+  DescribeError()
 ******************************************************************************************************************************************************/
 /*! \brief          reads an error line back into the names behind it
  *  \details        ErrorMessage appends a space after each error, so one line can carry
@@ -227,11 +227,11 @@ wxString MessageDecoder::DescribeError(const wxString& line)
     }
 
     return described;
-} /* describeError */
+} /* DescribeError */
 
 
 /******************************************************************************************************************************************************
-  describeErrorPart()
+  DescribeErrorPart()
 ******************************************************************************************************************************************************/
 /*! \brief          reads one error of a line back into names
  *  \details        Three shapes come out of ErrorMessage: the error on its own, the error
@@ -267,11 +267,11 @@ wxString MessageDecoder::DescribeErrorPart(const wxString& part, const char* ind
     }
 
     return wxEmptyString;
-} /* describeErrorPart */
+} /* DescribeErrorPart */
 
 
 /******************************************************************************************************************************************************
-  describeValue()
+  DescribeValue()
 ******************************************************************************************************************************************************/
 /*! \brief          puts a label and its value together, spelling the value out if named
  *  \details        The number stays alongside the name: the name is what makes the line
@@ -297,11 +297,11 @@ wxString MessageDecoder::DescribeValue(const char* label, const wxString& value,
     }
 
     return described;
-} /* describeValue */
+} /* DescribeValue */
 
 
 /******************************************************************************************************************************************************
-  toValue()
+  ToValue()
 ******************************************************************************************************************************************************/
 /*! \brief          reads a number out of a token in the width the catalog uses
  *  \details        wxString only parses into unsigned long, which is why this exists: it
@@ -319,7 +319,7 @@ bool MessageDecoder::ToValue(const wxString& text, uint16_t& value)
 
     value = static_cast<uint16_t>(parsed);
     return true;
-} /* toValue */
+} /* ToValue */
 
 
 /******************************************************************************************************************************************************

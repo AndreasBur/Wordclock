@@ -36,32 +36,32 @@ implementation to mirror.
 
 ## What a backend must provide
 
-Where the table writes `getPixel` twice it means two overloads, and the argument list
-says which is which: `getPixel(Index, Pixel)` answers `StdReturnType` and `getPixel(Index)`
+Where the table writes `GetPixel` twice it means two overloads, and the argument list
+says which is which: `GetPixel(index, pixel)` answers `StdReturnType` and `GetPixel(index)`
 answers the pixel. Both check the index; the second one answers an unlit pixel where the
-first answers `E_NOT_OK`. Writers have one form, which answers a code that a caller with
+first answers `kENotOk`. Writers have one form, which answers a code that a caller with
 nothing to do with it ignores.
 
 This used to be a checked form beside a `*Fast` form that trusted its caller, and the
 measurement that ended it is in [decisions.md](../../docs/decisions.md#the-fast-accessor-pair):
 the checked build was the smaller one. What is left of the argument is that a backend supplying only one overload of
-a pair compiles until something reaches for the other, which is how `getOutputPixel` went
+a pair compiles until something reaches for the other, which is how `GetOutputPixel` went
 through three backends with only its unchecked half.
 
 | Header / unit | Contract | Here |
 |---------------|----------|------|
 | `Arduino.h` | `byte`, `boolean`, `F()`, `PROGMEM`, `pgm_read_byte`, `memcpy_P`, `bitRead`, `itoa`, and a `Serial` object exposing `print` / `println` / `available` / `read` | avr-libc directly, plus a non-virtual `SerialPort` on USART1 |
-| `Pixels.h` | `Pixels` singleton: `getInstance`, `setPixel` / `clearPixel` / `getPixel` (both overloads) / `getOutputPixel` (both overloads), `setBrightness`, `show`, `clearPixels`, `init(pin)`. Plus the output gate the supply switch needs: `isDirty`, `isFrameOnTheWire`, `suspendOutput` / `resumeOutput` / `isOutputSuspended`, where a suspended output must make the render a no-op **without** clearing the dirty mark, and resuming must set it — the LEDs lose their registers with their supply, so coming back is a redraw | Buffer and brightness; `render()` hands the frame to `WS2812`, and `isFrameOnTheWire()` is that driver's `isBusy()` |
-| `RealTimeClock.h` | `RealTimeClock` singleton holding a `ClockDateTime`; the core only *reads* it via `getDateTime()` | Read from the DS3231 once a second, written through on a command |
+| `Pixels.h` | `Pixels` singleton: `GetInstance`, `SetPixel` / `ClearPixel` / `GetPixel` (both overloads) / `GetOutputPixel` (both overloads), `SetBrightness`, `Show`, `ClearPixels`, `Init(pin)`. Plus the output gate the supply switch needs: `IsDirty`, `IsFrameOnTheWire`, `SuspendOutput` / `ResumeOutput` / `IsOutputSuspended`, where a suspended output must make the render a no-op **without** clearing the dirty mark, and resuming must set it — the LEDs lose their registers with their supply, so coming back is a redraw | Buffer and brightness; `Render()` hands the frame to `WS2812`, and `IsFrameOnTheWire()` is that driver's `IsBusy()` |
+| `RealTimeClock.h` | `RealTimeClock` singleton holding a `ClockDateTime`; the core only *reads* it via `GetDateTime()` | Read from the DS3231 once a second, written through on a command |
 | `BH1750.h` | Ambient-light driver exposing the illuminance reading the core consumes | BH1750 over TWI1 |
-| `DS3231.h` | `DS3231` with `getTaskCycle`, `task`, and `getTemperature(TemperatureType&)` in tenths of a degree Celsius. The return code is the contract: `E_NOT_OK` until a reading has arrived, which is what a board without the chip keeps answering and what keeps the temperature overlay away | DS3231 over TWI1, register handling shared with the ESP32 backend |
-| `Storage.h` | `Storage` singleton with a `Capacity` and `read` / `write` / `clear` over one byte blob; the core owns the format inside it, so this only has to store what it is given and refuse a blob of another length | On-chip EEPROM, length byte in front of the blob |
-| `System.h` | `System` singleton: `getFreeMemoryInKibibytes`, `getNetworkAddress`, `getLinkQuality` for the status command, and `restart` / `resynchroniseTime` / `reconnectNetwork` for the procedures. Every one of them may answer `E_NOT_OK`, and a backend that cannot do a thing has to — a clock with no network has no address, and the status command sends an empty field rather than a zero. `restart()` only asks; the application carries it out on its next tick, after the answer has gone out | Free memory is real; everything about a network answers `E_NOT_OK`. The uptime is not here: the core counts it in `Uptime`, off the scheduler's tick, because a backend dividing its own millisecond counter down is what used to wrap |
-| `PowerSwitch.h` | `PowerSwitch` singleton: `isFitted` as a compile-time answer, `isSupplyOn`, `init`, `switchSupplyOn` / `switchSupplyOff`. Three things are the contract rather than the port. `isFitted()` may be false — the switch is optional hardware, and a backend that says so keeps the two procedures from pretending. `isSupplyOn()` must then answer **true** anyway, because a board without the switch has the high side bridged and its strip cannot be unpowered. And `init()` has to switch the supply *on*: the reset leaves it off, and it must run before `Pixels::init()` claims the data line | `PORTD` through `DIRSET`/`OUTSET`, and declared not fitted until a pin is confirmed |
-| `WebTransport.h` + `WordclockSerial.h` | **Only where `WEB_FRONTEND_SUPPORT` is on**, which is the two backends with a radio and the simulator. `WebResponseBody` with `write` / `finish` for one route's answer, and a `WebTransport` singleton with `isListening` / `hasClients` / `sendText` / `sendBinary`; `WordclockSerial` with `inject` and `setLineSink`, which is how a browser's command reaches the parser and how every answer gets back out. What is *sent* is not here: the catalog, the letter grid, the asset table, the UTF-8 widening, the frame rate limit and the comparison against the last frame are [`WebFrontend`](../../firmware/inc/Communication/WebFrontend/WebFrontend.h) and are written once. `WebTransport.h` must name no framework type by value, because the firmware includes it and cannot promise the include order a backend's `Arduino.h` needs | Not provided — this part has no radio, and the switch stays off |
-| app entry point | Equivalent of the simulator's `WordclockApp` / `WordclockMain`: initialise, restore the settings with `Persistence::load()`, then repeatedly tick `Scheduler::task()` and update the `RealTimeClock` | `main()` in [`src/main.cpp`](src/main.cpp) |
+| `DS3231.h` | `DS3231` with `GetTaskCycle`, `Task`, and `GetTemperature(TemperatureType&)` in tenths of a degree Celsius. The return code is the contract: `kENotOk` until a reading has arrived, which is what a board without the chip keeps answering and what keeps the temperature overlay away | DS3231 over TWI1, register handling shared with the ESP32 backend |
+| `Storage.h` | `Storage` singleton with a `kCapacity` and `Read` / `Write` / `Clear` over one byte blob; the core owns the format inside it, so this only has to store what it is given and refuse a blob of another length | On-chip EEPROM, length byte in front of the blob |
+| `System.h` | `System` singleton: `GetFreeMemoryInKibibytes`, `GetNetworkAddress`, `GetLinkQuality` for the status command, and `Restart` / `ResynchroniseTime` / `ReconnectNetwork` for the procedures. Every one of them may answer `kENotOk`, and a backend that cannot do a thing has to — a clock with no network has no address, and the status command sends an empty field rather than a zero. `Restart()` only asks; the application carries it out on its next tick, after the answer has gone out | Free memory is real; everything about a network answers `kENotOk`. The uptime is not here: the core counts it in `Uptime`, off the scheduler's tick, because a backend dividing its own millisecond counter down is what used to wrap |
+| `PowerSwitch.h` | `PowerSwitch` singleton: `IsFitted` as a compile-time answer, `IsSupplyOn`, `Init`, `SwitchSupplyOn` / `SwitchSupplyOff`. Three things are the contract rather than the port. `IsFitted()` may be false — the switch is optional hardware, and a backend that says so keeps the two procedures from pretending. `IsSupplyOn()` must then answer **true** anyway, because a board without the switch has the high side bridged and its strip cannot be unpowered. And `Init()` has to switch the supply *on*: the reset leaves it off, and it must run before `Pixels::Init()` claims the data line | `PORTD` through `DIRSET`/`OUTSET`, and declared not fitted until a pin is confirmed |
+| `WebTransport.h` + `WordclockSerial.h` | **Only where `WEB_FRONTEND_SUPPORT` is on**, which is the two backends with a radio and the simulator. `WebResponseBody` with `Write` / `Finish` for one route's answer, and a `WebTransport` singleton with `IsListening` / `HasClients` / `SendText` / `SendBinary`; `WordclockSerial` with `Inject` and `SetLineSink`, which is how a browser's command reaches the parser and how every answer gets back out. What is *sent* is not here: the catalog, the letter grid, the asset table, the UTF-8 widening, the frame rate limit and the comparison against the last frame are [`WebFrontend`](../../firmware/inc/Communication/WebFrontend/WebFrontend.h) and are written once. `WebTransport.h` must name no framework type by value, because the firmware includes it and cannot promise the include order a backend's `Arduino.h` needs | Not provided — this part has no radio, and the switch stays off |
+| app entry point | Equivalent of the simulator's `WordclockApp` / `WordclockMain`: initialise, restore the settings with `Persistence::Load()`, then repeatedly tick `Scheduler::Task()` and update the `RealTimeClock` | `main()` in [`src/main.cpp`](src/main.cpp) |
 
-The tick has to come every `Scheduler::getTaskIntervalMs()` milliseconds: every
+The tick has to come every `Scheduler::GetTaskIntervalMs()` milliseconds: every
 module's task cycle counts in that unit, so a tick at another rate silently
 rescales animation speed, the sensor's sampling interval and the serial poll rate
 alike. Read the value rather than repeating the number, as the simulator's timer
@@ -236,8 +236,8 @@ deform a pulse. The gap is the budget instead, and it has to stay under the WS28
 TWI1 rather than TWI0 is forced: TWI0 can only reach PA2 and PA3, which the strip
 already uses.
 
-`DISPLAY_DATA_PIN` does not reach any of this. `Pixels::init()` takes it and stores it, and
-`WS2812::init()` is then called without it: the output is LUT0's own pin and the CCL decides
+`DISPLAY_DATA_PIN` does not reach any of this. `Pixels::Init()` takes it and stores it, and
+`WS2812::Init()` is then called without it: the output is LUT0's own pin and the CCL decides
 where it appears, not a number the firmware passes down. Overriding the macro for this
 backend would therefore change nothing — on the two backends that drive an ordinary GPIO,
 the ESP32's RMT and the RP2350's PIO, it is the pin.
@@ -255,7 +255,7 @@ Three things changed on the way across, and those three are the part worth knowi
 
 **It runs on TCA0, routed to PORTB.** TCA0 comes out of reset routed to PORTA, where PA0 and PA2
 already carry the strip's USART into the CCL — a timer left on its default route would drive both
-of them. `PORTMUX.TCAROUTEA` is therefore set in `init()`, before any channel can reach a pin.
+of them. `PORTMUX.TCAROUTEA` is therefore set in `Init()`, before any channel can reach a pin.
 PORTD is left to `PowerSwitch.h`, and PORTC and PORTF are the console and the two-wire bus.
 
 The port is named by its letter, in `TIMER_TCA0_ROUTE_PORT`, and the `PORT_t` and the PORTMUX
@@ -268,7 +268,7 @@ builds for an AVR128DA28 today, the supply switch not being fitted.
 
 **The callback cannot be interrupted.** On the xmega the overflow sat on the PMIC's low level so
 that the core's `millis()` could preempt it. The Dx has one `CPUINT.LVL1VEC` where the xmega had
-two levels, and `WS2812::init()` has already given it to `USART0_DRE` — the handler that keeps
+two levels, and `WS2812::Init()` has already given it to `USART0_DRE` — the handler that keeps
 bytes flowing inside the strip's reset gap. So the overflow stays at level 0, and a callback that
 runs long delays everything else. Keep it short.
 
@@ -276,8 +276,8 @@ runs long delays everything else. Keep it short.
 outright when this was ported, which in dual-slope mode can leave the counter above the new TOP; it
 then runs all the way to `0xFFFF` before wrapping, putting one period of several hundred
 milliseconds exactly where a shorter one was asked for. `PERBUF` is taken over at BOTTOM, where the
-counter is below any legal TOP. A duty is a fraction of the period, so `setPeriod()` recomputes
-every channel's `CMPnBUF` alongside and the new period starts with a PWM that fits it. `start()`
+counter is below any legal TOP. A duty is a fraction of the period, so `SetPeriod()` recomputes
+every channel's `CMPnBUF` alongside and the new period starts with a PWM that fits it. `Start()`
 loads `PER` and the compare registers directly while the timer is disabled, so the first period is
 already the configured one.
 
@@ -305,11 +305,11 @@ Before trusting a first board, check three things:
 The timer above has not run on hardware either, and its registers were checked by reading the
 disassembly rather than by watching a pin. On paper the configuration agrees with Microchip's own:
 TB3217 runs TCA0 in `DSBOTTOM` too, documents its overflow at BOTTOM, and gets 1 kHz out of
-`PER = 500` at a 1 MHz timer clock - the same factor 2 `setPeriod()` divides by. What a scope
+`PER = 500` at a 1 MHz timer clock - the same factor 2 `SetPeriod()` divides by. What a scope
 would still have to show is two separate things. That the overflows come one period apart and not
 half of one, which is what a mode overflowing at both ends, or counting single-slope, would give.
-And that the first one after `start()` comes a whole period late and not half: an overflow at TOP
-would keep the period but shift its phase, and `read()` - which counts from BOTTOM - would then be
+And that the first one after `Start()` comes a whole period late and not half: an overflow at TOP
+would keep the period but shift its phase, and `Read()` - which counts from BOTTOM - would then be
 half a period off.
 
 ## Notes for anyone reading the old xmega project

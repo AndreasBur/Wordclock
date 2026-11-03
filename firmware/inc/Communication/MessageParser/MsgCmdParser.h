@@ -118,7 +118,7 @@ class MsgCmdParser
     /* A command without a delimiter has no parameter, and the terminator is where that
        empty string lives. It used to be the last character instead, so "12" handed the
        parameter parser a "2" to read options out of - and an empty message asked for
-       index length() - 1, which is a strlen of zero minus one and not a position at all. */
+       index Length() - 1, which is a strlen of zero minus one and not a position at all. */
     const char* GetParameter() const {
         const char* message = incoming_message_.GetMessage();
         size_t value_pos = incoming_message_.Find(kCommandParameterDelimiter);

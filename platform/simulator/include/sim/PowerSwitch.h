@@ -22,7 +22,7 @@
  *                  the tests can drive them.
  *
  *                  The supply starts on. On a board the gate's pull down leaves it off until
- *                  init() asks, and there is nothing to hold here.
+ *                  Init() asks, and there is nothing to hold here.
  *
 ******************************************************************************************************************************************************/
 #ifndef _POWER_SWITCH_H_

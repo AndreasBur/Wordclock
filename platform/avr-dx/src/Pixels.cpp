@@ -40,7 +40,7 @@ byte frame_buffer[kFrameSize]{};
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  fillFrameBuffer()
+  FillFrameBuffer()
 ******************************************************************************************************************************************************/
 /*! \brief          Lays the buffer out the way the strip reads it
  *  \details        Green, red, blue - the WS2812's own order, which is not the order the
@@ -59,11 +59,11 @@ void Pixels::FillFrameBuffer() const
         *target++ = pixel.GetRed();
         *target++ = pixel.GetBlue();
     }
-} /* fillFrameBuffer */
+} /* FillFrameBuffer */
 
 
 /******************************************************************************************************************************************************
-  transmitFrame()
+  TransmitFrame()
 ******************************************************************************************************************************************************/
 StdReturnType Pixels::TransmitFrame()
 {
@@ -75,7 +75,7 @@ StdReturnType Pixels::TransmitFrame()
     FillFrameBuffer();
 
     return WS2812::GetInstance().Send(frame_buffer, kFrameSize);
-} /* transmitFrame */
+} /* TransmitFrame */
 
 
 /******************************************************************************************************************************************************
@@ -83,7 +83,7 @@ StdReturnType Pixels::TransmitFrame()
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  init()
+  Init()
 ******************************************************************************************************************************************************/
 /*! \brief          Claims the strip's data line
  *  \details        The pin the core passes is not used: the line is driven by the look-up
@@ -97,20 +97,20 @@ void Pixels::Init(byte pin)
 
     WS2812::GetInstance().Init();
     initialised_ = true;
-} /* init */
+} /* Init */
 
 
 /******************************************************************************************************************************************************
-  render()
+  Render()
 ******************************************************************************************************************************************************/
 /*! \brief          Puts the buffer on the strip, if the firmware asked for it
- *  \details        Called once per tick by the application, never by show(). Several modules
+ *  \details        Called once per tick by the application, never by Show(). Several modules
  *                  ask for a frame within a single tick, and transmitting from each of them
  *                  would put frames back to back on the wire; the strip needs the line idle
  *                  between them or it latches a frame shifted by a pixel, which reads as a
  *                  wiring fault rather than as a software one.
  *
- *  \return         E_OK if a frame went out or none was due
+ *  \return         kEOk if a frame went out or none was due
 ******************************************************************************************************************************************************/
 StdReturnType Pixels::Render()
 {
@@ -128,17 +128,17 @@ StdReturnType Pixels::Render()
     dirty_ = false;
 
     return result;
-} /* render */
+} /* Render */
 
 
 /* An instance method, though it reads no member: it is part of the interface the
-   firmware core calls through getInstance(), and every backend - the simulator's
+   firmware core calls through GetInstance(), and every backend - the simulator's
    stand-ins included - offers it that way. Whether this backend's implementation
    happens to need a member is its own detail, and answering the check would carry
    that detail into the interface. */
 // NOLINTBEGIN(readability-convert-member-functions-to-static)
 /******************************************************************************************************************************************************
-  isFrameOnTheWire()
+  IsFrameOnTheWire()
 ******************************************************************************************************************************************************/
 /*! \brief          Whether the previous frame is still being transmitted
  *  \details        The driver's own answer rather than a flag kept here: it knows both halves
@@ -149,12 +149,12 @@ StdReturnType Pixels::Render()
 bool Pixels::IsFrameOnTheWire() const
 {
     return WS2812::GetInstance().IsBusy();
-} /* isFrameOnTheWire */
+} /* IsFrameOnTheWire */
 // NOLINTEND(readability-convert-member-functions-to-static)
 
 
 /******************************************************************************************************************************************************
-  getPixel()
+  GetPixel()
 ******************************************************************************************************************************************************/
 StdReturnType Pixels::GetPixel(byte index, PixelType& pixel) const
 {
@@ -162,11 +162,11 @@ StdReturnType Pixels::GetPixel(byte index, PixelType& pixel) const
 
     pixel = GetPixel(index);
     return kEOk;
-} /* getPixel */
+} /* GetPixel */
 
 
 /******************************************************************************************************************************************************
-  getPixel()
+  GetPixel()
 ******************************************************************************************************************************************************/
 Pixels::PixelType Pixels::GetPixel(byte index) const
 {
@@ -175,11 +175,11 @@ Pixels::PixelType Pixels::GetPixel(byte index) const
     if(!IsIndexValid(index)) { return PixelType{}; }
 
     return pixel_buffer_[ToRow(index)][ToColumn(index)];
-} /* getPixel */
+} /* GetPixel */
 
 
 /******************************************************************************************************************************************************
-  setPixel()
+  SetPixel()
 ******************************************************************************************************************************************************/
 StdReturnType Pixels::SetPixel(byte index, PixelType pixel)
 {
@@ -187,11 +187,11 @@ StdReturnType Pixels::SetPixel(byte index, PixelType pixel)
 
     SetPixel(index, pixel);
     return kEOk;
-} /* setPixel */
+} /* SetPixel */
 
 
 /******************************************************************************************************************************************************
-  setPixel()
+  SetPixel()
 ******************************************************************************************************************************************************/
 StdReturnType Pixels::SetPixel(byte index, byte red, byte green, byte blue)
 {
@@ -199,22 +199,22 @@ StdReturnType Pixels::SetPixel(byte index, byte red, byte green, byte blue)
 
     SetPixel(index, red, green, blue);
     return kEOk;
-} /* setPixel */
+} /* SetPixel */
 
 
 /******************************************************************************************************************************************************
-  setPixels()
+  SetPixels()
 ******************************************************************************************************************************************************/
 void Pixels::SetPixels(PixelType pixel)
 {
     for(byte index = 0u; index < PIXELS_NUMBER_OF_LEDS; index++) {
         SetPixel(index, pixel);
     }
-} /* setPixels */
+} /* SetPixels */
 
 
 /******************************************************************************************************************************************************
-  setBrightness()
+  SetBrightness()
 ******************************************************************************************************************************************************/
 /*! \brief          Sets what the buffer is dimmed by on its way out
  *  \details        The buffer itself is left alone, so the colour a command set can still be
@@ -224,7 +224,7 @@ void Pixels::SetBrightness(byte brightness, bool)
 {
     brightness_ = brightness;
     dirty_ = true;
-} /* setBrightness */
+} /* SetBrightness */
 
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E

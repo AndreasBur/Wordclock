@@ -36,7 +36,7 @@
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
 /* Storage configuration parameter */
-/* What one write() may hold. Well above what the core writes today, so its settings can
+/* What one Write() may hold. Well above what the core writes today, so its settings can
    grow without the platforms having to change together. */
 #define STORAGE_CAPACITY                                128u
 

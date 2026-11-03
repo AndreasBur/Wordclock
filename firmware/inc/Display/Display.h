@@ -119,8 +119,8 @@ class Display
     static constexpr byte kWordLengthUnlimited{0u};
     StateType state_{kStateNone};
     /* Whether the display was last asked to be on, true because a strip comes up lit. Kept
-       here rather than read back from the strip's master brightness, which is what enable()
-       and disable() write: under DISPLAY_USE_PIXELS_DIMMING that same register carries the
+       here rather than read back from the strip's master brightness, which is what Enable()
+       and Disable() write: under DISPLAY_USE_PIXELS_DIMMING that same register carries the
        brightness setting, so a zero in it would answer "dark" where the question is
        "switched off". */
     bool enabled_{true};
@@ -162,7 +162,7 @@ class Display
     void ApplyColor();
     /* A colour change moves the current as much as a brightness change does - white draws
        three times what amber at the same brightness does - so both have to go past the
-       limit. This is what the colour setters call instead of applyColor() alone. */
+       limit. This is what the colour setters call instead of ApplyColor() alone. */
     void ApplyColorAndCurrentLimit();
 
     void ApplyCurrentLimit();
@@ -208,7 +208,7 @@ class Display
         brightness_.SetUseGammaCorrection(brightness_use_gamma_correction);
         ApplyBrightness();
     }
-    /* Every one of them applies what it set, for the reason applyColor() gives. */
+    /* Every one of them applies what it set, for the reason ApplyColor() gives. */
     void SetColor(Pixel color) { color_.SetColor(color); ApplyColorAndCurrentLimit(); }
     void SetColor(ColorType red, ColorType green, ColorType blue) { color_.SetColorRed(red); color_.SetColorGreen(green); color_.SetColorBlue(blue); ApplyColorAndCurrentLimit(); }
     void SetColorRed(ColorType red) { color_.SetColorRed(red); ApplyColorAndCurrentLimit(); }
@@ -216,7 +216,7 @@ class Display
     void SetColorBlue(ColorType blue) { color_.SetColorBlue(blue); ApplyColorAndCurrentLimit(); }
 
     /* Takes the brightness the user asked for. What reaches the LEDs is
-       calcBrightness(), which folds in gamma correction and the light sensor. */
+       CalcBrightness(), which folds in gamma correction and the light sensor. */
     void SetBrightness(byte);
 
     // char methods
@@ -266,7 +266,7 @@ class Display
     // methods
     void Init();
     StdReturnType Show() { return pixel_stripe_.Show(); }
-    /* Not enablePixels(): that puts the master back at full, which is the one value the
+    /* Not EnablePixels(): that puts the master back at full, which is the one value the
        supply may not allow. The way back on goes through the cap instead. */
     void Enable() { enabled_ = true; ResumeAtCurrentLimit(); }
     void Disable() { enabled_ = false; pixel_stripe_.DisablePixels(); }
@@ -282,7 +282,7 @@ class Display
        so that the module driving the switch needs one collaborator instead of two - and so
        the rule stays where the rest of the strip's handling is.
 
-       isDirty() and isFrameOnTheWire() are two different waits and both are needed: the
+       IsDirty() and IsFrameOnTheWire() are two different waits and both are needed: the
        first says the blanked frame has not been handed over yet, the second that it has and
        is still on the wire. Cutting the supply at either point leaves the strip holding
        half a frame with nothing to latch it. */
@@ -296,7 +296,7 @@ class Display
     void EnableBrightnessGammaCorrection() { brightness_.EnableGammaCorrection(); }
     void DisableBrightnessGammaCorrection() { brightness_.DisableGammaCorrection(); }
     /* Through the setters rather than through the enable/disable pair above, which is the
-       half of it that leaves applyBrightness() to the next task: a knob turned once should
+       half of it that leaves ApplyBrightness() to the next task: a knob turned once should
        show what it did, not a tick later. */
     void ToggleBrightnessAutomatic() { SetBrightnessUseAutomatic(!GetBrightnessUseAutomatic()); }
     void ToggleBrightnessGammaCorrection() { SetBrightnessUseGammaCorrection(!GetBrightnessUseGammaCorrection()); }
@@ -332,7 +332,7 @@ class Display
     void ApplyBrightness();
 
     /* What AnimationFade dims the display with while it runs. It goes through the display
-       rather than through the strip because applyBrightness() runs on every task and
+       rather than through the strip because ApplyBrightness() runs on every task and
        would otherwise write the configured brightness back over it - and it is a level of
        its own rather than the brightness setting, so that what a fade dims is never what
        Persistence stores. */
@@ -352,7 +352,7 @@ class Display
         color_.ResetToDefaults();
         brightness_.ResetToDefaults();
         ApplyBrightness();
-        /* After the brightness, not instead of it: applyBrightness() does nothing where the
+        /* After the brightness, not instead of it: ApplyBrightness() does nothing where the
            brightness was already at its default, and the colour would stay behind. */
         ApplyColor();
     }

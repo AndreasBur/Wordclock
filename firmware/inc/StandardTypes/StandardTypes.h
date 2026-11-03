@@ -60,11 +60,11 @@
 #define SET_BIT(Var, Bit) \
     ((Var) |= (UINT64_C(1) << (Bit)))
 
-/* clear bit */
+/* Clear bit */
 #define CLEAR_BIT(Var, Bit) \
     ((Var) &= ~(UINT64_C(1) << (Bit)))
 
-/* toggle bit */
+/* Toggle bit */
 #define TOGGLE_BIT(Var, Bit) \
     ((Var) ^= (UINT64_C(1) << (Bit)))
 
@@ -157,14 +157,14 @@ static inline VarType SetBit(VarType var, uint8_t bit)
     return var | (UINT64_C(1) << bit);
 }
 
-/* clear bit */
+/* Clear bit */
 template <typename VarType>
 static inline VarType ClearBit(VarType var, uint8_t bit)
 {
     return var & ~(UINT64_C(1) << bit);
 }
 
-/* toggle bit */
+/* Toggle bit */
 template <typename VarType>
 static inline VarType ToggleBit(VarType var, uint8_t bit)
 {

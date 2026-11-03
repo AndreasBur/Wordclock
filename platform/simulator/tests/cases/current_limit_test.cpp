@@ -35,7 +35,7 @@ constexpr uint16_t kWhiteChannelSum{DisplayCurrentLimit::ToChannelSum(255u, 255u
 constexpr uint16_t kRedChannelSum{DisplayCurrentLimit::ToChannelSum(255u, 0u, 0u)};
 
 /* The master the strip is carrying, which is where the cap lives - not the setting, which
-   getBrightness() answers and which the cap deliberately leaves alone. */
+   GetBrightness() answers and which the cap deliberately leaves alone. */
 byte GetMaster()
 {
     return Pixels::GetInstance().GetBrightness();
@@ -135,7 +135,7 @@ void TestCurrentLimitLeavesTheRestoredFaceAlone()
 }
 
 
-/* The master is also what disable() uses, so the two must not fight over it: a task on a dark
+/* The master is also what Disable() uses, so the two must not fight over it: a task on a dark
    display must leave it dark rather than write a cap into it. */
 void TestCurrentLimitDoesNotSwitchTheDisplayOn()
 {

@@ -53,11 +53,11 @@ constexpr byte kWeekdayOffset{1u};
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  task()
+  Task()
 ******************************************************************************************************************************************************/
 /*! \brief          Takes one reading from the chip
- *  \details        Set up from here rather than from an init() call, the same way the light
- *                  sensor is: there is no place in the core to call an init() from, and
+ *  \details        Set up from here rather than from an Init() call, the same way the light
+ *                  sensor is: there is no place in the core to call an Init() from, and
  *                  retrying from the task means a chip that is plugged in later, or a bus
  *                  that was busy at boot, still comes up.
 ******************************************************************************************************************************************************/
@@ -66,11 +66,11 @@ void DS3231::Task()
     if(StartBus() == kENotOk) { return; }
 
     ReadTemperature();
-} /* task */
+} /* Task */
 
 
 /******************************************************************************************************************************************************
-  getDateTime()
+  GetDateTime()
 ******************************************************************************************************************************************************/
 /*! \brief          Reads what the chip counted, in UTC
  *  \details        The stopped flag is asked first and not afterwards: a chip whose
@@ -83,7 +83,7 @@ void DS3231::Task()
  *                  is assembled through ClockDateTime's own setters and their return
  *                  codes rather than trusted.
  *
- *  \return         E_OK if the chip answered with a believable date and time
+ *  \return         kEOk if the chip answered with a believable date and time
 ******************************************************************************************************************************************************/
 StdReturnType DS3231::GetDateTime(ClockDateTime& date_time)
 {
@@ -107,11 +107,11 @@ StdReturnType DS3231::GetDateTime(ClockDateTime& date_time)
 
     date_time = value;
     return kEOk;
-} /* getDateTime */
+} /* GetDateTime */
 
 
 /******************************************************************************************************************************************************
-  setDateTime()
+  SetDateTime()
 ******************************************************************************************************************************************************/
 /*! \brief          Writes the time to the chip, in UTC
  *  \details        The seconds register goes out with the rest rather than being written
@@ -122,7 +122,7 @@ StdReturnType DS3231::GetDateTime(ClockDateTime& date_time)
  *                  the date carries the weekday anyway, and a register left at zero is one
  *                  that another reader of this chip would be misled by.
  *
- *  \return         E_OK if the chip took the whole block and the stopped flag is cleared
+ *  \return         kEOk if the chip took the whole block and the stopped flag is cleared
 ******************************************************************************************************************************************************/
 StdReturnType DS3231::SetDateTime(const ClockDateTime& date_time)
 {
@@ -141,7 +141,7 @@ StdReturnType DS3231::SetDateTime(const ClockDateTime& date_time)
     if(WriteRegisters(DS3231_REG_SECONDS, registers, DS3231_DATE_TIME_NUMBER_OF_BYTES) == kENotOk) { return kENotOk; }
 
     return ClearOscillatorStopped();
-} /* setDateTime */
+} /* SetDateTime */
 
 
 /******************************************************************************************************************************************************
@@ -149,13 +149,13 @@ StdReturnType DS3231::SetDateTime(const ClockDateTime& date_time)
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  startBus()
+  StartBus()
 ******************************************************************************************************************************************************/
 /*! \brief          Opens the I2C bus, once
  *  \details        Shared with the light sensor, and opening it twice is what the Wire
  *                  library allows for - whichever of the two runs first does it.
  *
- *  \return         E_OK, which is all this core can tell us
+ *  \return         kEOk, which is all this core can tell us
 ******************************************************************************************************************************************************/
 StdReturnType DS3231::StartBus()
 {
@@ -164,7 +164,7 @@ StdReturnType DS3231::StartBus()
     /* Four calls where the ESP32 has one: this core's begin() takes no arguments and
        returns nothing, and the clock rate is set afterwards because begin() would otherwise
        put the default back over it. The pin setters are not the check that replaces
-       begin()'s return value, although they read like one - see BH1750::startBus() for why
+       begin()'s return value, although they read like one - see BH1750::StartBus() for why
        an kENotOk branch on them cannot be reached, and what carries the case instead. */
     Wire.setSDA(DS3231_I2C_PIN_SDA);
     Wire.setSCL(DS3231_I2C_PIN_SCL);
@@ -174,11 +174,11 @@ StdReturnType DS3231::StartBus()
 
     bus_started_ = true;
     return kEOk;
-} /* startBus */
+} /* StartBus */
 
 
 /******************************************************************************************************************************************************
-  readRegisters()
+  ReadRegisters()
 ******************************************************************************************************************************************************/
 /*! \brief          Reads a block of registers, starting at one of them
  *  \details        Two transfers rather than one with a repeated start: the chip's address
@@ -186,7 +186,7 @@ StdReturnType DS3231::StartBus()
  *                  followed by a plain read lands in the same place, and this way the code
  *                  does not depend on the Wire implementation's repeated-start support.
  *
- *  \return         E_OK if the chip acknowledged and handed over every byte
+ *  \return         kEOk if the chip acknowledged and handed over every byte
 ******************************************************************************************************************************************************/
 StdReturnType DS3231::ReadRegisters(byte register_address, byte* values, byte length)
 {
@@ -200,15 +200,15 @@ StdReturnType DS3231::ReadRegisters(byte register_address, byte* values, byte le
     for(byte index = 0u; index < length; index++) { values[index] = static_cast<byte>(Wire.read()); }
 
     return kEOk;
-} /* readRegisters */
+} /* ReadRegisters */
 
 
 /******************************************************************************************************************************************************
-  writeRegisters()
+  WriteRegisters()
 ******************************************************************************************************************************************************/
 /*! \brief          Writes a block of registers, starting at one of them
  *
- *  \return         E_OK if the chip acknowledged the whole transfer
+ *  \return         kEOk if the chip acknowledged the whole transfer
 ******************************************************************************************************************************************************/
 StdReturnType DS3231::WriteRegisters(byte register_address, const byte* values, byte length)
 {
@@ -220,11 +220,11 @@ StdReturnType DS3231::WriteRegisters(byte register_address, const byte* values, 
     if(Wire.endTransmission() != kWireTransmissionSuccess) { return kENotOk; }
 
     return kEOk;
-} /* writeRegisters */
+} /* WriteRegisters */
 
 
 /******************************************************************************************************************************************************
-  hasOscillatorStopped()
+  HasOscillatorStopped()
 ******************************************************************************************************************************************************/
 /*! \brief          Tells whether the chip lost track of the time
  *  \details        The flag is set by the chip itself whenever its oscillator was not
@@ -242,18 +242,18 @@ bool DS3231::HasOscillatorStopped()
     if(ReadRegisters(DS3231_REG_STATUS, &status, 1u) == kENotOk) { return true; }
 
     return (status & DS3231_STATUS_OSCILLATOR_STOPPED_MASK) != 0u;
-} /* hasOscillatorStopped */
+} /* HasOscillatorStopped */
 
 
 /******************************************************************************************************************************************************
-  clearOscillatorStopped()
+  ClearOscillatorStopped()
 ******************************************************************************************************************************************************/
 /*! \brief          Declares what the chip counts believable again
  *  \details        Read, modify, write rather than a plain write: the register carries the
  *                  alarm flags and the square wave setting beside this bit, and a clock
  *                  that clobbered them would switch off somebody else's alarm.
  *
- *  \return         E_OK if the flag is cleared
+ *  \return         kEOk if the flag is cleared
 ******************************************************************************************************************************************************/
 StdReturnType DS3231::ClearOscillatorStopped()
 {
@@ -264,11 +264,11 @@ StdReturnType DS3231::ClearOscillatorStopped()
     status = static_cast<byte>(status & ~DS3231_STATUS_OSCILLATOR_STOPPED_MASK);
 
     return WriteRegisters(DS3231_REG_STATUS, &status, 1u);
-} /* clearOscillatorStopped */
+} /* ClearOscillatorStopped */
 
 
 /******************************************************************************************************************************************************
-  readTemperature()
+  ReadTemperature()
 ******************************************************************************************************************************************************/
 /*! \brief          Reads the temperature register pair
  *  \details        A chip that does not answer leaves the last reading in place, including
@@ -277,7 +277,7 @@ StdReturnType DS3231::ClearOscillatorStopped()
  *                  value that is a few minutes old on something that changes as slowly as
  *                  a room does.
  *
- *  \return         E_OK if both bytes arrived
+ *  \return         kEOk if both bytes arrived
 ******************************************************************************************************************************************************/
 StdReturnType DS3231::ReadTemperature()
 {
@@ -288,7 +288,7 @@ StdReturnType DS3231::ReadTemperature()
     temperature_ = ToTenths(static_cast<int8_t>(registers[0u]), registers[1u]);
     temperature_valid_ = true;
     return kEOk;
-} /* readTemperature */
+} /* ReadTemperature */
 
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E

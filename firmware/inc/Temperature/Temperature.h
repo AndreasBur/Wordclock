@@ -61,7 +61,7 @@ class Temperature
     static constexpr char kDegreeUnit{'C'};
     /* Latin-1 0xB0, which is what the font tables index by and what the letter table's
        umlauts already are. It stays out of the reported form on purpose - see
-       getTemperatureString() below. */
+       GetTemperatureString() below. */
     static constexpr char kDegreeSign{'\xB0'};
     static constexpr char kDecimalPoint{'.'};
 
@@ -125,7 +125,7 @@ class Temperature
     // get methods
     byte GetTaskCycle() const { return sensor_.GetTaskCycle(); }
 
-    /* E_NOT_OK while there is no reading, which is the answer a build without the chip
+    /* kENotOk while there is no reading, which is the answer a build without the chip
        keeps giving. */
     StdReturnType GetTemperature(TemperatureType& temperature) const { return sensor_.GetTemperature(temperature); }
 
@@ -134,7 +134,7 @@ class Temperature
         return GetTemperature(unused) == kEOk;
     }
 
-    /* The reading as it is reported, "23.4C", into a buffer of StringLength. Written by
+    /* The reading as it is reported, "23.4C", into a buffer of kStringLength. Written by
        whoever needs it rather than kept here, because the overlay needs it to stand still
        while its text scrolls, and the status command needs it once.
 
@@ -149,7 +149,7 @@ class Temperature
         return AppendReading(string, false);
     }
 
-    /* The same reading as it is shown, "23.4°C", into a buffer of StringToShowLength. The
+    /* The same reading as it is shown, "23.4°C", into a buffer of kStringToShowLength. The
        display indexes the font tables by Latin-1 byte, so the sign can be one here. */
     StdReturnType GetTemperatureStringToShow(char* string) const {
         return AppendReading(string, true);

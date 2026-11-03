@@ -163,7 +163,7 @@ constexpr WebFrontend::AssetType kAssets[]{
     {"/icon-512.png",          kWebIcon512,   kWebIcon512Size,   "image/png",                 false},
 };
 
-/* A backend sizes its route array with MaxAssets, which it can see and this count it cannot.
+/* A backend sizes its route array with kMaxAssets, which it can see and this count it cannot.
    Adding a file here without raising that fails the build, rather than quietly registering
    the first five of six. */
 static_assert((sizeof(kAssets) / sizeof(kAssets[0])) <= WebFrontend::kMaxAssets,
@@ -176,7 +176,7 @@ static_assert((sizeof(kAssets) / sizeof(kAssets[0])) <= WebFrontend::kMaxAssets,
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  getNumberOfAssets() / getAsset()
+  GetNumberOfAssets() / GetAsset()
 ******************************************************************************************************************************************************/
 /*! \brief          The files a clock serves unchanged, for a backend to register routes from
  *
@@ -198,7 +198,7 @@ const WebFrontend::AssetType& WebFrontend::GetAsset(byte index)
 
 
 /******************************************************************************************************************************************************
-  writeCommands()
+  WriteCommands()
 ******************************************************************************************************************************************************/
 /*! \brief          Writes the command catalog, so the page can build its own form
  *
@@ -262,11 +262,11 @@ void WebFrontend::WriteCommands(WebResponseBody& body)
 
     writer.Put(']');
     writer.Finish();
-} /* writeCommands */
+} /* WriteCommands */
 
 
 /******************************************************************************************************************************************************
-  writeDisplay()
+  WriteDisplay()
 ******************************************************************************************************************************************************/
 /*! \brief          Writes the panel's shape and its letters
  *
@@ -299,11 +299,11 @@ void WebFrontend::WriteDisplay(WebResponseBody& body)
 
     writer.Put("\"}");
     writer.Finish();
-} /* writeDisplay */
+} /* WriteDisplay */
 
 
 /******************************************************************************************************************************************************
-  injectCommand()
+  InjectCommand()
 ******************************************************************************************************************************************************/
 /*! \brief          Takes one socket frame's text and injects it as typed characters
  *
@@ -329,11 +329,11 @@ void WebFrontend::InjectCommand(const char* text, size_t length)
         const char terminator = Communication::GetEndOfMessageChar();
         port.Inject(&terminator, 1u);
     }
-} /* injectCommand */
+} /* InjectCommand */
 
 
 /******************************************************************************************************************************************************
-  broadcastLine()
+  BroadcastLine()
 ******************************************************************************************************************************************************/
 /*! \brief          Sends one finished line to whoever is connected
  *
@@ -347,7 +347,7 @@ void WebFrontend::BroadcastLine(const char* line)
 
     if(!transport.IsListening() || (line == nullptr)) { return; }
 
-    /* Widened rather than sent as it stands - see toUtf8(). Two bytes per Latin-1 byte is
+    /* Widened rather than sent as it stands - see ToUtf8(). Two bytes per Latin-1 byte is
        the worst case, so a line that is nothing but umlauts still fits and there is no
        truncation to expect. Sized from the producer's own line length rather than from a
        number of its own, because that is the buffer the line was assembled in.
@@ -365,11 +365,11 @@ void WebFrontend::BroadcastLine(const char* line)
     if(used == 0u) { return; }
 
     transport.SendText(payload, used);
-} /* broadcastLine */
+} /* BroadcastLine */
 
 
 /******************************************************************************************************************************************************
-  broadcastFrame()
+  BroadcastFrame()
 ******************************************************************************************************************************************************/
 /*! \brief          Sends the pixel buffer to whoever is connected, when it changed
  *
@@ -417,7 +417,7 @@ void WebFrontend::BroadcastFrame()
     memcpy(last_frame_, frame, kFrameSize);
 
     transport.SendBinary(frame, kFrameSize);
-} /* broadcastFrame */
+} /* BroadcastFrame */
 
 #endif // (WEB_FRONTEND_SUPPORT == STD_ON)
 

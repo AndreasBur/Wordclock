@@ -83,7 +83,7 @@ uint32_t TotalIntensity(const PixelBufferType& pixels)
 }
 
 /* The latch itself: the display is redrawn when the word set changes and left alone
-   when it does not. Pixels::isDirty() is what makes "left alone" observable at all - the
+   when it does not. Pixels::IsDirty() is what makes "left alone" observable at all - the
    buffer staying equal would not tell a skipped redraw from one that rewrote the same
    words. Must run before any other test touches DisplayManager. */
 void TestDisplayManagerLatch()
@@ -294,7 +294,7 @@ void TestColourChangesReachTheStrip()
 
 /* Guards a swap that this simulator cannot show: Pixel keeps its channels in the WS2812
    wire order rather than in argument order, so a constructor that filled the raw array
-   positionally put red where getRed() does not look. Every colour built that way so far
+   positionally put red where GetRed() does not look. Every colour built that way so far
    was grey or black, which hides it, and the window renders brightness rather than hue,
    which hides it again - it would first have appeared on the strip. */
 void TestPixelColorChannels()

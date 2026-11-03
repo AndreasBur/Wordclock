@@ -51,11 +51,11 @@ void AnimationSnake::Init()
 {
     Animation::Init(kStateIdle);
     Reset();
-} /* init */
+} /* Init */
 
 
 /******************************************************************************************************************************************************
-  setTime()
+  SetTime()
 ******************************************************************************************************************************************************/
 StdReturnType AnimationSnake::SetTime(byte hour, byte minute)
 {
@@ -68,11 +68,11 @@ StdReturnType AnimationSnake::SetTime(byte hour, byte minute)
         state_ = kStateSetTime;
     }
     return return_value;
-} /* setTime */
+} /* SetTime */
 
 
 /******************************************************************************************************************************************************
-  task()
+  Task()
 ******************************************************************************************************************************************************/
 void AnimationSnake::Task()
 {
@@ -89,7 +89,7 @@ void AnimationSnake::Task()
         if(snake_begin_index_ < DISPLAY_NUMBER_OF_LEDS - 1u) snake_begin_index_++;
         if(snake_end_index_ >= DISPLAY_NUMBER_OF_LEDS) FinishWithClockWords(clock_words_table_);
     }
-} /* task */
+} /* Task */
 
 
 /******************************************************************************************************************************************************
@@ -97,18 +97,18 @@ void AnimationSnake::Task()
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  reset()
+  Reset()
 ******************************************************************************************************************************************************/
 void AnimationSnake::Reset()
 {
     snake_begin_index_ = 0u;
     snake_end_index_ = 0u;
     snake_state_ = kSnakeStateToRight;
-} /* reset */
+} /* Reset */
 
 
 /******************************************************************************************************************************************************
-  transformToSerpentine()
+  TransformToSerpentine()
 ******************************************************************************************************************************************************/
 byte AnimationSnake::TransformToSerpentine(byte column, byte row)
 {
@@ -118,11 +118,11 @@ byte AnimationSnake::TransformToSerpentine(byte column, byte row)
     else index = (row * DISPLAY_NUMBER_OF_COLUMNS) + (DISPLAY_NUMBER_OF_COLUMNS - column - 1u);
 
     return index;
-} /* transformToSerpentine */
+} /* TransformToSerpentine */
 
 
 /******************************************************************************************************************************************************
-  transformToSerpentine()
+  TransformToSerpentine()
 ******************************************************************************************************************************************************/
 byte AnimationSnake::TransformToSerpentine(byte index)
 {
@@ -130,7 +130,7 @@ byte AnimationSnake::TransformToSerpentine(byte index)
     byte row = Display::GetInstance().IndexToRow(index);
 
     return TransformToSerpentine(column, row);
-} /* transformToSerpentine */
+} /* TransformToSerpentine */
 
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E

@@ -49,7 +49,7 @@ constexpr byte kWeekdayOffset{1u};
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  startBus()
+  StartBus()
 ******************************************************************************************************************************************************/
 /*! \brief          Opens the bus this chip shares with the light sensor
  *  \details        Idempotent, so whichever driver runs first opens it and the other finds
@@ -61,20 +61,20 @@ StdReturnType DS3231::StartBus()
     Twi::GetInstance().Init();
 
     return kEOk;
-} /* startBus */
+} /* StartBus */
 
 
 /******************************************************************************************************************************************************
-  readRegisters()
+  ReadRegisters()
 ******************************************************************************************************************************************************/
 StdReturnType DS3231::ReadRegisters(byte register_address, byte* values, byte length)
 {
     return Twi::GetInstance().ReadRegister(DS3231_I2C_ADDR, register_address, values, length);
-} /* readRegisters */
+} /* ReadRegisters */
 
 
 /******************************************************************************************************************************************************
-  writeRegisters()
+  WriteRegisters()
 ******************************************************************************************************************************************************/
 /*! \brief          Writes a block of registers starting at one address
  *  \details        The block goes out in a single transfer rather than register by register:
@@ -92,11 +92,11 @@ StdReturnType DS3231::WriteRegisters(byte register_address, const byte* values, 
     for(byte index = 0u; index < length; index++) { buffer[index + 1u] = values[index]; }
 
     return Twi::GetInstance().Write(DS3231_I2C_ADDR, buffer, static_cast<byte>(length + 1u));
-} /* writeRegisters */
+} /* WriteRegisters */
 
 
 /******************************************************************************************************************************************************
-  hasOscillatorStopped()
+  HasOscillatorStopped()
 ******************************************************************************************************************************************************/
 /*! \brief          Whether the chip admits it lost track of time
  *  \details        A chip that cannot be read is treated as stopped: both mean there is no
@@ -110,11 +110,11 @@ bool DS3231::HasOscillatorStopped()
     if(ReadRegisters(DS3231_REG_STATUS, &status, 1u) == kENotOk) { return true; }
 
     return (status & DS3231_STATUS_OSCILLATOR_STOPPED_MASK) != 0u;
-} /* hasOscillatorStopped */
+} /* HasOscillatorStopped */
 
 
 /******************************************************************************************************************************************************
-  clearOscillatorStopped()
+  ClearOscillatorStopped()
 ******************************************************************************************************************************************************/
 StdReturnType DS3231::ClearOscillatorStopped()
 {
@@ -125,11 +125,11 @@ StdReturnType DS3231::ClearOscillatorStopped()
     status &= static_cast<byte>(~DS3231_STATUS_OSCILLATOR_STOPPED_MASK);
 
     return WriteRegisters(DS3231_REG_STATUS, &status, 1u);
-} /* clearOscillatorStopped */
+} /* ClearOscillatorStopped */
 
 
 /******************************************************************************************************************************************************
-  readTemperature()
+  ReadTemperature()
 ******************************************************************************************************************************************************/
 StdReturnType DS3231::ReadTemperature()
 {
@@ -141,7 +141,7 @@ StdReturnType DS3231::ReadTemperature()
     temperature_valid_ = true;
 
     return kEOk;
-} /* readTemperature */
+} /* ReadTemperature */
 
 
 /******************************************************************************************************************************************************
@@ -149,24 +149,24 @@ StdReturnType DS3231::ReadTemperature()
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  task()
+  Task()
 ******************************************************************************************************************************************************/
 void DS3231::Task()
 {
     if(StartBus() == kENotOk) { return; }
 
     ReadTemperature();
-} /* task */
+} /* Task */
 
 
 /* Instance methods, though some of them read no member: they are the interface the
-   firmware core calls through getInstance(), and every backend - the simulator's
+   firmware core calls through GetInstance(), and every backend - the simulator's
    stand-ins included - offers it that way. Whether this backend's implementation
    happens to need a member is its own detail, and answering the check would carry
    that detail into the interface. */
 // NOLINTBEGIN(readability-convert-member-functions-to-static)
 /******************************************************************************************************************************************************
-  getDateTime()
+  GetDateTime()
 ******************************************************************************************************************************************************/
 /*! \brief          Reads what the chip counted, in UTC
  *  \details        The stopped flag is asked first and not afterwards: a chip whose
@@ -201,11 +201,11 @@ StdReturnType DS3231::GetDateTime(ClockDateTime& date_time)
 
     date_time = value;
     return kEOk;
-} /* getDateTime */
+} /* GetDateTime */
 
 
 /******************************************************************************************************************************************************
-  setDateTime()
+  SetDateTime()
 ******************************************************************************************************************************************************/
 StdReturnType DS3231::SetDateTime(const ClockDateTime& date_time)
 {
@@ -224,7 +224,7 @@ StdReturnType DS3231::SetDateTime(const ClockDateTime& date_time)
     if(WriteRegisters(DS3231_REG_SECONDS, registers, DS3231_DATE_TIME_NUMBER_OF_BYTES) == kENotOk) { return kENotOk; }
 
     return ClearOscillatorStopped();
-} /* setDateTime */
+} /* SetDateTime */
 // NOLINTEND(readability-convert-member-functions-to-static)
 
 /******************************************************************************************************************************************************

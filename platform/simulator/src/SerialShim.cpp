@@ -43,7 +43,7 @@
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  read()
+  Read()
 ******************************************************************************************************************************************************/
 /*! \brief          hands the firmware the next character that was typed
  *  \details        Takes it off the front, the way a real port does, so a line arrives
@@ -63,11 +63,11 @@ char SerialShim::read()
     }
 
     return first_char;
-} /* read */
+} /* Read */
 
 
 /******************************************************************************************************************************************************
-  sendInput()
+  SendInput()
 ******************************************************************************************************************************************************/
 /*! \brief          hands the line in the input field over to be read
  *  \details        Only while nothing is waiting: read() drains a line one character at a
@@ -82,7 +82,7 @@ void SerialShim::SendInput()
     if(send_buffer_.IsEmpty()) {
         send_buffer_ = input_->GetValue() + _T("\n");
     }
-} /* sendInput */
+} /* SendInput */
 
 
 /******************************************************************************************************************************************************
@@ -90,7 +90,7 @@ void SerialShim::SendInput()
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  appendOutput()
+  AppendOutput()
 ******************************************************************************************************************************************************/
 void SerialShim::AppendOutput(const wxString& text)
 {
@@ -98,11 +98,11 @@ void SerialShim::AppendOutput(const wxString& text)
 
     output_->AppendText(text);
     output_line_ += text;
-} /* appendOutput */
+} /* AppendOutput */
 
 
 /******************************************************************************************************************************************************
-  finishOutputLine()
+  FinishOutputLine()
 ******************************************************************************************************************************************************/
 /*! \brief          closes the line the firmware has been printing and reads it back
  *  \details        An answer gets its readable form underneath, indented to show it
@@ -129,7 +129,7 @@ void SerialShim::FinishOutputLine()
        past the controls, so a run with none would have grown one line for the length of it -
        harmless while nothing else read the line, and not once a socket does. */
     output_line_.Clear();
-} /* finishOutputLine */
+} /* FinishOutputLine */
 
 
 /******************************************************************************************************************************************************

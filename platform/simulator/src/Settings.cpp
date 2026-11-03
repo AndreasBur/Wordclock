@@ -83,7 +83,7 @@ Settings::~Settings()
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  createSizerAll()
+  CreateSizerAll()
 ******************************************************************************************************************************************************/
 wxBoxSizer* Settings::CreateSizerAll(wxWindow* parent)
 {
@@ -93,11 +93,11 @@ wxBoxSizer* Settings::CreateSizerAll(wxWindow* parent)
     sizer_all->Add(CreateSizerTemperature(parent), 0, wxALL | wxEXPAND, kBorder);
 
     return sizer_all;
-} /* createSizerAll */
+} /* CreateSizerAll */
 
 
 /******************************************************************************************************************************************************
-  createSizerIlluminance()
+  CreateSizerIlluminance()
 ******************************************************************************************************************************************************/
 wxBoxSizer* Settings::CreateSizerIlluminance(wxWindow* parent)
 {
@@ -116,11 +116,11 @@ wxBoxSizer* Settings::CreateSizerIlluminance(wxWindow* parent)
     sizer_illuminance->Add(illuminance_slider_, 0, wxALL | wxEXPAND, kBorder);
 
     return sizer_illuminance;
-} /* createSizerIlluminance */
+} /* CreateSizerIlluminance */
 
 
 /******************************************************************************************************************************************************
-  createSizerTemperature()
+  CreateSizerTemperature()
 ******************************************************************************************************************************************************/
 /*! \brief          Builds the group that stands in for the clock chip's thermometer
  *  \details        The check box is what the slider alone could not express: a clock built
@@ -148,7 +148,7 @@ wxBoxSizer* Settings::CreateSizerTemperature(wxWindow* parent)
     sizer_temperature->Add(temperature_slider_, 0, wxALL | wxEXPAND, kBorder);
 
     return sizer_temperature;
-} /* createSizerTemperature */
+} /* CreateSizerTemperature */
 
 
 /******************************************************************************************************************************************************
@@ -156,7 +156,7 @@ wxBoxSizer* Settings::CreateSizerTemperature(wxWindow* parent)
 ******************************************************************************************************************************************************/
 void Settings::OnClose(wxCloseEvent &event)
 {
-    /* Hide rather than destroy: getInstance() keeps handing out this very dialog, so a
+    /* Hide rather than destroy: GetInstance() keeps handing out this very dialog, so a
        destroyed one would leave the singleton pointing at freed memory. The parent
        window destroys it when the application exits. */
     Hide();
@@ -199,7 +199,7 @@ void Settings::OnTemperatureConnected(wxCommandEvent &event)
 
 
 /******************************************************************************************************************************************************
-  applyTemperature()
+  ApplyTemperature()
 ******************************************************************************************************************************************************/
 /*! \brief          Hands the dialled-in reading to the simulated clock chip
  *  \details        Both controls end here, because between them they describe one state:
@@ -216,7 +216,7 @@ void Settings::ApplyTemperature()
     }
 
     DS3231::SetSimulatedTemperature(static_cast<DS3231::TemperatureType>(temperature_slider_->GetValue() * DS3231::kTenthsPerDegree));
-} /* applyTemperature */
+} /* ApplyTemperature */
 
 
 /******************************************************************************************************************************************************

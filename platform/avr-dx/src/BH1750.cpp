@@ -25,7 +25,7 @@
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  init()
+  Init()
 ******************************************************************************************************************************************************/
 StdReturnType BH1750::Init(ModeType mode)
 {
@@ -37,17 +37,17 @@ StdReturnType BH1750::Init(ModeType mode)
     if(SendCommand(BH1750_CMD_POWER_ON) == kENotOk) { return kENotOk; }
 
     return SetMode(mode);
-} /* init */
+} /* Init */
 
 
 /******************************************************************************************************************************************************
-  setMode()
+  SetMode()
 ******************************************************************************************************************************************************/
 /*! \brief          Puts the sensor into a measurement mode
  *  \details        Mode is assigned only once the sensor has acknowledged, because it is
- *                  also what isReady() reads to decide whether the sensor is set up.
+ *                  also what IsReady() reads to decide whether the sensor is set up.
  *                  Assigning first marks a sensor that never took the command as ready, and
- *                  the retry in task() then never runs again - which leaves the sensor
+ *                  the retry in Task() then never runs again - which leaves the sensor
  *                  powered on but converting nothing, and every later reading is the empty
  *                  data register.
 ******************************************************************************************************************************************************/
@@ -59,11 +59,11 @@ StdReturnType BH1750::SetMode(ModeType mode)
 
     mode_ = mode;
     return kEOk;
-} /* setMode */
+} /* SetMode */
 
 
 /******************************************************************************************************************************************************
-  changeMeasurementTime()
+  ChangeMeasurementTime()
 ******************************************************************************************************************************************************/
 /*! \brief          Changes the sensor's measurement time register
  *  \details        The register is split over two commands, and in both of them the value
@@ -87,19 +87,19 @@ StdReturnType BH1750::ChangeMeasurementTime(byte mt_reg_value)
     if(SendMode() == kENotOk) { return kENotOk; }
 
     /* Kept last, and only once all three went through, because this is what
-       convertRawToLux() divides by: a value stored after a failed transfer would scale every
+       ConvertRawToLux() divides by: a value stored after a failed transfer would scale every
        later reading by a measurement time the sensor is not using. */
     measurement_time_ = mt_reg_value;
     return kEOk;
-} /* changeMeasurementTime */
+} /* ChangeMeasurementTime */
 
 
 /******************************************************************************************************************************************************
-  task()
+  Task()
 ******************************************************************************************************************************************************/
 /*! \brief          Reads the sensor, setting it up first if that has not worked yet
- *  \details        Set up from here rather than from an init() call, and retried until it
- *                  works: the core keeps its sensor private and has no place to call init()
+ *  \details        Set up from here rather than from an Init() call, and retried until it
+ *                  works: the core keeps its sensor private and has no place to call Init()
  *                  from. The retry costs one failing transfer per cycle on a board with no
  *                  sensor, which the bounded timeouts keep short.
 ******************************************************************************************************************************************************/
@@ -121,7 +121,7 @@ void BH1750::Task()
 
     read_failures_ = 0u;
     SendModeForOneTimeMode();
-} /* task */
+} /* Task */
 
 
 /******************************************************************************************************************************************************
@@ -129,7 +129,7 @@ void BH1750::Task()
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  startBus()
+  StartBus()
 ******************************************************************************************************************************************************/
 StdReturnType BH1750::StartBus()
 {
@@ -137,11 +137,11 @@ StdReturnType BH1750::StartBus()
     bus_started_ = true;
 
     return kEOk;
-} /* startBus */
+} /* StartBus */
 
 
 /******************************************************************************************************************************************************
-  sendCommand()
+  SendCommand()
 ******************************************************************************************************************************************************/
 /*! \brief          Sends one opcode to the sensor
  *  \details        The sensor has no register pointer: every command is a single byte, and
@@ -150,17 +150,17 @@ StdReturnType BH1750::StartBus()
 StdReturnType BH1750::SendCommand(byte command)
 {
     return Twi::GetInstance().Write(BH1750_I2C_ADDR, &command, 1u);
-} /* sendCommand */
+} /* SendCommand */
 
 
 /******************************************************************************************************************************************************
-  readIlluminance()
+  ReadIlluminance()
 ******************************************************************************************************************************************************/
 /*! \brief          Reads the last measurement and converts it to lux
  *  \details        The reading is kept as it was when the sensor does not answer, rather
  *                  than falling to zero: the brightness automatic works on this value, so a
  *                  dropped reading would otherwise dim the display for a second. What bounds
- *                  that is the caller - see countReadFailure().
+ *                  that is the caller - see CountReadFailure().
 ******************************************************************************************************************************************************/
 StdReturnType BH1750::ReadIlluminance()
 {
@@ -171,17 +171,17 @@ StdReturnType BH1750::ReadIlluminance()
     illuminance_ = ConvertRawToLux(CombineRawValueParts(raw_value[0u], raw_value[1u]));
 
     return kEOk;
-} /* readIlluminance */
+} /* ReadIlluminance */
 
 
 /******************************************************************************************************************************************************
-  sendModeForOneTimeMode()
+  SendModeForOneTimeMode()
 ******************************************************************************************************************************************************/
 /*! \brief          Starts the next measurement when the sensor only makes one at a time
  *  \details        A one-time measurement leaves the sensor powered down, so the next task
  *                  would read the same value again unless the mode is sent afresh - and it
  *                  takes the power-on command before it listens to that mode, which is the
- *                  same departure from the xmega driver init() makes and which the other two
+ *                  same departure from the xmega driver Init() makes and which the other two
  *                  backends make here.
 ******************************************************************************************************************************************************/
 void BH1750::SendModeForOneTimeMode()
@@ -190,7 +190,7 @@ void BH1750::SendModeForOneTimeMode()
 
     SendCommand(BH1750_CMD_POWER_ON);
     SendMode();
-} /* sendModeForOneTimeMode */
+} /* SendModeForOneTimeMode */
 
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E

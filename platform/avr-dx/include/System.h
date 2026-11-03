@@ -12,7 +12,7 @@
  *      \brief      The machine the clock runs on, as the status command asks about it
  *
  *      \details    Half of this seam is about a network, and this board has none. Those
- *                  calls answer E_NOT_OK, which is not a stub standing in for something
+ *                  calls answer kENotOk, which is not a stub standing in for something
  *                  missing - it is the defined answer, and the status command sends an empty
  *                  field rather than a made-up one. The simulator answers the same way.
  *
@@ -78,10 +78,10 @@ class System
     StdReturnType GetFreeMemoryInKibibytes(uint16_t&) const;
 
     /* Instance methods, though none of the stubs below reads a member: they are the
-       interface the firmware core calls through getInstance(), and the backends that have a
+       interface the firmware core calls through GetInstance(), and the backends that have a
        network answer them from instance state. A backend without one keeps the shape. */
     // NOLINTBEGIN(readability-convert-member-functions-to-static)
-    /* No network, so no address, no name and no quality to report. E_NOT_OK is the answer
+    /* No network, so no address, no name and no quality to report. kENotOk is the answer
        the command is built to receive, not a gap. */
     StdReturnType GetNetworkAddress(char* string) const { string[0u] = STD_NULL_CHARACTER; return kENotOk; }
     StdReturnType GetNetworkSsid(char* string) const { string[0u] = STD_NULL_CHARACTER; return kENotOk; }

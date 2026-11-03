@@ -56,7 +56,7 @@ A glyph appended by hand costs three edits, which is the path the degree sign to
    readable: `0b` bits for the 5×8 table, hex for the rest, LSB first in both
    packings — bit 0 is the top row of a column, or the leftmost pixel of a row.
 2. `*_FONT_TABLE_SIZE` in the matching header, raised by one.
-3. One branch in `convertCharToFontIndex`
+3. One branch in `ConvertCharToFontIndex`
    ([Text.cpp](../firmware/src/Text/Text.cpp)), mapping the Latin-1 byte to the new
    index. Past the ASCII run rather than inside it, the same way the six umlauts sit
    at 96 to 101 — a character inserted into the run would shift every index after it.

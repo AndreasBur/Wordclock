@@ -110,7 +110,7 @@ esp_err_t httpd_resp_send(httpd_req_t*, const char* b, ssize_t n)
     return ESP_OK;
 }
 
-/* Hands over the prepared body a chunk at a time, and stops at BodyLimit rather than at its
+/* Hands over the prepared body a chunk at a time, and stops at body_limit rather than at its
    end - which is how a dropped connection is reached without a socket to drop. */
 int httpd_req_recv(httpd_req_t*, char* target, size_t max)
 {

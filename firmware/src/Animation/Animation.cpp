@@ -45,7 +45,7 @@
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  isPixelPartOfClockWords()
+  IsPixelPartOfClockWords()
 ******************************************************************************************************************************************************/
 bool Animation::IsPixelPartOfClockWords(const ClockWords::WordsListType clock_words_table, byte column, byte row)
 {
@@ -60,7 +60,7 @@ bool Animation::IsPixelPartOfClockWords(const ClockWords::WordsListType clock_wo
 } /* isPixelPartOfWord */
 
 /******************************************************************************************************************************************************
-  isPixelPartOfClockWords()
+  IsPixelPartOfClockWords()
 ******************************************************************************************************************************************************/
 bool Animation::IsPixelPartOfClockWords(const ClockWords::WordsListType clock_words_table, byte index)
 {
@@ -72,7 +72,7 @@ bool Animation::IsPixelPartOfClockWords(const ClockWords::WordsListType clock_wo
 
 
 /******************************************************************************************************************************************************
-  selectByTime()
+  SelectByTime()
 ******************************************************************************************************************************************************/
 byte Animation::SelectByTime(byte hour, byte minute, byte number_of_values)
 {
@@ -85,9 +85,9 @@ byte Animation::SelectByTime(byte hour, byte minute, byte number_of_values)
     hash = static_cast<byte>(hash * kSelectHashFactor);
 
     /* scaled by multiplication instead of a modulo, which would favour the lower
-       values because 256 is not a multiple of NumberOfValues */
+       values because 256 is not a multiple of number_of_values */
     return static_cast<byte>((static_cast<uint16_t>(hash) * number_of_values) >> 8u);
-} /* selectByTime */
+} /* SelectByTime */
 
 
 /******************************************************************************************************************************************************

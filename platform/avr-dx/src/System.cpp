@@ -41,14 +41,14 @@ constexpr uint16_t kBytesPerKibibyte{1024u};
 ******************************************************************************************************************************************************/
 
 /* Instance methods, though some of them read no member: they are the interface the
-   firmware core calls through getInstance(), and every backend - the simulator's
+   firmware core calls through GetInstance(), and every backend - the simulator's
    stand-ins included - offers it that way. Whether this backend's implementation
    happens to need a member is its own detail, and answering the check would carry
    that detail into the interface.
    The ones it would make const drive the hardware, which a const would deny. */
 // NOLINTBEGIN(readability-convert-member-functions-to-static, readability-make-member-function-const)
 /******************************************************************************************************************************************************
-  getFreeMemoryInKibibytes()
+  GetFreeMemoryInKibibytes()
 ******************************************************************************************************************************************************/
 /*! \brief          What is left between the stack and everything below it
  *  \details        The gap the stack still has to grow into, measured from a local variable
@@ -74,11 +74,11 @@ StdReturnType System::GetFreeMemoryInKibibytes(uint16_t& free_memory) const
     free_memory = static_cast<uint16_t>(static_cast<uint16_t>(stack_address - lower_edge) / kBytesPerKibibyte);
 
     return kEOk;
-} /* getFreeMemoryInKibibytes */
+} /* GetFreeMemoryInKibibytes */
 
 
 /******************************************************************************************************************************************************
-  performPendingRestart()
+  PerformPendingRestart()
 ******************************************************************************************************************************************************/
 /*! \brief          Resets the controller, if a command asked for one
  *  \details        The console is drained first: the command that asked for this has already
@@ -95,7 +95,7 @@ void System::PerformPendingRestart()
     /* The software reset request is protected, like every register that can change how the
        device runs. */
     _PROTECTED_WRITE(RSTCTRL.SWRR, RSTCTRL_SWRST_bm);
-} /* performPendingRestart */
+} /* PerformPendingRestart */
 // NOLINTEND(readability-convert-member-functions-to-static, readability-make-member-function-const)
 
 /******************************************************************************************************************************************************

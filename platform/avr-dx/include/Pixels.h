@@ -12,11 +12,11 @@
  *      \brief      The LED matrix as the firmware core sees it
  *
  *      \details    The buffer the core writes into, and the brightness it is dimmed by. What
- *                  reaches the strip is decided in render(), which the application calls once
- *                  per tick - show() only marks the buffer as changed.
+ *                  reaches the strip is decided in Render(), which the application calls once
+ *                  per tick - Show() only marks the buffer as changed.
  *
  *                  Same split as the ESP32 backend, for the same reason: several modules call
- *                  show() within one tick, and transmitting from each of them would put
+ *                  Show() within one tick, and transmitting from each of them would put
  *                  frames back to back with no reset gap between them.
  *
 ******************************************************************************************************************************************************/
@@ -128,7 +128,7 @@ class Pixels
     void DisablePixels() { SetBrightness(0); }
     void ClearPixels() { SetPixels(PixelType(0u, 0u, 0u)); }
 
-    /* Only asks for a render; what reaches the strip is decided by render() on the next
+    /* Only asks for a render; what reaches the strip is decided by Render() on the next
        tick. */
     StdReturnType Show() {
         dirty_ = true;

@@ -27,7 +27,7 @@
  *                  and the value lists of the enumerations sit behind the same support
  *                  switches as the enumerations do, so neither can drift. What remains
  *                  MIRRORED by hand are the option short names and argument types, which
- *                  each parser keeps private in its ParameterTable, plus the labels and
+ *                  each parser keeps private in its parameter_table_, plus the labels and
  *                  ranges this table adds on top. Every entry names the parser it was
  *                  taken from.
  *

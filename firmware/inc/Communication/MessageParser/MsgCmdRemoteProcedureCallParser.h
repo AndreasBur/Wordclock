@@ -239,7 +239,7 @@ class MsgCmdRemoteProcedureCallParser : public MsgParameterParser<MsgCmdRemotePr
                 if(!Power::IsSwitchFitted()) { answer_error_ = ErrorMessage::kErrorPowerSwitchAbsent; }
                 else { return_value_ = Power::GetInstance().SwitchSupplyOff(); }
                 break;
-            /* These seven answer E_NOT_OK where the display is busy with something else,
+            /* These seven answer kENotOk where the display is busy with something else,
                rather than doing it anyway: an overlay holding the display and an overlay
                already showing are the two states in which "now" cannot be honoured, and a
                caller that is told so can try again. */
@@ -310,7 +310,7 @@ class MsgCmdRemoteProcedureCallParser : public MsgParameterParser<MsgCmdRemotePr
                 Display::GetInstance().ResetColor();
                 break;
             default:
-                // Unknown or missing RPC id (including RPC_ID_NONE): there is
+                // Unknown or missing RPC id (including kRpcIdNone): there is
                 // nothing to execute, so report a specific error instead of Error=0.
                 answer_error_ = ErrorMessage::kErrorRpcIdUnknown;
                 break;

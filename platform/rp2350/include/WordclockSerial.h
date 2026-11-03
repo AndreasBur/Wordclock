@@ -130,7 +130,7 @@ class WordclockSerial
        firmware runs with the UART alone until a front end asks for them. */
     void SetLineSink(LineSinkType line_sink) { line_sink_ = line_sink; }
 
-    /* Called from another task, one character stream at a time. Returns E_NOT_OK when the
+    /* Called from another task, one character stream at a time. Returns kENotOk when the
        buffer is full, which drops the rest of that command rather than a random middle
        part of it - a half command is worse than a missing one, and the parser would
        answer with an error either way. */

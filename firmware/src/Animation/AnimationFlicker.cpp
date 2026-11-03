@@ -51,11 +51,11 @@ void AnimationFlicker::Init()
 {
     Animation::Init(kStateIdle);
     Reset();
-} /* init */
+} /* Init */
 
 
 /******************************************************************************************************************************************************
-  setTime()
+  SetTime()
 ******************************************************************************************************************************************************/
 StdReturnType AnimationFlicker::SetTime(byte hour, byte minute)
 {
@@ -68,17 +68,17 @@ StdReturnType AnimationFlicker::SetTime(byte hour, byte minute)
         return_value = kEOk;
     }
     return return_value;
-} /* setTime */
+} /* SetTime */
 
 
 /******************************************************************************************************************************************************
-  task()
+  Task()
 ******************************************************************************************************************************************************/
 void AnimationFlicker::Task()
 {
     if(state_ == kStateClearTime) { ClearTimeTask(); }
     else if(state_ == kStateSetTime) { SetTimeTask(); }
-} /* task */
+} /* Task */
 
 
 /******************************************************************************************************************************************************
@@ -86,17 +86,17 @@ void AnimationFlicker::Task()
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  reset()
+  Reset()
 ******************************************************************************************************************************************************/
 void AnimationFlicker::Reset()
 {
     /* The flicker is made by switching the display off and on, and it ends on an off:
-       clearTimeTask() toggles first and only then decides whether it was the last run, so
+       ClearTimeTask() toggles first and only then decides whether it was the last run, so
        the final toggle is always the one that darkens. Nothing switched it back, which
        left a clock that had shown this animation dark until something else happened to
        turn it on.
 
-       Here rather than at the end of the animation, because reset() is also where an
+       Here rather than at the end of the animation, because Reset() is also where an
        abort lands - a flicker cut short in the middle had the same ending. */
     Display::GetInstance().Enable();
 
@@ -104,11 +104,11 @@ void AnimationFlicker::Reset()
     hour_ = 0u;
     is_clock_set_ = false;
     flicker_counter_ = ANIMATION_FLICKER_COUNTER_INIT_VALUE;
-} /* reset */
+} /* Reset */
 
 
 /******************************************************************************************************************************************************
-  clearTimeTask()
+  ClearTimeTask()
 ******************************************************************************************************************************************************/
 void AnimationFlicker::ClearTimeTask()
 {
@@ -122,18 +122,18 @@ void AnimationFlicker::ClearTimeTask()
     }
 
     if(flicker_counter_-- <= 0u) state_ = kStateSetTime;
-} /* clearTimeTask */
+} /* ClearTimeTask */
 
 
 /******************************************************************************************************************************************************
-  setTimeTask()
+  SetTimeTask()
 ******************************************************************************************************************************************************/
 void AnimationFlicker::SetTimeTask()
 {
-    /* before reset(), which clears Hour and Minute */
+    /* before Reset(), which clears Hour and Minute */
     FinishWithTime(hour_, minute_);
     Reset();
-} /* setTimeTask */
+} /* SetTimeTask */
 
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E

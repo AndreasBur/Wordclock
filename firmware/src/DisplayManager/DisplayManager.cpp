@@ -45,7 +45,7 @@
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  task()
+  Task()
 ******************************************************************************************************************************************************/
 /*! \brief          Decides what the display is showing
  *  \details        
@@ -68,7 +68,7 @@ void DisplayManager::Task()
     /* The overlay has ended. Nothing else brings the clock back — Overlay's transition
        to idle only stops the Text — so without this the grid would keep the last
        overlay frame until the next word change, which can be nearly five minutes away.
-       Updating LastClockWords keeps that change from drawing a second time. */
+       Updating last_clock_words_ keeps that change from drawing a second time. */
     if(overlay_was_showing_) {
         overlay_was_showing_ = false;
         UpdateClockWords(time.GetHour(), time.GetMinute());
@@ -79,7 +79,7 @@ void DisplayManager::Task()
     if(UpdateClockWords(time.GetHour(), time.GetMinute())) {
         TaskClockWordsChange(time.GetHour(), time.GetMinute());
     }
-} /* task */
+} /* Task */
 
 
 /******************************************************************************************************************************************************

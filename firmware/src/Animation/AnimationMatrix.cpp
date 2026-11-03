@@ -52,11 +52,11 @@ void AnimationMatrix::Init()
     Animation::Init(kStateIdle);
     /* all animations share one union, so nothing may rely on member initializers */
     Reset();
-} /* init */
+} /* Init */
 
 
 /******************************************************************************************************************************************************
-  setTime()
+  SetTime()
 ******************************************************************************************************************************************************/
 StdReturnType AnimationMatrix::SetTime(byte hour, byte minute)
 {
@@ -72,16 +72,16 @@ StdReturnType AnimationMatrix::SetTime(byte hour, byte minute)
         return_value = kEOk;
     }
     return return_value;
-} /* setTime */
+} /* SetTime */
 
 
 /******************************************************************************************************************************************************
-  task()
+  Task()
 ******************************************************************************************************************************************************/
 void AnimationMatrix::Task()
 {
     if(state_ == kStateSetTime) { SetTimeTask(); }
-} /* task */
+} /* Task */
 
 
 /******************************************************************************************************************************************************
@@ -89,18 +89,18 @@ void AnimationMatrix::Task()
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  reset()
+  Reset()
 ******************************************************************************************************************************************************/
 void AnimationMatrix::Reset()
 {
     clock_words_table_.fill(DisplayWords::kWordNone);
     frame_counter_ = 0u;
     seed_ = 0u;
-} /* reset */
+} /* Reset */
 
 
 /******************************************************************************************************************************************************
-  setTimeTask()
+  SetTimeTask()
 ******************************************************************************************************************************************************/
 void AnimationMatrix::SetTimeTask()
 {
@@ -117,11 +117,11 @@ void AnimationMatrix::SetTimeTask()
         FinishWithClockWords(clock_words_table_);
         Reset();
     }
-} /* setTimeTask */
+} /* SetTimeTask */
 
 
 /******************************************************************************************************************************************************
-  drawColumn()
+  DrawColumn()
 ******************************************************************************************************************************************************/
 void AnimationMatrix::DrawColumn(byte column, byte head)
 {
@@ -147,11 +147,11 @@ void AnimationMatrix::DrawColumn(byte column, byte head)
             Display::GetInstance().SetPixel(column, row, static_cast<byte>(kTrailBrightness / fade_step));
         }
     }
-} /* drawColumn */
+} /* DrawColumn */
 
 
 /******************************************************************************************************************************************************
-  startFrame()
+  StartFrame()
 ******************************************************************************************************************************************************/
 byte AnimationMatrix::StartFrame(byte column) const
 {
@@ -167,9 +167,9 @@ byte AnimationMatrix::StartFrame(byte column) const
     hash = static_cast<byte>(hash * kStartFrameHashFactor);
 
     /* scaled by multiplication instead of a modulo: 256 is not a multiple of
-       MaxStartDelay, so a modulo would favour the lower start frames */
+       kMaxStartDelay, so a modulo would favour the lower start frames */
     return static_cast<byte>((static_cast<uint16_t>(hash) * kMaxStartDelay) >> 8u);
-} /* startFrame */
+} /* StartFrame */
 
 
 /******************************************************************************************************************************************************

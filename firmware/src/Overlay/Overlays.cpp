@@ -43,7 +43,7 @@
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  getState()
+  GetState()
 ******************************************************************************************************************************************************/
 /*! \brief          the state of the overlays as a whole
  *  \details        Showing beats idle beats disabled, so that the one overlay holding the
@@ -57,7 +57,7 @@ Overlays::StateType Overlays::GetState() const {
     if(IsShow()) { return OverlayType::kStateShow; }
     if(IsIdle()) { return OverlayType::kStateIdle; }
     return OverlayType::kStateDisabled;
-} /* getState */
+} /* GetState */
 
 /******************************************************************************************************************************************************
   Task()
@@ -71,11 +71,11 @@ void Overlays::Task() {
         if(IsShow()) { TaskShow(date, time); }
         else { TaskIdle(date, time); }
     }
-} /* task */
+} /* Task */
 
 
 /******************************************************************************************************************************************************
-  abort()
+  Abort()
 ******************************************************************************************************************************************************/
 /*! \brief          ends the overlay that is showing
  *  \details        Through the same transition the expired show timer takes, so the
@@ -84,11 +84,11 @@ void Overlays::Task() {
  *                  which redraws once it sees that no overlay is showing any more.
  *
  *                  The timer is cleared here rather than left to run out: it is what
- *                  taskIdle() reads to decide whether an overlay may start, so a
+ *                  TaskIdle() reads to decide whether an overlay may start, so a
  *                  leftover value would block the next one for as long as the aborted
  *                  overlay had left.
  *
- *  \return         E_OK if an overlay was showing
+ *  \return         kEOk if an overlay was showing
 ******************************************************************************************************************************************************/
 StdReturnType Overlays::Abort() {
     if(!IsShow()) { return kENotOk; }
@@ -108,7 +108,7 @@ StdReturnType Overlays::Abort() {
 
     show_timer_in_seconds_ = 0u;
     return kEOk;
-} /* abort */
+} /* Abort */
 
 
 /******************************************************************************************************************************************************
@@ -116,7 +116,7 @@ StdReturnType Overlays::Abort() {
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  taskIdle()
+  TaskIdle()
 ******************************************************************************************************************************************************/
 void Overlays::TaskIdle(ClockDate date, ClockTime time) {
 #if (OVERLAYS_SUPPORT_DATE == STD_ON)
@@ -134,10 +134,10 @@ void Overlays::TaskIdle(ClockDate date, ClockTime time) {
         show_timer_in_seconds_ =  text_.Task(show_timer_in_seconds_, date, time);
     }
 #endif
-} /* taskIdle */
+} /* TaskIdle */
 
 /******************************************************************************************************************************************************
-  taskShow()
+  TaskShow()
 ******************************************************************************************************************************************************/
 void Overlays::TaskShow(ClockDate date, ClockTime time) {
 #if (OVERLAYS_SUPPORT_DATE == STD_ON)
@@ -149,7 +149,7 @@ void Overlays::TaskShow(ClockDate date, ClockTime time) {
 #if (OVERLAYS_SUPPORT_TEXT == STD_ON)
     if(text_.GetState() == OverlayText::kStateShow) { show_timer_in_seconds_ =  text_.Task(show_timer_in_seconds_, date, time); }
 #endif
-} /* taskShow */
+} /* TaskShow */
 
 
 /******************************************************************************************************************************************************

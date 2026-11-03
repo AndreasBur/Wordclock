@@ -89,7 +89,7 @@ platform/esp32/test/run.sh              # build and run them
 ```
 
 Those compile the backend against stand-ins for the framework, so they reach everything
-above the peripherals: the frame `Pixels::render()` hands over, byte for byte; that an
+above the peripherals: the frame `Pixels::Render()` hands over, byte for byte; that an
 injected command takes the same path through `Communication` as one typed on the wire; and
 the handlers, driven through the same registration call the server makes - which is where this
 backend's own routes and its password are pinned down.
@@ -120,7 +120,7 @@ network. The time then stays unset, because there is no other time source (see b
 
 The LED data pin is **not** configured here. It comes from `DISPLAY_DATA_PIN` in
 [`../../firmware/inc/Display/Display.h`](../../firmware/inc/Display/Display.h), like
-every other display parameter, and the backend takes what `Display::init()` hands it.
+every other display parameter, and the backend takes what `Display::Init()` hands it.
 
 Its default of GPIO 10 is chosen for the S3, where that pin is free. It is **not** free on
 a classic ESP32-WROOM — GPIO 6 to 11 are wired to the flash chip there — so a board that
@@ -151,7 +151,7 @@ RISC-V parts are not a different case. Two things decide it:
 | ESP32-S3 | yes | 4 × 48 | what this backend targets — see the app slot table below |
 | ESP32 (classic) | yes | 8 × 64 | builds; GPIO 6 to 11 are flash, so the data pin has to move |
 | ESP32-S2 | yes | 4 × 64 | never built, nothing known against it |
-| ESP32-C3 / C6 | yes | 2 × 48 | builds; both transmit channels go to the strip, see `RmtMemoryBlockSymbols` |
+| ESP32-C3 / C6 | yes | 2 × 48 | builds; both transmit channels go to the strip, see `kRmtMemoryBlockSymbols` |
 | ESP32-C5 | yes | 2 × 48 | never built, nothing known against it |
 | ESP32-C2 | — | — | the pinned platform ships no C2 libraries, so it does not build here |
 | ESP32-H2 | **no** | 2 × 48 | out. 802.15.4 only |
@@ -198,21 +198,21 @@ free, which is the same reservation the rest of this README carries.
 
 Four details are worth knowing before changing anything here.
 
-**The frame goes out once per tick, not from `show()`.** Several modules call
-`Display::show()` within a single tick — DisplayManager, Animations, Text, Clock and two
-command parsers all do — so transmitting from `show()` would put frames back to back on
+**The frame goes out once per tick, not from `Show()`.** Several modules call
+`Display::Show()` within a single tick — DisplayManager, Animations, Text, Clock and two
+command parsers all do — so transmitting from `Show()` would put frames back to back on
 the wire. WS2812 needs the line low for longer than 280 µs between frames, and losing
 that gap does not blank the display; it shifts the next frame by a pixel, which reads as
-a wiring fault. `show()` therefore only marks the buffer dirty, exactly as on the
-simulator, and `Pixels::render()` transmits from the application's tick.
+a wiring fault. `Show()` therefore only marks the buffer dirty, exactly as on the
+simulator, and `Pixels::Render()` transmits from the application's tick.
 
-**`WordclockMain::init()` exists because nothing in the core calls `Display::init()`.**
+**`WordclockMain::Init()` exists because nothing in the core calls `Display::Init()`.**
 The simulator gets away with that because its stand-ins need no setting up. On hardware
-that call is what claims the RMT channel, and without it every `show()` is dropped in
+that call is what claims the RMT channel, and without it every `Show()` is dropped in
 silence.
 
-**The light sensor sets itself up from its first `task()`.** `Illuminance` keeps its
-`BH1750` private and its own `init()` is declared but never defined, so there is no
+**The light sensor sets itself up from its first `Task()`.** `Illuminance` keeps its
+`BH1750` private and its own `Init()` is declared but never defined, so there is no
 place in the core to initialise the sensor from. Doing it lazily also retries, which is
 what a sensor that is not answering yet after power-on needs.
 
@@ -355,7 +355,7 @@ and why it takes two ticks, is in [`Power.h`](../../firmware/inc/Power/Power.h).
 - **Supply sizing.** A word clock lights twenty to thirty letters at once, so it draws a
   few hundred mA in amber at a living-room brightness and some 2 A in white at full. The
   6.6 A that all 110 at full white would take is reachable all the same, and with three
-  commands: `test()` sets every pixel at once and `BrightnessMaxValue` is 255. Size for the
+  commands: `Test()` sets every pixel at once and `kBrightnessMaxValue` is 255. Size for the
   6.6 A rather than for the display — 5 V / 10 A puts a supply at two thirds of its rating,
   which is where it belongs once it has aged and warmed up.
 - **What the firmware will not let it draw.**
@@ -364,7 +364,7 @@ and why it takes two ticks, is in [`Power.h`](../../firmware/inc/Power/Power.h).
   can be asked for. It estimates from the number of lit letters and the colour — 20 mA per
   channel at full and 1 mA idle per LED, the numbers the 6.6 A above is itself made of — and
   scales the strip's master down until the estimate fits. On this display and that budget the
-  clock face costs 1190 mA in white and is left alone; `test()` in white asks 6710 mA and is
+  clock face costs 1190 mA in white and is left alone; `Test()` in white asks 6710 mA and is
   held to 92 of 255, which is 2481 mA.
 
   This is a floor under a mistake, not a substitute for a supply: it cannot know what the rail

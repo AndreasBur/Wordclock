@@ -114,7 +114,7 @@ ISR(USART1_RXC_vect)
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  initRuntime()
+  InitRuntime()
 ******************************************************************************************************************************************************/
 /*! \brief          Brings the clock and the millisecond time base up
  *  \details        The oscillator is set explicitly rather than left at its reset value:
@@ -136,7 +136,7 @@ void InitRuntime()
     TCB0.CTRLA = TCB_CLKSEL_DIV1_gc | TCB_ENABLE_bm;
 
     sei();
-} /* initRuntime */
+} /* InitRuntime */
 
 
 /******************************************************************************************************************************************************
@@ -158,7 +158,7 @@ uint32_t millis()
 
 
 /* Instance methods, though some of them read no member: they are the interface the
-   firmware core calls through getInstance(), and every backend - the simulator's
+   firmware core calls through GetInstance(), and every backend - the simulator's
    stand-ins included - offers it that way. Whether this backend's implementation
    happens to need a member is its own detail, and answering the check would carry
    that detail into the interface. */
@@ -174,7 +174,7 @@ void SerialPort::begin(uint32_t baudrate)
     ARDUINO_SERIAL_USART.CTRLC = USART_CMODE_ASYNCHRONOUS_gc | USART_CHSIZE_8BIT_gc | USART_PMODE_DISABLED_gc | USART_SBMODE_1BIT_gc;
     ARDUINO_SERIAL_USART.CTRLA = USART_RXCIE_bm;
     ARDUINO_SERIAL_USART.CTRLB = USART_RXEN_bm | USART_TXEN_bm;
-} /* begin */
+} /* Begin */
 
 
 /******************************************************************************************************************************************************
@@ -198,7 +198,7 @@ void SerialPort::write(char character)
     transmit_head = next_head;
 
     ARDUINO_SERIAL_USART.CTRLA |= USART_DREIE_bm;
-} /* write */
+} /* Write */
 
 
 /******************************************************************************************************************************************************
@@ -237,7 +237,7 @@ void SerialPort::print(const __FlashStringHelper* text)
 
 
 /******************************************************************************************************************************************************
-  SerialPort::printNumber()
+  SerialPort::PrintNumber()
 ******************************************************************************************************************************************************/
 void SerialPort::PrintNumber(int32_t number)
 {
@@ -245,11 +245,11 @@ void SerialPort::PrintNumber(int32_t number)
 
     ltoa(number, number_string, 10);
     print(number_string);
-} /* printNumber */
+} /* PrintNumber */
 
 
 /******************************************************************************************************************************************************
-  SerialPort::printUnsignedNumber()
+  SerialPort::PrintUnsignedNumber()
 ******************************************************************************************************************************************************/
 void SerialPort::PrintUnsignedNumber(uint32_t number)
 {
@@ -257,7 +257,7 @@ void SerialPort::PrintUnsignedNumber(uint32_t number)
 
     ultoa(number, number_string, 10);
     print(number_string);
-} /* printUnsignedNumber */
+} /* PrintUnsignedNumber */
 
 
 /******************************************************************************************************************************************************
@@ -285,7 +285,7 @@ char SerialPort::read()
     receive_tail = (receive_tail + 1u) & kReceiveBufferMask;
 
     return character;
-} /* read */
+} /* Read */
 
 
 /******************************************************************************************************************************************************
@@ -300,7 +300,7 @@ void SerialPort::flush()
     while((ARDUINO_SERIAL_USART.STATUS & USART_TXCIF_bm) == 0u) {
         /* And for the last character to have left the shift register. */
     }
-} /* flush */
+} /* Flush */
 // NOLINTEND(readability-convert-member-functions-to-static)
 
 /******************************************************************************************************************************************************

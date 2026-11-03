@@ -84,7 +84,7 @@ class AnimationExplodeWords : public Animation
     void ToggleWordOnDisplay() const;
     void SetWordOnDisplay() const;
 
-    //byte getFinalIndex() const { return Display::getInstance().columnAndRowToIndex(getFinalColumn(), getFinalRow()); }
+    //byte getFinalIndex() const { return Display::GetInstance().ColumnAndRowToIndex(getFinalColumn(), getFinalRow()); }
     static byte GetClearFinalRow() { return kRowCenter; }
     byte GetSetFinalRow() const { return Display::GetInstance().IndexToRow(current_word_index_); }
     byte GetClearFinalColumn() const { return kColumnCenter - (current_word_length_ / 2u); }

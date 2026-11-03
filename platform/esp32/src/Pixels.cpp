@@ -67,7 +67,7 @@ constexpr uint16_t kBit1LowTicks{4u};
    which is affordable exactly as long as nothing else wants RMT. */
 constexpr size_t kRmtMemoryBlockSymbols{2u * SOC_RMT_MEM_WORDS_PER_CHANNEL};
 
-/* Only ever one frame in flight - see render(), which waits for the previous one. A
+/* Only ever one frame in flight - see Render(), which waits for the previous one. A
    deeper queue would let two frames go out back to back and lose the reset gap. */
 constexpr size_t kRmtQueueDepth{1u};
 
@@ -93,11 +93,11 @@ rmt_encoder_handle_t rmt_encoder{nullptr};
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  init()
+  Init()
 ******************************************************************************************************************************************************/
 /*! \brief          Claims an RMT channel for the strip's data pin
  *  \details        Failures are reported and left behind rather than thrown: the
- *                  contract's init() returns nothing, and a clock whose serial console
+ *                  contract's Init() returns nothing, and a clock whose serial console
  *                  still answers is more useful for finding a miswired pin than one
  *                  that reboots. render() then does nothing until a channel exists.
 ******************************************************************************************************************************************************/
@@ -146,24 +146,24 @@ void Pixels::Init(byte pin)
         Serial.println(static_cast<int>(result));
         rmt_channel = nullptr;
     }
-} /* init */
+} /* Init */
 
 
 /******************************************************************************************************************************************************
-  render()
+  Render()
 ******************************************************************************************************************************************************/
 /*! \brief          Puts the buffer on the strip, if the firmware asked for it
  *  \details        The application calls this once per tick, after the firmware's pass -
- *                  never show() itself. Two reasons, and the second is the one that
- *                  bites: several modules call Display::show() within a single tick
+ *                  never Show() itself. Two reasons, and the second is the one that
+ *                  bites: several modules call Display::Show() within a single tick
  *                  (DisplayManager, Animations, Text, Clock and the command parsers all
- *                  do), so transmitting from show() would put frames back to back on the
+ *                  do), so transmitting from Show() would put frames back to back on the
  *                  wire. WS2812 needs the line low for longer than 280 us between
  *                  frames, and losing that gap does not blank the display - it shifts
  *                  the next frame by a pixel, which reads as a wiring fault.
  *                  Rendering once per 10 ms tick leaves milliseconds of idle line.
  *
- *  \return         E_OK if a frame went out or none was due
+ *  \return         kEOk if a frame went out or none was due
 ******************************************************************************************************************************************************/
 StdReturnType Pixels::Render()
 {
@@ -180,20 +180,20 @@ StdReturnType Pixels::Render()
        turn every following tick into another failing attempt. */
     dirty_ = false;
     return result;
-} /* render */
+} /* Render */
 
 
 /* An instance method, though it reads no member: it is part of the interface the
-   firmware core calls through getInstance(), and every backend - the simulator's
+   firmware core calls through GetInstance(), and every backend - the simulator's
    stand-ins included - offers it that way. Whether this backend's implementation
    happens to need a member is its own detail, and answering the check would carry
    that detail into the interface. */
 // NOLINTBEGIN(readability-convert-member-functions-to-static)
 /******************************************************************************************************************************************************
-  isFrameOnTheWire()
+  IsFrameOnTheWire()
 ******************************************************************************************************************************************************/
 /*! \brief          Whether the previous frame is still being transmitted
- *  \details        The same call transmitFrame() waits on, with a timeout of nothing: this is
+ *  \details        The same call TransmitFrame() waits on, with a timeout of nothing: this is
  *                  a question and not a wait, and it is asked from a task that has a clock to
  *                  keep. ESP_ERR_TIMEOUT is therefore the ordinary "still busy" answer rather
  *                  than a fault.
@@ -209,12 +209,12 @@ bool Pixels::IsFrameOnTheWire() const
     if(rmt_channel == nullptr) { return false; }
 
     return rmt_tx_wait_all_done(rmt_channel, 0) != ESP_OK;
-} /* isFrameOnTheWire */
+} /* IsFrameOnTheWire */
 // NOLINTEND(readability-convert-member-functions-to-static)
 
 
 /******************************************************************************************************************************************************
-  getPixel()
+  GetPixel()
 ******************************************************************************************************************************************************/
 StdReturnType Pixels::GetPixel(byte index, PixelType& pixel) const
 {
@@ -222,11 +222,11 @@ StdReturnType Pixels::GetPixel(byte index, PixelType& pixel) const
 
     pixel = pixel_buffer_[ToRow(index)][ToColumn(index)];
     return kEOk;
-} /* getPixel */
+} /* GetPixel */
 
 
 /******************************************************************************************************************************************************
-  getPixel()
+  GetPixel()
 ******************************************************************************************************************************************************/
 Pixels::PixelType Pixels::GetPixel(byte index) const
 {
@@ -235,11 +235,11 @@ Pixels::PixelType Pixels::GetPixel(byte index) const
     if(!IsIndexValid(index)) { return PixelType{}; }
 
     return pixel_buffer_[ToRow(index)][ToColumn(index)];
-} /* getPixel */
+} /* GetPixel */
 
 
 /******************************************************************************************************************************************************
-  setPixel()
+  SetPixel()
 ******************************************************************************************************************************************************/
 StdReturnType Pixels::SetPixel(byte index, PixelType pixel)
 {
@@ -248,20 +248,20 @@ StdReturnType Pixels::SetPixel(byte index, PixelType pixel)
     pixel_buffer_[ToRow(index)][ToColumn(index)] = pixel;
     dirty_ = true;
     return kEOk;
-} /* setPixel */
+} /* SetPixel */
 
 
 /******************************************************************************************************************************************************
-  setPixel()
+  SetPixel()
 ******************************************************************************************************************************************************/
 StdReturnType Pixels::SetPixel(byte index, byte red, byte green, byte blue)
 {
     return SetPixel(index, PixelType(red, green, blue));
-} /* setPixel */
+} /* SetPixel */
 
 
 /******************************************************************************************************************************************************
-  setPixels()
+  SetPixels()
 ******************************************************************************************************************************************************/
 void Pixels::SetPixels(PixelType pixel)
 {
@@ -271,22 +271,22 @@ void Pixels::SetPixels(PixelType pixel)
         }
     }
     dirty_ = true;
-} /* setPixels */
+} /* SetPixels */
 
 
 /******************************************************************************************************************************************************
-  setBrightness()
+  SetBrightness()
 ******************************************************************************************************************************************************/
 void Pixels::SetBrightness(byte brightness, bool gamma_correction)
 {
-    /* Master output on and off, driven by enablePixels() and disablePixels(). The buffer
+    /* Master output on and off, driven by EnablePixels() and DisablePixels(). The buffer
        is left alone and the level is applied on the way out, so switching back on
        restores the picture without the firmware having to redraw it. */
     brightness_ = brightness;
     dirty_ = true;
 
     UNUSED(gamma_correction);
-} /* setBrightness */
+} /* SetBrightness */
 
 
 /******************************************************************************************************************************************************
@@ -294,7 +294,7 @@ void Pixels::SetBrightness(byte brightness, bool gamma_correction)
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  fillFrameBuffer()
+  FillFrameBuffer()
 ******************************************************************************************************************************************************/
 /*! \brief          Copies the pixel buffer into the frame the peripheral reads
  *  \details        Pixel already stores its colours in the WS2812 order (green, red,
@@ -313,17 +313,17 @@ void Pixels::FillFrameBuffer() const
         *target++ = pixel.GetRed();
         *target++ = pixel.GetBlue();
     }
-} /* fillFrameBuffer */
+} /* FillFrameBuffer */
 
 
 /******************************************************************************************************************************************************
-  transmitFrame()
+  TransmitFrame()
 ******************************************************************************************************************************************************/
 /*! \brief          Hands one frame to the RMT peripheral
  *  \details        Waits for the previous frame first, because the peripheral is still
- *                  reading FrameBuffer until it is done.
+ *                  reading frame_buffer until it is done.
  *
- *  \return         E_OK if the frame was queued
+ *  \return         kEOk if the frame was queued
 ******************************************************************************************************************************************************/
 StdReturnType Pixels::TransmitFrame()
 {
@@ -337,7 +337,7 @@ StdReturnType Pixels::TransmitFrame()
     if(rmt_transmit(rmt_channel, rmt_encoder, frame_buffer, sizeof(frame_buffer), &transmit_config) != ESP_OK) { return kENotOk; }
 
     return kEOk;
-} /* transmitFrame */
+} /* TransmitFrame */
 
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E

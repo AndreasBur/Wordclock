@@ -2,9 +2,9 @@
 #define _ARDUINO_ITOA_H_
 
 /* -------------------------------------------------------------------------- */
-/*  itoa                                                                      */
+/*  Itoa                                                                      */
 /* -------------------------------------------------------------------------- */
-/*  The Arduino core provides itoa(); GCC/glibc does not. Minimal             */
+/*  The Arduino core provides Itoa(); GCC/glibc does not. Minimal             */
 /*  reimplementation matching Arduino's signature (value, buffer, base),      */
 /*  including base-10 sign handling.                                          */
 /* -------------------------------------------------------------------------- */

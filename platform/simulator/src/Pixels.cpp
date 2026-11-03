@@ -43,7 +43,7 @@ void Pixels::SetPixels(PixelType pixel)
 
 void Pixels::SetBrightness(byte brightness, bool gamma_correction)
 {
-    /* Master output on and off, driven by enablePixels() and disablePixels(). The
+    /* Master output on and off, driven by EnablePixels() and DisablePixels(). The
        buffer is left alone, so switching back on restores the picture without having to
        copy it away first. */
     brightness_ = brightness;

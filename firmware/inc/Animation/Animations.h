@@ -136,7 +136,7 @@ class Animations
         kAnimationIdNumberOfAnimations
     };
 
-    /* Which animation runs on a word change. Only MODE_FIXED uses the selected
+    /* Which animation runs on a word change. Only kModeFixed uses the selected
        animation, the others pick one themselves, which is why selecting an animation
        and selecting a strategy are two separate settings. */
     enum ModeType {
@@ -234,17 +234,17 @@ class Animations
   private:
     static constexpr byte kTaskCycleInitValue{ANIMATIONS_TASK_CYCLE_INIT_VALUE};
 
-    /* ANIMATION_ID_NONE means no animation at all, so the ids a mode may pick start
+    /* kAnimationIdNone means no animation at all, so the ids a mode may pick start
        behind it */
     static constexpr byte kFirstAnimation{kAnimationIdNone + 1u};
     static constexpr byte kNumberOfAnimations{kAnimationIdNumberOfAnimations - kFirstAnimation};
-    /* odd factor of the hash in calcRandomAnimation(), see there */
+    /* odd factor of the hash in CalcRandomAnimation(), see there */
     static constexpr byte kRandomHashFactor{181u};
 
     static_assert(kAnimationIdNumberOfAnimations <= 16u,
                   "Animations: too many animations for the favourites bit mask, please widen it");
 
-    /* one bit per animation id, bit 0 of ANIMATION_ID_NONE stays unused.
+    /* one bit per animation id, bit 0 of kAnimationIdNone stays unused.
        Shifted in an unsigned long rather than an unsigned int: there are sixteen
        animations, and on a target whose int is 16 bits wide - every AVR - 1u shifted by
        sixteen is undefined and the mask comes out empty, which silently leaves no
@@ -254,9 +254,9 @@ class Animations
     };
 
     std::array<byte, kAnimationIdNumberOfAnimations> task_cycles_;
-    /* what the user selected, used as it is in MODE_FIXED */
+    /* what the user selected, used as it is in kModeFixed */
     AnimationIdType animation_id_{kAnimationIdNone};
-    /* what is really running, equal to AnimationId unless a mode selected something */
+    /* what is really running, equal to animation_id_ unless a mode selected something */
     AnimationIdType current_animation_id_{kAnimationIdNone};
     ModeType mode_{kModeFixed};
     /* animations the selecting modes may pick, all of them until told otherwise */
@@ -277,7 +277,7 @@ class Animations
     AnimationIdType CalcNextAnimation() const;
     byte NumberOfFavourites() const;
 
-    /* The round a knob walks, which is not the one calcNextAnimation() walks: that one
+    /* The round a knob walks, which is not the one CalcNextAnimation() walks: that one
        skips everything but the favourites, because kModeSequence picks among those.
        Stepping the selection by hand may reach every animation, favourite or not. */
     static constexpr AnimationIdType ToNextAnimation(AnimationIdType animation_id) {
@@ -318,7 +318,7 @@ class Animations
     StdReturnType SetAnimation(AnimationIdType);
     StdReturnType SetMode(ModeType);
     StdReturnType SetFavourite(AnimationIdType animation_id, bool favourite) {
-        /* ANIMATION_ID_NONE is no animation and cannot be a favourite */
+        /* kAnimationIdNone is no animation and cannot be a favourite */
         if(animation_id < kFirstAnimation || !IsAnimationValid(animation_id)) { return kENotOk; }
         /* the last favourite may not be dropped, the selecting modes would be left
            with nothing to pick */
@@ -337,7 +337,7 @@ class Animations
         task_cycles_.fill(kTaskCycleInitValue);
         favourites_ = kAllFavourites;
         /* Both are valid by construction, so neither answer can say anything a caller of
-           resetToDefaults() could act on. */
+           ResetToDefaults() could act on. */
         SetAnimation(kAnimationIdNone);
         SetMode(kModeFixed);
     }
@@ -364,7 +364,7 @@ class Animations
        mode stay as they are, so the next word change animates again.
 
        Whatever half-finished frame the animation left is still on the display, so the
-       caller has to draw something over it - DisplayManager::abortAnimation() is the
+       caller has to draw something over it - DisplayManager::AbortAnimation() is the
        entry point that does both. */
     void Abort() { InitCurrentAnimation(); }
 

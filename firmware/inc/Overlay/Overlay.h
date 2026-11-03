@@ -92,7 +92,7 @@ template <typename Derived> class Overlay
   private:
     static constexpr SecondType kSecondToStartShow{30u};
 
-    /* Named rather than written twice, so the initialisers below and resetToDefaults()
+    /* Named rather than written twice, so the initialisers below and ResetToDefaults()
        cannot fall apart - a reset that put different values in than a clock starts with
        would be a second set of defaults to keep in step. */
     static constexpr MinuteType kPeriodInMinutesInitValue{1u};
@@ -269,8 +269,8 @@ template <typename Derived> class Overlay
     /* Back to what a clock that was never configured has, now that the overlays are
        stored and a reset has something to undo.
 
-       The derived hook is named apart from this for the reason canShow() gives: a
-       resetToDefaults() in an overlay would hide this one, and everything the base owns
+       The derived hook is named apart from this for the reason CanShow() gives: a
+       ResetToDefaults() in an overlay would hide this one, and everything the base owns
        would then quietly survive the reset. */
     void ResetToDefaults() {
         period_in_minutes_ = kPeriodInMinutesInitValue;

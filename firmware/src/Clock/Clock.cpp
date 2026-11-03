@@ -135,7 +135,7 @@ const Clock::MinuteType Clock::kMinutesTable[][CLOCK_NUMBER_OF_MINUTE_STEPS] PRO
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  getClockWords()
+  GetClockWords()
 ******************************************************************************************************************************************************/
 StdReturnType Clock::GetClockWords(byte hour, byte minute, ClockWords& clock_words) const
 {
@@ -160,11 +160,11 @@ StdReturnType Clock::GetClockWords(byte hour, byte minute, ClockWords& clock_wor
         return_value = kENotOk;
     }
     return return_value;
-} /* getClockWords */
+} /* GetClockWords */
 
 
 /******************************************************************************************************************************************************
-  getClockWords()
+  GetClockWords()
 ******************************************************************************************************************************************************/
 StdReturnType Clock::GetClockWords(byte hour, byte minute, ClockWordsListType& clock_words_list) const
 {
@@ -178,11 +178,11 @@ StdReturnType Clock::GetClockWords(byte hour, byte minute, ClockWordsListType& c
     } else {
         return kENotOk;
     }
-} /* getClockWords */
+} /* GetClockWords */
 
 
 /******************************************************************************************************************************************************
-  setTime()
+  SetTime()
 ******************************************************************************************************************************************************/
 StdReturnType Clock::SetTime(byte hour, byte minute) const
 {
@@ -204,7 +204,7 @@ StdReturnType Clock::SetTime(byte hour, byte minute) const
         if(Display::GetInstance().SetWord(clock_words.GetMinuteWord(index)) == kENotOk) return_value = kENotOk;
     }
     return return_value;
-} /* setTime */
+} /* SetTime */
 
 
 /******************************************************************************************************************************************************

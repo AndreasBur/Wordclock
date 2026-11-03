@@ -39,12 +39,12 @@
 ******************************************************************************************************************************************************/
 namespace {
 
-/* Named HttpServer rather than Server: the Arduino core has a class Server in the global
+/* Named http_server rather than Server: the Arduino core has a class Server in the global
    namespace, and an unqualified Server here is then ambiguous. */
 AsyncWebServer http_server(WEB_INTERFACE_PORT);
 AsyncWebSocket socket("/ws");
 
-/* Whether begin() got as far as listening. The server object exists from start-up either
+/* Whether Begin() got as far as listening. The server object exists from start-up either
    way, so unlike the ESP32's handle it cannot itself stand for that. */
 bool is_listening{false};
 
@@ -72,7 +72,7 @@ constexpr uint32_t kFilesystemReserve{8u * 1024u};
 
 /* An upload in progress. Static because the body arrives in chunks across several calls and
    the request object is not the place to hang a file on - what the answer needs afterwards is
-   whether it got that far, which is what Failure and IsCommitted say. */
+   whether it got that far, which is what Failure and is_committed say. */
 struct UploadType {
     File image;
     uint32_t written{0u};
@@ -88,7 +88,7 @@ UploadType upload;
  *  LOCAL FUNCTIONS
 ******************************************************************************************************************************************************/
 /******************************************************************************************************************************************************
-  isRequestAuthorised()
+  IsRequestAuthorised()
 ******************************************************************************************************************************************************/
 /*! \brief          Whether this request may be answered, and the 401 when it may not
  *
@@ -127,7 +127,7 @@ bool IsRequestAuthorised(AsyncWebServerRequest* request)
 
 
 /******************************************************************************************************************************************************
-  abortImage()
+  AbortImage()
 ******************************************************************************************************************************************************/
 /*! \brief          Gives up on the image being written, and takes it off the filesystem
  *
@@ -145,7 +145,7 @@ void AbortImage(const char* reason)
 
 
 /******************************************************************************************************************************************************
-  beginImage()
+  BeginImage()
 ******************************************************************************************************************************************************/
 /*! \brief          Opens the file the image is written into, or says why it cannot be
  *
@@ -186,7 +186,7 @@ void BeginImage(AsyncWebServerRequest* request, size_t announced)
 
 
 /******************************************************************************************************************************************************
-  commitImage()
+  CommitImage()
 ******************************************************************************************************************************************************/
 /*! \brief          Closes the image and writes the loader's command page beside it
  *
@@ -228,7 +228,7 @@ void CommitImage(size_t announced)
 
 
 /******************************************************************************************************************************************************
-  handleAsset()
+  HandleAsset()
 ******************************************************************************************************************************************************/
 /*! \brief          Serves one of the files the clock hands out unchanged
  *
@@ -252,7 +252,7 @@ void HandleAsset(AsyncWebServerRequest* request, const WebFrontend::AssetType& a
 
 
 /******************************************************************************************************************************************************
-  sendUpdateResult()
+  SendUpdateResult()
 ******************************************************************************************************************************************************/
 /*! \brief          Answers the update route, in the one shape the page reads
  *
@@ -286,7 +286,7 @@ void SendUpdateResult(AsyncWebServerRequest* request, bool ok, const char* reaso
 
 
 /******************************************************************************************************************************************************
-  handleUpdateBody()
+  HandleUpdateBody()
 ******************************************************************************************************************************************************/
 /*! \brief          Takes the image out of the request body and into the filesystem
  *
@@ -323,7 +323,7 @@ void HandleUpdateBody(AsyncWebServerRequest* request, uint8_t* data, size_t leng
 
 
 /******************************************************************************************************************************************************
-  handleUpdate()
+  HandleUpdate()
 ******************************************************************************************************************************************************/
 /*! \brief          Answers once the body has been taken, and asks for the restart
  *
@@ -355,7 +355,7 @@ void HandleUpdate(AsyncWebServerRequest* request)
 
 
 /******************************************************************************************************************************************************
-  handleCommands() / handleDisplay()
+  HandleCommands() / HandleDisplay()
 ******************************************************************************************************************************************************/
 /*! \brief          Serves the command catalog and the panel's letters
  *
@@ -386,7 +386,7 @@ void HandleDisplay(AsyncWebServerRequest* request)
 
 
 /******************************************************************************************************************************************************
-  handleSocket()
+  HandleSocket()
 ******************************************************************************************************************************************************/
 /*! \brief          Takes one web socket frame and injects it as typed characters
  *  \details        The library completes the handshake itself and reports the result as an
@@ -433,17 +433,17 @@ void OnSocketEvent(AsyncWebSocket*, AsyncWebSocketClient*, AwsEventType type,
 ******************************************************************************************************************************************************/
 
 /* Instance methods, though some of them read no member: they are the interface the
-   firmware core calls through getInstance(), and every backend - the simulator's
+   firmware core calls through GetInstance(), and every backend - the simulator's
    stand-ins included - offers it that way. Whether this backend's implementation
    happens to need a member is its own detail, and answering the check would carry
    that detail into the interface. */
 // NOLINTBEGIN(readability-convert-member-functions-to-static)
 /******************************************************************************************************************************************************
-  begin()
+  Begin()
 ******************************************************************************************************************************************************/
 /*! \brief          Starts the server and takes over the output lines
  *
- *  \return         E_OK if the server is listening
+ *  \return         kEOk if the server is listening
 ******************************************************************************************************************************************************/
 StdReturnType WebInterface::Begin()
 {
@@ -490,38 +490,38 @@ StdReturnType WebInterface::Begin()
     }
 
     return kEOk;
-} /* begin */
+} /* Begin */
 
 
 /******************************************************************************************************************************************************
-  broadcastLine()
+  BroadcastLine()
 ******************************************************************************************************************************************************/
 /*! \brief          Sends one finished line to every open socket
  *  \details        The widening to UTF-8 and the bound on it are WebFrontend's, shared with
- *                  the other backend; what is this file's is the one call in sendText()
+ *                  the other backend; what is this file's is the one call in SendText()
  *                  below, where the IDF needs a walk over descriptors.
 ******************************************************************************************************************************************************/
 void WebInterface::BroadcastLine(const char* line)
 {
     WebFrontend::GetInstance().BroadcastLine(line);
-} /* broadcastLine */
+} /* BroadcastLine */
 
 
 /******************************************************************************************************************************************************
-  broadcastFrame()
+  BroadcastFrame()
 ******************************************************************************************************************************************************/
 /*! \brief          Sends the pixel buffer to every open socket, when it changed
  *  \details        The rate limit, the gathering and the comparison against the last frame
  *                  are WebFrontend's, shared with the other backend - none of the three has
  *                  anything to do with which server is underneath. What is this file's is
- *                  sendBinary() below.
+ *                  SendBinary() below.
  *
  *  \return         -
 ******************************************************************************************************************************************************/
 void WebInterface::BroadcastFrame()
 {
     WebFrontend::GetInstance().BroadcastFrame();
-} /* broadcastFrame */
+} /* BroadcastFrame */
 
 
 /******************************************************************************************************************************************************
@@ -565,7 +565,7 @@ void WebTransport::SendBinary(const byte* bytes, size_t length)
  *  W E B   R E S P O N S E   B O D Y
 ******************************************************************************************************************************************************/
 /* A response this server is pulled from rather than pushed to: the stream collects what is
-   written and finish() hands it to the request, which is when the library sends it. */
+   written and Finish() hands it to the request, which is when the library sends it. */
 
 WebResponseBody::WebResponseBody(AsyncWebServerRequest* request, const char* content_type)
     : request_(request), stream_(request->beginResponseStream(content_type))

@@ -34,20 +34,20 @@
 ******************************************************************************************************************************************************/
 
 /* Instance methods, though some of them read no member: they are the interface the
-   firmware core calls through getInstance(), and every backend - the simulator's
+   firmware core calls through GetInstance(), and every backend - the simulator's
    stand-ins included - offers it that way. Whether this backend's implementation
    happens to need a member is its own detail, and answering the check would carry
    that detail into the interface. */
 // NOLINTBEGIN(readability-convert-member-functions-to-static)
 /******************************************************************************************************************************************************
-  read()
+  Read()
 ******************************************************************************************************************************************************/
 /*! \brief          Reads the stored blob
  *  \details        A blob of a different length is refused rather than read as far as it
  *                  goes: it belongs to another version of the settings, and Persistence
  *                  would have to reject it anyway.
  *
- *  \return         E_OK if exactly Size bytes were read
+ *  \return         kEOk if exactly Size bytes were read
 ******************************************************************************************************************************************************/
 StdReturnType Storage::Read(byte* buffer, size_t size) const
 {
@@ -68,15 +68,15 @@ StdReturnType Storage::Read(byte* buffer, size_t size) const
     if(read != size) { return kENotOk; }
 
     return kEOk;
-} /* read */
+} /* Read */
 
 
 /******************************************************************************************************************************************************
-  write()
+  Write()
 ******************************************************************************************************************************************************/
 /*! \brief          Replaces the stored blob
  *
- *  \return         E_OK if the whole blob was stored
+ *  \return         kEOk if the whole blob was stored
 ******************************************************************************************************************************************************/
 StdReturnType Storage::Write(const byte* buffer, size_t size)
 {
@@ -91,17 +91,17 @@ StdReturnType Storage::Write(const byte* buffer, size_t size)
     if(written != size) { return kENotOk; }
 
     return kEOk;
-} /* write */
+} /* Write */
 
 
 /******************************************************************************************************************************************************
-  clear()
+  Clear()
 ******************************************************************************************************************************************************/
 /*! \brief          Forgets the stored blob
  *  \details        A store that held nothing counts as cleared, so calling this twice is
  *                  not an error.
  *
- *  \return         E_OK if nothing is stored afterwards
+ *  \return         kEOk if nothing is stored afterwards
 ******************************************************************************************************************************************************/
 StdReturnType Storage::Clear()
 {
@@ -115,7 +115,7 @@ StdReturnType Storage::Clear()
     if(!was_removed && !was_empty) { return kENotOk; }
 
     return kEOk;
-} /* clear */
+} /* Clear */
 // NOLINTEND(readability-convert-member-functions-to-static)
 
 /******************************************************************************************************************************************************

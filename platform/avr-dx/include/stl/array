@@ -13,7 +13,7 @@
  *
  *      \details    An aggregate holding one C array, which is what the standard's is too.
  *                  That is load-bearing rather than incidental: the core writes
- *                  PixelsBuffer{0u} and TaskCycles{}, and a class with a declared
+ *                  pixels_buffer_{0u} and task_cycles_{}, and a class with a declared
  *                  constructor would stop being brace-initialisable that way.
  *
  *                  No at(), because it throws and this backend is built with

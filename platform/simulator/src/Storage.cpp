@@ -25,14 +25,14 @@
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  read()
+  Read()
 ******************************************************************************************************************************************************/
 /*! \brief          Reads the stored blob
  *  \details        A file of a different length is refused rather than read as far as it
  *                  goes: it belongs to another build of the settings, and half of one is
  *                  worse than none.
  *
- *  \return         E_OK if exactly Size bytes were read
+ *  \return         kEOk if exactly Size bytes were read
 ******************************************************************************************************************************************************/
 /* Not static, though nothing in them reads a member: these stand in for the backends the
    clock really runs on, and there the same call reaches a peripheral through instance
@@ -57,15 +57,15 @@ StdReturnType Storage::Read(byte* buffer, size_t size) const
     if((read != size) || !is_at_end) { return kENotOk; }
 
     return kEOk;
-} /* read */
+} /* Read */
 
 
 /******************************************************************************************************************************************************
-  write()
+  Write()
 ******************************************************************************************************************************************************/
 /*! \brief          Replaces the stored blob
  *
- *  \return         E_OK if the whole blob reached the file
+ *  \return         kEOk if the whole blob reached the file
 ******************************************************************************************************************************************************/
 StdReturnType Storage::Write(const byte* buffer, size_t size)
 {
@@ -80,17 +80,17 @@ StdReturnType Storage::Write(const byte* buffer, size_t size)
     if((written != size) || !is_flushed) { return kENotOk; }
 
     return kEOk;
-} /* write */
+} /* Write */
 
 
 /******************************************************************************************************************************************************
-  clear()
+  Clear()
 ******************************************************************************************************************************************************/
 /*! \brief          Forgets the stored blob
  *  \details        A store that was empty to begin with counts as cleared, so calling this
  *                  twice is not an error.
  *
- *  \return         E_OK if nothing is stored afterwards
+ *  \return         kEOk if nothing is stored afterwards
 ******************************************************************************************************************************************************/
 StdReturnType Storage::Clear()
 {
@@ -101,7 +101,7 @@ StdReturnType Storage::Clear()
     if(std::remove(STORAGE_FILE_NAME) != 0) { return kENotOk; }
 
     return kEOk;
-} /* clear */
+} /* Clear */
 // NOLINTEND(readability-convert-member-functions-to-static)
 
 /******************************************************************************************************************************************************

@@ -66,7 +66,7 @@ class Animation
  *  P R O T E C T E D   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   protected:
-    /* odd factor of the hash in selectByTime(), see there */
+    /* odd factor of the hash in SelectByTime(), see there */
     static constexpr byte kSelectHashFactor{181u};
 
     StateType state_{kStateNone};

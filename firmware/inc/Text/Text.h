@@ -125,7 +125,7 @@ class Text
 
     /* Each of these four had a twin that differed in nothing a reader sees - it dropped the
        answer instead of passing it on - and calling the wrong one of the pair from the wrong
-       place cost bounds checks and looked right. That happened once, in setChar()'s 9x10
+       place cost bounds checks and looked right. That happened once, in SetChar()'s 9x10
        branch. There is one of each now, so the mistake has nowhere left to happen, and the
        [[nodiscard]] that used to police it is gone with the twins. */
     template <typename RowType, byte RowsSize>

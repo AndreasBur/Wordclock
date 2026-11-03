@@ -16,11 +16,11 @@
  *                  register handling follows the xmega driver, which was written
  *                  against the same datasheet.
  *
- *                  The sensor is set up from the first task() rather than from an init()
+ *                  The sensor is set up from the first Task() rather than from an Init()
  *                  call, because the core keeps its BH1750 private and never calls one.
  *                  Setting up lazily also retries, which is what a sensor that is not
  *                  answering yet after power-on needs - and what a sensor that stops
- *                  answering later needs, see ReadFailuresBeforeReinit.
+ *                  answering later needs, see kReadFailuresBeforeReinit.
  *
 ******************************************************************************************************************************************************/
 #ifndef _BH1750_H_
@@ -49,7 +49,7 @@
 #define BH1750_I2C_FREQUENCY_HZ                         100000u
 
 /* In scheduler ticks, so 100 * 10 ms = 1 s between readings. Has to stay well above the
-   120 ms a high-resolution conversion takes, or task() reads a measurement that is not
+   120 ms a high-resolution conversion takes, or Task() reads a measurement that is not
    finished yet. */
 #define BH1750_TASK_CYCLE                               100u
 
@@ -136,8 +136,8 @@ class BH1750
   private:
     static constexpr byte kTaskCycle{BH1750_TASK_CYCLE};
     /* Readings in a row that may fail before the driver sets the sensor up again, so five
-       seconds at TaskCycle. Long enough that one disturbed transfer keeps the last value,
-       which is what readIlluminance() is written for, and short enough that a sensor which
+       seconds at task_cycle_. Long enough that one disturbed transfer keeps the last value,
+       which is what ReadIlluminance() is written for, and short enough that a sensor which
        came back is picked up while the room still looks the same. */
     static constexpr byte kReadFailuresBeforeReinit{5u};
     /* The count means half a lux in the two mode 2 variants rather than a whole one, so a
@@ -158,7 +158,7 @@ class BH1750
     static StdReturnType SendCommand(byte);
 
     StdReturnType SendMode() { return SendCommand(mode_); }
-    /* Both halves of what task() checks before it reads: a bus that was opened, and a mode
+    /* Both halves of what Task() checks before it reads: a bus that was opened, and a mode
        the sensor acknowledged. Clearing either one puts the set-up back on the next run. */
     bool IsReady() const { return bus_started_ && (mode_ != kModeNone); }
 
@@ -186,10 +186,10 @@ class BH1750
         return (mode_ == kModeOneTimeHighResMode) || (mode_ == kModeOneTimeHighResMode2) || (mode_ == kModeOneTimeLowResMode);
     }
 
-    /* One dropped reading keeps the last value on purpose - see readIlluminance(). A sensor
+    /* One dropped reading keeps the last value on purpose - see ReadIlluminance(). A sensor
        that stops answering altogether is the other case: that value would otherwise stand
        for good and the automatic would follow a room it can no longer see. Enough failures
-       therefore drop the mode, which is what puts task() back to setting the sensor up. */
+       therefore drop the mode, which is what puts Task() back to setting the sensor up. */
     void CountReadFailure() {
         if(++read_failures_ < kReadFailuresBeforeReinit) { return; }
         read_failures_ = 0u;

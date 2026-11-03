@@ -66,7 +66,7 @@ class DisplayBrightness
 
     byte brightness_{kBrightnessInitValue};
     byte fade_level_{kFadeLevelFull};
-    /* The night switch's own scaling, kept apart from FadeLevel although it does the same
+    /* The night switch's own scaling, kept apart from fade_level_ although it does the same
        arithmetic. A fade belongs to a running animation, which clears it when it ends -
        and an animation ending in the small hours would take the night dimming with it. */
     byte night_level_{kFadeLevelFull};
@@ -104,7 +104,7 @@ class DisplayBrightness
 
         return static_cast<float>(measured - dark) / static_cast<float>(bright - dark);
     }
-    /* Never darker than BrightnessAutomaticMinValue: a display the automatic took all the
+    /* Never darker than kBrightnessAutomaticMinValue: a display the automatic took all the
        way down reads as a clock that has failed, not as a dark room. */
     static constexpr byte ToAutomaticLevel(byte brightness, float illuminance_factor) {
         const byte level = static_cast<byte>(brightness * illuminance_factor * kAutomaticCorrectionFactor);
@@ -175,7 +175,7 @@ class DisplayBrightness
     }
 
     /* How dark a fade has made the display, 255 being not at all. Kept here rather than in
-       the animation because applyBrightness() runs on every task and would otherwise undo
+       the animation because ApplyBrightness() runs on every task and would otherwise undo
        what the animation wrote on the previous one. */
     byte GetFadeLevel() const { return fade_level_; }
     void SetFadeLevel(byte level) { fade_level_ = level; }

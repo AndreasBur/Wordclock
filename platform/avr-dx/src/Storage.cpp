@@ -48,13 +48,13 @@ byte* ToEepromAddress(uint16_t offset) { return reinterpret_cast<byte*>(offset);
 ******************************************************************************************************************************************************/
 
 /* Instance methods, though some of them read no member: they are the interface the
-   firmware core calls through getInstance(), and every backend - the simulator's
+   firmware core calls through GetInstance(), and every backend - the simulator's
    stand-ins included - offers it that way. Whether this backend's implementation
    happens to need a member is its own detail, and answering the check would carry
    that detail into the interface. */
 // NOLINTBEGIN(readability-convert-member-functions-to-static)
 /******************************************************************************************************************************************************
-  read()
+  Read()
 ******************************************************************************************************************************************************/
 /*! \brief          Hands back the stored blob, if it is the one the caller expects
  *  \details        A stored length that differs from the one asked for is a blob from an
@@ -74,11 +74,11 @@ StdReturnType Storage::Read(byte* data, size_t size) const
     eeprom_read_block(data, ToEepromAddress(kDataAddress), size);
 
     return kEOk;
-} /* read */
+} /* Read */
 
 
 /******************************************************************************************************************************************************
-  write()
+  Write()
 ******************************************************************************************************************************************************/
 /*! \brief          Stores one blob
  *  \details        The length goes in last. Until it does, a restart part way through finds
@@ -97,15 +97,15 @@ StdReturnType Storage::Write(const byte* data, size_t size)
     eeprom_update_byte(ToEepromAddress(kLengthAddress), static_cast<byte>(size));
 
     return kEOk;
-} /* write */
+} /* Write */
 
 
 /******************************************************************************************************************************************************
-  clear()
+  Clear()
 ******************************************************************************************************************************************************/
 /*! \brief          Forgets what was stored
  *  \details        Only the length is reset, not the blob behind it: the length is what
- *                  read() consults, so the blob is unreachable either way, and erasing it
+ *                  Read() consults, so the blob is unreachable either way, and erasing it
  *                  would spend a hundred and twenty-eight write cycles to no end.
 ******************************************************************************************************************************************************/
 StdReturnType Storage::Clear()
@@ -113,7 +113,7 @@ StdReturnType Storage::Clear()
     eeprom_update_byte(ToEepromAddress(kLengthAddress), kLengthEmpty);
 
     return kEOk;
-} /* clear */
+} /* Clear */
 // NOLINTEND(readability-convert-member-functions-to-static)
 
 /******************************************************************************************************************************************************

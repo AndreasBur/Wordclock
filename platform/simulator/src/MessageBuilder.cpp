@@ -57,7 +57,7 @@ MessageBuilder::MessageBuilder(wxWindow* parent, const wxString &title) : wxDial
 {
     /* Not SetSizerAndFit(): that also pins the minimum size to the height fitted here,
        and the window then cannot shrink again when a command with fewer options is
-       picked. showOptionsOfSelectedCommand() sizes it instead, on every change. */
+       picked. ShowOptionsOfSelectedCommand() sizes it instead, on every change. */
     SetSizer(CreateSizerAll(this));
 
     ShowOptionsOfSelectedCommand();
@@ -79,7 +79,7 @@ MessageBuilder::~MessageBuilder()
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  createSizerAll()
+  CreateSizerAll()
 ******************************************************************************************************************************************************/
 wxBoxSizer* MessageBuilder::CreateSizerAll(wxWindow* parent)
 {
@@ -132,11 +132,11 @@ wxBoxSizer* MessageBuilder::CreateSizerAll(wxWindow* parent)
     sizer_all->Add(insert, 0, wxLEFT | wxRIGHT | wxBOTTOM | wxEXPAND, kBorder);
 
     return sizer_all;
-} /* createSizerAll */
+} /* CreateSizerAll */
 
 
 /******************************************************************************************************************************************************
-  showOptionsOfSelectedCommand()
+  ShowOptionsOfSelectedCommand()
 ******************************************************************************************************************************************************/
 /*! \brief          brings the option rows in line with the selected command
  *  \details        Rows beyond the command's option list are hidden. The ones in use are
@@ -201,11 +201,11 @@ void MessageBuilder::ShowOptionsOfSelectedCommand()
     Layout();
     GetSizer()->SetSizeHints(this);
     UpdatePreview();
-} /* showOptionsOfSelectedCommand */
+} /* ShowOptionsOfSelectedCommand */
 
 
 /******************************************************************************************************************************************************
-  buildMessage()
+  BuildMessage()
 ******************************************************************************************************************************************************/
 /*! \brief          assembles the message from the selected command and its ticked options
  *  \details        Same shape the parsers expect: the command number, then one
@@ -237,7 +237,7 @@ wxString MessageBuilder::BuildMessage() const
     }
 
     return message;
-} /* buildMessage */
+} /* BuildMessage */
 
 
 /******************************************************************************************************************************************************
@@ -303,7 +303,7 @@ void MessageBuilder::OnInsert(wxCommandEvent &event)
 ******************************************************************************************************************************************************/
 void MessageBuilder::OnClose(wxCloseEvent &event)
 {
-    /* Hide rather than destroy: getInstance() keeps handing out this very dialog, so a
+    /* Hide rather than destroy: GetInstance() keeps handing out this very dialog, so a
        destroyed one would leave the singleton pointing at freed memory. The parent
        window destroys it when the application exits. */
     Hide();

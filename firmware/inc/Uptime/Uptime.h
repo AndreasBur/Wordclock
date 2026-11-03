@@ -75,7 +75,7 @@ class Uptime
     ~Uptime() { }
 
     /* One place of the count: steps it and says whether it rolled into the next one. The
-       carry is the whole of the arithmetic here, so it is worth its own name - task() then
+       carry is the whole of the arithmetic here, so it is worth its own name - Task() then
        reads as the three places it applies to. */
     static bool Carry(byte& value, byte limit) {
         value++;

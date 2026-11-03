@@ -15,8 +15,8 @@
  *                  sensor without knowing which one it holds - the hardware driver or the
  *                  simulator's stub.
  *
- *                  There is deliberately no init() here to match the other modules': the
- *                  sensor is private and the scheduler only ever calls task(), so the
+ *                  There is deliberately no Init() here to match the other modules': the
+ *                  sensor is private and the scheduler only ever calls Task(), so the
  *                  driver sets itself up from its first one. See the platform's BH1750.h.
 ******************************************************************************************************************************************************/
 #ifndef _ILLUMINANCE_H_

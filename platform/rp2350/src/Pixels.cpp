@@ -59,11 +59,11 @@ WS2812Pio::WordType frame_buffer[kFrameSize]{};
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  init()
+  Init()
 ******************************************************************************************************************************************************/
 /*! \brief          Hands the strip's data pin to the PIO driver
  *  \details        Failures are reported and left behind rather than thrown: the
- *                  contract's init() returns nothing, and a clock whose serial console
+ *                  contract's Init() returns nothing, and a clock whose serial console
  *                  still answers is more useful for finding a miswired pin than one
  *                  that reboots. render() then does nothing until the driver is ready.
 ******************************************************************************************************************************************************/
@@ -72,24 +72,24 @@ void Pixels::Init(byte pin)
     pin_ = pin;
 
     WS2812Pio::GetInstance().Init(pin_);
-} /* init */
+} /* Init */
 
 
 /******************************************************************************************************************************************************
-  render()
+  Render()
 ******************************************************************************************************************************************************/
 /*! \brief          Puts the buffer on the strip, if the firmware asked for it
  *  \details        The application calls this once per tick, after the firmware's pass -
- *                  never show() itself. Two reasons, and the second is the one that
- *                  bites: several modules call Display::show() within a single tick
+ *                  never Show() itself. Two reasons, and the second is the one that
+ *                  bites: several modules call Display::Show() within a single tick
  *                  (DisplayManager, Animations, Text, Clock and the command parsers all
- *                  do), so transmitting from show() would put frames back to back on the
+ *                  do), so transmitting from Show() would put frames back to back on the
  *                  wire. WS2812 needs the line low for longer than 280 us between
  *                  frames, and losing that gap does not blank the display - it shifts
  *                  the next frame by a pixel, which reads as a wiring fault.
  *                  Rendering once per 10 ms tick leaves milliseconds of idle line.
  *
- *  \return         E_OK if a frame went out or none was due
+ *  \return         kEOk if a frame went out or none was due
 ******************************************************************************************************************************************************/
 StdReturnType Pixels::Render()
 {
@@ -106,33 +106,33 @@ StdReturnType Pixels::Render()
        turn every following tick into another failing attempt. */
     dirty_ = false;
     return result;
-} /* render */
+} /* Render */
 
 
 /* An instance method, though it reads no member: it is part of the interface the
-   firmware core calls through getInstance(), and every backend - the simulator's
+   firmware core calls through GetInstance(), and every backend - the simulator's
    stand-ins included - offers it that way. Whether this backend's implementation
    happens to need a member is its own detail, and answering the check would carry
    that detail into the interface. */
 // NOLINTBEGIN(readability-convert-member-functions-to-static)
 /******************************************************************************************************************************************************
-  isFrameOnTheWire()
+  IsFrameOnTheWire()
 ******************************************************************************************************************************************************/
 /*! \brief          Whether the previous frame is still being transmitted
  *  \details        The driver's own answer rather than a flag kept here, and the same one
- *                  transmitFrame() refuses on.
+ *                  TransmitFrame() refuses on.
  *
  *  \return         true while a frame is still going out
 ******************************************************************************************************************************************************/
 bool Pixels::IsFrameOnTheWire() const
 {
     return WS2812Pio::GetInstance().IsBusy();
-} /* isFrameOnTheWire */
+} /* IsFrameOnTheWire */
 // NOLINTEND(readability-convert-member-functions-to-static)
 
 
 /******************************************************************************************************************************************************
-  getPixel()
+  GetPixel()
 ******************************************************************************************************************************************************/
 StdReturnType Pixels::GetPixel(byte index, PixelType& pixel) const
 {
@@ -140,11 +140,11 @@ StdReturnType Pixels::GetPixel(byte index, PixelType& pixel) const
 
     pixel = pixel_buffer_[ToRow(index)][ToColumn(index)];
     return kEOk;
-} /* getPixel */
+} /* GetPixel */
 
 
 /******************************************************************************************************************************************************
-  getPixel()
+  GetPixel()
 ******************************************************************************************************************************************************/
 Pixels::PixelType Pixels::GetPixel(byte index) const
 {
@@ -153,11 +153,11 @@ Pixels::PixelType Pixels::GetPixel(byte index) const
     if(!IsIndexValid(index)) { return PixelType{}; }
 
     return pixel_buffer_[ToRow(index)][ToColumn(index)];
-} /* getPixel */
+} /* GetPixel */
 
 
 /******************************************************************************************************************************************************
-  setPixel()
+  SetPixel()
 ******************************************************************************************************************************************************/
 StdReturnType Pixels::SetPixel(byte index, PixelType pixel)
 {
@@ -166,20 +166,20 @@ StdReturnType Pixels::SetPixel(byte index, PixelType pixel)
     pixel_buffer_[ToRow(index)][ToColumn(index)] = pixel;
     dirty_ = true;
     return kEOk;
-} /* setPixel */
+} /* SetPixel */
 
 
 /******************************************************************************************************************************************************
-  setPixel()
+  SetPixel()
 ******************************************************************************************************************************************************/
 StdReturnType Pixels::SetPixel(byte index, byte red, byte green, byte blue)
 {
     return SetPixel(index, PixelType(red, green, blue));
-} /* setPixel */
+} /* SetPixel */
 
 
 /******************************************************************************************************************************************************
-  setPixels()
+  SetPixels()
 ******************************************************************************************************************************************************/
 void Pixels::SetPixels(PixelType pixel)
 {
@@ -189,22 +189,22 @@ void Pixels::SetPixels(PixelType pixel)
         }
     }
     dirty_ = true;
-} /* setPixels */
+} /* SetPixels */
 
 
 /******************************************************************************************************************************************************
-  setBrightness()
+  SetBrightness()
 ******************************************************************************************************************************************************/
 void Pixels::SetBrightness(byte brightness, bool gamma_correction)
 {
-    /* Master output on and off, driven by enablePixels() and disablePixels(). The buffer
+    /* Master output on and off, driven by EnablePixels() and DisablePixels(). The buffer
        is left alone and the level is applied on the way out, so switching back on
        restores the picture without the firmware having to redraw it. */
     brightness_ = brightness;
     dirty_ = true;
 
     UNUSED(gamma_correction);
-} /* setBrightness */
+} /* SetBrightness */
 
 
 /******************************************************************************************************************************************************
@@ -212,7 +212,7 @@ void Pixels::SetBrightness(byte brightness, bool gamma_correction)
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  fillFrameBuffer()
+  FillFrameBuffer()
 ******************************************************************************************************************************************************/
 /*! \brief          Copies the pixel buffer into the frame the peripheral reads
  *  \details        Pixel already stores its colours in the WS2812 order (green, red,
@@ -232,20 +232,20 @@ void Pixels::FillFrameBuffer() const
                            | (static_cast<WS2812Pio::WordType>(pixel.GetRed())   << kRedShift)
                            | (static_cast<WS2812Pio::WordType>(pixel.GetBlue())  << kBlueShift);
     }
-} /* fillFrameBuffer */
+} /* FillFrameBuffer */
 
 
 /******************************************************************************************************************************************************
-  transmitFrame()
+  TransmitFrame()
 ******************************************************************************************************************************************************/
 /*! \brief          Hands one frame to the PIO driver
  *  \details        Refuses while the previous frame is still going out, because DMA is
- *                  still reading FrameBuffer until it is done. Where the ESP32 backend
+ *                  still reading frame_buffer until it is done. Where the ESP32 backend
  *                  waits for its peripheral with a timeout, this one returns: a frame
  *                  takes 3.3 ms against a 10 ms tick, so finding DMA still busy means
  *                  something is wrong rather than that the strip needs a moment.
  *
- *  \return         E_OK if the frame was handed over
+ *  \return         kEOk if the frame was handed over
 ******************************************************************************************************************************************************/
 StdReturnType Pixels::TransmitFrame()
 {
@@ -256,7 +256,7 @@ StdReturnType Pixels::TransmitFrame()
     FillFrameBuffer();
 
     return driver.Transmit(frame_buffer, kFrameSize);
-} /* transmitFrame */
+} /* TransmitFrame */
 
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E

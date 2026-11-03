@@ -243,7 +243,7 @@ class Overlays
 
 	// methods
     /* Every overlay back to what it starts with, the same way Display, Clock, Animations
-       and Illuminance answer Persistence::reset(). Here since the overlays are stored -
+       and Illuminance answer Persistence::Reset(). Here since the overlays are stored -
        before that a reset had nothing of theirs to undo. */
     void ResetToDefaults() {
 #if (OVERLAYS_SUPPORT_DATE == STD_ON)

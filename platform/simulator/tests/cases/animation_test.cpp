@@ -19,7 +19,7 @@
 
 /* The one promise every animation makes, and the one that is easy to break: whatever it
    does in between, the display it leaves behind is the new time and nothing else.
-   Animation::finishWithClockWords() exists because that was got wrong once - an animation
+   Animation::FinishWithClockWords() exists because that was got wrong once - an animation
    that places letters itself can leave a pixel of the previous time lit, and on a word
    clock that is a word nobody notices is wrong.
    The second promise is that they end at all. Both are checked for every animation there

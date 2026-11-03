@@ -105,7 +105,7 @@ class WebFrontend
 
     /* What was last sent, so an unchanged display costs a comparison rather than a frame.
        Same shape as Persistence, and for the same reason: nothing has to remember to report
-       a change, so nothing can forget. Pixels' own dirty flag cannot serve here - render()
+       a change, so nothing can forget. Pixels' own dirty flag cannot serve here - Render()
        clears it on its way to the strip, and a client that was not due on that tick would
        never learn of the change. */
     byte last_frame_[kFrameSize]{};

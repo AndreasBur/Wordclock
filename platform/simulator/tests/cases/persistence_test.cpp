@@ -105,7 +105,7 @@ void TestPersistence()
     Expect(storage.Clear() == kEOk, "the test must leave the store as it found it");
 }
 
-/* The two procedures that reach the store directly. What they are for is what task()
+/* The two procedures that reach the store directly. What they are for is what Task()
    cannot do: write before the plug is pulled rather than within the next period, and get
    a clock back to what it left the factory as without erasing its flash over USB. */
 void TestPersistenceSaveAndReset()

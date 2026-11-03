@@ -47,7 +47,7 @@
 
 
 /******************************************************************************************************************************************************
-  shiftLeft()
+  ShiftLeft()
 ******************************************************************************************************************************************************/
 StdReturnType Transformation::ShiftLeft(bool rotate)
 {
@@ -57,11 +57,11 @@ StdReturnType Transformation::ShiftLeft(bool rotate)
         if(ShiftRowLeft(row, rotate) == kENotOk) { return_value = kENotOk; }
     }
     return return_value;
-} /* shiftLeft */
+} /* ShiftLeft */
 
 
 /******************************************************************************************************************************************************
-  shiftRowLeft()
+  ShiftRowLeft()
 ******************************************************************************************************************************************************/
 StdReturnType Transformation::ShiftRowLeft(byte row, bool rotate)
 {
@@ -79,11 +79,11 @@ StdReturnType Transformation::ShiftRowLeft(byte row, bool rotate)
     else { if(Display::GetInstance().ClearPixel(DISPLAY_NUMBER_OF_COLUMNS - 1u, row) == kENotOk) return_value = kENotOk; }
 
     return return_value;
-} /* shiftRowLeft */
+} /* ShiftRowLeft */
 
 
 /******************************************************************************************************************************************************
-  shiftRight()
+  ShiftRight()
 ******************************************************************************************************************************************************/
 StdReturnType Transformation::ShiftRight(bool rotate)
 {
@@ -93,11 +93,11 @@ StdReturnType Transformation::ShiftRight(bool rotate)
         if(ShiftRowRight(row, rotate) == kENotOk) { return_value = kENotOk; }
     }
     return return_value;
-} /* shiftRight */
+} /* ShiftRight */
 
 
 /******************************************************************************************************************************************************
-  shiftRowRight()
+  ShiftRowRight()
 ******************************************************************************************************************************************************/
 StdReturnType Transformation::ShiftRowRight(byte row, bool rotate)
 {
@@ -115,11 +115,11 @@ StdReturnType Transformation::ShiftRowRight(byte row, bool rotate)
     else{ if(Display::GetInstance().ClearPixel(0u, row) == kENotOk) return_value = kENotOk; }
 
     return return_value;
-} /* shiftRowRight */
+} /* ShiftRowRight */
 
 
 /******************************************************************************************************************************************************
-  shiftUp()
+  ShiftUp()
 ******************************************************************************************************************************************************/
 StdReturnType Transformation::ShiftUp(bool rotate)
 {
@@ -129,11 +129,11 @@ StdReturnType Transformation::ShiftUp(bool rotate)
         if(ShiftColumnUp(column, rotate) == kENotOk) { return_value = kENotOk; }
     }
     return return_value;
-} /* shiftUp */
+} /* ShiftUp */
 
 
 /******************************************************************************************************************************************************
-  shiftColumnUp()
+  ShiftColumnUp()
 ******************************************************************************************************************************************************/
 StdReturnType Transformation::ShiftColumnUp(byte column, bool rotate)
 {
@@ -151,11 +151,11 @@ StdReturnType Transformation::ShiftColumnUp(byte column, bool rotate)
     else { if(Display::GetInstance().ClearPixel(column, DISPLAY_NUMBER_OF_ROWS - 1u) == kENotOk) return_value = kENotOk; }
 
     return return_value;
-} /* shiftColumnUp */
+} /* ShiftColumnUp */
 
 
 /******************************************************************************************************************************************************
-  shiftDown()
+  ShiftDown()
 ******************************************************************************************************************************************************/
 StdReturnType Transformation::ShiftDown(bool rotate)
 {
@@ -165,11 +165,11 @@ StdReturnType Transformation::ShiftDown(bool rotate)
         if(ShiftColumnDown(column, rotate) == kENotOk) { return_value = kENotOk; }
     }
     return return_value;
-} /* shiftDown */
+} /* ShiftDown */
 
 
 /******************************************************************************************************************************************************
-  shiftColumnDown()
+  ShiftColumnDown()
 ******************************************************************************************************************************************************/
 StdReturnType Transformation::ShiftColumnDown(byte column, bool rotate)
 {
@@ -187,7 +187,7 @@ StdReturnType Transformation::ShiftColumnDown(byte column, bool rotate)
     else { if(Display::GetInstance().ClearPixel(column, 0u) == kENotOk) return_value = kENotOk; }
 
     return return_value;
-} /* shiftColumnDown */
+} /* ShiftColumnDown */
 
 
 /******************************************************************************************************************************************************

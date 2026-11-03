@@ -58,7 +58,7 @@ inline void StartTimeServers()
     NTP.begin(WORDCLOCK_NTP_SERVER_PRIMARY, WORDCLOCK_NTP_SERVER_SECONDARY);
 }
 
-} // namespace WordclockTime
+} // namespace wordclock_time
 
 #endif // _TIME_SYNC_H_
 

@@ -14,7 +14,7 @@
  *                  window that renders it is a separate PixelsFrame, which is never
  *                  constructed.
  *
- *                  The order below is not arbitrary. testDisplayManagerLatch() runs first,
+ *                  The order below is not arbitrary. TestDisplayManagerLatch() runs first,
  *                  because the latch it checks is only unlatched before the first task, and
  *                  the two persistence cases run last, because they leave settings behind
  *                  and write to the real store in the working directory.

@@ -42,7 +42,7 @@
 #define STORAGE_KEY                                     "settings"
 
 /* Storage parameter */
-/* What one write() may hold. The overlay settings this was held open for have landed and
+/* What one Write() may hold. The overlay settings this was held open for have landed and
    take the blob to 110 bytes, which 128 would still have covered - but only just, and the
    next setting would have moved both platforms again. Raised once, with room, rather than
    by the byte: NVS stores what it is given, so the unused part costs nothing here.

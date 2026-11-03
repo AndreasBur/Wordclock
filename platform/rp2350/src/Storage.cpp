@@ -14,15 +14,15 @@
  *      \details    Where the ESP32 backend has the IDF's key-value store, this core offers
  *                  a filesystem and an EEPROM emulation. The filesystem wins on one point
  *                  that Storage's contract turns on: a file carries its own length, and
- *                  read() has to refuse a blob of the wrong size because it belongs to
+ *                  Read() has to refuse a blob of the wrong size because it belongs to
  *                  another version of the settings. The emulation would need that length
  *                  stored alongside and kept in step by hand.
  *
  *                  The namespace becomes a directory and the key a file inside it, so the
  *                  two names the contract already carries still say what they said.
  *
- *                  The filesystem is mounted on the first call rather than in an init():
- *                  the contract has no init(), and Persistence reads before it ever
+ *                  The filesystem is mounted on the first call rather than in an Init():
+ *                  the contract has no Init(), and Persistence reads before it ever
  *                  writes.
  *
 ******************************************************************************************************************************************************/
@@ -76,20 +76,20 @@ void EnsureDirectory()
 ******************************************************************************************************************************************************/
 
 /* Instance methods, though some of them read no member: they are the interface the
-   firmware core calls through getInstance(), and every backend - the simulator's
+   firmware core calls through GetInstance(), and every backend - the simulator's
    stand-ins included - offers it that way. Whether this backend's implementation
    happens to need a member is its own detail, and answering the check would carry
    that detail into the interface. */
 // NOLINTBEGIN(readability-convert-member-functions-to-static)
 /******************************************************************************************************************************************************
-  read()
+  Read()
 ******************************************************************************************************************************************************/
 /*! \brief          Reads the stored blob
  *  \details        A blob of a different length is refused rather than read as far as it
  *                  goes: it belongs to another version of the settings, and Persistence
  *                  would have to reject it anyway.
  *
- *  \return         E_OK if exactly Size bytes were read
+ *  \return         kEOk if exactly Size bytes were read
 ******************************************************************************************************************************************************/
 StdReturnType Storage::Read(byte* buffer, size_t size) const
 {
@@ -110,18 +110,18 @@ StdReturnType Storage::Read(byte* buffer, size_t size) const
     if(read != size) { return kENotOk; }
 
     return kEOk;
-} /* read */
+} /* Read */
 
 
 /******************************************************************************************************************************************************
-  write()
+  Write()
 ******************************************************************************************************************************************************/
 /*! \brief          Replaces the stored blob
  *  \details        Opened for writing rather than appended to, so a shorter blob cannot
- *                  leave the tail of a longer one behind it - which read() would then
+ *                  leave the tail of a longer one behind it - which Read() would then
  *                  refuse for a length it never wrote.
  *
- *  \return         E_OK if the whole blob was stored
+ *  \return         kEOk if the whole blob was stored
 ******************************************************************************************************************************************************/
 StdReturnType Storage::Write(const byte* buffer, size_t size)
 {
@@ -139,17 +139,17 @@ StdReturnType Storage::Write(const byte* buffer, size_t size)
     if(written != size) { return kENotOk; }
 
     return kEOk;
-} /* write */
+} /* Write */
 
 
 /******************************************************************************************************************************************************
-  clear()
+  Clear()
 ******************************************************************************************************************************************************/
 /*! \brief          Forgets the stored blob
  *  \details        A store that held nothing counts as cleared, so calling this twice is
  *                  not an error.
  *
- *  \return         E_OK if nothing is stored afterwards
+ *  \return         kEOk if nothing is stored afterwards
 ******************************************************************************************************************************************************/
 StdReturnType Storage::Clear()
 {
@@ -160,7 +160,7 @@ StdReturnType Storage::Clear()
     if(!LittleFS.remove(kBlobPath)) { return kENotOk; }
 
     return kEOk;
-} /* clear */
+} /* Clear */
 // NOLINTEND(readability-convert-member-functions-to-static)
 
 /******************************************************************************************************************************************************

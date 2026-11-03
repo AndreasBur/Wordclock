@@ -75,14 +75,14 @@ class AnimationMatrix : public Animation
     static constexpr byte kMaxStartDelay{DISPLAY_NUMBER_OF_ROWS};
     /* the drop has to run past the last row until its trail has left the display */
     static constexpr byte kNumberOfFrames{4u * DISPLAY_NUMBER_OF_ROWS};
-    /* fade step from which letters of the new time are shown, see drawColumn() */
+    /* fade step from which letters of the new time are shown, see DrawColumn() */
     static constexpr byte kRevealFadeStep{3u};
     /* last fade step of the trail, above it a pixel goes dark. The original has no
        such limit, its trail always reaches up to the first row. With the limit the
        trail follows the drop out of the display instead of leaving a dim haze
        behind, so the animation ends on a black display showing only the new time. */
     static constexpr byte kTrailFadeSteps{6u};
-    /* odd factor of the hash in startFrame(), see there */
+    /* odd factor of the hash in StartFrame(), see there */
     static constexpr byte kStartFrameHashFactor{181u};
     /* per pixel brightness of the brightest trail pixel, divided by the fade step for
        the ones behind it. The drop head and the letters of the new time do not use it,
@@ -91,7 +91,7 @@ class AnimationMatrix : public Animation
 
     ClockWords::WordsListType clock_words_table_{{DisplayWords::kWordNone}};
     byte frame_counter_{0u};
-    /* varies the start frames from minute to minute, see startFrame() */
+    /* varies the start frames from minute to minute, see StartFrame() */
     byte seed_{0u};
 
     // functions

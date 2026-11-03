@@ -60,7 +60,7 @@ first board, check these in order:
    left-aligned into bits 31..8 and shifted out from the top; if the shift direction is
    wrong, the display comes up in plausible but wrong colours rather than dark.
 3. **Whether the BH1750 and the DS3231 answer** on a bus opened through `setSDA`/`setSCL`
-   rather than through `begin()`'s arguments. Nothing here reports a refusal: a pin those
+   rather than through `Begin()`'s arguments. Nothing here reports a refusal: a pin those
    setters will not take ends in the SDK's `panic()`, which is noreturn, so what the ESP32
    returns as an error halts the chip here instead. What holds is that both drivers name
    the same two pins — and a bus that opens and stays silent is not reported either.
@@ -73,13 +73,13 @@ The two are the same program above the peripherals. Five things underneath are n
 
 - **`Wire` takes its pins separately.** `Wire.begin(sda, scl, freq)` is an ESP32 extension;
   here it is `setSDA`, `setSCL`, `begin`, `setClock`. The pin setters are what can refuse,
-  so they carry the check that `begin()`'s return value carries there.
+  so they carry the check that `Begin()`'s return value carries there.
 - **`Storage` is a file, not a key-value pair.** LittleFS rather than the EEPROM emulation,
-  because `read()` has to refuse a blob of the wrong length and a file carries its own.
+  because `Read()` has to refuse a blob of the wrong length and a file carries its own.
   `System`'s credentials go the same way, one file per key.
 - **Power saving is a mode.** `WiFi.setSleep(bool)` becomes `defaultLowPowerMode()` or
   `noLowPowerMode()`.
-- **There is no `setAutoReconnect`.** `reconnectNetwork()` joins again instead, which means
+- **There is no `setAutoReconnect`.** `ReconnectNetwork()` joins again instead, which means
   a router that reboots needs the command where the ESP32 recovers on its own. That is a
   real loss rather than a detail, and the first thing to fix if this backend is ever the
   one in the wall.
@@ -172,7 +172,7 @@ platform/rp2350/test/run.sh
 ```
 
 Those compile the backend against stand-ins for the core, so they reach everything above
-the peripherals: the frame `Pixels::render()` hands to DMA, word for word; that an injected
+the peripherals: the frame `Pixels::Render()` hands to DMA, word for word; that an injected
 command takes the same path through `Communication` as one typed on the wire; and the
 handlers, driven through the same registration call the server makes.
 

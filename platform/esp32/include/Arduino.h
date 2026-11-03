@@ -19,7 +19,7 @@
  *
  *                  Order matters twice over. The real header has to come first, because it
  *                  declares the port this file then hides. And the port has to be captured
- *                  before it is hidden - hardwarePort() below - because after the macro
+ *                  before it is hidden - HardwarePort() below - because after the macro
  *                  the name no longer refers to it. Capturing it through a function rather
  *                  than a reference variable is what makes it work whether the core made
  *                  Serial an object or, on a board that boots on USB CDC, a macro alias
@@ -77,7 +77,7 @@ namespace wordclock_platform {
 inline Stream& HardwarePort() { return Serial; }
 inline void HardwarePortBegin(unsigned long baud_rate) { Serial.begin(baud_rate); }
 
-} // namespace WordclockPlatform
+} // namespace wordclock_platform
 
 /******************************************************************************************************************************************************
  *  S E R I A L

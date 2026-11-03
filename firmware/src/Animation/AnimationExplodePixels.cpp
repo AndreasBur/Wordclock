@@ -49,11 +49,11 @@ void AnimationExplodePixels::Init()
 {
     Animation::Init(kStateIdle);
     Reset();
-} /* init */
+} /* Init */
 
 
 /******************************************************************************************************************************************************
-  setTime()
+  SetTime()
 ******************************************************************************************************************************************************/
 StdReturnType AnimationExplodePixels::SetTime(byte hour, byte minute)
 {
@@ -66,11 +66,11 @@ StdReturnType AnimationExplodePixels::SetTime(byte hour, byte minute)
         state_ = kStateClearTime;
     }
     return return_value;
-} /* setTime */
+} /* SetTime */
 
 
 /******************************************************************************************************************************************************
-  task()
+  Task()
 ******************************************************************************************************************************************************/
 void AnimationExplodePixels::Task()
 {
@@ -90,7 +90,7 @@ void AnimationExplodePixels::Task()
             FinishWithClockWords(clock_words_table_);
         }
     }
-} /* task */
+} /* Task */
 
 
 /******************************************************************************************************************************************************
@@ -98,16 +98,16 @@ void AnimationExplodePixels::Task()
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  reset()
+  Reset()
 ******************************************************************************************************************************************************/
 void AnimationExplodePixels::Reset()
 {
     shift_counter_ = 0u;
     clock_words_table_.fill(DisplayWords::kWordNone);
-} /* reset */
+} /* Reset */
 
 /******************************************************************************************************************************************************
-  clearTimeTask()
+  ClearTimeTask()
 ******************************************************************************************************************************************************/
 void AnimationExplodePixels::ClearTimeTask()
 {
@@ -115,10 +115,10 @@ void AnimationExplodePixels::ClearTimeTask()
     ShiftQuadrantLowerRight();
     ShiftQuadrantUpperRight();
     ShiftQuadrantLowerLeft();
-} /* clearTimeTask */
+} /* ClearTimeTask */
 
 /******************************************************************************************************************************************************
-  setTimeTask()
+  SetTimeTask()
 ******************************************************************************************************************************************************/
 void AnimationExplodePixels::SetTimeTask()
 {
@@ -127,20 +127,20 @@ void AnimationExplodePixels::SetTimeTask()
     SetTime(pixels);
     ShiftQuadrants(pixels, shift_counter_);
     Display::GetInstance().SetPixel(kColumnCenter, kRowCenter);
-} /* setTimeTask */
+} /* SetTimeTask */
 
 /******************************************************************************************************************************************************
-  setStateToSetTime()
+  SetStateToSetTime()
 ******************************************************************************************************************************************************/
 void AnimationExplodePixels::SetStateToSetTime()
 {
     state_ = kStateSetTime;
     Display::GetInstance().Clear();
     shift_counter_ = kShiftCounterMaxValue;
-} /* setStateToSetTime */
+} /* SetStateToSetTime */
 
 /******************************************************************************************************************************************************
-  shiftQuadrants()
+  ShiftQuadrants()
 ******************************************************************************************************************************************************/
 void AnimationExplodePixels::ShiftQuadrants(DisplayPixels& pixels, byte number_of_shifts)
 {
@@ -159,7 +159,7 @@ void AnimationExplodePixels::ShiftQuadrants(DisplayPixels& pixels, byte number_o
 }
 
 /******************************************************************************************************************************************************
-  shiftQuadrantUpperLeft()
+  ShiftQuadrantUpperLeft()
 ******************************************************************************************************************************************************/
 void AnimationExplodePixels::ShiftQuadrantUpperLeft()
 {
@@ -171,7 +171,7 @@ void AnimationExplodePixels::ShiftQuadrantUpperLeft()
 }
 
 /******************************************************************************************************************************************************
-  shiftDownRight()
+  ShiftDownRight()
 ******************************************************************************************************************************************************/
 void AnimationExplodePixels::ShiftDownRight(byte column, byte row)
 {
@@ -183,7 +183,7 @@ void AnimationExplodePixels::ShiftDownRight(byte column, byte row)
 }
 
 /******************************************************************************************************************************************************
-  shiftQuadrantUpperRight()
+  ShiftQuadrantUpperRight()
 ******************************************************************************************************************************************************/
 void AnimationExplodePixels::ShiftQuadrantUpperRight()
 {
@@ -195,7 +195,7 @@ void AnimationExplodePixels::ShiftQuadrantUpperRight()
 }
 
 /******************************************************************************************************************************************************
-  shiftDownLeft()
+  ShiftDownLeft()
 ******************************************************************************************************************************************************/
 void AnimationExplodePixels::ShiftDownLeft(byte column, byte row)
 {
@@ -207,7 +207,7 @@ void AnimationExplodePixels::ShiftDownLeft(byte column, byte row)
 }
 
 /******************************************************************************************************************************************************
-  shiftQuadrantLowerLeft()
+  ShiftQuadrantLowerLeft()
 ******************************************************************************************************************************************************/
 void AnimationExplodePixels::ShiftQuadrantLowerLeft()
 {
@@ -219,7 +219,7 @@ void AnimationExplodePixels::ShiftQuadrantLowerLeft()
 }
 
 /******************************************************************************************************************************************************
-  shiftUpRight()
+  ShiftUpRight()
 ******************************************************************************************************************************************************/
 void AnimationExplodePixels::ShiftUpRight(byte column, byte row)
 {
@@ -231,7 +231,7 @@ void AnimationExplodePixels::ShiftUpRight(byte column, byte row)
 }
 
 /******************************************************************************************************************************************************
-  shiftQuadrantLowerRight()
+  ShiftQuadrantLowerRight()
 ******************************************************************************************************************************************************/
 void AnimationExplodePixels::ShiftQuadrantLowerRight()
 {
@@ -243,7 +243,7 @@ void AnimationExplodePixels::ShiftQuadrantLowerRight()
 }
 
 /******************************************************************************************************************************************************
-  shiftUpLeft()
+  ShiftUpLeft()
 ******************************************************************************************************************************************************/
 void AnimationExplodePixels::ShiftUpLeft(byte column, byte row)
 {
@@ -255,7 +255,7 @@ void AnimationExplodePixels::ShiftUpLeft(byte column, byte row)
 }
 
 /******************************************************************************************************************************************************
-  clearOldAndSetNewPixel()
+  ClearOldAndSetNewPixel()
 ******************************************************************************************************************************************************/
 void AnimationExplodePixels::ClearOldAndSetNewPixel(byte column_old, byte row_old, byte column_new, byte row_new)
 {
@@ -267,7 +267,7 @@ void AnimationExplodePixels::ClearOldAndSetNewPixel(byte column_old, byte row_ol
 }
 
 /******************************************************************************************************************************************************
-  setNewPixel()
+  SetNewPixel()
 ******************************************************************************************************************************************************/
 void AnimationExplodePixels::SetNewPixel(byte column_old, byte row_old, byte column_new, byte row_new)
 {

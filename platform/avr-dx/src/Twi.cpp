@@ -46,10 +46,10 @@ static_assert(TWI_TIMEOUT_LOOPS > 0u, "Twi: the timeout rounded down to zero, ev
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  waitForWrite()
+  WaitForWrite()
 ******************************************************************************************************************************************************/
 /*! \brief          Waits for a written byte to have been acknowledged
- *  \return         E_NOT_OK when the device did not answer, or when the bus never reported
+ *  \return         kENotOk when the device did not answer, or when the bus never reported
  *                  the byte as sent at all
 ******************************************************************************************************************************************************/
 StdReturnType Twi::WaitForWrite()
@@ -67,11 +67,11 @@ StdReturnType Twi::WaitForWrite()
     }
 
     return kENotOk;
-} /* waitForWrite */
+} /* WaitForWrite */
 
 
 /******************************************************************************************************************************************************
-  waitForRead()
+  WaitForRead()
 ******************************************************************************************************************************************************/
 StdReturnType Twi::WaitForRead()
 {
@@ -83,11 +83,11 @@ StdReturnType Twi::WaitForRead()
     }
 
     return kENotOk;
-} /* waitForRead */
+} /* WaitForRead */
 
 
 /******************************************************************************************************************************************************
-  stop()
+  Stop()
 ******************************************************************************************************************************************************/
 /*! \brief          Releases the bus
  *  \details        Sent on every path out of a transfer, the failing ones included: a
@@ -97,7 +97,7 @@ StdReturnType Twi::WaitForRead()
 void Twi::Stop()
 {
     TWI_PERIPHERAL.MCTRLB = TWI_MCMD_STOP_gc;
-} /* stop */
+} /* Stop */
 
 
 /******************************************************************************************************************************************************
@@ -105,7 +105,7 @@ void Twi::Stop()
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  init()
+  Init()
 ******************************************************************************************************************************************************/
 void Twi::Init()
 {
@@ -118,14 +118,14 @@ void Twi::Init()
     TWI_PERIPHERAL.MSTATUS = TWI_BUSSTATE_IDLE_gc;
 
     initialised_ = true;
-} /* init */
+} /* Init */
 
 
 /* Not const, though nothing here writes a member: these drive the hardware, and a
    const would say they change nothing. */
 // NOLINTBEGIN(readability-make-member-function-const)
 /******************************************************************************************************************************************************
-  write()
+  Write()
 ******************************************************************************************************************************************************/
 StdReturnType Twi::Write(byte address, const byte* data, byte length)
 {
@@ -149,11 +149,11 @@ StdReturnType Twi::Write(byte address, const byte* data, byte length)
 
     Stop();
     return kEOk;
-} /* write */
+} /* Write */
 
 
 /******************************************************************************************************************************************************
-  read()
+  Read()
 ******************************************************************************************************************************************************/
 /*! \brief          Reads a number of bytes from a device
  *  \details        Every byte but the last is acknowledged, the last one is not: that is how
@@ -182,23 +182,23 @@ StdReturnType Twi::Read(byte address, byte* data, byte length)
 
     TWI_PERIPHERAL.MCTRLB = TWI_ACKACT_NACK_gc | TWI_MCMD_STOP_gc;
     return kEOk;
-} /* read */
+} /* Read */
 // NOLINTEND(readability-make-member-function-const)
 
 
 /******************************************************************************************************************************************************
-  writeRegister()
+  WriteRegister()
 ******************************************************************************************************************************************************/
 StdReturnType Twi::WriteRegister(byte address, byte register_address, byte value)
 {
     const byte buffer[]{register_address, value};
 
     return Write(address, buffer, sizeof(buffer));
-} /* writeRegister */
+} /* WriteRegister */
 
 
 /******************************************************************************************************************************************************
-  readRegister()
+  ReadRegister()
 ******************************************************************************************************************************************************/
 /*! \brief          Reads from a register of a device
  *  \details        Two transfers rather than a repeated start: the pointer write is stopped
@@ -211,7 +211,7 @@ StdReturnType Twi::ReadRegister(byte address, byte register_address, byte* data,
     if(Write(address, &register_address, 1u) != kEOk) { return kENotOk; }
 
     return Read(address, data, length);
-} /* readRegister */
+} /* ReadRegister */
 
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E

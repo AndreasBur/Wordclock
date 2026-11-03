@@ -16,7 +16,7 @@
  *                  its heap is the host's, where a number of free kibibytes says nothing
  *                  about the firmware.
  *
- *                  Those answer E_NOT_OK rather than a placeholder, which is also what
+ *                  Those answer kENotOk rather than a placeholder, which is also what
  *                  makes the "no answer" path of the status command reachable here - the
  *                  same reasoning as the clock chip's absent reading.
  *

@@ -17,7 +17,7 @@ generated from the parser sources under
   value directly (e.g. `-R255`), space-separated
   ([`MsgParameterParser::parse`](../firmware/inc/Communication/MessageParser/Base/MsgParameterParser.h)).
 - Messages are terminated by newline `\n`
-  ([`Communication::EndOfMessageChar`](../firmware/inc/Communication/Communication.h)).
+  ([`Communication::kEndOfMessageChar`](../firmware/inc/Communication/Communication.h)).
 - Every command **echoes back** the command number plus current values as
   `X=value` pairs. Sending a command with no options acts as a **query**: values
   are read back without being changed.
@@ -31,9 +31,9 @@ overlay is disabled at compile time.
 
 | # | Command | Options | Notes |
 |---|---------|---------|-------|
-| 0 | *(none)* | — | Reserved; empty/invalid command → `ERROR_WRONG_COMMAND` |
+| 0 | *(none)* | — | Reserved; empty/invalid command → `kErrorWrongCommand` |
 | 1 | Remote Procedure Call | `-P<id>` (uint8) | Fire-and-forget action; see RPC table below |
-| 2 | Display Color | `-R<0-255>` `-G<0-255>` `-B<0-255>` | RGB color; triggers `Display.show()` |
+| 2 | Display Color | `-R<0-255>` `-G<0-255>` `-B<0-255>` | RGB color; triggers `Display.Show()` |
 | 3 | Display Brightness | `-B<0-255>` `-A<0\|1>` `-G<0\|1>` | Brightness, auto-brightness, gamma correction; see below |
 | 4 | Display Pixel | `-I<index>` `-S<0\|1>` | Set a single LED on/off; out-of-range index → error |
 | 5 | Overlay Date | `-P -E -M -D -V -A` | See overlay options |
@@ -72,7 +72,7 @@ The Date and Temperature overlays ignore `-T` / `-S` / `-F`.
 
 Shows the temperature of the DS3231 clock chip, as `23.4C` — one decimal, and the letter
 rather than a degree sign, which the font tables do not carry
-([`Text::convertCharToFontIndex`](../firmware/src/Text/Text.cpp) covers ASCII plus six
+([`Text::ConvertCharToFontIndex`](../firmware/src/Text/Text.cpp) covers ASCII plus six
 umlauts). What is measured is the chip's own die, so in a closed case it reads above the
 room by whatever that case turns out to add.
 
@@ -195,7 +195,7 @@ id 0 is rejected the same way, since `0` is not an animation.
 `-S<speed>` sets the speed of the animation selected with `-A`: **higher is faster**,
 `255` is the fastest and `0` stops the animation entirely. Speeds `1` through `255`
 map one-to-one to task cycles `255` through `1`; the scheduler counts those cycles in
-([`Scheduler::convertSpeedToTaskCycle`](../firmware/inc/Scheduler/Scheduler.h)), which
+([`Scheduler::ConvertSpeedToTaskCycle`](../firmware/inc/Scheduler/Scheduler.h)), which
 is why the two run in opposite directions. The default task cycle of `10`
 (`ANIMATIONS_TASK_CYCLE_INIT_VALUE`) is reported as `S=246`. Every animation keeps its
 own speed, and modes 1 and 2 use the speed of whichever animation they picked.
@@ -228,7 +228,7 @@ answers `A=` and `Q=`. In the simulator `U` is real and `M`, `A` and `Q` are alw
 a host's free heap says nothing about the firmware.
 
 The command takes no options. Its parameter table is empty, so `12 -V1` is answered with
-`Error=3:V` (`ERROR_PARAMETER_UNKNOWN`) rather than silently accepted. The field names are
+`Error=3:V` (`kErrorParameterUnknown`) rather than silently accepted. The field names are
 still described in the
 [message catalog](../firmware/inc/Communication/MessageCatalog.h), marked read-only, which
 is how the simulator dialog and the web console put labels on an answer without offering
@@ -317,10 +317,10 @@ only way in that survives the WiFi being down.
 
 The RPC answer is `RpcId=<id> Error=<code>`. An unknown or missing id (including
 `0`, e.g. when `-P` is omitted) is rejected with `Error=7`
-(`ERROR_RPC_ID_UNKNOWN`) instead of being silently accepted.
+(`kErrorRpcIdUnknown`) instead of being silently accepted.
 
 Ids `1`, `2` and `22` to `30` are the ones that can be refused: they answer `Error=8`
-(`ERROR_UNKNOWN`, the general `E_NOT_OK`) when they could not be carried out —
+(`kErrorUnknown`, the general `kENotOk`) when they could not be carried out —
 `1` and `2` while the light sensor has not measured anything yet, `29` and `30` when the
 store did not take the write, the rest when the display is busy
 with something else rather than doing it anyway. The clock cannot be refreshed and no animation
@@ -341,16 +341,16 @@ Returned in the `Error=<code>` field
 
 | code | Name | Meaning |
 |------|------|---------|
-| 0 | `ERROR_NO_ERROR` | Success |
-| 1 | `ERROR_MESSAGE_TOO_LONG` | Incoming message exceeded the buffer |
-| 2 | `ERROR_WRONG_COMMAND` | Unknown/empty command number |
-| 3 | `ERROR_PARAMETER_UNKNOWN` | Unknown option short name |
-| 4 | `ERROR_VALUE_OUT_OF_BOUNDS` | Value outside the allowed range |
-| 5 | `ERROR_NO_VALUE_GIVEN` | Option given without a value |
-| 6 | `ERROR_DISPLAY_PENDING` | Display busy / show still pending |
-| 7 | `ERROR_RPC_ID_UNKNOWN` | RPC command with an unknown/missing `-P<id>` |
-| 8 | `ERROR_UNKNOWN` | Unspecified failure — what an `E_NOT_OK` from the firmware becomes |
-| 9 | `ERROR_POWER_SWITCH_ABSENT` | Ids 20 and 21 on a clock whose supply switch was not built. Appended behind `ERROR_UNKNOWN` rather than sorted in beside its neighbours, for the reason the RPC ids are appended too: inserting one would silently change every code behind it |
+| 0 | `kErrorNoError` | Success |
+| 1 | `kErrorMessageTooLong` | Incoming message exceeded the buffer |
+| 2 | `kErrorWrongCommand` | Unknown/empty command number |
+| 3 | `kErrorParameterUnknown` | Unknown option short name |
+| 4 | `kErrorValueOutOfBounds` | Value outside the allowed range |
+| 5 | `kErrorNoValueGiven` | Option given without a value |
+| 6 | `kErrorDisplayPending` | Display busy / show still pending |
+| 7 | `kErrorRpcIdUnknown` | RPC command with an unknown/missing `-P<id>` |
+| 8 | `kErrorUnknown` | Unspecified failure — what an `kENotOk` from the firmware becomes |
+| 9 | `kErrorPowerSwitchAbsent` | Ids 20 and 21 on a clock whose supply switch was not built. Appended behind `kErrorUnknown` rather than sorted in beside its neighbours, for the reason the RPC ids are appended too: inserting one would silently change every code behind it |
 
 ## Examples
 
@@ -371,7 +371,7 @@ Three places have to move together:
 
 1. `RpcIdType` and the `switch` in
    [MsgCmdRemoteProcedureCallParser.h](../firmware/inc/Communication/MessageParser/MsgCmdRemoteProcedureCallParser.h)
-2. `RemoteProcedureValueNames` in
+2. `kRemoteProcedureValueNames` in
    [MessageCatalog.cpp](../firmware/src/Communication/MessageCatalog.cpp) — written
    beside the firmware rather than derived from it, and read positionally, so the order
    is the contract. A `static_assert` counts the names against `RpcIdType`, so a missing

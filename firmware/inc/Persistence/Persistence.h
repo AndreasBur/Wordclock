@@ -96,7 +96,7 @@ class Persistence
 
     /* Every module back to what it starts with, and the store emptied. Emptied rather
        than written with the defaults: an empty store is what a clock that was never
-       configured has, and load() already treats the two the same. */
+       configured has, and Load() already treats the two the same. */
     static StdReturnType Reset();
 };
 

@@ -126,7 +126,7 @@ constexpr byte kSettingsVersion{5u};
 static_assert(sizeof(SettingsType) <= Storage::kCapacity,
               "Persistence: the settings no longer fit the store, please raise STORAGE_CAPACITY on every platform");
 
-/* What was last written, so task() can tell a changed setting from an unchanged one
+/* What was last written, so Task() can tell a changed setting from an unchanged one
    without anything having to report the change. Kept here rather than as a member so the
    format stays out of the header. */
 SettingsType last_saved{};
@@ -333,7 +333,7 @@ void Apply(const SettingsType& settings)
         animations.SetTaskCycle(animation_id, settings.animation_task_cycles[index]);
     }
 
-    /* The animation before the mode: setting the mode to MODE_FIXED starts the selected
+    /* The animation before the mode: setting the mode to kModeFixed starts the selected
        animation, so it has to find the restored one rather than the default. */
     animations.SetAnimation(static_cast<Animations::AnimationIdType>(settings.animation_id));
     animations.SetMode(static_cast<Animations::ModeType>(settings.animations_mode));
@@ -369,7 +369,7 @@ void Apply(const SettingsType& settings)
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  load()
+  Load()
 ******************************************************************************************************************************************************/
 /*! \brief          Restores the stored configuration, if there is a usable one
  *  \details        A blob that cannot be used is thrown away rather than left in place:
@@ -382,7 +382,7 @@ void Apply(const SettingsType& settings)
  *                  therefore shows up as a difference on the next task and gets corrected
  *                  in the store, instead of being read and rejected forever.
  *
- *  \return         E_OK if a stored configuration was applied
+ *  \return         kEOk if a stored configuration was applied
 ******************************************************************************************************************************************************/
 StdReturnType Persistence::Load()
 {
@@ -400,14 +400,14 @@ StdReturnType Persistence::Load()
 
     last_saved = Gather();
     return return_value;
-} /* load */
+} /* Load */
 
 
 /******************************************************************************************************************************************************
-  task()
+  Task()
 ******************************************************************************************************************************************************/
 /*! \brief          Writes the configuration if it changed since the last write
- *  \details        A failed write leaves LastSaved alone, so the next task tries again
+ *  \details        A failed write leaves last_saved alone, so the next task tries again
  *                  rather than treating the change as stored.
 ******************************************************************************************************************************************************/
 void Persistence::Task()
@@ -428,17 +428,17 @@ void Persistence::Task()
     if(Storage::GetInstance().Write(reinterpret_cast<const byte*>(&current), sizeof(current)) == kEOk) {
         last_saved = current;
     }
-} /* task */
+} /* Task */
 
 /******************************************************************************************************************************************************
-  save()
+  Save()
 ******************************************************************************************************************************************************/
 /*! \brief          Writes the configuration now
- *  \details        Unconditionally, unlike task(): a caller that asks for this is about to
+ *  \details        Unconditionally, unlike Task(): a caller that asks for this is about to
  *                  cut the power, and "nothing changed since the last write" is a state it
  *                  cannot check for itself.
  *
- *  \return         E_OK if the store took the configuration
+ *  \return         kEOk if the store took the configuration
 ******************************************************************************************************************************************************/
 StdReturnType Persistence::Save()
 {
@@ -448,14 +448,14 @@ StdReturnType Persistence::Save()
 
     last_saved = current;
     return kEOk;
-} /* save */
+} /* Save */
 
 
 /******************************************************************************************************************************************************
-  reset()
+  Reset()
 ******************************************************************************************************************************************************/
 /*! \brief          Puts the configuration back to what a clock starts with
- *  \details        Each module answers for its own defaults, the same way gather() reads
+ *  \details        Each module answers for its own defaults, the same way Gather() reads
  *                  from each of them rather than from a copy kept here - so a setting
  *                  added to one of them is reset by the module that owns it and not
  *                  forgotten in a list over here.
@@ -464,7 +464,7 @@ StdReturnType Persistence::Save()
  *                  hold, so the next task does not write the defaults straight back into
  *                  the store that was just emptied.
  *
- *  \return         E_OK if the store was emptied
+ *  \return         kEOk if the store was emptied
 ******************************************************************************************************************************************************/
 StdReturnType Persistence::Reset()
 {
@@ -480,7 +480,7 @@ StdReturnType Persistence::Reset()
 
     last_saved = Gather();
     return return_value;
-} /* reset */
+} /* Reset */
 
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E

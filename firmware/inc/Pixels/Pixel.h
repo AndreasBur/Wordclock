@@ -80,13 +80,13 @@ class Pixel
 ******************************************************************************************************************************************************/
   public:
     constexpr Pixel() { }
-    /* Goes through setPixel() rather than initialising the array in argument order,
+    /* Goes through SetPixel() rather than initialising the array in argument order,
        which is what it used to do: the raw array is ordered by the ColorOffset
        constants (green first, for the WS2812 wire order), so a positional initialiser
-       put red where getRed() does not look for it. Nothing visible came of it while
+       put red where GetRed() does not look for it. Nothing visible came of it while
        every colour built this way was grey or black, and the simulator could not have
        shown it either - it renders brightness, not hue. On the strip it swaps red and
-       green. Keeping setPixel() as the only place that knows the layout is what stops
+       green. Keeping SetPixel() as the only place that knows the layout is what stops
        that from coming back. */
     constexpr Pixel(ColorType color_red, ColorType color_green, ColorType color_blue) {
         SetPixel(color_red, color_green, color_blue);
@@ -115,7 +115,7 @@ class Pixel
     // methods
     void ClearPixel() { SetPixel(0u, 0u, 0u); }
 
-    /* dimms all three colors, ColorMaxValue keeps the pixel unchanged. Dimms the
+    /* dimms all three colors, kColorMaxValue keeps the pixel unchanged. Dimms the
        color as a whole, so the hue is preserved and only the brightness changes. */
     void DimmPixel(byte brightness) {
         SetPixel(DimmColor(GetRed(), brightness), DimmColor(GetGreen(), brightness), DimmColor(GetBlue(), brightness));

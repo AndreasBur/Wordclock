@@ -40,7 +40,7 @@
 ******************************************************************************************************************************************************/
 /* One route's answer, being written. Collected whole rather than pushed out in chunks: this
    server answers on loopback and the largest thing it writes is a page out of flash, so a
-   length up front is simpler than a chunked encoding and is what finish() sends. */
+   length up front is simpler than a chunked encoding and is what Finish() sends. */
 class WebResponseBody
 {
   private:

@@ -149,7 +149,7 @@ class Power
     static constexpr bool IsSwitchFitted() { return PowerSwitch::IsFitted(); }
 
     // methods
-    /* Asks for the supply. Answers E_NOT_OK only where there is no switch - an ask that is
+    /* Asks for the supply. Answers kENotOk only where there is no switch - an ask that is
        already the case, or already under way, is honoured rather than refused, because a
        caller that says "off" twice means the same thing both times. */
     StdReturnType SwitchSupplyOn() {

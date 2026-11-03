@@ -64,7 +64,7 @@ volatile uint16_t frame_position{0u};
  *  I N T E R R U P T   H A N D L E R S
 ******************************************************************************************************************************************************/
 /*! \brief          Feeds the next pixel byte to the strip
- *  \details        Raised to the elevated interrupt level in init(), so it runs ahead of the
+ *  \details        Raised to the elevated interrupt level in Init(), so it runs ahead of the
  *                  console's handlers. That is what keeps the gap between two bytes inside
  *                  the strip's reset time: the pulse widths themselves come from hardware and
  *                  do not care when this runs, but a byte held back longer than the reset
@@ -88,7 +88,7 @@ ISR(USART0_DRE_vect)
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  initUsart()
+  InitUsart()
 ******************************************************************************************************************************************************/
 /*! \brief          Puts USART0 into SPI host mode at the strip's bit rate
  *  \details        Master SPI mode rather than a plain USART because the strip needs a clock
@@ -107,11 +107,11 @@ void WS2812::InitUsart()
     USART0.BAUD = WS2812_BAUD_REGISTER;
     USART0.CTRLC = USART_CMODE_MSPI_gc;
     USART0.CTRLB = USART_TXEN_bm;
-} /* initUsart */
+} /* InitUsart */
 
 
 /******************************************************************************************************************************************************
-  initEventSystem()
+  InitEventSystem()
 ******************************************************************************************************************************************************/
 /*! \brief          Routes the SPI clock to both one-shots
  *  \details        One channel for both timers, so the two pulses start on the very same
@@ -123,11 +123,11 @@ void WS2812::InitEventSystem()
     EVSYS.CHANNEL0 = EVSYS_CHANNEL0_PORTA_PIN2_gc;
     EVSYS.USERTCB1CAPT = EVSYS_USER_CHANNEL0_gc;
     EVSYS.USERTCB2CAPT = EVSYS_USER_CHANNEL0_gc;
-} /* initEventSystem */
+} /* InitEventSystem */
 
 
 /******************************************************************************************************************************************************
-  initOneShotTimers()
+  InitOneShotTimers()
 ******************************************************************************************************************************************************/
 /*! \brief          Arms the two pulse widths
  *  \details        Single-shot mode: the event starts the counter, the output stays high for
@@ -145,11 +145,11 @@ void WS2812::InitOneShotTimers()
     TCB2.EVCTRL = TCB_CAPTEI_bm;
     TCB2.CTRLB = TCB_CNTMODE_SINGLE_gc;
     TCB2.CTRLA = TCB_CLKSEL_DIV1_gc | TCB_ENABLE_bm;
-} /* initOneShotTimers */
+} /* InitOneShotTimers */
 
 
 /******************************************************************************************************************************************************
-  initLookUpTable()
+  InitLookUpTable()
 ******************************************************************************************************************************************************/
 /*! \brief          Muxes the two pulses onto the data pin
  *  \details        The three inputs are peripherals rather than pins, which is why the port
@@ -165,7 +165,7 @@ void WS2812::InitLookUpTable()
     CCL.LUT0CTRLA = CCL_ENABLE_bm | CCL_OUTEN_bm;
 
     CCL.CTRLA = CCL_ENABLE_bm;
-} /* initLookUpTable */
+} /* InitLookUpTable */
 
 
 /******************************************************************************************************************************************************
@@ -173,14 +173,14 @@ void WS2812::InitLookUpTable()
 ******************************************************************************************************************************************************/
 
 /* Instance methods, though some of them read no member: they are the interface the
-   firmware core calls through getInstance(), and every backend - the simulator's
+   firmware core calls through GetInstance(), and every backend - the simulator's
    stand-ins included - offers it that way. Whether this backend's implementation
    happens to need a member is its own detail, and answering the check would carry
    that detail into the interface.
    The ones it would make const drive the hardware, which a const would deny. */
 // NOLINTBEGIN(readability-convert-member-functions-to-static, readability-make-member-function-const)
 /******************************************************************************************************************************************************
-  init()
+  Init()
 ******************************************************************************************************************************************************/
 /*! \brief          Builds the transmitter out of USART, event system, timers and look-up table
  *  \details        The order matters in one place only: the look-up table is enabled last, so
@@ -198,11 +198,11 @@ void WS2812::Init()
        "short" is measured against the strip's reset time here, and this removes the question
        rather than answering it per handler. */
     CPUINT.LVL1VEC = USART0_DRE_vect_num;
-} /* init */
+} /* Init */
 
 
 /******************************************************************************************************************************************************
-  isBusy()
+  IsBusy()
 ******************************************************************************************************************************************************/
 /*! \brief          Whether a frame is still going out
  *  \details        Both halves are needed: the queue can be empty while the last byte is
@@ -214,11 +214,11 @@ bool WS2812::IsBusy() const
     if(frame_position < frame_length) { return true; }
 
     return (USART0.STATUS & USART_TXCIF_bm) == 0u;
-} /* isBusy */
+} /* IsBusy */
 
 
 /******************************************************************************************************************************************************
-  send()
+  Send()
 ******************************************************************************************************************************************************/
 /*! \brief          Starts one frame
  *  \details        Returns as soon as the first byte is on its way; the rest follows from the
@@ -235,13 +235,13 @@ StdReturnType WS2812::Send(const byte* frame, uint16_t length)
     frame_length = length;
     frame_position = 0u;
 
-    /* Cleared by hand, because it is what isBusy() reads to tell a drained shift register
+    /* Cleared by hand, because it is what IsBusy() reads to tell a drained shift register
        from one that never started. */
     USART0.STATUS = USART_TXCIF_bm;
     USART0.CTRLA |= USART_DREIE_bm;
 
     return kEOk;
-} /* send */
+} /* Send */
 // NOLINTEND(readability-convert-member-functions-to-static, readability-make-member-function-const)
 
 /******************************************************************************************************************************************************

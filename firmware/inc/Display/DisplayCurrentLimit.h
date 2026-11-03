@@ -138,7 +138,7 @@ class DisplayCurrentLimit
     }
 };
 
-/* Available * BrightnessScale is the one product that could leave 32 bits, and this is the
+/* Available * kBrightnessScale is the one product that could leave 32 bits, and this is the
    budget at which it would. Far above any word clock, so the assert documents the ceiling
    rather than guarding a plausible mistake. */
 static_assert(DISPLAY_CURRENT_LIMIT_BUDGET_MILLI_AMPS <= 16000u,

@@ -86,7 +86,7 @@ PIO Block() { return (WS2812_PIO_BLOCK_INDEX == 0u) ? pio0 : pio1; }
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  init()
+  Init()
 ******************************************************************************************************************************************************/
 /*! \brief          Claims a state machine and a DMA channel for the strip's data pin
 ******************************************************************************************************************************************************/
@@ -136,25 +136,25 @@ void WS2812Pio::Init(uint8_t pin)
     pio_sm_set_enabled(block, kStateMachine, true);
 
     is_ready_ = true;
-} /* init */
+} /* Init */
 
 
 /******************************************************************************************************************************************************
-  isBusy()
+  IsBusy()
 ******************************************************************************************************************************************************/
 bool WS2812Pio::IsBusy() const
 {
     if(!is_ready_) { return false; }
 
     return dma_channel_is_busy(static_cast<uint>(dma_channel_));
-} /* isBusy */
+} /* IsBusy */
 
 
 /* Not const, though nothing here writes a member: it drives the hardware, and a const
    would say it changes nothing. */
 // NOLINTBEGIN(readability-make-member-function-const)
 /******************************************************************************************************************************************************
-  transmit()
+  Transmit()
 ******************************************************************************************************************************************************/
 /*! \brief          Hands one frame to DMA and returns
  *  \details        Refuses rather than waits while the previous frame is still going out.
@@ -162,7 +162,7 @@ bool WS2812Pio::IsBusy() const
  *                  here means something is wrong rather than that the strip is busy - and
  *                  waiting would spend a third of a tick doing nothing.
  *
- *  \return         E_OK if DMA took the frame
+ *  \return         kEOk if DMA took the frame
 ******************************************************************************************************************************************************/
 StdReturnType WS2812Pio::Transmit(const WordType* frame, size_t count)
 {
@@ -181,7 +181,7 @@ StdReturnType WS2812Pio::Transmit(const WordType* frame, size_t count)
                           &Block()->txf[kStateMachine], frame, count, true);
 
     return kEOk;
-} /* transmit */
+} /* Transmit */
 // NOLINTEND(readability-make-member-function-const)
 
 /******************************************************************************************************************************************************

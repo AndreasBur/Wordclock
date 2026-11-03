@@ -139,7 +139,7 @@ class DS3231
     }
 
     /* The registers hold their fields in BCD, two decimal digits per byte. Public for the
-       same reason as toTenths(): it is checkable without a bus, and the assertions below
+       same reason as ToTenths(): it is checkable without a bus, and the assertions below
        do it. */
     static constexpr byte FromBcd(byte value) { return static_cast<byte>(((value >> 4u) * 10u) + (value & 0x0Fu)); }
     static constexpr byte ToBcd(byte value) { return static_cast<byte>(((value / 10u) << 4u) | (value % 10u)); }
@@ -147,7 +147,7 @@ class DS3231
     // get methods
     static constexpr byte GetTaskCycle() { return kTaskCycle; }
 
-    /* E_NOT_OK while no reading has arrived yet, which is what a caller has to tell apart
+    /* kENotOk while no reading has arrived yet, which is what a caller has to tell apart
        from a reading of zero degrees. */
     StdReturnType GetTemperature(TemperatureType& temperature) const {
         if(!temperature_valid_) { return kENotOk; }
@@ -156,7 +156,7 @@ class DS3231
         return kEOk;
     }
 
-    /* Reads what the chip counted, in UTC. E_NOT_OK when the chip does not answer, when it
+    /* Reads what the chip counted, in UTC. kENotOk when the chip does not answer, when it
        reports that its oscillator stopped - a battery that ran out, so what it counted
        since is nothing - or when the registers do not form a date, which is what an
        unwritten chip and a botched transfer both look like. */

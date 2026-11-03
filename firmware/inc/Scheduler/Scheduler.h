@@ -27,9 +27,9 @@
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
 /* Scheduler configuration parameter */
-/* Milliseconds between two task() calls, and thereby the unit every module's task
+/* Milliseconds between two Task() calls, and thereby the unit every module's task
    cycle counts in. A platform whose tick comes from a timer it cannot set freely
-   overrides this; getTaskIntervalMs() is what the platform's tick source reads. */
+   overrides this; GetTaskIntervalMs() is what the platform's tick source reads. */
 #define SCHEDULER_TASK_INTERVAL_MS          10u
 
 /******************************************************************************************************************************************************
@@ -46,7 +46,7 @@ class Scheduler
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-    /* One per task that triggerTasks() drives, and in the order it drives them. */
+    /* One per task that TriggerTasks() drives, and in the order it drives them. */
     enum TaskIdType {
         kTaskIdIlluminance,
         kTaskIdTemperature,

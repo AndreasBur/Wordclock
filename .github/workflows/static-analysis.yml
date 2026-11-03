@@ -70,6 +70,13 @@ jobs:
       - name: Analyse
         run: run-clang-tidy -p build -quiet -j "$(nproc)" 'firmware/|platform/simulator/src'
 
+      # The names are the same everywhere, the tests and the window included, which the run
+      # above leaves out: what the other checks would say about test scaffolding is not worth
+      # answering, but a test written in the old names reads as the old code. Seconds, not
+      # minutes - one check.
+      - name: Names in the tests and the window
+        run: run-clang-tidy -p build -quiet -j "$(nproc)" -checks='-*,readability-identifier-naming' 'platform/simulator/(tests|Wordclock)'
+
   clang-tidy-avr:
     name: clang-tidy (AVR Dx)
     runs-on: ubuntu-26.04

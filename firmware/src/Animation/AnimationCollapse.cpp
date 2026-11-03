@@ -52,11 +52,11 @@ void AnimationCollapse::Init()
     Animation::Init(kStateIdle);
     /* all animations share one union, so nothing may rely on member initializers */
     Reset();
-} /* init */
+} /* Init */
 
 
 /******************************************************************************************************************************************************
-  setTime()
+  SetTime()
 ******************************************************************************************************************************************************/
 StdReturnType AnimationCollapse::SetTime(byte hour, byte minute)
 {
@@ -71,17 +71,17 @@ StdReturnType AnimationCollapse::SetTime(byte hour, byte minute)
         return_value = kEOk;
     }
     return return_value;
-} /* setTime */
+} /* SetTime */
 
 
 /******************************************************************************************************************************************************
-  task()
+  Task()
 ******************************************************************************************************************************************************/
 void AnimationCollapse::Task()
 {
     if(state_ == kStateClearTime) { ClearTimeTask(); }
     else if(state_ == kStateSetTime) { SetTimeTask(); }
-} /* task */
+} /* Task */
 
 
 /******************************************************************************************************************************************************
@@ -89,7 +89,7 @@ void AnimationCollapse::Task()
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  reset()
+  Reset()
 ******************************************************************************************************************************************************/
 void AnimationCollapse::Reset()
 {
@@ -97,11 +97,11 @@ void AnimationCollapse::Reset()
     step_ = 0u;
     expand_steps_ = 1u;
     direction_ = kDirectionToLeft;
-} /* reset */
+} /* Reset */
 
 
 /******************************************************************************************************************************************************
-  clearTimeTask()
+  ClearTimeTask()
 ******************************************************************************************************************************************************/
 void AnimationCollapse::ClearTimeTask()
 {
@@ -117,11 +117,11 @@ void AnimationCollapse::ClearTimeTask()
         expand_steps_ = CalcExpandSteps();
         state_ = kStateSetTime;
     }
-} /* clearTimeTask */
+} /* ClearTimeTask */
 
 
 /******************************************************************************************************************************************************
-  collapseRow()
+  CollapseRow()
 ******************************************************************************************************************************************************/
 bool AnimationCollapse::CollapseRow(byte row)
 {
@@ -153,11 +153,11 @@ bool AnimationCollapse::CollapseRow(byte row)
     }
 
     return moved;
-} /* collapseRow */
+} /* CollapseRow */
 
 
 /******************************************************************************************************************************************************
-  setTimeTask()
+  SetTimeTask()
 ******************************************************************************************************************************************************/
 void AnimationCollapse::SetTimeTask()
 {
@@ -181,11 +181,11 @@ void AnimationCollapse::SetTimeTask()
         FinishWithClockWords(clock_words_table_);
         Reset();
     }
-} /* setTimeTask */
+} /* SetTimeTask */
 
 
 /******************************************************************************************************************************************************
-  calcColumn()
+  CalcColumn()
 ******************************************************************************************************************************************************/
 byte AnimationCollapse::CalcColumn(byte final_column, byte block_column) const
 {
@@ -199,11 +199,11 @@ byte AnimationCollapse::CalcColumn(byte final_column, byte block_column) const
     }
 
     return static_cast<byte>(final_column - (((final_column - block_column) * remaining_steps) / expand_steps_));
-} /* calcColumn */
+} /* CalcColumn */
 
 
 /******************************************************************************************************************************************************
-  calcBlockColumn()
+  CalcBlockColumn()
 ******************************************************************************************************************************************************/
 byte AnimationCollapse::CalcBlockColumn(byte letter_index, byte letters_of_row) const
 {
@@ -213,11 +213,11 @@ byte AnimationCollapse::CalcBlockColumn(byte letter_index, byte letters_of_row) 
     if(direction_ == kDirectionToLeft) { return letter_index; }
 
     return static_cast<byte>(DISPLAY_NUMBER_OF_COLUMNS - letters_of_row + letter_index);
-} /* calcBlockColumn */
+} /* CalcBlockColumn */
 
 
 /******************************************************************************************************************************************************
-  countLettersOfRow()
+  CountLettersOfRow()
 ******************************************************************************************************************************************************/
 byte AnimationCollapse::CountLettersOfRow(byte row) const
 {
@@ -228,11 +228,11 @@ byte AnimationCollapse::CountLettersOfRow(byte row) const
     }
 
     return letters;
-} /* countLettersOfRow */
+} /* CountLettersOfRow */
 
 
 /******************************************************************************************************************************************************
-  calcExpandSteps()
+  CalcExpandSteps()
 ******************************************************************************************************************************************************/
 byte AnimationCollapse::CalcExpandSteps() const
 {
@@ -252,12 +252,12 @@ byte AnimationCollapse::CalcExpandSteps() const
         }
     }
 
-    /* never zero: calcColumn() divides by it, and a picture that needs no movement at
+    /* never zero: CalcColumn() divides by it, and a picture that needs no movement at
        all is then drawn once and done */
     if(longest_way == 0u) { return 1u; }
 
     return longest_way;
-} /* calcExpandSteps */
+} /* CalcExpandSteps */
 
 
 /******************************************************************************************************************************************************

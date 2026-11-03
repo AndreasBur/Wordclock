@@ -103,8 +103,8 @@ constexpr const char* const kBooleanValueNames[] {
     "off", "on"
 };
 
-/* MsgCmdRemoteProcedureCallParser::RpcIdType, from RPC_ID_NONE + 1 onwards. NONE is the
-   initial value of the parser's RpcId member, not a procedure: asking for it lands in the
+/* MsgCmdRemoteProcedureCallParser::RpcIdType, from kRpcIdNone + 1 onwards. NONE is the
+   initial value of the parser's rpc_id_ member, not a procedure: asking for it lands in the
    default case and answers kErrorRpcIdUnknown. Offering it would offer a guaranteed
    error, the same reason kCommandNone is left out of the command list. */
 constexpr const char* const kRemoteProcedureValueNames[] {
@@ -242,7 +242,7 @@ constexpr const char* const kFontValueNames[] {
    and there are as many values as names. */
 #define NAMED(Minimum, Names)                           (Minimum), static_cast<uint16_t>((Minimum) + NUMBER_OF(Names) - 1u), Names, NUMBER_OF(Names)
 
-/* MsgCmdRemoteProcedureCallParser. Starts at one, RPC_ID_NONE being left out. */
+/* MsgCmdRemoteProcedureCallParser. Starts at one, kRpcIdNone being left out. */
 constexpr MessageCatalog::OptionType kRemoteProcedureCallOptions[] {
     {'P', "Procedure",          kArgumentTypeUint8,  NAMED(1u, kRemoteProcedureValueNames)}
 };
@@ -269,8 +269,8 @@ constexpr MessageCatalog::OptionType kDisplayPixelOptions[] {
 };
 
 /* MsgCmdBaseOverlayParser, shared by the date, temperature and text commands. Only the
-   text overlay reads the text: the other two answer the parser's setText() and
-   sendAnswerText() with empty bodies, so a text sent to them is accepted, discarded and
+   text overlay reads the text: the other two answer the parser's SetText() and
+   SendAnswerText() with empty bodies, so a text sent to them is accepted, discarded and
    never answered. It is therefore the last entry rather than one in the middle, which
    lets those two share this table and simply stop one option short of it. */
 constexpr MessageCatalog::OptionType kOverlayOptions[] {
@@ -456,25 +456,25 @@ static_assert(AreNamedRangesConsistent(),
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  getNumberOfCommands()
+  GetNumberOfCommands()
 ******************************************************************************************************************************************************/
 byte MessageCatalog::GetNumberOfCommands()
 {
     return kNumberOfCommands;
-} /* getNumberOfCommands */
+} /* GetNumberOfCommands */
 
 
 /******************************************************************************************************************************************************
-  getCommand()
+  GetCommand()
 ******************************************************************************************************************************************************/
 const MessageCatalog::CommandType& MessageCatalog::GetCommand(byte index)
 {
     return kCommands[index];
-} /* getCommand */
+} /* GetCommand */
 
 
 /******************************************************************************************************************************************************
-  findCommandByNumber()
+  FindCommandByNumber()
 ******************************************************************************************************************************************************/
 /*! \brief          looks a command up by the number it is sent with
  *  \details        Not the same as the index into the table: the numbers happen to run
@@ -489,11 +489,11 @@ const MessageCatalog::CommandType* MessageCatalog::FindCommandByNumber(byte numb
     }
 
     return nullptr;
-} /* findCommandByNumber */
+} /* FindCommandByNumber */
 
 
 /******************************************************************************************************************************************************
-  findRemoteProcedureCallCommand()
+  FindRemoteProcedureCallCommand()
 ******************************************************************************************************************************************************/
 /*! \brief          the remote procedure call, for a caller that has no number to look up
  *
@@ -502,11 +502,11 @@ const MessageCatalog::CommandType* MessageCatalog::FindCommandByNumber(byte numb
 const MessageCatalog::CommandType* MessageCatalog::FindRemoteProcedureCallCommand()
 {
     return FindCommandByNumber(MsgCmdParser::kCommandRemoteProcedureCall);
-} /* findRemoteProcedureCallCommand */
+} /* FindRemoteProcedureCallCommand */
 
 
 /******************************************************************************************************************************************************
-  findOption()
+  FindOption()
 ******************************************************************************************************************************************************/
 /*! \brief          looks an option of a command up by its short name
  *
@@ -519,7 +519,7 @@ const MessageCatalog::OptionType* MessageCatalog::FindOption(const CommandType& 
     }
 
     return nullptr;
-} /* findOption */
+} /* FindOption */
 
 
 /******************************************************************************************************************************************************

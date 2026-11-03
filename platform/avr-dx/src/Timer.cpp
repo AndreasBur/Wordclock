@@ -44,8 +44,8 @@
 /*! \brief          bring the timer up, stopped, with a period and optionally a callback
  *  \param[in]      microseconds                period of the timer overflow interrupt
  *  \param[in]      timer_overflow_callback      called from the overflow ISR, or nullptr for none
- *  \return         E_OK
- *                  E_NOT_OK
+ *  \return         kEOk
+ *                  kENotOk
  *****************************************************************************************************************************************************/
 template <typename TimerTraits>
 StdReturnType Timer<TimerTraits>::Init(uint32_t microseconds, TimerIsrCallbackFVoid timer_overflow_callback)
@@ -111,8 +111,8 @@ typename Timer<TimerTraits>::TimerClockSelectType Timer<TimerTraits>::ToClockSel
  *  \details        this functions sets the period of the timer overflow interrupt therefore
  *                  prescaler and timer top value will be calculated
  *  \param[in]      microseconds                period of the timer overflow interrupt
- *  \return         E_OK
- *                  E_NOT_OK
+ *  \return         kEOk
+ *                  kENotOk
  *****************************************************************************************************************************************************/
 template <typename TimerTraits>
 StdReturnType Timer<TimerTraits>::SetPeriod(uint32_t microseconds)
@@ -155,8 +155,8 @@ StdReturnType Timer<TimerTraits>::SetPeriod(uint32_t microseconds)
   Start()
 ******************************************************************************************************************************************************/
 /*! \brief          start the timer from zero
- *  \return         E_OK
- *                  E_NOT_OK        timer was not initialized
+ *  \return         kEOk
+ *                  kENotOk        timer was not initialized
  *****************************************************************************************************************************************************/
 template <typename TimerTraits>
 StdReturnType Timer<TimerTraits>::Start()
@@ -195,8 +195,8 @@ void Timer<TimerTraits>::Stop()
   Resume()
 ******************************************************************************************************************************************************/
 /*! \brief          continue a stopped timer where it stopped
- *  \return         E_OK
- *                  E_NOT_OK        timer was not stopped
+ *  \return         kEOk
+ *                  kENotOk        timer was not stopped
  *****************************************************************************************************************************************************/
 template <typename TimerTraits>
 StdReturnType Timer<TimerTraits>::Resume()
@@ -223,8 +223,8 @@ StdReturnType Timer<TimerTraits>::Resume()
  *                  would corrupt a frame, so the overflow stays at level 0 and the callback runs
  *                  without being interruptible. Keep it short.
  *  \param[in]      timer_overflow_callback      called from the overflow ISR
- *  \return         E_OK
- *                  E_NOT_OK                    no callback given
+ *  \return         kEOk
+ *                  kENotOk                    no callback given
  *****************************************************************************************************************************************************/
 template <typename TimerTraits>
 StdReturnType Timer<TimerTraits>::AttachInterrupt(TimerIsrCallbackFVoid timer_overflow_callback)
@@ -262,8 +262,8 @@ void Timer<TimerTraits>::DetachInterrupt()
  *  \details        this function returns the time since the last overflow interrupt in microseconds
  *
  *  \param[out]     microseconds        current timer value
- *  \return         E_OK
- *                  E_NOT_OK
+ *  \return         kEOk
+ *                  kENotOk
  *  \pre            Timer has to be in RUNNING or STOPPED STATE
  *****************************************************************************************************************************************************/
 template <typename TimerTraits>
@@ -421,7 +421,7 @@ StdReturnType Timer<TimerTraits>::DisablePwmChannel(TimerChannelType channel)
 /******************************************************************************************************************************************************
   SetPwmDutyChannel
 ******************************************************************************************************************************************************/
-/*! \brief          set duty of one compare channel, 0 .. PwmDutyMax
+/*! \brief          set duty of one compare channel, 0 .. kPwmDutyMax
  *  \details        Written to the buffer register, so the new compare value takes effect at the next
  *                  BOTTOM and a running PWM never sees half a period of each.
  *****************************************************************************************************************************************************/

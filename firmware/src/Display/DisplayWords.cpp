@@ -72,7 +72,7 @@ const DisplayWord DisplayWords::kDisplayWordsTable[] PROGMEM
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  getDisplayWord()
+  GetDisplayWord()
 ******************************************************************************************************************************************************/
 StdReturnType DisplayWords::GetDisplayWord(WordIdType word_id, DisplayWord& word)
 {
@@ -85,11 +85,11 @@ StdReturnType DisplayWords::GetDisplayWord(WordIdType word_id, DisplayWord& word
         return_value = kENotOk;
     }
     return return_value;
-} /* getDisplayWord */
+} /* GetDisplayWord */
 
 
 /******************************************************************************************************************************************************
-  getDisplayWordLength()
+  GetDisplayWordLength()
 ******************************************************************************************************************************************************/
 StdReturnType DisplayWords::GetDisplayWordLength(WordIdType word_id, byte& length)
 {
@@ -102,11 +102,11 @@ StdReturnType DisplayWords::GetDisplayWordLength(WordIdType word_id, byte& lengt
         return_value = kENotOk;
     }
     return return_value;
-} /* getDisplayWordLength */
+} /* GetDisplayWordLength */
 
 
 /******************************************************************************************************************************************************
-  getDisplayWordColumn()
+  GetDisplayWordColumn()
 ******************************************************************************************************************************************************/
 StdReturnType DisplayWords::GetDisplayWordColumn(WordIdType word_id, byte& column)
 {
@@ -119,11 +119,11 @@ StdReturnType DisplayWords::GetDisplayWordColumn(WordIdType word_id, byte& colum
         return_value = kENotOk;
     }
     return return_value;
-} /* getDisplayWordColumn */
+} /* GetDisplayWordColumn */
 
 
 /******************************************************************************************************************************************************
-  getDisplayWordRow()
+  GetDisplayWordRow()
 ******************************************************************************************************************************************************/
 StdReturnType DisplayWords::GetDisplayWordRow(WordIdType word_id, byte& row)
 {
@@ -136,7 +136,7 @@ StdReturnType DisplayWords::GetDisplayWordRow(WordIdType word_id, byte& row)
         return_value = kENotOk;
     }
     return return_value;
-} /* getDisplayWordRow */
+} /* GetDisplayWordRow */
 
 
 /******************************************************************************************************************************************************

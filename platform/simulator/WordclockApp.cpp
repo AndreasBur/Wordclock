@@ -20,7 +20,7 @@ bool WordclockApp::OnInit()
 {
     PixelsFrame::GetInstance().Show();
     /* After the window, so the address it prints has somewhere to be printed. A port that is
-       taken is not fatal - the window is still worth having, which is what begin() answers. */
+       taken is not fatal - the window is still worth having, which is what Begin() answers. */
     WebHost::GetInstance().Begin();
     return true;
 }

@@ -45,7 +45,7 @@
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  getState()
+  GetState()
 ******************************************************************************************************************************************************/
 Animations::StateType Animations::GetState() const
 {
@@ -56,11 +56,11 @@ Animations::StateType Animations::GetState() const
     }
 
     return kStateIdle;
-} /* getState */
+} /* GetState */
 
 
 /******************************************************************************************************************************************************
-  task()
+  Task()
 ******************************************************************************************************************************************************/
 void Animations::Task(bool show)
 {
@@ -70,11 +70,11 @@ void Animations::Task(bool show)
         TaskOfCurrentAnimation();
         if(show) { ShowOfCurrentAnimation(); }
     }
-} /* task */
+} /* Task */
 
 
 /******************************************************************************************************************************************************
-  show()
+  Show()
 ******************************************************************************************************************************************************/
 StdReturnType Animations::Show() const
 {
@@ -85,10 +85,10 @@ StdReturnType Animations::Show() const
     }
 
     return kENotOk;
-} /* show */
+} /* Show */
 
 /******************************************************************************************************************************************************
-  setTaskCycle()
+  SetTaskCycle()
 ******************************************************************************************************************************************************/
 StdReturnType Animations::SetTaskCycle(AnimationIdType animation_id, byte cycle)
 {
@@ -101,7 +101,7 @@ StdReturnType Animations::SetTaskCycle(AnimationIdType animation_id, byte cycle)
 }
 
 /******************************************************************************************************************************************************
-  setAnimation()
+  SetAnimation()
 ******************************************************************************************************************************************************/
 StdReturnType Animations::SetAnimation(AnimationIdType animation_id)
 {
@@ -114,11 +114,11 @@ StdReturnType Animations::SetAnimation(AnimationIdType animation_id)
 
     InitCurrentAnimation();
     return kEOk;
-} /* setAnimation */
+} /* SetAnimation */
 
 
 /******************************************************************************************************************************************************
-  setMode()
+  SetMode()
 ******************************************************************************************************************************************************/
 StdReturnType Animations::SetMode(ModeType mode)
 {
@@ -133,11 +133,11 @@ StdReturnType Animations::SetMode(ModeType mode)
         InitCurrentAnimation();
     }
     return kEOk;
-} /* setMode */
+} /* SetMode */
 
 
 /******************************************************************************************************************************************************
-  initCurrentAnimation()
+  InitCurrentAnimation()
 ******************************************************************************************************************************************************/
 void Animations::InitCurrentAnimation()
 {
@@ -222,11 +222,11 @@ void Animations::InitCurrentAnimation()
             current_animation_id_ = kAnimationIdNone;
             break;
     }
-} /* initCurrentAnimation */
+} /* InitCurrentAnimation */
 
 
 /******************************************************************************************************************************************************
-  setTime()
+  SetTime()
 ******************************************************************************************************************************************************/
 StdReturnType Animations::SetTime(byte hour, byte minute)
 {
@@ -320,7 +320,7 @@ StdReturnType Animations::SetTime(byte hour, byte minute)
             return kENotOk;
             break;
     }
-} /* setTime */
+} /* SetTime */
 
 
 /******************************************************************************************************************************************************
@@ -328,7 +328,7 @@ StdReturnType Animations::SetTime(byte hour, byte minute)
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  getStateOfCurrentAnimation()
+  GetStateOfCurrentAnimation()
 ******************************************************************************************************************************************************/
 Animation::StateType Animations::GetStateOfCurrentAnimation() const
 {
@@ -416,11 +416,11 @@ Animation::StateType Animations::GetStateOfCurrentAnimation() const
             return Animation::kStateNone;
             break;
     }
-} /* getStateOfCurrentAnimation */
+} /* GetStateOfCurrentAnimation */
 
 
 /******************************************************************************************************************************************************
-  taskOfCurrentAnimation()
+  TaskOfCurrentAnimation()
 ******************************************************************************************************************************************************/
 void Animations::TaskOfCurrentAnimation()
 {
@@ -506,11 +506,11 @@ void Animations::TaskOfCurrentAnimation()
         default :
             break;
     }
-} /* taskOfCurrentAnimation */
+} /* TaskOfCurrentAnimation */
 
 
 /******************************************************************************************************************************************************
-  showOfCurrentAnimation()
+  ShowOfCurrentAnimation()
 ******************************************************************************************************************************************************/
 StdReturnType Animations::ShowOfCurrentAnimation() const
 {
@@ -598,11 +598,11 @@ StdReturnType Animations::ShowOfCurrentAnimation() const
             return kENotOk;
             break;
     }
-} /* showOfCurrentAnimation */
+} /* ShowOfCurrentAnimation */
 
 
 /******************************************************************************************************************************************************
-  selectAnimationOfMode()
+  SelectAnimationOfMode()
 ******************************************************************************************************************************************************/
 void Animations::SelectAnimationOfMode()
 {
@@ -621,11 +621,11 @@ void Animations::SelectAnimationOfMode()
     /* the selected animation shares its memory with the previous one, so it has to be
        initialized before it is used */
     InitCurrentAnimation();
-} /* selectAnimationOfMode */
+} /* SelectAnimationOfMode */
 
 
 /******************************************************************************************************************************************************
-  calcRandomAnimation()
+  CalcRandomAnimation()
 ******************************************************************************************************************************************************/
 Animations::AnimationIdType Animations::CalcRandomAnimation()
 {
@@ -651,13 +651,13 @@ Animations::AnimationIdType Animations::CalcRandomAnimation()
         }
     }
 
-    /* unreachable while at least one favourite is set, which setFavourite() enforces */
+    /* unreachable while at least one favourite is set, which SetFavourite() enforces */
     return animation_id_;
-} /* calcRandomAnimation */
+} /* CalcRandomAnimation */
 
 
 /******************************************************************************************************************************************************
-  calcNextAnimation()
+  CalcNextAnimation()
 ******************************************************************************************************************************************************/
 Animations::AnimationIdType Animations::CalcNextAnimation() const
 {
@@ -674,11 +674,11 @@ Animations::AnimationIdType Animations::CalcNextAnimation() const
     }
 
     return animation_id_;
-} /* calcNextAnimation */
+} /* CalcNextAnimation */
 
 
 /******************************************************************************************************************************************************
-  numberOfFavourites()
+  NumberOfFavourites()
 ******************************************************************************************************************************************************/
 byte Animations::NumberOfFavourites() const
 {
@@ -689,7 +689,7 @@ byte Animations::NumberOfFavourites() const
     }
 
     return count;
-} /* numberOfFavourites */
+} /* NumberOfFavourites */
 
 
 /******************************************************************************************************************************************************

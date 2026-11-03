@@ -76,7 +76,7 @@ class Pixels
     byte brightness_{255};
     /* Whether the firmware touched buffer or brightness since the last render. Same
        flag as the simulator's, and it earns its keep twice here: it saves the pass over
-       all 110 cells on the ticks where nothing happened, and it is what makes render()
+       all 110 cells on the ticks where nothing happened, and it is what makes Render()
        the only place that transmits - see the reset-gap note in the source. Starts true
        so the first render establishes the strip's state. */
     bool dirty_{true};
@@ -139,7 +139,7 @@ class Pixels
     void DisablePixels() { SetBrightness(0); }
     void ClearPixels() { SetPixels(PixelType(0u, 0u, 0u)); }
     /* Only asks for a render, exactly as on the simulator. What reaches the strip is
-       decided by render() on the next tick; see the source for why the transmission
+       decided by Render() on the next tick; see the source for why the transmission
        must not happen from here. */
     StdReturnType Show() {
         dirty_ = true;

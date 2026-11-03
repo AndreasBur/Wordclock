@@ -30,22 +30,22 @@
 ******************************************************************************************************************************************************/
 
 /* Instance methods, though some of them read no member: they are the interface the
-   firmware core calls through getInstance(), and every backend - the simulator's
+   firmware core calls through GetInstance(), and every backend - the simulator's
    stand-ins included - offers it that way. Whether this backend's implementation
    happens to need a member is its own detail, and answering the check would carry
    that detail into the interface. */
 // NOLINTBEGIN(readability-convert-member-functions-to-static)
 /******************************************************************************************************************************************************
-  begin()
+  Begin()
 ******************************************************************************************************************************************************/
 void WordclockSerial::begin(unsigned long baud_rate)
 {
     wordclock_platform::HardwarePortBegin(baud_rate);
-} /* begin */
+} /* Begin */
 
 
 /******************************************************************************************************************************************************
-  inject()
+  Inject()
 ******************************************************************************************************************************************************/
 /*! \brief          Hands characters to the port from another task
  *  \details        Written by the producer only, which is what keeps this free of a lock -
@@ -55,7 +55,7 @@ void WordclockSerial::begin(unsigned long baud_rate)
  *                  been read yet: the reader is mid-command, and overwriting would splice
  *                  two commands into one that parses as neither.
  *
- *  \return         E_OK if everything was taken
+ *  \return         kEOk if everything was taken
 ******************************************************************************************************************************************************/
 StdReturnType WordclockSerial::Inject(const char* characters, size_t length)
 {
@@ -77,7 +77,7 @@ StdReturnType WordclockSerial::Inject(const char* characters, size_t length)
     }
 
     return kEOk;
-} /* inject */
+} /* Inject */
 
 
 /******************************************************************************************************************************************************
@@ -94,7 +94,7 @@ int WordclockSerial::available() const
 
 
 /******************************************************************************************************************************************************
-  read()
+  Read()
 ******************************************************************************************************************************************************/
 /*! \brief          Takes the next character, wire before network
  *  \details        The UART is served first so that a console on the wire keeps working
@@ -111,7 +111,7 @@ int WordclockSerial::read()
     if(!IsInjectEmpty()) { return static_cast<unsigned char>(ReadInjected()); }
 
     return -1;
-} /* read */
+} /* Read */
 
 
 /******************************************************************************************************************************************************
@@ -210,14 +210,14 @@ void WordclockSerial::println(const __FlashStringHelper* text)
 
 
 /******************************************************************************************************************************************************
-  flush()
+  Flush()
 ******************************************************************************************************************************************************/
 /*! \brief          Waits until the UART has sent what it was given
 ******************************************************************************************************************************************************/
 void WordclockSerial::flush()
 {
     wordclock_platform::HardwarePort().flush();
-} /* flush */
+} /* Flush */
 // NOLINTEND(readability-convert-member-functions-to-static)
 
 
@@ -226,7 +226,7 @@ void WordclockSerial::flush()
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  readInjected()
+  ReadInjected()
 ******************************************************************************************************************************************************/
 char WordclockSerial::ReadInjected()
 {
@@ -238,11 +238,11 @@ char WordclockSerial::ReadInjected()
     inject_tail_.store(NextIndex(tail), std::memory_order_release);
 
     return character;
-} /* readInjected */
+} /* ReadInjected */
 
 
 /******************************************************************************************************************************************************
-  appendToLine()
+  AppendToLine()
 ******************************************************************************************************************************************************/
 /*! \brief          Collects the line the sink will be handed
  *  \details        A line that outgrows the buffer is flushed early rather than cut: the
@@ -254,11 +254,11 @@ void WordclockSerial::AppendToLine(char character)
     if(line_used_ >= (kLineLength - 1u)) { FlushLine(); }
 
     line_buffer_[line_used_++] = character;
-} /* appendToLine */
+} /* AppendToLine */
 
 
 /******************************************************************************************************************************************************
-  flushLine()
+  FlushLine()
 ******************************************************************************************************************************************************/
 /*! \brief          Hands the collected line to whoever registered for it
  *  \details        An empty line is dropped, because println() is also used to terminate
@@ -273,7 +273,7 @@ void WordclockSerial::FlushLine()
     line_used_ = 0u;
 
     if(line_sink_ != nullptr) { line_sink_(line_buffer_); }
-} /* flushLine */
+} /* FlushLine */
 
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E

@@ -63,7 +63,7 @@ const DisplayCharacters::DisplayCharactersTableElementType DisplayCharacters::kD
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  getCharacter()
+  GetCharacter()
 ******************************************************************************************************************************************************/
 StdReturnType DisplayCharacters::GetCharacter(byte column, byte row, char& character)
 {
@@ -73,11 +73,11 @@ StdReturnType DisplayCharacters::GetCharacter(byte column, byte row, char& chara
     } else {
         return kENotOk;
     }
-} /* getCharacter */
+} /* GetCharacter */
 
 
 /******************************************************************************************************************************************************
-  getCharacter()
+  GetCharacter()
   ****************************************************************************************************************************************************/
 StdReturnType DisplayCharacters::GetCharacter(byte index, char& character)
 {
@@ -87,11 +87,11 @@ StdReturnType DisplayCharacters::GetCharacter(byte index, char& character)
     } else {
         return kENotOk;
     }
-} /* getCharacter */
+} /* GetCharacter */
 
 
 /******************************************************************************************************************************************************
-  getCharacter()
+  GetCharacter()
   ****************************************************************************************************************************************************/
 StdReturnType DisplayCharacters::GetCharacter(CharacterIdType character_id, char& character)
 {
@@ -101,7 +101,7 @@ StdReturnType DisplayCharacters::GetCharacter(CharacterIdType character_id, char
     } else {
         return kENotOk;
     }
-} /* getCharacter */
+} /* GetCharacter */
 
 
 /******************************************************************************************************************************************************

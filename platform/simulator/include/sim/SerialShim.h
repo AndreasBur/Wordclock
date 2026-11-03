@@ -17,7 +17,7 @@
  *                  this instance.
  *
  *                  The two controls belong to the pixel matrix window, which lays them
- *                  out and passes them here with attach(). Splitting it that way keeps
+ *                  out and passes them here with Attach(). Splitting it that way keeps
  *                  the port's behaviour — the buffering, the line the answers are read
  *                  back from — out of a class whose subject is the letter grid.
  *
@@ -119,7 +119,7 @@ class SerialShim
 
     /* The second front end, the same arrangement the two networked backends have: a browser
        sends command text over a web socket and it arrives here as though it had been typed.
-       Appended rather than assigned, unlike sendInput() below - what is typed can wait for
+       Appended rather than assigned, unlike SendInput() below - what is typed can wait for
        the field to clear, but a command already on the wire has nowhere to wait.
 
        Called from the firmware's tick, because the simulator's server is polled from the same
