@@ -77,6 +77,17 @@ jobs:
       - name: Names in the tests and the window
         run: run-clang-tidy -p build -quiet -j "$(nproc)" -checks='-*,readability-identifier-naming' 'platform/simulator/(tests|Wordclock)'
 
+      # The backends' host tests are compiled by their own run.sh and by nothing CMake or
+      # PlatformIO sees, so their names are read through the compile database run.sh writes.
+      # That takes python3, for the database and the generated page, and nothing else: no
+      # PlatformIO and no cross compiler, the stubs stand in for both.
+      - name: Names in the host tests
+        run: |
+          for backend in esp32 rp2350; do
+            "platform/$backend/test/run.sh" compiledb
+            run-clang-tidy -p "platform/$backend/.pio/host-tests" -quiet -j "$(nproc)" -checks='-*,readability-identifier-naming' 'platform/'
+          done
+
   clang-tidy-avr:
     name: clang-tidy (AVR Dx)
     runs-on: ubuntu-26.04
