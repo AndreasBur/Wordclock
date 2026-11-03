@@ -127,7 +127,7 @@ void TestAnimationStepsThroughEveryOne()
            "and one forward again must undo it");
 
     /* An animation that no mode would pick has to be reachable by hand. */
-    const Animations::AnimationIdType not_a_favourite = Animations::AnimationIdType::kCursor;
+    const Animations::AnimationIdType not_a_favourite = FirstAnimation();
     Expect(animations.SetFavourite(not_a_favourite, false) == kEOk,
            "dropping one favourite of many must be allowed");
 

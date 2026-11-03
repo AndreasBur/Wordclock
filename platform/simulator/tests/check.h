@@ -13,6 +13,7 @@
 #include <array>
 #include <iostream>
 
+#include "Animations.h"
 #include "Clock.h"
 #include "Display.h"
 #include "Pixels.h"
@@ -69,8 +70,19 @@ inline bool IsAnyPixelLit(const PixelBufferType& pixels)
 }
 
 /* What would reach the LEDs, which is not what ReadPixels() shows: that reads the buffer,
-   and the brightness is folded in on the way out. The difference is the whole of what
-   switching the display off does, so a test that asked the buffer would see nothing. */
+   and the brightness is folded in on the way out. */
+inline PixelBufferType ReadOutputPixels()
+{
+    PixelBufferType pixels;
+
+    for(byte index = 0u; index < PIXELS_NUMBER_OF_PIXELS; index++) {
+        pixels[index] = Pixels::GetInstance().GetOutputPixel(index);
+    }
+    return pixels;
+}
+
+/* The difference is the whole of what switching the display off does, so a test that
+   asked the buffer would see nothing. */
 inline bool IsAnyOutputPixelLit()
 {
     for(byte index = 0u; index < PIXELS_NUMBER_OF_PIXELS; index++) {
@@ -79,6 +91,14 @@ inline bool IsAnyOutputPixelLit()
         if(pixel.GetRed() != 0u || pixel.GetGreen() != 0u || pixel.GetBlue() != 0u) { return true; }
     }
     return false;
+}
+
+/* The first animation this build has, for a case that needs one and does not care which.
+   Naming one ties the case to the switch that compiles that animation in, and with the
+   cursor switched off the test suite stopped compiling. */
+inline Animations::AnimationIdType FirstAnimation()
+{
+    return static_cast<Animations::AnimationIdType>(ToUnderlying(Animations::AnimationIdType::kNone) + 1u);
 }
 
 inline void SetTime(byte hour, byte minute, byte second)
