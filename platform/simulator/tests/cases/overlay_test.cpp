@@ -46,7 +46,7 @@ void TestShowNowProcedures()
     Expect(display_manager.RefreshClock() == kEOk, "the clock must be refreshable");
     Expect(ArePixelsEqual(ReadPixels(), clock_face), "the refresh must put the clock face back");
 
-    animations.SetAnimation(Animations::AnimationIdType::kCursor);
+    animations.SetAnimation(FirstAnimation());
     Expect(display_manager.StartAnimation() == kEOk, "the selected animation must start on demand");
     Expect(animations.GetState() == Animations::StateType::kPending, "the started animation must be running");
     Expect(display_manager.AbortAnimation() == kEOk, "a running animation must be abortable");

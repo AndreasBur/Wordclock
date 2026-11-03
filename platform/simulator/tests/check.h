@@ -13,6 +13,7 @@
 #include <array>
 #include <iostream>
 
+#include "Animations.h"
 #include "Clock.h"
 #include "Display.h"
 #include "Pixels.h"
@@ -90,6 +91,14 @@ inline bool IsAnyOutputPixelLit()
         if(pixel.GetRed() != 0u || pixel.GetGreen() != 0u || pixel.GetBlue() != 0u) { return true; }
     }
     return false;
+}
+
+/* The first animation this build has, for a case that needs one and does not care which.
+   Naming one ties the case to the switch that compiles that animation in, and with the
+   cursor switched off the test suite stopped compiling. */
+inline Animations::AnimationIdType FirstAnimation()
+{
+    return static_cast<Animations::AnimationIdType>(ToUnderlying(Animations::AnimationIdType::kNone) + 1u);
 }
 
 inline void SetTime(byte hour, byte minute, byte second)
