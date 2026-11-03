@@ -48,12 +48,12 @@ class Animation
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-    enum StateType {
-        kStateNone,
-        kStateUninit,
-        kStateIdle,
-        kStateClearTime,
-        kStateSetTime
+    enum class StateType {
+        kNone,
+        kUninit,
+        kIdle,
+        kClearTime,
+        kSetTime
     };
 
 /******************************************************************************************************************************************************
@@ -69,7 +69,7 @@ class Animation
     /* odd factor of the hash in SelectByTime(), see there */
     static constexpr byte kSelectHashFactor{181u};
 
-    StateType state_{kStateNone};
+    StateType state_{StateType::kNone};
 
     // functions
     void Init(StateType state) { state_ = state; }
@@ -81,13 +81,13 @@ class Animation
     void FinishWithClockWords(const ClockWords::WordsListType& clock_words_table) {
         Display::GetInstance().Clear();
         Clock::GetInstance().SetTime(clock_words_table);
-        state_ = kStateIdle;
+        state_ = StateType::kIdle;
     }
     /* For the animations that kept the time rather than the word list. */
     void FinishWithTime(byte hour, byte minute) {
         Display::GetInstance().Clear();
         Clock::GetInstance().SetTime(hour, minute);
-        state_ = kStateIdle;
+        state_ = StateType::kIdle;
     }
     static byte SelectByTime(byte, byte, byte);
 
@@ -95,7 +95,7 @@ class Animation
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr Animation() : state_{kStateNone} { }
+    constexpr Animation() : state_{StateType::kNone} { }
     ~Animation() { }
 
     // get methods

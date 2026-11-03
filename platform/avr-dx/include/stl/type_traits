@@ -99,6 +99,11 @@ template<class T> struct is_floating_point : is_floating_point_helper<remove_cv_
 template<class T> struct is_signed : integral_constant<bool, is_integral<T>::value && (T(-1) < T(0))> { };
 template<class T> struct is_unsigned : integral_constant<bool, is_integral<T>::value && (T(0) < T(-1))> { };
 
+/* The built-in, as libstdc++ itself has it: what an enum is stored as is the compiler's
+   knowledge and cannot be worked out in the language. */
+template<class T> struct underlying_type { using type = __underlying_type(T); };
+template<class T> using underlying_type_t = typename underlying_type<T>::type;
+
 } // namespace std
 // NOLINTEND(cert-dcl58-cpp,readability-identifier-naming)
 

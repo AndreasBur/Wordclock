@@ -54,7 +54,7 @@ class MsgCmdConsoleParser : public MsgParameterParser<MsgCmdConsoleParser, MSG_C
     static constexpr char kProtectedShortName{'A'};
 
     static constexpr ParameterTableType kParameterTable PROGMEM {
-        ParameterTableElementType(kPasswordShortName, MsgParameter::kArgumentTypeString)
+        ParameterTableElementType(kPasswordShortName, MsgParameter::ArgumentTypeType::kString)
     };
 
     // functions

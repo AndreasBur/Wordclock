@@ -53,9 +53,9 @@ StdReturnType Timer<TimerTraits>::Init(uint32_t microseconds, TimerIsrCallbackFV
 {
     StdReturnType return_value{kENotOk};
 
-    if(kStateNone == state_) {
+    if(StateType::kNone == state_) {
         return_value = kEOk;
-        state_ = kStateInit;
+        state_ = StateType::kInit;
 
         /* The Dx hands this timer over at its reset values rather than running, the way the
            xmegaForArduino core used to - but RESET is kept anyway, so that a second Init() after a
@@ -74,7 +74,7 @@ StdReturnType Timer<TimerTraits>::Init(uint32_t microseconds, TimerIsrCallbackFV
         if(SetPeriod(microseconds) == kENotOk) return_value = kENotOk;
         if(timer_overflow_callback != nullptr) if(AttachInterrupt(timer_overflow_callback) == kENotOk) return_value = kENotOk;
 
-        state_ = kStateReady;
+        state_ = StateType::kReady;
     }
     return return_value;
 } /* Init */
@@ -93,15 +93,15 @@ StdReturnType Timer<TimerTraits>::Init(uint32_t microseconds, TimerIsrCallbackFV
 template <typename TimerTraits>
 typename Timer<TimerTraits>::TimerClockSelectType Timer<TimerTraits>::ToClockSelect(uint32_t timer_cycles)
 {
-    if(timer_cycles < TIMER_RESOLUTION)          { return kTimerRegCsNoPrescaler; }
-    if((timer_cycles >> 1u) < TIMER_RESOLUTION)  { return kTimerRegCsPrescale2; }
-    if((timer_cycles >> 2u) < TIMER_RESOLUTION)  { return kTimerRegCsPrescale4; }
-    if((timer_cycles >> 3u) < TIMER_RESOLUTION)  { return kTimerRegCsPrescale8; }
-    if((timer_cycles >> 4u) < TIMER_RESOLUTION)  { return kTimerRegCsPrescale16; }
-    if((timer_cycles >> 6u) < TIMER_RESOLUTION)  { return kTimerRegCsPrescale64; }
-    if((timer_cycles >> 8u) < TIMER_RESOLUTION)  { return kTimerRegCsPrescale256; }
+    if(timer_cycles < TIMER_RESOLUTION)          { return TimerClockSelectType::kNoPrescaler; }
+    if((timer_cycles >> 1u) < TIMER_RESOLUTION)  { return TimerClockSelectType::kPrescale2; }
+    if((timer_cycles >> 2u) < TIMER_RESOLUTION)  { return TimerClockSelectType::kPrescale4; }
+    if((timer_cycles >> 3u) < TIMER_RESOLUTION)  { return TimerClockSelectType::kPrescale8; }
+    if((timer_cycles >> 4u) < TIMER_RESOLUTION)  { return TimerClockSelectType::kPrescale16; }
+    if((timer_cycles >> 6u) < TIMER_RESOLUTION)  { return TimerClockSelectType::kPrescale64; }
+    if((timer_cycles >> 8u) < TIMER_RESOLUTION)  { return TimerClockSelectType::kPrescale256; }
     /* TIMER_MAX_PERIOD in SetPeriod() is what keeps this one inside 16 bit */
-    return kTimerRegCsPrescale1024;
+    return TimerClockSelectType::kPrescale1024;
 } /* ToClockSelect */
 
 
@@ -146,7 +146,7 @@ StdReturnType Timer<TimerTraits>::SetPeriod(uint32_t microseconds)
             }
         }
 
-        if(kStateRunning == state_) { SetClockSelect(clock_select_bit_group_); }
+        if(StateType::kRunning == state_) { SetClockSelect(clock_select_bit_group_); }
     }
     return return_value;
 } /* SetPeriod */
@@ -164,7 +164,7 @@ StdReturnType Timer<TimerTraits>::Start()
 {
     StdReturnType return_value{kENotOk};
 
-    if(kStateReady == state_ || kStateRunning == state_ || kStateStopped == state_) {
+    if(StateType::kReady == state_ || StateType::kRunning == state_ || StateType::kStopped == state_) {
         return_value = kEOk;
         SetRunning(false);
         LoadPeriodAndCompare();
@@ -172,7 +172,7 @@ StdReturnType Timer<TimerTraits>::Start()
         /* RESTART clears the counter and the direction, so the first period is a whole one */
         GetTimer().CTRLESET = TCA_SINGLE_CMD_RESTART_gc;
         SetRunning(true);
-        state_ = kStateRunning;
+        state_ = StateType::kRunning;
     }
     return return_value;
 } /* Start */
@@ -185,9 +185,9 @@ template <typename TimerTraits>
 void Timer<TimerTraits>::Stop()
 {
     /* before Init() the timer is not this class's to stop */
-    if(kStateNone != state_) {
+    if(StateType::kNone != state_) {
         SetRunning(false);
-        if(kStateRunning == state_) { state_ = kStateStopped; }
+        if(StateType::kRunning == state_) { state_ = StateType::kStopped; }
     }
 } /* Stop */
 
@@ -204,10 +204,10 @@ StdReturnType Timer<TimerTraits>::Resume()
 {
     StdReturnType return_value{kENotOk};
 
-    if(kStateStopped == state_) {
+    if(StateType::kStopped == state_) {
         return_value = kEOk;
         SetRunning(true);
-        state_ = kStateRunning;
+        state_ = StateType::kRunning;
     }
     return return_value;
 } /* Resume */
@@ -272,10 +272,10 @@ StdReturnType Timer<TimerTraits>::Read(uint32_t& microseconds)
 {
     StdReturnType return_value{kENotOk};
 
-    if(kStateRunning == state_ || kStateStopped == state_) {
+    if(StateType::kRunning == state_ || StateType::kStopped == state_) {
         uint32_t counter_value{0u};
         uint32_t top_value{0u};
-        TimerCountDirection direction{kTimerCountDirectionUp};
+        TimerCountDirection direction{TimerCountDirection::kUp};
         return_value = kEOk;
 
         /* counter and direction have to come from the same instant, or a turn at TOP in between
@@ -286,7 +286,7 @@ StdReturnType Timer<TimerTraits>::Read(uint32_t& microseconds)
             direction = GetCountingDirection();
         }
         /* if counter counting down, add top value to current value */
-        if(direction == kTimerCountDirectionDown) { counter_value = (top_value - counter_value) + top_value; }
+        if(direction == TimerCountDirection::kDown) { counter_value = (top_value - counter_value) + top_value; }
 
         microseconds = ToMicroseconds(counter_value, clock_select_bit_group_);
     }
@@ -324,8 +324,8 @@ void Timer<TimerTraits>::HandleOverflowInterrupt()
 template <typename TimerTraits>
 typename Timer<TimerTraits>::TimerCountDirection Timer<TimerTraits>::GetCountingDirection()
 {
-    if(GetTimer().CTRLESET & TCA_SINGLE_DIR_bm) { return kTimerCountDirectionDown; }
-    else { return kTimerCountDirectionUp; }
+    if(GetTimer().CTRLESET & TCA_SINGLE_DIR_bm) { return TimerCountDirection::kDown; }
+    else { return TimerCountDirection::kUp; }
 } /* GetCountingDirection */
 
 
@@ -363,7 +363,7 @@ void Timer<TimerTraits>::SetCompareBuffer(TimerChannelType channel)
 {
     /* CMP0BUF..CMP2BUF are consecutive, which Timer.h asserts; the channel was range checked at
        compile time */
-    (&GetTimer().CMP0BUF)[channel] = ToCompareValue(top_, pwm_duty_[channel]);
+    (&GetTimer().CMP0BUF)[ToUnderlying(channel)] = ToCompareValue(top_, pwm_duty_[ToUnderlying(channel)]);
 } /* SetCompareBuffer */
 
 
@@ -434,7 +434,7 @@ StdReturnType Timer<TimerTraits>::SetPwmDutyChannel(TimerChannelType channel, ui
     if(duty <= kPwmDutyMax) {
         return_value = kEOk;
         ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-            pwm_duty_[channel] = duty;
+            pwm_duty_[ToUnderlying(channel)] = duty;
             SetCompareBuffer(channel);
         }
     }

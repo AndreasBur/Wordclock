@@ -52,7 +52,7 @@ bool Animation::IsPixelPartOfClockWords(const ClockWords::WordsListType clock_wo
     DisplayWords words;
 
     for(uint8_t word_index = 0u; word_index < clock_words_table.size(); word_index++) {
-        if(clock_words_table[word_index] == DisplayWords::kWordNone) { break; }
+        if(clock_words_table[word_index] == DisplayWords::WordIdType::kNone) { break; }
         DisplayWord word = words.GetDisplayWord(clock_words_table[word_index]);
         if(word.GetRow() == row) { if((column >= word.GetColumn()) && (column < word.GetColumn() + word.GetLength())) { return true; } }
     }

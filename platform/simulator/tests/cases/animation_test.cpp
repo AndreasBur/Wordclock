@@ -34,8 +34,8 @@ void TestFlickerLeavesTheDisplayOn()
     Animations& animations = Animations::GetInstance();
 
     display.Enable();
-    animations.SetMode(Animations::kModeFixed);
-    animations.SetAnimation(Animations::kAnimationIdFlicker);
+    animations.SetMode(Animations::ModeType::kFixed);
+    animations.SetAnimation(Animations::AnimationIdType::kFlicker);
 
     SetTime(10u, 5u, 0u);
     DisplayManager::GetInstance().Task();
@@ -44,7 +44,7 @@ void TestFlickerLeavesTheDisplayOn()
 
     Expect(IsAnyOutputPixelLit(), "a finished flicker must leave the display switched on");
 
-    animations.SetAnimation(Animations::kAnimationIdNone);
+    animations.SetAnimation(Animations::AnimationIdType::kNone);
 }
 
 void TestEveryAnimationEndsOnTheNewTime()
@@ -53,14 +53,14 @@ void TestEveryAnimationEndsOnTheNewTime()
        measurement. The longest of them walks all 110 pixels several times over. */
     constexpr int kTickLimit{5000};
 
-    Clock::GetInstance().SetMode(Clock::kModeWessi);
+    Clock::GetInstance().SetMode(Clock::ModeType::kWessi);
     Animations& animations = Animations::GetInstance();
-    animations.SetMode(Animations::kModeFixed);
+    animations.SetMode(Animations::ModeType::kFixed);
 
     /* Two times whose word sets differ in every part: hour, minute and the "it is". */
     const PixelBufferType target = DrawClockFace(10u, 35u);
 
-    for(byte id = 1u; id < Animations::kAnimationIdNumberOfAnimations; id++) {
+    for(byte id = 1u; id < Animations::kNumberOfAnimations; id++) {
         const Animations::AnimationIdType animation_id = static_cast<Animations::AnimationIdType>(id);
         char description[64];
 
@@ -71,7 +71,7 @@ void TestEveryAnimationEndsOnTheNewTime()
         animations.SetTime(10u, 35u);
 
         int ticks = 0;
-        while((animations.GetState() == Animations::kStatePending) && (ticks < kTickLimit)) {
+        while((animations.GetState() == Animations::StateType::kPending) && (ticks < kTickLimit)) {
             animations.Task(true);
             ticks++;
         }
@@ -91,53 +91,53 @@ void TestEveryAnimationEndsOnTheNewTime()
         Expect(ArePixelsEqual(ReadPixels(), target), description);
     }
 
-    animations.SetAnimation(Animations::kAnimationIdNone);
+    animations.SetAnimation(Animations::AnimationIdType::kNone);
 }
 
 /* Stepping the selection, which is the only way a control with no list reaches an
    animation. Three things have to hold, and the third is why this does not reuse the walk
-   kModeSequence already had: that one visits the favourites only, and a knob has to reach
+   ModeType::kSequence already had: that one visits the favourites only, and a knob has to reach
    an animation that is not one. */
 void TestAnimationStepsThroughEveryOne()
 {
     Animations& animations = Animations::GetInstance();
-    animations.SetMode(Animations::kModeFixed);
-    animations.SetAnimation(Animations::kAnimationIdNone);
+    animations.SetMode(Animations::ModeType::kFixed);
+    animations.SetAnimation(Animations::AnimationIdType::kNone);
 
     /* The round closes, and "no animation" is part of it - a knob is the only way back to
        it for somebody without a phone. */
-    bool seen[Animations::kAnimationIdNumberOfAnimations]{};
-    for(byte step = 0u; step < Animations::kAnimationIdNumberOfAnimations; step++) {
-        seen[animations.GetAnimation()] = true;
+    bool seen[Animations::kNumberOfAnimations]{};
+    for(byte step = 0u; step < Animations::kNumberOfAnimations; step++) {
+        seen[ToUnderlying(animations.GetAnimation())] = true;
         animations.NextAnimation();
     }
 
     bool all_seen = true;
     for(const bool was_seen : seen) { if(!was_seen) { all_seen = false; } }
     Expect(all_seen, "stepping must reach every animation, and \"none\" among them");
-    Expect(animations.GetAnimation() == Animations::kAnimationIdNone,
+    Expect(animations.GetAnimation() == Animations::AnimationIdType::kNone,
            "and must wrap back to the one it started on");
 
     /* One back is one forward undone, at the end where the wrapping happens. */
     animations.PreviousAnimation();
-    Expect(animations.GetAnimation() == Animations::kAnimationIdNumberOfAnimations - 1u,
+    Expect(ToUnderlying(animations.GetAnimation()) == Animations::kNumberOfAnimations - 1u,
            "one back from \"none\" must be the last animation");
     animations.NextAnimation();
-    Expect(animations.GetAnimation() == Animations::kAnimationIdNone,
+    Expect(animations.GetAnimation() == Animations::AnimationIdType::kNone,
            "and one forward again must undo it");
 
     /* An animation that no mode would pick has to be reachable by hand. */
-    const Animations::AnimationIdType not_a_favourite = Animations::kAnimationIdCursor;
+    const Animations::AnimationIdType not_a_favourite = Animations::AnimationIdType::kCursor;
     Expect(animations.SetFavourite(not_a_favourite, false) == kEOk,
            "dropping one favourite of many must be allowed");
 
-    animations.SetAnimation(Animations::kAnimationIdNone);
+    animations.SetAnimation(Animations::AnimationIdType::kNone);
     animations.NextAnimation();
     Expect(animations.GetAnimation() == not_a_favourite,
            "stepping must reach an animation that is not a favourite");
 
     Expect(animations.SetFavourite(not_a_favourite, true) == kEOk, "and it must go back to being one");
-    animations.SetAnimation(Animations::kAnimationIdNone);
+    animations.SetAnimation(Animations::AnimationIdType::kNone);
 }
 
 void TestSnakeLifetime()
@@ -146,5 +146,5 @@ void TestSnakeLifetime()
        does not call during a normal firmware run. */
     AnimationSnake snake;
     snake.Init();
-    Expect(snake.GetState() == Animation::kStateIdle, "a fresh snake animation must be idle");
+    Expect(snake.GetState() == Animation::StateType::kIdle, "a fresh snake animation must be idle");
 }

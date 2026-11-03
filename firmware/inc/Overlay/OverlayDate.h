@@ -79,7 +79,7 @@ class OverlayDate : public Overlay<OverlayDate>
        start, so there is no configuration here for a reset to undo. */
     static void ResetOwnToDefaults() { }
 
-    void ShowTask() { if(Text::GetInstance().GetState() == Text::kStateIdle) { SetText(); } }
+    void ShowTask() { if(Text::GetInstance().GetState() == Text::StateType::kIdle) { SetText(); } }
     void SetText() { Text::GetInstance().SetTextWithShift(date_string_, GetFont()); }
 
     void SetDateString(ClockDate current_date) {
@@ -108,7 +108,7 @@ class OverlayDate : public Overlay<OverlayDate>
 
 	// methods
     SecondType Task(SecondType show_timer_in_seconds, ClockDate current_date, ClockTime current_time) {
-        if(state_ == kStateShow) { ShowTask(); }
+        if(state_ == StateType::kShow) { ShowTask(); }
         return Overlay::Task(show_timer_in_seconds, current_date, current_time);
     }
 };

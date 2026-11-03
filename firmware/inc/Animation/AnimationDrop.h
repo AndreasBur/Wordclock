@@ -61,7 +61,7 @@ class AnimationDrop : public Animation
 ******************************************************************************************************************************************************/
   private:
     DisplayWords words_;
-    ClockWords::WordsListType clock_words_table_{{DisplayWords::kWordNone}};
+    ClockWords::WordsListType clock_words_table_{{DisplayWords::WordIdType::kNone}};
     byte row_{0u};
     byte column_{0u};
     byte current_word_index_{0u};

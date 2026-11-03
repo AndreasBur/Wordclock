@@ -48,29 +48,29 @@ class ClockDate
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-    enum WeekdayType {
-        kWeekdaySunday = 0u,
-        kWeekdayMonday,
-        kWeekdayTuesday,
-        kWeekdayWednesday,
-        kWeekdayThursday,
-        kWeekdayFriday,
-        kWeekdaySaturday,
+    enum class WeekdayType {
+        kSunday = 0u,
+        kMonday,
+        kTuesday,
+        kWednesday,
+        kThursday,
+        kFriday,
+        kSaturday,
     };
 
-    enum MonthEnumType {
-        kMonthJanuary = 1u,
-        kMonthFebruary,
-        kMonthMarch,
-        kMonthApril,
-        kMonthMay,
-        kMonthJune,
-        kMonthJuly,
-        kMonthAugust,
-        kMonthSeptember,
-        kMonthOctober,
-        kMonthNovember,
-        kMonthDezember
+    enum class MonthEnumType {
+        kJanuary = 1u,
+        kFebruary,
+        kMarch,
+        kApril,
+        kMay,
+        kJune,
+        kJuly,
+        kAugust,
+        kSeptember,
+        kOctober,
+        kNovember,
+        kDezember
     };
 
     using YearType = uint16_t;

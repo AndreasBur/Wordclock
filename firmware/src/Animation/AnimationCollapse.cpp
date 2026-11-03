@@ -49,7 +49,7 @@
 ******************************************************************************************************************************************************/
 void AnimationCollapse::Init()
 {
-    Animation::Init(kStateIdle);
+    Animation::Init(StateType::kIdle);
     /* all animations share one union, so nothing may rely on member initializers */
     Reset();
 } /* Init */
@@ -62,12 +62,12 @@ StdReturnType AnimationCollapse::SetTime(byte hour, byte minute)
 {
     StdReturnType return_value{kENotOk};
 
-    if(Clock::GetInstance().GetClockWords(hour, minute, clock_words_table_) == kEOk && state_ == kStateIdle) {
+    if(Clock::GetInstance().GetClockWords(hour, minute, clock_words_table_) == kEOk && state_ == StateType::kIdle) {
         step_ = 0u;
-        direction_ = static_cast<DirectionType>(SelectByTime(hour, minute, kDirectionNumberOfDirections));
+        direction_ = static_cast<DirectionType>(SelectByTime(hour, minute, kNumberOfDirections));
         /* the previous time is on the display and is what collapses first. An empty
            display simply finishes that phase on its first task. */
-        state_ = kStateClearTime;
+        state_ = StateType::kClearTime;
         return_value = kEOk;
     }
     return return_value;
@@ -79,8 +79,8 @@ StdReturnType AnimationCollapse::SetTime(byte hour, byte minute)
 ******************************************************************************************************************************************************/
 void AnimationCollapse::Task()
 {
-    if(state_ == kStateClearTime) { ClearTimeTask(); }
-    else if(state_ == kStateSetTime) { SetTimeTask(); }
+    if(state_ == StateType::kClearTime) { ClearTimeTask(); }
+    else if(state_ == StateType::kSetTime) { SetTimeTask(); }
 } /* Task */
 
 
@@ -93,10 +93,10 @@ void AnimationCollapse::Task()
 ******************************************************************************************************************************************************/
 void AnimationCollapse::Reset()
 {
-    clock_words_table_.fill(DisplayWords::kWordNone);
+    clock_words_table_.fill(DisplayWords::WordIdType::kNone);
     step_ = 0u;
     expand_steps_ = 1u;
-    direction_ = kDirectionToLeft;
+    direction_ = DirectionType::kToLeft;
 } /* Reset */
 
 
@@ -115,7 +115,7 @@ void AnimationCollapse::ClearTimeTask()
     if(!moved) {
         step_ = 0u;
         expand_steps_ = CalcExpandSteps();
-        state_ = kStateSetTime;
+        state_ = StateType::kSetTime;
     }
 } /* ClearTimeTask */
 
@@ -130,7 +130,7 @@ bool AnimationCollapse::CollapseRow(byte row)
     /* Scanned towards the target edge on purpose: a pixel that just moved frees the
        place for the next one behind it, so a whole word slides by one column per frame
        instead of collapsing into a single pixel. */
-    if(direction_ == kDirectionToLeft) {
+    if(direction_ == DirectionType::kToLeft) {
         for(byte column = 1u; column < DISPLAY_NUMBER_OF_COLUMNS; column++) {
             if(Display::GetInstance().GetPixel(column, row) &&
                !Display::GetInstance().GetPixel(column - 1u, row))
@@ -210,7 +210,7 @@ byte AnimationCollapse::CalcBlockColumn(byte letter_index, byte letters_of_row) 
     /* Where a letter sits while the row is one solid block. Counting the letters of the
        row up front keeps this a plain calculation, so both directions come out of one
        ascending loop instead of two mirrored ones. */
-    if(direction_ == kDirectionToLeft) { return letter_index; }
+    if(direction_ == DirectionType::kToLeft) { return letter_index; }
 
     return static_cast<byte>(DISPLAY_NUMBER_OF_COLUMNS - letters_of_row + letter_index);
 } /* CalcBlockColumn */

@@ -88,11 +88,11 @@ uint32_t TotalIntensity(const PixelBufferType& pixels)
    words. Must run before any other test touches DisplayManager. */
 void TestDisplayManagerLatch()
 {
-    Clock::GetInstance().SetMode(Clock::kModeWessi);
+    Clock::GetInstance().SetMode(Clock::ModeType::kWessi);
     /* Without an animation the word change draws straight to the buffer, so what the
        latch decided is visible in the same task. */
-    Animations::GetInstance().SetMode(Animations::kModeFixed);
-    Animations::GetInstance().SetAnimation(Animations::kAnimationIdNone);
+    Animations::GetInstance().SetMode(Animations::ModeType::kFixed);
+    Animations::GetInstance().SetAnimation(Animations::AnimationIdType::kNone);
 
     Pixels& pixels = Pixels::GetInstance();
     DisplayManager& display_manager = DisplayManager::GetInstance();
@@ -147,7 +147,7 @@ void TestFadeDimsAndComesBack()
     DrawClockFace(10u, 4u);
     const uint32_t intensity_before = TotalIntensity(ReadPixels());
 
-    animations.SetAnimation(Animations::kAnimationIdFade);
+    animations.SetAnimation(Animations::AnimationIdType::kFade);
     animations.SetTime(10u, 35u);
 
     /* Far enough in to be measurable, far short of the swap: the level counts down one per
@@ -156,7 +156,7 @@ void TestFadeDimsAndComesBack()
     Expect(TotalIntensity(ReadPixels()) < intensity_before, "the fade must dim what is on the display");
 
     int ticks = 0;
-    while((animations.GetState() == Animations::kStatePending) && (ticks < 5000)) {
+    while((animations.GetState() == Animations::StateType::kPending) && (ticks < 5000)) {
         animations.Task(true);
         ticks++;
     }
@@ -164,7 +164,7 @@ void TestFadeDimsAndComesBack()
     Expect(ArePixelsEqual(ReadPixels(), target), "the fade must come back to full brightness");
     Expect(display.GetBrightness() == brightness_before, "the fade must leave the brightness setting alone");
 
-    animations.SetAnimation(Animations::kAnimationIdNone);
+    animations.SetAnimation(Animations::AnimationIdType::kNone);
 }
 
 /* Switching the display off and on again, seen where it happens: the output rather than

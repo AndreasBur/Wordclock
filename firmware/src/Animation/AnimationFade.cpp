@@ -49,7 +49,7 @@
 ******************************************************************************************************************************************************/
 void AnimationFade::Init()
 {
-    Animation::Init(kStateIdle);
+    Animation::Init(StateType::kIdle);
     Reset();
 } /* Init */
 
@@ -64,7 +64,7 @@ StdReturnType AnimationFade::SetTime(byte hour, byte minute)
     if(hour < CLOCK_NUMBER_OF_HOURS_PER_DAY && minute < CLOCK_NUMBER_OF_MINUTES_PER_HOUR) {
         hour_ = hour;
         minute_ = minute;
-        state_ = kStateClearTime;
+        state_ = StateType::kClearTime;
         /* From the display as it is configured, whatever that currently is - the fade
            scales it rather than replacing it. */
         level_ = kLevelFull;
@@ -79,8 +79,8 @@ StdReturnType AnimationFade::SetTime(byte hour, byte minute)
 ******************************************************************************************************************************************************/
 void AnimationFade::Task()
 {
-    if(state_ == kStateClearTime) { ClearTimeTask(); }
-    else if(state_ == kStateSetTime) { SetTimeTask(); }
+    if(state_ == StateType::kClearTime) { ClearTimeTask(); }
+    else if(state_ == StateType::kSetTime) { SetTimeTask(); }
 } /* Task */
 
 
@@ -132,7 +132,7 @@ void AnimationFade::SetTimeTask()
            on every ApplyBrightness(), and leaving it set would hide a fade that never
            finished. */
         Display::GetInstance().ClearBrightnessFade();
-        state_ = kStateIdle;
+        state_ = StateType::kIdle;
     }
 } /* SetTimeTask */
 
@@ -148,7 +148,7 @@ void AnimationFade::SetTimeTask()
 ******************************************************************************************************************************************************/
 void AnimationFade::SetStateToSetTime()
 {
-    state_ = kStateSetTime;
+    state_ = StateType::kSetTime;
     Display::GetInstance().Clear();
     Clock::GetInstance().SetTime(hour_, minute_);
     level_ = 0u;

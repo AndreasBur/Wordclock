@@ -49,7 +49,7 @@
 ******************************************************************************************************************************************************/
 void AnimationSqueeze::Init()
 {
-    Animation::Init(kStateIdle);
+    Animation::Init(StateType::kIdle);
     Reset();
 } /* Init */
 
@@ -61,10 +61,10 @@ StdReturnType AnimationSqueeze::SetTime(byte hour, byte minute)
 {
     StdReturnType return_value{kENotOk};
 
-    if(Clock::GetInstance().GetClockWords(hour, minute, clock_words_table_) == kEOk && state_ == kStateIdle) {
+    if(Clock::GetInstance().GetClockWords(hour, minute, clock_words_table_) == kEOk && state_ == StateType::kIdle) {
         return_value = kEOk;
-        direction_ = static_cast<DirectionType>(SelectByTime(hour, minute, kDirectionNumberOfDirections));
-        state_ = kStateClearTime;
+        direction_ = static_cast<DirectionType>(SelectByTime(hour, minute, kNumberOfDirections));
+        state_ = StateType::kClearTime;
     }
     return return_value;
 } /* SetTime */
@@ -75,13 +75,13 @@ StdReturnType AnimationSqueeze::SetTime(byte hour, byte minute)
 ******************************************************************************************************************************************************/
 void AnimationSqueeze::Task()
 {
-    if(state_ == kStateClearTime) {
+    if(state_ == StateType::kClearTime) {
         ClearTimeTask();
         if(Display::GetInstance().IsCleared()) {
             SetMaxWordLength();
-            state_ = kStateSetTime;
+            state_ = StateType::kSetTime;
         }
-    } else if(state_ == kStateSetTime) {
+    } else if(state_ == StateType::kSetTime) {
         SetTimeTask();
         if(current_length_ > max_word_length_) { FinishWithClockWords(clock_words_table_); }
     }
@@ -97,10 +97,10 @@ void AnimationSqueeze::Task()
 ******************************************************************************************************************************************************/
 void AnimationSqueeze::Reset()
 {
-    clock_words_table_.fill(DisplayWords::kWordNone);
+    clock_words_table_.fill(DisplayWords::WordIdType::kNone);
     max_word_length_ = 0u;
     current_length_ = 1u;
-    direction_ = kDirectionFromLeft;
+    direction_ = DirectionType::kFromLeft;
 } /* Reset */
 
 /******************************************************************************************************************************************************
@@ -122,7 +122,7 @@ void AnimationSqueeze::ClearRow(byte row)
 {
     /* Takes one letter off every block of the row, on the side the direction says, so
        all words of the row get shorter at the same time. */
-    if(direction_ == kDirectionFromLeft) {
+    if(direction_ == DirectionType::kFromLeft) {
         for(byte column = 0u; column < DISPLAY_NUMBER_OF_COLUMNS; column++) {
             if(Display::GetInstance().GetPixel(column, row)) {
                 Display::GetInstance().ClearPixel(column, row);

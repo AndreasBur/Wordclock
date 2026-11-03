@@ -47,21 +47,22 @@ class Scheduler
 ******************************************************************************************************************************************************/
   public:
     /* One per task that TriggerTasks() drives, and in the order it drives them. */
-    enum TaskIdType {
-        kTaskIdIlluminance,
-        kTaskIdTemperature,
-        kTaskIdDisplayManager,
-        kTaskIdAnimations,
-        kTaskIdCommunication,
-        kTaskIdOverlays,
-        kTaskIdText,
-        kTaskIdPersistence,
-        kTaskIdUptime,
-        kTaskIdNightSwitch,
-        kTaskIdColorCycle,
-        kTaskIdPower,
-        kTaskIdNumberOfTasks
+    enum class TaskIdType {
+        kIlluminance,
+        kTemperature,
+        kDisplayManager,
+        kAnimations,
+        kCommunication,
+        kOverlays,
+        kText,
+        kPersistence,
+        kUptime,
+        kNightSwitch,
+        kColorCycle,
+        kPower,
+        kNumberOfTasks
     };
+    static constexpr byte kNumberOfTasks{static_cast<byte>(TaskIdType::kNumberOfTasks)};
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
@@ -70,7 +71,7 @@ class Scheduler
     static constexpr byte kTaskIntervalMs{SCHEDULER_TASK_INTERVAL_MS};
 
     using RemainingTicksType = byte;
-    std::array<RemainingTicksType, kTaskIdNumberOfTasks> remaining_ticks_{};
+    std::array<RemainingTicksType, kNumberOfTasks> remaining_ticks_{};
 
     // functions
     bool IsDue(TaskIdType, byte);

@@ -54,9 +54,9 @@
  *  \return         the state
 ******************************************************************************************************************************************************/
 Overlays::StateType Overlays::GetState() const {
-    if(IsShow()) { return OverlayType::kStateShow; }
-    if(IsIdle()) { return OverlayType::kStateIdle; }
-    return OverlayType::kStateDisabled;
+    if(IsShow()) { return OverlayType::StateType::kShow; }
+    if(IsIdle()) { return OverlayType::StateType::kIdle; }
+    return OverlayType::StateType::kDisabled;
 } /* GetState */
 
 /******************************************************************************************************************************************************
@@ -97,13 +97,13 @@ StdReturnType Overlays::Abort() {
     ClockTime time = RealTimeClock::GetInstance().GetTime();
 
 #if (OVERLAYS_SUPPORT_DATE == STD_ON)
-    if(date_.GetState() == OverlayDate::kStateShow) { date_.StopShow(date, time); }
+    if(date_.GetState() == OverlayDate::StateType::kShow) { date_.StopShow(date, time); }
 #endif
 #if (OVERLAYS_SUPPORT_TEMPERATURE == STD_ON)
-    if(temperature_.GetState() == OverlayTemperature::kStateShow) { temperature_.StopShow(date, time); }
+    if(temperature_.GetState() == OverlayTemperature::StateType::kShow) { temperature_.StopShow(date, time); }
 #endif
 #if (OVERLAYS_SUPPORT_TEXT == STD_ON)
-    if(text_.GetState() == OverlayText::kStateShow) { text_.StopShow(date, time); }
+    if(text_.GetState() == OverlayText::StateType::kShow) { text_.StopShow(date, time); }
 #endif
 
     show_timer_in_seconds_ = 0u;
@@ -141,13 +141,13 @@ void Overlays::TaskIdle(ClockDate date, ClockTime time) {
 ******************************************************************************************************************************************************/
 void Overlays::TaskShow(ClockDate date, ClockTime time) {
 #if (OVERLAYS_SUPPORT_DATE == STD_ON)
-    if(date_.GetState() == OverlayDate::kStateShow) { show_timer_in_seconds_ = date_.Task(show_timer_in_seconds_, date, time); }
+    if(date_.GetState() == OverlayDate::StateType::kShow) { show_timer_in_seconds_ = date_.Task(show_timer_in_seconds_, date, time); }
 #endif
 #if (OVERLAYS_SUPPORT_TEMPERATURE == STD_ON)
-    if(temperature_.GetState() == OverlayTemperature::kStateShow) { show_timer_in_seconds_ =  temperature_.Task(show_timer_in_seconds_, date, time); }
+    if(temperature_.GetState() == OverlayTemperature::StateType::kShow) { show_timer_in_seconds_ =  temperature_.Task(show_timer_in_seconds_, date, time); }
 #endif
 #if (OVERLAYS_SUPPORT_TEXT == STD_ON)
-    if(text_.GetState() == OverlayText::kStateShow) { show_timer_in_seconds_ =  text_.Task(show_timer_in_seconds_, date, time); }
+    if(text_.GetState() == OverlayText::StateType::kShow) { show_timer_in_seconds_ =  text_.Task(show_timer_in_seconds_, date, time); }
 #endif
 } /* TaskShow */
 

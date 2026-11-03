@@ -51,7 +51,7 @@ void Communication::Task()
         MsgCmdParser cmd_parser(incoming_message_);
         cmd_parser.Parse();
         incoming_message_.Clear();
-        state_ = kStateMessageIncomplete;
+        state_ = StateType::kMessageIncomplete;
     } else {
         AddMessagePart();
     }
@@ -72,11 +72,11 @@ void Communication::AddMessagePart()
         char in_char = static_cast<char>(Serial.read());
         // The end-of-message marker terminates the message but is not part of
         // it, so stop before appending it to the buffer.
-        if(in_char == kEndOfMessageChar) { state_ = kStateMessageComplete; break; }
+        if(in_char == kEndOfMessageChar) { state_ = StateType::kMessageComplete; break; }
         if(incoming_message_.AddChar(in_char) == kENotOk) {
             // Emitted while reading, outside the command parser's line framing,
             // so terminate it as its own line without a trailing separator space.
-            error_.Send(ErrorMessage::kErrorMessageTooLong, false);
+            error_.Send(ErrorMessage::ErrorType::kMessageTooLong, false);
             Serial.println();
         }
     }

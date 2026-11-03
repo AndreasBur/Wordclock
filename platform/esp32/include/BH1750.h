@@ -53,7 +53,7 @@
    finished yet. */
 #define BH1750_TASK_CYCLE                               100u
 
-#define BH1750_DEFAULT_MODE                             kModeContinuousHighResMode
+#define BH1750_DEFAULT_MODE                             ModeType::kContinuousHighResMode
 
 /* BH1750 parameter */
 /* The sensor's own range, which is what a reading is clamped to - not what the brightness
@@ -115,14 +115,14 @@ class BH1750
   public:
     using IlluminanceType = uint16_t;
 
-    enum ModeType {
-        kModeNone,
-        kModeContinuousLowResMode = BH1750_CMD_CONTINUOUS_LOW_RES_MODE,
-        kModeContinuousHighResMode = BH1750_CMD_CONTINUOUS_HIGH_RES_MODE,
-        kModeContinuousHighResMode2 = BH1750_CMD_CONTINUOUS_HIGH_RES_MODE_2,
-        kModeOneTimeLowResMode = BH1750_CMD_ONE_TIME_LOW_RES_MODE,
-        kModeOneTimeHighResMode = BH1750_CMD_ONE_TIME_HIGH_RES_MODE,
-        kModeOneTimeHighResMode2 = BH1750_CMD_ONE_TIME_HIGH_RES_MODE_2
+    enum class ModeType {
+        kNone,
+        kContinuousLowResMode = BH1750_CMD_CONTINUOUS_LOW_RES_MODE,
+        kContinuousHighResMode = BH1750_CMD_CONTINUOUS_HIGH_RES_MODE,
+        kContinuousHighResMode2 = BH1750_CMD_CONTINUOUS_HIGH_RES_MODE_2,
+        kOneTimeLowResMode = BH1750_CMD_ONE_TIME_LOW_RES_MODE,
+        kOneTimeHighResMode = BH1750_CMD_ONE_TIME_HIGH_RES_MODE,
+        kOneTimeHighResMode2 = BH1750_CMD_ONE_TIME_HIGH_RES_MODE_2
     };
 
     struct CalibrationValuesType {
@@ -144,7 +144,7 @@ class BH1750
        reading in them has to be divided by twice as much. */
     static constexpr float kHighResMode2Divider{2.0f};
 
-    ModeType mode_{kModeNone};
+    ModeType mode_{ModeType::kNone};
     IlluminanceType illuminance_{BH1750_ILLUMINANCE_MIN_LX_VALUE};
     CalibrationValuesType calibration_values_{BH1750_CALIBRATION_MAX_DEFAULT_LX_VALUE, BH1750_CALIBRATION_MIN_DEFAULT_LX_VALUE};
     byte measurement_time_{BH1750_REG_MT_DEFAULT_VALUE};
@@ -157,10 +157,10 @@ class BH1750
     void SendModeForOneTimeMode();
     static StdReturnType SendCommand(byte);
 
-    StdReturnType SendMode() { return SendCommand(mode_); }
+    StdReturnType SendMode() { return SendCommand(ToUnderlying(mode_)); }
     /* Both halves of what Task() checks before it reads: a bus that was opened, and a mode
        the sensor acknowledged. Clearing either one puts the set-up back on the next run. */
-    bool IsReady() const { return bus_started_ && (mode_ != kModeNone); }
+    bool IsReady() const { return bus_started_ && (mode_ != ModeType::kNone); }
 
     /* The datasheet's conversion, which is not the constant it looks like: the divider
        moves with the mode and with the measurement time. A fixed 1.2 is right only at the
@@ -170,7 +170,7 @@ class BH1750
     /* A longer integration counts more for the same light, so the register's distance from
        its reset value scales the reading back out again. */
     float ToMeasurementTimeFactor() const { return static_cast<float>(measurement_time_) / BH1750_REG_MT_DEFAULT_VALUE; }
-    bool IsHighResMode2() const { return (mode_ == kModeContinuousHighResMode2) || (mode_ == kModeOneTimeHighResMode2); }
+    bool IsHighResMode2() const { return (mode_ == ModeType::kContinuousHighResMode2) || (mode_ == ModeType::kOneTimeHighResMode2); }
 
     /* Clamped rather than cast straight: the shortest measurement time divides by about
        0.54, which takes a full-scale count past what IlluminanceType holds - and a float
@@ -183,7 +183,7 @@ class BH1750
     static constexpr IlluminanceType CombineRawValueParts(byte high_byte, byte low_byte) { return static_cast<uint16_t>(high_byte) << 8u | low_byte; }
     static constexpr bool IsMtRegValueInRange(byte mt_reg_value) { return ((mt_reg_value <= BH1750_REG_MT_MAX_VALUE) && (mt_reg_value >= BH1750_REG_MT_MIN_VALUE)); }
     bool IsOneTimeMode() const {
-        return (mode_ == kModeOneTimeHighResMode) || (mode_ == kModeOneTimeHighResMode2) || (mode_ == kModeOneTimeLowResMode);
+        return (mode_ == ModeType::kOneTimeHighResMode) || (mode_ == ModeType::kOneTimeHighResMode2) || (mode_ == ModeType::kOneTimeLowResMode);
     }
 
     /* One dropped reading keeps the last value on purpose - see ReadIlluminance(). A sensor
@@ -193,7 +193,7 @@ class BH1750
     void CountReadFailure() {
         if(++read_failures_ < kReadFailuresBeforeReinit) { return; }
         read_failures_ = 0u;
-        mode_ = kModeNone;
+        mode_ = ModeType::kNone;
     }
 
 /******************************************************************************************************************************************************

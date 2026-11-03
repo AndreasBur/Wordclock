@@ -47,20 +47,20 @@ class MsgParameter
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-    enum ArgumentTypeType {
-        kArgumentTypeNone,
-        kArgumentTypeString,
-        kArgumentTypeChar,
-        kArgumentTypeUint8,
-        kArgumentTypeUint16,
-        kArgumentTypeUint32,
-        kArgumentTypeUint64,
-        kArgumentTypeInt8,
-        kArgumentTypeInt16,
-        kArgumentTypeInt32,
-        kArgumentTypeInt64,
-        kArgumentTypeFloat,
-        kArgumentTypeDouble,
+    enum class ArgumentTypeType {
+        kNone,
+        kString,
+        kChar,
+        kUint8,
+        kUint16,
+        kUint32,
+        kUint64,
+        kInt8,
+        kInt16,
+        kInt32,
+        kInt64,
+        kFloat,
+        kDouble,
     };
 
 /******************************************************************************************************************************************************
@@ -82,7 +82,7 @@ class MsgParameter
     constexpr MsgParameter(char option_short_name, ArgumentTypeType argument_type)
     : option_short_name_(option_short_name), argument_type_(argument_type) { }
 
-    constexpr MsgParameter() : option_short_name_(' '), argument_type_(kArgumentTypeNone) { }
+    constexpr MsgParameter() : option_short_name_(' '), argument_type_(ArgumentTypeType::kNone) { }
 
     // get methods
     char GetOptionShortName() const { return option_short_name_; }

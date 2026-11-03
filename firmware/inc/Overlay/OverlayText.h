@@ -75,7 +75,7 @@ class OverlayText : public Overlay<OverlayText>
        configured. */
     void ResetOwnToDefaults() { text_[0u] = STD_NULL_CHARACTER; }
 
-    void ShowTask() { if(Text::GetInstance().GetState() == Text::kStateIdle) { SetText(); } }
+    void ShowTask() { if(Text::GetInstance().GetState() == Text::StateType::kIdle) { SetText(); } }
     void SetText() { Text::GetInstance().SetTextWithShift(text_, GetFont()); }
 
 /******************************************************************************************************************************************************
@@ -95,7 +95,7 @@ class OverlayText : public Overlay<OverlayText>
 
 	// methods
     SecondType Task(SecondType show_timer_in_seconds, ClockDate current_date, ClockTime current_time) {
-        if(state_ == kStateShow) { ShowTask(); }
+        if(state_ == StateType::kShow) { ShowTask(); }
         return Overlay::Task(show_timer_in_seconds, current_date, current_time);
     }
 };

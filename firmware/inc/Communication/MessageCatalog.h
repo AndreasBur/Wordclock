@@ -64,10 +64,10 @@ class MessageCatalog
   public:
     /* Only the argument types the commands actually use, not the full set
        MsgParameter knows. */
-    enum ArgumentType {
-        kArgumentTypeUint8,
-        kArgumentTypeUint16,
-        kArgumentTypeString
+    enum class ArgumentType {
+        kUint8,
+        kUint16,
+        kString
     };
 
     struct OptionType {
@@ -75,7 +75,7 @@ class MessageCatalog
         const char* label;
         ArgumentType argument;
         /* Bounds for the numeric types, both zero where anything the type holds is
-           allowed. Ignored for kArgumentTypeString. */
+           allowed. Ignored for ArgumentType::kString. */
         uint16_t minimum;
         uint16_t maximum;
         /* Names of the values, in ascending order beginning at Minimum, for options that

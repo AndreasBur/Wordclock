@@ -49,7 +49,7 @@
 ******************************************************************************************************************************************************/
 void AnimationShift::Init()
 {
-    Animation::Init(kStateIdle);
+    Animation::Init(StateType::kIdle);
     Reset();
 } /* Init */
 
@@ -61,8 +61,8 @@ StdReturnType AnimationShift::SetTime(byte hour, byte minute)
 {
     StdReturnType return_value{kENotOk};
 
-    if(Clock::GetInstance().GetClockWords(hour, minute, clock_words_table_) == kEOk && state_ == kStateIdle) {
-        state_ = kStateClearTime;
+    if(Clock::GetInstance().GetClockWords(hour, minute, clock_words_table_) == kEOk && state_ == StateType::kIdle) {
+        state_ = StateType::kClearTime;
     }
     return return_value;
 } /* SetTime */
@@ -73,8 +73,8 @@ StdReturnType AnimationShift::SetTime(byte hour, byte minute)
 ******************************************************************************************************************************************************/
 void AnimationShift::Task()
 {
-    if(state_ == kStateClearTime) { ClearTimeTask(); }
-    else if(state_ == kStateSetTime) { SetTimeTask(); }
+    if(state_ == StateType::kClearTime) { ClearTimeTask(); }
+    else if(state_ == StateType::kSetTime) { SetTimeTask(); }
 } /* Task */
 
 
@@ -94,7 +94,7 @@ void AnimationShift::Reset()
 #if (ANIMATION_SHIFT_VERTICAL == STD_ON)
     current_row_ = 0u;
 #endif
-    clock_words_table_.fill(DisplayWords::kWordNone);
+    clock_words_table_.fill(DisplayWords::WordIdType::kNone);
 } /* Reset */
 
 
@@ -108,7 +108,7 @@ void AnimationShift::ClearTimeTask()
         wc_transformation_.ShiftRight();
         current_column_++;
     } else {
-        state_ = kStateSetTime;
+        state_ = StateType::kSetTime;
         current_column_ = 0u;
     }
 #endif
@@ -118,7 +118,7 @@ void AnimationShift::ClearTimeTask()
         wc_transformation_.ShiftDown();
         current_row_++;
     } else {
-        state_ = kStateSetTime;
+        state_ = StateType::kSetTime;
         current_row_ = 0u;
     }
 #endif

@@ -89,7 +89,7 @@ class AnimationMatrix : public Animation
        they are set without a brightness and are therefore at full display brightness. */
     static constexpr byte kTrailBrightness{255u};
 
-    ClockWords::WordsListType clock_words_table_{{DisplayWords::kWordNone}};
+    ClockWords::WordsListType clock_words_table_{{DisplayWords::WordIdType::kNone}};
     byte frame_counter_{0u};
     /* varies the start frames from minute to minute, see StartFrame() */
     byte seed_{0u};

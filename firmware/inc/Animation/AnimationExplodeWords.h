@@ -62,7 +62,7 @@ class AnimationExplodeWords : public Animation
 ******************************************************************************************************************************************************/
   private:
     DisplayWords words_;
-    ClockWords::WordsListType clock_words_table_{{DisplayWords::kWordNone}};
+    ClockWords::WordsListType clock_words_table_{{DisplayWords::WordIdType::kNone}};
     byte clock_words_table_index_{0u};
     byte current_word_index_{0u};
     byte current_word_length_{0u};

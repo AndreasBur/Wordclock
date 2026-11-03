@@ -180,7 +180,7 @@ void MessageBuilder::ShowOptionsOfSelectedCommand()
                 option_rows_[index].choice->SetSelection(0);
             } else {
                 option_rows_[index].value->ChangeValue(_T(""));
-                if(option.argument == MessageCatalog::kArgumentTypeString) {
+                if(option.argument == MessageCatalog::ArgumentType::kString) {
                     option_rows_[index].value->SetHint(_T("text"));
                 } else {
                     option_rows_[index].value->SetHint(wxString::Format(wxT("%u..%u"), option.minimum, option.maximum));

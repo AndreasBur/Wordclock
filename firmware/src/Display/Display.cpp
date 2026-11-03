@@ -49,7 +49,7 @@ void Display::Init()
 {
     Clear();
     pixel_stripe_.Init(DISPLAY_DATA_PIN);
-    state_ = kStateInit;
+    state_ = StateType::kInit;
 } /* Init */
 
 /******************************************************************************************************************************************************
@@ -218,7 +218,7 @@ StdReturnType Display::SetWord(WordIdType word_id, byte max_length)
     StdReturnType return_value{kENotOk};
     byte length;
 
-    if(word_id < DisplayWords::kWordNumberOfWords) {
+    if(word_id < WordIdType::kNumberOfWords) {
         return_value = kEOk;
         DisplayWord word = words_.GetDisplayWord(word_id);
         byte word_length = word.GetLength();
@@ -243,7 +243,7 @@ StdReturnType Display::ClearWord(WordIdType word_id)
 {
     StdReturnType return_value{kENotOk};
 
-    if(word_id < DisplayWords::kWordNumberOfWords) {
+    if(word_id < WordIdType::kNumberOfWords) {
         return_value = kEOk;
         DisplayWord word = words_.GetDisplayWord(word_id);
 
@@ -264,8 +264,8 @@ StdReturnType Display::ClearWords()
 {
     StdReturnType return_value{kEOk};
 
-    for(byte i = DisplayWords::kWordEs; i < DisplayWords::kWordNumberOfWords; i++) {
-        if(ClearWord((WordIdType) i) == kENotOk) return_value = kENotOk;
+    for(byte i = ToUnderlying(WordIdType::kEs); i < DisplayWords::kNumberOfWords; i++) {
+        if(ClearWord(static_cast<WordIdType>(i)) == kENotOk) return_value = kENotOk;
     }
     return return_value;
 } /* clearAllWords */
@@ -530,7 +530,7 @@ Display::Display(Pixel color) : pixel_stripe_{Pixels::GetInstance()}
 : pixel_stripe_()
 #endif
 {
-    state_ = kStateUninit;
+    state_ = StateType::kUninit;
     color_.SetColor(color);
 
 #if (DISPLAY_USE_PIXELS_DIMMING == STD_OFF)
@@ -550,7 +550,7 @@ Display::Display(ColorType red, ColorType green, ColorType blue) : pixel_stripe_
     color_.SetColorRed(red);
     color_.SetColorGreen(green);
     color_.SetColorBlue(blue);
-    state_ = kStateUninit;
+    state_ = StateType::kUninit;
 
 #if (DISPLAY_USE_PIXELS_DIMMING == STD_OFF)
     brightness_.SetBrightness(255u);

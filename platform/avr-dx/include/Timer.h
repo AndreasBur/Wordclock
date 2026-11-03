@@ -149,44 +149,44 @@ class Timer
     typedef void (*TimerIsrCallbackFVoid)(void);
 
     /* Type which describes the internal state of the TIMER */
-    typedef enum {
-        kStateNone,
-        kStateInit,
-        kStateReady,
-        kStateRunning,
-        kStateStopped
-    } StateType;
+    enum class StateType {
+        kNone,
+        kInit,
+        kReady,
+        kRunning,
+        kStopped
+    };
 
     /* Type which includes the values of the Clock Select Bit Group.
      * One more step than the xmega offered: the Dx prescaler has a 16 between 8 and 64, which lets
      * a period that used to round up to the 64 keep four times the resolution. There is no OFF
      * here, though - this CLKSEL has no such group config, and the timer is stopped by taking
      * ENABLE away instead. */
-    typedef enum {
-        kTimerRegCsNoPrescaler = TCA_SINGLE_CLKSEL_DIV1_gc,
-        kTimerRegCsPrescale2 = TCA_SINGLE_CLKSEL_DIV2_gc,
-        kTimerRegCsPrescale4 = TCA_SINGLE_CLKSEL_DIV4_gc,
-        kTimerRegCsPrescale8 = TCA_SINGLE_CLKSEL_DIV8_gc,
-        kTimerRegCsPrescale16 = TCA_SINGLE_CLKSEL_DIV16_gc,
-        kTimerRegCsPrescale64 = TCA_SINGLE_CLKSEL_DIV64_gc,
-        kTimerRegCsPrescale256 = TCA_SINGLE_CLKSEL_DIV256_gc,
-        kTimerRegCsPrescale1024 = TCA_SINGLE_CLKSEL_DIV1024_gc
-    } TimerClockSelectType;
+    enum class TimerClockSelectType {
+        kNoPrescaler = TCA_SINGLE_CLKSEL_DIV1_gc,
+        kPrescale2 = TCA_SINGLE_CLKSEL_DIV2_gc,
+        kPrescale4 = TCA_SINGLE_CLKSEL_DIV4_gc,
+        kPrescale8 = TCA_SINGLE_CLKSEL_DIV8_gc,
+        kPrescale16 = TCA_SINGLE_CLKSEL_DIV16_gc,
+        kPrescale64 = TCA_SINGLE_CLKSEL_DIV64_gc,
+        kPrescale256 = TCA_SINGLE_CLKSEL_DIV256_gc,
+        kPrescale1024 = TCA_SINGLE_CLKSEL_DIV1024_gc
+    };
 
     /* Type which defines the compare channels, each drives one PWM pin.
      * Numbered, where the xmega lettered them A..D: the registers these reach are CMP0..CMP2 and
      * the pins WO0..WO2, so carrying the letters over would mean translating at every look into
      * the data sheet. */
-    typedef enum {
-        kTimerChannel0,
-        kTimerChannel1,
-        kTimerChannel2
-    } TimerChannelType;
+    enum class TimerChannelType {
+        kChannel0,
+        kChannel1,
+        kChannel2
+    };
 
-    typedef enum {
-        kTimerCountDirectionUp,
-        kTimerCountDirectionDown
-    } TimerCountDirection;
+    enum class TimerCountDirection {
+        kUp,
+        kDown
+    };
 
     /* PWM duty resolution, the same 10 bit TimerOne offers */
     static constexpr uint16_t kPwmDutyMax{1023u};
@@ -224,16 +224,16 @@ class Timer
     uint16_t top_;
     uint16_t pwm_duty_[TimerTraits::kNumberOfChannels];
 
-    constexpr Timer() : state_(kStateNone), clock_select_bit_group_(kTimerRegCsNoPrescaler), timer_overflow_callback_(nullptr), top_(0xFFFFu), pwm_duty_{} { }
+    constexpr Timer() : state_(StateType::kNone), clock_select_bit_group_(TimerClockSelectType::kNoPrescaler), timer_overflow_callback_(nullptr), top_(0xFFFFu), pwm_duty_{} { }
 
     // functions
     static typename TimerTraits::RegisterType& GetTimer() { return TimerTraits::GetTimer(); }
 
     static constexpr uint8_t ToPinMask(TimerChannelType channel) {
-        return static_cast<uint8_t>(1u << (TimerTraits::kFirstPin + channel));
+        return static_cast<uint8_t>(1u << (TimerTraits::kFirstPin + ToUnderlying(channel)));
     }
     static constexpr uint8_t ToChannelEnableMask(TimerChannelType channel) {
-        return static_cast<uint8_t>(TCA_SINGLE_CMP0EN_bm << channel);
+        return static_cast<uint8_t>(TCA_SINGLE_CMP0EN_bm << ToUnderlying(channel));
     }
     static constexpr uint16_t ToCompareValue(uint16_t top, uint16_t duty) {
         return static_cast<uint16_t>((static_cast<uint32_t>(top) * duty) >> kPwmDutyBits);
@@ -246,13 +246,13 @@ class Timer
     }
     static constexpr uint8_t ToPrescalerShift(TimerClockSelectType clock_select) {
         switch(clock_select) {
-            case kTimerRegCsPrescale2:       return 1u;
-            case kTimerRegCsPrescale4:       return 2u;
-            case kTimerRegCsPrescale8:       return 3u;
-            case kTimerRegCsPrescale16:      return 4u;
-            case kTimerRegCsPrescale64:      return 6u;
-            case kTimerRegCsPrescale256:     return 8u;
-            case kTimerRegCsPrescale1024:    return 10u;
+            case TimerClockSelectType::kPrescale2:       return 1u;
+            case TimerClockSelectType::kPrescale4:       return 2u;
+            case TimerClockSelectType::kPrescale8:       return 3u;
+            case TimerClockSelectType::kPrescale16:      return 4u;
+            case TimerClockSelectType::kPrescale64:      return 6u;
+            case TimerClockSelectType::kPrescale256:     return 8u;
+            case TimerClockSelectType::kPrescale1024:    return 10u;
             default:                            return 0u;
         }
     }
@@ -289,15 +289,15 @@ class Timer
     /* The channel is a template argument so that a channel the timer does not have fails to compile
      * instead of writing into reserved registers at run time */
     template <TimerChannelType Channel> StdReturnType EnablePwm(uint16_t duty) {
-        static_assert(Channel < TimerTraits::kNumberOfChannels, "this timer has no such compare channel");
+        static_assert(ToUnderlying(Channel) < TimerTraits::kNumberOfChannels, "this timer has no such compare channel");
         return EnablePwmChannel(Channel, duty);
     }
     template <TimerChannelType Channel> StdReturnType DisablePwm() {
-        static_assert(Channel < TimerTraits::kNumberOfChannels, "this timer has no such compare channel");
+        static_assert(ToUnderlying(Channel) < TimerTraits::kNumberOfChannels, "this timer has no such compare channel");
         return DisablePwmChannel(Channel);
     }
     template <TimerChannelType Channel> StdReturnType SetPwmDuty(uint16_t duty) {
-        static_assert(Channel < TimerTraits::kNumberOfChannels, "this timer has no such compare channel");
+        static_assert(ToUnderlying(Channel) < TimerTraits::kNumberOfChannels, "this timer has no such compare channel");
         return SetPwmDutyChannel(Channel, duty);
     }
 };

@@ -63,8 +63,8 @@ void TestPersistence()
     display.SetColor(10u, 20u, 30u);
     display.SetBrightness(123u);
     display.SetBrightnessUseGammaCorrection(true);
-    clock.SetMode(Clock::kModeSchwaben);
-    Animations::GetInstance().SetTaskCycle(Animations::kAnimationIdNone, 42u);
+    clock.SetMode(Clock::ModeType::kSchwaben);
+    Animations::GetInstance().SetTaskCycle(Animations::AnimationIdType::kNone, 42u);
     Illuminance::GetInstance().SetCalibrationValuesMaxValue(4321u);
 
     persistence.Task();
@@ -73,8 +73,8 @@ void TestPersistence()
     display.SetColor(1u, 2u, 3u);
     display.SetBrightness(7u);
     display.SetBrightnessUseGammaCorrection(false);
-    clock.SetMode(Clock::kModeWessi);
-    Animations::GetInstance().SetTaskCycle(Animations::kAnimationIdNone, 1u);
+    clock.SetMode(Clock::ModeType::kWessi);
+    Animations::GetInstance().SetTaskCycle(Animations::AnimationIdType::kNone, 1u);
     Illuminance::GetInstance().SetCalibrationValuesMaxValue(1u);
 
     Expect(persistence.Load() == kEOk, "a stored configuration must be restored");
@@ -82,8 +82,8 @@ void TestPersistence()
            "the colour must come back");
     Expect(display.GetBrightness() == 123u, "the brightness must come back");
     Expect(display.GetBrightnessUseGammaCorrection(), "the gamma correction switch must come back");
-    Expect(clock.GetMode() == Clock::kModeSchwaben, "the clock mode must come back");
-    Expect(Animations::GetInstance().GetTaskCycle(Animations::kAnimationIdNone) == 42u,
+    Expect(clock.GetMode() == Clock::ModeType::kSchwaben, "the clock mode must come back");
+    Expect(Animations::GetInstance().GetTaskCycle(Animations::AnimationIdType::kNone) == 42u,
            "an animation speed must come back");
     Expect(Illuminance::GetInstance().GetCalibrationValuesMaxValue() == 4321u,
            "the sensor calibration must come back");
@@ -116,7 +116,7 @@ void TestPersistenceSaveAndReset()
     Clock& clock = Clock::GetInstance();
 
     display.SetColor(1u, 2u, 3u);
-    clock.SetMode(Clock::kModeOssi);
+    clock.SetMode(Clock::ModeType::kOssi);
     clock.SetShowItIsPermanently(false);
     Expect(persistence.Save() == kEOk, "saving must write the configuration");
 
@@ -138,7 +138,7 @@ void TestPersistenceSaveAndReset()
     overlays.SetTextDay(23u);
     overlays.SetTextValidInDays(3u);
     overlays.SetTextSpeed(4u);
-    (void)overlays.SetTextFont(Text::kFont5x8);
+    (void)overlays.SetTextFont(Text::FontType::kFont5x8);
     overlays.SetTextIsActive(true);
     (void)overlays.SetDatePeriodInMinutes(5u);
     overlays.SetDateIsActive(true);
@@ -149,7 +149,7 @@ void TestPersistenceSaveAndReset()
     (void)overlays.SetTextPeriodInMinutes(1u);
     overlays.SetTextMonth(0u);
     overlays.SetTextSpeed(1u);
-    (void)overlays.SetTextFont(Text::kFont10x10);
+    (void)overlays.SetTextFont(Text::FontType::kFont10x10);
     overlays.SetTextIsActive(false);
     overlays.SetDateIsActive(false);
 
@@ -161,7 +161,7 @@ void TestPersistenceSaveAndReset()
     Expect(overlays.GetTextMonth() == 7u && overlays.GetTextDay() == 23u, "and its date");
     Expect(overlays.GetTextValidInDays() == 3u, "and how long that date stays valid");
     Expect(overlays.GetTextSpeed() == 4u, "and its speed");
-    Expect(overlays.GetTextFont() == Text::kFont5x8, "and its font");
+    Expect(overlays.GetTextFont() == Text::FontType::kFont5x8, "and its font");
     Expect(overlays.GetTextIsActive(), "and whether it is switched on");
     Expect(overlays.GetDatePeriodInMinutes() == 5u && overlays.GetDateIsActive(),
            "a second overlay must not have been read out of the first one's slot");
@@ -178,7 +178,7 @@ void TestPersistenceSaveAndReset()
     /* Qualified because the macro expands to the bare enumerator, and asked through the
        macro rather than through the mode it happens to name today. */
     Expect(clock.GetMode() == Clock::CLOCK_INITIAL_MODE, "the reset must put the clock mode back");
-    Expect(Animations::GetInstance().GetAnimation() == Animations::kAnimationIdNone,
+    Expect(Animations::GetInstance().GetAnimation() == Animations::AnimationIdType::kNone,
            "the reset must deselect the animation");
 
     /* The store stays empty rather than being refilled with the defaults on the next

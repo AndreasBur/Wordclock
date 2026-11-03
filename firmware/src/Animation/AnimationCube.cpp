@@ -50,7 +50,7 @@
 ******************************************************************************************************************************************************/
 void AnimationCube::Init()
 {
-    Animation::Init(kStateIdle);
+    Animation::Init(StateType::kIdle);
     Reset();
 } /* Init */
 
@@ -62,10 +62,10 @@ StdReturnType AnimationCube::SetTime(byte hour, byte minute)
 {
     StdReturnType return_value{kENotOk};
 
-    if(Clock::GetInstance().GetClockWords(hour, minute, clock_words_table_) == kEOk && state_ == kStateIdle) {
+    if(Clock::GetInstance().GetClockWords(hour, minute, clock_words_table_) == kEOk && state_ == StateType::kIdle) {
         return_value = kEOk;
         SetMaxBorder();
-        state_ = kStateClearTime;
+        state_ = StateType::kClearTime;
     }
     return return_value;
 } /* SetTime */
@@ -76,8 +76,8 @@ StdReturnType AnimationCube::SetTime(byte hour, byte minute)
 ******************************************************************************************************************************************************/
 void AnimationCube::Task()
 {
-    if(state_ == kStateClearTime) { ClearTimeTask(); }
-    else if(state_ == kStateSetTime) { SetTimeTask(); }
+    if(state_ == StateType::kClearTime) { ClearTimeTask(); }
+    else if(state_ == StateType::kSetTime) { SetTimeTask(); }
 } /* Task */
 
 
@@ -90,7 +90,7 @@ void AnimationCube::Task()
 ******************************************************************************************************************************************************/
 void AnimationCube::Reset()
 {
-    clock_words_table_.fill(DisplayWords::kWordNone);
+    clock_words_table_.fill(DisplayWords::WordIdType::kNone);
     SetMinBorder();
 } /* Reset */
 
@@ -101,7 +101,7 @@ void AnimationCube::Reset()
 void AnimationCube::SetStateToSetTime()
 {
     ClearBorderPixels();
-    state_ = kStateSetTime;
+    state_ = StateType::kSetTime;
     SetMinBorder();
 } /* SetStateToSetTime */
 
@@ -113,11 +113,11 @@ void AnimationCube::ClearTimeTask()
 {
     switch(border_state_)
     {
-        case kBorderStateMax:
+        case BorderStateType::kMax:
             SetBorderPixels();
-            border_state_ = kBorderStateBetween;
+            border_state_ = BorderStateType::kBetween;
             break;
-        case kBorderStateBetween:
+        case BorderStateType::kBetween:
             ClearBorderPixels();
             if(DecreaseBorder() == kENotOk) { SetStateToSetTime(); } 
             else { SetBorderPixels(); }
@@ -135,11 +135,11 @@ void AnimationCube::SetTimeTask()
 {
     switch(border_state_)
     {
-        case kBorderStateMin:
+        case BorderStateType::kMin:
             SetBorderPixels();
-            border_state_ = kBorderStateBetween;
+            border_state_ = BorderStateType::kBetween;
             break;
-        case kBorderStateBetween:
+        case BorderStateType::kBetween:
             ClearBorderPixelsWithoutClockPixels();
             if(IncreaseBorder() == kENotOk) { FinishWithClockWords(clock_words_table_); }
             else { SetBorderPixels(); }
@@ -247,7 +247,7 @@ void AnimationCube::SetMaxBorder()
     border_.column_end = DISPLAY_NUMBER_OF_COLUMNS - 1u;
     border_.row_start = 0u;
     border_.row_end = DISPLAY_NUMBER_OF_ROWS - 1u;
-    border_state_ = kBorderStateMax;
+    border_state_ = BorderStateType::kMax;
 } /* SetMaxBorder */
 
 
@@ -260,7 +260,7 @@ void AnimationCube::SetMinBorder()
     border_.column_end = ANIMATION_CUBE_COLUMN_END_MIN_VALUE;
     border_.row_start = ANIMATION_CUBE_ROW_START_MAX_VALUE;
     border_.row_end = ANIMATION_CUBE_ROW_END_MIN_VALUE;
-    border_state_ = kBorderStateMin;
+    border_state_ = BorderStateType::kMin;
 } /* SetMinBorder */
 
 

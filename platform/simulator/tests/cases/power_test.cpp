@@ -95,7 +95,7 @@ void TestSupplyReturnsBeforeTheDataLine()
     power.Task();
     Expect(!display.IsOutputSuspended(), "the next task must release the line");
     Expect(IsAnyOutputPixelLit(), "and give the display back");
-    Expect(power.GetState() == Power::kStateSupplyOn, "which leaves the sequence idle again");
+    Expect(power.GetState() == Power::StateType::kSupplyOn, "which leaves the sequence idle again");
 
     /* The strip forgot its registers with its supply, so the buffer has to be marked for a
        redraw rather than trusted to still be up there. */
@@ -136,14 +136,14 @@ void TestSupplyRequestsAreReversible()
     /* Asked for what is already the case. Honoured rather than refused: twice off means the
        same as once off, and a caller with no readback would have nothing to do with a no. */
     Expect(power.SwitchSupplyOn() == kEOk, "asking for a supply that is already on must be honoured");
-    Expect(power.GetState() == Power::kStateSupplyOn, "and must not start a sequence");
+    Expect(power.GetState() == Power::StateType::kSupplyOn, "and must not start a sequence");
 
     /* Changed mind while the blanked frame is still going out. The supply never went, so
        there is nothing to bring up - only the darkness to undo. */
     power.SwitchSupplyOff();
-    Expect(power.GetState() == Power::kStateBlanking, "the ask must put the sequence into blanking");
+    Expect(power.GetState() == Power::StateType::kBlanking, "the ask must put the sequence into blanking");
     Expect(power.SwitchSupplyOn() == kEOk, "and must be revocable while it is still there");
-    Expect(power.GetState() == Power::kStateSupplyOn, "which takes the sequence straight back");
+    Expect(power.GetState() == Power::StateType::kSupplyOn, "which takes the sequence straight back");
     Expect(power.IsSupplyOn() && IsAnyOutputPixelLit(), "with the strip powered and lit again");
 
     /* Changed mind the other way, while the rail is settling. The line is still gated there,
@@ -152,7 +152,7 @@ void TestSupplyRequestsAreReversible()
     RenderOnce();
     power.Task();
     power.SwitchSupplyOn();
-    Expect(power.GetState() == Power::kStateSettling, "the ask back must settle rather than finish");
+    Expect(power.GetState() == Power::StateType::kSettling, "the ask back must settle rather than finish");
     Expect(power.SwitchSupplyOff() == kEOk, "and must itself be revocable");
     Expect(!power.IsSupplyOn(), "which drops the port again");
     Expect(display.IsOutputSuspended(), "with the line still gated, as it never stopped being");

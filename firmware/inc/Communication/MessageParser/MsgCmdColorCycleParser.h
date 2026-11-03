@@ -53,8 +53,8 @@ class MsgCmdColorCycleParser : public MsgParameterParser<MsgCmdColorCycleParser,
     static constexpr char kHueShortName{'H'};
 
     static constexpr ParameterTableType kParameterTable PROGMEM {
-        ParameterTableElementType(kActiveShortName, MsgParameter::kArgumentTypeUint8),
-        ParameterTableElementType(kSpeedShortName,  MsgParameter::kArgumentTypeUint8)
+        ParameterTableElementType(kActiveShortName, MsgParameter::ArgumentTypeType::kUint8),
+        ParameterTableElementType(kSpeedShortName,  MsgParameter::ArgumentTypeType::kUint8)
     };
 
     /* Collected rather than applied where it arrives, and applied after the speed: switching

@@ -62,18 +62,19 @@ class AnimationSqueeze : public Animation
   public:
     /* Side the letters are eaten away from, selected for each word change. From the right is what
        the reference project does, from the left is the other half of the coin. */
-    enum DirectionType {
-        kDirectionFromLeft,
-        kDirectionFromRight,
-        kDirectionNumberOfDirections
+    enum class DirectionType {
+        kFromLeft,
+        kFromRight,
+        kNumberOfDirections
     };
+    static constexpr byte kNumberOfDirections{static_cast<byte>(DirectionType::kNumberOfDirections)};
 
   private:
     DisplayWords words_;
-    ClockWords::WordsListType clock_words_table_{{DisplayWords::kWordNone}};
+    ClockWords::WordsListType clock_words_table_{{DisplayWords::WordIdType::kNone}};
     byte max_word_length_{0u};
     byte current_length_{1u};
-    DirectionType direction_{kDirectionFromLeft};
+    DirectionType direction_{DirectionType::kFromLeft};
 
     // functions
     void Reset();

@@ -49,7 +49,7 @@
 ******************************************************************************************************************************************************/
 void AnimationFlicker::Init()
 {
-    Animation::Init(kStateIdle);
+    Animation::Init(StateType::kIdle);
     Reset();
 } /* Init */
 
@@ -64,7 +64,7 @@ StdReturnType AnimationFlicker::SetTime(byte hour, byte minute)
     if(hour < CLOCK_NUMBER_OF_HOURS_PER_DAY && minute < CLOCK_NUMBER_OF_MINUTES_PER_HOUR) {
         hour_ = hour;
         minute_ = minute;
-        state_ = kStateClearTime;
+        state_ = StateType::kClearTime;
         return_value = kEOk;
     }
     return return_value;
@@ -76,8 +76,8 @@ StdReturnType AnimationFlicker::SetTime(byte hour, byte minute)
 ******************************************************************************************************************************************************/
 void AnimationFlicker::Task()
 {
-    if(state_ == kStateClearTime) { ClearTimeTask(); }
-    else if(state_ == kStateSetTime) { SetTimeTask(); }
+    if(state_ == StateType::kClearTime) { ClearTimeTask(); }
+    else if(state_ == StateType::kSetTime) { SetTimeTask(); }
 } /* Task */
 
 
@@ -121,7 +121,7 @@ void AnimationFlicker::ClearTimeTask()
         Display::GetInstance().Enable();
     }
 
-    if(flicker_counter_-- <= 0u) state_ = kStateSetTime;
+    if(flicker_counter_-- <= 0u) state_ = StateType::kSetTime;
 } /* ClearTimeTask */
 
 

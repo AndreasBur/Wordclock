@@ -61,19 +61,20 @@ class AnimationCollapse : public Animation
 ******************************************************************************************************************************************************/
   public:
     /* Edge the letters collapse against, selected for each word change */
-    enum DirectionType {
-        kDirectionToLeft,
-        kDirectionToRight,
-        kDirectionNumberOfDirections
+    enum class DirectionType {
+        kToLeft,
+        kToRight,
+        kNumberOfDirections
     };
+    static constexpr byte kNumberOfDirections{static_cast<byte>(DirectionType::kNumberOfDirections)};
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    ClockWords::WordsListType clock_words_table_{{DisplayWords::kWordNone}};
+    ClockWords::WordsListType clock_words_table_{{DisplayWords::WordIdType::kNone}};
     byte step_{0u};
-    DirectionType direction_{kDirectionToLeft};
+    DirectionType direction_{DirectionType::kToLeft};
     /* Steps the expansion needs, which is the longest way a single letter has to
        travel. Taking the display width instead would let the letters arrive long
        before the animation ends, because the gaps between words are only one or two

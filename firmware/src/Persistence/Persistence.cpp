@@ -85,7 +85,7 @@ struct SettingsType {
     byte clock_show_it_is_permanently;
     byte animations_mode;
     byte animation_id;
-    byte animation_task_cycles[Animations::kAnimationIdNumberOfAnimations];
+    byte animation_task_cycles[Animations::kNumberOfAnimations];
     OverlaySettingsType overlays[kNumberOfOverlaySlots];
     /* The text overlay's own, and the only variable-length thing here - stored at its full
        buffer size rather than length-prefixed, so the struct stays one fixed block that
@@ -280,7 +280,7 @@ SettingsType Gather()
        every word change, and storing that would mean a write every few minutes. */
     settings.animation_id = static_cast<byte>(animations.GetAnimation());
 
-    for(byte index = 0u; index < Animations::kAnimationIdNumberOfAnimations; index++) {
+    for(byte index = 0u; index < Animations::kNumberOfAnimations; index++) {
         const Animations::AnimationIdType animation_id = static_cast<Animations::AnimationIdType>(index);
 
         settings.animation_task_cycles[index] = animations.GetTaskCycle(animation_id);
@@ -326,7 +326,7 @@ void Apply(const SettingsType& settings)
 
     Animations& animations = Animations::GetInstance();
 
-    for(byte index = 0u; index < Animations::kAnimationIdNumberOfAnimations; index++) {
+    for(byte index = 0u; index < Animations::kNumberOfAnimations; index++) {
         const Animations::AnimationIdType animation_id = static_cast<Animations::AnimationIdType>(index);
         const bool is_favourite = Bit<uint16_t>::ReadBit(settings.animation_favourites, index);
 
@@ -334,7 +334,7 @@ void Apply(const SettingsType& settings)
         animations.SetTaskCycle(animation_id, settings.animation_task_cycles[index]);
     }
 
-    /* The animation before the mode: setting the mode to kModeFixed starts the selected
+    /* The animation before the mode: setting the mode to ModeType::kFixed starts the selected
        animation, so it has to find the restored one rather than the default. */
     animations.SetAnimation(static_cast<Animations::AnimationIdType>(settings.animation_id));
     animations.SetMode(static_cast<Animations::ModeType>(settings.animations_mode));

@@ -39,7 +39,7 @@
 const DisplayWord DisplayWords::kDisplayWordsTable[] PROGMEM
 {
     DisplayWord(0,0,0),                  //  0 = DISPLAY_WORD_NONE           = ""
-    DisplayWord(0,0,2),                  //  1 = DisplayWords::kWordEs       = "ES"
+    DisplayWord(0,0,2),                  //  1 = DisplayWords::WordIdType::kEs       = "ES"
     DisplayWord(3,0,3),                  //  2 = DISPLAY_WORD_IST            = "IST"
     DisplayWord(7,0,4),                  //  3 = DISPLAY_WORD_FUENF          = "FÜNF"
     DisplayWord(0,1,4),                  //  4 = DISPLAY_WORD_ZEHN           = "ZEHN"
@@ -79,7 +79,7 @@ StdReturnType DisplayWords::GetDisplayWord(WordIdType word_id, DisplayWord& word
     StdReturnType return_value{kENotOk};
 
     if(IsWordIdValid(word_id)) {
-        word = GetDisplayWordsTableElement(word_id);
+        word = GetDisplayWordsTableElement(ToUnderlying(word_id));
         return_value = kEOk;
     } else {
         return_value = kENotOk;
@@ -96,7 +96,7 @@ StdReturnType DisplayWords::GetDisplayWordLength(WordIdType word_id, byte& lengt
     StdReturnType return_value{kENotOk};
 
     if(IsWordIdValid(word_id)) {
-        length = GetDisplayWordsTableElement(word_id).GetLength();
+        length = GetDisplayWordsTableElement(ToUnderlying(word_id)).GetLength();
         return_value = kEOk;
     } else {
         return_value = kENotOk;
@@ -113,7 +113,7 @@ StdReturnType DisplayWords::GetDisplayWordColumn(WordIdType word_id, byte& colum
     StdReturnType return_value{kENotOk};
 
     if(IsWordIdValid(word_id)) {
-        column = GetDisplayWordsTableElement(word_id).GetColumn();
+        column = GetDisplayWordsTableElement(ToUnderlying(word_id)).GetColumn();
         return_value = kEOk;
     } else {
         return_value = kENotOk;
@@ -130,7 +130,7 @@ StdReturnType DisplayWords::GetDisplayWordRow(WordIdType word_id, byte& row)
     StdReturnType return_value{kENotOk};
 
     if(IsWordIdValid(word_id)) {
-        row = GetDisplayWordsTableElement(word_id).GetRow();
+        row = GetDisplayWordsTableElement(ToUnderlying(word_id)).GetRow();
         return_value = kEOk;
     } else {
         return_value = kENotOk;

@@ -216,7 +216,7 @@ StdReturnType DS3231::SetDateTime(const ClockDateTime& date_time)
     registers[kRegisterSeconds] = ToBcd(date_time.GetTimeSecond());
     registers[kRegisterMinutes] = ToBcd(date_time.GetTimeMinute());
     registers[kRegisterHours] = ToBcd(date_time.GetTimeHour());
-    registers[kRegisterWeekday] = ToBcd(static_cast<byte>(date_time.GetDateWeekday() + kWeekdayOffset));
+    registers[kRegisterWeekday] = ToBcd(static_cast<byte>(ToUnderlying(date_time.GetDateWeekday()) + kWeekdayOffset));
     registers[kRegisterDay] = ToBcd(date_time.GetDateDay());
     registers[kRegisterMonth] = ToBcd(date_time.GetDateMonth());
     registers[kRegisterYear] = ToBcd(static_cast<byte>(date_time.GetDateYear() - kYearOfCentury));

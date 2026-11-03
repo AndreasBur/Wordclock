@@ -58,8 +58,8 @@ class MsgCmdAnimationParser : public MsgParameterParser<MsgCmdAnimationParser, M
 ******************************************************************************************************************************************************/
   private:
     friend class MsgParameterParser;
-    AnimationIdType animation_id_{Animations::kAnimationIdNone};
-    ModeType mode_{Animations::kModeFixed};
+    AnimationIdType animation_id_{Animations::AnimationIdType::kNone};
+    ModeType mode_{Animations::ModeType::kFixed};
     byte speed_{0u};
     bool favourite_{true};
 
@@ -79,10 +79,10 @@ class MsgCmdAnimationParser : public MsgParameterParser<MsgCmdAnimationParser, M
     static constexpr char kFavouriteOptionShortName{'F'};
 
     static constexpr ParameterTableType kParameterTable PROGMEM {
-        ParameterTableElementType(kAnimationOptionShortName, MsgParameter::kArgumentTypeUint8),
-        ParameterTableElementType(kModeOptionShortName, MsgParameter::kArgumentTypeUint8),
-        ParameterTableElementType(kSpeedOptionShortName, MsgParameter::kArgumentTypeUint8),
-        ParameterTableElementType(kFavouriteOptionShortName, MsgParameter::kArgumentTypeUint8)
+        ParameterTableElementType(kAnimationOptionShortName, MsgParameter::ArgumentTypeType::kUint8),
+        ParameterTableElementType(kModeOptionShortName, MsgParameter::ArgumentTypeType::kUint8),
+        ParameterTableElementType(kSpeedOptionShortName, MsgParameter::ArgumentTypeType::kUint8),
+        ParameterTableElementType(kFavouriteOptionShortName, MsgParameter::ArgumentTypeType::kUint8)
     };
 
     // functions
@@ -108,11 +108,11 @@ class MsgCmdAnimationParser : public MsgParameterParser<MsgCmdAnimationParser, M
     }
 
     static void SendAnswerAnimation(bool append_space) {
-        SendAnswerParameter(kAnimationOptionShortName, Animations::GetInstance().GetAnimation(), append_space);
+        SendAnswerParameter(kAnimationOptionShortName, ToUnderlying(Animations::GetInstance().GetAnimation()), append_space);
     }
 
     static void SendAnswerMode(bool append_space) {
-        SendAnswerParameter(kModeOptionShortName, Animations::GetInstance().GetMode(), append_space);
+        SendAnswerParameter(kModeOptionShortName, ToUnderlying(Animations::GetInstance().GetMode()), append_space);
     }
 
     static void SendAnswerSpeed(bool append_space) {
@@ -124,13 +124,13 @@ class MsgCmdAnimationParser : public MsgParameterParser<MsgCmdAnimationParser, M
     void SetAnimation() const
     {
         StdReturnType return_value = Animations::GetInstance().SetAnimation(animation_id_);
-        error_.CheckReturnValueAndSend(kAnimationOptionShortName, return_value, ErrorMessage::kErrorValueOutOfBounds);
+        error_.CheckReturnValueAndSend(kAnimationOptionShortName, return_value, ErrorMessage::ErrorType::kValueOutOfBounds);
     }
 
     void SetMode() const
     {
         StdReturnType return_value = Animations::GetInstance().SetMode(mode_);
-        error_.CheckReturnValueAndSend(kModeOptionShortName, return_value, ErrorMessage::kErrorValueOutOfBounds);
+        error_.CheckReturnValueAndSend(kModeOptionShortName, return_value, ErrorMessage::ErrorType::kValueOutOfBounds);
     }
 
     static void SendAnswerFavourite(bool append_space) {
@@ -143,13 +143,13 @@ class MsgCmdAnimationParser : public MsgParameterParser<MsgCmdAnimationParser, M
     void SetFavourite() const
     {
         StdReturnType return_value = Animations::GetInstance().SetFavourite(animation_id_, favourite_);
-        error_.CheckReturnValueAndSend(kFavouriteOptionShortName, return_value, ErrorMessage::kErrorValueOutOfBounds);
+        error_.CheckReturnValueAndSend(kFavouriteOptionShortName, return_value, ErrorMessage::ErrorType::kValueOutOfBounds);
     }
 
     void SetClockTaskCycle() const
     {
         StdReturnType return_value = Animations::GetInstance().SetTaskCycle(animation_id_, Scheduler::ConvertSpeedToTaskCycle(speed_));
-        error_.CheckReturnValueAndSend(kSpeedOptionShortName, return_value, ErrorMessage::kErrorValueOutOfBounds);
+        error_.CheckReturnValueAndSend(kSpeedOptionShortName, return_value, ErrorMessage::ErrorType::kValueOutOfBounds);
     }
 
 /******************************************************************************************************************************************************

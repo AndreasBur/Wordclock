@@ -96,11 +96,11 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    enum StateType {
-        kStateParse,
-        kStateOptionStart,
-        kStateOptionChar,
-        kStateOptionArgument
+    enum class StateType {
+        kParse,
+        kOptionStart,
+        kOptionChar,
+        kOptionArgument
     };
 
     static constexpr char kOptionStartChar{'-'};
@@ -138,40 +138,40 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
 
     PositionType ParseArgument(MsgParameter parameter, const char* argument) {
 # if (MSG_PARAMETER_PARSER_ARGUMENT_TYPE_CHAR == STD_ON)
-        if(parameter.GetArgumentType() == MsgParameter::kArgumentTypeChar) { return ConvertArgument<char>(parameter, argument); }
+        if(parameter.GetArgumentType() == MsgParameter::ArgumentTypeType::kChar) { return ConvertArgument<char>(parameter, argument); }
 # endif
 # if (MSG_PARAMETER_PARSER_ARGUMENT_TYPE_UINT8 == STD_ON)
-        if(parameter.GetArgumentType() == MsgParameter::kArgumentTypeUint8) { return ConvertArgument<uint8_t>(parameter, argument); }
+        if(parameter.GetArgumentType() == MsgParameter::ArgumentTypeType::kUint8) { return ConvertArgument<uint8_t>(parameter, argument); }
 # endif
 # if (MSG_PARAMETER_PARSER_ARGUMENT_TYPE_UINT16 == STD_ON)
-        if(parameter.GetArgumentType() == MsgParameter::kArgumentTypeUint16) { return ConvertArgument<uint16_t>(parameter, argument); }
+        if(parameter.GetArgumentType() == MsgParameter::ArgumentTypeType::kUint16) { return ConvertArgument<uint16_t>(parameter, argument); }
 # endif
 # if (MSG_PARAMETER_PARSER_ARGUMENT_TYPE_UINT32 == STD_ON)
-        if(parameter.GetArgumentType() == MsgParameter::kArgumentTypeUint32) { return ConvertArgument<uint32_t>(parameter, argument); }
+        if(parameter.GetArgumentType() == MsgParameter::ArgumentTypeType::kUint32) { return ConvertArgument<uint32_t>(parameter, argument); }
 # endif
 # if (MSG_PARAMETER_PARSER_ARGUMENT_TYPE_UINT64 == STD_ON)
-        if(parameter.GetArgumentType() == MsgParameter::kArgumentTypeUint64) { return ConvertArgument<uint64_t>(parameter, argument); }
+        if(parameter.GetArgumentType() == MsgParameter::ArgumentTypeType::kUint64) { return ConvertArgument<uint64_t>(parameter, argument); }
 # endif
 # if (MSG_PARAMETER_PARSER_ARGUMENT_TYPE_INT8 == STD_ON)
-        if(parameter.GetArgumentType() == MsgParameter::kArgumentTypeInt8) { return ConvertArgument<int8_t>(parameter, argument); }
+        if(parameter.GetArgumentType() == MsgParameter::ArgumentTypeType::kInt8) { return ConvertArgument<int8_t>(parameter, argument); }
 # endif
 # if (MSG_PARAMETER_PARSER_ARGUMENT_TYPE_INT16 == STD_ON)
-        if(parameter.GetArgumentType() == MsgParameter::kArgumentTypeInt16) { return ConvertArgument<int16_t>(parameter, argument); }
+        if(parameter.GetArgumentType() == MsgParameter::ArgumentTypeType::kInt16) { return ConvertArgument<int16_t>(parameter, argument); }
 # endif
 # if (MSG_PARAMETER_PARSER_ARGUMENT_TYPE_INT32 == STD_ON)
-        if(parameter.GetArgumentType() == MsgParameter::kArgumentTypeInt32) { return ConvertArgument<int32_t>(parameter, argument); }
+        if(parameter.GetArgumentType() == MsgParameter::ArgumentTypeType::kInt32) { return ConvertArgument<int32_t>(parameter, argument); }
 # endif
 # if (MSG_PARAMETER_PARSER_ARGUMENT_TYPE_INT64 == STD_ON)
-        if(parameter.GetArgumentType() == MsgParameter::kArgumentTypeInt64) { return ConvertArgument<int64_t>(parameter, argument); }
+        if(parameter.GetArgumentType() == MsgParameter::ArgumentTypeType::kInt64) { return ConvertArgument<int64_t>(parameter, argument); }
 # endif
 # if (MSG_PARAMETER_PARSER_ARGUMENT_TYPE_FLOAT == STD_ON)
-        if(parameter.GetArgumentType() == MsgParameter::kArgumentTypeFloat) { return ConvertArgument<float>(parameter, argument); }
+        if(parameter.GetArgumentType() == MsgParameter::ArgumentTypeType::kFloat) { return ConvertArgument<float>(parameter, argument); }
 # endif
 # if (MSG_PARAMETER_PARSER_ARGUMENT_TYPE_DOUBLE == STD_ON)
-        if(parameter.GetArgumentType() == MsgParameter::kArgumentTypeDouble) { return ConvertArgument<double>(parameter, argument); }
+        if(parameter.GetArgumentType() == MsgParameter::ArgumentTypeType::kDouble) { return ConvertArgument<double>(parameter, argument); }
 # endif
 # if (MSG_PARAMETER_PARSER_ARGUMENT_TYPE_STRING == STD_ON)
-        if(parameter.GetArgumentType() == MsgParameter::kArgumentTypeString) { return ConvertArgumentToString(parameter, argument); }
+        if(parameter.GetArgumentType() == MsgParameter::ArgumentTypeType::kString) { return ConvertArgumentToString(parameter, argument); }
 # endif
         return 0u;
     }
@@ -181,7 +181,7 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
         PositionType position;
         StringTools::ResultType result = StringTools::StringTo(argument, position, value, kArgumentNumberBase);
         HandleConvertResult(parameter, result);
-        if(result == StringTools::kResultOk) { Underlying().HandleParameter(parameter.GetOptionShortName(), value); }
+        if(result == StringTools::ResultType::kOk) { Underlying().HandleParameter(parameter.GetOptionShortName(), value); }
         return position;
     }
 
@@ -194,11 +194,11 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
     }
 
     void HandleConvertResult(MsgParameter parameter, StringTools::ResultType result) const {
-        if(result == StringTools::kResultNoValue) {
-            error_.Send(parameter, ErrorMessage::kErrorNoValueGiven);
+        if(result == StringTools::ResultType::kNoValue) {
+            error_.Send(parameter, ErrorMessage::ErrorType::kNoValueGiven);
         }
-        if(result == StringTools::kResultOverflow) {
-            error_.Send(parameter, ErrorMessage::kErrorValueOutOfBounds);
+        if(result == StringTools::ResultType::kOverflow) {
+            error_.Send(parameter, ErrorMessage::ErrorType::kValueOutOfBounds);
         }
     }
 
@@ -216,22 +216,22 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
     // methods
     void Parse()
     {
-        StateType state = kStateParse;
+        StateType state = StateType::kParse;
         char option_short_name;
 
         for(PositionType position = 0u; parameter_buffer_[position] != STD_NULL_CHARACTER; position++) {
-            if(state == kStateParse) {
+            if(state == StateType::kParse) {
                 char current_char = parameter_buffer_[position];
-                if(current_char == kOptionStartChar) { state = kStateOptionChar; }
-            } else if(state == kStateOptionChar) {
+                if(current_char == kOptionStartChar) { state = StateType::kOptionChar; }
+            } else if(state == StateType::kOptionChar) {
                 option_short_name = parameter_buffer_[position];
-                state = kStateOptionArgument;
-            } else if(state == kStateOptionArgument) {
+                state = StateType::kOptionArgument;
+            } else if(state == StateType::kOptionArgument) {
                 ParameterTableElementType parameter;
                 if(GetMsgParameterByOptionShortName(option_short_name, parameter) == kEOk) {
                     position += ParseArgument(parameter, &parameter_buffer_[position]) - 1u;
-                } else { error_.Send(option_short_name, ErrorMessage::kErrorParameterUnknown); }
-                state = kStateParse;
+                } else { error_.Send(option_short_name, ErrorMessage::ErrorType::kParameterUnknown); }
+                state = StateType::kParse;
             }
         }
     }

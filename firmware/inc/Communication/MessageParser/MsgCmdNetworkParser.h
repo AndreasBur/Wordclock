@@ -60,8 +60,8 @@ class MsgCmdNetworkParser : public MsgParameterParser<MsgCmdNetworkParser, MSG_C
     static constexpr char kPasswordShortName{'P'};
 
     static constexpr ParameterTableType kParameterTable PROGMEM {
-        ParameterTableElementType(kSsidShortName, MsgParameter::kArgumentTypeString),
-        ParameterTableElementType(kPasswordShortName, MsgParameter::kArgumentTypeString)
+        ParameterTableElementType(kSsidShortName, MsgParameter::ArgumentTypeType::kString),
+        ParameterTableElementType(kPasswordShortName, MsgParameter::ArgumentTypeType::kString)
     };
 
     char ssid_[System::kSsidStringLength]{0u};

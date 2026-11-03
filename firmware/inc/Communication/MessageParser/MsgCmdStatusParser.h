@@ -19,7 +19,7 @@
  *
  *                  It is read-only, and its parameter table is empty rather than filled
  *                  with fields that are ignored: an option sent to it is answered with
- *                  kErrorParameterUnknown by the base parser, which is what a caller
+ *                  ErrorType::kParameterUnknown by the base parser, which is what a caller
  *                  trying to set a reading should hear. The field names still exist - in
  *                  the message catalog, marked read-only - so a front end can read the
  *                  answer back through them without offering them as inputs.

@@ -38,52 +38,52 @@ void TestRegionalWordings()
 
     /* Quarter past four: named after the hour it is past, or after the one it counts
        towards. */
-    clock.SetMode(Clock::kModeWessi);
-    Expect(WordsContain(WordsAt(4u, 15u), DisplayWords::kWordNach),
+    clock.SetMode(Clock::ModeType::kWessi);
+    Expect(WordsContain(WordsAt(4u, 15u), DisplayWords::WordIdType::kNach),
            "Wessi says a quarter *past* four");
-    clock.SetMode(Clock::kModeOssi);
-    Expect(!WordsContain(WordsAt(4u, 15u), DisplayWords::kWordNach),
+    clock.SetMode(Clock::ModeType::kOssi);
+    Expect(!WordsContain(WordsAt(4u, 15u), DisplayWords::WordIdType::kNach),
            "Ossi says viertel five, with no past in it");
-    Expect(WordsContain(WordsAt(4u, 15u), DisplayWords::kWordViertel),
+    Expect(WordsContain(WordsAt(4u, 15u), DisplayWords::WordIdType::kViertel),
            "and it is still a quarter");
 
     /* Quarter to five: the same difference, from the other side. */
-    clock.SetMode(Clock::kModeWessi);
-    Expect(WordsContain(WordsAt(4u, 45u), DisplayWords::kWordVor),
+    clock.SetMode(Clock::ModeType::kWessi);
+    Expect(WordsContain(WordsAt(4u, 45u), DisplayWords::WordIdType::kVor),
            "Wessi says a quarter *to* five");
-    clock.SetMode(Clock::kModeSchwaben);
-    Expect(WordsContain(WordsAt(4u, 45u), DisplayWords::kWordDreiviertel),
+    clock.SetMode(Clock::ModeType::kSchwaben);
+    Expect(WordsContain(WordsAt(4u, 45u), DisplayWords::WordIdType::kDreiviertel),
            "Schwaben says three quarters five");
-    Expect(!WordsContain(WordsAt(4u, 45u), DisplayWords::kWordVor),
+    Expect(!WordsContain(WordsAt(4u, 45u), DisplayWords::WordIdType::kVor),
            "which has no to in it");
 
     /* Twenty past four: counted from the hour, or as ten before half five. */
-    clock.SetMode(Clock::kModeRheinRuhr);
-    Expect(WordsContain(WordsAt(4u, 20u), DisplayWords::kWordNach),
+    clock.SetMode(Clock::ModeType::kRheinRuhr);
+    Expect(WordsContain(WordsAt(4u, 20u), DisplayWords::WordIdType::kNach),
            "Rhein-Ruhr counts twenty past the hour");
-    Expect(!WordsContain(WordsAt(4u, 20u), DisplayWords::kWordHalb),
+    Expect(!WordsContain(WordsAt(4u, 20u), DisplayWords::WordIdType::kHalb),
            "and does not reach for the half hour");
-    clock.SetMode(Clock::kModeWessi);
-    Expect(WordsContain(WordsAt(4u, 20u), DisplayWords::kWordHalb),
+    clock.SetMode(Clock::ModeType::kWessi);
+    Expect(WordsContain(WordsAt(4u, 20u), DisplayWords::WordIdType::kHalb),
            "Wessi counts ten before half five");
-    Expect(WordsContain(WordsAt(4u, 20u), DisplayWords::kWordVor),
+    Expect(WordsContain(WordsAt(4u, 20u), DisplayWords::WordIdType::kVor),
            "which is a before");
 
     /* Twenty to five, the mirror of it. */
-    clock.SetMode(Clock::kModeRheinRuhr);
-    Expect(WordsContain(WordsAt(4u, 40u), DisplayWords::kWordVor),
+    clock.SetMode(Clock::ModeType::kRheinRuhr);
+    Expect(WordsContain(WordsAt(4u, 40u), DisplayWords::WordIdType::kVor),
            "Rhein-Ruhr counts twenty to the hour");
-    clock.SetMode(Clock::kModeWessi);
-    Expect(WordsContain(WordsAt(4u, 40u), DisplayWords::kWordHalb),
+    clock.SetMode(Clock::ModeType::kWessi);
+    Expect(WordsContain(WordsAt(4u, 40u), DisplayWords::WordIdType::kHalb),
            "Wessi counts ten past half five");
-    Expect(WordsContain(WordsAt(4u, 40u), DisplayWords::kWordNach),
+    Expect(WordsContain(WordsAt(4u, 40u), DisplayWords::WordIdType::kNach),
            "which is a past");
 
     /* And what none of them differ in: the full hour and the half hour always say "it is".
        Whether the times between them do is the one thing about the wording that is a
        setting, so both of its answers are asked here rather than whichever one the build
        happens to carry. */
-    clock.SetMode(Clock::kModeWessi);
+    clock.SetMode(Clock::ModeType::kWessi);
     const bool show_it_is_permanently_before = clock.GetShowItIsPermanently();
 
     clock.SetShowItIsPermanently(false);
@@ -99,7 +99,7 @@ void TestRegionalWordings()
 
     clock.SetShowItIsPermanently(show_it_is_permanently_before);
 
-    clock.SetMode(Clock::kModeWessi);
+    clock.SetMode(Clock::ModeType::kWessi);
 }
 
 /* The premise of driving the display off the word set instead of off the minute: a
@@ -107,7 +107,7 @@ void TestRegionalWordings()
    over the whole day rather than at a few sample times. */
 void TestWordsChangeOnFiveMinuteStepsOnly()
 {
-    Clock::GetInstance().SetMode(Clock::kModeWessi);
+    Clock::GetInstance().SetMode(Clock::ModeType::kWessi);
 
     ClockWords previous_words = WordsAt(0u, 0u);
 
@@ -142,14 +142,14 @@ void TestInvalidTimeIsRejected()
 void TestClockModes()
 {
     Clock& clock = Clock::GetInstance();
-    clock.SetMode(Clock::kModeWessi);
+    clock.SetMode(Clock::ModeType::kWessi);
     const ClockWords wessi_words = WordsAt(10u, 15u);
 
-    clock.SetMode(Clock::kModeOssi);
+    clock.SetMode(Clock::ModeType::kOssi);
     Expect(wessi_words != WordsAt(10u, 15u),
            "changing the clock mode must change the words where modes differ");
 
-    clock.SetMode(Clock::kModeWessi);
+    clock.SetMode(Clock::ModeType::kWessi);
     Expect(wessi_words == WordsAt(10u, 15u),
            "the same mode and time must produce the same words again");
 }
@@ -160,25 +160,25 @@ void TestClockModes()
 void TestClockModeStepsThroughEveryWording()
 {
     Clock& clock = Clock::GetInstance();
-    clock.SetMode(Clock::kModeWessi);
+    clock.SetMode(Clock::ModeType::kWessi);
 
-    bool seen[Clock::kModeNumberOfModes]{};
-    for(byte step = 0u; step < Clock::kModeNumberOfModes; step++) {
-        seen[clock.GetMode()] = true;
+    bool seen[Clock::kNumberOfModes]{};
+    for(byte step = 0u; step < Clock::kNumberOfModes; step++) {
+        seen[ToUnderlying(clock.GetMode())] = true;
         clock.NextMode();
     }
 
     bool all_seen = true;
     for(const bool was_seen : seen) { if(!was_seen) { all_seen = false; } }
     Expect(all_seen, "stepping must reach every wording");
-    Expect(clock.GetMode() == Clock::kModeWessi, "and must wrap back to the one it started on");
+    Expect(clock.GetMode() == Clock::ModeType::kWessi, "and must wrap back to the one it started on");
 
     /* The step itself, said once outright: the mode after the last is the first again. */
-    clock.SetMode(Clock::kModeSchwaben);
+    clock.SetMode(Clock::ModeType::kSchwaben);
     clock.NextMode();
-    Expect(clock.GetMode() == Clock::kModeWessi, "the wording after the last must be the first");
+    Expect(clock.GetMode() == Clock::ModeType::kWessi, "the wording after the last must be the first");
 
-    clock.SetMode(Clock::kModeWessi);
+    clock.SetMode(Clock::ModeType::kWessi);
 }
 
 /* The comparison the display update hangs on: it has to notice a difference in each
@@ -195,15 +195,15 @@ void TestClockWordsComparison()
 
     ClockWords different_hour = words;
     ClockWords::HourWordsType hour_words = words.GetHourWords();
-    hour_words[0] = (hour_words[0] == DisplayWords::kWordNone) ? DisplayWords::kWordEs
-                                                            : DisplayWords::kWordNone;
+    hour_words[0] = (hour_words[0] == DisplayWords::WordIdType::kNone) ? DisplayWords::WordIdType::kEs
+                                                            : DisplayWords::WordIdType::kNone;
     different_hour.SetHourWords(hour_words);
     Expect(different_hour != words, "a different hour word must compare unequal");
 
     ClockWords different_minute = words;
     ClockWords::MinutesWordsType minute_words = words.GetMinuteWords();
-    minute_words[0] = (minute_words[0] == DisplayWords::kWordNone) ? DisplayWords::kWordEs
-                                                                : DisplayWords::kWordNone;
+    minute_words[0] = (minute_words[0] == DisplayWords::WordIdType::kNone) ? DisplayWords::WordIdType::kEs
+                                                                : DisplayWords::WordIdType::kNone;
     different_minute.SetMinuteWords(minute_words);
     Expect(different_minute != words, "a different minute word must compare unequal");
 }

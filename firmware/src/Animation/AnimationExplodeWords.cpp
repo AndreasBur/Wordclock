@@ -47,7 +47,7 @@
 ******************************************************************************************************************************************************/
 void AnimationExplodeWords::Init()
 {
-    Animation::Init(kStateIdle);
+    Animation::Init(StateType::kIdle);
     Reset();
 } /* Init */
 
@@ -58,10 +58,10 @@ StdReturnType AnimationExplodeWords::SetTime(byte hour, byte minute)
 {
     StdReturnType return_value{kENotOk};
 
-    if(Clock::GetInstance().GetClockWords(hour, minute, clock_words_table_) == kEOk && state_ == kStateIdle) {
+    if(Clock::GetInstance().GetClockWords(hour, minute, clock_words_table_) == kEOk && state_ == StateType::kIdle) {
         return_value = kEOk;
-        if(SetNextWordToClear() == kEOk) { state_ = kStateClearTime; }
-        else { state_ = kStateSetTime; }
+        if(SetNextWordToClear() == kEOk) { state_ = StateType::kClearTime; }
+        else { state_ = StateType::kSetTime; }
     }
     return return_value;
 } /* SetTime */
@@ -71,8 +71,8 @@ StdReturnType AnimationExplodeWords::SetTime(byte hour, byte minute)
 ******************************************************************************************************************************************************/
 void AnimationExplodeWords::Task()
 {
-    if(state_ == kStateClearTime) ClearTimeTask();
-    else if(state_ == kStateSetTime) SetTimeTask();
+    if(state_ == StateType::kClearTime) ClearTimeTask();
+    else if(state_ == StateType::kSetTime) SetTimeTask();
 } /* Task */
 
 
@@ -85,7 +85,7 @@ void AnimationExplodeWords::Task()
 ******************************************************************************************************************************************************/
 void AnimationExplodeWords::Reset()
 {
-    clock_words_table_.fill(DisplayWords::kWordNone);
+    clock_words_table_.fill(DisplayWords::WordIdType::kNone);
     clock_words_table_index_ = 0u;
     current_word_index_ = Display::GetInstance().ColumnAndRowToIndex(0u, kRowCenter);
     current_word_length_ = 0u;
@@ -104,7 +104,7 @@ void AnimationExplodeWords::ClearTimeTask()
             current_word_index_ = 0u;
             SetWordToSet(clock_words_table_[current_word_index_]);
             SetWordOnDisplay();
-            state_ = kStateSetTime;
+            state_ = StateType::kSetTime;
         }
     }
 } /* ClearTimeTask */
@@ -207,7 +207,7 @@ StdReturnType AnimationExplodeWords::SetNextRowToClear()
 StdReturnType AnimationExplodeWords::SetNextWordToSet()
 {
     for(byte index = clock_words_table_index_ + 1u; index < clock_words_table_.size(); index++) {
-        if(clock_words_table_[index] != DisplayWords::kWordNone) {
+        if(clock_words_table_[index] != DisplayWords::WordIdType::kNone) {
             clock_words_table_index_ = index;
             SetWordToSet(clock_words_table_[clock_words_table_index_]);
             return kEOk;

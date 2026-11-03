@@ -82,14 +82,14 @@ class BH1750
   public:
     using IlluminanceType = uint16_t;
 
-    enum ModeType {
-        kModeNone,
-        kModeContinuousLowResMode = BH1750_CMD_CONTINUOUS_LOW_RES_MODE,
-        kModeContinuousHighResMode = BH1750_CMD_CONTINUOUS_HIGH_RES_MODE,
-        kModeContinuousHighResMode2 = BH1750_CMD_CONTINUOUS_HIGH_RES_MODE_2,
-        kModeOneTimeLowResMode = BH1750_CMD_ONE_TIME_LOW_RES_MODE,
-        kModeOneTimeHighResMode = BH1750_CMD_ONE_TIME_HIGH_RES_MODE,
-        kModeOneTimeHighResMode2 = BH1750_CMD_ONE_TIME_HIGH_RES_MODE_2
+    enum class ModeType {
+        kNone,
+        kContinuousLowResMode = BH1750_CMD_CONTINUOUS_LOW_RES_MODE,
+        kContinuousHighResMode = BH1750_CMD_CONTINUOUS_HIGH_RES_MODE,
+        kContinuousHighResMode2 = BH1750_CMD_CONTINUOUS_HIGH_RES_MODE_2,
+        kOneTimeLowResMode = BH1750_CMD_ONE_TIME_LOW_RES_MODE,
+        kOneTimeHighResMode = BH1750_CMD_ONE_TIME_HIGH_RES_MODE,
+        kOneTimeHighResMode2 = BH1750_CMD_ONE_TIME_HIGH_RES_MODE_2
     };
 
     struct CalibrationValuesType {
@@ -102,7 +102,7 @@ class BH1750
 ******************************************************************************************************************************************************/
   private:
     static constexpr byte kTaskCycle{BH1750_TASK_CYCLE};
-    ModeType mode_{kModeNone};
+    ModeType mode_{ModeType::kNone};
     IlluminanceType illuminance_{BH1750_ILLUMINANCE_MIN_LX_VALUE};
     CalibrationValuesType calibration_values_{BH1750_CALIBRATION_MAX_DEFAULT_LX_VALUE, BH1750_CALIBRATION_MIN_DEFAULT_LX_VALUE};
 
@@ -111,7 +111,7 @@ class BH1750
     void SendModeForOneTimeMode();
     StdReturnType SendCommand(byte);
 
-    StdReturnType SendMode() { return SendCommand(mode_); }
+    StdReturnType SendMode() { return SendCommand(ToUnderlying(mode_)); }
     /* Not static, though nothing in it reads a member: it stands in for the backends the
        clock really runs on, and there the same call reaches a peripheral through instance
        state. A stand-in that answered the check would have a different API from the thing it

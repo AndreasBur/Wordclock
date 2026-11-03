@@ -48,10 +48,10 @@ class StringTools
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-    enum ResultType {
-        kResultOverflow,
-        kResultNoValue,
-        kResultOk
+    enum class ResultType {
+        kOverflow,
+        kNoValue,
+        kOk
     };
       /*
         struct ResultType {
@@ -133,13 +133,13 @@ class StringTools
         position = end - string;
 
         if(string == end) {
-            return kResultNoValue;
+            return ResultType::kNoValue;
         } else if(errno == ERANGE || value_big > std::numeric_limits<Unsigned>::max()) {
             value = std::numeric_limits<Unsigned>::max();
-            return kResultOverflow;
+            return ResultType::kOverflow;
         } else {
             value = static_cast<Unsigned>(value_big);
-            return kResultOk;
+            return ResultType::kOk;
         }
     }
 
@@ -153,14 +153,14 @@ class StringTools
         position = end - string;
 
         if(string == end) {
-            return kResultNoValue;
+            return ResultType::kNoValue;
         } else if(errno == ERANGE) {
             if(value_big > std::numeric_limits<Signed>::max()) { value = std::numeric_limits<Signed>::max(); }
             if(value_big < std::numeric_limits<Signed>::min()) { value = std::numeric_limits<Signed>::min(); }
-            return kResultOverflow;
+            return ResultType::kOverflow;
         } else {
             value = static_cast<Signed>(value_big);
-            return kResultOk;
+            return ResultType::kOk;
         }
     }
 
@@ -173,14 +173,14 @@ class StringTools
         position = end - string;
 
         if(string == end) {
-            return kResultNoValue;
+            return ResultType::kNoValue;
         } else if(errno == ERANGE) {
             if(value_big > std::numeric_limits<Float>::max()) { value = std::numeric_limits<Float>::max(); }
             if(value_big < std::numeric_limits<Float>::min()) { value = std::numeric_limits<Float>::min(); }
-            return kResultOverflow;
+            return ResultType::kOverflow;
         } else {
             value = static_cast<Float>(value_big);
-            return kResultOk;
+            return ResultType::kOk;
         }
     }
 

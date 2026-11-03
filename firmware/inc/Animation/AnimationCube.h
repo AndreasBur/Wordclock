@@ -60,20 +60,20 @@ class AnimationCube : public Animation
         byte row_end;
     };
 
-    enum BorderStateType {
-        kBorderStateMin,
-        kBorderStateMax,
-        kBorderStateBetween
+    enum class BorderStateType {
+        kMin,
+        kMax,
+        kBetween
     };
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    ClockWords::WordsListType clock_words_table_{{DisplayWords::kWordNone}};
+    ClockWords::WordsListType clock_words_table_{{DisplayWords::WordIdType::kNone}};
     BorderType border_{ANIMATION_CUBE_COLUMN_START_MAX_VALUE, ANIMATION_CUBE_COLUMN_END_MIN_VALUE,
       ANIMATION_CUBE_ROW_START_MAX_VALUE, ANIMATION_CUBE_ROW_END_MIN_VALUE};
-    BorderStateType border_state_{kBorderStateMin};
+    BorderStateType border_state_{BorderStateType::kMin};
 
     // functions
     void Reset();
