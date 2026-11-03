@@ -31,6 +31,7 @@
 #include <avr/io.h>
 
 #include "Arduino.h"
+#include "Bit.h"
 
 /******************************************************************************************************************************************************
  *  L O C A L   C O N S T A N T   M A C R O S
@@ -87,7 +88,7 @@ ISR(TCB0_INT_vect)
 ISR(USART1_DRE_vect)
 {
     if(transmit_head == transmit_tail) {
-        ARDUINO_SERIAL_USART.CTRLA &= static_cast<uint8_t>(~USART_DREIE_bm);
+        Bit<uint8_t>::ClearBits(ARDUINO_SERIAL_USART.CTRLA, USART_DREIE_bm);
         return;
     }
 
@@ -197,7 +198,7 @@ void SerialPort::write(char character)
     transmit_buffer[transmit_head] = character;
     transmit_head = next_head;
 
-    ARDUINO_SERIAL_USART.CTRLA |= USART_DREIE_bm;
+    Bit<uint8_t>::SetBits(ARDUINO_SERIAL_USART.CTRLA, USART_DREIE_bm);
 } /* Write */
 
 

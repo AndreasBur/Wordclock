@@ -41,12 +41,24 @@ void TestBitGroups()
 {
     /* in place, the way a register's _gm and _gc are written */
     Expect(Bit<uint8_t>::ReadBitGroup(0b10110110u, 0b00001110u) == 0b00000110u, "a group read in place keeps its position");
-    Expect(Bit<uint8_t>::WriteBitGroup(0b10110110u, 0b00001110u, 0b00001000u) == 0b10111000u,
-           "a group written in place leaves the bits outside the mask alone");
-    Expect(Bit<uint8_t>::WriteBitGroup(0b00000000u, 0b00001110u, 0b11111111u) == 0b00001110u,
-           "and a value wider than the mask does not spill over it");
-
     Expect(Bit<uint8_t>::ReadBitGroup(0b10100000u, 0b111u, 5u) == 0b101u, "a group given unshifted comes back shifted down");
+}
+
+/* What the AVR's registers are changed through. A volatile byte stands in for one: the
+   functions take it by reference, which is the whole of what they add over the value forms. */
+void TestBitsChangedInPlace()
+{
+    volatile uint8_t target{0b10110110u};
+
+    Bit<uint8_t>::WriteBitGroup(target, 0b00001110u, 0b00001000u);
+    Expect(target == 0b10111000u, "a group written in place leaves the bits outside the mask alone");
+    Bit<uint8_t>::WriteBitGroup(target, 0b00001110u, 0b11111111u);
+    Expect(target == 0b10111110u, "and a value wider than the mask does not spill over it");
+
+    Bit<uint8_t>::ClearBits(target, 0b10000010u);
+    Expect(target == 0b00111100u, "clearing takes exactly the bits of the mask");
+    Bit<uint8_t>::SetBits(target, 0b10000001u);
+    Expect(target == 0b10111101u, "and setting adds them without touching the rest");
 }
 
 void TestHeldBits()

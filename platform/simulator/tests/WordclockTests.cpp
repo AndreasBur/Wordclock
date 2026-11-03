@@ -38,6 +38,7 @@ int main()
     TestSingleBits();
     TestBitGroups();
     TestHeldBits();
+    TestBitsChangedInPlace();
     TestColourDimmingAcrossByteRange();
     TestGammaCorrectionCurve();
     TestSnakeLifetime();

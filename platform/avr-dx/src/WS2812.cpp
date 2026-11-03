@@ -21,6 +21,7 @@
 
 #include "Arduino.h"
 #include "WS2812.h"
+#include "Bit.h"
 
 /******************************************************************************************************************************************************
  *  L O C A L   C O N S T A N T   M A C R O S
@@ -75,7 +76,7 @@ ISR(USART0_DRE_vect)
     if(frame_position >= frame_length) {
         /* Disarmed rather than left to fire on an empty frame; the transmitter counts as
            busy until the shift register has drained, which STATUS reports. */
-        USART0.CTRLA &= static_cast<uint8_t>(~USART_DREIE_bm);
+        Bit<uint8_t>::ClearBits(USART0.CTRLA, USART_DREIE_bm);
         return;
     }
 
@@ -238,7 +239,7 @@ StdReturnType WS2812::Send(const byte* frame, uint16_t length)
     /* Cleared by hand, because it is what IsBusy() reads to tell a drained shift register
        from one that never started. */
     USART0.STATUS = USART_TXCIF_bm;
-    USART0.CTRLA |= USART_DREIE_bm;
+    Bit<uint8_t>::SetBits(USART0.CTRLA, USART_DREIE_bm);
 
     return kEOk;
 } /* Send */
