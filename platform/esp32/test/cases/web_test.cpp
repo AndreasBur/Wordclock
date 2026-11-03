@@ -307,9 +307,9 @@ int main()
 
     /* the display frame */
     WebInterface& web = WebInterface::GetInstance();
-    const unsigned interval = WEB_FRONTEND_FRAME_INTERVAL_TICKS;
-    auto run_interval = [&web, interval](unsigned count) {
-        for(unsigned tick = 0u; tick < (count * interval); tick++) { web.BroadcastFrame(); }
+    constexpr unsigned kInterval{WEB_FRONTEND_FRAME_INTERVAL_TICKS};
+    auto run_interval = [&web](unsigned count) {
+        for(unsigned tick = 0u; tick < (count * kInterval); tick++) { web.BroadcastFrame(); }
     };
 
     /* The handshake above counted as a client arriving, so one frame is already owed. Drain
@@ -331,7 +331,7 @@ int main()
         Check(sent_binary[0].size() == 110u * 3u, "the frame is 110 * 3 bytes");
         Check((frame[0] == 20u) && (frame[1] == 10u) && (frame[2] == 30u),
               "the frame carries green, red, blue like the strip");
-        printf("   frame: %zu bytes, one per %u ticks\n", sent_binary[0].size(), interval);
+        printf("   frame: %zu bytes, one per %u ticks\n", sent_binary[0].size(), kInterval);
     }
 
     sent_binary.clear();
@@ -371,7 +371,7 @@ int main()
     /* Changed on every tick, and still one frame per interval rather than one per tick. */
     sent_binary.clear();
     sent_binary_to.clear();
-    for(unsigned tick = 0u; tick < (4u * interval); tick++) {
+    for(unsigned tick = 0u; tick < (4u * kInterval); tick++) {
         Pixels::GetInstance().SetPixel(1u, static_cast<byte>(tick + 1u), 0u, 0u);
         web.BroadcastFrame();
     }

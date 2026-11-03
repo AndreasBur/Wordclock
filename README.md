@@ -179,7 +179,7 @@ good at different things:
 
 | Job | What it does |
 |-----|--------------|
-| clang-tidy | Over the firmware core and the simulator backend, seeing exactly what the compiler sees through `compile_commands.json`. Which checks and why the others are off is in [`.clang-tidy`](.clang-tidy) |
+| clang-tidy | Over the firmware core and the simulator backend, seeing exactly what the compiler sees through `compile_commands.json`. Which checks and why the others are off is in [`.clang-tidy`](.clang-tidy). The names alone are also checked in every test: the simulator's, and the backends' host tests through the database their `run.sh compiledb` writes |
 | cppcheck | Parses the tree by itself, which is what reaches the template instantiations and container bounds the clang checks do not follow. Its two suppressions and their reasons are in [`.cppcheck-suppressions`](.cppcheck-suppressions) |
 
 cppcheck reads `firmware/` only: without wxWidgets' own headers it stops at
@@ -193,6 +193,9 @@ that need a configured build directory rather than a built one:
 ```bash
 cmake -S . -B build -G Ninja -DPLATFORM=simulator -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 run-clang-tidy -p build -quiet 'firmware/|platform/simulator/src'
+run-clang-tidy -p build -quiet -checks='-*,readability-identifier-naming' 'platform/simulator/(tests|Wordclock)'
+platform/esp32/test/run.sh compiledb    # and the same for rp2350
+run-clang-tidy -p platform/esp32/.pio/host-tests -quiet -checks='-*,readability-identifier-naming' 'platform/'
 cppcheck --enable=warning,portability --std=c++17 --inline-suppr \
     --suppressions-list=.cppcheck-suppressions \
     $(find firmware/inc -type d | sed 's/^/-I/') \

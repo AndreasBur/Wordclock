@@ -10,6 +10,7 @@
 #
 #   test/run.sh              build and run the tests
 #   test/run.sh clean        throw the object cache away
+#   test/run.sh compiledb    write the cache's compile_commands.json and stop
 #
 # There is no `serve` here, and there is none in the ESP32's harness either any more: the
 # pages are shared and the simulator serves them itself, out of the same WebFrontend, with no
@@ -171,9 +172,33 @@ link() {   # name, then the sources that belong to it
     g++ "${FLAGS[@]}" -o "$WORK/$name" "${objects[@]}"
 }
 
-compileAll "${CORE[@]}" "${BACKEND[@]}" "${SHARED[@]}" "${WEB[@]}" \
-           "$TEST_DIR/cases/frame_test.cpp" "$SHARED_TEST_DIR/cases/serial_test.cpp" "$SHARED_TEST_DIR/cases/ds3231_test.cpp" \
-           "$TEST_DIR/cases/web_test.cpp" "$TEST_DIR/stubs/pio_stubs.cpp"
+# What every source is compiled with, written down as a compile database: no other build
+# compiles the host tests, so this is the only way clang-tidy can read them - the naming
+# check in static-analysis.yml does, through `run.sh compiledb`. Written on every run, as it
+# costs nothing, so that a local clang-tidy finds it too. Through python rather than printf:
+# the core's Arduino.h is named in a define that carries its own quotes.
+writeCompileCommands() {
+    python3 - "$ROOT" "$CACHE/compile_commands.json" "${#FLAGS[@]}" "${FLAGS[@]}" "${INCLUDES[@]}" -- "$@" <<'PYTHON'
+import json, sys
+root, out, count, rest = sys.argv[1], sys.argv[2], int(sys.argv[3]), sys.argv[4:]
+split = rest.index('--')
+arguments, sources = rest[:split], rest[split + 1:]
+json.dump([{'directory': root, 'file': source, 'arguments': ['g++'] + arguments + ['-c', source]}
+           for source in sources], open(out, 'w'), indent=1)
+PYTHON
+}
+
+SOURCES=("${CORE[@]}" "${BACKEND[@]}" "${SHARED[@]}" "${WEB[@]}"
+         "$TEST_DIR/cases/frame_test.cpp" "$SHARED_TEST_DIR/cases/serial_test.cpp" "$SHARED_TEST_DIR/cases/ds3231_test.cpp"
+         "$TEST_DIR/cases/web_test.cpp" "$TEST_DIR/stubs/pio_stubs.cpp")
+
+writeCompileCommands "${SOURCES[@]}"
+if [ "${1:-}" = "compiledb" ]; then
+    echo "compile database written to ${CACHE#"$ROOT"/}/compile_commands.json"
+    exit
+fi
+
+compileAll "${SOURCES[@]}"
 
 # frame_test brings its own PIO and DMA calls, because it keeps the frame that was handed
 # over. It still needs WordclockSerial, which Pixels reports a failed driver through.
