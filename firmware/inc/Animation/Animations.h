@@ -81,148 +81,148 @@ class Animations
 ******************************************************************************************************************************************************/
   public:
     enum StateType {
-        STATE_NONE,
-        STATE_IDLE,
-        STATE_PENDING
+        kStateNone,
+        kStateIdle,
+        kStatePending
     };
   
     enum AnimationIdType {
-        ANIMATION_ID_NONE,
+        kAnimationIdNone,
 # if(ANIMATIONS_SUPPORT_CURSOR == STD_ON)
-        ANIMATION_ID_CURSOR,
+        kAnimationIdCursor,
 # endif
 # if(ANIMATIONS_SUPPORT_TELETYPE == STD_ON)
-        ANIMATION_ID_TELETYPE,
+        kAnimationIdTeletype,
 # endif
 # if(ANIMATIONS_SUPPORT_DROP == STD_ON)
-        ANIMATION_ID_DROP,
+        kAnimationIdDrop,
 # endif
 # if(ANIMATIONS_SUPPORT_SHIFT == STD_ON)
-        ANIMATION_ID_SHIFT,
+        kAnimationIdShift,
 # endif
 # if(ANIMATIONS_SUPPORT_FADE == STD_ON)
-        ANIMATION_ID_FADE,
+        kAnimationIdFade,
 # endif
 # if(ANIMATIONS_SUPPORT_SNAKE == STD_ON)
-        ANIMATION_ID_SNAKE,
+        kAnimationIdSnake,
 # endif
 # if(ANIMATIONS_SUPPORT_WIPE == STD_ON)
-        ANIMATION_ID_WIPE,
+        kAnimationIdWipe,
 # endif
 # if(ANIMATIONS_SUPPORT_CUBE == STD_ON)
-        ANIMATION_ID_CUBE,
+        kAnimationIdCube,
 # endif
 # if(ANIMATIONS_SUPPORT_FLICKER == STD_ON)
-        ANIMATION_ID_FLICKER,
+        kAnimationIdFlicker,
 # endif
 # if(ANIMATIONS_SUPPORT_SQUEEZE == STD_ON)
-        ANIMATION_ID_SQUEEZE,
+        kAnimationIdSqueeze,
 # endif
 # if(ANIMATIONS_SUPPORT_EXPLODE_PIXELS == STD_ON)
-        ANIMATION_ID_EXPLODE_PIXELS,
+        kAnimationIdExplodePixels,
 # endif
 # if(ANIMATIONS_SUPPORT_EXPLODE_WORDS == STD_ON)
-        ANIMATION_ID_EXPLODE_WORDS,
+        kAnimationIdExplodeWords,
 # endif
 # if(ANIMATIONS_SUPPORT_MATRIX == STD_ON)
-        ANIMATION_ID_MATRIX,
+        kAnimationIdMatrix,
 # endif
 # if(ANIMATIONS_SUPPORT_ROLL == STD_ON)
-        ANIMATION_ID_ROLL,
+        kAnimationIdRoll,
 # endif
 # if(ANIMATIONS_SUPPORT_COLLAPSE == STD_ON)
-        ANIMATION_ID_COLLAPSE,
+        kAnimationIdCollapse,
 # endif
-        ANIMATION_ID_NUMBER_OF_ANIMATIONS
+        kAnimationIdNumberOfAnimations
     };
 
-    /* Which animation runs on a word change. Only MODE_FIXED uses the selected
+    /* Which animation runs on a word change. Only kModeFixed uses the selected
        animation, the others pick one themselves, which is why selecting an animation
        and selecting a strategy are two separate settings. */
     enum ModeType {
-        MODE_FIXED,
-        MODE_RANDOM,
-        MODE_SEQUENCE,
-        MODE_NUMBER_OF_MODES
+        kModeFixed,
+        kModeRandom,
+        kModeSequence,
+        kModeNumberOfModes
     };
 
     union AnimationsType {
 # if(ANIMATIONS_SUPPORT_CURSOR == STD_ON)
-        AnimationCursor Cursor;
+        AnimationCursor cursor;
 # endif
 # if(ANIMATIONS_SUPPORT_TELETYPE == STD_ON)
-        AnimationTeletype Teletype;
+        AnimationTeletype teletype;
 # endif
 # if(ANIMATIONS_SUPPORT_DROP == STD_ON)
-        AnimationDrop Drop;
+        AnimationDrop drop;
 # endif
 # if(ANIMATIONS_SUPPORT_SHIFT == STD_ON)
-        AnimationShift Shift;
+        AnimationShift shift;
 # endif
 # if(ANIMATIONS_SUPPORT_WIPE == STD_ON)
-        AnimationWipe Wipe;
+        AnimationWipe wipe;
 # endif
 # if(ANIMATIONS_SUPPORT_SNAKE == STD_ON)
-        AnimationSnake Snake;
+        AnimationSnake snake;
 # endif
 # if(ANIMATIONS_SUPPORT_FADE == STD_ON)
-        AnimationFade Fade;
+        AnimationFade fade;
 # endif
 # if(ANIMATIONS_SUPPORT_CUBE == STD_ON)
-        AnimationCube Cube;
+        AnimationCube cube;
 # endif
 # if(ANIMATIONS_SUPPORT_FLICKER == STD_ON)
-        AnimationFlicker Flicker;
+        AnimationFlicker flicker;
 # endif
 # if(ANIMATIONS_SUPPORT_SQUEEZE == STD_ON)
-        AnimationSqueeze Squeeze;
+        AnimationSqueeze squeeze;
 # endif
 # if(ANIMATIONS_SUPPORT_EXPLODE_PIXELS == STD_ON)
-        AnimationExplodePixels ExplodePixels;
+        AnimationExplodePixels explode_pixels;
 # endif
 # if(ANIMATIONS_SUPPORT_EXPLODE_WORDS == STD_ON)
-        AnimationExplodeWords ExplodeWords;
+        AnimationExplodeWords explode_words;
 # endif
 # if(ANIMATIONS_SUPPORT_MATRIX == STD_ON)
-        AnimationMatrix Matrix;
+        AnimationMatrix matrix;
 # endif
 # if(ANIMATIONS_SUPPORT_ROLL == STD_ON)
-        AnimationRoll Roll;
+        AnimationRoll roll;
 # endif
 # if(ANIMATIONS_SUPPORT_COLLAPSE == STD_ON)
-        AnimationCollapse Collapse;
+        AnimationCollapse collapse;
 # endif
         constexpr AnimationsType() :
 # if(ANIMATIONS_SUPPORT_CURSOR == STD_ON)
-        Cursor()
+        cursor()
 # elif(ANIMATIONS_SUPPORT_TELETYPE == STD_ON)
-        Teletype()
+        teletype()
 # elif(ANIMATIONS_SUPPORT_DROP == STD_ON)
-        Drop()
+        drop()
 # elif(ANIMATIONS_SUPPORT_SHIFT == STD_ON)
-        Shift()
+        shift()
 # elif(ANIMATIONS_SUPPORT_WIPE == STD_ON)
-        Wipe()
+        wipe()
 # elif(ANIMATIONS_SUPPORT_SNAKE == STD_ON)
-        Snake()
+        snake()
 # elif(ANIMATIONS_SUPPORT_FADE == STD_ON)
-        Fade()
+        fade()
 # elif(ANIMATIONS_SUPPORT_CUBE == STD_ON)
-        Cube()
+        cube()
 # elif(ANIMATIONS_SUPPORT_FLICKER == STD_ON)
-        Flicker()
+        flicker()
 # elif(ANIMATIONS_SUPPORT_SQUEEZE == STD_ON)
-        Squeeze()
+        squeeze()
 # elif(ANIMATIONS_SUPPORT_EXPLODE_PIXELS == STD_ON)
-        ExplodePixels()
+        explode_pixels()
 # elif(ANIMATIONS_SUPPORT_EXPLODE_WORDS == STD_ON)
-        ExplodeWords()
+        explode_words()
 # elif(ANIMATIONS_SUPPORT_MATRIX == STD_ON)
-        Matrix()
+        matrix()
 # elif(ANIMATIONS_SUPPORT_ROLL == STD_ON)
-        Roll()
+        roll()
 # elif(ANIMATIONS_SUPPORT_COLLAPSE == STD_ON)
-        Collapse()
+        collapse()
 # endif
 { }
         ~AnimationsType() { }
@@ -232,141 +232,141 @@ class Animations
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    static constexpr byte TaskCycleInitValue{ANIMATIONS_TASK_CYCLE_INIT_VALUE};
+    static constexpr byte kTaskCycleInitValue{ANIMATIONS_TASK_CYCLE_INIT_VALUE};
 
-    /* ANIMATION_ID_NONE means no animation at all, so the ids a mode may pick start
+    /* kAnimationIdNone means no animation at all, so the ids a mode may pick start
        behind it */
-    static constexpr byte FirstAnimation{ANIMATION_ID_NONE + 1u};
-    static constexpr byte NumberOfAnimations{ANIMATION_ID_NUMBER_OF_ANIMATIONS - FirstAnimation};
-    /* odd factor of the hash in calcRandomAnimation(), see there */
-    static constexpr byte RandomHashFactor{181u};
+    static constexpr byte kFirstAnimation{kAnimationIdNone + 1u};
+    static constexpr byte kNumberOfAnimations{kAnimationIdNumberOfAnimations - kFirstAnimation};
+    /* odd factor of the hash in CalcRandomAnimation(), see there */
+    static constexpr byte kRandomHashFactor{181u};
 
-    static_assert(ANIMATION_ID_NUMBER_OF_ANIMATIONS <= 16u,
+    static_assert(kAnimationIdNumberOfAnimations <= 16u,
                   "Animations: too many animations for the favourites bit mask, please widen it");
 
-    /* one bit per animation id, bit 0 of ANIMATION_ID_NONE stays unused.
+    /* one bit per animation id, bit 0 of kAnimationIdNone stays unused.
        Shifted in an unsigned long rather than an unsigned int: there are sixteen
        animations, and on a target whose int is 16 bits wide - every AVR - 1u shifted by
        sixteen is undefined and the mask comes out empty, which silently leaves no
        animation a favourite. */
-    static constexpr uint16_t AllFavourites{
-        static_cast<uint16_t>(((1uL << ANIMATION_ID_NUMBER_OF_ANIMATIONS) - 1uL) & ~((1uL << FirstAnimation) - 1uL))
+    static constexpr uint16_t kAllFavourites{
+        static_cast<uint16_t>(((1uL << kAnimationIdNumberOfAnimations) - 1uL) & ~((1uL << kFirstAnimation) - 1uL))
     };
 
-    std::array<byte, ANIMATION_ID_NUMBER_OF_ANIMATIONS> TaskCycles;
-    /* what the user selected, used as it is in MODE_FIXED */
-    AnimationIdType AnimationId{ANIMATION_ID_NONE};
-    /* what is really running, equal to AnimationId unless a mode selected something */
-    AnimationIdType CurrentAnimationId{ANIMATION_ID_NONE};
-    ModeType Mode{MODE_FIXED};
+    std::array<byte, kAnimationIdNumberOfAnimations> task_cycles_;
+    /* what the user selected, used as it is in kModeFixed */
+    AnimationIdType animation_id_{kAnimationIdNone};
+    /* what is really running, equal to animation_id_ unless a mode selected something */
+    AnimationIdType current_animation_id_{kAnimationIdNone};
+    ModeType mode_{kModeFixed};
     /* animations the selecting modes may pick, all of them until told otherwise */
-    uint16_t Favourites{AllFavourites};
-    uint16_t RandomState{0u};
-    AnimationsType AnimationsRaw;
+    uint16_t favourites_{kAllFavourites};
+    uint16_t random_state_{0u};
+    AnimationsType animations_raw_;
 
     // functions
-    Animations() : AnimationsRaw() { TaskCycles.fill(TaskCycleInitValue); }
+    Animations() : animations_raw_() { task_cycles_.fill(kTaskCycleInitValue); }
     ~Animations() { }
 
-    Animation::StateType getStateOfCurrentAnimation() const;
-    void taskOfCurrentAnimation();
-    StdReturnType showOfCurrentAnimation() const;
-    void initCurrentAnimation();
-    void selectAnimationOfMode();
-    AnimationIdType calcRandomAnimation();
-    AnimationIdType calcNextAnimation() const;
-    byte numberOfFavourites() const;
+    Animation::StateType GetStateOfCurrentAnimation() const;
+    void TaskOfCurrentAnimation();
+    StdReturnType ShowOfCurrentAnimation() const;
+    void InitCurrentAnimation();
+    void SelectAnimationOfMode();
+    AnimationIdType CalcRandomAnimation();
+    AnimationIdType CalcNextAnimation() const;
+    byte NumberOfFavourites() const;
 
-    /* The round a knob walks, which is not the one calcNextAnimation() walks: that one
-       skips everything but the favourites, because MODE_SEQUENCE picks among those.
+    /* The round a knob walks, which is not the one CalcNextAnimation() walks: that one
+       skips everything but the favourites, because kModeSequence picks among those.
        Stepping the selection by hand may reach every animation, favourite or not. */
-    static constexpr AnimationIdType toNextAnimation(AnimationIdType sAnimationId) {
-        return (sAnimationId + 1u >= ANIMATION_ID_NUMBER_OF_ANIMATIONS)
-             ? ANIMATION_ID_NONE : static_cast<AnimationIdType>(sAnimationId + 1u);
+    static constexpr AnimationIdType ToNextAnimation(AnimationIdType animation_id) {
+        return (animation_id + 1u >= kAnimationIdNumberOfAnimations)
+             ? kAnimationIdNone : static_cast<AnimationIdType>(animation_id + 1u);
     }
-    static constexpr AnimationIdType toPreviousAnimation(AnimationIdType sAnimationId) {
-        return (sAnimationId == ANIMATION_ID_NONE)
-             ? static_cast<AnimationIdType>(ANIMATION_ID_NUMBER_OF_ANIMATIONS - 1u)
-             : static_cast<AnimationIdType>(sAnimationId - 1u);
+    static constexpr AnimationIdType ToPreviousAnimation(AnimationIdType animation_id) {
+        return (animation_id == kAnimationIdNone)
+             ? static_cast<AnimationIdType>(kAnimationIdNumberOfAnimations - 1u)
+             : static_cast<AnimationIdType>(animation_id - 1u);
     }
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    static Animations& getInstance() {
-        static Animations singletonInstance;
-        return singletonInstance;
+    static Animations& GetInstance() {
+        static Animations singleton_instance;
+        return singleton_instance;
     }
 
     // get methods
-    StateType getState() const;
-    AnimationIdType getAnimation() const { return AnimationId; }
-    AnimationIdType getCurrentAnimation() const { return CurrentAnimationId; }
-    ModeType getMode() const { return Mode; }
-    bool isFavourite(AnimationIdType sAnimationId) const {
-        return (Favourites & static_cast<uint16_t>(1u << sAnimationId)) != 0u;
+    StateType GetState() const;
+    AnimationIdType GetAnimation() const { return animation_id_; }
+    AnimationIdType GetCurrentAnimation() const { return current_animation_id_; }
+    ModeType GetMode() const { return mode_; }
+    bool IsFavourite(AnimationIdType animation_id) const {
+        return (favourites_ & static_cast<uint16_t>(1u << animation_id)) != 0u;
     }
 
-    byte getTaskCycle(AnimationIdType sAnimationId) const { return TaskCycles[sAnimationId]; }
+    byte GetTaskCycle(AnimationIdType animation_id) const { return task_cycles_[animation_id]; }
     /* the cycle of the running animation, so every animation keeps its own speed while
        a meta animation switches between them */
-    byte getTaskCycle() const { return TaskCycles[CurrentAnimationId]; }
+    byte GetTaskCycle() const { return task_cycles_[current_animation_id_]; }
 
     // set methods
-    StdReturnType setTaskCycle(AnimationIdType, byte);
-    StdReturnType setAnimation(AnimationIdType);
-    StdReturnType setMode(ModeType);
-    StdReturnType setFavourite(AnimationIdType sAnimationId, bool Favourite) {
-        /* ANIMATION_ID_NONE is no animation and cannot be a favourite */
-        if(sAnimationId < FirstAnimation || !isAnimationValid(sAnimationId)) { return E_NOT_OK; }
+    StdReturnType SetTaskCycle(AnimationIdType, byte);
+    StdReturnType SetAnimation(AnimationIdType);
+    StdReturnType SetMode(ModeType);
+    StdReturnType SetFavourite(AnimationIdType animation_id, bool favourite) {
+        /* kAnimationIdNone is no animation and cannot be a favourite */
+        if(animation_id < kFirstAnimation || !IsAnimationValid(animation_id)) { return kENotOk; }
         /* the last favourite may not be dropped, the selecting modes would be left
            with nothing to pick */
-        if(!Favourite && isFavourite(sAnimationId) && numberOfFavourites() <= 1u) { return E_NOT_OK; }
+        if(!favourite && IsFavourite(animation_id) && NumberOfFavourites() <= 1u) { return kENotOk; }
 
-        if(Favourite) { Favourites |= static_cast<uint16_t>(1u << sAnimationId); }
-        else { Favourites &= static_cast<uint16_t>(~(1u << sAnimationId)); }
-        return E_OK;
+        if(favourite) { favourites_ |= static_cast<uint16_t>(1u << animation_id); }
+        else { favourites_ &= static_cast<uint16_t>(~(1u << animation_id)); }
+        return kEOk;
     }
 
     // methods
     /* The same state the constructor leaves behind: every speed at its initial cycle,
        every animation a favourite again, and nothing selected. Written out here rather
        than by constructing a second instance, which a singleton cannot do. */
-    void resetToDefaults() {
-        TaskCycles.fill(TaskCycleInitValue);
-        Favourites = AllFavourites;
+    void ResetToDefaults() {
+        task_cycles_.fill(kTaskCycleInitValue);
+        favourites_ = kAllFavourites;
         /* Both are valid by construction, so neither answer can say anything a caller of
-           resetToDefaults() could act on. */
-        setAnimation(ANIMATION_ID_NONE);
-        setMode(MODE_FIXED);
+           ResetToDefaults() could act on. */
+        SetAnimation(kAnimationIdNone);
+        SetMode(kModeFixed);
     }
 
     /* One animation further and one back, wrapping at both ends, for a control that has
-       no list to pick from. ANIMATION_ID_NONE is part of that round rather than skipped:
+       no list to pick from. kAnimationIdNone is part of that round rather than skipped:
        "no animation" is a setting like any other, and a knob is the only way somebody
        without a phone gets back to it.
 
        They step the selection, so they mean what "9 -A<id>" means and not what
-       RPC_ID_ANIMATION_START means - the animation runs at the next word change, and in
-       a mode that picks its own the selection is what MODE_FIXED would return to. */
-    void nextAnimation() { setAnimation(toNextAnimation(AnimationId)); }
-    void previousAnimation() { setAnimation(toPreviousAnimation(AnimationId)); }
+       kRpcIdAnimationStart means - the animation runs at the next word change, and in
+       a mode that picks its own the selection is what kModeFixed would return to. */
+    void NextAnimation() { SetAnimation(ToNextAnimation(animation_id_)); }
+    void PreviousAnimation() { SetAnimation(ToPreviousAnimation(animation_id_)); }
 
-    void task(bool=false);
-    StdReturnType show() const;
-    static bool isAnimationValid(AnimationIdType AnimationId) { return AnimationId < ANIMATION_ID_NUMBER_OF_ANIMATIONS; }
-    static bool isModeValid(ModeType sMode) { return sMode < MODE_NUMBER_OF_MODES; }
-    StdReturnType setTime(byte, byte);
+    void Task(bool=false);
+    StdReturnType Show() const;
+    static bool IsAnimationValid(AnimationIdType animation_id) { return animation_id < kAnimationIdNumberOfAnimations; }
+    static bool IsModeValid(ModeType mode) { return mode < kModeNumberOfModes; }
+    StdReturnType SetTime(byte, byte);
 
     /* Ends a running animation by initialising it, which is what every animation's own
-       init() already means: back to idle, and its progress reset. The selection and the
+       Init() already means: back to idle, and its progress reset. The selection and the
        mode stay as they are, so the next word change animates again.
 
        Whatever half-finished frame the animation left is still on the display, so the
-       caller has to draw something over it - DisplayManager::abortAnimation() is the
+       caller has to draw something over it - DisplayManager::AbortAnimation() is the
        entry point that does both. */
-    void abort() { initCurrentAnimation(); }
+    void Abort() { InitCurrentAnimation(); }
 
 };
 

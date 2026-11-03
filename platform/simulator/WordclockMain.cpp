@@ -6,32 +6,32 @@
 
 namespace {
 
-ClockDateTime getSystemDateTime()
+ClockDateTime GetSystemDateTime()
 {
-    wxDateTime wxDT = wxDateTime::Now();
-    ClockDateTime dateTime;
+    wxDateTime wx_dt = wxDateTime::Now();
+    ClockDateTime date_time;
 
-    dateTime.setDateYear(wxDT.GetYear());
-    dateTime.setDateMonth(wxDT.GetMonth() + 1);   // wxDateTime months are 0-based (Jan=0); ClockDate expects 1-12
-    dateTime.setDateDay(wxDT.GetDay());
-    dateTime.setTimeHour(wxDT.GetHour());
-    dateTime.setTimeMinute(wxDT.GetMinute());
-    dateTime.setTimeSecond(wxDT.GetSecond());
-    return dateTime;
+    date_time.SetDateYear(wx_dt.GetYear());
+    date_time.SetDateMonth(wx_dt.GetMonth() + 1);   // wxDateTime months are 0-based (Jan=0); ClockDate expects 1-12
+    date_time.SetDateDay(wx_dt.GetDay());
+    date_time.SetTimeHour(wx_dt.GetHour());
+    date_time.SetTimeMinute(wx_dt.GetMinute());
+    date_time.SetTimeSecond(wx_dt.GetSecond());
+    return date_time;
 }
 
 } // namespace
 
 WordclockMain::WordclockMain()
 {
-    RealTimeClock::getInstance().setDateTime(getSystemDateTime());
+    RealTimeClock::GetInstance().SetDateTime(GetSystemDateTime());
     /* Nothing to set up here - there is no port - but the call is made anyway, so that the
        one backend the others are mirrored from shows where it belongs. On hardware it is what
        brings the strip's 5 V up, and it has to come before the data line is claimed. */
-    PowerSwitch::getInstance().init();
+    PowerSwitch::GetInstance().Init();
     /* Before the first task, so the window's first paint already shows the restored
        colour and mode rather than the defaults for a tick. */
-    Persistence::getInstance().load();
+    Persistence::GetInstance().Load();
 }
 
 WordclockMain::~WordclockMain()
@@ -39,8 +39,8 @@ WordclockMain::~WordclockMain()
 
 }
 
-void WordclockMain::task()
+void WordclockMain::Task()
 {
-    RealTimeClock::getInstance().task();
-    wcScheduler.task();
+    RealTimeClock::GetInstance().Task();
+    wc_scheduler_.Task();
 }

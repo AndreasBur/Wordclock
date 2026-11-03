@@ -65,65 +65,65 @@ class RealTimeClock
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    ClockDateTime DateTime;
-    std::chrono::steady_clock::time_point LastUpdate{std::chrono::steady_clock::now()};
+    ClockDateTime date_time_;
+    std::chrono::steady_clock::time_point last_update_{std::chrono::steady_clock::now()};
 
     // functions
     RealTimeClock() {}
     ~RealTimeClock() {}
 
-    void updateDateTime(const wxDateTime& Value) {
-        DateTime.setDateYear(Value.GetYear());
-        DateTime.setDateMonth(Value.GetMonth() + 1u);
-        DateTime.setDateDay(Value.GetDay());
-        DateTime.setTimeHour(Value.GetHour());
-        DateTime.setTimeMinute(Value.GetMinute());
-        DateTime.setTimeSecond(Value.GetSecond());
+    void UpdateDateTime(const wxDateTime& value) {
+        date_time_.SetDateYear(value.GetYear());
+        date_time_.SetDateMonth(value.GetMonth() + 1u);
+        date_time_.SetDateDay(value.GetDay());
+        date_time_.SetTimeHour(value.GetHour());
+        date_time_.SetTimeMinute(value.GetMinute());
+        date_time_.SetTimeSecond(value.GetSecond());
     }
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    static RealTimeClock& getInstance() {
-        static RealTimeClock singletonInstance;
-        return singletonInstance;
+    static RealTimeClock& GetInstance() {
+        static RealTimeClock singleton_instance;
+        return singleton_instance;
     }
 
     // get methods
-    ClockDateTime getDateTime() const { return DateTime; }
-    ClockTime getTime() const { return DateTime.getTime(); }
-    ClockDate getDate() const { return DateTime.getDate(); }
+    ClockDateTime GetDateTime() const { return date_time_; }
+    ClockTime GetTime() const { return date_time_.GetTime(); }
+    ClockDate GetDate() const { return date_time_.GetDate(); }
 
     // set methods
-    void setDateTime(ClockDateTime sDateTime) {
-        DateTime = sDateTime;
-        LastUpdate = std::chrono::steady_clock::now();
+    void SetDateTime(ClockDateTime date_time) {
+        date_time_ = date_time;
+        last_update_ = std::chrono::steady_clock::now();
     }
-    void setTime(ClockTime Time) {
-        DateTime.setTime(Time);
-        LastUpdate = std::chrono::steady_clock::now();
+    void SetTime(ClockTime time) {
+        date_time_.SetTime(time);
+        last_update_ = std::chrono::steady_clock::now();
     }
-    void setDate(ClockDate Date) {
-        DateTime.setDate(Date);
-        LastUpdate = std::chrono::steady_clock::now();
+    void SetDate(ClockDate date) {
+        date_time_.SetDate(date);
+        last_update_ = std::chrono::steady_clock::now();
     }
 
     // methods
-    void task() {
+    void Task() {
         const std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
-        const auto elapsedSeconds = std::chrono::duration_cast<std::chrono::seconds>(now - LastUpdate);
-        if(elapsedSeconds.count() == 0) { return; }
+        const auto elapsed_seconds = std::chrono::duration_cast<std::chrono::seconds>(now - last_update_);
+        if(elapsed_seconds.count() == 0) { return; }
 
-        wxDateTime current(DateTime.getDateDay(),
-                             static_cast<wxDateTime::Month>(DateTime.getDateMonth() - 1u),
-                             DateTime.getDateYear(),
-                             DateTime.getTimeHour(),
-                             DateTime.getTimeMinute(),
-                             DateTime.getTimeSecond());
-        current += wxTimeSpan::Seconds(elapsedSeconds.count());
-        updateDateTime(current);
-        LastUpdate += elapsedSeconds;
+        wxDateTime current(date_time_.GetDateDay(),
+                             static_cast<wxDateTime::Month>(date_time_.GetDateMonth() - 1u),
+                             date_time_.GetDateYear(),
+                             date_time_.GetTimeHour(),
+                             date_time_.GetTimeMinute(),
+                             date_time_.GetTimeSecond());
+        current += wxTimeSpan::Seconds(elapsed_seconds.count());
+        UpdateDateTime(current);
+        last_update_ += elapsed_seconds;
     }
 };
 

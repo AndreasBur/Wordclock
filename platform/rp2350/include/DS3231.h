@@ -95,29 +95,29 @@ class DS3231
        and the overlay has to say so. */
     using TemperatureType = int16_t;
 
-    static constexpr TemperatureType TenthsPerDegree{10};
+    static constexpr TemperatureType kTenthsPerDegree{10};
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    static constexpr byte TaskCycle{DS3231_TASK_CYCLE};
-    static constexpr TemperatureType QuartersPerDegree{4};
+    static constexpr byte kTaskCycle{DS3231_TASK_CYCLE};
+    static constexpr TemperatureType kQuartersPerDegree{4};
 
-    TemperatureType Temperature{0};
+    TemperatureType temperature_{0};
     /* Until the chip has answered once there is nothing to show, and the overlay stays
        away rather than showing a zero that looks like a reading. */
-    bool TemperatureValid{false};
-    bool BusStarted{false};
+    bool temperature_valid_{false};
+    bool bus_started_{false};
 
     // functions
-    StdReturnType startBus();
-    StdReturnType readTemperature();
+    StdReturnType StartBus();
+    StdReturnType ReadTemperature();
 
-    static StdReturnType readRegisters(byte Register, byte* Values, byte Length);
-    static StdReturnType writeRegisters(byte Register, const byte* Values, byte Length);
-    static StdReturnType clearOscillatorStopped();
-    static bool hasOscillatorStopped();
+    static StdReturnType ReadRegisters(byte register_address, byte* values, byte length);
+    static StdReturnType WriteRegisters(byte register_address, const byte* values, byte length);
+    static StdReturnType ClearOscillatorStopped();
+    static bool HasOscillatorStopped();
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
@@ -132,61 +132,61 @@ class DS3231
 
        Public because it is the one part of this driver that can be checked without a bus,
        and the assertions below do exactly that. */
-    static constexpr TemperatureType toTenths(int8_t Degrees, byte FractionRegister) {
-        const TemperatureType Quarters = static_cast<TemperatureType>(Degrees * QuartersPerDegree) +
-                                         READ_BIT_GROUP(FractionRegister, DS3231_TEMPERATURE_FRACTION_GM, DS3231_TEMPERATURE_FRACTION_GP);
-        return static_cast<TemperatureType>((Quarters * TenthsPerDegree) / QuartersPerDegree);
+    static constexpr TemperatureType ToTenths(int8_t degrees, byte fraction_register) {
+        const TemperatureType quarters = static_cast<TemperatureType>(degrees * kQuartersPerDegree) +
+                                         READ_BIT_GROUP(fraction_register, DS3231_TEMPERATURE_FRACTION_GM, DS3231_TEMPERATURE_FRACTION_GP);
+        return static_cast<TemperatureType>((quarters * kTenthsPerDegree) / kQuartersPerDegree);
     }
 
     /* The registers hold their fields in BCD, two decimal digits per byte. Public for the
-       same reason as toTenths(): it is checkable without a bus, and the assertions below
+       same reason as ToTenths(): it is checkable without a bus, and the assertions below
        do it. */
-    static constexpr byte fromBcd(byte Value) { return static_cast<byte>(((Value >> 4u) * 10u) + (Value & 0x0Fu)); }
-    static constexpr byte toBcd(byte Value) { return static_cast<byte>(((Value / 10u) << 4u) | (Value % 10u)); }
+    static constexpr byte FromBcd(byte value) { return static_cast<byte>(((value >> 4u) * 10u) + (value & 0x0Fu)); }
+    static constexpr byte ToBcd(byte value) { return static_cast<byte>(((value / 10u) << 4u) | (value % 10u)); }
 
     // get methods
-    static constexpr byte getTaskCycle() { return TaskCycle; }
+    static constexpr byte GetTaskCycle() { return kTaskCycle; }
 
-    /* E_NOT_OK while no reading has arrived yet, which is what a caller has to tell apart
+    /* kENotOk while no reading has arrived yet, which is what a caller has to tell apart
        from a reading of zero degrees. */
-    StdReturnType getTemperature(TemperatureType& sTemperature) const {
-        if(!TemperatureValid) { return E_NOT_OK; }
+    StdReturnType GetTemperature(TemperatureType& temperature) const {
+        if(!temperature_valid_) { return kENotOk; }
 
-        sTemperature = Temperature;
-        return E_OK;
+        temperature = temperature_;
+        return kEOk;
     }
 
-    /* Reads what the chip counted, in UTC. E_NOT_OK when the chip does not answer, when it
+    /* Reads what the chip counted, in UTC. kENotOk when the chip does not answer, when it
        reports that its oscillator stopped - a battery that ran out, so what it counted
        since is nothing - or when the registers do not form a date, which is what an
        unwritten chip and a botched transfer both look like. */
-    StdReturnType getDateTime(ClockDateTime&);
+    StdReturnType GetDateTime(ClockDateTime&);
 
     // set methods
     /* Writes the time to the chip, in UTC, and clears the stopped flag with it: the value
        just written is by definition believable again. */
-    StdReturnType setDateTime(const ClockDateTime&);
+    StdReturnType SetDateTime(const ClockDateTime&);
 
     // methods
-    void task();
+    void Task();
 };
 
 /* The register pair, read off the datasheet's own examples. */
-static_assert(DS3231::TenthsPerDegree == 10, "the conversion below is written in tenths");
+static_assert(DS3231::kTenthsPerDegree == 10, "the conversion below is written in tenths");
 
 /* The datasheet's own two examples, which are the pair that matters: one above zero, and
    one below where the fraction counts upwards from a whole degree more negative than the
    result. Outside the class because a member function cannot be called in a constant
    expression until the class is complete. */
-static_assert(DS3231::toTenths(0x19, 0x40u) == 252, "+25.25 degrees must read as 25.2");
-static_assert(DS3231::toTenths(static_cast<int8_t>(0xFE), 0x80u) == -15, "-1.5 degrees must read as -1.5");
-static_assert(DS3231::toTenths(0, 0x00u) == 0, "zero must stay zero");
+static_assert(DS3231::ToTenths(0x19, 0x40u) == 252, "+25.25 degrees must read as 25.2");
+static_assert(DS3231::ToTenths(static_cast<int8_t>(0xFE), 0x80u) == -15, "-1.5 degrees must read as -1.5");
+static_assert(DS3231::ToTenths(0, 0x00u) == 0, "zero must stay zero");
 
 /* Both ends of what the registers carry, and the round trip in between. */
-static_assert(DS3231::fromBcd(0x59u) == 59u, "the tens digit sits in the upper nibble");
-static_assert(DS3231::toBcd(59u) == 0x59u, "and goes back there");
-static_assert(DS3231::fromBcd(DS3231::toBcd(0u)) == 0u, "zero must round-trip");
-static_assert(DS3231::fromBcd(DS3231::toBcd(99u)) == 99u, "the largest two-digit value must round-trip");
+static_assert(DS3231::FromBcd(0x59u) == 59u, "the tens digit sits in the upper nibble");
+static_assert(DS3231::ToBcd(59u) == 0x59u, "and goes back there");
+static_assert(DS3231::FromBcd(DS3231::ToBcd(0u)) == 0u, "zero must round-trip");
+static_assert(DS3231::FromBcd(DS3231::ToBcd(99u)) == 99u, "the largest two-digit value must round-trip");
 
 #endif // _DS3231_H_
 

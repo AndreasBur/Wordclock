@@ -81,33 +81,33 @@ class WordclockSerial
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    static constexpr size_t LineLength{WORDCLOCK_SERIAL_LINE_LENGTH};
-    static constexpr size_t InjectBufferSize{WORDCLOCK_SERIAL_INJECT_BUFFER_SIZE};
+    static constexpr size_t kLineLength{WORDCLOCK_SERIAL_LINE_LENGTH};
+    static constexpr size_t kInjectBufferSize{WORDCLOCK_SERIAL_INJECT_BUFFER_SIZE};
 
-    static_assert((InjectBufferSize & (InjectBufferSize - 1u)) == 0u,
+    static_assert((kInjectBufferSize & (kInjectBufferSize - 1u)) == 0u,
                   "WordclockSerial: the inject buffer size has to be a power of two");
 
-    char LineBuffer[LineLength]{};
-    size_t LineUsed{0u};
+    char line_buffer_[kLineLength]{};
+    size_t line_used_{0u};
 
-    char InjectBuffer[InjectBufferSize]{};
+    char inject_buffer_[kInjectBufferSize]{};
     /* One producer - the web server's task - and one consumer, the firmware's tick. That
        is what makes two atomic indices enough and a lock unnecessary: each side writes
        only its own index and reads only the other's. esp_http_server serves its handlers
        from a single task, so the one-producer premise holds; a second injecting task
        would break it and would need a mutex here. */
-    std::atomic<size_t> InjectHead{0u};
-    std::atomic<size_t> InjectTail{0u};
+    std::atomic<size_t> inject_head_{0u};
+    std::atomic<size_t> inject_tail_{0u};
 
-    LineSinkType LineSink{nullptr};
+    LineSinkType line_sink_{nullptr};
 
     // functions
-    static constexpr size_t nextIndex(size_t Index) { return (Index + 1u) & (InjectBufferSize - 1u); }
+    static constexpr size_t NextIndex(size_t index) { return (index + 1u) & (kInjectBufferSize - 1u); }
 
-    bool isInjectEmpty() const { return InjectTail.load(std::memory_order_acquire) == InjectHead.load(std::memory_order_relaxed); }
-    char readInjected();
-    void appendToLine(char);
-    void flushLine();
+    bool IsInjectEmpty() const { return inject_tail_.load(std::memory_order_acquire) == inject_head_.load(std::memory_order_relaxed); }
+    char ReadInjected();
+    void AppendToLine(char);
+    void FlushLine();
 
     WordclockSerial() { }
     ~WordclockSerial() { }
@@ -116,43 +116,45 @@ class WordclockSerial
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    static WordclockSerial& getInstance() {
-        static WordclockSerial SingletonInstance;
-        return SingletonInstance;
+    static WordclockSerial& GetInstance() {
+        static WordclockSerial singleton_instance;
+        return singleton_instance;
     }
 
     // methods
-    void begin(unsigned long);
+    /* Here and below, a NOLINT keeps the name Arduino's Serial gives it: the firmware core is
+       written against that API, and this class stands in for it. */
+    void begin(unsigned long); // NOLINT(readability-identifier-naming)
 
     /* Whoever wants the answers registers here. Nothing is registered by default, so the
        firmware runs with the UART alone until a front end asks for them. */
-    void setLineSink(LineSinkType sLineSink) { LineSink = sLineSink; }
+    void SetLineSink(LineSinkType line_sink) { line_sink_ = line_sink; }
 
-    /* Called from another task, one character stream at a time. Returns E_NOT_OK when the
+    /* Called from another task, one character stream at a time. Returns kENotOk when the
        buffer is full, which drops the rest of that command rather than a random middle
        part of it - a half command is worse than a missing one, and the parser would
        answer with an error either way. */
-    StdReturnType inject(const char*, size_t);
+    StdReturnType Inject(const char*, size_t);
 
     // the interface Communication uses
-    int available() const;
-    int read();
+    int available() const; // NOLINT(readability-identifier-naming)
+    int read(); // NOLINT(readability-identifier-naming)
 
-    void println();
-    void print(const char*);
-    void print(int);
-    void println(const char*);
-    void println(int);
-    void print(char);
+    void println(); // NOLINT(readability-identifier-naming)
+    void print(const char*); // NOLINT(readability-identifier-naming)
+    void print(int); // NOLINT(readability-identifier-naming)
+    void println(const char*); // NOLINT(readability-identifier-naming)
+    void println(int); // NOLINT(readability-identifier-naming)
+    void print(char); // NOLINT(readability-identifier-naming)
     /* What F() produces on the target. The simulator's F() is a no-op, so the same
        firmware call lands on print(const char*) there. */
-    void print(const __FlashStringHelper*);
-    void println(const __FlashStringHelper*);
+    void print(const __FlashStringHelper*); // NOLINT(readability-identifier-naming)
+    void println(const __FlashStringHelper*); // NOLINT(readability-identifier-naming)
 
     /* Waits for the UART to have sent what it was given. Only one caller so far, and it is
        the one that matters: the restart, which would otherwise cut its own answer in half.
        Says nothing about the web socket, whose frames leave from the server's task. */
-    void flush();
+    void flush(); // NOLINT(readability-identifier-naming)
 };
 
 #endif // _WORDCLOCK_SERIAL_H_

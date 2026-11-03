@@ -45,38 +45,38 @@
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  init()
+  Init()
 ******************************************************************************************************************************************************/
-void AnimationWipe::init()
+void AnimationWipe::Init()
 {
-    Animation::init(STATE_IDLE);
-    reset();
-} /* init */
+    Animation::Init(kStateIdle);
+    Reset();
+} /* Init */
 
 
 /******************************************************************************************************************************************************
-  setTime()
+  SetTime()
 ******************************************************************************************************************************************************/
-StdReturnType AnimationWipe::setTime(byte Hour, byte Minute)
+StdReturnType AnimationWipe::SetTime(byte hour, byte minute)
 {
-    StdReturnType returnValue{E_NOT_OK};
+    StdReturnType return_value{kENotOk};
 
-    if(Clock::getInstance().getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
-        returnValue = E_OK;
-        State = STATE_CLEAR_TIME;
+    if(Clock::GetInstance().GetClockWords(hour, minute, clock_words_table_) == kEOk && state_ == kStateIdle) {
+        return_value = kEOk;
+        state_ = kStateClearTime;
     }
-    return returnValue;
-} /* setTime */
+    return return_value;
+} /* SetTime */
 
 
 /******************************************************************************************************************************************************
-  task()
+  Task()
 ******************************************************************************************************************************************************/
-void AnimationWipe::task()
+void AnimationWipe::Task()
 {
-    if(State == STATE_CLEAR_TIME) { clearTimeTask(); }
-    else if(State == STATE_SET_TIME) { setTimeTask(); }
-} /* task */
+    if(state_ == kStateClearTime) { ClearTimeTask(); }
+    else if(state_ == kStateSetTime) { SetTimeTask(); }
+} /* Task */
 
 
 /******************************************************************************************************************************************************
@@ -84,112 +84,112 @@ void AnimationWipe::task()
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  reset()
+  Reset()
 ******************************************************************************************************************************************************/
-void AnimationWipe::reset()
+void AnimationWipe::Reset()
 {
-    ClockWordsTable.fill(DisplayWords::WORD_NONE);
-    Index = 0u;
-    SetPixelState = SET_PIXEL_STATE_DOWN;
-} /* reset */
+    clock_words_table_.fill(DisplayWords::kWordNone);
+    index_ = 0u;
+    set_pixel_state_ = kSetPixelStateDown;
+} /* Reset */
 
 
 /******************************************************************************************************************************************************
-  clearTimeTask()
+  ClearTimeTask()
 ******************************************************************************************************************************************************/
-void AnimationWipe::clearTimeTask()
+void AnimationWipe::ClearTimeTask()
 {
     byte column, row;
 
-    Display::getInstance().indexToColumnAndRow(Index, column, row);
+    Display::GetInstance().IndexToColumnAndRow(index_, column, row);
 
     do {
-        if(Display::getInstance().getPixel(column, row)) {
-            if(SetPixelState == SET_PIXEL_STATE_DOWN) { setPixelDown(column, row); }
-            else { setPixelRight(column, row); }
+        if(Display::GetInstance().GetPixel(column, row)) {
+            if(set_pixel_state_ == kSetPixelStateDown) { SetPixelDown(column, row); }
+            else { SetPixelRight(column, row); }
         }
     } while(column-- != 0u && row++ < DISPLAY_NUMBER_OF_ROWS - 1u);
 
-    if(SetPixelState == SET_PIXEL_STATE_DOWN) { SetPixelState = SET_PIXEL_STATE_RIGHT; }
-    else { SetPixelState = SET_PIXEL_STATE_DOWN; }
+    if(set_pixel_state_ == kSetPixelStateDown) { set_pixel_state_ = kSetPixelStateRight; }
+    else { set_pixel_state_ = kSetPixelStateDown; }
 
-    if(setNextIndex() == E_NOT_OK) {
-        Index = 0u;
-        State = STATE_SET_TIME;
+    if(SetNextIndex() == kENotOk) {
+        index_ = 0u;
+        state_ = kStateSetTime;
     }
-} /* clearTimeTask */
+} /* ClearTimeTask */
 
 
 /******************************************************************************************************************************************************
-  setTimeTask()
+  SetTimeTask()
 ******************************************************************************************************************************************************/
-void AnimationWipe::setTimeTask()
+void AnimationWipe::SetTimeTask()
 {
     byte column, row;
 
-    Display::getInstance().indexToColumnAndRow(Index, column, row);
+    Display::GetInstance().IndexToColumnAndRow(index_, column, row);
 
     do {
-        if(isPixelPartOfClockWords(ClockWordsTable, column, row)) {
-            Display::getInstance().setPixel(column, row);
+        if(IsPixelPartOfClockWords(clock_words_table_, column, row)) {
+            Display::GetInstance().SetPixel(column, row);
         }
     } while(column-- != 0u && row++ < DISPLAY_NUMBER_OF_ROWS - 1u);
 
-    if(setNextIndex() == E_NOT_OK) {
-        finishWithClockWords(ClockWordsTable);
+    if(SetNextIndex() == kENotOk) {
+        FinishWithClockWords(clock_words_table_);
     }
-} /* setTimeTask */
+} /* SetTimeTask */
 
 
 /******************************************************************************************************************************************************
-  setNextIndex()
+  SetNextIndex()
 ******************************************************************************************************************************************************/
-StdReturnType AnimationWipe::setNextIndex()
+StdReturnType AnimationWipe::SetNextIndex()
 {
-    StdReturnType returnValue = E_OK;
+    StdReturnType return_value = kEOk;
     byte column, row;
 
-    Display::getInstance().indexToColumnAndRow(Index, column, row);
+    Display::GetInstance().IndexToColumnAndRow(index_, column, row);
 
     if(column < DISPLAY_NUMBER_OF_COLUMNS - 1u) column++;
     else if(row < DISPLAY_NUMBER_OF_ROWS - 1u) row++;
-    else returnValue = E_NOT_OK;
+    else return_value = kENotOk;
 
-    Index = Display::getInstance().columnAndRowToIndex(column, row);
-    return returnValue;
-} /* setNextIndex */
-
-
-/******************************************************************************************************************************************************
-  setPixelDown()
-******************************************************************************************************************************************************/
-void AnimationWipe::setPixelDown(byte Column, byte Row)
-{
-    Display::getInstance().clearPixel(Column, Row);
-
-    for(byte rowNext = Row + 1u; rowNext < DISPLAY_NUMBER_OF_ROWS; rowNext++) {
-        if(Display::getInstance().getPixel(Column, rowNext) == false) {
-            Display::getInstance().setPixel(Column, rowNext);
-            break;
-        }
-    }
-} /* setPixelDown */
+    index_ = Display::GetInstance().ColumnAndRowToIndex(column, row);
+    return return_value;
+} /* SetNextIndex */
 
 
 /******************************************************************************************************************************************************
-  setPixelRight()
+  SetPixelDown()
 ******************************************************************************************************************************************************/
-void AnimationWipe::setPixelRight(byte Column, byte Row)
+void AnimationWipe::SetPixelDown(byte column, byte row)
 {
-    Display::getInstance().clearPixel(Column, Row);
+    Display::GetInstance().ClearPixel(column, row);
 
-    for(byte columnNext = Column + 1u; columnNext < DISPLAY_NUMBER_OF_COLUMNS; columnNext++) {
-        if(Display::getInstance().getPixel(columnNext, Row) == false) {
-            Display::getInstance().setPixel(columnNext, Row);
+    for(byte row_next = row + 1u; row_next < DISPLAY_NUMBER_OF_ROWS; row_next++) {
+        if(Display::GetInstance().GetPixel(column, row_next) == false) {
+            Display::GetInstance().SetPixel(column, row_next);
             break;
         }
     }
-} /* setPixelRight */
+} /* SetPixelDown */
+
+
+/******************************************************************************************************************************************************
+  SetPixelRight()
+******************************************************************************************************************************************************/
+void AnimationWipe::SetPixelRight(byte column, byte row)
+{
+    Display::GetInstance().ClearPixel(column, row);
+
+    for(byte column_next = column + 1u; column_next < DISPLAY_NUMBER_OF_COLUMNS; column_next++) {
+        if(Display::GetInstance().GetPixel(column_next, row) == false) {
+            Display::GetInstance().SetPixel(column_next, row);
+            break;
+        }
+    }
+} /* SetPixelRight */
 
 
 /******************************************************************************************************************************************************

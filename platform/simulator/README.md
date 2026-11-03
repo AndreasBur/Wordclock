@@ -34,7 +34,7 @@ deliberate:
 
 - **It is polled from the wxTimer, not run in a thread.** Both hardware backends give their
   server a task of its own and pay for it with a lock-free buffer to the firmware. Here
-  `task()` runs on the tick, so a browser's command is injected on the thread that reads it -
+  `Task()` runs on the tick, so a browser's command is injected on the thread that reads it -
   which is what lets the port stay a `wxString`. What it costs is that a write blocks the
   tick; everything written goes to loopback, where the largest of them fits in the socket
   buffer many times over.
@@ -152,7 +152,7 @@ leaves them out.
 
 They run without a display, including the ones that drive `Display` and
 `DisplayManager`: `Pixels` is a plain buffer and the window that renders it,
-`PixelsFrame`, is simply never constructed. `Pixels::isDirty()` is what lets a
+`PixelsFrame`, is simply never constructed. `Pixels::IsDirty()` is what lets a
 test see whether the firmware wrote anything at all, which is how
 `DisplayManager`'s promise *not* to redraw an unchanged word set can be checked —
 a buffer that stayed equal would not tell a skipped redraw from one that rewrote
@@ -187,8 +187,8 @@ platform/simulator/
 
 ## How it works
 
-`WordclockApp` starts a `wxTimer` at `Scheduler::getTaskIntervalMs()` that calls
-`WordclockMain::task()`, which ticks the simulated `RealTimeClock` and then runs
+`WordclockApp` starts a `wxTimer` at `Scheduler::GetTaskIntervalMs()` that calls
+`WordclockMain::Task()`, which ticks the simulated `RealTimeClock` and then runs
 the `Scheduler`. Before the first tick, `WordclockMain` restores the stored
 settings, which `Storage` keeps in a `wordclock-settings.bin` in the working
 directory — a real file rather than a buffer, so the persistence path is exercised

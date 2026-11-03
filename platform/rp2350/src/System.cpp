@@ -36,20 +36,20 @@ namespace {
 /* Its own namespace, not the one the settings blob lives in: a settings reset must not
    take the network with it, or a clock is left that nobody can reach without a cable.
    Both are limited to 15 characters by NVS. */
-constexpr const char* NetworkNamespace{"wc-network"};
-constexpr const char* SsidKey{"ssid"};
-constexpr const char* PasswordKey{"password"};
+constexpr const char* kNetworkNamespace{"wc-network"};
+constexpr const char* kSsidKey{"ssid"};
+constexpr const char* kPasswordKey{"password"};
 /* Beside the network's own keys and in the same directory: this is how the clock is reached
    as well, which is what that namespace holds and what keeps it out of the settings blob the
    core persists. */
-constexpr const char* ConsolePasswordKey{"console-pass"};
+constexpr const char* kConsolePasswordKey{"console-pass"};
 /* Two names, two separators and the terminator, which the longest of the pair fits in
    several times over. */
-constexpr size_t CredentialPathLength{32u};
+constexpr size_t kCredentialPathLength{32u};
 
-constexpr uint32_t BytesPerKibibyte{1024u};
+constexpr uint32_t kBytesPerKibibyte{1024u};
 
-bool isNetworkJoined()
+bool IsNetworkJoined()
 {
     return WiFi.status() == WL_CONNECTED;
 }
@@ -57,90 +57,90 @@ bool isNetworkJoined()
 /* One file per key under a directory named after the namespace, which is what this core
    offers in place of the IDF's key-value store. The two names the RP2350 backend uses are
    kept so that both read the same way, and Storage does the same with its own pair. */
-bool isCredentialStoreReady()
+bool IsCredentialStoreReady()
 {
-    static bool WasTried{false};
-    static bool IsMounted{false};
+    static bool was_tried{false};
+    static bool is_mounted{false};
 
-    if(!WasTried) {
-        WasTried = true;
-        IsMounted = LittleFS.begin();
+    if(!was_tried) {
+        was_tried = true;
+        is_mounted = LittleFS.begin();
     }
 
-    return IsMounted;
+    return is_mounted;
 }
 
-void buildCredentialPath(const char* Key, char* Path, size_t Capacity)
+void BuildCredentialPath(const char* key, char* path, size_t capacity)
 {
     /* The namespace and the keys are this file's own constants, and the longest pair fits
-       CredentialPathLength with room to spare. */
-    (void)snprintf(Path, Capacity, "/%s/%s", NetworkNamespace, Key);
+       kCredentialPathLength with room to spare. */
+    (void)snprintf(path, capacity, "/%s/%s", kNetworkNamespace, key);
 }
 
 /* Reads one stored string into a buffer that has room for it, terminator included. An
    empty answer and a missing key are the same thing here: a network nobody entered. */
-StdReturnType readStoredString(const char* Key, char* String, size_t Capacity)
+StdReturnType ReadStoredString(const char* key, char* string, size_t capacity)
 {
-    String[0u] = STD_NULL_CHARACTER;
+    string[0u] = STD_NULL_CHARACTER;
 
-    if(!isCredentialStoreReady()) { return E_NOT_OK; }
+    if(!IsCredentialStoreReady()) { return kENotOk; }
 
-    char Path[CredentialPathLength]{};
-    buildCredentialPath(Key, Path, sizeof(Path));
+    char path[kCredentialPathLength]{};
+    BuildCredentialPath(key, path, sizeof(path));
 
-    File Stored = LittleFS.open(Path, "r");
-    if(!Stored) { return E_NOT_OK; }
+    File stored = LittleFS.open(path, "r");
+    if(!stored) { return kENotOk; }
 
     /* One short of the capacity, so the terminator this writes is always inside the
        buffer however long the file turned out to be. */
-    const size_t Length = Stored.read(reinterpret_cast<uint8_t*>(String), Capacity - 1u);
-    Stored.close();
+    const size_t length = stored.read(reinterpret_cast<uint8_t*>(string), capacity - 1u);
+    stored.close();
 
-    String[Length] = STD_NULL_CHARACTER;
+    string[length] = STD_NULL_CHARACTER;
 
-    if(Length == 0u) { return E_NOT_OK; }
+    if(length == 0u) { return kENotOk; }
 
-    return E_OK;
+    return kEOk;
 }
 
 /* Replaces one stored string. Opened for writing rather than appended to, so a shorter
    pass phrase cannot leave the tail of a longer one behind it. */
-bool writeStoredString(const char* Key, const char* String)
+bool WriteStoredString(const char* key, const char* string)
 {
-    if(!isCredentialStoreReady()) { return false; }
+    if(!IsCredentialStoreReady()) { return false; }
 
-    char Path[CredentialPathLength]{};
-    LittleFS.mkdir(NetworkNamespace);
-    buildCredentialPath(Key, Path, sizeof(Path));
+    char path[kCredentialPathLength]{};
+    LittleFS.mkdir(kNetworkNamespace);
+    BuildCredentialPath(key, path, sizeof(path));
 
-    File Stored = LittleFS.open(Path, "w");
-    if(!Stored) { return false; }
+    File stored = LittleFS.open(path, "w");
+    if(!stored) { return false; }
 
-    const size_t Length = strlen(String);
-    const size_t Written = Stored.write(reinterpret_cast<const uint8_t*>(String), Length);
-    Stored.close();
+    const size_t length = strlen(string);
+    const size_t written = stored.write(reinterpret_cast<const uint8_t*>(string), length);
+    stored.close();
 
-    return Written == Length;
+    return written == length;
 }
 
 /* What was compiled in, which is what a clock that was flashed with a WordclockSecrets.h
    still comes up with. Stored credentials win over it: they are the later word. */
-constexpr bool isSsidCompiledIn()
+constexpr bool IsSsidCompiledIn()
 {
     return sizeof(WORDCLOCK_WIFI_SSID) > 1u;
 }
 
 /* Copies into the caller's buffer only if the whole string fits, so a value that grew
    past what the field was sized for is reported as no value rather than as half of one. */
-StdReturnType copyIfItFits(const char* Value, char* String, size_t Capacity)
+StdReturnType CopyIfItFits(const char* value, char* string, size_t capacity)
 {
-    String[0u] = STD_NULL_CHARACTER;
+    string[0u] = STD_NULL_CHARACTER;
 
-    const size_t Length = strlen(Value);
-    if(Length >= Capacity) { return E_NOT_OK; }
+    const size_t length = strlen(value);
+    if(length >= capacity) { return kENotOk; }
 
-    memcpy(String, Value, Length + 1u);
-    return E_OK;
+    memcpy(string, value, length + 1u);
+    return kEOk;
 }
 
 } // namespace
@@ -150,91 +150,91 @@ StdReturnType copyIfItFits(const char* Value, char* String, size_t Capacity)
 ******************************************************************************************************************************************************/
 
 /* Instance methods, though some of them read no member: they are the interface the
-   firmware core calls through getInstance(), and every backend - the simulator's
+   firmware core calls through GetInstance(), and every backend - the simulator's
    stand-ins included - offers it that way. Whether this backend's implementation
    happens to need a member is its own detail, and answering the check would carry
    that detail into the interface.
    The ones it would make const drive the hardware, which a const would deny. */
 // NOLINTBEGIN(readability-convert-member-functions-to-static, readability-make-member-function-const)
 /******************************************************************************************************************************************************
-  getFreeMemoryInKibibytes()
+  GetFreeMemoryInKibibytes()
 ******************************************************************************************************************************************************/
-StdReturnType System::getFreeMemoryInKibibytes(uint16_t& FreeMemory) const
+StdReturnType System::GetFreeMemoryInKibibytes(uint16_t& free_memory) const
 {
-    FreeMemory = static_cast<uint16_t>(rp2040.getFreeHeap() / BytesPerKibibyte);
-    return E_OK;
-} /* getFreeMemoryInKibibytes */
+    free_memory = static_cast<uint16_t>(rp2040.getFreeHeap() / kBytesPerKibibyte);
+    return kEOk;
+} /* GetFreeMemoryInKibibytes */
 
 
 /******************************************************************************************************************************************************
-  getNetworkAddress()
+  GetNetworkAddress()
 ******************************************************************************************************************************************************/
 /*! \brief          The address the clock answers on
  *
- *  \return         E_OK if the clock has joined a network and the address fits the buffer
+ *  \return         kEOk if the clock has joined a network and the address fits the buffer
 ******************************************************************************************************************************************************/
-StdReturnType System::getNetworkAddress(char* String) const
+StdReturnType System::GetNetworkAddress(char* string) const
 {
-    String[0u] = STD_NULL_CHARACTER;
+    string[0u] = STD_NULL_CHARACTER;
 
-    if(!isNetworkJoined()) { return E_NOT_OK; }
+    if(!IsNetworkJoined()) { return kENotOk; }
 
-    return copyIfItFits(WiFi.localIP().toString().c_str(), String, AddressStringLength);
-} /* getNetworkAddress */
+    return CopyIfItFits(WiFi.localIP().toString().c_str(), string, kAddressStringLength);
+} /* GetNetworkAddress */
 
 
 /******************************************************************************************************************************************************
-  getLinkQuality()
+  GetLinkQuality()
 ******************************************************************************************************************************************************/
 /*! \brief          The received signal strength in dBm
  *
- *  \return         E_OK if the clock has joined a network
+ *  \return         kEOk if the clock has joined a network
 ******************************************************************************************************************************************************/
-StdReturnType System::getLinkQuality(char* String) const
+StdReturnType System::GetLinkQuality(char* string) const
 {
-    String[0u] = STD_NULL_CHARACTER;
+    string[0u] = STD_NULL_CHARACTER;
 
-    if(!isNetworkJoined()) { return E_NOT_OK; }
+    if(!IsNetworkJoined()) { return kENotOk; }
 
-    itoa(static_cast<int>(WiFi.RSSI()), String, 10);
-    return E_OK;
-} /* getLinkQuality */
+    itoa(static_cast<int>(WiFi.RSSI()), string, 10);
+    return kEOk;
+} /* GetLinkQuality */
 
 
 
 /******************************************************************************************************************************************************
-  getNetworkSsid()
+  GetNetworkSsid()
 ******************************************************************************************************************************************************/
 /*! \brief          The network the clock is configured for
  *  \details        What was stored, and what was compiled in when nothing was stored -
  *                  in that order, because the stored one is the later word.
  *
- *  \return         E_OK if there is a network to name
+ *  \return         kEOk if there is a network to name
 ******************************************************************************************************************************************************/
-StdReturnType System::getNetworkSsid(char* Ssid) const
+StdReturnType System::GetNetworkSsid(char* ssid) const
 {
-    if(readStoredString(SsidKey, Ssid, SsidStringLength) == E_OK) { return E_OK; }
+    if(ReadStoredString(kSsidKey, ssid, kSsidStringLength) == kEOk) { return kEOk; }
 
-    if(isSsidCompiledIn()) { return copyIfItFits(WORDCLOCK_WIFI_SSID, Ssid, SsidStringLength); }
+    if(IsSsidCompiledIn()) { return CopyIfItFits(WORDCLOCK_WIFI_SSID, ssid, kSsidStringLength); }
 
-    Ssid[0u] = STD_NULL_CHARACTER;
-    return E_NOT_OK;
-}  /* getNetworkSsid */
+    ssid[0u] = STD_NULL_CHARACTER;
+    return kENotOk;
+}  /* GetNetworkSsid */
 
 
 /******************************************************************************************************************************************************
-  isNetworkConfigured()
+  IsNetworkConfigured()
 ******************************************************************************************************************************************************/
-bool System::isNetworkConfigured() const
+bool System::IsNetworkConfigured() const
 {
-    char Ssid[SsidStringLength]{};
+    char ssid[kSsidStringLength]{};
 
-    return getNetworkSsid(Ssid) == E_OK;
-} /* isNetworkConfigured */
+    return GetNetworkSsid(ssid) == kEOk;
+} /* IsNetworkConfigured */
 
 
 /******************************************************************************************************************************************************
-  setNetworkCredentials()
+  SetNetworkCredentials()
 ******************************************************************************************************************************************************/
 /*! \brief          Stores what the clock is to join, and joins it
  *  \details        Both halves are written before anything is joined, so that a clock that
@@ -245,24 +245,24 @@ bool System::isNetworkConfigured() const
  *                  the access point back and is the way out of a typo that cannot be
  *                  corrected over the network it broke.
  *
- *  \return         E_OK if the pair was stored
+ *  \return         kEOk if the pair was stored
 ******************************************************************************************************************************************************/
-StdReturnType System::setNetworkCredentials(const char* Ssid, const char* Password)
+StdReturnType System::SetNetworkCredentials(const char* ssid, const char* password)
 {
-    if((Ssid == nullptr) || (Password == nullptr)) { return E_NOT_OK; }
-    if(strlen(Ssid) >= SsidStringLength) { return E_NOT_OK; }
-    if(strlen(Password) >= PasswordStringLength) { return E_NOT_OK; }
+    if((ssid == nullptr) || (password == nullptr)) { return kENotOk; }
+    if(strlen(ssid) >= kSsidStringLength) { return kENotOk; }
+    if(strlen(password) >= kPasswordStringLength) { return kENotOk; }
 
-    if(!writeStoredString(SsidKey, Ssid)) { return E_NOT_OK; }
-    if(!writeStoredString(PasswordKey, Password)) { return E_NOT_OK; }
+    if(!WriteStoredString(kSsidKey, ssid)) { return kENotOk; }
+    if(!WriteStoredString(kPasswordKey, password)) { return kENotOk; }
 
-    startNetwork();
-    return E_OK;
-} /* setNetworkCredentials */
+    StartNetwork();
+    return kEOk;
+} /* SetNetworkCredentials */
 
 
 /******************************************************************************************************************************************************
-  startNetwork()
+  StartNetwork()
 ******************************************************************************************************************************************************/
 /*! \brief          Brings the network up as configured
  *  \details        A clock with credentials joins that network. A clock without opens one
@@ -279,20 +279,20 @@ StdReturnType System::setNetworkCredentials(const char* Ssid, const char* Passwo
  *                  middle of a command lands inside that command\'s answer - which is how
  *                  this was found. The application says what happened instead.
 ******************************************************************************************************************************************************/
-void System::startNetwork()
+void System::StartNetwork()
 {
-    char Ssid[SsidStringLength]{};
-    char Password[PasswordStringLength]{};
+    char ssid[kSsidStringLength]{};
+    char password[kPasswordStringLength]{};
 
-    if(getNetworkSsid(Ssid) == E_NOT_OK) {
+    if(GetNetworkSsid(ssid) == kENotOk) {
         WiFi.mode(WIFI_AP);
         WiFi.softAP(SYSTEM_ACCESS_POINT_SSID);
         return;
     }
 
     /* The stored pass phrase, or the compiled-in one when the name came from there. */
-    if(readStoredString(PasswordKey, Password, PasswordStringLength) == E_NOT_OK) {
-        copyIfItFits(WORDCLOCK_WIFI_PASSWORD, Password, PasswordStringLength);
+    if(ReadStoredString(kPasswordKey, password, kPasswordStringLength) == kENotOk) {
+        CopyIfItFits(WORDCLOCK_WIFI_PASSWORD, password, kPasswordStringLength);
     }
 
     WiFi.mode(WIFI_STA);
@@ -303,15 +303,15 @@ void System::startNetwork()
     else                           { WiFi.noLowPowerMode(); }
 
     /* No setAutoReconnect() here: this core has none, and joining again is what stands in
-       for it - see reconnectNetwork(), which the command calls and which this function is
+       for it - see ReconnectNetwork(), which the command calls and which this function is
        the whole of. A router that reboots therefore needs that command, where the ESP32
        recovers on its own. */
-    WiFi.begin(Ssid, Password);
-} /* startNetwork */
+    WiFi.begin(ssid, password);
+} /* StartNetwork */
 
 
 /******************************************************************************************************************************************************
-  performPendingRestart()
+  PerformPendingRestart()
 ******************************************************************************************************************************************************/
 /*! \brief          Carries out a restart that was asked for
  *  \details        From the application's tick, which is after the command's answer has
@@ -319,17 +319,17 @@ void System::startNetwork()
  *                  flushed first: the UART writes in the background, and a controller that
  *                  restarts with bytes still in that buffer cuts its own answer in half.
 ******************************************************************************************************************************************************/
-void System::performPendingRestart()
+void System::PerformPendingRestart()
 {
-    if(!RestartPending) { return; }
+    if(!restart_pending_) { return; }
 
     Serial.flush();
     rp2040.restart();
-} /* performPendingRestart */
+} /* PerformPendingRestart */
 
 
 /******************************************************************************************************************************************************
-  resynchroniseTime()
+  ResynchroniseTime()
 ******************************************************************************************************************************************************/
 /*! \brief          Asks the network for the time again
  *  \details        The same call the application makes at start-up rather than a reach
@@ -337,44 +337,44 @@ void System::performPendingRestart()
  *                  it keeps the zone rule in one place - a second installation of the
  *                  servers alone would leave the rule to be repeated here.
  *
- *  \return         E_OK if there is a network to ask over
+ *  \return         kEOk if there is a network to ask over
 ******************************************************************************************************************************************************/
-StdReturnType System::resynchroniseTime()
+StdReturnType System::ResynchroniseTime()
 {
-    if(!isNetworkJoined()) { return E_NOT_OK; }
+    if(!IsNetworkJoined()) { return kENotOk; }
 
     /* The rule is already in place from start-up; only the servers are asked again. */
-    WordclockTime::startTimeServers();
-    return E_OK;
-} /* resynchroniseTime */
+    wordclock_time::StartTimeServers();
+    return kEOk;
+} /* ResynchroniseTime */
 
 
 /******************************************************************************************************************************************************
-  reconnectNetwork()
+  ReconnectNetwork()
 ******************************************************************************************************************************************************/
 /*! \brief          Joins the network again
  *  \details        Refused where no network was ever configured, which is a clock running
  *                  on the serial line alone - there is nothing to reconnect to, and
- *                  answering E_OK would say there was.
+ *                  answering kEOk would say there was.
  *
- *  \return         E_OK if the attempt was started
+ *  \return         kEOk if the attempt was started
 ******************************************************************************************************************************************************/
-StdReturnType System::reconnectNetwork()
+StdReturnType System::ReconnectNetwork()
 {
-    /* Nothing configured is nothing to reconnect to. isNetworkConfigured() rather than the
+    /* Nothing configured is nothing to reconnect to. IsNetworkConfigured() rather than the
        compiled-in name alone, because credentials entered over the console count too. */
-    if(!isNetworkConfigured()) { return E_NOT_OK; }
+    if(!IsNetworkConfigured()) { return kENotOk; }
 
-    /* Joining again rather than a reconnect() this core does not have. startNetwork()
+    /* Joining again rather than a reconnect() this core does not have. StartNetwork()
        re-reads the stored credentials on its way, so this also picks up a network that was
        entered while the old one was still being retried. */
-    startNetwork();
+    StartNetwork();
 
-    return E_OK;
-} /* reconnectNetwork */
+    return kEOk;
+} /* ReconnectNetwork */
 
 /******************************************************************************************************************************************************
-  isConsoleProtected() / getConsolePassword() / setConsolePassword()
+  IsConsoleProtected() / GetConsolePassword() / SetConsolePassword()
 ******************************************************************************************************************************************************/
 /*! \brief          The password the console asks for
  *
@@ -388,44 +388,44 @@ StdReturnType System::reconnectNetwork()
  *                  behind is not worth having, and a password changed by command takes effect
  *                  on the next request instead of on the next restart.
 ******************************************************************************************************************************************************/
-bool System::isConsoleProtected() const
+bool System::IsConsoleProtected() const
 {
-    char Password[PasswordStringLength]{};
+    char password[kPasswordStringLength]{};
 
-    return readStoredString(ConsolePasswordKey, Password, PasswordStringLength) == E_OK;
+    return ReadStoredString(kConsolePasswordKey, password, kPasswordStringLength) == kEOk;
 }
 
 
-StdReturnType System::getConsolePassword(char* Password, size_t Capacity) const
+StdReturnType System::GetConsolePassword(char* password, size_t capacity) const
 {
-    if(Password == nullptr) { return E_NOT_OK; }
+    if(password == nullptr) { return kENotOk; }
 
-    return readStoredString(ConsolePasswordKey, Password, Capacity);
+    return ReadStoredString(kConsolePasswordKey, password, capacity);
 }
 
 
-StdReturnType System::setConsolePassword(const char* Password)
+StdReturnType System::SetConsolePassword(const char* password)
 {
-    if(Password == nullptr) { return E_NOT_OK; }
-    if(strlen(Password) >= PasswordStringLength) { return E_NOT_OK; }
+    if(password == nullptr) { return kENotOk; }
+    if(strlen(password) >= kPasswordStringLength) { return kENotOk; }
 
     /* An empty password removes the file rather than writing an empty one, so that
-       isConsoleProtected() has one state to recognise instead of two - and readStoredString()
-       answers E_NOT_OK for an empty file as well as for a missing one, which would otherwise
+       IsConsoleProtected() has one state to recognise instead of two - and ReadStoredString()
+       answers kENotOk for an empty file as well as for a missing one, which would otherwise
        make the two indistinguishable by accident rather than on purpose. */
-    if(Password[0u] == STD_NULL_CHARACTER) {
-        if(!isCredentialStoreReady()) { return E_NOT_OK; }
+    if(password[0u] == STD_NULL_CHARACTER) {
+        if(!IsCredentialStoreReady()) { return kENotOk; }
 
-        char Path[CredentialPathLength]{};
-        buildCredentialPath(ConsolePasswordKey, Path, sizeof(Path));
+        char path[kCredentialPathLength]{};
+        BuildCredentialPath(kConsolePasswordKey, path, sizeof(path));
         /* A file that was never there is the state being asked for, so its absence is not a
            failure to report. */
-        LittleFS.remove(Path);
-        return E_OK;
+        LittleFS.remove(path);
+        return kEOk;
     }
 
-    return writeStoredString(ConsolePasswordKey, Password) ? E_OK : E_NOT_OK;
-} /* setConsolePassword */
+    return WriteStoredString(kConsolePasswordKey, password) ? kEOk : kENotOk;
+} /* SetConsolePassword */
 // NOLINTEND(readability-convert-member-functions-to-static, readability-make-member-function-const)
 
 

@@ -37,7 +37,7 @@
 /******************************************************************************************************************************************************
  *  L O C A L   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
-const FontSprite5x8::FontTableType FontSprite5x8::FontTable PROGMEM
+const FontSprite5x8::FontTableType FontSprite5x8::kFontTable PROGMEM
 {
     FontTableElementType(3, {0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000}), // space
     FontTableElementType(1, {0b01011111, 0b00000000, 0b00000000, 0b00000000, 0b00000000}), // !

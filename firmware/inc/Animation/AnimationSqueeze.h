@@ -63,31 +63,31 @@ class AnimationSqueeze : public Animation
     /* Side the letters are eaten away from, selected for each word change. From the right is what
        the reference project does, from the left is the other half of the coin. */
     enum DirectionType {
-        DIRECTION_FROM_LEFT,
-        DIRECTION_FROM_RIGHT,
-        DIRECTION_NUMBER_OF_DIRECTIONS
+        kDirectionFromLeft,
+        kDirectionFromRight,
+        kDirectionNumberOfDirections
     };
 
   private:
-    DisplayWords Words;
-    ClockWords::WordsListType ClockWordsTable{{DisplayWords::WORD_NONE}};
-    byte MaxWordLength{0u};
-    byte CurrentLength{1u};
-    DirectionType Direction{DIRECTION_FROM_LEFT};
+    DisplayWords words_;
+    ClockWords::WordsListType clock_words_table_{{DisplayWords::kWordNone}};
+    byte max_word_length_{0u};
+    byte current_length_{1u};
+    DirectionType direction_{kDirectionFromLeft};
 
     // functions
-    void reset();
-    void clearTimeTask();
-    void setTimeTask();
+    void Reset();
+    void ClearTimeTask();
+    void SetTimeTask();
 
-    void clearRow(byte);
-    void setMaxWordLength();
+    void ClearRow(byte);
+    void SetMaxWordLength();
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr AnimationSqueeze() : Words() { }
+    constexpr AnimationSqueeze() : words_() { }
     ~AnimationSqueeze() { }
 
     // get methods
@@ -95,9 +95,9 @@ class AnimationSqueeze : public Animation
     // set methods
 
     // methods
-    void init();
-    StdReturnType setTime(byte, byte);
-    void task();
+    void Init();
+    StdReturnType SetTime(byte, byte);
+    void Task();
 };
 
 

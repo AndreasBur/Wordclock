@@ -60,35 +60,35 @@ class ClockWords
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    bool ShowItIs;
-    HourWordsType HourWords;
-    MinutesWordsType MinuteWords;
+    bool show_it_is_;
+    HourWordsType hour_words_;
+    MinutesWordsType minute_words_;
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr ClockWords() : ShowItIs(false), HourWords{DisplayWords::WORD_NONE}, MinuteWords{DisplayWords::WORD_NONE} { }
-    constexpr ClockWords(bool sShowItIs, HourWordsType sHourWords, MinutesWordsType sMinuteWords)
-        : ShowItIs(sShowItIs), HourWords(sHourWords), MinuteWords(sMinuteWords) { }
+    constexpr ClockWords() : show_it_is_(false), hour_words_{DisplayWords::kWordNone}, minute_words_{DisplayWords::kWordNone} { }
+    constexpr ClockWords(bool show_it_is, HourWordsType hour_words, MinutesWordsType minute_words)
+        : show_it_is_(show_it_is), hour_words_(hour_words), minute_words_(minute_words) { }
     ~ClockWords() { }
 
-    bool operator==(const ClockWords& sClockWords) const;
-    bool operator!=(const ClockWords& sClockWords) const;
+    bool operator==(const ClockWords& clock_words) const;
+    bool operator!=(const ClockWords& clock_words) const;
 
     // get methods
-    bool getShowItIs() const { return ShowItIs; }
-    HourWordsType getHourWords() const { return HourWords; }
-    DisplayWords::WordIdType getHourWord(byte Index) const { return HourWords[Index]; }
-    MinutesWordsType getMinuteWords() const { return MinuteWords; }
-    DisplayWords::WordIdType getMinuteWord(byte Index) const { return MinuteWords[Index]; }
+    bool GetShowItIs() const { return show_it_is_; }
+    HourWordsType GetHourWords() const { return hour_words_; }
+    DisplayWords::WordIdType GetHourWord(byte index) const { return hour_words_[index]; }
+    MinutesWordsType GetMinuteWords() const { return minute_words_; }
+    DisplayWords::WordIdType GetMinuteWord(byte index) const { return minute_words_[index]; }
 
-    WordsListType getWordsList() const;
+    WordsListType GetWordsList() const;
 
     // set methods
-    void setShowItIs(bool sShowItIs) { ShowItIs = sShowItIs; }
-    void setMinuteWords(MinutesWordsType sMinutWords) { MinuteWords = sMinutWords; }
-    void setHourWords(HourWordsType sHourWords) { HourWords = sHourWords; }
+    void SetShowItIs(bool show_it_is) { show_it_is_ = show_it_is; }
+    void SetMinuteWords(MinutesWordsType minut_words) { minute_words_ = minut_words; }
+    void SetHourWords(HourWordsType hour_words) { hour_words_ = hour_words; }
 
     // methods
 

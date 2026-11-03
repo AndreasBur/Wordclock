@@ -58,39 +58,39 @@ class DisplayCurrentLimit
 
     /* The answer where the supply is not the binding constraint, and the value the strip's
        master carries when nothing is being held back. */
-    static constexpr byte NoLimit{255u};
+    static constexpr byte kNoLimit{255u};
 
 /******************************************************************************************************************************************************
  *  P   R   I   V   A   T   E       D   A   T   A       A   N   D       F   U   N   C   T   I   O   N   S
 ******************************************************************************************************************************************************/
   private:
-    static constexpr CurrentType BudgetMicroAmps{static_cast<CurrentType>(DISPLAY_CURRENT_LIMIT_BUDGET_MILLI_AMPS) * 1000u};
+    static constexpr CurrentType kBudgetMicroAmps{static_cast<CurrentType>(DISPLAY_CURRENT_LIMIT_BUDGET_MILLI_AMPS) * 1000u};
 
     /* The two numbers the whole estimate rests on, both from the WS2812's datasheet and both
        confirmed by the figure the README sizes the supply from: 20 mA per channel at full
        makes 60 mA for a white LED, and 110 of those are the 6.6 A quoted there. The idle
        current is what a dark strip still draws - some 1 mA each, so a tenth of an amp for
        this display before a single letter is lit. */
-    static constexpr CurrentType ChannelCurrentAtFullMicroAmps{20000u};
-    static constexpr CurrentType IdleCurrentPerLedMicroAmps{1000u};
+    static constexpr CurrentType kChannelCurrentAtFullMicroAmps{20000u};
+    static constexpr CurrentType kIdleCurrentPerLedMicroAmps{1000u};
 
-    static constexpr byte ChannelValueAtFull{255u};
+    static constexpr byte kChannelValueAtFull{255u};
 
     /* Dimming multiplies by the brightness and shifts by eight, so the factor a brightness
        stands for is over 256 rather than over 255. Reproduced here rather than assumed,
        because an estimate that used 255 would run one part in 256 low. */
-    static constexpr CurrentType BrightnessScale{256u};
+    static constexpr CurrentType kBrightnessScale{256u};
 
     /* Bounded by 255 * 765 * 20000, which stays inside 32 bits with room to spare - so no
        display this code could be built for overflows it. */
-    static constexpr CurrentType getLitCurrentAtFullMicroAmps(byte LitPixels, uint16_t ChannelSum) {
-        return static_cast<CurrentType>(LitPixels) * ChannelSum * ChannelCurrentAtFullMicroAmps / ChannelValueAtFull;
+    static constexpr CurrentType GetLitCurrentAtFullMicroAmps(byte lit_pixels, uint16_t channel_sum) {
+        return static_cast<CurrentType>(lit_pixels) * channel_sum * kChannelCurrentAtFullMicroAmps / kChannelValueAtFull;
     }
 
-    static constexpr CurrentType getAvailableMicroAmps(byte LedCount) {
-        const CurrentType Idle = getIdleCurrentMicroAmps(LedCount);
+    static constexpr CurrentType GetAvailableMicroAmps(byte led_count) {
+        const CurrentType idle = GetIdleCurrentMicroAmps(led_count);
 
-        return (BudgetMicroAmps > Idle) ? (BudgetMicroAmps - Idle) : 0u;
+        return (kBudgetMicroAmps > idle) ? (kBudgetMicroAmps - idle) : 0u;
     }
 
 /******************************************************************************************************************************************************
@@ -103,19 +103,19 @@ class DisplayCurrentLimit
     /* What a dark but powered strip still draws. Public because it is the floor every other
        answer here sits on, and because a caller comparing an estimate against a supply needs
        to know that a display showing nothing is not free. */
-    static constexpr CurrentType getIdleCurrentMicroAmps(byte LedCount) {
-        return static_cast<CurrentType>(LedCount) * IdleCurrentPerLedMicroAmps;
+    static constexpr CurrentType GetIdleCurrentMicroAmps(byte led_count) {
+        return static_cast<CurrentType>(led_count) * kIdleCurrentPerLedMicroAmps;
     }
 
-    static constexpr uint16_t toChannelSum(byte Red, byte Green, byte Blue) {
-        return static_cast<uint16_t>(Red) + Green + Blue;
+    static constexpr uint16_t ToChannelSum(byte red, byte green, byte blue) {
+        return static_cast<uint16_t>(red) + green + blue;
     }
 
     /* What the strip would draw at full brightness, idle current included. The answer the
        limit below is derived from, and worth having on its own: it is the number to compare
        against a supply's rating. */
-    static constexpr CurrentType getCurrentAtFullBrightnessMicroAmps(byte LedCount, byte LitPixels, uint16_t ChannelSum) {
-        return getIdleCurrentMicroAmps(LedCount) + getLitCurrentAtFullMicroAmps(LitPixels, ChannelSum);
+    static constexpr CurrentType GetCurrentAtFullBrightnessMicroAmps(byte led_count, byte lit_pixels, uint16_t channel_sum) {
+        return GetIdleCurrentMicroAmps(led_count) + GetLitCurrentAtFullMicroAmps(lit_pixels, channel_sum);
     }
 
     /* The largest brightness whose estimated current still fits the budget.
@@ -127,18 +127,18 @@ class DisplayCurrentLimit
        Answers BrightnessAtFull where nothing is lit or where the display cannot reach the
        budget anyway, so a clock on a supply with headroom never pays for this beyond the
        division. */
-    static constexpr byte toBrightnessLimit(byte LedCount, byte LitPixels, uint16_t ChannelSum) {
-        const CurrentType Available = getAvailableMicroAmps(LedCount);
-        const CurrentType AtFull = getLitCurrentAtFullMicroAmps(LitPixels, ChannelSum);
+    static constexpr byte ToBrightnessLimit(byte led_count, byte lit_pixels, uint16_t channel_sum) {
+        const CurrentType available = GetAvailableMicroAmps(led_count);
+        const CurrentType at_full = GetLitCurrentAtFullMicroAmps(lit_pixels, channel_sum);
 
-        if(Available == 0u) { return 0u; }
-        if(AtFull <= Available) { return NoLimit; }
+        if(available == 0u) { return 0u; }
+        if(at_full <= available) { return kNoLimit; }
 
-        return static_cast<byte>(Available * BrightnessScale / AtFull);
+        return static_cast<byte>(available * kBrightnessScale / at_full);
     }
 };
 
-/* Available * BrightnessScale is the one product that could leave 32 bits, and this is the
+/* Available * kBrightnessScale is the one product that could leave 32 bits, and this is the
    budget at which it would. Far above any word clock, so the assert documents the ceiling
    rather than guarding a plausible mistake. */
 static_assert(DISPLAY_CURRENT_LIMIT_BUDGET_MILLI_AMPS <= 16000u,

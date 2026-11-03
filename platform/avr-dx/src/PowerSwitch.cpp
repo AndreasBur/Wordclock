@@ -30,7 +30,7 @@
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  init()
+  Init()
 ******************************************************************************************************************************************************/
 /*! \brief          Makes the port an output and brings the supply up
  *  \details        Switched on rather than left where the reset found it, because the reset
@@ -46,13 +46,13 @@
  *                  whatever else the board put there, and driving it would be the one way this
  *                  can do damage rather than nothing.
 ******************************************************************************************************************************************************/
-void PowerSwitch::init()
+void PowerSwitch::Init()
 {
-    if(!isFitted()) { return; }
+    if(!IsFitted()) { return; }
 
     POWER_SWITCH_PORT.DIRSET = POWER_SWITCH_PIN_MASK;
-    switchSupplyOn();
-} /* init */
+    SwitchSupplyOn();
+} /* Init */
 
 
 /******************************************************************************************************************************************************
@@ -60,7 +60,7 @@ void PowerSwitch::init()
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  driveSupply()
+  DriveSupply()
 ******************************************************************************************************************************************************/
 /*! \brief          Puts the port high or low
  *  \details        Active high, so on is high. OUTSET and OUTCLR rather than a read, a mask
@@ -68,13 +68,13 @@ void PowerSwitch::init()
  *                  business, and the pair does it in one instruction each without a window in
  *                  which an interrupt could write the register in between.
 ******************************************************************************************************************************************************/
-void PowerSwitch::driveSupply(bool On)
+void PowerSwitch::DriveSupply(bool on)
 {
-    if(!isFitted()) { return; }
+    if(!IsFitted()) { return; }
 
-    if(On) { POWER_SWITCH_PORT.OUTSET = POWER_SWITCH_PIN_MASK; }
+    if(on) { POWER_SWITCH_PORT.OUTSET = POWER_SWITCH_PIN_MASK; }
     else   { POWER_SWITCH_PORT.OUTCLR = POWER_SWITCH_PIN_MASK; }
-} /* driveSupply */
+} /* DriveSupply */
 
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E

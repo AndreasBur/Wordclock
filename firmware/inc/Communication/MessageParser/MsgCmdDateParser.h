@@ -58,58 +58,58 @@ class MsgCmdDateParser : public MsgParameterParser<MsgCmdDateParser, MSG_CMD_DAT
 ******************************************************************************************************************************************************/
   private:
     friend class MsgParameterParser;
-    ClockDate Date;
+    ClockDate date_;
 
-    static constexpr char YearOptionShortName{'Y'};
-    static constexpr char MonthOptionShortName{'M'};
-    static constexpr char DayOptionShortName{'D'};
+    static constexpr char kYearOptionShortName{'Y'};
+    static constexpr char kMonthOptionShortName{'M'};
+    static constexpr char kDayOptionShortName{'D'};
 
-    static constexpr ParameterTableType ParameterTable PROGMEM {
-        ParameterTableElementType(YearOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT16),
-        ParameterTableElementType(MonthOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8),
-        ParameterTableElementType(DayOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8)
+    static constexpr ParameterTableType kParameterTable PROGMEM {
+        ParameterTableElementType(kYearOptionShortName, MsgParameter::kArgumentTypeUint16),
+        ParameterTableElementType(kMonthOptionShortName, MsgParameter::kArgumentTypeUint8),
+        ParameterTableElementType(kDayOptionShortName, MsgParameter::kArgumentTypeUint8)
     };
 
     // functions
-    static void handleParameter(char ParameterShortName, const char* Argument, PositionType Length) { UNUSED(ParameterShortName); UNUSED(Argument); UNUSED(Length); }
-    void handleParameter(char ParameterShortName, byte Argument) {
-        if(ParameterShortName == MonthOptionShortName) { setMonth(static_cast<MonthType>(Argument)); }
-        if(ParameterShortName == DayOptionShortName) { setDay(Argument); }
+    static void HandleParameter(char parameter_short_name, const char* argument, PositionType length) { UNUSED(parameter_short_name); UNUSED(argument); UNUSED(length); }
+    void HandleParameter(char parameter_short_name, byte argument) {
+        if(parameter_short_name == kMonthOptionShortName) { SetMonth(static_cast<MonthType>(argument)); }
+        if(parameter_short_name == kDayOptionShortName) { SetDay(argument); }
     }
 
-	void handleParameter(char ParameterShortName, uint16_t Argument) {
-		if(ParameterShortName == YearOptionShortName) { setYear(Argument); }
+	void HandleParameter(char parameter_short_name, uint16_t argument) {
+		if(parameter_short_name == kYearOptionShortName) { SetYear(argument); }
 	}
 
-    void sendAnswerYear(bool AppendSpace) const {
-        sendAnswerParameter(YearOptionShortName, Date.getYear(), AppendSpace);
+    void SendAnswerYear(bool append_space) const {
+        SendAnswerParameter(kYearOptionShortName, date_.GetYear(), append_space);
     }
-    void sendAnswerMonth(bool AppendSpace) const {
-        sendAnswerParameter(MonthOptionShortName, Date.getMonth(), AppendSpace);
+    void SendAnswerMonth(bool append_space) const {
+        SendAnswerParameter(kMonthOptionShortName, date_.GetMonth(), append_space);
     }
-    void sendAnswerDay(bool AppendSpace) const {
-        sendAnswerParameter(DayOptionShortName, Date.getDay(), AppendSpace);
+    void SendAnswerDay(bool append_space) const {
+        SendAnswerParameter(kDayOptionShortName, date_.GetDay(), append_space);
     }
 
-    void setYear(YearType Year)  {
-        StdReturnType returnValue =  Date.setYear(Year);
-        Error.checkReturnValueAndSend(YearOptionShortName, returnValue, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNDS);
+    void SetYear(YearType year)  {
+        StdReturnType return_value =  date_.SetYear(year);
+        error_.CheckReturnValueAndSend(kYearOptionShortName, return_value, ErrorMessage::kErrorValueOutOfBounds);
     }
-    void setMonth(MonthType Month)  {
-        StdReturnType returnValue = Date.setMonth(Month);
-        Error.checkReturnValueAndSend(MonthOptionShortName, returnValue, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNDS);
+    void SetMonth(MonthType month)  {
+        StdReturnType return_value = date_.SetMonth(month);
+        error_.CheckReturnValueAndSend(kMonthOptionShortName, return_value, ErrorMessage::kErrorValueOutOfBounds);
     }
-    void setDay(DayType Day)  {
-        StdReturnType returnValue = Date.setDay(Day);
-        Error.checkReturnValueAndSend(DayOptionShortName, returnValue, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNDS);
+    void SetDay(DayType day)  {
+        StdReturnType return_value = date_.SetDay(day);
+        error_.CheckReturnValueAndSend(kDayOptionShortName, return_value, ErrorMessage::kErrorValueOutOfBounds);
     }
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    MsgCmdDateParser(const char* Parameter) : MsgParameterParser(ParameterTable, Parameter) {
-        Date = RealTimeClock::getInstance().getDate();
+    MsgCmdDateParser(const char* parameter) : MsgParameterParser(kParameterTable, parameter) {
+        date_ = RealTimeClock::GetInstance().GetDate();
     }
     ~MsgCmdDateParser() { }
 
@@ -118,17 +118,17 @@ class MsgCmdDateParser : public MsgParameterParser<MsgCmdDateParser, MSG_CMD_DAT
     // set methods
 
     // methods
-    void sendAnswer() const
+    void SendAnswer() const
     {
-        sendAnswerYear(true);
-        sendAnswerMonth(true);
-        sendAnswerDay(false);
+        SendAnswerYear(true);
+        SendAnswerMonth(true);
+        SendAnswerDay(false);
     }
 
-    void process()
+    void Process()
     {
-        RealTimeClock::getInstance().setDate(Date);
-        Date = RealTimeClock::getInstance().getDate();
+        RealTimeClock::GetInstance().SetDate(date_);
+        date_ = RealTimeClock::GetInstance().GetDate();
     }
 };
 

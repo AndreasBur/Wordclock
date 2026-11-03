@@ -45,40 +45,40 @@
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  init()
+  Init()
 ******************************************************************************************************************************************************/
-void AnimationFlicker::init()
+void AnimationFlicker::Init()
 {
-    Animation::init(STATE_IDLE);
-    reset();
-} /* init */
+    Animation::Init(kStateIdle);
+    Reset();
+} /* Init */
 
 
 /******************************************************************************************************************************************************
-  setTime()
+  SetTime()
 ******************************************************************************************************************************************************/
-StdReturnType AnimationFlicker::setTime(byte sHour, byte sMinute)
+StdReturnType AnimationFlicker::SetTime(byte hour, byte minute)
 {
-    StdReturnType returnValue{E_NOT_OK};
+    StdReturnType return_value{kENotOk};
 
-    if(sHour < CLOCK_NUMBER_OF_HOURS_PER_DAY && sMinute < CLOCK_NUMBER_OF_MINUTES_PER_HOUR) {
-        Hour = sHour;
-        Minute = sMinute;
-        State = STATE_CLEAR_TIME;
-        returnValue = E_OK;
+    if(hour < CLOCK_NUMBER_OF_HOURS_PER_DAY && minute < CLOCK_NUMBER_OF_MINUTES_PER_HOUR) {
+        hour_ = hour;
+        minute_ = minute;
+        state_ = kStateClearTime;
+        return_value = kEOk;
     }
-    return returnValue;
-} /* setTime */
+    return return_value;
+} /* SetTime */
 
 
 /******************************************************************************************************************************************************
-  task()
+  Task()
 ******************************************************************************************************************************************************/
-void AnimationFlicker::task()
+void AnimationFlicker::Task()
 {
-    if(State == STATE_CLEAR_TIME) { clearTimeTask(); }
-    else if(State == STATE_SET_TIME) { setTimeTask(); }
-} /* task */
+    if(state_ == kStateClearTime) { ClearTimeTask(); }
+    else if(state_ == kStateSetTime) { SetTimeTask(); }
+} /* Task */
 
 
 /******************************************************************************************************************************************************
@@ -86,54 +86,54 @@ void AnimationFlicker::task()
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  reset()
+  Reset()
 ******************************************************************************************************************************************************/
-void AnimationFlicker::reset()
+void AnimationFlicker::Reset()
 {
     /* The flicker is made by switching the display off and on, and it ends on an off:
-       clearTimeTask() toggles first and only then decides whether it was the last run, so
+       ClearTimeTask() toggles first and only then decides whether it was the last run, so
        the final toggle is always the one that darkens. Nothing switched it back, which
        left a clock that had shown this animation dark until something else happened to
        turn it on.
 
-       Here rather than at the end of the animation, because reset() is also where an
+       Here rather than at the end of the animation, because Reset() is also where an
        abort lands - a flicker cut short in the middle had the same ending. */
-    Display::getInstance().enable();
+    Display::GetInstance().Enable();
 
-    Minute = 0u;
-    Hour = 0u;
-    IsClockSet = false;
-    FlickerCounter = ANIMATION_FLICKER_COUNTER_INIT_VALUE;
-} /* reset */
+    minute_ = 0u;
+    hour_ = 0u;
+    is_clock_set_ = false;
+    flicker_counter_ = ANIMATION_FLICKER_COUNTER_INIT_VALUE;
+} /* Reset */
 
 
 /******************************************************************************************************************************************************
-  clearTimeTask()
+  ClearTimeTask()
 ******************************************************************************************************************************************************/
-void AnimationFlicker::clearTimeTask()
+void AnimationFlicker::ClearTimeTask()
 {
 
-    IsClockSet = !IsClockSet;
+    is_clock_set_ = !is_clock_set_;
 
-    if(IsClockSet) {
-        Display::getInstance().disable();
+    if(is_clock_set_) {
+        Display::GetInstance().Disable();
     } else {
-        Display::getInstance().enable();
+        Display::GetInstance().Enable();
     }
 
-    if(FlickerCounter-- <= 0u) State = STATE_SET_TIME;
-} /* clearTimeTask */
+    if(flicker_counter_-- <= 0u) state_ = kStateSetTime;
+} /* ClearTimeTask */
 
 
 /******************************************************************************************************************************************************
-  setTimeTask()
+  SetTimeTask()
 ******************************************************************************************************************************************************/
-void AnimationFlicker::setTimeTask()
+void AnimationFlicker::SetTimeTask()
 {
-    /* before reset(), which clears Hour and Minute */
-    finishWithTime(Hour, Minute);
-    reset();
-} /* setTimeTask */
+    /* before Reset(), which clears Hour and Minute */
+    FinishWithTime(hour_, minute_);
+    Reset();
+} /* SetTimeTask */
 
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E

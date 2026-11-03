@@ -61,8 +61,8 @@ class Bit
         public:
             constexpr BitReference(T& sValue, size_t sBitPos) : Value(sValue), BitPos(sBitPos) {}
 
-            operator bool() const { return readBit(Value, BitPos); }
-            void operator = (bool Bit) { Value = writeBit(Value, Bit, BitPos); }
+            operator bool() const { return ReadBit(Value, BitPos); }
+            void operator = (bool Bit) { Value = WriteBit(Value, Bit, BitPos); }
 
         private:
             T& Value;
@@ -85,7 +85,7 @@ class Bit
     Bit& setBit(size_t BitPos) { Value = setBit(Value, BitPos); return *this; }
     Bit& clearBit(size_t BitPos) { Value = clearBit(Value, BitPos); return *this; }
     Bit& toggleBit(size_t BitPos) { Value = toggleBit(Value, BitPos); return *this; }
-    Bit& writeBit(size_t BitPos, bool BitValue) { Value = writeBit(Value, BitValue, BitPos); return *this; }
+    Bit& WriteBit(size_t BitPos, bool BitValue) { Value = WriteBit(Value, BitValue, BitPos); return *this; }
     Bit& shiftRight(size_t BitPos) { Value = shiftRight(Value, BitPos); return *this; }
     Bit& shiftLeft(size_t BitPos) { Value = shiftLeft(Value, BitPos); return *this; }
     Bit& setBitMask(T BitMask) { Value = setBitMask(Value, BitMask); return *this; }
@@ -94,7 +94,7 @@ class Bit
 
 	// methods
     size_t numberOfDigits(unsigned Base) { return numberOfDigits(Value, Base); }
-    bool readBit(size_t BitPos) const { return readBit(Value, BitPos); }
+    bool ReadBit(size_t BitPos) const { return ReadBit(Value, BitPos); }
     T readBitsValue(T BitMask, size_t BitPos) const { return readBitsValue(Value, BitMask, BitPos); }
     T readBits(T BitMask) const { return readBits(Value, BitMask); }
 
@@ -105,7 +105,7 @@ class Bit
 
 	// operators
 	// read [] operator
-    bool operator [] (size_t BitPos) const { return readBit(BitPos); }
+    bool operator [] (size_t BitPos) const { return ReadBit(BitPos); }
     // write [] operator
     BitReference operator [] (size_t BitPos) { return BitReference(Value, BitPos); }
 
@@ -113,7 +113,7 @@ class Bit
     template <typename ValueType> static ValueType setBit(ValueType sValue, size_t BitPos) { return sValue | (UINT64_C(1) << BitPos); }
     template <typename ValueType> static ValueType clearBit(ValueType sValue, size_t BitPos) { return sValue & ~(UINT64_C(1) << BitPos); }
     template <typename ValueType> static ValueType toggleBit(ValueType sValue, size_t BitPos) { return sValue ^ ~(UINT64_C(1) << BitPos); }
-    template <typename ValueType> static ValueType writeBit(ValueType sValue, bool BitValue, size_t BitPos) { return clearBit(sValue, BitPos) | (static_cast<ValueType>(BitValue) << BitPos); }
+    template <typename ValueType> static ValueType WriteBit(ValueType sValue, bool BitValue, size_t BitPos) { return clearBit(sValue, BitPos) | (static_cast<ValueType>(BitValue) << BitPos); }
     template <typename ValueType> static ValueType shiftRight(ValueType sValue, size_t BitPos) { return sValue >> BitPos; }
     template <typename ValueType> static ValueType shiftLeft(ValueType sValue, size_t BitPos) { return sValue << BitPos; }
     template <typename ValueType> static ValueType setBitMask(ValueType sValue, T BitMask) { return sValue | BitMask; }
@@ -121,7 +121,7 @@ class Bit
     template <typename ValueType> static ValueType writeBits(ValueType sValue, T BitMask, T BitsValue) { return setBitMask(clearBitMask(sValue, BitMask), BitsValue); }
 
     // static get methods
-    template <typename ValueType> static ValueType readBit(ValueType sValue, size_t BitPos) { return readBits(sValue, bitValue(BitPos)) >> BitPos; }
+    template <typename ValueType> static ValueType ReadBit(ValueType sValue, size_t BitPos) { return readBits(sValue, bitValue(BitPos)) >> BitPos; }
     template <typename ValueType> static ValueType readBitsValue(ValueType sValue, T BitMask, size_t BitPos) { return readBits(sValue, BitMask) >> BitPos; }
     template <typename ValueType> static ValueType readBits(ValueType sValue, T BitMask) { return sValue & BitMask; }
 

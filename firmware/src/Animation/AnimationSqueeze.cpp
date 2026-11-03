@@ -45,47 +45,47 @@
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  init()
+  Init()
 ******************************************************************************************************************************************************/
-void AnimationSqueeze::init()
+void AnimationSqueeze::Init()
 {
-    Animation::init(STATE_IDLE);
-    reset();
-} /* init */
+    Animation::Init(kStateIdle);
+    Reset();
+} /* Init */
 
 
 /******************************************************************************************************************************************************
-  setTime()
+  SetTime()
 ******************************************************************************************************************************************************/
-StdReturnType AnimationSqueeze::setTime(byte Hour, byte Minute)
+StdReturnType AnimationSqueeze::SetTime(byte hour, byte minute)
 {
-    StdReturnType ReturnValue{E_NOT_OK};
+    StdReturnType return_value{kENotOk};
 
-    if(Clock::getInstance().getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
-        ReturnValue = E_OK;
-        Direction = static_cast<DirectionType>(selectByTime(Hour, Minute, DIRECTION_NUMBER_OF_DIRECTIONS));
-        State = STATE_CLEAR_TIME;
+    if(Clock::GetInstance().GetClockWords(hour, minute, clock_words_table_) == kEOk && state_ == kStateIdle) {
+        return_value = kEOk;
+        direction_ = static_cast<DirectionType>(SelectByTime(hour, minute, kDirectionNumberOfDirections));
+        state_ = kStateClearTime;
     }
-    return ReturnValue;
-} /* setTime */
+    return return_value;
+} /* SetTime */
 
 
 /******************************************************************************************************************************************************
-  task()
+  Task()
 ******************************************************************************************************************************************************/
-void AnimationSqueeze::task()
+void AnimationSqueeze::Task()
 {
-    if(State == STATE_CLEAR_TIME) {
-        clearTimeTask();
-        if(Display::getInstance().isCleared()) {
-            setMaxWordLength();
-            State = STATE_SET_TIME;
+    if(state_ == kStateClearTime) {
+        ClearTimeTask();
+        if(Display::GetInstance().IsCleared()) {
+            SetMaxWordLength();
+            state_ = kStateSetTime;
         }
-    } else if(State == STATE_SET_TIME) {
-        setTimeTask();
-        if(CurrentLength > MaxWordLength) { finishWithClockWords(ClockWordsTable); }
+    } else if(state_ == kStateSetTime) {
+        SetTimeTask();
+        if(current_length_ > max_word_length_) { FinishWithClockWords(clock_words_table_); }
     }
-} /* task */
+} /* Task */
 
 
 /******************************************************************************************************************************************************
@@ -93,76 +93,76 @@ void AnimationSqueeze::task()
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  reset()
+  Reset()
 ******************************************************************************************************************************************************/
-void AnimationSqueeze::reset()
+void AnimationSqueeze::Reset()
 {
-    ClockWordsTable.fill(DisplayWords::WORD_NONE);
-    MaxWordLength = 0u;
-    CurrentLength = 1u;
-    Direction = DIRECTION_FROM_LEFT;
-} /* reset */
+    clock_words_table_.fill(DisplayWords::kWordNone);
+    max_word_length_ = 0u;
+    current_length_ = 1u;
+    direction_ = kDirectionFromLeft;
+} /* Reset */
 
 /******************************************************************************************************************************************************
-  clearTimeTask()
+  ClearTimeTask()
 ******************************************************************************************************************************************************/
-void AnimationSqueeze::clearTimeTask()
+void AnimationSqueeze::ClearTimeTask()
 {
     /* Row by row, not over the linear pixel index: on the index a block at the end of
        one row and a block at the start of the next count as one, which makes the
        result depend on where the rows wrap. */
-    for(byte row = 0u; row < DISPLAY_NUMBER_OF_ROWS; row++) { clearRow(row); }
-} /* clearTimeTask */
+    for(byte row = 0u; row < DISPLAY_NUMBER_OF_ROWS; row++) { ClearRow(row); }
+} /* ClearTimeTask */
 
 
 /******************************************************************************************************************************************************
-  clearRow()
+  ClearRow()
 ******************************************************************************************************************************************************/
-void AnimationSqueeze::clearRow(byte Row)
+void AnimationSqueeze::ClearRow(byte row)
 {
     /* Takes one letter off every block of the row, on the side the direction says, so
        all words of the row get shorter at the same time. */
-    if(Direction == DIRECTION_FROM_LEFT) {
+    if(direction_ == kDirectionFromLeft) {
         for(byte column = 0u; column < DISPLAY_NUMBER_OF_COLUMNS; column++) {
-            if(Display::getInstance().getPixel(column, Row)) {
-                Display::getInstance().clearPixel(column, Row);
+            if(Display::GetInstance().GetPixel(column, row)) {
+                Display::GetInstance().ClearPixel(column, row);
 
                 /* skip the rest of this block, only its first letter goes this frame */
                 while((column + 1u < DISPLAY_NUMBER_OF_COLUMNS) &&
-                      Display::getInstance().getPixel(column + 1u, Row)) { column++; }
+                      Display::GetInstance().GetPixel(column + 1u, row)) { column++; }
             }
         }
     } else {
         for(int8_t column = DISPLAY_NUMBER_OF_COLUMNS - 1; column >= 0; column--) {
-            if(Display::getInstance().getPixel(static_cast<byte>(column), Row)) {
-                Display::getInstance().clearPixel(static_cast<byte>(column), Row);
+            if(Display::GetInstance().GetPixel(static_cast<byte>(column), row)) {
+                Display::GetInstance().ClearPixel(static_cast<byte>(column), row);
 
                 while((column - 1 >= 0) &&
-                      Display::getInstance().getPixel(static_cast<byte>(column - 1), Row)) { column--; }
+                      Display::GetInstance().GetPixel(static_cast<byte>(column - 1), row)) { column--; }
             }
         }
     }
-} /* clearRow */
+} /* ClearRow */
 
 /******************************************************************************************************************************************************
-  setTimeTask()
+  SetTimeTask()
 ******************************************************************************************************************************************************/
-void AnimationSqueeze::setTimeTask()
+void AnimationSqueeze::SetTimeTask()
 {
-    Clock::getInstance().setTime(ClockWordsTable, CurrentLength);
-    CurrentLength++;
-} /* setTimeTask */
+    Clock::GetInstance().SetTime(clock_words_table_, current_length_);
+    current_length_++;
+} /* SetTimeTask */
 
 /******************************************************************************************************************************************************
   getMaxWordLength()
 ******************************************************************************************************************************************************/
-void AnimationSqueeze::setMaxWordLength()
+void AnimationSqueeze::SetMaxWordLength()
 {
-    for(byte index = 0u; index < ClockWordsTable.size(); index++)
+    for(byte index = 0u; index < clock_words_table_.size(); index++)
     {
-        byte CurrentWordLength = Words.getDisplayWordLength(ClockWordsTable[index]);
-        if(CurrentWordLength > MaxWordLength) {
-            MaxWordLength = CurrentWordLength;
+        byte current_word_length = words_.GetDisplayWordLength(clock_words_table_[index]);
+        if(current_word_length > max_word_length_) {
+            max_word_length_ = current_word_length;
         }
     }
 } /* getMaxWordLength */

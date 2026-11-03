@@ -1,4 +1,4 @@
-/* What Pixels::render() puts on the wire, checked against a captured transfer. The DMA
+/* What Pixels::Render() puts on the wire, checked against a captured transfer. The DMA
    call is stubbed here rather than in pio_stubs.cpp because this test has to keep the frame
    the driver handed over - the shared stub throws it away.
 
@@ -16,8 +16,8 @@
 #include <cstdio>
 #include <cstring>
 
-static uint32_t Captured[256];
-static size_t CapturedCount = 0;
+static uint32_t captured[256];
+static size_t captured_count = 0;
 
 /* The blocks themselves, which the driver takes the FIFO address out of. Defined here as
    well as in pio_stubs.cpp because this test links that file's replacement rather than the
@@ -48,53 +48,53 @@ void channel_config_set_write_increment(dma_channel_config*, bool) { }
 void channel_config_set_dreq(dma_channel_config*, uint) { }
 bool dma_channel_is_busy(uint) { return false; }
 
-void dma_channel_configure(uint, const dma_channel_config*, volatile void*, const void* Source, uint Count, bool)
+void dma_channel_configure(uint, const dma_channel_config*, volatile void*, const void* source, uint count, bool)
 {
-    CapturedCount = Count;
-    memcpy(Captured, Source, Count * sizeof(uint32_t));
+    captured_count = count;
+    memcpy(captured, source, count * sizeof(uint32_t));
 }
 
 /* The three bytes as the strip receives them, taken out of the word the way the state
    machine shifts them: from bit 31 down. Written out here rather than compared against the
    shifts the driver used, so that a change to those has to be justified against the wire
    order and not against itself. */
-static byte green(uint32_t Word) { return static_cast<byte>((Word >> 24u) & 0xFFu); }
-static byte red(uint32_t Word)   { return static_cast<byte>((Word >> 16u) & 0xFFu); }
-static byte blue(uint32_t Word)  { return static_cast<byte>((Word >> 8u) & 0xFFu); }
+static byte Green(uint32_t word) { return static_cast<byte>((word >> 24u) & 0xFFu); }
+static byte Red(uint32_t word)   { return static_cast<byte>((word >> 16u) & 0xFFu); }
+static byte Blue(uint32_t word)  { return static_cast<byte>((word >> 8u) & 0xFFu); }
 
 
 int main()
 {
-    Pixels& P = Pixels::getInstance();
-    P.init(10);
+    Pixels& p = Pixels::GetInstance();
+    p.Init(10);
 
-    P.clearPixels();
-    P.setPixel(0u, 10u, 20u, 30u);      // Red=10, Green=20, Blue=30
-    P.setPixel(12u, 1u, 2u, 3u);        // row 1, column 1 -> word 12
-    P.render();
+    p.ClearPixels();
+    p.SetPixel(0u, 10u, 20u, 30u);      // Red=10, Green=20, Blue=30
+    p.SetPixel(12u, 1u, 2u, 3u);        // row 1, column 1 -> word 12
+    p.Render();
 
-    check(CapturedCount == 110u, "frame is one word per LED");
-    check(green(Captured[0]) == 20u && red(Captured[0]) == 10u && blue(Captured[0]) == 30u,
+    Check(captured_count == 110u, "frame is one word per LED");
+    Check(Green(captured[0]) == 20u && Red(captured[0]) == 10u && Blue(captured[0]) == 30u,
           "pixel 0 goes out as green, red, blue from the top of the word");
-    check(green(Captured[12]) == 2u && red(Captured[12]) == 1u && blue(Captured[12]) == 3u,
+    Check(Green(captured[12]) == 2u && Red(captured[12]) == 1u && Blue(captured[12]) == 3u,
           "pixel 12 goes out as green, red, blue in word 12");
     /* The eight low bits are never shifted out - autopull refills after 24 - so nothing
        may depend on them, and nothing here checks them. */
-    check(!P.isDirty(), "render clears the dirty flag");
+    Check(!p.IsDirty(), "render clears the dirty flag");
 
-    CapturedCount = 0;
-    P.render();
-    check(CapturedCount == 0u, "an unchanged frame is not retransmitted");
+    captured_count = 0;
+    p.Render();
+    Check(captured_count == 0u, "an unchanged frame is not retransmitted");
 
-    P.disablePixels();
-    P.render();
-    bool AllDark = true;
-    for(size_t i = 0; i < CapturedCount; i++) { if((Captured[i] & 0xFFFFFF00u) != 0u) AllDark = false; }
-    check(AllDark, "disablePixels blanks the frame");
+    p.DisablePixels();
+    p.Render();
+    bool all_dark = true;
+    for(size_t i = 0; i < captured_count; i++) { if((captured[i] & 0xFFFFFF00u) != 0u) all_dark = false; }
+    Check(all_dark, "disablePixels blanks the frame");
 
-    P.enablePixels();
-    P.render();
-    check(green(Captured[0]) == 20u && red(Captured[0]) == 10u && blue(Captured[0]) == 30u,
+    p.EnablePixels();
+    p.Render();
+    Check(Green(captured[0]) == 20u && Red(captured[0]) == 10u && Blue(captured[0]) == 30u,
           "enablePixels restores it without a redraw");
-    return report();
+    return Report();
 }

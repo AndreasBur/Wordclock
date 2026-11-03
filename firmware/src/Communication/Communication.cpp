@@ -43,17 +43,17 @@
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  task()
+  Task()
 ******************************************************************************************************************************************************/
-void Communication::task()
+void Communication::Task()
 {
-    if(isMessageComplete()) {
-        MsgCmdParser CmdParser(IncomingMessage);
-        CmdParser.parse();
-        IncomingMessage.clear();
-        State = STATE_MESSAGE_INCOMPLETE;
+    if(IsMessageComplete()) {
+        MsgCmdParser cmd_parser(incoming_message_);
+        cmd_parser.Parse();
+        incoming_message_.Clear();
+        state_ = kStateMessageIncomplete;
     } else {
-        addMessagePart();
+        AddMessagePart();
     }
 }
 
@@ -63,20 +63,20 @@ void Communication::task()
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  addMessagePart()
+  AddMessagePart()
 ******************************************************************************************************************************************************/
-void Communication::addMessagePart()
+void Communication::AddMessagePart()
 {
     while (Serial.available()) {
         // get the new byte from uart
-        char inChar = static_cast<char>(Serial.read());
+        char in_char = static_cast<char>(Serial.read());
         // The end-of-message marker terminates the message but is not part of
         // it, so stop before appending it to the buffer.
-        if(inChar == EndOfMessageChar) { State = STATE_MESSAGE_COMPLETE; break; }
-        if(IncomingMessage.addChar(inChar) == E_NOT_OK) {
+        if(in_char == kEndOfMessageChar) { state_ = kStateMessageComplete; break; }
+        if(incoming_message_.AddChar(in_char) == kENotOk) {
             // Emitted while reading, outside the command parser's line framing,
             // so terminate it as its own line without a trailing separator space.
-            Error.send(ErrorMessage::ERROR_MESSAGE_TOO_LONG, false);
+            error_.Send(ErrorMessage::kErrorMessageTooLong, false);
             Serial.println();
         }
     }

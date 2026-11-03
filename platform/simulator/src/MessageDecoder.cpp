@@ -37,17 +37,17 @@
 /******************************************************************************************************************************************************
  *  L O C A L   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
-const char* const MessageDecoder::CommandIndent{"   "};
-const char* const MessageDecoder::ArgumentIndent{"      "};
-const char* const MessageDecoder::NameValueSeparator{" = "};
+const char* const MessageDecoder::kCommandIndent{"   "};
+const char* const MessageDecoder::kArgumentIndent{"      "};
+const char* const MessageDecoder::kNameValueSeparator{" = "};
 
-const char* const MessageDecoder::ErrorPrefix{"Error="};
-const char* const MessageDecoder::ApiPrefix{"Api="};
-const char* const MessageDecoder::RemoteProcedureIdPrefix{"RpcId="};
-const char* const MessageDecoder::OptionLabel{"Option"};
+const char* const MessageDecoder::kErrorPrefix{"Error="};
+const char* const MessageDecoder::kApiPrefix{"Api="};
+const char* const MessageDecoder::kRemoteProcedureIdPrefix{"RpcId="};
+const char* const MessageDecoder::kOptionLabel{"Option"};
 
 /* ErrorMessage::ErrorType */
-const char* const MessageDecoder::ErrorValueNames[] {
+const char* const MessageDecoder::kErrorValueNames[] {
     "No error",
     "Message too long",
     "Wrong command",
@@ -60,7 +60,7 @@ const char* const MessageDecoder::ErrorValueNames[] {
 };
 
 /* ErrorMessage::ApiType */
-const char* const MessageDecoder::ApiValueNames[] {
+const char* const MessageDecoder::kApiValueNames[] {
     "None",
     "Display show",
     "Display write pixel",
@@ -76,7 +76,7 @@ const char* const MessageDecoder::ApiValueNames[] {
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  describe()
+  Describe()
 ******************************************************************************************************************************************************/
 /*! \brief          reads a line from the firmware back into the names behind it
  *  \details        An answer first, an error line second; a line is never both, because
@@ -84,16 +84,16 @@ const char* const MessageDecoder::ApiValueNames[] {
  *
  *  \return         the readable form, or an empty string if this is neither
 ******************************************************************************************************************************************************/
-wxString MessageDecoder::describe(const wxString& Line)
+wxString MessageDecoder::Describe(const wxString& line)
 {
-    wxString Answer = describeAnswer(Line);
-    if(!Answer.IsEmpty()) { return Answer; }
+    wxString answer = DescribeAnswer(line);
+    if(!answer.IsEmpty()) { return answer; }
 
-    wxString RemoteProcedureCall = describeRemoteProcedureCall(Line);
-    if(!RemoteProcedureCall.IsEmpty()) { return RemoteProcedureCall; }
+    wxString remote_procedure_call = DescribeRemoteProcedureCall(line);
+    if(!remote_procedure_call.IsEmpty()) { return remote_procedure_call; }
 
-    return describeError(Line);
-} /* describe */
+    return DescribeError(line);
+} /* Describe */
 
 
 /******************************************************************************************************************************************************
@@ -101,7 +101,7 @@ wxString MessageDecoder::describe(const wxString& Line)
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  describeAnswer()
+  DescribeAnswer()
 ******************************************************************************************************************************************************/
 /*! \brief          reads an answer line back into the names behind it
  *  \details        Deliberately strict about the shape: the line has to start with the
@@ -111,35 +111,35 @@ wxString MessageDecoder::describe(const wxString& Line)
  *
  *  \return         the readable form, or an empty string if this is no answer
 ******************************************************************************************************************************************************/
-wxString MessageDecoder::describeAnswer(const wxString& Line)
+wxString MessageDecoder::DescribeAnswer(const wxString& line)
 {
-    wxStringTokenizer Tokenizer(Line, _T(" "));
-    if(!Tokenizer.HasMoreTokens()) { return wxEmptyString; }
+    wxStringTokenizer tokenizer(line, _T(" "));
+    if(!tokenizer.HasMoreTokens()) { return wxEmptyString; }
 
-    uint16_t Number{0u};
-    if(!toValue(Tokenizer.GetNextToken(), Number)) { return wxEmptyString; }
-    if(Number > CommandNumberMax) { return wxEmptyString; }
+    uint16_t number{0u};
+    if(!ToValue(tokenizer.GetNextToken(), number)) { return wxEmptyString; }
+    if(number > kCommandNumberMax) { return wxEmptyString; }
 
-    const MessageCatalog::CommandType* Command = MessageCatalog::findCommandByNumber(static_cast<byte>(Number));
-    if(Command == nullptr) { return wxEmptyString; }
+    const MessageCatalog::CommandType* command = MessageCatalog::FindCommandByNumber(static_cast<byte>(number));
+    if(command == nullptr) { return wxEmptyString; }
 
-    wxString Arguments;
+    wxString arguments;
 
-    while(Tokenizer.HasMoreTokens()) {
-        const wxString Argument = describeArgument(*Command, Tokenizer.GetNextToken());
-        if(Argument.IsEmpty()) { continue; }
+    while(tokenizer.HasMoreTokens()) {
+        const wxString argument = DescribeArgument(*command, tokenizer.GetNextToken());
+        if(argument.IsEmpty()) { continue; }
 
-        Arguments += ArgumentIndent + Argument + _T("\n");
+        arguments += kArgumentIndent + argument + _T("\n");
     }
 
-    if(Arguments.IsEmpty()) { return wxEmptyString; }
+    if(arguments.IsEmpty()) { return wxEmptyString; }
 
-    return CommandIndent + wxString(Command->Label) + _T("\n") + Arguments;
-} /* describeAnswer */
+    return kCommandIndent + wxString(command->label) + _T("\n") + arguments;
+} /* DescribeAnswer */
 
 
 /******************************************************************************************************************************************************
-  describeArgument()
+  DescribeArgument()
 ******************************************************************************************************************************************************/
 /*! \brief          reads one "<short name>=<value>" of an answer back into names
  *  \details        A short name the command does not have is kept as it is rather than
@@ -148,22 +148,22 @@ wxString MessageDecoder::describeAnswer(const wxString& Line)
  *
  *  \return         the readable form, or an empty string if the token is not an argument
 ******************************************************************************************************************************************************/
-wxString MessageDecoder::describeArgument(const MessageCatalog::CommandType& Command, const wxString& Token)
+wxString MessageDecoder::DescribeArgument(const MessageCatalog::CommandType& command, const wxString& token)
 {
-    if(Token.Find(OptionArgumentDelimiter) != DelimiterPosition) { return wxEmptyString; }
+    if(token.Find(kOptionArgumentDelimiter) != kDelimiterPosition) { return wxEmptyString; }
 
-    const char ShortName = static_cast<char>(Token[0]);
-    const wxString Value = Token.Mid(DelimiterPosition + 1);
-    const MessageCatalog::OptionType* Option = MessageCatalog::findOption(Command, ShortName);
+    const char short_name = static_cast<char>(token[0]);
+    const wxString value = token.Mid(kDelimiterPosition + 1);
+    const MessageCatalog::OptionType* option = MessageCatalog::FindOption(command, short_name);
 
-    if(Option == nullptr) { return Token; }
+    if(option == nullptr) { return token; }
 
-    return describeValue(Option->Label, Value, Option->ValueNames, Option->NumberOfValueNames, Option->Minimum);
-} /* describeArgument */
+    return DescribeValue(option->label, value, option->value_names, option->number_of_value_names, option->minimum);
+} /* DescribeArgument */
 
 
 /******************************************************************************************************************************************************
-  describeRemoteProcedureCall()
+  DescribeRemoteProcedureCall()
 ******************************************************************************************************************************************************/
 /*! \brief          reads the remote procedure call's answer back into names
  *  \details        It is the one answer that does not begin with its command number:
@@ -176,39 +176,39 @@ wxString MessageDecoder::describeArgument(const MessageCatalog::CommandType& Com
  *
  *  \return         the readable form, or an empty string if this is not that answer
 ******************************************************************************************************************************************************/
-wxString MessageDecoder::describeRemoteProcedureCall(const wxString& Line)
+wxString MessageDecoder::DescribeRemoteProcedureCall(const wxString& line)
 {
-    wxStringTokenizer Tokenizer(Line, _T(" "));
-    if(!Tokenizer.HasMoreTokens()) { return wxEmptyString; }
+    wxStringTokenizer tokenizer(line, _T(" "));
+    if(!tokenizer.HasMoreTokens()) { return wxEmptyString; }
 
-    wxString Number;
-    if(!Tokenizer.GetNextToken().StartsWith(RemoteProcedureIdPrefix, &Number)) { return wxEmptyString; }
+    wxString number;
+    if(!tokenizer.GetNextToken().StartsWith(kRemoteProcedureIdPrefix, &number)) { return wxEmptyString; }
 
     /* As strict about the shape as an answer: without a number behind the prefix this is
        something else that happens to begin the same way. */
-    uint16_t Procedure{0u};
-    if(!toValue(Number, Procedure)) { return wxEmptyString; }
+    uint16_t procedure{0u};
+    if(!ToValue(number, procedure)) { return wxEmptyString; }
 
-    const MessageCatalog::CommandType* Command = MessageCatalog::findRemoteProcedureCallCommand();
-    if((Command == nullptr) || (Command->NumberOfOptions == 0u)) { return wxEmptyString; }
+    const MessageCatalog::CommandType* command = MessageCatalog::FindRemoteProcedureCallCommand();
+    if((command == nullptr) || (command->number_of_options == 0u)) { return wxEmptyString; }
 
     /* The procedure is the command's only option. */
-    const MessageCatalog::OptionType& Option = Command->Options[0];
-    wxString Described = CommandIndent + wxString(Command->Label) + _T("\n")
-                       + ArgumentIndent
-                       + describeValue(Option.Label, Number, Option.ValueNames, Option.NumberOfValueNames, Option.Minimum)
+    const MessageCatalog::OptionType& option = command->options[0];
+    wxString described = kCommandIndent + wxString(command->label) + _T("\n")
+                       + kArgumentIndent
+                       + DescribeValue(option.label, number, option.value_names, option.number_of_value_names, option.minimum)
                        + _T("\n");
 
-    while(Tokenizer.HasMoreTokens()) {
-        Described += describeErrorPart(Tokenizer.GetNextToken(), ArgumentIndent);
+    while(tokenizer.HasMoreTokens()) {
+        described += DescribeErrorPart(tokenizer.GetNextToken(), kArgumentIndent);
     }
 
-    return Described;
-} /* describeRemoteProcedureCall */
+    return described;
+} /* DescribeRemoteProcedureCall */
 
 
 /******************************************************************************************************************************************************
-  describeError()
+  DescribeError()
 ******************************************************************************************************************************************************/
 /*! \brief          reads an error line back into the names behind it
  *  \details        ErrorMessage appends a space after each error, so one line can carry
@@ -217,21 +217,21 @@ wxString MessageDecoder::describeRemoteProcedureCall(const wxString& Line)
  *
  *  \return         the readable form, or an empty string if this is no error line
 ******************************************************************************************************************************************************/
-wxString MessageDecoder::describeError(const wxString& Line)
+wxString MessageDecoder::DescribeError(const wxString& line)
 {
-    wxString Described;
-    wxStringTokenizer Tokenizer(Line, _T(" "));
+    wxString described;
+    wxStringTokenizer tokenizer(line, _T(" "));
 
-    while(Tokenizer.HasMoreTokens()) {
-        Described += describeErrorPart(Tokenizer.GetNextToken(), CommandIndent);
+    while(tokenizer.HasMoreTokens()) {
+        described += DescribeErrorPart(tokenizer.GetNextToken(), kCommandIndent);
     }
 
-    return Described;
-} /* describeError */
+    return described;
+} /* DescribeError */
 
 
 /******************************************************************************************************************************************************
-  describeErrorPart()
+  DescribeErrorPart()
 ******************************************************************************************************************************************************/
 /*! \brief          reads one error of a line back into names
  *  \details        Three shapes come out of ErrorMessage: the error on its own, the error
@@ -241,37 +241,37 @@ wxString MessageDecoder::describeError(const wxString& Line)
  *
  *  \return         the readable form, or an empty string if this is no error
 ******************************************************************************************************************************************************/
-wxString MessageDecoder::describeErrorPart(const wxString& Part, const char* Indent)
+wxString MessageDecoder::DescribeErrorPart(const wxString& part, const char* indent)
 {
-    wxString Rest;
+    wxString rest;
 
-    if(Part.StartsWith(ApiPrefix, &Rest)) {
-        return Indent
-             + describeValue(ApiPrefix, Rest.BeforeFirst(ErrorPartDelimiter), ApiValueNames, NUMBER_OF(ApiValueNames))
+    if(part.StartsWith(kApiPrefix, &rest)) {
+        return indent
+             + DescribeValue(kApiPrefix, rest.BeforeFirst(kErrorPartDelimiter), kApiValueNames, NUMBER_OF(kApiValueNames))
              + _T("\n")
-             + describeErrorPart(Rest.AfterFirst(ErrorPartDelimiter), Indent);
+             + DescribeErrorPart(rest.AfterFirst(kErrorPartDelimiter), indent);
     }
 
-    if(Part.StartsWith(ErrorPrefix, &Rest)) {
-        wxString Described = Indent
-                           + describeValue(ErrorPrefix, Rest.BeforeFirst(ErrorPartDelimiter), ErrorValueNames, NUMBER_OF(ErrorValueNames))
+    if(part.StartsWith(kErrorPrefix, &rest)) {
+        wxString described = indent
+                           + DescribeValue(kErrorPrefix, rest.BeforeFirst(kErrorPartDelimiter), kErrorValueNames, NUMBER_OF(kErrorValueNames))
                            + _T("\n");
 
         /* Only the shape that names an option has anything after the delimiter. */
-        const wxString Option = Rest.AfterFirst(ErrorPartDelimiter);
-        if(!Option.IsEmpty()) {
-            Described += Indent + wxString(OptionLabel) + NameValueSeparator + Option + _T("\n");
+        const wxString option = rest.AfterFirst(kErrorPartDelimiter);
+        if(!option.IsEmpty()) {
+            described += indent + wxString(kOptionLabel) + kNameValueSeparator + option + _T("\n");
         }
 
-        return Described;
+        return described;
     }
 
     return wxEmptyString;
-} /* describeErrorPart */
+} /* DescribeErrorPart */
 
 
 /******************************************************************************************************************************************************
-  describeValue()
+  DescribeValue()
 ******************************************************************************************************************************************************/
 /*! \brief          puts a label and its value together, spelling the value out if named
  *  \details        The number stays alongside the name: the name is what makes the line
@@ -279,29 +279,29 @@ wxString MessageDecoder::describeErrorPart(const wxString& Part, const char* Ind
  *
  *  \return         "<label> = <name> (<number>)", or "<label> = <value>" without a name
 ******************************************************************************************************************************************************/
-wxString MessageDecoder::describeValue(const char* Label, const wxString& Value,
-                                       const char* const* Names, byte NumberOfNames, uint16_t Minimum)
+wxString MessageDecoder::DescribeValue(const char* label, const wxString& value,
+                                       const char* const* names, byte number_of_names, uint16_t minimum)
 {
     /* The labels of the error shapes carry the delimiter the firmware prints them with,
        which would read oddly in front of one of ours. */
-    wxString Described = wxString(Label);
-    Described.Replace(wxString(OptionArgumentDelimiter), wxEmptyString);
-    Described += NameValueSeparator;
+    wxString described = wxString(label);
+    described.Replace(wxString(kOptionArgumentDelimiter), wxEmptyString);
+    described += kNameValueSeparator;
 
-    uint16_t Number{0u};
-    if((Names != nullptr) && toValue(Value, Number) &&
-       (Number >= Minimum) && ((Number - Minimum) < NumberOfNames)) {
-        Described += wxString::Format(wxT("%s (%s)"), Names[Number - Minimum], Value);
+    uint16_t number{0u};
+    if((names != nullptr) && ToValue(value, number) &&
+       (number >= minimum) && ((number - minimum) < number_of_names)) {
+        described += wxString::Format(wxT("%s (%s)"), names[number - minimum], value);
     } else {
-        Described += Value;
+        described += value;
     }
 
-    return Described;
-} /* describeValue */
+    return described;
+} /* DescribeValue */
 
 
 /******************************************************************************************************************************************************
-  toValue()
+  ToValue()
 ******************************************************************************************************************************************************/
 /*! \brief          reads a number out of a token in the width the catalog uses
  *  \details        wxString only parses into unsigned long, which is why this exists: it
@@ -310,16 +310,16 @@ wxString MessageDecoder::describeValue(const char* Label, const wxString& Value,
  *
  *  \return         true if the token is a number that fits
 ******************************************************************************************************************************************************/
-bool MessageDecoder::toValue(const wxString& Text, uint16_t& Value)
+bool MessageDecoder::ToValue(const wxString& text, uint16_t& value)
 {
-    unsigned long Parsed{0ul};
+    unsigned long parsed{0ul};
 
-    if(!Text.ToULong(&Parsed)) { return false; }
-    if(Parsed > UINT16_MAX) { return false; }
+    if(!text.ToULong(&parsed)) { return false; }
+    if(parsed > UINT16_MAX) { return false; }
 
-    Value = static_cast<uint16_t>(Parsed);
+    value = static_cast<uint16_t>(parsed);
     return true;
-} /* toValue */
+} /* ToValue */
 
 
 /******************************************************************************************************************************************************

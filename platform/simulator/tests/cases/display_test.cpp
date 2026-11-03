@@ -19,114 +19,114 @@
 #include "Pixels.h"
 #include "RealTimeClock.h"
 
-void testColourDimmingAcrossByteRange()
+void TestColourDimmingAcrossByteRange()
 {
     DisplayColor color;
-    bool allMatch = true;
+    bool all_match = true;
     for(unsigned channel = 0u; channel <= 255u; ++channel) {
-        color.setColor(Pixel(channel, channel, channel));
+        color.SetColor(Pixel(channel, channel, channel));
         for(unsigned brightness = 0u; brightness <= 255u; ++brightness) {
-            color.dimmColors(brightness);
+            color.DimmColors(brightness);
             const uint32_t scaled = (static_cast<uint32_t>(channel) * brightness) / 256u;
             const byte expected = (channel == 0u) ? 0u : ((scaled == 0u) ? 1u : static_cast<byte>(scaled));
-            allMatch = allMatch && color.getColorRedDimmed() == expected
-                && color.getColorGreenDimmed() == expected && color.getColorBlueDimmed() == expected;
+            all_match = all_match && color.GetColorRedDimmed() == expected
+                && color.GetColorGreenDimmed() == expected && color.GetColorBlueDimmed() == expected;
         }
     }
-    expect(allMatch, "dimming must scale every byte pair without overflow and retain the minimum level");
-    expect(color.getColorRed() == 255u, "dimming must preserve the configured colour");
+    Expect(all_match, "dimming must scale every byte pair without overflow and retain the minimum level");
+    Expect(color.GetColorRed() == 255u, "dimming must preserve the configured colour");
 
     /* The case the loop above walks only on the diagonal: a colour with a channel at 0. */
-    color.setColor(Pixel(255u, 0u, 0u));
-    color.dimmColors(0u);
-    expect(color.getColorRedDimmed() == 1u, "a pure red at the lowest brightness must keep its red at the minimum");
-    expect(color.getColorGreenDimmed() == 0u && color.getColorBlueDimmed() == 0u,
+    color.SetColor(Pixel(255u, 0u, 0u));
+    color.DimmColors(0u);
+    Expect(color.GetColorRedDimmed() == 1u, "a pure red at the lowest brightness must keep its red at the minimum");
+    Expect(color.GetColorGreenDimmed() == 0u && color.GetColorBlueDimmed() == 0u,
            "and must not gain the green and blue it does not have");
-    color.dimmColors(128u);
-    expect(color.getColorGreenDimmed() == 0u && color.getColorBlueDimmed() == 0u,
+    color.DimmColors(128u);
+    Expect(color.GetColorGreenDimmed() == 0u && color.GetColorBlueDimmed() == 0u,
            "at any brightness");
 }
 
 /* The curve's ends, its shape and a value from each end of the shift range. The middle
    ones are what the construction gives directly: one stored value, shifted once per
    doubling below the top. */
-void testGammaCorrectionCurve()
+void TestGammaCorrectionCurve()
 {
-    expect(GammaCorrection::calcCorrectedValue(0u) == 0u, "a setting of 0 must stay 0, not the faintest light");
-    expect(GammaCorrection::calcCorrectedValue(1u) == 1u, "the first step above 0 must be the faintest light there is");
-    expect(GammaCorrection::calcCorrectedValue(255u) == 255u, "the full setting must stay full");
+    Expect(GammaCorrection::CalcCorrectedValue(0u) == 0u, "a setting of 0 must stay 0, not the faintest light");
+    Expect(GammaCorrection::CalcCorrectedValue(1u) == 1u, "the first step above 0 must be the faintest light there is");
+    Expect(GammaCorrection::CalcCorrectedValue(255u) == 255u, "the full setting must stay full");
 
     bool rising = true;
     for(unsigned value = 1u; value <= 255u; ++value) {
-        rising = rising && GammaCorrection::calcCorrectedValue(static_cast<byte>(value - 1u)) <= GammaCorrection::calcCorrectedValue(static_cast<byte>(value));
+        rising = rising && GammaCorrection::CalcCorrectedValue(static_cast<byte>(value - 1u)) <= GammaCorrection::CalcCorrectedValue(static_cast<byte>(value));
     }
-    expect(rising, "the curve must never fall, not even where one doubling hands over to the next");
+    Expect(rising, "the curve must never fall, not even where one doubling hands over to the next");
 
-    expect(GammaCorrection::calcCorrectedValue(31u) == 1u && GammaCorrection::calcCorrectedValue(32u) == 2u,
+    Expect(GammaCorrection::CalcCorrectedValue(31u) == 1u && GammaCorrection::CalcCorrectedValue(32u) == 2u,
            "the first doubling must end at setting 31 and the second begin at 32");
-    expect(GammaCorrection::calcCorrectedValue(128u) == 16u, "half the setting must be 133 shifted down three doublings");
-    expect(GammaCorrection::calcCorrectedValue(254u) == 255u, "the last step must be the top of the stored doubling, unshifted");
+    Expect(GammaCorrection::CalcCorrectedValue(128u) == 16u, "half the setting must be 133 shifted down three doublings");
+    Expect(GammaCorrection::CalcCorrectedValue(254u) == 255u, "the last step must be the top of the stored doubling, unshifted");
 }
 
 /* How much light the whole display is putting out, which is what a fade changes and a
    redraw does not. */
-uint32_t totalIntensity(const PixelBufferType& Pixels)
+uint32_t TotalIntensity(const PixelBufferType& pixels)
 {
-    uint32_t Total = 0u;
+    uint32_t total = 0u;
 
     for(byte index = 0u; index < PIXELS_NUMBER_OF_PIXELS; index++) {
-        Total += Pixels[index].getRed();
-        Total += Pixels[index].getGreen();
-        Total += Pixels[index].getBlue();
+        total += pixels[index].GetRed();
+        total += pixels[index].GetGreen();
+        total += pixels[index].GetBlue();
     }
-    return Total;
+    return total;
 }
 
 /* The latch itself: the display is redrawn when the word set changes and left alone
-   when it does not. Pixels::isDirty() is what makes "left alone" observable at all - the
+   when it does not. Pixels::IsDirty() is what makes "left alone" observable at all - the
    buffer staying equal would not tell a skipped redraw from one that rewrote the same
    words. Must run before any other test touches DisplayManager. */
-void testDisplayManagerLatch()
+void TestDisplayManagerLatch()
 {
-    Clock::getInstance().setMode(Clock::MODE_WESSI);
+    Clock::GetInstance().SetMode(Clock::kModeWessi);
     /* Without an animation the word change draws straight to the buffer, so what the
        latch decided is visible in the same task. */
-    Animations::getInstance().setMode(Animations::MODE_FIXED);
-    Animations::getInstance().setAnimation(Animations::ANIMATION_ID_NONE);
+    Animations::GetInstance().SetMode(Animations::kModeFixed);
+    Animations::GetInstance().SetAnimation(Animations::kAnimationIdNone);
 
-    Pixels& pixels = Pixels::getInstance();
-    DisplayManager& displayManager = DisplayManager::getInstance();
+    Pixels& pixels = Pixels::GetInstance();
+    DisplayManager& display_manager = DisplayManager::GetInstance();
 
-    setTime(10u, 4u, 0u);
-    pixels.clearDirty();
-    displayManager.task();
-    expect(pixels.isDirty(), "the first task must draw the time it finds");
+    SetTime(10u, 4u, 0u);
+    pixels.ClearDirty();
+    display_manager.Task();
+    Expect(pixels.IsDirty(), "the first task must draw the time it finds");
 
-    const PixelBufferType afterFirstTask = readPixels();
-    expect(isAnyPixelLit(afterFirstTask), "the first task must light some letters");
+    const PixelBufferType after_first_task = ReadPixels();
+    Expect(IsAnyPixelLit(after_first_task), "the first task must light some letters");
 
     /* Same five-minute step, one task later. */
-    setTime(10u, 4u, 30u);
-    pixels.clearDirty();
-    displayManager.task();
-    expect(!pixels.isDirty(), "an unchanged word set must not redraw");
-    expect(arePixelsEqual(readPixels(), afterFirstTask),
+    SetTime(10u, 4u, 30u);
+    pixels.ClearDirty();
+    display_manager.Task();
+    Expect(!pixels.IsDirty(), "an unchanged word set must not redraw");
+    Expect(ArePixelsEqual(ReadPixels(), after_first_task),
            "an unchanged word set must leave the letters as they were");
 
-    setTime(10u, 5u, 0u);
-    pixels.clearDirty();
-    displayManager.task();
-    expect(pixels.isDirty(), "a word change must redraw");
-    expect(!arePixelsEqual(readPixels(), afterFirstTask),
+    SetTime(10u, 5u, 0u);
+    pixels.ClearDirty();
+    display_manager.Task();
+    Expect(pixels.IsDirty(), "a word change must redraw");
+    Expect(!ArePixelsEqual(ReadPixels(), after_first_task),
            "a word change must reach the letters");
 
     /* And back to standing still on the new step. */
-    const PixelBufferType afterChange = readPixels();
-    setTime(10u, 9u, 59u);
-    pixels.clearDirty();
-    displayManager.task();
-    expect(!pixels.isDirty(), "the rest of the step must not redraw either");
-    expect(arePixelsEqual(readPixels(), afterChange),
+    const PixelBufferType after_change = ReadPixels();
+    SetTime(10u, 9u, 59u);
+    pixels.ClearDirty();
+    display_manager.Task();
+    Expect(!pixels.IsDirty(), "the rest of the step must not redraw either");
+    Expect(ArePixelsEqual(ReadPixels(), after_change),
            "the rest of the step must leave the letters as they were");
 }
 
@@ -136,62 +136,62 @@ void testDisplayManagerLatch()
    The other half of this is what it must not touch: the brightness setting, which is what
    Persistence writes to the store. A fade that dimmed by turning the setting down would
    save its own half-way value as what the user asked for. */
-void testFadeDimsAndComesBack()
+void TestFadeDimsAndComesBack()
 {
-    Animations& animations = Animations::getInstance();
-    Display& display = Display::getInstance();
+    Animations& animations = Animations::GetInstance();
+    Display& display = Display::GetInstance();
 
-    const PixelBufferType Target = drawClockFace(10u, 35u);
-    const byte BrightnessBefore = display.getBrightness();
+    const PixelBufferType target = DrawClockFace(10u, 35u);
+    const byte brightness_before = display.GetBrightness();
 
-    drawClockFace(10u, 4u);
-    const uint32_t IntensityBefore = totalIntensity(readPixels());
+    DrawClockFace(10u, 4u);
+    const uint32_t intensity_before = TotalIntensity(ReadPixels());
 
-    animations.setAnimation(Animations::ANIMATION_ID_FADE);
-    animations.setTime(10u, 35u);
+    animations.SetAnimation(Animations::kAnimationIdFade);
+    animations.SetTime(10u, 35u);
 
     /* Far enough in to be measurable, far short of the swap: the level counts down one per
        task from 255. */
-    for(int Tick = 0; Tick < 64; Tick++) { animations.task(true); }
-    expect(totalIntensity(readPixels()) < IntensityBefore, "the fade must dim what is on the display");
+    for(int tick = 0; tick < 64; tick++) { animations.Task(true); }
+    Expect(TotalIntensity(ReadPixels()) < intensity_before, "the fade must dim what is on the display");
 
-    int Ticks = 0;
-    while((animations.getState() == Animations::STATE_PENDING) && (Ticks < 5000)) {
-        animations.task(true);
-        Ticks++;
+    int ticks = 0;
+    while((animations.GetState() == Animations::kStatePending) && (ticks < 5000)) {
+        animations.Task(true);
+        ticks++;
     }
 
-    expect(arePixelsEqual(readPixels(), Target), "the fade must come back to full brightness");
-    expect(display.getBrightness() == BrightnessBefore, "the fade must leave the brightness setting alone");
+    Expect(ArePixelsEqual(ReadPixels(), target), "the fade must come back to full brightness");
+    Expect(display.GetBrightness() == brightness_before, "the fade must leave the brightness setting alone");
 
-    animations.setAnimation(Animations::ANIMATION_ID_NONE);
+    animations.SetAnimation(Animations::kAnimationIdNone);
 }
 
 /* Switching the display off and on again, seen where it happens: the output rather than
    the buffer. disable() leaves every colour in the buffer where it was and takes the
    brightness to zero, so a check on the buffer alone would call a dark clock lit. */
-void testDisplayOffAndOnAgain()
+void TestDisplayOffAndOnAgain()
 {
-    Display& display = Display::getInstance();
+    Display& display = Display::GetInstance();
 
     /* Switched on first rather than assumed on: the flicker animation leaves it off, and
        until this test there was nothing that could notice. */
-    display.enable();
-    display.setBrightness(120u);
-    expect(Clock::getInstance().setTime(10u, 5u) == E_OK, "test clock time must be accepted");
-    expect(display.show() == E_OK, "the clock face must reach the strip");
-    expect(isAnyOutputPixelLit(), "a display that is on must put something out");
+    display.Enable();
+    display.SetBrightness(120u);
+    Expect(Clock::GetInstance().SetTime(10u, 5u) == kEOk, "test clock time must be accepted");
+    Expect(display.Show() == kEOk, "the clock face must reach the strip");
+    Expect(IsAnyOutputPixelLit(), "a display that is on must put something out");
 
-    const PixelBufferType Lit = readPixels();
+    const PixelBufferType lit = ReadPixels();
 
-    display.disable();
-    expect(!isAnyOutputPixelLit(), "a display that is off must put nothing out");
-    expect(arePixelsEqual(readPixels(), Lit),
+    display.Disable();
+    Expect(!IsAnyOutputPixelLit(), "a display that is off must put nothing out");
+    Expect(ArePixelsEqual(ReadPixels(), lit),
            "and must leave the buffer alone, so switching back on needs no redraw");
 
-    display.enable();
-    expect(isAnyOutputPixelLit(), "switching back on must put something out again");
-    expect(display.getBrightness() == 120u,
+    display.Enable();
+    Expect(IsAnyOutputPixelLit(), "switching back on must put something out again");
+    Expect(display.GetBrightness() == 120u,
            "and must come back on the brightness that was set, not on full");
 }
 
@@ -199,53 +199,53 @@ void testDisplayOffAndOnAgain()
    button on the case can send, so it has to agree with the enable and disable a phone
    sends - a toggle that only tracked its own calls would drift apart from ids 3 and 4 the
    first time both were used. */
-void testDisplayToggleFollowsTheState()
+void TestDisplayToggleFollowsTheState()
 {
-    Display& display = Display::getInstance();
-    const byte BrightnessBefore = display.getBrightness();
+    Display& display = Display::GetInstance();
+    const byte brightness_before = display.GetBrightness();
 
-    display.enable();
-    display.setBrightness(120u);
-    expect(Clock::getInstance().setTime(10u, 5u) == E_OK, "test clock time must be accepted");
-    display.show();
-    expect(display.isEnabled(), "a display that was enabled must say so");
+    display.Enable();
+    display.SetBrightness(120u);
+    Expect(Clock::GetInstance().SetTime(10u, 5u) == kEOk, "test clock time must be accepted");
+    display.Show();
+    Expect(display.IsEnabled(), "a display that was enabled must say so");
 
-    display.toggle();
-    expect(!display.isEnabled(), "a toggle must switch an enabled display off");
-    expect(!isAnyOutputPixelLit(), "and must reach the strip, not only the flag");
+    display.Toggle();
+    Expect(!display.IsEnabled(), "a toggle must switch an enabled display off");
+    Expect(!IsAnyOutputPixelLit(), "and must reach the strip, not only the flag");
 
-    display.toggle();
-    expect(display.isEnabled(), "a second toggle must switch it back on");
-    expect(isAnyOutputPixelLit(), "and must put something out again");
+    display.Toggle();
+    Expect(display.IsEnabled(), "a second toggle must switch it back on");
+    Expect(IsAnyOutputPixelLit(), "and must put something out again");
 
     /* The other direction: a phone switching it off, a knob switching it back on. */
-    display.disable();
-    expect(!display.isEnabled(), "disable must be visible to the toggle too");
-    display.toggle();
-    expect(display.isEnabled() && isAnyOutputPixelLit(),
+    display.Disable();
+    Expect(!display.IsEnabled(), "disable must be visible to the toggle too");
+    display.Toggle();
+    Expect(display.IsEnabled() && IsAnyOutputPixelLit(),
            "a toggle after a disable must switch the display on");
 
-    display.setBrightness(BrightnessBefore);
+    display.SetBrightness(brightness_before);
 }
 
 /* The two settings that are a yes or a no, turned round by a control that cannot read
    them. Both go through the setters that apply what they set, so this also says that a
    toggle does not need a task to take effect. */
-void testBrightnessTogglesInvertTheSetting()
+void TestBrightnessTogglesInvertTheSetting()
 {
-    Display& display = Display::getInstance();
+    Display& display = Display::GetInstance();
 
-    display.setBrightnessUseAutomatic(false);
-    display.toggleBrightnessAutomatic();
-    expect(display.getBrightnessUseAutomatic(), "a toggle must switch the automatic on");
-    display.toggleBrightnessAutomatic();
-    expect(!display.getBrightnessUseAutomatic(), "and the next one must switch it off again");
+    display.SetBrightnessUseAutomatic(false);
+    display.ToggleBrightnessAutomatic();
+    Expect(display.GetBrightnessUseAutomatic(), "a toggle must switch the automatic on");
+    display.ToggleBrightnessAutomatic();
+    Expect(!display.GetBrightnessUseAutomatic(), "and the next one must switch it off again");
 
-    display.setBrightnessUseGammaCorrection(false);
-    display.toggleBrightnessGammaCorrection();
-    expect(display.getBrightnessUseGammaCorrection(), "a toggle must switch the gamma correction on");
-    display.toggleBrightnessGammaCorrection();
-    expect(!display.getBrightnessUseGammaCorrection(), "and the next one must switch it off again");
+    display.SetBrightnessUseGammaCorrection(false);
+    display.ToggleBrightnessGammaCorrection();
+    Expect(display.GetBrightnessUseGammaCorrection(), "a toggle must switch the gamma correction on");
+    display.ToggleBrightnessGammaCorrection();
+    Expect(!display.GetBrightnessUseGammaCorrection(), "and the next one must switch it off again");
 }
 
 /* What the colour reset needs to be worth having, and what it did not have: a colour that
@@ -253,72 +253,72 @@ void testBrightnessTogglesInvertTheSetting()
    dimmed copy used to be recomputed only when the brightness moved - so every colour change,
    the reset and the six increment procedures alike, stayed invisible until something else
    happened to touch the brightness. A redraw did not help: it wrote the same stale copy. */
-void testColourChangesReachTheStrip()
+void TestColourChangesReachTheStrip()
 {
-    Display& display = Display::getInstance();
-    const byte BrightnessBefore = display.getBrightness();
+    Display& display = Display::GetInstance();
+    const byte brightness_before = display.GetBrightness();
 
-    display.enable();
-    display.setBrightness(200u);
-    display.resetColor();
-    const PixelBufferType White = drawClockFace(10u, 5u);
-    expect(isAnyPixelLit(White), "a clock face must light some letters to compare");
+    display.Enable();
+    display.SetBrightness(200u);
+    display.ResetColor();
+    const PixelBufferType white = DrawClockFace(10u, 5u);
+    Expect(IsAnyPixelLit(white), "a clock face must light some letters to compare");
 
     /* No brightness change anywhere between here and the check, which is the whole point. */
-    display.setColor(255u, 0u, 0u);
-    expect(!arePixelsEqual(readPixels(), White),
+    display.SetColor(255u, 0u, 0u);
+    Expect(!ArePixelsEqual(ReadPixels(), white),
            "a colour change must reach the letters that are already lit");
 
     /* Red, and the other two channels as far down as they go: DisplayColor's dimming
        rounds a channel up to one rather than to nothing, so "off" is a one here. */
-    const PixelBufferType Red = readPixels();
-    bool anyLitPixelIsRed = false;
-    bool everyLitPixelIsRed = true;
+    const PixelBufferType red = ReadPixels();
+    bool any_lit_pixel_is_red = false;
+    bool every_lit_pixel_is_red = true;
     for(byte index = 0u; index < PIXELS_NUMBER_OF_PIXELS; index++) {
-        if(Red[index].getRed() <= 1u) { continue; }
+        if(red[index].GetRed() <= 1u) { continue; }
 
-        anyLitPixelIsRed = true;
-        if(Red[index].getGreen() > 1u || Red[index].getBlue() > 1u) { everyLitPixelIsRed = false; }
+        any_lit_pixel_is_red = true;
+        if(red[index].GetGreen() > 1u || red[index].GetBlue() > 1u) { every_lit_pixel_is_red = false; }
     }
-    expect(anyLitPixelIsRed && everyLitPixelIsRed,
+    Expect(any_lit_pixel_is_red && every_lit_pixel_is_red,
            "a red display must have nothing but the rounding left in the other two channels");
 
-    display.resetColor();
-    expect(arePixelsEqual(readPixels(), White),
+    display.ResetColor();
+    Expect(ArePixelsEqual(ReadPixels(), white),
            "the colour reset must put white back, on the strip and not only in the setting");
-    expect(display.getColorRed() == 255u && display.getColorGreen() == 255u &&
-           display.getColorBlue() == 255u, "and must reach all three channels");
+    Expect(display.GetColorRed() == 255u && display.GetColorGreen() == 255u &&
+           display.GetColorBlue() == 255u, "and must reach all three channels");
 
-    display.setBrightness(BrightnessBefore);
+    display.SetBrightness(brightness_before);
 }
 
 /* Guards a swap that this simulator cannot show: Pixel keeps its channels in the WS2812
    wire order rather than in argument order, so a constructor that filled the raw array
-   positionally put red where getRed() does not look. Every colour built that way so far
+   positionally put red where GetRed() does not look. Every colour built that way so far
    was grey or black, which hides it, and the window renders brightness rather than hue,
    which hides it again - it would first have appeared on the strip. */
-void testPixelColorChannels()
+void TestPixelColorChannels()
 {
     const Pixel color(10u, 20u, 30u);
 
-    expect(color.getRed() == 10u, "the first constructor argument must be red");
-    expect(color.getGreen() == 20u, "the second constructor argument must be green");
-    expect(color.getBlue() == 30u, "the third constructor argument must be blue");
+    Expect(color.GetRed() == 10u, "the first constructor argument must be red");
+    Expect(color.GetGreen() == 20u, "the second constructor argument must be green");
+    Expect(color.GetBlue() == 30u, "the third constructor argument must be blue");
 
     Pixel assigned;
-    assigned.setPixel(10u, 20u, 30u);
-    expect(assigned.getRed() == color.getRed() &&
-           assigned.getGreen() == color.getGreen() &&
-           assigned.getBlue() == color.getBlue(),
+    assigned.SetPixel(10u, 20u, 30u);
+    Expect(assigned.GetRed() == color.GetRed() &&
+           assigned.GetGreen() == color.GetGreen() &&
+           assigned.GetBlue() == color.GetBlue(),
            "setPixel and the constructor must place the channels alike");
 
     Pixel individual;
-    individual.setRed(10u);
-    individual.setGreen(20u);
-    individual.setBlue(30u);
-    expect(individual.getRed() == color.getRed() &&
-           individual.getGreen() == color.getGreen() &&
-           individual.getBlue() == color.getBlue(),
+    individual.SetRed(10u);
+    individual.SetGreen(20u);
+    individual.SetBlue(30u);
+    Expect(individual.GetRed() == color.GetRed() &&
+           individual.GetGreen() == color.GetGreen() &&
+           individual.GetBlue() == color.GetBlue(),
            "the per-channel setters must place the channels alike");
 }
 
@@ -326,41 +326,41 @@ void testPixelColorChannels()
    not: two of them indexed the table transposed, which for the last column read past its
    end. Nothing called any of them, so the simulator kept a second copy of the letters
    instead - which is the duplication this pins down as unnecessary. */
-void testDisplayCharacterLookup()
+void TestDisplayCharacterLookup()
 {
     const DisplayCharacters characters;
 
     /* First row is "ESKISTLF" then U with an umlaut, "NF". */
-    expect(characters.getCharacter(0u) == 'E', "index 0 must be the first letter of the first row");
-    expect(characters.getCharacter(2u) == 'K', "index 2 must be the third letter of the first row");
-    expect(characters.getCharacter(0u, 0u) == 'E', "column 0, row 0 must be the first letter");
+    Expect(characters.GetCharacter(0u) == 'E', "index 0 must be the first letter of the first row");
+    Expect(characters.GetCharacter(2u) == 'K', "index 2 must be the third letter of the first row");
+    Expect(characters.GetCharacter(0u, 0u) == 'E', "column 0, row 0 must be the first letter");
 
     /* Column 10 is the one a transposed lookup read past the end of the table for. */
-    expect(characters.getCharacter(10u, 0u) == 'F', "the last column of the first row must be reachable");
-    expect(characters.getCharacter(10u) == 'F', "index 10 must be the last letter of the first row");
+    Expect(characters.GetCharacter(10u, 0u) == 'F', "the last column of the first row must be reachable");
+    Expect(characters.GetCharacter(10u) == 'F', "index 10 must be the last letter of the first row");
 
     /* Last row is "BSECHSFMUHR", so the very last letter is its R. */
-    constexpr byte lastIndex{DISPLAY_CHARACTERS_NUMBER_OF_CHARACTERS - 1u};
-    expect(characters.getCharacter(lastIndex) == 'R', "the last index must be the last letter");
-    expect(characters.getCharacter(DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS - 1u,
+    constexpr byte kLastIndex{DISPLAY_CHARACTERS_NUMBER_OF_CHARACTERS - 1u};
+    Expect(characters.GetCharacter(kLastIndex) == 'R', "the last index must be the last letter");
+    Expect(characters.GetCharacter(DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS - 1u,
                                       DISPLAY_CHARACTERS_NUMBER_OF_ROWS - 1u) == 'R',
            "the last column of the last row must be the last letter");
 
     /* Every position has to read the same whether it is asked for by index or by column
        and row - that is what the two broken entry points disagreed on. */
-    bool allAgree = true;
+    bool all_agree = true;
     for(byte index = 0u; index < DISPLAY_CHARACTERS_NUMBER_OF_CHARACTERS; index++) {
         byte column, row;
-        characters.indexToColumnAndRow(index, column, row);
+        characters.IndexToColumnAndRow(index, column, row);
 
-        if(characters.getCharacter(index) != characters.getCharacter(column, row)) { allAgree = false; }
-        if(characters.columnAndRowToIndex(column, row) != index) { allAgree = false; }
+        if(characters.GetCharacter(index) != characters.GetCharacter(column, row)) { all_agree = false; }
+        if(characters.ColumnAndRowToIndex(column, row) != index) { all_agree = false; }
     }
-    expect(allAgree, "index and column/row lookups must agree on every position");
+    Expect(all_agree, "index and column/row lookups must agree on every position");
 
     char character{'\0'};
-    expect(characters.getCharacter(DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS, 0u, character) == E_NOT_OK,
+    Expect(characters.GetCharacter(DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS, 0u, character) == kENotOk,
            "a column past the last one must be rejected");
-    expect(characters.getCharacter(DISPLAY_CHARACTERS_NUMBER_OF_CHARACTERS, character) == E_NOT_OK,
+    Expect(characters.GetCharacter(DISPLAY_CHARACTERS_NUMBER_OF_CHARACTERS, character) == kENotOk,
            "an index past the last one must be rejected");
 }

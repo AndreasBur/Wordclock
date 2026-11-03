@@ -62,11 +62,11 @@ class AnimationCursor : public Animation
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    ClockWords::WordsListType ClockWordsTable{{DisplayWords::WORD_NONE}};
-    byte CurrentPixelIndex{0u};
+    ClockWords::WordsListType clock_words_table_{{DisplayWords::kWordNone}};
+    byte current_pixel_index_{0u};
 
     // functions
-    void reset();
+    void Reset();
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
@@ -81,9 +81,9 @@ class AnimationCursor : public Animation
     // set methods
 
     // methods
-    void init();
-    StdReturnType setTime(byte, byte);
-    void task();
+    void Init();
+    StdReturnType SetTime(byte, byte);
+    void Task();
 };
 
 

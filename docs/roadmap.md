@@ -92,7 +92,7 @@ while running" is a solved problem. ESPWortuhr's shape is the one to copy — on
 per layout with a generated file collecting them, chosen from a dropdown.
 
 What is German is deeper than the tables, though, and that is why this is an idea.
-`DisplayWords::WordIdType` names its entries `WORD_FUENF`, which is cosmetic; the letter
+`DisplayWords::WordIdType` names its entries `kWordFuenf`, which is cosmetic; the letter
 grid in `DisplayCharacters` is not, because it *is* the front plate. A second language is
 therefore a second front plate, and its size need not be 11×10 — which turns this from a
 table into a layout abstraction, with the column and row counts becoming values instead
@@ -118,10 +118,10 @@ it happened in.
 
 | | Where the reasoning lives |
 |---|---|
-| **RPCs 22 to 30** — clock refresh, animation start and abort, the three overlays on demand, overlay abort, save and reset the settings | the RPC table in [serial-commands.md](serial-commands.md); the per-module `resetToDefaults()` in [Animations.h](../firmware/inc/Animation/Animations.h) and its siblings |
+| **RPCs 22 to 30** — clock refresh, animation start and abort, the three overlays on demand, overlay abort, save and reset the settings | the RPC table in [serial-commands.md](serial-commands.md); the per-module `ResetToDefaults()` in [Animations.h](../firmware/inc/Animation/Animations.h) and its siblings |
 | **The temperature overlay**, reading a DS3231 on the bus the light sensor already runs | [OverlayTemperature.h](../firmware/inc/Overlay/OverlayTemperature.h), [Temperature.h](../firmware/inc/Temperature/Temperature.h) |
 | **The degree sign**, appended by hand as glyph 102 and sent to the display only | *Adding a single glyph* in [fonts.md](fonts.md) |
-| **Status command 12** — version, uptime, illuminance, temperature, address, link quality, free memory | the `ReadOnly` flag in [MessageCatalog.h](../firmware/inc/Communication/MessageCatalog.h), [Version.h](../firmware/inc/Version/Version.h) |
+| **Status command 12** — version, uptime, illuminance, temperature, address, link quality, free memory | the `read_only` flag in [MessageCatalog.h](../firmware/inc/Communication/MessageCatalog.h), [Version.h](../firmware/inc/Version/Version.h) |
 | **RPCs 34 to 40** for a control with no display — animation next and previous, clock mode next, three toggles, colour reset | [Animations.h](../firmware/inc/Animation/Animations.h), [DisplayManager.h](../firmware/inc/DisplayManager/DisplayManager.h) |
 | **Platform hooks** — `System.h`, procedures 31 to 33, and the four fields only a backend knows | the [platform contract](../platform/avr-dx/README.md) |
 | **Cutting the strip's supply**, ids 20 and 21 against the WC MiniDev Shield v5 | [Power.h](../firmware/inc/Power/Power.h), and the hardware end in the [ESP32 notes](../platform/esp32/README.md#switching-the-strips-supply) |

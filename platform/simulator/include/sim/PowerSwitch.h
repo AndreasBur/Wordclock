@@ -22,7 +22,7 @@
  *                  the tests can drive them.
  *
  *                  The supply starts on. On a board the gate's pull down leaves it off until
- *                  init() asks, and there is nothing to hold here.
+ *                  Init() asks, and there is nothing to hold here.
  *
 ******************************************************************************************************************************************************/
 #ifndef _POWER_SWITCH_H_
@@ -51,7 +51,7 @@ class PowerSwitch
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    bool SupplyOn{true};
+    bool supply_on_{true};
 
     PowerSwitch() { }
     ~PowerSwitch() { }
@@ -60,23 +60,23 @@ class PowerSwitch
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    static PowerSwitch& getInstance() {
-        static PowerSwitch SingletonInstance;
-        return SingletonInstance;
+    static PowerSwitch& GetInstance() {
+        static PowerSwitch singleton_instance;
+        return singleton_instance;
     }
 
     // get methods
-    static constexpr bool isFitted() { return POWER_SWITCH_IS_FITTED == STD_ON; }
-    bool isSupplyOn() const { return SupplyOn; }
+    static constexpr bool IsFitted() { return POWER_SWITCH_IS_FITTED == STD_ON; }
+    bool IsSupplyOn() const { return supply_on_; }
 
     // methods
     /* Nothing to set up: there is no port to make an output, and the supply already reads
        on. It exists so that the call in the application's start-up is the same one on every
        backend. */
-    void init() { }
+    void Init() { }
 
-    void switchSupplyOn() { SupplyOn = true; }
-    void switchSupplyOff() { SupplyOn = false; }
+    void SwitchSupplyOn() { supply_on_ = true; }
+    void SwitchSupplyOff() { supply_on_ = false; }
 };
 
 #endif // _POWER_SWITCH_H_

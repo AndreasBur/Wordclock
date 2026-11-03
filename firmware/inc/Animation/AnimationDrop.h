@@ -60,27 +60,27 @@ class AnimationDrop : public Animation
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    DisplayWords Words;
-    ClockWords::WordsListType ClockWordsTable{{DisplayWords::WORD_NONE}};
-    byte Row{0u};
-    byte Column{0u};
-    byte CurrentWordIndex{0u};
+    DisplayWords words_;
+    ClockWords::WordsListType clock_words_table_{{DisplayWords::kWordNone}};
+    byte row_{0u};
+    byte column_{0u};
+    byte current_word_index_{0u};
 
     // functions
-    void reset();
-    StdReturnType setNextActivePixelIndex();
-    void clearTimeTask();
-    void setTimeTask();
-    StdReturnType setNextWordIndex();
-    void setStateToSetTime();
-    StdReturnType setNextRow(byte);
-    StdReturnType setNextColumn(byte);
+    void Reset();
+    StdReturnType SetNextActivePixelIndex();
+    void ClearTimeTask();
+    void SetTimeTask();
+    StdReturnType SetNextWordIndex();
+    void SetStateToSetTime();
+    StdReturnType SetNextRow(byte);
+    StdReturnType SetNextColumn(byte);
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr AnimationDrop() : Words() { }
+    constexpr AnimationDrop() : words_() { }
     ~AnimationDrop() { }
 
     // get methods
@@ -89,9 +89,9 @@ class AnimationDrop : public Animation
     // set methods
 
     // methods
-    void init();
-    StdReturnType setTime(byte, byte);
-    void task();
+    void Init();
+    StdReturnType SetTime(byte, byte);
+    void Task();
 };
 
 

@@ -56,20 +56,20 @@ class DisplayColor
   private:
     /* White, and named rather than written into the member below alone: it is also what
        the reset puts back, and two literals could drift apart. */
-    static constexpr byte ColorInitValue{255u};
+    static constexpr byte kColorInitValue{255u};
 
-    Pixel Color{ColorInitValue, ColorInitValue, ColorInitValue};
+    Pixel color_{kColorInitValue, kColorInitValue, kColorInitValue};
 
     /* What the colour cycle is currently on, and whether it is running at all. A level
        above the setting rather than a write into it: the setting is what command 2 answers
        and what Persistence stores, and a cycle that wrote it would save a colour nobody
        chose - and leave nothing to put back when it stopped. The same arrangement the night
        brightness has above the brightness. */
-    bool CycleActive{false};
-    Pixel CycleColor{Color};
+    bool cycle_active_{false};
+    Pixel cycle_color_{color_};
 
 #if (DISPLAY_COLOR_SUPPORT_DIMMING == STD_ON)
-    Pixel ColorDimmed{Color};
+    Pixel color_dimmed_{color_};
 #endif
 
     // functions
@@ -78,14 +78,14 @@ class DisplayColor
        reached 0 would read as unlit at a low brightness. A channel the colour does not have
        is the other way round - lifting it to 1 like the rest put a trace of green and blue
        into a pure red, which is a different colour rather than a dimmer one. */
-    static constexpr byte dimmColor(byte Color, byte Brightness) {
-        if(Color == 0u) { return 0u; }
+    static constexpr byte DimmColor(byte color, byte brightness) {
+        if(color == 0u) { return 0u; }
 
         /* One operand widened before the multiply: two bytes promote to a signed 16-bit
            int on the AVR, and 255 * 255 does not fit in one. */
-        const byte DimmedColor = (static_cast<uint16_t>(Color) * Brightness) >> 8u;
-        if(DimmedColor == 0u) { return 1u; }
-        else { return DimmedColor; }
+        const byte dimmed_color = (static_cast<uint16_t>(color) * brightness) >> 8u;
+        if(dimmed_color == 0u) { return 1u; }
+        else { return dimmed_color; }
     }
 #endif
 
@@ -97,59 +97,59 @@ class DisplayColor
     ~DisplayColor() { }
 
 	// get methods
-    Pixel getColor() const { return Color; }
+    Pixel GetColor() const { return color_; }
 
     /* What is to reach the strip, which is not always the setting - the one place that
        difference is decided, so every writer of a pixel and the current limit with them see
        the cycle without having to know there is one. */
-    Pixel getColorToShow() const { return CycleActive ? CycleColor : Color; }
-    byte getColorRed() const { return Color.getRed(); }
-    byte getColorGreen() const { return Color.getGreen(); }
-    byte getColorBlue() const { return Color.getBlue(); }
+    Pixel GetColorToShow() const { return cycle_active_ ? cycle_color_ : color_; }
+    byte GetColorRed() const { return color_.GetRed(); }
+    byte GetColorGreen() const { return color_.GetGreen(); }
+    byte GetColorBlue() const { return color_.GetBlue(); }
         
 #if (DISPLAY_COLOR_SUPPORT_DIMMING == STD_ON)
-    Pixel getColorDimmed() const { return ColorDimmed; }
-    byte getColorRedDimmed() const { return ColorDimmed.getRed(); }
-    byte getColorGreenDimmed() const { return ColorDimmed.getGreen(); }
-    byte getColorBlueDimmed() const { return ColorDimmed.getBlue(); }
+    Pixel GetColorDimmed() const { return color_dimmed_; }
+    byte GetColorRedDimmed() const { return color_dimmed_.GetRed(); }
+    byte GetColorGreenDimmed() const { return color_dimmed_.GetGreen(); }
+    byte GetColorBlueDimmed() const { return color_dimmed_.GetBlue(); }
 #endif
 
 	// set methods
-    void setColor(Pixel sColor) { Color = sColor; }
-    void setColorRed(byte Red) { Color.setRed(Red); }
-    void setColorGreen(byte Green) { Color.setGreen(Green); }
-    void setColorBlue(byte Blue) { Color.setBlue(Blue); }
+    void SetColor(Pixel color) { color_ = color; }
+    void SetColorRed(byte red) { color_.SetRed(red); }
+    void SetColorGreen(byte green) { color_.SetGreen(green); }
+    void SetColorBlue(byte blue) { color_.SetBlue(blue); }
 
     /* The cycle's own pair. Reading it back is what lets a test say which of the two levels
        the strip is on without going through the strip. */
-    bool isCycleActive() const { return CycleActive; }
-    Pixel getCycleColor() const { return CycleColor; }
-    void setCycleColor(Pixel sCycleColor) { CycleColor = sCycleColor; CycleActive = true; }
-    void clearCycle() { CycleActive = false; }
+    bool IsCycleActive() const { return cycle_active_; }
+    Pixel GetCycleColor() const { return cycle_color_; }
+    void SetCycleColor(Pixel cycle_color) { cycle_color_ = cycle_color; cycle_active_ = true; }
+    void ClearCycle() { cycle_active_ = false; }
 
 	// methods
     /* The cycle is not reset here. It belongs to ColorCycle, which has its own defaults and
        is asked for them by the same reset - and a colour reset that stopped the cycle would
        be command 2's reset quietly switching off command 15. */
-    void resetToDefaults() { setColor(Pixel(ColorInitValue, ColorInitValue, ColorInitValue)); }
+    void ResetToDefaults() { SetColor(Pixel(kColorInitValue, kColorInitValue, kColorInitValue)); }
 
-    void incrementColorRed() { Color.incrementRed(); }
-    void incrementColorGreen() { Color.incrementGreen(); }
-    void incrementColorBlue() { Color.incrementBlue(); }
+    void IncrementColorRed() { color_.IncrementRed(); }
+    void IncrementColorGreen() { color_.IncrementGreen(); }
+    void IncrementColorBlue() { color_.IncrementBlue(); }
     
-    void decrementColorRed() { Color.decrementRed(); }
-    void decrementColorGreen() { Color.decrementGreen(); }
-    void decrementColorBlue() { Color.decrementBlue(); }    
+    void DecrementColorRed() { color_.DecrementRed(); }
+    void DecrementColorGreen() { color_.DecrementGreen(); }
+    void DecrementColorBlue() { color_.DecrementBlue(); }    
     
 #if (DISPLAY_COLOR_SUPPORT_DIMMING == STD_ON)
-    void dimmColorRed(byte Brightness) { ColorDimmed.setRed(dimmColor(getColorToShow().getRed(), Brightness)); }
-    void dimmColorGreen(byte Brightness) { ColorDimmed.setGreen(dimmColor(getColorToShow().getGreen(), Brightness)); }
-    void dimmColorBlue(byte Brightness) { ColorDimmed.setBlue(dimmColor(getColorToShow().getBlue(), Brightness)); }
+    void DimmColorRed(byte brightness) { color_dimmed_.SetRed(DimmColor(GetColorToShow().GetRed(), brightness)); }
+    void DimmColorGreen(byte brightness) { color_dimmed_.SetGreen(DimmColor(GetColorToShow().GetGreen(), brightness)); }
+    void DimmColorBlue(byte brightness) { color_dimmed_.SetBlue(DimmColor(GetColorToShow().GetBlue(), brightness)); }
     
-    void dimmColors(byte Brightness) {
-        dimmColorRed(Brightness);
-        dimmColorGreen(Brightness);
-        dimmColorBlue(Brightness);
+    void DimmColors(byte brightness) {
+        DimmColorRed(brightness);
+        DimmColorGreen(brightness);
+        DimmColorBlue(brightness);
     }
 #endif
 };

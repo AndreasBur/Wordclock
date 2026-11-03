@@ -48,45 +48,45 @@ class Communication
 ******************************************************************************************************************************************************/
   public:
     enum StateType {
-        STATE_MESSAGE_COMPLETE,
-        STATE_MESSAGE_INCOMPLETE,
+        kStateMessageComplete,
+        kStateMessageIncomplete,
     };
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    Communication() : Error(), IncomingMessage(), State(STATE_MESSAGE_INCOMPLETE) { }
+    Communication() : error_(), incoming_message_(), state_(kStateMessageIncomplete) { }
     ~Communication() { }
 
-    static constexpr byte TaskCycle{COMMUNICATION_TASK_CYCLE};
-    static constexpr char EndOfMessageChar{'\n'};
-    ErrorMessage Error;
-    Message IncomingMessage;
-    StateType State;
+    static constexpr byte kTaskCycle{COMMUNICATION_TASK_CYCLE};
+    static constexpr char kEndOfMessageChar{'\n'};
+    ErrorMessage error_;
+    Message incoming_message_;
+    StateType state_;
 
     // private functions
-    void addMessagePart();
+    void AddMessagePart();
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    static Communication& getInstance() {
-        static Communication SingletonInstance;
-        return SingletonInstance;
+    static Communication& GetInstance() {
+        static Communication singleton_instance;
+        return singleton_instance;
     }
 
     // get methods
-    static constexpr char getEndOfMessageChar() { return EndOfMessageChar; }
-    static constexpr byte getTaskCycle() { return TaskCycle; }
-    StateType getState() const { return State; }
+    static constexpr char GetEndOfMessageChar() { return kEndOfMessageChar; }
+    static constexpr byte GetTaskCycle() { return kTaskCycle; }
+    StateType GetState() const { return state_; }
 
     // set methods
 
     // methods
-    void task();
-    bool isMessageComplete() const { return State == STATE_MESSAGE_COMPLETE; }
+    void Task();
+    bool IsMessageComplete() const { return state_ == kStateMessageComplete; }
 };
 
 #endif

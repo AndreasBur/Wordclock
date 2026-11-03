@@ -67,27 +67,27 @@ class AnimationShift : public Animation
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    Transformation wcTransformation;
-    ClockWords::WordsListType ClockWordsTable{{DisplayWords::WORD_NONE}};
+    Transformation wc_transformation_;
+    ClockWords::WordsListType clock_words_table_{{DisplayWords::kWordNone}};
 
 #if (ANIMATION_SHIFT_HORIZONTAL == STD_ON)
-    byte CurrentColumn{0u};
+    byte current_column_{0u};
 #endif
 
 #if (ANIMATION_SHIFT_VERTICAL == STD_ON)
-    byte CurrentRow{0u};
+    byte current_row_{0u};
 #endif
 
     // functions
-    void reset();
-    void clearTimeTask();
-    void setTimeTask();
+    void Reset();
+    void ClearTimeTask();
+    void SetTimeTask();
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr AnimationShift() : wcTransformation() { }
+    constexpr AnimationShift() : wc_transformation_() { }
     ~AnimationShift() { }
 
     // get methods
@@ -96,9 +96,9 @@ class AnimationShift : public Animation
     // set methods
 
     // methods
-    void init();
-    StdReturnType setTime(byte, byte);
-    void task();
+    void Init();
+    StdReturnType SetTime(byte, byte);
+    void Task();
 };
 
 

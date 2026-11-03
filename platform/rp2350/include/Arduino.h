@@ -19,7 +19,7 @@
  *
  *                  Order matters twice over. The real header has to come first, because it
  *                  declares the port this file then hides. And the port has to be captured
- *                  before it is hidden - hardwarePort() below - because after the macro
+ *                  before it is hidden - HardwarePort() below - because after the macro
  *                  the name no longer refers to it. Capturing it through a function rather
  *                  than a reference variable is what makes it work whether the core made
  *                  Serial an object or, on a board that boots on USB CDC, a macro alias
@@ -71,13 +71,13 @@ static_assert(sizeof(byte) == 1u, "Arduino.h: the Arduino core's header did not 
 /******************************************************************************************************************************************************
  *  G L O B A L   F U N C T I O N S
 ******************************************************************************************************************************************************/
-namespace WordclockPlatform {
+namespace wordclock_platform {
 
 /* Both of these have to be defined while Serial still means the core's port. */
-inline Stream& hardwarePort() { return Serial; }
-inline void hardwarePortBegin(unsigned long BaudRate) { Serial.begin(BaudRate); }
+inline Stream& HardwarePort() { return Serial; }
+inline void HardwarePortBegin(unsigned long baud_rate) { Serial.begin(baud_rate); }
 
-} // namespace WordclockPlatform
+} // namespace wordclock_platform
 
 /******************************************************************************************************************************************************
  *  S E R I A L
@@ -87,7 +87,7 @@ inline void hardwarePortBegin(unsigned long BaudRate) { Serial.begin(BaudRate); 
    is a redefinition, and the compiler is right to warn; the alias is also exactly why the
    port above is captured through a function rather than a reference. */
 #undef Serial
-#define Serial                  WordclockSerial::getInstance()
+#define Serial                  WordclockSerial::GetInstance() // NOLINT(readability-identifier-naming)
 
 #endif // _WORDCLOCK_ARDUINO_H_
 

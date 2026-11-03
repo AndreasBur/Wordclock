@@ -31,7 +31,7 @@
 ******************************************************************************************************************************************************/
 /* Clock configuration parameter */
 #define CLOCK_SHOW_IT_IS_PERMANENTLY            STD_ON
-#define CLOCK_INITIAL_MODE                      MODE_WESSI
+#define CLOCK_INITIAL_MODE                      kModeWessi
 
 /* Clock  parameter */
 /* Hour */
@@ -65,27 +65,27 @@ class Clock
 ******************************************************************************************************************************************************/
   public:
     enum ModeType {
-        MODE_WESSI,
-        MODE_OSSI,
-        MODE_RHEIN_RUHR,
-        MODE_SCHWABEN,
-        MODE_NUMBER_OF_MODES
+        kModeWessi,
+        kModeOssi,
+        kModeRheinRuhr,
+        kModeSchwaben,
+        kModeNumberOfModes
     };
 
     enum HourModeType {
-        HOUR_MODE_FULL_HOUR,
-        HOUR_MODE_NO_FULL_HOUR
+        kHourModeFullHour,
+        kHourModeNoFullHour
     };
 
     struct MinuteType {
-        HourModeType HourMode;
-        byte HourOffset;
-        ClockWords::MinutesWordsType Words;
+        HourModeType hour_mode;
+        byte hour_offset;
+        ClockWords::MinutesWordsType words;
     };
 
     struct TimeType {
-        byte Hour;
-        byte Minute;
+        byte hour;
+        byte minute;
     };
 
   private:
@@ -99,75 +99,75 @@ class Clock
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    static constexpr bool ShowItIsPermanentlyInitValue{CLOCK_SHOW_IT_IS_PERMANENTLY == STD_ON};
+    static constexpr bool kShowItIsPermanentlyInitValue{CLOCK_SHOW_IT_IS_PERMANENTLY == STD_ON};
 
-    ModeType Mode{CLOCK_INITIAL_MODE};
+    ModeType mode_{CLOCK_INITIAL_MODE};
     /* Whether "es ist" stands in every time or only in the two it is said in. A setting
        rather than the compile-time switch it was: both are ways German tells the time, the
        clock can say either, and which one somebody wants is not a property of the build. */
-    bool ShowItIsPermanently{ShowItIsPermanentlyInitValue};
+    bool show_it_is_permanently_{kShowItIsPermanentlyInitValue};
 
-    static const HourType HoursTable[][CLOCK_NUMBER_OF_HOURS];
-    static const MinuteType MinutesTable[][CLOCK_NUMBER_OF_MINUTE_STEPS];
+    static const HourType kHoursTable[][CLOCK_NUMBER_OF_HOURS];
+    static const MinuteType kMinutesTable[][CLOCK_NUMBER_OF_MINUTE_STEPS];
 
     // functions
-    constexpr Clock(ModeType sMode) : Mode(sMode) { }
+    constexpr Clock(ModeType mode) : mode_(mode) { }
     ~Clock() { }
 
-    MinuteTableElementType getMinutesTableElement(byte Minute) const {
-        MinuteTableElementType minutesTableElement;
-        memcpy_P(&minutesTableElement, &MinutesTable[Mode][Minute / CLOCK_MINUTE_STEP_IN_MINUTES], sizeof(MinuteTableElementType));
-        return minutesTableElement;
+    MinuteTableElementType GetMinutesTableElement(byte minute) const {
+        MinuteTableElementType minutes_table_element;
+        memcpy_P(&minutes_table_element, &kMinutesTable[mode_][minute / CLOCK_MINUTE_STEP_IN_MINUTES], sizeof(MinuteTableElementType));
+        return minutes_table_element;
     }
 
-    static HourTableElementType getHoursTableElement(HourModeType HourMode, byte Hour) {
-        HourTableElementType hoursTableElement;
-        memcpy_P(&hoursTableElement, &HoursTable[HourMode][Hour], sizeof(HourTableElementType));
-        return hoursTableElement;
+    static HourTableElementType GetHoursTableElement(HourModeType hour_mode, byte hour) {
+        HourTableElementType hours_table_element;
+        memcpy_P(&hours_table_element, &kHoursTable[hour_mode][hour], sizeof(HourTableElementType));
+        return hours_table_element;
     }
 
-    static bool calculateItIs(byte Minute) {
-        byte minuteSteps = Minute / CLOCK_MINUTE_STEP_IN_MINUTES;
+    static bool CalculateItIs(byte minute) {
+        byte minute_steps = minute / CLOCK_MINUTE_STEP_IN_MINUTES;
         // show "it is" only to full and half hour
-        if(minuteSteps == 0u || minuteSteps == (CLOCK_NUMBER_OF_MINUTE_STEPS / 2u)) {
+        if(minute_steps == 0u || minute_steps == (CLOCK_NUMBER_OF_MINUTE_STEPS / 2u)) {
             return true;
         } else {
             return false;
         }
     }
 
-    static byte transform24hTo12hFormat(byte Hour) {
-        return Hour % CLOCK_NUMBER_OF_HOURS;
+    static byte Transform24hTo12hFormat(byte hour) {
+        return hour % CLOCK_NUMBER_OF_HOURS;
     }
 
-    static constexpr ModeType toNextMode(ModeType sMode) {
-        return (sMode + 1u >= MODE_NUMBER_OF_MODES) ? MODE_WESSI : static_cast<ModeType>(sMode + 1u);
+    static constexpr ModeType ToNextMode(ModeType mode) {
+        return (mode + 1u >= kModeNumberOfModes) ? kModeWessi : static_cast<ModeType>(mode + 1u);
     }
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    static Clock& getInstance() {
-        static Clock SingletonInstance(CLOCK_INITIAL_MODE);
-        return SingletonInstance;
+    static Clock& GetInstance() {
+        static Clock singleton_instance(CLOCK_INITIAL_MODE);
+        return singleton_instance;
     }
 
     // get methods
-    ModeType getMode() const { return Mode; }
-    bool getShowItIsPermanently() const { return ShowItIsPermanently; }
-    StdReturnType getClockWords(byte, byte, ClockWords&) const;
-    StdReturnType getClockWords(byte, byte, ClockWordsListType&) const;
+    ModeType GetMode() const { return mode_; }
+    bool GetShowItIsPermanently() const { return show_it_is_permanently_; }
+    StdReturnType GetClockWords(byte, byte, ClockWords&) const;
+    StdReturnType GetClockWords(byte, byte, ClockWordsListType&) const;
 
     // set methods
-    void setShowItIsPermanently(bool sShowItIsPermanently) { ShowItIsPermanently = sShowItIsPermanently; }
-    StdReturnType setMode(ModeType sMode)
+    void SetShowItIsPermanently(bool show_it_is_permanently) { show_it_is_permanently_ = show_it_is_permanently; }
+    StdReturnType SetMode(ModeType mode)
     {
-        if(isModeValid(sMode)) {
-            Mode = sMode;
-            return E_OK;
+        if(IsModeValid(mode)) {
+            mode_ = mode;
+            return kEOk;
         } else {
-            return E_NOT_OK;
+            return kENotOk;
         }
     }
 
@@ -178,31 +178,31 @@ class Clock
        for every other one - with the selected animation, which "8 -M<id>" does not do.
        Where two wordings say the same thing at the current time there is nothing to
        redraw, and nothing happens, which is the right answer rather than a missed one. */
-    void nextMode() { setMode(toNextMode(Mode)); }
+    void NextMode() { SetMode(ToNextMode(mode_)); }
 
-    void resetToDefaults() {
-        setMode(CLOCK_INITIAL_MODE);
-        ShowItIsPermanently = ShowItIsPermanentlyInitValue;
+    void ResetToDefaults() {
+        SetMode(CLOCK_INITIAL_MODE);
+        show_it_is_permanently_ = kShowItIsPermanentlyInitValue;
     }
 
-    static bool isModeValid(ModeType sMode) { return sMode < MODE_NUMBER_OF_MODES; }
-    StdReturnType setTime(TimeType Time) const { return setTime(Time.Hour, Time.Minute); }
-    StdReturnType setTime(byte, byte) const;
-    static void setTime(ClockWords::WordsListType ClockWordsTable) {
-        setTime(ClockWordsTable, 0u);
+    static bool IsModeValid(ModeType mode) { return mode < kModeNumberOfModes; }
+    StdReturnType SetTime(TimeType time) const { return SetTime(time.hour, time.minute); }
+    StdReturnType SetTime(byte, byte) const;
+    static void SetTime(ClockWords::WordsListType clock_words_table) {
+        SetTime(clock_words_table, 0u);
     }
-    static void setTime(ClockWords::WordsListType ClockWordsTable, byte MaxLength) {
-        for(byte index = 0u; index < ClockWordsTable.size(); index++) {
-            Display::getInstance().setWord(ClockWordsTable[index], MaxLength);
+    static void SetTime(ClockWords::WordsListType clock_words_table, byte max_length) {
+        for(byte index = 0u; index < clock_words_table.size(); index++) {
+            Display::GetInstance().SetWord(clock_words_table[index], max_length);
         }
     }
 
-    static StdReturnType show() { return Display::getInstance().show(); }
-    StdReturnType refresh(byte Hour, byte Minute) const {
-        StdReturnType returnValue{E_OK};
-        if(setTime(Hour, Minute) == E_NOT_OK) { returnValue = E_NOT_OK; }
-        if(show() == E_NOT_OK) { returnValue = E_NOT_OK; }
-        return returnValue;
+    static StdReturnType Show() { return Display::GetInstance().Show(); }
+    StdReturnType Refresh(byte hour, byte minute) const {
+        StdReturnType return_value{kEOk};
+        if(SetTime(hour, minute) == kENotOk) { return_value = kENotOk; }
+        if(Show() == kENotOk) { return_value = kENotOk; }
+        return return_value;
     }
 };
 

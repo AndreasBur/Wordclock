@@ -42,7 +42,7 @@
 #define STORAGE_KEY                                     "settings"
 
 /* Storage parameter */
-/* What one write() may hold. The overlay settings this was held open for have landed and
+/* What one Write() may hold. The overlay settings this was held open for have landed and
    take the blob to 110 bytes, which 128 would still have covered - but only just, and the
    next setting would have moved both platforms again. Raised once, with room, rather than
    by the byte: NVS stores what it is given, so the unused part costs nothing here.
@@ -63,7 +63,7 @@ class Storage
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-    static constexpr size_t Capacity{STORAGE_CAPACITY};
+    static constexpr size_t kCapacity{STORAGE_CAPACITY};
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
@@ -76,15 +76,15 @@ class Storage
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    static Storage& getInstance() {
-        static Storage SingletonInstance;
-        return SingletonInstance;
+    static Storage& GetInstance() {
+        static Storage singleton_instance;
+        return singleton_instance;
     }
 
     // methods
-    StdReturnType read(byte*, size_t) const;
-    StdReturnType write(const byte*, size_t);
-    StdReturnType clear();
+    StdReturnType Read(byte*, size_t) const;
+    StdReturnType Write(const byte*, size_t);
+    StdReturnType Clear();
 };
 
 #endif // _STORAGE_H_

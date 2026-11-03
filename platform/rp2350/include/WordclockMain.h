@@ -37,11 +37,11 @@ class WordclockMain
         WordclockMain() { }
         ~WordclockMain() { }
 
-        void init();
-        void task();
+        void Init();
+        void Task();
 
     private:
-        Scheduler wcScheduler;
+        Scheduler wc_scheduler_;
 };
 
 #endif // _WORDCLOCK_MAIN_H_

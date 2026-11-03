@@ -45,51 +45,51 @@
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  init()
+  Init()
 ******************************************************************************************************************************************************/
-void AnimationTeletype::init()
+void AnimationTeletype::Init()
 {
-    Animation::init(STATE_IDLE);
-    reset();
-} /* init */
+    Animation::Init(kStateIdle);
+    Reset();
+} /* Init */
 
 
 /******************************************************************************************************************************************************
-  setTime()
+  SetTime()
 ******************************************************************************************************************************************************/
-StdReturnType AnimationTeletype::setTime(byte Hour, byte Minute)
+StdReturnType AnimationTeletype::SetTime(byte hour, byte minute)
 {
-    StdReturnType returnValue{E_NOT_OK};
+    StdReturnType return_value{kENotOk};
 
-    if(Clock::getInstance().getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
-        returnValue = E_OK;
-        CurrentWordIndex = 0u;
-        CurrentCharIndex = 0u;
-        CurrentWordLength = Words.getDisplayWordLength(ClockWordsTable[CurrentWordIndex]);
-        State = STATE_SET_TIME;
+    if(Clock::GetInstance().GetClockWords(hour, minute, clock_words_table_) == kEOk && state_ == kStateIdle) {
+        return_value = kEOk;
+        current_word_index_ = 0u;
+        current_char_index_ = 0u;
+        current_word_length_ = words_.GetDisplayWordLength(clock_words_table_[current_word_index_]);
+        state_ = kStateSetTime;
     }
-    return returnValue;
-} /* setTime */
+    return return_value;
+} /* SetTime */
 
 
 /******************************************************************************************************************************************************
-  task()
+  Task()
 ******************************************************************************************************************************************************/
-void AnimationTeletype::task()
+void AnimationTeletype::Task()
 {
-    if(State == STATE_SET_TIME) {
-        if(CurrentCharIndex >= CurrentWordLength) {
-            if(setNextWordIndex() == E_NOT_OK) {
-                finishWithClockWords(ClockWordsTable);
+    if(state_ == kStateSetTime) {
+        if(current_char_index_ >= current_word_length_) {
+            if(SetNextWordIndex() == kENotOk) {
+                FinishWithClockWords(clock_words_table_);
                 return;
             }
-            CurrentCharIndex = 0u;
-            CurrentWordLength = Words.getDisplayWordLength(ClockWordsTable[CurrentWordIndex]);
+            current_char_index_ = 0u;
+            current_word_length_ = words_.GetDisplayWordLength(clock_words_table_[current_word_index_]);
         }
-        CurrentCharIndex++;
-        Display::getInstance().setWord(ClockWordsTable[CurrentWordIndex], CurrentCharIndex);
+        current_char_index_++;
+        Display::GetInstance().SetWord(clock_words_table_[current_word_index_], current_char_index_);
     }
-} /* task */
+} /* Task */
 
 
 /******************************************************************************************************************************************************
@@ -97,28 +97,28 @@ void AnimationTeletype::task()
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  reset()
+  Reset()
 ******************************************************************************************************************************************************/
-void AnimationTeletype::reset()
+void AnimationTeletype::Reset()
 {
-    ClockWordsTable.fill(DisplayWords::WORD_NONE);
-    CurrentWordIndex = 0u;
-    CurrentWordLength = 0u;
-    CurrentCharIndex = 0u;
-} /* reset */
+    clock_words_table_.fill(DisplayWords::kWordNone);
+    current_word_index_ = 0u;
+    current_word_length_ = 0u;
+    current_char_index_ = 0u;
+} /* Reset */
 
 
 /******************************************************************************************************************************************************
-  setNextWordIndex()
+  SetNextWordIndex()
 ******************************************************************************************************************************************************/
-StdReturnType AnimationTeletype::setNextWordIndex()
+StdReturnType AnimationTeletype::SetNextWordIndex()
 {
-    if(CurrentWordIndex + 1u < static_cast<byte>(ClockWordsTable.size())) {
-        CurrentWordIndex++;
-        return E_OK;
+    if(current_word_index_ + 1u < static_cast<byte>(clock_words_table_.size())) {
+        current_word_index_++;
+        return kEOk;
     }
-    return E_NOT_OK;
-} /* setNextWordIndex */
+    return kENotOk;
+} /* SetNextWordIndex */
 
 
 /******************************************************************************************************************************************************

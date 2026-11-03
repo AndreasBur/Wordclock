@@ -54,40 +54,40 @@ class AnimationCube : public Animation
 ******************************************************************************************************************************************************/
   public:
     struct BorderType {
-        byte ColumnStart;
-        byte ColumnEnd;
-        byte RowStart;
-        byte RowEnd;
+        byte column_start;
+        byte column_end;
+        byte row_start;
+        byte row_end;
     };
 
     enum BorderStateType {
-        BORDER_STATE_MIN,
-        BORDER_STATE_MAX,
-        BORDER_STATE_BETWEEN
+        kBorderStateMin,
+        kBorderStateMax,
+        kBorderStateBetween
     };
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    ClockWords::WordsListType ClockWordsTable{{DisplayWords::WORD_NONE}};
-    BorderType Border{ANIMATION_CUBE_COLUMN_START_MAX_VALUE, ANIMATION_CUBE_COLUMN_END_MIN_VALUE,
+    ClockWords::WordsListType clock_words_table_{{DisplayWords::kWordNone}};
+    BorderType border_{ANIMATION_CUBE_COLUMN_START_MAX_VALUE, ANIMATION_CUBE_COLUMN_END_MIN_VALUE,
       ANIMATION_CUBE_ROW_START_MAX_VALUE, ANIMATION_CUBE_ROW_END_MIN_VALUE};
-    BorderStateType BorderState{BORDER_STATE_MIN};
+    BorderStateType border_state_{kBorderStateMin};
 
     // functions
-    void reset();
-    void setStateToSetTime();
-    void setBorderPixels() { writeBorderPixels(true); }
-    void clearBorderPixels() { writeBorderPixels(false); }
-    void clearBorderPixelsWithoutClockPixels();
-    void writeBorderPixels(bool) const;
-    StdReturnType increaseBorder();
-    StdReturnType decreaseBorder();
-    void clearTimeTask();
-    void setTimeTask();
-    void setMinBorder();
-    void setMaxBorder();
+    void Reset();
+    void SetStateToSetTime();
+    void SetBorderPixels() { WriteBorderPixels(true); }
+    void ClearBorderPixels() { WriteBorderPixels(false); }
+    void ClearBorderPixelsWithoutClockPixels();
+    void WriteBorderPixels(bool) const;
+    StdReturnType IncreaseBorder();
+    StdReturnType DecreaseBorder();
+    void ClearTimeTask();
+    void SetTimeTask();
+    void SetMinBorder();
+    void SetMaxBorder();
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
@@ -102,9 +102,9 @@ class AnimationCube : public Animation
     // set methods
 
     // methods
-    void init();
-    StdReturnType setTime(byte, byte);
-    void task();
+    void Init();
+    StdReturnType SetTime(byte, byte);
+    void Task();
 
 };
 

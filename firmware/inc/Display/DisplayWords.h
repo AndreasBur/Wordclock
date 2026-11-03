@@ -54,34 +54,34 @@ class DisplayWords
 ******************************************************************************************************************************************************/
   public:
     enum WordIdType {
-        WORD_NONE,
-        WORD_ES,
-        WORD_IST,
-        WORD_FUENF,
-        WORD_ZEHN,
-        WORD_ZWANZIG,
-        WORD_DREI,
-        WORD_VIER,
-        WORD_VIERTEL,
-        WORD_DREIVIERTEL,
-        WORD_NACH,
-        WORD_VOR,
-        WORD_HALB,
-        WORD_HOUR_ZWOELF,
-        WORD_HOUR_ZWEI,
-        WORD_HOUR_EIN,
-        WORD_HOUR_EINS,
-        WORD_HOUR_SIEBEN,
-        WORD_HOUR_DREI,
-        WORD_HOUR_FUENF,
-        WORD_HOUR_ELF,
-        WORD_HOUR_NEUN,
-        WORD_HOUR_VIER,
-        WORD_HOUR_ACHT,
-        WORD_HOUR_ZEHN,
-        WORD_HOUR_SECHS,
-        WORD_UHR,
-        WORD_NUMBER_OF_WORDS
+        kWordNone,
+        kWordEs,
+        kWordIst,
+        kWordFuenf,
+        kWordZehn,
+        kWordZwanzig,
+        kWordDrei,
+        kWordVier,
+        kWordViertel,
+        kWordDreiviertel,
+        kWordNach,
+        kWordVor,
+        kWordHalb,
+        kWordHourZwoelf,
+        kWordHourZwei,
+        kWordHourEin,
+        kWordHourEins,
+        kWordHourSieben,
+        kWordHourDrei,
+        kWordHourFuenf,
+        kWordHourElf,
+        kWordHourNeun,
+        kWordHourVier,
+        kWordHourAcht,
+        kWordHourZehn,
+        kWordHourSechs,
+        kWordUhr,
+        kWordNumberOfWords
     };
 
     using DisplayWordsTableElementType = DisplayWord;
@@ -90,13 +90,13 @@ class DisplayWords
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    static const DisplayWord DisplayWordsTable[];
+    static const DisplayWord kDisplayWordsTable[];
 
     // functions
-    static DisplayWordsTableElementType getDisplayWordsTableElement(byte WordId) {
-        DisplayWordsTableElementType displayWordsTableElement;
-        memcpy_P(&displayWordsTableElement, &DisplayWordsTable[WordId], sizeof(DisplayWordsTableElementType));
-        return displayWordsTableElement;
+    static DisplayWordsTableElementType GetDisplayWordsTableElement(byte word_id) {
+        DisplayWordsTableElementType display_words_table_element;
+        memcpy_P(&display_words_table_element, &kDisplayWordsTable[word_id], sizeof(DisplayWordsTableElementType));
+        return display_words_table_element;
     }
 
 /******************************************************************************************************************************************************
@@ -112,23 +112,23 @@ class DisplayWords
        is not in the table has no place on the plate, which is what a length of zero says,
        and a word of zero length lights nothing. */
     // get methods
-    static StdReturnType getDisplayWord(WordIdType, DisplayWord&);
-    static StdReturnType getDisplayWordLength(WordIdType, byte&);
-    static StdReturnType getDisplayWordColumn(WordIdType, byte&);
-    static StdReturnType getDisplayWordRow(WordIdType, byte&);
+    static StdReturnType GetDisplayWord(WordIdType, DisplayWord&);
+    static StdReturnType GetDisplayWordLength(WordIdType, byte&);
+    static StdReturnType GetDisplayWordColumn(WordIdType, byte&);
+    static StdReturnType GetDisplayWordRow(WordIdType, byte&);
 
-    static DisplayWord getDisplayWord(WordIdType WordId) {
-        if(!isWordIdValid(WordId)) { return DisplayWord{}; }
-        return getDisplayWordsTableElement(WordId);
+    static DisplayWord GetDisplayWord(WordIdType word_id) {
+        if(!IsWordIdValid(word_id)) { return DisplayWord{}; }
+        return GetDisplayWordsTableElement(word_id);
     }
-    static byte getDisplayWordRow(WordIdType WordId) { return getDisplayWord(WordId).getRow(); }
-    static byte getDisplayWordColumn(WordIdType WordId) { return getDisplayWord(WordId).getColumn(); }
-    static byte getDisplayWordLength(WordIdType WordId) { return getDisplayWord(WordId).getLength(); }
+    static byte GetDisplayWordRow(WordIdType word_id) { return GetDisplayWord(word_id).GetRow(); }
+    static byte GetDisplayWordColumn(WordIdType word_id) { return GetDisplayWord(word_id).GetColumn(); }
+    static byte GetDisplayWordLength(WordIdType word_id) { return GetDisplayWord(word_id).GetLength(); }
 
     // set methods
 
     // methods
-    static bool isWordIdValid(WordIdType WordId) { return WordId < WORD_NUMBER_OF_WORDS; }
+    static bool IsWordIdValid(WordIdType word_id) { return word_id < kWordNumberOfWords; }
 };
 
 

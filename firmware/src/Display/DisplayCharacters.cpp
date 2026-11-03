@@ -43,7 +43,7 @@
 /******************************************************************************************************************************************************
  *  LOCAL DATA TYPES AND STRUCTURES
 ******************************************************************************************************************************************************/
-const DisplayCharacters::DisplayCharactersTableElementType DisplayCharacters::DisplayCharactersTable[][DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS + 1] PROGMEM
+const DisplayCharacters::DisplayCharactersTableElementType DisplayCharacters::kDisplayCharactersTable[][DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS + 1] PROGMEM
 {
     "ESKISTLF\xDCNF",
     "ZEHNZWANZIG",
@@ -63,45 +63,45 @@ const DisplayCharacters::DisplayCharactersTableElementType DisplayCharacters::Di
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  getCharacter()
+  GetCharacter()
 ******************************************************************************************************************************************************/
-StdReturnType DisplayCharacters::getCharacter(byte Column, byte Row, char& Character)
+StdReturnType DisplayCharacters::GetCharacter(byte column, byte row, char& character)
 {
-    if(isColumnAndRowValid(Column, Row)) {
-        Character =  getDisplayCharactersTableElement(Column, Row);
-        return E_OK;
+    if(IsColumnAndRowValid(column, row)) {
+        character =  GetDisplayCharactersTableElement(column, row);
+        return kEOk;
     } else {
-        return E_NOT_OK;
+        return kENotOk;
     }
-} /* getCharacter */
+} /* GetCharacter */
 
 
 /******************************************************************************************************************************************************
-  getCharacter()
+  GetCharacter()
   ****************************************************************************************************************************************************/
-StdReturnType DisplayCharacters::getCharacter(byte Index, char& Character)
+StdReturnType DisplayCharacters::GetCharacter(byte index, char& character)
 {
-    if(isIndexValid(Index)) {
-        Character =  getDisplayCharactersTableElement(Index);
-        return E_OK;
+    if(IsIndexValid(index)) {
+        character =  GetDisplayCharactersTableElement(index);
+        return kEOk;
     } else {
-        return E_NOT_OK;
+        return kENotOk;
     }
-} /* getCharacter */
+} /* GetCharacter */
 
 
 /******************************************************************************************************************************************************
-  getCharacter()
+  GetCharacter()
   ****************************************************************************************************************************************************/
-StdReturnType DisplayCharacters::getCharacter(CharacterIdType CharacterId, char& Character)
+StdReturnType DisplayCharacters::GetCharacter(CharacterIdType character_id, char& character)
 {
-    if(isCharacterIdValid(CharacterId)) {
-        Character =  getDisplayCharactersTableElement(CharacterId);
-        return E_OK;
+    if(IsCharacterIdValid(character_id)) {
+        character =  GetDisplayCharactersTableElement(character_id);
+        return kEOk;
     } else {
-        return E_NOT_OK;
+        return kENotOk;
     }
-} /* getCharacter */
+} /* GetCharacter */
 
 
 /******************************************************************************************************************************************************

@@ -57,20 +57,20 @@ class FontCourierNew7x10 : public Font<FontCharHorizontal<byte, FONT_COURIER_NEW
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    static const FontTableType FontTable;
+    static const FontTableType kFontTable;
   
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr FontCourierNew7x10() : Font(FontTable) { }
+    constexpr FontCourierNew7x10() : Font(kFontTable) { }
     ~FontCourierNew7x10() { }
 
     // get methods
-    static byte getWidth() { return FONT_COURIER_NEW_7X10_WIDTH; }
-    static byte getHeight() { return FONT_COURIER_NEW_7X10_HEIGHT; }
-    static Orientation getOrientation() { return Orientation::ORIENTATION_HORIZONTAL; }
-    static const FontTableType& getFontTable() { return FontTable; }
+    static byte GetWidth() { return FONT_COURIER_NEW_7X10_WIDTH; }
+    static byte GetHeight() { return FONT_COURIER_NEW_7X10_HEIGHT; }
+    static Orientation GetOrientation() { return Orientation::kOrientationHorizontal; }
+    static const FontTableType& GetFontTable() { return kFontTable; }
         
     // set methods
 

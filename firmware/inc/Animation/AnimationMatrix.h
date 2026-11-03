@@ -72,33 +72,33 @@ class AnimationMatrix : public Animation
 ******************************************************************************************************************************************************/
   private:
     /* number of frames a column stays dark before its drop enters the display */
-    static constexpr byte MaxStartDelay{DISPLAY_NUMBER_OF_ROWS};
+    static constexpr byte kMaxStartDelay{DISPLAY_NUMBER_OF_ROWS};
     /* the drop has to run past the last row until its trail has left the display */
-    static constexpr byte NumberOfFrames{4u * DISPLAY_NUMBER_OF_ROWS};
-    /* fade step from which letters of the new time are shown, see drawColumn() */
-    static constexpr byte RevealFadeStep{3u};
+    static constexpr byte kNumberOfFrames{4u * DISPLAY_NUMBER_OF_ROWS};
+    /* fade step from which letters of the new time are shown, see DrawColumn() */
+    static constexpr byte kRevealFadeStep{3u};
     /* last fade step of the trail, above it a pixel goes dark. The original has no
        such limit, its trail always reaches up to the first row. With the limit the
        trail follows the drop out of the display instead of leaving a dim haze
        behind, so the animation ends on a black display showing only the new time. */
-    static constexpr byte TrailFadeSteps{6u};
-    /* odd factor of the hash in startFrame(), see there */
-    static constexpr byte StartFrameHashFactor{181u};
+    static constexpr byte kTrailFadeSteps{6u};
+    /* odd factor of the hash in StartFrame(), see there */
+    static constexpr byte kStartFrameHashFactor{181u};
     /* per pixel brightness of the brightest trail pixel, divided by the fade step for
        the ones behind it. The drop head and the letters of the new time do not use it,
        they are set without a brightness and are therefore at full display brightness. */
-    static constexpr byte TrailBrightness{255u};
+    static constexpr byte kTrailBrightness{255u};
 
-    ClockWords::WordsListType ClockWordsTable{{DisplayWords::WORD_NONE}};
-    byte FrameCounter{0u};
-    /* varies the start frames from minute to minute, see startFrame() */
-    byte Seed{0u};
+    ClockWords::WordsListType clock_words_table_{{DisplayWords::kWordNone}};
+    byte frame_counter_{0u};
+    /* varies the start frames from minute to minute, see StartFrame() */
+    byte seed_{0u};
 
     // functions
-    void reset();
-    void setTimeTask();
-    void drawColumn(byte, byte);
-    byte startFrame(byte) const;
+    void Reset();
+    void SetTimeTask();
+    void DrawColumn(byte, byte);
+    byte StartFrame(byte) const;
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
@@ -114,9 +114,9 @@ class AnimationMatrix : public Animation
 
 
     // methods
-    void init();
-    StdReturnType setTime(byte, byte);
-    void task();
+    void Init();
+    StdReturnType SetTime(byte, byte);
+    void Task();
 };
 
 

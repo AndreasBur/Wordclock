@@ -14,12 +14,12 @@ class WordclockApp : public wxApp
         void OnClose(wxCloseEvent& event);
 
     private:
-        WordclockMain Wordclock;
-        wxTimer Timer;
+        WordclockMain wordclock_;
+        wxTimer timer_;
         wxDECLARE_EVENT_TABLE();
 
         enum {
-            TIMER_ID = 1500
+            kTimerId = 1500
         };
 };
 

@@ -55,40 +55,40 @@ class MsgCmdDisplayColorParser : public MsgParameterParser<MsgCmdDisplayColorPar
 ******************************************************************************************************************************************************/
   private:
     friend class MsgParameterParser;
-    static constexpr char RedOptionShortName{'R'};
-    static constexpr char GreenOptionShortName{'G'};
-    static constexpr char BlueOptionShortName{'B'};
+    static constexpr char kRedOptionShortName{'R'};
+    static constexpr char kGreenOptionShortName{'G'};
+    static constexpr char kBlueOptionShortName{'B'};
 
-    static constexpr ParameterTableType ParameterTable PROGMEM {
-        ParameterTableElementType(RedOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8),
-        ParameterTableElementType(GreenOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8),
-        ParameterTableElementType(BlueOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8)
+    static constexpr ParameterTableType kParameterTable PROGMEM {
+        ParameterTableElementType(kRedOptionShortName, MsgParameter::kArgumentTypeUint8),
+        ParameterTableElementType(kGreenOptionShortName, MsgParameter::kArgumentTypeUint8),
+        ParameterTableElementType(kBlueOptionShortName, MsgParameter::kArgumentTypeUint8)
     };
 
     // functions
-    static void handleParameter(char ParameterShortName, const char* Argument, PositionType Length) { UNUSED(ParameterShortName); UNUSED(Argument); UNUSED(Length); }
-    static void handleParameter(char ParameterShortName, byte Argument)
+    static void HandleParameter(char parameter_short_name, const char* argument, PositionType length) { UNUSED(parameter_short_name); UNUSED(argument); UNUSED(length); }
+    static void HandleParameter(char parameter_short_name, byte argument)
     {
-        if(ParameterShortName == RedOptionShortName) { Display::getInstance().setColorRed(Argument); }
-        if(ParameterShortName == GreenOptionShortName) { Display::getInstance().setColorGreen(Argument); }
-        if(ParameterShortName == BlueOptionShortName) { Display::getInstance().setColorBlue(Argument); }
+        if(parameter_short_name == kRedOptionShortName) { Display::GetInstance().SetColorRed(argument); }
+        if(parameter_short_name == kGreenOptionShortName) { Display::GetInstance().SetColorGreen(argument); }
+        if(parameter_short_name == kBlueOptionShortName) { Display::GetInstance().SetColorBlue(argument); }
     }
 
-    static void sendAnswerRed(bool AppendSpace) { sendAnswerParameter(RedOptionShortName, Display::getInstance().getColorRed(), AppendSpace); }
-    static void sendAnswerGreen(bool AppendSpace) { sendAnswerParameter(GreenOptionShortName, Display::getInstance().getColorGreen(), AppendSpace); }
-    static void sendAnswerBlue(bool AppendSpace) { sendAnswerParameter(BlueOptionShortName, Display::getInstance().getColorBlue(), AppendSpace); }
+    static void SendAnswerRed(bool append_space) { SendAnswerParameter(kRedOptionShortName, Display::GetInstance().GetColorRed(), append_space); }
+    static void SendAnswerGreen(bool append_space) { SendAnswerParameter(kGreenOptionShortName, Display::GetInstance().GetColorGreen(), append_space); }
+    static void SendAnswerBlue(bool append_space) { SendAnswerParameter(kBlueOptionShortName, Display::GetInstance().GetColorBlue(), append_space); }
 
-    void show() const
+    void Show() const
     {
-        StdReturnType returnValue = Display::getInstance().show();
-        Error.checkReturnValueAndSend(ErrorMessage::API_DISPLAY_SHOW, returnValue, ErrorMessage::ERROR_DISPLAY_PENDING);
+        StdReturnType return_value = Display::GetInstance().Show();
+        error_.CheckReturnValueAndSend(ErrorMessage::kApiDisplayShow, return_value, ErrorMessage::kErrorDisplayPending);
     }
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr MsgCmdDisplayColorParser(const char* Parameter) : MsgParameterParser(ParameterTable, Parameter) { }
+    constexpr MsgCmdDisplayColorParser(const char* parameter) : MsgParameterParser(kParameterTable, parameter) { }
     ~MsgCmdDisplayColorParser() { }
 
     // get methods
@@ -96,14 +96,14 @@ class MsgCmdDisplayColorParser : public MsgParameterParser<MsgCmdDisplayColorPar
     // set methods
 
     // methods
-    static void sendAnswer()
+    static void SendAnswer()
     {
-        sendAnswerRed(true);
-        sendAnswerGreen(true);
-        sendAnswerBlue(false);
+        SendAnswerRed(true);
+        SendAnswerGreen(true);
+        SendAnswerBlue(false);
     }
 
-    void process() const { show(); }
+    void Process() const { Show(); }
 
 };
 

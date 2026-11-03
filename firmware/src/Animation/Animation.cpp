@@ -45,49 +45,49 @@
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  isPixelPartOfClockWords()
+  IsPixelPartOfClockWords()
 ******************************************************************************************************************************************************/
-bool Animation::isPixelPartOfClockWords(const ClockWords::WordsListType ClockWordsTable, byte Column, byte Row)
+bool Animation::IsPixelPartOfClockWords(const ClockWords::WordsListType clock_words_table, byte column, byte row)
 {
     DisplayWords words;
 
-    for(uint8_t wordIndex = 0u; wordIndex < ClockWordsTable.size(); wordIndex++) {
-        if(ClockWordsTable[wordIndex] == DisplayWords::WORD_NONE) { break; }
-        DisplayWord Word = words.getDisplayWord(ClockWordsTable[wordIndex]);
-        if(Word.getRow() == Row) { if((Column >= Word.getColumn()) && (Column < Word.getColumn() + Word.getLength())) { return true; } }
+    for(uint8_t word_index = 0u; word_index < clock_words_table.size(); word_index++) {
+        if(clock_words_table[word_index] == DisplayWords::kWordNone) { break; }
+        DisplayWord word = words.GetDisplayWord(clock_words_table[word_index]);
+        if(word.GetRow() == row) { if((column >= word.GetColumn()) && (column < word.GetColumn() + word.GetLength())) { return true; } }
     }
     return false;
 } /* isPixelPartOfWord */
 
 /******************************************************************************************************************************************************
-  isPixelPartOfClockWords()
+  IsPixelPartOfClockWords()
 ******************************************************************************************************************************************************/
-bool Animation::isPixelPartOfClockWords(const ClockWords::WordsListType ClockWordsTable, byte Index)
+bool Animation::IsPixelPartOfClockWords(const ClockWords::WordsListType clock_words_table, byte index)
 {
-    byte row = Index / DISPLAY_NUMBER_OF_COLUMNS;
-    byte column = Index % DISPLAY_NUMBER_OF_COLUMNS;
+    byte row = index / DISPLAY_NUMBER_OF_COLUMNS;
+    byte column = index % DISPLAY_NUMBER_OF_COLUMNS;
 
-    return isPixelPartOfClockWords(ClockWordsTable, column, row);
+    return IsPixelPartOfClockWords(clock_words_table, column, row);
 } /* isPixelPartOfWord */
 
 
 /******************************************************************************************************************************************************
-  selectByTime()
+  SelectByTime()
 ******************************************************************************************************************************************************/
-byte Animation::selectByTime(byte Hour, byte Minute, byte NumberOfValues)
+byte Animation::SelectByTime(byte hour, byte minute, byte number_of_values)
 {
     /* Lets an animation vary from minute to minute without keeping a random generator
        of its own. A plain modulo of the minute would not do, because it walks through
        the values in a fixed order; two multiplications with an xor fold in between
        scatter them as a random generator would. */
-    byte hash = static_cast<byte>(((Hour * 60u) + Minute) * SelectHashFactor);
+    byte hash = static_cast<byte>(((hour * 60u) + minute) * kSelectHashFactor);
     hash ^= static_cast<byte>(hash >> 4u);
-    hash = static_cast<byte>(hash * SelectHashFactor);
+    hash = static_cast<byte>(hash * kSelectHashFactor);
 
     /* scaled by multiplication instead of a modulo, which would favour the lower
-       values because 256 is not a multiple of NumberOfValues */
-    return static_cast<byte>((static_cast<uint16_t>(hash) * NumberOfValues) >> 8u);
-} /* selectByTime */
+       values because 256 is not a multiple of number_of_values */
+    return static_cast<byte>((static_cast<uint16_t>(hash) * number_of_values) >> 8u);
+} /* SelectByTime */
 
 
 /******************************************************************************************************************************************************

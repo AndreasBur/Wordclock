@@ -56,7 +56,7 @@ namespace {
  * the operands. The delay is what is left of the five-bit field, hence the four-bit limit
  * the header asserts against.
  */
-constexpr uint16_t Instructions[]{
+constexpr uint16_t kInstructions[]{
     /* out x, 1 side 0 [8]: opcode 011, side 0 + delay 8 -> 01000, destination X 001,
        bit count 1 -> 00001. */
     0x6821u,
@@ -71,13 +71,13 @@ constexpr uint16_t Instructions[]{
     0xA742u,
 };
 
-constexpr uint InstructionCount{sizeof(Instructions) / sizeof(Instructions[0])};
-constexpr uint WrapTargetOffset{0u};
-constexpr uint WrapOffset{3u};
+constexpr uint kInstructionCount{sizeof(kInstructions) / sizeof(kInstructions[0])};
+constexpr uint kWrapTargetOffset{0u};
+constexpr uint kWrapOffset{3u};
 
-constexpr uint StateMachine{WS2812_PIO_STATE_MACHINE_INDEX};
+constexpr uint kStateMachine{WS2812_PIO_STATE_MACHINE_INDEX};
 
-PIO block() { return (WS2812_PIO_BLOCK_INDEX == 0u) ? pio0 : pio1; }
+PIO Block() { return (WS2812_PIO_BLOCK_INDEX == 0u) ? pio0 : pio1; }
 
 } // namespace
 
@@ -86,75 +86,75 @@ PIO block() { return (WS2812_PIO_BLOCK_INDEX == 0u) ? pio0 : pio1; }
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  init()
+  Init()
 ******************************************************************************************************************************************************/
 /*! \brief          Claims a state machine and a DMA channel for the strip's data pin
 ******************************************************************************************************************************************************/
-void WS2812Pio::init(uint8_t Pin)
+void WS2812Pio::Init(uint8_t pin)
 {
-    if(IsReady) { return; }
+    if(is_ready_) { return; }
 
-    PIO Block = block();
+    PIO block = Block();
 
-    pio_program_t Program{};
-    Program.instructions = Instructions;
-    Program.length = InstructionCount;
+    pio_program_t program{};
+    program.instructions = kInstructions;
+    program.length = kInstructionCount;
     /* Anywhere the loader finds room, rather than a fixed address: nothing else in this
        firmware uses the block, but a fixed origin is a conflict waiting for the first
        library that does. */
-    Program.origin = -1;
+    program.origin = -1;
 
-    const int Offset = pio_add_program(Block, &Program);
-    if(Offset < 0) {
+    const int offset = pio_add_program(block, &program);
+    if(offset < 0) {
         Serial.println(F("Pixels: no room for the PIO program"));
         return;
     }
 
-    DmaChannel = dma_claim_unused_channel(false);
-    if(DmaChannel < 0) {
+    dma_channel_ = dma_claim_unused_channel(false);
+    if(dma_channel_ < 0) {
         Serial.println(F("Pixels: no free DMA channel"));
         return;
     }
 
-    pio_sm_config Config = pio_get_default_sm_config();
-    sm_config_set_wrap(&Config, Offset + WrapTargetOffset, Offset + WrapOffset);
+    pio_sm_config config = pio_get_default_sm_config();
+    sm_config_set_wrap(&config, offset + kWrapTargetOffset, offset + kWrapOffset);
     /* One bit, not optional and not a direction: every instruction carries it, which is
        what lets the four of them above describe the whole waveform. */
-    sm_config_set_sideset(&Config, 1, false, false);
-    sm_config_set_sideset_pins(&Config, Pin);
+    sm_config_set_sideset(&config, 1, false, false);
+    sm_config_set_sideset_pins(&config, pin);
     /* Shifting left, so the most significant bit leaves first - the WS2812's order - and
        pulling automatically every 24 bits, which is one LED. */
-    sm_config_set_out_shift(&Config, false, true, BitsPerPixel);
+    sm_config_set_out_shift(&config, false, true, kBitsPerPixel);
     /* The receive side is never read here, so its four words are worth more as depth on
        the side DMA fills. */
-    sm_config_set_fifo_join(&Config, PIO_FIFO_JOIN_TX);
-    sm_config_set_clkdiv(&Config, static_cast<float>(clock_get_hz(clk_sys)) / static_cast<float>(StateMachineClockHz));
+    sm_config_set_fifo_join(&config, PIO_FIFO_JOIN_TX);
+    sm_config_set_clkdiv(&config, static_cast<float>(clock_get_hz(clk_sys)) / static_cast<float>(kStateMachineClockHz));
 
-    pio_gpio_init(Block, Pin);
-    pio_sm_set_consecutive_pindirs(Block, StateMachine, Pin, 1, true);
-    pio_sm_init(Block, StateMachine, Offset, &Config);
-    pio_sm_set_enabled(Block, StateMachine, true);
+    pio_gpio_init(block, pin);
+    pio_sm_set_consecutive_pindirs(block, kStateMachine, pin, 1, true);
+    pio_sm_init(block, kStateMachine, offset, &config);
+    pio_sm_set_enabled(block, kStateMachine, true);
 
-    IsReady = true;
-} /* init */
+    is_ready_ = true;
+} /* Init */
 
 
 /******************************************************************************************************************************************************
-  isBusy()
+  IsBusy()
 ******************************************************************************************************************************************************/
-bool WS2812Pio::isBusy() const
+bool WS2812Pio::IsBusy() const
 {
-    if(!IsReady) { return false; }
+    if(!is_ready_) { return false; }
 
-    return dma_channel_is_busy(static_cast<uint>(DmaChannel));
-} /* isBusy */
+    return dma_channel_is_busy(static_cast<uint>(dma_channel_));
+} /* IsBusy */
 
 
 /* Not const, though nothing here writes a member: it drives the hardware, and a const
    would say it changes nothing. */
 // NOLINTBEGIN(readability-make-member-function-const)
 /******************************************************************************************************************************************************
-  transmit()
+  Transmit()
 ******************************************************************************************************************************************************/
 /*! \brief          Hands one frame to DMA and returns
  *  \details        Refuses rather than waits while the previous frame is still going out.
@@ -162,26 +162,26 @@ bool WS2812Pio::isBusy() const
  *                  here means something is wrong rather than that the strip is busy - and
  *                  waiting would spend a third of a tick doing nothing.
  *
- *  \return         E_OK if DMA took the frame
+ *  \return         kEOk if DMA took the frame
 ******************************************************************************************************************************************************/
-StdReturnType WS2812Pio::transmit(const WordType* Frame, size_t Count)
+StdReturnType WS2812Pio::Transmit(const WordType* frame, size_t count)
 {
-    if(!IsReady || (Frame == nullptr) || (Count == 0u)) { return E_NOT_OK; }
-    if(isBusy()) { return E_NOT_OK; }
+    if(!is_ready_ || (frame == nullptr) || (count == 0u)) { return kENotOk; }
+    if(IsBusy()) { return kENotOk; }
 
-    dma_channel_config Configuration = dma_channel_get_default_config(static_cast<uint>(DmaChannel));
-    channel_config_set_transfer_data_size(&Configuration, DMA_SIZE_32);
-    channel_config_set_read_increment(&Configuration, true);
-    channel_config_set_write_increment(&Configuration, false);
+    dma_channel_config configuration = dma_channel_get_default_config(static_cast<uint>(dma_channel_));
+    channel_config_set_transfer_data_size(&configuration, DMA_SIZE_32);
+    channel_config_set_read_increment(&configuration, true);
+    channel_config_set_write_increment(&configuration, false);
     /* Paced by the state machine's appetite rather than free-running, so the FIFO is
        refilled as it empties instead of being overrun in the first microsecond. */
-    channel_config_set_dreq(&Configuration, pio_get_dreq(block(), StateMachine, true));
+    channel_config_set_dreq(&configuration, pio_get_dreq(Block(), kStateMachine, true));
 
-    dma_channel_configure(static_cast<uint>(DmaChannel), &Configuration,
-                          &block()->txf[StateMachine], Frame, Count, true);
+    dma_channel_configure(static_cast<uint>(dma_channel_), &configuration,
+                          &Block()->txf[kStateMachine], frame, count, true);
 
-    return E_OK;
-} /* transmit */
+    return kEOk;
+} /* Transmit */
 // NOLINTEND(readability-make-member-function-const)
 
 /******************************************************************************************************************************************************

@@ -25,13 +25,13 @@
 ******************************************************************************************************************************************************/
 namespace {
 
-constexpr uint16_t FrameSize{PIXELS_NUMBER_OF_LEDS * Pixel::getNumberOfColors()};
+constexpr uint16_t kFrameSize{PIXELS_NUMBER_OF_LEDS * Pixel::GetNumberOfColors()};
 
 /* The frame the interrupt reads from while it transmits. Separate from the pixel buffer
    because the transmission outlives the call: the next tick may already be writing new
    pixels while the previous frame is still going out, and sharing one buffer would put
    half of each on the strip. */
-byte FrameBuffer[FrameSize]{};
+byte frame_buffer[kFrameSize]{};
 
 } // namespace
 
@@ -40,7 +40,7 @@ byte FrameBuffer[FrameSize]{};
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  fillFrameBuffer()
+  FillFrameBuffer()
 ******************************************************************************************************************************************************/
 /*! \brief          Lays the buffer out the way the strip reads it
  *  \details        Green, red, blue - the WS2812's own order, which is not the order the
@@ -48,34 +48,34 @@ byte FrameBuffer[FrameSize]{};
  *                  copied wholesale, so a change to the pixel's internal layout cannot
  *                  silently swap two colours on the wire.
 ******************************************************************************************************************************************************/
-void Pixels::fillFrameBuffer() const
+void Pixels::FillFrameBuffer() const
 {
-    byte* Target = FrameBuffer;
+    byte* target = frame_buffer;
 
-    for(byte Index = 0u; Index < PIXELS_NUMBER_OF_LEDS; Index++) {
-        const PixelType Pixel = getOutputPixel(Index);
+    for(byte index = 0u; index < PIXELS_NUMBER_OF_LEDS; index++) {
+        const PixelType pixel = GetOutputPixel(index);
 
-        *Target++ = Pixel.getGreen();
-        *Target++ = Pixel.getRed();
-        *Target++ = Pixel.getBlue();
+        *target++ = pixel.GetGreen();
+        *target++ = pixel.GetRed();
+        *target++ = pixel.GetBlue();
     }
-} /* fillFrameBuffer */
+} /* FillFrameBuffer */
 
 
 /******************************************************************************************************************************************************
-  transmitFrame()
+  TransmitFrame()
 ******************************************************************************************************************************************************/
-StdReturnType Pixels::transmitFrame()
+StdReturnType Pixels::TransmitFrame()
 {
     /* Not waited for: a frame still on the wire means the previous tick's is barely done,
        and the display is redrawn on the next one anyway. Blocking here would hold up the
        clock for a frame nobody would have seen. */
-    if(WS2812::getInstance().isBusy()) { return E_NOT_OK; }
+    if(WS2812::GetInstance().IsBusy()) { return kENotOk; }
 
-    fillFrameBuffer();
+    FillFrameBuffer();
 
-    return WS2812::getInstance().send(FrameBuffer, FrameSize);
-} /* transmitFrame */
+    return WS2812::GetInstance().Send(frame_buffer, kFrameSize);
+} /* TransmitFrame */
 
 
 /******************************************************************************************************************************************************
@@ -83,7 +83,7 @@ StdReturnType Pixels::transmitFrame()
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  init()
+  Init()
 ******************************************************************************************************************************************************/
 /*! \brief          Claims the strip's data line
  *  \details        The pin the core passes is not used: the line is driven by the look-up
@@ -91,54 +91,54 @@ StdReturnType Pixels::transmitFrame()
  *                  WS2812.h. Taken as a parameter regardless, because that is the seam every
  *                  backend implements.
 ******************************************************************************************************************************************************/
-void Pixels::init(byte sPin)
+void Pixels::Init(byte pin)
 {
-    Pin = sPin;
+    pin_ = pin;
 
-    WS2812::getInstance().init();
-    Initialised = true;
-} /* init */
+    WS2812::GetInstance().Init();
+    initialised_ = true;
+} /* Init */
 
 
 /******************************************************************************************************************************************************
-  render()
+  Render()
 ******************************************************************************************************************************************************/
 /*! \brief          Puts the buffer on the strip, if the firmware asked for it
- *  \details        Called once per tick by the application, never by show(). Several modules
+ *  \details        Called once per tick by the application, never by Show(). Several modules
  *                  ask for a frame within a single tick, and transmitting from each of them
  *                  would put frames back to back on the wire; the strip needs the line idle
  *                  between them or it latches a frame shifted by a pixel, which reads as a
  *                  wiring fault rather than as a software one.
  *
- *  \return         E_OK if a frame went out or none was due
+ *  \return         kEOk if a frame went out or none was due
 ******************************************************************************************************************************************************/
-StdReturnType Pixels::render()
+StdReturnType Pixels::Render()
 {
     /* Before the dirty check, and the buffer is left marked on purpose: while the strip has
        no supply nothing may reach DIN, and the supply coming back has to find a frame still
        owed rather than a buffer that looks up to date. */
-    if(OutputSuspended) { return E_OK; }
+    if(output_suspended_) { return kEOk; }
 
-    if(!Dirty) { return E_OK; }
-    if(!Initialised) { return E_NOT_OK; }
+    if(!dirty_) { return kEOk; }
+    if(!initialised_) { return kENotOk; }
 
-    const StdReturnType Result = transmitFrame();
+    const StdReturnType result = TransmitFrame();
     /* Cleared even when the transmission failed, so a strip that does not take the frame
        cannot turn every following tick into another failing attempt. */
-    Dirty = false;
+    dirty_ = false;
 
-    return Result;
-} /* render */
+    return result;
+} /* Render */
 
 
 /* An instance method, though it reads no member: it is part of the interface the
-   firmware core calls through getInstance(), and every backend - the simulator's
+   firmware core calls through GetInstance(), and every backend - the simulator's
    stand-ins included - offers it that way. Whether this backend's implementation
    happens to need a member is its own detail, and answering the check would carry
    that detail into the interface. */
 // NOLINTBEGIN(readability-convert-member-functions-to-static)
 /******************************************************************************************************************************************************
-  isFrameOnTheWire()
+  IsFrameOnTheWire()
 ******************************************************************************************************************************************************/
 /*! \brief          Whether the previous frame is still being transmitted
  *  \details        The driver's own answer rather than a flag kept here: it knows both halves
@@ -146,85 +146,85 @@ StdReturnType Pixels::render()
  *
  *  \return         true while a frame is still going out
 ******************************************************************************************************************************************************/
-bool Pixels::isFrameOnTheWire() const
+bool Pixels::IsFrameOnTheWire() const
 {
-    return WS2812::getInstance().isBusy();
-} /* isFrameOnTheWire */
+    return WS2812::GetInstance().IsBusy();
+} /* IsFrameOnTheWire */
 // NOLINTEND(readability-convert-member-functions-to-static)
 
 
 /******************************************************************************************************************************************************
-  getPixel()
+  GetPixel()
 ******************************************************************************************************************************************************/
-StdReturnType Pixels::getPixel(byte Index, PixelType& Pixel) const
+StdReturnType Pixels::GetPixel(byte index, PixelType& pixel) const
 {
-    if(!isIndexValid(Index)) { return E_NOT_OK; }
+    if(!IsIndexValid(index)) { return kENotOk; }
 
-    Pixel = getPixel(Index);
-    return E_OK;
-} /* getPixel */
+    pixel = GetPixel(index);
+    return kEOk;
+} /* GetPixel */
 
 
 /******************************************************************************************************************************************************
-  getPixel()
+  GetPixel()
 ******************************************************************************************************************************************************/
-Pixels::PixelType Pixels::getPixel(byte Index) const
+Pixels::PixelType Pixels::GetPixel(byte index) const
 {
     /* An index that is not on the strip has no pixel, and an unlit one is the answer no
        caller can mistake for an LED that is on. */
-    if(!isIndexValid(Index)) { return PixelType{}; }
+    if(!IsIndexValid(index)) { return PixelType{}; }
 
-    return PixelBuffer[toRow(Index)][toColumn(Index)];
-} /* getPixel */
-
-
-/******************************************************************************************************************************************************
-  setPixel()
-******************************************************************************************************************************************************/
-StdReturnType Pixels::setPixel(byte Index, PixelType Pixel)
-{
-    if(!isIndexValid(Index)) { return E_NOT_OK; }
-
-    setPixel(Index, Pixel);
-    return E_OK;
-} /* setPixel */
+    return pixel_buffer_[ToRow(index)][ToColumn(index)];
+} /* GetPixel */
 
 
 /******************************************************************************************************************************************************
-  setPixel()
+  SetPixel()
 ******************************************************************************************************************************************************/
-StdReturnType Pixels::setPixel(byte Index, byte Red, byte Green, byte Blue)
+StdReturnType Pixels::SetPixel(byte index, PixelType pixel)
 {
-    if(!isIndexValid(Index)) { return E_NOT_OK; }
+    if(!IsIndexValid(index)) { return kENotOk; }
 
-    setPixel(Index, Red, Green, Blue);
-    return E_OK;
-} /* setPixel */
+    SetPixel(index, pixel);
+    return kEOk;
+} /* SetPixel */
 
 
 /******************************************************************************************************************************************************
-  setPixels()
+  SetPixel()
 ******************************************************************************************************************************************************/
-void Pixels::setPixels(PixelType Pixel)
+StdReturnType Pixels::SetPixel(byte index, byte red, byte green, byte blue)
 {
-    for(byte Index = 0u; Index < PIXELS_NUMBER_OF_LEDS; Index++) {
-        setPixel(Index, Pixel);
+    if(!IsIndexValid(index)) { return kENotOk; }
+
+    SetPixel(index, red, green, blue);
+    return kEOk;
+} /* SetPixel */
+
+
+/******************************************************************************************************************************************************
+  SetPixels()
+******************************************************************************************************************************************************/
+void Pixels::SetPixels(PixelType pixel)
+{
+    for(byte index = 0u; index < PIXELS_NUMBER_OF_LEDS; index++) {
+        SetPixel(index, pixel);
     }
-} /* setPixels */
+} /* SetPixels */
 
 
 /******************************************************************************************************************************************************
-  setBrightness()
+  SetBrightness()
 ******************************************************************************************************************************************************/
 /*! \brief          Sets what the buffer is dimmed by on its way out
  *  \details        The buffer itself is left alone, so the colour a command set can still be
  *                  read back after the light sensor has dimmed the display.
 ******************************************************************************************************************************************************/
-void Pixels::setBrightness(byte sBrightness, bool)
+void Pixels::SetBrightness(byte brightness, bool)
 {
-    Brightness = sBrightness;
-    Dirty = true;
-} /* setBrightness */
+    brightness_ = brightness;
+    dirty_ = true;
+} /* SetBrightness */
 
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E

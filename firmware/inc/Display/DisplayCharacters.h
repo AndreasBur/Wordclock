@@ -55,117 +55,117 @@ class DisplayCharacters
 ******************************************************************************************************************************************************/
   public:
     enum CharacterIdType {
-        CHARACTER_E_1,
-        CHARACTER_S_1,
-        CHARACTER_K_1,
-        CHARACTER_I_1,
-        CHARACTER_S_2,
-        CHARACTER_T_1,
-        CHARACTER_L_1,
-        CHARACTER_F_1,
-        CHARACTER_UE_1,
-        CHARACTER_N_1,
-        CHARACTER_F_2,
-        CHARACTER_Z_1,
-        CHARACTER_E_2,
-        CHARACTER_H_1,
-        CHARACTER_N_2,
-        CHARACTER_Z_2,
-        CHARACTER_W_1,
-        CHARACTER_A_1,
-        CHARACTER_N_3,
-        CHARACTER_Z_3,
-        CHARACTER_I_2,
-        CHARACTER_G_1,
-        CHARACTER_D_1,
-        CHARACTER_R_1,
-        CHARACTER_E_3,
-        CHARACTER_I_3,
-        CHARACTER_V_1,
-        CHARACTER_I_4,
-        CHARACTER_E_4,
-        CHARACTER_R_2,
-        CHARACTER_T_2,
-        CHARACTER_E_5,
-        CHARACTER_L_2,
-        CHARACTER_T_3,
-        CHARACTER_G_2,
-        CHARACTER_N_4,
-        CHARACTER_A_2,
-        CHARACTER_C_1,
-        CHARACTER_H_2,
-        CHARACTER_V_2,
-        CHARACTER_O_1,
-        CHARACTER_R_3,
-        CHARACTER_J_1,
-        CHARACTER_M_1,
-        CHARACTER_H_3,
-        CHARACTER_A_3,
-        CHARACTER_L_3,
-        CHARACTER_B_1,
-        CHARACTER_Q_1,
-        CHARACTER_Z_4,
-        CHARACTER_W_2,
-        CHARACTER_OE_1,
-        CHARACTER_L_4,
-        CHARACTER_F_3,
-        CHARACTER_P_1,
-        CHARACTER_Z_5,
-        CHARACTER_W_3,
-        CHARACTER_E_6,
-        CHARACTER_I_5,
-        CHARACTER_N_5,
-        CHARACTER_S_3,
-        CHARACTER_I_6,
-        CHARACTER_E_7,
-        CHARACTER_B_2,
-        CHARACTER_E_8,
-        CHARACTER_N_6,
-        CHARACTER_K_2,
-        CHARACTER_D_2,
-        CHARACTER_R_4,
-        CHARACTER_E_9,
-        CHARACTER_I_7,
-        CHARACTER_R_5,
-        CHARACTER_H_4,
-        CHARACTER_F_4,
-        CHARACTER_UE_2,
-        CHARACTER_N_7,
-        CHARACTER_F_5,
-        CHARACTER_E_10,
-        CHARACTER_L_5,
-        CHARACTER_F_6,
-        CHARACTER_N_8,
-        CHARACTER_E_11,
-        CHARACTER_U_3,
-        CHARACTER_N_9,
-        CHARACTER_V_3,
-        CHARACTER_I_8,
-        CHARACTER_E_12,
-        CHARACTER_R_6,
-        CHARACTER_W_4,
-        CHARACTER_A_4,
-        CHARACTER_C_2,
-        CHARACTER_H_5,
-        CHARACTER_T_5,
-        CHARACTER_Z_6,
-        CHARACTER_E_13,
-        CHARACTER_H_6,
-        CHARACTER_N_10,
-        CHARACTER_R_7,
-        CHARACTER_S_4,
-        CHARACTER_B_3,
-        CHARACTER_S_5,
-        CHARACTER_E_14,
-        CHARACTER_C_3,
-        CHARACTER_H_7,
-        CHARACTER_S_6,
-        CHARACTER_F_7,
-        CHARACTER_M_2,
-        CHARACTER_U_4,
-        CHARACTER_H_8,
-        CHARACTER_R_8,
-        CHARACTER_NUMBER_OF_CHARACTERS
+        kCharacterE1,
+        kCharacterS1,
+        kCharacterK1,
+        kCharacterI1,
+        kCharacterS2,
+        kCharacterT1,
+        kCharacterL1,
+        kCharacterF1,
+        kCharacterUe1,
+        kCharacterN1,
+        kCharacterF2,
+        kCharacterZ1,
+        kCharacterE2,
+        kCharacterH1,
+        kCharacterN2,
+        kCharacterZ2,
+        kCharacterW1,
+        kCharacterA1,
+        kCharacterN3,
+        kCharacterZ3,
+        kCharacterI2,
+        kCharacterG1,
+        kCharacterD1,
+        kCharacterR1,
+        kCharacterE3,
+        kCharacterI3,
+        kCharacterV1,
+        kCharacterI4,
+        kCharacterE4,
+        kCharacterR2,
+        kCharacterT2,
+        kCharacterE5,
+        kCharacterL2,
+        kCharacterT3,
+        kCharacterG2,
+        kCharacterN4,
+        kCharacterA2,
+        kCharacterC1,
+        kCharacterH2,
+        kCharacterV2,
+        kCharacterO1,
+        kCharacterR3,
+        kCharacterJ1,
+        kCharacterM1,
+        kCharacterH3,
+        kCharacterA3,
+        kCharacterL3,
+        kCharacterB1,
+        kCharacterQ1,
+        kCharacterZ4,
+        kCharacterW2,
+        kCharacterOe1,
+        kCharacterL4,
+        kCharacterF3,
+        kCharacterP1,
+        kCharacterZ5,
+        kCharacterW3,
+        kCharacterE6,
+        kCharacterI5,
+        kCharacterN5,
+        kCharacterS3,
+        kCharacterI6,
+        kCharacterE7,
+        kCharacterB2,
+        kCharacterE8,
+        kCharacterN6,
+        kCharacterK2,
+        kCharacterD2,
+        kCharacterR4,
+        kCharacterE9,
+        kCharacterI7,
+        kCharacterR5,
+        kCharacterH4,
+        kCharacterF4,
+        kCharacterUe2,
+        kCharacterN7,
+        kCharacterF5,
+        kCharacterE10,
+        kCharacterL5,
+        kCharacterF6,
+        kCharacterN8,
+        kCharacterE11,
+        kCharacterU3,
+        kCharacterN9,
+        kCharacterV3,
+        kCharacterI8,
+        kCharacterE12,
+        kCharacterR6,
+        kCharacterW4,
+        kCharacterA4,
+        kCharacterC2,
+        kCharacterH5,
+        kCharacterT5,
+        kCharacterZ6,
+        kCharacterE13,
+        kCharacterH6,
+        kCharacterN10,
+        kCharacterR7,
+        kCharacterS4,
+        kCharacterB3,
+        kCharacterS5,
+        kCharacterE14,
+        kCharacterC3,
+        kCharacterH7,
+        kCharacterS6,
+        kCharacterF7,
+        kCharacterM2,
+        kCharacterU4,
+        kCharacterH8,
+        kCharacterR8,
+        kCharacterNumberOfCharacters
     };
 
     using DisplayCharactersTableElementType = char;
@@ -174,22 +174,22 @@ class DisplayCharacters
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    static const char DisplayCharactersTable[][DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS + 1u];
+    static const char kDisplayCharactersTable[][DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS + 1u];
 
     // functions
     /* Row first, because that is how the table is written - one string per row. It used
        to be indexed the other way round, which every caller then compensated for by
        swapping its arguments; the two that did not compensate read past the end of the
        table for the last column. Nothing called any of them, so nothing showed it. */
-    static DisplayCharactersTableElementType getDisplayCharactersTableElement(byte Column, byte Row) {
-        DisplayCharactersTableElementType displayCharactersTableElement;
-        memcpy_P(&displayCharactersTableElement, &DisplayCharactersTable[Row][Column], sizeof(DisplayCharactersTableElementType));
-        return displayCharactersTableElement;
+    static DisplayCharactersTableElementType GetDisplayCharactersTableElement(byte column, byte row) {
+        DisplayCharactersTableElementType display_characters_table_element;
+        memcpy_P(&display_characters_table_element, &kDisplayCharactersTable[row][column], sizeof(DisplayCharactersTableElementType));
+        return display_characters_table_element;
     }
-    static DisplayCharactersTableElementType getDisplayCharactersTableElement(byte Index) {
+    static DisplayCharactersTableElementType GetDisplayCharactersTableElement(byte index) {
         byte column, row;
-        indexToColumnAndRow(Index, column, row);
-        return getDisplayCharactersTableElement(column, row);
+        IndexToColumnAndRow(index, column, row);
+        return GetDisplayCharactersTableElement(column, row);
     }
 
 /******************************************************************************************************************************************************
@@ -205,35 +205,35 @@ class DisplayCharacters
        a plate has no character outside its grid, so STD_NULL_CHARACTER is the honest
        answer where a read past the table used to be. */
     // get methods
-    static char getCharacter(byte Column, byte Row) {
-        if(!isColumnAndRowValid(Column, Row)) { return STD_NULL_CHARACTER; }
-        return getDisplayCharactersTableElement(Column, Row);
+    static char GetCharacter(byte column, byte row) {
+        if(!IsColumnAndRowValid(column, row)) { return STD_NULL_CHARACTER; }
+        return GetDisplayCharactersTableElement(column, row);
     }
-    static char getCharacter(byte Index) {
-        if(!isIndexValid(Index)) { return STD_NULL_CHARACTER; }
-        return getDisplayCharactersTableElement(Index);
+    static char GetCharacter(byte index) {
+        if(!IsIndexValid(index)) { return STD_NULL_CHARACTER; }
+        return GetDisplayCharactersTableElement(index);
     }
-    static char getCharacter(CharacterIdType CharacterId) {
-        if(!isCharacterIdValid(CharacterId)) { return STD_NULL_CHARACTER; }
-        return getDisplayCharactersTableElement(CharacterId);
+    static char GetCharacter(CharacterIdType character_id) {
+        if(!IsCharacterIdValid(character_id)) { return STD_NULL_CHARACTER; }
+        return GetDisplayCharactersTableElement(character_id);
     }
-    static StdReturnType getCharacter(byte, byte, char&);
-    static StdReturnType getCharacter(byte, char&);
-    static StdReturnType getCharacter(CharacterIdType, char&);
+    static StdReturnType GetCharacter(byte, byte, char&);
+    static StdReturnType GetCharacter(byte, char&);
+    static StdReturnType GetCharacter(CharacterIdType, char&);
 
     // set methods
 
     // methods
-    static bool isCharacterIdValid(CharacterIdType CharacterId) { return CharacterId < DISPLAY_CHARACTERS_NUMBER_OF_CHARACTERS; };
-    static bool isIndexValid(byte Index) { return Index < DISPLAY_CHARACTERS_NUMBER_OF_CHARACTERS; };
-    static constexpr bool isColumnAndRowValid(byte Column, byte Row) {
-        return (Column < DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS) && (Row < DISPLAY_CHARACTERS_NUMBER_OF_ROWS);
+    static bool IsCharacterIdValid(CharacterIdType character_id) { return character_id < DISPLAY_CHARACTERS_NUMBER_OF_CHARACTERS; };
+    static bool IsIndexValid(byte index) { return index < DISPLAY_CHARACTERS_NUMBER_OF_CHARACTERS; };
+    static constexpr bool IsColumnAndRowValid(byte column, byte row) {
+        return (column < DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS) && (row < DISPLAY_CHARACTERS_NUMBER_OF_ROWS);
     }
     /* Column before Row, matching both the name and Display's function of the same name.
        They were the other way round here, so a caller that read the two classes side by
        side got a silent swap. */
-    static void indexToColumnAndRow(byte Index, byte& Column, byte& Row) { Column = Index % DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS; Row = Index / DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS; }
-    static byte columnAndRowToIndex(byte Column, byte Row) { return (Row * DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS) + Column; }
+    static void IndexToColumnAndRow(byte index, byte& column, byte& row) { column = index % DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS; row = index / DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS; }
+    static byte ColumnAndRowToIndex(byte column, byte row) { return (row * DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS) + column; }
 
 };
 

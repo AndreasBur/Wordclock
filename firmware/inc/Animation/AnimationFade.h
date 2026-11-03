@@ -58,16 +58,16 @@ class AnimationFade : public Animation
     /* How far the fade has got, in what Display calls a fade level: 255 is the display as
        configured, 0 is dark. Counted here rather than read back from the display, which
        scales the level by the setting, the gamma correction and the automatic. */
-    static constexpr byte LevelFull{255u};
-    byte Level{LevelFull};
-    byte Hour{0u};
-    byte Minute{0u};
+    static constexpr byte kLevelFull{255u};
+    byte level_{kLevelFull};
+    byte hour_{0u};
+    byte minute_{0u};
 
     // functions
-    void reset();
-    void clearTimeTask();
-    void setTimeTask();
-    void setStateToSetTime();
+    void Reset();
+    void ClearTimeTask();
+    void SetTimeTask();
+    void SetStateToSetTime();
 
 
 /******************************************************************************************************************************************************
@@ -83,9 +83,9 @@ class AnimationFade : public Animation
     // set methods
 
     // methods
-    void init();
-    StdReturnType setTime(byte, byte);
-    void task();
+    void Init();
+    StdReturnType SetTime(byte, byte);
+    void Task();
 };
 
 

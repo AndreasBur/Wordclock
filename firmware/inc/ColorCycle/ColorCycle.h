@@ -73,25 +73,25 @@ class ColorCycle
        overflowing rather than by a comparison. */
     using HueType = byte;
 
-    static constexpr byte TaskCycleInitValue{COLOR_CYCLE_TASK_CYCLE_INIT_VALUE};
-    static constexpr bool IsActiveInitValue{false};
-    static constexpr HueType HueInitValue{0u};
+    static constexpr byte kTaskCycleInitValue{COLOR_CYCLE_TASK_CYCLE_INIT_VALUE};
+    static constexpr bool kIsActiveInitValue{false};
+    static constexpr HueType kHueInitValue{0u};
 
     /* The six segments of the wheel, and the channel that is at full through each of them.
        Named because the conversion below is otherwise six lines of arithmetic that only
        says what it is if the reader already knows the wheel. */
-    static constexpr byte NumberOfSegments{6u};
-    static constexpr byte FullChannel{255u};
+    static constexpr byte kNumberOfSegments{6u};
+    static constexpr byte kFullChannel{255u};
 
-    bool IsActive{IsActiveInitValue};
-    byte TaskCycle{TaskCycleInitValue};
-    HueType Hue{HueInitValue};
+    bool is_active_{kIsActiveInitValue};
+    byte task_cycle_{kTaskCycleInitValue};
+    HueType hue_{kHueInitValue};
 
     ColorCycle() { }
     ~ColorCycle() { }
 
     // functions
-    static Display& getDisplay() { return Display::getInstance(); }
+    static Display& GetDisplay() { return Display::GetInstance(); }
 
     /* One hue as a colour, at full saturation and full value - the outside edge of the
        wheel. Anything inside it is a colour the strip shows as a paler version of white,
@@ -104,19 +104,19 @@ class ColorCycle
 
        Plain static rather than constexpr: Pixel declares a destructor, so it is not a
        literal type and cannot be what a constexpr function returns. */
-    static Pixel toColour(HueType Hue) {
-        const uint16_t Scaled = static_cast<uint16_t>(Hue) * NumberOfSegments;
-        const byte Segment = static_cast<byte>(Scaled >> 8u);
-        const byte Rising = static_cast<byte>(Scaled & 0xFFu);
-        const byte Falling = static_cast<byte>(FullChannel - Rising);
+    static Pixel ToColour(HueType hue) {
+        const uint16_t scaled = static_cast<uint16_t>(hue) * kNumberOfSegments;
+        const byte segment = static_cast<byte>(scaled >> 8u);
+        const byte rising = static_cast<byte>(scaled & 0xFFu);
+        const byte falling = static_cast<byte>(kFullChannel - rising);
 
-        switch(Segment) {
-            case 0u  : return Pixel(FullChannel, Rising,      0u);
-            case 1u  : return Pixel(Falling,     FullChannel, 0u);
-            case 2u  : return Pixel(0u,          FullChannel, Rising);
-            case 3u  : return Pixel(0u,          Falling,     FullChannel);
-            case 4u  : return Pixel(Rising,      0u,          FullChannel);
-            default  : return Pixel(FullChannel, 0u,          Falling);
+        switch(segment) {
+            case 0u  : return Pixel(kFullChannel, rising,      0u);
+            case 1u  : return Pixel(falling,     kFullChannel, 0u);
+            case 2u  : return Pixel(0u,          kFullChannel, rising);
+            case 3u  : return Pixel(0u,          falling,     kFullChannel);
+            case 4u  : return Pixel(rising,      0u,          kFullChannel);
+            default  : return Pixel(kFullChannel, 0u,          falling);
         }
     }
 
@@ -124,51 +124,51 @@ class ColorCycle
        than the arithmetic: every step marks the pixel buffer, and the supply switch waits
        for a buffer that has settled before it drops the rail. A cycle running through the
        night would hold that wait open and spend the current the switch exists to save. */
-    static bool isDisplayShowingAnything() { return getDisplay().isEnabled(); }
+    static bool IsDisplayShowingAnything() { return GetDisplay().IsEnabled(); }
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    static ColorCycle& getInstance() {
-        static ColorCycle SingletonInstance;
-        return SingletonInstance;
+    static ColorCycle& GetInstance() {
+        static ColorCycle singleton_instance;
+        return singleton_instance;
     }
 
     // get methods
     /* Zero is a cycle standing still on the hue it reached, which the scheduler answers
        with a task that never comes due - so it needs no rule of its own here. */
-    byte getTaskCycle() const { return TaskCycle; }
+    byte GetTaskCycle() const { return task_cycle_; }
 
-    bool getIsActive() const { return IsActive; }
-    byte getHue() const { return Hue; }
+    bool GetIsActive() const { return is_active_; }
+    byte GetHue() const { return hue_; }
 
     // set methods
-    void setTaskCycle(byte sTaskCycle) { TaskCycle = sTaskCycle; }
+    void SetTaskCycle(byte task_cycle) { task_cycle_ = task_cycle; }
 
     /* Switching off puts the chosen colour back at once rather than at the next tick: the
        tick may be seconds away, and a setting that takes seconds to take effect reads as
        one that did not work. */
-    void setIsActive(bool sIsActive) {
-        IsActive = sIsActive;
+    void SetIsActive(bool is_active) {
+        is_active_ = is_active;
 
-        if(IsActive) { getDisplay().setColorCycle(toColour(Hue)); }
-        else         { getDisplay().clearColorCycle(); }
+        if(is_active_) { GetDisplay().SetColorCycle(ToColour(hue_)); }
+        else         { GetDisplay().ClearColorCycle(); }
     }
 
     // methods
-    void resetToDefaults() {
-        setTaskCycle(TaskCycleInitValue);
-        Hue = HueInitValue;
-        setIsActive(IsActiveInitValue);
+    void ResetToDefaults() {
+        SetTaskCycle(kTaskCycleInitValue);
+        hue_ = kHueInitValue;
+        SetIsActive(kIsActiveInitValue);
     }
 
-    void task() {
-        if(!IsActive) { return; }
-        if(!isDisplayShowingAnything()) { return; }
+    void Task() {
+        if(!is_active_) { return; }
+        if(!IsDisplayShowingAnything()) { return; }
 
-        Hue++;
-        getDisplay().setColorCycle(toColour(Hue));
+        hue_++;
+        GetDisplay().SetColorCycle(ToColour(hue_));
     }
 };
 

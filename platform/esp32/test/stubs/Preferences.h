@@ -1,5 +1,7 @@
 #ifndef _PREFERENCES_H_
 #define _PREFERENCES_H_
+/* Under the framework's names, because it stands in for the framework's header. */
+// NOLINTBEGIN(readability-identifier-naming)
 #include <stddef.h>
 #include <stdint.h>
 #include <cstring>
@@ -40,4 +42,5 @@ struct Preferences {
     bool remove(const char* Key) { return preferencesStore()[Namespace].erase(Key) > 0u; }
     bool isKey(const char*) { return false; }
 };
+// NOLINTEND(readability-identifier-naming)
 #endif

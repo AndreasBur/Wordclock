@@ -56,46 +56,46 @@ class MsgCmdNetworkParser : public MsgParameterParser<MsgCmdNetworkParser, MSG_C
   private:
     friend class MsgParameterParser;
 
-    static constexpr char SsidShortName{'S'};
-    static constexpr char PasswordShortName{'P'};
+    static constexpr char kSsidShortName{'S'};
+    static constexpr char kPasswordShortName{'P'};
 
-    static constexpr ParameterTableType ParameterTable PROGMEM {
-        ParameterTableElementType(SsidShortName, MsgParameter::ARGUMENT_TYPE_STRING),
-        ParameterTableElementType(PasswordShortName, MsgParameter::ARGUMENT_TYPE_STRING)
+    static constexpr ParameterTableType kParameterTable PROGMEM {
+        ParameterTableElementType(kSsidShortName, MsgParameter::kArgumentTypeString),
+        ParameterTableElementType(kPasswordShortName, MsgParameter::kArgumentTypeString)
     };
 
-    char Ssid[System::SsidStringLength]{0u};
-    char Password[System::PasswordStringLength]{0u};
-    bool SsidGiven{false};
-    bool PasswordGiven{false};
-    StdReturnType ReturnValue{E_OK};
+    char ssid_[System::kSsidStringLength]{0u};
+    char password_[System::kPasswordStringLength]{0u};
+    bool ssid_given_{false};
+    bool password_given_{false};
+    StdReturnType return_value_{kEOk};
 
     // functions
-    static void handleParameter(char ParameterShortName, byte Argument) { UNUSED(ParameterShortName); UNUSED(Argument); }
-    void handleParameter(char ParameterShortName, const char* Argument, PositionType Length)
+    static void HandleParameter(char parameter_short_name, byte argument) { UNUSED(parameter_short_name); UNUSED(argument); }
+    void HandleParameter(char parameter_short_name, const char* argument, PositionType length)
     {
-        if(ParameterShortName == SsidShortName) {
-            StringTools::stringCopy(Ssid, Argument, minimum(Length, sizeof(Ssid)));
-            trimTrailingBlanks(Ssid);
-            SsidGiven = true;
+        if(parameter_short_name == kSsidShortName) {
+            StringTools::StringCopy(ssid_, argument, Minimum(length, sizeof(ssid_)));
+            TrimTrailingBlanks(ssid_);
+            ssid_given_ = true;
         }
-        if(ParameterShortName == PasswordShortName) {
-            StringTools::stringCopy(Password, Argument, minimum(Length, sizeof(Password)));
-            trimTrailingBlanks(Password);
-            PasswordGiven = true;
+        if(parameter_short_name == kPasswordShortName) {
+            StringTools::StringCopy(password_, argument, Minimum(length, sizeof(password_)));
+            TrimTrailingBlanks(password_);
+            password_given_ = true;
         }
     }
 
-    static constexpr size_t minimum(size_t Left, size_t Right) { return (Left < Right) ? Left : Right; }
+    static constexpr size_t Minimum(size_t left, size_t right) { return (left < right) ? left : right; }
 
     /* A string argument runs to the next option, so it carries the space that separates
        them. A network called "Home " is not what anybody typed, and joining it would fail
        in a way that names nothing - so a trailing blank is taken off here. It also means a
        name or a pass phrase cannot end in a space over this interface, which is written
        down in the command reference. */
-    static void trimTrailingBlanks(char* String) {
-        for(size_t Index = strlen(String); (Index > 0u) && (String[Index - 1u] == ' '); Index--) {
-            String[Index - 1u] = STD_NULL_CHARACTER;
+    static void TrimTrailingBlanks(char* string) {
+        for(size_t index = strlen(string); (index > 0u) && (string[index - 1u] == ' '); index--) {
+            string[index - 1u] = STD_NULL_CHARACTER;
         }
     }
 
@@ -103,37 +103,37 @@ class MsgCmdNetworkParser : public MsgParameterParser<MsgCmdNetworkParser, MSG_C
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr MsgCmdNetworkParser(const char* Parameter) : MsgParameterParser(ParameterTable, Parameter) { }
+    constexpr MsgCmdNetworkParser(const char* parameter) : MsgParameterParser(kParameterTable, parameter) { }
     ~MsgCmdNetworkParser() { }
 
     // methods
     /* Names the network and says whether there is one, and never the pass phrase. */
-    void sendAnswer() const {
-        char StoredSsid[System::SsidStringLength]{};
+    void SendAnswer() const {
+        char stored_ssid[System::kSsidStringLength]{};
 
         /* An empty name is a clock with no network, which is the state the access point
            stands in for - the same empty field the status command answers with. */
-        System::getInstance().getNetworkSsid(StoredSsid);
+        System::GetInstance().GetNetworkSsid(stored_ssid);
 
-        sendAnswerParameter(SsidShortName, StoredSsid);
+        SendAnswerParameter(kSsidShortName, stored_ssid);
         /* Last field before the command parser's terminating println(), so no trailing
            separator space. */
-        Error.send(ReturnValue, false);
+        error_.Send(return_value_, false);
     }
 
     /* Both halves or neither: a command that carried only one of them would either join a
        network with the previous pass phrase or store a pass phrase for the previous
        network, and both of those are a clock that goes quiet. */
-    void process()
+    void Process()
     {
-        if(!SsidGiven && !PasswordGiven) { return; }
+        if(!ssid_given_ && !password_given_) { return; }
 
-        if(!SsidGiven || !PasswordGiven) {
-            ReturnValue = E_NOT_OK;
+        if(!ssid_given_ || !password_given_) {
+            return_value_ = kENotOk;
             return;
         }
 
-        ReturnValue = System::getInstance().setNetworkCredentials(Ssid, Password);
+        return_value_ = System::GetInstance().SetNetworkCredentials(ssid_, password_);
     }
 };
 

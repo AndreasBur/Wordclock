@@ -14,15 +14,15 @@
  *      \details    Where the ESP32 backend has the IDF's key-value store, this core offers
  *                  a filesystem and an EEPROM emulation. The filesystem wins on one point
  *                  that Storage's contract turns on: a file carries its own length, and
- *                  read() has to refuse a blob of the wrong size because it belongs to
+ *                  Read() has to refuse a blob of the wrong size because it belongs to
  *                  another version of the settings. The emulation would need that length
  *                  stored alongside and kept in step by hand.
  *
  *                  The namespace becomes a directory and the key a file inside it, so the
  *                  two names the contract already carries still say what they said.
  *
- *                  The filesystem is mounted on the first call rather than in an init():
- *                  the contract has no init(), and Persistence reads before it ever
+ *                  The filesystem is mounted on the first call rather than in an Init():
+ *                  the contract has no Init(), and Persistence reads before it ever
  *                  writes.
  *
 ******************************************************************************************************************************************************/
@@ -40,7 +40,7 @@
 ******************************************************************************************************************************************************/
 namespace {
 
-constexpr char BlobPath[]{"/" STORAGE_NAMESPACE "/" STORAGE_KEY};
+constexpr char kBlobPath[]{"/" STORAGE_NAMESPACE "/" STORAGE_KEY};
 
 /******************************************************************************************************************************************************
  *  LOCAL FUNCTIONS
@@ -49,22 +49,22 @@ constexpr char BlobPath[]{"/" STORAGE_NAMESPACE "/" STORAGE_KEY};
    will not come up on the next call either, and retrying on every read would turn a fault
    into a stall. Formatting on a failed mount is what makes a first boot work on a chip
    whose flash has never held one. */
-bool isFilesystemReady()
+bool IsFilesystemReady()
 {
-    static bool WasTried{false};
-    static bool IsMounted{false};
+    static bool was_tried{false};
+    static bool is_mounted{false};
 
-    if(!WasTried) {
-        WasTried = true;
-        IsMounted = LittleFS.begin();
+    if(!was_tried) {
+        was_tried = true;
+        is_mounted = LittleFS.begin();
     }
 
-    return IsMounted;
+    return is_mounted;
 }
 
 /* The directory the blob lives in. mkdir() on an existing one is not an error worth
    reporting - the open that follows is what decides. */
-void ensureDirectory()
+void EnsureDirectory()
 {
     LittleFS.mkdir("/" STORAGE_NAMESPACE);
 }
@@ -76,91 +76,91 @@ void ensureDirectory()
 ******************************************************************************************************************************************************/
 
 /* Instance methods, though some of them read no member: they are the interface the
-   firmware core calls through getInstance(), and every backend - the simulator's
+   firmware core calls through GetInstance(), and every backend - the simulator's
    stand-ins included - offers it that way. Whether this backend's implementation
    happens to need a member is its own detail, and answering the check would carry
    that detail into the interface. */
 // NOLINTBEGIN(readability-convert-member-functions-to-static)
 /******************************************************************************************************************************************************
-  read()
+  Read()
 ******************************************************************************************************************************************************/
 /*! \brief          Reads the stored blob
  *  \details        A blob of a different length is refused rather than read as far as it
  *                  goes: it belongs to another version of the settings, and Persistence
  *                  would have to reject it anyway.
  *
- *  \return         E_OK if exactly Size bytes were read
+ *  \return         kEOk if exactly Size bytes were read
 ******************************************************************************************************************************************************/
-StdReturnType Storage::read(byte* Buffer, size_t Size) const
+StdReturnType Storage::Read(byte* buffer, size_t size) const
 {
-    if((Buffer == nullptr) || (Size == 0u) || (Size > Capacity)) { return E_NOT_OK; }
-    if(!isFilesystemReady()) { return E_NOT_OK; }
+    if((buffer == nullptr) || (size == 0u) || (size > kCapacity)) { return kENotOk; }
+    if(!IsFilesystemReady()) { return kENotOk; }
 
-    File Blob = LittleFS.open(BlobPath, "r");
-    if(!Blob) { return E_NOT_OK; }
+    File blob = LittleFS.open(kBlobPath, "r");
+    if(!blob) { return kENotOk; }
 
-    if(Blob.size() != Size) {
-        Blob.close();
-        return E_NOT_OK;
+    if(blob.size() != size) {
+        blob.close();
+        return kENotOk;
     }
 
-    const size_t Read = Blob.read(Buffer, Size);
-    Blob.close();
+    const size_t read = blob.read(buffer, size);
+    blob.close();
 
-    if(Read != Size) { return E_NOT_OK; }
+    if(read != size) { return kENotOk; }
 
-    return E_OK;
-} /* read */
+    return kEOk;
+} /* Read */
 
 
 /******************************************************************************************************************************************************
-  write()
+  Write()
 ******************************************************************************************************************************************************/
 /*! \brief          Replaces the stored blob
  *  \details        Opened for writing rather than appended to, so a shorter blob cannot
- *                  leave the tail of a longer one behind it - which read() would then
+ *                  leave the tail of a longer one behind it - which Read() would then
  *                  refuse for a length it never wrote.
  *
- *  \return         E_OK if the whole blob was stored
+ *  \return         kEOk if the whole blob was stored
 ******************************************************************************************************************************************************/
-StdReturnType Storage::write(const byte* Buffer, size_t Size)
+StdReturnType Storage::Write(const byte* buffer, size_t size)
 {
-    if((Buffer == nullptr) || (Size == 0u) || (Size > Capacity)) { return E_NOT_OK; }
-    if(!isFilesystemReady()) { return E_NOT_OK; }
+    if((buffer == nullptr) || (size == 0u) || (size > kCapacity)) { return kENotOk; }
+    if(!IsFilesystemReady()) { return kENotOk; }
 
-    ensureDirectory();
+    EnsureDirectory();
 
-    File Blob = LittleFS.open(BlobPath, "w");
-    if(!Blob) { return E_NOT_OK; }
+    File blob = LittleFS.open(kBlobPath, "w");
+    if(!blob) { return kENotOk; }
 
-    const size_t Written = Blob.write(Buffer, Size);
-    Blob.close();
+    const size_t written = blob.write(buffer, size);
+    blob.close();
 
-    if(Written != Size) { return E_NOT_OK; }
+    if(written != size) { return kENotOk; }
 
-    return E_OK;
-} /* write */
+    return kEOk;
+} /* Write */
 
 
 /******************************************************************************************************************************************************
-  clear()
+  Clear()
 ******************************************************************************************************************************************************/
 /*! \brief          Forgets the stored blob
  *  \details        A store that held nothing counts as cleared, so calling this twice is
  *                  not an error.
  *
- *  \return         E_OK if nothing is stored afterwards
+ *  \return         kEOk if nothing is stored afterwards
 ******************************************************************************************************************************************************/
-StdReturnType Storage::clear()
+StdReturnType Storage::Clear()
 {
-    if(!isFilesystemReady()) { return E_NOT_OK; }
+    if(!IsFilesystemReady()) { return kENotOk; }
 
-    if(!LittleFS.exists(BlobPath)) { return E_OK; }
+    if(!LittleFS.exists(kBlobPath)) { return kEOk; }
 
-    if(!LittleFS.remove(BlobPath)) { return E_NOT_OK; }
+    if(!LittleFS.remove(kBlobPath)) { return kENotOk; }
 
-    return E_OK;
-} /* clear */
+    return kEOk;
+} /* Clear */
 // NOLINTEND(readability-convert-member-functions-to-static)
 
 /******************************************************************************************************************************************************

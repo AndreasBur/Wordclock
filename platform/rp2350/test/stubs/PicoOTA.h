@@ -1,5 +1,7 @@
 #ifndef _PICO_OTA_H_
 #define _PICO_OTA_H_
+/* Under the framework's names, because it stands in for the framework's header. */
+// NOLINTBEGIN(readability-identifier-naming)
 #include <string>
 /* Stand-in for the core's PicoOTA, which on the target writes the command page the OTA
    loader reads on the next boot. Nothing here writes flash, so what the stub keeps is the
@@ -34,4 +36,5 @@ struct PicoOtaStub {
 };
 
 extern PicoOtaStub picoOTA;
+// NOLINTEND(readability-identifier-naming)
 #endif

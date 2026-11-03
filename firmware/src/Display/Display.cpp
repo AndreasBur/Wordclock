@@ -42,138 +42,138 @@
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  init()
+  Init()
 ******************************************************************************************************************************************************/
-void Display::init()
+void Display::Init()
 {
-    clear();
-    PixelStripe.init(DISPLAY_DATA_PIN);
-    State = STATE_INIT;
-} /* init */
+    Clear();
+    pixel_stripe_.Init(DISPLAY_DATA_PIN);
+    state_ = kStateInit;
+} /* Init */
 
 /******************************************************************************************************************************************************
-  setBrightness()
+  SetBrightness()
 ******************************************************************************************************************************************************/
-void Display::setBrightness(byte sBrightness)
+void Display::SetBrightness(byte brightness)
 {
-    /* only the wish is stored here, what reaches the LEDs is calcBrightness() */
-    Brightness.setBrightness(sBrightness);
-    applyBrightness();
-} /* setBrightness */
+    /* only the wish is stored here, what reaches the LEDs is CalcBrightness() */
+    brightness_.SetBrightness(brightness);
+    ApplyBrightness();
+} /* SetBrightness */
 
 
 /******************************************************************************************************************************************************
-  applyBrightness()
+  ApplyBrightness()
 ******************************************************************************************************************************************************/
-void Display::applyBrightness()
+void Display::ApplyBrightness()
 {
     /* Before the shortcut below and on every run, because what the cap depends on moves
        without the setting moving: a clock face that lights more letters than the last one
        draws more current at the same brightness. This task is the only place that notices. */
-    applyCurrentLimit();
+    ApplyCurrentLimit();
 
-    const byte brightness = Brightness.calcBrightness();
+    const byte brightness = brightness_.CalcBrightness();
 
     /* Nothing to do while the calculated value stays put, which is the normal case: only
        the automatic makes it move on its own. Without this check the task would rewrite
        every lit pixel on every run. */
-    if(brightness == AppliedBrightness) { return; }
-    AppliedBrightness = brightness;
+    if(brightness == applied_brightness_) { return; }
+    applied_brightness_ = brightness;
 
 #if (DISPLAY_USE_PIXELS_DIMMING == STD_ON)
     /* Where the strip does all of the dimming, the master carries the setting and the cap at
-       once, so the two are combined here rather than kept apart as applyCurrentLimit() does
+       once, so the two are combined here rather than kept apart as ApplyCurrentLimit() does
        for the other path. */
-    const byte Limit = getCurrentLimit();
-    PixelStripe.setBrightness((brightness < Limit) ? brightness : Limit);
-    AppliedCurrentLimit = Limit;
+    const byte limit = GetCurrentLimit();
+    pixel_stripe_.SetBrightness((brightness < limit) ? brightness : limit);
+    applied_current_limit_ = limit;
 #else
-    applyColor();
+    ApplyColor();
 #endif
-} /* applyBrightness */
+} /* ApplyBrightness */
 
 
 /******************************************************************************************************************************************************
-  applyColor()
+  ApplyColor()
 ******************************************************************************************************************************************************/
 /* The dimmed color is derived from the color and the brightness, and what the pixels carry
-   is the dimmed one - so a write to either invalidates both. applyBrightness() above has
+   is the dimmed one - so a write to either invalidates both. ApplyBrightness() above has
    always done this for its own half; the color setters did not, which left a color change
    invisible until the brightness happened to move, redraw or no redraw.
 
    Nothing to do where the strip does the dimming: there the pixels carry the color itself,
    and the next redraw picks a new one up on its own. */
-void Display::applyColor()
+void Display::ApplyColor()
 {
 #if (DISPLAY_USE_PIXELS_DIMMING == STD_OFF)
-    Color.dimmColors(AppliedBrightness);
+    color_.DimmColors(applied_brightness_);
 
     /* the pixels already on the display still carry the previous color */
-    for(IndexType Index = 0; Index < DISPLAY_NUMBER_OF_PIXELS; Index++) {
-        if(getPixel(Index)) { setPixel(Index); }
+    for(IndexType index = 0; index < DISPLAY_NUMBER_OF_PIXELS; index++) {
+        if(GetPixel(index)) { SetPixel(index); }
     }
 #endif
-} /* applyColor */
+} /* ApplyColor */
 
 
 /******************************************************************************************************************************************************
-  applyColorAndCurrentLimit()
+  ApplyColorAndCurrentLimit()
 *******************************************************************************************************************************************************/
 /* The colour reaches the pixels, and then the cap is recomputed for it: white at the same
    brightness draws three times what amber does, so a colour change moves the current as much
    as a brightness change and must not wait for the next task run to be noticed. */
-void Display::applyColorAndCurrentLimit()
+void Display::ApplyColorAndCurrentLimit()
 {
-    applyColor();
-    applyCurrentLimit();
-} /* applyColorAndCurrentLimit */
+    ApplyColor();
+    ApplyCurrentLimit();
+} /* ApplyColorAndCurrentLimit */
 
 
 /******************************************************************************************************************************************************
-  getNumberOfLitPixels()
+  GetNumberOfLitPixels()
 *******************************************************************************************************************************************************/
 /* Counted from the strip's buffer rather than kept as a running total beside it. The
-   animations and setPixel() write there directly, so a counter would be the copy that
-   falls behind - the same argument Persistence::gather() is built on. One pass over the
-   display per task run, next to the pass applyColor() already makes. */
-byte Display::getNumberOfLitPixels() const
+   animations and SetPixel() write there directly, so a counter would be the copy that
+   falls behind - the same argument Persistence::Gather() is built on. One pass over the
+   display per task run, next to the pass ApplyColor() already makes. */
+byte Display::GetNumberOfLitPixels() const
 {
     static_assert(DISPLAY_NUMBER_OF_PIXELS <= 255u, "Display: a larger display needs a wider lit count");
-    byte Count{0u};
+    byte count{0u};
 
-    for(IndexType Index = 0u; Index < DISPLAY_NUMBER_OF_PIXELS; Index++) {
-        if(getPixel(Index)) { Count++; }
+    for(IndexType index = 0u; index < DISPLAY_NUMBER_OF_PIXELS; index++) {
+        if(GetPixel(index)) { count++; }
     }
-    return Count;
-} /* getNumberOfLitPixels */
+    return count;
+} /* GetNumberOfLitPixels */
 
 
 /******************************************************************************************************************************************************
-  getCurrentLimit()
+  GetCurrentLimit()
 ******************************************************************************************************************************************************/
 /* Built from the colour and a count rather than from the pixel values, and that is not a
    shortcut: which dimming path is compiled decides whether the buffer holds the dimmed colour
    or the plain one, and only the plain one says what the strip would draw at full brightness.
    Every lit pixel carries the same colour, so a count is all the buffer has to give.
 
-   An upper bound on purpose. setPixel() with its own brightness leaves a pixel dimmer than
+   An upper bound on purpose. SetPixel() with its own brightness leaves a pixel dimmer than
    the colour, and a limiter that guessed low would be one that does not protect.
 
    The colour it asks for is the one being *shown*, not the one that was set: with the colour
    cycle running those are different, and reading the setting would let a saturated hue on the
    strip be budgeted as whatever pale colour happens to be stored underneath it - which is a
    guess in the one direction this must never guess. */
-byte Display::getCurrentLimit() const
+byte Display::GetCurrentLimit() const
 {
-    const Pixel Shown = Color.getColorToShow();
-    const uint16_t ChannelSum = DisplayCurrentLimit::toChannelSum(Shown.getRed(), Shown.getGreen(), Shown.getBlue());
+    const Pixel shown = color_.GetColorToShow();
+    const uint16_t channel_sum = DisplayCurrentLimit::ToChannelSum(shown.GetRed(), shown.GetGreen(), shown.GetBlue());
 
-    return DisplayCurrentLimit::toBrightnessLimit(DISPLAY_NUMBER_OF_PIXELS, getNumberOfLitPixels(), ChannelSum);
-} /* getCurrentLimit */
+    return DisplayCurrentLimit::ToBrightnessLimit(DISPLAY_NUMBER_OF_PIXELS, GetNumberOfLitPixels(), channel_sum);
+} /* GetCurrentLimit */
 
 
 /******************************************************************************************************************************************************
-  applyCurrentLimit()
+  ApplyCurrentLimit()
 ******************************************************************************************************************************************************/
 /* The cap rides on the strip's own master rather than on the colour written into the buffer,
    and that placement is the whole reason this is cheap. The buffer keeps the colour somebody
@@ -183,224 +183,224 @@ byte Display::getCurrentLimit() const
 
    Writing the master marks the frame dirty, which is why the remembered value is compared
    first: without that, every task run would queue a transmission that changes nothing. */
-void Display::applyCurrentLimit()
+void Display::ApplyCurrentLimit()
 {
-    /* Off stays off - the master is also what disable() uses. enable() asks for the cap again
+    /* Off stays off - the master is also what Disable() uses. enable() asks for the cap again
        on its way back, so nothing is lost by leaving it alone here. */
-    if(!Enabled) { return; }
+    if(!enabled_) { return; }
 
-    const byte Limit = getCurrentLimit();
+    const byte limit = GetCurrentLimit();
 
-    if(Limit == AppliedCurrentLimit) { return; }
-    AppliedCurrentLimit = Limit;
-    PixelStripe.setBrightness(Limit);
-} /* applyCurrentLimit */
+    if(limit == applied_current_limit_) { return; }
+    applied_current_limit_ = limit;
+    pixel_stripe_.SetBrightness(limit);
+} /* ApplyCurrentLimit */
 
 
 /******************************************************************************************************************************************************
-  resumeAtCurrentLimit()
+  ResumeAtCurrentLimit()
 ******************************************************************************************************************************************************/
-/* What enable() uses instead of enablePixels(). The remembered value is set from the same
-   computation that is written, so the guard in applyCurrentLimit() agrees with the strip
+/* What Enable() uses instead of EnablePixels(). The remembered value is set from the same
+   computation that is written, so the guard in ApplyCurrentLimit() agrees with the strip
    afterwards. */
-void Display::resumeAtCurrentLimit()
+void Display::ResumeAtCurrentLimit()
 {
-    AppliedCurrentLimit = getCurrentLimit();
-    PixelStripe.setBrightness(AppliedCurrentLimit);
-} /* resumeAtCurrentLimit */
+    applied_current_limit_ = GetCurrentLimit();
+    pixel_stripe_.SetBrightness(applied_current_limit_);
+} /* ResumeAtCurrentLimit */
 
 /******************************************************************************************************************************************************
-  setWord()
+  SetWord()
 ******************************************************************************************************************************************************/
-StdReturnType Display::setWord(WordIdType WordId, byte MaxLength)
+StdReturnType Display::SetWord(WordIdType word_id, byte max_length)
 {
-    StdReturnType returnValue{E_NOT_OK};
+    StdReturnType return_value{kENotOk};
     byte length;
 
-    if(WordId < DisplayWords::WORD_NUMBER_OF_WORDS) {
-        returnValue = E_OK;
-        DisplayWord word = Words.getDisplayWord(WordId);
-        byte WordLength = word.getLength();
+    if(word_id < DisplayWords::kWordNumberOfWords) {
+        return_value = kEOk;
+        DisplayWord word = words_.GetDisplayWord(word_id);
+        byte word_length = word.GetLength();
 
-        if(MaxLength == WordLengthUnlimited || MaxLength >= WordLength) { length = WordLength; }
-        else { length = MaxLength; }
+        if(max_length == kWordLengthUnlimited || max_length >= word_length) { length = word_length; }
+        else { length = max_length; }
 
-        for(IndexType Index = 0; Index < length; Index++) {
-            if(setPixel(word.getColumn() + Index,  word.getRow()) == E_NOT_OK) returnValue = E_NOT_OK;
+        for(IndexType index = 0; index < length; index++) {
+            if(SetPixel(word.GetColumn() + index,  word.GetRow()) == kENotOk) return_value = kENotOk;
         }
     } else {
-        returnValue = E_NOT_OK;
+        return_value = kENotOk;
     }
-    return returnValue;
-} /* setWord */
+    return return_value;
+} /* SetWord */
 
 
 /******************************************************************************************************************************************************
-  clearWord()
+  ClearWord()
 ******************************************************************************************************************************************************/
-StdReturnType Display::clearWord(WordIdType WordId)
+StdReturnType Display::ClearWord(WordIdType word_id)
 {
-    StdReturnType returnValue{E_NOT_OK};
+    StdReturnType return_value{kENotOk};
 
-    if(WordId < DisplayWords::WORD_NUMBER_OF_WORDS) {
-        returnValue = E_OK;
-        DisplayWord Word = Words.getDisplayWord(WordId);
+    if(word_id < DisplayWords::kWordNumberOfWords) {
+        return_value = kEOk;
+        DisplayWord word = words_.GetDisplayWord(word_id);
 
-        for(IndexType Index = 0; Index < Word.getLength(); Index++) {
-            if(clearPixel(Word.getColumn() + Index,  Word.getRow()) == E_NOT_OK) returnValue = E_NOT_OK;
+        for(IndexType index = 0; index < word.GetLength(); index++) {
+            if(ClearPixel(word.GetColumn() + index,  word.GetRow()) == kENotOk) return_value = kENotOk;
         }
     } else {
-        returnValue = E_NOT_OK;
+        return_value = kENotOk;
     }
-    return returnValue;
-} /* clearWord */
+    return return_value;
+} /* ClearWord */
 
 
 /******************************************************************************************************************************************************
   clearAllWords()
 ******************************************************************************************************************************************************/
-StdReturnType Display::clearWords()
+StdReturnType Display::ClearWords()
 {
-    StdReturnType returnValue{E_OK};
+    StdReturnType return_value{kEOk};
 
-    for(byte i = DisplayWords::WORD_ES; i < DisplayWords::WORD_NUMBER_OF_WORDS; i++) {
-        if(clearWord((WordIdType) i) == E_NOT_OK) returnValue = E_NOT_OK;
+    for(byte i = DisplayWords::kWordEs; i < DisplayWords::kWordNumberOfWords; i++) {
+        if(ClearWord((WordIdType) i) == kENotOk) return_value = kENotOk;
     }
-    return returnValue;
+    return return_value;
 } /* clearAllWords */
 
 
 /******************************************************************************************************************************************************
-  getPixel()
+  GetPixel()
 ******************************************************************************************************************************************************/
-StdReturnType Display::getPixel(IndexType Index, PixelValueType& Value) const
+StdReturnType Display::GetPixel(IndexType index, PixelValueType& value) const
 {
     byte row, column;
-    indexToColumnAndRow(Index, column, row);
-    return getPixel(column, row, Value);
-} /* getPixel */
+    IndexToColumnAndRow(index, column, row);
+    return GetPixel(column, row, value);
+} /* GetPixel */
 
 
 /******************************************************************************************************************************************************
-  getPixel()
+  GetPixel()
 ******************************************************************************************************************************************************/
-Display::PixelValueType Display::getPixel(IndexType Index) const
+Display::PixelValueType Display::GetPixel(IndexType index) const
 {
     byte row, column;
-    indexToColumnAndRow(Index, column, row);
-    return getPixel(column, row);
-} /* getPixel */
+    IndexToColumnAndRow(index, column, row);
+    return GetPixel(column, row);
+} /* GetPixel */
 
 
 /******************************************************************************************************************************************************
-  getPixel()
+  GetPixel()
 ******************************************************************************************************************************************************/
-StdReturnType Display::getPixel(byte Column, byte Row, PixelValueType& Value)  const
+StdReturnType Display::GetPixel(byte column, byte row, PixelValueType& value)  const
 {
-    if(!isColumnAndRowValid(Column, Row)) { return E_NOT_OK; }
+    if(!IsColumnAndRowValid(column, row)) { return kENotOk; }
 
-    Value = getPixel(Column, Row);
-    return E_OK;
-} /* getPixel */
+    value = GetPixel(column, row);
+    return kEOk;
+} /* GetPixel */
 
 
 /******************************************************************************************************************************************************
-  getPixel()
+  GetPixel()
 ******************************************************************************************************************************************************/
-Display::PixelValueType Display::getPixel(byte Column, byte Row)  const
+Display::PixelValueType Display::GetPixel(byte column, byte row)  const
 {
-    if(!isColumnAndRowValid(Column, Row)) { return false; }
+    if(!IsColumnAndRowValid(column, row)) { return false; }
 
-    const Pixel pixel = PixelStripe.getPixel(toIndex(Column, Row));
+    const Pixel pixel = pixel_stripe_.GetPixel(ToIndex(column, row));
 
     /* Pixel is only off when all colors are zero */
-    return !(pixel.getRed() == 0u && pixel.getGreen() == 0u && pixel.getBlue() == 0u);
-} /* getPixel */
+    return !(pixel.GetRed() == 0u && pixel.GetGreen() == 0u && pixel.GetBlue() == 0u);
+} /* GetPixel */
 
 
 /******************************************************************************************************************************************************
-  setPixel()
+  SetPixel()
 ******************************************************************************************************************************************************/
-StdReturnType Display::setPixel(byte Column, byte Row)
+StdReturnType Display::SetPixel(byte column, byte row)
 {
-    if(!isColumnAndRowValid(Column, Row)) { return E_NOT_OK; }
+    if(!IsColumnAndRowValid(column, row)) { return kENotOk; }
 
 #if (DISPLAY_USE_PIXELS_DIMMING == STD_ON)
-    return PixelStripe.setPixel(toIndex(Column, Row), Color);
+    return pixel_stripe_.SetPixel(ToIndex(column, row), color_);
 #else
-    return PixelStripe.setPixel(toIndex(Column, Row), Color.getColorDimmed());
+    return pixel_stripe_.SetPixel(ToIndex(column, row), color_.GetColorDimmed());
 #endif
-} /* setPixel */
+} /* SetPixel */
 
 
 /******************************************************************************************************************************************************
-  getColorDimmed()
+  GetColorDimmed()
 ******************************************************************************************************************************************************/
-Pixel Display::getColorDimmed(byte Brightness) const
+Pixel Display::GetColorDimmed(byte brightness) const
 {
     /* the display color stays the only color, the brightness just dimms it. It comes
        on top of the display brightness, which is already part of the color here. */
 #if (DISPLAY_USE_PIXELS_DIMMING == STD_ON)
-    Pixel pixelColor = Color.getColor();
+    Pixel pixel_color = color_.GetColor();
 #else
-    Pixel pixelColor = Color.getColorDimmed();
+    Pixel pixel_color = color_.GetColorDimmed();
 #endif
-    pixelColor.dimmPixel(Brightness);
+    pixel_color.DimmPixel(brightness);
 
-    return pixelColor;
-} /* getColorDimmed */
+    return pixel_color;
+} /* GetColorDimmed */
 
 
 /******************************************************************************************************************************************************
-  setPixel()
+  SetPixel()
 ******************************************************************************************************************************************************/
-StdReturnType Display::setPixel(byte Column, byte Row, byte Brightness)
+StdReturnType Display::SetPixel(byte column, byte row, byte brightness)
 {
-    if(!isColumnAndRowValid(Column, Row)) { return E_NOT_OK; }
+    if(!IsColumnAndRowValid(column, row)) { return kENotOk; }
 
-    return PixelStripe.setPixel(toIndex(Column, Row), getColorDimmed(Brightness));
-} /* setPixel */
-
-
-/******************************************************************************************************************************************************
-  setPixel()
-******************************************************************************************************************************************************/
-StdReturnType Display::setPixel(IndexType Index)
-{
-    byte row, column;
-    indexToColumnAndRow(Index, column, row);
-    return setPixel(column,  row);
-} /* setPixel */
+    return pixel_stripe_.SetPixel(ToIndex(column, row), GetColorDimmed(brightness));
+} /* SetPixel */
 
 
 /******************************************************************************************************************************************************
-  clearPixel()
+  SetPixel()
 ******************************************************************************************************************************************************/
-StdReturnType Display::clearPixel(byte Column, byte Row)
-{
-    if(!isColumnAndRowValid(Column, Row)) { return E_NOT_OK; }
-
-    return PixelStripe.clearPixel(toIndex(Column, Row));
-} /* clearPixel */
-
-
-/******************************************************************************************************************************************************
-  clearPixel()
-******************************************************************************************************************************************************/
-StdReturnType Display::clearPixel(IndexType Index)
+StdReturnType Display::SetPixel(IndexType index)
 {
     byte row, column;
-    indexToColumnAndRow(Index, column, row);
-    return clearPixel(column,  row);
-} /* clearPixel */
+    IndexToColumnAndRow(index, column, row);
+    return SetPixel(column,  row);
+} /* SetPixel */
 
 
 /******************************************************************************************************************************************************
-  togglePixel()
+  ClearPixel()
 ******************************************************************************************************************************************************/
-StdReturnType Display::togglePixel(byte Column, byte Row)
+StdReturnType Display::ClearPixel(byte column, byte row)
 {
-    if(!isColumnAndRowValid(Column, Row)) { return E_NOT_OK; }
+    if(!IsColumnAndRowValid(column, row)) { return kENotOk; }
+
+    return pixel_stripe_.ClearPixel(ToIndex(column, row));
+} /* ClearPixel */
+
+
+/******************************************************************************************************************************************************
+  ClearPixel()
+******************************************************************************************************************************************************/
+StdReturnType Display::ClearPixel(IndexType index)
+{
+    byte row, column;
+    IndexToColumnAndRow(index, column, row);
+    return ClearPixel(column,  row);
+} /* ClearPixel */
+
+
+/******************************************************************************************************************************************************
+  TogglePixel()
+******************************************************************************************************************************************************/
+StdReturnType Display::TogglePixel(byte column, byte row)
+{
+    if(!IsColumnAndRowValid(column, row)) { return kENotOk; }
 
     /* The column and the row are what is toggled, not the index they map to: the serpentine
        branch used to transform them into an index and hand that to functions which transform
@@ -408,113 +408,113 @@ StdReturnType Display::togglePixel(byte Column, byte Row)
        the display. Nothing showed it, because nothing here is built with the serpentine
        wiring - and the same branch passed a pointer where a reference was expected, so it
        would not have compiled if anything had. */
-    if(getPixel(Column, Row)) { return clearPixel(Column, Row); }
-    else { return setPixel(Column, Row); }
-} /* togglePixel */
+    if(GetPixel(column, row)) { return ClearPixel(column, row); }
+    else { return SetPixel(column, row); }
+} /* TogglePixel */
 
 
 /******************************************************************************************************************************************************
-  togglePixel()
+  TogglePixel()
 ******************************************************************************************************************************************************/
-StdReturnType Display::togglePixel(IndexType Index)
+StdReturnType Display::TogglePixel(IndexType index)
 {
     byte row, column;
-    indexToColumnAndRow(Index, column, row);
-    return togglePixel(column,  row);
-} /* togglePixel */
+    IndexToColumnAndRow(index, column, row);
+    return TogglePixel(column,  row);
+} /* TogglePixel */
 
 
 /******************************************************************************************************************************************************
-  getPixelRow()
+  GetPixelRow()
 ******************************************************************************************************************************************************/
-StdReturnType Display::getPixelRow(byte Row, PixelRowType& PixelRow) const
+StdReturnType Display::GetPixelRow(byte row, PixelRowType& pixel_row) const
 {
-    StdReturnType returnValue{E_OK};
-    PixelValueType pixelValue;
+    StdReturnType return_value{kEOk};
+    PixelValueType pixel_value;
 
     for(byte column = 0; column < DISPLAY_NUMBER_OF_COLUMNS; column++) {
-        if(getPixel(column, Row, pixelValue) == E_OK) {
-            WRITE_BIT(PixelRow, column, pixelValue);
+        if(GetPixel(column, row, pixel_value) == kEOk) {
+            WRITE_BIT(pixel_row, column, pixel_value);
         } else {
-            returnValue = E_NOT_OK;
+            return_value = kENotOk;
         }
     }
-    return returnValue;
-} /* getPixelRow */
+    return return_value;
+} /* GetPixelRow */
 
 
 /******************************************************************************************************************************************************
-  getPixelRow()
+  GetPixelRow()
 ******************************************************************************************************************************************************/
-Display::PixelRowType Display::getPixelRow(byte Row)  const
+Display::PixelRowType Display::GetPixelRow(byte row)  const
 {
-    PixelRowType pixelRow{0};
+    PixelRowType pixel_row{0};
 
     for(byte column = 0; column < DISPLAY_NUMBER_OF_COLUMNS; column++) {
-        WRITE_BIT(pixelRow, column, getPixel(column, Row));
+        WRITE_BIT(pixel_row, column, GetPixel(column, row));
     }
-    return pixelRow;
-} /* getPixelRow */
+    return pixel_row;
+} /* GetPixelRow */
 
 
 /******************************************************************************************************************************************************
-  getPixelColumn()
+  GetPixelColumn()
 ******************************************************************************************************************************************************/
-StdReturnType Display::getPixelColumn(byte Column, PixelRowType& PixelColumn)  const
+StdReturnType Display::GetPixelColumn(byte column, PixelRowType& pixel_column)  const
 {
-    StdReturnType returnValue{E_OK};
-    PixelValueType pixelValue;
+    StdReturnType return_value{kEOk};
+    PixelValueType pixel_value;
 
     for(byte row = 0; row < DISPLAY_NUMBER_OF_ROWS; row++) {
-        if(getPixel(Column, row, pixelValue) == E_OK) {
-            WRITE_BIT(PixelColumn, row, pixelValue);
+        if(GetPixel(column, row, pixel_value) == kEOk) {
+            WRITE_BIT(pixel_column, row, pixel_value);
         } else {
-            returnValue = E_NOT_OK;
+            return_value = kENotOk;
         }
     }
-    return returnValue;
-} /* getPixelColumn */
+    return return_value;
+} /* GetPixelColumn */
 
 
 /******************************************************************************************************************************************************
-  getPixelColumn()
+  GetPixelColumn()
 ******************************************************************************************************************************************************/
-Display::PixelColumnType Display::getPixelColumn(byte Column)  const
+Display::PixelColumnType Display::GetPixelColumn(byte column)  const
 {
-    Display::PixelColumnType pixelColumn{0};
+    Display::PixelColumnType pixel_column{0};
 
     for(byte row = 0; row < DISPLAY_NUMBER_OF_ROWS; row++) {
-        WRITE_BIT(pixelColumn, row, getPixel(Column, row));
+        WRITE_BIT(pixel_column, row, GetPixel(column, row));
     }
-    return pixelColumn;
-} /* getPixelColumn */
+    return pixel_column;
+} /* GetPixelColumn */
 
 
 /******************************************************************************************************************************************************
-  setPixelRow()
+  SetPixelRow()
 ******************************************************************************************************************************************************/
-StdReturnType Display::setPixelRow(byte Row, PixelRowType PixelRow)
+StdReturnType Display::SetPixelRow(byte row, PixelRowType pixel_row)
 {
-    StdReturnType returnValue{E_OK};
+    StdReturnType return_value{kEOk};
 
     for(byte column = 0; column < DISPLAY_NUMBER_OF_COLUMNS; column++) {
-        if(writePixel(column, Row, READ_BIT(PixelRow, column)) == E_NOT_OK) returnValue = E_NOT_OK;
+        if(WritePixel(column, row, READ_BIT(pixel_row, column)) == kENotOk) return_value = kENotOk;
     }
-    return returnValue;
-} /* setPixelRow */
+    return return_value;
+} /* SetPixelRow */
 
 
 /******************************************************************************************************************************************************
-  setPixelColumn()
+  SetPixelColumn()
 ******************************************************************************************************************************************************/
-StdReturnType Display::setPixelColumn(byte Column, PixelRowType PixelColumn)
+StdReturnType Display::SetPixelColumn(byte column, PixelRowType pixel_column)
 {
-    StdReturnType returnValue{E_OK};
+    StdReturnType return_value{kEOk};
     for(byte row = 0; row < DISPLAY_NUMBER_OF_ROWS; row++) {
-        if(writePixel(Column, row, READ_BIT(PixelColumn, row)) == E_NOT_OK) returnValue = E_NOT_OK;
+        if(WritePixel(column, row, READ_BIT(pixel_column, row)) == kENotOk) return_value = kENotOk;
     }
-    return returnValue;
-} /* setPixelColumn */
+    return return_value;
+} /* SetPixelColumn */
 
 
 /******************************************************************************************************************************************************
@@ -524,16 +524,16 @@ StdReturnType Display::setPixelColumn(byte Column, PixelRowType PixelColumn)
 /******************************************************************************************************************************************************
   Constructor of Display
 ******************************************************************************************************************************************************/
-Display::Display(Pixel sColor) : PixelStripe{Pixels::getInstance()}
+Display::Display(Pixel color) : pixel_stripe_{Pixels::GetInstance()}
 #if (PIXELS_IS_SINGLETON == STD_OFF)
-: PixelStripe()
+: pixel_stripe_()
 #endif
 {
-    State = STATE_UNINIT;
-    Color.setColor(sColor);
+    state_ = kStateUninit;
+    color_.SetColor(color);
 
 #if (DISPLAY_USE_PIXELS_DIMMING == STD_OFF)
-    Brightness.setBrightness(255u);
+    brightness_.SetBrightness(255u);
 #endif
 } /* Display */
 
@@ -541,18 +541,18 @@ Display::Display(Pixel sColor) : PixelStripe{Pixels::getInstance()}
 /******************************************************************************************************************************************************
   Constructor of Display
 ******************************************************************************************************************************************************/
-Display::Display(ColorType Red, ColorType Green, ColorType Blue) : PixelStripe{Pixels::getInstance()}
+Display::Display(ColorType red, ColorType green, ColorType blue) : pixel_stripe_{Pixels::GetInstance()}
 #if (PIXELS_IS_SINGLETON == STD_OFF)
-: PixelStripe()
+: pixel_stripe_()
 #endif
 {
-    Color.setColorRed(Red);
-    Color.setColorGreen(Green);
-    Color.setColorBlue(Blue);
-    State = STATE_UNINIT;
+    color_.SetColorRed(red);
+    color_.SetColorGreen(green);
+    color_.SetColorBlue(blue);
+    state_ = kStateUninit;
 
 #if (DISPLAY_USE_PIXELS_DIMMING == STD_OFF)
-    Brightness.setBrightness(255u);
+    brightness_.SetBrightness(255u);
 #endif
 } /* Display */
 
@@ -566,29 +566,29 @@ Display::~Display()
 } /* ~Display */
 
 /******************************************************************************************************************************************************
-  transformToSerpentine()
+  TransformToSerpentine()
 ******************************************************************************************************************************************************/
-byte Display::transformToSerpentine(byte Column, byte Row)
+byte Display::TransformToSerpentine(byte column, byte row)
 {
     byte index;
 
-    if(IS_BIT_CLEARED(Row, 0)) index = (Row * DISPLAY_NUMBER_OF_COLUMNS) + Column;
-    else index = (Row * DISPLAY_NUMBER_OF_COLUMNS) + (DISPLAY_NUMBER_OF_COLUMNS - Column - 1);
+    if(IS_BIT_CLEARED(row, 0)) index = (row * DISPLAY_NUMBER_OF_COLUMNS) + column;
+    else index = (row * DISPLAY_NUMBER_OF_COLUMNS) + (DISPLAY_NUMBER_OF_COLUMNS - column - 1);
 
     return index;
-} /* transformToSerpentine */
+} /* TransformToSerpentine */
 
 
 /******************************************************************************************************************************************************
-  transformToSerpentine()
+  TransformToSerpentine()
 ******************************************************************************************************************************************************/
-byte Display::transformToSerpentine(IndexType Index)
+byte Display::TransformToSerpentine(IndexType index)
 {
-    byte column = indexToColumn(Index);
-    byte row = indexToRow(Index);
+    byte column = IndexToColumn(index);
+    byte row = IndexToRow(index);
 
-    return transformToSerpentine(column, row);
-} /* transformToSerpentine */
+    return TransformToSerpentine(column, row);
+} /* TransformToSerpentine */
 
 
 /******************************************************************************************************************************************************

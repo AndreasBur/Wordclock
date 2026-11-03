@@ -18,4 +18,4 @@ void gpio_init(uint) { }
 void gpio_set_dir(uint, bool) { }
 void gpio_put(uint, bool) { }
 
-char* itoa(int Value, char* Buffer, int) { snprintf(Buffer, 12, "%d", Value); return Buffer; }
+char* itoa(int value, char* buffer, int) { snprintf(buffer, 12, "%d", value); return buffer; }

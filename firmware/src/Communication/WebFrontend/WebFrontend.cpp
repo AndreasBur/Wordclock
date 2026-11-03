@@ -51,14 +51,14 @@ namespace {
    character, it makes the browser close the connection. That is reachable rather than
    theoretical - command 8 answers with the overlay text it was given, and an umlaut in that
    text is exactly what the font tables carry umlauts for. */
-byte toUtf8(byte Latin1, char* Target)
+byte ToUtf8(byte latin1, char* target)
 {
-    if(Latin1 < 0x80u) {
-        Target[0u] = static_cast<char>(Latin1);
+    if(latin1 < 0x80u) {
+        target[0u] = static_cast<char>(latin1);
         return 1u;
     }
-    Target[0u] = static_cast<char>(0xC0u | (Latin1 >> 6u));
-    Target[1u] = static_cast<char>(0x80u | (Latin1 & 0x3Fu));
+    target[0u] = static_cast<char>(0xC0u | (latin1 >> 6u));
+    target[1u] = static_cast<char>(0x80u | (latin1 & 0x3Fu));
     return 2u;
 }
 
@@ -78,62 +78,62 @@ byte toUtf8(byte Latin1, char* Target)
 class ChunkWriter
 {
   private:
-    static constexpr size_t Capacity{256u};
+    static constexpr size_t kCapacity{256u};
 
-    WebResponseBody& Body;
-    char Buffer[Capacity]{};
-    size_t Used{0u};
+    WebResponseBody& body_;
+    char buffer_[kCapacity]{};
+    size_t used_{0u};
 
-    void flush() {
-        if(Used == 0u) { return; }
+    void Flush() {
+        if(used_ == 0u) { return; }
 
-        Body.write(Buffer, Used);
-        Used = 0u;
+        body_.Write(buffer_, used_);
+        used_ = 0u;
     }
 
   public:
-    explicit ChunkWriter(WebResponseBody& sBody) : Body(sBody) { }
+    explicit ChunkWriter(WebResponseBody& body) : body_(body) { }
 
-    void put(char Character) {
-        if(Used == Capacity) { flush(); }
+    void Put(char character) {
+        if(used_ == kCapacity) { Flush(); }
 
-        Buffer[Used++] = Character;
+        buffer_[used_++] = character;
     }
 
-    void put(const char* Text) {
-        if(Text == nullptr) { return; }
+    void Put(const char* text) {
+        if(text == nullptr) { return; }
 
-        for(const char* Character = Text; *Character != '\0'; Character++) { put(*Character); }
+        for(const char* character = text; *character != '\0'; character++) { Put(*character); }
     }
 
-    void putNumber(uint16_t Number) {
-        char Digits[8]{};
+    void PutNumber(uint16_t number) {
+        char digits[8]{};
         /* Taken rather than dropped, and then used: it is the length, so the digits go out
            without a second walk to find their terminator. Negative is snprintf's encoding
            failure, which cannot happen for "%u" and is refused rather than trusted. */
-        const int Length = snprintf(Digits, sizeof(Digits), "%u", static_cast<unsigned>(Number));
+        const int length = snprintf(digits, sizeof(digits), "%u", static_cast<unsigned>(number));
 
-        if(Length <= 0) { return; }
+        if(length <= 0) { return; }
 
-        for(int Index = 0; Index < Length; Index++) { put(Digits[Index]); }
+        for(int index = 0; index < length; index++) { Put(digits[index]); }
     }
 
     /* Escaped, because a label is data: a quote in one would otherwise produce a document
        the browser refuses whole, and that failure looks like a server fault. */
-    void putString(const char* Text) {
-        put('"');
-        for(const char* Character = Text; (Text != nullptr) && (*Character != '\0'); Character++) {
-            if((*Character == '"') || (*Character == '\\')) { put('\\'); }
-            put(*Character);
+    void PutString(const char* text) {
+        Put('"');
+        for(const char* character = text; (text != nullptr) && (*character != '\0'); character++) {
+            if((*character == '"') || (*character == '\\')) { Put('\\'); }
+            Put(*character);
         }
-        put('"');
+        Put('"');
     }
 
     /* Whatever ends a body on this backend - an empty chunk for one, handing the stream over
        for another. */
-    void finish() {
-        flush();
-        Body.finish();
+    void Finish() {
+        Flush();
+        body_.Finish();
     }
 };
 
@@ -155,18 +155,18 @@ namespace {
  * which is what lets the console be installed with an icon to tap and a start without an
  * address bar.
  */
-constexpr WebFrontend::AssetType Assets[]{
-    {"/",                      WebAppGzip,   WebAppGzipSize,   "text/html",                 true},
-    {"/console",               WebPageGzip,  WebPageGzipSize,  "text/html",                 true},
-    {"/manifest.webmanifest",  WebManifest,  WebManifestSize,  "application/manifest+json", false},
-    {"/icon-192.png",          WebIcon192,   WebIcon192Size,   "image/png",                 false},
-    {"/icon-512.png",          WebIcon512,   WebIcon512Size,   "image/png",                 false},
+constexpr WebFrontend::AssetType kAssets[]{
+    {"/",                      kWebAppGzip,   kWebAppGzipSize,   "text/html",                 true},
+    {"/console",               kWebPageGzip,  kWebPageGzipSize,  "text/html",                 true},
+    {"/manifest.webmanifest",  kWebManifest,  kWebManifestSize,  "application/manifest+json", false},
+    {"/icon-192.png",          kWebIcon192,   kWebIcon192Size,   "image/png",                 false},
+    {"/icon-512.png",          kWebIcon512,   kWebIcon512Size,   "image/png",                 false},
 };
 
-/* A backend sizes its route array with MaxAssets, which it can see and this count it cannot.
+/* A backend sizes its route array with kMaxAssets, which it can see and this count it cannot.
    Adding a file here without raising that fails the build, rather than quietly registering
    the first five of six. */
-static_assert((sizeof(Assets) / sizeof(Assets[0])) <= WebFrontend::MaxAssets,
+static_assert((sizeof(kAssets) / sizeof(kAssets[0])) <= WebFrontend::kMaxAssets,
               "WebFrontend::MaxAssets has to grow with the asset table");
 
 } // namespace
@@ -176,7 +176,7 @@ static_assert((sizeof(Assets) / sizeof(Assets[0])) <= WebFrontend::MaxAssets,
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  getNumberOfAssets() / getAsset()
+  GetNumberOfAssets() / GetAsset()
 ******************************************************************************************************************************************************/
 /*! \brief          The files a clock serves unchanged, for a backend to register routes from
  *
@@ -186,19 +186,19 @@ static_assert((sizeof(Assets) / sizeof(Assets[0])) <= WebFrontend::MaxAssets,
  *                  between them was data, and the sameness between the two backends was
  *                  complete.
 ******************************************************************************************************************************************************/
-byte WebFrontend::getNumberOfAssets()
+byte WebFrontend::GetNumberOfAssets()
 {
-    return static_cast<byte>(sizeof(Assets) / sizeof(Assets[0]));
+    return static_cast<byte>(sizeof(kAssets) / sizeof(kAssets[0]));
 }
 
-const WebFrontend::AssetType& WebFrontend::getAsset(byte Index)
+const WebFrontend::AssetType& WebFrontend::GetAsset(byte index)
 {
-    return Assets[Index];
+    return kAssets[index];
 }
 
 
 /******************************************************************************************************************************************************
-  writeCommands()
+  WriteCommands()
 ******************************************************************************************************************************************************/
 /*! \brief          Writes the command catalog, so the page can build its own form
  *
@@ -212,61 +212,61 @@ const WebFrontend::AssetType& WebFrontend::getAsset(byte Index)
  *                  copies were identical down to their comments, and both feed the same
  *                  page's parser.
 ******************************************************************************************************************************************************/
-void WebFrontend::writeCommands(WebResponseBody& Body)
+void WebFrontend::WriteCommands(WebResponseBody& body)
 {
-    ChunkWriter Writer(Body);
-    Writer.put('[');
+    ChunkWriter writer(body);
+    writer.Put('[');
 
-    for(byte Index = 0u; Index < MessageCatalog::getNumberOfCommands(); Index++) {
-        const MessageCatalog::CommandType& Command = MessageCatalog::getCommand(Index);
+    for(byte index = 0u; index < MessageCatalog::GetNumberOfCommands(); index++) {
+        const MessageCatalog::CommandType& command = MessageCatalog::GetCommand(index);
 
-        if(Index > 0u) { Writer.put(','); }
-        Writer.put("{\"number\":");
-        Writer.putNumber(Command.Number);
-        Writer.put(",\"label\":");
-        Writer.putString(Command.Label);
-        Writer.put(",\"options\":[");
+        if(index > 0u) { writer.Put(','); }
+        writer.Put("{\"number\":");
+        writer.PutNumber(command.number);
+        writer.Put(",\"label\":");
+        writer.PutString(command.label);
+        writer.Put(",\"options\":[");
 
-        for(byte OptionIndex = 0u; OptionIndex < Command.NumberOfOptions; OptionIndex++) {
-            const MessageCatalog::OptionType& Option = Command.Options[OptionIndex];
+        for(byte option_index = 0u; option_index < command.number_of_options; option_index++) {
+            const MessageCatalog::OptionType& option = command.options[option_index];
 
-            if(OptionIndex > 0u) { Writer.put(','); }
-            Writer.put("{\"short\":\"");
-            Writer.put(Option.ShortName);
-            Writer.put("\",\"label\":");
-            Writer.putString(Option.Label);
-            Writer.put(",\"type\":");
-            Writer.putNumber(static_cast<uint16_t>(Option.Argument));
-            Writer.put(",\"min\":");
-            Writer.putNumber(Option.Minimum);
-            Writer.put(",\"max\":");
-            Writer.putNumber(Option.Maximum);
+            if(option_index > 0u) { writer.Put(','); }
+            writer.Put("{\"short\":\"");
+            writer.Put(option.short_name);
+            writer.Put("\",\"label\":");
+            writer.PutString(option.label);
+            writer.Put(",\"type\":");
+            writer.PutNumber(static_cast<uint16_t>(option.argument));
+            writer.Put(",\"min\":");
+            writer.PutNumber(option.minimum);
+            writer.Put(",\"max\":");
+            writer.PutNumber(option.maximum);
 
             /* Only where it is set, so the page's form stays as it was for every option
                that can be sent, and the read-only fields it must not offer are the ones
                that say so. */
-            if(Option.ReadOnly) { Writer.put(",\"readonly\":true"); }
+            if(option.read_only) { writer.Put(",\"readonly\":true"); }
 
-            if((Option.ValueNames != nullptr) && (Option.NumberOfValueNames > 0u)) {
-                Writer.put(",\"values\":[");
-                for(byte NameIndex = 0u; NameIndex < Option.NumberOfValueNames; NameIndex++) {
-                    if(NameIndex > 0u) { Writer.put(','); }
-                    Writer.putString(Option.ValueNames[NameIndex]);
+            if((option.value_names != nullptr) && (option.number_of_value_names > 0u)) {
+                writer.Put(",\"values\":[");
+                for(byte name_index = 0u; name_index < option.number_of_value_names; name_index++) {
+                    if(name_index > 0u) { writer.Put(','); }
+                    writer.PutString(option.value_names[name_index]);
                 }
-                Writer.put(']');
+                writer.Put(']');
             }
-            Writer.put('}');
+            writer.Put('}');
         }
-        Writer.put("]}");
+        writer.Put("]}");
     }
 
-    Writer.put(']');
-    Writer.finish();
-} /* writeCommands */
+    writer.Put(']');
+    writer.Finish();
+} /* WriteCommands */
 
 
 /******************************************************************************************************************************************************
-  writeDisplay()
+  WriteDisplay()
 ******************************************************************************************************************************************************/
 /*! \brief          Writes the panel's shape and its letters
  *
@@ -279,31 +279,31 @@ void WebFrontend::writeCommands(WebResponseBody& Body)
  *                  widened to UTF-8 on the way out: JSON is UTF-8, and a raw 0xDC makes the
  *                  whole document invalid rather than one letter wrong.
 ******************************************************************************************************************************************************/
-void WebFrontend::writeDisplay(WebResponseBody& Body)
+void WebFrontend::WriteDisplay(WebResponseBody& body)
 {
-    const DisplayCharacters Letters;
-    ChunkWriter Writer(Body);
+    const DisplayCharacters letters;
+    ChunkWriter writer(body);
 
-    Writer.put("{\"columns\":");
-    Writer.putNumber(DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS);
-    Writer.put(",\"rows\":");
-    Writer.putNumber(DISPLAY_CHARACTERS_NUMBER_OF_ROWS);
-    Writer.put(",\"letters\":\"");
+    writer.Put("{\"columns\":");
+    writer.PutNumber(DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS);
+    writer.Put(",\"rows\":");
+    writer.PutNumber(DISPLAY_CHARACTERS_NUMBER_OF_ROWS);
+    writer.Put(",\"letters\":\"");
 
-    for(byte Index = 0u; Index < DISPLAY_CHARACTERS_NUMBER_OF_CHARACTERS; Index++) {
-        char Utf8[2u];
-        const byte Length = toUtf8(static_cast<byte>(Letters.getCharacter(Index)), Utf8);
+    for(byte index = 0u; index < DISPLAY_CHARACTERS_NUMBER_OF_CHARACTERS; index++) {
+        char utf8[2u];
+        const byte length = ToUtf8(static_cast<byte>(letters.GetCharacter(index)), utf8);
 
-        for(byte Byte = 0u; Byte < Length; Byte++) { Writer.put(Utf8[Byte]); }
+        for(byte position = 0u; position < length; position++) { writer.Put(utf8[position]); }
     }
 
-    Writer.put("\"}");
-    Writer.finish();
-} /* writeDisplay */
+    writer.Put("\"}");
+    writer.Finish();
+} /* WriteDisplay */
 
 
 /******************************************************************************************************************************************************
-  injectCommand()
+  InjectCommand()
 ******************************************************************************************************************************************************/
 /*! \brief          Takes one socket frame's text and injects it as typed characters
  *
@@ -318,22 +318,22 @@ void WebFrontend::writeDisplay(WebResponseBody& Body)
  *                  library hands over whatever arrived has not, and this is where both end
  *                  up equal.
 ******************************************************************************************************************************************************/
-void WebFrontend::injectCommand(const char* Text, size_t Length)
+void WebFrontend::InjectCommand(const char* text, size_t length)
 {
-    if((Text == nullptr) || (Length == 0u) || (Length > WEB_FRONTEND_MAX_FRAME_LENGTH)) { return; }
+    if((text == nullptr) || (length == 0u) || (length > WEB_FRONTEND_MAX_FRAME_LENGTH)) { return; }
 
-    WordclockSerial& Port = WordclockSerial::getInstance();
-    Port.inject(Text, Length);
+    WordclockSerial& port = WordclockSerial::GetInstance();
+    port.Inject(text, length);
 
-    if(Text[Length - 1u] != Communication::getEndOfMessageChar()) {
-        const char Terminator = Communication::getEndOfMessageChar();
-        Port.inject(&Terminator, 1u);
+    if(text[length - 1u] != Communication::GetEndOfMessageChar()) {
+        const char terminator = Communication::GetEndOfMessageChar();
+        port.Inject(&terminator, 1u);
     }
-} /* injectCommand */
+} /* InjectCommand */
 
 
 /******************************************************************************************************************************************************
-  broadcastLine()
+  BroadcastLine()
 ******************************************************************************************************************************************************/
 /*! \brief          Sends one finished line to whoever is connected
  *
@@ -341,13 +341,13 @@ void WebFrontend::injectCommand(const char* Text, size_t Length)
  *                  client is not dropped here - a backend's own close hook owns that, and
  *                  dropping a client from this side would race with it.
 ******************************************************************************************************************************************************/
-void WebFrontend::broadcastLine(const char* Line)
+void WebFrontend::BroadcastLine(const char* line)
 {
-    WebTransport& Transport = WebTransport::getInstance();
+    WebTransport& transport = WebTransport::GetInstance();
 
-    if(!Transport.isListening() || (Line == nullptr)) { return; }
+    if(!transport.IsListening() || (line == nullptr)) { return; }
 
-    /* Widened rather than sent as it stands - see toUtf8(). Two bytes per Latin-1 byte is
+    /* Widened rather than sent as it stands - see ToUtf8(). Two bytes per Latin-1 byte is
        the worst case, so a line that is nothing but umlauts still fits and there is no
        truncation to expect. Sized from the producer's own line length rather than from a
        number of its own, because that is the buffer the line was assembled in.
@@ -355,21 +355,21 @@ void WebFrontend::broadcastLine(const char* Line)
        The bound is still checked. Nothing longer can arrive today, but this takes a plain
        pointer and the sink it is installed as is a function pointer - the day a second
        producer appears, an assumption written only in a comment is the one that gives. */
-    char Payload[2u * WORDCLOCK_SERIAL_LINE_LENGTH];
-    size_t Used{0u};
+    char payload[2u * WORDCLOCK_SERIAL_LINE_LENGTH];
+    size_t used{0u};
 
-    for(const char* Character = Line; (*Character != '\0') && ((Used + 2u) <= sizeof(Payload)); Character++) {
-        Used += toUtf8(static_cast<byte>(*Character), &Payload[Used]);
+    for(const char* character = line; (*character != '\0') && ((used + 2u) <= sizeof(payload)); character++) {
+        used += ToUtf8(static_cast<byte>(*character), &payload[used]);
     }
 
-    if(Used == 0u) { return; }
+    if(used == 0u) { return; }
 
-    Transport.sendText(Payload, Used);
-} /* broadcastLine */
+    transport.SendText(payload, used);
+} /* BroadcastLine */
 
 
 /******************************************************************************************************************************************************
-  broadcastFrame()
+  BroadcastFrame()
 ******************************************************************************************************************************************************/
 /*! \brief          Sends the pixel buffer to whoever is connected, when it changed
  *
@@ -385,39 +385,39 @@ void WebFrontend::broadcastLine(const char* Line)
  *                  page reads the bytes for that on/off state only and paints its own
  *                  colour; the wx window is the colour-accurate view.
 ******************************************************************************************************************************************************/
-void WebFrontend::broadcastFrame()
+void WebFrontend::BroadcastFrame()
 {
-    WebTransport& Transport = WebTransport::getInstance();
+    WebTransport& transport = WebTransport::GetInstance();
 
-    if(!Transport.isListening()) { return; }
+    if(!transport.IsListening()) { return; }
 
-    const bool Forced = ForceFrame.exchange(false, std::memory_order_acq_rel);
+    const bool forced = force_frame_.exchange(false, std::memory_order_acq_rel);
 
-    if(!Forced) {
-        if(FrameCountdown > 0u) { FrameCountdown--; return; }
+    if(!forced) {
+        if(frame_countdown_ > 0u) { frame_countdown_--; return; }
     }
-    FrameCountdown = WEB_FRONTEND_FRAME_INTERVAL_TICKS - 1u;
+    frame_countdown_ = WEB_FRONTEND_FRAME_INTERVAL_TICKS - 1u;
 
     /* Nothing to send to, so nothing is even gathered. */
-    if(!Transport.hasClients()) { return; }
+    if(!transport.HasClients()) { return; }
 
-    byte Frame[FrameSize];
-    byte* Target = Frame;
-    const Pixels& Strip = Pixels::getInstance();
+    byte frame[kFrameSize];
+    byte* target = frame;
+    const Pixels& strip = Pixels::GetInstance();
 
-    for(byte Index = 0u; Index < PIXELS_NUMBER_OF_LEDS; Index++) {
-        const Pixel Colour = Strip.getOutputPixel(Index);
+    for(byte index = 0u; index < PIXELS_NUMBER_OF_LEDS; index++) {
+        const Pixel colour = strip.GetOutputPixel(index);
 
-        *Target++ = Colour.getGreen();
-        *Target++ = Colour.getRed();
-        *Target++ = Colour.getBlue();
+        *target++ = colour.GetGreen();
+        *target++ = colour.GetRed();
+        *target++ = colour.GetBlue();
     }
 
-    if(!Forced && (memcmp(Frame, LastFrame, FrameSize) == 0)) { return; }
-    memcpy(LastFrame, Frame, FrameSize);
+    if(!forced && (memcmp(frame, last_frame_, kFrameSize) == 0)) { return; }
+    memcpy(last_frame_, frame, kFrameSize);
 
-    Transport.sendBinary(Frame, FrameSize);
-} /* broadcastFrame */
+    transport.SendBinary(frame, kFrameSize);
+} /* BroadcastFrame */
 
 #endif // (WEB_FRONTEND_SUPPORT == STD_ON)
 

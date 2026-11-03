@@ -56,12 +56,12 @@
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  task()
+  Task()
 ******************************************************************************************************************************************************/
-void Scheduler::task()
+void Scheduler::Task()
 {
-    triggerTasks();
-} /* task */
+    TriggerTasks();
+} /* Task */
 
 
 /******************************************************************************************************************************************************
@@ -69,7 +69,7 @@ void Scheduler::task()
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  isDue()
+  IsDue()
 ******************************************************************************************************************************************************/
 /*! \brief          Tells whether a task is due on this tick, and counts it down if not
  *  \details        A cycle of zero switches the task off. Its remaining ticks are
@@ -78,48 +78,48 @@ void Scheduler::task()
  *
  *  \return         true if the task is to run on this tick
 ******************************************************************************************************************************************************/
-bool Scheduler::isDue(TaskIdType TaskId, byte Cycle) {
-    if(Cycle == 0u) { RemainingTicks[TaskId] = 0u; return false; }
-    if(RemainingTicks[TaskId] > 1u) { RemainingTicks[TaskId]--; return false; }
+bool Scheduler::IsDue(TaskIdType task_id, byte cycle) {
+    if(cycle == 0u) { remaining_ticks_[task_id] = 0u; return false; }
+    if(remaining_ticks_[task_id] > 1u) { remaining_ticks_[task_id]--; return false; }
 
     /* Reloading here rather than on the previous run is what makes a cycle that changed
        in between take effect. Starting from zero, every task is due on the first tick. */
-    RemainingTicks[TaskId] = Cycle;
+    remaining_ticks_[task_id] = cycle;
     return true;
-} /* isDue */
+} /* IsDue */
 
 
 /******************************************************************************************************************************************************
-  triggerTasks()
+  TriggerTasks()
 ******************************************************************************************************************************************************/
-void Scheduler::triggerTasks()
+void Scheduler::TriggerTasks()
 {
-    if(isDue(TASK_ID_ILLUMINANCE, Illuminance::getInstance().getTaskCycle())) { Illuminance::getInstance().task(); }
+    if(IsDue(kTaskIdIlluminance, Illuminance::GetInstance().GetTaskCycle())) { Illuminance::GetInstance().Task(); }
     /* Beside the light sensor because it is one too, and nothing downstream is timed
        against it: the overlay reads whatever the last pass left. */
-    if(isDue(TASK_ID_TEMPERATURE, Temperature::getInstance().getTaskCycle())) { Temperature::getInstance().task(); }
+    if(IsDue(kTaskIdTemperature, Temperature::GetInstance().GetTaskCycle())) { Temperature::GetInstance().Task(); }
     /* after the sensor, so the brightness automatic works on a fresh reading */
-    if(isDue(TASK_ID_DISPLAY_MANAGER, DisplayManager::getInstance().getTaskCycle())) { DisplayManager::getInstance().task(); }
-    if(isDue(TASK_ID_ANIMATIONS, Animations::getInstance().getTaskCycle())) { Animations::getInstance().task(true); }
-    if(isDue(TASK_ID_COMMUNICATION, Communication::getInstance().getTaskCycle())) { Communication::getInstance().task(); }
-    if(isDue(TASK_ID_OVERLAYS, Overlays::getInstance().getTaskCycle())) { Overlays::getInstance().task(); }
-    if(isDue(TASK_ID_TEXT, Text::getInstance().getTaskCycle())) { Text::getInstance().task(true); }
+    if(IsDue(kTaskIdDisplayManager, DisplayManager::GetInstance().GetTaskCycle())) { DisplayManager::GetInstance().Task(); }
+    if(IsDue(kTaskIdAnimations, Animations::GetInstance().GetTaskCycle())) { Animations::GetInstance().Task(true); }
+    if(IsDue(kTaskIdCommunication, Communication::GetInstance().GetTaskCycle())) { Communication::GetInstance().Task(); }
+    if(IsDue(kTaskIdOverlays, Overlays::GetInstance().GetTaskCycle())) { Overlays::GetInstance().Task(); }
+    if(IsDue(kTaskIdText, Text::GetInstance().GetTaskCycle())) { Text::GetInstance().Task(true); }
     /* last, so what it compares against the store is a settled state rather than one from
        the middle of this tick's pass */
-    if(isDue(TASK_ID_PERSISTENCE, Persistence::getInstance().getTaskCycle())) { Persistence::getInstance().task(); }
-    if(isDue(TASK_ID_UPTIME, Uptime::getInstance().getTaskCycle())) { Uptime::getInstance().task(); }
-    if(isDue(TASK_ID_NIGHT_SWITCH, NightSwitch::getInstance().getTaskCycle())) { NightSwitch::getInstance().task(); }
+    if(IsDue(kTaskIdPersistence, Persistence::GetInstance().GetTaskCycle())) { Persistence::GetInstance().Task(); }
+    if(IsDue(kTaskIdUptime, Uptime::GetInstance().GetTaskCycle())) { Uptime::GetInstance().Task(); }
+    if(IsDue(kTaskIdNightSwitch, NightSwitch::GetInstance().GetTaskCycle())) { NightSwitch::GetInstance().Task(); }
     /* After the night switch, which is what may have switched the display off this tick: a
        cycle stepping after that would mark the buffer for a display that is meant to be
        dark, and the supply switch below waits for a buffer that has settled. */
-    if(isDue(TASK_ID_COLOR_CYCLE, ColorCycle::getInstance().getTaskCycle())) { ColorCycle::getInstance().task(); }
+    if(IsDue(kTaskIdColorCycle, ColorCycle::GetInstance().GetTaskCycle())) { ColorCycle::GetInstance().Task(); }
     /* Last of all, and after the night switch in particular: everything above may still
        write pixels in this pass, and what this one waits for is the pass being over - a
        supply cut before the last writer would leave the strip holding a frame nobody
        finished. The application renders after this returns, which is the transmission this
        task is watching for on its next run. */
-    if(isDue(TASK_ID_POWER, Power::getInstance().getTaskCycle())) { Power::getInstance().task(); }
-} /* triggerTasks */
+    if(IsDue(kTaskIdPower, Power::GetInstance().GetTaskCycle())) { Power::GetInstance().Task(); }
+} /* TriggerTasks */
 
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E

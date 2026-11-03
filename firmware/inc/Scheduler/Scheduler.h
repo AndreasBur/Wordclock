@@ -27,9 +27,9 @@
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
 /* Scheduler configuration parameter */
-/* Milliseconds between two task() calls, and thereby the unit every module's task
+/* Milliseconds between two Task() calls, and thereby the unit every module's task
    cycle counts in. A platform whose tick comes from a timer it cannot set freely
-   overrides this; getTaskIntervalMs() is what the platform's tick source reads. */
+   overrides this; GetTaskIntervalMs() is what the platform's tick source reads. */
 #define SCHEDULER_TASK_INTERVAL_MS          10u
 
 /******************************************************************************************************************************************************
@@ -46,35 +46,35 @@ class Scheduler
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-    /* One per task that triggerTasks() drives, and in the order it drives them. */
+    /* One per task that TriggerTasks() drives, and in the order it drives them. */
     enum TaskIdType {
-        TASK_ID_ILLUMINANCE,
-        TASK_ID_TEMPERATURE,
-        TASK_ID_DISPLAY_MANAGER,
-        TASK_ID_ANIMATIONS,
-        TASK_ID_COMMUNICATION,
-        TASK_ID_OVERLAYS,
-        TASK_ID_TEXT,
-        TASK_ID_PERSISTENCE,
-        TASK_ID_UPTIME,
-        TASK_ID_NIGHT_SWITCH,
-        TASK_ID_COLOR_CYCLE,
-        TASK_ID_POWER,
-        TASK_ID_NUMBER_OF_TASKS
+        kTaskIdIlluminance,
+        kTaskIdTemperature,
+        kTaskIdDisplayManager,
+        kTaskIdAnimations,
+        kTaskIdCommunication,
+        kTaskIdOverlays,
+        kTaskIdText,
+        kTaskIdPersistence,
+        kTaskIdUptime,
+        kTaskIdNightSwitch,
+        kTaskIdColorCycle,
+        kTaskIdPower,
+        kTaskIdNumberOfTasks
     };
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    static constexpr byte TaskIntervalMs{SCHEDULER_TASK_INTERVAL_MS};
+    static constexpr byte kTaskIntervalMs{SCHEDULER_TASK_INTERVAL_MS};
 
     using RemainingTicksType = byte;
-    std::array<RemainingTicksType, TASK_ID_NUMBER_OF_TASKS> RemainingTicks{};
+    std::array<RemainingTicksType, kTaskIdNumberOfTasks> remaining_ticks_{};
 
     // functions
-    bool isDue(TaskIdType, byte);
-    void triggerTasks();
+    bool IsDue(TaskIdType, byte);
+    void TriggerTasks();
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
@@ -84,30 +84,30 @@ class Scheduler
     ~Scheduler() { }
 
 	// get methods
-    static constexpr byte getTaskIntervalMs() { return TaskIntervalMs; }
+    static constexpr byte GetTaskIntervalMs() { return kTaskIntervalMs; }
 
 	// set methods
 
     // methods
-    void task();
-    static constexpr byte convertSpeedToTaskCycle(byte Speed) {
-        if(Speed == 0u) { return 0u; }
-        return static_cast<byte>((UINT8_MAX - Speed) + 1u);
+    void Task();
+    static constexpr byte ConvertSpeedToTaskCycle(byte speed) {
+        if(speed == 0u) { return 0u; }
+        return static_cast<byte>((UINT8_MAX - speed) + 1u);
     }
-    static constexpr byte convertTaskCycleToSpeed(byte TaskCycle) {
-        if(TaskCycle == 0u) { return 0u; }
-        return static_cast<byte>((UINT8_MAX - TaskCycle) + 1u);
+    static constexpr byte ConvertTaskCycleToSpeed(byte task_cycle) {
+        if(task_cycle == 0u) { return 0u; }
+        return static_cast<byte>((UINT8_MAX - task_cycle) + 1u);
     }
 
 };
 
-static_assert(Scheduler::convertSpeedToTaskCycle(0u) == 0u, "Speed zero must stop the task");
-static_assert(Scheduler::convertSpeedToTaskCycle(1u) == UINT8_MAX, "Slowest speed must use the longest cycle");
-static_assert(Scheduler::convertSpeedToTaskCycle(UINT8_MAX - 1u) == 2u, "Second-fastest speed must use cycle two");
-static_assert(Scheduler::convertSpeedToTaskCycle(UINT8_MAX) == 1u, "Fastest speed must use cycle one");
-static_assert(Scheduler::convertTaskCycleToSpeed(0u) == 0u, "Cycle zero must report speed zero");
-static_assert(Scheduler::convertTaskCycleToSpeed(1u) == UINT8_MAX, "Cycle one must report the fastest speed");
-static_assert(Scheduler::convertTaskCycleToSpeed(UINT8_MAX) == 1u, "Longest cycle must report the slowest speed");
+static_assert(Scheduler::ConvertSpeedToTaskCycle(0u) == 0u, "Speed zero must stop the task");
+static_assert(Scheduler::ConvertSpeedToTaskCycle(1u) == UINT8_MAX, "Slowest speed must use the longest cycle");
+static_assert(Scheduler::ConvertSpeedToTaskCycle(UINT8_MAX - 1u) == 2u, "Second-fastest speed must use cycle two");
+static_assert(Scheduler::ConvertSpeedToTaskCycle(UINT8_MAX) == 1u, "Fastest speed must use cycle one");
+static_assert(Scheduler::ConvertTaskCycleToSpeed(0u) == 0u, "Cycle zero must report speed zero");
+static_assert(Scheduler::ConvertTaskCycleToSpeed(1u) == UINT8_MAX, "Cycle one must report the fastest speed");
+static_assert(Scheduler::ConvertTaskCycleToSpeed(UINT8_MAX) == 1u, "Longest cycle must report the slowest speed");
 
 #endif
 

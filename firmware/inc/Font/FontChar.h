@@ -54,14 +54,14 @@ class FontChar
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    byte Width;
+    byte width_;
 
 /******************************************************************************************************************************************************
  *  P R O T E C T E D   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   protected:
-    constexpr FontChar() : Width(0u) { }
-    constexpr FontChar(byte sWidth) : Width(sWidth) { }
+    constexpr FontChar() : width_(0u) { }
+    constexpr FontChar(byte width) : width_(width) { }
 
 
 /******************************************************************************************************************************************************
@@ -69,10 +69,10 @@ class FontChar
 ******************************************************************************************************************************************************/
   public:
     // get methods
-    byte getWidth() const { return Width; }
+    byte GetWidth() const { return width_; }
 
     // set methods
-    void setWidth(byte sWidth) { Width = sWidth; }
+    void SetWidth(byte width) { width_ = width; }
 
     // methods
 };
@@ -94,46 +94,46 @@ template <typename RowType, byte RowsSize> class FontCharHorizontal : public Fon
 ******************************************************************************************************************************************************/
   private:
     using RowsType = std::array<RowType, RowsSize>;
-    RowsType Rows;
+    RowsType rows_;
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr FontCharHorizontal(byte sWidth, std::array<RowType, RowsSize> sRows) : FontChar(sWidth), Rows(sRows) { }
-    constexpr FontCharHorizontal() : FontChar(0u), Rows{} { }
+    constexpr FontCharHorizontal(byte width, std::array<RowType, RowsSize> rows) : FontChar(width), rows_(rows) { }
+    constexpr FontCharHorizontal() : FontChar(0u), rows_{} { }
 
     /* Two forms of the reader, and the argument list says which: the one taking a reference
        answers whether the row is part of the glyph, the one taking none answers the row -
        and a row outside the glyph is empty, which draws nothing. */
     // get methods
-    RowType getRow(byte Index) const {
-        if(!isIndexValid(Index)) { return RowType{}; }
-        return Rows[Index];
+    RowType GetRow(byte index) const {
+        if(!IsIndexValid(index)) { return RowType{}; }
+        return rows_[index];
     }
-    StdReturnType getRow(byte Index, RowType& Row) const {
-        if(isIndexValid(Index)) {
-            Row = Rows[Index];
-            return E_OK;
+    StdReturnType GetRow(byte index, RowType& row) const {
+        if(IsIndexValid(index)) {
+            row = rows_[index];
+            return kEOk;
         } else {
-            return E_NOT_OK;
+            return kENotOk;
         }
     }
-    RowsType getRows() const { return Rows; }
+    RowsType GetRows() const { return rows_; }
 
     // set methods
-    StdReturnType setRow(byte Index, RowType Row) {
-        if(isIndexValid(Index)) {
-            Rows[Index] = Row;
-            return E_OK;
+    StdReturnType SetRow(byte index, RowType row) {
+        if(IsIndexValid(index)) {
+            rows_[index] = row;
+            return kEOk;
         } else {
-            return E_NOT_OK;
+            return kENotOk;
         }
     }
-    void setRows(RowsType sRows) { Rows = sRows; }
+    void SetRows(RowsType rows) { rows_ = rows; }
 
     // methods
-    static constexpr bool isIndexValid(byte Index) { return Index < RowsSize; }
+    static constexpr bool IsIndexValid(byte index) { return index < RowsSize; }
 
 };
 
@@ -154,46 +154,46 @@ template <typename ColumnType, byte ColumnsSize> class FontCharVertical : public
 ******************************************************************************************************************************************************/
   private:
     using ColumnsType = std::array<ColumnType, ColumnsSize>;
-    ColumnsType Columns;
+    ColumnsType columns_;
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr FontCharVertical(byte sWidth, std::array<ColumnType, ColumnsSize> sColumns) : FontChar(sWidth), Columns(sColumns) { }
+    constexpr FontCharVertical(byte width, std::array<ColumnType, ColumnsSize> columns) : FontChar(width), columns_(columns) { }
 
-    constexpr FontCharVertical() : FontChar(0), Columns{} { }
+    constexpr FontCharVertical() : FontChar(0), columns_{} { }
 
     /* The same two forms as the horizontal glyph above, for the same reason: a column
        outside the glyph is empty rather than whatever follows it in memory. */
     // get methods
-    ColumnType getColumn(byte Index) const {
-        if(!isIndexValid(Index)) { return ColumnType{}; }
-        return Columns[Index];
+    ColumnType GetColumn(byte index) const {
+        if(!IsIndexValid(index)) { return ColumnType{}; }
+        return columns_[index];
     }
-    StdReturnType getColumn(byte Index, ColumnType& Column) const {
-        if(isIndexValid(Index)) {
-            Column = Columns[Index];
-            return E_OK;
+    StdReturnType GetColumn(byte index, ColumnType& column) const {
+        if(IsIndexValid(index)) {
+            column = columns_[index];
+            return kEOk;
         } else {
-            return E_NOT_OK;
+            return kENotOk;
         }
     }
-    ColumnsType getColumns() const { return Columns; }
+    ColumnsType GetColumns() const { return columns_; }
 
     // set methods
-    StdReturnType setColumn(byte Index, ColumnType Column) {
-        if(isIndexValid(Index)) {
-            Columns[Index] = Column;
-            return E_OK;
+    StdReturnType SetColumn(byte index, ColumnType column) {
+        if(IsIndexValid(index)) {
+            columns_[index] = column;
+            return kEOk;
         } else {
-            return E_NOT_OK;
+            return kENotOk;
         }
     }
-    void setColumns(ColumnsType sColumns) { Columns = sColumns; }
+    void SetColumns(ColumnsType columns) { columns_ = columns; }
 
     // methods
-    static constexpr bool isIndexValid(byte Index) { return Index < ColumnsSize; }
+    static constexpr bool IsIndexValid(byte index) { return index < ColumnsSize; }
 
 };
 

@@ -13,7 +13,7 @@
  *
  *      \details    An aggregate holding one C array, which is what the standard's is too.
  *                  That is load-bearing rather than incidental: the core writes
- *                  PixelsBuffer{0u} and TaskCycles{}, and a class with a declared
+ *                  pixels_buffer_{0u} and task_cycles_{}, and a class with a declared
  *                  constructor would stop being brace-initialisable that way.
  *
  *                  No at(), because it throws and this backend is built with
@@ -26,8 +26,9 @@
 #include <stddef.h>
 
 /* On this toolchain these headers are the standard library, see type_traits, so declaring
-   into std is what they exist to do. */
-// NOLINTBEGIN(cert-dcl58-cpp)
+   into std is what they exist to do - and under the standard's names, which is what the
+   naming check is told here. */
+// NOLINTBEGIN(cert-dcl58-cpp,readability-identifier-naming)
 namespace std {
 
 template<class T, size_t N>
@@ -41,8 +42,8 @@ struct array {
     using iterator = T*;
     using const_iterator = const T*;
 
-    constexpr T& operator[](size_type Index) { return _M_elems[Index]; }
-    constexpr const T& operator[](size_type Index) const { return _M_elems[Index]; }
+    constexpr T& operator[](size_type index) { return _M_elems[index]; }
+    constexpr const T& operator[](size_type index) const { return _M_elems[index]; }
 
     constexpr T* data() { return _M_elems; }
     constexpr const T* data() const { return _M_elems; }
@@ -61,28 +62,28 @@ struct array {
     constexpr size_type max_size() const { return N; }
     constexpr bool empty() const { return N == 0u; }
 
-    void fill(const T& Value) {
-        for(size_type Index = 0u; Index < N; Index++) { _M_elems[Index] = Value; }
+    void fill(const T& value) {
+        for(size_type index = 0u; index < N; index++) { _M_elems[index] = value; }
     }
 };
 
 template<class T, size_t N>
-constexpr bool operator==(const array<T, N>& Left, const array<T, N>& Right)
+constexpr bool operator==(const array<T, N>& left, const array<T, N>& right)
 {
-    for(size_t Index = 0u; Index < N; Index++) {
-        if(!(Left[Index] == Right[Index])) { return false; }
+    for(size_t index = 0u; index < N; index++) {
+        if(!(left[index] == right[index])) { return false; }
     }
     return true;
 }
 
 template<class T, size_t N>
-constexpr bool operator!=(const array<T, N>& Left, const array<T, N>& Right)
+constexpr bool operator!=(const array<T, N>& left, const array<T, N>& right)
 {
-    return !(Left == Right);
+    return !(left == right);
 }
 
 } // namespace std
-// NOLINTEND(cert-dcl58-cpp)
+// NOLINTEND(cert-dcl58-cpp,readability-identifier-naming)
 
 #endif // _STL_ARRAY_
 

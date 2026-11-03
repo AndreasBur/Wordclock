@@ -40,19 +40,19 @@
 ******************************************************************************************************************************************************/
 /* One route's answer, being written. Collected whole rather than pushed out in chunks: this
    server answers on loopback and the largest thing it writes is a page out of flash, so a
-   length up front is simpler than a chunked encoding and is what finish() sends. */
+   length up front is simpler than a chunked encoding and is what Finish() sends. */
 class WebResponseBody
 {
   private:
-    int Socket;
-    const char* ContentType;
-    std::string Collected;
+    int socket_;
+    const char* content_type_;
+    std::string collected_;
 
   public:
-    WebResponseBody(int sSocket, const char* sContentType);
+    WebResponseBody(int socket, const char* content_type);
 
-    void write(const char* Data, size_t Length);
-    void finish();
+    void Write(const char* data, size_t length);
+    void Finish();
 };
 
 /******************************************************************************************************************************************************
@@ -63,12 +63,12 @@ class WebResponseBody
 class WebTransport
 {
   public:
-    static WebTransport& getInstance();
+    static WebTransport& GetInstance();
 
-    bool isListening() const;
-    bool hasClients() const;
-    void sendText(const char* Text, size_t Length);
-    void sendBinary(const byte* Bytes, size_t Length);
+    bool IsListening() const;
+    bool HasClients() const;
+    void SendText(const char* text, size_t length);
+    void SendBinary(const byte* bytes, size_t length);
 };
 
 #endif // _WEB_TRANSPORT_H_

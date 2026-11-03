@@ -56,26 +56,26 @@ class MsgCmdBaseOverlayParser
  *  P R O T E C T E D   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   protected:
-    static constexpr char PeriodOptionShortName{'P'};
-    static constexpr char EnduranceOptionShortName{'E'};
-    static constexpr char MonthOptionShortName{'M'};
-    static constexpr char DayOptionShortName{'D'};
-    static constexpr char ValidOptionShortName{'V'};
-    static constexpr char ActiveOptionShortName{'A'};
-	static constexpr char TextOptionShortName{'T'};
-	static constexpr char SpeedOptionShortName{'S'};
-	static constexpr char FontOptionShortName{'F'};
+    static constexpr char kPeriodOptionShortName{'P'};
+    static constexpr char kEnduranceOptionShortName{'E'};
+    static constexpr char kMonthOptionShortName{'M'};
+    static constexpr char kDayOptionShortName{'D'};
+    static constexpr char kValidOptionShortName{'V'};
+    static constexpr char kActiveOptionShortName{'A'};
+	static constexpr char kTextOptionShortName{'T'};
+	static constexpr char kSpeedOptionShortName{'S'};
+	static constexpr char kFontOptionShortName{'F'};
 
-    static constexpr ParameterTableType ParameterTable PROGMEM {
-        ParameterTableElementType(PeriodOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8),
-        ParameterTableElementType(EnduranceOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8),
-        ParameterTableElementType(MonthOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8),
-        ParameterTableElementType(DayOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8),
-        ParameterTableElementType(ValidOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8),
-        ParameterTableElementType(ActiveOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8),
-		ParameterTableElementType(TextOptionShortName, MsgParameter::ARGUMENT_TYPE_STRING),
-		ParameterTableElementType(SpeedOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8),
-		ParameterTableElementType(FontOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8),
+    static constexpr ParameterTableType kParameterTable PROGMEM {
+        ParameterTableElementType(kPeriodOptionShortName, MsgParameter::kArgumentTypeUint8),
+        ParameterTableElementType(kEnduranceOptionShortName, MsgParameter::kArgumentTypeUint8),
+        ParameterTableElementType(kMonthOptionShortName, MsgParameter::kArgumentTypeUint8),
+        ParameterTableElementType(kDayOptionShortName, MsgParameter::kArgumentTypeUint8),
+        ParameterTableElementType(kValidOptionShortName, MsgParameter::kArgumentTypeUint8),
+        ParameterTableElementType(kActiveOptionShortName, MsgParameter::kArgumentTypeUint8),
+		ParameterTableElementType(kTextOptionShortName, MsgParameter::kArgumentTypeString),
+		ParameterTableElementType(kSpeedOptionShortName, MsgParameter::kArgumentTypeUint8),
+		ParameterTableElementType(kFontOptionShortName, MsgParameter::kArgumentTypeUint8),
     };
 
     constexpr MsgCmdBaseOverlayParser() { }

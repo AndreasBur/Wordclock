@@ -47,11 +47,11 @@
 /******************************************************************************************************************************************************
   Operator ==
 ******************************************************************************************************************************************************/
-bool ClockWords::operator==(const ClockWords& sClockWords) const
+bool ClockWords::operator==(const ClockWords& clock_words) const
 {
-    if(ShowItIs    == sClockWords.getShowItIs()    &&
-       HourWords   == sClockWords.getHourWords()   &&
-       MinuteWords == sClockWords.getMinuteWords() )
+    if(show_it_is_    == clock_words.GetShowItIs()    &&
+       hour_words_   == clock_words.GetHourWords()   &&
+       minute_words_ == clock_words.GetMinuteWords() )
     {
         return true;
     } else {
@@ -62,40 +62,40 @@ bool ClockWords::operator==(const ClockWords& sClockWords) const
 /******************************************************************************************************************************************************
   Operator !=
 ******************************************************************************************************************************************************/
-bool ClockWords::operator!=(const ClockWords& sClockWords) const
+bool ClockWords::operator!=(const ClockWords& clock_words) const
 {
-    if(operator==(sClockWords)) { return false; }
+    if(operator==(clock_words)) { return false; }
     else { return true; }
 }
 
 /******************************************************************************************************************************************************
-  getWordsList()
+  GetWordsList()
 ******************************************************************************************************************************************************/
-ClockWords::WordsListType ClockWords::getWordsList() const
+ClockWords::WordsListType ClockWords::GetWordsList() const
 {
     /* ----- Local Variables ---------------------------------------------- */
-    WordsListType clockWords;
-    byte clockWordsIndex{0};
+    WordsListType clock_words;
+    byte clock_words_index{0};
 
     /* ----- Implementation ----------------------------------------------- */  
-    if(ShowItIs) {
-        clockWords[clockWordsIndex++] = DisplayWords::WORD_ES;
-        clockWords[clockWordsIndex++] = DisplayWords::WORD_IST;
+    if(show_it_is_) {
+        clock_words[clock_words_index++] = DisplayWords::kWordEs;
+        clock_words[clock_words_index++] = DisplayWords::kWordIst;
     }
-    for(uint8_t Index = 0; Index < CLOCK_WORDS_MAX_NUMBER_OF_MINUTE_WORDS; Index++) {
-        if(MinuteWords[Index] != DisplayWords::WORD_NONE) {
-            clockWords[clockWordsIndex++] = MinuteWords[Index];
+    for(uint8_t index = 0; index < CLOCK_WORDS_MAX_NUMBER_OF_MINUTE_WORDS; index++) {
+        if(minute_words_[index] != DisplayWords::kWordNone) {
+            clock_words[clock_words_index++] = minute_words_[index];
         }
     }
-    for(uint8_t Index = 0; Index < CLOCK_WORDS_MAX_NUMBER_OF_HOUR_WORDS; Index++) {
-        if(HourWords[Index] != DisplayWords::WORD_NONE) {
-            clockWords[clockWordsIndex++] = HourWords[Index];
+    for(uint8_t index = 0; index < CLOCK_WORDS_MAX_NUMBER_OF_HOUR_WORDS; index++) {
+        if(hour_words_[index] != DisplayWords::kWordNone) {
+            clock_words[clock_words_index++] = hour_words_[index];
         }
     }
-    for(uint8_t Index = clockWordsIndex; Index < CLOCK_WORDS_MAX_NUMBER_OF_WORDS; Index++) {
-        clockWords[Index] = DisplayWords::WORD_NONE;
+    for(uint8_t index = clock_words_index; index < CLOCK_WORDS_MAX_NUMBER_OF_WORDS; index++) {
+        clock_words[index] = DisplayWords::kWordNone;
     }
-    return clockWords;
+    return clock_words;
 }
 
 

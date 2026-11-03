@@ -15,8 +15,8 @@
  *                  sensor without knowing which one it holds - the hardware driver or the
  *                  simulator's stub.
  *
- *                  There is deliberately no init() here to match the other modules': the
- *                  sensor is private and the scheduler only ever calls task(), so the
+ *                  There is deliberately no Init() here to match the other modules': the
+ *                  sensor is private and the scheduler only ever calls Task(), so the
  *                  driver sets itself up from its first one. See the platform's BH1750.h.
 ******************************************************************************************************************************************************/
 #ifndef _ILLUMINANCE_H_
@@ -64,44 +64,44 @@ class Illuminance
     constexpr Illuminance() { }
     ~Illuminance() { }
     
-    BH1750 Sensor;
+    BH1750 sensor_;
   
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    static Illuminance& getInstance() {
-        static Illuminance singletonInstance;
-        return singletonInstance;
+    static Illuminance& GetInstance() {
+        static Illuminance singleton_instance;
+        return singleton_instance;
     }
 
-    byte getTaskCycle() const { return Sensor.getTaskCycle(); }
-    IlluminanceType getIlluminance() const { return Sensor.getIlluminance(); }
-    CalibrationValuesType getCalibrationValues() const { return Sensor.getCalibrationValues(); }
-    IlluminanceType getCalibrationValuesMaxValue() const { return Sensor.getCalibrationValues().MaxValue; }
-    IlluminanceType getCalibrationValuesMinValue() const { return Sensor.getCalibrationValues().MinValue; }
+    byte GetTaskCycle() const { return sensor_.GetTaskCycle(); }
+    IlluminanceType GetIlluminance() const { return sensor_.GetIlluminance(); }
+    CalibrationValuesType GetCalibrationValues() const { return sensor_.GetCalibrationValues(); }
+    IlluminanceType GetCalibrationValuesMaxValue() const { return sensor_.GetCalibrationValues().max_value; }
+    IlluminanceType GetCalibrationValuesMinValue() const { return sensor_.GetCalibrationValues().min_value; }
 
     // set methods
-    void setCalibrationValuesMaxValue(IlluminanceType MaxValue) { Sensor.setCalibrationValuesMaxValue(MaxValue); }
-    void setCalibrationValuesMinValue(IlluminanceType MinValue) { Sensor.setCalibrationValuesMinValue(MinValue); }
-    void setCalibrationValues(CalibrationValuesType CalibrationValues) { Sensor.setCalibrationValues(CalibrationValues); }
+    void SetCalibrationValuesMaxValue(IlluminanceType max_value) { sensor_.SetCalibrationValuesMaxValue(max_value); }
+    void SetCalibrationValuesMinValue(IlluminanceType min_value) { sensor_.SetCalibrationValuesMinValue(min_value); }
+    void SetCalibrationValues(CalibrationValuesType calibration_values) { sensor_.SetCalibrationValues(calibration_values); }
 
     // methods
     /* The calibration back to the span an uncalibrated clock starts in - the same two
        bounds the driver initialises from, so a reset and a fresh chip agree. Not the
        sensor's full range: see the defaults in the platform's BH1750.h for why that one
        leaves the automatic sitting at its floor in every room. */
-    void resetToDefaults() {
-        setCalibrationValuesMaxValue(BH1750_CALIBRATION_MAX_DEFAULT_LX_VALUE);
-        setCalibrationValuesMinValue(BH1750_CALIBRATION_MIN_DEFAULT_LX_VALUE);
+    void ResetToDefaults() {
+        SetCalibrationValuesMaxValue(BH1750_CALIBRATION_MAX_DEFAULT_LX_VALUE);
+        SetCalibrationValuesMinValue(BH1750_CALIBRATION_MIN_DEFAULT_LX_VALUE);
     }
 
     /* Both refuse while the sensor has nothing measured, so the answer to the procedure is
        the sensor's rather than an unconditional success. */
-    StdReturnType startCalibrationMaxValue() { return Sensor.startCalibrationMaxValue(); }
-    StdReturnType startCalibrationMinValue() { return Sensor.startCalibrationMinValue(); }
+    StdReturnType StartCalibrationMaxValue() { return sensor_.StartCalibrationMaxValue(); }
+    StdReturnType StartCalibrationMinValue() { return sensor_.StartCalibrationMinValue(); }
 
-    void task() { Sensor.task(); }
+    void Task() { sensor_.Task(); }
 };
 
 #endif

@@ -36,10 +36,10 @@
 /******************************************************************************************************************************************************
  *  LOCAL DATA TYPES AND STRUCTURES
 ******************************************************************************************************************************************************/
-const DisplayWord DisplayWords::DisplayWordsTable[] PROGMEM
+const DisplayWord DisplayWords::kDisplayWordsTable[] PROGMEM
 {
     DisplayWord(0,0,0),                  //  0 = DISPLAY_WORD_NONE           = ""
-    DisplayWord(0,0,2),                  //  1 = DisplayWords::WORD_ES       = "ES"
+    DisplayWord(0,0,2),                  //  1 = DisplayWords::kWordEs       = "ES"
     DisplayWord(3,0,3),                  //  2 = DISPLAY_WORD_IST            = "IST"
     DisplayWord(7,0,4),                  //  3 = DISPLAY_WORD_FUENF          = "FÜNF"
     DisplayWord(0,1,4),                  //  4 = DISPLAY_WORD_ZEHN           = "ZEHN"
@@ -72,71 +72,71 @@ const DisplayWord DisplayWords::DisplayWordsTable[] PROGMEM
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  getDisplayWord()
+  GetDisplayWord()
 ******************************************************************************************************************************************************/
-StdReturnType DisplayWords::getDisplayWord(WordIdType WordId, DisplayWord& Word)
+StdReturnType DisplayWords::GetDisplayWord(WordIdType word_id, DisplayWord& word)
 {
-    StdReturnType returnValue{E_NOT_OK};
+    StdReturnType return_value{kENotOk};
 
-    if(isWordIdValid(WordId)) {
-        Word = getDisplayWordsTableElement(WordId);
-        returnValue = E_OK;
+    if(IsWordIdValid(word_id)) {
+        word = GetDisplayWordsTableElement(word_id);
+        return_value = kEOk;
     } else {
-        returnValue = E_NOT_OK;
+        return_value = kENotOk;
     }
-    return returnValue;
-} /* getDisplayWord */
+    return return_value;
+} /* GetDisplayWord */
 
 
 /******************************************************************************************************************************************************
-  getDisplayWordLength()
+  GetDisplayWordLength()
 ******************************************************************************************************************************************************/
-StdReturnType DisplayWords::getDisplayWordLength(WordIdType WordId, byte& Length)
+StdReturnType DisplayWords::GetDisplayWordLength(WordIdType word_id, byte& length)
 {
-    StdReturnType returnValue{E_NOT_OK};
+    StdReturnType return_value{kENotOk};
 
-    if(isWordIdValid(WordId)) {
-        Length = getDisplayWordsTableElement(WordId).getLength();
-        returnValue = E_OK;
+    if(IsWordIdValid(word_id)) {
+        length = GetDisplayWordsTableElement(word_id).GetLength();
+        return_value = kEOk;
     } else {
-        returnValue = E_NOT_OK;
+        return_value = kENotOk;
     }
-    return returnValue;
-} /* getDisplayWordLength */
+    return return_value;
+} /* GetDisplayWordLength */
 
 
 /******************************************************************************************************************************************************
-  getDisplayWordColumn()
+  GetDisplayWordColumn()
 ******************************************************************************************************************************************************/
-StdReturnType DisplayWords::getDisplayWordColumn(WordIdType WordId, byte& Column)
+StdReturnType DisplayWords::GetDisplayWordColumn(WordIdType word_id, byte& column)
 {
-    StdReturnType returnValue{E_NOT_OK};
+    StdReturnType return_value{kENotOk};
 
-    if(isWordIdValid(WordId)) {
-        Column = getDisplayWordsTableElement(WordId).getColumn();
-        returnValue = E_OK;
+    if(IsWordIdValid(word_id)) {
+        column = GetDisplayWordsTableElement(word_id).GetColumn();
+        return_value = kEOk;
     } else {
-        returnValue = E_NOT_OK;
+        return_value = kENotOk;
     }
-    return returnValue;
-} /* getDisplayWordColumn */
+    return return_value;
+} /* GetDisplayWordColumn */
 
 
 /******************************************************************************************************************************************************
-  getDisplayWordRow()
+  GetDisplayWordRow()
 ******************************************************************************************************************************************************/
-StdReturnType DisplayWords::getDisplayWordRow(WordIdType WordId, byte& Row)
+StdReturnType DisplayWords::GetDisplayWordRow(WordIdType word_id, byte& row)
 {
-    StdReturnType returnValue{E_NOT_OK};
+    StdReturnType return_value{kENotOk};
 
-    if(isWordIdValid(WordId)) {
-        Row = getDisplayWordsTableElement(WordId).getRow();
-        returnValue = E_OK;
+    if(IsWordIdValid(word_id)) {
+        row = GetDisplayWordsTableElement(word_id).GetRow();
+        return_value = kEOk;
     } else {
-        returnValue = E_NOT_OK;
+        return_value = kENotOk;
     }
-    return returnValue;
-} /* getDisplayWordRow */
+    return return_value;
+} /* GetDisplayWordRow */
 
 
 /******************************************************************************************************************************************************

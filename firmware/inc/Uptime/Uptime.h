@@ -55,33 +55,33 @@ class Uptime
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    static constexpr byte TaskCycle{UPTIME_TASK_CYCLE};
+    static constexpr byte kTaskCycle{UPTIME_TASK_CYCLE};
 
-    static constexpr byte SecondsPerMinute{60u};
-    static constexpr byte MinutesPerHour{60u};
-    static constexpr byte HoursPerDay{24u};
+    static constexpr byte kSecondsPerMinute{60u};
+    static constexpr byte kMinutesPerHour{60u};
+    static constexpr byte kHoursPerDay{24u};
 
     /* 179 years, which no clock reaches - but it holds there rather than rolling over,
        because the whole point of this class is that it never reports a small number for a
        long time. */
-    static constexpr uint16_t DaysMaximum{65535u};
+    static constexpr uint16_t kDaysMaximum{65535u};
 
-    byte Seconds{0u};
-    byte Minutes{0u};
-    byte Hours{0u};
-    uint16_t Days{0u};
+    byte seconds_{0u};
+    byte minutes_{0u};
+    byte hours_{0u};
+    uint16_t days_{0u};
 
     Uptime() { }
     ~Uptime() { }
 
     /* One place of the count: steps it and says whether it rolled into the next one. The
-       carry is the whole of the arithmetic here, so it is worth its own name - task() then
+       carry is the whole of the arithmetic here, so it is worth its own name - Task() then
        reads as the three places it applies to. */
-    static bool carry(byte& Value, byte Limit) {
-        Value++;
-        if(Value < Limit) { return false; }
+    static bool Carry(byte& value, byte limit) {
+        value++;
+        if(value < limit) { return false; }
 
-        Value = 0u;
+        value = 0u;
         return true;
     }
 
@@ -89,25 +89,25 @@ class Uptime
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    static Uptime& getInstance() {
-        static Uptime SingletonInstance;
-        return SingletonInstance;
+    static Uptime& GetInstance() {
+        static Uptime singleton_instance;
+        return singleton_instance;
     }
 
     // get methods
-    static constexpr byte getTaskCycle() { return TaskCycle; }
+    static constexpr byte GetTaskCycle() { return kTaskCycle; }
 
-    uint16_t getDays() const { return Days; }
-    byte getHours() const { return Hours; }
-    byte getMinutes() const { return Minutes; }
+    uint16_t GetDays() const { return days_; }
+    byte GetHours() const { return hours_; }
+    byte GetMinutes() const { return minutes_; }
 
     // methods
-    void task() {
-        if(!carry(Seconds, SecondsPerMinute)) { return; }
-        if(!carry(Minutes, MinutesPerHour)) { return; }
-        if(!carry(Hours, HoursPerDay)) { return; }
+    void Task() {
+        if(!Carry(seconds_, kSecondsPerMinute)) { return; }
+        if(!Carry(minutes_, kMinutesPerHour)) { return; }
+        if(!Carry(hours_, kHoursPerDay)) { return; }
 
-        if(Days < DaysMaximum) { Days++; }
+        if(days_ < kDaysMaximum) { days_++; }
     }
 };
 

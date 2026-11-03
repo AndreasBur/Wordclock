@@ -72,32 +72,32 @@ class WebInterface
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    static WebInterface& getInstance() {
-        static WebInterface SingletonInstance;
-        return SingletonInstance;
+    static WebInterface& GetInstance() {
+        static WebInterface singleton_instance;
+        return singleton_instance;
     }
 
     // methods
     /* Starts the server and registers itself as the sink for finished output lines. Safe to
        call before the network is up: the server listens on whatever address arrives later.
-       Returns E_NOT_OK when the server could not be started, which leaves the clock running
+       Returns kENotOk when the server could not be started, which leaves the clock running
        on the UART alone rather than failing to boot. */
-    StdReturnType begin();
+    StdReturnType Begin();
 
     /* Sends one finished line to every open socket. Called from the firmware's task through
        WordclockSerial's line sink, not from the server's. Both of these forward into
        WebFrontend, which is where the widening, the rate limit and the comparison live; they
        stay on this class because the application and the line sink call them by this name. */
-    void broadcastLine(const char*);
+    void BroadcastLine(const char*);
 
     /* Sends the pixel buffer as one binary frame, at most every
        WEB_FRONTEND_FRAME_INTERVAL_TICKS and only when it changed. Called from the
        application's tick, after the display has been handed to the strip. */
-    void broadcastFrame();
+    void BroadcastFrame();
 
     /* For the socket handler, which runs in the server's task. */
-    void onClientOpened(int Descriptor);
-    void onClientClosed(int Descriptor);
+    void OnClientOpened(int descriptor);
+    void OnClientClosed(int descriptor);
 };
 
 #endif // _WEB_INTERFACE_H_

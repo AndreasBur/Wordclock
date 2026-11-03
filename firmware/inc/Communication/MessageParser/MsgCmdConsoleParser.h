@@ -50,42 +50,42 @@ class MsgCmdConsoleParser : public MsgParameterParser<MsgCmdConsoleParser, MSG_C
   private:
     friend class MsgParameterParser;
 
-    static constexpr char PasswordShortName{'P'};
-    static constexpr char ProtectedShortName{'A'};
+    static constexpr char kPasswordShortName{'P'};
+    static constexpr char kProtectedShortName{'A'};
 
-    static constexpr ParameterTableType ParameterTable PROGMEM {
-        ParameterTableElementType(PasswordShortName, MsgParameter::ARGUMENT_TYPE_STRING)
+    static constexpr ParameterTableType kParameterTable PROGMEM {
+        ParameterTableElementType(kPasswordShortName, MsgParameter::kArgumentTypeString)
     };
 
     // functions
-    static void handleParameter(char ParameterShortName, byte Argument) {
-        UNUSED(ParameterShortName); UNUSED(Argument);
+    static void HandleParameter(char parameter_short_name, byte argument) {
+        UNUSED(parameter_short_name); UNUSED(argument);
     }
-    static void handleParameter(char ParameterShortName, const char* Argument, PositionType Length)
+    static void HandleParameter(char parameter_short_name, const char* argument, PositionType length)
     {
-        UNUSED(Length);
+        UNUSED(length);
 
-        if(ParameterShortName == PasswordShortName) { System::getInstance().setConsolePassword(Argument); }
+        if(parameter_short_name == kPasswordShortName) { System::GetInstance().SetConsolePassword(argument); }
     }
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr MsgCmdConsoleParser(const char* Parameter) : MsgParameterParser(ParameterTable, Parameter) { }
+    constexpr MsgCmdConsoleParser(const char* parameter) : MsgParameterParser(kParameterTable, parameter) { }
     ~MsgCmdConsoleParser() { }
 
     // methods
     /* Whether a password is set, and never which one. Last field before the command parser's
        terminating println(), so no trailing separator space. */
-    static void sendAnswer() {
-        sendAnswerParameter(ProtectedShortName,
-                            static_cast<byte>(System::getInstance().isConsoleProtected() ? 1u : 0u), false);
+    static void SendAnswer() {
+        SendAnswerParameter(kProtectedShortName,
+                            static_cast<byte>(System::GetInstance().IsConsoleProtected() ? 1u : 0u), false);
     }
 
     /* Nothing deferred: the password is stored where it arrives, since there is no second
        field it has to agree with. */
-    static void process() { }
+    static void Process() { }
 };
 
 #endif // _MSG_CMD_CONSOLE_PARSER_H_

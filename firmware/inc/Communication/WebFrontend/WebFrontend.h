@@ -84,14 +84,14 @@ class WebFrontend
        generated arrays have internal linkage, so a second includer would put a second copy
        of both pages in flash. */
     struct AssetType {
-        const char* Path;
-        const uint8_t* Bytes;
-        size_t Size;
-        const char* ContentType;
+        const char* path;
+        const uint8_t* bytes;
+        size_t size;
+        const char* content_type;
         /* Stored compressed and sent compressed, so the backend has to say so in a header
            and the browser unpacks it. False for the manifest, which is 485 bytes, and for
            the icons, a PNG being deflated already. */
-        bool IsGzipped;
+        bool is_gzipped;
     };
 
 /******************************************************************************************************************************************************
@@ -101,21 +101,21 @@ class WebFrontend
     /* size_t on the left so the multiplication happens there too. Both operands are small
        enough that an int product could not overflow, but the analyser cannot know the
        display's size and is right to ask rather than to work it out. */
-    static constexpr size_t FrameSize{static_cast<size_t>(PIXELS_NUMBER_OF_LEDS) * Pixel::getNumberOfColors()};
+    static constexpr size_t kFrameSize{static_cast<size_t>(PIXELS_NUMBER_OF_LEDS) * Pixel::GetNumberOfColors()};
 
     /* What was last sent, so an unchanged display costs a comparison rather than a frame.
        Same shape as Persistence, and for the same reason: nothing has to remember to report
-       a change, so nothing can forget. Pixels' own dirty flag cannot serve here - render()
+       a change, so nothing can forget. Pixels' own dirty flag cannot serve here - Render()
        clears it on its way to the strip, and a client that was not due on that tick would
        never learn of the change. */
-    byte LastFrame[FrameSize]{};
-    byte FrameCountdown{0u};
+    byte last_frame_[kFrameSize]{};
+    byte frame_countdown_{0u};
     /* Set when a client arrives, so the next frame goes out even though nothing changed. A
        browser that connects to a standing display would otherwise wait for the next change -
        on a word clock, up to five minutes of empty panel. Written by whichever context the
        backend's socket callback runs in and cleared by the firmware's tick; a byte either
        way, so a lost race costs one interval. */
-    std::atomic<bool> ForceFrame{false};
+    std::atomic<bool> force_frame_{false};
 
     WebFrontend() { }
     ~WebFrontend() { }
@@ -124,44 +124,44 @@ class WebFrontend
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    static WebFrontend& getInstance() {
-        static WebFrontend SingletonInstance;
-        return SingletonInstance;
+    static WebFrontend& GetInstance() {
+        static WebFrontend singleton_instance;
+        return singleton_instance;
     }
 
     // methods
     /* What a backend may size a static array of routes with, since the count itself is only
        known in the source. A static_assert there holds the two together, so a file added to
        the table without raising this fails the build rather than one registration. */
-    static constexpr byte MaxAssets{5u};
+    static constexpr byte kMaxAssets{5u};
 
     /* The files a clock serves unchanged, for a backend to register a route per entry and
        answer it from the table. Walked rather than named one by one, so a file added to
        web/ reaches both backends by appearing here. */
-    static byte getNumberOfAssets();
-    static const AssetType& getAsset(byte Index);
+    static byte GetNumberOfAssets();
+    static const AssetType& GetAsset(byte index);
 
     /* The command catalog as JSON, so a page can build its own form from it, and the panel's
        shape and letters. Both take the body a backend's route handler opened, which is the
        only thing about them that is a backend's business. */
-    static void writeCommands(WebResponseBody&);
-    static void writeDisplay(WebResponseBody&);
+    static void WriteCommands(WebResponseBody&);
+    static void WriteDisplay(WebResponseBody&);
 
     /* Sends one finished line to whoever is connected. Called from the firmware's task
        through WordclockSerial's line sink, not from a server's. */
-    static void broadcastLine(const char*);
+    static void BroadcastLine(const char*);
 
     /* Sends the pixel buffer as one binary frame, at most every
        WEB_FRONTEND_FRAME_INTERVAL_TICKS and only when it changed. Called from the
        application's tick, after the display has been handed to the strip. */
-    void broadcastFrame();
+    void BroadcastFrame();
 
     /* One socket frame's text on its way into the parser, terminator included. Refuses an
        empty frame and one too long to be a command rather than passing either on. */
-    static void injectCommand(const char*, size_t);
+    static void InjectCommand(const char*, size_t);
 
     /* For a backend's socket callback, which runs outside the firmware's tick. */
-    void onClientOpened() { ForceFrame.store(true, std::memory_order_release); }
+    void OnClientOpened() { force_frame_.store(true, std::memory_order_release); }
 };
 
 #endif // (WEB_FRONTEND_SUPPORT == STD_ON)

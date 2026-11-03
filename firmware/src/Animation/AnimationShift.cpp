@@ -45,37 +45,37 @@
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  init()
+  Init()
 ******************************************************************************************************************************************************/
-void AnimationShift::init()
+void AnimationShift::Init()
 {
-    Animation::init(STATE_IDLE);
-    reset();
-} /* init */
+    Animation::Init(kStateIdle);
+    Reset();
+} /* Init */
 
 
 /******************************************************************************************************************************************************
-  setTime()
+  SetTime()
 ******************************************************************************************************************************************************/
-StdReturnType AnimationShift::setTime(byte Hour, byte Minute)
+StdReturnType AnimationShift::SetTime(byte hour, byte minute)
 {
-    StdReturnType returnValue{E_NOT_OK};
+    StdReturnType return_value{kENotOk};
 
-    if(Clock::getInstance().getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
-        State = STATE_CLEAR_TIME;
+    if(Clock::GetInstance().GetClockWords(hour, minute, clock_words_table_) == kEOk && state_ == kStateIdle) {
+        state_ = kStateClearTime;
     }
-    return returnValue;
-} /* setTime */
+    return return_value;
+} /* SetTime */
 
 
 /******************************************************************************************************************************************************
-  task()
+  Task()
 ******************************************************************************************************************************************************/
-void AnimationShift::task()
+void AnimationShift::Task()
 {
-    if(State == STATE_CLEAR_TIME) { clearTimeTask(); }
-    else if(State == STATE_SET_TIME) { setTimeTask(); }
-} /* task */
+    if(state_ == kStateClearTime) { ClearTimeTask(); }
+    else if(state_ == kStateSetTime) { SetTimeTask(); }
+} /* Task */
 
 
 /******************************************************************************************************************************************************
@@ -83,82 +83,82 @@ void AnimationShift::task()
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  reset()
+  Reset()
 ******************************************************************************************************************************************************/
-void AnimationShift::reset()
+void AnimationShift::Reset()
 {
 #if (ANIMATION_SHIFT_HORIZONTAL == STD_ON)
-    CurrentColumn = 0u;
+    current_column_ = 0u;
 #endif
 
 #if (ANIMATION_SHIFT_VERTICAL == STD_ON)
-    CurrentRow = 0u;
+    current_row_ = 0u;
 #endif
-    ClockWordsTable.fill(DisplayWords::WORD_NONE);
-} /* reset */
+    clock_words_table_.fill(DisplayWords::kWordNone);
+} /* Reset */
 
 
 /******************************************************************************************************************************************************
-  clearTimeTask()
+  ClearTimeTask()
 ******************************************************************************************************************************************************/
-void AnimationShift::clearTimeTask()
+void AnimationShift::ClearTimeTask()
 {
 #if (ANIMATION_SHIFT_HORIZONTAL == STD_ON)
-    if(CurrentColumn < DISPLAY_NUMBER_OF_COLUMNS) {
-        wcTransformation.shiftRight();
-        CurrentColumn++;
+    if(current_column_ < DISPLAY_NUMBER_OF_COLUMNS) {
+        wc_transformation_.ShiftRight();
+        current_column_++;
     } else {
-        State = STATE_SET_TIME;
-        CurrentColumn = 0u;
+        state_ = kStateSetTime;
+        current_column_ = 0u;
     }
 #endif
 
 #if (ANIMATION_SHIFT_VERTICAL == STD_ON)
-    if(CurrentRow < DISPLAY_NUMBER_OF_ROWS) {
-        wcTransformation.shiftDown();
-        CurrentRow++;
+    if(current_row_ < DISPLAY_NUMBER_OF_ROWS) {
+        wc_transformation_.ShiftDown();
+        current_row_++;
     } else {
-        State = STATE_SET_TIME;
-        CurrentRow = 0u;
+        state_ = kStateSetTime;
+        current_row_ = 0u;
     }
 #endif
 
-} /* clearTimeTask */
+} /* ClearTimeTask */
 
 
 /******************************************************************************************************************************************************
-  setTimeTask()
+  SetTimeTask()
 ******************************************************************************************************************************************************/
-void AnimationShift::setTimeTask()
+void AnimationShift::SetTimeTask()
 {
 #if (ANIMATION_SHIFT_HORIZONTAL == STD_ON)
-    if(CurrentColumn < DISPLAY_NUMBER_OF_COLUMNS) {
-        wcTransformation.shiftRight();
-        for(byte Row = 0u; Row < DISPLAY_NUMBER_OF_ROWS; Row++) {
-            if(isPixelPartOfClockWords(ClockWordsTable, DISPLAY_NUMBER_OF_COLUMNS - CurrentColumn - 1u, Row)) {
-                Display::getInstance().setPixel(0u, Row);
+    if(current_column_ < DISPLAY_NUMBER_OF_COLUMNS) {
+        wc_transformation_.ShiftRight();
+        for(byte row = 0u; row < DISPLAY_NUMBER_OF_ROWS; row++) {
+            if(IsPixelPartOfClockWords(clock_words_table_, DISPLAY_NUMBER_OF_COLUMNS - current_column_ - 1u, row)) {
+                Display::GetInstance().SetPixel(0u, row);
             }
         }
-        CurrentColumn++;
+        current_column_++;
     } else {
-        finishWithClockWords(ClockWordsTable);
+        FinishWithClockWords(clock_words_table_);
     }
 #endif
 
 #if (ANIMATION_SHIFT_VERTICAL == STD_ON)
-    if(CurrentRow < DISPLAY_NUMBER_OF_ROWS) {
-        wcTransformation.shiftDown();
-        for(byte Column = 0u; Column < DISPLAY_NUMBER_OF_COLUMNS; Column++) {
-            if(isPixelPartOfClockWords(ClockWordsTable, Column, DISPLAY_NUMBER_OF_ROWS - CurrentRow - 1u)) {
-                Display::getInstance().setPixel(Column, 0u);
+    if(current_row_ < DISPLAY_NUMBER_OF_ROWS) {
+        wc_transformation_.ShiftDown();
+        for(byte column = 0u; column < DISPLAY_NUMBER_OF_COLUMNS; column++) {
+            if(IsPixelPartOfClockWords(clock_words_table_, column, DISPLAY_NUMBER_OF_ROWS - current_row_ - 1u)) {
+                Display::GetInstance().SetPixel(column, 0u);
             }
         }
-        CurrentRow++;
+        current_row_++;
     } else {
-        finishWithClockWords(ClockWordsTable);
+        FinishWithClockWords(clock_words_table_);
     }
 #endif
-} /* setTimeTask */
+} /* SetTimeTask */
 
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E

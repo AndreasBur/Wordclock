@@ -1,5 +1,7 @@
 #ifndef _WIFI_H_
 #define _WIFI_H_
+/* Under the framework's names, because it stands in for the framework's header. */
+// NOLINTBEGIN(readability-identifier-naming)
 #include <string>
 enum { WIFI_STA, WIFI_AP };
 enum { WL_CONNECTED, WL_IDLE_STATUS };
@@ -24,4 +26,5 @@ struct WiFiStub {
     bool softAP(const char* Ssid) { AccessPoint = Ssid; return true; }
 };
 extern WiFiStub WiFi;
+// NOLINTEND(readability-identifier-naming)
 #endif

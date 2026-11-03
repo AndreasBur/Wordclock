@@ -54,15 +54,15 @@ class AnimationFlicker : public Animation
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    byte Minute{0u};
-    byte Hour{0u};
-    bool IsClockSet{false};
-    byte FlickerCounter{ANIMATION_FLICKER_COUNTER_INIT_VALUE};
+    byte minute_{0u};
+    byte hour_{0u};
+    bool is_clock_set_{false};
+    byte flicker_counter_{ANIMATION_FLICKER_COUNTER_INIT_VALUE};
 
     // functions
-    void reset();
-    void clearTimeTask();
-    void setTimeTask();
+    void Reset();
+    void ClearTimeTask();
+    void SetTimeTask();
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
@@ -77,9 +77,9 @@ class AnimationFlicker : public Animation
     // set methods
 
     // methods
-    void init();
-    StdReturnType setTime(byte, byte);
-    void task();
+    void Init();
+    StdReturnType SetTime(byte, byte);
+    void Task();
 
 };
 

@@ -27,11 +27,12 @@
 namespace {
 
 /* Where the linker put the end of the statically allocated data, and where the allocator
-   has grown to if it was ever used. Declared by avr-libc rather than defined here. */
-extern "C" char __heap_start;
-extern "C" char* __brkval;
+   has grown to if it was ever used. Declared by avr-libc rather than defined here, so the
+   names are avr-libc's. */
+extern "C" char __heap_start; // NOLINT(readability-identifier-naming)
+extern "C" char* __brkval; // NOLINT(readability-identifier-naming)
 
-constexpr uint16_t BytesPerKibibyte{1024u};
+constexpr uint16_t kBytesPerKibibyte{1024u};
 
 } // namespace
 
@@ -40,14 +41,14 @@ constexpr uint16_t BytesPerKibibyte{1024u};
 ******************************************************************************************************************************************************/
 
 /* Instance methods, though some of them read no member: they are the interface the
-   firmware core calls through getInstance(), and every backend - the simulator's
+   firmware core calls through GetInstance(), and every backend - the simulator's
    stand-ins included - offers it that way. Whether this backend's implementation
    happens to need a member is its own detail, and answering the check would carry
    that detail into the interface.
    The ones it would make const drive the hardware, which a const would deny. */
 // NOLINTBEGIN(readability-convert-member-functions-to-static, readability-make-member-function-const)
 /******************************************************************************************************************************************************
-  getFreeMemoryInKibibytes()
+  GetFreeMemoryInKibibytes()
 ******************************************************************************************************************************************************/
 /*! \brief          What is left between the stack and everything below it
  *  \details        The gap the stack still has to grow into, measured from a local variable
@@ -59,25 +60,25 @@ constexpr uint16_t BytesPerKibibyte{1024u};
  *                  with sixteen of them costs the last three digits - enough to see the
  *                  headroom, not enough to watch it move.
 ******************************************************************************************************************************************************/
-StdReturnType System::getFreeMemoryInKibibytes(uint16_t& FreeMemory) const
+StdReturnType System::GetFreeMemoryInKibibytes(uint16_t& free_memory) const
 {
-    char StackMark;
+    char stack_mark;
     /* As addresses rather than pointers: the stack and the heap are not one array, and
        comparing or subtracting pointers into two different objects is undefined - an
        optimiser is entitled to fold the comparison away. Integers have no such rule. */
-    const uintptr_t StackAddress = reinterpret_cast<uintptr_t>(&StackMark);
-    const uintptr_t LowerEdge = reinterpret_cast<uintptr_t>((__brkval == nullptr) ? &__heap_start : __brkval);
+    const uintptr_t stack_address = reinterpret_cast<uintptr_t>(&stack_mark);
+    const uintptr_t lower_edge = reinterpret_cast<uintptr_t>((__brkval == nullptr) ? &__heap_start : __brkval);
 
-    if(StackAddress < LowerEdge) { return E_NOT_OK; }
+    if(stack_address < lower_edge) { return kENotOk; }
 
-    FreeMemory = static_cast<uint16_t>(static_cast<uint16_t>(StackAddress - LowerEdge) / BytesPerKibibyte);
+    free_memory = static_cast<uint16_t>(static_cast<uint16_t>(stack_address - lower_edge) / kBytesPerKibibyte);
 
-    return E_OK;
-} /* getFreeMemoryInKibibytes */
+    return kEOk;
+} /* GetFreeMemoryInKibibytes */
 
 
 /******************************************************************************************************************************************************
-  performPendingRestart()
+  PerformPendingRestart()
 ******************************************************************************************************************************************************/
 /*! \brief          Resets the controller, if a command asked for one
  *  \details        The console is drained first: the command that asked for this has already
@@ -85,16 +86,16 @@ StdReturnType System::getFreeMemoryInKibibytes(uint16_t& FreeMemory) const
  *                  still full would throw it away - the clock would come back up having
  *                  never confirmed what it was told to do.
 ******************************************************************************************************************************************************/
-void System::performPendingRestart()
+void System::PerformPendingRestart()
 {
-    if(!RestartPending) { return; }
+    if(!restart_pending_) { return; }
 
     Serial.flush();
 
     /* The software reset request is protected, like every register that can change how the
        device runs. */
     _PROTECTED_WRITE(RSTCTRL.SWRR, RSTCTRL_SWRST_bm);
-} /* performPendingRestart */
+} /* PerformPendingRestart */
 // NOLINTEND(readability-convert-member-functions-to-static, readability-make-member-function-const)
 
 /******************************************************************************************************************************************************

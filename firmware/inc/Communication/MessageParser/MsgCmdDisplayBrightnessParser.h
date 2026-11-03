@@ -56,46 +56,46 @@ class MsgCmdDisplayBrightnessParser : public MsgParameterParser<MsgCmdDisplayBri
 ******************************************************************************************************************************************************/
   private:
     friend class MsgParameterParser;
-    static constexpr char BrightnessOptionShortName{'B'};
-    static constexpr char UseAutomaticOptionShortName{'A'};
-    static constexpr char UseGammaCorrectionOptionShortName{'G'};
+    static constexpr char kBrightnessOptionShortName{'B'};
+    static constexpr char kUseAutomaticOptionShortName{'A'};
+    static constexpr char kUseGammaCorrectionOptionShortName{'G'};
 
-    static constexpr ParameterTableType ParameterTable PROGMEM {
-        MsgParameter(BrightnessOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8),
-        MsgParameter(UseAutomaticOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8),
-        MsgParameter(UseGammaCorrectionOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8)
+    static constexpr ParameterTableType kParameterTable PROGMEM {
+        MsgParameter(kBrightnessOptionShortName, MsgParameter::kArgumentTypeUint8),
+        MsgParameter(kUseAutomaticOptionShortName, MsgParameter::kArgumentTypeUint8),
+        MsgParameter(kUseGammaCorrectionOptionShortName, MsgParameter::kArgumentTypeUint8)
     };
 
     // functions
-    static void handleParameter(char ParameterShortName, const char* Argument, PositionType Length) { UNUSED(ParameterShortName); UNUSED(Argument); UNUSED(Length); }
-    static void handleParameter(char ParameterShortName, byte Argument)
+    static void HandleParameter(char parameter_short_name, const char* argument, PositionType length) { UNUSED(parameter_short_name); UNUSED(argument); UNUSED(length); }
+    static void HandleParameter(char parameter_short_name, byte argument)
     {
-        if(ParameterShortName == BrightnessOptionShortName) {
-            Display::getInstance().setBrightness(Argument);
+        if(parameter_short_name == kBrightnessOptionShortName) {
+            Display::GetInstance().SetBrightness(argument);
         }
-        if(ParameterShortName == UseAutomaticOptionShortName) {
-            Display::getInstance().setBrightnessUseAutomatic(Argument);
+        if(parameter_short_name == kUseAutomaticOptionShortName) {
+            Display::GetInstance().SetBrightnessUseAutomatic(argument);
         }
-        if(ParameterShortName == UseGammaCorrectionOptionShortName) {
-            Display::getInstance().setBrightnessUseGammaCorrection(Argument);
+        if(parameter_short_name == kUseGammaCorrectionOptionShortName) {
+            Display::GetInstance().SetBrightnessUseGammaCorrection(argument);
         }
     }
 
-     static void sendAnswerBrightness(bool AppendSpace) { sendAnswerParameter(BrightnessOptionShortName, Display::getInstance().getBrightness(), AppendSpace); }
-     static void sendAnswerAutomatic(bool AppendSpace) { sendAnswerParameter(UseAutomaticOptionShortName, Display::getInstance().getBrightnessUseAutomatic(), AppendSpace); }
-     static void sendAnswerGammaCorrection(bool AppendSpace) { sendAnswerParameter(UseGammaCorrectionOptionShortName, Display::getInstance().getBrightnessUseGammaCorrection(), AppendSpace); }
+     static void SendAnswerBrightness(bool append_space) { SendAnswerParameter(kBrightnessOptionShortName, Display::GetInstance().GetBrightness(), append_space); }
+     static void SendAnswerAutomatic(bool append_space) { SendAnswerParameter(kUseAutomaticOptionShortName, Display::GetInstance().GetBrightnessUseAutomatic(), append_space); }
+     static void SendAnswerGammaCorrection(bool append_space) { SendAnswerParameter(kUseGammaCorrectionOptionShortName, Display::GetInstance().GetBrightnessUseGammaCorrection(), append_space); }
 
-    void show() const
+    void Show() const
     {
-        StdReturnType returnValue = Display::getInstance().show();
-        Error.checkReturnValueAndSend(ErrorMessage::API_DISPLAY_SHOW, returnValue, ErrorMessage::ERROR_DISPLAY_PENDING);
+        StdReturnType return_value = Display::GetInstance().Show();
+        error_.CheckReturnValueAndSend(ErrorMessage::kApiDisplayShow, return_value, ErrorMessage::kErrorDisplayPending);
     }
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr MsgCmdDisplayBrightnessParser(const char* Parameter) : MsgParameterParser(ParameterTable, Parameter) { }
+    constexpr MsgCmdDisplayBrightnessParser(const char* parameter) : MsgParameterParser(kParameterTable, parameter) { }
     ~MsgCmdDisplayBrightnessParser() { }
 
     // get methods
@@ -103,15 +103,15 @@ class MsgCmdDisplayBrightnessParser : public MsgParameterParser<MsgCmdDisplayBri
     // set methods
 
     // methods
-    static void sendAnswer()
+    static void SendAnswer()
     {
-        sendAnswerBrightness(true);
-        sendAnswerAutomatic(true);
-        sendAnswerGammaCorrection(false);
+        SendAnswerBrightness(true);
+        SendAnswerAutomatic(true);
+        SendAnswerGammaCorrection(false);
 
     }
 
-    void process() { show(); }
+    void Process() { Show(); }
 
 };
 

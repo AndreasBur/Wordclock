@@ -15,8 +15,8 @@ otherwise have to.
 Such helpers live in the class body in the header, so they inline:
 
 ```cpp
-static constexpr ColorType dimmColor(ColorType Color, byte Brightness) {
-    return static_cast<ColorType>((static_cast<uint16_t>(Color) * (Brightness + 1u)) >> 8u);
+static constexpr ColorType DimmColor(ColorType color, byte brightness) {
+    return static_cast<ColorType>((static_cast<uint16_t>(color) * (brightness + 1u)) >> 8u);
 }
 ```
 
@@ -25,23 +25,35 @@ the body allows it — a helper calling a non-`constexpr` function (or `std::sqr
 stays plain `static`. The caller then reads as a pipeline:
 
 ```cpp
-const byte Level = toLevel(getWeightedIntensity(getIntensity(Pixel)));
+const byte level = ToLevel(GetWeightedIntensity(GetIntensity(pixel)));
 ```
 
 ### Naming
 
-- Functions `lowerCamelCase`; `get`/`set` for accessors, `to` for conversions
-  (`toColour`, `toLevel`), `is` for predicates (`isIndexValid`, `isAnimationValid`).
-- Variables, parameters and members `PascalCase`.
-- A setter parameter that collides with its member is prefixed `s`
-  (`setBrightness(byte sBrightness)` assigning `Brightness`).
+Google's names, the same as in MaxMatrix and Utl, and checked: `.clang-tidy` runs
+`readability-identifier-naming`, so a name that breaks them fails the static-analysis job.
+
+- Types, functions and methods `CamelCase`; `Get`/`Set` for accessors, `To` for
+  conversions (`ToIndex`, `ToLevel`), `Is` for predicates (`IsIndexValid`, `IsAnimationValid`).
+- Variables, parameters and public members `lower_case`; a private or protected member
+  ends in `_` (`brightness_`). A setter's parameter is therefore the plain name -
+  `SetBrightness(byte brightness)` assigning `brightness_` - with no prefix to tell them apart.
+- Constants and enumerators `k` plus `CamelCase` (`kUnlitLevel`, `kWordEs`); the
+  enumerations are still plain `enum`, so the enumerator keeps its type's word as a
+  prefix (`kDirectionFromLeft`).
+- A name that belongs to someone else keeps its spelling and says so with a
+  `NOLINT(readability-identifier-naming)` where it is declared: Arduino's `Serial`,
+  `millis()` and `byte`, the standard library's `std::array`, the frameworks the host
+  tests stub.
+- The check does not see a name used inside a macro body: it neither renames nor
+  reports it. Grep for the old spelling after renaming anything a macro reaches.
 
 ### Constants
 
 Class-internal constants are `static constexpr`, not `#define`:
 
 ```cpp
-static constexpr byte UnlitLevel{192u};
+static constexpr byte kUnlitLevel{192u};
 ```
 
 `#define` is reserved for the configuration macros at the top of a header, which

@@ -45,42 +45,42 @@
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  init()
+  Init()
 ******************************************************************************************************************************************************/
-void AnimationRoll::init()
+void AnimationRoll::Init()
 {
-    Animation::init(STATE_IDLE);
+    Animation::Init(kStateIdle);
     /* all animations share one union, so nothing may rely on member initializers */
-    reset();
-} /* init */
+    Reset();
+} /* Init */
 
 
 /******************************************************************************************************************************************************
-  setTime()
+  SetTime()
 ******************************************************************************************************************************************************/
-StdReturnType AnimationRoll::setTime(byte Hour, byte Minute)
+StdReturnType AnimationRoll::SetTime(byte hour, byte minute)
 {
-    StdReturnType returnValue{E_NOT_OK};
+    StdReturnType return_value{kENotOk};
 
-    if(Clock::getInstance().getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
-        Direction = calcDirection(Hour, Minute);
-        Step = 0u;
+    if(Clock::GetInstance().GetClockWords(hour, minute, clock_words_table_) == kEOk && state_ == kStateIdle) {
+        direction_ = CalcDirection(hour, minute);
+        step_ = 0u;
         /* no clear phase: the previous time is still on the display and rolls out
            while the new one rolls in behind it */
-        State = STATE_SET_TIME;
-        returnValue = E_OK;
+        state_ = kStateSetTime;
+        return_value = kEOk;
     }
-    return returnValue;
-} /* setTime */
+    return return_value;
+} /* SetTime */
 
 
 /******************************************************************************************************************************************************
-  task()
+  Task()
 ******************************************************************************************************************************************************/
-void AnimationRoll::task()
+void AnimationRoll::Task()
 {
-    if(State == STATE_SET_TIME) { setTimeTask(); }
-} /* task */
+    if(state_ == kStateSetTime) { SetTimeTask(); }
+} /* Task */
 
 
 /******************************************************************************************************************************************************
@@ -88,102 +88,102 @@ void AnimationRoll::task()
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  reset()
+  Reset()
 ******************************************************************************************************************************************************/
-void AnimationRoll::reset()
+void AnimationRoll::Reset()
 {
-    ClockWordsTable.fill(DisplayWords::WORD_NONE);
-    Step = 0u;
-    Direction = DIRECTION_RIGHT;
-} /* reset */
+    clock_words_table_.fill(DisplayWords::kWordNone);
+    step_ = 0u;
+    direction_ = kDirectionRight;
+} /* Reset */
 
 
 /******************************************************************************************************************************************************
-  setTimeTask()
+  SetTimeTask()
 ******************************************************************************************************************************************************/
-void AnimationRoll::setTimeTask()
+void AnimationRoll::SetTimeTask()
 {
-    if(Step < numberOfSteps()) {
-        if(Direction == DIRECTION_RIGHT || Direction == DIRECTION_LEFT) { rollHorizontal(); }
-        else { rollVertical(); }
-        Step++;
+    if(step_ < NumberOfSteps()) {
+        if(direction_ == kDirectionRight || direction_ == kDirectionLeft) { RollHorizontal(); }
+        else { RollVertical(); }
+        step_++;
     } else {
         /* the new time has reached its place, nothing left to shift */
-        finishWithClockWords(ClockWordsTable);
-        reset();
+        FinishWithClockWords(clock_words_table_);
+        Reset();
     }
-} /* setTimeTask */
+} /* SetTimeTask */
 
 
 /******************************************************************************************************************************************************
-  rollHorizontal()
+  RollHorizontal()
 ******************************************************************************************************************************************************/
-void AnimationRoll::rollHorizontal()
+void AnimationRoll::RollHorizontal()
 {
     /* Shift everything by one and feed the column of the new time that belongs in at
        the freed edge. The remaining shifts carry it to its final column, so the
        column entering in step n is the one that ends up n columns away from the edge
        it entered at. */
-    if(Direction == DIRECTION_RIGHT) {
-        wcTransformation.shiftRight();
+    if(direction_ == kDirectionRight) {
+        wc_transformation_.ShiftRight();
         for(byte row = 0u; row < DISPLAY_NUMBER_OF_ROWS; row++) {
-            if(isPixelPartOfClockWords(ClockWordsTable, DISPLAY_NUMBER_OF_COLUMNS - Step - 1u, row)) {
-                Display::getInstance().setPixel(0u, row);
+            if(IsPixelPartOfClockWords(clock_words_table_, DISPLAY_NUMBER_OF_COLUMNS - step_ - 1u, row)) {
+                Display::GetInstance().SetPixel(0u, row);
             }
         }
     } else {
-        wcTransformation.shiftLeft();
+        wc_transformation_.ShiftLeft();
         for(byte row = 0u; row < DISPLAY_NUMBER_OF_ROWS; row++) {
-            if(isPixelPartOfClockWords(ClockWordsTable, Step, row)) {
-                Display::getInstance().setPixel(DISPLAY_NUMBER_OF_COLUMNS - 1u, row);
+            if(IsPixelPartOfClockWords(clock_words_table_, step_, row)) {
+                Display::GetInstance().SetPixel(DISPLAY_NUMBER_OF_COLUMNS - 1u, row);
             }
         }
     }
-} /* rollHorizontal */
+} /* RollHorizontal */
 
 
 /******************************************************************************************************************************************************
-  rollVertical()
+  RollVertical()
 ******************************************************************************************************************************************************/
-void AnimationRoll::rollVertical()
+void AnimationRoll::RollVertical()
 {
-    /* same as rollHorizontal(), with rows instead of columns */
-    if(Direction == DIRECTION_DOWN) {
-        wcTransformation.shiftDown();
+    /* same as RollHorizontal(), with rows instead of columns */
+    if(direction_ == kDirectionDown) {
+        wc_transformation_.ShiftDown();
         for(byte column = 0u; column < DISPLAY_NUMBER_OF_COLUMNS; column++) {
-            if(isPixelPartOfClockWords(ClockWordsTable, column, DISPLAY_NUMBER_OF_ROWS - Step - 1u)) {
-                Display::getInstance().setPixel(column, 0u);
+            if(IsPixelPartOfClockWords(clock_words_table_, column, DISPLAY_NUMBER_OF_ROWS - step_ - 1u)) {
+                Display::GetInstance().SetPixel(column, 0u);
             }
         }
     } else {
-        wcTransformation.shiftUp();
+        wc_transformation_.ShiftUp();
         for(byte column = 0u; column < DISPLAY_NUMBER_OF_COLUMNS; column++) {
-            if(isPixelPartOfClockWords(ClockWordsTable, column, Step)) {
-                Display::getInstance().setPixel(column, DISPLAY_NUMBER_OF_ROWS - 1u);
+            if(IsPixelPartOfClockWords(clock_words_table_, column, step_)) {
+                Display::GetInstance().SetPixel(column, DISPLAY_NUMBER_OF_ROWS - 1u);
             }
         }
     }
-} /* rollVertical */
+} /* RollVertical */
 
 
 /******************************************************************************************************************************************************
-  numberOfSteps()
+  NumberOfSteps()
 ******************************************************************************************************************************************************/
-byte AnimationRoll::numberOfSteps() const
+byte AnimationRoll::NumberOfSteps() const
 {
-    if(Direction == DIRECTION_RIGHT || Direction == DIRECTION_LEFT) { return DISPLAY_NUMBER_OF_COLUMNS; }
+    if(direction_ == kDirectionRight || direction_ == kDirectionLeft) { return DISPLAY_NUMBER_OF_COLUMNS; }
 
     return DISPLAY_NUMBER_OF_ROWS;
-} /* numberOfSteps */
+} /* NumberOfSteps */
 
 
 /******************************************************************************************************************************************************
-  calcDirection()
+  CalcDirection()
 ******************************************************************************************************************************************************/
-AnimationRoll::DirectionType AnimationRoll::calcDirection(byte Hour, byte Minute)
+AnimationRoll::DirectionType AnimationRoll::CalcDirection(byte hour, byte minute)
 {
-    return static_cast<DirectionType>(selectByTime(Hour, Minute, DIRECTION_NUMBER_OF_DIRECTIONS));
-} /* calcDirection */
+    return static_cast<DirectionType>(SelectByTime(hour, minute, kDirectionNumberOfDirections));
+} /* CalcDirection */
 
 
 /******************************************************************************************************************************************************

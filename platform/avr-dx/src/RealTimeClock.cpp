@@ -24,7 +24,7 @@
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  readChip()
+  ReadChip()
 ******************************************************************************************************************************************************/
 /*! \brief          Takes the time from the chip, if it has one to give
  *  \details        What the chip refuses to answer is left alone rather than replaced: a
@@ -32,19 +32,19 @@
  *                  default date and shows an obviously wrong time - which is what tells a
  *                  first bring-up apart from a display that is simply dark.
 ******************************************************************************************************************************************************/
-StdReturnType RealTimeClock::readChip()
+StdReturnType RealTimeClock::ReadChip()
 {
-    ClockDateTime Value;
+    ClockDateTime value;
 
-    if(Chip.getDateTime(Value) == E_NOT_OK) { return E_NOT_OK; }
+    if(chip_.GetDateTime(value) == kENotOk) { return kENotOk; }
 
-    DateTime = Value;
-    return E_OK;
-} /* readChip */
+    date_time_ = value;
+    return kEOk;
+} /* ReadChip */
 
 
 /******************************************************************************************************************************************************
-  writeChip()
+  WriteChip()
 ******************************************************************************************************************************************************/
 /*! \brief          Puts what was just set into the chip
  *  \details        The return code is dropped on purpose: a clock with no chip has to keep
@@ -52,15 +52,15 @@ StdReturnType RealTimeClock::readChip()
  *                  a failure to - the command's own answer has already been decided by the
  *                  parser that called this.
 ******************************************************************************************************************************************************/
-void RealTimeClock::writeChip()
+void RealTimeClock::WriteChip()
 {
-    Chip.setDateTime(DateTime);
+    chip_.SetDateTime(date_time_);
 
     /* Restarted, so the value just written is not read back over in the same second - the
        chip zeroes nothing, but a read landing between the write and the next second would
        hand back a time one second behind what the answer reported. */
-    ChipReadCountdown = ChipReadInterval;
-} /* writeChip */
+    chip_read_countdown_ = kChipReadInterval;
+} /* WriteChip */
 
 
 /******************************************************************************************************************************************************
@@ -68,53 +68,53 @@ void RealTimeClock::writeChip()
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  task()
+  Task()
 ******************************************************************************************************************************************************/
 /*! \brief          Keeps the time up to date from the chip
  *  \details        Called from the application's tick rather than through the scheduler,
  *                  because the core reads the time within its own tasks and would otherwise
  *                  see it change part way through a pass.
 ******************************************************************************************************************************************************/
-void RealTimeClock::task()
+void RealTimeClock::Task()
 {
-    if(ChipReadCountdown > 0u) {
-        ChipReadCountdown--;
+    if(chip_read_countdown_ > 0u) {
+        chip_read_countdown_--;
         return;
     }
 
-    ChipReadCountdown = ChipReadInterval;
-    readChip();
-} /* task */
+    chip_read_countdown_ = kChipReadInterval;
+    ReadChip();
+} /* Task */
 
 
 /******************************************************************************************************************************************************
-  setDateTime()
+  SetDateTime()
 ******************************************************************************************************************************************************/
-void RealTimeClock::setDateTime(ClockDateTime sDateTime)
+void RealTimeClock::SetDateTime(ClockDateTime date_time)
 {
-    DateTime = sDateTime;
-    writeChip();
-} /* setDateTime */
+    date_time_ = date_time;
+    WriteChip();
+} /* SetDateTime */
 
 
 /******************************************************************************************************************************************************
-  setTime()
+  SetTime()
 ******************************************************************************************************************************************************/
-void RealTimeClock::setTime(ClockTime Time)
+void RealTimeClock::SetTime(ClockTime time)
 {
-    DateTime.setTime(Time);
-    writeChip();
-} /* setTime */
+    date_time_.SetTime(time);
+    WriteChip();
+} /* SetTime */
 
 
 /******************************************************************************************************************************************************
-  setDate()
+  SetDate()
 ******************************************************************************************************************************************************/
-void RealTimeClock::setDate(ClockDate Date)
+void RealTimeClock::SetDate(ClockDate date)
 {
-    DateTime.setDate(Date);
-    writeChip();
-} /* setDate */
+    date_time_.SetDate(date);
+    WriteChip();
+} /* SetDate */
 
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E

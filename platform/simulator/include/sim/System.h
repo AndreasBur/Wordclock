@@ -16,7 +16,7 @@
  *                  its heap is the host's, where a number of free kibibytes says nothing
  *                  about the firmware.
  *
- *                  Those answer E_NOT_OK rather than a placeholder, which is also what
+ *                  Those answer kENotOk rather than a placeholder, which is also what
  *                  makes the "no answer" path of the status command reachable here - the
  *                  same reasoning as the clock chip's absent reading.
  *
@@ -53,10 +53,10 @@ class System
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-    static constexpr byte AddressStringLength{SYSTEM_ADDRESS_STRING_LENGTH};
-    static constexpr byte LinkQualityStringLength{SYSTEM_LINK_QUALITY_STRING_LENGTH};
-    static constexpr byte SsidStringLength{SYSTEM_SSID_STRING_LENGTH};
-    static constexpr byte PasswordStringLength{SYSTEM_PASSWORD_STRING_LENGTH};
+    static constexpr byte kAddressStringLength{SYSTEM_ADDRESS_STRING_LENGTH};
+    static constexpr byte kLinkQualityStringLength{SYSTEM_LINK_QUALITY_STRING_LENGTH};
+    static constexpr byte kSsidStringLength{SYSTEM_SSID_STRING_LENGTH};
+    static constexpr byte kPasswordStringLength{SYSTEM_PASSWORD_STRING_LENGTH};
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
@@ -69,9 +69,9 @@ class System
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    static System& getInstance() {
-        static System SingletonInstance;
-        return SingletonInstance;
+    static System& GetInstance() {
+        static System singleton_instance;
+        return singleton_instance;
     }
 
     // get methods
@@ -80,28 +80,28 @@ class System
        state. A stand-in that answered the check would have a different API from the thing it
        stands in for, which is the one property it exists to keep. */
     // NOLINTBEGIN(readability-convert-member-functions-to-static)
-    StdReturnType getFreeMemoryInKibibytes(uint16_t& FreeMemory) const { UNUSED(FreeMemory); return E_NOT_OK; }
+    StdReturnType GetFreeMemoryInKibibytes(uint16_t& free_memory) const { UNUSED(free_memory); return kENotOk; }
 
-    StdReturnType getNetworkAddress(char* String) const { String[0u] = STD_NULL_CHARACTER; return E_NOT_OK; }
+    StdReturnType GetNetworkAddress(char* string) const { string[0u] = STD_NULL_CHARACTER; return kENotOk; }
 
     /* There is no network here to be on or to join, so the command that configures one
        answers that it could not - which is the same answer a clock gives whose store
        refused the pair, and the one the simulator has to be able to produce. */
-    StdReturnType getNetworkSsid(char* String) const { String[0u] = STD_NULL_CHARACTER; return E_NOT_OK; }
-    bool isNetworkConfigured() const { return false; }
-    StdReturnType setNetworkCredentials(const char* Ssid, const char* Password) { UNUSED(Ssid); UNUSED(Password); return E_NOT_OK; }
+    StdReturnType GetNetworkSsid(char* string) const { string[0u] = STD_NULL_CHARACTER; return kENotOk; }
+    bool IsNetworkConfigured() const { return false; }
+    StdReturnType SetNetworkCredentials(const char* ssid, const char* password) { UNUSED(ssid); UNUSED(password); return kENotOk; }
     /* No console to protect: this build has no web interface, so the password has nowhere to
        be asked for and the answer is the same "no" the network methods above give. */
-    bool isConsoleProtected() const { return false; }
-    StdReturnType setConsolePassword(const char* Password) { UNUSED(Password); return E_NOT_OK; }
+    bool IsConsoleProtected() const { return false; }
+    StdReturnType SetConsolePassword(const char* password) { UNUSED(password); return kENotOk; }
 
-    void startNetwork() { }
-    StdReturnType getLinkQuality(char* String) const { String[0u] = STD_NULL_CHARACTER; return E_NOT_OK; }
+    void StartNetwork() { }
+    StdReturnType GetLinkQuality(char* string) const { string[0u] = STD_NULL_CHARACTER; return kENotOk; }
 
     // methods
-    StdReturnType restart() { return E_NOT_OK; }
-    StdReturnType resynchroniseTime() { return E_NOT_OK; }
-    StdReturnType reconnectNetwork() { return E_NOT_OK; }
+    StdReturnType Restart() { return kENotOk; }
+    StdReturnType ResynchroniseTime() { return kENotOk; }
+    StdReturnType ReconnectNetwork() { return kENotOk; }
     // NOLINTEND(readability-convert-member-functions-to-static)
 };
 

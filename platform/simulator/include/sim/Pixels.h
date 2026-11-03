@@ -71,25 +71,25 @@ class Pixels
   private:
     /* Zero-initialised, so the strip starts dark rather than at whatever the memory
        held - the hardware driver starts from a defined state too. */
-    PixelType PixelBuffer[PIXELS_DISPLAY_NUMBER_OF_ROWS][PIXELS_DISPLAY_NUMBER_OF_COLUMNS]{};
-    byte Pin{0};
-    byte Brightness{255};
+    PixelType pixel_buffer_[PIXELS_DISPLAY_NUMBER_OF_ROWS][PIXELS_DISPLAY_NUMBER_OF_COLUMNS]{};
+    byte pin_{0};
+    byte brightness_{255};
     /* Whether the firmware touched buffer or brightness since the last render. It saves
        the window a pass over all 110 cells on the ticks where nothing happened, and it
        is what lets a test see whether a redraw was attempted at all - which is exactly
        what DisplayManager's word-set latch promises not to do. Starts true so the first
        pass establishes the window's colours. */
-    bool Dirty{true};
+    bool dirty_{true};
     /* Whether anything may reach the strip at all. Separate from a brightness of zero,
        which still sends a frame of black pixels: this is for the state in which the strip
        has no supply, and a frame arriving then pushes current into a dead rail through the
        LED's own protection diode. Starts false, because a strip that is powered is what
        every backend comes up with. */
-    bool OutputSuspended{false};
+    bool output_suspended_{false};
 
     // functions
-    static constexpr byte toRow(byte Index) { return Index / PIXELS_DISPLAY_NUMBER_OF_COLUMNS; }
-    static constexpr byte toColumn(byte Index) { return Index % PIXELS_DISPLAY_NUMBER_OF_COLUMNS; }
+    static constexpr byte ToRow(byte index) { return index / PIXELS_DISPLAY_NUMBER_OF_COLUMNS; }
+    static constexpr byte ToColumn(byte index) { return index % PIXELS_DISPLAY_NUMBER_OF_COLUMNS; }
 
     Pixels() { }
     ~Pixels() { }
@@ -98,9 +98,9 @@ class Pixels
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    static Pixels& getInstance() {
-        static Pixels SingletonInstance;
-        return SingletonInstance;
+    static Pixels& GetInstance() {
+        static Pixels singleton_instance;
+        return singleton_instance;
     }
 
     // get methods
@@ -108,56 +108,56 @@ class Pixels
        answers whether the index is on the strip, the one taking none answers the pixel and
        leaves an unlit one where the index is not. Both check. Writers have a single form,
        which answers, and a caller that has nothing to do with the answer ignores it. */
-    byte getBrightness() const { return Brightness; }
-    StdReturnType getPixel(byte, PixelType&) const;
-    PixelType getPixel(byte) const;
-    StdReturnType getOutputPixel(byte Index, PixelType& Pixel) const {
-        if(getPixel(Index, Pixel) == E_NOT_OK) { return E_NOT_OK; }
+    byte GetBrightness() const { return brightness_; }
+    StdReturnType GetPixel(byte, PixelType&) const;
+    PixelType GetPixel(byte) const;
+    StdReturnType GetOutputPixel(byte index, PixelType& pixel) const {
+        if(GetPixel(index, pixel) == kENotOk) { return kENotOk; }
 
-        Pixel.dimmPixel(Brightness);
-        return E_OK;
+        pixel.DimmPixel(brightness_);
+        return kEOk;
     }
-    PixelType getOutputPixel(byte Index) const {
-        PixelType Pixel = getPixel(Index);
-        Pixel.dimmPixel(Brightness);
-        return Pixel;
+    PixelType GetOutputPixel(byte index) const {
+        PixelType pixel = GetPixel(index);
+        pixel.DimmPixel(brightness_);
+        return pixel;
     }
 
     // set methods
-    void setPixels(PixelType);
-    void setBrightness(byte, bool = false);
-    StdReturnType setPixel(byte, PixelType);
-    StdReturnType setPixel(byte, byte, byte, byte);
-    StdReturnType clearPixel(byte Index) { return setPixel(Index, 0, 0, 0); }
+    void SetPixels(PixelType);
+    void SetBrightness(byte, bool = false);
+    StdReturnType SetPixel(byte, PixelType);
+    StdReturnType SetPixel(byte, byte, byte, byte);
+    StdReturnType ClearPixel(byte index) { return SetPixel(index, 0, 0, 0); }
 
     // methods
-    static constexpr bool isIndexValid(IndexType Index) { return Index < PIXELS_NUMBER_OF_PIXELS; }
-    void init(byte sPin) { Pin = sPin; }
-    void enablePixels() { setBrightness(255); }
-    void disablePixels() { setBrightness(0); }
-    void clearPixels() { setPixels(PixelType(0u, 0u, 0u)); }
+    static constexpr bool IsIndexValid(IndexType index) { return index < PIXELS_NUMBER_OF_PIXELS; }
+    void Init(byte pin) { pin_ = pin; }
+    void EnablePixels() { SetBrightness(255); }
+    void DisablePixels() { SetBrightness(0); }
+    void ClearPixels() { SetPixels(PixelType(0u, 0u, 0u)); }
     /* On the hardware this hands the buffer to the strip. Here it only asks for a
        render, which PixelsFrame picks up on the next tick. */
-    StdReturnType show() {
-        Dirty = true;
-        return E_OK;
+    StdReturnType Show() {
+        dirty_ = true;
+        return kEOk;
     }
 
     // render interface, for PixelsFrame and the tests
-    bool isDirty() const { return Dirty; }
-    void clearDirty() { Dirty = false; }
+    bool IsDirty() const { return dirty_; }
+    void ClearDirty() { dirty_ = false; }
 
     // output gate, for the supply switch
     /* Nothing is on a wire here, so a frame is never still going out. The hardware
        backends ask their peripheral, and answering false is what lets the sequence that
        waits for a frame be tested without one. */
-    static constexpr bool isFrameOnTheWire() { return false; }
-    bool isOutputSuspended() const { return OutputSuspended; }
-    void suspendOutput() { OutputSuspended = true; }
+    static constexpr bool IsFrameOnTheWire() { return false; }
+    bool IsOutputSuspended() const { return output_suspended_; }
+    void SuspendOutput() { output_suspended_ = true; }
     /* Marks the buffer, so what comes back is a redraw and not the window's last state:
        the LEDs lose their registers along with their supply, so on hardware there is
        nothing left up there to keep showing. */
-    void resumeOutput() { OutputSuspended = false; Dirty = true; }
+    void ResumeOutput() { output_suspended_ = false; dirty_ = true; }
 };
 
 #endif // PIXELS_H

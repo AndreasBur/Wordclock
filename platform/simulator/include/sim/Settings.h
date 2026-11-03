@@ -53,28 +53,28 @@ class Settings : public wxDialog
     /* Own range, so the ids stay clear of the pixel matrix window's. */
     enum
     {
-        ID_SLIDER_ILLUMINANCE = 2000,
-        ID_STATIC_BOX_ILLUMINANCE,
-        ID_SLIDER_TEMPERATURE,
-        ID_CHECKBOX_TEMPERATURE_CONNECTED,
-        ID_STATIC_BOX_TEMPERATURE
+        kIdSliderIlluminance = 2000,
+        kIdStaticBoxIlluminance,
+        kIdSliderTemperature,
+        kIdCheckboxTemperatureConnected,
+        kIdStaticBoxTemperature
     };
 
-    wxSlider* IlluminanceSlider;
-    wxSlider* TemperatureSlider;
-    wxCheckBox* TemperatureConnectedCheckBox;
+    wxSlider* illuminance_slider_;
+    wxSlider* temperature_slider_;
+    wxCheckBox* temperature_connected_check_box_;
 
-    static constexpr int IlluminancePercentMin{0};
-    static constexpr int IlluminancePercentMax{100};
+    static constexpr int kIlluminancePercentMin{0};
+    static constexpr int kIlluminancePercentMax{100};
     /* Full daylight, which leaves the brightness automatic at its brightest. */
-    static constexpr int IlluminancePercentInitial{100};
+    static constexpr int kIlluminancePercentInitial{100};
     /* Whole degrees Celsius; the overlay shows a tenth, which the slider does not need to
        reach for what it is here to try out. Well inside what the chip can measure. */
-    static constexpr int TemperatureCelsiusMin{-20};
-    static constexpr int TemperatureCelsiusMax{50};
-    static constexpr int TemperatureCelsiusInitial{21};
-    static constexpr int SliderWidth{200};
-    static constexpr int Border{10};
+    static constexpr int kTemperatureCelsiusMin{-20};
+    static constexpr int kTemperatureCelsiusMax{50};
+    static constexpr int kTemperatureCelsiusInitial{21};
+    static constexpr int kSliderWidth{200};
+    static constexpr int kBorder{10};
 
     DECLARE_EVENT_TABLE()
 
@@ -87,24 +87,24 @@ class Settings : public wxDialog
     void OnTemperature(wxCommandEvent&);
     void OnTemperatureConnected(wxCommandEvent&);
 
-    void applyTemperature();
+    void ApplyTemperature();
 
-    wxBoxSizer* createSizerAll(wxWindow*);
-    wxBoxSizer* createSizerIlluminance(wxWindow*);
-    wxBoxSizer* createSizerTemperature(wxWindow*);
+    wxBoxSizer* CreateSizerAll(wxWindow*);
+    wxBoxSizer* CreateSizerIlluminance(wxWindow*);
+    wxBoxSizer* CreateSizerTemperature(wxWindow*);
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    static Settings& getInstance() {
-        static Settings* pSingletonInstance = new Settings(&PixelsFrame::getInstance(), _("Wordclock Settings"));
-        return *pSingletonInstance;
+    static Settings& GetInstance() {
+        static Settings* p_singleton_instance = new Settings(&PixelsFrame::GetInstance(), _("Wordclock Settings"));
+        return *p_singleton_instance;
     }
 
     // methods
     /* Brings the window up, whether it was never shown or only hidden. */
-    void reveal() {
+    void Reveal() {
         Show();
         Raise();
     }

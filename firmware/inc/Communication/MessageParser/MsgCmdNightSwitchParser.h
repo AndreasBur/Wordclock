@@ -47,67 +47,67 @@ class MsgCmdNightSwitchParser : public MsgParameterParser<MsgCmdNightSwitchParse
   private:
     friend class MsgParameterParser;
 
-    static constexpr char ActiveShortName{'A'};
-    static constexpr char StartHourShortName{'H'};
-    static constexpr char StartMinuteShortName{'M'};
-    static constexpr char EndHourShortName{'E'};
-    static constexpr char EndMinuteShortName{'N'};
-    static constexpr char BrightnessShortName{'B'};
+    static constexpr char kActiveShortName{'A'};
+    static constexpr char kStartHourShortName{'H'};
+    static constexpr char kStartMinuteShortName{'M'};
+    static constexpr char kEndHourShortName{'E'};
+    static constexpr char kEndMinuteShortName{'N'};
+    static constexpr char kBrightnessShortName{'B'};
 
-    static constexpr ParameterTableType ParameterTable PROGMEM {
-        ParameterTableElementType(ActiveShortName,      MsgParameter::ARGUMENT_TYPE_UINT8),
-        ParameterTableElementType(StartHourShortName,   MsgParameter::ARGUMENT_TYPE_UINT8),
-        ParameterTableElementType(StartMinuteShortName, MsgParameter::ARGUMENT_TYPE_UINT8),
-        ParameterTableElementType(EndHourShortName,     MsgParameter::ARGUMENT_TYPE_UINT8),
-        ParameterTableElementType(EndMinuteShortName,   MsgParameter::ARGUMENT_TYPE_UINT8),
-        ParameterTableElementType(BrightnessShortName,  MsgParameter::ARGUMENT_TYPE_UINT8)
+    static constexpr ParameterTableType kParameterTable PROGMEM {
+        ParameterTableElementType(kActiveShortName,      MsgParameter::kArgumentTypeUint8),
+        ParameterTableElementType(kStartHourShortName,   MsgParameter::kArgumentTypeUint8),
+        ParameterTableElementType(kStartMinuteShortName, MsgParameter::kArgumentTypeUint8),
+        ParameterTableElementType(kEndHourShortName,     MsgParameter::kArgumentTypeUint8),
+        ParameterTableElementType(kEndMinuteShortName,   MsgParameter::kArgumentTypeUint8),
+        ParameterTableElementType(kBrightnessShortName,  MsgParameter::kArgumentTypeUint8)
     };
 
     /* Collected rather than applied as they arrive, and the switch applied last: switching
        it on is what makes the next tick an edge, and an edge acting on half a window would
        use one end from this command and the other from the one before it. */
-    bool Active{false};
-    bool ActiveGiven{false};
+    bool active_{false};
+    bool active_given_{false};
 
     // functions
-    static void handleParameter(char ParameterShortName, const char* Argument, PositionType Length) {
-        UNUSED(ParameterShortName); UNUSED(Argument); UNUSED(Length);
+    static void HandleParameter(char parameter_short_name, const char* argument, PositionType length) {
+        UNUSED(parameter_short_name); UNUSED(argument); UNUSED(length);
     }
-    void handleParameter(char ParameterShortName, byte Argument)
+    void HandleParameter(char parameter_short_name, byte argument)
     {
-        NightSwitch& nightSwitch = NightSwitch::getInstance();
+        NightSwitch& night_switch = NightSwitch::GetInstance();
 
-        if(ParameterShortName == ActiveShortName)      { Active = (Argument != 0u); ActiveGiven = true; }
-        if(ParameterShortName == StartHourShortName)   { nightSwitch.setStartHour(Argument); }
-        if(ParameterShortName == StartMinuteShortName) { nightSwitch.setStartMinute(Argument); }
-        if(ParameterShortName == EndHourShortName)     { nightSwitch.setEndHour(Argument); }
-        if(ParameterShortName == EndMinuteShortName)   { nightSwitch.setEndMinute(Argument); }
-        if(ParameterShortName == BrightnessShortName)  { nightSwitch.setNightBrightness(Argument); }
+        if(parameter_short_name == kActiveShortName)      { active_ = (argument != 0u); active_given_ = true; }
+        if(parameter_short_name == kStartHourShortName)   { night_switch.SetStartHour(argument); }
+        if(parameter_short_name == kStartMinuteShortName) { night_switch.SetStartMinute(argument); }
+        if(parameter_short_name == kEndHourShortName)     { night_switch.SetEndHour(argument); }
+        if(parameter_short_name == kEndMinuteShortName)   { night_switch.SetEndMinute(argument); }
+        if(parameter_short_name == kBrightnessShortName)  { night_switch.SetNightBrightness(argument); }
     }
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr MsgCmdNightSwitchParser(const char* Parameter) : MsgParameterParser(ParameterTable, Parameter) { }
+    constexpr MsgCmdNightSwitchParser(const char* parameter) : MsgParameterParser(kParameterTable, parameter) { }
     ~MsgCmdNightSwitchParser() { }
 
     // methods
-    static void sendAnswer() {
-        const NightSwitch& nightSwitch = NightSwitch::getInstance();
+    static void SendAnswer() {
+        const NightSwitch& night_switch = NightSwitch::GetInstance();
 
-        sendAnswerParameter(ActiveShortName, static_cast<byte>(nightSwitch.getIsActive() ? 1u : 0u));
-        sendAnswerParameter(StartHourShortName, nightSwitch.getStartHour());
-        sendAnswerParameter(StartMinuteShortName, nightSwitch.getStartMinute());
-        sendAnswerParameter(EndHourShortName, nightSwitch.getEndHour());
-        sendAnswerParameter(EndMinuteShortName, nightSwitch.getEndMinute());
+        SendAnswerParameter(kActiveShortName, static_cast<byte>(night_switch.GetIsActive() ? 1u : 0u));
+        SendAnswerParameter(kStartHourShortName, night_switch.GetStartHour());
+        SendAnswerParameter(kStartMinuteShortName, night_switch.GetStartMinute());
+        SendAnswerParameter(kEndHourShortName, night_switch.GetEndHour());
+        SendAnswerParameter(kEndMinuteShortName, night_switch.GetEndMinute());
         /* Last field before the command parser's terminating println(), so no trailing
            separator space. */
-        sendAnswerParameter(BrightnessShortName, nightSwitch.getNightBrightness(), false);
+        SendAnswerParameter(kBrightnessShortName, night_switch.GetNightBrightness(), false);
     }
 
-    void process() const {
-        if(ActiveGiven) { NightSwitch::getInstance().setIsActive(Active); }
+    void Process() const {
+        if(active_given_) { NightSwitch::GetInstance().SetIsActive(active_); }
     }
 };
 

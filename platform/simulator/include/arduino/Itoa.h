@@ -2,32 +2,32 @@
 #define _ARDUINO_ITOA_H_
 
 /* -------------------------------------------------------------------------- */
-/*  itoa                                                                      */
+/*  Itoa                                                                      */
 /* -------------------------------------------------------------------------- */
-/*  The Arduino core provides itoa(); GCC/glibc does not. Minimal             */
+/*  The Arduino core provides Itoa(); GCC/glibc does not. Minimal             */
 /*  reimplementation matching Arduino's signature (value, buffer, base),      */
 /*  including base-10 sign handling.                                          */
 /* -------------------------------------------------------------------------- */
-inline char* itoa(int Value, char* Buffer, int Base)
+inline char* itoa(int value, char* buffer, int base) // NOLINT(readability-identifier-naming)
 {
-    char* p = Buffer;
-    bool Negative = (Base == 10 && Value < 0);
-    unsigned int u = Negative ? (unsigned int)(-Value) : (unsigned int)Value;
+    char* p = buffer;
+    bool negative = (base == 10 && value < 0);
+    unsigned int u = negative ? (unsigned int)(-value) : (unsigned int)value;
 
     char* start = p;
     do {
-        int Digit = u % (unsigned int)Base;
-        *p++ = (Digit < 10) ? char('0' + Digit) : char('a' + Digit - 10);
-        u /= (unsigned int)Base;
+        int digit = u % (unsigned int)base;
+        *p++ = (digit < 10) ? char('0' + digit) : char('a' + digit - 10);
+        u /= (unsigned int)base;
     } while(u);
-    if(Negative) *p++ = '-';
+    if(negative) *p++ = '-';
     *p = '\0';
 
     // reverse in place
     for(char* q = p - 1; start < q; ++start, --q) {
         char t = *start; *start = *q; *q = t;
     }
-    return Buffer;
+    return buffer;
 }
 
 #endif // _ARDUINO_ITOA_H_

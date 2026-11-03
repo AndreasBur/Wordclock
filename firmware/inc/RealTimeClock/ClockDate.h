@@ -49,28 +49,28 @@ class ClockDate
 ******************************************************************************************************************************************************/
   public:
     enum WeekdayType {
-        WEEKDAY_SUNDAY = 0u,
-        WEEKDAY_MONDAY,
-        WEEKDAY_TUESDAY,
-        WEEKDAY_WEDNESDAY,
-        WEEKDAY_THURSDAY,
-        WEEKDAY_FRIDAY,
-        WEEKDAY_SATURDAY,
+        kWeekdaySunday = 0u,
+        kWeekdayMonday,
+        kWeekdayTuesday,
+        kWeekdayWednesday,
+        kWeekdayThursday,
+        kWeekdayFriday,
+        kWeekdaySaturday,
     };
 
     enum MonthEnumType {
-        MONTH_JANUARY = 1u,
-        MONTH_FEBRUARY,
-        MONTH_MARCH,
-        MONTH_APRIL,
-        MONTH_MAY,
-        MONTH_JUNE,
-        MONTH_JULY,
-        MONTH_AUGUST,
-        MONTH_SEPTEMBER,
-        MONTH_OCTOBER,
-        MONTH_NOVEMBER,
-        MONTH_DEZEMBER
+        kMonthJanuary = 1u,
+        kMonthFebruary,
+        kMonthMarch,
+        kMonthApril,
+        kMonthMay,
+        kMonthJune,
+        kMonthJuly,
+        kMonthAugust,
+        kMonthSeptember,
+        kMonthOctober,
+        kMonthNovember,
+        kMonthDezember
     };
 
     using YearType = uint16_t;
@@ -82,20 +82,20 @@ class ClockDate
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    YearType Year{YearMinValue};
-    MonthType Month{MonthMinValue};
-    DayType Day{DayMinValue};
+    YearType year_{kYearMinValue};
+    MonthType month_{kMonthMinValue};
+    DayType day_{kDayMinValue};
 
-    static constexpr YearType YearMinValue{2000u};
-    static constexpr YearType YearMaxValue{2099u};
-    static constexpr MonthType MonthMinValue{1u};
-    static constexpr MonthType MonthMaxValue{12u};
-    static constexpr DayType DayMinValue{1u};
-    static constexpr DayType DayMaxValue{31u};
+    static constexpr YearType kYearMinValue{2000u};
+    static constexpr YearType kYearMaxValue{2099u};
+    static constexpr MonthType kMonthMinValue{1u};
+    static constexpr MonthType kMonthMaxValue{12u};
+    static constexpr DayType kDayMinValue{1u};
+    static constexpr DayType kDayMaxValue{31u};
 
     // functions
-    static constexpr DayType getWeekday(YearType Year, MonthType Month, DayType Day) {
-        return (Day+=Month < 3 ? Year-- : Year-2, 23*Month/9+Day+4+Year/4-Year/100+Year/400)%7;
+    static constexpr DayType GetWeekday(YearType year, MonthType month, DayType day) {
+        return (day+=month < 3 ? year-- : year-2, 23*month/9+day+4+year/4-year/100+year/400)%7;
     }
 
 /******************************************************************************************************************************************************
@@ -103,76 +103,76 @@ class ClockDate
 ******************************************************************************************************************************************************/
   public:
     constexpr ClockDate() { }
-    constexpr ClockDate(YearType sYear, MonthType sMonth, DayType sDay)
+    constexpr ClockDate(YearType year, MonthType month, DayType day)
     {
-        setYear(sYear);
-        setMonth(sMonth);
-        setDay(sDay);
+        SetYear(year);
+        SetMonth(month);
+        SetDay(day);
     }
     ~ClockDate() {}
 
 	// get methods
-    YearType getYear() const { return Year; }
-    MonthType getMonth() const { return Month; }
-    MonthEnumType getMonthEnum() const { return static_cast<MonthEnumType>(Month); }
-    DayType getDay() const { return Day; }
-    WeekdayType getWeekday() const {
-        return static_cast<WeekdayType>(getWeekday(Year, Month, Day));
+    YearType GetYear() const { return year_; }
+    MonthType GetMonth() const { return month_; }
+    MonthEnumType GetMonthEnum() const { return static_cast<MonthEnumType>(month_); }
+    DayType GetDay() const { return day_; }
+    WeekdayType GetWeekday() const {
+        return static_cast<WeekdayType>(GetWeekday(year_, month_, day_));
     }
 
 	// set methods
-    constexpr StdReturnType setYear(YearType sYear)
+    constexpr StdReturnType SetYear(YearType year)
     {
-        if(isYearValid(sYear)) {
-            Year = sYear;
-            return E_OK;
+        if(IsYearValid(year)) {
+            year_ = year;
+            return kEOk;
         } else {
-            return E_NOT_OK;
+            return kENotOk;
         }
     }
-    constexpr StdReturnType setMonth(MonthType sMonth)
+    constexpr StdReturnType SetMonth(MonthType month)
     {
-        if(isMonthValid(sMonth)) {
-            Month = sMonth;
-            return E_OK;
+        if(IsMonthValid(month)) {
+            month_ = month;
+            return kEOk;
         } else {
-            return E_NOT_OK; }
+            return kENotOk; }
     }
-    constexpr StdReturnType setDay(DayType sDay)
+    constexpr StdReturnType SetDay(DayType day)
     {
-        if(isDayValid(sDay)) {
-            Day = sDay;
-            return E_OK;
+        if(IsDayValid(day)) {
+            day_ = day;
+            return kEOk;
         } else {
-            return E_NOT_OK;
+            return kENotOk;
         }
     }
 
 	// methods
-    static constexpr bool isYearValid(YearType Year) { return (Year >= YearMinValue) && (Year <= YearMaxValue); }
-    static constexpr bool isMonthValid(MonthType Month) { return (Month >= MonthMinValue) && (Month <= MonthMaxValue); }
-    static constexpr bool isDayValid(DayType Day) { return (Day >= DayMinValue) && (Day <= DayMaxValue); }
+    static constexpr bool IsYearValid(YearType year) { return (year >= kYearMinValue) && (year <= kYearMaxValue); }
+    static constexpr bool IsMonthValid(MonthType month) { return (month >= kMonthMinValue) && (month <= kMonthMaxValue); }
+    static constexpr bool IsDayValid(DayType day) { return (day >= kDayMinValue) && (day <= kDayMaxValue); }
 
-    static RataDieDayType getRataDieDay(YearType sYear, MonthType sMonth, DayType sDay) {
-        if (sMonth < 3u) { sYear--, sMonth += 12u; }
-        return static_cast<RataDieDayType>(365u)*sYear+sYear/4u-sYear/100u+sYear/400u+(153u*sMonth-457u)/5u+sDay-306u;
+    static RataDieDayType GetRataDieDay(YearType year, MonthType month, DayType day) {
+        if (month < 3u) { year--, month += 12u; }
+        return static_cast<RataDieDayType>(365u)*year+year/4u-year/100u+year/400u+(153u*month-457u)/5u+day-306u;
     }
 
-    RataDieDayType getPassedDays(YearType sYear, MonthType sMonth, DayType sDay) const {
-        const RataDieDayType requestedDay = getRataDieDay(sYear, sMonth, sDay);
-        const RataDieDayType currentDay = getRataDieDay(Year, Month, Day);
-        return requestedDay >= currentDay ? requestedDay - currentDay : currentDay - requestedDay;
+    RataDieDayType GetPassedDays(YearType year, MonthType month, DayType day) const {
+        const RataDieDayType requested_day = GetRataDieDay(year, month, day);
+        const RataDieDayType current_day = GetRataDieDay(year_, month_, day_);
+        return requested_day >= current_day ? requested_day - current_day : current_day - requested_day;
     }
 
-    static DayType getDaysOfMonth(MonthType sMonth, YearType sYear) {
-        switch (sMonth) {
+    static DayType GetDaysOfMonth(MonthType month, YearType year) {
+        switch (month) {
             case 4u:
             case 6u:
             case 9u:
             case 11u:
                 return 30u;
             case 2u:
-                return (sYear % 4u == 0u) ? 29u : 28u;
+                return (year % 4u == 0u) ? 29u : 28u;
             case 1u:
             case 3u:
             case 5u:

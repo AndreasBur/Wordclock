@@ -16,21 +16,21 @@
 
 /* Inline, so every test can include this and still link: one variable, one definition,
    however many translation units. */
-inline int Failures = 0;
+inline int failures = 0;
 
 /* The description first and the verdict in a fixed column, so a run reads as a list of
    what was checked rather than as a list of results. */
-inline void check(bool Ok, const char* What)
+inline void Check(bool ok, const char* what)
 {
-    printf("%-56s %s\n", What, Ok ? "ok" : "FAIL");
-    if(!Ok) { Failures++; }
+    printf("%-56s %s\n", what, ok ? "ok" : "FAIL");
+    if(!ok) { failures++; }
 }
 
 /* What main() ends with: the line a reader looks for, and the exit code run.sh reads. */
-inline int report()
+inline int Report()
 {
-    printf("\n%s\n", (Failures == 0) ? "all checks passed" : "FAILURES");
-    return (Failures == 0) ? 0 : 1;
+    printf("\n%s\n", (failures == 0) ? "all checks passed" : "FAILURES");
+    return (failures == 0) ? 0 : 1;
 }
 
 #endif // _CHECK_H_

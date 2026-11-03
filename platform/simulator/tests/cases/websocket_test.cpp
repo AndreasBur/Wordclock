@@ -16,51 +16,51 @@
 
 namespace {
 
-std::string toSha1Hex(const std::string& Message)
+std::string ToSha1Hex(const std::string& message)
 {
-    uint8_t Digest[WebSocket::Sha1Length];
-    char Hex[3];
-    std::string Text;
+    uint8_t digest[WebSocket::kSha1Length];
+    char hex[3];
+    std::string text;
 
-    WebSocket::calculateSha1(Message, Digest);
-    for(const uint8_t Byte : Digest) {
+    WebSocket::CalculateSha1(message, digest);
+    for(const uint8_t byte : digest) {
         /* Two hex digits always fit the three bytes, so there is no truncation to report. */
-        (void)snprintf(Hex, sizeof(Hex), "%02x", Byte);
-        Text += Hex;
+        (void)snprintf(hex, sizeof(hex), "%02x", byte);
+        text += hex;
     }
-    return Text;
+    return text;
 }
 
-std::string toBase64(const std::string& Text)
+std::string ToBase64(const std::string& text)
 {
-    return WebSocket::convertToBase64(reinterpret_cast<const uint8_t*>(Text.data()), Text.size());
+    return WebSocket::ConvertToBase64(reinterpret_cast<const uint8_t*>(text.data()), text.size());
 }
 
 /* A text frame as a browser sends it: final, masked, and with a mask that is not zeros,
    which would leave a decoder that unmasks wrongly undetected. */
-std::string toClientFrame(const std::string& Payload)
+std::string ToClientFrame(const std::string& payload)
 {
-    const uint8_t Mask[4]{0x12u, 0x34u, 0x56u, 0x78u};
-    std::string Frame;
+    const uint8_t mask[4]{0x12u, 0x34u, 0x56u, 0x78u};
+    std::string frame;
 
-    Frame.push_back(static_cast<char>(0x81));
-    if(Payload.size() < 126u) {
-        Frame.push_back(static_cast<char>(0x80u | Payload.size()));
+    frame.push_back(static_cast<char>(0x81));
+    if(payload.size() < 126u) {
+        frame.push_back(static_cast<char>(0x80u | payload.size()));
     } else {
-        Frame.push_back(static_cast<char>(0x80u | 126u));
-        Frame.push_back(static_cast<char>(Payload.size() >> 8));
-        Frame.push_back(static_cast<char>(Payload.size() & 0xFFu));
+        frame.push_back(static_cast<char>(0x80u | 126u));
+        frame.push_back(static_cast<char>(payload.size() >> 8));
+        frame.push_back(static_cast<char>(payload.size() & 0xFFu));
     }
-    Frame.append(reinterpret_cast<const char*>(Mask), sizeof(Mask));
-    for(size_t Index = 0u; Index < Payload.size(); Index++) {
-        Frame.push_back(static_cast<char>(Payload[Index] ^ Mask[Index % 4u]));
+    frame.append(reinterpret_cast<const char*>(mask), sizeof(mask));
+    for(size_t index = 0u; index < payload.size(); index++) {
+        frame.push_back(static_cast<char>(payload[index] ^ mask[index % 4u]));
     }
-    return Frame;
+    return frame;
 }
 
-std::string toServerFrame(const std::string& Payload)
+std::string ToServerFrame(const std::string& payload)
 {
-    return WebSocket::encodeFrame(false, Payload.data(), Payload.size());
+    return WebSocket::EncodeFrame(false, payload.data(), payload.size());
 }
 
 } // namespace
@@ -68,106 +68,106 @@ std::string toServerFrame(const std::string& Payload)
 /* The examples of FIPS 180-2, appendix A, the last one two blocks long - and the RFC 4648
    examples for base64, one for every length the last group can have. Then the example of
    RFC 6455 section 1.3, which names its answer and so checks both together. */
-void testWebSocketHashAndEncoding()
+void TestWebSocketHashAndEncoding()
 {
-    expect(toSha1Hex("") == "da39a3ee5e6b4b0d3255bfef95601890afd80709", "SHA-1 of the empty message");
-    expect(toSha1Hex("abc") == "a9993e364706816aba3e25717850c26c9cd0d89d", "SHA-1 of a one-block message");
-    expect(toSha1Hex("abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq")
+    Expect(ToSha1Hex("") == "da39a3ee5e6b4b0d3255bfef95601890afd80709", "SHA-1 of the empty message");
+    Expect(ToSha1Hex("abc") == "a9993e364706816aba3e25717850c26c9cd0d89d", "SHA-1 of a one-block message");
+    Expect(ToSha1Hex("abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq")
                == "84983e441c3bd26ebaae4aa1f95129e5e54670f1",
            "SHA-1 of a two-block message");
 
-    expect(toBase64("").empty(), "base64 of nothing is nothing");
-    expect(toBase64("f") == "Zg==", "base64 pads one byte with two '='");
-    expect(toBase64("fo") == "Zm8=", "base64 pads two bytes with one '='");
-    expect(toBase64("foo") == "Zm9v", "base64 of a whole group has no padding");
-    expect(toBase64("foobar") == "Zm9vYmFy", "base64 of two whole groups");
+    Expect(ToBase64("").empty(), "base64 of nothing is nothing");
+    Expect(ToBase64("f") == "Zg==", "base64 pads one byte with two '='");
+    Expect(ToBase64("fo") == "Zm8=", "base64 pads two bytes with one '='");
+    Expect(ToBase64("foo") == "Zm9v", "base64 of a whole group has no padding");
+    Expect(ToBase64("foobar") == "Zm9vYmFy", "base64 of two whole groups");
 
-    expect(WebSocket::convertKeyToAcceptKey("dGhlIHNhbXBsZSBub25jZQ==") == "s3pPLMBiTxaQ9kYGzzhZRbK+xOo=",
+    Expect(WebSocket::ConvertKeyToAcceptKey("dGhlIHNhbXBsZSBub25jZQ==") == "s3pPLMBiTxaQ9kYGzzhZRbK+xOo=",
            "the accept key must match RFC 6455's example");
 }
 
 /* Header names are case-insensitive, and a browser may put more than one space after the
    colon. */
-void testWebSocketHandshake()
+void TestWebSocketHandshake()
 {
-    std::string Answer;
+    std::string answer;
 
-    expect(WebSocket::getHandshakeAnswer("GET /ws HTTP/1.1\r\nSEC-WEBSOCKET-KEY:   dGhlIHNhbXBsZSBub25jZQ==\r\n\r\n",
-                                         Answer) == E_OK,
+    Expect(WebSocket::GetHandshakeAnswer("GET /ws HTTP/1.1\r\nSEC-WEBSOCKET-KEY:   dGhlIHNhbXBsZSBub25jZQ==\r\n\r\n",
+                                         answer) == kEOk,
            "the key must be found in any case");
-    expect(Answer.compare(0u, 13u, "HTTP/1.1 101 ") == 0, "the answer switches protocols");
-    expect(Answer.find("Sec-WebSocket-Accept: s3pPLMBiTxaQ9kYGzzhZRbK+xOo=\r\n") != std::string::npos,
+    Expect(answer.compare(0u, 13u, "HTTP/1.1 101 ") == 0, "the answer switches protocols");
+    Expect(answer.find("Sec-WebSocket-Accept: s3pPLMBiTxaQ9kYGzzhZRbK+xOo=\r\n") != std::string::npos,
            "the answer carries the accept key");
-    expect((Answer.size() >= 4u) && (Answer.substr(Answer.size() - 4u) == "\r\n\r\n"),
+    Expect((answer.size() >= 4u) && (answer.substr(answer.size() - 4u) == "\r\n\r\n"),
            "the answer ends its headers");
 
-    expect(WebSocket::getHandshakeAnswer("GET /ws HTTP/1.1\r\nHost: localhost\r\n\r\n", Answer) == E_NOT_OK,
+    Expect(WebSocket::GetHandshakeAnswer("GET /ws HTTP/1.1\r\nHost: localhost\r\n\r\n", answer) == kENotOk,
            "a request without a key is no handshake");
 }
 
 /* 125 bytes is the longest payload whose length fits in the second byte; a display frame is
    past it and takes the 16-bit length. */
-void testWebSocketEncodesBothLengths()
+void TestWebSocketEncodesBothLengths()
 {
-    const std::string Short = toServerFrame(std::string(125u, 'x'));
-    expect(Short.size() == (2u + 125u), "a short frame has a two-byte header");
-    expect(static_cast<uint8_t>(Short[0]) == 0x81u, "a text frame is final and has the text opcode");
-    expect(static_cast<uint8_t>(Short[1]) == 125u, "and carries its length in the second byte");
+    const std::string short_frame = ToServerFrame(std::string(125u, 'x'));
+    Expect(short_frame.size() == (2u + 125u), "a short frame has a two-byte header");
+    Expect(static_cast<uint8_t>(short_frame[0]) == 0x81u, "a text frame is final and has the text opcode");
+    Expect(static_cast<uint8_t>(short_frame[1]) == 125u, "and carries its length in the second byte");
 
-    const std::string Long = toServerFrame(std::string(330u, 'x'));
-    expect(Long.size() == (4u + 330u), "a long frame has a four-byte header");
-    expect(static_cast<uint8_t>(Long[1]) == 126u, "and says so in the second byte");
-    expect((static_cast<uint8_t>(Long[2]) == (330u >> 8)) && (static_cast<uint8_t>(Long[3]) == (330u & 0xFFu)),
+    const std::string long_frame = ToServerFrame(std::string(330u, 'x'));
+    Expect(long_frame.size() == (4u + 330u), "a long frame has a four-byte header");
+    Expect(static_cast<uint8_t>(long_frame[1]) == 126u, "and says so in the second byte");
+    Expect((static_cast<uint8_t>(long_frame[2]) == (330u >> 8)) && (static_cast<uint8_t>(long_frame[3]) == (330u & 0xFFu)),
            "and carries its length big-endian in the next two");
-    expect(Long.substr(4u) == std::string(330u, 'x'), "the payload follows unmasked");
+    Expect(long_frame.substr(4u) == std::string(330u, 'x'), "the payload follows unmasked");
 
-    const char Bytes[]{'\x01', '\x02'};
-    const std::string Binary = WebSocket::encodeFrame(true, Bytes, sizeof(Bytes));
-    expect(static_cast<uint8_t>(Binary[0]) == 0x82u, "a binary frame has the binary opcode");
+    const char bytes[]{'\x01', '\x02'};
+    const std::string binary = WebSocket::EncodeFrame(true, bytes, sizeof(bytes));
+    Expect(static_cast<uint8_t>(binary[0]) == 0x82u, "a binary frame has the binary opcode");
 }
 
-void testWebSocketDecodesWhatABrowserSends()
+void TestWebSocketDecodesWhatABrowserSends()
 {
-    std::string Payload;
-    uint8_t Opcode{0u};
+    std::string payload;
+    uint8_t opcode{0u};
 
-    std::string Buffer = toClientFrame("2 0");
-    expect(WebSocket::decodeFrame(Buffer, Opcode, Payload) == E_OK, "a whole masked frame decodes");
-    expect(Opcode == WebSocket::TextOpcode, "as text");
-    expect(Payload == "2 0", "and unmasked");
-    expect(Buffer.empty(), "and is taken out of the buffer");
+    std::string buffer = ToClientFrame("2 0");
+    Expect(WebSocket::DecodeFrame(buffer, opcode, payload) == kEOk, "a whole masked frame decodes");
+    Expect(opcode == WebSocket::kTextOpcode, "as text");
+    Expect(payload == "2 0", "and unmasked");
+    Expect(buffer.empty(), "and is taken out of the buffer");
 
-    Buffer = toClientFrame(std::string(200u, 'x'));
-    expect((WebSocket::decodeFrame(Buffer, Opcode, Payload) == E_OK) && (Payload == std::string(200u, 'x')),
+    buffer = ToClientFrame(std::string(200u, 'x'));
+    Expect((WebSocket::DecodeFrame(buffer, opcode, payload) == kEOk) && (payload == std::string(200u, 'x')),
            "a frame with the 16-bit length decodes");
 
     /* A frame may arrive over several reads; until it is whole, nothing is taken from the
        buffer. */
-    const std::string Frame = toClientFrame("hello");
-    Buffer.clear();
-    for(size_t Index = 0u; (Index + 1u) < Frame.size(); Index++) {
-        Buffer.push_back(Frame[Index]);
-        if((WebSocket::decodeFrame(Buffer, Opcode, Payload) != E_NOT_OK) || (Buffer.size() != (Index + 1u))) {
-            expect(false, "a partial frame must stay in the buffer undecoded");
+    const std::string frame = ToClientFrame("hello");
+    buffer.clear();
+    for(size_t index = 0u; (index + 1u) < frame.size(); index++) {
+        buffer.push_back(frame[index]);
+        if((WebSocket::DecodeFrame(buffer, opcode, payload) != kENotOk) || (buffer.size() != (index + 1u))) {
+            Expect(false, "a partial frame must stay in the buffer undecoded");
             break;
         }
     }
-    Buffer.push_back(Frame.back());
-    expect((WebSocket::decodeFrame(Buffer, Opcode, Payload) == E_OK) && (Payload == "hello"),
+    buffer.push_back(frame.back());
+    Expect((WebSocket::DecodeFrame(buffer, opcode, payload) == kEOk) && (payload == "hello"),
            "the last byte completes it");
 
     /* Two frames in one read come out one at a time, in order. */
-    Buffer = toClientFrame("first") + toClientFrame("second");
-    expect((WebSocket::decodeFrame(Buffer, Opcode, Payload) == E_OK) && (Payload == "first"), "the first frame first");
-    expect((WebSocket::decodeFrame(Buffer, Opcode, Payload) == E_OK) && (Payload == "second"), "then the second");
-    expect(WebSocket::decodeFrame(Buffer, Opcode, Payload) == E_NOT_OK, "then nothing");
+    buffer = ToClientFrame("first") + ToClientFrame("second");
+    Expect((WebSocket::DecodeFrame(buffer, opcode, payload) == kEOk) && (payload == "first"), "the first frame first");
+    Expect((WebSocket::DecodeFrame(buffer, opcode, payload) == kEOk) && (payload == "second"), "then the second");
+    Expect(WebSocket::DecodeFrame(buffer, opcode, payload) == kENotOk, "then nothing");
 
     /* Kept, a frame announcing a 64-bit length would block every frame behind it. */
-    Buffer = std::string("\x81\xFF", 2u) + std::string(12u, '\0');
-    expect(WebSocket::decodeFrame(Buffer, Opcode, Payload) == E_NOT_OK, "a 64-bit length is refused");
-    expect(Buffer.empty(), "and dropped");
+    buffer = std::string("\x81\xFF", 2u) + std::string(12u, '\0');
+    Expect(WebSocket::DecodeFrame(buffer, opcode, payload) == kENotOk, "a 64-bit length is refused");
+    Expect(buffer.empty(), "and dropped");
 
-    Buffer = toServerFrame(std::string(330u, 'y'));
-    expect((WebSocket::decodeFrame(Buffer, Opcode, Payload) == E_OK) && (Payload == std::string(330u, 'y')),
+    buffer = ToServerFrame(std::string(330u, 'y'));
+    Expect((WebSocket::DecodeFrame(buffer, opcode, payload) == kEOk) && (payload == std::string(330u, 'y')),
            "what encodeFrame() writes decodes again");
 }

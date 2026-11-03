@@ -49,9 +49,9 @@ class StringTools
 ******************************************************************************************************************************************************/
   public:
     enum ResultType {
-        RESULT_OVERFLOW,
-        RESULT_NO_VALUE,
-        RESULT_OK
+        kResultOverflow,
+        kResultNoValue,
+        kResultOk
     };
       /*
         struct ResultType {
@@ -67,7 +67,7 @@ class StringTools
       */
 
      static constexpr size_t npos = -1;
-     static constexpr char NullCharacter{'\0'};
+     static constexpr char kNullCharacter{'\0'};
      using PositionType = uint8_t;
      using LengthType = uint8_t;
 
@@ -88,99 +88,99 @@ class StringTools
     // set methods
 
     // methods
-    static void stringCopy(char* Destination, const char* Source, int Length) {
-        strncpy(Destination, Source, Length - 1u);
-        Destination[Length - 1u] = NullCharacter;
+    static void StringCopy(char* destination, const char* source, int length) {
+        strncpy(destination, source, length - 1u);
+        destination[length - 1u] = kNullCharacter;
     }
 
-    static char* itoa(int32_t Number, char* String)
+    static char* Itoa(int32_t number, char* string)
     {
         int32_t i;
-        const int32_t sign = Number;   /* record sign */
+        const int32_t sign = number;   /* record sign */
 
         if (sign < 0) {
-            Number = -Number;          /* make n positive */
+            number = -number;          /* make n positive */
         }
         i = 0;
         do {       /* generate digits in reverse order */
-            String[i++] = Number % 10 + '0';   /* get next digit */
-        } while ((Number /= 10) > 0);     /* delete it */
+            string[i++] = number % 10 + '0';   /* get next digit */
+        } while ((number /= 10) > 0);     /* delete it */
         if (sign < 0)
-            String[i++] = '-';
-        String[i] = '\0';
-        stringReverse(String);
-        return &String[i];
+            string[i++] = '-';
+        string[i] = '\0';
+        StringReverse(string);
+        return &string[i];
     }
 
-    static void stringReverse(char* String) {
+    static void StringReverse(char* string) {
         unsigned int i, j;
         char c;
 
-        for (i = 0, j = strlen(String)-1; i<j; i++, j--) {
-            c = String[i];
-            String[i] = String[j];
-            String[j] = c;
+        for (i = 0, j = strlen(string)-1; i<j; i++, j--) {
+            c = string[i];
+            string[i] = string[j];
+            string[j] = c;
         }
     }
 
     template<typename Unsigned,
              std::enable_if_t<std::is_unsigned<Unsigned>::value>* = nullptr,
              std::enable_if_t<std::is_integral<Unsigned>::value>* = nullptr>
-    static ResultType stringTo(const char* String, PositionType& Position, Unsigned& Value, uint8_t Base = 10u) {
+    static ResultType StringTo(const char* string, PositionType& position, Unsigned& value, uint8_t base = 10u) {
         char* end = nullptr;
         errno = 0;
-        uint64_t valueBig = strtoul(String, &end, Base);
-        Position = end - String;
+        uint64_t value_big = strtoul(string, &end, base);
+        position = end - string;
 
-        if(String == end) {
-            return RESULT_NO_VALUE;
-        } else if(errno == ERANGE || valueBig > std::numeric_limits<Unsigned>::max()) {
-            Value = std::numeric_limits<Unsigned>::max();
-            return RESULT_OVERFLOW;
+        if(string == end) {
+            return kResultNoValue;
+        } else if(errno == ERANGE || value_big > std::numeric_limits<Unsigned>::max()) {
+            value = std::numeric_limits<Unsigned>::max();
+            return kResultOverflow;
         } else {
-            Value = static_cast<Unsigned>(valueBig);
-            return RESULT_OK;
+            value = static_cast<Unsigned>(value_big);
+            return kResultOk;
         }
     }
 
     template<typename Signed,
              std::enable_if_t<std::is_signed<Signed>::value>* = nullptr,
              std::enable_if_t<std::is_integral<Signed>::value>* = nullptr>
-    static ResultType stringTo(const char* String, PositionType& Position, Signed& Value, uint8_t Base = 10u) {
+    static ResultType StringTo(const char* string, PositionType& position, Signed& value, uint8_t base = 10u) {
         char* end = nullptr;
         errno = 0;
-        int64_t valueBig = strtol(String, &end, Base);
-        Position = end - String;
+        int64_t value_big = strtol(string, &end, base);
+        position = end - string;
 
-        if(String == end) {
-            return RESULT_NO_VALUE;
+        if(string == end) {
+            return kResultNoValue;
         } else if(errno == ERANGE) {
-            if(valueBig > std::numeric_limits<Signed>::max()) { Value = std::numeric_limits<Signed>::max(); }
-            if(valueBig < std::numeric_limits<Signed>::min()) { Value = std::numeric_limits<Signed>::min(); }
-            return RESULT_OVERFLOW;
+            if(value_big > std::numeric_limits<Signed>::max()) { value = std::numeric_limits<Signed>::max(); }
+            if(value_big < std::numeric_limits<Signed>::min()) { value = std::numeric_limits<Signed>::min(); }
+            return kResultOverflow;
         } else {
-            Value = static_cast<Signed>(valueBig);
-            return RESULT_OK;
+            value = static_cast<Signed>(value_big);
+            return kResultOk;
         }
     }
 
     template<typename Float,
              std::enable_if_t<std::is_floating_point<Float>::value>* = nullptr>
-    static ResultType stringTo(const char* String, PositionType& Position, Float& Value, uint8_t = 10u) {
+    static ResultType StringTo(const char* string, PositionType& position, Float& value, uint8_t = 10u) {
         char* end = nullptr;
         errno = 0;
-        double valueBig = strtod(String, &end);
-        Position = end - String;
+        double value_big = strtod(string, &end);
+        position = end - string;
 
-        if(String == end) {
-            return RESULT_NO_VALUE;
+        if(string == end) {
+            return kResultNoValue;
         } else if(errno == ERANGE) {
-            if(valueBig > std::numeric_limits<Float>::max()) { Value = std::numeric_limits<Float>::max(); }
-            if(valueBig < std::numeric_limits<Float>::min()) { Value = std::numeric_limits<Float>::min(); }
-            return RESULT_OVERFLOW;
+            if(value_big > std::numeric_limits<Float>::max()) { value = std::numeric_limits<Float>::max(); }
+            if(value_big < std::numeric_limits<Float>::min()) { value = std::numeric_limits<Float>::min(); }
+            return kResultOverflow;
         } else {
-            Value = static_cast<Float>(valueBig);
-            return RESULT_OK;
+            value = static_cast<Float>(value_big);
+            return kResultOk;
         }
     }
 

@@ -43,7 +43,7 @@
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  read()
+  Read()
 ******************************************************************************************************************************************************/
 /*! \brief          hands the firmware the next character that was typed
  *  \details        Takes it off the front, the way a real port does, so a line arrives
@@ -53,21 +53,21 @@
 ******************************************************************************************************************************************************/
 char SerialShim::read()
 {
-    char FirstChar{' '};
+    char first_char{' '};
 
-    if(!SendBuffer.IsEmpty()) {
+    if(!send_buffer_.IsEmpty()) {
         /* The firmware's port is a byte wide, and what is typed into the console is
            ASCII; the cast says that rather than leaving it to the conversion. */
-        FirstChar = static_cast<char>(SendBuffer.at(0).GetValue());
-        SendBuffer.Remove(0, 1);
+        first_char = static_cast<char>(send_buffer_.at(0).GetValue());
+        send_buffer_.Remove(0, 1);
     }
 
-    return FirstChar;
-} /* read */
+    return first_char;
+} /* Read */
 
 
 /******************************************************************************************************************************************************
-  sendInput()
+  SendInput()
 ******************************************************************************************************************************************************/
 /*! \brief          hands the line in the input field over to be read
  *  \details        Only while nothing is waiting: read() drains a line one character at a
@@ -75,14 +75,14 @@ char SerialShim::read()
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-void SerialShim::sendInput()
+void SerialShim::SendInput()
 {
-    if(!isAttached()) { return; }
+    if(!IsAttached()) { return; }
 
-    if(SendBuffer.IsEmpty()) {
-        SendBuffer = Input->GetValue() + _T("\n");
+    if(send_buffer_.IsEmpty()) {
+        send_buffer_ = input_->GetValue() + _T("\n");
     }
-} /* sendInput */
+} /* SendInput */
 
 
 /******************************************************************************************************************************************************
@@ -90,19 +90,19 @@ void SerialShim::sendInput()
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  appendOutput()
+  AppendOutput()
 ******************************************************************************************************************************************************/
-void SerialShim::appendOutput(const wxString& Text)
+void SerialShim::AppendOutput(const wxString& text)
 {
-    if(!isAttached()) { return; }
+    if(!IsAttached()) { return; }
 
-    Output->AppendText(Text);
-    OutputLine += Text;
-} /* appendOutput */
+    output_->AppendText(text);
+    output_line_ += text;
+} /* AppendOutput */
 
 
 /******************************************************************************************************************************************************
-  finishOutputLine()
+  FinishOutputLine()
 ******************************************************************************************************************************************************/
 /*! \brief          closes the line the firmware has been printing and reads it back
  *  \details        An answer gets its readable form underneath, indented to show it
@@ -113,23 +113,23 @@ void SerialShim::appendOutput(const wxString& Text)
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-void SerialShim::finishOutputLine()
+void SerialShim::FinishOutputLine()
 {
     /* The browsers first, and outside the attached check: they are watching whether or not a
        window has handed its controls over, and an answer that reached one front end and not
        the other is the confusing half. */
-    if(LineSink != nullptr) { LineSink(OutputLine.utf8_str()); }
+    if(line_sink_ != nullptr) { line_sink_(output_line_.utf8_str()); }
 
-    if(isAttached()) {
-        Output->AppendText(_T("\n"));
-        Output->AppendText(MessageDecoder::describe(OutputLine));
+    if(IsAttached()) {
+        output_->AppendText(_T("\n"));
+        output_->AppendText(MessageDecoder::Describe(output_line_));
     }
 
     /* Cleared whether or not anything displayed it. It used to be cleared only on the way
        past the controls, so a run with none would have grown one line for the length of it -
        harmless while nothing else read the line, and not once a socket does. */
-    OutputLine.Clear();
-} /* finishOutputLine */
+    output_line_.Clear();
+} /* FinishOutputLine */
 
 
 /******************************************************************************************************************************************************

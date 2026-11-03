@@ -45,51 +45,51 @@
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  init()
+  Init()
 ******************************************************************************************************************************************************/
-void AnimationSnake::init()
+void AnimationSnake::Init()
 {
-    Animation::init(STATE_IDLE);
-    reset();
-} /* init */
+    Animation::Init(kStateIdle);
+    Reset();
+} /* Init */
 
 
 /******************************************************************************************************************************************************
-  setTime()
+  SetTime()
 ******************************************************************************************************************************************************/
-StdReturnType AnimationSnake::setTime(byte Hour, byte Minute)
+StdReturnType AnimationSnake::SetTime(byte hour, byte minute)
 {
-    StdReturnType returnValue{E_NOT_OK};
+    StdReturnType return_value{kENotOk};
 
-    if(Clock::getInstance().getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
-        returnValue = E_OK;
-        SnakeBeginIndex = 0u;
-        SnakeEndIndex = 0u;
-        State = STATE_SET_TIME;
+    if(Clock::GetInstance().GetClockWords(hour, minute, clock_words_table_) == kEOk && state_ == kStateIdle) {
+        return_value = kEOk;
+        snake_begin_index_ = 0u;
+        snake_end_index_ = 0u;
+        state_ = kStateSetTime;
     }
-    return returnValue;
-} /* setTime */
+    return return_value;
+} /* SetTime */
 
 
 /******************************************************************************************************************************************************
-  task()
+  Task()
 ******************************************************************************************************************************************************/
-void AnimationSnake::task()
+void AnimationSnake::Task()
 {
-    if(State == STATE_SET_TIME) {
-        byte snakeEndIndexTrans = transformToSerpentine(SnakeEndIndex);
-        Display::getInstance().setPixel(transformToSerpentine(SnakeBeginIndex));
+    if(state_ == kStateSetTime) {
+        byte snake_end_index_trans = TransformToSerpentine(snake_end_index_);
+        Display::GetInstance().SetPixel(TransformToSerpentine(snake_begin_index_));
 
-        if((SnakeBeginIndex - SnakeEndIndex) == ANIMATION_SNAKE_LENGTH ||
-           (SnakeBeginIndex >= DISPLAY_NUMBER_OF_LEDS - 1u && SnakeEndIndex < DISPLAY_NUMBER_OF_LEDS))
+        if((snake_begin_index_ - snake_end_index_) == ANIMATION_SNAKE_LENGTH ||
+           (snake_begin_index_ >= DISPLAY_NUMBER_OF_LEDS - 1u && snake_end_index_ < DISPLAY_NUMBER_OF_LEDS))
         {
-            if(isPixelPartOfClockWords(ClockWordsTable, snakeEndIndexTrans) == false) Display::getInstance().clearPixel(snakeEndIndexTrans);
-            SnakeEndIndex++;
+            if(IsPixelPartOfClockWords(clock_words_table_, snake_end_index_trans) == false) Display::GetInstance().ClearPixel(snake_end_index_trans);
+            snake_end_index_++;
         }
-        if(SnakeBeginIndex < DISPLAY_NUMBER_OF_LEDS - 1u) SnakeBeginIndex++;
-        if(SnakeEndIndex >= DISPLAY_NUMBER_OF_LEDS) finishWithClockWords(ClockWordsTable);
+        if(snake_begin_index_ < DISPLAY_NUMBER_OF_LEDS - 1u) snake_begin_index_++;
+        if(snake_end_index_ >= DISPLAY_NUMBER_OF_LEDS) FinishWithClockWords(clock_words_table_);
     }
-} /* task */
+} /* Task */
 
 
 /******************************************************************************************************************************************************
@@ -97,40 +97,40 @@ void AnimationSnake::task()
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  reset()
+  Reset()
 ******************************************************************************************************************************************************/
-void AnimationSnake::reset()
+void AnimationSnake::Reset()
 {
-    SnakeBeginIndex = 0u;
-    SnakeEndIndex = 0u;
-    SnakeState = SNAKE_STATE_TO_RIGHT;
-} /* reset */
+    snake_begin_index_ = 0u;
+    snake_end_index_ = 0u;
+    snake_state_ = kSnakeStateToRight;
+} /* Reset */
 
 
 /******************************************************************************************************************************************************
-  transformToSerpentine()
+  TransformToSerpentine()
 ******************************************************************************************************************************************************/
-byte AnimationSnake::transformToSerpentine(byte Column, byte Row)
+byte AnimationSnake::TransformToSerpentine(byte column, byte row)
 {
     byte index;
 
-    if(IS_BIT_CLEARED(Row, 0u)) index = (Row * DISPLAY_NUMBER_OF_COLUMNS) + Column;
-    else index = (Row * DISPLAY_NUMBER_OF_COLUMNS) + (DISPLAY_NUMBER_OF_COLUMNS - Column - 1u);
+    if(IS_BIT_CLEARED(row, 0u)) index = (row * DISPLAY_NUMBER_OF_COLUMNS) + column;
+    else index = (row * DISPLAY_NUMBER_OF_COLUMNS) + (DISPLAY_NUMBER_OF_COLUMNS - column - 1u);
 
     return index;
-} /* transformToSerpentine */
+} /* TransformToSerpentine */
 
 
 /******************************************************************************************************************************************************
-  transformToSerpentine()
+  TransformToSerpentine()
 ******************************************************************************************************************************************************/
-byte AnimationSnake::transformToSerpentine(byte Index)
+byte AnimationSnake::TransformToSerpentine(byte index)
 {
-    byte column = Display::getInstance().indexToColumn(Index);
-    byte row = Display::getInstance().indexToRow(Index);
+    byte column = Display::GetInstance().IndexToColumn(index);
+    byte row = Display::GetInstance().IndexToRow(index);
 
-    return transformToSerpentine(column, row);
-} /* transformToSerpentine */
+    return TransformToSerpentine(column, row);
+} /* TransformToSerpentine */
 
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E

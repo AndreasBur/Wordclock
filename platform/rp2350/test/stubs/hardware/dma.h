@@ -1,5 +1,7 @@
 #ifndef _HARDWARE_DMA_H_
 #define _HARDWARE_DMA_H_
+/* Under the framework's names, because it stands in for the framework's header. */
+// NOLINTBEGIN(readability-identifier-naming)
 #include <stdint.h>
 #include <stddef.h>
 #include "pio.h"
@@ -13,4 +15,5 @@ void channel_config_set_write_increment(dma_channel_config*, bool);
 void channel_config_set_dreq(dma_channel_config*, uint);
 void dma_channel_configure(uint, const dma_channel_config*, volatile void*, const void*, uint, bool);
 bool dma_channel_is_busy(uint);
+// NOLINTEND(readability-identifier-naming)
 #endif

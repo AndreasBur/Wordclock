@@ -1,5 +1,7 @@
 #ifndef _ESP_ASYNC_WEB_SERVER_H_
 #define _ESP_ASYNC_WEB_SERVER_H_
+/* Under the framework's names, because it stands in for the framework's header. */
+// NOLINTBEGIN(readability-identifier-naming)
 #include <stdint.h>
 #include <stddef.h>
 #include <functional>
@@ -127,4 +129,5 @@ class AsyncWebServer {
     void addHandler(AsyncWebSocket*) { }
     void begin() { webStubState().Listening = true; }
 };
+// NOLINTEND(readability-identifier-naming)
 #endif

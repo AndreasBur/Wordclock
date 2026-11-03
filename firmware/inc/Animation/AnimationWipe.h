@@ -50,25 +50,25 @@ class AnimationWipe : public Animation
 ******************************************************************************************************************************************************/
   public:
     enum SetPixelStateType {
-        SET_PIXEL_STATE_RIGHT,
-        SET_PIXEL_STATE_DOWN
+        kSetPixelStateRight,
+        kSetPixelStateDown
     };
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    ClockWords::WordsListType ClockWordsTable{{DisplayWords::WORD_NONE}};
-    byte Index{0u};
-    SetPixelStateType SetPixelState{SET_PIXEL_STATE_DOWN};
+    ClockWords::WordsListType clock_words_table_{{DisplayWords::kWordNone}};
+    byte index_{0u};
+    SetPixelStateType set_pixel_state_{kSetPixelStateDown};
 
     // functions
-    void reset();
-    void clearTimeTask();
-    void setTimeTask();
-    StdReturnType setNextIndex();
-    static void setPixelDown(byte, byte);
-    static void setPixelRight(byte, byte);
+    void Reset();
+    void ClearTimeTask();
+    void SetTimeTask();
+    StdReturnType SetNextIndex();
+    static void SetPixelDown(byte, byte);
+    static void SetPixelRight(byte, byte);
 
 
 /******************************************************************************************************************************************************
@@ -85,9 +85,9 @@ class AnimationWipe : public Animation
 
 
     // methods
-    void init();
-    StdReturnType setTime(byte, byte);
-    void task();
+    void Init();
+    StdReturnType SetTime(byte, byte);
+    void Task();
 };
 
 

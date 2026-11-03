@@ -45,43 +45,43 @@
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  init()
+  Init()
 ******************************************************************************************************************************************************/
-void AnimationCollapse::init()
+void AnimationCollapse::Init()
 {
-    Animation::init(STATE_IDLE);
+    Animation::Init(kStateIdle);
     /* all animations share one union, so nothing may rely on member initializers */
-    reset();
-} /* init */
+    Reset();
+} /* Init */
 
 
 /******************************************************************************************************************************************************
-  setTime()
+  SetTime()
 ******************************************************************************************************************************************************/
-StdReturnType AnimationCollapse::setTime(byte Hour, byte Minute)
+StdReturnType AnimationCollapse::SetTime(byte hour, byte minute)
 {
-    StdReturnType returnValue{E_NOT_OK};
+    StdReturnType return_value{kENotOk};
 
-    if(Clock::getInstance().getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
-        Step = 0u;
-        Direction = static_cast<DirectionType>(selectByTime(Hour, Minute, DIRECTION_NUMBER_OF_DIRECTIONS));
+    if(Clock::GetInstance().GetClockWords(hour, minute, clock_words_table_) == kEOk && state_ == kStateIdle) {
+        step_ = 0u;
+        direction_ = static_cast<DirectionType>(SelectByTime(hour, minute, kDirectionNumberOfDirections));
         /* the previous time is on the display and is what collapses first. An empty
            display simply finishes that phase on its first task. */
-        State = STATE_CLEAR_TIME;
-        returnValue = E_OK;
+        state_ = kStateClearTime;
+        return_value = kEOk;
     }
-    return returnValue;
-} /* setTime */
+    return return_value;
+} /* SetTime */
 
 
 /******************************************************************************************************************************************************
-  task()
+  Task()
 ******************************************************************************************************************************************************/
-void AnimationCollapse::task()
+void AnimationCollapse::Task()
 {
-    if(State == STATE_CLEAR_TIME) { clearTimeTask(); }
-    else if(State == STATE_SET_TIME) { setTimeTask(); }
-} /* task */
+    if(state_ == kStateClearTime) { ClearTimeTask(); }
+    else if(state_ == kStateSetTime) { SetTimeTask(); }
+} /* Task */
 
 
 /******************************************************************************************************************************************************
@@ -89,175 +89,175 @@ void AnimationCollapse::task()
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  reset()
+  Reset()
 ******************************************************************************************************************************************************/
-void AnimationCollapse::reset()
+void AnimationCollapse::Reset()
 {
-    ClockWordsTable.fill(DisplayWords::WORD_NONE);
-    Step = 0u;
-    ExpandSteps = 1u;
-    Direction = DIRECTION_TO_LEFT;
-} /* reset */
+    clock_words_table_.fill(DisplayWords::kWordNone);
+    step_ = 0u;
+    expand_steps_ = 1u;
+    direction_ = kDirectionToLeft;
+} /* Reset */
 
 
 /******************************************************************************************************************************************************
-  clearTimeTask()
+  ClearTimeTask()
 ******************************************************************************************************************************************************/
-void AnimationCollapse::clearTimeTask()
+void AnimationCollapse::ClearTimeTask()
 {
     bool moved{false};
 
     for(byte row = 0u; row < DISPLAY_NUMBER_OF_ROWS; row++) {
-        if(collapseRow(row)) { moved = true; }
+        if(CollapseRow(row)) { moved = true; }
     }
 
     /* nothing moved any more, so every row is a solid block at the left edge */
     if(!moved) {
-        Step = 0u;
-        ExpandSteps = calcExpandSteps();
-        State = STATE_SET_TIME;
+        step_ = 0u;
+        expand_steps_ = CalcExpandSteps();
+        state_ = kStateSetTime;
     }
-} /* clearTimeTask */
+} /* ClearTimeTask */
 
 
 /******************************************************************************************************************************************************
-  collapseRow()
+  CollapseRow()
 ******************************************************************************************************************************************************/
-bool AnimationCollapse::collapseRow(byte Row)
+bool AnimationCollapse::CollapseRow(byte row)
 {
     bool moved{false};
 
     /* Scanned towards the target edge on purpose: a pixel that just moved frees the
        place for the next one behind it, so a whole word slides by one column per frame
        instead of collapsing into a single pixel. */
-    if(Direction == DIRECTION_TO_LEFT) {
+    if(direction_ == kDirectionToLeft) {
         for(byte column = 1u; column < DISPLAY_NUMBER_OF_COLUMNS; column++) {
-            if(Display::getInstance().getPixel(column, Row) &&
-               !Display::getInstance().getPixel(column - 1u, Row))
+            if(Display::GetInstance().GetPixel(column, row) &&
+               !Display::GetInstance().GetPixel(column - 1u, row))
             {
-                Display::getInstance().clearPixel(column, Row);
-                Display::getInstance().setPixel(column - 1u, Row);
+                Display::GetInstance().ClearPixel(column, row);
+                Display::GetInstance().SetPixel(column - 1u, row);
                 moved = true;
             }
         }
     } else {
         for(int8_t column = DISPLAY_NUMBER_OF_COLUMNS - 2; column >= 0; column--) {
-            if(Display::getInstance().getPixel(static_cast<byte>(column), Row) &&
-               !Display::getInstance().getPixel(static_cast<byte>(column + 1), Row))
+            if(Display::GetInstance().GetPixel(static_cast<byte>(column), row) &&
+               !Display::GetInstance().GetPixel(static_cast<byte>(column + 1), row))
             {
-                Display::getInstance().clearPixel(static_cast<byte>(column), Row);
-                Display::getInstance().setPixel(static_cast<byte>(column + 1), Row);
+                Display::GetInstance().ClearPixel(static_cast<byte>(column), row);
+                Display::GetInstance().SetPixel(static_cast<byte>(column + 1), row);
                 moved = true;
             }
         }
     }
 
     return moved;
-} /* collapseRow */
+} /* CollapseRow */
 
 
 /******************************************************************************************************************************************************
-  setTimeTask()
+  SetTimeTask()
 ******************************************************************************************************************************************************/
-void AnimationCollapse::setTimeTask()
+void AnimationCollapse::SetTimeTask()
 {
-    Display::getInstance().clear();
+    Display::GetInstance().Clear();
 
     for(byte row = 0u; row < DISPLAY_NUMBER_OF_ROWS; row++) {
-        const byte lettersOfRow = countLettersOfRow(row);
-        byte letterIndex{0u};
+        const byte letters_of_row = CountLettersOfRow(row);
+        byte letter_index{0u};
 
         for(byte column = 0u; column < DISPLAY_NUMBER_OF_COLUMNS; column++) {
-            if(isPixelPartOfClockWords(ClockWordsTable, column, row)) {
-                Display::getInstance().setPixel(calcColumn(column, calcBlockColumn(letterIndex, lettersOfRow)), row);
-                letterIndex++;
+            if(IsPixelPartOfClockWords(clock_words_table_, column, row)) {
+                Display::GetInstance().SetPixel(CalcColumn(column, CalcBlockColumn(letter_index, letters_of_row)), row);
+                letter_index++;
             }
         }
     }
 
     /* the last step draws the letters exactly in place, only then it is done */
-    if(Step < ExpandSteps) { Step++; }
+    if(step_ < expand_steps_) { step_++; }
     else {
-        finishWithClockWords(ClockWordsTable);
-        reset();
+        FinishWithClockWords(clock_words_table_);
+        Reset();
     }
-} /* setTimeTask */
+} /* SetTimeTask */
 
 
 /******************************************************************************************************************************************************
-  calcColumn()
+  CalcColumn()
 ******************************************************************************************************************************************************/
-byte AnimationCollapse::calcColumn(byte FinalColumn, byte BlockColumn) const
+byte AnimationCollapse::CalcColumn(byte final_column, byte block_column) const
 {
     /* Interpolates between the position in the block and the final one, which needs no
        memory of where a letter currently is. Split by direction to stay unsigned: the
        block is left of the final position in one and right of it in the other. */
-    const byte remainingSteps = ExpandSteps - Step;
+    const byte remaining_steps = expand_steps_ - step_;
 
-    if(BlockColumn > FinalColumn) {
-        return static_cast<byte>(FinalColumn + (((BlockColumn - FinalColumn) * remainingSteps) / ExpandSteps));
+    if(block_column > final_column) {
+        return static_cast<byte>(final_column + (((block_column - final_column) * remaining_steps) / expand_steps_));
     }
 
-    return static_cast<byte>(FinalColumn - (((FinalColumn - BlockColumn) * remainingSteps) / ExpandSteps));
-} /* calcColumn */
+    return static_cast<byte>(final_column - (((final_column - block_column) * remaining_steps) / expand_steps_));
+} /* CalcColumn */
 
 
 /******************************************************************************************************************************************************
-  calcBlockColumn()
+  CalcBlockColumn()
 ******************************************************************************************************************************************************/
-byte AnimationCollapse::calcBlockColumn(byte LetterIndex, byte LettersOfRow) const
+byte AnimationCollapse::CalcBlockColumn(byte letter_index, byte letters_of_row) const
 {
     /* Where a letter sits while the row is one solid block. Counting the letters of the
        row up front keeps this a plain calculation, so both directions come out of one
        ascending loop instead of two mirrored ones. */
-    if(Direction == DIRECTION_TO_LEFT) { return LetterIndex; }
+    if(direction_ == kDirectionToLeft) { return letter_index; }
 
-    return static_cast<byte>(DISPLAY_NUMBER_OF_COLUMNS - LettersOfRow + LetterIndex);
-} /* calcBlockColumn */
+    return static_cast<byte>(DISPLAY_NUMBER_OF_COLUMNS - letters_of_row + letter_index);
+} /* CalcBlockColumn */
 
 
 /******************************************************************************************************************************************************
-  countLettersOfRow()
+  CountLettersOfRow()
 ******************************************************************************************************************************************************/
-byte AnimationCollapse::countLettersOfRow(byte Row) const
+byte AnimationCollapse::CountLettersOfRow(byte row) const
 {
     byte letters{0u};
 
     for(byte column = 0u; column < DISPLAY_NUMBER_OF_COLUMNS; column++) {
-        if(isPixelPartOfClockWords(ClockWordsTable, column, Row)) { letters++; }
+        if(IsPixelPartOfClockWords(clock_words_table_, column, row)) { letters++; }
     }
 
     return letters;
-} /* countLettersOfRow */
+} /* CountLettersOfRow */
 
 
 /******************************************************************************************************************************************************
-  calcExpandSteps()
+  CalcExpandSteps()
 ******************************************************************************************************************************************************/
-byte AnimationCollapse::calcExpandSteps() const
+byte AnimationCollapse::CalcExpandSteps() const
 {
-    byte longestWay{0u};
+    byte longest_way{0u};
 
     for(byte row = 0u; row < DISPLAY_NUMBER_OF_ROWS; row++) {
-        const byte lettersOfRow = countLettersOfRow(row);
-        byte letterIndex{0u};
+        const byte letters_of_row = CountLettersOfRow(row);
+        byte letter_index{0u};
 
         for(byte column = 0u; column < DISPLAY_NUMBER_OF_COLUMNS; column++) {
-            if(isPixelPartOfClockWords(ClockWordsTable, column, row)) {
-                const byte blockColumn = calcBlockColumn(letterIndex, lettersOfRow);
-                const byte way = (blockColumn > column) ? (blockColumn - column) : (column - blockColumn);
-                if(way > longestWay) { longestWay = way; }
-                letterIndex++;
+            if(IsPixelPartOfClockWords(clock_words_table_, column, row)) {
+                const byte block_column = CalcBlockColumn(letter_index, letters_of_row);
+                const byte way = (block_column > column) ? (block_column - column) : (column - block_column);
+                if(way > longest_way) { longest_way = way; }
+                letter_index++;
             }
         }
     }
 
-    /* never zero: calcColumn() divides by it, and a picture that needs no movement at
+    /* never zero: CalcColumn() divides by it, and a picture that needs no movement at
        all is then drawn once and done */
-    if(longestWay == 0u) { return 1u; }
+    if(longest_way == 0u) { return 1u; }
 
-    return longestWay;
-} /* calcExpandSteps */
+    return longest_way;
+} /* CalcExpandSteps */
 
 
 /******************************************************************************************************************************************************

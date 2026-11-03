@@ -15,7 +15,7 @@
 
 #include "arduino/Progmem.h"    // PROGMEM, F, pgm_read_byte, memcpy_P
 #include "arduino/Bits.h"       // bitRead
-#include "arduino/Itoa.h"       // itoa()
+#include "arduino/Itoa.h"       // Itoa()
 
 /* -------------------------------------------------------------------------- */
 /*  Serial → simulator window                                                 */
@@ -25,6 +25,6 @@
 /*  sub-header because it is specific to this simulator, not to the Arduino   */
 /*  API.                                                                      */
 /* -------------------------------------------------------------------------- */
-#define Serial                  SerialShim::getInstance()
+#define Serial                  SerialShim::GetInstance() // NOLINT(readability-identifier-naming)
 
 #endif // _ARDUINO_H_

@@ -38,14 +38,14 @@ are about particular classes and not about the check:
 
 - The wxWidgets event handlers in `platform/simulator/src/PixelsFrame.cpp` stay non-static
   because the event tables require member-function pointers.
-- The interface the firmware core calls through `getInstance()` - `Storage`, `System`,
+- The interface the firmware core calls through `GetInstance()` - `Storage`, `System`,
   `Pixels`, the web interface, the clock chip - stays made of instance methods in every
   backend, although many implementations read no member. Whether one backend needs its
   members for a call is that backend's detail; answering the check would carry it into the
   interface. The simulator's stand-ins keep the same shape for the same reason. Private
   helpers are not covered by this: one that reads no member is `static` - except the AVR's
   `SerialPort::write`, which cost 72 bytes of flash as one.
-- Methods that drive hardware - `Twi::write`, `WS2812::send`, `performPendingRestart()` and
+- Methods that drive hardware - `Twi::write`, `WS2812::send`, `PerformPendingRestart()` and
   their kind - stay non-const. Nothing in them writes a member, but a const would say they
   change nothing.
 - The STL headers in `platform/avr-dx/include/stl/` are the standard library on a
@@ -62,8 +62,8 @@ write to one.
 
 ## Read and not acted on
 
-- `optionShortName` in `MsgParameterParser::parse` is assigned in `STATE_OPTION_CHAR`
-  before the parser enters `STATE_OPTION_ARGUMENT`.
+- `option_short_name` in `MsgParameterParser::parse` is assigned in `kStateOptionChar`
+  before the parser enters `kStateOptionArgument`.
 - `words == words` in `clock_test.cpp` deliberately tests reflexivity of the overloaded
   equality operator.
 - Ignoring a return value does not make a call side-effect free. Transformation and clock

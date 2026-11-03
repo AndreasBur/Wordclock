@@ -53,9 +53,9 @@ template <typename Derived> class Overlay
 ******************************************************************************************************************************************************/
   public:
     enum StateType {
-        STATE_DISABLED,
-        STATE_IDLE,
-        STATE_SHOW
+        kStateDisabled,
+        kStateIdle,
+        kStateShow
     };
 
     using YearType = ClockDate::YearType;
@@ -70,7 +70,7 @@ template <typename Derived> class Overlay
  *  P R O T E C T E D   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   protected:
-    StateType State{STATE_DISABLED};
+    StateType state_{kStateDisabled};
 
     // functions
     /* Protected rather than private with the derived class as a friend, which is what
@@ -90,104 +90,104 @@ template <typename Derived> class Overlay
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    static constexpr SecondType SecondToStartShow{30u};
+    static constexpr SecondType kSecondToStartShow{30u};
 
-    /* Named rather than written twice, so the initialisers below and resetToDefaults()
+    /* Named rather than written twice, so the initialisers below and ResetToDefaults()
        cannot fall apart - a reset that put different values in than a clock starts with
        would be a second set of defaults to keep in step. */
-    static constexpr MinuteType PeriodInMinutesInitValue{1u};
-    static constexpr SecondType EnduranceInSecondsInitValue{1u};
-    static constexpr MonthType MonthInitValue{0u};
-    static constexpr DayType DayInitValue{0u};
-    static constexpr DayType ValidInDaysInitValue{0u};
-    static constexpr byte SpeedInitValue{1u};
-    static constexpr FontType FontInitValue{Text::FONT_10X10};
+    static constexpr MinuteType kPeriodInMinutesInitValue{1u};
+    static constexpr SecondType kEnduranceInSecondsInitValue{1u};
+    static constexpr MonthType kMonthInitValue{0u};
+    static constexpr DayType kDayInitValue{0u};
+    static constexpr DayType kValidInDaysInitValue{0u};
+    static constexpr byte kSpeedInitValue{1u};
+    static constexpr FontType kFontInitValue{Text::kFont10x10};
 
-    MinuteType PeriodInMinutes{PeriodInMinutesInitValue};
-    SecondType EnduranceInSeconds{EnduranceInSecondsInitValue};
-    MonthType Month{MonthInitValue};
-    DayType Day{DayInitValue};
-    DayType ValidInDays{ValidInDaysInitValue};
-    byte Speed{SpeedInitValue};
-    FontType Font{FontInitValue};
+    MinuteType period_in_minutes_{kPeriodInMinutesInitValue};
+    SecondType endurance_in_seconds_{kEnduranceInSecondsInitValue};
+    MonthType month_{kMonthInitValue};
+    DayType day_{kDayInitValue};
+    DayType valid_in_days_{kValidInDaysInitValue};
+    byte speed_{kSpeedInitValue};
+    FontType font_{kFontInitValue};
 
     // functions
-    Derived& underlying() { return static_cast<Derived&>(*this); }
-    Derived const& underlying() const { return static_cast<Derived const&>(*this); }
+    Derived& Underlying() { return static_cast<Derived&>(*this); }
+    Derived const& Underlying() const { return static_cast<Derived const&>(*this); }
 
-    static bool isPeriodValid(MinuteType Period) { return Period > 0u; }
-    static bool isEnduranceValid(SecondType Endurance) { return Endurance > 0u; }
-    bool isDateSet() const { return (Month != 0u) || (Day != 0u); }
-    bool isDayAndMonthSet() const { return isDaySet() && isMonthSet(); }
-    bool isMonthMatching(MonthType CurrentMonth) const { return CurrentMonth == Month; }
-    bool isDayMatching(DayType CurrentDay) const { return CurrentDay == Day; }
-    bool isDateMatchingDayAndMonthSet(MonthType CurrentMonth, DayType CurrentDay) const { return isMonthMatching(CurrentMonth) && isDayMatching(CurrentDay); }
-    bool isDateMatchingMonthSet(MonthType CurrentMonth) const { return CurrentMonth == Month; }
-    bool isDateMatchingDaySet(DayType CurrentDay) const { return CurrentDay == Day; }
-    bool isMinuteMatching(MinuteType CurrentMinute) const { return !(CurrentMinute % PeriodInMinutes); }
-    static bool isSecondMatching(SecondType CurrentSecond) { return CurrentSecond == SecondToStartShow; }
-    bool isDaySet() const { return Day != 0u; }
-    bool isMonthSet() const { return Month != 0u; }
-    bool isValidInDaysSet() const { return ValidInDays != 0; }
-    bool isNextYear(MonthType CurrentMonth) const { return CurrentMonth < Month; }
+    static bool IsPeriodValid(MinuteType period) { return period > 0u; }
+    static bool IsEnduranceValid(SecondType endurance) { return endurance > 0u; }
+    bool IsDateSet() const { return (month_ != 0u) || (day_ != 0u); }
+    bool IsDayAndMonthSet() const { return IsDaySet() && IsMonthSet(); }
+    bool IsMonthMatching(MonthType current_month) const { return current_month == month_; }
+    bool IsDayMatching(DayType current_day) const { return current_day == day_; }
+    bool IsDateMatchingDayAndMonthSet(MonthType current_month, DayType current_day) const { return IsMonthMatching(current_month) && IsDayMatching(current_day); }
+    bool IsDateMatchingMonthSet(MonthType current_month) const { return current_month == month_; }
+    bool IsDateMatchingDaySet(DayType current_day) const { return current_day == day_; }
+    bool IsMinuteMatching(MinuteType current_minute) const { return !(current_minute % period_in_minutes_); }
+    static bool IsSecondMatching(SecondType current_second) { return current_second == kSecondToStartShow; }
+    bool IsDaySet() const { return day_ != 0u; }
+    bool IsMonthSet() const { return month_ != 0u; }
+    bool IsValidInDaysSet() const { return valid_in_days_ != 0; }
+    bool IsNextYear(MonthType current_month) const { return current_month < month_; }
 
-    bool isTimeMatching(MinuteType CurrentMinute, SecondType CurrentSecond) const { return isMinuteMatching(CurrentMinute) && isSecondMatching(CurrentSecond); }
-    bool isDateMatching(MonthType CurrentMonth, DayType CurrentDay) const {
-        if(isDayAndMonthSet()) { return isDateMatchingDayAndMonthSet(CurrentMonth, CurrentDay); }
-        if(isMonthSet()) { return isDateMatchingMonthSet(CurrentMonth); }
-        if(isDaySet()) { return isDateMatchingDaySet(CurrentDay); }
+    bool IsTimeMatching(MinuteType current_minute, SecondType current_second) const { return IsMinuteMatching(current_minute) && IsSecondMatching(current_second); }
+    bool IsDateMatching(MonthType current_month, DayType current_day) const {
+        if(IsDayAndMonthSet()) { return IsDateMatchingDayAndMonthSet(current_month, current_day); }
+        if(IsMonthSet()) { return IsDateMatchingMonthSet(current_month); }
+        if(IsDaySet()) { return IsDateMatchingDaySet(current_day); }
         return false;
     }
 
-    bool isDateValid(ClockDate CurrentDate) const {
-        YearType year = CurrentDate.getYear();
-        if(isNextYear(CurrentDate.getMonth())) { year--;}
-        return CurrentDate.getPassedDays(year, Month, Day) <= ValidInDays;
+    bool IsDateValid(ClockDate current_date) const {
+        YearType year = current_date.GetYear();
+        if(IsNextYear(current_date.GetMonth())) { year--;}
+        return current_date.GetPassedDays(year, month_, day_) <= valid_in_days_;
     }
 
-    SecondType checkDateAndSetStateToShow(SecondType ShowTimerInSeconds, ClockDate CurrentDate, ClockTime CurrentTime) {
-        if(isValidInDaysSet() && isDayAndMonthSet()) {
-            if(isDateValid(CurrentDate)) { return setStateToShow(CurrentDate, CurrentTime); }
-        } else if(isDateMatching(CurrentDate.getMonth(), CurrentDate.getDay())) {
-            return setStateToShow(CurrentDate, CurrentTime);
+    SecondType CheckDateAndSetStateToShow(SecondType show_timer_in_seconds, ClockDate current_date, ClockTime current_time) {
+        if(IsValidInDaysSet() && IsDayAndMonthSet()) {
+            if(IsDateValid(current_date)) { return SetStateToShow(current_date, current_time); }
+        } else if(IsDateMatching(current_date.GetMonth(), current_date.GetDay())) {
+            return SetStateToShow(current_date, current_time);
         }
-        return ShowTimerInSeconds;
+        return show_timer_in_seconds;
     }
 
-    SecondType setStateToShow(ClockDate CurrentDate, ClockTime CurrentTime) {
-        State = STATE_SHOW;
-        Text::getInstance().setTaskCycle(Scheduler::convertSpeedToTaskCycle(Speed));
-        underlying().setStateToShow(CurrentDate, CurrentTime);
-        return EnduranceInSeconds;
+    SecondType SetStateToShow(ClockDate current_date, ClockTime current_time) {
+        state_ = kStateShow;
+        Text::GetInstance().SetTaskCycle(Scheduler::ConvertSpeedToTaskCycle(speed_));
+        Underlying().SetStateToShow(current_date, current_time);
+        return endurance_in_seconds_;
     }
 
-    void setStateToIdle(ClockDate CurrentDate, ClockTime CurrentTime) {
-        State = STATE_IDLE;
-        underlying().setStateToIdle(CurrentDate, CurrentTime);
+    void SetStateToIdle(ClockDate current_date, ClockTime current_time) {
+        state_ = kStateIdle;
+        Underlying().SetStateToIdle(current_date, current_time);
     }
 
-    SecondType showTimerTask(SecondType ShowTimerInSeconds) {
-        return decrementShowTimer(ShowTimerInSeconds);
+    SecondType ShowTimerTask(SecondType show_timer_in_seconds) {
+        return DecrementShowTimer(show_timer_in_seconds);
     }
 
-    SecondType idleTask(SecondType ShowTimerInSeconds, ClockDate CurrentDate, ClockTime CurrentTime) {
-        if(!canShow()) { return ShowTimerInSeconds; }
+    SecondType IdleTask(SecondType show_timer_in_seconds, ClockDate current_date, ClockTime current_time) {
+        if(!CanShow()) { return show_timer_in_seconds; }
 
-        if(isTimeMatching(CurrentTime.getMinute(), CurrentTime.getSecond())) {
-            if(isDateSet()) { return checkDateAndSetStateToShow(ShowTimerInSeconds, CurrentDate, CurrentTime); }
-            else { return setStateToShow(CurrentDate, CurrentTime); }
+        if(IsTimeMatching(current_time.GetMinute(), current_time.GetSecond())) {
+            if(IsDateSet()) { return CheckDateAndSetStateToShow(show_timer_in_seconds, current_date, current_time); }
+            else { return SetStateToShow(current_date, current_time); }
         }
-        return ShowTimerInSeconds;
+        return show_timer_in_seconds;
     }
 
-    SecondType showTask(SecondType ShowTimerInSeconds, ClockDate CurrentDate, ClockTime CurrentTime) {
-        if(isShowTimerExpired(ShowTimerInSeconds)) { setStateToIdle(CurrentDate, CurrentTime); }
-        return showTimerTask(ShowTimerInSeconds);
+    SecondType ShowTask(SecondType show_timer_in_seconds, ClockDate current_date, ClockTime current_time) {
+        if(IsShowTimerExpired(show_timer_in_seconds)) { SetStateToIdle(current_date, current_time); }
+        return ShowTimerTask(show_timer_in_seconds);
     }
 
-    static bool isShowTimerExpired(SecondType ShowTimerInSeconds) { return ShowTimerInSeconds == 0u; }
-    static SecondType decrementShowTimer(SecondType ShowTimerInSeconds) {
-        if(ShowTimerInSeconds > 0u) { return ShowTimerInSeconds - 1u; }
+    static bool IsShowTimerExpired(SecondType show_timer_in_seconds) { return show_timer_in_seconds == 0u; }
+    static SecondType DecrementShowTimer(SecondType show_timer_in_seconds) {
+        if(show_timer_in_seconds > 0u) { return show_timer_in_seconds - 1u; }
         else { return 0u; }
     }
 
@@ -204,11 +204,11 @@ template <typename Derived> class Overlay
        Whether the overlay may start at all is not decided here: only Overlays knows
        whether another one already holds the display, and it owns the timer this hands
        back. */
-    SecondType startShow(ClockDate CurrentDate, ClockTime CurrentTime) {
-        return setStateToShow(CurrentDate, CurrentTime);
+    SecondType StartShow(ClockDate current_date, ClockTime current_time) {
+        return SetStateToShow(current_date, current_time);
     }
-    void stopShow(ClockDate CurrentDate, ClockTime CurrentTime) {
-        setStateToIdle(CurrentDate, CurrentTime);
+    void StopShow(ClockDate current_date, ClockTime current_time) {
+        SetStateToIdle(current_date, current_time);
     }
 
     /* Whether the overlay has anything to show at all, which is not the same as being
@@ -217,79 +217,79 @@ template <typename Derived> class Overlay
        the "show now" call alike, so that an overlay with nothing to say does not hold the
        display for its endurance. The date and the text always have something.
 
-       Named apart from the isReady() each overlay answers, rather than being the same name
-       in both places like setStateToShow(): a derived member of the same name would hide
+       Named apart from the IsReady() each overlay answers, rather than being the same name
+       in both places like SetStateToShow(): a derived member of the same name would hide
        this one, and a caller outside the overlays - Overlays itself - would then reach the
        private hook instead of this. */
-    bool canShow() const { return underlying().isReady(); }
+    bool CanShow() const { return Underlying().IsReady(); }
 
 	// get methods
-	StateType getState() const { return State; }
-    MinuteType getPeriodInMinutes() const { return PeriodInMinutes; }
-    SecondType getEnduranceInSeconds() const { return EnduranceInSeconds; }
-    MonthType getMonth() const { return Month; }
-    DayType getDay() const { return Day; }
-    DayType getValidInDays() const { return ValidInDays; }
-    byte getSpeed() const { return Speed; }
-    FontType getFont() const { return Font; }
-    bool getIsActive() const { return State != STATE_DISABLED; }
+	StateType GetState() const { return state_; }
+    MinuteType GetPeriodInMinutes() const { return period_in_minutes_; }
+    SecondType GetEnduranceInSeconds() const { return endurance_in_seconds_; }
+    MonthType GetMonth() const { return month_; }
+    DayType GetDay() const { return day_; }
+    DayType GetValidInDays() const { return valid_in_days_; }
+    byte GetSpeed() const { return speed_; }
+    FontType GetFont() const { return font_; }
+    bool GetIsActive() const { return state_ != kStateDisabled; }
 
 	// set methods
-    StdReturnType setPeriodInMinutes(MinuteType sPeriodInMinutes) {
-        if(isPeriodValid(sPeriodInMinutes)) {
-            PeriodInMinutes = sPeriodInMinutes;
-            return E_OK;
+    StdReturnType SetPeriodInMinutes(MinuteType period_in_minutes) {
+        if(IsPeriodValid(period_in_minutes)) {
+            period_in_minutes_ = period_in_minutes;
+            return kEOk;
         } else {
-            return E_NOT_OK;
+            return kENotOk;
         }
     }
-    StdReturnType setEnduranceInSeconds(SecondType sEnduranceInSeconds) {
-        if(isEnduranceValid(sEnduranceInSeconds)) {
-            EnduranceInSeconds = sEnduranceInSeconds;
-            return E_OK;
+    StdReturnType SetEnduranceInSeconds(SecondType endurance_in_seconds) {
+        if(IsEnduranceValid(endurance_in_seconds)) {
+            endurance_in_seconds_ = endurance_in_seconds;
+            return kEOk;
         } else {
-            return E_NOT_OK;
+            return kENotOk;
         }
     }
-    StdReturnType setFont(FontType sFont) {
-        if(Text::isFontValid(sFont)) {
-            Font = sFont;
-            return E_OK;
+    StdReturnType SetFont(FontType font) {
+        if(Text::IsFontValid(font)) {
+            font_ = font;
+            return kEOk;
         } else {
-            return E_NOT_OK;
+            return kENotOk;
         }
     }
-    void setMonth(MonthType sMonth) { Month = sMonth; }
-    void setDay(DayType sDay) { Day = sDay; }
-    void setValidInDays(DayType sValidInDays) { ValidInDays = sValidInDays; }
-    void setSpeed(byte sSpeed) { Speed = sSpeed; }
-    void setIsActive(bool sIsActive) { if(sIsActive) { enableIsActive(); } else { disableIsActive(); } }
+    void SetMonth(MonthType month) { month_ = month; }
+    void SetDay(DayType day) { day_ = day; }
+    void SetValidInDays(DayType valid_in_days) { valid_in_days_ = valid_in_days; }
+    void SetSpeed(byte speed) { speed_ = speed; }
+    void SetIsActive(bool is_active) { if(is_active) { EnableIsActive(); } else { DisableIsActive(); } }
 
 	// methods
     /* Back to what a clock that was never configured has, now that the overlays are
        stored and a reset has something to undo.
 
-       The derived hook is named apart from this for the reason canShow() gives: a
-       resetToDefaults() in an overlay would hide this one, and everything the base owns
+       The derived hook is named apart from this for the reason CanShow() gives: a
+       ResetToDefaults() in an overlay would hide this one, and everything the base owns
        would then quietly survive the reset. */
-    void resetToDefaults() {
-        PeriodInMinutes = PeriodInMinutesInitValue;
-        EnduranceInSeconds = EnduranceInSecondsInitValue;
-        Month = MonthInitValue;
-        Day = DayInitValue;
-        ValidInDays = ValidInDaysInitValue;
-        Speed = SpeedInitValue;
-        Font = FontInitValue;
-        State = STATE_DISABLED;
-        underlying().resetOwnToDefaults();
+    void ResetToDefaults() {
+        period_in_minutes_ = kPeriodInMinutesInitValue;
+        endurance_in_seconds_ = kEnduranceInSecondsInitValue;
+        month_ = kMonthInitValue;
+        day_ = kDayInitValue;
+        valid_in_days_ = kValidInDaysInitValue;
+        speed_ = kSpeedInitValue;
+        font_ = kFontInitValue;
+        state_ = kStateDisabled;
+        Underlying().ResetOwnToDefaults();
     }
 
-    void enableIsActive() { if(State == STATE_DISABLED) { State = STATE_IDLE; } }
-    void disableIsActive() { State = STATE_DISABLED; }
+    void EnableIsActive() { if(state_ == kStateDisabled) { state_ = kStateIdle; } }
+    void DisableIsActive() { state_ = kStateDisabled; }
 
-    SecondType task(SecondType ShowTimerInSeconds, ClockDate CurrentDate, ClockTime CurrentTime) {
-        if(State == STATE_IDLE) { return idleTask(ShowTimerInSeconds, CurrentDate, CurrentTime); }
-        if(State == STATE_SHOW) { return showTask(ShowTimerInSeconds, CurrentDate, CurrentTime); }
+    SecondType Task(SecondType show_timer_in_seconds, ClockDate current_date, ClockTime current_time) {
+        if(state_ == kStateIdle) { return IdleTask(show_timer_in_seconds, current_date, current_time); }
+        if(state_ == kStateShow) { return ShowTask(show_timer_in_seconds, current_date, current_time); }
         return 0u;
     }
 };

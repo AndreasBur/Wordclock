@@ -60,7 +60,7 @@ class MsgCmdOverlayDateParser : public MsgCmdOverlayParser<MsgCmdOverlayDatePars
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr MsgCmdOverlayDateParser(const char* Parameter) : MsgCmdOverlayParser(Parameter) { }
+    constexpr MsgCmdOverlayDateParser(const char* parameter) : MsgCmdOverlayParser(parameter) { }
     ~MsgCmdOverlayDateParser() { }
 
     // get methods
@@ -68,27 +68,27 @@ class MsgCmdOverlayDateParser : public MsgCmdOverlayParser<MsgCmdOverlayDatePars
     // set methods
 
     // methods
-    static MinuteType getPeriodInMinutes() { return Overlays::getInstance().getDatePeriodInMinutes(); }
-    static SecondType getEnduranceInSeconds() { return Overlays::getInstance().getDateEnduranceInSeconds(); }
-    static MonthType getMonth() { return Overlays::getInstance().getDateMonth(); }
-    static DayType getDay() { return Overlays::getInstance().getDateDay(); }
-    static DayType getValidInDays() { return Overlays::getInstance().getDateValidInDays(); }
-    static bool getIsActive() { return Overlays::getInstance().getDateIsActive(); }
-    static byte getSpeed() { return Overlays::getInstance().getDateSpeed(); }
-    static FontType getFont() {return Overlays::getInstance().getDateFont(); }
+    static MinuteType GetPeriodInMinutes() { return Overlays::GetInstance().GetDatePeriodInMinutes(); }
+    static SecondType GetEnduranceInSeconds() { return Overlays::GetInstance().GetDateEnduranceInSeconds(); }
+    static MonthType GetMonth() { return Overlays::GetInstance().GetDateMonth(); }
+    static DayType GetDay() { return Overlays::GetInstance().GetDateDay(); }
+    static DayType GetValidInDays() { return Overlays::GetInstance().GetDateValidInDays(); }
+    static bool GetIsActive() { return Overlays::GetInstance().GetDateIsActive(); }
+    static byte GetSpeed() { return Overlays::GetInstance().GetDateSpeed(); }
+    static FontType GetFont() {return Overlays::GetInstance().GetDateFont(); }
 
-    static StdReturnType setPeriodInMinutes(MinuteType PeriodInMinutes) { return Overlays::getInstance().setDatePeriodInMinutes(PeriodInMinutes); }
-    static StdReturnType setEnduranceInSeconds(SecondType EnduranceInSeconds) { return Overlays::getInstance().setDateEnduranceInSeconds(EnduranceInSeconds); }
-    static void setMonth(MonthType Month) { Overlays::getInstance().setDateMonth(Month); }
-    static void setDay(DayType Day) { Overlays::getInstance().setDateDay(Day); }
-    static void setValidInDays(DayType ValidInDays) { Overlays::getInstance().setDateValidInDays(ValidInDays); }
-    static void setSpeed(byte Speed) { Overlays::getInstance().setDateSpeed(Speed); }
-    static StdReturnType setFont(FontType Font) { return Overlays::getInstance().setDateFont(Font); }
-    static void setIsActive(bool IsActive) { Overlays::getInstance().setDateIsActive(IsActive); }
-    static void setText(const char* Text, LengthType Length) { UNUSED(Text); UNUSED(Length); }
+    static StdReturnType SetPeriodInMinutes(MinuteType period_in_minutes) { return Overlays::GetInstance().SetDatePeriodInMinutes(period_in_minutes); }
+    static StdReturnType SetEnduranceInSeconds(SecondType endurance_in_seconds) { return Overlays::GetInstance().SetDateEnduranceInSeconds(endurance_in_seconds); }
+    static void SetMonth(MonthType month) { Overlays::GetInstance().SetDateMonth(month); }
+    static void SetDay(DayType day) { Overlays::GetInstance().SetDateDay(day); }
+    static void SetValidInDays(DayType valid_in_days) { Overlays::GetInstance().SetDateValidInDays(valid_in_days); }
+    static void SetSpeed(byte speed) { Overlays::GetInstance().SetDateSpeed(speed); }
+    static StdReturnType SetFont(FontType font) { return Overlays::GetInstance().SetDateFont(font); }
+    static void SetIsActive(bool is_active) { Overlays::GetInstance().SetDateIsActive(is_active); }
+    static void SetText(const char* text, LengthType length) { UNUSED(text); UNUSED(length); }
 
-    static void sendAnswerText(bool AppendSpace) { UNUSED(AppendSpace); }
-    static void sendAnswerSpeedText(bool AppendSpace) { UNUSED(AppendSpace); }
+    static void SendAnswerText(bool append_space) { UNUSED(append_space); }
+    static void SendAnswerSpeedText(bool append_space) { UNUSED(append_space); }
 
 };
 

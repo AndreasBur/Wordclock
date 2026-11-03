@@ -73,7 +73,7 @@ template <typename Derived> class MsgCmdOverlayParser
        prevent - somebody inheriting this template with another class's Derived - the
        assertion catches instead, at the first point where Derived is a complete type. */
     // NOLINTNEXTLINE(bugprone-crtp-constructor-accessibility)
-    constexpr MsgCmdOverlayParser(const char* Parameter) : MsgParameterParserType(ParameterTable, Parameter) {
+    constexpr MsgCmdOverlayParser(const char* parameter) : MsgParameterParserType(kParameterTable, parameter) {
         static_assert(std::is_base_of<MsgCmdOverlayParser, Derived>::value,
                       "MsgCmdOverlayParser is a CRTP base: Derived has to be the class that inherits it");
     }
@@ -86,47 +86,47 @@ template <typename Derived> class MsgCmdOverlayParser
     friend class MsgParameterParser<MsgCmdOverlayParser<Derived>, MSG_CMD_BASE_OVERLAY_PARSER_PARAMETER_TABLE_SIZE>;
 
     // functions
-    Derived& underlying() { return static_cast<Derived&>(*this); }
-    Derived const& underlying() const { return static_cast<Derived const&>(*this); }
+    Derived& Underlying() { return static_cast<Derived&>(*this); }
+    Derived const& Underlying() const { return static_cast<Derived const&>(*this); }
 
-    void handleParameter(char ParameterShortName, byte Argument) {
-        if(ParameterShortName == PeriodOptionShortName) { setPeriodInMinutes(Argument); }
-        if(ParameterShortName == EnduranceOptionShortName) { setEnduranceInSeconds(Argument); }
-        if(ParameterShortName == MonthOptionShortName) { underlying().setMonth(Argument); }
-        if(ParameterShortName == DayOptionShortName) { underlying().setDay(Argument); }
-        if(ParameterShortName == ValidOptionShortName) { underlying().setValidInDays(Argument); }
-        if(ParameterShortName == ActiveOptionShortName) { underlying().setIsActive(static_cast<bool>(Argument)); }
-        if(ParameterShortName == SpeedOptionShortName) { underlying().setSpeed(Argument); }
-        if(ParameterShortName == FontOptionShortName) { underlying().setFont(static_cast<FontType>(Argument)); }
+    void HandleParameter(char parameter_short_name, byte argument) {
+        if(parameter_short_name == kPeriodOptionShortName) { SetPeriodInMinutes(argument); }
+        if(parameter_short_name == kEnduranceOptionShortName) { SetEnduranceInSeconds(argument); }
+        if(parameter_short_name == kMonthOptionShortName) { Underlying().SetMonth(argument); }
+        if(parameter_short_name == kDayOptionShortName) { Underlying().SetDay(argument); }
+        if(parameter_short_name == kValidOptionShortName) { Underlying().SetValidInDays(argument); }
+        if(parameter_short_name == kActiveOptionShortName) { Underlying().SetIsActive(static_cast<bool>(argument)); }
+        if(parameter_short_name == kSpeedOptionShortName) { Underlying().SetSpeed(argument); }
+        if(parameter_short_name == kFontOptionShortName) { Underlying().SetFont(static_cast<FontType>(argument)); }
     }
 
-    void handleParameter(char ParameterShortName, const char* Argument, PositionType Length) {
-        if(ParameterShortName == TextOptionShortName) { underlying().setText(Argument, Length); }
+    void HandleParameter(char parameter_short_name, const char* argument, PositionType length) {
+        if(parameter_short_name == kTextOptionShortName) { Underlying().SetText(argument, length); }
     }
 
-    void setPeriodInMinutes(MinuteType PeriodInMinutes) {
-        StdReturnType returnValue = underlying().setPeriodInMinutes(PeriodInMinutes);
-        MsgParameterParserType::Error.checkReturnValueAndSend(PeriodOptionShortName, returnValue, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNDS);
+    void SetPeriodInMinutes(MinuteType period_in_minutes) {
+        StdReturnType return_value = Underlying().SetPeriodInMinutes(period_in_minutes);
+        MsgParameterParserType::error_.CheckReturnValueAndSend(kPeriodOptionShortName, return_value, ErrorMessage::kErrorValueOutOfBounds);
     }
-    void setEnduranceInSeconds(SecondType EnduranceInSeconds) {
-        StdReturnType returnValue = underlying().setEnduranceInSeconds(EnduranceInSeconds);
-        MsgParameterParserType::Error.checkReturnValueAndSend(EnduranceOptionShortName, returnValue, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNDS);
+    void SetEnduranceInSeconds(SecondType endurance_in_seconds) {
+        StdReturnType return_value = Underlying().SetEnduranceInSeconds(endurance_in_seconds);
+        MsgParameterParserType::error_.CheckReturnValueAndSend(kEnduranceOptionShortName, return_value, ErrorMessage::kErrorValueOutOfBounds);
     }
-    void setFont(FontType Font) {
-        StdReturnType returnValue = underlying().setFont(Font);
-        MsgParameterParserType::Error.checkReturnValueAndSend(FontOptionShortName, returnValue, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNDS);
+    void SetFont(FontType font) {
+        StdReturnType return_value = Underlying().SetFont(font);
+        MsgParameterParserType::error_.CheckReturnValueAndSend(kFontOptionShortName, return_value, ErrorMessage::kErrorValueOutOfBounds);
 
     }
 
-    void sendAnswerPeriod(bool AppendSpace) const { MsgParameterParserType::sendAnswerParameter(PeriodOptionShortName,  underlying().getPeriodInMinutes(), AppendSpace); }
-    void sendAnswerEndurance(bool AppendSpace) const { MsgParameterParserType::sendAnswerParameter(EnduranceOptionShortName, underlying().getEnduranceInSeconds(), AppendSpace); }
-    void sendAnswerMonth(bool AppendSpace) const { MsgParameterParserType::sendAnswerParameter(MonthOptionShortName, underlying().getMonth(), AppendSpace); }
-    void sendAnswerDay(bool AppendSpace) const { MsgParameterParserType::sendAnswerParameter(DayOptionShortName, underlying().getDay(), AppendSpace); }
-    void sendAnswerValid(bool AppendSpace) const { MsgParameterParserType::sendAnswerParameter(ValidOptionShortName, underlying().getValidInDays(), AppendSpace); }
-    void sendAnswerSpeed(bool AppendSpace) const { MsgParameterParserType::sendAnswerParameter(SpeedOptionShortName, underlying().getSpeed(), AppendSpace); }
-    void sendAnswerFont(bool AppendSpace) const { MsgParameterParserType::sendAnswerParameter(FontOptionShortName, underlying().getFont(), AppendSpace); }
-    void sendAnswerActive(bool AppendSpace) const { MsgParameterParserType::sendAnswerParameter(ActiveOptionShortName, underlying().getIsActive(), AppendSpace); }
-    void sendAnswerText(bool AppendSpace) const { underlying().sendAnswerText(AppendSpace); }
+    void SendAnswerPeriod(bool append_space) const { MsgParameterParserType::SendAnswerParameter(kPeriodOptionShortName,  Underlying().GetPeriodInMinutes(), append_space); }
+    void SendAnswerEndurance(bool append_space) const { MsgParameterParserType::SendAnswerParameter(kEnduranceOptionShortName, Underlying().GetEnduranceInSeconds(), append_space); }
+    void SendAnswerMonth(bool append_space) const { MsgParameterParserType::SendAnswerParameter(kMonthOptionShortName, Underlying().GetMonth(), append_space); }
+    void SendAnswerDay(bool append_space) const { MsgParameterParserType::SendAnswerParameter(kDayOptionShortName, Underlying().GetDay(), append_space); }
+    void SendAnswerValid(bool append_space) const { MsgParameterParserType::SendAnswerParameter(kValidOptionShortName, Underlying().GetValidInDays(), append_space); }
+    void SendAnswerSpeed(bool append_space) const { MsgParameterParserType::SendAnswerParameter(kSpeedOptionShortName, Underlying().GetSpeed(), append_space); }
+    void SendAnswerFont(bool append_space) const { MsgParameterParserType::SendAnswerParameter(kFontOptionShortName, Underlying().GetFont(), append_space); }
+    void SendAnswerActive(bool append_space) const { MsgParameterParserType::SendAnswerParameter(kActiveOptionShortName, Underlying().GetIsActive(), append_space); }
+    void SendAnswerText(bool append_space) const { Underlying().SendAnswerText(append_space); }
 
 
 /******************************************************************************************************************************************************
@@ -140,20 +140,20 @@ template <typename Derived> class MsgCmdOverlayParser
     // set methods
 
     // methods
-    void sendAnswer() const
+    void SendAnswer() const
     {
-        sendAnswerPeriod(true);
-        sendAnswerEndurance(true);
-        sendAnswerMonth(true);
-        sendAnswerDay(true);
-        sendAnswerValid(true);
-        sendAnswerText(true);
-        sendAnswerSpeed(true);
-        sendAnswerFont(true);
-        sendAnswerActive(false);
+        SendAnswerPeriod(true);
+        SendAnswerEndurance(true);
+        SendAnswerMonth(true);
+        SendAnswerDay(true);
+        SendAnswerValid(true);
+        SendAnswerText(true);
+        SendAnswerSpeed(true);
+        SendAnswerFont(true);
+        SendAnswerActive(false);
     }
 
-    static void process() {  }
+    static void Process() {  }
 
 };
 

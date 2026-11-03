@@ -45,39 +45,39 @@
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  init()
+  Init()
 ******************************************************************************************************************************************************/
-void AnimationDrop::init()
+void AnimationDrop::Init()
 {
-    Animation::init(STATE_IDLE);
-    reset();
-} /* init */
+    Animation::Init(kStateIdle);
+    Reset();
+} /* Init */
 
 
 /******************************************************************************************************************************************************
-  setTime()
+  SetTime()
 ******************************************************************************************************************************************************/
-StdReturnType AnimationDrop::setTime(byte Hour, byte Minute)
+StdReturnType AnimationDrop::SetTime(byte hour, byte minute)
 {
-    StdReturnType returnValue{E_NOT_OK};
+    StdReturnType return_value{kENotOk};
 
-    if(Clock::getInstance().getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
-        setNextWordIndex();
-        if(setNextActivePixelIndex() == E_NOT_OK) { setStateToSetTime(); }
-        else { State = STATE_CLEAR_TIME; }
+    if(Clock::GetInstance().GetClockWords(hour, minute, clock_words_table_) == kEOk && state_ == kStateIdle) {
+        SetNextWordIndex();
+        if(SetNextActivePixelIndex() == kENotOk) { SetStateToSetTime(); }
+        else { state_ = kStateClearTime; }
     }
-    return returnValue;
-} /* setTime */
+    return return_value;
+} /* SetTime */
 
 
 /******************************************************************************************************************************************************
-  task()
+  Task()
 ******************************************************************************************************************************************************/
-void AnimationDrop::task()
+void AnimationDrop::Task()
 {
-    if(State == STATE_CLEAR_TIME) { clearTimeTask(); }
-    else if(State == STATE_SET_TIME) { setTimeTask(); }
-} /* task */
+    if(state_ == kStateClearTime) { ClearTimeTask(); }
+    else if(state_ == kStateSetTime) { SetTimeTask(); }
+} /* Task */
 
 
 /******************************************************************************************************************************************************
@@ -85,135 +85,135 @@ void AnimationDrop::task()
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  reset()
+  Reset()
 ******************************************************************************************************************************************************/
-void AnimationDrop::reset()
+void AnimationDrop::Reset()
 {
-    Row = 0u;
-    Column = 0u;
-    ClockWordsTable.fill(DisplayWords::WORD_NONE);
-    CurrentWordIndex = ClockWordsTable.size() - 1u;
-} /* reset */
+    row_ = 0u;
+    column_ = 0u;
+    clock_words_table_.fill(DisplayWords::kWordNone);
+    current_word_index_ = clock_words_table_.size() - 1u;
+} /* Reset */
 
 
 /******************************************************************************************************************************************************
-  clearTimeTask()
+  ClearTimeTask()
 ******************************************************************************************************************************************************/
-void AnimationDrop::clearTimeTask()
+void AnimationDrop::ClearTimeTask()
 {
     // toggle current Pixel
-    if(Row < DISPLAY_NUMBER_OF_ROWS && Column < DISPLAY_NUMBER_OF_COLUMNS) { Display::getInstance().togglePixel(Column, Row); }
+    if(row_ < DISPLAY_NUMBER_OF_ROWS && column_ < DISPLAY_NUMBER_OF_COLUMNS) { Display::GetInstance().TogglePixel(column_, row_); }
     // increment row and check for out of bounds
-    if(Row + 1u < DISPLAY_NUMBER_OF_ROWS) {
+    if(row_ + 1u < DISPLAY_NUMBER_OF_ROWS) {
         // toggle Pixel in next row
-        Row++;
-        Display::getInstance().togglePixel(Column, Row);
+        row_++;
+        Display::GetInstance().TogglePixel(column_, row_);
     } else {
         // no more active pixels available
-        if(setNextActivePixelIndex() == E_NOT_OK) { setStateToSetTime(); }
+        if(SetNextActivePixelIndex() == kENotOk) { SetStateToSetTime(); }
     }
-} /* clearTimeTask */
+} /* ClearTimeTask */
 
 
 /******************************************************************************************************************************************************
-  setTimeTask()
+  SetTimeTask()
 ******************************************************************************************************************************************************/
-void AnimationDrop::setTimeTask()
+void AnimationDrop::SetTimeTask()
 {
-    DisplayWord currentWord = Words.getDisplayWord(ClockWordsTable[CurrentWordIndex]);
-    const byte maxColumn = Words.getDisplayWordColumn(ClockWordsTable[CurrentWordIndex]) + currentWord.getLength() - 1u;
+    DisplayWord current_word = words_.GetDisplayWord(clock_words_table_[current_word_index_]);
+    const byte max_column = words_.GetDisplayWordColumn(clock_words_table_[current_word_index_]) + current_word.GetLength() - 1u;
 
-    if(setNextRow(currentWord.getRow()) == E_OK) {
-        Display::getInstance().clearPixel(Column, Row - 1u);
+    if(SetNextRow(current_word.GetRow()) == kEOk) {
+        Display::GetInstance().ClearPixel(column_, row_ - 1u);
     } else {
-        if(setNextColumn(maxColumn) == E_NOT_OK) {
-            finishWithClockWords(ClockWordsTable);
-            reset();
+        if(SetNextColumn(max_column) == kENotOk) {
+            FinishWithClockWords(clock_words_table_);
+            Reset();
             return;
         }
     }
-    Display::getInstance().setPixel(Column, Row);
-} /* setTimeTask */
+    Display::GetInstance().SetPixel(column_, row_);
+} /* SetTimeTask */
 
 
 /******************************************************************************************************************************************************
   getNextActivePixel()
 ******************************************************************************************************************************************************/
-StdReturnType AnimationDrop::setNextActivePixelIndex()
+StdReturnType AnimationDrop::SetNextActivePixelIndex()
 {
     for(int16_t index = DISPLAY_NUMBER_OF_PIXELS - 1u; index >= 0; index--) {
-        if(Display::getInstance().getPixel(index)) {
-            Display::getInstance().indexToColumnAndRow(index, Column, Row);
-            return E_OK;
+        if(Display::GetInstance().GetPixel(index)) {
+            Display::GetInstance().IndexToColumnAndRow(index, column_, row_);
+            return kEOk;
         }
     }
-    return E_NOT_OK;
+    return kENotOk;
 }
 
 
 /******************************************************************************************************************************************************
-  setNextWordIndex()
+  SetNextWordIndex()
 ******************************************************************************************************************************************************/
-StdReturnType AnimationDrop::setNextWordIndex()
+StdReturnType AnimationDrop::SetNextWordIndex()
 {
     /* int rather than int8_t: the loop has to be able to go below zero to end, and
        initialising a signed byte from the unsigned expression on the right got there by
        an implementation-defined conversion rather than by arithmetic. */
-    for(int index = static_cast<int>(CurrentWordIndex) - 1; index >= 0; index--) {
-        if(ClockWordsTable[index] != DisplayWords::WORD_NONE) {
-            CurrentWordIndex = index;
-            return E_OK;
+    for(int index = static_cast<int>(current_word_index_) - 1; index >= 0; index--) {
+        if(clock_words_table_[index] != DisplayWords::kWordNone) {
+            current_word_index_ = index;
+            return kEOk;
         }
     }
-    return E_NOT_OK;
-} /* setNextWordIndex */
+    return kENotOk;
+} /* SetNextWordIndex */
 
 
 /******************************************************************************************************************************************************
-  setStateToSetTime()
+  SetStateToSetTime()
 ******************************************************************************************************************************************************/
-void AnimationDrop::setStateToSetTime()
+void AnimationDrop::SetStateToSetTime()
 {
-    Row = 0u;
-    Column = Words.getDisplayWordColumn(ClockWordsTable[CurrentWordIndex]);
-    Display::getInstance().setPixel(Column, Row);
-    State = STATE_SET_TIME;
-} /* setStateToSetTime */
+    row_ = 0u;
+    column_ = words_.GetDisplayWordColumn(clock_words_table_[current_word_index_]);
+    Display::GetInstance().SetPixel(column_, row_);
+    state_ = kStateSetTime;
+} /* SetStateToSetTime */
 
 
 /******************************************************************************************************************************************************
-  setNextRow()
+  SetNextRow()
 ******************************************************************************************************************************************************/
-StdReturnType AnimationDrop::setNextRow(byte MaxRow)
+StdReturnType AnimationDrop::SetNextRow(byte max_row)
 {
-    if(Row >= MaxRow) {
-        return E_NOT_OK;
+    if(row_ >= max_row) {
+        return kENotOk;
     } else {
-        Row++;
-        return E_OK;
+        row_++;
+        return kEOk;
     }
-} /* setNextRow */
+} /* SetNextRow */
 
 
 /******************************************************************************************************************************************************
-  setNextColumn()
+  SetNextColumn()
 ******************************************************************************************************************************************************/
-StdReturnType AnimationDrop::setNextColumn(byte MaxColumn)
+StdReturnType AnimationDrop::SetNextColumn(byte max_column)
 {
-    if(Column >= MaxColumn) {
-         if(setNextWordIndex() == E_OK) {
-            Column = Words.getDisplayWordColumn(ClockWordsTable[CurrentWordIndex]);
-            Row = 0u;
-            return E_OK;
+    if(column_ >= max_column) {
+         if(SetNextWordIndex() == kEOk) {
+            column_ = words_.GetDisplayWordColumn(clock_words_table_[current_word_index_]);
+            row_ = 0u;
+            return kEOk;
         } else {
-            return E_NOT_OK;
+            return kENotOk;
         }
     } else {
-        Column++;
-        Row = 0u;
-        return E_OK;
+        column_++;
+        row_ = 0u;
+        return kEOk;
     }
-} /* setNextColumn */
+} /* SetNextColumn */
 
 
 /******************************************************************************************************************************************************

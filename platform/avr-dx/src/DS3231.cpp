@@ -26,21 +26,21 @@
 namespace {
 
 /* Where each field sits in the seven-register block that is read and written in one go. */
-constexpr byte RegisterSeconds{0u};
-constexpr byte RegisterMinutes{1u};
-constexpr byte RegisterHours{2u};
-constexpr byte RegisterWeekday{3u};
-constexpr byte RegisterDay{4u};
-constexpr byte RegisterMonth{5u};
-constexpr byte RegisterYear{6u};
+constexpr byte kRegisterSeconds{0u};
+constexpr byte kRegisterMinutes{1u};
+constexpr byte kRegisterHours{2u};
+constexpr byte kRegisterWeekday{3u};
+constexpr byte kRegisterDay{4u};
+constexpr byte kRegisterMonth{5u};
+constexpr byte kRegisterYear{6u};
 
 /* The chip keeps two year digits and a century bit; ClockDate covers 2000 to 2099, so the
    bit is always clear and the century is this constant. */
-constexpr ClockDateTime::YearType YearOfCentury{2000u};
+constexpr ClockDateTime::YearType kYearOfCentury{2000u};
 
 /* The chip counts weekdays from one, ClockDate from zero. Neither says which day is
    first, and nothing reads the register back, so only the range has to match. */
-constexpr byte WeekdayOffset{1u};
+constexpr byte kWeekdayOffset{1u};
 
 } // namespace
 
@@ -49,32 +49,32 @@ constexpr byte WeekdayOffset{1u};
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  startBus()
+  StartBus()
 ******************************************************************************************************************************************************/
 /*! \brief          Opens the bus this chip shares with the light sensor
  *  \details        Idempotent, so whichever driver runs first opens it and the other finds
  *                  it open. Neither owns the bus, and neither can be relied on to run at all
  *                  on a board where only one of the two is fitted.
 ******************************************************************************************************************************************************/
-StdReturnType DS3231::startBus()
+StdReturnType DS3231::StartBus()
 {
-    Twi::getInstance().init();
+    Twi::GetInstance().Init();
 
-    return E_OK;
-} /* startBus */
+    return kEOk;
+} /* StartBus */
 
 
 /******************************************************************************************************************************************************
-  readRegisters()
+  ReadRegisters()
 ******************************************************************************************************************************************************/
-StdReturnType DS3231::readRegisters(byte Register, byte* Values, byte Length)
+StdReturnType DS3231::ReadRegisters(byte register_address, byte* values, byte length)
 {
-    return Twi::getInstance().readRegister(DS3231_I2C_ADDR, Register, Values, Length);
-} /* readRegisters */
+    return Twi::GetInstance().ReadRegister(DS3231_I2C_ADDR, register_address, values, length);
+} /* ReadRegisters */
 
 
 /******************************************************************************************************************************************************
-  writeRegisters()
+  WriteRegisters()
 ******************************************************************************************************************************************************/
 /*! \brief          Writes a block of registers starting at one address
  *  \details        The block goes out in a single transfer rather than register by register:
@@ -82,66 +82,66 @@ StdReturnType DS3231::readRegisters(byte Register, byte* Values, byte Length)
  *                  would let the seconds roll over between two of them and leave the chip
  *                  holding a time assembled from two different ones.
 ******************************************************************************************************************************************************/
-StdReturnType DS3231::writeRegisters(byte Register, const byte* Values, byte Length)
+StdReturnType DS3231::WriteRegisters(byte register_address, const byte* values, byte length)
 {
-    byte Buffer[DS3231_DATE_TIME_NUMBER_OF_BYTES + 1u]{};
+    byte buffer[DS3231_DATE_TIME_NUMBER_OF_BYTES + 1u]{};
 
-    if(Length > DS3231_DATE_TIME_NUMBER_OF_BYTES) { return E_NOT_OK; }
+    if(length > DS3231_DATE_TIME_NUMBER_OF_BYTES) { return kENotOk; }
 
-    Buffer[0u] = Register;
-    for(byte Index = 0u; Index < Length; Index++) { Buffer[Index + 1u] = Values[Index]; }
+    buffer[0u] = register_address;
+    for(byte index = 0u; index < length; index++) { buffer[index + 1u] = values[index]; }
 
-    return Twi::getInstance().write(DS3231_I2C_ADDR, Buffer, static_cast<byte>(Length + 1u));
-} /* writeRegisters */
+    return Twi::GetInstance().Write(DS3231_I2C_ADDR, buffer, static_cast<byte>(length + 1u));
+} /* WriteRegisters */
 
 
 /******************************************************************************************************************************************************
-  hasOscillatorStopped()
+  HasOscillatorStopped()
 ******************************************************************************************************************************************************/
 /*! \brief          Whether the chip admits it lost track of time
  *  \details        A chip that cannot be read is treated as stopped: both mean there is no
  *                  time to be had from it, and the caller has one case to handle instead of
  *                  two.
 ******************************************************************************************************************************************************/
-bool DS3231::hasOscillatorStopped()
+bool DS3231::HasOscillatorStopped()
 {
-    byte Status{0u};
+    byte status{0u};
 
-    if(readRegisters(DS3231_REG_STATUS, &Status, 1u) == E_NOT_OK) { return true; }
+    if(ReadRegisters(DS3231_REG_STATUS, &status, 1u) == kENotOk) { return true; }
 
-    return (Status & DS3231_STATUS_OSCILLATOR_STOPPED_MASK) != 0u;
-} /* hasOscillatorStopped */
+    return (status & DS3231_STATUS_OSCILLATOR_STOPPED_MASK) != 0u;
+} /* HasOscillatorStopped */
 
 
 /******************************************************************************************************************************************************
-  clearOscillatorStopped()
+  ClearOscillatorStopped()
 ******************************************************************************************************************************************************/
-StdReturnType DS3231::clearOscillatorStopped()
+StdReturnType DS3231::ClearOscillatorStopped()
 {
-    byte Status{0u};
+    byte status{0u};
 
-    if(readRegisters(DS3231_REG_STATUS, &Status, 1u) == E_NOT_OK) { return E_NOT_OK; }
+    if(ReadRegisters(DS3231_REG_STATUS, &status, 1u) == kENotOk) { return kENotOk; }
 
-    Status &= static_cast<byte>(~DS3231_STATUS_OSCILLATOR_STOPPED_MASK);
+    status &= static_cast<byte>(~DS3231_STATUS_OSCILLATOR_STOPPED_MASK);
 
-    return writeRegisters(DS3231_REG_STATUS, &Status, 1u);
-} /* clearOscillatorStopped */
+    return WriteRegisters(DS3231_REG_STATUS, &status, 1u);
+} /* ClearOscillatorStopped */
 
 
 /******************************************************************************************************************************************************
-  readTemperature()
+  ReadTemperature()
 ******************************************************************************************************************************************************/
-StdReturnType DS3231::readTemperature()
+StdReturnType DS3231::ReadTemperature()
 {
-    byte Registers[DS3231_TEMPERATURE_NUMBER_OF_BYTES]{};
+    byte registers[DS3231_TEMPERATURE_NUMBER_OF_BYTES]{};
 
-    if(readRegisters(DS3231_REG_TEMPERATURE_MSB, Registers, DS3231_TEMPERATURE_NUMBER_OF_BYTES) == E_NOT_OK) { return E_NOT_OK; }
+    if(ReadRegisters(DS3231_REG_TEMPERATURE_MSB, registers, DS3231_TEMPERATURE_NUMBER_OF_BYTES) == kENotOk) { return kENotOk; }
 
-    Temperature = toTenths(static_cast<int8_t>(Registers[0u]), Registers[1u]);
-    TemperatureValid = true;
+    temperature_ = ToTenths(static_cast<int8_t>(registers[0u]), registers[1u]);
+    temperature_valid_ = true;
 
-    return E_OK;
-} /* readTemperature */
+    return kEOk;
+} /* ReadTemperature */
 
 
 /******************************************************************************************************************************************************
@@ -149,24 +149,24 @@ StdReturnType DS3231::readTemperature()
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  task()
+  Task()
 ******************************************************************************************************************************************************/
-void DS3231::task()
+void DS3231::Task()
 {
-    if(startBus() == E_NOT_OK) { return; }
+    if(StartBus() == kENotOk) { return; }
 
-    readTemperature();
-} /* task */
+    ReadTemperature();
+} /* Task */
 
 
 /* Instance methods, though some of them read no member: they are the interface the
-   firmware core calls through getInstance(), and every backend - the simulator's
+   firmware core calls through GetInstance(), and every backend - the simulator's
    stand-ins included - offers it that way. Whether this backend's implementation
    happens to need a member is its own detail, and answering the check would carry
    that detail into the interface. */
 // NOLINTBEGIN(readability-convert-member-functions-to-static)
 /******************************************************************************************************************************************************
-  getDateTime()
+  GetDateTime()
 ******************************************************************************************************************************************************/
 /*! \brief          Reads what the chip counted, in UTC
  *  \details        The stopped flag is asked first and not afterwards: a chip whose
@@ -179,52 +179,52 @@ void DS3231::task()
  *                  assembled through ClockDateTime's own setters and their return codes
  *                  rather than trusted.
 ******************************************************************************************************************************************************/
-StdReturnType DS3231::getDateTime(ClockDateTime& DateTime)
+StdReturnType DS3231::GetDateTime(ClockDateTime& date_time)
 {
-    if(startBus() == E_NOT_OK) { return E_NOT_OK; }
-    if(hasOscillatorStopped()) { return E_NOT_OK; }
+    if(StartBus() == kENotOk) { return kENotOk; }
+    if(HasOscillatorStopped()) { return kENotOk; }
 
-    byte Registers[DS3231_DATE_TIME_NUMBER_OF_BYTES]{};
-    if(readRegisters(DS3231_REG_SECONDS, Registers, DS3231_DATE_TIME_NUMBER_OF_BYTES) == E_NOT_OK) { return E_NOT_OK; }
+    byte registers[DS3231_DATE_TIME_NUMBER_OF_BYTES]{};
+    if(ReadRegisters(DS3231_REG_SECONDS, registers, DS3231_DATE_TIME_NUMBER_OF_BYTES) == kENotOk) { return kENotOk; }
 
-    ClockDateTime Value;
-    StdReturnType ReturnValue{E_OK};
+    ClockDateTime value;
+    StdReturnType return_value{kEOk};
 
-    if(Value.setTimeSecond(fromBcd(Registers[RegisterSeconds])) == E_NOT_OK) { ReturnValue = E_NOT_OK; }
-    if(Value.setTimeMinute(fromBcd(Registers[RegisterMinutes])) == E_NOT_OK) { ReturnValue = E_NOT_OK; }
-    if(Value.setTimeHour(fromBcd(Registers[RegisterHours] & DS3231_HOURS_VALUE_MASK)) == E_NOT_OK) { ReturnValue = E_NOT_OK; }
-    if(Value.setDateDay(fromBcd(Registers[RegisterDay])) == E_NOT_OK) { ReturnValue = E_NOT_OK; }
-    if(Value.setDateMonth(fromBcd(Registers[RegisterMonth] & DS3231_MONTH_VALUE_MASK)) == E_NOT_OK) { ReturnValue = E_NOT_OK; }
-    if(Value.setDateYear(static_cast<ClockDateTime::YearType>(YearOfCentury + fromBcd(Registers[RegisterYear]))) == E_NOT_OK) { ReturnValue = E_NOT_OK; }
+    if(value.SetTimeSecond(FromBcd(registers[kRegisterSeconds])) == kENotOk) { return_value = kENotOk; }
+    if(value.SetTimeMinute(FromBcd(registers[kRegisterMinutes])) == kENotOk) { return_value = kENotOk; }
+    if(value.SetTimeHour(FromBcd(registers[kRegisterHours] & DS3231_HOURS_VALUE_MASK)) == kENotOk) { return_value = kENotOk; }
+    if(value.SetDateDay(FromBcd(registers[kRegisterDay])) == kENotOk) { return_value = kENotOk; }
+    if(value.SetDateMonth(FromBcd(registers[kRegisterMonth] & DS3231_MONTH_VALUE_MASK)) == kENotOk) { return_value = kENotOk; }
+    if(value.SetDateYear(static_cast<ClockDateTime::YearType>(kYearOfCentury + FromBcd(registers[kRegisterYear]))) == kENotOk) { return_value = kENotOk; }
 
-    if(ReturnValue == E_NOT_OK) { return E_NOT_OK; }
+    if(return_value == kENotOk) { return kENotOk; }
 
-    DateTime = Value;
-    return E_OK;
-} /* getDateTime */
+    date_time = value;
+    return kEOk;
+} /* GetDateTime */
 
 
 /******************************************************************************************************************************************************
-  setDateTime()
+  SetDateTime()
 ******************************************************************************************************************************************************/
-StdReturnType DS3231::setDateTime(const ClockDateTime& DateTime)
+StdReturnType DS3231::SetDateTime(const ClockDateTime& date_time)
 {
-    if(startBus() == E_NOT_OK) { return E_NOT_OK; }
+    if(StartBus() == kENotOk) { return kENotOk; }
 
-    byte Registers[DS3231_DATE_TIME_NUMBER_OF_BYTES]{};
+    byte registers[DS3231_DATE_TIME_NUMBER_OF_BYTES]{};
 
-    Registers[RegisterSeconds] = toBcd(DateTime.getTimeSecond());
-    Registers[RegisterMinutes] = toBcd(DateTime.getTimeMinute());
-    Registers[RegisterHours] = toBcd(DateTime.getTimeHour());
-    Registers[RegisterWeekday] = toBcd(static_cast<byte>(DateTime.getDateWeekday() + WeekdayOffset));
-    Registers[RegisterDay] = toBcd(DateTime.getDateDay());
-    Registers[RegisterMonth] = toBcd(DateTime.getDateMonth());
-    Registers[RegisterYear] = toBcd(static_cast<byte>(DateTime.getDateYear() - YearOfCentury));
+    registers[kRegisterSeconds] = ToBcd(date_time.GetTimeSecond());
+    registers[kRegisterMinutes] = ToBcd(date_time.GetTimeMinute());
+    registers[kRegisterHours] = ToBcd(date_time.GetTimeHour());
+    registers[kRegisterWeekday] = ToBcd(static_cast<byte>(date_time.GetDateWeekday() + kWeekdayOffset));
+    registers[kRegisterDay] = ToBcd(date_time.GetDateDay());
+    registers[kRegisterMonth] = ToBcd(date_time.GetDateMonth());
+    registers[kRegisterYear] = ToBcd(static_cast<byte>(date_time.GetDateYear() - kYearOfCentury));
 
-    if(writeRegisters(DS3231_REG_SECONDS, Registers, DS3231_DATE_TIME_NUMBER_OF_BYTES) == E_NOT_OK) { return E_NOT_OK; }
+    if(WriteRegisters(DS3231_REG_SECONDS, registers, DS3231_DATE_TIME_NUMBER_OF_BYTES) == kENotOk) { return kENotOk; }
 
-    return clearOscillatorStopped();
-} /* setDateTime */
+    return ClearOscillatorStopped();
+} /* SetDateTime */
 // NOLINTEND(readability-convert-member-functions-to-static)
 
 /******************************************************************************************************************************************************

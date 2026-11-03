@@ -49,16 +49,16 @@ class DS3231
   public:
     using TemperatureType = int16_t;
 
-    static constexpr TemperatureType TenthsPerDegree{10};
+    static constexpr TemperatureType kTenthsPerDegree{10};
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    static constexpr byte TaskCycle{DS3231_TASK_CYCLE};
+    static constexpr byte kTaskCycle{DS3231_TASK_CYCLE};
 
-    TemperatureType Temperature{0};
-    bool TemperatureValid{false};
+    TemperatureType temperature_{0};
+    bool temperature_valid_{false};
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
@@ -68,38 +68,38 @@ class DS3231
     ~DS3231() { }
 
     // get methods
-    static constexpr byte getTaskCycle() { return TaskCycle; }
+    static constexpr byte GetTaskCycle() { return kTaskCycle; }
 
-    StdReturnType getTemperature(TemperatureType& sTemperature) const {
-        if(!TemperatureValid) { return E_NOT_OK; }
+    StdReturnType GetTemperature(TemperatureType& temperature) const {
+        if(!temperature_valid_) { return kENotOk; }
 
-        sTemperature = Temperature;
-        return E_OK;
+        temperature = temperature_;
+        return kEOk;
     }
 
     // methods
     /* On hardware this reads the chip. Here it takes what the window dialled in. The
        values are static because the firmware keeps its DS3231 inside the Temperature
        singleton, which leaves the window no instance to talk to. */
-    void task() {
-        Temperature = SimulatedTemperature;
-        TemperatureValid = SimulatedTemperatureValid;
+    void Task() {
+        temperature_ = simulated_temperature;
+        temperature_valid_ = simulated_temperature_valid;
     }
 
-    static void setSimulatedTemperature(TemperatureType Value) {
-        SimulatedTemperature = Value;
-        SimulatedTemperatureValid = true;
+    static void SetSimulatedTemperature(TemperatureType value) {
+        simulated_temperature = value;
+        simulated_temperature_valid = true;
     }
-    static TemperatureType getSimulatedTemperature() { return SimulatedTemperature; }
+    static TemperatureType GetSimulatedTemperature() { return simulated_temperature; }
 
     /* Puts the chip back to never having answered, which is the state the overlay has to
        stay away in. */
-    static void clearSimulatedTemperature() { SimulatedTemperatureValid = false; }
-    static bool isSimulatedTemperatureValid() { return SimulatedTemperatureValid; }
+    static void ClearSimulatedTemperature() { simulated_temperature_valid = false; }
+    static bool IsSimulatedTemperatureValid() { return simulated_temperature_valid; }
 
   private:
-    static inline TemperatureType SimulatedTemperature{0};
-    static inline bool SimulatedTemperatureValid{false};
+    static inline TemperatureType simulated_temperature{0};
+    static inline bool simulated_temperature_valid{false};
 };
 
 #endif // _DS3231_H_

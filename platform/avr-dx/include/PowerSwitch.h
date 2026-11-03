@@ -19,7 +19,7 @@
  *                  pushing it back up to 5 V is what a 3.3 V port cannot do.
  *
  *                  The 100 kohm at that gate is why the polarity is worth having: with the
- *                  port an input, which is what it is from reset until init() runs, the stage
+ *                  port an input, which is what it is from reset until Init() runs, the stage
  *                  is held off and the strip has no supply. Nothing lights before the firmware
  *                  says so.
  *
@@ -62,39 +62,39 @@ class PowerSwitch
     /* What the port was last driven to, rather than the port read back. A board with no
        switch fitted never has it driven at all, and then this is what the answer is about:
        whether the firmware believes the strip is powered. */
-    bool SupplyOn{false};
+    bool supply_on_{false};
 
     PowerSwitch() { }
     ~PowerSwitch() { }
 
-    static void driveSupply(bool On);
+    static void DriveSupply(bool on);
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    static PowerSwitch& getInstance() {
-        static PowerSwitch SingletonInstance;
-        return SingletonInstance;
+    static PowerSwitch& GetInstance() {
+        static PowerSwitch singleton_instance;
+        return singleton_instance;
     }
 
     // get methods
-    static constexpr bool isFitted() { return POWER_SWITCH_IS_FITTED == STD_ON; }
+    static constexpr bool IsFitted() { return POWER_SWITCH_IS_FITTED == STD_ON; }
 
     /* A board built without the switch has the high side MOSFET bridged, so its strip is
        powered and cannot be anything else. Answering from the flag there would report a
        supply that is off while the LEDs are lit, which is worse than not having the switch. */
-    bool isSupplyOn() const {
-        if(!isFitted()) { return true; }
+    bool IsSupplyOn() const {
+        if(!IsFitted()) { return true; }
 
-        return SupplyOn;
+        return supply_on_;
     }
 
     // methods
-    void init();
+    void Init();
 
-    void switchSupplyOn() { driveSupply(true); SupplyOn = true; }
-    void switchSupplyOff() { driveSupply(false); SupplyOn = false; }
+    void SwitchSupplyOn() { DriveSupply(true); supply_on_ = true; }
+    void SwitchSupplyOff() { DriveSupply(false); supply_on_ = false; }
 };
 
 #endif // _POWER_SWITCH_H_

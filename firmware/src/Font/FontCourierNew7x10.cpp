@@ -37,7 +37,7 @@
 /******************************************************************************************************************************************************
  *  L O C A L   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
-const FontCourierNew7x10::FontTableType FontCourierNew7x10::FontTable PROGMEM
+const FontCourierNew7x10::FontTableType FontCourierNew7x10::kFontTable PROGMEM
 {
     FontTableElementType(4, {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00}),   // Code for char
     FontTableElementType(4, {0x08,0x08,0x08,0x08,0x08,0x00,0x00,0x08,0x00,0x00}),   // Code for char !

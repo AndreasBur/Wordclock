@@ -58,64 +58,64 @@ class MsgCmdTimeParser : public MsgParameterParser<MsgCmdTimeParser, MSG_CMD_TIM
 ******************************************************************************************************************************************************/
   private:
     friend class MsgParameterParser;
-    ClockTime Time;
+    ClockTime time_;
 
-    static constexpr char HourOptionShortName{'H'};
-    static constexpr char MinuteOptionShortName{'M'};
-    static constexpr char SecondOptionShortName{'S'};
+    static constexpr char kHourOptionShortName{'H'};
+    static constexpr char kMinuteOptionShortName{'M'};
+    static constexpr char kSecondOptionShortName{'S'};
 
-    static constexpr ParameterTableType ParameterTable PROGMEM {
-        ParameterTableElementType(HourOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8),
-        ParameterTableElementType(MinuteOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8),
-        ParameterTableElementType(SecondOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8)
+    static constexpr ParameterTableType kParameterTable PROGMEM {
+        ParameterTableElementType(kHourOptionShortName, MsgParameter::kArgumentTypeUint8),
+        ParameterTableElementType(kMinuteOptionShortName, MsgParameter::kArgumentTypeUint8),
+        ParameterTableElementType(kSecondOptionShortName, MsgParameter::kArgumentTypeUint8)
     };
 
     // functions
-    static void handleParameter(char ParameterShortName, const char* Argument, PositionType Length) { UNUSED(ParameterShortName); UNUSED(Argument); UNUSED(Length); }
-    void handleParameter(char ParameterShortName, byte Argument)
+    static void HandleParameter(char parameter_short_name, const char* argument, PositionType length) { UNUSED(parameter_short_name); UNUSED(argument); UNUSED(length); }
+    void HandleParameter(char parameter_short_name, byte argument)
     {
-        if(ParameterShortName == HourOptionShortName) {
-            setHour(Argument);
+        if(parameter_short_name == kHourOptionShortName) {
+            SetHour(argument);
         }
-        if(ParameterShortName == MinuteOptionShortName) {
-            setMinute(Argument);
+        if(parameter_short_name == kMinuteOptionShortName) {
+            SetMinute(argument);
         }
-        if(ParameterShortName == SecondOptionShortName) {
-            setSecond(Argument);
+        if(parameter_short_name == kSecondOptionShortName) {
+            SetSecond(argument);
         }
     }
 
-    void sendAnswerHour(bool AppendSpace) const {
-        sendAnswerParameter(HourOptionShortName, Time.getHour(), AppendSpace);
+    void SendAnswerHour(bool append_space) const {
+        SendAnswerParameter(kHourOptionShortName, time_.GetHour(), append_space);
     }
-    void sendAnswerMinute(bool AppendSpace) const {
-        sendAnswerParameter(MinuteOptionShortName, Time.getMinute(), AppendSpace);
+    void SendAnswerMinute(bool append_space) const {
+        SendAnswerParameter(kMinuteOptionShortName, time_.GetMinute(), append_space);
     }
-    void sendAnswerSecond(bool AppendSpace) const {
-        sendAnswerParameter(SecondOptionShortName, Time.getSecond(), AppendSpace);
-    }
-
-    void setHour(HourType Hour) {
-        StdReturnType returnValue = Time.setHour(Hour);
-        Error.checkReturnValueAndSend(HourOptionShortName, returnValue, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNDS);
+    void SendAnswerSecond(bool append_space) const {
+        SendAnswerParameter(kSecondOptionShortName, time_.GetSecond(), append_space);
     }
 
-    void setMinute(MinuteType Minute) {
-        StdReturnType returnValue = Time.setMinute(Minute);
-        Error.checkReturnValueAndSend(MinuteOptionShortName, returnValue, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNDS);
+    void SetHour(HourType hour) {
+        StdReturnType return_value = time_.SetHour(hour);
+        error_.CheckReturnValueAndSend(kHourOptionShortName, return_value, ErrorMessage::kErrorValueOutOfBounds);
     }
 
-    void setSecond(SecondType Second) {
-        StdReturnType returnValue = Time.setSecond(Second);
-        Error.checkReturnValueAndSend(SecondOptionShortName, returnValue, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNDS);
+    void SetMinute(MinuteType minute) {
+        StdReturnType return_value = time_.SetMinute(minute);
+        error_.CheckReturnValueAndSend(kMinuteOptionShortName, return_value, ErrorMessage::kErrorValueOutOfBounds);
+    }
+
+    void SetSecond(SecondType second) {
+        StdReturnType return_value = time_.SetSecond(second);
+        error_.CheckReturnValueAndSend(kSecondOptionShortName, return_value, ErrorMessage::kErrorValueOutOfBounds);
     }
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    MsgCmdTimeParser(const char* Parameter) : MsgParameterParser(ParameterTable, Parameter) {
-        Time = RealTimeClock::getInstance().getTime();
+    MsgCmdTimeParser(const char* parameter) : MsgParameterParser(kParameterTable, parameter) {
+        time_ = RealTimeClock::GetInstance().GetTime();
     }
     ~MsgCmdTimeParser() { }
 
@@ -124,17 +124,17 @@ class MsgCmdTimeParser : public MsgParameterParser<MsgCmdTimeParser, MSG_CMD_TIM
     // set methods
 
     // methods
-    void sendAnswer() const
+    void SendAnswer() const
     {
-        sendAnswerHour(true);
-        sendAnswerMinute(true);
-        sendAnswerSecond(false);
+        SendAnswerHour(true);
+        SendAnswerMinute(true);
+        SendAnswerSecond(false);
     }
 
-    void process()
+    void Process()
     {
-        RealTimeClock::getInstance().setTime(Time);
-        Time = RealTimeClock::getInstance().getTime();
+        RealTimeClock::GetInstance().SetTime(time_);
+        time_ = RealTimeClock::GetInstance().GetTime();
     }
 };
 

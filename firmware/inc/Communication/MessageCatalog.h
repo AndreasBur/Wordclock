@@ -27,7 +27,7 @@
  *                  and the value lists of the enumerations sit behind the same support
  *                  switches as the enumerations do, so neither can drift. What remains
  *                  MIRRORED by hand are the option short names and argument types, which
- *                  each parser keeps private in its ParameterTable, plus the labels and
+ *                  each parser keeps private in its parameter_table_, plus the labels and
  *                  ranges this table adds on top. Every entry names the parser it was
  *                  taken from.
  *
@@ -65,38 +65,38 @@ class MessageCatalog
     /* Only the argument types the commands actually use, not the full set
        MsgParameter knows. */
     enum ArgumentType {
-        ARGUMENT_TYPE_UINT8,
-        ARGUMENT_TYPE_UINT16,
-        ARGUMENT_TYPE_STRING
+        kArgumentTypeUint8,
+        kArgumentTypeUint16,
+        kArgumentTypeString
     };
 
     struct OptionType {
-        char ShortName;
-        const char* Label;
-        ArgumentType Argument;
+        char short_name;
+        const char* label;
+        ArgumentType argument;
         /* Bounds for the numeric types, both zero where anything the type holds is
-           allowed. Ignored for ARGUMENT_TYPE_STRING. */
-        uint16_t Minimum;
-        uint16_t Maximum;
+           allowed. Ignored for kArgumentTypeString. */
+        uint16_t minimum;
+        uint16_t maximum;
         /* Names of the values, in ascending order beginning at Minimum, for options that
            carry an enumeration rather than a number. Where they are given, the message
            builder offers them as a dropdown and an answer is read back through them.
            Defaulted, so an option that is a plain number simply leaves both out instead
            of spelling out that it has no names. */
-        const char* const* ValueNames{nullptr};
-        byte NumberOfValueNames{0u};
+        const char* const* value_names{nullptr};
+        byte number_of_value_names{0u};
         /* A field that only ever appears in an answer. Its command takes no such option -
            sending one is refused by the parser - but the name is described here so that a
            front end can read the answer back through it without offering it as an input.
            Defaulted, so the options that are settable say nothing about it. */
-        bool ReadOnly{false};
+        bool read_only{false};
     };
 
     struct CommandType {
-        byte Number;
-        const char* Label;
-        const OptionType* Options;
-        byte NumberOfOptions;
+        byte number;
+        const char* label;
+        const OptionType* options;
+        byte number_of_options;
     };
 
 /******************************************************************************************************************************************************
@@ -107,19 +107,19 @@ class MessageCatalog
        firmware at compile time. Hence out of line rather than inline here. */
 
     // get methods
-    static byte getNumberOfCommands();
-    static const CommandType& getCommand(byte Index);
+    static byte GetNumberOfCommands();
+    static const CommandType& GetCommand(byte index);
 
     // methods
     /* Both return nullptr when there is no such entry, which is how a line that only
        looks like an answer is told apart from one that is. */
-    static const CommandType* findCommandByNumber(byte Number);
-    static const OptionType* findOption(const CommandType&, char ShortName);
+    static const CommandType* FindCommandByNumber(byte number);
+    static const OptionType* FindOption(const CommandType&, char short_name);
 
     /* The remote procedure call is the one command whose answer names its value in words
        of its own ("RpcId=") rather than by the option's short name, so the decoder has to
        reach it without having a number to look it up by. */
-    static const CommandType* findRemoteProcedureCallCommand();
+    static const CommandType* FindRemoteProcedureCallCommand();
 };
 
 #endif // MESSAGE_CATALOG_H

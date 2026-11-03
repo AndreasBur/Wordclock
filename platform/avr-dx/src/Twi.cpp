@@ -46,58 +46,58 @@ static_assert(TWI_TIMEOUT_LOOPS > 0u, "Twi: the timeout rounded down to zero, ev
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  waitForWrite()
+  WaitForWrite()
 ******************************************************************************************************************************************************/
 /*! \brief          Waits for a written byte to have been acknowledged
- *  \return         E_NOT_OK when the device did not answer, or when the bus never reported
+ *  \return         kENotOk when the device did not answer, or when the bus never reported
  *                  the byte as sent at all
 ******************************************************************************************************************************************************/
-StdReturnType Twi::waitForWrite()
+StdReturnType Twi::WaitForWrite()
 {
-    for(uint16_t Loops = TWI_TIMEOUT_LOOPS; Loops > 0u; Loops--) {
-        const uint8_t Status = TWI_PERIPHERAL.MSTATUS;
+    for(uint16_t loops = TWI_TIMEOUT_LOOPS; loops > 0u; loops--) {
+        const uint8_t status = TWI_PERIPHERAL.MSTATUS;
 
-        if((Status & (TWI_ARBLOST_bm | TWI_BUSERR_bm)) != 0u) { return E_NOT_OK; }
+        if((status & (TWI_ARBLOST_bm | TWI_BUSERR_bm)) != 0u) { return kENotOk; }
 
-        if((Status & TWI_WIF_bm) != 0u) {
+        if((status & TWI_WIF_bm) != 0u) {
             /* Written, but not necessarily to anybody: an unfitted device leaves the line
                high, which reads back as a missing acknowledge. */
-            return ((Status & TWI_RXACK_bm) != 0u) ? E_NOT_OK : E_OK;
+            return ((status & TWI_RXACK_bm) != 0u) ? kENotOk : kEOk;
         }
     }
 
-    return E_NOT_OK;
-} /* waitForWrite */
+    return kENotOk;
+} /* WaitForWrite */
 
 
 /******************************************************************************************************************************************************
-  waitForRead()
+  WaitForRead()
 ******************************************************************************************************************************************************/
-StdReturnType Twi::waitForRead()
+StdReturnType Twi::WaitForRead()
 {
-    for(uint16_t Loops = TWI_TIMEOUT_LOOPS; Loops > 0u; Loops--) {
-        const uint8_t Status = TWI_PERIPHERAL.MSTATUS;
+    for(uint16_t loops = TWI_TIMEOUT_LOOPS; loops > 0u; loops--) {
+        const uint8_t status = TWI_PERIPHERAL.MSTATUS;
 
-        if((Status & (TWI_ARBLOST_bm | TWI_BUSERR_bm)) != 0u) { return E_NOT_OK; }
-        if((Status & TWI_RIF_bm) != 0u) { return E_OK; }
+        if((status & (TWI_ARBLOST_bm | TWI_BUSERR_bm)) != 0u) { return kENotOk; }
+        if((status & TWI_RIF_bm) != 0u) { return kEOk; }
     }
 
-    return E_NOT_OK;
-} /* waitForRead */
+    return kENotOk;
+} /* WaitForRead */
 
 
 /******************************************************************************************************************************************************
-  stop()
+  Stop()
 ******************************************************************************************************************************************************/
 /*! \brief          Releases the bus
  *  \details        Sent on every path out of a transfer, the failing ones included: a
  *                  transfer abandoned without a stop leaves the bus owned, and the next
  *                  reader - the other chip on it - would find it busy for good.
 ******************************************************************************************************************************************************/
-void Twi::stop()
+void Twi::Stop()
 {
     TWI_PERIPHERAL.MCTRLB = TWI_MCMD_STOP_gc;
-} /* stop */
+} /* Stop */
 
 
 /******************************************************************************************************************************************************
@@ -105,11 +105,11 @@ void Twi::stop()
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  init()
+  Init()
 ******************************************************************************************************************************************************/
-void Twi::init()
+void Twi::Init()
 {
-    if(Initialised) { return; }
+    if(initialised_) { return; }
 
     TWI_PERIPHERAL.MBAUD = TWI_BAUD_REGISTER;
     TWI_PERIPHERAL.MCTRLA = TWI_ENABLE_bm;
@@ -117,88 +117,88 @@ void Twi::init()
        transfer until it is told otherwise. */
     TWI_PERIPHERAL.MSTATUS = TWI_BUSSTATE_IDLE_gc;
 
-    Initialised = true;
-} /* init */
+    initialised_ = true;
+} /* Init */
 
 
 /* Not const, though nothing here writes a member: these drive the hardware, and a
    const would say they change nothing. */
 // NOLINTBEGIN(readability-make-member-function-const)
 /******************************************************************************************************************************************************
-  write()
+  Write()
 ******************************************************************************************************************************************************/
-StdReturnType Twi::write(byte Address, const byte* Data, byte Length)
+StdReturnType Twi::Write(byte address, const byte* data, byte length)
 {
-    if(!Initialised) { return E_NOT_OK; }
+    if(!initialised_) { return kENotOk; }
 
-    TWI_PERIPHERAL.MADDR = static_cast<uint8_t>(Address << 1u);
+    TWI_PERIPHERAL.MADDR = static_cast<uint8_t>(address << 1u);
 
-    if(waitForWrite() != E_OK) {
-        stop();
-        return E_NOT_OK;
+    if(WaitForWrite() != kEOk) {
+        Stop();
+        return kENotOk;
     }
 
-    for(byte Index = 0u; Index < Length; Index++) {
-        TWI_PERIPHERAL.MDATA = Data[Index];
+    for(byte index = 0u; index < length; index++) {
+        TWI_PERIPHERAL.MDATA = data[index];
 
-        if(waitForWrite() != E_OK) {
-            stop();
-            return E_NOT_OK;
+        if(WaitForWrite() != kEOk) {
+            Stop();
+            return kENotOk;
         }
     }
 
-    stop();
-    return E_OK;
-} /* write */
+    Stop();
+    return kEOk;
+} /* Write */
 
 
 /******************************************************************************************************************************************************
-  read()
+  Read()
 ******************************************************************************************************************************************************/
 /*! \brief          Reads a number of bytes from a device
  *  \details        Every byte but the last is acknowledged, the last one is not: that is how
  *                  the device is told to stop driving the bus, and acknowledging it too
  *                  would leave it sending into the stop condition.
 ******************************************************************************************************************************************************/
-StdReturnType Twi::read(byte Address, byte* Data, byte Length)
+StdReturnType Twi::Read(byte address, byte* data, byte length)
 {
-    if(!Initialised) { return E_NOT_OK; }
-    if(Length == 0u) { return E_NOT_OK; }
+    if(!initialised_) { return kENotOk; }
+    if(length == 0u) { return kENotOk; }
 
-    TWI_PERIPHERAL.MADDR = static_cast<uint8_t>((Address << 1u) | 1u);
+    TWI_PERIPHERAL.MADDR = static_cast<uint8_t>((address << 1u) | 1u);
 
-    for(byte Index = 0u; Index < Length; Index++) {
-        if(waitForRead() != E_OK) {
-            stop();
-            return E_NOT_OK;
+    for(byte index = 0u; index < length; index++) {
+        if(WaitForRead() != kEOk) {
+            Stop();
+            return kENotOk;
         }
 
-        Data[Index] = TWI_PERIPHERAL.MDATA;
+        data[index] = TWI_PERIPHERAL.MDATA;
 
-        if(Index < (Length - 1u)) {
+        if(index < (length - 1u)) {
             TWI_PERIPHERAL.MCTRLB = TWI_MCMD_RECVTRANS_gc;
         }
     }
 
     TWI_PERIPHERAL.MCTRLB = TWI_ACKACT_NACK_gc | TWI_MCMD_STOP_gc;
-    return E_OK;
-} /* read */
+    return kEOk;
+} /* Read */
 // NOLINTEND(readability-make-member-function-const)
 
 
 /******************************************************************************************************************************************************
-  writeRegister()
+  WriteRegister()
 ******************************************************************************************************************************************************/
-StdReturnType Twi::writeRegister(byte Address, byte Register, byte Value)
+StdReturnType Twi::WriteRegister(byte address, byte register_address, byte value)
 {
-    const byte Buffer[]{Register, Value};
+    const byte buffer[]{register_address, value};
 
-    return write(Address, Buffer, sizeof(Buffer));
-} /* writeRegister */
+    return Write(address, buffer, sizeof(buffer));
+} /* WriteRegister */
 
 
 /******************************************************************************************************************************************************
-  readRegister()
+  ReadRegister()
 ******************************************************************************************************************************************************/
 /*! \brief          Reads from a register of a device
  *  \details        Two transfers rather than a repeated start: the pointer write is stopped
@@ -206,12 +206,12 @@ StdReturnType Twi::writeRegister(byte Address, byte Register, byte Value)
  *                  the stop, and separating the transfers keeps this simple enough to have no
  *                  second waiting path to get wrong.
 ******************************************************************************************************************************************************/
-StdReturnType Twi::readRegister(byte Address, byte Register, byte* Data, byte Length)
+StdReturnType Twi::ReadRegister(byte address, byte register_address, byte* data, byte length)
 {
-    if(write(Address, &Register, 1u) != E_OK) { return E_NOT_OK; }
+    if(Write(address, &register_address, 1u) != kEOk) { return kENotOk; }
 
-    return read(Address, Data, Length);
-} /* readRegister */
+    return Read(address, data, length);
+} /* ReadRegister */
 
 /******************************************************************************************************************************************************
  *  E N D   O F   F I L E

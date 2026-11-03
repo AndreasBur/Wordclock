@@ -45,34 +45,34 @@
  *  C L A S S   W E B   R E S P O N S E   B O D Y
 ******************************************************************************************************************************************************/
 /* One route's answer, being written. This server is pushed to: a chunk handed over is a
-   chunk on the wire, and finish() is the empty chunk that ends a chunked response. */
+   chunk on the wire, and Finish() is the empty chunk that ends a chunked response. */
 class WebResponseBody
 {
   private:
-    struct httpd_req* Request;
+    struct httpd_req* request_;
 
   public:
-    WebResponseBody(struct httpd_req* sRequest, const char* ContentType);
+    WebResponseBody(struct httpd_req* request, const char* content_type);
 
-    void write(const char* Data, size_t Length);
-    void finish();
+    void Write(const char* data, size_t length);
+    void Finish();
 };
 
 /******************************************************************************************************************************************************
  *  C L A S S   W E B   T R A N S P O R T
 ******************************************************************************************************************************************************/
 /* Where a finished line or a display frame leaves for whoever is watching. This server hands
-   out socket descriptors that the backend has to keep itself, so hasClients() is a walk over
+   out socket descriptors that the backend has to keep itself, so HasClients() is a walk over
    that table rather than a count somebody else keeps. */
 class WebTransport
 {
   public:
-    static WebTransport& getInstance();
+    static WebTransport& GetInstance();
 
-    bool isListening() const;
-    bool hasClients() const;
-    void sendText(const char* Text, size_t Length);
-    void sendBinary(const byte* Bytes, size_t Length);
+    bool IsListening() const;
+    bool HasClients() const;
+    void SendText(const char* text, size_t length);
+    void SendBinary(const byte* bytes, size_t length);
 };
 
 #endif // _WEB_TRANSPORT_H_

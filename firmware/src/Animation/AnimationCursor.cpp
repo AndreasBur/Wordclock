@@ -45,63 +45,63 @@
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  init()
+  Init()
 ******************************************************************************************************************************************************/
-void AnimationCursor::init()
+void AnimationCursor::Init()
 {
-    Animation::init(STATE_IDLE);
-    reset();
-} /* init */
+    Animation::Init(kStateIdle);
+    Reset();
+} /* Init */
 
 /******************************************************************************************************************************************************
-  setTime()
+  SetTime()
 ******************************************************************************************************************************************************/
-StdReturnType AnimationCursor::setTime(byte Hour, byte Minute)
+StdReturnType AnimationCursor::SetTime(byte hour, byte minute)
 {
-    StdReturnType returnValue{E_NOT_OK};
+    StdReturnType return_value{kENotOk};
 
-    if(Clock::getInstance().getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
-        returnValue = E_OK;
-        CurrentPixelIndex = 0u;
-        State = STATE_SET_TIME;
+    if(Clock::GetInstance().GetClockWords(hour, minute, clock_words_table_) == kEOk && state_ == kStateIdle) {
+        return_value = kEOk;
+        current_pixel_index_ = 0u;
+        state_ = kStateSetTime;
     }
-    return returnValue;
-} /* setTime */
+    return return_value;
+} /* SetTime */
 
 /******************************************************************************************************************************************************
-  task()
+  Task()
 ******************************************************************************************************************************************************/
-void AnimationCursor::task()
+void AnimationCursor::Task()
 {
-    if(State == STATE_SET_TIME) {
-        if(CurrentPixelIndex < DISPLAY_NUMBER_OF_PIXELS) { Display::getInstance().setPixel(CurrentPixelIndex); }
-        if(CurrentPixelIndex > 0u) {
-            if(isPixelPartOfClockWords(ClockWordsTable, CurrentPixelIndex - 1u) == false) {
-                Display::getInstance().clearPixel(CurrentPixelIndex - 1u);
+    if(state_ == kStateSetTime) {
+        if(current_pixel_index_ < DISPLAY_NUMBER_OF_PIXELS) { Display::GetInstance().SetPixel(current_pixel_index_); }
+        if(current_pixel_index_ > 0u) {
+            if(IsPixelPartOfClockWords(clock_words_table_, current_pixel_index_ - 1u) == false) {
+                Display::GetInstance().ClearPixel(current_pixel_index_ - 1u);
             }
         }
-        if(CurrentPixelIndex >= DISPLAY_NUMBER_OF_PIXELS) {
+        if(current_pixel_index_ >= DISPLAY_NUMBER_OF_PIXELS) {
             /* The cursor normally clears every old pixel as it passes. Rebuild the
                target once at the end as well, so a skipped or overlapping pixel can
                never leave a word from the previous time on the display. */
-            finishWithClockWords(ClockWordsTable);
+            FinishWithClockWords(clock_words_table_);
         }
-        CurrentPixelIndex++;
+        current_pixel_index_++;
     }
-} /* task */
+} /* Task */
 
 /******************************************************************************************************************************************************
  * P R I V A T E   F U N C T I O N S
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  reset()
+  Reset()
 ******************************************************************************************************************************************************/
-void AnimationCursor::reset()
+void AnimationCursor::Reset()
 {
-    ClockWordsTable.fill(DisplayWords::WORD_NONE);
-    CurrentPixelIndex = 0u;
-} /* reset */
+    clock_words_table_.fill(DisplayWords::kWordNone);
+    current_pixel_index_ = 0u;
+} /* Reset */
 
 
 /******************************************************************************************************************************************************

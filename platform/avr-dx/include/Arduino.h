@@ -68,28 +68,30 @@ class __FlashStringHelper;
 #define F(String)               (reinterpret_cast<const __FlashStringHelper*>(PSTR(String)))
 
 #ifndef bitRead
-#define bitRead(Value, Bit)     (((Value) >> (Bit)) & 0x01u)
+#define bitRead(value, bit)     (((value) >> (bit)) & 0x01u) // NOLINT(readability-identifier-naming)
 #endif
 
-#define Serial                  SerialPort::getInstance()
+#define Serial                  SerialPort::GetInstance() // NOLINT(readability-identifier-naming)
 
 /******************************************************************************************************************************************************
  *  G L O B A L   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
-using byte = uint8_t;
-using boolean = bool;
+/* Here and below, a NOLINT keeps a name the Arduino core gives it: the firmware is written
+   against that API, and these are its stand-ins. */
+using byte = uint8_t; // NOLINT(readability-identifier-naming)
+using boolean = bool; // NOLINT(readability-identifier-naming)
 
 /******************************************************************************************************************************************************
  *  G L O B A L   F U N C T I O N S
 ******************************************************************************************************************************************************/
 /* Starts the millisecond time base and enables interrupts. Has to run before anything
    below is used, which is why main() calls it first. */
-void initRuntime();
+void InitRuntime();
 
-/* Milliseconds since initRuntime(). Wraps after 49 days; every reader here takes a
+/* Milliseconds since InitRuntime(). Wraps after 49 days; every reader here takes a
    difference, which stays correct across the wrap as long as it is read more often than
    that. */
-uint32_t millis();
+uint32_t millis(); // NOLINT(readability-identifier-naming)
 
 /******************************************************************************************************************************************************
  *  C L A S S   S E R I A L   P O R T
@@ -100,12 +102,12 @@ class SerialPort
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    static constexpr uint16_t TransmitBufferSize{ARDUINO_SERIAL_TRANSMIT_BUFFER_SIZE};
-    static constexpr uint16_t ReceiveBufferSize{ARDUINO_SERIAL_RECEIVE_BUFFER_SIZE};
+    static constexpr uint16_t kTransmitBufferSize{ARDUINO_SERIAL_TRANSMIT_BUFFER_SIZE};
+    static constexpr uint16_t kReceiveBufferSize{ARDUINO_SERIAL_RECEIVE_BUFFER_SIZE};
 
     /* Long enough for the widest number any overload below prints, plus sign and
        terminator. */
-    static constexpr byte NumberStringLength{12u};
+    static constexpr byte kNumberStringLength{12u};
 
     SerialPort() { }
     ~SerialPort() { }
@@ -113,44 +115,44 @@ class SerialPort
     /* Reads no member, and is still not static: made static it cost 72 bytes of flash, as
        GCC then compiles it and the print() overloads built on it differently. The check is
        answered where it is defined, in Arduino.cpp. */
-    void write(char);
-    void printNumber(int32_t);
-    void printUnsignedNumber(uint32_t);
+    void write(char); // NOLINT(readability-identifier-naming)
+    void PrintNumber(int32_t);
+    void PrintUnsignedNumber(uint32_t);
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    static SerialPort& getInstance() {
-        static SerialPort SingletonInstance;
-        return SingletonInstance;
+    static SerialPort& GetInstance() {
+        static SerialPort singleton_instance;
+        return singleton_instance;
     }
 
-    void begin(uint32_t Baudrate);
+    void begin(uint32_t baudrate); // NOLINT(readability-identifier-naming)
 
     /* The overload set is the simulator's, plus the flash-string one that F() needs.
-       byte and the smaller integers reach printNumber() through the int overload by
+       byte and the smaller integers reach PrintNumber() through the int overload by
        integral promotion, which is what makes a byte print as a number here and on the
        simulator alike rather than as a character. */
-    void print(const __FlashStringHelper*);
-    void print(const char*);
-    void print(char Character) { write(Character); }
-    void print(int Number) { printNumber(Number); }
-    void print(unsigned int Number) { printUnsignedNumber(Number); }
-    void print(long Number) { printNumber(Number); }
-    void print(unsigned long Number) { printUnsignedNumber(Number); }
+    void print(const __FlashStringHelper*); // NOLINT(readability-identifier-naming)
+    void print(const char*); // NOLINT(readability-identifier-naming)
+    void print(char character) { write(character); } // NOLINT(readability-identifier-naming)
+    void print(int number) { PrintNumber(number); } // NOLINT(readability-identifier-naming)
+    void print(unsigned int number) { PrintUnsignedNumber(number); } // NOLINT(readability-identifier-naming)
+    void print(long number) { PrintNumber(number); } // NOLINT(readability-identifier-naming)
+    void print(unsigned long number) { PrintUnsignedNumber(number); } // NOLINT(readability-identifier-naming)
 
-    void println() { write('\r'); write('\n'); }
-    void println(const __FlashStringHelper* Text) { print(Text); println(); }
-    void println(const char* Text) { print(Text); println(); }
-    void println(int Number) { print(Number); println(); }
+    void println() { write('\r'); write('\n'); } // NOLINT(readability-identifier-naming)
+    void println(const __FlashStringHelper* text) { print(text); println(); } // NOLINT(readability-identifier-naming)
+    void println(const char* text) { print(text); println(); } // NOLINT(readability-identifier-naming)
+    void println(int number) { print(number); println(); } // NOLINT(readability-identifier-naming)
 
-    bool available() const;
-    char read();
+    bool available() const; // NOLINT(readability-identifier-naming)
+    char read(); // NOLINT(readability-identifier-naming)
 
     /* Waits until the queue has reached the wire. Only for the paths that are about to
        stop the processor - a restart otherwise cuts its own answer off mid-sentence. */
-    void flush();
+    void flush(); // NOLINT(readability-identifier-naming)
 };
 
 #endif // _ARDUINO_H_

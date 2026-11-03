@@ -34,26 +34,27 @@
 #include "type_traits"
 
 /* On this toolchain these headers are the standard library, see type_traits, so declaring
-   into std is what they exist to do. */
-// NOLINTBEGIN(cert-dcl58-cpp)
+   into std is what they exist to do - and under the standard's names, which is what the
+   naming check is told here. */
+// NOLINTBEGIN(cert-dcl58-cpp,readability-identifier-naming)
 namespace std {
 
 /* The integral case, worked out from the type itself: everything the core measures against
    is an integer of some width, and deriving the bound beats one specialisation per type. */
 template<class T> struct numeric_limits {
   private:
-    static constexpr bool IsSigned{T(-1) < T(0)};
-    static constexpr unsigned Bits{sizeof(T) * 8u};
+    static constexpr bool kIsSigned{T(-1) < T(0)};
+    static constexpr unsigned kBits{sizeof(T) * 8u};
 
   public:
-    static constexpr bool is_signed{IsSigned};
+    static constexpr bool is_signed{kIsSigned};
 
     static constexpr T max() {
-        return IsSigned ? static_cast<T>(~(static_cast<T>(1) << (Bits - 1u))) : static_cast<T>(~static_cast<T>(0));
+        return kIsSigned ? static_cast<T>(~(static_cast<T>(1) << (kBits - 1u))) : static_cast<T>(~static_cast<T>(0));
     }
 
     static constexpr T min() {
-        return IsSigned ? static_cast<T>(static_cast<T>(1) << (Bits - 1u)) : static_cast<T>(0);
+        return kIsSigned ? static_cast<T>(static_cast<T>(1) << (kBits - 1u)) : static_cast<T>(0);
     }
 };
 
@@ -79,7 +80,7 @@ template<> struct numeric_limits<long double> {
 };
 
 } // namespace std
-// NOLINTEND(cert-dcl58-cpp)
+// NOLINTEND(cert-dcl58-cpp,readability-identifier-naming)
 
 #endif // _STL_LIMITS_
 

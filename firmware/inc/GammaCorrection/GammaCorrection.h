@@ -86,37 +86,37 @@ class GammaCorrection
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    static constexpr byte ValuesPerDoubling{16u};
-    static constexpr byte NumberOfDoublings{sizeof(byte) * CHAR_BIT};
-    static constexpr byte NumberOfSteps{128u};
+    static constexpr byte kValuesPerDoubling{16u};
+    static constexpr byte kNumberOfDoublings{sizeof(byte) * CHAR_BIT};
+    static constexpr byte kNumberOfSteps{128u};
 
-    static_assert(ValuesPerDoubling * NumberOfDoublings == NumberOfSteps,
+    static_assert(kValuesPerDoubling * kNumberOfDoublings == kNumberOfSteps,
                   "GammaCorrection: the steps must be exactly the stored doubling shifted through every bit of the result");
 
     /* 2^(7 + n/16) for n = 1..16, as published - see the file header for the 1 they lie
        below the formula. */
-    static constexpr TopDoublingElementType TopDoublingTable[ValuesPerDoubling] PROGMEM {
+    static constexpr TopDoublingElementType kTopDoublingTable[kValuesPerDoubling] PROGMEM {
         133u, 139u, 145u, 151u, 158u, 165u, 172u, 180u, 188u, 196u, 205u, 214u, 224u, 234u, 244u, 255u
     };
 
     // functions
-    static TopDoublingElementType getTopDoublingElement(byte Index) {
-        TopDoublingElementType Element;
-        memcpy_P(&Element, &TopDoublingTable[Index], sizeof(TopDoublingElementType));
-        return Element;
+    static TopDoublingElementType GetTopDoublingElement(byte index) {
+        TopDoublingElementType element;
+        memcpy_P(&element, &kTopDoublingTable[index], sizeof(TopDoublingElementType));
+        return element;
     }
 
     /* The top doubling needs no shift, each one below it one bit more. */
-    static constexpr byte toShift(byte Step) {
-        return static_cast<byte>((NumberOfDoublings - 1u) - (Step / ValuesPerDoubling));
+    static constexpr byte ToShift(byte step) {
+        return static_cast<byte>((kNumberOfDoublings - 1u) - (step / kValuesPerDoubling));
     }
 
     /* About 1.0443^Step - 2^(1/16) per step - from 1 at step 0 to 255 at step 127. */
-    static byte toExponential(byte Step) {
-        return static_cast<byte>(getTopDoublingElement(Step % ValuesPerDoubling) >> toShift(Step));
+    static byte ToExponential(byte step) {
+        return static_cast<byte>(GetTopDoublingElement(step % kValuesPerDoubling) >> ToShift(step));
     }
 
-    static constexpr byte toStep(byte ValueLinear) { return static_cast<byte>(ValueLinear / 2u); }
+    static constexpr byte ToStep(byte value_linear) { return static_cast<byte>(value_linear / 2u); }
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
@@ -128,9 +128,9 @@ class GammaCorrection
     /* 0 to 0, everything else onto the curve: see the file header for why 0 is answered
        apart rather than by subtracting 1 from every result, which would take 255 down to
        254 as well. */
-    static byte calcCorrectedValue(byte ValueLinear) {
-        if(ValueLinear == 0u) { return 0u; }
-        return toExponential(toStep(ValueLinear));
+    static byte CalcCorrectedValue(byte value_linear) {
+        if(value_linear == 0u) { return 0u; }
+        return ToExponential(ToStep(value_linear));
     }
 };
 

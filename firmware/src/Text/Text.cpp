@@ -43,200 +43,200 @@
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  setChar()
+  SetChar()
 ******************************************************************************************************************************************************/
-StdReturnType Text::setChar(byte Column, byte Row, char Char, FontType Font)
+StdReturnType Text::SetChar(byte column, byte row, char character, FontType font)
 {
-    byte fontIndex;
-    if(convertCharToFontIndex(Char, fontIndex) == E_NOT_OK) return E_NOT_OK;
+    byte font_index;
+    if(ConvertCharToFontIndex(character, font_index) == kENotOk) return kENotOk;
 
 #if(TEXT_SUPPORT_FONT_5X8 == STD_ON)
-    if(Font == FONT_5X8) {
-        FontSprite5x8::FontCharType FontChar;
-        if(Font5x8.getChar(fontIndex, FontChar) == E_NOT_OK) { return E_NOT_OK; }
-        return setCharFontVertical(Column, Row, FontChar, FONT_SPRITE_5X8_HEIGHT);
+    if(font == kFont5x8) {
+        FontSprite5x8::FontCharType font_char;
+        if(font5x8_.GetChar(font_index, font_char) == kENotOk) { return kENotOk; }
+        return SetCharFontVertical(column, row, font_char, FONT_SPRITE_5X8_HEIGHT);
     }
 #endif
 #if(TEXT_SUPPORT_FONT_7X9 == STD_ON)
-    if(Font == FONT_7X9) {
-        FontCourierNew7x9::FontCharType FontChar;
-        if(Font7x9.getChar(fontIndex, FontChar) == E_NOT_OK) { return E_NOT_OK; }
-        return setCharFontHorizontal(Column, Row, FontChar, FONT_COURIER_NEW_7X9_HEIGHT);
+    if(font == kFont7x9) {
+        FontCourierNew7x9::FontCharType font_char;
+        if(font7x9_.GetChar(font_index, font_char) == kENotOk) { return kENotOk; }
+        return SetCharFontHorizontal(column, row, font_char, FONT_COURIER_NEW_7X9_HEIGHT);
     }
 #endif
 #if(TEXT_SUPPORT_FONT_7X10 == STD_ON)
-    if(Font == FONT_7X10) {
-        FontCourierNew7x10::FontCharType FontChar;
-        if(Font7x10.getChar(fontIndex, FontChar) == E_NOT_OK) { return E_NOT_OK; }
-        return setCharFontHorizontal(Column, Row, FontChar, FONT_COURIER_NEW_7X10_HEIGHT);
+    if(font == kFont7x10) {
+        FontCourierNew7x10::FontCharType font_char;
+        if(font7x10_.GetChar(font_index, font_char) == kENotOk) { return kENotOk; }
+        return SetCharFontHorizontal(column, row, font_char, FONT_COURIER_NEW_7X10_HEIGHT);
     }
 #endif
 #if(TEXT_SUPPORT_FONT_9X10 == STD_ON)
-    if(Font == FONT_9X10) {
-        FontLucidaSans9x10::FontCharType FontChar;
-        if(Font9x10.getChar(fontIndex, FontChar) == E_NOT_OK) { return E_NOT_OK; }
-        return setCharFontVertical(Column, Row, FontChar, FONT_LUCIDA_SANS_9X10_HEIGHT);
+    if(font == kFont9x10) {
+        FontLucidaSans9x10::FontCharType font_char;
+        if(font9x10_.GetChar(font_index, font_char) == kENotOk) { return kENotOk; }
+        return SetCharFontVertical(column, row, font_char, FONT_LUCIDA_SANS_9X10_HEIGHT);
     }
 #endif
 #if(TEXT_SUPPORT_FONT_10X10 == STD_ON)
-    if(Font == FONT_10X10) {
-        FontTahoma10x10::FontCharType FontChar;
-        if(Font10x10.getChar(fontIndex, FontChar) == E_NOT_OK) { return E_NOT_OK; }
-        return setCharFontHorizontal(Column, Row, FontChar, FONT_TAHOMA_10X10_HEIGHT);
+    if(font == kFont10x10) {
+        FontTahoma10x10::FontCharType font_char;
+        if(font10x10_.GetChar(font_index, font_char) == kENotOk) { return kENotOk; }
+        return SetCharFontHorizontal(column, row, font_char, FONT_TAHOMA_10X10_HEIGHT);
     }
 #endif
-    return E_NOT_OK;
-} /* setChar */
+    return kENotOk;
+} /* SetChar */
 
 
 /******************************************************************************************************************************************************
-  setCharWithShift()
+  SetCharWithShift()
 ******************************************************************************************************************************************************/
-void Text::setCharWithShift(char Char, FontType Font)
+void Text::SetCharWithShift(char character, FontType font)
 {
-    State = STATE_CHAR_SHIFT;
-    Shift.State = SHIFT_STATE_BUSY;
-    Shift.Font = Font;
-    Shift.Char = Char;
-    Shift.CharWidth = getFontCharWidth(Font, Char);
-    Shift.Counter = Shift.CharWidth;
+    state_ = kStateCharShift;
+    shift_.state = kShiftStateBusy;
+    shift_.font = font;
+    shift_.character = character;
+    shift_.char_width = GetFontCharWidth(font, character);
+    shift_.counter = shift_.char_width;
 }
 
 
 /******************************************************************************************************************************************************
-  setTextWithShift()
+  SetTextWithShift()
 ******************************************************************************************************************************************************/
-void Text::setTextWithShift(const char* Text, FontType Font)
+void Text::SetTextWithShift(const char* text, FontType font)
 {
-    State = STATE_TEXT_SHIFT;
-    Shift.State = SHIFT_STATE_IDLE;
-    Shift.Font = Font;
-    Shift.Text = Text;
+    state_ = kStateTextShift;
+    shift_.state = kShiftStateIdle;
+    shift_.font = font;
+    shift_.text = text;
 }
 
 
 /******************************************************************************************************************************************************
-  task()
+  Task()
 ******************************************************************************************************************************************************/
-void Text::task(bool Show)
+void Text::Task(bool show)
 {
-    if(State == STATE_TEXT_SHIFT) {
-        stringShiftTask();
-        if(Show) { Display::getInstance().show(); }
+    if(state_ == kStateTextShift) {
+        StringShiftTask();
+        if(show) { Display::GetInstance().Show(); }
     }
-    if(State == STATE_CHAR_SHIFT) {
-        charShiftTask();
-        if(Show) { Display::getInstance().show(); }
+    if(state_ == kStateCharShift) {
+        CharShiftTask();
+        if(show) { Display::GetInstance().Show(); }
     }
-} /* task */
+} /* Task */
 
 
 /******************************************************************************************************************************************************
-  stop()
+  Stop()
 ******************************************************************************************************************************************************/
-void Text::stop()
+void Text::Stop()
 {
-    State = STATE_IDLE;
-    Shift.State = SHIFT_STATE_IDLE;
-} /* stop */
+    state_ = kStateIdle;
+    shift_.state = kShiftStateIdle;
+} /* Stop */
 
 
 /******************************************************************************************************************************************************
-  getFontHeight()
+  GetFontHeight()
 ******************************************************************************************************************************************************/
-byte Text::getFontHeight(FontType Font) const
+byte Text::GetFontHeight(FontType font) const
 {
 #if(TEXT_SUPPORT_FONT_5X8 == STD_ON)
-    if(Font == FONT_5X8) return Font5x8.getHeight();
+    if(font == kFont5x8) return font5x8_.GetHeight();
 #endif
 #if(TEXT_SUPPORT_FONT_7X9 == STD_ON)
-    if(Font == FONT_7X9) return Font7x9.getHeight();
+    if(font == kFont7x9) return font7x9_.GetHeight();
 #endif
 #if(TEXT_SUPPORT_FONT_7X10 == STD_ON)
-    if(Font == FONT_7X10) return Font7x10.getHeight();
+    if(font == kFont7x10) return font7x10_.GetHeight();
 #endif
 #if(TEXT_SUPPORT_FONT_9X10 == STD_ON)
-    if(Font == FONT_9X10) return Font9x10.getHeight();
+    if(font == kFont9x10) return font9x10_.GetHeight();
 #endif
 #if(TEXT_SUPPORT_FONT_10X10 == STD_ON)
-    if(Font == FONT_10X10) return Font10x10.getHeight();
+    if(font == kFont10x10) return font10x10_.GetHeight();
 #endif
     return 0;
-} /* getFontHeight */
+} /* GetFontHeight */
 
 
 /******************************************************************************************************************************************************
-  getFontWidth()
+  GetFontWidth()
 ******************************************************************************************************************************************************/
-byte Text::getFontWidth(FontType Font) const
+byte Text::GetFontWidth(FontType font) const
 {
 #if(TEXT_SUPPORT_FONT_5X8 == STD_ON)
-    if(Font == FONT_5X8) return Font5x8.getWidth();
+    if(font == kFont5x8) return font5x8_.GetWidth();
 #endif
 #if(TEXT_SUPPORT_FONT_7X9 == STD_ON)
-    if(Font == FONT_7X9) return Font7x9.getWidth();
+    if(font == kFont7x9) return font7x9_.GetWidth();
 #endif
 #if(TEXT_SUPPORT_FONT_7X10 == STD_ON)
-    if(Font == FONT_7X10) return Font7x10.getWidth();
+    if(font == kFont7x10) return font7x10_.GetWidth();
 #endif
 #if(TEXT_SUPPORT_FONT_9X10 == STD_ON)
-    if(Font == FONT_9X10) return Font9x10.getWidth();
+    if(font == kFont9x10) return font9x10_.GetWidth();
 #endif
 #if(TEXT_SUPPORT_FONT_10X10 == STD_ON)
-    if(Font == FONT_10X10) return Font10x10.getWidth();
+    if(font == kFont10x10) return font10x10_.GetWidth();
 #endif
     return 0;
-} /* getFontWidth */
+} /* GetFontWidth */
 
 
 /******************************************************************************************************************************************************
-  getFontCharWidth()
+  GetFontCharWidth()
 ******************************************************************************************************************************************************/
-byte Text::getFontCharWidth(FontType Font, char Char) const
+byte Text::GetFontCharWidth(FontType font, char character) const
 {
-    byte index = convertCharToFontIndex(Char);
+    byte index = ConvertCharToFontIndex(character);
 
 #if(TEXT_SUPPORT_FONT_5X8 == STD_ON)
-    if(Font == FONT_5X8) return Font5x8.getCharWidth(index);
+    if(font == kFont5x8) return font5x8_.GetCharWidth(index);
 #endif
 #if(TEXT_SUPPORT_FONT_7X9 == STD_ON)
-    if(Font == FONT_7X9) return Font7x9.getCharWidth(index);
+    if(font == kFont7x9) return font7x9_.GetCharWidth(index);
 #endif
 #if(TEXT_SUPPORT_FONT_7X10 == STD_ON)
-    if(Font == FONT_7X10) return Font7x10.getCharWidth(index);
+    if(font == kFont7x10) return font7x10_.GetCharWidth(index);
 #endif
 #if(TEXT_SUPPORT_FONT_9X10 == STD_ON)
-    if(Font == FONT_9X10) return Font9x10.getCharWidth(index);
+    if(font == kFont9x10) return font9x10_.GetCharWidth(index);
 #endif
 #if(TEXT_SUPPORT_FONT_10X10 == STD_ON)
-    if(Font == FONT_10X10) return Font10x10.getCharWidth(index);
+    if(font == kFont10x10) return font10x10_.GetCharWidth(index);
 #endif
     return 0;
-} /* getFontCharWidth */
+} /* GetFontCharWidth */
 
 
 /******************************************************************************************************************************************************
-  getFontOrientation()
+  GetFontOrientation()
 ******************************************************************************************************************************************************/
-Orientation Text::getFontOrientation(FontType Font) const
+Orientation Text::GetFontOrientation(FontType font) const
 {
 #if(TEXT_SUPPORT_FONT_5X8 == STD_ON)
-    if(Font == FONT_5X8) return Font5x8.getOrientation();
+    if(font == kFont5x8) return font5x8_.GetOrientation();
 #endif
 #if(TEXT_SUPPORT_FONT_7X9 == STD_ON)
-    if(Font == FONT_7X9) return Font7x9.getOrientation();
+    if(font == kFont7x9) return font7x9_.GetOrientation();
 #endif
 #if(TEXT_SUPPORT_FONT_7X10 == STD_ON)
-    if(Font == FONT_7X10) return Font7x10.getOrientation();
+    if(font == kFont7x10) return font7x10_.GetOrientation();
 #endif
 #if(TEXT_SUPPORT_FONT_9X10 == STD_ON)
-    if(Font == FONT_9X10) return Font9x10.getOrientation();
+    if(font == kFont9x10) return font9x10_.GetOrientation();
 #endif
 #if(TEXT_SUPPORT_FONT_10X10 == STD_ON)
-    if(Font == FONT_10X10) return Font10x10.getOrientation();
+    if(font == kFont10x10) return font10x10_.GetOrientation();
 #endif
-    return Orientation::ORIENTATION_NONE;
-} /* getFontOrientation */
+    return Orientation::kOrientationNone;
+} /* GetFontOrientation */
 
 
 /******************************************************************************************************************************************************
@@ -244,196 +244,196 @@ Orientation Text::getFontOrientation(FontType Font) const
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  stringShiftTask()
+  StringShiftTask()
 ******************************************************************************************************************************************************/
-void Text::stringShiftTask()
+void Text::StringShiftTask()
 {
-    if(Shift.State == SHIFT_STATE_IDLE) {
+    if(shift_.state == kShiftStateIdle) {
         /* If end of string is not reached, load next char */
-        if(*Shift.Text != STD_NULL_CHARACTER) {
-            Shift.Char = *Shift.Text;
-            Shift.State = SHIFT_STATE_BUSY;
-            Shift.CharWidth = getFontCharWidth(Shift.Font, Shift.Char);
-            Shift.Counter = Shift.CharWidth;
-            charShiftTask();
-            Shift.Text++;
+        if(*shift_.text != STD_NULL_CHARACTER) {
+            shift_.character = *shift_.text;
+            shift_.state = kShiftStateBusy;
+            shift_.char_width = GetFontCharWidth(shift_.font, shift_.character);
+            shift_.counter = shift_.char_width;
+            CharShiftTask();
+            shift_.text++;
         } else { /* otherwise task has finished */
-            if(State == STATE_TEXT_SHIFT) State = STATE_IDLE;
-            wcTransformation.shiftLeft();
+            if(state_ == kStateTextShift) state_ = kStateIdle;
+            wc_transformation_.ShiftLeft();
         }
     } else {
         /* go on shifting char */
-        charShiftTask();
+        CharShiftTask();
     }
-} /* stringShiftTask */
+} /* StringShiftTask */
 
 
 /******************************************************************************************************************************************************
-  charShiftTask()
+  CharShiftTask()
 ******************************************************************************************************************************************************/
-void Text::charShiftTask()
+void Text::CharShiftTask()
 {
-    if(Shift.State == SHIFT_STATE_BUSY) {
-        wcTransformation.shiftLeft();
-        if(Shift.Counter == 0u) {
-            Shift.State = SHIFT_STATE_IDLE;
-            if(State == STATE_CHAR_SHIFT) State = STATE_IDLE;
+    if(shift_.state == kShiftStateBusy) {
+        wc_transformation_.ShiftLeft();
+        if(shift_.counter == 0u) {
+            shift_.state = kShiftStateIdle;
+            if(state_ == kStateCharShift) state_ = kStateIdle;
         } else {
-            Shift.Counter--;
-            byte Column = DISPLAY_NUMBER_OF_COLUMNS - Shift.CharWidth + Shift.Counter;
-            byte Row = getRowCenter(Shift.Font);
-            /* A character setChar refuses is shifted through as a space, which is the blank
+            shift_.counter--;
+            byte column = DISPLAY_NUMBER_OF_COLUMNS - shift_.char_width + shift_.counter;
+            byte row = GetRowCenter(shift_.font);
+            /* A character SetChar refuses is shifted through as a space, which is the blank
                glyph and therefore clears the cells the previous step wrote. Leaving it out
                instead would smear those pixels across the display for as long as the text
                runs. The width was already taken from the same substitute. */
-            if(setChar(Column, Row, Shift.Char, Shift.Font) == E_NOT_OK) {
-                setChar(Column, Row, ' ', Shift.Font);
+            if(SetChar(column, row, shift_.character, shift_.font) == kENotOk) {
+                SetChar(column, row, ' ', shift_.font);
             }
         }
     }
-} /* charShiftTask */
+} /* CharShiftTask */
 
 
 /******************************************************************************************************************************************************
-  setCharFontHorizontal()
+  SetCharFontHorizontal()
 ******************************************************************************************************************************************************/
 template <typename RowType, byte RowsSize>
-StdReturnType Text::setCharFontHorizontal(byte Column, byte Row, const FontCharHorizontal<RowType, RowsSize>& FontChar, byte FontHeight)
+StdReturnType Text::SetCharFontHorizontal(byte column, byte row, const FontCharHorizontal<RowType, RowsSize>& font_char, byte font_height)
 {
-    for(byte fontRow = 0u; fontRow < FontHeight; fontRow++)
+    for(byte font_row = 0u; font_row < font_height; font_row++)
     {
-        RowType CharRow;
-        byte RowAbs = Row + fontRow;
-        if(FontChar.getRow(fontRow, CharRow) == E_NOT_OK) { return E_NOT_OK; }
-        if(setCharRow(CharRow, Column, RowAbs, FontChar.getWidth()) == E_NOT_OK) { return E_NOT_OK; }
+        RowType char_row;
+        byte row_abs = row + font_row;
+        if(font_char.GetRow(font_row, char_row) == kENotOk) { return kENotOk; }
+        if(SetCharRow(char_row, column, row_abs, font_char.GetWidth()) == kENotOk) { return kENotOk; }
     }
-    return E_OK;
-} /* setCharFontHorizontal */
+    return kEOk;
+} /* SetCharFontHorizontal */
 
 
 /******************************************************************************************************************************************************
-  setCharRow()
+  SetCharRow()
 ******************************************************************************************************************************************************/
 template <typename RowType>
-StdReturnType Text::setCharRow(RowType CharRow, byte Column, byte RowAbs, byte FontWidth)
+StdReturnType Text::SetCharRow(RowType char_row, byte column, byte row_abs, byte font_width)
 {
-    StdReturnType ReturnValue{E_OK};
+    StdReturnType return_value{kEOk};
 
-    for(byte fontColumn = 0u; fontColumn < FontWidth; fontColumn++)
+    for(byte font_column = 0u; font_column < font_width; font_column++)
     {
-        byte ColumnAbs = Column + fontColumn;
-        if(ColumnAbs < DISPLAY_NUMBER_OF_COLUMNS && RowAbs < DISPLAY_NUMBER_OF_ROWS) {
-            if(Display::getInstance().writePixel(ColumnAbs, RowAbs, bitRead(CharRow, fontColumn)) == E_NOT_OK) { ReturnValue = E_NOT_OK; }
+        byte column_abs = column + font_column;
+        if(column_abs < DISPLAY_NUMBER_OF_COLUMNS && row_abs < DISPLAY_NUMBER_OF_ROWS) {
+            if(Display::GetInstance().WritePixel(column_abs, row_abs, bitRead(char_row, font_column)) == kENotOk) { return_value = kENotOk; }
         } else {
             break;
         }
     }
-    return ReturnValue;
-} /* setCharRow */
+    return return_value;
+} /* SetCharRow */
 
 
 /******************************************************************************************************************************************************
-  setCharFontVertical()
+  SetCharFontVertical()
 ******************************************************************************************************************************************************/
 template <typename ColumnType, byte ColumnsSize>
-StdReturnType Text::setCharFontVertical(byte Column, byte Row, const FontCharVertical<ColumnType, ColumnsSize>& FontChar, byte FontHeight)
+StdReturnType Text::SetCharFontVertical(byte column, byte row, const FontCharVertical<ColumnType, ColumnsSize>& font_char, byte font_height)
 {
-    for(byte fontColumn = 0u; fontColumn < FontChar.getWidth(); fontColumn++)
+    for(byte font_column = 0u; font_column < font_char.GetWidth(); font_column++)
     {
-        ColumnType CharColumn;
-        byte ColumnAbs = Column + fontColumn;
-        if(FontChar.getColumn(fontColumn, CharColumn) == E_NOT_OK) { return E_NOT_OK; }
-        if(setCharColumn(CharColumn, ColumnAbs, Row, FontHeight) == E_NOT_OK) { return E_NOT_OK; }
+        ColumnType char_column;
+        byte column_abs = column + font_column;
+        if(font_char.GetColumn(font_column, char_column) == kENotOk) { return kENotOk; }
+        if(SetCharColumn(char_column, column_abs, row, font_height) == kENotOk) { return kENotOk; }
     }
-    return E_OK;
-} /* setCharFontVertical */
+    return kEOk;
+} /* SetCharFontVertical */
 
 
 /******************************************************************************************************************************************************
-  setCharColumn()
+  SetCharColumn()
 ******************************************************************************************************************************************************/
 template <typename ColumnType>
-StdReturnType Text::setCharColumn(ColumnType CharColumn, byte ColumnAbs, byte Row, byte FontHeight)
+StdReturnType Text::SetCharColumn(ColumnType char_column, byte column_abs, byte row, byte font_height)
 {
-    StdReturnType returnValue{E_OK};
+    StdReturnType return_value{kEOk};
 
-    for(byte fontRow = 0u; fontRow < FontHeight; fontRow++)
+    for(byte font_row = 0u; font_row < font_height; font_row++)
     {
-        byte RowAbs = Row + fontRow;
-        if(ColumnAbs < DISPLAY_NUMBER_OF_COLUMNS && RowAbs < DISPLAY_NUMBER_OF_ROWS) {
-            if(Display::getInstance().writePixel(ColumnAbs, RowAbs, bitRead(CharColumn, fontRow)) == E_NOT_OK) { returnValue = E_NOT_OK; }
+        byte row_abs = row + font_row;
+        if(column_abs < DISPLAY_NUMBER_OF_COLUMNS && row_abs < DISPLAY_NUMBER_OF_ROWS) {
+            if(Display::GetInstance().WritePixel(column_abs, row_abs, bitRead(char_column, font_row)) == kENotOk) { return_value = kENotOk; }
         } else {
             break;
         }
     }
-    return returnValue;
-} /* setCharColumn */
+    return return_value;
+} /* SetCharColumn */
 
 
 /******************************************************************************************************************************************************
-  convertCharToFontIndex()
+  ConvertCharToFontIndex()
 ******************************************************************************************************************************************************/
 /*! \brief          converts char to sprite
  *  \details        this function converts the ASCII char to sprite index
  *
- *  \param[in]      Char            char to convert to sprite
- *  \param[out]     Index           appropriate sprite
- *  \return         E_OK
- *                  E_NOT_OK
+ *  \param[in]      character            char to convert to sprite
+ *  \param[out]     index           appropriate sprite
+ *  \return         kEOk
+ *                  kENotOk
  *****************************************************************************************************************************************************/
-StdReturnType Text::convertCharToFontIndex(char Char, byte& Index)
+StdReturnType Text::ConvertCharToFontIndex(char character, byte& index)
 {
-    StdReturnType returnValue = E_NOT_OK;
+    StdReturnType return_value = kENotOk;
 
     /* for umlauts we need a special treatment */
-    if('\xC4' == Char) { Index = 96u; returnValue = E_OK; }
-    else if('\xD6' == Char) { Index = 97u; returnValue = E_OK; }
-    else if('\xDC' == Char) { Index = 98u; returnValue = E_OK; }
-    else if('\xE4' == Char) { Index = 99u; returnValue = E_OK; }
-    else if('\xF6' == Char) { Index = 100u; returnValue = E_OK; }
-    else if('\xFC' == Char) { Index = 101u; returnValue = E_OK; }
+    if('\xC4' == character) { index = 96u; return_value = kEOk; }
+    else if('\xD6' == character) { index = 97u; return_value = kEOk; }
+    else if('\xDC' == character) { index = 98u; return_value = kEOk; }
+    else if('\xE4' == character) { index = 99u; return_value = kEOk; }
+    else if('\xF6' == character) { index = 100u; return_value = kEOk; }
+    else if('\xFC' == character) { index = 101u; return_value = kEOk; }
     /* The degree sign sits with them for the same reason: Latin-1 0xB0 is nowhere near the
        ASCII run, so it is appended past its end rather than shifting every index after it. */
-    else if('\xB0' == Char) { Index = 102u; returnValue = E_OK; }
+    else if('\xB0' == character) { index = 102u; return_value = kEOk; }
     /* For all others only add the offset - within both bounds, and compared as a byte.
        Whether char is signed is the platform's decision: where it is not, and AVR is one
        of those, every Latin-1 byte above the six umlauts passes a lower bound on its own
        and indexes past the end of a font table that has 102 entries. */
     else {
-        const byte Value = static_cast<byte>(Char);
+        const byte value = static_cast<byte>(character);
 
-        if((Value >= TEXT_ASCII_CHAR_MIN) && (Value <= TEXT_ASCII_CHAR_MAX)) {
-            Index = static_cast<byte>(Value + TEXT_ASCII_TABLE_OFFSET); returnValue = E_OK;
+        if((value >= TEXT_ASCII_CHAR_MIN) && (value <= TEXT_ASCII_CHAR_MAX)) {
+            index = static_cast<byte>(value + TEXT_ASCII_TABLE_OFFSET); return_value = kEOk;
         }
     }
-    return returnValue;
-} /* convertCharToFontIndex */
+    return return_value;
+} /* ConvertCharToFontIndex */
 
 
 /******************************************************************************************************************************************************
-  convertCharToFontIndex()
+  ConvertCharToFontIndex()
 ******************************************************************************************************************************************************/
 /*! \brief          converts char to sprite
  *  \details        this function converts the ASCII char to sprite index
  *
- *  \param[in]      Char            char to convert to sprite
+ *  \param[in]      character            char to convert to sprite
  *  \param[out]     SpriteIndex     appropriate sprite
- *  \return         E_OK
- *                  E_NOT_OK
+ *  \return         kEOk
+ *                  kENotOk
  *****************************************************************************************************************************************************/
-byte Text::convertCharToFontIndex(char Char)
+byte Text::ConvertCharToFontIndex(char character)
 {
-    byte Index;
+    byte index;
 
     /* The mapping is written once, above. It used to be written here as well, which made
        adding a glyph a change in two branches that had to agree - see fonts.md. */
-    if(convertCharToFontIndex(Char, Index) == E_NOT_OK) {
+    if(ConvertCharToFontIndex(character, index) == kENotOk) {
         /* The space, which is the first glyph: a character that cannot be drawn leaves a gap
            rather than whatever byte sits past the end of the table. */
-        return SpaceFontIndex;
+        return kSpaceFontIndex;
     }
-    return Index;
-} /* convertCharToFontIndex */
+    return index;
+} /* ConvertCharToFontIndex */
 
 
 /******************************************************************************************************************************************************

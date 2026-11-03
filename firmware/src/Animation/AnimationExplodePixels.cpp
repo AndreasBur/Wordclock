@@ -43,54 +43,54 @@
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  init()
+  Init()
 ******************************************************************************************************************************************************/
-void AnimationExplodePixels::init()
+void AnimationExplodePixels::Init()
 {
-    Animation::init(STATE_IDLE);
-    reset();
-} /* init */
+    Animation::Init(kStateIdle);
+    Reset();
+} /* Init */
 
 
 /******************************************************************************************************************************************************
-  setTime()
+  SetTime()
 ******************************************************************************************************************************************************/
-StdReturnType AnimationExplodePixels::setTime(byte Hour, byte Minute)
+StdReturnType AnimationExplodePixels::SetTime(byte hour, byte minute)
 {
-    StdReturnType returnValue{E_NOT_OK};
+    StdReturnType return_value{kENotOk};
 
-    if(Clock::getInstance().getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
-        returnValue = E_OK;
-        Display::getInstance().setPixel(ColumnCenter, RowCenter);
-        ShiftCounter = 0u;
-        State = STATE_CLEAR_TIME;
+    if(Clock::GetInstance().GetClockWords(hour, minute, clock_words_table_) == kEOk && state_ == kStateIdle) {
+        return_value = kEOk;
+        Display::GetInstance().SetPixel(kColumnCenter, kRowCenter);
+        shift_counter_ = 0u;
+        state_ = kStateClearTime;
     }
-    return returnValue;
-} /* setTime */
+    return return_value;
+} /* SetTime */
 
 
 /******************************************************************************************************************************************************
-  task()
+  Task()
 ******************************************************************************************************************************************************/
-void AnimationExplodePixels::task()
+void AnimationExplodePixels::Task()
 {
-    if(State == STATE_CLEAR_TIME) {
-        if(ShiftCounter < ShiftCounterMaxValue) {
-            ShiftCounter++;
-            clearTimeTask();
+    if(state_ == kStateClearTime) {
+        if(shift_counter_ < kShiftCounterMaxValue) {
+            shift_counter_++;
+            ClearTimeTask();
         } else {
-            setStateToSetTime();
+            SetStateToSetTime();
         }
     }
-    if(State == STATE_SET_TIME) {
-        if(ShiftCounter >= 2u) {
-            ShiftCounter--;
-            setTimeTask();
+    if(state_ == kStateSetTime) {
+        if(shift_counter_ >= 2u) {
+            shift_counter_--;
+            SetTimeTask();
         } else {
-            finishWithClockWords(ClockWordsTable);
+            FinishWithClockWords(clock_words_table_);
         }
     }
-} /* task */
+} /* Task */
 
 
 /******************************************************************************************************************************************************
@@ -98,182 +98,182 @@ void AnimationExplodePixels::task()
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  reset()
+  Reset()
 ******************************************************************************************************************************************************/
-void AnimationExplodePixels::reset()
+void AnimationExplodePixels::Reset()
 {
-    ShiftCounter = 0u;
-    ClockWordsTable.fill(DisplayWords::WORD_NONE);
-} /* reset */
+    shift_counter_ = 0u;
+    clock_words_table_.fill(DisplayWords::kWordNone);
+} /* Reset */
 
 /******************************************************************************************************************************************************
-  clearTimeTask()
+  ClearTimeTask()
 ******************************************************************************************************************************************************/
-void AnimationExplodePixels::clearTimeTask()
+void AnimationExplodePixels::ClearTimeTask()
 {
-    shiftQuadrantUpperLeft();
-    shiftQuadrantLowerRight();
-    shiftQuadrantUpperRight();
-    shiftQuadrantLowerLeft();
-} /* clearTimeTask */
+    ShiftQuadrantUpperLeft();
+    ShiftQuadrantLowerRight();
+    ShiftQuadrantUpperRight();
+    ShiftQuadrantLowerLeft();
+} /* ClearTimeTask */
 
 /******************************************************************************************************************************************************
-  setTimeTask()
+  SetTimeTask()
 ******************************************************************************************************************************************************/
-void AnimationExplodePixels::setTimeTask()
+void AnimationExplodePixels::SetTimeTask()
 {
     DisplayPixels pixels;
-    Display::getInstance().clear();
-    setTime(pixels);
-    shiftQuadrants(pixels, ShiftCounter);
-    Display::getInstance().setPixel(ColumnCenter, RowCenter);
-} /* setTimeTask */
+    Display::GetInstance().Clear();
+    SetTime(pixels);
+    ShiftQuadrants(pixels, shift_counter_);
+    Display::GetInstance().SetPixel(kColumnCenter, kRowCenter);
+} /* SetTimeTask */
 
 /******************************************************************************************************************************************************
-  setStateToSetTime()
+  SetStateToSetTime()
 ******************************************************************************************************************************************************/
-void AnimationExplodePixels::setStateToSetTime()
+void AnimationExplodePixels::SetStateToSetTime()
 {
-    State = STATE_SET_TIME;
-    Display::getInstance().clear();
-    ShiftCounter = ShiftCounterMaxValue;
-} /* setStateToSetTime */
+    state_ = kStateSetTime;
+    Display::GetInstance().Clear();
+    shift_counter_ = kShiftCounterMaxValue;
+} /* SetStateToSetTime */
 
 /******************************************************************************************************************************************************
-  shiftQuadrants()
+  ShiftQuadrants()
 ******************************************************************************************************************************************************/
-void AnimationExplodePixels::shiftQuadrants(DisplayPixels& Pixels, byte NumberOfShifts)
+void AnimationExplodePixels::ShiftQuadrants(DisplayPixels& pixels, byte number_of_shifts)
 {
     for(uint8_t row = 0u; row < DISPLAY_NUMBER_OF_ROWS; row++) {
         for(uint8_t column = 0u; column < DISPLAY_NUMBER_OF_COLUMNS; column++) {
-            if(Pixels.getPixel(column, row)) {
-                byte ColumnNext = column, RowNext = row;
-                if(column < ColumnCenter) ColumnNext = shiftRight(column, NumberOfShifts);
-                if(column > ColumnCenter) ColumnNext = shiftLeft(column, NumberOfShifts);
-                if(row < RowCenter) RowNext = shiftDown(row, NumberOfShifts);
-                if(row > RowCenter) RowNext = shiftUp(row, NumberOfShifts);
-                setNewPixel(column, row, ColumnNext, RowNext);
+            if(pixels.GetPixel(column, row)) {
+                byte column_next = column, row_next = row;
+                if(column < kColumnCenter) column_next = ShiftRight(column, number_of_shifts);
+                if(column > kColumnCenter) column_next = ShiftLeft(column, number_of_shifts);
+                if(row < kRowCenter) row_next = ShiftDown(row, number_of_shifts);
+                if(row > kRowCenter) row_next = ShiftUp(row, number_of_shifts);
+                SetNewPixel(column, row, column_next, row_next);
             }
         }
     }
 }
 
 /******************************************************************************************************************************************************
-  shiftQuadrantUpperLeft()
+  ShiftQuadrantUpperLeft()
 ******************************************************************************************************************************************************/
-void AnimationExplodePixels::shiftQuadrantUpperLeft()
+void AnimationExplodePixels::ShiftQuadrantUpperLeft()
 {
-    for(int8_t column = ColumnCenter; column >= 0; column--) {
-        for(int8_t row = RowCenter; row >= 0; row--) {
-            if(Display::getInstance().getPixel(column, row)) { shiftDownRight(column, row); }
+    for(int8_t column = kColumnCenter; column >= 0; column--) {
+        for(int8_t row = kRowCenter; row >= 0; row--) {
+            if(Display::GetInstance().GetPixel(column, row)) { ShiftDownRight(column, row); }
         }
     }
 }
 
 /******************************************************************************************************************************************************
-  shiftDownRight()
+  ShiftDownRight()
 ******************************************************************************************************************************************************/
-void AnimationExplodePixels::shiftDownRight(byte Column, byte Row)
+void AnimationExplodePixels::ShiftDownRight(byte column, byte row)
 {
-    byte columnNext = Column, rowNext = Row;
+    byte column_next = column, row_next = row;
 
-    if(Column < ColumnCenter) columnNext++;
-    if(Row < ColumnCenter) rowNext++;
-    clearOldAndSetNewPixel(Column, Row, columnNext, rowNext);
+    if(column < kColumnCenter) column_next++;
+    if(row < kColumnCenter) row_next++;
+    ClearOldAndSetNewPixel(column, row, column_next, row_next);
 }
 
 /******************************************************************************************************************************************************
-  shiftQuadrantUpperRight()
+  ShiftQuadrantUpperRight()
 ******************************************************************************************************************************************************/
-void AnimationExplodePixels::shiftQuadrantUpperRight()
+void AnimationExplodePixels::ShiftQuadrantUpperRight()
 {
-    for(uint8_t column = ColumnCenter + 1u; column < DISPLAY_NUMBER_OF_COLUMNS; column++) {
-        for(int8_t row = RowCenter - 1u; row >= 0; row--) {
-            if(Display::getInstance().getPixel(column, row)) { shiftDownLeft(column, row); }
+    for(uint8_t column = kColumnCenter + 1u; column < DISPLAY_NUMBER_OF_COLUMNS; column++) {
+        for(int8_t row = kRowCenter - 1u; row >= 0; row--) {
+            if(Display::GetInstance().GetPixel(column, row)) { ShiftDownLeft(column, row); }
         }
     }
 }
 
 /******************************************************************************************************************************************************
-  shiftDownLeft()
+  ShiftDownLeft()
 ******************************************************************************************************************************************************/
-void AnimationExplodePixels::shiftDownLeft(byte Column, byte Row)
+void AnimationExplodePixels::ShiftDownLeft(byte column, byte row)
 {
-    byte columnNext = Column, rowNext = Row;
+    byte column_next = column, row_next = row;
 
-    if(Column > ColumnCenter) columnNext--;
-    if(Row < ColumnCenter) rowNext++;
-    clearOldAndSetNewPixel(Column, Row, columnNext, rowNext);
+    if(column > kColumnCenter) column_next--;
+    if(row < kColumnCenter) row_next++;
+    ClearOldAndSetNewPixel(column, row, column_next, row_next);
 }
 
 /******************************************************************************************************************************************************
-  shiftQuadrantLowerLeft()
+  ShiftQuadrantLowerLeft()
 ******************************************************************************************************************************************************/
-void AnimationExplodePixels::shiftQuadrantLowerLeft()
+void AnimationExplodePixels::ShiftQuadrantLowerLeft()
 {
-    for(int8_t column = ColumnCenter - 1u; column >= 0; column--) {
-        for(int8_t row = RowCenter + 1u; row < static_cast<int8_t>(DISPLAY_NUMBER_OF_ROWS); row++) {
-            if(Display::getInstance().getPixel(column, row)) { shiftUpRight(column, row); }
+    for(int8_t column = kColumnCenter - 1u; column >= 0; column--) {
+        for(int8_t row = kRowCenter + 1u; row < static_cast<int8_t>(DISPLAY_NUMBER_OF_ROWS); row++) {
+            if(Display::GetInstance().GetPixel(column, row)) { ShiftUpRight(column, row); }
         }
     }
 }
 
 /******************************************************************************************************************************************************
-  shiftUpRight()
+  ShiftUpRight()
 ******************************************************************************************************************************************************/
-void AnimationExplodePixels::shiftUpRight(byte Column, byte Row)
+void AnimationExplodePixels::ShiftUpRight(byte column, byte row)
 {
-    byte columnNext = Column, rowNext = Row;
+    byte column_next = column, row_next = row;
 
-    if(Column < ColumnCenter) columnNext++;
-    if(Row > ColumnCenter) rowNext--;
-    clearOldAndSetNewPixel(Column, Row, columnNext, rowNext);
+    if(column < kColumnCenter) column_next++;
+    if(row > kColumnCenter) row_next--;
+    ClearOldAndSetNewPixel(column, row, column_next, row_next);
 }
 
 /******************************************************************************************************************************************************
-  shiftQuadrantLowerRight()
+  ShiftQuadrantLowerRight()
 ******************************************************************************************************************************************************/
-void AnimationExplodePixels::shiftQuadrantLowerRight()
+void AnimationExplodePixels::ShiftQuadrantLowerRight()
 {
-    for(uint8_t column = ColumnCenter; column < DISPLAY_NUMBER_OF_COLUMNS; column++) {
-        for(int8_t row = RowCenter; row < static_cast<int8_t>(DISPLAY_NUMBER_OF_ROWS); row++) {
-            if(Display::getInstance().getPixel(column, row)) { shiftUpLeft(column, row); }
+    for(uint8_t column = kColumnCenter; column < DISPLAY_NUMBER_OF_COLUMNS; column++) {
+        for(int8_t row = kRowCenter; row < static_cast<int8_t>(DISPLAY_NUMBER_OF_ROWS); row++) {
+            if(Display::GetInstance().GetPixel(column, row)) { ShiftUpLeft(column, row); }
         }
     }
 }
 
 /******************************************************************************************************************************************************
-  shiftUpLeft()
+  ShiftUpLeft()
 ******************************************************************************************************************************************************/
-void AnimationExplodePixels::shiftUpLeft(byte Column, byte Row)
+void AnimationExplodePixels::ShiftUpLeft(byte column, byte row)
 {
-    byte columnNext = Column, rowNext = Row;
+    byte column_next = column, row_next = row;
 
-    if(Column > ColumnCenter) columnNext--;
-    if(Row > ColumnCenter) rowNext--;
-    clearOldAndSetNewPixel(Column, Row, columnNext, rowNext);
+    if(column > kColumnCenter) column_next--;
+    if(row > kColumnCenter) row_next--;
+    ClearOldAndSetNewPixel(column, row, column_next, row_next);
 }
 
 /******************************************************************************************************************************************************
-  clearOldAndSetNewPixel()
+  ClearOldAndSetNewPixel()
 ******************************************************************************************************************************************************/
-void AnimationExplodePixels::clearOldAndSetNewPixel(byte ColumnOld, byte RowOld, byte ColumnNew, byte RowNew)
+void AnimationExplodePixels::ClearOldAndSetNewPixel(byte column_old, byte row_old, byte column_new, byte row_new)
 {
-    if((ColumnOld != ColumnNew) || (RowOld != RowNew))
+    if((column_old != column_new) || (row_old != row_new))
     {
-        Display::getInstance().clearPixel(ColumnOld, RowOld);
-        Display::getInstance().setPixel(ColumnNew, RowNew);
+        Display::GetInstance().ClearPixel(column_old, row_old);
+        Display::GetInstance().SetPixel(column_new, row_new);
     }
 }
 
 /******************************************************************************************************************************************************
-  setNewPixel()
+  SetNewPixel()
 ******************************************************************************************************************************************************/
-void AnimationExplodePixels::setNewPixel(byte ColumnOld, byte RowOld, byte ColumnNew, byte RowNew)
+void AnimationExplodePixels::SetNewPixel(byte column_old, byte row_old, byte column_new, byte row_new)
 {
-    if((ColumnOld != ColumnNew) || (RowOld != RowNew))
+    if((column_old != column_new) || (row_old != row_new))
     {
-        Display::getInstance().setPixel(ColumnNew, RowNew);
+        Display::GetInstance().SetPixel(column_new, row_new);
     }
 }
 
