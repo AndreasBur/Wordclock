@@ -83,44 +83,44 @@ class BH1750
     using IlluminanceType = uint16_t;
 
     enum ModeType {
-        MODE_NONE,
-        MODE_CONTINUOUS_LOW_RES_MODE = BH1750_CMD_CONTINUOUS_LOW_RES_MODE,
-        MODE_CONTINUOUS_HIGH_RES_MODE = BH1750_CMD_CONTINUOUS_HIGH_RES_MODE,
-        MODE_CONTINUOUS_HIGH_RES_MODE_2 = BH1750_CMD_CONTINUOUS_HIGH_RES_MODE_2,
-        MODE_ONE_TIME_LOW_RES_MODE = BH1750_CMD_ONE_TIME_LOW_RES_MODE,
-        MODE_ONE_TIME_HIGH_RES_MODE = BH1750_CMD_ONE_TIME_HIGH_RES_MODE,
-        MODE_ONE_TIME_HIGH_RES_MODE_2 = BH1750_CMD_ONE_TIME_HIGH_RES_MODE_2
+        kModeNone,
+        kModeContinuousLowResMode = BH1750_CMD_CONTINUOUS_LOW_RES_MODE,
+        kModeContinuousHighResMode = BH1750_CMD_CONTINUOUS_HIGH_RES_MODE,
+        kModeContinuousHighResMode2 = BH1750_CMD_CONTINUOUS_HIGH_RES_MODE_2,
+        kModeOneTimeLowResMode = BH1750_CMD_ONE_TIME_LOW_RES_MODE,
+        kModeOneTimeHighResMode = BH1750_CMD_ONE_TIME_HIGH_RES_MODE,
+        kModeOneTimeHighResMode2 = BH1750_CMD_ONE_TIME_HIGH_RES_MODE_2
     };
 
     struct CalibrationValuesType {
-        IlluminanceType MaxValue;
-        IlluminanceType MinValue;
+        IlluminanceType max_value;
+        IlluminanceType min_value;
     };
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    static constexpr byte TaskCycle{BH1750_TASK_CYCLE};
-    ModeType Mode{MODE_NONE};
-    IlluminanceType Illuminance{BH1750_ILLUMINANCE_MIN_LX_VALUE};
-    CalibrationValuesType CalibrationValues{BH1750_CALIBRATION_MAX_DEFAULT_LX_VALUE, BH1750_CALIBRATION_MIN_DEFAULT_LX_VALUE};
+    static constexpr byte kTaskCycle{BH1750_TASK_CYCLE};
+    ModeType mode_{kModeNone};
+    IlluminanceType illuminance_{BH1750_ILLUMINANCE_MIN_LX_VALUE};
+    CalibrationValuesType calibration_values_{BH1750_CALIBRATION_MAX_DEFAULT_LX_VALUE, BH1750_CALIBRATION_MIN_DEFAULT_LX_VALUE};
 
     // functions
-    StdReturnType readIlluminance();
-    void sendModeForOneTimeMode();
-    StdReturnType sendCommand(byte);
+    StdReturnType ReadIlluminance();
+    void SendModeForOneTimeMode();
+    StdReturnType SendCommand(byte);
 
-    StdReturnType sendMode() { return sendCommand(Mode); }
+    StdReturnType SendMode() { return SendCommand(mode_); }
     /* Not static, though nothing in it reads a member: it stands in for the backends the
        clock really runs on, and there the same call reaches a peripheral through instance
        state. A stand-in that answered the check would have a different API from the thing it
        stands in for, which is the one property it exists to keep. */
     // NOLINTBEGIN(readability-convert-member-functions-to-static)
-    IlluminanceType convertRawToLux(IlluminanceType IlluminanceRaw) const { return IlluminanceRaw / BH1750_ILLUMINANCE_RAW_VALUE_DIVIDER; }
+    IlluminanceType ConvertRawToLux(IlluminanceType illuminance_raw) const { return illuminance_raw / BH1750_ILLUMINANCE_RAW_VALUE_DIVIDER; }
     // NOLINTEND(readability-convert-member-functions-to-static)
-    static constexpr IlluminanceType combineRawValueParts(byte HighByte, byte LowByte) { return static_cast<uint16_t>(HighByte) << 8u | LowByte; }
-    static constexpr bool isMTRegValueInRange(byte MTRegValue) { return ((MTRegValue <= BH1750_REG_MT_MAX_VALUE) && (MTRegValue >= BH1750_REG_MT_MIN_VALUE)); }
+    static constexpr IlluminanceType CombineRawValueParts(byte high_byte, byte low_byte) { return static_cast<uint16_t>(high_byte) << 8u | low_byte; }
+    static constexpr bool IsMtRegValueInRange(byte mt_reg_value) { return ((mt_reg_value <= BH1750_REG_MT_MAX_VALUE) && (mt_reg_value >= BH1750_REG_MT_MIN_VALUE)); }
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N   S
@@ -130,49 +130,49 @@ class BH1750
     ~BH1750() { }
 
     // get methods
-    static constexpr byte getTaskCycle() { return TaskCycle; }
-    ModeType getMode() const { return Mode; }
-    IlluminanceType getIlluminance() const { return Illuminance; }
-    CalibrationValuesType getCalibrationValues() const { return CalibrationValues; }
-    IlluminanceType getCalibrationValuesMaxValue() const { return CalibrationValues.MaxValue; }
-    IlluminanceType getCalibrationValuesMinValue() const { return CalibrationValues.MinValue; }
+    static constexpr byte GetTaskCycle() { return kTaskCycle; }
+    ModeType GetMode() const { return mode_; }
+    IlluminanceType GetIlluminance() const { return illuminance_; }
+    CalibrationValuesType GetCalibrationValues() const { return calibration_values_; }
+    IlluminanceType GetCalibrationValuesMaxValue() const { return calibration_values_.max_value; }
+    IlluminanceType GetCalibrationValuesMinValue() const { return calibration_values_.min_value; }
 
     // set methods
-    StdReturnType setMode(ModeType);
-    void setCalibrationValuesMaxValue(IlluminanceType MaxValue) { CalibrationValues.MaxValue = MaxValue; }
-    void setCalibrationValuesMinValue(IlluminanceType MinValue) { CalibrationValues.MinValue = MinValue; }
-    void setCalibrationValues(CalibrationValuesType sCalibrationValues) { CalibrationValues = sCalibrationValues; }
+    StdReturnType SetMode(ModeType);
+    void SetCalibrationValuesMaxValue(IlluminanceType max_value) { calibration_values_.max_value = max_value; }
+    void SetCalibrationValuesMinValue(IlluminanceType min_value) { calibration_values_.min_value = min_value; }
+    void SetCalibrationValues(CalibrationValuesType calibration_values) { calibration_values_ = calibration_values; }
 
     // methods
-    StdReturnType init(ModeType);
-    StdReturnType changeMeasurementTime(byte);
+    StdReturnType Init(ModeType);
+    StdReturnType ChangeMeasurementTime(byte);
     /* Always succeeds, unlike on hardware: what the window dialled in is available from
        the first call, so there is no not-set-up state for the calibration to refuse. */
-    StdReturnType startCalibrationMaxValue() {
-        task();
-        CalibrationValues.MaxValue = Illuminance;
-        return E_OK;
+    StdReturnType StartCalibrationMaxValue() {
+        Task();
+        calibration_values_.max_value = illuminance_;
+        return kEOk;
     }
-    StdReturnType startCalibrationMinValue() {
-        task();
-        CalibrationValues.MinValue = Illuminance;
-        return E_OK;
+    StdReturnType StartCalibrationMinValue() {
+        Task();
+        calibration_values_.min_value = illuminance_;
+        return kEOk;
     }
 
     /* On hardware this reads the sensor. Here it takes what the window dialled in, so
        the brightness automatic can be exercised without a sensor. The value is static
        because the firmware keeps its BH1750 inside the Illuminance singleton, which
        leaves the window no instance to talk to. */
-    void task() { Illuminance = SimulatedIlluminance; }
+    void Task() { illuminance_ = simulated_illuminance; }
 
-    static void setSimulatedIlluminance(IlluminanceType Value) { SimulatedIlluminance = Value; }
-    static IlluminanceType getSimulatedIlluminance() { return SimulatedIlluminance; }
+    static void SetSimulatedIlluminance(IlluminanceType value) { simulated_illuminance = value; }
+    static IlluminanceType GetSimulatedIlluminance() { return simulated_illuminance; }
 
   private:
     /* a bright room by default, so switching the automatic on does not darken the
        display before anything was dialled in - the calibrated maximum rather than the
        sensor's, which is the top of the slider's range in Settings */
-    static inline IlluminanceType SimulatedIlluminance{BH1750_CALIBRATION_MAX_DEFAULT_LX_VALUE};
+    static inline IlluminanceType simulated_illuminance{BH1750_CALIBRATION_MAX_DEFAULT_LX_VALUE};
 };
 
 #endif

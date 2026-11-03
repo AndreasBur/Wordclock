@@ -41,48 +41,48 @@ namespace {
 
 /* Named HttpServer rather than Server: the Arduino core has a class Server in the global
    namespace, and an unqualified Server here is then ambiguous. */
-AsyncWebServer HttpServer(WEB_INTERFACE_PORT);
-AsyncWebSocket Socket("/ws");
+AsyncWebServer http_server(WEB_INTERFACE_PORT);
+AsyncWebSocket socket("/ws");
 
 /* Whether begin() got as far as listening. The server object exists from start-up either
    way, so unlike the ESP32's handle it cannot itself stand for that. */
-bool IsListening{false};
+bool is_listening{false};
 
 /* Handed to WordclockSerial, which takes a plain function pointer - so the singleton is
    reached from here rather than carried along. */
-void sendLineToClients(const char* Line)
+void SendLineToClients(const char* line)
 {
-    WebInterface::getInstance().broadcastLine(Line);
+    WebInterface::GetInstance().BroadcastLine(line);
 }
 
 /* Fixed, and named in the realm so nobody has to guess it. Not a secret: what is secret is
    the password beside it. */
-constexpr char ConsoleUserName[]{"wordclock"};
-constexpr char ConsoleRealm[]{"Wordclock, user wordclock"};
+constexpr char kConsoleUserName[]{"wordclock"};
+constexpr char kConsoleRealm[]{"Wordclock, user wordclock"};
 
 /* Where the image waits for the loader. At the root of the filesystem and not beside the
    settings, because it is not settings: this file is written by one update and gone from the
    next one's point of view, and the loader is given the path as text. */
-constexpr char ImagePath[]{"/firmware.bin"};
+constexpr char kImagePath[]{"/firmware.bin"};
 /* Kept free on top of the image itself: the loader's command page is a file of its own, and
    LittleFS spends blocks on metadata before it spends them on content. Two blocks would
    probably do; this is a filesystem sized for an image plus room, so the slack is cheaper
    than finding out on a clock. */
-constexpr uint32_t FilesystemReserve{8u * 1024u};
+constexpr uint32_t kFilesystemReserve{8u * 1024u};
 
 /* An upload in progress. Static because the body arrives in chunks across several calls and
    the request object is not the place to hang a file on - what the answer needs afterwards is
    whether it got that far, which is what Failure and IsCommitted say. */
 struct UploadType {
-    File Image;
-    uint32_t Written{0u};
-    bool IsOpen{false};
-    bool IsCommitted{false};
+    File image;
+    uint32_t written{0u};
+    bool is_open{false};
+    bool is_committed{false};
     /* A literal, so the answer can name what went wrong without carrying a buffer for it.
        nullptr means nothing has gone wrong *yet*, which is not the same as success. */
-    const char* Failure{nullptr};
+    const char* failure{nullptr};
 };
-UploadType Upload;
+UploadType upload;
 
 /******************************************************************************************************************************************************
  *  LOCAL FUNCTIONS
@@ -108,20 +108,20 @@ UploadType Upload;
  *                  can encode base64 and not decode it, and this one has a server that needs
  *                  neither.
 ******************************************************************************************************************************************************/
-bool isRequestAuthorised(AsyncWebServerRequest* Request)
+bool IsRequestAuthorised(AsyncWebServerRequest* request)
 {
-    System& system = System::getInstance();
+    System& system = System::GetInstance();
 
-    if(!system.isConsoleProtected()) { return true; }
+    if(!system.IsConsoleProtected()) { return true; }
 
-    char Password[SYSTEM_PASSWORD_STRING_LENGTH]{};
-    if(system.getConsolePassword(Password, sizeof(Password)) == E_NOT_OK) { return true; }
+    char password[SYSTEM_PASSWORD_STRING_LENGTH]{};
+    if(system.GetConsolePassword(password, sizeof(password)) == kENotOk) { return true; }
 
     /* Basic and not digest: what a browser sends for digest is a hash of a nonce this server
        would have to keep, and over plain http the two are worth the same anyway. */
-    if(Request->authenticate(ConsoleUserName, Password)) { return true; }
+    if(request->authenticate(kConsoleUserName, password)) { return true; }
 
-    Request->requestAuthentication(AsyncAuthType::AUTH_BASIC, ConsoleRealm);
+    request->requestAuthentication(AsyncAuthType::AUTH_BASIC, kConsoleRealm);
     return false;
 }
 
@@ -135,12 +135,12 @@ bool isRequestAuthorised(AsyncWebServerRequest* Request)
  *                  upload is a file the loader will not read, and the next attempt needs the
  *                  space more than anyone needs the wreckage.
 ******************************************************************************************************************************************************/
-void abortImage(const char* Reason)
+void AbortImage(const char* reason)
 {
-    if(Upload.IsOpen) { Upload.Image.close(); }
-    Upload.IsOpen = false;
-    LittleFS.remove(ImagePath);
-    Upload.Failure = Reason;
+    if(upload.is_open) { upload.image.close(); }
+    upload.is_open = false;
+    LittleFS.remove(kImagePath);
+    upload.failure = reason;
 }
 
 
@@ -157,31 +157,31 @@ void abortImage(const char* Reason)
  *                  The previous image is removed *before* the free space is measured, or a
  *                  second update would be refused for the space the first one still holds.
 ******************************************************************************************************************************************************/
-void beginImage(AsyncWebServerRequest* Request, size_t Announced)
+void BeginImage(AsyncWebServerRequest* request, size_t announced)
 {
-    Upload = UploadType{};
+    upload = UploadType{};
 
-    if(!isRequestAuthorised(Request)) { Upload.Failure = "not authorised"; return; }
-    if(Announced == 0u) { Upload.Failure = "no image in the request body"; return; }
-    if(!LittleFS.begin()) { Upload.Failure = "the filesystem is not there to write into"; return; }
+    if(!IsRequestAuthorised(request)) { upload.failure = "not authorised"; return; }
+    if(announced == 0u) { upload.failure = "no image in the request body"; return; }
+    if(!LittleFS.begin()) { upload.failure = "the filesystem is not there to write into"; return; }
 
-    LittleFS.remove(ImagePath);
+    LittleFS.remove(kImagePath);
 
-    FSInfo Info{};
-    if(LittleFS.info(Info)) {
-        const uint64_t Free = Info.totalBytes - Info.usedBytes;
+    FSInfo info{};
+    if(LittleFS.info(info)) {
+        const uint64_t free = info.totalBytes - info.usedBytes;
 
-        if(Free < static_cast<uint64_t>(Announced) + FilesystemReserve) {
+        if(free < static_cast<uint64_t>(announced) + kFilesystemReserve) {
             /* Named as the filesystem's size and not as "too large": the image is the size it
                is, and what is too small is the region this board keeps for it. */
-            Upload.Failure = "the image does not fit in the filesystem";
+            upload.failure = "the image does not fit in the filesystem";
             return;
         }
     }
 
-    Upload.Image = LittleFS.open(ImagePath, "w");
-    if(!Upload.Image) { Upload.Failure = "the image file could not be opened"; return; }
-    Upload.IsOpen = true;
+    upload.image = LittleFS.open(kImagePath, "w");
+    if(!upload.image) { upload.failure = "the image file could not be opened"; return; }
+    upload.is_open = true;
 }
 
 
@@ -201,29 +201,29 @@ void beginImage(AsyncWebServerRequest* Request, size_t Announced)
  *                  the last chunk and here leaves a file that is short, and a short image
  *                  copied over the application is the one outcome this must not produce.
 ******************************************************************************************************************************************************/
-void commitImage(size_t Announced)
+void CommitImage(size_t announced)
 {
-    Upload.Image.close();
-    Upload.IsOpen = false;
+    upload.image.close();
+    upload.is_open = false;
 
-    if(Upload.Written != Announced) {
-        LittleFS.remove(ImagePath);
-        Upload.Failure = "the upload stopped before the image was complete";
+    if(upload.written != announced) {
+        LittleFS.remove(kImagePath);
+        upload.failure = "the upload stopped before the image was complete";
         return;
     }
 
     picoOTA.begin();
-    if(!picoOTA.addFile(ImagePath)) {
-        LittleFS.remove(ImagePath);
-        Upload.Failure = "the image could not be handed to the loader";
+    if(!picoOTA.addFile(kImagePath)) {
+        LittleFS.remove(kImagePath);
+        upload.failure = "the image could not be handed to the loader";
         return;
     }
     if(!picoOTA.commit()) {
-        LittleFS.remove(ImagePath);
-        Upload.Failure = "the loader's command could not be written";
+        LittleFS.remove(kImagePath);
+        upload.failure = "the loader's command could not be written";
         return;
     }
-    Upload.IsCommitted = true;
+    upload.is_committed = true;
 }
 
 
@@ -240,14 +240,14 @@ void commitImage(size_t Announced)
  *                  A gzipped asset is sent as it is stored and the browser unpacks it; that
  *                  is the whole of what the header does here, and the table says which.
 ******************************************************************************************************************************************************/
-void handleAsset(AsyncWebServerRequest* Request, const WebFrontend::AssetType& Asset)
+void HandleAsset(AsyncWebServerRequest* request, const WebFrontend::AssetType& asset)
 {
-    if(!isRequestAuthorised(Request)) { return; }
+    if(!IsRequestAuthorised(request)) { return; }
 
-    AsyncWebServerResponse* Response = Request->beginResponse(200, Asset.ContentType, Asset.Bytes, Asset.Size);
+    AsyncWebServerResponse* response = request->beginResponse(200, asset.content_type, asset.bytes, asset.size);
 
-    if(Asset.IsGzipped) { Response->addHeader("Content-Encoding", "gzip"); }
-    Request->send(Response);
+    if(asset.is_gzipped) { response->addHeader("Content-Encoding", "gzip"); }
+    request->send(response);
 }
 
 
@@ -264,24 +264,24 @@ void handleAsset(AsyncWebServerRequest* Request, const WebFrontend::AssetType& A
  *                  more than the shorter call, and it is the form the backend's stub already
  *                  stands in for.
 ******************************************************************************************************************************************************/
-void sendUpdateResult(AsyncWebServerRequest* Request, bool Ok, const char* Reason)
+void SendUpdateResult(AsyncWebServerRequest* request, bool ok, const char* reason)
 {
-    char Answer[128];
+    char answer[128];
 
-    if(Ok) {
-        strncpy(Answer, "{\"ok\":true}", sizeof(Answer) - 1u);
+    if(ok) {
+        strncpy(answer, "{\"ok\":true}", sizeof(answer) - 1u);
     } else {
         /* %.100s, as on the ESP32: an unbounded reason would be cut off together with the
            closing brace, and the page would get an answer that is not JSON at all. 100 is
            what the buffer holds beside the frame. */
-        (void)snprintf(Answer, sizeof(Answer), "{\"ok\":false,\"error\":\"%.100s\"}", Reason);
+        (void)snprintf(answer, sizeof(answer), "{\"ok\":false,\"error\":\"%.100s\"}", reason);
         Serial.print(F("Web: update refused - "));
-        Serial.println(Reason);
+        Serial.println(reason);
     }
-    Answer[sizeof(Answer) - 1u] = '\0';
+    answer[sizeof(answer) - 1u] = '\0';
 
-    Request->send(Request->beginResponse(Ok ? 200 : 400, "application/json",
-                                        reinterpret_cast<const uint8_t*>(Answer), strlen(Answer)));
+    request->send(request->beginResponse(ok ? 200 : 400, "application/json",
+                                        reinterpret_cast<const uint8_t*>(answer), strlen(answer)));
 }
 
 
@@ -307,18 +307,18 @@ void sendUpdateResult(AsyncWebServerRequest* Request, bool Ok, const char* Reaso
  *                  asked here as well and not only there: a check that happened after the
  *                  writing would have let an unauthorised upload fill the filesystem first.
 ******************************************************************************************************************************************************/
-void handleUpdateBody(AsyncWebServerRequest* Request, uint8_t* Data, size_t Length, size_t Index, size_t Total)
+void HandleUpdateBody(AsyncWebServerRequest* request, uint8_t* data, size_t length, size_t index, size_t total)
 {
-    if(Index == 0u) { beginImage(Request, Total); }
-    if(!Upload.IsOpen) { return; }
+    if(index == 0u) { BeginImage(request, total); }
+    if(!upload.is_open) { return; }
 
-    if(Upload.Image.write(Data, Length) != Length) {
-        abortImage("the image could not be written to the filesystem");
+    if(upload.image.write(data, length) != length) {
+        AbortImage("the image could not be written to the filesystem");
         return;
     }
-    Upload.Written += Length;
+    upload.written += length;
 
-    if(Upload.Written >= Total) { commitImage(Total); }
+    if(upload.written >= total) { CommitImage(total); }
 }
 
 
@@ -335,22 +335,22 @@ void handleUpdateBody(AsyncWebServerRequest* Request, uint8_t* Data, size_t Leng
  *                  A POST with no body never reaches the body handler at all, so "nothing was
  *                  committed and nothing failed" is its own case and says so.
 ******************************************************************************************************************************************************/
-void handleUpdate(AsyncWebServerRequest* Request)
+void HandleUpdate(AsyncWebServerRequest* request)
 {
-    if(!isRequestAuthorised(Request)) { return; }
+    if(!IsRequestAuthorised(request)) { return; }
 
     /* Still open here means the body ended before the length it announced - a client that
        declared more than it sent. The image goes with it: an incomplete file is one no loader
        will read, and the next attempt needs the room more than anybody needs the wreckage.
        (A connection that simply dies never reaches this handler at all; what cleans up after
        that one is the next upload, which removes the old image before it writes.) */
-    if(Upload.IsOpen) { abortImage("the upload stopped before the image was complete"); }
+    if(upload.is_open) { AbortImage("the upload stopped before the image was complete"); }
 
-    if(Upload.Failure != nullptr) { sendUpdateResult(Request, false, Upload.Failure); return; }
-    if(!Upload.IsCommitted) { sendUpdateResult(Request, false, "no image in the request body"); return; }
+    if(upload.failure != nullptr) { SendUpdateResult(request, false, upload.failure); return; }
+    if(!upload.is_committed) { SendUpdateResult(request, false, "no image in the request body"); return; }
 
-    sendUpdateResult(Request, true, "");
-    System::getInstance().restart();
+    SendUpdateResult(request, true, "");
+    System::GetInstance().Restart();
 }
 
 
@@ -368,20 +368,20 @@ void handleUpdate(AsyncWebServerRequest* Request)
  *                  What is left here is what is genuinely this server's: the password, the
  *                  content type, and a body to write into.
 ******************************************************************************************************************************************************/
-void handleCommands(AsyncWebServerRequest* Request)
+void HandleCommands(AsyncWebServerRequest* request)
 {
-    if(!isRequestAuthorised(Request)) { return; }
+    if(!IsRequestAuthorised(request)) { return; }
 
-    WebResponseBody Body(Request, "application/json");
-    WebFrontend::writeCommands(Body);
+    WebResponseBody body(request, "application/json");
+    WebFrontend::WriteCommands(body);
 }
 
-void handleDisplay(AsyncWebServerRequest* Request)
+void HandleDisplay(AsyncWebServerRequest* request)
 {
-    if(!isRequestAuthorised(Request)) { return; }
+    if(!IsRequestAuthorised(request)) { return; }
 
-    WebResponseBody Body(Request, "application/json");
-    WebFrontend::writeDisplay(Body);
+    WebResponseBody body(request, "application/json");
+    WebFrontend::WriteDisplay(body);
 }
 
 
@@ -406,24 +406,24 @@ void handleDisplay(AsyncWebServerRequest* Request)
  *                  this side has to keep, the socket owns its client list, so a client that
  *                  simply vanished stops being broadcast to without anything here noticing.
 ******************************************************************************************************************************************************/
-void onSocketEvent(AsyncWebSocket*, AsyncWebSocketClient*, AwsEventType Type,
-                   void* Argument, uint8_t* Payload, size_t Length)
+void OnSocketEvent(AsyncWebSocket*, AsyncWebSocketClient*, AwsEventType type,
+                   void* argument, uint8_t* payload, size_t length)
 {
-    if(Type == WS_EVT_CONNECT) {
-        WebInterface::getInstance().onClientOpened();
+    if(type == WS_EVT_CONNECT) {
+        WebInterface::GetInstance().OnClientOpened();
         return;
     }
-    if(Type != WS_EVT_DATA) { return; }
+    if(type != WS_EVT_DATA) { return; }
 
-    const AwsFrameInfo* Frame = static_cast<const AwsFrameInfo*>(Argument);
+    const AwsFrameInfo* frame = static_cast<const AwsFrameInfo*>(argument);
 
-    if((Frame == nullptr) || (!Frame->final) || (Frame->index != 0u) || (Frame->len != Length)) { return; }
-    if(Frame->opcode != WS_TEXT) { return; }
+    if((frame == nullptr) || (!frame->final) || (frame->index != 0u) || (frame->len != length)) { return; }
+    if(frame->opcode != WS_TEXT) { return; }
 
     /* The length bound, the terminator and the empty-frame case are WebFrontend's, so that a
        command coming off a socket reaches the parser the same way on either backend. What
        stays here is the framing, which is this library's shape and not the other's. */
-    WebFrontend::injectCommand(reinterpret_cast<const char*>(Payload), Length);
+    WebFrontend::InjectCommand(reinterpret_cast<const char*>(payload), length);
 }
 
 } // namespace
@@ -445,39 +445,39 @@ void onSocketEvent(AsyncWebSocket*, AsyncWebSocketClient*, AwsEventType Type,
  *
  *  \return         E_OK if the server is listening
 ******************************************************************************************************************************************************/
-StdReturnType WebInterface::begin()
+StdReturnType WebInterface::Begin()
 {
-    Socket.onEvent(onSocketEvent);
-    HttpServer.addHandler(&Socket);
+    socket.onEvent(OnSocketEvent);
+    http_server.addHandler(&socket);
 
     /* The files served unchanged, one route per entry of WebFrontend's table, so a file added
        to web/ needs no edit here. The entry is captured by reference and outlives the lambda:
        the table has static storage duration. */
-    for(byte Index = 0u; Index < WebFrontend::getNumberOfAssets(); Index++) {
-        const WebFrontend::AssetType& Asset = WebFrontend::getAsset(Index);
+    for(byte index = 0u; index < WebFrontend::GetNumberOfAssets(); index++) {
+        const WebFrontend::AssetType& asset = WebFrontend::GetAsset(index);
 
-        HttpServer.on(Asset.Path, HTTP_GET,
-                      [&Asset](AsyncWebServerRequest* Request) { handleAsset(Request, Asset); });
+        http_server.on(asset.path, HTTP_GET,
+                      [&asset](AsyncWebServerRequest* request) { HandleAsset(request, asset); });
     }
 
-    HttpServer.on("/commands", HTTP_GET, handleCommands);
-    HttpServer.on("/display", HTTP_GET, handleDisplay);
+    http_server.on("/commands", HTTP_GET, HandleCommands);
+    http_server.on("/display", HTTP_GET, HandleDisplay);
     /* Four arguments, and the fourth is where the image arrives: the library hands a POST
        body to that callback in chunks and calls the request handler afterwards. The third,
        the upload handler, is for multipart forms and stays empty - the panel sends the file
        as the body itself, so nothing here has to parse what a <form> would have wrapped it
        in. */
-    HttpServer.on("/update", HTTP_POST, handleUpdate, nullptr, handleUpdateBody);
+    http_server.on("/update", HTTP_POST, HandleUpdate, nullptr, HandleUpdateBody);
 
     /* No failure to report: this library's begin() returns nothing and starts listening on
        whatever address arrives later. Where the ESP32 backend can find its server refusing
        to start and fall back to the UART, here the equivalent shows up as a page that never
        answers - which is why the address is printed below either way. */
-    HttpServer.begin();
-    IsListening = true;
+    http_server.begin();
+    is_listening = true;
 
     /* Only now, so a line printed during startup cannot reach a half-built server. */
-    WordclockSerial::getInstance().setLineSink(sendLineToClients);
+    WordclockSerial::GetInstance().SetLineSink(SendLineToClients);
 
     if(MDNS.begin(WEB_INTERFACE_HOSTNAME)) {
         MDNS.addService("http", "tcp", WEB_INTERFACE_PORT);
@@ -489,7 +489,7 @@ StdReturnType WebInterface::begin()
         Serial.println(F("Web: mDNS unavailable, reach the clock by its address"));
     }
 
-    return E_OK;
+    return kEOk;
 } /* begin */
 
 
@@ -501,9 +501,9 @@ StdReturnType WebInterface::begin()
  *                  the other backend; what is this file's is the one call in sendText()
  *                  below, where the IDF needs a walk over descriptors.
 ******************************************************************************************************************************************************/
-void WebInterface::broadcastLine(const char* Line)
+void WebInterface::BroadcastLine(const char* line)
 {
-    WebFrontend::getInstance().broadcastLine(Line);
+    WebFrontend::GetInstance().BroadcastLine(line);
 } /* broadcastLine */
 
 
@@ -518,9 +518,9 @@ void WebInterface::broadcastLine(const char* Line)
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-void WebInterface::broadcastFrame()
+void WebInterface::BroadcastFrame()
 {
-    WebFrontend::getInstance().broadcastFrame();
+    WebFrontend::GetInstance().BroadcastFrame();
 } /* broadcastFrame */
 
 
@@ -531,32 +531,32 @@ void WebInterface::broadcastFrame()
    source of its own because what it reaches - the server and its web socket - is this file's
    and stays this file's. */
 
-WebTransport& WebTransport::getInstance()
+WebTransport& WebTransport::GetInstance()
 {
-    static WebTransport SingletonInstance;
-    return SingletonInstance;
+    static WebTransport singleton_instance;
+    return singleton_instance;
 }
 
-bool WebTransport::isListening() const
+bool WebTransport::IsListening() const
 {
-    return IsListening;
+    return is_listening;
 }
 
-bool WebTransport::hasClients() const
+bool WebTransport::HasClients() const
 {
     /* The socket's own count, not a table of ours: it owns the list, so there is nothing here
        that could fall out of step with it. */
-    return Socket.count() > 0u;
+    return socket.count() > 0u;
 }
 
-void WebTransport::sendText(const char* Text, size_t Length)
+void WebTransport::SendText(const char* text, size_t length)
 {
-    Socket.textAll(Text, Length);
+    socket.textAll(text, length);
 }
 
-void WebTransport::sendBinary(const byte* Bytes, size_t Length)
+void WebTransport::SendBinary(const byte* bytes, size_t length)
 {
-    Socket.binaryAll(reinterpret_cast<const char*>(Bytes), Length);
+    socket.binaryAll(reinterpret_cast<const char*>(bytes), length);
 }
 // NOLINTEND(readability-convert-member-functions-to-static)
 
@@ -567,19 +567,19 @@ void WebTransport::sendBinary(const byte* Bytes, size_t Length)
 /* A response this server is pulled from rather than pushed to: the stream collects what is
    written and finish() hands it to the request, which is when the library sends it. */
 
-WebResponseBody::WebResponseBody(AsyncWebServerRequest* sRequest, const char* ContentType)
-    : Request(sRequest), Stream(sRequest->beginResponseStream(ContentType))
+WebResponseBody::WebResponseBody(AsyncWebServerRequest* request, const char* content_type)
+    : request_(request), stream_(request->beginResponseStream(content_type))
 {
 }
 
-void WebResponseBody::write(const char* Data, size_t Length)
+void WebResponseBody::Write(const char* data, size_t length)
 {
-    Stream->write(reinterpret_cast<const uint8_t*>(Data), Length);
+    stream_->write(reinterpret_cast<const uint8_t*>(data), length);
 }
 
-void WebResponseBody::finish()
+void WebResponseBody::Finish()
 {
-    Request->send(Stream);
+    request_->send(stream_);
 }
 
 

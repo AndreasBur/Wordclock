@@ -39,12 +39,12 @@
  *                  whatever else the board put there, and driving it would be the one way this
  *                  can do damage rather than nothing.
 ******************************************************************************************************************************************************/
-void PowerSwitch::init()
+void PowerSwitch::Init()
 {
-    if(!isFitted()) { return; }
+    if(!IsFitted()) { return; }
 
     pinMode(POWER_SWITCH_PIN, OUTPUT);
-    switchSupplyOn();
+    SwitchSupplyOn();
 } /* init */
 
 
@@ -59,11 +59,11 @@ void PowerSwitch::init()
  *  \details        Active high, so on is high - the level reaches the gate of the small-signal
  *                  MOSFET, not the high side one, which is why the sense is not inverted here.
 ******************************************************************************************************************************************************/
-void PowerSwitch::driveSupply(bool On)
+void PowerSwitch::DriveSupply(bool on)
 {
-    if(!isFitted()) { return; }
+    if(!IsFitted()) { return; }
 
-    digitalWrite(POWER_SWITCH_PIN, On ? HIGH : LOW);
+    digitalWrite(POWER_SWITCH_PIN, on ? HIGH : LOW);
 } /* driveSupply */
 
 /******************************************************************************************************************************************************

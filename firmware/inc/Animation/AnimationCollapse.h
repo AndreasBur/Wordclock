@@ -62,33 +62,33 @@ class AnimationCollapse : public Animation
   public:
     /* Edge the letters collapse against, selected for each word change */
     enum DirectionType {
-        DIRECTION_TO_LEFT,
-        DIRECTION_TO_RIGHT,
-        DIRECTION_NUMBER_OF_DIRECTIONS
+        kDirectionToLeft,
+        kDirectionToRight,
+        kDirectionNumberOfDirections
     };
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    ClockWords::WordsListType ClockWordsTable{{DisplayWords::WORD_NONE}};
-    byte Step{0u};
-    DirectionType Direction{DIRECTION_TO_LEFT};
+    ClockWords::WordsListType clock_words_table_{{DisplayWords::kWordNone}};
+    byte step_{0u};
+    DirectionType direction_{kDirectionToLeft};
     /* Steps the expansion needs, which is the longest way a single letter has to
        travel. Taking the display width instead would let the letters arrive long
        before the animation ends, because the gaps between words are only one or two
        columns wide. */
-    byte ExpandSteps{1u};
+    byte expand_steps_{1u};
 
     // functions
-    void reset();
-    void clearTimeTask();
-    void setTimeTask();
-    bool collapseRow(byte);
-    byte calcColumn(byte, byte) const;
-    byte calcBlockColumn(byte, byte) const;
-    byte countLettersOfRow(byte) const;
-    byte calcExpandSteps() const;
+    void Reset();
+    void ClearTimeTask();
+    void SetTimeTask();
+    bool CollapseRow(byte);
+    byte CalcColumn(byte, byte) const;
+    byte CalcBlockColumn(byte, byte) const;
+    byte CountLettersOfRow(byte) const;
+    byte CalcExpandSteps() const;
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
@@ -104,9 +104,9 @@ class AnimationCollapse : public Animation
 
 
     // methods
-    void init();
-    StdReturnType setTime(byte, byte);
-    void task();
+    void Init();
+    StdReturnType SetTime(byte, byte);
+    void Task();
 };
 
 

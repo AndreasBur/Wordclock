@@ -1,5 +1,7 @@
 #ifndef _RMT_TX_H_
 #define _RMT_TX_H_
+/* Under the framework's names, because it stands in for the framework's header. */
+// NOLINTBEGIN(readability-identifier-naming)
 #include <stdint.h>
 #include <stddef.h>
 #include "esp_err.h"
@@ -18,4 +20,5 @@ esp_err_t rmt_enable(rmt_channel_handle_t);
 esp_err_t rmt_del_channel(rmt_channel_handle_t);
 esp_err_t rmt_transmit(rmt_channel_handle_t, rmt_encoder_handle_t, const void*, size_t, const rmt_transmit_config_t*);
 esp_err_t rmt_tx_wait_all_done(rmt_channel_handle_t, int);
+// NOLINTEND(readability-identifier-naming)
 #endif

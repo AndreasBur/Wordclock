@@ -5,11 +5,10 @@
 # are off because they argue with decisions this project has already made, and a check that
 # is answered by "no, on purpose" a hundred times is a check nobody reads.
 #
-# Style checks identify member functions that can be static or const.
-# The conventions are in CLAUDE.md and are not clang-tidy's
-# to have an opinion about: readability-identifier-naming would report every member in the
-# tree, and the modernize- family would report the configuration macros that every module
-# is configured through.
+# Style checks identify member functions that can be static or const, and check the names.
+# The names are Google's, as in MaxMatrix and Utl, and the point is that all three read the
+# same - see CHECK OPTIONS at the end. The modernize- family stays off: it would report the
+# configuration macros that every module is configured through.
 #
 # Run over the simulator's compile database, which covers the whole firmware core:
 #
@@ -30,6 +29,7 @@ Checks: >
   clang-analyzer-*,
   performance-*,
   readability-convert-member-functions-to-static,
+  readability-identifier-naming,
   readability-make-member-function-const,
   -bugprone-dynamic-static-initializers,
   -bugprone-easily-swappable-parameters,
@@ -113,7 +113,55 @@ Checks: >
 #
 # The leading slash is load-bearing: without it the Pico SDK's pico_platform/ matched, and
 # its register accessors were reported as this repository's. The libraries PlatformIO
-# fetches sit inside platform/<backend>/.pio, which is why that is excluded by name.
+# fetches sit inside platform/<backend>/.pio, which is why that is excluded by name. The
+# frameworks sit in ~/.platformio, and the SDK's pico/platform/ matches even with the slash:
+# the naming check was the first to report there, on __isr and its neighbours.
 HeaderFilterRegex: '/(firmware|platform)/'
-ExcludeHeaderFilterRegex: '/\.pio/'
+ExcludeHeaderFilterRegex: '/\.pio/|/\.platformio/'
 WarningsAsErrors: '*'
+
+# CHECK OPTIONS
+#
+# Google's names: types and functions CamelCase, variables and members lower_case, a
+# private or protected member ending in an underscore, constants and enumerators k plus
+# CamelCase, macros UPPER_CASE. The case options are what check the case of a member with
+# the suffix - the suffix alone accepted Count_ in Utl.
+#
+# An include guard begins and ends with an underscore, hence the ignore pattern on macros.
+# A name that belongs to someone else - Arduino's Serial and byte, the standard library's
+# array, the frameworks the host tests stub - carries a NOLINT where it is declared.
+#
+# Not enforced, and worth knowing before trusting a clean run: a name used inside a macro
+# body is neither renamed by the check's fixes nor reported at all. Clock's initial mode,
+# reached only through CLOCK_INITIAL_MODE, kept its old spelling through a clean run.
+CheckOptions:
+  readability-identifier-naming.NamespaceCase: lower_case
+  readability-identifier-naming.ClassCase: CamelCase
+  readability-identifier-naming.StructCase: CamelCase
+  readability-identifier-naming.EnumCase: CamelCase
+  readability-identifier-naming.UnionCase: CamelCase
+  readability-identifier-naming.TemplateParameterCase: CamelCase
+  readability-identifier-naming.FunctionCase: CamelCase
+  readability-identifier-naming.MethodCase: CamelCase
+  readability-identifier-naming.VariableCase: lower_case
+  readability-identifier-naming.ParameterCase: lower_case
+  readability-identifier-naming.MemberCase: lower_case
+  readability-identifier-naming.PrivateMemberCase: lower_case
+  readability-identifier-naming.PrivateMemberSuffix: _
+  readability-identifier-naming.ProtectedMemberCase: lower_case
+  readability-identifier-naming.ProtectedMemberSuffix: _
+  readability-identifier-naming.ConstexprVariableCase: CamelCase
+  readability-identifier-naming.ConstexprVariablePrefix: k
+  # Message::npos and StringTools::npos stand for what std::string::npos stands for, and
+  # are read as that - as in MaxMatrix and Utl.
+  readability-identifier-naming.ConstexprVariableIgnoredRegexp: '^npos$'
+  readability-identifier-naming.GlobalConstantCase: CamelCase
+  readability-identifier-naming.GlobalConstantPrefix: k
+  readability-identifier-naming.StaticConstantCase: CamelCase
+  readability-identifier-naming.StaticConstantPrefix: k
+  readability-identifier-naming.TypeAliasCase: CamelCase
+  readability-identifier-naming.TypedefCase: CamelCase
+  readability-identifier-naming.EnumConstantCase: CamelCase
+  readability-identifier-naming.EnumConstantPrefix: k
+  readability-identifier-naming.MacroDefinitionCase: UPPER_CASE
+  readability-identifier-naming.MacroDefinitionIgnoredRegexp: '^_?[A-Z][A-Z0-9_]*_$'

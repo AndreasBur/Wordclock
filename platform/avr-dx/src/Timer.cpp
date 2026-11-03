@@ -39,93 +39,93 @@
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  init()
+  Init()
 ******************************************************************************************************************************************************/
 /*! \brief          bring the timer up, stopped, with a period and optionally a callback
- *  \param[in]      Microseconds                period of the timer overflow interrupt
- *  \param[in]      sTimerOverflowCallback      called from the overflow ISR, or nullptr for none
+ *  \param[in]      microseconds                period of the timer overflow interrupt
+ *  \param[in]      timer_overflow_callback      called from the overflow ISR, or nullptr for none
  *  \return         E_OK
  *                  E_NOT_OK
  *****************************************************************************************************************************************************/
 template <typename TimerTraits>
-StdReturnType Timer<TimerTraits>::init(uint32_t Microseconds, TimerIsrCallbackF_void sTimerOverflowCallback)
+StdReturnType Timer<TimerTraits>::Init(uint32_t microseconds, TimerIsrCallbackFVoid timer_overflow_callback)
 {
-    StdReturnType returnValue{E_NOT_OK};
+    StdReturnType return_value{kENotOk};
 
-    if(STATE_NONE == State) {
-        returnValue = E_OK;
-        State = STATE_INIT;
+    if(kStateNone == state_) {
+        return_value = kEOk;
+        state_ = kStateInit;
 
         /* The Dx hands this timer over at its reset values rather than running, the way the
-           xmegaForArduino core used to - but RESET is kept anyway, so that a second init() after a
-           detachInterrupt() starts from the same place the first one did. The command is only
+           xmegaForArduino core used to - but RESET is kept anyway, so that a second Init() after a
+           DetachInterrupt() starts from the same place the first one did. The command is only
            obeyed while the timer is disabled, hence the order. */
-        setRunning(false);
-        getTimer().CTRLESET = TCA_SINGLE_CMD_RESET_gc;
+        SetRunning(false);
+        GetTimer().CTRLESET = TCA_SINGLE_CMD_RESET_gc;
 
         /* Away from the PORTA the route comes up on, before any channel can drive a pin: PA0 and
            PA2 belong to the strip. See the traits in Timer.h. */
-        writeBitGroup(PORTMUX.TCAROUTEA, TimerTraits::RouteMask, TimerTraits::RouteGroup);
+        WriteBitGroup(PORTMUX.TCAROUTEA, TimerTraits::kRouteMask, TimerTraits::kRouteGroup);
 
         /* dual-slope PWM, overflow interrupt at BOTTOM */
-        writeBitGroup(getTimer().CTRLB, TCA_SINGLE_WGMODE_gm, TCA_SINGLE_WGMODE_DSBOTTOM_gc);
+        WriteBitGroup(GetTimer().CTRLB, TCA_SINGLE_WGMODE_gm, TCA_SINGLE_WGMODE_DSBOTTOM_gc);
 
-        if(setPeriod(Microseconds) == E_NOT_OK) returnValue = E_NOT_OK;
-        if(sTimerOverflowCallback != nullptr) if(attachInterrupt(sTimerOverflowCallback) == E_NOT_OK) returnValue = E_NOT_OK;
+        if(SetPeriod(microseconds) == kENotOk) return_value = kENotOk;
+        if(timer_overflow_callback != nullptr) if(AttachInterrupt(timer_overflow_callback) == kENotOk) return_value = kENotOk;
 
-        State = STATE_READY;
+        state_ = kStateReady;
     }
-    return returnValue;
-} /* init */
+    return return_value;
+} /* Init */
 
 
 /******************************************************************************************************************************************************
-  toClockSelect()
+  ToClockSelect()
 ******************************************************************************************************************************************************/
 /*! \brief          The smallest prescaler that brings a period inside the counter
  *  \details        Smallest, because every step up halves the resolution of TOP and of the
  *                  compare values derived from it. Each test shifts the undivided count, so
  *                  no step depends on what the one before it did to it.
- *  \param[in]      TimerCycles                 the period in undivided timer cycles
+ *  \param[in]      timer_cycles                 the period in undivided timer cycles
  *  \return         the clock select bit group
  *****************************************************************************************************************************************************/
 template <typename TimerTraits>
-typename Timer<TimerTraits>::TimerClockSelectType Timer<TimerTraits>::toClockSelect(uint32_t TimerCycles)
+typename Timer<TimerTraits>::TimerClockSelectType Timer<TimerTraits>::ToClockSelect(uint32_t timer_cycles)
 {
-    if(TimerCycles < TIMER_RESOLUTION)          { return TIMER_REG_CS_NO_PRESCALER; }
-    if((TimerCycles >> 1u) < TIMER_RESOLUTION)  { return TIMER_REG_CS_PRESCALE_2; }
-    if((TimerCycles >> 2u) < TIMER_RESOLUTION)  { return TIMER_REG_CS_PRESCALE_4; }
-    if((TimerCycles >> 3u) < TIMER_RESOLUTION)  { return TIMER_REG_CS_PRESCALE_8; }
-    if((TimerCycles >> 4u) < TIMER_RESOLUTION)  { return TIMER_REG_CS_PRESCALE_16; }
-    if((TimerCycles >> 6u) < TIMER_RESOLUTION)  { return TIMER_REG_CS_PRESCALE_64; }
-    if((TimerCycles >> 8u) < TIMER_RESOLUTION)  { return TIMER_REG_CS_PRESCALE_256; }
-    /* TIMER_MAX_PERIOD in setPeriod() is what keeps this one inside 16 bit */
-    return TIMER_REG_CS_PRESCALE_1024;
-} /* toClockSelect */
+    if(timer_cycles < TIMER_RESOLUTION)          { return kTimerRegCsNoPrescaler; }
+    if((timer_cycles >> 1u) < TIMER_RESOLUTION)  { return kTimerRegCsPrescale2; }
+    if((timer_cycles >> 2u) < TIMER_RESOLUTION)  { return kTimerRegCsPrescale4; }
+    if((timer_cycles >> 3u) < TIMER_RESOLUTION)  { return kTimerRegCsPrescale8; }
+    if((timer_cycles >> 4u) < TIMER_RESOLUTION)  { return kTimerRegCsPrescale16; }
+    if((timer_cycles >> 6u) < TIMER_RESOLUTION)  { return kTimerRegCsPrescale64; }
+    if((timer_cycles >> 8u) < TIMER_RESOLUTION)  { return kTimerRegCsPrescale256; }
+    /* TIMER_MAX_PERIOD in SetPeriod() is what keeps this one inside 16 bit */
+    return kTimerRegCsPrescale1024;
+} /* ToClockSelect */
 
 
 /******************************************************************************************************************************************************
-  setPeriod()
+  SetPeriod()
 ******************************************************************************************************************************************************/
 /*! \brief          set period of the timer overflow interrupt
  *  \details        this functions sets the period of the timer overflow interrupt therefore
  *                  prescaler and timer top value will be calculated
- *  \param[in]      Microseconds                period of the timer overflow interrupt
+ *  \param[in]      microseconds                period of the timer overflow interrupt
  *  \return         E_OK
  *                  E_NOT_OK
  *****************************************************************************************************************************************************/
 template <typename TimerTraits>
-StdReturnType Timer<TimerTraits>::setPeriod(uint32_t Microseconds)
+StdReturnType Timer<TimerTraits>::SetPeriod(uint32_t microseconds)
 {
-    StdReturnType returnValue{E_NOT_OK};
+    StdReturnType return_value{kENotOk};
 
     /* was request out of bounds? An out of range period is refused and changes nothing */
-    if((Microseconds > 0u) && (Microseconds < TIMER_MAX_PERIOD)) {
-        returnValue = E_OK;
+    if((microseconds > 0u) && (microseconds < TIMER_MAX_PERIOD)) {
+        return_value = kEOk;
         /* calculate timer cycles to reach timer period, counter runs backwards after TOP, interrupt is at BOTTOM so divide microseconds by 2 */
-        uint32_t timerCycles = (F_CPU / 2000000uL) * Microseconds;
-        ClockSelectBitGroup = toClockSelect(timerCycles);
-        timerCycles >>= toPrescalerShift(ClockSelectBitGroup);
+        uint32_t timer_cycles = (F_CPU / 2000000uL) * microseconds;
+        clock_select_bit_group_ = ToClockSelect(timer_cycles);
+        timer_cycles >>= ToPrescalerShift(clock_select_bit_group_);
 
         /* A 16-bit access goes through the timer's shared TEMP register, so an ISR touching another
            16-bit register of this timer must not get in between.
@@ -133,168 +133,168 @@ StdReturnType Timer<TimerTraits>::setPeriod(uint32_t Microseconds)
            picked up until the counter has gone all the way round 0xFFFF, which is one period of
            several hundred milliseconds in the wrong place. PERBUF is taken over at BOTTOM, where
            the counter is below any legal TOP - and that holds for a stopped timer as much as for a
-           running one, since resume() continues mid-period. A timer not yet started has its
-           registers loaded by start().
+           running one, since Resume() continues mid-period. A timer not yet started has its
+           registers loaded by Start().
            The compare values go along, recomputed from their duty, so the PWM keeps its ratio
            across the change and takes the new period at the same BOTTOM. */
         ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-            Top = static_cast<uint16_t>(timerCycles);
-            getTimer().PERBUF = Top;
-            for(uint8_t Channel = 0u; Channel < TimerTraits::NumberOfChannels; Channel++) {
-                setCompareBuffer(static_cast<TimerChannelType>(Channel));
+            top_ = static_cast<uint16_t>(timer_cycles);
+            GetTimer().PERBUF = top_;
+            for(uint8_t channel = 0u; channel < TimerTraits::kNumberOfChannels; channel++) {
+                SetCompareBuffer(static_cast<TimerChannelType>(channel));
             }
         }
 
-        if(STATE_RUNNING == State) { setClockSelect(ClockSelectBitGroup); }
+        if(kStateRunning == state_) { SetClockSelect(clock_select_bit_group_); }
     }
-    return returnValue;
-} /* setPeriod */
+    return return_value;
+} /* SetPeriod */
 
 
 /******************************************************************************************************************************************************
-  start()
+  Start()
 ******************************************************************************************************************************************************/
 /*! \brief          start the timer from zero
  *  \return         E_OK
  *                  E_NOT_OK        timer was not initialized
  *****************************************************************************************************************************************************/
 template <typename TimerTraits>
-StdReturnType Timer<TimerTraits>::start()
+StdReturnType Timer<TimerTraits>::Start()
 {
-    StdReturnType returnValue{E_NOT_OK};
+    StdReturnType return_value{kENotOk};
 
-    if(STATE_READY == State || STATE_RUNNING == State || STATE_STOPPED == State) {
-        returnValue = E_OK;
-        setRunning(false);
-        loadPeriodAndCompare();
-        setClockSelect(ClockSelectBitGroup);
+    if(kStateReady == state_ || kStateRunning == state_ || kStateStopped == state_) {
+        return_value = kEOk;
+        SetRunning(false);
+        LoadPeriodAndCompare();
+        SetClockSelect(clock_select_bit_group_);
         /* RESTART clears the counter and the direction, so the first period is a whole one */
-        getTimer().CTRLESET = TCA_SINGLE_CMD_RESTART_gc;
-        setRunning(true);
-        State = STATE_RUNNING;
+        GetTimer().CTRLESET = TCA_SINGLE_CMD_RESTART_gc;
+        SetRunning(true);
+        state_ = kStateRunning;
     }
-    return returnValue;
-} /* start */
+    return return_value;
+} /* Start */
 
 
 /******************************************************************************************************************************************************
-  stop()
+  Stop()
 ******************************************************************************************************************************************************/
 template <typename TimerTraits>
-void Timer<TimerTraits>::stop()
+void Timer<TimerTraits>::Stop()
 {
-    /* before init() the timer is not this class's to stop */
-    if(STATE_NONE != State) {
-        setRunning(false);
-        if(STATE_RUNNING == State) { State = STATE_STOPPED; }
+    /* before Init() the timer is not this class's to stop */
+    if(kStateNone != state_) {
+        SetRunning(false);
+        if(kStateRunning == state_) { state_ = kStateStopped; }
     }
-} /* stop */
+} /* Stop */
 
 
 /******************************************************************************************************************************************************
-  resume()
+  Resume()
 ******************************************************************************************************************************************************/
 /*! \brief          continue a stopped timer where it stopped
  *  \return         E_OK
  *                  E_NOT_OK        timer was not stopped
  *****************************************************************************************************************************************************/
 template <typename TimerTraits>
-StdReturnType Timer<TimerTraits>::resume()
+StdReturnType Timer<TimerTraits>::Resume()
 {
-    StdReturnType returnValue{E_NOT_OK};
+    StdReturnType return_value{kENotOk};
 
-    if(STATE_STOPPED == State) {
-        returnValue = E_OK;
-        setRunning(true);
-        State = STATE_RUNNING;
+    if(kStateStopped == state_) {
+        return_value = kEOk;
+        SetRunning(true);
+        state_ = kStateRunning;
     }
-    return returnValue;
-} /* resume */
+    return return_value;
+} /* Resume */
 
 
 /******************************************************************************************************************************************************
-  attachInterrupt()
+  AttachInterrupt()
 ******************************************************************************************************************************************************/
 /*! \brief          install the callback the overflow ISR calls
  *  \details        The xmega put this interrupt on the PMIC's low level so that the core's millis()
  *                  could interrupt the callback. The Dx has no such pair of levels - it has one
- *                  CPUINT.LVL1VEC, and WS2812::init() has given it to USART0_DRE, which is what
+ *                  CPUINT.LVL1VEC, and WS2812::Init() has given it to USART0_DRE, which is what
  *                  keeps the strip's bytes flowing inside its reset gap. Taking it away for this
  *                  would corrupt a frame, so the overflow stays at level 0 and the callback runs
  *                  without being interruptible. Keep it short.
- *  \param[in]      sTimerOverflowCallback      called from the overflow ISR
+ *  \param[in]      timer_overflow_callback      called from the overflow ISR
  *  \return         E_OK
  *                  E_NOT_OK                    no callback given
  *****************************************************************************************************************************************************/
 template <typename TimerTraits>
-StdReturnType Timer<TimerTraits>::attachInterrupt(TimerIsrCallbackF_void sTimerOverflowCallback)
+StdReturnType Timer<TimerTraits>::AttachInterrupt(TimerIsrCallbackFVoid timer_overflow_callback)
 {
-    StdReturnType returnValue{E_NOT_OK};
+    StdReturnType return_value{kENotOk};
 
-    if(sTimerOverflowCallback != nullptr) {
-        returnValue = E_OK;
-        ATOMIC_BLOCK(ATOMIC_RESTORESTATE) { TimerOverflowCallback = sTimerOverflowCallback; }
+    if(timer_overflow_callback != nullptr) {
+        return_value = kEOk;
+        ATOMIC_BLOCK(ATOMIC_RESTORESTATE) { timer_overflow_callback_ = timer_overflow_callback; }
         /* The flag is set at every BOTTOM whether the interrupt is on or not, so one left over from
            while it was off would call the new callback at once. Only then: with the interrupt
            already on, a set flag is a real overflow about to be served. */
-        if(!(getTimer().INTCTRL & TCA_SINGLE_OVF_bm)) { getTimer().INTFLAGS = TCA_SINGLE_OVF_bm; }
-        getTimer().INTCTRL |= TCA_SINGLE_OVF_bm;
+        if(!(GetTimer().INTCTRL & TCA_SINGLE_OVF_bm)) { GetTimer().INTFLAGS = TCA_SINGLE_OVF_bm; }
+        GetTimer().INTCTRL |= TCA_SINGLE_OVF_bm;
     }
-    return returnValue;
-} /* attachInterrupt */
+    return return_value;
+} /* AttachInterrupt */
 
 
 /******************************************************************************************************************************************************
-  detachInterrupt()
+  DetachInterrupt()
 ******************************************************************************************************************************************************/
 template <typename TimerTraits>
-void Timer<TimerTraits>::detachInterrupt()
+void Timer<TimerTraits>::DetachInterrupt()
 {
-    getTimer().INTCTRL &= static_cast<uint8_t>(~TCA_SINGLE_OVF_bm);
-    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) { TimerOverflowCallback = nullptr; }
-} /* detachInterrupt */
+    GetTimer().INTCTRL &= static_cast<uint8_t>(~TCA_SINGLE_OVF_bm);
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) { timer_overflow_callback_ = nullptr; }
+} /* DetachInterrupt */
 
 
 /******************************************************************************************************************************************************
-  read()
+  Read()
 ******************************************************************************************************************************************************/
 /*! \brief          read current timer value in microseconds
  *  \details        this function returns the time since the last overflow interrupt in microseconds
  *
- *  \param[out]     Microseconds        current timer value
+ *  \param[out]     microseconds        current timer value
  *  \return         E_OK
  *                  E_NOT_OK
  *  \pre            Timer has to be in RUNNING or STOPPED STATE
  *****************************************************************************************************************************************************/
 template <typename TimerTraits>
-StdReturnType Timer<TimerTraits>::read(uint32_t& Microseconds)
+StdReturnType Timer<TimerTraits>::Read(uint32_t& microseconds)
 {
-    StdReturnType returnValue{E_NOT_OK};
+    StdReturnType return_value{kENotOk};
 
-    if(STATE_RUNNING == State || STATE_STOPPED == State) {
-        uint32_t counterValue{0u};
-        uint32_t topValue{0u};
-        TimerCountDirection direction{TIMER_COUNT_DIRECTION_UP};
-        returnValue = E_OK;
+    if(kStateRunning == state_ || kStateStopped == state_) {
+        uint32_t counter_value{0u};
+        uint32_t top_value{0u};
+        TimerCountDirection direction{kTimerCountDirectionUp};
+        return_value = kEOk;
 
         /* counter and direction have to come from the same instant, or a turn at TOP in between
            reads as a whole period too much */
         ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-            counterValue = getTimer().CNT;
-            topValue = getTimer().PER;
-            direction = getCountingDirection();
+            counter_value = GetTimer().CNT;
+            top_value = GetTimer().PER;
+            direction = GetCountingDirection();
         }
         /* if counter counting down, add top value to current value */
-        if(direction == TIMER_COUNT_DIRECTION_DOWN) { counterValue = (topValue - counterValue) + topValue; }
+        if(direction == kTimerCountDirectionDown) { counter_value = (top_value - counter_value) + top_value; }
 
-        Microseconds = toMicroseconds(counterValue, ClockSelectBitGroup);
+        microseconds = ToMicroseconds(counter_value, clock_select_bit_group_);
     }
-    return returnValue;
-} /* read */
+    return return_value;
+} /* Read */
 
 
 /******************************************************************************************************************************************************
-  handleOverflowInterrupt()
+  HandleOverflowInterrupt()
 ******************************************************************************************************************************************************/
 /*! \brief          called from the overflow ISR of this timer
  *  \details        The flag is not cleared by the vector executing, on this part no more than on the
@@ -302,11 +302,11 @@ StdReturnType Timer<TimerTraits>::read(uint32_t& Microseconds)
  *                  Writing the bit is what clears it here.
  *****************************************************************************************************************************************************/
 template <typename TimerTraits>
-void Timer<TimerTraits>::handleOverflowInterrupt()
+void Timer<TimerTraits>::HandleOverflowInterrupt()
 {
-    getTimer().INTFLAGS = TCA_SINGLE_OVF_bm;
-    if(TimerOverflowCallback != nullptr) { TimerOverflowCallback(); }
-} /* handleOverflowInterrupt */
+    GetTimer().INTFLAGS = TCA_SINGLE_OVF_bm;
+    if(timer_overflow_callback_ != nullptr) { timer_overflow_callback_(); }
+} /* HandleOverflowInterrupt */
 
 
 /******************************************************************************************************************************************************
@@ -314,131 +314,131 @@ void Timer<TimerTraits>::handleOverflowInterrupt()
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  getCountingDirection
+  GetCountingDirection
 ******************************************************************************************************************************************************/
 /*! \details        CTRLESET and CTRLECLR are one register seen twice: a write sets or clears the
  *                  bits it names, and a read of either gives the state. Reading the SET half keeps
  *                  this looking like the xmega's CTRLGSET.
  *****************************************************************************************************************************************************/
 template <typename TimerTraits>
-typename Timer<TimerTraits>::TimerCountDirection Timer<TimerTraits>::getCountingDirection()
+typename Timer<TimerTraits>::TimerCountDirection Timer<TimerTraits>::GetCountingDirection()
 {
-    if(getTimer().CTRLESET & TCA_SINGLE_DIR_bm) { return TIMER_COUNT_DIRECTION_DOWN; }
-    else { return TIMER_COUNT_DIRECTION_UP; }
-} /* getCountingDirection */
+    if(GetTimer().CTRLESET & TCA_SINGLE_DIR_bm) { return kTimerCountDirectionDown; }
+    else { return kTimerCountDirectionUp; }
+} /* GetCountingDirection */
 
 
 /******************************************************************************************************************************************************
-  setClockSelect
+  SetClockSelect
 ******************************************************************************************************************************************************/
 template <typename TimerTraits>
-void Timer<TimerTraits>::setClockSelect(TimerClockSelectType ClockSelect)
+void Timer<TimerTraits>::SetClockSelect(TimerClockSelectType clock_select)
 {
-    writeBitGroup(getTimer().CTRLA, TCA_SINGLE_CLKSEL_gm, ClockSelect);
-} /* setClockSelect */
+    WriteBitGroup(GetTimer().CTRLA, TCA_SINGLE_CLKSEL_gm, clock_select);
+} /* SetClockSelect */
 
 
 /******************************************************************************************************************************************************
-  setRunning
+  SetRunning
 ******************************************************************************************************************************************************/
 /*! \details        Where the xmega stopped its timer by selecting no clock source, this one keeps
  *                  the prescaler and loses ENABLE: the Dx CLKSEL has no OFF to select.
  *****************************************************************************************************************************************************/
 template <typename TimerTraits>
-void Timer<TimerTraits>::setRunning(bool Running)
+void Timer<TimerTraits>::SetRunning(bool running)
 {
-    if(Running) { getTimer().CTRLA |= TCA_SINGLE_ENABLE_bm; }
-    else        { getTimer().CTRLA &= static_cast<uint8_t>(~TCA_SINGLE_ENABLE_bm); }
-} /* setRunning */
+    if(running) { GetTimer().CTRLA |= TCA_SINGLE_ENABLE_bm; }
+    else        { GetTimer().CTRLA &= static_cast<uint8_t>(~TCA_SINGLE_ENABLE_bm); }
+} /* SetRunning */
 
 
 /******************************************************************************************************************************************************
-  setCompareBuffer
+  SetCompareBuffer
 ******************************************************************************************************************************************************/
 /*! \pre            called with interrupts off, the write goes through the TEMP register
  *****************************************************************************************************************************************************/
 template <typename TimerTraits>
-void Timer<TimerTraits>::setCompareBuffer(TimerChannelType Channel)
+void Timer<TimerTraits>::SetCompareBuffer(TimerChannelType channel)
 {
     /* CMP0BUF..CMP2BUF are consecutive, which Timer.h asserts; the channel was range checked at
        compile time */
-    (&getTimer().CMP0BUF)[Channel] = toCompareValue(Top, PwmDuty[Channel]);
-} /* setCompareBuffer */
+    (&GetTimer().CMP0BUF)[channel] = ToCompareValue(top_, pwm_duty_[channel]);
+} /* SetCompareBuffer */
 
 
 /******************************************************************************************************************************************************
-  loadPeriodAndCompare
+  LoadPeriodAndCompare
 ******************************************************************************************************************************************************/
 /*! \details        Straight into PER and CMPn, past the buffers, which is only safe while the timer is
- *                  disabled. Without it the first period after start() would run on whatever the
+ *                  disabled. Without it the first period after Start() would run on whatever the
  *                  registers held: the buffers are taken over at BOTTOM, and the first BOTTOM after
- *                  RESTART is a whole period away - with CMPn at the 0 init()'s RESET left there.
+ *                  RESTART is a whole period away - with CMPn at the 0 Init()'s RESET left there.
  *                  Not a forced UPDATE before the RESTART instead: both are written to CTRLESET,
  *                  and an UPDATE still pending there ORed with RESTART reads as RESET.
  *  \pre            timer disabled
  *****************************************************************************************************************************************************/
 template <typename TimerTraits>
-void Timer<TimerTraits>::loadPeriodAndCompare()
+void Timer<TimerTraits>::LoadPeriodAndCompare()
 {
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-        getTimer().PER = Top;
-        for(uint8_t Channel = 0u; Channel < TimerTraits::NumberOfChannels; Channel++) {
+        GetTimer().PER = top_;
+        for(uint8_t channel = 0u; channel < TimerTraits::kNumberOfChannels; channel++) {
             /* CMP0..CMP2 are consecutive like their buffers, which Timer.h asserts as well */
-            (&getTimer().CMP0)[Channel] = toCompareValue(Top, PwmDuty[Channel]);
+            (&GetTimer().CMP0)[channel] = ToCompareValue(top_, pwm_duty_[channel]);
         }
     }
-} /* loadPeriodAndCompare */
+} /* LoadPeriodAndCompare */
 
 
 /******************************************************************************************************************************************************
-  enablePwmChannel
+  EnablePwmChannel
 ******************************************************************************************************************************************************/
 template <typename TimerTraits>
-StdReturnType Timer<TimerTraits>::enablePwmChannel(TimerChannelType Channel, uint16_t Duty)
+StdReturnType Timer<TimerTraits>::EnablePwmChannel(TimerChannelType channel, uint16_t duty)
 {
-    StdReturnType returnValue = setPwmDutyChannel(Channel, Duty);
+    StdReturnType return_value = SetPwmDutyChannel(channel, duty);
 
-    if(E_OK == returnValue) {
-        TimerTraits::getPort().DIRSET = toPinMask(Channel);
-        getTimer().CTRLB |= toChannelEnableMask(Channel);
+    if(kEOk == return_value) {
+        TimerTraits::GetPort().DIRSET = ToPinMask(channel);
+        GetTimer().CTRLB |= ToChannelEnableMask(channel);
     }
-    return returnValue;
-} /* enablePwmChannel */
+    return return_value;
+} /* EnablePwmChannel */
 
 
 /******************************************************************************************************************************************************
-  disablePwmChannel
+  DisablePwmChannel
 ******************************************************************************************************************************************************/
 template <typename TimerTraits>
-StdReturnType Timer<TimerTraits>::disablePwmChannel(TimerChannelType Channel)
+StdReturnType Timer<TimerTraits>::DisablePwmChannel(TimerChannelType channel)
 {
-    getTimer().CTRLB &= static_cast<uint8_t>(~toChannelEnableMask(Channel));
+    GetTimer().CTRLB &= static_cast<uint8_t>(~ToChannelEnableMask(channel));
     /* the pin stays an output, it now shows its PORT.OUT value instead of the waveform */
-    return E_OK;
-} /* disablePwmChannel */
+    return kEOk;
+} /* DisablePwmChannel */
 
 
 /******************************************************************************************************************************************************
-  setPwmDutyChannel
+  SetPwmDutyChannel
 ******************************************************************************************************************************************************/
 /*! \brief          set duty of one compare channel, 0 .. PwmDutyMax
  *  \details        Written to the buffer register, so the new compare value takes effect at the next
  *                  BOTTOM and a running PWM never sees half a period of each.
  *****************************************************************************************************************************************************/
 template <typename TimerTraits>
-StdReturnType Timer<TimerTraits>::setPwmDutyChannel(TimerChannelType Channel, uint16_t Duty)
+StdReturnType Timer<TimerTraits>::SetPwmDutyChannel(TimerChannelType channel, uint16_t duty)
 {
-    StdReturnType returnValue{E_NOT_OK};
+    StdReturnType return_value{kENotOk};
 
-    if(Duty <= PwmDutyMax) {
-        returnValue = E_OK;
+    if(duty <= kPwmDutyMax) {
+        return_value = kEOk;
         ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-            PwmDuty[Channel] = Duty;
-            setCompareBuffer(Channel);
+            pwm_duty_[channel] = duty;
+            SetCompareBuffer(channel);
         }
     }
-    return returnValue;
-} /* setPwmDutyChannel */
+    return return_value;
+} /* SetPwmDutyChannel */
 
 
 /******************************************************************************************************************************************************
@@ -446,12 +446,12 @@ StdReturnType Timer<TimerTraits>::setPwmDutyChannel(TimerChannelType Channel, ui
 ******************************************************************************************************************************************************/
 #if (TIMER_USE_TCA0 == STD_ON)
 template class Timer<TimerA0>;
-ISR(TCA0_OVF_vect) { Timer<TimerA0>::getInstance().handleOverflowInterrupt(); }
+ISR(TCA0_OVF_vect) { Timer<TimerA0>::GetInstance().HandleOverflowInterrupt(); }
 #endif
 
 #if (TIMER_USE_TCA1 == STD_ON)
 template class Timer<TimerA1>;
-ISR(TCA1_OVF_vect) { Timer<TimerA1>::getInstance().handleOverflowInterrupt(); }
+ISR(TCA1_OVF_vect) { Timer<TimerA1>::GetInstance().HandleOverflowInterrupt(); }
 #endif
 
 

@@ -30,44 +30,44 @@
    Closed from a second thread after a few seconds, so that a host which does wait for it
    ends this case late and failed rather than never. Needs the port, so a simulator left
    open next to the tests skips the case rather than failing it. */
-void testWebHostOutlastsAnIdleConnection()
+void TestWebHostOutlastsAnIdleConnection()
 {
 #ifndef _WIN32
-    WebHost& Host = WebHost::getInstance();
+    WebHost& host = WebHost::GetInstance();
 
-    if(Host.begin() != E_OK) {
+    if(host.Begin() != kEOk) {
         std::cerr << "skipped: port " << WEB_HOST_PORT << " is taken, the web host case needs it\n";
         return;
     }
 
-    const int Idle = socket(AF_INET, SOCK_STREAM, 0);
-    if(Idle < 0) {
-        expect(false, "the case must get a socket of its own");
-        Host.end();
+    const int idle = socket(AF_INET, SOCK_STREAM, 0);
+    if(idle < 0) {
+        Expect(false, "the case must get a socket of its own");
+        host.End();
         return;
     }
 
-    sockaddr_in Address{};
-    Address.sin_family = AF_INET;
-    Address.sin_port = htons(WEB_HOST_PORT);
-    Address.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
-    expect(connect(Idle, reinterpret_cast<sockaddr*>(&Address), sizeof(Address)) == 0,
+    sockaddr_in address{};
+    address.sin_family = AF_INET;
+    address.sin_port = htons(WEB_HOST_PORT);
+    address.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+    Expect(connect(idle, reinterpret_cast<sockaddr*>(&address), sizeof(address)) == 0,
            "the idle connection must reach the host");
 
-    std::promise<void> TaskDone;
-    std::thread Closer([Idle, Done = TaskDone.get_future()]() {
-        if(Done.wait_for(std::chrono::seconds(3)) == std::future_status::timeout) { shutdown(Idle, SHUT_RDWR); }
+    std::promise<void> task_done;
+    std::thread closer([idle, done = task_done.get_future()]() {
+        if(done.wait_for(std::chrono::seconds(3)) == std::future_status::timeout) { shutdown(idle, SHUT_RDWR); }
     });
 
-    const auto Start = std::chrono::steady_clock::now();
-    Host.task();
-    const auto Elapsed = std::chrono::steady_clock::now() - Start;
+    const auto start = std::chrono::steady_clock::now();
+    host.Task();
+    const auto elapsed = std::chrono::steady_clock::now() - start;
 
-    TaskDone.set_value();
-    Closer.join();
-    close(Idle);
-    Host.end();
+    task_done.set_value();
+    closer.join();
+    close(idle);
+    host.End();
 
-    expect(Elapsed < std::chrono::seconds(1), "an idle connection must not hold the tick until it closes");
+    Expect(elapsed < std::chrono::seconds(1), "an idle connection must not hold the tick until it closes");
 #endif
 }

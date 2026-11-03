@@ -59,50 +59,50 @@ class DisplayPixels
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    PixelsBufferType PixelsBuffer;
-    DisplayWords Words;
+    PixelsBufferType pixels_buffer_;
+    DisplayWords words_;
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    DisplayPixels() : PixelsBuffer{0u} {}
+    DisplayPixels() : pixels_buffer_{0u} {}
     ~DisplayPixels() {}
 
 	// get methods
-    boolean getPixel(byte Column, byte Row) const { return readBit(PixelsBuffer[Row], Column); }
+    boolean GetPixel(byte column, byte row) const { return ReadBit(pixels_buffer_[row], column); }
 
 	// set methods
-	void setPixel(byte Column, byte Row) { PixelsBuffer[Row] = writeBit(PixelsBuffer[Row], Column, true); }
-	void setPixel(IndexType Index) {
-	    byte Column, Row;
-	    Display::indexToColumnAndRow(Index, Column, Row);
-	    setPixel(Column, Row);
+	void SetPixel(byte column, byte row) { pixels_buffer_[row] = WriteBit(pixels_buffer_[row], column, true); }
+	void SetPixel(IndexType index) {
+	    byte column, row;
+	    Display::IndexToColumnAndRow(index, column, row);
+	    SetPixel(column, row);
     }
 
 	// methods
-	void clearPixel(byte Column, byte Row) { PixelsBuffer[Row] = writeBit(PixelsBuffer[Row], Column, false); }
-	void writePixel(byte Column, byte Row, bool Value) { PixelsBuffer[Row] = writeBit(PixelsBuffer[Row], Column, Value); }
+	void ClearPixel(byte column, byte row) { pixels_buffer_[row] = WriteBit(pixels_buffer_[row], column, false); }
+	void WritePixel(byte column, byte row, bool value) { pixels_buffer_[row] = WriteBit(pixels_buffer_[row], column, value); }
 
-	void setWord(WordIdType WordId) {
-        DisplayWord word = Words.getDisplayWord(WordId);
-        for(IndexType Index = 0u; Index < word.getLength(); Index++) { setPixel(word.getColumn() + Index,  word.getRow()); }
+	void SetWord(WordIdType word_id) {
+        DisplayWord word = words_.GetDisplayWord(word_id);
+        for(IndexType index = 0u; index < word.GetLength(); index++) { SetPixel(word.GetColumn() + index,  word.GetRow()); }
     }
 
-	void setPixelsToDisplay() const
+	void SetPixelsToDisplay() const
 	{
-        for(byte Column = 0u; Column < DISPLAY_NUMBER_OF_COLUMNS; Column++) {
-            for(byte Row = 0u; Row < DISPLAY_NUMBER_OF_ROWS; Row++) {
-                Display::getInstance().writePixel(Column, Row, getPixel(Column, Row));
+        for(byte column = 0u; column < DISPLAY_NUMBER_OF_COLUMNS; column++) {
+            for(byte row = 0u; row < DISPLAY_NUMBER_OF_ROWS; row++) {
+                Display::GetInstance().WritePixel(column, row, GetPixel(column, row));
             }
         }
 	}
 
-	void getPixelsFromDisplay()
+	void GetPixelsFromDisplay()
 	{
-        for(byte Column = 0u; Column < DISPLAY_NUMBER_OF_COLUMNS; Column++) {
-            for(byte Row = 0u; Row < DISPLAY_NUMBER_OF_ROWS; Row++) {
-                PixelsBuffer[Row] = writeBit(PixelsBuffer[Row], Column, Display::getInstance().getPixel(Column, Row));
+        for(byte column = 0u; column < DISPLAY_NUMBER_OF_COLUMNS; column++) {
+            for(byte row = 0u; row < DISPLAY_NUMBER_OF_ROWS; row++) {
+                pixels_buffer_[row] = WriteBit(pixels_buffer_[row], column, Display::GetInstance().GetPixel(column, row));
             }
         }
 	}

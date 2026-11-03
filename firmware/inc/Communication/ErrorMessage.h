@@ -49,30 +49,30 @@ class ErrorMessage
 ******************************************************************************************************************************************************/
   public:
     enum ErrorType {
-        ERROR_NO_ERROR,
-        ERROR_MESSAGE_TOO_LONG,
-        ERROR_WRONG_COMMAND,
-        ERROR_PARAMETER_UNKNOWN,
-        ERROR_VALUE_OUT_OF_BOUNDS,
-        ERROR_NO_VALUE_GIVEN,
-        ERROR_DISPLAY_PENDING,
-        ERROR_RPC_ID_UNKNOWN,
-        ERROR_UNKNOWN,
+        kErrorNoError,
+        kErrorMessageTooLong,
+        kErrorWrongCommand,
+        kErrorParameterUnknown,
+        kErrorValueOutOfBounds,
+        kErrorNoValueGiven,
+        kErrorDisplayPending,
+        kErrorRpcIdUnknown,
+        kErrorUnknown,
         /* Appended behind ERROR_UNKNOWN rather than sorted in beside its neighbours, for the
            reason the remote procedure ids are appended too: these numbers are what an answer
            carries and what this repository's own documentation writes down, and inserting one
            would silently change what every code behind it means. */
-        ERROR_POWER_SWITCH_ABSENT,
+        kErrorPowerSwitchAbsent,
     };
 
     enum ApiType {
-        API_NONE,
-        API_DISPLAY_SHOW,
-        API_DISPLAY_WRITE_PIXEL,
-        API_ANIMATION_SHOW,
-        API_CLOCK_SHOW,
-        API_ANIMATION_SET_ANIMATION,
-        API_ANIMATION_SET_CLOCK_TASK_CYCLE,
+        kApiNone,
+        kApiDisplayShow,
+        kApiDisplayWritePixel,
+        kApiAnimationShow,
+        kApiClockShow,
+        kApiAnimationSetAnimation,
+        kApiAnimationSetClockTaskCycle,
     };
 
 /******************************************************************************************************************************************************
@@ -80,15 +80,15 @@ class ErrorMessage
 ******************************************************************************************************************************************************/
   private:
     // functions
-    static void sendSpace() { Serial.print(' '); }
-    static void sendColon() { Serial.print(':'); }
-    static void sendEqual() { Serial.print('='); }
+    static void SendSpace() { Serial.print(' '); }
+    static void SendColon() { Serial.print(':'); }
+    static void SendEqual() { Serial.print('='); }
 
-    static void send(ApiType Api)
+    static void Send(ApiType api)
     {
         Serial.print(F("Api"));
-        sendEqual();
-        Serial.print(Api);
+        SendEqual();
+        Serial.print(api);
     }
 
 /******************************************************************************************************************************************************
@@ -104,47 +104,47 @@ class ErrorMessage
     // set methods
 
     // methods
-    static void send(ErrorType Error, bool AppendSpace = true)
+    static void Send(ErrorType error, bool append_space = true)
     {
         Serial.print(F("Error"));
-        sendEqual();
-        Serial.print(Error);
-        if(AppendSpace) { sendSpace(); }
+        SendEqual();
+        Serial.print(error);
+        if(append_space) { SendSpace(); }
     }
 
-    static void send(char OptionShortName, ErrorType Error, bool AppendSpace = true)
+    static void Send(char option_short_name, ErrorType error, bool append_space = true)
     {
-        send(Error, false);
-        sendColon();
-        Serial.print(OptionShortName);
-        if(AppendSpace) { sendSpace(); }
+        Send(error, false);
+        SendColon();
+        Serial.print(option_short_name);
+        if(append_space) { SendSpace(); }
     }
 
-    static void send(MsgParameter Parameter, ErrorType Error, bool AppendSpace = true)
+    static void Send(MsgParameter parameter, ErrorType error, bool append_space = true)
     {
-        send(Parameter.getOptionShortName(), Error, AppendSpace);
+        Send(parameter.GetOptionShortName(), error, append_space);
     }
 
-    static void send(StdReturnType ReturnValue, bool AppendSpace = true)
+    static void Send(StdReturnType return_value, bool append_space = true)
     {
-        if(ReturnValue == E_OK) { send(ERROR_NO_ERROR, AppendSpace); }
-        else { send(ERROR_UNKNOWN, AppendSpace); }
+        if(return_value == kEOk) { Send(kErrorNoError, append_space); }
+        else { Send(kErrorUnknown, append_space); }
     }
 
-    static void checkReturnValueAndSend(ApiType Api, StdReturnType ReturnValue, ErrorType Error, bool AppendSpace = true)
+    static void CheckReturnValueAndSend(ApiType api, StdReturnType return_value, ErrorType error, bool append_space = true)
     {
-        if(ReturnValue == E_NOT_OK) {
-            send(Api);
-            sendColon();
-            send(Error);
-            if(AppendSpace) { sendSpace(); }
+        if(return_value == kENotOk) {
+            Send(api);
+            SendColon();
+            Send(error);
+            if(append_space) { SendSpace(); }
         }
     }
 
-        static void checkReturnValueAndSend(char OptionShortName, StdReturnType ReturnValue, ErrorType Error, bool AppendSpace = true)
+        static void CheckReturnValueAndSend(char option_short_name, StdReturnType return_value, ErrorType error, bool append_space = true)
     {
-        if(ReturnValue == E_NOT_OK) {
-            send(OptionShortName, Error, AppendSpace);
+        if(return_value == kENotOk) {
+            Send(option_short_name, error, append_space);
         }
     }
 };

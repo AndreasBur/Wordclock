@@ -1,5 +1,7 @@
 #ifndef _WIRE_H_
 #define _WIRE_H_
+/* Under the framework's names, because it stands in for the framework's header. */
+// NOLINTBEGIN(readability-identifier-naming)
 #include <stdint.h>
 #include <stddef.h>
 #include <vector>
@@ -25,4 +27,5 @@ struct TwoWire {
     int available() { return static_cast<int>(remaining()); }
 };
 extern TwoWire Wire;
+// NOLINTEND(readability-identifier-naming)
 #endif

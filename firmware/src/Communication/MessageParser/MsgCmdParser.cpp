@@ -61,15 +61,15 @@
 ******************************************************************************************************************************************************/
 namespace {
 /* Every command parser shares the same lifecycle: construct from the parameter
- * string, then parse -> process -> sendAnswer. This helper runs that sequence so
+ * string, then parse -> Process -> SendAnswer. This helper runs that sequence so
  * the dispatch below stays a flat table instead of a copy-pasted if/else chain. */
 template <typename ParserType>
-void dispatchCommand(const char* Parameter)
+void DispatchCommand(const char* parameter)
 {
-    ParserType parser(Parameter);
-    parser.parse();
-    parser.process();
-    parser.sendAnswer();
+    ParserType parser(parameter);
+    parser.Parse();
+    parser.Process();
+    parser.SendAnswer();
 }
 } /* namespace */
 
@@ -81,37 +81,37 @@ void dispatchCommand(const char* Parameter)
 /******************************************************************************************************************************************************
   parse()
 ******************************************************************************************************************************************************/
-void MsgCmdParser::parse()
+void MsgCmdParser::Parse()
 {
-    CommandType command = getCommand();
-    const char* parameter = getParameter();
+    CommandType command = GetCommand();
+    const char* parameter = GetParameter();
 
-    if(command != COMMAND_NONE) sendAnswer(command);
+    if(command != kCommandNone) SendAnswer(command);
 
     switch(command) {
-        case COMMAND_REMOTE_PROCEDURE_CALL: dispatchCommand<MsgCmdRemoteProcedureCallParser>(parameter); break;
-        case COMMAND_DISPLAY_COLOR:         dispatchCommand<MsgCmdDisplayColorParser>(parameter);        break;
-        case COMMAND_DISPLAY_BRIGHTNESS:    dispatchCommand<MsgCmdDisplayBrightnessParser>(parameter);   break;
-        case COMMAND_DISPLAY_PIXEL:         dispatchCommand<MsgCmdDisplayPixelParser>(parameter);        break;
-        case COMMAND_ANIMATION:             dispatchCommand<MsgCmdAnimationParser>(parameter);           break;
-        case COMMAND_CLOCK_MODE:            dispatchCommand<MsgCmdClockModeParser>(parameter);           break;
-        case COMMAND_TIME:                  dispatchCommand<MsgCmdTimeParser>(parameter);                break;
-        case COMMAND_DATE:                  dispatchCommand<MsgCmdDateParser>(parameter);                break;
-        case COMMAND_STATUS:                dispatchCommand<MsgCmdStatusParser>(parameter);              break;
-        case COMMAND_NETWORK:               dispatchCommand<MsgCmdNetworkParser>(parameter);             break;
-        case COMMAND_NIGHT_SWITCH:          dispatchCommand<MsgCmdNightSwitchParser>(parameter);         break;
-        case COMMAND_COLOR_CYCLE:           dispatchCommand<MsgCmdColorCycleParser>(parameter);          break;
-        case COMMAND_CONSOLE:               dispatchCommand<MsgCmdConsoleParser>(parameter);             break;
+        case kCommandRemoteProcedureCall: DispatchCommand<MsgCmdRemoteProcedureCallParser>(parameter); break;
+        case kCommandDisplayColor:         DispatchCommand<MsgCmdDisplayColorParser>(parameter);        break;
+        case kCommandDisplayBrightness:    DispatchCommand<MsgCmdDisplayBrightnessParser>(parameter);   break;
+        case kCommandDisplayPixel:         DispatchCommand<MsgCmdDisplayPixelParser>(parameter);        break;
+        case kCommandAnimation:             DispatchCommand<MsgCmdAnimationParser>(parameter);           break;
+        case kCommandClockMode:            DispatchCommand<MsgCmdClockModeParser>(parameter);           break;
+        case kCommandTime:                  DispatchCommand<MsgCmdTimeParser>(parameter);                break;
+        case kCommandDate:                  DispatchCommand<MsgCmdDateParser>(parameter);                break;
+        case kCommandStatus:                DispatchCommand<MsgCmdStatusParser>(parameter);              break;
+        case kCommandNetwork:               DispatchCommand<MsgCmdNetworkParser>(parameter);             break;
+        case kCommandNightSwitch:          DispatchCommand<MsgCmdNightSwitchParser>(parameter);         break;
+        case kCommandColorCycle:           DispatchCommand<MsgCmdColorCycleParser>(parameter);          break;
+        case kCommandConsole:               DispatchCommand<MsgCmdConsoleParser>(parameter);             break;
 #if (OVERLAYS_SUPPORT_DATE == STD_ON)
-        case COMMAND_OVERLAY_DATE:          dispatchCommand<MsgCmdOverlayDateParser>(parameter);         break;
+        case kCommandOverlayDate:          DispatchCommand<MsgCmdOverlayDateParser>(parameter);         break;
 #endif
 #if (OVERLAYS_SUPPORT_TEMPERATURE == STD_ON)
-        case COMMAND_OVERLAY_TEMPERATURE:   dispatchCommand<MsgCmdOverlayTemperatureParser>(parameter);  break;
+        case kCommandOverlayTemperature:   DispatchCommand<MsgCmdOverlayTemperatureParser>(parameter);  break;
 #endif
 #if (OVERLAYS_SUPPORT_TEXT == STD_ON)
-        case COMMAND_OVERLAY_TEXT:          dispatchCommand<MsgCmdOverlayTextParser>(parameter);         break;
+        case kCommandOverlayText:          DispatchCommand<MsgCmdOverlayTextParser>(parameter);         break;
 #endif
-        default:                            Error.send(ErrorMessage::ERROR_WRONG_COMMAND, false);        break;
+        default:                            error_.Send(ErrorMessage::kErrorWrongCommand, false);        break;
     }
 
     Serial.println();

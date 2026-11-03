@@ -13,14 +13,14 @@ class WordclockMain
         WordclockMain();
         ~WordclockMain();
 
-        void task();
+        void Task();
 
     protected:
 
     private:
-        Scheduler wcScheduler;
+        Scheduler wc_scheduler_;
         enum {
-            TIMER_ID = 1500
+            kTimerId = 1500
         };
 };
 

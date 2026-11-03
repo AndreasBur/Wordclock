@@ -43,9 +43,9 @@
  *  G L O B A L   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
 enum class Orientation {
-    ORIENTATION_HORIZONTAL,
-    ORIENTATION_VERTICAL,
-    ORIENTATION_NONE
+    kOrientationHorizontal,
+    kOrientationVertical,
+    kOrientationNone
 };
 
 /******************************************************************************************************************************************************
@@ -64,13 +64,13 @@ template <typename FontCharType, size_t FontTableSize> class Font
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    const FontTableType& FontTable;
+    const FontTableType& font_table_;
   
     // functions
-    FontTableElementType getFontTableElement(byte Index) const {
-        FontTableElementType fontTableElement;
-        memcpy_P(&fontTableElement, &FontTable[Index], sizeof(FontTableElementType));
-        return fontTableElement;
+    FontTableElementType GetFontTableElement(byte index) const {
+        FontTableElementType font_table_element;
+        memcpy_P(&font_table_element, &font_table_[index], sizeof(FontTableElementType));
+        return font_table_element;
     }
     
 /******************************************************************************************************************************************************
@@ -83,7 +83,7 @@ template <typename FontCharType, size_t FontTableSize> class Font
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr Font(const FontTableType& sFontTable) : FontTable(sFontTable) { }
+    constexpr Font(const FontTableType& font_table) : font_table_(font_table) { }
     ~Font() { }
 
     /* Two forms of every reader, and the argument list says which: the one taking a
@@ -92,34 +92,34 @@ template <typename FontCharType, size_t FontTableSize> class Font
        glyph outside the table is the default one, which is zero columns wide and therefore
        draws nothing. */
     // get methods
-    FontCharType getChar(byte Index) const {
-        if(!isIndexValid(Index)) { return FontCharType{}; }
-        return getFontTableElement(Index);
+    FontCharType GetChar(byte index) const {
+        if(!IsIndexValid(index)) { return FontCharType{}; }
+        return GetFontTableElement(index);
     }
-    byte getCharWidth(byte Index) const { return getChar(Index).getWidth(); }
+    byte GetCharWidth(byte index) const { return GetChar(index).GetWidth(); }
 
-    StdReturnType getChar(byte Index, FontCharType& FontChar) const {
-        if(isIndexValid(Index)) {
-            FontChar = getFontTableElement(Index);
-            return E_OK;
+    StdReturnType GetChar(byte index, FontCharType& font_char) const {
+        if(IsIndexValid(index)) {
+            font_char = GetFontTableElement(index);
+            return kEOk;
         } else {
-            return E_NOT_OK;
+            return kENotOk;
         }
     }
 
-    StdReturnType getCharWidth(byte Index, byte& Width) const {
-        if(isIndexValid(Index)) {
-            Width = getFontTableElement(Index).getWidth();
-            return E_OK;
+    StdReturnType GetCharWidth(byte index, byte& width) const {
+        if(IsIndexValid(index)) {
+            width = GetFontTableElement(index).GetWidth();
+            return kEOk;
         } else {
-            return E_NOT_OK;
+            return kENotOk;
         }
     }
 
     // set methods
 
     // methods
-    static constexpr bool isIndexValid(byte Index) { return Index < FontTableSize; }
+    static constexpr bool IsIndexValid(byte index) { return index < FontTableSize; }
 
 };
 

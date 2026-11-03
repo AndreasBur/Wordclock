@@ -40,10 +40,10 @@ namespace {
 
 /* Named HttpServer rather than Server: the Arduino core has a class Server in the global
    namespace, and an unqualified Server here is then ambiguous. */
-httpd_handle_t HttpServer{nullptr};
+httpd_handle_t http_server{nullptr};
 
-constexpr size_t MaxClients{WEB_INTERFACE_MAX_CLIENTS};
-constexpr int NoClient{-1};
+constexpr size_t kMaxClients{WEB_INTERFACE_MAX_CLIENTS};
+constexpr int kNoClient{-1};
 
 /* The descriptors this server hands out, which it expects to be kept: unlike a library that
    owns its client list, the IDF's server reports a handshake and a close and leaves the
@@ -58,44 +58,44 @@ constexpr int NoClient{-1};
    actually be given. Initialising on first use is also what the singleton it used to live on
    did. */
 struct ClientTableType {
-    std::atomic<int> Slots[MaxClients];
+    std::atomic<int> slots[kMaxClients];
 
     ClientTableType() {
-        for(size_t Slot = 0u; Slot < MaxClients; Slot++) { Slots[Slot].store(NoClient); }
+        for(size_t slot = 0u; slot < kMaxClients; slot++) { slots[slot].store(kNoClient); }
     }
 };
 
-ClientTableType& clientTable()
+ClientTableType& ClientTable()
 {
-    static ClientTableType Table;
-    return Table;
+    static ClientTableType table;
+    return table;
 }
 
 /* One frame to everybody, which is what both of WebTransport's send calls come down to - the
    type and the payload are all that differ between a line and a display frame. A send that
    fails is not retried and the client is not dropped here: the server's close hook owns that,
    and dropping a client from this side would race with it. */
-void sendToEveryClient(httpd_ws_type_t Type, uint8_t* Payload, size_t Length)
+void SendToEveryClient(httpd_ws_type_t type, uint8_t* payload, size_t length)
 {
-    if((HttpServer == nullptr) || (Length == 0u)) { return; }
+    if((http_server == nullptr) || (length == 0u)) { return; }
 
-    httpd_ws_frame_t Frame{};
-    Frame.type = Type;
-    Frame.payload = Payload;
-    Frame.len = Length;
+    httpd_ws_frame_t frame{};
+    frame.type = type;
+    frame.payload = payload;
+    frame.len = length;
 
-    for(size_t Slot = 0u; Slot < MaxClients; Slot++) {
-        const int Descriptor = clientTable().Slots[Slot].load(std::memory_order_acquire);
+    for(size_t slot = 0u; slot < kMaxClients; slot++) {
+        const int descriptor = ClientTable().slots[slot].load(std::memory_order_acquire);
 
-        if(Descriptor != NoClient) { httpd_ws_send_frame_async(HttpServer, Descriptor, &Frame); }
+        if(descriptor != kNoClient) { httpd_ws_send_frame_async(http_server, descriptor, &frame); }
     }
 }
 
 /* Handed to WordclockSerial, which takes a plain function pointer - so the singleton is
    reached from here rather than carried along. */
-void sendLineToClients(const char* Line)
+void SendLineToClients(const char* line)
 {
-    WebInterface::getInstance().broadcastLine(Line);
+    WebInterface::GetInstance().BroadcastLine(line);
 }
 
 /******************************************************************************************************************************************************
@@ -122,27 +122,27 @@ void sendLineToClients(const char* Line)
  *                  console that asked for a password and then took commands on an unchecked
  *                  socket would be a lock on the wrong door.
 ******************************************************************************************************************************************************/
-bool isRequestAuthorised(httpd_req_t* Request)
+bool IsRequestAuthorised(httpd_req_t* request)
 {
-    if(!System::getInstance().isConsoleProtected()) { return true; }
+    if(!System::GetInstance().IsConsoleProtected()) { return true; }
 
     /* "Basic " and the blob. Sized for the longest credential the store can hold, and a
         header longer than that cannot be one this clock would accept. */
-    char Header[SYSTEM_PASSWORD_STRING_LENGTH + 128u]{};
-    static constexpr char Scheme[]{"Basic "};
+    char header[SYSTEM_PASSWORD_STRING_LENGTH + 128u]{};
+    static constexpr char kScheme[]{"Basic "};
 
-    if(httpd_req_get_hdr_value_str(Request, "Authorization", Header, sizeof(Header)) == ESP_OK) {
-        if(strncmp(Header, Scheme, sizeof(Scheme) - 1u) == 0) {
-            if(System::getInstance().isConsoleCredentialValid(&Header[sizeof(Scheme) - 1u])) { return true; }
+    if(httpd_req_get_hdr_value_str(request, "Authorization", header, sizeof(header)) == ESP_OK) {
+        if(strncmp(header, kScheme, sizeof(kScheme) - 1u) == 0) {
+            if(System::GetInstance().IsConsoleCredentialValid(&header[sizeof(kScheme) - 1u])) { return true; }
         }
     }
 
     /* The realm carries the user name, because it is the one field a browser cannot guess and
        it is not a secret - the password beside it is. */
-    httpd_resp_set_status(Request, "401 Unauthorized");
-    httpd_resp_set_hdr(Request, "WWW-Authenticate", "Basic realm=\"Wordclock, user wordclock\"");
-    httpd_resp_set_type(Request, "text/plain");
-    httpd_resp_send(Request, "this clock asks for a password\n", HTTPD_RESP_USE_STRLEN);
+    httpd_resp_set_status(request, "401 Unauthorized");
+    httpd_resp_set_hdr(request, "WWW-Authenticate", "Basic realm=\"Wordclock, user wordclock\"");
+    httpd_resp_set_type(request, "text/plain");
+    httpd_resp_send(request, "this clock asks for a password\n", HTTPD_RESP_USE_STRLEN);
 
     return false;
 }
@@ -163,16 +163,16 @@ bool isRequestAuthorised(httpd_req_t* Request)
  *
  *  \return         ESP_OK
 ******************************************************************************************************************************************************/
-esp_err_t handleAsset(httpd_req_t* Request)
+esp_err_t HandleAsset(httpd_req_t* request)
 {
-    if(!isRequestAuthorised(Request)) { return ESP_OK; }
+    if(!IsRequestAuthorised(request)) { return ESP_OK; }
 
-    const WebFrontend::AssetType& Asset = *static_cast<const WebFrontend::AssetType*>(Request->user_ctx);
+    const WebFrontend::AssetType& asset = *static_cast<const WebFrontend::AssetType*>(request->user_ctx);
 
-    httpd_resp_set_type(Request, Asset.ContentType);
-    if(Asset.IsGzipped) { httpd_resp_set_hdr(Request, "Content-Encoding", "gzip"); }
+    httpd_resp_set_type(request, asset.content_type);
+    if(asset.is_gzipped) { httpd_resp_set_hdr(request, "Content-Encoding", "gzip"); }
 
-    return httpd_resp_send(Request, reinterpret_cast<const char*>(Asset.Bytes), Asset.Size);
+    return httpd_resp_send(request, reinterpret_cast<const char*>(asset.bytes), asset.size);
 }
 
 
@@ -186,25 +186,25 @@ esp_err_t handleAsset(httpd_req_t* Request)
  *                  a wrong file or a dropped connection, and a number for that would only
  *                  have to be translated back somewhere.
 ******************************************************************************************************************************************************/
-esp_err_t sendUpdateResult(httpd_req_t* Request, bool Ok, const char* Reason)
+esp_err_t SendUpdateResult(httpd_req_t* request, bool ok, const char* reason)
 {
-    char Body[192u];
+    char body[192u];
 
-    httpd_resp_set_type(Request, "application/json");
+    httpd_resp_set_type(request, "application/json");
 
-    if(Ok) {
-        httpd_resp_set_status(Request, "200 OK");
-        (void)snprintf(Body, sizeof(Body), "{\"ok\":true}");
+    if(ok) {
+        httpd_resp_set_status(request, "200 OK");
+        (void)snprintf(body, sizeof(body), "{\"ok\":true}");
     } else {
-        httpd_resp_set_status(Request, "400 Bad Request");
+        httpd_resp_set_status(request, "400 Bad Request");
         /* %.120s, because errorString() is the framework's text and the buffer is ours - and
            with it the answer cannot be cut short, so the length snprintf returns says nothing. */
-        (void)snprintf(Body, sizeof(Body), "{\"ok\":false,\"error\":\"%.120s\"}", Reason);
+        (void)snprintf(body, sizeof(body), "{\"ok\":false,\"error\":\"%.120s\"}", reason);
         Serial.print(F("Web: update refused - "));
-        Serial.println(Reason);
+        Serial.println(reason);
     }
 
-    return httpd_resp_send(Request, Body, HTTPD_RESP_USE_STRLEN);
+    return httpd_resp_send(request, body, HTTPD_RESP_USE_STRLEN);
 }
 
 
@@ -233,53 +233,53 @@ esp_err_t sendUpdateResult(httpd_req_t* Request, bool Ok, const char* Reason)
  *                  a finished one. System::restart() already defers to the application's
  *                  tick for exactly this reason, so it is what carries it out.
 ******************************************************************************************************************************************************/
-esp_err_t handleUpdate(httpd_req_t* Request)
+esp_err_t HandleUpdate(httpd_req_t* request)
 {
-    if(!isRequestAuthorised(Request)) { return ESP_OK; }
+    if(!IsRequestAuthorised(request)) { return ESP_OK; }
 
     /* Announced rather than measured, and it has to be: Update needs the size before the
        first byte, to know which partition can hold it and to erase it. A body that then
        turns out shorter is caught by end() below, which refuses to finish an image that is
        not all there. */
-    const size_t Announced = Request->content_len;
+    const size_t announced = request->content_len;
 
-    if(Announced == 0u) { return sendUpdateResult(Request, false, "no image in the request body"); }
+    if(announced == 0u) { return SendUpdateResult(request, false, "no image in the request body"); }
 
-    if(!Update.begin(Announced)) {
+    if(!Update.begin(announced)) {
         /* The usual one is an image larger than the partition, which is worth saying as
            itself rather than as "update failed": it means the wrong file was picked - the
            factory image instead of the plain one, most likely. */
-        return sendUpdateResult(Request, false, Update.errorString());
+        return SendUpdateResult(request, false, Update.errorString());
     }
 
     /* One kilobyte at a time, on the server's own task. Larger buffers buy nothing here:
        the flash write is what takes the time, and this runs beside the clock rather than
        inside its tick, so the display keeps its frames throughout. */
-    char Chunk[1024u];
-    size_t Received = 0u;
+    char chunk[1024u];
+    size_t received = 0u;
 
-    while(Received < Announced) {
-        const int Read = httpd_req_recv(Request, Chunk, sizeof(Chunk));
+    while(received < announced) {
+        const int read = httpd_req_recv(request, chunk, sizeof(chunk));
 
         /* A dropped connection halfway through, which is the case the abort exists for:
            without it the next attempt would find the partition still claimed. */
-        if(Read <= 0) {
+        if(read <= 0) {
             Update.abort();
-            return sendUpdateResult(Request, false, "the upload stopped before the image was complete");
+            return SendUpdateResult(request, false, "the upload stopped before the image was complete");
         }
-        if(Update.write(reinterpret_cast<uint8_t*>(Chunk), static_cast<size_t>(Read)) != static_cast<size_t>(Read)) {
-            const char* Reason = Update.errorString();
+        if(Update.write(reinterpret_cast<uint8_t*>(chunk), static_cast<size_t>(read)) != static_cast<size_t>(read)) {
+            const char* reason = Update.errorString();
             Update.abort();
-            return sendUpdateResult(Request, false, Reason);
+            return SendUpdateResult(request, false, reason);
         }
-        Received += static_cast<size_t>(Read);
+        received += static_cast<size_t>(read);
     }
 
-    if(!Update.end(true)) { return sendUpdateResult(Request, false, Update.errorString()); }
+    if(!Update.end(true)) { return SendUpdateResult(request, false, Update.errorString()); }
 
-    System::getInstance().restart();
+    System::GetInstance().Restart();
 
-    return sendUpdateResult(Request, true, "");
+    return SendUpdateResult(request, true, "");
 }
 
 
@@ -301,22 +301,22 @@ esp_err_t handleUpdate(httpd_req_t* Request)
  *
  *  \return         ESP_OK
 ******************************************************************************************************************************************************/
-esp_err_t handleCommands(httpd_req_t* Request)
+esp_err_t HandleCommands(httpd_req_t* request)
 {
-    if(!isRequestAuthorised(Request)) { return ESP_OK; }
+    if(!IsRequestAuthorised(request)) { return ESP_OK; }
 
-    WebResponseBody Body(Request, "application/json");
-    WebFrontend::writeCommands(Body);
+    WebResponseBody body(request, "application/json");
+    WebFrontend::WriteCommands(body);
 
     return ESP_OK;
 }
 
-esp_err_t handleDisplay(httpd_req_t* Request)
+esp_err_t HandleDisplay(httpd_req_t* request)
 {
-    if(!isRequestAuthorised(Request)) { return ESP_OK; }
+    if(!IsRequestAuthorised(request)) { return ESP_OK; }
 
-    WebResponseBody Body(Request, "application/json");
-    WebFrontend::writeDisplay(Body);
+    WebResponseBody body(request, "application/json");
+    WebFrontend::WriteDisplay(body);
 
     return ESP_OK;
 }
@@ -336,39 +336,39 @@ esp_err_t handleDisplay(httpd_req_t* Request)
  *
  *  \return         ESP_OK unless the frame could not be read
 ******************************************************************************************************************************************************/
-esp_err_t handleSocket(httpd_req_t* Request)
+esp_err_t HandleSocket(httpd_req_t* request)
 {
     /* The handshake only. A frame arriving later has no headers to carry a credential, so
        the check belongs at the one moment the browser does send them - which is the GET the
        server calls this handler with before the socket exists. */
-    if(Request->method == HTTP_GET) {
-        if(!isRequestAuthorised(Request)) { return ESP_OK; }
+    if(request->method == HTTP_GET) {
+        if(!IsRequestAuthorised(request)) { return ESP_OK; }
     }
 
-    if(Request->method == HTTP_GET) {
-        WebInterface::getInstance().onClientOpened(httpd_req_to_sockfd(Request));
+    if(request->method == HTTP_GET) {
+        WebInterface::GetInstance().OnClientOpened(httpd_req_to_sockfd(request));
         return ESP_OK;
     }
 
-    uint8_t Payload[WEB_FRONTEND_MAX_FRAME_LENGTH + 1u]{};
-    httpd_ws_frame_t Frame{};
-    Frame.type = HTTPD_WS_TYPE_TEXT;
-    Frame.payload = Payload;
+    uint8_t payload[WEB_FRONTEND_MAX_FRAME_LENGTH + 1u]{};
+    httpd_ws_frame_t frame{};
+    frame.type = HTTPD_WS_TYPE_TEXT;
+    frame.payload = payload;
 
     /* Asking with the buffer's size rather than in two steps: a frame that does not fit is
        refused whole, so half a command can never reach the parser. */
-    const esp_err_t Result = httpd_ws_recv_frame(Request, &Frame, WEB_FRONTEND_MAX_FRAME_LENGTH);
-    if(Result != ESP_OK) { return Result; }
+    const esp_err_t result = httpd_ws_recv_frame(request, &frame, WEB_FRONTEND_MAX_FRAME_LENGTH);
+    if(result != ESP_OK) { return result; }
 
-    if(Frame.type == HTTPD_WS_TYPE_CLOSE) {
-        WebInterface::getInstance().onClientClosed(httpd_req_to_sockfd(Request));
+    if(frame.type == HTTPD_WS_TYPE_CLOSE) {
+        WebInterface::GetInstance().OnClientClosed(httpd_req_to_sockfd(request));
         return ESP_OK;
     }
-    if(Frame.type != HTTPD_WS_TYPE_TEXT) { return ESP_OK; }
+    if(frame.type != HTTPD_WS_TYPE_TEXT) { return ESP_OK; }
 
     /* The terminator and the empty-frame case are WebFrontend's, so that a command coming off
        a socket reaches the parser the same way on either backend. */
-    WebFrontend::injectCommand(reinterpret_cast<const char*>(Payload), Frame.len);
+    WebFrontend::InjectCommand(reinterpret_cast<const char*>(payload), frame.len);
 
     return ESP_OK;
 }
@@ -382,10 +382,10 @@ esp_err_t handleSocket(httpd_req_t* Request)
  *                  send: a browser that is simply gone never sends a close frame, and its
  *                  descriptor would otherwise be handed to send() for the rest of the run.
 ******************************************************************************************************************************************************/
-void onSocketClosed(httpd_handle_t, int Descriptor)
+void OnSocketClosed(httpd_handle_t, int descriptor)
 {
-    WebInterface::getInstance().onClientClosed(Descriptor);
-    close(Descriptor);
+    WebInterface::GetInstance().OnClientClosed(descriptor);
+    close(descriptor);
 }
 
 } // namespace
@@ -407,27 +407,27 @@ void onSocketClosed(httpd_handle_t, int Descriptor)
  *
  *  \return         E_OK if the server is listening
 ******************************************************************************************************************************************************/
-StdReturnType WebInterface::begin()
+StdReturnType WebInterface::Begin()
 {
-    httpd_config_t Config = HTTPD_DEFAULT_CONFIG();
-    Config.server_port = WEB_INTERFACE_PORT;
+    httpd_config_t config = HTTPD_DEFAULT_CONFIG();
+    config.server_port = WEB_INTERFACE_PORT;
     /* The sockets the server keeps have to cover the console clients plus the ones fetching
        the page, or a reload can push a console off. */
-    Config.max_open_sockets = WEB_INTERFACE_MAX_CLIENTS + 2u;
+    config.max_open_sockets = WEB_INTERFACE_MAX_CLIENTS + 2u;
     /* Said rather than left to the default, which is 8 and was exactly the count until the
        console moved to its own route. A route past the limit is refused by the registration
        below and nothing here reads that answer, so the failure would be one route quietly
        missing - and the test that counts them is what would find it, on a host, rather than a
        browser on somebody's wall. The next route to be added has to raise this number with it. */
-    Config.max_uri_handlers = 9u;
-    Config.close_fn = onSocketClosed;
+    config.max_uri_handlers = 9u;
+    config.close_fn = OnSocketClosed;
     /* Its own task, so nothing here runs inside the firmware's tick. */
-    Config.core_id = 0;
+    config.core_id = 0;
 
-    if(httpd_start(&HttpServer, &Config) != ESP_OK) {
-        HttpServer = nullptr;
+    if(httpd_start(&http_server, &config) != ESP_OK) {
+        http_server = nullptr;
         Serial.println(F("Web: server failed to start, console stays on the UART"));
-        return E_NOT_OK;
+        return kENotOk;
     }
 
     /* The files served unchanged, one route per entry of WebFrontend's table. The array is
@@ -435,28 +435,28 @@ StdReturnType WebInterface::begin()
        sized from the table so that a file added to web/ needs no edit here - only
        max_uri_handlers above has to still be large enough, which is why that number is said
        out loud rather than left at its default. */
-    static httpd_uri_t AssetUris[WebFrontend::MaxAssets]{};
+    static httpd_uri_t asset_uris[WebFrontend::kMaxAssets]{};
 
-    for(byte Index = 0u; Index < WebFrontend::getNumberOfAssets(); Index++) {
-        const WebFrontend::AssetType& Asset = WebFrontend::getAsset(Index);
+    for(byte index = 0u; index < WebFrontend::GetNumberOfAssets(); index++) {
+        const WebFrontend::AssetType& asset = WebFrontend::GetAsset(index);
 
-        AssetUris[Index] = httpd_uri_t{Asset.Path, HTTP_GET, handleAsset, const_cast<WebFrontend::AssetType*>(&Asset),
+        asset_uris[index] = httpd_uri_t{asset.path, HTTP_GET, HandleAsset, const_cast<WebFrontend::AssetType*>(&asset),
                                        false, false, nullptr};
-        httpd_register_uri_handler(HttpServer, &AssetUris[Index]);
+        httpd_register_uri_handler(http_server, &asset_uris[index]);
     }
 
-    static const httpd_uri_t CommandsUri{"/commands", HTTP_GET, handleCommands, nullptr, false, false, nullptr};
-    static const httpd_uri_t DisplayUri{"/display", HTTP_GET, handleDisplay, nullptr, false, false, nullptr};
-    static const httpd_uri_t UpdateUri{"/update", HTTP_POST, handleUpdate, nullptr, false, false, nullptr};
-    static const httpd_uri_t SocketUri{"/ws", HTTP_GET, handleSocket, nullptr, true, false, nullptr};
+    static const httpd_uri_t kCommandsUri{"/commands", HTTP_GET, HandleCommands, nullptr, false, false, nullptr};
+    static const httpd_uri_t kDisplayUri{"/display", HTTP_GET, HandleDisplay, nullptr, false, false, nullptr};
+    static const httpd_uri_t kUpdateUri{"/update", HTTP_POST, HandleUpdate, nullptr, false, false, nullptr};
+    static const httpd_uri_t kSocketUri{"/ws", HTTP_GET, HandleSocket, nullptr, true, false, nullptr};
 
-    httpd_register_uri_handler(HttpServer, &CommandsUri);
-    httpd_register_uri_handler(HttpServer, &DisplayUri);
-    httpd_register_uri_handler(HttpServer, &UpdateUri);
-    httpd_register_uri_handler(HttpServer, &SocketUri);
+    httpd_register_uri_handler(http_server, &kCommandsUri);
+    httpd_register_uri_handler(http_server, &kDisplayUri);
+    httpd_register_uri_handler(http_server, &kUpdateUri);
+    httpd_register_uri_handler(http_server, &kSocketUri);
 
     /* Only now, so a line printed during startup cannot reach a half-built server. */
-    WordclockSerial::getInstance().setLineSink(sendLineToClients);
+    WordclockSerial::GetInstance().SetLineSink(SendLineToClients);
 
     if(MDNS.begin(WEB_INTERFACE_HOSTNAME)) {
         MDNS.addService("http", "tcp", WEB_INTERFACE_PORT);
@@ -468,7 +468,7 @@ StdReturnType WebInterface::begin()
         Serial.println(F("Web: mDNS unavailable, reach the clock by its address"));
     }
 
-    return E_OK;
+    return kEOk;
 } /* begin */
 
 
@@ -480,9 +480,9 @@ StdReturnType WebInterface::begin()
  *                  the other backend; what is this file's is the walk over the descriptors,
  *                  in sendText() below.
 ******************************************************************************************************************************************************/
-void WebInterface::broadcastLine(const char* Line)
+void WebInterface::BroadcastLine(const char* line)
 {
-    WebFrontend::getInstance().broadcastLine(Line);
+    WebFrontend::GetInstance().BroadcastLine(line);
 } /* broadcastLine */
 
 
@@ -497,9 +497,9 @@ void WebInterface::broadcastLine(const char* Line)
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-void WebInterface::broadcastFrame()
+void WebInterface::BroadcastFrame()
 {
-    WebFrontend::getInstance().broadcastFrame();
+    WebFrontend::GetInstance().BroadcastFrame();
 } /* broadcastFrame */
 
 
@@ -510,35 +510,35 @@ void WebInterface::broadcastFrame()
    source of its own because what it reads is this file's: the server handle above and the
    descriptor table on WebInterface. */
 
-WebTransport& WebTransport::getInstance()
+WebTransport& WebTransport::GetInstance()
 {
-    static WebTransport SingletonInstance;
-    return SingletonInstance;
+    static WebTransport singleton_instance;
+    return singleton_instance;
 }
 
-bool WebTransport::isListening() const
+bool WebTransport::IsListening() const
 {
-    return HttpServer != nullptr;
+    return http_server != nullptr;
 }
 
-bool WebTransport::hasClients() const
+bool WebTransport::HasClients() const
 {
-    for(size_t Slot = 0u; Slot < MaxClients; Slot++) {
-        if(clientTable().Slots[Slot].load(std::memory_order_acquire) != NoClient) { return true; }
+    for(size_t slot = 0u; slot < kMaxClients; slot++) {
+        if(ClientTable().slots[slot].load(std::memory_order_acquire) != kNoClient) { return true; }
     }
     return false;
 }
 
-void WebTransport::sendText(const char* Text, size_t Length)
+void WebTransport::SendText(const char* text, size_t length)
 {
     /* const_cast because httpd's frame struct is the same type used for receiving, where the
        payload is written into. Nothing on the sending path writes through it. */
-    sendToEveryClient(HTTPD_WS_TYPE_TEXT, reinterpret_cast<uint8_t*>(const_cast<char*>(Text)), Length);
+    SendToEveryClient(HTTPD_WS_TYPE_TEXT, reinterpret_cast<uint8_t*>(const_cast<char*>(text)), length);
 }
 
-void WebTransport::sendBinary(const byte* Bytes, size_t Length)
+void WebTransport::SendBinary(const byte* bytes, size_t length)
 {
-    sendToEveryClient(HTTPD_WS_TYPE_BINARY, const_cast<uint8_t*>(Bytes), Length);
+    SendToEveryClient(HTTPD_WS_TYPE_BINARY, const_cast<uint8_t*>(bytes), length);
 }
 
 
@@ -548,20 +548,20 @@ void WebTransport::sendBinary(const byte* Bytes, size_t Length)
 /* A chunked response, which is what this server offers: a chunk handed over is a chunk on the
    wire, and the empty one at the end is what closes it. */
 
-WebResponseBody::WebResponseBody(struct httpd_req* sRequest, const char* ContentType)
-    : Request(sRequest)
+WebResponseBody::WebResponseBody(struct httpd_req* request, const char* content_type)
+    : request_(request)
 {
-    httpd_resp_set_type(Request, ContentType);
+    httpd_resp_set_type(request_, content_type);
 }
 
-void WebResponseBody::write(const char* Data, size_t Length)
+void WebResponseBody::Write(const char* data, size_t length)
 {
-    httpd_resp_send_chunk(Request, Data, static_cast<ssize_t>(Length));
+    httpd_resp_send_chunk(request_, data, static_cast<ssize_t>(length));
 }
 
-void WebResponseBody::finish()
+void WebResponseBody::Finish()
 {
-    httpd_resp_send_chunk(Request, nullptr, 0);
+    httpd_resp_send_chunk(request_, nullptr, 0);
 }
 
 
@@ -573,21 +573,21 @@ void WebResponseBody::finish()
  *                  says so on the UART - silently serving a page whose socket then never
  *                  answers is the more confusing failure.
 ******************************************************************************************************************************************************/
-void WebInterface::onClientOpened(int Descriptor)
+void WebInterface::OnClientOpened(int descriptor)
 {
     /* Told before the table is even looked at: either way a client just arrived, and it has to
        be shown the display as it stands rather than as it next changes. That includes the
        descriptor already being in the table - the system reuses them, so the same number
        coming back is a new client rather than the old one. */
-    WebFrontend::getInstance().onClientOpened();
+    WebFrontend::GetInstance().OnClientOpened();
 
-    for(size_t Slot = 0u; Slot < MaxClients; Slot++) {
-        if(clientTable().Slots[Slot].load(std::memory_order_relaxed) == Descriptor) { return; }
+    for(size_t slot = 0u; slot < kMaxClients; slot++) {
+        if(ClientTable().slots[slot].load(std::memory_order_relaxed) == descriptor) { return; }
     }
 
-    for(size_t Slot = 0u; Slot < MaxClients; Slot++) {
-        if(clientTable().Slots[Slot].load(std::memory_order_relaxed) == NoClient) {
-            clientTable().Slots[Slot].store(Descriptor, std::memory_order_release);
+    for(size_t slot = 0u; slot < kMaxClients; slot++) {
+        if(ClientTable().slots[slot].load(std::memory_order_relaxed) == kNoClient) {
+            ClientTable().slots[slot].store(descriptor, std::memory_order_release);
             return;
         }
     }
@@ -599,11 +599,11 @@ void WebInterface::onClientOpened(int Descriptor)
 /******************************************************************************************************************************************************
   onClientClosed()
 ******************************************************************************************************************************************************/
-void WebInterface::onClientClosed(int Descriptor)
+void WebInterface::OnClientClosed(int descriptor)
 {
-    for(size_t Slot = 0u; Slot < MaxClients; Slot++) {
-        if(clientTable().Slots[Slot].load(std::memory_order_relaxed) == Descriptor) {
-            clientTable().Slots[Slot].store(NoClient, std::memory_order_release);
+    for(size_t slot = 0u; slot < kMaxClients; slot++) {
+        if(ClientTable().slots[slot].load(std::memory_order_relaxed) == descriptor) {
+            ClientTable().slots[slot].store(kNoClient, std::memory_order_release);
             return;
         }
     }

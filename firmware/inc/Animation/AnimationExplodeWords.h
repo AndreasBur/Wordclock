@@ -54,61 +54,61 @@ class AnimationExplodeWords : public Animation
 /******************************************************************************************************************************************************
  *  GLOBAL DATA TYPES AND STRUCTURES
 ******************************************************************************************************************************************************/
-    static constexpr byte ColumnCenter{DISPLAY_NUMBER_OF_COLUMNS / 2u};
-    static constexpr byte RowCenter{DISPLAY_NUMBER_OF_ROWS / 2u};
+    static constexpr byte kColumnCenter{DISPLAY_NUMBER_OF_COLUMNS / 2u};
+    static constexpr byte kRowCenter{DISPLAY_NUMBER_OF_ROWS / 2u};
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    DisplayWords Words;
-    ClockWords::WordsListType ClockWordsTable{{DisplayWords::WORD_NONE}};
-    byte ClockWordsTableIndex{0u};
-    byte CurrentWordIndex{0u};
-    byte CurrentWordLength{0u};
-    byte CurrentColumn{0u};
-    byte CurrentRow{0u};
+    DisplayWords words_;
+    ClockWords::WordsListType clock_words_table_{{DisplayWords::kWordNone}};
+    byte clock_words_table_index_{0u};
+    byte current_word_index_{0u};
+    byte current_word_length_{0u};
+    byte current_column_{0u};
+    byte current_row_{0u};
 
     // functions
-    void reset();
-    void clearTimeTask();
-    void setTimeTask();
-    void setWordToSet(DisplayWords::WordIdType);
-    StdReturnType setNextWordToClear();
-    StdReturnType setNextWordToClearInColumn();
-    StdReturnType setNextRowToClear();
-    StdReturnType setNextWordToSet();
-    void setWordIndex(DisplayWords::WordIdType);
-    void setWordLength();
-    StdReturnType shiftWord(byte, byte);
-    void toggleWordOnDisplay() const;
-    void setWordOnDisplay() const;
+    void Reset();
+    void ClearTimeTask();
+    void SetTimeTask();
+    void SetWordToSet(DisplayWords::WordIdType);
+    StdReturnType SetNextWordToClear();
+    StdReturnType SetNextWordToClearInColumn();
+    StdReturnType SetNextRowToClear();
+    StdReturnType SetNextWordToSet();
+    void SetWordIndex(DisplayWords::WordIdType);
+    void SetWordLength();
+    StdReturnType ShiftWord(byte, byte);
+    void ToggleWordOnDisplay() const;
+    void SetWordOnDisplay() const;
 
     //byte getFinalIndex() const { return Display::getInstance().columnAndRowToIndex(getFinalColumn(), getFinalRow()); }
-    static byte getClearFinalRow() { return RowCenter; }
-    byte getSetFinalRow() const { return Display::getInstance().indexToRow(CurrentWordIndex); }
-    byte getClearFinalColumn() const { return ColumnCenter - (CurrentWordLength / 2u); }
-    byte getSetFinalColumn() const { return Display::getInstance().indexToColumn(CurrentWordIndex); }
+    static byte GetClearFinalRow() { return kRowCenter; }
+    byte GetSetFinalRow() const { return Display::GetInstance().IndexToRow(current_word_index_); }
+    byte GetClearFinalColumn() const { return kColumnCenter - (current_word_length_ / 2u); }
+    byte GetSetFinalColumn() const { return Display::GetInstance().IndexToColumn(current_word_index_); }
 
-    byte getNextColumn(byte FinalColumn) const {
-        byte nextColumn = CurrentColumn;
-        if(CurrentColumn < FinalColumn) { nextColumn++; }
-        if(CurrentColumn > FinalColumn) { nextColumn--; }
-        return nextColumn;
+    byte GetNextColumn(byte final_column) const {
+        byte next_column = current_column_;
+        if(current_column_ < final_column) { next_column++; }
+        if(current_column_ > final_column) { next_column--; }
+        return next_column;
     }
 
-    byte getNextRow(byte FinalRow) const {
-        byte nextRow = CurrentRow;
-        if(CurrentRow < FinalRow) { nextRow++; }
-        if(CurrentRow > FinalRow) { nextRow--; }
-        return nextRow;
+    byte GetNextRow(byte final_row) const {
+        byte next_row = current_row_;
+        if(current_row_ < final_row) { next_row++; }
+        if(current_row_ > final_row) { next_row--; }
+        return next_row;
     }
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr AnimationExplodeWords() : Words() { }
+    constexpr AnimationExplodeWords() : words_() { }
     ~AnimationExplodeWords() { }
 
     // get methods
@@ -116,9 +116,9 @@ class AnimationExplodeWords : public Animation
     // set methods
 
     // methods
-    void init();
-    StdReturnType setTime(byte, byte);
-    void task();
+    void Init();
+    StdReturnType SetTime(byte, byte);
+    void Task();
 };
 
 

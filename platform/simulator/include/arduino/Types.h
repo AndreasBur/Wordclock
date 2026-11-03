@@ -11,7 +11,7 @@
 /*  on GTK/Linux it did not, so define it up front here. Arduino.h therefore  */
 /*  includes this header first.                                               */
 /* -------------------------------------------------------------------------- */
-typedef uint8_t byte;
-typedef bool    boolean;
+typedef uint8_t byte; // NOLINT(readability-identifier-naming)
+typedef bool    boolean; // NOLINT(readability-identifier-naming)
 
 #endif // _ARDUINO_TYPES_H_

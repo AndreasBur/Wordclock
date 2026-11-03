@@ -54,7 +54,7 @@
 
 /* The bounds of an option, measured off the firmware's own predicate instead of copied
    from beside it. */
-#define MEASURED(ValueType, IsValid)                    findMinimum<ValueType>(IsValid), findMaximum<ValueType>(IsValid)
+#define MEASURED(ValueType, IsValid)                    FindMinimum<ValueType>(IsValid), FindMaximum<ValueType>(IsValid)
 
 /******************************************************************************************************************************************************
  *  L O C A L   D A T A   T Y P E S   A N D   S T R U C T U R E S
@@ -62,33 +62,33 @@
 /* The tables below sit outside the class, so that they can be constexpr and be checked at
    compile time. These bring the argument types back within reach unqualified, which keeps
    the tables readable. */
-constexpr MessageCatalog::ArgumentType ARGUMENT_TYPE_UINT8{MessageCatalog::ARGUMENT_TYPE_UINT8};
-constexpr MessageCatalog::ArgumentType ARGUMENT_TYPE_UINT16{MessageCatalog::ARGUMENT_TYPE_UINT16};
-constexpr MessageCatalog::ArgumentType ARGUMENT_TYPE_STRING{MessageCatalog::ARGUMENT_TYPE_STRING};
+constexpr MessageCatalog::ArgumentType kArgumentTypeUint8{MessageCatalog::kArgumentTypeUint8};
+constexpr MessageCatalog::ArgumentType kArgumentTypeUint16{MessageCatalog::kArgumentTypeUint16};
+constexpr MessageCatalog::ArgumentType kArgumentTypeString{MessageCatalog::kArgumentTypeString};
 
 /* Walk the whole range of the value's own type and ask the firmware which values it
    accepts. Searching beats copying the limits: they are private, and a copy is a number
    that can quietly fall behind. The type parameter keeps the search inside what the
    predicate takes, so a byte predicate is never asked about 300. */
 template <typename ValueType, typename PredicateType>
-constexpr uint16_t findMinimum(PredicateType IsValid)
+constexpr uint16_t FindMinimum(PredicateType is_valid)
 {
-    constexpr uint32_t Limit{std::numeric_limits<ValueType>::max()};
+    constexpr uint32_t kLimit{std::numeric_limits<ValueType>::max()};
 
-    for(uint32_t Value = 0u; Value <= Limit; Value++) {
-        if(IsValid(static_cast<ValueType>(Value))) { return static_cast<uint16_t>(Value); }
+    for(uint32_t value = 0u; value <= kLimit; value++) {
+        if(is_valid(static_cast<ValueType>(value))) { return static_cast<uint16_t>(value); }
     }
 
     return 0u;
 }
 
 template <typename ValueType, typename PredicateType>
-constexpr uint16_t findMaximum(PredicateType IsValid)
+constexpr uint16_t FindMaximum(PredicateType is_valid)
 {
-    constexpr uint32_t Limit{std::numeric_limits<ValueType>::max()};
+    constexpr uint32_t kLimit{std::numeric_limits<ValueType>::max()};
 
-    for(uint32_t Value = Limit + 1u; Value > 0u; Value--) {
-        if(IsValid(static_cast<ValueType>(Value - 1u))) { return static_cast<uint16_t>(Value - 1u); }
+    for(uint32_t value = kLimit + 1u; value > 0u; value--) {
+        if(is_valid(static_cast<ValueType>(value - 1u))) { return static_cast<uint16_t>(value - 1u); }
     }
 
     return 0u;
@@ -99,15 +99,15 @@ constexpr uint16_t findMaximum(PredicateType IsValid)
 ******************************************************************************************************************************************************/
 
 /* For every option that carries a flag rather than a number. */
-constexpr const char* const BooleanValueNames[] {
+constexpr const char* const kBooleanValueNames[] {
     "off", "on"
 };
 
 /* MsgCmdRemoteProcedureCallParser::RpcIdType, from RPC_ID_NONE + 1 onwards. NONE is the
    initial value of the parser's RpcId member, not a procedure: asking for it lands in the
-   default case and answers ERROR_RPC_ID_UNKNOWN. Offering it would offer a guaranteed
-   error, the same reason COMMAND_NONE is left out of the command list. */
-constexpr const char* const RemoteProcedureValueNames[] {
+   default case and answers kErrorRpcIdUnknown. Offering it would offer a guaranteed
+   error, the same reason kCommandNone is left out of the command list. */
+constexpr const char* const kRemoteProcedureValueNames[] {
     "Illuminance calibration maximum",
     "Illuminance calibration minimum",
     "Display enable",
@@ -153,19 +153,19 @@ constexpr const char* const RemoteProcedureValueNames[] {
 /* The command numbers and the value lists of the enumerations come out of the firmware
    itself; this list does not, so it is the one that can fall behind. A procedure added to
    RpcIdType without a name here would be offered as the name of the procedure before it.
-   RPC_ID_NONE has no name, hence the one. */
-static_assert(NUMBER_OF(RemoteProcedureValueNames) ==
-              MsgCmdRemoteProcedureCallParser::RPC_ID_NUMBER_OF_PROCEDURES - 1u,
+   kRpcIdNone has no name, hence the one. */
+static_assert(NUMBER_OF(kRemoteProcedureValueNames) ==
+              MsgCmdRemoteProcedureCallParser::kRpcIdNumberOfProcedures - 1u,
               "the remote procedure names have fallen behind MsgCmdRemoteProcedureCallParser::RpcIdType");
 
 /* Clock::ModeType */
-constexpr const char* const ClockModeValueNames[] {
+constexpr const char* const kClockModeValueNames[] {
     "Wessi", "Ossi", "Rhein-Ruhr", "Schwaben"
 };
 
 /* Animations::AnimationIdType, under the same switches as the enum. Its values shift as
    soon as one animation is switched off, so a fixed list would name the wrong ones. */
-constexpr const char* const AnimationValueNames[] {
+constexpr const char* const kAnimationValueNames[] {
     "None",
 #if(ANIMATIONS_SUPPORT_CURSOR == STD_ON)
     "Cursor",
@@ -215,12 +215,12 @@ constexpr const char* const AnimationValueNames[] {
 };
 
 /* Animations::ModeType */
-constexpr const char* const AnimationModeValueNames[] {
+constexpr const char* const kAnimationModeValueNames[] {
     "Fixed", "Random", "Sequence"
 };
 
 /* Text::FontType, under the same switches as the enum. */
-constexpr const char* const FontValueNames[] {
+constexpr const char* const kFontValueNames[] {
 #if(TEXT_SUPPORT_FONT_5X8 == STD_ON)
     "5x8",
 #endif
@@ -243,29 +243,29 @@ constexpr const char* const FontValueNames[] {
 #define NAMED(Minimum, Names)                           (Minimum), static_cast<uint16_t>((Minimum) + NUMBER_OF(Names) - 1u), Names, NUMBER_OF(Names)
 
 /* MsgCmdRemoteProcedureCallParser. Starts at one, RPC_ID_NONE being left out. */
-constexpr MessageCatalog::OptionType RemoteProcedureCallOptions[] {
-    {'P', "Procedure",          ARGUMENT_TYPE_UINT8,  NAMED(1u, RemoteProcedureValueNames)}
+constexpr MessageCatalog::OptionType kRemoteProcedureCallOptions[] {
+    {'P', "Procedure",          kArgumentTypeUint8,  NAMED(1u, kRemoteProcedureValueNames)}
 };
 
 /* MsgCmdDisplayColorParser */
-constexpr MessageCatalog::OptionType DisplayColorOptions[] {
-    {'R', "Red",                ARGUMENT_TYPE_UINT8,  0u, BYTE_MAX},
-    {'G', "Green",              ARGUMENT_TYPE_UINT8,  0u, BYTE_MAX},
-    {'B', "Blue",               ARGUMENT_TYPE_UINT8,  0u, BYTE_MAX}
+constexpr MessageCatalog::OptionType kDisplayColorOptions[] {
+    {'R', "Red",                kArgumentTypeUint8,  0u, BYTE_MAX},
+    {'G', "Green",              kArgumentTypeUint8,  0u, BYTE_MAX},
+    {'B', "Blue",               kArgumentTypeUint8,  0u, BYTE_MAX}
 };
 
 /* MsgCmdDisplayBrightnessParser */
-constexpr MessageCatalog::OptionType DisplayBrightnessOptions[] {
-    {'B', "Brightness",         ARGUMENT_TYPE_UINT8,  0u, BYTE_MAX},
-    {'A', "Automatic",          ARGUMENT_TYPE_UINT8,  NAMED(0u, BooleanValueNames)},
-    {'G', "Gamma correction",   ARGUMENT_TYPE_UINT8,  NAMED(0u, BooleanValueNames)}
+constexpr MessageCatalog::OptionType kDisplayBrightnessOptions[] {
+    {'B', "Brightness",         kArgumentTypeUint8,  0u, BYTE_MAX},
+    {'A', "Automatic",          kArgumentTypeUint8,  NAMED(0u, kBooleanValueNames)},
+    {'G', "Gamma correction",   kArgumentTypeUint8,  NAMED(0u, kBooleanValueNames)}
 };
 
 /* MsgCmdDisplayPixelParser. The index is a uint16 as soon as the display has more than
    255 pixels; 110 here, so the parser compiles it as a uint8. */
-constexpr MessageCatalog::OptionType DisplayPixelOptions[] {
-    {'I', "Index",              ARGUMENT_TYPE_UINT8,  0u, DISPLAY_NUMBER_OF_PIXELS - 1u},
-    {'S', "State",              ARGUMENT_TYPE_UINT8,  NAMED(0u, BooleanValueNames)}
+constexpr MessageCatalog::OptionType kDisplayPixelOptions[] {
+    {'I', "Index",              kArgumentTypeUint8,  0u, DISPLAY_NUMBER_OF_PIXELS - 1u},
+    {'S', "State",              kArgumentTypeUint8,  NAMED(0u, kBooleanValueNames)}
 };
 
 /* MsgCmdBaseOverlayParser, shared by the date, temperature and text commands. Only the
@@ -273,27 +273,27 @@ constexpr MessageCatalog::OptionType DisplayPixelOptions[] {
    sendAnswerText() with empty bodies, so a text sent to them is accepted, discarded and
    never answered. It is therefore the last entry rather than one in the middle, which
    lets those two share this table and simply stop one option short of it. */
-constexpr MessageCatalog::OptionType OverlayOptions[] {
-    {'P', "Period (minutes)",   ARGUMENT_TYPE_UINT8,  1u, BYTE_MAX},
-    {'E', "Endurance (s)",      ARGUMENT_TYPE_UINT8,  1u, BYTE_MAX},
-    {'M', "Month",              ARGUMENT_TYPE_UINT8,  0u, 12u},
-    {'D', "Day",                ARGUMENT_TYPE_UINT8,  0u, 31u},
-    {'V', "Valid in days",      ARGUMENT_TYPE_UINT8,  0u, BYTE_MAX},
-    {'A', "Active",             ARGUMENT_TYPE_UINT8,  NAMED(0u, BooleanValueNames)},
-    {'S', "Speed",              ARGUMENT_TYPE_UINT8,  0u, BYTE_MAX},
-    {'F', "Font",               ARGUMENT_TYPE_UINT8,  NAMED(0u, FontValueNames)},
-    {'T', "Text",               ARGUMENT_TYPE_STRING, 0u, 0u}
+constexpr MessageCatalog::OptionType kOverlayOptions[] {
+    {'P', "Period (minutes)",   kArgumentTypeUint8,  1u, BYTE_MAX},
+    {'E', "Endurance (s)",      kArgumentTypeUint8,  1u, BYTE_MAX},
+    {'M', "Month",              kArgumentTypeUint8,  0u, 12u},
+    {'D', "Day",                kArgumentTypeUint8,  0u, 31u},
+    {'V', "Valid in days",      kArgumentTypeUint8,  0u, BYTE_MAX},
+    {'A', "Active",             kArgumentTypeUint8,  NAMED(0u, kBooleanValueNames)},
+    {'S', "Speed",              kArgumentTypeUint8,  0u, BYTE_MAX},
+    {'F', "Font",               kArgumentTypeUint8,  NAMED(0u, kFontValueNames)},
+    {'T', "Text",               kArgumentTypeString, 0u, 0u}
 };
 
 /* The overlays that have no text of their own stop one short of the shared table. Derived
    from its length rather than written out, so it follows if an option is added. */
-constexpr byte NumberOfOverlayOptionsWithoutText{static_cast<byte>(NUMBER_OF(OverlayOptions) - 1u)};
+constexpr byte kNumberOfOverlayOptionsWithoutText{static_cast<byte>(NUMBER_OF(kOverlayOptions) - 1u)};
 
 /* Stopping one short only leaves out the text as long as the text is what sits last.
    Appending an option would otherwise hide that one and offer the text instead, to two
    overlays that do not read it — quietly, since both lists would still be the right
    length. */
-static_assert(OverlayOptions[NumberOfOverlayOptionsWithoutText].ShortName == 'T',
+static_assert(kOverlayOptions[kNumberOfOverlayOptionsWithoutText].short_name == 'T',
               "the text has to be the last of the overlay options, see NumberOfOverlayOptionsWithoutText");
 
 /* MsgCmdStatusParser. Every one of them read-only: the command takes no options at all,
@@ -302,131 +302,131 @@ static_assert(OverlayOptions[NumberOfOverlayOptionsWithoutText].ShortName == 'T'
    check against. */
 #define READ_ONLY                                       0u, 0u, nullptr, 0u, true
 
-constexpr MessageCatalog::OptionType StatusOptions[] {
-    {'V', "Firmware version",   ARGUMENT_TYPE_STRING, READ_ONLY},
+constexpr MessageCatalog::OptionType kStatusOptions[] {
+    {'V', "Firmware version",   kArgumentTypeString, READ_ONLY},
     /* Three fields rather than one count. A single number has to be in some unit, and
        every unit that fits a uint16 runs out on a clock that is meant to hang on a wall
        for years - minutes did, after 45 days. Days carry the range, hours and minutes the
        resolution, and none of them has to be divided by a reader. */
-    {'U', "Uptime (days)",      ARGUMENT_TYPE_UINT16, READ_ONLY},
-    {'H', "Uptime (hours)",     ARGUMENT_TYPE_UINT8,  READ_ONLY},
-    {'N', "Uptime (minutes)",   ARGUMENT_TYPE_UINT8,  READ_ONLY},
-    {'I', "Illuminance (lx)",   ARGUMENT_TYPE_UINT16, READ_ONLY},
-    {'T', "Temperature",        ARGUMENT_TYPE_STRING, READ_ONLY},
-    {'A', "Address",            ARGUMENT_TYPE_STRING, READ_ONLY},
-    {'Q', "Link quality (dBm)", ARGUMENT_TYPE_STRING, READ_ONLY},
-    {'M', "Free memory (KiB)",  ARGUMENT_TYPE_UINT16, READ_ONLY}
+    {'U', "Uptime (days)",      kArgumentTypeUint16, READ_ONLY},
+    {'H', "Uptime (hours)",     kArgumentTypeUint8,  READ_ONLY},
+    {'N', "Uptime (minutes)",   kArgumentTypeUint8,  READ_ONLY},
+    {'I', "Illuminance (lx)",   kArgumentTypeUint16, READ_ONLY},
+    {'T', "Temperature",        kArgumentTypeString, READ_ONLY},
+    {'A', "Address",            kArgumentTypeString, READ_ONLY},
+    {'Q', "Link quality (dBm)", kArgumentTypeString, READ_ONLY},
+    {'M', "Free memory (KiB)",  kArgumentTypeUint16, READ_ONLY}
 };
 
 /* MsgCmdNightSwitchParser. Brightness zero is the display switched off rather than a
    dimming of nothing, which is what lets one field carry both wishes. */
-constexpr MessageCatalog::OptionType NightSwitchOptions[] {
-    {'A', "Active",             ARGUMENT_TYPE_UINT8,  NAMED(0u, BooleanValueNames)},
-    {'H', "Start hour",         ARGUMENT_TYPE_UINT8,  0u, 23u},
-    {'M', "Start minute",       ARGUMENT_TYPE_UINT8,  0u, 59u},
-    {'E', "End hour",           ARGUMENT_TYPE_UINT8,  0u, 23u},
-    {'N', "End minute",         ARGUMENT_TYPE_UINT8,  0u, 59u},
-    {'B', "Night brightness",   ARGUMENT_TYPE_UINT8,  0u, BYTE_MAX}
+constexpr MessageCatalog::OptionType kNightSwitchOptions[] {
+    {'A', "Active",             kArgumentTypeUint8,  NAMED(0u, kBooleanValueNames)},
+    {'H', "Start hour",         kArgumentTypeUint8,  0u, 23u},
+    {'M', "Start minute",       kArgumentTypeUint8,  0u, 59u},
+    {'E', "End hour",           kArgumentTypeUint8,  0u, 23u},
+    {'N', "End minute",         kArgumentTypeUint8,  0u, 59u},
+    {'B', "Night brightness",   kArgumentTypeUint8,  0u, BYTE_MAX}
 };
 
 /* MsgCmdColorCycleParser. The hue is read-only: it is where the wheel has got to, which is
    worth seeing and not worth setting - command 2 is how a colour is chosen. Speed is the same
    kind of number as the animation speed above, scheduler ticks per step, and zero there is a
    cycle standing still rather than a value to refuse. */
-constexpr MessageCatalog::OptionType ColorCycleOptions[] {
-    {'A', "Active",             ARGUMENT_TYPE_UINT8,  NAMED(0u, BooleanValueNames)},
-    {'S', "Speed",              ARGUMENT_TYPE_UINT8,  0u, BYTE_MAX},
-    {'H', "Hue",                ARGUMENT_TYPE_UINT8,  READ_ONLY}
+constexpr MessageCatalog::OptionType kColorCycleOptions[] {
+    {'A', "Active",             kArgumentTypeUint8,  NAMED(0u, kBooleanValueNames)},
+    {'S', "Speed",              kArgumentTypeUint8,  0u, BYTE_MAX},
+    {'H', "Hue",                kArgumentTypeUint8,  READ_ONLY}
 };
 
 /* MsgCmdConsoleParser. The password is an input and never an answer, the same as the pass
    phrase below; what is read back is whether one is set. Sending the command with no password
    at all clears it, which is the way back for a clock nobody can log into any more. */
-constexpr MessageCatalog::OptionType ConsoleOptions[] {
-    {'P', "Console password",   ARGUMENT_TYPE_STRING, 0u, 0u},
-    {'A', "Protected",          ARGUMENT_TYPE_UINT8,  READ_ONLY}
+constexpr MessageCatalog::OptionType kConsoleOptions[] {
+    {'P', "Console password",   kArgumentTypeString, 0u, 0u},
+    {'A', "Protected",          kArgumentTypeUint8,  READ_ONLY}
 };
 
 /* MsgCmdNetworkParser. The pass phrase is an input and never an answer, so it carries no
    range and is never read back - see the parser for why. */
-constexpr MessageCatalog::OptionType NetworkOptions[] {
-    {'S', "Network name",       ARGUMENT_TYPE_STRING, 0u, 0u},
-    {'P', "Pass phrase",        ARGUMENT_TYPE_STRING, 0u, 0u}
+constexpr MessageCatalog::OptionType kNetworkOptions[] {
+    {'S', "Network name",       kArgumentTypeString, 0u, 0u},
+    {'P', "Pass phrase",        kArgumentTypeString, 0u, 0u}
 };
 
 /* MsgCmdClockModeParser */
-constexpr MessageCatalog::OptionType ClockModeOptions[] {
-    {'M', "Mode",               ARGUMENT_TYPE_UINT8,  NAMED(0u, ClockModeValueNames)},
-    {'I', "It is permanently",  ARGUMENT_TYPE_UINT8,  NAMED(0u, BooleanValueNames)}
+constexpr MessageCatalog::OptionType kClockModeOptions[] {
+    {'M', "Mode",               kArgumentTypeUint8,  NAMED(0u, kClockModeValueNames)},
+    {'I', "It is permanently",  kArgumentTypeUint8,  NAMED(0u, kBooleanValueNames)}
 };
 
 /* MsgCmdAnimationParser */
-constexpr MessageCatalog::OptionType AnimationOptions[] {
-    {'A', "Animation",          ARGUMENT_TYPE_UINT8,  NAMED(0u, AnimationValueNames)},
-    {'M', "Mode",               ARGUMENT_TYPE_UINT8,  NAMED(0u, AnimationModeValueNames)},
-    {'S', "Speed",              ARGUMENT_TYPE_UINT8,  0u, BYTE_MAX},
-    {'F', "Favourite",          ARGUMENT_TYPE_UINT8,  0u, BYTE_MAX}
+constexpr MessageCatalog::OptionType kAnimationOptions[] {
+    {'A', "Animation",          kArgumentTypeUint8,  NAMED(0u, kAnimationValueNames)},
+    {'M', "Mode",               kArgumentTypeUint8,  NAMED(0u, kAnimationModeValueNames)},
+    {'S', "Speed",              kArgumentTypeUint8,  0u, BYTE_MAX},
+    {'F', "Favourite",          kArgumentTypeUint8,  0u, BYTE_MAX}
 };
 
 /* MsgCmdTimeParser */
-constexpr MessageCatalog::OptionType TimeOptions[] {
-    {'H', "Hour",               ARGUMENT_TYPE_UINT8,  MEASURED(ClockTime::HourType, ClockTime::isHourValid)},
-    {'M', "Minute",             ARGUMENT_TYPE_UINT8,  MEASURED(ClockTime::MinuteType, ClockTime::isMinuteValid)},
-    {'S', "Second",             ARGUMENT_TYPE_UINT8,  MEASURED(ClockTime::SecondType, ClockTime::isSecondValid)}
+constexpr MessageCatalog::OptionType kTimeOptions[] {
+    {'H', "Hour",               kArgumentTypeUint8,  MEASURED(ClockTime::HourType, ClockTime::IsHourValid)},
+    {'M', "Minute",             kArgumentTypeUint8,  MEASURED(ClockTime::MinuteType, ClockTime::IsMinuteValid)},
+    {'S', "Second",             kArgumentTypeUint8,  MEASURED(ClockTime::SecondType, ClockTime::IsSecondValid)}
 };
 
 /* MsgCmdDateParser */
-constexpr MessageCatalog::OptionType DateOptions[] {
-    {'Y', "Year",               ARGUMENT_TYPE_UINT16, MEASURED(ClockDate::YearType, ClockDate::isYearValid)},
-    {'M', "Month",              ARGUMENT_TYPE_UINT8,  MEASURED(ClockDate::MonthType, ClockDate::isMonthValid)},
-    {'D', "Day",                ARGUMENT_TYPE_UINT8,  MEASURED(ClockDate::DayType, ClockDate::isDayValid)}
+constexpr MessageCatalog::OptionType kDateOptions[] {
+    {'Y', "Year",               kArgumentTypeUint16, MEASURED(ClockDate::YearType, ClockDate::IsYearValid)},
+    {'M', "Month",              kArgumentTypeUint8,  MEASURED(ClockDate::MonthType, ClockDate::IsMonthValid)},
+    {'D', "Day",                kArgumentTypeUint8,  MEASURED(ClockDate::DayType, ClockDate::IsDayValid)}
 };
 
 /* The numbers come from the enumeration itself, so they follow it instead of having to be
    kept level with it — including when a support switch shortens it, which is why the
-   overlay entries carry the same guards the enumerators do. COMMAND_NONE is left out, it
+   overlay entries carry the same guards the enumerators do. kCommandNone is left out, it
    is not a command that can be sent. Sending a command with no option at all asks the
    firmware for its current settings, which is why every entry is useful on its own. */
-constexpr MessageCatalog::CommandType Commands[] {
-    {MsgCmdParser::COMMAND_REMOTE_PROCEDURE_CALL, "Remote procedure call", RemoteProcedureCallOptions, NUMBER_OF(RemoteProcedureCallOptions)},
-    {MsgCmdParser::COMMAND_DISPLAY_COLOR,         "Display colour",        DisplayColorOptions,        NUMBER_OF(DisplayColorOptions)},
-    {MsgCmdParser::COMMAND_DISPLAY_BRIGHTNESS,    "Display brightness",    DisplayBrightnessOptions,   NUMBER_OF(DisplayBrightnessOptions)},
-    {MsgCmdParser::COMMAND_DISPLAY_PIXEL,         "Display pixel",         DisplayPixelOptions,        NUMBER_OF(DisplayPixelOptions)},
+constexpr MessageCatalog::CommandType kCommands[] {
+    {MsgCmdParser::kCommandRemoteProcedureCall, "Remote procedure call", kRemoteProcedureCallOptions, NUMBER_OF(kRemoteProcedureCallOptions)},
+    {MsgCmdParser::kCommandDisplayColor,         "Display colour",        kDisplayColorOptions,        NUMBER_OF(kDisplayColorOptions)},
+    {MsgCmdParser::kCommandDisplayBrightness,    "Display brightness",    kDisplayBrightnessOptions,   NUMBER_OF(kDisplayBrightnessOptions)},
+    {MsgCmdParser::kCommandDisplayPixel,         "Display pixel",         kDisplayPixelOptions,        NUMBER_OF(kDisplayPixelOptions)},
 #if (OVERLAYS_SUPPORT_DATE == STD_ON)
-    {MsgCmdParser::COMMAND_OVERLAY_DATE,          "Overlay date",          OverlayOptions,             NumberOfOverlayOptionsWithoutText},
+    {MsgCmdParser::kCommandOverlayDate,          "Overlay date",          kOverlayOptions,             kNumberOfOverlayOptionsWithoutText},
 #endif
 #if (OVERLAYS_SUPPORT_TEMPERATURE == STD_ON)
-    {MsgCmdParser::COMMAND_OVERLAY_TEMPERATURE,   "Overlay temperature",   OverlayOptions,             NumberOfOverlayOptionsWithoutText},
+    {MsgCmdParser::kCommandOverlayTemperature,   "Overlay temperature",   kOverlayOptions,             kNumberOfOverlayOptionsWithoutText},
 #endif
 #if (OVERLAYS_SUPPORT_TEXT == STD_ON)
-    {MsgCmdParser::COMMAND_OVERLAY_TEXT,          "Overlay text",          OverlayOptions,             NUMBER_OF(OverlayOptions)},
+    {MsgCmdParser::kCommandOverlayText,          "Overlay text",          kOverlayOptions,             NUMBER_OF(kOverlayOptions)},
 #endif
-    {MsgCmdParser::COMMAND_CLOCK_MODE,            "Clock mode",            ClockModeOptions,           NUMBER_OF(ClockModeOptions)},
-    {MsgCmdParser::COMMAND_ANIMATION,             "Animation",             AnimationOptions,           NUMBER_OF(AnimationOptions)},
-    {MsgCmdParser::COMMAND_TIME,                  "Time",                  TimeOptions,                NUMBER_OF(TimeOptions)},
-    {MsgCmdParser::COMMAND_DATE,                  "Date",                  DateOptions,                NUMBER_OF(DateOptions)},
-    {MsgCmdParser::COMMAND_STATUS,                "Status",                StatusOptions,              NUMBER_OF(StatusOptions)},
-    {MsgCmdParser::COMMAND_NETWORK,               "Network",               NetworkOptions,             NUMBER_OF(NetworkOptions)},
-    {MsgCmdParser::COMMAND_NIGHT_SWITCH,          "Night switch",          NightSwitchOptions,         NUMBER_OF(NightSwitchOptions)},
-    {MsgCmdParser::COMMAND_COLOR_CYCLE,           "Colour cycle",          ColorCycleOptions,          NUMBER_OF(ColorCycleOptions)},
-    {MsgCmdParser::COMMAND_CONSOLE,               "Console access",        ConsoleOptions,             NUMBER_OF(ConsoleOptions)}
+    {MsgCmdParser::kCommandClockMode,            "Clock mode",            kClockModeOptions,           NUMBER_OF(kClockModeOptions)},
+    {MsgCmdParser::kCommandAnimation,             "Animation",             kAnimationOptions,           NUMBER_OF(kAnimationOptions)},
+    {MsgCmdParser::kCommandTime,                  "Time",                  kTimeOptions,                NUMBER_OF(kTimeOptions)},
+    {MsgCmdParser::kCommandDate,                  "Date",                  kDateOptions,                NUMBER_OF(kDateOptions)},
+    {MsgCmdParser::kCommandStatus,                "Status",                kStatusOptions,              NUMBER_OF(kStatusOptions)},
+    {MsgCmdParser::kCommandNetwork,               "Network",               kNetworkOptions,             NUMBER_OF(kNetworkOptions)},
+    {MsgCmdParser::kCommandNightSwitch,          "Night switch",          kNightSwitchOptions,         NUMBER_OF(kNightSwitchOptions)},
+    {MsgCmdParser::kCommandColorCycle,           "Colour cycle",          kColorCycleOptions,          NUMBER_OF(kColorCycleOptions)},
+    {MsgCmdParser::kCommandConsole,               "Console access",        kConsoleOptions,             NUMBER_OF(kConsoleOptions)}
 };
 
-constexpr byte NumberOfCommands{NUMBER_OF(Commands)};
+constexpr byte kNumberOfCommands{NUMBER_OF(kCommands)};
 
 /* The message builder builds this many option rows once and shows the ones a command
    needs, so a command with more options than that would have some of them unreachable.
    Checked here rather than trusted, because the two live in different files. */
-constexpr bool areOptionCountsWithinBounds()
+constexpr bool AreOptionCountsWithinBounds()
 {
-    for(const MessageCatalog::CommandType& Command : Commands) {
-        if(Command.NumberOfOptions > MESSAGE_CATALOG_MAX_NUMBER_OF_OPTIONS) { return false; }
+    for(const MessageCatalog::CommandType& command : kCommands) {
+        if(command.number_of_options > MESSAGE_CATALOG_MAX_NUMBER_OF_OPTIONS) { return false; }
     }
 
     return true;
 }
 
-static_assert(areOptionCountsWithinBounds(),
+static_assert(AreOptionCountsWithinBounds(),
               "a command has more options than MESSAGE_CATALOG_MAX_NUMBER_OF_OPTIONS allows rows for");
 
 /* Naming the values makes the names the range: the dropdown offers one entry per name and
@@ -434,21 +434,21 @@ static_assert(areOptionCountsWithinBounds(),
    promise values that cannot be picked, and a narrower one would name values outside it.
    NAMED() gets this right by construction; this keeps a range written out by hand from
    getting it wrong. */
-constexpr bool areNamedRangesConsistent()
+constexpr bool AreNamedRangesConsistent()
 {
-    for(const MessageCatalog::CommandType& Command : Commands) {
-        for(byte Index = 0u; Index < Command.NumberOfOptions; Index++) {
-            const MessageCatalog::OptionType& Option = Command.Options[Index];
+    for(const MessageCatalog::CommandType& command : kCommands) {
+        for(byte index = 0u; index < command.number_of_options; index++) {
+            const MessageCatalog::OptionType& option = command.options[index];
 
-            if(Option.ValueNames == nullptr) { continue; }
-            if((Option.Maximum - Option.Minimum + 1u) != Option.NumberOfValueNames) { return false; }
+            if(option.value_names == nullptr) { continue; }
+            if((option.maximum - option.minimum + 1u) != option.number_of_value_names) { return false; }
         }
     }
 
     return true;
 }
 
-static_assert(areNamedRangesConsistent(),
+static_assert(AreNamedRangesConsistent(),
               "an option with named values has a range that does not match the number of names");
 
 /******************************************************************************************************************************************************
@@ -458,18 +458,18 @@ static_assert(areNamedRangesConsistent(),
 /******************************************************************************************************************************************************
   getNumberOfCommands()
 ******************************************************************************************************************************************************/
-byte MessageCatalog::getNumberOfCommands()
+byte MessageCatalog::GetNumberOfCommands()
 {
-    return NumberOfCommands;
+    return kNumberOfCommands;
 } /* getNumberOfCommands */
 
 
 /******************************************************************************************************************************************************
   getCommand()
 ******************************************************************************************************************************************************/
-const MessageCatalog::CommandType& MessageCatalog::getCommand(byte Index)
+const MessageCatalog::CommandType& MessageCatalog::GetCommand(byte index)
 {
-    return Commands[Index];
+    return kCommands[index];
 } /* getCommand */
 
 
@@ -482,10 +482,10 @@ const MessageCatalog::CommandType& MessageCatalog::getCommand(byte Index)
  *
  *  \return         the command, or nullptr if no command carries that number
 ******************************************************************************************************************************************************/
-const MessageCatalog::CommandType* MessageCatalog::findCommandByNumber(byte Number)
+const MessageCatalog::CommandType* MessageCatalog::FindCommandByNumber(byte number)
 {
-    for(byte Index = 0u; Index < NumberOfCommands; Index++) {
-        if(Commands[Index].Number == Number) { return &Commands[Index]; }
+    for(byte index = 0u; index < kNumberOfCommands; index++) {
+        if(kCommands[index].number == number) { return &kCommands[index]; }
     }
 
     return nullptr;
@@ -499,9 +499,9 @@ const MessageCatalog::CommandType* MessageCatalog::findCommandByNumber(byte Numb
  *
  *  \return         the command, or nullptr if it is not in the table
 ******************************************************************************************************************************************************/
-const MessageCatalog::CommandType* MessageCatalog::findRemoteProcedureCallCommand()
+const MessageCatalog::CommandType* MessageCatalog::FindRemoteProcedureCallCommand()
 {
-    return findCommandByNumber(MsgCmdParser::COMMAND_REMOTE_PROCEDURE_CALL);
+    return FindCommandByNumber(MsgCmdParser::kCommandRemoteProcedureCall);
 } /* findRemoteProcedureCallCommand */
 
 
@@ -512,10 +512,10 @@ const MessageCatalog::CommandType* MessageCatalog::findRemoteProcedureCallComman
  *
  *  \return         the option, or nullptr if the command has no such option
 ******************************************************************************************************************************************************/
-const MessageCatalog::OptionType* MessageCatalog::findOption(const CommandType& Command, char ShortName)
+const MessageCatalog::OptionType* MessageCatalog::FindOption(const CommandType& command, char short_name)
 {
-    for(byte Index = 0u; Index < Command.NumberOfOptions; Index++) {
-        if(Command.Options[Index].ShortName == ShortName) { return &Command.Options[Index]; }
+    for(byte index = 0u; index < command.number_of_options; index++) {
+        if(command.options[index].short_name == short_name) { return &command.options[index]; }
     }
 
     return nullptr;

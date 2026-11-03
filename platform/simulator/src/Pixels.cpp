@@ -1,53 +1,53 @@
 #include "sim/Pixels.h"
 
-StdReturnType Pixels::getPixel(byte Index, PixelType& Pixel) const
+StdReturnType Pixels::GetPixel(byte index, PixelType& pixel) const
 {
-    if(!isIndexValid(Index)) { return E_NOT_OK; }
+    if(!IsIndexValid(index)) { return kENotOk; }
 
-    Pixel = PixelBuffer[toRow(Index)][toColumn(Index)];
-    return E_OK;
+    pixel = pixel_buffer_[ToRow(index)][ToColumn(index)];
+    return kEOk;
 }
 
-Pixels::PixelType Pixels::getPixel(byte Index) const
+Pixels::PixelType Pixels::GetPixel(byte index) const
 {
     /* An index that is not on the strip has no pixel, and an unlit one is the answer no
        caller can mistake for an LED that is on. */
-    if(!isIndexValid(Index)) { return PixelType{}; }
+    if(!IsIndexValid(index)) { return PixelType{}; }
 
-    return PixelBuffer[toRow(Index)][toColumn(Index)];
+    return pixel_buffer_[ToRow(index)][ToColumn(index)];
 }
 
-StdReturnType Pixels::setPixel(byte Index, PixelType Pixel)
+StdReturnType Pixels::SetPixel(byte index, PixelType pixel)
 {
-    if(!isIndexValid(Index)) { return E_NOT_OK; }
+    if(!IsIndexValid(index)) { return kENotOk; }
 
-    PixelBuffer[toRow(Index)][toColumn(Index)] = Pixel;
-    Dirty = true;
-    return E_OK;
+    pixel_buffer_[ToRow(index)][ToColumn(index)] = pixel;
+    dirty_ = true;
+    return kEOk;
 }
 
-StdReturnType Pixels::setPixel(byte Index, byte Red, byte Green, byte Blue)
+StdReturnType Pixels::SetPixel(byte index, byte red, byte green, byte blue)
 {
-    return setPixel(Index, PixelType(Red, Green, Blue));
+    return SetPixel(index, PixelType(red, green, blue));
 }
 
-void Pixels::setPixels(PixelType Pixel)
+void Pixels::SetPixels(PixelType pixel)
 {
-    for(unsigned int Row = 0; Row < PIXELS_DISPLAY_NUMBER_OF_ROWS; Row++) {
-        for(unsigned int Column = 0; Column < PIXELS_DISPLAY_NUMBER_OF_COLUMNS; Column++) {
-            PixelBuffer[Row][Column] = Pixel;
+    for(unsigned int row = 0; row < PIXELS_DISPLAY_NUMBER_OF_ROWS; row++) {
+        for(unsigned int column = 0; column < PIXELS_DISPLAY_NUMBER_OF_COLUMNS; column++) {
+            pixel_buffer_[row][column] = pixel;
         }
     }
-    Dirty = true;
+    dirty_ = true;
 }
 
-void Pixels::setBrightness(byte sBrightness, bool GammaCorrection)
+void Pixels::SetBrightness(byte brightness, bool gamma_correction)
 {
     /* Master output on and off, driven by enablePixels() and disablePixels(). The
        buffer is left alone, so switching back on restores the picture without having to
        copy it away first. */
-    Brightness = sBrightness;
-    Dirty = true;
+    brightness_ = brightness;
+    dirty_ = true;
 
-    UNUSED(GammaCorrection);
+    UNUSED(gamma_correction);
 }

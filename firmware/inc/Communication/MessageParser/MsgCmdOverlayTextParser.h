@@ -61,7 +61,7 @@ class MsgCmdOverlayTextParser : public MsgCmdOverlayParser<MsgCmdOverlayTextPars
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr MsgCmdOverlayTextParser(const char* Parameter) : MsgCmdOverlayParser(Parameter) { }
+    constexpr MsgCmdOverlayTextParser(const char* parameter) : MsgCmdOverlayParser(parameter) { }
     ~MsgCmdOverlayTextParser() { }
 
     // get methods
@@ -69,28 +69,28 @@ class MsgCmdOverlayTextParser : public MsgCmdOverlayParser<MsgCmdOverlayTextPars
     // set methods
 
     // methods
-    static MinuteType getPeriodInMinutes() { return Overlays::getInstance().getTextPeriodInMinutes(); }
-    static SecondType getEnduranceInSeconds() { return Overlays::getInstance().getTextEnduranceInSeconds(); }
-    static MonthType getMonth() { return Overlays::getInstance().getTextMonth(); }
-    static DayType getDay() { return Overlays::getInstance().getTextDay(); }
-    static DayType getValidInDays() { return Overlays::getInstance().getTextValidInDays(); }
-    static byte getSpeed() { return Overlays::getInstance().getTextSpeed(); }
-    static FontType getFont() {return Overlays::getInstance().getTextFont(); }
-    static bool getIsActive() { return Overlays::getInstance().getTextIsActive(); }
-    static const char* getText() { return Overlays::getInstance().getTextText(); }
+    static MinuteType GetPeriodInMinutes() { return Overlays::GetInstance().GetTextPeriodInMinutes(); }
+    static SecondType GetEnduranceInSeconds() { return Overlays::GetInstance().GetTextEnduranceInSeconds(); }
+    static MonthType GetMonth() { return Overlays::GetInstance().GetTextMonth(); }
+    static DayType GetDay() { return Overlays::GetInstance().GetTextDay(); }
+    static DayType GetValidInDays() { return Overlays::GetInstance().GetTextValidInDays(); }
+    static byte GetSpeed() { return Overlays::GetInstance().GetTextSpeed(); }
+    static FontType GetFont() {return Overlays::GetInstance().GetTextFont(); }
+    static bool GetIsActive() { return Overlays::GetInstance().GetTextIsActive(); }
+    static const char* GetText() { return Overlays::GetInstance().GetTextText(); }
 
-    static StdReturnType setPeriodInMinutes(MinuteType PeriodInMinutes) { return Overlays::getInstance().setTextPeriodInMinutes(PeriodInMinutes); }
-    static StdReturnType setEnduranceInSeconds(SecondType EnduranceInSeconds) { return Overlays::getInstance().setTextEnduranceInSeconds(EnduranceInSeconds); }
-    static void setMonth(MonthType Month) { Overlays::getInstance().setTextMonth(Month); }
-    static void setDay(DayType Day) { Overlays::getInstance().setTextDay(Day); }
-    static void setValidInDays(DayType ValidInDays) { Overlays::getInstance().setTextValidInDays(ValidInDays); }
-    static void setSpeed(byte Speed) { Overlays::getInstance().setTextSpeed(Speed); }
-    static StdReturnType setFont(FontType Font) { return Overlays::getInstance().setTextFont(Font); }
-    static void setIsActive(bool IsActive) { Overlays::getInstance().setTextIsActive(IsActive); }
-    static void setText(const char* Text, LengthType Length) { Overlays::getInstance().setTextText(Text, Length); }
+    static StdReturnType SetPeriodInMinutes(MinuteType period_in_minutes) { return Overlays::GetInstance().SetTextPeriodInMinutes(period_in_minutes); }
+    static StdReturnType SetEnduranceInSeconds(SecondType endurance_in_seconds) { return Overlays::GetInstance().SetTextEnduranceInSeconds(endurance_in_seconds); }
+    static void SetMonth(MonthType month) { Overlays::GetInstance().SetTextMonth(month); }
+    static void SetDay(DayType day) { Overlays::GetInstance().SetTextDay(day); }
+    static void SetValidInDays(DayType valid_in_days) { Overlays::GetInstance().SetTextValidInDays(valid_in_days); }
+    static void SetSpeed(byte speed) { Overlays::GetInstance().SetTextSpeed(speed); }
+    static StdReturnType SetFont(FontType font) { return Overlays::GetInstance().SetTextFont(font); }
+    static void SetIsActive(bool is_active) { Overlays::GetInstance().SetTextIsActive(is_active); }
+    static void SetText(const char* text, LengthType length) { Overlays::GetInstance().SetTextText(text, length); }
 
-    static void sendAnswerText(bool AppendSpace) { sendAnswerParameter(TextOptionShortName, getText(), AppendSpace); }
-    static void sendAnswerSpeed(bool AppendSpace) { sendAnswerParameter(SpeedOptionShortName, getSpeed(), AppendSpace); }
+    static void SendAnswerText(bool append_space) { SendAnswerParameter(kTextOptionShortName, GetText(), append_space); }
+    static void SendAnswerSpeed(bool append_space) { SendAnswerParameter(kSpeedOptionShortName, GetSpeed(), append_space); }
 
 };
 

@@ -66,7 +66,7 @@ class Persistence
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    static constexpr byte TaskCycle{PERSISTENCE_TASK_CYCLE};
+    static constexpr byte kTaskCycle{PERSISTENCE_TASK_CYCLE};
 
     Persistence() { }
     ~Persistence() { }
@@ -75,29 +75,29 @@ class Persistence
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    static Persistence& getInstance() {
-        static Persistence SingletonInstance;
-        return SingletonInstance;
+    static Persistence& GetInstance() {
+        static Persistence singleton_instance;
+        return singleton_instance;
     }
 
     // get methods
-    static constexpr byte getTaskCycle() { return TaskCycle; }
+    static constexpr byte GetTaskCycle() { return kTaskCycle; }
 
     // methods
     /* Called once by the platform's entry point, after the display is up: the settings it
        restores reach the display through the modules' own setters. */
-    static StdReturnType load();
-    static void task();
+    static StdReturnType Load();
+    static void Task();
 
     /* Writes now rather than within the next period. What that period is there for is
        rationing a burst of commands, which is exactly what a caller asking for this is
        not doing - it is about to pull the plug. */
-    static StdReturnType save();
+    static StdReturnType Save();
 
     /* Every module back to what it starts with, and the store emptied. Emptied rather
        than written with the defaults: an empty store is what a clock that was never
        configured has, and load() already treats the two the same. */
-    static StdReturnType reset();
+    static StdReturnType Reset();
 };
 
 #endif // _PERSISTENCE_H_

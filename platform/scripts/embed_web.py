@@ -53,11 +53,11 @@ ASSETS = (
     # not one: the first is hand-made for the handful of settings somebody changes, the second
     # is generated from the catalog and is therefore complete. Both are stripped and gzipped -
     # they are the only assets with comments worth having in the source and not worth shipping.
-    Asset("app.html", "WebApp", "text/html", gzip=True, strip=True),
-    Asset("index.html", "WebPage", "text/html", gzip=True, strip=True),
-    Asset("manifest.webmanifest", "WebManifest", "application/manifest+json", gzip=False, strip=False),
-    Asset("icon-192.png", "WebIcon192", "image/png", gzip=False, strip=False),
-    Asset("icon-512.png", "WebIcon512", "image/png", gzip=False, strip=False),
+    Asset("app.html", "kWebApp", "text/html", gzip=True, strip=True),
+    Asset("index.html", "kWebPage", "text/html", gzip=True, strip=True),
+    Asset("manifest.webmanifest", "kWebManifest", "application/manifest+json", gzip=False, strip=False),
+    Asset("icon-192.png", "kWebIcon192", "image/png", gzip=False, strip=False),
+    Asset("icon-512.png", "kWebIcon512", "image/png", gzip=False, strip=False),
 )
 
 

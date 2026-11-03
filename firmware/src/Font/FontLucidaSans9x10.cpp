@@ -37,7 +37,7 @@
 /******************************************************************************************************************************************************
  *  L O C A L   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
-const FontLucidaSans9x10::FontTableType FontLucidaSans9x10::FontTable PROGMEM
+const FontLucidaSans9x10::FontTableType FontLucidaSans9x10::kFontTable PROGMEM
 {
     FontTableElementType(5, {0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000}),   // Code for char
     FontTableElementType(2, {0x0000, 0x017e, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000}),   // Code for char !

@@ -30,37 +30,37 @@
 
 namespace {
 
-constexpr uint32_t BudgetMicroAmps{static_cast<uint32_t>(DISPLAY_CURRENT_LIMIT_BUDGET_MILLI_AMPS) * 1000u};
-constexpr uint16_t WhiteChannelSum{DisplayCurrentLimit::toChannelSum(255u, 255u, 255u)};
-constexpr uint16_t RedChannelSum{DisplayCurrentLimit::toChannelSum(255u, 0u, 0u)};
+constexpr uint32_t kBudgetMicroAmps{static_cast<uint32_t>(DISPLAY_CURRENT_LIMIT_BUDGET_MILLI_AMPS) * 1000u};
+constexpr uint16_t kWhiteChannelSum{DisplayCurrentLimit::ToChannelSum(255u, 255u, 255u)};
+constexpr uint16_t kRedChannelSum{DisplayCurrentLimit::ToChannelSum(255u, 0u, 0u)};
 
 /* The master the strip is carrying, which is where the cap lives - not the setting, which
    getBrightness() answers and which the cap deliberately leaves alone. */
-byte getMaster()
+byte GetMaster()
 {
-    return Pixels::getInstance().getBrightness();
+    return Pixels::GetInstance().GetBrightness();
 }
 
 /* What the strip would draw with a given master, in microamps. The idle current does not
    scale: a WS2812 held dark by the master still draws it. */
-uint32_t toCurrentMicroAmps(byte LitPixels, uint16_t ChannelSum, byte Master)
+uint32_t ToCurrentMicroAmps(byte lit_pixels, uint16_t channel_sum, byte master)
 {
-    const uint32_t Idle = DisplayCurrentLimit::getIdleCurrentMicroAmps(PIXELS_NUMBER_OF_LEDS);
-    const uint32_t AtFull = DisplayCurrentLimit::getCurrentAtFullBrightnessMicroAmps(PIXELS_NUMBER_OF_LEDS, LitPixels, ChannelSum);
+    const uint32_t idle = DisplayCurrentLimit::GetIdleCurrentMicroAmps(PIXELS_NUMBER_OF_LEDS);
+    const uint32_t at_full = DisplayCurrentLimit::GetCurrentAtFullBrightnessMicroAmps(PIXELS_NUMBER_OF_LEDS, lit_pixels, channel_sum);
 
-    return Idle + ((AtFull - Idle) * Master / 256u);
+    return idle + ((at_full - idle) * master / 256u);
 }
 
 /* White, enabled, and a clock face on the display - what every case here starts from and has
    to leave behind, since the cases after this file expect a white display. */
-void startFromWhiteClockFace()
+void StartFromWhiteClockFace()
 {
-    Display& display = Display::getInstance();
+    Display& display = Display::GetInstance();
 
-    display.enable();
-    display.resetColor();
-    drawClockFace(10u, 4u);
-    DisplayManager::getInstance().task();
+    display.Enable();
+    display.ResetColor();
+    DrawClockFace(10u, 4u);
+    DisplayManager::GetInstance().Task();
 }
 
 } /* namespace */
@@ -69,21 +69,21 @@ void startFromWhiteClockFace()
 /* The property the class exists for, checked as a property rather than at one point: for every
    number of lit letters, the current at the brightness the solver allows must fit the budget,
    and one more lit letter must never allow more brightness than the last. */
-void testCurrentLimitFitsTheBudgetAtEveryLitCount()
+void TestCurrentLimitFitsTheBudgetAtEveryLitCount()
 {
-    expect(DisplayCurrentLimit::toBrightnessLimit(PIXELS_NUMBER_OF_LEDS, 0u, WhiteChannelSum) == DisplayCurrentLimit::NoLimit,
+    Expect(DisplayCurrentLimit::ToBrightnessLimit(PIXELS_NUMBER_OF_LEDS, 0u, kWhiteChannelSum) == DisplayCurrentLimit::kNoLimit,
            "a display with nothing lit must not be held back");
-    expect(DisplayCurrentLimit::toBrightnessLimit(PIXELS_NUMBER_OF_LEDS, PIXELS_NUMBER_OF_LEDS, WhiteChannelSum) < DisplayCurrentLimit::NoLimit,
+    Expect(DisplayCurrentLimit::ToBrightnessLimit(PIXELS_NUMBER_OF_LEDS, PIXELS_NUMBER_OF_LEDS, kWhiteChannelSum) < DisplayCurrentLimit::kNoLimit,
            "a full white display must be held back, or this budget leaves nothing to test");
 
-    byte Previous = DisplayCurrentLimit::NoLimit;
-    for(byte Lit = 0u; Lit <= PIXELS_NUMBER_OF_LEDS; Lit++) {
-        const byte Limit = DisplayCurrentLimit::toBrightnessLimit(PIXELS_NUMBER_OF_LEDS, Lit, WhiteChannelSum);
+    byte previous = DisplayCurrentLimit::kNoLimit;
+    for(byte lit = 0u; lit <= PIXELS_NUMBER_OF_LEDS; lit++) {
+        const byte limit = DisplayCurrentLimit::ToBrightnessLimit(PIXELS_NUMBER_OF_LEDS, lit, kWhiteChannelSum);
 
-        expect(Limit <= Previous, "one more lit letter must never allow more brightness");
-        expect(toCurrentMicroAmps(Lit, WhiteChannelSum, Limit) <= BudgetMicroAmps,
+        Expect(limit <= previous, "one more lit letter must never allow more brightness");
+        Expect(ToCurrentMicroAmps(lit, kWhiteChannelSum, limit) <= kBudgetMicroAmps,
                "the brightness the limit allows must stay inside the budget");
-        Previous = Limit;
+        previous = limit;
     }
 }
 
@@ -91,23 +91,23 @@ void testCurrentLimitFitsTheBudgetAtEveryLitCount()
 /* The colour decides as much as the count does: red asks a third of what white asks at the
    same brightness, and on this display that is the difference between fitting the budget and
    not. A limiter that only counted letters would hold both back equally. */
-void testCurrentLimitFollowsTheColour()
+void TestCurrentLimitFollowsTheColour()
 {
-    const byte WhiteLimit = DisplayCurrentLimit::toBrightnessLimit(PIXELS_NUMBER_OF_LEDS, PIXELS_NUMBER_OF_LEDS, WhiteChannelSum);
-    const byte RedLimit = DisplayCurrentLimit::toBrightnessLimit(PIXELS_NUMBER_OF_LEDS, PIXELS_NUMBER_OF_LEDS, RedChannelSum);
+    const byte white_limit = DisplayCurrentLimit::ToBrightnessLimit(PIXELS_NUMBER_OF_LEDS, PIXELS_NUMBER_OF_LEDS, kWhiteChannelSum);
+    const byte red_limit = DisplayCurrentLimit::ToBrightnessLimit(PIXELS_NUMBER_OF_LEDS, PIXELS_NUMBER_OF_LEDS, kRedChannelSum);
 
-    expect(WhiteLimit < RedLimit, "white must be held back harder than red on the same letters");
+    Expect(white_limit < red_limit, "white must be held back harder than red on the same letters");
 
-    Display& display = Display::getInstance();
+    Display& display = Display::GetInstance();
 
-    startFromWhiteClockFace();
-    display.test();
-    expect(getMaster() == WhiteLimit, "a full white display must be capped at the white limit");
+    StartFromWhiteClockFace();
+    display.Test();
+    Expect(GetMaster() == white_limit, "a full white display must be capped at the white limit");
 
-    display.setColor(255u, 0u, 0u);
-    expect(getMaster() == RedLimit, "and turning it red must lift the cap to the red one");
+    display.SetColor(255u, 0u, 0u);
+    Expect(GetMaster() == red_limit, "and turning it red must lift the cap to the red one");
 
-    startFromWhiteClockFace();
+    StartFromWhiteClockFace();
 }
 
 
@@ -115,43 +115,43 @@ void testCurrentLimitFollowsTheColour()
    the strip's master, so the buffer keeps the colour it was written with and a face that comes
    back after a full display is the face that went away. Applying the cap to the colour instead
    would leave it a fifth darker until the next task run, which is what this case would catch. */
-void testCurrentLimitLeavesTheRestoredFaceAlone()
+void TestCurrentLimitLeavesTheRestoredFaceAlone()
 {
-    Display& display = Display::getInstance();
+    Display& display = Display::GetInstance();
 
-    startFromWhiteClockFace();
-    const PixelBufferType ClockFace = readPixels();
-    expect(getMaster() == DisplayCurrentLimit::NoLimit, "a clock face on this budget must run uncapped");
+    StartFromWhiteClockFace();
+    const PixelBufferType clock_face = ReadPixels();
+    Expect(GetMaster() == DisplayCurrentLimit::kNoLimit, "a clock face on this budget must run uncapped");
 
-    display.test();
-    expect(getMaster() < DisplayCurrentLimit::NoLimit, "the display test must be capped");
+    display.Test();
+    Expect(GetMaster() < DisplayCurrentLimit::kNoLimit, "the display test must be capped");
 
-    drawClockFace(10u, 4u);
-    DisplayManager::getInstance().task();
-    expect(getMaster() == DisplayCurrentLimit::NoLimit, "the cap must lift again once the letters go");
-    expect(arePixelsEqual(readPixels(), ClockFace), "and the face must come back exactly as it was");
+    DrawClockFace(10u, 4u);
+    DisplayManager::GetInstance().Task();
+    Expect(GetMaster() == DisplayCurrentLimit::kNoLimit, "the cap must lift again once the letters go");
+    Expect(ArePixelsEqual(ReadPixels(), clock_face), "and the face must come back exactly as it was");
 
-    startFromWhiteClockFace();
+    StartFromWhiteClockFace();
 }
 
 
 /* The master is also what disable() uses, so the two must not fight over it: a task on a dark
    display must leave it dark rather than write a cap into it. */
-void testCurrentLimitDoesNotSwitchTheDisplayOn()
+void TestCurrentLimitDoesNotSwitchTheDisplayOn()
 {
-    Display& display = Display::getInstance();
+    Display& display = Display::GetInstance();
 
-    startFromWhiteClockFace();
-    display.test();
-    display.disable();
-    expect(getMaster() == 0u, "a disabled display must have its master at zero");
+    StartFromWhiteClockFace();
+    display.Test();
+    display.Disable();
+    Expect(GetMaster() == 0u, "a disabled display must have its master at zero");
 
-    DisplayManager::getInstance().task();
-    expect(getMaster() == 0u, "and a task must not put a cap there instead");
+    DisplayManager::GetInstance().Task();
+    Expect(GetMaster() == 0u, "and a task must not put a cap there instead");
 
-    display.enable();
-    expect(getMaster() == DisplayCurrentLimit::toBrightnessLimit(PIXELS_NUMBER_OF_LEDS, PIXELS_NUMBER_OF_LEDS, WhiteChannelSum),
+    display.Enable();
+    Expect(GetMaster() == DisplayCurrentLimit::ToBrightnessLimit(PIXELS_NUMBER_OF_LEDS, PIXELS_NUMBER_OF_LEDS, kWhiteChannelSum),
            "switching back on must go through the cap rather than to full");
 
-    startFromWhiteClockFace();
+    StartFromWhiteClockFace();
 }

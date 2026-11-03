@@ -9,6 +9,8 @@
    file instead of the OTA one looks like from here. */
 #ifndef _UPDATE_H_
 #define _UPDATE_H_
+/* Under the framework's names, because it stands in for the framework's header. */
+// NOLINTBEGIN(readability-identifier-naming)
 
 #include <stddef.h>
 #include <stdint.h>
@@ -67,4 +69,5 @@ class UpdateClass
 
 extern UpdateClass Update;
 
+// NOLINTEND(readability-identifier-naming)
 #endif // _UPDATE_H_

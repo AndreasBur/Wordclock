@@ -59,19 +59,19 @@ class MessageBuilder : public wxDialog
        their own, which is what lets one handler serve all of them. */
     enum
     {
-        ID_STATIC_BOX_MESSAGE = 3000,
-        ID_CHOICE_COMMAND,
-        ID_TEXT_CTRL_PREVIEW,
-        ID_BUTTON_INSERT,
+        kIdStaticBoxMessage = 3000,
+        kIdChoiceCommand,
+        kIdTextCtrlPreview,
+        kIdButtonInsert,
 
-        ID_CHECKBOX_OPTION_FIRST = 3100,
-        ID_CHECKBOX_OPTION_LAST = ID_CHECKBOX_OPTION_FIRST + MESSAGE_CATALOG_MAX_NUMBER_OF_OPTIONS - 1,
+        kIdCheckboxOptionFirst = 3100,
+        kIdCheckboxOptionLast = kIdCheckboxOptionFirst + MESSAGE_CATALOG_MAX_NUMBER_OF_OPTIONS - 1,
 
-        ID_TEXT_OPTION_FIRST = 3200,
-        ID_TEXT_OPTION_LAST = ID_TEXT_OPTION_FIRST + MESSAGE_CATALOG_MAX_NUMBER_OF_OPTIONS - 1,
+        kIdTextOptionFirst = 3200,
+        kIdTextOptionLast = kIdTextOptionFirst + MESSAGE_CATALOG_MAX_NUMBER_OF_OPTIONS - 1,
 
-        ID_CHOICE_OPTION_FIRST = 3300,
-        ID_CHOICE_OPTION_LAST = ID_CHOICE_OPTION_FIRST + MESSAGE_CATALOG_MAX_NUMBER_OF_OPTIONS - 1
+        kIdChoiceOptionFirst = 3300,
+        kIdChoiceOptionLast = kIdChoiceOptionFirst + MESSAGE_CATALOG_MAX_NUMBER_OF_OPTIONS - 1
     };
 
     /* One row per option of the selected command: whether it is part of the message at
@@ -80,19 +80,19 @@ class MessageBuilder : public wxDialog
        values, a text field for a plain number or a string. Building them once and
        hiding one keeps the rows reusable across commands. */
     struct OptionRowType {
-        wxCheckBox* Use;
-        wxTextCtrl* Value;
-        wxOwnerDrawnComboBox* Choice;
+        wxCheckBox* use;
+        wxTextCtrl* value;
+        wxOwnerDrawnComboBox* choice;
     };
 
-    wxOwnerDrawnComboBox* CommandChoice;
-    std::array<OptionRowType, MESSAGE_CATALOG_MAX_NUMBER_OF_OPTIONS> OptionRows;
-    wxTextCtrl* Preview;
+    wxOwnerDrawnComboBox* command_choice_;
+    std::array<OptionRowType, MESSAGE_CATALOG_MAX_NUMBER_OF_OPTIONS> option_rows_;
+    wxTextCtrl* preview_;
 
-    static constexpr int ValueWidth{80};
+    static constexpr int kValueWidth{80};
     /* Wider than the plain value field: it has to hold names like "Illuminance
        calibration maximum". */
-    static constexpr int ChoiceWidth{240};
+    static constexpr int kChoiceWidth{240};
     /* What a popup may grow to before it scrolls instead. wxChoice had no such knob: its
        popup is a GTK one, and GTK decides when to switch on its scroll arrows from the
        monitor's work area - which is right on a normal desktop and wrong under WSLg, where
@@ -100,9 +100,9 @@ class MessageBuilder : public wxDialog
        reached at all. wxOwnerDrawnComboBox draws its own popup, so this is a number rather
        than a hope. Ten rows or so, which is the RPC list's thirty-three in three screens
        rather than one screen and a cliff. */
-    static constexpr int PopupMaxHeight{240};
-    static constexpr int PreviewWidth{300};
-    static constexpr int Border{10};
+    static constexpr int kPopupMaxHeight{240};
+    static constexpr int kPreviewWidth{300};
+    static constexpr int kBorder{10};
 
     DECLARE_EVENT_TABLE()
 
@@ -118,20 +118,20 @@ class MessageBuilder : public wxDialog
 
     /* An option that is not ticked contributes nothing to the message, so its argument is
        greyed out rather than left looking as though it did. */
-    void enableOptionValue(byte Index, bool Enabled) {
-        OptionRows[Index].Value->Enable(Enabled);
-        OptionRows[Index].Choice->Enable(Enabled);
+    void EnableOptionValue(byte index, bool enabled) {
+        option_rows_[index].value->Enable(enabled);
+        option_rows_[index].choice->Enable(enabled);
     }
 
-    wxBoxSizer* createSizerAll(wxWindow*);
+    wxBoxSizer* CreateSizerAll(wxWindow*);
 
-    const MessageCatalog::CommandType& getSelectedCommand() const {
-        return MessageCatalog::getCommand(static_cast<byte>(CommandChoice->GetSelection()));
+    const MessageCatalog::CommandType& GetSelectedCommand() const {
+        return MessageCatalog::GetCommand(static_cast<byte>(command_choice_->GetSelection()));
     }
 
-    void showOptionsOfSelectedCommand();
-    wxString buildMessage() const;
-    void updatePreview() { Preview->SetValue(buildMessage()); }
+    void ShowOptionsOfSelectedCommand();
+    wxString BuildMessage() const;
+    void UpdatePreview() { preview_->SetValue(BuildMessage()); }
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
@@ -139,13 +139,13 @@ class MessageBuilder : public wxDialog
   public:
     /* Parented to the pixel matrix window, so closing that one takes this along and the
        application can exit. */
-    static MessageBuilder& getInstance() {
-        static MessageBuilder* pSingletonInstance = new MessageBuilder(&PixelsFrame::getInstance(), _("Wordclock Message"));
-        return *pSingletonInstance;
+    static MessageBuilder& GetInstance() {
+        static MessageBuilder* p_singleton_instance = new MessageBuilder(&PixelsFrame::GetInstance(), _("Wordclock Message"));
+        return *p_singleton_instance;
     }
 
     // methods
-    void reveal() {
+    void Reveal() {
         Show();
         Raise();
         /* Again once the window is on screen. A size set while it was still hidden did

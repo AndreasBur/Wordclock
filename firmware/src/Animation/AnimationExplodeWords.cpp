@@ -43,36 +43,36 @@
 ******************************************************************************************************************************************************/
 
 /******************************************************************************************************************************************************
-  init()
+  Init()
 ******************************************************************************************************************************************************/
-void AnimationExplodeWords::init()
+void AnimationExplodeWords::Init()
 {
-    Animation::init(STATE_IDLE);
-    reset();
+    Animation::Init(kStateIdle);
+    Reset();
 } /* init */
 
 /******************************************************************************************************************************************************
   setTime()
 ******************************************************************************************************************************************************/
-StdReturnType AnimationExplodeWords::setTime(byte Hour, byte Minute)
+StdReturnType AnimationExplodeWords::SetTime(byte hour, byte minute)
 {
-    StdReturnType returnValue{E_NOT_OK};
+    StdReturnType return_value{kENotOk};
 
-    if(Clock::getInstance().getClockWords(Hour, Minute, ClockWordsTable) == E_OK && State == STATE_IDLE) {
-        returnValue = E_OK;
-        if(setNextWordToClear() == E_OK) { State = STATE_CLEAR_TIME; }
-        else { State = STATE_SET_TIME; }
+    if(Clock::GetInstance().GetClockWords(hour, minute, clock_words_table_) == kEOk && state_ == kStateIdle) {
+        return_value = kEOk;
+        if(SetNextWordToClear() == kEOk) { state_ = kStateClearTime; }
+        else { state_ = kStateSetTime; }
     }
-    return returnValue;
+    return return_value;
 } /* setTime */
 
 /******************************************************************************************************************************************************
   task()
 ******************************************************************************************************************************************************/
-void AnimationExplodeWords::task()
+void AnimationExplodeWords::Task()
 {
-    if(State == STATE_CLEAR_TIME) clearTimeTask();
-    else if(State == STATE_SET_TIME) setTimeTask();
+    if(state_ == kStateClearTime) ClearTimeTask();
+    else if(state_ == kStateSetTime) SetTimeTask();
 } /* task */
 
 
@@ -83,28 +83,28 @@ void AnimationExplodeWords::task()
 /******************************************************************************************************************************************************
   reset()
 ******************************************************************************************************************************************************/
-void AnimationExplodeWords::reset()
+void AnimationExplodeWords::Reset()
 {
-    ClockWordsTable.fill(DisplayWords::WORD_NONE);
-    ClockWordsTableIndex = 0u;
-    CurrentWordIndex = Display::getInstance().columnAndRowToIndex(0u, RowCenter);
-    CurrentWordLength = 0u;
-    CurrentColumn = 0u;
-    CurrentRow = 0u;
+    clock_words_table_.fill(DisplayWords::kWordNone);
+    clock_words_table_index_ = 0u;
+    current_word_index_ = Display::GetInstance().ColumnAndRowToIndex(0u, kRowCenter);
+    current_word_length_ = 0u;
+    current_column_ = 0u;
+    current_row_ = 0u;
 } /* reset */
 
 /******************************************************************************************************************************************************
   clearTimeTask()
 ******************************************************************************************************************************************************/
-void AnimationExplodeWords::clearTimeTask()
+void AnimationExplodeWords::ClearTimeTask()
 {
-    if(shiftWord(getClearFinalColumn(), getClearFinalRow()) == E_NOT_OK) {
-        toggleWordOnDisplay();
-        if(setNextWordToClear() == E_NOT_OK) {
-            CurrentWordIndex = 0u;
-            setWordToSet(ClockWordsTable[CurrentWordIndex]);
-            setWordOnDisplay();
-            State = STATE_SET_TIME;
+    if(ShiftWord(GetClearFinalColumn(), GetClearFinalRow()) == kENotOk) {
+        ToggleWordOnDisplay();
+        if(SetNextWordToClear() == kENotOk) {
+            current_word_index_ = 0u;
+            SetWordToSet(clock_words_table_[current_word_index_]);
+            SetWordOnDisplay();
+            state_ = kStateSetTime;
         }
     }
 } /* clearTimeTask */
@@ -112,141 +112,141 @@ void AnimationExplodeWords::clearTimeTask()
 /******************************************************************************************************************************************************
   setTimeTask()
 ******************************************************************************************************************************************************/
-void AnimationExplodeWords::setTimeTask()
+void AnimationExplodeWords::SetTimeTask()
 {
-    if(shiftWord(getSetFinalColumn(), getSetFinalRow()) == E_NOT_OK) {
-        if(setNextWordToSet() == E_NOT_OK) { finishWithClockWords(ClockWordsTable); }
-        else { toggleWordOnDisplay(); }
+    if(ShiftWord(GetSetFinalColumn(), GetSetFinalRow()) == kENotOk) {
+        if(SetNextWordToSet() == kENotOk) { FinishWithClockWords(clock_words_table_); }
+        else { ToggleWordOnDisplay(); }
     }
 } /* setTimeTask */
 
 /******************************************************************************************************************************************************
   shiftWord()
 ******************************************************************************************************************************************************/
-StdReturnType AnimationExplodeWords::shiftWord(byte FinalColum, byte FinalRow)
+StdReturnType AnimationExplodeWords::ShiftWord(byte final_colum, byte final_row)
 {
-    if(CurrentColumn != getNextColumn(FinalColum) || CurrentRow != getNextRow(FinalRow)) {
-        toggleWordOnDisplay();
-        CurrentColumn = getNextColumn(FinalColum);
-        CurrentRow = getNextRow(FinalRow);
-        toggleWordOnDisplay();
-        return E_OK;
+    if(current_column_ != GetNextColumn(final_colum) || current_row_ != GetNextRow(final_row)) {
+        ToggleWordOnDisplay();
+        current_column_ = GetNextColumn(final_colum);
+        current_row_ = GetNextRow(final_row);
+        ToggleWordOnDisplay();
+        return kEOk;
     } else {
-        return E_NOT_OK;
+        return kENotOk;
     }
 } /* shiftWord */
 
 /******************************************************************************************************************************************************
   toggleWordOnDisplay()
 ******************************************************************************************************************************************************/
-void AnimationExplodeWords::toggleWordOnDisplay() const
+void AnimationExplodeWords::ToggleWordOnDisplay() const
 {
-    for(byte columnIndex = CurrentColumn; columnIndex < CurrentColumn + CurrentWordLength; columnIndex++) {
-        Display::getInstance().togglePixel(columnIndex, CurrentRow);
+    for(byte column_index = current_column_; column_index < current_column_ + current_word_length_; column_index++) {
+        Display::GetInstance().TogglePixel(column_index, current_row_);
     }
 } /* toggleWordOnDisplay */
 
 /******************************************************************************************************************************************************
   setWordOnDisplay()
 ******************************************************************************************************************************************************/
-void AnimationExplodeWords::setWordOnDisplay() const
+void AnimationExplodeWords::SetWordOnDisplay() const
 {
-    for(byte columnIndex = CurrentColumn; columnIndex < CurrentColumn + CurrentWordLength; columnIndex++) {
-        Display::getInstance().setPixel(columnIndex, CurrentRow);
+    for(byte column_index = current_column_; column_index < current_column_ + current_word_length_; column_index++) {
+        Display::GetInstance().SetPixel(column_index, current_row_);
     }
 } /* setWordOnDisplay */
 
 /******************************************************************************************************************************************************
   setNextWordToClear()
 ******************************************************************************************************************************************************/
-StdReturnType AnimationExplodeWords::setNextWordToClear()
+StdReturnType AnimationExplodeWords::SetNextWordToClear()
 {
-    CurrentColumn = Display::getInstance().indexToColumn(CurrentWordIndex) + CurrentWordLength;
-    CurrentRow = Display::getInstance().indexToRow(CurrentWordIndex);
+    current_column_ = Display::GetInstance().IndexToColumn(current_word_index_) + current_word_length_;
+    current_row_ = Display::GetInstance().IndexToRow(current_word_index_);
 
     do {
-        if(setNextWordToClearInColumn() == E_OK) { return E_OK; }
-        CurrentColumn = 0;
-    } while(setNextRowToClear() == E_OK);
+        if(SetNextWordToClearInColumn() == kEOk) { return kEOk; }
+        current_column_ = 0;
+    } while(SetNextRowToClear() == kEOk);
 
-    return E_NOT_OK;
+    return kENotOk;
 } /* setNextWordToClear */
 
 /******************************************************************************************************************************************************
   setNextWordToClearInColumn()
 ******************************************************************************************************************************************************/
-StdReturnType AnimationExplodeWords::setNextWordToClearInColumn()
+StdReturnType AnimationExplodeWords::SetNextWordToClearInColumn()
 {
-    for(; CurrentColumn < DISPLAY_NUMBER_OF_COLUMNS; CurrentColumn++) {
-        if(Display::getInstance().getPixel(CurrentColumn, CurrentRow)) {
-            CurrentWordIndex = Display::getInstance().columnAndRowToIndex(CurrentColumn, CurrentRow);
-            setWordLength();
-            return E_OK;
+    for(; current_column_ < DISPLAY_NUMBER_OF_COLUMNS; current_column_++) {
+        if(Display::GetInstance().GetPixel(current_column_, current_row_)) {
+            current_word_index_ = Display::GetInstance().ColumnAndRowToIndex(current_column_, current_row_);
+            SetWordLength();
+            return kEOk;
         }
     }
-    return E_NOT_OK;
+    return kENotOk;
 } /* setNextWordToClearInColumn */
 
 /******************************************************************************************************************************************************
   setRowNextToClear()
 ******************************************************************************************************************************************************/
-StdReturnType AnimationExplodeWords::setNextRowToClear()
+StdReturnType AnimationExplodeWords::SetNextRowToClear()
 {
-    if(CurrentRow > 0 && CurrentRow < DISPLAY_NUMBER_OF_ROWS) {
-        if(CurrentRow >= RowCenter) { CurrentRow = DISPLAY_NUMBER_OF_ROWS - CurrentRow - 1u; }
-        else { CurrentRow = DISPLAY_NUMBER_OF_ROWS - CurrentRow; }
-        return E_OK;
+    if(current_row_ > 0 && current_row_ < DISPLAY_NUMBER_OF_ROWS) {
+        if(current_row_ >= kRowCenter) { current_row_ = DISPLAY_NUMBER_OF_ROWS - current_row_ - 1u; }
+        else { current_row_ = DISPLAY_NUMBER_OF_ROWS - current_row_; }
+        return kEOk;
     } else {
-        return E_NOT_OK;
+        return kENotOk;
     }
 } /* setRowNextToClear */
 
 /******************************************************************************************************************************************************
   setNextWordToSet()
 ******************************************************************************************************************************************************/
-StdReturnType AnimationExplodeWords::setNextWordToSet()
+StdReturnType AnimationExplodeWords::SetNextWordToSet()
 {
-    for(byte index = ClockWordsTableIndex + 1u; index < ClockWordsTable.size(); index++) {
-        if(ClockWordsTable[index] != DisplayWords::WORD_NONE) {
-            ClockWordsTableIndex = index;
-            setWordToSet(ClockWordsTable[ClockWordsTableIndex]);
-            return E_OK;
+    for(byte index = clock_words_table_index_ + 1u; index < clock_words_table_.size(); index++) {
+        if(clock_words_table_[index] != DisplayWords::kWordNone) {
+            clock_words_table_index_ = index;
+            SetWordToSet(clock_words_table_[clock_words_table_index_]);
+            return kEOk;
         }
     }
-    return E_NOT_OK;
+    return kENotOk;
 } /* setNextWordToSet */
 
 /******************************************************************************************************************************************************
   setWordToSet()
 ******************************************************************************************************************************************************/
-void AnimationExplodeWords::setWordToSet(DisplayWords::WordIdType WordId)
+void AnimationExplodeWords::SetWordToSet(DisplayWords::WordIdType word_id)
 {
-    setWordIndex(WordId);
-    CurrentWordLength = Words.getDisplayWordLength(WordId);
-    CurrentColumn = getClearFinalColumn();
-    CurrentRow = getClearFinalRow();
+    SetWordIndex(word_id);
+    current_word_length_ = words_.GetDisplayWordLength(word_id);
+    current_column_ = GetClearFinalColumn();
+    current_row_ = GetClearFinalRow();
 } /* setWordToSet */
 
 /******************************************************************************************************************************************************
   setWordIndex()
 ******************************************************************************************************************************************************/
-void AnimationExplodeWords::setWordIndex(DisplayWords::WordIdType WordId)
+void AnimationExplodeWords::SetWordIndex(DisplayWords::WordIdType word_id)
 {
-    byte column = Words.getDisplayWordColumn(WordId);
-    byte row = Words.getDisplayWordRow(WordId);
-    CurrentWordIndex = Display::getInstance().columnAndRowToIndex(column, row);
+    byte column = words_.GetDisplayWordColumn(word_id);
+    byte row = words_.GetDisplayWordRow(word_id);
+    current_word_index_ = Display::GetInstance().ColumnAndRowToIndex(column, row);
 } /* setWordIndex */
 
 /******************************************************************************************************************************************************
   setWordLength()
 ******************************************************************************************************************************************************/
-void AnimationExplodeWords::setWordLength()
+void AnimationExplodeWords::SetWordLength()
 {
-    CurrentWordLength = 1u;
+    current_word_length_ = 1u;
 
-    for(byte index = CurrentWordIndex + 1u; index < DISPLAY_NUMBER_OF_PIXELS; index++) {
-        if(Display::getInstance().getPixel(index)) {
-            CurrentWordLength++;
+    for(byte index = current_word_index_ + 1u; index < DISPLAY_NUMBER_OF_PIXELS; index++) {
+        if(Display::GetInstance().GetPixel(index)) {
+            current_word_length_++;
         } else {
             break;
         }

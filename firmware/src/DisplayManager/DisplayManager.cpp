@@ -52,16 +52,16 @@
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-void DisplayManager::task()
+void DisplayManager::Task()
 {
-    Display::getInstance().applyBrightness();
+    Display::GetInstance().ApplyBrightness();
 
-    ClockTime time = RealTimeClock::getInstance().getTime();
+    ClockTime time = RealTimeClock::GetInstance().GetTime();
 
     /* An overlay owns the display while it shows: Text draws its letters there and the
        clock must not write over them. */
-    if(isOverlayShowing()) {
-        OverlayWasShowing = true;
+    if(IsOverlayShowing()) {
+        overlay_was_showing_ = true;
         return;
     }
 
@@ -69,15 +69,15 @@ void DisplayManager::task()
        to idle only stops the Text — so without this the grid would keep the last
        overlay frame until the next word change, which can be nearly five minutes away.
        Updating LastClockWords keeps that change from drawing a second time. */
-    if(OverlayWasShowing) {
-        OverlayWasShowing = false;
-        updateClockWords(time.getHour(), time.getMinute());
-        showClock(time.getHour(), time.getMinute());
+    if(overlay_was_showing_) {
+        overlay_was_showing_ = false;
+        UpdateClockWords(time.GetHour(), time.GetMinute());
+        ShowClock(time.GetHour(), time.GetMinute());
         return;
     }
 
-    if(updateClockWords(time.getHour(), time.getMinute())) {
-        taskClockWordsChange(time.getHour(), time.getMinute());
+    if(UpdateClockWords(time.GetHour(), time.GetMinute())) {
+        TaskClockWordsChange(time.GetHour(), time.GetMinute());
     }
 } /* task */
 

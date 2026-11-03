@@ -37,12 +37,12 @@
 ******************************************************************************************************************************************************/
 BEGIN_EVENT_TABLE(MessageBuilder, wxDialog)
     EVT_CLOSE(MessageBuilder::OnClose)
-    EVT_COMBOBOX(ID_CHOICE_COMMAND, MessageBuilder::OnCommand)
-    EVT_BUTTON(ID_BUTTON_INSERT, MessageBuilder::OnInsert)
+    EVT_COMBOBOX(kIdChoiceCommand, MessageBuilder::OnCommand)
+    EVT_BUTTON(kIdButtonInsert, MessageBuilder::OnInsert)
     /* All option rows share one handler; the preview does not care which of them moved. */
-    EVT_COMMAND_RANGE(ID_CHECKBOX_OPTION_FIRST, ID_CHECKBOX_OPTION_LAST, wxEVT_CHECKBOX, MessageBuilder::OnOptionUsed)
-    EVT_COMMAND_RANGE(ID_TEXT_OPTION_FIRST, ID_TEXT_OPTION_LAST, wxEVT_TEXT, MessageBuilder::OnOptionChanged)
-    EVT_COMMAND_RANGE(ID_CHOICE_OPTION_FIRST, ID_CHOICE_OPTION_LAST, wxEVT_COMBOBOX, MessageBuilder::OnOptionChanged)
+    EVT_COMMAND_RANGE(kIdCheckboxOptionFirst, kIdCheckboxOptionLast, wxEVT_CHECKBOX, MessageBuilder::OnOptionUsed)
+    EVT_COMMAND_RANGE(kIdTextOptionFirst, kIdTextOptionLast, wxEVT_TEXT, MessageBuilder::OnOptionChanged)
+    EVT_COMMAND_RANGE(kIdChoiceOptionFirst, kIdChoiceOptionLast, wxEVT_COMBOBOX, MessageBuilder::OnOptionChanged)
 END_EVENT_TABLE()
 
 
@@ -58,9 +58,9 @@ MessageBuilder::MessageBuilder(wxWindow* parent, const wxString &title) : wxDial
     /* Not SetSizerAndFit(): that also pins the minimum size to the height fitted here,
        and the window then cannot shrink again when a command with fewer options is
        picked. showOptionsOfSelectedCommand() sizes it instead, on every change. */
-    SetSizer(createSizerAll(this));
+    SetSizer(CreateSizerAll(this));
 
-    showOptionsOfSelectedCommand();
+    ShowOptionsOfSelectedCommand();
     CentreOnParent();
 }
 
@@ -81,57 +81,57 @@ MessageBuilder::~MessageBuilder()
 /******************************************************************************************************************************************************
   createSizerAll()
 ******************************************************************************************************************************************************/
-wxBoxSizer* MessageBuilder::createSizerAll(wxWindow* Parent)
+wxBoxSizer* MessageBuilder::CreateSizerAll(wxWindow* parent)
 {
-    wxStaticBox* StaticBox = new wxStaticBox(Parent, ID_STATIC_BOX_MESSAGE, _T("Command"));
-    wxStaticBoxSizer* SizerAll = new wxStaticBoxSizer(StaticBox, wxVERTICAL);
+    wxStaticBox* static_box = new wxStaticBox(parent, kIdStaticBoxMessage, _T("Command"));
+    wxStaticBoxSizer* sizer_all = new wxStaticBoxSizer(static_box, wxVERTICAL);
 
     /* wxCB_READONLY so it behaves as the wxChoice it replaces: pick from the list, do not
        type into it. */
-    CommandChoice = new wxOwnerDrawnComboBox(Parent, ID_CHOICE_COMMAND, wxEmptyString,
+    command_choice_ = new wxOwnerDrawnComboBox(parent, kIdChoiceCommand, wxEmptyString,
                                              wxDefaultPosition, wxDefaultSize,
                                              0, nullptr, wxCB_READONLY);
-    CommandChoice->SetPopupMaxHeight(PopupMaxHeight);
-    for(byte Index = 0u; Index < MessageCatalog::getNumberOfCommands(); Index++) {
-        const MessageCatalog::CommandType& Command = MessageCatalog::getCommand(Index);
-        CommandChoice->Append(wxString::Format(wxT("%u  %s"), Command.Number, Command.Label));
+    command_choice_->SetPopupMaxHeight(kPopupMaxHeight);
+    for(byte index = 0u; index < MessageCatalog::GetNumberOfCommands(); index++) {
+        const MessageCatalog::CommandType& command = MessageCatalog::GetCommand(index);
+        command_choice_->Append(wxString::Format(wxT("%u  %s"), command.number, command.label));
     }
-    CommandChoice->SetSelection(0);
+    command_choice_->SetSelection(0);
 
-    SizerAll->Add(CommandChoice, 0, wxALL | wxEXPAND, Border);
+    sizer_all->Add(command_choice_, 0, wxALL | wxEXPAND, kBorder);
 
     /* Every row is built once, for the command with the longest option list, and later
        only shown or hidden. Creating and destroying them per selection would be the same
        widgets over and over, with more to go wrong. */
-    for(byte Index = 0u; Index < MESSAGE_CATALOG_MAX_NUMBER_OF_OPTIONS; Index++) {
-        wxBoxSizer* SizerOption = new wxBoxSizer(wxHORIZONTAL);
+    for(byte index = 0u; index < MESSAGE_CATALOG_MAX_NUMBER_OF_OPTIONS; index++) {
+        wxBoxSizer* sizer_option = new wxBoxSizer(wxHORIZONTAL);
 
-        OptionRows[Index].Use = new wxCheckBox(Parent, ID_CHECKBOX_OPTION_FIRST + Index, _T(""));
-        OptionRows[Index].Value = new wxTextCtrl(Parent, ID_TEXT_OPTION_FIRST + Index, _T(""),
-                                                 wxDefaultPosition, wxSize(ValueWidth, -1));
-        OptionRows[Index].Choice = new wxOwnerDrawnComboBox(Parent, ID_CHOICE_OPTION_FIRST + Index,
+        option_rows_[index].use = new wxCheckBox(parent, kIdCheckboxOptionFirst + index, _T(""));
+        option_rows_[index].value = new wxTextCtrl(parent, kIdTextOptionFirst + index, _T(""),
+                                                 wxDefaultPosition, wxSize(kValueWidth, -1));
+        option_rows_[index].choice = new wxOwnerDrawnComboBox(parent, kIdChoiceOptionFirst + index,
                                                             wxEmptyString, wxDefaultPosition,
-                                                            wxSize(ChoiceWidth, -1),
+                                                            wxSize(kChoiceWidth, -1),
                                                             0, nullptr, wxCB_READONLY);
-        OptionRows[Index].Choice->SetPopupMaxHeight(PopupMaxHeight);
+        option_rows_[index].choice->SetPopupMaxHeight(kPopupMaxHeight);
 
-        SizerOption->Add(OptionRows[Index].Use, 1, wxALIGN_CENTER_VERTICAL);
-        SizerOption->Add(OptionRows[Index].Value, 0, wxALIGN_CENTER_VERTICAL);
-        SizerOption->Add(OptionRows[Index].Choice, 0, wxALIGN_CENTER_VERTICAL);
+        sizer_option->Add(option_rows_[index].use, 1, wxALIGN_CENTER_VERTICAL);
+        sizer_option->Add(option_rows_[index].value, 0, wxALIGN_CENTER_VERTICAL);
+        sizer_option->Add(option_rows_[index].choice, 0, wxALIGN_CENTER_VERTICAL);
 
-        SizerAll->Add(SizerOption, 0, wxLEFT | wxRIGHT | wxBOTTOM | wxEXPAND, Border);
+        sizer_all->Add(sizer_option, 0, wxLEFT | wxRIGHT | wxBOTTOM | wxEXPAND, kBorder);
     }
 
-    wxStaticText* PreviewLabel = new wxStaticText(Parent, wxID_ANY, _T("Message"));
-    Preview = new wxTextCtrl(Parent, ID_TEXT_CTRL_PREVIEW, _T(""), wxDefaultPosition,
-                             wxSize(PreviewWidth, -1), wxTE_READONLY);
-    wxButton* Insert = new wxButton(Parent, ID_BUTTON_INSERT, wxT("&Insert"));
+    wxStaticText* preview_label = new wxStaticText(parent, wxID_ANY, _T("Message"));
+    preview_ = new wxTextCtrl(parent, kIdTextCtrlPreview, _T(""), wxDefaultPosition,
+                             wxSize(kPreviewWidth, -1), wxTE_READONLY);
+    wxButton* insert = new wxButton(parent, kIdButtonInsert, wxT("&Insert"));
 
-    SizerAll->Add(PreviewLabel, 0, wxLEFT | wxRIGHT, Border);
-    SizerAll->Add(Preview, 0, wxALL | wxEXPAND, Border);
-    SizerAll->Add(Insert, 0, wxLEFT | wxRIGHT | wxBOTTOM | wxEXPAND, Border);
+    sizer_all->Add(preview_label, 0, wxLEFT | wxRIGHT, kBorder);
+    sizer_all->Add(preview_, 0, wxALL | wxEXPAND, kBorder);
+    sizer_all->Add(insert, 0, wxLEFT | wxRIGHT | wxBOTTOM | wxEXPAND, kBorder);
 
-    return SizerAll;
+    return sizer_all;
 } /* createSizerAll */
 
 
@@ -146,53 +146,53 @@ wxBoxSizer* MessageBuilder::createSizerAll(wxWindow* Parent)
  *
  *  \return         -
 ******************************************************************************************************************************************************/
-void MessageBuilder::showOptionsOfSelectedCommand()
+void MessageBuilder::ShowOptionsOfSelectedCommand()
 {
-    const MessageCatalog::CommandType& Command = getSelectedCommand();
+    const MessageCatalog::CommandType& command = GetSelectedCommand();
 
-    for(byte Index = 0u; Index < MESSAGE_CATALOG_MAX_NUMBER_OF_OPTIONS; Index++) {
-        const bool Exists = Index < Command.NumberOfOptions;
+    for(byte index = 0u; index < MESSAGE_CATALOG_MAX_NUMBER_OF_OPTIONS; index++) {
+        const bool exists = index < command.number_of_options;
         /* A read-only field is answered, never sent, so it gets no row of its own. Its
            name is still in the catalog, which is what lets the decoder put a label on it
            when the answer comes back. */
-        const bool Used = Exists && !Command.Options[Index].ReadOnly;
+        const bool used = exists && !command.options[index].read_only;
 
-        bool Named = false;
+        bool named = false;
 
         /* Cleared for every option this command has, not only for the ones that get a row:
            a checkbox left ticked from a previous command would otherwise put its option
            into the message although nothing shows it. */
-        if(Exists) { OptionRows[Index].Use->SetValue(false); }
+        if(exists) { option_rows_[index].use->SetValue(false); }
 
-        if(Used) {
-            const MessageCatalog::OptionType& Option = Command.Options[Index];
-            Named = Option.ValueNames != nullptr;
+        if(used) {
+            const MessageCatalog::OptionType& option = command.options[index];
+            named = option.value_names != nullptr;
 
-            OptionRows[Index].Use->SetLabel(wxString::Format(wxT("-%c  %s"), Option.ShortName, Option.Label));
+            option_rows_[index].use->SetLabel(wxString::Format(wxT("-%c  %s"), option.short_name, option.label));
 
-            if(Named) {
-                OptionRows[Index].Choice->Clear();
-                for(byte Name = 0u; Name < Option.NumberOfValueNames; Name++) {
-                    OptionRows[Index].Choice->Append(wxString::Format(wxT("%u  %s"),
-                                                                      Option.Minimum + Name,
-                                                                      Option.ValueNames[Name]));
+            if(named) {
+                option_rows_[index].choice->Clear();
+                for(byte name = 0u; name < option.number_of_value_names; name++) {
+                    option_rows_[index].choice->Append(wxString::Format(wxT("%u  %s"),
+                                                                      option.minimum + name,
+                                                                      option.value_names[name]));
                 }
-                OptionRows[Index].Choice->SetSelection(0);
+                option_rows_[index].choice->SetSelection(0);
             } else {
-                OptionRows[Index].Value->ChangeValue(_T(""));
-                if(Option.Argument == MessageCatalog::ARGUMENT_TYPE_STRING) {
-                    OptionRows[Index].Value->SetHint(_T("text"));
+                option_rows_[index].value->ChangeValue(_T(""));
+                if(option.argument == MessageCatalog::kArgumentTypeString) {
+                    option_rows_[index].value->SetHint(_T("text"));
                 } else {
-                    OptionRows[Index].Value->SetHint(wxString::Format(wxT("%u..%u"), Option.Minimum, Option.Maximum));
+                    option_rows_[index].value->SetHint(wxString::Format(wxT("%u..%u"), option.minimum, option.maximum));
                 }
             }
         }
 
-        OptionRows[Index].Use->Show(Used);
-        OptionRows[Index].Value->Show(Used && !Named);
-        OptionRows[Index].Choice->Show(Used && Named);
+        option_rows_[index].use->Show(used);
+        option_rows_[index].value->Show(used && !named);
+        option_rows_[index].choice->Show(used && named);
         /* Every row starts unticked, so every argument starts greyed out. */
-        enableOptionValue(Index, false);
+        EnableOptionValue(index, false);
     }
 
     /* Resizes the window to the rows that are left and moves its minimum along, so it
@@ -200,7 +200,7 @@ void MessageBuilder::showOptionsOfSelectedCommand()
        option list would leave a command with one option above 360 pixels of nothing. */
     Layout();
     GetSizer()->SetSizeHints(this);
-    updatePreview();
+    UpdatePreview();
 } /* showOptionsOfSelectedCommand */
 
 
@@ -214,29 +214,29 @@ void MessageBuilder::showOptionsOfSelectedCommand()
  *
  *  \return         the message, without the newline the Serial shim adds when it is sent
 ******************************************************************************************************************************************************/
-wxString MessageBuilder::buildMessage() const
+wxString MessageBuilder::BuildMessage() const
 {
-    const MessageCatalog::CommandType& Command = getSelectedCommand();
-    wxString Message = wxString::Format(wxT("%u"), Command.Number);
+    const MessageCatalog::CommandType& command = GetSelectedCommand();
+    wxString message = wxString::Format(wxT("%u"), command.number);
 
-    for(byte Index = 0u; Index < Command.NumberOfOptions; Index++) {
-        if(!OptionRows[Index].Use->IsChecked()) { continue; }
+    for(byte index = 0u; index < command.number_of_options; index++) {
+        if(!option_rows_[index].use->IsChecked()) { continue; }
 
-        const MessageCatalog::OptionType& Option = Command.Options[Index];
-        wxString Argument;
+        const MessageCatalog::OptionType& option = command.options[index];
+        wxString argument;
 
-        if(Option.ValueNames != nullptr) {
+        if(option.value_names != nullptr) {
             /* The names run upwards from Minimum, so the position in the dropdown is the
                offset from it — what goes on the wire stays the number. */
-            Argument = wxString::Format(wxT("%u"), Option.Minimum + OptionRows[Index].Choice->GetSelection());
+            argument = wxString::Format(wxT("%u"), option.minimum + option_rows_[index].choice->GetSelection());
         } else {
-            Argument = OptionRows[Index].Value->GetValue();
+            argument = option_rows_[index].value->GetValue();
         }
 
-        Message += wxString::Format(wxT(" -%c%s"), Option.ShortName, Argument);
+        message += wxString::Format(wxT(" -%c%s"), option.short_name, argument);
     }
 
-    return Message;
+    return message;
 } /* buildMessage */
 
 
@@ -245,7 +245,7 @@ wxString MessageBuilder::buildMessage() const
 ******************************************************************************************************************************************************/
 void MessageBuilder::OnCommand(wxCommandEvent &event)
 {
-    showOptionsOfSelectedCommand();
+    ShowOptionsOfSelectedCommand();
     UNUSED(event);
 } /* OnCommand */
 
@@ -261,10 +261,10 @@ void MessageBuilder::OnCommand(wxCommandEvent &event)
 ******************************************************************************************************************************************************/
 void MessageBuilder::OnOptionUsed(wxCommandEvent &event)
 {
-    const byte Index = static_cast<byte>(event.GetId() - ID_CHECKBOX_OPTION_FIRST);
+    const byte index = static_cast<byte>(event.GetId() - kIdCheckboxOptionFirst);
 
-    enableOptionValue(Index, OptionRows[Index].Use->IsChecked());
-    updatePreview();
+    EnableOptionValue(index, option_rows_[index].use->IsChecked());
+    UpdatePreview();
 } /* OnOptionUsed */
 
 
@@ -273,7 +273,7 @@ void MessageBuilder::OnOptionUsed(wxCommandEvent &event)
 ******************************************************************************************************************************************************/
 void MessageBuilder::OnOptionChanged(wxCommandEvent &event)
 {
-    updatePreview();
+    UpdatePreview();
     UNUSED(event);
 } /* OnOptionChanged */
 
@@ -292,7 +292,7 @@ void MessageBuilder::OnOptionChanged(wxCommandEvent &event)
 ******************************************************************************************************************************************************/
 void MessageBuilder::OnInsert(wxCommandEvent &event)
 {
-    SerialShim::getInstance().setInput(buildMessage());
+    SerialShim::GetInstance().SetInput(BuildMessage());
     Hide();
     UNUSED(event);
 } /* OnInsert */

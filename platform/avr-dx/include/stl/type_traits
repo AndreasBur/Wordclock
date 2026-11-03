@@ -32,8 +32,9 @@
 #define _STL_TYPE_TRAITS_
 
 /* On this toolchain these headers are the standard library, see type_traits, so declaring
-   into std is what they exist to do. */
-// NOLINTBEGIN(cert-dcl58-cpp)
+   into std is what they exist to do - and under the standard's names, which is what the
+   naming check is told here. */
+// NOLINTBEGIN(cert-dcl58-cpp,readability-identifier-naming)
 namespace std {
 
 template<class T, T v> struct integral_constant {
@@ -99,7 +100,7 @@ template<class T> struct is_signed : integral_constant<bool, is_integral<T>::val
 template<class T> struct is_unsigned : integral_constant<bool, is_integral<T>::value && (T(0) < T(-1))> { };
 
 } // namespace std
-// NOLINTEND(cert-dcl58-cpp)
+// NOLINTEND(cert-dcl58-cpp,readability-identifier-naming)
 
 #endif // _STL_TYPE_TRAITS_
 

@@ -1,5 +1,7 @@
 #ifndef _LITTLEFS_H_
 #define _LITTLEFS_H_
+/* Under the framework's names, because it stands in for the framework's header. */
+// NOLINTBEGIN(readability-identifier-naming)
 #include <stddef.h>
 #include <stdint.h>
 #include <cstring>
@@ -94,4 +96,5 @@ struct LittleFSStub {
     }
 };
 extern LittleFSStub LittleFS;
+// NOLINTEND(readability-identifier-naming)
 #endif

@@ -65,76 +65,76 @@ class WebHost
 #ifdef _WIN32
     /* What winsock2.h calls SOCKET, spelled out so that this header need not include it. */
     using SocketType = uintptr_t;
-    static constexpr SocketType InvalidSocket{~SocketType{0u}};
+    static constexpr SocketType kInvalidSocket{~SocketType{0u}};
 #else
     using SocketType = int;
-    static constexpr SocketType InvalidSocket{-1};
+    static constexpr SocketType kInvalidSocket{-1};
 #endif
 
-    static constexpr int Backlog{4};
-    static constexpr size_t RequestChunkLength{4096u};
-    static constexpr size_t FrameChunkLength{2048u};
-    static constexpr unsigned RequestTimeoutMs{100u};
-    static constexpr unsigned BodyTimeoutMs{2000u};
-    static constexpr char WebSocketPath[]{"/ws"};
-    static constexpr char UpdateRequestLine[]{"POST /update "};
-    static constexpr char LengthHeader[]{"content-length:"};
+    static constexpr int kBacklog{4};
+    static constexpr size_t kRequestChunkLength{4096u};
+    static constexpr size_t kFrameChunkLength{2048u};
+    static constexpr unsigned kRequestTimeoutMs{100u};
+    static constexpr unsigned kBodyTimeoutMs{2000u};
+    static constexpr char kWebSocketPath[]{"/ws"};
+    static constexpr char kUpdateRequestLine[]{"POST /update "};
+    static constexpr char kLengthHeader[]{"content-length:"};
 
     /* A slot holds a connection that has finished its handshake and is being broadcast to.
        Anything before that is a request being read and is gone by the end of the tick that
        read it. */
-    SocketType Listener{InvalidSocket};
-    SocketType Clients[WEB_HOST_MAX_CLIENTS];
-    std::string Pending[WEB_HOST_MAX_CLIENTS];
+    SocketType listener_{kInvalidSocket};
+    SocketType clients_[WEB_HOST_MAX_CLIENTS];
+    std::string pending_[WEB_HOST_MAX_CLIENTS];
 
     WebHost();
 
-    void acceptClients();
-    void readClient(size_t);
-    size_t findFreeSlot() const;
-    void dropClient(size_t);
-    static bool serveConnection(SocketType);
-    static bool answerRequest(SocketType, const std::string&);
-    static void answerUpdate(SocketType, size_t);
-    static StdReturnType sendAsset(SocketType, const std::string&);
-    static SocketType openListener();
-    static std::string readRequest(SocketType);
-    static StdReturnType getPath(const std::string&, std::string&);
-    static bool isUpdateRequest(const std::string&);
-    static size_t getAnnouncedLength(const std::string&);
-    static size_t getArrivedBodyLength(const std::string&);
-    static size_t drainBody(SocketType, size_t, size_t);
-    static void setNonBlocking(SocketType);
-    static void setBlocking(SocketType);
-    static void setReceiveTimeout(SocketType, unsigned);
-    static bool sendAll(SocketType, const char*, size_t);
-    static void sendLineToClients(const char*);
+    void AcceptClients();
+    void ReadClient(size_t);
+    size_t FindFreeSlot() const;
+    void DropClient(size_t);
+    static bool ServeConnection(SocketType);
+    static bool AnswerRequest(SocketType, const std::string&);
+    static void AnswerUpdate(SocketType, size_t);
+    static StdReturnType SendAsset(SocketType, const std::string&);
+    static SocketType OpenListener();
+    static std::string ReadRequest(SocketType);
+    static StdReturnType GetPath(const std::string&, std::string&);
+    static bool IsUpdateRequest(const std::string&);
+    static size_t GetAnnouncedLength(const std::string&);
+    static size_t GetArrivedBodyLength(const std::string&);
+    static size_t DrainBody(SocketType, size_t, size_t);
+    static void SetNonBlocking(SocketType);
+    static void SetBlocking(SocketType);
+    static void SetReceiveTimeout(SocketType, unsigned);
+    static bool SendAll(SocketType, const char*, size_t);
+    static void SendLineToClients(const char*);
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    static WebHost& getInstance();
+    static WebHost& GetInstance();
 
     /* Opens the listening socket and takes over the output lines. Answers E_NOT_OK when the
        port is taken, which leaves the simulator running exactly as it did before - a window
        and no browsers, which is what it was until now. */
-    StdReturnType begin();
+    StdReturnType Begin();
 
     /* Accepts what has arrived and answers it. Called from the firmware's tick. */
-    void task();
+    void Task();
 
     /* Closes every socket, for the way out. */
-    void end();
+    void End();
 
     /* What WebTransport is implemented in terms of. */
-    bool isListening() const;
-    bool hasClients() const;
-    void sendToEveryClient(bool IsBinary, const char* Payload, size_t Length);
+    bool IsListening() const;
+    bool HasClients() const;
+    void SendToEveryClient(bool is_binary, const char* payload, size_t length);
 
     /* What WebResponseBody is implemented in terms of. */
-    static void sendResponse(SocketType Socket, const char* Status, const char* ContentType,
-                             const char* Body, size_t Length, bool IsGzipped);
+    static void SendResponse(SocketType socket, const char* status, const char* content_type,
+                             const char* body, size_t length, bool is_gzipped);
 };
 
 #endif // _WEB_HOST_H_

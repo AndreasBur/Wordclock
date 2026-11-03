@@ -49,25 +49,25 @@
  *
  *  \return         E_OK if exactly Size bytes were read
 ******************************************************************************************************************************************************/
-StdReturnType Storage::read(byte* Buffer, size_t Size) const
+StdReturnType Storage::Read(byte* buffer, size_t size) const
 {
-    if((Buffer == nullptr) || (Size == 0u) || (Size > Capacity)) { return E_NOT_OK; }
+    if((buffer == nullptr) || (size == 0u) || (size > kCapacity)) { return kENotOk; }
 
-    Preferences Store;
-    if(!Store.begin(STORAGE_NAMESPACE, true)) { return E_NOT_OK; }
+    Preferences store;
+    if(!store.begin(STORAGE_NAMESPACE, true)) { return kENotOk; }
 
-    const size_t StoredSize = Store.getBytesLength(STORAGE_KEY);
-    if(StoredSize != Size) {
-        Store.end();
-        return E_NOT_OK;
+    const size_t stored_size = store.getBytesLength(STORAGE_KEY);
+    if(stored_size != size) {
+        store.end();
+        return kENotOk;
     }
 
-    const size_t Read = Store.getBytes(STORAGE_KEY, Buffer, Size);
-    Store.end();
+    const size_t read = store.getBytes(STORAGE_KEY, buffer, size);
+    store.end();
 
-    if(Read != Size) { return E_NOT_OK; }
+    if(read != size) { return kENotOk; }
 
-    return E_OK;
+    return kEOk;
 } /* read */
 
 
@@ -78,19 +78,19 @@ StdReturnType Storage::read(byte* Buffer, size_t Size) const
  *
  *  \return         E_OK if the whole blob was stored
 ******************************************************************************************************************************************************/
-StdReturnType Storage::write(const byte* Buffer, size_t Size)
+StdReturnType Storage::Write(const byte* buffer, size_t size)
 {
-    if((Buffer == nullptr) || (Size == 0u) || (Size > Capacity)) { return E_NOT_OK; }
+    if((buffer == nullptr) || (size == 0u) || (size > kCapacity)) { return kENotOk; }
 
-    Preferences Store;
-    if(!Store.begin(STORAGE_NAMESPACE, false)) { return E_NOT_OK; }
+    Preferences store;
+    if(!store.begin(STORAGE_NAMESPACE, false)) { return kENotOk; }
 
-    const size_t Written = Store.putBytes(STORAGE_KEY, Buffer, Size);
-    Store.end();
+    const size_t written = store.putBytes(STORAGE_KEY, buffer, size);
+    store.end();
 
-    if(Written != Size) { return E_NOT_OK; }
+    if(written != size) { return kENotOk; }
 
-    return E_OK;
+    return kEOk;
 } /* write */
 
 
@@ -103,18 +103,18 @@ StdReturnType Storage::write(const byte* Buffer, size_t Size)
  *
  *  \return         E_OK if nothing is stored afterwards
 ******************************************************************************************************************************************************/
-StdReturnType Storage::clear()
+StdReturnType Storage::Clear()
 {
-    Preferences Store;
-    if(!Store.begin(STORAGE_NAMESPACE, false)) { return E_NOT_OK; }
+    Preferences store;
+    if(!store.begin(STORAGE_NAMESPACE, false)) { return kENotOk; }
 
-    const bool WasRemoved = Store.remove(STORAGE_KEY);
-    const bool WasEmpty = !Store.isKey(STORAGE_KEY);
-    Store.end();
+    const bool was_removed = store.remove(STORAGE_KEY);
+    const bool was_empty = !store.isKey(STORAGE_KEY);
+    store.end();
 
-    if(!WasRemoved && !WasEmpty) { return E_NOT_OK; }
+    if(!was_removed && !was_empty) { return kENotOk; }
 
-    return E_OK;
+    return kEOk;
 } /* clear */
 // NOLINTEND(readability-convert-member-functions-to-static)
 

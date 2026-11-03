@@ -75,8 +75,8 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
  *  P R O T E C T E D   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   protected:
-    static constexpr char OptionArgumentDelimiter{'='};
-    ErrorMessage Error;
+    static constexpr char kOptionArgumentDelimiter{'='};
+    ErrorMessage error_;
 
     /* Protected rather than private with the derived class as a friend, which is what
        clang-tidy asks for: a friend would open this base's whole private side to it, where
@@ -84,8 +84,8 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
        prevent - somebody inheriting this template with another class's Derived - the
        assertion catches instead, at the first point where Derived is a complete type. */
     // NOLINTNEXTLINE(bugprone-crtp-constructor-accessibility)
-    constexpr MsgParameterParser(const ParameterTableType& sParameterTable, const char* sParameter)
-    : Error(), ParameterBuffer(sParameter), ParameterTable(sParameterTable) {
+    constexpr MsgParameterParser(const ParameterTableType& parameter_table, const char* parameter)
+    : error_(), parameter_buffer_(parameter), parameter_table_(parameter_table) {
         static_assert(std::is_base_of<MsgParameterParser, Derived>::value,
                       "MsgParameterParser is a CRTP base: Derived has to be the class that inherits it");
     }
@@ -97,108 +97,108 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
 ******************************************************************************************************************************************************/
   private:
     enum StateType {
-        STATE_PARSE,
-        STATE_OPTION_START,
-        STATE_OPTION_CHAR,
-        STATE_OPTION_ARGUMENT
+        kStateParse,
+        kStateOptionStart,
+        kStateOptionChar,
+        kStateOptionArgument
     };
 
-    static constexpr char OptionStartChar{'-'};
-    static constexpr byte ArgumentNumberBase{10u};
+    static constexpr char kOptionStartChar{'-'};
+    static constexpr byte kArgumentNumberBase{10u};
 
-    const char* ParameterBuffer{nullptr};
-    const ParameterTableType& ParameterTable;
+    const char* parameter_buffer_{nullptr};
+    const ParameterTableType& parameter_table_;
 
     // functions
-    Derived& underlying() { return static_cast<Derived&>(*this); }
-    Derived const& underlying() const { return static_cast<Derived const&>(*this); }
+    Derived& Underlying() { return static_cast<Derived&>(*this); }
+    Derived const& Underlying() const { return static_cast<Derived const&>(*this); }
 
-    static bool isEndOfStringReached(char Char) {
-        return (Char == STD_NULL_CHARACTER) ||
-               (Char == Communication::getEndOfMessageChar() ||
-               (Char == OptionStartChar));
+    static bool IsEndOfStringReached(char character) {
+        return (character == STD_NULL_CHARACTER) ||
+               (character == Communication::GetEndOfMessageChar() ||
+               (character == kOptionStartChar));
     }
 
-    ParameterTableElementType getParameterTableElement(byte Index) const {
-        ParameterTableElementType parameterTableElement;
-        memcpy_P(&parameterTableElement, &ParameterTable[Index], sizeof(ParameterTableElementType));
-        return parameterTableElement;
+    ParameterTableElementType GetParameterTableElement(byte index) const {
+        ParameterTableElementType parameter_table_element;
+        memcpy_P(&parameter_table_element, &parameter_table_[index], sizeof(ParameterTableElementType));
+        return parameter_table_element;
     }
 
-    StdReturnType getMsgParameterByOptionShortName(char OptionShortName, ParameterTableElementType& Parameter) const {
-        for(size_t index = 0; index < ParameterTable.size(); index++) {
-            ParameterTableElementType parameterTableElement = getParameterTableElement(index);
-            if(parameterTableElement.getOptionShortName() == OptionShortName) {
-                Parameter = parameterTableElement;
-                return E_OK;
+    StdReturnType GetMsgParameterByOptionShortName(char option_short_name, ParameterTableElementType& parameter) const {
+        for(size_t index = 0; index < parameter_table_.size(); index++) {
+            ParameterTableElementType parameter_table_element = GetParameterTableElement(index);
+            if(parameter_table_element.GetOptionShortName() == option_short_name) {
+                parameter = parameter_table_element;
+                return kEOk;
             }
         }
-        return E_NOT_OK;
+        return kENotOk;
     }
 
-    PositionType parseArgument(MsgParameter Parameter, const char* Argument) {
+    PositionType ParseArgument(MsgParameter parameter, const char* argument) {
 # if (MSG_PARAMETER_PARSER_ARGUMENT_TYPE_CHAR == STD_ON)
-        if(Parameter.getArgumentType() == MsgParameter::ARGUMENT_TYPE_CHAR) { return convertArgument<char>(Parameter, Argument); }
+        if(parameter.GetArgumentType() == MsgParameter::kArgumentTypeChar) { return ConvertArgument<char>(parameter, argument); }
 # endif
 # if (MSG_PARAMETER_PARSER_ARGUMENT_TYPE_UINT8 == STD_ON)
-        if(Parameter.getArgumentType() == MsgParameter::ARGUMENT_TYPE_UINT8) { return convertArgument<uint8_t>(Parameter, Argument); }
+        if(parameter.GetArgumentType() == MsgParameter::kArgumentTypeUint8) { return ConvertArgument<uint8_t>(parameter, argument); }
 # endif
 # if (MSG_PARAMETER_PARSER_ARGUMENT_TYPE_UINT16 == STD_ON)
-        if(Parameter.getArgumentType() == MsgParameter::ARGUMENT_TYPE_UINT16) { return convertArgument<uint16_t>(Parameter, Argument); }
+        if(parameter.GetArgumentType() == MsgParameter::kArgumentTypeUint16) { return ConvertArgument<uint16_t>(parameter, argument); }
 # endif
 # if (MSG_PARAMETER_PARSER_ARGUMENT_TYPE_UINT32 == STD_ON)
-        if(Parameter.getArgumentType() == MsgParameter::ARGUMENT_TYPE_UINT32) { return convertArgument<uint32_t>(Parameter, Argument); }
+        if(parameter.GetArgumentType() == MsgParameter::kArgumentTypeUint32) { return ConvertArgument<uint32_t>(parameter, argument); }
 # endif
 # if (MSG_PARAMETER_PARSER_ARGUMENT_TYPE_UINT64 == STD_ON)
-        if(Parameter.getArgumentType() == MsgParameter::ARGUMENT_TYPE_UINT64) { return convertArgument<uint64_t>(Parameter, Argument); }
+        if(parameter.GetArgumentType() == MsgParameter::kArgumentTypeUint64) { return ConvertArgument<uint64_t>(parameter, argument); }
 # endif
 # if (MSG_PARAMETER_PARSER_ARGUMENT_TYPE_INT8 == STD_ON)
-        if(Parameter.getArgumentType() == MsgParameter::ARGUMENT_TYPE_INT8) { return convertArgument<int8_t>(Parameter, Argument); }
+        if(parameter.GetArgumentType() == MsgParameter::kArgumentTypeInt8) { return ConvertArgument<int8_t>(parameter, argument); }
 # endif
 # if (MSG_PARAMETER_PARSER_ARGUMENT_TYPE_INT16 == STD_ON)
-        if(Parameter.getArgumentType() == MsgParameter::ARGUMENT_TYPE_INT16) { return convertArgument<int16_t>(Parameter, Argument); }
+        if(parameter.GetArgumentType() == MsgParameter::kArgumentTypeInt16) { return ConvertArgument<int16_t>(parameter, argument); }
 # endif
 # if (MSG_PARAMETER_PARSER_ARGUMENT_TYPE_INT32 == STD_ON)
-        if(Parameter.getArgumentType() == MsgParameter::ARGUMENT_TYPE_INT32) { return convertArgument<int32_t>(Parameter, Argument); }
+        if(parameter.GetArgumentType() == MsgParameter::kArgumentTypeInt32) { return ConvertArgument<int32_t>(parameter, argument); }
 # endif
 # if (MSG_PARAMETER_PARSER_ARGUMENT_TYPE_INT64 == STD_ON)
-        if(Parameter.getArgumentType() == MsgParameter::ARGUMENT_TYPE_INT64) { return convertArgument<int64_t>(Parameter, Argument); }
+        if(parameter.GetArgumentType() == MsgParameter::kArgumentTypeInt64) { return ConvertArgument<int64_t>(parameter, argument); }
 # endif
 # if (MSG_PARAMETER_PARSER_ARGUMENT_TYPE_FLOAT == STD_ON)
-        if(Parameter.getArgumentType() == MsgParameter::ARGUMENT_TYPE_FLOAT) { return convertArgument<float>(Parameter, Argument); }
+        if(parameter.GetArgumentType() == MsgParameter::kArgumentTypeFloat) { return ConvertArgument<float>(parameter, argument); }
 # endif
 # if (MSG_PARAMETER_PARSER_ARGUMENT_TYPE_DOUBLE == STD_ON)
-        if(Parameter.getArgumentType() == MsgParameter::ARGUMENT_TYPE_DOUBLE) { return convertArgument<double>(Parameter, Argument); }
+        if(parameter.GetArgumentType() == MsgParameter::kArgumentTypeDouble) { return ConvertArgument<double>(parameter, argument); }
 # endif
 # if (MSG_PARAMETER_PARSER_ARGUMENT_TYPE_STRING == STD_ON)
-        if(Parameter.getArgumentType() == MsgParameter::ARGUMENT_TYPE_STRING) { return convertArgumentToString(Parameter, Argument); }
+        if(parameter.GetArgumentType() == MsgParameter::kArgumentTypeString) { return ConvertArgumentToString(parameter, argument); }
 # endif
         return 0u;
     }
 
-    template <typename T> PositionType convertArgument(MsgParameter Parameter, const char* Argument) {
+    template <typename T> PositionType ConvertArgument(MsgParameter parameter, const char* argument) {
         T value;
         PositionType position;
-        StringTools::ResultType result = StringTools::stringTo(Argument, position, value, ArgumentNumberBase);
-        handleConvertResult(Parameter, result);
-        if(result == StringTools::RESULT_OK) { underlying().handleParameter(Parameter.getOptionShortName(), value); }
+        StringTools::ResultType result = StringTools::StringTo(argument, position, value, kArgumentNumberBase);
+        HandleConvertResult(parameter, result);
+        if(result == StringTools::kResultOk) { Underlying().HandleParameter(parameter.GetOptionShortName(), value); }
         return position;
     }
 
-    PositionType convertArgumentToString(MsgParameter Parameter, const char* Argument) {
+    PositionType ConvertArgumentToString(MsgParameter parameter, const char* argument) {
         PositionType position = 0u;
-        while(!isEndOfStringReached(Argument[position])) { position++; }
+        while(!IsEndOfStringReached(argument[position])) { position++; }
         LengthType length = position + 1u;
-        underlying().handleParameter(Parameter.getOptionShortName(), Argument, length);
+        Underlying().HandleParameter(parameter.GetOptionShortName(), argument, length);
         return position;
     }
 
-    void handleConvertResult(MsgParameter Parameter, StringTools::ResultType Result) const {
-        if(Result == StringTools::RESULT_NO_VALUE) {
-            Error.send(Parameter, ErrorMessage::ERROR_NO_VALUE_GIVEN);
+    void HandleConvertResult(MsgParameter parameter, StringTools::ResultType result) const {
+        if(result == StringTools::kResultNoValue) {
+            error_.Send(parameter, ErrorMessage::kErrorNoValueGiven);
         }
-        if(Result == StringTools::RESULT_OVERFLOW) {
-            Error.send(Parameter, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNDS);
+        if(result == StringTools::kResultOverflow) {
+            error_.Send(parameter, ErrorMessage::kErrorValueOutOfBounds);
         }
     }
 
@@ -208,40 +208,40 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
   public:
 
     // get methods
-    const char* getParameter() const { return ParameterBuffer; }
-    const ParameterTableType& getParameterTable() const { return ParameterTable; }
+    const char* GetParameter() const { return parameter_buffer_; }
+    const ParameterTableType& GetParameterTable() const { return parameter_table_; }
 
     // set methods
 
     // methods
-    void parse()
+    void Parse()
     {
-        StateType state = STATE_PARSE;
-        char optionShortName;
+        StateType state = kStateParse;
+        char option_short_name;
 
-        for(PositionType position = 0u; ParameterBuffer[position] != STD_NULL_CHARACTER; position++) {
-            if(state == STATE_PARSE) {
-                char currentChar = ParameterBuffer[position];
-                if(currentChar == OptionStartChar) { state = STATE_OPTION_CHAR; }
-            } else if(state == STATE_OPTION_CHAR) {
-                optionShortName = ParameterBuffer[position];
-                state = STATE_OPTION_ARGUMENT;
-            } else if(state == STATE_OPTION_ARGUMENT) {
+        for(PositionType position = 0u; parameter_buffer_[position] != STD_NULL_CHARACTER; position++) {
+            if(state == kStateParse) {
+                char current_char = parameter_buffer_[position];
+                if(current_char == kOptionStartChar) { state = kStateOptionChar; }
+            } else if(state == kStateOptionChar) {
+                option_short_name = parameter_buffer_[position];
+                state = kStateOptionArgument;
+            } else if(state == kStateOptionArgument) {
                 ParameterTableElementType parameter;
-                if(getMsgParameterByOptionShortName(optionShortName, parameter) == E_OK) {
-                    position += parseArgument(parameter, &ParameterBuffer[position]) - 1u;
-                } else { Error.send(optionShortName, ErrorMessage::ERROR_PARAMETER_UNKNOWN); }
-                state = STATE_PARSE;
+                if(GetMsgParameterByOptionShortName(option_short_name, parameter) == kEOk) {
+                    position += ParseArgument(parameter, &parameter_buffer_[position]) - 1u;
+                } else { error_.Send(option_short_name, ErrorMessage::kErrorParameterUnknown); }
+                state = kStateParse;
             }
         }
     }
 
-    template <typename T> static void sendAnswerParameter(char OptionShortName, T Value, bool AppendSpace = true)
+    template <typename T> static void SendAnswerParameter(char option_short_name, T value, bool append_space = true)
     {
-        Serial.print(OptionShortName);
-        Serial.print(OptionArgumentDelimiter);
-        Serial.print(Value);
-        if(AppendSpace) { Serial.print(' '); }
+        Serial.print(option_short_name);
+        Serial.print(kOptionArgumentDelimiter);
+        Serial.print(value);
+        if(append_space) { Serial.print(' '); }
     }
 };
 

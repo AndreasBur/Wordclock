@@ -56,23 +56,23 @@ class Pixel
  *  P R I V A T E   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   private:
-    static constexpr byte NumberOfColors{3u};
-    using PixelRawType = std::array<byte, NumberOfColors>;
+    static constexpr byte kNumberOfColors{3u};
+    using PixelRawType = std::array<byte, kNumberOfColors>;
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    PixelRawType PixelRaw{0u, 0u, 0u};
+    PixelRawType pixel_raw_{0u, 0u, 0u};
 
-    static constexpr byte ColorMaxValue{255u};
-    static constexpr byte ColorOffsetRed{PIXEL_COLOR_OFFSET_RED};
-    static constexpr byte ColorOffsetGreen{PIXEL_COLOR_OFFSET_GREEN};
-    static constexpr byte ColorOffsetBlue{PIXEL_COLOR_OFFSET_BLUE};
+    static constexpr byte kColorMaxValue{255u};
+    static constexpr byte kColorOffsetRed{PIXEL_COLOR_OFFSET_RED};
+    static constexpr byte kColorOffsetGreen{PIXEL_COLOR_OFFSET_GREEN};
+    static constexpr byte kColorOffsetBlue{PIXEL_COLOR_OFFSET_BLUE};
 
     // functions
-    static constexpr ColorType dimmColor(ColorType Color, byte Brightness) {
-        return static_cast<ColorType>((static_cast<uint16_t>(Color) * (Brightness + 1u)) >> 8u);
+    static constexpr ColorType DimmColor(ColorType color, byte brightness) {
+        return static_cast<ColorType>((static_cast<uint16_t>(color) * (brightness + 1u)) >> 8u);
     }
 
 /******************************************************************************************************************************************************
@@ -88,46 +88,46 @@ class Pixel
        shown it either - it renders brightness, not hue. On the strip it swaps red and
        green. Keeping setPixel() as the only place that knows the layout is what stops
        that from coming back. */
-    constexpr Pixel(ColorType ColorRed, ColorType ColorGreen, ColorType ColorBlue) {
-        setPixel(ColorRed, ColorGreen, ColorBlue);
+    constexpr Pixel(ColorType color_red, ColorType color_green, ColorType color_blue) {
+        SetPixel(color_red, color_green, color_blue);
     }
     ~Pixel() { }
 
     // get methods
-    static constexpr byte getNumberOfColors() { return NumberOfColors; }
-    ColorType getRed() const { return PixelRaw[ColorOffsetRed]; }
-    ColorType getBlue() const { return PixelRaw[ColorOffsetBlue]; }
-    ColorType getGreen() const { return PixelRaw[ColorOffsetGreen]; }
+    static constexpr byte GetNumberOfColors() { return kNumberOfColors; }
+    ColorType GetRed() const { return pixel_raw_[kColorOffsetRed]; }
+    ColorType GetBlue() const { return pixel_raw_[kColorOffsetBlue]; }
+    ColorType GetGreen() const { return pixel_raw_[kColorOffsetGreen]; }
 
     // set methods
-    void setRed(ColorType Value) { PixelRaw[ColorOffsetRed] = Value; }
-    void setBlue(ColorType Value) { PixelRaw[ColorOffsetBlue] = Value; }
-    void setGreen(ColorType Value) { PixelRaw[ColorOffsetGreen] = Value; }
+    void SetRed(ColorType value) { pixel_raw_[kColorOffsetRed] = value; }
+    void SetBlue(ColorType value) { pixel_raw_[kColorOffsetBlue] = value; }
+    void SetGreen(ColorType value) { pixel_raw_[kColorOffsetGreen] = value; }
 
     /* constexpr so the constructor can use it, and thereby be the only place in the
        class that maps a colour name onto a raw index. */
-    constexpr void setPixel(ColorType Red, ColorType Green, ColorType Blue) {
-         PixelRaw[ColorOffsetRed] = Red;
-         PixelRaw[ColorOffsetBlue] = Blue;
-         PixelRaw[ColorOffsetGreen] = Green;
+    constexpr void SetPixel(ColorType red, ColorType green, ColorType blue) {
+         pixel_raw_[kColorOffsetRed] = red;
+         pixel_raw_[kColorOffsetBlue] = blue;
+         pixel_raw_[kColorOffsetGreen] = green;
     }
 
     // methods
-    void clearPixel() { setPixel(0u, 0u, 0u); }
+    void ClearPixel() { SetPixel(0u, 0u, 0u); }
 
     /* dimms all three colors, ColorMaxValue keeps the pixel unchanged. Dimms the
        color as a whole, so the hue is preserved and only the brightness changes. */
-    void dimmPixel(byte Brightness) {
-        setPixel(dimmColor(getRed(), Brightness), dimmColor(getGreen(), Brightness), dimmColor(getBlue(), Brightness));
+    void DimmPixel(byte brightness) {
+        SetPixel(DimmColor(GetRed(), brightness), DimmColor(GetGreen(), brightness), DimmColor(GetBlue(), brightness));
     }
 
-    void incrementRed() { if(PixelRaw[ColorOffsetRed] < ColorMaxValue) PixelRaw[ColorOffsetRed]++; }
-    void incrementGreen() { if(PixelRaw[ColorOffsetGreen] < ColorMaxValue) PixelRaw[ColorOffsetGreen]++; }
-    void incrementBlue() { if(PixelRaw[ColorOffsetBlue] < ColorMaxValue) PixelRaw[ColorOffsetBlue]++; }
+    void IncrementRed() { if(pixel_raw_[kColorOffsetRed] < kColorMaxValue) pixel_raw_[kColorOffsetRed]++; }
+    void IncrementGreen() { if(pixel_raw_[kColorOffsetGreen] < kColorMaxValue) pixel_raw_[kColorOffsetGreen]++; }
+    void IncrementBlue() { if(pixel_raw_[kColorOffsetBlue] < kColorMaxValue) pixel_raw_[kColorOffsetBlue]++; }
 
-    void decrementRed() { if(PixelRaw[ColorOffsetRed] > 0u) PixelRaw[ColorOffsetRed]--; }
-    void decrementGreen() { if(PixelRaw[ColorOffsetGreen] > 0u) PixelRaw[ColorOffsetGreen]--; }
-    void decrementBlue() { if(PixelRaw[ColorOffsetBlue] > 0u) PixelRaw[ColorOffsetBlue]--; }
+    void DecrementRed() { if(pixel_raw_[kColorOffsetRed] > 0u) pixel_raw_[kColorOffsetRed]--; }
+    void DecrementGreen() { if(pixel_raw_[kColorOffsetGreen] > 0u) pixel_raw_[kColorOffsetGreen]--; }
+    void DecrementBlue() { if(pixel_raw_[kColorOffsetBlue] > 0u) pixel_raw_[kColorOffsetBlue]--; }
 };
 
 #endif

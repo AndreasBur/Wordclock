@@ -60,21 +60,21 @@ class AnimationTeletype : public Animation
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    DisplayWords Words;
-    ClockWords::WordsListType ClockWordsTable{{DisplayWords::WORD_NONE}};
-    byte CurrentWordIndex{0u};
-    byte CurrentWordLength{0u};
-    byte CurrentCharIndex{0u};
+    DisplayWords words_;
+    ClockWords::WordsListType clock_words_table_{{DisplayWords::kWordNone}};
+    byte current_word_index_{0u};
+    byte current_word_length_{0u};
+    byte current_char_index_{0u};
 
     // functions
-    void reset();
-    StdReturnType setNextWordIndex();
+    void Reset();
+    StdReturnType SetNextWordIndex();
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr AnimationTeletype() : Words() { }
+    constexpr AnimationTeletype() : words_() { }
     ~AnimationTeletype() { }
 
     // get methods
@@ -82,9 +82,9 @@ class AnimationTeletype : public Animation
     // set methods
 
     // methods
-    void init();
-    StdReturnType setTime(byte, byte);
-    void task();
+    void Init();
+    StdReturnType SetTime(byte, byte);
+    void Task();
 };
 
 

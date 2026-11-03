@@ -49,11 +49,11 @@ class Animation
 ******************************************************************************************************************************************************/
   public:
     enum StateType {
-        STATE_NONE,
-        STATE_UNINIT,
-        STATE_IDLE,
-        STATE_CLEAR_TIME,
-        STATE_SET_TIME
+        kStateNone,
+        kStateUninit,
+        kStateIdle,
+        kStateClearTime,
+        kStateSetTime
     };
 
 /******************************************************************************************************************************************************
@@ -67,46 +67,46 @@ class Animation
 ******************************************************************************************************************************************************/
   protected:
     /* odd factor of the hash in selectByTime(), see there */
-    static constexpr byte SelectHashFactor{181u};
+    static constexpr byte kSelectHashFactor{181u};
 
-    StateType State{STATE_NONE};
+    StateType state_{kStateNone};
 
     // functions
-    void init(StateType sState) { State = sState; }
+    void Init(StateType state) { state_ = state; }
     /* Every animation whose set phase places the letters itself ends through one of
        these two instead of just going idle: drawing the target once more makes the last
        frame authoritative, so a pixel the animation skipped or hit twice cannot leave a
        word of the previous time behind. AnimationFade is the one animation outside this,
        because its set phase only ramps the brightness of letters already in place. */
-    void finishWithClockWords(const ClockWords::WordsListType& ClockWordsTable) {
-        Display::getInstance().clear();
-        Clock::getInstance().setTime(ClockWordsTable);
-        State = STATE_IDLE;
+    void FinishWithClockWords(const ClockWords::WordsListType& clock_words_table) {
+        Display::GetInstance().Clear();
+        Clock::GetInstance().SetTime(clock_words_table);
+        state_ = kStateIdle;
     }
     /* For the animations that kept the time rather than the word list. */
-    void finishWithTime(byte Hour, byte Minute) {
-        Display::getInstance().clear();
-        Clock::getInstance().setTime(Hour, Minute);
-        State = STATE_IDLE;
+    void FinishWithTime(byte hour, byte minute) {
+        Display::GetInstance().Clear();
+        Clock::GetInstance().SetTime(hour, minute);
+        state_ = kStateIdle;
     }
-    static byte selectByTime(byte, byte, byte);
+    static byte SelectByTime(byte, byte, byte);
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr Animation() : State{STATE_NONE} { }
+    constexpr Animation() : state_{kStateNone} { }
     ~Animation() { }
 
     // get methods
-    StateType getState() const { return State; }
+    StateType GetState() const { return state_; }
 
     // set methods
 
     // methods
-    static StdReturnType show() { return Display::getInstance().show(); }
-    static bool isPixelPartOfClockWords(ClockWords::WordsListType, byte, byte);
-    static bool isPixelPartOfClockWords(ClockWords::WordsListType, byte);
+    static StdReturnType Show() { return Display::GetInstance().Show(); }
+    static bool IsPixelPartOfClockWords(ClockWords::WordsListType, byte, byte);
+    static bool IsPixelPartOfClockWords(ClockWords::WordsListType, byte);
 };
 
 

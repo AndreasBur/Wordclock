@@ -71,11 +71,11 @@ static_assert(sizeof(byte) == 1u, "Arduino.h: the Arduino core's header did not 
 /******************************************************************************************************************************************************
  *  G L O B A L   F U N C T I O N S
 ******************************************************************************************************************************************************/
-namespace WordclockPlatform {
+namespace wordclock_platform {
 
 /* Both of these have to be defined while Serial still means the core's port. */
-inline Stream& hardwarePort() { return Serial; }
-inline void hardwarePortBegin(unsigned long BaudRate) { Serial.begin(BaudRate); }
+inline Stream& HardwarePort() { return Serial; }
+inline void HardwarePortBegin(unsigned long baud_rate) { Serial.begin(baud_rate); }
 
 } // namespace WordclockPlatform
 
@@ -87,7 +87,7 @@ inline void hardwarePortBegin(unsigned long BaudRate) { Serial.begin(BaudRate); 
    is a redefinition, and the compiler is right to warn; the alias is also exactly why the
    port above is captured through a function rather than a reference. */
 #undef Serial
-#define Serial                  WordclockSerial::getInstance()
+#define Serial                  WordclockSerial::GetInstance() // NOLINT(readability-identifier-naming)
 
 #endif // _WORDCLOCK_ARDUINO_H_
 

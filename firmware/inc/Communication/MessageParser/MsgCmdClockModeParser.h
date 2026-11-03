@@ -57,43 +57,43 @@ class MsgCmdClockModeParser : public MsgParameterParser<MsgCmdClockModeParser, M
   private:
     friend class MsgParameterParser;
 
-    static constexpr char ModeOptionShortName{'M'};
-    static constexpr char ShowItIsOptionShortName{'I'};
+    static constexpr char kModeOptionShortName{'M'};
+    static constexpr char kShowItIsOptionShortName{'I'};
 
-    static constexpr ParameterTableType ParameterTable PROGMEM {
-        ParameterTableElementType(ModeOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8),
-        ParameterTableElementType(ShowItIsOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8)
+    static constexpr ParameterTableType kParameterTable PROGMEM {
+        ParameterTableElementType(kModeOptionShortName, MsgParameter::kArgumentTypeUint8),
+        ParameterTableElementType(kShowItIsOptionShortName, MsgParameter::kArgumentTypeUint8)
     };
 
     // functions
-    static void handleParameter(char ParameterShortName, const char* Argument, PositionType Length) { UNUSED(ParameterShortName); UNUSED(Argument); UNUSED(Length); }
-    void handleParameter(char ParameterShortName, byte Argument)
+    static void HandleParameter(char parameter_short_name, const char* argument, PositionType length) { UNUSED(parameter_short_name); UNUSED(argument); UNUSED(length); }
+    void HandleParameter(char parameter_short_name, byte argument)
     {
-        if(ParameterShortName == ModeOptionShortName) {
-            setMode(static_cast<ModeType>(Argument));
+        if(parameter_short_name == kModeOptionShortName) {
+            SetMode(static_cast<ModeType>(argument));
         }
-        if(ParameterShortName == ShowItIsOptionShortName) {
-            Clock::getInstance().setShowItIsPermanently(Argument != 0u);
+        if(parameter_short_name == kShowItIsOptionShortName) {
+            Clock::GetInstance().SetShowItIsPermanently(argument != 0u);
         }
     }
 
-    void setMode(ModeType Mode) const
+    void SetMode(ModeType mode) const
     {
-        StdReturnType returnValue = Clock::getInstance().setMode(Mode);
-        Error.checkReturnValueAndSend(ModeOptionShortName, returnValue, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNDS);
+        StdReturnType return_value = Clock::GetInstance().SetMode(mode);
+        error_.CheckReturnValueAndSend(kModeOptionShortName, return_value, ErrorMessage::kErrorValueOutOfBounds);
     }
 
-    void show() const
+    void Show() const
     {
-        StdReturnType returnValue = Clock::getInstance().show();
-        Error.checkReturnValueAndSend(ErrorMessage::API_CLOCK_SHOW, returnValue, ErrorMessage::ERROR_DISPLAY_PENDING);
+        StdReturnType return_value = Clock::GetInstance().Show();
+        error_.CheckReturnValueAndSend(ErrorMessage::kApiClockShow, return_value, ErrorMessage::kErrorDisplayPending);
     }
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr MsgCmdClockModeParser(const char* Parameter) : MsgParameterParser(ParameterTable, Parameter) { }
+    constexpr MsgCmdClockModeParser(const char* parameter) : MsgParameterParser(kParameterTable, parameter) { }
     ~MsgCmdClockModeParser() { }
 
     // get methods
@@ -101,14 +101,14 @@ class MsgCmdClockModeParser : public MsgParameterParser<MsgCmdClockModeParser, M
     // set methods
 
     // methods
-    static void sendAnswer() {
-        sendAnswerParameter(ModeOptionShortName, Clock::getInstance().getMode());
+    static void SendAnswer() {
+        SendAnswerParameter(kModeOptionShortName, Clock::GetInstance().GetMode());
         /* Last field before the command parser's terminating println(), so no trailing
            separator space. */
-        sendAnswerParameter(ShowItIsOptionShortName, static_cast<byte>(Clock::getInstance().getShowItIsPermanently() ? 1u : 0u), false);
+        SendAnswerParameter(kShowItIsOptionShortName, static_cast<byte>(Clock::GetInstance().GetShowItIsPermanently() ? 1u : 0u), false);
     }
 
-    void process() const { show(); }
+    void Process() const { Show(); }
 };
 
 #endif

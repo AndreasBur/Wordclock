@@ -71,31 +71,31 @@ class Power
   public:
     enum StateType {
         /* The supply is on and frames are going out - what a clock runs in. */
-        STATE_SUPPLY_ON,
+        kStateSupplyOn,
         /* Asked to go off. The display is dark; what is left is to see the blanked frame
            off the wire before the port drops. */
-        STATE_BLANKING,
+        kStateBlanking,
         /* The supply is off and the data line is gated. */
-        STATE_SUPPLY_OFF,
+        kStateSupplyOff,
         /* Asked to come on. The supply is up; the data line is released on the next task,
            which gives the strip a tick to find its rail. */
-        STATE_SETTLING
+        kStateSettling
     };
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    static constexpr byte TaskCycle{POWER_TASK_CYCLE};
+    static constexpr byte kTaskCycle{POWER_TASK_CYCLE};
 
-    StateType State{STATE_SUPPLY_ON};
+    StateType state_{kStateSupplyOn};
 
     Power() { }
     ~Power() { }
 
     // functions
-    static Display& getDisplay() { return Display::getInstance(); }
-    static PowerSwitch& getSwitch() { return PowerSwitch::getInstance(); }
+    static Display& GetDisplay() { return Display::GetInstance(); }
+    static PowerSwitch& GetSwitch() { return PowerSwitch::GetInstance(); }
 
     /* Both waits, as one question. A buffer still marked dirty means the blanked frame has
        not been handed to the strip yet; a frame on the wire means it has and is still going
@@ -105,109 +105,109 @@ class Power
        marks the buffer again and makes this wait another tick. That is left as it is rather
        than cut short: the display is dark from the first step onwards, so what a longer wait
        postpones is the current the switch saves, not the darkness somebody asked for. */
-    static bool isStripDarkAndIdle() {
-        if(getDisplay().isDirty()) { return false; }
+    static bool IsStripDarkAndIdle() {
+        if(GetDisplay().IsDirty()) { return false; }
 
-        return !getDisplay().isFrameOnTheWire();
+        return !GetDisplay().IsFrameOnTheWire();
     }
 
     /* The gate before the port, so that no tick can slip a frame in between the two. */
-    void cutSupply() {
-        getDisplay().suspendOutput();
-        getSwitch().switchSupplyOff();
-        State = STATE_SUPPLY_OFF;
+    void CutSupply() {
+        GetDisplay().SuspendOutput();
+        GetSwitch().SwitchSupplyOff();
+        state_ = kStateSupplyOff;
     }
 
     /* The port before the gate, for the same reason read the other way round. */
-    void releaseSupply() {
-        getDisplay().resumeOutput();
-        getDisplay().enable();
-        State = STATE_SUPPLY_ON;
+    void ReleaseSupply() {
+        GetDisplay().ResumeOutput();
+        GetDisplay().Enable();
+        state_ = kStateSupplyOn;
     }
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    static Power& getInstance() {
-        static Power SingletonInstance;
-        return SingletonInstance;
+    static Power& GetInstance() {
+        static Power singleton_instance;
+        return singleton_instance;
     }
 
     // get methods
-    static constexpr byte getTaskCycle() { return TaskCycle; }
+    static constexpr byte GetTaskCycle() { return kTaskCycle; }
 
-    StateType getState() const { return State; }
+    StateType GetState() const { return state_; }
 
     /* What the status of the supply is, rather than which step the sequence is on: a switch
        that is on its way off still has its supply up, and the two ticks it takes to get
        there are nobody else's business. */
-    static bool isSupplyOn() { return getSwitch().isSupplyOn(); }
+    static bool IsSupplyOn() { return GetSwitch().IsSupplyOn(); }
 
     /* Whether there is a switch to ask at all. A board that was built without one has the
        high side MOSFET bridged, and then these procedures have nothing to act on. */
-    static constexpr bool isSwitchFitted() { return PowerSwitch::isFitted(); }
+    static constexpr bool IsSwitchFitted() { return PowerSwitch::IsFitted(); }
 
     // methods
     /* Asks for the supply. Answers E_NOT_OK only where there is no switch - an ask that is
        already the case, or already under way, is honoured rather than refused, because a
        caller that says "off" twice means the same thing both times. */
-    StdReturnType switchSupplyOn() {
-        if constexpr (!isSwitchFitted()) { return E_NOT_OK; }
+    StdReturnType SwitchSupplyOn() {
+        if constexpr (!IsSwitchFitted()) { return kENotOk; }
 
-        switch(State) {
-            case STATE_SUPPLY_OFF :
+        switch(state_) {
+            case kStateSupplyOff :
                 /* The port first; the data line follows on the next task. */
-                getSwitch().switchSupplyOn();
-                State = STATE_SETTLING;
+                GetSwitch().SwitchSupplyOn();
+                state_ = kStateSettling;
                 break;
             /* Never got as far as cutting it, so there is nothing to bring up and nothing
                to settle - only the darkness to undo. */
-            case STATE_BLANKING :
-                releaseSupply();
+            case kStateBlanking :
+                ReleaseSupply();
                 break;
-            case STATE_SUPPLY_ON :
-            case STATE_SETTLING :
+            case kStateSupplyOn :
+            case kStateSettling :
                 break;
         }
 
-        return E_OK;
+        return kEOk;
     }
 
-    StdReturnType switchSupplyOff() {
-        if constexpr (!isSwitchFitted()) { return E_NOT_OK; }
+    StdReturnType SwitchSupplyOff() {
+        if constexpr (!IsSwitchFitted()) { return kENotOk; }
 
-        switch(State) {
-            case STATE_SUPPLY_ON :
+        switch(state_) {
+            case kStateSupplyOn :
                 /* Over the data line, not by cutting the supply: this is the frame the
                    strip has to be holding when its rail goes. */
-                getDisplay().disable();
-                State = STATE_BLANKING;
+                GetDisplay().Disable();
+                state_ = kStateBlanking;
                 break;
             /* Asked while the supply is coming up. The data line is still gated, so the
                strip is dark already and the port can go straight back down. */
-            case STATE_SETTLING :
-                getSwitch().switchSupplyOff();
-                State = STATE_SUPPLY_OFF;
+            case kStateSettling :
+                GetSwitch().SwitchSupplyOff();
+                state_ = kStateSupplyOff;
                 break;
-            case STATE_BLANKING :
-            case STATE_SUPPLY_OFF :
+            case kStateBlanking :
+            case kStateSupplyOff :
                 break;
         }
 
-        return E_OK;
+        return kEOk;
     }
 
-    void task() {
-        switch(State) {
-            case STATE_BLANKING :
-                if(isStripDarkAndIdle()) { cutSupply(); }
+    void Task() {
+        switch(state_) {
+            case kStateBlanking :
+                if(IsStripDarkAndIdle()) { CutSupply(); }
                 break;
-            case STATE_SETTLING :
-                releaseSupply();
+            case kStateSettling :
+                ReleaseSupply();
                 break;
-            case STATE_SUPPLY_ON :
-            case STATE_SUPPLY_OFF :
+            case kStateSupplyOn :
+            case kStateSupplyOff :
                 break;
         }
     }

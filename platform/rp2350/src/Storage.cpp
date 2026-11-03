@@ -40,7 +40,7 @@
 ******************************************************************************************************************************************************/
 namespace {
 
-constexpr char BlobPath[]{"/" STORAGE_NAMESPACE "/" STORAGE_KEY};
+constexpr char kBlobPath[]{"/" STORAGE_NAMESPACE "/" STORAGE_KEY};
 
 /******************************************************************************************************************************************************
  *  LOCAL FUNCTIONS
@@ -49,22 +49,22 @@ constexpr char BlobPath[]{"/" STORAGE_NAMESPACE "/" STORAGE_KEY};
    will not come up on the next call either, and retrying on every read would turn a fault
    into a stall. Formatting on a failed mount is what makes a first boot work on a chip
    whose flash has never held one. */
-bool isFilesystemReady()
+bool IsFilesystemReady()
 {
-    static bool WasTried{false};
-    static bool IsMounted{false};
+    static bool was_tried{false};
+    static bool is_mounted{false};
 
-    if(!WasTried) {
-        WasTried = true;
-        IsMounted = LittleFS.begin();
+    if(!was_tried) {
+        was_tried = true;
+        is_mounted = LittleFS.begin();
     }
 
-    return IsMounted;
+    return is_mounted;
 }
 
 /* The directory the blob lives in. mkdir() on an existing one is not an error worth
    reporting - the open that follows is what decides. */
-void ensureDirectory()
+void EnsureDirectory()
 {
     LittleFS.mkdir("/" STORAGE_NAMESPACE);
 }
@@ -91,25 +91,25 @@ void ensureDirectory()
  *
  *  \return         E_OK if exactly Size bytes were read
 ******************************************************************************************************************************************************/
-StdReturnType Storage::read(byte* Buffer, size_t Size) const
+StdReturnType Storage::Read(byte* buffer, size_t size) const
 {
-    if((Buffer == nullptr) || (Size == 0u) || (Size > Capacity)) { return E_NOT_OK; }
-    if(!isFilesystemReady()) { return E_NOT_OK; }
+    if((buffer == nullptr) || (size == 0u) || (size > kCapacity)) { return kENotOk; }
+    if(!IsFilesystemReady()) { return kENotOk; }
 
-    File Blob = LittleFS.open(BlobPath, "r");
-    if(!Blob) { return E_NOT_OK; }
+    File blob = LittleFS.open(kBlobPath, "r");
+    if(!blob) { return kENotOk; }
 
-    if(Blob.size() != Size) {
-        Blob.close();
-        return E_NOT_OK;
+    if(blob.size() != size) {
+        blob.close();
+        return kENotOk;
     }
 
-    const size_t Read = Blob.read(Buffer, Size);
-    Blob.close();
+    const size_t read = blob.read(buffer, size);
+    blob.close();
 
-    if(Read != Size) { return E_NOT_OK; }
+    if(read != size) { return kENotOk; }
 
-    return E_OK;
+    return kEOk;
 } /* read */
 
 
@@ -123,22 +123,22 @@ StdReturnType Storage::read(byte* Buffer, size_t Size) const
  *
  *  \return         E_OK if the whole blob was stored
 ******************************************************************************************************************************************************/
-StdReturnType Storage::write(const byte* Buffer, size_t Size)
+StdReturnType Storage::Write(const byte* buffer, size_t size)
 {
-    if((Buffer == nullptr) || (Size == 0u) || (Size > Capacity)) { return E_NOT_OK; }
-    if(!isFilesystemReady()) { return E_NOT_OK; }
+    if((buffer == nullptr) || (size == 0u) || (size > kCapacity)) { return kENotOk; }
+    if(!IsFilesystemReady()) { return kENotOk; }
 
-    ensureDirectory();
+    EnsureDirectory();
 
-    File Blob = LittleFS.open(BlobPath, "w");
-    if(!Blob) { return E_NOT_OK; }
+    File blob = LittleFS.open(kBlobPath, "w");
+    if(!blob) { return kENotOk; }
 
-    const size_t Written = Blob.write(Buffer, Size);
-    Blob.close();
+    const size_t written = blob.write(buffer, size);
+    blob.close();
 
-    if(Written != Size) { return E_NOT_OK; }
+    if(written != size) { return kENotOk; }
 
-    return E_OK;
+    return kEOk;
 } /* write */
 
 
@@ -151,15 +151,15 @@ StdReturnType Storage::write(const byte* Buffer, size_t Size)
  *
  *  \return         E_OK if nothing is stored afterwards
 ******************************************************************************************************************************************************/
-StdReturnType Storage::clear()
+StdReturnType Storage::Clear()
 {
-    if(!isFilesystemReady()) { return E_NOT_OK; }
+    if(!IsFilesystemReady()) { return kENotOk; }
 
-    if(!LittleFS.exists(BlobPath)) { return E_OK; }
+    if(!LittleFS.exists(kBlobPath)) { return kEOk; }
 
-    if(!LittleFS.remove(BlobPath)) { return E_NOT_OK; }
+    if(!LittleFS.remove(kBlobPath)) { return kENotOk; }
 
-    return E_OK;
+    return kEOk;
 } /* clear */
 // NOLINTEND(readability-convert-member-functions-to-static)
 

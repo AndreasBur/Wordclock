@@ -61,36 +61,36 @@ class OverlayTemperature : public Overlay<OverlayTemperature>
     /* Written when the overlay starts and left alone while it shows: the text scrolls out
        of this buffer, and a reading that changed halfway through would swap a digit under
        the letters that are already on their way across. */
-    char TemperatureString[Temperature::StringToShowLength]{0u};
+    char temperature_string_[Temperature::kStringToShowLength]{0u};
 
     // functions
-    /* Only ever entered with a reading in hand: isReady() is what the overlay is started
+    /* Only ever entered with a reading in hand: IsReady() is what the overlay is started
        through, and it is what says whether there is one. */
-    void setStateToShow(ClockDate CurrentDate, ClockTime CurrentTime) {
-        setTemperatureString();
-        setText();
-        UNUSED(CurrentDate);
-        UNUSED(CurrentTime);
+    void SetStateToShow(ClockDate current_date, ClockTime current_time) {
+        SetTemperatureString();
+        SetText();
+        UNUSED(current_date);
+        UNUSED(current_time);
     }
-    static void setStateToIdle(ClockDate CurrentDate, ClockTime CurrentTime) {
-        Text::getInstance().stop();
-        UNUSED(CurrentDate);
-        UNUSED(CurrentTime);
+    static void SetStateToIdle(ClockDate current_date, ClockTime current_time) {
+        Text::GetInstance().Stop();
+        UNUSED(current_date);
+        UNUSED(current_time);
     }
 
     /* No reading, no overlay: a clock without the chip - and every clock until it has
        answered once - would otherwise hold the display for the whole endurance to show
        nothing, or show a zero that reads like a measurement. */
-    static bool isReady() { return Temperature::getInstance().isTemperatureAvailable(); }
+    static bool IsReady() { return Temperature::GetInstance().IsTemperatureAvailable(); }
 
     /* Nothing of its own: the string it shows comes from the chip on every start, so
        there is no configuration here for a reset to undo. */
-    static void resetOwnToDefaults() { }
+    static void ResetOwnToDefaults() { }
 
-    void showTask() { if(Text::getInstance().getState() == Text::STATE_IDLE) { setText(); } }
-    void setText() { Text::getInstance().setTextWithShift(TemperatureString, getFont()); }
+    void ShowTask() { if(Text::GetInstance().GetState() == Text::kStateIdle) { SetText(); } }
+    void SetText() { Text::GetInstance().SetTextWithShift(temperature_string_, GetFont()); }
 
-    void setTemperatureString() { Temperature::getInstance().getTemperatureStringToShow(TemperatureString); }
+    void SetTemperatureString() { Temperature::GetInstance().GetTemperatureStringToShow(temperature_string_); }
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
@@ -100,14 +100,14 @@ class OverlayTemperature : public Overlay<OverlayTemperature>
     ~OverlayTemperature() { }
 
 	// get methods
-    const char* getTemperatureString() const { return TemperatureString; }
+    const char* GetTemperatureString() const { return temperature_string_; }
 
 	// set methods
 
 	// methods
-    SecondType task(SecondType ShowTimerInSeconds, ClockDate CurrentDate, ClockTime CurrentTime) {
-        if(State == STATE_SHOW) { showTask(); }
-        return Overlay::task(ShowTimerInSeconds, CurrentDate, CurrentTime);
+    SecondType Task(SecondType show_timer_in_seconds, ClockDate current_date, ClockTime current_time) {
+        if(state_ == kStateShow) { ShowTask(); }
+        return Overlay::Task(show_timer_in_seconds, current_date, current_time);
     }
 };
 

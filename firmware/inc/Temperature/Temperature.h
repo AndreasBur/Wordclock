@@ -44,94 +44,94 @@ class Temperature
     /* Tenths of a degree Celsius, signed. */
     using TemperatureType = DS3231::TemperatureType;
 
-    static constexpr TemperatureType TenthsPerDegree{DS3231::TenthsPerDegree};
+    static constexpr TemperatureType kTenthsPerDegree{DS3231::kTenthsPerDegree};
 
     /* "-12.3C" and its terminator, which is the longest a reading the chip can produce
        makes: it measures from -40 to +85 degrees. */
-    static constexpr byte StringLength{6u + 1u};
+    static constexpr byte kStringLength{6u + 1u};
 
     /* The shown form carries the degree sign as well, which is one byte more - it is
        Latin-1 here, the same single-byte encoding the font tables are indexed by. */
-    static constexpr byte StringToShowLength{StringLength + 1u};
+    static constexpr byte kStringToShowLength{kStringLength + 1u};
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    static constexpr char DegreeUnit{'C'};
+    static constexpr char kDegreeUnit{'C'};
     /* Latin-1 0xB0, which is what the font tables index by and what the letter table's
        umlauts already are. It stays out of the reported form on purpose - see
        getTemperatureString() below. */
-    static constexpr char DegreeSign{'\xB0'};
-    static constexpr char DecimalPoint{'.'};
+    static constexpr char kDegreeSign{'\xB0'};
+    static constexpr char kDecimalPoint{'.'};
 
     constexpr Temperature() { }
     ~Temperature() { }
 
-    DS3231 Sensor;
+    DS3231 sensor_;
 
     /* Sign, whole part and tenth are taken apart before they are written, so that the
        digits themselves are always those of a positive number - a remainder of a negative
        value is negative in C, and would print a second minus in the middle of the
        reading. */
-    static char* appendSign(TemperatureType Tenths, char* String) {
-        if(Tenths >= 0) { return String; }
+    static char* AppendSign(TemperatureType tenths, char* string) {
+        if(tenths >= 0) { return string; }
 
-        return appendChar('-', String);
+        return AppendChar('-', string);
     }
-    static TemperatureType wholeDegrees(TemperatureType Tenths) { return absolute(Tenths) / TenthsPerDegree; }
-    static TemperatureType tenthOfDegree(TemperatureType Tenths) { return absolute(Tenths) % TenthsPerDegree; }
-    static constexpr TemperatureType absolute(TemperatureType Value) { return (Value < 0) ? static_cast<TemperatureType>(-Value) : Value; }
+    static TemperatureType WholeDegrees(TemperatureType tenths) { return Absolute(tenths) / kTenthsPerDegree; }
+    static TemperatureType TenthOfDegree(TemperatureType tenths) { return Absolute(tenths) % kTenthsPerDegree; }
+    static constexpr TemperatureType Absolute(TemperatureType value) { return (value < 0) ? static_cast<TemperatureType>(-value) : value; }
 
-    static char* appendChar(char Char, char* String) { String[0u] = Char; return &String[1u]; }
-    static char* appendDegreeSign(bool Wanted, char* String) {
-        if(!Wanted) { return String; }
+    static char* AppendChar(char character, char* string) { string[0u] = character; return &string[1u]; }
+    static char* AppendDegreeSign(bool wanted, char* string) {
+        if(!wanted) { return string; }
 
-        return appendChar(DegreeSign, String);
+        return AppendChar(kDegreeSign, string);
     }
 
     /* Both public forms come through here, so the digits cannot drift apart between what
        is shown and what is reported - only the degree sign differs. */
-    StdReturnType appendReading(char* String, bool WithDegreeSign) const {
-        TemperatureType Tenths{0};
+    StdReturnType AppendReading(char* string, bool with_degree_sign) const {
+        TemperatureType tenths{0};
 
-        String[0u] = STD_NULL_CHARACTER;
-        if(getTemperature(Tenths) == E_NOT_OK) { return E_NOT_OK; }
+        string[0u] = STD_NULL_CHARACTER;
+        if(GetTemperature(tenths) == kENotOk) { return kENotOk; }
 
-        char* Position = String;
-        Position = appendSign(Tenths, Position);
-        Position = appendNumber(wholeDegrees(Tenths), Position);
-        Position = appendChar(DecimalPoint, Position);
-        Position = appendNumber(tenthOfDegree(Tenths), Position);
-        Position = appendDegreeSign(WithDegreeSign, Position);
-        Position = appendChar(DegreeUnit, Position);
-        *Position = STD_NULL_CHARACTER;
-        return E_OK;
+        char* position = string;
+        position = AppendSign(tenths, position);
+        position = AppendNumber(WholeDegrees(tenths), position);
+        position = AppendChar(kDecimalPoint, position);
+        position = AppendNumber(TenthOfDegree(tenths), position);
+        position = AppendDegreeSign(with_degree_sign, position);
+        position = AppendChar(kDegreeUnit, position);
+        *position = STD_NULL_CHARACTER;
+        return kEOk;
     }
-    static char* appendNumber(TemperatureType Value, char* String) {
-        itoa(Value, String, 10u);
-        return &String[digitsOfNumber(Value)];
+    static char* AppendNumber(TemperatureType value, char* string) {
+        itoa(value, string, 10u);
+        return &string[DigitsOfNumber(value)];
     }
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    static Temperature& getInstance() {
-        static Temperature SingletonInstance;
-        return SingletonInstance;
+    static Temperature& GetInstance() {
+        static Temperature singleton_instance;
+        return singleton_instance;
     }
 
     // get methods
-    byte getTaskCycle() const { return Sensor.getTaskCycle(); }
+    byte GetTaskCycle() const { return sensor_.GetTaskCycle(); }
 
     /* E_NOT_OK while there is no reading, which is the answer a build without the chip
        keeps giving. */
-    StdReturnType getTemperature(TemperatureType& sTemperature) const { return Sensor.getTemperature(sTemperature); }
+    StdReturnType GetTemperature(TemperatureType& temperature) const { return sensor_.GetTemperature(temperature); }
 
-    bool isTemperatureAvailable() const {
-        TemperatureType Unused{0};
-        return getTemperature(Unused) == E_OK;
+    bool IsTemperatureAvailable() const {
+        TemperatureType unused{0};
+        return GetTemperature(unused) == kEOk;
     }
 
     /* The reading as it is reported, "23.4C", into a buffer of StringLength. Written by
@@ -145,18 +145,18 @@ class Temperature
        the serial line and the web socket, and a web socket text frame has to be valid
        UTF-8. A raw Latin-1 0xB0 in it makes the browser close the connection with a
        protocol error rather than draw one character oddly. */
-    StdReturnType getTemperatureString(char* String) const {
-        return appendReading(String, false);
+    StdReturnType GetTemperatureString(char* string) const {
+        return AppendReading(string, false);
     }
 
     /* The same reading as it is shown, "23.4°C", into a buffer of StringToShowLength. The
        display indexes the font tables by Latin-1 byte, so the sign can be one here. */
-    StdReturnType getTemperatureStringToShow(char* String) const {
-        return appendReading(String, true);
+    StdReturnType GetTemperatureStringToShow(char* string) const {
+        return AppendReading(string, true);
     }
 
     // methods
-    void task() { Sensor.task(); }
+    void Task() { sensor_.Task(); }
 };
 
 #endif // _TEMPERATURE_H_

@@ -60,7 +60,7 @@ class MsgCmdOverlayTemperatureParser : public MsgCmdOverlayParser<MsgCmdOverlayT
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr MsgCmdOverlayTemperatureParser(const char* Parameter) : MsgCmdOverlayParser(Parameter) { }
+    constexpr MsgCmdOverlayTemperatureParser(const char* parameter) : MsgCmdOverlayParser(parameter) { }
     ~MsgCmdOverlayTemperatureParser() { }
 
     // get methods
@@ -68,27 +68,27 @@ class MsgCmdOverlayTemperatureParser : public MsgCmdOverlayParser<MsgCmdOverlayT
     // set methods
 
     // methods
-    static MinuteType getPeriodInMinutes() { return Overlays::getInstance().getTemperaturePeriodInMinutes(); }
-    static SecondType getEnduranceInSeconds() { return Overlays::getInstance().getTemperatureEnduranceInSeconds(); }
-    static MonthType getMonth() { return Overlays::getInstance().getTemperatureMonth(); }
-    static DayType getDay() { return Overlays::getInstance().getTemperatureDay(); }
-    static DayType getValidInDays() { return Overlays::getInstance().getTemperatureValidInDays(); }
-    static bool getIsActive() { return Overlays::getInstance().getTemperatureIsActive(); }
-    static byte getSpeed() { return Overlays::getInstance().getTemperatureSpeed(); }
-    static FontType getFont() {return Overlays::getInstance().getTemperatureFont(); }
+    static MinuteType GetPeriodInMinutes() { return Overlays::GetInstance().GetTemperaturePeriodInMinutes(); }
+    static SecondType GetEnduranceInSeconds() { return Overlays::GetInstance().GetTemperatureEnduranceInSeconds(); }
+    static MonthType GetMonth() { return Overlays::GetInstance().GetTemperatureMonth(); }
+    static DayType GetDay() { return Overlays::GetInstance().GetTemperatureDay(); }
+    static DayType GetValidInDays() { return Overlays::GetInstance().GetTemperatureValidInDays(); }
+    static bool GetIsActive() { return Overlays::GetInstance().GetTemperatureIsActive(); }
+    static byte GetSpeed() { return Overlays::GetInstance().GetTemperatureSpeed(); }
+    static FontType GetFont() {return Overlays::GetInstance().GetTemperatureFont(); }
 
-    static StdReturnType setPeriodInMinutes(MinuteType PeriodInMinutes) { return Overlays::getInstance().setTemperaturePeriodInMinutes(PeriodInMinutes); }
-    static StdReturnType setEnduranceInSeconds(SecondType EnduranceInSeconds) {return Overlays::getInstance().setTemperatureEnduranceInSeconds(EnduranceInSeconds); }
-    static void setMonth(MonthType Month) { Overlays::getInstance().setTemperatureMonth(Month); }
-    static void setDay(DayType Day) { Overlays::getInstance().setTemperatureDay(Day); }
-    static void setValidInDays(DayType ValidInDays) { Overlays::getInstance().setTemperatureValidInDays(ValidInDays); }
-    static void setSpeed(byte Speed) { Overlays::getInstance().setTemperatureSpeed(Speed); }
-    static StdReturnType setFont(FontType Font) { return Overlays::getInstance().setTemperatureFont(Font); }
-    static void setIsActive(bool IsActive) { Overlays::getInstance().setTemperatureIsActive(IsActive); }
-    static void setText(const char* Text, LengthType Length) { UNUSED(Text); UNUSED(Length); }
+    static StdReturnType SetPeriodInMinutes(MinuteType period_in_minutes) { return Overlays::GetInstance().SetTemperaturePeriodInMinutes(period_in_minutes); }
+    static StdReturnType SetEnduranceInSeconds(SecondType endurance_in_seconds) {return Overlays::GetInstance().SetTemperatureEnduranceInSeconds(endurance_in_seconds); }
+    static void SetMonth(MonthType month) { Overlays::GetInstance().SetTemperatureMonth(month); }
+    static void SetDay(DayType day) { Overlays::GetInstance().SetTemperatureDay(day); }
+    static void SetValidInDays(DayType valid_in_days) { Overlays::GetInstance().SetTemperatureValidInDays(valid_in_days); }
+    static void SetSpeed(byte speed) { Overlays::GetInstance().SetTemperatureSpeed(speed); }
+    static StdReturnType SetFont(FontType font) { return Overlays::GetInstance().SetTemperatureFont(font); }
+    static void SetIsActive(bool is_active) { Overlays::GetInstance().SetTemperatureIsActive(is_active); }
+    static void SetText(const char* text, LengthType length) { UNUSED(text); UNUSED(length); }
 
-    static void sendAnswerText(bool AppendSpace) { UNUSED(AppendSpace); }
-    static void sendAnswerSpeedText(bool AppendSpace) { UNUSED(AppendSpace); }
+    static void SendAnswerText(bool append_space) { UNUSED(append_space); }
+    static void SendAnswerSpeedText(bool append_space) { UNUSED(append_space); }
 
 };
 

@@ -46,12 +46,12 @@
 ******************************************************************************************************************************************************/
 namespace {
 
-WordclockMain Wordclock;
+WordclockMain wordclock;
 
 /* The tick the whole firmware is timed against: every module's task cycle counts in this
    unit, so it is read from the scheduler rather than repeated as a number here. */
-const TickType_t TaskInterval{pdMS_TO_TICKS(Scheduler::getTaskIntervalMs())};
-TickType_t LastWakeTime{0};
+const TickType_t kTaskInterval{pdMS_TO_TICKS(Scheduler::GetTaskIntervalMs())};
+TickType_t last_wake_time{0};
 
 /******************************************************************************************************************************************************
  *  LOCAL FUNCTIONS
@@ -59,7 +59,7 @@ TickType_t LastWakeTime{0};
 /* Installs the zone rule together with the servers, which is what makes every conversion
    in RealTimeClock local time. Safe to do before the link is up: the request is repeated
    until an answer arrives. */
-void startTimeSync()
+void StartTimeSync()
 {
     configTzTime(WORDCLOCK_TIMEZONE, WORDCLOCK_NTP_SERVER_PRIMARY, WORDCLOCK_NTP_SERVER_SECONDARY);
 }
@@ -68,13 +68,13 @@ void startTimeSync()
    because it has none. System does not print this itself - it also runs from the command
    that changes the credentials, and a line printed there would land inside that command's
    answer. */
-void reportNetwork()
+void ReportNetwork()
 {
-    char Ssid[System::SsidStringLength]{};
+    char ssid[System::kSsidStringLength]{};
 
-    if(System::getInstance().getNetworkSsid(Ssid) == E_OK) {
+    if(System::GetInstance().GetNetworkSsid(ssid) == kEOk) {
         Serial.print(F("WiFi: joining "));
-        Serial.println(Ssid);
+        Serial.println(ssid);
     } else {
         Serial.print(F("WiFi: no network configured, console on the access point "));
         Serial.println(SYSTEM_ACCESS_POINT_SSID);
@@ -85,19 +85,19 @@ void reportNetwork()
    setup() has returned. Until the second one appears the display holds its default date,
    which is the one thing a first bring-up needs to be able to tell apart from a dead
    strip. */
-void reportProgress()
+void ReportProgress()
 {
-    static bool ConnectionReported{false};
-    static bool TimeReported{false};
+    static bool connection_reported{false};
+    static bool time_reported{false};
 
-    if(!ConnectionReported && (WiFi.status() == WL_CONNECTED)) {
-        ConnectionReported = true;
+    if(!connection_reported && (WiFi.status() == WL_CONNECTED)) {
+        connection_reported = true;
         Serial.print(F("WiFi: connected, address "));
         Serial.println(WiFi.localIP().toString().c_str());
     }
 
-    if(!TimeReported && RealTimeClock::isSystemTimeSet()) {
-        TimeReported = true;
+    if(!time_reported && RealTimeClock::IsSystemTimeSet()) {
+        time_reported = true;
         Serial.println(F("Time: synchronised"));
     }
 }
@@ -115,21 +115,21 @@ void setup()
 {
     Serial.begin(WORDCLOCK_SERIAL_BAUDRATE);
 
-    Wordclock.init();
+    wordclock.Init();
 
     /* Which network, and whether there is one at all, is System's answer now: what was
        stored over the console, what was compiled in, or - when neither - an access point
        of its own, so that the console the credentials are entered through can be reached
        without a cable. */
-    System::getInstance().startNetwork();
-    reportNetwork();
-    startTimeSync();
+    System::GetInstance().StartNetwork();
+    ReportNetwork();
+    StartTimeSync();
     /* Before the network is up on purpose: the server listens on whatever address arrives
        later, and starting it here keeps the order in setup() the same whether there is a
        WiFi or not. */
-    WebInterface::getInstance().begin();
+    WebInterface::GetInstance().Begin();
 
-    LastWakeTime = xTaskGetTickCount();
+    last_wake_time = xTaskGetTickCount();
 } /* setup */
 
 
@@ -144,23 +144,23 @@ void setup()
 ******************************************************************************************************************************************************/
 void loop()
 {
-    Wordclock.task();
+    wordclock.Task();
 
     /* After the firmware, not from inside its pixel writes: the strip gets whatever the
        buffer holds once the whole pass over the tasks is done. */
-    Pixels::getInstance().render();
+    Pixels::GetInstance().Render();
 
     /* After the strip, so a watching browser is shown the frame that went out rather than
        one the firmware is still assembling. */
-    WebInterface::getInstance().broadcastFrame();
+    WebInterface::GetInstance().BroadcastFrame();
 
-    reportProgress();
+    ReportProgress();
 
     /* Last, so a restart asked for by a command takes place once that command's answer has
        reached both the wire and the browser. */
-    System::getInstance().performPendingRestart();
+    System::GetInstance().PerformPendingRestart();
 
-    vTaskDelayUntil(&LastWakeTime, TaskInterval);
+    vTaskDelayUntil(&last_wake_time, kTaskInterval);
 } /* loop */
 
 /******************************************************************************************************************************************************

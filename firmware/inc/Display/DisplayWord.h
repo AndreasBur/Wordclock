@@ -54,26 +54,26 @@ class DisplayWord
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    byte Column;
-    byte Row;
-    byte Length;
+    byte column_;
+    byte row_;
+    byte length_;
   
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr DisplayWord(byte sColumn, byte sRow, byte sLength) : Column(sColumn), Row(sRow), Length(sLength) { }
-    constexpr DisplayWord() : Column(0u), Row(0u), Length(0u) { }
+    constexpr DisplayWord(byte column, byte row, byte length) : column_(column), row_(row), length_(length) { }
+    constexpr DisplayWord() : column_(0u), row_(0u), length_(0u) { }
 
     // get methods
-    byte getLength() const { return Length; }
-    byte getRow() const { return Row; }
-    byte getColumn() const { return Column; }
+    byte GetLength() const { return length_; }
+    byte GetRow() const { return row_; }
+    byte GetColumn() const { return column_; }
     
     // set methods
-    void setLength(byte sLength) { Length = sLength; }
-    void setRow(byte sRow) { Row = sRow; }
-    void setColumn(byte sColumn) { Column = sColumn; }
+    void SetLength(byte length) { length_ = length; }
+    void SetRow(byte row) { row_ = row; }
+    void SetColumn(byte column) { column_ = column; }
 
     // methods
 

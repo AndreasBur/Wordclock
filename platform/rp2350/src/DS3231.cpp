@@ -27,24 +27,24 @@
 namespace {
 
 /* Wire reports zero from endTransmission() when the slave acknowledged. */
-constexpr uint8_t WireTransmissionSuccess{0u};
+constexpr uint8_t kWireTransmissionSuccess{0u};
 
 /* Where each field sits in the seven-register block that is read and written in one go. */
-constexpr byte RegisterSeconds{0u};
-constexpr byte RegisterMinutes{1u};
-constexpr byte RegisterHours{2u};
-constexpr byte RegisterWeekday{3u};
-constexpr byte RegisterDay{4u};
-constexpr byte RegisterMonth{5u};
-constexpr byte RegisterYear{6u};
+constexpr byte kRegisterSeconds{0u};
+constexpr byte kRegisterMinutes{1u};
+constexpr byte kRegisterHours{2u};
+constexpr byte kRegisterWeekday{3u};
+constexpr byte kRegisterDay{4u};
+constexpr byte kRegisterMonth{5u};
+constexpr byte kRegisterYear{6u};
 
 /* The chip keeps two year digits and a century bit; ClockDate covers 2000 to 2099, so the
    bit is always clear and the century is this constant. */
-constexpr ClockDateTime::YearType YearOfCentury{2000u};
+constexpr ClockDateTime::YearType kYearOfCentury{2000u};
 
 /* The chip counts weekdays from one, ClockDate from zero. Neither says which day is
    first, and nothing reads the register back, so only the range has to match. */
-constexpr byte WeekdayOffset{1u};
+constexpr byte kWeekdayOffset{1u};
 
 } // namespace
 
@@ -61,11 +61,11 @@ constexpr byte WeekdayOffset{1u};
  *                  retrying from the task means a chip that is plugged in later, or a bus
  *                  that was busy at boot, still comes up.
 ******************************************************************************************************************************************************/
-void DS3231::task()
+void DS3231::Task()
 {
-    if(startBus() == E_NOT_OK) { return; }
+    if(StartBus() == kENotOk) { return; }
 
-    readTemperature();
+    ReadTemperature();
 } /* task */
 
 
@@ -85,28 +85,28 @@ void DS3231::task()
  *
  *  \return         E_OK if the chip answered with a believable date and time
 ******************************************************************************************************************************************************/
-StdReturnType DS3231::getDateTime(ClockDateTime& DateTime)
+StdReturnType DS3231::GetDateTime(ClockDateTime& date_time)
 {
-    if(startBus() == E_NOT_OK) { return E_NOT_OK; }
-    if(hasOscillatorStopped()) { return E_NOT_OK; }
+    if(StartBus() == kENotOk) { return kENotOk; }
+    if(HasOscillatorStopped()) { return kENotOk; }
 
-    byte Registers[DS3231_DATE_TIME_NUMBER_OF_BYTES]{};
-    if(readRegisters(DS3231_REG_SECONDS, Registers, DS3231_DATE_TIME_NUMBER_OF_BYTES) == E_NOT_OK) { return E_NOT_OK; }
+    byte registers[DS3231_DATE_TIME_NUMBER_OF_BYTES]{};
+    if(ReadRegisters(DS3231_REG_SECONDS, registers, DS3231_DATE_TIME_NUMBER_OF_BYTES) == kENotOk) { return kENotOk; }
 
-    ClockDateTime Value;
-    StdReturnType ReturnValue{E_OK};
+    ClockDateTime value;
+    StdReturnType return_value{kEOk};
 
-    if(Value.setTimeSecond(fromBcd(Registers[RegisterSeconds])) == E_NOT_OK) { ReturnValue = E_NOT_OK; }
-    if(Value.setTimeMinute(fromBcd(Registers[RegisterMinutes])) == E_NOT_OK) { ReturnValue = E_NOT_OK; }
-    if(Value.setTimeHour(fromBcd(Registers[RegisterHours] & DS3231_HOURS_VALUE_MASK)) == E_NOT_OK) { ReturnValue = E_NOT_OK; }
-    if(Value.setDateDay(fromBcd(Registers[RegisterDay])) == E_NOT_OK) { ReturnValue = E_NOT_OK; }
-    if(Value.setDateMonth(fromBcd(Registers[RegisterMonth] & DS3231_MONTH_VALUE_MASK)) == E_NOT_OK) { ReturnValue = E_NOT_OK; }
-    if(Value.setDateYear(static_cast<ClockDateTime::YearType>(YearOfCentury + fromBcd(Registers[RegisterYear]))) == E_NOT_OK) { ReturnValue = E_NOT_OK; }
+    if(value.SetTimeSecond(FromBcd(registers[kRegisterSeconds])) == kENotOk) { return_value = kENotOk; }
+    if(value.SetTimeMinute(FromBcd(registers[kRegisterMinutes])) == kENotOk) { return_value = kENotOk; }
+    if(value.SetTimeHour(FromBcd(registers[kRegisterHours] & DS3231_HOURS_VALUE_MASK)) == kENotOk) { return_value = kENotOk; }
+    if(value.SetDateDay(FromBcd(registers[kRegisterDay])) == kENotOk) { return_value = kENotOk; }
+    if(value.SetDateMonth(FromBcd(registers[kRegisterMonth] & DS3231_MONTH_VALUE_MASK)) == kENotOk) { return_value = kENotOk; }
+    if(value.SetDateYear(static_cast<ClockDateTime::YearType>(kYearOfCentury + FromBcd(registers[kRegisterYear]))) == kENotOk) { return_value = kENotOk; }
 
-    if(ReturnValue == E_NOT_OK) { return E_NOT_OK; }
+    if(return_value == kENotOk) { return kENotOk; }
 
-    DateTime = Value;
-    return E_OK;
+    date_time = value;
+    return kEOk;
 } /* getDateTime */
 
 
@@ -124,23 +124,23 @@ StdReturnType DS3231::getDateTime(ClockDateTime& DateTime)
  *
  *  \return         E_OK if the chip took the whole block and the stopped flag is cleared
 ******************************************************************************************************************************************************/
-StdReturnType DS3231::setDateTime(const ClockDateTime& DateTime)
+StdReturnType DS3231::SetDateTime(const ClockDateTime& date_time)
 {
-    if(startBus() == E_NOT_OK) { return E_NOT_OK; }
+    if(StartBus() == kENotOk) { return kENotOk; }
 
-    byte Registers[DS3231_DATE_TIME_NUMBER_OF_BYTES]{};
+    byte registers[DS3231_DATE_TIME_NUMBER_OF_BYTES]{};
 
-    Registers[RegisterSeconds] = toBcd(DateTime.getTimeSecond());
-    Registers[RegisterMinutes] = toBcd(DateTime.getTimeMinute());
-    Registers[RegisterHours] = toBcd(DateTime.getTimeHour());
-    Registers[RegisterWeekday] = toBcd(static_cast<byte>(DateTime.getDateWeekday() + WeekdayOffset));
-    Registers[RegisterDay] = toBcd(DateTime.getDateDay());
-    Registers[RegisterMonth] = toBcd(DateTime.getDateMonth());
-    Registers[RegisterYear] = toBcd(static_cast<byte>(DateTime.getDateYear() - YearOfCentury));
+    registers[kRegisterSeconds] = ToBcd(date_time.GetTimeSecond());
+    registers[kRegisterMinutes] = ToBcd(date_time.GetTimeMinute());
+    registers[kRegisterHours] = ToBcd(date_time.GetTimeHour());
+    registers[kRegisterWeekday] = ToBcd(static_cast<byte>(date_time.GetDateWeekday() + kWeekdayOffset));
+    registers[kRegisterDay] = ToBcd(date_time.GetDateDay());
+    registers[kRegisterMonth] = ToBcd(date_time.GetDateMonth());
+    registers[kRegisterYear] = ToBcd(static_cast<byte>(date_time.GetDateYear() - kYearOfCentury));
 
-    if(writeRegisters(DS3231_REG_SECONDS, Registers, DS3231_DATE_TIME_NUMBER_OF_BYTES) == E_NOT_OK) { return E_NOT_OK; }
+    if(WriteRegisters(DS3231_REG_SECONDS, registers, DS3231_DATE_TIME_NUMBER_OF_BYTES) == kENotOk) { return kENotOk; }
 
-    return clearOscillatorStopped();
+    return ClearOscillatorStopped();
 } /* setDateTime */
 
 
@@ -157,23 +157,23 @@ StdReturnType DS3231::setDateTime(const ClockDateTime& DateTime)
  *
  *  \return         E_OK, which is all this core can tell us
 ******************************************************************************************************************************************************/
-StdReturnType DS3231::startBus()
+StdReturnType DS3231::StartBus()
 {
-    if(BusStarted) { return E_OK; }
+    if(bus_started_) { return kEOk; }
 
     /* Four calls where the ESP32 has one: this core's begin() takes no arguments and
        returns nothing, and the clock rate is set afterwards because begin() would otherwise
        put the default back over it. The pin setters are not the check that replaces
        begin()'s return value, although they read like one - see BH1750::startBus() for why
-       an E_NOT_OK branch on them cannot be reached, and what carries the case instead. */
+       an kENotOk branch on them cannot be reached, and what carries the case instead. */
     Wire.setSDA(DS3231_I2C_PIN_SDA);
     Wire.setSCL(DS3231_I2C_PIN_SCL);
 
     Wire.begin();
     Wire.setClock(DS3231_I2C_FREQUENCY_HZ);
 
-    BusStarted = true;
-    return E_OK;
+    bus_started_ = true;
+    return kEOk;
 } /* startBus */
 
 
@@ -188,18 +188,18 @@ StdReturnType DS3231::startBus()
  *
  *  \return         E_OK if the chip acknowledged and handed over every byte
 ******************************************************************************************************************************************************/
-StdReturnType DS3231::readRegisters(byte Register, byte* Values, byte Length)
+StdReturnType DS3231::ReadRegisters(byte register_address, byte* values, byte length)
 {
     Wire.beginTransmission(static_cast<uint8_t>(DS3231_I2C_ADDR));
-    Wire.write(static_cast<uint8_t>(Register));
+    Wire.write(static_cast<uint8_t>(register_address));
 
-    if(Wire.endTransmission() != WireTransmissionSuccess) { return E_NOT_OK; }
+    if(Wire.endTransmission() != kWireTransmissionSuccess) { return kENotOk; }
 
-    if(Wire.requestFrom(static_cast<uint8_t>(DS3231_I2C_ADDR), static_cast<size_t>(Length)) != Length) { return E_NOT_OK; }
+    if(Wire.requestFrom(static_cast<uint8_t>(DS3231_I2C_ADDR), static_cast<size_t>(length)) != length) { return kENotOk; }
 
-    for(byte Index = 0u; Index < Length; Index++) { Values[Index] = static_cast<byte>(Wire.read()); }
+    for(byte index = 0u; index < length; index++) { values[index] = static_cast<byte>(Wire.read()); }
 
-    return E_OK;
+    return kEOk;
 } /* readRegisters */
 
 
@@ -210,16 +210,16 @@ StdReturnType DS3231::readRegisters(byte Register, byte* Values, byte Length)
  *
  *  \return         E_OK if the chip acknowledged the whole transfer
 ******************************************************************************************************************************************************/
-StdReturnType DS3231::writeRegisters(byte Register, const byte* Values, byte Length)
+StdReturnType DS3231::WriteRegisters(byte register_address, const byte* values, byte length)
 {
     Wire.beginTransmission(static_cast<uint8_t>(DS3231_I2C_ADDR));
-    Wire.write(static_cast<uint8_t>(Register));
+    Wire.write(static_cast<uint8_t>(register_address));
 
-    for(byte Index = 0u; Index < Length; Index++) { Wire.write(static_cast<uint8_t>(Values[Index])); }
+    for(byte index = 0u; index < length; index++) { Wire.write(static_cast<uint8_t>(values[index])); }
 
-    if(Wire.endTransmission() != WireTransmissionSuccess) { return E_NOT_OK; }
+    if(Wire.endTransmission() != kWireTransmissionSuccess) { return kENotOk; }
 
-    return E_OK;
+    return kEOk;
 } /* writeRegisters */
 
 
@@ -235,13 +235,13 @@ StdReturnType DS3231::writeRegisters(byte Register, const byte* Values, byte Len
  *
  *  \return         true if what the chip counted is not to be used
 ******************************************************************************************************************************************************/
-bool DS3231::hasOscillatorStopped()
+bool DS3231::HasOscillatorStopped()
 {
-    byte Status{0u};
+    byte status{0u};
 
-    if(readRegisters(DS3231_REG_STATUS, &Status, 1u) == E_NOT_OK) { return true; }
+    if(ReadRegisters(DS3231_REG_STATUS, &status, 1u) == kENotOk) { return true; }
 
-    return (Status & DS3231_STATUS_OSCILLATOR_STOPPED_MASK) != 0u;
+    return (status & DS3231_STATUS_OSCILLATOR_STOPPED_MASK) != 0u;
 } /* hasOscillatorStopped */
 
 
@@ -255,15 +255,15 @@ bool DS3231::hasOscillatorStopped()
  *
  *  \return         E_OK if the flag is cleared
 ******************************************************************************************************************************************************/
-StdReturnType DS3231::clearOscillatorStopped()
+StdReturnType DS3231::ClearOscillatorStopped()
 {
-    byte Status{0u};
+    byte status{0u};
 
-    if(readRegisters(DS3231_REG_STATUS, &Status, 1u) == E_NOT_OK) { return E_NOT_OK; }
+    if(ReadRegisters(DS3231_REG_STATUS, &status, 1u) == kENotOk) { return kENotOk; }
 
-    Status = static_cast<byte>(Status & ~DS3231_STATUS_OSCILLATOR_STOPPED_MASK);
+    status = static_cast<byte>(status & ~DS3231_STATUS_OSCILLATOR_STOPPED_MASK);
 
-    return writeRegisters(DS3231_REG_STATUS, &Status, 1u);
+    return WriteRegisters(DS3231_REG_STATUS, &status, 1u);
 } /* clearOscillatorStopped */
 
 
@@ -279,15 +279,15 @@ StdReturnType DS3231::clearOscillatorStopped()
  *
  *  \return         E_OK if both bytes arrived
 ******************************************************************************************************************************************************/
-StdReturnType DS3231::readTemperature()
+StdReturnType DS3231::ReadTemperature()
 {
-    byte Registers[DS3231_TEMPERATURE_NUMBER_OF_BYTES]{};
+    byte registers[DS3231_TEMPERATURE_NUMBER_OF_BYTES]{};
 
-    if(readRegisters(DS3231_REG_TEMPERATURE_MSB, Registers, DS3231_TEMPERATURE_NUMBER_OF_BYTES) == E_NOT_OK) { return E_NOT_OK; }
+    if(ReadRegisters(DS3231_REG_TEMPERATURE_MSB, registers, DS3231_TEMPERATURE_NUMBER_OF_BYTES) == kENotOk) { return kENotOk; }
 
-    Temperature = toTenths(static_cast<int8_t>(Registers[0u]), Registers[1u]);
-    TemperatureValid = true;
-    return E_OK;
+    temperature_ = ToTenths(static_cast<int8_t>(registers[0u]), registers[1u]);
+    temperature_valid_ = true;
+    return kEOk;
 } /* readTemperature */
 
 /******************************************************************************************************************************************************

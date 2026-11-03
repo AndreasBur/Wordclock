@@ -49,144 +49,144 @@
 /******************************************************************************************************************************************************
   shiftLeft()
 ******************************************************************************************************************************************************/
-StdReturnType Transformation::shiftLeft(bool Rotate)
+StdReturnType Transformation::ShiftLeft(bool rotate)
 {
-    StdReturnType returnValue{E_OK};
+    StdReturnType return_value{kEOk};
 
     for(byte row = 0u; row < DISPLAY_NUMBER_OF_ROWS; row++) {
-        if(shiftRowLeft(row, Rotate) == E_NOT_OK) { returnValue = E_NOT_OK; }
+        if(ShiftRowLeft(row, rotate) == kENotOk) { return_value = kENotOk; }
     }
-    return returnValue;
+    return return_value;
 } /* shiftLeft */
 
 
 /******************************************************************************************************************************************************
   shiftRowLeft()
 ******************************************************************************************************************************************************/
-StdReturnType Transformation::shiftRowLeft(byte Row, bool Rotate)
+StdReturnType Transformation::ShiftRowLeft(byte row, bool rotate)
 {
-    Display::PixelValueType firstPixelValue;
-    Display::PixelValueType pixelValue;
-    StdReturnType returnValue{E_OK};
+    Display::PixelValueType first_pixel_value;
+    Display::PixelValueType pixel_value;
+    StdReturnType return_value{kEOk};
 
-    if(Rotate) if(Display::getInstance().getPixel(0, Row, firstPixelValue) == E_NOT_OK) returnValue = E_NOT_OK;
+    if(rotate) if(Display::GetInstance().GetPixel(0, row, first_pixel_value) == kENotOk) return_value = kENotOk;
 
-    for(byte Column = 0u; Column < DISPLAY_NUMBER_OF_COLUMNS - 1u; Column++) {
-        if(Display::getInstance().getPixel(Column + 1u, Row, pixelValue) == E_NOT_OK) returnValue = E_NOT_OK;
-        if(Display::getInstance().writePixel(Column, Row, pixelValue) == E_NOT_OK) returnValue = E_NOT_OK;
+    for(byte column = 0u; column < DISPLAY_NUMBER_OF_COLUMNS - 1u; column++) {
+        if(Display::GetInstance().GetPixel(column + 1u, row, pixel_value) == kENotOk) return_value = kENotOk;
+        if(Display::GetInstance().WritePixel(column, row, pixel_value) == kENotOk) return_value = kENotOk;
     }
-    if(Rotate) { if(Display::getInstance().writePixel(DISPLAY_NUMBER_OF_COLUMNS - 1u, Row, firstPixelValue) == E_NOT_OK) returnValue = E_NOT_OK; }
-    else { if(Display::getInstance().clearPixel(DISPLAY_NUMBER_OF_COLUMNS - 1u, Row) == E_NOT_OK) returnValue = E_NOT_OK; }
+    if(rotate) { if(Display::GetInstance().WritePixel(DISPLAY_NUMBER_OF_COLUMNS - 1u, row, first_pixel_value) == kENotOk) return_value = kENotOk; }
+    else { if(Display::GetInstance().ClearPixel(DISPLAY_NUMBER_OF_COLUMNS - 1u, row) == kENotOk) return_value = kENotOk; }
 
-    return returnValue;
+    return return_value;
 } /* shiftRowLeft */
 
 
 /******************************************************************************************************************************************************
   shiftRight()
 ******************************************************************************************************************************************************/
-StdReturnType Transformation::shiftRight(bool Rotate)
+StdReturnType Transformation::ShiftRight(bool rotate)
 {
-    StdReturnType returnValue = E_OK;
+    StdReturnType return_value = kEOk;
 
-    for(byte Row = 0u; Row < DISPLAY_NUMBER_OF_ROWS; Row++) {
-        if(shiftRowRight(Row, Rotate) == E_NOT_OK) { returnValue = E_NOT_OK; }
+    for(byte row = 0u; row < DISPLAY_NUMBER_OF_ROWS; row++) {
+        if(ShiftRowRight(row, rotate) == kENotOk) { return_value = kENotOk; }
     }
-    return returnValue;
+    return return_value;
 } /* shiftRight */
 
 
 /******************************************************************************************************************************************************
   shiftRowRight()
 ******************************************************************************************************************************************************/
-StdReturnType Transformation::shiftRowRight(byte Row, bool Rotate)
+StdReturnType Transformation::ShiftRowRight(byte row, bool rotate)
 {
-    Display::PixelValueType lastPixelValue;
-    Display::PixelValueType pixelValue;
-    StdReturnType returnValue{E_OK};
+    Display::PixelValueType last_pixel_value;
+    Display::PixelValueType pixel_value;
+    StdReturnType return_value{kEOk};
 
-    if(Rotate) if(Display::getInstance().getPixel(DISPLAY_NUMBER_OF_COLUMNS - 1u, Row, lastPixelValue) == E_NOT_OK) returnValue = E_NOT_OK;
+    if(rotate) if(Display::GetInstance().GetPixel(DISPLAY_NUMBER_OF_COLUMNS - 1u, row, last_pixel_value) == kENotOk) return_value = kENotOk;
 
     for(int8_t column = DISPLAY_NUMBER_OF_COLUMNS - 1u; column > 0; column--) {
-        if(Display::getInstance().getPixel(column - 1u, Row, pixelValue) == E_NOT_OK) returnValue = E_NOT_OK;
-        if(Display::getInstance().writePixel(column, Row, pixelValue) == E_NOT_OK) returnValue = E_NOT_OK;
+        if(Display::GetInstance().GetPixel(column - 1u, row, pixel_value) == kENotOk) return_value = kENotOk;
+        if(Display::GetInstance().WritePixel(column, row, pixel_value) == kENotOk) return_value = kENotOk;
     }
-    if(Rotate) { if(Display::getInstance().writePixel(0u, Row, lastPixelValue) == E_NOT_OK) returnValue = E_NOT_OK; }
-    else{ if(Display::getInstance().clearPixel(0u, Row) == E_NOT_OK) returnValue = E_NOT_OK; }
+    if(rotate) { if(Display::GetInstance().WritePixel(0u, row, last_pixel_value) == kENotOk) return_value = kENotOk; }
+    else{ if(Display::GetInstance().ClearPixel(0u, row) == kENotOk) return_value = kENotOk; }
 
-    return returnValue;
+    return return_value;
 } /* shiftRowRight */
 
 
 /******************************************************************************************************************************************************
   shiftUp()
 ******************************************************************************************************************************************************/
-StdReturnType Transformation::shiftUp(bool Rotate)
+StdReturnType Transformation::ShiftUp(bool rotate)
 {
-    StdReturnType returnValue{E_OK};
+    StdReturnType return_value{kEOk};
 
     for(byte column = 0u; column < DISPLAY_NUMBER_OF_COLUMNS; column++) {
-        if(shiftColumnUp(column, Rotate) == E_NOT_OK) { returnValue = E_NOT_OK; }
+        if(ShiftColumnUp(column, rotate) == kENotOk) { return_value = kENotOk; }
     }
-    return returnValue;
+    return return_value;
 } /* shiftUp */
 
 
 /******************************************************************************************************************************************************
   shiftColumnUp()
 ******************************************************************************************************************************************************/
-StdReturnType Transformation::shiftColumnUp(byte Column, bool Rotate)
+StdReturnType Transformation::ShiftColumnUp(byte column, bool rotate)
 {
-    Display::PixelValueType firstPixelValue;
-    Display::PixelValueType pixelValue;
-    StdReturnType returnValue{E_OK};
+    Display::PixelValueType first_pixel_value;
+    Display::PixelValueType pixel_value;
+    StdReturnType return_value{kEOk};
 
-    if(Rotate) if(Display::getInstance().getPixel(Column, 0u, firstPixelValue) == E_NOT_OK) returnValue = E_NOT_OK;
+    if(rotate) if(Display::GetInstance().GetPixel(column, 0u, first_pixel_value) == kENotOk) return_value = kENotOk;
 
-    for(byte Row = 0u; Row < DISPLAY_NUMBER_OF_ROWS - 1u; Row++) {
-        if(Display::getInstance().getPixel(Column, Row + 1u, pixelValue) == E_NOT_OK) returnValue = E_NOT_OK;
-        if(Display::getInstance().writePixel(Column, Row, pixelValue) == E_NOT_OK) returnValue = E_NOT_OK;
+    for(byte row = 0u; row < DISPLAY_NUMBER_OF_ROWS - 1u; row++) {
+        if(Display::GetInstance().GetPixel(column, row + 1u, pixel_value) == kENotOk) return_value = kENotOk;
+        if(Display::GetInstance().WritePixel(column, row, pixel_value) == kENotOk) return_value = kENotOk;
     }
-    if(Rotate) { if(Display::getInstance().writePixel(Column, DISPLAY_NUMBER_OF_ROWS - 1u, firstPixelValue) == E_NOT_OK) returnValue = E_NOT_OK; }
-    else { if(Display::getInstance().clearPixel(Column, DISPLAY_NUMBER_OF_ROWS - 1u) == E_NOT_OK) returnValue = E_NOT_OK; }
+    if(rotate) { if(Display::GetInstance().WritePixel(column, DISPLAY_NUMBER_OF_ROWS - 1u, first_pixel_value) == kENotOk) return_value = kENotOk; }
+    else { if(Display::GetInstance().ClearPixel(column, DISPLAY_NUMBER_OF_ROWS - 1u) == kENotOk) return_value = kENotOk; }
 
-    return returnValue;
+    return return_value;
 } /* shiftColumnUp */
 
 
 /******************************************************************************************************************************************************
   shiftDown()
 ******************************************************************************************************************************************************/
-StdReturnType Transformation::shiftDown(bool Rotate)
+StdReturnType Transformation::ShiftDown(bool rotate)
 {
-    StdReturnType returnValue{E_OK};
+    StdReturnType return_value{kEOk};
 
     for(byte column = 0u; column < DISPLAY_NUMBER_OF_COLUMNS; column++) {
-        if(shiftColumnDown(column, Rotate) == E_NOT_OK) { returnValue = E_NOT_OK; }
+        if(ShiftColumnDown(column, rotate) == kENotOk) { return_value = kENotOk; }
     }
-    return returnValue;
+    return return_value;
 } /* shiftDown */
 
 
 /******************************************************************************************************************************************************
   shiftColumnDown()
 ******************************************************************************************************************************************************/
-StdReturnType Transformation::shiftColumnDown(byte Column, bool Rotate)
+StdReturnType Transformation::ShiftColumnDown(byte column, bool rotate)
 {
-    Display::PixelValueType lastPixelValue;
-    Display::PixelValueType pixelValue;
-    StdReturnType returnValue{E_OK};
+    Display::PixelValueType last_pixel_value;
+    Display::PixelValueType pixel_value;
+    StdReturnType return_value{kEOk};
 
-    if(Rotate) if(Display::getInstance().getPixel(Column, DISPLAY_NUMBER_OF_ROWS - 1u, lastPixelValue) == E_NOT_OK) returnValue = E_NOT_OK;
+    if(rotate) if(Display::GetInstance().GetPixel(column, DISPLAY_NUMBER_OF_ROWS - 1u, last_pixel_value) == kENotOk) return_value = kENotOk;
 
     for(int8_t row = DISPLAY_NUMBER_OF_ROWS - 1u; row > 0; row--) {
-        if(Display::getInstance().getPixel(Column, row - 1u, pixelValue) == E_NOT_OK) returnValue = E_NOT_OK;
-        if(Display::getInstance().writePixel(Column, row, pixelValue) == E_NOT_OK) returnValue = E_NOT_OK;
+        if(Display::GetInstance().GetPixel(column, row - 1u, pixel_value) == kENotOk) return_value = kENotOk;
+        if(Display::GetInstance().WritePixel(column, row, pixel_value) == kENotOk) return_value = kENotOk;
     }
-    if(Rotate) { if(Display::getInstance().writePixel(Column, 0u, lastPixelValue) == E_NOT_OK) returnValue = E_NOT_OK; }
-    else { if(Display::getInstance().clearPixel(Column, 0u) == E_NOT_OK) returnValue = E_NOT_OK; }
+    if(rotate) { if(Display::GetInstance().WritePixel(column, 0u, last_pixel_value) == kENotOk) return_value = kENotOk; }
+    else { if(Display::GetInstance().ClearPixel(column, 0u) == kENotOk) return_value = kENotOk; }
 
-    return returnValue;
+    return return_value;
 } /* shiftColumnDown */
 
 

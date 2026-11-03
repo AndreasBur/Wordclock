@@ -53,55 +53,55 @@ class AnimationExplodePixels : public Animation
 /******************************************************************************************************************************************************
  *  GLOBAL DATA TYPES AND STRUCTURES
 ******************************************************************************************************************************************************/
-    static constexpr byte ShiftCounterMaxValue{5u};
-    static constexpr byte ColumnCenter{DISPLAY_NUMBER_OF_COLUMNS / 2u};
-    static constexpr byte RowCenter{DISPLAY_NUMBER_OF_ROWS / 2u};
+    static constexpr byte kShiftCounterMaxValue{5u};
+    static constexpr byte kColumnCenter{DISPLAY_NUMBER_OF_COLUMNS / 2u};
+    static constexpr byte kRowCenter{DISPLAY_NUMBER_OF_ROWS / 2u};
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    ClockWords::WordsListType ClockWordsTable{{DisplayWords::WORD_NONE}};
-    DisplayWords Words;
-    byte ShiftCounter{0u};
+    ClockWords::WordsListType clock_words_table_{{DisplayWords::kWordNone}};
+    DisplayWords words_;
+    byte shift_counter_{0u};
 
     // functions
-    void reset();
-    static void clearTimeTask();
-    void setTimeTask();
-    void setStateToSetTime();
+    void Reset();
+    static void ClearTimeTask();
+    void SetTimeTask();
+    void SetStateToSetTime();
 
-    static void shiftQuadrants(DisplayPixels&, byte);
+    static void ShiftQuadrants(DisplayPixels&, byte);
 
-    static void shiftQuadrantUpperLeft();
-    static void shiftQuadrantUpperRight();
-    static void shiftQuadrantLowerLeft();
-    static void shiftQuadrantLowerRight();
+    static void ShiftQuadrantUpperLeft();
+    static void ShiftQuadrantUpperRight();
+    static void ShiftQuadrantLowerLeft();
+    static void ShiftQuadrantLowerRight();
 
-    static void shiftDownRight(byte, byte);
-    static void shiftDownLeft(byte, byte);
-    static void shiftUpRight(byte, byte);
-    static void shiftUpLeft(byte, byte);
+    static void ShiftDownRight(byte, byte);
+    static void ShiftDownLeft(byte, byte);
+    static void ShiftUpRight(byte, byte);
+    static void ShiftUpLeft(byte, byte);
 
-    static void clearOldAndSetNewPixel(byte, byte, byte, byte);
-    static void setNewPixel(byte, byte, byte, byte);
+    static void ClearOldAndSetNewPixel(byte, byte, byte, byte);
+    static void SetNewPixel(byte, byte, byte, byte);
 
-    static byte shiftLeft(byte Column, byte NumberOfShifts) {
-         return (static_cast<int16_t>(Column) - NumberOfShifts > ColumnCenter) ? (Column - NumberOfShifts) : ColumnCenter;
+    static byte ShiftLeft(byte column, byte number_of_shifts) {
+         return (static_cast<int16_t>(column) - number_of_shifts > kColumnCenter) ? (column - number_of_shifts) : kColumnCenter;
     }
-    static byte shiftRight(byte Column, byte NumberOfShifts) {
-         return (static_cast<uint16_t>(Column) + NumberOfShifts < ColumnCenter) ? (Column + NumberOfShifts) : ColumnCenter;
+    static byte ShiftRight(byte column, byte number_of_shifts) {
+         return (static_cast<uint16_t>(column) + number_of_shifts < kColumnCenter) ? (column + number_of_shifts) : kColumnCenter;
     }
-    static byte shiftUp(byte Row, byte NumberOfShifts) {
-         return (static_cast<int16_t>(Row) - NumberOfShifts > RowCenter) ? (Row - NumberOfShifts) : RowCenter;
+    static byte ShiftUp(byte row, byte number_of_shifts) {
+         return (static_cast<int16_t>(row) - number_of_shifts > kRowCenter) ? (row - number_of_shifts) : kRowCenter;
     }
-    static byte shiftDown(byte Row, byte NumberOfShifts) {
-         return (static_cast<uint16_t>(Row) + NumberOfShifts < RowCenter) ? (Row + NumberOfShifts) : RowCenter;
+    static byte ShiftDown(byte row, byte number_of_shifts) {
+         return (static_cast<uint16_t>(row) + number_of_shifts < kRowCenter) ? (row + number_of_shifts) : kRowCenter;
     }
 
-    void setTime(DisplayPixels& Pixels) {
-        for(byte Index  = 0u; Index < ClockWordsTable.size(); Index++) {
-            Pixels.setWord(ClockWordsTable[Index]);
+    void SetTime(DisplayPixels& pixels) {
+        for(byte index  = 0u; index < clock_words_table_.size(); index++) {
+            pixels.SetWord(clock_words_table_[index]);
         }
     }
 
@@ -109,7 +109,7 @@ class AnimationExplodePixels : public Animation
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr AnimationExplodePixels() : Words() { }
+    constexpr AnimationExplodePixels() : words_() { }
     ~AnimationExplodePixels() { }
 
     // get methods
@@ -117,9 +117,9 @@ class AnimationExplodePixels : public Animation
     // set methods
 
     // methods
-    void init();
-    StdReturnType setTime(byte, byte);
-    void task();
+    void Init();
+    StdReturnType SetTime(byte, byte);
+    void Task();
 };
 
 

@@ -48,51 +48,51 @@ class MsgCmdColorCycleParser : public MsgParameterParser<MsgCmdColorCycleParser,
   private:
     friend class MsgParameterParser;
 
-    static constexpr char ActiveShortName{'A'};
-    static constexpr char SpeedShortName{'S'};
-    static constexpr char HueShortName{'H'};
+    static constexpr char kActiveShortName{'A'};
+    static constexpr char kSpeedShortName{'S'};
+    static constexpr char kHueShortName{'H'};
 
-    static constexpr ParameterTableType ParameterTable PROGMEM {
-        ParameterTableElementType(ActiveShortName, MsgParameter::ARGUMENT_TYPE_UINT8),
-        ParameterTableElementType(SpeedShortName,  MsgParameter::ARGUMENT_TYPE_UINT8)
+    static constexpr ParameterTableType kParameterTable PROGMEM {
+        ParameterTableElementType(kActiveShortName, MsgParameter::kArgumentTypeUint8),
+        ParameterTableElementType(kSpeedShortName,  MsgParameter::kArgumentTypeUint8)
     };
 
     /* Collected rather than applied where it arrives, and applied after the speed: switching
        the cycle on puts a colour on the strip at once, and doing that before the speed of the
        same command has landed would start the wheel at the old rate for one step. */
-    bool Active{false};
-    bool ActiveGiven{false};
+    bool active_{false};
+    bool active_given_{false};
 
     // functions
-    static void handleParameter(char ParameterShortName, const char* Argument, PositionType Length) {
-        UNUSED(ParameterShortName); UNUSED(Argument); UNUSED(Length);
+    static void HandleParameter(char parameter_short_name, const char* argument, PositionType length) {
+        UNUSED(parameter_short_name); UNUSED(argument); UNUSED(length);
     }
-    void handleParameter(char ParameterShortName, byte Argument)
+    void HandleParameter(char parameter_short_name, byte argument)
     {
-        if(ParameterShortName == ActiveShortName) { Active = (Argument != 0u); ActiveGiven = true; }
-        if(ParameterShortName == SpeedShortName)  { ColorCycle::getInstance().setTaskCycle(Argument); }
+        if(parameter_short_name == kActiveShortName) { active_ = (argument != 0u); active_given_ = true; }
+        if(parameter_short_name == kSpeedShortName)  { ColorCycle::GetInstance().SetTaskCycle(argument); }
     }
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr MsgCmdColorCycleParser(const char* Parameter) : MsgParameterParser(ParameterTable, Parameter) { }
+    constexpr MsgCmdColorCycleParser(const char* parameter) : MsgParameterParser(kParameterTable, parameter) { }
     ~MsgCmdColorCycleParser() { }
 
     // methods
-    static void sendAnswer() {
-        const ColorCycle& colorCycle = ColorCycle::getInstance();
+    static void SendAnswer() {
+        const ColorCycle& color_cycle = ColorCycle::GetInstance();
 
-        sendAnswerParameter(ActiveShortName, static_cast<byte>(colorCycle.getIsActive() ? 1u : 0u));
-        sendAnswerParameter(SpeedShortName, colorCycle.getTaskCycle());
+        SendAnswerParameter(kActiveShortName, static_cast<byte>(color_cycle.GetIsActive() ? 1u : 0u));
+        SendAnswerParameter(kSpeedShortName, color_cycle.GetTaskCycle());
         /* Last field before the command parser's terminating println(), so no trailing
            separator space. */
-        sendAnswerParameter(HueShortName, colorCycle.getHue(), false);
+        SendAnswerParameter(kHueShortName, color_cycle.GetHue(), false);
     }
 
-    void process() const {
-        if(ActiveGiven) { ColorCycle::getInstance().setIsActive(Active); }
+    void Process() const {
+        if(active_given_) { ColorCycle::GetInstance().SetIsActive(active_); }
     }
 };
 

@@ -18,9 +18,9 @@ namespace {
 
    The firmware's table stores one byte per letter, so the umlauts are Latin-1 and need
    converting; wxString would otherwise read 0xDC as an invalid UTF-8 byte and drop it. */
-wxString toCharacterLabel(char Character)
+wxString ToCharacterLabel(char character)
 {
-    return wxString(&Character, wxCSConv(wxFONTENCODING_ISO8859_1), 1u);
+    return wxString(&character, wxCSConv(wxFONTENCODING_ISO8859_1), 1u);
 }
 
 } // namespace
@@ -29,11 +29,11 @@ wxString toCharacterLabel(char Character)
 
 BEGIN_EVENT_TABLE(PixelsFrame, wxFrame)
     EVT_CLOSE(PixelsFrame::OnClose)
-    EVT_BUTTON(ID_BUTTON_SEND, PixelsFrame::OnSend)
-    EVT_BUTTON(ID_BUTTON_CLEAR, PixelsFrame::OnClear)
+    EVT_BUTTON(kIdButtonSend, PixelsFrame::OnSend)
+    EVT_BUTTON(kIdButtonClear, PixelsFrame::OnClear)
     EVT_MENU(wxID_PREFERENCES, PixelsFrame::OnSettings)
-    EVT_BUTTON(ID_BUTTON_CREATE, PixelsFrame::OnMessage)
-    EVT_MENU(ID_MENU_MESSAGE, PixelsFrame::OnMessage)
+    EVT_BUTTON(kIdButtonCreate, PixelsFrame::OnMessage)
+    EVT_MENU(kIdMenuMessage, PixelsFrame::OnMessage)
     EVT_MENU(wxID_ABOUT, PixelsFrame::OnAbout)
     EVT_MENU(wxID_EXIT, PixelsFrame::OnQuit)
 END_EVENT_TABLE()
@@ -43,127 +43,127 @@ PixelsFrame::PixelsFrame(wxWindow* parent, const wxString &title) : wxFrame(pare
 {
     SetIcon(wxICON(WordclockIcon));
     SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DFACE));
-    SetMenuBar(createMenuBar());
+    SetMenuBar(CreateMenuBar());
 
-    wxScrolledWindow* ScrolledWindow = new wxScrolledWindow(this);
-    wxBoxSizer* ContentSizer = createSizerAll(ScrolledWindow);
-    ScrolledWindow->SetSizer(ContentSizer);
-    ScrolledWindow->SetScrollRate(5, 5);
+    wxScrolledWindow* scrolled_window = new wxScrolledWindow(this);
+    wxBoxSizer* content_sizer = CreateSizerAll(scrolled_window);
+    scrolled_window->SetSizer(content_sizer);
+    scrolled_window->SetScrollRate(5, 5);
 
     // Lay the scrolled window out to fill the frame's client area.
-    wxBoxSizer* FrameSizer = new wxBoxSizer(wxVERTICAL);
-    FrameSizer->Add(ScrolledWindow, 1, wxEXPAND);
-    SetSizer(FrameSizer);
+    wxBoxSizer* frame_sizer = new wxBoxSizer(wxVERTICAL);
+    frame_sizer->Add(scrolled_window, 1, wxEXPAND);
+    SetSizer(frame_sizer);
 
     // A wxScrolledWindow advertises a tiny best size (it is meant to scroll),
     // so Fit() would shrink the frame and clip the letter grid. Size the frame
     // to the content's minimum instead. Note that wxWidgets/GTK only finalises
     // font metrics once the window is mapped, so GetMinSize() under-measures the
     // grid here; this initial size just avoids a tiny first paint.
-    SetClientSize(ContentSizer->GetMinSize());
-    ScrolledWindow->Show();
+    SetClientSize(content_sizer->GetMinSize());
+    scrolled_window->Show();
 
     // Re-fit once the window is on screen and the letter sizes are accurate, so
     // nothing gets clipped. Scrollbars still appear if the user shrinks it.
-    CallAfter([this, ContentSizer] {
-        SetClientSize(ContentSizer->GetMinSize());
+    CallAfter([this, content_sizer] {
+        SetClientSize(content_sizer->GetMinSize());
     });
 }
 
-wxMenuBar* PixelsFrame::createMenuBar()
+wxMenuBar* PixelsFrame::CreateMenuBar()
 {
-    wxMenu* MenuFile = new wxMenu();
-    MenuFile->Append(wxID_PREFERENCES, _T("&Settings"));
-    MenuFile->Append(ID_MENU_MESSAGE, _T("&Message"));
-    MenuFile->AppendSeparator();
-    MenuFile->Append(wxID_EXIT);
+    wxMenu* menu_file = new wxMenu();
+    menu_file->Append(wxID_PREFERENCES, _T("&Settings"));
+    menu_file->Append(kIdMenuMessage, _T("&Message"));
+    menu_file->AppendSeparator();
+    menu_file->Append(wxID_EXIT);
 
-    wxMenu* MenuHelp = new wxMenu();
-    MenuHelp->Append(wxID_ABOUT);
+    wxMenu* menu_help = new wxMenu();
+    menu_help->Append(wxID_ABOUT);
 
-    wxMenuBar* MenuBar = new wxMenuBar();
-    MenuBar->Append(MenuFile, _T("&File"));
-    MenuBar->Append(MenuHelp, _T("&Help"));
+    wxMenuBar* menu_bar = new wxMenuBar();
+    menu_bar->Append(menu_file, _T("&File"));
+    menu_bar->Append(menu_help, _T("&Help"));
 
-    return MenuBar;
+    return menu_bar;
 }
 
-wxBoxSizer* PixelsFrame::createSizerAll(wxWindow* Parent)
+wxBoxSizer* PixelsFrame::CreateSizerAll(wxWindow* parent)
 {
-    wxBoxSizer* SizerAll = new wxBoxSizer(wxHORIZONTAL);
-    wxBoxSizer* SizerControl = createSizerControl(Parent);
+    wxBoxSizer* sizer_all = new wxBoxSizer(wxHORIZONTAL);
+    wxBoxSizer* sizer_control = CreateSizerControl(parent);
 
-    SizerAll->Add(createSizerCharacters(Parent), 1, wxALL|wxEXPAND, 10);
-    SizerAll->Add(SizerControl, 0, wxALL|wxEXPAND, 10);
+    sizer_all->Add(CreateSizerCharacters(parent), 1, wxALL|wxEXPAND, 10);
+    sizer_all->Add(sizer_control, 0, wxALL|wxEXPAND, 10);
 
-    return SizerAll;
+    return sizer_all;
 }
 
-wxBoxSizer* PixelsFrame::createSizerCharacters(wxWindow* Parent)
+wxBoxSizer* PixelsFrame::CreateSizerCharacters(wxWindow* parent)
 {
-    wxBoxSizer* SizerCharacters = new wxBoxSizer(wxVERTICAL);
+    wxBoxSizer* sizer_characters = new wxBoxSizer(wxVERTICAL);
 
-    for(unsigned int Row = 0; Row < PIXELS_DISPLAY_NUMBER_OF_ROWS; Row++) {
+    for(unsigned int row = 0; row < PIXELS_DISPLAY_NUMBER_OF_ROWS; row++) {
         // Proportion 0: rows keep their (square-cell) height instead of being
         // stretched vertically to fill the frame.
-        SizerCharacters->Add(createSizerCharacter(Parent, static_cast<int>(Row)), 0, wxALIGN_CENTER);
+        sizer_characters->Add(CreateSizerCharacter(parent, static_cast<int>(row)), 0, wxALIGN_CENTER);
     }
 
-    return SizerCharacters;
+    return sizer_characters;
 }
 
-wxBoxSizer* PixelsFrame::createSizerCharacter(wxWindow* Parent, int Row)
+wxBoxSizer* PixelsFrame::CreateSizerCharacter(wxWindow* parent, int row)
 {
-    wxBoxSizer* SizerCharacter = new wxBoxSizer(wxHORIZONTAL);
+    wxBoxSizer* sizer_character = new wxBoxSizer(wxHORIZONTAL);
 
     // Each letter lives in a fixed square cell so the grid reads as a real
     // matrix instead of vertically-stretched columns.
-    static constexpr int CellSize = 44;
+    static constexpr int kCellSize = 44;
 
-    const DisplayCharacters Letters;
+    const DisplayCharacters letters;
 
-    for(unsigned int Column = 0; Column < PIXELS_DISPLAY_NUMBER_OF_COLUMNS; Column++) {
-        const wxString Label = toCharacterLabel(Letters.getCharacter(static_cast<byte>(Column), static_cast<byte>(Row)));
+    for(unsigned int column = 0; column < PIXELS_DISPLAY_NUMBER_OF_COLUMNS; column++) {
+        const wxString label = ToCharacterLabel(letters.GetCharacter(static_cast<byte>(column), static_cast<byte>(row)));
 
-        Characters[Row][Column] = new wxStaticText(Parent, wxID_ANY, Label, wxDefaultPosition, wxSize(CellSize, CellSize), wxALIGN_CENTRE_HORIZONTAL);
-        Characters[Row][Column]->SetFont(wxFont(wxSize(40,40), wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false));
-        Characters[Row][Column]->SetForegroundColour(wxColour(*wxLIGHT_GREY));
-        Characters[Row][Column]->SetMinSize(wxSize(CellSize, CellSize));
+        characters_[row][column] = new wxStaticText(parent, wxID_ANY, label, wxDefaultPosition, wxSize(kCellSize, kCellSize), wxALIGN_CENTRE_HORIZONTAL);
+        characters_[row][column]->SetFont(wxFont(wxSize(40,40), wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false));
+        characters_[row][column]->SetForegroundColour(wxColour(*wxLIGHT_GREY));
+        characters_[row][column]->SetMinSize(wxSize(kCellSize, kCellSize));
         // Proportion 0 + centered: the cell stays square and never stretches.
-        SizerCharacter->Add(Characters[Row][Column], 0, wxALIGN_CENTER);
+        sizer_character->Add(characters_[row][column], 0, wxALIGN_CENTER);
     }
 
-    return SizerCharacter;
+    return sizer_character;
 }
 
-wxBoxSizer* PixelsFrame::createSizerControl(wxWindow* Parent)
+wxBoxSizer* PixelsFrame::CreateSizerControl(wxWindow* parent)
 {
-    wxStaticBox* StaticBox = new wxStaticBox(Parent, ID_STATIC_BOX, _T("Control"));
-    wxStaticBoxSizer* SizerControl = new wxStaticBoxSizer(StaticBox, wxVERTICAL);
-    wxStaticText* OutputLabel = new wxStaticText(Parent, wxID_ANY, _T("Output"));
-    wxStaticText* InputLabel = new wxStaticText(Parent, wxID_ANY, _T("Input"));
+    wxStaticBox* static_box = new wxStaticBox(parent, kIdStaticBox, _T("Control"));
+    wxStaticBoxSizer* sizer_control = new wxStaticBoxSizer(static_box, wxVERTICAL);
+    wxStaticText* output_label = new wxStaticText(parent, wxID_ANY, _T("Output"));
+    wxStaticText* input_label = new wxStaticText(parent, wxID_ANY, _T("Input"));
     /* Opens the message builder, which fills the input field below. */
-    wxButton* Create = new wxButton(Parent, ID_BUTTON_CREATE, wxT("C&reate"), wxDefaultPosition, wxDefaultSize, 0);
-    wxButton* Send = new wxButton(Parent, ID_BUTTON_SEND, wxT("&Send"), wxDefaultPosition, wxDefaultSize, 0);
-    wxButton* Clear = new wxButton(Parent, ID_BUTTON_CLEAR, wxT("&Clear"), wxDefaultPosition, wxDefaultSize, 0);
+    wxButton* create = new wxButton(parent, kIdButtonCreate, wxT("C&reate"), wxDefaultPosition, wxDefaultSize, 0);
+    wxButton* send = new wxButton(parent, kIdButtonSend, wxT("&Send"), wxDefaultPosition, wxDefaultSize, 0);
+    wxButton* clear = new wxButton(parent, kIdButtonClear, wxT("&Clear"), wxDefaultPosition, wxDefaultSize, 0);
 
-    static constexpr int ConsoleWidth = 300;
+    static constexpr int kConsoleWidth = 300;
 
-    wxTextCtrl* Output = new wxTextCtrl(Parent, ID_TEXT_CTRL_OUTPUT, _(""), wxDefaultPosition,
-                                        wxSize(ConsoleWidth, 200), wxTE_MULTILINE|wxTE_READONLY|wxTE_DONTWRAP);
-    wxTextCtrl* Input  = new wxTextCtrl(Parent, ID_TEXT_CTRL_INPUT, _(""), wxDefaultPosition, wxSize(ConsoleWidth, 20));
+    wxTextCtrl* output = new wxTextCtrl(parent, kIdTextCtrlOutput, _(""), wxDefaultPosition,
+                                        wxSize(kConsoleWidth, 200), wxTE_MULTILINE|wxTE_READONLY|wxTE_DONTWRAP);
+    wxTextCtrl* input  = new wxTextCtrl(parent, kIdTextCtrlInput, _(""), wxDefaultPosition, wxSize(kConsoleWidth, 20));
 
-    SerialShim::getInstance().attach(Output, Input);
+    SerialShim::GetInstance().Attach(output, input);
 
-    SizerControl->Add(OutputLabel, 0, wxLEFT | wxTOP | wxEXPAND, 10);
-    SizerControl->Add(Output, 1, wxRIGHT | wxLEFT | wxEXPAND, 10);
-    SizerControl->Add(Clear, 0, wxTOP | wxRIGHT | wxLEFT | wxEXPAND, 10);
-    SizerControl->Add(InputLabel, 0, wxLEFT | wxTOP, 10);
-    SizerControl->Add(Input, 0, wxRIGHT | wxLEFT | wxEXPAND, 10);
-    SizerControl->Add(Create, 0, wxTOP | wxRIGHT | wxLEFT | wxEXPAND, 10);
-    SizerControl->Add(Send, 0, wxTOP | wxRIGHT | wxLEFT | wxBOTTOM | wxEXPAND, 10);
+    sizer_control->Add(output_label, 0, wxLEFT | wxTOP | wxEXPAND, 10);
+    sizer_control->Add(output, 1, wxRIGHT | wxLEFT | wxEXPAND, 10);
+    sizer_control->Add(clear, 0, wxTOP | wxRIGHT | wxLEFT | wxEXPAND, 10);
+    sizer_control->Add(input_label, 0, wxLEFT | wxTOP, 10);
+    sizer_control->Add(input, 0, wxRIGHT | wxLEFT | wxEXPAND, 10);
+    sizer_control->Add(create, 0, wxTOP | wxRIGHT | wxLEFT | wxEXPAND, 10);
+    sizer_control->Add(send, 0, wxTOP | wxRIGHT | wxLEFT | wxBOTTOM | wxEXPAND, 10);
 
-    return SizerControl;
+    return sizer_control;
 }
 
 PixelsFrame::~PixelsFrame()
@@ -181,7 +181,7 @@ void PixelsFrame::OnClose(wxCloseEvent &event)
 // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 void PixelsFrame::OnSend(wxCommandEvent &event)
 {
-    SerialShim::getInstance().sendInput();
+    SerialShim::GetInstance().SendInput();
     UNUSED(event);
 }
 
@@ -189,7 +189,7 @@ void PixelsFrame::OnSend(wxCommandEvent &event)
 // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 void PixelsFrame::OnClear(wxCommandEvent &event)
 {
-    SerialShim::getInstance().clearOutput();
+    SerialShim::GetInstance().ClearOutput();
     UNUSED(event);
 }
 
@@ -197,7 +197,7 @@ void PixelsFrame::OnClear(wxCommandEvent &event)
 // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 void PixelsFrame::OnSettings(wxCommandEvent &event)
 {
-    Settings::getInstance().reveal();
+    Settings::GetInstance().Reveal();
     UNUSED(event);
 }
 
@@ -205,7 +205,7 @@ void PixelsFrame::OnSettings(wxCommandEvent &event)
 // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 void PixelsFrame::OnMessage(wxCommandEvent &event)
 {
-    MessageBuilder::getInstance().reveal();
+    MessageBuilder::GetInstance().Reveal();
     UNUSED(event);
 }
 
@@ -223,34 +223,34 @@ void PixelsFrame::OnAbout(wxCommandEvent &event)
     UNUSED(event);
 }
 
-wxColour PixelsFrame::toColour(PixelType Pixel)
+wxColour PixelsFrame::ToColour(PixelType pixel)
 {
     /* Only a pixel's brightness is rendered, as the grey level of its letter. */
-    const byte Level = toLevel(getWeightedIntensity(getIntensity(Pixel)));
+    const byte level = ToLevel(GetWeightedIntensity(GetIntensity(pixel)));
 
-    return wxColour(Level, Level, Level);
+    return wxColour(level, level, level);
 }
 
-void PixelsFrame::renderPixel(byte Row, byte Column)
+void PixelsFrame::RenderPixel(byte row, byte column)
 {
-    const Pixels& pixels = Pixels::getInstance();
-    const byte Index = static_cast<byte>((Row * PIXELS_DISPLAY_NUMBER_OF_COLUMNS) + Column);
-    const wxColour Colour = (pixels.getBrightness() == 0u) ? wxColour(*wxLIGHT_GREY)
-                                                           : toColour(pixels.getPixel(Index));
+    const Pixels& pixels = Pixels::GetInstance();
+    const byte index = static_cast<byte>((row * PIXELS_DISPLAY_NUMBER_OF_COLUMNS) + column);
+    const wxColour colour = (pixels.GetBrightness() == 0u) ? wxColour(*wxLIGHT_GREY)
+                                                           : ToColour(pixels.GetPixel(index));
 
     /* SetForegroundColour marks the label for repaint even when the colour does not
        change. Rendering now walks the whole grid instead of only the pixel that was
        written, so without this every pass would repaint all 110 letters. */
-    if(Characters[Row][Column]->GetForegroundColour() == Colour) { return; }
+    if(characters_[row][column]->GetForegroundColour() == colour) { return; }
 
-    Characters[Row][Column]->SetForegroundColour(Colour);
+    characters_[row][column]->SetForegroundColour(colour);
 }
 
-void PixelsFrame::renderAllPixels()
+void PixelsFrame::RenderAllPixels()
 {
-    for(unsigned int Row = 0; Row < PIXELS_DISPLAY_NUMBER_OF_ROWS; Row++) {
-        for(unsigned int Column = 0; Column < PIXELS_DISPLAY_NUMBER_OF_COLUMNS; Column++) {
-            renderPixel(Row, Column);
+    for(unsigned int row = 0; row < PIXELS_DISPLAY_NUMBER_OF_ROWS; row++) {
+        for(unsigned int column = 0; column < PIXELS_DISPLAY_NUMBER_OF_COLUMNS; column++) {
+            RenderPixel(row, column);
         }
     }
 }
@@ -258,19 +258,19 @@ void PixelsFrame::renderAllPixels()
 /* Called once per application tick rather than from inside every pixel write, so the
    window is repainted at most once per pass over the firmware's tasks - and not at all
    on the ticks where the firmware wrote nothing. */
-void PixelsFrame::render()
+void PixelsFrame::Render()
 {
-    Pixels& pixels = Pixels::getInstance();
+    Pixels& pixels = Pixels::GetInstance();
 
     /* Before the dirty check rather than after it: while the strip has no supply nothing
        may be drawn, and the buffer has to stay dirty so that the supply coming back
        redraws it. What stands in the window until then is the black frame the switch-off
        sequence sends on purpose, which is also what the wall would show. */
-    if(pixels.isOutputSuspended()) { return; }
+    if(pixels.IsOutputSuspended()) { return; }
 
-    if(!pixels.isDirty()) { return; }
-    pixels.clearDirty();
+    if(!pixels.IsDirty()) { return; }
+    pixels.ClearDirty();
 
-    renderAllPixels();
+    RenderAllPixels();
     Refresh();
 }

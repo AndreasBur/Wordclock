@@ -81,13 +81,13 @@ class Overlays
 
     enum OverlayIdType {
 #if (OVERLAYS_SUPPORT_DATE == STD_ON)
-        OVERLAY_ID_DATE,
+        kOverlayIdDate,
 #endif
 #if (OVERLAYS_SUPPORT_TEMPERATURE == STD_ON)
-        OVERLAY_ID_TEMPERATURE,
+        kOverlayIdTemperature,
 #endif
 #if (OVERLAYS_SUPPORT_TEXT == STD_ON)
-        OVERLAY_ID_TEXT
+        kOverlayIdText
 #endif
     };
 
@@ -95,53 +95,53 @@ class Overlays
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    static constexpr byte TaskCycle{OVERLAYS_TASK_CYCLE};
-    SecondType ShowTimerInSeconds{0u};
-    SecondType LastSecond{0u};
+    static constexpr byte kTaskCycle{OVERLAYS_TASK_CYCLE};
+    SecondType show_timer_in_seconds_{0u};
+    SecondType last_second_{0u};
 #if (OVERLAYS_SUPPORT_DATE == STD_ON)
-    OverlayDate Date;
+    OverlayDate date_;
 #endif
 #if (OVERLAYS_SUPPORT_TEMPERATURE == STD_ON)
-    OverlayTemperature Temperature;
+    OverlayTemperature temperature_;
 #endif
 #if (OVERLAYS_SUPPORT_TEXT == STD_ON)
-    OverlayText Text;
+    OverlayText text_;
 #endif
 
     // functions
     constexpr Overlays() { }
     ~Overlays() { }
 
-    bool isShow() const {
-        bool Show{false};
+    bool IsShow() const {
+        bool show{false};
 #if (OVERLAYS_SUPPORT_DATE == STD_ON)
-        Show = Show || (Date.getState() == OverlayDate::STATE_SHOW);
+        show = show || (date_.GetState() == OverlayDate::kStateShow);
 #endif
 #if (OVERLAYS_SUPPORT_TEMPERATURE == STD_ON)
-        Show = Show || (Temperature.getState() == OverlayTemperature::STATE_SHOW);
+        show = show || (temperature_.GetState() == OverlayTemperature::kStateShow);
 #endif
 #if (OVERLAYS_SUPPORT_TEXT == STD_ON)
-        Show = Show || (Text.getState() == OverlayText::STATE_SHOW);
+        show = show || (text_.GetState() == OverlayText::kStateShow);
 #endif
-        return Show;
+        return show;
     }
 
-    bool isIdle() const {
-        bool Idle{false};
+    bool IsIdle() const {
+        bool idle{false};
 #if (OVERLAYS_SUPPORT_DATE == STD_ON)
-        Idle = Idle || (Date.getState() == OverlayDate::STATE_IDLE);
+        idle = idle || (date_.GetState() == OverlayDate::kStateIdle);
 #endif
 #if (OVERLAYS_SUPPORT_TEMPERATURE == STD_ON)
-        Idle = Idle || (Temperature.getState() == OverlayTemperature::STATE_IDLE);
+        idle = idle || (temperature_.GetState() == OverlayTemperature::kStateIdle);
 #endif
 #if (OVERLAYS_SUPPORT_TEXT == STD_ON)
-        Idle = Idle || (Text.getState() == OverlayText::STATE_IDLE);
+        idle = idle || (text_.GetState() == OverlayText::kStateIdle);
 #endif
-        return Idle;
+        return idle;
     }
 
-    void taskIdle(ClockDate, ClockTime);
-    void taskShow(ClockDate, ClockTime);
+    void TaskIdle(ClockDate, ClockTime);
+    void TaskShow(ClockDate, ClockTime);
 
     /* Shared by the three "show now" entry points below, which differ in nothing but the
        overlay they name - a template rather than three copies of the two rules that
@@ -150,128 +150,128 @@ class Overlays
        Switched off is a configuration and not a state to be talked out of, and only one
        overlay may hold the display, because there is one show timer for all of them. */
     template <typename OverlayClassType>
-    StdReturnType showNow(OverlayClassType& Overlay) {
-        if(!Overlay.getIsActive()) { return E_NOT_OK; }
-        if(!Overlay.canShow()) { return E_NOT_OK; }
-        if(isShow()) { return E_NOT_OK; }
+    StdReturnType ShowNow(OverlayClassType& overlay) {
+        if(!overlay.GetIsActive()) { return kENotOk; }
+        if(!overlay.CanShow()) { return kENotOk; }
+        if(IsShow()) { return kENotOk; }
 
-        ShowTimerInSeconds = Overlay.startShow(RealTimeClock::getInstance().getDate(),
-                                               RealTimeClock::getInstance().getTime());
-        return E_OK;
+        show_timer_in_seconds_ = overlay.StartShow(RealTimeClock::GetInstance().GetDate(),
+                                               RealTimeClock::GetInstance().GetTime());
+        return kEOk;
     }
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    static Overlays& getInstance() {
-        static Overlays singletonInstance;
-        return singletonInstance;
+    static Overlays& GetInstance() {
+        static Overlays singleton_instance;
+        return singleton_instance;
     }
 
 	// get methods
-    static byte getTaskCycle() { return TaskCycle; }
-    StateType getState() const;
+    static byte GetTaskCycle() { return kTaskCycle; }
+    StateType GetState() const;
 
 #if (OVERLAYS_SUPPORT_DATE == STD_ON)
-    MinuteType getDatePeriodInMinutes() const { return Date.getPeriodInMinutes(); }
-    SecondType getDateEnduranceInSeconds() const { return Date.getEnduranceInSeconds(); }
-    MonthType getDateMonth() const { return Date.getMonth(); }
-    DayType getDateDay() const { return Date.getDay(); }
-    DayType getDateValidInDays() const { return Date.getValidInDays(); }
-    byte getDateSpeed() const { return Date.getSpeed(); }
-    Text::FontType getDateFont() const { return Date.getFont(); }
-    bool getDateIsActive() const { return Date.getIsActive(); }
+    MinuteType GetDatePeriodInMinutes() const { return date_.GetPeriodInMinutes(); }
+    SecondType GetDateEnduranceInSeconds() const { return date_.GetEnduranceInSeconds(); }
+    MonthType GetDateMonth() const { return date_.GetMonth(); }
+    DayType GetDateDay() const { return date_.GetDay(); }
+    DayType GetDateValidInDays() const { return date_.GetValidInDays(); }
+    byte GetDateSpeed() const { return date_.GetSpeed(); }
+    Text::FontType GetDateFont() const { return date_.GetFont(); }
+    bool GetDateIsActive() const { return date_.GetIsActive(); }
 #endif
 #if (OVERLAYS_SUPPORT_TEMPERATURE == STD_ON)
-    MinuteType getTemperaturePeriodInMinutes() const { return Temperature.getPeriodInMinutes(); }
-    SecondType getTemperatureEnduranceInSeconds() const { return Temperature.getEnduranceInSeconds(); }
-    MonthType getTemperatureMonth() const { return Temperature.getMonth(); }
-    DayType getTemperatureDay() const { return Temperature.getDay(); }
-    DayType getTemperatureValidInDays() const { return Temperature.getValidInDays(); }
-    byte getTemperatureSpeed() const { return Temperature.getSpeed(); }
-    Text::FontType getTemperatureFont() const { return Temperature.getFont(); }
+    MinuteType GetTemperaturePeriodInMinutes() const { return temperature_.GetPeriodInMinutes(); }
+    SecondType GetTemperatureEnduranceInSeconds() const { return temperature_.GetEnduranceInSeconds(); }
+    MonthType GetTemperatureMonth() const { return temperature_.GetMonth(); }
+    DayType GetTemperatureDay() const { return temperature_.GetDay(); }
+    DayType GetTemperatureValidInDays() const { return temperature_.GetValidInDays(); }
+    byte GetTemperatureSpeed() const { return temperature_.GetSpeed(); }
+    Text::FontType GetTemperatureFont() const { return temperature_.GetFont(); }
     /* What the overlay would put on the display, which is the only way to read the
        temperature back out of the firmware until there is a status command. */
-    const char* getTemperatureString() const { return Temperature.getTemperatureString(); }
-    bool getTemperatureIsActive() const { return Temperature.getIsActive(); }
+    const char* GetTemperatureString() const { return temperature_.GetTemperatureString(); }
+    bool GetTemperatureIsActive() const { return temperature_.GetIsActive(); }
 #endif
 #if (OVERLAYS_SUPPORT_TEXT == STD_ON)
-    MinuteType getTextPeriodInMinutes() const { return Text.getPeriodInMinutes(); }
-    SecondType getTextEnduranceInSeconds() const { return Text.getEnduranceInSeconds(); }
-    MonthType getTextMonth() const { return Text.getMonth(); }
-    DayType getTextDay() const { return Text.getDay(); }
-    DayType getTextValidInDays() const { return Text.getValidInDays(); }
-    byte getTextSpeed() const { return Text.getSpeed(); }
-    Text::FontType getTextFont() const { return Text.getFont(); }
-    bool getTextIsActive() const { return Text.getIsActive(); }
-    const char* getTextText() const { return Text.getText(); }
+    MinuteType GetTextPeriodInMinutes() const { return text_.GetPeriodInMinutes(); }
+    SecondType GetTextEnduranceInSeconds() const { return text_.GetEnduranceInSeconds(); }
+    MonthType GetTextMonth() const { return text_.GetMonth(); }
+    DayType GetTextDay() const { return text_.GetDay(); }
+    DayType GetTextValidInDays() const { return text_.GetValidInDays(); }
+    byte GetTextSpeed() const { return text_.GetSpeed(); }
+    Text::FontType GetTextFont() const { return text_.GetFont(); }
+    bool GetTextIsActive() const { return text_.GetIsActive(); }
+    const char* GetTextText() const { return text_.GetText(); }
 #endif
 
 	// set methods
 #if (OVERLAYS_SUPPORT_DATE == STD_ON)
-    StdReturnType setDatePeriodInMinutes(MinuteType PeriodInMinutes) { return Date.setPeriodInMinutes(PeriodInMinutes); }
-    StdReturnType setDateEnduranceInSeconds(SecondType EnduranceInSeconds) { return Date.setEnduranceInSeconds(EnduranceInSeconds); }
-    void setDateMonth(MonthType Month) { Date.setMonth(Month); }
-    void setDateDay(DayType Day) { Date.setDay(Day); }
-    void setDateValidInDays(DayType ValidInDays) { Date.setValidInDays(ValidInDays); }
-    void setDateSpeed(byte Speed) { Date.setSpeed(Speed); }
-    StdReturnType setDateFont(FontType Font) { return Date.setFont(Font); }
-    void setDateIsActive(bool IsActive) { Date.setIsActive(IsActive); }
+    StdReturnType SetDatePeriodInMinutes(MinuteType period_in_minutes) { return date_.SetPeriodInMinutes(period_in_minutes); }
+    StdReturnType SetDateEnduranceInSeconds(SecondType endurance_in_seconds) { return date_.SetEnduranceInSeconds(endurance_in_seconds); }
+    void SetDateMonth(MonthType month) { date_.SetMonth(month); }
+    void SetDateDay(DayType day) { date_.SetDay(day); }
+    void SetDateValidInDays(DayType valid_in_days) { date_.SetValidInDays(valid_in_days); }
+    void SetDateSpeed(byte speed) { date_.SetSpeed(speed); }
+    StdReturnType SetDateFont(FontType font) { return date_.SetFont(font); }
+    void SetDateIsActive(bool is_active) { date_.SetIsActive(is_active); }
 #endif
 #if (OVERLAYS_SUPPORT_TEMPERATURE == STD_ON)
-    StdReturnType setTemperaturePeriodInMinutes(MinuteType PeriodInMinutes) { return Temperature.setPeriodInMinutes(PeriodInMinutes); }
-    StdReturnType setTemperatureEnduranceInSeconds(SecondType EnduranceInSeconds) { return Temperature.setEnduranceInSeconds(EnduranceInSeconds); }
-    void setTemperatureMonth(MonthType Month) { Temperature.setMonth(Month); }
-    void setTemperatureDay(DayType Day) { Temperature.setDay(Day); }
-    void setTemperatureValidInDays(DayType ValidInDays) { Temperature.setValidInDays(ValidInDays); }
-    void setTemperatureSpeed(byte Speed) { Temperature.setSpeed(Speed); }
-    StdReturnType setTemperatureFont(FontType Font) { return Temperature.setFont(Font); }
-    void setTemperatureIsActive(bool IsActive) { Temperature.setIsActive(IsActive); }
+    StdReturnType SetTemperaturePeriodInMinutes(MinuteType period_in_minutes) { return temperature_.SetPeriodInMinutes(period_in_minutes); }
+    StdReturnType SetTemperatureEnduranceInSeconds(SecondType endurance_in_seconds) { return temperature_.SetEnduranceInSeconds(endurance_in_seconds); }
+    void SetTemperatureMonth(MonthType month) { temperature_.SetMonth(month); }
+    void SetTemperatureDay(DayType day) { temperature_.SetDay(day); }
+    void SetTemperatureValidInDays(DayType valid_in_days) { temperature_.SetValidInDays(valid_in_days); }
+    void SetTemperatureSpeed(byte speed) { temperature_.SetSpeed(speed); }
+    StdReturnType SetTemperatureFont(FontType font) { return temperature_.SetFont(font); }
+    void SetTemperatureIsActive(bool is_active) { temperature_.SetIsActive(is_active); }
 #endif
 #if (OVERLAYS_SUPPORT_TEXT == STD_ON)
-    StdReturnType setTextPeriodInMinutes(MinuteType PeriodInMinutes) { return Text.setPeriodInMinutes(PeriodInMinutes); }
-    StdReturnType setTextEnduranceInSeconds(SecondType EnduranceInSeconds) { return Text.setEnduranceInSeconds(EnduranceInSeconds); }
-    void setTextMonth(MonthType Month) { Text.setMonth(Month); }
-    void setTextDay(DayType Day) { Text.setDay(Day); }
-    void setTextValidInDays(DayType ValidInDays) { Text.setValidInDays(ValidInDays); }
-    void setTextIsActive(bool IsActive) { Text.setIsActive(IsActive); }
-    void setTextSpeed(byte Speed) { Text.setSpeed(Speed); }
-    StdReturnType setTextFont(FontType Font) { return Text.setFont(Font); }
-    void setTextText(const char* sText, LengthType Length) { Text.setText(sText, Length); }
+    StdReturnType SetTextPeriodInMinutes(MinuteType period_in_minutes) { return text_.SetPeriodInMinutes(period_in_minutes); }
+    StdReturnType SetTextEnduranceInSeconds(SecondType endurance_in_seconds) { return text_.SetEnduranceInSeconds(endurance_in_seconds); }
+    void SetTextMonth(MonthType month) { text_.SetMonth(month); }
+    void SetTextDay(DayType day) { text_.SetDay(day); }
+    void SetTextValidInDays(DayType valid_in_days) { text_.SetValidInDays(valid_in_days); }
+    void SetTextIsActive(bool is_active) { text_.SetIsActive(is_active); }
+    void SetTextSpeed(byte speed) { text_.SetSpeed(speed); }
+    StdReturnType SetTextFont(FontType font) { return text_.SetFont(font); }
+    void SetTextText(const char* text, LengthType length) { text_.SetText(text, length); }
 #endif
 
 	// methods
     /* Every overlay back to what it starts with, the same way Display, Clock, Animations
        and Illuminance answer Persistence::reset(). Here since the overlays are stored -
        before that a reset had nothing of theirs to undo. */
-    void resetToDefaults() {
+    void ResetToDefaults() {
 #if (OVERLAYS_SUPPORT_DATE == STD_ON)
-        Date.resetToDefaults();
+        date_.ResetToDefaults();
 #endif
 #if (OVERLAYS_SUPPORT_TEMPERATURE == STD_ON)
-        Temperature.resetToDefaults();
+        temperature_.ResetToDefaults();
 #endif
 #if (OVERLAYS_SUPPORT_TEXT == STD_ON)
-        Text.resetToDefaults();
+        text_.ResetToDefaults();
 #endif
     }
 
-	void task();
+	void Task();
 
     /* Show an overlay now instead of at its next period, and end the one that is
        showing. Without these an overlay can only be watched by waiting for its raster,
        which is also what makes one hard to develop against. */
 #if (OVERLAYS_SUPPORT_DATE == STD_ON)
-    StdReturnType showDateNow() { return showNow(Date); }
+    StdReturnType ShowDateNow() { return ShowNow(date_); }
 #endif
 #if (OVERLAYS_SUPPORT_TEMPERATURE == STD_ON)
-    StdReturnType showTemperatureNow() { return showNow(Temperature); }
+    StdReturnType ShowTemperatureNow() { return ShowNow(temperature_); }
 #endif
 #if (OVERLAYS_SUPPORT_TEXT == STD_ON)
-    StdReturnType showTextNow() { return showNow(Text); }
+    StdReturnType ShowTextNow() { return ShowNow(text_); }
 #endif
-    StdReturnType abort();
+    StdReturnType Abort();
 };
 
 #endif

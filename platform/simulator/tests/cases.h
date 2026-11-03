@@ -9,89 +9,89 @@
 
 
 /* display_test.cpp */
-void testColourDimmingAcrossByteRange();
-void testGammaCorrectionCurve();
-void testDisplayManagerLatch();
-void testFadeDimsAndComesBack();
-void testDisplayOffAndOnAgain();
-void testDisplayToggleFollowsTheState();
-void testBrightnessTogglesInvertTheSetting();
-void testColourChangesReachTheStrip();
-void testPixelColorChannels();
-void testDisplayCharacterLookup();
+void TestColourDimmingAcrossByteRange();
+void TestGammaCorrectionCurve();
+void TestDisplayManagerLatch();
+void TestFadeDimsAndComesBack();
+void TestDisplayOffAndOnAgain();
+void TestDisplayToggleFollowsTheState();
+void TestBrightnessTogglesInvertTheSetting();
+void TestColourChangesReachTheStrip();
+void TestPixelColorChannels();
+void TestDisplayCharacterLookup();
 
 /* overlay_test.cpp */
-void testShowNowProcedures();
-void testTemperatureOverlayWithoutSensor();
-void testOverlayPeriodAndEndurance();
+void TestShowNowProcedures();
+void TestTemperatureOverlayWithoutSensor();
+void TestOverlayPeriodAndEndurance();
 
 /* animation_test.cpp */
-void testSnakeLifetime();
-void testFlickerLeavesTheDisplayOn();
-void testEveryAnimationEndsOnTheNewTime();
-void testAnimationStepsThroughEveryOne();
+void TestSnakeLifetime();
+void TestFlickerLeavesTheDisplayOn();
+void TestEveryAnimationEndsOnTheNewTime();
+void TestAnimationStepsThroughEveryOne();
 
 /* text_test.cpp */
-void testCharacterToGlyphMapping();
-void testUndrawableCharacterShiftsAsASpace();
+void TestCharacterToGlyphMapping();
+void TestUndrawableCharacterShiftsAsASpace();
 
 /* accessor_test.cpp */
-void testReadingPastTheEndIsEmpty();
-void testWritingPastTheEndIsRefused();
-void testGlyphAccessorsCheckBothWays();
+void TestReadingPastTheEndIsEmpty();
+void TestWritingPastTheEndIsRefused();
+void TestGlyphAccessorsCheckBothWays();
 
 /* clock_test.cpp */
-void testRegionalWordings();
-void testWordsChangeOnFiveMinuteStepsOnly();
-void testInvalidTimeIsRejected();
-void testClockModes();
-void testClockModeStepsThroughEveryWording();
-void testClockWordsComparison();
+void TestRegionalWordings();
+void TestWordsChangeOnFiveMinuteStepsOnly();
+void TestInvalidTimeIsRejected();
+void TestClockModes();
+void TestClockModeStepsThroughEveryWording();
+void TestClockWordsComparison();
 
 /* scheduler_test.cpp */
-void testSchedulerSpeedRoundTrip();
-void testUptimeCountsWithoutWrapping();
+void TestSchedulerSpeedRoundTrip();
+void TestUptimeCountsWithoutWrapping();
 
 /* nightswitch_test.cpp */
-void testNightWindowIncludesMidnight();
-void testNightSwitchDimsWithoutLosingTheSetting();
-void testNightSwitchActsOnTheCrossingOnly();
-void testNightWithNoBrightnessCutsTheSupply();
-void testDisplaySwitchedOnAtNightGetsItsSupplyBack();
+void TestNightWindowIncludesMidnight();
+void TestNightSwitchDimsWithoutLosingTheSetting();
+void TestNightSwitchActsOnTheCrossingOnly();
+void TestNightWithNoBrightnessCutsTheSupply();
+void TestDisplaySwitchedOnAtNightGetsItsSupplyBack();
 
 /* colorcycle_test.cpp */
-void testColourCycleLeavesTheChosenColourAlone();
-void testColourCycleWalksTheWholeWheel();
-void testColourCycleStandsStillOnADarkDisplay();
-void testColourCycleBudgetsTheColourItShows();
+void TestColourCycleLeavesTheChosenColourAlone();
+void TestColourCycleWalksTheWholeWheel();
+void TestColourCycleStandsStillOnADarkDisplay();
+void TestColourCycleBudgetsTheColourItShows();
 
 /* power_test.cpp */
-void testSupplyCutWaitsForTheBlankedFrame();
-void testSupplyReturnsBeforeTheDataLine();
-void testSupplyOffIsNotDisplayDisable();
-void testSupplyRequestsAreReversible();
+void TestSupplyCutWaitsForTheBlankedFrame();
+void TestSupplyReturnsBeforeTheDataLine();
+void TestSupplyOffIsNotDisplayDisable();
+void TestSupplyRequestsAreReversible();
 
 /* illuminance_test.cpp */
-void testAutomaticDefaultsSuitARoom();
-void testAutomaticSpreadsBetweenBothBounds();
+void TestAutomaticDefaultsSuitARoom();
+void TestAutomaticSpreadsBetweenBothBounds();
 
 /* current_limit_test.cpp */
-void testCurrentLimitFitsTheBudgetAtEveryLitCount();
-void testCurrentLimitFollowsTheColour();
-void testCurrentLimitLeavesTheRestoredFaceAlone();
-void testCurrentLimitDoesNotSwitchTheDisplayOn();
+void TestCurrentLimitFitsTheBudgetAtEveryLitCount();
+void TestCurrentLimitFollowsTheColour();
+void TestCurrentLimitLeavesTheRestoredFaceAlone();
+void TestCurrentLimitDoesNotSwitchTheDisplayOn();
 
 /* persistence_test.cpp */
-void testPersistence();
-void testPersistenceSaveAndReset();
+void TestPersistence();
+void TestPersistenceSaveAndReset();
 
 /* websocket_test.cpp */
-void testWebSocketHashAndEncoding();
-void testWebSocketHandshake();
-void testWebSocketEncodesBothLengths();
-void testWebSocketDecodesWhatABrowserSends();
+void TestWebSocketHashAndEncoding();
+void TestWebSocketHandshake();
+void TestWebSocketEncodesBothLengths();
+void TestWebSocketDecodesWhatABrowserSends();
 
 /* webhost_test.cpp */
-void testWebHostOutlastsAnIdleConnection();
+void TestWebHostOutlastsAnIdleConnection();
 
 #endif // _CASES_H_

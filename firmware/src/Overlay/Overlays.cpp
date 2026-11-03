@@ -53,23 +53,23 @@
  *
  *  \return         the state
 ******************************************************************************************************************************************************/
-Overlays::StateType Overlays::getState() const {
-    if(isShow()) { return OverlayType::STATE_SHOW; }
-    if(isIdle()) { return OverlayType::STATE_IDLE; }
-    return OverlayType::STATE_DISABLED;
+Overlays::StateType Overlays::GetState() const {
+    if(IsShow()) { return OverlayType::kStateShow; }
+    if(IsIdle()) { return OverlayType::kStateIdle; }
+    return OverlayType::kStateDisabled;
 } /* getState */
 
 /******************************************************************************************************************************************************
-  task()
+  Task()
 ******************************************************************************************************************************************************/
-void Overlays::task() {
-    ClockDate date = RealTimeClock::getInstance().getDate();
-    ClockTime time = RealTimeClock::getInstance().getTime();
+void Overlays::Task() {
+    ClockDate date = RealTimeClock::GetInstance().GetDate();
+    ClockTime time = RealTimeClock::GetInstance().GetTime();
 
-    if(LastSecond != time.getSecond()) {
-        LastSecond = time.getSecond();
-        if(isShow()) { taskShow(date, time); }
-        else { taskIdle(date, time); }
+    if(last_second_ != time.GetSecond()) {
+        last_second_ = time.GetSecond();
+        if(IsShow()) { TaskShow(date, time); }
+        else { TaskIdle(date, time); }
     }
 } /* task */
 
@@ -90,24 +90,24 @@ void Overlays::task() {
  *
  *  \return         E_OK if an overlay was showing
 ******************************************************************************************************************************************************/
-StdReturnType Overlays::abort() {
-    if(!isShow()) { return E_NOT_OK; }
+StdReturnType Overlays::Abort() {
+    if(!IsShow()) { return kENotOk; }
 
-    ClockDate date = RealTimeClock::getInstance().getDate();
-    ClockTime time = RealTimeClock::getInstance().getTime();
+    ClockDate date = RealTimeClock::GetInstance().GetDate();
+    ClockTime time = RealTimeClock::GetInstance().GetTime();
 
 #if (OVERLAYS_SUPPORT_DATE == STD_ON)
-    if(Date.getState() == OverlayDate::STATE_SHOW) { Date.stopShow(date, time); }
+    if(date_.GetState() == OverlayDate::kStateShow) { date_.StopShow(date, time); }
 #endif
 #if (OVERLAYS_SUPPORT_TEMPERATURE == STD_ON)
-    if(Temperature.getState() == OverlayTemperature::STATE_SHOW) { Temperature.stopShow(date, time); }
+    if(temperature_.GetState() == OverlayTemperature::kStateShow) { temperature_.StopShow(date, time); }
 #endif
 #if (OVERLAYS_SUPPORT_TEXT == STD_ON)
-    if(Text.getState() == OverlayText::STATE_SHOW) { Text.stopShow(date, time); }
+    if(text_.GetState() == OverlayText::kStateShow) { text_.StopShow(date, time); }
 #endif
 
-    ShowTimerInSeconds = 0u;
-    return E_OK;
+    show_timer_in_seconds_ = 0u;
+    return kEOk;
 } /* abort */
 
 
@@ -118,20 +118,20 @@ StdReturnType Overlays::abort() {
 /******************************************************************************************************************************************************
   taskIdle()
 ******************************************************************************************************************************************************/
-void Overlays::taskIdle(ClockDate date, ClockTime time) {
+void Overlays::TaskIdle(ClockDate date, ClockTime time) {
 #if (OVERLAYS_SUPPORT_DATE == STD_ON)
-    if((Date.getIsActive()) && (ShowTimerInSeconds == 0u)) {
-        ShowTimerInSeconds = Date.task(ShowTimerInSeconds, date, time);
+    if((date_.GetIsActive()) && (show_timer_in_seconds_ == 0u)) {
+        show_timer_in_seconds_ = date_.Task(show_timer_in_seconds_, date, time);
     }
 #endif
 #if (OVERLAYS_SUPPORT_TEMPERATURE == STD_ON)
-    if((Temperature.getIsActive()) && (ShowTimerInSeconds == 0u)) {
-        ShowTimerInSeconds =  Temperature.task(ShowTimerInSeconds, date, time);
+    if((temperature_.GetIsActive()) && (show_timer_in_seconds_ == 0u)) {
+        show_timer_in_seconds_ =  temperature_.Task(show_timer_in_seconds_, date, time);
     }
 #endif
 #if (OVERLAYS_SUPPORT_TEXT == STD_ON)
-    if((Text.getIsActive()) && (ShowTimerInSeconds == 0u)) {
-        ShowTimerInSeconds =  Text.task(ShowTimerInSeconds, date, time);
+    if((text_.GetIsActive()) && (show_timer_in_seconds_ == 0u)) {
+        show_timer_in_seconds_ =  text_.Task(show_timer_in_seconds_, date, time);
     }
 #endif
 } /* taskIdle */
@@ -139,15 +139,15 @@ void Overlays::taskIdle(ClockDate date, ClockTime time) {
 /******************************************************************************************************************************************************
   taskShow()
 ******************************************************************************************************************************************************/
-void Overlays::taskShow(ClockDate date, ClockTime time) {
+void Overlays::TaskShow(ClockDate date, ClockTime time) {
 #if (OVERLAYS_SUPPORT_DATE == STD_ON)
-    if(Date.getState() == OverlayDate::STATE_SHOW) { ShowTimerInSeconds = Date.task(ShowTimerInSeconds, date, time); }
+    if(date_.GetState() == OverlayDate::kStateShow) { show_timer_in_seconds_ = date_.Task(show_timer_in_seconds_, date, time); }
 #endif
 #if (OVERLAYS_SUPPORT_TEMPERATURE == STD_ON)
-    if(Temperature.getState() == OverlayTemperature::STATE_SHOW) { ShowTimerInSeconds =  Temperature.task(ShowTimerInSeconds, date, time); }
+    if(temperature_.GetState() == OverlayTemperature::kStateShow) { show_timer_in_seconds_ =  temperature_.Task(show_timer_in_seconds_, date, time); }
 #endif
 #if (OVERLAYS_SUPPORT_TEXT == STD_ON)
-    if(Text.getState() == OverlayText::STATE_SHOW) { ShowTimerInSeconds =  Text.task(ShowTimerInSeconds, date, time); }
+    if(text_.GetState() == OverlayText::kStateShow) { show_timer_in_seconds_ =  text_.Task(show_timer_in_seconds_, date, time); }
 #endif
 } /* taskShow */
 

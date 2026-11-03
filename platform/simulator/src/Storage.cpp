@@ -39,24 +39,24 @@
    state. A stand-in that answered the check would have a different API from the thing it
    stands in for, which is the one property it exists to keep. */
 // NOLINTBEGIN(readability-convert-member-functions-to-static)
-StdReturnType Storage::read(byte* Buffer, size_t Size) const
+StdReturnType Storage::Read(byte* buffer, size_t size) const
 {
-    if((Buffer == nullptr) || (Size == 0u) || (Size > Capacity)) { return E_NOT_OK; }
+    if((buffer == nullptr) || (size == 0u) || (size > kCapacity)) { return kENotOk; }
 
-    std::FILE* File = std::fopen(STORAGE_FILE_NAME, "rb");
-    if(File == nullptr) { return E_NOT_OK; }
+    std::FILE* file = std::fopen(STORAGE_FILE_NAME, "rb");
+    if(file == nullptr) { return kENotOk; }
 
-    const size_t Read = std::fread(Buffer, 1u, Size, File);
+    const size_t read = std::fread(buffer, 1u, size, file);
     /* One byte more would mean the file outgrew what is being asked for, which is the
        same mismatch as one byte less. Only asked when the read delivered, because after a
        failed one the standard stops saying where the position is. */
-    const bool IsAtEnd = (Read == Size) && (std::fgetc(File) == EOF);
+    const bool is_at_end = (read == size) && (std::fgetc(file) == EOF);
     /* Nothing to report from closing a stream that was only read. */
-    (void)std::fclose(File);
+    (void)std::fclose(file);
 
-    if((Read != Size) || !IsAtEnd) { return E_NOT_OK; }
+    if((read != size) || !is_at_end) { return kENotOk; }
 
-    return E_OK;
+    return kEOk;
 } /* read */
 
 
@@ -67,19 +67,19 @@ StdReturnType Storage::read(byte* Buffer, size_t Size) const
  *
  *  \return         E_OK if the whole blob reached the file
 ******************************************************************************************************************************************************/
-StdReturnType Storage::write(const byte* Buffer, size_t Size)
+StdReturnType Storage::Write(const byte* buffer, size_t size)
 {
-    if((Buffer == nullptr) || (Size == 0u) || (Size > Capacity)) { return E_NOT_OK; }
+    if((buffer == nullptr) || (size == 0u) || (size > kCapacity)) { return kENotOk; }
 
-    std::FILE* File = std::fopen(STORAGE_FILE_NAME, "wb");
-    if(File == nullptr) { return E_NOT_OK; }
+    std::FILE* file = std::fopen(STORAGE_FILE_NAME, "wb");
+    if(file == nullptr) { return kENotOk; }
 
-    const size_t Written = std::fwrite(Buffer, 1u, Size, File);
-    const bool IsFlushed = (std::fclose(File) == 0);
+    const size_t written = std::fwrite(buffer, 1u, size, file);
+    const bool is_flushed = (std::fclose(file) == 0);
 
-    if((Written != Size) || !IsFlushed) { return E_NOT_OK; }
+    if((written != size) || !is_flushed) { return kENotOk; }
 
-    return E_OK;
+    return kEOk;
 } /* write */
 
 
@@ -92,15 +92,15 @@ StdReturnType Storage::write(const byte* Buffer, size_t Size)
  *
  *  \return         E_OK if nothing is stored afterwards
 ******************************************************************************************************************************************************/
-StdReturnType Storage::clear()
+StdReturnType Storage::Clear()
 {
-    std::FILE* File = std::fopen(STORAGE_FILE_NAME, "rb");
-    if(File == nullptr) { return E_OK; }
-    (void)std::fclose(File);
+    std::FILE* file = std::fopen(STORAGE_FILE_NAME, "rb");
+    if(file == nullptr) { return kEOk; }
+    (void)std::fclose(file);
 
-    if(std::remove(STORAGE_FILE_NAME) != 0) { return E_NOT_OK; }
+    if(std::remove(STORAGE_FILE_NAME) != 0) { return kENotOk; }
 
-    return E_OK;
+    return kEOk;
 } /* clear */
 // NOLINTEND(readability-convert-member-functions-to-static)
 

@@ -55,44 +55,44 @@ class OverlayDate : public Overlay<OverlayDate>
 ******************************************************************************************************************************************************/
   private:
     friend class Overlay;
-    static constexpr byte DateStringLength{10u + 1u};
-    char DateString[DateStringLength]{0u};
+    static constexpr byte kDateStringLength{10u + 1u};
+    char date_string_[kDateStringLength]{0u};
 
     // functions
-    void setStateToShow(ClockDate CurrentDate, ClockTime CurrentTime) {
-        setDateString(CurrentDate);
-        setText();
-        UNUSED(CurrentTime);
+    void SetStateToShow(ClockDate current_date, ClockTime current_time) {
+        SetDateString(current_date);
+        SetText();
+        UNUSED(current_time);
     }
-    static void setStateToIdle(ClockDate CurrentDate, ClockTime CurrentTime) {
-        Text::getInstance().stop();
-        UNUSED(CurrentDate);
-        UNUSED(CurrentTime);
+    static void SetStateToIdle(ClockDate current_date, ClockTime current_time) {
+        Text::GetInstance().Stop();
+        UNUSED(current_date);
+        UNUSED(current_time);
     }
 
     /* The date is always there to be shown; only the temperature has to wait for a
        reading. Answered here rather than defaulted in the base, so that adding an overlay
        is a decision about this and not a silent inheritance of it. */
-    static bool isReady() { return true; }
+    static bool IsReady() { return true; }
 
     /* Nothing of its own: the string it shows is built from the current date on every
        start, so there is no configuration here for a reset to undo. */
-    static void resetOwnToDefaults() { }
+    static void ResetOwnToDefaults() { }
 
-    void showTask() { if(Text::getInstance().getState() == Text::STATE_IDLE) { setText(); } }
-    void setText() { Text::getInstance().setTextWithShift(DateString, getFont()); }
+    void ShowTask() { if(Text::GetInstance().GetState() == Text::kStateIdle) { SetText(); } }
+    void SetText() { Text::GetInstance().SetTextWithShift(date_string_, GetFont()); }
 
-    void setDateString(ClockDate CurrentDate) {
-        char* tmp = DateString;
-        itoa(CurrentDate.getDay(), tmp, 10u);
-        tmp = checkDigitsAndAppendDot(CurrentDate.getDay(), tmp);
-        itoa(CurrentDate.getMonth(), tmp, 10u);
-        tmp = checkDigitsAndAppendDot(CurrentDate.getMonth(), tmp);
-        itoa(CurrentDate.getYear(), tmp, 10u);
+    void SetDateString(ClockDate current_date) {
+        char* tmp = date_string_;
+        itoa(current_date.GetDay(), tmp, 10u);
+        tmp = CheckDigitsAndAppendDot(current_date.GetDay(), tmp);
+        itoa(current_date.GetMonth(), tmp, 10u);
+        tmp = CheckDigitsAndAppendDot(current_date.GetMonth(), tmp);
+        itoa(current_date.GetYear(), tmp, 10u);
     }
 
-    static char* appendDot(char* String) { String[0u] = '.'; return &String[1u]; }
-    static char* checkDigitsAndAppendDot(uint16_t Value, char* String) { return appendDot(&String[digitsOfNumber(Value)]); }
+    static char* AppendDot(char* string) { string[0u] = '.'; return &string[1u]; }
+    static char* CheckDigitsAndAppendDot(uint16_t value, char* string) { return AppendDot(&string[DigitsOfNumber(value)]); }
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
@@ -107,9 +107,9 @@ class OverlayDate : public Overlay<OverlayDate>
 	// set methods
 
 	// methods
-    SecondType task(SecondType ShowTimerInSeconds, ClockDate CurrentDate, ClockTime CurrentTime) {
-        if(State == STATE_SHOW) { showTask(); }
-        return Overlay::task(ShowTimerInSeconds, CurrentDate, CurrentTime);
+    SecondType Task(SecondType show_timer_in_seconds, ClockDate current_date, ClockTime current_time) {
+        if(state_ == kStateShow) { ShowTask(); }
+        return Overlay::Task(show_timer_in_seconds, current_date, current_time);
     }
 };
 

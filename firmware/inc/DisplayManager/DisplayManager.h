@@ -63,52 +63,52 @@ class DisplayManager
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    static constexpr byte TaskCycle{DISPLAY_MANAGER_TASK_CYCLE};
-    ClockWords LastClockWords{};
+    static constexpr byte kTaskCycle{DISPLAY_MANAGER_TASK_CYCLE};
+    ClockWords last_clock_words_{};
     /* Rather than letting a default-constructed ClockWords stand for "nothing drawn
        yet": that only works as long as no real word set can equal it, which is a
        property of ClockWords the compiler would not defend. An own flag says so
        outright, and the first task then always draws the current time. */
-    bool ClockWordsInitialized{false};
+    bool clock_words_initialized_{false};
     /* Whether an overlay held the display on the previous task, which is what makes the
        end of one detectable. */
-    bool OverlayWasShowing{false};
+    bool overlay_was_showing_{false};
 
     // functions
     constexpr DisplayManager() { }
     ~DisplayManager() { }
 
-    static bool isOverlayShowing() {
-        return Overlays::getInstance().getState() == Overlays::OverlayType::STATE_SHOW;
+    static bool IsOverlayShowing() {
+        return Overlays::GetInstance().GetState() == Overlays::OverlayType::kStateShow;
     }
 
-    static void showClock(HourType Hour, MinuteType Minute) {
-        Display::getInstance().clear();
-        Clock::getInstance().setTime(Hour, Minute);
-        Display::getInstance().show();
+    static void ShowClock(HourType hour, MinuteType minute) {
+        Display::GetInstance().Clear();
+        Clock::GetInstance().SetTime(hour, minute);
+        Display::GetInstance().Show();
     }
 
-    static void taskClockWordsChange(HourType Hour, MinuteType Minute) {
-        Animations& animations = Animations::getInstance();
-        if(animations.getAnimation() == Animations::ANIMATION_ID_NONE) {
-            showClock(Hour, Minute);
+    static void TaskClockWordsChange(HourType hour, MinuteType minute) {
+        Animations& animations = Animations::GetInstance();
+        if(animations.GetAnimation() == Animations::kAnimationIdNone) {
+            ShowClock(hour, minute);
         } else {
-            animations.setTime(Hour, Minute);
+            animations.SetTime(hour, minute);
         }
     }
 
-    bool updateClockWords(HourType Hour, MinuteType Minute) {
-        ClockWords clockWords;
-        if(Clock::getInstance().getClockWords(Hour, Minute, clockWords) == E_NOT_OK) {
+    bool UpdateClockWords(HourType hour, MinuteType minute) {
+        ClockWords clock_words;
+        if(Clock::GetInstance().GetClockWords(hour, minute, clock_words) == kENotOk) {
             return false;
         }
 
-        if(ClockWordsInitialized && clockWords == LastClockWords) {
+        if(clock_words_initialized_ && clock_words == last_clock_words_) {
             return false;
         }
 
-        LastClockWords = clockWords;
-        ClockWordsInitialized = true;
+        last_clock_words_ = clock_words;
+        clock_words_initialized_ = true;
         return true;
     }
 
@@ -116,18 +116,18 @@ class DisplayManager
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    static DisplayManager& getInstance() {
-        static DisplayManager SingletonInstance;
-        return SingletonInstance;
+    static DisplayManager& GetInstance() {
+        static DisplayManager singleton_instance;
+        return singleton_instance;
     }
 
 	// get methods
-    static constexpr byte getTaskCycle() { return TaskCycle; }
+    static constexpr byte GetTaskCycle() { return kTaskCycle; }
 
 	// set methods
 
 	// methods
-    void task();
+    void Task();
 
     /* Draws the current time again, right now and without an animation. What asks for
        this is a display that no longer shows the clock at all - a test pattern, a pixel
@@ -137,32 +137,32 @@ class DisplayManager
        Refused while an overlay owns the display: the overlay would be overwritten for
        one task and redraw itself on the next, which looks like a glitch rather than
        like the refusal it is. */
-    StdReturnType refreshClock() {
-        if(isOverlayShowing()) { return E_NOT_OK; }
+    StdReturnType RefreshClock() {
+        if(IsOverlayShowing()) { return kENotOk; }
 
-        const ClockTime Time = RealTimeClock::getInstance().getTime();
-        updateClockWords(Time.getHour(), Time.getMinute());
-        showClock(Time.getHour(), Time.getMinute());
-        return E_OK;
+        const ClockTime time = RealTimeClock::GetInstance().GetTime();
+        UpdateClockWords(time.GetHour(), time.GetMinute());
+        ShowClock(time.GetHour(), time.GetMinute());
+        return kEOk;
     }
 
     /* Runs the selected animation on the current time, without waiting for the word
        change that would otherwise be the only trigger. Selecting the animation again
        with "9 -A<id>" shows it too, but it also means something else - it changes what
        runs from now on. */
-    static StdReturnType startAnimation() {
-        if(isOverlayShowing()) { return E_NOT_OK; }
+    static StdReturnType StartAnimation() {
+        if(IsOverlayShowing()) { return kENotOk; }
 
-        const ClockTime Time = RealTimeClock::getInstance().getTime();
-        return Animations::getInstance().setTime(Time.getHour(), Time.getMinute());
+        const ClockTime time = RealTimeClock::GetInstance().GetTime();
+        return Animations::GetInstance().SetTime(time.GetHour(), time.GetMinute());
     }
 
     /* Ends a running animation and puts the time back on the display. At a low speed an
        animation runs for minutes, and both a word change and a mode change are ignored
        while it does. */
-    StdReturnType abortAnimation() {
-        Animations::getInstance().abort();
-        return refreshClock();
+    StdReturnType AbortAnimation() {
+        Animations::GetInstance().Abort();
+        return RefreshClock();
     }
 };
 

@@ -50,23 +50,23 @@ class AnimationSnake : public Animation
 ******************************************************************************************************************************************************/
   public:
     enum SnakeStateType {
-        SNAKE_STATE_TO_RIGHT,
-        SNAKE_STATE_TO_LEFT
+        kSnakeStateToRight,
+        kSnakeStateToLeft
     };
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    SnakeStateType SnakeState{SNAKE_STATE_TO_RIGHT};
-    ClockWords::WordsListType ClockWordsTable{{DisplayWords::WORD_NONE}};
-    byte SnakeBeginIndex{0u};
-    byte SnakeEndIndex{0u};
+    SnakeStateType snake_state_{kSnakeStateToRight};
+    ClockWords::WordsListType clock_words_table_{{DisplayWords::kWordNone}};
+    byte snake_begin_index_{0u};
+    byte snake_end_index_{0u};
 
     // functions
-    void reset();
-    static byte transformToSerpentine(byte, byte);
-    static byte transformToSerpentine(byte);
+    void Reset();
+    static byte TransformToSerpentine(byte, byte);
+    static byte TransformToSerpentine(byte);
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
@@ -81,9 +81,9 @@ class AnimationSnake : public Animation
     // set methods
 
     // methods
-    void init();
-    StdReturnType setTime(byte, byte);
-    void task();
+    void Init();
+    StdReturnType SetTime(byte, byte);
+    void Task();
 };
 
 

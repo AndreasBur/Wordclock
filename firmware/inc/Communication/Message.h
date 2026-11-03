@@ -48,65 +48,65 @@ class Message
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-      static constexpr size_t MessageLength{MESSAGE_LENGTH};
+      static constexpr size_t kMessageLength{MESSAGE_LENGTH};
       static constexpr size_t npos = -1;
-      static constexpr char NullCharacter{STD_NULL_CHARACTER};
+      static constexpr char kNullCharacter{STD_NULL_CHARACTER};
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    char Buffer[MessageLength];
+    char buffer_[kMessageLength];
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    Message() { clear(); }
+    Message() { Clear(); }
     ~Message() { }
 
     // get methods
-    const char* getMessage() const { return Buffer; }
+    const char* GetMessage() const { return buffer_; }
 
     // set methods
 
     // methods
-    void clear() { Buffer[0u] = NullCharacter; }
-    bool isEmpty() const { return Buffer[0u] == NullCharacter; }
+    void Clear() { buffer_[0u] = kNullCharacter; }
+    bool IsEmpty() const { return buffer_[0u] == kNullCharacter; }
 
-    size_t length() const
+    size_t Length() const
     {
-        return strlen(Buffer);
+        return strlen(buffer_);
     }
 
-    size_t find(const char* String, size_t Position = 0u) const
+    size_t Find(const char* string, size_t position = 0u) const
     {
-        const char* finding = strstr(&Buffer[Position], String);
+        const char* finding = strstr(&buffer_[position], string);
         if(finding == nullptr) { return npos; }
-        else { return finding - Buffer; }
+        else { return finding - buffer_; }
     }
 
-    bool contains(char Character) const { return strchr(Buffer, Character); }
+    bool Contains(char character) const { return strchr(buffer_, character); }
 
-    size_t find(char Char, size_t position = 0u) const
+    size_t Find(char character, size_t position = 0u) const
     {
-        const char* finding = strchr(&Buffer[position], Char);
+        const char* finding = strchr(&buffer_[position], character);
         if(finding == nullptr) { return npos; }
-        else { return finding - Buffer; }
+        else { return finding - buffer_; }
     }
 
-    StdReturnType addChar(char Char)
+    StdReturnType AddChar(char character)
     {
-        byte messageLength = strlen(Buffer);
+        byte message_length = strlen(buffer_);
         // check for free space in message buffer
-        if(messageLength < (MESSAGE_LENGTH - 1u))
+        if(message_length < (MESSAGE_LENGTH - 1u))
         {
             // save new char
-            Buffer[messageLength] = Char;
-            Buffer[messageLength + 1u] = NullCharacter;
-            return E_OK;
+            buffer_[message_length] = character;
+            buffer_[message_length + 1u] = kNullCharacter;
+            return kEOk;
         } else {
-            return E_NOT_OK;
+            return kENotOk;
         }
     }
 };

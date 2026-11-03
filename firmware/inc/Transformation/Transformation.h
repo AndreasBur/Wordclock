@@ -72,15 +72,15 @@ class Transformation
     // set methods
 
     // methods
-    static StdReturnType shiftLeft(bool = false);
-    static StdReturnType shiftRight(bool = false);
-    static StdReturnType shiftUp(bool = false);
-    static StdReturnType shiftDown(bool = false);
+    static StdReturnType ShiftLeft(bool = false);
+    static StdReturnType ShiftRight(bool = false);
+    static StdReturnType ShiftUp(bool = false);
+    static StdReturnType ShiftDown(bool = false);
 
-    static StdReturnType shiftRowLeft(byte, bool = false);
-    static StdReturnType shiftRowRight(byte, bool = false);
-    static StdReturnType shiftColumnUp(byte, bool = false);
-    static StdReturnType shiftColumnDown(byte, bool = false);
+    static StdReturnType ShiftRowLeft(byte, bool = false);
+    static StdReturnType ShiftRowRight(byte, bool = false);
+    static StdReturnType ShiftColumnUp(byte, bool = false);
+    static StdReturnType ShiftColumnDown(byte, bool = false);
 };
 
 

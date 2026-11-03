@@ -50,12 +50,12 @@
 ******************************************************************************************************************************************************/
 namespace {
 
-WordclockMain Wordclock;
+WordclockMain wordclock;
 
 /* The tick the whole firmware is timed against: every module's task cycle counts in this
    unit, so it is read from the scheduler rather than repeated as a number here. */
-const uint32_t TaskIntervalMs{Scheduler::getTaskIntervalMs()};
-uint32_t NextTickMs{0u};
+const uint32_t kTaskIntervalMs{Scheduler::GetTaskIntervalMs()};
+uint32_t next_tick_ms{0u};
 
 /******************************************************************************************************************************************************
  *  LOCAL FUNCTIONS
@@ -64,13 +64,13 @@ uint32_t NextTickMs{0u};
    because it has none. System does not print this itself - it also runs from the command
    that changes the credentials, and a line printed there would land inside that command's
    answer. */
-void reportNetwork()
+void ReportNetwork()
 {
-    char Ssid[System::SsidStringLength]{};
+    char ssid[System::kSsidStringLength]{};
 
-    if(System::getInstance().getNetworkSsid(Ssid) == E_OK) {
+    if(System::GetInstance().GetNetworkSsid(ssid) == kEOk) {
         Serial.print(F("WiFi: joining "));
-        Serial.println(Ssid);
+        Serial.println(ssid);
     } else {
         Serial.print(F("WiFi: no network configured, console on the access point "));
         Serial.println(SYSTEM_ACCESS_POINT_SSID);
@@ -81,22 +81,22 @@ void reportNetwork()
    setup() has returned. Until the second one appears the display holds its default date,
    which is the one thing a first bring-up needs to be able to tell apart from a dead
    strip. */
-void reportProgress()
+void ReportProgress()
 {
-    static bool ConnectionReported{false};
-    static bool TimeReported{false};
+    static bool connection_reported{false};
+    static bool time_reported{false};
 
-    if(!ConnectionReported && (WiFi.status() == WL_CONNECTED)) {
-        ConnectionReported = true;
+    if(!connection_reported && (WiFi.status() == WL_CONNECTED)) {
+        connection_reported = true;
         /* Here rather than in setup(): the server names are resolved when this is called,
            so before the link there is nothing to resolve them over. */
-        WordclockTime::startTimeServers();
+        wordclock_time::StartTimeServers();
         Serial.print(F("WiFi: connected, address "));
         Serial.println(WiFi.localIP().toString().c_str());
     }
 
-    if(!TimeReported && RealTimeClock::isSystemTimeSet()) {
-        TimeReported = true;
+    if(!time_reported && RealTimeClock::IsSystemTimeSet()) {
+        time_reported = true;
         Serial.println(F("Time: synchronised"));
     }
 }
@@ -109,14 +109,14 @@ void reportProgress()
  *
  * The difference is taken as a signed value so that the millisecond counter's wrap, which
  * a clock reaches after seven weeks, passes without a tick that waits for another seven. */
-void waitForNextTick()
+void WaitForNextTick()
 {
-    NextTickMs += TaskIntervalMs;
+    next_tick_ms += kTaskIntervalMs;
 
-    const int32_t RemainingMs = static_cast<int32_t>(NextTickMs - millis());
+    const int32_t remaining_ms = static_cast<int32_t>(next_tick_ms - millis());
 
-    if(RemainingMs > 0) { delay(static_cast<uint32_t>(RemainingMs)); }
-    else                { NextTickMs = millis(); }
+    if(remaining_ms > 0) { delay(static_cast<uint32_t>(remaining_ms)); }
+    else                { next_tick_ms = millis(); }
 }
 
 } // namespace
@@ -132,24 +132,24 @@ void setup()
 {
     Serial.begin(WORDCLOCK_SERIAL_BAUDRATE);
 
-    Wordclock.init();
+    wordclock.Init();
 
     /* Which network, and whether there is one at all, is System's answer now: what was
        stored over the console, what was compiled in, or - when neither - an access point
        of its own, so that the console the credentials are entered through can be reached
        without a cable. */
-    System::getInstance().startNetwork();
-    reportNetwork();
+    System::GetInstance().StartNetwork();
+    ReportNetwork();
     /* The zone rule only, which is what makes every conversion in RealTimeClock local time.
        The servers cannot follow it here as they do on the ESP32 - see TimeSync.h - so they
        are started from the tick, at the moment the link comes up. */
-    WordclockTime::applyTimeZone();
+    wordclock_time::ApplyTimeZone();
     /* Before the network is up on purpose: the server listens on whatever address arrives
        later, and starting it here keeps the order in setup() the same whether there is a
        WiFi or not. */
-    WebInterface::getInstance().begin();
+    WebInterface::GetInstance().Begin();
 
-    NextTickMs = millis();
+    next_tick_ms = millis();
 } /* setup */
 
 
@@ -164,23 +164,23 @@ void setup()
 ******************************************************************************************************************************************************/
 void loop()
 {
-    Wordclock.task();
+    wordclock.Task();
 
     /* After the firmware, not from inside its pixel writes: the strip gets whatever the
        buffer holds once the whole pass over the tasks is done. */
-    Pixels::getInstance().render();
+    Pixels::GetInstance().Render();
 
     /* After the strip, so a watching browser is shown the frame that went out rather than
        one the firmware is still assembling. */
-    WebInterface::getInstance().broadcastFrame();
+    WebInterface::GetInstance().BroadcastFrame();
 
-    reportProgress();
+    ReportProgress();
 
     /* Last, so a restart asked for by a command takes place once that command's answer has
        reached both the wire and the browser. */
-    System::getInstance().performPendingRestart();
+    System::GetInstance().PerformPendingRestart();
 
-    waitForNextTick();
+    WaitForNextTick();
 } /* loop */
 
 /******************************************************************************************************************************************************

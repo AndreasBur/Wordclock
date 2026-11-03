@@ -43,16 +43,16 @@
 namespace {
 
 /* 0.1 us per tick, which makes every WS2812 duration below a small whole number. */
-constexpr uint32_t RmtResolutionHz{10u * 1000u * 1000u};
+constexpr uint32_t kRmtResolutionHz{10u * 1000u * 1000u};
 
 /* The datasheet gives T0H 0.4 us and T1H 0.8 us with a tolerance of +-150 ns. The
    ESP-IDF led_strip example uses 0.3/0.9 instead, which also works but sits at the edge
    of the window on one side; centring on the nominal values keeps the margin symmetric,
    and that is what a long strip with a slow edge eats into. */
-constexpr uint16_t Bit0HighTicks{4u};
-constexpr uint16_t Bit0LowTicks{8u};
-constexpr uint16_t Bit1HighTicks{8u};
-constexpr uint16_t Bit1LowTicks{4u};
+constexpr uint16_t kBit0HighTicks{4u};
+constexpr uint16_t kBit0LowTicks{8u};
+constexpr uint16_t kBit1HighTicks{8u};
+constexpr uint16_t kBit1LowTicks{4u};
 
 /* Two blocks, and deliberately rather than by rounding: the frame is streamed through this
    memory and not held in it, so without DMA its depth is the deadline the driver's refill
@@ -65,26 +65,26 @@ constexpr uint16_t Bit1LowTicks{4u};
    chip that number came from and two on the S3, which is the right amount for the wrong
    stated reason. On a part with only two transmit channels - C3, C6 - this is both of them,
    which is affordable exactly as long as nothing else wants RMT. */
-constexpr size_t RmtMemoryBlockSymbols{2u * SOC_RMT_MEM_WORDS_PER_CHANNEL};
+constexpr size_t kRmtMemoryBlockSymbols{2u * SOC_RMT_MEM_WORDS_PER_CHANNEL};
 
 /* Only ever one frame in flight - see render(), which waits for the previous one. A
    deeper queue would let two frames go out back to back and lose the reset gap. */
-constexpr size_t RmtQueueDepth{1u};
+constexpr size_t kRmtQueueDepth{1u};
 
 /* Long enough that it can only be reached if the peripheral stopped answering: a full
    frame takes 110 * 24 * 1.2 us, so about 3.2 ms. */
-constexpr int TransmitTimeoutMs{50};
+constexpr int kTransmitTimeoutMs{50};
 
-constexpr size_t FrameSize{PIXELS_NUMBER_OF_LEDS * Pixel::getNumberOfColors()};
+constexpr size_t kFrameSize{PIXELS_NUMBER_OF_LEDS * Pixel::GetNumberOfColors()};
 
 /* The frame the peripheral reads from while it transmits. Separate from the firmware's
    pixel buffer because the transmission outlives the call: the next tick may already be
    writing new pixels while the DMA is still fetching the old frame, and sharing one
    buffer would put half of each on the strip. */
-byte FrameBuffer[FrameSize]{};
+byte frame_buffer[kFrameSize]{};
 
-rmt_channel_handle_t RmtChannel{nullptr};
-rmt_encoder_handle_t RmtEncoder{nullptr};
+rmt_channel_handle_t rmt_channel{nullptr};
+rmt_encoder_handle_t rmt_encoder{nullptr};
 
 } // namespace
 
@@ -101,50 +101,50 @@ rmt_encoder_handle_t RmtEncoder{nullptr};
  *                  still answers is more useful for finding a miswired pin than one
  *                  that reboots. render() then does nothing until a channel exists.
 ******************************************************************************************************************************************************/
-void Pixels::init(byte sPin)
+void Pixels::Init(byte pin)
 {
-    Pin = sPin;
+    pin_ = pin;
 
-    rmt_tx_channel_config_t ChannelConfig{};
-    ChannelConfig.gpio_num = static_cast<gpio_num_t>(Pin);
-    ChannelConfig.clk_src = RMT_CLK_SRC_DEFAULT;
-    ChannelConfig.resolution_hz = RmtResolutionHz;
-    ChannelConfig.mem_block_symbols = RmtMemoryBlockSymbols;
-    ChannelConfig.trans_queue_depth = RmtQueueDepth;
+    rmt_tx_channel_config_t channel_config{};
+    channel_config.gpio_num = static_cast<gpio_num_t>(pin_);
+    channel_config.clk_src = RMT_CLK_SRC_DEFAULT;
+    channel_config.resolution_hz = kRmtResolutionHz;
+    channel_config.mem_block_symbols = kRmtMemoryBlockSymbols;
+    channel_config.trans_queue_depth = kRmtQueueDepth;
 
-    esp_err_t Result = rmt_new_tx_channel(&ChannelConfig, &RmtChannel);
-    if(Result != ESP_OK) {
+    esp_err_t result = rmt_new_tx_channel(&channel_config, &rmt_channel);
+    if(result != ESP_OK) {
         Serial.print(F("Pixels: RMT channel failed, error "));
-        Serial.println(static_cast<int>(Result));
-        RmtChannel = nullptr;
+        Serial.println(static_cast<int>(result));
+        rmt_channel = nullptr;
         return;
     }
 
-    rmt_bytes_encoder_config_t EncoderConfig{};
-    EncoderConfig.bit0.level0 = 1u;
-    EncoderConfig.bit0.duration0 = Bit0HighTicks;
-    EncoderConfig.bit0.level1 = 0u;
-    EncoderConfig.bit0.duration1 = Bit0LowTicks;
-    EncoderConfig.bit1.level0 = 1u;
-    EncoderConfig.bit1.duration0 = Bit1HighTicks;
-    EncoderConfig.bit1.level1 = 0u;
-    EncoderConfig.bit1.duration1 = Bit1LowTicks;
-    EncoderConfig.flags.msb_first = 1u;
+    rmt_bytes_encoder_config_t encoder_config{};
+    encoder_config.bit0.level0 = 1u;
+    encoder_config.bit0.duration0 = kBit0HighTicks;
+    encoder_config.bit0.level1 = 0u;
+    encoder_config.bit0.duration1 = kBit0LowTicks;
+    encoder_config.bit1.level0 = 1u;
+    encoder_config.bit1.duration0 = kBit1HighTicks;
+    encoder_config.bit1.level1 = 0u;
+    encoder_config.bit1.duration1 = kBit1LowTicks;
+    encoder_config.flags.msb_first = 1u;
 
-    Result = rmt_new_bytes_encoder(&EncoderConfig, &RmtEncoder);
-    if(Result != ESP_OK) {
+    result = rmt_new_bytes_encoder(&encoder_config, &rmt_encoder);
+    if(result != ESP_OK) {
         Serial.print(F("Pixels: RMT encoder failed, error "));
-        Serial.println(static_cast<int>(Result));
-        rmt_del_channel(RmtChannel);
-        RmtChannel = nullptr;
+        Serial.println(static_cast<int>(result));
+        rmt_del_channel(rmt_channel);
+        rmt_channel = nullptr;
         return;
     }
 
-    Result = rmt_enable(RmtChannel);
-    if(Result != ESP_OK) {
+    result = rmt_enable(rmt_channel);
+    if(result != ESP_OK) {
         Serial.print(F("Pixels: RMT enable failed, error "));
-        Serial.println(static_cast<int>(Result));
-        RmtChannel = nullptr;
+        Serial.println(static_cast<int>(result));
+        rmt_channel = nullptr;
     }
 } /* init */
 
@@ -165,21 +165,21 @@ void Pixels::init(byte sPin)
  *
  *  \return         E_OK if a frame went out or none was due
 ******************************************************************************************************************************************************/
-StdReturnType Pixels::render()
+StdReturnType Pixels::Render()
 {
     /* Before the dirty check, and the buffer is left marked on purpose: while the strip has
        no supply nothing may reach DIN, and the supply coming back has to find a frame still
        owed rather than a buffer that looks up to date. */
-    if(OutputSuspended) { return E_OK; }
+    if(output_suspended_) { return kEOk; }
 
-    if(!Dirty) { return E_OK; }
-    if(RmtChannel == nullptr) { return E_NOT_OK; }
+    if(!dirty_) { return kEOk; }
+    if(rmt_channel == nullptr) { return kENotOk; }
 
-    const StdReturnType Result = transmitFrame();
+    const StdReturnType result = TransmitFrame();
     /* Cleared even when the transmission failed, so a strip that does not answer cannot
        turn every following tick into another failing attempt. */
-    Dirty = false;
-    return Result;
+    dirty_ = false;
+    return result;
 } /* render */
 
 
@@ -204,11 +204,11 @@ StdReturnType Pixels::render()
  *
  *  \return         true while a frame is still going out
 ******************************************************************************************************************************************************/
-bool Pixels::isFrameOnTheWire() const
+bool Pixels::IsFrameOnTheWire() const
 {
-    if(RmtChannel == nullptr) { return false; }
+    if(rmt_channel == nullptr) { return false; }
 
-    return rmt_tx_wait_all_done(RmtChannel, 0) != ESP_OK;
+    return rmt_tx_wait_all_done(rmt_channel, 0) != ESP_OK;
 } /* isFrameOnTheWire */
 // NOLINTEND(readability-convert-member-functions-to-static)
 
@@ -216,76 +216,76 @@ bool Pixels::isFrameOnTheWire() const
 /******************************************************************************************************************************************************
   getPixel()
 ******************************************************************************************************************************************************/
-StdReturnType Pixels::getPixel(byte Index, PixelType& Pixel) const
+StdReturnType Pixels::GetPixel(byte index, PixelType& pixel) const
 {
-    if(!isIndexValid(Index)) { return E_NOT_OK; }
+    if(!IsIndexValid(index)) { return kENotOk; }
 
-    Pixel = PixelBuffer[toRow(Index)][toColumn(Index)];
-    return E_OK;
+    pixel = pixel_buffer_[ToRow(index)][ToColumn(index)];
+    return kEOk;
 } /* getPixel */
 
 
 /******************************************************************************************************************************************************
   getPixel()
 ******************************************************************************************************************************************************/
-Pixels::PixelType Pixels::getPixel(byte Index) const
+Pixels::PixelType Pixels::GetPixel(byte index) const
 {
     /* An index that is not on the strip has no pixel, and an unlit one is the answer no
        caller can mistake for an LED that is on. */
-    if(!isIndexValid(Index)) { return PixelType{}; }
+    if(!IsIndexValid(index)) { return PixelType{}; }
 
-    return PixelBuffer[toRow(Index)][toColumn(Index)];
+    return pixel_buffer_[ToRow(index)][ToColumn(index)];
 } /* getPixel */
 
 
 /******************************************************************************************************************************************************
   setPixel()
 ******************************************************************************************************************************************************/
-StdReturnType Pixels::setPixel(byte Index, PixelType Pixel)
+StdReturnType Pixels::SetPixel(byte index, PixelType pixel)
 {
-    if(!isIndexValid(Index)) { return E_NOT_OK; }
+    if(!IsIndexValid(index)) { return kENotOk; }
 
-    PixelBuffer[toRow(Index)][toColumn(Index)] = Pixel;
-    Dirty = true;
-    return E_OK;
+    pixel_buffer_[ToRow(index)][ToColumn(index)] = pixel;
+    dirty_ = true;
+    return kEOk;
 } /* setPixel */
 
 
 /******************************************************************************************************************************************************
   setPixel()
 ******************************************************************************************************************************************************/
-StdReturnType Pixels::setPixel(byte Index, byte Red, byte Green, byte Blue)
+StdReturnType Pixels::SetPixel(byte index, byte red, byte green, byte blue)
 {
-    return setPixel(Index, PixelType(Red, Green, Blue));
+    return SetPixel(index, PixelType(red, green, blue));
 } /* setPixel */
 
 
 /******************************************************************************************************************************************************
   setPixels()
 ******************************************************************************************************************************************************/
-void Pixels::setPixels(PixelType Pixel)
+void Pixels::SetPixels(PixelType pixel)
 {
-    for(unsigned int Row = 0; Row < PIXELS_DISPLAY_NUMBER_OF_ROWS; Row++) {
-        for(unsigned int Column = 0; Column < PIXELS_DISPLAY_NUMBER_OF_COLUMNS; Column++) {
-            PixelBuffer[Row][Column] = Pixel;
+    for(unsigned int row = 0; row < PIXELS_DISPLAY_NUMBER_OF_ROWS; row++) {
+        for(unsigned int column = 0; column < PIXELS_DISPLAY_NUMBER_OF_COLUMNS; column++) {
+            pixel_buffer_[row][column] = pixel;
         }
     }
-    Dirty = true;
+    dirty_ = true;
 } /* setPixels */
 
 
 /******************************************************************************************************************************************************
   setBrightness()
 ******************************************************************************************************************************************************/
-void Pixels::setBrightness(byte sBrightness, bool GammaCorrection)
+void Pixels::SetBrightness(byte brightness, bool gamma_correction)
 {
     /* Master output on and off, driven by enablePixels() and disablePixels(). The buffer
        is left alone and the level is applied on the way out, so switching back on
        restores the picture without the firmware having to redraw it. */
-    Brightness = sBrightness;
-    Dirty = true;
+    brightness_ = brightness;
+    dirty_ = true;
 
-    UNUSED(GammaCorrection);
+    UNUSED(gamma_correction);
 } /* setBrightness */
 
 
@@ -302,16 +302,16 @@ void Pixels::setBrightness(byte sBrightness, bool GammaCorrection)
  *                  reordering. The accessors are used anyway, so that changing those
  *                  offsets cannot silently swap the colours on the strip.
 ******************************************************************************************************************************************************/
-void Pixels::fillFrameBuffer() const
+void Pixels::FillFrameBuffer() const
 {
-    byte* Target = FrameBuffer;
+    byte* target = frame_buffer;
 
-    for(byte Index = 0u; Index < PIXELS_NUMBER_OF_LEDS; Index++) {
-        const PixelType Pixel = getOutputPixel(Index);
+    for(byte index = 0u; index < PIXELS_NUMBER_OF_LEDS; index++) {
+        const PixelType pixel = GetOutputPixel(index);
 
-        *Target++ = Pixel.getGreen();
-        *Target++ = Pixel.getRed();
-        *Target++ = Pixel.getBlue();
+        *target++ = pixel.GetGreen();
+        *target++ = pixel.GetRed();
+        *target++ = pixel.GetBlue();
     }
 } /* fillFrameBuffer */
 
@@ -325,18 +325,18 @@ void Pixels::fillFrameBuffer() const
  *
  *  \return         E_OK if the frame was queued
 ******************************************************************************************************************************************************/
-StdReturnType Pixels::transmitFrame()
+StdReturnType Pixels::TransmitFrame()
 {
-    if(rmt_tx_wait_all_done(RmtChannel, TransmitTimeoutMs) != ESP_OK) { return E_NOT_OK; }
+    if(rmt_tx_wait_all_done(rmt_channel, kTransmitTimeoutMs) != ESP_OK) { return kENotOk; }
 
-    fillFrameBuffer();
+    FillFrameBuffer();
 
-    rmt_transmit_config_t TransmitConfig{};
-    TransmitConfig.loop_count = 0;
+    rmt_transmit_config_t transmit_config{};
+    transmit_config.loop_count = 0;
 
-    if(rmt_transmit(RmtChannel, RmtEncoder, FrameBuffer, sizeof(FrameBuffer), &TransmitConfig) != ESP_OK) { return E_NOT_OK; }
+    if(rmt_transmit(rmt_channel, rmt_encoder, frame_buffer, sizeof(frame_buffer), &transmit_config) != ESP_OK) { return kENotOk; }
 
-    return E_OK;
+    return kEOk;
 } /* transmitFrame */
 
 /******************************************************************************************************************************************************

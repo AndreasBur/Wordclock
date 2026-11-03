@@ -1,5 +1,7 @@
 #ifndef _ESP_HTTP_SERVER_H_
 #define _ESP_HTTP_SERVER_H_
+/* Under the framework's names, because it stands in for the framework's header. */
+// NOLINTBEGIN(readability-identifier-naming)
 #include <stdint.h>
 #include <stddef.h>
 #include "esp_err.h"
@@ -37,4 +39,5 @@ esp_err_t httpd_resp_send_chunk(httpd_req_t*, const char*, ssize_t);
 int httpd_req_to_sockfd(httpd_req_t*);
 esp_err_t httpd_ws_recv_frame(httpd_req_t*, httpd_ws_frame_t*, size_t);
 esp_err_t httpd_ws_send_frame_async(httpd_handle_t, int, httpd_ws_frame_t*);
+// NOLINTEND(readability-identifier-naming)
 #endif

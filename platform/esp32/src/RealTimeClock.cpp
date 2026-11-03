@@ -31,32 +31,32 @@
 namespace {
 
 /* tm counts years from 1900 and months from zero, ClockDate counts neither. */
-constexpr int TmYearOffset{1900};
-constexpr int TmMonthOffset{1};
+constexpr int kTmYearOffset{1900};
+constexpr int kTmMonthOffset{1};
 
-void toDateTime(const struct tm& Local, ClockDateTime& DateTime)
+void ToDateTime(const struct tm& local, ClockDateTime& date_time)
 {
-    DateTime.setDateYear(static_cast<ClockDateTime::YearType>(Local.tm_year + TmYearOffset));
-    DateTime.setDateMonth(static_cast<ClockDateTime::MonthType>(Local.tm_mon + TmMonthOffset));
-    DateTime.setDateDay(static_cast<ClockDateTime::DayType>(Local.tm_mday));
-    DateTime.setTimeHour(static_cast<ClockDateTime::HourType>(Local.tm_hour));
-    DateTime.setTimeMinute(static_cast<ClockDateTime::MinuteType>(Local.tm_min));
-    DateTime.setTimeSecond(static_cast<ClockDateTime::SecondType>(Local.tm_sec));
+    date_time.SetDateYear(static_cast<ClockDateTime::YearType>(local.tm_year + kTmYearOffset));
+    date_time.SetDateMonth(static_cast<ClockDateTime::MonthType>(local.tm_mon + kTmMonthOffset));
+    date_time.SetDateDay(static_cast<ClockDateTime::DayType>(local.tm_mday));
+    date_time.SetTimeHour(static_cast<ClockDateTime::HourType>(local.tm_hour));
+    date_time.SetTimeMinute(static_cast<ClockDateTime::MinuteType>(local.tm_min));
+    date_time.SetTimeSecond(static_cast<ClockDateTime::SecondType>(local.tm_sec));
 }
 
 /* The chip keeps UTC, so the two conversions for it leave the zone rule out: gmtime_r and
    timegm are what localtime_r and mktime are for the display's local time. */
-void toDateTimeUtc(const time_t& Seconds, ClockDateTime& DateTime)
+void ToDateTimeUtc(const time_t& seconds, ClockDateTime& date_time)
 {
-    struct tm Utc{};
+    struct tm utc{};
 
-    gmtime_r(&Seconds, &Utc);
-    toDateTime(Utc, DateTime);
+    gmtime_r(&seconds, &utc);
+    ToDateTime(utc, date_time);
 }
 
-constexpr int32_t SecondsPerMinute{60};
-constexpr int32_t SecondsPerHour{60 * SecondsPerMinute};
-constexpr int32_t SecondsPerDay{24 * SecondsPerHour};
+constexpr int32_t kSecondsPerMinute{60};
+constexpr int32_t kSecondsPerHour{60 * kSecondsPerMinute};
+constexpr int32_t kSecondsPerDay{24 * kSecondsPerHour};
 
 /* Days from 1970-01-01 to a civil date, by Howard Hinnant's days_from_civil: the year is
    shifted so that it begins in March, which puts the leap day at the end of it and makes
@@ -66,61 +66,61 @@ constexpr int32_t SecondsPerDay{24 * SecondsPerHour};
    does not declare it on this target, so a build against the ESP32 core does not compile
    with it. The other way round - a local time to seconds - keeps using mktime, which is
    there and which has to apply the zone rule anyway. */
-constexpr int32_t daysFromCivil(int32_t Year, int32_t Month, int32_t Day)
+constexpr int32_t DaysFromCivil(int32_t year, int32_t month, int32_t day)
 {
-    Year -= (Month <= 2) ? 1 : 0;
+    year -= (month <= 2) ? 1 : 0;
 
-    const int32_t Era = ((Year >= 0) ? Year : (Year - 399)) / 400;
-    const int32_t YearOfEra = Year - (Era * 400);
-    const int32_t DayOfYear = (((153 * (Month + ((Month > 2) ? -3 : 9))) + 2) / 5) + Day - 1;
-    const int32_t DayOfEra = (YearOfEra * 365) + (YearOfEra / 4) - (YearOfEra / 100) + DayOfYear;
+    const int32_t era = ((year >= 0) ? year : (year - 399)) / 400;
+    const int32_t year_of_era = year - (era * 400);
+    const int32_t day_of_year = (((153 * (month + ((month > 2) ? -3 : 9))) + 2) / 5) + day - 1;
+    const int32_t day_of_era = (year_of_era * 365) + (year_of_era / 4) - (year_of_era / 100) + day_of_year;
 
-    return (Era * 146097) + DayOfEra - 719468;
+    return (era * 146097) + day_of_era - 719468;
 }
 
 /* The epoch itself, the leap day that the shifted year is built around, and both ends of
    what ClockDate covers. */
-static_assert(daysFromCivil(1970, 1, 1) == 0, "the epoch must be day zero");
-static_assert(daysFromCivil(2000, 3, 1) == 11017, "the day after a leap day must line up");
-static_assert(daysFromCivil(2026, 8, 14) == 20679, "an ordinary day must line up");
-static_assert(daysFromCivil(2099, 12, 31) == 47481, "the last day ClockDate accepts must line up");
+static_assert(DaysFromCivil(1970, 1, 1) == 0, "the epoch must be day zero");
+static_assert(DaysFromCivil(2000, 3, 1) == 11017, "the day after a leap day must line up");
+static_assert(DaysFromCivil(2026, 8, 14) == 20679, "an ordinary day must line up");
+static_assert(DaysFromCivil(2099, 12, 31) == 47481, "the last day ClockDate accepts must line up");
 
 /* Widened before the multiplication, not after it: in 32 bit the days alone overflow on
    2038-01-19, and ClockDate runs to 2099. */
-constexpr time_t toSecondsSinceEpoch(int32_t Days, int32_t Hour, int32_t Minute, int32_t Second)
+constexpr time_t ToSecondsSinceEpoch(int32_t days, int32_t hour, int32_t minute, int32_t second)
 {
-    return (static_cast<time_t>(Days) * SecondsPerDay) + (static_cast<time_t>(Hour) * SecondsPerHour) +
-           (static_cast<time_t>(Minute) * SecondsPerMinute) + Second;
+    return (static_cast<time_t>(days) * kSecondsPerDay) + (static_cast<time_t>(hour) * kSecondsPerHour) +
+           (static_cast<time_t>(minute) * kSecondsPerMinute) + second;
 }
 
-static_assert(toSecondsSinceEpoch(daysFromCivil(2099, 12, 31), 23, 59, 59) == 4102444799,
+static_assert(ToSecondsSinceEpoch(DaysFromCivil(2099, 12, 31), 23, 59, 59) == 4102444799,
               "the last second ClockDate accepts must not overflow");
 
-time_t toSecondsUtc(const ClockDateTime& DateTime)
+time_t ToSecondsUtc(const ClockDateTime& date_time)
 {
-    const int32_t Days = daysFromCivil(static_cast<int32_t>(DateTime.getDateYear()),
-                                       static_cast<int32_t>(DateTime.getDateMonth()),
-                                       static_cast<int32_t>(DateTime.getDateDay()));
+    const int32_t days = DaysFromCivil(static_cast<int32_t>(date_time.GetDateYear()),
+                                       static_cast<int32_t>(date_time.GetDateMonth()),
+                                       static_cast<int32_t>(date_time.GetDateDay()));
 
-    return toSecondsSinceEpoch(Days,
-                               static_cast<int32_t>(DateTime.getTimeHour()),
-                               static_cast<int32_t>(DateTime.getTimeMinute()),
-                               static_cast<int32_t>(DateTime.getTimeSecond()));
+    return ToSecondsSinceEpoch(days,
+                               static_cast<int32_t>(date_time.GetTimeHour()),
+                               static_cast<int32_t>(date_time.GetTimeMinute()),
+                               static_cast<int32_t>(date_time.GetTimeSecond()));
 }
 
-void toTm(const ClockDateTime& DateTime, struct tm& Local)
+void ToTm(const ClockDateTime& date_time, struct tm& local)
 {
-    Local = {};
-    Local.tm_year = static_cast<int>(DateTime.getDateYear()) - TmYearOffset;
-    Local.tm_mon = static_cast<int>(DateTime.getDateMonth()) - TmMonthOffset;
-    Local.tm_mday = static_cast<int>(DateTime.getDateDay());
-    Local.tm_hour = static_cast<int>(DateTime.getTimeHour());
-    Local.tm_min = static_cast<int>(DateTime.getTimeMinute());
-    Local.tm_sec = static_cast<int>(DateTime.getTimeSecond());
+    local = {};
+    local.tm_year = static_cast<int>(date_time.GetDateYear()) - kTmYearOffset;
+    local.tm_mon = static_cast<int>(date_time.GetDateMonth()) - kTmMonthOffset;
+    local.tm_mday = static_cast<int>(date_time.GetDateDay());
+    local.tm_hour = static_cast<int>(date_time.GetTimeHour());
+    local.tm_min = static_cast<int>(date_time.GetTimeMinute());
+    local.tm_sec = static_cast<int>(date_time.GetTimeSecond());
     /* Unknown rather than off, so mktime() decides from the zone rule whether the wall
        clock time it was handed is in summer or winter time. Hardcoding zero would move
        the clock by an hour for half the year. */
-    Local.tm_isdst = -1;
+    local.tm_isdst = -1;
 }
 
 } // namespace
@@ -139,46 +139,46 @@ void toTm(const ClockDateTime& DateTime, struct tm& Local)
  *
  *  \return         true once the system clock has been set
 ******************************************************************************************************************************************************/
-bool RealTimeClock::isSystemTimeSet()
+bool RealTimeClock::IsSystemTimeSet()
 {
-    ClockDateTime Unused;
-    return readSystemDateTime(Unused);
+    ClockDateTime unused;
+    return ReadSystemDateTime(unused);
 } /* isSystemTimeSet */
 
 
 /******************************************************************************************************************************************************
   setDateTime()
 ******************************************************************************************************************************************************/
-void RealTimeClock::setDateTime(ClockDateTime sDateTime)
+void RealTimeClock::SetDateTime(ClockDateTime date_time)
 {
-    DateTime = sDateTime;
-    writeSystemDateTime(DateTime);
+    date_time_ = date_time;
+    WriteSystemDateTime(date_time_);
     /* A time set by hand is worth keeping over the next power cut as much as one from the
        network, so the chip is written again on the next task rather than at the turn of
        the hour it would otherwise wait for. */
-    HourWrittenToChip = NoHourWritten;
+    hour_written_to_chip_ = kNoHourWritten;
 } /* setDateTime */
 
 
 /******************************************************************************************************************************************************
   setTime()
 ******************************************************************************************************************************************************/
-void RealTimeClock::setTime(ClockTime Time)
+void RealTimeClock::SetTime(ClockTime time)
 {
-    ClockDateTime Value = DateTime;
-    Value.setTime(Time);
-    setDateTime(Value);
+    ClockDateTime value = date_time_;
+    value.SetTime(time);
+    SetDateTime(value);
 } /* setTime */
 
 
 /******************************************************************************************************************************************************
   setDate()
 ******************************************************************************************************************************************************/
-void RealTimeClock::setDate(ClockDate Date)
+void RealTimeClock::SetDate(ClockDate date)
 {
-    ClockDateTime Value = DateTime;
-    Value.setDate(Date);
-    setDateTime(Value);
+    ClockDateTime value = date_time_;
+    value.SetDate(date);
+    SetDateTime(value);
 } /* setDate */
 
 
@@ -196,20 +196,20 @@ void RealTimeClock::setDate(ClockDate Date)
  *                  drifts a few seconds a month and SNTP does not, so a chip that could
  *                  overwrite a synchronised clock would make the clock worse.
 ******************************************************************************************************************************************************/
-void RealTimeClock::task()
+void RealTimeClock::Task()
 {
-    ClockDateTime Current;
+    ClockDateTime current;
 
     /* An unset clock is left alone rather than shown. Before the first SNTP answer the
        system clock sits in 1970, which ClockDate rejects outright - so the display would
        otherwise keep whatever the failed setters left behind. */
-    if(!readSystemDateTime(Current)) {
-        readChip();
+    if(!ReadSystemDateTime(current)) {
+        ReadChip();
         return;
     }
 
-    DateTime = Current;
-    writeChip();
+    date_time_ = current;
+    WriteChip();
 } /* task */
 
 
@@ -224,15 +224,15 @@ void RealTimeClock::task()
  *
  *  \return         true if the system clock holds a year ClockDate accepts
 ******************************************************************************************************************************************************/
-bool RealTimeClock::readSystemDateTime(ClockDateTime& Value)
+bool RealTimeClock::ReadSystemDateTime(ClockDateTime& value)
 {
-    const time_t Now = time(nullptr);
-    struct tm Local{};
+    const time_t now = time(nullptr);
+    struct tm local{};
 
-    if(localtime_r(&Now, &Local) == nullptr) { return false; }
-    if(!ClockDate::isYearValid(static_cast<ClockDate::YearType>(Local.tm_year + TmYearOffset))) { return false; }
+    if(localtime_r(&now, &local) == nullptr) { return false; }
+    if(!ClockDate::IsYearValid(static_cast<ClockDate::YearType>(local.tm_year + kTmYearOffset))) { return false; }
 
-    toDateTime(Local, Value);
+    ToDateTime(local, value);
     return true;
 } /* readSystemDateTime */
 
@@ -248,23 +248,23 @@ bool RealTimeClock::readSystemDateTime(ClockDateTime& Value)
  *
  *  \return         E_OK if the chip had a time and the system clock took it
 ******************************************************************************************************************************************************/
-StdReturnType RealTimeClock::readChip()
+StdReturnType RealTimeClock::ReadChip()
 {
-    if(ChipReadCountdown > 0u) { ChipReadCountdown--; return E_NOT_OK; }
+    if(chip_read_countdown_ > 0u) { chip_read_countdown_--; return kENotOk; }
 
-    ChipReadCountdown = ChipReadInterval;
+    chip_read_countdown_ = kChipReadInterval;
 
-    ClockDateTime Utc;
+    ClockDateTime utc;
 
-    if(Chip.getDateTime(Utc) == E_NOT_OK) { return E_NOT_OK; }
+    if(chip_.GetDateTime(utc) == kENotOk) { return kENotOk; }
 
-    const struct timeval Time{toSecondsUtc(Utc), 0};
-    if(settimeofday(&Time, nullptr) != 0) { return E_NOT_OK; }
+    const struct timeval time{ToSecondsUtc(utc), 0};
+    if(settimeofday(&time, nullptr) != 0) { return kENotOk; }
 
     /* Not written back at once: what was just read is what the chip already holds, and the
        hour it belongs to is what the next write is measured against. */
-    HourWrittenToChip = Utc.getTimeHour();
-    return E_OK;
+    hour_written_to_chip_ = utc.GetTimeHour();
+    return kEOk;
 } /* readChip */
 
 
@@ -284,15 +284,15 @@ StdReturnType RealTimeClock::readChip()
  *                  anyway, and a chip that is not answering would otherwise be talked to
  *                  on every single tick.
 ******************************************************************************************************************************************************/
-void RealTimeClock::writeChip()
+void RealTimeClock::WriteChip()
 {
-    if(DateTime.getTimeHour() == HourWrittenToChip) { return; }
+    if(date_time_.GetTimeHour() == hour_written_to_chip_) { return; }
 
-    ClockDateTime Utc;
-    toDateTimeUtc(time(nullptr), Utc);
+    ClockDateTime utc;
+    ToDateTimeUtc(time(nullptr), utc);
 
-    Chip.setDateTime(Utc);
-    HourWrittenToChip = DateTime.getTimeHour();
+    chip_.SetDateTime(utc);
+    hour_written_to_chip_ = date_time_.GetTimeHour();
 } /* writeChip */
 
 
@@ -303,18 +303,18 @@ void RealTimeClock::writeChip()
  *
  *  \return         E_OK if the system clock took the value
 ******************************************************************************************************************************************************/
-StdReturnType RealTimeClock::writeSystemDateTime(const ClockDateTime& Value)
+StdReturnType RealTimeClock::WriteSystemDateTime(const ClockDateTime& value)
 {
-    struct tm Local{};
-    toTm(Value, Local);
+    struct tm local{};
+    ToTm(value, local);
 
-    const time_t Seconds = mktime(&Local);
-    if(Seconds == static_cast<time_t>(-1)) { return E_NOT_OK; }
+    const time_t seconds = mktime(&local);
+    if(seconds == static_cast<time_t>(-1)) { return kENotOk; }
 
-    const struct timeval Time{Seconds, 0};
-    if(settimeofday(&Time, nullptr) != 0) { return E_NOT_OK; }
+    const struct timeval time{seconds, 0};
+    if(settimeofday(&time, nullptr) != 0) { return kENotOk; }
 
-    return E_OK;
+    return kEOk;
 } /* writeSystemDateTime */
 
 /******************************************************************************************************************************************************

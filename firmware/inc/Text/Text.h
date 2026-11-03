@@ -62,32 +62,32 @@ class Text
 ******************************************************************************************************************************************************/
   public:
     enum StateType {
-        STATE_IDLE,
-        STATE_TEXT_SHIFT,
-        STATE_CHAR_SHIFT
+        kStateIdle,
+        kStateTextShift,
+        kStateCharShift
     };
 
     enum ShiftStateType {
-        SHIFT_STATE_IDLE,
-        SHIFT_STATE_BUSY
+        kShiftStateIdle,
+        kShiftStateBusy
     };
 
     enum FontType {
-        FONT_5X8,
-        FONT_7X9,
-        FONT_7X10,
-        FONT_9X10,
-        FONT_10X10,
-        FONT_NUMBER_OF_FONTS
+        kFont5x8,
+        kFont7x9,
+        kFont7x10,
+        kFont9x10,
+        kFont10x10,
+        kFontNumberOfFonts
     };
 
     struct ShiftType {
-        const char* Text;
-        FontType Font;
-        char Char;
-        byte CharWidth;
-        byte Counter : 7;
-        ShiftStateType State : 1;
+        const char* text;
+        FontType font;
+        char character;
+        byte char_width;
+        byte counter : 7;
+        ShiftStateType state : 1;
     };
 
 /******************************************************************************************************************************************************
@@ -96,30 +96,30 @@ class Text
   private:
     /* The first glyph of every table is the space, which is what a character with no glyph
        of its own is drawn as. */
-    static constexpr byte SpaceFontIndex{0u};
-    Transformation wcTransformation;
-    ShiftType Shift;
-    byte TaskCycle{TEXT_TASK_CYCLE_INIT_VALUE};
-    StateType State{STATE_IDLE};
+    static constexpr byte kSpaceFontIndex{0u};
+    Transformation wc_transformation_;
+    ShiftType shift_;
+    byte task_cycle_{TEXT_TASK_CYCLE_INIT_VALUE};
+    StateType state_{kStateIdle};
 
 #if(TEXT_SUPPORT_FONT_5X8 == STD_ON)
-    FontSprite5x8 Font5x8;
+    FontSprite5x8 font5x8_;
 #endif
 #if(TEXT_SUPPORT_FONT_7X9 == STD_ON)
-    FontCourierNew7x9 Font7x9;
+    FontCourierNew7x9 font7x9_;
 #endif
 #if(TEXT_SUPPORT_FONT_7X10 == STD_ON)
-    FontCourierNew7x10 Font7x10;
+    FontCourierNew7x10 font7x10_;
 #endif
 #if(TEXT_SUPPORT_FONT_9X10 == STD_ON)
-    FontLucidaSans9x10 Font9x10;
+    FontLucidaSans9x10 font9x10_;
 #endif
 #if(TEXT_SUPPORT_FONT_10X10 == STD_ON)
-    FontTahoma10x10 Font10x10;
+    FontTahoma10x10 font10x10_;
 #endif
 
     // functions
-    constexpr Text() : wcTransformation(), Shift{nullptr, FONT_10X10, STD_NULL_CHARACTER, 0, 0, SHIFT_STATE_IDLE} { }
+    constexpr Text() : wc_transformation_(), shift_{nullptr, kFont10x10, STD_NULL_CHARACTER, 0, 0, kShiftStateIdle} { }
     ~Text() { }
 
 
@@ -129,53 +129,53 @@ class Text
        branch. There is one of each now, so the mistake has nowhere left to happen, and the
        [[nodiscard]] that used to police it is gone with the twins. */
     template <typename RowType, byte RowsSize>
-    StdReturnType setCharFontHorizontal(byte, byte, const FontCharHorizontal<RowType, RowsSize>&, byte);
+    StdReturnType SetCharFontHorizontal(byte, byte, const FontCharHorizontal<RowType, RowsSize>&, byte);
     template <typename RowType>
-    static StdReturnType setCharRow(RowType, byte, byte, byte);
+    static StdReturnType SetCharRow(RowType, byte, byte, byte);
 
     template <typename ColumnType, byte ColumnsSize>
-    StdReturnType setCharFontVertical(byte, byte, const FontCharVertical<ColumnType, ColumnsSize>&, byte);
+    StdReturnType SetCharFontVertical(byte, byte, const FontCharVertical<ColumnType, ColumnsSize>&, byte);
     template <typename ColumnType>
-    static StdReturnType setCharColumn(ColumnType, byte, byte, byte);
+    static StdReturnType SetCharColumn(ColumnType, byte, byte, byte);
 
-    static StdReturnType convertCharToFontIndex(char, byte&);
-    static byte convertCharToFontIndex(char);
-    void stringShiftTask();
-    void charShiftTask();
-    byte getColumnCenter(FontType Font) const { return (DISPLAY_NUMBER_OF_COLUMNS / 2u) - (getFontWidth(Font) / 2u); }
-    byte getRowCenter(FontType Font) const { return (DISPLAY_NUMBER_OF_ROWS / 2u) - (getFontHeight(Font) / 2u); }
+    static StdReturnType ConvertCharToFontIndex(char, byte&);
+    static byte ConvertCharToFontIndex(char);
+    void StringShiftTask();
+    void CharShiftTask();
+    byte GetColumnCenter(FontType font) const { return (DISPLAY_NUMBER_OF_COLUMNS / 2u) - (GetFontWidth(font) / 2u); }
+    byte GetRowCenter(FontType font) const { return (DISPLAY_NUMBER_OF_ROWS / 2u) - (GetFontHeight(font) / 2u); }
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    static Text& getInstance() {
-        static Text singletonInstance;
-        return singletonInstance;
+    static Text& GetInstance() {
+        static Text singleton_instance;
+        return singleton_instance;
     }
 
     // get methods
-    StateType getState() const { return State; }
-    byte getTaskCycle() const { return TaskCycle; }
-    FontType getFontShift() const { return Shift.Font; }
+    StateType GetState() const { return state_; }
+    byte GetTaskCycle() const { return task_cycle_; }
+    FontType GetFontShift() const { return shift_.font; }
 
     // set methods
-    void setTaskCycle(byte Cycle) { TaskCycle = Cycle; }
-    void setFontShift(FontType Font) { if(isFontValid(Font)) { Shift.Font = Font; } }
+    void SetTaskCycle(byte cycle) { task_cycle_ = cycle; }
+    void SetFontShift(FontType font) { if(IsFontValid(font)) { shift_.font = font; } }
 
     // methods
-    static bool isFontValid(FontType sFont) { return sFont < FONT_NUMBER_OF_FONTS; }
-    static StdReturnType show() { return Display::getInstance().show(); }
-    void task(bool=false);
-    void stop();
-    StdReturnType setChar(byte, byte, char, FontType);
-    void setCharWithShift(char, FontType);
-    void setTextWithShift(const char*, FontType);
-    void setTextWithShift(const char* Text) { setTextWithShift(Text, Shift.Font); }
-    byte getFontHeight(FontType) const;
-    byte getFontWidth(FontType) const;
-    byte getFontCharWidth(FontType, char) const;
-    Orientation getFontOrientation(FontType) const;
+    static bool IsFontValid(FontType font) { return font < kFontNumberOfFonts; }
+    static StdReturnType Show() { return Display::GetInstance().Show(); }
+    void Task(bool=false);
+    void Stop();
+    StdReturnType SetChar(byte, byte, char, FontType);
+    void SetCharWithShift(char, FontType);
+    void SetTextWithShift(const char*, FontType);
+    void SetTextWithShift(const char* text) { SetTextWithShift(text, shift_.font); }
+    byte GetFontHeight(FontType) const;
+    byte GetFontWidth(FontType) const;
+    byte GetFontCharWidth(FontType, char) const;
+    Orientation GetFontOrientation(FontType) const;
 };
 
 

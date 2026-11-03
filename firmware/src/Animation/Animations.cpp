@@ -47,28 +47,28 @@
 /******************************************************************************************************************************************************
   getState()
 ******************************************************************************************************************************************************/
-Animations::StateType Animations::getState() const
+Animations::StateType Animations::GetState() const
 {
-    if(getStateOfCurrentAnimation() == Animation::STATE_CLEAR_TIME ||
-       getStateOfCurrentAnimation() == Animation::STATE_SET_TIME)
+    if(GetStateOfCurrentAnimation() == Animation::kStateClearTime ||
+       GetStateOfCurrentAnimation() == Animation::kStateSetTime)
     {
-        return STATE_PENDING;
+        return kStatePending;
     }
 
-    return STATE_IDLE;
+    return kStateIdle;
 } /* getState */
 
 
 /******************************************************************************************************************************************************
   task()
 ******************************************************************************************************************************************************/
-void Animations::task(bool Show)
+void Animations::Task(bool show)
 {
-    if(getStateOfCurrentAnimation() == Animation::STATE_CLEAR_TIME ||
-       getStateOfCurrentAnimation() == Animation::STATE_SET_TIME)
+    if(GetStateOfCurrentAnimation() == Animation::kStateClearTime ||
+       GetStateOfCurrentAnimation() == Animation::kStateSetTime)
     {
-        taskOfCurrentAnimation();
-        if(Show) { showOfCurrentAnimation(); }
+        TaskOfCurrentAnimation();
+        if(show) { ShowOfCurrentAnimation(); }
     }
 } /* task */
 
@@ -76,150 +76,150 @@ void Animations::task(bool Show)
 /******************************************************************************************************************************************************
   show()
 ******************************************************************************************************************************************************/
-StdReturnType Animations::show() const
+StdReturnType Animations::Show() const
 {
-    if(getStateOfCurrentAnimation() == Animation::STATE_CLEAR_TIME ||
-       getStateOfCurrentAnimation() == Animation::STATE_SET_TIME)
+    if(GetStateOfCurrentAnimation() == Animation::kStateClearTime ||
+       GetStateOfCurrentAnimation() == Animation::kStateSetTime)
     {
-        return showOfCurrentAnimation();
+        return ShowOfCurrentAnimation();
     }
 
-    return E_NOT_OK;
+    return kENotOk;
 } /* show */
 
 /******************************************************************************************************************************************************
   setTaskCycle()
 ******************************************************************************************************************************************************/
-StdReturnType Animations::setTaskCycle(AnimationIdType AnimationId, byte Cycle)
+StdReturnType Animations::SetTaskCycle(AnimationIdType animation_id, byte cycle)
 {
-    if(isAnimationValid(AnimationId)) {
-        TaskCycles[AnimationId] = Cycle;
-        return E_OK;
+    if(IsAnimationValid(animation_id)) {
+        task_cycles_[animation_id] = cycle;
+        return kEOk;
     } else {
-        return E_NOT_OK;
+        return kENotOk;
     }
 }
 
 /******************************************************************************************************************************************************
   setAnimation()
 ******************************************************************************************************************************************************/
-StdReturnType Animations::setAnimation(AnimationIdType sAnimationId)
+StdReturnType Animations::SetAnimation(AnimationIdType animation_id)
 {
-    if(!isAnimationValid(sAnimationId)) { return E_NOT_OK; }
+    if(!IsAnimationValid(animation_id)) { return kENotOk; }
 
-    AnimationId = sAnimationId;
+    animation_id_ = animation_id;
     /* shows the selected animation right away, even in a mode that selects on its own;
        that mode takes over again on the next word change */
-    CurrentAnimationId = AnimationId;
+    current_animation_id_ = animation_id_;
 
-    initCurrentAnimation();
-    return E_OK;
+    InitCurrentAnimation();
+    return kEOk;
 } /* setAnimation */
 
 
 /******************************************************************************************************************************************************
   setMode()
 ******************************************************************************************************************************************************/
-StdReturnType Animations::setMode(ModeType sMode)
+StdReturnType Animations::SetMode(ModeType mode)
 {
-    if(!isModeValid(sMode)) { return E_NOT_OK; }
+    if(!IsModeValid(mode)) { return kENotOk; }
 
-    Mode = sMode;
+    mode_ = mode;
 
     /* Back to the selected animation. The selecting modes leave the current animation
        alone and take over on the next word change. */
-    if(Mode == MODE_FIXED) {
-        CurrentAnimationId = AnimationId;
-        initCurrentAnimation();
+    if(mode_ == kModeFixed) {
+        current_animation_id_ = animation_id_;
+        InitCurrentAnimation();
     }
-    return E_OK;
+    return kEOk;
 } /* setMode */
 
 
 /******************************************************************************************************************************************************
   initCurrentAnimation()
 ******************************************************************************************************************************************************/
-void Animations::initCurrentAnimation()
+void Animations::InitCurrentAnimation()
 {
-    switch(CurrentAnimationId)
+    switch(current_animation_id_)
     {
 # if(ANIMATIONS_SUPPORT_CURSOR == STD_ON)
-        case ANIMATION_ID_CURSOR :
-            return AnimationsRaw.Cursor.init();
+        case kAnimationIdCursor :
+            return animations_raw_.cursor.Init();
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_TELETYPE == STD_ON)
-        case ANIMATION_ID_TELETYPE :
-            return AnimationsRaw.Teletype.init();
+        case kAnimationIdTeletype :
+            return animations_raw_.teletype.Init();
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_DROP == STD_ON)
-        case ANIMATION_ID_DROP :
-            return AnimationsRaw.Drop.init();
+        case kAnimationIdDrop :
+            return animations_raw_.drop.Init();
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_SHIFT == STD_ON)
-        case ANIMATION_ID_SHIFT :
-            return AnimationsRaw.Shift.init();
+        case kAnimationIdShift :
+            return animations_raw_.shift.Init();
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_FADE == STD_ON)
-        case ANIMATION_ID_FADE :
-            return AnimationsRaw.Fade.init();
+        case kAnimationIdFade :
+            return animations_raw_.fade.Init();
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_SNAKE == STD_ON)
-        case ANIMATION_ID_SNAKE :
-            return AnimationsRaw.Snake.init();
+        case kAnimationIdSnake :
+            return animations_raw_.snake.Init();
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_WIPE == STD_ON)
-        case ANIMATION_ID_WIPE :
-            return AnimationsRaw.Wipe.init();
+        case kAnimationIdWipe :
+            return animations_raw_.wipe.Init();
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_CUBE == STD_ON)
-        case ANIMATION_ID_CUBE :
-            return AnimationsRaw.Cube.init();
+        case kAnimationIdCube :
+            return animations_raw_.cube.Init();
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_FLICKER == STD_ON)
-        case ANIMATION_ID_FLICKER :
-            return AnimationsRaw.Flicker.init();
+        case kAnimationIdFlicker :
+            return animations_raw_.flicker.Init();
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_SQUEEZE == STD_ON)
-        case ANIMATION_ID_SQUEEZE :
-            return AnimationsRaw.Squeeze.init();
+        case kAnimationIdSqueeze :
+            return animations_raw_.squeeze.Init();
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_EXPLODE_PIXELS == STD_ON)
-        case ANIMATION_ID_EXPLODE_PIXELS :
-            return AnimationsRaw.ExplodePixels.init();
+        case kAnimationIdExplodePixels :
+            return animations_raw_.explode_pixels.Init();
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_EXPLODE_WORDS == STD_ON)
-        case ANIMATION_ID_EXPLODE_WORDS :
-            return AnimationsRaw.ExplodeWords.init();
+        case kAnimationIdExplodeWords :
+            return animations_raw_.explode_words.Init();
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_MATRIX == STD_ON)
-        case ANIMATION_ID_MATRIX :
-            return AnimationsRaw.Matrix.init();
+        case kAnimationIdMatrix :
+            return animations_raw_.matrix.Init();
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_ROLL == STD_ON)
-        case ANIMATION_ID_ROLL :
-            return AnimationsRaw.Roll.init();
+        case kAnimationIdRoll :
+            return animations_raw_.roll.Init();
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_COLLAPSE == STD_ON)
-        case ANIMATION_ID_COLLAPSE :
-            return AnimationsRaw.Collapse.init();
+        case kAnimationIdCollapse :
+            return animations_raw_.collapse.Init();
             break;
 # endif
         default :
-            CurrentAnimationId = ANIMATION_ID_NONE;
+            current_animation_id_ = kAnimationIdNone;
             break;
     }
 } /* initCurrentAnimation */
@@ -228,96 +228,96 @@ void Animations::initCurrentAnimation()
 /******************************************************************************************************************************************************
   setTime()
 ******************************************************************************************************************************************************/
-StdReturnType Animations::setTime(byte Hour, byte Minute)
+StdReturnType Animations::SetTime(byte hour, byte minute)
 {
     /* Only while nothing is running, so a word change during a still running
        animation is ignored here exactly as it is by the animations themselves. */
-    if(Mode != MODE_FIXED && getStateOfCurrentAnimation() == Animation::STATE_IDLE) {
-        selectAnimationOfMode();
+    if(mode_ != kModeFixed && GetStateOfCurrentAnimation() == Animation::kStateIdle) {
+        SelectAnimationOfMode();
     }
 
-    switch(CurrentAnimationId)
+    switch(current_animation_id_)
     {
-        case ANIMATION_ID_NONE :
-            return Clock::getInstance().setTime(Hour, Minute);
+        case kAnimationIdNone :
+            return Clock::GetInstance().SetTime(hour, minute);
             break;
 # if(ANIMATIONS_SUPPORT_CURSOR == STD_ON)
-        case ANIMATION_ID_CURSOR :
-            return AnimationsRaw.Cursor.setTime(Hour, Minute);
+        case kAnimationIdCursor :
+            return animations_raw_.cursor.SetTime(hour, minute);
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_TELETYPE == STD_ON)
-        case ANIMATION_ID_TELETYPE :
-            return AnimationsRaw.Teletype.setTime(Hour, Minute);
+        case kAnimationIdTeletype :
+            return animations_raw_.teletype.SetTime(hour, minute);
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_DROP == STD_ON)
-        case ANIMATION_ID_DROP :
-            return AnimationsRaw.Drop.setTime(Hour, Minute);
+        case kAnimationIdDrop :
+            return animations_raw_.drop.SetTime(hour, minute);
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_SHIFT == STD_ON)
-        case ANIMATION_ID_SHIFT :
-            return AnimationsRaw.Shift.setTime(Hour, Minute);
+        case kAnimationIdShift :
+            return animations_raw_.shift.SetTime(hour, minute);
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_FADE == STD_ON)
-        case ANIMATION_ID_FADE :
-            return AnimationsRaw.Fade.setTime(Hour, Minute);
+        case kAnimationIdFade :
+            return animations_raw_.fade.SetTime(hour, minute);
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_SNAKE == STD_ON)
-        case ANIMATION_ID_SNAKE :
-            return AnimationsRaw.Snake.setTime(Hour, Minute);
+        case kAnimationIdSnake :
+            return animations_raw_.snake.SetTime(hour, minute);
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_WIPE == STD_ON)
-        case ANIMATION_ID_WIPE :
-            return AnimationsRaw.Wipe.setTime(Hour, Minute);
+        case kAnimationIdWipe :
+            return animations_raw_.wipe.SetTime(hour, minute);
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_CUBE == STD_ON)
-        case ANIMATION_ID_CUBE :
-            return AnimationsRaw.Cube.setTime(Hour, Minute);
+        case kAnimationIdCube :
+            return animations_raw_.cube.SetTime(hour, minute);
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_FLICKER == STD_ON)
-        case ANIMATION_ID_FLICKER :
-            return AnimationsRaw.Flicker.setTime(Hour, Minute);
+        case kAnimationIdFlicker :
+            return animations_raw_.flicker.SetTime(hour, minute);
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_SQUEEZE == STD_ON)
-        case ANIMATION_ID_SQUEEZE :
-            return AnimationsRaw.Squeeze.setTime(Hour, Minute);
+        case kAnimationIdSqueeze :
+            return animations_raw_.squeeze.SetTime(hour, minute);
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_EXPLODE_PIXELS == STD_ON)
-        case ANIMATION_ID_EXPLODE_PIXELS :
-            return AnimationsRaw.ExplodePixels.setTime(Hour, Minute);
+        case kAnimationIdExplodePixels :
+            return animations_raw_.explode_pixels.SetTime(hour, minute);
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_EXPLODE_WORDS == STD_ON)
-        case ANIMATION_ID_EXPLODE_WORDS :
-            return AnimationsRaw.ExplodeWords.setTime(Hour, Minute);
+        case kAnimationIdExplodeWords :
+            return animations_raw_.explode_words.SetTime(hour, minute);
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_MATRIX == STD_ON)
-        case ANIMATION_ID_MATRIX :
-            return AnimationsRaw.Matrix.setTime(Hour, Minute);
+        case kAnimationIdMatrix :
+            return animations_raw_.matrix.SetTime(hour, minute);
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_ROLL == STD_ON)
-        case ANIMATION_ID_ROLL :
-            return AnimationsRaw.Roll.setTime(Hour, Minute);
+        case kAnimationIdRoll :
+            return animations_raw_.roll.SetTime(hour, minute);
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_COLLAPSE == STD_ON)
-        case ANIMATION_ID_COLLAPSE :
-            return AnimationsRaw.Collapse.setTime(Hour, Minute);
+        case kAnimationIdCollapse :
+            return animations_raw_.collapse.SetTime(hour, minute);
             break;
 # endif
         default :
-            return E_NOT_OK;
+            return kENotOk;
             break;
     }
 } /* setTime */
@@ -330,90 +330,90 @@ StdReturnType Animations::setTime(byte Hour, byte Minute)
 /******************************************************************************************************************************************************
   getStateOfCurrentAnimation()
 ******************************************************************************************************************************************************/
-Animation::StateType Animations::getStateOfCurrentAnimation() const
+Animation::StateType Animations::GetStateOfCurrentAnimation() const
 {
-    switch(CurrentAnimationId)
+    switch(current_animation_id_)
     {
-        case ANIMATION_ID_NONE :
-            return Animation::STATE_IDLE;
+        case kAnimationIdNone :
+            return Animation::kStateIdle;
             break;
 # if(ANIMATIONS_SUPPORT_CURSOR == STD_ON)
-        case ANIMATION_ID_CURSOR :
-            return AnimationsRaw.Cursor.getState();
+        case kAnimationIdCursor :
+            return animations_raw_.cursor.GetState();
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_TELETYPE == STD_ON)
-        case ANIMATION_ID_TELETYPE :
-            return AnimationsRaw.Teletype.getState();
+        case kAnimationIdTeletype :
+            return animations_raw_.teletype.GetState();
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_DROP == STD_ON)
-        case ANIMATION_ID_DROP :
-            return AnimationsRaw.Drop.getState();
+        case kAnimationIdDrop :
+            return animations_raw_.drop.GetState();
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_SHIFT == STD_ON)
-        case ANIMATION_ID_SHIFT :
-            return AnimationsRaw.Shift.getState();
+        case kAnimationIdShift :
+            return animations_raw_.shift.GetState();
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_FADE == STD_ON)
-        case ANIMATION_ID_FADE :
-            return AnimationsRaw.Fade.getState();
+        case kAnimationIdFade :
+            return animations_raw_.fade.GetState();
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_SNAKE == STD_ON)
-        case ANIMATION_ID_SNAKE :
-            return AnimationsRaw.Snake.getState();
+        case kAnimationIdSnake :
+            return animations_raw_.snake.GetState();
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_WIPE == STD_ON)
-        case ANIMATION_ID_WIPE :
-            return AnimationsRaw.Wipe.getState();
+        case kAnimationIdWipe :
+            return animations_raw_.wipe.GetState();
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_CUBE == STD_ON)
-        case ANIMATION_ID_CUBE :
-            return AnimationsRaw.Cube.getState();
+        case kAnimationIdCube :
+            return animations_raw_.cube.GetState();
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_FLICKER == STD_ON)
-        case ANIMATION_ID_FLICKER :
-            return AnimationsRaw.Flicker.getState();
+        case kAnimationIdFlicker :
+            return animations_raw_.flicker.GetState();
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_SQUEEZE == STD_ON)
-        case ANIMATION_ID_SQUEEZE :
-            return AnimationsRaw.Squeeze.getState();
+        case kAnimationIdSqueeze :
+            return animations_raw_.squeeze.GetState();
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_EXPLODE_PIXELS == STD_ON)
-        case ANIMATION_ID_EXPLODE_PIXELS :
-            return AnimationsRaw.ExplodePixels.getState();
+        case kAnimationIdExplodePixels :
+            return animations_raw_.explode_pixels.GetState();
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_EXPLODE_WORDS == STD_ON)
-        case ANIMATION_ID_EXPLODE_WORDS :
-            return AnimationsRaw.ExplodeWords.getState();
+        case kAnimationIdExplodeWords :
+            return animations_raw_.explode_words.GetState();
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_MATRIX == STD_ON)
-        case ANIMATION_ID_MATRIX :
-            return AnimationsRaw.Matrix.getState();
+        case kAnimationIdMatrix :
+            return animations_raw_.matrix.GetState();
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_ROLL == STD_ON)
-        case ANIMATION_ID_ROLL :
-            return AnimationsRaw.Roll.getState();
+        case kAnimationIdRoll :
+            return animations_raw_.roll.GetState();
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_COLLAPSE == STD_ON)
-        case ANIMATION_ID_COLLAPSE :
-            return AnimationsRaw.Collapse.getState();
+        case kAnimationIdCollapse :
+            return animations_raw_.collapse.GetState();
             break;
 # endif
         default :
-            return Animation::STATE_NONE;
+            return Animation::kStateNone;
             break;
     }
 } /* getStateOfCurrentAnimation */
@@ -422,85 +422,85 @@ Animation::StateType Animations::getStateOfCurrentAnimation() const
 /******************************************************************************************************************************************************
   taskOfCurrentAnimation()
 ******************************************************************************************************************************************************/
-void Animations::taskOfCurrentAnimation()
+void Animations::TaskOfCurrentAnimation()
 {
-    switch(CurrentAnimationId)
+    switch(current_animation_id_)
     {
-        case ANIMATION_ID_NONE :
+        case kAnimationIdNone :
             break;
 # if(ANIMATIONS_SUPPORT_CURSOR == STD_ON)
-        case ANIMATION_ID_CURSOR :
-            AnimationsRaw.Cursor.task();
+        case kAnimationIdCursor :
+            animations_raw_.cursor.Task();
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_TELETYPE == STD_ON)
-        case ANIMATION_ID_TELETYPE :
-            AnimationsRaw.Teletype.task();
+        case kAnimationIdTeletype :
+            animations_raw_.teletype.Task();
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_DROP == STD_ON)
-        case ANIMATION_ID_DROP :
-            AnimationsRaw.Drop.task();
+        case kAnimationIdDrop :
+            animations_raw_.drop.Task();
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_SHIFT == STD_ON)
-        case ANIMATION_ID_SHIFT :
-            AnimationsRaw.Shift.task();
+        case kAnimationIdShift :
+            animations_raw_.shift.Task();
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_FADE == STD_ON)
-        case ANIMATION_ID_FADE :
-            AnimationsRaw.Fade.task();
+        case kAnimationIdFade :
+            animations_raw_.fade.Task();
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_SNAKE == STD_ON)
-        case ANIMATION_ID_SNAKE :
-            AnimationsRaw.Snake.task();
+        case kAnimationIdSnake :
+            animations_raw_.snake.Task();
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_WIPE == STD_ON)
-        case ANIMATION_ID_WIPE :
-            AnimationsRaw.Wipe.task();
+        case kAnimationIdWipe :
+            animations_raw_.wipe.Task();
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_CUBE == STD_ON)
-        case ANIMATION_ID_CUBE :
-            AnimationsRaw.Cube.task();
+        case kAnimationIdCube :
+            animations_raw_.cube.Task();
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_FLICKER == STD_ON)
-        case ANIMATION_ID_FLICKER :
-            AnimationsRaw.Flicker.task();
+        case kAnimationIdFlicker :
+            animations_raw_.flicker.Task();
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_SQUEEZE == STD_ON)
-        case ANIMATION_ID_SQUEEZE :
-            AnimationsRaw.Squeeze.task();
+        case kAnimationIdSqueeze :
+            animations_raw_.squeeze.Task();
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_EXPLODE_PIXELS == STD_ON)
-        case ANIMATION_ID_EXPLODE_PIXELS :
-            AnimationsRaw.ExplodePixels.task();
+        case kAnimationIdExplodePixels :
+            animations_raw_.explode_pixels.Task();
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_EXPLODE_WORDS == STD_ON)
-        case ANIMATION_ID_EXPLODE_WORDS :
-            AnimationsRaw.ExplodeWords.task();
+        case kAnimationIdExplodeWords :
+            animations_raw_.explode_words.Task();
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_MATRIX == STD_ON)
-        case ANIMATION_ID_MATRIX :
-            AnimationsRaw.Matrix.task();
+        case kAnimationIdMatrix :
+            animations_raw_.matrix.Task();
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_ROLL == STD_ON)
-        case ANIMATION_ID_ROLL :
-            AnimationsRaw.Roll.task();
+        case kAnimationIdRoll :
+            animations_raw_.roll.Task();
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_COLLAPSE == STD_ON)
-        case ANIMATION_ID_COLLAPSE :
-            AnimationsRaw.Collapse.task();
+        case kAnimationIdCollapse :
+            animations_raw_.collapse.Task();
             break;
 # endif
         default :
@@ -512,90 +512,90 @@ void Animations::taskOfCurrentAnimation()
 /******************************************************************************************************************************************************
   showOfCurrentAnimation()
 ******************************************************************************************************************************************************/
-StdReturnType Animations::showOfCurrentAnimation() const
+StdReturnType Animations::ShowOfCurrentAnimation() const
 {
-    switch(CurrentAnimationId)
+    switch(current_animation_id_)
     {
-        case ANIMATION_ID_NONE :
-            return Display::getInstance().show();
+        case kAnimationIdNone :
+            return Display::GetInstance().Show();
             break;
 # if(ANIMATIONS_SUPPORT_CURSOR == STD_ON)
-        case ANIMATION_ID_CURSOR :
-            return AnimationsRaw.Cursor.show();
+        case kAnimationIdCursor :
+            return animations_raw_.cursor.Show();
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_TELETYPE == STD_ON)
-        case ANIMATION_ID_TELETYPE :
-            return AnimationsRaw.Teletype.show();
+        case kAnimationIdTeletype :
+            return animations_raw_.teletype.Show();
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_DROP == STD_ON)
-        case ANIMATION_ID_DROP :
-            return AnimationsRaw.Drop.show();
+        case kAnimationIdDrop :
+            return animations_raw_.drop.Show();
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_SHIFT == STD_ON)
-        case ANIMATION_ID_SHIFT :
-            return AnimationsRaw.Shift.show();
+        case kAnimationIdShift :
+            return animations_raw_.shift.Show();
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_FADE == STD_ON)
-        case ANIMATION_ID_FADE :
-            return AnimationsRaw.Fade.show();
+        case kAnimationIdFade :
+            return animations_raw_.fade.Show();
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_SNAKE == STD_ON)
-        case ANIMATION_ID_SNAKE :
-            return AnimationsRaw.Snake.show();
+        case kAnimationIdSnake :
+            return animations_raw_.snake.Show();
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_WIPE == STD_ON)
-        case ANIMATION_ID_WIPE :
-            return AnimationsRaw.Wipe.show();
+        case kAnimationIdWipe :
+            return animations_raw_.wipe.Show();
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_CUBE == STD_ON)
-        case ANIMATION_ID_CUBE :
-            return AnimationsRaw.Cube.show();
+        case kAnimationIdCube :
+            return animations_raw_.cube.Show();
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_FLICKER == STD_ON)
-        case ANIMATION_ID_FLICKER :
-            return AnimationsRaw.Flicker.show();
+        case kAnimationIdFlicker :
+            return animations_raw_.flicker.Show();
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_SQUEEZE == STD_ON)
-        case ANIMATION_ID_SQUEEZE :
-            return AnimationsRaw.Squeeze.show();
+        case kAnimationIdSqueeze :
+            return animations_raw_.squeeze.Show();
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_EXPLODE_PIXELS == STD_ON)
-        case ANIMATION_ID_EXPLODE_PIXELS :
-            return AnimationsRaw.ExplodePixels.show();
+        case kAnimationIdExplodePixels :
+            return animations_raw_.explode_pixels.Show();
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_EXPLODE_WORDS == STD_ON)
-        case ANIMATION_ID_EXPLODE_WORDS :
-            return AnimationsRaw.ExplodeWords.show();
+        case kAnimationIdExplodeWords :
+            return animations_raw_.explode_words.Show();
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_MATRIX == STD_ON)
-        case ANIMATION_ID_MATRIX :
-            return AnimationsRaw.Matrix.show();
+        case kAnimationIdMatrix :
+            return animations_raw_.matrix.Show();
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_ROLL == STD_ON)
-        case ANIMATION_ID_ROLL :
-            return AnimationsRaw.Roll.show();
+        case kAnimationIdRoll :
+            return animations_raw_.roll.Show();
             break;
 # endif
 # if(ANIMATIONS_SUPPORT_COLLAPSE == STD_ON)
-        case ANIMATION_ID_COLLAPSE :
-            return AnimationsRaw.Collapse.show();
+        case kAnimationIdCollapse :
+            return animations_raw_.collapse.Show();
             break;
 # endif
         default :
-            return E_NOT_OK;
+            return kENotOk;
             break;
     }
 } /* showOfCurrentAnimation */
@@ -604,15 +604,15 @@ StdReturnType Animations::showOfCurrentAnimation() const
 /******************************************************************************************************************************************************
   selectAnimationOfMode()
 ******************************************************************************************************************************************************/
-void Animations::selectAnimationOfMode()
+void Animations::SelectAnimationOfMode()
 {
-    switch(Mode)
+    switch(mode_)
     {
-        case MODE_RANDOM :
-            CurrentAnimationId = calcRandomAnimation();
+        case kModeRandom :
+            current_animation_id_ = CalcRandomAnimation();
             break;
-        case MODE_SEQUENCE :
-            CurrentAnimationId = calcNextAnimation();
+        case kModeSequence :
+            current_animation_id_ = CalcNextAnimation();
             break;
         default :
             break;
@@ -620,72 +620,72 @@ void Animations::selectAnimationOfMode()
 
     /* the selected animation shares its memory with the previous one, so it has to be
        initialized before it is used */
-    initCurrentAnimation();
+    InitCurrentAnimation();
 } /* selectAnimationOfMode */
 
 
 /******************************************************************************************************************************************************
   calcRandomAnimation()
 ******************************************************************************************************************************************************/
-Animations::AnimationIdType Animations::calcRandomAnimation()
+Animations::AnimationIdType Animations::CalcRandomAnimation()
 {
     /* Advancing state instead of deriving it from the time: the same animation would
        otherwise always run at the same minute of every day. Both halves of the state
        go into the hash, otherwise the order of animations would repeat every 256
        minutes instead of every 65536. */
-    RandomState++;
+    random_state_++;
 
-    byte hash = static_cast<byte>((RandomState ^ (RandomState >> 8u)) * RandomHashFactor);
+    byte hash = static_cast<byte>((random_state_ ^ (random_state_ >> 8u)) * kRandomHashFactor);
     hash ^= static_cast<byte>(hash >> 4u);
-    hash = static_cast<byte>(hash * RandomHashFactor);
+    hash = static_cast<byte>(hash * kRandomHashFactor);
 
     /* Drawn among the favourites only, so the draw counts them and then walks to the
        one it landed on. Scaled by multiplication instead of a modulo, which would
        favour the first animations because 256 is not a multiple of their number. */
-    byte offset = static_cast<byte>((static_cast<uint16_t>(hash) * numberOfFavourites()) >> 8u);
+    byte offset = static_cast<byte>((static_cast<uint16_t>(hash) * NumberOfFavourites()) >> 8u);
 
-    for(byte animationId = FirstAnimation; animationId < ANIMATION_ID_NUMBER_OF_ANIMATIONS; animationId++) {
-        if(isFavourite(static_cast<AnimationIdType>(animationId))) {
-            if(offset == 0u) { return static_cast<AnimationIdType>(animationId); }
+    for(byte animation_id = kFirstAnimation; animation_id < kAnimationIdNumberOfAnimations; animation_id++) {
+        if(IsFavourite(static_cast<AnimationIdType>(animation_id))) {
+            if(offset == 0u) { return static_cast<AnimationIdType>(animation_id); }
             offset--;
         }
     }
 
     /* unreachable while at least one favourite is set, which setFavourite() enforces */
-    return AnimationId;
+    return animation_id_;
 } /* calcRandomAnimation */
 
 
 /******************************************************************************************************************************************************
   calcNextAnimation()
 ******************************************************************************************************************************************************/
-Animations::AnimationIdType Animations::calcNextAnimation() const
+Animations::AnimationIdType Animations::CalcNextAnimation() const
 {
-    byte next = CurrentAnimationId;
+    byte next = current_animation_id_;
 
     /* Walks on until it finds a favourite. It cannot loop forever, because at least
        one favourite is always set and there are only that many animations to try. */
-    for(byte tries = 0u; tries < NumberOfAnimations; tries++) {
+    for(byte tries = 0u; tries < kNumberOfAnimations; tries++) {
         /* none as the running animation means nothing ran yet, so start at the first */
-        if(next == ANIMATION_ID_NONE || next + 1u >= ANIMATION_ID_NUMBER_OF_ANIMATIONS) { next = FirstAnimation; }
+        if(next == kAnimationIdNone || next + 1u >= kAnimationIdNumberOfAnimations) { next = kFirstAnimation; }
         else { next++; }
 
-        if(isFavourite(static_cast<AnimationIdType>(next))) { return static_cast<AnimationIdType>(next); }
+        if(IsFavourite(static_cast<AnimationIdType>(next))) { return static_cast<AnimationIdType>(next); }
     }
 
-    return AnimationId;
+    return animation_id_;
 } /* calcNextAnimation */
 
 
 /******************************************************************************************************************************************************
   numberOfFavourites()
 ******************************************************************************************************************************************************/
-byte Animations::numberOfFavourites() const
+byte Animations::NumberOfFavourites() const
 {
     byte count{0u};
 
-    for(byte animationId = FirstAnimation; animationId < ANIMATION_ID_NUMBER_OF_ANIMATIONS; animationId++) {
-        if(isFavourite(static_cast<AnimationIdType>(animationId))) { count++; }
+    for(byte animation_id = kFirstAnimation; animation_id < kAnimationIdNumberOfAnimations; animation_id++) {
+        if(IsFavourite(static_cast<AnimationIdType>(animation_id))) { count++; }
     }
 
     return count;

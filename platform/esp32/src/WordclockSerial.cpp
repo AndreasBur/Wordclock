@@ -38,9 +38,9 @@
 /******************************************************************************************************************************************************
   begin()
 ******************************************************************************************************************************************************/
-void WordclockSerial::begin(unsigned long BaudRate)
+void WordclockSerial::begin(unsigned long baud_rate)
 {
-    WordclockPlatform::hardwarePortBegin(BaudRate);
+    wordclock_platform::HardwarePortBegin(baud_rate);
 } /* begin */
 
 
@@ -57,26 +57,26 @@ void WordclockSerial::begin(unsigned long BaudRate)
  *
  *  \return         E_OK if everything was taken
 ******************************************************************************************************************************************************/
-StdReturnType WordclockSerial::inject(const char* Characters, size_t Length)
+StdReturnType WordclockSerial::Inject(const char* characters, size_t length)
 {
-    if((Characters == nullptr) || (Length == 0u)) { return E_NOT_OK; }
+    if((characters == nullptr) || (length == 0u)) { return kENotOk; }
 
-    size_t Head = InjectHead.load(std::memory_order_relaxed);
+    size_t head = inject_head_.load(std::memory_order_relaxed);
 
-    for(size_t Index = 0u; Index < Length; Index++) {
-        const size_t Next = nextIndex(Head);
+    for(size_t index = 0u; index < length; index++) {
+        const size_t next = NextIndex(head);
 
         /* One slot stays empty, which is what tells a full buffer from an empty one. */
-        if(Next == InjectTail.load(std::memory_order_acquire)) { return E_NOT_OK; }
+        if(next == inject_tail_.load(std::memory_order_acquire)) { return kENotOk; }
 
-        InjectBuffer[Head] = Characters[Index];
-        Head = Next;
+        inject_buffer_[head] = characters[index];
+        head = next;
         /* Published after the character, so the reader cannot see the index move ahead of
            the data it points at. */
-        InjectHead.store(Head, std::memory_order_release);
+        inject_head_.store(head, std::memory_order_release);
     }
 
-    return E_OK;
+    return kEOk;
 } /* inject */
 
 
@@ -85,11 +85,11 @@ StdReturnType WordclockSerial::inject(const char* Characters, size_t Length)
 ******************************************************************************************************************************************************/
 int WordclockSerial::available() const
 {
-    const int FromPort = WordclockPlatform::hardwarePort().available();
+    const int from_port = wordclock_platform::HardwarePort().available();
 
-    if(FromPort > 0) { return FromPort; }
+    if(from_port > 0) { return from_port; }
 
-    return isInjectEmpty() ? 0 : 1;
+    return IsInjectEmpty() ? 0 : 1;
 } /* available */
 
 
@@ -105,10 +105,10 @@ int WordclockSerial::available() const
 ******************************************************************************************************************************************************/
 int WordclockSerial::read()
 {
-    Stream& Port = WordclockPlatform::hardwarePort();
+    Stream& port = wordclock_platform::HardwarePort();
 
-    if(Port.available() > 0) { return Port.read(); }
-    if(!isInjectEmpty()) { return static_cast<unsigned char>(readInjected()); }
+    if(port.available() > 0) { return port.read(); }
+    if(!IsInjectEmpty()) { return static_cast<unsigned char>(ReadInjected()); }
 
     return -1;
 } /* read */
@@ -117,35 +117,35 @@ int WordclockSerial::read()
 /******************************************************************************************************************************************************
   print()
 ******************************************************************************************************************************************************/
-void WordclockSerial::print(const char* Text)
+void WordclockSerial::print(const char* text)
 {
-    if(Text == nullptr) { return; }
+    if(text == nullptr) { return; }
 
-    for(const char* Character = Text; *Character != '\0'; Character++) { print(*Character); }
+    for(const char* character = text; *character != '\0'; character++) { print(*character); }
 } /* print */
 
 
 /******************************************************************************************************************************************************
   print()
 ******************************************************************************************************************************************************/
-void WordclockSerial::print(const __FlashStringHelper* Text)
+void WordclockSerial::print(const __FlashStringHelper* text)
 {
     /* On this target flash is read through the same address space, so what F() wrapped can
        be read as an ordinary string. */
-    print(reinterpret_cast<const char*>(Text));
+    print(reinterpret_cast<const char*>(text));
 } /* print */
 
 
 /******************************************************************************************************************************************************
   print()
 ******************************************************************************************************************************************************/
-void WordclockSerial::print(int Number)
+void WordclockSerial::print(int number)
 {
-    char Digits[12]{};
+    char digits[12]{};
 
     /* Ten digits and a sign are the most an int can print to; nothing to truncate. */
-    (void)snprintf(Digits, sizeof(Digits), "%d", Number);
-    print(Digits);
+    (void)snprintf(digits, sizeof(digits), "%d", number);
+    print(digits);
 } /* print */
 
 
@@ -158,12 +158,12 @@ void WordclockSerial::print(int Number)
  *                  its output with print('\n') instead of println(), and a line sink that
  *                  did not notice would run two answers together.
 ******************************************************************************************************************************************************/
-void WordclockSerial::print(char Character)
+void WordclockSerial::print(char character)
 {
-    if(Character == '\n') { println(); return; }
+    if(character == '\n') { println(); return; }
 
-    WordclockPlatform::hardwarePort().write(static_cast<uint8_t>(Character));
-    appendToLine(Character);
+    wordclock_platform::HardwarePort().write(static_cast<uint8_t>(character));
+    AppendToLine(character);
 } /* print */
 
 
@@ -172,19 +172,19 @@ void WordclockSerial::print(char Character)
 ******************************************************************************************************************************************************/
 void WordclockSerial::println()
 {
-    WordclockPlatform::hardwarePort().write(static_cast<uint8_t>('\r'));
-    WordclockPlatform::hardwarePort().write(static_cast<uint8_t>('\n'));
+    wordclock_platform::HardwarePort().write(static_cast<uint8_t>('\r'));
+    wordclock_platform::HardwarePort().write(static_cast<uint8_t>('\n'));
 
-    flushLine();
+    FlushLine();
 } /* println */
 
 
 /******************************************************************************************************************************************************
   println()
 ******************************************************************************************************************************************************/
-void WordclockSerial::println(const char* Text)
+void WordclockSerial::println(const char* text)
 {
-    print(Text);
+    print(text);
     println();
 } /* println */
 
@@ -192,9 +192,9 @@ void WordclockSerial::println(const char* Text)
 /******************************************************************************************************************************************************
   println()
 ******************************************************************************************************************************************************/
-void WordclockSerial::println(int Number)
+void WordclockSerial::println(int number)
 {
-    print(Number);
+    print(number);
     println();
 } /* println */
 
@@ -202,9 +202,9 @@ void WordclockSerial::println(int Number)
 /******************************************************************************************************************************************************
   println()
 ******************************************************************************************************************************************************/
-void WordclockSerial::println(const __FlashStringHelper* Text)
+void WordclockSerial::println(const __FlashStringHelper* text)
 {
-    print(Text);
+    print(text);
     println();
 } /* println */
 
@@ -216,7 +216,7 @@ void WordclockSerial::println(const __FlashStringHelper* Text)
 ******************************************************************************************************************************************************/
 void WordclockSerial::flush()
 {
-    WordclockPlatform::hardwarePort().flush();
+    wordclock_platform::HardwarePort().flush();
 } /* flush */
 // NOLINTEND(readability-convert-member-functions-to-static)
 
@@ -228,16 +228,16 @@ void WordclockSerial::flush()
 /******************************************************************************************************************************************************
   readInjected()
 ******************************************************************************************************************************************************/
-char WordclockSerial::readInjected()
+char WordclockSerial::ReadInjected()
 {
-    const size_t Tail = InjectTail.load(std::memory_order_relaxed);
-    const char Character = InjectBuffer[Tail];
+    const size_t tail = inject_tail_.load(std::memory_order_relaxed);
+    const char character = inject_buffer_[tail];
 
     /* Published after the character was taken, so the producer cannot refill the slot
        while it is still being read. */
-    InjectTail.store(nextIndex(Tail), std::memory_order_release);
+    inject_tail_.store(NextIndex(tail), std::memory_order_release);
 
-    return Character;
+    return character;
 } /* readInjected */
 
 
@@ -249,11 +249,11 @@ char WordclockSerial::readInjected()
  *                  client then sees the answer split over two frames, which is readable,
  *                  where a truncated line would silently lose its end.
 ******************************************************************************************************************************************************/
-void WordclockSerial::appendToLine(char Character)
+void WordclockSerial::AppendToLine(char character)
 {
-    if(LineUsed >= (LineLength - 1u)) { flushLine(); }
+    if(line_used_ >= (kLineLength - 1u)) { FlushLine(); }
 
-    LineBuffer[LineUsed++] = Character;
+    line_buffer_[line_used_++] = character;
 } /* appendToLine */
 
 
@@ -265,14 +265,14 @@ void WordclockSerial::appendToLine(char Character)
  *                  output that print() already ended with a newline - passing that on
  *                  would send a blank frame after every answer.
 ******************************************************************************************************************************************************/
-void WordclockSerial::flushLine()
+void WordclockSerial::FlushLine()
 {
-    if(LineUsed == 0u) { return; }
+    if(line_used_ == 0u) { return; }
 
-    LineBuffer[LineUsed] = '\0';
-    LineUsed = 0u;
+    line_buffer_[line_used_] = '\0';
+    line_used_ = 0u;
 
-    if(LineSink != nullptr) { LineSink(LineBuffer); }
+    if(line_sink_ != nullptr) { line_sink_(line_buffer_); }
 } /* flushLine */
 
 /******************************************************************************************************************************************************

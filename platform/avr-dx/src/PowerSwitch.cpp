@@ -46,12 +46,12 @@
  *                  whatever else the board put there, and driving it would be the one way this
  *                  can do damage rather than nothing.
 ******************************************************************************************************************************************************/
-void PowerSwitch::init()
+void PowerSwitch::Init()
 {
-    if(!isFitted()) { return; }
+    if(!IsFitted()) { return; }
 
     POWER_SWITCH_PORT.DIRSET = POWER_SWITCH_PIN_MASK;
-    switchSupplyOn();
+    SwitchSupplyOn();
 } /* init */
 
 
@@ -68,11 +68,11 @@ void PowerSwitch::init()
  *                  business, and the pair does it in one instruction each without a window in
  *                  which an interrupt could write the register in between.
 ******************************************************************************************************************************************************/
-void PowerSwitch::driveSupply(bool On)
+void PowerSwitch::DriveSupply(bool on)
 {
-    if(!isFitted()) { return; }
+    if(!IsFitted()) { return; }
 
-    if(On) { POWER_SWITCH_PORT.OUTSET = POWER_SWITCH_PIN_MASK; }
+    if(on) { POWER_SWITCH_PORT.OUTSET = POWER_SWITCH_PIN_MASK; }
     else   { POWER_SWITCH_PORT.OUTCLR = POWER_SWITCH_PIN_MASK; }
 } /* driveSupply */
 

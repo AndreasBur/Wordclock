@@ -18,52 +18,52 @@
 #include "Pixels.h"
 #include "RealTimeClock.h"
 
-inline int Failures{0};
+inline int failures{0};
 
-inline void expect(bool Condition, const char* Description)
+inline void Expect(bool condition, const char* description)
 {
-    if(Condition) { return; }
+    if(condition) { return; }
 
-    std::cerr << "FAILED: " << Description << '\n';
-    Failures++;
+    std::cerr << "FAILED: " << description << '\n';
+    failures++;
 }
 
-inline ClockWords wordsAt(byte Hour, byte Minute)
+inline ClockWords WordsAt(byte hour, byte minute)
 {
     ClockWords words;
-    expect(Clock::getInstance().getClockWords(Hour, Minute, words) == E_OK,
+    Expect(Clock::GetInstance().GetClockWords(hour, minute, words) == kEOk,
            "valid time must produce clock words");
     return words;
 }
 
 using PixelBufferType = std::array<Pixels::PixelType, PIXELS_NUMBER_OF_PIXELS>;
 
-inline PixelBufferType readPixels()
+inline PixelBufferType ReadPixels()
 {
     PixelBufferType pixels;
 
     for(byte index = 0u; index < PIXELS_NUMBER_OF_PIXELS; index++) {
-        pixels[index] = Pixels::getInstance().getPixel(index);
+        pixels[index] = Pixels::GetInstance().GetPixel(index);
     }
     return pixels;
 }
 
 /* Pixel has no operator==, and comparing the three channels is all this needs. */
-inline bool arePixelsEqual(const PixelBufferType& Left, const PixelBufferType& Right)
+inline bool ArePixelsEqual(const PixelBufferType& left, const PixelBufferType& right)
 {
     for(byte index = 0u; index < PIXELS_NUMBER_OF_PIXELS; index++) {
-        if(Left[index].getRed()   != Right[index].getRed()   ||
-           Left[index].getGreen() != Right[index].getGreen() ||
-           Left[index].getBlue()  != Right[index].getBlue()) { return false; }
+        if(left[index].GetRed()   != right[index].GetRed()   ||
+           left[index].GetGreen() != right[index].GetGreen() ||
+           left[index].GetBlue()  != right[index].GetBlue()) { return false; }
     }
     return true;
 }
 
-inline bool isAnyPixelLit(const PixelBufferType& Pixels)
+inline bool IsAnyPixelLit(const PixelBufferType& pixels)
 {
     for(byte index = 0u; index < PIXELS_NUMBER_OF_PIXELS; index++) {
-        if(Pixels[index].getRed() != 0u || Pixels[index].getGreen() != 0u ||
-           Pixels[index].getBlue() != 0u) { return true; }
+        if(pixels[index].GetRed() != 0u || pixels[index].GetGreen() != 0u ||
+           pixels[index].GetBlue() != 0u) { return true; }
     }
     return false;
 }
@@ -71,33 +71,33 @@ inline bool isAnyPixelLit(const PixelBufferType& Pixels)
 /* What would reach the LEDs, which is not what readPixels() shows: that reads the buffer,
    and the brightness is folded in on the way out. The difference is the whole of what
    switching the display off does, so a test that asked the buffer would see nothing. */
-inline bool isAnyOutputPixelLit()
+inline bool IsAnyOutputPixelLit()
 {
     for(byte index = 0u; index < PIXELS_NUMBER_OF_PIXELS; index++) {
-        const Pixels::PixelType Pixel = Pixels::getInstance().getOutputPixel(index);
+        const Pixels::PixelType pixel = Pixels::GetInstance().GetOutputPixel(index);
 
-        if(Pixel.getRed() != 0u || Pixel.getGreen() != 0u || Pixel.getBlue() != 0u) { return true; }
+        if(pixel.GetRed() != 0u || pixel.GetGreen() != 0u || pixel.GetBlue() != 0u) { return true; }
     }
     return false;
 }
 
-inline void setTime(byte Hour, byte Minute, byte Second)
+inline void SetTime(byte hour, byte minute, byte second)
 {
-    RealTimeClock::getInstance().setTime(ClockTime(Hour, Minute, Second));
+    RealTimeClock::GetInstance().SetTime(ClockTime(hour, minute, second));
 }
 
 /* More than one case needs a clock face on the display before it can say what changed
    about it, so it lives here rather than in whichever file got it first. */
 /* Draws a time the way the clock does when no animation is selected: the reference every
    animation has to arrive at. */
-inline PixelBufferType drawClockFace(byte Hour, byte Minute)
+inline PixelBufferType DrawClockFace(byte hour, byte minute)
 {
-    Display& display = Display::getInstance();
+    Display& display = Display::GetInstance();
 
-    display.clear();
-    expect(Clock::getInstance().setTime(Hour, Minute) == E_OK, "clock face time must be accepted");
-    display.show();
-    return readPixels();
+    display.Clear();
+    Expect(Clock::GetInstance().SetTime(hour, minute) == kEOk, "clock face time must be accepted");
+    display.Show();
+    return ReadPixels();
 }
 
 #endif // _CHECK_H_

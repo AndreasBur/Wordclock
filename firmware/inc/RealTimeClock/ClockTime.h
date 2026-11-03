@@ -56,16 +56,16 @@ class ClockTime
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    HourType Hour{0u};
-    MinuteType Minute{0u};
-    SecondType Second{0u};
+    HourType hour_{0u};
+    MinuteType minute_{0u};
+    SecondType second_{0u};
 
-    static constexpr HourType HourMinValue{0u};
-    static constexpr HourType HourMaxValue{23u};
-    static constexpr MinuteType MinuteMinValue{0u};
-    static constexpr MinuteType MinuteMaxValue{59u};
-    static constexpr SecondType SecondMinValue{0u};
-    static constexpr SecondType SecondMaxValue{59u};
+    static constexpr HourType kHourMinValue{0u};
+    static constexpr HourType kHourMaxValue{23u};
+    static constexpr MinuteType kMinuteMinValue{0u};
+    static constexpr MinuteType kMinuteMaxValue{59u};
+    static constexpr SecondType kSecondMinValue{0u};
+    static constexpr SecondType kSecondMaxValue{59u};
 
     // functions
 
@@ -74,51 +74,51 @@ class ClockTime
 ******************************************************************************************************************************************************/
   public:
     constexpr ClockTime() { }
-    constexpr ClockTime(HourType sHour, MinuteType sMinute, SecondType sSecond)
+    constexpr ClockTime(HourType hour, MinuteType minute, SecondType second)
     {
-        setHour(sHour);
-        setMinute(sMinute);
-        setSecond(sSecond);
+        SetHour(hour);
+        SetMinute(minute);
+        SetSecond(second);
     }
     ~ClockTime() {}
 
 	// get methods
-    HourType getHour() const { return Hour; }
-    MinuteType getMinute() const { return Minute; }
-    SecondType getSecond() const { return Second; }
+    HourType GetHour() const { return hour_; }
+    MinuteType GetMinute() const { return minute_; }
+    SecondType GetSecond() const { return second_; }
 
 	// set methods
-    constexpr StdReturnType setHour(HourType sHour)
+    constexpr StdReturnType SetHour(HourType hour)
     {
-        if(isHourValid(sHour)) {
-            Hour = sHour;
-            return E_OK;
+        if(IsHourValid(hour)) {
+            hour_ = hour;
+            return kEOk;
         } else {
-            return E_NOT_OK;
+            return kENotOk;
         }
     }
-    constexpr StdReturnType setMinute(MinuteType sMinute)
+    constexpr StdReturnType SetMinute(MinuteType minute)
     {
-        if(isMinuteValid(sMinute)) {
-            Minute = sMinute;
-            return E_OK;
+        if(IsMinuteValid(minute)) {
+            minute_ = minute;
+            return kEOk;
         } else {
-            return E_NOT_OK; }
+            return kENotOk; }
     }
-    constexpr StdReturnType setSecond(SecondType sSecond)
+    constexpr StdReturnType SetSecond(SecondType second)
     {
-        if(isSecondValid(sSecond)) {
-            Second = sSecond;
-            return E_OK;
+        if(IsSecondValid(second)) {
+            second_ = second;
+            return kEOk;
         } else {
-            return E_NOT_OK;
+            return kENotOk;
         }
     }
 
 	// methods
-    static constexpr bool isHourValid(HourType Hour) { return (Hour >= HourMinValue) && (Hour <= HourMaxValue); }
-    static constexpr bool isMinuteValid(MinuteType Minute) { return (Minute >= MinuteMinValue) && (Minute <= MinuteMaxValue); }
-    static constexpr bool isSecondValid(SecondType Second) { return (Second >= SecondMinValue) && (Second <= SecondMaxValue);  }
+    static constexpr bool IsHourValid(HourType hour) { return (hour >= kHourMinValue) && (hour <= kHourMaxValue); }
+    static constexpr bool IsMinuteValid(MinuteType minute) { return (minute >= kMinuteMinValue) && (minute <= kMinuteMaxValue); }
+    static constexpr bool IsSecondValid(SecondType second) { return (second >= kSecondMinValue) && (second <= kSecondMaxValue);  }
 };
 
 #endif

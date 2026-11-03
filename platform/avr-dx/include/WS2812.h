@@ -86,30 +86,30 @@ class WS2812
     WS2812() { }
     ~WS2812() { }
 
-    static void initUsart();
-    static void initEventSystem();
-    static void initOneShotTimers();
-    static void initLookUpTable();
+    static void InitUsart();
+    static void InitEventSystem();
+    static void InitOneShotTimers();
+    static void InitLookUpTable();
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    static WS2812& getInstance() {
-        static WS2812 SingletonInstance;
-        return SingletonInstance;
+    static WS2812& GetInstance() {
+        static WS2812 singleton_instance;
+        return singleton_instance;
     }
 
-    void init();
+    void Init();
 
     /* Whether the previous frame is still on the wire. A frame started while one is running
        would interleave two of them, so the caller has to ask first. */
-    bool isBusy() const;
+    bool IsBusy() const;
 
     /* Hands one frame over and returns; the interrupt does the rest. The buffer has to
        outlive the transmission, which is why the caller keeps it rather than passing a
        temporary. */
-    StdReturnType send(const byte* Frame, uint16_t Length);
+    StdReturnType Send(const byte* frame, uint16_t length);
 };
 
 #endif // _WS2812_H_

@@ -37,7 +37,7 @@
 ******************************************************************************************************************************************************/
 namespace {
 
-WordclockMain Wordclock;
+WordclockMain wordclock;
 
 } // namespace
 
@@ -55,31 +55,31 @@ WordclockMain Wordclock;
 ******************************************************************************************************************************************************/
 int main()
 {
-    initRuntime();
+    InitRuntime();
 
     Serial.begin(WORDCLOCK_SERIAL_BAUDRATE);
     Serial.println(F("Wordclock"));
 
-    Wordclock.init();
+    wordclock.Init();
 
-    uint32_t NextTick = millis();
+    uint32_t next_tick = millis();
 
     for(;;) {
         /* Subtraction rather than a comparison of the two, so that the wrap of the
            millisecond counter passes without a tick that never comes due. */
-        if(static_cast<int32_t>(millis() - NextTick) < 0) { continue; }
+        if(static_cast<int32_t>(millis() - next_tick) < 0) { continue; }
 
-        NextTick += Scheduler::getTaskIntervalMs();
+        next_tick += Scheduler::GetTaskIntervalMs();
 
-        Wordclock.task();
+        wordclock.Task();
 
         /* After the firmware, not from inside its pixel writes: the strip gets whatever the
            buffer holds once the whole pass over the tasks is done. */
-        Pixels::getInstance().render();
+        Pixels::GetInstance().Render();
 
         /* Last, so a restart asked for by a command takes place once that command's answer
            has reached the wire. */
-        System::getInstance().performPendingRestart();
+        System::GetInstance().PerformPendingRestart();
     }
 } /* main */
 

@@ -11,7 +11,7 @@
 /* -------------------------------------------------------------------------- */
 #define PROGMEM
 #define F(x)                    x
-#define pgm_read_byte(x)        (*(x))
-#define memcpy_P(x, y, z)       memcpy((x), (y), (z))
+#define pgm_read_byte(x)        (*(x)) // NOLINT(readability-identifier-naming)
+#define memcpy_P(x, y, z)       memcpy((x), (y), (z)) // NOLINT(readability-identifier-naming)
 
 #endif // _ARDUINO_PROGMEM_H_

@@ -31,7 +31,7 @@
 namespace {
 
 /* Wire reports zero from endTransmission() when the slave acknowledged. */
-constexpr uint8_t WireTransmissionSuccess{0u};
+constexpr uint8_t kWireTransmissionSuccess{0u};
 
 } // namespace
 
@@ -46,16 +46,16 @@ constexpr uint8_t WireTransmissionSuccess{0u};
  *
  *  \return         E_OK if the sensor acknowledged both commands
 ******************************************************************************************************************************************************/
-StdReturnType BH1750::init(ModeType sMode)
+StdReturnType BH1750::Init(ModeType mode)
 {
-    if(startBus() == E_NOT_OK) { return E_NOT_OK; }
+    if(StartBus() == kENotOk) { return kENotOk; }
 
     /* Sent explicitly, unlike in the xmega driver: a sensor that is still in power-down -
        which is where it sits after reset, and where a one-time measurement leaves it -
        ignores a mode command. */
-    if(sendCommand(BH1750_CMD_POWER_ON) == E_NOT_OK) { return E_NOT_OK; }
+    if(SendCommand(BH1750_CMD_POWER_ON) == kENotOk) { return kENotOk; }
 
-    return setMode(sMode);
+    return SetMode(mode);
 } /* init */
 
 
@@ -72,14 +72,14 @@ StdReturnType BH1750::init(ModeType sMode)
  *
  *  \return         E_OK if the sensor acknowledged the mode
 ******************************************************************************************************************************************************/
-StdReturnType BH1750::setMode(ModeType sMode)
+StdReturnType BH1750::SetMode(ModeType mode)
 {
-    if(sMode == MODE_NONE) { return E_NOT_OK; }
+    if(mode == kModeNone) { return kENotOk; }
 
-    if(sendCommand(sMode) == E_NOT_OK) { return E_NOT_OK; }
+    if(SendCommand(mode) == kENotOk) { return kENotOk; }
 
-    Mode = sMode;
-    return E_OK;
+    mode_ = mode;
+    return kEOk;
 } /* setMode */
 
 
@@ -93,23 +93,23 @@ StdReturnType BH1750::setMode(ModeType sMode)
  *
  *  \return         E_OK if the value was in range and the sensor took all three commands
 ******************************************************************************************************************************************************/
-StdReturnType BH1750::changeMeasurementTime(byte MTRegValue)
+StdReturnType BH1750::ChangeMeasurementTime(byte mt_reg_value)
 {
-    if(!isMTRegValueInRange(MTRegValue)) { return E_NOT_OK; }
+    if(!IsMtRegValueInRange(mt_reg_value)) { return kENotOk; }
 
-    const byte HighBits = READ_BIT_GROUP(MTRegValue, BH1750_MT_REG_VALUE_HIGH_BITS_GM, BH1750_MT_REG_VALUE_HIGH_BITS_GP);
-    const byte LowBits = READ_BIT_GROUP(MTRegValue, BH1750_MT_REG_VALUE_LOW_BITS_GM, BH1750_MT_REG_VALUE_LOW_BITS_GP);
+    const byte high_bits = READ_BIT_GROUP(mt_reg_value, BH1750_MT_REG_VALUE_HIGH_BITS_GM, BH1750_MT_REG_VALUE_HIGH_BITS_GP);
+    const byte low_bits = READ_BIT_GROUP(mt_reg_value, BH1750_MT_REG_VALUE_LOW_BITS_GM, BH1750_MT_REG_VALUE_LOW_BITS_GP);
 
-    if(sendCommand(BH1750_CMD_CHANGE_MEASUREMENT_TIME_HIGH_BITS | HighBits) == E_NOT_OK) { return E_NOT_OK; }
-    if(sendCommand(BH1750_CMD_CHANGE_MEASUREMENT_TIME_LOW_BITS | LowBits) == E_NOT_OK) { return E_NOT_OK; }
+    if(SendCommand(BH1750_CMD_CHANGE_MEASUREMENT_TIME_HIGH_BITS | high_bits) == kENotOk) { return kENotOk; }
+    if(SendCommand(BH1750_CMD_CHANGE_MEASUREMENT_TIME_LOW_BITS | low_bits) == kENotOk) { return kENotOk; }
     /* The measurement time only takes effect with the next mode command. */
-    if(sendMode() == E_NOT_OK) { return E_NOT_OK; }
+    if(SendMode() == kENotOk) { return kENotOk; }
 
     /* Kept last, and only once all three went through, because this is what
        convertRawToLux() divides by: a value stored after a failed transfer would scale
        every later reading by a measurement time the sensor is not using. */
-    MeasurementTime = MTRegValue;
-    return E_OK;
+    measurement_time_ = mt_reg_value;
+    return kEOk;
 } /* changeMeasurementTime */
 
 
@@ -126,7 +126,7 @@ StdReturnType BH1750::changeMeasurementTime(byte MTRegValue)
  *                  xmega driver - the sensor keeps converting on its own, and resending
  *                  restarts the integration for no gain.
 ******************************************************************************************************************************************************/
-void BH1750::task()
+void BH1750::Task()
 {
     /* Set up from here rather than from an init() call, and retried until it works: see
        the file's header for why there is no place in the core to call init() from.
@@ -134,18 +134,18 @@ void BH1750::task()
        120 ms and the data register reads zero until it is over, so reading on would hand
        the brightness automatic a darkness that was never measured. The next run is a
        second away, which is well past that. */
-    if(!isReady()) {
-        init(BH1750_DEFAULT_MODE);
+    if(!IsReady()) {
+        Init(BH1750_DEFAULT_MODE);
         return;
     }
 
-    if(readIlluminance() == E_NOT_OK) {
-        countReadFailure();
+    if(ReadIlluminance() == kENotOk) {
+        CountReadFailure();
         return;
     }
 
-    ReadFailures = 0u;
-    sendModeForOneTimeMode();
+    read_failures_ = 0u;
+    SendModeForOneTimeMode();
 } /* task */
 
 
@@ -160,14 +160,14 @@ void BH1750::task()
  *
  *  \return         E_OK if the bus is available
 ******************************************************************************************************************************************************/
-StdReturnType BH1750::startBus()
+StdReturnType BH1750::StartBus()
 {
-    if(BusStarted) { return E_OK; }
+    if(bus_started_) { return kEOk; }
 
-    if(!Wire.begin(BH1750_I2C_PIN_SDA, BH1750_I2C_PIN_SCL, BH1750_I2C_FREQUENCY_HZ)) { return E_NOT_OK; }
+    if(!Wire.begin(BH1750_I2C_PIN_SDA, BH1750_I2C_PIN_SCL, BH1750_I2C_FREQUENCY_HZ)) { return kENotOk; }
 
-    BusStarted = true;
-    return E_OK;
+    bus_started_ = true;
+    return kEOk;
 } /* startBus */
 
 
@@ -182,18 +182,18 @@ StdReturnType BH1750::startBus()
  *
  *  \return         E_OK if both bytes arrived
 ******************************************************************************************************************************************************/
-StdReturnType BH1750::readIlluminance()
+StdReturnType BH1750::ReadIlluminance()
 {
     if(Wire.requestFrom(static_cast<uint8_t>(BH1750_I2C_ADDR),
                         static_cast<size_t>(BH1750_ILLUMINANCE_RAW_VALUE_NUMBER_OF_BYTES)) != BH1750_ILLUMINANCE_RAW_VALUE_NUMBER_OF_BYTES) {
-        return E_NOT_OK;
+        return kENotOk;
     }
 
-    const byte HighByte = static_cast<byte>(Wire.read());
-    const byte LowByte = static_cast<byte>(Wire.read());
+    const byte high_byte = static_cast<byte>(Wire.read());
+    const byte low_byte = static_cast<byte>(Wire.read());
 
-    Illuminance = convertRawToLux(combineRawValueParts(HighByte, LowByte));
-    return E_OK;
+    illuminance_ = ConvertRawToLux(CombineRawValueParts(high_byte, low_byte));
+    return kEOk;
 } /* readIlluminance */
 
 
@@ -204,12 +204,12 @@ StdReturnType BH1750::readIlluminance()
  *  \details        A one-time measurement leaves the sensor powered down, so it takes the
  *                  power-on command again before it listens to the mode.
 ******************************************************************************************************************************************************/
-void BH1750::sendModeForOneTimeMode()
+void BH1750::SendModeForOneTimeMode()
 {
-    if(!isOneTimeMode()) { return; }
+    if(!IsOneTimeMode()) { return; }
 
-    sendCommand(BH1750_CMD_POWER_ON);
-    sendMode();
+    SendCommand(BH1750_CMD_POWER_ON);
+    SendMode();
 } /* sendModeForOneTimeMode */
 
 
@@ -220,14 +220,14 @@ void BH1750::sendModeForOneTimeMode()
  *
  *  \return         E_OK if the sensor acknowledged
 ******************************************************************************************************************************************************/
-StdReturnType BH1750::sendCommand(byte Command)
+StdReturnType BH1750::SendCommand(byte command)
 {
     Wire.beginTransmission(static_cast<uint8_t>(BH1750_I2C_ADDR));
-    Wire.write(Command);
+    Wire.write(command);
 
-    if(Wire.endTransmission() != WireTransmissionSuccess) { return E_NOT_OK; }
+    if(Wire.endTransmission() != kWireTransmissionSuccess) { return kENotOk; }
 
-    return E_OK;
+    return kEOk;
 } /* sendCommand */
 
 /******************************************************************************************************************************************************

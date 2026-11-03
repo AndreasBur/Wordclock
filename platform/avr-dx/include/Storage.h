@@ -52,7 +52,7 @@ class Storage
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-    static constexpr size_t Capacity{STORAGE_CAPACITY};
+    static constexpr size_t kCapacity{STORAGE_CAPACITY};
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
@@ -60,7 +60,7 @@ class Storage
   private:
     /* A length no blob can have, so an EEPROM that was never written - which reads 0xFF
        throughout on a fresh part - says so by itself and needs no separate magic. */
-    static constexpr byte LengthEmpty{0xFFu};
+    static constexpr byte kLengthEmpty{0xFFu};
 
     Storage() { }
     ~Storage() { }
@@ -69,15 +69,15 @@ class Storage
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    static Storage& getInstance() {
-        static Storage SingletonInstance;
-        return SingletonInstance;
+    static Storage& GetInstance() {
+        static Storage singleton_instance;
+        return singleton_instance;
     }
 
     // methods
-    StdReturnType read(byte*, size_t) const;
-    StdReturnType write(const byte*, size_t);
-    StdReturnType clear();
+    StdReturnType Read(byte*, size_t) const;
+    StdReturnType Write(const byte*, size_t);
+    StdReturnType Clear();
 };
 
 #endif // _STORAGE_H_

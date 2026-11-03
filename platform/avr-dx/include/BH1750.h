@@ -42,7 +42,7 @@
    120 ms a high-resolution conversion takes, or task() reads a measurement that is not
    finished yet. */
 #define BH1750_TASK_CYCLE                               100u
-#define BH1750_DEFAULT_MODE                             MODE_CONTINUOUS_HIGH_RES_MODE
+#define BH1750_DEFAULT_MODE                             kModeContinuousHighResMode
 
 /* BH1750 parameter */
 /* The sensor's own range, which is what a reading is clamped to - not what the brightness
@@ -97,83 +97,83 @@ class BH1750
     using IlluminanceType = uint16_t;
 
     enum ModeType {
-        MODE_NONE,
-        MODE_CONTINUOUS_LOW_RES_MODE = BH1750_CMD_CONTINUOUS_LOW_RES_MODE,
-        MODE_CONTINUOUS_HIGH_RES_MODE = BH1750_CMD_CONTINUOUS_HIGH_RES_MODE,
-        MODE_CONTINUOUS_HIGH_RES_MODE_2 = BH1750_CMD_CONTINUOUS_HIGH_RES_MODE_2,
-        MODE_ONE_TIME_LOW_RES_MODE = BH1750_CMD_ONE_TIME_LOW_RES_MODE,
-        MODE_ONE_TIME_HIGH_RES_MODE = BH1750_CMD_ONE_TIME_HIGH_RES_MODE,
-        MODE_ONE_TIME_HIGH_RES_MODE_2 = BH1750_CMD_ONE_TIME_HIGH_RES_MODE_2
+        kModeNone,
+        kModeContinuousLowResMode = BH1750_CMD_CONTINUOUS_LOW_RES_MODE,
+        kModeContinuousHighResMode = BH1750_CMD_CONTINUOUS_HIGH_RES_MODE,
+        kModeContinuousHighResMode2 = BH1750_CMD_CONTINUOUS_HIGH_RES_MODE_2,
+        kModeOneTimeLowResMode = BH1750_CMD_ONE_TIME_LOW_RES_MODE,
+        kModeOneTimeHighResMode = BH1750_CMD_ONE_TIME_HIGH_RES_MODE,
+        kModeOneTimeHighResMode2 = BH1750_CMD_ONE_TIME_HIGH_RES_MODE_2
     };
 
     struct CalibrationValuesType {
-        IlluminanceType MaxValue;
-        IlluminanceType MinValue;
+        IlluminanceType max_value;
+        IlluminanceType min_value;
     };
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    static constexpr byte TaskCycle{BH1750_TASK_CYCLE};
+    static constexpr byte kTaskCycle{BH1750_TASK_CYCLE};
     /* Readings in a row that may fail before the driver sets the sensor up again, so five
        seconds at TaskCycle. Long enough that one disturbed transfer keeps the last value,
        which is what readIlluminance() is written for, and short enough that a sensor which
        came back is picked up while the room still looks the same. */
-    static constexpr byte ReadFailuresBeforeReinit{5u};
+    static constexpr byte kReadFailuresBeforeReinit{5u};
     /* The count means half a lux in the two mode 2 variants rather than a whole one, so a
        reading in them has to be divided by twice as much. */
-    static constexpr float HighResMode2Divider{2.0f};
+    static constexpr float kHighResMode2Divider{2.0f};
 
-    ModeType Mode{MODE_NONE};
-    IlluminanceType Illuminance{BH1750_ILLUMINANCE_MIN_LX_VALUE};
-    CalibrationValuesType CalibrationValues{BH1750_CALIBRATION_MAX_DEFAULT_LX_VALUE, BH1750_CALIBRATION_MIN_DEFAULT_LX_VALUE};
-    byte MeasurementTime{BH1750_REG_MT_DEFAULT_VALUE};
-    byte ReadFailures{0u};
-    bool BusStarted{false};
+    ModeType mode_{kModeNone};
+    IlluminanceType illuminance_{BH1750_ILLUMINANCE_MIN_LX_VALUE};
+    CalibrationValuesType calibration_values_{BH1750_CALIBRATION_MAX_DEFAULT_LX_VALUE, BH1750_CALIBRATION_MIN_DEFAULT_LX_VALUE};
+    byte measurement_time_{BH1750_REG_MT_DEFAULT_VALUE};
+    byte read_failures_{0u};
+    bool bus_started_{false};
 
     // functions
-    StdReturnType startBus();
-    StdReturnType readIlluminance();
-    void sendModeForOneTimeMode();
-    static StdReturnType sendCommand(byte);
-    StdReturnType sendMode() { return sendCommand(Mode); }
+    StdReturnType StartBus();
+    StdReturnType ReadIlluminance();
+    void SendModeForOneTimeMode();
+    static StdReturnType SendCommand(byte);
+    StdReturnType SendMode() { return SendCommand(mode_); }
     /* Both halves of what task() checks before it reads: a bus that was opened, and a mode
        the sensor acknowledged. Clearing either one puts the set-up back on the next run. */
-    bool isReady() const { return BusStarted && (Mode != MODE_NONE); }
+    bool IsReady() const { return bus_started_ && (mode_ != kModeNone); }
 
     /* The datasheet's conversion, which is not the constant it looks like: the divider
        moves with the mode and with the measurement time. A fixed 1.2 is right only at the
        default of both - which is what the sensor starts in, and why this went unnoticed. */
-    float toLuxDivider() const { return BH1750_ILLUMINANCE_RAW_VALUE_DIVIDER * toModeDivider() * toMeasurementTimeFactor(); }
-    float toModeDivider() const { return isHighResMode2() ? HighResMode2Divider : 1.0f; }
+    float ToLuxDivider() const { return BH1750_ILLUMINANCE_RAW_VALUE_DIVIDER * ToModeDivider() * ToMeasurementTimeFactor(); }
+    float ToModeDivider() const { return IsHighResMode2() ? kHighResMode2Divider : 1.0f; }
     /* A longer integration counts more for the same light, so the register's distance from
        its reset value scales the reading back out again. */
-    float toMeasurementTimeFactor() const { return static_cast<float>(MeasurementTime) / BH1750_REG_MT_DEFAULT_VALUE; }
-    bool isHighResMode2() const { return (Mode == MODE_CONTINUOUS_HIGH_RES_MODE_2) || (Mode == MODE_ONE_TIME_HIGH_RES_MODE_2); }
+    float ToMeasurementTimeFactor() const { return static_cast<float>(measurement_time_) / BH1750_REG_MT_DEFAULT_VALUE; }
+    bool IsHighResMode2() const { return (mode_ == kModeContinuousHighResMode2) || (mode_ == kModeOneTimeHighResMode2); }
 
     /* Clamped rather than cast straight: the shortest measurement time divides by about
        0.54, which takes a full-scale count past what IlluminanceType holds - and a float
        that does not fit the integer it is cast to is undefined behaviour, not a wrap. */
-    IlluminanceType convertRawToLux(IlluminanceType IlluminanceRaw) const {
-        const float Lux = static_cast<float>(IlluminanceRaw) / toLuxDivider();
-        if(Lux >= static_cast<float>(BH1750_ILLUMINANCE_MAX_LX_VALUE)) { return BH1750_ILLUMINANCE_MAX_LX_VALUE; }
-        return static_cast<IlluminanceType>(Lux);
+    IlluminanceType ConvertRawToLux(IlluminanceType illuminance_raw) const {
+        const float lux = static_cast<float>(illuminance_raw) / ToLuxDivider();
+        if(lux >= static_cast<float>(BH1750_ILLUMINANCE_MAX_LX_VALUE)) { return BH1750_ILLUMINANCE_MAX_LX_VALUE; }
+        return static_cast<IlluminanceType>(lux);
     }
-    static constexpr IlluminanceType combineRawValueParts(byte HighByte, byte LowByte) { return static_cast<uint16_t>(HighByte) << 8u | LowByte; }
-    static constexpr bool isMTRegValueInRange(byte MTRegValue) { return ((MTRegValue <= BH1750_REG_MT_MAX_VALUE) && (MTRegValue >= BH1750_REG_MT_MIN_VALUE)); }
-    bool isOneTimeMode() const {
-        return (Mode == MODE_ONE_TIME_HIGH_RES_MODE) || (Mode == MODE_ONE_TIME_HIGH_RES_MODE_2) || (Mode == MODE_ONE_TIME_LOW_RES_MODE);
+    static constexpr IlluminanceType CombineRawValueParts(byte high_byte, byte low_byte) { return static_cast<uint16_t>(high_byte) << 8u | low_byte; }
+    static constexpr bool IsMtRegValueInRange(byte mt_reg_value) { return ((mt_reg_value <= BH1750_REG_MT_MAX_VALUE) && (mt_reg_value >= BH1750_REG_MT_MIN_VALUE)); }
+    bool IsOneTimeMode() const {
+        return (mode_ == kModeOneTimeHighResMode) || (mode_ == kModeOneTimeHighResMode2) || (mode_ == kModeOneTimeLowResMode);
     }
 
     /* One dropped reading keeps the last value on purpose - see readIlluminance(). A sensor
        that stops answering altogether is the other case: that value would otherwise stand
        for good and the automatic would follow a room it can no longer see. Enough failures
        therefore drop the mode, which is what puts task() back to setting the sensor up. */
-    void countReadFailure() {
-        if(++ReadFailures < ReadFailuresBeforeReinit) { return; }
-        ReadFailures = 0u;
-        Mode = MODE_NONE;
+    void CountReadFailure() {
+        if(++read_failures_ < kReadFailuresBeforeReinit) { return; }
+        read_failures_ = 0u;
+        mode_ = kModeNone;
     }
 
 /******************************************************************************************************************************************************
@@ -184,39 +184,39 @@ class BH1750
     ~BH1750() { }
 
     // get methods
-    static constexpr byte getTaskCycle() { return TaskCycle; }
-    ModeType getMode() const { return Mode; }
-    IlluminanceType getIlluminance() const { return Illuminance; }
-    CalibrationValuesType getCalibrationValues() const { return CalibrationValues; }
-    IlluminanceType getCalibrationValuesMaxValue() const { return CalibrationValues.MaxValue; }
-    IlluminanceType getCalibrationValuesMinValue() const { return CalibrationValues.MinValue; }
+    static constexpr byte GetTaskCycle() { return kTaskCycle; }
+    ModeType GetMode() const { return mode_; }
+    IlluminanceType GetIlluminance() const { return illuminance_; }
+    CalibrationValuesType GetCalibrationValues() const { return calibration_values_; }
+    IlluminanceType GetCalibrationValuesMaxValue() const { return calibration_values_.max_value; }
+    IlluminanceType GetCalibrationValuesMinValue() const { return calibration_values_.min_value; }
 
     // set methods
-    StdReturnType setMode(ModeType);
-    void setCalibrationValuesMaxValue(IlluminanceType MaxValue) { CalibrationValues.MaxValue = MaxValue; }
-    void setCalibrationValuesMinValue(IlluminanceType MinValue) { CalibrationValues.MinValue = MinValue; }
-    void setCalibrationValues(CalibrationValuesType sCalibrationValues) { CalibrationValues = sCalibrationValues; }
+    StdReturnType SetMode(ModeType);
+    void SetCalibrationValuesMaxValue(IlluminanceType max_value) { calibration_values_.max_value = max_value; }
+    void SetCalibrationValuesMinValue(IlluminanceType min_value) { calibration_values_.min_value = min_value; }
+    void SetCalibrationValues(CalibrationValuesType calibration_values) { calibration_values_ = calibration_values; }
 
     // methods
-    StdReturnType init(ModeType);
-    StdReturnType changeMeasurementTime(byte);
+    StdReturnType Init(ModeType);
+    StdReturnType ChangeMeasurementTime(byte);
     /* Refused while the sensor is not set up, rather than storing whatever Illuminance
        happens to hold: a clock calibrated in that state would keep a bound the sensor never
        measured, Persistence would save it, and a stored zero maximum switches the automatic
        off for good. The caller reports the refusal, so it is visible instead of silent. */
-    StdReturnType startCalibrationMaxValue() {
-        if(!isReady()) { return E_NOT_OK; }
-        task();
-        CalibrationValues.MaxValue = Illuminance;
-        return E_OK;
+    StdReturnType StartCalibrationMaxValue() {
+        if(!IsReady()) { return kENotOk; }
+        Task();
+        calibration_values_.max_value = illuminance_;
+        return kEOk;
     }
-    StdReturnType startCalibrationMinValue() {
-        if(!isReady()) { return E_NOT_OK; }
-        task();
-        CalibrationValues.MinValue = Illuminance;
-        return E_OK;
+    StdReturnType StartCalibrationMinValue() {
+        if(!IsReady()) { return kENotOk; }
+        Task();
+        calibration_values_.min_value = illuminance_;
+        return kEOk;
     }
-    void task();
+    void Task();
 };
 
 #endif // _BH1750_H_

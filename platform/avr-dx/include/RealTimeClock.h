@@ -63,45 +63,45 @@ class RealTimeClock
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    static constexpr byte ChipReadInterval{REAL_TIME_CLOCK_CHIP_READ_INTERVAL};
+    static constexpr byte kChipReadInterval{REAL_TIME_CLOCK_CHIP_READ_INTERVAL};
 
-    ClockDateTime DateTime;
+    ClockDateTime date_time_;
     /* An instance of its own, next to the one the core's temperature side keeps. The chip
        has no state that two readers could disturb, and both reach it through the same bus
        driver. */
-    DS3231 Chip;
+    DS3231 chip_;
     /* Zero, so the first tick asks the chip straight away rather than showing the default
        date for a second. */
-    byte ChipReadCountdown{0u};
+    byte chip_read_countdown_{0u};
 
     // functions
     RealTimeClock() {}
     ~RealTimeClock() {}
 
-    StdReturnType readChip();
-    void writeChip();
+    StdReturnType ReadChip();
+    void WriteChip();
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    static RealTimeClock& getInstance() {
-        static RealTimeClock SingletonInstance;
-        return SingletonInstance;
+    static RealTimeClock& GetInstance() {
+        static RealTimeClock singleton_instance;
+        return singleton_instance;
     }
 
     // get methods
-    ClockDateTime getDateTime() const { return DateTime; }
-    ClockTime getTime() const { return DateTime.getTime(); }
-    ClockDate getDate() const { return DateTime.getDate(); }
+    ClockDateTime GetDateTime() const { return date_time_; }
+    ClockTime GetTime() const { return date_time_.GetTime(); }
+    ClockDate GetDate() const { return date_time_.GetDate(); }
 
     // set methods
-    void setDateTime(ClockDateTime sDateTime);
-    void setTime(ClockTime Time);
-    void setDate(ClockDate Date);
+    void SetDateTime(ClockDateTime date_time);
+    void SetTime(ClockTime time);
+    void SetDate(ClockDate date);
 
     // methods
-    void task();
+    void Task();
 };
 
 #endif // _REAL_TIME_CLOCK_H_

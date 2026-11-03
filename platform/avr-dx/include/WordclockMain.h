@@ -36,7 +36,7 @@ class WordclockMain
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    Scheduler wcScheduler;
+    Scheduler wc_scheduler_;
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
@@ -45,8 +45,8 @@ class WordclockMain
     WordclockMain() { }
     ~WordclockMain() { }
 
-    void init();
-    void task();
+    void Init();
+    void Task();
 };
 
 #endif // _WORDCLOCK_MAIN_H_

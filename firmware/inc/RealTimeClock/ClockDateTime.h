@@ -61,8 +61,8 @@ class ClockDateTime
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    ClockTime Time;
-    ClockDate Date;
+    ClockTime time_;
+    ClockDate date_;
 
     // functions
 
@@ -74,30 +74,30 @@ class ClockDateTime
     ~ClockDateTime() {}
 
 	// get methods
-    ClockTime getTime() const { return Time; }
-    HourType getTimeHour() const { return Time.getHour(); }
-    MinuteType getTimeMinute() const { return Time.getMinute(); }
-    SecondType getTimeSecond() const { return Time.getSecond(); }
+    ClockTime GetTime() const { return time_; }
+    HourType GetTimeHour() const { return time_.GetHour(); }
+    MinuteType GetTimeMinute() const { return time_.GetMinute(); }
+    SecondType GetTimeSecond() const { return time_.GetSecond(); }
 
-    ClockDate getDate() const { return Date; }
-    YearType getDateYear() const { return Date.getYear(); }
-    MonthType getDateMonth() const { return Date.getMonth(); }
-    DayType getDateDay() const { return Date.getDay(); }
-    WeekdayType getDateWeekday() const { return Date.getWeekday(); }
+    ClockDate GetDate() const { return date_; }
+    YearType GetDateYear() const { return date_.GetYear(); }
+    MonthType GetDateMonth() const { return date_.GetMonth(); }
+    DayType GetDateDay() const { return date_.GetDay(); }
+    WeekdayType GetDateWeekday() const { return date_.GetWeekday(); }
 
     // set methods
-    void setTime(ClockTime sTime) { Time = sTime; }
-    StdReturnType setTimeHour(HourType Hour) { return Time.setHour(Hour); }
-    StdReturnType setTimeMinute(MinuteType Minute) { return Time.setMinute(Minute); }
-    StdReturnType setTimeSecond(SecondType Second) { return Time.setSecond(Second); }
+    void SetTime(ClockTime time) { time_ = time; }
+    StdReturnType SetTimeHour(HourType hour) { return time_.SetHour(hour); }
+    StdReturnType SetTimeMinute(MinuteType minute) { return time_.SetMinute(minute); }
+    StdReturnType SetTimeSecond(SecondType second) { return time_.SetSecond(second); }
 
-    void setDate(ClockDate sDate) { Date = sDate; }
-    StdReturnType setDateYear(YearType Year) { return Date.setYear(Year); }
-    StdReturnType setDateMonth(MonthType Month) { return Date.setMonth(Month); }
-    StdReturnType setDateDay(DayType Day) { return Date.setDay(Day); }
+    void SetDate(ClockDate date) { date_ = date; }
+    StdReturnType SetDateYear(YearType year) { return date_.SetYear(year); }
+    StdReturnType SetDateMonth(MonthType month) { return date_.SetMonth(month); }
+    StdReturnType SetDateDay(DayType day) { return date_.SetDay(day); }
 
 	// methods
-    static DayType getDaysOfMonth(MonthType Month, YearType Year) { return ClockDate::getDaysOfMonth(Month, Year); }
+    static DayType GetDaysOfMonth(MonthType month, YearType year) { return ClockDate::GetDaysOfMonth(month, year); }
 };
 
 #endif

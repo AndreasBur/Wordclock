@@ -25,6 +25,6 @@
 /*  sub-header because it is specific to this simulator, not to the Arduino   */
 /*  API.                                                                      */
 /* -------------------------------------------------------------------------- */
-#define Serial                  SerialShim::getInstance()
+#define Serial                  SerialShim::GetInstance() // NOLINT(readability-identifier-naming)
 
 #endif // _ARDUINO_H_

@@ -87,60 +87,60 @@ class NightSwitch
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    static constexpr byte TaskCycle{NIGHT_SWITCH_TASK_CYCLE};
-    static constexpr TimeOfDayType MinutesPerHour{60u};
-    static constexpr byte NightBrightnessOff{0u};
+    static constexpr byte kTaskCycle{NIGHT_SWITCH_TASK_CYCLE};
+    static constexpr TimeOfDayType kMinutesPerHour{60u};
+    static constexpr byte kNightBrightnessOff{0u};
     /* What the display's night level is when nothing is dimming it. */
-    static constexpr byte NightLevelFull{255u};
+    static constexpr byte kNightLevelFull{255u};
 
-    static constexpr bool IsActiveInitValue{false};
-    static constexpr HourType StartHourInitValue{23u};
-    static constexpr MinuteType StartMinuteInitValue{0u};
-    static constexpr HourType EndHourInitValue{6u};
-    static constexpr MinuteType EndMinuteInitValue{0u};
-    static constexpr byte NightBrightnessInitValue{NightBrightnessOff};
+    static constexpr bool kIsActiveInitValue{false};
+    static constexpr HourType kStartHourInitValue{23u};
+    static constexpr MinuteType kStartMinuteInitValue{0u};
+    static constexpr HourType kEndHourInitValue{6u};
+    static constexpr MinuteType kEndMinuteInitValue{0u};
+    static constexpr byte kNightBrightnessInitValue{kNightBrightnessOff};
 
-    bool IsActive{IsActiveInitValue};
-    HourType StartHour{StartHourInitValue};
-    MinuteType StartMinute{StartMinuteInitValue};
-    HourType EndHour{EndHourInitValue};
-    MinuteType EndMinute{EndMinuteInitValue};
-    byte NightBrightness{NightBrightnessInitValue};
+    bool is_active_{kIsActiveInitValue};
+    HourType start_hour_{kStartHourInitValue};
+    MinuteType start_minute_{kStartMinuteInitValue};
+    HourType end_hour_{kEndHourInitValue};
+    MinuteType end_minute_{kEndMinuteInitValue};
+    byte night_brightness_{kNightBrightnessInitValue};
 
     /* What the last tick saw, so that only a change acts. Starts as day: a clock that comes
        up inside the window gets its first tick as an edge and switches straight away. */
-    bool WasNight{false};
+    bool was_night_{false};
 
     /* Whether it was the night that took the supply down. What it guards is the tick that
        watches for a hand: without it a supply cut by hand at noon would be handed straight
        back on the next tick, because the display is enabled the whole time. A window's edge
        is another matter and gives it back either way - the same rule that already re-enables
        a display somebody switched off. */
-    bool SupplyCutForNight{false};
+    bool supply_cut_for_night_{false};
 
     NightSwitch() { }
     ~NightSwitch() { }
 
     // functions
-    static constexpr TimeOfDayType toTimeOfDay(HourType Hour, MinuteType Minute) {
-        return static_cast<TimeOfDayType>((Hour * MinutesPerHour) + Minute);
+    static constexpr TimeOfDayType ToTimeOfDay(HourType hour, MinuteType minute) {
+        return static_cast<TimeOfDayType>((hour * kMinutesPerHour) + minute);
     }
 
     /* An empty window - one whose ends are the same minute - is no window at all rather
        than a whole day, because that is what somebody who has not configured it yet has. */
-    static constexpr bool isWindowEmpty(TimeOfDayType Start, TimeOfDayType End) { return Start == End; }
-    static constexpr bool isWindowCrossingMidnight(TimeOfDayType Start, TimeOfDayType End) { return Start > End; }
+    static constexpr bool IsWindowEmpty(TimeOfDayType start, TimeOfDayType end) { return start == end; }
+    static constexpr bool IsWindowCrossingMidnight(TimeOfDayType start, TimeOfDayType end) { return start > end; }
 
-    static constexpr bool isWithinWindow(TimeOfDayType Now, TimeOfDayType Start, TimeOfDayType End) {
-        if(isWindowEmpty(Start, End)) { return false; }
+    static constexpr bool IsWithinWindow(TimeOfDayType now, TimeOfDayType start, TimeOfDayType end) {
+        if(IsWindowEmpty(start, end)) { return false; }
         /* The ordinary window is a span; the one that crosses midnight is everything
            outside the span between its ends, which is the same test read the other way. */
-        if(isWindowCrossingMidnight(Start, End)) { return (Now >= Start) || (Now < End); }
+        if(IsWindowCrossingMidnight(start, end)) { return (now >= start) || (now < end); }
 
-        return (Now >= Start) && (Now < End);
+        return (now >= start) && (now < end);
     }
 
-    static bool isDisplayOffAtNight(byte Brightness) { return Brightness == NightBrightnessOff; }
+    static bool IsDisplayOffAtNight(byte brightness) { return brightness == kNightBrightnessOff; }
 
     /* Power is asked rather than the port written: it darkens the strip over the data line
        first and waits for that frame to leave the wire, so the rail is still up when this
@@ -149,34 +149,34 @@ class NightSwitch
        Where no switch is fitted the display is darkened the way it always was, and the strip
        keeps its current because on that board it cannot do otherwise - which is the same
        answer the procedures give, rather than a night that quietly does less than it says. */
-    void cutSupplyForTheNight() {
-        if constexpr (!Power::isSwitchFitted()) { Display::getInstance().disable(); return; }
+    void CutSupplyForTheNight() {
+        if constexpr (!Power::IsSwitchFitted()) { Display::GetInstance().Disable(); return; }
 
-        Power::getInstance().switchSupplyOff();
-        SupplyCutForNight = true;
+        Power::GetInstance().SwitchSupplyOff();
+        supply_cut_for_night_ = true;
     }
 
     /* Ahead of the enable and not after it, because the rail has to be up before a frame
        goes out - Power keeps the data line gated until it is, and releases it a tick later. */
-    void restoreSupplyAfterTheNight() {
-        if(!SupplyCutForNight) { return; }
+    void RestoreSupplyAfterTheNight() {
+        if(!supply_cut_for_night_) { return; }
 
-        Power::getInstance().switchSupplyOn();
-        SupplyCutForNight = false;
+        Power::GetInstance().SwitchSupplyOn();
+        supply_cut_for_night_ = false;
     }
 
-    void applyNight() {
-        if(isDisplayOffAtNight(NightBrightness)) { cutSupplyForTheNight(); }
-        else                                     { Display::getInstance().setBrightnessNightLevel(NightBrightness); }
+    void ApplyNight() {
+        if(IsDisplayOffAtNight(night_brightness_)) { CutSupplyForTheNight(); }
+        else                                     { Display::GetInstance().SetBrightnessNightLevel(night_brightness_); }
     }
 
     /* Both undone rather than only the one that was applied: the night brightness may have
        been changed while the window was open, and then the morning has to put back
        whichever of the two the evening happened to use. */
-    void applyDay() {
-        Display::getInstance().clearBrightnessNight();
-        restoreSupplyAfterTheNight();
-        Display::getInstance().enable();
+    void ApplyDay() {
+        Display::GetInstance().ClearBrightnessNight();
+        RestoreSupplyAfterTheNight();
+        Display::GetInstance().Enable();
     }
 
     /* The one thing watched as a state rather than as an edge, and only because a cut rail
@@ -189,82 +189,82 @@ class NightSwitch
        Nothing here cuts the supply again. A display switched off by hand a minute later keeps
        its rail until the window's next edge, for the same reason the rest of this module acts
        on crossings: a clock that undid what a hand just did would read as a fault. */
-    void followTheDisplayBackOn() {
-        if(!SupplyCutForNight) { return; }
-        if(!Display::getInstance().isEnabled()) { return; }
+    void FollowTheDisplayBackOn() {
+        if(!supply_cut_for_night_) { return; }
+        if(!Display::GetInstance().IsEnabled()) { return; }
 
-        restoreSupplyAfterTheNight();
+        RestoreSupplyAfterTheNight();
     }
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    static NightSwitch& getInstance() {
-        static NightSwitch SingletonInstance;
-        return SingletonInstance;
+    static NightSwitch& GetInstance() {
+        static NightSwitch singleton_instance;
+        return singleton_instance;
     }
 
     // get methods
-    static constexpr byte getTaskCycle() { return TaskCycle; }
+    static constexpr byte GetTaskCycle() { return kTaskCycle; }
 
-    bool getIsActive() const { return IsActive; }
-    HourType getStartHour() const { return StartHour; }
-    MinuteType getStartMinute() const { return StartMinute; }
-    HourType getEndHour() const { return EndHour; }
-    MinuteType getEndMinute() const { return EndMinute; }
-    byte getNightBrightness() const { return NightBrightness; }
+    bool GetIsActive() const { return is_active_; }
+    HourType GetStartHour() const { return start_hour_; }
+    MinuteType GetStartMinute() const { return start_minute_; }
+    HourType GetEndHour() const { return end_hour_; }
+    MinuteType GetEndMinute() const { return end_minute_; }
+    byte GetNightBrightness() const { return night_brightness_; }
 
     /* Whether the clock considers it night now, which is what the answer reports - a
        window that is configured but switched off still has an answer to this. */
-    bool isNight() const {
-        const ClockTime Now = RealTimeClock::getInstance().getTime();
+    bool IsNight() const {
+        const ClockTime now = RealTimeClock::GetInstance().GetTime();
 
-        return isWithinWindow(toTimeOfDay(Now.getHour(), Now.getMinute()),
-                              toTimeOfDay(StartHour, StartMinute),
-                              toTimeOfDay(EndHour, EndMinute));
+        return IsWithinWindow(ToTimeOfDay(now.GetHour(), now.GetMinute()),
+                              ToTimeOfDay(start_hour_, start_minute_),
+                              ToTimeOfDay(end_hour_, end_minute_));
     }
 
     // set methods
-    void setStartHour(HourType sStartHour) { StartHour = sStartHour; }
-    void setStartMinute(MinuteType sStartMinute) { StartMinute = sStartMinute; }
-    void setEndHour(HourType sEndHour) { EndHour = sEndHour; }
-    void setEndMinute(MinuteType sEndMinute) { EndMinute = sEndMinute; }
-    void setNightBrightness(byte sNightBrightness) { NightBrightness = sNightBrightness; }
+    void SetStartHour(HourType start_hour) { start_hour_ = start_hour; }
+    void SetStartMinute(MinuteType start_minute) { start_minute_ = start_minute; }
+    void SetEndHour(HourType end_hour) { end_hour_ = end_hour; }
+    void SetEndMinute(MinuteType end_minute) { end_minute_ = end_minute; }
+    void SetNightBrightness(byte night_brightness) { night_brightness_ = night_brightness; }
 
     /* Switching the whole thing off gives the display back rather than leaving it wherever
        the last edge put it - a clock left dark by a timer that is no longer running is a
        clock nobody can explain. */
-    void setIsActive(bool sIsActive) {
-        IsActive = sIsActive;
-        if(!IsActive) { applyDay(); }
-        WasNight = false;
+    void SetIsActive(bool is_active) {
+        is_active_ = is_active;
+        if(!is_active_) { ApplyDay(); }
+        was_night_ = false;
     }
 
     // methods
-    void resetToDefaults() {
-        setIsActive(IsActiveInitValue);
-        StartHour = StartHourInitValue;
-        StartMinute = StartMinuteInitValue;
-        EndHour = EndHourInitValue;
-        EndMinute = EndMinuteInitValue;
-        NightBrightness = NightBrightnessInitValue;
+    void ResetToDefaults() {
+        SetIsActive(kIsActiveInitValue);
+        start_hour_ = kStartHourInitValue;
+        start_minute_ = kStartMinuteInitValue;
+        end_hour_ = kEndHourInitValue;
+        end_minute_ = kEndMinuteInitValue;
+        night_brightness_ = kNightBrightnessInitValue;
     }
 
     /* Acts on the crossing, not on the state: between two edges the display is whatever
        anybody last made it, so switching it on by hand at night keeps it on - which is what
        the tick between two edges is for, since a hand that switched it on has a supply to
        get back. */
-    void task() {
-        if(!IsActive) { return; }
+    void Task() {
+        if(!is_active_) { return; }
 
-        const bool IsNightNow = isNight();
+        const bool is_night_now = IsNight();
 
-        if(IsNightNow == WasNight) { followTheDisplayBackOn(); return; }
-        WasNight = IsNightNow;
+        if(is_night_now == was_night_) { FollowTheDisplayBackOn(); return; }
+        was_night_ = is_night_now;
 
-        if(IsNightNow) { applyNight(); }
-        else           { applyDay(); }
+        if(is_night_now) { ApplyNight(); }
+        else           { ApplyDay(); }
     }
 };
 

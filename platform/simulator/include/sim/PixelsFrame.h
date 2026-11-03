@@ -52,20 +52,20 @@ class PixelsFrame : public wxFrame
   private:
     enum
     {
-        ID_BUTTON_CLEAR = 1000,
-        ID_BUTTON_SEND,
-        ID_TEXT_CTRL_OUTPUT,
-        ID_TEXT_CTRL_INPUT,
-        ID_STATIC_BOX,
-        ID_BUTTON_CREATE,
+        kIdButtonClear = 1000,
+        kIdButtonSend,
+        kIdTextCtrlOutput,
+        kIdTextCtrlInput,
+        kIdStaticBox,
+        kIdButtonCreate,
         /* No stock wx id fits the message builder, unlike Settings, About and Quit. */
-        ID_MENU_MESSAGE
+        kIdMenuMessage
     };
 
-    wxStaticText* Characters[PIXELS_DISPLAY_NUMBER_OF_ROWS][PIXELS_DISPLAY_NUMBER_OF_COLUMNS];
+    wxStaticText* characters_[PIXELS_DISPLAY_NUMBER_OF_ROWS][PIXELS_DISPLAY_NUMBER_OF_COLUMNS];
 
-    static constexpr byte IntensityMaxValue{255u};
-    static constexpr byte UnlitLevel{192u};             /* wxLIGHT_GREY */
+    static constexpr byte kIntensityMaxValue{255u};
+    static constexpr byte kUnlitLevel{192u};             /* wxLIGHT_GREY */
 
     DECLARE_EVENT_TABLE()
 
@@ -73,11 +73,11 @@ class PixelsFrame : public wxFrame
     /* The brightest channel decides how far the letter is pulled from the unlit colour
        towards black. Colour itself cannot be shown on a light background — a white LED
        at full would be invisible — so only the brightness is rendered. */
-    static byte getIntensity(PixelType Pixel) {
-        byte Intensity = Pixel.getRed();
-        if(Pixel.getGreen() > Intensity) { Intensity = Pixel.getGreen(); }
-        if(Pixel.getBlue() > Intensity) { Intensity = Pixel.getBlue(); }
-        return Intensity;
+    static byte GetIntensity(PixelType pixel) {
+        byte intensity = pixel.GetRed();
+        if(pixel.GetGreen() > intensity) { intensity = pixel.GetGreen(); }
+        if(pixel.GetBlue() > intensity) { intensity = pixel.GetBlue(); }
+        return intensity;
     }
 
     /* Weighted rather than proportional. Unlit letters sit at UnlitLevel and not at
@@ -85,14 +85,14 @@ class PixelsFrame : public wxFrame
        3 percent would land five levels off the unlit colour and be invisible, while on
        real LEDs it is clearly visible against LEDs that are truly off. The square root
        spreads the low end, which is also closer to how the eye reads brightness. */
-    static byte getWeightedIntensity(byte Intensity) {
-        return static_cast<byte>(std::sqrt(static_cast<double>(Intensity) * IntensityMaxValue));
+    static byte GetWeightedIntensity(byte intensity) {
+        return static_cast<byte>(std::sqrt(static_cast<double>(intensity) * kIntensityMaxValue));
     }
 
     /* Grey level of the letter, which the weighted intensity pulls from UnlitLevel
        towards black. */
-    static constexpr byte toLevel(byte WeightedIntensity) {
-        return static_cast<byte>(UnlitLevel - ((UnlitLevel * WeightedIntensity) / IntensityMaxValue));
+    static constexpr byte ToLevel(byte weighted_intensity) {
+        return static_cast<byte>(kUnlitLevel - ((kUnlitLevel * weighted_intensity) / kIntensityMaxValue));
     }
 
     PixelsFrame(wxWindow*, const wxString&);
@@ -104,26 +104,26 @@ class PixelsFrame : public wxFrame
     void OnSettings(wxCommandEvent&);
     void OnMessage(wxCommandEvent&);
     void OnQuit(wxCommandEvent&);
-    static wxColour toColour(PixelType);
-    void renderPixel(byte Row, byte Column);
-    void renderAllPixels();
-    static wxMenuBar* createMenuBar();
-    wxBoxSizer* createSizerAll(wxWindow*);
-    wxBoxSizer* createSizerCharacters(wxWindow*);
-    wxBoxSizer* createSizerCharacter(wxWindow*, int Row);
-    static wxBoxSizer* createSizerControl(wxWindow*);
+    static wxColour ToColour(PixelType);
+    void RenderPixel(byte row, byte column);
+    void RenderAllPixels();
+    static wxMenuBar* CreateMenuBar();
+    wxBoxSizer* CreateSizerAll(wxWindow*);
+    wxBoxSizer* CreateSizerCharacters(wxWindow*);
+    wxBoxSizer* CreateSizerCharacter(wxWindow*, int row);
+    static wxBoxSizer* CreateSizerControl(wxWindow*);
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    static PixelsFrame& getInstance() {
-        static PixelsFrame* pSingletonInstance = new PixelsFrame(0L, _("Wordclock Pixels"));
-        return *pSingletonInstance;
+    static PixelsFrame& GetInstance() {
+        static PixelsFrame* p_singleton_instance = new PixelsFrame(0L, _("Wordclock Pixels"));
+        return *p_singleton_instance;
     }
 
     // methods
-    void render();
+    void Render();
 };
 
 #endif // PIXELS_FRAME_H

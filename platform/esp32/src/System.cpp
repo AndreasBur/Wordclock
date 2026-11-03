@@ -34,20 +34,20 @@ namespace {
 /* Its own namespace, not the one the settings blob lives in: a settings reset must not
    take the network with it, or a clock is left that nobody can reach without a cable.
    Both are limited to 15 characters by NVS. */
-constexpr const char* NetworkNamespace{"wc-network"};
-constexpr const char* SsidKey{"ssid"};
-constexpr const char* PasswordKey{"password"};
+constexpr const char* kNetworkNamespace{"wc-network"};
+constexpr const char* kSsidKey{"ssid"};
+constexpr const char* kPasswordKey{"password"};
 /* Beside the network's own keys, in the same namespace: this is how the clock is reached as
    well, which is what that namespace holds and what keeps it out of the settings blob the
    core persists. */
-constexpr const char* ConsolePasswordKey{"console-pass"};
+constexpr const char* kConsolePasswordKey{"console-pass"};
 /* Fixed, and printed in the 401's realm so nobody has to guess it. Not a secret: what is
    secret is the password beside it. */
-constexpr char ConsoleUserName[]{"wordclock"};
+constexpr char kConsoleUserName[]{"wordclock"};
 
-constexpr uint32_t BytesPerKibibyte{1024u};
+constexpr uint32_t kBytesPerKibibyte{1024u};
 
-bool isNetworkJoined()
+bool IsNetworkJoined()
 {
     return WiFi.status() == WL_CONNECTED;
 }
@@ -62,61 +62,61 @@ bool isNetworkJoined()
 
    Padding included, because a browser's header carries it and a comparison of the two has to
    see the same string. */
-void toBase64(const char* Plain, size_t Length, char* Target, size_t Capacity)
+void ToBase64(const char* plain, size_t length, char* target, size_t capacity)
 {
-    static constexpr char Alphabet[]{"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"};
-    size_t Out = 0u;
+    static constexpr char kAlphabet[]{"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"};
+    size_t out = 0u;
 
-    for(size_t In = 0u; In < Length; In += 3u) {
-        const uint32_t Byte0 = static_cast<uint8_t>(Plain[In]);
-        const uint32_t Byte1 = ((In + 1u) < Length) ? static_cast<uint8_t>(Plain[In + 1u]) : 0u;
-        const uint32_t Byte2 = ((In + 2u) < Length) ? static_cast<uint8_t>(Plain[In + 2u]) : 0u;
-        const uint32_t Triple = (Byte0 << 16u) | (Byte1 << 8u) | Byte2;
+    for(size_t in = 0u; in < length; in += 3u) {
+        const uint32_t byte0 = static_cast<uint8_t>(plain[in]);
+        const uint32_t byte1 = ((in + 1u) < length) ? static_cast<uint8_t>(plain[in + 1u]) : 0u;
+        const uint32_t byte2 = ((in + 2u) < length) ? static_cast<uint8_t>(plain[in + 2u]) : 0u;
+        const uint32_t triple = (byte0 << 16u) | (byte1 << 8u) | byte2;
 
-        if((Out + 4u) >= Capacity) { break; }
+        if((out + 4u) >= capacity) { break; }
 
-        Target[Out++] = Alphabet[(Triple >> 18u) & 0x3Fu];
-        Target[Out++] = Alphabet[(Triple >> 12u) & 0x3Fu];
-        Target[Out++] = ((In + 1u) < Length) ? Alphabet[(Triple >> 6u) & 0x3Fu] : '=';
-        Target[Out++] = ((In + 2u) < Length) ? Alphabet[Triple & 0x3Fu] : '=';
+        target[out++] = kAlphabet[(triple >> 18u) & 0x3Fu];
+        target[out++] = kAlphabet[(triple >> 12u) & 0x3Fu];
+        target[out++] = ((in + 1u) < length) ? kAlphabet[(triple >> 6u) & 0x3Fu] : '=';
+        target[out++] = ((in + 2u) < length) ? kAlphabet[triple & 0x3Fu] : '=';
     }
-    Target[Out] = STD_NULL_CHARACTER;
+    target[out] = STD_NULL_CHARACTER;
 }
 
 
-StdReturnType readStoredString(const char* Key, char* String, size_t Capacity)
+StdReturnType ReadStoredString(const char* key, char* string, size_t capacity)
 {
-    String[0u] = STD_NULL_CHARACTER;
+    string[0u] = STD_NULL_CHARACTER;
 
-    Preferences Store;
-    if(!Store.begin(NetworkNamespace, true)) { return E_NOT_OK; }
+    Preferences store;
+    if(!store.begin(kNetworkNamespace, true)) { return kENotOk; }
 
-    const size_t Length = Store.getString(Key, String, Capacity);
-    Store.end();
+    const size_t length = store.getString(key, string, capacity);
+    store.end();
 
-    if(Length == 0u) { return E_NOT_OK; }
+    if(length == 0u) { return kENotOk; }
 
-    return E_OK;
+    return kEOk;
 }
 
 /* What was compiled in, which is what a clock that was flashed with a WordclockSecrets.h
    still comes up with. Stored credentials win over it: they are the later word. */
-constexpr bool isSsidCompiledIn()
+constexpr bool IsSsidCompiledIn()
 {
     return sizeof(WORDCLOCK_WIFI_SSID) > 1u;
 }
 
 /* Copies into the caller's buffer only if the whole string fits, so a value that grew
    past what the field was sized for is reported as no value rather than as half of one. */
-StdReturnType copyIfItFits(const char* Value, char* String, size_t Capacity)
+StdReturnType CopyIfItFits(const char* value, char* string, size_t capacity)
 {
-    String[0u] = STD_NULL_CHARACTER;
+    string[0u] = STD_NULL_CHARACTER;
 
-    const size_t Length = strlen(Value);
-    if(Length >= Capacity) { return E_NOT_OK; }
+    const size_t length = strlen(value);
+    if(length >= capacity) { return kENotOk; }
 
-    memcpy(String, Value, Length + 1u);
-    return E_OK;
+    memcpy(string, value, length + 1u);
+    return kEOk;
 }
 
 } // namespace
@@ -135,10 +135,10 @@ StdReturnType copyIfItFits(const char* Value, char* String, size_t Capacity)
 /******************************************************************************************************************************************************
   getFreeMemoryInKibibytes()
 ******************************************************************************************************************************************************/
-StdReturnType System::getFreeMemoryInKibibytes(uint16_t& FreeMemory) const
+StdReturnType System::GetFreeMemoryInKibibytes(uint16_t& free_memory) const
 {
-    FreeMemory = static_cast<uint16_t>(ESP.getFreeHeap() / BytesPerKibibyte);
-    return E_OK;
+    free_memory = static_cast<uint16_t>(ESP.getFreeHeap() / kBytesPerKibibyte);
+    return kEOk;
 } /* getFreeMemoryInKibibytes */
 
 
@@ -149,13 +149,13 @@ StdReturnType System::getFreeMemoryInKibibytes(uint16_t& FreeMemory) const
  *
  *  \return         E_OK if the clock has joined a network and the address fits the buffer
 ******************************************************************************************************************************************************/
-StdReturnType System::getNetworkAddress(char* String) const
+StdReturnType System::GetNetworkAddress(char* string) const
 {
-    String[0u] = STD_NULL_CHARACTER;
+    string[0u] = STD_NULL_CHARACTER;
 
-    if(!isNetworkJoined()) { return E_NOT_OK; }
+    if(!IsNetworkJoined()) { return kENotOk; }
 
-    return copyIfItFits(WiFi.localIP().toString().c_str(), String, AddressStringLength);
+    return CopyIfItFits(WiFi.localIP().toString().c_str(), string, kAddressStringLength);
 } /* getNetworkAddress */
 
 
@@ -166,14 +166,14 @@ StdReturnType System::getNetworkAddress(char* String) const
  *
  *  \return         E_OK if the clock has joined a network
 ******************************************************************************************************************************************************/
-StdReturnType System::getLinkQuality(char* String) const
+StdReturnType System::GetLinkQuality(char* string) const
 {
-    String[0u] = STD_NULL_CHARACTER;
+    string[0u] = STD_NULL_CHARACTER;
 
-    if(!isNetworkJoined()) { return E_NOT_OK; }
+    if(!IsNetworkJoined()) { return kENotOk; }
 
-    itoa(static_cast<int>(WiFi.RSSI()), String, 10);
-    return E_OK;
+    itoa(static_cast<int>(WiFi.RSSI()), string, 10);
+    return kEOk;
 } /* getLinkQuality */
 
 
@@ -187,25 +187,25 @@ StdReturnType System::getLinkQuality(char* String) const
  *
  *  \return         E_OK if there is a network to name
 ******************************************************************************************************************************************************/
-StdReturnType System::getNetworkSsid(char* Ssid) const
+StdReturnType System::GetNetworkSsid(char* ssid) const
 {
-    if(readStoredString(SsidKey, Ssid, SsidStringLength) == E_OK) { return E_OK; }
+    if(ReadStoredString(kSsidKey, ssid, kSsidStringLength) == kEOk) { return kEOk; }
 
-    if(isSsidCompiledIn()) { return copyIfItFits(WORDCLOCK_WIFI_SSID, Ssid, SsidStringLength); }
+    if(IsSsidCompiledIn()) { return CopyIfItFits(WORDCLOCK_WIFI_SSID, ssid, kSsidStringLength); }
 
-    Ssid[0u] = STD_NULL_CHARACTER;
-    return E_NOT_OK;
+    ssid[0u] = STD_NULL_CHARACTER;
+    return kENotOk;
 }  /* getNetworkSsid */
 
 
 /******************************************************************************************************************************************************
   isNetworkConfigured()
 ******************************************************************************************************************************************************/
-bool System::isNetworkConfigured() const
+bool System::IsNetworkConfigured() const
 {
-    char Ssid[SsidStringLength]{};
+    char ssid[kSsidStringLength]{};
 
-    return getNetworkSsid(Ssid) == E_OK;
+    return GetNetworkSsid(ssid) == kEOk;
 } /* isNetworkConfigured */
 
 
@@ -223,23 +223,23 @@ bool System::isNetworkConfigured() const
  *
  *  \return         E_OK if the pair was stored
 ******************************************************************************************************************************************************/
-StdReturnType System::setNetworkCredentials(const char* Ssid, const char* Password)
+StdReturnType System::SetNetworkCredentials(const char* ssid, const char* password)
 {
-    if((Ssid == nullptr) || (Password == nullptr)) { return E_NOT_OK; }
-    if(strlen(Ssid) >= SsidStringLength) { return E_NOT_OK; }
-    if(strlen(Password) >= PasswordStringLength) { return E_NOT_OK; }
+    if((ssid == nullptr) || (password == nullptr)) { return kENotOk; }
+    if(strlen(ssid) >= kSsidStringLength) { return kENotOk; }
+    if(strlen(password) >= kPasswordStringLength) { return kENotOk; }
 
-    Preferences Store;
-    if(!Store.begin(NetworkNamespace, false)) { return E_NOT_OK; }
+    Preferences store;
+    if(!store.begin(kNetworkNamespace, false)) { return kENotOk; }
 
-    const bool Stored = (Store.putString(SsidKey, Ssid) == strlen(Ssid)) &&
-                        (Store.putString(PasswordKey, Password) == strlen(Password));
-    Store.end();
+    const bool stored = (store.putString(kSsidKey, ssid) == strlen(ssid)) &&
+                        (store.putString(kPasswordKey, password) == strlen(password));
+    store.end();
 
-    if(!Stored) { return E_NOT_OK; }
+    if(!stored) { return kENotOk; }
 
-    startNetwork();
-    return E_OK;
+    StartNetwork();
+    return kEOk;
 } /* setNetworkCredentials */
 
 
@@ -261,20 +261,20 @@ StdReturnType System::setNetworkCredentials(const char* Ssid, const char* Passwo
  *                  middle of a command lands inside that command\'s answer - which is how
  *                  this was found. The application says what happened instead.
 ******************************************************************************************************************************************************/
-void System::startNetwork()
+void System::StartNetwork()
 {
-    char Ssid[SsidStringLength]{};
-    char Password[PasswordStringLength]{};
+    char ssid[kSsidStringLength]{};
+    char password[kPasswordStringLength]{};
 
-    if(getNetworkSsid(Ssid) == E_NOT_OK) {
+    if(GetNetworkSsid(ssid) == kENotOk) {
         WiFi.mode(WIFI_AP);
         WiFi.softAP(SYSTEM_ACCESS_POINT_SSID);
         return;
     }
 
     /* The stored pass phrase, or the compiled-in one when the name came from there. */
-    if(readStoredString(PasswordKey, Password, PasswordStringLength) == E_NOT_OK) {
-        copyIfItFits(WORDCLOCK_WIFI_PASSWORD, Password, PasswordStringLength);
+    if(ReadStoredString(kPasswordKey, password, kPasswordStringLength) == kENotOk) {
+        CopyIfItFits(WORDCLOCK_WIFI_PASSWORD, password, kPasswordStringLength);
     }
 
     WiFi.mode(WIFI_STA);
@@ -282,7 +282,7 @@ void System::startNetwork()
        time source with it for good. */
     WiFi.setAutoReconnect(true);
     WiFi.setSleep(WORDCLOCK_WIFI_MODEM_SLEEP);
-    WiFi.begin(Ssid, Password);
+    WiFi.begin(ssid, password);
 } /* startNetwork */
 
 
@@ -295,9 +295,9 @@ void System::startNetwork()
  *                  flushed first: the UART writes in the background, and a controller that
  *                  restarts with bytes still in that buffer cuts its own answer in half.
 ******************************************************************************************************************************************************/
-void System::performPendingRestart()
+void System::PerformPendingRestart()
 {
-    if(!RestartPending) { return; }
+    if(!restart_pending_) { return; }
 
     Serial.flush();
     ESP.restart();
@@ -315,12 +315,12 @@ void System::performPendingRestart()
  *
  *  \return         E_OK if there is a network to ask over
 ******************************************************************************************************************************************************/
-StdReturnType System::resynchroniseTime()
+StdReturnType System::ResynchroniseTime()
 {
-    if(!isNetworkJoined()) { return E_NOT_OK; }
+    if(!IsNetworkJoined()) { return kENotOk; }
 
     configTzTime(WORDCLOCK_TIMEZONE, WORDCLOCK_NTP_SERVER_PRIMARY, WORDCLOCK_NTP_SERVER_SECONDARY);
-    return E_OK;
+    return kEOk;
 } /* resynchroniseTime */
 
 
@@ -334,15 +334,15 @@ StdReturnType System::resynchroniseTime()
  *
  *  \return         E_OK if the attempt was started
 ******************************************************************************************************************************************************/
-StdReturnType System::reconnectNetwork()
+StdReturnType System::ReconnectNetwork()
 {
     /* An unset SSID is a configuration that was never filled in, the same test the
        application makes before it joins at all. */
-    if(sizeof(WORDCLOCK_WIFI_SSID) <= 1u) { return E_NOT_OK; }
+    if(sizeof(WORDCLOCK_WIFI_SSID) <= 1u) { return kENotOk; }
 
-    if(!WiFi.reconnect()) { return E_NOT_OK; }
+    if(!WiFi.reconnect()) { return kENotOk; }
 
-    return E_OK;
+    return kEOk;
 } /* reconnectNetwork */
 
 /******************************************************************************************************************************************************
@@ -360,52 +360,52 @@ StdReturnType System::reconnectNetwork()
  *                  that could fall behind is not worth having - and a password changed by
  *                  command takes effect on the next request rather than on the next restart.
 ******************************************************************************************************************************************************/
-bool System::isConsoleProtected() const
+bool System::IsConsoleProtected() const
 {
-    char Password[PasswordStringLength]{};
+    char password[kPasswordStringLength]{};
 
-    return readStoredString(ConsolePasswordKey, Password, PasswordStringLength) == E_OK;
+    return ReadStoredString(kConsolePasswordKey, password, kPasswordStringLength) == kEOk;
 }
 
 
-bool System::isConsoleCredentialValid(const char* Credential) const
+bool System::IsConsoleCredentialValid(const char* credential) const
 {
-    if(Credential == nullptr) { return false; }
+    if(credential == nullptr) { return false; }
 
-    char Password[PasswordStringLength]{};
-    if(readStoredString(ConsolePasswordKey, Password, PasswordStringLength) == E_NOT_OK) { return true; }
+    char password[kPasswordStringLength]{};
+    if(ReadStoredString(kConsolePasswordKey, password, kPasswordStringLength) == kENotOk) { return true; }
 
-    char Expected[PasswordStringLength + sizeof(ConsoleUserName) + 1u]{};
-    const int Length = snprintf(Expected, sizeof(Expected), "%s:%s", ConsoleUserName, Password);
-    if(Length <= 0) { return false; }
+    char expected[kPasswordStringLength + sizeof(kConsoleUserName) + 1u]{};
+    const int length = snprintf(expected, sizeof(expected), "%s:%s", kConsoleUserName, password);
+    if(length <= 0) { return false; }
 
-    char Encoded[(sizeof(Expected) + 2u) / 3u * 4u + 1u]{};
-    toBase64(Expected, static_cast<size_t>(Length), Encoded, sizeof(Encoded));
+    char encoded[(sizeof(expected) + 2u) / 3u * 4u + 1u]{};
+    ToBase64(expected, static_cast<size_t>(length), encoded, sizeof(encoded));
 
     /* Same length first, then the whole of it: strncmp on the shorter of two strings would
        accept a prefix, which for a password is the one comparison that must not be lenient. */
-    if(strlen(Credential) != strlen(Encoded)) { return false; }
+    if(strlen(credential) != strlen(encoded)) { return false; }
 
-    return strcmp(Credential, Encoded) == 0;
+    return strcmp(credential, encoded) == 0;
 }
 
 
-StdReturnType System::setConsolePassword(const char* Password)
+StdReturnType System::SetConsolePassword(const char* password)
 {
-    if(Password == nullptr) { return E_NOT_OK; }
-    if(strlen(Password) >= PasswordStringLength) { return E_NOT_OK; }
+    if(password == nullptr) { return kENotOk; }
+    if(strlen(password) >= kPasswordStringLength) { return kENotOk; }
 
-    Preferences Store;
-    if(!Store.begin(NetworkNamespace, false)) { return E_NOT_OK; }
+    Preferences store;
+    if(!store.begin(kNetworkNamespace, false)) { return kENotOk; }
 
     /* An empty password removes the key rather than storing nothing under it, so that
        isConsoleProtected() has one state to recognise instead of two. */
-    const bool Stored = (Password[0u] == STD_NULL_CHARACTER)
-                      ? Store.remove(ConsolePasswordKey)
-                      : (Store.putString(ConsolePasswordKey, Password) == strlen(Password));
-    Store.end();
+    const bool stored = (password[0u] == STD_NULL_CHARACTER)
+                      ? store.remove(kConsolePasswordKey)
+                      : (store.putString(kConsolePasswordKey, password) == strlen(password));
+    store.end();
 
-    return Stored ? E_OK : E_NOT_OK;
+    return stored ? kEOk : kENotOk;
 } /* setConsolePassword */
 // NOLINTEND(readability-convert-member-functions-to-static, readability-make-member-function-const)
 

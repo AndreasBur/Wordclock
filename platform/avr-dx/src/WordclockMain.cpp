@@ -52,11 +52,11 @@
  *                  keeps both inside singletons of its own with no defined init(), and each
  *                  driver sets itself up from its first task.
 ******************************************************************************************************************************************************/
-void WordclockMain::init()
+void WordclockMain::Init()
 {
-    PowerSwitch::getInstance().init();
-    Display::getInstance().init();
-    Persistence::getInstance().load();
+    PowerSwitch::GetInstance().Init();
+    Display::GetInstance().Init();
+    Persistence::GetInstance().Load();
 } /* init */
 // NOLINTEND(readability-convert-member-functions-to-static)
 
@@ -69,10 +69,10 @@ void WordclockMain::init()
  *                  pass sees one and the same time rather than one that changes half way
  *                  through it.
 ******************************************************************************************************************************************************/
-void WordclockMain::task()
+void WordclockMain::Task()
 {
-    RealTimeClock::getInstance().task();
-    wcScheduler.task();
+    RealTimeClock::GetInstance().Task();
+    wc_scheduler_.Task();
 } /* task */
 
 /******************************************************************************************************************************************************

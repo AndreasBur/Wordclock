@@ -61,37 +61,37 @@ class Twi
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    bool Initialised{false};
+    bool initialised_{false};
 
     Twi() { }
     ~Twi() { }
 
-    static StdReturnType waitForWrite();
-    static StdReturnType waitForRead();
-    static void stop();
+    static StdReturnType WaitForWrite();
+    static StdReturnType WaitForRead();
+    static void Stop();
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    static Twi& getInstance() {
-        static Twi SingletonInstance;
-        return SingletonInstance;
+    static Twi& GetInstance() {
+        static Twi singleton_instance;
+        return singleton_instance;
     }
 
-    void init();
+    void Init();
 
     /* Both address the device in seven-bit form, as it is printed in the data sheets; the
        read/write bit is added here. */
-    StdReturnType write(byte Address, const byte* Data, byte Length);
-    StdReturnType read(byte Address, byte* Data, byte Length);
+    StdReturnType Write(byte address, const byte* data, byte length);
+    StdReturnType Read(byte address, byte* data, byte length);
 
     /* One register write, the shape every configuration command on this bus takes. */
-    StdReturnType writeRegister(byte Address, byte Register, byte Value);
+    StdReturnType WriteRegister(byte address, byte register_address, byte value);
 
     /* Points the device at a register and reads from there, which is how both chips are
        read. */
-    StdReturnType readRegister(byte Address, byte Register, byte* Data, byte Length);
+    StdReturnType ReadRegister(byte address, byte register_address, byte* data, byte length);
 };
 
 #endif // _TWI_H_

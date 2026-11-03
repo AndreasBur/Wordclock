@@ -58,113 +58,113 @@ class MsgCmdAnimationParser : public MsgParameterParser<MsgCmdAnimationParser, M
 ******************************************************************************************************************************************************/
   private:
     friend class MsgParameterParser;
-    AnimationIdType AnimationId{Animations::ANIMATION_ID_NONE};
-    ModeType Mode{Animations::MODE_FIXED};
-    byte Speed{0u};
-    bool Favourite{true};
+    AnimationIdType animation_id_{Animations::kAnimationIdNone};
+    ModeType mode_{Animations::kModeFixed};
+    byte speed_{0u};
+    bool favourite_{true};
 
     /* Which options the message actually carried. The values above are preloaded with
        the current settings so a message may set single options, but writing all of them
        back would do harm: -F and -S address whatever -A points at, so a preloaded value
        would land on the newly selected animation instead of the one it was read from.
        A message without options also has to stay a pure query. */
-    bool AnimationGiven{false};
-    bool ModeGiven{false};
-    bool SpeedGiven{false};
-    bool FavouriteGiven{false};
+    bool animation_given_{false};
+    bool mode_given_{false};
+    bool speed_given_{false};
+    bool favourite_given_{false};
 
-    static constexpr char AnimationOptionShortName{'A'};
-    static constexpr char ModeOptionShortName{'M'};
-    static constexpr char SpeedOptionShortName{'S'};
-    static constexpr char FavouriteOptionShortName{'F'};
+    static constexpr char kAnimationOptionShortName{'A'};
+    static constexpr char kModeOptionShortName{'M'};
+    static constexpr char kSpeedOptionShortName{'S'};
+    static constexpr char kFavouriteOptionShortName{'F'};
 
-    static constexpr ParameterTableType ParameterTable PROGMEM {
-        ParameterTableElementType(AnimationOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8),
-        ParameterTableElementType(ModeOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8),
-        ParameterTableElementType(SpeedOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8),
-        ParameterTableElementType(FavouriteOptionShortName, MsgParameter::ARGUMENT_TYPE_UINT8)
+    static constexpr ParameterTableType kParameterTable PROGMEM {
+        ParameterTableElementType(kAnimationOptionShortName, MsgParameter::kArgumentTypeUint8),
+        ParameterTableElementType(kModeOptionShortName, MsgParameter::kArgumentTypeUint8),
+        ParameterTableElementType(kSpeedOptionShortName, MsgParameter::kArgumentTypeUint8),
+        ParameterTableElementType(kFavouriteOptionShortName, MsgParameter::kArgumentTypeUint8)
     };
 
     // functions
-    static void handleParameter(char ParameterShortName, const char* Argument, PositionType Length) { UNUSED(ParameterShortName); UNUSED(Argument); UNUSED(Length); }
-    void handleParameter(char ParameterShortName, byte Argument)
+    static void HandleParameter(char parameter_short_name, const char* argument, PositionType length) { UNUSED(parameter_short_name); UNUSED(argument); UNUSED(length); }
+    void HandleParameter(char parameter_short_name, byte argument)
     {
-        if(ParameterShortName == AnimationOptionShortName) {
-            AnimationId = static_cast<Animations::AnimationIdType>(Argument);
-            AnimationGiven = true;
+        if(parameter_short_name == kAnimationOptionShortName) {
+            animation_id_ = static_cast<Animations::AnimationIdType>(argument);
+            animation_given_ = true;
         }
-        if(ParameterShortName == ModeOptionShortName) {
-            Mode = static_cast<Animations::ModeType>(Argument);
-            ModeGiven = true;
+        if(parameter_short_name == kModeOptionShortName) {
+            mode_ = static_cast<Animations::ModeType>(argument);
+            mode_given_ = true;
         }
-        if(ParameterShortName == SpeedOptionShortName) {
-             Speed = Argument;
-             SpeedGiven = true;
+        if(parameter_short_name == kSpeedOptionShortName) {
+             speed_ = argument;
+             speed_given_ = true;
         }
-        if(ParameterShortName == FavouriteOptionShortName) {
-            Favourite = (Argument != 0u);
-            FavouriteGiven = true;
+        if(parameter_short_name == kFavouriteOptionShortName) {
+            favourite_ = (argument != 0u);
+            favourite_given_ = true;
         }
     }
 
-    static void sendAnswerAnimation(bool AppendSpace) {
-        sendAnswerParameter(AnimationOptionShortName, Animations::getInstance().getAnimation(), AppendSpace);
+    static void SendAnswerAnimation(bool append_space) {
+        SendAnswerParameter(kAnimationOptionShortName, Animations::GetInstance().GetAnimation(), append_space);
     }
 
-    static void sendAnswerMode(bool AppendSpace) {
-        sendAnswerParameter(ModeOptionShortName, Animations::getInstance().getMode(), AppendSpace);
+    static void SendAnswerMode(bool append_space) {
+        SendAnswerParameter(kModeOptionShortName, Animations::GetInstance().GetMode(), append_space);
     }
 
-    static void sendAnswerSpeed(bool AppendSpace) {
-        AnimationIdType animation = Animations::getInstance().getAnimation();
-        byte taskCycle = Animations::getInstance().getTaskCycle(animation);
-        sendAnswerParameter(SpeedOptionShortName, Scheduler::convertTaskCycleToSpeed(taskCycle), AppendSpace);
+    static void SendAnswerSpeed(bool append_space) {
+        AnimationIdType animation = Animations::GetInstance().GetAnimation();
+        byte task_cycle = Animations::GetInstance().GetTaskCycle(animation);
+        SendAnswerParameter(kSpeedOptionShortName, Scheduler::ConvertTaskCycleToSpeed(task_cycle), append_space);
     }
 
-    void setAnimation() const
+    void SetAnimation() const
     {
-        StdReturnType returnValue = Animations::getInstance().setAnimation(AnimationId);
-        Error.checkReturnValueAndSend(AnimationOptionShortName, returnValue, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNDS);
+        StdReturnType return_value = Animations::GetInstance().SetAnimation(animation_id_);
+        error_.CheckReturnValueAndSend(kAnimationOptionShortName, return_value, ErrorMessage::kErrorValueOutOfBounds);
     }
 
-    void setMode() const
+    void SetMode() const
     {
-        StdReturnType returnValue = Animations::getInstance().setMode(Mode);
-        Error.checkReturnValueAndSend(ModeOptionShortName, returnValue, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNDS);
+        StdReturnType return_value = Animations::GetInstance().SetMode(mode_);
+        error_.CheckReturnValueAndSend(kModeOptionShortName, return_value, ErrorMessage::kErrorValueOutOfBounds);
     }
 
-    static void sendAnswerFavourite(bool AppendSpace) {
+    static void SendAnswerFavourite(bool append_space) {
         /* the flag of the selected animation, not of the one a mode is running */
-        AnimationIdType animation = Animations::getInstance().getAnimation();
-        byte favourite = Animations::getInstance().isFavourite(animation) ? 1u : 0u;
-        sendAnswerParameter(FavouriteOptionShortName, favourite, AppendSpace);
+        AnimationIdType animation = Animations::GetInstance().GetAnimation();
+        byte favourite = Animations::GetInstance().IsFavourite(animation) ? 1u : 0u;
+        SendAnswerParameter(kFavouriteOptionShortName, favourite, append_space);
     }
 
-    void setFavourite() const
+    void SetFavourite() const
     {
-        StdReturnType returnValue = Animations::getInstance().setFavourite(AnimationId, Favourite);
-        Error.checkReturnValueAndSend(FavouriteOptionShortName, returnValue, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNDS);
+        StdReturnType return_value = Animations::GetInstance().SetFavourite(animation_id_, favourite_);
+        error_.CheckReturnValueAndSend(kFavouriteOptionShortName, return_value, ErrorMessage::kErrorValueOutOfBounds);
     }
 
-    void setClockTaskCycle() const
+    void SetClockTaskCycle() const
     {
-        StdReturnType returnValue = Animations::getInstance().setTaskCycle(AnimationId, Scheduler::convertSpeedToTaskCycle(Speed));
-        Error.checkReturnValueAndSend(SpeedOptionShortName, returnValue, ErrorMessage::ERROR_VALUE_OUT_OF_BOUNDS);
+        StdReturnType return_value = Animations::GetInstance().SetTaskCycle(animation_id_, Scheduler::ConvertSpeedToTaskCycle(speed_));
+        error_.CheckReturnValueAndSend(kSpeedOptionShortName, return_value, ErrorMessage::kErrorValueOutOfBounds);
     }
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    MsgCmdAnimationParser(const char* Parameter) : MsgParameterParser(ParameterTable, Parameter), AnimationId(), Mode(), Speed(0u), Favourite(true),
-        AnimationGiven(false), ModeGiven(false), SpeedGiven(false), FavouriteGiven(false)
+    MsgCmdAnimationParser(const char* parameter) : MsgParameterParser(kParameterTable, parameter), animation_id_(), mode_(), speed_(0u), favourite_(true),
+        animation_given_(false), mode_given_(false), speed_given_(false), favourite_given_(false)
     {
         /* preloaded with the current settings, so a command may set single options
            without resetting the others */
-        AnimationId = Animations::getInstance().getAnimation();
-        Mode = Animations::getInstance().getMode();
-        Speed = Scheduler::convertTaskCycleToSpeed(Animations::getInstance().getTaskCycle(AnimationId));
-        Favourite = Animations::getInstance().isFavourite(AnimationId);
+        animation_id_ = Animations::GetInstance().GetAnimation();
+        mode_ = Animations::GetInstance().GetMode();
+        speed_ = Scheduler::ConvertTaskCycleToSpeed(Animations::GetInstance().GetTaskCycle(animation_id_));
+        favourite_ = Animations::GetInstance().IsFavourite(animation_id_);
     }
 
     ~MsgCmdAnimationParser() { }
@@ -174,21 +174,21 @@ class MsgCmdAnimationParser : public MsgParameterParser<MsgCmdAnimationParser, M
     // set methods
 
     // methods
-    static void sendAnswer()
+    static void SendAnswer()
     {
-        sendAnswerAnimation(true);
-        sendAnswerMode(true);
-        sendAnswerFavourite(true);
-        sendAnswerSpeed(false);
+        SendAnswerAnimation(true);
+        SendAnswerMode(true);
+        SendAnswerFavourite(true);
+        SendAnswerSpeed(false);
     }
 
-    void process() const
+    void Process() const
     {
         /* the animation first, since -F and -S address the one it selects */
-        if(AnimationGiven) { setAnimation(); }
-        if(ModeGiven) { setMode(); }
-        if(FavouriteGiven) { setFavourite(); }
-        if(SpeedGiven) { setClockTaskCycle(); }
+        if(animation_given_) { SetAnimation(); }
+        if(mode_given_) { SetMode(); }
+        if(favourite_given_) { SetFavourite(); }
+        if(speed_given_) { SetClockTaskCycle(); }
     }
 };
 

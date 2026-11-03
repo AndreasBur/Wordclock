@@ -68,50 +68,50 @@ class WS2812Pio
        datasheet's nominal values, not the 300/900 the vendor examples use. Those also
        work, but they spend the whole tolerance on one side, and it is the far end of a
        long strip with a slow edge that eats into what is left. */
-    static constexpr uint32_t Phase1Cycles{8u};
-    static constexpr uint32_t Phase2Cycles{8u};
-    static constexpr uint32_t Phase3Cycles{9u};
-    static constexpr uint32_t CyclesPerBit{Phase1Cycles + Phase2Cycles + Phase3Cycles};
+    static constexpr uint32_t kPhase1Cycles{8u};
+    static constexpr uint32_t kPhase2Cycles{8u};
+    static constexpr uint32_t kPhase3Cycles{9u};
+    static constexpr uint32_t kCyclesPerBit{kPhase1Cycles + kPhase2Cycles + kPhase3Cycles};
 
     /* 50 ns a cycle, which makes all three phases whole numbers and keeps every delay
        inside the four bits an instruction has for it once one bit is spent on side-set. */
-    static constexpr uint32_t StateMachineClockHz{20u * 1000u * 1000u};
+    static constexpr uint32_t kStateMachineClockHz{20u * 1000u * 1000u};
 
-    static constexpr uint32_t BitsPerPixel{24u};
+    static constexpr uint32_t kBitsPerPixel{24u};
 
-    static_assert(CyclesPerBit * (1000000000u / StateMachineClockHz) == 1250u,
+    static_assert(kCyclesPerBit * (1000000000u / kStateMachineClockHz) == 1250u,
                   "WS2812Pio: the three phases do not add up to the WS2812's 1.25 us bit period");
-    static_assert((Phase1Cycles <= 16u) && (Phase2Cycles <= 16u) && (Phase3Cycles <= 16u),
+    static_assert((kPhase1Cycles <= 16u) && (kPhase2Cycles <= 16u) && (kPhase3Cycles <= 16u),
                   "WS2812Pio: a delay of more than 16 cycles does not fit an instruction's four delay bits");
 
-    bool IsReady{false};
-    int DmaChannel{-1};
+    bool is_ready_{false};
+    int dma_channel_{-1};
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    static WS2812Pio& getInstance() {
-        static WS2812Pio SingletonInstance;
-        return SingletonInstance;
+    static WS2812Pio& GetInstance() {
+        static WS2812Pio singleton_instance;
+        return singleton_instance;
     }
 
     /* Claims the state machine and a DMA channel for the strip's data pin. Reports and
        gives up rather than retrying: the contract's init() returns nothing, and a clock
        whose console still answers is more useful for finding a miswired pin than one that
        reboots. */
-    void init(uint8_t Pin);
+    void Init(uint8_t pin);
 
-    bool isReady() const { return IsReady; }
+    bool IsReady() const { return is_ready_; }
 
     /* True while DMA is still fetching the previous frame. The caller has to check this
        before handing over the next one - two frames back to back would lose the low gap
        the strip latches on. */
-    bool isBusy() const;
+    bool IsBusy() const;
 
     /* Hands one frame to DMA and returns. The buffer has to outlive the transfer, which
        is why Pixels keeps a frame of its own rather than passing its pixel buffer. */
-    StdReturnType transmit(const WordType* Frame, size_t Count);
+    StdReturnType Transmit(const WordType* frame, size_t count);
 };
 
 #endif // _WS2812_PIO_H_

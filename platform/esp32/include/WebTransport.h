@@ -49,13 +49,13 @@
 class WebResponseBody
 {
   private:
-    struct httpd_req* Request;
+    struct httpd_req* request_;
 
   public:
-    WebResponseBody(struct httpd_req* sRequest, const char* ContentType);
+    WebResponseBody(struct httpd_req* request, const char* content_type);
 
-    void write(const char* Data, size_t Length);
-    void finish();
+    void Write(const char* data, size_t length);
+    void Finish();
 };
 
 /******************************************************************************************************************************************************
@@ -67,12 +67,12 @@ class WebResponseBody
 class WebTransport
 {
   public:
-    static WebTransport& getInstance();
+    static WebTransport& GetInstance();
 
-    bool isListening() const;
-    bool hasClients() const;
-    void sendText(const char* Text, size_t Length);
-    void sendBinary(const byte* Bytes, size_t Length);
+    bool IsListening() const;
+    bool HasClients() const;
+    void SendText(const char* text, size_t length);
+    void SendBinary(const byte* bytes, size_t length);
 };
 
 #endif // _WEB_TRANSPORT_H_

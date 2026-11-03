@@ -64,47 +64,47 @@ class AnimationRoll : public Animation
 ******************************************************************************************************************************************************/
   public:
     enum DirectionType {
-        DIRECTION_RIGHT,
-        DIRECTION_LEFT,
-        DIRECTION_DOWN,
-        DIRECTION_UP,
-        DIRECTION_NUMBER_OF_DIRECTIONS
+        kDirectionRight,
+        kDirectionLeft,
+        kDirectionDown,
+        kDirectionUp,
+        kDirectionNumberOfDirections
     };
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    Transformation wcTransformation;
-    ClockWords::WordsListType ClockWordsTable{{DisplayWords::WORD_NONE}};
-    byte Step{0u};
-    DirectionType Direction{DIRECTION_RIGHT};
+    Transformation wc_transformation_;
+    ClockWords::WordsListType clock_words_table_{{DisplayWords::kWordNone}};
+    byte step_{0u};
+    DirectionType direction_{kDirectionRight};
 
     // functions
-    void reset();
-    void setTimeTask();
-    void rollHorizontal();
-    void rollVertical();
-    byte numberOfSteps() const;
-    static DirectionType calcDirection(byte, byte);
+    void Reset();
+    void SetTimeTask();
+    void RollHorizontal();
+    void RollVertical();
+    byte NumberOfSteps() const;
+    static DirectionType CalcDirection(byte, byte);
 
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr AnimationRoll() : wcTransformation() { }
+    constexpr AnimationRoll() : wc_transformation_() { }
     ~AnimationRoll() { }
 
     // get methods
-    DirectionType getDirection() const { return Direction; }
+    DirectionType GetDirection() const { return direction_; }
 
     // set methods
 
 
     // methods
-    void init();
-    StdReturnType setTime(byte, byte);
-    void task();
+    void Init();
+    StdReturnType SetTime(byte, byte);
+    void Task();
 };
 
 

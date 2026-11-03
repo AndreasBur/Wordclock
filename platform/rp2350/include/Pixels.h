@@ -71,27 +71,27 @@ class Pixels
   private:
     /* Zero-initialised, so the strip starts dark rather than at whatever the memory
        held - the first render then puts a defined frame on the wire. */
-    PixelType PixelBuffer[PIXELS_DISPLAY_NUMBER_OF_ROWS][PIXELS_DISPLAY_NUMBER_OF_COLUMNS]{};
-    byte Pin{0};
-    byte Brightness{255};
+    PixelType pixel_buffer_[PIXELS_DISPLAY_NUMBER_OF_ROWS][PIXELS_DISPLAY_NUMBER_OF_COLUMNS]{};
+    byte pin_{0};
+    byte brightness_{255};
     /* Whether the firmware touched buffer or brightness since the last render. Same
        flag as the simulator's, and it earns its keep twice here: it saves the pass over
        all 110 cells on the ticks where nothing happened, and it is what makes render()
        the only place that transmits - see the reset-gap note in the source. Starts true
        so the first render establishes the strip's state. */
-    bool Dirty{true};
+    bool dirty_{true};
     /* Whether anything may go out on the wire at all. Not the same as a brightness of zero,
        which still transmits a frame of black pixels: this is for the state in which the strip
        has no supply, and a frame arriving then pushes current into a dead rail through the
        LED's own protection diode. */
-    bool OutputSuspended{false};
+    bool output_suspended_{false};
 
     // functions
-    static constexpr byte toRow(byte Index) { return Index / PIXELS_DISPLAY_NUMBER_OF_COLUMNS; }
-    static constexpr byte toColumn(byte Index) { return Index % PIXELS_DISPLAY_NUMBER_OF_COLUMNS; }
+    static constexpr byte ToRow(byte index) { return index / PIXELS_DISPLAY_NUMBER_OF_COLUMNS; }
+    static constexpr byte ToColumn(byte index) { return index % PIXELS_DISPLAY_NUMBER_OF_COLUMNS; }
 
-    StdReturnType transmitFrame();
-    void fillFrameBuffer() const;
+    StdReturnType TransmitFrame();
+    void FillFrameBuffer() const;
 
     Pixels() { }
     ~Pixels() { }
@@ -100,9 +100,9 @@ class Pixels
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    static Pixels& getInstance() {
-        static Pixels SingletonInstance;
-        return SingletonInstance;
+    static Pixels& GetInstance() {
+        static Pixels singleton_instance;
+        return singleton_instance;
     }
 
     // get methods
@@ -110,56 +110,56 @@ class Pixels
        answers whether the index is on the strip, the one taking none answers the pixel and
        leaves an unlit one where the index is not. Both check. Writers have a single form,
        which answers, and a caller that has nothing to do with the answer ignores it. */
-    byte getBrightness() const { return Brightness; }
-    StdReturnType getPixel(byte, PixelType&) const;
-    PixelType getPixel(byte) const;
-    StdReturnType getOutputPixel(byte Index, PixelType& Pixel) const {
-        if(getPixel(Index, Pixel) == E_NOT_OK) { return E_NOT_OK; }
+    byte GetBrightness() const { return brightness_; }
+    StdReturnType GetPixel(byte, PixelType&) const;
+    PixelType GetPixel(byte) const;
+    StdReturnType GetOutputPixel(byte index, PixelType& pixel) const {
+        if(GetPixel(index, pixel) == kENotOk) { return kENotOk; }
 
-        Pixel.dimmPixel(Brightness);
-        return E_OK;
+        pixel.DimmPixel(brightness_);
+        return kEOk;
     }
-    PixelType getOutputPixel(byte Index) const {
-        PixelType Pixel = getPixel(Index);
-        Pixel.dimmPixel(Brightness);
-        return Pixel;
+    PixelType GetOutputPixel(byte index) const {
+        PixelType pixel = GetPixel(index);
+        pixel.DimmPixel(brightness_);
+        return pixel;
     }
 
     // set methods
-    void setPixels(PixelType);
-    void setBrightness(byte, bool = false);
-    StdReturnType setPixel(byte, PixelType);
-    StdReturnType setPixel(byte, byte, byte, byte);
-    StdReturnType clearPixel(byte Index) { return setPixel(Index, 0, 0, 0); }
+    void SetPixels(PixelType);
+    void SetBrightness(byte, bool = false);
+    StdReturnType SetPixel(byte, PixelType);
+    StdReturnType SetPixel(byte, byte, byte, byte);
+    StdReturnType ClearPixel(byte index) { return SetPixel(index, 0, 0, 0); }
 
     // methods
-    static constexpr bool isIndexValid(IndexType Index) { return Index < PIXELS_NUMBER_OF_PIXELS; }
-    void init(byte sPin);
-    void enablePixels() { setBrightness(255); }
-    void disablePixels() { setBrightness(0); }
-    void clearPixels() { setPixels(PixelType(0u, 0u, 0u)); }
+    static constexpr bool IsIndexValid(IndexType index) { return index < PIXELS_NUMBER_OF_PIXELS; }
+    void Init(byte pin);
+    void EnablePixels() { SetBrightness(255); }
+    void DisablePixels() { SetBrightness(0); }
+    void ClearPixels() { SetPixels(PixelType(0u, 0u, 0u)); }
     /* Only asks for a render, exactly as on the simulator. What reaches the strip is
        decided by render() on the next tick; see the source for why the transmission
        must not happen from here. */
-    StdReturnType show() {
-        Dirty = true;
-        return E_OK;
+    StdReturnType Show() {
+        dirty_ = true;
+        return kEOk;
     }
 
     // render interface, for the application's tick
-    bool isDirty() const { return Dirty; }
-    StdReturnType render();
+    bool IsDirty() const { return dirty_; }
+    StdReturnType Render();
 
     // output gate, for the supply switch
     /* Whether the last frame is still going out. Asked before the supply is cut: DMA reads the
        frame buffer long after the call that started it returned, so a port dropped on that
        tick lands in the middle of a frame. */
-    bool isFrameOnTheWire() const;
-    bool isOutputSuspended() const { return OutputSuspended; }
-    void suspendOutput() { OutputSuspended = true; }
+    bool IsFrameOnTheWire() const;
+    bool IsOutputSuspended() const { return output_suspended_; }
+    void SuspendOutput() { output_suspended_ = true; }
     /* Marks the buffer, because the LEDs lose their registers along with their supply: what
        was up there is gone, so coming back is a redraw rather than a resume. */
-    void resumeOutput() { OutputSuspended = false; Dirty = true; }
+    void ResumeOutput() { output_suspended_ = false; dirty_ = true; }
 };
 
 #endif // _PIXELS_H_
