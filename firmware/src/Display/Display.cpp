@@ -21,6 +21,7 @@
  * INCLUDES
 ******************************************************************************************************************************************************/
 #include "Display.h"
+#include "Bit.h"
 
 /******************************************************************************************************************************************************
  *  LOCAL CONSTANT MACROS
@@ -434,7 +435,7 @@ StdReturnType Display::GetPixelRow(byte row, PixelRowType& pixel_row) const
 
     for(byte column = 0; column < DISPLAY_NUMBER_OF_COLUMNS; column++) {
         if(GetPixel(column, row, pixel_value) == kEOk) {
-            WRITE_BIT(pixel_row, column, pixel_value);
+            pixel_row = Bit<PixelRowType>::WriteBit(pixel_row, column, pixel_value);
         } else {
             return_value = kENotOk;
         }
@@ -448,12 +449,12 @@ StdReturnType Display::GetPixelRow(byte row, PixelRowType& pixel_row) const
 ******************************************************************************************************************************************************/
 Display::PixelRowType Display::GetPixelRow(byte row)  const
 {
-    PixelRowType pixel_row{0};
+    Bit<PixelRowType> pixel_row;
 
     for(byte column = 0; column < DISPLAY_NUMBER_OF_COLUMNS; column++) {
-        WRITE_BIT(pixel_row, column, GetPixel(column, row));
+        pixel_row[column] = GetPixel(column, row);
     }
-    return pixel_row;
+    return pixel_row.GetValue();
 } /* GetPixelRow */
 
 
@@ -467,7 +468,7 @@ StdReturnType Display::GetPixelColumn(byte column, PixelRowType& pixel_column)  
 
     for(byte row = 0; row < DISPLAY_NUMBER_OF_ROWS; row++) {
         if(GetPixel(column, row, pixel_value) == kEOk) {
-            WRITE_BIT(pixel_column, row, pixel_value);
+            pixel_column = Bit<PixelRowType>::WriteBit(pixel_column, row, pixel_value);
         } else {
             return_value = kENotOk;
         }
@@ -481,12 +482,12 @@ StdReturnType Display::GetPixelColumn(byte column, PixelRowType& pixel_column)  
 ******************************************************************************************************************************************************/
 Display::PixelColumnType Display::GetPixelColumn(byte column)  const
 {
-    Display::PixelColumnType pixel_column{0};
+    Bit<PixelColumnType> pixel_column;
 
     for(byte row = 0; row < DISPLAY_NUMBER_OF_ROWS; row++) {
-        WRITE_BIT(pixel_column, row, GetPixel(column, row));
+        pixel_column[row] = GetPixel(column, row);
     }
-    return pixel_column;
+    return pixel_column.GetValue();
 } /* GetPixelColumn */
 
 
@@ -498,7 +499,7 @@ StdReturnType Display::SetPixelRow(byte row, PixelRowType pixel_row)
     StdReturnType return_value{kEOk};
 
     for(byte column = 0; column < DISPLAY_NUMBER_OF_COLUMNS; column++) {
-        if(WritePixel(column, row, READ_BIT(pixel_row, column)) == kENotOk) return_value = kENotOk;
+        if(WritePixel(column, row, Bit<PixelRowType>::ReadBit(pixel_row, column)) == kENotOk) return_value = kENotOk;
     }
     return return_value;
 } /* SetPixelRow */
@@ -511,7 +512,7 @@ StdReturnType Display::SetPixelColumn(byte column, PixelRowType pixel_column)
 {
     StdReturnType return_value{kEOk};
     for(byte row = 0; row < DISPLAY_NUMBER_OF_ROWS; row++) {
-        if(WritePixel(column, row, READ_BIT(pixel_column, row)) == kENotOk) return_value = kENotOk;
+        if(WritePixel(column, row, Bit<PixelRowType>::ReadBit(pixel_column, row)) == kENotOk) return_value = kENotOk;
     }
     return return_value;
 } /* SetPixelColumn */
@@ -572,7 +573,7 @@ byte Display::TransformToSerpentine(byte column, byte row)
 {
     byte index;
 
-    if(IS_BIT_CLEARED(row, 0)) index = (row * DISPLAY_NUMBER_OF_COLUMNS) + column;
+    if(!Bit<byte>::ReadBit(row, 0u)) index = (row * DISPLAY_NUMBER_OF_COLUMNS) + column;
     else index = (row * DISPLAY_NUMBER_OF_COLUMNS) + (DISPLAY_NUMBER_OF_COLUMNS - column - 1);
 
     return index;

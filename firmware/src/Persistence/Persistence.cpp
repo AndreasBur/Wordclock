@@ -29,6 +29,7 @@
 #include "NightSwitch.h"
 #include "Overlays.h"
 #include "Storage.h"
+#include "Bit.h"
 
 #include <string.h>
 
@@ -284,7 +285,7 @@ SettingsType Gather()
 
         settings.animation_task_cycles[index] = animations.GetTaskCycle(animation_id);
         if(animations.IsFavourite(animation_id)) {
-            settings.animation_favourites = static_cast<uint16_t>(settings.animation_favourites | (1u << index));
+            settings.animation_favourites = Bit<uint16_t>::SetBit(settings.animation_favourites, index);
         }
     }
 
@@ -327,7 +328,7 @@ void Apply(const SettingsType& settings)
 
     for(byte index = 0u; index < Animations::kAnimationIdNumberOfAnimations; index++) {
         const Animations::AnimationIdType animation_id = static_cast<Animations::AnimationIdType>(index);
-        const bool is_favourite = (settings.animation_favourites & static_cast<uint16_t>(1u << index)) != 0u;
+        const bool is_favourite = Bit<uint16_t>::ReadBit(settings.animation_favourites, index);
 
         animations.SetFavourite(animation_id, is_favourite);
         animations.SetTaskCycle(animation_id, settings.animation_task_cycles[index]);

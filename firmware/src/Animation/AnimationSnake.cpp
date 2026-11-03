@@ -21,6 +21,7 @@
  * I N C L U D E S
 ******************************************************************************************************************************************************/
 #include "AnimationSnake.h"
+#include "Bit.h"
 
 
 /******************************************************************************************************************************************************
@@ -114,7 +115,7 @@ byte AnimationSnake::TransformToSerpentine(byte column, byte row)
 {
     byte index;
 
-    if(IS_BIT_CLEARED(row, 0u)) index = (row * DISPLAY_NUMBER_OF_COLUMNS) + column;
+    if(!Bit<byte>::ReadBit(row, 0u)) index = (row * DISPLAY_NUMBER_OF_COLUMNS) + column;
     else index = (row * DISPLAY_NUMBER_OF_COLUMNS) + (DISPLAY_NUMBER_OF_COLUMNS - column - 1u);
 
     return index;

@@ -21,6 +21,7 @@
  * I N C L U D E S
 ******************************************************************************************************************************************************/
 #include "Timer.h"
+#include "Bit.h"
 #include <avr/interrupt.h>
 #include <util/atomic.h>
 
@@ -65,10 +66,10 @@ StdReturnType Timer<TimerTraits>::Init(uint32_t microseconds, TimerIsrCallbackFV
 
         /* Away from the PORTA the route comes up on, before any channel can drive a pin: PA0 and
            PA2 belong to the strip. See the traits in Timer.h. */
-        WriteBitGroup(PORTMUX.TCAROUTEA, TimerTraits::kRouteMask, TimerTraits::kRouteGroup);
+        Bit<uint8_t>::WriteBitGroup(PORTMUX.TCAROUTEA, TimerTraits::kRouteMask, TimerTraits::kRouteGroup);
 
         /* dual-slope PWM, overflow interrupt at BOTTOM */
-        WriteBitGroup(GetTimer().CTRLB, TCA_SINGLE_WGMODE_gm, TCA_SINGLE_WGMODE_DSBOTTOM_gc);
+        Bit<uint8_t>::WriteBitGroup(GetTimer().CTRLB, TCA_SINGLE_WGMODE_gm, TCA_SINGLE_WGMODE_DSBOTTOM_gc);
 
         if(SetPeriod(microseconds) == kENotOk) return_value = kENotOk;
         if(timer_overflow_callback != nullptr) if(AttachInterrupt(timer_overflow_callback) == kENotOk) return_value = kENotOk;
@@ -238,7 +239,7 @@ StdReturnType Timer<TimerTraits>::AttachInterrupt(TimerIsrCallbackFVoid timer_ov
            while it was off would call the new callback at once. Only then: with the interrupt
            already on, a set flag is a real overflow about to be served. */
         if(!(GetTimer().INTCTRL & TCA_SINGLE_OVF_bm)) { GetTimer().INTFLAGS = TCA_SINGLE_OVF_bm; }
-        GetTimer().INTCTRL |= TCA_SINGLE_OVF_bm;
+        Bit<uint8_t>::SetBits(GetTimer().INTCTRL, TCA_SINGLE_OVF_bm);
     }
     return return_value;
 } /* AttachInterrupt */
@@ -250,7 +251,7 @@ StdReturnType Timer<TimerTraits>::AttachInterrupt(TimerIsrCallbackFVoid timer_ov
 template <typename TimerTraits>
 void Timer<TimerTraits>::DetachInterrupt()
 {
-    GetTimer().INTCTRL &= static_cast<uint8_t>(~TCA_SINGLE_OVF_bm);
+    Bit<uint8_t>::ClearBits(GetTimer().INTCTRL, TCA_SINGLE_OVF_bm);
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE) { timer_overflow_callback_ = nullptr; }
 } /* DetachInterrupt */
 
@@ -334,7 +335,7 @@ typename Timer<TimerTraits>::TimerCountDirection Timer<TimerTraits>::GetCounting
 template <typename TimerTraits>
 void Timer<TimerTraits>::SetClockSelect(TimerClockSelectType clock_select)
 {
-    WriteBitGroup(GetTimer().CTRLA, TCA_SINGLE_CLKSEL_gm, clock_select);
+    Bit<uint8_t>::WriteBitGroup(GetTimer().CTRLA, TCA_SINGLE_CLKSEL_gm, static_cast<uint8_t>(clock_select));
 } /* SetClockSelect */
 
 
@@ -347,8 +348,8 @@ void Timer<TimerTraits>::SetClockSelect(TimerClockSelectType clock_select)
 template <typename TimerTraits>
 void Timer<TimerTraits>::SetRunning(bool running)
 {
-    if(running) { GetTimer().CTRLA |= TCA_SINGLE_ENABLE_bm; }
-    else        { GetTimer().CTRLA &= static_cast<uint8_t>(~TCA_SINGLE_ENABLE_bm); }
+    if(running) { Bit<uint8_t>::SetBits(GetTimer().CTRLA, TCA_SINGLE_ENABLE_bm); }
+    else        { Bit<uint8_t>::ClearBits(GetTimer().CTRLA, TCA_SINGLE_ENABLE_bm); }
 } /* SetRunning */
 
 
@@ -400,7 +401,7 @@ StdReturnType Timer<TimerTraits>::EnablePwmChannel(TimerChannelType channel, uin
 
     if(kEOk == return_value) {
         TimerTraits::GetPort().DIRSET = ToPinMask(channel);
-        GetTimer().CTRLB |= ToChannelEnableMask(channel);
+        Bit<uint8_t>::SetBits(GetTimer().CTRLB, ToChannelEnableMask(channel));
     }
     return return_value;
 } /* EnablePwmChannel */
@@ -412,7 +413,7 @@ StdReturnType Timer<TimerTraits>::EnablePwmChannel(TimerChannelType channel, uin
 template <typename TimerTraits>
 StdReturnType Timer<TimerTraits>::DisablePwmChannel(TimerChannelType channel)
 {
-    GetTimer().CTRLB &= static_cast<uint8_t>(~ToChannelEnableMask(channel));
+    Bit<uint8_t>::ClearBits(GetTimer().CTRLB, ToChannelEnableMask(channel));
     /* the pin stays an output, it now shows its PORT.OUT value instead of the waveform */
     return kEOk;
 } /* DisablePwmChannel */

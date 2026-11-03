@@ -18,6 +18,7 @@
 ******************************************************************************************************************************************************/
 #include "Arduino.h"
 #include "BH1750.h"
+#include "Bit.h"
 #include "Twi.h"
 
 /******************************************************************************************************************************************************
@@ -75,9 +76,9 @@ StdReturnType BH1750::ChangeMeasurementTime(byte mt_reg_value)
     if(!IsMtRegValueInRange(mt_reg_value)) { return kENotOk; }
 
     const byte high_bits = static_cast<byte>(BH1750_CMD_CHANGE_MEASUREMENT_TIME_HIGH_BITS |
-                                            READ_BIT_GROUP(mt_reg_value, BH1750_MT_REG_VALUE_HIGH_BITS_GM, BH1750_MT_REG_VALUE_HIGH_BITS_GP));
+                                            Bit<byte>::ReadBitGroup(mt_reg_value, BH1750_MT_REG_VALUE_HIGH_BITS_GM, BH1750_MT_REG_VALUE_HIGH_BITS_GP));
     const byte low_bits = static_cast<byte>(BH1750_CMD_CHANGE_MEASUREMENT_TIME_LOW_BITS |
-                                           READ_BIT_GROUP(mt_reg_value, BH1750_MT_REG_VALUE_LOW_BITS_GM, BH1750_MT_REG_VALUE_LOW_BITS_GP));
+                                           Bit<byte>::ReadBitGroup(mt_reg_value, BH1750_MT_REG_VALUE_LOW_BITS_GM, BH1750_MT_REG_VALUE_LOW_BITS_GP));
 
     if(SendCommand(high_bits) == kENotOk) { return kENotOk; }
     if(SendCommand(low_bits) == kENotOk) { return kENotOk; }

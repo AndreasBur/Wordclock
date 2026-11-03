@@ -21,6 +21,7 @@
  * I N C L U D E S
 ******************************************************************************************************************************************************/
 #include "StandardTypes.h"
+#include "Bit.h"
 #include "Arduino.h"
 #include "DisplayCharacters.h"
 #include "Display.h"
@@ -53,7 +54,7 @@ class DisplayPixels
     using PixelColumnType = Display::PixelColumnType;
     using WordIdType = DisplayWords::WordIdType;
     using IndexType = Display::IndexType;
-    using PixelsBufferType = std::array<PixelColumnType, DISPLAY_NUMBER_OF_ROWS>;
+    using PixelsBufferType = std::array<Bit<PixelColumnType>, DISPLAY_NUMBER_OF_ROWS>;
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
@@ -66,14 +67,14 @@ class DisplayPixels
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    DisplayPixels() : pixels_buffer_{0u} {}
+    DisplayPixels() : pixels_buffer_{} {}
     ~DisplayPixels() {}
 
 	// get methods
-    boolean GetPixel(byte column, byte row) const { return ReadBit(pixels_buffer_[row], column); }
+    boolean GetPixel(byte column, byte row) const { return pixels_buffer_[row][column]; }
 
 	// set methods
-	void SetPixel(byte column, byte row) { pixels_buffer_[row] = WriteBit(pixels_buffer_[row], column, true); }
+	void SetPixel(byte column, byte row) { pixels_buffer_[row][column] = true; }
 	void SetPixel(IndexType index) {
 	    byte column, row;
 	    Display::IndexToColumnAndRow(index, column, row);
@@ -81,8 +82,8 @@ class DisplayPixels
     }
 
 	// methods
-	void ClearPixel(byte column, byte row) { pixels_buffer_[row] = WriteBit(pixels_buffer_[row], column, false); }
-	void WritePixel(byte column, byte row, bool value) { pixels_buffer_[row] = WriteBit(pixels_buffer_[row], column, value); }
+	void ClearPixel(byte column, byte row) { pixels_buffer_[row][column] = false; }
+	void WritePixel(byte column, byte row, bool value) { pixels_buffer_[row][column] = value; }
 
 	void SetWord(WordIdType word_id) {
         DisplayWord word = words_.GetDisplayWord(word_id);
@@ -102,7 +103,7 @@ class DisplayPixels
 	{
         for(byte column = 0u; column < DISPLAY_NUMBER_OF_COLUMNS; column++) {
             for(byte row = 0u; row < DISPLAY_NUMBER_OF_ROWS; row++) {
-                pixels_buffer_[row] = WriteBit(pixels_buffer_[row], column, Display::GetInstance().GetPixel(column, row));
+                pixels_buffer_[row][column] = Display::GetInstance().GetPixel(column, row);
             }
         }
 	}
