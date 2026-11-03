@@ -21,6 +21,7 @@
  * I N C L U D E S
 ******************************************************************************************************************************************************/
 #include "StandardTypes.h"
+#include "Bit.h"
 #include "Arduino.h"
 #include "Display.h"
 #include "Animation.h"
@@ -260,7 +261,7 @@ class Animations
     AnimationIdType current_animation_id_{kAnimationIdNone};
     ModeType mode_{kModeFixed};
     /* animations the selecting modes may pick, all of them until told otherwise */
-    uint16_t favourites_{kAllFavourites};
+    Bit<uint16_t> favourites_{kAllFavourites};
     uint16_t random_state_{0u};
     AnimationsType animations_raw_;
 
@@ -305,7 +306,7 @@ class Animations
     AnimationIdType GetCurrentAnimation() const { return current_animation_id_; }
     ModeType GetMode() const { return mode_; }
     bool IsFavourite(AnimationIdType animation_id) const {
-        return (favourites_ & static_cast<uint16_t>(1u << animation_id)) != 0u;
+        return favourites_[animation_id];
     }
 
     byte GetTaskCycle(AnimationIdType animation_id) const { return task_cycles_[animation_id]; }
@@ -324,8 +325,7 @@ class Animations
            with nothing to pick */
         if(!favourite && IsFavourite(animation_id) && NumberOfFavourites() <= 1u) { return kENotOk; }
 
-        if(favourite) { favourites_ |= static_cast<uint16_t>(1u << animation_id); }
-        else { favourites_ &= static_cast<uint16_t>(~(1u << animation_id)); }
+        favourites_[animation_id] = favourite;
         return kEOk;
     }
 
@@ -335,7 +335,7 @@ class Animations
        than by constructing a second instance, which a singleton cannot do. */
     void ResetToDefaults() {
         task_cycles_.fill(kTaskCycleInitValue);
-        favourites_ = kAllFavourites;
+        favourites_.SetValue(kAllFavourites);
         /* Both are valid by construction, so neither answer can say anything a caller of
            ResetToDefaults() could act on. */
         SetAnimation(kAnimationIdNone);

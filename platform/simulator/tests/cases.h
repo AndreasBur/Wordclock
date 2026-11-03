@@ -9,6 +9,10 @@
 
 
 /* display_test.cpp */
+void TestSingleBits();
+void TestBitGroups();
+void TestHeldBits();
+
 void TestColourDimmingAcrossByteRange();
 void TestGammaCorrectionCurve();
 void TestDisplayManagerLatch();

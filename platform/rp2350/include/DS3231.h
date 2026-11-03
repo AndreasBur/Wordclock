@@ -34,6 +34,7 @@
  * I N C L U D E S
 ******************************************************************************************************************************************************/
 #include "StandardTypes.h"
+#include "Bit.h"
 #include "Arduino.h"
 #include "ClockDateTime.h"
 
@@ -134,7 +135,7 @@ class DS3231
        and the assertions below do exactly that. */
     static constexpr TemperatureType ToTenths(int8_t degrees, byte fraction_register) {
         const TemperatureType quarters = static_cast<TemperatureType>(degrees * kQuartersPerDegree) +
-                                         READ_BIT_GROUP(fraction_register, DS3231_TEMPERATURE_FRACTION_GM, DS3231_TEMPERATURE_FRACTION_GP);
+                                         Bit<byte>::ReadBitGroup(fraction_register, DS3231_TEMPERATURE_FRACTION_GM, DS3231_TEMPERATURE_FRACTION_GP);
         return static_cast<TemperatureType>((quarters * kTenthsPerDegree) / kQuartersPerDegree);
     }
 

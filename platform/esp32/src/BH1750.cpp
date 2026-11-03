@@ -24,6 +24,7 @@
 #include <Wire.h>
 
 #include "BH1750.h"
+#include "Bit.h"
 
 /******************************************************************************************************************************************************
  *  LOCAL DATA
@@ -97,8 +98,8 @@ StdReturnType BH1750::ChangeMeasurementTime(byte mt_reg_value)
 {
     if(!IsMtRegValueInRange(mt_reg_value)) { return kENotOk; }
 
-    const byte high_bits = READ_BIT_GROUP(mt_reg_value, BH1750_MT_REG_VALUE_HIGH_BITS_GM, BH1750_MT_REG_VALUE_HIGH_BITS_GP);
-    const byte low_bits = READ_BIT_GROUP(mt_reg_value, BH1750_MT_REG_VALUE_LOW_BITS_GM, BH1750_MT_REG_VALUE_LOW_BITS_GP);
+    const byte high_bits = Bit<byte>::ReadBitGroup(mt_reg_value, BH1750_MT_REG_VALUE_HIGH_BITS_GM, BH1750_MT_REG_VALUE_HIGH_BITS_GP);
+    const byte low_bits = Bit<byte>::ReadBitGroup(mt_reg_value, BH1750_MT_REG_VALUE_LOW_BITS_GM, BH1750_MT_REG_VALUE_LOW_BITS_GP);
 
     if(SendCommand(BH1750_CMD_CHANGE_MEASUREMENT_TIME_HIGH_BITS | high_bits) == kENotOk) { return kENotOk; }
     if(SendCommand(BH1750_CMD_CHANGE_MEASUREMENT_TIME_LOW_BITS | low_bits) == kENotOk) { return kENotOk; }

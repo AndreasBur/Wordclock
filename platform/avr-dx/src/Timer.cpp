@@ -21,6 +21,7 @@
  * I N C L U D E S
 ******************************************************************************************************************************************************/
 #include "Timer.h"
+#include "Bit.h"
 #include <avr/interrupt.h>
 #include <util/atomic.h>
 
@@ -65,10 +66,10 @@ StdReturnType Timer<TimerTraits>::Init(uint32_t microseconds, TimerIsrCallbackFV
 
         /* Away from the PORTA the route comes up on, before any channel can drive a pin: PA0 and
            PA2 belong to the strip. See the traits in Timer.h. */
-        WriteBitGroup(PORTMUX.TCAROUTEA, TimerTraits::kRouteMask, TimerTraits::kRouteGroup);
+        PORTMUX.TCAROUTEA = Bit<uint8_t>::WriteBitGroup(PORTMUX.TCAROUTEA, TimerTraits::kRouteMask, TimerTraits::kRouteGroup);
 
         /* dual-slope PWM, overflow interrupt at BOTTOM */
-        WriteBitGroup(GetTimer().CTRLB, TCA_SINGLE_WGMODE_gm, TCA_SINGLE_WGMODE_DSBOTTOM_gc);
+        GetTimer().CTRLB = Bit<uint8_t>::WriteBitGroup(GetTimer().CTRLB, TCA_SINGLE_WGMODE_gm, TCA_SINGLE_WGMODE_DSBOTTOM_gc);
 
         if(SetPeriod(microseconds) == kENotOk) return_value = kENotOk;
         if(timer_overflow_callback != nullptr) if(AttachInterrupt(timer_overflow_callback) == kENotOk) return_value = kENotOk;
@@ -334,7 +335,7 @@ typename Timer<TimerTraits>::TimerCountDirection Timer<TimerTraits>::GetCounting
 template <typename TimerTraits>
 void Timer<TimerTraits>::SetClockSelect(TimerClockSelectType clock_select)
 {
-    WriteBitGroup(GetTimer().CTRLA, TCA_SINGLE_CLKSEL_gm, clock_select);
+    GetTimer().CTRLA = Bit<uint8_t>::WriteBitGroup(GetTimer().CTRLA, TCA_SINGLE_CLKSEL_gm, static_cast<uint8_t>(clock_select));
 } /* SetClockSelect */
 
 
