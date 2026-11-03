@@ -62,8 +62,8 @@ write to one.
 
 ## Read and not acted on
 
-- `option_short_name` in `MsgParameterParser::parse` is assigned in `kStateOptionChar`
-  before the parser enters `kStateOptionArgument`.
+- `option_short_name` in `MsgParameterParser::parse` is assigned in `StateType::kOptionChar`
+  before the parser enters `StateType::kOptionArgument`.
 - `words == words` in `clock_test.cpp` deliberately tests reflexivity of the overloaded
   equality operator.
 - Ignoring a return value does not make a call side-effect free. Transformation and clock

@@ -49,7 +49,7 @@
 ******************************************************************************************************************************************************/
 void AnimationDrop::Init()
 {
-    Animation::Init(kStateIdle);
+    Animation::Init(StateType::kIdle);
     Reset();
 } /* Init */
 
@@ -61,10 +61,10 @@ StdReturnType AnimationDrop::SetTime(byte hour, byte minute)
 {
     StdReturnType return_value{kENotOk};
 
-    if(Clock::GetInstance().GetClockWords(hour, minute, clock_words_table_) == kEOk && state_ == kStateIdle) {
+    if(Clock::GetInstance().GetClockWords(hour, minute, clock_words_table_) == kEOk && state_ == StateType::kIdle) {
         SetNextWordIndex();
         if(SetNextActivePixelIndex() == kENotOk) { SetStateToSetTime(); }
-        else { state_ = kStateClearTime; }
+        else { state_ = StateType::kClearTime; }
     }
     return return_value;
 } /* SetTime */
@@ -75,8 +75,8 @@ StdReturnType AnimationDrop::SetTime(byte hour, byte minute)
 ******************************************************************************************************************************************************/
 void AnimationDrop::Task()
 {
-    if(state_ == kStateClearTime) { ClearTimeTask(); }
-    else if(state_ == kStateSetTime) { SetTimeTask(); }
+    if(state_ == StateType::kClearTime) { ClearTimeTask(); }
+    else if(state_ == StateType::kSetTime) { SetTimeTask(); }
 } /* Task */
 
 
@@ -91,7 +91,7 @@ void AnimationDrop::Reset()
 {
     row_ = 0u;
     column_ = 0u;
-    clock_words_table_.fill(DisplayWords::kWordNone);
+    clock_words_table_.fill(DisplayWords::WordIdType::kNone);
     current_word_index_ = clock_words_table_.size() - 1u;
 } /* Reset */
 
@@ -160,7 +160,7 @@ StdReturnType AnimationDrop::SetNextWordIndex()
        initialising a signed byte from the unsigned expression on the right got there by
        an implementation-defined conversion rather than by arithmetic. */
     for(int index = static_cast<int>(current_word_index_) - 1; index >= 0; index--) {
-        if(clock_words_table_[index] != DisplayWords::kWordNone) {
+        if(clock_words_table_[index] != DisplayWords::WordIdType::kNone) {
             current_word_index_ = index;
             return kEOk;
         }
@@ -177,7 +177,7 @@ void AnimationDrop::SetStateToSetTime()
     row_ = 0u;
     column_ = words_.GetDisplayWordColumn(clock_words_table_[current_word_index_]);
     Display::GetInstance().SetPixel(column_, row_);
-    state_ = kStateSetTime;
+    state_ = StateType::kSetTime;
 } /* SetStateToSetTime */
 
 

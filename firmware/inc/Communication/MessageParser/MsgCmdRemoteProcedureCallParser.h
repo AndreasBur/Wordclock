@@ -57,72 +57,73 @@ class MsgCmdRemoteProcedureCallParser : public MsgParameterParser<MsgCmdRemotePr
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-    enum RpcIdType
+    enum class RpcIdType
     {
-        kRpcIdNone,
-        kRpcIdIlluminanceCalibrationMaxValue,
-        kRpcIdIlluminanceCalibrationMinValue,
-        kRpcIdDisplayEnable,
-        kRpcIdDisplayDisable,
-        kRpcIdDisplayShow,
-        kRpcIdDisplayClear,
-        kRpcIdDisplayTest,
-        kRpcIdDisplayColorRedIncrement,
-        kRpcIdDisplayColorGreenIncrement,
-        kRpcIdDisplayColorBlueIncrement,
-        kRpcIdDisplayColorRedDecrement,
-        kRpcIdDisplayColorGreenDecrement,
-        kRpcIdDisplayColorBlueDecrement,
-        kRpcIdDisplayBrightnessIncrement,
-        kRpcIdDisplayBrightnessDecrement,
-        kRpcIdDisplayBrightnessAutomaticOn,
-        kRpcIdDisplayBrightnessAutomaticOff,
-        kRpcIdDisplayBrightnessGammaCorrectionOn,
-        kRpcIdDisplayBrightnessGammaCorrectionOff,
-        kRpcIdPowerOn,
-        kRpcIdPowerOff,
+        kNone,
+        kIlluminanceCalibrationMaxValue,
+        kIlluminanceCalibrationMinValue,
+        kDisplayEnable,
+        kDisplayDisable,
+        kDisplayShow,
+        kDisplayClear,
+        kDisplayTest,
+        kDisplayColorRedIncrement,
+        kDisplayColorGreenIncrement,
+        kDisplayColorBlueIncrement,
+        kDisplayColorRedDecrement,
+        kDisplayColorGreenDecrement,
+        kDisplayColorBlueDecrement,
+        kDisplayBrightnessIncrement,
+        kDisplayBrightnessDecrement,
+        kDisplayBrightnessAutomaticOn,
+        kDisplayBrightnessAutomaticOff,
+        kDisplayBrightnessGammaCorrectionOn,
+        kDisplayBrightnessGammaCorrectionOff,
+        kPowerOn,
+        kPowerOff,
         /* Appended rather than sorted into the display group above: the ids are what a
            front end, this repository's own documentation and anybody's notes have written
            down, and inserting one would silently change what every id behind it does. */
-        kRpcIdClockRefresh,
-        kRpcIdAnimationStart,
-        kRpcIdAnimationAbort,
-        kRpcIdOverlayDateShow,
-        kRpcIdOverlayTemperatureShow,
-        kRpcIdOverlayTextShow,
-        kRpcIdOverlayAbort,
-        kRpcIdSettingsSave,
-        kRpcIdSettingsReset,
-        kRpcIdSystemRestart,
-        kRpcIdTimeResynchronise,
-        kRpcIdNetworkReconnect,
+        kClockRefresh,
+        kAnimationStart,
+        kAnimationAbort,
+        kOverlayDateShow,
+        kOverlayTemperatureShow,
+        kOverlayTextShow,
+        kOverlayAbort,
+        kSettingsSave,
+        kSettingsReset,
+        kSystemRestart,
+        kTimeResynchronise,
+        kNetworkReconnect,
         /* For a control that cannot name a value, only ask for one further - see the
            increment and decrement pairs above, which are the same eight for the colour
            and the brightness. */
-        kRpcIdAnimationNext,
-        kRpcIdAnimationPrevious,
-        kRpcIdClockModeNext,
-        kRpcIdDisplayToggle,
-        kRpcIdDisplayBrightnessAutomaticToggle,
-        kRpcIdDisplayBrightnessGammaCorrectionToggle,
-        kRpcIdDisplayColorReset,
+        kAnimationNext,
+        kAnimationPrevious,
+        kClockModeNext,
+        kDisplayToggle,
+        kDisplayBrightnessAutomaticToggle,
+        kDisplayBrightnessGammaCorrectionToggle,
+        kDisplayColorReset,
         /* Only so that the names in the message catalog can be counted against the
            procedures; never sent, and anything from here on lands in the default case. */
-        kRpcIdNumberOfProcedures
+        kNumberOfProcedures
     };
+    static constexpr byte kNumberOfProcedures{static_cast<byte>(RpcIdType::kNumberOfProcedures)};
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
     friend class MsgParameterParser;
-    RpcIdType rpc_id_{kRpcIdNone};
+    RpcIdType rpc_id_{RpcIdType::kNone};
     StdReturnType return_value_{kEOk};
-    ErrorMessage::ErrorType answer_error_{ErrorMessage::kErrorNoError};
+    ErrorMessage::ErrorType answer_error_{ErrorMessage::ErrorType::kNoError};
     static constexpr char kRemoteProcedureShortName{'P'};
 
     static constexpr ParameterTableType kParameterTable PROGMEM {
-        ParameterTableElementType(kRemoteProcedureShortName, MsgParameter::kArgumentTypeUint8)
+        ParameterTableElementType(kRemoteProcedureShortName, MsgParameter::ArgumentTypeType::kUint8)
     };
 
     // functions
@@ -148,72 +149,72 @@ class MsgCmdRemoteProcedureCallParser : public MsgParameterParser<MsgCmdRemotePr
         // Keep the whole response on one line, like every other command answer;
         // the command parser adds the terminating println() afterwards.
         Serial.print(F("RpcId="));
-        Serial.print(rpc_id_);
+        Serial.print(ToUnderlying(rpc_id_));
         Serial.print(' ');
         // Last field before that terminating println(); no trailing separator space.
         // An unknown RPC id reports its own code; otherwise the execution result.
-        if(answer_error_ != ErrorMessage::kErrorNoError) { error_.Send(answer_error_, false); }
+        if(answer_error_ != ErrorMessage::ErrorType::kNoError) { error_.Send(answer_error_, false); }
         else { error_.Send(return_value_, false); }
     }
 
     void Process()
     {
         switch(rpc_id_) {
-            case kRpcIdIlluminanceCalibrationMaxValue :
+            case RpcIdType::kIlluminanceCalibrationMaxValue :
                 return_value_ = Illuminance::GetInstance().StartCalibrationMaxValue();
                 break;
-            case kRpcIdIlluminanceCalibrationMinValue :
+            case RpcIdType::kIlluminanceCalibrationMinValue :
                 return_value_ = Illuminance::GetInstance().StartCalibrationMinValue();
                 break;
-            case kRpcIdDisplayEnable :
+            case RpcIdType::kDisplayEnable :
                 Display::GetInstance().Enable();
                 break;
-            case kRpcIdDisplayDisable :
+            case RpcIdType::kDisplayDisable :
                 Display::GetInstance().Disable();
                 break;
-            case kRpcIdDisplayBrightnessIncrement :
+            case RpcIdType::kDisplayBrightnessIncrement :
                 Display::GetInstance().IncrementBrightness();
                 break;
-            case kRpcIdDisplayBrightnessDecrement :
+            case RpcIdType::kDisplayBrightnessDecrement :
                 Display::GetInstance().DecrementBrightness();
                 break;
-            case kRpcIdDisplayBrightnessAutomaticOn :
+            case RpcIdType::kDisplayBrightnessAutomaticOn :
                 Display::GetInstance().EnableBrightnessAutomatic();
                 break;
-            case kRpcIdDisplayBrightnessGammaCorrectionOff :
+            case RpcIdType::kDisplayBrightnessGammaCorrectionOff :
                 Display::GetInstance().DisableBrightnessGammaCorrection();
                 break;
-            case kRpcIdDisplayBrightnessGammaCorrectionOn :
+            case RpcIdType::kDisplayBrightnessGammaCorrectionOn :
                 Display::GetInstance().EnableBrightnessGammaCorrection();
                 break;
-            case kRpcIdDisplayBrightnessAutomaticOff :
+            case RpcIdType::kDisplayBrightnessAutomaticOff :
                 Display::GetInstance().DisableBrightnessAutomatic();
                 break;
-            case kRpcIdDisplayColorRedIncrement :
+            case RpcIdType::kDisplayColorRedIncrement :
                 Display::GetInstance().IncrementColorRed();
                 break;
-            case kRpcIdDisplayColorGreenIncrement :
+            case RpcIdType::kDisplayColorGreenIncrement :
                 Display::GetInstance().IncrementColorGreen();
                 break;
-            case kRpcIdDisplayColorBlueIncrement :
+            case RpcIdType::kDisplayColorBlueIncrement :
                 Display::GetInstance().IncrementColorBlue();
                 break;
-            case kRpcIdDisplayColorRedDecrement :
+            case RpcIdType::kDisplayColorRedDecrement :
                 Display::GetInstance().DecrementColorRed();
                 break;
-            case kRpcIdDisplayColorGreenDecrement :
+            case RpcIdType::kDisplayColorGreenDecrement :
                 Display::GetInstance().DecrementColorGreen();
                 break;
-            case kRpcIdDisplayColorBlueDecrement :
+            case RpcIdType::kDisplayColorBlueDecrement :
                 Display::GetInstance().DecrementColorBlue();
                 break;
-            case kRpcIdDisplayShow :
+            case RpcIdType::kDisplayShow :
                 return_value_ = Display::GetInstance().Show();
                 break;
-            case kRpcIdDisplayClear :
+            case RpcIdType::kDisplayClear :
                 Display::GetInstance().Clear();
                 break;
-            case kRpcIdDisplayTest :
+            case RpcIdType::kDisplayTest :
                 Display::GetInstance().Test();
                 break;
             /* The switch in the strip's 5 V, not the display's enable and disable on ids 3
@@ -231,55 +232,55 @@ class MsgCmdRemoteProcedureCallParser : public MsgParameterParser<MsgCmdRemotePr
                something this clock does not have, and "unknown" would not say so. The circuit
                is written down in platform/esp32/README.md, under "Switching the strip's
                supply". */
-            case kRpcIdPowerOn :
-                if(!Power::IsSwitchFitted()) { answer_error_ = ErrorMessage::kErrorPowerSwitchAbsent; }
+            case RpcIdType::kPowerOn :
+                if(!Power::IsSwitchFitted()) { answer_error_ = ErrorMessage::ErrorType::kPowerSwitchAbsent; }
                 else { return_value_ = Power::GetInstance().SwitchSupplyOn(); }
                 break;
-            case kRpcIdPowerOff :
-                if(!Power::IsSwitchFitted()) { answer_error_ = ErrorMessage::kErrorPowerSwitchAbsent; }
+            case RpcIdType::kPowerOff :
+                if(!Power::IsSwitchFitted()) { answer_error_ = ErrorMessage::ErrorType::kPowerSwitchAbsent; }
                 else { return_value_ = Power::GetInstance().SwitchSupplyOff(); }
                 break;
             /* These seven answer kENotOk where the display is busy with something else,
                rather than doing it anyway: an overlay holding the display and an overlay
                already showing are the two states in which "now" cannot be honoured, and a
                caller that is told so can try again. */
-            case kRpcIdClockRefresh :
+            case RpcIdType::kClockRefresh :
                 return_value_ = DisplayManager::GetInstance().RefreshClock();
                 break;
-            case kRpcIdAnimationStart :
+            case RpcIdType::kAnimationStart :
                 return_value_ = DisplayManager::GetInstance().StartAnimation();
                 break;
-            case kRpcIdAnimationAbort :
+            case RpcIdType::kAnimationAbort :
                 return_value_ = DisplayManager::GetInstance().AbortAnimation();
                 break;
-            case kRpcIdOverlayDateShow :
+            case RpcIdType::kOverlayDateShow :
                 return_value_ = Overlays::GetInstance().ShowDateNow();
                 break;
-            case kRpcIdOverlayTemperatureShow :
+            case RpcIdType::kOverlayTemperatureShow :
                 return_value_ = Overlays::GetInstance().ShowTemperatureNow();
                 break;
-            case kRpcIdOverlayTextShow :
+            case RpcIdType::kOverlayTextShow :
                 return_value_ = Overlays::GetInstance().ShowTextNow();
                 break;
-            case kRpcIdOverlayAbort :
+            case RpcIdType::kOverlayAbort :
                 return_value_ = Overlays::GetInstance().Abort();
                 break;
-            case kRpcIdSettingsSave :
+            case RpcIdType::kSettingsSave :
                 return_value_ = Persistence::GetInstance().Save();
                 break;
-            case kRpcIdSettingsReset :
+            case RpcIdType::kSettingsReset :
                 return_value_ = Persistence::GetInstance().Reset();
                 break;
             /* Asks for a restart rather than carrying one out: the answer to this command
                is sent after Process() returns, and a controller that restarted in here
                would take that answer with it. */
-            case kRpcIdSystemRestart :
+            case RpcIdType::kSystemRestart :
                 return_value_ = System::GetInstance().Restart();
                 break;
-            case kRpcIdTimeResynchronise :
+            case RpcIdType::kTimeResynchronise :
                 return_value_ = System::GetInstance().ResynchroniseTime();
                 break;
-            case kRpcIdNetworkReconnect :
+            case RpcIdType::kNetworkReconnect :
                 return_value_ = System::GetInstance().ReconnectNetwork();
                 break;
             /* These seven cannot be refused, which is why none of them takes a return
@@ -288,31 +289,31 @@ class MsgCmdRemoteProcedureCallParser : public MsgParameterParser<MsgCmdRemotePr
                ask of the display is left to the display - the clock's wording redraws
                through DisplayManager's latch on the next task, and the selected animation
                runs at the next word change, the same as if a phone had sent the value. */
-            case kRpcIdAnimationNext :
+            case RpcIdType::kAnimationNext :
                 Animations::GetInstance().NextAnimation();
                 break;
-            case kRpcIdAnimationPrevious :
+            case RpcIdType::kAnimationPrevious :
                 Animations::GetInstance().PreviousAnimation();
                 break;
-            case kRpcIdClockModeNext :
+            case RpcIdType::kClockModeNext :
                 Clock::GetInstance().NextMode();
                 break;
-            case kRpcIdDisplayToggle :
+            case RpcIdType::kDisplayToggle :
                 Display::GetInstance().Toggle();
                 break;
-            case kRpcIdDisplayBrightnessAutomaticToggle :
+            case RpcIdType::kDisplayBrightnessAutomaticToggle :
                 Display::GetInstance().ToggleBrightnessAutomatic();
                 break;
-            case kRpcIdDisplayBrightnessGammaCorrectionToggle :
+            case RpcIdType::kDisplayBrightnessGammaCorrectionToggle :
                 Display::GetInstance().ToggleBrightnessGammaCorrection();
                 break;
-            case kRpcIdDisplayColorReset :
+            case RpcIdType::kDisplayColorReset :
                 Display::GetInstance().ResetColor();
                 break;
             default:
-                // Unknown or missing RPC id (including kRpcIdNone): there is
+                // Unknown or missing RPC id (including RpcIdType::kNone): there is
                 // nothing to execute, so report a specific error instead of Error=0.
-                answer_error_ = ErrorMessage::kErrorRpcIdUnknown;
+                answer_error_ = ErrorMessage::ErrorType::kRpcIdUnknown;
                 break;
         }
     }

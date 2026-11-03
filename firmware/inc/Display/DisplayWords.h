@@ -53,36 +53,37 @@ class DisplayWords
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-    enum WordIdType {
-        kWordNone,
-        kWordEs,
-        kWordIst,
-        kWordFuenf,
-        kWordZehn,
-        kWordZwanzig,
-        kWordDrei,
-        kWordVier,
-        kWordViertel,
-        kWordDreiviertel,
-        kWordNach,
-        kWordVor,
-        kWordHalb,
-        kWordHourZwoelf,
-        kWordHourZwei,
-        kWordHourEin,
-        kWordHourEins,
-        kWordHourSieben,
-        kWordHourDrei,
-        kWordHourFuenf,
-        kWordHourElf,
-        kWordHourNeun,
-        kWordHourVier,
-        kWordHourAcht,
-        kWordHourZehn,
-        kWordHourSechs,
-        kWordUhr,
-        kWordNumberOfWords
+    enum class WordIdType {
+        kNone,
+        kEs,
+        kIst,
+        kFuenf,
+        kZehn,
+        kZwanzig,
+        kDrei,
+        kVier,
+        kViertel,
+        kDreiviertel,
+        kNach,
+        kVor,
+        kHalb,
+        kHourZwoelf,
+        kHourZwei,
+        kHourEin,
+        kHourEins,
+        kHourSieben,
+        kHourDrei,
+        kHourFuenf,
+        kHourElf,
+        kHourNeun,
+        kHourVier,
+        kHourAcht,
+        kHourZehn,
+        kHourSechs,
+        kUhr,
+        kNumberOfWords
     };
+    static constexpr byte kNumberOfWords{static_cast<byte>(WordIdType::kNumberOfWords)};
 
     using DisplayWordsTableElementType = DisplayWord;
 
@@ -119,7 +120,7 @@ class DisplayWords
 
     static DisplayWord GetDisplayWord(WordIdType word_id) {
         if(!IsWordIdValid(word_id)) { return DisplayWord{}; }
-        return GetDisplayWordsTableElement(word_id);
+        return GetDisplayWordsTableElement(ToUnderlying(word_id));
     }
     static byte GetDisplayWordRow(WordIdType word_id) { return GetDisplayWord(word_id).GetRow(); }
     static byte GetDisplayWordColumn(WordIdType word_id) { return GetDisplayWord(word_id).GetColumn(); }
@@ -128,7 +129,7 @@ class DisplayWords
     // set methods
 
     // methods
-    static bool IsWordIdValid(WordIdType word_id) { return word_id < kWordNumberOfWords; }
+    static bool IsWordIdValid(WordIdType word_id) { return word_id < WordIdType::kNumberOfWords; }
 };
 
 

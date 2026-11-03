@@ -47,7 +47,7 @@
 ******************************************************************************************************************************************************/
 void AnimationExplodePixels::Init()
 {
-    Animation::Init(kStateIdle);
+    Animation::Init(StateType::kIdle);
     Reset();
 } /* Init */
 
@@ -59,11 +59,11 @@ StdReturnType AnimationExplodePixels::SetTime(byte hour, byte minute)
 {
     StdReturnType return_value{kENotOk};
 
-    if(Clock::GetInstance().GetClockWords(hour, minute, clock_words_table_) == kEOk && state_ == kStateIdle) {
+    if(Clock::GetInstance().GetClockWords(hour, minute, clock_words_table_) == kEOk && state_ == StateType::kIdle) {
         return_value = kEOk;
         Display::GetInstance().SetPixel(kColumnCenter, kRowCenter);
         shift_counter_ = 0u;
-        state_ = kStateClearTime;
+        state_ = StateType::kClearTime;
     }
     return return_value;
 } /* SetTime */
@@ -74,7 +74,7 @@ StdReturnType AnimationExplodePixels::SetTime(byte hour, byte minute)
 ******************************************************************************************************************************************************/
 void AnimationExplodePixels::Task()
 {
-    if(state_ == kStateClearTime) {
+    if(state_ == StateType::kClearTime) {
         if(shift_counter_ < kShiftCounterMaxValue) {
             shift_counter_++;
             ClearTimeTask();
@@ -82,7 +82,7 @@ void AnimationExplodePixels::Task()
             SetStateToSetTime();
         }
     }
-    if(state_ == kStateSetTime) {
+    if(state_ == StateType::kSetTime) {
         if(shift_counter_ >= 2u) {
             shift_counter_--;
             SetTimeTask();
@@ -103,7 +103,7 @@ void AnimationExplodePixels::Task()
 void AnimationExplodePixels::Reset()
 {
     shift_counter_ = 0u;
-    clock_words_table_.fill(DisplayWords::kWordNone);
+    clock_words_table_.fill(DisplayWords::WordIdType::kNone);
 } /* Reset */
 
 /******************************************************************************************************************************************************
@@ -134,7 +134,7 @@ void AnimationExplodePixels::SetTimeTask()
 ******************************************************************************************************************************************************/
 void AnimationExplodePixels::SetStateToSetTime()
 {
-    state_ = kStateSetTime;
+    state_ = StateType::kSetTime;
     Display::GetInstance().Clear();
     shift_counter_ = kShiftCounterMaxValue;
 } /* SetStateToSetTime */

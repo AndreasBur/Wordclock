@@ -61,25 +61,28 @@ class Text
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-    enum StateType {
-        kStateIdle,
-        kStateTextShift,
-        kStateCharShift
+    enum class StateType {
+        kIdle,
+        kTextShift,
+        kCharShift
     };
 
-    enum ShiftStateType {
-        kShiftStateIdle,
-        kShiftStateBusy
+    /* uint8_t and not the default int: it is stored in a one-bit field below, where a signed
+       type holds 0 and -1, and kBusy would read back as -1. */
+    enum class ShiftStateType : uint8_t {
+        kIdle,
+        kBusy
     };
 
-    enum FontType {
+    enum class FontType {
         kFont5x8,
         kFont7x9,
         kFont7x10,
         kFont9x10,
         kFont10x10,
-        kFontNumberOfFonts
+        kNumberOfFonts
     };
+    static constexpr byte kNumberOfFonts{static_cast<byte>(FontType::kNumberOfFonts)};
 
     struct ShiftType {
         const char* text;
@@ -100,7 +103,7 @@ class Text
     Transformation wc_transformation_;
     ShiftType shift_;
     byte task_cycle_{TEXT_TASK_CYCLE_INIT_VALUE};
-    StateType state_{kStateIdle};
+    StateType state_{StateType::kIdle};
 
 #if(TEXT_SUPPORT_FONT_5X8 == STD_ON)
     FontSprite5x8 font5x8_;
@@ -119,7 +122,7 @@ class Text
 #endif
 
     // functions
-    constexpr Text() : wc_transformation_(), shift_{nullptr, kFont10x10, STD_NULL_CHARACTER, 0, 0, kShiftStateIdle} { }
+    constexpr Text() : wc_transformation_(), shift_{nullptr, FontType::kFont10x10, STD_NULL_CHARACTER, 0, 0, ShiftStateType::kIdle} { }
     ~Text() { }
 
 
@@ -164,7 +167,7 @@ class Text
     void SetFontShift(FontType font) { if(IsFontValid(font)) { shift_.font = font; } }
 
     // methods
-    static bool IsFontValid(FontType font) { return font < kFontNumberOfFonts; }
+    static bool IsFontValid(FontType font) { return font < FontType::kNumberOfFonts; }
     static StdReturnType Show() { return Display::GetInstance().Show(); }
     void Task(bool=false);
     void Stop();

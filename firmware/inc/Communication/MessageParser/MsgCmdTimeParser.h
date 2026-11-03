@@ -65,9 +65,9 @@ class MsgCmdTimeParser : public MsgParameterParser<MsgCmdTimeParser, MSG_CMD_TIM
     static constexpr char kSecondOptionShortName{'S'};
 
     static constexpr ParameterTableType kParameterTable PROGMEM {
-        ParameterTableElementType(kHourOptionShortName, MsgParameter::kArgumentTypeUint8),
-        ParameterTableElementType(kMinuteOptionShortName, MsgParameter::kArgumentTypeUint8),
-        ParameterTableElementType(kSecondOptionShortName, MsgParameter::kArgumentTypeUint8)
+        ParameterTableElementType(kHourOptionShortName, MsgParameter::ArgumentTypeType::kUint8),
+        ParameterTableElementType(kMinuteOptionShortName, MsgParameter::ArgumentTypeType::kUint8),
+        ParameterTableElementType(kSecondOptionShortName, MsgParameter::ArgumentTypeType::kUint8)
     };
 
     // functions
@@ -97,17 +97,17 @@ class MsgCmdTimeParser : public MsgParameterParser<MsgCmdTimeParser, MSG_CMD_TIM
 
     void SetHour(HourType hour) {
         StdReturnType return_value = time_.SetHour(hour);
-        error_.CheckReturnValueAndSend(kHourOptionShortName, return_value, ErrorMessage::kErrorValueOutOfBounds);
+        error_.CheckReturnValueAndSend(kHourOptionShortName, return_value, ErrorMessage::ErrorType::kValueOutOfBounds);
     }
 
     void SetMinute(MinuteType minute) {
         StdReturnType return_value = time_.SetMinute(minute);
-        error_.CheckReturnValueAndSend(kMinuteOptionShortName, return_value, ErrorMessage::kErrorValueOutOfBounds);
+        error_.CheckReturnValueAndSend(kMinuteOptionShortName, return_value, ErrorMessage::ErrorType::kValueOutOfBounds);
     }
 
     void SetSecond(SecondType second) {
         StdReturnType return_value = time_.SetSecond(second);
-        error_.CheckReturnValueAndSend(kSecondOptionShortName, return_value, ErrorMessage::kErrorValueOutOfBounds);
+        error_.CheckReturnValueAndSend(kSecondOptionShortName, return_value, ErrorMessage::ErrorType::kValueOutOfBounds);
     }
 
 /******************************************************************************************************************************************************

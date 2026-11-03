@@ -79,15 +79,15 @@ class Overlays
 #endif
 
 
-    enum OverlayIdType {
+    enum class OverlayIdType {
 #if (OVERLAYS_SUPPORT_DATE == STD_ON)
-        kOverlayIdDate,
+        kDate,
 #endif
 #if (OVERLAYS_SUPPORT_TEMPERATURE == STD_ON)
-        kOverlayIdTemperature,
+        kTemperature,
 #endif
 #if (OVERLAYS_SUPPORT_TEXT == STD_ON)
-        kOverlayIdText
+        kText
 #endif
     };
 
@@ -115,13 +115,13 @@ class Overlays
     bool IsShow() const {
         bool show{false};
 #if (OVERLAYS_SUPPORT_DATE == STD_ON)
-        show = show || (date_.GetState() == OverlayDate::kStateShow);
+        show = show || (date_.GetState() == OverlayDate::StateType::kShow);
 #endif
 #if (OVERLAYS_SUPPORT_TEMPERATURE == STD_ON)
-        show = show || (temperature_.GetState() == OverlayTemperature::kStateShow);
+        show = show || (temperature_.GetState() == OverlayTemperature::StateType::kShow);
 #endif
 #if (OVERLAYS_SUPPORT_TEXT == STD_ON)
-        show = show || (text_.GetState() == OverlayText::kStateShow);
+        show = show || (text_.GetState() == OverlayText::StateType::kShow);
 #endif
         return show;
     }
@@ -129,13 +129,13 @@ class Overlays
     bool IsIdle() const {
         bool idle{false};
 #if (OVERLAYS_SUPPORT_DATE == STD_ON)
-        idle = idle || (date_.GetState() == OverlayDate::kStateIdle);
+        idle = idle || (date_.GetState() == OverlayDate::StateType::kIdle);
 #endif
 #if (OVERLAYS_SUPPORT_TEMPERATURE == STD_ON)
-        idle = idle || (temperature_.GetState() == OverlayTemperature::kStateIdle);
+        idle = idle || (temperature_.GetState() == OverlayTemperature::StateType::kIdle);
 #endif
 #if (OVERLAYS_SUPPORT_TEXT == STD_ON)
-        idle = idle || (text_.GetState() == OverlayText::kStateIdle);
+        idle = idle || (text_.GetState() == OverlayText::StateType::kIdle);
 #endif
         return idle;
     }

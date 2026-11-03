@@ -25,7 +25,7 @@ int main()
 
     /* Exercise the parser directly as well: Communication filters empty messages, but
        the parser must still be safe for an empty buffer and out-of-range numbers. */
-    const std::string wrong_command = "Error=" + std::to_string(ErrorMessage::kErrorWrongCommand);
+    const std::string wrong_command = "Error=" + std::to_string(ToUnderlying(ErrorMessage::ErrorType::kWrongCommand));
     const char* invalid_commands[]{
         "", " ", "abc", "0", "-1", "17", "65537", "4294967297",
         "9999999999999999999999999999999999999999999999999",
@@ -98,7 +98,7 @@ int main()
     {
         char message[16];
         char expected[32];
-        const unsigned past_the_last = MsgCmdRemoteProcedureCallParser::kRpcIdNumberOfProcedures;
+        const unsigned past_the_last = MsgCmdRemoteProcedureCallParser::kNumberOfProcedures;
 
         snprintf(message, sizeof(message), "1 -P%u\n", past_the_last);
         snprintf(expected, sizeof(expected), "1 RpcId=%u Error=7", past_the_last);

@@ -79,7 +79,7 @@ class DisplayManager
     ~DisplayManager() { }
 
     static bool IsOverlayShowing() {
-        return Overlays::GetInstance().GetState() == Overlays::OverlayType::kStateShow;
+        return Overlays::GetInstance().GetState() == Overlays::OverlayType::StateType::kShow;
     }
 
     static void ShowClock(HourType hour, MinuteType minute) {
@@ -90,7 +90,7 @@ class DisplayManager
 
     static void TaskClockWordsChange(HourType hour, MinuteType minute) {
         Animations& animations = Animations::GetInstance();
-        if(animations.GetAnimation() == Animations::kAnimationIdNone) {
+        if(animations.GetAnimation() == Animations::AnimationIdType::kNone) {
             ShowClock(hour, minute);
         } else {
             animations.SetTime(hour, minute);

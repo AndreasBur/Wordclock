@@ -49,7 +49,7 @@
 ******************************************************************************************************************************************************/
 void AnimationTeletype::Init()
 {
-    Animation::Init(kStateIdle);
+    Animation::Init(StateType::kIdle);
     Reset();
 } /* Init */
 
@@ -61,12 +61,12 @@ StdReturnType AnimationTeletype::SetTime(byte hour, byte minute)
 {
     StdReturnType return_value{kENotOk};
 
-    if(Clock::GetInstance().GetClockWords(hour, minute, clock_words_table_) == kEOk && state_ == kStateIdle) {
+    if(Clock::GetInstance().GetClockWords(hour, minute, clock_words_table_) == kEOk && state_ == StateType::kIdle) {
         return_value = kEOk;
         current_word_index_ = 0u;
         current_char_index_ = 0u;
         current_word_length_ = words_.GetDisplayWordLength(clock_words_table_[current_word_index_]);
-        state_ = kStateSetTime;
+        state_ = StateType::kSetTime;
     }
     return return_value;
 } /* SetTime */
@@ -77,7 +77,7 @@ StdReturnType AnimationTeletype::SetTime(byte hour, byte minute)
 ******************************************************************************************************************************************************/
 void AnimationTeletype::Task()
 {
-    if(state_ == kStateSetTime) {
+    if(state_ == StateType::kSetTime) {
         if(current_char_index_ >= current_word_length_) {
             if(SetNextWordIndex() == kENotOk) {
                 FinishWithClockWords(clock_words_table_);
@@ -101,7 +101,7 @@ void AnimationTeletype::Task()
 ******************************************************************************************************************************************************/
 void AnimationTeletype::Reset()
 {
-    clock_words_table_.fill(DisplayWords::kWordNone);
+    clock_words_table_.fill(DisplayWords::WordIdType::kNone);
     current_word_index_ = 0u;
     current_word_length_ = 0u;
     current_char_index_ = 0u;

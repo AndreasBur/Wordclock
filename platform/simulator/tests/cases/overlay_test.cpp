@@ -25,10 +25,10 @@
    same word set and leaves the letters alone, for up to five minutes. */
 void TestShowNowProcedures()
 {
-    Clock::GetInstance().SetMode(Clock::kModeWessi);
+    Clock::GetInstance().SetMode(Clock::ModeType::kWessi);
     Animations& animations = Animations::GetInstance();
-    animations.SetMode(Animations::kModeFixed);
-    animations.SetAnimation(Animations::kAnimationIdNone);
+    animations.SetMode(Animations::ModeType::kFixed);
+    animations.SetAnimation(Animations::AnimationIdType::kNone);
 
     DisplayManager& display_manager = DisplayManager::GetInstance();
     Overlays& overlays = Overlays::GetInstance();
@@ -46,19 +46,19 @@ void TestShowNowProcedures()
     Expect(display_manager.RefreshClock() == kEOk, "the clock must be refreshable");
     Expect(ArePixelsEqual(ReadPixels(), clock_face), "the refresh must put the clock face back");
 
-    animations.SetAnimation(Animations::kAnimationIdCursor);
+    animations.SetAnimation(Animations::AnimationIdType::kCursor);
     Expect(display_manager.StartAnimation() == kEOk, "the selected animation must start on demand");
-    Expect(animations.GetState() == Animations::kStatePending, "the started animation must be running");
+    Expect(animations.GetState() == Animations::StateType::kPending, "the started animation must be running");
     Expect(display_manager.AbortAnimation() == kEOk, "a running animation must be abortable");
-    Expect(animations.GetState() == Animations::kStateIdle, "the aborted animation must be idle");
+    Expect(animations.GetState() == Animations::StateType::kIdle, "the aborted animation must be idle");
     Expect(ArePixelsEqual(ReadPixels(), clock_face), "the abort must put the clock face back");
-    animations.SetAnimation(Animations::kAnimationIdNone);
+    animations.SetAnimation(Animations::AnimationIdType::kNone);
 
     /* An overlay owns the display while it shows, so both clock procedures step aside
        instead of drawing underneath it. */
     overlays.SetDateIsActive(true);
     Expect(overlays.ShowDateNow() == kEOk, "an active overlay must start on demand");
-    Expect(overlays.GetState() == Overlays::OverlayType::kStateShow, "the started overlay must show");
+    Expect(overlays.GetState() == Overlays::OverlayType::StateType::kShow, "the started overlay must show");
     Expect(overlays.ShowDateNow() == kENotOk, "a second overlay must not start while one shows");
     Expect(display_manager.RefreshClock() == kENotOk, "the clock must not be refreshed under an overlay");
     Expect(display_manager.StartAnimation() == kENotOk, "no animation must start under an overlay");
@@ -69,7 +69,7 @@ void TestShowNowProcedures()
     display.Test();
 
     Expect(overlays.Abort() == kEOk, "a showing overlay must be abortable");
-    Expect(overlays.GetState() != Overlays::OverlayType::kStateShow,
+    Expect(overlays.GetState() != Overlays::OverlayType::StateType::kShow,
            "the aborted overlay must stop showing");
     Expect(overlays.Abort() == kENotOk, "aborting with no overlay showing must be refused");
 
@@ -137,34 +137,34 @@ void TestOverlayPeriodAndEndurance()
     /* A minute the raster covers, but before the second it starts on. */
     SetTime(10u, 8u, 29u);
     overlays.Task();
-    Expect(overlays.GetState() != Overlays::OverlayType::kStateShow,
+    Expect(overlays.GetState() != Overlays::OverlayType::StateType::kShow,
            "an overlay must not start before its second");
 
     SetTime(10u, 8u, 30u);
     overlays.Task();
-    Expect(overlays.GetState() == Overlays::OverlayType::kStateShow,
+    Expect(overlays.GetState() == Overlays::OverlayType::StateType::kShow,
            "an overlay must start on its second");
 
     /* It ends by itself, and within the endurance it was given rather than whenever. */
     int seconds = 0;
-    for(byte second = 31u; (second < 59u) && (overlays.GetState() == Overlays::OverlayType::kStateShow); second++) {
+    for(byte second = 31u; (second < 59u) && (overlays.GetState() == Overlays::OverlayType::StateType::kShow); second++) {
         SetTime(10u, 8u, second);
         overlays.Task();
         seconds++;
     }
-    Expect(overlays.GetState() != Overlays::OverlayType::kStateShow, "an overlay must end by itself");
+    Expect(overlays.GetState() != Overlays::OverlayType::StateType::kShow, "an overlay must end by itself");
     Expect(seconds <= 5, "and within the endurance it was given");
 
     /* A minute the raster does not cover. */
     SetTime(10u, 9u, 30u);
     overlays.Task();
-    Expect(overlays.GetState() != Overlays::OverlayType::kStateShow,
+    Expect(overlays.GetState() != Overlays::OverlayType::StateType::kShow,
            "an overlay must not start outside its period");
 
     /* Switched off, it does not fire at all. */
     overlays.SetDateIsActive(false);
     SetTime(10u, 12u, 30u);
     overlays.Task();
-    Expect(overlays.GetState() != Overlays::OverlayType::kStateShow,
+    Expect(overlays.GetState() != Overlays::OverlayType::StateType::kShow,
            "an overlay that is switched off must stay away");
 }

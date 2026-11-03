@@ -79,21 +79,21 @@ ClockWords::WordsListType ClockWords::GetWordsList() const
 
     /* ----- Implementation ----------------------------------------------- */  
     if(show_it_is_) {
-        clock_words[clock_words_index++] = DisplayWords::kWordEs;
-        clock_words[clock_words_index++] = DisplayWords::kWordIst;
+        clock_words[clock_words_index++] = DisplayWords::WordIdType::kEs;
+        clock_words[clock_words_index++] = DisplayWords::WordIdType::kIst;
     }
     for(uint8_t index = 0; index < CLOCK_WORDS_MAX_NUMBER_OF_MINUTE_WORDS; index++) {
-        if(minute_words_[index] != DisplayWords::kWordNone) {
+        if(minute_words_[index] != DisplayWords::WordIdType::kNone) {
             clock_words[clock_words_index++] = minute_words_[index];
         }
     }
     for(uint8_t index = 0; index < CLOCK_WORDS_MAX_NUMBER_OF_HOUR_WORDS; index++) {
-        if(hour_words_[index] != DisplayWords::kWordNone) {
+        if(hour_words_[index] != DisplayWords::WordIdType::kNone) {
             clock_words[clock_words_index++] = hour_words_[index];
         }
     }
     for(uint8_t index = clock_words_index; index < CLOCK_WORDS_MAX_NUMBER_OF_WORDS; index++) {
-        clock_words[index] = DisplayWords::kWordNone;
+        clock_words[index] = DisplayWords::WordIdType::kNone;
     }
     return clock_words;
 }

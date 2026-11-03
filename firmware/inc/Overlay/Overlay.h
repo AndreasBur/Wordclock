@@ -52,10 +52,10 @@ template <typename Derived> class Overlay
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-    enum StateType {
-        kStateDisabled,
-        kStateIdle,
-        kStateShow
+    enum class StateType {
+        kDisabled,
+        kIdle,
+        kShow
     };
 
     using YearType = ClockDate::YearType;
@@ -70,7 +70,7 @@ template <typename Derived> class Overlay
  *  P R O T E C T E D   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   protected:
-    StateType state_{kStateDisabled};
+    StateType state_{StateType::kDisabled};
 
     // functions
     /* Protected rather than private with the derived class as a friend, which is what
@@ -101,7 +101,7 @@ template <typename Derived> class Overlay
     static constexpr DayType kDayInitValue{0u};
     static constexpr DayType kValidInDaysInitValue{0u};
     static constexpr byte kSpeedInitValue{1u};
-    static constexpr FontType kFontInitValue{Text::kFont10x10};
+    static constexpr FontType kFontInitValue{Text::FontType::kFont10x10};
 
     MinuteType period_in_minutes_{kPeriodInMinutesInitValue};
     SecondType endurance_in_seconds_{kEnduranceInSecondsInitValue};
@@ -155,14 +155,14 @@ template <typename Derived> class Overlay
     }
 
     SecondType SetStateToShow(ClockDate current_date, ClockTime current_time) {
-        state_ = kStateShow;
+        state_ = StateType::kShow;
         Text::GetInstance().SetTaskCycle(Scheduler::ConvertSpeedToTaskCycle(speed_));
         Underlying().SetStateToShow(current_date, current_time);
         return endurance_in_seconds_;
     }
 
     void SetStateToIdle(ClockDate current_date, ClockTime current_time) {
-        state_ = kStateIdle;
+        state_ = StateType::kIdle;
         Underlying().SetStateToIdle(current_date, current_time);
     }
 
@@ -232,7 +232,7 @@ template <typename Derived> class Overlay
     DayType GetValidInDays() const { return valid_in_days_; }
     byte GetSpeed() const { return speed_; }
     FontType GetFont() const { return font_; }
-    bool GetIsActive() const { return state_ != kStateDisabled; }
+    bool GetIsActive() const { return state_ != StateType::kDisabled; }
 
 	// set methods
     StdReturnType SetPeriodInMinutes(MinuteType period_in_minutes) {
@@ -280,16 +280,16 @@ template <typename Derived> class Overlay
         valid_in_days_ = kValidInDaysInitValue;
         speed_ = kSpeedInitValue;
         font_ = kFontInitValue;
-        state_ = kStateDisabled;
+        state_ = StateType::kDisabled;
         Underlying().ResetOwnToDefaults();
     }
 
-    void EnableIsActive() { if(state_ == kStateDisabled) { state_ = kStateIdle; } }
-    void DisableIsActive() { state_ = kStateDisabled; }
+    void EnableIsActive() { if(state_ == StateType::kDisabled) { state_ = StateType::kIdle; } }
+    void DisableIsActive() { state_ = StateType::kDisabled; }
 
     SecondType Task(SecondType show_timer_in_seconds, ClockDate current_date, ClockTime current_time) {
-        if(state_ == kStateIdle) { return IdleTask(show_timer_in_seconds, current_date, current_time); }
-        if(state_ == kStateShow) { return ShowTask(show_timer_in_seconds, current_date, current_time); }
+        if(state_ == StateType::kIdle) { return IdleTask(show_timer_in_seconds, current_date, current_time); }
+        if(state_ == StateType::kShow) { return ShowTask(show_timer_in_seconds, current_date, current_time); }
         return 0u;
     }
 };

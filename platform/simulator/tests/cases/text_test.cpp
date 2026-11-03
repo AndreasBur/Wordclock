@@ -26,32 +26,32 @@ void TestCharacterToGlyphMapping()
     Text& text = Text::GetInstance();
 
     for(char character = ' '; character < '\x7F'; character++) {
-        if(text.SetChar(0u, 0u, character, Text::kFont5x8) != kEOk) {
+        if(text.SetChar(0u, 0u, character, Text::FontType::kFont5x8) != kEOk) {
             Expect(false, "every printable character must have a glyph");
             break;
         }
     }
 
-    Expect(text.SetChar(0u, 0u, '\n', Text::kFont5x8) == kENotOk, "a control character has no glyph");
-    Expect(text.SetChar(0u, 0u, '\x1F', Text::kFont5x8) == kENotOk, "and neither has the last one below the space");
+    Expect(text.SetChar(0u, 0u, '\n', Text::FontType::kFont5x8) == kENotOk, "a control character has no glyph");
+    Expect(text.SetChar(0u, 0u, '\x1F', Text::FontType::kFont5x8) == kENotOk, "and neither has the last one below the space");
 
     /* The umlauts, which sit behind the ASCII range in every table. */
     const char umlauts[] = {'\xC4', '\xD6', '\xDC', '\xE4', '\xF6', '\xFC'};
     for(const char umlaut : umlauts) {
-        if(text.SetChar(0u, 0u, umlaut, Text::kFont5x8) != kEOk) {
+        if(text.SetChar(0u, 0u, umlaut, Text::FontType::kFont5x8) != kEOk) {
             Expect(false, "every umlaut must have a glyph");
             break;
         }
     }
 
-    Expect(text.SetChar(0u, 0u, '\xE0', Text::kFont5x8) == kENotOk,
+    Expect(text.SetChar(0u, 0u, '\xE0', Text::FontType::kFont5x8) == kENotOk,
            "a Latin-1 byte that is none of the seven must be refused");
 
     /* The degree sign, appended past the umlauts so the temperature overlay can show a
        reading rather than spell its unit out. Checked by what reaches the display rather
        than by the width: an unmapped byte falls back to the space, and in the 5x8 table the
        space is exactly as wide as the sign, so a width test would pass on the fallback. */
-    for(byte font = 0u; font < Text::kFontNumberOfFonts; font++) {
+    for(byte font = 0u; font < Text::kNumberOfFonts; font++) {
         const Text::FontType font_type = static_cast<Text::FontType>(font);
         char description[64];
 
@@ -70,18 +70,18 @@ void TestCharacterToGlyphMapping()
        than against an empty display - a fallback would light nothing and look like a blank
        glyph. */
     Display::GetInstance().Clear();
-    text.SetChar(0u, 0u, '\xB0', Text::kFont5x8);
+    text.SetChar(0u, 0u, '\xB0', Text::FontType::kFont5x8);
     const PixelBufferType sign = ReadPixels();
 
     Display::GetInstance().Clear();
-    text.SetChar(0u, 0u, ' ', Text::kFont5x8);
+    text.SetChar(0u, 0u, ' ', Text::FontType::kFont5x8);
     const PixelBufferType space = ReadPixels();
 
     Expect(!ArePixelsEqual(sign, space), "the substituting conversion must not fall back to the space");
 
     /* Every font carries the same character set, and a glyph nobody can see would be a
        table read as the wrong packing. */
-    for(byte font = 0u; font < Text::kFontNumberOfFonts; font++) {
+    for(byte font = 0u; font < Text::kNumberOfFonts; font++) {
         const Text::FontType font_type = static_cast<Text::FontType>(font);
         char description[64];
 
@@ -123,9 +123,9 @@ void TestUndrawableCharacterShiftsAsASpace()
         display.Clear();
         /* Something to clear, in every pixel the glyph could touch. */
         display.Test();
-        text.SetCharWithShift(character, Text::kFont5x8);
+        text.SetCharWithShift(character, Text::FontType::kFont5x8);
 
-        for(byte step = 0u; step < DISPLAY_NUMBER_OF_COLUMNS && text.GetState() != Text::kStateIdle; step++) {
+        for(byte step = 0u; step < DISPLAY_NUMBER_OF_COLUMNS && text.GetState() != Text::StateType::kIdle; step++) {
             text.Task();
         }
         return ReadPixels();

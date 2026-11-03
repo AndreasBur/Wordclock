@@ -48,31 +48,31 @@ class ErrorMessage
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-    enum ErrorType {
-        kErrorNoError,
-        kErrorMessageTooLong,
-        kErrorWrongCommand,
-        kErrorParameterUnknown,
-        kErrorValueOutOfBounds,
-        kErrorNoValueGiven,
-        kErrorDisplayPending,
-        kErrorRpcIdUnknown,
-        kErrorUnknown,
-        /* Appended behind kErrorUnknown rather than sorted in beside its neighbours, for the
+    enum class ErrorType {
+        kNoError,
+        kMessageTooLong,
+        kWrongCommand,
+        kParameterUnknown,
+        kValueOutOfBounds,
+        kNoValueGiven,
+        kDisplayPending,
+        kRpcIdUnknown,
+        kUnknown,
+        /* Appended behind kUnknown rather than sorted in beside its neighbours, for the
            reason the remote procedure ids are appended too: these numbers are what an answer
            carries and what this repository's own documentation writes down, and inserting one
            would silently change what every code behind it means. */
-        kErrorPowerSwitchAbsent,
+        kPowerSwitchAbsent,
     };
 
-    enum ApiType {
-        kApiNone,
-        kApiDisplayShow,
-        kApiDisplayWritePixel,
-        kApiAnimationShow,
-        kApiClockShow,
-        kApiAnimationSetAnimation,
-        kApiAnimationSetClockTaskCycle,
+    enum class ApiType {
+        kNone,
+        kDisplayShow,
+        kDisplayWritePixel,
+        kAnimationShow,
+        kClockShow,
+        kAnimationSetAnimation,
+        kAnimationSetClockTaskCycle,
     };
 
 /******************************************************************************************************************************************************
@@ -88,7 +88,7 @@ class ErrorMessage
     {
         Serial.print(F("Api"));
         SendEqual();
-        Serial.print(api);
+        Serial.print(ToUnderlying(api));
     }
 
 /******************************************************************************************************************************************************
@@ -108,7 +108,7 @@ class ErrorMessage
     {
         Serial.print(F("Error"));
         SendEqual();
-        Serial.print(error);
+        Serial.print(ToUnderlying(error));
         if(append_space) { SendSpace(); }
     }
 
@@ -127,8 +127,8 @@ class ErrorMessage
 
     static void Send(StdReturnType return_value, bool append_space = true)
     {
-        if(return_value == kEOk) { Send(kErrorNoError, append_space); }
-        else { Send(kErrorUnknown, append_space); }
+        if(return_value == kEOk) { Send(ErrorType::kNoError, append_space); }
+        else { Send(ErrorType::kUnknown, append_space); }
     }
 
     static void CheckReturnValueAndSend(ApiType api, StdReturnType return_value, ErrorType error, bool append_space = true)

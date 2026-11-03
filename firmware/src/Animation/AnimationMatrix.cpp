@@ -49,7 +49,7 @@
 ******************************************************************************************************************************************************/
 void AnimationMatrix::Init()
 {
-    Animation::Init(kStateIdle);
+    Animation::Init(StateType::kIdle);
     /* all animations share one union, so nothing may rely on member initializers */
     Reset();
 } /* Init */
@@ -62,13 +62,13 @@ StdReturnType AnimationMatrix::SetTime(byte hour, byte minute)
 {
     StdReturnType return_value{kENotOk};
 
-    if(Clock::GetInstance().GetClockWords(hour, minute, clock_words_table_) == kEOk && state_ == kStateIdle) {
+    if(Clock::GetInstance().GetClockWords(hour, minute, clock_words_table_) == kEOk && state_ == StateType::kIdle) {
         /* derives the start frames from the time, so word changes vary the rain pattern */
         seed_ = static_cast<byte>((hour * 60u) + minute);
         frame_counter_ = 0u;
         /* no clear here: the previous time stays visible below the drops and is eaten
            by the rain while it falls */
-        state_ = kStateSetTime;
+        state_ = StateType::kSetTime;
         return_value = kEOk;
     }
     return return_value;
@@ -80,7 +80,7 @@ StdReturnType AnimationMatrix::SetTime(byte hour, byte minute)
 ******************************************************************************************************************************************************/
 void AnimationMatrix::Task()
 {
-    if(state_ == kStateSetTime) { SetTimeTask(); }
+    if(state_ == StateType::kSetTime) { SetTimeTask(); }
 } /* Task */
 
 
@@ -93,7 +93,7 @@ void AnimationMatrix::Task()
 ******************************************************************************************************************************************************/
 void AnimationMatrix::Reset()
 {
-    clock_words_table_.fill(DisplayWords::kWordNone);
+    clock_words_table_.fill(DisplayWords::WordIdType::kNone);
     frame_counter_ = 0u;
     seed_ = 0u;
 } /* Reset */

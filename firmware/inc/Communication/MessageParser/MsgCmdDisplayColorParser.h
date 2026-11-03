@@ -60,9 +60,9 @@ class MsgCmdDisplayColorParser : public MsgParameterParser<MsgCmdDisplayColorPar
     static constexpr char kBlueOptionShortName{'B'};
 
     static constexpr ParameterTableType kParameterTable PROGMEM {
-        ParameterTableElementType(kRedOptionShortName, MsgParameter::kArgumentTypeUint8),
-        ParameterTableElementType(kGreenOptionShortName, MsgParameter::kArgumentTypeUint8),
-        ParameterTableElementType(kBlueOptionShortName, MsgParameter::kArgumentTypeUint8)
+        ParameterTableElementType(kRedOptionShortName, MsgParameter::ArgumentTypeType::kUint8),
+        ParameterTableElementType(kGreenOptionShortName, MsgParameter::ArgumentTypeType::kUint8),
+        ParameterTableElementType(kBlueOptionShortName, MsgParameter::ArgumentTypeType::kUint8)
     };
 
     // functions
@@ -81,7 +81,7 @@ class MsgCmdDisplayColorParser : public MsgParameterParser<MsgCmdDisplayColorPar
     void Show() const
     {
         StdReturnType return_value = Display::GetInstance().Show();
-        error_.CheckReturnValueAndSend(ErrorMessage::kApiDisplayShow, return_value, ErrorMessage::kErrorDisplayPending);
+        error_.CheckReturnValueAndSend(ErrorMessage::ApiType::kDisplayShow, return_value, ErrorMessage::ErrorType::kDisplayPending);
     }
 
 /******************************************************************************************************************************************************

@@ -84,11 +84,11 @@ class Display
 ******************************************************************************************************************************************************/
   public:
     /* type which describes the internal state of the Display */
-    enum StateType {
-        kStateNone,
-        kStateUninit,
-        kStateInit,
-        kStateReady
+    enum class StateType {
+        kNone,
+        kUninit,
+        kInit,
+        kReady
     };
 
     using PixelValueType = bool;
@@ -117,7 +117,7 @@ class Display
 ******************************************************************************************************************************************************/
   private:
     static constexpr byte kWordLengthUnlimited{0u};
-    StateType state_{kStateNone};
+    StateType state_{StateType::kNone};
     /* Whether the display was last asked to be on, true because a strip comes up lit. Kept
        here rather than read back from the strip's master brightness, which is what Enable()
        and Disable() write: under DISPLAY_USE_PIXELS_DIMMING that same register carries the
@@ -220,10 +220,10 @@ class Display
     void SetBrightness(byte);
 
     // char methods
-    StdReturnType SetCharacter(CharacterIdType character_id) { return SetPixel(character_id); }
-    StdReturnType ClearCharacter(CharacterIdType character_id) { return ClearPixel(character_id); }
-    StdReturnType GetCharacter(CharacterIdType character_id, PixelValueType& value) const { return GetPixel(character_id, value); }
-    PixelValueType GetCharacter(CharacterIdType character_id) const { return GetPixel(character_id); }
+    StdReturnType SetCharacter(CharacterIdType character_id) { return SetPixel(ToUnderlying(character_id)); }
+    StdReturnType ClearCharacter(CharacterIdType character_id) { return ClearPixel(ToUnderlying(character_id)); }
+    StdReturnType GetCharacter(CharacterIdType character_id, PixelValueType& value) const { return GetPixel(ToUnderlying(character_id), value); }
+    PixelValueType GetCharacter(CharacterIdType character_id) const { return GetPixel(ToUnderlying(character_id)); }
 
     // word methods
     StdReturnType SetWord(WordIdType, byte max_length = kWordLengthUnlimited);

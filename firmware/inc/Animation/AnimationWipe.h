@@ -49,18 +49,18 @@ class AnimationWipe : public Animation
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-    enum SetPixelStateType {
-        kSetPixelStateRight,
-        kSetPixelStateDown
+    enum class SetPixelStateType {
+        kRight,
+        kDown
     };
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    ClockWords::WordsListType clock_words_table_{{DisplayWords::kWordNone}};
+    ClockWords::WordsListType clock_words_table_{{DisplayWords::WordIdType::kNone}};
     byte index_{0u};
-    SetPixelStateType set_pixel_state_{kSetPixelStateDown};
+    SetPixelStateType set_pixel_state_{SetPixelStateType::kDown};
 
     // functions
     void Reset();

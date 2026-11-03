@@ -75,9 +75,9 @@ StdReturnType BH1750::Init(ModeType mode)
 ******************************************************************************************************************************************************/
 StdReturnType BH1750::SetMode(ModeType mode)
 {
-    if(mode == kModeNone) { return kENotOk; }
+    if(mode == ModeType::kNone) { return kENotOk; }
 
-    if(SendCommand(mode) == kENotOk) { return kENotOk; }
+    if(SendCommand(ToUnderlying(mode)) == kENotOk) { return kENotOk; }
 
     mode_ = mode;
     return kEOk;

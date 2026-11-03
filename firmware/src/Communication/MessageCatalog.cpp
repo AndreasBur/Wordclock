@@ -60,11 +60,9 @@
  *  L O C A L   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
 /* The tables below sit outside the class, so that they can be constexpr and be checked at
-   compile time. These bring the argument types back within reach unqualified, which keeps
-   the tables readable. */
-constexpr MessageCatalog::ArgumentType kArgumentTypeUint8{MessageCatalog::kArgumentTypeUint8};
-constexpr MessageCatalog::ArgumentType kArgumentTypeUint16{MessageCatalog::kArgumentTypeUint16};
-constexpr MessageCatalog::ArgumentType kArgumentTypeString{MessageCatalog::kArgumentTypeString};
+   compile time. This brings the argument types back within reach without the class's name,
+   which keeps the tables readable. */
+using ArgumentType = MessageCatalog::ArgumentType;
 
 /* Walk the whole range of the value's own type and ask the firmware which values it
    accepts. Searching beats copying the limits: they are private, and a copy is a number
@@ -103,10 +101,10 @@ constexpr const char* const kBooleanValueNames[] {
     "off", "on"
 };
 
-/* MsgCmdRemoteProcedureCallParser::RpcIdType, from kRpcIdNone + 1 onwards. NONE is the
+/* MsgCmdRemoteProcedureCallParser::RpcIdType, from RpcIdType::kNone + 1 onwards. NONE is the
    initial value of the parser's rpc_id_ member, not a procedure: asking for it lands in the
-   default case and answers kErrorRpcIdUnknown. Offering it would offer a guaranteed
-   error, the same reason kCommandNone is left out of the command list. */
+   default case and answers ErrorType::kRpcIdUnknown. Offering it would offer a guaranteed
+   error, the same reason CommandType::kNone is left out of the command list. */
 constexpr const char* const kRemoteProcedureValueNames[] {
     "Illuminance calibration maximum",
     "Illuminance calibration minimum",
@@ -153,9 +151,9 @@ constexpr const char* const kRemoteProcedureValueNames[] {
 /* The command numbers and the value lists of the enumerations come out of the firmware
    itself; this list does not, so it is the one that can fall behind. A procedure added to
    RpcIdType without a name here would be offered as the name of the procedure before it.
-   kRpcIdNone has no name, hence the one. */
+   RpcIdType::kNone has no name, hence the one. */
 static_assert(NUMBER_OF(kRemoteProcedureValueNames) ==
-              MsgCmdRemoteProcedureCallParser::kRpcIdNumberOfProcedures - 1u,
+              MsgCmdRemoteProcedureCallParser::kNumberOfProcedures - 1u,
               "the remote procedure names have fallen behind MsgCmdRemoteProcedureCallParser::RpcIdType");
 
 /* Clock::ModeType */
@@ -242,30 +240,30 @@ constexpr const char* const kFontValueNames[] {
    and there are as many values as names. */
 #define NAMED(Minimum, Names)                           (Minimum), static_cast<uint16_t>((Minimum) + NUMBER_OF(Names) - 1u), Names, NUMBER_OF(Names)
 
-/* MsgCmdRemoteProcedureCallParser. Starts at one, kRpcIdNone being left out. */
+/* MsgCmdRemoteProcedureCallParser. Starts at one, RpcIdType::kNone being left out. */
 constexpr MessageCatalog::OptionType kRemoteProcedureCallOptions[] {
-    {'P', "Procedure",          kArgumentTypeUint8,  NAMED(1u, kRemoteProcedureValueNames)}
+    {'P', "Procedure",          ArgumentType::kUint8,  NAMED(1u, kRemoteProcedureValueNames)}
 };
 
 /* MsgCmdDisplayColorParser */
 constexpr MessageCatalog::OptionType kDisplayColorOptions[] {
-    {'R', "Red",                kArgumentTypeUint8,  0u, BYTE_MAX},
-    {'G', "Green",              kArgumentTypeUint8,  0u, BYTE_MAX},
-    {'B', "Blue",               kArgumentTypeUint8,  0u, BYTE_MAX}
+    {'R', "Red",                ArgumentType::kUint8,  0u, BYTE_MAX},
+    {'G', "Green",              ArgumentType::kUint8,  0u, BYTE_MAX},
+    {'B', "Blue",               ArgumentType::kUint8,  0u, BYTE_MAX}
 };
 
 /* MsgCmdDisplayBrightnessParser */
 constexpr MessageCatalog::OptionType kDisplayBrightnessOptions[] {
-    {'B', "Brightness",         kArgumentTypeUint8,  0u, BYTE_MAX},
-    {'A', "Automatic",          kArgumentTypeUint8,  NAMED(0u, kBooleanValueNames)},
-    {'G', "Gamma correction",   kArgumentTypeUint8,  NAMED(0u, kBooleanValueNames)}
+    {'B', "Brightness",         ArgumentType::kUint8,  0u, BYTE_MAX},
+    {'A', "Automatic",          ArgumentType::kUint8,  NAMED(0u, kBooleanValueNames)},
+    {'G', "Gamma correction",   ArgumentType::kUint8,  NAMED(0u, kBooleanValueNames)}
 };
 
 /* MsgCmdDisplayPixelParser. The index is a uint16 as soon as the display has more than
    255 pixels; 110 here, so the parser compiles it as a uint8. */
 constexpr MessageCatalog::OptionType kDisplayPixelOptions[] {
-    {'I', "Index",              kArgumentTypeUint8,  0u, DISPLAY_NUMBER_OF_PIXELS - 1u},
-    {'S', "State",              kArgumentTypeUint8,  NAMED(0u, kBooleanValueNames)}
+    {'I', "Index",              ArgumentType::kUint8,  0u, DISPLAY_NUMBER_OF_PIXELS - 1u},
+    {'S', "State",              ArgumentType::kUint8,  NAMED(0u, kBooleanValueNames)}
 };
 
 /* MsgCmdBaseOverlayParser, shared by the date, temperature and text commands. Only the
@@ -274,15 +272,15 @@ constexpr MessageCatalog::OptionType kDisplayPixelOptions[] {
    never answered. It is therefore the last entry rather than one in the middle, which
    lets those two share this table and simply stop one option short of it. */
 constexpr MessageCatalog::OptionType kOverlayOptions[] {
-    {'P', "Period (minutes)",   kArgumentTypeUint8,  1u, BYTE_MAX},
-    {'E', "Endurance (s)",      kArgumentTypeUint8,  1u, BYTE_MAX},
-    {'M', "Month",              kArgumentTypeUint8,  0u, 12u},
-    {'D', "Day",                kArgumentTypeUint8,  0u, 31u},
-    {'V', "Valid in days",      kArgumentTypeUint8,  0u, BYTE_MAX},
-    {'A', "Active",             kArgumentTypeUint8,  NAMED(0u, kBooleanValueNames)},
-    {'S', "Speed",              kArgumentTypeUint8,  0u, BYTE_MAX},
-    {'F', "Font",               kArgumentTypeUint8,  NAMED(0u, kFontValueNames)},
-    {'T', "Text",               kArgumentTypeString, 0u, 0u}
+    {'P', "Period (minutes)",   ArgumentType::kUint8,  1u, BYTE_MAX},
+    {'E', "Endurance (s)",      ArgumentType::kUint8,  1u, BYTE_MAX},
+    {'M', "Month",              ArgumentType::kUint8,  0u, 12u},
+    {'D', "Day",                ArgumentType::kUint8,  0u, 31u},
+    {'V', "Valid in days",      ArgumentType::kUint8,  0u, BYTE_MAX},
+    {'A', "Active",             ArgumentType::kUint8,  NAMED(0u, kBooleanValueNames)},
+    {'S', "Speed",              ArgumentType::kUint8,  0u, BYTE_MAX},
+    {'F', "Font",               ArgumentType::kUint8,  NAMED(0u, kFontValueNames)},
+    {'T', "Text",               ArgumentType::kString, 0u, 0u}
 };
 
 /* The overlays that have no text of their own stop one short of the shared table. Derived
@@ -303,30 +301,30 @@ static_assert(kOverlayOptions[kNumberOfOverlayOptionsWithoutText].short_name == 
 #define READ_ONLY                                       0u, 0u, nullptr, 0u, true
 
 constexpr MessageCatalog::OptionType kStatusOptions[] {
-    {'V', "Firmware version",   kArgumentTypeString, READ_ONLY},
+    {'V', "Firmware version",   ArgumentType::kString, READ_ONLY},
     /* Three fields rather than one count. A single number has to be in some unit, and
        every unit that fits a uint16 runs out on a clock that is meant to hang on a wall
        for years - minutes did, after 45 days. Days carry the range, hours and minutes the
        resolution, and none of them has to be divided by a reader. */
-    {'U', "Uptime (days)",      kArgumentTypeUint16, READ_ONLY},
-    {'H', "Uptime (hours)",     kArgumentTypeUint8,  READ_ONLY},
-    {'N', "Uptime (minutes)",   kArgumentTypeUint8,  READ_ONLY},
-    {'I', "Illuminance (lx)",   kArgumentTypeUint16, READ_ONLY},
-    {'T', "Temperature",        kArgumentTypeString, READ_ONLY},
-    {'A', "Address",            kArgumentTypeString, READ_ONLY},
-    {'Q', "Link quality (dBm)", kArgumentTypeString, READ_ONLY},
-    {'M', "Free memory (KiB)",  kArgumentTypeUint16, READ_ONLY}
+    {'U', "Uptime (days)",      ArgumentType::kUint16, READ_ONLY},
+    {'H', "Uptime (hours)",     ArgumentType::kUint8,  READ_ONLY},
+    {'N', "Uptime (minutes)",   ArgumentType::kUint8,  READ_ONLY},
+    {'I', "Illuminance (lx)",   ArgumentType::kUint16, READ_ONLY},
+    {'T', "Temperature",        ArgumentType::kString, READ_ONLY},
+    {'A', "Address",            ArgumentType::kString, READ_ONLY},
+    {'Q', "Link quality (dBm)", ArgumentType::kString, READ_ONLY},
+    {'M', "Free memory (KiB)",  ArgumentType::kUint16, READ_ONLY}
 };
 
 /* MsgCmdNightSwitchParser. Brightness zero is the display switched off rather than a
    dimming of nothing, which is what lets one field carry both wishes. */
 constexpr MessageCatalog::OptionType kNightSwitchOptions[] {
-    {'A', "Active",             kArgumentTypeUint8,  NAMED(0u, kBooleanValueNames)},
-    {'H', "Start hour",         kArgumentTypeUint8,  0u, 23u},
-    {'M', "Start minute",       kArgumentTypeUint8,  0u, 59u},
-    {'E', "End hour",           kArgumentTypeUint8,  0u, 23u},
-    {'N', "End minute",         kArgumentTypeUint8,  0u, 59u},
-    {'B', "Night brightness",   kArgumentTypeUint8,  0u, BYTE_MAX}
+    {'A', "Active",             ArgumentType::kUint8,  NAMED(0u, kBooleanValueNames)},
+    {'H', "Start hour",         ArgumentType::kUint8,  0u, 23u},
+    {'M', "Start minute",       ArgumentType::kUint8,  0u, 59u},
+    {'E', "End hour",           ArgumentType::kUint8,  0u, 23u},
+    {'N', "End minute",         ArgumentType::kUint8,  0u, 59u},
+    {'B', "Night brightness",   ArgumentType::kUint8,  0u, BYTE_MAX}
 };
 
 /* MsgCmdColorCycleParser. The hue is read-only: it is where the wheel has got to, which is
@@ -334,82 +332,82 @@ constexpr MessageCatalog::OptionType kNightSwitchOptions[] {
    kind of number as the animation speed above, scheduler ticks per step, and zero there is a
    cycle standing still rather than a value to refuse. */
 constexpr MessageCatalog::OptionType kColorCycleOptions[] {
-    {'A', "Active",             kArgumentTypeUint8,  NAMED(0u, kBooleanValueNames)},
-    {'S', "Speed",              kArgumentTypeUint8,  0u, BYTE_MAX},
-    {'H', "Hue",                kArgumentTypeUint8,  READ_ONLY}
+    {'A', "Active",             ArgumentType::kUint8,  NAMED(0u, kBooleanValueNames)},
+    {'S', "Speed",              ArgumentType::kUint8,  0u, BYTE_MAX},
+    {'H', "Hue",                ArgumentType::kUint8,  READ_ONLY}
 };
 
 /* MsgCmdConsoleParser. The password is an input and never an answer, the same as the pass
    phrase below; what is read back is whether one is set. Sending the command with no password
    at all clears it, which is the way back for a clock nobody can log into any more. */
 constexpr MessageCatalog::OptionType kConsoleOptions[] {
-    {'P', "Console password",   kArgumentTypeString, 0u, 0u},
-    {'A', "Protected",          kArgumentTypeUint8,  READ_ONLY}
+    {'P', "Console password",   ArgumentType::kString, 0u, 0u},
+    {'A', "Protected",          ArgumentType::kUint8,  READ_ONLY}
 };
 
 /* MsgCmdNetworkParser. The pass phrase is an input and never an answer, so it carries no
    range and is never read back - see the parser for why. */
 constexpr MessageCatalog::OptionType kNetworkOptions[] {
-    {'S', "Network name",       kArgumentTypeString, 0u, 0u},
-    {'P', "Pass phrase",        kArgumentTypeString, 0u, 0u}
+    {'S', "Network name",       ArgumentType::kString, 0u, 0u},
+    {'P', "Pass phrase",        ArgumentType::kString, 0u, 0u}
 };
 
 /* MsgCmdClockModeParser */
 constexpr MessageCatalog::OptionType kClockModeOptions[] {
-    {'M', "Mode",               kArgumentTypeUint8,  NAMED(0u, kClockModeValueNames)},
-    {'I', "It is permanently",  kArgumentTypeUint8,  NAMED(0u, kBooleanValueNames)}
+    {'M', "Mode",               ArgumentType::kUint8,  NAMED(0u, kClockModeValueNames)},
+    {'I', "It is permanently",  ArgumentType::kUint8,  NAMED(0u, kBooleanValueNames)}
 };
 
 /* MsgCmdAnimationParser */
 constexpr MessageCatalog::OptionType kAnimationOptions[] {
-    {'A', "Animation",          kArgumentTypeUint8,  NAMED(0u, kAnimationValueNames)},
-    {'M', "Mode",               kArgumentTypeUint8,  NAMED(0u, kAnimationModeValueNames)},
-    {'S', "Speed",              kArgumentTypeUint8,  0u, BYTE_MAX},
-    {'F', "Favourite",          kArgumentTypeUint8,  0u, BYTE_MAX}
+    {'A', "Animation",          ArgumentType::kUint8,  NAMED(0u, kAnimationValueNames)},
+    {'M', "Mode",               ArgumentType::kUint8,  NAMED(0u, kAnimationModeValueNames)},
+    {'S', "Speed",              ArgumentType::kUint8,  0u, BYTE_MAX},
+    {'F', "Favourite",          ArgumentType::kUint8,  0u, BYTE_MAX}
 };
 
 /* MsgCmdTimeParser */
 constexpr MessageCatalog::OptionType kTimeOptions[] {
-    {'H', "Hour",               kArgumentTypeUint8,  MEASURED(ClockTime::HourType, ClockTime::IsHourValid)},
-    {'M', "Minute",             kArgumentTypeUint8,  MEASURED(ClockTime::MinuteType, ClockTime::IsMinuteValid)},
-    {'S', "Second",             kArgumentTypeUint8,  MEASURED(ClockTime::SecondType, ClockTime::IsSecondValid)}
+    {'H', "Hour",               ArgumentType::kUint8,  MEASURED(ClockTime::HourType, ClockTime::IsHourValid)},
+    {'M', "Minute",             ArgumentType::kUint8,  MEASURED(ClockTime::MinuteType, ClockTime::IsMinuteValid)},
+    {'S', "Second",             ArgumentType::kUint8,  MEASURED(ClockTime::SecondType, ClockTime::IsSecondValid)}
 };
 
 /* MsgCmdDateParser */
 constexpr MessageCatalog::OptionType kDateOptions[] {
-    {'Y', "Year",               kArgumentTypeUint16, MEASURED(ClockDate::YearType, ClockDate::IsYearValid)},
-    {'M', "Month",              kArgumentTypeUint8,  MEASURED(ClockDate::MonthType, ClockDate::IsMonthValid)},
-    {'D', "Day",                kArgumentTypeUint8,  MEASURED(ClockDate::DayType, ClockDate::IsDayValid)}
+    {'Y', "Year",               ArgumentType::kUint16, MEASURED(ClockDate::YearType, ClockDate::IsYearValid)},
+    {'M', "Month",              ArgumentType::kUint8,  MEASURED(ClockDate::MonthType, ClockDate::IsMonthValid)},
+    {'D', "Day",                ArgumentType::kUint8,  MEASURED(ClockDate::DayType, ClockDate::IsDayValid)}
 };
 
 /* The numbers come from the enumeration itself, so they follow it instead of having to be
    kept level with it — including when a support switch shortens it, which is why the
-   overlay entries carry the same guards the enumerators do. kCommandNone is left out, it
+   overlay entries carry the same guards the enumerators do. CommandType::kNone is left out, it
    is not a command that can be sent. Sending a command with no option at all asks the
    firmware for its current settings, which is why every entry is useful on its own. */
 constexpr MessageCatalog::CommandType kCommands[] {
-    {MsgCmdParser::kCommandRemoteProcedureCall, "Remote procedure call", kRemoteProcedureCallOptions, NUMBER_OF(kRemoteProcedureCallOptions)},
-    {MsgCmdParser::kCommandDisplayColor,         "Display colour",        kDisplayColorOptions,        NUMBER_OF(kDisplayColorOptions)},
-    {MsgCmdParser::kCommandDisplayBrightness,    "Display brightness",    kDisplayBrightnessOptions,   NUMBER_OF(kDisplayBrightnessOptions)},
-    {MsgCmdParser::kCommandDisplayPixel,         "Display pixel",         kDisplayPixelOptions,        NUMBER_OF(kDisplayPixelOptions)},
+    {ToUnderlying(MsgCmdParser::CommandType::kRemoteProcedureCall), "Remote procedure call", kRemoteProcedureCallOptions, NUMBER_OF(kRemoteProcedureCallOptions)},
+    {ToUnderlying(MsgCmdParser::CommandType::kDisplayColor),         "Display colour",        kDisplayColorOptions,        NUMBER_OF(kDisplayColorOptions)},
+    {ToUnderlying(MsgCmdParser::CommandType::kDisplayBrightness),    "Display brightness",    kDisplayBrightnessOptions,   NUMBER_OF(kDisplayBrightnessOptions)},
+    {ToUnderlying(MsgCmdParser::CommandType::kDisplayPixel),         "Display pixel",         kDisplayPixelOptions,        NUMBER_OF(kDisplayPixelOptions)},
 #if (OVERLAYS_SUPPORT_DATE == STD_ON)
-    {MsgCmdParser::kCommandOverlayDate,          "Overlay date",          kOverlayOptions,             kNumberOfOverlayOptionsWithoutText},
+    {ToUnderlying(MsgCmdParser::CommandType::kOverlayDate),          "Overlay date",          kOverlayOptions,             kNumberOfOverlayOptionsWithoutText},
 #endif
 #if (OVERLAYS_SUPPORT_TEMPERATURE == STD_ON)
-    {MsgCmdParser::kCommandOverlayTemperature,   "Overlay temperature",   kOverlayOptions,             kNumberOfOverlayOptionsWithoutText},
+    {ToUnderlying(MsgCmdParser::CommandType::kOverlayTemperature),   "Overlay temperature",   kOverlayOptions,             kNumberOfOverlayOptionsWithoutText},
 #endif
 #if (OVERLAYS_SUPPORT_TEXT == STD_ON)
-    {MsgCmdParser::kCommandOverlayText,          "Overlay text",          kOverlayOptions,             NUMBER_OF(kOverlayOptions)},
+    {ToUnderlying(MsgCmdParser::CommandType::kOverlayText),          "Overlay text",          kOverlayOptions,             NUMBER_OF(kOverlayOptions)},
 #endif
-    {MsgCmdParser::kCommandClockMode,            "Clock mode",            kClockModeOptions,           NUMBER_OF(kClockModeOptions)},
-    {MsgCmdParser::kCommandAnimation,             "Animation",             kAnimationOptions,           NUMBER_OF(kAnimationOptions)},
-    {MsgCmdParser::kCommandTime,                  "Time",                  kTimeOptions,                NUMBER_OF(kTimeOptions)},
-    {MsgCmdParser::kCommandDate,                  "Date",                  kDateOptions,                NUMBER_OF(kDateOptions)},
-    {MsgCmdParser::kCommandStatus,                "Status",                kStatusOptions,              NUMBER_OF(kStatusOptions)},
-    {MsgCmdParser::kCommandNetwork,               "Network",               kNetworkOptions,             NUMBER_OF(kNetworkOptions)},
-    {MsgCmdParser::kCommandNightSwitch,          "Night switch",          kNightSwitchOptions,         NUMBER_OF(kNightSwitchOptions)},
-    {MsgCmdParser::kCommandColorCycle,           "Colour cycle",          kColorCycleOptions,          NUMBER_OF(kColorCycleOptions)},
-    {MsgCmdParser::kCommandConsole,               "Console access",        kConsoleOptions,             NUMBER_OF(kConsoleOptions)}
+    {ToUnderlying(MsgCmdParser::CommandType::kClockMode),            "Clock mode",            kClockModeOptions,           NUMBER_OF(kClockModeOptions)},
+    {ToUnderlying(MsgCmdParser::CommandType::kAnimation),             "Animation",             kAnimationOptions,           NUMBER_OF(kAnimationOptions)},
+    {ToUnderlying(MsgCmdParser::CommandType::kTime),                  "Time",                  kTimeOptions,                NUMBER_OF(kTimeOptions)},
+    {ToUnderlying(MsgCmdParser::CommandType::kDate),                  "Date",                  kDateOptions,                NUMBER_OF(kDateOptions)},
+    {ToUnderlying(MsgCmdParser::CommandType::kStatus),                "Status",                kStatusOptions,              NUMBER_OF(kStatusOptions)},
+    {ToUnderlying(MsgCmdParser::CommandType::kNetwork),               "Network",               kNetworkOptions,             NUMBER_OF(kNetworkOptions)},
+    {ToUnderlying(MsgCmdParser::CommandType::kNightSwitch),          "Night switch",          kNightSwitchOptions,         NUMBER_OF(kNightSwitchOptions)},
+    {ToUnderlying(MsgCmdParser::CommandType::kColorCycle),           "Colour cycle",          kColorCycleOptions,          NUMBER_OF(kColorCycleOptions)},
+    {ToUnderlying(MsgCmdParser::CommandType::kConsole),               "Console access",        kConsoleOptions,             NUMBER_OF(kConsoleOptions)}
 };
 
 constexpr byte kNumberOfCommands{NUMBER_OF(kCommands)};
@@ -501,7 +499,7 @@ const MessageCatalog::CommandType* MessageCatalog::FindCommandByNumber(byte numb
 ******************************************************************************************************************************************************/
 const MessageCatalog::CommandType* MessageCatalog::FindRemoteProcedureCallCommand()
 {
-    return FindCommandByNumber(MsgCmdParser::kCommandRemoteProcedureCall);
+    return FindCommandByNumber(ToUnderlying(MsgCmdParser::CommandType::kRemoteProcedureCall));
 } /* FindRemoteProcedureCallCommand */
 
 

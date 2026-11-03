@@ -65,9 +65,9 @@ class MsgCmdDateParser : public MsgParameterParser<MsgCmdDateParser, MSG_CMD_DAT
     static constexpr char kDayOptionShortName{'D'};
 
     static constexpr ParameterTableType kParameterTable PROGMEM {
-        ParameterTableElementType(kYearOptionShortName, MsgParameter::kArgumentTypeUint16),
-        ParameterTableElementType(kMonthOptionShortName, MsgParameter::kArgumentTypeUint8),
-        ParameterTableElementType(kDayOptionShortName, MsgParameter::kArgumentTypeUint8)
+        ParameterTableElementType(kYearOptionShortName, MsgParameter::ArgumentTypeType::kUint16),
+        ParameterTableElementType(kMonthOptionShortName, MsgParameter::ArgumentTypeType::kUint8),
+        ParameterTableElementType(kDayOptionShortName, MsgParameter::ArgumentTypeType::kUint8)
     };
 
     // functions
@@ -93,15 +93,15 @@ class MsgCmdDateParser : public MsgParameterParser<MsgCmdDateParser, MSG_CMD_DAT
 
     void SetYear(YearType year)  {
         StdReturnType return_value =  date_.SetYear(year);
-        error_.CheckReturnValueAndSend(kYearOptionShortName, return_value, ErrorMessage::kErrorValueOutOfBounds);
+        error_.CheckReturnValueAndSend(kYearOptionShortName, return_value, ErrorMessage::ErrorType::kValueOutOfBounds);
     }
     void SetMonth(MonthType month)  {
         StdReturnType return_value = date_.SetMonth(month);
-        error_.CheckReturnValueAndSend(kMonthOptionShortName, return_value, ErrorMessage::kErrorValueOutOfBounds);
+        error_.CheckReturnValueAndSend(kMonthOptionShortName, return_value, ErrorMessage::ErrorType::kValueOutOfBounds);
     }
     void SetDay(DayType day)  {
         StdReturnType return_value = date_.SetDay(day);
-        error_.CheckReturnValueAndSend(kDayOptionShortName, return_value, ErrorMessage::kErrorValueOutOfBounds);
+        error_.CheckReturnValueAndSend(kDayOptionShortName, return_value, ErrorMessage::ErrorType::kValueOutOfBounds);
     }
 
 /******************************************************************************************************************************************************

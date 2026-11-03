@@ -50,7 +50,7 @@
 ******************************************************************************************************************************************************/
 void AnimationSnake::Init()
 {
-    Animation::Init(kStateIdle);
+    Animation::Init(StateType::kIdle);
     Reset();
 } /* Init */
 
@@ -62,11 +62,11 @@ StdReturnType AnimationSnake::SetTime(byte hour, byte minute)
 {
     StdReturnType return_value{kENotOk};
 
-    if(Clock::GetInstance().GetClockWords(hour, minute, clock_words_table_) == kEOk && state_ == kStateIdle) {
+    if(Clock::GetInstance().GetClockWords(hour, minute, clock_words_table_) == kEOk && state_ == StateType::kIdle) {
         return_value = kEOk;
         snake_begin_index_ = 0u;
         snake_end_index_ = 0u;
-        state_ = kStateSetTime;
+        state_ = StateType::kSetTime;
     }
     return return_value;
 } /* SetTime */
@@ -77,7 +77,7 @@ StdReturnType AnimationSnake::SetTime(byte hour, byte minute)
 ******************************************************************************************************************************************************/
 void AnimationSnake::Task()
 {
-    if(state_ == kStateSetTime) {
+    if(state_ == StateType::kSetTime) {
         byte snake_end_index_trans = TransformToSerpentine(snake_end_index_);
         Display::GetInstance().SetPixel(TransformToSerpentine(snake_begin_index_));
 
@@ -104,7 +104,7 @@ void AnimationSnake::Reset()
 {
     snake_begin_index_ = 0u;
     snake_end_index_ = 0u;
-    snake_state_ = kSnakeStateToRight;
+    snake_state_ = SnakeStateType::kToRight;
 } /* Reset */
 
 

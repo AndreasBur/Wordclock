@@ -35,9 +35,9 @@
 #define MSG_CMD_DISPLAY_PIXEL_PARSER_PARAMETER_TABLE_SIZE       2u
 
 # if (WS2812_NUMBER_OF_LEDS < 255u)
-#  define MSG_CMD_DISPLAY_PIXEL_PARSER_INDEX_ARGUMENT_TYPE      MsgParameter::kArgumentTypeUint8
+#  define MSG_CMD_DISPLAY_PIXEL_PARSER_INDEX_ARGUMENT_TYPE      MsgParameter::ArgumentTypeType::kUint8
 # else
-#  define MSG_CMD_DISPLAY_PIXEL_PARSER_INDEX_ARGUMENT_TYPE      MsgParameter::kArgumentTypeUint16
+#  define MSG_CMD_DISPLAY_PIXEL_PARSER_INDEX_ARGUMENT_TYPE      MsgParameter::ArgumentTypeType::kUint16
 # endif
 
 /******************************************************************************************************************************************************
@@ -54,10 +54,10 @@ class MsgCmdDisplayPixelParser : public MsgParameterParser<MsgCmdDisplayPixelPar
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-    enum StateType {
-        kStateNone,
-        kStateOff,
-        kStateOn
+    enum class StateType {
+        kNone,
+        kOff,
+        kOn
     };
 
     using IndexType = Display::IndexType;
@@ -68,14 +68,14 @@ class MsgCmdDisplayPixelParser : public MsgParameterParser<MsgCmdDisplayPixelPar
   private:
     friend class MsgParameterParser;
     byte index_{0u};
-    StateType state_{kStateNone};
+    StateType state_{StateType::kNone};
 
     static constexpr char kIndexOptionShortName{'I'};
     static constexpr char kStateOptionShortName{'S'};
 
     static constexpr ParameterTableType kParameterTable PROGMEM {
         ParameterTableElementType(kIndexOptionShortName, MSG_CMD_DISPLAY_PIXEL_PARSER_INDEX_ARGUMENT_TYPE),
-        ParameterTableElementType(kStateOptionShortName, MsgParameter::kArgumentTypeUint8),
+        ParameterTableElementType(kStateOptionShortName, MsgParameter::ArgumentTypeType::kUint8),
     };
 
     // functions
@@ -89,7 +89,7 @@ class MsgCmdDisplayPixelParser : public MsgParameterParser<MsgCmdDisplayPixelPar
     void HandleParameterIndex(byte argument)
     {
         index_ = argument;
-        if(state_ == kStateNone) { state_ = GetPixelState(index_); }
+        if(state_ == StateType::kNone) { state_ = GetPixelState(index_); }
     }
 
     void HandleParameterState(byte argument)
@@ -103,13 +103,13 @@ class MsgCmdDisplayPixelParser : public MsgParameterParser<MsgCmdDisplayPixelPar
         /* Asked before reading rather than read and then judged by a return code: the pixel
            itself is what this answers with, and an index that is not on the display has no
            state rather than a false one. */
-        if(!Display::GetInstance().IsIndexValid(index)) { return kStateNone; }
+        if(!Display::GetInstance().IsIndexValid(index)) { return StateType::kNone; }
 
         return GetPixelState(Display::GetInstance().GetPixel(index));
     }
 
-    static StateType GetPixelState(bool pixel_value) { return pixel_value ? kStateOn : kStateOff; }
-    static bool GetPixelValue(StateType pixel_state) { return pixel_state == kStateOn; }
+    static StateType GetPixelState(bool pixel_value) { return pixel_value ? StateType::kOn : StateType::kOff; }
+    static bool GetPixelValue(StateType pixel_state) { return pixel_state == StateType::kOn; }
 
     void SendAnswerIndex(bool append_space) const {
         SendAnswerParameter(kIndexOptionShortName, index_, append_space);
@@ -118,12 +118,12 @@ class MsgCmdDisplayPixelParser : public MsgParameterParser<MsgCmdDisplayPixelPar
         SendAnswerParameter(kStateOptionShortName, Display::GetInstance().GetPixel(index_), append_space);
     }
 
-    void SetPixel() const { if(state_ != kStateNone) { Display::GetInstance().WritePixel(index_, GetPixelValue(state_)); }}
+    void SetPixel() const { if(state_ != StateType::kNone) { Display::GetInstance().WritePixel(index_, GetPixelValue(state_)); }}
 
     void Show() const
     {
         StdReturnType return_value = Display::GetInstance().Show();
-        error_.CheckReturnValueAndSend(ErrorMessage::kApiDisplayShow, return_value, ErrorMessage::kErrorDisplayPending);
+        error_.CheckReturnValueAndSend(ErrorMessage::ApiType::kDisplayShow, return_value, ErrorMessage::ErrorType::kDisplayPending);
     }
 
 /******************************************************************************************************************************************************
@@ -149,7 +149,7 @@ class MsgCmdDisplayPixelParser : public MsgParameterParser<MsgCmdDisplayPixelPar
     void Process()
     {
         if(!Display::GetInstance().IsIndexValid(index_)) {
-            error_.Send(kIndexOptionShortName, ErrorMessage::kErrorValueOutOfBounds, false);
+            error_.Send(kIndexOptionShortName, ErrorMessage::ErrorType::kValueOutOfBounds, false);
         } else {
             SetPixel();
         }

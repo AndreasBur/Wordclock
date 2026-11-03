@@ -63,22 +63,23 @@ class AnimationRoll : public Animation
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-    enum DirectionType {
-        kDirectionRight,
-        kDirectionLeft,
-        kDirectionDown,
-        kDirectionUp,
-        kDirectionNumberOfDirections
+    enum class DirectionType {
+        kRight,
+        kLeft,
+        kDown,
+        kUp,
+        kNumberOfDirections
     };
+    static constexpr byte kNumberOfDirections{static_cast<byte>(DirectionType::kNumberOfDirections)};
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
     Transformation wc_transformation_;
-    ClockWords::WordsListType clock_words_table_{{DisplayWords::kWordNone}};
+    ClockWords::WordsListType clock_words_table_{{DisplayWords::WordIdType::kNone}};
     byte step_{0u};
-    DirectionType direction_{kDirectionRight};
+    DirectionType direction_{DirectionType::kRight};
 
     // functions
     void Reset();

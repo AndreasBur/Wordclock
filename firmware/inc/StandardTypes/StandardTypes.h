@@ -25,6 +25,7 @@
 #include <stdint.h>
 #include <limits.h>
 #include <stddef.h>
+#include <type_traits>
 
 /******************************************************************************************************************************************************
  *  GLOBAL CONSTANT MACROS
@@ -74,6 +75,15 @@ enum StdReturnType {
  *  GLOBAL INLINE FUNCTION PROTOTYPES
 ******************************************************************************************************************************************************/
 template <typename T> uint8_t DigitsOfNumber(T number, unsigned = 10);
+
+/* An enumerator as the number it is stored as - to index an array with, count with or print.
+   An enum class does not turn into a number by itself, which is the point of it; this is the
+   one place it is asked to. std::to_underlying, which is C++23. */
+template <typename EnumType>
+constexpr std::underlying_type_t<EnumType> ToUnderlying(EnumType value)
+{
+    return static_cast<std::underlying_type_t<EnumType>>(value);
+}
 
 /******************************************************************************************************************************************************
  *  GLOBAL INLINE FUNCTIONS

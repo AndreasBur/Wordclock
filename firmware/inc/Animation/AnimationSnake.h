@@ -49,17 +49,17 @@ class AnimationSnake : public Animation
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-    enum SnakeStateType {
-        kSnakeStateToRight,
-        kSnakeStateToLeft
+    enum class SnakeStateType {
+        kToRight,
+        kToLeft
     };
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    SnakeStateType snake_state_{kSnakeStateToRight};
-    ClockWords::WordsListType clock_words_table_{{DisplayWords::kWordNone}};
+    SnakeStateType snake_state_{SnakeStateType::kToRight};
+    ClockWords::WordsListType clock_words_table_{{DisplayWords::WordIdType::kNone}};
     byte snake_begin_index_{0u};
     byte snake_end_index_{0u};
 

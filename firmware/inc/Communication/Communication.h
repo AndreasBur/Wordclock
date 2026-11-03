@@ -47,16 +47,16 @@ class Communication
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-    enum StateType {
-        kStateMessageComplete,
-        kStateMessageIncomplete,
+    enum class StateType {
+        kMessageComplete,
+        kMessageIncomplete,
     };
 
 /******************************************************************************************************************************************************
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    Communication() : error_(), incoming_message_(), state_(kStateMessageIncomplete) { }
+    Communication() : error_(), incoming_message_(), state_(StateType::kMessageIncomplete) { }
     ~Communication() { }
 
     static constexpr byte kTaskCycle{COMMUNICATION_TASK_CYCLE};
@@ -86,7 +86,7 @@ class Communication
 
     // methods
     void Task();
-    bool IsMessageComplete() const { return state_ == kStateMessageComplete; }
+    bool IsMessageComplete() const { return state_ == StateType::kMessageComplete; }
 };
 
 #endif

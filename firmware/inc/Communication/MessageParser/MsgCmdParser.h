@@ -49,30 +49,30 @@ class MsgCmdParser
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-    enum CommandType {
-        kCommandNone = MSG_COMMAND_NONE_NUMBER,
-        kCommandRemoteProcedureCall,
-        kCommandDisplayColor,
-        kCommandDisplayBrightness,
-        kCommandDisplayPixel,
+    enum class CommandType {
+        kNone = MSG_COMMAND_NONE_NUMBER,
+        kRemoteProcedureCall,
+        kDisplayColor,
+        kDisplayBrightness,
+        kDisplayPixel,
 #if (OVERLAYS_SUPPORT_DATE == STD_ON)
-        kCommandOverlayDate,
+        kOverlayDate,
 #endif
 #if (OVERLAYS_SUPPORT_TEMPERATURE == STD_ON)
-        kCommandOverlayTemperature,
+        kOverlayTemperature,
 #endif
 #if (OVERLAYS_SUPPORT_TEXT == STD_ON)
-        kCommandOverlayText,
+        kOverlayText,
 #endif
-        kCommandClockMode,
-        kCommandAnimation,
-        kCommandTime,
-        kCommandDate,
-        kCommandStatus,
-        kCommandNetwork,
-        kCommandNightSwitch,
-        kCommandColorCycle,
-        kCommandConsole
+        kClockMode,
+        kAnimation,
+        kTime,
+        kDate,
+        kStatus,
+        kNetwork,
+        kNightSwitch,
+        kColorCycle,
+        kConsole
     };
 
 /******************************************************************************************************************************************************
@@ -85,7 +85,7 @@ class MsgCmdParser
 
     //private functions
     static void SendAnswer(CommandType command) {
-        Serial.print(command);
+        Serial.print(ToUnderlying(command));
         Serial.print(kCommandParameterDelimiter);
     }
 
@@ -103,12 +103,12 @@ class MsgCmdParser
 
         while(IsDecimalDigit(*digit)) {
             number = static_cast<uint16_t>((number * 10u) + ToDigitValue(*digit));
-            if(number > kCommandConsole) { return kCommandNone; }
+            if(number > ToUnderlying(CommandType::kConsole)) { return CommandType::kNone; }
             digit++;
         }
         /* Not one digit read: a message that is not a number at all, which is the same
-           kCommandNone that a zero converts to on its own. */
-        if(digit == message) { return kCommandNone; }
+           CommandType::kNone that a zero converts to on its own. */
+        if(digit == message) { return CommandType::kNone; }
 
         return static_cast<CommandType>(number);
     }

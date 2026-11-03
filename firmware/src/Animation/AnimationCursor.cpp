@@ -49,7 +49,7 @@
 ******************************************************************************************************************************************************/
 void AnimationCursor::Init()
 {
-    Animation::Init(kStateIdle);
+    Animation::Init(StateType::kIdle);
     Reset();
 } /* Init */
 
@@ -60,10 +60,10 @@ StdReturnType AnimationCursor::SetTime(byte hour, byte minute)
 {
     StdReturnType return_value{kENotOk};
 
-    if(Clock::GetInstance().GetClockWords(hour, minute, clock_words_table_) == kEOk && state_ == kStateIdle) {
+    if(Clock::GetInstance().GetClockWords(hour, minute, clock_words_table_) == kEOk && state_ == StateType::kIdle) {
         return_value = kEOk;
         current_pixel_index_ = 0u;
-        state_ = kStateSetTime;
+        state_ = StateType::kSetTime;
     }
     return return_value;
 } /* SetTime */
@@ -73,7 +73,7 @@ StdReturnType AnimationCursor::SetTime(byte hour, byte minute)
 ******************************************************************************************************************************************************/
 void AnimationCursor::Task()
 {
-    if(state_ == kStateSetTime) {
+    if(state_ == StateType::kSetTime) {
         if(current_pixel_index_ < DISPLAY_NUMBER_OF_PIXELS) { Display::GetInstance().SetPixel(current_pixel_index_); }
         if(current_pixel_index_ > 0u) {
             if(IsPixelPartOfClockWords(clock_words_table_, current_pixel_index_ - 1u) == false) {
@@ -99,7 +99,7 @@ void AnimationCursor::Task()
 ******************************************************************************************************************************************************/
 void AnimationCursor::Reset()
 {
-    clock_words_table_.fill(DisplayWords::kWordNone);
+    clock_words_table_.fill(DisplayWords::WordIdType::kNone);
     current_pixel_index_ = 0u;
 } /* Reset */
 

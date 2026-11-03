@@ -49,7 +49,7 @@
 ******************************************************************************************************************************************************/
 void AnimationRoll::Init()
 {
-    Animation::Init(kStateIdle);
+    Animation::Init(StateType::kIdle);
     /* all animations share one union, so nothing may rely on member initializers */
     Reset();
 } /* Init */
@@ -62,12 +62,12 @@ StdReturnType AnimationRoll::SetTime(byte hour, byte minute)
 {
     StdReturnType return_value{kENotOk};
 
-    if(Clock::GetInstance().GetClockWords(hour, minute, clock_words_table_) == kEOk && state_ == kStateIdle) {
+    if(Clock::GetInstance().GetClockWords(hour, minute, clock_words_table_) == kEOk && state_ == StateType::kIdle) {
         direction_ = CalcDirection(hour, minute);
         step_ = 0u;
         /* no clear phase: the previous time is still on the display and rolls out
            while the new one rolls in behind it */
-        state_ = kStateSetTime;
+        state_ = StateType::kSetTime;
         return_value = kEOk;
     }
     return return_value;
@@ -79,7 +79,7 @@ StdReturnType AnimationRoll::SetTime(byte hour, byte minute)
 ******************************************************************************************************************************************************/
 void AnimationRoll::Task()
 {
-    if(state_ == kStateSetTime) { SetTimeTask(); }
+    if(state_ == StateType::kSetTime) { SetTimeTask(); }
 } /* Task */
 
 
@@ -92,9 +92,9 @@ void AnimationRoll::Task()
 ******************************************************************************************************************************************************/
 void AnimationRoll::Reset()
 {
-    clock_words_table_.fill(DisplayWords::kWordNone);
+    clock_words_table_.fill(DisplayWords::WordIdType::kNone);
     step_ = 0u;
-    direction_ = kDirectionRight;
+    direction_ = DirectionType::kRight;
 } /* Reset */
 
 
@@ -104,7 +104,7 @@ void AnimationRoll::Reset()
 void AnimationRoll::SetTimeTask()
 {
     if(step_ < NumberOfSteps()) {
-        if(direction_ == kDirectionRight || direction_ == kDirectionLeft) { RollHorizontal(); }
+        if(direction_ == DirectionType::kRight || direction_ == DirectionType::kLeft) { RollHorizontal(); }
         else { RollVertical(); }
         step_++;
     } else {
@@ -124,7 +124,7 @@ void AnimationRoll::RollHorizontal()
        the freed edge. The remaining shifts carry it to its final column, so the
        column entering in step n is the one that ends up n columns away from the edge
        it entered at. */
-    if(direction_ == kDirectionRight) {
+    if(direction_ == DirectionType::kRight) {
         wc_transformation_.ShiftRight();
         for(byte row = 0u; row < DISPLAY_NUMBER_OF_ROWS; row++) {
             if(IsPixelPartOfClockWords(clock_words_table_, DISPLAY_NUMBER_OF_COLUMNS - step_ - 1u, row)) {
@@ -148,7 +148,7 @@ void AnimationRoll::RollHorizontal()
 void AnimationRoll::RollVertical()
 {
     /* same as RollHorizontal(), with rows instead of columns */
-    if(direction_ == kDirectionDown) {
+    if(direction_ == DirectionType::kDown) {
         wc_transformation_.ShiftDown();
         for(byte column = 0u; column < DISPLAY_NUMBER_OF_COLUMNS; column++) {
             if(IsPixelPartOfClockWords(clock_words_table_, column, DISPLAY_NUMBER_OF_ROWS - step_ - 1u)) {
@@ -171,7 +171,7 @@ void AnimationRoll::RollVertical()
 ******************************************************************************************************************************************************/
 byte AnimationRoll::NumberOfSteps() const
 {
-    if(direction_ == kDirectionRight || direction_ == kDirectionLeft) { return DISPLAY_NUMBER_OF_COLUMNS; }
+    if(direction_ == DirectionType::kRight || direction_ == DirectionType::kLeft) { return DISPLAY_NUMBER_OF_COLUMNS; }
 
     return DISPLAY_NUMBER_OF_ROWS;
 } /* NumberOfSteps */
@@ -182,7 +182,7 @@ byte AnimationRoll::NumberOfSteps() const
 ******************************************************************************************************************************************************/
 AnimationRoll::DirectionType AnimationRoll::CalcDirection(byte hour, byte minute)
 {
-    return static_cast<DirectionType>(SelectByTime(hour, minute, kDirectionNumberOfDirections));
+    return static_cast<DirectionType>(SelectByTime(hour, minute, kNumberOfDirections));
 } /* CalcDirection */
 
 

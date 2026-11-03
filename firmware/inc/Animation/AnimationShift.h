@@ -68,7 +68,7 @@ class AnimationShift : public Animation
 ******************************************************************************************************************************************************/
   private:
     Transformation wc_transformation_;
-    ClockWords::WordsListType clock_words_table_{{DisplayWords::kWordNone}};
+    ClockWords::WordsListType clock_words_table_{{DisplayWords::WordIdType::kNone}};
 
 #if (ANIMATION_SHIFT_HORIZONTAL == STD_ON)
     byte current_column_{0u};

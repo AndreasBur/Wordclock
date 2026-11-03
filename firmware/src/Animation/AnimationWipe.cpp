@@ -49,7 +49,7 @@
 ******************************************************************************************************************************************************/
 void AnimationWipe::Init()
 {
-    Animation::Init(kStateIdle);
+    Animation::Init(StateType::kIdle);
     Reset();
 } /* Init */
 
@@ -61,9 +61,9 @@ StdReturnType AnimationWipe::SetTime(byte hour, byte minute)
 {
     StdReturnType return_value{kENotOk};
 
-    if(Clock::GetInstance().GetClockWords(hour, minute, clock_words_table_) == kEOk && state_ == kStateIdle) {
+    if(Clock::GetInstance().GetClockWords(hour, minute, clock_words_table_) == kEOk && state_ == StateType::kIdle) {
         return_value = kEOk;
-        state_ = kStateClearTime;
+        state_ = StateType::kClearTime;
     }
     return return_value;
 } /* SetTime */
@@ -74,8 +74,8 @@ StdReturnType AnimationWipe::SetTime(byte hour, byte minute)
 ******************************************************************************************************************************************************/
 void AnimationWipe::Task()
 {
-    if(state_ == kStateClearTime) { ClearTimeTask(); }
-    else if(state_ == kStateSetTime) { SetTimeTask(); }
+    if(state_ == StateType::kClearTime) { ClearTimeTask(); }
+    else if(state_ == StateType::kSetTime) { SetTimeTask(); }
 } /* Task */
 
 
@@ -88,9 +88,9 @@ void AnimationWipe::Task()
 ******************************************************************************************************************************************************/
 void AnimationWipe::Reset()
 {
-    clock_words_table_.fill(DisplayWords::kWordNone);
+    clock_words_table_.fill(DisplayWords::WordIdType::kNone);
     index_ = 0u;
-    set_pixel_state_ = kSetPixelStateDown;
+    set_pixel_state_ = SetPixelStateType::kDown;
 } /* Reset */
 
 
@@ -105,17 +105,17 @@ void AnimationWipe::ClearTimeTask()
 
     do {
         if(Display::GetInstance().GetPixel(column, row)) {
-            if(set_pixel_state_ == kSetPixelStateDown) { SetPixelDown(column, row); }
+            if(set_pixel_state_ == SetPixelStateType::kDown) { SetPixelDown(column, row); }
             else { SetPixelRight(column, row); }
         }
     } while(column-- != 0u && row++ < DISPLAY_NUMBER_OF_ROWS - 1u);
 
-    if(set_pixel_state_ == kSetPixelStateDown) { set_pixel_state_ = kSetPixelStateRight; }
-    else { set_pixel_state_ = kSetPixelStateDown; }
+    if(set_pixel_state_ == SetPixelStateType::kDown) { set_pixel_state_ = SetPixelStateType::kRight; }
+    else { set_pixel_state_ = SetPixelStateType::kDown; }
 
     if(SetNextIndex() == kENotOk) {
         index_ = 0u;
-        state_ = kStateSetTime;
+        state_ = StateType::kSetTime;
     }
 } /* ClearTimeTask */
 

@@ -81,71 +81,73 @@ class Animations
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-    enum StateType {
-        kStateNone,
-        kStateIdle,
-        kStatePending
+    enum class StateType {
+        kNone,
+        kIdle,
+        kPending
     };
   
-    enum AnimationIdType {
-        kAnimationIdNone,
+    enum class AnimationIdType {
+        kNone,
 # if(ANIMATIONS_SUPPORT_CURSOR == STD_ON)
-        kAnimationIdCursor,
+        kCursor,
 # endif
 # if(ANIMATIONS_SUPPORT_TELETYPE == STD_ON)
-        kAnimationIdTeletype,
+        kTeletype,
 # endif
 # if(ANIMATIONS_SUPPORT_DROP == STD_ON)
-        kAnimationIdDrop,
+        kDrop,
 # endif
 # if(ANIMATIONS_SUPPORT_SHIFT == STD_ON)
-        kAnimationIdShift,
+        kShift,
 # endif
 # if(ANIMATIONS_SUPPORT_FADE == STD_ON)
-        kAnimationIdFade,
+        kFade,
 # endif
 # if(ANIMATIONS_SUPPORT_SNAKE == STD_ON)
-        kAnimationIdSnake,
+        kSnake,
 # endif
 # if(ANIMATIONS_SUPPORT_WIPE == STD_ON)
-        kAnimationIdWipe,
+        kWipe,
 # endif
 # if(ANIMATIONS_SUPPORT_CUBE == STD_ON)
-        kAnimationIdCube,
+        kCube,
 # endif
 # if(ANIMATIONS_SUPPORT_FLICKER == STD_ON)
-        kAnimationIdFlicker,
+        kFlicker,
 # endif
 # if(ANIMATIONS_SUPPORT_SQUEEZE == STD_ON)
-        kAnimationIdSqueeze,
+        kSqueeze,
 # endif
 # if(ANIMATIONS_SUPPORT_EXPLODE_PIXELS == STD_ON)
-        kAnimationIdExplodePixels,
+        kExplodePixels,
 # endif
 # if(ANIMATIONS_SUPPORT_EXPLODE_WORDS == STD_ON)
-        kAnimationIdExplodeWords,
+        kExplodeWords,
 # endif
 # if(ANIMATIONS_SUPPORT_MATRIX == STD_ON)
-        kAnimationIdMatrix,
+        kMatrix,
 # endif
 # if(ANIMATIONS_SUPPORT_ROLL == STD_ON)
-        kAnimationIdRoll,
+        kRoll,
 # endif
 # if(ANIMATIONS_SUPPORT_COLLAPSE == STD_ON)
-        kAnimationIdCollapse,
+        kCollapse,
 # endif
-        kAnimationIdNumberOfAnimations
+        kNumberOfAnimations
     };
+    static constexpr byte kNumberOfAnimations{static_cast<byte>(AnimationIdType::kNumberOfAnimations)};
 
-    /* Which animation runs on a word change. Only kModeFixed uses the selected
+    /* Which animation runs on a word change. Only ModeType::kFixed uses the selected
        animation, the others pick one themselves, which is why selecting an animation
        and selecting a strategy are two separate settings. */
-    enum ModeType {
-        kModeFixed,
-        kModeRandom,
-        kModeSequence,
-        kModeNumberOfModes
+    enum class ModeType {
+        kFixed,
+        kRandom,
+        kSequence,
+        kNumberOfModes
     };
+    static constexpr byte kNumberOfModes{static_cast<byte>(ModeType::kNumberOfModes)};
 
     union AnimationsType {
 # if(ANIMATIONS_SUPPORT_CURSOR == STD_ON)
@@ -235,31 +237,31 @@ class Animations
   private:
     static constexpr byte kTaskCycleInitValue{ANIMATIONS_TASK_CYCLE_INIT_VALUE};
 
-    /* kAnimationIdNone means no animation at all, so the ids a mode may pick start
+    /* AnimationIdType::kNone means no animation at all, so the ids a mode may pick start
        behind it */
-    static constexpr byte kFirstAnimation{kAnimationIdNone + 1u};
-    static constexpr byte kNumberOfAnimations{kAnimationIdNumberOfAnimations - kFirstAnimation};
+    static constexpr byte kFirstAnimation{ToUnderlying(AnimationIdType::kNone) + 1u};
+    static constexpr byte kNumberOfSelectableAnimations{kNumberOfAnimations - kFirstAnimation};
     /* odd factor of the hash in CalcRandomAnimation(), see there */
     static constexpr byte kRandomHashFactor{181u};
 
-    static_assert(kAnimationIdNumberOfAnimations <= 16u,
+    static_assert(kNumberOfAnimations <= 16u,
                   "Animations: too many animations for the favourites bit mask, please widen it");
 
-    /* one bit per animation id, bit 0 of kAnimationIdNone stays unused.
+    /* one bit per animation id, bit 0 of AnimationIdType::kNone stays unused.
        Shifted in an unsigned long rather than an unsigned int: there are sixteen
        animations, and on a target whose int is 16 bits wide - every AVR - 1u shifted by
        sixteen is undefined and the mask comes out empty, which silently leaves no
        animation a favourite. */
     static constexpr uint16_t kAllFavourites{
-        static_cast<uint16_t>(((1uL << kAnimationIdNumberOfAnimations) - 1uL) & ~((1uL << kFirstAnimation) - 1uL))
+        static_cast<uint16_t>(((1uL << kNumberOfAnimations) - 1uL) & ~((1uL << kFirstAnimation) - 1uL))
     };
 
-    std::array<byte, kAnimationIdNumberOfAnimations> task_cycles_;
-    /* what the user selected, used as it is in kModeFixed */
-    AnimationIdType animation_id_{kAnimationIdNone};
+    std::array<byte, kNumberOfAnimations> task_cycles_;
+    /* what the user selected, used as it is in ModeType::kFixed */
+    AnimationIdType animation_id_{AnimationIdType::kNone};
     /* what is really running, equal to animation_id_ unless a mode selected something */
-    AnimationIdType current_animation_id_{kAnimationIdNone};
-    ModeType mode_{kModeFixed};
+    AnimationIdType current_animation_id_{AnimationIdType::kNone};
+    ModeType mode_{ModeType::kFixed};
     /* animations the selecting modes may pick, all of them until told otherwise */
     Bit<uint16_t> favourites_{kAllFavourites};
     uint16_t random_state_{0u};
@@ -279,16 +281,16 @@ class Animations
     byte NumberOfFavourites() const;
 
     /* The round a knob walks, which is not the one CalcNextAnimation() walks: that one
-       skips everything but the favourites, because kModeSequence picks among those.
+       skips everything but the favourites, because ModeType::kSequence picks among those.
        Stepping the selection by hand may reach every animation, favourite or not. */
     static constexpr AnimationIdType ToNextAnimation(AnimationIdType animation_id) {
-        return (animation_id + 1u >= kAnimationIdNumberOfAnimations)
-             ? kAnimationIdNone : static_cast<AnimationIdType>(animation_id + 1u);
+        return (ToUnderlying(animation_id) + 1u >= kNumberOfAnimations)
+             ? AnimationIdType::kNone : static_cast<AnimationIdType>(ToUnderlying(animation_id) + 1u);
     }
     static constexpr AnimationIdType ToPreviousAnimation(AnimationIdType animation_id) {
-        return (animation_id == kAnimationIdNone)
-             ? static_cast<AnimationIdType>(kAnimationIdNumberOfAnimations - 1u)
-             : static_cast<AnimationIdType>(animation_id - 1u);
+        return (animation_id == AnimationIdType::kNone)
+             ? static_cast<AnimationIdType>(kNumberOfAnimations - 1u)
+             : static_cast<AnimationIdType>(ToUnderlying(animation_id) - 1u);
     }
 
 /******************************************************************************************************************************************************
@@ -306,26 +308,26 @@ class Animations
     AnimationIdType GetCurrentAnimation() const { return current_animation_id_; }
     ModeType GetMode() const { return mode_; }
     bool IsFavourite(AnimationIdType animation_id) const {
-        return favourites_[animation_id];
+        return favourites_[ToUnderlying(animation_id)];
     }
 
-    byte GetTaskCycle(AnimationIdType animation_id) const { return task_cycles_[animation_id]; }
+    byte GetTaskCycle(AnimationIdType animation_id) const { return task_cycles_[ToUnderlying(animation_id)]; }
     /* the cycle of the running animation, so every animation keeps its own speed while
        a meta animation switches between them */
-    byte GetTaskCycle() const { return task_cycles_[current_animation_id_]; }
+    byte GetTaskCycle() const { return task_cycles_[ToUnderlying(current_animation_id_)]; }
 
     // set methods
     StdReturnType SetTaskCycle(AnimationIdType, byte);
     StdReturnType SetAnimation(AnimationIdType);
     StdReturnType SetMode(ModeType);
     StdReturnType SetFavourite(AnimationIdType animation_id, bool favourite) {
-        /* kAnimationIdNone is no animation and cannot be a favourite */
-        if(animation_id < kFirstAnimation || !IsAnimationValid(animation_id)) { return kENotOk; }
+        /* AnimationIdType::kNone is no animation and cannot be a favourite */
+        if(ToUnderlying(animation_id) < kFirstAnimation || !IsAnimationValid(animation_id)) { return kENotOk; }
         /* the last favourite may not be dropped, the selecting modes would be left
            with nothing to pick */
         if(!favourite && IsFavourite(animation_id) && NumberOfFavourites() <= 1u) { return kENotOk; }
 
-        favourites_[animation_id] = favourite;
+        favourites_[ToUnderlying(animation_id)] = favourite;
         return kEOk;
     }
 
@@ -338,25 +340,25 @@ class Animations
         favourites_.SetValue(kAllFavourites);
         /* Both are valid by construction, so neither answer can say anything a caller of
            ResetToDefaults() could act on. */
-        SetAnimation(kAnimationIdNone);
-        SetMode(kModeFixed);
+        SetAnimation(AnimationIdType::kNone);
+        SetMode(ModeType::kFixed);
     }
 
     /* One animation further and one back, wrapping at both ends, for a control that has
-       no list to pick from. kAnimationIdNone is part of that round rather than skipped:
+       no list to pick from. AnimationIdType::kNone is part of that round rather than skipped:
        "no animation" is a setting like any other, and a knob is the only way somebody
        without a phone gets back to it.
 
        They step the selection, so they mean what "9 -A<id>" means and not what
-       kRpcIdAnimationStart means - the animation runs at the next word change, and in
-       a mode that picks its own the selection is what kModeFixed would return to. */
+       RpcIdType::kAnimationStart means - the animation runs at the next word change, and in
+       a mode that picks its own the selection is what ModeType::kFixed would return to. */
     void NextAnimation() { SetAnimation(ToNextAnimation(animation_id_)); }
     void PreviousAnimation() { SetAnimation(ToPreviousAnimation(animation_id_)); }
 
     void Task(bool=false);
     StdReturnType Show() const;
-    static bool IsAnimationValid(AnimationIdType animation_id) { return animation_id < kAnimationIdNumberOfAnimations; }
-    static bool IsModeValid(ModeType mode) { return mode < kModeNumberOfModes; }
+    static bool IsAnimationValid(AnimationIdType animation_id) { return animation_id < AnimationIdType::kNumberOfAnimations; }
+    static bool IsModeValid(ModeType mode) { return mode < ModeType::kNumberOfModes; }
     StdReturnType SetTime(byte, byte);
 
     /* Ends a running animation by initialising it, which is what every animation's own

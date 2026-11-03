@@ -39,32 +39,32 @@
 const Clock::HourType Clock::kHoursTable[][CLOCK_NUMBER_OF_HOURS] PROGMEM
 {
     {                                                                    // ClockHoursTable[0][] = hh:00 CLOCK_HOUR_MODE_FULL_HOUR
-        {DisplayWords::kWordHourZwoelf, DisplayWords::kWordUhr},        // 00:00
-        {DisplayWords::kWordHourEin,    DisplayWords::kWordUhr},        // 01:00
-        {DisplayWords::kWordHourZwei,   DisplayWords::kWordUhr},        // 02:00
-        {DisplayWords::kWordHourDrei,   DisplayWords::kWordUhr},        // 03:00
-        {DisplayWords::kWordHourVier,   DisplayWords::kWordUhr},        // 04:00
-        {DisplayWords::kWordHourFuenf,  DisplayWords::kWordUhr},        // 05:00
-        {DisplayWords::kWordHourSechs,  DisplayWords::kWordUhr},        // 06:00
-        {DisplayWords::kWordHourSieben, DisplayWords::kWordUhr},        // 07:00
-        {DisplayWords::kWordHourAcht,   DisplayWords::kWordUhr},        // 08:00
-        {DisplayWords::kWordHourNeun,   DisplayWords::kWordUhr},        // 09:00
-        {DisplayWords::kWordHourZehn,   DisplayWords::kWordUhr},        // 10:00
-        {DisplayWords::kWordHourElf,    DisplayWords::kWordUhr}         // 11:00
+        {DisplayWords::WordIdType::kHourZwoelf, DisplayWords::WordIdType::kUhr},        // 00:00
+        {DisplayWords::WordIdType::kHourEin,    DisplayWords::WordIdType::kUhr},        // 01:00
+        {DisplayWords::WordIdType::kHourZwei,   DisplayWords::WordIdType::kUhr},        // 02:00
+        {DisplayWords::WordIdType::kHourDrei,   DisplayWords::WordIdType::kUhr},        // 03:00
+        {DisplayWords::WordIdType::kHourVier,   DisplayWords::WordIdType::kUhr},        // 04:00
+        {DisplayWords::WordIdType::kHourFuenf,  DisplayWords::WordIdType::kUhr},        // 05:00
+        {DisplayWords::WordIdType::kHourSechs,  DisplayWords::WordIdType::kUhr},        // 06:00
+        {DisplayWords::WordIdType::kHourSieben, DisplayWords::WordIdType::kUhr},        // 07:00
+        {DisplayWords::WordIdType::kHourAcht,   DisplayWords::WordIdType::kUhr},        // 08:00
+        {DisplayWords::WordIdType::kHourNeun,   DisplayWords::WordIdType::kUhr},        // 09:00
+        {DisplayWords::WordIdType::kHourZehn,   DisplayWords::WordIdType::kUhr},        // 10:00
+        {DisplayWords::WordIdType::kHourElf,    DisplayWords::WordIdType::kUhr}         // 11:00
     },
     {                                                                    // ClockHoursTable[1][] = hh:mm CLOCK_HOUR_MODE_NO_FULL_HOUR
-        {DisplayWords::kWordHourZwoelf, DisplayWords::kWordNone},       // 00:mm
-        {DisplayWords::kWordHourEins,   DisplayWords::kWordNone},       // 01:mm
-        {DisplayWords::kWordHourZwei,   DisplayWords::kWordNone},       // 02:mm
-        {DisplayWords::kWordHourDrei,   DisplayWords::kWordNone},       // 03:mm
-        {DisplayWords::kWordHourVier,   DisplayWords::kWordNone},       // 04:mm
-        {DisplayWords::kWordHourFuenf,  DisplayWords::kWordNone},       // 05:mm
-        {DisplayWords::kWordHourSechs,  DisplayWords::kWordNone},       // 06:mm
-        {DisplayWords::kWordHourSieben, DisplayWords::kWordNone},       // 07:mm
-        {DisplayWords::kWordHourAcht,   DisplayWords::kWordNone},       // 08:mm
-        {DisplayWords::kWordHourNeun,   DisplayWords::kWordNone},       // 09:mm
-        {DisplayWords::kWordHourZehn,   DisplayWords::kWordNone},       // 10:mm
-        {DisplayWords::kWordHourElf,    DisplayWords::kWordNone}        // 11:mm
+        {DisplayWords::WordIdType::kHourZwoelf, DisplayWords::WordIdType::kNone},       // 00:mm
+        {DisplayWords::WordIdType::kHourEins,   DisplayWords::WordIdType::kNone},       // 01:mm
+        {DisplayWords::WordIdType::kHourZwei,   DisplayWords::WordIdType::kNone},       // 02:mm
+        {DisplayWords::WordIdType::kHourDrei,   DisplayWords::WordIdType::kNone},       // 03:mm
+        {DisplayWords::WordIdType::kHourVier,   DisplayWords::WordIdType::kNone},       // 04:mm
+        {DisplayWords::WordIdType::kHourFuenf,  DisplayWords::WordIdType::kNone},       // 05:mm
+        {DisplayWords::WordIdType::kHourSechs,  DisplayWords::WordIdType::kNone},       // 06:mm
+        {DisplayWords::WordIdType::kHourSieben, DisplayWords::WordIdType::kNone},       // 07:mm
+        {DisplayWords::WordIdType::kHourAcht,   DisplayWords::WordIdType::kNone},       // 08:mm
+        {DisplayWords::WordIdType::kHourNeun,   DisplayWords::WordIdType::kNone},       // 09:mm
+        {DisplayWords::WordIdType::kHourZehn,   DisplayWords::WordIdType::kNone},       // 10:mm
+        {DisplayWords::WordIdType::kHourElf,    DisplayWords::WordIdType::kNone}        // 11:mm
     }
 };
 
@@ -72,60 +72,60 @@ const Clock::HourType Clock::kHoursTable[][CLOCK_NUMBER_OF_HOURS] PROGMEM
 const Clock::MinuteType Clock::kMinutesTable[][CLOCK_NUMBER_OF_MINUTE_STEPS] PROGMEM
 {
     {                                                                                                                              // ClockMinutesTable[0][] = WESSI
-        {kHourModeFullHour,    0u, {DisplayWords::kWordNone,        DisplayWords::kWordNone, DisplayWords::kWordNone}},          // 00
-        {kHourModeNoFullHour, 0u, {DisplayWords::kWordFuenf,       DisplayWords::kWordNach, DisplayWords::kWordNone}},          // 05
-        {kHourModeNoFullHour, 0u, {DisplayWords::kWordZehn,        DisplayWords::kWordNach, DisplayWords::kWordNone}},          // 10
-        {kHourModeNoFullHour, 0u, {DisplayWords::kWordViertel,     DisplayWords::kWordNach, DisplayWords::kWordNone}},          // 15
-        {kHourModeNoFullHour, 1u, {DisplayWords::kWordZehn,        DisplayWords::kWordVor,  DisplayWords::kWordHalb}},          // 20
-        {kHourModeNoFullHour, 1u, {DisplayWords::kWordFuenf,       DisplayWords::kWordVor,  DisplayWords::kWordHalb}},          // 25
-        {kHourModeNoFullHour, 1u, {DisplayWords::kWordHalb,        DisplayWords::kWordNone, DisplayWords::kWordNone}},          // 30
-        {kHourModeNoFullHour, 1u, {DisplayWords::kWordFuenf,       DisplayWords::kWordNach, DisplayWords::kWordHalb}},          // 35
-        {kHourModeNoFullHour, 1u, {DisplayWords::kWordZehn,        DisplayWords::kWordNach, DisplayWords::kWordHalb}},          // 40
-        {kHourModeNoFullHour, 1u, {DisplayWords::kWordViertel,     DisplayWords::kWordVor,  DisplayWords::kWordNone}},          // 45
-        {kHourModeNoFullHour, 1u, {DisplayWords::kWordZehn,        DisplayWords::kWordVor,  DisplayWords::kWordNone}},          // 50
-        {kHourModeNoFullHour, 1u, {DisplayWords::kWordFuenf,       DisplayWords::kWordVor,  DisplayWords::kWordNone}},          // 55
+        {HourModeType::kFullHour,    0u, {DisplayWords::WordIdType::kNone,        DisplayWords::WordIdType::kNone, DisplayWords::WordIdType::kNone}},          // 00
+        {HourModeType::kNoFullHour, 0u, {DisplayWords::WordIdType::kFuenf,       DisplayWords::WordIdType::kNach, DisplayWords::WordIdType::kNone}},          // 05
+        {HourModeType::kNoFullHour, 0u, {DisplayWords::WordIdType::kZehn,        DisplayWords::WordIdType::kNach, DisplayWords::WordIdType::kNone}},          // 10
+        {HourModeType::kNoFullHour, 0u, {DisplayWords::WordIdType::kViertel,     DisplayWords::WordIdType::kNach, DisplayWords::WordIdType::kNone}},          // 15
+        {HourModeType::kNoFullHour, 1u, {DisplayWords::WordIdType::kZehn,        DisplayWords::WordIdType::kVor,  DisplayWords::WordIdType::kHalb}},          // 20
+        {HourModeType::kNoFullHour, 1u, {DisplayWords::WordIdType::kFuenf,       DisplayWords::WordIdType::kVor,  DisplayWords::WordIdType::kHalb}},          // 25
+        {HourModeType::kNoFullHour, 1u, {DisplayWords::WordIdType::kHalb,        DisplayWords::WordIdType::kNone, DisplayWords::WordIdType::kNone}},          // 30
+        {HourModeType::kNoFullHour, 1u, {DisplayWords::WordIdType::kFuenf,       DisplayWords::WordIdType::kNach, DisplayWords::WordIdType::kHalb}},          // 35
+        {HourModeType::kNoFullHour, 1u, {DisplayWords::WordIdType::kZehn,        DisplayWords::WordIdType::kNach, DisplayWords::WordIdType::kHalb}},          // 40
+        {HourModeType::kNoFullHour, 1u, {DisplayWords::WordIdType::kViertel,     DisplayWords::WordIdType::kVor,  DisplayWords::WordIdType::kNone}},          // 45
+        {HourModeType::kNoFullHour, 1u, {DisplayWords::WordIdType::kZehn,        DisplayWords::WordIdType::kVor,  DisplayWords::WordIdType::kNone}},          // 50
+        {HourModeType::kNoFullHour, 1u, {DisplayWords::WordIdType::kFuenf,       DisplayWords::WordIdType::kVor,  DisplayWords::WordIdType::kNone}},          // 55
     },
     {                                                                                                                              // ClockMinutesTable[1][] = OSSI
-        {kHourModeFullHour,    0u, {DisplayWords::kWordNone,        DisplayWords::kWordNone, DisplayWords::kWordNone}},          // 00
-        {kHourModeNoFullHour, 0u, {DisplayWords::kWordFuenf,       DisplayWords::kWordNach, DisplayWords::kWordNone}},          // 05
-        {kHourModeNoFullHour, 0u, {DisplayWords::kWordZehn,        DisplayWords::kWordNach, DisplayWords::kWordNone}},          // 10
-        {kHourModeNoFullHour, 1u, {DisplayWords::kWordViertel,     DisplayWords::kWordNone, DisplayWords::kWordNone}},          // 15
-        {kHourModeNoFullHour, 1u, {DisplayWords::kWordZehn,        DisplayWords::kWordVor,  DisplayWords::kWordHalb}},          // 20
-        {kHourModeNoFullHour, 1u, {DisplayWords::kWordFuenf,       DisplayWords::kWordVor,  DisplayWords::kWordHalb}},          // 25
-        {kHourModeNoFullHour, 1u, {DisplayWords::kWordHalb,        DisplayWords::kWordNone, DisplayWords::kWordNone}},          // 30
-        {kHourModeNoFullHour, 1u, {DisplayWords::kWordFuenf,       DisplayWords::kWordNach, DisplayWords::kWordHalb}},          // 35
-        {kHourModeNoFullHour, 1u, {DisplayWords::kWordZehn,        DisplayWords::kWordNach, DisplayWords::kWordHalb}},          // 40
-        {kHourModeNoFullHour, 1u, {DisplayWords::kWordDreiviertel, DisplayWords::kWordNone, DisplayWords::kWordNone}},          // 45
-        {kHourModeNoFullHour, 1u, {DisplayWords::kWordZehn,        DisplayWords::kWordVor,  DisplayWords::kWordNone}},          // 50
-        {kHourModeNoFullHour, 1u, {DisplayWords::kWordFuenf,       DisplayWords::kWordVor,  DisplayWords::kWordNone}},          // 55
+        {HourModeType::kFullHour,    0u, {DisplayWords::WordIdType::kNone,        DisplayWords::WordIdType::kNone, DisplayWords::WordIdType::kNone}},          // 00
+        {HourModeType::kNoFullHour, 0u, {DisplayWords::WordIdType::kFuenf,       DisplayWords::WordIdType::kNach, DisplayWords::WordIdType::kNone}},          // 05
+        {HourModeType::kNoFullHour, 0u, {DisplayWords::WordIdType::kZehn,        DisplayWords::WordIdType::kNach, DisplayWords::WordIdType::kNone}},          // 10
+        {HourModeType::kNoFullHour, 1u, {DisplayWords::WordIdType::kViertel,     DisplayWords::WordIdType::kNone, DisplayWords::WordIdType::kNone}},          // 15
+        {HourModeType::kNoFullHour, 1u, {DisplayWords::WordIdType::kZehn,        DisplayWords::WordIdType::kVor,  DisplayWords::WordIdType::kHalb}},          // 20
+        {HourModeType::kNoFullHour, 1u, {DisplayWords::WordIdType::kFuenf,       DisplayWords::WordIdType::kVor,  DisplayWords::WordIdType::kHalb}},          // 25
+        {HourModeType::kNoFullHour, 1u, {DisplayWords::WordIdType::kHalb,        DisplayWords::WordIdType::kNone, DisplayWords::WordIdType::kNone}},          // 30
+        {HourModeType::kNoFullHour, 1u, {DisplayWords::WordIdType::kFuenf,       DisplayWords::WordIdType::kNach, DisplayWords::WordIdType::kHalb}},          // 35
+        {HourModeType::kNoFullHour, 1u, {DisplayWords::WordIdType::kZehn,        DisplayWords::WordIdType::kNach, DisplayWords::WordIdType::kHalb}},          // 40
+        {HourModeType::kNoFullHour, 1u, {DisplayWords::WordIdType::kDreiviertel, DisplayWords::WordIdType::kNone, DisplayWords::WordIdType::kNone}},          // 45
+        {HourModeType::kNoFullHour, 1u, {DisplayWords::WordIdType::kZehn,        DisplayWords::WordIdType::kVor,  DisplayWords::WordIdType::kNone}},          // 50
+        {HourModeType::kNoFullHour, 1u, {DisplayWords::WordIdType::kFuenf,       DisplayWords::WordIdType::kVor,  DisplayWords::WordIdType::kNone}},          // 55
     },
     {                                                                                                                              // ClockMinutesTable[2][] = RHEIN-RUHR
-        {kHourModeFullHour,    0u, {DisplayWords::kWordNone,        DisplayWords::kWordNone, DisplayWords::kWordNone}},          // 00
-        {kHourModeNoFullHour, 0u, {DisplayWords::kWordFuenf,       DisplayWords::kWordNach, DisplayWords::kWordNone}},          // 05
-        {kHourModeNoFullHour, 0u, {DisplayWords::kWordZehn,        DisplayWords::kWordNach, DisplayWords::kWordNone}},          // 10
-        {kHourModeNoFullHour, 0u, {DisplayWords::kWordViertel,     DisplayWords::kWordNach, DisplayWords::kWordNone}},          // 15
-        {kHourModeNoFullHour, 0u, {DisplayWords::kWordZwanzig,     DisplayWords::kWordNach, DisplayWords::kWordNone}},          // 20
-        {kHourModeNoFullHour, 1u, {DisplayWords::kWordFuenf,       DisplayWords::kWordVor,  DisplayWords::kWordHalb}},          // 25
-        {kHourModeNoFullHour, 1u, {DisplayWords::kWordHalb,        DisplayWords::kWordNone, DisplayWords::kWordNone}},          // 30
-        {kHourModeNoFullHour, 1u, {DisplayWords::kWordFuenf,       DisplayWords::kWordNach, DisplayWords::kWordHalb}},          // 35
-        {kHourModeNoFullHour, 1u, {DisplayWords::kWordZwanzig,     DisplayWords::kWordVor,  DisplayWords::kWordNone}},          // 40
-        {kHourModeNoFullHour, 1u, {DisplayWords::kWordViertel,     DisplayWords::kWordVor,  DisplayWords::kWordNone}},          // 45
-        {kHourModeNoFullHour, 1u, {DisplayWords::kWordZehn,        DisplayWords::kWordVor,  DisplayWords::kWordNone}},          // 50
-        {kHourModeNoFullHour, 1u, {DisplayWords::kWordFuenf,       DisplayWords::kWordVor,  DisplayWords::kWordNone}},          // 55
+        {HourModeType::kFullHour,    0u, {DisplayWords::WordIdType::kNone,        DisplayWords::WordIdType::kNone, DisplayWords::WordIdType::kNone}},          // 00
+        {HourModeType::kNoFullHour, 0u, {DisplayWords::WordIdType::kFuenf,       DisplayWords::WordIdType::kNach, DisplayWords::WordIdType::kNone}},          // 05
+        {HourModeType::kNoFullHour, 0u, {DisplayWords::WordIdType::kZehn,        DisplayWords::WordIdType::kNach, DisplayWords::WordIdType::kNone}},          // 10
+        {HourModeType::kNoFullHour, 0u, {DisplayWords::WordIdType::kViertel,     DisplayWords::WordIdType::kNach, DisplayWords::WordIdType::kNone}},          // 15
+        {HourModeType::kNoFullHour, 0u, {DisplayWords::WordIdType::kZwanzig,     DisplayWords::WordIdType::kNach, DisplayWords::WordIdType::kNone}},          // 20
+        {HourModeType::kNoFullHour, 1u, {DisplayWords::WordIdType::kFuenf,       DisplayWords::WordIdType::kVor,  DisplayWords::WordIdType::kHalb}},          // 25
+        {HourModeType::kNoFullHour, 1u, {DisplayWords::WordIdType::kHalb,        DisplayWords::WordIdType::kNone, DisplayWords::WordIdType::kNone}},          // 30
+        {HourModeType::kNoFullHour, 1u, {DisplayWords::WordIdType::kFuenf,       DisplayWords::WordIdType::kNach, DisplayWords::WordIdType::kHalb}},          // 35
+        {HourModeType::kNoFullHour, 1u, {DisplayWords::WordIdType::kZwanzig,     DisplayWords::WordIdType::kVor,  DisplayWords::WordIdType::kNone}},          // 40
+        {HourModeType::kNoFullHour, 1u, {DisplayWords::WordIdType::kViertel,     DisplayWords::WordIdType::kVor,  DisplayWords::WordIdType::kNone}},          // 45
+        {HourModeType::kNoFullHour, 1u, {DisplayWords::WordIdType::kZehn,        DisplayWords::WordIdType::kVor,  DisplayWords::WordIdType::kNone}},          // 50
+        {HourModeType::kNoFullHour, 1u, {DisplayWords::WordIdType::kFuenf,       DisplayWords::WordIdType::kVor,  DisplayWords::WordIdType::kNone}},          // 55
     },
     {                                                                                                                              // ClockMinutesTable[3][] = SCHWABEN
-        {kHourModeFullHour,    0u, {DisplayWords::kWordNone,        DisplayWords::kWordNone, DisplayWords::kWordNone}},          // 00
-        {kHourModeNoFullHour, 0u, {DisplayWords::kWordFuenf,       DisplayWords::kWordNach, DisplayWords::kWordNone}},          // 05
-        {kHourModeNoFullHour, 0u, {DisplayWords::kWordZehn,        DisplayWords::kWordNach, DisplayWords::kWordNone}},          // 10
-        {kHourModeNoFullHour, 1u, {DisplayWords::kWordViertel,     DisplayWords::kWordNone, DisplayWords::kWordNone}},          // 15
-        {kHourModeNoFullHour, 0u, {DisplayWords::kWordZwanzig,     DisplayWords::kWordNach, DisplayWords::kWordNone}},          // 20
-        {kHourModeNoFullHour, 1u, {DisplayWords::kWordFuenf,       DisplayWords::kWordVor,  DisplayWords::kWordHalb}},          // 25
-        {kHourModeNoFullHour, 1u, {DisplayWords::kWordHalb,        DisplayWords::kWordNone, DisplayWords::kWordNone}},          // 30
-        {kHourModeNoFullHour, 1u, {DisplayWords::kWordFuenf,       DisplayWords::kWordNach, DisplayWords::kWordHalb}},          // 35
-        {kHourModeNoFullHour, 1u, {DisplayWords::kWordZwanzig,     DisplayWords::kWordVor,  DisplayWords::kWordNone}},          // 40
-        {kHourModeNoFullHour, 1u, {DisplayWords::kWordDreiviertel, DisplayWords::kWordNone, DisplayWords::kWordNone}},          // 45
-        {kHourModeNoFullHour, 1u, {DisplayWords::kWordZehn,        DisplayWords::kWordVor,  DisplayWords::kWordNone}},          // 50
-        {kHourModeNoFullHour, 1u, {DisplayWords::kWordFuenf,       DisplayWords::kWordVor,  DisplayWords::kWordNone}},          // 55
+        {HourModeType::kFullHour,    0u, {DisplayWords::WordIdType::kNone,        DisplayWords::WordIdType::kNone, DisplayWords::WordIdType::kNone}},          // 00
+        {HourModeType::kNoFullHour, 0u, {DisplayWords::WordIdType::kFuenf,       DisplayWords::WordIdType::kNach, DisplayWords::WordIdType::kNone}},          // 05
+        {HourModeType::kNoFullHour, 0u, {DisplayWords::WordIdType::kZehn,        DisplayWords::WordIdType::kNach, DisplayWords::WordIdType::kNone}},          // 10
+        {HourModeType::kNoFullHour, 1u, {DisplayWords::WordIdType::kViertel,     DisplayWords::WordIdType::kNone, DisplayWords::WordIdType::kNone}},          // 15
+        {HourModeType::kNoFullHour, 0u, {DisplayWords::WordIdType::kZwanzig,     DisplayWords::WordIdType::kNach, DisplayWords::WordIdType::kNone}},          // 20
+        {HourModeType::kNoFullHour, 1u, {DisplayWords::WordIdType::kFuenf,       DisplayWords::WordIdType::kVor,  DisplayWords::WordIdType::kHalb}},          // 25
+        {HourModeType::kNoFullHour, 1u, {DisplayWords::WordIdType::kHalb,        DisplayWords::WordIdType::kNone, DisplayWords::WordIdType::kNone}},          // 30
+        {HourModeType::kNoFullHour, 1u, {DisplayWords::WordIdType::kFuenf,       DisplayWords::WordIdType::kNach, DisplayWords::WordIdType::kHalb}},          // 35
+        {HourModeType::kNoFullHour, 1u, {DisplayWords::WordIdType::kZwanzig,     DisplayWords::WordIdType::kVor,  DisplayWords::WordIdType::kNone}},          // 40
+        {HourModeType::kNoFullHour, 1u, {DisplayWords::WordIdType::kDreiviertel, DisplayWords::WordIdType::kNone, DisplayWords::WordIdType::kNone}},          // 45
+        {HourModeType::kNoFullHour, 1u, {DisplayWords::WordIdType::kZehn,        DisplayWords::WordIdType::kVor,  DisplayWords::WordIdType::kNone}},          // 50
+        {HourModeType::kNoFullHour, 1u, {DisplayWords::WordIdType::kFuenf,       DisplayWords::WordIdType::kVor,  DisplayWords::WordIdType::kNone}},          // 55
     }
 };
 
@@ -194,13 +194,13 @@ StdReturnType Clock::SetTime(byte hour, byte minute) const
     if(GetClockWords(hour, minute, clock_words) == kENotOk) return_value = kENotOk;
 
     if(clock_words.GetShowItIs()) {
-        if(Display::GetInstance().SetWord(DisplayWords::kWordEs) == kENotOk) return_value = kENotOk;
-        if(Display::GetInstance().SetWord(DisplayWords::kWordIst) == kENotOk) return_value = kENotOk;
+        if(Display::GetInstance().SetWord(DisplayWords::WordIdType::kEs) == kENotOk) return_value = kENotOk;
+        if(Display::GetInstance().SetWord(DisplayWords::WordIdType::kIst) == kENotOk) return_value = kENotOk;
     }
-    for(byte index = 0u; index < clock_words.GetHourWords().size() && clock_words.GetHourWord(index) != DisplayWords::kWordNone; index++) {
+    for(byte index = 0u; index < clock_words.GetHourWords().size() && clock_words.GetHourWord(index) != DisplayWords::WordIdType::kNone; index++) {
         if(Display::GetInstance().SetWord(clock_words.GetHourWord(index)) == kENotOk) return_value = kENotOk;
     }
-    for(byte index = 0u; index < clock_words.GetMinuteWords().size() && clock_words.GetMinuteWord(index) != DisplayWords::kWordNone; index++) {
+    for(byte index = 0u; index < clock_words.GetMinuteWords().size() && clock_words.GetMinuteWord(index) != DisplayWords::WordIdType::kNone; index++) {
         if(Display::GetInstance().SetWord(clock_words.GetMinuteWord(index)) == kENotOk) return_value = kENotOk;
     }
     return return_value;

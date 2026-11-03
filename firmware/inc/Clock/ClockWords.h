@@ -68,7 +68,7 @@ class ClockWords
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
   public:
-    constexpr ClockWords() : show_it_is_(false), hour_words_{DisplayWords::kWordNone}, minute_words_{DisplayWords::kWordNone} { }
+    constexpr ClockWords() : show_it_is_(false), hour_words_{DisplayWords::WordIdType::kNone}, minute_words_{DisplayWords::WordIdType::kNone} { }
     constexpr ClockWords(bool show_it_is, HourWordsType hour_words, MinutesWordsType minute_words)
         : show_it_is_(show_it_is), hour_words_(hour_words), minute_words_(minute_words) { }
     ~ClockWords() { }

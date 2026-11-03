@@ -55,12 +55,12 @@ class MsgCmdNightSwitchParser : public MsgParameterParser<MsgCmdNightSwitchParse
     static constexpr char kBrightnessShortName{'B'};
 
     static constexpr ParameterTableType kParameterTable PROGMEM {
-        ParameterTableElementType(kActiveShortName,      MsgParameter::kArgumentTypeUint8),
-        ParameterTableElementType(kStartHourShortName,   MsgParameter::kArgumentTypeUint8),
-        ParameterTableElementType(kStartMinuteShortName, MsgParameter::kArgumentTypeUint8),
-        ParameterTableElementType(kEndHourShortName,     MsgParameter::kArgumentTypeUint8),
-        ParameterTableElementType(kEndMinuteShortName,   MsgParameter::kArgumentTypeUint8),
-        ParameterTableElementType(kBrightnessShortName,  MsgParameter::kArgumentTypeUint8)
+        ParameterTableElementType(kActiveShortName,      MsgParameter::ArgumentTypeType::kUint8),
+        ParameterTableElementType(kStartHourShortName,   MsgParameter::ArgumentTypeType::kUint8),
+        ParameterTableElementType(kStartMinuteShortName, MsgParameter::ArgumentTypeType::kUint8),
+        ParameterTableElementType(kEndHourShortName,     MsgParameter::ArgumentTypeType::kUint8),
+        ParameterTableElementType(kEndMinuteShortName,   MsgParameter::ArgumentTypeType::kUint8),
+        ParameterTableElementType(kBrightnessShortName,  MsgParameter::ArgumentTypeType::kUint8)
     };
 
     /* Collected rather than applied as they arrive, and the switch applied last: switching

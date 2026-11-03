@@ -61,9 +61,9 @@ class MsgCmdDisplayBrightnessParser : public MsgParameterParser<MsgCmdDisplayBri
     static constexpr char kUseGammaCorrectionOptionShortName{'G'};
 
     static constexpr ParameterTableType kParameterTable PROGMEM {
-        MsgParameter(kBrightnessOptionShortName, MsgParameter::kArgumentTypeUint8),
-        MsgParameter(kUseAutomaticOptionShortName, MsgParameter::kArgumentTypeUint8),
-        MsgParameter(kUseGammaCorrectionOptionShortName, MsgParameter::kArgumentTypeUint8)
+        MsgParameter(kBrightnessOptionShortName, MsgParameter::ArgumentTypeType::kUint8),
+        MsgParameter(kUseAutomaticOptionShortName, MsgParameter::ArgumentTypeType::kUint8),
+        MsgParameter(kUseGammaCorrectionOptionShortName, MsgParameter::ArgumentTypeType::kUint8)
     };
 
     // functions
@@ -88,7 +88,7 @@ class MsgCmdDisplayBrightnessParser : public MsgParameterParser<MsgCmdDisplayBri
     void Show() const
     {
         StdReturnType return_value = Display::GetInstance().Show();
-        error_.CheckReturnValueAndSend(ErrorMessage::kApiDisplayShow, return_value, ErrorMessage::kErrorDisplayPending);
+        error_.CheckReturnValueAndSend(ErrorMessage::ApiType::kDisplayShow, return_value, ErrorMessage::ErrorType::kDisplayPending);
     }
 
 /******************************************************************************************************************************************************

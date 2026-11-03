@@ -69,17 +69,17 @@ class Power
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-    enum StateType {
+    enum class StateType {
         /* The supply is on and frames are going out - what a clock runs in. */
-        kStateSupplyOn,
+        kSupplyOn,
         /* Asked to go off. The display is dark; what is left is to see the blanked frame
            off the wire before the port drops. */
-        kStateBlanking,
+        kBlanking,
         /* The supply is off and the data line is gated. */
-        kStateSupplyOff,
+        kSupplyOff,
         /* Asked to come on. The supply is up; the data line is released on the next task,
            which gives the strip a tick to find its rail. */
-        kStateSettling
+        kSettling
     };
 
 /******************************************************************************************************************************************************
@@ -88,7 +88,7 @@ class Power
   private:
     static constexpr byte kTaskCycle{POWER_TASK_CYCLE};
 
-    StateType state_{kStateSupplyOn};
+    StateType state_{StateType::kSupplyOn};
 
     Power() { }
     ~Power() { }
@@ -115,14 +115,14 @@ class Power
     void CutSupply() {
         GetDisplay().SuspendOutput();
         GetSwitch().SwitchSupplyOff();
-        state_ = kStateSupplyOff;
+        state_ = StateType::kSupplyOff;
     }
 
     /* The port before the gate, for the same reason read the other way round. */
     void ReleaseSupply() {
         GetDisplay().ResumeOutput();
         GetDisplay().Enable();
-        state_ = kStateSupplyOn;
+        state_ = StateType::kSupplyOn;
     }
 
 /******************************************************************************************************************************************************
@@ -156,18 +156,18 @@ class Power
         if constexpr (!IsSwitchFitted()) { return kENotOk; }
 
         switch(state_) {
-            case kStateSupplyOff :
+            case StateType::kSupplyOff :
                 /* The port first; the data line follows on the next task. */
                 GetSwitch().SwitchSupplyOn();
-                state_ = kStateSettling;
+                state_ = StateType::kSettling;
                 break;
             /* Never got as far as cutting it, so there is nothing to bring up and nothing
                to settle - only the darkness to undo. */
-            case kStateBlanking :
+            case StateType::kBlanking :
                 ReleaseSupply();
                 break;
-            case kStateSupplyOn :
-            case kStateSettling :
+            case StateType::kSupplyOn :
+            case StateType::kSettling :
                 break;
         }
 
@@ -178,20 +178,20 @@ class Power
         if constexpr (!IsSwitchFitted()) { return kENotOk; }
 
         switch(state_) {
-            case kStateSupplyOn :
+            case StateType::kSupplyOn :
                 /* Over the data line, not by cutting the supply: this is the frame the
                    strip has to be holding when its rail goes. */
                 GetDisplay().Disable();
-                state_ = kStateBlanking;
+                state_ = StateType::kBlanking;
                 break;
             /* Asked while the supply is coming up. The data line is still gated, so the
                strip is dark already and the port can go straight back down. */
-            case kStateSettling :
+            case StateType::kSettling :
                 GetSwitch().SwitchSupplyOff();
-                state_ = kStateSupplyOff;
+                state_ = StateType::kSupplyOff;
                 break;
-            case kStateBlanking :
-            case kStateSupplyOff :
+            case StateType::kBlanking :
+            case StateType::kSupplyOff :
                 break;
         }
 
@@ -200,14 +200,14 @@ class Power
 
     void Task() {
         switch(state_) {
-            case kStateBlanking :
+            case StateType::kBlanking :
                 if(IsStripDarkAndIdle()) { CutSupply(); }
                 break;
-            case kStateSettling :
+            case StateType::kSettling :
                 ReleaseSupply();
                 break;
-            case kStateSupplyOn :
-            case kStateSupplyOff :
+            case StateType::kSupplyOn :
+            case StateType::kSupplyOff :
                 break;
         }
     }

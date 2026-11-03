@@ -38,9 +38,13 @@ Google's names, the same as in MaxMatrix and Utl, and checked: `.clang-tidy` run
 - Variables, parameters and public members `lower_case`; a private or protected member
   ends in `_` (`brightness_`). A setter's parameter is therefore the plain name -
   `SetBrightness(byte brightness)` assigning `brightness_` - with no prefix to tell them apart.
-- Constants and enumerators `k` plus `CamelCase` (`kUnlitLevel`, `kWordEs`); the
-  enumerations are still plain `enum`, so the enumerator keeps its type's word as a
-  prefix (`kDirectionFromLeft`).
+- Constants and enumerators `k` plus `CamelCase` (`kUnlitLevel`, `WordIdType::kEs`). The
+  enumerations are `enum class`, so an enumerator is named without its type's word and
+  turns into a number only through `ToUnderlying()`. A count that sizes arrays or bounds
+  loops stays the enumeration's last enumerator - so the compiler keeps counting, behind
+  `#if`s too - and is offered beside it as a number: `static constexpr byte
+  kNumberOfWords{static_cast<byte>(WordIdType::kNumberOfWords)}`.
+- `StdReturnType` is the exception and still a plain `enum`, `kEOk` and `kENotOk`.
 - A name that belongs to someone else keeps its spelling and says so with a
   `NOLINT(readability-identifier-naming)` where it is declared: Arduino's `Serial`,
   `millis()` and `byte`, the standard library's `std::array`, the frameworks the host

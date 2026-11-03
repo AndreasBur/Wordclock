@@ -106,15 +106,15 @@ template <typename Derived> class MsgCmdOverlayParser
 
     void SetPeriodInMinutes(MinuteType period_in_minutes) {
         StdReturnType return_value = Underlying().SetPeriodInMinutes(period_in_minutes);
-        MsgParameterParserType::error_.CheckReturnValueAndSend(kPeriodOptionShortName, return_value, ErrorMessage::kErrorValueOutOfBounds);
+        MsgParameterParserType::error_.CheckReturnValueAndSend(kPeriodOptionShortName, return_value, ErrorMessage::ErrorType::kValueOutOfBounds);
     }
     void SetEnduranceInSeconds(SecondType endurance_in_seconds) {
         StdReturnType return_value = Underlying().SetEnduranceInSeconds(endurance_in_seconds);
-        MsgParameterParserType::error_.CheckReturnValueAndSend(kEnduranceOptionShortName, return_value, ErrorMessage::kErrorValueOutOfBounds);
+        MsgParameterParserType::error_.CheckReturnValueAndSend(kEnduranceOptionShortName, return_value, ErrorMessage::ErrorType::kValueOutOfBounds);
     }
     void SetFont(FontType font) {
         StdReturnType return_value = Underlying().SetFont(font);
-        MsgParameterParserType::error_.CheckReturnValueAndSend(kFontOptionShortName, return_value, ErrorMessage::kErrorValueOutOfBounds);
+        MsgParameterParserType::error_.CheckReturnValueAndSend(kFontOptionShortName, return_value, ErrorMessage::ErrorType::kValueOutOfBounds);
 
     }
 
@@ -124,7 +124,7 @@ template <typename Derived> class MsgCmdOverlayParser
     void SendAnswerDay(bool append_space) const { MsgParameterParserType::SendAnswerParameter(kDayOptionShortName, Underlying().GetDay(), append_space); }
     void SendAnswerValid(bool append_space) const { MsgParameterParserType::SendAnswerParameter(kValidOptionShortName, Underlying().GetValidInDays(), append_space); }
     void SendAnswerSpeed(bool append_space) const { MsgParameterParserType::SendAnswerParameter(kSpeedOptionShortName, Underlying().GetSpeed(), append_space); }
-    void SendAnswerFont(bool append_space) const { MsgParameterParserType::SendAnswerParameter(kFontOptionShortName, Underlying().GetFont(), append_space); }
+    void SendAnswerFont(bool append_space) const { MsgParameterParserType::SendAnswerParameter(kFontOptionShortName, ToUnderlying(Underlying().GetFont()), append_space); }
     void SendAnswerActive(bool append_space) const { MsgParameterParserType::SendAnswerParameter(kActiveOptionShortName, Underlying().GetIsActive(), append_space); }
     void SendAnswerText(bool append_space) const { Underlying().SendAnswerText(append_space); }
 

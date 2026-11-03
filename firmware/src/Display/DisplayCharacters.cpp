@@ -96,7 +96,7 @@ StdReturnType DisplayCharacters::GetCharacter(byte index, char& character)
 StdReturnType DisplayCharacters::GetCharacter(CharacterIdType character_id, char& character)
 {
     if(IsCharacterIdValid(character_id)) {
-        character =  GetDisplayCharactersTableElement(character_id);
+        character =  GetDisplayCharactersTableElement(ToUnderlying(character_id));
         return kEOk;
     } else {
         return kENotOk;

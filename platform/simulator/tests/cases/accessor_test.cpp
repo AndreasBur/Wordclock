@@ -54,9 +54,9 @@ void TestReadingPastTheEndIsEmpty()
            "and so must a column past the plate");
 
     const DisplayWords words;
-    Expect(words.GetDisplayWord(DisplayWords::kWordNumberOfWords).GetLength() == 0u,
+    Expect(words.GetDisplayWord(DisplayWords::WordIdType::kNumberOfWords).GetLength() == 0u,
            "a word that is not in the table must have no length");
-    Expect(words.GetDisplayWordLength(DisplayWords::kWordNumberOfWords) == 0u,
+    Expect(words.GetDisplayWordLength(DisplayWords::WordIdType::kNumberOfWords) == 0u,
            "which is what the length on its own answers too");
 }
 
@@ -79,7 +79,7 @@ void TestWritingPastTheEndIsRefused()
            "a display pixel past the last one must be refused");
     Expect(display.SetPixel(DISPLAY_NUMBER_OF_COLUMNS, 0u) == kENotOk,
            "and so must a column past the last one");
-    Expect(display.SetWord(DisplayWords::kWordNumberOfWords) == kENotOk,
+    Expect(display.SetWord(DisplayWords::WordIdType::kNumberOfWords) == kENotOk,
            "a word that is not in the table must be refused");
 
     Expect(ArePixelsEqual(before, ReadPixels()), "none of the refused writes may reach the strip");

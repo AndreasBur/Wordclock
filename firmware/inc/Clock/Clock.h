@@ -31,7 +31,7 @@
 ******************************************************************************************************************************************************/
 /* Clock configuration parameter */
 #define CLOCK_SHOW_IT_IS_PERMANENTLY            STD_ON
-#define CLOCK_INITIAL_MODE                      kModeWessi
+#define CLOCK_INITIAL_MODE                      ModeType::kWessi
 
 /* Clock  parameter */
 /* Hour */
@@ -64,17 +64,18 @@ class Clock
  *  GLOBAL DATA TYPES AND STRUCTURES
 ******************************************************************************************************************************************************/
   public:
-    enum ModeType {
-        kModeWessi,
-        kModeOssi,
-        kModeRheinRuhr,
-        kModeSchwaben,
-        kModeNumberOfModes
+    enum class ModeType {
+        kWessi,
+        kOssi,
+        kRheinRuhr,
+        kSchwaben,
+        kNumberOfModes
     };
+    static constexpr byte kNumberOfModes{static_cast<byte>(ModeType::kNumberOfModes)};
 
-    enum HourModeType {
-        kHourModeFullHour,
-        kHourModeNoFullHour
+    enum class HourModeType {
+        kFullHour,
+        kNoFullHour
     };
 
     struct MinuteType {
@@ -116,13 +117,13 @@ class Clock
 
     MinuteTableElementType GetMinutesTableElement(byte minute) const {
         MinuteTableElementType minutes_table_element;
-        memcpy_P(&minutes_table_element, &kMinutesTable[mode_][minute / CLOCK_MINUTE_STEP_IN_MINUTES], sizeof(MinuteTableElementType));
+        memcpy_P(&minutes_table_element, &kMinutesTable[ToUnderlying(mode_)][minute / CLOCK_MINUTE_STEP_IN_MINUTES], sizeof(MinuteTableElementType));
         return minutes_table_element;
     }
 
     static HourTableElementType GetHoursTableElement(HourModeType hour_mode, byte hour) {
         HourTableElementType hours_table_element;
-        memcpy_P(&hours_table_element, &kHoursTable[hour_mode][hour], sizeof(HourTableElementType));
+        memcpy_P(&hours_table_element, &kHoursTable[ToUnderlying(hour_mode)][hour], sizeof(HourTableElementType));
         return hours_table_element;
     }
 
@@ -141,7 +142,7 @@ class Clock
     }
 
     static constexpr ModeType ToNextMode(ModeType mode) {
-        return (mode + 1u >= kModeNumberOfModes) ? kModeWessi : static_cast<ModeType>(mode + 1u);
+        return (ToUnderlying(mode) + 1u >= kNumberOfModes) ? ModeType::kWessi : static_cast<ModeType>(ToUnderlying(mode) + 1u);
     }
 
 /******************************************************************************************************************************************************
@@ -185,7 +186,7 @@ class Clock
         show_it_is_permanently_ = kShowItIsPermanentlyInitValue;
     }
 
-    static bool IsModeValid(ModeType mode) { return mode < kModeNumberOfModes; }
+    static bool IsModeValid(ModeType mode) { return mode < ModeType::kNumberOfModes; }
     StdReturnType SetTime(TimeType time) const { return SetTime(time.hour, time.minute); }
     StdReturnType SetTime(byte, byte) const;
     static void SetTime(ClockWords::WordsListType clock_words_table) {
