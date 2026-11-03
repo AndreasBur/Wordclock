@@ -102,18 +102,20 @@ void Display::ApplyBrightness()
    always done this for its own half; the color setters did not, which left a color change
    invisible until the brightness happened to move, redraw or no redraw.
 
-   Nothing to do where the strip does the dimming: there the pixels carry the color itself,
-   and the next redraw picks a new one up on its own. */
+   Where the strip does the dimming there is no dimmed copy to derive, but the pixels still
+   carry the previous color. This used to do nothing there, on the reasoning that the next
+   redraw would pick the new one up - and nothing redraws a clock face between two minutes,
+   so a color change, and every step of the color cycle, waited for the time to move. */
 void Display::ApplyColor()
 {
 #if (DISPLAY_USE_PIXELS_DIMMING == STD_OFF)
     color_.DimmColors(applied_brightness_);
+#endif
 
     /* the pixels already on the display still carry the previous color */
     for(IndexType index = 0; index < DISPLAY_NUMBER_OF_PIXELS; index++) {
         if(GetPixel(index)) { SetPixel(index); }
     }
-#endif
 } /* ApplyColor */
 
 
@@ -326,11 +328,7 @@ StdReturnType Display::SetPixel(byte column, byte row)
 {
     if(!IsColumnAndRowValid(column, row)) { return kENotOk; }
 
-#if (DISPLAY_USE_PIXELS_DIMMING == STD_ON)
-    return pixel_stripe_.SetPixel(ToIndex(column, row), color_);
-#else
-    return pixel_stripe_.SetPixel(ToIndex(column, row), color_.GetColorDimmed());
-#endif
+    return pixel_stripe_.SetPixel(ToIndex(column, row), GetColorToWrite());
 } /* SetPixel */
 
 
@@ -341,11 +339,7 @@ Pixel Display::GetColorDimmed(byte brightness) const
 {
     /* the display color stays the only color, the brightness just dimms it. It comes
        on top of the display brightness, which is already part of the color here. */
-#if (DISPLAY_USE_PIXELS_DIMMING == STD_ON)
-    Pixel pixel_color = color_.GetColor();
-#else
-    Pixel pixel_color = color_.GetColorDimmed();
-#endif
+    Pixel pixel_color = GetColorToWrite();
     pixel_color.DimmPixel(brightness);
 
     return pixel_color;

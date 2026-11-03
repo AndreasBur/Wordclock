@@ -173,6 +173,19 @@ class Display
 
     Pixel GetColorDimmed(byte) const;
 
+    /* The colour a lit pixel is written in, decided here once rather than at every writer -
+       the writers that each decided it for themselves were how the strip-dimming path came
+       to hand SetPixel() a DisplayColor and stop compiling. Where the colour does the
+       dimming that is its dimmed copy; where the strip does it, the colour as it is to be
+       shown, which the strip's master then scales on the way out. */
+    Pixel GetColorToWrite() const {
+#if (DISPLAY_USE_PIXELS_DIMMING == STD_ON)
+        return color_.GetColorToShow();
+#else
+        return color_.GetColorDimmed();
+#endif
+    }
+
 /******************************************************************************************************************************************************
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
@@ -302,7 +315,7 @@ class Display
     void ToggleBrightnessGammaCorrection() { SetBrightnessUseGammaCorrection(!GetBrightnessUseGammaCorrection()); }
     /* The one call that reaches every LED at once, and the reason the README names it when it
        sizes a supply. So it asks for the cap itself rather than leaving a task to notice. */
-    void Test() { pixel_stripe_.SetPixels(color_.GetColorDimmed()); ApplyCurrentLimit(); }
+    void Test() { pixel_stripe_.SetPixels(GetColorToWrite()); ApplyCurrentLimit(); }
     void Clear() { pixel_stripe_.ClearPixels(); }
     bool IsCleared() const { for(byte index = 0; index < DISPLAY_NUMBER_OF_PIXELS; index++) { if(GetPixel(index)) return false; } return true; }
 

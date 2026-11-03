@@ -19,8 +19,11 @@
 #include "Pixels.h"
 #include "RealTimeClock.h"
 
+/* Only where the colour does the dimming: where the strip does it, DisplayColor keeps no
+   dimmed copy, and what this would check is the strip's master. */
 void TestColourDimmingAcrossByteRange()
 {
+#if (DISPLAY_COLOR_SUPPORT_DIMMING == STD_ON)
     DisplayColor color;
     bool all_match = true;
     for(unsigned channel = 0u; channel <= 255u; ++channel) {
@@ -45,6 +48,7 @@ void TestColourDimmingAcrossByteRange()
     color.DimmColors(128u);
     Expect(color.GetColorGreenDimmed() == 0u && color.GetColorBlueDimmed() == 0u,
            "at any brightness");
+#endif
 }
 
 /* The curve's ends, its shape and a value from each end of the shift range. The middle
@@ -145,7 +149,7 @@ void TestFadeDimsAndComesBack()
     const byte brightness_before = display.GetBrightness();
 
     DrawClockFace(10u, 4u);
-    const uint32_t intensity_before = TotalIntensity(ReadPixels());
+    const uint32_t intensity_before = TotalIntensity(ReadOutputPixels());
 
     animations.SetAnimation(Animations::AnimationIdType::kFade);
     animations.SetTime(10u, 35u);
@@ -153,7 +157,10 @@ void TestFadeDimsAndComesBack()
     /* Far enough in to be measurable, far short of the swap: the level counts down one per
        task from 255. */
     for(int tick = 0; tick < 64; tick++) { animations.Task(true); }
-    Expect(TotalIntensity(ReadPixels()) < intensity_before, "the fade must dim what is on the display");
+    /* At the output, because that is where the dimming is in both configurations: in the
+       colour's dimmed copy, or in the strip's master where the strip does the dimming and the
+       buffer keeps every colour at full strength. */
+    Expect(TotalIntensity(ReadOutputPixels()) < intensity_before, "the fade must dim what is on the display");
 
     int ticks = 0;
     while((animations.GetState() == Animations::StateType::kPending) && (ticks < 5000)) {

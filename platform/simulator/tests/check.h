@@ -69,8 +69,19 @@ inline bool IsAnyPixelLit(const PixelBufferType& pixels)
 }
 
 /* What would reach the LEDs, which is not what ReadPixels() shows: that reads the buffer,
-   and the brightness is folded in on the way out. The difference is the whole of what
-   switching the display off does, so a test that asked the buffer would see nothing. */
+   and the brightness is folded in on the way out. */
+inline PixelBufferType ReadOutputPixels()
+{
+    PixelBufferType pixels;
+
+    for(byte index = 0u; index < PIXELS_NUMBER_OF_PIXELS; index++) {
+        pixels[index] = Pixels::GetInstance().GetOutputPixel(index);
+    }
+    return pixels;
+}
+
+/* The difference is the whole of what switching the display off does, so a test that
+   asked the buffer would see nothing. */
 inline bool IsAnyOutputPixelLit()
 {
     for(byte index = 0u; index < PIXELS_NUMBER_OF_PIXELS; index++) {
