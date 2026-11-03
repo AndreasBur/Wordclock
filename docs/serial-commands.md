@@ -31,7 +31,7 @@ overlay is disabled at compile time.
 
 | # | Command | Options | Notes |
 |---|---------|---------|-------|
-| 0 | *(none)* | — | Reserved; empty/invalid command → `kErrorWrongCommand` |
+| 0 | *(none)* | — | Reserved; empty/invalid command → `ErrorType::kWrongCommand` |
 | 1 | Remote Procedure Call | `-P<id>` (uint8) | Fire-and-forget action; see RPC table below |
 | 2 | Display Color | `-R<0-255>` `-G<0-255>` `-B<0-255>` | RGB color; triggers `Display.Show()` |
 | 3 | Display Brightness | `-B<0-255>` `-A<0\|1>` `-G<0\|1>` | Brightness, auto-brightness, gamma correction; see below |
@@ -228,7 +228,7 @@ answers `A=` and `Q=`. In the simulator `U` is real and `M`, `A` and `Q` are alw
 a host's free heap says nothing about the firmware.
 
 The command takes no options. Its parameter table is empty, so `12 -V1` is answered with
-`Error=3:V` (`kErrorParameterUnknown`) rather than silently accepted. The field names are
+`Error=3:V` (`ErrorType::kParameterUnknown`) rather than silently accepted. The field names are
 still described in the
 [message catalog](../firmware/inc/Communication/MessageCatalog.h), marked read-only, which
 is how the simulator dialog and the web console put labels on an answer without offering
@@ -317,10 +317,10 @@ only way in that survives the WiFi being down.
 
 The RPC answer is `RpcId=<id> Error=<code>`. An unknown or missing id (including
 `0`, e.g. when `-P` is omitted) is rejected with `Error=7`
-(`kErrorRpcIdUnknown`) instead of being silently accepted.
+(`ErrorType::kRpcIdUnknown`) instead of being silently accepted.
 
 Ids `1`, `2` and `22` to `30` are the ones that can be refused: they answer `Error=8`
-(`kErrorUnknown`, the general `kENotOk`) when they could not be carried out —
+(`ErrorType::kUnknown`, the general `kENotOk`) when they could not be carried out —
 `1` and `2` while the light sensor has not measured anything yet, `29` and `30` when the
 store did not take the write, the rest when the display is busy
 with something else rather than doing it anyway. The clock cannot be refreshed and no animation
@@ -341,16 +341,16 @@ Returned in the `Error=<code>` field
 
 | code | Name | Meaning |
 |------|------|---------|
-| 0 | `kErrorNoError` | Success |
-| 1 | `kErrorMessageTooLong` | Incoming message exceeded the buffer |
-| 2 | `kErrorWrongCommand` | Unknown/empty command number |
-| 3 | `kErrorParameterUnknown` | Unknown option short name |
-| 4 | `kErrorValueOutOfBounds` | Value outside the allowed range |
-| 5 | `kErrorNoValueGiven` | Option given without a value |
-| 6 | `kErrorDisplayPending` | Display busy / show still pending |
-| 7 | `kErrorRpcIdUnknown` | RPC command with an unknown/missing `-P<id>` |
-| 8 | `kErrorUnknown` | Unspecified failure — what an `kENotOk` from the firmware becomes |
-| 9 | `kErrorPowerSwitchAbsent` | Ids 20 and 21 on a clock whose supply switch was not built. Appended behind `kErrorUnknown` rather than sorted in beside its neighbours, for the reason the RPC ids are appended too: inserting one would silently change every code behind it |
+| 0 | `ErrorType::kNoError` | Success |
+| 1 | `ErrorType::kMessageTooLong` | Incoming message exceeded the buffer |
+| 2 | `ErrorType::kWrongCommand` | Unknown/empty command number |
+| 3 | `ErrorType::kParameterUnknown` | Unknown option short name |
+| 4 | `ErrorType::kValueOutOfBounds` | Value outside the allowed range |
+| 5 | `ErrorType::kNoValueGiven` | Option given without a value |
+| 6 | `ErrorType::kDisplayPending` | Display busy / show still pending |
+| 7 | `ErrorType::kRpcIdUnknown` | RPC command with an unknown/missing `-P<id>` |
+| 8 | `ErrorType::kUnknown` | Unspecified failure — what an `kENotOk` from the firmware becomes |
+| 9 | `ErrorType::kPowerSwitchAbsent` | Ids 20 and 21 on a clock whose supply switch was not built. Appended behind `ErrorType::kUnknown` rather than sorted in beside its neighbours, for the reason the RPC ids are appended too: inserting one would silently change every code behind it |
 
 ## Examples
 

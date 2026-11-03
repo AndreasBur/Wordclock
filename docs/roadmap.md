@@ -92,7 +92,7 @@ while running" is a solved problem. ESPWortuhr's shape is the one to copy — on
 per layout with a generated file collecting them, chosen from a dropdown.
 
 What is German is deeper than the tables, though, and that is why this is an idea.
-`DisplayWords::WordIdType` names its entries `kWordFuenf`, which is cosmetic; the letter
+`DisplayWords::WordIdType` names its entries `kFuenf`, which is cosmetic; the letter
 grid in `DisplayCharacters` is not, because it *is* the front plate. A second language is
 therefore a second front plate, and its size need not be 11×10 — which turns this from a
 table into a layout abstraction, with the column and row counts becoming values instead
