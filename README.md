@@ -205,8 +205,10 @@ cppcheck --enable=warning,portability --std=c++17 --inline-suppr \
 
 ## License
 
-[MIT](LICENSE) — Copyright (c) 2017-2026 Andreas Burnickl. The dependencies the
-firmware links against keep their own licences: the Arduino cores are LGPL-2.1,
-ESPAsyncWebServer is LGPL-3.0-or-later and wxWidgets carries the wxWindows
+[GPL-3.0-or-later](LICENSE) — Copyright (c) 2017-2026 Andreas Burnickl, the licence
+of Utl and MaxMatrix as well. The dependencies the firmware links against keep their
+own licences, and each of them may be combined with the GPL: the Arduino cores are
+LGPL-2.1, ESPAsyncWebServer is LGPL-3.0-or-later and wxWidgets carries the wxWindows
 Licence. None of them is redistributed here; PlatformIO and CMake fetch them at
-build time.
+build time. A release carries the source of its tag beside the firmware, as GitHub
+attaches it to every release.
