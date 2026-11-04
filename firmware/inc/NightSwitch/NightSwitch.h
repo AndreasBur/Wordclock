@@ -43,29 +43,44 @@
 #include "Power.h"
 #include "RealTimeClock.h"
 
-/* NightSwitch configuration parameter */
-/*
- * In scheduler ticks, so 100 * 10 ms = 1 s. A window's edge is a minute wide, so this is
- * far finer than it needs to be - and still cheap, because a tick that is not an edge
- * costs one comparison.
+/*!
+ * \brief Scheduler ticks between two calls of NightSwitch::Task(), so 100 * 10 ms = 1 s.
+ *
+ * A window's edge is a minute wide, so this is far finer than it needs to be - and still cheap,
+ * because a tick that is not an edge costs one comparison.
  */
 #define NIGHT_SWITCH_TASK_CYCLE                         100u
 
+/*!
+ * \brief The night switch: dims the display or takes it down inside a window of the day, and gives
+ *        it back at the window's end.
+ *
+ * The window runs from its start to its end, in hours and minutes of the real-time clock, and
+ * may cross midnight. Task() acts on the window's edges only. The setters store what they are
+ * given without a check.
+ */
 class NightSwitch
 {
   public:
+    /*! \brief An hour of the day, as ClockTime counts it. */
     using HourType = ClockTime::HourType;
+
+    /*! \brief A minute of the hour, as ClockTime counts it. */
     using MinuteType = ClockTime::MinuteType;
 
-    // Minutes since midnight, which is what the window is compared in: two numbers rather
-    // than four, and the wrap around midnight becomes one comparison instead of a case.
+    /*!
+     * \brief A time of day in minutes since midnight.
+     *
+     * What the window is compared in: two numbers rather than four, and the wrap around midnight
+     * becomes one comparison instead of a case.
+     */
     using TimeOfDayType = uint16_t;
 
   private:
     static constexpr byte kTaskCycle{NIGHT_SWITCH_TASK_CYCLE};
     static constexpr TimeOfDayType kMinutesPerHour{60u};
     static constexpr byte kNightBrightnessOff{0u};
-    /* What the display's night level is when nothing is dimming it. */
+    // What the display's night level is when nothing is dimming it.
     static constexpr byte kNightLevelFull{255u};
 
     static constexpr bool kIsActiveInitValue{false};
@@ -98,7 +113,6 @@ class NightSwitch
     NightSwitch() { }
     ~NightSwitch() { }
 
-    // functions
     static constexpr TimeOfDayType ToTimeOfDay(HourType hour, MinuteType minute) {
         return static_cast<TimeOfDayType>((hour * kMinutesPerHour) + minute);
     }
@@ -180,23 +194,43 @@ class NightSwitch
     }
 
   public:
+    /*! \brief Returns the one night switch. */
     static NightSwitch& GetInstance() {
         static NightSwitch singleton_instance;
         return singleton_instance;
     }
 
-    // get methods
+    /*! \brief Returns the scheduler ticks between two calls of Task(), NIGHT_SWITCH_TASK_CYCLE. */
     static constexpr byte GetTaskCycle() { return kTaskCycle; }
 
+    /*! \brief Returns whether the night switch acts on its window. */
     bool GetIsActive() const { return is_active_; }
+
+    /*! \brief Returns the hour the night starts at. */
     HourType GetStartHour() const { return start_hour_; }
+
+    /*! \brief Returns the minute the night starts at. */
     MinuteType GetStartMinute() const { return start_minute_; }
+
+    /*! \brief Returns the hour the night ends at. */
     HourType GetEndHour() const { return end_hour_; }
+
+    /*! \brief Returns the minute the night ends at. */
     MinuteType GetEndMinute() const { return end_minute_; }
+
+    /*! \brief Returns the night brightness: 0 for off, anything else the level to dim to. */
     byte GetNightBrightness() const { return night_brightness_; }
 
-    // Whether the clock considers it night now, which is what the answer reports - a
-    // window that is configured but switched off still has an answer to this.
+    /*!
+     * \brief Returns whether the clock considers it night now.
+     *
+     * This is what the answer reports - a window that is configured but switched off still has
+     * an answer to this. The start minute is inside the window and the end minute is not. A
+     * window whose start and end are the same minute is no window at all, so it is never night
+     * then.
+     *
+     * \return True if the time of the real-time clock lies inside the window.
+     */
     bool IsNight() const {
         const ClockTime now = RealTimeClock::GetInstance().GetTime();
 
@@ -205,17 +239,53 @@ class NightSwitch
                               ToTimeOfDay(end_hour_, end_minute_));
     }
 
-    // set methods
+    /*!
+     * \brief Sets the hour the night starts at.
+     *
+     * \param[in] start_hour The hour.
+     */
     void SetStartHour(HourType start_hour) { start_hour_ = start_hour; }
+
+    /*!
+     * \brief Sets the minute the night starts at.
+     *
+     * \param[in] start_minute The minute.
+     */
     void SetStartMinute(MinuteType start_minute) { start_minute_ = start_minute; }
+
+    /*!
+     * \brief Sets the hour the night ends at.
+     *
+     * \param[in] end_hour The hour.
+     */
     void SetEndHour(HourType end_hour) { end_hour_ = end_hour; }
+
+    /*!
+     * \brief Sets the minute the night ends at.
+     *
+     * \param[in] end_minute The minute.
+     */
     void SetEndMinute(MinuteType end_minute) { end_minute_ = end_minute; }
+
+    /*!
+     * \brief Sets what the night does to the display.
+     *
+     * It takes effect at the next start of the night.
+     *
+     * \param[in] night_brightness 0 to switch the display off, anything else to dim it to that
+     *                             level.
+     */
     void SetNightBrightness(byte night_brightness) { night_brightness_ = night_brightness; }
 
-    /*
-     * Switching the whole thing off gives the display back rather than leaving it wherever
-     * the last edge put it - a clock left dark by a timer that is no longer running is a
-     * clock nobody can explain.
+    /*!
+     * \brief Switches the night switch on or off.
+     *
+     * Switching the whole thing off gives the display back rather than leaving it wherever the
+     * last edge put it - a clock left dark by a timer that is no longer running is a clock nobody
+     * can explain. Switching it on inside the window takes the next Task() for the start of the
+     * night.
+     *
+     * \param[in] is_active True to switch it on, false to switch it off.
      */
     void SetIsActive(bool is_active) {
         is_active_ = is_active;
@@ -223,7 +293,12 @@ class NightSwitch
         was_night_ = false;
     }
 
-    // methods
+    /*!
+     * \brief Puts the night switch back to how a new clock has it: off, with a night from 23:00 to
+     *        6:00 that switches the display off.
+     *
+     * Switching off gives the display back, as SetIsActive() does.
+     */
     void ResetToDefaults() {
         SetIsActive(kIsActiveInitValue);
         start_hour_ = kStartHourInitValue;
@@ -233,11 +308,17 @@ class NightSwitch
         night_brightness_ = kNightBrightnessInitValue;
     }
 
-    /*
-     * Acts on the crossing, not on the state: between two edges the display is whatever
-     * anybody last made it, so switching it on by hand at night keeps it on - which is what
-     * the tick between two edges is for, since a hand that switched it on has a supply to
-     * get back.
+    /*!
+     * \brief Acts on the window's edges.
+     *
+     * Does nothing while the night switch is off. At the start of the night a night brightness
+     * of 0 has Power cut the strip's supply, or disables the display where no switch is fitted;
+     * any other dims the display's night level to it. At the end of the night the night level is
+     * cleared, the supply given back if the night cut it, and the display enabled.
+     *
+     * Acts on the crossing, not on the state: between two edges the display is whatever anybody
+     * last made it, so switching it on by hand at night keeps it on - which is what the tick
+     * between two edges is for, since a hand that switched it on has a supply to get back.
      */
     void Task() {
         if(!is_active_) { return; }

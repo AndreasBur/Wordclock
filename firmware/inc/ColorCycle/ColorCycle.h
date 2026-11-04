@@ -34,16 +34,23 @@
 #include "Arduino.h"
 #include "Display.h"
 
-/* ColorCycle configuration parameter */
-/*
- * Scheduler ticks per step of hue, so 100 * 10 ms is a step a second and 256 of those are
- * a round in a little over four minutes. Slow is the point: this runs on a clock somebody
- * lives with, and a wheel spun fast enough to notice is a wheel nobody can read the time
- * off. It is also the initial value of a setting rather than a fixed cycle, so a clock that
- * wants faster says so with command 15.
+/*!
+ * \brief Scheduler ticks per step of hue, so 100 * 10 ms is a step a second and 256 of those are a
+ *        round in a little over four minutes.
+ *
+ * Slow is the point: this runs on a clock somebody lives with, and a wheel spun fast enough to
+ * notice is a wheel nobody can read the time off. It is also the initial value of a setting
+ * rather than a fixed cycle, so a clock that wants faster says so with command 15.
  */
 #define COLOR_CYCLE_TASK_CYCLE_INIT_VALUE               100u
 
+/*!
+ * \brief The colour cycle: walks the display's colour round the hue wheel while the words stand
+ *        still.
+ *
+ * It sets the colour as a level of its own in Display, on top of the colour setting, which it
+ * never writes. Each step is one of 256 hues, at full saturation and full value.
+ */
 class ColorCycle
 {
   private:
@@ -70,7 +77,6 @@ class ColorCycle
     ColorCycle() { }
     ~ColorCycle() { }
 
-    // functions
     static Display& GetDisplay() { return Display::GetInstance(); }
 
     /*
@@ -111,26 +117,43 @@ class ColorCycle
     static bool IsDisplayShowingAnything() { return GetDisplay().IsEnabled(); }
 
   public:
+    /*! \brief Returns the one colour cycle. */
     static ColorCycle& GetInstance() {
         static ColorCycle singleton_instance;
         return singleton_instance;
     }
 
-    // get methods
-    // Zero is a cycle standing still on the hue it reached, which the scheduler answers
-    // with a task that never comes due - so it needs no rule of its own here.
+    /*!
+     * \brief Returns the scheduler ticks per step of hue.
+     *
+     * Zero is a cycle standing still on the hue it reached, which the scheduler answers with a
+     * task that never comes due - so it needs no rule of its own here.
+     *
+     * \return The ticks per step, or 0 for a cycle standing still.
+     */
     byte GetTaskCycle() const { return task_cycle_; }
 
+    /*! \brief Returns whether the cycle runs. */
     bool GetIsActive() const { return is_active_; }
+
+    /*! \brief Returns the hue the cycle has reached, one of 256 steps round the wheel. */
     byte GetHue() const { return hue_; }
 
-    // set methods
+    /*!
+     * \brief Sets the scheduler ticks per step of hue.
+     *
+     * \param[in] task_cycle The ticks per step; zero stands the cycle still on the hue it reached.
+     */
     void SetTaskCycle(byte task_cycle) { task_cycle_ = task_cycle; }
 
-    /*
-     * Switching off puts the chosen colour back at once rather than at the next tick: the
-     * tick may be seconds away, and a setting that takes seconds to take effect reads as
-     * one that did not work.
+    /*!
+     * \brief Starts or stops the cycle.
+     *
+     * Starting sets the display to the colour of the hue reached at once. Stopping puts the
+     * chosen colour back at once rather than at the next tick: the tick may be seconds away, and
+     * a setting that takes seconds to take effect reads as one that did not work.
+     *
+     * \param[in] is_active True to start the cycle, false to stop it.
      */
     void SetIsActive(bool is_active) {
         is_active_ = is_active;
@@ -139,13 +162,24 @@ class ColorCycle
         else         { GetDisplay().ClearColorCycle(); }
     }
 
-    // methods
+    /*!
+     * \brief Puts the cycle back to how a new clock has it: stopped, on the first hue, at
+     *        COLOR_CYCLE_TASK_CYCLE_INIT_VALUE ticks per step.
+     *
+     * Stopping puts the chosen colour back at once, as SetIsActive() does.
+     */
     void ResetToDefaults() {
         SetTaskCycle(kTaskCycleInitValue);
         hue_ = kHueInitValue;
         SetIsActive(kIsActiveInitValue);
     }
 
+    /*!
+     * \brief Steps the hue one further round the wheel and sets the display to its colour.
+     *
+     * Does nothing while the cycle is stopped or the display is disabled. After the last of the
+     * 256 hues comes the first again.
+     */
     void Task() {
         if(!is_active_) { return; }
         if(!IsDisplayShowingAnything()) { return; }

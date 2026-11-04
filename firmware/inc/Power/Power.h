@@ -38,27 +38,41 @@
 #include "Display.h"
 #include "PowerSwitch.h"
 
-/* Power configuration parameter */
-/*
- * Every tick. The two states this counts through are waits on the strip, and a frame takes
- * about a third of one tick - so anything slower would idle with the supply in mid-air for
- * no reason. A tick that has nothing to wait for costs one comparison.
+/*!
+ * \brief Scheduler ticks between two calls of Power::Task(): every tick.
+ *
+ * The two states this counts through are waits on the strip, and a frame takes about a third of
+ * one tick - so anything slower would idle with the supply in mid-air for no reason. A tick that
+ * has nothing to wait for costs one comparison.
  */
 #define POWER_TASK_CYCLE                                1u
 
+/*!
+ * \brief The strip's supply: switches it off and on in the order the hardware needs.
+ *
+ * SwitchSupplyOff() and SwitchSupplyOn() only ask; Task() finishes the sequence on the ticks
+ * after. Where no switch is fitted, both refuse.
+ */
 class Power
 {
   public:
+    /*! \brief The steps of switching the supply off and on. */
     enum class StateType {
-        /* The supply is on and frames are going out - what a clock runs in. */
-        kSupplyOn,
-        // Asked to go off. The display is dark; what is left is to see the blanked frame
-        // off the wire before the port drops.
+        kSupplyOn, /*!< The supply is on and frames are going out - what a clock runs in. */
+        /*!
+         * \brief Asked to go off.
+         *
+         * The display is dark; what is left is to see the blanked frame off the wire before the
+         * port drops.
+         */
         kBlanking,
-        /* The supply is off and the data line is gated. */
-        kSupplyOff,
-        // Asked to come on. The supply is up; the data line is released on the next task,
-        // which gives the strip a tick to find its rail.
+        kSupplyOff, /*!< The supply is off and the data line is gated. */
+        /*!
+         * \brief Asked to come on.
+         *
+         * The supply is up; the data line is released on the next task, which gives the strip a
+         * tick to find its rail.
+         */
         kSettling
     };
 
@@ -70,7 +84,6 @@ class Power
     Power() { }
     ~Power() { }
 
-    // functions
     static Display& GetDisplay() { return Display::GetInstance(); }
     static PowerSwitch& GetSwitch() { return PowerSwitch::GetInstance(); }
 
@@ -90,14 +103,14 @@ class Power
         return !GetDisplay().IsFrameOnTheWire();
     }
 
-    /* The gate before the port, so that no tick can slip a frame in between the two. */
+    // The gate before the port, so that no tick can slip a frame in between the two.
     void CutSupply() {
         GetDisplay().SuspendOutput();
         GetSwitch().SwitchSupplyOff();
         state_ = StateType::kSupplyOff;
     }
 
-    /* The port before the gate, for the same reason read the other way round. */
+    // The port before the gate, for the same reason read the other way round.
     void ReleaseSupply() {
         GetDisplay().ResumeOutput();
         GetDisplay().Enable();
@@ -105,39 +118,57 @@ class Power
     }
 
   public:
+    /*! \brief Returns the one supply. */
     static Power& GetInstance() {
         static Power singleton_instance;
         return singleton_instance;
     }
 
-    // get methods
+    /*! \brief Returns the scheduler ticks between two calls of Task(), POWER_TASK_CYCLE. */
     static constexpr byte GetTaskCycle() { return kTaskCycle; }
 
+    /*! \brief Returns the step the sequence of switching is on. */
     StateType GetState() const { return state_; }
 
-    /*
+    /*!
+     * \brief Returns whether the supply is on.
+     *
      * What the status of the supply is, rather than which step the sequence is on: a switch
-     * that is on its way off still has its supply up, and the two ticks it takes to get
-     * there are nobody else's business.
+     * that is on its way off still has its supply up, and the two ticks it takes to get there
+     * are nobody else's business.
+     *
+     * \return True while the supply is on, as the platform's PowerSwitch reports it.
      */
     static bool IsSupplyOn() { return GetSwitch().IsSupplyOn(); }
 
-    // Whether there is a switch to ask at all. A board that was built without one has the
-    // high side MOSFET bridged, and then these procedures have nothing to act on.
+    /*!
+     * \brief Returns whether there is a switch to ask at all.
+     *
+     * A board that was built without one has the high side MOSFET bridged, and then these
+     * procedures have nothing to act on.
+     *
+     * \return True if the board has the switch.
+     */
     static constexpr bool IsSwitchFitted() { return PowerSwitch::IsFitted(); }
 
-    // methods
-    /*
-     * Asks for the supply. Answers kENotOk only where there is no switch - an ask that is
-     * already the case, or already under way, is honoured rather than refused, because a
-     * caller that says "off" twice means the same thing both times.
+    /*!
+     * \brief Asks for the supply to come on.
+     *
+     * A supply that is off is switched on at once, and the next Task() releases the data line
+     * and enables the display. A supply that is still being blanked was never cut, so the
+     * display is only enabled again, at once.
+     *
+     * An ask that is already the case, or already under way, is honoured rather than refused,
+     * because a caller that says "off" twice means the same thing both times.
+     *
+     * \return kEOk, or kENotOk if no switch is fitted; nothing changes then.
      */
     StdReturnType SwitchSupplyOn() {
         if constexpr (!IsSwitchFitted()) { return kENotOk; }
 
         switch(state_) {
             case StateType::kSupplyOff :
-                /* The port first; the data line follows on the next task. */
+                // The port first; the data line follows on the next task.
                 GetSwitch().SwitchSupplyOn();
                 state_ = StateType::kSettling;
                 break;
@@ -154,6 +185,18 @@ class Power
         return kEOk;
     }
 
+    /*!
+     * \brief Asks for the supply to go off.
+     *
+     * A supply that is on is not cut at once: the display is disabled, which blanks the strip
+     * over the data line, and Task() cuts the supply once that frame has left the wire. A supply
+     * that is still coming up has its data line gated still, so it goes straight back off.
+     *
+     * An ask that is already the case, or already under way, is honoured rather than refused,
+     * as for SwitchSupplyOn().
+     *
+     * \return kEOk, or kENotOk if no switch is fitted; nothing changes then.
+     */
     StdReturnType SwitchSupplyOff() {
         if constexpr (!IsSwitchFitted()) { return kENotOk; }
 
@@ -178,6 +221,13 @@ class Power
         return kEOk;
     }
 
+    /*!
+     * \brief Takes the sequence of switching one step further.
+     *
+     * While blanking, it waits until the display's buffer holds nothing unsent and no frame is
+     * on the wire, then gates the data line and cuts the supply. While settling, it releases the
+     * data line and enables the display. In the other two states it does nothing.
+     */
     void Task() {
         switch(state_) {
             case StateType::kBlanking :

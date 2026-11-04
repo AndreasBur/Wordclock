@@ -10,7 +10,6 @@
 
 #include "DisplayManager.h"
 
-/*! \brief          Decides what the display is showing */
 void DisplayManager::Task()
 {
     Display::GetInstance().ApplyBrightness();

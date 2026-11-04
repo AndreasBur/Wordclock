@@ -27,12 +27,11 @@ void Scheduler::Task()
     TriggerTasks();
 }
 
-/*! \brief          Tells whether a task is due on this tick, and counts it down if not
- *  \details        A cycle of zero switches the task off. Its remaining ticks are
- *                  cleared along with it, so switching it back on runs it right away
- *                  instead of somewhere inside a period left over from before.
- *
- *  \return         true if the task is to run on this tick
+/*
+ * Tells whether a task is due on this tick - true if it is to run - and counts it down if not.
+ * A cycle of zero switches the task off. Its remaining ticks are cleared along with it, so
+ * switching it back on runs it right away instead of somewhere inside a period left over from
+ * before.
  */
 bool Scheduler::IsDue(TaskIdType task_id, byte cycle) {
     if(cycle == 0u) { remaining_ticks_[ToUnderlying(task_id)] = 0u; return false; }

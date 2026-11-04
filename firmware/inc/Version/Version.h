@@ -17,9 +17,13 @@
 #ifndef _VERSION_H_
 #define _VERSION_H_
 
-// Major, minor, patch. A build that wants to say more - a branch, a commit - overrides it
-// from the outside rather than editing this line.
 #ifndef WORDCLOCK_VERSION
+/*!
+ * \brief The version of the firmware, as a string: major, minor, patch.
+ *
+ * A build that wants to say more - a branch, a commit - overrides it from the outside rather than
+ * editing this line.
+ */
 # define WORDCLOCK_VERSION                              "0.1.0"
 #endif
 

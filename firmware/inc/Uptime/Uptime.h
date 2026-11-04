@@ -26,11 +26,22 @@
 
 #include "Arduino.h"
 
-/* Uptime configuration parameter */
-// In scheduler ticks, so 100 * 10 ms = 1 s. The scheduler counts cycles in a byte, which
-// caps this at 255 - a second is the coarsest unit that still carries a minute exactly.
+/*!
+ * \brief The cycle of the uptime's task, in scheduler ticks, so 100 * 10 ms = 1 s: Task() counts
+ *        one second per call.
+ *
+ * The scheduler counts cycles in a byte, which caps this at 255 - a second is the coarsest unit
+ * that still carries a minute exactly.
+ */
 #define UPTIME_TASK_CYCLE                               100u
 
+/*!
+ * \brief How long the clock has been running: days, hours and minutes, counted from the scheduler's
+ *        tick.
+ *
+ * The days stop at their maximum rather than rolling over, so it never reports a small number for
+ * a long time.
+ */
 class Uptime
 {
   private:
@@ -69,19 +80,30 @@ class Uptime
     }
 
   public:
+    /*! \brief Returns the one uptime of the firmware. */
     static Uptime& GetInstance() {
         static Uptime singleton_instance;
         return singleton_instance;
     }
 
-    // get methods
+    /*! \brief Returns the scheduler ticks between two calls of Task(), UPTIME_TASK_CYCLE. */
     static constexpr byte GetTaskCycle() { return kTaskCycle; }
 
+    /*! \brief Returns the whole days counted so far, up to 65535. */
     uint16_t GetDays() const { return days_; }
+
+    /*! \brief Returns the whole hours counted so far beyond the days, 0 to 23. */
     byte GetHours() const { return hours_; }
+
+    /*! \brief Returns the whole minutes counted so far beyond the hours, 0 to 59. */
     byte GetMinutes() const { return minutes_; }
 
-    // methods
+    /*!
+     * \brief Counts one second.
+     *
+     * The scheduler calls it every UPTIME_TASK_CYCLE ticks. Seconds carry into minutes, minutes
+     * into hours and hours into days; the days stop at 65535 rather than rolling over.
+     */
     void Task() {
         if(!Carry(seconds_, kSecondsPerMinute)) { return; }
         if(!Carry(minutes_, kMinutesPerHour)) { return; }

@@ -229,3 +229,8 @@ jobs:
       # docs/documentation.md says what a block holds. The runner's python3 is enough.
       - name: Check
         run: python3 tools/docs.py
+
+      # A line that continues a command of a block is indented under the command's text; the
+      # modules of PENDING are left out, as docs.py leaves them.
+      - name: Indented
+        run: python3 tools/doc-indent.py

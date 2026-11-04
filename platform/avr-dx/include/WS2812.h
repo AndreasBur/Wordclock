@@ -13,9 +13,11 @@
  * TCBs carry one compare value each. So the one XCL timer becomes two TCBs, one per width, and the
  * LUT picks between them:
  *
- * USART0 (MSPI host) clocks the pixel bytes out at 800 kbit/s XCK edge starts both one-shots
- * through the event system TCB1 the short pulse, a zero bit TCB2 the long pulse, a one bit CCL LUT0
- * out = TXD ? TCB2 : TCB1, truth table 0xE4.
+ * - USART0 (MSPI host): clocks the pixel bytes out at 800 kbit/s.
+ * - XCK edge: starts both one-shots through the event system.
+ * - TCB1: the short pulse, a zero bit.
+ * - TCB2: the long pulse, a one bit.
+ * - CCL LUT0: out = TXD ? TCB2 : TCB1, truth table 0xE4.
  *
  * What the E5 had and this does not is the DMA: no AVR Dx has one. The bytes are therefore fed by
  * an interrupt, one per 10 us. That is affordable precisely because the pulse shaping is in

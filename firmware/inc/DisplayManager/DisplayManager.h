@@ -22,17 +22,20 @@
 #include "Overlays.h"
 #include "RealTimeClock.h"
 
-/* DisplayManager configuration parameter */
-
+/*! \brief The cycle of the display manager's task, in scheduler ticks. */
 #define DISPLAY_MANAGER_TASK_CYCLE                  1u
 
-/* DisplayManager parameter */
-
+/*!
+ * \brief Decides what the display shows: the clock, the animation that carries a word change, or an
+ *        overlay that takes the display over for a while.
+ *
+ * It also keeps the brightness the LEDs are driven with up to date.
+ */
 class DisplayManager
 {
   public:
-    using HourType = ClockTime::HourType;
-    using MinuteType = ClockTime::MinuteType;
+    using HourType = ClockTime::HourType;     /*!< The hour of a time, as ClockTime holds it. */
+    using MinuteType = ClockTime::MinuteType; /*!< The minute of a time, as ClockTime holds it. */
 
   private:
     static constexpr byte kTaskCycle{DISPLAY_MANAGER_TASK_CYCLE};
@@ -48,7 +51,6 @@ class DisplayManager
     // end of one detectable.
     bool overlay_was_showing_{false};
 
-    // functions
     constexpr DisplayManager() { }
     ~DisplayManager() { }
 
@@ -87,28 +89,38 @@ class DisplayManager
     }
 
   public:
+    /*! \brief Returns the one display manager of the firmware. */
     static DisplayManager& GetInstance() {
         static DisplayManager singleton_instance;
         return singleton_instance;
     }
 
-	// get methods
+    /*! \brief Returns the ticks between two calls of Task(), DISPLAY_MANAGER_TASK_CYCLE. */
     static constexpr byte GetTaskCycle() { return kTaskCycle; }
 
-	// set methods
-
-	// methods
+    /*!
+     * \brief Decides what the display shows, and brings the brightness the LEDs are driven with up
+     *        to date.
+     *
+     * While an overlay shows, the display is left to it. When the overlay has ended, the current
+     * time is drawn at once, without an animation. Otherwise the time is drawn when its words
+     * change, and on the first call: through the selected animation, or directly if none is
+     * selected.
+     */
     void Task();
 
-    /*
-     * Draws the current time again, right now and without an animation. What asks for
-     * this is a display that no longer shows the clock at all - a test pattern, a pixel
-     * set by hand - and an animation would transition out of that rather than replace
-     * it. The latch is updated with it, so the redraw does not repeat on the next task.
+    /*!
+     * \brief Draws the current time again, right now and without an animation.
      *
-     * Refused while an overlay owns the display: the overlay would be overwritten for
-     * one task and redraw itself on the next, which looks like a glitch rather than
-     * like the refusal it is.
+     * What asks for this is a display that no longer shows the clock at all - a test pattern, a
+     * pixel set by hand - and an animation would transition out of that rather than replace it.
+     * The latch of the words last drawn is updated with it, so the redraw does not repeat on the
+     * next task.
+     *
+     * Refused while an overlay owns the display: the overlay would be overwritten for one task and
+     * redraw itself on the next, which looks like a glitch rather than like the refusal it is.
+     *
+     * \return kEOk, or kENotOk while an overlay shows; the display is then left as it was.
      */
     StdReturnType RefreshClock() {
         if(IsOverlayShowing()) { return kENotOk; }
@@ -119,11 +131,15 @@ class DisplayManager
         return kEOk;
     }
 
-    /*
-     * Runs the selected animation on the current time, without waiting for the word
-     * change that would otherwise be the only trigger. Selecting the animation again
-     * with "9 -A<id>" shows it too, but it also means something else - it changes what
-     * runs from now on.
+    /*!
+     * \brief Runs the selected animation on the current time, without waiting for the word change
+     *        that would otherwise be the only trigger.
+     *
+     * Selecting the animation again with `9 -A<id>` shows it too, but it also means something
+     * else - it changes what runs from now on.
+     *
+     * \return kENotOk while an overlay shows, with nothing started; otherwise what
+     *         Animations::SetTime() returns.
      */
     static StdReturnType StartAnimation() {
         if(IsOverlayShowing()) { return kENotOk; }
@@ -132,10 +148,14 @@ class DisplayManager
         return Animations::GetInstance().SetTime(time.GetHour(), time.GetMinute());
     }
 
-    /*
-     * Ends a running animation and puts the time back on the display. At a low speed an
-     * animation runs for minutes, and both a word change and a mode change are ignored
-     * while it does.
+    /*!
+     * \brief Ends a running animation and puts the time back on the display.
+     *
+     * At a low speed an animation runs for minutes, and both a word change and a mode change are
+     * ignored while it does.
+     *
+     * \return kEOk, or kENotOk while an overlay shows; the animation is ended all the same, but the
+     *         time is not drawn.
      */
     StdReturnType AbortAnimation() {
         Animations::GetInstance().Abort();
