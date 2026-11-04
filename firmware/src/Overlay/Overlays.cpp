@@ -9,6 +9,7 @@
 #define _OVERLAYS_SOURCE_
 
 #include "Overlays.h"
+#include "Animations.h"
 
 // Disabled is what is left over when none of the overlays has anything to do, which is
 // why it needs no test of its own.
@@ -25,7 +26,14 @@ void Overlays::Task() {
     if(last_second_ != time.GetSecond()) {
         last_second_ = time.GetSecond();
         if(IsShow()) { TaskShow(date, time); }
-        else { TaskIdle(date, time); }
+        else {
+            // The timer counts a show and nothing else; with none showing it is 0, however the
+            // last one ended. An overlay switched off while it showed left it standing, and no
+            // overlay started by its period again.
+            show_timer_in_seconds_ = 0u;
+            TaskIdle(date, time);
+            if(IsShow()) { AbortAnimation(); }
+        }
     }
 }
 
@@ -85,4 +93,15 @@ void Overlays::TaskShow(ClockDate date, ClockTime time) {
 #if (OVERLAYS_SUPPORT_TEXT == STD_ON)
     if(text_.GetState() == OverlayText::StateType::kShow) { show_timer_in_seconds_ =  text_.Task(show_timer_in_seconds_, date, time); }
 #endif
+}
+
+/*
+ * An overlay that starts ends a running animation: both draw on the same display, and an
+ * animation that ran past second 30 - Fade at its default speed takes some 51 seconds, any of
+ * them minutes at a low one - drew its pixels into the scrolling text. The overlay holds the
+ * display, as DisplayManager already has it; once it ends, DisplayManager draws the time anew.
+ */
+void Overlays::AbortAnimation()
+{
+    Animations::GetInstance().Abort();
 }

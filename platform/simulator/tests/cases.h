@@ -30,6 +30,9 @@ void TestDisplayCharacterLookup();
 void TestShowNowProcedures();
 void TestTemperatureOverlayWithoutSensor();
 void TestOverlayPeriodAndEndurance();
+void TestOverlaySwitchedOffWhileItShows();
+void TestStartingOverlayEndsTheAnimation();
+void TestValidInDaysCountsFromTheDate();
 
 /* animation_test.cpp */
 void TestSnakeLifetime();

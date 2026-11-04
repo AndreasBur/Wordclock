@@ -147,7 +147,10 @@ void TestOverlayPeriodAndEndurance()
     Expect(overlays.GetState() == Overlays::OverlayType::StateType::kShow,
            "an overlay must start on its second");
 
-    /* It ends by itself, and within the endurance it was given rather than whenever. */
+    /*
+     * It ends by itself, after exactly the endurance it was given: three seconds, ending on
+     * the third. It used to ask whether the time was up before counting, and ran one longer.
+     */
     int seconds = 0;
     for(byte second = 31u; (second < 59u) && (overlays.GetState() == Overlays::OverlayType::StateType::kShow); second++) {
         SetTime(10u, 8u, second);
@@ -155,7 +158,7 @@ void TestOverlayPeriodAndEndurance()
         seconds++;
     }
     Expect(overlays.GetState() != Overlays::OverlayType::StateType::kShow, "an overlay must end by itself");
-    Expect(seconds <= 5, "and within the endurance it was given");
+    Expect(seconds == 3, "and after exactly the endurance it was given");
 
     /* A minute the raster does not cover. */
     SetTime(10u, 9u, 30u);
@@ -169,4 +172,147 @@ void TestOverlayPeriodAndEndurance()
     overlays.Task();
     Expect(overlays.GetState() != Overlays::OverlayType::StateType::kShow,
            "an overlay that is switched off must stay away");
+}
+
+// Starts the date overlay by its period in `minute` of 10 o'clock, if it will, and says whether
+// it did; a show it started is ended again. Overlays acts once per second, so the second before
+// is passed through first.
+static bool DateOverlayStartsIn(byte minute)
+{
+    Overlays& overlays = Overlays::GetInstance();
+
+    SetTime(10u, minute, 29u);
+    overlays.Task();
+    SetTime(10u, minute, 30u);
+    overlays.Task();
+    const bool started = overlays.GetState() == Overlays::OverlayType::StateType::kShow;
+    overlays.Abort();
+    return started;
+}
+
+static void ConfigureDateOverlayEveryMinute()
+{
+    Overlays& overlays = Overlays::GetInstance();
+
+    overlays.SetDatePeriodInMinutes(1u);
+    overlays.SetDateEnduranceInSeconds(10u);
+    overlays.SetDateMonth(0u);
+    overlays.SetDateDay(0u);
+    overlays.SetDateValidInDays(0u);
+    overlays.SetDateIsActive(true);
+}
+
+/*
+ * An overlay switched off, or reset, while it shows ends its show as Abort() would: its text
+ * stops, and the next overlay starts by its period. It used to go straight to switched off,
+ * leaving the text scrolling over the clock and the show timer standing, and no overlay
+ * started by its period again until a "show now" had run.
+ */
+void TestOverlaySwitchedOffWhileItShows()
+{
+    Overlays& overlays = Overlays::GetInstance();
+
+    ConfigureDateOverlayEveryMinute();
+    SetTime(10u, 20u, 29u);
+    overlays.Task();
+    SetTime(10u, 20u, 30u);
+    overlays.Task();
+    SetTime(10u, 20u, 32u);
+    overlays.Task();
+    Expect(overlays.GetState() == Overlays::OverlayType::StateType::kShow, "the date overlay must show");
+
+    overlays.SetDateIsActive(false);
+    Expect(Text::GetInstance().GetState() == Text::StateType::kIdle,
+           "an overlay switched off while it shows must stop its text");
+    overlays.SetDateIsActive(true);
+    Expect(DateOverlayStartsIn(21u), "and the next start by period must come");
+
+    SetTime(10u, 22u, 29u);
+    overlays.Task();
+    SetTime(10u, 22u, 30u);
+    overlays.Task();
+    overlays.ResetToDefaults();
+    Expect(Text::GetInstance().GetState() == Text::StateType::kIdle,
+           "an overlay reset while it shows must stop its text");
+    ConfigureDateOverlayEveryMinute();
+    Expect(DateOverlayStartsIn(23u), "and the next start by period must come after a reset too");
+
+    overlays.SetDateIsActive(false);
+}
+
+/*
+ * An overlay that starts ends a running animation, by its period and by "show now" alike. Both
+ * draw on the same display, and an animation still running at second 30 - Fade at its default
+ * speed, any at a low one - drew its pixels into the scrolling text.
+ */
+void TestStartingOverlayEndsTheAnimation()
+{
+    Overlays& overlays = Overlays::GetInstance();
+    Animations& animations = Animations::GetInstance();
+
+    ConfigureDateOverlayEveryMinute();
+    animations.SetMode(Animations::ModeType::kFixed);
+    animations.SetAnimation(FirstAnimation());
+
+    DrawClockFace(10u, 4u);
+    animations.SetTime(10u, 35u);
+    SetTime(10u, 30u, 29u);
+    overlays.Task();
+    Expect(animations.GetState() == Animations::StateType::kPending, "the animation must be running");
+    SetTime(10u, 30u, 30u);
+    overlays.Task();
+    Expect(overlays.GetState() == Overlays::OverlayType::StateType::kShow, "the date overlay must start");
+    Expect(animations.GetState() == Animations::StateType::kIdle,
+           "an overlay that starts by its period must end a running animation");
+    overlays.Abort();
+
+    DrawClockFace(10u, 4u);
+    animations.SetTime(10u, 35u);
+    Expect(overlays.ShowDateNow() == kEOk, "the date overlay must start now");
+    Expect(animations.GetState() == Animations::StateType::kIdle,
+           "an overlay shown now must end a running animation");
+    overlays.Abort();
+
+    animations.SetAnimation(Animations::AnimationIdType::kNone);
+    overlays.SetDateIsActive(false);
+}
+
+/*
+ * Valid-in-days counts from the date on: 24 December and three days is 24 to 27 December, and
+ * across the end of the year as well. It used to count in both directions, and the days before
+ * the date only within its month - 21 December, but not 31 December for 2 January.
+ */
+void TestValidInDaysCountsFromTheDate()
+{
+    Overlays& overlays = Overlays::GetInstance();
+
+    ConfigureDateOverlayEveryMinute();
+    overlays.SetDateMonth(12u);
+    overlays.SetDateDay(24u);
+    overlays.SetDateValidInDays(3u);
+
+    RealTimeClock::GetInstance().SetDate(ClockDate(2026u, 12u, 21u));
+    Expect(!DateOverlayStartsIn(40u), "valid-in-days must not reach the days before the date");
+    RealTimeClock::GetInstance().SetDate(ClockDate(2026u, 12u, 24u));
+    Expect(DateOverlayStartsIn(41u), "the date itself must be in the window");
+    RealTimeClock::GetInstance().SetDate(ClockDate(2026u, 12u, 27u));
+    Expect(DateOverlayStartsIn(42u), "the last day of the window must be in it");
+    RealTimeClock::GetInstance().SetDate(ClockDate(2026u, 12u, 28u));
+    Expect(!DateOverlayStartsIn(43u), "the day after the window must not be in it");
+
+    overlays.SetDateMonth(12u);
+    overlays.SetDateDay(30u);
+    overlays.SetDateValidInDays(5u);
+    RealTimeClock::GetInstance().SetDate(ClockDate(2027u, 1u, 3u));
+    Expect(DateOverlayStartsIn(44u), "the window must reach across the end of the year");
+
+    overlays.SetDateMonth(1u);
+    overlays.SetDateDay(2u);
+    RealTimeClock::GetInstance().SetDate(ClockDate(2026u, 12u, 31u));
+    Expect(!DateOverlayStartsIn(45u), "nor the days before the date across the year");
+
+    overlays.SetDateMonth(0u);
+    overlays.SetDateDay(0u);
+    overlays.SetDateValidInDays(0u);
+    overlays.SetDateIsActive(false);
 }

@@ -14,6 +14,7 @@
 #include "ClockDateTime.h"
 #include "Text.h"
 #include "Scheduler.h"
+#include "RealTimeClock.h"
 
 #include <type_traits>
 
@@ -31,8 +32,7 @@
  * The month, the day and the valid-in-days limit the days on which it starts:
  * - With neither a month nor a day, it starts on every day.
  * - With a month, a day and a valid-in-days above 0, it starts on that date and on the
- *   valid-in-days days after it, across the turn of the year too; see SetValidInDays() for the
- *   days before the date.
+ *   valid-in-days days after it, across the turn of the year too.
  * - Otherwise the valid-in-days is not used: with a month and a day, it starts on that date each
  *   year; with a month only, on every day of that month; with a day only, on that day of every
  *   month.
@@ -134,7 +134,9 @@ template <typename Derived> class Overlay
     bool IsDaySet() const { return day_ != 0u; }
     bool IsMonthSet() const { return month_ != 0u; }
     bool IsValidInDaysSet() const { return valid_in_days_ != 0; }
-    bool IsNextYear(MonthType current_month) const { return current_month < month_; }
+    bool IsBeforeInYear(MonthType current_month, DayType current_day) const {
+        return (current_month < month_) || ((current_month == month_) && (current_day < day_));
+    }
 
     bool IsTimeMatching(MinuteType current_minute, SecondType current_second) const { return IsMinuteMatching(current_minute) && IsSecondMatching(current_second); }
     bool IsDateMatching(MonthType current_month, DayType current_day) const {
@@ -144,9 +146,14 @@ template <typename Derived> class Overlay
         return false;
     }
 
+    /*
+     * From the date on: the days since its last time on or before today, this year's or, before
+     * it in the year, last year's. GetPassedDays() counts in either direction, and against this
+     * year's date alone the window also took in the days before the date within its month.
+     */
     bool IsDateValid(ClockDate current_date) const {
         YearType year = current_date.GetYear();
-        if(IsNextYear(current_date.GetMonth())) { year--;}
+        if(IsBeforeInYear(current_date.GetMonth(), current_date.GetDay())) { year--; }
         return current_date.GetPassedDays(year, month_, day_) <= valid_in_days_;
     }
 
@@ -185,9 +192,22 @@ template <typename Derived> class Overlay
         return show_timer_in_seconds;
     }
 
+    // Counted down first, so that an endurance of n seconds ends the show n seconds after its
+    // start; asked first, it ran a second longer.
     SecondType ShowTask(SecondType show_timer_in_seconds, ClockDate current_date, ClockTime current_time) {
-        if(IsShowTimerExpired(show_timer_in_seconds)) { SetStateToIdle(current_date, current_time); }
-        return ShowTimerTask(show_timer_in_seconds);
+        const SecondType remaining_seconds = ShowTimerTask(show_timer_in_seconds);
+        if(IsShowTimerExpired(remaining_seconds)) { SetStateToIdle(current_date, current_time); }
+        return remaining_seconds;
+    }
+
+    /*
+     * Ends a show the way StopShow() does, before the overlay leaves it another way. Switched off
+     * or reset while it showed, the overlay left Text scrolling its text over the clock.
+     */
+    void EndShowIfShowing() {
+        if(state_ == StateType::kShow) {
+            SetStateToIdle(RealTimeClock::GetInstance().GetDate(), RealTimeClock::GetInstance().GetTime());
+        }
     }
 
     static bool IsShowTimerExpired(SecondType show_timer_in_seconds) { return show_timer_in_seconds == 0u; }
@@ -311,8 +331,6 @@ template <typename Derived> class Overlay
      * \param[in] endurance_in_seconds The endurance, in seconds.
      * \return kEOk, or kENotOk if `endurance_in_seconds` is 0; the endurance is then left as it
      *         was.
-     * \note Called once a second, as Overlays calls it, Task() keeps the overlay showing for one
-     *       second more than its endurance.
      */
     StdReturnType SetEnduranceInSeconds(SecondType endurance_in_seconds) {
         if(IsEnduranceValid(endurance_in_seconds)) {
@@ -364,12 +382,11 @@ template <typename Derived> class Overlay
      * \brief Sets on how many days after its date the overlay goes on starting.
      *
      * It counts only while both a month and a day are set; otherwise the overlay keeps to them as
-     * if it were 0. At 0 the overlay starts on the date only.
+     * if it were 0. At 0 the overlay starts on the date only. The days count from the date on,
+     * across the end of the year as well: with 24 December and 3, the overlay starts from 24 to
+     * 27 December, and with 30 December and 5 up to 4 January.
      *
      * \param[in] valid_in_days The days after the date, 0 for the date only.
-     * \note In the month of the date, the days before the date count as well, as far as
-     *       `valid_in_days` reaches: with 24 December and 3, the overlay starts from 21 December
-     *       on. The days before the date in the month before it do not count.
      */
     void SetValidInDays(DayType valid_in_days) { valid_in_days_ = valid_in_days; }
 
@@ -389,8 +406,6 @@ template <typename Derived> class Overlay
      * \brief Switches the overlay on through EnableIsActive() or off through DisableIsActive().
      *
      * \param[in] is_active True to switch the overlay on, false to switch it off.
-     * \warning Switched off while it shows, the overlay does not end its show cleanly; see
-     *          DisableIsActive().
      */
     void SetIsActive(bool is_active) { if(is_active) { EnableIsActive(); } else { DisableIsActive(); } }
 
@@ -404,8 +419,8 @@ template <typename Derived> class Overlay
      *
      * \note The derived hook, `ResetOwnToDefaults()`, is named apart from this for the reason
      *       CanShow() gives: a `ResetToDefaults()` in an overlay would hide this one, and
-     *       everything the base owns would then quietly survive the reset.
-     * \warning On an overlay that shows, the show does not end cleanly; see DisableIsActive().
+     *       everything the base owns would then quietly survive the reset. An overlay that shows
+     *       ends its show first, as DisableIsActive() ends it.
      */
     void ResetToDefaults() {
         period_in_minutes_ = kPeriodInMinutesInitValue;
@@ -415,6 +430,7 @@ template <typename Derived> class Overlay
         valid_in_days_ = kValidInDaysInitValue;
         speed_ = kSpeedInitValue;
         font_ = kFontInitValue;
+        EndShowIfShowing();
         state_ = StateType::kDisabled;
         Underlying().ResetOwnToDefaults();
     }
@@ -428,12 +444,12 @@ template <typename Derived> class Overlay
     /*!
      * \brief Switches the overlay off, StateType::kDisabled, from any state.
      *
-     * \warning On an overlay that shows, the show does not end through StopShow(): the text is not
-     *          stopped and goes on scrolling over the clock to its end, and the show timer Overlays
-     *          keeps is not cleared. No overlay then starts by its period until one has been
-     *          started by a "show now" procedure and has ended.
+     * An overlay that shows ends its show first, as StopShow() ends it: its text stops.
      */
-    void DisableIsActive() { state_ = StateType::kDisabled; }
+    void DisableIsActive() {
+        EndShowIfShowing();
+        state_ = StateType::kDisabled;
+    }
 
     /*!
      * \brief Takes the overlay one second further: starts it when its time has come, and ends it
@@ -457,10 +473,9 @@ template <typename Derived> class Overlay
      * \param[in] current_time The time now, whose minute and second decide a start.
      * \return The new show timer, in seconds: the endurance at a start; while the overlay shows,
      *         `show_timer_in_seconds` one lower, but not below 0; while it is idle and does not
-     *         start, `show_timer_in_seconds` unchanged; and 0 while it is switched off.
-     * \note As the overlay ends on the call that finds the timer at 0, and not on the one that
-     *       counts it down to 0, an overlay called once a second shows for one second more than its
-     *       endurance.
+     *         start, `show_timer_in_seconds` unchanged; and 0 while it is switched off. The overlay
+     *         ends on the call that counts the timer down to 0, so that an overlay called once a
+     *         second shows for exactly its endurance.
      */
     SecondType Task(SecondType show_timer_in_seconds, ClockDate current_date, ClockTime current_time) {
         if(state_ == StateType::kIdle) { return IdleTask(show_timer_in_seconds, current_date, current_time); }

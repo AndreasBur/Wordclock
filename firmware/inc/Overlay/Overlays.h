@@ -66,8 +66,8 @@
  * An overlay whose `OVERLAYS_SUPPORT_*` switch is STD_OFF is not built in, and neither are its
  * accessors and its "show now" procedure.
  *
- * \note An overlay starts whether or not an animation runs: a running animation goes on stepping
- *       and showing the display beside the text until it ends.
+ * An overlay that starts, by its period or now, ends a running animation through
+ * Animations::Abort(): both would draw on the same display.
  */
 class Overlays
 {
@@ -161,6 +161,7 @@ class Overlays
 
     void TaskIdle(ClockDate date, ClockTime time);
     void TaskShow(ClockDate date, ClockTime time);
+    static void AbortAnimation();
 
     /*
      * Shared by the three "show now" entry points below, which differ in nothing but the
@@ -179,6 +180,7 @@ class Overlays
 
         show_timer_in_seconds_ = overlay.StartShow(RealTimeClock::GetInstance().GetDate(),
                                                RealTimeClock::GetInstance().GetTime());
+        AbortAnimation();
         return kEOk;
     }
 
@@ -363,9 +365,6 @@ class Overlays
      * Switching on an overlay that is on leaves it as it is. Switching off ends a show at once.
      *
      * \param[in] is_active True to switch it on, false to switch it off.
-     * \warning Switching the date overlay off while it shows neither stops its text nor clears the
-     *          show timer: Text shifts the text on, and no overlay starts in its period again until
-     *          one started with a "show now" procedure has ended.
      */
     void SetDateIsActive(bool is_active) { date_.SetIsActive(is_active); }
 #endif
@@ -441,9 +440,6 @@ class Overlays
      * Switching on an overlay that is on leaves it as it is. Switching off ends a show at once.
      *
      * \param[in] is_active True to switch it on, false to switch it off.
-     * \warning Switching the temperature overlay off while it shows neither stops its text nor
-     *          clears the show timer: Text shifts the text on, and no overlay starts in its period
-     *          again until one started with a "show now" procedure has ended.
      */
     void SetTemperatureIsActive(bool is_active) { temperature_.SetIsActive(is_active); }
 #endif
@@ -496,9 +492,6 @@ class Overlays
      * Switching on an overlay that is on leaves it as it is. Switching off ends a show at once.
      *
      * \param[in] is_active True to switch it on, false to switch it off.
-     * \warning Switching the text overlay off while it shows neither stops its text nor clears the
-     *          show timer: Text shifts the text on, and no overlay starts in its period again until
-     *          one started with a "show now" procedure has ended.
      */
     void SetTextIsActive(bool is_active) { text_.SetIsActive(is_active); }
 
@@ -548,9 +541,7 @@ class Overlays
      * Illuminance answer Persistence::Reset(). Here since the overlays are stored - before that a
      * reset had nothing of theirs to undo.
      *
-     * \warning An overlay that shows is switched off as SetDateIsActive() switches it off: its text
-     *          is not stopped and the show timer not cleared, so no overlay starts in its period
-     *          again until one started with a "show now" procedure has ended.
+     * An overlay that shows ends its show first, as Abort() would end it.
      */
     void ResetToDefaults() {
 #if (OVERLAYS_SUPPORT_DATE == STD_ON)

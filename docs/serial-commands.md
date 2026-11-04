@@ -60,7 +60,7 @@ From
 | `-E` | Endurance (seconds) |
 | `-M` | Month |
 | `-D` | Day |
-| `-V` | Valid-in-days |
+| `-V` | Valid-in-days: on how many days after the date of `-M` and `-D` the overlay still starts |
 | `-A` | Active (0/1) |
 | `-T` | Text (string) |
 | `-S` | Speed |
