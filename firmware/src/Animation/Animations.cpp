@@ -57,8 +57,8 @@ StdReturnType Animations::SetAnimation(AnimationIdType animation_id)
     if(!IsAnimationValid(animation_id)) { return kENotOk; }
 
     animation_id_ = animation_id;
-    // shows the selected animation right away, even in a mode that selects on its own;
-    // that mode takes over again on the next word change
+    // the selected animation becomes the current one right away, even in a mode that selects
+    // on its own; that mode picks again on the next word change
     current_animation_id_ = animation_id_;
 
     InitCurrentAnimation();
@@ -167,8 +167,8 @@ void Animations::InitCurrentAnimation()
 
 StdReturnType Animations::SetTime(byte hour, byte minute)
 {
-    // Only while nothing is running, so a word change during a still running
-    // animation is ignored here exactly as it is by the animations themselves.
+    // Only while nothing is running, so a word change during a still running animation picks
+    // nothing here; the running animation gets the time and decides itself whether to take it.
     if(mode_ != ModeType::kFixed && GetStateOfCurrentAnimation() == Animation::StateType::kIdle) {
         SelectAnimationOfMode();
     }

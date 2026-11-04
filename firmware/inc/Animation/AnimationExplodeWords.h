@@ -14,14 +14,38 @@
 #include "Clock.h"
 #include "Animation.h"
 
-/* AnimationExplodeWords configuration parameter */
-
-/* AnimationExplodeWords parameter */
-
+/*!
+ * \brief The explode-words animation: the two halves of AnimationExplodePixels, but word by word:
+ *        every word of the previous time travels into the centre on its own, then the words of the
+ *        new time come back out one after the other.
+ *
+ * A word in the centre stands in row kRowCenter, centred on column kColumnCenter. In the first
+ * half, while GetState() returns kClearTime, the words of the previous time are the blocks of lit
+ * pixels on the display. They travel one after the other, row by row from the centre row
+ * outwards, first the centre row, then the row above it, the row below it and so on, and each row
+ * from left to right; a word goes out when it has arrived in the centre. In the second half,
+ * while it returns kSetTime, the words of the new time start in the centre one after the other,
+ * in the order of the clock's word list, and each travels to its place.
+ *
+ * SetTime() starts it from whatever the display shows, and each Task() takes one step of it. The
+ * last step clears the display, lights the words of the new time whole and makes the animation
+ * idle.
+ *
+ * \warning Only Init() puts back the place the search for the next word starts at and the place in
+ *          the word list of the last word that came out; the end of the animation leaves them as
+ *          they are. Started again without an Init() in between, as Animations does at every word
+ *          change in Animations::ModeType::kFixed, the first half starts its search in the row of
+ *          the last word of the run before rather than in the centre row, so it may skip rows whose
+ *          words then stay lit. In the second half, the words up to the place in the word list
+ *          where the run before ended do not travel, but for the first one. What it skips appears
+ *          with the last step.
+ */
 class AnimationExplodeWords : public Animation
 {
   public:
+    /*! \brief The column of the centre, DISPLAY_NUMBER_OF_COLUMNS / 2. */
     static constexpr byte kColumnCenter{DISPLAY_NUMBER_OF_COLUMNS / 2u};
+    /*! \brief The row of the centre, DISPLAY_NUMBER_OF_ROWS / 2. */
     static constexpr byte kRowCenter{DISPLAY_NUMBER_OF_ROWS / 2u};
 
   private:
@@ -33,18 +57,17 @@ class AnimationExplodeWords : public Animation
     byte current_column_{0u};
     byte current_row_{0u};
 
-    // functions
     void Reset();
     void ClearTimeTask();
     void SetTimeTask();
-    void SetWordToSet(DisplayWords::WordIdType);
+    void SetWordToSet(DisplayWords::WordIdType word_id);
     StdReturnType SetNextWordToClear();
     StdReturnType SetNextWordToClearInColumn();
     StdReturnType SetNextRowToClear();
     StdReturnType SetNextWordToSet();
-    void SetWordIndex(DisplayWords::WordIdType);
+    void SetWordIndex(DisplayWords::WordIdType word_id);
     void SetWordLength();
-    StdReturnType ShiftWord(byte, byte);
+    StdReturnType ShiftWord(byte final_colum, byte final_row);
     void ToggleWordOnDisplay() const;
     void SetWordOnDisplay() const;
 
@@ -69,16 +92,45 @@ class AnimationExplodeWords : public Animation
     }
 
   public:
+    /*! \brief Makes the animation, with GetState() kNone until Init(). */
     constexpr AnimationExplodeWords() : words_() { }
+
+    /*! \brief Destroys the animation. */
     ~AnimationExplodeWords() { }
 
-    // get methods
-
-    // set methods
-
-    // methods
+    /*!
+     * \brief Makes the animation idle and resets its progress.
+     *
+     * A running animation ends where it stands, and the display keeps what its last step drew.
+     */
     void Init();
-    StdReturnType SetTime(byte, byte);
+
+    /*!
+     * \brief Starts the animation towards the time `hour`:`minute`.
+     *
+     * It draws nothing itself. On a dark display it starts with the second half; the first word
+     * of the new time then does not travel, and appears with the last step.
+     *
+     * \param[in] hour The hour, 0 to 23.
+     * \param[in] minute The minute, 0 to 59.
+     * \return kEOk, or kENotOk if `hour` is above 23 or `minute` above 59, and the animation is
+     *         then left as it was, or if it is not idle; a running one then runs on, but ends on
+     *         the words of `hour`:`minute`.
+     */
+    StdReturnType SetTime(byte hour, byte minute);
+
+    /*!
+     * \brief Takes one step of the animation; does nothing while it is idle.
+     *
+     * A step moves the word that travels one column and one row towards where it goes, each only
+     * as far as needed. In the first half, the step after the word has arrived in the centre turns
+     * it off and picks the next; when none is left, the same step lights the first word of the
+     * new time in the centre and starts the second half. In the second half, the step after the
+     * word has arrived in its place lights the next word in the centre, and the step after the
+     * last one has arrived ends it.
+     *
+     * It writes the pixels of Display and leaves showing them to Show().
+     */
     void Task();
 };
 

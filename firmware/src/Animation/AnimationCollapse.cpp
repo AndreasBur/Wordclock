@@ -54,7 +54,7 @@ void AnimationCollapse::ClearTimeTask()
         if(CollapseRow(row)) { moved = true; }
     }
 
-    /* nothing moved any more, so every row is a solid block at the left edge */
+    /* nothing moved any more, so every row is a solid block at the edge of the direction */
     if(!moved) {
         step_ = 0u;
         expand_steps_ = CalcExpandSteps();

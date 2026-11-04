@@ -24,10 +24,22 @@
 #include "Clock.h"
 #include "Animation.h"
 
-/* AnimationMatrix configuration parameter */
-
-/* AnimationMatrix parameter */
-
+/*!
+ * \brief The matrix animation: falling code rain in the display color; the new time stays behind as
+ *        the drops pass over its letters.
+ *
+ * One drop falls per column, one row per step, with a trail above its head that fades with the
+ * distance. Each drop starts at a step between the first and the
+ * DISPLAY_NUMBER_OF_ROWS-th, which SetTime() derives from the time. A column keeps the previous
+ * time until its drop starts, and the rows below a head keep it until the head passes them. A
+ * letter of the new time that lies deep enough in the trail is lit at full brightness and stays
+ * lit; the rest of the column goes dark behind the trail. It runs in one part, while GetState()
+ * returns kSetTime.
+ *
+ * SetTime() starts it from whatever the display shows, and each Task() takes one step of it. The
+ * last step clears the display, lights the words of the new time whole and makes the animation
+ * idle.
+ */
 class AnimationMatrix : public Animation
 {
   public:
@@ -60,23 +72,50 @@ class AnimationMatrix : public Animation
     /* varies the start frames from minute to minute, see StartFrame() */
     byte seed_{0u};
 
-    // functions
     void Reset();
     void SetTimeTask();
-    void DrawColumn(byte, byte);
-    byte StartFrame(byte) const;
+    void DrawColumn(byte column, byte head);
+    byte StartFrame(byte column) const;
 
   public:
+    /*! \brief Makes the animation, with GetState() kNone until Init(). */
     constexpr AnimationMatrix() { }
+
+    /*! \brief Destroys the animation. */
     ~AnimationMatrix() { }
 
-    // get methods
-
-    // set methods
-
-    // methods
+    /*!
+     * \brief Makes the animation idle and resets its progress.
+     *
+     * A running animation ends where it stands, and the display keeps what its last step drew.
+     */
     void Init();
-    StdReturnType SetTime(byte, byte);
+
+    /*!
+     * \brief Starts the animation towards the time `hour`:`minute`.
+     *
+     * It draws nothing itself. It derives the steps the drops start at from `hour` and `minute`,
+     * so that the rain varies from one word change to the next and the same time always rains
+     * the same.
+     *
+     * \param[in] hour The hour, 0 to 23.
+     * \param[in] minute The minute, 0 to 59.
+     * \return kEOk, or kENotOk if `hour` is above 23 or `minute` above 59, and the animation is
+     *         then left as it was, or if it is not idle; a running one then runs on, but ends on
+     *         the words of `hour`:`minute`.
+     */
+    StdReturnType SetTime(byte hour, byte minute);
+
+    /*!
+     * \brief Takes one step of the animation; does nothing while it is idle.
+     *
+     * A step draws one frame of the rain: in every column whose drop has started, it lights the
+     * head at full brightness, the trail above it dimmer with the distance and the letters of the
+     * new time deep in the trail at full brightness, and turns the pixels above the trail off. It
+     * takes 4 * DISPLAY_NUMBER_OF_ROWS frames, and the step after them ends it.
+     *
+     * It writes the pixels of Display and leaves showing them to Show().
+     */
     void Task();
 };
 
