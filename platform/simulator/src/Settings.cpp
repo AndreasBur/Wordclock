@@ -55,16 +55,18 @@ END_EVENT_TABLE()
 ******************************************************************************************************************************************************/
 Settings::Settings(wxWindow* parent, const wxString &title) : wxDialog(parent, wxID_ANY, title)
 {
-    /* No content whose size only settles once the window is mapped, unlike the letter
-       grid in Pixels, so fitting right here is enough — no CallAfter() needed. */
+    // No content whose size only settles once the window is mapped, unlike the letter
+    // grid in Pixels, so fitting right here is enough — no CallAfter() needed.
     SetSizerAndFit(CreateSizerAll(this));
 
-    /* Under X11 this places the window. Under Wayland a client cannot position its own
-       toplevel at all, so a frame lands wherever the compositor puts it; what centres it
-       there is being a dialog that is transient for the main window, which the compositor
-       then places over its parent. Hence wxDialog and not wxFrame. Only on construction,
-       so a window the user has dragged somewhere stays put when it is closed and opened
-       again. */
+    /*
+     * Under X11 this places the window. Under Wayland a client cannot position its own
+     * toplevel at all, so a frame lands wherever the compositor puts it; what centres it
+     * there is being a dialog that is transient for the main window, which the compositor
+     * then places over its parent. Hence wxDialog and not wxFrame. Only on construction,
+     * so a window the user has dragged somewhere stays put when it is closed and opened
+     * again.
+     */
     CentreOnParent();
 }
 
@@ -105,8 +107,8 @@ wxBoxSizer* Settings::CreateSizerIlluminance(wxWindow* parent)
     wxStaticBoxSizer* sizer_illuminance = new wxStaticBoxSizer(static_box, wxVERTICAL);
     wxStaticText* illuminance_label = new wxStaticText(parent, wxID_ANY, _T("Illuminance (%)"));
 
-    /* Stands in for the light sensor, which has nothing to measure here. Only has an
-       effect while the brightness automatic is on (command 3 -A1). */
+    // Stands in for the light sensor, which has nothing to measure here. Only has an
+    // effect while the brightness automatic is on (command 3 -A1).
     illuminance_slider_ = new wxSlider(parent, kIdSliderIlluminance, kIlluminancePercentInitial,
                                      kIlluminancePercentMin, kIlluminancePercentMax,
                                      wxDefaultPosition, wxSize(kSliderWidth, -1),
@@ -156,9 +158,11 @@ wxBoxSizer* Settings::CreateSizerTemperature(wxWindow* parent)
 ******************************************************************************************************************************************************/
 void Settings::OnClose(wxCloseEvent &event)
 {
-    /* Hide rather than destroy: GetInstance() keeps handing out this very dialog, so a
-       destroyed one would leave the singleton pointing at freed memory. The parent
-       window destroys it when the application exits. */
+    /*
+     * Hide rather than destroy: GetInstance() keeps handing out this very dialog, so a
+     * destroyed one would leave the singleton pointing at freed memory. The parent
+     * window destroys it when the application exits.
+     */
     Hide();
     UNUSED(event);
 } /* OnClose */
@@ -169,9 +173,11 @@ void Settings::OnClose(wxCloseEvent &event)
 ******************************************************************************************************************************************************/
 void Settings::OnIlluminance(wxCommandEvent &event)
 {
-    /* The slider is a percentage of the calibration maximum, which is the top of what the
-       brightness automatic spreads between. The sensor's own range would put every useful
-       room in the bottom percent of the slider. */
+    /*
+     * The slider is a percentage of the calibration maximum, which is the top of what the
+     * brightness automatic spreads between. The sensor's own range would put every useful
+     * room in the bottom percent of the slider.
+     */
     const BH1750::IlluminanceType maximum = BH1750_CALIBRATION_MAX_DEFAULT_LX_VALUE;
     BH1750::SetSimulatedIlluminance(static_cast<BH1750::IlluminanceType>((maximum / kIlluminancePercentMax) * illuminance_slider_->GetValue()));
     UNUSED(event);

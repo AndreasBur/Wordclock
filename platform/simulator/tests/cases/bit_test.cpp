@@ -13,18 +13,20 @@
 
 #include <stdint.h>
 
-/* The masks have to work where a 64-bit one hid the problem: the top bit of a uint16_t, which
-   is where shifting a promoted int would turn negative on the AVR, and a bit above 16 in a
-   uint32_t, which an int-wide shift would lose there. Compile-time first, because a group
-   read sits in a constexpr function of the DS3231 driver. */
+/*
+ * The masks have to work where a 64-bit one hid the problem: the top bit of a uint16_t, which
+ * is where shifting a promoted int would turn negative on the AVR, and a bit above 16 in a
+ * uint32_t, which an int-wide shift would lose there. Compile-time first, because a group
+ * read sits in a constexpr function of the DS3231 driver.
+ */
 static_assert(Bit<uint16_t>::ToMask(15u) == 0x8000u, "the top bit of a uint16_t");
 static_assert(Bit<uint32_t>::ToMask(20u) == 0x00100000uL, "a bit above 16 in a uint32_t");
 static_assert(Bit<uint8_t>::ReadBitGroup(0b11000000u, 0b11u, 6u) == 0b11u, "a group given unshifted, at its position");
 
 void TestSingleBits()
 {
-    /* Toggling used to xor with the inverted mask, which flips every bit but the one asked
-       for. Nothing called it, which is the only reason it never showed. */
+    // Toggling used to xor with the inverted mask, which flips every bit but the one asked
+    // for. Nothing called it, which is the only reason it never showed.
     Expect(Bit<uint8_t>::ToggleBit(0b00000000u, 3u) == 0b00001000u, "toggling a clear bit sets that bit and no other");
     Expect(Bit<uint8_t>::ToggleBit(0b00001000u, 3u) == 0b00000000u, "and toggling it again clears it");
 
@@ -44,8 +46,8 @@ void TestBitGroups()
     Expect(Bit<uint8_t>::ReadBitGroup(0b10100000u, 0b111u, 5u) == 0b101u, "a group given unshifted comes back shifted down");
 }
 
-/* What the AVR's registers are changed through. A volatile byte stands in for one: the
-   functions take it by reference, which is the whole of what they add over the value forms. */
+// What the AVR's registers are changed through. A volatile byte stands in for one: the
+// functions take it by reference, which is the whole of what they add over the value forms.
 void TestBitsChangedInPlace()
 {
     volatile uint8_t target{0b10110110u};

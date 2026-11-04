@@ -65,8 +65,8 @@ StdReturnType AnimationRoll::SetTime(byte hour, byte minute)
     if(Clock::GetInstance().GetClockWords(hour, minute, clock_words_table_) == kEOk && state_ == StateType::kIdle) {
         direction_ = CalcDirection(hour, minute);
         step_ = 0u;
-        /* no clear phase: the previous time is still on the display and rolls out
-           while the new one rolls in behind it */
+        // no clear phase: the previous time is still on the display and rolls out
+        // while the new one rolls in behind it
         state_ = StateType::kSetTime;
         return_value = kEOk;
     }
@@ -120,10 +120,12 @@ void AnimationRoll::SetTimeTask()
 ******************************************************************************************************************************************************/
 void AnimationRoll::RollHorizontal()
 {
-    /* Shift everything by one and feed the column of the new time that belongs in at
-       the freed edge. The remaining shifts carry it to its final column, so the
-       column entering in step n is the one that ends up n columns away from the edge
-       it entered at. */
+    /*
+     * Shift everything by one and feed the column of the new time that belongs in at
+     * the freed edge. The remaining shifts carry it to its final column, so the
+     * column entering in step n is the one that ends up n columns away from the edge
+     * it entered at.
+     */
     if(direction_ == DirectionType::kRight) {
         wc_transformation_.ShiftRight();
         for(byte row = 0u; row < DISPLAY_NUMBER_OF_ROWS; row++) {

@@ -78,11 +78,13 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
     static constexpr char kOptionArgumentDelimiter{'='};
     ErrorMessage error_;
 
-    /* Protected rather than private with the derived class as a friend, which is what
-       clang-tidy asks for: a friend would open this base's whole private side to it, where
-       protected opens only what is meant for it. What the private constructor would
-       prevent - somebody inheriting this template with another class's Derived - the
-       assertion catches instead, at the first point where Derived is a complete type. */
+    /*
+     * Protected rather than private with the derived class as a friend, which is what
+     * clang-tidy asks for: a friend would open this base's whole private side to it, where
+     * protected opens only what is meant for it. What the private constructor would
+     * prevent - somebody inheriting this template with another class's Derived - the
+     * assertion catches instead, at the first point where Derived is a complete type.
+     */
     // NOLINTNEXTLINE(bugprone-crtp-constructor-accessibility)
     constexpr MsgParameterParser(const ParameterTableType& parameter_table, const char* parameter)
     : error_(), parameter_buffer_(parameter), parameter_table_(parameter_table) {

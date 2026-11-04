@@ -58,10 +58,12 @@ class ErrorMessage
         kDisplayPending,
         kRpcIdUnknown,
         kUnknown,
-        /* Appended behind kUnknown rather than sorted in beside its neighbours, for the
-           reason the remote procedure ids are appended too: these numbers are what an answer
-           carries and what this repository's own documentation writes down, and inserting one
-           would silently change what every code behind it means. */
+        /*
+         * Appended behind kUnknown rather than sorted in beside its neighbours, for the
+         * reason the remote procedure ids are appended too: these numbers are what an answer
+         * carries and what this repository's own documentation writes down, and inserting one
+         * would silently change what every code behind it means.
+         */
         kPowerSwitchAbsent,
     };
 

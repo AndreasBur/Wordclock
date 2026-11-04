@@ -45,10 +45,12 @@ constexpr char kBlobPath[]{"/" STORAGE_NAMESPACE "/" STORAGE_KEY};
 /******************************************************************************************************************************************************
  *  LOCAL FUNCTIONS
 ******************************************************************************************************************************************************/
-/* Mounted once and remembered, including the failure: a filesystem that would not come up
-   will not come up on the next call either, and retrying on every read would turn a fault
-   into a stall. Formatting on a failed mount is what makes a first boot work on a chip
-   whose flash has never held one. */
+/*
+ * Mounted once and remembered, including the failure: a filesystem that would not come up
+ * will not come up on the next call either, and retrying on every read would turn a fault
+ * into a stall. Formatting on a failed mount is what makes a first boot work on a chip
+ * whose flash has never held one.
+ */
 bool IsFilesystemReady()
 {
     static bool was_tried{false};
@@ -62,8 +64,8 @@ bool IsFilesystemReady()
     return is_mounted;
 }
 
-/* The directory the blob lives in. mkdir() on an existing one is not an error worth
-   reporting - the open that follows is what decides. */
+// The directory the blob lives in. mkdir() on an existing one is not an error worth
+// reporting - the open that follows is what decides.
 void EnsureDirectory()
 {
     LittleFS.mkdir("/" STORAGE_NAMESPACE);
@@ -75,11 +77,13 @@ void EnsureDirectory()
  * P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
 
-/* Instance methods, though some of them read no member: they are the interface the
-   firmware core calls through GetInstance(), and every backend - the simulator's
-   stand-ins included - offers it that way. Whether this backend's implementation
-   happens to need a member is its own detail, and answering the check would carry
-   that detail into the interface. */
+/*
+ * Instance methods, though some of them read no member: they are the interface the
+ * firmware core calls through GetInstance(), and every backend - the simulator's
+ * stand-ins included - offers it that way. Whether this backend's implementation
+ * happens to need a member is its own detail, and answering the check would carry
+ * that detail into the interface.
+ */
 // NOLINTBEGIN(readability-convert-member-functions-to-static)
 /******************************************************************************************************************************************************
   Read()

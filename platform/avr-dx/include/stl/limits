@@ -33,14 +33,16 @@
 
 #include "type_traits"
 
-/* On this toolchain these headers are the standard library, see type_traits, so declaring
-   into std is what they exist to do - and under the standard's names, which is what the
-   naming check is told here. */
+/*
+ * On this toolchain these headers are the standard library, see type_traits, so declaring
+ * into std is what they exist to do - and under the standard's names, which is what the
+ * naming check is told here.
+ */
 // NOLINTBEGIN(cert-dcl58-cpp,readability-identifier-naming)
 namespace std {
 
-/* The integral case, worked out from the type itself: everything the core measures against
-   is an integer of some width, and deriving the bound beats one specialisation per type. */
+// The integral case, worked out from the type itself: everything the core measures against
+// is an integer of some width, and deriving the bound beats one specialisation per type.
 template<class T> struct numeric_limits {
   private:
     static constexpr bool kIsSigned{T(-1) < T(0)};

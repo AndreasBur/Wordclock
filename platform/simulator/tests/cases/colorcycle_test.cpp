@@ -16,9 +16,11 @@
 
 namespace {
 
-/* The colour the strip is actually carrying, read off the first lit pixel. The buffer holds
-   the colour already dimmed by the brightness, so the cases below set a brightness that
-   leaves the channels recognisable rather than comparing against exact values. */
+/*
+ * The colour the strip is actually carrying, read off the first lit pixel. The buffer holds
+ * the colour already dimmed by the brightness, so the cases below set a brightness that
+ * leaves the channels recognisable rather than comparing against exact values.
+ */
 Pixel FirstLitPixel()
 {
     for(byte index = 0u; index < PIXELS_NUMBER_OF_PIXELS; index++) {
@@ -37,10 +39,12 @@ bool ArePixelsSame(Pixel left, Pixel right)
 
 byte GetMaster() { return Pixels::GetInstance().GetBrightness(); }
 
-/* A lit clock face at full brightness, the cycle off, and a colour that is nobody's hue on
-   the wheel - so a pixel carrying the wheel's colour cannot be mistaken for one carrying the
-   setting. Also what every case here has to leave behind, white included, because the cases
-   after this file start from a white display. */
+/*
+ * A lit clock face at full brightness, the cycle off, and a colour that is nobody's hue on
+ * the wheel - so a pixel carrying the wheel's colour cannot be mistaken for one carrying the
+ * setting. Also what every case here has to leave behind, white included, because the cases
+ * after this file start from a white display.
+ */
 void StartFromWhiteClockFace()
 {
     Display& display = Display::GetInstance();
@@ -55,16 +59,16 @@ void StartFromWhiteClockFace()
 
 } // namespace
 
-/* The whole point of the cycle being a level of its own: what it paints is on the strip, and
-   what somebody chose is still what the clock answers and what Persistence would store. */
+// The whole point of the cycle being a level of its own: what it paints is on the strip, and
+// what somebody chose is still what the clock answers and what Persistence would store.
 void TestColourCycleLeavesTheChosenColourAlone()
 {
     Display& display = Display::GetInstance();
     ColorCycle& color_cycle = ColorCycle::GetInstance();
 
     StartFromWhiteClockFace();
-    /* Deliberately not on the wheel: full saturation is what the cycle paints, so a colour
-       with three unequal channels cannot be one of its. */
+    // Deliberately not on the wheel: full saturation is what the cycle paints, so a colour
+    // with three unequal channels cannot be one of its.
     display.SetColor(200u, 120u, 60u);
     const Pixel chosen = FirstLitPixel();
 
@@ -74,23 +78,23 @@ void TestColourCycleLeavesTheChosenColourAlone()
     Expect(display.GetColorRed() == 200u && display.GetColorGreen() == 120u && display.GetColorBlue() == 60u,
            "and must not touch the colour that was chosen");
 
-    /* A step of the wheel, which is one task run - and a visible one, since what is being
-       checked is that the strip follows it. */
+    // A step of the wheel, which is one task run - and a visible one, since what is being
+    // checked is that the strip follows it.
     color_cycle.Task();
     Expect(!ArePixelsSame(first_of_the_wheel, FirstLitPixel()), "a step of the wheel must reach the strip");
     Expect(display.GetColorRed() == 200u, "and still must not touch the setting");
 
     color_cycle.SetIsActive(false);
     Expect(ArePixelsSame(chosen, FirstLitPixel()), "switching it off must put the chosen colour back");
-    /* Nothing was remembered to put back: the setting was never overwritten, which is what
-       makes this work rather than a saved copy somewhere. */
+    // Nothing was remembered to put back: the setting was never overwritten, which is what
+    // makes this work rather than a saved copy somewhere.
     Expect(!display.IsColorCycleActive(), "with no cycle level left over the top");
 
     StartFromWhiteClockFace();
 }
 
-/* What the wheel is: a full round of saturated colours. Checked through the module rather
-   than against the conversion, because the property is what reaches the strip. */
+// What the wheel is: a full round of saturated colours. Checked through the module rather
+// than against the conversion, because the property is what reaches the strip.
 void TestColourCycleWalksTheWholeWheel()
 {
     Display& display = Display::GetInstance();
@@ -113,8 +117,8 @@ void TestColourCycleWalksTheWholeWheel()
         const byte green = shown.GetGreen();
         const byte blue = shown.GetBlue();
 
-        /* One channel at full is the outside edge of the wheel, one channel dark is what
-           keeps it from being a paler white - together they are "saturated". */
+        // One channel at full is the outside edge of the wheel, one channel dark is what
+        // keeps it from being a paler white - together they are "saturated".
         if((red != 255u) && (green != 255u) && (blue != 255u)) { every_one_saturated = false; }
         if((red != 0u) && (green != 0u) && (blue != 0u)) { none_washed_out = false; }
 
@@ -134,9 +138,11 @@ void TestColourCycleWalksTheWholeWheel()
     StartFromWhiteClockFace();
 }
 
-/* A dark display is not a display to cycle. What this protects is not the arithmetic but the
-   supply switch: it waits for a pixel buffer that has settled, and a wheel stepping through
-   the night would hold that wait open for as long as the night lasts. */
+/*
+ * A dark display is not a display to cycle. What this protects is not the arithmetic but the
+ * supply switch: it waits for a pixel buffer that has settled, and a wheel stepping through
+ * the night would hold that wait open for as long as the night lasts.
+ */
 void TestColourCycleStandsStillOnADarkDisplay()
 {
     Display& display = Display::GetInstance();
@@ -161,10 +167,12 @@ void TestColourCycleStandsStillOnADarkDisplay()
     StartFromWhiteClockFace();
 }
 
-/* The one place where getting this wrong is not cosmetic. The supply cap is computed from a
-   colour, and with the cycle running the colour on the strip is not the colour in the
-   setting - so a cap taken from the setting would let a saturated hue draw against the
-   budget of whatever pale value happens to be stored underneath it. */
+/*
+ * The one place where getting this wrong is not cosmetic. The supply cap is computed from a
+ * colour, and with the cycle running the colour on the strip is not the colour in the
+ * setting - so a cap taken from the setting would let a saturated hue draw against the
+ * budget of whatever pale value happens to be stored underneath it.
+ */
 void TestColourCycleBudgetsTheColourItShows()
 {
     Display& display = Display::GetInstance();
@@ -172,16 +180,20 @@ void TestColourCycleBudgetsTheColourItShows()
 
     StartFromWhiteClockFace();
 
-    /* A tenth of one channel: the cheapest colour there is, and one this display draws so
-       little of that the cap lifts entirely. Every pixel lit, so the count is not what makes
-       the difference below. */
+    /*
+     * A tenth of one channel: the cheapest colour there is, and one this display draws so
+     * little of that the cap lifts entirely. Every pixel lit, so the count is not what makes
+     * the difference below.
+     */
     display.SetColor(25u, 0u, 0u);
     display.Test();
     Expect(GetMaster() == DisplayCurrentLimit::kNoLimit, "a tenth of one channel must run uncapped");
 
-    /* Stepped to a corner of the wheel rather than to a chosen hue: two channels near full is
-       where a saturated colour costs enough for the cap to bite, and which hue that is follows
-       from the conversion rather than from a number written down here. */
+    /*
+     * Stepped to a corner of the wheel rather than to a chosen hue: two channels near full is
+     * where a saturated colour costs enough for the cap to bite, and which hue that is follows
+     * from the conversion rather than from a number written down here.
+     */
     color_cycle.SetIsActive(true);
     for(uint16_t step = 0u; step < 256u; step++) {
         const Pixel shown = display.GetColorCycle();
@@ -197,8 +209,8 @@ void TestColourCycleBudgetsTheColourItShows()
     Expect(shown_sum >= 500u, "the wheel must reach a colour with two channels near full");
     Expect(shown_limit < DisplayCurrentLimit::kNoLimit, "which on a full display is more than the budget allows");
     Expect(GetMaster() == shown_limit, "so the cap must follow the colour the cycle is showing");
-    /* The failure this guards: budgeting the stored colour would leave the strip uncapped
-       while it draws twenty times what that colour would. */
+    // The failure this guards: budgeting the stored colour would leave the strip uncapped
+    // while it draws twenty times what that colour would.
     Expect(GetMaster() != DisplayCurrentLimit::kNoLimit, "rather than the tenth of a channel that is merely set");
 
     color_cycle.SetIsActive(false);

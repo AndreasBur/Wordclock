@@ -27,9 +27,11 @@
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
 /* Scheduler configuration parameter */
-/* Milliseconds between two Task() calls, and thereby the unit every module's task
-   cycle counts in. A platform whose tick comes from a timer it cannot set freely
-   overrides this; GetTaskIntervalMs() is what the platform's tick source reads. */
+/*
+ * Milliseconds between two Task() calls, and thereby the unit every module's task
+ * cycle counts in. A platform whose tick comes from a timer it cannot set freely
+ * overrides this; GetTaskIntervalMs() is what the platform's tick source reads.
+ */
 #define SCHEDULER_TASK_INTERVAL_MS          10u
 
 /******************************************************************************************************************************************************

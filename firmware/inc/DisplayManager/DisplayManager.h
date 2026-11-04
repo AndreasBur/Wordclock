@@ -65,13 +65,15 @@ class DisplayManager
   private:
     static constexpr byte kTaskCycle{DISPLAY_MANAGER_TASK_CYCLE};
     ClockWords last_clock_words_{};
-    /* Rather than letting a default-constructed ClockWords stand for "nothing drawn
-       yet": that only works as long as no real word set can equal it, which is a
-       property of ClockWords the compiler would not defend. An own flag says so
-       outright, and the first task then always draws the current time. */
+    /*
+     * Rather than letting a default-constructed ClockWords stand for "nothing drawn
+     * yet": that only works as long as no real word set can equal it, which is a
+     * property of ClockWords the compiler would not defend. An own flag says so
+     * outright, and the first task then always draws the current time.
+     */
     bool clock_words_initialized_{false};
-    /* Whether an overlay held the display on the previous task, which is what makes the
-       end of one detectable. */
+    // Whether an overlay held the display on the previous task, which is what makes the
+    // end of one detectable.
     bool overlay_was_showing_{false};
 
     // functions
@@ -129,14 +131,16 @@ class DisplayManager
 	// methods
     void Task();
 
-    /* Draws the current time again, right now and without an animation. What asks for
-       this is a display that no longer shows the clock at all - a test pattern, a pixel
-       set by hand - and an animation would transition out of that rather than replace
-       it. The latch is updated with it, so the redraw does not repeat on the next task.
-
-       Refused while an overlay owns the display: the overlay would be overwritten for
-       one task and redraw itself on the next, which looks like a glitch rather than
-       like the refusal it is. */
+    /*
+     * Draws the current time again, right now and without an animation. What asks for
+     * this is a display that no longer shows the clock at all - a test pattern, a pixel
+     * set by hand - and an animation would transition out of that rather than replace
+     * it. The latch is updated with it, so the redraw does not repeat on the next task.
+     *
+     * Refused while an overlay owns the display: the overlay would be overwritten for
+     * one task and redraw itself on the next, which looks like a glitch rather than
+     * like the refusal it is.
+     */
     StdReturnType RefreshClock() {
         if(IsOverlayShowing()) { return kENotOk; }
 
@@ -146,10 +150,12 @@ class DisplayManager
         return kEOk;
     }
 
-    /* Runs the selected animation on the current time, without waiting for the word
-       change that would otherwise be the only trigger. Selecting the animation again
-       with "9 -A<id>" shows it too, but it also means something else - it changes what
-       runs from now on. */
+    /*
+     * Runs the selected animation on the current time, without waiting for the word
+     * change that would otherwise be the only trigger. Selecting the animation again
+     * with "9 -A<id>" shows it too, but it also means something else - it changes what
+     * runs from now on.
+     */
     static StdReturnType StartAnimation() {
         if(IsOverlayShowing()) { return kENotOk; }
 
@@ -157,9 +163,11 @@ class DisplayManager
         return Animations::GetInstance().SetTime(time.GetHour(), time.GetMinute());
     }
 
-    /* Ends a running animation and puts the time back on the display. At a low speed an
-       animation runs for minutes, and both a word change and a mode change are ignored
-       while it does. */
+    /*
+     * Ends a running animation and puts the time back on the display. At a low speed an
+     * animation runs for minutes, and both a word change and a mode change are ignored
+     * while it does.
+     */
     StdReturnType AbortAnimation() {
         Animations::GetInstance().Abort();
         return RefreshClock();

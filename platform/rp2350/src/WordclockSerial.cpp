@@ -29,11 +29,13 @@
  * P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
 
-/* Instance methods, though some of them read no member: they are the interface the
-   firmware core calls through GetInstance(), and every backend - the simulator's
-   stand-ins included - offers it that way. Whether this backend's implementation
-   happens to need a member is its own detail, and answering the check would carry
-   that detail into the interface. */
+/*
+ * Instance methods, though some of them read no member: they are the interface the
+ * firmware core calls through GetInstance(), and every backend - the simulator's
+ * stand-ins included - offers it that way. Whether this backend's implementation
+ * happens to need a member is its own detail, and answering the check would carry
+ * that detail into the interface.
+ */
 // NOLINTBEGIN(readability-convert-member-functions-to-static)
 /******************************************************************************************************************************************************
   Begin()
@@ -71,8 +73,8 @@ StdReturnType WordclockSerial::Inject(const char* characters, size_t length)
 
         inject_buffer_[head] = characters[index];
         head = next;
-        /* Published after the character, so the reader cannot see the index move ahead of
-           the data it points at. */
+        // Published after the character, so the reader cannot see the index move ahead of
+        // the data it points at.
         inject_head_.store(head, std::memory_order_release);
     }
 
@@ -130,8 +132,8 @@ void WordclockSerial::print(const char* text)
 ******************************************************************************************************************************************************/
 void WordclockSerial::print(const __FlashStringHelper* text)
 {
-    /* On this target flash is read through the same address space, so what F() wrapped can
-       be read as an ordinary string. */
+    // On this target flash is read through the same address space, so what F() wrapped can
+    // be read as an ordinary string.
     print(reinterpret_cast<const char*>(text));
 } /* print */
 
@@ -233,8 +235,8 @@ char WordclockSerial::ReadInjected()
     const size_t tail = inject_tail_.load(std::memory_order_relaxed);
     const char character = inject_buffer_[tail];
 
-    /* Published after the character was taken, so the producer cannot refill the slot
-       while it is still being read. */
+    // Published after the character was taken, so the producer cannot refill the slot
+    // while it is still being read.
     inject_tail_.store(NextIndex(tail), std::memory_order_release);
 
     return character;

@@ -53,11 +53,13 @@
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
 /* ColorCycle configuration parameter */
-/* Scheduler ticks per step of hue, so 100 * 10 ms is a step a second and 256 of those are
-   a round in a little over four minutes. Slow is the point: this runs on a clock somebody
-   lives with, and a wheel spun fast enough to notice is a wheel nobody can read the time
-   off. It is also the initial value of a setting rather than a fixed cycle, so a clock that
-   wants faster says so with command 15. */
+/*
+ * Scheduler ticks per step of hue, so 100 * 10 ms is a step a second and 256 of those are
+ * a round in a little over four minutes. Slow is the point: this runs on a clock somebody
+ * lives with, and a wheel spun fast enough to notice is a wheel nobody can read the time
+ * off. It is also the initial value of a setting rather than a fixed cycle, so a clock that
+ * wants faster says so with command 15.
+ */
 #define COLOR_CYCLE_TASK_CYCLE_INIT_VALUE               100u
 
 /******************************************************************************************************************************************************
@@ -69,17 +71,19 @@ class ColorCycle
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    /* The wheel walked in one byte, so a step is a step of this and the round closes by
-       overflowing rather than by a comparison. */
+    // The wheel walked in one byte, so a step is a step of this and the round closes by
+    // overflowing rather than by a comparison.
     using HueType = byte;
 
     static constexpr byte kTaskCycleInitValue{COLOR_CYCLE_TASK_CYCLE_INIT_VALUE};
     static constexpr bool kIsActiveInitValue{false};
     static constexpr HueType kHueInitValue{0u};
 
-    /* The six segments of the wheel, and the channel that is at full through each of them.
-       Named because the conversion below is otherwise six lines of arithmetic that only
-       says what it is if the reader already knows the wheel. */
+    /*
+     * The six segments of the wheel, and the channel that is at full through each of them.
+     * Named because the conversion below is otherwise six lines of arithmetic that only
+     * says what it is if the reader already knows the wheel.
+     */
     static constexpr byte kNumberOfSegments{6u};
     static constexpr byte kFullChannel{255u};
 
@@ -93,17 +97,19 @@ class ColorCycle
     // functions
     static Display& GetDisplay() { return Display::GetInstance(); }
 
-    /* One hue as a colour, at full saturation and full value - the outside edge of the
-       wheel. Anything inside it is a colour the strip shows as a paler version of white,
-       and a cycle whose hue cannot be seen is not what this is for.
-
-       Integer throughout, six segments of 256/6 each: within a segment one channel rises
-       while the third stays dark, and which channel does what is the segment number. The
-       multiplication by six before the shift is what keeps that division exact without a
-       remainder to carry, which a hue split into 43-wide segments would have had.
-
-       Plain static rather than constexpr: Pixel declares a destructor, so it is not a
-       literal type and cannot be what a constexpr function returns. */
+    /*
+     * One hue as a colour, at full saturation and full value - the outside edge of the
+     * wheel. Anything inside it is a colour the strip shows as a paler version of white,
+     * and a cycle whose hue cannot be seen is not what this is for.
+     *
+     * Integer throughout, six segments of 256/6 each: within a segment one channel rises
+     * while the third stays dark, and which channel does what is the segment number. The
+     * multiplication by six before the shift is what keeps that division exact without a
+     * remainder to carry, which a hue split into 43-wide segments would have had.
+     *
+     * Plain static rather than constexpr: Pixel declares a destructor, so it is not a
+     * literal type and cannot be what a constexpr function returns.
+     */
     static Pixel ToColour(HueType hue) {
         const uint16_t scaled = static_cast<uint16_t>(hue) * kNumberOfSegments;
         const byte segment = static_cast<byte>(scaled >> 8u);
@@ -120,10 +126,12 @@ class ColorCycle
         }
     }
 
-    /* A display that is off has nothing to cycle, and stepping it anyway would cost more
-       than the arithmetic: every step marks the pixel buffer, and the supply switch waits
-       for a buffer that has settled before it drops the rail. A cycle running through the
-       night would hold that wait open and spend the current the switch exists to save. */
+    /*
+     * A display that is off has nothing to cycle, and stepping it anyway would cost more
+     * than the arithmetic: every step marks the pixel buffer, and the supply switch waits
+     * for a buffer that has settled before it drops the rail. A cycle running through the
+     * night would hold that wait open and spend the current the switch exists to save.
+     */
     static bool IsDisplayShowingAnything() { return GetDisplay().IsEnabled(); }
 
 /******************************************************************************************************************************************************
@@ -136,8 +144,8 @@ class ColorCycle
     }
 
     // get methods
-    /* Zero is a cycle standing still on the hue it reached, which the scheduler answers
-       with a task that never comes due - so it needs no rule of its own here. */
+    // Zero is a cycle standing still on the hue it reached, which the scheduler answers
+    // with a task that never comes due - so it needs no rule of its own here.
     byte GetTaskCycle() const { return task_cycle_; }
 
     bool GetIsActive() const { return is_active_; }
@@ -146,9 +154,11 @@ class ColorCycle
     // set methods
     void SetTaskCycle(byte task_cycle) { task_cycle_ = task_cycle; }
 
-    /* Switching off puts the chosen colour back at once rather than at the next tick: the
-       tick may be seconds away, and a setting that takes seconds to take effect reads as
-       one that did not work. */
+    /*
+     * Switching off puts the chosen colour back at once rather than at the next tick: the
+     * tick may be seconds away, and a setting that takes seconds to take effect reads as
+     * one that did not work.
+     */
     void SetIsActive(bool is_active) {
         is_active_ = is_active;
 

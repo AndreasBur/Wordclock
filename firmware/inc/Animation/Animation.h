@@ -73,11 +73,13 @@ class Animation
 
     // functions
     void Init(StateType state) { state_ = state; }
-    /* Every animation whose set phase places the letters itself ends through one of
-       these two instead of just going idle: drawing the target once more makes the last
-       frame authoritative, so a pixel the animation skipped or hit twice cannot leave a
-       word of the previous time behind. AnimationFade is the one animation outside this,
-       because its set phase only ramps the brightness of letters already in place. */
+    /*
+     * Every animation whose set phase places the letters itself ends through one of
+     * these two instead of just going idle: drawing the target once more makes the last
+     * frame authoritative, so a pixel the animation skipped or hit twice cannot leave a
+     * word of the previous time behind. AnimationFade is the one animation outside this,
+     * because its set phase only ramps the brightness of letters already in place.
+     */
     void FinishWithClockWords(const ClockWords::WordsListType& clock_words_table) {
         Display::GetInstance().Clear();
         Clock::GetInstance().SetTime(clock_words_table);

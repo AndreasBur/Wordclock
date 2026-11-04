@@ -37,9 +37,11 @@
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
 /* PowerSwitch configuration parameter */
-/* Whether the switch is built at all. It is optional hardware - the board it is read from
-   says so and bridges the high side MOSFET when it is left off - so the firmware has to
-   answer for a clock that has none. */
+/*
+ * Whether the switch is built at all. It is optional hardware - the board it is read from
+ * says so and bridges the high side MOSFET when it is left off - so the firmware has to
+ * answer for a clock that has none.
+ */
 #define POWER_SWITCH_IS_FITTED                          STD_ON
 
 /******************************************************************************************************************************************************
@@ -70,9 +72,11 @@ class PowerSwitch
     bool IsSupplyOn() const { return supply_on_; }
 
     // methods
-    /* Nothing to set up: there is no port to make an output, and the supply already reads
-       on. It exists so that the call in the application's start-up is the same one on every
-       backend. */
+    /*
+     * Nothing to set up: there is no port to make an output, and the supply already reads
+     * on. It exists so that the call in the application's start-up is the same one on every
+     * backend.
+     */
     void Init() { }
 
     void SwitchSupplyOn() { supply_on_ = true; }

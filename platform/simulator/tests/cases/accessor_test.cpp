@@ -15,13 +15,15 @@
 #include "FontChar.h"
 #include "Pixels.h"
 
-/* Every reader used to come in two forms, and the second one trusted its caller: it read
-   the buffer or the table at whatever index it was handed. That is what these cases exist
-   for. There is one form of each now, it checks, and what it answers for an index that is
-   not there is written down here rather than left to whatever sits past the end.
-
-   An unlit pixel, a null character and a word of zero length are the answers, because none
-   of them can be mistaken for something that is on the display. */
+/*
+ * Every reader used to come in two forms, and the second one trusted its caller: it read
+ * the buffer or the table at whatever index it was handed. That is what these cases exist
+ * for. There is one form of each now, it checks, and what it answers for an index that is
+ * not there is written down here rather than left to whatever sits past the end.
+ *
+ * An unlit pixel, a null character and a word of zero length are the answers, because none
+ * of them can be mistaken for something that is on the display.
+ */
 void TestReadingPastTheEndIsEmpty()
 {
     Pixels& pixels = Pixels::GetInstance();
@@ -31,8 +33,8 @@ void TestReadingPastTheEndIsEmpty()
     Expect(unlit.GetRed() == 0u && unlit.GetGreen() == 0u && unlit.GetBlue() == 0u,
            "a pixel past the strip must read as unlit");
 
-    /* The dimmed form goes through the same reader, so it inherits the check rather than
-       having one of its own - and a dimmed black is still black. */
+    // The dimmed form goes through the same reader, so it inherits the check rather than
+    // having one of its own - and a dimmed black is still black.
     const Pixels::PixelType unlit_output = pixels.GetOutputPixel(kPastTheStrip);
     Expect(unlit_output.GetRed() == 0u && unlit_output.GetGreen() == 0u && unlit_output.GetBlue() == 0u,
            "and so must the dimmed copy of it");
@@ -61,9 +63,11 @@ void TestReadingPastTheEndIsEmpty()
 }
 
 
-/* The writers lost their second form entirely: what is left answers, and a caller with
-   nothing to do with the answer ignores it. So the check is no longer something a caller
-   opts into by picking a name, and an index past the end changes nothing. */
+/*
+ * The writers lost their second form entirely: what is left answers, and a caller with
+ * nothing to do with the answer ignores it. So the check is no longer something a caller
+ * opts into by picking a name, and an index past the end changes nothing.
+ */
 void TestWritingPastTheEndIsRefused()
 {
     Display& display = Display::GetInstance();
@@ -86,11 +90,13 @@ void TestWritingPastTheEndIsRefused()
 }
 
 
-/* The glyph accessors, which are the ones this collapse found something in: their checked
-   halves were templates nobody instantiated, and the setter among them assigned a member
-   from a const function. That does not compile - and it never had to, because only the
-   unchecked half was ever called. These cases call the survivors, so the code is compiled
-   rather than merely written. */
+/*
+ * The glyph accessors, which are the ones this collapse found something in: their checked
+ * halves were templates nobody instantiated, and the setter among them assigned a member
+ * from a const function. That does not compile - and it never had to, because only the
+ * unchecked half was ever called. These cases call the survivors, so the code is compiled
+ * rather than merely written.
+ */
 void TestGlyphAccessorsCheckBothWays()
 {
     FontCharHorizontal<uint16_t, 3u> rows(2u, {0b11u, 0b01u, 0b10u});

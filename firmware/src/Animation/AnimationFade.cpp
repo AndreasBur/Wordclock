@@ -65,8 +65,8 @@ StdReturnType AnimationFade::SetTime(byte hour, byte minute)
         hour_ = hour;
         minute_ = minute;
         state_ = StateType::kClearTime;
-        /* From the display as it is configured, whatever that currently is - the fade
-           scales it rather than replacing it. */
+        // From the display as it is configured, whatever that currently is - the fade
+        // scales it rather than replacing it.
         level_ = kLevelFull;
         return_value = kEOk;
     }
@@ -128,9 +128,11 @@ void AnimationFade::SetTimeTask()
         level_++;
         Display::GetInstance().SetBrightnessFadeLevel(level_);
     } else {
-        /* Cleared rather than left at full: a level that is set at all costs a comparison
-           on every ApplyBrightness(), and leaving it set would hide a fade that never
-           finished. */
+        /*
+         * Cleared rather than left at full: a level that is set at all costs a comparison
+         * on every ApplyBrightness(), and leaving it set would hide a fade that never
+         * finished.
+         */
         Display::GetInstance().ClearBrightnessFade();
         state_ = StateType::kIdle;
     }

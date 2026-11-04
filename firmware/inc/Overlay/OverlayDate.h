@@ -70,13 +70,15 @@ class OverlayDate : public Overlay<OverlayDate>
         UNUSED(current_time);
     }
 
-    /* The date is always there to be shown; only the temperature has to wait for a
-       reading. Answered here rather than defaulted in the base, so that adding an overlay
-       is a decision about this and not a silent inheritance of it. */
+    /*
+     * The date is always there to be shown; only the temperature has to wait for a
+     * reading. Answered here rather than defaulted in the base, so that adding an overlay
+     * is a decision about this and not a silent inheritance of it.
+     */
     static bool IsReady() { return true; }
 
-    /* Nothing of its own: the string it shows is built from the current date on every
-       start, so there is no configuration here for a reset to undo. */
+    // Nothing of its own: the string it shows is built from the current date on every
+    // start, so there is no configuration here for a reset to undo.
     static void ResetOwnToDefaults() { }
 
     void ShowTask() { if(Text::GetInstance().GetState() == Text::StateType::kIdle) { SetText(); } }

@@ -51,9 +51,11 @@ StdReturnType BH1750::Init(ModeType mode)
 {
     if(StartBus() == kENotOk) { return kENotOk; }
 
-    /* Sent explicitly, unlike in the xmega driver: a sensor that is still in power-down -
-       which is where it sits after reset, and where a one-time measurement leaves it -
-       ignores a mode command. */
+    /*
+     * Sent explicitly, unlike in the xmega driver: a sensor that is still in power-down -
+     * which is where it sits after reset, and where a one-time measurement leaves it -
+     * ignores a mode command.
+     */
     if(SendCommand(BH1750_CMD_POWER_ON) == kENotOk) { return kENotOk; }
 
     return SetMode(mode);
@@ -106,9 +108,11 @@ StdReturnType BH1750::ChangeMeasurementTime(byte mt_reg_value)
     /* The measurement time only takes effect with the next mode command. */
     if(SendMode() == kENotOk) { return kENotOk; }
 
-    /* Kept last, and only once all three went through, because this is what
-       ConvertRawToLux() divides by: a value stored after a failed transfer would scale
-       every later reading by a measurement time the sensor is not using. */
+    /*
+     * Kept last, and only once all three went through, because this is what
+     * ConvertRawToLux() divides by: a value stored after a failed transfer would scale
+     * every later reading by a measurement time the sensor is not using.
+     */
     measurement_time_ = mt_reg_value;
     return kEOk;
 } /* ChangeMeasurementTime */
@@ -129,12 +133,14 @@ StdReturnType BH1750::ChangeMeasurementTime(byte mt_reg_value)
 ******************************************************************************************************************************************************/
 void BH1750::Task()
 {
-    /* Set up from here rather than from an Init() call, and retried until it works: see
-       the file's header for why there is no place in the core to call Init() from.
-       Nothing is read on the run that does it - the first high-resolution conversion needs
-       120 ms and the data register reads zero until it is over, so reading on would hand
-       the brightness automatic a darkness that was never measured. The next run is a
-       second away, which is well past that. */
+    /*
+     * Set up from here rather than from an Init() call, and retried until it works: see
+     * the file's header for why there is no place in the core to call Init() from.
+     * Nothing is read on the run that does it - the first high-resolution conversion needs
+     * 120 ms and the data register reads zero until it is over, so reading on would hand
+     * the brightness automatic a darkness that was never measured. The next run is a
+     * second away, which is well past that.
+     */
     if(!IsReady()) {
         Init(BH1750_DEFAULT_MODE);
         return;

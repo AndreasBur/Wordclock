@@ -55,24 +55,30 @@ class OverlayText : public Overlay<OverlayText>
 ******************************************************************************************************************************************************/
   private:
     friend class Overlay;
-    /* Initialised like the other two overlays' string buffers rather than left to the
-       singleton's static storage to zero. Persistence reads this one before anything has
-       written it, and a terminator that holds only because of where the object lives is
-       one refactor away from not holding. */
+    /*
+     * Initialised like the other two overlays' string buffers rather than left to the
+     * singleton's static storage to zero. Persistence reads this one before anything has
+     * written it, and a terminator that holds only because of where the object lives is
+     * one refactor away from not holding.
+     */
     char text_[OVERLAY_TEXT_TEXT_SIZE]{0u};
 
     // functions
     void SetStateToShow(ClockDate current_date, ClockTime current_time) { SetText(); UNUSED(current_date); UNUSED(current_time); }
     static void SetStateToIdle(ClockDate current_date, ClockTime current_time) { Text::GetInstance().Stop(); UNUSED(current_date); UNUSED(current_time); }
 
-    /* An empty text is still a text - it is what was configured, and shortening the
-       overlay because of it would hide the mistake rather than show it. Only the
-       temperature can have nothing to show. */
+    /*
+     * An empty text is still a text - it is what was configured, and shortening the
+     * overlay because of it would hide the mistake rather than show it. Only the
+     * temperature can have nothing to show.
+     */
     static bool IsReady() { return true; }
 
-    /* The only overlay with anything of its own to reset. An empty text rather than the
-       previous one, so a reset clock shows nothing rather than whatever the last owner
-       configured. */
+    /*
+     * The only overlay with anything of its own to reset. An empty text rather than the
+     * previous one, so a reset clock shows nothing rather than whatever the last owner
+     * configured.
+     */
     void ResetOwnToDefaults() { text_[0u] = STD_NULL_CHARACTER; }
 
     void ShowTask() { if(Text::GetInstance().GetState() == Text::StateType::kIdle) { SetText(); } }

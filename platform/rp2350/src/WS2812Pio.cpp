@@ -39,7 +39,8 @@
 ******************************************************************************************************************************************************/
 namespace {
 
-/* The program, one bit of the strip per pass.
+/*
+ * The program, one bit of the strip per pass.
  *
  *      bitloop: out x, 1       side 0 [Phase3 - 1]
  *               jmp !x do_zero side 1 [Phase1 - 1]
@@ -57,17 +58,17 @@ namespace {
  * the header asserts against.
  */
 constexpr uint16_t kInstructions[]{
-    /* out x, 1 side 0 [8]: opcode 011, side 0 + delay 8 -> 01000, destination X 001,
-       bit count 1 -> 00001. */
+    // out x, 1 side 0 [8]: opcode 011, side 0 + delay 8 -> 01000, destination X 001,
+    // bit count 1 -> 00001.
     0x6821u,
-    /* jmp !x, 3 side 1 [7]: opcode 000, side 1 + delay 7 -> 10111, condition !X 001,
-       address 3 -> 00011. */
+    // jmp !x, 3 side 1 [7]: opcode 000, side 1 + delay 7 -> 10111, condition !X 001,
+    // address 3 -> 00011.
     0x1723u,
-    /* jmp 0 side 1 [7]: opcode 000, side 1 + delay 7 -> 10111, condition always 000,
-       address 0 -> 00000. */
+    // jmp 0 side 1 [7]: opcode 000, side 1 + delay 7 -> 10111, condition always 000,
+    // address 0 -> 00000.
     0x1700u,
-    /* nop side 0 [7], which is mov y, y: opcode 101, side 0 + delay 7 -> 00111,
-       destination Y 010, operation none 00, source Y 010. */
+    // nop side 0 [7], which is mov y, y: opcode 101, side 0 + delay 7 -> 00111,
+    // destination Y 010, operation none 00, source Y 010.
     0xA742u,
 };
 
@@ -99,9 +100,11 @@ void WS2812Pio::Init(uint8_t pin)
     pio_program_t program{};
     program.instructions = kInstructions;
     program.length = kInstructionCount;
-    /* Anywhere the loader finds room, rather than a fixed address: nothing else in this
-       firmware uses the block, but a fixed origin is a conflict waiting for the first
-       library that does. */
+    /*
+     * Anywhere the loader finds room, rather than a fixed address: nothing else in this
+     * firmware uses the block, but a fixed origin is a conflict waiting for the first
+     * library that does.
+     */
     program.origin = -1;
 
     const int offset = pio_add_program(block, &program);
@@ -118,15 +121,15 @@ void WS2812Pio::Init(uint8_t pin)
 
     pio_sm_config config = pio_get_default_sm_config();
     sm_config_set_wrap(&config, offset + kWrapTargetOffset, offset + kWrapOffset);
-    /* One bit, not optional and not a direction: every instruction carries it, which is
-       what lets the four of them above describe the whole waveform. */
+    // One bit, not optional and not a direction: every instruction carries it, which is
+    // what lets the four of them above describe the whole waveform.
     sm_config_set_sideset(&config, 1, false, false);
     sm_config_set_sideset_pins(&config, pin);
-    /* Shifting left, so the most significant bit leaves first - the WS2812's order - and
-       pulling automatically every 24 bits, which is one LED. */
+    // Shifting left, so the most significant bit leaves first - the WS2812's order - and
+    // pulling automatically every 24 bits, which is one LED.
     sm_config_set_out_shift(&config, false, true, kBitsPerPixel);
-    /* The receive side is never read here, so its four words are worth more as depth on
-       the side DMA fills. */
+    // The receive side is never read here, so its four words are worth more as depth on
+    // the side DMA fills.
     sm_config_set_fifo_join(&config, PIO_FIFO_JOIN_TX);
     sm_config_set_clkdiv(&config, static_cast<float>(clock_get_hz(clk_sys)) / static_cast<float>(kStateMachineClockHz));
 
@@ -150,8 +153,8 @@ bool WS2812Pio::IsBusy() const
 } /* IsBusy */
 
 
-/* Not const, though nothing here writes a member: it drives the hardware, and a const
-   would say it changes nothing. */
+// Not const, though nothing here writes a member: it drives the hardware, and a const
+// would say it changes nothing.
 // NOLINTBEGIN(readability-make-member-function-const)
 /******************************************************************************************************************************************************
   Transmit()
@@ -173,8 +176,8 @@ StdReturnType WS2812Pio::Transmit(const WordType* frame, size_t count)
     channel_config_set_transfer_data_size(&configuration, DMA_SIZE_32);
     channel_config_set_read_increment(&configuration, true);
     channel_config_set_write_increment(&configuration, false);
-    /* Paced by the state machine's appetite rather than free-running, so the FIFO is
-       refilled as it empties instead of being overrun in the first microsecond. */
+    // Paced by the state machine's appetite rather than free-running, so the FIFO is
+    // refilled as it empties instead of being overrun in the first microsecond.
     channel_config_set_dreq(&configuration, pio_get_dreq(Block(), kStateMachine, true));
 
     dma_channel_configure(static_cast<uint>(dma_channel_), &configuration,

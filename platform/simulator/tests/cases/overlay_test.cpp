@@ -19,10 +19,12 @@
 #include "Temperature.h"
 #include "sim/DS3231.h"
 
-/* The procedures that act now rather than at the next word change. What makes them worth
-   testing is the state they are asked for in: the display has been written to by something
-   that is not the clock, and nothing in the firmware takes it back - the latch sees the
-   same word set and leaves the letters alone, for up to five minutes. */
+/*
+ * The procedures that act now rather than at the next word change. What makes them worth
+ * testing is the state they are asked for in: the display has been written to by something
+ * that is not the clock, and nothing in the firmware takes it back - the latch sees the
+ * same word set and leaves the letters alone, for up to five minutes.
+ */
 void TestShowNowProcedures()
 {
     Clock::GetInstance().SetMode(Clock::ModeType::kWessi);
@@ -54,8 +56,8 @@ void TestShowNowProcedures()
     Expect(ArePixelsEqual(ReadPixels(), clock_face), "the abort must put the clock face back");
     animations.SetAnimation(Animations::AnimationIdType::kNone);
 
-    /* An overlay owns the display while it shows, so both clock procedures step aside
-       instead of drawing underneath it. */
+    // An overlay owns the display while it shows, so both clock procedures step aside
+    // instead of drawing underneath it.
     overlays.SetDateIsActive(true);
     Expect(overlays.ShowDateNow() == kEOk, "an active overlay must start on demand");
     Expect(overlays.GetState() == Overlays::OverlayType::StateType::kShow, "the started overlay must show");
@@ -63,8 +65,8 @@ void TestShowNowProcedures()
     Expect(display_manager.RefreshClock() == kENotOk, "the clock must not be refreshed under an overlay");
     Expect(display_manager.StartAnimation() == kENotOk, "no animation must start under an overlay");
 
-    /* Stands in for what the overlay's text draws, which needs the scheduler this test
-       does not run: what matters here is that the clock comes back over it. */
+    // Stands in for what the overlay's text draws, which needs the scheduler this test
+    // does not run: what matters here is that the clock comes back over it.
     display_manager.Task();
     display.Test();
 
@@ -80,10 +82,12 @@ void TestShowNowProcedures()
     Expect(overlays.ShowDateNow() == kENotOk, "a switched-off overlay must not be started");
 }
 
-/* The temperature overlay's one rule that is not about text: it shows nothing at all
-   until a reading exists. A clock built without the chip stays in that state for good, so
-   what is checked here is the state and not the string - the string is checked against a
-   real register pair in the ESP32 host tests, where there is a driver to read it with. */
+/*
+ * The temperature overlay's one rule that is not about text: it shows nothing at all
+ * until a reading exists. A clock built without the chip stays in that state for good, so
+ * what is checked here is the state and not the string - the string is checked against a
+ * real register pair in the ESP32 host tests, where there is a driver to read it with.
+ */
 void TestTemperatureOverlayWithoutSensor()
 {
     Overlays& overlays = Overlays::GetInstance();
@@ -98,30 +102,34 @@ void TestTemperatureOverlayWithoutSensor()
     DS3231::SetSimulatedTemperature(215);
     Temperature::GetInstance().Task();
     Expect(overlays.ShowTemperatureNow() == kEOk, "a reading must let the overlay start");
-    /* Split around the escape on purpose: "\xB0C" would swallow the C as a third hex digit
-       and stop compiling, which is the trap this string invites. */
+    // Split around the escape on purpose: "\xB0C" would swallow the C as a third hex digit
+    // and stop compiling, which is the trap this string invites.
     Expect(strcmp(overlays.GetTemperatureString(), "21.5\xB0" "C") == 0,
            "the overlay must show the dialled-in reading");
 
-    /* The reported form must stay free of the degree sign: it travels the web socket, and
-       a text frame carrying a raw Latin-1 byte is closed by the browser as invalid UTF-8
-       rather than drawn. This is the one assertion standing between that and a regression. */
+    /*
+     * The reported form must stay free of the degree sign: it travels the web socket, and
+     * a text frame carrying a raw Latin-1 byte is closed by the browser as invalid UTF-8
+     * rather than drawn. This is the one assertion standing between that and a regression.
+     */
     char reported[Temperature::kStringLength]{0};
     Expect(Temperature::GetInstance().GetTemperatureString(reported) == kEOk
                && strcmp(reported, "21.5C") == 0,
            "the reported reading must carry no degree sign");
     Expect(overlays.Abort() == kEOk, "the overlay must end again");
 
-    /* Left as it was found: an active temperature overlay would take the display away
-       from whatever runs after this. */
+    // Left as it was found: an active temperature overlay would take the display away
+    // from whatever runs after this.
     overlays.SetTemperatureIsActive(false);
     DS3231::ClearSimulatedTemperature();
     Temperature::GetInstance().Task();
 }
 
-/* When an overlay shows and for how long, which is the part of it no display can reveal:
-   the raster is a minute count and one particular second, and the endurance is counted in
-   the same task. Driven a second at a time, the way the clock does. */
+/*
+ * When an overlay shows and for how long, which is the part of it no display can reveal:
+ * the raster is a minute count and one particular second, and the endurance is counted in
+ * the same task. Driven a second at a time, the way the clock does.
+ */
 void TestOverlayPeriodAndEndurance()
 {
     Overlays& overlays = Overlays::GetInstance();

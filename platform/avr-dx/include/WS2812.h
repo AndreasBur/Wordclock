@@ -53,15 +53,17 @@
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
 /* WS2812 configuration parameter */
-/* The data line, driven by the CCL rather than by a port register: LUT0's own output pin.
-   PA3 also carries USART0's XDIR, which stays undriven because RS485 mode is never
-   enabled - the alternative, PA6, belongs to USART0's alternative pin block and would be
-   just as free. */
+/*
+ * The data line, driven by the CCL rather than by a port register: LUT0's own output pin.
+ * PA3 also carries USART0's XDIR, which stays undriven because RS485 mode is never
+ * enabled - the alternative, PA6, belongs to USART0's alternative pin block and would be
+ * just as free.
+ */
 #define WS2812_DATA_PIN                                 3u
 
 /* WS2812 parameter */
-/* The data sheet's pulse widths. Only the short one is critical: a zero that grows past
-   about 550 ns is read as a one. */
+// The data sheet's pulse widths. Only the short one is critical: a zero that grows past
+// about 550 ns is read as a one.
 #define WS2812_ZERO_PULSE_DURATION_NS                   350u
 #define WS2812_ONE_PULSE_DURATION_NS                    900u
 #define WS2812_ZERO_PULSE_MAX_DURATION_NS               550u
@@ -69,9 +71,11 @@
 /* One bit per 1.25 us. This is the strip's rate, not a choice. */
 #define WS2812_BIT_RATE_HZ                              800000uL
 
-/* How long the line has to rest before the strip latches what it was sent. The gap between
-   two bytes has to stay below this, or the frame is torn in half - which is the one budget
-   every interrupt handler in this backend is measured against. */
+/*
+ * How long the line has to rest before the strip latches what it was sent. The gap between
+ * two bytes has to stay below this, or the frame is torn in half - which is the one budget
+ * every interrupt handler in this backend is measured against.
+ */
 #define WS2812_RESET_DURATION_US                        50u
 
 /******************************************************************************************************************************************************
@@ -102,13 +106,15 @@ class WS2812
 
     void Init();
 
-    /* Whether the previous frame is still on the wire. A frame started while one is running
-       would interleave two of them, so the caller has to ask first. */
+    // Whether the previous frame is still on the wire. A frame started while one is running
+    // would interleave two of them, so the caller has to ask first.
     bool IsBusy() const;
 
-    /* Hands one frame over and returns; the interrupt does the rest. The buffer has to
-       outlive the transmission, which is why the caller keeps it rather than passing a
-       temporary. */
+    /*
+     * Hands one frame over and returns; the interrupt does the rest. The buffer has to
+     * outlive the transmission, which is why the caller keeps it rather than passing a
+     * temporary.
+     */
     StdReturnType Send(const byte* frame, uint16_t length);
 };
 

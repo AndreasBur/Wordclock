@@ -4,9 +4,11 @@
 
 #include "Scheduler.h"
 
-/* Adapts the wxWidgets side to the firmware: it hands the host's time to the real time
-   clock and drives the scheduler. What reaches the display is the DisplayManager's
-   decision, so nothing of that lives here. */
+/*
+ * Adapts the wxWidgets side to the firmware: it hands the host's time to the real time
+ * clock and drives the scheduler. What reaches the display is the DisplayManager's
+ * decision, so nothing of that lives here.
+ */
 class WordclockMain
 {
     public:

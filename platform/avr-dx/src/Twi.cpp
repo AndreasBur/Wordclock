@@ -27,15 +27,17 @@
 /* The bus the strip left free, see Twi.h. */
 #define TWI_PERIPHERAL                  TWI1
 
-/* The data sheet's baud formula without the rise-time term, which is negligible against
-   the pull-ups this bus is built with. The five is the controller's own overhead per bit. */
+// The data sheet's baud formula without the rise-time term, which is negligible against
+// the pull-ups this bus is built with. The five is the controller's own overhead per bit.
 #define TWI_BAUD_OVERHEAD_CYCLES        5uL
 #define TWI_BAUD_REGISTER               static_cast<uint8_t>((F_CPU / (2uL * TWI_FREQUENCY_HZ)) - TWI_BAUD_OVERHEAD_CYCLES)
 
-/* Both figures below are derived from F_CPU, and both fail quietly rather than loudly if it
-   is changed far enough: a baud register computed from too low a clock underflows to a huge
-   value and drops the bus to a crawl, and a timeout rounded to zero makes every transfer
-   report failure without ever waiting. Neither shows up as a build error on its own. */
+/*
+ * Both figures below are derived from F_CPU, and both fail quietly rather than loudly if it
+ * is changed far enough: a baud register computed from too low a clock underflows to a huge
+ * value and drops the bus to a crawl, and a timeout rounded to zero makes every transfer
+ * report failure without ever waiting. Neither shows up as a build error on its own.
+ */
 static_assert((F_CPU / (2uL * TWI_FREQUENCY_HZ)) > TWI_BAUD_OVERHEAD_CYCLES,
               "Twi: F_CPU is too low for this bus frequency, the baud register would underflow");
 static_assert(TWI_BAUD_REGISTER <= 0xFFu, "Twi: F_CPU is too high for this bus frequency, the baud register does not fit");
@@ -60,8 +62,8 @@ StdReturnType Twi::WaitForWrite()
         if((status & (TWI_ARBLOST_bm | TWI_BUSERR_bm)) != 0u) { return kENotOk; }
 
         if((status & TWI_WIF_bm) != 0u) {
-            /* Written, but not necessarily to anybody: an unfitted device leaves the line
-               high, which reads back as a missing acknowledge. */
+            // Written, but not necessarily to anybody: an unfitted device leaves the line
+            // high, which reads back as a missing acknowledge.
             return ((status & TWI_RXACK_bm) != 0u) ? kENotOk : kEOk;
         }
     }
@@ -113,16 +115,16 @@ void Twi::Init()
 
     TWI_PERIPHERAL.MBAUD = TWI_BAUD_REGISTER;
     TWI_PERIPHERAL.MCTRLA = TWI_ENABLE_bm;
-    /* The controller comes up believing the bus state unknown, and refuses to start a
-       transfer until it is told otherwise. */
+    // The controller comes up believing the bus state unknown, and refuses to start a
+    // transfer until it is told otherwise.
     TWI_PERIPHERAL.MSTATUS = TWI_BUSSTATE_IDLE_gc;
 
     initialised_ = true;
 } /* Init */
 
 
-/* Not const, though nothing here writes a member: these drive the hardware, and a
-   const would say they change nothing. */
+// Not const, though nothing here writes a member: these drive the hardware, and a
+// const would say they change nothing.
 // NOLINTBEGIN(readability-make-member-function-const)
 /******************************************************************************************************************************************************
   Write()

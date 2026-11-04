@@ -31,8 +31,8 @@
 ******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 
-/* What a browser is *sent* lives there, together with the frame rate limit and the longest
-   command a socket frame may carry - shared with the RP2350 backend rather than kept twice. */
+// What a browser is *sent* lives there, together with the frame rate limit and the longest
+// command a socket frame may carry - shared with the RP2350 backend rather than kept twice.
 #include "WebFrontend.h"
 
 #include <stddef.h>
@@ -41,8 +41,8 @@
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
 /* WebInterface configuration parameter */
-/* How many browsers may watch at once. Each costs a socket in the server and a slot here;
-   a wall clock does not need more, and the server's own limit has to be at least this. */
+// How many browsers may watch at once. Each costs a socket in the server and a slot here;
+// a wall clock does not need more, and the server's own limit has to be at least this.
 #define WEB_INTERFACE_MAX_CLIENTS                       4u
 
 #define WEB_INTERFACE_PORT                              80u
@@ -59,12 +59,14 @@ class WebInterface
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    /* The table of socket descriptors this server hands out is not here but in the anonymous
-       namespace of WebInterface.cpp, beside the server handle it is used with and beside
-       WebTransport, which is the only thing that reads it. Keeping it a member would have
-       meant naming httpd's frame type in this header, and this header is reached from sources
-       that have not included the framework's own first - the ordering this backend's
-       Arduino.h depends on. */
+    /*
+     * The table of socket descriptors this server hands out is not here but in the anonymous
+     * namespace of WebInterface.cpp, beside the server handle it is used with and beside
+     * WebTransport, which is the only thing that reads it. Keeping it a member would have
+     * meant naming httpd's frame type in this header, and this header is reached from sources
+     * that have not included the framework's own first - the ordering this backend's
+     * Arduino.h depends on.
+     */
     WebInterface() { }
     ~WebInterface() { }
 
@@ -78,21 +80,27 @@ class WebInterface
     }
 
     // methods
-    /* Starts the server and registers itself as the sink for finished output lines. Safe to
-       call before the network is up: the server listens on whatever address arrives later.
-       Returns kENotOk when the server could not be started, which leaves the clock running
-       on the UART alone rather than failing to boot. */
+    /*
+     * Starts the server and registers itself as the sink for finished output lines. Safe to
+     * call before the network is up: the server listens on whatever address arrives later.
+     * Returns kENotOk when the server could not be started, which leaves the clock running
+     * on the UART alone rather than failing to boot.
+     */
     StdReturnType Begin();
 
-    /* Sends one finished line to every open socket. Called from the firmware's task through
-       WordclockSerial's line sink, not from the server's. Both of these forward into
-       WebFrontend, which is where the widening, the rate limit and the comparison live; they
-       stay on this class because the application and the line sink call them by this name. */
+    /*
+     * Sends one finished line to every open socket. Called from the firmware's task through
+     * WordclockSerial's line sink, not from the server's. Both of these forward into
+     * WebFrontend, which is where the widening, the rate limit and the comparison live; they
+     * stay on this class because the application and the line sink call them by this name.
+     */
     void BroadcastLine(const char*);
 
-    /* Sends the pixel buffer as one binary frame, at most every
-       WEB_FRONTEND_FRAME_INTERVAL_TICKS and only when it changed. Called from the
-       application's tick, after the display has been handed to the strip. */
+    /*
+     * Sends the pixel buffer as one binary frame, at most every
+     * WEB_FRONTEND_FRAME_INTERVAL_TICKS and only when it changed. Called from the
+     * application's tick, after the display has been handed to the strip.
+     */
     void BroadcastFrame();
 
     /* For the socket handler, which runs in the server's task. */

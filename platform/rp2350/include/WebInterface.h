@@ -31,8 +31,8 @@
 ******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 
-/* What a browser is *sent* lives there, together with the frame rate limit and the longest
-   command a socket frame may carry - shared with the ESP32 backend rather than kept twice. */
+// What a browser is *sent* lives there, together with the frame rate limit and the longest
+// command a socket frame may carry - shared with the ESP32 backend rather than kept twice.
 #include "WebFrontend.h"
 
 #include <stddef.h>
@@ -41,10 +41,12 @@
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
 /* WebInterface configuration parameter */
-/* There is no client limit here, and the one that used to stand in this place was never one:
-   it sized a constant nothing read, because AsyncWebSocket owns the list and enforces its own
-   ceiling. The ESP32 keeps its WEB_INTERFACE_MAX_CLIENTS because a table there really is that
-   long and its server is told the same number. */
+/*
+ * There is no client limit here, and the one that used to stand in this place was never one:
+ * it sized a constant nothing read, because AsyncWebSocket owns the list and enforces its own
+ * ceiling. The ESP32 keeps its WEB_INTERFACE_MAX_CLIENTS because a table there really is that
+ * long and its server is told the same number.
+ */
 #define WEB_INTERFACE_PORT                              80u
 
 /* What the clock answers to on the local network, so no address has to be looked up. */
@@ -59,10 +61,12 @@ class WebInterface
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    /* Nothing is kept here at all any more. The list of clients never was - AsyncWebSocket
-       owns it, counts it and broadcasts to it, so a second copy could only ever disagree with
-       the first - and the frame bookkeeping that used to sit beside it is WebFrontend's now,
-       a rate limit and a comparison being the same on any backend. */
+    /*
+     * Nothing is kept here at all any more. The list of clients never was - AsyncWebSocket
+     * owns it, counts it and broadcasts to it, so a second copy could only ever disagree with
+     * the first - and the frame bookkeeping that used to sit beside it is WebFrontend's now,
+     * a rate limit and a comparison being the same on any backend.
+     */
     WebInterface() { }
     ~WebInterface() { }
 
@@ -76,27 +80,35 @@ class WebInterface
     }
 
     // methods
-    /* Starts the server and registers itself as the sink for finished output lines. Safe to
-       call before the network is up: the server listens on whatever address arrives later.
-       Returns kENotOk when the server could not be started, which leaves the clock running
-       on the UART alone rather than failing to boot. */
+    /*
+     * Starts the server and registers itself as the sink for finished output lines. Safe to
+     * call before the network is up: the server listens on whatever address arrives later.
+     * Returns kENotOk when the server could not be started, which leaves the clock running
+     * on the UART alone rather than failing to boot.
+     */
     StdReturnType Begin();
 
-    /* Sends one finished line to every open socket. Called from the firmware's task through
-       WordclockSerial's line sink, not from the server's. Both of these forward into
-       WebFrontend, which is where the widening, the rate limit and the comparison live; they
-       stay on this class because the application and the line sink call them by this name. */
+    /*
+     * Sends one finished line to every open socket. Called from the firmware's task through
+     * WordclockSerial's line sink, not from the server's. Both of these forward into
+     * WebFrontend, which is where the widening, the rate limit and the comparison live; they
+     * stay on this class because the application and the line sink call them by this name.
+     */
     void BroadcastLine(const char*);
 
-    /* Sends the pixel buffer as one binary frame, at most every
-       WEB_FRONTEND_FRAME_INTERVAL_TICKS and only when it changed. Called from the
-       application's tick, after the display has been handed to the strip. */
+    /*
+     * Sends the pixel buffer as one binary frame, at most every
+     * WEB_FRONTEND_FRAME_INTERVAL_TICKS and only when it changed. Called from the
+     * application's tick, after the display has been handed to the strip.
+     */
     void BroadcastFrame();
 
-    /* For the socket callback, which runs in the network stack's context rather than the
-       firmware's tick. Only the force flag is touched from there; who is connected is the
-       socket's own business. An instance method like the rest of this interface, for the
-       reason WebInterface.cpp gives. */
+    /*
+     * For the socket callback, which runs in the network stack's context rather than the
+     * firmware's tick. Only the force flag is touched from there; who is connected is the
+     * socket's own business. An instance method like the rest of this interface, for the
+     * reason WebInterface.cpp gives.
+     */
     // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
     void OnClientOpened() { WebFrontend::GetInstance().OnClientOpened(); }
 };

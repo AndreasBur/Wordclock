@@ -44,18 +44,22 @@
 /******************************************************************************************************************************************************
  * I N C L U D E S
 ******************************************************************************************************************************************************/
-/* The real one, at the path scripts/firmware_includes.py found in the installed framework
-   and passed in as a define. Not hardcoded, so a framework update moves it on its own; not
-   include_next, for the reason given above. */
+/*
+ * The real one, at the path scripts/firmware_includes.py found in the installed framework
+ * and passed in as a define. Not hardcoded, so a framework update moves it on its own; not
+ * include_next, for the reason given above.
+ */
 #ifndef WORDCLOCK_CORE_ARDUINO_H
 # error "Arduino.h: WORDCLOCK_CORE_ARDUINO_H is not set. scripts/firmware_includes.py defines it; a build that bypasses that script cannot find the Arduino core's own header."
 #endif
 
 #include WORDCLOCK_CORE_ARDUINO_H
 
-/* Proof that the line above really brought the core in. Without it everything below still
-   parses, and the build fails much later on the first use of byte, in a firmware file that
-   has nothing to do with the cause. */
+/*
+ * Proof that the line above really brought the core in. Without it everything below still
+ * parses, and the build fails much later on the first use of byte, in a firmware file that
+ * has nothing to do with the cause.
+ */
 static_assert(sizeof(byte) == 1u, "Arduino.h: the Arduino core's header did not come in through WORDCLOCK_CORE_ARDUINO_H");
 
 #include "WordclockSerial.h"
@@ -63,9 +67,11 @@ static_assert(sizeof(byte) == 1u, "Arduino.h: the Arduino core's header did not 
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
-/* Proof that this file, and not the core's, was the one that got included. WordclockSerial.cpp
-   refuses to build without it: the alternative failure is silent - everything compiles, the
-   firmware talks to the UART as before, and only the web console stays mute. */
+/*
+ * Proof that this file, and not the core's, was the one that got included. WordclockSerial.cpp
+ * refuses to build without it: the alternative failure is silent - everything compiles, the
+ * firmware talks to the UART as before, and only the web console stays mute.
+ */
 #define WORDCLOCK_ARDUINO_SHIM                          1
 
 /******************************************************************************************************************************************************
@@ -82,10 +88,12 @@ inline void HardwarePortBegin(unsigned long baud_rate) { Serial.begin(baud_rate)
 /******************************************************************************************************************************************************
  *  S E R I A L
 ******************************************************************************************************************************************************/
-/* Undefined first, because the core defines Serial as a macro of its own - on this target
-   it aliases whichever port the board boots its console on. Replacing it without saying so
-   is a redefinition, and the compiler is right to warn; the alias is also exactly why the
-   port above is captured through a function rather than a reference. */
+/*
+ * Undefined first, because the core defines Serial as a macro of its own - on this target
+ * it aliases whichever port the board boots its console on. Replacing it without saying so
+ * is a redefinition, and the compiler is right to warn; the alias is also exactly why the
+ * port above is captured through a function rather than a reference.
+ */
 #undef Serial
 #define Serial                  WordclockSerial::GetInstance() // NOLINT(readability-identifier-naming)
 

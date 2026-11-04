@@ -282,10 +282,12 @@ void Text::CharShiftTask()
             shift_.counter--;
             byte column = DISPLAY_NUMBER_OF_COLUMNS - shift_.char_width + shift_.counter;
             byte row = GetRowCenter(shift_.font);
-            /* A character SetChar refuses is shifted through as a space, which is the blank
-               glyph and therefore clears the cells the previous step wrote. Leaving it out
-               instead would smear those pixels across the display for as long as the text
-               runs. The width was already taken from the same substitute. */
+            /*
+             * A character SetChar refuses is shifted through as a space, which is the blank
+             * glyph and therefore clears the cells the previous step wrote. Leaving it out
+             * instead would smear those pixels across the display for as long as the text
+             * runs. The width was already taken from the same substitute.
+             */
             if(SetChar(column, row, shift_.character, shift_.font) == kENotOk) {
                 SetChar(column, row, ' ', shift_.font);
             }
@@ -392,13 +394,15 @@ StdReturnType Text::ConvertCharToFontIndex(char character, byte& index)
     else if('\xE4' == character) { index = 99u; return_value = kEOk; }
     else if('\xF6' == character) { index = 100u; return_value = kEOk; }
     else if('\xFC' == character) { index = 101u; return_value = kEOk; }
-    /* The degree sign sits with them for the same reason: Latin-1 0xB0 is nowhere near the
-       ASCII run, so it is appended past its end rather than shifting every index after it. */
+    // The degree sign sits with them for the same reason: Latin-1 0xB0 is nowhere near the
+    // ASCII run, so it is appended past its end rather than shifting every index after it.
     else if('\xB0' == character) { index = 102u; return_value = kEOk; }
-    /* For all others only add the offset - within both bounds, and compared as a byte.
-       Whether char is signed is the platform's decision: where it is not, and AVR is one
-       of those, every Latin-1 byte above the six umlauts passes a lower bound on its own
-       and indexes past the end of a font table that has 102 entries. */
+    /*
+     * For all others only add the offset - within both bounds, and compared as a byte.
+     * Whether char is signed is the platform's decision: where it is not, and AVR is one
+     * of those, every Latin-1 byte above the six umlauts passes a lower bound on its own
+     * and indexes past the end of a font table that has 102 entries.
+     */
     else {
         const byte value = static_cast<byte>(character);
 
@@ -425,11 +429,11 @@ byte Text::ConvertCharToFontIndex(char character)
 {
     byte index;
 
-    /* The mapping is written once, above. It used to be written here as well, which made
-       adding a glyph a change in two branches that had to agree - see fonts.md. */
+    // The mapping is written once, above. It used to be written here as well, which made
+    // adding a glyph a change in two branches that had to agree - see fonts.md.
     if(ConvertCharToFontIndex(character, index) == kENotOk) {
-        /* The space, which is the first glyph: a character that cannot be drawn leaves a gap
-           rather than whatever byte sits past the end of the table. */
+        // The space, which is the first glyph: a character that cannot be drawn leaves a gap
+        // rather than whatever byte sits past the end of the table.
         return kSpaceFontIndex;
     }
     return index;

@@ -455,8 +455,8 @@ WebHost::SocketType WebHost::OpenListener()
     const SocketType socket = ::socket(AF_INET, SOCK_STREAM, 0);
     if(socket == kInvalidSocket) { return kInvalidSocket; }
 
-    /* So a restart does not have to wait out the last connection's TIME_WAIT, which is a
-       minute of "port already in use" for a program somebody restarts constantly. */
+    // So a restart does not have to wait out the last connection's TIME_WAIT, which is a
+    // minute of "port already in use" for a program somebody restarts constantly.
     int reuse{1};
     setsockopt(socket, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<const char*>(&reuse), sizeof(reuse));
 
@@ -743,10 +743,12 @@ WebTransport& WebTransport::GetInstance()
     return singleton_instance;
 }
 
-/* Not static, though nothing in them reads a member: these stand in for the backends the
-   clock really runs on, and there the same call reaches a peripheral through instance
-   state. A stand-in that answered the check would have a different API from the thing it
-   stands in for, which is the one property it exists to keep. */
+/*
+ * Not static, though nothing in them reads a member: these stand in for the backends the
+ * clock really runs on, and there the same call reaches a peripheral through instance
+ * state. A stand-in that answered the check would have a different API from the thing it
+ * stands in for, which is the one property it exists to keep.
+ */
 // NOLINTBEGIN(readability-convert-member-functions-to-static)
 bool WebTransport::IsListening() const { return WebHost::GetInstance().IsListening(); }
 bool WebTransport::HasClients() const { return WebHost::GetInstance().HasClients(); }
@@ -766,9 +768,11 @@ void WebTransport::SendBinary(const byte* bytes, size_t length)
 /******************************************************************************************************************************************************
  *  W E B   R E S P O N S E   B O D Y
 ******************************************************************************************************************************************************/
-/* Collected and sent whole. The two documents this carries are a few kilobytes at most and
-   go to loopback, so a Content-Length up front is simpler than a chunked encoding - and it is
-   what lets the browser show a progress that ends. */
+/*
+ * Collected and sent whole. The two documents this carries are a few kilobytes at most and
+ * go to loopback, so a Content-Length up front is simpler than a chunked encoding - and it is
+ * what lets the browser show a progress that ends.
+ */
 
 WebResponseBody::WebResponseBody(int socket, const char* content_type)
     : socket_(socket), content_type_(content_type)

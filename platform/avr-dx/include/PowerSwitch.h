@@ -59,9 +59,11 @@ class PowerSwitch
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    /* What the port was last driven to, rather than the port read back. A board with no
-       switch fitted never has it driven at all, and then this is what the answer is about:
-       whether the firmware believes the strip is powered. */
+    /*
+     * What the port was last driven to, rather than the port read back. A board with no
+     * switch fitted never has it driven at all, and then this is what the answer is about:
+     * whether the firmware believes the strip is powered.
+     */
     bool supply_on_{false};
 
     PowerSwitch() { }
@@ -81,9 +83,11 @@ class PowerSwitch
     // get methods
     static constexpr bool IsFitted() { return POWER_SWITCH_IS_FITTED == STD_ON; }
 
-    /* A board built without the switch has the high side MOSFET bridged, so its strip is
-       powered and cannot be anything else. Answering from the flag there would report a
-       supply that is off while the LEDs are lit, which is worse than not having the switch. */
+    /*
+     * A board built without the switch has the high side MOSFET bridged, so its strip is
+     * powered and cannot be anything else. Answering from the flag there would report a
+     * supply that is off while the LEDs are lit, which is worse than not having the switch.
+     */
     bool IsSupplyOn() const {
         if(!IsFitted()) { return true; }
 

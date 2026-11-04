@@ -42,16 +42,18 @@
 #define STORAGE_KEY                                     "settings"
 
 /* Storage parameter */
-/* What one Write() may hold. The overlay settings this was held open for have landed and
-   take the blob to 110 bytes, which 128 would still have covered - but only just, and the
-   next setting would have moved both platforms again. Raised once, with room, rather than
-   by the byte: NVS stores what it is given, so the unused part costs nothing here.
-
-   This bounds what store() and load() accept, and nothing else - it does not shape the
-   blob, so platforms may disagree about it and still read each other's. What each one has
-   to clear on its own is Persistence's static_assert that the settings fit, and the
-   platform with the smallest capacity is the one that stops compiling first when they
-   grow. */
+/*
+ * What one Write() may hold. The overlay settings this was held open for have landed and
+ * take the blob to 110 bytes, which 128 would still have covered - but only just, and the
+ * next setting would have moved both platforms again. Raised once, with room, rather than
+ * by the byte: NVS stores what it is given, so the unused part costs nothing here.
+ *
+ * This bounds what store() and load() accept, and nothing else - it does not shape the
+ * blob, so platforms may disagree about it and still read each other's. What each one has
+ * to clear on its own is Persistence's static_assert that the settings fit, and the
+ * platform with the smallest capacity is the one that stops compiling first when they
+ * grow.
+ */
 #define STORAGE_CAPACITY                                256u
 
 /******************************************************************************************************************************************************

@@ -55,9 +55,11 @@ class AnimationFade : public Animation
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    /* How far the fade has got, in what Display calls a fade level: 255 is the display as
-       configured, 0 is dark. Counted here rather than read back from the display, which
-       scales the level by the setting, the gamma correction and the automatic. */
+    /*
+     * How far the fade has got, in what Display calls a fade level: 255 is the display as
+     * configured, 0 is dark. Counted here rather than read back from the display, which
+     * scales the level by the setting, the gamma correction and the automatic.
+     */
     static constexpr byte kLevelFull{255u};
     byte level_{kLevelFull};
     byte hour_{0u};

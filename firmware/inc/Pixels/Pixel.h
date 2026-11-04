@@ -80,14 +80,16 @@ class Pixel
 ******************************************************************************************************************************************************/
   public:
     constexpr Pixel() { }
-    /* Goes through SetPixel() rather than initialising the array in argument order,
-       which is what it used to do: the raw array is ordered by the ColorOffset
-       constants (green first, for the WS2812 wire order), so a positional initialiser
-       put red where GetRed() does not look for it. Nothing visible came of it while
-       every colour built this way was grey or black, and the simulator could not have
-       shown it either - it renders brightness, not hue. On the strip it swaps red and
-       green. Keeping SetPixel() as the only place that knows the layout is what stops
-       that from coming back. */
+    /*
+     * Goes through SetPixel() rather than initialising the array in argument order,
+     * which is what it used to do: the raw array is ordered by the ColorOffset
+     * constants (green first, for the WS2812 wire order), so a positional initialiser
+     * put red where GetRed() does not look for it. Nothing visible came of it while
+     * every colour built this way was grey or black, and the simulator could not have
+     * shown it either - it renders brightness, not hue. On the strip it swaps red and
+     * green. Keeping SetPixel() as the only place that knows the layout is what stops
+     * that from coming back.
+     */
     constexpr Pixel(ColorType color_red, ColorType color_green, ColorType color_blue) {
         SetPixel(color_red, color_green, color_blue);
     }
@@ -104,8 +106,8 @@ class Pixel
     void SetBlue(ColorType value) { pixel_raw_[kColorOffsetBlue] = value; }
     void SetGreen(ColorType value) { pixel_raw_[kColorOffsetGreen] = value; }
 
-    /* constexpr so the constructor can use it, and thereby be the only place in the
-       class that maps a colour name onto a raw index. */
+    // constexpr so the constructor can use it, and thereby be the only place in the
+    // class that maps a colour name onto a raw index.
     constexpr void SetPixel(ColorType red, ColorType green, ColorType blue) {
          pixel_raw_[kColorOffsetRed] = red;
          pixel_raw_[kColorOffsetBlue] = blue;
@@ -115,8 +117,8 @@ class Pixel
     // methods
     void ClearPixel() { SetPixel(0u, 0u, 0u); }
 
-    /* dimms all three colors, kColorMaxValue keeps the pixel unchanged. Dimms the
-       color as a whole, so the hue is preserved and only the brightness changes. */
+    // dimms all three colors, kColorMaxValue keeps the pixel unchanged. Dimms the
+    // color as a whole, so the hue is preserved and only the brightness changes.
     void DimmPixel(byte brightness) {
         SetPixel(DimmColor(GetRed(), brightness), DimmColor(GetGreen(), brightness), DimmColor(GetBlue(), brightness));
     }

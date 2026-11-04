@@ -107,11 +107,13 @@ class DisplayWords
     constexpr DisplayWords() { }
     ~DisplayWords() { }
 
-    /* Two forms of every reader, and the argument list says which: the one taking a
-       reference answers whether the word exists, the one taking none answers the word.
-       Both check, and the unchecked read is the private table element above - a word that
-       is not in the table has no place on the plate, which is what a length of zero says,
-       and a word of zero length lights nothing. */
+    /*
+     * Two forms of every reader, and the argument list says which: the one taking a
+     * reference answers whether the word exists, the one taking none answers the word.
+     * Both check, and the unchecked read is the private table element above - a word that
+     * is not in the table has no place on the plate, which is what a length of zero says,
+     * and a word of zero length lights nothing.
+     */
     // get methods
     static StdReturnType GetDisplayWord(WordIdType, DisplayWord&);
     static StdReturnType GetDisplayWordLength(WordIdType, byte&);

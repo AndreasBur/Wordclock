@@ -75,10 +75,12 @@ class AnimationCollapse : public Animation
     ClockWords::WordsListType clock_words_table_{{DisplayWords::WordIdType::kNone}};
     byte step_{0u};
     DirectionType direction_{DirectionType::kToLeft};
-    /* Steps the expansion needs, which is the longest way a single letter has to
-       travel. Taking the display width instead would let the letters arrive long
-       before the animation ends, because the gaps between words are only one or two
-       columns wide. */
+    /*
+     * Steps the expansion needs, which is the longest way a single letter has to
+     * travel. Taking the display width instead would let the letters arrive long
+     * before the animation ends, because the gaps between words are only one or two
+     * columns wide.
+     */
     byte expand_steps_{1u};
 
     // functions

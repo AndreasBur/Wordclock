@@ -60,9 +60,11 @@
  *  L O C A L   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
 namespace {
-/* Every command parser shares the same lifecycle: construct from the parameter
+/*
+ * Every command parser shares the same lifecycle: construct from the parameter
  * string, then parse -> Process -> SendAnswer. This helper runs that sequence so
- * the dispatch below stays a flat table instead of a copy-pasted if/else chain. */
+ * the dispatch below stays a flat table instead of a copy-pasted if/else chain.
+ */
 template <typename ParserType>
 void DispatchCommand(const char* parameter)
 {

@@ -108,9 +108,11 @@ void AnimationSqueeze::Reset()
 ******************************************************************************************************************************************************/
 void AnimationSqueeze::ClearTimeTask()
 {
-    /* Row by row, not over the linear pixel index: on the index a block at the end of
-       one row and a block at the start of the next count as one, which makes the
-       result depend on where the rows wrap. */
+    /*
+     * Row by row, not over the linear pixel index: on the index a block at the end of
+     * one row and a block at the start of the next count as one, which makes the
+     * result depend on where the rows wrap.
+     */
     for(byte row = 0u; row < DISPLAY_NUMBER_OF_ROWS; row++) { ClearRow(row); }
 } /* ClearTimeTask */
 
@@ -120,8 +122,8 @@ void AnimationSqueeze::ClearTimeTask()
 ******************************************************************************************************************************************************/
 void AnimationSqueeze::ClearRow(byte row)
 {
-    /* Takes one letter off every block of the row, on the side the direction says, so
-       all words of the row get shorter at the same time. */
+    // Takes one letter off every block of the row, on the side the direction says, so
+    // all words of the row get shorter at the same time.
     if(direction_ == DirectionType::kFromLeft) {
         for(byte column = 0u; column < DISPLAY_NUMBER_OF_COLUMNS; column++) {
             if(Display::GetInstance().GetPixel(column, row)) {

@@ -37,22 +37,24 @@
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
 /* System parameter */
-/* "255.255.255.255" and its terminator. IPv6 does not fit and is not offered: the clock
-   joins a home network over IPv4, and the field says what to type into a browser. */
+// "255.255.255.255" and its terminator. IPv6 does not fit and is not offered: the clock
+// joins a home network over IPv4, and the field says what to type into a browser.
 #define SYSTEM_ADDRESS_STRING_LENGTH                    16u
 
 /* "-100" and its terminator. */
 #define SYSTEM_LINK_QUALITY_STRING_LENGTH               5u
 
-/* What 802.11 allows: 32 characters of network name, and 63 of a WPA2 pass phrase. Both
-   with room for the terminator, because they are handed over as strings. */
+// What 802.11 allows: 32 characters of network name, and 63 of a WPA2 pass phrase. Both
+// with room for the terminator, because they are handed over as strings.
 #define SYSTEM_SSID_STRING_LENGTH                       33u
 #define SYSTEM_PASSWORD_STRING_LENGTH                   64u
 
-/* The network the clock opens when it has none to join, so that the console it is
-   configured through can be reached at all. Open, and only while there is nothing stored:
-   a pass phrase every clock of this firmware shares would protect nothing, and the window
-   closes as soon as the first network is entered. */
+/*
+ * The network the clock opens when it has none to join, so that the console it is
+ * configured through can be reached at all. Open, and only while there is nothing stored:
+ * a pass phrase every clock of this firmware shares would protect nothing, and the window
+ * closes as soon as the first network is entered.
+ */
 #define SYSTEM_ACCESS_POINT_SSID                        "Wordclock"
 
 /******************************************************************************************************************************************************
@@ -73,9 +75,11 @@ class System
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    /* A restart that was asked for and not carried out yet. The command that asks for one
-       is answered first, and the answer travels over a UART and a web socket that a
-       controller restarting inside the command would cut off mid-line. */
+    /*
+     * A restart that was asked for and not carried out yet. The command that asks for one
+     * is answered first, and the answer travels over a UART and a web socket that a
+     * controller restarting inside the command would cut off mid-line.
+     */
     bool restart_pending_{false};
 
     System() { }
@@ -91,79 +95,95 @@ class System
     }
 
     // get methods
-    /* Kibibytes of free heap. Says whether the clock is leaking, which is the one thing a
-       device that runs for months has to be watched for. */
+    // Kibibytes of free heap. Says whether the clock is leaking, which is the one thing a
+    // device that runs for months has to be watched for.
     StdReturnType GetFreeMemoryInKibibytes(uint16_t&) const;
 
-    /* The address to type into a browser, into a buffer of kAddressStringLength.
-       kENotOk while the clock has not joined a network, which is when there is none. */
+    // The address to type into a browser, into a buffer of kAddressStringLength.
+    // kENotOk while the clock has not joined a network, which is when there is none.
     StdReturnType GetNetworkAddress(char*) const;
 
-    /* The received signal strength in dBm, into a buffer of kLinkQualityStringLength. A
-       string rather than a number because it is negative, and the answer format carries
-       unsigned values. */
+    /*
+     * The received signal strength in dBm, into a buffer of kLinkQualityStringLength. A
+     * string rather than a number because it is negative, and the answer format carries
+     * unsigned values.
+     */
     StdReturnType GetLinkQuality(char*) const;
 
-    /* The network the clock is configured for, into a buffer of kSsidStringLength.
-       kENotOk when there is none, which is what a clock that was never told answers - and
-       what the access point stands in for. The pass phrase is deliberately not readable:
-       it goes in and is never handed back out. */
+    /*
+     * The network the clock is configured for, into a buffer of kSsidStringLength.
+     * kENotOk when there is none, which is what a clock that was never told answers - and
+     * what the access point stands in for. The pass phrase is deliberately not readable:
+     * it goes in and is never handed back out.
+     */
     StdReturnType GetNetworkSsid(char*) const;
     bool IsNetworkConfigured() const;
 
     // set methods
-    /* Stores what the clock is to join, and joins it. Kept apart from the settings the
-       core persists: those are what the clock shows, this is how it is reached, and a
-       settings reset that threw the network away would leave a clock nobody can talk to
-       without a cable. */
+    /*
+     * Stores what the clock is to join, and joins it. Kept apart from the settings the
+     * core persists: those are what the clock shows, this is how it is reached, and a
+     * settings reset that threw the network away would leave a clock nobody can talk to
+     * without a cable.
+     */
     StdReturnType SetNetworkCredentials(const char*, const char*);
 
-    /* Whether the console asks for a password before it answers, and whether a candidate
-       matches. The password itself is never handed back out, the same way the WiFi pass
-       phrase is not: what a caller may learn is yes or no.
-
-       The candidate is the base64 blob out of an Authorization header, not the password -
-       and that is a decision about flash rather than about layering. Basic sends
-       base64("user:password"), the ESP32 core can only *encode*, and encoding the expected
-       value once to compare strings is a decoder's worth of code less than decoding what
-       arrived. The user name is therefore fixed and is not a secret; the realm in the 401
-       says which one to type. */
+    /*
+     * Whether the console asks for a password before it answers, and whether a candidate
+     * matches. The password itself is never handed back out, the same way the WiFi pass
+     * phrase is not: what a caller may learn is yes or no.
+     *
+     * The candidate is the base64 blob out of an Authorization header, not the password -
+     * and that is a decision about flash rather than about layering. Basic sends
+     * base64("user:password"), the ESP32 core can only *encode*, and encoding the expected
+     * value once to compare strings is a decoder's worth of code less than decoding what
+     * arrived. The user name is therefore fixed and is not a secret; the realm in the 401
+     * says which one to type.
+     */
     bool IsConsoleProtected() const;
 
-    /* Not in the platform contract, and deliberately: the core has no business checking a
-       credential, it only needs to answer whether one is asked for. This is between System
-       and this backend's own WebInterface, which is why the Pico's has a different shape -
-       its server library does the comparison itself and wants the password, not a blob. */
+    /*
+     * Not in the platform contract, and deliberately: the core has no business checking a
+     * credential, it only needs to answer whether one is asked for. This is between System
+     * and this backend's own WebInterface, which is why the Pico's has a different shape -
+     * its server library does the comparison itself and wants the password, not a blob.
+     */
     bool IsConsoleCredentialValid(const char*) const;
 
-    /* Stores the password the console is to ask for, or clears it when given an empty
-       string - which is the state a clock ships in, so an update introduces no lock and the
-       access point of a first setup still answers. A password that is forgotten is undone
-       from the serial line, which is the one way in that does not go through the console. */
+    /*
+     * Stores the password the console is to ask for, or clears it when given an empty
+     * string - which is the state a clock ships in, so an update introduces no lock and the
+     * access point of a first setup still answers. A password that is forgotten is undone
+     * from the serial line, which is the one way in that does not go through the console.
+     */
     StdReturnType SetConsolePassword(const char*);
 
 
     // methods
-    /* Brings the network up as configured: the stored credentials, or the access point
-       when there are none. Called once at start-up and again whenever the credentials
-       change. */
+    /*
+     * Brings the network up as configured: the stored credentials, or the access point
+     * when there are none. Called once at start-up and again whenever the credentials
+     * change.
+     */
     void StartNetwork();
 
-    /* Asks for a restart, which the application carries out on its next tick through
-       PerformPendingRestart(). Deferred rather than done here so that the answer to the
-       command that asked for it still goes out. */
+    /*
+     * Asks for a restart, which the application carries out on its next tick through
+     * PerformPendingRestart(). Deferred rather than done here so that the answer to the
+     * command that asked for it still goes out.
+     */
     StdReturnType Restart() { restart_pending_ = true; return kEOk; }
 
-    /* Called from the application's tick, after everything that had something to send has
-       sent it. Does not return when a restart was asked for. */
+    // Called from the application's tick, after everything that had something to send has
+    // sent it. Does not return when a restart was asked for.
     void PerformPendingRestart();
 
-    /* Asks the network for the time again. What it is for is the clock that came up while
-       the time server was unreachable and has been showing nothing since. */
+    // Asks the network for the time again. What it is for is the clock that came up while
+    // the time server was unreachable and has been showing nothing since.
     StdReturnType ResynchroniseTime();
 
-    /* Joins the network again, for the clock whose access point was away longer than the
-       core's own retries lasted. */
+    // Joins the network again, for the clock whose access point was away longer than the
+    // core's own retries lasted.
     StdReturnType ReconnectNetwork();
 };
 

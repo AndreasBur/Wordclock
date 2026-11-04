@@ -113,9 +113,11 @@ StdReturnType WebSocket::DecodeFrame(std::string& buffer, uint8_t& opcode, std::
     size_t offset = kHeaderLength;
 
     if(length == kLength64Bit) {
-        /* A command is never this long, and a browser that says so is not one this serves.
-           Dropping what arrived is better than trying to read it - and better than keeping
-           it, which would leave every later frame stuck behind this one. */
+        /*
+         * A command is never this long, and a browser that says so is not one this serves.
+         * Dropping what arrived is better than trying to read it - and better than keeping
+         * it, which would leave every later frame stuck behind this one.
+         */
         buffer.clear();
         return kENotOk;
     }

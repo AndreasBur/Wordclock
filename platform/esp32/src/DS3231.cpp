@@ -38,12 +38,12 @@ constexpr byte kRegisterDay{4u};
 constexpr byte kRegisterMonth{5u};
 constexpr byte kRegisterYear{6u};
 
-/* The chip keeps two year digits and a century bit; ClockDate covers 2000 to 2099, so the
-   bit is always clear and the century is this constant. */
+// The chip keeps two year digits and a century bit; ClockDate covers 2000 to 2099, so the
+// bit is always clear and the century is this constant.
 constexpr ClockDateTime::YearType kYearOfCentury{2000u};
 
-/* The chip counts weekdays from one, ClockDate from zero. Neither says which day is
-   first, and nothing reads the register back, so only the range has to match. */
+// The chip counts weekdays from one, ClockDate from zero. Neither says which day is
+// first, and nothing reads the register back, so only the range has to match.
 constexpr byte kWeekdayOffset{1u};
 
 } // namespace

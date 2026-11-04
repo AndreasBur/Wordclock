@@ -63,11 +63,13 @@ class MsgCmdAnimationParser : public MsgParameterParser<MsgCmdAnimationParser, M
     byte speed_{0u};
     bool favourite_{true};
 
-    /* Which options the message actually carried. The values above are preloaded with
-       the current settings so a message may set single options, but writing all of them
-       back would do harm: -F and -S address whatever -A points at, so a preloaded value
-       would land on the newly selected animation instead of the one it was read from.
-       A message without options also has to stay a pure query. */
+    /*
+     * Which options the message actually carried. The values above are preloaded with
+     * the current settings so a message may set single options, but writing all of them
+     * back would do harm: -F and -S address whatever -A points at, so a preloaded value
+     * would land on the newly selected animation instead of the one it was read from.
+     * A message without options also has to stay a pure query.
+     */
     bool animation_given_{false};
     bool mode_given_{false};
     bool speed_given_{false};
@@ -159,8 +161,8 @@ class MsgCmdAnimationParser : public MsgParameterParser<MsgCmdAnimationParser, M
     MsgCmdAnimationParser(const char* parameter) : MsgParameterParser(kParameterTable, parameter), animation_id_(), mode_(), speed_(0u), favourite_(true),
         animation_given_(false), mode_given_(false), speed_given_(false), favourite_given_(false)
     {
-        /* preloaded with the current settings, so a command may set single options
-           without resetting the others */
+        // preloaded with the current settings, so a command may set single options
+        // without resetting the others
         animation_id_ = Animations::GetInstance().GetAnimation();
         mode_ = Animations::GetInstance().GetMode();
         speed_ = Scheduler::ConvertTaskCycleToSpeed(Animations::GetInstance().GetTaskCycle(animation_id_));

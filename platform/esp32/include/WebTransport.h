@@ -44,8 +44,8 @@
 /******************************************************************************************************************************************************
  *  C L A S S   W E B   R E S P O N S E   B O D Y
 ******************************************************************************************************************************************************/
-/* One route's answer, being written. This server is pushed to: a chunk handed over is a
-   chunk on the wire, and Finish() is the empty chunk that ends a chunked response. */
+// One route's answer, being written. This server is pushed to: a chunk handed over is a
+// chunk on the wire, and Finish() is the empty chunk that ends a chunked response.
 class WebResponseBody
 {
   private:
@@ -61,9 +61,11 @@ class WebResponseBody
 /******************************************************************************************************************************************************
  *  C L A S S   W E B   T R A N S P O R T
 ******************************************************************************************************************************************************/
-/* Where a finished line or a display frame leaves for whoever is watching. This server hands
-   out socket descriptors that the backend has to keep itself, so HasClients() is a walk over
-   that table rather than a count somebody else keeps. */
+/*
+ * Where a finished line or a display frame leaves for whoever is watching. This server hands
+ * out socket descriptors that the backend has to keep itself, so HasClients() is a walk over
+ * that table rather than a count somebody else keeps.
+ */
 class WebTransport
 {
   public:

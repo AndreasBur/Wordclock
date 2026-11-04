@@ -55,9 +55,11 @@ END_EVENT_TABLE()
 ******************************************************************************************************************************************************/
 MessageBuilder::MessageBuilder(wxWindow* parent, const wxString &title) : wxDialog(parent, wxID_ANY, title)
 {
-    /* Not SetSizerAndFit(): that also pins the minimum size to the height fitted here,
-       and the window then cannot shrink again when a command with fewer options is
-       picked. ShowOptionsOfSelectedCommand() sizes it instead, on every change. */
+    /*
+     * Not SetSizerAndFit(): that also pins the minimum size to the height fitted here,
+     * and the window then cannot shrink again when a command with fewer options is
+     * picked. ShowOptionsOfSelectedCommand() sizes it instead, on every change.
+     */
     SetSizer(CreateSizerAll(this));
 
     ShowOptionsOfSelectedCommand();
@@ -86,8 +88,8 @@ wxBoxSizer* MessageBuilder::CreateSizerAll(wxWindow* parent)
     wxStaticBox* static_box = new wxStaticBox(parent, kIdStaticBoxMessage, _T("Command"));
     wxStaticBoxSizer* sizer_all = new wxStaticBoxSizer(static_box, wxVERTICAL);
 
-    /* wxCB_READONLY so it behaves as the wxChoice it replaces: pick from the list, do not
-       type into it. */
+    // wxCB_READONLY so it behaves as the wxChoice it replaces: pick from the list, do not
+    // type into it.
     command_choice_ = new wxOwnerDrawnComboBox(parent, kIdChoiceCommand, wxEmptyString,
                                              wxDefaultPosition, wxDefaultSize,
                                              0, nullptr, wxCB_READONLY);
@@ -100,9 +102,11 @@ wxBoxSizer* MessageBuilder::CreateSizerAll(wxWindow* parent)
 
     sizer_all->Add(command_choice_, 0, wxALL | wxEXPAND, kBorder);
 
-    /* Every row is built once, for the command with the longest option list, and later
-       only shown or hidden. Creating and destroying them per selection would be the same
-       widgets over and over, with more to go wrong. */
+    /*
+     * Every row is built once, for the command with the longest option list, and later
+     * only shown or hidden. Creating and destroying them per selection would be the same
+     * widgets over and over, with more to go wrong.
+     */
     for(byte index = 0u; index < MESSAGE_CATALOG_MAX_NUMBER_OF_OPTIONS; index++) {
         wxBoxSizer* sizer_option = new wxBoxSizer(wxHORIZONTAL);
 
@@ -152,16 +156,20 @@ void MessageBuilder::ShowOptionsOfSelectedCommand()
 
     for(byte index = 0u; index < MESSAGE_CATALOG_MAX_NUMBER_OF_OPTIONS; index++) {
         const bool exists = index < command.number_of_options;
-        /* A read-only field is answered, never sent, so it gets no row of its own. Its
-           name is still in the catalog, which is what lets the decoder put a label on it
-           when the answer comes back. */
+        /*
+         * A read-only field is answered, never sent, so it gets no row of its own. Its
+         * name is still in the catalog, which is what lets the decoder put a label on it
+         * when the answer comes back.
+         */
         const bool used = exists && !command.options[index].read_only;
 
         bool named = false;
 
-        /* Cleared for every option this command has, not only for the ones that get a row:
-           a checkbox left ticked from a previous command would otherwise put its option
-           into the message although nothing shows it. */
+        /*
+         * Cleared for every option this command has, not only for the ones that get a row:
+         * a checkbox left ticked from a previous command would otherwise put its option
+         * into the message although nothing shows it.
+         */
         if(exists) { option_rows_[index].use->SetValue(false); }
 
         if(used) {
@@ -195,9 +203,11 @@ void MessageBuilder::ShowOptionsOfSelectedCommand()
         EnableOptionValue(index, false);
     }
 
-    /* Resizes the window to the rows that are left and moves its minimum along, so it
-       follows the content in both directions. Fixing it at the height of the longest
-       option list would leave a command with one option above 360 pixels of nothing. */
+    /*
+     * Resizes the window to the rows that are left and moves its minimum along, so it
+     * follows the content in both directions. Fixing it at the height of the longest
+     * option list would leave a command with one option above 360 pixels of nothing.
+     */
     Layout();
     GetSizer()->SetSizeHints(this);
     UpdatePreview();
@@ -226,8 +236,8 @@ wxString MessageBuilder::BuildMessage() const
         wxString argument;
 
         if(option.value_names != nullptr) {
-            /* The names run upwards from Minimum, so the position in the dropdown is the
-               offset from it — what goes on the wire stays the number. */
+            // The names run upwards from Minimum, so the position in the dropdown is the
+            // offset from it — what goes on the wire stays the number.
             argument = wxString::Format(wxT("%u"), option.minimum + option_rows_[index].choice->GetSelection());
         } else {
             argument = option_rows_[index].value->GetValue();
@@ -303,9 +313,11 @@ void MessageBuilder::OnInsert(wxCommandEvent &event)
 ******************************************************************************************************************************************************/
 void MessageBuilder::OnClose(wxCloseEvent &event)
 {
-    /* Hide rather than destroy: GetInstance() keeps handing out this very dialog, so a
-       destroyed one would leave the singleton pointing at freed memory. The parent
-       window destroys it when the application exits. */
+    /*
+     * Hide rather than destroy: GetInstance() keeps handing out this very dialog, so a
+     * destroyed one would leave the singleton pointing at freed memory. The parent
+     * window destroys it when the application exits.
+     */
     Hide();
     UNUSED(event);
 } /* OnClose */

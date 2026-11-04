@@ -100,9 +100,11 @@ class MsgCmdDisplayPixelParser : public MsgParameterParser<MsgCmdDisplayPixelPar
 
     static StateType GetPixelState(byte index)
     {
-        /* Asked before reading rather than read and then judged by a return code: the pixel
-           itself is what this answers with, and an index that is not on the display has no
-           state rather than a false one. */
+        /*
+         * Asked before reading rather than read and then judged by a return code: the pixel
+         * itself is what this answers with, and an index that is not on the display has no
+         * state rather than a false one.
+         */
         if(!Display::GetInstance().IsIndexValid(index)) { return StateType::kNone; }
 
         return GetPixelState(Display::GetInstance().GetPixel(index));

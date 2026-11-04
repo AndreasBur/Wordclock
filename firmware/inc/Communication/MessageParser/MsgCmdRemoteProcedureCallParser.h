@@ -81,9 +81,11 @@ class MsgCmdRemoteProcedureCallParser : public MsgParameterParser<MsgCmdRemotePr
         kDisplayBrightnessGammaCorrectionOff,
         kPowerOn,
         kPowerOff,
-        /* Appended rather than sorted into the display group above: the ids are what a
-           front end, this repository's own documentation and anybody's notes have written
-           down, and inserting one would silently change what every id behind it does. */
+        /*
+         * Appended rather than sorted into the display group above: the ids are what a
+         * front end, this repository's own documentation and anybody's notes have written
+         * down, and inserting one would silently change what every id behind it does.
+         */
         kClockRefresh,
         kAnimationStart,
         kAnimationAbort,
@@ -96,9 +98,11 @@ class MsgCmdRemoteProcedureCallParser : public MsgParameterParser<MsgCmdRemotePr
         kSystemRestart,
         kTimeResynchronise,
         kNetworkReconnect,
-        /* For a control that cannot name a value, only ask for one further - see the
-           increment and decrement pairs above, which are the same eight for the colour
-           and the brightness. */
+        /*
+         * For a control that cannot name a value, only ask for one further - see the
+         * increment and decrement pairs above, which are the same eight for the colour
+         * and the brightness.
+         */
         kAnimationNext,
         kAnimationPrevious,
         kClockModeNext,
@@ -106,8 +110,8 @@ class MsgCmdRemoteProcedureCallParser : public MsgParameterParser<MsgCmdRemotePr
         kDisplayBrightnessAutomaticToggle,
         kDisplayBrightnessGammaCorrectionToggle,
         kDisplayColorReset,
-        /* Only so that the names in the message catalog can be counted against the
-           procedures; never sent, and anything from here on lands in the default case. */
+        // Only so that the names in the message catalog can be counted against the
+        // procedures; never sent, and anything from here on lands in the default case.
         kNumberOfProcedures
     };
     static constexpr byte kNumberOfProcedures{static_cast<byte>(RpcIdType::kNumberOfProcedures)};
@@ -217,21 +221,23 @@ class MsgCmdRemoteProcedureCallParser : public MsgParameterParser<MsgCmdRemotePr
             case RpcIdType::kDisplayTest :
                 Display::GetInstance().Test();
                 break;
-            /* The switch in the strip's 5 V, not the display's enable and disable on ids 3
-               and 4 - those set the brightness to zero and leave a powered strip drawing its
-               quiescent current. Both pairs exist and neither stands in for the other.
-
-               Only asked for here. Cutting the supply means blanking the strip over the data
-               line and waiting for that frame to be gone, and the frame is not gone when this
-               returns: nothing is transmitted until the application's tick renders, and the
-               transmission outlives that call as well. Power carries the order out over the
-               ticks that follow, the way SYSTEM_RESTART leaves the restart to one.
-
-               A board built without the switch has the high side MOSFET bridged and nothing
-               to act on, which is its own answer rather than kENotOk: the caller asked for
-               something this clock does not have, and "unknown" would not say so. The circuit
-               is written down in platform/esp32/README.md, under "Switching the strip's
-               supply". */
+            /*
+             * The switch in the strip's 5 V, not the display's enable and disable on ids 3
+             * and 4 - those set the brightness to zero and leave a powered strip drawing its
+             * quiescent current. Both pairs exist and neither stands in for the other.
+             *
+             * Only asked for here. Cutting the supply means blanking the strip over the data
+             * line and waiting for that frame to be gone, and the frame is not gone when this
+             * returns: nothing is transmitted until the application's tick renders, and the
+             * transmission outlives that call as well. Power carries the order out over the
+             * ticks that follow, the way SYSTEM_RESTART leaves the restart to one.
+             *
+             * A board built without the switch has the high side MOSFET bridged and nothing
+             * to act on, which is its own answer rather than kENotOk: the caller asked for
+             * something this clock does not have, and "unknown" would not say so. The circuit
+             * is written down in platform/esp32/README.md, under "Switching the strip's
+             * supply".
+             */
             case RpcIdType::kPowerOn :
                 if(!Power::IsSwitchFitted()) { answer_error_ = ErrorMessage::ErrorType::kPowerSwitchAbsent; }
                 else { return_value_ = Power::GetInstance().SwitchSupplyOn(); }
@@ -240,10 +246,12 @@ class MsgCmdRemoteProcedureCallParser : public MsgParameterParser<MsgCmdRemotePr
                 if(!Power::IsSwitchFitted()) { answer_error_ = ErrorMessage::ErrorType::kPowerSwitchAbsent; }
                 else { return_value_ = Power::GetInstance().SwitchSupplyOff(); }
                 break;
-            /* These seven answer kENotOk where the display is busy with something else,
-               rather than doing it anyway: an overlay holding the display and an overlay
-               already showing are the two states in which "now" cannot be honoured, and a
-               caller that is told so can try again. */
+            /*
+             * These seven answer kENotOk where the display is busy with something else,
+             * rather than doing it anyway: an overlay holding the display and an overlay
+             * already showing are the two states in which "now" cannot be honoured, and a
+             * caller that is told so can try again.
+             */
             case RpcIdType::kClockRefresh :
                 return_value_ = DisplayManager::GetInstance().RefreshClock();
                 break;
@@ -271,9 +279,11 @@ class MsgCmdRemoteProcedureCallParser : public MsgParameterParser<MsgCmdRemotePr
             case RpcIdType::kSettingsReset :
                 return_value_ = Persistence::GetInstance().Reset();
                 break;
-            /* Asks for a restart rather than carrying one out: the answer to this command
-               is sent after Process() returns, and a controller that restarted in here
-               would take that answer with it. */
+            /*
+             * Asks for a restart rather than carrying one out: the answer to this command
+             * is sent after Process() returns, and a controller that restarted in here
+             * would take that answer with it.
+             */
             case RpcIdType::kSystemRestart :
                 return_value_ = System::GetInstance().Restart();
                 break;
@@ -283,12 +293,14 @@ class MsgCmdRemoteProcedureCallParser : public MsgParameterParser<MsgCmdRemotePr
             case RpcIdType::kNetworkReconnect :
                 return_value_ = System::GetInstance().ReconnectNetwork();
                 break;
-            /* These seven cannot be refused, which is why none of them takes a return
-               value: every one of them is a setting moved to its neighbour, and a setting
-               has no state it can be in that makes the next one unreachable. What they
-               ask of the display is left to the display - the clock's wording redraws
-               through DisplayManager's latch on the next task, and the selected animation
-               runs at the next word change, the same as if a phone had sent the value. */
+            /*
+             * These seven cannot be refused, which is why none of them takes a return
+             * value: every one of them is a setting moved to its neighbour, and a setting
+             * has no state it can be in that makes the next one unreachable. What they
+             * ask of the display is left to the display - the clock's wording redraws
+             * through DisplayManager's latch on the next task, and the selected animation
+             * runs at the next word change, the same as if a phone had sent the value.
+             */
             case RpcIdType::kAnimationNext :
                 Animations::GetInstance().NextAnimation();
                 break;

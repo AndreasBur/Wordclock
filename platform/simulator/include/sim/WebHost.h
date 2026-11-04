@@ -46,8 +46,8 @@
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
-/* Not 80: a desktop needs root for that, and the point of this is to be started like any
-   other program. The console prints the address on start-up. */
+// Not 80: a desktop needs root for that, and the point of this is to be started like any
+// other program. The console prints the address on start-up.
 #define WEB_HOST_PORT                                   8080u
 
 /* How many browsers may watch at once. A slot is a socket and nothing more. */
@@ -80,9 +80,11 @@ class WebHost
     static constexpr char kUpdateRequestLine[]{"POST /update "};
     static constexpr char kLengthHeader[]{"content-length:"};
 
-    /* A slot holds a connection that has finished its handshake and is being broadcast to.
-       Anything before that is a request being read and is gone by the end of the tick that
-       read it. */
+    /*
+     * A slot holds a connection that has finished its handshake and is being broadcast to.
+     * Anything before that is a request being read and is gone by the end of the tick that
+     * read it.
+     */
     SocketType listener_{kInvalidSocket};
     SocketType clients_[WEB_HOST_MAX_CLIENTS];
     std::string pending_[WEB_HOST_MAX_CLIENTS];
@@ -116,9 +118,11 @@ class WebHost
   public:
     static WebHost& GetInstance();
 
-    /* Opens the listening socket and takes over the output lines. Answers kENotOk when the
-       port is taken, which leaves the simulator running exactly as it did before - a window
-       and no browsers, which is what it was until now. */
+    /*
+     * Opens the listening socket and takes over the output lines. Answers kENotOk when the
+     * port is taken, which leaves the simulator running exactly as it did before - a window
+     * and no browsers, which is what it was until now.
+     */
     StdReturnType Begin();
 
     /* Accepts what has arrived and answers it. Called from the firmware's tick. */

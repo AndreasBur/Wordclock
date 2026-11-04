@@ -27,10 +27,12 @@ namespace {
 
 constexpr uint16_t kFrameSize{PIXELS_NUMBER_OF_LEDS * Pixel::GetNumberOfColors()};
 
-/* The frame the interrupt reads from while it transmits. Separate from the pixel buffer
-   because the transmission outlives the call: the next tick may already be writing new
-   pixels while the previous frame is still going out, and sharing one buffer would put
-   half of each on the strip. */
+/*
+ * The frame the interrupt reads from while it transmits. Separate from the pixel buffer
+ * because the transmission outlives the call: the next tick may already be writing new
+ * pixels while the previous frame is still going out, and sharing one buffer would put
+ * half of each on the strip.
+ */
 byte frame_buffer[kFrameSize]{};
 
 } // namespace
@@ -67,9 +69,11 @@ void Pixels::FillFrameBuffer() const
 ******************************************************************************************************************************************************/
 StdReturnType Pixels::TransmitFrame()
 {
-    /* Not waited for: a frame still on the wire means the previous tick's is barely done,
-       and the display is redrawn on the next one anyway. Blocking here would hold up the
-       clock for a frame nobody would have seen. */
+    /*
+     * Not waited for: a frame still on the wire means the previous tick's is barely done,
+     * and the display is redrawn on the next one anyway. Blocking here would hold up the
+     * clock for a frame nobody would have seen.
+     */
     if(WS2812::GetInstance().IsBusy()) { return kENotOk; }
 
     FillFrameBuffer();
@@ -114,28 +118,32 @@ void Pixels::Init(byte pin)
 ******************************************************************************************************************************************************/
 StdReturnType Pixels::Render()
 {
-    /* Before the dirty check, and the buffer is left marked on purpose: while the strip has
-       no supply nothing may reach DIN, and the supply coming back has to find a frame still
-       owed rather than a buffer that looks up to date. */
+    /*
+     * Before the dirty check, and the buffer is left marked on purpose: while the strip has
+     * no supply nothing may reach DIN, and the supply coming back has to find a frame still
+     * owed rather than a buffer that looks up to date.
+     */
     if(output_suspended_) { return kEOk; }
 
     if(!dirty_) { return kEOk; }
     if(!initialised_) { return kENotOk; }
 
     const StdReturnType result = TransmitFrame();
-    /* Cleared even when the transmission failed, so a strip that does not take the frame
-       cannot turn every following tick into another failing attempt. */
+    // Cleared even when the transmission failed, so a strip that does not take the frame
+    // cannot turn every following tick into another failing attempt.
     dirty_ = false;
 
     return result;
 } /* Render */
 
 
-/* An instance method, though it reads no member: it is part of the interface the
-   firmware core calls through GetInstance(), and every backend - the simulator's
-   stand-ins included - offers it that way. Whether this backend's implementation
-   happens to need a member is its own detail, and answering the check would carry
-   that detail into the interface. */
+/*
+ * An instance method, though it reads no member: it is part of the interface the
+ * firmware core calls through GetInstance(), and every backend - the simulator's
+ * stand-ins included - offers it that way. Whether this backend's implementation
+ * happens to need a member is its own detail, and answering the check would carry
+ * that detail into the interface.
+ */
 // NOLINTBEGIN(readability-convert-member-functions-to-static)
 /******************************************************************************************************************************************************
   IsFrameOnTheWire()
@@ -170,8 +178,8 @@ StdReturnType Pixels::GetPixel(byte index, PixelType& pixel) const
 ******************************************************************************************************************************************************/
 Pixels::PixelType Pixels::GetPixel(byte index) const
 {
-    /* An index that is not on the strip has no pixel, and an unlit one is the answer no
-       caller can mistake for an LED that is on. */
+    // An index that is not on the strip has no pixel, and an unlit one is the answer no
+    // caller can mistake for an LED that is on.
     if(!IsIndexValid(index)) { return PixelType{}; }
 
     return pixel_buffer_[ToRow(index)][ToColumn(index)];

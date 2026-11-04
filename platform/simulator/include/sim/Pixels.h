@@ -69,22 +69,26 @@ class Pixels
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    /* Zero-initialised, so the strip starts dark rather than at whatever the memory
-       held - the hardware driver starts from a defined state too. */
+    // Zero-initialised, so the strip starts dark rather than at whatever the memory
+    // held - the hardware driver starts from a defined state too.
     PixelType pixel_buffer_[PIXELS_DISPLAY_NUMBER_OF_ROWS][PIXELS_DISPLAY_NUMBER_OF_COLUMNS]{};
     byte pin_{0};
     byte brightness_{255};
-    /* Whether the firmware touched buffer or brightness since the last render. It saves
-       the window a pass over all 110 cells on the ticks where nothing happened, and it
-       is what lets a test see whether a redraw was attempted at all - which is exactly
-       what DisplayManager's word-set latch promises not to do. Starts true so the first
-       pass establishes the window's colours. */
+    /*
+     * Whether the firmware touched buffer or brightness since the last render. It saves
+     * the window a pass over all 110 cells on the ticks where nothing happened, and it
+     * is what lets a test see whether a redraw was attempted at all - which is exactly
+     * what DisplayManager's word-set latch promises not to do. Starts true so the first
+     * pass establishes the window's colours.
+     */
     bool dirty_{true};
-    /* Whether anything may reach the strip at all. Separate from a brightness of zero,
-       which still sends a frame of black pixels: this is for the state in which the strip
-       has no supply, and a frame arriving then pushes current into a dead rail through the
-       LED's own protection diode. Starts false, because a strip that is powered is what
-       every backend comes up with. */
+    /*
+     * Whether anything may reach the strip at all. Separate from a brightness of zero,
+     * which still sends a frame of black pixels: this is for the state in which the strip
+     * has no supply, and a frame arriving then pushes current into a dead rail through the
+     * LED's own protection diode. Starts false, because a strip that is powered is what
+     * every backend comes up with.
+     */
     bool output_suspended_{false};
 
     // functions
@@ -104,10 +108,12 @@ class Pixels
     }
 
     // get methods
-    /* Two forms of the reader, and the argument list says which: the one taking a reference
-       answers whether the index is on the strip, the one taking none answers the pixel and
-       leaves an unlit one where the index is not. Both check. Writers have a single form,
-       which answers, and a caller that has nothing to do with the answer ignores it. */
+    /*
+     * Two forms of the reader, and the argument list says which: the one taking a reference
+     * answers whether the index is on the strip, the one taking none answers the pixel and
+     * leaves an unlit one where the index is not. Both check. Writers have a single form,
+     * which answers, and a caller that has nothing to do with the answer ignores it.
+     */
     byte GetBrightness() const { return brightness_; }
     StdReturnType GetPixel(byte, PixelType&) const;
     PixelType GetPixel(byte) const;
@@ -136,8 +142,8 @@ class Pixels
     void EnablePixels() { SetBrightness(255); }
     void DisablePixels() { SetBrightness(0); }
     void ClearPixels() { SetPixels(PixelType(0u, 0u, 0u)); }
-    /* On the hardware this hands the buffer to the strip. Here it only asks for a
-       render, which PixelsFrame picks up on the next tick. */
+    // On the hardware this hands the buffer to the strip. Here it only asks for a
+    // render, which PixelsFrame picks up on the next tick.
     StdReturnType Show() {
         dirty_ = true;
         return kEOk;
@@ -148,15 +154,19 @@ class Pixels
     void ClearDirty() { dirty_ = false; }
 
     // output gate, for the supply switch
-    /* Nothing is on a wire here, so a frame is never still going out. The hardware
-       backends ask their peripheral, and answering false is what lets the sequence that
-       waits for a frame be tested without one. */
+    /*
+     * Nothing is on a wire here, so a frame is never still going out. The hardware
+     * backends ask their peripheral, and answering false is what lets the sequence that
+     * waits for a frame be tested without one.
+     */
     static constexpr bool IsFrameOnTheWire() { return false; }
     bool IsOutputSuspended() const { return output_suspended_; }
     void SuspendOutput() { output_suspended_ = true; }
-    /* Marks the buffer, so what comes back is a redraw and not the window's last state:
-       the LEDs lose their registers along with their supply, so on hardware there is
-       nothing left up there to keep showing. */
+    /*
+     * Marks the buffer, so what comes back is a redraw and not the window's last state:
+     * the LEDs lose their registers along with their supply, so on hardware there is
+     * nothing left up there to keep showing.
+     */
     void ResumeOutput() { output_suspended_ = false; dirty_ = true; }
 };
 

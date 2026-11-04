@@ -36,9 +36,11 @@
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
 /* RealTimeClock configuration parameter */
-/* Application ticks between two reads of the chip, so once a second. A read is two
-   transfers on a bus the light sensor shares, and the display only ever shows minutes -
-   asking a hundred times a second would buy nothing. */
+/*
+ * Application ticks between two reads of the chip, so once a second. A read is two
+ * transfers on a bus the light sensor shares, and the display only ever shows minutes -
+ * asking a hundred times a second would buy nothing.
+ */
 #define REAL_TIME_CLOCK_CHIP_READ_INTERVAL              100u
 
 /******************************************************************************************************************************************************
@@ -66,12 +68,14 @@ class RealTimeClock
     static constexpr byte kChipReadInterval{REAL_TIME_CLOCK_CHIP_READ_INTERVAL};
 
     ClockDateTime date_time_;
-    /* An instance of its own, next to the one the core's temperature side keeps. The chip
-       has no state that two readers could disturb, and both reach it through the same bus
-       driver. */
+    /*
+     * An instance of its own, next to the one the core's temperature side keeps. The chip
+     * has no state that two readers could disturb, and both reach it through the same bus
+     * driver.
+     */
     DS3231 chip_;
-    /* Zero, so the first tick asks the chip straight away rather than showing the default
-       date for a second. */
+    // Zero, so the first tick asks the chip straight away rather than showing the default
+    // date for a second.
     byte chip_read_countdown_{0u};
 
     // functions

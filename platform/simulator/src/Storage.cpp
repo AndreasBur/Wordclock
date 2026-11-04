@@ -34,10 +34,12 @@
  *
  *  \return         kEOk if exactly Size bytes were read
 ******************************************************************************************************************************************************/
-/* Not static, though nothing in them reads a member: these stand in for the backends the
-   clock really runs on, and there the same call reaches a peripheral through instance
-   state. A stand-in that answered the check would have a different API from the thing it
-   stands in for, which is the one property it exists to keep. */
+/*
+ * Not static, though nothing in them reads a member: these stand in for the backends the
+ * clock really runs on, and there the same call reaches a peripheral through instance
+ * state. A stand-in that answered the check would have a different API from the thing it
+ * stands in for, which is the one property it exists to keep.
+ */
 // NOLINTBEGIN(readability-convert-member-functions-to-static)
 StdReturnType Storage::Read(byte* buffer, size_t size) const
 {
@@ -47,9 +49,11 @@ StdReturnType Storage::Read(byte* buffer, size_t size) const
     if(file == nullptr) { return kENotOk; }
 
     const size_t read = std::fread(buffer, 1u, size, file);
-    /* One byte more would mean the file outgrew what is being asked for, which is the
-       same mismatch as one byte less. Only asked when the read delivered, because after a
-       failed one the standard stops saying where the position is. */
+    /*
+     * One byte more would mean the file outgrew what is being asked for, which is the
+     * same mismatch as one byte less. Only asked when the read delivered, because after a
+     * failed one the standard stops saying where the position is.
+     */
     const bool is_at_end = (read == size) && (std::fgetc(file) == EOF);
     /* Nothing to report from closing a stream that was only read. */
     (void)std::fclose(file);

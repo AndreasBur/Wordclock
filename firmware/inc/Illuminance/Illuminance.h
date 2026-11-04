@@ -87,17 +87,19 @@ class Illuminance
     void SetCalibrationValues(CalibrationValuesType calibration_values) { sensor_.SetCalibrationValues(calibration_values); }
 
     // methods
-    /* The calibration back to the span an uncalibrated clock starts in - the same two
-       bounds the driver initialises from, so a reset and a fresh chip agree. Not the
-       sensor's full range: see the defaults in the platform's BH1750.h for why that one
-       leaves the automatic sitting at its floor in every room. */
+    /*
+     * The calibration back to the span an uncalibrated clock starts in - the same two
+     * bounds the driver initialises from, so a reset and a fresh chip agree. Not the
+     * sensor's full range: see the defaults in the platform's BH1750.h for why that one
+     * leaves the automatic sitting at its floor in every room.
+     */
     void ResetToDefaults() {
         SetCalibrationValuesMaxValue(BH1750_CALIBRATION_MAX_DEFAULT_LX_VALUE);
         SetCalibrationValuesMinValue(BH1750_CALIBRATION_MIN_DEFAULT_LX_VALUE);
     }
 
-    /* Both refuse while the sensor has nothing measured, so the answer to the procedure is
-       the sensor's rather than an unconditional success. */
+    // Both refuse while the sensor has nothing measured, so the answer to the procedure is
+    // the sensor's rather than an unconditional success.
     StdReturnType StartCalibrationMaxValue() { return sensor_.StartCalibrationMaxValue(); }
     StdReturnType StartCalibrationMinValue() { return sensor_.StartCalibrationMinValue(); }
 

@@ -18,9 +18,11 @@
 #include "Pixels.h"
 #include "sim/Storage.h"
 
-/* Reaches around Storage on purpose, which nothing else may: damaging a stored blob is
-   the one thing the store's own interface will not do, and rejecting a damaged one is
-   what has to be shown. */
+/*
+ * Reaches around Storage on purpose, which nothing else may: damaging a stored blob is
+ * the one thing the store's own interface will not do, and rejecting a damaged one is
+ * what has to be shown.
+ */
 bool DamageStoredChecksum()
 {
     std::array<byte, Storage::kCapacity> blob{};
@@ -34,9 +36,11 @@ bool DamageStoredChecksum()
 
     if(read_failed || read_close_result != 0 || size == 0u) { return false; }
 
-    /* The last byte, which is behind every field the format names - so this flip leaves
-       magic and version intact and is caught only if the checksum really covers the whole
-       blob rather than the fields it happens to know about. */
+    /*
+     * The last byte, which is behind every field the format names - so this flip leaves
+     * magic and version intact and is caught only if the checksum really covers the whole
+     * blob rather than the fields it happens to know about.
+     */
     blob[size - 1u] = static_cast<byte>(blob[size - 1u] + 1u);
 
     file = std::fopen(STORAGE_FILE_NAME, "wb");
@@ -47,9 +51,11 @@ bool DamageStoredChecksum()
     return written == size && write_close_result == 0;
 }
 
-/* The whole persistence path, on the store the simulator really writes to. Runs last
-   because it leaves the clock and the display on values of its own, and it clears the
-   store afterwards so a second run starts where this one did. */
+/*
+ * The whole persistence path, on the store the simulator really writes to. Runs last
+ * because it leaves the clock and the display on values of its own, and it clears the
+ * store afterwards so a second run starts where this one did.
+ */
 void TestPersistence()
 {
     Storage& storage = Storage::GetInstance();
@@ -88,8 +94,8 @@ void TestPersistence()
     Expect(Illuminance::GetInstance().GetCalibrationValuesMaxValue() == 4321u,
            "the sensor calibration must come back");
 
-    /* Nothing changed since that restore, so nothing may be written - which is the whole
-       reason there is no dirty flag to forget. */
+    // Nothing changed since that restore, so nothing may be written - which is the whole
+    // reason there is no dirty flag to forget.
     Expect(storage.Clear() == kEOk, "clearing a written store must succeed");
     persistence.Task();
     Expect(persistence.Load() == kENotOk, "an unchanged configuration must not have been written");
@@ -105,9 +111,11 @@ void TestPersistence()
     Expect(storage.Clear() == kEOk, "the test must leave the store as it found it");
 }
 
-/* The two procedures that reach the store directly. What they are for is what Task()
-   cannot do: write before the plug is pulled rather than within the next period, and get
-   a clock back to what it left the factory as without erasing its flash over USB. */
+/*
+ * The two procedures that reach the store directly. What they are for is what Task()
+ * cannot do: write before the plug is pulled rather than within the next period, and get
+ * a clock back to what it left the factory as without erasing its flash over USB.
+ */
 void TestPersistenceSaveAndReset()
 {
     Storage& storage = Storage::GetInstance();
@@ -126,9 +134,11 @@ void TestPersistenceSaveAndReset()
     Expect(display.GetColorRed() == 1u, "and it must be what was saved");
     Expect(!clock.GetShowItIsPermanently(), "including the it is rule");
 
-    /* The overlays, which used to be the one configured thing a power cut took away. The
-       text goes through the store as a whole buffer, so a shorter one written after a
-       longer one must not leave the tail of the longer behind. */
+    /*
+     * The overlays, which used to be the one configured thing a power cut took away. The
+     * text goes through the store as a whole buffer, so a shorter one written after a
+     * longer one must not leave the tail of the longer behind.
+     */
     Overlays& overlays = Overlays::GetInstance();
 
     overlays.SetTextText("Herzlichen Glueckwunsch", 24u);
@@ -175,14 +185,14 @@ void TestPersistenceSaveAndReset()
     Expect(display.GetColorRed() == 255u && display.GetColorGreen() == 255u && display.GetColorBlue() == 255u,
            "the reset must put the colour back to white");
     Expect(display.GetBrightness() == 255u, "the reset must put the brightness back");
-    /* Qualified because the macro expands to the bare enumerator, and asked through the
-       macro rather than through the mode it happens to name today. */
+    // Qualified because the macro expands to the bare enumerator, and asked through the
+    // macro rather than through the mode it happens to name today.
     Expect(clock.GetMode() == Clock::CLOCK_INITIAL_MODE, "the reset must put the clock mode back");
     Expect(Animations::GetInstance().GetAnimation() == Animations::AnimationIdType::kNone,
            "the reset must deselect the animation");
 
-    /* The store stays empty rather than being refilled with the defaults on the next
-       period - an empty store is what a clock that was never configured has. */
+    // The store stays empty rather than being refilled with the defaults on the next
+    // period - an empty store is what a clock that was never configured has.
     persistence.Task();
     Expect(persistence.Load() == kENotOk, "the task after a reset must leave the store empty");
 

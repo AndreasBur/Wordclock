@@ -184,8 +184,8 @@ wxString MessageDecoder::DescribeRemoteProcedureCall(const wxString& line)
     wxString number;
     if(!tokenizer.GetNextToken().StartsWith(kRemoteProcedureIdPrefix, &number)) { return wxEmptyString; }
 
-    /* As strict about the shape as an answer: without a number behind the prefix this is
-       something else that happens to begin the same way. */
+    // As strict about the shape as an answer: without a number behind the prefix this is
+    // something else that happens to begin the same way.
     uint16_t procedure{0u};
     if(!ToValue(number, procedure)) { return wxEmptyString; }
 
@@ -282,8 +282,8 @@ wxString MessageDecoder::DescribeErrorPart(const wxString& part, const char* ind
 wxString MessageDecoder::DescribeValue(const char* label, const wxString& value,
                                        const char* const* names, byte number_of_names, uint16_t minimum)
 {
-    /* The labels of the error shapes carry the delimiter the firmware prints them with,
-       which would read oddly in front of one of ours. */
+    // The labels of the error shapes carry the delimiter the firmware prints them with,
+    // which would read oddly in front of one of ours.
     wxString described = wxString(label);
     described.Replace(wxString(kOptionArgumentDelimiter), wxEmptyString);
     described += kNameValueSeparator;

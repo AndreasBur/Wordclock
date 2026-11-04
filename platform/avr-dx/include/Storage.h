@@ -36,8 +36,8 @@
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
 /* Storage configuration parameter */
-/* What one Write() may hold. Well above what the core writes today, so its settings can
-   grow without the platforms having to change together. */
+// What one Write() may hold. Well above what the core writes today, so its settings can
+// grow without the platforms having to change together.
 #define STORAGE_CAPACITY                                128u
 
 /* Where the blob starts in the EEPROM. Behind the length byte that precedes it. */
@@ -58,8 +58,8 @@ class Storage
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    /* A length no blob can have, so an EEPROM that was never written - which reads 0xFF
-       throughout on a fresh part - says so by itself and needs no separate magic. */
+    // A length no blob can have, so an EEPROM that was never written - which reads 0xFF
+    // throughout on a fresh part - says so by itself and needs no separate magic.
     static constexpr byte kLengthEmpty{0xFFu};
 
     Storage() { }

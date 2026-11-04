@@ -33,16 +33,18 @@
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
-/* Room for one answer, the same number the two networked backends use. What reads it is the
-   web front end, which sizes the buffer it widens a line into by it. */
+// Room for one answer, the same number the two networked backends use. What reads it is the
+// web front end, which sizes the buffer it widens a line into by it.
 #define WORDCLOCK_SERIAL_LINE_LENGTH                    160u
 
 /******************************************************************************************************************************************************
  *  W O R D C L O C K   S E R I A L
 ******************************************************************************************************************************************************/
-/* The port under the name the firmware reaches it by. An alias rather than a wrapper: there
-   is one port in this backend, and a second object standing in front of it would only be
-   something to keep in step. */
+/*
+ * The port under the name the firmware reaches it by. An alias rather than a wrapper: there
+ * is one port in this backend, and a second object standing in front of it would only be
+ * something to keep in step.
+ */
 using WordclockSerial = SerialShim;
 
 #endif // _WORDCLOCK_SERIAL_H_

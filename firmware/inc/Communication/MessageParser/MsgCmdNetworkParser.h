@@ -88,11 +88,13 @@ class MsgCmdNetworkParser : public MsgParameterParser<MsgCmdNetworkParser, MSG_C
 
     static constexpr size_t Minimum(size_t left, size_t right) { return (left < right) ? left : right; }
 
-    /* A string argument runs to the next option, so it carries the space that separates
-       them. A network called "Home " is not what anybody typed, and joining it would fail
-       in a way that names nothing - so a trailing blank is taken off here. It also means a
-       name or a pass phrase cannot end in a space over this interface, which is written
-       down in the command reference. */
+    /*
+     * A string argument runs to the next option, so it carries the space that separates
+     * them. A network called "Home " is not what anybody typed, and joining it would fail
+     * in a way that names nothing - so a trailing blank is taken off here. It also means a
+     * name or a pass phrase cannot end in a space over this interface, which is written
+     * down in the command reference.
+     */
     static void TrimTrailingBlanks(char* string) {
         for(size_t index = strlen(string); (index > 0u) && (string[index - 1u] == ' '); index--) {
             string[index - 1u] = STD_NULL_CHARACTER;
@@ -111,19 +113,21 @@ class MsgCmdNetworkParser : public MsgParameterParser<MsgCmdNetworkParser, MSG_C
     void SendAnswer() const {
         char stored_ssid[System::kSsidStringLength]{};
 
-        /* An empty name is a clock with no network, which is the state the access point
-           stands in for - the same empty field the status command answers with. */
+        // An empty name is a clock with no network, which is the state the access point
+        // stands in for - the same empty field the status command answers with.
         System::GetInstance().GetNetworkSsid(stored_ssid);
 
         SendAnswerParameter(kSsidShortName, stored_ssid);
-        /* Last field before the command parser's terminating println(), so no trailing
-           separator space. */
+        // Last field before the command parser's terminating println(), so no trailing
+        // separator space.
         error_.Send(return_value_, false);
     }
 
-    /* Both halves or neither: a command that carried only one of them would either join a
-       network with the previous pass phrase or store a pass phrase for the previous
-       network, and both of those are a clock that goes quiet. */
+    /*
+     * Both halves or neither: a command that carried only one of them would either join a
+     * network with the previous pass phrase or store a pass phrase for the previous
+     * network, and both of those are a clock that goes quiet.
+     */
     void Process()
     {
         if(!ssid_given_ && !password_given_) { return; }

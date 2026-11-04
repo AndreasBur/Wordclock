@@ -40,14 +40,16 @@
 /* Twi configuration parameter */
 #define TWI_FREQUENCY_HZ                                100000uL
 
-/* How long one byte may take before the bus is given up on, expressed in bit times so that
-   it means a duration rather than a number of spins: twenty of them is twice what a byte
-   needs, which leaves room for a device stretching the clock and still keeps a dead bus far
-   inside a single tick.
-   The conversion needs the cost of one iteration - a volatile register read, a mask and a
-   branch, call it eight cycles. Guessing low is the safe direction: it yields more
-   iterations, so an inaccurate estimate lengthens the timeout rather than cutting a healthy
-   transfer short. */
+/*
+ * How long one byte may take before the bus is given up on, expressed in bit times so that
+ * it means a duration rather than a number of spins: twenty of them is twice what a byte
+ * needs, which leaves room for a device stretching the clock and still keeps a dead bus far
+ * inside a single tick.
+ * The conversion needs the cost of one iteration - a volatile register read, a mask and a
+ * branch, call it eight cycles. Guessing low is the safe direction: it yields more
+ * iterations, so an inaccurate estimate lengthens the timeout rather than cutting a healthy
+ * transfer short.
+ */
 #define TWI_TIMEOUT_BIT_TIMES                           20u
 #define TWI_TIMEOUT_LOOP_CYCLES                         8u
 #define TWI_TIMEOUT_LOOPS                               static_cast<uint16_t>(((F_CPU / TWI_FREQUENCY_HZ) * TWI_TIMEOUT_BIT_TIMES) / TWI_TIMEOUT_LOOP_CYCLES)
@@ -81,16 +83,16 @@ class Twi
 
     void Init();
 
-    /* Both address the device in seven-bit form, as it is printed in the data sheets; the
-       read/write bit is added here. */
+    // Both address the device in seven-bit form, as it is printed in the data sheets; the
+    // read/write bit is added here.
     StdReturnType Write(byte address, const byte* data, byte length);
     StdReturnType Read(byte address, byte* data, byte length);
 
     /* One register write, the shape every configuration command on this bus takes. */
     StdReturnType WriteRegister(byte address, byte register_address, byte value);
 
-    /* Points the device at a register and reads from there, which is how both chips are
-       read. */
+    // Points the device at a register and reads from there, which is how both chips are
+    // read.
     StdReturnType ReadRegister(byte address, byte register_address, byte* data, byte length);
 };
 

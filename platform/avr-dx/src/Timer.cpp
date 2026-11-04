@@ -57,15 +57,17 @@ StdReturnType Timer<TimerTraits>::Init(uint32_t microseconds, TimerIsrCallbackFV
         return_value = kEOk;
         state_ = StateType::kInit;
 
-        /* The Dx hands this timer over at its reset values rather than running, the way the
-           xmegaForArduino core used to - but RESET is kept anyway, so that a second Init() after a
-           DetachInterrupt() starts from the same place the first one did. The command is only
-           obeyed while the timer is disabled, hence the order. */
+        /*
+         * The Dx hands this timer over at its reset values rather than running, the way the
+         * xmegaForArduino core used to - but RESET is kept anyway, so that a second Init() after a
+         * DetachInterrupt() starts from the same place the first one did. The command is only
+         * obeyed while the timer is disabled, hence the order.
+         */
         SetRunning(false);
         GetTimer().CTRLESET = TCA_SINGLE_CMD_RESET_gc;
 
-        /* Away from the PORTA the route comes up on, before any channel can drive a pin: PA0 and
-           PA2 belong to the strip. See the traits in Timer.h. */
+        // Away from the PORTA the route comes up on, before any channel can drive a pin: PA0 and
+        // PA2 belong to the strip. See the traits in Timer.h.
         Bit<uint8_t>::WriteBitGroup(PORTMUX.TCAROUTEA, TimerTraits::kRouteMask, TimerTraits::kRouteGroup);
 
         /* dual-slope PWM, overflow interrupt at BOTTOM */
@@ -128,16 +130,18 @@ StdReturnType Timer<TimerTraits>::SetPeriod(uint32_t microseconds)
         clock_select_bit_group_ = ToClockSelect(timer_cycles);
         timer_cycles >>= ToPrescalerShift(clock_select_bit_group_);
 
-        /* A 16-bit access goes through the timer's shared TEMP register, so an ISR touching another
-           16-bit register of this timer must not get in between.
-           Through the buffer rather than PER: a TOP that lands below the counter mid-period is not
-           picked up until the counter has gone all the way round 0xFFFF, which is one period of
-           several hundred milliseconds in the wrong place. PERBUF is taken over at BOTTOM, where
-           the counter is below any legal TOP - and that holds for a stopped timer as much as for a
-           running one, since Resume() continues mid-period. A timer not yet started has its
-           registers loaded by Start().
-           The compare values go along, recomputed from their duty, so the PWM keeps its ratio
-           across the change and takes the new period at the same BOTTOM. */
+        /*
+         * A 16-bit access goes through the timer's shared TEMP register, so an ISR touching another
+         * 16-bit register of this timer must not get in between.
+         * Through the buffer rather than PER: a TOP that lands below the counter mid-period is not
+         * picked up until the counter has gone all the way round 0xFFFF, which is one period of
+         * several hundred milliseconds in the wrong place. PERBUF is taken over at BOTTOM, where
+         * the counter is below any legal TOP - and that holds for a stopped timer as much as for a
+         * running one, since Resume() continues mid-period. A timer not yet started has its
+         * registers loaded by Start().
+         * The compare values go along, recomputed from their duty, so the PWM keeps its ratio
+         * across the change and takes the new period at the same BOTTOM.
+         */
         ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
             top_ = static_cast<uint16_t>(timer_cycles);
             GetTimer().PERBUF = top_;
@@ -235,9 +239,11 @@ StdReturnType Timer<TimerTraits>::AttachInterrupt(TimerIsrCallbackFVoid timer_ov
     if(timer_overflow_callback != nullptr) {
         return_value = kEOk;
         ATOMIC_BLOCK(ATOMIC_RESTORESTATE) { timer_overflow_callback_ = timer_overflow_callback; }
-        /* The flag is set at every BOTTOM whether the interrupt is on or not, so one left over from
-           while it was off would call the new callback at once. Only then: with the interrupt
-           already on, a set flag is a real overflow about to be served. */
+        /*
+         * The flag is set at every BOTTOM whether the interrupt is on or not, so one left over from
+         * while it was off would call the new callback at once. Only then: with the interrupt
+         * already on, a set flag is a real overflow about to be served.
+         */
         if(!(GetTimer().INTCTRL & TCA_SINGLE_OVF_bm)) { GetTimer().INTFLAGS = TCA_SINGLE_OVF_bm; }
         Bit<uint8_t>::SetBits(GetTimer().INTCTRL, TCA_SINGLE_OVF_bm);
     }
@@ -278,8 +284,8 @@ StdReturnType Timer<TimerTraits>::Read(uint32_t& microseconds)
         TimerCountDirection direction{TimerCountDirection::kUp};
         return_value = kEOk;
 
-        /* counter and direction have to come from the same instant, or a turn at TOP in between
-           reads as a whole period too much */
+        // counter and direction have to come from the same instant, or a turn at TOP in between
+        // reads as a whole period too much
         ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
             counter_value = GetTimer().CNT;
             top_value = GetTimer().PER;
@@ -361,8 +367,8 @@ void Timer<TimerTraits>::SetRunning(bool running)
 template <typename TimerTraits>
 void Timer<TimerTraits>::SetCompareBuffer(TimerChannelType channel)
 {
-    /* CMP0BUF..CMP2BUF are consecutive, which Timer.h asserts; the channel was range checked at
-       compile time */
+    // CMP0BUF..CMP2BUF are consecutive, which Timer.h asserts; the channel was range checked at
+    // compile time
     (&GetTimer().CMP0BUF)[ToUnderlying(channel)] = ToCompareValue(top_, pwm_duty_[ToUnderlying(channel)]);
 } /* SetCompareBuffer */
 

@@ -34,14 +34,16 @@
 #define BH1750_TASK_CYCLE                               100u
 
 /* BH1750 parameter */
-/* The sensor's own range, not what the brightness automatic spreads between - see the two
-   calibration defaults below, which the hardware headers carry with the same reasoning. */
+// The sensor's own range, not what the brightness automatic spreads between - see the two
+// calibration defaults below, which the hardware headers carry with the same reasoning.
 #define BH1750_ILLUMINANCE_MAX_LX_VALUE                 65535u
 #define BH1750_ILLUMINANCE_MIN_LX_VALUE                 1u
 
-/* What an uncalibrated clock spreads its brightness between: a dim room and a bright day at
-   a window. Deliberately not the sensor's range, where every indoor reading would sit at the
-   very bottom and hold the display at its floor. */
+/*
+ * What an uncalibrated clock spreads its brightness between: a dim room and a bright day at
+ * a window. Deliberately not the sensor's range, where every indoor reading would sit at the
+ * very bottom and hold the display at its floor.
+ */
 #define BH1750_CALIBRATION_MAX_DEFAULT_LX_VALUE         1000u
 #define BH1750_CALIBRATION_MIN_DEFAULT_LX_VALUE         1u
 
@@ -112,10 +114,12 @@ class BH1750
     StdReturnType SendCommand(byte);
 
     StdReturnType SendMode() { return SendCommand(ToUnderlying(mode_)); }
-    /* Not static, though nothing in it reads a member: it stands in for the backends the
-       clock really runs on, and there the same call reaches a peripheral through instance
-       state. A stand-in that answered the check would have a different API from the thing it
-       stands in for, which is the one property it exists to keep. */
+    /*
+     * Not static, though nothing in it reads a member: it stands in for the backends the
+     * clock really runs on, and there the same call reaches a peripheral through instance
+     * state. A stand-in that answered the check would have a different API from the thing it
+     * stands in for, which is the one property it exists to keep.
+     */
     // NOLINTBEGIN(readability-convert-member-functions-to-static)
     IlluminanceType ConvertRawToLux(IlluminanceType illuminance_raw) const { return illuminance_raw / BH1750_ILLUMINANCE_RAW_VALUE_DIVIDER; }
     // NOLINTEND(readability-convert-member-functions-to-static)
@@ -146,8 +150,8 @@ class BH1750
     // methods
     StdReturnType Init(ModeType);
     StdReturnType ChangeMeasurementTime(byte);
-    /* Always succeeds, unlike on hardware: what the window dialled in is available from
-       the first call, so there is no not-set-up state for the calibration to refuse. */
+    // Always succeeds, unlike on hardware: what the window dialled in is available from
+    // the first call, so there is no not-set-up state for the calibration to refuse.
     StdReturnType StartCalibrationMaxValue() {
         Task();
         calibration_values_.max_value = illuminance_;
@@ -159,19 +163,23 @@ class BH1750
         return kEOk;
     }
 
-    /* On hardware this reads the sensor. Here it takes what the window dialled in, so
-       the brightness automatic can be exercised without a sensor. The value is static
-       because the firmware keeps its BH1750 inside the Illuminance singleton, which
-       leaves the window no instance to talk to. */
+    /*
+     * On hardware this reads the sensor. Here it takes what the window dialled in, so
+     * the brightness automatic can be exercised without a sensor. The value is static
+     * because the firmware keeps its BH1750 inside the Illuminance singleton, which
+     * leaves the window no instance to talk to.
+     */
     void Task() { illuminance_ = simulated_illuminance; }
 
     static void SetSimulatedIlluminance(IlluminanceType value) { simulated_illuminance = value; }
     static IlluminanceType GetSimulatedIlluminance() { return simulated_illuminance; }
 
   private:
-    /* a bright room by default, so switching the automatic on does not darken the
-       display before anything was dialled in - the calibrated maximum rather than the
-       sensor's, which is the top of the slider's range in Settings */
+    /*
+     * a bright room by default, so switching the automatic on does not darken the
+     * display before anything was dialled in - the calibrated maximum rather than the
+     * sensor's, which is the top of the slider's range in Settings
+     */
     static inline IlluminanceType simulated_illuminance{BH1750_CALIBRATION_MAX_DEFAULT_LX_VALUE};
 };
 

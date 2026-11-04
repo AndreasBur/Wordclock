@@ -56,9 +56,11 @@ void RealTimeClock::WriteChip()
 {
     chip_.SetDateTime(date_time_);
 
-    /* Restarted, so the value just written is not read back over in the same second - the
-       chip zeroes nothing, but a read landing between the write and the next second would
-       hand back a time one second behind what the answer reported. */
+    /*
+     * Restarted, so the value just written is not read back over in the same second - the
+     * chip zeroes nothing, but a read landing between the write and the next second would
+     * hand back a time one second behind what the answer reported.
+     */
     chip_read_countdown_ = kChipReadInterval;
 } /* WriteChip */
 

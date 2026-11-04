@@ -56,14 +56,14 @@ class MessageDecoder
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    /* Mirrors MsgParameterParser::kOptionArgumentDelimiter, which the parser keeps
-       private. */
+    // Mirrors MsgParameterParser::kOptionArgumentDelimiter, which the parser keeps
+    // private.
     static constexpr char kOptionArgumentDelimiter{'='};
-    /* Where the delimiter sits in a "<short name>=<value>" token, and so what tells one
-       apart from anything else on the line. */
+    // Where the delimiter sits in a "<short name>=<value>" token, and so what tells one
+    // apart from anything else on the line.
     static constexpr int kDelimiterPosition{1};
-    /* What ErrorMessage puts between the api and the error, and between an error and the
-       option it belongs to. */
+    // What ErrorMessage puts between the api and the error, and between an error and the
+    // option it belongs to.
     static constexpr char kErrorPartDelimiter{':'};
 
     static const char* const kErrorPrefix;
@@ -74,10 +74,12 @@ class MessageDecoder
     static const char* const kErrorValueNames[];
     static const char* const kApiValueNames[];
 
-    /* One option per line, each indented under the command and that under the raw answer.
-       Short lines are what makes the indentation hold: the output field is narrow, and a
-       line long enough to wrap continues at the left edge, where it no longer reads as
-       belonging to anything. */
+    /*
+     * One option per line, each indented under the command and that under the raw answer.
+     * Short lines are what makes the indentation hold: the output field is narrow, and a
+     * line long enough to wrap continues at the left edge, where it no longer reads as
+     * belonging to anything.
+     */
     static const char* const kCommandIndent;
     static const char* const kArgumentIndent;
     static const char* const kNameValueSeparator;
@@ -85,22 +87,26 @@ class MessageDecoder
     /* Command numbers are a byte in the catalog, so anything wider is not one. */
     static constexpr uint16_t kCommandNumberMax{UINT8_MAX};
 
-    /* wxString parses into unsigned long and nothing narrower, so that stays confined to
-       here: the value comes back in the width the catalog actually uses, and a number too
-       large to fit is refused rather than truncated into a different one. */
+    /*
+     * wxString parses into unsigned long and nothing narrower, so that stays confined to
+     * here: the value comes back in the width the catalog actually uses, and a number too
+     * large to fit is refused rather than truncated into a different one.
+     */
     static bool ToValue(const wxString&, uint16_t&);
 
-    /* "<label> = <name> (<number>)" where the value is named, "<label> = <number>" where
-       it is not. Serves the options of an answer as well as an error and its api, which
-       differ only in where their names come from. */
+    /*
+     * "<label> = <name> (<number>)" where the value is named, "<label> = <number>" where
+     * it is not. Serves the options of an answer as well as an error and its api, which
+     * differ only in where their names come from.
+     */
     static wxString DescribeValue(const char*, const wxString&, const char* const*, byte, uint16_t minimum = 0u);
 
     static wxString DescribeAnswer(const wxString&);
     static wxString DescribeArgument(const MessageCatalog::CommandType&, const wxString&);
     static wxString DescribeRemoteProcedureCall(const wxString&);
     static wxString DescribeError(const wxString&);
-    /* The indent is a parameter because an error stands on its own on most lines, but sits
-       under a command heading in the remote procedure call's answer. */
+    // The indent is a parameter because an error stands on its own on most lines, but sits
+    // under a command heading in the remote procedure call's answer.
     static wxString DescribeErrorPart(const wxString&, const char* indent);
 
 /******************************************************************************************************************************************************
@@ -108,9 +114,11 @@ class MessageDecoder
 ******************************************************************************************************************************************************/
   public:
     // methods
-    /* Returns the indented block, newline-terminated and ready to be appended below the
-       raw answer, or an empty string when the line is not an answer this can read — which
-       is the caller's signal to leave it alone. */
+    /*
+     * Returns the indented block, newline-terminated and ready to be appended below the
+     * raw answer, or an empty string when the line is not an answer this can read — which
+     * is the caller's signal to leave it alone.
+     */
     static wxString Describe(const wxString&);
 };
 

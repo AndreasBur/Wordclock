@@ -44,8 +44,8 @@ void ToDateTime(const struct tm& local, ClockDateTime& date_time)
     date_time.SetTimeSecond(static_cast<ClockDateTime::SecondType>(local.tm_sec));
 }
 
-/* The chip keeps UTC, so the two conversions for it leave the zone rule out: gmtime_r and
-   timegm are what localtime_r and mktime are for the display's local time. */
+// The chip keeps UTC, so the two conversions for it leave the zone rule out: gmtime_r and
+// timegm are what localtime_r and mktime are for the display's local time.
 void ToDateTimeUtc(const time_t& seconds, ClockDateTime& date_time)
 {
     struct tm utc{};
@@ -58,14 +58,16 @@ constexpr int32_t kSecondsPerMinute{60};
 constexpr int32_t kSecondsPerHour{60 * kSecondsPerMinute};
 constexpr int32_t kSecondsPerDay{24 * kSecondsPerHour};
 
-/* Days from 1970-01-01 to a civil date, by Howard Hinnant's days_from_civil: the year is
-   shifted so that it begins in March, which puts the leap day at the end of it and makes
-   the month lengths a repeating pattern rather than a table.
-
-   Written out rather than left to timegm(), which mktime's counterpart would be: newlib
-   does not declare it on this target, so a build against the ESP32 core does not compile
-   with it. The other way round - a local time to seconds - keeps using mktime, which is
-   there and which has to apply the zone rule anyway. */
+/*
+ * Days from 1970-01-01 to a civil date, by Howard Hinnant's days_from_civil: the year is
+ * shifted so that it begins in March, which puts the leap day at the end of it and makes
+ * the month lengths a repeating pattern rather than a table.
+ *
+ * Written out rather than left to timegm(), which mktime's counterpart would be: newlib
+ * does not declare it on this target, so a build against the ESP32 core does not compile
+ * with it. The other way round - a local time to seconds - keeps using mktime, which is
+ * there and which has to apply the zone rule anyway.
+ */
 constexpr int32_t DaysFromCivil(int32_t year, int32_t month, int32_t day)
 {
     year -= (month <= 2) ? 1 : 0;
@@ -78,15 +80,15 @@ constexpr int32_t DaysFromCivil(int32_t year, int32_t month, int32_t day)
     return (era * 146097) + day_of_era - 719468;
 }
 
-/* The epoch itself, the leap day that the shifted year is built around, and both ends of
-   what ClockDate covers. */
+// The epoch itself, the leap day that the shifted year is built around, and both ends of
+// what ClockDate covers.
 static_assert(DaysFromCivil(1970, 1, 1) == 0, "the epoch must be day zero");
 static_assert(DaysFromCivil(2000, 3, 1) == 11017, "the day after a leap day must line up");
 static_assert(DaysFromCivil(2026, 8, 14) == 20679, "an ordinary day must line up");
 static_assert(DaysFromCivil(2099, 12, 31) == 47481, "the last day ClockDate accepts must line up");
 
-/* Widened before the multiplication, not after it: in 32 bit the days alone overflow on
-   2038-01-19, and ClockDate runs to 2099. */
+// Widened before the multiplication, not after it: in 32 bit the days alone overflow on
+// 2038-01-19, and ClockDate runs to 2099.
 constexpr time_t ToSecondsSinceEpoch(int32_t days, int32_t hour, int32_t minute, int32_t second)
 {
     return (static_cast<time_t>(days) * kSecondsPerDay) + (static_cast<time_t>(hour) * kSecondsPerHour) +
@@ -117,9 +119,11 @@ void ToTm(const ClockDateTime& date_time, struct tm& local)
     local.tm_hour = static_cast<int>(date_time.GetTimeHour());
     local.tm_min = static_cast<int>(date_time.GetTimeMinute());
     local.tm_sec = static_cast<int>(date_time.GetTimeSecond());
-    /* Unknown rather than off, so mktime() decides from the zone rule whether the wall
-       clock time it was handed is in summer or winter time. Hardcoding zero would move
-       the clock by an hour for half the year. */
+    /*
+     * Unknown rather than off, so mktime() decides from the zone rule whether the wall
+     * clock time it was handed is in summer or winter time. Hardcoding zero would move
+     * the clock by an hour for half the year.
+     */
     local.tm_isdst = -1;
 }
 
@@ -153,9 +157,11 @@ void RealTimeClock::SetDateTime(ClockDateTime date_time)
 {
     date_time_ = date_time;
     WriteSystemDateTime(date_time_);
-    /* A time set by hand is worth keeping over the next power cut as much as one from the
-       network, so the chip is written again on the next task rather than at the turn of
-       the hour it would otherwise wait for. */
+    /*
+     * A time set by hand is worth keeping over the next power cut as much as one from the
+     * network, so the chip is written again on the next task rather than at the turn of
+     * the hour it would otherwise wait for.
+     */
     hour_written_to_chip_ = kNoHourWritten;
 } /* SetDateTime */
 
@@ -200,9 +206,11 @@ void RealTimeClock::Task()
 {
     ClockDateTime current;
 
-    /* An unset clock is left alone rather than shown. Before the first SNTP answer the
-       system clock sits in 1970, which ClockDate rejects outright - so the display would
-       otherwise keep whatever the failed setters left behind. */
+    /*
+     * An unset clock is left alone rather than shown. Before the first SNTP answer the
+     * system clock sits in 1970, which ClockDate rejects outright - so the display would
+     * otherwise keep whatever the failed setters left behind.
+     */
     if(!ReadSystemDateTime(current)) {
         ReadChip();
         return;
@@ -261,8 +269,8 @@ StdReturnType RealTimeClock::ReadChip()
     const struct timeval time{ToSecondsUtc(utc), 0};
     if(settimeofday(&time, nullptr) != 0) { return kENotOk; }
 
-    /* Not written back at once: what was just read is what the chip already holds, and the
-       hour it belongs to is what the next write is measured against. */
+    // Not written back at once: what was just read is what the chip already holds, and the
+    // hour it belongs to is what the next write is measured against.
     hour_written_to_chip_ = utc.GetTimeHour();
     return kEOk;
 } /* ReadChip */

@@ -43,11 +43,13 @@
 #include <stddef.h>
 #include <stdint.h>
 
-/* Only ever used as a pointer, so the declaration is enough - and it has to be made here
-   rather than taken from a header, see the note about the include circle above. In the
-   core's namespace and brought out with the core's own using-declaration, because this core
-   is ArduinoCore-API: a class of the same name declared at global scope is a second class
-   that conflicts with that using-declaration. GCC let it pass; clang refuses it. */
+/*
+ * Only ever used as a pointer, so the declaration is enough - and it has to be made here
+ * rather than taken from a header, see the note about the include circle above. In the
+ * core's namespace and brought out with the core's own using-declaration, because this core
+ * is ArduinoCore-API: a class of the same name declared at global scope is a second class
+ * that conflicts with that using-declaration. GCC let it pass; clang refuses it.
+ */
 namespace arduino { class __FlashStringHelper; }
 using arduino::__FlashStringHelper;
 
@@ -55,13 +57,15 @@ using arduino::__FlashStringHelper;
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
 /* WordclockSerial configuration parameter */
-/* Room for one answer. Longer output is flushed early rather than truncated, which costs
-   a web socket client a split line and keeps the UART's output complete. */
+// Room for one answer. Longer output is flushed early rather than truncated, which costs
+// a web socket client a split line and keeps the UART's output complete.
 #define WORDCLOCK_SERIAL_LINE_LENGTH                    160u
 
-/* Room for a command in flight. A command is short and the firmware drains this every
-   scheduler tick, so this only has to bridge one tick's worth of typing. Must be a power
-   of two, which is what lets the indices wrap by masking. */
+/*
+ * Room for a command in flight. A command is short and the firmware drains this every
+ * scheduler tick, so this only has to bridge one tick's worth of typing. Must be a power
+ * of two, which is what lets the indices wrap by masking.
+ */
 #define WORDCLOCK_SERIAL_INJECT_BUFFER_SIZE             256u
 
 /******************************************************************************************************************************************************
@@ -73,8 +77,8 @@ class WordclockSerial
  *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
   public:
-    /* A plain function pointer rather than std::function: this is called from the
-       firmware's task on every finished line, and nothing here allocates. */
+    // A plain function pointer rather than std::function: this is called from the
+    // firmware's task on every finished line, and nothing here allocates.
     using LineSinkType = void (*)(const char*);
 
 /******************************************************************************************************************************************************
@@ -91,11 +95,13 @@ class WordclockSerial
     size_t line_used_{0u};
 
     char inject_buffer_[kInjectBufferSize]{};
-    /* One producer - the web server's task - and one consumer, the firmware's tick. That
-       is what makes two atomic indices enough and a lock unnecessary: each side writes
-       only its own index and reads only the other's. esp_http_server serves its handlers
-       from a single task, so the one-producer premise holds; a second injecting task
-       would break it and would need a mutex here. */
+    /*
+     * One producer - the web server's task - and one consumer, the firmware's tick. That
+     * is what makes two atomic indices enough and a lock unnecessary: each side writes
+     * only its own index and reads only the other's. esp_http_server serves its handlers
+     * from a single task, so the one-producer premise holds; a second injecting task
+     * would break it and would need a mutex here.
+     */
     std::atomic<size_t> inject_head_{0u};
     std::atomic<size_t> inject_tail_{0u};
 
@@ -122,18 +128,20 @@ class WordclockSerial
     }
 
     // methods
-    /* Here and below, a NOLINT keeps the name Arduino's Serial gives it: the firmware core is
-       written against that API, and this class stands in for it. */
+    // Here and below, a NOLINT keeps the name Arduino's Serial gives it: the firmware core is
+    // written against that API, and this class stands in for it.
     void begin(unsigned long); // NOLINT(readability-identifier-naming)
 
-    /* Whoever wants the answers registers here. Nothing is registered by default, so the
-       firmware runs with the UART alone until a front end asks for them. */
+    // Whoever wants the answers registers here. Nothing is registered by default, so the
+    // firmware runs with the UART alone until a front end asks for them.
     void SetLineSink(LineSinkType line_sink) { line_sink_ = line_sink; }
 
-    /* Called from another task, one character stream at a time. Returns kENotOk when the
-       buffer is full, which drops the rest of that command rather than a random middle
-       part of it - a half command is worse than a missing one, and the parser would
-       answer with an error either way. */
+    /*
+     * Called from another task, one character stream at a time. Returns kENotOk when the
+     * buffer is full, which drops the rest of that command rather than a random middle
+     * part of it - a half command is worse than a missing one, and the parser would
+     * answer with an error either way.
+     */
     StdReturnType Inject(const char*, size_t);
 
     // the interface Communication uses
@@ -146,14 +154,16 @@ class WordclockSerial
     void println(const char*); // NOLINT(readability-identifier-naming)
     void println(int); // NOLINT(readability-identifier-naming)
     void print(char); // NOLINT(readability-identifier-naming)
-    /* What F() produces on the target. The simulator's F() is a no-op, so the same
-       firmware call lands on print(const char*) there. */
+    // What F() produces on the target. The simulator's F() is a no-op, so the same
+    // firmware call lands on print(const char*) there.
     void print(const __FlashStringHelper*); // NOLINT(readability-identifier-naming)
     void println(const __FlashStringHelper*); // NOLINT(readability-identifier-naming)
 
-    /* Waits for the UART to have sent what it was given. Only one caller so far, and it is
-       the one that matters: the restart, which would otherwise cut its own answer in half.
-       Says nothing about the web socket, whose frames leave from the server's task. */
+    /*
+     * Waits for the UART to have sent what it was given. Only one caller so far, and it is
+     * the one that matters: the restart, which would otherwise cut its own answer in half.
+     * Says nothing about the web socket, whose frames leave from the server's task.
+     */
     void flush(); // NOLINT(readability-identifier-naming)
 };
 

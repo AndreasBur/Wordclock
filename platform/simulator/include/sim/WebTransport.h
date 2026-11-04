@@ -28,8 +28,8 @@
  * I N C L U D E S
 ******************************************************************************************************************************************************/
 #include "StandardTypes.h"
-/* Where this backend's `byte` comes from - the two on hardware get it from the Arduino core,
-   and this header is reached before that one on the way in from WebHost.cpp. */
+// Where this backend's `byte` comes from - the two on hardware get it from the Arduino core,
+// and this header is reached before that one on the way in from WebHost.cpp.
 #include "arduino/Types.h"
 
 #include <stddef.h>
@@ -38,9 +38,11 @@
 /******************************************************************************************************************************************************
  *  C L A S S   W E B   R E S P O N S E   B O D Y
 ******************************************************************************************************************************************************/
-/* One route's answer, being written. Collected whole rather than pushed out in chunks: this
-   server answers on loopback and the largest thing it writes is a page out of flash, so a
-   length up front is simpler than a chunked encoding and is what Finish() sends. */
+/*
+ * One route's answer, being written. Collected whole rather than pushed out in chunks: this
+ * server answers on loopback and the largest thing it writes is a page out of flash, so a
+ * length up front is simpler than a chunked encoding and is what Finish() sends.
+ */
 class WebResponseBody
 {
   private:
@@ -58,8 +60,8 @@ class WebResponseBody
 /******************************************************************************************************************************************************
  *  C L A S S   W E B   T R A N S P O R T
 ******************************************************************************************************************************************************/
-/* Where a finished line or a display frame leaves for whoever is watching. The client list is
-   WebHost's, since nothing here comes with one. */
+// Where a finished line or a display frame leaves for whoever is watching. The client list is
+// WebHost's, since nothing here comes with one.
 class WebTransport
 {
   public:

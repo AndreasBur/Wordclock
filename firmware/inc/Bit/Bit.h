@@ -48,9 +48,11 @@ class Bit
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    /* What T is shifted in: T itself when it is at least an unsigned int, unsigned int
-       otherwise. Shifting the uint8_t or uint16_t directly would promote it to int, which on
-       the AVR is 16 bits wide and signed. */
+    /*
+     * What T is shifted in: T itself when it is at least an unsigned int, unsigned int
+     * otherwise. Shifting the uint8_t or uint16_t directly would promote it to int, which on
+     * the AVR is 16 bits wide and signed.
+     */
     using ShiftType = decltype(T{} | 0u);
 
     T value_;
@@ -103,14 +105,16 @@ class Bit
     }
 
     // in place
-    /* Each of these reads the target, changes it and writes it back - which is what a
-       register's |= did, and named so that it says so. That rules out two kinds of AVR
-       register, which share a type with all the others, so nothing but this note keeps them
-       away: INTFLAGS, where writing back a 1 that was read clears a flag nobody asked to
-       clear, and the write-only halves OUTSET, OUTCLR, DIRSET, CTRLESET and their like, which
-       take the mask alone in a single write. Nor is any of it atomic: a target an interrupt
-       writes as well needs the caller's ATOMIC_BLOCK, which a platform-independent header
-       cannot provide. */
+    /*
+     * Each of these reads the target, changes it and writes it back - which is what a
+     * register's |= did, and named so that it says so. That rules out two kinds of AVR
+     * register, which share a type with all the others, so nothing but this note keeps them
+     * away: INTFLAGS, where writing back a 1 that was read clears a flag nobody asked to
+     * clear, and the write-only halves OUTSET, OUTCLR, DIRSET, CTRLESET and their like, which
+     * take the mask alone in a single write. Nor is any of it atomic: a target an interrupt
+     * writes as well needs the caller's ATOMIC_BLOCK, which a platform-independent header
+     * cannot provide.
+     */
     static void SetBits(volatile T& target, T mask) { target = static_cast<T>(target | mask); }
     static void ClearBits(volatile T& target, T mask) { target = static_cast<T>(target & static_cast<T>(~mask)); }
     static void WriteBitGroup(volatile T& target, T mask, T group) {

@@ -54,17 +54,17 @@ class StringTools
         kOk
     };
       /*
-        struct ResultType {
-            PositionType Position;
-            ConvertResultType ConvertResult;
-        }
-
-        enum ConvertResultType {
-            CONVERT_RESULT_OVERFLOW,
-            CONVERT_RESULT_NO_VALUE,
-            CONVERT_RESULT_OK
-        };
-      */
+       * struct ResultType {
+       *    PositionType Position;
+       *    ConvertResultType ConvertResult;
+       * }
+       *
+       * enum ConvertResultType {
+       *    CONVERT_RESULT_OVERFLOW,
+       *    CONVERT_RESULT_NO_VALUE,
+       *    CONVERT_RESULT_OK
+       * };
+       */
 
      static constexpr size_t npos = -1;
      static constexpr char kNullCharacter{'\0'};

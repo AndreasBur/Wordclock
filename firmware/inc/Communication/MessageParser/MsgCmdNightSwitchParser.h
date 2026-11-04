@@ -63,9 +63,11 @@ class MsgCmdNightSwitchParser : public MsgParameterParser<MsgCmdNightSwitchParse
         ParameterTableElementType(kBrightnessShortName,  MsgParameter::ArgumentTypeType::kUint8)
     };
 
-    /* Collected rather than applied as they arrive, and the switch applied last: switching
-       it on is what makes the next tick an edge, and an edge acting on half a window would
-       use one end from this command and the other from the one before it. */
+    /*
+     * Collected rather than applied as they arrive, and the switch applied last: switching
+     * it on is what makes the next tick an edge, and an edge acting on half a window would
+     * use one end from this command and the other from the one before it.
+     */
     bool active_{false};
     bool active_given_{false};
 
@@ -101,8 +103,8 @@ class MsgCmdNightSwitchParser : public MsgParameterParser<MsgCmdNightSwitchParse
         SendAnswerParameter(kStartMinuteShortName, night_switch.GetStartMinute());
         SendAnswerParameter(kEndHourShortName, night_switch.GetEndHour());
         SendAnswerParameter(kEndMinuteShortName, night_switch.GetEndMinute());
-        /* Last field before the command parser's terminating println(), so no trailing
-           separator space. */
+        // Last field before the command parser's terminating println(), so no trailing
+        // separator space.
         SendAnswerParameter(kBrightnessShortName, night_switch.GetNightBrightness(), false);
     }
 

@@ -15,8 +15,8 @@
 #include "Pixels.h"
 #include "RealTimeClock.h"
 
-/* Whether a word is part of what the clock would light for a time, which is what the
-   regional wordings differ in. */
+// Whether a word is part of what the clock would light for a time, which is what the
+// regional wordings differ in.
 bool WordsContain(const ClockWords& words, DisplayWords::WordIdType word)
 {
     for(const DisplayWords::WordIdType id : words.GetWordsList()) {
@@ -25,19 +25,21 @@ bool WordsContain(const ClockWords& words, DisplayWords::WordIdType word)
     return false;
 }
 
-/* The four regional wordings, at the four times where they part company. This is the table
-   in docs/serial-commands.md, asserted rather than described: the modes differ in how the
-   quarters are said and in whether twenty past is counted from the hour or from the half
-   hour, and in nothing else.
-   What makes it worth pinning is that all four share one pair of tables, indexed by mode -
-   a row edited in the wrong one is a clock that is wrong in one region and right in the
-   other three. */
+/*
+ * The four regional wordings, at the four times where they part company. This is the table
+ * in docs/serial-commands.md, asserted rather than described: the modes differ in how the
+ * quarters are said and in whether twenty past is counted from the hour or from the half
+ * hour, and in nothing else.
+ * What makes it worth pinning is that all four share one pair of tables, indexed by mode -
+ * a row edited in the wrong one is a clock that is wrong in one region and right in the
+ * other three.
+ */
 void TestRegionalWordings()
 {
     Clock& clock = Clock::GetInstance();
 
-    /* Quarter past four: named after the hour it is past, or after the one it counts
-       towards. */
+    // Quarter past four: named after the hour it is past, or after the one it counts
+    // towards.
     clock.SetMode(Clock::ModeType::kWessi);
     Expect(WordsContain(WordsAt(4u, 15u), DisplayWords::WordIdType::kNach),
            "Wessi says a quarter *past* four");
@@ -79,10 +81,12 @@ void TestRegionalWordings()
     Expect(WordsContain(WordsAt(4u, 40u), DisplayWords::WordIdType::kNach),
            "which is a past");
 
-    /* And what none of them differ in: the full hour and the half hour always say "it is".
-       Whether the times between them do is the one thing about the wording that is a
-       setting, so both of its answers are asked here rather than whichever one the build
-       happens to carry. */
+    /*
+     * And what none of them differ in: the full hour and the half hour always say "it is".
+     * Whether the times between them do is the one thing about the wording that is a
+     * setting, so both of its answers are asked here rather than whichever one the build
+     * happens to carry.
+     */
     clock.SetMode(Clock::ModeType::kWessi);
     const bool show_it_is_permanently_before = clock.GetShowItIsPermanently();
 
@@ -102,9 +106,11 @@ void TestRegionalWordings()
     clock.SetMode(Clock::ModeType::kWessi);
 }
 
-/* The premise of driving the display off the word set instead of off the minute: a
-   word change happens on every five-minute step and on none of the minutes between,
-   over the whole day rather than at a few sample times. */
+/*
+ * The premise of driving the display off the word set instead of off the minute: a
+ * word change happens on every five-minute step and on none of the minutes between,
+ * over the whole day rather than at a few sample times.
+ */
 void TestWordsChangeOnFiveMinuteStepsOnly()
 {
     Clock::GetInstance().SetMode(Clock::ModeType::kWessi);
@@ -154,9 +160,11 @@ void TestClockModes()
            "the same mode and time must produce the same words again");
 }
 
-/* One wording further, which is all a knob can ask for. The round has to close: a walk of
-   as many steps as there are wordings must arrive back where it started, or a control with
-   no list in front of it can reach a mode and never leave it. */
+/*
+ * One wording further, which is all a knob can ask for. The round has to close: a walk of
+ * as many steps as there are wordings must arrive back where it started, or a control with
+ * no list in front of it can reach a mode and never leave it.
+ */
 void TestClockModeStepsThroughEveryWording()
 {
     Clock& clock = Clock::GetInstance();
@@ -181,8 +189,8 @@ void TestClockModeStepsThroughEveryWording()
     clock.SetMode(Clock::ModeType::kWessi);
 }
 
-/* The comparison the display update hangs on: it has to notice a difference in each
-   of the three fields, or a word change goes unnoticed and the display stays behind. */
+// The comparison the display update hangs on: it has to notice a difference in each
+// of the three fields, or a word change goes unnoticed and the display stays behind.
 void TestClockWordsComparison()
 {
     const ClockWords words = WordsAt(10u, 15u);

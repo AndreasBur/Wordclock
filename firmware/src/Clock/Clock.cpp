@@ -145,9 +145,11 @@ StdReturnType Clock::GetClockWords(byte hour, byte minute, ClockWords& clock_wor
     /* ----- Implementation ----------------------------------------------- */
     if(hour < CLOCK_NUMBER_OF_HOURS_PER_DAY && minute < CLOCK_NUMBER_OF_MINUTES_PER_HOUR) {
         return_value = kEOk;
-        /* Show "it is" permanently, or only at the full and the half hour. The switch this
-           was is now the default of the setting; what a running clock does is asked here
-           rather than compiled in. */
+        /*
+         * Show "it is" permanently, or only at the full and the half hour. The switch this
+         * was is now the default of the setting; what a running clock does is asked here
+         * rather than compiled in.
+         */
         clock_words.SetShowItIs(show_it_is_permanently_ || CalculateItIs(minute));
         MinuteTableElementType minutes_table_element = GetMinutesTableElement(minute);
         hour = Transform24hTo12hFormat(hour);

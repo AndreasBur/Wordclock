@@ -19,8 +19,8 @@
 /* The framework's headers first, ahead of the Arduino.h that binds Serial to a macro. */
 #include <LEAmDNS.h>
 #include <ESPAsyncWebServer.h>
-/* The two halves of an update on this core: the image goes into the filesystem, and PicoOTA
-   writes the command page that the loader at the front of the image reads on the next boot. */
+// The two halves of an update on this core: the image goes into the filesystem, and PicoOTA
+// writes the command page that the loader at the front of the image reads on the next boot.
 #include <LittleFS.h>
 #include <PicoOTA.h>
 
@@ -39,47 +39,53 @@
 ******************************************************************************************************************************************************/
 namespace {
 
-/* Named http_server rather than Server: the Arduino core has a class Server in the global
-   namespace, and an unqualified Server here is then ambiguous. */
+// Named http_server rather than Server: the Arduino core has a class Server in the global
+// namespace, and an unqualified Server here is then ambiguous.
 AsyncWebServer http_server(WEB_INTERFACE_PORT);
 AsyncWebSocket socket("/ws");
 
-/* Whether Begin() got as far as listening. The server object exists from start-up either
-   way, so unlike the ESP32's handle it cannot itself stand for that. */
+// Whether Begin() got as far as listening. The server object exists from start-up either
+// way, so unlike the ESP32's handle it cannot itself stand for that.
 bool is_listening{false};
 
-/* Handed to WordclockSerial, which takes a plain function pointer - so the singleton is
-   reached from here rather than carried along. */
+// Handed to WordclockSerial, which takes a plain function pointer - so the singleton is
+// reached from here rather than carried along.
 void SendLineToClients(const char* line)
 {
     WebInterface::GetInstance().BroadcastLine(line);
 }
 
-/* Fixed, and named in the realm so nobody has to guess it. Not a secret: what is secret is
-   the password beside it. */
+// Fixed, and named in the realm so nobody has to guess it. Not a secret: what is secret is
+// the password beside it.
 constexpr char kConsoleUserName[]{"wordclock"};
 constexpr char kConsoleRealm[]{"Wordclock, user wordclock"};
 
-/* Where the image waits for the loader. At the root of the filesystem and not beside the
-   settings, because it is not settings: this file is written by one update and gone from the
-   next one's point of view, and the loader is given the path as text. */
+/*
+ * Where the image waits for the loader. At the root of the filesystem and not beside the
+ * settings, because it is not settings: this file is written by one update and gone from the
+ * next one's point of view, and the loader is given the path as text.
+ */
 constexpr char kImagePath[]{"/firmware.bin"};
-/* Kept free on top of the image itself: the loader's command page is a file of its own, and
-   LittleFS spends blocks on metadata before it spends them on content. Two blocks would
-   probably do; this is a filesystem sized for an image plus room, so the slack is cheaper
-   than finding out on a clock. */
+/*
+ * Kept free on top of the image itself: the loader's command page is a file of its own, and
+ * LittleFS spends blocks on metadata before it spends them on content. Two blocks would
+ * probably do; this is a filesystem sized for an image plus room, so the slack is cheaper
+ * than finding out on a clock.
+ */
 constexpr uint32_t kFilesystemReserve{8u * 1024u};
 
-/* An upload in progress. Static because the body arrives in chunks across several calls and
-   the request object is not the place to hang a file on - what the answer needs afterwards is
-   whether it got that far, which is what Failure and is_committed say. */
+/*
+ * An upload in progress. Static because the body arrives in chunks across several calls and
+ * the request object is not the place to hang a file on - what the answer needs afterwards is
+ * whether it got that far, which is what Failure and is_committed say.
+ */
 struct UploadType {
     File image;
     uint32_t written{0u};
     bool is_open{false};
     bool is_committed{false};
-    /* A literal, so the answer can name what went wrong without carrying a buffer for it.
-       nullptr means nothing has gone wrong *yet*, which is not the same as success. */
+    // A literal, so the answer can name what went wrong without carrying a buffer for it.
+    // nullptr means nothing has gone wrong *yet*, which is not the same as success.
     const char* failure{nullptr};
 };
 UploadType upload;
@@ -117,8 +123,8 @@ bool IsRequestAuthorised(AsyncWebServerRequest* request)
     char password[SYSTEM_PASSWORD_STRING_LENGTH]{};
     if(system.GetConsolePassword(password, sizeof(password)) == kENotOk) { return true; }
 
-    /* Basic and not digest: what a browser sends for digest is a hash of a nonce this server
-       would have to keep, and over plain http the two are worth the same anyway. */
+    // Basic and not digest: what a browser sends for digest is a hash of a nonce this server
+    // would have to keep, and over plain http the two are worth the same anyway.
     if(request->authenticate(kConsoleUserName, password)) { return true; }
 
     request->requestAuthentication(AsyncAuthType::AUTH_BASIC, kConsoleRealm);
@@ -172,8 +178,8 @@ void BeginImage(AsyncWebServerRequest* request, size_t announced)
         const uint64_t free = info.totalBytes - info.usedBytes;
 
         if(free < static_cast<uint64_t>(announced) + kFilesystemReserve) {
-            /* Named as the filesystem's size and not as "too large": the image is the size it
-               is, and what is too small is the region this board keeps for it. */
+            // Named as the filesystem's size and not as "too large": the image is the size it
+            // is, and what is too small is the region this board keeps for it.
             upload.failure = "the image does not fit in the filesystem";
             return;
         }
@@ -271,9 +277,11 @@ void SendUpdateResult(AsyncWebServerRequest* request, bool ok, const char* reaso
     if(ok) {
         strncpy(answer, "{\"ok\":true}", sizeof(answer) - 1u);
     } else {
-        /* %.100s, as on the ESP32: an unbounded reason would be cut off together with the
-           closing brace, and the page would get an answer that is not JSON at all. 100 is
-           what the buffer holds beside the frame. */
+        /*
+         * %.100s, as on the ESP32: an unbounded reason would be cut off together with the
+         * closing brace, and the page would get an answer that is not JSON at all. 100 is
+         * what the buffer holds beside the frame.
+         */
         (void)snprintf(answer, sizeof(answer), "{\"ok\":false,\"error\":\"%.100s\"}", reason);
         Serial.print(F("Web: update refused - "));
         Serial.println(reason);
@@ -339,11 +347,13 @@ void HandleUpdate(AsyncWebServerRequest* request)
 {
     if(!IsRequestAuthorised(request)) { return; }
 
-    /* Still open here means the body ended before the length it announced - a client that
-       declared more than it sent. The image goes with it: an incomplete file is one no loader
-       will read, and the next attempt needs the room more than anybody needs the wreckage.
-       (A connection that simply dies never reaches this handler at all; what cleans up after
-       that one is the next upload, which removes the old image before it writes.) */
+    /*
+     * Still open here means the body ended before the length it announced - a client that
+     * declared more than it sent. The image goes with it: an incomplete file is one no loader
+     * will read, and the next attempt needs the room more than anybody needs the wreckage.
+     * (A connection that simply dies never reaches this handler at all; what cleans up after
+     * that one is the next upload, which removes the old image before it writes.)
+     */
     if(upload.is_open) { AbortImage("the upload stopped before the image was complete"); }
 
     if(upload.failure != nullptr) { SendUpdateResult(request, false, upload.failure); return; }
@@ -420,9 +430,11 @@ void OnSocketEvent(AsyncWebSocket*, AsyncWebSocketClient*, AwsEventType type,
     if((frame == nullptr) || (!frame->final) || (frame->index != 0u) || (frame->len != length)) { return; }
     if(frame->opcode != WS_TEXT) { return; }
 
-    /* The length bound, the terminator and the empty-frame case are WebFrontend's, so that a
-       command coming off a socket reaches the parser the same way on either backend. What
-       stays here is the framing, which is this library's shape and not the other's. */
+    /*
+     * The length bound, the terminator and the empty-frame case are WebFrontend's, so that a
+     * command coming off a socket reaches the parser the same way on either backend. What
+     * stays here is the framing, which is this library's shape and not the other's.
+     */
     WebFrontend::InjectCommand(reinterpret_cast<const char*>(payload), length);
 }
 
@@ -432,11 +444,13 @@ void OnSocketEvent(AsyncWebSocket*, AsyncWebSocketClient*, AwsEventType type,
  * P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
 
-/* Instance methods, though some of them read no member: they are the interface the
-   firmware core calls through GetInstance(), and every backend - the simulator's
-   stand-ins included - offers it that way. Whether this backend's implementation
-   happens to need a member is its own detail, and answering the check would carry
-   that detail into the interface. */
+/*
+ * Instance methods, though some of them read no member: they are the interface the
+ * firmware core calls through GetInstance(), and every backend - the simulator's
+ * stand-ins included - offers it that way. Whether this backend's implementation
+ * happens to need a member is its own detail, and answering the check would carry
+ * that detail into the interface.
+ */
 // NOLINTBEGIN(readability-convert-member-functions-to-static)
 /******************************************************************************************************************************************************
   Begin()
@@ -450,9 +464,11 @@ StdReturnType WebInterface::Begin()
     socket.onEvent(OnSocketEvent);
     http_server.addHandler(&socket);
 
-    /* The files served unchanged, one route per entry of WebFrontend's table, so a file added
-       to web/ needs no edit here. The entry is captured by reference and outlives the lambda:
-       the table has static storage duration. */
+    /*
+     * The files served unchanged, one route per entry of WebFrontend's table, so a file added
+     * to web/ needs no edit here. The entry is captured by reference and outlives the lambda:
+     * the table has static storage duration.
+     */
     for(byte index = 0u; index < WebFrontend::GetNumberOfAssets(); index++) {
         const WebFrontend::AssetType& asset = WebFrontend::GetAsset(index);
 
@@ -462,17 +478,21 @@ StdReturnType WebInterface::Begin()
 
     http_server.on("/commands", HTTP_GET, HandleCommands);
     http_server.on("/display", HTTP_GET, HandleDisplay);
-    /* Four arguments, and the fourth is where the image arrives: the library hands a POST
-       body to that callback in chunks and calls the request handler afterwards. The third,
-       the upload handler, is for multipart forms and stays empty - the panel sends the file
-       as the body itself, so nothing here has to parse what a <form> would have wrapped it
-       in. */
+    /*
+     * Four arguments, and the fourth is where the image arrives: the library hands a POST
+     * body to that callback in chunks and calls the request handler afterwards. The third,
+     * the upload handler, is for multipart forms and stays empty - the panel sends the file
+     * as the body itself, so nothing here has to parse what a <form> would have wrapped it
+     * in.
+     */
     http_server.on("/update", HTTP_POST, HandleUpdate, nullptr, HandleUpdateBody);
 
-    /* No failure to report: this library's begin() returns nothing and starts listening on
-       whatever address arrives later. Where the ESP32 backend can find its server refusing
-       to start and fall back to the UART, here the equivalent shows up as a page that never
-       answers - which is why the address is printed below either way. */
+    /*
+     * No failure to report: this library's begin() returns nothing and starts listening on
+     * whatever address arrives later. Where the ESP32 backend can find its server refusing
+     * to start and fall back to the UART, here the equivalent shows up as a page that never
+     * answers - which is why the address is printed below either way.
+     */
     http_server.begin();
     is_listening = true;
 
@@ -527,9 +547,11 @@ void WebInterface::BroadcastFrame()
 /******************************************************************************************************************************************************
  *  W E B   T R A N S P O R T
 ******************************************************************************************************************************************************/
-/* This backend's half of the contract WebFrontend.h states. Defined here rather than in a
-   source of its own because what it reaches - the server and its web socket - is this file's
-   and stays this file's. */
+/*
+ * This backend's half of the contract WebFrontend.h states. Defined here rather than in a
+ * source of its own because what it reaches - the server and its web socket - is this file's
+ * and stays this file's.
+ */
 
 WebTransport& WebTransport::GetInstance()
 {
@@ -544,8 +566,8 @@ bool WebTransport::IsListening() const
 
 bool WebTransport::HasClients() const
 {
-    /* The socket's own count, not a table of ours: it owns the list, so there is nothing here
-       that could fall out of step with it. */
+    // The socket's own count, not a table of ours: it owns the list, so there is nothing here
+    // that could fall out of step with it.
     return socket.count() > 0u;
 }
 
@@ -564,8 +586,8 @@ void WebTransport::SendBinary(const byte* bytes, size_t length)
 /******************************************************************************************************************************************************
  *  W E B   R E S P O N S E   B O D Y
 ******************************************************************************************************************************************************/
-/* A response this server is pulled from rather than pushed to: the stream collects what is
-   written and Finish() hands it to the request, which is when the library sends it. */
+// A response this server is pulled from rather than pushed to: the stream collects what is
+// written and Finish() hands it to the request, which is when the library sends it.
 
 WebResponseBody::WebResponseBody(AsyncWebServerRequest* request, const char* content_type)
     : request_(request), stream_(request->beginResponseStream(content_type))

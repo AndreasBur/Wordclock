@@ -58,17 +58,19 @@ void DisplayManager::Task()
 
     ClockTime time = RealTimeClock::GetInstance().GetTime();
 
-    /* An overlay owns the display while it shows: Text draws its letters there and the
-       clock must not write over them. */
+    // An overlay owns the display while it shows: Text draws its letters there and the
+    // clock must not write over them.
     if(IsOverlayShowing()) {
         overlay_was_showing_ = true;
         return;
     }
 
-    /* The overlay has ended. Nothing else brings the clock back — Overlay's transition
-       to idle only stops the Text — so without this the grid would keep the last
-       overlay frame until the next word change, which can be nearly five minutes away.
-       Updating last_clock_words_ keeps that change from drawing a second time. */
+    /*
+     * The overlay has ended. Nothing else brings the clock back — Overlay's transition
+     * to idle only stops the Text — so without this the grid would keep the last
+     * overlay frame until the next word change, which can be nearly five minutes away.
+     * Updating last_clock_words_ keeps that change from drawing a second time.
+     */
     if(overlay_was_showing_) {
         overlay_was_showing_ = false;
         UpdateClockWords(time.GetHour(), time.GetMinute());

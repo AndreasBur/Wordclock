@@ -23,8 +23,8 @@
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
-/* The same rate the other backends' consoles run at, so one terminal setting fits all
-   three. */
+// The same rate the other backends' consoles run at, so one terminal setting fits all
+// three.
 #define WORDCLOCK_SERIAL_BAUDRATE                       115200uL
 
 #endif // _WORDCLOCK_CONFIGURATION_H_

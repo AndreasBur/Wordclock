@@ -23,13 +23,15 @@
 # include <unistd.h>
 #endif
 
-/* A connection that is opened and says nothing - what a browser does when it opens a socket
-   ahead of a request - must cost the tick a moment and not stop it. It used to stop it until
-   the browser closed the socket, and the window and every other client with it.
-
-   Closed from a second thread after a few seconds, so that a host which does wait for it
-   ends this case late and failed rather than never. Needs the port, so a simulator left
-   open next to the tests skips the case rather than failing it. */
+/*
+ * A connection that is opened and says nothing - what a browser does when it opens a socket
+ * ahead of a request - must cost the tick a moment and not stop it. It used to stop it until
+ * the browser closed the socket, and the window and every other client with it.
+ *
+ * Closed from a second thread after a few seconds, so that a host which does wait for it
+ * ends this case late and failed rather than never. Needs the port, so a simulator left
+ * open next to the tests skips the case rather than failing it.
+ */
 void TestWebHostOutlastsAnIdleConnection()
 {
 #ifndef _WIN32

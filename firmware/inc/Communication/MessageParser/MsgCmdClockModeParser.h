@@ -103,8 +103,8 @@ class MsgCmdClockModeParser : public MsgParameterParser<MsgCmdClockModeParser, M
     // methods
     static void SendAnswer() {
         SendAnswerParameter(kModeOptionShortName, ToUnderlying(Clock::GetInstance().GetMode()));
-        /* Last field before the command parser's terminating println(), so no trailing
-           separator space. */
+        // Last field before the command parser's terminating println(), so no trailing
+        // separator space.
         SendAnswerParameter(kShowItIsOptionShortName, static_cast<byte>(Clock::GetInstance().GetShowItIsPermanently() ? 1u : 0u), false);
     }
 

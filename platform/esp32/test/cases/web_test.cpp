@@ -1,5 +1,5 @@
-/* Drives the registered handlers the way the server reaches them - through the
-   registration call - so WebInterface's own wiring is covered rather than bypassed. */
+// Drives the registered handlers the way the server reaches them - through the
+// registration call - so WebInterface's own wiring is covered rather than bypassed.
 #include <esp_http_server.h>
 #include <ESPmDNS.h>
 #include "Arduino.h"
@@ -17,10 +17,12 @@
 #include <vector>
 
 
-/* A registered route as the server keeps it: the handler and the context handed back with
-   it. The context matters since the five files served unchanged share one handler and tell
-   each other apart by it - so a route is called through here rather than as a bare function
-   pointer, or every asset would answer as whichever was registered last. */
+/*
+ * A registered route as the server keeps it: the handler and the context handed back with
+ * it. The context matters since the five files served unchanged share one handler and tell
+ * each other apart by it - so a route is called through here rather than as a bare function
+ * pointer, or every asset would answer as whichever was registered last.
+ */
 struct RouteType {
     httpd_handler_t handler = nullptr;
     void* context = nullptr;
@@ -30,8 +32,8 @@ struct RouteType {
         return handler(request);
     }
 
-    /* So a case can still ask whether a route was registered at all, which is what the
-       nullptr comparisons below are for. */
+    // So a case can still ask whether a route was registered at all, which is what the
+    // nullptr comparisons below are for.
     bool operator!=(std::nullptr_t) const { return handler != nullptr; }
     bool operator==(std::nullptr_t) const { return handler == nullptr; }
 };
@@ -49,8 +51,8 @@ static std::string sent_type;
 static std::string sent_status;
 /* Every header a handler set, by name - the gate's WWW-Authenticate is read out of here. */
 static std::map<std::string, std::string> sent_headers;
-/* The body the next upload is to be fed, and how much of it the stub is willing to hand
-   over - short of the announced length is a connection that went away mid-upload. */
+// The body the next upload is to be fed, and how much of it the stub is willing to hand
+// over - short of the announced length is a connection that went away mid-upload.
 static std::string body;
 static size_t body_offset = 0u;
 static size_t body_limit = 0u;
@@ -103,15 +105,17 @@ esp_err_t httpd_req_get_hdr_value_str(httpd_req_t*, const char* field, char* tar
 
 esp_err_t httpd_resp_send(httpd_req_t*, const char* b, ssize_t n)
 {
-    /* The update route answers with the framework's "until the terminator" sentinel, the
-       others with a length - and a body of bytes may hold a zero, so the two cannot be
-       collapsed into strlen(). */
+    /*
+     * The update route answers with the framework's "until the terminator" sentinel, the
+     * others with a length - and a body of bytes may hold a zero, so the two cannot be
+     * collapsed into strlen().
+     */
     root_body.assign(b, (n == HTTPD_RESP_USE_STRLEN) ? strlen(b) : static_cast<size_t>(n));
     return ESP_OK;
 }
 
-/* Hands over the prepared body a chunk at a time, and stops at body_limit rather than at its
-   end - which is how a dropped connection is reached without a socket to drop. */
+// Hands over the prepared body a chunk at a time, and stops at body_limit rather than at its
+// end - which is how a dropped connection is reached without a socket to drop.
 int httpd_req_recv(httpd_req_t*, char* target, size_t max)
 {
     if(body_offset >= body_limit) { return 0; }
@@ -141,8 +145,8 @@ esp_err_t httpd_ws_recv_frame(httpd_req_t*, httpd_ws_frame_t* f, size_t max)
 }
 
 static std::vector<std::string> sent_binary;
-/* The descriptor each frame went to, so a test can ask who was served rather than only how
-   many frames left - the answer differs once more than one client is registered. */
+// The descriptor each frame went to, so a test can ask who was served rather than only how
+// many frames left - the answer differs once more than one client is registered.
 static std::vector<int> sent_binary_to;
 
 esp_err_t httpd_ws_send_frame_async(httpd_handle_t, int descriptor, httpd_ws_frame_t* f)
@@ -161,9 +165,11 @@ static size_t FramesSentTo(int descriptor)
     return count;
 }
 
-/* Enough of a parse to say the document is well formed: brackets balanced and no string
-   left open. A browser would refuse the whole thing otherwise, and that failure looks
-   like a broken server rather than a broken label. */
+/*
+ * Enough of a parse to say the document is well formed: brackets balanced and no string
+ * left open. A browser would refuse the whole thing otherwise, and that failure looks
+ * like a broken server rather than a broken label.
+ */
 static bool IsBalancedJson(const std::string& text)
 {
     int depth = 0;
@@ -189,23 +195,27 @@ int main()
     Check(WebInterface::GetInstance().Begin() == kEOk, "the server starts and registers its handlers");
     Check((socket_handler != nullptr) && (root_handler != nullptr) && (commands_handler != nullptr)
           && (display_handler != nullptr), "all four handlers were registered");
-    /* Separately, because the server's own handler limit is what would drop these: it is a
-       number in the configuration, and one route past it is refused rather than reported. */
+    // Separately, because the server's own handler limit is what would drop these: it is a
+    // number in the configuration, and one route past it is refused rather than reported.
     Check((manifest_handler != nullptr) && (icon192_handler != nullptr) && (icon512_handler != nullptr)
           && (update_handler != nullptr),
           "and the four added since fit under the handler limit as well");
-    /* The ninth, which is the one that pushed the limit past its default: "/" is the panel and
-       the console moved here, so a missing registration would answer 404 on the page that
-       everything the panel does not cover goes through. */
+    /*
+     * The ninth, which is the one that pushed the limit past its default: "/" is the panel and
+     * the console moved here, so a missing registration would answer 404 on the page that
+     * everything the panel does not cover goes through.
+     */
     Check(console_handler != nullptr, "and the console's own route fits too");
 
     httpd_req_t request{};
     request.method = HTTP_GET;
 
-    /* the two pages: both gzipped, both announced as such, and not the same bytes - "/" is
-       the panel and "/console" the generated console. Told apart by their titles, because
-       that is what a browser would show and what a swapped pair of pointers would get
-       wrong while every other check here still passed. */
+    /*
+     * the two pages: both gzipped, both announced as such, and not the same bytes - "/" is
+     * the panel and "/console" the generated console. Told apart by their titles, because
+     * that is what a browser would show and what a swapped pair of pointers would get
+     * wrong while every other check here still passed.
+     */
     console_handler(&request);
     const std::string console = root_body;
     Check(root_encoding == "gzip", "the console is announced as gzip");
@@ -229,8 +239,8 @@ int main()
           && manifest.find("standalone") != std::string::npos, "it asks to start without an address bar");
     Check(manifest.find("icon-192.png") != std::string::npos
           && manifest.find("icon-512.png") != std::string::npos, "it names both icons");
-    /* Relative, because the clock answers on whatever address it was given: an absolute
-       start_url baked in here would send an installed console to a different clock. */
+    // Relative, because the clock answers on whatever address it was given: an absolute
+    // start_url baked in here would send an installed console to a different clock.
     Check(manifest.find("\"start_url\": \".\"") != std::string::npos, "and starts at a relative URL");
 
     /* the icons: sent as they are, which is what a PNG wants */
@@ -253,8 +263,8 @@ int main()
     Check(chunked.find("\"short\":\"B\"") != std::string::npos, "it carries an option short name");
     Check(chunked.find("\"max\":255") != std::string::npos, "it carries the ranges");
     Check(chunked.find("\"values\":[") != std::string::npos, "it carries named values for the enumerations");
-    /* Without this the page would offer the status fields as inputs, and a value typed
-       into one of them would come back as "parameter unknown". */
+    // Without this the page would offer the status fields as inputs, and a value typed
+    // into one of them would come back as "parameter unknown".
     Check(chunked.find("\"readonly\":true") != std::string::npos, "it marks the fields that only appear in answers");
     size_t commands = 0u;
     for(size_t at = chunked.find("\"number\":"); at != std::string::npos; at = chunked.find("\"number\":", at + 1u)) { commands++; }
@@ -267,8 +277,8 @@ int main()
     Check(chunked.find("\"columns\":11") != std::string::npos, "it carries the column count");
     Check(chunked.find("\"rows\":10") != std::string::npos, "it carries the row count");
     Check(chunked.find("ESKISTLF") != std::string::npos, "it carries the letters");
-    /* U with an umlaut is 0xDC in the firmware's table and has to arrive as two UTF-8 bytes;
-       the raw byte would make the whole document invalid. */
+    // U with an umlaut is 0xDC in the firmware's table and has to arrive as two UTF-8 bytes;
+    // the raw byte would make the whole document invalid.
     Check(chunked.find("\xc3\x9c") != std::string::npos, "the umlauts arrive as UTF-8");
     Check(chunked.find("\xdc") == std::string::npos, "no raw Latin-1 byte escapes into the JSON");
 
@@ -290,13 +300,15 @@ int main()
     Check(found, "the answer came back over the socket");
     for(const auto& line : sent) { printf("   sent: \"%s\"\n", line.c_str()); }
 
-    /* An answer carrying a Latin-1 byte, which is what the overlay text command answers with
-       once somebody sets a text with an umlaut in it - the thing the font tables carry
-       umlauts for. A web socket text frame has to be valid UTF-8, so a raw 0xFC here does
-       not draw one character wrong, it makes the browser close the connection.
-
-       The strings are split around the escapes on purpose: "\xFCck" would swallow the c as a
-       further hex digit and stop compiling. */
+    /*
+     * An answer carrying a Latin-1 byte, which is what the overlay text command answers with
+     * once somebody sets a text with an umlaut in it - the thing the font tables carry
+     * umlauts for. A web socket text frame has to be valid UTF-8, so a raw 0xFC here does
+     * not draw one character wrong, it makes the browser close the connection.
+     *
+     * The strings are split around the escapes on purpose: "\xFCck" would swallow the c as a
+     * further hex digit and stop compiling.
+     */
     sent.clear();
     WebInterface::GetInstance().BroadcastLine("T=Gl\xFC" "ck");
     Check(!sent.empty(), "an answer with an umlaut is sent at all");
@@ -312,8 +324,8 @@ int main()
         for(unsigned tick = 0u; tick < (count * kInterval); tick++) { web.BroadcastFrame(); }
     };
 
-    /* The handshake above counted as a client arriving, so one frame is already owed. Drain
-       it before measuring anything, or every count below is one too high. */
+    // The handshake above counted as a client arriving, so one frame is already owed. Drain
+    // it before measuring anything, or every count below is one too high.
     run_interval(1u);
     sent_binary.clear();
     sent_binary_to.clear();
@@ -350,9 +362,11 @@ int main()
           static_cast<unsigned char>(sent_binary[0][2]) == 30u,
           "enabling the display restores the browser frame");
 
-    /* A client arriving between two changes still has to be shown the panel - and every
-       client that is already watching gets the same frame, which is why this counts by
-       descriptor rather than by frames. */
+    /*
+     * A client arriving between two changes still has to be shown the panel - and every
+     * client that is already watching gets the same frame, which is why this counts by
+     * descriptor rather than by frames.
+     */
     sent_binary.clear();
     sent_binary_to.clear();
     web.OnClientOpened(9);
@@ -360,8 +374,8 @@ int main()
     Check(FramesSentTo(9) == 1u, "a client that arrives is shown the standing display");
     Check(FramesSentTo(7) == 1u, "and the one already watching gets it too");
 
-    /* A descriptor the system handed out again is a new client, not the old one, so it also
-       has to be shown the panel - the early return on the duplicate used to skip that. */
+    // A descriptor the system handed out again is a new client, not the old one, so it also
+    // has to be shown the panel - the early return on the duplicate used to skip that.
     sent_binary.clear();
     sent_binary_to.clear();
     web.OnClientOpened(9);
@@ -381,11 +395,13 @@ int main()
     pending_frame.assign(WEB_FRONTEND_MAX_FRAME_LENGTH + 10u, 'x');
     Check(socket_handler(&request) != ESP_OK, "an oversized frame is refused");
 
-    /* ---- the firmware update ----------------------------------------------------------
-       What a host can say about this is the sequence: begun with the size the request
-       announced, written what arrived, ended only when all of it did, and the reboot asked
-       for afterwards rather than taken inside the handler. Whether the bytes land in the
-       other partition is the framework's business and no test here can speak to it. */
+    /*
+     * ---- the firmware update ----------------------------------------------------------
+     * What a host can say about this is the sequence: begun with the size the request
+     * announced, written what arrived, ended only when all of it did, and the reboot asked
+     * for afterwards rather than taken inside the handler. Whether the bytes land in the
+     * other partition is the framework's business and no test here can speak to it.
+     */
     auto upload = [](const std::string& image, size_t deliver) {
         Update.forget();
         body = image;
@@ -399,8 +415,8 @@ int main()
         update_handler(&post);
     };
 
-    /* An image of no particular content: what is being checked is the byte count, and the
-       header the real Update would insist on is the framework's check rather than this. */
+    // An image of no particular content: what is being checked is the byte count, and the
+    // header the real Update would insist on is the framework's check rather than this.
     const std::string image(4096u, '\xe9');
 
     upload(image, image.size());
@@ -410,15 +426,17 @@ int main()
     Check(Update.Written == image.size(), "every byte that arrived was written");
     Check(Update.Ended && !Update.Aborted, "and the image was finished rather than abandoned");
 
-    /* The reboot is the point of the deferral: asked for here, carried out by the tick after
-       the answer has gone out. A handler that restarted on the spot would send nothing. */
+    // The reboot is the point of the deferral: asked for here, carried out by the tick after
+    // the answer has gone out. A handler that restarted on the spot would send nothing.
     Check(!ESP.Restarted, "the handler does not restart the controller itself");
     System::GetInstance().PerformPendingRestart();
     Check(ESP.Restarted, "the tick after the answer does");
 
-    /* Half an image, which is what a connection that goes away mid-upload leaves. The clock
-       has to keep running what it was running, so nothing may be finished and the partition
-       has to be given back. */
+    /*
+     * Half an image, which is what a connection that goes away mid-upload leaves. The clock
+     * has to keep running what it was running, so nothing may be finished and the partition
+     * has to be given back.
+     */
     upload(image, image.size() / 2u);
     Check(sent_status == "400 Bad Request", "an upload that stops halfway is refused");
     Check(!Update.Ended, "nothing is finished on a partial image");
@@ -426,9 +444,11 @@ int main()
     Check(root_body.find("stopped before") != std::string::npos,
           "with a reason that says what happened rather than that something did");
 
-    /* Refused before a byte is written, which is what an image too large for the partition
-       does - the factory file instead of the OTA one, most likely. The reason is the
-       framework's own text, because it is the one that names which limit was hit. */
+    /*
+     * Refused before a byte is written, which is what an image too large for the partition
+     * does - the factory file instead of the OTA one, most likely. The reason is the
+     * framework's own text, because it is the one that names which limit was hit.
+     */
     Update.forget();
     Update.RefuseBegin = true;
     Update.Error = "Not Enough Space";
@@ -446,8 +466,8 @@ int main()
     Check(Update.Written == 0u, "before anything is written");
     Check(root_body.find("Not Enough Space") != std::string::npos, "and the framework's reason is passed on");
 
-    /* No body at all, which is what an empty file picker sends. Refused without claiming the
-       partition, or a mis-click would take the running firmware's spare with it. */
+    // No body at all, which is what an empty file picker sends. Refused without claiming the
+    // partition, or a mis-click would take the running firmware's spare with it.
     Update.forget();
     sent_status.clear();
     {
@@ -460,10 +480,12 @@ int main()
     Check(!Update.Begun, "and does not claim the partition to find that out");
 
 
-    /* ---- the console password --------------------------------------------------------
-       What this can say on a host is the gate: who is refused, who is let through, and that
-       every route goes through the same door. What it cannot say is whether base64 over plain
-       http is worth anything - it is not encryption, and the backend's notes say so. */
+    /*
+     * ---- the console password --------------------------------------------------------
+     * What this can say on a host is the gate: who is refused, who is let through, and that
+     * every route goes through the same door. What it cannot say is whether base64 over plain
+     * http is worth anything - it is not encryption, and the backend's notes say so.
+     */
     auto fetch_root = [](const char* header) {
         authorization = (header == nullptr) ? "" : header;
         sent_status.clear();
@@ -472,9 +494,11 @@ int main()
         get.method = HTTP_GET;
         root_handler(&get);
     };
-    /* The console goes through the same door, and it is worth asking separately: both pages
-       come out of one sendPage(), and a gate that had stayed in the old handler would now be
-       in one of the two callers and not in the other. */
+    /*
+     * The console goes through the same door, and it is worth asking separately: both pages
+     * come out of one sendPage(), and a gate that had stayed in the old handler would now be
+     * in one of the two callers and not in the other.
+     */
     auto fetch_console = [](const char* header) {
         authorization = (header == nullptr) ? "" : header;
         sent_status.clear();
@@ -510,16 +534,16 @@ int main()
     fetch_root("Basic d29yZGNsb2NrOmh1bnRlcjM=");
     Check(sent_status == "401 Unauthorized", "a wrong password is refused");
 
-    /* A prefix of the right credential, which is the one comparison that must not be lenient:
-       a length-blind strncmp would accept this. */
+    // A prefix of the right credential, which is the one comparison that must not be lenient:
+    // a length-blind strncmp would accept this.
     fetch_root("Basic d29yZGNsb2NrOmh1bnRlcj");
     Check(sent_status == "401 Unauthorized", "and so is a prefix of the right one");
 
     fetch_root("d29yZGNsb2NrOmh1bnRlcjI=");
     Check(sent_status == "401 Unauthorized", "a credential without the scheme is refused");
 
-    /* Every route, not just the page: a console that asked for a password and then took
-       commands on an unchecked socket would be a lock on the wrong door. */
+    // Every route, not just the page: a console that asked for a password and then took
+    // commands on an unchecked socket would be a lock on the wrong door.
     authorization.clear();
     for(const auto& route : {std::make_pair("commands", commands_handler), std::make_pair("display", display_handler),
                              std::make_pair("manifest", manifest_handler), std::make_pair("icon", icon192_handler),

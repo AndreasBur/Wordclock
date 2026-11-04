@@ -76,15 +76,15 @@ class MsgCmdConsoleParser : public MsgParameterParser<MsgCmdConsoleParser, MSG_C
     ~MsgCmdConsoleParser() { }
 
     // methods
-    /* Whether a password is set, and never which one. Last field before the command parser's
-       terminating println(), so no trailing separator space. */
+    // Whether a password is set, and never which one. Last field before the command parser's
+    // terminating println(), so no trailing separator space.
     static void SendAnswer() {
         SendAnswerParameter(kProtectedShortName,
                             static_cast<byte>(System::GetInstance().IsConsoleProtected() ? 1u : 0u), false);
     }
 
-    /* Nothing deferred: the password is stored where it arrives, since there is no second
-       field it has to agree with. */
+    // Nothing deferred: the password is stored where it arrives, since there is no second
+    // field it has to agree with.
     static void Process() { }
 };
 

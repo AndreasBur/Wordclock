@@ -31,9 +31,11 @@
 #ifndef _STL_TYPE_TRAITS_
 #define _STL_TYPE_TRAITS_
 
-/* On this toolchain these headers are the standard library, see type_traits, so declaring
-   into std is what they exist to do - and under the standard's names, which is what the
-   naming check is told here. */
+/*
+ * On this toolchain these headers are the standard library, see type_traits, so declaring
+ * into std is what they exist to do - and under the standard's names, which is what the
+ * naming check is told here.
+ */
 // NOLINTBEGIN(cert-dcl58-cpp,readability-identifier-naming)
 namespace std {
 
@@ -60,15 +62,19 @@ template<class T> using remove_cv_t = typename remove_cv<T>::type;
 template<class T, class U> struct is_same : false_type { };
 template<class T> struct is_same<T, T> : true_type { };
 
-/* __is_base_of rather than a hand-rolled conversion test: the built-in also answers
-   correctly for private and ambiguous bases, which is what the CRTP assertions are
-   guarding against in the first place. */
+/*
+ * __is_base_of rather than a hand-rolled conversion test: the built-in also answers
+ * correctly for private and ambiguous bases, which is what the CRTP assertions are
+ * guarding against in the first place.
+ */
 template<class Base, class Derived> struct is_base_of : integral_constant<bool, __is_base_of(Base, Derived)> { };
 
-/* Listed out rather than asked of the compiler: GCC 14 has no __is_integral built-in for
-   this target, and enumerating the fundamental types is the portable answer. The list is
-   the language's, not the core's - a trait that only knew the types used today would
-   silently answer false for the next one. */
+/*
+ * Listed out rather than asked of the compiler: GCC 14 has no __is_integral built-in for
+ * this target, and enumerating the fundamental types is the portable answer. The list is
+ * the language's, not the core's - a trait that only knew the types used today would
+ * silently answer false for the next one.
+ */
 template<class T> struct is_integral_helper : false_type { };
 template<> struct is_integral_helper<bool> : true_type { };
 template<> struct is_integral_helper<char> : true_type { };
@@ -93,14 +99,16 @@ template<> struct is_floating_point_helper<double> : true_type { };
 template<> struct is_floating_point_helper<long double> : true_type { };
 template<class T> struct is_floating_point : is_floating_point_helper<remove_cv_t<T>> { };
 
-/* Deliberately not __is_signed: that built-in answers true for floating-point types as
-   well, while the core pairs is_signed with is_integral to pick an integer conversion.
-   Comparing T(-1) against T(0) keeps the answer to what the parsers mean by it. */
+/*
+ * Deliberately not __is_signed: that built-in answers true for floating-point types as
+ * well, while the core pairs is_signed with is_integral to pick an integer conversion.
+ * Comparing T(-1) against T(0) keeps the answer to what the parsers mean by it.
+ */
 template<class T> struct is_signed : integral_constant<bool, is_integral<T>::value && (T(-1) < T(0))> { };
 template<class T> struct is_unsigned : integral_constant<bool, is_integral<T>::value && (T(0) < T(-1))> { };
 
-/* The built-in, as libstdc++ itself has it: what an enum is stored as is the compiler's
-   knowledge and cannot be worked out in the language. */
+// The built-in, as libstdc++ itself has it: what an enum is stored as is the compiler's
+// knowledge and cannot be worked out in the language.
 template<class T> struct underlying_type { using type = __underlying_type(T); };
 template<class T> using underlying_type_t = typename underlying_type<T>::type;
 

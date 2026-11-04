@@ -33,12 +33,14 @@
  *  GLOBAL CONSTANT MACROS
 ******************************************************************************************************************************************************/
 /* Display configuration parameter */
-/* The one display parameter that is a property of the board rather than of the display:
-   which pin is free is decided by the part, not by the strip. So a board that cannot use
-   this one overrides it from its own build instead of editing here - the way
-   WORDCLOCK_VERSION is overridden - because every target shares this header, and editing
-   the line would move the pin for all four of them at once. Which pin each backend needs is
-   in its own README. */
+/*
+ * The one display parameter that is a property of the board rather than of the display:
+ * which pin is free is decided by the part, not by the strip. So a board that cannot use
+ * this one overrides it from its own build instead of editing here - the way
+ * WORDCLOCK_VERSION is overridden - because every target shares this header, and editing
+ * the line would move the pin for all four of them at once. Which pin each backend needs is
+ * in its own README.
+ */
 #ifndef DISPLAY_DATA_PIN
 # define DISPLAY_DATA_PIN                           10u
 #endif
@@ -118,19 +120,25 @@ class Display
   private:
     static constexpr byte kWordLengthUnlimited{0u};
     StateType state_{StateType::kNone};
-    /* Whether the display was last asked to be on, true because a strip comes up lit. Kept
-       here rather than read back from the strip's master brightness, which is what Enable()
-       and Disable() write: under DISPLAY_USE_PIXELS_DIMMING that same register carries the
-       brightness setting, so a zero in it would answer "dark" where the question is
-       "switched off". */
+    /*
+     * Whether the display was last asked to be on, true because a strip comes up lit. Kept
+     * here rather than read back from the strip's master brightness, which is what Enable()
+     * and Disable() write: under DISPLAY_USE_PIXELS_DIMMING that same register carries the
+     * brightness setting, so a zero in it would answer "dark" where the question is
+     * "switched off".
+     */
     bool enabled_{true};
-    /* brightness the pixels on the display were last written with. Zero rather than the
-       initial brightness, so the first task establishes a defined state; the display is
-       still empty then, which makes that first pass free. */
+    /*
+     * brightness the pixels on the display were last written with. Zero rather than the
+     * initial brightness, so the first task establishes a defined state; the display is
+     * still empty then, which makes that first pass free.
+     */
     byte applied_brightness_{0u};
-    /* master the strip was last handed. Full, because that is where Pixels starts - and
-       because writing it marks the frame dirty, so this exists to write it only when the cap
-       has actually moved rather than on every task run. */
+    /*
+     * master the strip was last handed. Full, because that is where Pixels starts - and
+     * because writing it marks the frame dirty, so this exists to write it only when the cap
+     * has actually moved rather than on every task run.
+     */
     byte applied_current_limit_{DisplayCurrentLimit::kNoLimit};
 # if (PIXELS_IS_SINGLETON == STD_OFF)
     Pixels pixel_stripe_;
@@ -148,8 +156,8 @@ class Display
 
     static byte TransformToSerpentine(byte, byte);
     static byte TransformToSerpentine(byte);
-    /* The one place a column and a row become an index on the strip, so the wiring is
-       written once instead of as a #if in every entry point that takes a column. */
+    // The one place a column and a row become an index on the strip, so the wiring is
+    // written once instead of as a #if in every entry point that takes a column.
     static byte ToIndex(byte column, byte row) {
 #if (DISPLAY_LED_STRIPE_SERPENTINE == STD_ON)
         /* if led stripe is snake or serpentine the odd row: count from right to left */
@@ -160,9 +168,11 @@ class Display
     }
 
     void ApplyColor();
-    /* A colour change moves the current as much as a brightness change does - white draws
-       three times what amber at the same brightness does - so both have to go past the
-       limit. This is what the colour setters call instead of ApplyColor() alone. */
+    /*
+     * A colour change moves the current as much as a brightness change does - white draws
+     * three times what amber at the same brightness does - so both have to go past the
+     * limit. This is what the colour setters call instead of ApplyColor() alone.
+     */
     void ApplyColorAndCurrentLimit();
 
     void ApplyCurrentLimit();
@@ -173,11 +183,13 @@ class Display
 
     Pixel GetColorDimmed(byte) const;
 
-    /* The colour a lit pixel is written in, decided here once rather than at every writer -
-       the writers that each decided it for themselves were how the strip-dimming path came
-       to hand SetPixel() a DisplayColor and stop compiling. Where the colour does the
-       dimming that is its dimmed copy; where the strip does it, the colour as it is to be
-       shown, which the strip's master then scales on the way out. */
+    /*
+     * The colour a lit pixel is written in, decided here once rather than at every writer -
+     * the writers that each decided it for themselves were how the strip-dimming path came
+     * to hand SetPixel() a DisplayColor and stop compiling. Where the colour does the
+     * dimming that is its dimmed copy; where the strip does it, the colour as it is to be
+     * shown, which the strip's master then scales on the way out.
+     */
     Pixel GetColorToWrite() const {
 #if (DISPLAY_USE_PIXELS_DIMMING == STD_ON)
         return color_.GetColorToShow();
@@ -205,12 +217,14 @@ class Display
     ColorType GetColorGreen() const { return color_.GetColorGreen(); }
     ColorType GetColorBlue() const { return color_.GetColorBlue(); }
 
-    /* The brightness that was asked for, not the one on the strip. The two used to differ by
-       which dimming path was compiled, and now they differ for a second reason: the current
-       limit can cap what reaches the LEDs. Both callers - Persistence and the brightness
-       command's answer - want the setting. A saved configuration that came back one part
-       dimmer for having been saved on a hot afternoon would be the alternative, and the
-       command would report a number nobody typed. */
+    /*
+     * The brightness that was asked for, not the one on the strip. The two used to differ by
+     * which dimming path was compiled, and now they differ for a second reason: the current
+     * limit can cap what reaches the LEDs. Both callers - Persistence and the brightness
+     * command's answer - want the setting. A saved configuration that came back one part
+     * dimmer for having been saved on a hot afternoon would be the alternative, and the
+     * command would report a number nobody typed.
+     */
     byte GetBrightness() const { return brightness_.GetBrightness(); }
 
     void SetBrightnessUseAutomatic(bool brightness_use_automatic) {
@@ -228,8 +242,8 @@ class Display
     void SetColorGreen(ColorType green) { color_.SetColorGreen(green); ApplyColorAndCurrentLimit(); }
     void SetColorBlue(ColorType blue) { color_.SetColorBlue(blue); ApplyColorAndCurrentLimit(); }
 
-    /* Takes the brightness the user asked for. What reaches the LEDs is
-       CalcBrightness(), which folds in gamma correction and the light sensor. */
+    // Takes the brightness the user asked for. What reaches the LEDs is
+    // CalcBrightness(), which folds in gamma correction and the light sensor.
     void SetBrightness(byte);
 
     // char methods
@@ -243,10 +257,12 @@ class Display
     StdReturnType ClearWord(WordIdType);
     StdReturnType ClearWords();
 
-    /* Two forms of a reader, and the argument list says which: the one taking a reference
-       answers whether the index was there, the one taking none answers the pixel and leaves
-       an unlit one where it was not. Writers have a single form, since a caller who ignores
-       what it answers is written the same way as one that never asked. */
+    /*
+     * Two forms of a reader, and the argument list says which: the one taking a reference
+     * answers whether the index was there, the one taking none answers the pixel and leaves
+     * an unlit one where it was not. Writers have a single form, since a caller who ignores
+     * what it answers is written the same way as one that never asked.
+     */
     // pixel methods
     StdReturnType WritePixel(byte column, byte row, PixelValueType value) { if(value) return SetPixel(column, row); else return ClearPixel(column, row); }
     StdReturnType WritePixel(IndexType index, PixelValueType value) { if(value) return SetPixel(index); else return ClearPixel(index); }
@@ -269,9 +285,11 @@ class Display
     StdReturnType SetPixelColumn(byte, PixelColumnType);
 
     bool IsIndexValid(IndexType index) const { return pixel_stripe_.IsIndexValid(index); }
-    /* Asked by every entry point taking a column and a row, because the index they map to
-       is a valid one for the next row: a column past the last one used to light the first
-       letter of the row below rather than being refused. */
+    /*
+     * Asked by every entry point taking a column and a row, because the index they map to
+     * is a valid one for the next row: a column past the last one used to light the first
+     * letter of the row below rather than being refused.
+     */
     static constexpr bool IsColumnAndRowValid(byte column, byte row) {
         return (column < DISPLAY_NUMBER_OF_COLUMNS) && (row < DISPLAY_NUMBER_OF_ROWS);
     }
@@ -279,26 +297,30 @@ class Display
     // methods
     void Init();
     StdReturnType Show() { return pixel_stripe_.Show(); }
-    /* Not EnablePixels(): that puts the master back at full, which is the one value the
-       supply may not allow. The way back on goes through the cap instead. */
+    // Not EnablePixels(): that puts the master back at full, which is the one value the
+    // supply may not allow. The way back on goes through the cap instead.
     void Enable() { enabled_ = true; ResumeAtCurrentLimit(); }
     void Disable() { enabled_ = false; pixel_stripe_.DisablePixels(); }
     bool IsEnabled() const { return enabled_; }
-    /* The other way round from whatever it is now, for a button that has nothing to read
-       the state off. The three toggles below are the same idea for the two settings that
-       are a yes or a no. */
+    /*
+     * The other way round from whatever it is now, for a button that has nothing to read
+     * the state off. The three toggles below are the same idea for the two settings that
+     * are a yes or a no.
+     */
     void Toggle() { if(IsEnabled()) { Disable(); } else { Enable(); } }
 
-    /* The strip as a wire rather than as a picture, for the supply switch: whether a frame
-       is still waiting to go out, whether one is still going out, and the gate that stops
-       any from going out at all. Forwarded here rather than reached through Pixels directly
-       so that the module driving the switch needs one collaborator instead of two - and so
-       the rule stays where the rest of the strip's handling is.
-
-       IsDirty() and IsFrameOnTheWire() are two different waits and both are needed: the
-       first says the blanked frame has not been handed over yet, the second that it has and
-       is still on the wire. Cutting the supply at either point leaves the strip holding
-       half a frame with nothing to latch it. */
+    /*
+     * The strip as a wire rather than as a picture, for the supply switch: whether a frame
+     * is still waiting to go out, whether one is still going out, and the gate that stops
+     * any from going out at all. Forwarded here rather than reached through Pixels directly
+     * so that the module driving the switch needs one collaborator instead of two - and so
+     * the rule stays where the rest of the strip's handling is.
+     *
+     * IsDirty() and IsFrameOnTheWire() are two different waits and both are needed: the
+     * first says the blanked frame has not been handed over yet, the second that it has and
+     * is still on the wire. Cutting the supply at either point leaves the strip holding
+     * half a frame with nothing to latch it.
+     */
     bool IsDirty() const { return pixel_stripe_.IsDirty(); }
     bool IsFrameOnTheWire() const { return pixel_stripe_.IsFrameOnTheWire(); }
     bool IsOutputSuspended() const { return pixel_stripe_.IsOutputSuspended(); }
@@ -308,13 +330,15 @@ class Display
     void DisableBrightnessAutomatic() { brightness_.DisableAutomatic(); }
     void EnableBrightnessGammaCorrection() { brightness_.EnableGammaCorrection(); }
     void DisableBrightnessGammaCorrection() { brightness_.DisableGammaCorrection(); }
-    /* Through the setters rather than through the enable/disable pair above, which is the
-       half of it that leaves ApplyBrightness() to the next task: a knob turned once should
-       show what it did, not a tick later. */
+    /*
+     * Through the setters rather than through the enable/disable pair above, which is the
+     * half of it that leaves ApplyBrightness() to the next task: a knob turned once should
+     * show what it did, not a tick later.
+     */
     void ToggleBrightnessAutomatic() { SetBrightnessUseAutomatic(!GetBrightnessUseAutomatic()); }
     void ToggleBrightnessGammaCorrection() { SetBrightnessUseGammaCorrection(!GetBrightnessUseGammaCorrection()); }
-    /* The one call that reaches every LED at once, and the reason the README names it when it
-       sizes a supply. So it asks for the cap itself rather than leaving a task to notice. */
+    // The one call that reaches every LED at once, and the reason the README names it when it
+    // sizes a supply. So it asks for the cap itself rather than leaving a task to notice.
     void Test() { pixel_stripe_.SetPixels(GetColorToWrite()); ApplyCurrentLimit(); }
     void Clear() { pixel_stripe_.ClearPixels(); }
     bool IsCleared() const { for(byte index = 0; index < DISPLAY_NUMBER_OF_PIXELS; index++) { if(GetPixel(index)) return false; } return true; }
@@ -329,44 +353,50 @@ class Display
     void DecrementColorBlue() { color_.DecrementColorBlue(); ApplyColor(); }
     void DecrementBrightness() { brightness_.DecrementBrightness(); ApplyBrightness(); }
 
-    /* The colour cycle's level, which ColorCycle drives. Through the current limit like every
-       other colour change and for the same reason: white draws three times what a saturated
-       hue does, so a wheel stepping without recomputing the cap would be a wheel walking past
-       the supply's budget on one segment and leaving it unused on the next. */
+    /*
+     * The colour cycle's level, which ColorCycle drives. Through the current limit like every
+     * other colour change and for the same reason: white draws three times what a saturated
+     * hue does, so a wheel stepping without recomputing the cap would be a wheel walking past
+     * the supply's budget on one segment and leaving it unused on the next.
+     */
     void SetColorCycle(Pixel cycle_color) { color_.SetCycleColor(cycle_color); ApplyColorAndCurrentLimit(); }
     void ClearColorCycle() { color_.ClearCycle(); ApplyColorAndCurrentLimit(); }
     bool IsColorCycleActive() const { return color_.IsCycleActive(); }
     Pixel GetColorCycle() const { return color_.GetCycleColor(); }
 
-    /* White again, and through DisplayColor's own reset so that what this puts back is the
-       one named value the settings reset and the member initialiser already use. */
+    // White again, and through DisplayColor's own reset so that what this puts back is the
+    // one named value the settings reset and the member initialiser already use.
     void ResetColor() { color_.ResetToDefaults(); ApplyColor(); }
 
     void ApplyBrightness();
 
-    /* What AnimationFade dims the display with while it runs. It goes through the display
-       rather than through the strip because ApplyBrightness() runs on every task and
-       would otherwise write the configured brightness back over it - and it is a level of
-       its own rather than the brightness setting, so that what a fade dims is never what
-       Persistence stores. */
+    /*
+     * What AnimationFade dims the display with while it runs. It goes through the display
+     * rather than through the strip because ApplyBrightness() runs on every task and
+     * would otherwise write the configured brightness back over it - and it is a level of
+     * its own rather than the brightness setting, so that what a fade dims is never what
+     * Persistence stores.
+     */
     void SetBrightnessFadeLevel(byte level) { brightness_.SetFadeLevel(level); ApplyBrightness(); }
     void ClearBrightnessFade() { brightness_.ClearFade(); ApplyBrightness(); }
 
-    /* The night switch's dimming, which scales what the setting arrived at instead of
-       replacing it - so the brightness the owner chose is what morning returns to. */
+    // The night switch's dimming, which scales what the setting arrived at instead of
+    // replacing it - so the brightness the owner chose is what morning returns to.
     byte GetBrightnessNightLevel() const { return brightness_.GetNightLevel(); }
     void SetBrightnessNightLevel(byte level) { brightness_.SetNightLevel(level); ApplyBrightness(); }
     void ClearBrightnessNight() { brightness_.ClearNight(); ApplyBrightness(); }
 
-    /* Back to what a clock that was never configured shows. Each part answers for its own
-       defaults, so nothing here has to know what they are; the brightness is applied
-       afterwards, because that is what recalculates what reaches the LEDs. */
+    /*
+     * Back to what a clock that was never configured shows. Each part answers for its own
+     * defaults, so nothing here has to know what they are; the brightness is applied
+     * afterwards, because that is what recalculates what reaches the LEDs.
+     */
     void ResetToDefaults() {
         color_.ResetToDefaults();
         brightness_.ResetToDefaults();
         ApplyBrightness();
-        /* After the brightness, not instead of it: ApplyBrightness() does nothing where the
-           brightness was already at its default, and the colour would stay behind. */
+        // After the brightness, not instead of it: ApplyBrightness() does nothing where the
+        // brightness was already at its default, and the colour would stay behind.
         ApplyColor();
     }
 

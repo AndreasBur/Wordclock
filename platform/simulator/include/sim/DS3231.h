@@ -78,9 +78,11 @@ class DS3231
     }
 
     // methods
-    /* On hardware this reads the chip. Here it takes what the window dialled in. The
-       values are static because the firmware keeps its DS3231 inside the Temperature
-       singleton, which leaves the window no instance to talk to. */
+    /*
+     * On hardware this reads the chip. Here it takes what the window dialled in. The
+     * values are static because the firmware keeps its DS3231 inside the Temperature
+     * singleton, which leaves the window no instance to talk to.
+     */
     void Task() {
         temperature_ = simulated_temperature;
         temperature_valid_ = simulated_temperature_valid;
@@ -92,8 +94,8 @@ class DS3231
     }
     static TemperatureType GetSimulatedTemperature() { return simulated_temperature; }
 
-    /* Puts the chip back to never having answered, which is the state the overlay has to
-       stay away in. */
+    // Puts the chip back to never having answered, which is the state the overlay has to
+    // stay away in.
     static void ClearSimulatedTemperature() { simulated_temperature_valid = false; }
     static bool IsSimulatedTemperatureValid() { return simulated_temperature_valid; }
 

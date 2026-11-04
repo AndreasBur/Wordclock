@@ -143,12 +143,14 @@ class Overlays
     void TaskIdle(ClockDate, ClockTime);
     void TaskShow(ClockDate, ClockTime);
 
-    /* Shared by the three "show now" entry points below, which differ in nothing but the
-       overlay they name - a template rather than three copies of the two rules that
-       decide whether an overlay may start at all.
-
-       Switched off is a configuration and not a state to be talked out of, and only one
-       overlay may hold the display, because there is one show timer for all of them. */
+    /*
+     * Shared by the three "show now" entry points below, which differ in nothing but the
+     * overlay they name - a template rather than three copies of the two rules that
+     * decide whether an overlay may start at all.
+     *
+     * Switched off is a configuration and not a state to be talked out of, and only one
+     * overlay may hold the display, because there is one show timer for all of them.
+     */
     template <typename OverlayClassType>
     StdReturnType ShowNow(OverlayClassType& overlay) {
         if(!overlay.GetIsActive()) { return kENotOk; }
@@ -191,8 +193,8 @@ class Overlays
     DayType GetTemperatureValidInDays() const { return temperature_.GetValidInDays(); }
     byte GetTemperatureSpeed() const { return temperature_.GetSpeed(); }
     Text::FontType GetTemperatureFont() const { return temperature_.GetFont(); }
-    /* What the overlay would put on the display, which is the only way to read the
-       temperature back out of the firmware until there is a status command. */
+    // What the overlay would put on the display, which is the only way to read the
+    // temperature back out of the firmware until there is a status command.
     const char* GetTemperatureString() const { return temperature_.GetTemperatureString(); }
     bool GetTemperatureIsActive() const { return temperature_.GetIsActive(); }
 #endif
@@ -242,9 +244,11 @@ class Overlays
 #endif
 
 	// methods
-    /* Every overlay back to what it starts with, the same way Display, Clock, Animations
-       and Illuminance answer Persistence::Reset(). Here since the overlays are stored -
-       before that a reset had nothing of theirs to undo. */
+    /*
+     * Every overlay back to what it starts with, the same way Display, Clock, Animations
+     * and Illuminance answer Persistence::Reset(). Here since the overlays are stored -
+     * before that a reset had nothing of theirs to undo.
+     */
     void ResetToDefaults() {
 #if (OVERLAYS_SUPPORT_DATE == STD_ON)
         date_.ResetToDefaults();
@@ -259,9 +263,11 @@ class Overlays
 
 	void Task();
 
-    /* Show an overlay now instead of at its next period, and end the one that is
-       showing. Without these an overlay can only be watched by waiting for its raster,
-       which is also what makes one hard to develop against. */
+    /*
+     * Show an overlay now instead of at its next period, and end the one that is
+     * showing. Without these an overlay can only be watched by waiting for its raster,
+     * which is also what makes one hard to develop against.
+     */
 #if (OVERLAYS_SUPPORT_DATE == STD_ON)
     StdReturnType ShowDateNow() { return ShowNow(date_); }
 #endif

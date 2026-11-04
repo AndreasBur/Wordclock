@@ -26,23 +26,23 @@
 /******************************************************************************************************************************************************
  *  L O C A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
-/* The synchronous baud rate register: the host clock is the peripheral clock divided by
-   twice this, in units of a sixty-fourth. */
+// The synchronous baud rate register: the host clock is the peripheral clock divided by
+// twice this, in units of a sixty-fourth.
 #define WS2812_BAUD_REGISTER            static_cast<uint16_t>((64uL * F_CPU) / (2uL * WS2812_BIT_RATE_HZ))
 
-/* Peripheral clock cycles per pulse. Rounded to nearest, because at 24 MHz a cycle is
-   already 42 ns and truncating both widths would move them a full step towards zero. */
+// Peripheral clock cycles per pulse. Rounded to nearest, because at 24 MHz a cycle is
+// already 42 ns and truncating both widths would move them a full step towards zero.
 #define WS2812_CYCLES_PER_NS(Nanoseconds)   static_cast<uint16_t>(((F_CPU / 1000000uL) * (Nanoseconds) + 500uL) / 1000uL)
 
 #define WS2812_ZERO_PULSE_CYCLES        WS2812_CYCLES_PER_NS(WS2812_ZERO_PULSE_DURATION_NS)
 #define WS2812_ONE_PULSE_CYCLES         WS2812_CYCLES_PER_NS(WS2812_ONE_PULSE_DURATION_NS)
 
-/* out = IN0 ? IN2 : IN1, with IN0 the data line and IN1/IN2 the two one-shots. Written out
-   rather than left as a bare 0xE4 so the table can be checked against the wiring below. */
+// out = IN0 ? IN2 : IN1, with IN0 the data line and IN1/IN2 the two one-shots. Written out
+// rather than left as a bare 0xE4 so the table can be checked against the wiring below.
 #define WS2812_LUT_TRUTH_TABLE          0xE4u
 
-/* The truth table is what turns two timers into one data line, so a wrong width is worth
-   catching here rather than on a strip that only shows the wrong colour. */
+// The truth table is what turns two timers into one data line, so a wrong width is worth
+// catching here rather than on a strip that only shows the wrong colour.
 static_assert(WS2812_ZERO_PULSE_CYCLES > 0u, "WS2812: F_CPU is too low to time a zero pulse");
 static_assert(WS2812_ONE_PULSE_CYCLES > WS2812_ZERO_PULSE_CYCLES, "WS2812: the two pulse widths collapsed into one");
 static_assert(WS2812_CYCLES_PER_NS(WS2812_ZERO_PULSE_MAX_DURATION_NS) > WS2812_ZERO_PULSE_CYCLES,
@@ -53,8 +53,8 @@ static_assert(WS2812_CYCLES_PER_NS(WS2812_ZERO_PULSE_MAX_DURATION_NS) > WS2812_Z
 ******************************************************************************************************************************************************/
 namespace {
 
-/* What the interrupt is working through. Only ever set while the transmitter is idle, so
-   the handler needs no guard against the frame changing under it. */
+// What the interrupt is working through. Only ever set while the transmitter is idle, so
+// the handler needs no guard against the frame changing under it.
 const byte* volatile frame_data{nullptr};
 volatile uint16_t frame_length{0u};
 volatile uint16_t frame_position{0u};
@@ -74,8 +74,8 @@ volatile uint16_t frame_position{0u};
 ISR(USART0_DRE_vect)
 {
     if(frame_position >= frame_length) {
-        /* Disarmed rather than left to fire on an empty frame; the transmitter counts as
-           busy until the shift register has drained, which STATUS reports. */
+        // Disarmed rather than left to fire on an empty frame; the transmitter counts as
+        // busy until the shift register has drained, which STATUS reports.
         Bit<uint8_t>::ClearBits(USART0.CTRLA, USART_DREIE_bm);
         return;
     }
@@ -101,8 +101,8 @@ ISR(USART0_DRE_vect)
 ******************************************************************************************************************************************************/
 void WS2812::InitUsart()
 {
-    /* TXD and XCK are outputs; the data line the strip sees is neither of them, it is the
-       look-up table's own pin. TXD only has to reach the table, XCK the event system. */
+    // TXD and XCK are outputs; the data line the strip sees is neither of them, it is the
+    // look-up table's own pin. TXD only has to reach the table, XCK the event system.
     PORTA.DIRSET = PIN0_bm | PIN2_bm;
 
     USART0.BAUD = WS2812_BAUD_REGISTER;
@@ -173,12 +173,14 @@ void WS2812::InitLookUpTable()
  *  P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
 
-/* Instance methods, though some of them read no member: they are the interface the
-   firmware core calls through GetInstance(), and every backend - the simulator's
-   stand-ins included - offers it that way. Whether this backend's implementation
-   happens to need a member is its own detail, and answering the check would carry
-   that detail into the interface.
-   The ones it would make const drive the hardware, which a const would deny. */
+/*
+ * Instance methods, though some of them read no member: they are the interface the
+ * firmware core calls through GetInstance(), and every backend - the simulator's
+ * stand-ins included - offers it that way. Whether this backend's implementation
+ * happens to need a member is its own detail, and answering the check would carry
+ * that detail into the interface.
+ * The ones it would make const drive the hardware, which a const would deny.
+ */
 // NOLINTBEGIN(readability-convert-member-functions-to-static, readability-make-member-function-const)
 /******************************************************************************************************************************************************
   Init()
@@ -195,9 +197,11 @@ void WS2812::Init()
     InitOneShotTimers();
     InitLookUpTable();
 
-    /* The one vector allowed to interrupt the others. The console's handlers are short, but
-       "short" is measured against the strip's reset time here, and this removes the question
-       rather than answering it per handler. */
+    /*
+     * The one vector allowed to interrupt the others. The console's handlers are short, but
+     * "short" is measured against the strip's reset time here, and this removes the question
+     * rather than answering it per handler.
+     */
     CPUINT.LVL1VEC = USART0_DRE_vect_num;
 } /* Init */
 
@@ -236,8 +240,8 @@ StdReturnType WS2812::Send(const byte* frame, uint16_t length)
     frame_length = length;
     frame_position = 0u;
 
-    /* Cleared by hand, because it is what IsBusy() reads to tell a drained shift register
-       from one that never started. */
+    // Cleared by hand, because it is what IsBusy() reads to tell a drained shift register
+    // from one that never started.
     USART0.STATUS = USART_TXCIF_bm;
     Bit<uint8_t>::SetBits(USART0.CTRLA, USART_DREIE_bm);
 

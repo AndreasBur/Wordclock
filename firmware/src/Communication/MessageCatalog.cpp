@@ -20,20 +20,24 @@
  * I N C L U D E S
 ******************************************************************************************************************************************************/
 #include "MessageCatalog.h"
-/* The command numbers are taken from here rather than copied, so they cannot fall behind
-   the firmware. Its OVERLAYS_SUPPORT_* switches reach the entries below through it too. */
+// The command numbers are taken from here rather than copied, so they cannot fall behind
+// the firmware. Its OVERLAYS_SUPPORT_* switches reach the entries below through it too.
 #include "MsgCmdParser.h"
-/* For RpcIdType alone, which the procedure names below are counted against - they are the
-   one list here that is written beside the firmware rather than derived from it. */
+// For RpcIdType alone, which the procedure names below are counted against - they are the
+// one list here that is written beside the firmware rather than derived from it.
 #include "MsgCmdRemoteProcedureCallParser.h"
-/* Not for any type, only for the ANIMATIONS_SUPPORT_* and TEXT_SUPPORT_FONT_* switches:
-   the value lists below are guarded by exactly the same ones as the enums they name, so
-   they cannot end up naming the wrong value when one is switched off. */
+/*
+ * Not for any type, only for the ANIMATIONS_SUPPORT_* and TEXT_SUPPORT_FONT_* switches:
+ * the value lists below are guarded by exactly the same ones as the enums they name, so
+ * they cannot end up naming the wrong value when one is switched off.
+ */
 #include "Animations.h"
 #include "Text.h"
-/* For the ranges. The limits themselves are private to these classes, but the predicates
-   that test them are public and constexpr, so the range can be measured rather than
-   copied. */
+/*
+ * For the ranges. The limits themselves are private to these classes, but the predicates
+ * that test them are public and constexpr, so the range can be measured rather than
+ * copied.
+ */
 #include "Clock.h"
 #include "Display.h"
 #include "RealTimeClock.h"
@@ -42,8 +46,8 @@
 /******************************************************************************************************************************************************
  *  L O C A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
-/* For the options the firmware bounds only by the width of the argument: the overlay
-   periods and endurances reject nothing but zero, and the speeds nothing at all. */
+// For the options the firmware bounds only by the width of the argument: the overlay
+// periods and endurances reject nothing but zero, and the speeds nothing at all.
 #define BYTE_MAX                                        255u
 
 /******************************************************************************************************************************************************
@@ -52,22 +56,26 @@
 /* Counted rather than written out, so a value list and its length cannot drift apart. */
 #define NUMBER_OF(Array)                                static_cast<byte>(sizeof(Array) / sizeof((Array)[0]))
 
-/* The bounds of an option, measured off the firmware's own predicate instead of copied
-   from beside it. */
+// The bounds of an option, measured off the firmware's own predicate instead of copied
+// from beside it.
 #define MEASURED(ValueType, IsValid)                    FindMinimum<ValueType>(IsValid), FindMaximum<ValueType>(IsValid)
 
 /******************************************************************************************************************************************************
  *  L O C A L   D A T A   T Y P E S   A N D   S T R U C T U R E S
 ******************************************************************************************************************************************************/
-/* The tables below sit outside the class, so that they can be constexpr and be checked at
-   compile time. This brings the argument types back within reach without the class's name,
-   which keeps the tables readable. */
+/*
+ * The tables below sit outside the class, so that they can be constexpr and be checked at
+ * compile time. This brings the argument types back within reach without the class's name,
+ * which keeps the tables readable.
+ */
 using ArgumentType = MessageCatalog::ArgumentType;
 
-/* Walk the whole range of the value's own type and ask the firmware which values it
-   accepts. Searching beats copying the limits: they are private, and a copy is a number
-   that can quietly fall behind. The type parameter keeps the search inside what the
-   predicate takes, so a byte predicate is never asked about 300. */
+/*
+ * Walk the whole range of the value's own type and ask the firmware which values it
+ * accepts. Searching beats copying the limits: they are private, and a copy is a number
+ * that can quietly fall behind. The type parameter keeps the search inside what the
+ * predicate takes, so a byte predicate is never asked about 300.
+ */
 template <typename ValueType, typename PredicateType>
 constexpr uint16_t FindMinimum(PredicateType is_valid)
 {
@@ -101,10 +109,12 @@ constexpr const char* const kBooleanValueNames[] {
     "off", "on"
 };
 
-/* MsgCmdRemoteProcedureCallParser::RpcIdType, from RpcIdType::kNone + 1 onwards. NONE is the
-   initial value of the parser's rpc_id_ member, not a procedure: asking for it lands in the
-   default case and answers ErrorType::kRpcIdUnknown. Offering it would offer a guaranteed
-   error, the same reason CommandType::kNone is left out of the command list. */
+/*
+ * MsgCmdRemoteProcedureCallParser::RpcIdType, from RpcIdType::kNone + 1 onwards. NONE is the
+ * initial value of the parser's rpc_id_ member, not a procedure: asking for it lands in the
+ * default case and answers ErrorType::kRpcIdUnknown. Offering it would offer a guaranteed
+ * error, the same reason CommandType::kNone is left out of the command list.
+ */
 constexpr const char* const kRemoteProcedureValueNames[] {
     "Illuminance calibration maximum",
     "Illuminance calibration minimum",
@@ -148,10 +158,12 @@ constexpr const char* const kRemoteProcedureValueNames[] {
     "Colour reset"
 };
 
-/* The command numbers and the value lists of the enumerations come out of the firmware
-   itself; this list does not, so it is the one that can fall behind. A procedure added to
-   RpcIdType without a name here would be offered as the name of the procedure before it.
-   RpcIdType::kNone has no name, hence the one. */
+/*
+ * The command numbers and the value lists of the enumerations come out of the firmware
+ * itself; this list does not, so it is the one that can fall behind. A procedure added to
+ * RpcIdType without a name here would be offered as the name of the procedure before it.
+ * RpcIdType::kNone has no name, hence the one.
+ */
 static_assert(NUMBER_OF(kRemoteProcedureValueNames) ==
               MsgCmdRemoteProcedureCallParser::kNumberOfProcedures - 1u,
               "the remote procedure names have fallen behind MsgCmdRemoteProcedureCallParser::RpcIdType");
@@ -161,8 +173,8 @@ constexpr const char* const kClockModeValueNames[] {
     "Wessi", "Ossi", "Rhein-Ruhr", "Schwaben"
 };
 
-/* Animations::AnimationIdType, under the same switches as the enum. Its values shift as
-   soon as one animation is switched off, so a fixed list would name the wrong ones. */
+// Animations::AnimationIdType, under the same switches as the enum. Its values shift as
+// soon as one animation is switched off, so a fixed list would name the wrong ones.
 constexpr const char* const kAnimationValueNames[] {
     "None",
 #if(ANIMATIONS_SUPPORT_CURSOR == STD_ON)
@@ -236,8 +248,8 @@ constexpr const char* const kFontValueNames[] {
 #endif
 };
 
-/* Where the values are named, the names are the range: the first one sits at the minimum
-   and there are as many values as names. */
+// Where the values are named, the names are the range: the first one sits at the minimum
+// and there are as many values as names.
 #define NAMED(Minimum, Names)                           (Minimum), static_cast<uint16_t>((Minimum) + NUMBER_OF(Names) - 1u), Names, NUMBER_OF(Names)
 
 /* MsgCmdRemoteProcedureCallParser. Starts at one, RpcIdType::kNone being left out. */
@@ -259,18 +271,20 @@ constexpr MessageCatalog::OptionType kDisplayBrightnessOptions[] {
     {'G', "Gamma correction",   ArgumentType::kUint8,  NAMED(0u, kBooleanValueNames)}
 };
 
-/* MsgCmdDisplayPixelParser. The index is a uint16 as soon as the display has more than
-   255 pixels; 110 here, so the parser compiles it as a uint8. */
+// MsgCmdDisplayPixelParser. The index is a uint16 as soon as the display has more than
+// 255 pixels; 110 here, so the parser compiles it as a uint8.
 constexpr MessageCatalog::OptionType kDisplayPixelOptions[] {
     {'I', "Index",              ArgumentType::kUint8,  0u, DISPLAY_NUMBER_OF_PIXELS - 1u},
     {'S', "State",              ArgumentType::kUint8,  NAMED(0u, kBooleanValueNames)}
 };
 
-/* MsgCmdBaseOverlayParser, shared by the date, temperature and text commands. Only the
-   text overlay reads the text: the other two answer the parser's SetText() and
-   SendAnswerText() with empty bodies, so a text sent to them is accepted, discarded and
-   never answered. It is therefore the last entry rather than one in the middle, which
-   lets those two share this table and simply stop one option short of it. */
+/*
+ * MsgCmdBaseOverlayParser, shared by the date, temperature and text commands. Only the
+ * text overlay reads the text: the other two answer the parser's SetText() and
+ * SendAnswerText() with empty bodies, so a text sent to them is accepted, discarded and
+ * never answered. It is therefore the last entry rather than one in the middle, which
+ * lets those two share this table and simply stop one option short of it.
+ */
 constexpr MessageCatalog::OptionType kOverlayOptions[] {
     {'P', "Period (minutes)",   ArgumentType::kUint8,  1u, BYTE_MAX},
     {'E', "Endurance (s)",      ArgumentType::kUint8,  1u, BYTE_MAX},
@@ -283,29 +297,35 @@ constexpr MessageCatalog::OptionType kOverlayOptions[] {
     {'T', "Text",               ArgumentType::kString, 0u, 0u}
 };
 
-/* The overlays that have no text of their own stop one short of the shared table. Derived
-   from its length rather than written out, so it follows if an option is added. */
+// The overlays that have no text of their own stop one short of the shared table. Derived
+// from its length rather than written out, so it follows if an option is added.
 constexpr byte kNumberOfOverlayOptionsWithoutText{static_cast<byte>(NUMBER_OF(kOverlayOptions) - 1u)};
 
-/* Stopping one short only leaves out the text as long as the text is what sits last.
-   Appending an option would otherwise hide that one and offer the text instead, to two
-   overlays that do not read it — quietly, since both lists would still be the right
-   length. */
+/*
+ * Stopping one short only leaves out the text as long as the text is what sits last.
+ * Appending an option would otherwise hide that one and offer the text instead, to two
+ * overlays that do not read it — quietly, since both lists would still be the right
+ * length.
+ */
 static_assert(kOverlayOptions[kNumberOfOverlayOptionsWithoutText].short_name == 'T',
               "the text has to be the last of the overlay options, see NumberOfOverlayOptionsWithoutText");
 
-/* MsgCmdStatusParser. Every one of them read-only: the command takes no options at all,
-   and these names exist so that its answer can be read back through them. The bounds are
-   therefore left at zero - nothing offers these to be typed, so nothing has a range to
-   check against. */
+/*
+ * MsgCmdStatusParser. Every one of them read-only: the command takes no options at all,
+ * and these names exist so that its answer can be read back through them. The bounds are
+ * therefore left at zero - nothing offers these to be typed, so nothing has a range to
+ * check against.
+ */
 #define READ_ONLY                                       0u, 0u, nullptr, 0u, true
 
 constexpr MessageCatalog::OptionType kStatusOptions[] {
     {'V', "Firmware version",   ArgumentType::kString, READ_ONLY},
-    /* Three fields rather than one count. A single number has to be in some unit, and
-       every unit that fits a uint16 runs out on a clock that is meant to hang on a wall
-       for years - minutes did, after 45 days. Days carry the range, hours and minutes the
-       resolution, and none of them has to be divided by a reader. */
+    /*
+     * Three fields rather than one count. A single number has to be in some unit, and
+     * every unit that fits a uint16 runs out on a clock that is meant to hang on a wall
+     * for years - minutes did, after 45 days. Days carry the range, hours and minutes the
+     * resolution, and none of them has to be divided by a reader.
+     */
     {'U', "Uptime (days)",      ArgumentType::kUint16, READ_ONLY},
     {'H', "Uptime (hours)",     ArgumentType::kUint8,  READ_ONLY},
     {'N', "Uptime (minutes)",   ArgumentType::kUint8,  READ_ONLY},
@@ -316,8 +336,8 @@ constexpr MessageCatalog::OptionType kStatusOptions[] {
     {'M', "Free memory (KiB)",  ArgumentType::kUint16, READ_ONLY}
 };
 
-/* MsgCmdNightSwitchParser. Brightness zero is the display switched off rather than a
-   dimming of nothing, which is what lets one field carry both wishes. */
+// MsgCmdNightSwitchParser. Brightness zero is the display switched off rather than a
+// dimming of nothing, which is what lets one field carry both wishes.
 constexpr MessageCatalog::OptionType kNightSwitchOptions[] {
     {'A', "Active",             ArgumentType::kUint8,  NAMED(0u, kBooleanValueNames)},
     {'H', "Start hour",         ArgumentType::kUint8,  0u, 23u},
@@ -327,26 +347,30 @@ constexpr MessageCatalog::OptionType kNightSwitchOptions[] {
     {'B', "Night brightness",   ArgumentType::kUint8,  0u, BYTE_MAX}
 };
 
-/* MsgCmdColorCycleParser. The hue is read-only: it is where the wheel has got to, which is
-   worth seeing and not worth setting - command 2 is how a colour is chosen. Speed is the same
-   kind of number as the animation speed above, scheduler ticks per step, and zero there is a
-   cycle standing still rather than a value to refuse. */
+/*
+ * MsgCmdColorCycleParser. The hue is read-only: it is where the wheel has got to, which is
+ * worth seeing and not worth setting - command 2 is how a colour is chosen. Speed is the same
+ * kind of number as the animation speed above, scheduler ticks per step, and zero there is a
+ * cycle standing still rather than a value to refuse.
+ */
 constexpr MessageCatalog::OptionType kColorCycleOptions[] {
     {'A', "Active",             ArgumentType::kUint8,  NAMED(0u, kBooleanValueNames)},
     {'S', "Speed",              ArgumentType::kUint8,  0u, BYTE_MAX},
     {'H', "Hue",                ArgumentType::kUint8,  READ_ONLY}
 };
 
-/* MsgCmdConsoleParser. The password is an input and never an answer, the same as the pass
-   phrase below; what is read back is whether one is set. Sending the command with no password
-   at all clears it, which is the way back for a clock nobody can log into any more. */
+/*
+ * MsgCmdConsoleParser. The password is an input and never an answer, the same as the pass
+ * phrase below; what is read back is whether one is set. Sending the command with no password
+ * at all clears it, which is the way back for a clock nobody can log into any more.
+ */
 constexpr MessageCatalog::OptionType kConsoleOptions[] {
     {'P', "Console password",   ArgumentType::kString, 0u, 0u},
     {'A', "Protected",          ArgumentType::kUint8,  READ_ONLY}
 };
 
-/* MsgCmdNetworkParser. The pass phrase is an input and never an answer, so it carries no
-   range and is never read back - see the parser for why. */
+// MsgCmdNetworkParser. The pass phrase is an input and never an answer, so it carries no
+// range and is never read back - see the parser for why.
 constexpr MessageCatalog::OptionType kNetworkOptions[] {
     {'S', "Network name",       ArgumentType::kString, 0u, 0u},
     {'P', "Pass phrase",        ArgumentType::kString, 0u, 0u}
@@ -380,11 +404,13 @@ constexpr MessageCatalog::OptionType kDateOptions[] {
     {'D', "Day",                ArgumentType::kUint8,  MEASURED(ClockDate::DayType, ClockDate::IsDayValid)}
 };
 
-/* The numbers come from the enumeration itself, so they follow it instead of having to be
-   kept level with it — including when a support switch shortens it, which is why the
-   overlay entries carry the same guards the enumerators do. CommandType::kNone is left out, it
-   is not a command that can be sent. Sending a command with no option at all asks the
-   firmware for its current settings, which is why every entry is useful on its own. */
+/*
+ * The numbers come from the enumeration itself, so they follow it instead of having to be
+ * kept level with it — including when a support switch shortens it, which is why the
+ * overlay entries carry the same guards the enumerators do. CommandType::kNone is left out, it
+ * is not a command that can be sent. Sending a command with no option at all asks the
+ * firmware for its current settings, which is why every entry is useful on its own.
+ */
 constexpr MessageCatalog::CommandType kCommands[] {
     {ToUnderlying(MsgCmdParser::CommandType::kRemoteProcedureCall), "Remote procedure call", kRemoteProcedureCallOptions, NUMBER_OF(kRemoteProcedureCallOptions)},
     {ToUnderlying(MsgCmdParser::CommandType::kDisplayColor),         "Display colour",        kDisplayColorOptions,        NUMBER_OF(kDisplayColorOptions)},
@@ -412,9 +438,11 @@ constexpr MessageCatalog::CommandType kCommands[] {
 
 constexpr byte kNumberOfCommands{NUMBER_OF(kCommands)};
 
-/* The message builder builds this many option rows once and shows the ones a command
-   needs, so a command with more options than that would have some of them unreachable.
-   Checked here rather than trusted, because the two live in different files. */
+/*
+ * The message builder builds this many option rows once and shows the ones a command
+ * needs, so a command with more options than that would have some of them unreachable.
+ * Checked here rather than trusted, because the two live in different files.
+ */
 constexpr bool AreOptionCountsWithinBounds()
 {
     for(const MessageCatalog::CommandType& command : kCommands) {
@@ -427,11 +455,13 @@ constexpr bool AreOptionCountsWithinBounds()
 static_assert(AreOptionCountsWithinBounds(),
               "a command has more options than MESSAGE_CATALOG_MAX_NUMBER_OF_OPTIONS allows rows for");
 
-/* Naming the values makes the names the range: the dropdown offers one entry per name and
-   the builder sends Minimum plus the position picked, so a range wider than the list would
-   promise values that cannot be picked, and a narrower one would name values outside it.
-   NAMED() gets this right by construction; this keeps a range written out by hand from
-   getting it wrong. */
+/*
+ * Naming the values makes the names the range: the dropdown offers one entry per name and
+ * the builder sends Minimum plus the position picked, so a range wider than the list would
+ * promise values that cannot be picked, and a narrower one would name values outside it.
+ * NAMED() gets this right by construction; this keeps a range written out by hand from
+ * getting it wrong.
+ */
 constexpr bool AreNamedRangesConsistent()
 {
     for(const MessageCatalog::CommandType& command : kCommands) {

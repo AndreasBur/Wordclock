@@ -1,5 +1,5 @@
-/* The PIO and DMA calls, for the tests and the host process that do not inspect the frame.
-   frame_test.cpp defines its own instead, so it can keep what was transmitted. */
+// The PIO and DMA calls, for the tests and the host process that do not inspect the frame.
+// frame_test.cpp defines its own instead, so it can keep what was transmitted.
 #include <hardware/clocks.h>
 #include <hardware/dma.h>
 #include <hardware/pio.h>

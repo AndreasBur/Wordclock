@@ -76,9 +76,11 @@ enum StdReturnType {
 ******************************************************************************************************************************************************/
 template <typename T> uint8_t DigitsOfNumber(T number, unsigned = 10);
 
-/* An enumerator as the number it is stored as - to index an array with, count with or print.
-   An enum class does not turn into a number by itself, which is the point of it; this is the
-   one place it is asked to. std::to_underlying, which is C++23. */
+/*
+ * An enumerator as the number it is stored as - to index an array with, count with or print.
+ * An enum class does not turn into a number by itself, which is the point of it; this is the
+ * one place it is asked to. std::to_underlying, which is C++23.
+ */
 template <typename EnumType>
 constexpr std::underlying_type_t<EnumType> ToUnderlying(EnumType value)
 {

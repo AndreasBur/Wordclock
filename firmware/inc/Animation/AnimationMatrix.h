@@ -77,16 +77,20 @@ class AnimationMatrix : public Animation
     static constexpr byte kNumberOfFrames{4u * DISPLAY_NUMBER_OF_ROWS};
     /* fade step from which letters of the new time are shown, see DrawColumn() */
     static constexpr byte kRevealFadeStep{3u};
-    /* last fade step of the trail, above it a pixel goes dark. The original has no
-       such limit, its trail always reaches up to the first row. With the limit the
-       trail follows the drop out of the display instead of leaving a dim haze
-       behind, so the animation ends on a black display showing only the new time. */
+    /*
+     * last fade step of the trail, above it a pixel goes dark. The original has no
+     * such limit, its trail always reaches up to the first row. With the limit the
+     * trail follows the drop out of the display instead of leaving a dim haze
+     * behind, so the animation ends on a black display showing only the new time.
+     */
     static constexpr byte kTrailFadeSteps{6u};
     /* odd factor of the hash in StartFrame(), see there */
     static constexpr byte kStartFrameHashFactor{181u};
-    /* per pixel brightness of the brightest trail pixel, divided by the fade step for
-       the ones behind it. The drop head and the letters of the new time do not use it,
-       they are set without a brightness and are therefore at full display brightness. */
+    /*
+     * per pixel brightness of the brightest trail pixel, divided by the fade step for
+     * the ones behind it. The drop head and the letters of the new time do not use it,
+     * they are set without a brightness and are therefore at full display brightness.
+     */
     static constexpr byte kTrailBrightness{255u};
 
     ClockWords::WordsListType clock_words_table_{{DisplayWords::WordIdType::kNone}};

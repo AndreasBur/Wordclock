@@ -41,9 +41,11 @@
 /******************************************************************************************************************************************************
  *  C L A S S   S E T T I N G S
 ******************************************************************************************************************************************************/
-/* A dialog rather than a frame: that is what gets it centred over the main window
-   instead of dropped wherever the compositor pleases, see the constructor. Shown with
-   Show(), not ShowModal(), so it does not block the main window. */
+/*
+ * A dialog rather than a frame: that is what gets it centred over the main window
+ * instead of dropped wherever the compositor pleases, see the constructor. Shown with
+ * Show(), not ShowModal(), so it does not block the main window.
+ */
 class Settings : public wxDialog
 {
 /******************************************************************************************************************************************************
@@ -68,8 +70,8 @@ class Settings : public wxDialog
     static constexpr int kIlluminancePercentMax{100};
     /* Full daylight, which leaves the brightness automatic at its brightest. */
     static constexpr int kIlluminancePercentInitial{100};
-    /* Whole degrees Celsius; the overlay shows a tenth, which the slider does not need to
-       reach for what it is here to try out. Well inside what the chip can measure. */
+    // Whole degrees Celsius; the overlay shows a tenth, which the slider does not need to
+    // reach for what it is here to try out. Well inside what the chip can measure.
     static constexpr int kTemperatureCelsiusMin{-20};
     static constexpr int kTemperatureCelsiusMax{50};
     static constexpr int kTemperatureCelsiusInitial{21};

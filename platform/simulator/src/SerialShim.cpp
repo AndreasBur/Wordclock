@@ -56,8 +56,8 @@ char SerialShim::read()
     char first_char{' '};
 
     if(!send_buffer_.IsEmpty()) {
-        /* The firmware's port is a byte wide, and what is typed into the console is
-           ASCII; the cast says that rather than leaving it to the conversion. */
+        // The firmware's port is a byte wide, and what is typed into the console is
+        // ASCII; the cast says that rather than leaving it to the conversion.
         first_char = static_cast<char>(send_buffer_.at(0).GetValue());
         send_buffer_.Remove(0, 1);
     }
@@ -115,9 +115,11 @@ void SerialShim::AppendOutput(const wxString& text)
 ******************************************************************************************************************************************************/
 void SerialShim::FinishOutputLine()
 {
-    /* The browsers first, and outside the attached check: they are watching whether or not a
-       window has handed its controls over, and an answer that reached one front end and not
-       the other is the confusing half. */
+    /*
+     * The browsers first, and outside the attached check: they are watching whether or not a
+     * window has handed its controls over, and an answer that reached one front end and not
+     * the other is the confusing half.
+     */
     if(line_sink_ != nullptr) { line_sink_(output_line_.utf8_str()); }
 
     if(IsAttached()) {
@@ -125,9 +127,11 @@ void SerialShim::FinishOutputLine()
         output_->AppendText(MessageDecoder::Describe(output_line_));
     }
 
-    /* Cleared whether or not anything displayed it. It used to be cleared only on the way
-       past the controls, so a run with none would have grown one line for the length of it -
-       harmless while nothing else read the line, and not once a socket does. */
+    /*
+     * Cleared whether or not anything displayed it. It used to be cleared only on the way
+     * past the controls, so a run with none would have grown one line for the length of it -
+     * harmless while nothing else read the line, and not once a socket does.
+     */
     output_line_.Clear();
 } /* FinishOutputLine */
 

@@ -93,8 +93,8 @@ class GammaCorrection
     static_assert(kValuesPerDoubling * kNumberOfDoublings == kNumberOfSteps,
                   "GammaCorrection: the steps must be exactly the stored doubling shifted through every bit of the result");
 
-    /* 2^(7 + n/16) for n = 1..16, as published - see the file header for the 1 they lie
-       below the formula. */
+    // 2^(7 + n/16) for n = 1..16, as published - see the file header for the 1 they lie
+    // below the formula.
     static constexpr TopDoublingElementType kTopDoublingTable[kValuesPerDoubling] PROGMEM {
         133u, 139u, 145u, 151u, 158u, 165u, 172u, 180u, 188u, 196u, 205u, 214u, 224u, 234u, 244u, 255u
     };
@@ -125,9 +125,11 @@ class GammaCorrection
     constexpr GammaCorrection() { }
 
     // methods
-    /* 0 to 0, everything else onto the curve: see the file header for why 0 is answered
-       apart rather than by subtracting 1 from every result, which would take 255 down to
-       254 as well. */
+    /*
+     * 0 to 0, everything else onto the curve: see the file header for why 0 is answered
+     * apart rather than by subtracting 1 from every result, which would take 255 down to
+     * 254 as well.
+     */
     static byte CalcCorrectedValue(byte value_linear) {
         if(value_linear == 0u) { return 0u; }
         return ToExponential(ToStep(value_linear));

@@ -33,18 +33,22 @@
 ******************************************************************************************************************************************************/
 namespace {
 
-/* Its own namespace, not the one the settings blob lives in: a settings reset must not
-   take the network with it, or a clock is left that nobody can reach without a cable.
-   Both are limited to 15 characters by NVS. */
+/*
+ * Its own namespace, not the one the settings blob lives in: a settings reset must not
+ * take the network with it, or a clock is left that nobody can reach without a cable.
+ * Both are limited to 15 characters by NVS.
+ */
 constexpr const char* kNetworkNamespace{"wc-network"};
 constexpr const char* kSsidKey{"ssid"};
 constexpr const char* kPasswordKey{"password"};
-/* Beside the network's own keys and in the same directory: this is how the clock is reached
-   as well, which is what that namespace holds and what keeps it out of the settings blob the
-   core persists. */
+/*
+ * Beside the network's own keys and in the same directory: this is how the clock is reached
+ * as well, which is what that namespace holds and what keeps it out of the settings blob the
+ * core persists.
+ */
 constexpr const char* kConsolePasswordKey{"console-pass"};
-/* Two names, two separators and the terminator, which the longest of the pair fits in
-   several times over. */
+// Two names, two separators and the terminator, which the longest of the pair fits in
+// several times over.
 constexpr size_t kCredentialPathLength{32u};
 
 constexpr uint32_t kBytesPerKibibyte{1024u};
@@ -54,9 +58,11 @@ bool IsNetworkJoined()
     return WiFi.status() == WL_CONNECTED;
 }
 
-/* One file per key under a directory named after the namespace, which is what this core
-   offers in place of the IDF's key-value store. The two names the RP2350 backend uses are
-   kept so that both read the same way, and Storage does the same with its own pair. */
+/*
+ * One file per key under a directory named after the namespace, which is what this core
+ * offers in place of the IDF's key-value store. The two names the RP2350 backend uses are
+ * kept so that both read the same way, and Storage does the same with its own pair.
+ */
 bool IsCredentialStoreReady()
 {
     static bool was_tried{false};
@@ -72,13 +78,13 @@ bool IsCredentialStoreReady()
 
 void BuildCredentialPath(const char* key, char* path, size_t capacity)
 {
-    /* The namespace and the keys are this file's own constants, and the longest pair fits
-       kCredentialPathLength with room to spare. */
+    // The namespace and the keys are this file's own constants, and the longest pair fits
+    // kCredentialPathLength with room to spare.
     (void)snprintf(path, capacity, "/%s/%s", kNetworkNamespace, key);
 }
 
-/* Reads one stored string into a buffer that has room for it, terminator included. An
-   empty answer and a missing key are the same thing here: a network nobody entered. */
+// Reads one stored string into a buffer that has room for it, terminator included. An
+// empty answer and a missing key are the same thing here: a network nobody entered.
 StdReturnType ReadStoredString(const char* key, char* string, size_t capacity)
 {
     string[0u] = STD_NULL_CHARACTER;
@@ -91,8 +97,8 @@ StdReturnType ReadStoredString(const char* key, char* string, size_t capacity)
     File stored = LittleFS.open(path, "r");
     if(!stored) { return kENotOk; }
 
-    /* One short of the capacity, so the terminator this writes is always inside the
-       buffer however long the file turned out to be. */
+    // One short of the capacity, so the terminator this writes is always inside the
+    // buffer however long the file turned out to be.
     const size_t length = stored.read(reinterpret_cast<uint8_t*>(string), capacity - 1u);
     stored.close();
 
@@ -103,8 +109,8 @@ StdReturnType ReadStoredString(const char* key, char* string, size_t capacity)
     return kEOk;
 }
 
-/* Replaces one stored string. Opened for writing rather than appended to, so a shorter
-   pass phrase cannot leave the tail of a longer one behind it. */
+// Replaces one stored string. Opened for writing rather than appended to, so a shorter
+// pass phrase cannot leave the tail of a longer one behind it.
 bool WriteStoredString(const char* key, const char* string)
 {
     if(!IsCredentialStoreReady()) { return false; }
@@ -123,15 +129,15 @@ bool WriteStoredString(const char* key, const char* string)
     return written == length;
 }
 
-/* What was compiled in, which is what a clock that was flashed with a WordclockSecrets.h
-   still comes up with. Stored credentials win over it: they are the later word. */
+// What was compiled in, which is what a clock that was flashed with a WordclockSecrets.h
+// still comes up with. Stored credentials win over it: they are the later word.
 constexpr bool IsSsidCompiledIn()
 {
     return sizeof(WORDCLOCK_WIFI_SSID) > 1u;
 }
 
-/* Copies into the caller's buffer only if the whole string fits, so a value that grew
-   past what the field was sized for is reported as no value rather than as half of one. */
+// Copies into the caller's buffer only if the whole string fits, so a value that grew
+// past what the field was sized for is reported as no value rather than as half of one.
 StdReturnType CopyIfItFits(const char* value, char* string, size_t capacity)
 {
     string[0u] = STD_NULL_CHARACTER;
@@ -149,12 +155,14 @@ StdReturnType CopyIfItFits(const char* value, char* string, size_t capacity)
  * P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
 
-/* Instance methods, though some of them read no member: they are the interface the
-   firmware core calls through GetInstance(), and every backend - the simulator's
-   stand-ins included - offers it that way. Whether this backend's implementation
-   happens to need a member is its own detail, and answering the check would carry
-   that detail into the interface.
-   The ones it would make const drive the hardware, which a const would deny. */
+/*
+ * Instance methods, though some of them read no member: they are the interface the
+ * firmware core calls through GetInstance(), and every backend - the simulator's
+ * stand-ins included - offers it that way. Whether this backend's implementation
+ * happens to need a member is its own detail, and answering the check would carry
+ * that detail into the interface.
+ * The ones it would make const drive the hardware, which a const would deny.
+ */
 // NOLINTBEGIN(readability-convert-member-functions-to-static, readability-make-member-function-const)
 /******************************************************************************************************************************************************
   GetFreeMemoryInKibibytes()
@@ -296,16 +304,20 @@ void System::StartNetwork()
     }
 
     WiFi.mode(WIFI_STA);
-    /* Power saving is a mode on this core rather than a flag: the default one is the modem
-       sleep the ESP32 backend asks for by name, and the aggressive one adds latency a
-       console typed into would notice. */
+    /*
+     * Power saving is a mode on this core rather than a flag: the default one is the modem
+     * sleep the ESP32 backend asks for by name, and the aggressive one adds latency a
+     * console typed into would notice.
+     */
     if(WORDCLOCK_WIFI_MODEM_SLEEP) { WiFi.defaultLowPowerMode(); }
     else                           { WiFi.noLowPowerMode(); }
 
-    /* No setAutoReconnect() here: this core has none, and joining again is what stands in
-       for it - see ReconnectNetwork(), which the command calls and which this function is
-       the whole of. A router that reboots therefore needs that command, where the ESP32
-       recovers on its own. */
+    /*
+     * No setAutoReconnect() here: this core has none, and joining again is what stands in
+     * for it - see ReconnectNetwork(), which the command calls and which this function is
+     * the whole of. A router that reboots therefore needs that command, where the ESP32
+     * recovers on its own.
+     */
     WiFi.begin(ssid, password);
 } /* StartNetwork */
 
@@ -361,13 +373,15 @@ StdReturnType System::ResynchroniseTime()
 ******************************************************************************************************************************************************/
 StdReturnType System::ReconnectNetwork()
 {
-    /* Nothing configured is nothing to reconnect to. IsNetworkConfigured() rather than the
-       compiled-in name alone, because credentials entered over the console count too. */
+    // Nothing configured is nothing to reconnect to. IsNetworkConfigured() rather than the
+    // compiled-in name alone, because credentials entered over the console count too.
     if(!IsNetworkConfigured()) { return kENotOk; }
 
-    /* Joining again rather than a reconnect() this core does not have. StartNetwork()
-       re-reads the stored credentials on its way, so this also picks up a network that was
-       entered while the old one was still being retried. */
+    /*
+     * Joining again rather than a reconnect() this core does not have. StartNetwork()
+     * re-reads the stored credentials on its way, so this also picks up a network that was
+     * entered while the old one was still being retried.
+     */
     StartNetwork();
 
     return kEOk;
@@ -409,17 +423,19 @@ StdReturnType System::SetConsolePassword(const char* password)
     if(password == nullptr) { return kENotOk; }
     if(strlen(password) >= kPasswordStringLength) { return kENotOk; }
 
-    /* An empty password removes the file rather than writing an empty one, so that
-       IsConsoleProtected() has one state to recognise instead of two - and ReadStoredString()
-       answers kENotOk for an empty file as well as for a missing one, which would otherwise
-       make the two indistinguishable by accident rather than on purpose. */
+    /*
+     * An empty password removes the file rather than writing an empty one, so that
+     * IsConsoleProtected() has one state to recognise instead of two - and ReadStoredString()
+     * answers kENotOk for an empty file as well as for a missing one, which would otherwise
+     * make the two indistinguishable by accident rather than on purpose.
+     */
     if(password[0u] == STD_NULL_CHARACTER) {
         if(!IsCredentialStoreReady()) { return kENotOk; }
 
         char path[kCredentialPathLength]{};
         BuildCredentialPath(kConsolePasswordKey, path, sizeof(path));
-        /* A file that was never there is the state being asked for, so its absence is not a
-           failure to report. */
+        // A file that was never there is the state being asked for, so its absence is not a
+        // failure to report.
         LittleFS.remove(path);
         return kEOk;
     }

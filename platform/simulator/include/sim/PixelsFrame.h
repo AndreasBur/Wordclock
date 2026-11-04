@@ -70,9 +70,11 @@ class PixelsFrame : public wxFrame
     DECLARE_EVENT_TABLE()
 
     // functions
-    /* The brightest channel decides how far the letter is pulled from the unlit colour
-       towards black. Colour itself cannot be shown on a light background — a white LED
-       at full would be invisible — so only the brightness is rendered. */
+    /*
+     * The brightest channel decides how far the letter is pulled from the unlit colour
+     * towards black. Colour itself cannot be shown on a light background — a white LED
+     * at full would be invisible — so only the brightness is rendered.
+     */
     static byte GetIntensity(PixelType pixel) {
         byte intensity = pixel.GetRed();
         if(pixel.GetGreen() > intensity) { intensity = pixel.GetGreen(); }
@@ -80,17 +82,19 @@ class PixelsFrame : public wxFrame
         return intensity;
     }
 
-    /* Weighted rather than proportional. Unlit letters sit at kUnlitLevel and not at
-       black, which leaves the dark end of the range squeezed: proportionally, a pixel at
-       3 percent would land five levels off the unlit colour and be invisible, while on
-       real LEDs it is clearly visible against LEDs that are truly off. The square root
-       spreads the low end, which is also closer to how the eye reads brightness. */
+    /*
+     * Weighted rather than proportional. Unlit letters sit at kUnlitLevel and not at
+     * black, which leaves the dark end of the range squeezed: proportionally, a pixel at
+     * 3 percent would land five levels off the unlit colour and be invisible, while on
+     * real LEDs it is clearly visible against LEDs that are truly off. The square root
+     * spreads the low end, which is also closer to how the eye reads brightness.
+     */
     static byte GetWeightedIntensity(byte intensity) {
         return static_cast<byte>(std::sqrt(static_cast<double>(intensity) * kIntensityMaxValue));
     }
 
-    /* Grey level of the letter, which the weighted intensity pulls from kUnlitLevel
-       towards black. */
+    // Grey level of the letter, which the weighted intensity pulls from kUnlitLevel
+    // towards black.
     static constexpr byte ToLevel(byte weighted_intensity) {
         return static_cast<byte>(kUnlitLevel - ((kUnlitLevel * weighted_intensity) / kIntensityMaxValue));
     }

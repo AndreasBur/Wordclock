@@ -103,9 +103,11 @@ class Clock
     static constexpr bool kShowItIsPermanentlyInitValue{CLOCK_SHOW_IT_IS_PERMANENTLY == STD_ON};
 
     ModeType mode_{CLOCK_INITIAL_MODE};
-    /* Whether "es ist" stands in every time or only in the two it is said in. A setting
-       rather than the compile-time switch it was: both are ways German tells the time, the
-       clock can say either, and which one somebody wants is not a property of the build. */
+    /*
+     * Whether "es ist" stands in every time or only in the two it is said in. A setting
+     * rather than the compile-time switch it was: both are ways German tells the time, the
+     * clock can say either, and which one somebody wants is not a property of the build.
+     */
     bool show_it_is_permanently_{kShowItIsPermanentlyInitValue};
 
     static const HourType kHoursTable[][CLOCK_NUMBER_OF_HOURS];
@@ -173,12 +175,14 @@ class Clock
     }
 
     // methods
-    /* One wording further, wrapping at the last, for a control that cannot name a mode.
-       It draws nothing: the words of the new wording differ from the ones DisplayManager
-       has latched, so its next task finds the change and puts them up the way it does
-       for every other one - with the selected animation, which "8 -M<id>" does not do.
-       Where two wordings say the same thing at the current time there is nothing to
-       redraw, and nothing happens, which is the right answer rather than a missed one. */
+    /*
+     * One wording further, wrapping at the last, for a control that cannot name a mode.
+     * It draws nothing: the words of the new wording differ from the ones DisplayManager
+     * has latched, so its next task finds the change and puts them up the way it does
+     * for every other one - with the selected animation, which "8 -M<id>" does not do.
+     * Where two wordings say the same thing at the current time there is nothing to
+     * redraw, and nothing happens, which is the right answer rather than a missed one.
+     */
     void NextMode() { SetMode(ToNextMode(mode_)); }
 
     void ResetToDefaults() {

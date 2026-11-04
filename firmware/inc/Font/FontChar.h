@@ -103,9 +103,11 @@ template <typename RowType, byte RowsSize> class FontCharHorizontal : public Fon
     constexpr FontCharHorizontal(byte width, std::array<RowType, RowsSize> rows) : FontChar(width), rows_(rows) { }
     constexpr FontCharHorizontal() : FontChar(0u), rows_{} { }
 
-    /* Two forms of the reader, and the argument list says which: the one taking a reference
-       answers whether the row is part of the glyph, the one taking none answers the row -
-       and a row outside the glyph is empty, which draws nothing. */
+    /*
+     * Two forms of the reader, and the argument list says which: the one taking a reference
+     * answers whether the row is part of the glyph, the one taking none answers the row -
+     * and a row outside the glyph is empty, which draws nothing.
+     */
     // get methods
     RowType GetRow(byte index) const {
         if(!IsIndexValid(index)) { return RowType{}; }
@@ -164,8 +166,8 @@ template <typename ColumnType, byte ColumnsSize> class FontCharVertical : public
 
     constexpr FontCharVertical() : FontChar(0), columns_{} { }
 
-    /* The same two forms as the horizontal glyph above, for the same reason: a column
-       outside the glyph is empty rather than whatever follows it in memory. */
+    // The same two forms as the horizontal glyph above, for the same reason: a column
+    // outside the glyph is empty rather than whatever follows it in memory.
     // get methods
     ColumnType GetColumn(byte index) const {
         if(!IsIndexValid(index)) { return ColumnType{}; }

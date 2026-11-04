@@ -31,18 +31,22 @@
 ******************************************************************************************************************************************************/
 namespace {
 
-/* Its own namespace, not the one the settings blob lives in: a settings reset must not
-   take the network with it, or a clock is left that nobody can reach without a cable.
-   Both are limited to 15 characters by NVS. */
+/*
+ * Its own namespace, not the one the settings blob lives in: a settings reset must not
+ * take the network with it, or a clock is left that nobody can reach without a cable.
+ * Both are limited to 15 characters by NVS.
+ */
 constexpr const char* kNetworkNamespace{"wc-network"};
 constexpr const char* kSsidKey{"ssid"};
 constexpr const char* kPasswordKey{"password"};
-/* Beside the network's own keys, in the same namespace: this is how the clock is reached as
-   well, which is what that namespace holds and what keeps it out of the settings blob the
-   core persists. */
+/*
+ * Beside the network's own keys, in the same namespace: this is how the clock is reached as
+ * well, which is what that namespace holds and what keeps it out of the settings blob the
+ * core persists.
+ */
 constexpr const char* kConsolePasswordKey{"console-pass"};
-/* Fixed, and printed in the 401's realm so nobody has to guess it. Not a secret: what is
-   secret is the password beside it. */
+// Fixed, and printed in the 401's realm so nobody has to guess it. Not a secret: what is
+// secret is the password beside it.
 constexpr char kConsoleUserName[]{"wordclock"};
 
 constexpr uint32_t kBytesPerKibibyte{1024u};
@@ -52,16 +56,18 @@ bool IsNetworkJoined()
     return WiFi.status() == WL_CONNECTED;
 }
 
-/* Reads one stored string into a buffer that has room for it, terminator included. An
-   empty answer and a missing key are the same thing here: a network nobody entered. */
-/* Base64, written here rather than taken from the core's own. Two reasons, and the second is
-   the better one: the core offers only an encoder anyway, and its encoder answers an Arduino
-   String - a heap allocation on a path that runs once per HTTP request, for twenty bytes that
-   fit on the stack. Encoding is also all this needs, since what it compares against is what a
-   browser would have sent.
-
-   Padding included, because a browser's header carries it and a comparison of the two has to
-   see the same string. */
+// Reads one stored string into a buffer that has room for it, terminator included. An
+// empty answer and a missing key are the same thing here: a network nobody entered.
+/*
+ * Base64, written here rather than taken from the core's own. Two reasons, and the second is
+ * the better one: the core offers only an encoder anyway, and its encoder answers an Arduino
+ * String - a heap allocation on a path that runs once per HTTP request, for twenty bytes that
+ * fit on the stack. Encoding is also all this needs, since what it compares against is what a
+ * browser would have sent.
+ *
+ * Padding included, because a browser's header carries it and a comparison of the two has to
+ * see the same string.
+ */
 void ToBase64(const char* plain, size_t length, char* target, size_t capacity)
 {
     static constexpr char kAlphabet[]{"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"};
@@ -99,15 +105,15 @@ StdReturnType ReadStoredString(const char* key, char* string, size_t capacity)
     return kEOk;
 }
 
-/* What was compiled in, which is what a clock that was flashed with a WordclockSecrets.h
-   still comes up with. Stored credentials win over it: they are the later word. */
+// What was compiled in, which is what a clock that was flashed with a WordclockSecrets.h
+// still comes up with. Stored credentials win over it: they are the later word.
 constexpr bool IsSsidCompiledIn()
 {
     return sizeof(WORDCLOCK_WIFI_SSID) > 1u;
 }
 
-/* Copies into the caller's buffer only if the whole string fits, so a value that grew
-   past what the field was sized for is reported as no value rather than as half of one. */
+// Copies into the caller's buffer only if the whole string fits, so a value that grew
+// past what the field was sized for is reported as no value rather than as half of one.
 StdReturnType CopyIfItFits(const char* value, char* string, size_t capacity)
 {
     string[0u] = STD_NULL_CHARACTER;
@@ -125,12 +131,14 @@ StdReturnType CopyIfItFits(const char* value, char* string, size_t capacity)
  * P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
 
-/* Instance methods, though some of them read no member: they are the interface the
-   firmware core calls through GetInstance(), and every backend - the simulator's
-   stand-ins included - offers it that way. Whether this backend's implementation
-   happens to need a member is its own detail, and answering the check would carry
-   that detail into the interface.
-   The ones it would make const drive the hardware, which a const would deny. */
+/*
+ * Instance methods, though some of them read no member: they are the interface the
+ * firmware core calls through GetInstance(), and every backend - the simulator's
+ * stand-ins included - offers it that way. Whether this backend's implementation
+ * happens to need a member is its own detail, and answering the check would carry
+ * that detail into the interface.
+ * The ones it would make const drive the hardware, which a const would deny.
+ */
 // NOLINTBEGIN(readability-convert-member-functions-to-static, readability-make-member-function-const)
 /******************************************************************************************************************************************************
   GetFreeMemoryInKibibytes()
@@ -278,8 +286,8 @@ void System::StartNetwork()
     }
 
     WiFi.mode(WIFI_STA);
-    /* Reconnecting is left to the core, so a router that reboots does not take the clock's
-       time source with it for good. */
+    // Reconnecting is left to the core, so a router that reboots does not take the clock's
+    // time source with it for good.
     WiFi.setAutoReconnect(true);
     WiFi.setSleep(WORDCLOCK_WIFI_MODEM_SLEEP);
     WiFi.begin(ssid, password);
@@ -336,8 +344,8 @@ StdReturnType System::ResynchroniseTime()
 ******************************************************************************************************************************************************/
 StdReturnType System::ReconnectNetwork()
 {
-    /* An unset SSID is a configuration that was never filled in, the same test the
-       application makes before it joins at all. */
+    // An unset SSID is a configuration that was never filled in, the same test the
+    // application makes before it joins at all.
     if(sizeof(WORDCLOCK_WIFI_SSID) <= 1u) { return kENotOk; }
 
     if(!WiFi.reconnect()) { return kENotOk; }
@@ -382,8 +390,8 @@ bool System::IsConsoleCredentialValid(const char* credential) const
     char encoded[(sizeof(expected) + 2u) / 3u * 4u + 1u]{};
     ToBase64(expected, static_cast<size_t>(length), encoded, sizeof(encoded));
 
-    /* Same length first, then the whole of it: strncmp on the shorter of two strings would
-       accept a prefix, which for a password is the one comparison that must not be lenient. */
+    // Same length first, then the whole of it: strncmp on the shorter of two strings would
+    // accept a prefix, which for a password is the one comparison that must not be lenient.
     if(strlen(credential) != strlen(encoded)) { return false; }
 
     return strcmp(credential, encoded) == 0;
@@ -398,8 +406,8 @@ StdReturnType System::SetConsolePassword(const char* password)
     Preferences store;
     if(!store.begin(kNetworkNamespace, false)) { return kENotOk; }
 
-    /* An empty password removes the key rather than storing nothing under it, so that
-       IsConsoleProtected() has one state to recognise instead of two. */
+    // An empty password removes the key rather than storing nothing under it, so that
+    // IsConsoleProtected() has one state to recognise instead of two.
     const bool stored = (password[0u] == STD_NULL_CHARACTER)
                       ? store.remove(kConsolePasswordKey)
                       : (store.putString(kConsolePasswordKey, password) == strlen(password));

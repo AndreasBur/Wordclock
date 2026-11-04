@@ -1,14 +1,16 @@
-/* Drives the registered handlers the way the server reaches them - through the registration
-   call - so WebInterface's own wiring is covered rather than bypassed.
-
-   One thing this can no longer ask, and the ESP32's version can: which client a frame went
-   to. On the target that accounting has moved out of our code and into the socket, so what
-   is left to check here is what the backend still decides - whether a frame is sent at all
-   and when - rather than who received it. */
+/*
+ * Drives the registered handlers the way the server reaches them - through the registration
+ * call - so WebInterface's own wiring is covered rather than bypassed.
+ *
+ * One thing this can no longer ask, and the ESP32's version can: which client a frame went
+ * to. On the target that accounting has moved out of our code and into the socket, so what
+ * is left to check here is what the backend still decides - whether a frame is sent at all
+ * and when - rather than who received it.
+ */
 #include <ESPAsyncWebServer.h>
 #include <LEAmDNS.h>
-/* The two the update path leaves its evidence in: the image is a file, and the command page
-   is what the loader would read on the next boot. */
+// The two the update path leaves its evidence in: the image is a file, and the command page
+// is what the loader would read on the next boot.
 #include <LittleFS.h>
 #include <PicoOTA.h>
 
@@ -25,9 +27,11 @@
 #include <string>
 #include <vector>
 
-/* Enough of a parse to say the document is well formed: brackets balanced and no string
-   left open. A browser would refuse the whole thing otherwise, and that failure looks
-   like a broken server rather than a broken label. */
+/*
+ * Enough of a parse to say the document is well formed: brackets balanced and no string
+ * left open. A browser would refuse the whole thing otherwise, and that failure looks
+ * like a broken server rather than a broken label.
+ */
 static bool IsBalancedJson(const std::string& text)
 {
     int depth = 0;
@@ -48,10 +52,10 @@ static bool IsBalancedJson(const std::string& text)
     return (depth == 0) && !in_string;
 }
 
-/* Runs one route and hands back what it produced. The request owns its response, so it
-   outlives neither - hence the copy out. */
-/* Whether the next Fetch() arrives with a credential the library would accept. The library
-   does the comparing on the target, so what a case here decides is its answer. */
+// Runs one route and hands back what it produced. The request owns its response, so it
+// outlives neither - hence the copy out.
+// Whether the next Fetch() arrives with a credential the library would accept. The library
+// does the comparing on the target, so what a case here decides is its answer.
 static bool request_authorised = true;
 static bool authentication_was_requested = false;
 
@@ -75,12 +79,14 @@ static std::string Fetch(const char* route, std::string* content_encoding = null
     return request.Response->Body;
 }
 
-/* An upload, in the order the library performs one: the body arrives in chunks through the
-   body handler, and only when it is through does the request handler answer. A test that
-   called the request handler alone would be testing the answer and not the update.
-
-   Chunked on purpose, and at a size that leaves a remainder, because the handler's arithmetic
-   is what decides when an image is complete. */
+/*
+ * An upload, in the order the library performs one: the body arrives in chunks through the
+ * body handler, and only when it is through does the request handler answer. A test that
+ * called the request handler alone would be testing the answer and not the update.
+ *
+ * Chunked on purpose, and at a size that leaves a remainder, because the handler's arithmetic
+ * is what decides when an image is complete.
+ */
 struct UploadOutcome {
     int code{0};
     std::string body;
@@ -128,9 +134,11 @@ int main()
 {
     Check(WebInterface::GetInstance().Begin() == kEOk, "the server starts and registers its handlers");
     Check(webStubState().Listening, "and it is listening");
-    /* "/" is the panel and the console has its own route, so both have to be there: a missing
-       registration would answer 404 on the page everything the panel does not cover goes
-       through. */
+    /*
+     * "/" is the panel and the console has its own route, so both have to be there: a missing
+     * registration would answer 404 on the page everything the panel does not cover goes
+     * through.
+     */
     Check(webStubState().Routes.count("/console") == 1u, "the console has a route of its own");
     Check((webStubState().SocketHandler != nullptr) && (webStubState().Routes.count("/") == 1u)
           && (webStubState().Routes.count("/commands") == 1u)
@@ -141,12 +149,12 @@ int main()
           && (webStubState().Routes.count("/icon-512.png") == 1u),
           "and the three the home screen needs with them");
     Check(webStubState().Routes.count("/update") == 1u, "and the update route");
-    /* The body handler is the half that matters: without it the image would arrive nowhere
-       and the request handler would answer about an upload that never happened. */
+    // The body handler is the half that matters: without it the image would arrive nowhere
+    // and the request handler would answer about an upload that never happened.
     Check(webStubState().BodyRoutes.count("/update") == 1u, "with the body handler the image arrives through");
 
-    /* both pages: gzipped, announced as such, and not the same bytes - a swapped pair of
-       pointers would pass every other check here. */
+    // both pages: gzipped, announced as such, and not the same bytes - a swapped pair of
+    // pointers would pass every other check here.
     std::string encoding;
     const std::string page = Fetch("/", &encoding);
     Check(encoding == "gzip", "the page is announced as gzip");
@@ -165,8 +173,8 @@ int main()
     Check(manifest.find("standalone") != std::string::npos, "it asks to start without an address bar");
     Check(manifest.find("icon-192.png") != std::string::npos
           && manifest.find("icon-512.png") != std::string::npos, "it names both icons");
-    /* Relative, because the clock answers on whatever address it was given: an absolute
-       start_url baked in here would send an installed console to a different clock. */
+    // Relative, because the clock answers on whatever address it was given: an absolute
+    // start_url baked in here would send an installed console to a different clock.
     Check(manifest.find("\"start_url\": \".\"") != std::string::npos, "and starts at a relative URL");
 
     const std::string small_icon = Fetch("/icon-192.png", &encoding);
@@ -176,23 +184,26 @@ int main()
     Check(large_icon.size() > small_icon.size() && large_icon.compare(1u, 3u, "PNG") == 0,
           "the large icon is a PNG too, and the larger of the two");
 
-    /* ---- the update ------------------------------------------------------------------
-       This board has no second app partition, so an update is a file plus a command page that
-       the loader at the front of the image reads on the next boot. Which makes the interesting
-       question not "did it answer 200" but *what it left on the filesystem* - because that,
-       and only that, is what the next boot acts on.
-    */
+    /*
+     * ---- the update ------------------------------------------------------------------
+     * This board has no second app partition, so an update is a file plus a command page that
+     * the loader at the front of the image reads on the next boot. Which makes the interesting
+     * question not "did it answer 200" but *what it left on the filesystem* - because that,
+     * and only that, is what the next boot acts on.
+     */
     const std::string image(2000u, '\xa5');
 
-    /* Only the image is swept away between cases, never the whole store: the console password
-       is a file in this same filesystem, and a case that cleared it would unprotect the
-       console and then pass for the wrong reason - which is what the first version of the
-       authorisation case below did.
-
-       The failing cases come first, and that order is not cosmetic either. A restart that has
-       been asked for cannot be unasked - the flag is one-way, because on the target the call
-       that reads it does not return - so "no restart was asked for" can only be checked
-       before anything has asked for one. */
+    /*
+     * Only the image is swept away between cases, never the whole store: the console password
+     * is a file in this same filesystem, and a case that cleared it would unprotect the
+     * console and then pass for the wrong reason - which is what the first version of the
+     * authorisation case below did.
+     *
+     * The failing cases come first, and that order is not cosmetic either. A restart that has
+     * been asked for cannot be unasked - the flag is one-way, because on the target the call
+     * that reads it does not return - so "no restart was asked for" can only be checked
+     * before anything has asked for one.
+     */
     littleFsStore().erase("/firmware.bin");
     picoOTA = PicoOtaStub{};
     UploadOutcome update = Post("/update", image.substr(0u, 900u), image.size());
@@ -203,9 +214,11 @@ int main()
     System::GetInstance().PerformPendingRestart();
     Check(!rp2040.Restarted, "and the clock is left running what it has");
 
-    /* An image that does not fit is refused before the first byte is written, so it cannot
-       fill the filesystem the settings live in. 64 KB is what this board's filesystem was
-       before it had to hold an image. */
+    /*
+     * An image that does not fit is refused before the first byte is written, so it cannot
+     * fill the filesystem the settings live in. 64 KB is what this board's filesystem was
+     * before it had to hold an image.
+     */
     littleFsStore().erase("/firmware.bin");
     picoOTA = PicoOtaStub{};
     LittleFS.Total = 64u * 1024u;
@@ -217,8 +230,8 @@ int main()
     Check(!rp2040.Restarted, "and asks for no restart");
     LittleFS.Total = 1024u * 1024u;
 
-    /* A command page that will not write is a failed update, and it takes the image with it:
-       what is on the filesystem after a failure is a file nobody will read. */
+    // A command page that will not write is a failed update, and it takes the image with it:
+    // what is on the filesystem after a failure is a file nobody will read.
     littleFsStore().erase("/firmware.bin");
     picoOTA = PicoOtaStub{};
     picoOTA.CommitSucceeds = false;
@@ -227,8 +240,8 @@ int main()
     Check(littleFsStore().count("/firmware.bin") == 0u, "and the image is taken off the filesystem");
     picoOTA = PicoOtaStub{};
 
-    /* A POST that carries nothing never reaches the body handler at all, which is its own
-       case and not an empty success. */
+    // A POST that carries nothing never reaches the body handler at all, which is its own
+    // case and not an empty success.
     littleFsStore().erase("/firmware.bin");
     const std::string nothing = Fetch("/update");
     Check(nothing.find("\"ok\":false") != std::string::npos, "a POST with no body is refused");
@@ -244,8 +257,8 @@ int main()
           && littleFsStore()["/firmware.bin"] == image,
           "and is on the filesystem, byte for byte");
     Check(picoOTA.Committed == "/firmware.bin", "the loader was told which file to install");
-    /* Asked for and not taken: a controller that restarted inside the handler would send the
-       browser nothing, which reads as a failed update. The application's tick carries it. */
+    // Asked for and not taken: a controller that restarted inside the handler would send the
+    // browser nothing, which reads as a failed update. The application's tick carries it.
     Check(!rp2040.Restarted, "the handler does not restart the controller itself");
     System::GetInstance().PerformPendingRestart();
     Check(rp2040.Restarted, "but the tick after it does");
@@ -259,8 +272,8 @@ int main()
     Check(catalog.find("\"short\":\"B\"") != std::string::npos, "it carries an option short name");
     Check(catalog.find("\"max\":255") != std::string::npos, "it carries the ranges");
     Check(catalog.find("\"values\":[") != std::string::npos, "it carries named values for the enumerations");
-    /* Without this the page would offer the status fields as inputs, and a value typed
-       into one of them would come back as "parameter unknown". */
+    // Without this the page would offer the status fields as inputs, and a value typed
+    // into one of them would come back as "parameter unknown".
     Check(catalog.find("\"readonly\":true") != std::string::npos, "it marks the fields that only appear in answers");
     size_t commands = 0u;
     for(size_t at = catalog.find("\"number\":"); at != std::string::npos; at = catalog.find("\"number\":", at + 1u)) { commands++; }
@@ -272,8 +285,8 @@ int main()
     Check(panel.find("\"columns\":11") != std::string::npos, "it carries the column count");
     Check(panel.find("\"rows\":10") != std::string::npos, "it carries the row count");
     Check(panel.find("ESKISTLF") != std::string::npos, "it carries the letters");
-    /* U with an umlaut is 0xDC in the firmware's table and has to arrive as two UTF-8 bytes;
-       the raw byte would make the whole document invalid. */
+    // U with an umlaut is 0xDC in the firmware's table and has to arrive as two UTF-8 bytes;
+    // the raw byte would make the whole document invalid.
     Check(panel.find("\xc3\x9c") != std::string::npos, "the umlauts arrive as UTF-8");
     Check(panel.find("\xdc") == std::string::npos, "no raw Latin-1 byte escapes into the JSON");
 
@@ -294,13 +307,15 @@ int main()
     Check(found, "the answer came back over the socket");
     for(const auto& line : webStubState().Text) { printf("   sent: \"%s\"\n", line.c_str()); }
 
-    /* An answer carrying a Latin-1 byte, which is what the overlay text command answers with
-       once somebody sets a text with an umlaut in it - the thing the font tables carry
-       umlauts for. A web socket text frame has to be valid UTF-8, so a raw 0xFC here does
-       not draw one character wrong, it makes the browser close the connection.
-
-       The strings are split around the escapes on purpose: "\xFCck" would swallow the c as a
-       further hex digit and stop compiling. */
+    /*
+     * An answer carrying a Latin-1 byte, which is what the overlay text command answers with
+     * once somebody sets a text with an umlaut in it - the thing the font tables carry
+     * umlauts for. A web socket text frame has to be valid UTF-8, so a raw 0xFC here does
+     * not draw one character wrong, it makes the browser close the connection.
+     *
+     * The strings are split around the escapes on purpose: "\xFCck" would swallow the c as a
+     * further hex digit and stop compiling.
+     */
     webStubState().Text.clear();
     WebInterface::GetInstance().BroadcastLine("T=Gl\xFC" "ck");
     Check(!webStubState().Text.empty(), "an answer with an umlaut is sent at all");
@@ -316,8 +331,8 @@ int main()
         for(unsigned tick = 0u; tick < (count * kInterval); tick++) { web.BroadcastFrame(); }
     };
 
-    /* The handshake above counted as a client arriving, so one frame is already owed. Drain
-       it before measuring anything, or every count below is one too high. */
+    // The handshake above counted as a client arriving, so one frame is already owed. Drain
+    // it before measuring anything, or every count below is one too high.
     run_interval(1u);
     webStubState().Binary.clear();
 
@@ -355,9 +370,11 @@ int main()
           static_cast<unsigned char>(webStubState().Binary[0][2]) == 30u,
           "enabling the display restores the browser frame");
 
-    /* A client arriving between two changes still has to be shown the panel. Who it goes to
-       is the socket's business here, so what is checked is that a frame goes out at all on
-       an unchanged display - which is the decision that is still ours. */
+    /*
+     * A client arriving between two changes still has to be shown the panel. Who it goes to
+     * is the socket's business here, so what is checked is that a frame goes out at all on
+     * an unchanged display - which is the decision that is still ours.
+     */
     webStubState().Binary.clear();
     web.OnClientOpened();
     run_interval(1u);
@@ -384,9 +401,11 @@ int main()
     Check(webStubState().Binary.empty(), "with nobody watching, no frame is built at all");
     webStubState().ClientCount = 1u;
 
-    /* An oversized frame must be refused whole rather than truncated into the parser, and a
-       split one dropped rather than reassembled. Both would put half a command in front of
-       it. */
+    /*
+     * An oversized frame must be refused whole rather than truncated into the parser, and a
+     * split one dropped rather than reassembled. Both would put half a command in front of
+     * it.
+     */
     webStubState().Text.clear();
     SendFrame(std::string(WEB_FRONTEND_MAX_FRAME_LENGTH + 10u, 'x'));
     communication.Task();
@@ -399,11 +418,12 @@ int main()
     Check(webStubState().Text.empty(), "and so is a split one");
 
 
-    /* ---- the console password --------------------------------------------------------
-       The gate, and only the gate: the credential itself is compared by the server library on
-       the target, so what a host can check is who is asked and what happens when the answer is
-       no. Base64 over plain http is not encryption either way, and this backend's notes say so.
-    */
+    /*
+     * ---- the console password --------------------------------------------------------
+     * The gate, and only the gate: the credential itself is compared by the server library on
+     * the target, so what a host can check is who is asked and what happens when the answer is
+     * no. Base64 over plain http is not encryption either way, and this backend's notes say so.
+     */
     Check(!System::GetInstance().IsConsoleProtected(), "a clock with no password is not protected");
     request_authorised = false;
     Check(!Fetch("/display").empty(), "and answers a request that carries no credential");
@@ -417,9 +437,11 @@ int main()
         Check(body.empty() && authentication_was_requested, route);
     }
 
-    /* The update again, through the path an image really takes: the body arrives before the
-       request handler runs, so a check that sat only in the handler would have let an
-       unauthorised upload write the filesystem first and refuse afterwards. */
+    /*
+     * The update again, through the path an image really takes: the body arrives before the
+     * request handler runs, so a check that sat only in the handler would have let an
+     * unauthorised upload write the filesystem first and refuse afterwards.
+     */
     littleFsStore().erase("/firmware.bin");
     picoOTA = PicoOtaStub{};
     const UploadOutcome unauthorised = Post("/update", image, image.size());
@@ -427,9 +449,11 @@ int main()
           "an unauthorised upload is not accepted");
     Check(littleFsStore().count("/firmware.bin") == 0u, "and never reaches the filesystem");
     Check(picoOTA.Committed.empty(), "and nothing was handed to the loader");
-    /* No restart assertion here: by this point a successful upload above has asked for one,
-       and that flag does not come back. What this case is about is the two lines above it -
-       that the filesystem was never touched by a request that had no business writing it. */
+    /*
+     * No restart assertion here: by this point a successful upload above has asked for one,
+     * and that flag does not come back. What this case is about is the two lines above it -
+     * that the filesystem was never touched by a request that had no business writing it.
+     */
 
     request_authorised = true;
     Check(!Fetch("/display").empty(), "the right credential is let through");

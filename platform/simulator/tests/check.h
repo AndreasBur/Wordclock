@@ -1,12 +1,14 @@
-/* The assertion these tests share, its tally, and the fixtures more than one case needs.
-
-   Deliberately quiet on a pass, which is the opposite of the ESP32 tests' Check() - and
-   for the reason given there: ctest wraps these and counts them, so a passing run has
-   nothing to say, while nothing wraps the ESP32 binaries and a silent one would leave no
-   evidence that anything ran.
-
-   inline throughout, so every case file can include this and still link: one variable and
-   one function, however many translation units. */
+/*
+ * The assertion these tests share, its tally, and the fixtures more than one case needs.
+ *
+ * Deliberately quiet on a pass, which is the opposite of the ESP32 tests' Check() - and
+ * for the reason given there: ctest wraps these and counts them, so a passing run has
+ * nothing to say, while nothing wraps the ESP32 binaries and a silent one would leave no
+ * evidence that anything ran.
+ *
+ * inline throughout, so every case file can include this and still link: one variable and
+ * one function, however many translation units.
+ */
 #ifndef _CHECK_H_
 #define _CHECK_H_
 
@@ -69,8 +71,8 @@ inline bool IsAnyPixelLit(const PixelBufferType& pixels)
     return false;
 }
 
-/* What would reach the LEDs, which is not what ReadPixels() shows: that reads the buffer,
-   and the brightness is folded in on the way out. */
+// What would reach the LEDs, which is not what ReadPixels() shows: that reads the buffer,
+// and the brightness is folded in on the way out.
 inline PixelBufferType ReadOutputPixels()
 {
     PixelBufferType pixels;
@@ -81,8 +83,8 @@ inline PixelBufferType ReadOutputPixels()
     return pixels;
 }
 
-/* The difference is the whole of what switching the display off does, so a test that
-   asked the buffer would see nothing. */
+// The difference is the whole of what switching the display off does, so a test that
+// asked the buffer would see nothing.
 inline bool IsAnyOutputPixelLit()
 {
     for(byte index = 0u; index < PIXELS_NUMBER_OF_PIXELS; index++) {
@@ -93,9 +95,11 @@ inline bool IsAnyOutputPixelLit()
     return false;
 }
 
-/* The first animation this build has, for a case that needs one and does not care which.
-   Naming one ties the case to the switch that compiles that animation in, and with the
-   cursor switched off the test suite stopped compiling. */
+/*
+ * The first animation this build has, for a case that needs one and does not care which.
+ * Naming one ties the case to the switch that compiles that animation in, and with the
+ * cursor switched off the test suite stopped compiling.
+ */
 inline Animations::AnimationIdType FirstAnimation()
 {
     return static_cast<Animations::AnimationIdType>(ToUnderlying(Animations::AnimationIdType::kNone) + 1u);
@@ -106,10 +110,10 @@ inline void SetTime(byte hour, byte minute, byte second)
     RealTimeClock::GetInstance().SetTime(ClockTime(hour, minute, second));
 }
 
-/* More than one case needs a clock face on the display before it can say what changed
-   about it, so it lives here rather than in whichever file got it first. */
-/* Draws a time the way the clock does when no animation is selected: the reference every
-   animation has to arrive at. */
+// More than one case needs a clock face on the display before it can say what changed
+// about it, so it lives here rather than in whichever file got it first.
+// Draws a time the way the clock does when no animation is selected: the reference every
+// animation has to arrive at.
 inline PixelBufferType DrawClockFace(byte hour, byte minute)
 {
     Display& display = Display::GetInstance();

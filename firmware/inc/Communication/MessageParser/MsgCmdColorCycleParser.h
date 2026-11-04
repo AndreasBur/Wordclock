@@ -57,9 +57,11 @@ class MsgCmdColorCycleParser : public MsgParameterParser<MsgCmdColorCycleParser,
         ParameterTableElementType(kSpeedShortName,  MsgParameter::ArgumentTypeType::kUint8)
     };
 
-    /* Collected rather than applied where it arrives, and applied after the speed: switching
-       the cycle on puts a colour on the strip at once, and doing that before the speed of the
-       same command has landed would start the wheel at the old rate for one step. */
+    /*
+     * Collected rather than applied where it arrives, and applied after the speed: switching
+     * the cycle on puts a colour on the strip at once, and doing that before the speed of the
+     * same command has landed would start the wheel at the old rate for one step.
+     */
     bool active_{false};
     bool active_given_{false};
 
@@ -86,8 +88,8 @@ class MsgCmdColorCycleParser : public MsgParameterParser<MsgCmdColorCycleParser,
 
         SendAnswerParameter(kActiveShortName, static_cast<byte>(color_cycle.GetIsActive() ? 1u : 0u));
         SendAnswerParameter(kSpeedShortName, color_cycle.GetTaskCycle());
-        /* Last field before the command parser's terminating println(), so no trailing
-           separator space. */
+        // Last field before the command parser's terminating println(), so no trailing
+        // separator space.
         SendAnswerParameter(kHueShortName, color_cycle.GetHue(), false);
     }
 

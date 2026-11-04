@@ -90,14 +90,16 @@ void AnimationFlicker::Task()
 ******************************************************************************************************************************************************/
 void AnimationFlicker::Reset()
 {
-    /* The flicker is made by switching the display off and on, and it ends on an off:
-       ClearTimeTask() toggles first and only then decides whether it was the last run, so
-       the final toggle is always the one that darkens. Nothing switched it back, which
-       left a clock that had shown this animation dark until something else happened to
-       turn it on.
-
-       Here rather than at the end of the animation, because Reset() is also where an
-       abort lands - a flicker cut short in the middle had the same ending. */
+    /*
+     * The flicker is made by switching the display off and on, and it ends on an off:
+     * ClearTimeTask() toggles first and only then decides whether it was the last run, so
+     * the final toggle is always the one that darkens. Nothing switched it back, which
+     * left a clock that had shown this animation dark until something else happened to
+     * turn it on.
+     *
+     * Here rather than at the end of the animation, because Reset() is also where an
+     * abort lands - a flicker cut short in the middle had the same ending.
+     */
     Display::GetInstance().Enable();
 
     minute_ = 0u;

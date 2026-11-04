@@ -27,8 +27,8 @@
 /******************************************************************************************************************************************************
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
-/* Major, minor, patch. A build that wants to say more - a branch, a commit - overrides it
-   from the outside rather than editing this line. */
+// Major, minor, patch. A build that wants to say more - a branch, a commit - overrides it
+// from the outside rather than editing this line.
 #ifndef WORDCLOCK_VERSION
 # define WORDCLOCK_VERSION                              "0.1.0"
 #endif

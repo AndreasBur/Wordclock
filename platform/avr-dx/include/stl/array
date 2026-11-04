@@ -25,16 +25,18 @@
 
 #include <stddef.h>
 
-/* On this toolchain these headers are the standard library, see type_traits, so declaring
-   into std is what they exist to do - and under the standard's names, which is what the
-   naming check is told here. */
+/*
+ * On this toolchain these headers are the standard library, see type_traits, so declaring
+ * into std is what they exist to do - and under the standard's names, which is what the
+ * naming check is told here.
+ */
 // NOLINTBEGIN(cert-dcl58-cpp,readability-identifier-naming)
 namespace std {
 
 template<class T, size_t N>
 struct array {
-    /* Public and named with the standard's underscore, because an aggregate has no other
-       way to hold its storage - the brace initialisers in the core reach it directly. */
+    // Public and named with the standard's underscore, because an aggregate has no other
+    // way to hold its storage - the brace initialisers in the core reach it directly.
     T _M_elems[N];
 
     using value_type = T;

@@ -61,19 +61,21 @@ class Pixels
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    /* Zero-initialised, so the strip starts dark rather than at whatever the memory held -
-       the first render then puts a defined frame on the wire. */
+    // Zero-initialised, so the strip starts dark rather than at whatever the memory held -
+    // the first render then puts a defined frame on the wire.
     PixelType pixel_buffer_[PIXELS_DISPLAY_NUMBER_OF_ROWS][PIXELS_DISPLAY_NUMBER_OF_COLUMNS]{};
     byte pin_{0};
     byte brightness_{255};
-    /* Whether the firmware touched buffer or brightness since the last render. Starts true
-       so the first render establishes the strip's state. */
+    // Whether the firmware touched buffer or brightness since the last render. Starts true
+    // so the first render establishes the strip's state.
     bool dirty_{true};
     bool initialised_{false};
-    /* Whether anything may go out on the wire at all. Not the same as a brightness of zero,
-       which still transmits a frame of black pixels: this is for the state in which the strip
-       has no supply, and a frame arriving then pushes current into a dead rail through the
-       LED's own protection diode. */
+    /*
+     * Whether anything may go out on the wire at all. Not the same as a brightness of zero,
+     * which still transmits a frame of black pixels: this is for the state in which the strip
+     * has no supply, and a frame arriving then pushes current into a dead rail through the
+     * LED's own protection diode.
+     */
     bool output_suspended_{false};
 
     // functions
@@ -95,10 +97,12 @@ class Pixels
     }
 
     // get methods
-    /* Two forms of the reader, and the argument list says which: the one taking a reference
-       answers whether the index is on the strip, the one taking none answers the pixel and
-       leaves an unlit one where the index is not. Both check. Writers have a single form,
-       which answers, and a caller that has nothing to do with the answer ignores it. */
+    /*
+     * Two forms of the reader, and the argument list says which: the one taking a reference
+     * answers whether the index is on the strip, the one taking none answers the pixel and
+     * leaves an unlit one where the index is not. Both check. Writers have a single form,
+     * which answers, and a caller that has nothing to do with the answer ignores it.
+     */
     byte GetBrightness() const { return brightness_; }
     StdReturnType GetPixel(byte, PixelType&) const;
     PixelType GetPixel(byte) const;
@@ -128,8 +132,8 @@ class Pixels
     void DisablePixels() { SetBrightness(0); }
     void ClearPixels() { SetPixels(PixelType(0u, 0u, 0u)); }
 
-    /* Only asks for a render; what reaches the strip is decided by Render() on the next
-       tick. */
+    // Only asks for a render; what reaches the strip is decided by Render() on the next
+    // tick.
     StdReturnType Show() {
         dirty_ = true;
         return kEOk;
@@ -140,14 +144,16 @@ class Pixels
     StdReturnType Render();
 
     // output gate, for the supply switch
-    /* Whether the last frame is still going out. Asked before the supply is cut: the driver
-       hands one byte at a time to an interrupt and the frame outlives the call that started
-       it, so a port dropped on the tick that started it lands in the middle of one. */
+    /*
+     * Whether the last frame is still going out. Asked before the supply is cut: the driver
+     * hands one byte at a time to an interrupt and the frame outlives the call that started
+     * it, so a port dropped on the tick that started it lands in the middle of one.
+     */
     bool IsFrameOnTheWire() const;
     bool IsOutputSuspended() const { return output_suspended_; }
     void SuspendOutput() { output_suspended_ = true; }
-    /* Marks the buffer, because the LEDs lose their registers along with their supply: what
-       was up there is gone, so coming back is a redraw rather than a resume. */
+    // Marks the buffer, because the LEDs lose their registers along with their supply: what
+    // was up there is gone, so coming back is a redraw rather than a resume.
     void ResumeOutput() { output_suspended_ = false; dirty_ = true; }
 };
 

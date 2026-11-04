@@ -55,9 +55,11 @@
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
 /* Power configuration parameter */
-/* Every tick. The two states this counts through are waits on the strip, and a frame takes
-   about a third of one tick - so anything slower would idle with the supply in mid-air for
-   no reason. A tick that has nothing to wait for costs one comparison. */
+/*
+ * Every tick. The two states this counts through are waits on the strip, and a frame takes
+ * about a third of one tick - so anything slower would idle with the supply in mid-air for
+ * no reason. A tick that has nothing to wait for costs one comparison.
+ */
 #define POWER_TASK_CYCLE                                1u
 
 /******************************************************************************************************************************************************
@@ -72,13 +74,13 @@ class Power
     enum class StateType {
         /* The supply is on and frames are going out - what a clock runs in. */
         kSupplyOn,
-        /* Asked to go off. The display is dark; what is left is to see the blanked frame
-           off the wire before the port drops. */
+        // Asked to go off. The display is dark; what is left is to see the blanked frame
+        // off the wire before the port drops.
         kBlanking,
         /* The supply is off and the data line is gated. */
         kSupplyOff,
-        /* Asked to come on. The supply is up; the data line is released on the next task,
-           which gives the strip a tick to find its rail. */
+        // Asked to come on. The supply is up; the data line is released on the next task,
+        // which gives the strip a tick to find its rail.
         kSettling
     };
 
@@ -97,14 +99,16 @@ class Power
     static Display& GetDisplay() { return Display::GetInstance(); }
     static PowerSwitch& GetSwitch() { return PowerSwitch::GetInstance(); }
 
-    /* Both waits, as one question. A buffer still marked dirty means the blanked frame has
-       not been handed to the strip yet; a frame on the wire means it has and is still going
-       out. Only when neither holds is the strip dark and idle.
-
-       Anything still drawing - an animation that is running out, the clock changing minute -
-       marks the buffer again and makes this wait another tick. That is left as it is rather
-       than cut short: the display is dark from the first step onwards, so what a longer wait
-       postpones is the current the switch saves, not the darkness somebody asked for. */
+    /*
+     * Both waits, as one question. A buffer still marked dirty means the blanked frame has
+     * not been handed to the strip yet; a frame on the wire means it has and is still going
+     * out. Only when neither holds is the strip dark and idle.
+     *
+     * Anything still drawing - an animation that is running out, the clock changing minute -
+     * marks the buffer again and makes this wait another tick. That is left as it is rather
+     * than cut short: the display is dark from the first step onwards, so what a longer wait
+     * postpones is the current the switch saves, not the darkness somebody asked for.
+     */
     static bool IsStripDarkAndIdle() {
         if(GetDisplay().IsDirty()) { return false; }
 
@@ -139,19 +143,23 @@ class Power
 
     StateType GetState() const { return state_; }
 
-    /* What the status of the supply is, rather than which step the sequence is on: a switch
-       that is on its way off still has its supply up, and the two ticks it takes to get
-       there are nobody else's business. */
+    /*
+     * What the status of the supply is, rather than which step the sequence is on: a switch
+     * that is on its way off still has its supply up, and the two ticks it takes to get
+     * there are nobody else's business.
+     */
     static bool IsSupplyOn() { return GetSwitch().IsSupplyOn(); }
 
-    /* Whether there is a switch to ask at all. A board that was built without one has the
-       high side MOSFET bridged, and then these procedures have nothing to act on. */
+    // Whether there is a switch to ask at all. A board that was built without one has the
+    // high side MOSFET bridged, and then these procedures have nothing to act on.
     static constexpr bool IsSwitchFitted() { return PowerSwitch::IsFitted(); }
 
     // methods
-    /* Asks for the supply. Answers kENotOk only where there is no switch - an ask that is
-       already the case, or already under way, is honoured rather than refused, because a
-       caller that says "off" twice means the same thing both times. */
+    /*
+     * Asks for the supply. Answers kENotOk only where there is no switch - an ask that is
+     * already the case, or already under way, is honoured rather than refused, because a
+     * caller that says "off" twice means the same thing both times.
+     */
     StdReturnType SwitchSupplyOn() {
         if constexpr (!IsSwitchFitted()) { return kENotOk; }
 
@@ -161,8 +169,8 @@ class Power
                 GetSwitch().SwitchSupplyOn();
                 state_ = StateType::kSettling;
                 break;
-            /* Never got as far as cutting it, so there is nothing to bring up and nothing
-               to settle - only the darkness to undo. */
+            // Never got as far as cutting it, so there is nothing to bring up and nothing
+            // to settle - only the darkness to undo.
             case StateType::kBlanking :
                 ReleaseSupply();
                 break;
@@ -179,13 +187,13 @@ class Power
 
         switch(state_) {
             case StateType::kSupplyOn :
-                /* Over the data line, not by cutting the supply: this is the frame the
-                   strip has to be holding when its rail goes. */
+                // Over the data line, not by cutting the supply: this is the frame the
+                // strip has to be holding when its rail goes.
                 GetDisplay().Disable();
                 state_ = StateType::kBlanking;
                 break;
-            /* Asked while the supply is coming up. The data line is still gated, so the
-               strip is dark already and the port can go straight back down. */
+            // Asked while the supply is coming up. The data line is still gated, so the
+            // strip is dark already and the port can go straight back down.
             case StateType::kSettling :
                 GetSwitch().SwitchSupplyOff();
                 state_ = StateType::kSupplyOff;

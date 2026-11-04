@@ -65,20 +65,20 @@ int main()
     uint32_t next_tick = millis();
 
     for(;;) {
-        /* Subtraction rather than a comparison of the two, so that the wrap of the
-           millisecond counter passes without a tick that never comes due. */
+        // Subtraction rather than a comparison of the two, so that the wrap of the
+        // millisecond counter passes without a tick that never comes due.
         if(static_cast<int32_t>(millis() - next_tick) < 0) { continue; }
 
         next_tick += Scheduler::GetTaskIntervalMs();
 
         wordclock.Task();
 
-        /* After the firmware, not from inside its pixel writes: the strip gets whatever the
-           buffer holds once the whole pass over the tasks is done. */
+        // After the firmware, not from inside its pixel writes: the strip gets whatever the
+        // buffer holds once the whole pass over the tasks is done.
         Pixels::GetInstance().Render();
 
-        /* Last, so a restart asked for by a command takes place once that command's answer
-           has reached the wire. */
+        // Last, so a restart asked for by a command takes place once that command's answer
+        // has reached the wire.
         System::GetInstance().PerformPendingRestart();
     }
 } /* main */

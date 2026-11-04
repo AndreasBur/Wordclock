@@ -38,12 +38,12 @@ constexpr byte kRegisterDay{4u};
 constexpr byte kRegisterMonth{5u};
 constexpr byte kRegisterYear{6u};
 
-/* The chip keeps two year digits and a century bit; ClockDate covers 2000 to 2099, so the
-   bit is always clear and the century is this constant. */
+// The chip keeps two year digits and a century bit; ClockDate covers 2000 to 2099, so the
+// bit is always clear and the century is this constant.
 constexpr ClockDateTime::YearType kYearOfCentury{2000u};
 
-/* The chip counts weekdays from one, ClockDate from zero. Neither says which day is
-   first, and nothing reads the register back, so only the range has to match. */
+// The chip counts weekdays from one, ClockDate from zero. Neither says which day is
+// first, and nothing reads the register back, so only the range has to match.
 constexpr byte kWeekdayOffset{1u};
 
 } // namespace
@@ -161,11 +161,13 @@ StdReturnType DS3231::StartBus()
 {
     if(bus_started_) { return kEOk; }
 
-    /* Four calls where the ESP32 has one: this core's begin() takes no arguments and
-       returns nothing, and the clock rate is set afterwards because begin() would otherwise
-       put the default back over it. The pin setters are not the check that replaces
-       begin()'s return value, although they read like one - see BH1750::StartBus() for why
-       an kENotOk branch on them cannot be reached, and what carries the case instead. */
+    /*
+     * Four calls where the ESP32 has one: this core's begin() takes no arguments and
+     * returns nothing, and the clock rate is set afterwards because begin() would otherwise
+     * put the default back over it. The pin setters are not the check that replaces
+     * begin()'s return value, although they read like one - see BH1750::StartBus() for why
+     * an kENotOk branch on them cannot be reached, and what carries the case instead.
+     */
     Wire.setSDA(DS3231_I2C_PIN_SDA);
     Wire.setSCL(DS3231_I2C_PIN_SCL);
 

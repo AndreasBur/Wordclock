@@ -33,8 +33,8 @@
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
 /* System configuration parameter */
-/* The buffer sizes the status command hands in. Kept identical to the other backends, so
-   the command's own buffers do not have to change with the platform. */
+// The buffer sizes the status command hands in. Kept identical to the other backends, so
+// the command's own buffers do not have to change with the platform.
 #define SYSTEM_ADDRESS_STRING_LENGTH                    16u
 #define SYSTEM_LINK_QUALITY_STRING_LENGTH               5u
 #define SYSTEM_SSID_STRING_LENGTH                       33u
@@ -77,12 +77,14 @@ class System
     // get methods
     StdReturnType GetFreeMemoryInKibibytes(uint16_t&) const;
 
-    /* Instance methods, though none of the stubs below reads a member: they are the
-       interface the firmware core calls through GetInstance(), and the backends that have a
-       network answer them from instance state. A backend without one keeps the shape. */
+    /*
+     * Instance methods, though none of the stubs below reads a member: they are the
+     * interface the firmware core calls through GetInstance(), and the backends that have a
+     * network answer them from instance state. A backend without one keeps the shape.
+     */
     // NOLINTBEGIN(readability-convert-member-functions-to-static)
-    /* No network, so no address, no name and no quality to report. kENotOk is the answer
-       the command is built to receive, not a gap. */
+    // No network, so no address, no name and no quality to report. kENotOk is the answer
+    // the command is built to receive, not a gap.
     StdReturnType GetNetworkAddress(char* string) const { string[0u] = STD_NULL_CHARACTER; return kENotOk; }
     StdReturnType GetNetworkSsid(char* string) const { string[0u] = STD_NULL_CHARACTER; return kENotOk; }
     StdReturnType GetLinkQuality(char* string) const { string[0u] = STD_NULL_CHARACTER; return kENotOk; }
@@ -90,8 +92,8 @@ class System
 
     // set methods
     StdReturnType SetNetworkCredentials(const char* ssid, const char* password) { UNUSED(ssid); UNUSED(password); return kENotOk; }
-    /* No console to protect: this build has no web interface, so the password has nowhere to
-       be asked for and the answer is the same "no" the network methods above give. */
+    // No console to protect: this build has no web interface, so the password has nowhere to
+    // be asked for and the answer is the same "no" the network methods above give.
     bool IsConsoleProtected() const { return false; }
     StdReturnType SetConsolePassword(const char* password) { UNUSED(password); return kENotOk; }
 
@@ -100,13 +102,13 @@ class System
     void StartNetwork() { }
     StdReturnType ReconnectNetwork() { return kENotOk; }
 
-    /* The clock chip is the time source here and needs no synchronising - it is asked
-       afresh once a second anyway. */
+    // The clock chip is the time source here and needs no synchronising - it is asked
+    // afresh once a second anyway.
     StdReturnType ResynchroniseTime() { return kENotOk; }
     // NOLINTEND(readability-convert-member-functions-to-static)
 
-    /* Only asks. The application carries it out on its next tick, once the command's answer
-       has reached the wire - a reset from here would cut the answer off mid-sentence. */
+    // Only asks. The application carries it out on its next tick, once the command's answer
+    // has reached the wire - a reset from here would cut the answer off mid-sentence.
     StdReturnType Restart() {
         restart_pending_ = true;
         return kEOk;

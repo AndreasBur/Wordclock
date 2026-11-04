@@ -38,25 +38,27 @@
 ******************************************************************************************************************************************************/
 namespace {
 
-/* Named http_server rather than Server: the Arduino core has a class Server in the global
-   namespace, and an unqualified Server here is then ambiguous. */
+// Named http_server rather than Server: the Arduino core has a class Server in the global
+// namespace, and an unqualified Server here is then ambiguous.
 httpd_handle_t http_server{nullptr};
 
 constexpr size_t kMaxClients{WEB_INTERFACE_MAX_CLIENTS};
 constexpr int kNoClient{-1};
 
-/* The descriptors this server hands out, which it expects to be kept: unlike a library that
-   owns its client list, the IDF's server reports a handshake and a close and leaves the
-   bookkeeping here.
-
-   Written only by the HTTP server's task - on a handshake and on a close - and read only by
-   the firmware's task when it broadcasts. One writer is what makes the plain atomics enough,
-   the same reasoning as for WordclockSerial's ring buffer.
-
-   Reached through a function rather than left as an object with static storage duration,
-   because the slots start at kNoClient and not at zero, and zero is a descriptor a socket can
-   actually be given. Initialising on first use is also what the singleton it used to live on
-   did. */
+/*
+ * The descriptors this server hands out, which it expects to be kept: unlike a library that
+ * owns its client list, the IDF's server reports a handshake and a close and leaves the
+ * bookkeeping here.
+ *
+ * Written only by the HTTP server's task - on a handshake and on a close - and read only by
+ * the firmware's task when it broadcasts. One writer is what makes the plain atomics enough,
+ * the same reasoning as for WordclockSerial's ring buffer.
+ *
+ * Reached through a function rather than left as an object with static storage duration,
+ * because the slots start at kNoClient and not at zero, and zero is a descriptor a socket can
+ * actually be given. Initialising on first use is also what the singleton it used to live on
+ * did.
+ */
 struct ClientTableType {
     std::atomic<int> slots[kMaxClients];
 
@@ -71,10 +73,12 @@ ClientTableType& ClientTable()
     return table;
 }
 
-/* One frame to everybody, which is what both of WebTransport's send calls come down to - the
-   type and the payload are all that differ between a line and a display frame. A send that
-   fails is not retried and the client is not dropped here: the server's close hook owns that,
-   and dropping a client from this side would race with it. */
+/*
+ * One frame to everybody, which is what both of WebTransport's send calls come down to - the
+ * type and the payload are all that differ between a line and a display frame. A send that
+ * fails is not retried and the client is not dropped here: the server's close hook owns that,
+ * and dropping a client from this side would race with it.
+ */
 void SendToEveryClient(httpd_ws_type_t type, uint8_t* payload, size_t length)
 {
     if((http_server == nullptr) || (length == 0u)) { return; }
@@ -91,8 +95,8 @@ void SendToEveryClient(httpd_ws_type_t type, uint8_t* payload, size_t length)
     }
 }
 
-/* Handed to WordclockSerial, which takes a plain function pointer - so the singleton is
-   reached from here rather than carried along. */
+// Handed to WordclockSerial, which takes a plain function pointer - so the singleton is
+// reached from here rather than carried along.
 void SendLineToClients(const char* line)
 {
     WebInterface::GetInstance().BroadcastLine(line);
@@ -126,8 +130,8 @@ bool IsRequestAuthorised(httpd_req_t* request)
 {
     if(!System::GetInstance().IsConsoleProtected()) { return true; }
 
-    /* "Basic " and the blob. Sized for the longest credential the store can hold, and a
-        header longer than that cannot be one this clock would accept. */
+    // "Basic " and the blob. Sized for the longest credential the store can hold, and a
+    // header longer than that cannot be one this clock would accept.
     char header[SYSTEM_PASSWORD_STRING_LENGTH + 128u]{};
     static constexpr char kScheme[]{"Basic "};
 
@@ -137,8 +141,8 @@ bool IsRequestAuthorised(httpd_req_t* request)
         }
     }
 
-    /* The realm carries the user name, because it is the one field a browser cannot guess and
-       it is not a secret - the password beside it is. */
+    // The realm carries the user name, because it is the one field a browser cannot guess and
+    // it is not a secret - the password beside it is.
     httpd_resp_set_status(request, "401 Unauthorized");
     httpd_resp_set_hdr(request, "WWW-Authenticate", "Basic realm=\"Wordclock, user wordclock\"");
     httpd_resp_set_type(request, "text/plain");
@@ -197,8 +201,8 @@ esp_err_t SendUpdateResult(httpd_req_t* request, bool ok, const char* reason)
         (void)snprintf(body, sizeof(body), "{\"ok\":true}");
     } else {
         httpd_resp_set_status(request, "400 Bad Request");
-        /* %.120s, because errorString() is the framework's text and the buffer is ours - and
-           with it the answer cannot be cut short, so the length snprintf returns says nothing. */
+        // %.120s, because errorString() is the framework's text and the buffer is ours - and
+        // with it the answer cannot be cut short, so the length snprintf returns says nothing.
         (void)snprintf(body, sizeof(body), "{\"ok\":false,\"error\":\"%.120s\"}", reason);
         Serial.print(F("Web: update refused - "));
         Serial.println(reason);
@@ -237,32 +241,38 @@ esp_err_t HandleUpdate(httpd_req_t* request)
 {
     if(!IsRequestAuthorised(request)) { return ESP_OK; }
 
-    /* Announced rather than measured, and it has to be: Update needs the size before the
-       first byte, to know which partition can hold it and to erase it. A body that then
-       turns out shorter is caught by end() below, which refuses to finish an image that is
-       not all there. */
+    /*
+     * Announced rather than measured, and it has to be: Update needs the size before the
+     * first byte, to know which partition can hold it and to erase it. A body that then
+     * turns out shorter is caught by end() below, which refuses to finish an image that is
+     * not all there.
+     */
     const size_t announced = request->content_len;
 
     if(announced == 0u) { return SendUpdateResult(request, false, "no image in the request body"); }
 
     if(!Update.begin(announced)) {
-        /* The usual one is an image larger than the partition, which is worth saying as
-           itself rather than as "update failed": it means the wrong file was picked - the
-           factory image instead of the plain one, most likely. */
+        /*
+         * The usual one is an image larger than the partition, which is worth saying as
+         * itself rather than as "update failed": it means the wrong file was picked - the
+         * factory image instead of the plain one, most likely.
+         */
         return SendUpdateResult(request, false, Update.errorString());
     }
 
-    /* One kilobyte at a time, on the server's own task. Larger buffers buy nothing here:
-       the flash write is what takes the time, and this runs beside the clock rather than
-       inside its tick, so the display keeps its frames throughout. */
+    /*
+     * One kilobyte at a time, on the server's own task. Larger buffers buy nothing here:
+     * the flash write is what takes the time, and this runs beside the clock rather than
+     * inside its tick, so the display keeps its frames throughout.
+     */
     char chunk[1024u];
     size_t received = 0u;
 
     while(received < announced) {
         const int read = httpd_req_recv(request, chunk, sizeof(chunk));
 
-        /* A dropped connection halfway through, which is the case the abort exists for:
-           without it the next attempt would find the partition still claimed. */
+        // A dropped connection halfway through, which is the case the abort exists for:
+        // without it the next attempt would find the partition still claimed.
         if(read <= 0) {
             Update.abort();
             return SendUpdateResult(request, false, "the upload stopped before the image was complete");
@@ -338,9 +348,11 @@ esp_err_t HandleDisplay(httpd_req_t* request)
 ******************************************************************************************************************************************************/
 esp_err_t HandleSocket(httpd_req_t* request)
 {
-    /* The handshake only. A frame arriving later has no headers to carry a credential, so
-       the check belongs at the one moment the browser does send them - which is the GET the
-       server calls this handler with before the socket exists. */
+    /*
+     * The handshake only. A frame arriving later has no headers to carry a credential, so
+     * the check belongs at the one moment the browser does send them - which is the GET the
+     * server calls this handler with before the socket exists.
+     */
     if(request->method == HTTP_GET) {
         if(!IsRequestAuthorised(request)) { return ESP_OK; }
     }
@@ -355,8 +367,8 @@ esp_err_t HandleSocket(httpd_req_t* request)
     frame.type = HTTPD_WS_TYPE_TEXT;
     frame.payload = payload;
 
-    /* Asking with the buffer's size rather than in two steps: a frame that does not fit is
-       refused whole, so half a command can never reach the parser. */
+    // Asking with the buffer's size rather than in two steps: a frame that does not fit is
+    // refused whole, so half a command can never reach the parser.
     const esp_err_t result = httpd_ws_recv_frame(request, &frame, WEB_FRONTEND_MAX_FRAME_LENGTH);
     if(result != ESP_OK) { return result; }
 
@@ -366,8 +378,8 @@ esp_err_t HandleSocket(httpd_req_t* request)
     }
     if(frame.type != HTTPD_WS_TYPE_TEXT) { return ESP_OK; }
 
-    /* The terminator and the empty-frame case are WebFrontend's, so that a command coming off
-       a socket reaches the parser the same way on either backend. */
+    // The terminator and the empty-frame case are WebFrontend's, so that a command coming off
+    // a socket reaches the parser the same way on either backend.
     WebFrontend::InjectCommand(reinterpret_cast<const char*>(payload), frame.len);
 
     return ESP_OK;
@@ -394,11 +406,13 @@ void OnSocketClosed(httpd_handle_t, int descriptor)
  * P U B L I C   F U N C T I O N S
 ******************************************************************************************************************************************************/
 
-/* Instance methods, though some of them read no member: they are the interface the
-   firmware core calls through GetInstance(), and every backend - the simulator's
-   stand-ins included - offers it that way. Whether this backend's implementation
-   happens to need a member is its own detail, and answering the check would carry
-   that detail into the interface. */
+/*
+ * Instance methods, though some of them read no member: they are the interface the
+ * firmware core calls through GetInstance(), and every backend - the simulator's
+ * stand-ins included - offers it that way. Whether this backend's implementation
+ * happens to need a member is its own detail, and answering the check would carry
+ * that detail into the interface.
+ */
 // NOLINTBEGIN(readability-convert-member-functions-to-static)
 /******************************************************************************************************************************************************
   Begin()
@@ -411,14 +425,16 @@ StdReturnType WebInterface::Begin()
 {
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
     config.server_port = WEB_INTERFACE_PORT;
-    /* The sockets the server keeps have to cover the console clients plus the ones fetching
-       the page, or a reload can push a console off. */
+    // The sockets the server keeps have to cover the console clients plus the ones fetching
+    // the page, or a reload can push a console off.
     config.max_open_sockets = WEB_INTERFACE_MAX_CLIENTS + 2u;
-    /* Said rather than left to the default, which is 8 and was exactly the count until the
-       console moved to its own route. A route past the limit is refused by the registration
-       below and nothing here reads that answer, so the failure would be one route quietly
-       missing - and the test that counts them is what would find it, on a host, rather than a
-       browser on somebody's wall. The next route to be added has to raise this number with it. */
+    /*
+     * Said rather than left to the default, which is 8 and was exactly the count until the
+     * console moved to its own route. A route past the limit is refused by the registration
+     * below and nothing here reads that answer, so the failure would be one route quietly
+     * missing - and the test that counts them is what would find it, on a host, rather than a
+     * browser on somebody's wall. The next route to be added has to raise this number with it.
+     */
     config.max_uri_handlers = 9u;
     config.close_fn = OnSocketClosed;
     /* Its own task, so nothing here runs inside the firmware's tick. */
@@ -430,11 +446,13 @@ StdReturnType WebInterface::Begin()
         return kENotOk;
     }
 
-    /* The files served unchanged, one route per entry of WebFrontend's table. The array is
-       static because httpd keeps the pointer it is registered with rather than a copy, and
-       sized from the table so that a file added to web/ needs no edit here - only
-       max_uri_handlers above has to still be large enough, which is why that number is said
-       out loud rather than left at its default. */
+    /*
+     * The files served unchanged, one route per entry of WebFrontend's table. The array is
+     * static because httpd keeps the pointer it is registered with rather than a copy, and
+     * sized from the table so that a file added to web/ needs no edit here - only
+     * max_uri_handlers above has to still be large enough, which is why that number is said
+     * out loud rather than left at its default.
+     */
     static httpd_uri_t asset_uris[WebFrontend::kMaxAssets]{};
 
     for(byte index = 0u; index < WebFrontend::GetNumberOfAssets(); index++) {
@@ -506,9 +524,11 @@ void WebInterface::BroadcastFrame()
 /******************************************************************************************************************************************************
  *  W E B   T R A N S P O R T
 ******************************************************************************************************************************************************/
-/* This backend's half of the contract WebFrontend.h states. Defined here rather than in a
-   source of its own because what it reads is this file's: the server handle above and the
-   descriptor table on WebInterface. */
+/*
+ * This backend's half of the contract WebFrontend.h states. Defined here rather than in a
+ * source of its own because what it reads is this file's: the server handle above and the
+ * descriptor table on WebInterface.
+ */
 
 WebTransport& WebTransport::GetInstance()
 {
@@ -531,8 +551,8 @@ bool WebTransport::HasClients() const
 
 void WebTransport::SendText(const char* text, size_t length)
 {
-    /* const_cast because httpd's frame struct is the same type used for receiving, where the
-       payload is written into. Nothing on the sending path writes through it. */
+    // const_cast because httpd's frame struct is the same type used for receiving, where the
+    // payload is written into. Nothing on the sending path writes through it.
     SendToEveryClient(HTTPD_WS_TYPE_TEXT, reinterpret_cast<uint8_t*>(const_cast<char*>(text)), length);
 }
 
@@ -545,8 +565,8 @@ void WebTransport::SendBinary(const byte* bytes, size_t length)
 /******************************************************************************************************************************************************
  *  W E B   R E S P O N S E   B O D Y
 ******************************************************************************************************************************************************/
-/* A chunked response, which is what this server offers: a chunk handed over is a chunk on the
-   wire, and the empty one at the end is what closes it. */
+// A chunked response, which is what this server offers: a chunk handed over is a chunk on the
+// wire, and the empty one at the end is what closes it.
 
 WebResponseBody::WebResponseBody(struct httpd_req* request, const char* content_type)
     : request_(request)
@@ -575,10 +595,12 @@ void WebResponseBody::Finish()
 ******************************************************************************************************************************************************/
 void WebInterface::OnClientOpened(int descriptor)
 {
-    /* Told before the table is even looked at: either way a client just arrived, and it has to
-       be shown the display as it stands rather than as it next changes. That includes the
-       descriptor already being in the table - the system reuses them, so the same number
-       coming back is a new client rather than the old one. */
+    /*
+     * Told before the table is even looked at: either way a client just arrived, and it has to
+     * be shown the display as it stands rather than as it next changes. That includes the
+     * descriptor already being in the table - the system reuses them, so the same number
+     * coming back is a new client rather than the old one.
+     */
     WebFrontend::GetInstance().OnClientOpened();
 
     for(size_t slot = 0u; slot < kMaxClients; slot++) {

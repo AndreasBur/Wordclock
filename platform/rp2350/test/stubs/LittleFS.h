@@ -7,11 +7,13 @@
 #include <cstring>
 #include <map>
 #include <string>
-/* Keeps what was written, so a test can watch a round trip rather than only a call. One
-   map for the whole filesystem, shared by every handle, which is what a filesystem is.
-
-   A File is a cursor into that map. Deliberately a value rather than a handle: the backend
-   opens, uses and closes within one function, so nothing here has to outlive the call. */
+/*
+ * Keeps what was written, so a test can watch a round trip rather than only a call. One
+ * map for the whole filesystem, shared by every handle, which is what a filesystem is.
+ *
+ * A File is a cursor into that map. Deliberately a value rather than a handle: the backend
+ * opens, uses and closes within one function, so nothing here has to outlive the call.
+ */
 inline std::map<std::string, std::string>& littleFsStore()
 {
     static std::map<std::string, std::string> Store;
@@ -67,8 +69,8 @@ struct FSInfo {
 
 struct LittleFSStub {
     bool Mounted{true};
-    /* The region the platformio.ini asks for. A case that wants an image refused for want of
-       space sets this to what the board used to have. */
+    // The region the platformio.ini asks for. A case that wants an image refused for want of
+    // space sets this to what the board used to have.
     uint64_t Total{1024u * 1024u};
 
     bool begin() { return Mounted; }
@@ -86,8 +88,8 @@ struct LittleFSStub {
     File open(const char* Path, const char* Mode) {
         const bool Writable = (Mode[0] == 'w');
         if(Writable) {
-            /* Truncating, as the real one does: a shorter blob must not leave the tail of
-               a longer one behind it. */
+            // Truncating, as the real one does: a shorter blob must not leave the tail of
+            // a longer one behind it.
             littleFsStore()[Path].clear();
             return File(Path, true, true);
         }

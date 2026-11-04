@@ -43,16 +43,16 @@
 ******************************************************************************************************************************************************/
 namespace wordclock_time {
 
-/* Safe before the link is up, and needed there: until this runs, localtime() is UTC and
-   the display would show the wrong hour for as long as that lasted. */
+// Safe before the link is up, and needed there: until this runs, localtime() is UTC and
+// the display would show the wrong hour for as long as that lasted.
 inline void ApplyTimeZone()
 {
     setenv("TZ", WORDCLOCK_TIMEZONE, 1);
     tzset();
 }
 
-/* Only once there is a link. The core resolves the server names here rather than at the
-   first poll, so a call made too early returns having started nothing. */
+// Only once there is a link. The core resolves the server names here rather than at the
+// first poll, so a call made too early returns having started nothing.
 inline void StartTimeServers()
 {
     NTP.begin(WORDCLOCK_NTP_SERVER_PRIMARY, WORDCLOCK_NTP_SERVER_SECONDARY);

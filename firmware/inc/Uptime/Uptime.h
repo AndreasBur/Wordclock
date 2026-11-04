@@ -42,8 +42,8 @@
  *  G L O B A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
 /* Uptime configuration parameter */
-/* In scheduler ticks, so 100 * 10 ms = 1 s. The scheduler counts cycles in a byte, which
-   caps this at 255 - a second is the coarsest unit that still carries a minute exactly. */
+// In scheduler ticks, so 100 * 10 ms = 1 s. The scheduler counts cycles in a byte, which
+// caps this at 255 - a second is the coarsest unit that still carries a minute exactly.
 #define UPTIME_TASK_CYCLE                               100u
 
 /******************************************************************************************************************************************************
@@ -61,9 +61,11 @@ class Uptime
     static constexpr byte kMinutesPerHour{60u};
     static constexpr byte kHoursPerDay{24u};
 
-    /* 179 years, which no clock reaches - but it holds there rather than rolling over,
-       because the whole point of this class is that it never reports a small number for a
-       long time. */
+    /*
+     * 179 years, which no clock reaches - but it holds there rather than rolling over,
+     * because the whole point of this class is that it never reports a small number for a
+     * long time.
+     */
     static constexpr uint16_t kDaysMaximum{65535u};
 
     byte seconds_{0u};
@@ -74,9 +76,11 @@ class Uptime
     Uptime() { }
     ~Uptime() { }
 
-    /* One place of the count: steps it and says whether it rolled into the next one. The
-       carry is the whole of the arithmetic here, so it is worth its own name - Task() then
-       reads as the three places it applies to. */
+    /*
+     * One place of the count: steps it and says whether it rolled into the next one. The
+     * carry is the whole of the arithmetic here, so it is worth its own name - Task() then
+     * reads as the three places it applies to.
+     */
     static bool Carry(byte& value, byte limit) {
         value++;
         if(value < limit) { return false; }

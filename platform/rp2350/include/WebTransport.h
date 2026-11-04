@@ -45,9 +45,11 @@ class AsyncResponseStream;
 /******************************************************************************************************************************************************
  *  C L A S S   W E B   R E S P O N S E   B O D Y
 ******************************************************************************************************************************************************/
-/* One route's answer, being written. This server is pulled from rather than pushed to: the
-   stream collects what is written and Finish() is what hands it to the request, after which
-   the library sends it. */
+/*
+ * One route's answer, being written. This server is pulled from rather than pushed to: the
+ * stream collects what is written and Finish() is what hands it to the request, after which
+ * the library sends it.
+ */
 class WebResponseBody
 {
   private:
@@ -64,9 +66,11 @@ class WebResponseBody
 /******************************************************************************************************************************************************
  *  C L A S S   W E B   T R A N S P O R T
 ******************************************************************************************************************************************************/
-/* Where a finished line or a display frame leaves for whoever is watching. AsyncWebSocket
-   owns its client list, counts it and broadcasts to it, so HasClients() is that count and
-   there is no table here that could disagree with it. */
+/*
+ * Where a finished line or a display frame leaves for whoever is watching. AsyncWebSocket
+ * owns its client list, counts it and broadcasts to it, so HasClients() is that count and
+ * there is no table here that could disagree with it.
+ */
 class WebTransport
 {
   public:

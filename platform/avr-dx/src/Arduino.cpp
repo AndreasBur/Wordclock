@@ -36,13 +36,15 @@
 /******************************************************************************************************************************************************
  *  L O C A L   C O N S T A N T   M A C R O S
 ******************************************************************************************************************************************************/
-/* The asynchronous baud rate register, from the data sheet: 64 samples per bit over the
-   sixteen the receiver takes. Rounded rather than truncated, which keeps the error inside
-   the receiver's tolerance at the rates the console is used at. */
+/*
+ * The asynchronous baud rate register, from the data sheet: 64 samples per bit over the
+ * sixteen the receiver takes. Rounded rather than truncated, which keeps the error inside
+ * the receiver's tolerance at the rates the console is used at.
+ */
 #define ARDUINO_BAUD_REGISTER(Baudrate)     static_cast<uint16_t>(((64uL * F_CPU) + (8uL * (Baudrate))) / (16uL * (Baudrate)))
 
-/* One interrupt per millisecond. At 24 MHz the reload stays inside the counter's 16 bits,
-   so the time base needs no prescaler and keeps its full resolution. */
+// One interrupt per millisecond. At 24 MHz the reload stays inside the counter's 16 bits,
+// so the time base needs no prescaler and keeps its full resolution.
 #define ARDUINO_TIMEBASE_COMPARE_VALUE      static_cast<uint16_t>((F_CPU / 1000uL) - 1uL)
 
 /******************************************************************************************************************************************************
@@ -50,8 +52,8 @@
 ******************************************************************************************************************************************************/
 namespace {
 
-/* Power of two, so the wrap is a mask rather than a division - these run inside the
-   interrupt handlers the strip's timing budget is measured against. */
+// Power of two, so the wrap is a mask rather than a division - these run inside the
+// interrupt handlers the strip's timing budget is measured against.
 static_assert((ARDUINO_SERIAL_TRANSMIT_BUFFER_SIZE & (ARDUINO_SERIAL_TRANSMIT_BUFFER_SIZE - 1u)) == 0u,
               "Arduino: the transmit buffer size has to be a power of two");
 static_assert((ARDUINO_SERIAL_RECEIVE_BUFFER_SIZE & (ARDUINO_SERIAL_RECEIVE_BUFFER_SIZE - 1u)) == 0u,
@@ -75,16 +77,16 @@ volatile uint32_t milliseconds{0u};
 /******************************************************************************************************************************************************
  *  I N T E R R U P T   H A N D L E R S
 ******************************************************************************************************************************************************/
-/* The time base. Nothing but a counter, so that it can never be the handler that pushes
-   the strip past its reset gap. */
+// The time base. Nothing but a counter, so that it can never be the handler that pushes
+// the strip past its reset gap.
 ISR(TCB0_INT_vect)
 {
     TCB0.INTFLAGS = TCB_CAPT_bm;
     milliseconds++;
 }
 
-/* One character out of the queue per empty data register. Disarms itself when the queue
-   runs dry, rather than firing on into an empty buffer. */
+// One character out of the queue per empty data register. Disarms itself when the queue
+// runs dry, rather than firing on into an empty buffer.
 ISR(USART1_DRE_vect)
 {
     if(transmit_head == transmit_tail) {
@@ -96,9 +98,11 @@ ISR(USART1_DRE_vect)
     transmit_tail = (transmit_tail + 1u) & kTransmitBufferMask;
 }
 
-/* A full receive buffer drops the newest character rather than overwriting the oldest: what
-   is already queued is the beginning of a command, and keeping that lets the parser reject
-   a truncated line, while overwriting would hand it a line spliced from two. */
+/*
+ * A full receive buffer drops the newest character rather than overwriting the oldest: what
+ * is already queued is the beginning of a command, and keeping that lets the parser reject
+ * a truncated line, while overwriting would hand it a line spliced from two.
+ */
 ISR(USART1_RXC_vect)
 {
     const char character = static_cast<char>(ARDUINO_SERIAL_USART.RXDATAL);
@@ -127,8 +131,8 @@ ISR(USART1_RXC_vect)
 void InitRuntime()
 {
     _PROTECTED_WRITE(CLKCTRL.OSCHFCTRLA, CLKCTRL_FRQSEL_24M_gc);
-    /* No prescaler, so the peripheral clock is the oscillator and F_CPU means what the
-       pulse widths assume it means. */
+    // No prescaler, so the peripheral clock is the oscillator and F_CPU means what the
+    // pulse widths assume it means.
     _PROTECTED_WRITE(CLKCTRL.MCLKCTRLB, 0u);
 
     TCB0.CCMP = ARDUINO_TIMEBASE_COMPARE_VALUE;
@@ -147,8 +151,8 @@ uint32_t millis()
 {
     uint32_t value;
 
-    /* Four bytes read against a one-byte-wide interrupt: without the guard a tick landing
-       mid-read returns a number that was never on the clock. */
+    // Four bytes read against a one-byte-wide interrupt: without the guard a tick landing
+    // mid-read returns a number that was never on the clock.
     const uint8_t stored_status = SREG;
     cli();
     value = milliseconds;
@@ -158,11 +162,13 @@ uint32_t millis()
 } /* millis */
 
 
-/* Instance methods, though some of them read no member: they are the interface the
-   firmware core calls through GetInstance(), and every backend - the simulator's
-   stand-ins included - offers it that way. Whether this backend's implementation
-   happens to need a member is its own detail, and answering the check would carry
-   that detail into the interface. */
+/*
+ * Instance methods, though some of them read no member: they are the interface the
+ * firmware core calls through GetInstance(), and every backend - the simulator's
+ * stand-ins included - offers it that way. Whether this backend's implementation
+ * happens to need a member is its own detail, and answering the check would carry
+ * that detail into the interface.
+ */
 // NOLINTBEGIN(readability-convert-member-functions-to-static)
 /******************************************************************************************************************************************************
   SerialPort::begin()
@@ -191,8 +197,8 @@ void SerialPort::write(char character)
     const uint16_t next_head = (transmit_head + 1u) & kTransmitBufferMask;
 
     while(next_head == transmit_tail) {
-        /* The handler that drains the queue may be the one being waited for, so it has to
-           be able to run - a spin with interrupts disabled here would never end. */
+        // The handler that drains the queue may be the one being waited for, so it has to
+        // be able to run - a spin with interrupts disabled here would never end.
     }
 
     transmit_buffer[transmit_head] = character;

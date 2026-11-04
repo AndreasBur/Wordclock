@@ -86,11 +86,13 @@ template <typename FontCharType, size_t FontTableSize> class Font
     constexpr Font(const FontTableType& font_table) : font_table_(font_table) { }
     ~Font() { }
 
-    /* Two forms of every reader, and the argument list says which: the one taking a
-       reference answers whether the glyph is in the table, the one taking none answers the
-       glyph. Both check, and the unchecked read is the private table element above - a
-       glyph outside the table is the default one, which is zero columns wide and therefore
-       draws nothing. */
+    /*
+     * Two forms of every reader, and the argument list says which: the one taking a
+     * reference answers whether the glyph is in the table, the one taking none answers the
+     * glyph. Both check, and the unchecked read is the private table element above - a
+     * glyph outside the table is the default one, which is zero columns wide and therefore
+     * draws nothing.
+     */
     // get methods
     FontCharType GetChar(byte index) const {
         if(!IsIndexValid(index)) { return FontCharType{}; }

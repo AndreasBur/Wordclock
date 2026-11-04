@@ -67,8 +67,8 @@ class Text
         kCharShift
     };
 
-    /* uint8_t and not the default int: it is stored in a one-bit field below, where a signed
-       type holds 0 and -1, and kBusy would read back as -1. */
+    // uint8_t and not the default int: it is stored in a one-bit field below, where a signed
+    // type holds 0 and -1, and kBusy would read back as -1.
     enum class ShiftStateType : uint8_t {
         kIdle,
         kBusy
@@ -97,8 +97,8 @@ class Text
  *  P R I V A T E   D A T A   A N D   F U N C T I O N S
 ******************************************************************************************************************************************************/
   private:
-    /* The first glyph of every table is the space, which is what a character with no glyph
-       of its own is drawn as. */
+    // The first glyph of every table is the space, which is what a character with no glyph
+    // of its own is drawn as.
     static constexpr byte kSpaceFontIndex{0u};
     Transformation wc_transformation_;
     ShiftType shift_;
@@ -126,11 +126,13 @@ class Text
     ~Text() { }
 
 
-    /* Each of these four had a twin that differed in nothing a reader sees - it dropped the
-       answer instead of passing it on - and calling the wrong one of the pair from the wrong
-       place cost bounds checks and looked right. That happened once, in SetChar()'s 9x10
-       branch. There is one of each now, so the mistake has nowhere left to happen, and the
-       [[nodiscard]] that used to police it is gone with the twins. */
+    /*
+     * Each of these four had a twin that differed in nothing a reader sees - it dropped the
+     * answer instead of passing it on - and calling the wrong one of the pair from the wrong
+     * place cost bounds checks and looked right. That happened once, in SetChar()'s 9x10
+     * branch. There is one of each now, so the mistake has nowhere left to happen, and the
+     * [[nodiscard]] that used to police it is gone with the twins.
+     */
     template <typename RowType, byte RowsSize>
     StdReturnType SetCharFontHorizontal(byte, byte, const FontCharHorizontal<RowType, RowsSize>&, byte);
     template <typename RowType>

@@ -81,9 +81,11 @@ void AnimationCursor::Task()
             }
         }
         if(current_pixel_index_ >= DISPLAY_NUMBER_OF_PIXELS) {
-            /* The cursor normally clears every old pixel as it passes. Rebuild the
-               target once at the end as well, so a skipped or overlapping pixel can
-               never leave a word from the previous time on the display. */
+            /*
+             * The cursor normally clears every old pixel as it passes. Rebuild the
+             * target once at the end as well, so a skipped or overlapping pixel can
+             * never leave a word from the previous time on the display.
+             */
             FinishWithClockWords(clock_words_table_);
         }
         current_pixel_index_++;
