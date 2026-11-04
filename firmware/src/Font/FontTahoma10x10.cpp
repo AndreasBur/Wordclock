@@ -10,6 +10,12 @@
 
 #include "FontTahoma10x10.h"
 
+/*
+ * The glyphs, one per index: the ASCII codes 32 to 127, then the umlauts and the degree sign,
+ * in the order Text::ConvertCharToFontIndex() maps them to. Each is its width in columns and
+ * its 10 rows from the top, a `uint16_t` each with bit 0 the leftmost pixel.
+ * FontCreator generated all but the degree sign, which was appended by hand; see docs/fonts.md.
+ */
 const FontTahoma10x10::FontTableType FontTahoma10x10::kFontTable PROGMEM
 {
     FontTableElementType(6,  {0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000}),      // Code for char

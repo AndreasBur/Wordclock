@@ -10,6 +10,12 @@
 
 #include "FontCourierNew7x9.h"
 
+/*
+ * The glyphs, one per index: the ASCII codes 32 to 127, then the umlauts and the degree sign,
+ * in the order Text::ConvertCharToFontIndex() maps them to. Each is its width in columns and
+ * its 9 rows from the top, a `byte` each with bit 0 the leftmost pixel.
+ * FontCreator generated all but the degree sign, which was appended by hand; see docs/fonts.md.
+ */
 const FontCourierNew7x9::FontTableType FontCourierNew7x9::kFontTable PROGMEM
 {
     FontTableElementType(4, {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00}),   // Code for char

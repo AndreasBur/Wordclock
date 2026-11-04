@@ -10,9 +10,14 @@
 
 #include "Clock.h"
 
+/*
+ * The hour words: one row per HourModeType, and in it one element per hour of the face, from
+ * 0 for twelve to 11. The full hour is said with UHR, as EIN UHR; any other time without it,
+ * as ZEHN NACH EINS.
+ */
 const Clock::HourType Clock::kHoursTable[][CLOCK_NUMBER_OF_HOURS] PROGMEM
 {
-    {                                                                    // ClockHoursTable[0][] = hh:00 CLOCK_HOUR_MODE_FULL_HOUR
+    {                                                                    // HourModeType::kFullHour: hh:00
         {DisplayWords::WordIdType::kHourZwoelf, DisplayWords::WordIdType::kUhr},        // 00:00
         {DisplayWords::WordIdType::kHourEin,    DisplayWords::WordIdType::kUhr},        // 01:00
         {DisplayWords::WordIdType::kHourZwei,   DisplayWords::WordIdType::kUhr},        // 02:00
@@ -26,7 +31,7 @@ const Clock::HourType Clock::kHoursTable[][CLOCK_NUMBER_OF_HOURS] PROGMEM
         {DisplayWords::WordIdType::kHourZehn,   DisplayWords::WordIdType::kUhr},        // 10:00
         {DisplayWords::WordIdType::kHourElf,    DisplayWords::WordIdType::kUhr}         // 11:00
     },
-    {                                                                    // ClockHoursTable[1][] = hh:mm CLOCK_HOUR_MODE_NO_FULL_HOUR
+    {                                                                    // HourModeType::kNoFullHour: hh:mm
         {DisplayWords::WordIdType::kHourZwoelf, DisplayWords::WordIdType::kNone},       // 00:mm
         {DisplayWords::WordIdType::kHourEins,   DisplayWords::WordIdType::kNone},       // 01:mm
         {DisplayWords::WordIdType::kHourZwei,   DisplayWords::WordIdType::kNone},       // 02:mm
@@ -42,9 +47,15 @@ const Clock::HourType Clock::kHoursTable[][CLOCK_NUMBER_OF_HOURS] PROGMEM
     }
 };
 
+/*
+ * The minute words: one row per ModeType, and in it one element per step of five minutes,
+ * from 0 for the full hour to 11 for 55 minutes past. Each element also says whether the hour
+ * is said as a full hour, and what is added to it: 1 where the words count towards the next
+ * hour, as ZEHN VOR HALB VIER at 3:20 does.
+ */
 const Clock::MinuteType Clock::kMinutesTable[][CLOCK_NUMBER_OF_MINUTE_STEPS] PROGMEM
 {
-    {                                                                                                                              // ClockMinutesTable[0][] = WESSI
+    {                                                                                                                              // ModeType::kWessi
         {HourModeType::kFullHour,    0u, {DisplayWords::WordIdType::kNone,        DisplayWords::WordIdType::kNone, DisplayWords::WordIdType::kNone}},          // 00
         {HourModeType::kNoFullHour, 0u, {DisplayWords::WordIdType::kFuenf,       DisplayWords::WordIdType::kNach, DisplayWords::WordIdType::kNone}},          // 05
         {HourModeType::kNoFullHour, 0u, {DisplayWords::WordIdType::kZehn,        DisplayWords::WordIdType::kNach, DisplayWords::WordIdType::kNone}},          // 10
@@ -58,7 +69,7 @@ const Clock::MinuteType Clock::kMinutesTable[][CLOCK_NUMBER_OF_MINUTE_STEPS] PRO
         {HourModeType::kNoFullHour, 1u, {DisplayWords::WordIdType::kZehn,        DisplayWords::WordIdType::kVor,  DisplayWords::WordIdType::kNone}},          // 50
         {HourModeType::kNoFullHour, 1u, {DisplayWords::WordIdType::kFuenf,       DisplayWords::WordIdType::kVor,  DisplayWords::WordIdType::kNone}},          // 55
     },
-    {                                                                                                                              // ClockMinutesTable[1][] = OSSI
+    {                                                                                                                              // ModeType::kOssi
         {HourModeType::kFullHour,    0u, {DisplayWords::WordIdType::kNone,        DisplayWords::WordIdType::kNone, DisplayWords::WordIdType::kNone}},          // 00
         {HourModeType::kNoFullHour, 0u, {DisplayWords::WordIdType::kFuenf,       DisplayWords::WordIdType::kNach, DisplayWords::WordIdType::kNone}},          // 05
         {HourModeType::kNoFullHour, 0u, {DisplayWords::WordIdType::kZehn,        DisplayWords::WordIdType::kNach, DisplayWords::WordIdType::kNone}},          // 10
@@ -72,7 +83,7 @@ const Clock::MinuteType Clock::kMinutesTable[][CLOCK_NUMBER_OF_MINUTE_STEPS] PRO
         {HourModeType::kNoFullHour, 1u, {DisplayWords::WordIdType::kZehn,        DisplayWords::WordIdType::kVor,  DisplayWords::WordIdType::kNone}},          // 50
         {HourModeType::kNoFullHour, 1u, {DisplayWords::WordIdType::kFuenf,       DisplayWords::WordIdType::kVor,  DisplayWords::WordIdType::kNone}},          // 55
     },
-    {                                                                                                                              // ClockMinutesTable[2][] = RHEIN-RUHR
+    {                                                                                                                              // ModeType::kRheinRuhr
         {HourModeType::kFullHour,    0u, {DisplayWords::WordIdType::kNone,        DisplayWords::WordIdType::kNone, DisplayWords::WordIdType::kNone}},          // 00
         {HourModeType::kNoFullHour, 0u, {DisplayWords::WordIdType::kFuenf,       DisplayWords::WordIdType::kNach, DisplayWords::WordIdType::kNone}},          // 05
         {HourModeType::kNoFullHour, 0u, {DisplayWords::WordIdType::kZehn,        DisplayWords::WordIdType::kNach, DisplayWords::WordIdType::kNone}},          // 10
@@ -86,7 +97,7 @@ const Clock::MinuteType Clock::kMinutesTable[][CLOCK_NUMBER_OF_MINUTE_STEPS] PRO
         {HourModeType::kNoFullHour, 1u, {DisplayWords::WordIdType::kZehn,        DisplayWords::WordIdType::kVor,  DisplayWords::WordIdType::kNone}},          // 50
         {HourModeType::kNoFullHour, 1u, {DisplayWords::WordIdType::kFuenf,       DisplayWords::WordIdType::kVor,  DisplayWords::WordIdType::kNone}},          // 55
     },
-    {                                                                                                                              // ClockMinutesTable[3][] = SCHWABEN
+    {                                                                                                                              // ModeType::kSchwaben
         {HourModeType::kFullHour,    0u, {DisplayWords::WordIdType::kNone,        DisplayWords::WordIdType::kNone, DisplayWords::WordIdType::kNone}},          // 00
         {HourModeType::kNoFullHour, 0u, {DisplayWords::WordIdType::kFuenf,       DisplayWords::WordIdType::kNach, DisplayWords::WordIdType::kNone}},          // 05
         {HourModeType::kNoFullHour, 0u, {DisplayWords::WordIdType::kZehn,        DisplayWords::WordIdType::kNach, DisplayWords::WordIdType::kNone}},          // 10
@@ -104,10 +115,8 @@ const Clock::MinuteType Clock::kMinutesTable[][CLOCK_NUMBER_OF_MINUTE_STEPS] PRO
 
 StdReturnType Clock::GetClockWords(byte hour, byte minute, ClockWords& clock_words) const
 {
-    /* ----- Local Variables ---------------------------------------------- */
     StdReturnType return_value{kENotOk};
 
-    /* ----- Implementation ----------------------------------------------- */
     if(hour < CLOCK_NUMBER_OF_HOURS_PER_DAY && minute < CLOCK_NUMBER_OF_MINUTES_PER_HOUR) {
         return_value = kEOk;
         /*
@@ -131,10 +140,8 @@ StdReturnType Clock::GetClockWords(byte hour, byte minute, ClockWords& clock_wor
 
 StdReturnType Clock::GetClockWords(byte hour, byte minute, ClockWordsListType& clock_words_list) const
 {
-    /* ----- Local Variables ---------------------------------------------- */
     ClockWords clock_words;
 
-    /* ----- Implementation ----------------------------------------------- */
     if(GetClockWords(hour, minute, clock_words) == kEOk) {
         clock_words_list = clock_words.GetWordsList();
         return kEOk;
@@ -145,11 +152,9 @@ StdReturnType Clock::GetClockWords(byte hour, byte minute, ClockWordsListType& c
 
 StdReturnType Clock::SetTime(byte hour, byte minute) const
 {
-    /* ----- Local Variables ---------------------------------------------- */
     StdReturnType return_value{kEOk};
     ClockWords clock_words;
 
-    /* ----- Implementation ----------------------------------------------- */
     if(GetClockWords(hour, minute, clock_words) == kENotOk) return_value = kENotOk;
 
     if(clock_words.GetShowItIs()) {
