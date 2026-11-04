@@ -29,10 +29,24 @@
 #include "Uptime.h"
 #include "Version.h"
 
-/* MsgCmdStatusParser parameter */
-/* Empty: the command takes nothing, see the file header. */
+/*!
+ * \brief The number of options in the parameter table of the status command: none, as the command
+ *        takes nothing; see the file header.
+ */
 #define MSG_CMD_STATUS_PARSER_PARAMETER_TABLE_SIZE                  0u
 
+/*!
+ * \brief The parser of command 12, the status command: answers what the clock can say about itself.
+ *
+ * It takes no option. Its parameter table is empty, so MsgParameterParser answers every option
+ * with `Error=3:<option>`, ErrorType::kParameterUnknown, as `12 -V1` is answered with
+ * `Error=3:V`, and the private `HandleParameter()` is never called. MsgCmdParser makes the parser
+ * and calls Parse(), Process() and SendAnswer() in this order, so an error answered for an option
+ * stands in the line before the fields of the answer.
+ *
+ * The number holds while every overlay is built in; one whose `OVERLAYS_SUPPORT_*` switch is
+ * STD_OFF moves the commands behind it down by one.
+ */
 class MsgCmdStatusParser : public MsgParameterParser<MsgCmdStatusParser, MSG_CMD_STATUS_PARSER_PARAMETER_TABLE_SIZE>
 {
   private:
@@ -50,27 +64,57 @@ class MsgCmdStatusParser : public MsgParameterParser<MsgCmdStatusParser, MSG_CMD
 
     static constexpr ParameterTableType kParameterTable PROGMEM { };
 
-    // functions
     // Never called - the table above has nothing to match an option against - but the base
     // parser instantiates both, so both have to exist.
     static void HandleParameter(char parameter_short_name, const char* argument, PositionType length) { UNUSED(parameter_short_name); UNUSED(argument); UNUSED(length); }
     static void HandleParameter(char parameter_short_name, byte argument) { UNUSED(parameter_short_name); UNUSED(argument); }
 
   public:
+    /*!
+     * \brief Makes the parser for the options in `parameter`.
+     *
+     * \param[in] parameter The parameter string, terminated by a null character; the parser keeps
+     *                      the pointer and reads it in Parse().
+     */
     constexpr MsgCmdStatusParser(const char* parameter) : MsgParameterParser(kParameterTable, parameter) { }
+
+    /*! \brief Destroys the parser. */
     ~MsgCmdStatusParser() { }
 
-    /*
-     * Every field that can be absent is sent empty rather than as a zero that reads like a
-     * value: no chip, no network, no answer. The getters write the terminator either way,
-     * so what is sent after a refusal is the empty string.
+    /*!
+     * \brief Sends a number field of the answer, or the field empty where there is no number.
+     *
+     * \param[in] short_name The short name of the field.
+     * \param[in] return_value What the getter of `value` returned: kEOk sends `value`, kENotOk an
+     *                         empty field.
+     * \param[in] value The number.
+     * \param[in] append_space True to send a space after the field.
      */
     static void SendAnswerNumber(char short_name, StdReturnType return_value, uint16_t value, bool append_space = true) {
         if(return_value == kEOk) { SendAnswerParameter(short_name, value, append_space); }
         else { SendAnswerParameter(short_name, "", append_space); }
     }
 
-    // methods
+    /*!
+     * \brief Sends the answer: the fields that follow the command number.
+     *
+     * It sends `V=<version> U=<days> H=<hours> N=<minutes> I=<lux> T=<temperature> A=<address>
+     * Q=<link quality> M=<free memory>`:
+     * - `V`: the firmware version, WORDCLOCK_VERSION.
+     * - `U`, `H` and `N`: the uptime, as whole days, the hours beyond them and the minutes beyond
+     *   those.
+     * - `I`: the illuminance the light sensor read last, in lux.
+     * - `T`: the temperature of the clock chip, as `23.4C`; empty while there is no reading.
+     * - `A`: the address of the clock in its network; empty while it has none.
+     * - `Q`: the received signal strength, in dBm; empty while there is no network.
+     * - `M`: the free memory, in kibibytes; empty where System cannot tell, as in the simulator.
+     *
+     * Every field that can be absent is sent empty rather than as a zero that reads like a value:
+     * no chip, no network, no answer. The getters write the terminator either way, so what is sent
+     * after a refusal is the empty string.
+     *
+     * A space follows each field but the last; MsgCmdParser ends the line.
+     */
     static void SendAnswer() {
         const System& system = System::GetInstance();
 
@@ -107,6 +151,11 @@ class MsgCmdStatusParser : public MsgParameterParser<MsgCmdStatusParser, MSG_CMD
         SendAnswerNumber(kFreeMemoryShortName, free_memory_return, free_memory, false);
     }
 
+    /*!
+     * \brief Completes the command once Parse() has read its options.
+     *
+     * Nothing is left to do: the command takes no option.
+     */
     static void Process() { }
 };
 

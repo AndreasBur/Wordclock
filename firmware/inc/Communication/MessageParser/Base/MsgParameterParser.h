@@ -20,47 +20,128 @@
 #include "Communication.h"
 #include <array>
 
-/* MsgParameterParser configuration parameter */
+/*! \brief STD_ON reads the arguments of type MsgParameter::ArgumentTypeType::kChar. */
 #define MSG_PARAMETER_PARSER_ARGUMENT_TYPE_CHAR                     STD_OFF
+/*! \brief STD_ON reads the arguments of type MsgParameter::ArgumentTypeType::kUint8. */
 #define MSG_PARAMETER_PARSER_ARGUMENT_TYPE_UINT8                    STD_ON
+/*! \brief STD_ON reads the arguments of type MsgParameter::ArgumentTypeType::kUint16. */
 #define MSG_PARAMETER_PARSER_ARGUMENT_TYPE_UINT16                   STD_ON
+/*! \brief STD_ON reads the arguments of type MsgParameter::ArgumentTypeType::kUint32. */
 #define MSG_PARAMETER_PARSER_ARGUMENT_TYPE_UINT32                   STD_OFF
+/*! \brief STD_ON reads the arguments of type MsgParameter::ArgumentTypeType::kUint64. */
 #define MSG_PARAMETER_PARSER_ARGUMENT_TYPE_UINT64                   STD_OFF
+/*! \brief STD_ON reads the arguments of type MsgParameter::ArgumentTypeType::kInt8. */
 #define MSG_PARAMETER_PARSER_ARGUMENT_TYPE_INT8                     STD_OFF
+/*! \brief STD_ON reads the arguments of type MsgParameter::ArgumentTypeType::kInt16. */
 #define MSG_PARAMETER_PARSER_ARGUMENT_TYPE_INT16                    STD_OFF
+/*! \brief STD_ON reads the arguments of type MsgParameter::ArgumentTypeType::kInt32. */
 #define MSG_PARAMETER_PARSER_ARGUMENT_TYPE_INT32                    STD_OFF
+/*! \brief STD_ON reads the arguments of type MsgParameter::ArgumentTypeType::kInt64. */
 #define MSG_PARAMETER_PARSER_ARGUMENT_TYPE_INT64                    STD_OFF
+/*! \brief STD_ON reads the arguments of type MsgParameter::ArgumentTypeType::kFloat. */
 #define MSG_PARAMETER_PARSER_ARGUMENT_TYPE_FLOAT                    STD_OFF
+/*! \brief STD_ON reads the arguments of type MsgParameter::ArgumentTypeType::kDouble. */
 #define MSG_PARAMETER_PARSER_ARGUMENT_TYPE_DOUBLE                   STD_OFF
+/*! \brief STD_ON reads the arguments of type MsgParameter::ArgumentTypeType::kString. */
 #define MSG_PARAMETER_PARSER_ARGUMENT_TYPE_STRING                   STD_ON
 
-/* MsgParser parameter */
-
+/*!
+ * \brief The base of the command parsers: reads the options of a command by its parameter table and
+ *        hands each value to the derived parser.
+ *
+ * A command arrives as `9 -A3 -M1`, and MsgCmdParser hands the parser of command 9 the rest of the
+ * message from its first space on, ` -A3 -M1`: the parameter string. Parse() reads it option by
+ * option. An option is a `-`, its short name, one character, and its argument right behind the
+ * short name. The entry of the short name in the parameter table says the type of the argument,
+ * and with it how the argument is read:
+ * - A number is read in base 10 by StringTools::StringTo(). It ends at the first character that
+ *   is not part of it; what follows it up to the next `-` is skipped.
+ * - A string runs up to the next `-` or the end of the parameter string, so it cannot hold a `-`.
+ *   It keeps the spaces before and behind it, the one before the next option included.
+ *
+ * Whatever stands outside an option is skipped without an answer. Which argument types are read
+ * at all is decided when the firmware is built, by the MSG_PARAMETER_PARSER_ARGUMENT_TYPE_
+ * switches: as delivered, ArgumentTypeType::kUint8, kUint16 and kString. An option of another
+ * type is skipped without an answer, as one of ArgumentTypeType::kNone is.
+ *
+ * An option that cannot be read is answered right away, in the middle of the answer line, with
+ * the code of the error and the short name of the option, as in `Error=4:A`:
+ * - `Error=3`, ErrorMessage::ErrorType::kParameterUnknown: the table has no entry for the short
+ *   name.
+ * - `Error=5`, ErrorMessage::ErrorType::kNoValueGiven: a number without a digit.
+ * - `Error=4`, ErrorMessage::ErrorType::kValueOutOfBounds: a number above the largest value of
+ *   its type, such as `-A256` for a `uint8_t`.
+ *
+ * Such an option is not handed on, so the setting it was to change is left as it was; the options
+ * behind it are still read.
+ *
+ * Each command parser derives from this class with itself as `Derived`, makes this class its
+ * friend, hands its table and the parameter string to the constructor, and provides two hooks,
+ * which are not virtual. The overlay parsers share one `Derived`, MsgCmdOverlayParser, which
+ * provides the hooks for them.
+ * - `HandleParameter(char, T)` takes the short name and the value of each number that was read
+ *   without error.
+ * - `HandleParameter(char, const char*, LengthType)` takes the short name of each string, a
+ *   pointer to its first character and its length; see Parse().
+ *
+ * The calls of both are compiled for every argument type that is switched on, whether the table
+ * uses it or not, so every parser declares both, an empty one where it has no option of that kind.
+ *
+ * A parser also offers a public constructor that takes the parameter string, `Process()`, which
+ * carries out what the options asked for, and `SendAnswer()`, which sends the fields of the
+ * answer, mostly through SendAnswerParameter(). MsgCmdParser makes the parser and calls Parse(),
+ * `Process()` and `SendAnswer()`, in this order.
+ *
+ * \tparam Derived The command parser that derives from this class.
+ * \tparam ParameterTableSize The number of options in the parameter table.
+ * \warning A number goes to the `HandleParameter()` that overload resolution picks. A parser with
+ *          no overload for `uint16_t` gets a `uint16_t` value through its `byte` overload, cut to
+ *          the low byte and without an error. A parser with an option of ArgumentTypeType::kUint16
+ *          needs an overload of its own for it, as MsgCmdDateParser has.
+ */
 template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
 {
   public:
+    /*! \brief An entry of the parameter table: one option, with the type of its argument. */
     using ParameterTableElementType = MsgParameter;
+    /*! \brief The parameter table: one entry for each option of the command. */
     using ParameterTableType = std::array<ParameterTableElementType, ParameterTableSize>;
+    /*! \brief A position in the parameter string, StringTools::PositionType. */
     using PositionType = StringTools::PositionType;
+    /*! \brief The length handed on with a string argument, StringTools::LengthType. */
     using LengthType = StringTools::LengthType;
 
   protected:
+    /*! \brief The character between the short name and the value of an answer field, `=`. */
     static constexpr char kOptionArgumentDelimiter{'='};
+    /*! \brief Sends the `Error=` fields, of the options as Parse() reads them and of the parser. */
     ErrorMessage error_;
 
-    /*
-     * Protected rather than private with the derived class as a friend, which is what
-     * clang-tidy asks for: a friend would open this base's whole private side to it, where
-     * protected opens only what is meant for it. What the private constructor would
-     * prevent - somebody inheriting this template with another class's Derived - the
-     * assertion catches instead, at the first point where Derived is a complete type.
+    /*!
+     * \brief Makes a parser that reads `parameter` by `parameter_table`.
+     *
+     * The parser keeps a pointer to the parameter string and a reference to the table, not
+     * copies; both have to outlive it. On the AVR it reads each entry of the table out of flash
+     * with memcpy_P(), so the table has to be declared PROGMEM there.
+     *
+     * \param[in] parameter_table The parameter table of the command.
+     * \param[in] parameter The parameter string, terminated by a null character.
      */
     // NOLINTNEXTLINE(bugprone-crtp-constructor-accessibility)
     constexpr MsgParameterParser(const ParameterTableType& parameter_table, const char* parameter)
     : error_(), parameter_buffer_(parameter), parameter_table_(parameter_table) {
+        /*
+         * Protected rather than private with the derived class as a friend, which is what
+         * clang-tidy asks for: a friend would open this base's whole private side to it, where
+         * protected opens only what is meant for it. What the private constructor would
+         * prevent - somebody inheriting this template with another class's Derived - the
+         * assertion catches instead, at the first point where Derived is a complete type.
+         */
         static_assert(std::is_base_of<MsgParameterParser, Derived>::value,
                       "MsgParameterParser is a CRTP base: Derived has to be the class that inherits it");
     }
+
+    /*! \brief Destroys the parser. */
     ~MsgParameterParser() { }
 
   private:
@@ -77,7 +158,6 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
     const char* parameter_buffer_{nullptr};
     const ParameterTableType& parameter_table_;
 
-    // functions
     Derived& Underlying() { return static_cast<Derived&>(*this); }
     Derived const& Underlying() const { return static_cast<Derived const&>(*this); }
 
@@ -172,13 +252,34 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
 
   public:
 
-    // get methods
+    /*! \brief Returns the parameter string the parser reads. */
     const char* GetParameter() const { return parameter_buffer_; }
+    /*! \brief Returns the parameter table the parser reads the options by. */
     const ParameterTableType& GetParameterTable() const { return parameter_table_; }
 
-    // set methods
-
-    // methods
+    /*!
+     * \brief Reads the options of the parameter string, answers those it cannot read, and hands the
+     *        others to the derived parser.
+     *
+     * It reads the string from its start to its null character, as described at
+     * MsgParameterParser. A number that was read is handed to `HandleParameter(char, T)`, with the
+     * type of its table entry as `T`. A string is handed to
+     * `HandleParameter(char, const char*, LengthType)` with a pointer to its first character in
+     * the parameter string, where it is not terminated, and its number of characters plus one:
+     * the size of a buffer that holds it with a null character, as StringTools::StringCopy() takes
+     * it. An empty string, as `-T` has in `-T-A1`, is handed on with the length 1.
+     *
+     * After a number without a digit or an empty string, the reading goes on at the first
+     * character of the argument: `-A -M1` answers `Error=5:A` and still reads `-M1`. A string is
+     * handed on even with a leading or trailing space; it is for the derived parser to trim it.
+     *
+     * \warning An option at the very end of the parameter string, with nothing behind its short
+     *          name, is not read at all: it is neither handed on nor answered. `9 -A` answers no
+     *          `Error=5:A`, as `9 -A ` with a trailing space does, and `13 -S -P` hands on `-S`
+     *          alone, so MsgCmdNetworkParser refuses it as half a pair.
+     * \note After an unknown short name the first character behind it is skipped as well, even a
+     *       `-`: `9 -X-A3` answers `Error=3:X` and does not read `-A3`.
+     */
     void Parse()
     {
         StateType state = StateType::kParse;
@@ -194,6 +295,8 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
             } else if(state == StateType::kOptionArgument) {
                 ParameterTableElementType parameter;
                 if(GetMsgParameterByOptionShortName(option_short_name, parameter) == kEOk) {
+                    // One less than the characters read, as the loop counts one up: an argument of
+                    // none wraps the unsigned position back by one, onto the argument's start.
                     position += ParseArgument(parameter, &parameter_buffer_[position]) - 1u;
                 } else { error_.Send(option_short_name, ErrorMessage::ErrorType::kParameterUnknown); }
                 state = StateType::kParse;
@@ -201,6 +304,18 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
         }
     }
 
+    /*!
+     * \brief Sends one field of the answer, such as `A=3`, with a space behind it.
+     *
+     * It writes the short name, `=` and `value` to `Serial`, and prints `value` as Serial.print()
+     * prints its type.
+     *
+     * \tparam T The type of the value.
+     * \param[in] option_short_name The short name of the option the field answers.
+     * \param[in] value The value.
+     * \param[in] append_space False to leave out the space, for the last field before the line
+     *                         ends.
+     */
     template <typename T> static void SendAnswerParameter(char option_short_name, T value, bool append_space = true)
     {
         Serial.print(option_short_name);

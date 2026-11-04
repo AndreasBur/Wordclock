@@ -15,11 +15,29 @@
 #include "Display.h"
 #include "MsgParameterParser.h"
 
-/* MsgCmdDisplayBrightnessParser configuration parameter */
-
-/* MsgCmdDisplayBrightnessParser parameter */
+/*! \brief The number of options in the parameter table of the display brightness command. */
 #define MSG_CMD_DISPLAY_BRIGHTNESS_PARSER_PARAMETER_TABLE_SIZE           3u
 
+/*!
+ * \brief The parser of command 3, the display brightness command: sets the brightness, and whether
+ *        it follows the light sensor and is gamma corrected.
+ *
+ * Its options:
+ * - `-B<brightness>`, uint8: sets the brightness asked for, 0 to 255. What reaches the LEDs is
+ *   worked out from it, with the gamma correction, the light sensor and the night switch, and the
+ *   current limit can hold it lower.
+ * - `-A<0|1>`, uint8: with any value but 0, the brightness follows the light sensor; with 0, it
+ *   does not.
+ * - `-G<0|1>`, uint8: with any value but 0, the brightness is gamma corrected; with 0, it is not.
+ *
+ * Each option takes effect at once. An option the command does not carry is left alone, so `3`
+ * alone is a query.
+ *
+ * MsgParameterParser reads the options by the parameter table and hands each value to the private
+ * `HandleParameter()`, which applies it at once. MsgCmdParser makes the parser and calls Parse(),
+ * Process() and SendAnswer() in this order, so an error answered for an option stands in the line
+ * before the fields of the answer.
+ */
 class MsgCmdDisplayBrightnessParser : public MsgParameterParser<MsgCmdDisplayBrightnessParser, MSG_CMD_DISPLAY_BRIGHTNESS_PARSER_PARAMETER_TABLE_SIZE>
 {
   public:
@@ -36,7 +54,6 @@ class MsgCmdDisplayBrightnessParser : public MsgParameterParser<MsgCmdDisplayBri
         MsgParameter(kUseGammaCorrectionOptionShortName, MsgParameter::ArgumentTypeType::kUint8)
     };
 
-    // functions
     static void HandleParameter(char parameter_short_name, const char* argument, PositionType length) { UNUSED(parameter_short_name); UNUSED(argument); UNUSED(length); }
     static void HandleParameter(char parameter_short_name, byte argument)
     {
@@ -62,14 +79,24 @@ class MsgCmdDisplayBrightnessParser : public MsgParameterParser<MsgCmdDisplayBri
     }
 
   public:
+    /*!
+     * \brief Makes the parser for the options in `parameter`.
+     *
+     * \param[in] parameter The parameter string, terminated by a null character; the parser keeps
+     *                      the pointer and reads it in Parse().
+     */
     constexpr MsgCmdDisplayBrightnessParser(const char* parameter) : MsgParameterParser(kParameterTable, parameter) { }
+
+    /*! \brief Destroys the parser. */
     ~MsgCmdDisplayBrightnessParser() { }
 
-    // get methods
-
-    // set methods
-
-    // methods
+    /*!
+     * \brief Sends the answer: the fields that follow the command number.
+     *
+     * It sends `B=<brightness> A=<0|1> G=<0|1>`: the brightness asked for, not the one on the
+     * LEDs, whether it follows the light sensor, and whether it is gamma corrected. A space follows
+     * each field but the last; MsgCmdParser ends the line.
+     */
     static void SendAnswer()
     {
         SendAnswerBrightness(true);
@@ -78,6 +105,12 @@ class MsgCmdDisplayBrightnessParser : public MsgParameterParser<MsgCmdDisplayBri
 
     }
 
+    /*!
+     * \brief Completes the command once Parse() has read its options.
+     *
+     * It marks the display's buffer to be sent, through Display::Show(). A refusal would be
+     * answered as an error of ErrorMessage::ApiType::kDisplayShow, but no backend refuses.
+     */
     void Process() { Show(); }
 
 };

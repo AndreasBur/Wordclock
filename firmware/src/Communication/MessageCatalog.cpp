@@ -34,11 +34,14 @@
 #include "RealTimeClock.h"
 #include <limits>
 
+// Everything up to the member functions is local to this file, so Doxygen leaves it out.
+/*! \cond */
+
 // For the options the firmware bounds only by the width of the argument: the overlay
 // periods and endurances reject nothing but zero, and the speeds nothing at all.
 #define BYTE_MAX                                        255u
 
-/* Counted rather than written out, so a value list and its length cannot drift apart. */
+// Counted rather than written out, so a value list and its length cannot drift apart.
 #define NUMBER_OF(Array)                                static_cast<byte>(sizeof(Array) / sizeof((Array)[0]))
 
 // The bounds of an option, measured off the firmware's own predicate instead of copied
@@ -82,7 +85,7 @@ constexpr uint16_t FindMaximum(PredicateType is_valid)
     return 0u;
 }
 
-/* For every option that carries a flag rather than a number. */
+// The names of every option that carries a flag rather than a number.
 constexpr const char* const kBooleanValueNames[] {
     "off", "on"
 };
@@ -146,7 +149,7 @@ static_assert(NUMBER_OF(kRemoteProcedureValueNames) ==
               MsgCmdRemoteProcedureCallParser::kNumberOfProcedures - 1u,
               "the remote procedure names have fallen behind MsgCmdRemoteProcedureCallParser::RpcIdType");
 
-/* Clock::ModeType */
+// The names of Clock::ModeType.
 constexpr const char* const kClockModeValueNames[] {
     "Wessi", "Ossi", "Rhein-Ruhr", "Schwaben"
 };
@@ -202,12 +205,12 @@ constexpr const char* const kAnimationValueNames[] {
 #endif
 };
 
-/* Animations::ModeType */
+// The names of Animations::ModeType.
 constexpr const char* const kAnimationModeValueNames[] {
     "Fixed", "Random", "Sequence"
 };
 
-/* Text::FontType, under the same switches as the enum. */
+// The names of Text::FontType, under the same switches as the enum.
 constexpr const char* const kFontValueNames[] {
 #if(TEXT_SUPPORT_FONT_5X8 == STD_ON)
     "5x8",
@@ -230,19 +233,19 @@ constexpr const char* const kFontValueNames[] {
 // and there are as many values as names.
 #define NAMED(Minimum, Names)                           (Minimum), static_cast<uint16_t>((Minimum) + NUMBER_OF(Names) - 1u), Names, NUMBER_OF(Names)
 
-/* MsgCmdRemoteProcedureCallParser. Starts at one, RpcIdType::kNone being left out. */
+// The options of MsgCmdRemoteProcedureCallParser. Starts at one, RpcIdType::kNone being left out.
 constexpr MessageCatalog::OptionType kRemoteProcedureCallOptions[] {
     {'P', "Procedure",          ArgumentType::kUint8,  NAMED(1u, kRemoteProcedureValueNames)}
 };
 
-/* MsgCmdDisplayColorParser */
+// The options of MsgCmdDisplayColorParser.
 constexpr MessageCatalog::OptionType kDisplayColorOptions[] {
     {'R', "Red",                ArgumentType::kUint8,  0u, BYTE_MAX},
     {'G', "Green",              ArgumentType::kUint8,  0u, BYTE_MAX},
     {'B', "Blue",               ArgumentType::kUint8,  0u, BYTE_MAX}
 };
 
-/* MsgCmdDisplayBrightnessParser */
+// The options of MsgCmdDisplayBrightnessParser.
 constexpr MessageCatalog::OptionType kDisplayBrightnessOptions[] {
     {'B', "Brightness",         ArgumentType::kUint8,  0u, BYTE_MAX},
     {'A', "Automatic",          ArgumentType::kUint8,  NAMED(0u, kBooleanValueNames)},
@@ -282,7 +285,7 @@ constexpr byte kNumberOfOverlayOptionsWithoutText{static_cast<byte>(NUMBER_OF(kO
 /*
  * Stopping one short only leaves out the text as long as the text is what sits last.
  * Appending an option would otherwise hide that one and offer the text instead, to two
- * overlays that do not read it — quietly, since both lists would still be the right
+ * overlays that do not read it - quietly, since both lists would still be the right
  * length.
  */
 static_assert(kOverlayOptions[kNumberOfOverlayOptionsWithoutText].short_name == 'T',
@@ -354,13 +357,13 @@ constexpr MessageCatalog::OptionType kNetworkOptions[] {
     {'P', "Pass phrase",        ArgumentType::kString, 0u, 0u}
 };
 
-/* MsgCmdClockModeParser */
+// The options of MsgCmdClockModeParser.
 constexpr MessageCatalog::OptionType kClockModeOptions[] {
     {'M', "Mode",               ArgumentType::kUint8,  NAMED(0u, kClockModeValueNames)},
     {'I', "It is permanently",  ArgumentType::kUint8,  NAMED(0u, kBooleanValueNames)}
 };
 
-/* MsgCmdAnimationParser */
+// The options of MsgCmdAnimationParser.
 constexpr MessageCatalog::OptionType kAnimationOptions[] {
     {'A', "Animation",          ArgumentType::kUint8,  NAMED(0u, kAnimationValueNames)},
     {'M', "Mode",               ArgumentType::kUint8,  NAMED(0u, kAnimationModeValueNames)},
@@ -368,14 +371,14 @@ constexpr MessageCatalog::OptionType kAnimationOptions[] {
     {'F', "Favourite",          ArgumentType::kUint8,  0u, BYTE_MAX}
 };
 
-/* MsgCmdTimeParser */
+// The options of MsgCmdTimeParser.
 constexpr MessageCatalog::OptionType kTimeOptions[] {
     {'H', "Hour",               ArgumentType::kUint8,  MEASURED(ClockTime::HourType, ClockTime::IsHourValid)},
     {'M', "Minute",             ArgumentType::kUint8,  MEASURED(ClockTime::MinuteType, ClockTime::IsMinuteValid)},
     {'S', "Second",             ArgumentType::kUint8,  MEASURED(ClockTime::SecondType, ClockTime::IsSecondValid)}
 };
 
-/* MsgCmdDateParser */
+// The options of MsgCmdDateParser.
 constexpr MessageCatalog::OptionType kDateOptions[] {
     {'Y', "Year",               ArgumentType::kUint16, MEASURED(ClockDate::YearType, ClockDate::IsYearValid)},
     {'M', "Month",              ArgumentType::kUint8,  MEASURED(ClockDate::MonthType, ClockDate::IsMonthValid)},
@@ -384,7 +387,7 @@ constexpr MessageCatalog::OptionType kDateOptions[] {
 
 /*
  * The numbers come from the enumeration itself, so they follow it instead of having to be
- * kept level with it — including when a support switch shortens it, which is why the
+ * kept level with it - including when a support switch shortens it, which is why the
  * overlay entries carry the same guards the enumerators do. CommandType::kNone is left out, it
  * is not a command that can be sent. Sending a command with no option at all asks the
  * firmware for its current settings, which is why every entry is useful on its own.
@@ -457,6 +460,9 @@ constexpr bool AreNamedRangesConsistent()
 static_assert(AreNamedRangesConsistent(),
               "an option with named values has a range that does not match the number of names");
 
+/*! \endcond */
+// The tables live in the source, where they can be constexpr and checked against the
+// firmware at compile time. Hence out of line rather than inline in the header.
 byte MessageCatalog::GetNumberOfCommands()
 {
     return kNumberOfCommands;
@@ -467,12 +473,6 @@ const MessageCatalog::CommandType& MessageCatalog::GetCommand(byte index)
     return kCommands[index];
 }
 
-/*! \brief          looks a command up by the number it is sent with
- *  \details        Not the same as the index into the table: the numbers happen to run
- *                  from one without a gap today, but nothing keeps them that way.
- *
- *  \return         the command, or nullptr if no command carries that number
- */
 const MessageCatalog::CommandType* MessageCatalog::FindCommandByNumber(byte number)
 {
     for(byte index = 0u; index < kNumberOfCommands; index++) {
@@ -482,19 +482,11 @@ const MessageCatalog::CommandType* MessageCatalog::FindCommandByNumber(byte numb
     return nullptr;
 }
 
-/*! \brief          the remote procedure call, for a caller that has no number to look up
- *
- *  \return         the command, or nullptr if it is not in the table
- */
 const MessageCatalog::CommandType* MessageCatalog::FindRemoteProcedureCallCommand()
 {
     return FindCommandByNumber(ToUnderlying(MsgCmdParser::CommandType::kRemoteProcedureCall));
 }
 
-/*! \brief          looks an option of a command up by its short name
- *
- *  \return         the option, or nullptr if the command has no such option
- */
 const MessageCatalog::OptionType* MessageCatalog::FindOption(const CommandType& command, char short_name)
 {
     for(byte index = 0u; index < command.number_of_options; index++) {

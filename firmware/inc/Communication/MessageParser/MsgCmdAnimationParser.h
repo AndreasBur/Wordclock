@@ -15,15 +15,44 @@
 #include "Animations.h"
 #include "Scheduler.h"
 
-/* MsgCmdAnimationParser configuration parameter */
-
-/* MsgCmdAnimationParser parameter */
+/*! \brief The number of options in the parameter table of the animation command. */
 #define MSG_CMD_ANIMATION_PARSER_PARAMETER_TABLE_SIZE           4u
 
+/*!
+ * \brief The parser of command 9, the animation command: selects the animation of a word change and
+ *        the mode that picks it, and sets the speed and the favourite flag of an animation.
+ *
+ * Its options:
+ * - `-A<id>`, uint8: selects the animation, Animations::AnimationIdType, and makes it the current
+ *   one at once; mode 0 runs it on each word change. An id from Animations::kNumberOfAnimations on
+ *   is answered with `Error=4:A`.
+ * - `-M<mode>`, uint8: sets the mode, Animations::ModeType. One from Animations::kNumberOfModes on
+ *   is answered with `Error=4:M`.
+ * - `-F<0|1>`, uint8: with any value but 0, makes the animation a favourite, one that the modes 1
+ *   and 2 may pick; with 0, leaves it out. The flag of id 0, and taking the last favourite out,
+ *   are answered with `Error=4:F`.
+ * - `-S<speed>`, uint8: sets the speed of the animation, from 1 the slowest to 255 the fastest;
+ *   at 0 it stops where it is.
+ *
+ * `-F` and `-S` address the animation of `-A`, or the selected one where the command has no `-A`.
+ * Where `-A` is refused, they address the refused id and are refused as well. An option that is
+ * refused leaves its setting as it was. An option the command does not carry is left alone, so
+ * `9` alone is a query.
+ *
+ * MsgParameterParser reads the options by the parameter table and hands each value to the private
+ * `HandleParameter()`, which keeps it for Process(). MsgCmdParser makes the parser and calls
+ * Parse(), Process() and SendAnswer() in this order, so an error answered for an option stands in
+ * the line before the fields of the answer.
+ *
+ * The number holds while every overlay is built in; one whose `OVERLAYS_SUPPORT_*` switch is
+ * STD_OFF moves the commands behind it down by one.
+ */
 class MsgCmdAnimationParser : public MsgParameterParser<MsgCmdAnimationParser, MSG_CMD_ANIMATION_PARSER_PARAMETER_TABLE_SIZE>
 {
   public:
+    /*! \brief An animation id, as `-A` takes it: Animations::AnimationIdType. */
     using AnimationIdType = Animations::AnimationIdType;
+    /*! \brief A mode, as `-M` takes it: Animations::ModeType. */
     using ModeType = Animations::ModeType;
 
   private:
@@ -57,7 +86,6 @@ class MsgCmdAnimationParser : public MsgParameterParser<MsgCmdAnimationParser, M
         ParameterTableElementType(kFavouriteOptionShortName, MsgParameter::ArgumentTypeType::kUint8)
     };
 
-    // functions
     static void HandleParameter(char parameter_short_name, const char* argument, PositionType length) { UNUSED(parameter_short_name); UNUSED(argument); UNUSED(length); }
     void HandleParameter(char parameter_short_name, byte argument)
     {
@@ -125,6 +153,15 @@ class MsgCmdAnimationParser : public MsgParameterParser<MsgCmdAnimationParser, M
     }
 
   public:
+    /*!
+     * \brief Makes the parser for the options in `parameter`.
+     *
+     * It takes the selected animation as it is now, which `-F` and `-S` address where the command
+     * has no `-A`.
+     *
+     * \param[in] parameter The parameter string, terminated by a null character; the parser keeps
+     *                      the pointer and reads it in Parse().
+     */
     MsgCmdAnimationParser(const char* parameter) : MsgParameterParser(kParameterTable, parameter), animation_id_(), mode_(), speed_(0u), favourite_(true),
         animation_given_(false), mode_given_(false), speed_given_(false), favourite_given_(false)
     {
@@ -136,13 +173,16 @@ class MsgCmdAnimationParser : public MsgParameterParser<MsgCmdAnimationParser, M
         favourite_ = Animations::GetInstance().IsFavourite(animation_id_);
     }
 
+    /*! \brief Destroys the parser. */
     ~MsgCmdAnimationParser() { }
 
-    // get methods
-
-    // set methods
-
-    // methods
+    /*!
+     * \brief Sends the answer: the fields that follow the command number.
+     *
+     * It sends `A=<id> M=<mode> F=<0|1> S=<speed>`: the selected animation, the mode, and whether
+     * the selected animation is a favourite and at which speed it runs. A space follows each field
+     * but the last; MsgCmdParser ends the line.
+     */
     static void SendAnswer()
     {
         SendAnswerAnimation(true);
@@ -151,6 +191,13 @@ class MsgCmdAnimationParser : public MsgParameterParser<MsgCmdAnimationParser, M
         SendAnswerSpeed(false);
     }
 
+    /*!
+     * \brief Completes the command once Parse() has read its options.
+     *
+     * It applies the options the command carried: `-A` first, as `-F` and `-S` address the
+     * animation it selects, then `-M`, `-F` and `-S`. Each one that Animations refuses is answered
+     * with `Error=4:<option>`.
+     */
     void Process() const
     {
         /* the animation first, since -F and -S address the one it selects */

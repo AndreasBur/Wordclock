@@ -160,14 +160,6 @@ static_assert((sizeof(kAssets) / sizeof(kAssets[0])) <= WebFrontend::kMaxAssets,
 
 } // namespace
 
-/*! \brief          The files a clock serves unchanged, for a backend to register routes from
- *
- *  \details        A table rather than a handler per file, because that is what the ten
- *                  handlers this replaces actually were: each one set a content type, set a
- *                  Content-Encoding header or did not, and pushed a blob. The difference
- *                  between them was data, and the sameness between the two backends was
- *                  complete.
- */
 byte WebFrontend::GetNumberOfAssets()
 {
     return static_cast<byte>(sizeof(kAssets) / sizeof(kAssets[0]));
@@ -178,18 +170,6 @@ const WebFrontend::AssetType& WebFrontend::GetAsset(byte index)
     return kAssets[index];
 }
 
-/*! \brief          Writes the command catalog, so the page can build its own form
- *
- *  \details        Generated from MessageCatalog rather than written out a second time.
- *                  That table is what the simulator's message builder derives its whole
- *                  dialog from, down to the input hints; serving it makes the browser a
- *                  second renderer of the same description, so a command added to the
- *                  catalog shows up in both front ends and on the wire at once.
- *
- *                  Written here rather than once per backend, which is what it was: the two
- *                  copies were identical down to their comments, and both feed the same
- *                  page's parser.
- */
 void WebFrontend::WriteCommands(WebResponseBody& body)
 {
     ChunkWriter writer(body);
@@ -244,17 +224,6 @@ void WebFrontend::WriteCommands(WebResponseBody& body)
     writer.Finish();
 }
 
-/*! \brief          Writes the panel's shape and its letters
- *
- *  \details        The page draws a grid of letters and has to know which, and there is
- *                  exactly one table of them - DisplayCharacters. Serving it keeps the
- *                  browser from carrying a second copy, which is the duplication the
- *                  simulator used to have and no longer does.
- *
- *                  The table stores one byte per letter, so the umlauts are Latin-1 and are
- *                  widened to UTF-8 on the way out: JSON is UTF-8, and a raw 0xDC makes the
- *                  whole document invalid rather than one letter wrong.
- */
 void WebFrontend::WriteDisplay(WebResponseBody& body)
 {
     const DisplayCharacters letters;
@@ -277,19 +246,6 @@ void WebFrontend::WriteDisplay(WebResponseBody& body)
     writer.Finish();
 }
 
-/*! \brief          Takes one socket frame's text and injects it as typed characters
- *
- *  \details        The command is injected followed by the end-of-message character, unless
- *                  the browser already sent one. That keeps the page free of protocol
- *                  bookkeeping: it sends the command text, the terminator is this side's
- *                  business.
- *
- *                  A frame too long to be a command is refused whole rather than truncated,
- *                  so half a command can never reach the parser. A backend whose server
- *                  hands over a bounded buffer has already made that impossible; one whose
- *                  library hands over whatever arrived has not, and this is where both end
- *                  up equal.
- */
 void WebFrontend::InjectCommand(const char* text, size_t length)
 {
     if((text == nullptr) || (length == 0u) || (length > WEB_FRONTEND_MAX_FRAME_LENGTH)) { return; }
@@ -303,12 +259,6 @@ void WebFrontend::InjectCommand(const char* text, size_t length)
     }
 }
 
-/*! \brief          Sends one finished line to whoever is connected
- *
- *  \details        Runs in the firmware's task. A send that fails is not retried and the
- *                  client is not dropped here - a backend's own close hook owns that, and
- *                  dropping a client from this side would race with it.
- */
 void WebFrontend::BroadcastLine(const char* line)
 {
     WebTransport& transport = WebTransport::GetInstance();
@@ -337,20 +287,6 @@ void WebFrontend::BroadcastLine(const char* line)
     transport.SendText(payload, used);
 }
 
-/*! \brief          Sends the pixel buffer to whoever is connected, when it changed
- *
- *  \details        Rate limited first and compared second, so a display that changes on
- *                  every tick still costs one frame per interval, and one that stands still
- *                  costs a comparison.
- *
- *                  Sent in the strip's own byte order, green first: it is what the buffer
- *                  already holds, and the page is told the shape by the display description
- *                  rather than guessing it. Taken from the output pixel, so what goes out is
- *                  dimmed the way the strip is - which is what lets the page blank itself
- *                  when the display is switched off, without a redraw to tell it so. The
- *                  page reads the bytes for that on/off state only and paints its own
- *                  colour; the wx window is the colour-accurate view.
- */
 void WebFrontend::BroadcastFrame()
 {
     WebTransport& transport = WebTransport::GetInstance();
