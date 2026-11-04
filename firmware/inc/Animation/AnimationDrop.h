@@ -69,11 +69,9 @@ class AnimationDrop : public Animation
      *
      * \param[in] hour The hour, 0 to 23.
      * \param[in] minute The minute, 0 to 59.
-     * \return kENotOk in every case; see the warning.
-     * \warning It never returns kEOk, so a caller cannot tell a start from a refusal. It starts the
-     *          animation if `hour` is 0 to 23, `minute` 0 to 59 and the animation is idle.
-     *          Otherwise a time out of range leaves the animation as it was, and a running one runs
-     *          on, but ends on the words of `hour`:`minute`.
+     * \return kEOk, or kENotOk if `hour` is above 23 or `minute` above 59, and the animation is
+     *         then left as it was, or if it is not idle; a running one then runs on, but ends on
+     *         the words of `hour`:`minute`.
      */
     StdReturnType SetTime(byte hour, byte minute);
 

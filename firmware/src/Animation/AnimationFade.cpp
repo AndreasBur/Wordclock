@@ -21,13 +21,17 @@ StdReturnType AnimationFade::SetTime(byte hour, byte minute)
     StdReturnType return_value{kENotOk};
 
     if(hour < CLOCK_NUMBER_OF_HOURS_PER_DAY && minute < CLOCK_NUMBER_OF_MINUTES_PER_HOUR) {
+        // A running fade takes the newer time and ends on it, rather than starting over, as
+        // every other animation does.
         hour_ = hour;
         minute_ = minute;
-        state_ = StateType::kClearTime;
-        // From the display as it is configured, whatever that currently is - the fade
-        // scales it rather than replacing it.
-        level_ = kLevelFull;
-        return_value = kEOk;
+        if(state_ == StateType::kIdle) {
+            state_ = StateType::kClearTime;
+            // From the display as it is configured, whatever that currently is - the fade
+            // scales it rather than replacing it.
+            level_ = kLevelFull;
+            return_value = kEOk;
+        }
     }
     return return_value;
 }
@@ -73,7 +77,9 @@ void AnimationFade::SetTimeTask()
          * finished.
          */
         Display::GetInstance().ClearBrightnessFade();
-        state_ = StateType::kIdle;
+        // Drawn again rather than left as the swap drew it, for a newer time that came in
+        // while the fade rose. At full brightness and before the next Show(), nobody sees it.
+        FinishWithTime(hour_, minute_);
     }
 }
 

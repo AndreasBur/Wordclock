@@ -337,8 +337,8 @@ void Apply(const SettingsType& settings)
         animations.SetTaskCycle(animation_id, settings.animation_task_cycles[index]);
     }
 
-    // The animation before the mode: setting the mode to ModeType::kFixed starts the selected
-    // animation, so it has to find the restored one rather than the default.
+    // The animation before the mode: setting the mode to ModeType::kFixed makes the selected
+    // animation the current one, so it has to find the restored one rather than the default.
     animations.SetAnimation(static_cast<Animations::AnimationIdType>(settings.animation_id));
     animations.SetMode(static_cast<Animations::ModeType>(settings.animations_mode));
 

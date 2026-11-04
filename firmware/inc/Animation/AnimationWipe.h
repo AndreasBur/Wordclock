@@ -27,12 +27,6 @@
  * SetTime() starts it from whatever the display shows, and each Task() takes one step of it. The
  * last step clears the display, lights the words of the new time whole and makes the animation
  * idle.
- *
- * \warning Only Init() puts the line back to the top left corner; the end of the animation leaves
- *          it at the bottom right one. Started again without an Init() in between, as Animations
- *          does at every word change in Animations::ModeType::kFixed, the first half ends in its
- *          first step, and the previous time stays lit, but for its bottom right pixel, until the
- *          last step instead of being pushed off.
  */
 class AnimationWipe : public Animation
 {

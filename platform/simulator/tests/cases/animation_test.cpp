@@ -148,3 +148,189 @@ void TestSnakeLifetime()
     snake.Init();
     Expect(snake.GetState() == Animation::StateType::kIdle, "a fresh snake animation must be idle");
 }
+
+// Runs the current animation to its end, and says how many steps it took.
+static int RunAnimationToItsEnd()
+{
+    Animations& animations = Animations::GetInstance();
+    int ticks = 0;
+
+    while((animations.GetState() == Animations::StateType::kPending) && (ticks < 5000)) {
+        animations.Task(true);
+        ticks++;
+    }
+    return ticks;
+}
+
+/*
+ * A second run in mode kFixed, with no SetAnimation() between the two, against the same
+ * transition run fresh. The facade used to initialise only when a selecting mode picked, so in
+ * kFixed an animation kept the counters of its last run: Shift, Wipe, Squeeze and Explode words
+ * took half their steps from the second word change on, which is every word change but the
+ * first on a clock that has one animation selected. The test above selects before every run.
+ */
+void TestFixedModeRunsEveryTimeAsTheFirst()
+{
+    Animations& animations = Animations::GetInstance();
+    animations.SetMode(Animations::ModeType::kFixed);
+    const PixelBufferType target = DrawClockFace(10u, 4u);
+
+    for(byte id = 1u; id < Animations::kNumberOfAnimations; id++) {
+        const Animations::AnimationIdType animation_id = static_cast<Animations::AnimationIdType>(id);
+
+        DrawClockFace(10u, 4u);
+        animations.SetAnimation(animation_id);
+        animations.SetTime(10u, 35u);
+        RunAnimationToItsEnd();
+        animations.SetTime(10u, 4u);
+        const int second = RunAnimationToItsEnd();
+        const bool second_ends_on_the_time = ArePixelsEqual(ReadPixels(), target);
+
+        DrawClockFace(10u, 35u);
+        animations.SetAnimation(animation_id);
+        animations.SetTime(10u, 4u);
+        const int fresh = RunAnimationToItsEnd();
+
+        Expect(second == fresh && second_ends_on_the_time,
+               "a second run in mode kFixed must take the steps of a fresh one and end on the time");
+    }
+    animations.SetAnimation(Animations::AnimationIdType::kNone);
+}
+
+// Every animation reports a start from idle as one: Drop and Shift reported kENotOk, which RPC
+// 23 hands on as a failure for an animation that runs.
+void TestEveryAnimationReportsItsStart()
+{
+    Animations& animations = Animations::GetInstance();
+    animations.SetMode(Animations::ModeType::kFixed);
+
+    for(byte id = 1u; id < Animations::kNumberOfAnimations; id++) {
+        DrawClockFace(10u, 4u);
+        animations.SetAnimation(static_cast<Animations::AnimationIdType>(id));
+        Expect(animations.SetTime(10u, 35u) == kEOk, "an animation that starts must say so");
+        RunAnimationToItsEnd();
+    }
+    animations.SetAnimation(Animations::AnimationIdType::kNone);
+}
+
+/*
+ * A display switched off - by hand, or by the night switch - stays off through the flicker.
+ * Its Init() and every other step switched the display on, and Init() runs whenever it is
+ * selected or picked; at night the night switch then gave the supply back as well.
+ */
+void TestFlickerLeavesADarkDisplayDark()
+{
+    Display& display = Display::GetInstance();
+    Animations& animations = Animations::GetInstance();
+
+    DrawClockFace(10u, 4u);
+    display.Disable();
+    animations.SetMode(Animations::ModeType::kFixed);
+    animations.SetAnimation(Animations::AnimationIdType::kFlicker);
+    Expect(!display.IsEnabled(), "selecting the flicker must leave a dark display dark");
+
+    animations.SetTime(10u, 35u);
+    bool ever_enabled = false;
+    while(animations.GetState() == Animations::StateType::kPending) {
+        animations.Task(true);
+        ever_enabled = ever_enabled || display.IsEnabled();
+    }
+    Expect(!ever_enabled && !display.IsEnabled(), "the flicker must not switch a dark display on");
+
+    display.Enable();
+    animations.SetAnimation(Animations::AnimationIdType::kNone);
+}
+
+/*
+ * Modes 1 and 2 animate with animation 0 selected, which is how a clock comes: -A and -M are
+ * independent. DisplayManager asked for the selection alone and drew the time without one.
+ */
+void TestSelectingModesAnimateWithNothingSelected()
+{
+    Animations& animations = Animations::GetInstance();
+
+    animations.SetAnimation(Animations::AnimationIdType::kNone);
+    animations.SetMode(Animations::ModeType::kRandom);
+    SetTime(7u, 50u, 0u);
+    DisplayManager::GetInstance().Task();
+    Expect(animations.GetState() == Animations::StateType::kPending,
+           "a word change in mode 1 must start an animation with animation 0 selected");
+
+    RunAnimationToItsEnd();
+    animations.SetMode(Animations::ModeType::kFixed);
+}
+
+/*
+ * Leaving a fade half way through puts the display's brightness back. The facade overwrote the
+ * running fade with the new animation, and only the fade's own Init() clears the fade level.
+ */
+void TestLeavingAFadeUndimsTheDisplay()
+{
+    Animations& animations = Animations::GetInstance();
+    Pixels& pixels = Pixels::GetInstance();
+
+    DrawClockFace(10u, 4u);
+    byte lit = 0u;
+    while((lit < PIXELS_NUMBER_OF_PIXELS) && (pixels.GetPixel(lit).GetRed() == 0u)) { lit++; }
+    const Pixel::ColorType before = pixels.GetPixel(lit).GetRed();
+
+    animations.SetMode(Animations::ModeType::kFixed);
+    animations.SetAnimation(Animations::AnimationIdType::kFade);
+    animations.SetTime(10u, 35u);
+    for(byte tick = 0u; tick < 32u; tick++) { animations.Task(true); }
+    const Pixel::ColorType faded = pixels.GetPixel(lit).GetRed();
+
+    animations.SetAnimation(Animations::AnimationIdType::kNone);
+    Expect(faded < before && pixels.GetPixel(lit).GetRed() == before,
+           "leaving a running fade must put the brightness back");
+}
+
+/*
+ * A word change during a fade or a flicker runs it on and ends it on the newer time, as every
+ * other animation does. The two started over, a fade halfway down coming back up from full.
+ */
+void TestAWordChangeRunsAFadeOrFlickerOn()
+{
+    Animations& animations = Animations::GetInstance();
+    animations.SetMode(Animations::ModeType::kFixed);
+    const Animations::AnimationIdType ids[]{Animations::AnimationIdType::kFade, Animations::AnimationIdType::kFlicker};
+
+    for(const Animations::AnimationIdType id : ids) {
+        const PixelBufferType target = DrawClockFace(10u, 40u);
+
+        DrawClockFace(10u, 4u);
+        animations.SetAnimation(id);
+        animations.SetTime(10u, 35u);
+        const int fresh = RunAnimationToItsEnd();
+
+        DrawClockFace(10u, 4u);
+        animations.SetAnimation(id);
+        animations.SetTime(10u, 35u);
+        for(byte tick = 0u; tick < 3u; tick++) { animations.Task(true); }
+        const bool refused = animations.SetTime(10u, 40u) == kENotOk;
+        const int interrupted = 3 + RunAnimationToItsEnd();
+
+        Expect(refused && interrupted == fresh && ArePixelsEqual(ReadPixels(), target),
+               "a word change must run a fade or flicker on and end it on the newer time");
+    }
+    animations.SetAnimation(Animations::AnimationIdType::kNone);
+}
+
+// Explode words on a dark display lights its first word on its first step. It used to start
+// on a word of no length, and nothing was lit until that had travelled for nothing.
+void TestExplodeWordsLightsItsFirstWordOnADarkDisplay()
+{
+    Animations& animations = Animations::GetInstance();
+    const PixelBufferType target = DrawClockFace(10u, 35u);
+
+    Display::GetInstance().Clear();
+    animations.SetMode(Animations::ModeType::kFixed);
+    animations.SetAnimation(Animations::AnimationIdType::kExplodeWords);
+    animations.SetTime(10u, 35u);
+    animations.Task(true);
+    Expect(IsAnyPixelLit(ReadPixels()), "explode words must light its first word at once on a dark display");
+
+    RunAnimationToItsEnd();
+    Expect(ArePixelsEqual(ReadPixels(), target), "and end on the time");
+    animations.SetAnimation(Animations::AnimationIdType::kNone);
+}

@@ -23,7 +23,7 @@ StdReturnType AnimationExplodeWords::SetTime(byte hour, byte minute)
     if(Clock::GetInstance().GetClockWords(hour, minute, clock_words_table_) == kEOk && state_ == StateType::kIdle) {
         return_value = kEOk;
         if(SetNextWordToClear() == kEOk) { state_ = StateType::kClearTime; }
-        else { state_ = StateType::kSetTime; }
+        else { StartSetTime(); }
     }
     return return_value;
 }
@@ -48,13 +48,27 @@ void AnimationExplodeWords::ClearTimeTask()
 {
     if(ShiftWord(GetClearFinalColumn(), GetClearFinalRow()) == kENotOk) {
         ToggleWordOnDisplay();
-        if(SetNextWordToClear() == kENotOk) {
-            current_word_index_ = 0u;
-            SetWordToSet(clock_words_table_[current_word_index_]);
-            SetWordOnDisplay();
-            state_ = StateType::kSetTime;
-        }
+        if(SetNextWordToClear() == kENotOk) { StartSetTime(); }
     }
+}
+
+/*
+ * The second half begins with the first word of the list that is one: with "es ist" left
+ * out, the first place is empty. A display that was dark when the run started goes straight
+ * here, and used to start on a word of no length that travelled for nothing.
+ */
+void AnimationExplodeWords::StartSetTime()
+{
+    state_ = StateType::kSetTime;
+    clock_words_table_index_ = 0u;
+
+    if(clock_words_table_[clock_words_table_index_] != DisplayWords::WordIdType::kNone) {
+        SetWordToSet(clock_words_table_[clock_words_table_index_]);
+    } else if(SetNextWordToSet() == kENotOk) {
+        FinishWithClockWords(clock_words_table_);
+        return;
+    }
+    SetWordOnDisplay();
 }
 
 void AnimationExplodeWords::SetTimeTask()

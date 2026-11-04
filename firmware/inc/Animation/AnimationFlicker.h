@@ -30,10 +30,8 @@
  * last step clears the display, lights the words of the new time whole and makes the animation
  * idle; it also enables the display.
  *
- * \warning It enables the display in Init(), at every other step of the flicker and at its end,
- *          whether the display was enabled before or not. A display that was switched off, by hand
- *          or by NightSwitch, lights up again when the flicker is selected or runs at a word
- *          change.
+ * A display that is switched off when the run starts, by hand or by NightSwitch, is not
+ * flickered and stays off: the run only counts its steps and then lights the words.
  */
 class AnimationFlicker : public Animation
 {
@@ -43,6 +41,8 @@ class AnimationFlicker : public Animation
     byte minute_{0u};
     byte hour_{0u};
     bool is_clock_set_{false};
+    // Whether the display was on when the run started; a display that was off is not flickered.
+    bool display_was_enabled_{true};
     byte flicker_counter_{ANIMATION_FLICKER_COUNTER_INIT_VALUE};
 
     void Reset();
@@ -60,20 +60,21 @@ class AnimationFlicker : public Animation
      * \brief Makes the animation idle and resets its progress.
      *
      * A running animation ends where it stands, and the display keeps what its last step drew.
-     * It also enables the display, so that a flicker cut short does not leave it switched off.
+     * A display the flicker switched off is switched on again, so that a flicker cut short does
+     * not leave it dark; one switched off by hand or for the night stays off.
      */
     void Init();
 
     /*!
      * \brief Starts the animation towards the time `hour`:`minute`.
      *
-     * It draws nothing itself. It does not refuse while it runs: a running flicker goes on with
-     * the switches it has left, and ends on the new time.
+     * It draws nothing itself. A display that is switched off now stays off through the run.
      *
      * \param[in] hour The hour, 0 to 23.
      * \param[in] minute The minute, 0 to 59.
-     * \return kEOk, or kENotOk if `hour` is above 23 or `minute` above 59; the animation is then
-     *         left as it was.
+     * \return kEOk, or kENotOk if `hour` is above 23 or `minute` above 59, and the animation is
+     *         then left as it was, or if it is not idle; a running one then runs on, but ends on
+     *         the words of `hour`:`minute`.
      */
     StdReturnType SetTime(byte hour, byte minute);
 

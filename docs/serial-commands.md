@@ -175,10 +175,11 @@ to it.
 | 1 | Random — draws one of the animations 1–15 on each word change |
 | 2 | Sequence — runs the animations 1–15 in order, one on each word change |
 
-A mode only selects while no animation is running, so a word change during a
-running animation is ignored, exactly as the animations themselves ignore it.
-Selecting an animation with `-A` shows it right away even in mode 1 or 2, which then
-take over again on the next word change.
+A mode only selects while no animation is running: a word change during a running
+animation does not start another one, and the running animation ends on the newer
+time. Selecting an animation with `-A` ends a running one and makes the selected one
+current; in mode 0 it runs on the next word change, while modes 1 and 2 pick again
+there, mode 2 going on after the selected one.
 
 `-F<0|1>` decides whether the animation selected with `-A` takes part in modes 1 and
 2. All animations do by default. The flag belongs to the animation, so it is set for

@@ -51,6 +51,13 @@ int main()
     TestClockWordsComparison();
     TestWeekdayOfEveryDate();
     TestAnimationStepsThroughEveryOne();
+    TestFixedModeRunsEveryTimeAsTheFirst();
+    TestEveryAnimationReportsItsStart();
+    TestFlickerLeavesADarkDisplayDark();
+    TestSelectingModesAnimateWithNothingSelected();
+    TestLeavingAFadeUndimsTheDisplay();
+    TestAWordChangeRunsAFadeOrFlickerOn();
+    TestExplodeWordsLightsItsFirstWordOnADarkDisplay();
     TestDisplayOffAndOnAgain();
     TestDisplayToggleFollowsTheState();
     TestBrightnessTogglesInvertTheSetting();
