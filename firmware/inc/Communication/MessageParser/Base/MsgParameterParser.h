@@ -184,6 +184,21 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
         return kENotOk;
     }
 
+    /*
+     * Reads the argument of `option_short_name` at `position` and hands it on, and says how many
+     * characters it read. None for an unknown short name, so that the character behind it is read
+     * again as anything else is: it used to be skipped, even when it began the next option.
+     */
+    PositionType ParseOption(char option_short_name, PositionType position) {
+        ParameterTableElementType parameter;
+
+        if(GetMsgParameterByOptionShortName(option_short_name, parameter) == kEOk) {
+            return ParseArgument(parameter, &parameter_buffer_[position]);
+        }
+        error_.Send(option_short_name, ErrorMessage::ErrorType::kParameterUnknown);
+        return 0u;
+    }
+
     PositionType ParseArgument(MsgParameter parameter, const char* argument) {
 # if (MSG_PARAMETER_PARSER_ARGUMENT_TYPE_CHAR == STD_ON)
         if(parameter.GetArgumentType() == MsgParameter::ArgumentTypeType::kChar) { return ConvertArgument<char>(parameter, argument); }
@@ -273,34 +288,40 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
      * character of the argument: `-A -M1` answers `Error=5:A` and still reads `-M1`. A string is
      * handed on even with a leading or trailing space; it is for the derived parser to trim it.
      *
-     * \warning An option at the very end of the parameter string, with nothing behind its short
-     *          name, is not read at all: it is neither handed on nor answered. `9 -A` answers no
-     *          `Error=5:A`, as `9 -A ` with a trailing space does, and `13 -S -P` hands on `-S`
-     *          alone, so MsgCmdNetworkParser refuses it as half a pair.
-     * \note After an unknown short name the first character behind it is skipped as well, even a
-     *       `-`: `9 -X-A3` answers `Error=3:X` and does not read `-A3`.
+     * An option at the very end of the parameter string has an empty argument and is read as
+     * any other: `9 -A` answers `Error=5:A`, and `13 -S -P` hands on two empty strings. An
+     * unknown short name is answered with `Error=3`, and the reading goes on at the character
+     * behind it: `9 -X-A3` answers `Error=3:X` and reads `-A3`.
      */
     void Parse()
     {
         StateType state = StateType::kParse;
-        char option_short_name;
+        char option_short_name{STD_NULL_CHARACTER};
+        PositionType position = 0u;
 
-        for(PositionType position = 0u; parameter_buffer_[position] != STD_NULL_CHARACTER; position++) {
-            if(state == StateType::kParse) {
-                char current_char = parameter_buffer_[position];
-                if(current_char == kOptionStartChar) { state = StateType::kOptionChar; }
-            } else if(state == StateType::kOptionChar) {
-                option_short_name = parameter_buffer_[position];
-                state = StateType::kOptionArgument;
-            } else if(state == StateType::kOptionArgument) {
-                ParameterTableElementType parameter;
-                if(GetMsgParameterByOptionShortName(option_short_name, parameter) == kEOk) {
-                    // One less than the characters read, as the loop counts one up: an argument of
-                    // none wraps the unsigned position back by one, onto the argument's start.
-                    position += ParseArgument(parameter, &parameter_buffer_[position]) - 1u;
-                } else { error_.Send(option_short_name, ErrorMessage::ErrorType::kParameterUnknown); }
+        while(true) {
+            const char current_char = parameter_buffer_[position];
+
+            /*
+             * The argument starts here, at the end of the string as well, where it is empty. The
+             * loop used to stop at the null character before it got here, and an option that
+             * ended the line was dropped: 13 -S -P forgot no network and 16 -P cleared no
+             * password.
+             */
+            if(state == StateType::kOptionArgument) {
+                position += ParseOption(option_short_name, position);
                 state = StateType::kParse;
+                continue;
             }
+            if(current_char == STD_NULL_CHARACTER) { break; }
+
+            if(state == StateType::kParse) {
+                if(current_char == kOptionStartChar) { state = StateType::kOptionChar; }
+            } else {
+                option_short_name = current_char;
+                state = StateType::kOptionArgument;
+            }
+            position++;
         }
     }
 

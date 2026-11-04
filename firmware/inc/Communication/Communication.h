@@ -39,7 +39,7 @@ class Communication
     };
 
   private:
-    Communication() : error_(), incoming_message_(), state_(StateType::kMessageIncomplete) { }
+    Communication() : error_(), incoming_message_(), state_(StateType::kMessageIncomplete), is_message_too_long_(false) { }
     ~Communication() { }
 
     static constexpr byte kTaskCycle{COMMUNICATION_TASK_CYCLE};
@@ -47,6 +47,8 @@ class Communication
     ErrorMessage error_;
     Message incoming_message_;
     StateType state_;
+    // A character of the line was dropped, so the line is not parsed when it ends.
+    bool is_message_too_long_;
 
     void AddMessagePart();
 
@@ -74,15 +76,12 @@ class Communication
      * stay in the port for the call after the parse. Once the line is complete, the next call
      * has MsgCmdParser parse and answer it, empties the buffer, and reads nothing.
      *
-     * A character that arrives while the line already holds MESSAGE_LENGTH - 1 characters is
-     * dropped and answered with `Error=1`, ErrorMessage::ErrorType::kMessageTooLong, on a line of
-     * its own: one such line for every character dropped.
+     * A line longer than MESSAGE_LENGTH - 1 characters is refused whole: at its end-of-message
+     * character it is answered with `Error=1`, ErrorMessage::ErrorType::kMessageTooLong, on a line
+     * of its own, and not parsed.
      *
      * An empty line is parsed as well, and answered with `Error=2`,
      * ErrorMessage::ErrorType::kWrongCommand.
-     *
-     * \warning A line that is too long is not refused: at its end-of-message character, its first
-     *          MESSAGE_LENGTH - 1 characters are parsed as a command.
      */
     void Task();
 

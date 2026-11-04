@@ -19,6 +19,7 @@
 #include "Pixels.h"
 #include "System.h"
 #include "WebInterface.h"
+#include "WordclockSerial.h"
 #include "check.h"
 
 #include <algorithm>
@@ -462,6 +463,24 @@ int main()
     request_authorised = false;
     Check(!Fetch("/display").empty(), "and answers everybody again");
     request_authorised = true;
+
+    /*
+     * The same way back over the command line, command 16 - and the password it takes ends
+     * where the next option begins. It used to run to the end of the line.
+     */
+    {
+        auto run = [](const char* line) {
+            WordclockSerial::GetInstance().Inject(line, strlen(line));
+            for(int tick = 0; tick < 8; tick++) { Communication::GetInstance().Task(); }
+        };
+        char password[SYSTEM_PASSWORD_STRING_LENGTH]{};
+
+        run("16 -Psecret -A1\n");
+        Check(System::GetInstance().GetConsolePassword(password, sizeof(password)) == kEOk &&
+              strcmp(password, "secret") == 0, "a password is taken up to the next option");
+        run("16\n");
+        Check(!System::GetInstance().IsConsoleProtected(), "and command 16 alone clears it");
+    }
 
     return Report();
 }

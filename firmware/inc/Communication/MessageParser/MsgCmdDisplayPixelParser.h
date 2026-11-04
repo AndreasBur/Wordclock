@@ -47,9 +47,8 @@
  * Parse(), Process() and SendAnswer() in this order, so an error answered for an option stands in
  * the line before the fields of the answer.
  *
- * \warning An `-I` that MsgParameterParser refuses, such as `-I300`, leaves the index at 0, and an
- *          `-S` of the same command writes pixel 0: `4 -I300 -S1` lights pixel 0 and answers
- *          `4 Error=4:I I=0 S=1`.
+ * `-S` sets a pixel only together with an `-I` that was taken: `4 -I300 -S1` answers `Error=4:I`
+ * and sets nothing, and `4 -S1` alone sets nothing either.
  */
 class MsgCmdDisplayPixelParser : public MsgParameterParser<MsgCmdDisplayPixelParser, MSG_CMD_DISPLAY_PIXEL_PARSER_PARAMETER_TABLE_SIZE>
 {
@@ -67,6 +66,8 @@ class MsgCmdDisplayPixelParser : public MsgParameterParser<MsgCmdDisplayPixelPar
   private:
     friend class MsgParameterParser;
     byte index_{0u};
+    // Whether an -I was taken; -S sets a pixel only then.
+    bool index_given_{false};
     StateType state_{StateType::kNone};
 
     static constexpr char kIndexOptionShortName{'I'};
@@ -87,6 +88,7 @@ class MsgCmdDisplayPixelParser : public MsgParameterParser<MsgCmdDisplayPixelPar
     void HandleParameterIndex(byte argument)
     {
         index_ = argument;
+        index_given_ = true;
         if(state_ == StateType::kNone) { state_ = GetPixelState(index_); }
     }
 
@@ -118,7 +120,13 @@ class MsgCmdDisplayPixelParser : public MsgParameterParser<MsgCmdDisplayPixelPar
         SendAnswerParameter(kStateOptionShortName, Display::GetInstance().GetPixel(index_), append_space);
     }
 
-    void SetPixel() const { if(state_ != StateType::kNone) { Display::GetInstance().WritePixel(index_, GetPixelValue(state_)); }}
+    /*
+     * Only for an index that was given and taken. Without one, a refused -I left the index at 0,
+     * and 4 -I300 -S1 lit pixel 0.
+     */
+    void SetPixel() const {
+        if(index_given_ && (state_ != StateType::kNone)) { Display::GetInstance().WritePixel(index_, GetPixelValue(state_)); }
+    }
 
     void Show() const
     {
