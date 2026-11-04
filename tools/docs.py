@@ -29,13 +29,9 @@ BACKENDS = ('simulator', 'avr-dx', 'esp32', 'rp2350')
 # Where a member may still be undocumented, until its module is written in the new style.
 PENDING = (
     'firmware/inc/Animation/', 'firmware/src/Animation/',
-    'firmware/inc/Clock/', 'firmware/src/Clock/',
     'firmware/inc/Communication/', 'firmware/src/Communication/',
     'firmware/inc/Display/', 'firmware/src/Display/',
-    'firmware/inc/Font/', 'firmware/src/Font/',
     'firmware/inc/Overlay/', 'firmware/src/Overlay/',
-    'firmware/inc/RealTimeClock/',
-    'firmware/inc/Text/', 'firmware/src/Text/',
     'platform/simulator/',
     'platform/avr-dx/',
     'platform/esp32/',

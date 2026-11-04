@@ -30,11 +30,9 @@ bool ClockWords::operator!=(const ClockWords& clock_words) const
 
 ClockWords::WordsListType ClockWords::GetWordsList() const
 {
-    /* ----- Local Variables ---------------------------------------------- */
     WordsListType clock_words;
     byte clock_words_index{0};
 
-    /* ----- Implementation ----------------------------------------------- */  
     if(show_it_is_) {
         clock_words[clock_words_index++] = DisplayWords::WordIdType::kEs;
         clock_words[clock_words_index++] = DisplayWords::WordIdType::kIst;

@@ -276,14 +276,8 @@ StdReturnType Text::SetCharColumn(ColumnType char_column, byte column_abs, byte 
     return return_value;
 }
 
-/*! \brief          converts char to sprite
- *  \details        this function converts the ASCII char to sprite index
- *
- *  \param[in]      character            char to convert to sprite
- *  \param[out]     index           appropriate sprite
- *  \return         kEOk
- *                  kENotOk
- */
+// Converts `character` to the index of its glyph in the font tables. kENotOk for a character
+// without a glyph, with `index` left as it was.
 StdReturnType Text::ConvertCharToFontIndex(char character, byte& index)
 {
     StdReturnType return_value = kENotOk;
@@ -314,12 +308,8 @@ StdReturnType Text::ConvertCharToFontIndex(char character, byte& index)
     return return_value;
 }
 
-/*! \brief          converts char to sprite
- *  \details        this function converts the ASCII char to sprite index
- *
- *  \param[in]      character       char to convert to sprite
- *  \return         the sprite index, or the space's if the char has no sprite
- */
+// Converts `character` to the index of its glyph in the font tables, or to the space's if it
+// has no glyph.
 byte Text::ConvertCharToFontIndex(char character)
 {
     byte index;

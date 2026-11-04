@@ -10,6 +10,12 @@
 
 #include "FontSprite5x8.h"
 
+/*
+ * The glyphs, one per index: the ASCII codes 32 to 127, then the umlauts and the degree sign,
+ * in the order Text::ConvertCharToFontIndex() maps them to. Each is its width in columns and
+ * its 5 columns from the left, a `byte` each with bit 0 the top pixel.
+ * FontCreator generated all but the degree sign, which was appended by hand; see docs/fonts.md.
+ */
 const FontSprite5x8::FontTableType FontSprite5x8::kFontTable PROGMEM
 {
     FontTableElementType(3, {0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000}), // space
