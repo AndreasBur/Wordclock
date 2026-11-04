@@ -21,20 +21,35 @@
 #include "Arduino.h"
 #include "DS3231.h"
 
+/*!
+ * \brief The temperature: the last reading of the DS3231, as a number and as text.
+ *
+ * There is no reading until the chip has answered once, so every function that gives one says
+ * whether there is.
+ */
 class Temperature
 {
   public:
-    /* Tenths of a degree Celsius, signed. */
+    /*! \brief A temperature in tenths of a degree Celsius, signed. */
     using TemperatureType = DS3231::TemperatureType;
 
+    /*! \brief The tenths in a degree, the unit of a TemperatureType. */
     static constexpr TemperatureType kTenthsPerDegree{DS3231::kTenthsPerDegree};
 
-    // "-12.3C" and its terminator, which is the longest a reading the chip can produce
-    // makes: it measures from -40 to +85 degrees.
+    /*!
+     * \brief The length of the buffer GetTemperatureString() writes to.
+     *
+     * "-12.3C" and its terminator, which is the longest a reading the chip can produce makes: it
+     * measures from -40 to +85 degrees.
+     */
     static constexpr byte kStringLength{6u + 1u};
 
-    // The shown form carries the degree sign as well, which is one byte more - it is
-    // Latin-1 here, the same single-byte encoding the font tables are indexed by.
+    /*!
+     * \brief The length of the buffer GetTemperatureStringToShow() writes to.
+     *
+     * The shown form carries the degree sign as well, which is one byte more - it is Latin-1
+     * here, the same single-byte encoding the font tables are indexed by.
+     */
     static constexpr byte kStringToShowLength{kStringLength + 1u};
 
   private:
@@ -98,47 +113,64 @@ class Temperature
     }
 
   public:
+    /*! \brief Returns the one temperature. */
     static Temperature& GetInstance() {
         static Temperature singleton_instance;
         return singleton_instance;
     }
 
-    // get methods
+    /*! \brief Returns the scheduler ticks between two calls of Task(). */
     byte GetTaskCycle() const { return sensor_.GetTaskCycle(); }
 
-    // kENotOk while there is no reading, which is the answer a build without the chip
-    // keeps giving.
+    /*!
+     * \brief Gives the temperature last read.
+     *
+     * \param[out] temperature The temperature, in tenths of a degree Celsius.
+     * \return kEOk, or kENotOk while there is no reading, which is the answer a build without the
+     *         chip keeps giving; `temperature` is then left as it was.
+     */
     StdReturnType GetTemperature(TemperatureType& temperature) const { return sensor_.GetTemperature(temperature); }
 
+    /*! \brief Returns whether there is a reading. */
     bool IsTemperatureAvailable() const {
         TemperatureType unused{0};
         return GetTemperature(unused) == kEOk;
     }
 
-    /*
-     * The reading as it is reported, "23.4C", into a buffer of kStringLength. Written by
-     * whoever needs it rather than kept here, because the overlay needs it to stand still
-     * while its text scrolls, and the status command needs it once.
+    /*!
+     * \brief Writes the reading as it is reported, "23.4C".
      *
-     * An empty string when there is no reading - the degree it would otherwise print is
-     * the one thing a reader must not mistake for a measurement.
+     * Written into the caller's buffer rather than kept here, because the overlay needs it to
+     * stand still while its text scrolls, and the status command needs it once.
      *
-     * No degree sign in this one, and that is the point of the split: this string travels
-     * the serial line and the web socket, and a web socket text frame has to be valid
-     * UTF-8. A raw Latin-1 0xB0 in it makes the browser close the connection with a
-     * protocol error rather than draw one character oddly.
+     * No degree sign in this one, and that is the point of the split: this string travels the
+     * serial line and the web socket, and a web socket text frame has to be valid UTF-8. A raw
+     * Latin-1 0xB0 in it makes the browser close the connection with a protocol error rather
+     * than draw one character oddly.
+     *
+     * \param[out] string A buffer of kStringLength.
+     * \return kEOk, or kENotOk if there is no reading; `string` is then an empty string - the
+     *         degree it would otherwise print is the one thing a reader must not mistake for a
+     *         measurement.
      */
     StdReturnType GetTemperatureString(char* string) const {
         return AppendReading(string, false);
     }
 
-    // The same reading as it is shown, "23.4°C", into a buffer of kStringToShowLength. The
-    // display indexes the font tables by Latin-1 byte, so the sign can be one here.
+    /*!
+     * \brief Writes the same reading as it is shown, "23.4°C".
+     *
+     * The display indexes the font tables by Latin-1 byte, so the degree sign can be one here:
+     * the byte 0xB0.
+     *
+     * \param[out] string A buffer of kStringToShowLength.
+     * \return kEOk, or kENotOk if there is no reading; `string` is then an empty string.
+     */
     StdReturnType GetTemperatureStringToShow(char* string) const {
         return AppendReading(string, true);
     }
 
-    // methods
+    /*! \brief Lets the DS3231 driver of the platform read the temperature. */
     void Task() { sensor_.Task(); }
 };
 

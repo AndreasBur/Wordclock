@@ -56,7 +56,8 @@ the line it is for.
 - One space between a command, its direction and its name, `\param[in] column`; nothing is aligned
   in columns.
 - A line that continues a command starts where the text after the command starts, as the
-  `\return` above does.
+  `\return` above does. `tools/doc-indent.py --fix` indents it so; without `--fix`, it fails where
+  a line is not indented so.
 
 ### The parts, in this order
 
@@ -139,14 +140,18 @@ animation."
   clangd shows these in the editor as you type. A backslash meant as a char is written `\\`, or
   clang takes it for a command.
 
-Both run in `static-analysis.yml` on every pull request.
+- **`tools/doc-indent.py`** checks that the lines continuing a command are indented under its
+  text.
+
+All three run in `static-analysis.yml` on every pull request.
 
 ### Until every module is written
 
 The modules are written in this style one at a time, each in its own pull request. Until then a
 module keeps the blocks it had, at the definitions in the `.cpp`, and its members may lack one:
 `PENDING` in `tools/docs.py` lists those modules, and a module comes off the list in the pull
-request that documents it. Every other warning fails already.
+request that documents it. Every other warning fails already. `tools/doc-indent.py` leaves those
+modules out, as their old lists of values in a `\return` would run together.
 
 ## Writing a block
 

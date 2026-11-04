@@ -370,19 +370,6 @@ void Apply(const SettingsType& settings)
 
 } // namespace
 
-/*! \brief          Restores the stored configuration, if there is a usable one
- *  \details        A blob that cannot be used is thrown away rather than left in place:
- *                  it would otherwise be read and rejected on every start, and the store
- *                  has nothing to offer that a fresh write does not. Nothing stored at all
- *                  takes the same path, where clearing is a no-op.
- *
- *                  What is remembered as "last written" afterwards is what the modules
- *                  actually hold, not what the blob said. A value one of them rejected
- *                  therefore shows up as a difference on the next task and gets corrected
- *                  in the store, instead of being read and rejected forever.
- *
- *  \return         kEOk if a stored configuration was applied
- */
 StdReturnType Persistence::Load()
 {
     SettingsType settings{};
@@ -401,10 +388,6 @@ StdReturnType Persistence::Load()
     return return_value;
 }
 
-/*! \brief          Writes the configuration if it changed since the last write
- *  \details        A failed write leaves last_saved alone, so the next task tries again
- *                  rather than treating the change as stored.
- */
 void Persistence::Task()
 {
     const SettingsType current = Gather();
@@ -429,13 +412,6 @@ void Persistence::Task()
     }
 }
 
-/*! \brief          Writes the configuration now
- *  \details        Unconditionally, unlike Task(): a caller that asks for this is about to
- *                  cut the power, and "nothing changed since the last write" is a state it
- *                  cannot check for itself.
- *
- *  \return         kEOk if the store took the configuration
- */
 StdReturnType Persistence::Save()
 {
     const SettingsType current = Gather();
@@ -446,18 +422,6 @@ StdReturnType Persistence::Save()
     return kEOk;
 }
 
-/*! \brief          Puts the configuration back to what a clock starts with
- *  \details        Each module answers for its own defaults, the same way Gather() reads
- *                  from each of them rather than from a copy kept here - so a setting
- *                  added to one of them is reset by the module that owns it and not
- *                  forgotten in a list over here.
- *
- *                  What is remembered as "last written" afterwards is what the modules now
- *                  hold, so the next task does not write the defaults straight back into
- *                  the store that was just emptied.
- *
- *  \return         kEOk if the store was emptied
- */
 StdReturnType Persistence::Reset()
 {
     Display::GetInstance().ResetToDefaults();
