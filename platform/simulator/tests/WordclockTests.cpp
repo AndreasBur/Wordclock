@@ -49,6 +49,7 @@ int main()
     TestClockModes();
     TestClockModeStepsThroughEveryWording();
     TestClockWordsComparison();
+    TestWeekdayOfEveryDate();
     TestAnimationStepsThroughEveryOne();
     TestDisplayOffAndOnAgain();
     TestDisplayToggleFollowsTheState();

@@ -54,6 +54,9 @@ void TestClockModes();
 void TestClockModeStepsThroughEveryWording();
 void TestClockWordsComparison();
 
+/* date_test.cpp */
+void TestWeekdayOfEveryDate();
+
 /* scheduler_test.cpp */
 void TestSchedulerSpeedRoundTrip();
 void TestUptimeCountsWithoutWrapping();

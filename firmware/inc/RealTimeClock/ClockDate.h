@@ -70,8 +70,19 @@ class ClockDate
     static constexpr DayType kDayMinValue{1u};
     static constexpr DayType kDayMaxValue{31u};
 
-    static constexpr DayType GetWeekday(YearType year, MonthType month, DayType day) {
-        return (day+=month < 3 ? year-- : year-2, 23*month/9+day+4+year/4-year/100+year/400)%7;
+    /*
+     * Keith and Craver's formula, as it is usually written:
+     * (d += m < 3 ? y-- : y - 2, 23*m/9 + d + 4 + y/4 - y/100 + y/400) % 7.
+     * Here the day and the year are added in a uint16_t. Added to the day itself, a byte, the
+     * sum wrapped, and from 31 January 2017 on most dates came out on the wrong weekday.
+     */
+    static constexpr byte GetWeekday(YearType year, MonthType month, DayType day) {
+        const bool is_before_march{month < 3u};
+        const uint16_t day_and_year{static_cast<uint16_t>(day + (is_before_march ? year : year - 2u))};
+        const YearType counted_year{is_before_march ? static_cast<YearType>(year - 1u) : year};
+
+        return static_cast<byte>((23u * month / 9u + day_and_year + 4u + counted_year / 4u
+                                  - counted_year / 100u + counted_year / 400u) % 7u);
     }
 
   public:
@@ -114,8 +125,6 @@ class ClockDate
      * \brief Returns the weekday of the date.
      *
      * \return The weekday.
-     * \warning The computation adds the year to the day in a byte, and the sum wraps: from 31
-     *          January 2017 on, the weekday comes out wrong for most dates.
      */
     WeekdayType GetWeekday() const {
         return static_cast<WeekdayType>(GetWeekday(year_, month_, day_));
