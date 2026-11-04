@@ -42,6 +42,9 @@ int main()
     TestGlyphAccessorsCheckBothWays();
     TestRegionalWordings();
     TestOverlayPeriodAndEndurance();
+    TestOverlaySwitchedOffWhileItShows();
+    TestStartingOverlayEndsTheAnimation();
+    TestValidInDaysCountsFromTheDate();
     TestSchedulerSpeedRoundTrip();
     TestUptimeCountsWithoutWrapping();
     TestWordsChangeOnFiveMinuteStepsOnly();

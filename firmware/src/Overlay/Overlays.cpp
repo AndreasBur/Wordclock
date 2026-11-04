@@ -9,15 +9,10 @@
 #define _OVERLAYS_SOURCE_
 
 #include "Overlays.h"
+#include "Animations.h"
 
-/*! \brief          the state of the overlays as a whole
- *  \details        Showing beats idle beats disabled, so that the one overlay holding the
- *                  display decides, and an armed one is not hidden behind the others that
- *                  are switched off. Disabled is what is left over when none of them has
- *                  anything to do, which is why it needs no test of its own.
- *
- *  \return         the state
- */
+// Disabled is what is left over when none of the overlays has anything to do, which is
+// why it needs no test of its own.
 Overlays::StateType Overlays::GetState() const {
     if(IsShow()) { return OverlayType::StateType::kShow; }
     if(IsIdle()) { return OverlayType::StateType::kIdle; }
@@ -31,23 +26,17 @@ void Overlays::Task() {
     if(last_second_ != time.GetSecond()) {
         last_second_ = time.GetSecond();
         if(IsShow()) { TaskShow(date, time); }
-        else { TaskIdle(date, time); }
+        else {
+            // The timer counts a show and nothing else; with none showing it is 0, however the
+            // last one ended. An overlay switched off while it showed left it standing, and no
+            // overlay started by its period again.
+            show_timer_in_seconds_ = 0u;
+            TaskIdle(date, time);
+            if(IsShow()) { AbortAnimation(); }
+        }
     }
 }
 
-/*! \brief          ends the overlay that is showing
- *  \details        Through the same transition the expired show timer takes, so the
- *                  overlay stops its text and goes back to idle rather than being cut
- *                  off mid-word. What brings the clock back afterwards is DisplayManager,
- *                  which redraws once it sees that no overlay is showing any more.
- *
- *                  The timer is cleared here rather than left to run out: it is what
- *                  TaskIdle() reads to decide whether an overlay may start, so a
- *                  leftover value would block the next one for as long as the aborted
- *                  overlay had left.
- *
- *  \return         kEOk if an overlay was showing
- */
 StdReturnType Overlays::Abort() {
     if(!IsShow()) { return kENotOk; }
 
@@ -64,10 +53,18 @@ StdReturnType Overlays::Abort() {
     if(text_.GetState() == OverlayText::StateType::kShow) { text_.StopShow(date, time); }
 #endif
 
+    /*
+     * The timer is cleared here rather than left to run out: it is what TaskIdle() reads
+     * to decide whether an overlay may start, and only TaskShow() counts it down, so a
+     * leftover value would keep every overlay from starting in its period until a "show
+     * now" call replaced it.
+     */
     show_timer_in_seconds_ = 0u;
     return kEOk;
 }
 
+// In the order date, temperature, text: the first overlay that starts sets the timer, and
+// a timer that is not 0 keeps the ones behind it from starting in the same second.
 void Overlays::TaskIdle(ClockDate date, ClockTime time) {
 #if (OVERLAYS_SUPPORT_DATE == STD_ON)
     if((date_.GetIsActive()) && (show_timer_in_seconds_ == 0u)) {
@@ -96,4 +93,15 @@ void Overlays::TaskShow(ClockDate date, ClockTime time) {
 #if (OVERLAYS_SUPPORT_TEXT == STD_ON)
     if(text_.GetState() == OverlayText::StateType::kShow) { show_timer_in_seconds_ =  text_.Task(show_timer_in_seconds_, date, time); }
 #endif
+}
+
+/*
+ * An overlay that starts ends a running animation: both draw on the same display, and an
+ * animation that ran past second 30 - Fade at its default speed takes some 51 seconds, any of
+ * them minutes at a low one - drew its pixels into the scrolling text. The overlay holds the
+ * display, as DisplayManager already has it; once it ends, DisplayManager draws the time anew.
+ */
+void Overlays::AbortAnimation()
+{
+    Animations::GetInstance().Abort();
 }

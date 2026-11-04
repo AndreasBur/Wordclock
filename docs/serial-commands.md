@@ -36,8 +36,8 @@ overlay is disabled at compile time.
 | 2 | Display Color | `-R<0-255>` `-G<0-255>` `-B<0-255>` | RGB color; triggers `Display.Show()` |
 | 3 | Display Brightness | `-B<0-255>` `-A<0\|1>` `-G<0\|1>` | Brightness, auto-brightness, gamma correction; see below |
 | 4 | Display Pixel | `-I<index>` `-S<0\|1>` | Set a single LED on/off; out-of-range index → error |
-| 5 | Overlay Date | `-P -E -M -D -V -A` | See overlay options |
-| 6 | Overlay Temperature | `-P -E -M -D -V -A` | See overlay options |
+| 5 | Overlay Date | `-P -E -M -D -V -S -F -A` | See overlay options |
+| 6 | Overlay Temperature | `-P -E -M -D -V -S -F -A` | See overlay options |
 | 7 | Overlay Text | `-P -E -M -D -V -T -S -F -A` | Text overlay adds text/speed/font |
 | 8 | Clock Mode | `-M<mode>` `-I<0\|1>` | Regional wording, and whether "es ist" stands permanently |
 | 9 | Animation | `-A<id>` `-M<mode>` `-S<speed>` `-F<0\|1>` | Animation id, selection mode, speed, favourite flag |
@@ -60,21 +60,21 @@ From
 | `-E` | Endurance (seconds) |
 | `-M` | Month |
 | `-D` | Day |
-| `-V` | Valid-in-days |
+| `-V` | Valid-in-days: on how many days after the date of `-M` and `-D` the overlay still starts |
 | `-A` | Active (0/1) |
 | `-T` | Text (string) |
 | `-S` | Speed |
 | `-F` | Font |
 
-The Date and Temperature overlays ignore `-T` / `-S` / `-F`.
+The Date and Temperature overlays ignore `-T`: what they show is the date or the
+temperature. `-S` and `-F` set how it is shifted in, as for the text.
 
 ### Temperature overlay (`command 6`)
 
-Shows the temperature of the DS3231 clock chip, as `23.4C` — one decimal, and the letter
-rather than a degree sign, which the font tables do not carry
-([`Text::ConvertCharToFontIndex`](../firmware/src/Text/Text.cpp) covers ASCII plus six
-umlauts). What is measured is the chip's own die, so in a closed case it reads above the
-room by whatever that case turns out to add.
+Shows the temperature of the DS3231 clock chip, as `23.4°C` — one decimal and the degree
+sign, which every font carries as a glyph appended by hand ([fonts.md](fonts.md)). What is
+measured is the chip's own die, so in a closed case it reads above the room by whatever
+that case turns out to add.
 
 Until the chip has answered once the overlay stays away entirely — it does not start in
 its period, and `1 -P26` answers `Error=8`. A clock built without the chip therefore

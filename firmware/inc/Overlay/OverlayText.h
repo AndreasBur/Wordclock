@@ -13,14 +13,29 @@
 #include "Arduino.h"
 #include "Overlay.h"
 
-/* OverlayText configuration parameter */
+/*!
+ * \brief The size of the text overlay's buffer, its terminator included: the longest text has one
+ *        character less.
+ *
+ * Persistence stores the text at this size, so a change of it changes the layout of the stored
+ * settings.
+ */
 #define OVERLAY_TEXT_TEXT_SIZE              50u
 
-/* OverlayText parameter */
-
+/*!
+ * \brief The text overlay: scrolls a configured text over the clock.
+ *
+ * SetText() copies the text in, and the overlay keeps it, up to OVERLAY_TEXT_TEXT_SIZE - 1
+ * characters. A new overlay has an empty text. An empty text is still a text, so CanShow() is
+ * always true and the overlay starts with it all the same.
+ *
+ * The text is the overlay's one setting beyond those of Overlay, and ResetToDefaults() empties
+ * it.
+ */
 class OverlayText : public Overlay<OverlayText>
 {
   public:
+    /*! \brief The length SetText() takes, StringTools::LengthType. */
     using LengthType = StringTools::LengthType;
 
   private:
@@ -33,7 +48,6 @@ class OverlayText : public Overlay<OverlayText>
      */
     char text_[OVERLAY_TEXT_TEXT_SIZE]{0u};
 
-    // functions
     void SetStateToShow(ClockDate current_date, ClockTime current_time) { SetText(); UNUSED(current_date); UNUSED(current_time); }
     static void SetStateToIdle(ClockDate current_date, ClockTime current_time) { Text::GetInstance().Stop(); UNUSED(current_date); UNUSED(current_time); }
 
@@ -55,18 +69,42 @@ class OverlayText : public Overlay<OverlayText>
     void SetText() { Text::GetInstance().SetTextWithShift(text_, GetFont()); }
 
   public:
+    /*! \brief Makes the text overlay, switched off and with an empty text. */
     constexpr OverlayText() : text_{StringTools::kNullCharacter} { }
+
+    /*! \brief Destroys the text overlay. */
     ~OverlayText() { }
 
-	// get methods
+    /*! \brief Returns the text the overlay shows, ended by a null character. */
     const char* GetText() const { return text_; }
 
-    // set methods
-
-	// set methods
+    /*!
+     * \brief Sets the text the overlay shows: the first `length` - 1 characters of `text`.
+     *
+     * The overlay copies them, fewer if `text` ends before, and ends the copy with a null
+     * character; `length` counts that terminator. `text` is not read again afterwards.
+     *
+     * \param[in] text The text.
+     * \param[in] length The number of characters to take, plus one.
+     * \note While the overlay shows, its text scrolls out of the same buffer: a new text can change
+     *       the characters still to come in the run under way, and the next run shows it whole.
+     * \warning `length` must lie from 1 to OVERLAY_TEXT_TEXT_SIZE, and is not checked. A larger one
+     *          writes behind the overlay's buffer, and 0 writes far beyond it.
+     */
     void SetText(const char* text, LengthType length) { StringTools::StringCopy(text_, text, length); }
 
-	// methods
+    /*!
+     * \brief Takes the overlay one second further, as Overlay::Task() does, and starts the text
+     *        again each time it has scrolled through.
+     *
+     * While the overlay shows, it first starts the text anew if the text output is idle, which it
+     * is once the previous run has come to its end; then it runs Overlay::Task().
+     *
+     * \param[in] show_timer_in_seconds The show timer, in seconds.
+     * \param[in] current_date The date now.
+     * \param[in] current_time The time now.
+     * \return The new show timer, in seconds, as Overlay::Task() returns it.
+     */
     SecondType Task(SecondType show_timer_in_seconds, ClockDate current_date, ClockTime current_time) {
         if(state_ == StateType::kShow) { ShowTask(); }
         return Overlay::Task(show_timer_in_seconds, current_date, current_time);
