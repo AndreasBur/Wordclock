@@ -1,10 +1,4 @@
-/******************************************************************************************************************************************************
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       display_test.cpp
- *      \brief      What reaches the pixels: the word-set latch, the fade, the colour channels and the letter table
-******************************************************************************************************************************************************/
-
+// What reaches the pixels: the word-set latch, the fade, the colour channels and the letter table.
 
 #include "check.h"
 #include "cases.h"
@@ -19,8 +13,8 @@
 #include "Pixels.h"
 #include "RealTimeClock.h"
 
-/* Only where the colour does the dimming: where the strip does it, DisplayColor keeps no
-   dimmed copy, and what this would check is the strip's master. */
+// Only where the colour does the dimming: where the strip does it, DisplayColor keeps no
+// dimmed copy, and what this would check is the strip's master.
 void TestColourDimmingAcrossByteRange()
 {
 #if (DISPLAY_COLOR_SUPPORT_DIMMING == STD_ON)
@@ -51,9 +45,11 @@ void TestColourDimmingAcrossByteRange()
 #endif
 }
 
-/* The curve's ends, its shape and a value from each end of the shift range. The middle
-   ones are what the construction gives directly: one stored value, shifted once per
-   doubling below the top. */
+/*
+ * The curve's ends, its shape and a value from each end of the shift range. The middle
+ * ones are what the construction gives directly: one stored value, shifted once per
+ * doubling below the top.
+ */
 void TestGammaCorrectionCurve()
 {
     Expect(GammaCorrection::CalcCorrectedValue(0u) == 0u, "a setting of 0 must stay 0, not the faintest light");
@@ -72,8 +68,8 @@ void TestGammaCorrectionCurve()
     Expect(GammaCorrection::CalcCorrectedValue(254u) == 255u, "the last step must be the top of the stored doubling, unshifted");
 }
 
-/* How much light the whole display is putting out, which is what a fade changes and a
-   redraw does not. */
+// How much light the whole display is putting out, which is what a fade changes and a
+// redraw does not.
 uint32_t TotalIntensity(const PixelBufferType& pixels)
 {
     uint32_t total = 0u;
@@ -86,15 +82,17 @@ uint32_t TotalIntensity(const PixelBufferType& pixels)
     return total;
 }
 
-/* The latch itself: the display is redrawn when the word set changes and left alone
-   when it does not. Pixels::IsDirty() is what makes "left alone" observable at all - the
-   buffer staying equal would not tell a skipped redraw from one that rewrote the same
-   words. Must run before any other test touches DisplayManager. */
+/*
+ * The latch itself: the display is redrawn when the word set changes and left alone
+ * when it does not. Pixels::IsDirty() is what makes "left alone" observable at all - the
+ * buffer staying equal would not tell a skipped redraw from one that rewrote the same
+ * words. Must run before any other test touches DisplayManager.
+ */
 void TestDisplayManagerLatch()
 {
     Clock::GetInstance().SetMode(Clock::ModeType::kWessi);
-    /* Without an animation the word change draws straight to the buffer, so what the
-       latch decided is visible in the same task. */
+    // Without an animation the word change draws straight to the buffer, so what the
+    // latch decided is visible in the same task.
     Animations::GetInstance().SetMode(Animations::ModeType::kFixed);
     Animations::GetInstance().SetAnimation(Animations::AnimationIdType::kNone);
 
@@ -134,12 +132,14 @@ void TestDisplayManagerLatch()
            "the rest of the step must leave the letters as they were");
 }
 
-/* The fade's own promise, which the display it leaves behind cannot show: that it dims on
-   the way. It used to count a brightness nobody applied - the variable went down and up
-   and reached no pixel - so the animation was a pause with a hard change at the end of it.
-   The other half of this is what it must not touch: the brightness setting, which is what
-   Persistence writes to the store. A fade that dimmed by turning the setting down would
-   save its own half-way value as what the user asked for. */
+/*
+ * The fade's own promise, which the display it leaves behind cannot show: that it dims on
+ * the way. It used to count a brightness nobody applied - the variable went down and up
+ * and reached no pixel - so the animation was a pause with a hard change at the end of it.
+ * The other half of this is what it must not touch: the brightness setting, which is what
+ * Persistence writes to the store. A fade that dimmed by turning the setting down would
+ * save its own half-way value as what the user asked for.
+ */
 void TestFadeDimsAndComesBack()
 {
     Animations& animations = Animations::GetInstance();
@@ -154,12 +154,14 @@ void TestFadeDimsAndComesBack()
     animations.SetAnimation(Animations::AnimationIdType::kFade);
     animations.SetTime(10u, 35u);
 
-    /* Far enough in to be measurable, far short of the swap: the level counts down one per
-       task from 255. */
+    // Far enough in to be measurable, far short of the swap: the level counts down one per
+    // task from 255.
     for(int tick = 0; tick < 64; tick++) { animations.Task(true); }
-    /* At the output, because that is where the dimming is in both configurations: in the
-       colour's dimmed copy, or in the strip's master where the strip does the dimming and the
-       buffer keeps every colour at full strength. */
+    /*
+     * At the output, because that is where the dimming is in both configurations: in the
+     * colour's dimmed copy, or in the strip's master where the strip does the dimming and the
+     * buffer keeps every colour at full strength.
+     */
     Expect(TotalIntensity(ReadOutputPixels()) < intensity_before, "the fade must dim what is on the display");
 
     int ticks = 0;
@@ -174,15 +176,17 @@ void TestFadeDimsAndComesBack()
     animations.SetAnimation(Animations::AnimationIdType::kNone);
 }
 
-/* Switching the display off and on again, seen where it happens: the output rather than
-   the buffer. disable() leaves every colour in the buffer where it was and takes the
-   brightness to zero, so a check on the buffer alone would call a dark clock lit. */
+/*
+ * Switching the display off and on again, seen where it happens: the output rather than
+ * the buffer. disable() leaves every colour in the buffer where it was and takes the
+ * brightness to zero, so a check on the buffer alone would call a dark clock lit.
+ */
 void TestDisplayOffAndOnAgain()
 {
     Display& display = Display::GetInstance();
 
-    /* Switched on first rather than assumed on: the flicker animation leaves it off, and
-       until this test there was nothing that could notice. */
+    // Switched on first rather than assumed on: the flicker animation leaves it off, and
+    // until this test there was nothing that could notice.
     display.Enable();
     display.SetBrightness(120u);
     Expect(Clock::GetInstance().SetTime(10u, 5u) == kEOk, "test clock time must be accepted");
@@ -202,10 +206,12 @@ void TestDisplayOffAndOnAgain()
            "and must come back on the brightness that was set, not on full");
 }
 
-/* What "one further" means for a switch: the other one. The toggle is the whole of what a
-   button on the case can send, so it has to agree with the enable and disable a phone
-   sends - a toggle that only tracked its own calls would drift apart from ids 3 and 4 the
-   first time both were used. */
+/*
+ * What "one further" means for a switch: the other one. The toggle is the whole of what a
+ * button on the case can send, so it has to agree with the enable and disable a phone
+ * sends - a toggle that only tracked its own calls would drift apart from ids 3 and 4 the
+ * first time both were used.
+ */
 void TestDisplayToggleFollowsTheState()
 {
     Display& display = Display::GetInstance();
@@ -235,9 +241,11 @@ void TestDisplayToggleFollowsTheState()
     display.SetBrightness(brightness_before);
 }
 
-/* The two settings that are a yes or a no, turned round by a control that cannot read
-   them. Both go through the setters that apply what they set, so this also says that a
-   toggle does not need a task to take effect. */
+/*
+ * The two settings that are a yes or a no, turned round by a control that cannot read
+ * them. Both go through the setters that apply what they set, so this also says that a
+ * toggle does not need a task to take effect.
+ */
 void TestBrightnessTogglesInvertTheSetting()
 {
     Display& display = Display::GetInstance();
@@ -255,11 +263,13 @@ void TestBrightnessTogglesInvertTheSetting()
     Expect(!display.GetBrightnessUseGammaCorrection(), "and the next one must switch it off again");
 }
 
-/* What the colour reset needs to be worth having, and what it did not have: a colour that
-   reaches the strip. The pixels carry the colour already dimmed by the brightness, and that
-   dimmed copy used to be recomputed only when the brightness moved - so every colour change,
-   the reset and the six increment procedures alike, stayed invisible until something else
-   happened to touch the brightness. A redraw did not help: it wrote the same stale copy. */
+/*
+ * What the colour reset needs to be worth having, and what it did not have: a colour that
+ * reaches the strip. The pixels carry the colour already dimmed by the brightness, and that
+ * dimmed copy used to be recomputed only when the brightness moved - so every colour change,
+ * the reset and the six increment procedures alike, stayed invisible until something else
+ * happened to touch the brightness. A redraw did not help: it wrote the same stale copy.
+ */
 void TestColourChangesReachTheStrip()
 {
     Display& display = Display::GetInstance();
@@ -276,8 +286,8 @@ void TestColourChangesReachTheStrip()
     Expect(!ArePixelsEqual(ReadPixels(), white),
            "a colour change must reach the letters that are already lit");
 
-    /* Red, and the other two channels as far down as they go: DisplayColor's dimming
-       rounds a channel up to one rather than to nothing, so "off" is a one here. */
+    // Red, and the other two channels as far down as they go: DisplayColor's dimming
+    // rounds a channel up to one rather than to nothing, so "off" is a one here.
     const PixelBufferType red = ReadPixels();
     bool any_lit_pixel_is_red = false;
     bool every_lit_pixel_is_red = true;
@@ -299,11 +309,13 @@ void TestColourChangesReachTheStrip()
     display.SetBrightness(brightness_before);
 }
 
-/* Guards a swap that this simulator cannot show: Pixel keeps its channels in the WS2812
-   wire order rather than in argument order, so a constructor that filled the raw array
-   positionally put red where GetRed() does not look. Every colour built that way so far
-   was grey or black, which hides it, and the window renders brightness rather than hue,
-   which hides it again - it would first have appeared on the strip. */
+/*
+ * Guards a swap that this simulator cannot show: Pixel keeps its channels in the WS2812
+ * wire order rather than in argument order, so a constructor that filled the raw array
+ * positionally put red where GetRed() does not look. Every colour built that way so far
+ * was grey or black, which hides it, and the window renders brightness rather than hue,
+ * which hides it again - it would first have appeared on the strip.
+ */
 void TestPixelColorChannels()
 {
     const Pixel color(10u, 20u, 30u);
@@ -329,10 +341,12 @@ void TestPixelColorChannels()
            "the per-channel setters must place the channels alike");
 }
 
-/* The letter table has four entry points that all have to agree, and until now they did
-   not: two of them indexed the table transposed, which for the last column read past its
-   end. Nothing called any of them, so the simulator kept a second copy of the letters
-   instead - which is the duplication this pins down as unnecessary. */
+/*
+ * The letter table has four entry points that all have to agree, and until now they did
+ * not: two of them indexed the table transposed, which for the last column read past its
+ * end. Nothing called any of them, so the simulator kept a second copy of the letters
+ * instead - which is the duplication this pins down as unnecessary.
+ */
 void TestDisplayCharacterLookup()
 {
     const DisplayCharacters characters;
@@ -353,8 +367,8 @@ void TestDisplayCharacterLookup()
                                       DISPLAY_CHARACTERS_NUMBER_OF_ROWS - 1u) == 'R',
            "the last column of the last row must be the last letter");
 
-    /* Every position has to read the same whether it is asked for by index or by column
-       and row - that is what the two broken entry points disagreed on. */
+    // Every position has to read the same whether it is asked for by index or by column
+    // and row - that is what the two broken entry points disagreed on.
     bool all_agree = true;
     for(byte index = 0u; index < DISPLAY_CHARACTERS_NUMBER_OF_CHARACTERS; index++) {
         byte column, row;

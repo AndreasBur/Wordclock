@@ -1,10 +1,4 @@
-/******************************************************************************************************************************************************
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       websocket_test.cpp
- *      \brief      The web socket protocol, against the RFCs rather than against a browser
-******************************************************************************************************************************************************/
-
+// The web socket protocol, against the RFCs rather than against a browser.
 
 #include "check.h"
 #include "cases.h"
@@ -15,7 +9,6 @@
 #include <string>
 
 namespace {
-
 std::string ToSha1Hex(const std::string& message)
 {
     uint8_t digest[WebSocket::kSha1Length];
@@ -36,8 +29,8 @@ std::string ToBase64(const std::string& text)
     return WebSocket::ConvertToBase64(reinterpret_cast<const uint8_t*>(text.data()), text.size());
 }
 
-/* A text frame as a browser sends it: final, masked, and with a mask that is not zeros,
-   which would leave a decoder that unmasks wrongly undetected. */
+// A text frame as a browser sends it: final, masked, and with a mask that is not zeros,
+// which would leave a decoder that unmasks wrongly undetected.
 std::string ToClientFrame(const std::string& payload)
 {
     const uint8_t mask[4]{0x12u, 0x34u, 0x56u, 0x78u};
@@ -65,9 +58,11 @@ std::string ToServerFrame(const std::string& payload)
 
 } // namespace
 
-/* The examples of FIPS 180-2, appendix A, the last one two blocks long - and the RFC 4648
-   examples for base64, one for every length the last group can have. Then the example of
-   RFC 6455 section 1.3, which names its answer and so checks both together. */
+/*
+ * The examples of FIPS 180-2, appendix A, the last one two blocks long - and the RFC 4648
+ * examples for base64, one for every length the last group can have. Then the example of
+ * RFC 6455 section 1.3, which names its answer and so checks both together.
+ */
 void TestWebSocketHashAndEncoding()
 {
     Expect(ToSha1Hex("") == "da39a3ee5e6b4b0d3255bfef95601890afd80709", "SHA-1 of the empty message");
@@ -86,8 +81,8 @@ void TestWebSocketHashAndEncoding()
            "the accept key must match RFC 6455's example");
 }
 
-/* Header names are case-insensitive, and a browser may put more than one space after the
-   colon. */
+// Header names are case-insensitive, and a browser may put more than one space after the
+// colon.
 void TestWebSocketHandshake()
 {
     std::string answer;
@@ -105,8 +100,8 @@ void TestWebSocketHandshake()
            "a request without a key is no handshake");
 }
 
-/* 125 bytes is the longest payload whose length fits in the second byte; a display frame is
-   past it and takes the 16-bit length. */
+// 125 bytes is the longest payload whose length fits in the second byte; a display frame is
+// past it and takes the 16-bit length.
 void TestWebSocketEncodesBothLengths()
 {
     const std::string short_frame = ToServerFrame(std::string(125u, 'x'));
@@ -141,8 +136,8 @@ void TestWebSocketDecodesWhatABrowserSends()
     Expect((WebSocket::DecodeFrame(buffer, opcode, payload) == kEOk) && (payload == std::string(200u, 'x')),
            "a frame with the 16-bit length decodes");
 
-    /* A frame may arrive over several reads; until it is whole, nothing is taken from the
-       buffer. */
+    // A frame may arrive over several reads; until it is whole, nothing is taken from the
+    // buffer.
     const std::string frame = ToClientFrame("hello");
     buffer.clear();
     for(size_t index = 0u; (index + 1u) < frame.size(); index++) {

@@ -1,37 +1,25 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
+// Copyright 2017 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+/*!
+ * \file
+ * \brief The LED matrix as the firmware core sees it.
  *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       Pixels.h
- *      \brief      The LED matrix as the firmware core sees it
+ * The buffer the core writes into, and the brightness it is dimmed by. What reaches the strip is
+ * decided in Render(), which the application calls once per tick - Show() only marks the buffer as
+ * changed.
  *
- *      \details    The buffer the core writes into, and the brightness it is dimmed by. What
- *                  reaches the strip is decided in Render(), which the application calls once
- *                  per tick - Show() only marks the buffer as changed.
- *
- *                  Same split as the ESP32 backend, for the same reason: several modules call
- *                  Show() within one tick, and transmitting from each of them would put
- *                  frames back to back with no reset gap between them.
- *
-******************************************************************************************************************************************************/
+ * Same split as the ESP32 backend, for the same reason: several modules call Show() within one
+ * tick, and transmitting from each of them would put frames back to back with no reset gap between
+ * them.
+ */
+
 #ifndef _PIXELS_H_
 #define _PIXELS_H_
 
-/******************************************************************************************************************************************************
- * I N C L U D E S
-******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Pixel.h"
 
-/******************************************************************************************************************************************************
- *  G L O B A L   C O N S T A N T   M A C R O S
-******************************************************************************************************************************************************/
 /* Pixels configuration parameter */
 #define PIXELS_NUMBER_OF_LEDS                           110
 #define PIXELS_SUPPORT_DIMMING                          STD_ON
@@ -41,14 +29,8 @@
 #define PIXELS_DISPLAY_NUMBER_OF_COLUMNS                11u
 #define PIXELS_NUMBER_OF_PIXELS                         (PIXELS_DISPLAY_NUMBER_OF_ROWS * PIXELS_DISPLAY_NUMBER_OF_COLUMNS)
 
-/******************************************************************************************************************************************************
- *  C L A S S   P I X E L S
-******************************************************************************************************************************************************/
 class Pixels
 {
-/******************************************************************************************************************************************************
- *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
-******************************************************************************************************************************************************/
   public:
     using PixelType = Pixel;
 # if (PIXELS_NUMBER_OF_PIXELS < 255u)
@@ -57,23 +39,22 @@ class Pixels
     using IndexType = uint16_t;
 # endif
 
-/******************************************************************************************************************************************************
- *  P R I V A T E   D A T A   A N D   F U N C T I O N S
-******************************************************************************************************************************************************/
   private:
-    /* Zero-initialised, so the strip starts dark rather than at whatever the memory held -
-       the first render then puts a defined frame on the wire. */
+    // Zero-initialised, so the strip starts dark rather than at whatever the memory held -
+    // the first render then puts a defined frame on the wire.
     PixelType pixel_buffer_[PIXELS_DISPLAY_NUMBER_OF_ROWS][PIXELS_DISPLAY_NUMBER_OF_COLUMNS]{};
     byte pin_{0};
     byte brightness_{255};
-    /* Whether the firmware touched buffer or brightness since the last render. Starts true
-       so the first render establishes the strip's state. */
+    // Whether the firmware touched buffer or brightness since the last render. Starts true
+    // so the first render establishes the strip's state.
     bool dirty_{true};
     bool initialised_{false};
-    /* Whether anything may go out on the wire at all. Not the same as a brightness of zero,
-       which still transmits a frame of black pixels: this is for the state in which the strip
-       has no supply, and a frame arriving then pushes current into a dead rail through the
-       LED's own protection diode. */
+    /*
+     * Whether anything may go out on the wire at all. Not the same as a brightness of zero,
+     * which still transmits a frame of black pixels: this is for the state in which the strip
+     * has no supply, and a frame arriving then pushes current into a dead rail through the
+     * LED's own protection diode.
+     */
     bool output_suspended_{false};
 
     // functions
@@ -85,9 +66,6 @@ class Pixels
     Pixels() { }
     ~Pixels() { }
 
-/******************************************************************************************************************************************************
- *  P U B L I C   F U N C T I O N S
-******************************************************************************************************************************************************/
   public:
     static Pixels& GetInstance() {
         static Pixels singleton_instance;
@@ -95,10 +73,12 @@ class Pixels
     }
 
     // get methods
-    /* Two forms of the reader, and the argument list says which: the one taking a reference
-       answers whether the index is on the strip, the one taking none answers the pixel and
-       leaves an unlit one where the index is not. Both check. Writers have a single form,
-       which answers, and a caller that has nothing to do with the answer ignores it. */
+    /*
+     * Two forms of the reader, and the argument list says which: the one taking a reference
+     * answers whether the index is on the strip, the one taking none answers the pixel and
+     * leaves an unlit one where the index is not. Both check. Writers have a single form,
+     * which answers, and a caller that has nothing to do with the answer ignores it.
+     */
     byte GetBrightness() const { return brightness_; }
     StdReturnType GetPixel(byte, PixelType&) const;
     PixelType GetPixel(byte) const;
@@ -128,8 +108,8 @@ class Pixels
     void DisablePixels() { SetBrightness(0); }
     void ClearPixels() { SetPixels(PixelType(0u, 0u, 0u)); }
 
-    /* Only asks for a render; what reaches the strip is decided by Render() on the next
-       tick. */
+    // Only asks for a render; what reaches the strip is decided by Render() on the next
+    // tick.
     StdReturnType Show() {
         dirty_ = true;
         return kEOk;
@@ -140,19 +120,17 @@ class Pixels
     StdReturnType Render();
 
     // output gate, for the supply switch
-    /* Whether the last frame is still going out. Asked before the supply is cut: the driver
-       hands one byte at a time to an interrupt and the frame outlives the call that started
-       it, so a port dropped on the tick that started it lands in the middle of one. */
+    /*
+     * Whether the last frame is still going out. Asked before the supply is cut: the driver
+     * hands one byte at a time to an interrupt and the frame outlives the call that started
+     * it, so a port dropped on the tick that started it lands in the middle of one.
+     */
     bool IsFrameOnTheWire() const;
     bool IsOutputSuspended() const { return output_suspended_; }
     void SuspendOutput() { output_suspended_ = true; }
-    /* Marks the buffer, because the LEDs lose their registers along with their supply: what
-       was up there is gone, so coming back is a redraw rather than a resume. */
+    // Marks the buffer, because the LEDs lose their registers along with their supply: what
+    // was up there is gone, so coming back is a redraw rather than a resume.
     void ResumeOutput() { output_suspended_ = false; dirty_ = true; }
 };
 
 #endif // _PIXELS_H_
-
-/******************************************************************************************************************************************************
- *  E N D   O F   F I L E
-******************************************************************************************************************************************************/

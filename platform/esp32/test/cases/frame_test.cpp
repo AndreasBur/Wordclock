@@ -1,6 +1,8 @@
-/* What Pixels::Render() puts on the wire, checked byte for byte against a captured
-   transmission. The RMT calls are stubbed here rather than in stubs.cpp because this test
-   has to keep the frame the driver handed over - the shared stub throws it away. */
+/*
+ * What Pixels::Render() puts on the wire, checked byte for byte against a captured
+ * transmission. The RMT calls are stubbed here rather than in stubs.cpp because this test
+ * has to keep the frame the driver handed over - the shared stub throws it away.
+ */
 #include <driver/rmt_tx.h>
 
 #include "Arduino.h"
@@ -24,7 +26,6 @@ esp_err_t rmt_transmit(rmt_channel_handle_t, rmt_encoder_handle_t, const void* d
     memcpy(captured, d, n);
     return ESP_OK;
 }
-
 
 int main()
 {

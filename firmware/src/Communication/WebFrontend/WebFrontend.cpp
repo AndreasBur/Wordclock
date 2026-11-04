@@ -1,21 +1,11 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
- *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       WebFrontend.cpp
- *      \brief      The half of the web front end that is not a server
- *
-******************************************************************************************************************************************************/
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
 
-/******************************************************************************************************************************************************
- * I N C L U D E S
-******************************************************************************************************************************************************/
+/*!
+ * \file
+ * \brief The half of the web front end that is not a server.
+ */
+
 #include "WebFrontend.h"
 
 #if (WEB_FRONTEND_SUPPORT == STD_ON)
@@ -24,33 +14,33 @@
 #include "DisplayCharacters.h"
 #include "MessageCatalog.h"
 #include "Pixels.h"
-/* The build generates this from web/. Included here and nowhere else: its arrays have
-   internal linkage, so every further includer would be a second copy of both pages in
-   flash. */
+/*
+ * The build generates this from web/. Included here and nowhere else: its arrays have
+ * internal linkage, so every further includer would be a second copy of both pages in
+ * flash.
+ */
 #include "WebPage.h"
 #include "WordclockSerial.h"
 
 #include <stdio.h>
 #include <string.h>
 
-/******************************************************************************************************************************************************
- *  LOCAL FUNCTIONS
-******************************************************************************************************************************************************/
 namespace {
-
-/* One Latin-1 byte as UTF-8, into Target, answering how many bytes that took. The whole of
-   Latin-1 widens by this one rule, so no table is needed: below 0x80 a byte is itself, and
-   above it becomes two.
-
-   Both ways out of here need it, for different reasons. The letters served by /display are
-   Latin-1 because the table holds one byte per letter, and JSON is UTF-8 - a raw 0xDC there
-   makes the whole document invalid rather than one letter wrong.
-
-   An answer line needs it for a harder reason: it leaves as a web socket *text* frame, and
-   RFC 6455 requires those to be valid UTF-8. A raw 0xF6 in one does not draw a wrong
-   character, it makes the browser close the connection. That is reachable rather than
-   theoretical - command 8 answers with the overlay text it was given, and an umlaut in that
-   text is exactly what the font tables carry umlauts for. */
+/*
+ * One Latin-1 byte as UTF-8, into Target, answering how many bytes that took. The whole of
+ * Latin-1 widens by this one rule, so no table is needed: below 0x80 a byte is itself, and
+ * above it becomes two.
+ *
+ * Both ways out of here need it, for different reasons. The letters served by /display are
+ * Latin-1 because the table holds one byte per letter, and JSON is UTF-8 - a raw 0xDC there
+ * makes the whole document invalid rather than one letter wrong.
+ *
+ * An answer line needs it for a harder reason: it leaves as a web socket *text* frame, and
+ * RFC 6455 requires those to be valid UTF-8. A raw 0xF6 in one does not draw a wrong
+ * character, it makes the browser close the connection. That is reachable rather than
+ * theoretical - command 8 answers with the overlay text it was given, and an umlaut in that
+ * text is exactly what the font tables carry umlauts for.
+ */
 byte ToUtf8(byte latin1, char* target)
 {
     if(latin1 < 0x80u) {
@@ -62,19 +52,17 @@ byte ToUtf8(byte latin1, char* target)
     return 2u;
 }
 
-
-/******************************************************************************************************************************************************
-  C H U N K   W R I T E R
-******************************************************************************************************************************************************/
-/* Collects a document in a small buffer and hands it to the body in chunks, so neither the
-   whole thing nor any allocation is needed to serve it.
-
-   The buffer is kept even for a backend whose body is pulled from rather than pushed to,
-   which is the one behaviour this file changed on its way out of the two backends: the
-   RP2350's writer used to hand its response stream one character at a time, on the argument
-   that a library building everything out of String would not notice a buffer of ours. True,
-   but it cuts both ways - the stream does not notice 256 bytes arriving at once either, and
-   one writer that behaves the same on both is worth more than a saved memcpy. */
+/*
+ * Collects a document in a small buffer and hands it to the body in chunks, so neither the
+ * whole thing nor any allocation is needed to serve it.
+ *
+ * The buffer is kept even for a backend whose body is pulled from rather than pushed to,
+ * which is the one behaviour this file changed on its way out of the two backends: the
+ * RP2350's writer used to hand its response stream one character at a time, on the argument
+ * that a library building everything out of String would not notice a buffer of ours. True,
+ * but it cuts both ways - the stream does not notice 256 bytes arriving at once either, and
+ * one writer that behaves the same on both is worth more than a saved memcpy.
+ */
 class ChunkWriter
 {
   private:
@@ -108,9 +96,11 @@ class ChunkWriter
 
     void PutNumber(uint16_t number) {
         char digits[8]{};
-        /* Taken rather than dropped, and then used: it is the length, so the digits go out
-           without a second walk to find their terminator. Negative is snprintf's encoding
-           failure, which cannot happen for "%u" and is refused rather than trusted. */
+        /*
+         * Taken rather than dropped, and then used: it is the length, so the digits go out
+         * without a second walk to find their terminator. Negative is snprintf's encoding
+         * failure, which cannot happen for "%u" and is refused rather than trusted.
+         */
         const int length = snprintf(digits, sizeof(digits), "%u", static_cast<unsigned>(number));
 
         if(length <= 0) { return; }
@@ -118,8 +108,8 @@ class ChunkWriter
         for(int index = 0; index < length; index++) { Put(digits[index]); }
     }
 
-    /* Escaped, because a label is data: a quote in one would otherwise produce a document
-       the browser refuses whole, and that failure looks like a server fault. */
+    // Escaped, because a label is data: a quote in one would otherwise produce a document
+    // the browser refuses whole, and that failure looks like a server fault.
     void PutString(const char* text) {
         Put('"');
         for(const char* character = text; (text != nullptr) && (*character != '\0'); character++) {
@@ -129,8 +119,8 @@ class ChunkWriter
         Put('"');
     }
 
-    /* Whatever ends a body on this backend - an empty chunk for one, handing the stream over
-       for another. */
+    // Whatever ends a body on this backend - an empty chunk for one, handing the stream over
+    // for another.
     void Finish() {
         Flush();
         body_.Finish();
@@ -139,12 +129,9 @@ class ChunkWriter
 
 } // namespace
 
-/******************************************************************************************************************************************************
- *  L O C A L   D A T A
-******************************************************************************************************************************************************/
 namespace {
-
-/* Every file a clock hands out unchanged, at the path it hands it out at.
+/*
+ * Every file a clock hands out unchanged, at the path it hands it out at.
  *
  * "/" is the panel and "/console" the console, which is the whole arrangement rather than a
  * detail: nobody types a path, they type the clock's address and take what comes, so what
@@ -163,21 +150,16 @@ constexpr WebFrontend::AssetType kAssets[]{
     {"/icon-512.png",          kWebIcon512,   kWebIcon512Size,   "image/png",                 false},
 };
 
-/* A backend sizes its route array with kMaxAssets, which it can see and this count it cannot.
-   Adding a file here without raising that fails the build, rather than quietly registering
-   the first five of six. */
+/*
+ * A backend sizes its route array with kMaxAssets, which it can see and this count it cannot.
+ * Adding a file here without raising that fails the build, rather than quietly registering
+ * the first five of six.
+ */
 static_assert((sizeof(kAssets) / sizeof(kAssets[0])) <= WebFrontend::kMaxAssets,
               "WebFrontend::MaxAssets has to grow with the asset table");
 
 } // namespace
 
-/******************************************************************************************************************************************************
- * P U B L I C   F U N C T I O N S
-******************************************************************************************************************************************************/
-
-/******************************************************************************************************************************************************
-  GetNumberOfAssets() / GetAsset()
-******************************************************************************************************************************************************/
 /*! \brief          The files a clock serves unchanged, for a backend to register routes from
  *
  *  \details        A table rather than a handler per file, because that is what the ten
@@ -185,7 +167,7 @@ static_assert((sizeof(kAssets) / sizeof(kAssets[0])) <= WebFrontend::kMaxAssets,
  *                  Content-Encoding header or did not, and pushed a blob. The difference
  *                  between them was data, and the sameness between the two backends was
  *                  complete.
-******************************************************************************************************************************************************/
+ */
 byte WebFrontend::GetNumberOfAssets()
 {
     return static_cast<byte>(sizeof(kAssets) / sizeof(kAssets[0]));
@@ -196,10 +178,6 @@ const WebFrontend::AssetType& WebFrontend::GetAsset(byte index)
     return kAssets[index];
 }
 
-
-/******************************************************************************************************************************************************
-  WriteCommands()
-******************************************************************************************************************************************************/
 /*! \brief          Writes the command catalog, so the page can build its own form
  *
  *  \details        Generated from MessageCatalog rather than written out a second time.
@@ -211,7 +189,7 @@ const WebFrontend::AssetType& WebFrontend::GetAsset(byte index)
  *                  Written here rather than once per backend, which is what it was: the two
  *                  copies were identical down to their comments, and both feed the same
  *                  page's parser.
-******************************************************************************************************************************************************/
+ */
 void WebFrontend::WriteCommands(WebResponseBody& body)
 {
     ChunkWriter writer(body);
@@ -242,9 +220,11 @@ void WebFrontend::WriteCommands(WebResponseBody& body)
             writer.Put(",\"max\":");
             writer.PutNumber(option.maximum);
 
-            /* Only where it is set, so the page's form stays as it was for every option
-               that can be sent, and the read-only fields it must not offer are the ones
-               that say so. */
+            /*
+             * Only where it is set, so the page's form stays as it was for every option
+             * that can be sent, and the read-only fields it must not offer are the ones
+             * that say so.
+             */
             if(option.read_only) { writer.Put(",\"readonly\":true"); }
 
             if((option.value_names != nullptr) && (option.number_of_value_names > 0u)) {
@@ -262,12 +242,8 @@ void WebFrontend::WriteCommands(WebResponseBody& body)
 
     writer.Put(']');
     writer.Finish();
-} /* WriteCommands */
+}
 
-
-/******************************************************************************************************************************************************
-  WriteDisplay()
-******************************************************************************************************************************************************/
 /*! \brief          Writes the panel's shape and its letters
  *
  *  \details        The page draws a grid of letters and has to know which, and there is
@@ -278,7 +254,7 @@ void WebFrontend::WriteCommands(WebResponseBody& body)
  *                  The table stores one byte per letter, so the umlauts are Latin-1 and are
  *                  widened to UTF-8 on the way out: JSON is UTF-8, and a raw 0xDC makes the
  *                  whole document invalid rather than one letter wrong.
-******************************************************************************************************************************************************/
+ */
 void WebFrontend::WriteDisplay(WebResponseBody& body)
 {
     const DisplayCharacters letters;
@@ -299,12 +275,8 @@ void WebFrontend::WriteDisplay(WebResponseBody& body)
 
     writer.Put("\"}");
     writer.Finish();
-} /* WriteDisplay */
+}
 
-
-/******************************************************************************************************************************************************
-  InjectCommand()
-******************************************************************************************************************************************************/
 /*! \brief          Takes one socket frame's text and injects it as typed characters
  *
  *  \details        The command is injected followed by the end-of-message character, unless
@@ -317,7 +289,7 @@ void WebFrontend::WriteDisplay(WebResponseBody& body)
  *                  hands over a bounded buffer has already made that impossible; one whose
  *                  library hands over whatever arrived has not, and this is where both end
  *                  up equal.
-******************************************************************************************************************************************************/
+ */
 void WebFrontend::InjectCommand(const char* text, size_t length)
 {
     if((text == nullptr) || (length == 0u) || (length > WEB_FRONTEND_MAX_FRAME_LENGTH)) { return; }
@@ -329,32 +301,30 @@ void WebFrontend::InjectCommand(const char* text, size_t length)
         const char terminator = Communication::GetEndOfMessageChar();
         port.Inject(&terminator, 1u);
     }
-} /* InjectCommand */
+}
 
-
-/******************************************************************************************************************************************************
-  BroadcastLine()
-******************************************************************************************************************************************************/
 /*! \brief          Sends one finished line to whoever is connected
  *
  *  \details        Runs in the firmware's task. A send that fails is not retried and the
  *                  client is not dropped here - a backend's own close hook owns that, and
  *                  dropping a client from this side would race with it.
-******************************************************************************************************************************************************/
+ */
 void WebFrontend::BroadcastLine(const char* line)
 {
     WebTransport& transport = WebTransport::GetInstance();
 
     if(!transport.IsListening() || (line == nullptr)) { return; }
 
-    /* Widened rather than sent as it stands - see ToUtf8(). Two bytes per Latin-1 byte is
-       the worst case, so a line that is nothing but umlauts still fits and there is no
-       truncation to expect. Sized from the producer's own line length rather than from a
-       number of its own, because that is the buffer the line was assembled in.
-
-       The bound is still checked. Nothing longer can arrive today, but this takes a plain
-       pointer and the sink it is installed as is a function pointer - the day a second
-       producer appears, an assumption written only in a comment is the one that gives. */
+    /*
+     * Widened rather than sent as it stands - see ToUtf8(). Two bytes per Latin-1 byte is
+     * the worst case, so a line that is nothing but umlauts still fits and there is no
+     * truncation to expect. Sized from the producer's own line length rather than from a
+     * number of its own, because that is the buffer the line was assembled in.
+     *
+     * The bound is still checked. Nothing longer can arrive today, but this takes a plain
+     * pointer and the sink it is installed as is a function pointer - the day a second
+     * producer appears, an assumption written only in a comment is the one that gives.
+     */
     char payload[2u * WORDCLOCK_SERIAL_LINE_LENGTH];
     size_t used{0u};
 
@@ -365,12 +335,8 @@ void WebFrontend::BroadcastLine(const char* line)
     if(used == 0u) { return; }
 
     transport.SendText(payload, used);
-} /* BroadcastLine */
+}
 
-
-/******************************************************************************************************************************************************
-  BroadcastFrame()
-******************************************************************************************************************************************************/
 /*! \brief          Sends the pixel buffer to whoever is connected, when it changed
  *
  *  \details        Rate limited first and compared second, so a display that changes on
@@ -384,7 +350,7 @@ void WebFrontend::BroadcastLine(const char* line)
  *                  when the display is switched off, without a redraw to tell it so. The
  *                  page reads the bytes for that on/off state only and paints its own
  *                  colour; the wx window is the colour-accurate view.
-******************************************************************************************************************************************************/
+ */
 void WebFrontend::BroadcastFrame()
 {
     WebTransport& transport = WebTransport::GetInstance();
@@ -417,10 +383,6 @@ void WebFrontend::BroadcastFrame()
     memcpy(last_frame_, frame, kFrameSize);
 
     transport.SendBinary(frame, kFrameSize);
-} /* BroadcastFrame */
+}
 
 #endif // (WEB_FRONTEND_SUPPORT == STD_ON)
-
-/******************************************************************************************************************************************************
- *  E N D   O F   F I L E
-******************************************************************************************************************************************************/

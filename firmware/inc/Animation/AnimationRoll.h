@@ -1,67 +1,35 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
+// Copyright 2017 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+/*!
+ * \file
+ * \brief The roll animation: the old time rolls out while the new one rolls in behind it.
  *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       AnimationRoll.h
- *      \brief      Rolls the previous time out while the new one rolls in
+ * Unlike AnimationShift, which first shifts the previous time out of an empty display and only then
+ * shifts the new one in, both move together here. The display therefore never goes blank and the
+ * animation takes one pass instead of two.
  *
- *      \details    Unlike AnimationShift, which first shifts the previous time out of
- *                  an empty display and only then shifts the new one in, both move
- *                  together here. The display therefore never goes blank and the
- *                  animation takes one pass instead of two.
+ * The direction is selected for each word change out of right, left, down and up.
  *
- *                  The direction is selected for each word change out of right, left, down and up.
- *
- *                  Ported from the wordclock24h project by Frank Meyer
- *                  (display_animation_roll in src/display/display.c).
- *
-******************************************************************************************************************************************************/
+ * Ported from the wordclock24h project by Frank Meyer (display_animation_roll in
+ * src/display/display.c).
+ */
+
 #ifndef _ANIMATION_ROLL_H_
 #define _ANIMATION_ROLL_H_
 
-/******************************************************************************************************************************************************
- * INCLUDES
-******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Arduino.h"
 #include "Clock.h"
 #include "Transformation.h"
 #include "Animation.h"
 
-/******************************************************************************************************************************************************
- *  GLOBAL CONSTANT MACROS
-******************************************************************************************************************************************************/
 /* AnimationRoll configuration parameter */
-
 
 /* AnimationRoll parameter */
 
-
-
-/******************************************************************************************************************************************************
- *  GLOBAL FUNCTION MACROS
-******************************************************************************************************************************************************/
-
-
-/******************************************************************************************************************************************************
- *  GLOBAL DATA TYPES AND STRUCTURES
- *****************************************************************************************************************************************************/
-
-
-/******************************************************************************************************************************************************
- *  C L A S S   A N I M A T I O N   R O L L
-******************************************************************************************************************************************************/
 class AnimationRoll : public Animation
 {
-/******************************************************************************************************************************************************
- *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
-******************************************************************************************************************************************************/
   public:
     enum class DirectionType {
         kRight,
@@ -72,9 +40,6 @@ class AnimationRoll : public Animation
     };
     static constexpr byte kNumberOfDirections{static_cast<byte>(DirectionType::kNumberOfDirections)};
 
-/******************************************************************************************************************************************************
- *  P R I V A T E   D A T A   A N D   F U N C T I O N S
-******************************************************************************************************************************************************/
   private:
     Transformation wc_transformation_;
     ClockWords::WordsListType clock_words_table_{{DisplayWords::WordIdType::kNone}};
@@ -89,9 +54,6 @@ class AnimationRoll : public Animation
     byte NumberOfSteps() const;
     static DirectionType CalcDirection(byte, byte);
 
-/******************************************************************************************************************************************************
- *  P U B L I C   F U N C T I O N S
-******************************************************************************************************************************************************/
   public:
     constexpr AnimationRoll() : wc_transformation_() { }
     ~AnimationRoll() { }
@@ -101,15 +63,10 @@ class AnimationRoll : public Animation
 
     // set methods
 
-
     // methods
     void Init();
     StdReturnType SetTime(byte, byte);
     void Task();
 };
 
-
 #endif
-/******************************************************************************************************************************************************
- *  E N D   O F   F I L E
-******************************************************************************************************************************************************/

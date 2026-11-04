@@ -1,34 +1,20 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
- *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       Overlays.h
- *      \brief
- *
- *      \details
- *
-******************************************************************************************************************************************************/
+// Copyright 2017 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+/*!
+ * \file
+ * \brief The date, temperature and text overlays together, and which of them holds the display.
+ */
+
 #ifndef _OVERLAYS_H_
 #define _OVERLAYS_H_
 
-/******************************************************************************************************************************************************
- * I N C L U D E S
-******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Arduino.h"
 #include "StringTools.h"
 #include "RealTimeClock.h"
 #include "Overlay.h"
 
-/******************************************************************************************************************************************************
- *  G L O B A L   C O N S T A N T   M A C R O S
-******************************************************************************************************************************************************/
 /* Overlays configuration parameter */
 #define OVERLAYS_SUPPORT_DATE               STD_ON
 #define OVERLAYS_SUPPORT_TEMPERATURE        STD_ON
@@ -38,9 +24,6 @@
 
 /* Overlays parameter */
 
-/******************************************************************************************************************************************************
- * D E P E N D E N D   I N C L U D E S
-******************************************************************************************************************************************************/
 #if (OVERLAYS_SUPPORT_DATE == STD_ON)
 # include "OverlayDate.h"
 #endif
@@ -51,19 +34,8 @@
 # include "OverlayText.h"
 #endif
 
-/******************************************************************************************************************************************************
- *  G L O B A L   F U N C T I O N   M A C R O S
-******************************************************************************************************************************************************/
-
-
-/******************************************************************************************************************************************************
- *  C L A S S   O V E R L A Y S
-******************************************************************************************************************************************************/
 class Overlays
 {
-/******************************************************************************************************************************************************
- *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
-******************************************************************************************************************************************************/
   public:
     using OverlayType = Overlay<Overlays>;
     using MonthType = OverlayType::MonthType;
@@ -78,7 +50,6 @@ class Overlays
     using LengthType = OverlayText::LengthType;
 #endif
 
-
     enum class OverlayIdType {
 #if (OVERLAYS_SUPPORT_DATE == STD_ON)
         kDate,
@@ -91,9 +62,6 @@ class Overlays
 #endif
     };
 
-/******************************************************************************************************************************************************
- *  P R I V A T E   D A T A   A N D   F U N C T I O N S
-******************************************************************************************************************************************************/
   private:
     static constexpr byte kTaskCycle{OVERLAYS_TASK_CYCLE};
     SecondType show_timer_in_seconds_{0u};
@@ -143,12 +111,14 @@ class Overlays
     void TaskIdle(ClockDate, ClockTime);
     void TaskShow(ClockDate, ClockTime);
 
-    /* Shared by the three "show now" entry points below, which differ in nothing but the
-       overlay they name - a template rather than three copies of the two rules that
-       decide whether an overlay may start at all.
-
-       Switched off is a configuration and not a state to be talked out of, and only one
-       overlay may hold the display, because there is one show timer for all of them. */
+    /*
+     * Shared by the three "show now" entry points below, which differ in nothing but the
+     * overlay they name - a template rather than three copies of the two rules that
+     * decide whether an overlay may start at all.
+     *
+     * Switched off is a configuration and not a state to be talked out of, and only one
+     * overlay may hold the display, because there is one show timer for all of them.
+     */
     template <typename OverlayClassType>
     StdReturnType ShowNow(OverlayClassType& overlay) {
         if(!overlay.GetIsActive()) { return kENotOk; }
@@ -160,9 +130,6 @@ class Overlays
         return kEOk;
     }
 
-/******************************************************************************************************************************************************
- *  P U B L I C   F U N C T I O N S
-******************************************************************************************************************************************************/
   public:
     static Overlays& GetInstance() {
         static Overlays singleton_instance;
@@ -191,8 +158,8 @@ class Overlays
     DayType GetTemperatureValidInDays() const { return temperature_.GetValidInDays(); }
     byte GetTemperatureSpeed() const { return temperature_.GetSpeed(); }
     Text::FontType GetTemperatureFont() const { return temperature_.GetFont(); }
-    /* What the overlay would put on the display, which is the only way to read the
-       temperature back out of the firmware until there is a status command. */
+    // What the overlay would put on the display, which is the only way to read the
+    // temperature back out of the firmware until there is a status command.
     const char* GetTemperatureString() const { return temperature_.GetTemperatureString(); }
     bool GetTemperatureIsActive() const { return temperature_.GetIsActive(); }
 #endif
@@ -242,9 +209,11 @@ class Overlays
 #endif
 
 	// methods
-    /* Every overlay back to what it starts with, the same way Display, Clock, Animations
-       and Illuminance answer Persistence::Reset(). Here since the overlays are stored -
-       before that a reset had nothing of theirs to undo. */
+    /*
+     * Every overlay back to what it starts with, the same way Display, Clock, Animations
+     * and Illuminance answer Persistence::Reset(). Here since the overlays are stored -
+     * before that a reset had nothing of theirs to undo.
+     */
     void ResetToDefaults() {
 #if (OVERLAYS_SUPPORT_DATE == STD_ON)
         date_.ResetToDefaults();
@@ -259,9 +228,11 @@ class Overlays
 
 	void Task();
 
-    /* Show an overlay now instead of at its next period, and end the one that is
-       showing. Without these an overlay can only be watched by waiting for its raster,
-       which is also what makes one hard to develop against. */
+    /*
+     * Show an overlay now instead of at its next period, and end the one that is
+     * showing. Without these an overlay can only be watched by waiting for its raster,
+     * which is also what makes one hard to develop against.
+     */
 #if (OVERLAYS_SUPPORT_DATE == STD_ON)
     StdReturnType ShowDateNow() { return ShowNow(date_); }
 #endif
@@ -275,7 +246,3 @@ class Overlays
 };
 
 #endif
-
-/******************************************************************************************************************************************************
- *  E N D   O F   F I L E
-******************************************************************************************************************************************************/

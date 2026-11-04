@@ -1,54 +1,37 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
+// Copyright 2017 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+/*!
+ * \file
+ * \brief The time the core reads, kept by the clock chip.
  *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       RealTimeClock.h
- *      \brief      The time the core reads, kept by the clock chip
+ * Simpler than the ESP32's counterpart, because there is nothing to reconcile: that backend has a
+ * network time and a chip and has to decide which of the two is right. Here the chip is the only
+ * source there is, so this reads it and hands on what it said.
  *
- *      \details    Simpler than the ESP32's counterpart, because there is nothing to
- *                  reconcile: that backend has a network time and a chip and has to decide
- *                  which of the two is right. Here the chip is the only source there is, so
- *                  this reads it and hands on what it said.
- *
- *                  A command that sets the time writes through to the chip and keeps the
- *                  value at once, rather than waiting for the next read to bring it back.
- *                  Otherwise the answer to the command would still show the old time.
- *
-******************************************************************************************************************************************************/
+ * A command that sets the time writes through to the chip and keeps the value at once, rather than
+ * waiting for the next read to bring it back. Otherwise the answer to the command would still show
+ * the old time.
+ */
+
 #ifndef _REAL_TIME_CLOCK_H_
 #define _REAL_TIME_CLOCK_H_
 
-/******************************************************************************************************************************************************
- * I N C L U D E S
-******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Arduino.h"
 #include "ClockDateTime.h"
 #include "DS3231.h"
 
-/******************************************************************************************************************************************************
- *  G L O B A L   C O N S T A N T   M A C R O S
-******************************************************************************************************************************************************/
 /* RealTimeClock configuration parameter */
-/* Application ticks between two reads of the chip, so once a second. A read is two
-   transfers on a bus the light sensor shares, and the display only ever shows minutes -
-   asking a hundred times a second would buy nothing. */
+/*
+ * Application ticks between two reads of the chip, so once a second. A read is two
+ * transfers on a bus the light sensor shares, and the display only ever shows minutes -
+ * asking a hundred times a second would buy nothing.
+ */
 #define REAL_TIME_CLOCK_CHIP_READ_INTERVAL              100u
 
-/******************************************************************************************************************************************************
- *  C L A S S   R E A L   T I M E   C L O C K
-******************************************************************************************************************************************************/
 class RealTimeClock
 {
-/******************************************************************************************************************************************************
- *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
-******************************************************************************************************************************************************/
   public:
     using HourType = ClockDateTime::HourType;
     using MinuteType = ClockDateTime::MinuteType;
@@ -59,19 +42,18 @@ class RealTimeClock
     using DayType = ClockDateTime::DayType;
     using WeekdayType = ClockDateTime::WeekdayType;
 
-/******************************************************************************************************************************************************
- *  P R I V A T E   D A T A   A N D   F U N C T I O N S
-******************************************************************************************************************************************************/
   private:
     static constexpr byte kChipReadInterval{REAL_TIME_CLOCK_CHIP_READ_INTERVAL};
 
     ClockDateTime date_time_;
-    /* An instance of its own, next to the one the core's temperature side keeps. The chip
-       has no state that two readers could disturb, and both reach it through the same bus
-       driver. */
+    /*
+     * An instance of its own, next to the one the core's temperature side keeps. The chip
+     * has no state that two readers could disturb, and both reach it through the same bus
+     * driver.
+     */
     DS3231 chip_;
-    /* Zero, so the first tick asks the chip straight away rather than showing the default
-       date for a second. */
+    // Zero, so the first tick asks the chip straight away rather than showing the default
+    // date for a second.
     byte chip_read_countdown_{0u};
 
     // functions
@@ -81,9 +63,6 @@ class RealTimeClock
     StdReturnType ReadChip();
     void WriteChip();
 
-/******************************************************************************************************************************************************
- *  P U B L I C   F U N C T I O N S
-******************************************************************************************************************************************************/
   public:
     static RealTimeClock& GetInstance() {
         static RealTimeClock singleton_instance;
@@ -105,7 +84,3 @@ class RealTimeClock
 };
 
 #endif // _REAL_TIME_CLOCK_H_
-
-/******************************************************************************************************************************************************
- *  E N D   O F   F I L E
-******************************************************************************************************************************************************/

@@ -1,34 +1,20 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+/*!
+ * \file
+ * \brief What is set for this board rather than for the firmware.
  *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       WordclockConfiguration.h
- *      \brief      What is set for this board rather than for the firmware
- *
- *      \details    Only what the application itself needs. Anything a peripheral owns - the
- *                  strip's pin, the bus frequency, the chip addresses - is configured in the
- *                  driver that owns it, so that a pin can be moved without a second file
- *                  having to agree.
- *
-******************************************************************************************************************************************************/
+ * Only what the application itself needs. Anything a peripheral owns - the strip's pin, the bus
+ * frequency, the chip addresses - is configured in the driver that owns it, so that a pin can be
+ * moved without a second file having to agree.
+ */
+
 #ifndef _WORDCLOCK_CONFIGURATION_H_
 #define _WORDCLOCK_CONFIGURATION_H_
 
-/******************************************************************************************************************************************************
- *  G L O B A L   C O N S T A N T   M A C R O S
-******************************************************************************************************************************************************/
-/* The same rate the other backends' consoles run at, so one terminal setting fits all
-   three. */
+// The same rate the other backends' consoles run at, so one terminal setting fits all
+// three.
 #define WORDCLOCK_SERIAL_BAUDRATE                       115200uL
 
 #endif // _WORDCLOCK_CONFIGURATION_H_
-
-/******************************************************************************************************************************************************
- *  E N D   O F   F I L E
-******************************************************************************************************************************************************/

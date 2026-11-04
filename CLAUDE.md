@@ -69,6 +69,13 @@ Comments say *why*, not what — the reasoning that is not recoverable from the
 code, such as which alternative was rejected and what went wrong with it. Keep a
 comment attached to the function whose behaviour it explains.
 
+Two kinds, as in Utl and MaxMatrix: a Doxygen block `/*! ... */` above a declaration
+in the header, for whoever calls it, and a comment on the implementation, `//` for one
+or two lines and `/* ... */` with a ` * ` on every line from three. Every file starts
+with the copyright, an SPDX line and a `\file` block. What a block holds, and how
+`tools/docs.py` and `-Wdocumentation` check it, is
+[docs/documentation.md](docs/documentation.md).
+
 ## Layout
 
 - `firmware/` — the platform-independent clock, shared by both targets.

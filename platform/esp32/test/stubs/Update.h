@@ -1,12 +1,14 @@
-/* Stands in for the Arduino core's Update object, which is what writes the other app
-   partition. What the cases here can check is the sequence the backend drives it through -
-   begun with the announced size, written the bytes that arrived, ended only when they all
-   did, aborted when they did not - and that is the part the backend owns. Whether the
-   flash write lands is the framework's, and no host test can say anything about it.
-
-   The refusal is settable, because the interesting failure is the one that happens before
-   any byte is written: an image larger than the partition, which is what picking the factory
-   file instead of the OTA one looks like from here. */
+/*
+ * Stands in for the Arduino core's Update object, which is what writes the other app
+ * partition. What the cases here can check is the sequence the backend drives it through -
+ * begun with the announced size, written the bytes that arrived, ended only when they all
+ * did, aborted when they did not - and that is the part the backend owns. Whether the
+ * flash write lands is the framework's, and no host test can say anything about it.
+ *
+ * The refusal is settable, because the interesting failure is the one that happens before
+ * any byte is written: an image larger than the partition, which is what picking the factory
+ * file instead of the OTA one looks like from here.
+ */
 #ifndef _UPDATE_H_
 #define _UPDATE_H_
 /* Under the framework's names, because it stands in for the framework's header. */
@@ -53,9 +55,11 @@ class UpdateClass
         return Length;
     }
 
-    /* The framework refuses an image that is shorter than the size begin() was given, which
-       is what a dropped connection leaves behind - so the stub refuses it too, or the case
-       for a truncated upload would pass on a backend that never checked. */
+    /*
+     * The framework refuses an image that is shorter than the size begin() was given, which
+     * is what a dropped connection leaves behind - so the stub refuses it too, or the case
+     * for a truncated upload would pass on a backend that never checked.
+     */
     bool end(bool)
     {
         Ended = (Written == Announced);

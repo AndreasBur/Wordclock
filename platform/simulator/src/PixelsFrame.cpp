@@ -1,3 +1,11 @@
+// Copyright 2017 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+/*!
+ * \file
+ * \brief The window of the simulator: the letter grid, rendered from the pixel buffer.
+ */
+
 #include "sim/PixelsFrame.h"
 #include "sim/Settings.h"
 #include "sim/MessageBuilder.h"
@@ -10,22 +18,21 @@
 #endif
 
 namespace {
-
-/* Taken from the firmware rather than kept here. There used to be a second copy of the
-   letters in this file, which had to be edited alongside the firmware's table and the
-   CharacterIdType enumeration that names the same positions - three places, and a
-   mismatch shows up as one wrong letter on a panel nobody rereads.
-
-   The firmware's table stores one byte per letter, so the umlauts are Latin-1 and need
-   converting; wxString would otherwise read 0xDC as an invalid UTF-8 byte and drop it. */
+/*
+ * Taken from the firmware rather than kept here. There used to be a second copy of the
+ * letters in this file, which had to be edited alongside the firmware's table and the
+ * CharacterIdType enumeration that names the same positions - three places, and a
+ * mismatch shows up as one wrong letter on a panel nobody rereads.
+ *
+ * The firmware's table stores one byte per letter, so the umlauts are Latin-1 and need
+ * converting; wxString would otherwise read 0xDC as an invalid UTF-8 byte and drop it.
+ */
 wxString ToCharacterLabel(char character)
 {
     return wxString(&character, wxCSConv(wxFONTENCODING_ISO8859_1), 1u);
 }
 
 } // namespace
-
-
 
 BEGIN_EVENT_TABLE(PixelsFrame, wxFrame)
     EVT_CLOSE(PixelsFrame::OnClose)
@@ -37,7 +44,6 @@ BEGIN_EVENT_TABLE(PixelsFrame, wxFrame)
     EVT_MENU(wxID_ABOUT, PixelsFrame::OnAbout)
     EVT_MENU(wxID_EXIT, PixelsFrame::OnQuit)
 END_EVENT_TABLE()
-
 
 PixelsFrame::PixelsFrame(wxWindow* parent, const wxString &title) : wxFrame(parent, -1, title)
 {
@@ -168,7 +174,6 @@ wxBoxSizer* PixelsFrame::CreateSizerControl(wxWindow* parent)
 
 PixelsFrame::~PixelsFrame()
 {
-
 }
 
 void PixelsFrame::OnClose(wxCloseEvent &event)
@@ -238,9 +243,11 @@ void PixelsFrame::RenderPixel(byte row, byte column)
     const wxColour colour = (pixels.GetBrightness() == 0u) ? wxColour(*wxLIGHT_GREY)
                                                            : ToColour(pixels.GetPixel(index));
 
-    /* SetForegroundColour marks the label for repaint even when the colour does not
-       change. Rendering now walks the whole grid instead of only the pixel that was
-       written, so without this every pass would repaint all 110 letters. */
+    /*
+     * SetForegroundColour marks the label for repaint even when the colour does not
+     * change. Rendering now walks the whole grid instead of only the pixel that was
+     * written, so without this every pass would repaint all 110 letters.
+     */
     if(characters_[row][column]->GetForegroundColour() == colour) { return; }
 
     characters_[row][column]->SetForegroundColour(colour);
@@ -255,17 +262,21 @@ void PixelsFrame::RenderAllPixels()
     }
 }
 
-/* Called once per application tick rather than from inside every pixel write, so the
-   window is repainted at most once per pass over the firmware's tasks - and not at all
-   on the ticks where the firmware wrote nothing. */
+/*
+ * Called once per application tick rather than from inside every pixel write, so the
+ * window is repainted at most once per pass over the firmware's tasks - and not at all
+ * on the ticks where the firmware wrote nothing.
+ */
 void PixelsFrame::Render()
 {
     Pixels& pixels = Pixels::GetInstance();
 
-    /* Before the dirty check rather than after it: while the strip has no supply nothing
-       may be drawn, and the buffer has to stay dirty so that the supply coming back
-       redraws it. What stands in the window until then is the black frame the switch-off
-       sequence sends on purpose, which is also what the wall would show. */
+    /*
+     * Before the dirty check rather than after it: while the strip has no supply nothing
+     * may be drawn, and the buffer has to stay dirty so that the supply coming back
+     * redraws it. What stands in the window until then is the black frame the switch-off
+     * sequence sends on purpose, which is also what the wall would show.
+     */
     if(pixels.IsOutputSuspended()) { return; }
 
     if(!pixels.IsDirty()) { return; }

@@ -1,25 +1,14 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
- *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       Overlay.h
- *      \brief
- *
- *      \details
- *
-******************************************************************************************************************************************************/
+// Copyright 2017 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+/*!
+ * \file
+ * \brief The base of the overlays, with the idle and show states they share.
+ */
+
 #ifndef _OVERLAY_H_
 #define _OVERLAY_H_
 
-/******************************************************************************************************************************************************
- * I N C L U D E S
-******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Arduino.h"
 #include "ClockDateTime.h"
@@ -28,29 +17,12 @@
 
 #include <type_traits>
 
-/******************************************************************************************************************************************************
- *  G L O B A L   C O N S T A N T   M A C R O S
-******************************************************************************************************************************************************/
 /* Overlay configuration parameter */
-
 
 /* Overlay parameter */
 
-
-
-/******************************************************************************************************************************************************
- *  G L O B A L   F U N C T I O N   M A C R O S
-******************************************************************************************************************************************************/
-
-
-/******************************************************************************************************************************************************
- *  C L A S S   O V E R L A Y
-******************************************************************************************************************************************************/
 template <typename Derived> class Overlay
 {
-/******************************************************************************************************************************************************
- *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
-******************************************************************************************************************************************************/
   public:
     enum class StateType {
         kDisabled,
@@ -66,18 +38,17 @@ template <typename Derived> class Overlay
     using SecondType = ClockDateTime::SecondType;
     using FontType = Text::FontType;
 
-/******************************************************************************************************************************************************
- *  P R O T E C T E D   D A T A   A N D   F U N C T I O N S
-******************************************************************************************************************************************************/
   protected:
     StateType state_{StateType::kDisabled};
 
     // functions
-    /* Protected rather than private with the derived class as a friend, which is what
-       clang-tidy asks for: a friend would open this base's whole private side to it, where
-       protected opens only what is meant for it. What the private constructor would
-       prevent - somebody inheriting this template with another class's Derived - the
-       assertion catches instead, at the first point where Derived is a complete type. */
+    /*
+     * Protected rather than private with the derived class as a friend, which is what
+     * clang-tidy asks for: a friend would open this base's whole private side to it, where
+     * protected opens only what is meant for it. What the private constructor would
+     * prevent - somebody inheriting this template with another class's Derived - the
+     * assertion catches instead, at the first point where Derived is a complete type.
+     */
     // NOLINTNEXTLINE(bugprone-crtp-constructor-accessibility)
     constexpr Overlay() {
         static_assert(std::is_base_of<Overlay, Derived>::value,
@@ -85,16 +56,14 @@ template <typename Derived> class Overlay
     }
     ~Overlay() { }
 
-
-/******************************************************************************************************************************************************
- *  P R I V A T E   D A T A   A N D   F U N C T I O N S
-******************************************************************************************************************************************************/
   private:
     static constexpr SecondType kSecondToStartShow{30u};
 
-    /* Named rather than written twice, so the initialisers below and ResetToDefaults()
-       cannot fall apart - a reset that put different values in than a clock starts with
-       would be a second set of defaults to keep in step. */
+    /*
+     * Named rather than written twice, so the initialisers below and ResetToDefaults()
+     * cannot fall apart - a reset that put different values in than a clock starts with
+     * would be a second set of defaults to keep in step.
+     */
     static constexpr MinuteType kPeriodInMinutesInitValue{1u};
     static constexpr SecondType kEnduranceInSecondsInitValue{1u};
     static constexpr MonthType kMonthInitValue{0u};
@@ -191,19 +160,17 @@ template <typename Derived> class Overlay
         else { return 0u; }
     }
 
-
-/******************************************************************************************************************************************************
- *  P U B L I C   F U N C T I O N S
-******************************************************************************************************************************************************/
   public:
-    /* The two transitions the period raster makes on its own, opened up for a caller that
-       wants the overlay now - the "show now" remote procedure calls. They are the same
-       transitions and not a second path into the show state, so an overlay started by
-       hand ends through the show timer like any other.
-
-       Whether the overlay may start at all is not decided here: only Overlays knows
-       whether another one already holds the display, and it owns the timer this hands
-       back. */
+    /*
+     * The two transitions the period raster makes on its own, opened up for a caller that
+     * wants the overlay now - the "show now" remote procedure calls. They are the same
+     * transitions and not a second path into the show state, so an overlay started by
+     * hand ends through the show timer like any other.
+     *
+     * Whether the overlay may start at all is not decided here: only Overlays knows
+     * whether another one already holds the display, and it owns the timer this hands
+     * back.
+     */
     SecondType StartShow(ClockDate current_date, ClockTime current_time) {
         return SetStateToShow(current_date, current_time);
     }
@@ -211,16 +178,18 @@ template <typename Derived> class Overlay
         SetStateToIdle(current_date, current_time);
     }
 
-    /* Whether the overlay has anything to show at all, which is not the same as being
-       switched on: the temperature has nothing until a chip has answered, and a clock
-       built without one never will. Asked before every start, by the period raster and by
-       the "show now" call alike, so that an overlay with nothing to say does not hold the
-       display for its endurance. The date and the text always have something.
-
-       Named apart from the IsReady() each overlay answers, rather than being the same name
-       in both places like SetStateToShow(): a derived member of the same name would hide
-       this one, and a caller outside the overlays - Overlays itself - would then reach the
-       private hook instead of this. */
+    /*
+     * Whether the overlay has anything to show at all, which is not the same as being
+     * switched on: the temperature has nothing until a chip has answered, and a clock
+     * built without one never will. Asked before every start, by the period raster and by
+     * the "show now" call alike, so that an overlay with nothing to say does not hold the
+     * display for its endurance. The date and the text always have something.
+     *
+     * Named apart from the IsReady() each overlay answers, rather than being the same name
+     * in both places like SetStateToShow(): a derived member of the same name would hide
+     * this one, and a caller outside the overlays - Overlays itself - would then reach the
+     * private hook instead of this.
+     */
     bool CanShow() const { return Underlying().IsReady(); }
 
 	// get methods
@@ -266,12 +235,14 @@ template <typename Derived> class Overlay
     void SetIsActive(bool is_active) { if(is_active) { EnableIsActive(); } else { DisableIsActive(); } }
 
 	// methods
-    /* Back to what a clock that was never configured has, now that the overlays are
-       stored and a reset has something to undo.
-
-       The derived hook is named apart from this for the reason CanShow() gives: a
-       ResetToDefaults() in an overlay would hide this one, and everything the base owns
-       would then quietly survive the reset. */
+    /*
+     * Back to what a clock that was never configured has, now that the overlays are
+     * stored and a reset has something to undo.
+     *
+     * The derived hook is named apart from this for the reason CanShow() gives: a
+     * ResetToDefaults() in an overlay would hide this one, and everything the base owns
+     * would then quietly survive the reset.
+     */
     void ResetToDefaults() {
         period_in_minutes_ = kPeriodInMinutesInitValue;
         endurance_in_seconds_ = kEnduranceInSecondsInitValue;
@@ -295,7 +266,3 @@ template <typename Derived> class Overlay
 };
 
 #endif
-
-/******************************************************************************************************************************************************
- *  E N D   O F   F I L E
-******************************************************************************************************************************************************/

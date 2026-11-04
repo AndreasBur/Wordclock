@@ -13,6 +13,10 @@
 #
 # Which checks are on, and why the rest are off, is in .clang-tidy and
 # .cppcheck-suppressions, not here.
+#
+# The comments are read as well: clang-tidy reads every Doxygen block with -Wdocumentation, and
+# the docs job has Doxygen read them, which is what notices a block that leaves out a
+# parameter. What a block holds is docs/documentation.md.
 # clang-tidy reads four builds, not one. The simulator's covers the firmware core as the
 # host compiler sees it; each hardware backend is only ever compiled by its own cross
 # compiler, so it is read through that build's database - rewritten by
@@ -206,3 +210,22 @@ jobs:
             -Iplatform/simulator/include/sim \
             -Iplatform/simulator/include \
             firmware/src firmware/inc
+
+  docs:
+    name: Doxygen blocks
+    runs-on: ubuntu-26.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install doxygen
+        uses: ./.github/actions/apt-install
+        with:
+          packages: doxygen
+
+      # Once per backend, over firmware/ and that backend: a \param that names no parameter, a
+      # command Doxygen does not know, a block in a module already written in the new style
+      # that leaves something out. The modules not yet written are listed in the script, and
+      # docs/documentation.md says what a block holds. The runner's python3 is enough.
+      - name: Check
+        run: python3 tools/docs.py

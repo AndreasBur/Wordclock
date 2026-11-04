@@ -1,50 +1,15 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
- *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       Text.cpp
- *      \brief
- *
- *      \details
- *
- *
-******************************************************************************************************************************************************/
+// Copyright 2017 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+/*!
+ * \file
+ * \brief What the text output does itself: glyph drawing and the shifting of characters and text.
+ */
+
 #define _TEXT_SOURCE_
 
-/******************************************************************************************************************************************************
- * I N C L U D E S
-******************************************************************************************************************************************************/
 #include "Text.h"
 
-
-/******************************************************************************************************************************************************
- *  L O C A L   C O N S T A N T   M A C R O S
-******************************************************************************************************************************************************/
-
-
-/******************************************************************************************************************************************************
- *  L O C A L   F U N C T I O N   M A C R O S
-******************************************************************************************************************************************************/
-
-
-/******************************************************************************************************************************************************
- *  L O C A L   D A T A   T Y P E S   A N D   S T R U C T U R E S
-******************************************************************************************************************************************************/
-
-
-/******************************************************************************************************************************************************
- * P U B L I C   F U N C T I O N S
-******************************************************************************************************************************************************/
-
-/******************************************************************************************************************************************************
-  SetChar()
-******************************************************************************************************************************************************/
 StdReturnType Text::SetChar(byte column, byte row, char character, FontType font)
 {
     byte font_index;
@@ -86,12 +51,8 @@ StdReturnType Text::SetChar(byte column, byte row, char character, FontType font
     }
 #endif
     return kENotOk;
-} /* SetChar */
+}
 
-
-/******************************************************************************************************************************************************
-  SetCharWithShift()
-******************************************************************************************************************************************************/
 void Text::SetCharWithShift(char character, FontType font)
 {
     state_ = StateType::kCharShift;
@@ -102,10 +63,6 @@ void Text::SetCharWithShift(char character, FontType font)
     shift_.counter = shift_.char_width;
 }
 
-
-/******************************************************************************************************************************************************
-  SetTextWithShift()
-******************************************************************************************************************************************************/
 void Text::SetTextWithShift(const char* text, FontType font)
 {
     state_ = StateType::kTextShift;
@@ -114,10 +71,6 @@ void Text::SetTextWithShift(const char* text, FontType font)
     shift_.text = text;
 }
 
-
-/******************************************************************************************************************************************************
-  Task()
-******************************************************************************************************************************************************/
 void Text::Task(bool show)
 {
     if(state_ == StateType::kTextShift) {
@@ -128,22 +81,14 @@ void Text::Task(bool show)
         CharShiftTask();
         if(show) { Display::GetInstance().Show(); }
     }
-} /* Task */
+}
 
-
-/******************************************************************************************************************************************************
-  Stop()
-******************************************************************************************************************************************************/
 void Text::Stop()
 {
     state_ = StateType::kIdle;
     shift_.state = ShiftStateType::kIdle;
-} /* Stop */
+}
 
-
-/******************************************************************************************************************************************************
-  GetFontHeight()
-******************************************************************************************************************************************************/
 byte Text::GetFontHeight(FontType font) const
 {
 #if(TEXT_SUPPORT_FONT_5X8 == STD_ON)
@@ -162,12 +107,8 @@ byte Text::GetFontHeight(FontType font) const
     if(font == FontType::kFont10x10) return font10x10_.GetHeight();
 #endif
     return 0;
-} /* GetFontHeight */
+}
 
-
-/******************************************************************************************************************************************************
-  GetFontWidth()
-******************************************************************************************************************************************************/
 byte Text::GetFontWidth(FontType font) const
 {
 #if(TEXT_SUPPORT_FONT_5X8 == STD_ON)
@@ -186,12 +127,8 @@ byte Text::GetFontWidth(FontType font) const
     if(font == FontType::kFont10x10) return font10x10_.GetWidth();
 #endif
     return 0;
-} /* GetFontWidth */
+}
 
-
-/******************************************************************************************************************************************************
-  GetFontCharWidth()
-******************************************************************************************************************************************************/
 byte Text::GetFontCharWidth(FontType font, char character) const
 {
     byte index = ConvertCharToFontIndex(character);
@@ -212,12 +149,8 @@ byte Text::GetFontCharWidth(FontType font, char character) const
     if(font == FontType::kFont10x10) return font10x10_.GetCharWidth(index);
 #endif
     return 0;
-} /* GetFontCharWidth */
+}
 
-
-/******************************************************************************************************************************************************
-  GetFontOrientation()
-******************************************************************************************************************************************************/
 Orientation Text::GetFontOrientation(FontType font) const
 {
 #if(TEXT_SUPPORT_FONT_5X8 == STD_ON)
@@ -236,16 +169,8 @@ Orientation Text::GetFontOrientation(FontType font) const
     if(font == FontType::kFont10x10) return font10x10_.GetOrientation();
 #endif
     return Orientation::kOrientationNone;
-} /* GetFontOrientation */
+}
 
-
-/******************************************************************************************************************************************************
- * P R I V A T E   F U N C T I O N S
-******************************************************************************************************************************************************/
-
-/******************************************************************************************************************************************************
-  StringShiftTask()
-******************************************************************************************************************************************************/
 void Text::StringShiftTask()
 {
     if(shift_.state == ShiftStateType::kIdle) {
@@ -265,12 +190,8 @@ void Text::StringShiftTask()
         /* go on shifting char */
         CharShiftTask();
     }
-} /* StringShiftTask */
+}
 
-
-/******************************************************************************************************************************************************
-  CharShiftTask()
-******************************************************************************************************************************************************/
 void Text::CharShiftTask()
 {
     if(shift_.state == ShiftStateType::kBusy) {
@@ -282,21 +203,19 @@ void Text::CharShiftTask()
             shift_.counter--;
             byte column = DISPLAY_NUMBER_OF_COLUMNS - shift_.char_width + shift_.counter;
             byte row = GetRowCenter(shift_.font);
-            /* A character SetChar refuses is shifted through as a space, which is the blank
-               glyph and therefore clears the cells the previous step wrote. Leaving it out
-               instead would smear those pixels across the display for as long as the text
-               runs. The width was already taken from the same substitute. */
+            /*
+             * A character SetChar refuses is shifted through as a space, which is the blank
+             * glyph and therefore clears the cells the previous step wrote. Leaving it out
+             * instead would smear those pixels across the display for as long as the text
+             * runs. The width was already taken from the same substitute.
+             */
             if(SetChar(column, row, shift_.character, shift_.font) == kENotOk) {
                 SetChar(column, row, ' ', shift_.font);
             }
         }
     }
-} /* CharShiftTask */
+}
 
-
-/******************************************************************************************************************************************************
-  SetCharFontHorizontal()
-******************************************************************************************************************************************************/
 template <typename RowType, byte RowsSize>
 StdReturnType Text::SetCharFontHorizontal(byte column, byte row, const FontCharHorizontal<RowType, RowsSize>& font_char, byte font_height)
 {
@@ -308,12 +227,8 @@ StdReturnType Text::SetCharFontHorizontal(byte column, byte row, const FontCharH
         if(SetCharRow(char_row, column, row_abs, font_char.GetWidth()) == kENotOk) { return kENotOk; }
     }
     return kEOk;
-} /* SetCharFontHorizontal */
+}
 
-
-/******************************************************************************************************************************************************
-  SetCharRow()
-******************************************************************************************************************************************************/
 template <typename RowType>
 StdReturnType Text::SetCharRow(RowType char_row, byte column, byte row_abs, byte font_width)
 {
@@ -329,12 +244,8 @@ StdReturnType Text::SetCharRow(RowType char_row, byte column, byte row_abs, byte
         }
     }
     return return_value;
-} /* SetCharRow */
+}
 
-
-/******************************************************************************************************************************************************
-  SetCharFontVertical()
-******************************************************************************************************************************************************/
 template <typename ColumnType, byte ColumnsSize>
 StdReturnType Text::SetCharFontVertical(byte column, byte row, const FontCharVertical<ColumnType, ColumnsSize>& font_char, byte font_height)
 {
@@ -346,12 +257,8 @@ StdReturnType Text::SetCharFontVertical(byte column, byte row, const FontCharVer
         if(SetCharColumn(char_column, column_abs, row, font_height) == kENotOk) { return kENotOk; }
     }
     return kEOk;
-} /* SetCharFontVertical */
+}
 
-
-/******************************************************************************************************************************************************
-  SetCharColumn()
-******************************************************************************************************************************************************/
 template <typename ColumnType>
 StdReturnType Text::SetCharColumn(ColumnType char_column, byte column_abs, byte row, byte font_height)
 {
@@ -367,12 +274,8 @@ StdReturnType Text::SetCharColumn(ColumnType char_column, byte column_abs, byte 
         }
     }
     return return_value;
-} /* SetCharColumn */
+}
 
-
-/******************************************************************************************************************************************************
-  ConvertCharToFontIndex()
-******************************************************************************************************************************************************/
 /*! \brief          converts char to sprite
  *  \details        this function converts the ASCII char to sprite index
  *
@@ -380,7 +283,7 @@ StdReturnType Text::SetCharColumn(ColumnType char_column, byte column_abs, byte 
  *  \param[out]     index           appropriate sprite
  *  \return         kEOk
  *                  kENotOk
- *****************************************************************************************************************************************************/
+ */
 StdReturnType Text::ConvertCharToFontIndex(char character, byte& index)
 {
     StdReturnType return_value = kENotOk;
@@ -392,13 +295,15 @@ StdReturnType Text::ConvertCharToFontIndex(char character, byte& index)
     else if('\xE4' == character) { index = 99u; return_value = kEOk; }
     else if('\xF6' == character) { index = 100u; return_value = kEOk; }
     else if('\xFC' == character) { index = 101u; return_value = kEOk; }
-    /* The degree sign sits with them for the same reason: Latin-1 0xB0 is nowhere near the
-       ASCII run, so it is appended past its end rather than shifting every index after it. */
+    // The degree sign sits with them for the same reason: Latin-1 0xB0 is nowhere near the
+    // ASCII run, so it is appended past its end rather than shifting every index after it.
     else if('\xB0' == character) { index = 102u; return_value = kEOk; }
-    /* For all others only add the offset - within both bounds, and compared as a byte.
-       Whether char is signed is the platform's decision: where it is not, and AVR is one
-       of those, every Latin-1 byte above the six umlauts passes a lower bound on its own
-       and indexes past the end of a font table that has 102 entries. */
+    /*
+     * For all others only add the offset - within both bounds, and compared as a byte.
+     * Whether char is signed is the platform's decision: where it is not, and AVR is one
+     * of those, every Latin-1 byte above the six umlauts passes a lower bound on its own
+     * and indexes past the end of a font table that has 102 entries.
+     */
     else {
         const byte value = static_cast<byte>(character);
 
@@ -407,35 +312,24 @@ StdReturnType Text::ConvertCharToFontIndex(char character, byte& index)
         }
     }
     return return_value;
-} /* ConvertCharToFontIndex */
+}
 
-
-/******************************************************************************************************************************************************
-  ConvertCharToFontIndex()
-******************************************************************************************************************************************************/
 /*! \brief          converts char to sprite
  *  \details        this function converts the ASCII char to sprite index
  *
- *  \param[in]      character            char to convert to sprite
- *  \param[out]     SpriteIndex     appropriate sprite
- *  \return         kEOk
- *                  kENotOk
- *****************************************************************************************************************************************************/
+ *  \param[in]      character       char to convert to sprite
+ *  \return         the sprite index, or the space's if the char has no sprite
+ */
 byte Text::ConvertCharToFontIndex(char character)
 {
     byte index;
 
-    /* The mapping is written once, above. It used to be written here as well, which made
-       adding a glyph a change in two branches that had to agree - see fonts.md. */
+    // The mapping is written once, above. It used to be written here as well, which made
+    // adding a glyph a change in two branches that had to agree - see fonts.md.
     if(ConvertCharToFontIndex(character, index) == kENotOk) {
-        /* The space, which is the first glyph: a character that cannot be drawn leaves a gap
-           rather than whatever byte sits past the end of the table. */
+        // The space, which is the first glyph: a character that cannot be drawn leaves a gap
+        // rather than whatever byte sits past the end of the table.
         return kSpaceFontIndex;
     }
     return index;
-} /* ConvertCharToFontIndex */
-
-
-/******************************************************************************************************************************************************
- *  E N D   O F   F I L E
-******************************************************************************************************************************************************/
+}

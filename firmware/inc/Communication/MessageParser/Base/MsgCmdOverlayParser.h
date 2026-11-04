@@ -1,54 +1,27 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
- *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       MsgCmdOverlayParser.h
- *      \brief
- *
- *      \details
- *
-******************************************************************************************************************************************************/
+// Copyright 2021 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+/*!
+ * \file
+ * \brief The parser the date, temperature and text overlay commands share.
+ */
+
 #ifndef _MSG_CMD_OVERLAY_PARSER_H_
 #define _MSG_CMD_OVERLAY_PARSER_H_
 
-/******************************************************************************************************************************************************
- * I N C L U D E S
-******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Arduino.h"
 #include "MsgParameterParser.h"
 #include "MsgCmdBaseOverlayParser.h"
 #include "Overlays.h"
 
-/******************************************************************************************************************************************************
- *  G L O B A L   C O N S T A N T   M A C R O S
-******************************************************************************************************************************************************/
 /* MsgCmdOverlayParser configuration parameter */
-
 
 /* MsgCmdOverlayParser parameter */
 
-
-/******************************************************************************************************************************************************
- *  G L O B A L   F U N C T I O N   M A C R O S
-******************************************************************************************************************************************************/
-
-
-/******************************************************************************************************************************************************
- *  C L A S S   M S G   C M D   O V E R L A Y   P A R S E R
-******************************************************************************************************************************************************/
 template <typename Derived> class MsgCmdOverlayParser
     : public MsgParameterParser<MsgCmdOverlayParser<Derived>, MSG_CMD_BASE_OVERLAY_PARSER_PARAMETER_TABLE_SIZE>, public MsgCmdBaseOverlayParser
 {
-/******************************************************************************************************************************************************
- *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
-******************************************************************************************************************************************************/
   public:
     using MsgParameterParserType = MsgParameterParser<MsgCmdOverlayParser<Derived>, MSG_CMD_BASE_OVERLAY_PARSER_PARAMETER_TABLE_SIZE>;
     using PositionType = typename MsgParameterParserType::PositionType;
@@ -62,16 +35,15 @@ template <typename Derived> class MsgCmdOverlayParser
     using SecondType = ClockDateTime::SecondType;
     using FontType = Text::FontType;
 
-/******************************************************************************************************************************************************
- *  P R O T E C T E D   D A T A   A N D   F U N C T I O N S
-******************************************************************************************************************************************************/
   protected:
     // functions
-    /* Protected rather than private with the derived class as a friend, which is what
-       clang-tidy asks for: a friend would open this base's whole private side to it, where
-       protected opens only what is meant for it. What the private constructor would
-       prevent - somebody inheriting this template with another class's Derived - the
-       assertion catches instead, at the first point where Derived is a complete type. */
+    /*
+     * Protected rather than private with the derived class as a friend, which is what
+     * clang-tidy asks for: a friend would open this base's whole private side to it, where
+     * protected opens only what is meant for it. What the private constructor would
+     * prevent - somebody inheriting this template with another class's Derived - the
+     * assertion catches instead, at the first point where Derived is a complete type.
+     */
     // NOLINTNEXTLINE(bugprone-crtp-constructor-accessibility)
     constexpr MsgCmdOverlayParser(const char* parameter) : MsgParameterParserType(kParameterTable, parameter) {
         static_assert(std::is_base_of<MsgCmdOverlayParser, Derived>::value,
@@ -79,9 +51,6 @@ template <typename Derived> class MsgCmdOverlayParser
     }
     ~MsgCmdOverlayParser() { }
 
-/******************************************************************************************************************************************************
- *  P R I V A T E   D A T A   A N D   F U N C T I O N S
-******************************************************************************************************************************************************/
   private:
     friend class MsgParameterParser<MsgCmdOverlayParser<Derived>, MSG_CMD_BASE_OVERLAY_PARSER_PARAMETER_TABLE_SIZE>;
 
@@ -128,12 +97,7 @@ template <typename Derived> class MsgCmdOverlayParser
     void SendAnswerActive(bool append_space) const { MsgParameterParserType::SendAnswerParameter(kActiveOptionShortName, Underlying().GetIsActive(), append_space); }
     void SendAnswerText(bool append_space) const { Underlying().SendAnswerText(append_space); }
 
-
-/******************************************************************************************************************************************************
- *  P U B L I C   F U N C T I O N S
-******************************************************************************************************************************************************/
   public:
-
 
     // get methods
 
@@ -158,7 +122,3 @@ template <typename Derived> class MsgCmdOverlayParser
 };
 
 #endif
-
-/******************************************************************************************************************************************************
- *  E N D   O F   F I L E
-******************************************************************************************************************************************************/

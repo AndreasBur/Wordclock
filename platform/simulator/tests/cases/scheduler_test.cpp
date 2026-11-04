@@ -1,10 +1,4 @@
-/******************************************************************************************************************************************************
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       scheduler_test.cpp
- *      \brief      The speed/cycle round trip and the uptime counter
-******************************************************************************************************************************************************/
-
+// The speed/cycle round trip and the uptime counter.
 
 #include "check.h"
 #include "cases.h"
@@ -12,9 +6,11 @@
 #include "Scheduler.h"
 #include "Uptime.h"
 
-/* Only the round trip. That speed 1 maps to cycle 255 and speed 255 to cycle 1 is
-   asserted at compile time in Scheduler.h, so repeating those points here would test
-   the compiler rather than the code. */
+/*
+ * Only the round trip. That speed 1 maps to cycle 255 and speed 255 to cycle 1 is
+ * asserted at compile time in Scheduler.h, so repeating those points here would test
+ * the compiler rather than the code.
+ */
 void TestSchedulerSpeedRoundTrip()
 {
     for(unsigned int speed = 0u; speed <= UINT8_MAX; speed++) {
@@ -25,11 +21,13 @@ void TestSchedulerSpeedRoundTrip()
     }
 }
 
-/* The uptime, driven through its own task rather than through the clock: the thing worth
-   proving is the carry, and a test that waited for it would take a day. Counting is what
-   replaced dividing a millisecond counter down, which ran out after 45 days on a field a
-   wall clock outlives - so the boundaries checked here are the three carries and the fact
-   that a day's worth of ticks lands exactly on one day, not near it. */
+/*
+ * The uptime, driven through its own task rather than through the clock: the thing worth
+ * proving is the carry, and a test that waited for it would take a day. Counting is what
+ * replaced dividing a millisecond counter down, which ran out after 45 days on a field a
+ * wall clock outlives - so the boundaries checked here are the three carries and the fact
+ * that a day's worth of ticks lands exactly on one day, not near it.
+ */
 void TestUptimeCountsWithoutWrapping()
 {
     Uptime& uptime = Uptime::GetInstance();
@@ -51,8 +49,8 @@ void TestUptimeCountsWithoutWrapping()
     Expect(uptime.GetDays() == 1u && uptime.GetHours() == 0u && uptime.GetMinutes() == 0u,
            "twenty-four hours must be one day exactly");
 
-    /* A second day, because a carry that works once can still be a carry that only works
-       from zero. */
+    // A second day, because a carry that works once can still be a carry that only works
+    // from zero.
     for(unsigned int second = 0u; second < 24u * 60u * 60u; second++) { uptime.Task(); }
     Expect(uptime.GetDays() == 2u && uptime.GetHours() == 0u && uptime.GetMinutes() == 0u,
            "and the day after it must follow the same way");

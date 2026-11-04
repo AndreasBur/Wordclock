@@ -1,3 +1,11 @@
+// Copyright 2017 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+/*!
+ * \file
+ * \brief The wxWidgets application of the simulator.
+ */
+
 #ifndef WORDCLOCKAPP_H
 #define WORDCLOCKAPP_H
 

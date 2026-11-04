@@ -1,34 +1,20 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
- *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       Clock.h
- *      \brief
- *
- *      \details
- *
- *****************************************************************************************************************************************************/
+// Copyright 2017 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+/*!
+ * \file
+ * \brief The clock: turns a time into the words to show, in the selectable dialects.
+ */
+
 #ifndef _CLOCK_H_
 #define _CLOCK_H_
 
-/******************************************************************************************************************************************************
- * INCLUDES
-******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Arduino.h"
 #include "Display.h"
 #include "ClockWords.h"
 #include <array>
 
-/******************************************************************************************************************************************************
- *  GLOBAL CONSTANT MACROS
-******************************************************************************************************************************************************/
 /* Clock configuration parameter */
 #define CLOCK_SHOW_IT_IS_PERMANENTLY            STD_ON
 #define CLOCK_INITIAL_MODE                      ModeType::kWessi
@@ -45,24 +31,8 @@
 #define CLOCK_MINUTE_STEP_IN_MINUTES            5u
 #define CLOCK_NUMBER_OF_MINUTE_STEPS            12u
 
-/******************************************************************************************************************************************************
- *  GLOBAL FUNCTION MACROS
-******************************************************************************************************************************************************/
-
-
-/******************************************************************************************************************************************************
- *  GLOBAL DATA TYPES AND STRUCTURES
- *****************************************************************************************************************************************************/
-
-
-/******************************************************************************************************************************************************
- *  C L A S S   C L O C K
-******************************************************************************************************************************************************/
 class Clock
 {
-/******************************************************************************************************************************************************
- *  GLOBAL DATA TYPES AND STRUCTURES
-******************************************************************************************************************************************************/
   public:
     enum class ModeType {
         kWessi,
@@ -96,16 +66,15 @@ class Clock
     using HourTableElementType = HourType;
     using MinuteTableElementType = MinuteType;
 
-/******************************************************************************************************************************************************
- *  P R I V A T E   D A T A   A N D   F U N C T I O N S
-******************************************************************************************************************************************************/
   private:
     static constexpr bool kShowItIsPermanentlyInitValue{CLOCK_SHOW_IT_IS_PERMANENTLY == STD_ON};
 
     ModeType mode_{CLOCK_INITIAL_MODE};
-    /* Whether "es ist" stands in every time or only in the two it is said in. A setting
-       rather than the compile-time switch it was: both are ways German tells the time, the
-       clock can say either, and which one somebody wants is not a property of the build. */
+    /*
+     * Whether "es ist" stands in every time or only in the two it is said in. A setting
+     * rather than the compile-time switch it was: both are ways German tells the time, the
+     * clock can say either, and which one somebody wants is not a property of the build.
+     */
     bool show_it_is_permanently_{kShowItIsPermanentlyInitValue};
 
     static const HourType kHoursTable[][CLOCK_NUMBER_OF_HOURS];
@@ -145,9 +114,6 @@ class Clock
         return (ToUnderlying(mode) + 1u >= kNumberOfModes) ? ModeType::kWessi : static_cast<ModeType>(ToUnderlying(mode) + 1u);
     }
 
-/******************************************************************************************************************************************************
- *  P U B L I C   F U N C T I O N S
-******************************************************************************************************************************************************/
   public:
     static Clock& GetInstance() {
         static Clock singleton_instance(CLOCK_INITIAL_MODE);
@@ -173,12 +139,14 @@ class Clock
     }
 
     // methods
-    /* One wording further, wrapping at the last, for a control that cannot name a mode.
-       It draws nothing: the words of the new wording differ from the ones DisplayManager
-       has latched, so its next task finds the change and puts them up the way it does
-       for every other one - with the selected animation, which "8 -M<id>" does not do.
-       Where two wordings say the same thing at the current time there is nothing to
-       redraw, and nothing happens, which is the right answer rather than a missed one. */
+    /*
+     * One wording further, wrapping at the last, for a control that cannot name a mode.
+     * It draws nothing: the words of the new wording differ from the ones DisplayManager
+     * has latched, so its next task finds the change and puts them up the way it does
+     * for every other one - with the selected animation, which "8 -M<id>" does not do.
+     * Where two wordings say the same thing at the current time there is nothing to
+     * redraw, and nothing happens, which is the right answer rather than a missed one.
+     */
     void NextMode() { SetMode(ToNextMode(mode_)); }
 
     void ResetToDefaults() {
@@ -207,8 +175,4 @@ class Clock
     }
 };
 
-
 #endif
-/******************************************************************************************************************************************************
- *  END OF FILE
-******************************************************************************************************************************************************/

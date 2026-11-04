@@ -1,30 +1,16 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
- *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       DS3231.cpp
- *      \brief      The clock chip: the time it counted, and the temperature it measures, see DS3231.h
- *
-******************************************************************************************************************************************************/
+// Copyright 2017 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
 
-/******************************************************************************************************************************************************
- * I N C L U D E S
-******************************************************************************************************************************************************/
+/*!
+ * \file
+ * \brief The clock chip: the time it counted, and the temperature it measures, see DS3231.h.
+ */
+
 #include "Arduino.h"
 #include "DS3231.h"
 #include "Twi.h"
 
-/******************************************************************************************************************************************************
- *  L O C A L   D A T A
-******************************************************************************************************************************************************/
 namespace {
-
 /* Where each field sits in the seven-register block that is read and written in one go. */
 constexpr byte kRegisterSeconds{0u};
 constexpr byte kRegisterMinutes{1u};
@@ -34,54 +20,39 @@ constexpr byte kRegisterDay{4u};
 constexpr byte kRegisterMonth{5u};
 constexpr byte kRegisterYear{6u};
 
-/* The chip keeps two year digits and a century bit; ClockDate covers 2000 to 2099, so the
-   bit is always clear and the century is this constant. */
+// The chip keeps two year digits and a century bit; ClockDate covers 2000 to 2099, so the
+// bit is always clear and the century is this constant.
 constexpr ClockDateTime::YearType kYearOfCentury{2000u};
 
-/* The chip counts weekdays from one, ClockDate from zero. Neither says which day is
-   first, and nothing reads the register back, so only the range has to match. */
+// The chip counts weekdays from one, ClockDate from zero. Neither says which day is
+// first, and nothing reads the register back, so only the range has to match.
 constexpr byte kWeekdayOffset{1u};
 
 } // namespace
 
-/******************************************************************************************************************************************************
- *  P R I V A T E   F U N C T I O N S
-******************************************************************************************************************************************************/
-
-/******************************************************************************************************************************************************
-  StartBus()
-******************************************************************************************************************************************************/
 /*! \brief          Opens the bus this chip shares with the light sensor
  *  \details        Idempotent, so whichever driver runs first opens it and the other finds
  *                  it open. Neither owns the bus, and neither can be relied on to run at all
  *                  on a board where only one of the two is fitted.
-******************************************************************************************************************************************************/
+ */
 StdReturnType DS3231::StartBus()
 {
     Twi::GetInstance().Init();
 
     return kEOk;
-} /* StartBus */
+}
 
-
-/******************************************************************************************************************************************************
-  ReadRegisters()
-******************************************************************************************************************************************************/
 StdReturnType DS3231::ReadRegisters(byte register_address, byte* values, byte length)
 {
     return Twi::GetInstance().ReadRegister(DS3231_I2C_ADDR, register_address, values, length);
-} /* ReadRegisters */
+}
 
-
-/******************************************************************************************************************************************************
-  WriteRegisters()
-******************************************************************************************************************************************************/
 /*! \brief          Writes a block of registers starting at one address
  *  \details        The block goes out in a single transfer rather than register by register:
  *                  the chip counts on while it is written, and seven separate transfers
  *                  would let the seconds roll over between two of them and leave the chip
  *                  holding a time assembled from two different ones.
-******************************************************************************************************************************************************/
+ */
 StdReturnType DS3231::WriteRegisters(byte register_address, const byte* values, byte length)
 {
     byte buffer[DS3231_DATE_TIME_NUMBER_OF_BYTES + 1u]{};
@@ -92,17 +63,13 @@ StdReturnType DS3231::WriteRegisters(byte register_address, const byte* values, 
     for(byte index = 0u; index < length; index++) { buffer[index + 1u] = values[index]; }
 
     return Twi::GetInstance().Write(DS3231_I2C_ADDR, buffer, static_cast<byte>(length + 1u));
-} /* WriteRegisters */
+}
 
-
-/******************************************************************************************************************************************************
-  HasOscillatorStopped()
-******************************************************************************************************************************************************/
 /*! \brief          Whether the chip admits it lost track of time
  *  \details        A chip that cannot be read is treated as stopped: both mean there is no
  *                  time to be had from it, and the caller has one case to handle instead of
  *                  two.
-******************************************************************************************************************************************************/
+ */
 bool DS3231::HasOscillatorStopped()
 {
     byte status{0u};
@@ -110,12 +77,8 @@ bool DS3231::HasOscillatorStopped()
     if(ReadRegisters(DS3231_REG_STATUS, &status, 1u) == kENotOk) { return true; }
 
     return (status & DS3231_STATUS_OSCILLATOR_STOPPED_MASK) != 0u;
-} /* HasOscillatorStopped */
+}
 
-
-/******************************************************************************************************************************************************
-  ClearOscillatorStopped()
-******************************************************************************************************************************************************/
 StdReturnType DS3231::ClearOscillatorStopped()
 {
     byte status{0u};
@@ -125,12 +88,8 @@ StdReturnType DS3231::ClearOscillatorStopped()
     status &= static_cast<byte>(~DS3231_STATUS_OSCILLATOR_STOPPED_MASK);
 
     return WriteRegisters(DS3231_REG_STATUS, &status, 1u);
-} /* ClearOscillatorStopped */
+}
 
-
-/******************************************************************************************************************************************************
-  ReadTemperature()
-******************************************************************************************************************************************************/
 StdReturnType DS3231::ReadTemperature()
 {
     byte registers[DS3231_TEMPERATURE_NUMBER_OF_BYTES]{};
@@ -141,33 +100,23 @@ StdReturnType DS3231::ReadTemperature()
     temperature_valid_ = true;
 
     return kEOk;
-} /* ReadTemperature */
+}
 
-
-/******************************************************************************************************************************************************
- *  P U B L I C   F U N C T I O N S
-******************************************************************************************************************************************************/
-
-/******************************************************************************************************************************************************
-  Task()
-******************************************************************************************************************************************************/
 void DS3231::Task()
 {
     if(StartBus() == kENotOk) { return; }
 
     ReadTemperature();
-} /* Task */
+}
 
-
-/* Instance methods, though some of them read no member: they are the interface the
-   firmware core calls through GetInstance(), and every backend - the simulator's
-   stand-ins included - offers it that way. Whether this backend's implementation
-   happens to need a member is its own detail, and answering the check would carry
-   that detail into the interface. */
+/*
+ * Instance methods, though some of them read no member: they are the interface the
+ * firmware core calls through GetInstance(), and every backend - the simulator's
+ * stand-ins included - offers it that way. Whether this backend's implementation
+ * happens to need a member is its own detail, and answering the check would carry
+ * that detail into the interface.
+ */
 // NOLINTBEGIN(readability-convert-member-functions-to-static)
-/******************************************************************************************************************************************************
-  GetDateTime()
-******************************************************************************************************************************************************/
 /*! \brief          Reads what the chip counted, in UTC
  *  \details        The stopped flag is asked first and not afterwards: a chip whose
  *                  oscillator stood still has registers that still read like a date, and
@@ -178,7 +127,7 @@ void DS3231::Task()
  *                  zero, and a transfer that lost its way reads anything. Hence the value is
  *                  assembled through ClockDateTime's own setters and their return codes
  *                  rather than trusted.
-******************************************************************************************************************************************************/
+ */
 StdReturnType DS3231::GetDateTime(ClockDateTime& date_time)
 {
     if(StartBus() == kENotOk) { return kENotOk; }
@@ -201,12 +150,8 @@ StdReturnType DS3231::GetDateTime(ClockDateTime& date_time)
 
     date_time = value;
     return kEOk;
-} /* GetDateTime */
+}
 
-
-/******************************************************************************************************************************************************
-  SetDateTime()
-******************************************************************************************************************************************************/
 StdReturnType DS3231::SetDateTime(const ClockDateTime& date_time)
 {
     if(StartBus() == kENotOk) { return kENotOk; }
@@ -224,9 +169,5 @@ StdReturnType DS3231::SetDateTime(const ClockDateTime& date_time)
     if(WriteRegisters(DS3231_REG_SECONDS, registers, DS3231_DATE_TIME_NUMBER_OF_BYTES) == kENotOk) { return kENotOk; }
 
     return ClearOscillatorStopped();
-} /* SetDateTime */
+}
 // NOLINTEND(readability-convert-member-functions-to-static)
-
-/******************************************************************************************************************************************************
- *  E N D   O F   F I L E
-******************************************************************************************************************************************************/

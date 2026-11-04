@@ -1,0 +1,5 @@
+# clangd reads build/compile_commands.json and .clang-tidy on its own; this file adds what
+# .clang-tidy passes as ExtraArgs, which clangd does not read: the checks of the Doxygen blocks,
+# so that the editor shows what static-analysis.yml reports. See docs/documentation.md.
+CompileFlags:
+  Add: [-Wdocumentation, -Wdocumentation-unknown-command]

@@ -1,58 +1,26 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
- *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       DisplayCharacters.h
- *      \brief      
- *
- *      \details    
- *                  
-******************************************************************************************************************************************************/
+// Copyright 2017 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+/*!
+ * \file
+ * \brief The letters of the grid, by id, and the size of the grid.
+ */
+
 #ifndef _DISPLAY_CHARACTERS_H_
 #define _DISPLAY_CHARACTERS_H_
 
-/******************************************************************************************************************************************************
- * INCLUDES
-******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Arduino.h"
 
-
-/******************************************************************************************************************************************************
- *  GLOBAL CONSTANT MACROS
-******************************************************************************************************************************************************/
 /* DisplayCharacters configuration parameter */
-
 
 /* DisplayCharacters parameter */
 #define DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS                11u
 #define DISPLAY_CHARACTERS_NUMBER_OF_ROWS                   10u
 #define DISPLAY_CHARACTERS_NUMBER_OF_CHARACTERS             (DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS * DISPLAY_CHARACTERS_NUMBER_OF_ROWS)
 
-/******************************************************************************************************************************************************
- *  GLOBAL FUNCTION MACROS
-******************************************************************************************************************************************************/
-
-
-/******************************************************************************************************************************************************
- *  GLOBAL DATA TYPES AND STRUCTURES
- *****************************************************************************************************************************************************/
-
-
-/******************************************************************************************************************************************************
- *  C L A S S   D I S P L A Y C H A R A C T E R S
-******************************************************************************************************************************************************/
 class DisplayCharacters
 {
-/******************************************************************************************************************************************************
- *  GLOBAL DATA TYPES AND STRUCTURES
-******************************************************************************************************************************************************/
   public:
     enum class CharacterIdType {
         kE1,
@@ -173,17 +141,16 @@ class DisplayCharacters
 
     using DisplayCharactersTableElementType = char;
 
-/******************************************************************************************************************************************************
- *  P R I V A T E   D A T A   A N D   F U N C T I O N S
-******************************************************************************************************************************************************/
   private:
     static const char kDisplayCharactersTable[][DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS + 1u];
 
     // functions
-    /* Row first, because that is how the table is written - one string per row. It used
-       to be indexed the other way round, which every caller then compensated for by
-       swapping its arguments; the two that did not compensate read past the end of the
-       table for the last column. Nothing called any of them, so nothing showed it. */
+    /*
+     * Row first, because that is how the table is written - one string per row. It used
+     * to be indexed the other way round, which every caller then compensated for by
+     * swapping its arguments; the two that did not compensate read past the end of the
+     * table for the last column. Nothing called any of them, so nothing showed it.
+     */
     static DisplayCharactersTableElementType GetDisplayCharactersTableElement(byte column, byte row) {
         DisplayCharactersTableElementType display_characters_table_element;
         memcpy_P(&display_characters_table_element, &kDisplayCharactersTable[row][column], sizeof(DisplayCharactersTableElementType));
@@ -195,18 +162,17 @@ class DisplayCharacters
         return GetDisplayCharactersTableElement(column, row);
     }
 
-/******************************************************************************************************************************************************
- *  P U B L I C   F U N C T I O N S
-******************************************************************************************************************************************************/
   public:
     constexpr DisplayCharacters() { }
     ~DisplayCharacters() { }
 
-    /* Two forms of every reader, and the argument list says which: the one taking a
-       reference answers whether the character was there, the one taking none answers the
-       character. Both check, and the unchecked read is the private table element above -
-       a plate has no character outside its grid, so STD_NULL_CHARACTER is the honest
-       answer where a read past the table used to be. */
+    /*
+     * Two forms of every reader, and the argument list says which: the one taking a
+     * reference answers whether the character was there, the one taking none answers the
+     * character. Both check, and the unchecked read is the private table element above -
+     * a plate has no character outside its grid, so STD_NULL_CHARACTER is the honest
+     * answer where a read past the table used to be.
+     */
     // get methods
     static char GetCharacter(byte column, byte row) {
         if(!IsColumnAndRowValid(column, row)) { return STD_NULL_CHARACTER; }
@@ -232,16 +198,14 @@ class DisplayCharacters
     static constexpr bool IsColumnAndRowValid(byte column, byte row) {
         return (column < DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS) && (row < DISPLAY_CHARACTERS_NUMBER_OF_ROWS);
     }
-    /* Column before Row, matching both the name and Display's function of the same name.
-       They were the other way round here, so a caller that read the two classes side by
-       side got a silent swap. */
+    /*
+     * Column before Row, matching both the name and Display's function of the same name.
+     * They were the other way round here, so a caller that read the two classes side by
+     * side got a silent swap.
+     */
     static void IndexToColumnAndRow(byte index, byte& column, byte& row) { column = index % DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS; row = index / DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS; }
     static byte ColumnAndRowToIndex(byte column, byte row) { return (row * DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS) + column; }
 
 };
 
-
 #endif
-/******************************************************************************************************************************************************
- *  E N D   O F   F I L E
-******************************************************************************************************************************************************/

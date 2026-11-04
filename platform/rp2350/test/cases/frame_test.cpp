@@ -1,10 +1,12 @@
-/* What Pixels::Render() puts on the wire, checked against a captured transfer. The DMA
-   call is stubbed here rather than in pio_stubs.cpp because this test has to keep the frame
-   the driver handed over - the shared stub throws it away.
-
-   One word per LED here where the ESP32 has three bytes, which is the shape the state
-   machine reads. The check is the same question asked of a different container: green,
-   then red, then blue, from the top of the word down. */
+/*
+ * What Pixels::Render() puts on the wire, checked against a captured transfer. The DMA
+ * call is stubbed here rather than in pio_stubs.cpp because this test has to keep the frame
+ * the driver handed over - the shared stub throws it away.
+ *
+ * One word per LED here where the ESP32 has three bytes, which is the shape the state
+ * machine reads. The check is the same question asked of a different container: green,
+ * then red, then blue, from the top of the word down.
+ */
 #include <hardware/clocks.h>
 #include <hardware/dma.h>
 #include <hardware/pio.h>
@@ -19,9 +21,11 @@
 static uint32_t captured[256];
 static size_t captured_count = 0;
 
-/* The blocks themselves, which the driver takes the FIFO address out of. Defined here as
-   well as in pio_stubs.cpp because this test links that file's replacement rather than the
-   file. */
+/*
+ * The blocks themselves, which the driver takes the FIFO address out of. Defined here as
+ * well as in pio_stubs.cpp because this test links that file's replacement rather than the
+ * file.
+ */
 pio_hw pio0_hw{};
 pio_hw pio1_hw{};
 
@@ -54,14 +58,15 @@ void dma_channel_configure(uint, const dma_channel_config*, volatile void*, cons
     memcpy(captured, source, count * sizeof(uint32_t));
 }
 
-/* The three bytes as the strip receives them, taken out of the word the way the state
-   machine shifts them: from bit 31 down. Written out here rather than compared against the
-   shifts the driver used, so that a change to those has to be justified against the wire
-   order and not against itself. */
+/*
+ * The three bytes as the strip receives them, taken out of the word the way the state
+ * machine shifts them: from bit 31 down. Written out here rather than compared against the
+ * shifts the driver used, so that a change to those has to be justified against the wire
+ * order and not against itself.
+ */
 static byte Green(uint32_t word) { return static_cast<byte>((word >> 24u) & 0xFFu); }
 static byte Red(uint32_t word)   { return static_cast<byte>((word >> 16u) & 0xFFu); }
 static byte Blue(uint32_t word)  { return static_cast<byte>((word >> 8u) & 0xFFu); }
-
 
 int main()
 {
@@ -78,8 +83,8 @@ int main()
           "pixel 0 goes out as green, red, blue from the top of the word");
     Check(Green(captured[12]) == 2u && Red(captured[12]) == 1u && Blue(captured[12]) == 3u,
           "pixel 12 goes out as green, red, blue in word 12");
-    /* The eight low bits are never shifted out - autopull refills after 24 - so nothing
-       may depend on them, and nothing here checks them. */
+    // The eight low bits are never shifted out - autopull refills after 24 - so nothing
+    // may depend on them, and nothing here checks them.
     Check(!p.IsDirty(), "render clears the dirty flag");
 
     captured_count = 0;

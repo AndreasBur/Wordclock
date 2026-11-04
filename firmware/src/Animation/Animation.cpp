@@ -1,52 +1,15 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
- *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       Animation.cpp
- *      \brief
- *
- *      \details
- *
- *
-******************************************************************************************************************************************************/
+// Copyright 2017 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+/*!
+ * \file
+ * \brief What the animation base class does itself.
+ */
+
 #define _ANIMATION_SOURCE_
 
-/******************************************************************************************************************************************************
- * I N C L U D E S
-******************************************************************************************************************************************************/
 #include "Animation.h"
 
-
-/******************************************************************************************************************************************************
- *  L O C A L   C O N S T A N T   M A C R O S
-******************************************************************************************************************************************************/
-
-
-/******************************************************************************************************************************************************
- *  L O C A L   F U N C T I O N   M A C R O S
-******************************************************************************************************************************************************/
-
-
-
-/******************************************************************************************************************************************************
- *  L O C A L   D A T A   T Y P E S   A N D   S T R U C T U R E S
-******************************************************************************************************************************************************/
-
-
-
-/******************************************************************************************************************************************************
- * P U B L I C   F U N C T I O N S
-******************************************************************************************************************************************************/
-
-/******************************************************************************************************************************************************
-  IsPixelPartOfClockWords()
-******************************************************************************************************************************************************/
 bool Animation::IsPixelPartOfClockWords(const ClockWords::WordsListType clock_words_table, byte column, byte row)
 {
     DisplayWords words;
@@ -57,44 +20,29 @@ bool Animation::IsPixelPartOfClockWords(const ClockWords::WordsListType clock_wo
         if(word.GetRow() == row) { if((column >= word.GetColumn()) && (column < word.GetColumn() + word.GetLength())) { return true; } }
     }
     return false;
-} /* isPixelPartOfWord */
+}
 
-/******************************************************************************************************************************************************
-  IsPixelPartOfClockWords()
-******************************************************************************************************************************************************/
 bool Animation::IsPixelPartOfClockWords(const ClockWords::WordsListType clock_words_table, byte index)
 {
     byte row = index / DISPLAY_NUMBER_OF_COLUMNS;
     byte column = index % DISPLAY_NUMBER_OF_COLUMNS;
 
     return IsPixelPartOfClockWords(clock_words_table, column, row);
-} /* isPixelPartOfWord */
+}
 
-
-/******************************************************************************************************************************************************
-  SelectByTime()
-******************************************************************************************************************************************************/
 byte Animation::SelectByTime(byte hour, byte minute, byte number_of_values)
 {
-    /* Lets an animation vary from minute to minute without keeping a random generator
-       of its own. A plain modulo of the minute would not do, because it walks through
-       the values in a fixed order; two multiplications with an xor fold in between
-       scatter them as a random generator would. */
+    /*
+     * Lets an animation vary from minute to minute without keeping a random generator
+     * of its own. A plain modulo of the minute would not do, because it walks through
+     * the values in a fixed order; two multiplications with an xor fold in between
+     * scatter them as a random generator would.
+     */
     byte hash = static_cast<byte>(((hour * 60u) + minute) * kSelectHashFactor);
     hash ^= static_cast<byte>(hash >> 4u);
     hash = static_cast<byte>(hash * kSelectHashFactor);
 
-    /* scaled by multiplication instead of a modulo, which would favour the lower
-       values because 256 is not a multiple of number_of_values */
+    // scaled by multiplication instead of a modulo, which would favour the lower
+    // values because 256 is not a multiple of number_of_values
     return static_cast<byte>((static_cast<uint16_t>(hash) * number_of_values) >> 8u);
-} /* SelectByTime */
-
-
-/******************************************************************************************************************************************************
- * P R I V A T E   F U N C T I O N S
-******************************************************************************************************************************************************/
-
-
-/******************************************************************************************************************************************************
- *  E N D   O F   F I L E
-******************************************************************************************************************************************************/
+}

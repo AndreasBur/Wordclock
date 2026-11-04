@@ -1,25 +1,14 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
- *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       Animations.h
- *      \brief
- *
- *      \details
- *
-******************************************************************************************************************************************************/
+// Copyright 2021 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+/*!
+ * \file
+ * \brief The animations facade: selects the animation and runs it to change the displayed time.
+ */
+
 #ifndef _ANIMATIONS_H_
 #define _ANIMATIONS_H_
 
-/******************************************************************************************************************************************************
- * I N C L U D E S
-******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Bit.h"
 #include "Arduino.h"
@@ -41,9 +30,6 @@
 #include "AnimationRoll.h"
 #include "AnimationCollapse.h"
 
-/******************************************************************************************************************************************************
- *  G L O B A L   C O N S T A N T   M A C R O S
-******************************************************************************************************************************************************/
 /* Animations configuration parameter */
 #define ANIMATIONS_SUPPORT_TELETYPE             STD_ON
 #define ANIMATIONS_SUPPORT_CURSOR               STD_ON
@@ -65,21 +51,8 @@
 
 /* Animations parameter */
 
-
-
-/******************************************************************************************************************************************************
- *  G L O B A L   F U N C T I O N   M A C R O S
-******************************************************************************************************************************************************/
-
-
-/******************************************************************************************************************************************************
- *  C L A S S   A N I M A T I O N S
-******************************************************************************************************************************************************/
 class Animations
 {
-/******************************************************************************************************************************************************
- *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
-******************************************************************************************************************************************************/
   public:
     enum class StateType {
         kNone,
@@ -138,9 +111,11 @@ class Animations
     };
     static constexpr byte kNumberOfAnimations{static_cast<byte>(AnimationIdType::kNumberOfAnimations)};
 
-    /* Which animation runs on a word change. Only ModeType::kFixed uses the selected
-       animation, the others pick one themselves, which is why selecting an animation
-       and selecting a strategy are two separate settings. */
+    /*
+     * Which animation runs on a word change. Only ModeType::kFixed uses the selected
+     * animation, the others pick one themselves, which is why selecting an animation
+     * and selecting a strategy are two separate settings.
+     */
     enum class ModeType {
         kFixed,
         kRandom,
@@ -231,14 +206,11 @@ class Animations
         ~AnimationsType() { }
     };
 
-/******************************************************************************************************************************************************
- *  P R I V A T E   D A T A   A N D   F U N C T I O N S
-******************************************************************************************************************************************************/
   private:
     static constexpr byte kTaskCycleInitValue{ANIMATIONS_TASK_CYCLE_INIT_VALUE};
 
-    /* AnimationIdType::kNone means no animation at all, so the ids a mode may pick start
-       behind it */
+    // AnimationIdType::kNone means no animation at all, so the ids a mode may pick start
+    // behind it
     static constexpr byte kFirstAnimation{ToUnderlying(AnimationIdType::kNone) + 1u};
     static constexpr byte kNumberOfSelectableAnimations{kNumberOfAnimations - kFirstAnimation};
     /* odd factor of the hash in CalcRandomAnimation(), see there */
@@ -247,11 +219,13 @@ class Animations
     static_assert(kNumberOfAnimations <= 16u,
                   "Animations: too many animations for the favourites bit mask, please widen it");
 
-    /* one bit per animation id, bit 0 of AnimationIdType::kNone stays unused.
-       Shifted in an unsigned long rather than an unsigned int: there are sixteen
-       animations, and on a target whose int is 16 bits wide - every AVR - 1u shifted by
-       sixteen is undefined and the mask comes out empty, which silently leaves no
-       animation a favourite. */
+    /*
+     * one bit per animation id, bit 0 of AnimationIdType::kNone stays unused.
+     * Shifted in an unsigned long rather than an unsigned int: there are sixteen
+     * animations, and on a target whose int is 16 bits wide - every AVR - 1u shifted by
+     * sixteen is undefined and the mask comes out empty, which silently leaves no
+     * animation a favourite.
+     */
     static constexpr uint16_t kAllFavourites{
         static_cast<uint16_t>(((1uL << kNumberOfAnimations) - 1uL) & ~((1uL << kFirstAnimation) - 1uL))
     };
@@ -280,9 +254,11 @@ class Animations
     AnimationIdType CalcNextAnimation() const;
     byte NumberOfFavourites() const;
 
-    /* The round a knob walks, which is not the one CalcNextAnimation() walks: that one
-       skips everything but the favourites, because ModeType::kSequence picks among those.
-       Stepping the selection by hand may reach every animation, favourite or not. */
+    /*
+     * The round a knob walks, which is not the one CalcNextAnimation() walks: that one
+     * skips everything but the favourites, because ModeType::kSequence picks among those.
+     * Stepping the selection by hand may reach every animation, favourite or not.
+     */
     static constexpr AnimationIdType ToNextAnimation(AnimationIdType animation_id) {
         return (ToUnderlying(animation_id) + 1u >= kNumberOfAnimations)
              ? AnimationIdType::kNone : static_cast<AnimationIdType>(ToUnderlying(animation_id) + 1u);
@@ -293,9 +269,6 @@ class Animations
              : static_cast<AnimationIdType>(ToUnderlying(animation_id) - 1u);
     }
 
-/******************************************************************************************************************************************************
- *  P U B L I C   F U N C T I O N S
-******************************************************************************************************************************************************/
   public:
     static Animations& GetInstance() {
         static Animations singleton_instance;
@@ -312,8 +285,8 @@ class Animations
     }
 
     byte GetTaskCycle(AnimationIdType animation_id) const { return task_cycles_[ToUnderlying(animation_id)]; }
-    /* the cycle of the running animation, so every animation keeps its own speed while
-       a meta animation switches between them */
+    // the cycle of the running animation, so every animation keeps its own speed while
+    // a meta animation switches between them
     byte GetTaskCycle() const { return task_cycles_[ToUnderlying(current_animation_id_)]; }
 
     // set methods
@@ -323,8 +296,8 @@ class Animations
     StdReturnType SetFavourite(AnimationIdType animation_id, bool favourite) {
         /* AnimationIdType::kNone is no animation and cannot be a favourite */
         if(ToUnderlying(animation_id) < kFirstAnimation || !IsAnimationValid(animation_id)) { return kENotOk; }
-        /* the last favourite may not be dropped, the selecting modes would be left
-           with nothing to pick */
+        // the last favourite may not be dropped, the selecting modes would be left
+        // with nothing to pick
         if(!favourite && IsFavourite(animation_id) && NumberOfFavourites() <= 1u) { return kENotOk; }
 
         favourites_[ToUnderlying(animation_id)] = favourite;
@@ -332,26 +305,30 @@ class Animations
     }
 
     // methods
-    /* The same state the constructor leaves behind: every speed at its initial cycle,
-       every animation a favourite again, and nothing selected. Written out here rather
-       than by constructing a second instance, which a singleton cannot do. */
+    /*
+     * The same state the constructor leaves behind: every speed at its initial cycle,
+     * every animation a favourite again, and nothing selected. Written out here rather
+     * than by constructing a second instance, which a singleton cannot do.
+     */
     void ResetToDefaults() {
         task_cycles_.fill(kTaskCycleInitValue);
         favourites_.SetValue(kAllFavourites);
-        /* Both are valid by construction, so neither answer can say anything a caller of
-           ResetToDefaults() could act on. */
+        // Both are valid by construction, so neither answer can say anything a caller of
+        // ResetToDefaults() could act on.
         SetAnimation(AnimationIdType::kNone);
         SetMode(ModeType::kFixed);
     }
 
-    /* One animation further and one back, wrapping at both ends, for a control that has
-       no list to pick from. AnimationIdType::kNone is part of that round rather than skipped:
-       "no animation" is a setting like any other, and a knob is the only way somebody
-       without a phone gets back to it.
-
-       They step the selection, so they mean what "9 -A<id>" means and not what
-       RpcIdType::kAnimationStart means - the animation runs at the next word change, and in
-       a mode that picks its own the selection is what ModeType::kFixed would return to. */
+    /*
+     * One animation further and one back, wrapping at both ends, for a control that has
+     * no list to pick from. AnimationIdType::kNone is part of that round rather than skipped:
+     * "no animation" is a setting like any other, and a knob is the only way somebody
+     * without a phone gets back to it.
+     *
+     * They step the selection, so they mean what "9 -A<id>" means and not what
+     * RpcIdType::kAnimationStart means - the animation runs at the next word change, and in
+     * a mode that picks its own the selection is what ModeType::kFixed would return to.
+     */
     void NextAnimation() { SetAnimation(ToNextAnimation(animation_id_)); }
     void PreviousAnimation() { SetAnimation(ToPreviousAnimation(animation_id_)); }
 
@@ -361,19 +338,17 @@ class Animations
     static bool IsModeValid(ModeType mode) { return mode < ModeType::kNumberOfModes; }
     StdReturnType SetTime(byte, byte);
 
-    /* Ends a running animation by initialising it, which is what every animation's own
-       Init() already means: back to idle, and its progress reset. The selection and the
-       mode stay as they are, so the next word change animates again.
-
-       Whatever half-finished frame the animation left is still on the display, so the
-       caller has to draw something over it - DisplayManager::AbortAnimation() is the
-       entry point that does both. */
+    /*
+     * Ends a running animation by initialising it, which is what every animation's own
+     * Init() already means: back to idle, and its progress reset. The selection and the
+     * mode stay as they are, so the next word change animates again.
+     *
+     * Whatever half-finished frame the animation left is still on the display, so the
+     * caller has to draw something over it - DisplayManager::AbortAnimation() is the
+     * entry point that does both.
+     */
     void Abort() { InitCurrentAnimation(); }
 
 };
 
-
 #endif
-/******************************************************************************************************************************************************
- *  E N D   O F   F I L E
-******************************************************************************************************************************************************/

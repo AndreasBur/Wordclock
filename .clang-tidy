@@ -27,6 +27,7 @@ Checks: >
   bugprone-*,
   cert-*,
   clang-analyzer-*,
+  clang-diagnostic-documentation*,
   performance-*,
   readability-convert-member-functions-to-static,
   readability-identifier-naming,
@@ -119,6 +120,14 @@ Checks: >
 HeaderFilterRegex: '/(firmware|platform)/'
 ExcludeHeaderFilterRegex: '/\.pio/|/\.platformio/'
 WarningsAsErrors: '*'
+
+# clang reads every Doxygen block as it compiles: a \param whose name is not the parameter's, a
+# command without its text, an unknown command. See docs/documentation.md. Checks names
+# clang-diagnostic-documentation*, as the -* it starts with leaves out every diagnostic that is
+# not named.
+ExtraArgs:
+  - -Wdocumentation
+  - -Wdocumentation-unknown-command
 
 # CHECK OPTIONS
 #

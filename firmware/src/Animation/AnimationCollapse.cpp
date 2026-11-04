@@ -1,63 +1,22 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
- *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       AnimationCollapse.cpp
- *      \brief      Letters slide together and the new ones slide apart again
- *
- *      \details
- *
- *
-******************************************************************************************************************************************************/
+// Copyright 2017 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+/*!
+ * \file
+ * \brief The steps of the collapse animation.
+ */
+
 #define _ANIMATION_COLLAPSE_SOURCE_
 
-/******************************************************************************************************************************************************
- * INCLUDES
-******************************************************************************************************************************************************/
 #include "AnimationCollapse.h"
 
-
-/******************************************************************************************************************************************************
- *  LOCAL CONSTANT MACROS
-******************************************************************************************************************************************************/
-
-
-/******************************************************************************************************************************************************
- *  LOCAL FUNCTION MACROS
-******************************************************************************************************************************************************/
-
-
-
-/******************************************************************************************************************************************************
- *  LOCAL DATA TYPES AND STRUCTURES
-******************************************************************************************************************************************************/
-
-
-
-/******************************************************************************************************************************************************
- * P U B L I C   F U N C T I O N S
-******************************************************************************************************************************************************/
-
-/******************************************************************************************************************************************************
-  Init()
-******************************************************************************************************************************************************/
 void AnimationCollapse::Init()
 {
     Animation::Init(StateType::kIdle);
     /* all animations share one union, so nothing may rely on member initializers */
     Reset();
-} /* Init */
+}
 
-
-/******************************************************************************************************************************************************
-  SetTime()
-******************************************************************************************************************************************************/
 StdReturnType AnimationCollapse::SetTime(byte hour, byte minute)
 {
     StdReturnType return_value{kENotOk};
@@ -65,44 +24,28 @@ StdReturnType AnimationCollapse::SetTime(byte hour, byte minute)
     if(Clock::GetInstance().GetClockWords(hour, minute, clock_words_table_) == kEOk && state_ == StateType::kIdle) {
         step_ = 0u;
         direction_ = static_cast<DirectionType>(SelectByTime(hour, minute, kNumberOfDirections));
-        /* the previous time is on the display and is what collapses first. An empty
-           display simply finishes that phase on its first task. */
+        // the previous time is on the display and is what collapses first. An empty
+        // display simply finishes that phase on its first task.
         state_ = StateType::kClearTime;
         return_value = kEOk;
     }
     return return_value;
-} /* SetTime */
+}
 
-
-/******************************************************************************************************************************************************
-  Task()
-******************************************************************************************************************************************************/
 void AnimationCollapse::Task()
 {
     if(state_ == StateType::kClearTime) { ClearTimeTask(); }
     else if(state_ == StateType::kSetTime) { SetTimeTask(); }
-} /* Task */
+}
 
-
-/******************************************************************************************************************************************************
- * P R I V A T E   F U N C T I O N S
-******************************************************************************************************************************************************/
-
-/******************************************************************************************************************************************************
-  Reset()
-******************************************************************************************************************************************************/
 void AnimationCollapse::Reset()
 {
     clock_words_table_.fill(DisplayWords::WordIdType::kNone);
     step_ = 0u;
     expand_steps_ = 1u;
     direction_ = DirectionType::kToLeft;
-} /* Reset */
+}
 
-
-/******************************************************************************************************************************************************
-  ClearTimeTask()
-******************************************************************************************************************************************************/
 void AnimationCollapse::ClearTimeTask()
 {
     bool moved{false};
@@ -117,19 +60,17 @@ void AnimationCollapse::ClearTimeTask()
         expand_steps_ = CalcExpandSteps();
         state_ = StateType::kSetTime;
     }
-} /* ClearTimeTask */
+}
 
-
-/******************************************************************************************************************************************************
-  CollapseRow()
-******************************************************************************************************************************************************/
 bool AnimationCollapse::CollapseRow(byte row)
 {
     bool moved{false};
 
-    /* Scanned towards the target edge on purpose: a pixel that just moved frees the
-       place for the next one behind it, so a whole word slides by one column per frame
-       instead of collapsing into a single pixel. */
+    /*
+     * Scanned towards the target edge on purpose: a pixel that just moved frees the
+     * place for the next one behind it, so a whole word slides by one column per frame
+     * instead of collapsing into a single pixel.
+     */
     if(direction_ == DirectionType::kToLeft) {
         for(byte column = 1u; column < DISPLAY_NUMBER_OF_COLUMNS; column++) {
             if(Display::GetInstance().GetPixel(column, row) &&
@@ -153,12 +94,8 @@ bool AnimationCollapse::CollapseRow(byte row)
     }
 
     return moved;
-} /* CollapseRow */
+}
 
-
-/******************************************************************************************************************************************************
-  SetTimeTask()
-******************************************************************************************************************************************************/
 void AnimationCollapse::SetTimeTask()
 {
     Display::GetInstance().Clear();
@@ -181,17 +118,15 @@ void AnimationCollapse::SetTimeTask()
         FinishWithClockWords(clock_words_table_);
         Reset();
     }
-} /* SetTimeTask */
+}
 
-
-/******************************************************************************************************************************************************
-  CalcColumn()
-******************************************************************************************************************************************************/
 byte AnimationCollapse::CalcColumn(byte final_column, byte block_column) const
 {
-    /* Interpolates between the position in the block and the final one, which needs no
-       memory of where a letter currently is. Split by direction to stay unsigned: the
-       block is left of the final position in one and right of it in the other. */
+    /*
+     * Interpolates between the position in the block and the final one, which needs no
+     * memory of where a letter currently is. Split by direction to stay unsigned: the
+     * block is left of the final position in one and right of it in the other.
+     */
     const byte remaining_steps = expand_steps_ - step_;
 
     if(block_column > final_column) {
@@ -199,26 +134,20 @@ byte AnimationCollapse::CalcColumn(byte final_column, byte block_column) const
     }
 
     return static_cast<byte>(final_column - (((final_column - block_column) * remaining_steps) / expand_steps_));
-} /* CalcColumn */
+}
 
-
-/******************************************************************************************************************************************************
-  CalcBlockColumn()
-******************************************************************************************************************************************************/
 byte AnimationCollapse::CalcBlockColumn(byte letter_index, byte letters_of_row) const
 {
-    /* Where a letter sits while the row is one solid block. Counting the letters of the
-       row up front keeps this a plain calculation, so both directions come out of one
-       ascending loop instead of two mirrored ones. */
+    /*
+     * Where a letter sits while the row is one solid block. Counting the letters of the
+     * row up front keeps this a plain calculation, so both directions come out of one
+     * ascending loop instead of two mirrored ones.
+     */
     if(direction_ == DirectionType::kToLeft) { return letter_index; }
 
     return static_cast<byte>(DISPLAY_NUMBER_OF_COLUMNS - letters_of_row + letter_index);
-} /* CalcBlockColumn */
+}
 
-
-/******************************************************************************************************************************************************
-  CountLettersOfRow()
-******************************************************************************************************************************************************/
 byte AnimationCollapse::CountLettersOfRow(byte row) const
 {
     byte letters{0u};
@@ -228,12 +157,8 @@ byte AnimationCollapse::CountLettersOfRow(byte row) const
     }
 
     return letters;
-} /* CountLettersOfRow */
+}
 
-
-/******************************************************************************************************************************************************
-  CalcExpandSteps()
-******************************************************************************************************************************************************/
 byte AnimationCollapse::CalcExpandSteps() const
 {
     byte longest_way{0u};
@@ -252,14 +177,9 @@ byte AnimationCollapse::CalcExpandSteps() const
         }
     }
 
-    /* never zero: CalcColumn() divides by it, and a picture that needs no movement at
-       all is then drawn once and done */
+    // never zero: CalcColumn() divides by it, and a picture that needs no movement at
+    // all is then drawn once and done
     if(longest_way == 0u) { return 1u; }
 
     return longest_way;
-} /* CalcExpandSteps */
-
-
-/******************************************************************************************************************************************************
- *  E N D   O F   F I L E
-******************************************************************************************************************************************************/
+}

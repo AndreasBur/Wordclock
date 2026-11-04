@@ -1,32 +1,21 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+/*!
+ * \file
+ * \brief Puts a serial message together from a command and its options.
  *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       MessageBuilder.h
- *      \brief      Puts a serial message together from a command and its options
+ * Offers the commands the firmware understands by name, with an option row each, and writes the
+ * result into the pixel matrix window's input field. It does not send: that stays with the Send
+ * button there, so a built message can still be edited by hand first.
  *
- *      \details    Offers the commands the firmware understands by name, with an
- *                  option row each, and writes the result into the pixel matrix
- *                  window's input field. It does not send: that stays with the Send
- *                  button there, so a built message can still be edited by hand
- *                  first.
- *
- *                  Named MessageBuilder rather than Message, which the firmware
- *                  already uses for an incoming message.
- *
-******************************************************************************************************************************************************/
+ * Named MessageBuilder rather than Message, which the firmware already uses for an incoming
+ * message.
+ */
+
 #ifndef MESSAGE_BUILDER_H
 #define MESSAGE_BUILDER_H
 
-/******************************************************************************************************************************************************
- * I N C L U D E S
-******************************************************************************************************************************************************/
 #include <wx/wx.h>
 #include <wx/odcombo.h>
 #include <array>
@@ -34,29 +23,13 @@
 #include "PixelsFrame.h"
 #include "MessageCatalog.h"
 
-/******************************************************************************************************************************************************
- *  G L O B A L   C O N S T A N T   M A C R O S
-******************************************************************************************************************************************************/
-
-
-/******************************************************************************************************************************************************
- *  G L O B A L   F U N C T I O N   M A C R O S
-******************************************************************************************************************************************************/
-
-
-/******************************************************************************************************************************************************
- *  C L A S S   M E S S A G E   B U I L D E R
-******************************************************************************************************************************************************/
-/* A dialog rather than a frame, so the compositor centres it over the main window.
-   Shown with Show(), not ShowModal(), so the input field it writes to stays reachable. */
+// A dialog rather than a frame, so the compositor centres it over the main window.
+// Shown with Show(), not ShowModal(), so the input field it writes to stays reachable.
 class MessageBuilder : public wxDialog
 {
-/******************************************************************************************************************************************************
- *  P R I V A T E   D A T A   A N D   F U N C T I O N S
-******************************************************************************************************************************************************/
   private:
-    /* Own range, clear of the other windows'. The option rows get contiguous ranges of
-       their own, which is what lets one handler serve all of them. */
+    // Own range, clear of the other windows'. The option rows get contiguous ranges of
+    // their own, which is what lets one handler serve all of them.
     enum
     {
         kIdStaticBoxMessage = 3000,
@@ -74,11 +47,13 @@ class MessageBuilder : public wxDialog
         kIdChoiceOptionLast = kIdChoiceOptionFirst + MESSAGE_CATALOG_MAX_NUMBER_OF_OPTIONS - 1
     };
 
-    /* One row per option of the selected command: whether it is part of the message at
-       all, and with which argument. Both argument widgets exist in every row and only
-       the one the option calls for is shown — a dropdown where the catalog names the
-       values, a text field for a plain number or a string. Building them once and
-       hiding one keeps the rows reusable across commands. */
+    /*
+     * One row per option of the selected command: whether it is part of the message at
+     * all, and with which argument. Both argument widgets exist in every row and only
+     * the one the option calls for is shown — a dropdown where the catalog names the
+     * values, a text field for a plain number or a string. Building them once and
+     * hiding one keeps the rows reusable across commands.
+     */
     struct OptionRowType {
         wxCheckBox* use;
         wxTextCtrl* value;
@@ -90,16 +65,18 @@ class MessageBuilder : public wxDialog
     wxTextCtrl* preview_;
 
     static constexpr int kValueWidth{80};
-    /* Wider than the plain value field: it has to hold names like "Illuminance
-       calibration maximum". */
+    // Wider than the plain value field: it has to hold names like "Illuminance
+    // calibration maximum".
     static constexpr int kChoiceWidth{240};
-    /* What a popup may grow to before it scrolls instead. wxChoice had no such knob: its
-       popup is a GTK one, and GTK decides when to switch on its scroll arrows from the
-       monitor's work area - which is right on a normal desktop and wrong under WSLg, where
-       the list simply ran off the bottom of the screen and the entries past it could not be
-       reached at all. wxOwnerDrawnComboBox draws its own popup, so this is a number rather
-       than a hope. Ten rows or so, which is the RPC list's thirty-three in three screens
-       rather than one screen and a cliff. */
+    /*
+     * What a popup may grow to before it scrolls instead. wxChoice had no such knob: its
+     * popup is a GTK one, and GTK decides when to switch on its scroll arrows from the
+     * monitor's work area - which is right on a normal desktop and wrong under WSLg, where
+     * the list simply ran off the bottom of the screen and the entries past it could not be
+     * reached at all. wxOwnerDrawnComboBox draws its own popup, so this is a number rather
+     * than a hope. Ten rows or so, which is the RPC list's thirty-three in three screens
+     * rather than one screen and a cliff.
+     */
     static constexpr int kPopupMaxHeight{240};
     static constexpr int kPreviewWidth{300};
     static constexpr int kBorder{10};
@@ -116,8 +93,8 @@ class MessageBuilder : public wxDialog
     void OnOptionChanged(wxCommandEvent&);
     void OnInsert(wxCommandEvent&);
 
-    /* An option that is not ticked contributes nothing to the message, so its argument is
-       greyed out rather than left looking as though it did. */
+    // An option that is not ticked contributes nothing to the message, so its argument is
+    // greyed out rather than left looking as though it did.
     void EnableOptionValue(byte index, bool enabled) {
         option_rows_[index].value->Enable(enabled);
         option_rows_[index].choice->Enable(enabled);
@@ -133,12 +110,9 @@ class MessageBuilder : public wxDialog
     wxString BuildMessage() const;
     void UpdatePreview() { preview_->SetValue(BuildMessage()); }
 
-/******************************************************************************************************************************************************
- *  P U B L I C   F U N C T I O N S
-******************************************************************************************************************************************************/
   public:
-    /* Parented to the pixel matrix window, so closing that one takes this along and the
-       application can exit. */
+    // Parented to the pixel matrix window, so closing that one takes this along and the
+    // application can exit.
     static MessageBuilder& GetInstance() {
         static MessageBuilder* p_singleton_instance = new MessageBuilder(&PixelsFrame::GetInstance(), _("Wordclock Message"));
         return *p_singleton_instance;
@@ -148,15 +122,13 @@ class MessageBuilder : public wxDialog
     void Reveal() {
         Show();
         Raise();
-        /* Again once the window is on screen. A size set while it was still hidden did
-           not always reach the window manager under XWayland, which left the frame at
-           the height of a different command's option list. */
+        /*
+         * Again once the window is on screen. A size set while it was still hidden did
+         * not always reach the window manager under XWayland, which left the frame at
+         * the height of a different command's option list.
+         */
         GetSizer()->SetSizeHints(this);
     }
 };
 
 #endif // MESSAGE_BUILDER_H
-
-/******************************************************************************************************************************************************
- *  E N D   O F   F I L E
-******************************************************************************************************************************************************/

@@ -1,61 +1,31 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
- *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       MsgCmdAnimationParser.h
- *      \brief
- *
- *      \details
- *
-******************************************************************************************************************************************************/
+// Copyright 2017 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+/*!
+ * \file
+ * \brief The parser of the animation command.
+ */
+
 #ifndef _MSG_CMD_ANIMATION_PARSER_H_
 #define _MSG_CMD_ANIMATION_PARSER_H_
 
-/******************************************************************************************************************************************************
- * I N C L U D E S
-******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Arduino.h"
 #include "MsgParameterParser.h"
 #include "Animations.h"
 #include "Scheduler.h"
 
-/******************************************************************************************************************************************************
- *  G L O B A L   C O N S T A N T   M A C R O S
-******************************************************************************************************************************************************/
 /* MsgCmdAnimationParser configuration parameter */
-
 
 /* MsgCmdAnimationParser parameter */
 #define MSG_CMD_ANIMATION_PARSER_PARAMETER_TABLE_SIZE           4u
 
-
-/******************************************************************************************************************************************************
- *  G L O B A L   F U N C T I O N   M A C R O S
-******************************************************************************************************************************************************/
-
-
-/******************************************************************************************************************************************************
- *  C L A S S   T E M P L A T E
-******************************************************************************************************************************************************/
 class MsgCmdAnimationParser : public MsgParameterParser<MsgCmdAnimationParser, MSG_CMD_ANIMATION_PARSER_PARAMETER_TABLE_SIZE>
 {
-/******************************************************************************************************************************************************
- *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
-******************************************************************************************************************************************************/
   public:
     using AnimationIdType = Animations::AnimationIdType;
     using ModeType = Animations::ModeType;
 
-/******************************************************************************************************************************************************
- *  P R I V A T E   D A T A   A N D   F U N C T I O N S
-******************************************************************************************************************************************************/
   private:
     friend class MsgParameterParser;
     AnimationIdType animation_id_{Animations::AnimationIdType::kNone};
@@ -63,11 +33,13 @@ class MsgCmdAnimationParser : public MsgParameterParser<MsgCmdAnimationParser, M
     byte speed_{0u};
     bool favourite_{true};
 
-    /* Which options the message actually carried. The values above are preloaded with
-       the current settings so a message may set single options, but writing all of them
-       back would do harm: -F and -S address whatever -A points at, so a preloaded value
-       would land on the newly selected animation instead of the one it was read from.
-       A message without options also has to stay a pure query. */
+    /*
+     * Which options the message actually carried. The values above are preloaded with
+     * the current settings so a message may set single options, but writing all of them
+     * back would do harm: -F and -S address whatever -A points at, so a preloaded value
+     * would land on the newly selected animation instead of the one it was read from.
+     * A message without options also has to stay a pure query.
+     */
     bool animation_given_{false};
     bool mode_given_{false};
     bool speed_given_{false};
@@ -152,15 +124,12 @@ class MsgCmdAnimationParser : public MsgParameterParser<MsgCmdAnimationParser, M
         error_.CheckReturnValueAndSend(kSpeedOptionShortName, return_value, ErrorMessage::ErrorType::kValueOutOfBounds);
     }
 
-/******************************************************************************************************************************************************
- *  P U B L I C   F U N C T I O N S
-******************************************************************************************************************************************************/
   public:
     MsgCmdAnimationParser(const char* parameter) : MsgParameterParser(kParameterTable, parameter), animation_id_(), mode_(), speed_(0u), favourite_(true),
         animation_given_(false), mode_given_(false), speed_given_(false), favourite_given_(false)
     {
-        /* preloaded with the current settings, so a command may set single options
-           without resetting the others */
+        // preloaded with the current settings, so a command may set single options
+        // without resetting the others
         animation_id_ = Animations::GetInstance().GetAnimation();
         mode_ = Animations::GetInstance().GetMode();
         speed_ = Scheduler::ConvertTaskCycleToSpeed(Animations::GetInstance().GetTaskCycle(animation_id_));
@@ -193,7 +162,3 @@ class MsgCmdAnimationParser : public MsgParameterParser<MsgCmdAnimationParser, M
 };
 
 #endif
-
-/******************************************************************************************************************************************************
- *  E N D   O F   F I L E
-******************************************************************************************************************************************************/

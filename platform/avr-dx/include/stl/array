@@ -1,40 +1,34 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+/*!
+ * \file
+ * \brief std::array for a toolchain that ships no libstdc++, see stl/type_traits.
  *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       array
- *      \brief      std::array for a toolchain that ships no libstdc++, see stl/type_traits
+ * An aggregate holding one C array, which is what the standard's is too. That is load-bearing
+ * rather than incidental: the core writes pixels_buffer_{0u} and task_cycles_{}, and a class with a
+ * declared constructor would stop being brace-initialisable that way.
  *
- *      \details    An aggregate holding one C array, which is what the standard's is too.
- *                  That is load-bearing rather than incidental: the core writes
- *                  pixels_buffer_{0u} and task_cycles_{}, and a class with a declared
- *                  constructor would stop being brace-initialisable that way.
- *
- *                  No at(), because it throws and this backend is built with
- *                  -fno-exceptions; the core does not call it.
- *
-******************************************************************************************************************************************************/
+ * No at(), because it throws and this backend is built with -fno-exceptions; the core does not call
+ * it.
+ */
+
 #ifndef _STL_ARRAY_
 #define _STL_ARRAY_
 
 #include <stddef.h>
 
-/* On this toolchain these headers are the standard library, see type_traits, so declaring
-   into std is what they exist to do - and under the standard's names, which is what the
-   naming check is told here. */
+/*
+ * On this toolchain these headers are the standard library, see type_traits, so declaring
+ * into std is what they exist to do - and under the standard's names, which is what the
+ * naming check is told here.
+ */
 // NOLINTBEGIN(cert-dcl58-cpp,readability-identifier-naming)
 namespace std {
-
 template<class T, size_t N>
 struct array {
-    /* Public and named with the standard's underscore, because an aggregate has no other
-       way to hold its storage - the brace initialisers in the core reach it directly. */
+    // Public and named with the standard's underscore, because an aggregate has no other
+    // way to hold its storage - the brace initialisers in the core reach it directly.
     T _M_elems[N];
 
     using value_type = T;
@@ -86,7 +80,3 @@ constexpr bool operator!=(const array<T, N>& left, const array<T, N>& right)
 // NOLINTEND(cert-dcl58-cpp,readability-identifier-naming)
 
 #endif // _STL_ARRAY_
-
-/******************************************************************************************************************************************************
- *  E N D   O F   F I L E
-******************************************************************************************************************************************************/

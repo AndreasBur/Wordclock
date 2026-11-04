@@ -1,42 +1,19 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
- *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       MessageDecoder.cpp
- *      \brief      Turns an answer from the firmware into a readable line
- *
- *      \details
- *
-******************************************************************************************************************************************************/
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+/*!
+ * \file
+ * \brief Turns an answer from the firmware into a readable line.
+ */
+
 #define _MESSAGE_DECODER_SOURCE_
 
-/******************************************************************************************************************************************************
- * I N C L U D E S
-******************************************************************************************************************************************************/
 #include "sim/MessageDecoder.h"
 #include <wx/tokenzr.h>
 
-/******************************************************************************************************************************************************
- *  L O C A L   C O N S T A N T   M A C R O S
-******************************************************************************************************************************************************/
-
-
-/******************************************************************************************************************************************************
- *  L O C A L   F U N C T I O N   M A C R O S
-******************************************************************************************************************************************************/
 /* Counted rather than written out, so a value list and its length cannot drift apart. */
 #define NUMBER_OF(Array)                                static_cast<byte>(sizeof(Array) / sizeof((Array)[0]))
 
-
-/******************************************************************************************************************************************************
- *  L O C A L   D A T A   T Y P E S   A N D   S T R U C T U R E S
-******************************************************************************************************************************************************/
 const char* const MessageDecoder::kCommandIndent{"   "};
 const char* const MessageDecoder::kArgumentIndent{"      "};
 const char* const MessageDecoder::kNameValueSeparator{" = "};
@@ -70,20 +47,12 @@ const char* const MessageDecoder::kApiValueNames[] {
     "Animation set clock task cycle"
 };
 
-
-/******************************************************************************************************************************************************
- * P U B L I C   F U N C T I O N S
-******************************************************************************************************************************************************/
-
-/******************************************************************************************************************************************************
-  Describe()
-******************************************************************************************************************************************************/
 /*! \brief          reads a line from the firmware back into the names behind it
  *  \details        An answer first, an error line second; a line is never both, because
  *                  an answer starts with a number and an error with a name.
  *
  *  \return         the readable form, or an empty string if this is neither
-******************************************************************************************************************************************************/
+ */
 wxString MessageDecoder::Describe(const wxString& line)
 {
     wxString answer = DescribeAnswer(line);
@@ -93,16 +62,8 @@ wxString MessageDecoder::Describe(const wxString& line)
     if(!remote_procedure_call.IsEmpty()) { return remote_procedure_call; }
 
     return DescribeError(line);
-} /* Describe */
+}
 
-
-/******************************************************************************************************************************************************
- * P R I V A T E   F U N C T I O N S
-******************************************************************************************************************************************************/
-
-/******************************************************************************************************************************************************
-  DescribeAnswer()
-******************************************************************************************************************************************************/
 /*! \brief          reads an answer line back into the names behind it
  *  \details        Deliberately strict about the shape: the line has to start with the
  *                  number of a known command and carry at least one option, otherwise it
@@ -110,7 +71,7 @@ wxString MessageDecoder::Describe(const wxString& line)
  *                  similar would be worse than leaving it alone.
  *
  *  \return         the readable form, or an empty string if this is no answer
-******************************************************************************************************************************************************/
+ */
 wxString MessageDecoder::DescribeAnswer(const wxString& line)
 {
     wxStringTokenizer tokenizer(line, _T(" "));
@@ -135,19 +96,15 @@ wxString MessageDecoder::DescribeAnswer(const wxString& line)
     if(arguments.IsEmpty()) { return wxEmptyString; }
 
     return kCommandIndent + wxString(command->label) + _T("\n") + arguments;
-} /* DescribeAnswer */
+}
 
-
-/******************************************************************************************************************************************************
-  DescribeArgument()
-******************************************************************************************************************************************************/
 /*! \brief          reads one "<short name>=<value>" of an answer back into names
  *  \details        A short name the command does not have is kept as it is rather than
  *                  dropped: it means this table has fallen behind the parser, and hiding
  *                  that would be the wrong way round.
  *
  *  \return         the readable form, or an empty string if the token is not an argument
-******************************************************************************************************************************************************/
+ */
 wxString MessageDecoder::DescribeArgument(const MessageCatalog::CommandType& command, const wxString& token)
 {
     if(token.Find(kOptionArgumentDelimiter) != kDelimiterPosition) { return wxEmptyString; }
@@ -159,12 +116,8 @@ wxString MessageDecoder::DescribeArgument(const MessageCatalog::CommandType& com
     if(option == nullptr) { return token; }
 
     return DescribeValue(option->label, value, option->value_names, option->number_of_value_names, option->minimum);
-} /* DescribeArgument */
+}
 
-
-/******************************************************************************************************************************************************
-  DescribeRemoteProcedureCall()
-******************************************************************************************************************************************************/
 /*! \brief          reads the remote procedure call's answer back into names
  *  \details        It is the one answer that does not begin with its command number:
  *                  "RpcId=<number>" and then the error of carrying it out. Laid out like
@@ -175,7 +128,7 @@ wxString MessageDecoder::DescribeArgument(const MessageCatalog::CommandType& com
  *                  command's option, rather than a second list.
  *
  *  \return         the readable form, or an empty string if this is not that answer
-******************************************************************************************************************************************************/
+ */
 wxString MessageDecoder::DescribeRemoteProcedureCall(const wxString& line)
 {
     wxStringTokenizer tokenizer(line, _T(" "));
@@ -184,8 +137,8 @@ wxString MessageDecoder::DescribeRemoteProcedureCall(const wxString& line)
     wxString number;
     if(!tokenizer.GetNextToken().StartsWith(kRemoteProcedureIdPrefix, &number)) { return wxEmptyString; }
 
-    /* As strict about the shape as an answer: without a number behind the prefix this is
-       something else that happens to begin the same way. */
+    // As strict about the shape as an answer: without a number behind the prefix this is
+    // something else that happens to begin the same way.
     uint16_t procedure{0u};
     if(!ToValue(number, procedure)) { return wxEmptyString; }
 
@@ -204,19 +157,15 @@ wxString MessageDecoder::DescribeRemoteProcedureCall(const wxString& line)
     }
 
     return described;
-} /* DescribeRemoteProcedureCall */
+}
 
-
-/******************************************************************************************************************************************************
-  DescribeError()
-******************************************************************************************************************************************************/
 /*! \brief          reads an error line back into the names behind it
  *  \details        ErrorMessage appends a space after each error, so one line can carry
  *                  several; each is read on its own and anything that is not one is
  *                  passed over.
  *
  *  \return         the readable form, or an empty string if this is no error line
-******************************************************************************************************************************************************/
+ */
 wxString MessageDecoder::DescribeError(const wxString& line)
 {
     wxString described;
@@ -227,12 +176,8 @@ wxString MessageDecoder::DescribeError(const wxString& line)
     }
 
     return described;
-} /* DescribeError */
+}
 
-
-/******************************************************************************************************************************************************
-  DescribeErrorPart()
-******************************************************************************************************************************************************/
 /*! \brief          reads one error of a line back into names
  *  \details        Three shapes come out of ErrorMessage: the error on its own, the error
  *                  with the option it belongs to appended, and the error behind the api
@@ -240,7 +185,7 @@ wxString MessageDecoder::DescribeError(const wxString& line)
  *                  delimiter, which is why this reaches back into itself for it.
  *
  *  \return         the readable form, or an empty string if this is no error
-******************************************************************************************************************************************************/
+ */
 wxString MessageDecoder::DescribeErrorPart(const wxString& part, const char* indent)
 {
     wxString rest;
@@ -267,23 +212,19 @@ wxString MessageDecoder::DescribeErrorPart(const wxString& part, const char* ind
     }
 
     return wxEmptyString;
-} /* DescribeErrorPart */
+}
 
-
-/******************************************************************************************************************************************************
-  DescribeValue()
-******************************************************************************************************************************************************/
 /*! \brief          puts a label and its value together, spelling the value out if named
  *  \details        The number stays alongside the name: the name is what makes the line
  *                  readable, the number is what was actually on the wire.
  *
  *  \return         "<label> = <name> (<number>)", or "<label> = <value>" without a name
-******************************************************************************************************************************************************/
+ */
 wxString MessageDecoder::DescribeValue(const char* label, const wxString& value,
                                        const char* const* names, byte number_of_names, uint16_t minimum)
 {
-    /* The labels of the error shapes carry the delimiter the firmware prints them with,
-       which would read oddly in front of one of ours. */
+    // The labels of the error shapes carry the delimiter the firmware prints them with,
+    // which would read oddly in front of one of ours.
     wxString described = wxString(label);
     described.Replace(wxString(kOptionArgumentDelimiter), wxEmptyString);
     described += kNameValueSeparator;
@@ -297,19 +238,15 @@ wxString MessageDecoder::DescribeValue(const char* label, const wxString& value,
     }
 
     return described;
-} /* DescribeValue */
+}
 
-
-/******************************************************************************************************************************************************
-  ToValue()
-******************************************************************************************************************************************************/
 /*! \brief          reads a number out of a token in the width the catalog uses
  *  \details        wxString only parses into unsigned long, which is why this exists: it
  *                  narrows once, in one place, and refuses a value that does not fit
  *                  instead of truncating it into a different one.
  *
  *  \return         true if the token is a number that fits
-******************************************************************************************************************************************************/
+ */
 bool MessageDecoder::ToValue(const wxString& text, uint16_t& value)
 {
     unsigned long parsed{0ul};
@@ -319,9 +256,4 @@ bool MessageDecoder::ToValue(const wxString& text, uint16_t& value)
 
     value = static_cast<uint16_t>(parsed);
     return true;
-} /* ToValue */
-
-
-/******************************************************************************************************************************************************
- *  E N D   O F   F I L E
-******************************************************************************************************************************************************/
+}

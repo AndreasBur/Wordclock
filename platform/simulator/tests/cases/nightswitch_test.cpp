@@ -1,9 +1,4 @@
-/******************************************************************************************************************************************************
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       nightswitch_test.cpp
- *      \brief      The window, the midnight wrap, the strip's supply, and who wins between the timer and a hand
-******************************************************************************************************************************************************/
+// The window, the midnight wrap, the strip's supply, and who wins between the timer and a hand.
 
 #include "check.h"
 #include "cases.h"
@@ -16,18 +11,19 @@
 #include "RealTimeClock.h"
 
 namespace {
-
-/* One tick of the night switch at a given time. Its own task rather than the scheduler's,
-   because what is being checked is the edge and not the cycle counting that reaches it. */
+// One tick of the night switch at a given time. Its own task rather than the scheduler's,
+// because what is being checked is the edge and not the cycle counting that reaches it.
 void TickAt(byte hour, byte minute)
 {
     SetTime(hour, minute, 0u);
     NightSwitch::GetInstance().Task();
 }
 
-/* A tick of both tasks, the way the scheduler runs them, with the render in between that
-   Power waits for. The cases about the supply need it: the night switch only asks, and a
-   case that ran the one task would watch a rail that never moves. */
+/*
+ * A tick of both tasks, the way the scheduler runs them, with the render in between that
+ * Power waits for. The cases about the supply need it: the night switch only asks, and a
+ * case that ran the one task would watch a rail that never moves.
+ */
 void TickBothAt(byte hour, byte minute)
 {
     SetTime(hour, minute, 0u);
@@ -36,8 +32,8 @@ void TickBothAt(byte hour, byte minute)
     Power::GetInstance().Task();
 }
 
-/* A lit clock face with the supply up and the sequence idle, which is where every case about
-   the supply starts and what it has to leave behind for the next one. */
+// A lit clock face with the supply up and the sequence idle, which is where every case about
+// the supply starts and what it has to leave behind for the next one.
 void StartFromRunningClock()
 {
     Display& display = Display::GetInstance();
@@ -65,8 +61,8 @@ void UseNightWindow(byte night_brightness)
 
 } // namespace
 
-/* The window itself, including the one that crosses midnight - which is the ordinary case
-   for a clock, and the only one where the test reads the other way round. */
+// The window itself, including the one that crosses midnight - which is the ordinary case
+// for a clock, and the only one where the test reads the other way round.
 void TestNightWindowIncludesMidnight()
 {
     NightSwitch& night_switch = NightSwitch::GetInstance();
@@ -96,8 +92,8 @@ void TestNightWindowIncludesMidnight()
     SetTime(1u, 0u, 0u);   Expect(!night_switch.IsNight(), "an empty window is never night");
 }
 
-/* What the window does to the display, and what it does not do to the brightness setting -
-   which is the whole reason the night dimming is its own level and not the fade. */
+// What the window does to the display, and what it does not do to the brightness setting -
+// which is the whole reason the night dimming is its own level and not the fade.
 void TestNightSwitchDimsWithoutLosingTheSetting()
 {
     NightSwitch& night_switch = NightSwitch::GetInstance();
@@ -125,9 +121,11 @@ void TestNightSwitchDimsWithoutLosingTheSetting()
     Expect(IsAnyOutputPixelLit(), "morning gives it back");
     Expect(display.GetBrightness() == 120u, "and gives back the brightness that was set");
 
-    /* Dimming rather than switching off: still lit, still not the day brightness, and the
-       setting untouched - Persistence reads that setting, so a night that wrote it would
-       be a night that changed the clock for good. */
+    /*
+     * Dimming rather than switching off: still lit, still not the day brightness, and the
+     * setting untouched - Persistence reads that setting, so a night that wrote it would
+     * be a night that changed the clock for good.
+     */
     night_switch.SetNightBrightness(16u);
     TickAt(23u, 0u);
     Expect(IsAnyOutputPixelLit(), "a dimmed night is still lit");
@@ -140,8 +138,8 @@ void TestNightSwitchDimsWithoutLosingTheSetting()
     night_switch.SetIsActive(false);
 }
 
-/* The edge, not the state. A clock switched on by hand in the small hours has to stay on,
-   or a timer is something people switch off after one night. */
+// The edge, not the state. A clock switched on by hand in the small hours has to stay on,
+// or a timer is something people switch off after one night.
 void TestNightSwitchActsOnTheCrossingOnly()
 {
     NightSwitch& night_switch = NightSwitch::GetInstance();
@@ -173,16 +171,16 @@ void TestNightSwitchActsOnTheCrossingOnly()
     TickAt(6u, 0u);
     Expect(IsAnyOutputPixelLit(), "the end of the window is not a reason to switch it off");
 
-    /* And switching the whole timer off hands the display back rather than leaving it
-       wherever the last edge put it. */
+    // And switching the whole timer off hands the display back rather than leaving it
+    // wherever the last edge put it.
     TickAt(23u, 0u);
     Expect(!IsAnyOutputPixelLit(), "the next night switches it off again");
     night_switch.SetIsActive(false);
     Expect(IsAnyOutputPixelLit(), "switching the timer off gives the display back");
 }
 
-/* The whole return on the switch: a night the display spends off is a night the strip need
-   not be powered for, and that is the one state where cutting the rail costs nothing. */
+// The whole return on the switch: a night the display spends off is a night the strip need
+// not be powered for, and that is the one state where cutting the rail costs nothing.
 void TestNightWithNoBrightnessCutsTheSupply()
 {
     NightSwitch& night_switch = NightSwitch::GetInstance();
@@ -211,8 +209,8 @@ void TestNightWithNoBrightnessCutsTheSupply()
     Expect(IsAnyOutputPixelLit(), "so the clock face reaches the strip again");
     Expect(display.GetBrightness() == 120u, "with the brightness that was set");
 
-    /* A dimmed night is a lit strip, so there is nothing to save and the rail stays up -
-       cutting it there would take the dimming that was asked for with it. */
+    // A dimmed night is a lit strip, so there is nothing to save and the rail stays up -
+    // cutting it there would take the dimming that was asked for with it.
     night_switch.SetNightBrightness(16u);
     TickBothAt(23u, 0u);
     Expect(power.IsSupplyOn(), "a dimmed night keeps the supply, because the strip is still lit");
@@ -223,9 +221,11 @@ void TestNightWithNoBrightnessCutsTheSupply()
     StartFromRunningClock();
 }
 
-/* The one thing the crossing rule cannot answer on its own. Switching the clock on by hand
-   reaches the display and not the rail, so without this the switch is a switch that does
-   nothing - and a wall that stays dark is read as a fault, not as a timer working. */
+/*
+ * The one thing the crossing rule cannot answer on its own. Switching the clock on by hand
+ * reaches the display and not the rail, so without this the switch is a switch that does
+ * nothing - and a wall that stays dark is read as a fault, not as a timer working.
+ */
 void TestDisplaySwitchedOnAtNightGetsItsSupplyBack()
 {
     NightSwitch& night_switch = NightSwitch::GetInstance();
@@ -252,8 +252,8 @@ void TestDisplaySwitchedOnAtNightGetsItsSupplyBack()
     Expect(power.IsSupplyOn(), "and nothing takes it away again before the window ends");
     Expect(IsAnyOutputPixelLit(), "with the display left where the hand put it");
 
-    /* A hand that switches it off again keeps its rail until the next edge, for the same
-       reason: a tick that undid what somebody just did is the behaviour this module avoids. */
+    // A hand that switches it off again keeps its rail until the next edge, for the same
+    // reason: a tick that undid what somebody just did is the behaviour this module avoids.
     display.Disable();
     TickBothAt(4u, 0u);
     Expect(power.IsSupplyOn(), "a display switched off by hand does not cut the supply");

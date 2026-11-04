@@ -5,11 +5,13 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <vector>
-/* Answers reads out of one buffer and keeps everything that was written, so a driver's
-   register addressing can be checked rather than only its arithmetic. The buffer is
-   consumed as it is read, which is what lets a test answer a sequence of transfers - the
-   status register and then the time block - with one prepared response. A test that
-   prepares nothing gets the silent bus the drivers have to cope with. */
+/*
+ * Answers reads out of one buffer and keeps everything that was written, so a driver's
+ * register addressing can be checked rather than only its arithmetic. The buffer is
+ * consumed as it is read, which is what lets a test answer a sequence of transfers - the
+ * status register and then the time block - with one prepared response. A test that
+ * prepares nothing gets the silent bus the drivers have to cope with.
+ */
 struct TwoWire {
     std::vector<uint8_t> Response;
     std::vector<uint8_t> Written;

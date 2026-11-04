@@ -1,6 +1,8 @@
-/* Stand-in for the ESP32 Arduino core, enough of it to compile and link the backend on
-   the host. Serial here is the *hardware* port: platform/esp32/include/Arduino.h shadows
-   this file, captures this object, and rebinds Serial to WordclockSerial. */
+/*
+ * Stand-in for the ESP32 Arduino core, enough of it to compile and link the backend on
+ * the host. Serial here is the *hardware* port: platform/esp32/include/Arduino.h shadows
+ * this file, captures this object, and rebinds Serial to WordclockSerial.
+ */
 #ifndef _ARDUINO_H_
 #define _ARDUINO_H_
 /* Under the framework's names, because it stands in for the framework's header. */
@@ -19,9 +21,11 @@ typedef bool boolean;
 #define bitRead(v,b) (((v) >> (b)) & 0x01)
 #define SDA 8
 #define SCL 9
-/* Enough of the core's digital IO for the supply switch to link. The test never reads a pin
-   back, so what a write did is not recorded: the switch's own state is kept in PowerSwitch and
-   that is what a case would ask. */
+/*
+ * Enough of the core's digital IO for the supply switch to link. The test never reads a pin
+ * back, so what a write did is not recorded: the switch's own state is kept in PowerSwitch and
+ * that is what a case would ask.
+ */
 #define OUTPUT 1
 #define HIGH 1
 #define LOW 0
@@ -42,10 +46,12 @@ struct Stream {
     void flush() {}
 };
 
-/* What the backend asks the chip itself for. restart() records rather than restarts: a
-   finished firmware update ends in one, and the case for it wants to see that the reboot was
-   asked for on the tick after the answer went out - which is the whole of why the restart is
-   deferred and not done in the handler. */
+/*
+ * What the backend asks the chip itself for. restart() records rather than restarts: a
+ * finished firmware update ends in one, and the case for it wants to see that the reboot was
+ * asked for on the tick after the answer went out - which is the whole of why the restart is
+ * deferred and not done in the handler.
+ */
 struct EspClass {
     bool Restarted{false};
     uint32_t getFreeHeap() { return 0u; }

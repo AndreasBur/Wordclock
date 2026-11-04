@@ -1,13 +1,17 @@
+// Copyright 2017 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+/*!
+ * \file
+ * \brief The Arduino API for the simulator, which the firmware includes as Arduino.h.
+ *
+ * It pulls the individual pieces together. Include order matters: arduino/Types.h defines `byte`,
+ * which the sim headers depend on, so it comes first. Serial is bound last because it needs
+ * SerialShim.
+ */
+
 #ifndef _ARDUINO_H_
 #define _ARDUINO_H_
-
-/* ========================================================================== */
-/*  Arduino compatibility shim for the wxWidgets simulator                    */
-/* -------------------------------------------------------------------------- */
-/*  Umbrella header that pulls the individual pieces together. Include order  */
-/*  matters: arduino/Types.h defines `byte`, which the sim headers depend on,  */
-/*  so it comes first. Serial is bound last because it needs SerialShim.      */
-/* ========================================================================== */
 
 #include "arduino/Types.h"      // byte, boolean  (before the sim headers!)
 

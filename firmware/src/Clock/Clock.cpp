@@ -1,41 +1,15 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
- *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       Clock.cpp
- *      \brief
- *
- *      \details
- *
- *
- *****************************************************************************************************************************************************/
+// Copyright 2017 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+/*!
+ * \file
+ * \brief The word tables of the clock dialects and how a time is looked up in them.
+ */
+
 #define _CLOCK_SOURCE_
 
-/******************************************************************************************************************************************************
- * INCLUDES
- *****************************************************************************************************************************************************/
 #include "Clock.h"
 
-
-/******************************************************************************************************************************************************
- *  LOCAL CONSTANT MACROS
-******************************************************************************************************************************************************/
-
-
-/******************************************************************************************************************************************************
- *  LOCAL FUNCTION MACROS
-******************************************************************************************************************************************************/
-
-
-/******************************************************************************************************************************************************
- *  LOCAL DATA TYPES AND STRUCTURES
-******************************************************************************************************************************************************/
 const Clock::HourType Clock::kHoursTable[][CLOCK_NUMBER_OF_HOURS] PROGMEM
 {
     {                                                                    // ClockHoursTable[0][] = hh:00 CLOCK_HOUR_MODE_FULL_HOUR
@@ -67,7 +41,6 @@ const Clock::HourType Clock::kHoursTable[][CLOCK_NUMBER_OF_HOURS] PROGMEM
         {DisplayWords::WordIdType::kHourElf,    DisplayWords::WordIdType::kNone}        // 11:mm
     }
 };
-
 
 const Clock::MinuteType Clock::kMinutesTable[][CLOCK_NUMBER_OF_MINUTE_STEPS] PROGMEM
 {
@@ -129,14 +102,6 @@ const Clock::MinuteType Clock::kMinutesTable[][CLOCK_NUMBER_OF_MINUTE_STEPS] PRO
     }
 };
 
-
-/******************************************************************************************************************************************************
- * P U B L I C   F U N C T I O N S
-******************************************************************************************************************************************************/
-
-/******************************************************************************************************************************************************
-  GetClockWords()
-******************************************************************************************************************************************************/
 StdReturnType Clock::GetClockWords(byte hour, byte minute, ClockWords& clock_words) const
 {
     /* ----- Local Variables ---------------------------------------------- */
@@ -145,9 +110,11 @@ StdReturnType Clock::GetClockWords(byte hour, byte minute, ClockWords& clock_wor
     /* ----- Implementation ----------------------------------------------- */
     if(hour < CLOCK_NUMBER_OF_HOURS_PER_DAY && minute < CLOCK_NUMBER_OF_MINUTES_PER_HOUR) {
         return_value = kEOk;
-        /* Show "it is" permanently, or only at the full and the half hour. The switch this
-           was is now the default of the setting; what a running clock does is asked here
-           rather than compiled in. */
+        /*
+         * Show "it is" permanently, or only at the full and the half hour. The switch this
+         * was is now the default of the setting; what a running clock does is asked here
+         * rather than compiled in.
+         */
         clock_words.SetShowItIs(show_it_is_permanently_ || CalculateItIs(minute));
         MinuteTableElementType minutes_table_element = GetMinutesTableElement(minute);
         hour = Transform24hTo12hFormat(hour);
@@ -160,12 +127,8 @@ StdReturnType Clock::GetClockWords(byte hour, byte minute, ClockWords& clock_wor
         return_value = kENotOk;
     }
     return return_value;
-} /* GetClockWords */
+}
 
-
-/******************************************************************************************************************************************************
-  GetClockWords()
-******************************************************************************************************************************************************/
 StdReturnType Clock::GetClockWords(byte hour, byte minute, ClockWordsListType& clock_words_list) const
 {
     /* ----- Local Variables ---------------------------------------------- */
@@ -178,12 +141,8 @@ StdReturnType Clock::GetClockWords(byte hour, byte minute, ClockWordsListType& c
     } else {
         return kENotOk;
     }
-} /* GetClockWords */
+}
 
-
-/******************************************************************************************************************************************************
-  SetTime()
-******************************************************************************************************************************************************/
 StdReturnType Clock::SetTime(byte hour, byte minute) const
 {
     /* ----- Local Variables ---------------------------------------------- */
@@ -204,15 +163,4 @@ StdReturnType Clock::SetTime(byte hour, byte minute) const
         if(Display::GetInstance().SetWord(clock_words.GetMinuteWord(index)) == kENotOk) return_value = kENotOk;
     }
     return return_value;
-} /* SetTime */
-
-
-/******************************************************************************************************************************************************
- * P R I V A T E   F U N C T I O N S
- *****************************************************************************************************************************************************/
-
-
-
-/******************************************************************************************************************************************************
- *  E N D   O F   F I L E
- *****************************************************************************************************************************************************/
+}

@@ -1,5 +1,5 @@
-/* The RMT calls, for the tests and the host process that do not inspect the frame.
-   frame_test.cpp defines its own instead, so it can keep what was transmitted. */
+// The RMT calls, for the tests and the host process that do not inspect the frame.
+// frame_test.cpp defines its own instead, so it can keep what was transmitted.
 #include <driver/rmt_tx.h>
 
 esp_err_t rmt_new_tx_channel(const rmt_tx_channel_config_t*, rmt_channel_handle_t* h) { *h = (rmt_channel_handle_t)1; return ESP_OK; }

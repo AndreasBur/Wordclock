@@ -1,46 +1,38 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+/*!
+ * \file
+ * \brief numeric_limits for a toolchain that ships no libstdc++, see stl/type_traits.
  *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       limits
- *      \brief      numeric_limits for a toolchain that ships no libstdc++, see stl/type_traits
+ * Only max() and min() are provided, because that is all the core asks for.
  *
- *      \details    Only max() and min() are provided, because that is all the core asks for.
+ * Both are constexpr, which the vendored xmega STL's were not: the core calls them from constant
+ * expressions and that copy fails to compile there.
  *
- *                  Both are constexpr, which the vendored xmega STL's were not: the core
- *                  calls them from constant expressions and that copy fails to compile there.
+ * min() keeps the standard's meaning for floating-point types, the smallest positive normal rather
+ * than the most negative value. Anything else would be a quiet disagreement with the libstdc++ the
+ * other backends are built against, and a backend that answers a command differently from the
+ * simulator it was tested on is worse than one that reproduces a surprise faithfully.
  *
- *                  min() keeps the standard's meaning for floating-point types, the smallest
- *                  positive normal rather than the most negative value. Anything else would
- *                  be a quiet disagreement with the libstdc++ the other backends are built
- *                  against, and a backend that answers a command differently from the
- *                  simulator it was tested on is worse than one that reproduces a surprise
- *                  faithfully.
- *
- *                  The floating-point figures come from the compiler's own __FLT_MAX__ and
- *                  friends rather than from literals, so a build with -mdouble=64 gets the
- *                  limits of the double it actually has.
- *
-******************************************************************************************************************************************************/
+ * The floating-point figures come from the compiler's own __FLT_MAX__ and friends rather than from
+ * literals, so a build with -mdouble=64 gets the limits of the double it actually has.
+ */
+
 #ifndef _STL_LIMITS_
 #define _STL_LIMITS_
 
 #include "type_traits"
 
-/* On this toolchain these headers are the standard library, see type_traits, so declaring
-   into std is what they exist to do - and under the standard's names, which is what the
-   naming check is told here. */
+/*
+ * On this toolchain these headers are the standard library, see type_traits, so declaring
+ * into std is what they exist to do - and under the standard's names, which is what the
+ * naming check is told here.
+ */
 // NOLINTBEGIN(cert-dcl58-cpp,readability-identifier-naming)
 namespace std {
-
-/* The integral case, worked out from the type itself: everything the core measures against
-   is an integer of some width, and deriving the bound beats one specialisation per type. */
+// The integral case, worked out from the type itself: everything the core measures against
+// is an integer of some width, and deriving the bound beats one specialisation per type.
 template<class T> struct numeric_limits {
   private:
     static constexpr bool kIsSigned{T(-1) < T(0)};
@@ -83,7 +75,3 @@ template<> struct numeric_limits<long double> {
 // NOLINTEND(cert-dcl58-cpp,readability-identifier-naming)
 
 #endif // _STL_LIMITS_
-
-/******************************************************************************************************************************************************
- *  E N D   O F   F I L E
-******************************************************************************************************************************************************/

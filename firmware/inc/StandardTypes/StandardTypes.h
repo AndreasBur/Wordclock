@@ -1,35 +1,22 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
+// Copyright 2017 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+/*!
+ * \file
+ * \brief Main header file of standard types library.
  *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       StandardTypes.h
- *      \brief      Main header file of standard types library
- *
- *      \details    Library with standard types
- *
- *
-******************************************************************************************************************************************************/
+ * Library with standard types.
+ */
+
 #ifndef _STANDARD_TYPES_H_
 #define _STANDARD_TYPES_H_
 
-/******************************************************************************************************************************************************
- * INCLUDES
-******************************************************************************************************************************************************/
 #include "limits"
 #include <stdint.h>
 #include <limits.h>
 #include <stddef.h>
 #include <type_traits>
 
-/******************************************************************************************************************************************************
- *  GLOBAL CONSTANT MACROS
-******************************************************************************************************************************************************/
 /* standard type for configuration */
 #define STD_ON                  1u
 #define STD_OFF                 0u
@@ -46,9 +33,6 @@
 /* Dummy statement to prevent compiler warnings unused parameter */
 #define UNUSED(x) (void)(x)
 
-/******************************************************************************************************************************************************
- *  GLOBAL FUNCTION MACROS
-******************************************************************************************************************************************************/
 /* binary to decimal */
 /*
 #define B(x) ( \
@@ -62,32 +46,25 @@
 (0##x >> 14 & 0200) )
 */
 
-/******************************************************************************************************************************************************
- *  GLOBAL DATA TYPES AND STRUCTURES
-******************************************************************************************************************************************************/
 /* standard return type for functions */
 enum StdReturnType {
     kEOk = 0u,
     kENotOk = 1u
 };
 
-/******************************************************************************************************************************************************
- *  GLOBAL INLINE FUNCTION PROTOTYPES
-******************************************************************************************************************************************************/
 template <typename T> uint8_t DigitsOfNumber(T number, unsigned = 10);
 
-/* An enumerator as the number it is stored as - to index an array with, count with or print.
-   An enum class does not turn into a number by itself, which is the point of it; this is the
-   one place it is asked to. std::to_underlying, which is C++23. */
+/*
+ * An enumerator as the number it is stored as - to index an array with, count with or print.
+ * An enum class does not turn into a number by itself, which is the point of it; this is the
+ * one place it is asked to. std::to_underlying, which is C++23.
+ */
 template <typename EnumType>
 constexpr std::underlying_type_t<EnumType> ToUnderlying(EnumType value)
 {
     return static_cast<std::underlying_type_t<EnumType>>(value);
 }
 
-/******************************************************************************************************************************************************
- *  GLOBAL INLINE FUNCTIONS
-******************************************************************************************************************************************************/
 template <typename T>
 uint8_t DigitsOfNumber(T number, unsigned base)
 {
@@ -100,6 +77,3 @@ uint8_t DigitsOfNumber(T number, unsigned base)
 }
 
 #endif
-/******************************************************************************************************************************************************
- *  E N D   O F   F I L E
-******************************************************************************************************************************************************/

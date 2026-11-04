@@ -1,10 +1,4 @@
-/******************************************************************************************************************************************************
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       animation_test.cpp
- *      \brief      That every animation ends on the time it was started for
-******************************************************************************************************************************************************/
-
+// That every animation ends on the time it was started for.
 
 #include "check.h"
 #include "cases.h"
@@ -17,17 +11,21 @@
 #include "Pixels.h"
 #include "RealTimeClock.h"
 
-/* The one promise every animation makes, and the one that is easy to break: whatever it
-   does in between, the display it leaves behind is the new time and nothing else.
-   Animation::FinishWithClockWords() exists because that was got wrong once - an animation
-   that places letters itself can leave a pixel of the previous time lit, and on a word
-   clock that is a word nobody notices is wrong.
-   The second promise is that they end at all. Both are checked for every animation there
-   is, so an added one is covered by being added to the enumeration. */
-/* The flicker makes its effect by switching the display off and on, and it used to end on
-   an off: the toggle happens before the decision to stop, so the last one always darkened.
-   Asked at the output rather than at the buffer, which is where it hid - the words are in
-   the buffer either way, and every existing check looked there. */
+/*
+ * The one promise every animation makes, and the one that is easy to break: whatever it
+ * does in between, the display it leaves behind is the new time and nothing else.
+ * Animation::FinishWithClockWords() exists because that was got wrong once - an animation
+ * that places letters itself can leave a pixel of the previous time lit, and on a word
+ * clock that is a word nobody notices is wrong.
+ * The second promise is that they end at all. Both are checked for every animation there
+ * is, so an added one is covered by being added to the enumeration.
+ */
+/*
+ * The flicker makes its effect by switching the display off and on, and it used to end on
+ * an off: the toggle happens before the decision to stop, so the last one always darkened.
+ * Asked at the output rather than at the buffer, which is where it hid - the words are in
+ * the buffer either way, and every existing check looked there.
+ */
 void TestFlickerLeavesTheDisplayOn()
 {
     Display& display = Display::GetInstance();
@@ -49,8 +47,8 @@ void TestFlickerLeavesTheDisplayOn()
 
 void TestEveryAnimationEndsOnTheNewTime()
 {
-    /* A generous bound rather than a tight one: what it is here for is a runaway, not a
-       measurement. The longest of them walks all 110 pixels several times over. */
+    // A generous bound rather than a tight one: what it is here for is a runaway, not a
+    // measurement. The longest of them walks all 110 pixels several times over.
     constexpr int kTickLimit{5000};
 
     Clock::GetInstance().SetMode(Clock::ModeType::kWessi);
@@ -64,8 +62,8 @@ void TestEveryAnimationEndsOnTheNewTime()
         const Animations::AnimationIdType animation_id = static_cast<Animations::AnimationIdType>(id);
         char description[64];
 
-        /* The display holds the previous time when a word change starts, which is what
-           the animations transition away from. */
+        // The display holds the previous time when a word change starts, which is what
+        // the animations transition away from.
         DrawClockFace(10u, 4u);
         animations.SetAnimation(animation_id);
         animations.SetTime(10u, 35u);
@@ -94,18 +92,20 @@ void TestEveryAnimationEndsOnTheNewTime()
     animations.SetAnimation(Animations::AnimationIdType::kNone);
 }
 
-/* Stepping the selection, which is the only way a control with no list reaches an
-   animation. Three things have to hold, and the third is why this does not reuse the walk
-   ModeType::kSequence already had: that one visits the favourites only, and a knob has to reach
-   an animation that is not one. */
+/*
+ * Stepping the selection, which is the only way a control with no list reaches an
+ * animation. Three things have to hold, and the third is why this does not reuse the walk
+ * ModeType::kSequence already had: that one visits the favourites only, and a knob has to reach
+ * an animation that is not one.
+ */
 void TestAnimationStepsThroughEveryOne()
 {
     Animations& animations = Animations::GetInstance();
     animations.SetMode(Animations::ModeType::kFixed);
     animations.SetAnimation(Animations::AnimationIdType::kNone);
 
-    /* The round closes, and "no animation" is part of it - a knob is the only way back to
-       it for somebody without a phone. */
+    // The round closes, and "no animation" is part of it - a knob is the only way back to
+    // it for somebody without a phone.
     bool seen[Animations::kNumberOfAnimations]{};
     for(byte step = 0u; step < Animations::kNumberOfAnimations; step++) {
         seen[ToUnderlying(animations.GetAnimation())] = true;
@@ -142,8 +142,8 @@ void TestAnimationStepsThroughEveryOne()
 
 void TestSnakeLifetime()
 {
-    /* Automatic storage exercises the destructor that the long-lived animation pool
-       does not call during a normal firmware run. */
+    // Automatic storage exercises the destructor that the long-lived animation pool
+    // does not call during a normal firmware run.
     AnimationSnake snake;
     snake.Init();
     Expect(snake.GetState() == Animation::StateType::kIdle, "a fresh snake animation must be idle");

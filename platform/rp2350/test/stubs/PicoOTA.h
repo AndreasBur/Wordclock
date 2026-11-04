@@ -3,14 +3,16 @@
 /* Under the framework's names, because it stands in for the framework's header. */
 // NOLINTBEGIN(readability-identifier-naming)
 #include <string>
-/* Stand-in for the core's PicoOTA, which on the target writes the command page the OTA
-   loader reads on the next boot. Nothing here writes flash, so what the stub keeps is the
-   one fact a test can check: which file the loader was told to install, and only once the
-   commit succeeded. Empty therefore means "this clock will boot what it is running", which
-   is what every failing case has to leave behind.
-
-   The two switches are for the cases that cannot be provoked otherwise: a filesystem that
-   loses the image between writing and reading it, and a command page that will not write. */
+/*
+ * Stand-in for the core's PicoOTA, which on the target writes the command page the OTA
+ * loader reads on the next boot. Nothing here writes flash, so what the stub keeps is the
+ * one fact a test can check: which file the loader was told to install, and only once the
+ * commit succeeded. Empty therefore means "this clock will boot what it is running", which
+ * is what every failing case has to leave behind.
+ *
+ * The two switches are for the cases that cannot be provoked otherwise: a filesystem that
+ * loses the image between writing and reading it, and a command page that will not write.
+ */
 struct PicoOtaStub {
     bool AddSucceeds{true};
     bool CommitSucceeds{true};

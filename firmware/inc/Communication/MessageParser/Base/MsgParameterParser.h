@@ -1,25 +1,14 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
- *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       MsgParameterParser.h
- *      \brief
- *
- *      \details
- *
-******************************************************************************************************************************************************/
+// Copyright 2017 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+/*!
+ * \file
+ * \brief The base of the command parsers, which reads the options by a parameter table.
+ */
+
 #ifndef _MSG_PARAMETER_PARSER_H_
 #define _MSG_PARAMETER_PARSER_H_
 
-/******************************************************************************************************************************************************
- * I N C L U D E S
-******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Arduino.h"
 #include "Message.h"
@@ -31,9 +20,6 @@
 #include "Communication.h"
 #include <array>
 
-/******************************************************************************************************************************************************
- *  G L O B A L   C O N S T A N T   M A C R O S
-******************************************************************************************************************************************************/
 /* MsgParameterParser configuration parameter */
 #define MSG_PARAMETER_PARSER_ARGUMENT_TYPE_CHAR                     STD_OFF
 #define MSG_PARAMETER_PARSER_ARGUMENT_TYPE_UINT8                    STD_ON
@@ -50,39 +36,25 @@
 
 /* MsgParser parameter */
 
-
-
-/******************************************************************************************************************************************************
- *  G L O B A L   F U N C T I O N   M A C R O S
-******************************************************************************************************************************************************/
-
-
-/******************************************************************************************************************************************************
- *  C L A S S   M S G   P A R A M E T E R   P A R S E R
-******************************************************************************************************************************************************/
 template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
 {
-/******************************************************************************************************************************************************
- *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
-******************************************************************************************************************************************************/
   public:
     using ParameterTableElementType = MsgParameter;
     using ParameterTableType = std::array<ParameterTableElementType, ParameterTableSize>;
     using PositionType = StringTools::PositionType;
     using LengthType = StringTools::LengthType;
 
-/******************************************************************************************************************************************************
- *  P R O T E C T E D   D A T A   A N D   F U N C T I O N S
-******************************************************************************************************************************************************/
   protected:
     static constexpr char kOptionArgumentDelimiter{'='};
     ErrorMessage error_;
 
-    /* Protected rather than private with the derived class as a friend, which is what
-       clang-tidy asks for: a friend would open this base's whole private side to it, where
-       protected opens only what is meant for it. What the private constructor would
-       prevent - somebody inheriting this template with another class's Derived - the
-       assertion catches instead, at the first point where Derived is a complete type. */
+    /*
+     * Protected rather than private with the derived class as a friend, which is what
+     * clang-tidy asks for: a friend would open this base's whole private side to it, where
+     * protected opens only what is meant for it. What the private constructor would
+     * prevent - somebody inheriting this template with another class's Derived - the
+     * assertion catches instead, at the first point where Derived is a complete type.
+     */
     // NOLINTNEXTLINE(bugprone-crtp-constructor-accessibility)
     constexpr MsgParameterParser(const ParameterTableType& parameter_table, const char* parameter)
     : error_(), parameter_buffer_(parameter), parameter_table_(parameter_table) {
@@ -91,10 +63,6 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
     }
     ~MsgParameterParser() { }
 
-
-/******************************************************************************************************************************************************
- *  P R I V A T E   D A T A   A N D   F U N C T I O N S
-******************************************************************************************************************************************************/
   private:
     enum class StateType {
         kParse,
@@ -202,9 +170,6 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
         }
     }
 
-/******************************************************************************************************************************************************
- *  P U B L I C   F U N C T I O N S
-******************************************************************************************************************************************************/
   public:
 
     // get methods
@@ -246,7 +211,3 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
 };
 
 #endif
-
-/******************************************************************************************************************************************************
- *  E N D   O F   F I L E
-******************************************************************************************************************************************************/

@@ -1,52 +1,15 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
- *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       Animations.cpp
- *      \brief
- *
- *      \details
- *
- *
-******************************************************************************************************************************************************/
+// Copyright 2021 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+/*!
+ * \file
+ * \brief What the animations facade does itself.
+ */
+
 #define _ANIMATIONS_SOURCE_
 
-/******************************************************************************************************************************************************
- * I N C L U D E S
-******************************************************************************************************************************************************/
 #include "Animations.h"
 
-
-/******************************************************************************************************************************************************
- *  L O C A L   C O N S T A N T   M A C R O S
-******************************************************************************************************************************************************/
-
-
-/******************************************************************************************************************************************************
- *  L O C A L   F U N C T I O N   M A C R O S
-******************************************************************************************************************************************************/
-
-
-
-/******************************************************************************************************************************************************
- *  L O C A L   D A T A   T Y P E S   A N D   S T R U C T U R E S
-******************************************************************************************************************************************************/
-
-
-
-/******************************************************************************************************************************************************
- * P U B L I C   F U N C T I O N S
-******************************************************************************************************************************************************/
-
-/******************************************************************************************************************************************************
-  GetState()
-******************************************************************************************************************************************************/
 Animations::StateType Animations::GetState() const
 {
     if(GetStateOfCurrentAnimation() == Animation::StateType::kClearTime ||
@@ -56,12 +19,8 @@ Animations::StateType Animations::GetState() const
     }
 
     return StateType::kIdle;
-} /* GetState */
+}
 
-
-/******************************************************************************************************************************************************
-  Task()
-******************************************************************************************************************************************************/
 void Animations::Task(bool show)
 {
     if(GetStateOfCurrentAnimation() == Animation::StateType::kClearTime ||
@@ -70,12 +29,8 @@ void Animations::Task(bool show)
         TaskOfCurrentAnimation();
         if(show) { ShowOfCurrentAnimation(); }
     }
-} /* Task */
+}
 
-
-/******************************************************************************************************************************************************
-  Show()
-******************************************************************************************************************************************************/
 StdReturnType Animations::Show() const
 {
     if(GetStateOfCurrentAnimation() == Animation::StateType::kClearTime ||
@@ -85,11 +40,8 @@ StdReturnType Animations::Show() const
     }
 
     return kENotOk;
-} /* Show */
+}
 
-/******************************************************************************************************************************************************
-  SetTaskCycle()
-******************************************************************************************************************************************************/
 StdReturnType Animations::SetTaskCycle(AnimationIdType animation_id, byte cycle)
 {
     if(IsAnimationValid(animation_id)) {
@@ -100,45 +52,34 @@ StdReturnType Animations::SetTaskCycle(AnimationIdType animation_id, byte cycle)
     }
 }
 
-/******************************************************************************************************************************************************
-  SetAnimation()
-******************************************************************************************************************************************************/
 StdReturnType Animations::SetAnimation(AnimationIdType animation_id)
 {
     if(!IsAnimationValid(animation_id)) { return kENotOk; }
 
     animation_id_ = animation_id;
-    /* shows the selected animation right away, even in a mode that selects on its own;
-       that mode takes over again on the next word change */
+    // shows the selected animation right away, even in a mode that selects on its own;
+    // that mode takes over again on the next word change
     current_animation_id_ = animation_id_;
 
     InitCurrentAnimation();
     return kEOk;
-} /* SetAnimation */
+}
 
-
-/******************************************************************************************************************************************************
-  SetMode()
-******************************************************************************************************************************************************/
 StdReturnType Animations::SetMode(ModeType mode)
 {
     if(!IsModeValid(mode)) { return kENotOk; }
 
     mode_ = mode;
 
-    /* Back to the selected animation. The selecting modes leave the current animation
-       alone and take over on the next word change. */
+    // Back to the selected animation. The selecting modes leave the current animation
+    // alone and take over on the next word change.
     if(mode_ == ModeType::kFixed) {
         current_animation_id_ = animation_id_;
         InitCurrentAnimation();
     }
     return kEOk;
-} /* SetMode */
+}
 
-
-/******************************************************************************************************************************************************
-  InitCurrentAnimation()
-******************************************************************************************************************************************************/
 void Animations::InitCurrentAnimation()
 {
     switch(current_animation_id_)
@@ -222,16 +163,12 @@ void Animations::InitCurrentAnimation()
             current_animation_id_ = AnimationIdType::kNone;
             break;
     }
-} /* InitCurrentAnimation */
+}
 
-
-/******************************************************************************************************************************************************
-  SetTime()
-******************************************************************************************************************************************************/
 StdReturnType Animations::SetTime(byte hour, byte minute)
 {
-    /* Only while nothing is running, so a word change during a still running
-       animation is ignored here exactly as it is by the animations themselves. */
+    // Only while nothing is running, so a word change during a still running
+    // animation is ignored here exactly as it is by the animations themselves.
     if(mode_ != ModeType::kFixed && GetStateOfCurrentAnimation() == Animation::StateType::kIdle) {
         SelectAnimationOfMode();
     }
@@ -320,16 +257,8 @@ StdReturnType Animations::SetTime(byte hour, byte minute)
             return kENotOk;
             break;
     }
-} /* SetTime */
+}
 
-
-/******************************************************************************************************************************************************
- * P R I V A T E   F U N C T I O N S
-******************************************************************************************************************************************************/
-
-/******************************************************************************************************************************************************
-  GetStateOfCurrentAnimation()
-******************************************************************************************************************************************************/
 Animation::StateType Animations::GetStateOfCurrentAnimation() const
 {
     switch(current_animation_id_)
@@ -416,12 +345,8 @@ Animation::StateType Animations::GetStateOfCurrentAnimation() const
             return Animation::StateType::kNone;
             break;
     }
-} /* GetStateOfCurrentAnimation */
+}
 
-
-/******************************************************************************************************************************************************
-  TaskOfCurrentAnimation()
-******************************************************************************************************************************************************/
 void Animations::TaskOfCurrentAnimation()
 {
     switch(current_animation_id_)
@@ -506,12 +431,8 @@ void Animations::TaskOfCurrentAnimation()
         default :
             break;
     }
-} /* TaskOfCurrentAnimation */
+}
 
-
-/******************************************************************************************************************************************************
-  ShowOfCurrentAnimation()
-******************************************************************************************************************************************************/
 StdReturnType Animations::ShowOfCurrentAnimation() const
 {
     switch(current_animation_id_)
@@ -598,12 +519,8 @@ StdReturnType Animations::ShowOfCurrentAnimation() const
             return kENotOk;
             break;
     }
-} /* ShowOfCurrentAnimation */
+}
 
-
-/******************************************************************************************************************************************************
-  SelectAnimationOfMode()
-******************************************************************************************************************************************************/
 void Animations::SelectAnimationOfMode()
 {
     switch(mode_)
@@ -618,30 +535,30 @@ void Animations::SelectAnimationOfMode()
             break;
     }
 
-    /* the selected animation shares its memory with the previous one, so it has to be
-       initialized before it is used */
+    // the selected animation shares its memory with the previous one, so it has to be
+    // initialized before it is used
     InitCurrentAnimation();
-} /* SelectAnimationOfMode */
+}
 
-
-/******************************************************************************************************************************************************
-  CalcRandomAnimation()
-******************************************************************************************************************************************************/
 Animations::AnimationIdType Animations::CalcRandomAnimation()
 {
-    /* Advancing state instead of deriving it from the time: the same animation would
-       otherwise always run at the same minute of every day. Both halves of the state
-       go into the hash, otherwise the order of animations would repeat every 256
-       minutes instead of every 65536. */
+    /*
+     * Advancing state instead of deriving it from the time: the same animation would
+     * otherwise always run at the same minute of every day. Both halves of the state
+     * go into the hash, otherwise the order of animations would repeat every 256
+     * minutes instead of every 65536.
+     */
     random_state_++;
 
     byte hash = static_cast<byte>((random_state_ ^ (random_state_ >> 8u)) * kRandomHashFactor);
     hash ^= static_cast<byte>(hash >> 4u);
     hash = static_cast<byte>(hash * kRandomHashFactor);
 
-    /* Drawn among the favourites only, so the draw counts them and then walks to the
-       one it landed on. Scaled by multiplication instead of a modulo, which would
-       favour the first animations because 256 is not a multiple of their number. */
+    /*
+     * Drawn among the favourites only, so the draw counts them and then walks to the
+     * one it landed on. Scaled by multiplication instead of a modulo, which would
+     * favour the first animations because 256 is not a multiple of their number.
+     */
     byte offset = static_cast<byte>((static_cast<uint16_t>(hash) * NumberOfFavourites()) >> 8u);
 
     for(byte animation_id = kFirstAnimation; animation_id < kNumberOfAnimations; animation_id++) {
@@ -653,18 +570,14 @@ Animations::AnimationIdType Animations::CalcRandomAnimation()
 
     /* unreachable while at least one favourite is set, which SetFavourite() enforces */
     return animation_id_;
-} /* CalcRandomAnimation */
+}
 
-
-/******************************************************************************************************************************************************
-  CalcNextAnimation()
-******************************************************************************************************************************************************/
 Animations::AnimationIdType Animations::CalcNextAnimation() const
 {
     byte next = ToUnderlying(current_animation_id_);
 
-    /* Walks on until it finds a favourite. It cannot loop forever, because at least
-       one favourite is always set and there are only that many animations to try. */
+    // Walks on until it finds a favourite. It cannot loop forever, because at least
+    // one favourite is always set and there are only that many animations to try.
     for(byte tries = 0u; tries < kNumberOfSelectableAnimations; tries++) {
         /* none as the running animation means nothing ran yet, so start at the first */
         if(next == ToUnderlying(AnimationIdType::kNone) || next + 1u >= kNumberOfAnimations) { next = kFirstAnimation; }
@@ -674,12 +587,8 @@ Animations::AnimationIdType Animations::CalcNextAnimation() const
     }
 
     return animation_id_;
-} /* CalcNextAnimation */
+}
 
-
-/******************************************************************************************************************************************************
-  NumberOfFavourites()
-******************************************************************************************************************************************************/
 byte Animations::NumberOfFavourites() const
 {
     byte count{0u};
@@ -689,9 +598,4 @@ byte Animations::NumberOfFavourites() const
     }
 
     return count;
-} /* NumberOfFavourites */
-
-
-/******************************************************************************************************************************************************
- *  E N D   O F   F I L E
-******************************************************************************************************************************************************/
+}

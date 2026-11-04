@@ -1,23 +1,11 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
+/*
+ * That the supply's budget is what decides how bright the display may get.
  *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       current_limit_test.cpp
- *      \brief      That the supply's budget is what decides how bright the display may get
- *
- *      \details    Two halves. The arithmetic is checked over the whole range of lit counts,
- *                  because the property that matters is not one value but that no value
- *                  exceeds the budget. The rest is checked on the display, because where the
- *                  cap is applied decides whether a restored clock face comes back at the
- *                  brightness it had.
- *
-******************************************************************************************************************************************************/
+ * Two halves. The arithmetic is checked over the whole range of lit counts, because the property
+ * that matters is not one value but that no value exceeds the budget. The rest is checked on the
+ * display, because where the cap is applied decides whether a restored clock face comes back at the
+ * brightness it had.
+ */
 
 #include "check.h"
 #include "cases.h"
@@ -29,20 +17,19 @@
 #include "Pixels.h"
 
 namespace {
-
 constexpr uint32_t kBudgetMicroAmps{static_cast<uint32_t>(DISPLAY_CURRENT_LIMIT_BUDGET_MILLI_AMPS) * 1000u};
 constexpr uint16_t kWhiteChannelSum{DisplayCurrentLimit::ToChannelSum(255u, 255u, 255u)};
 constexpr uint16_t kRedChannelSum{DisplayCurrentLimit::ToChannelSum(255u, 0u, 0u)};
 
-/* The master the strip is carrying, which is where the cap lives - not the setting, which
-   GetBrightness() answers and which the cap deliberately leaves alone. */
+// The master the strip is carrying, which is where the cap lives - not the setting, which
+// GetBrightness() answers and which the cap deliberately leaves alone.
 byte GetMaster()
 {
     return Pixels::GetInstance().GetBrightness();
 }
 
-/* What the strip would draw with a given master, in microamps. The idle current does not
-   scale: a WS2812 held dark by the master still draws it. */
+// What the strip would draw with a given master, in microamps. The idle current does not
+// scale: a WS2812 held dark by the master still draws it.
 uint32_t ToCurrentMicroAmps(byte lit_pixels, uint16_t channel_sum, byte master)
 {
     const uint32_t idle = DisplayCurrentLimit::GetIdleCurrentMicroAmps(PIXELS_NUMBER_OF_LEDS);
@@ -51,8 +38,8 @@ uint32_t ToCurrentMicroAmps(byte lit_pixels, uint16_t channel_sum, byte master)
     return idle + ((at_full - idle) * master / 256u);
 }
 
-/* White, enabled, and a clock face on the display - what every case here starts from and has
-   to leave behind, since the cases after this file expect a white display. */
+// White, enabled, and a clock face on the display - what every case here starts from and has
+// to leave behind, since the cases after this file expect a white display.
 void StartFromWhiteClockFace()
 {
     Display& display = Display::GetInstance();
@@ -63,12 +50,13 @@ void StartFromWhiteClockFace()
     DisplayManager::GetInstance().Task();
 }
 
-} /* namespace */
+}
 
-
-/* The property the class exists for, checked as a property rather than at one point: for every
-   number of lit letters, the current at the brightness the solver allows must fit the budget,
-   and one more lit letter must never allow more brightness than the last. */
+/*
+ * The property the class exists for, checked as a property rather than at one point: for every
+ * number of lit letters, the current at the brightness the solver allows must fit the budget,
+ * and one more lit letter must never allow more brightness than the last.
+ */
 void TestCurrentLimitFitsTheBudgetAtEveryLitCount()
 {
     Expect(DisplayCurrentLimit::ToBrightnessLimit(PIXELS_NUMBER_OF_LEDS, 0u, kWhiteChannelSum) == DisplayCurrentLimit::kNoLimit,
@@ -87,10 +75,11 @@ void TestCurrentLimitFitsTheBudgetAtEveryLitCount()
     }
 }
 
-
-/* The colour decides as much as the count does: red asks a third of what white asks at the
-   same brightness, and on this display that is the difference between fitting the budget and
-   not. A limiter that only counted letters would hold both back equally. */
+/*
+ * The colour decides as much as the count does: red asks a third of what white asks at the
+ * same brightness, and on this display that is the difference between fitting the budget and
+ * not. A limiter that only counted letters would hold both back equally.
+ */
 void TestCurrentLimitFollowsTheColour()
 {
     const byte white_limit = DisplayCurrentLimit::ToBrightnessLimit(PIXELS_NUMBER_OF_LEDS, PIXELS_NUMBER_OF_LEDS, kWhiteChannelSum);
@@ -110,11 +99,12 @@ void TestCurrentLimitFollowsTheColour()
     StartFromWhiteClockFace();
 }
 
-
-/* Where the cap is applied, checked by what a restored clock face looks like. The cap rides on
-   the strip's master, so the buffer keeps the colour it was written with and a face that comes
-   back after a full display is the face that went away. Applying the cap to the colour instead
-   would leave it a fifth darker until the next task run, which is what this case would catch. */
+/*
+ * Where the cap is applied, checked by what a restored clock face looks like. The cap rides on
+ * the strip's master, so the buffer keeps the colour it was written with and a face that comes
+ * back after a full display is the face that went away. Applying the cap to the colour instead
+ * would leave it a fifth darker until the next task run, which is what this case would catch.
+ */
 void TestCurrentLimitLeavesTheRestoredFaceAlone()
 {
     Display& display = Display::GetInstance();
@@ -134,9 +124,8 @@ void TestCurrentLimitLeavesTheRestoredFaceAlone()
     StartFromWhiteClockFace();
 }
 
-
-/* The master is also what Disable() uses, so the two must not fight over it: a task on a dark
-   display must leave it dark rather than write a cap into it. */
+// The master is also what Disable() uses, so the two must not fight over it: a task on a dark
+// display must leave it dark rather than write a cap into it.
 void TestCurrentLimitDoesNotSwitchTheDisplayOn()
 {
     Display& display = Display::GetInstance();

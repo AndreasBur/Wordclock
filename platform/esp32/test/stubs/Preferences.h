@@ -8,8 +8,8 @@
 #include <map>
 #include <string>
 
-/* Keeps what was put into it, so a test can watch a round trip rather than only a call.
-   One map per namespace, shared by every instance, which is what NVS is. */
+// Keeps what was put into it, so a test can watch a round trip rather than only a call.
+// One map per namespace, shared by every instance, which is what NVS is.
 inline std::map<std::string, std::map<std::string, std::string>>& preferencesStore()
 {
     static std::map<std::string, std::map<std::string, std::string>> Store;
@@ -36,9 +36,11 @@ struct Preferences {
     size_t getBytesLength(const char*) { return 0; }
     size_t getBytes(const char*, void*, size_t) { return 0; }
     size_t putBytes(const char*, const void*, size_t) { return 0; }
-    /* Really removes, because clearing the console password is a state a case has to be able
-       to reach - and "returns false and keeps the key" would make the cleared clock and the
-       protected one the same thing here. */
+    /*
+     * Really removes, because clearing the console password is a state a case has to be able
+     * to reach - and "returns false and keeps the key" would make the cleared clock and the
+     * protected one the same thing here.
+     */
     bool remove(const char* Key) { return preferencesStore()[Namespace].erase(Key) > 0u; }
     bool isKey(const char*) { return false; }
 };

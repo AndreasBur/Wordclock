@@ -1,6 +1,8 @@
-/* Stand-in for the arduino-pico core, enough of it to compile and link the backend on the
-   host. Serial here is the *hardware* port: platform/rp2350/include/Arduino.h shadows this
-   file, captures this object, and rebinds Serial to WordclockSerial. */
+/*
+ * Stand-in for the arduino-pico core, enough of it to compile and link the backend on the
+ * host. Serial here is the *hardware* port: platform/rp2350/include/Arduino.h shadows this
+ * file, captures this object, and rebinds Serial to WordclockSerial.
+ */
 #ifndef _ARDUINO_H_
 #define _ARDUINO_H_
 /* Under the framework's names, because it stands in for the framework's header. */
@@ -40,10 +42,12 @@ struct Stream {
     void flush() {}
 };
 
-/* What the backend asks the chip itself for. Named after the part on this core, where the
-   ESP32's is named ESP. Recorded rather than only linkable since the update path exists: what
-   a case there has to tell apart is a restart *asked for* from one taken inside the handler,
-   and the second one would have sent the browser nothing. */
+/*
+ * What the backend asks the chip itself for. Named after the part on this core, where the
+ * ESP32's is named ESP. Recorded rather than only linkable since the update path exists: what
+ * a case there has to tell apart is a restart *asked for* from one taken inside the handler,
+ * and the second one would have sent the browser nothing.
+ */
 struct Rp2040Class {
     bool Restarted{false};
 

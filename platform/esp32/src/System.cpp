@@ -1,21 +1,11 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
- *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       System.cpp
- *      \brief      What the clock knows about the machine it runs on
- *
-******************************************************************************************************************************************************/
+// Copyright 2017 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
 
-/******************************************************************************************************************************************************
- * I N C L U D E S
-******************************************************************************************************************************************************/
+/*!
+ * \file
+ * \brief What the clock knows about the machine it runs on.
+ */
+
 /* Ahead of System.h, which pulls in the Arduino.h that binds Serial to a macro. */
 #include <WiFi.h>
 
@@ -26,23 +16,23 @@
 
 #include <string.h>
 
-/******************************************************************************************************************************************************
- *  LOCAL DATA
-******************************************************************************************************************************************************/
 namespace {
-
-/* Its own namespace, not the one the settings blob lives in: a settings reset must not
-   take the network with it, or a clock is left that nobody can reach without a cable.
-   Both are limited to 15 characters by NVS. */
+/*
+ * Its own namespace, not the one the settings blob lives in: a settings reset must not
+ * take the network with it, or a clock is left that nobody can reach without a cable.
+ * Both are limited to 15 characters by NVS.
+ */
 constexpr const char* kNetworkNamespace{"wc-network"};
 constexpr const char* kSsidKey{"ssid"};
 constexpr const char* kPasswordKey{"password"};
-/* Beside the network's own keys, in the same namespace: this is how the clock is reached as
-   well, which is what that namespace holds and what keeps it out of the settings blob the
-   core persists. */
+/*
+ * Beside the network's own keys, in the same namespace: this is how the clock is reached as
+ * well, which is what that namespace holds and what keeps it out of the settings blob the
+ * core persists.
+ */
 constexpr const char* kConsolePasswordKey{"console-pass"};
-/* Fixed, and printed in the 401's realm so nobody has to guess it. Not a secret: what is
-   secret is the password beside it. */
+// Fixed, and printed in the 401's realm so nobody has to guess it. Not a secret: what is
+// secret is the password beside it.
 constexpr char kConsoleUserName[]{"wordclock"};
 
 constexpr uint32_t kBytesPerKibibyte{1024u};
@@ -52,16 +42,18 @@ bool IsNetworkJoined()
     return WiFi.status() == WL_CONNECTED;
 }
 
-/* Reads one stored string into a buffer that has room for it, terminator included. An
-   empty answer and a missing key are the same thing here: a network nobody entered. */
-/* Base64, written here rather than taken from the core's own. Two reasons, and the second is
-   the better one: the core offers only an encoder anyway, and its encoder answers an Arduino
-   String - a heap allocation on a path that runs once per HTTP request, for twenty bytes that
-   fit on the stack. Encoding is also all this needs, since what it compares against is what a
-   browser would have sent.
-
-   Padding included, because a browser's header carries it and a comparison of the two has to
-   see the same string. */
+// Reads one stored string into a buffer that has room for it, terminator included. An
+// empty answer and a missing key are the same thing here: a network nobody entered.
+/*
+ * Base64, written here rather than taken from the core's own. Two reasons, and the second is
+ * the better one: the core offers only an encoder anyway, and its encoder answers an Arduino
+ * String - a heap allocation on a path that runs once per HTTP request, for twenty bytes that
+ * fit on the stack. Encoding is also all this needs, since what it compares against is what a
+ * browser would have sent.
+ *
+ * Padding included, because a browser's header carries it and a comparison of the two has to
+ * see the same string.
+ */
 void ToBase64(const char* plain, size_t length, char* target, size_t capacity)
 {
     static constexpr char kAlphabet[]{"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"};
@@ -83,7 +75,6 @@ void ToBase64(const char* plain, size_t length, char* target, size_t capacity)
     target[out] = STD_NULL_CHARACTER;
 }
 
-
 StdReturnType ReadStoredString(const char* key, char* string, size_t capacity)
 {
     string[0u] = STD_NULL_CHARACTER;
@@ -99,15 +90,15 @@ StdReturnType ReadStoredString(const char* key, char* string, size_t capacity)
     return kEOk;
 }
 
-/* What was compiled in, which is what a clock that was flashed with a WordclockSecrets.h
-   still comes up with. Stored credentials win over it: they are the later word. */
+// What was compiled in, which is what a clock that was flashed with a WordclockSecrets.h
+// still comes up with. Stored credentials win over it: they are the later word.
 constexpr bool IsSsidCompiledIn()
 {
     return sizeof(WORDCLOCK_WIFI_SSID) > 1u;
 }
 
-/* Copies into the caller's buffer only if the whole string fits, so a value that grew
-   past what the field was sized for is reported as no value rather than as half of one. */
+// Copies into the caller's buffer only if the whole string fits, so a value that grew
+// past what the field was sized for is reported as no value rather than as half of one.
 StdReturnType CopyIfItFits(const char* value, char* string, size_t capacity)
 {
     string[0u] = STD_NULL_CHARACTER;
@@ -121,34 +112,25 @@ StdReturnType CopyIfItFits(const char* value, char* string, size_t capacity)
 
 } // namespace
 
-/******************************************************************************************************************************************************
- * P U B L I C   F U N C T I O N S
-******************************************************************************************************************************************************/
-
-/* Instance methods, though some of them read no member: they are the interface the
-   firmware core calls through GetInstance(), and every backend - the simulator's
-   stand-ins included - offers it that way. Whether this backend's implementation
-   happens to need a member is its own detail, and answering the check would carry
-   that detail into the interface.
-   The ones it would make const drive the hardware, which a const would deny. */
+/*
+ * Instance methods, though some of them read no member: they are the interface the
+ * firmware core calls through GetInstance(), and every backend - the simulator's
+ * stand-ins included - offers it that way. Whether this backend's implementation
+ * happens to need a member is its own detail, and answering the check would carry
+ * that detail into the interface.
+ * The ones it would make const drive the hardware, which a const would deny.
+ */
 // NOLINTBEGIN(readability-convert-member-functions-to-static, readability-make-member-function-const)
-/******************************************************************************************************************************************************
-  GetFreeMemoryInKibibytes()
-******************************************************************************************************************************************************/
 StdReturnType System::GetFreeMemoryInKibibytes(uint16_t& free_memory) const
 {
     free_memory = static_cast<uint16_t>(ESP.getFreeHeap() / kBytesPerKibibyte);
     return kEOk;
-} /* GetFreeMemoryInKibibytes */
+}
 
-
-/******************************************************************************************************************************************************
-  GetNetworkAddress()
-******************************************************************************************************************************************************/
 /*! \brief          The address the clock answers on
  *
  *  \return         kEOk if the clock has joined a network and the address fits the buffer
-******************************************************************************************************************************************************/
+ */
 StdReturnType System::GetNetworkAddress(char* string) const
 {
     string[0u] = STD_NULL_CHARACTER;
@@ -156,16 +138,12 @@ StdReturnType System::GetNetworkAddress(char* string) const
     if(!IsNetworkJoined()) { return kENotOk; }
 
     return CopyIfItFits(WiFi.localIP().toString().c_str(), string, kAddressStringLength);
-} /* GetNetworkAddress */
+}
 
-
-/******************************************************************************************************************************************************
-  GetLinkQuality()
-******************************************************************************************************************************************************/
 /*! \brief          The received signal strength in dBm
  *
  *  \return         kEOk if the clock has joined a network
-******************************************************************************************************************************************************/
+ */
 StdReturnType System::GetLinkQuality(char* string) const
 {
     string[0u] = STD_NULL_CHARACTER;
@@ -174,19 +152,14 @@ StdReturnType System::GetLinkQuality(char* string) const
 
     itoa(static_cast<int>(WiFi.RSSI()), string, 10);
     return kEOk;
-} /* GetLinkQuality */
+}
 
-
-
-/******************************************************************************************************************************************************
-  GetNetworkSsid()
-******************************************************************************************************************************************************/
 /*! \brief          The network the clock is configured for
  *  \details        What was stored, and what was compiled in when nothing was stored -
  *                  in that order, because the stored one is the later word.
  *
  *  \return         kEOk if there is a network to name
-******************************************************************************************************************************************************/
+ */
 StdReturnType System::GetNetworkSsid(char* ssid) const
 {
     if(ReadStoredString(kSsidKey, ssid, kSsidStringLength) == kEOk) { return kEOk; }
@@ -195,23 +168,15 @@ StdReturnType System::GetNetworkSsid(char* ssid) const
 
     ssid[0u] = STD_NULL_CHARACTER;
     return kENotOk;
-}  /* GetNetworkSsid */
+}
 
-
-/******************************************************************************************************************************************************
-  IsNetworkConfigured()
-******************************************************************************************************************************************************/
 bool System::IsNetworkConfigured() const
 {
     char ssid[kSsidStringLength]{};
 
     return GetNetworkSsid(ssid) == kEOk;
-} /* IsNetworkConfigured */
+}
 
-
-/******************************************************************************************************************************************************
-  SetNetworkCredentials()
-******************************************************************************************************************************************************/
 /*! \brief          Stores what the clock is to join, and joins it
  *  \details        Both halves are written before anything is joined, so that a clock that
  *                  loses power in the middle of this comes back with either the old pair
@@ -222,7 +187,7 @@ bool System::IsNetworkConfigured() const
  *                  corrected over the network it broke.
  *
  *  \return         kEOk if the pair was stored
-******************************************************************************************************************************************************/
+ */
 StdReturnType System::SetNetworkCredentials(const char* ssid, const char* password)
 {
     if((ssid == nullptr) || (password == nullptr)) { return kENotOk; }
@@ -240,12 +205,8 @@ StdReturnType System::SetNetworkCredentials(const char* ssid, const char* passwo
 
     StartNetwork();
     return kEOk;
-} /* SetNetworkCredentials */
+}
 
-
-/******************************************************************************************************************************************************
-  StartNetwork()
-******************************************************************************************************************************************************/
 /*! \brief          Brings the network up as configured
  *  \details        A clock with credentials joins that network. A clock without opens one
  *                  of its own instead, because the console it is configured through is
@@ -260,7 +221,7 @@ StdReturnType System::SetNetworkCredentials(const char* ssid, const char* passwo
  *                  the credentials as well as from start-up, and a line printed in the
  *                  middle of a command lands inside that command\'s answer - which is how
  *                  this was found. The application says what happened instead.
-******************************************************************************************************************************************************/
+ */
 void System::StartNetwork()
 {
     char ssid[kSsidStringLength]{};
@@ -278,35 +239,27 @@ void System::StartNetwork()
     }
 
     WiFi.mode(WIFI_STA);
-    /* Reconnecting is left to the core, so a router that reboots does not take the clock's
-       time source with it for good. */
+    // Reconnecting is left to the core, so a router that reboots does not take the clock's
+    // time source with it for good.
     WiFi.setAutoReconnect(true);
     WiFi.setSleep(WORDCLOCK_WIFI_MODEM_SLEEP);
     WiFi.begin(ssid, password);
-} /* StartNetwork */
+}
 
-
-/******************************************************************************************************************************************************
-  PerformPendingRestart()
-******************************************************************************************************************************************************/
 /*! \brief          Carries out a restart that was asked for
  *  \details        From the application's tick, which is after the command's answer has
  *                  been printed and after the web interface has sent it on. Serial is
  *                  flushed first: the UART writes in the background, and a controller that
  *                  restarts with bytes still in that buffer cuts its own answer in half.
-******************************************************************************************************************************************************/
+ */
 void System::PerformPendingRestart()
 {
     if(!restart_pending_) { return; }
 
     Serial.flush();
     ESP.restart();
-} /* PerformPendingRestart */
+}
 
-
-/******************************************************************************************************************************************************
-  ResynchroniseTime()
-******************************************************************************************************************************************************/
 /*! \brief          Asks the network for the time again
  *  \details        The same call the application makes at start-up rather than a reach
  *                  into SNTP: installing the servers again is what restarts the query, and
@@ -314,40 +267,33 @@ void System::PerformPendingRestart()
  *                  servers alone would leave the rule to be repeated here.
  *
  *  \return         kEOk if there is a network to ask over
-******************************************************************************************************************************************************/
+ */
 StdReturnType System::ResynchroniseTime()
 {
     if(!IsNetworkJoined()) { return kENotOk; }
 
     configTzTime(WORDCLOCK_TIMEZONE, WORDCLOCK_NTP_SERVER_PRIMARY, WORDCLOCK_NTP_SERVER_SECONDARY);
     return kEOk;
-} /* ResynchroniseTime */
+}
 
-
-/******************************************************************************************************************************************************
-  ReconnectNetwork()
-******************************************************************************************************************************************************/
 /*! \brief          Joins the network again
  *  \details        Refused where no network was ever configured, which is a clock running
  *                  on the serial line alone - there is nothing to reconnect to, and
  *                  answering kEOk would say there was.
  *
  *  \return         kEOk if the attempt was started
-******************************************************************************************************************************************************/
+ */
 StdReturnType System::ReconnectNetwork()
 {
-    /* An unset SSID is a configuration that was never filled in, the same test the
-       application makes before it joins at all. */
+    // An unset SSID is a configuration that was never filled in, the same test the
+    // application makes before it joins at all.
     if(sizeof(WORDCLOCK_WIFI_SSID) <= 1u) { return kENotOk; }
 
     if(!WiFi.reconnect()) { return kENotOk; }
 
     return kEOk;
-} /* ReconnectNetwork */
+}
 
-/******************************************************************************************************************************************************
-  IsConsoleProtected() / IsConsoleCredentialValid() / SetConsolePassword()
-******************************************************************************************************************************************************/
 /*! \brief          The password the console asks for, and whether what arrived matches
  *
  *  \details        Encoded once and compared as a string, because the core here can encode
@@ -359,14 +305,13 @@ StdReturnType System::ReconnectNetwork()
  *                  network round trip and this is a flash read of sixty bytes, so the copy
  *                  that could fall behind is not worth having - and a password changed by
  *                  command takes effect on the next request rather than on the next restart.
-******************************************************************************************************************************************************/
+ */
 bool System::IsConsoleProtected() const
 {
     char password[kPasswordStringLength]{};
 
     return ReadStoredString(kConsolePasswordKey, password, kPasswordStringLength) == kEOk;
 }
-
 
 bool System::IsConsoleCredentialValid(const char* credential) const
 {
@@ -382,13 +327,12 @@ bool System::IsConsoleCredentialValid(const char* credential) const
     char encoded[(sizeof(expected) + 2u) / 3u * 4u + 1u]{};
     ToBase64(expected, static_cast<size_t>(length), encoded, sizeof(encoded));
 
-    /* Same length first, then the whole of it: strncmp on the shorter of two strings would
-       accept a prefix, which for a password is the one comparison that must not be lenient. */
+    // Same length first, then the whole of it: strncmp on the shorter of two strings would
+    // accept a prefix, which for a password is the one comparison that must not be lenient.
     if(strlen(credential) != strlen(encoded)) { return false; }
 
     return strcmp(credential, encoded) == 0;
 }
-
 
 StdReturnType System::SetConsolePassword(const char* password)
 {
@@ -398,18 +342,13 @@ StdReturnType System::SetConsolePassword(const char* password)
     Preferences store;
     if(!store.begin(kNetworkNamespace, false)) { return kENotOk; }
 
-    /* An empty password removes the key rather than storing nothing under it, so that
-       IsConsoleProtected() has one state to recognise instead of two. */
+    // An empty password removes the key rather than storing nothing under it, so that
+    // IsConsoleProtected() has one state to recognise instead of two.
     const bool stored = (password[0u] == STD_NULL_CHARACTER)
                       ? store.remove(kConsolePasswordKey)
                       : (store.putString(kConsolePasswordKey, password) == strlen(password));
     store.end();
 
     return stored ? kEOk : kENotOk;
-} /* SetConsolePassword */
+}
 // NOLINTEND(readability-convert-member-functions-to-static, readability-make-member-function-const)
-
-
-/******************************************************************************************************************************************************
- *  E N D   O F   F I L E
-******************************************************************************************************************************************************/
