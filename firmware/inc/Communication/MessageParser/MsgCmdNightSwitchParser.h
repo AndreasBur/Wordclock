@@ -21,8 +21,32 @@
 #include "MsgParameterParser.h"
 #include "NightSwitch.h"
 
+/*! \brief The number of options in the parameter table of the night switch command. */
 #define MSG_CMD_NIGHT_SWITCH_PARSER_PARAMETER_TABLE_SIZE        6u
 
+/*!
+ * \brief The parser of command 14, the night switch command: sets the window of the night, and what
+ *        the night does to the display.
+ *
+ * Its options:
+ * - `-A<0|1>`, uint8: with any value but 0, switches the night switch on; with 0, switches it off
+ *   and gives the display back.
+ * - `-H<hour>` and `-M<minute>`, uint8: the time the night starts at.
+ * - `-E<hour>` and `-N<minute>`, uint8: the time the night ends at. The window may cross midnight.
+ * - `-B<brightness>`, uint8: what the night does to the display: 0 switches it off, any other value
+ *   dims it to that level. It takes effect at the next start of the night.
+ *
+ * None of the values is checked: an hour above 23 or a minute above 59 is stored as it comes. An
+ * option the command does not carry is left as it was, so `14` alone is a query.
+ *
+ * MsgParameterParser reads the options by the parameter table and hands each value to the private
+ * `HandleParameter()`, which applies `-H`, `-M`, `-E`, `-N` and `-B` at once and keeps `-A` for
+ * Process(). MsgCmdParser makes the parser and calls Parse(), Process() and SendAnswer() in this
+ * order, so an error answered for an option stands in the line before the fields of the answer.
+ *
+ * The number holds while every overlay is built in; one whose `OVERLAYS_SUPPORT_*` switch is
+ * STD_OFF moves the commands behind it down by one.
+ */
 class MsgCmdNightSwitchParser : public MsgParameterParser<MsgCmdNightSwitchParser, MSG_CMD_NIGHT_SWITCH_PARSER_PARAMETER_TABLE_SIZE>
 {
   private:
@@ -52,7 +76,6 @@ class MsgCmdNightSwitchParser : public MsgParameterParser<MsgCmdNightSwitchParse
     bool active_{false};
     bool active_given_{false};
 
-    // functions
     static void HandleParameter(char parameter_short_name, const char* argument, PositionType length) {
         UNUSED(parameter_short_name); UNUSED(argument); UNUSED(length);
     }
@@ -69,10 +92,24 @@ class MsgCmdNightSwitchParser : public MsgParameterParser<MsgCmdNightSwitchParse
     }
 
   public:
+    /*!
+     * \brief Makes the parser for the options in `parameter`.
+     *
+     * \param[in] parameter The parameter string, terminated by a null character; the parser keeps
+     *                      the pointer and reads it in Parse().
+     */
     constexpr MsgCmdNightSwitchParser(const char* parameter) : MsgParameterParser(kParameterTable, parameter) { }
+
+    /*! \brief Destroys the parser. */
     ~MsgCmdNightSwitchParser() { }
 
-    // methods
+    /*!
+     * \brief Sends the answer: the fields that follow the command number.
+     *
+     * It sends `A=<0|1> H=<hour> M=<minute> E=<hour> N=<minute> B=<brightness>`: whether the night
+     * switch is on, the start and the end of the window, and the night brightness, whatever the
+     * command carried. A space follows each field but the last; MsgCmdParser ends the line.
+     */
     static void SendAnswer() {
         const NightSwitch& night_switch = NightSwitch::GetInstance();
 
@@ -86,6 +123,12 @@ class MsgCmdNightSwitchParser : public MsgParameterParser<MsgCmdNightSwitchParse
         SendAnswerParameter(kBrightnessShortName, night_switch.GetNightBrightness(), false);
     }
 
+    /*!
+     * \brief Completes the command once Parse() has read its options.
+     *
+     * It switches the night switch on or off as `-A` asks, after the window and the brightness of
+     * the same command have been applied. Without `-A` it does nothing.
+     */
     void Process() const {
         if(active_given_) { NightSwitch::GetInstance().SetIsActive(active_); }
     }

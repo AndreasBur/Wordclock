@@ -23,8 +23,8 @@ int main()
     WordclockSerial& port = WordclockSerial::GetInstance();
     port.SetLineSink(CollectLine);
 
-    // Exercise the parser directly as well: Communication filters empty messages, but
-    // the parser must still be safe for an empty buffer and out-of-range numbers.
+    // Exercise the parser directly as well: it must be safe for an empty buffer, which
+    // Communication hands it for an empty line, and for out-of-range numbers.
     const std::string wrong_command = "Error=" + std::to_string(ToUnderlying(ErrorMessage::ErrorType::kWrongCommand));
     const char* invalid_commands[]{
         "", " ", "abc", "0", "-1", "17", "65537", "4294967297",

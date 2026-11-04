@@ -26,13 +26,15 @@
 
 #include "StandardTypes.h"
 
-/* WebFrontend configuration parameter */
-/*
+/*!
+ * \brief STD_ON builds in the web front end, WebFrontend.
+ *
  * Off unless a backend turns it on from its own build, because every target compiles
  * firmware/src whole and only two of them have a radio to serve anything over. Off is
  * therefore the answer that keeps the AVR-Dx image exactly the size it was. Overridden with
  * -DWEB_FRONTEND_SUPPORT=STD_ON, the way DISPLAY_DATA_PIN is overridden, rather than by
- * editing here - all four targets share this header.
+ * editing here - all four targets share this header. The ESP32, the RP2350 and the simulator
+ * turn it on.
  */
 #ifndef WEB_FRONTEND_SUPPORT
 # define WEB_FRONTEND_SUPPORT                           STD_OFF
@@ -46,42 +48,60 @@
 #include <atomic>
 #include <stddef.h>
 
-/*
- * The longest command a socket frame may carry. Longer frames are refused rather than
- * split, so half a command can never reach the parser. Well above the longest command in
- * the reference, whose text overlay is the only one that comes close.
+/*!
+ * \brief The longest command a socket frame may carry, in characters.
+ *
+ * Longer frames are refused whole rather than split, by WebFrontend::InjectCommand(). Well above
+ * the longest command in the reference, whose text overlay is the only one that comes close.
+ *
+ * \warning It is longer than a line Communication collects, MESSAGE_LENGTH - 1 characters. A frame
+ *          between the two passes here and is cut there: its first MESSAGE_LENGTH - 1 characters
+ *          are parsed as a command, and every character beyond them is answered with `Error=1`.
  */
 #define WEB_FRONTEND_MAX_FRAME_LENGTH                   192u
 
-/*
- * In scheduler ticks, so 5 * 10 ms is twenty frames a second. The buffer is 330 bytes, so
- * that is under 7 KB/s and only while somebody is watching - sending on every tick would be
- * five times that for a display that changes far more slowly.
+/*!
+ * \brief The scheduler ticks from one display frame to the next, at the least.
+ *
+ * In scheduler ticks, so 5 * 10 ms is twenty frames a second. The buffer is 330 bytes, so that is
+ * under 7 KB/s and only while somebody is watching - sending on every tick would be five times
+ * that for a display that changes far more slowly.
  */
 #define WEB_FRONTEND_FRAME_INTERVAL_TICKS               5u
 
+/*!
+ * \brief The web front end: the files and the JSON a browser is sent, the answer lines and the
+ *        display frames that go out over the socket, and the commands that come in over it.
+ *
+ * A backend runs the server and calls these functions from its routes, its socket and its tick;
+ * it supplies the response body and the socket's way out, WebResponseBody and WebTransport,
+ * through WebTransport.h.
+ */
 class WebFrontend
 {
   public:
-    /*
-     * One file a clock hands out unchanged: the two pages, the manifest and the two icons.
-     * Everything a backend needs in order to answer for it, and nothing about how - which is
-     * why this is a table and not five handlers. It was five handlers, twice, and the ten
-     * differed only in a blob, a content type and whether a header went out with it.
+    /*!
+     * \brief One file a clock hands out unchanged: the two pages, the manifest and the two icons.
+     *
+     * Everything a backend needs in order to answer for it, and nothing about how - which is why
+     * this is a table and not five handlers. It was five handlers, twice, and the ten differed
+     * only in a blob, a content type and whether a header went out with it.
      *
      * The bytes live in the generated WebPage.h, which only WebFrontend.cpp includes: the
-     * generated arrays have internal linkage, so a second includer would put a second copy
-     * of both pages in flash.
+     * generated arrays have internal linkage, so a second includer would put a second copy of
+     * both pages in flash.
      */
     struct AssetType {
-        const char* path;
-        const uint8_t* bytes;
-        size_t size;
-        const char* content_type;
-        /*
-         * Stored compressed and sent compressed, so the backend has to say so in a header
-         * and the browser unpacks it. False for the manifest, which is 485 bytes, and for
-         * the icons, a PNG being deflated already.
+        const char* path;         /*!< The path it is served at, such as "/console". */
+        const uint8_t* bytes;     /*!< Its bytes, as they are sent. */
+        size_t size;              /*!< The number of its bytes. */
+        const char* content_type; /*!< The content type it is sent with. */
+        /*!
+         * \brief True if the bytes are compressed with gzip.
+         *
+         * Stored compressed and sent compressed, so the backend has to say so in a header and
+         * the browser unpacks it. False for the manifest, which is 485 bytes, and for the icons,
+         * a PNG being deflated already.
          */
         bool is_gzipped;
     };
@@ -116,51 +136,156 @@ class WebFrontend
     ~WebFrontend() { }
 
   public:
+    /*! \brief Returns the one web front end. */
     static WebFrontend& GetInstance() {
         static WebFrontend singleton_instance;
         return singleton_instance;
     }
 
-    // methods
-    /*
-     * What a backend may size a static array of routes with, since the count itself is only
-     * known in the source. A static_assert there holds the two together, so a file added to
-     * the table without raising this fails the build rather than one registration.
+    /*!
+     * \brief The most files GetNumberOfAssets() can return.
+     *
+     * What a backend may size a static array of routes with, since the count itself is only known
+     * in the source. A static_assert there holds the two together, so a file added to the table
+     * without raising this fails the build rather than one registration.
      */
     static constexpr byte kMaxAssets{5u};
 
-    /*
-     * The files a clock serves unchanged, for a backend to register a route per entry and
-     * answer it from the table. Walked rather than named one by one, so a file added to
-     * web/ reaches both backends by appearing here.
+    /*!
+     * \brief Returns the number of files a clock serves unchanged.
+     *
+     * The files a clock serves unchanged, for a backend to register a route per entry and answer
+     * it from the table. Walked rather than named one by one, so a file added to web/ reaches
+     * every backend by appearing here.
+     *
+     * A table rather than a handler per file, because that is what the ten handlers this replaces
+     * actually were: each one set a content type, set a Content-Encoding header or did not, and
+     * pushed a blob. The difference between them was data, and the sameness between the two
+     * backends was complete.
+     *
+     * \return The number of files, at most kMaxAssets.
      */
     static byte GetNumberOfAssets();
+
+    /*!
+     * \brief Returns the file at `index` of the table.
+     *
+     * \param[in] index The index, counted from 0.
+     * \return The file.
+     * \pre `index` is below GetNumberOfAssets(); it is not checked.
+     */
     static const AssetType& GetAsset(byte index);
 
-    /*
-     * The command catalog as JSON, so a page can build its own form from it, and the panel's
-     * shape and letters. Both take the body a backend's route handler opened, which is the
-     * only thing about them that is a backend's business.
+    /*!
+     * \brief Writes the command catalog into `body` as JSON, so a page can build its own form from
+     *        it.
+     *
+     * Generated from MessageCatalog rather than written out a second time. That table is what the
+     * simulator's message builder derives its whole dialog from, down to the input hints; serving
+     * it makes the browser a second renderer of the same description, so a command added to the
+     * catalog shows up in both front ends and on the wire at once.
+     *
+     * Written here rather than once per backend, which is what it was: the two copies were
+     * identical down to their comments, and both feed the same page's parser. It takes the body a
+     * backend's route handler opened, which is the only thing about it that is a backend's
+     * business.
+     *
+     * The document is an array with an object per command, in the order of
+     * MessageCatalog::GetCommand(), of `number`, `label` and `options`. An option is an object of
+     * `short`, `label`, `type`, the number of its MessageCatalog::ArgumentType, `min` and `max`,
+     * followed by `"readonly":true` if it is read-only and by `values`, the names of its values,
+     * if it has any. A quote or a backslash in a label or a name is escaped.
+     *
+     * \param[in,out] body The body of the response; it is finished once the document is in it.
      */
-    static void WriteCommands(WebResponseBody&);
-    static void WriteDisplay(WebResponseBody&);
+    static void WriteCommands(WebResponseBody& body);
 
-    // Sends one finished line to whoever is connected. Called from the firmware's task
-    // through WordclockSerial's line sink, not from a server's.
-    static void BroadcastLine(const char*);
+    /*!
+     * \brief Writes the panel's shape and its letters into `body` as JSON.
+     *
+     * The page draws a grid of letters and has to know which, and there is exactly one table of
+     * them - DisplayCharacters. Serving it keeps the browser from carrying a second copy, which is
+     * the duplication the simulator used to have and no longer does. It takes the body a
+     * backend's route handler opened, which is the only thing about it that is a backend's
+     * business.
+     *
+     * The document is an object of `columns` and `rows`, DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS and
+     * DISPLAY_CHARACTERS_NUMBER_OF_ROWS, and `letters`, every letter of the grid row by row in one
+     * string.
+     *
+     * The table stores one byte per letter, so the umlauts are Latin-1 and are widened to UTF-8
+     * on the way out: JSON is UTF-8, and a raw 0xDC makes the whole document invalid rather than
+     * one letter wrong.
+     *
+     * \param[in,out] body The body of the response; it is finished once the document is in it.
+     */
+    static void WriteDisplay(WebResponseBody& body);
 
-    /*
-     * Sends the pixel buffer as one binary frame, at most every
-     * WEB_FRONTEND_FRAME_INTERVAL_TICKS and only when it changed. Called from the
-     * application's tick, after the display has been handed to the strip.
+    /*!
+     * \brief Sends one finished line to whoever is connected, as a text frame.
+     *
+     * Called from the firmware's task through WordclockSerial's line sink, not from a server's. A
+     * send that fails is not retried and the client is not dropped here - a backend's own close
+     * hook owns that, and dropping a client from this side would race with it.
+     *
+     * The line is read as Latin-1 and widened to UTF-8, which a text frame has to be. A line
+     * whose UTF-8 form does not fit in 2 * WORDCLOCK_SERIAL_LINE_LENGTH bytes is cut short.
+     * Nothing is sent while the server is not listening, for a null `line`, or for an empty one.
+     *
+     * \param[in] line The line, terminated.
+     */
+    static void BroadcastLine(const char* line);
+
+    /*!
+     * \brief Sends the pixel buffer to whoever is connected, as one binary frame, at most every
+     *        WEB_FRONTEND_FRAME_INTERVAL_TICKS calls and only when it changed.
+     *
+     * Called from the application's tick, after the display has been handed to the strip.
+     *
+     * Rate limited first and compared second, so a display that changes on every tick still
+     * costs one frame per interval, and one that stands still costs a comparison. After
+     * OnClientOpened(), the next call sends the frame whether or not it changed and whatever is
+     * left of the interval. Nothing is sent, nor even gathered, while the server is not
+     * listening or has no client.
+     *
+     * The frame holds three bytes per pixel of Pixels, green, red and blue. Sent in the strip's
+     * own byte order, green first: it is what the buffer already holds, and the page is told the
+     * shape by the display description rather than guessing it. Taken from the output pixel, so
+     * what goes out is dimmed the way the strip is - which is what lets the page blank itself
+     * when the display is switched off, without a redraw to tell it so. The page reads the bytes
+     * for that on/off state only and paints its own colour; the wx window is the colour-accurate
+     * view.
      */
     void BroadcastFrame();
 
-    // One socket frame's text on its way into the parser, terminator included. Refuses an
-    // empty frame and one too long to be a command rather than passing either on.
-    static void InjectCommand(const char*, size_t);
+    /*!
+     * \brief Hands one socket frame's text to Communication, as though it had been typed on the
+     *        port.
+     *
+     * The command is injected followed by the end-of-message character, unless the browser
+     * already sent one. That keeps the page free of protocol bookkeeping: it sends the command
+     * text, the terminator is this side's business.
+     *
+     * A frame longer than WEB_FRONTEND_MAX_FRAME_LENGTH is refused whole rather than truncated. A
+     * backend whose server hands over a bounded buffer has already made that impossible; one
+     * whose library hands over whatever arrived has not, and this is where both end up equal. An
+     * empty frame and a null `text` are refused as well.
+     *
+     * The characters go to WordclockSerial::Inject(), and what it answers is not checked.
+     *
+     * \param[in] text The text of the frame; it need not be terminated.
+     * \param[in] length The number of characters of `text`.
+     * \warning A frame that passes here can still be longer than a line Communication collects; see
+     *          WEB_FRONTEND_MAX_FRAME_LENGTH.
+     */
+    static void InjectCommand(const char* text, size_t length);
 
-    /* For a backend's socket callback, which runs outside the firmware's tick. */
+    /*!
+     * \brief Has the next BroadcastFrame() send the frame, changed or not and whatever is left of
+     *        the interval.
+     *
+     * For a backend's socket callback, which runs outside the firmware's tick.
+     */
     void OnClientOpened() { force_frame_.store(true, std::memory_order_release); }
 };
 

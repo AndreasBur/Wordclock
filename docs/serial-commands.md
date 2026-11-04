@@ -10,12 +10,13 @@ generated from the parser sources under
 <command-number> [-<opt><value> ...]\n
 ```
 
-- The command is a **leading integer**
-  ([`atoi`](../firmware/inc/Communication/MessageParser/MsgCmdParser.h) of the
-  message).
+- The command is the **leading run of digits** of the message
+  ([`MsgCmdParser::ToCommand`](../firmware/inc/Communication/MessageParser/MsgCmdParser.h));
+  a number past the last command is no command, rather than wrapping into one.
 - Options are introduced by `-`, then a **single-letter short name**, then the
-  value directly (e.g. `-R255`), space-separated
-  ([`MsgParameterParser::parse`](../firmware/inc/Communication/MessageParser/Base/MsgParameterParser.h)).
+  value directly (e.g. `-R255`)
+  ([`MsgParameterParser::Parse`](../firmware/inc/Communication/MessageParser/Base/MsgParameterParser.h)).
+  The space between options is customary rather than needed: `9 -A3-M1` sets both.
 - Messages are terminated by newline `\n`
   ([`Communication::kEndOfMessageChar`](../firmware/inc/Communication/Communication.h)).
 - Every command **echoes back** the command number plus current values as
@@ -47,7 +48,7 @@ overlay is disabled at compile time.
 | 13 | Network | `-S<name>` `-P<pass phrase>` | Which network the clock joins. The pass phrase goes in and never comes back |
 | 14 | Night switch | `-A<0/1>` `-H<hour>` `-M<min>` `-E<hour>` `-N<min>` `-B<brightness>` | When the clock takes the night off. `-H`/`-M` start it, `-E`/`-N` end it, `-B` is how bright it stays — **0 switches the display off**, and cuts the strip's supply where a switch is fitted. The window may cross midnight. Every option is optional; what is not sent stays as it was |
 | 16 | Console access | `-P<password>` | Locks the clock's pages behind a password - the panel, the console and every route they use. `-P` sets it; the command **without any option clears it**, which is the way back for a clock nobody can log into. The password goes in and never comes back — what is answered is `A=1` or `A=0`, whether one is set. The user name a browser is to type is fixed, `wordclock`, and the 401 says so. **Basic authentication over plain http is not encryption**: it keeps out a guest who opens the page, not anybody who can watch the traffic |
-| 15 | Colour cycle | `-A<0/1>` `-S<speed>` | Walks the display's colour round the wheel while the words stand still. `-S` is scheduler ticks per step of hue, the same kind of number as the animation speed, so 100 is a step a second and a round in a little over four minutes; **0 leaves the wheel standing** where it is. `-H` is answered and not accepted — it is where the wheel has got to. The cycle does **not** change the colour set with command 2: that one is still what is answered and stored, and switching the cycle off puts it back |
+| 15 | Colour cycle | `-A<0/1>` `-S<speed>` | Walks the display's colour round the wheel while the words stand still. `-S` is scheduler ticks per step of hue - a count of ticks, so a higher one is slower, unlike the speed of an animation or an overlay - so 100 is a step a second and a round in a little over four minutes; **0 leaves the wheel standing** where it is. `-H` is answered and not accepted — it is where the wheel has got to. The cycle does **not** change the colour set with command 2: that one is still what is answered and stored, and switching the cycle off puts it back |
 
 ### Overlay options (shared)
 
@@ -217,7 +218,9 @@ carries no value, so the readings live in a command of their own.
 | field | Meaning |
 |-------|---------|
 | `V` | Firmware version, hand-kept in [`Version.h`](../firmware/inc/Version/Version.h) |
-| `U` | Minutes since the last start. A `uint16` of them, so it wraps after 45 days |
+| `U` | Full days since the last start, held at 65535 rather than wrapping ([`Uptime.h`](../firmware/inc/Uptime/Uptime.h)) |
+| `H` | The hours beyond the full days, 0 to 23 |
+| `N` | The minutes beyond the full hours, 0 to 59 |
 | `I` | What the light sensor measures, in lux — the value the brightness automatic spreads between its two calibrated bounds |
 | `T` | What the clock chip measures, `23.4C`, and **empty** while no chip has answered |
 | `A` | The address to type into a browser, and **empty** while the clock has not joined a network |
@@ -226,7 +229,7 @@ carries no value, so the readings live in a command of their own.
 
 An empty field means there is nothing behind it, which is not the same as a zero: a clock
 built without the temperature chip answers `T=` for good, and one on the serial line alone
-answers `A=` and `Q=`. In the simulator `U` is real and `M`, `A` and `Q` are always empty —
+answers `A=` and `Q=`. In the simulator `U`, `H` and `N` are real and `M`, `A` and `Q` are always empty —
 a host's free heap says nothing about the firmware.
 
 The command takes no options. Its parameter table is empty, so `12 -V1` is answered with
@@ -328,7 +331,9 @@ store did not take the write, the rest when the display is busy
 with something else rather than doing it anyway. The clock cannot be refreshed and no animation
 started while an overlay owns the display; an overlay cannot be shown while another
 one is showing or while it is switched off (`-A0`); and aborting answers the same way
-when nothing was running. `22` and `24` are what brings the clock face back after a
+when nothing was running. Ids `31` to `33` depend on the backend: the simulator refuses a
+restart, and `32` and `33` are refused while the clock has no network to go back to.
+`22` and `24` are what brings the clock face back after a
 display test (`-P7`) or a hand-set pixel (command 4), which otherwise stands until
 the next word change — up to five minutes.
 
@@ -388,7 +393,7 @@ An RPC is a fire-and-forget action. Its answer is `RpcId=<id> Error=<code>` and 
 payload field, so anything with a value to report is a command, not an RPC — command 12
 is the shape for that.
 
-Two things the existing ids are worth knowing for. Ids 22 to 30 can each be refused, and
+Two things the existing ids are worth knowing for. Ids 22 to 33 can each be refused, and
 carry a return value that says so. Ids 34 to 40 — the increment and decrement pair for a
 control with no display — cannot: a setting has no state that makes its neighbour
 unreachable, so all seven answer `Error=0`.
