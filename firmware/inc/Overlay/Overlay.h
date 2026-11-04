@@ -17,43 +17,80 @@
 
 #include <type_traits>
 
-/* Overlay configuration parameter */
-
-/* Overlay parameter */
-
+/*!
+ * \brief The base of the date, temperature and text overlays: when an overlay starts, how long it
+ *        shows, and the settings that decide both.
+ *
+ * An overlay scrolls a text over the clock through Text for a while. A new overlay is switched
+ * off, StateType::kDisabled. Switched on, it waits in StateType::kIdle and starts by itself at
+ * second 30 of each minute that its period divides, SetPeriodInMinutes(), if it has anything to
+ * show, CanShow(), and its date allows it. It then shows, StateType::kShow, and its text starts
+ * again each time it has scrolled through, until the endurance, SetEnduranceInSeconds(), has run
+ * out. Then it goes back to StateType::kIdle.
+ *
+ * The month, the day and the valid-in-days limit the days on which it starts:
+ * - With neither a month nor a day, it starts on every day.
+ * - With a month, a day and a valid-in-days above 0, it starts on that date and on the
+ *   valid-in-days days after it, across the turn of the year too; see SetValidInDays() for the
+ *   days before the date.
+ * - Otherwise the valid-in-days is not used: with a month and a day, it starts on that date each
+ *   year; with a month only, on every day of that month; with a day only, on that day of every
+ *   month.
+ *
+ * Overlays holds the overlays, calls Task() once a second, and keeps the one show timer they
+ * share. It is Overlays that lets only one overlay show at a time.
+ *
+ * Each overlay derives from this class with itself as `Derived`, makes this class its friend, and
+ * answers four private hooks, which are not virtual: `SetStateToShow(ClockDate, ClockTime)` starts
+ * its text, `SetStateToIdle(ClockDate, ClockTime)` stops it, `IsReady()` says whether it has
+ * anything to show, and `ResetOwnToDefaults()` resets what it adds to the settings of this class.
+ *
+ * \tparam Derived The overlay that derives from this class.
+ */
 template <typename Derived> class Overlay
 {
   public:
+    /*! \brief The state of an overlay. */
     enum class StateType {
-        kDisabled,
-        kIdle,
-        kShow
+        kDisabled, /*!< Switched off: Task() does nothing. */
+        kIdle, /*!< Switched on, and waiting for its period to start. */
+        kShow /*!< Showing: its text scrolls until the show timer has run out. */
     };
 
+    /*! \brief A year in full, ClockDate::YearType. */
     using YearType = ClockDate::YearType;
+    /*! \brief A month, 1 for January to 12 for December, ClockDateTime::MonthType. */
     using MonthType = ClockDateTime::MonthType;
+    /*! \brief A day of the month or a number of days, ClockDateTime::DayType. */
     using DayType = ClockDateTime::DayType;
+    /*! \brief An hour, ClockDateTime::HourType. */
     using HourType = ClockDateTime::HourType;
+    /*! \brief A minute or a number of minutes, ClockDateTime::MinuteType. */
     using MinuteType = ClockDateTime::MinuteType;
+    /*! \brief A second or a number of seconds, ClockDateTime::SecondType. */
     using SecondType = ClockDateTime::SecondType;
+    /*! \brief A font of the text output, Text::FontType. */
     using FontType = Text::FontType;
 
   protected:
+    /*! \brief The state the overlay is in; the derived overlay reads it in its `Task()`. */
     StateType state_{StateType::kDisabled};
 
-    // functions
-    /*
-     * Protected rather than private with the derived class as a friend, which is what
-     * clang-tidy asks for: a friend would open this base's whole private side to it, where
-     * protected opens only what is meant for it. What the private constructor would
-     * prevent - somebody inheriting this template with another class's Derived - the
-     * assertion catches instead, at the first point where Derived is a complete type.
-     */
+    /*! \brief Makes an overlay with the settings of a new clock, switched off. */
     // NOLINTNEXTLINE(bugprone-crtp-constructor-accessibility)
     constexpr Overlay() {
+        /*
+         * Protected rather than private with the derived class as a friend, which is what
+         * clang-tidy asks for: a friend would open this base's whole private side to it, where
+         * protected opens only what is meant for it. What the private constructor would
+         * prevent - somebody inheriting this template with another class's Derived - the
+         * assertion catches instead, at the first point where Derived is a complete type.
+         */
         static_assert(std::is_base_of<Overlay, Derived>::value,
                       "Overlay is a CRTP base: Derived has to be the class that inherits it");
     }
+
+    /*! \brief Destroys the overlay. */
     ~Overlay() { }
 
   private:
@@ -80,7 +117,6 @@ template <typename Derived> class Overlay
     byte speed_{kSpeedInitValue};
     FontType font_{kFontInitValue};
 
-    // functions
     Derived& Underlying() { return static_cast<Derived&>(*this); }
     Derived const& Underlying() const { return static_cast<Derived const&>(*this); }
 
@@ -161,49 +197,102 @@ template <typename Derived> class Overlay
     }
 
   public:
-    /*
-     * The two transitions the period raster makes on its own, opened up for a caller that
-     * wants the overlay now - the "show now" remote procedure calls. They are the same
-     * transitions and not a second path into the show state, so an overlay started by
-     * hand ends through the show timer like any other.
+    /*!
+     * \brief Starts the overlay now rather than at its next period, for the "show now" procedures.
      *
-     * Whether the overlay may start at all is not decided here: only Overlays knows
-     * whether another one already holds the display, and it owns the timer this hands
-     * back.
+     * It is the transition the period raster makes on its own, opened up for a caller that wants
+     * the overlay now - the "show now" remote procedure calls. It is the same transition and not
+     * a second path into the show state, so an overlay started by hand ends through the show timer
+     * like any other: the state goes to StateType::kShow, the text output takes the task cycle of
+     * the speed, SetSpeed(), and the derived overlay starts its text.
+     *
+     * Whether the overlay may start at all is not decided here: only Overlays knows whether
+     * another one already holds the display, and it owns the timer this hands back. It starts from
+     * any state, StateType::kDisabled included, starts the text of an overlay that shows already
+     * anew, and does not ask CanShow(); Overlays asks all of that first.
+     *
+     * \param[in] current_date The date now, which the date overlay shows.
+     * \param[in] current_time The time now; none of the three overlays uses it.
+     * \return The endurance in seconds, the show timer to count down from.
      */
     SecondType StartShow(ClockDate current_date, ClockTime current_time) {
         return SetStateToShow(current_date, current_time);
     }
+
+    /*!
+     * \brief Ends the overlay now rather than when its show timer runs out.
+     *
+     * It is the transition the run-out show timer makes: the state goes to StateType::kIdle and
+     * the derived overlay stops its text, where it stands. The display is left as it is;
+     * DisplayManager draws the clock again once no overlay shows. The show timer is not touched
+     * here, as Overlays owns it.
+     *
+     * \param[in] current_date The date now; none of the three overlays uses it.
+     * \param[in] current_time The time now; none of the three overlays uses it.
+     * \note It goes to StateType::kIdle from any state, so it switches on an overlay that is
+     *       switched off. Overlays::Abort() calls it on the overlay that shows only.
+     */
     void StopShow(ClockDate current_date, ClockTime current_time) {
         SetStateToIdle(current_date, current_time);
     }
 
-    /*
-     * Whether the overlay has anything to show at all, which is not the same as being
-     * switched on: the temperature has nothing until a chip has answered, and a clock
-     * built without one never will. Asked before every start, by the period raster and by
-     * the "show now" call alike, so that an overlay with nothing to say does not hold the
-     * display for its endurance. The date and the text always have something.
+    /*!
+     * \brief Returns whether the overlay has anything to show, as the derived overlay's `IsReady()`
+     *        answers.
      *
-     * Named apart from the IsReady() each overlay answers, rather than being the same name
-     * in both places like SetStateToShow(): a derived member of the same name would hide
-     * this one, and a caller outside the overlays - Overlays itself - would then reach the
-     * private hook instead of this.
+     * Having something to show is not the same as being switched on: the temperature has nothing
+     * until a chip has answered, and a clock built without one never will. It is asked before
+     * every start, by the period raster in Task() and by the "show now" call in Overlays alike, so
+     * that an overlay with nothing to say does not hold the display for its endurance. The date
+     * and the text always have something.
+     *
+     * \return True if the overlay has something to show.
+     * \note It is named apart from the `IsReady()` each overlay answers, rather than being the same
+     *       name in both places like `SetStateToShow()`: a derived member of the same name would
+     *       hide this one, and a caller outside the overlays - Overlays itself - would then reach
+     *       the private hook instead of this.
      */
     bool CanShow() const { return Underlying().IsReady(); }
 
-	// get methods
+    /*! \brief Returns the state the overlay is in. */
 	StateType GetState() const { return state_; }
+
+    /*! \brief Returns the period, in minutes; see SetPeriodInMinutes(). */
     MinuteType GetPeriodInMinutes() const { return period_in_minutes_; }
+
+    /*! \brief Returns the endurance, in seconds; see SetEnduranceInSeconds(). */
     SecondType GetEnduranceInSeconds() const { return endurance_in_seconds_; }
+
+    /*! \brief Returns the month the overlay is limited to, 0 for none. */
     MonthType GetMonth() const { return month_; }
+
+    /*! \brief Returns the day of the month the overlay is limited to, 0 for none. */
     DayType GetDay() const { return day_; }
+
+    /*! \brief Returns the days after its date on which the overlay starts; see SetValidInDays(). */
     DayType GetValidInDays() const { return valid_in_days_; }
+
+    /*! \brief Returns the speed the text scrolls at; see SetSpeed(). */
     byte GetSpeed() const { return speed_; }
+
+    /*! \brief Returns the font the overlay's text is drawn in. */
     FontType GetFont() const { return font_; }
+
+    /*! \brief Returns whether the overlay is switched on: in any state but StateType::kDisabled. */
     bool GetIsActive() const { return state_ != StateType::kDisabled; }
 
-	// set methods
+    /*!
+     * \brief Sets the period: the overlay starts in each minute of the hour that
+     *        `period_in_minutes` divides.
+     *
+     * It starts at second 30 of such a minute, the minutes counted from the full hour: at a period
+     * of 15, in the minutes 0, 15, 30 and 45. A period that does not divide 60 leaves a shorter
+     * gap before the full hour, and a period of 60 or more starts the overlay once an hour, in
+     * minute 0. A new overlay has a period of 1, every minute.
+     *
+     * \param[in] period_in_minutes The period, in minutes.
+     * \return kEOk, or kENotOk if `period_in_minutes` is 0; the period is then left as it was.
+     */
     StdReturnType SetPeriodInMinutes(MinuteType period_in_minutes) {
         if(IsPeriodValid(period_in_minutes)) {
             period_in_minutes_ = period_in_minutes;
@@ -212,6 +301,19 @@ template <typename Derived> class Overlay
             return kENotOk;
         }
     }
+
+    /*!
+     * \brief Sets the endurance: how long the overlay shows once it has started, in seconds.
+     *
+     * The overlay takes it at its next start; one that shows already keeps the show timer it
+     * started with. A new overlay has an endurance of 1.
+     *
+     * \param[in] endurance_in_seconds The endurance, in seconds.
+     * \return kEOk, or kENotOk if `endurance_in_seconds` is 0; the endurance is then left as it
+     *         was.
+     * \note Called once a second, as Overlays calls it, Task() keeps the overlay showing for one
+     *       second more than its endurance.
+     */
     StdReturnType SetEnduranceInSeconds(SecondType endurance_in_seconds) {
         if(IsEnduranceValid(endurance_in_seconds)) {
             endurance_in_seconds_ = endurance_in_seconds;
@@ -220,6 +322,17 @@ template <typename Derived> class Overlay
             return kENotOk;
         }
     }
+
+    /*!
+     * \brief Sets the font the overlay's text is drawn in.
+     *
+     * The text takes it each time it starts, also each time it starts again while the overlay
+     * shows. A new overlay has Text::FontType::kFont10x10.
+     *
+     * \param[in] font The font; whether it is built in is not checked, see Text.
+     * \return kEOk, or kENotOk if Text::IsFontValid() refuses `font`; the font is then left as it
+     *         was.
+     */
     StdReturnType SetFont(FontType font) {
         if(Text::IsFontValid(font)) {
             font_ = font;
@@ -228,20 +341,71 @@ template <typename Derived> class Overlay
             return kENotOk;
         }
     }
+
+    /*!
+     * \brief Limits the overlay to `month`, or lifts the limit with 0.
+     *
+     * How the month, the day and the valid-in-days work together is described at Overlay.
+     *
+     * \param[in] month The month, 1 to 12, or 0 for none; it is not checked.
+     */
     void SetMonth(MonthType month) { month_ = month; }
+
+    /*!
+     * \brief Limits the overlay to `day` of the month, or lifts the limit with 0.
+     *
+     * How the month, the day and the valid-in-days work together is described at Overlay.
+     *
+     * \param[in] day The day of the month, 1 to 31, or 0 for none; it is not checked.
+     */
     void SetDay(DayType day) { day_ = day; }
+
+    /*!
+     * \brief Sets on how many days after its date the overlay goes on starting.
+     *
+     * It counts only while both a month and a day are set; otherwise the overlay keeps to them as
+     * if it were 0. At 0 the overlay starts on the date only.
+     *
+     * \param[in] valid_in_days The days after the date, 0 for the date only.
+     * \note In the month of the date, the days before the date count as well, as far as
+     *       `valid_in_days` reaches: with 24 December and 3, the overlay starts from 21 December
+     *       on. The days before the date in the month before it do not count.
+     */
     void SetValidInDays(DayType valid_in_days) { valid_in_days_ = valid_in_days; }
+
+    /*!
+     * \brief Sets the speed the text scrolls at.
+     *
+     * The overlay hands it to the text output at each start, as the task cycle
+     * Scheduler::ConvertSpeedToTaskCycle() makes of it: at 1 the text moves one column every 255
+     * scheduler ticks, at 255 every tick. At 0 the scheduler does not call Text::Task(), and the
+     * text does not move. A new overlay has the speed 1.
+     *
+     * \param[in] speed The speed, 0 to 255.
+     */
     void SetSpeed(byte speed) { speed_ = speed; }
+
+    /*!
+     * \brief Switches the overlay on through EnableIsActive() or off through DisableIsActive().
+     *
+     * \param[in] is_active True to switch the overlay on, false to switch it off.
+     * \warning Switched off while it shows, the overlay does not end its show cleanly; see
+     *          DisableIsActive().
+     */
     void SetIsActive(bool is_active) { if(is_active) { EnableIsActive(); } else { DisableIsActive(); } }
 
-	// methods
-    /*
-     * Back to what a clock that was never configured has, now that the overlays are
-     * stored and a reset has something to undo.
+    /*!
+     * \brief Puts the overlay back to what a clock that was never configured has.
      *
-     * The derived hook is named apart from this for the reason CanShow() gives: a
-     * ResetToDefaults() in an overlay would hide this one, and everything the base owns
-     * would then quietly survive the reset.
+     * The period is then 1 minute and the endurance 1 second, there is no month and no day, the
+     * valid-in-days is 0, the speed 1, the font Text::FontType::kFont10x10, and the overlay is
+     * switched off. Then the derived overlay resets its own settings: the text overlay empties its
+     * text. The reset exists now that the overlays are stored and a reset has something to undo.
+     *
+     * \note The derived hook, `ResetOwnToDefaults()`, is named apart from this for the reason
+     *       CanShow() gives: a `ResetToDefaults()` in an overlay would hide this one, and
+     *       everything the base owns would then quietly survive the reset.
+     * \warning On an overlay that shows, the show does not end cleanly; see DisableIsActive().
      */
     void ResetToDefaults() {
         period_in_minutes_ = kPeriodInMinutesInitValue;
@@ -255,9 +419,49 @@ template <typename Derived> class Overlay
         Underlying().ResetOwnToDefaults();
     }
 
+    /*!
+     * \brief Switches the overlay on: one that is switched off goes to StateType::kIdle, one that
+     *        is on already stays as it is.
+     */
     void EnableIsActive() { if(state_ == StateType::kDisabled) { state_ = StateType::kIdle; } }
+
+    /*!
+     * \brief Switches the overlay off, StateType::kDisabled, from any state.
+     *
+     * \warning On an overlay that shows, the show does not end through StopShow(): the text is not
+     *          stopped and goes on scrolling over the clock to its end, and the show timer Overlays
+     *          keeps is not cleared. No overlay then starts by its period until one has been
+     *          started by a "show now" procedure and has ended.
+     */
     void DisableIsActive() { state_ = StateType::kDisabled; }
 
+    /*!
+     * \brief Takes the overlay one second further: starts it when its time has come, and ends it
+     *        when its show timer has run out.
+     *
+     * Overlays calls it once a second, with the show timer it keeps for all overlays, and keeps
+     * what comes back as the timer's new value.
+     *
+     * Switched off, the overlay does nothing. Idle, it starts if CanShow() is true, the time is
+     * second 30 of a minute that the period divides, and the date passes the month, the day and
+     * the valid-in-days: as StartShow() does, it goes to StateType::kShow and the derived overlay
+     * starts its text. Showing, it ends once the timer is 0: as StopShow() does, it goes back to
+     * StateType::kIdle and the derived overlay stops its text.
+     *
+     * It draws nothing itself and does not show the display; Text::Task() does that, called by the
+     * scheduler.
+     *
+     * \param[in] show_timer_in_seconds The show timer, in seconds.
+     * \param[in] current_date The date now, which the month, the day and the valid-in-days are
+     *                         checked against.
+     * \param[in] current_time The time now, whose minute and second decide a start.
+     * \return The new show timer, in seconds: the endurance at a start; while the overlay shows,
+     *         `show_timer_in_seconds` one lower, but not below 0; while it is idle and does not
+     *         start, `show_timer_in_seconds` unchanged; and 0 while it is switched off.
+     * \note As the overlay ends on the call that finds the timer at 0, and not on the one that
+     *       counts it down to 0, an overlay called once a second shows for one second more than its
+     *       endurance.
+     */
     SecondType Task(SecondType show_timer_in_seconds, ClockDate current_date, ClockTime current_time) {
         if(state_ == StateType::kIdle) { return IdleTask(show_timer_in_seconds, current_date, current_time); }
         if(state_ == StateType::kShow) { return ShowTask(show_timer_in_seconds, current_date, current_time); }
