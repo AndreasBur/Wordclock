@@ -140,16 +140,14 @@ StdReturnType Pixels::SetPixel(byte index, PixelType pixel)
 {
     if(!IsIndexValid(index)) { return kENotOk; }
 
-    SetPixel(index, pixel);
+    pixel_buffer_[ToRow(index)][ToColumn(index)] = pixel;
+    dirty_ = true;
     return kEOk;
 }
 
 StdReturnType Pixels::SetPixel(byte index, byte red, byte green, byte blue)
 {
-    if(!IsIndexValid(index)) { return kENotOk; }
-
-    SetPixel(index, red, green, blue);
-    return kEOk;
+    return SetPixel(index, PixelType(red, green, blue));
 }
 
 void Pixels::SetPixels(PixelType pixel)
