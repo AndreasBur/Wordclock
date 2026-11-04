@@ -140,10 +140,6 @@ class Animations
      * Only ModeType::kFixed uses the selected animation, the others pick one themselves, which is
      * why selecting an animation and selecting a strategy are two separate settings. They pick
      * among the favourites only, and only while no animation runs.
-     *
-     * \warning DisplayManager hands a word change to SetTime() only while an animation is selected.
-     *          With AnimationIdType::kNone selected it draws the time itself, so then
-     *          ModeType::kRandom and ModeType::kSequence animate no word change either.
      */
     enum class ModeType {
         kFixed, /*!< The selected animation, SetAnimation(), on every word change. */
@@ -288,6 +284,7 @@ class Animations
     void TaskOfCurrentAnimation();
     StdReturnType ShowOfCurrentAnimation() const;
     void InitCurrentAnimation();
+    void SwitchCurrentAnimation(AnimationIdType animation_id);
     void SelectAnimationOfMode();
     AnimationIdType CalcRandomAnimation();
     AnimationIdType CalcNextAnimation() const;
@@ -382,31 +379,28 @@ class Animations
      * \brief Selects `animation_id`, the animation ModeType::kFixed runs, and makes it the current
      *        animation at once.
      *
-     * The animation is initialised, which ends it if it was running; nothing is drawn. In
-     * ModeType::kFixed it runs on the next SetTime(). A mode that picks its own picks again on the
-     * next SetTime(), ModeType::kSequence going on with the favourite after `animation_id`.
+     * The animation that was current is initialised first, which ends it where it stands and
+     * puts back what it changed on the display, a fade's dimming or a flicker's switching off.
+     * Then `animation_id` is initialised; nothing is drawn. In ModeType::kFixed it runs on the
+     * next SetTime(). A mode that picks its own picks again on the next SetTime(),
+     * ModeType::kSequence going on with the favourite after `animation_id`.
      *
      * \param[in] animation_id The animation, or AnimationIdType::kNone for none.
      * \return kEOk, or kENotOk if `animation_id` is not valid, IsAnimationValid(); the selection
      *         and the current animation are then left as they were.
-     * \warning A running animation other than `animation_id` is left where it is, without its
-     *          `Init()`: AnimationFade cut off so leaves the display dimmed, AnimationFlicker may
-     *          leave it switched off. Abort() before it ends the running animation properly.
      */
     StdReturnType SetAnimation(AnimationIdType animation_id);
 
     /*!
      * \brief Sets the mode, which decides which animation runs on a word change.
      *
-     * ModeType::kFixed makes the selected animation the current one again and initialises it,
-     * even if the mode was ModeType::kFixed already. The selecting modes leave the current
+     * ModeType::kFixed makes the selected animation the current one again as SetAnimation()
+     * does, even if the mode was ModeType::kFixed already. The selecting modes leave the current
      * animation alone and pick on the next SetTime().
      *
      * \param[in] mode The mode.
      * \return kEOk, or kENotOk if `mode` is not valid, IsModeValid(); the mode is then left as it
      *         was.
-     * \warning Switching to ModeType::kFixed while an animation other than the selected one runs
-     *          leaves that one without its `Init()`, as SetAnimation() does.
      */
     StdReturnType SetMode(ModeType mode);
 
@@ -439,8 +433,6 @@ class Animations
      *
      * The same settings the constructor leaves behind. Written out here rather than by
      * constructing a second instance, which a singleton cannot do.
-     *
-     * \warning A running animation is left without its `Init()`, as SetAnimation() leaves it.
      */
     void ResetToDefaults() {
         task_cycles_.fill(kTaskCycleInitValue);
@@ -515,9 +507,10 @@ class Animations
     /*!
      * \brief Starts the current animation on the time `hour`:`minute`.
      *
-     * In ModeType::kRandom and ModeType::kSequence the mode first picks the animation, if none
-     * runs, and initialises it. While one runs, the mode picks nothing, and the time goes to the
-     * running animation, which decides itself whether to take it.
+     * If none runs, the animation is initialised first, so that every run starts as the first
+     * did; in ModeType::kRandom and ModeType::kSequence the mode picks it before. While one runs,
+     * the mode picks nothing, and the time goes to the running animation, which runs on and ends
+     * on the newer time.
      *
      * With AnimationIdType::kNone current, the words of the time are lit through
      * Clock::SetTime(byte, byte), over what is lit already. Nothing is shown either way; Task()

@@ -36,6 +36,13 @@ void TestSnakeLifetime();
 void TestFlickerLeavesTheDisplayOn();
 void TestEveryAnimationEndsOnTheNewTime();
 void TestAnimationStepsThroughEveryOne();
+void TestFixedModeRunsEveryTimeAsTheFirst();
+void TestEveryAnimationReportsItsStart();
+void TestFlickerLeavesADarkDisplayDark();
+void TestSelectingModesAnimateWithNothingSelected();
+void TestLeavingAFadeUndimsTheDisplay();
+void TestAWordChangeRunsAFadeOrFlickerOn();
+void TestExplodeWordsLightsItsFirstWordOnADarkDisplay();
 
 /* text_test.cpp */
 void TestCharacterToGlyphMapping();

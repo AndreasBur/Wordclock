@@ -59,9 +59,7 @@ StdReturnType Animations::SetAnimation(AnimationIdType animation_id)
     animation_id_ = animation_id;
     // the selected animation becomes the current one right away, even in a mode that selects
     // on its own; that mode picks again on the next word change
-    current_animation_id_ = animation_id_;
-
-    InitCurrentAnimation();
+    SwitchCurrentAnimation(animation_id_);
     return kEOk;
 }
 
@@ -73,10 +71,7 @@ StdReturnType Animations::SetMode(ModeType mode)
 
     // Back to the selected animation. The selecting modes leave the current animation
     // alone and take over on the next word change.
-    if(mode_ == ModeType::kFixed) {
-        current_animation_id_ = animation_id_;
-        InitCurrentAnimation();
-    }
+    if(mode_ == ModeType::kFixed) { SwitchCurrentAnimation(animation_id_); }
     return kEOk;
 }
 
@@ -167,10 +162,16 @@ void Animations::InitCurrentAnimation()
 
 StdReturnType Animations::SetTime(byte hour, byte minute)
 {
-    // Only while nothing is running, so a word change during a still running animation picks
-    // nothing here; the running animation gets the time and decides itself whether to take it.
-    if(mode_ != ModeType::kFixed && GetStateOfCurrentAnimation() == Animation::StateType::kIdle) {
-        SelectAnimationOfMode();
+    /*
+     * Only while nothing is running, so a word change during a still running animation starts
+     * nothing here; the running animation gets the time and ends on it. A new run starts from
+     * a freshly initialised animation in every mode: an animation keeps its counters where its
+     * last run left them, and Shift, Wipe, Squeeze and Explode words took half their steps on
+     * every run after the first while mode kFixed skipped this.
+     */
+    if(GetStateOfCurrentAnimation() == Animation::StateType::kIdle) {
+        if(mode_ == ModeType::kFixed) { InitCurrentAnimation(); }
+        else { SelectAnimationOfMode(); }
     }
 
     switch(current_animation_id_)
@@ -526,17 +527,27 @@ void Animations::SelectAnimationOfMode()
     switch(mode_)
     {
         case ModeType::kRandom :
-            current_animation_id_ = CalcRandomAnimation();
+            SwitchCurrentAnimation(CalcRandomAnimation());
             break;
         case ModeType::kSequence :
-            current_animation_id_ = CalcNextAnimation();
+            SwitchCurrentAnimation(CalcNextAnimation());
             break;
         default :
             break;
     }
+}
 
-    // the selected animation shares its memory with the previous one, so it has to be
-    // initialized before it is used
+/*
+ * The current animation is initialised before it is left rather than overwritten: Fade has
+ * set the display's fade level and Flicker may have switched the display off, and only their
+ * own Init() puts that back - an animation left half way through through SetAnimation() kept
+ * the display dimmed. The new one shares its memory with the previous one, so it is
+ * initialised before it is used.
+ */
+void Animations::SwitchCurrentAnimation(AnimationIdType animation_id)
+{
+    InitCurrentAnimation();
+    current_animation_id_ = animation_id;
     InitCurrentAnimation();
 }
 

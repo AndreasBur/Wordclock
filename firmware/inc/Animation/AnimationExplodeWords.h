@@ -30,15 +30,6 @@
  * SetTime() starts it from whatever the display shows, and each Task() takes one step of it. The
  * last step clears the display, lights the words of the new time whole and makes the animation
  * idle.
- *
- * \warning Only Init() puts back the place the search for the next word starts at and the place in
- *          the word list of the last word that came out; the end of the animation leaves them as
- *          they are. Started again without an Init() in between, as Animations does at every word
- *          change in Animations::ModeType::kFixed, the first half starts its search in the row of
- *          the last word of the run before rather than in the centre row, so it may skip rows whose
- *          words then stay lit. In the second half, the words up to the place in the word list
- *          where the run before ended do not travel, but for the first one. What it skips appears
- *          with the last step.
  */
 class AnimationExplodeWords : public Animation
 {
@@ -59,6 +50,7 @@ class AnimationExplodeWords : public Animation
 
     void Reset();
     void ClearTimeTask();
+    void StartSetTime();
     void SetTimeTask();
     void SetWordToSet(DisplayWords::WordIdType word_id);
     StdReturnType SetNextWordToClear();
@@ -108,8 +100,8 @@ class AnimationExplodeWords : public Animation
     /*!
      * \brief Starts the animation towards the time `hour`:`minute`.
      *
-     * It draws nothing itself. On a dark display it starts with the second half; the first word
-     * of the new time then does not travel, and appears with the last step.
+     * It draws nothing itself, unless the display is dark: it then starts with the second half at
+     * once and lights the first word of the new time in the centre.
      *
      * \param[in] hour The hour, 0 to 23.
      * \param[in] minute The minute, 0 to 59.

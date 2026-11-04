@@ -21,6 +21,7 @@ StdReturnType AnimationShift::SetTime(byte hour, byte minute)
     StdReturnType return_value{kENotOk};
 
     if(Clock::GetInstance().GetClockWords(hour, minute, clock_words_table_) == kEOk && state_ == StateType::kIdle) {
+        return_value = kEOk;
         state_ = StateType::kClearTime;
     }
     return return_value;

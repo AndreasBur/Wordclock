@@ -21,10 +21,15 @@ StdReturnType AnimationFlicker::SetTime(byte hour, byte minute)
     StdReturnType return_value{kENotOk};
 
     if(hour < CLOCK_NUMBER_OF_HOURS_PER_DAY && minute < CLOCK_NUMBER_OF_MINUTES_PER_HOUR) {
+        // A running flicker takes the newer time and ends on it, rather than starting over,
+        // as every other animation does.
         hour_ = hour;
         minute_ = minute;
-        state_ = StateType::kClearTime;
-        return_value = kEOk;
+        if(state_ == StateType::kIdle) {
+            display_was_enabled_ = Display::GetInstance().IsEnabled();
+            state_ = StateType::kClearTime;
+            return_value = kEOk;
+        }
     }
     return return_value;
 }
@@ -46,8 +51,12 @@ void AnimationFlicker::Reset()
      *
      * Here rather than at the end of the animation, because Reset() is also where an
      * abort lands - a flicker cut short in the middle had the same ending.
+     *
+     * Only what the flicker switched off, which is_clock_set_ says: Init() runs before every
+     * run and on every switch of animation, and an Enable() regardless lit a display that was
+     * switched off by hand or for the night - and the night switch then gave its supply back.
      */
-    Display::GetInstance().Enable();
+    if(is_clock_set_) { Display::GetInstance().Enable(); }
 
     minute_ = 0u;
     hour_ = 0u;
@@ -57,12 +66,15 @@ void AnimationFlicker::Reset()
 
 void AnimationFlicker::ClearTimeTask()
 {
-    is_clock_set_ = !is_clock_set_;
+    // A display that was off when the flicker started stays off; it only counts its steps.
+    if(display_was_enabled_) {
+        is_clock_set_ = !is_clock_set_;
 
-    if(is_clock_set_) {
-        Display::GetInstance().Disable();
-    } else {
-        Display::GetInstance().Enable();
+        if(is_clock_set_) {
+            Display::GetInstance().Disable();
+        } else {
+            Display::GetInstance().Enable();
+        }
     }
 
     if(flicker_counter_-- <= 0u) state_ = StateType::kSetTime;

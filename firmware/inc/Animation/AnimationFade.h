@@ -23,8 +23,8 @@
  * rises back to 255.
  *
  * SetTime() starts it from whatever the display shows, and each Task() takes one step of it. The
- * last step ends the fade's dimming, through Display::ClearBrightnessFade(), and makes the
- * animation idle.
+ * last step ends the fade's dimming, through Display::ClearBrightnessFade(), clears the display,
+ * lights the words of the new time whole and makes the animation idle.
  */
 class AnimationFade : public Animation
 {
@@ -65,13 +65,13 @@ class AnimationFade : public Animation
     /*!
      * \brief Starts the animation towards the time `hour`:`minute`.
      *
-     * It draws nothing itself. It does not refuse while it runs: a running fade starts over from
-     * the full level, towards the new time.
+     * It draws nothing itself.
      *
      * \param[in] hour The hour, 0 to 23.
      * \param[in] minute The minute, 0 to 59.
-     * \return kEOk, or kENotOk if `hour` is above 23 or `minute` above 59; the animation is then
-     *         left as it was.
+     * \return kEOk, or kENotOk if `hour` is above 23 or `minute` above 59, and the animation is
+     *         then left as it was, or if it is not idle; a running one then runs on, but ends on
+     *         the words of `hour`:`minute`.
      */
     StdReturnType SetTime(byte hour, byte minute);
 

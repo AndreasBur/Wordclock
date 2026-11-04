@@ -66,7 +66,10 @@ class DisplayManager
 
     static void TaskClockWordsChange(HourType hour, MinuteType minute) {
         Animations& animations = Animations::GetInstance();
-        if(animations.GetAnimation() == Animations::AnimationIdType::kNone) {
+        // The mode first: a selecting mode animates whatever animation 0 is selected for -M0.
+        const bool is_animated{animations.GetMode() != Animations::ModeType::kFixed
+                               || animations.GetAnimation() != Animations::AnimationIdType::kNone};
+        if(!is_animated) {
             ShowClock(hour, minute);
         } else {
             animations.SetTime(hour, minute);
@@ -151,8 +154,8 @@ class DisplayManager
     /*!
      * \brief Ends a running animation and puts the time back on the display.
      *
-     * At a low speed an animation runs for minutes, and both a word change and a mode change are
-     * ignored while it does.
+     * At a low speed an animation runs for minutes, and a word change does not start another one
+     * while it does: the running animation ends on the newer time.
      *
      * \return kEOk, or kENotOk while an overlay shows; the animation is ended all the same, but the
      *         time is not drawn.

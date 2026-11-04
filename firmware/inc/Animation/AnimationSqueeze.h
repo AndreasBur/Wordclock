@@ -27,12 +27,6 @@
  * SetTime() starts it from whatever the display shows, and each Task() takes one step of it. The
  * last step clears the display, lights the words of the new time whole and makes the animation
  * idle.
- *
- * \warning Only Init() resets the count of letters lit and the length of the longest word; the end
- *          of the animation leaves them as they are. Started again without an Init() in between, as
- *          Animations does at every word change in Animations::ModeType::kFixed, the second half
- *          goes on from the length the run before ended at, so the new time does not grow but
- *          appears whole, or nearly whole, in its first step.
  */
 class AnimationSqueeze : public Animation
 {
