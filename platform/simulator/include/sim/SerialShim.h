@@ -6,8 +6,8 @@
  * \brief Stands in for the Arduino Serial port.
  *
  * What the firmware prints ends up in a text control, and what is typed into another one is handed
- * back to it character by character, the way a real port delivers it. Arduino's Serial is #defined
- * to this instance.
+ * back to it character by character, the way a real port delivers it. Arduino's Serial is a macro
+ * for this instance.
  *
  * The two controls belong to the pixel matrix window, which lays them out and passes them here with
  * Attach(). Splitting it that way keeps the port's behaviour — the buffering, the line the answers

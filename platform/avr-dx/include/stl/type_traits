@@ -5,9 +5,9 @@
  * \file
  * \brief The traits the firmware core uses, for a toolchain that ships no libstdc++.
  *
- * avr-gcc comes with avr-libc, which is a C library: there is no <array>, no <limits> and no
- * <type_traits> behind it. The core needs a handful of names from each, so this directory supplies
- * exactly those and nothing more.
+ * avr-gcc comes with avr-libc, which is a C library: there is no `<array>`, no `<limits>` and no
+ * `<type_traits>` behind it. The core needs a handful of names from each, so this directory
+ * supplies exactly those and nothing more.
  *
  * Written here rather than taken from the STL vendored in the old xmega project: that one predates
  * C++11 in the places that matter. Its numeric_limits::max() is not constexpr, which the core calls

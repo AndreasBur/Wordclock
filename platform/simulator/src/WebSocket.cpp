@@ -116,7 +116,7 @@ StdReturnType WebSocket::DecodeFrame(std::string& buffer, uint8_t& opcode, std::
 
 /*! \brief          Converts the browser's key into the key it expects back
  *
- *  \param[in]      Key             the value of Sec-WebSocket-Key
+ *  \param[in]      key             the value of Sec-WebSocket-Key
  *  \return         the value of Sec-WebSocket-Accept: the base64 of the SHA-1 of the key and
  *                  the fixed GUID of RFC 6455
  */
@@ -132,7 +132,6 @@ std::string WebSocket::ConvertKeyToAcceptKey(const std::string& key)
  *
  *  \param[in]      message         the bytes to hash
  *  \param[out]     digest          the hash, kSha1Length bytes
- *  \return         -
  */
 void WebSocket::CalculateSha1(const std::string& message, uint8_t* digest)
 {
@@ -182,7 +181,7 @@ std::string WebSocket::ConvertToBase64(const uint8_t* bytes, size_t length)
  *                  returned from the request itself, because the key is not.
  *
  *  \param[in]      request         the whole HTTP request, headers included
- *  \param[out]     Key             the value of Sec-WebSocket-Key
+ *  \param[out]     key             the value of Sec-WebSocket-Key
  *  \return         kEOk
  *                  kENotOk        the request has no such header
  */
@@ -229,7 +228,6 @@ std::string WebSocket::PadSha1Message(const std::string& message)
  *
  *  \param[in]      block           kSha1BlockLength bytes of the padded message
  *  \param[in,out]  state           the five words of the hash so far
- *  \return         -
  */
 void WebSocket::ProcessSha1Block(const uint8_t* block, uint32_t* state)
 {

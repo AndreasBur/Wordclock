@@ -151,7 +151,9 @@ variant can add its own extensions on top without repeating the shared list.
 
 The shared settings install `clangd` and configure it to read CMake's
 `build/compile_commands.json`; C/C++ Tools remains installed for debugging but
-does not provide IntelliSense.
+does not provide IntelliSense. Doxygen Documentation Generator writes the skeleton
+of a Doxygen block in the style of `docs/documentation.md` when you type `/*!` and
+Enter above a declaration.
 
 Feature metadata is baked into the image at build time, so editing
 `shared/devcontainer-feature.json` requires **Dev Containers: Rebuild

@@ -35,8 +35,6 @@ char SerialShim::read()
 /*! \brief          hands the line in the input field over to be read
  *  \details        Only while nothing is waiting: read() drains a line one character at a
  *                  time, and a second one written over it would be lost.
- *
- *  \return         -
  */
 void SerialShim::SendInput()
 {
@@ -61,8 +59,6 @@ void SerialShim::AppendOutput(const wxString& text)
  *                  line stays: it is what actually went over the wire, which is what
  *                  matters when the protocol itself is in doubt. Anything the decoder does
  *                  not recognise — an error line, or plain text — passes through untouched.
- *
- *  \return         -
  */
 void SerialShim::FinishOutputLine()
 {

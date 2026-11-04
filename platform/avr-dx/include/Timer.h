@@ -243,7 +243,7 @@ class Timer
         }
     }
 
-    static TimerClockSelectType ToClockSelect(uint32_t);
+    static TimerClockSelectType ToClockSelect(uint32_t timer_cycles);
     TimerCountDirection GetCountingDirection();
     void SetClockSelect(TimerClockSelectType);
     void SetRunning(bool);
@@ -259,14 +259,14 @@ class Timer
         static Timer singleton_instance;
         return singleton_instance;
     }
-    StdReturnType Init(uint32_t = 1000u, TimerIsrCallbackFVoid = nullptr);
-    StdReturnType SetPeriod(uint32_t);
+    StdReturnType Init(uint32_t microseconds = 1000u, TimerIsrCallbackFVoid timer_overflow_callback = nullptr);
+    StdReturnType SetPeriod(uint32_t microseconds);
     StdReturnType Start();
     void Stop();
     StdReturnType Resume();
-    StdReturnType AttachInterrupt(TimerIsrCallbackFVoid);
+    StdReturnType AttachInterrupt(TimerIsrCallbackFVoid timer_overflow_callback);
     void DetachInterrupt();
-    StdReturnType Read(uint32_t&);
+    StdReturnType Read(uint32_t& microseconds);
     void HandleOverflowInterrupt();
 
     // The channel is a template argument so that a channel the timer does not have fails to compile

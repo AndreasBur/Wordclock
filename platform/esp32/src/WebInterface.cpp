@@ -451,8 +451,6 @@ void WebInterface::BroadcastLine(const char* line)
  *                  are WebFrontend's, shared with the other backend - none of the three has
  *                  anything to do with which server is underneath. What is this file's is
  *                  SendBinary() below.
- *
- *  \return         -
  */
 void WebInterface::BroadcastFrame()
 {

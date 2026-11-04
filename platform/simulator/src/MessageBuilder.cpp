@@ -98,8 +98,6 @@ wxBoxSizer* MessageBuilder::CreateSizerAll(wxWindow* parent)
  *                  reset rather than left as they were, so an argument typed for a
  *                  different command cannot be carried over into this one under a short
  *                  name that happens to sit at the same position.
- *
- *  \return         -
  */
 void MessageBuilder::ShowOptionsOfSelectedCommand()
 {
@@ -205,8 +203,6 @@ void MessageBuilder::OnCommand(wxCommandEvent &event)
 /*! \brief          follows a ticked or unticked option
  *  \details        The row is taken from the event's id, which is what the contiguous
  *                  ranges of the option widgets are for.
- *
- *  \return         -
  */
 void MessageBuilder::OnOptionUsed(wxCommandEvent &event)
 {
@@ -228,8 +224,6 @@ void MessageBuilder::OnOptionChanged(wxCommandEvent &event)
  *                  The window closes with it, since what there was to do here is done —
  *                  hidden rather than destroyed, so the next Create brings back the
  *                  command that was selected.
- *
- *  \return         -
  */
 void MessageBuilder::OnInsert(wxCommandEvent &event)
 {

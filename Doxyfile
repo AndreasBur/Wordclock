@@ -1,0 +1,38 @@
+# The Doxygen blocks of firmware/ and of one backend under platform/, checked rather than
+# published: Wordclock is a firmware with no reader of a reference outside its code, and docs/
+# is the project's site. Only what differs from Doxygen's defaults is set.
+#
+# tools/docs.py runs it once per backend and sets INPUT, OUTPUT_DIRECTORY and WARN_LOGFILE for
+# each: the backends have a Pixels, a System and a Storage of their own, which one run would
+# merge into one class. See docs/documentation.md.
+
+PROJECT_NAME           = Wordclock
+PROJECT_BRIEF          = "A German word clock"
+OUTPUT_DIRECTORY       = build/doxygen/simulator
+
+INPUT                  = firmware platform/simulator
+RECURSIVE              = YES
+# The three headers of platform/avr-dx/include/stl are named as the standard's are, without an
+# extension.
+FILE_PATTERNS          = *.h *.cpp array limits type_traits
+EXTENSION_MAPPING      = no_extension=C++
+# The tests keep // comments, and .pio holds what PlatformIO fetched.
+EXCLUDE_PATTERNS       = */test/* */tests/* */.pio/*
+
+# PROGMEM and the attributes mean nothing to Doxygen; read as they are, a table in flash
+# becomes a symbol of its own.
+MACRO_EXPANSION        = YES
+EXPAND_ONLY_PREDEF     = YES
+PREDEFINED             = PROGMEM= "__attribute__(x)="
+
+HAVE_DOT               = NO
+DIRECTORY_GRAPH        = NO
+GENERATE_LATEX         = NO
+
+QUIET                  = YES
+WARN_IF_UNDOCUMENTED   = YES
+# A parameter without its \param fails, even the only one; docs.py lets a missing \return pass,
+# which a one-line block whose brief says what comes back needs not have.
+WARN_IF_INCOMPLETE_DOC = YES
+WARN_NO_PARAMDOC       = YES
+WARN_LOGFILE           = build/doxygen/simulator/warnings.log

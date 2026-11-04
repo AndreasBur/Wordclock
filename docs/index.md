@@ -32,3 +32,4 @@ Pi Pico 2 W und AVR128DA48 — und im Simulator auf dem PC, ganz ohne Hardware.
 
 The firmware, the three hardware backends, the simulator and the build
 instructions are on GitHub: [AndreasBur/Wordclock](https://github.com/AndreasBur/Wordclock).
+How its comments are written, and checked, is [Documenting the code](documentation.md).

@@ -317,10 +317,8 @@ StdReturnType Text::ConvertCharToFontIndex(char character, byte& index)
 /*! \brief          converts char to sprite
  *  \details        this function converts the ASCII char to sprite index
  *
- *  \param[in]      character            char to convert to sprite
- *  \param[out]     SpriteIndex     appropriate sprite
- *  \return         kEOk
- *                  kENotOk
+ *  \param[in]      character       char to convert to sprite
+ *  \return         the sprite index, or the space's if the char has no sprite
  */
 byte Text::ConvertCharToFontIndex(char character)
 {

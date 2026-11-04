@@ -11,6 +11,7 @@
                 "llvm-vs-code-extensions.vscode-clangd",
                 "EditorConfig.EditorConfig",
                 "eamodio.gitlens",
+                "cschlosser.doxdocgen",
                 "openai.chatgpt"
             ],
             "settings": {
@@ -23,7 +24,17 @@
                 "C_Cpp.intelliSenseEngine": "disabled",
                 "clangd.arguments": [
                     "--compile-commands-dir=${workspaceFolder}/build"
-                ]
+                ],
+                "doxdocgen.c.triggerSequence": "/*!",
+                "doxdocgen.c.firstLine": "/*!",
+                "doxdocgen.c.commentPrefix": " * ",
+                "doxdocgen.c.lastLine": " */",
+                "doxdocgen.generic.briefTemplate": "\\brief {text}",
+                "doxdocgen.generic.paramTemplate": "\\param[in] {param} ",
+                "doxdocgen.cpp.tparamTemplate": "\\tparam {param} ",
+                "doxdocgen.generic.returnTemplate": "\\return ",
+                "doxdocgen.generic.includeTypeAtReturn": false,
+                "doxdocgen.generic.order": ["brief", "empty", "tparam", "param", "return"]
             }
         }
     },

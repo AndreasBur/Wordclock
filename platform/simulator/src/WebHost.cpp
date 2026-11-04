@@ -41,8 +41,6 @@
 /*! \brief          WebHost constructor
  *  \details        A host that listens nowhere until Begin(), and has no clients until then
  *                  either - which HasClients() may be asked before Begin() ever ran.
- *
- *  \return         -
  */
 WebHost::WebHost()
 {
@@ -103,8 +101,6 @@ void WebHost::Task()
 }
 
 /*! \brief          Closes every socket, for the way out
- *
- *  \return         -
  */
 void WebHost::End()
 {
@@ -134,7 +130,6 @@ bool WebHost::HasClients() const
  *  \param[in]      is_binary       a binary frame rather than a text one
  *  \param[in]      payload         the bytes to send
  *  \param[in]      length          the number of bytes
- *  \return         -
  */
 void WebHost::SendToEveryClient(bool is_binary, const char* payload, size_t length)
 {
@@ -155,7 +150,6 @@ void WebHost::SendToEveryClient(bool is_binary, const char* payload, size_t leng
  *  \param[in]      body            the body
  *  \param[in]      length          the length of the body
  *  \param[in]      is_gzipped      the body is gzip-compressed and says so
- *  \return         -
  */
 void WebHost::SendResponse(SocketType socket, const char* status, const char* content_type,
                            const char* body, size_t length, bool is_gzipped)
@@ -174,8 +168,6 @@ void WebHost::SendResponse(SocketType socket, const char* status, const char* co
  *  \details        Keeps a connection that became a web socket, as long as there is a free
  *                  slot for it, and closes every other one. A connection that arrives with
  *                  every slot taken is closed unread.
- *
- *  \return         -
  */
 void WebHost::AcceptClients()
 {
@@ -199,7 +191,6 @@ void WebHost::AcceptClients()
  *                  close frame drops the client.
  *
  *  \param[in]      slot            the client's slot
- *  \return         -
  */
 void WebHost::ReadClient(size_t slot)
 {
@@ -234,7 +225,6 @@ size_t WebHost::FindFreeSlot() const
  *                  frame. An empty slot is left alone, so that End() may call this on every one.
  *
  *  \param[in]      slot            the client's slot
- *  \return         -
  */
 void WebHost::DropClient(size_t slot)
 {
@@ -514,7 +504,6 @@ size_t WebHost::DrainBody(SocketType socket, size_t received, size_t announced)
  *  \details        So that polling it from the tick never stops the firmware.
  *
  *  \param[in]      socket          the socket
- *  \return         -
  */
 void WebHost::SetNonBlocking(SocketType socket)
 {
@@ -535,7 +524,6 @@ void WebHost::SetNonBlocking(SocketType socket)
  *                  there at all. Said on both platforms, so that both read the same way.
  *
  *  \param[in]      socket          the socket
- *  \return         -
  */
 void WebHost::SetBlocking(SocketType socket)
 {
@@ -554,7 +542,6 @@ void WebHost::SetBlocking(SocketType socket)
  *
  *  \param[in]      socket          the connection
  *  \param[in]      milliseconds    how long one recv() may wait for the next bytes
- *  \return         -
  */
 void WebHost::SetReceiveTimeout(SocketType socket, unsigned milliseconds)
 {
@@ -600,7 +587,6 @@ bool WebHost::SendAll(SocketType socket, const char* data, size_t length)
  *  \details        Static because SerialShim takes a plain function pointer.
  *
  *  \param[in]      line            the line, without its line end
- *  \return         -
  */
 void WebHost::SendLineToClients(const char* line)
 {

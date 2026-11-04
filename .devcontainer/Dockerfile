@@ -30,6 +30,7 @@ FROM ${BASE_IMAGE}
 # request on; running them here is what keeps that from being a surprise. run-clang-tidy,
 # which walks the compile database in parallel, is part of the same package.
 # cppcheck is the second analyser of that same workflow, and is here for the same reason.
+# doxygen is what tools/docs.py reads the Doxygen blocks with, a job of that workflow as well.
 # CI uses the same Ubuntu release for both analysers; rebuild this image to pick up
 # package updates when a newer CI image reports a finding that is not reproducible locally.
 # gcc-avr and avr-libc cross-compile the AVR Dx backend, which nothing else here can build:
@@ -42,6 +43,7 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && \
         clangd \
         clang-tidy \
         cppcheck \
+        doxygen \
         gcc-avr \
         avr-libc \
         ninja-build \
