@@ -9,11 +9,10 @@
  * read back, exactly as the WiFi pass phrase is not - what comes back is whether one is set at all,
  * which is the only thing somebody needs to know from the outside.
  *
- * Sent without a password, the command is meant to clear it so that the console answers everybody
- * again. That is the way back for a clock whose password was forgotten, and it is why this command
- * is worth having on the serial line rather than only in the console it locks: the console would
- * ask for the very password that is missing. As the parser stands, no command line clears it; see
- * MsgCmdConsoleParser.
+ * Sent without a password, the command clears it so that the console answers everybody again.
+ * That is the way back for a clock whose password was forgotten, and it is why this command is
+ * worth having on the serial line rather than only in the console it locks: the console would ask
+ * for the very password that is missing.
  */
 
 #ifndef _MSG_CMD_CONSOLE_PARSER_H_
@@ -31,25 +30,22 @@
  * \brief The parser of command 16, the console command: sets the password the web console asks for.
  *
  * Its option:
- * - `-P<password>`, string: stores the password through System::SetConsolePassword(). It is
- *   stored on the ESP32 and the RP2350; the AVR and the simulator refuse it, and keep no password.
- *   A refusal is not answered.
+ * - `-P<password>`, string: the password, up to the next option, without trailing spaces, and cut
+ *   to what System::kPasswordStringLength holds. An empty one, `16 -P`, clears it.
+ *
+ * Process() stores it through System::SetConsolePassword(), and without `-P` it stores an empty
+ * one: `16` alone clears the password. It is stored on the ESP32 and the RP2350; the AVR and the
+ * simulator refuse it, and keep no password. A refusal is not answered.
  *
  * The answer says whether a password is set, never which one.
  *
  * MsgParameterParser reads the options by the parameter table and hands each value to the private
- * `HandleParameter()`, which applies it at once. MsgCmdParser makes the parser and calls Parse(),
+ * `HandleParameter()`, which keeps it for Process(). MsgCmdParser makes the parser and calls Parse(),
  * Process() and SendAnswer() in this order, so an error answered for an option stands in the line
  * before the fields of the answer.
  *
  * The number holds while every overlay is built in; one whose `OVERLAYS_SUPPORT_*` switch is
  * STD_OFF moves the commands behind it down by one.
- *
- * \warning The password is stored from the first character after `-P` to the end of the line, not
- *          to the next option: `16 -Psecret -A1` stores `secret -A1`, and answers `Error=3:A` as
- *          well. And no command line clears the password, though the panel sends `16 -P` for an
- *          empty password field: an option that ends the line is not read, see
- *          MsgParameterParser::Parse(), and `16` alone carries no option.
  */
 class MsgCmdConsoleParser : public MsgParameterParser<MsgCmdConsoleParser, MSG_CMD_CONSOLE_PARSER_PARAMETER_TABLE_SIZE>
 {
@@ -63,14 +59,30 @@ class MsgCmdConsoleParser : public MsgParameterParser<MsgCmdConsoleParser, MSG_C
         ParameterTableElementType(kPasswordShortName, MsgParameter::ArgumentTypeType::kString)
     };
 
+    // Empty until -P fills it, so that a command without it stores the empty password.
+    char password_[System::kPasswordStringLength]{0u};
+
     static void HandleParameter(char parameter_short_name, byte argument) {
         UNUSED(parameter_short_name); UNUSED(argument);
     }
-    static void HandleParameter(char parameter_short_name, const char* argument, PositionType length)
+    /*
+     * Copied with its length rather than read to the end of the line, as it was: the argument is
+     * not terminated in the parameter string, and 16 -Psecret -A1 stored "secret -A1".
+     */
+    void HandleParameter(char parameter_short_name, const char* argument, PositionType length)
     {
-        UNUSED(length);
+        if(parameter_short_name == kPasswordShortName) {
+            StringTools::StringCopy(password_, argument, Minimum(length, sizeof(password_)));
+            TrimTrailingBlanks(password_);
+        }
+    }
 
-        if(parameter_short_name == kPasswordShortName) { System::GetInstance().SetConsolePassword(argument); }
+    static constexpr size_t Minimum(size_t left, size_t right) { return (left < right) ? left : right; }
+
+    static void TrimTrailingBlanks(char* string) {
+        for(size_t index = strlen(string); (index > 0u) && (string[index - 1u] == ' '); index--) {
+            string[index - 1u] = STD_NULL_CHARACTER;
+        }
     }
 
   public:
@@ -99,10 +111,9 @@ class MsgCmdConsoleParser : public MsgParameterParser<MsgCmdConsoleParser, MSG_C
     /*!
      * \brief Completes the command once Parse() has read its options.
      *
-     * Nothing is left to do: every option is applied as Parse() reads it. Nothing is deferred, as
-     * the password has no second field it has to agree with.
+     * It stores the password of `-P`, or the empty one without it, which clears the password.
      */
-    static void Process() { }
+    void Process() const { System::GetInstance().SetConsolePassword(password_); }
 };
 
 #endif // _MSG_CMD_CONSOLE_PARSER_H_

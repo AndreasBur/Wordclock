@@ -349,7 +349,7 @@ Returned in the `Error=<code>` field
 | code | Name | Meaning |
 |------|------|---------|
 | 0 | `ErrorType::kNoError` | Success |
-| 1 | `ErrorType::kMessageTooLong` | Incoming message exceeded the buffer |
+| 1 | `ErrorType::kMessageTooLong` | Incoming message exceeded the buffer; the line is refused whole, on a line of its own |
 | 2 | `ErrorType::kWrongCommand` | Unknown/empty command number |
 | 3 | `ErrorType::kParameterUnknown` | Unknown option short name |
 | 4 | `ErrorType::kValueOutOfBounds` | Value outside the allowed range |

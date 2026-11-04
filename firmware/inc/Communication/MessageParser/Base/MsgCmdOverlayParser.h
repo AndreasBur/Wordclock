@@ -46,9 +46,10 @@
  * friend, and provides the public hooks this class calls to reach its overlay in Overlays: a getter
  * and a setter for each setting, `SetText()` for `-T` and `SendAnswerText()` for the `T` field.
  *
+ * A font that is not one of Text::FontType, such as `5 -F9`, is answered with `Error=4:F`, and
+ * the font is left as it was.
+ *
  * \tparam Derived The overlay parser that derives from this class.
- * \note A font that is not one of Text::FontType, such as `5 -F9`, leaves the font as it was, but
- *       no error is answered for it.
  */
 template <typename Derived> class MsgCmdOverlayParser
     : public MsgParameterParser<MsgCmdOverlayParser<Derived>, MSG_CMD_BASE_OVERLAY_PARSER_PARAMETER_TABLE_SIZE>, public MsgCmdBaseOverlayParser
@@ -113,7 +114,9 @@ template <typename Derived> class MsgCmdOverlayParser
         if(parameter_short_name == kValidOptionShortName) { Underlying().SetValidInDays(argument); }
         if(parameter_short_name == kActiveOptionShortName) { Underlying().SetIsActive(static_cast<bool>(argument)); }
         if(parameter_short_name == kSpeedOptionShortName) { Underlying().SetSpeed(argument); }
-        if(parameter_short_name == kFontOptionShortName) { Underlying().SetFont(static_cast<FontType>(argument)); }
+        // Through SetFont() below, which answers a refused font; called on the overlay directly,
+        // as it was, 5 -F9 left the font as it was without a word.
+        if(parameter_short_name == kFontOptionShortName) { SetFont(static_cast<FontType>(argument)); }
     }
 
     void HandleParameter(char parameter_short_name, const char* argument, PositionType length) {

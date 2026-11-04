@@ -54,9 +54,8 @@
  * Longer frames are refused whole rather than split, by WebFrontend::InjectCommand(). Well above
  * the longest command in the reference, whose text overlay is the only one that comes close.
  *
- * \warning It is longer than a line Communication collects, MESSAGE_LENGTH - 1 characters. A frame
- *          between the two passes here and is cut there: its first MESSAGE_LENGTH - 1 characters
- *          are parsed as a command, and every character beyond them is answered with `Error=1`.
+ * It is longer than a line Communication collects, MESSAGE_LENGTH - 1 characters. A frame between
+ * the two passes here and is refused there, whole, with `Error=1`.
  */
 #define WEB_FRONTEND_MAX_FRAME_LENGTH                   192u
 
@@ -275,8 +274,6 @@ class WebFrontend
      *
      * \param[in] text The text of the frame; it need not be terminated.
      * \param[in] length The number of characters of `text`.
-     * \warning A frame that passes here can still be longer than a line Communication collects; see
-     *          WEB_FRONTEND_MAX_FRAME_LENGTH.
      */
     static void InjectCommand(const char* text, size_t length);
 

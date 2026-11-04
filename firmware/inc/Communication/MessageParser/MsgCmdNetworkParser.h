@@ -56,9 +56,8 @@
  * The number holds while every overlay is built in; one whose `OVERLAYS_SUPPORT_*` switch is
  * STD_OFF moves the commands behind it down by one.
  *
- * \warning An option that ends the line is not read, see MsgParameterParser::Parse(). So an empty
- *          pass phrase at the end is no pass phrase at all: `13 -SOpenNet -P` for an open network
- *          and `13 -S -P` to forget the network are both refused with `Error=8` as half a pair.
+ * An empty pass phrase is a pass phrase all the same, at the end of the line too: `13 -SOpenNet -P`
+ * joins an open network, and `13 -S -P` forgets the network.
  */
 class MsgCmdNetworkParser : public MsgParameterParser<MsgCmdNetworkParser, MSG_CMD_NETWORK_PARSER_PARAMETER_TABLE_SIZE>
 {

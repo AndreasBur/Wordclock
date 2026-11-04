@@ -151,6 +151,52 @@ int main()
     Check(answer_to("13 -SOther\n") == "13 S=MyNetwork Error=8", "half a pair is refused");
     Check(answer_to("13\n") == "13 S=MyNetwork Error=0", "and leaves the stored one alone");
 
+    /*
+     * An option that ends the line is read with an empty argument, as any other. The parser
+     * used to stop at the end of the line before it got to the argument, and these did nothing.
+     */
+    Check(answer_to("13 -S -P\n") == "13 S= Error=0", "13 -S -P forgets the network");
+    Check(answer_to("13 -SOpenNet -P\n") == "13 S=OpenNet Error=0", "an empty pass phrase joins an open network");
+    Check(answer_to("9 -A\n").find("Error=5:A") != std::string::npos,
+          "an option without its value at the end of the line is answered");
+
+    // The character behind an unknown option is read again: it used to be skipped with it.
+    {
+        const std::string answer = answer_to("9 -X-A3\n");
+        Check(answer.find("Error=3:X") != std::string::npos && answer.find("A=3") != std::string::npos,
+              "an unknown option does not swallow the option behind it");
+        answer_to("9 -A0\n");
+    }
+
+    /*
+     * Command 16 clears the console password without an option and with an empty one, the way
+     * back for a clock nobody can log into. Neither cleared it.
+     */
+    Check(answer_to("16 -Psecret\n") == "16 A=1", "a console password is set");
+    Check(answer_to("16\n") == "16 A=0", "and command 16 alone clears it");
+    Check(answer_to("16 -Psecret\n") == "16 A=1", "a console password is set again");
+    Check(answer_to("16 -P\n") == "16 A=0", "and an empty -P, which the panel sends, clears it as well");
+
+    // A refused -I sets no pixel: the index stayed at 0, and -S lit pixel 0.
+    answer_to("4 -I0 -S0\n");
+    Check(answer_to("4 -I300 -S1\n") == "4 Error=4:I I=0 S=0", "a refused index sets no pixel");
+
+    // A font that is not one is answered rather than ignored.
+    Check(answer_to("5 -F9\n").find("Error=4:F") != std::string::npos, "an overlay font out of range is answered");
+
+    /*
+     * A line longer than the buffer is refused whole, with one error. It was answered with an
+     * error per character dropped and then run cut short, here as the text of the text overlay.
+     */
+    {
+        const std::string too_long = "7 -T" + std::string(MESSAGE_LENGTH, 'a') + "\n";
+        lines.clear();
+        port.Inject(too_long.data(), too_long.size());
+        for(int tick = 0; tick < 8; tick++) { communication.Task(); }
+        Check(lines.size() == 1u && lines[0] == "Error=1", "a line too long is answered with one error");
+        Check(answer_to("7\n").find("T= ") != std::string::npos, "and is not carried out");
+    }
+
     /* a full buffer refuses rather than overwriting a command in flight */
     std::string too_much(WORDCLOCK_SERIAL_INJECT_BUFFER_SIZE + 8u, 'x');
     Check(port.Inject(too_much.data(), too_much.size()) == kENotOk, "an overlong injection is refused");
