@@ -38,10 +38,10 @@ void AnimationFade::Task()
     else if(state_ == StateType::kSetTime) { SetTimeTask(); }
 }
 
-/*! \brief          Back to a display nobody is fading
- *  \details        Called from Init(), which is also what an aborted animation goes
- *                  through - a fade that was cut off half way would otherwise leave the
- *                  display dimmed with nothing left to undim it.
+/*
+ * Back to a display nobody is fading. Called from Init(), which is also what an aborted
+ * animation goes through - a fade that was cut off half way would otherwise leave the
+ * display dimmed with nothing left to undim it.
  */
 void AnimationFade::Reset()
 {
@@ -77,11 +77,11 @@ void AnimationFade::SetTimeTask()
     }
 }
 
-/*! \brief          Swaps the time behind a display that is dark
- *  \details        The clear is what was missing: setting the new time writes its letters,
- *                  it does not take the previous ones away, so both were lit at once - and
- *                  at the moment of the swap the display is black, which is the one moment
- *                  where nobody can see it happen.
+/*
+ * Swaps the time behind a display that is dark. The clear is what was missing: setting the
+ * new time writes its letters, it does not take the previous ones away, so both were lit at
+ * once - and at the moment of the swap the display is black, which is the one moment where
+ * nobody can see it happen.
  */
 void AnimationFade::SetStateToSetTime()
 {

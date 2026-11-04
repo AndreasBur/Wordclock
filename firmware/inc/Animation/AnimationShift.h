@@ -15,8 +15,9 @@
 #include "Transformation.h"
 #include "Animation.h"
 
-/* AnimationShift configuration parameter */
+/*! \brief STD_ON to shift by columns, to the right; exactly one of the two switches is STD_ON. */
 #define ANIMATION_SHIFT_HORIZONTAL              STD_ON
+/*! \brief STD_ON to shift by rows, downwards; exactly one of the two switches is STD_ON. */
 #define ANIMATION_SHIFT_VERTICAL                STD_OFF
 
 #if (ANIMATION_SHIFT_HORIZONTAL == STD_OFF && ANIMATION_SHIFT_VERTICAL == STD_OFF)
@@ -27,8 +28,26 @@
 # error "AnimationShift: ANIMATION_SHIFT_HORIZONTAL or ANIMATION_SHIFT_VERTICAL has to be STD_ON, but not both"
 #endif
 
-/* AnimationShift parameter */
-
+/*!
+ * \brief The shift animation: shifts the previous time out of the display, then shifts the new one
+ *        in, so the display is empty in between.
+ *
+ * With ANIMATION_SHIFT_HORIZONTAL it shifts the whole display to the right, one column per step,
+ * through Transformation::ShiftRight(). In the first half, while GetState() returns kClearTime,
+ * the previous time leaves at the right. In the second half, while it returns kSetTime, the new
+ * time comes in at the left, its rightmost column first. With ANIMATION_SHIFT_VERTICAL it is the
+ * same with rows, shifted down.
+ *
+ * SetTime() starts it from whatever the display shows, and each Task() takes one step of it. The
+ * last step clears the display, lights the words of the new time whole and makes the animation
+ * idle.
+ *
+ * \warning Only Init() puts the count of columns or rows back to the start of the first half; the
+ *          end of the animation leaves it at its end. Started again without an Init() in between,
+ *          as Animations does at every word change in Animations::ModeType::kFixed, the first half
+ *          ends in its first step, and the previous time shifts out together with the new one
+ *          coming in, so the display is not empty in between.
+ */
 class AnimationShift : public Animation
 {
   public:
@@ -45,22 +64,51 @@ class AnimationShift : public Animation
     byte current_row_{0u};
 #endif
 
-    // functions
     void Reset();
     void ClearTimeTask();
     void SetTimeTask();
 
   public:
+    /*! \brief Makes the animation, with GetState() kNone until Init(). */
     constexpr AnimationShift() : wc_transformation_() { }
+
+    /*! \brief Destroys the animation. */
     ~AnimationShift() { }
 
-    // get methods
-
-    // set methods
-
-    // methods
+    /*!
+     * \brief Makes the animation idle and resets its progress.
+     *
+     * A running animation ends where it stands, and the display keeps what its last step drew.
+     */
     void Init();
-    StdReturnType SetTime(byte, byte);
+
+    /*!
+     * \brief Starts the animation towards the time `hour`:`minute`.
+     *
+     * It draws nothing itself.
+     *
+     * \param[in] hour The hour, 0 to 23.
+     * \param[in] minute The minute, 0 to 59.
+     * \return kENotOk in every case; see the warning.
+     * \warning It never returns kEOk, so a caller cannot tell a start from a refusal. It starts the
+     *          animation if `hour` is 0 to 23, `minute` 0 to 59 and the animation is idle.
+     *          Otherwise a time out of range leaves the animation as it was, and a running one runs
+     *          on, but ends on the words of `hour`:`minute`.
+     */
+    StdReturnType SetTime(byte hour, byte minute);
+
+    /*!
+     * \brief Takes one step of the animation; does nothing while it is idle.
+     *
+     * With ANIMATION_SHIFT_HORIZONTAL a step of the first half shifts the display one column to
+     * the right; the step after DISPLAY_NUMBER_OF_COLUMNS of them only starts the second half. A
+     * step of the second half shifts the display one column to the right and lights, in the
+     * leftmost column, the column of the new time that the remaining shifts carry to its place;
+     * the step after DISPLAY_NUMBER_OF_COLUMNS of them ends it. With ANIMATION_SHIFT_VERTICAL it
+     * is the same with rows, DISPLAY_NUMBER_OF_ROWS of them in each half.
+     *
+     * It writes the pixels of Display and leaves showing them to Show().
+     */
     void Task();
 };
 
