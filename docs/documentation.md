@@ -41,8 +41,8 @@ the line it is for.
      *
      * \param[in] column The column of the grid, counted from 0.
      * \param[in] row The row of the grid, counted from 0.
-     * \return kEOk, or kENotOk if `column` or `row` lies off the grid; the pixels are then left
-     *         as they were.
+     * \return kEOk, or kENotOk if `column` or `row` lies off the grid; the pixels are then left as
+     *         they were.
      */
     StdReturnType SetPixel(byte column, byte row);
 ```

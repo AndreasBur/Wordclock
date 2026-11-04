@@ -10,6 +10,11 @@
 
 #include "DisplayWords.h"
 
+/*
+ * One entry per WordIdType, in its order: the column of the word's first letter, its row and its
+ * length, as DisplayWord takes them. It has to stay in step with WordIdType and with the letters
+ * of DisplayCharacters by hand, as nothing checks either.
+ */
 const DisplayWord DisplayWords::kDisplayWordsTable[] PROGMEM
 {
     DisplayWord(0,0,0),                  //  0 = DISPLAY_WORD_NONE           = ""

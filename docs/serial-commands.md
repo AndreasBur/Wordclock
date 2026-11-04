@@ -104,7 +104,8 @@ platform's `BH1750.h`.
 
 Two bounds keep it usable: the automatic never dims below a floor, so a dark room
 does not make the clock disappear, and it never brightens beyond what `-B` asked
-for. A `-B0` therefore stays off, floor or not.
+for. A `-B0` therefore stays at the bottom, floor or not: where the colour does the dimming,
+which it does by default, that is every lit channel at 1, the faintest light rather than dark.
 
 In the simulator there is no sensor to read, so the **Illuminance** slider in the
 window stands in for it. It only has an effect while `-A1` is set.

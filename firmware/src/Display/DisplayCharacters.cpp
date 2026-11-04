@@ -18,6 +18,8 @@
 
 #include "DisplayCharacters.h"
 
+// The table the file block describes: one string per row, row 0 first, each with the null that
+// ends it - hence the + 1.
 const DisplayCharacters::DisplayCharactersTableElementType DisplayCharacters::kDisplayCharactersTable[][DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS + 1] PROGMEM
 {
     "ESKISTLF\xDCNF",

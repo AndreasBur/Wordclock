@@ -143,7 +143,7 @@ byte Display::GetCurrentLimit() const
  */
 void Display::ApplyCurrentLimit()
 {
-    // Off stays off - the master is also what Disable() uses. enable() asks for the cap again
+    // Off stays off - the master is also what Disable() uses. Enable() asks for the cap again
     // on its way back, so nothing is lost by leaving it alone here.
     if(!enabled_) { return; }
 

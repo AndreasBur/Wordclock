@@ -30,7 +30,6 @@ BACKENDS = ('simulator', 'avr-dx', 'esp32', 'rp2350')
 PENDING = (
     'firmware/inc/Animation/', 'firmware/src/Animation/',
     'firmware/inc/Communication/', 'firmware/src/Communication/',
-    'firmware/inc/Display/', 'firmware/src/Display/',
     'firmware/inc/Overlay/', 'firmware/src/Overlay/',
     'platform/simulator/',
     'platform/avr-dx/',

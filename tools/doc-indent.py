@@ -4,8 +4,8 @@
 docs/documentation.md starts a line that continues \\param, \\return, \\pre and the others where
 the text after the command starts:
 
-     * \\return kEOk, or kENotOk if `column` or `row` lies off the grid; the pixels are then left
-     *         as they were.
+     * \\return kEOk, or kENotOk if `column` or `row` lies off the grid; the pixels are then left as
+     *         they were.
 
 With --fix, the paragraph after each command is rewrapped to 100 columns so; a code span in
 backticks is kept whole, and \\code ... \\endcode and the lines of a list are left as they are.
