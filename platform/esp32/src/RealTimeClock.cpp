@@ -1,35 +1,20 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
- *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       RealTimeClock.cpp
- *      \brief      ESP32 real-time clock, backed by the system clock
- *
- *      \details    All conversions go through the C library's local time, so the zone
- *                  and the daylight-saving rule that the application installed with
- *                  configTzTime() apply in both directions.
- *
-******************************************************************************************************************************************************/
+// Copyright 2017 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
 
-/******************************************************************************************************************************************************
- * I N C L U D E S
-******************************************************************************************************************************************************/
+/*!
+ * \file
+ * \brief ESP32 real-time clock, backed by the system clock.
+ *
+ * All conversions go through the C library's local time, so the zone and the daylight-saving rule
+ * that the application installed with configTzTime() apply in both directions.
+ */
+
 #include "RealTimeClock.h"
 
 #include <sys/time.h>
 #include <time.h>
 
-/******************************************************************************************************************************************************
- *  LOCAL FUNCTIONS
-******************************************************************************************************************************************************/
 namespace {
-
 /* tm counts years from 1900 and months from zero, ClockDate counts neither. */
 constexpr int kTmYearOffset{1900};
 constexpr int kTmMonthOffset{1};
@@ -129,30 +114,19 @@ void ToTm(const ClockDateTime& date_time, struct tm& local)
 
 } // namespace
 
-/******************************************************************************************************************************************************
- * P U B L I C   F U N C T I O N S
-******************************************************************************************************************************************************/
-
-/******************************************************************************************************************************************************
-  IsSystemTimeSet()
-******************************************************************************************************************************************************/
 /*! \brief          Tells whether the system clock holds a real date yet
  *  \details        Asked as "is the year one ClockDate accepts" rather than by querying
  *                  SNTP: that answers the question the firmware actually has, and it
  *                  stays true for a time that arrived from a command instead of the net.
  *
  *  \return         true once the system clock has been set
-******************************************************************************************************************************************************/
+ */
 bool RealTimeClock::IsSystemTimeSet()
 {
     ClockDateTime unused;
     return ReadSystemDateTime(unused);
-} /* IsSystemTimeSet */
+}
 
-
-/******************************************************************************************************************************************************
-  SetDateTime()
-******************************************************************************************************************************************************/
 void RealTimeClock::SetDateTime(ClockDateTime date_time)
 {
     date_time_ = date_time;
@@ -163,34 +137,22 @@ void RealTimeClock::SetDateTime(ClockDateTime date_time)
      * the hour it would otherwise wait for.
      */
     hour_written_to_chip_ = kNoHourWritten;
-} /* SetDateTime */
+}
 
-
-/******************************************************************************************************************************************************
-  SetTime()
-******************************************************************************************************************************************************/
 void RealTimeClock::SetTime(ClockTime time)
 {
     ClockDateTime value = date_time_;
     value.SetTime(time);
     SetDateTime(value);
-} /* SetTime */
+}
 
-
-/******************************************************************************************************************************************************
-  SetDate()
-******************************************************************************************************************************************************/
 void RealTimeClock::SetDate(ClockDate date)
 {
     ClockDateTime value = date_time_;
     value.SetDate(date);
     SetDateTime(value);
-} /* SetDate */
+}
 
-
-/******************************************************************************************************************************************************
-  Task()
-******************************************************************************************************************************************************/
 /*! \brief          Takes the current local time from the system clock
  *  \details        Nothing is counted forward here, unlike on the simulator: SNTP keeps
  *                  the system clock right on its own, so counting would only add a
@@ -201,7 +163,7 @@ void RealTimeClock::SetDate(ClockDate date)
  *                  from the system clock afterwards. Which way round matters - the chip
  *                  drifts a few seconds a month and SNTP does not, so a chip that could
  *                  overwrite a synchronised clock would make the clock worse.
-******************************************************************************************************************************************************/
+ */
 void RealTimeClock::Task()
 {
     ClockDateTime current;
@@ -218,20 +180,12 @@ void RealTimeClock::Task()
 
     date_time_ = current;
     WriteChip();
-} /* Task */
+}
 
-
-/******************************************************************************************************************************************************
- * P R I V A T E   F U N C T I O N S
-******************************************************************************************************************************************************/
-
-/******************************************************************************************************************************************************
-  ReadSystemDateTime()
-******************************************************************************************************************************************************/
 /*! \brief          Reads the system clock as local date and time
  *
  *  \return         true if the system clock holds a year ClockDate accepts
-******************************************************************************************************************************************************/
+ */
 bool RealTimeClock::ReadSystemDateTime(ClockDateTime& value)
 {
     const time_t now = time(nullptr);
@@ -242,12 +196,8 @@ bool RealTimeClock::ReadSystemDateTime(ClockDateTime& value)
 
     ToDateTime(local, value);
     return true;
-} /* ReadSystemDateTime */
+}
 
-
-/******************************************************************************************************************************************************
-  ReadChip()
-******************************************************************************************************************************************************/
 /*! \brief          Puts what the clock chip kept into the system clock
  *  \details        Only ever called while the system clock holds nothing, so there is
  *                  nothing here that could overwrite a synchronised time. Retried once a
@@ -255,7 +205,7 @@ bool RealTimeClock::ReadSystemDateTime(ClockDateTime& value)
  *                  and what keeps the retry off a bus the light sensor shares.
  *
  *  \return         kEOk if the chip had a time and the system clock took it
-******************************************************************************************************************************************************/
+ */
 StdReturnType RealTimeClock::ReadChip()
 {
     if(chip_read_countdown_ > 0u) { chip_read_countdown_--; return kENotOk; }
@@ -273,12 +223,8 @@ StdReturnType RealTimeClock::ReadChip()
     // hour it belongs to is what the next write is measured against.
     hour_written_to_chip_ = utc.GetTimeHour();
     return kEOk;
-} /* ReadChip */
+}
 
-
-/******************************************************************************************************************************************************
-  WriteChip()
-******************************************************************************************************************************************************/
 /*! \brief          Keeps the clock chip in step with the system clock
  *  \details        Once an hour, and once more whenever the time was set by hand. Once an
  *                  hour because the chip is the more accurate of the two and needs no
@@ -291,7 +237,7 @@ StdReturnType RealTimeClock::ReadChip()
  *                  A failed write is not retried within the hour: the next one comes
  *                  anyway, and a chip that is not answering would otherwise be talked to
  *                  on every single tick.
-******************************************************************************************************************************************************/
+ */
 void RealTimeClock::WriteChip()
 {
     if(date_time_.GetTimeHour() == hour_written_to_chip_) { return; }
@@ -301,16 +247,12 @@ void RealTimeClock::WriteChip()
 
     chip_.SetDateTime(utc);
     hour_written_to_chip_ = date_time_.GetTimeHour();
-} /* WriteChip */
+}
 
-
-/******************************************************************************************************************************************************
-  WriteSystemDateTime()
-******************************************************************************************************************************************************/
 /*! \brief          Puts a date and time into the system clock
  *
  *  \return         kEOk if the system clock took the value
-******************************************************************************************************************************************************/
+ */
 StdReturnType RealTimeClock::WriteSystemDateTime(const ClockDateTime& value)
 {
     struct tm local{};
@@ -323,8 +265,4 @@ StdReturnType RealTimeClock::WriteSystemDateTime(const ClockDateTime& value)
     if(settimeofday(&time, nullptr) != 0) { return kENotOk; }
 
     return kEOk;
-} /* WriteSystemDateTime */
-
-/******************************************************************************************************************************************************
- *  E N D   O F   F I L E
-******************************************************************************************************************************************************/
+}

@@ -1,24 +1,14 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
- *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       Persistence.cpp
- *      \brief      Keeps the configuration across a restart
- *
- *      \details    Holds the stored format: which settings it covers, how they are laid
- *                  out, and how a blob that does not belong to this build is recognised.
- *
-******************************************************************************************************************************************************/
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
 
-/******************************************************************************************************************************************************
- * I N C L U D E S
-******************************************************************************************************************************************************/
+/*!
+ * \file
+ * \brief Keeps the configuration across a restart.
+ *
+ * Holds the stored format: which settings it covers, how they are laid out, and how a blob that
+ * does not belong to this build is recognised.
+ */
+
 #include "Persistence.h"
 
 #include "Animations.h"
@@ -33,11 +23,7 @@
 
 #include <string.h>
 
-/******************************************************************************************************************************************************
- *  LOCAL DATA TYPES AND STRUCTURES
-******************************************************************************************************************************************************/
 namespace {
-
 /*
  * What one overlay carries, which is the same set for all three - the base class owns it,
  * and only the text overlay adds anything on top. Every member is a byte, so this nests
@@ -146,9 +132,6 @@ static_assert(sizeof(SettingsType) <= Storage::kCapacity,
  */
 SettingsType last_saved{};
 
-/******************************************************************************************************************************************************
- *  LOCAL FUNCTIONS
-******************************************************************************************************************************************************/
 /*
  * Sum of every byte but the checksum's own. It is there to catch a truncated or foreign
  * blob, not to detect tampering, and a sum does that for one byte of overhead.
@@ -387,13 +370,6 @@ void Apply(const SettingsType& settings)
 
 } // namespace
 
-/******************************************************************************************************************************************************
- * P U B L I C   F U N C T I O N S
-******************************************************************************************************************************************************/
-
-/******************************************************************************************************************************************************
-  Load()
-******************************************************************************************************************************************************/
 /*! \brief          Restores the stored configuration, if there is a usable one
  *  \details        A blob that cannot be used is thrown away rather than left in place:
  *                  it would otherwise be read and rejected on every start, and the store
@@ -406,7 +382,7 @@ void Apply(const SettingsType& settings)
  *                  in the store, instead of being read and rejected forever.
  *
  *  \return         kEOk if a stored configuration was applied
-******************************************************************************************************************************************************/
+ */
 StdReturnType Persistence::Load()
 {
     SettingsType settings{};
@@ -423,16 +399,12 @@ StdReturnType Persistence::Load()
 
     last_saved = Gather();
     return return_value;
-} /* Load */
+}
 
-
-/******************************************************************************************************************************************************
-  Task()
-******************************************************************************************************************************************************/
 /*! \brief          Writes the configuration if it changed since the last write
  *  \details        A failed write leaves last_saved alone, so the next task tries again
  *                  rather than treating the change as stored.
-******************************************************************************************************************************************************/
+ */
 void Persistence::Task()
 {
     const SettingsType current = Gather();
@@ -455,18 +427,15 @@ void Persistence::Task()
     if(Storage::GetInstance().Write(reinterpret_cast<const byte*>(&current), sizeof(current)) == kEOk) {
         last_saved = current;
     }
-} /* Task */
+}
 
-/******************************************************************************************************************************************************
-  Save()
-******************************************************************************************************************************************************/
 /*! \brief          Writes the configuration now
  *  \details        Unconditionally, unlike Task(): a caller that asks for this is about to
  *                  cut the power, and "nothing changed since the last write" is a state it
  *                  cannot check for itself.
  *
  *  \return         kEOk if the store took the configuration
-******************************************************************************************************************************************************/
+ */
 StdReturnType Persistence::Save()
 {
     const SettingsType current = Gather();
@@ -475,12 +444,8 @@ StdReturnType Persistence::Save()
 
     last_saved = current;
     return kEOk;
-} /* Save */
+}
 
-
-/******************************************************************************************************************************************************
-  Reset()
-******************************************************************************************************************************************************/
 /*! \brief          Puts the configuration back to what a clock starts with
  *  \details        Each module answers for its own defaults, the same way Gather() reads
  *                  from each of them rather than from a copy kept here - so a setting
@@ -492,7 +457,7 @@ StdReturnType Persistence::Save()
  *                  the store that was just emptied.
  *
  *  \return         kEOk if the store was emptied
-******************************************************************************************************************************************************/
+ */
 StdReturnType Persistence::Reset()
 {
     Display::GetInstance().ResetToDefaults();
@@ -507,8 +472,4 @@ StdReturnType Persistence::Reset()
 
     last_saved = Gather();
     return return_value;
-} /* Reset */
-
-/******************************************************************************************************************************************************
- *  E N D   O F   F I L E
-******************************************************************************************************************************************************/
+}

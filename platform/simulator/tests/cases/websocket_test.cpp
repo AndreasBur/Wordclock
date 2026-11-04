@@ -1,10 +1,4 @@
-/******************************************************************************************************************************************************
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       websocket_test.cpp
- *      \brief      The web socket protocol, against the RFCs rather than against a browser
-******************************************************************************************************************************************************/
-
+// The web socket protocol, against the RFCs rather than against a browser.
 
 #include "check.h"
 #include "cases.h"
@@ -15,7 +9,6 @@
 #include <string>
 
 namespace {
-
 std::string ToSha1Hex(const std::string& message)
 {
     uint8_t digest[WebSocket::kSha1Length];

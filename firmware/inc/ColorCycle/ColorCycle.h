@@ -1,57 +1,39 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+/*!
+ * \file
+ * \brief Walks the display's colour round the wheel while the words stand still.
  *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       ColorCycle.h
- *      \brief      Walks the display's colour round the wheel while the words stand still
+ * Every one of the fifteen animations is a transition: something happens because the words changed,
+ * and it is over. This is the other kind, and the clock had none - the display stands still for
+ * five minutes at a time, and this is what happens during those five minutes.
  *
- *      \details    Every one of the fifteen animations is a transition: something happens
- *                  because the words changed, and it is over. This is the other kind, and
- *                  the clock had none - the display stands still for five minutes at a time,
- *                  and this is what happens during those five minutes.
+ * It is not an animation id, and that is a decision rather than an omission. An id would put it in
+ * the list a word change picks from, where it has nothing to do: it does not begin, end, or have
+ * anything to say about a transition. The favourites mask is exactly full at sixteen ids as well,
+ * so it could not have gone there without widening that first.
  *
- *                  It is not an animation id, and that is a decision rather than an
- *                  omission. An id would put it in the list a word change picks from, where
- *                  it has nothing to do: it does not begin, end, or have anything to say
- *                  about a transition. The favourites mask is exactly full at sixteen ids as
- *                  well, so it could not have gone there without widening that first.
+ * What it does not do is write the colour setting. The cycle is a level of its own that
+ * DisplayColor applies on the way to the strip, so the colour somebody chose is still the colour
+ * the command answers and Persistence stores - the same arrangement the night brightness has, and
+ * for the same reason: a setting a feature overwrote is a setting nobody can get back. Switching
+ * the cycle off therefore needs no memory of what was there before; the level goes away and what
+ * was underneath it was never touched.
  *
- *                  What it does not do is write the colour setting. The cycle is a level of
- *                  its own that DisplayColor applies on the way to the strip, so the colour
- *                  somebody chose is still the colour the command answers and Persistence
- *                  stores - the same arrangement the night brightness has, and for the same
- *                  reason: a setting a feature overwrote is a setting nobody can get back.
- *                  Switching the cycle off therefore needs no memory of what was there
- *                  before; the level goes away and what was underneath it was never
- *                  touched.
- *
- *                  The hue is deliberately not stored. Persistence writes when the stored
- *                  blob differs from the live settings, so a hue in that blob would be a
- *                  flash write per step - a few hundred thousand of them a day, on a part
- *                  rated for a hundred thousand. What survives a restart is whether the
- *                  cycle runs and how fast; where in the round it was does not matter to
- *                  anybody.
- *
-******************************************************************************************************************************************************/
+ * The hue is deliberately not stored. Persistence writes when the stored blob differs from the live
+ * settings, so a hue in that blob would be a flash write per step - a few hundred thousand of them
+ * a day, on a part rated for a hundred thousand. What survives a restart is whether the cycle runs
+ * and how fast; where in the round it was does not matter to anybody.
+ */
+
 #ifndef _COLOR_CYCLE_H_
 #define _COLOR_CYCLE_H_
 
-/******************************************************************************************************************************************************
- * I N C L U D E S
-******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Arduino.h"
 #include "Display.h"
 
-/******************************************************************************************************************************************************
- *  G L O B A L   C O N S T A N T   M A C R O S
-******************************************************************************************************************************************************/
 /* ColorCycle configuration parameter */
 /*
  * Scheduler ticks per step of hue, so 100 * 10 ms is a step a second and 256 of those are
@@ -62,14 +44,8 @@
  */
 #define COLOR_CYCLE_TASK_CYCLE_INIT_VALUE               100u
 
-/******************************************************************************************************************************************************
- *  C L A S S   C O L O R   C Y C L E
-******************************************************************************************************************************************************/
 class ColorCycle
 {
-/******************************************************************************************************************************************************
- *  P R I V A T E   D A T A   A N D   F U N C T I O N S
-******************************************************************************************************************************************************/
   private:
     // The wheel walked in one byte, so a step is a step of this and the round closes by
     // overflowing rather than by a comparison.
@@ -134,9 +110,6 @@ class ColorCycle
      */
     static bool IsDisplayShowingAnything() { return GetDisplay().IsEnabled(); }
 
-/******************************************************************************************************************************************************
- *  P U B L I C   F U N C T I O N S
-******************************************************************************************************************************************************/
   public:
     static ColorCycle& GetInstance() {
         static ColorCycle singleton_instance;
@@ -183,7 +156,3 @@ class ColorCycle
 };
 
 #endif // _COLOR_CYCLE_H_
-
-/******************************************************************************************************************************************************
- *  E N D   O F   F I L E
-******************************************************************************************************************************************************/

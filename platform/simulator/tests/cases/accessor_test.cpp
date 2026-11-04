@@ -1,10 +1,4 @@
-/******************************************************************************************************************************************************
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       accessor_test.cpp
- *      \brief      What an accessor answers for an index that is not there, now that each one has a single form
-******************************************************************************************************************************************************/
-
+// What an accessor answers for an index that is not there, now that each one has a single form.
 
 #include "check.h"
 #include "cases.h"
@@ -62,7 +56,6 @@ void TestReadingPastTheEndIsEmpty()
            "which is what the length on its own answers too");
 }
 
-
 /*
  * The writers lost their second form entirely: what is left answers, and a caller with
  * nothing to do with the answer ignores it. So the check is no longer something a caller
@@ -88,7 +81,6 @@ void TestWritingPastTheEndIsRefused()
 
     Expect(ArePixelsEqual(before, ReadPixels()), "none of the refused writes may reach the strip");
 }
-
 
 /*
  * The glyph accessors, which are the ones this collapse found something in: their checked

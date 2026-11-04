@@ -15,10 +15,8 @@
 #include <string>
 #include <vector>
 
-
 static std::vector<std::string> lines;
 static void CollectLine(const char* line) { lines.emplace_back(line); }
-
 
 int main()
 {

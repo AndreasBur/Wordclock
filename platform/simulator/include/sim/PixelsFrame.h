@@ -1,32 +1,21 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
+// Copyright 2017 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+/*!
+ * \file
+ * \brief Simulator LED matrix window.
  *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       PixelsFrame.h
- *      \brief      Simulator LED matrix window
+ * wxWidgets frame that renders the Pixels buffer as the 10x11 character grid. It is the only part
+ * of the pixel stand-in that needs a GUI, which is why it is a class of its own: the firmware talks
+ * to Pixels, and Pixels knows nothing about this.
  *
- *      \details    wxWidgets frame that renders the Pixels buffer as the 10x11
- *                  character grid. It is the only part of the pixel stand-in that needs
- *                  a GUI, which is why it is a class of its own: the firmware talks to
- *                  Pixels, and Pixels knows nothing about this.
- *
- *                  It also lays out the serial output and input controls, but only
- *                  lays them out: what they mean belongs to SerialShim, which they are
- *                  handed to.
- *
-******************************************************************************************************************************************************/
+ * It also lays out the serial output and input controls, but only lays them out: what they mean
+ * belongs to SerialShim, which they are handed to.
+ */
+
 #ifndef PIXELS_FRAME_H
 #define PIXELS_FRAME_H
 
-/******************************************************************************************************************************************************
- * I N C L U D E S
-******************************************************************************************************************************************************/
 #include <wx/wx.h>
 #include <wx/button.h>
 #include <cmath>
@@ -34,21 +23,12 @@
 #include "StandardTypes.h"
 #include "Pixels.h"
 
-/******************************************************************************************************************************************************
- *  C L A S S   P I X E L S   F R A M E
-******************************************************************************************************************************************************/
 class PixelsFrame : public wxFrame
 {
-/******************************************************************************************************************************************************
- *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
-******************************************************************************************************************************************************/
   public:
     using PixelType = Pixels::PixelType;
     using SizerCharactersType = std::array<wxBoxSizer*, PIXELS_DISPLAY_NUMBER_OF_ROWS>;
 
-/******************************************************************************************************************************************************
- *  P R I V A T E   D A T A   A N D   F U N C T I O N S
-******************************************************************************************************************************************************/
   private:
     enum
     {
@@ -117,9 +97,6 @@ class PixelsFrame : public wxFrame
     wxBoxSizer* CreateSizerCharacter(wxWindow*, int row);
     static wxBoxSizer* CreateSizerControl(wxWindow*);
 
-/******************************************************************************************************************************************************
- *  P U B L I C   F U N C T I O N S
-******************************************************************************************************************************************************/
   public:
     static PixelsFrame& GetInstance() {
         static PixelsFrame* p_singleton_instance = new PixelsFrame(0L, _("Wordclock Pixels"));
@@ -131,7 +108,3 @@ class PixelsFrame : public wxFrame
 };
 
 #endif // PIXELS_FRAME_H
-
-/******************************************************************************************************************************************************
- *  E N D   O F   F I L E
-******************************************************************************************************************************************************/

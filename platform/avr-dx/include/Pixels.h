@@ -1,37 +1,25 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
+// Copyright 2017 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+/*!
+ * \file
+ * \brief The LED matrix as the firmware core sees it.
  *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       Pixels.h
- *      \brief      The LED matrix as the firmware core sees it
+ * The buffer the core writes into, and the brightness it is dimmed by. What reaches the strip is
+ * decided in Render(), which the application calls once per tick - Show() only marks the buffer as
+ * changed.
  *
- *      \details    The buffer the core writes into, and the brightness it is dimmed by. What
- *                  reaches the strip is decided in Render(), which the application calls once
- *                  per tick - Show() only marks the buffer as changed.
- *
- *                  Same split as the ESP32 backend, for the same reason: several modules call
- *                  Show() within one tick, and transmitting from each of them would put
- *                  frames back to back with no reset gap between them.
- *
-******************************************************************************************************************************************************/
+ * Same split as the ESP32 backend, for the same reason: several modules call Show() within one
+ * tick, and transmitting from each of them would put frames back to back with no reset gap between
+ * them.
+ */
+
 #ifndef _PIXELS_H_
 #define _PIXELS_H_
 
-/******************************************************************************************************************************************************
- * I N C L U D E S
-******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Pixel.h"
 
-/******************************************************************************************************************************************************
- *  G L O B A L   C O N S T A N T   M A C R O S
-******************************************************************************************************************************************************/
 /* Pixels configuration parameter */
 #define PIXELS_NUMBER_OF_LEDS                           110
 #define PIXELS_SUPPORT_DIMMING                          STD_ON
@@ -41,14 +29,8 @@
 #define PIXELS_DISPLAY_NUMBER_OF_COLUMNS                11u
 #define PIXELS_NUMBER_OF_PIXELS                         (PIXELS_DISPLAY_NUMBER_OF_ROWS * PIXELS_DISPLAY_NUMBER_OF_COLUMNS)
 
-/******************************************************************************************************************************************************
- *  C L A S S   P I X E L S
-******************************************************************************************************************************************************/
 class Pixels
 {
-/******************************************************************************************************************************************************
- *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
-******************************************************************************************************************************************************/
   public:
     using PixelType = Pixel;
 # if (PIXELS_NUMBER_OF_PIXELS < 255u)
@@ -57,9 +39,6 @@ class Pixels
     using IndexType = uint16_t;
 # endif
 
-/******************************************************************************************************************************************************
- *  P R I V A T E   D A T A   A N D   F U N C T I O N S
-******************************************************************************************************************************************************/
   private:
     // Zero-initialised, so the strip starts dark rather than at whatever the memory held -
     // the first render then puts a defined frame on the wire.
@@ -87,9 +66,6 @@ class Pixels
     Pixels() { }
     ~Pixels() { }
 
-/******************************************************************************************************************************************************
- *  P U B L I C   F U N C T I O N S
-******************************************************************************************************************************************************/
   public:
     static Pixels& GetInstance() {
         static Pixels singleton_instance;
@@ -158,7 +134,3 @@ class Pixels
 };
 
 #endif // _PIXELS_H_
-
-/******************************************************************************************************************************************************
- *  E N D   O F   F I L E
-******************************************************************************************************************************************************/

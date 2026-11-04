@@ -1,52 +1,35 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
+// Copyright 2017 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+/*!
+ * \file
+ * \brief Single bits and groups of bits in an unsigned integer.
  *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       Bit.h
- *      \brief      Single bits and groups of bits in an unsigned integer
+ * Two ways in, for two kinds of value. A value that is kept - a row of pixels, the set of favourite
+ * animations - is held in a Bit<T> and indexed like an array: bits[column] = true. A value that is
+ * only passed through - a register, a byte read off the bus, a field of the stored settings whose
+ * layout is a file format - goes through the static functions, Bit<uint8_t>::ReadBit(value, 3).
  *
- *      \details    Two ways in, for two kinds of value. A value that is kept - a row of pixels,
- *                  the set of favourite animations - is held in a Bit<T> and indexed like an
- *                  array: bits[column] = true. A value that is only passed through - a register,
- *                  a byte read off the bus, a field of the stored settings whose layout is a
- *                  file format - goes through the static functions, Bit<uint8_t>::ReadBit(value, 3).
+ * The masks are as wide as T. They used to be built from UINT64_C(1), which on the AVR made every
+ * variable shift a 64-bit one: a library call, for a byte.
  *
- *                  The masks are as wide as T. They used to be built from UINT64_C(1), which on
- *                  the AVR made every variable shift a 64-bit one: a library call, for a byte.
+ * A group is given by its mask as it stands in the value - a register's _gm - and is read back in
+ * place; ReadBitGroup with a position is for a mask written down unshifted, as the sensor drivers'
+ * _GM and _GP pairs are.
  *
- *                  A group is given by its mask as it stands in the value - a register's _gm -
- *                  and is read back in place; ReadBitGroup with a position is for a mask written
- *                  down unshifted, as the sensor drivers' _GM and _GP pairs are.
- *
- *                  A register is changed in place, by SetBits, ClearBits and WriteBitGroup on a
- *                  volatile reference. Not through bits[position]: that would hide a read-modify-
- *                  write behind an assignment, see the note above those three.
- *
-******************************************************************************************************************************************************/
+ * A register is changed in place, by SetBits, ClearBits and WriteBitGroup on a volatile reference.
+ * Not through bits[position]: that would hide a read-modify- write behind an assignment, see the
+ * note above those three.
+ */
+
 #ifndef _BIT_H_
 #define _BIT_H_
 
-/******************************************************************************************************************************************************
- * I N C L U D E S
-******************************************************************************************************************************************************/
 #include <stdint.h>
 
-
-/******************************************************************************************************************************************************
- *  C L A S S   B I T
-******************************************************************************************************************************************************/
 template <typename T>
 class Bit
 {
-/******************************************************************************************************************************************************
- *  P R I V A T E   D A T A   A N D   F U N C T I O N S
-******************************************************************************************************************************************************/
   private:
     /*
      * What T is shifted in: T itself when it is at least an unsigned int, unsigned int
@@ -71,9 +54,6 @@ class Bit
         uint8_t position_;
     };
 
-/******************************************************************************************************************************************************
- *  P U B L I C   F U N C T I O N S
-******************************************************************************************************************************************************/
   public:
     constexpr Bit() : value_{0u} {}
     constexpr explicit Bit(T value) : value_{value} {}
@@ -123,7 +103,3 @@ class Bit
 };
 
 #endif
-
-/******************************************************************************************************************************************************
- *  E N D   O F   F I L E
-******************************************************************************************************************************************************/

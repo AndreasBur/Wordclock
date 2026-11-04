@@ -1,21 +1,11 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
- *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       WebInterface.cpp
- *      \brief      Serves the console page and bridges its web socket to Serial
- *
-******************************************************************************************************************************************************/
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
 
-/******************************************************************************************************************************************************
- * I N C L U D E S
-******************************************************************************************************************************************************/
+/*!
+ * \file
+ * \brief Serves the console page and bridges its web socket to Serial.
+ */
+
 /* The framework's headers first, ahead of the Arduino.h that binds Serial to a macro. */
 #include <LEAmDNS.h>
 #include <ESPAsyncWebServer.h>
@@ -34,11 +24,7 @@
 
 #include <string.h>
 
-/******************************************************************************************************************************************************
- *  LOCAL DATA
-******************************************************************************************************************************************************/
 namespace {
-
 // Named http_server rather than Server: the Arduino core has a class Server in the global
 // namespace, and an unqualified Server here is then ambiguous.
 AsyncWebServer http_server(WEB_INTERFACE_PORT);
@@ -90,12 +76,6 @@ struct UploadType {
 };
 UploadType upload;
 
-/******************************************************************************************************************************************************
- *  LOCAL FUNCTIONS
-******************************************************************************************************************************************************/
-/******************************************************************************************************************************************************
-  IsRequestAuthorised()
-******************************************************************************************************************************************************/
 /*! \brief          Whether this request may be answered, and the 401 when it may not
  *
  *  \return         true when the handler may go on
@@ -113,7 +93,7 @@ UploadType upload;
  *                  password rather than checking a blob the way the ESP32's does - that core
  *                  can encode base64 and not decode it, and this one has a server that needs
  *                  neither.
-******************************************************************************************************************************************************/
+ */
 bool IsRequestAuthorised(AsyncWebServerRequest* request)
 {
     System& system = System::GetInstance();
@@ -131,16 +111,12 @@ bool IsRequestAuthorised(AsyncWebServerRequest* request)
     return false;
 }
 
-
-/******************************************************************************************************************************************************
-  AbortImage()
-******************************************************************************************************************************************************/
 /*! \brief          Gives up on the image being written, and takes it off the filesystem
  *
  *  \details        Removed rather than left behind: what is on the filesystem after a failed
  *                  upload is a file the loader will not read, and the next attempt needs the
  *                  space more than anyone needs the wreckage.
-******************************************************************************************************************************************************/
+ */
 void AbortImage(const char* reason)
 {
     if(upload.is_open) { upload.image.close(); }
@@ -149,10 +125,6 @@ void AbortImage(const char* reason)
     upload.failure = reason;
 }
 
-
-/******************************************************************************************************************************************************
-  BeginImage()
-******************************************************************************************************************************************************/
 /*! \brief          Opens the file the image is written into, or says why it cannot be
  *
  *  \details        Announced rather than measured, and it has to be: the space is checked
@@ -162,7 +134,7 @@ void AbortImage(const char* reason)
  *
  *                  The previous image is removed *before* the free space is measured, or a
  *                  second update would be refused for the space the first one still holds.
-******************************************************************************************************************************************************/
+ */
 void BeginImage(AsyncWebServerRequest* request, size_t announced)
 {
     upload = UploadType{};
@@ -190,10 +162,6 @@ void BeginImage(AsyncWebServerRequest* request, size_t announced)
     upload.is_open = true;
 }
 
-
-/******************************************************************************************************************************************************
-  CommitImage()
-******************************************************************************************************************************************************/
 /*! \brief          Closes the image and writes the loader's command page beside it
  *
  *  \details        The one irreversible step of an update, and the last: until this page is
@@ -206,7 +174,7 @@ void BeginImage(AsyncWebServerRequest* request, size_t announced)
  *                  that stops mid-image ends without this call at all; one that stops between
  *                  the last chunk and here leaves a file that is short, and a short image
  *                  copied over the application is the one outcome this must not produce.
-******************************************************************************************************************************************************/
+ */
 void CommitImage(size_t announced)
 {
     upload.image.close();
@@ -232,10 +200,6 @@ void CommitImage(size_t announced)
     upload.is_committed = true;
 }
 
-
-/******************************************************************************************************************************************************
-  HandleAsset()
-******************************************************************************************************************************************************/
 /*! \brief          Serves one of the files the clock hands out unchanged
  *
  *  \details        One handler for all five - the two pages, the manifest and the two icons -
@@ -245,7 +209,7 @@ void CommitImage(size_t announced)
  *
  *                  A gzipped asset is sent as it is stored and the browser unpacks it; that
  *                  is the whole of what the header does here, and the table says which.
-******************************************************************************************************************************************************/
+ */
 void HandleAsset(AsyncWebServerRequest* request, const WebFrontend::AssetType& asset)
 {
     if(!IsRequestAuthorised(request)) { return; }
@@ -256,10 +220,6 @@ void HandleAsset(AsyncWebServerRequest* request, const WebFrontend::AssetType& a
     request->send(response);
 }
 
-
-/******************************************************************************************************************************************************
-  SendUpdateResult()
-******************************************************************************************************************************************************/
 /*! \brief          Answers the update route, in the one shape the page reads
  *
  *  \details        The same two-field JSON the ESP32 backend answers with, because the panel
@@ -269,7 +229,7 @@ void HandleAsset(AsyncWebServerRequest* request, const WebFrontend::AssetType& a
  *                  library's send(code, type, text): one way of answering per file is worth
  *                  more than the shorter call, and it is the form the backend's stub already
  *                  stands in for.
-******************************************************************************************************************************************************/
+ */
 void SendUpdateResult(AsyncWebServerRequest* request, bool ok, const char* reason)
 {
     char answer[128];
@@ -292,10 +252,6 @@ void SendUpdateResult(AsyncWebServerRequest* request, bool ok, const char* reaso
                                         reinterpret_cast<const uint8_t*>(answer), strlen(answer)));
 }
 
-
-/******************************************************************************************************************************************************
-  HandleUpdateBody()
-******************************************************************************************************************************************************/
 /*! \brief          Takes the image out of the request body and into the filesystem
  *
  *  \details        This core has no second app partition, so an update here is not a write
@@ -314,7 +270,7 @@ void SendUpdateResult(AsyncWebServerRequest* request, bool ok, const char* reaso
  *                  The body arrives *before* the request handler runs, so authorisation is
  *                  asked here as well and not only there: a check that happened after the
  *                  writing would have let an unauthorised upload fill the filesystem first.
-******************************************************************************************************************************************************/
+ */
 void HandleUpdateBody(AsyncWebServerRequest* request, uint8_t* data, size_t length, size_t index, size_t total)
 {
     if(index == 0u) { BeginImage(request, total); }
@@ -329,10 +285,6 @@ void HandleUpdateBody(AsyncWebServerRequest* request, uint8_t* data, size_t leng
     if(upload.written >= total) { CommitImage(total); }
 }
 
-
-/******************************************************************************************************************************************************
-  HandleUpdate()
-******************************************************************************************************************************************************/
 /*! \brief          Answers once the body has been taken, and asks for the restart
  *
  *  \details        The restart is asked for rather than carried out, the same deferral RPC 31
@@ -342,7 +294,7 @@ void HandleUpdateBody(AsyncWebServerRequest* request, uint8_t* data, size_t leng
  *
  *                  A POST with no body never reaches the body handler at all, so "nothing was
  *                  committed and nothing failed" is its own case and says so.
-******************************************************************************************************************************************************/
+ */
 void HandleUpdate(AsyncWebServerRequest* request)
 {
     if(!IsRequestAuthorised(request)) { return; }
@@ -363,10 +315,6 @@ void HandleUpdate(AsyncWebServerRequest* request)
     System::GetInstance().Restart();
 }
 
-
-/******************************************************************************************************************************************************
-  HandleCommands() / HandleDisplay()
-******************************************************************************************************************************************************/
 /*! \brief          Serves the command catalog and the panel's letters
  *
  *  \details        Both documents are written by WebFrontend, shared with the ESP32 backend:
@@ -377,7 +325,7 @@ void HandleUpdate(AsyncWebServerRequest* request)
  *
  *                  What is left here is what is genuinely this server's: the password, the
  *                  content type, and a body to write into.
-******************************************************************************************************************************************************/
+ */
 void HandleCommands(AsyncWebServerRequest* request)
 {
     if(!IsRequestAuthorised(request)) { return; }
@@ -394,10 +342,6 @@ void HandleDisplay(AsyncWebServerRequest* request)
     WebFrontend::WriteDisplay(body);
 }
 
-
-/******************************************************************************************************************************************************
-  HandleSocket()
-******************************************************************************************************************************************************/
 /*! \brief          Takes one web socket frame and injects it as typed characters
  *  \details        The library completes the handshake itself and reports the result as an
  *                  event, so unlike the ESP32 backend there is no GET to answer here.
@@ -415,7 +359,7 @@ void HandleDisplay(AsyncWebServerRequest* request)
  *                  A close needs no handling. Where the IDF hands out socket descriptors
  *                  this side has to keep, the socket owns its client list, so a client that
  *                  simply vanished stops being broadcast to without anything here noticing.
-******************************************************************************************************************************************************/
+ */
 void OnSocketEvent(AsyncWebSocket*, AsyncWebSocketClient*, AwsEventType type,
                    void* argument, uint8_t* payload, size_t length)
 {
@@ -440,10 +384,6 @@ void OnSocketEvent(AsyncWebSocket*, AsyncWebSocketClient*, AwsEventType type,
 
 } // namespace
 
-/******************************************************************************************************************************************************
- * P U B L I C   F U N C T I O N S
-******************************************************************************************************************************************************/
-
 /*
  * Instance methods, though some of them read no member: they are the interface the
  * firmware core calls through GetInstance(), and every backend - the simulator's
@@ -452,13 +392,10 @@ void OnSocketEvent(AsyncWebSocket*, AsyncWebSocketClient*, AwsEventType type,
  * that detail into the interface.
  */
 // NOLINTBEGIN(readability-convert-member-functions-to-static)
-/******************************************************************************************************************************************************
-  Begin()
-******************************************************************************************************************************************************/
 /*! \brief          Starts the server and takes over the output lines
  *
  *  \return         kEOk if the server is listening
-******************************************************************************************************************************************************/
+ */
 StdReturnType WebInterface::Begin()
 {
     socket.onEvent(OnSocketEvent);
@@ -510,26 +447,18 @@ StdReturnType WebInterface::Begin()
     }
 
     return kEOk;
-} /* Begin */
+}
 
-
-/******************************************************************************************************************************************************
-  BroadcastLine()
-******************************************************************************************************************************************************/
 /*! \brief          Sends one finished line to every open socket
  *  \details        The widening to UTF-8 and the bound on it are WebFrontend's, shared with
  *                  the other backend; what is this file's is the one call in SendText()
  *                  below, where the IDF needs a walk over descriptors.
-******************************************************************************************************************************************************/
+ */
 void WebInterface::BroadcastLine(const char* line)
 {
     WebFrontend::GetInstance().BroadcastLine(line);
-} /* BroadcastLine */
+}
 
-
-/******************************************************************************************************************************************************
-  BroadcastFrame()
-******************************************************************************************************************************************************/
 /*! \brief          Sends the pixel buffer to every open socket, when it changed
  *  \details        The rate limit, the gathering and the comparison against the last frame
  *                  are WebFrontend's, shared with the other backend - none of the three has
@@ -537,16 +466,12 @@ void WebInterface::BroadcastLine(const char* line)
  *                  SendBinary() below.
  *
  *  \return         -
-******************************************************************************************************************************************************/
+ */
 void WebInterface::BroadcastFrame()
 {
     WebFrontend::GetInstance().BroadcastFrame();
-} /* BroadcastFrame */
+}
 
-
-/******************************************************************************************************************************************************
- *  W E B   T R A N S P O R T
-******************************************************************************************************************************************************/
 /*
  * This backend's half of the contract WebFrontend.h states. Defined here rather than in a
  * source of its own because what it reaches - the server and its web socket - is this file's
@@ -582,10 +507,6 @@ void WebTransport::SendBinary(const byte* bytes, size_t length)
 }
 // NOLINTEND(readability-convert-member-functions-to-static)
 
-
-/******************************************************************************************************************************************************
- *  W E B   R E S P O N S E   B O D Y
-******************************************************************************************************************************************************/
 // A response this server is pulled from rather than pushed to: the stream collects what is
 // written and Finish() hands it to the request, which is when the library sends it.
 
@@ -603,8 +524,3 @@ void WebResponseBody::Finish()
 {
     request_->send(stream_);
 }
-
-
-/******************************************************************************************************************************************************
- *  E N D   O F   F I L E
-******************************************************************************************************************************************************/

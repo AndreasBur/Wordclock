@@ -1,3 +1,11 @@
+// Copyright 2017 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+/*!
+ * \file
+ * \brief How the simulator application starts, ticks the firmware and stops.
+ */
+
 #include "WordclockApp.h"
 #include "sim/PixelsFrame.h"
 #include "sim/WebHost.h"

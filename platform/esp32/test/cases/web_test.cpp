@@ -16,7 +16,6 @@
 #include <string>
 #include <vector>
 
-
 /*
  * A registered route as the server keeps it: the handler and the context handed back with
  * it. The context matters since the five files served unchanged share one handler and tell
@@ -478,7 +477,6 @@ int main()
     }
     Check(sent_status == "400 Bad Request", "a request with no image is refused");
     Check(!Update.Begun, "and does not claim the partition to find that out");
-
 
     /*
      * ---- the console password --------------------------------------------------------

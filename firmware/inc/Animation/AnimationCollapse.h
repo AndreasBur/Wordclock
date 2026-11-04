@@ -1,64 +1,32 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
+// Copyright 2017 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+/*!
+ * \file
+ * \brief The collapse animation: the letters slide together, and the new ones slide apart.
  *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       AnimationCollapse.h
- *      \brief      Letters slide together and the new ones slide apart again
+ * The letters of the previous time slide to one edge of their row, closing every gap between the
+ * words on the way, until each row is one solid block. The letters of the new time start as such a
+ * block and slide apart into their words. The edge is selected for each word change.
  *
- *      \details    The letters of the previous time slide to one edge of their row,
- *                  closing every gap between the words on the way, until each row is
- *                  one solid block. The letters of the new time start as such a block
- *                  and slide apart into their words. The edge is selected for each word change.
- *
- *                  Unlike AnimationSqueeze, which lets the letters disappear one by
- *                  one, nothing vanishes here: the letters move.
- *
-******************************************************************************************************************************************************/
+ * Unlike AnimationSqueeze, which lets the letters disappear one by one, nothing vanishes here: the
+ * letters move.
+ */
+
 #ifndef _ANIMATION_COLLAPSE_H_
 #define _ANIMATION_COLLAPSE_H_
 
-/******************************************************************************************************************************************************
- * INCLUDES
-******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Arduino.h"
 #include "Clock.h"
 #include "Animation.h"
 
-/******************************************************************************************************************************************************
- *  GLOBAL CONSTANT MACROS
-******************************************************************************************************************************************************/
 /* AnimationCollapse configuration parameter */
-
 
 /* AnimationCollapse parameter */
 
-
-
-/******************************************************************************************************************************************************
- *  GLOBAL FUNCTION MACROS
-******************************************************************************************************************************************************/
-
-
-/******************************************************************************************************************************************************
- *  GLOBAL DATA TYPES AND STRUCTURES
- *****************************************************************************************************************************************************/
-
-
-/******************************************************************************************************************************************************
- *  C L A S S   A N I M A T I O N   C O L L A P S E
-******************************************************************************************************************************************************/
 class AnimationCollapse : public Animation
 {
-/******************************************************************************************************************************************************
- *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
-******************************************************************************************************************************************************/
   public:
     /* Edge the letters collapse against, selected for each word change */
     enum class DirectionType {
@@ -68,9 +36,6 @@ class AnimationCollapse : public Animation
     };
     static constexpr byte kNumberOfDirections{static_cast<byte>(DirectionType::kNumberOfDirections)};
 
-/******************************************************************************************************************************************************
- *  P R I V A T E   D A T A   A N D   F U N C T I O N S
-******************************************************************************************************************************************************/
   private:
     ClockWords::WordsListType clock_words_table_{{DisplayWords::WordIdType::kNone}};
     byte step_{0u};
@@ -93,18 +58,13 @@ class AnimationCollapse : public Animation
     byte CountLettersOfRow(byte) const;
     byte CalcExpandSteps() const;
 
-/******************************************************************************************************************************************************
- *  P U B L I C   F U N C T I O N S
-******************************************************************************************************************************************************/
   public:
     constexpr AnimationCollapse() { }
     ~AnimationCollapse() { }
 
     // get methods
 
-
     // set methods
-
 
     // methods
     void Init();
@@ -112,8 +72,4 @@ class AnimationCollapse : public Animation
     void Task();
 };
 
-
 #endif
-/******************************************************************************************************************************************************
- *  E N D   O F   F I L E
-******************************************************************************************************************************************************/

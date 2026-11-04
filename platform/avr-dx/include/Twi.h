@@ -1,42 +1,27 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
+// Copyright 2017 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+/*!
+ * \file
+ * \brief The I2C bus the clock chip and the light sensor share.
  *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       Twi.h
- *      \brief      The I2C bus the clock chip and the light sensor share
+ * A host-only master, polled rather than interrupt driven: both devices on it are read at most once
+ * a second, and a transfer of a few bytes at 100 kHz is far shorter than the tick it happens in.
  *
- *      \details    A host-only master, polled rather than interrupt driven: both devices on
- *                  it are read at most once a second, and a transfer of a few bytes at
- *                  100 kHz is far shorter than the tick it happens in.
+ * Every wait is bounded. A sensor that is not fitted, or a bus held low by one that has locked up,
+ * must cost a return code and not the clock - the display and the console have to keep working on a
+ * board where neither chip is populated.
  *
- *                  Every wait is bounded. A sensor that is not fitted, or a bus held low by
- *                  one that has locked up, must cost a return code and not the clock - the
- *                  display and the console have to keep working on a board where neither
- *                  chip is populated.
- *
- *                  TWI1 rather than TWI0, and that is not free choice: TWI0 can only reach
- *                  PA2 and PA3, which carry the LED strip's clock and its data line. TWI1's
- *                  default pins are untouched by anything else here.
- *
-******************************************************************************************************************************************************/
+ * TWI1 rather than TWI0, and that is not free choice: TWI0 can only reach PA2 and PA3, which carry
+ * the LED strip's clock and its data line. TWI1's default pins are untouched by anything else here.
+ */
+
 #ifndef _TWI_H_
 #define _TWI_H_
 
-/******************************************************************************************************************************************************
- * I N C L U D E S
-******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Arduino.h"
 
-/******************************************************************************************************************************************************
- *  G L O B A L   C O N S T A N T   M A C R O S
-******************************************************************************************************************************************************/
 /* Twi configuration parameter */
 #define TWI_FREQUENCY_HZ                                100000uL
 
@@ -54,14 +39,8 @@
 #define TWI_TIMEOUT_LOOP_CYCLES                         8u
 #define TWI_TIMEOUT_LOOPS                               static_cast<uint16_t>(((F_CPU / TWI_FREQUENCY_HZ) * TWI_TIMEOUT_BIT_TIMES) / TWI_TIMEOUT_LOOP_CYCLES)
 
-/******************************************************************************************************************************************************
- *  C L A S S   T W I
-******************************************************************************************************************************************************/
 class Twi
 {
-/******************************************************************************************************************************************************
- *  P R I V A T E   D A T A   A N D   F U N C T I O N S
-******************************************************************************************************************************************************/
   private:
     bool initialised_{false};
 
@@ -72,9 +51,6 @@ class Twi
     static StdReturnType WaitForRead();
     static void Stop();
 
-/******************************************************************************************************************************************************
- *  P U B L I C   F U N C T I O N S
-******************************************************************************************************************************************************/
   public:
     static Twi& GetInstance() {
         static Twi singleton_instance;
@@ -97,7 +73,3 @@ class Twi
 };
 
 #endif // _TWI_H_
-
-/******************************************************************************************************************************************************
- *  E N D   O F   F I L E
-******************************************************************************************************************************************************/

@@ -1,41 +1,27 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
+// Copyright 2017 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+/*!
+ * \file
+ * \brief Settings store backed by the ESP32's NVS partition.
  *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       Storage.h
- *      \brief      Settings store backed by the ESP32's NVS partition
+ * Mirrors the public API of the simulator's file-backed store, so Persistence keeps either one
+ * without knowing which.
  *
- *      \details    Mirrors the public API of the simulator's file-backed store, so
- *                  Persistence keeps either one without knowing which.
+ * One blob under one key rather than a key per setting. NVS would manage either, but a blob keeps
+ * the format in one place - Persistence's versioned struct - instead of spreading it over key names
+ * that then have to be kept in step with the struct.
  *
- *                  One blob under one key rather than a key per setting. NVS would manage
- *                  either, but a blob keeps the format in one place - Persistence's
- *                  versioned struct - instead of spreading it over key names that then
- *                  have to be kept in step with the struct.
- *
- *                  NVS wear-levels its own sectors, and Persistence only writes when a
- *                  setting actually changed, so the write count follows configuration
- *                  changes rather than the clock.
- *
-******************************************************************************************************************************************************/
+ * NVS wear-levels its own sectors, and Persistence only writes when a setting actually changed, so
+ * the write count follows configuration changes rather than the clock.
+ */
+
 #ifndef _STORAGE_H_
 #define _STORAGE_H_
 
-/******************************************************************************************************************************************************
- * I N C L U D E S
-******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Arduino.h"
 
-/******************************************************************************************************************************************************
- *  G L O B A L   C O N S T A N T   M A C R O S
-******************************************************************************************************************************************************/
 /* Storage configuration parameter */
 /* Both are limited to 15 characters by NVS. */
 #define STORAGE_NAMESPACE                               "wordclock"
@@ -56,27 +42,15 @@
  */
 #define STORAGE_CAPACITY                                256u
 
-/******************************************************************************************************************************************************
- *  C L A S S   S T O R A G E
-******************************************************************************************************************************************************/
 class Storage
 {
-/******************************************************************************************************************************************************
- *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
-******************************************************************************************************************************************************/
   public:
     static constexpr size_t kCapacity{STORAGE_CAPACITY};
 
-/******************************************************************************************************************************************************
- *  P R I V A T E   D A T A   A N D   F U N C T I O N S
-******************************************************************************************************************************************************/
   private:
     Storage() { }
     ~Storage() { }
 
-/******************************************************************************************************************************************************
- *  P U B L I C   F U N C T I O N S
-******************************************************************************************************************************************************/
   public:
     static Storage& GetInstance() {
         static Storage singleton_instance;
@@ -90,7 +64,3 @@ class Storage
 };
 
 #endif // _STORAGE_H_
-
-/******************************************************************************************************************************************************
- *  E N D   O F   F I L E
-******************************************************************************************************************************************************/

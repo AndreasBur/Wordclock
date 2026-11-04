@@ -1,26 +1,15 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
- *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       Pixels.cpp
- *      \brief      ESP32 WS2812 driver, driven by the RMT peripheral
- *
- *      \details    The RMT peripheral generates the WS2812 pulses in hardware and
- *                  fetches the bytes by DMA, so nothing here has to hit a timing with
- *                  instruction cycles - which is what the xmega driver spent most of
- *                  its 800 lines on, and what only an oscilloscope can debug.
- *
-******************************************************************************************************************************************************/
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
 
-/******************************************************************************************************************************************************
- * I N C L U D E S
-******************************************************************************************************************************************************/
+/*!
+ * \file
+ * \brief ESP32 WS2812 driver, driven by the RMT peripheral.
+ *
+ * The RMT peripheral generates the WS2812 pulses in hardware and fetches the bytes by DMA, so
+ * nothing here has to hit a timing with instruction cycles - which is what the xmega driver spent
+ * most of its 800 lines on, and what only an oscilloscope can debug.
+ */
+
 /* The driver headers first, ahead of the Arduino.h that binds Serial to a macro. */
 #include <driver/rmt_tx.h>
 #include <esp_err.h>
@@ -31,17 +20,7 @@
 #include "Arduino.h"
 #include "Pixels.h"
 
-
-/******************************************************************************************************************************************************
- *  LOCAL CONSTANT MACROS
-******************************************************************************************************************************************************/
-
-
-/******************************************************************************************************************************************************
- *  LOCAL DATA
-******************************************************************************************************************************************************/
 namespace {
-
 /* 0.1 us per tick, which makes every WS2812 duration below a small whole number. */
 constexpr uint32_t kRmtResolutionHz{10u * 1000u * 1000u};
 
@@ -94,19 +73,12 @@ rmt_encoder_handle_t rmt_encoder{nullptr};
 
 } // namespace
 
-/******************************************************************************************************************************************************
- * P U B L I C   F U N C T I O N S
-******************************************************************************************************************************************************/
-
-/******************************************************************************************************************************************************
-  Init()
-******************************************************************************************************************************************************/
 /*! \brief          Claims an RMT channel for the strip's data pin
  *  \details        Failures are reported and left behind rather than thrown: the
  *                  contract's Init() returns nothing, and a clock whose serial console
  *                  still answers is more useful for finding a miswired pin than one
  *                  that reboots. render() then does nothing until a channel exists.
-******************************************************************************************************************************************************/
+ */
 void Pixels::Init(byte pin)
 {
     pin_ = pin;
@@ -152,12 +124,8 @@ void Pixels::Init(byte pin)
         Serial.println(static_cast<int>(result));
         rmt_channel = nullptr;
     }
-} /* Init */
+}
 
-
-/******************************************************************************************************************************************************
-  Render()
-******************************************************************************************************************************************************/
 /*! \brief          Puts the buffer on the strip, if the firmware asked for it
  *  \details        The application calls this once per tick, after the firmware's pass -
  *                  never Show() itself. Two reasons, and the second is the one that
@@ -170,7 +138,7 @@ void Pixels::Init(byte pin)
  *                  Rendering once per 10 ms tick leaves milliseconds of idle line.
  *
  *  \return         kEOk if a frame went out or none was due
-******************************************************************************************************************************************************/
+ */
 StdReturnType Pixels::Render()
 {
     /*
@@ -188,8 +156,7 @@ StdReturnType Pixels::Render()
     // turn every following tick into another failing attempt.
     dirty_ = false;
     return result;
-} /* Render */
-
+}
 
 /*
  * An instance method, though it reads no member: it is part of the interface the
@@ -199,9 +166,6 @@ StdReturnType Pixels::Render()
  * that detail into the interface.
  */
 // NOLINTBEGIN(readability-convert-member-functions-to-static)
-/******************************************************************************************************************************************************
-  IsFrameOnTheWire()
-******************************************************************************************************************************************************/
 /*! \brief          Whether the previous frame is still being transmitted
  *  \details        The same call TransmitFrame() waits on, with a timeout of nothing: this is
  *                  a question and not a wait, and it is asked from a task that has a clock to
@@ -213,31 +177,23 @@ StdReturnType Pixels::Render()
  *                  frame that cannot exist would stall the switch-off for good.
  *
  *  \return         true while a frame is still going out
-******************************************************************************************************************************************************/
+ */
 bool Pixels::IsFrameOnTheWire() const
 {
     if(rmt_channel == nullptr) { return false; }
 
     return rmt_tx_wait_all_done(rmt_channel, 0) != ESP_OK;
-} /* IsFrameOnTheWire */
+}
 // NOLINTEND(readability-convert-member-functions-to-static)
 
-
-/******************************************************************************************************************************************************
-  GetPixel()
-******************************************************************************************************************************************************/
 StdReturnType Pixels::GetPixel(byte index, PixelType& pixel) const
 {
     if(!IsIndexValid(index)) { return kENotOk; }
 
     pixel = pixel_buffer_[ToRow(index)][ToColumn(index)];
     return kEOk;
-} /* GetPixel */
+}
 
-
-/******************************************************************************************************************************************************
-  GetPixel()
-******************************************************************************************************************************************************/
 Pixels::PixelType Pixels::GetPixel(byte index) const
 {
     // An index that is not on the strip has no pixel, and an unlit one is the answer no
@@ -245,12 +201,8 @@ Pixels::PixelType Pixels::GetPixel(byte index) const
     if(!IsIndexValid(index)) { return PixelType{}; }
 
     return pixel_buffer_[ToRow(index)][ToColumn(index)];
-} /* GetPixel */
+}
 
-
-/******************************************************************************************************************************************************
-  SetPixel()
-******************************************************************************************************************************************************/
 StdReturnType Pixels::SetPixel(byte index, PixelType pixel)
 {
     if(!IsIndexValid(index)) { return kENotOk; }
@@ -258,21 +210,13 @@ StdReturnType Pixels::SetPixel(byte index, PixelType pixel)
     pixel_buffer_[ToRow(index)][ToColumn(index)] = pixel;
     dirty_ = true;
     return kEOk;
-} /* SetPixel */
+}
 
-
-/******************************************************************************************************************************************************
-  SetPixel()
-******************************************************************************************************************************************************/
 StdReturnType Pixels::SetPixel(byte index, byte red, byte green, byte blue)
 {
     return SetPixel(index, PixelType(red, green, blue));
-} /* SetPixel */
+}
 
-
-/******************************************************************************************************************************************************
-  SetPixels()
-******************************************************************************************************************************************************/
 void Pixels::SetPixels(PixelType pixel)
 {
     for(unsigned int row = 0; row < PIXELS_DISPLAY_NUMBER_OF_ROWS; row++) {
@@ -281,12 +225,8 @@ void Pixels::SetPixels(PixelType pixel)
         }
     }
     dirty_ = true;
-} /* SetPixels */
+}
 
-
-/******************************************************************************************************************************************************
-  SetBrightness()
-******************************************************************************************************************************************************/
 void Pixels::SetBrightness(byte brightness, bool gamma_correction)
 {
     /*
@@ -298,22 +238,14 @@ void Pixels::SetBrightness(byte brightness, bool gamma_correction)
     dirty_ = true;
 
     UNUSED(gamma_correction);
-} /* SetBrightness */
+}
 
-
-/******************************************************************************************************************************************************
- * P R I V A T E   F U N C T I O N S
-******************************************************************************************************************************************************/
-
-/******************************************************************************************************************************************************
-  FillFrameBuffer()
-******************************************************************************************************************************************************/
 /*! \brief          Copies the pixel buffer into the frame the peripheral reads
  *  \details        Pixel already stores its colours in the WS2812 order (green, red,
  *                  blue - see the offsets in Pixel.h), so this is a scale and not a
  *                  reordering. The accessors are used anyway, so that changing those
  *                  offsets cannot silently swap the colours on the strip.
-******************************************************************************************************************************************************/
+ */
 void Pixels::FillFrameBuffer() const
 {
     byte* target = frame_buffer;
@@ -325,18 +257,14 @@ void Pixels::FillFrameBuffer() const
         *target++ = pixel.GetRed();
         *target++ = pixel.GetBlue();
     }
-} /* FillFrameBuffer */
+}
 
-
-/******************************************************************************************************************************************************
-  TransmitFrame()
-******************************************************************************************************************************************************/
 /*! \brief          Hands one frame to the RMT peripheral
  *  \details        Waits for the previous frame first, because the peripheral is still
  *                  reading frame_buffer until it is done.
  *
  *  \return         kEOk if the frame was queued
-******************************************************************************************************************************************************/
+ */
 StdReturnType Pixels::TransmitFrame()
 {
     if(rmt_tx_wait_all_done(rmt_channel, kTransmitTimeoutMs) != ESP_OK) { return kENotOk; }
@@ -349,8 +277,4 @@ StdReturnType Pixels::TransmitFrame()
     if(rmt_transmit(rmt_channel, rmt_encoder, frame_buffer, sizeof(frame_buffer), &transmit_config) != ESP_OK) { return kENotOk; }
 
     return kEOk;
-} /* TransmitFrame */
-
-/******************************************************************************************************************************************************
- *  E N D   O F   F I L E
-******************************************************************************************************************************************************/
+}

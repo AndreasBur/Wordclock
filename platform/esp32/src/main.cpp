@@ -1,30 +1,19 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
- *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       main.cpp
- *      \brief      Entry point of the ESP32 application
- *
- *      \details    The counterpart of the simulator's WordclockApp: it starts the network
- *                  and the time synchronisation, then ticks the firmware at the scheduler's
- *                  interval and hands the finished frame to the strip.
- *
- *                  Nothing here blocks waiting for the network. The clock has to come up
- *                  and answer commands whether or not there is a WiFi to join, so the
- *                  connection and the first SNTP answer are simply awaited in the
- *                  background while the firmware already runs.
- *
-******************************************************************************************************************************************************/
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
 
-/******************************************************************************************************************************************************
- * I N C L U D E S
-******************************************************************************************************************************************************/
+/*!
+ * \file
+ * \brief Entry point of the ESP32 application.
+ *
+ * The counterpart of the simulator's WordclockApp: it starts the network and the time
+ * synchronisation, then ticks the firmware at the scheduler's interval and hands the finished frame
+ * to the strip.
+ *
+ * Nothing here blocks waiting for the network. The clock has to come up and answer commands whether
+ * or not there is a WiFi to join, so the connection and the first SNTP answer are simply awaited in
+ * the background while the firmware already runs.
+ */
+
 // The framework headers come first, ahead of this platform's Arduino.h: that one binds
 // Serial to WordclockSerial, and the macro would otherwise reach into them.
 #include <WiFi.h>
@@ -41,11 +30,7 @@
 #include "WordclockConfiguration.h"
 #include "WordclockMain.h"
 
-/******************************************************************************************************************************************************
- *  LOCAL DATA
-******************************************************************************************************************************************************/
 namespace {
-
 WordclockMain wordclock;
 
 // The tick the whole firmware is timed against: every module's task cycle counts in this
@@ -53,9 +38,6 @@ WordclockMain wordclock;
 const TickType_t kTaskInterval{pdMS_TO_TICKS(Scheduler::GetTaskIntervalMs())};
 TickType_t last_wake_time{0};
 
-/******************************************************************************************************************************************************
- *  LOCAL FUNCTIONS
-******************************************************************************************************************************************************/
 /*
  * Installs the zone rule together with the servers, which is what makes every conversion
  * in RealTimeClock local time. Safe to do before the link is up: the request is repeated
@@ -110,13 +92,6 @@ void ReportProgress()
 
 } // namespace
 
-/******************************************************************************************************************************************************
- * P U B L I C   F U N C T I O N S
-******************************************************************************************************************************************************/
-
-/******************************************************************************************************************************************************
-  setup()
-******************************************************************************************************************************************************/
 void setup()
 {
     Serial.begin(WORDCLOCK_SERIAL_BAUDRATE);
@@ -140,18 +115,14 @@ void setup()
     WebInterface::GetInstance().Begin();
 
     last_wake_time = xTaskGetTickCount();
-} /* setup */
+}
 
-
-/******************************************************************************************************************************************************
-  loop()
-******************************************************************************************************************************************************/
 /*! \brief          Drives the firmware at the scheduler's interval
  *  \details        Timed against an absolute wake-up rather than a delay, so the work
  *                  inside a tick does not stretch the interval: animation speeds, the
  *                  sensor's sampling rate and the serial poll rate all count in this
  *                  interval, and a drifting one silently rescales all three.
-******************************************************************************************************************************************************/
+ */
 void loop()
 {
     wordclock.Task();
@@ -171,8 +142,4 @@ void loop()
     System::GetInstance().PerformPendingRestart();
 
     vTaskDelayUntil(&last_wake_time, kTaskInterval);
-} /* loop */
-
-/******************************************************************************************************************************************************
- *  E N D   O F   F I L E
-******************************************************************************************************************************************************/
+}

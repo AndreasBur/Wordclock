@@ -1,3 +1,11 @@
+// Copyright 2017 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+/*!
+ * \file
+ * \brief The window of the simulator: the letter grid, rendered from the pixel buffer.
+ */
+
 #include "sim/PixelsFrame.h"
 #include "sim/Settings.h"
 #include "sim/MessageBuilder.h"
@@ -10,7 +18,6 @@
 #endif
 
 namespace {
-
 /*
  * Taken from the firmware rather than kept here. There used to be a second copy of the
  * letters in this file, which had to be edited alongside the firmware's table and the
@@ -27,8 +34,6 @@ wxString ToCharacterLabel(char character)
 
 } // namespace
 
-
-
 BEGIN_EVENT_TABLE(PixelsFrame, wxFrame)
     EVT_CLOSE(PixelsFrame::OnClose)
     EVT_BUTTON(kIdButtonSend, PixelsFrame::OnSend)
@@ -39,7 +44,6 @@ BEGIN_EVENT_TABLE(PixelsFrame, wxFrame)
     EVT_MENU(wxID_ABOUT, PixelsFrame::OnAbout)
     EVT_MENU(wxID_EXIT, PixelsFrame::OnQuit)
 END_EVENT_TABLE()
-
 
 PixelsFrame::PixelsFrame(wxWindow* parent, const wxString &title) : wxFrame(parent, -1, title)
 {
@@ -170,7 +174,6 @@ wxBoxSizer* PixelsFrame::CreateSizerControl(wxWindow* parent)
 
 PixelsFrame::~PixelsFrame()
 {
-
 }
 
 void PixelsFrame::OnClose(wxCloseEvent &event)

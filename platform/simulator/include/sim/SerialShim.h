@@ -1,54 +1,27 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
+// Copyright 2017 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+/*!
+ * \file
+ * \brief Stands in for the Arduino Serial port.
  *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       SerialShim.h
- *      \brief      Stands in for the Arduino Serial port
+ * What the firmware prints ends up in a text control, and what is typed into another one is handed
+ * back to it character by character, the way a real port delivers it. Arduino's Serial is #defined
+ * to this instance.
  *
- *      \details    What the firmware prints ends up in a text control, and what is
- *                  typed into another one is handed back to it character by character,
- *                  the way a real port delivers it. Arduino's Serial is #defined to
- *                  this instance.
- *
- *                  The two controls belong to the pixel matrix window, which lays them
- *                  out and passes them here with Attach(). Splitting it that way keeps
- *                  the port's behaviour — the buffering, the line the answers are read
- *                  back from — out of a class whose subject is the letter grid.
- *
-******************************************************************************************************************************************************/
+ * The two controls belong to the pixel matrix window, which lays them out and passes them here with
+ * Attach(). Splitting it that way keeps the port's behaviour — the buffering, the line the answers
+ * are read back from — out of a class whose subject is the letter grid.
+ */
+
 #ifndef SERIAL_SHIM_H
 #define SERIAL_SHIM_H
 
-/******************************************************************************************************************************************************
- * I N C L U D E S
-******************************************************************************************************************************************************/
 #include <wx/wx.h>
 #include "arduino/Types.h"
 
-/******************************************************************************************************************************************************
- *  G L O B A L   C O N S T A N T   M A C R O S
-******************************************************************************************************************************************************/
-
-
-/******************************************************************************************************************************************************
- *  G L O B A L   F U N C T I O N   M A C R O S
-******************************************************************************************************************************************************/
-
-
-/******************************************************************************************************************************************************
- *  C L A S S   S E R I A L   S H I M
-******************************************************************************************************************************************************/
 class SerialShim
 {
-/******************************************************************************************************************************************************
- *  P R I V A T E   D A T A   A N D   F U N C T I O N S
-******************************************************************************************************************************************************/
   private:
     /* What was typed and not yet read, drained one character at a time by read(). */
     wxString send_buffer_{""};
@@ -82,9 +55,6 @@ class SerialShim
     void AppendOutput(const wxString&);
     void FinishOutputLine();
 
-/******************************************************************************************************************************************************
- *  P U B L I C   F U N C T I O N S
-******************************************************************************************************************************************************/
   public:
     static SerialShim& GetInstance() {
         static SerialShim singleton_instance;
@@ -148,7 +118,3 @@ class SerialShim
 };
 
 #endif // SERIAL_SHIM_H
-
-/******************************************************************************************************************************************************
- *  E N D   O F   F I L E
-******************************************************************************************************************************************************/

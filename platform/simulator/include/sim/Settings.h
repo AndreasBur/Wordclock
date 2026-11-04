@@ -1,46 +1,23 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
+// Copyright 2017 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+/*!
+ * \file
+ * \brief Simulator settings window.
  *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       Settings.h
- *      \brief      Simulator settings window
- *
- *      \details    Holds the controls that stand in for hardware the PC does not
- *                  have, starting with the light sensor's illuminance. Kept out of
- *                  the pixel matrix window so that one stays the size of the
- *                  letter grid. Shown without blocking it, so the effect of a
- *                  control is visible on the grid while it is being changed.
- *
-******************************************************************************************************************************************************/
+ * Holds the controls that stand in for hardware the PC does not have, starting with the light
+ * sensor's illuminance. Kept out of the pixel matrix window so that one stays the size of the
+ * letter grid. Shown without blocking it, so the effect of a control is visible on the grid while
+ * it is being changed.
+ */
+
 #ifndef SETTINGS_H
 #define SETTINGS_H
 
-/******************************************************************************************************************************************************
- * I N C L U D E S
-******************************************************************************************************************************************************/
 #include <wx/wx.h>
 #include "StandardTypes.h"
 #include "PixelsFrame.h"
 
-/******************************************************************************************************************************************************
- *  G L O B A L   C O N S T A N T   M A C R O S
-******************************************************************************************************************************************************/
-
-
-/******************************************************************************************************************************************************
- *  G L O B A L   F U N C T I O N   M A C R O S
-******************************************************************************************************************************************************/
-
-
-/******************************************************************************************************************************************************
- *  C L A S S   S E T T I N G S
-******************************************************************************************************************************************************/
 /*
  * A dialog rather than a frame: that is what gets it centred over the main window
  * instead of dropped wherever the compositor pleases, see the constructor. Shown with
@@ -48,9 +25,6 @@
  */
 class Settings : public wxDialog
 {
-/******************************************************************************************************************************************************
- *  P R I V A T E   D A T A   A N D   F U N C T I O N S
-******************************************************************************************************************************************************/
   private:
     /* Own range, so the ids stay clear of the pixel matrix window's. */
     enum
@@ -95,9 +69,6 @@ class Settings : public wxDialog
     wxBoxSizer* CreateSizerIlluminance(wxWindow*);
     wxBoxSizer* CreateSizerTemperature(wxWindow*);
 
-/******************************************************************************************************************************************************
- *  P U B L I C   F U N C T I O N S
-******************************************************************************************************************************************************/
   public:
     static Settings& GetInstance() {
         static Settings* p_singleton_instance = new Settings(&PixelsFrame::GetInstance(), _("Wordclock Settings"));
@@ -113,7 +84,3 @@ class Settings : public wxDialog
 };
 
 #endif // SETTINGS_H
-
-/******************************************************************************************************************************************************
- *  E N D   O F   F I L E
-******************************************************************************************************************************************************/

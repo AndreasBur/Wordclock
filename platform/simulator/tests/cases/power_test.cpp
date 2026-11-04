@@ -1,9 +1,4 @@
-/******************************************************************************************************************************************************
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       power_test.cpp
- *      \brief      The order the strip's supply is switched in, which is the whole of this feature
-******************************************************************************************************************************************************/
+// The order the strip's supply is switched in, which is the whole of this feature.
 
 #include "check.h"
 #include "cases.h"
@@ -15,7 +10,6 @@
 #include "PowerSwitch.h"
 
 namespace {
-
 /*
  * What the application does after every pass over the tasks, and what PixelsFrame does with
  * it here: the buffer is handed over and stops being dirty. It stands in for the render

@@ -1,45 +1,28 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
+// Copyright 2017 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+/*!
+ * \file
+ * \brief What the clock knows about the temperature.
  *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       Temperature.h
- *      \brief      What the clock knows about the temperature
+ * The same arrangement as Illuminance and its BH1750: the core owns the driver, reaches it by
+ * header name, and every platform supplies its own DS3231.h behind that name.
  *
- *      \details    The same arrangement as Illuminance and its BH1750: the core owns the
- *                  driver, reaches it by header name, and every platform supplies its own
- *                  DS3231.h behind that name.
- *
- *                  There is no reading until the chip has answered once, and a build with
- *                  no chip on the bus never gets one. That is why the value comes with a
- *                  return code rather than as a number: the overlay has to be able to stay
- *                  away, and a temperature of zero is a perfectly ordinary reading it must
- *                  not be confused with.
- *
-******************************************************************************************************************************************************/
+ * There is no reading until the chip has answered once, and a build with no chip on the bus never
+ * gets one. That is why the value comes with a return code rather than as a number: the overlay has
+ * to be able to stay away, and a temperature of zero is a perfectly ordinary reading it must not be
+ * confused with.
+ */
+
 #ifndef _TEMPERATURE_H_
 #define _TEMPERATURE_H_
 
-/******************************************************************************************************************************************************
- * I N C L U D E S
-******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Arduino.h"
 #include "DS3231.h"
 
-/******************************************************************************************************************************************************
- *  C L A S S   T E M P E R A T U R E
-******************************************************************************************************************************************************/
 class Temperature
 {
-/******************************************************************************************************************************************************
- *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
-******************************************************************************************************************************************************/
   public:
     /* Tenths of a degree Celsius, signed. */
     using TemperatureType = DS3231::TemperatureType;
@@ -54,9 +37,6 @@ class Temperature
     // Latin-1 here, the same single-byte encoding the font tables are indexed by.
     static constexpr byte kStringToShowLength{kStringLength + 1u};
 
-/******************************************************************************************************************************************************
- *  P R I V A T E   D A T A   A N D   F U N C T I O N S
-******************************************************************************************************************************************************/
   private:
     static constexpr char kDegreeUnit{'C'};
     /*
@@ -117,9 +97,6 @@ class Temperature
         return &string[DigitsOfNumber(value)];
     }
 
-/******************************************************************************************************************************************************
- *  P U B L I C   F U N C T I O N S
-******************************************************************************************************************************************************/
   public:
     static Temperature& GetInstance() {
         static Temperature singleton_instance;
@@ -166,7 +143,3 @@ class Temperature
 };
 
 #endif // _TEMPERATURE_H_
-
-/******************************************************************************************************************************************************
- *  E N D   O F   F I L E
-******************************************************************************************************************************************************/

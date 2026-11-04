@@ -1,19 +1,14 @@
-/******************************************************************************************************************************************************
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       illuminance_test.cpp
- *      \brief      What the light sensor's reading does to the display's brightness
+/*
+ * What the light sensor's reading does to the display's brightness.
  *
- *      \details    The automatic is checked on DisplayBrightness itself rather than
- *                  through the strip: what is at stake is the mapping from lux to a level,
- *                  and the strip only shows whether a pixel ended up lit at all. The
- *                  sensor is the simulator's stub, so a room is a number set from here.
+ * The automatic is checked on DisplayBrightness itself rather than through the strip: what is at
+ * stake is the mapping from lux to a level, and the strip only shows whether a pixel ended up lit
+ * at all. The sensor is the simulator's stub, so a room is a number set from here.
  *
- *                  None of this was covered before, and both cases below fail on the
- *                  arithmetic that stood here: the lower calibration bound was read
- *                  nowhere, and the upper one defaulted to the sensor's 65535 lx, which
- *                  left every indoor clock pinned to the automatic's floor.
-******************************************************************************************************************************************************/
+ * None of this was covered before, and both cases below fail on the arithmetic that stood here: the
+ * lower calibration bound was read nowhere, and the upper one defaulted to the sensor's 65535 lx,
+ * which left every indoor clock pinned to the automatic's floor.
+ */
 
 #include "check.h"
 #include "cases.h"
@@ -22,7 +17,6 @@
 #include "Illuminance.h"
 
 namespace {
-
 /*
  * The automatic's floor, which DisplayBrightness keeps to itself. Repeated here on purpose:
  * a test that read the constant from the class under test could not tell that the value
@@ -65,7 +59,6 @@ void RestoreDefaults()
 
 } // namespace
 
-
 /*
  * The defaults, which is the state every clock is in until somebody calibrates one. A
  * living room has to arrive at a level somebody would call dimmed rather than at the floor
@@ -100,7 +93,6 @@ void TestAutomaticDefaultsSuitARoom()
 
     RestoreDefaults();
 }
-
 
 /*
  * Both bounds, because the lower one used to be decoration: the procedure that calibrates

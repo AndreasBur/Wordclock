@@ -1,34 +1,23 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+/*!
+ * \file
+ * \brief Serves the console page and bridges its web socket to Serial.
  *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       WebInterface.h
- *      \brief      Serves the console page and bridges its web socket to Serial
+ * The page arrives as one gzipped blob out of flash, and its socket is wired straight to
+ * WordclockSerial: what a browser sends is injected as characters, and every line the firmware
+ * finishes is sent back as one frame. There is no protocol here beyond that - the commands are the
+ * ones in docs/serial-commands.md, parsed by the same parser as the wire.
  *
- *      \details    The page arrives as one gzipped blob out of flash, and its socket is
- *                  wired straight to WordclockSerial: what a browser sends is injected as
- *                  characters, and every line the firmware finishes is sent back as one
- *                  frame. There is no protocol here beyond that - the commands are the
- *                  ones in docs/serial-commands.md, parsed by the same parser as the wire.
- *
- *                  Nothing in this class ever touches the firmware. The HTTP server runs
- *                  in its own task, and the only thing that crosses over is the injected
- *                  character stream, which WordclockSerial takes from one producer without
- *                  a lock. Answers travel the other way, sent from the firmware's own task.
- *
-******************************************************************************************************************************************************/
+ * Nothing in this class ever touches the firmware. The HTTP server runs in its own task, and the
+ * only thing that crosses over is the injected character stream, which WordclockSerial takes from
+ * one producer without a lock. Answers travel the other way, sent from the firmware's own task.
+ */
+
 #ifndef _WEB_INTERFACE_H_
 #define _WEB_INTERFACE_H_
 
-/******************************************************************************************************************************************************
- * I N C L U D E S
-******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 
 // What a browser is *sent* lives there, together with the frame rate limit and the longest
@@ -37,9 +26,6 @@
 
 #include <stddef.h>
 
-/******************************************************************************************************************************************************
- *  G L O B A L   C O N S T A N T   M A C R O S
-******************************************************************************************************************************************************/
 /* WebInterface configuration parameter */
 /*
  * There is no client limit here, and the one that used to stand in this place was never one:
@@ -52,14 +38,8 @@
 /* What the clock answers to on the local network, so no address has to be looked up. */
 #define WEB_INTERFACE_HOSTNAME                          "wordclock"
 
-/******************************************************************************************************************************************************
- *  C L A S S   W E B   I N T E R F A C E
-******************************************************************************************************************************************************/
 class WebInterface
 {
-/******************************************************************************************************************************************************
- *  P R I V A T E   D A T A   A N D   F U N C T I O N S
-******************************************************************************************************************************************************/
   private:
     /*
      * Nothing is kept here at all any more. The list of clients never was - AsyncWebSocket
@@ -70,9 +50,6 @@ class WebInterface
     WebInterface() { }
     ~WebInterface() { }
 
-/******************************************************************************************************************************************************
- *  P U B L I C   F U N C T I O N S
-******************************************************************************************************************************************************/
   public:
     static WebInterface& GetInstance() {
         static WebInterface singleton_instance;
@@ -114,7 +91,3 @@ class WebInterface
 };
 
 #endif // _WEB_INTERFACE_H_
-
-/******************************************************************************************************************************************************
- *  E N D   O F   F I L E
-******************************************************************************************************************************************************/

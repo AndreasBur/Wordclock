@@ -1,60 +1,33 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+/*!
+ * \file
+ * \brief Turns an answer from the firmware into a readable line.
  *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       MessageDecoder.h
- *      \brief      Turns an answer from the firmware into a readable line
+ * An answer arrives as the command number followed by "<short name>=<value>" for each of its
+ * settings, which says little without the parser at hand. This reads it back through
+ * MessageCatalog, so "3 B=255 A=0" becomes the command and the option names, with named values
+ * spelled out.
  *
- *      \details    An answer arrives as the command number followed by
- *                  "<short name>=<value>" for each of its settings, which says little
- *                  without the parser at hand. This reads it back through
- *                  MessageCatalog, so "3 B=255 A=0" becomes the command and the
- *                  option names, with named values spelled out.
+ * Error lines are read too, in the three shapes ErrorMessage sends: "Error=<number>", the same with
+ * ":<option short name>" appended, and "Api=<number>:Error=<number>". Their names are MIRRORED from
+ * ErrorMessage::ErrorType and ::ApiType below and have to be kept in step with them by hand, the
+ * same as MessageCatalog.
  *
- *                  Error lines are read too, in the three shapes ErrorMessage sends:
- *                  "Error=<number>", the same with ":<option short name>" appended,
- *                  and "Api=<number>:Error=<number>". Their names are MIRRORED from
- *                  ErrorMessage::ErrorType and ::ApiType below and have to be kept in
- *                  step with them by hand, the same as MessageCatalog.
- *
- *                  Anything that is neither — plain text — is reported as undecodable
- *                  and left to be shown as it came.
- *
-******************************************************************************************************************************************************/
+ * Anything that is neither — plain text — is reported as undecodable and left to be shown as it
+ * came.
+ */
+
 #ifndef MESSAGE_DECODER_H
 #define MESSAGE_DECODER_H
 
-/******************************************************************************************************************************************************
- * I N C L U D E S
-******************************************************************************************************************************************************/
 #include <wx/wx.h>
 #include "StandardTypes.h"
 #include "MessageCatalog.h"
 
-/******************************************************************************************************************************************************
- *  G L O B A L   C O N S T A N T   M A C R O S
-******************************************************************************************************************************************************/
-
-
-/******************************************************************************************************************************************************
- *  G L O B A L   F U N C T I O N   M A C R O S
-******************************************************************************************************************************************************/
-
-
-/******************************************************************************************************************************************************
- *  C L A S S   M E S S A G E   D E C O D E R
-******************************************************************************************************************************************************/
 class MessageDecoder
 {
-/******************************************************************************************************************************************************
- *  P R I V A T E   D A T A   A N D   F U N C T I O N S
-******************************************************************************************************************************************************/
   private:
     // Mirrors MsgParameterParser::kOptionArgumentDelimiter, which the parser keeps
     // private.
@@ -109,9 +82,6 @@ class MessageDecoder
     // under a command heading in the remote procedure call's answer.
     static wxString DescribeErrorPart(const wxString&, const char* indent);
 
-/******************************************************************************************************************************************************
- *  P U B L I C   F U N C T I O N S
-******************************************************************************************************************************************************/
   public:
     // methods
     /*
@@ -123,7 +93,3 @@ class MessageDecoder
 };
 
 #endif // MESSAGE_DECODER_H
-
-/******************************************************************************************************************************************************
- *  E N D   O F   F I L E
-******************************************************************************************************************************************************/

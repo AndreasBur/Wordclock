@@ -1,41 +1,28 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+/*!
+ * \file
+ * \brief Settings of the ESP32 application.
  *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       WordclockConfiguration.h
- *      \brief      Settings of the ESP32 application
+ * Everything here is site-specific rather than firmware behaviour: the network to join, where the
+ * time comes from, which zone it is shown in.
  *
- *      \details    Everything here is site-specific rather than firmware behaviour: the
- *                  network to join, where the time comes from, which zone it is shown in.
- *
- *                  Each setting can be overridden from outside, either by a -D build flag
- *                  or by a WordclockSecrets.h next to this file, which is where the
- *                  network credentials belong - that file is not checked in. Credentials
- *                  will move into NVS once the firmware core can persist settings; until
- *                  then they are compiled in.
- *
-******************************************************************************************************************************************************/
+ * Each setting can be overridden from outside, either by a -D build flag or by a WordclockSecrets.h
+ * next to this file, which is where the network credentials belong - that file is not checked in.
+ * Credentials will move into NVS once the firmware core can persist settings; until then they are
+ * compiled in.
+ */
+
 #ifndef _WORDCLOCK_CONFIGURATION_H_
 #define _WORDCLOCK_CONFIGURATION_H_
 
-/******************************************************************************************************************************************************
- * I N C L U D E S
-******************************************************************************************************************************************************/
 #if defined(__has_include)
 # if __has_include("WordclockSecrets.h")
 #  include "WordclockSecrets.h"
 # endif
 #endif
 
-/******************************************************************************************************************************************************
- *  G L O B A L   C O N S T A N T   M A C R O S
-******************************************************************************************************************************************************/
 /*
  * Empty rather than a placeholder network: the application then says so on the console
  * and carries on without WiFi, which still leaves a clock that answers commands. A
@@ -83,7 +70,3 @@
 #endif
 
 #endif // _WORDCLOCK_CONFIGURATION_H_
-
-/******************************************************************************************************************************************************
- *  E N D   O F   F I L E
-******************************************************************************************************************************************************/

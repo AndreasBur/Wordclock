@@ -1,31 +1,17 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
- *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       WordclockMain.cpp
- *      \brief      The firmware, brought up and ticked, see WordclockMain.h
- *
-******************************************************************************************************************************************************/
+// Copyright 2017 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
 
-/******************************************************************************************************************************************************
- * I N C L U D E S
-******************************************************************************************************************************************************/
+/*!
+ * \file
+ * \brief The firmware, brought up and ticked, see WordclockMain.h.
+ */
+
 #include "Arduino.h"
 #include "Display.h"
 #include "Persistence.h"
 #include "PowerSwitch.h"
 #include "RealTimeClock.h"
 #include "WordclockMain.h"
-
-/******************************************************************************************************************************************************
- *  P U B L I C   F U N C T I O N S
-******************************************************************************************************************************************************/
 
 /*
  * An instance method, though it reads no member: it is part of the interface the
@@ -35,9 +21,6 @@
  * that detail into the interface.
  */
 // NOLINTBEGIN(readability-convert-member-functions-to-static)
-/******************************************************************************************************************************************************
-  Init()
-******************************************************************************************************************************************************/
 /*! \brief          Brings the supply and the display up and restores what was stored
  *  \details        The supply switch before the display, and that order is the hardware's
  *                  rather than a preference: the display's Init() claims the strip's data
@@ -53,30 +36,22 @@
  *                  The light sensor and the clock chip are not initialised here: the core
  *                  keeps both inside singletons of its own with no defined Init(), and each
  *                  driver sets itself up from its first task.
-******************************************************************************************************************************************************/
+ */
 void WordclockMain::Init()
 {
     PowerSwitch::GetInstance().Init();
     Display::GetInstance().Init();
     Persistence::GetInstance().Load();
-} /* Init */
+}
 // NOLINTEND(readability-convert-member-functions-to-static)
 
-
-/******************************************************************************************************************************************************
-  Task()
-******************************************************************************************************************************************************/
 /*! \brief          One pass over the firmware
  *  \details        The clock before the scheduler, so that everything the tasks read in this
  *                  pass sees one and the same time rather than one that changes half way
  *                  through it.
-******************************************************************************************************************************************************/
+ */
 void WordclockMain::Task()
 {
     RealTimeClock::GetInstance().Task();
     wc_scheduler_.Task();
-} /* Task */
-
-/******************************************************************************************************************************************************
- *  E N D   O F   F I L E
-******************************************************************************************************************************************************/
+}

@@ -1,66 +1,48 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+/*!
+ * \file
+ * \brief Takes the display down for the night and gives it back in the morning.
  *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       NightSwitch.h
- *      \brief      Takes the display down for the night and gives it back in the morning
+ * The clock lit the wall around the clock. This is the first setting that is a time of day rather
+ * than a value, and the first that acts on its own rather than when something asks.
  *
- *      \details    The clock lit the wall around the clock. This is the first setting that
- *                  is a time of day rather than a value, and the first that acts on its own
- *                  rather than when something asks.
+ * What it does at night is one number: the night brightness, where zero means the display goes off
+ * altogether and anything else means it is dimmed to that. One field rather than two settings,
+ * because "off" and "very dim" are the same wish answered at different strengths.
  *
- *                  What it does at night is one number: the night brightness, where zero
- *                  means the display goes off altogether and anything else means it is
- *                  dimmed to that. One field rather than two settings, because "off" and
- *                  "very dim" are the same wish answered at different strengths.
+ * Dimming goes through the display's night level, which scales what the setting, the gamma
+ * correction and the automatic arrived at. It does not write the brightness setting, which matters
+ * twice: morning returns to the brightness its owner chose rather than to one this module
+ * remembered, and Persistence keeps storing that same chosen value instead of whatever the clock
+ * happened to be showing at the moment it wrote.
  *
- *                  Dimming goes through the display's night level, which scales what the
- *                  setting, the gamma correction and the automatic arrived at. It does not
- *                  write the brightness setting, which matters twice: morning returns to
- *                  the brightness its owner chose rather than to one this module
- *                  remembered, and Persistence keeps storing that same chosen value instead
- *                  of whatever the clock happened to be showing at the moment it wrote.
+ * A night brightness of zero also takes the strip's supply away where there is a switch to do it
+ * with. That is the state the switch was built for: a display that is off still draws its quiescent
+ * current, some 110 mA for this strip, and a night is the longest stretch in which nobody is
+ * looking at what it buys. Power is asked rather than the port written, because the cut is a
+ * sequence over several ticks and not a write.
  *
- *                  A night brightness of zero also takes the strip's supply away where there
- *                  is a switch to do it with. That is the state the switch was built for:
- *                  a display that is off still draws its quiescent current, some 110 mA for
- *                  this strip, and a night is the longest stretch in which nobody is looking
- *                  at what it buys. Power is asked rather than the port written, because the
- *                  cut is a sequence over several ticks and not a write.
+ * It acts on the crossing and not on the state. A clock switched on by hand at two in the morning
+ * stays on until the window's next edge, rather than going dark again a second later - which looks
+ * like a fault, and is the behaviour that makes people stop using a timer.
  *
- *                  It acts on the crossing and not on the state. A clock switched on by
- *                  hand at two in the morning stays on until the window's next edge, rather
- *                  than going dark again a second later - which looks like a fault, and is
- *                  the behaviour that makes people stop using a timer.
- *
- *                  The supply is the one exception, and it is one because a cut rail turns
- *                  "on" into a switch that does nothing: the display would be enabled, the
- *                  data line gated and the wall still dark. So a hand that switches the
- *                  clock on inside the window gets the supply back, which is the crossing
- *                  rule kept rather than broken - the display stays where the hand put it.
- *
-******************************************************************************************************************************************************/
+ * The supply is the one exception, and it is one because a cut rail turns "on" into a switch that
+ * does nothing: the display would be enabled, the data line gated and the wall still dark. So a
+ * hand that switches the clock on inside the window gets the supply back, which is the crossing
+ * rule kept rather than broken - the display stays where the hand put it.
+ */
+
 #ifndef _NIGHT_SWITCH_H_
 #define _NIGHT_SWITCH_H_
 
-/******************************************************************************************************************************************************
- * I N C L U D E S
-******************************************************************************************************************************************************/
 #include "Arduino.h"
 #include "ClockTime.h"
 #include "Display.h"
 #include "Power.h"
 #include "RealTimeClock.h"
 
-/******************************************************************************************************************************************************
- *  G L O B A L   C O N S T A N T   M A C R O S
-******************************************************************************************************************************************************/
 /* NightSwitch configuration parameter */
 /*
  * In scheduler ticks, so 100 * 10 ms = 1 s. A window's edge is a minute wide, so this is
@@ -69,14 +51,8 @@
  */
 #define NIGHT_SWITCH_TASK_CYCLE                         100u
 
-/******************************************************************************************************************************************************
- *  C L A S S   N I G H T   S W I T C H
-******************************************************************************************************************************************************/
 class NightSwitch
 {
-/******************************************************************************************************************************************************
- *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
-******************************************************************************************************************************************************/
   public:
     using HourType = ClockTime::HourType;
     using MinuteType = ClockTime::MinuteType;
@@ -85,9 +61,6 @@ class NightSwitch
     // than four, and the wrap around midnight becomes one comparison instead of a case.
     using TimeOfDayType = uint16_t;
 
-/******************************************************************************************************************************************************
- *  P R I V A T E   D A T A   A N D   F U N C T I O N S
-******************************************************************************************************************************************************/
   private:
     static constexpr byte kTaskCycle{NIGHT_SWITCH_TASK_CYCLE};
     static constexpr TimeOfDayType kMinutesPerHour{60u};
@@ -206,9 +179,6 @@ class NightSwitch
         RestoreSupplyAfterTheNight();
     }
 
-/******************************************************************************************************************************************************
- *  P U B L I C   F U N C T I O N S
-******************************************************************************************************************************************************/
   public:
     static NightSwitch& GetInstance() {
         static NightSwitch singleton_instance;
@@ -283,7 +253,3 @@ class NightSwitch
 };
 
 #endif // _NIGHT_SWITCH_H_
-
-/******************************************************************************************************************************************************
- *  E N D   O F   F I L E
-******************************************************************************************************************************************************/

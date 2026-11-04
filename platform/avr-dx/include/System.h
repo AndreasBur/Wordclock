@@ -1,37 +1,24 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
+// Copyright 2017 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+/*!
+ * \file
+ * \brief The machine the clock runs on, as the status command asks about it.
  *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       System.h
- *      \brief      The machine the clock runs on, as the status command asks about it
+ * Half of this seam is about a network, and this board has none. Those calls answer kENotOk, which
+ * is not a stub standing in for something missing - it is the defined answer, and the status
+ * command sends an empty field rather than a made-up one. The simulator answers the same way.
  *
- *      \details    Half of this seam is about a network, and this board has none. Those
- *                  calls answer kENotOk, which is not a stub standing in for something
- *                  missing - it is the defined answer, and the status command sends an empty
- *                  field rather than a made-up one. The simulator answers the same way.
- *
- *                  What is left is real here: how long the clock has been running, how much
- *                  memory is still free, and the reset.
- *
-******************************************************************************************************************************************************/
+ * What is left is real here: how long the clock has been running, how much memory is still free,
+ * and the reset.
+ */
+
 #ifndef _SYSTEM_H_
 #define _SYSTEM_H_
 
-/******************************************************************************************************************************************************
- * I N C L U D E S
-******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Arduino.h"
 
-/******************************************************************************************************************************************************
- *  G L O B A L   C O N S T A N T   M A C R O S
-******************************************************************************************************************************************************/
 /* System configuration parameter */
 // The buffer sizes the status command hands in. Kept identical to the other backends, so
 // the command's own buffers do not have to change with the platform.
@@ -42,32 +29,20 @@
 
 /* System parameter */
 
-/******************************************************************************************************************************************************
- *  C L A S S   S Y S T E M
-******************************************************************************************************************************************************/
 class System
 {
-/******************************************************************************************************************************************************
- *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
-******************************************************************************************************************************************************/
   public:
     static constexpr byte kAddressStringLength{SYSTEM_ADDRESS_STRING_LENGTH};
     static constexpr byte kLinkQualityStringLength{SYSTEM_LINK_QUALITY_STRING_LENGTH};
     static constexpr byte kSsidStringLength{SYSTEM_SSID_STRING_LENGTH};
     static constexpr byte kPasswordStringLength{SYSTEM_PASSWORD_STRING_LENGTH};
 
-/******************************************************************************************************************************************************
- *  P R I V A T E   D A T A   A N D   F U N C T I O N S
-******************************************************************************************************************************************************/
   private:
     bool restart_pending_{false};
 
     System() { }
     ~System() { }
 
-/******************************************************************************************************************************************************
- *  P U B L I C   F U N C T I O N S
-******************************************************************************************************************************************************/
   public:
     static System& GetInstance() {
         static System singleton_instance;
@@ -97,7 +72,6 @@ class System
     bool IsConsoleProtected() const { return false; }
     StdReturnType SetConsolePassword(const char* password) { UNUSED(password); return kENotOk; }
 
-
     // methods
     void StartNetwork() { }
     StdReturnType ReconnectNetwork() { return kENotOk; }
@@ -118,7 +92,3 @@ class System
 };
 
 #endif // _SYSTEM_H_
-
-/******************************************************************************************************************************************************
- *  E N D   O F   F I L E
-******************************************************************************************************************************************************/

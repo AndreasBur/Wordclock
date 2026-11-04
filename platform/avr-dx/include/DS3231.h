@@ -1,40 +1,26 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+/*!
+ * \file
+ * \brief The clock chip: the time it counted, and the temperature it measures.
  *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       DS3231.h
- *      \brief      The clock chip: the time it counted, and the temperature it measures
+ * Everything below the bus is the chip's, not the board's - the register layout, the BCD fields and
+ * the temperature pair are the same here as on the ESP32 backend, and are deliberately kept
+ * identical to it. Only the transfers differ, and those go through Twi.
  *
- *      \details    Everything below the bus is the chip's, not the board's - the register
- *                  layout, the BCD fields and the temperature pair are the same here as on
- *                  the ESP32 backend, and are deliberately kept identical to it. Only the
- *                  transfers differ, and those go through Twi.
- *
- *                  The chip is the time source here rather than a fallback: this board has
- *                  no network to ask, so what the chip counted through the battery is all
- *                  there is after a restart.
- *
-******************************************************************************************************************************************************/
+ * The chip is the time source here rather than a fallback: this board has no network to ask, so
+ * what the chip counted through the battery is all there is after a restart.
+ */
+
 #ifndef _DS3231_H_
 #define _DS3231_H_
 
-/******************************************************************************************************************************************************
- * I N C L U D E S
-******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Bit.h"
 #include "Arduino.h"
 #include "ClockDateTime.h"
 
-/******************************************************************************************************************************************************
- *  G L O B A L   C O N S T A N T   M A C R O S
-******************************************************************************************************************************************************/
 /* DS3231 configuration parameter */
 /* The only address the chip has; A0 to A2 do not exist on it. */
 #define DS3231_I2C_ADDR                                 0x68u
@@ -74,14 +60,8 @@
 #define DS3231_REG_STATUS                               0x0Fu
 #define DS3231_STATUS_OSCILLATOR_STOPPED_MASK           0b10000000u
 
-/******************************************************************************************************************************************************
- *  C L A S S   D S 3 2 3 1
-******************************************************************************************************************************************************/
 class DS3231
 {
-/******************************************************************************************************************************************************
- *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
-******************************************************************************************************************************************************/
   public:
     /*
      * Tenths of a degree Celsius, signed. Tenths rather than the chip's own quarters
@@ -91,9 +71,6 @@ class DS3231
     using TemperatureType = int16_t;
     static constexpr TemperatureType kTenthsPerDegree{10};
 
-/******************************************************************************************************************************************************
- *  P R I V A T E   D A T A   A N D   F U N C T I O N S
-******************************************************************************************************************************************************/
   private:
     static constexpr byte kTaskCycle{DS3231_TASK_CYCLE};
     static constexpr TemperatureType kQuartersPerDegree{4};
@@ -111,9 +88,6 @@ class DS3231
     static StdReturnType ClearOscillatorStopped();
     static bool HasOscillatorStopped();
 
-/******************************************************************************************************************************************************
- *  P U B L I C   F U N C T I O N S
-******************************************************************************************************************************************************/
   public:
     constexpr DS3231() { }
     ~DS3231() { }
@@ -180,7 +154,3 @@ static_assert(DS3231::ToTenths(0x19, 0x40u) == 252, "+25.25 degrees must read as
 static_assert(DS3231::ToTenths(static_cast<int8_t>(0xFE), 0x80u) == -15, "-1.5 degrees must read as -1.5");
 
 #endif // _DS3231_H_
-
-/******************************************************************************************************************************************************
- *  E N D   O F   F I L E
-******************************************************************************************************************************************************/

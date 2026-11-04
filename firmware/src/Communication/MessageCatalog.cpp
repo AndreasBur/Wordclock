@@ -1,24 +1,15 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+/*!
+ * \file
+ * \brief What the serial commands are called and which options they take.
  *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       MessageCatalog.cpp
- *      \brief      What the serial commands are called and which options they take
- *
- *      \details    See the header on why this table is here and what it mirrors.
- *
-******************************************************************************************************************************************************/
+ * See the header on why this table is here and what it mirrors.
+ */
+
 #define _MESSAGE_CATALOG_SOURCE_
 
-/******************************************************************************************************************************************************
- * I N C L U D E S
-******************************************************************************************************************************************************/
 #include "MessageCatalog.h"
 // The command numbers are taken from here rather than copied, so they cannot fall behind
 // the firmware. Its OVERLAYS_SUPPORT_* switches reach the entries below through it too.
@@ -43,16 +34,10 @@
 #include "RealTimeClock.h"
 #include <limits>
 
-/******************************************************************************************************************************************************
- *  L O C A L   C O N S T A N T   M A C R O S
-******************************************************************************************************************************************************/
 // For the options the firmware bounds only by the width of the argument: the overlay
 // periods and endurances reject nothing but zero, and the speeds nothing at all.
 #define BYTE_MAX                                        255u
 
-/******************************************************************************************************************************************************
- *  L O C A L   F U N C T I O N   M A C R O S
-******************************************************************************************************************************************************/
 /* Counted rather than written out, so a value list and its length cannot drift apart. */
 #define NUMBER_OF(Array)                                static_cast<byte>(sizeof(Array) / sizeof((Array)[0]))
 
@@ -60,9 +45,6 @@
 // from beside it.
 #define MEASURED(ValueType, IsValid)                    FindMinimum<ValueType>(IsValid), FindMaximum<ValueType>(IsValid)
 
-/******************************************************************************************************************************************************
- *  L O C A L   D A T A   T Y P E S   A N D   S T R U C T U R E S
-******************************************************************************************************************************************************/
 /*
  * The tables below sit outside the class, so that they can be constexpr and be checked at
  * compile time. This brings the argument types back within reach without the class's name,
@@ -99,10 +81,6 @@ constexpr uint16_t FindMaximum(PredicateType is_valid)
 
     return 0u;
 }
-
-/******************************************************************************************************************************************************
- *  P R I V A T E   D A T A
-******************************************************************************************************************************************************/
 
 /* For every option that carries a flag rather than a number. */
 constexpr const char* const kBooleanValueNames[] {
@@ -479,37 +457,22 @@ constexpr bool AreNamedRangesConsistent()
 static_assert(AreNamedRangesConsistent(),
               "an option with named values has a range that does not match the number of names");
 
-/******************************************************************************************************************************************************
- * P U B L I C   F U N C T I O N S
-******************************************************************************************************************************************************/
-
-/******************************************************************************************************************************************************
-  GetNumberOfCommands()
-******************************************************************************************************************************************************/
 byte MessageCatalog::GetNumberOfCommands()
 {
     return kNumberOfCommands;
-} /* GetNumberOfCommands */
+}
 
-
-/******************************************************************************************************************************************************
-  GetCommand()
-******************************************************************************************************************************************************/
 const MessageCatalog::CommandType& MessageCatalog::GetCommand(byte index)
 {
     return kCommands[index];
-} /* GetCommand */
+}
 
-
-/******************************************************************************************************************************************************
-  FindCommandByNumber()
-******************************************************************************************************************************************************/
 /*! \brief          looks a command up by the number it is sent with
  *  \details        Not the same as the index into the table: the numbers happen to run
  *                  from one without a gap today, but nothing keeps them that way.
  *
  *  \return         the command, or nullptr if no command carries that number
-******************************************************************************************************************************************************/
+ */
 const MessageCatalog::CommandType* MessageCatalog::FindCommandByNumber(byte number)
 {
     for(byte index = 0u; index < kNumberOfCommands; index++) {
@@ -517,29 +480,21 @@ const MessageCatalog::CommandType* MessageCatalog::FindCommandByNumber(byte numb
     }
 
     return nullptr;
-} /* FindCommandByNumber */
+}
 
-
-/******************************************************************************************************************************************************
-  FindRemoteProcedureCallCommand()
-******************************************************************************************************************************************************/
 /*! \brief          the remote procedure call, for a caller that has no number to look up
  *
  *  \return         the command, or nullptr if it is not in the table
-******************************************************************************************************************************************************/
+ */
 const MessageCatalog::CommandType* MessageCatalog::FindRemoteProcedureCallCommand()
 {
     return FindCommandByNumber(ToUnderlying(MsgCmdParser::CommandType::kRemoteProcedureCall));
-} /* FindRemoteProcedureCallCommand */
+}
 
-
-/******************************************************************************************************************************************************
-  FindOption()
-******************************************************************************************************************************************************/
 /*! \brief          looks an option of a command up by its short name
  *
  *  \return         the option, or nullptr if the command has no such option
-******************************************************************************************************************************************************/
+ */
 const MessageCatalog::OptionType* MessageCatalog::FindOption(const CommandType& command, char short_name)
 {
     for(byte index = 0u; index < command.number_of_options; index++) {
@@ -547,9 +502,4 @@ const MessageCatalog::OptionType* MessageCatalog::FindOption(const CommandType& 
     }
 
     return nullptr;
-} /* FindOption */
-
-
-/******************************************************************************************************************************************************
- *  E N D   O F   F I L E
-******************************************************************************************************************************************************/
+}

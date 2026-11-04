@@ -1,41 +1,23 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
- *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       WebSocket.cpp
- *      \brief      The web socket protocol, as far as the two pages need it
- *
- *      \details    SHA-1 and base64 are here for one reason only: RFC 6455 makes the handshake
- *                  answer the base64 of the SHA-1 of the client's key and a fixed string. There
- *                  is nothing to choose about either, so they are written out rather than pulled
- *                  in - a dependency for eighty lines of arithmetic would be a worse trade in a
- *                  build that otherwise needs only wxWidgets.
- *
- *                  No other use, and in particular not a security one: this is a checksum a
- *                  browser demands, not a secret.
- *
-******************************************************************************************************************************************************/
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
 
-/******************************************************************************************************************************************************
- * I N C L U D E S
-******************************************************************************************************************************************************/
+/*!
+ * \file
+ * \brief The web socket protocol, as far as the two pages need it.
+ *
+ * SHA-1 and base64 are here for one reason only: RFC 6455 makes the handshake answer the base64 of
+ * the SHA-1 of the client's key and a fixed string. There is nothing to choose about either, so
+ * they are written out rather than pulled in - a dependency for eighty lines of arithmetic would be
+ * a worse trade in a build that otherwise needs only wxWidgets.
+ *
+ * No other use, and in particular not a security one: this is a checksum a browser demands, not a
+ * secret.
+ */
+
 #include "sim/WebSocket.h"
 
 #include <cctype>
 
-/******************************************************************************************************************************************************
- * P U B L I C   F U N C T I O N S
-******************************************************************************************************************************************************/
-
-/******************************************************************************************************************************************************
-  GetHandshakeAnswer()
-******************************************************************************************************************************************************/
 /*! \brief          Answers a browser's request to open a web socket
  *  \details        The handshake is the whole of what makes a socket out of a request: the 101
  *                  response, with the accept key the browser checks.
@@ -44,7 +26,7 @@
  *  \param[out]     answer          the response to send back
  *  \return         kEOk
  *                  kENotOk        the request has no Sec-WebSocket-Key
-******************************************************************************************************************************************************/
+ */
 StdReturnType WebSocket::GetHandshakeAnswer(const std::string& request, std::string& answer)
 {
     std::string key;
@@ -54,12 +36,8 @@ StdReturnType WebSocket::GetHandshakeAnswer(const std::string& request, std::str
     answer = "HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nConnection: Upgrade\r\n"
              "Sec-WebSocket-Accept: " + ConvertKeyToAcceptKey(key) + "\r\n\r\n";
     return kEOk;
-} /* GetHandshakeAnswer */
+}
 
-
-/******************************************************************************************************************************************************
-  EncodeFrame()
-******************************************************************************************************************************************************/
 /*! \brief          Wraps a payload into a frame
  *  \details        A final, unmasked frame, as a server sends it. Only the two lengths a clock
  *                  ever sends are encoded: a line is well under 126 bytes and a display frame
@@ -70,7 +48,7 @@ StdReturnType WebSocket::GetHandshakeAnswer(const std::string& request, std::str
  *  \param[in]      payload         the bytes to send
  *  \param[in]      length          the number of bytes
  *  \return         the frame, header and payload
-******************************************************************************************************************************************************/
+ */
 std::string WebSocket::EncodeFrame(bool is_binary, const char* payload, size_t length)
 {
     std::string frame;
@@ -85,12 +63,8 @@ std::string WebSocket::EncodeFrame(bool is_binary, const char* payload, size_t l
     }
     frame.append(payload, length);
     return frame;
-} /* EncodeFrame */
+}
 
-
-/******************************************************************************************************************************************************
-  DecodeFrame()
-******************************************************************************************************************************************************/
 /*! \brief          Takes the first frame out of what has arrived
  *  \details        What a browser sends is always masked, which is the one part of the format
  *                  this has to undo. A frame that has not fully arrived stays in the buffer for
@@ -101,7 +75,7 @@ std::string WebSocket::EncodeFrame(bool is_binary, const char* payload, size_t l
  *  \param[out]     payload         the payload of the frame, unmasked
  *  \return         kEOk
  *                  kENotOk        no complete frame in the buffer
-******************************************************************************************************************************************************/
+ */
 StdReturnType WebSocket::DecodeFrame(std::string& buffer, uint8_t& opcode, std::string& payload)
 {
     if(buffer.size() < kHeaderLength) { return kENotOk; }
@@ -138,36 +112,28 @@ StdReturnType WebSocket::DecodeFrame(std::string& buffer, uint8_t& opcode, std::
     opcode = first & kOpcodeMask;
     buffer.erase(0u, offset + mask + length);
     return kEOk;
-} /* DecodeFrame */
+}
 
-
-/******************************************************************************************************************************************************
-  ConvertKeyToAcceptKey()
-******************************************************************************************************************************************************/
 /*! \brief          Converts the browser's key into the key it expects back
  *
  *  \param[in]      Key             the value of Sec-WebSocket-Key
  *  \return         the value of Sec-WebSocket-Accept: the base64 of the SHA-1 of the key and
  *                  the fixed GUID of RFC 6455
-******************************************************************************************************************************************************/
+ */
 std::string WebSocket::ConvertKeyToAcceptKey(const std::string& key)
 {
     uint8_t digest[kSha1Length];
 
     CalculateSha1(key + kGuid, digest);
     return ConvertToBase64(digest, sizeof(digest));
-} /* ConvertKeyToAcceptKey */
+}
 
-
-/******************************************************************************************************************************************************
-  CalculateSha1()
-******************************************************************************************************************************************************/
 /*! \brief          Calculates the SHA-1 of a message
  *
  *  \param[in]      message         the bytes to hash
  *  \param[out]     digest          the hash, kSha1Length bytes
  *  \return         -
-******************************************************************************************************************************************************/
+ */
 void WebSocket::CalculateSha1(const std::string& message, uint8_t* digest)
 {
     uint32_t state[kSha1StateLength]{0x67452301u, 0xEFCDAB89u, 0x98BADCFEu, 0x10325476u, 0xC3D2E1F0u};
@@ -181,12 +147,8 @@ void WebSocket::CalculateSha1(const std::string& message, uint8_t* digest)
             digest[(word * 4u) + byte] = static_cast<uint8_t>(state[word] >> (24u - (8u * byte)));
         }
     }
-} /* CalculateSha1 */
+}
 
-
-/******************************************************************************************************************************************************
-  ConvertToBase64()
-******************************************************************************************************************************************************/
 /*! \brief          Converts bytes to base64
  *  \details        Every three bytes become four characters, and the last group is padded
  *                  with '='.
@@ -194,7 +156,7 @@ void WebSocket::CalculateSha1(const std::string& message, uint8_t* digest)
  *  \param[in]      bytes           the bytes to convert
  *  \param[in]      length          the number of bytes
  *  \return         the base64 text
-******************************************************************************************************************************************************/
+ */
 std::string WebSocket::ConvertToBase64(const uint8_t* bytes, size_t length)
 {
     static constexpr char kAlphabet[]{"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"};
@@ -213,16 +175,8 @@ std::string WebSocket::ConvertToBase64(const uint8_t* bytes, size_t length)
         encoded.push_back((remaining > 2u) ? kAlphabet[group & 0x3Fu] : '=');
     }
     return encoded;
-} /* ConvertToBase64 */
+}
 
-
-/******************************************************************************************************************************************************
- * P R I V A T E   F U N C T I O N S
-******************************************************************************************************************************************************/
-
-/******************************************************************************************************************************************************
-  GetKey()
-******************************************************************************************************************************************************/
 /*! \brief          Finds the browser's key in a request
  *  \details        Searched in a lowered copy, because header names are case-insensitive, and
  *                  returned from the request itself, because the key is not.
@@ -231,7 +185,7 @@ std::string WebSocket::ConvertToBase64(const uint8_t* bytes, size_t length)
  *  \param[out]     Key             the value of Sec-WebSocket-Key
  *  \return         kEOk
  *                  kENotOk        the request has no such header
-******************************************************************************************************************************************************/
+ */
 StdReturnType WebSocket::GetKey(const std::string& request, std::string& key)
 {
     std::string lowered(request);
@@ -247,19 +201,15 @@ StdReturnType WebSocket::GetKey(const std::string& request, std::string& key)
 
     key = request.substr(start, end - start);
     return kEOk;
-} /* GetKey */
+}
 
-
-/******************************************************************************************************************************************************
-  PadSha1Message()
-******************************************************************************************************************************************************/
 /*! \brief          Pads a message to whole blocks
  *  \details        The message, its terminator bit and its length in bits, which is what SHA-1
  *                  hashes.
  *
  *  \param[in]      message         the bytes to hash
  *  \return         the padded message, a multiple of kSha1BlockLength long
-******************************************************************************************************************************************************/
+ */
 std::string WebSocket::PadSha1Message(const std::string& message)
 {
     const uint64_t bits = static_cast<uint64_t>(message.size()) * 8u;
@@ -271,12 +221,8 @@ std::string WebSocket::PadSha1Message(const std::string& message)
         padded.push_back(static_cast<char>((bits >> shift) & 0xFFu));
     }
     return padded;
-} /* PadSha1Message */
+}
 
-
-/******************************************************************************************************************************************************
-  ProcessSha1Block()
-******************************************************************************************************************************************************/
 /*! \brief          Mixes one block into the state
  *  \details        Expands the block into the message schedule of 80 words and runs the 80
  *                  rounds over it.
@@ -284,7 +230,7 @@ std::string WebSocket::PadSha1Message(const std::string& message)
  *  \param[in]      block           kSha1BlockLength bytes of the padded message
  *  \param[in,out]  state           the five words of the hash so far
  *  \return         -
-******************************************************************************************************************************************************/
+ */
 void WebSocket::ProcessSha1Block(const uint8_t* block, uint32_t* state)
 {
     uint32_t word[kSha1Rounds];
@@ -312,8 +258,4 @@ void WebSocket::ProcessSha1Block(const uint8_t* block, uint32_t* state)
     state[2] += c;
     state[3] += d;
     state[4] += e;
-} /* ProcessSha1Block */
-
-/******************************************************************************************************************************************************
- *  E N D   O F   F I L E
-******************************************************************************************************************************************************/
+}

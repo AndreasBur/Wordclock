@@ -1,3 +1,11 @@
+// Copyright 2017 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+/*!
+ * \file
+ * \brief The pixel buffer of the simulator, in place of the LED strip.
+ */
+
 #include "sim/Pixels.h"
 
 StdReturnType Pixels::GetPixel(byte index, PixelType& pixel) const

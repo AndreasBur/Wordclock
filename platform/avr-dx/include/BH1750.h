@@ -1,38 +1,24 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
+// Copyright 2017 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+/*!
+ * \file
+ * \brief The ambient-light sensor the display dims itself by.
  *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       BH1750.h
- *      \brief      The ambient-light sensor the display dims itself by
+ * Sets itself up from its first Task() rather than from an Init() call: the core keeps its sensor
+ * private and never calls one, so a driver that waited to be initialised would never measure
+ * anything. The attempt is repeated on every task, which also picks up a sensor that was not
+ * answering earlier - and, through kReadFailuresBeforeReinit, one that stops answering later.
  *
- *      \details    Sets itself up from its first Task() rather than from an Init() call: the
- *                  core keeps its sensor private and never calls one, so a driver that waited
- *                  to be initialised would never measure anything. The attempt is repeated on
- *                  every task, which also picks up a sensor that was not answering earlier -
- *                  and, through kReadFailuresBeforeReinit, one that stops answering later.
- *
- *                  The bus is shared with the clock chip, and neither driver owns it - see
- *                  Twi.h.
- *
-******************************************************************************************************************************************************/
+ * The bus is shared with the clock chip, and neither driver owns it - see Twi.h.
+ */
+
 #ifndef _BH1750_H_
 #define _BH1750_H_
 
-/******************************************************************************************************************************************************
- * I N C L U D E S
-******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Arduino.h"
 
-/******************************************************************************************************************************************************
- *  G L O B A L   C O N S T A N T   M A C R O S
-******************************************************************************************************************************************************/
 /* BH1750 configuration parameter */
 /* The datasheet's two addresses, selected by the ADDR pin: low is 0x23, high is 0x5C. */
 #define BH1750_I2C_ADDR                                 0x23u
@@ -89,14 +75,8 @@
 
 #define BH1750_ILLUMINANCE_RAW_VALUE_DIVIDER            1.2f
 
-/******************************************************************************************************************************************************
- *  C L A S S   B H 1 7 5 0
-******************************************************************************************************************************************************/
 class BH1750
 {
-/******************************************************************************************************************************************************
- *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
-******************************************************************************************************************************************************/
   public:
     using IlluminanceType = uint16_t;
 
@@ -115,9 +95,6 @@ class BH1750
         IlluminanceType min_value;
     };
 
-/******************************************************************************************************************************************************
- *  P R I V A T E   D A T A   A N D   F U N C T I O N S
-******************************************************************************************************************************************************/
   private:
     static constexpr byte kTaskCycle{BH1750_TASK_CYCLE};
     /*
@@ -188,9 +165,6 @@ class BH1750
         mode_ = ModeType::kNone;
     }
 
-/******************************************************************************************************************************************************
- *  P U B L I C   F U N C T I O N S
-******************************************************************************************************************************************************/
   public:
     constexpr BH1750() { }
     ~BH1750() { }
@@ -234,7 +208,3 @@ class BH1750
 };
 
 #endif // _BH1750_H_
-
-/******************************************************************************************************************************************************
- *  E N D   O F   F I L E
-******************************************************************************************************************************************************/

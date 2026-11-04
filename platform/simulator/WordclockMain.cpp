@@ -1,3 +1,11 @@
+// Copyright 2017 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+/*!
+ * \file
+ * \brief How the simulator starts the firmware and runs a task of it.
+ */
+
 #include "WordclockMain.h"
 
 #include "Persistence.h"
@@ -5,7 +13,6 @@
 #include "sim/RealTimeClock.h"
 
 namespace {
-
 ClockDateTime GetSystemDateTime()
 {
     wxDateTime wx_dt = wxDateTime::Now();
@@ -38,7 +45,6 @@ WordclockMain::WordclockMain()
 
 WordclockMain::~WordclockMain()
 {
-
 }
 
 void WordclockMain::Task()

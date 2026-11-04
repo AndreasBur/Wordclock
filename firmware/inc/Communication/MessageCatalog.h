@@ -1,48 +1,32 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
+// Copyright 2017 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+/*!
+ * \file
+ * \brief What the serial commands are called and which options they take.
  *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       MessageCatalog.h
- *      \brief      What the serial commands are called and which options they take
+ * Readable names for the commands the firmware parses, so a front end can offer them instead of
+ * leaving them to be typed, and read an answer back through them.
  *
- *      \details    Readable names for the commands the firmware parses, so a front end can
- *                  offer them instead of leaving them to be typed, and read an answer back
- *                  through them.
+ * It describes the firmware's command set, so it lives with the firmware rather than with one front
+ * end. The simulator's message builder is one renderer of this table - it derives its whole dialog
+ * from it, down to the input hints - and the intent is that a web interface becomes a second one,
+ * so that a command added here appears in every front end and on the serial interface at once.
+ * Nothing in the core reads it, so a target too small to carry it can leave the source out of its
+ * build.
  *
- *                  It describes the firmware's command set, so it lives with the firmware
- *                  rather than with one front end. The simulator's message builder is one
- *                  renderer of this table - it derives its whole dialog from it, down to
- *                  the input hints - and the intent is that a web interface becomes a
- *                  second one, so that a command added here appears in every front end and
- *                  on the serial interface at once. Nothing in the core reads it, so a
- *                  target too small to carry it can leave the source out of its build.
- *
- *                  The command numbers are taken from MsgCmdParser::CommandType itself,
- *                  and the value lists of the enumerations sit behind the same support
- *                  switches as the enumerations do, so neither can drift. What remains
- *                  MIRRORED by hand are the option short names and argument types, which
- *                  each parser keeps private in its parameter_table_, plus the labels and
- *                  ranges this table adds on top. Every entry names the parser it was
- *                  taken from.
- *
-******************************************************************************************************************************************************/
+ * The command numbers are taken from MsgCmdParser::CommandType itself, and the value lists of the
+ * enumerations sit behind the same support switches as the enumerations do, so neither can drift.
+ * What remains MIRRORED by hand are the option short names and argument types, which each parser
+ * keeps private in its parameter_table_, plus the labels and ranges this table adds on top. Every
+ * entry names the parser it was taken from.
+ */
+
 #ifndef MESSAGE_CATALOG_H
 #define MESSAGE_CATALOG_H
 
-/******************************************************************************************************************************************************
- * I N C L U D E S
-******************************************************************************************************************************************************/
 #include "Arduino.h"
 
-/******************************************************************************************************************************************************
- *  G L O B A L   C O N S T A N T   M A C R O S
-******************************************************************************************************************************************************/
 /*
  * The widest option list of any command, which is the overlays' shared one. Fixes how
  * many option rows the message builder has to hold; a static_assert in the source keeps it
@@ -50,19 +34,8 @@
  */
 #define MESSAGE_CATALOG_MAX_NUMBER_OF_OPTIONS           9u
 
-/******************************************************************************************************************************************************
- *  G L O B A L   F U N C T I O N   M A C R O S
-******************************************************************************************************************************************************/
-
-
-/******************************************************************************************************************************************************
- *  C L A S S   M E S S A G E   C A T A L O G
-******************************************************************************************************************************************************/
 class MessageCatalog
 {
-/******************************************************************************************************************************************************
- *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
-******************************************************************************************************************************************************/
   public:
     // Only the argument types the commands actually use, not the full set
     // MsgParameter knows.
@@ -105,9 +78,6 @@ class MessageCatalog
         byte number_of_options;
     };
 
-/******************************************************************************************************************************************************
- *  P U B L I C   F U N C T I O N S
-******************************************************************************************************************************************************/
   public:
     // The tables live in the source, where they can be constexpr and checked against the
     // firmware at compile time. Hence out of line rather than inline here.
@@ -131,7 +101,3 @@ class MessageCatalog
 };
 
 #endif // MESSAGE_CATALOG_H
-
-/******************************************************************************************************************************************************
- *  E N D   O F   F I L E
-******************************************************************************************************************************************************/

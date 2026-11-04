@@ -1,9 +1,4 @@
-/******************************************************************************************************************************************************
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       colorcycle_test.cpp
- *      \brief      The wheel, what it leaves alone, and what the supply is told about it
-******************************************************************************************************************************************************/
+// The wheel, what it leaves alone, and what the supply is told about it.
 
 #include "check.h"
 #include "cases.h"
@@ -15,7 +10,6 @@
 #include "Pixels.h"
 
 namespace {
-
 /*
  * The colour the strip is actually carrying, read off the first lit pixel. The buffer holds
  * the colour already dimmed by the brightness, so the cases below set a brightness that

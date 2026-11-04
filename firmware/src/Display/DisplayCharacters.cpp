@@ -1,48 +1,23 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
+// Copyright 2017 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+/*!
+ * \file
+ * \brief The letters on the front panel, one string per row.
  *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       DisplayCharacters.cpp
- *      \brief      The letters on the front panel, one string per row
+ * One byte per letter, so the umlauts are escapes rather than literals: \\xDC is U with an umlaut
+ * and \\xD6 is O with one, in Latin-1. Written as escapes so the table cannot be changed by
+ * whatever encoding an editor saves the file in, and read as Latin-1 by whoever displays it.
  *
- *      \details    One byte per letter, so the umlauts are escapes rather than literals:
- *                  \\xDC is U with an umlaut and \\xD6 is O with one, in Latin-1. Written
- *                  as escapes so the table cannot be changed by whatever encoding an
- *                  editor saves the file in, and read as Latin-1 by whoever displays it.
- *
- *                  This is the one table of the front panel's letters. It has to stay in
- *                  step with the CharacterIdType enumeration in the header, which names
- *                  the same 110 positions, and with the word positions in DisplayWords.
- *
-******************************************************************************************************************************************************/
+ * This is the one table of the front panel's letters. It has to stay in step with the
+ * CharacterIdType enumeration in the header, which names the same 110 positions, and with the word
+ * positions in DisplayWords.
+ */
+
 #define _DISPLAY_CHARACTERS_SOURCE_
 
-/******************************************************************************************************************************************************
- * INCLUDES
-******************************************************************************************************************************************************/
 #include "DisplayCharacters.h"
 
-
-/******************************************************************************************************************************************************
- *  LOCAL CONSTANT MACROS
-******************************************************************************************************************************************************/
-
-
-/******************************************************************************************************************************************************
- *  LOCAL FUNCTION MACROS
-******************************************************************************************************************************************************/
-
-
-
-/******************************************************************************************************************************************************
- *  LOCAL DATA TYPES AND STRUCTURES
-******************************************************************************************************************************************************/
 const DisplayCharacters::DisplayCharactersTableElementType DisplayCharacters::kDisplayCharactersTable[][DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS + 1] PROGMEM
 {
     "ESKISTLF\xDCNF",
@@ -57,14 +32,6 @@ const DisplayCharacters::DisplayCharactersTableElementType DisplayCharacters::kD
     "BSECHSFMUHR"
 };
 
-
-/******************************************************************************************************************************************************
- * P U B L I C   F U N C T I O N S
-******************************************************************************************************************************************************/
-
-/******************************************************************************************************************************************************
-  GetCharacter()
-******************************************************************************************************************************************************/
 StdReturnType DisplayCharacters::GetCharacter(byte column, byte row, char& character)
 {
     if(IsColumnAndRowValid(column, row)) {
@@ -73,12 +40,8 @@ StdReturnType DisplayCharacters::GetCharacter(byte column, byte row, char& chara
     } else {
         return kENotOk;
     }
-} /* GetCharacter */
+}
 
-
-/******************************************************************************************************************************************************
-  GetCharacter()
-  ****************************************************************************************************************************************************/
 StdReturnType DisplayCharacters::GetCharacter(byte index, char& character)
 {
     if(IsIndexValid(index)) {
@@ -87,12 +50,8 @@ StdReturnType DisplayCharacters::GetCharacter(byte index, char& character)
     } else {
         return kENotOk;
     }
-} /* GetCharacter */
+}
 
-
-/******************************************************************************************************************************************************
-  GetCharacter()
-  ****************************************************************************************************************************************************/
 StdReturnType DisplayCharacters::GetCharacter(CharacterIdType character_id, char& character)
 {
     if(IsCharacterIdValid(character_id)) {
@@ -101,16 +60,4 @@ StdReturnType DisplayCharacters::GetCharacter(CharacterIdType character_id, char
     } else {
         return kENotOk;
     }
-} /* GetCharacter */
-
-
-/******************************************************************************************************************************************************
- * P R I V A T E   F U N C T I O N S
-******************************************************************************************************************************************************/
-
-
-
-/******************************************************************************************************************************************************
- *  E N D   O F   F I L E
-******************************************************************************************************************************************************/
- 
+}

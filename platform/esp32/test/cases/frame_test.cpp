@@ -27,7 +27,6 @@ esp_err_t rmt_transmit(rmt_channel_handle_t, rmt_encoder_handle_t, const void* d
     return ESP_OK;
 }
 
-
 int main()
 {
     Pixels& p = Pixels::GetInstance();

@@ -1,46 +1,32 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+/*!
+ * \file
+ * \brief Temperature of the DS3231 real time clock chip.
  *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       DS3231.h
- *      \brief      Temperature of the DS3231 real time clock chip
+ * Two things the chip keeps for the clock: the time it counts on its battery, and the die
+ * temperature it measures to compensate its crystal. The first fills the gap between power-on and
+ * the first SNTP answer, the second is what the temperature overlay shows.
  *
- *      \details    Two things the chip keeps for the clock: the time it counts on its
- *                  battery, and the die temperature it measures to compensate its crystal.
- *                  The first fills the gap between power-on and the first SNTP answer, the
- *                  second is what the temperature overlay shows.
+ * What is stored in the time registers is UTC, not the local time the display shows. A clock that
+ * stored local time would have nothing to say about the hour that occurs twice when summer time
+ * ends, and would be an hour wrong from a switch until the next SNTP answer. RealTimeClock does the
+ * conversion in both directions.
  *
- *                  What is stored in the time registers is UTC, not the local time the
- *                  display shows. A clock that stored local time would have nothing to say
- *                  about the hour that occurs twice when summer time ends, and would be an
- *                  hour wrong from a switch until the next SNTP answer. RealTimeClock does
- *                  the conversion in both directions.
- *
- *                  A die temperature is not a room temperature. The chip sits in the case
- *                  next to whatever else is warm in there, so what it reads is a degree or
- *                  two above the room and needs the offset the case turns out to have.
- *
-******************************************************************************************************************************************************/
+ * A die temperature is not a room temperature. The chip sits in the case next to whatever else is
+ * warm in there, so what it reads is a degree or two above the room and needs the offset the case
+ * turns out to have.
+ */
+
 #ifndef _DS3231_H_
 #define _DS3231_H_
 
-/******************************************************************************************************************************************************
- * I N C L U D E S
-******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Bit.h"
 #include "Arduino.h"
 #include "ClockDateTime.h"
 
-/******************************************************************************************************************************************************
- *  G L O B A L   C O N S T A N T   M A C R O S
-******************************************************************************************************************************************************/
 /* DS3231 configuration parameter */
 /* The only address the chip has; A0 to A2 do not exist on it. */
 #define DS3231_I2C_ADDR                                 0x68u
@@ -86,14 +72,8 @@
 #define DS3231_REG_STATUS                               0x0Fu
 #define DS3231_STATUS_OSCILLATOR_STOPPED_MASK           0b10000000u
 
-/******************************************************************************************************************************************************
- *  C L A S S   D S 3 2 3 1
-******************************************************************************************************************************************************/
 class DS3231
 {
-/******************************************************************************************************************************************************
- *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
-******************************************************************************************************************************************************/
   public:
     /*
      * Tenths of a degree Celsius, signed. Tenths rather than the chip's own quarters
@@ -104,9 +84,6 @@ class DS3231
 
     static constexpr TemperatureType kTenthsPerDegree{10};
 
-/******************************************************************************************************************************************************
- *  P R I V A T E   D A T A   A N D   F U N C T I O N S
-******************************************************************************************************************************************************/
   private:
     static constexpr byte kTaskCycle{DS3231_TASK_CYCLE};
     static constexpr TemperatureType kQuartersPerDegree{4};
@@ -126,9 +103,6 @@ class DS3231
     static StdReturnType ClearOscillatorStopped();
     static bool HasOscillatorStopped();
 
-/******************************************************************************************************************************************************
- *  P U B L I C   F U N C T I O N S
-******************************************************************************************************************************************************/
   public:
     constexpr DS3231() { }
     ~DS3231() { }
@@ -204,7 +178,3 @@ static_assert(DS3231::FromBcd(DS3231::ToBcd(0u)) == 0u, "zero must round-trip");
 static_assert(DS3231::FromBcd(DS3231::ToBcd(99u)) == 99u, "the largest two-digit value must round-trip");
 
 #endif // _DS3231_H_
-
-/******************************************************************************************************************************************************
- *  E N D   O F   F I L E
-******************************************************************************************************************************************************/

@@ -1,43 +1,19 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
- *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       Settings.cpp
- *      \brief      Simulator settings window
- *
- *      \details
- *
-******************************************************************************************************************************************************/
+// Copyright 2017 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+/*!
+ * \file
+ * \brief Simulator settings window.
+ */
+
 #define _SETTINGS_SOURCE_
 
-/******************************************************************************************************************************************************
- * I N C L U D E S
-******************************************************************************************************************************************************/
 #include "sim/Settings.h"
 /* the simulated light sensor the illuminance slider feeds */
 #include "sim/BH1750.h"
 /* and the simulated clock chip behind the temperature overlay */
 #include "sim/DS3231.h"
 
-/******************************************************************************************************************************************************
- *  L O C A L   C O N S T A N T   M A C R O S
-******************************************************************************************************************************************************/
-
-
-/******************************************************************************************************************************************************
- *  L O C A L   F U N C T I O N   M A C R O S
-******************************************************************************************************************************************************/
-
-
-/******************************************************************************************************************************************************
- *  L O C A L   D A T A   T Y P E S   A N D   S T R U C T U R E S
-******************************************************************************************************************************************************/
 BEGIN_EVENT_TABLE(Settings, wxDialog)
     EVT_CLOSE(Settings::OnClose)
     EVT_SLIDER(kIdSliderIlluminance, Settings::OnIlluminance)
@@ -45,14 +21,6 @@ BEGIN_EVENT_TABLE(Settings, wxDialog)
     EVT_CHECKBOX(kIdCheckboxTemperatureConnected, Settings::OnTemperatureConnected)
 END_EVENT_TABLE()
 
-
-/******************************************************************************************************************************************************
- * P U B L I C   F U N C T I O N S
-******************************************************************************************************************************************************/
-
-/******************************************************************************************************************************************************
-  Constructor of Settings
-******************************************************************************************************************************************************/
 Settings::Settings(wxWindow* parent, const wxString &title) : wxDialog(parent, wxID_ANY, title)
 {
     // No content whose size only settles once the window is mapped, unlike the letter
@@ -70,23 +38,10 @@ Settings::Settings(wxWindow* parent, const wxString &title) : wxDialog(parent, w
     CentreOnParent();
 }
 
-
-/******************************************************************************************************************************************************
-  Destructor of Settings
-******************************************************************************************************************************************************/
 Settings::~Settings()
 {
+}
 
-} /* ~Settings */
-
-
-/******************************************************************************************************************************************************
- * P R I V A T E   F U N C T I O N S
-******************************************************************************************************************************************************/
-
-/******************************************************************************************************************************************************
-  CreateSizerAll()
-******************************************************************************************************************************************************/
 wxBoxSizer* Settings::CreateSizerAll(wxWindow* parent)
 {
     wxBoxSizer* sizer_all = new wxBoxSizer(wxVERTICAL);
@@ -95,12 +50,8 @@ wxBoxSizer* Settings::CreateSizerAll(wxWindow* parent)
     sizer_all->Add(CreateSizerTemperature(parent), 0, wxALL | wxEXPAND, kBorder);
 
     return sizer_all;
-} /* CreateSizerAll */
+}
 
-
-/******************************************************************************************************************************************************
-  CreateSizerIlluminance()
-******************************************************************************************************************************************************/
 wxBoxSizer* Settings::CreateSizerIlluminance(wxWindow* parent)
 {
     wxStaticBox* static_box = new wxStaticBox(parent, kIdStaticBoxIlluminance, _T("Light sensor"));
@@ -118,19 +69,15 @@ wxBoxSizer* Settings::CreateSizerIlluminance(wxWindow* parent)
     sizer_illuminance->Add(illuminance_slider_, 0, wxALL | wxEXPAND, kBorder);
 
     return sizer_illuminance;
-} /* CreateSizerIlluminance */
+}
 
-
-/******************************************************************************************************************************************************
-  CreateSizerTemperature()
-******************************************************************************************************************************************************/
 /*! \brief          Builds the group that stands in for the clock chip's thermometer
  *  \details        The check box is what the slider alone could not express: a clock built
  *                  without the chip, and every clock until the chip has answered once. The
  *                  temperature overlay stays away in that state, which is the behaviour
  *                  that has to be tryable here. It starts cleared for the same reason -
  *                  the simulator has no chip until somebody says it has.
-******************************************************************************************************************************************************/
+ */
 wxBoxSizer* Settings::CreateSizerTemperature(wxWindow* parent)
 {
     wxStaticBox* static_box = new wxStaticBox(parent, kIdStaticBoxTemperature, _T("Clock chip"));
@@ -150,12 +97,8 @@ wxBoxSizer* Settings::CreateSizerTemperature(wxWindow* parent)
     sizer_temperature->Add(temperature_slider_, 0, wxALL | wxEXPAND, kBorder);
 
     return sizer_temperature;
-} /* CreateSizerTemperature */
+}
 
-
-/******************************************************************************************************************************************************
-  OnClose()
-******************************************************************************************************************************************************/
 void Settings::OnClose(wxCloseEvent &event)
 {
     /*
@@ -165,12 +108,8 @@ void Settings::OnClose(wxCloseEvent &event)
      */
     Hide();
     UNUSED(event);
-} /* OnClose */
+}
 
-
-/******************************************************************************************************************************************************
-  OnIlluminance()
-******************************************************************************************************************************************************/
 void Settings::OnIlluminance(wxCommandEvent &event)
 {
     /*
@@ -181,39 +120,27 @@ void Settings::OnIlluminance(wxCommandEvent &event)
     const BH1750::IlluminanceType maximum = BH1750_CALIBRATION_MAX_DEFAULT_LX_VALUE;
     BH1750::SetSimulatedIlluminance(static_cast<BH1750::IlluminanceType>((maximum / kIlluminancePercentMax) * illuminance_slider_->GetValue()));
     UNUSED(event);
-} /* OnIlluminance */
+}
 
-
-/******************************************************************************************************************************************************
-  OnTemperature()
-******************************************************************************************************************************************************/
 void Settings::OnTemperature(wxCommandEvent &event)
 {
     ApplyTemperature();
     UNUSED(event);
-} /* OnTemperature */
+}
 
-
-/******************************************************************************************************************************************************
-  OnTemperatureConnected()
-******************************************************************************************************************************************************/
 void Settings::OnTemperatureConnected(wxCommandEvent &event)
 {
     ApplyTemperature();
     UNUSED(event);
-} /* OnTemperatureConnected */
+}
 
-
-/******************************************************************************************************************************************************
-  ApplyTemperature()
-******************************************************************************************************************************************************/
 /*! \brief          Hands the dialled-in reading to the simulated clock chip
  *  \details        Both controls end here, because between them they describe one state:
  *                  a chip that is there and reads this much, or no chip at all. Moving the
  *                  slider while the box is cleared therefore changes nothing yet, and
  *                  ticking the box afterwards puts that value in - which is the order
  *                  somebody trying the overlay out will use it in.
-******************************************************************************************************************************************************/
+ */
 void Settings::ApplyTemperature()
 {
     if(!temperature_connected_check_box_->IsChecked()) {
@@ -222,9 +149,4 @@ void Settings::ApplyTemperature()
     }
 
     DS3231::SetSimulatedTemperature(static_cast<DS3231::TemperatureType>(temperature_slider_->GetValue() * DS3231::kTenthsPerDegree));
-} /* ApplyTemperature */
-
-
-/******************************************************************************************************************************************************
- *  E N D   O F   F I L E
-******************************************************************************************************************************************************/
+}

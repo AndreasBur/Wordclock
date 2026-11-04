@@ -1,21 +1,11 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
- *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       WebInterface.cpp
- *      \brief      Serves the console page and bridges its web socket to Serial
- *
-******************************************************************************************************************************************************/
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
 
-/******************************************************************************************************************************************************
- * I N C L U D E S
-******************************************************************************************************************************************************/
+/*!
+ * \file
+ * \brief Serves the console page and bridges its web socket to Serial.
+ */
+
 /* The framework's headers first, ahead of the Arduino.h that binds Serial to a macro. */
 #include <ESPmDNS.h>
 #include <Update.h>
@@ -33,11 +23,7 @@
 #include <string.h>
 #include <unistd.h>
 
-/******************************************************************************************************************************************************
- *  LOCAL DATA
-******************************************************************************************************************************************************/
 namespace {
-
 // Named http_server rather than Server: the Arduino core has a class Server in the global
 // namespace, and an unqualified Server here is then ambiguous.
 httpd_handle_t http_server{nullptr};
@@ -102,12 +88,6 @@ void SendLineToClients(const char* line)
     WebInterface::GetInstance().BroadcastLine(line);
 }
 
-/******************************************************************************************************************************************************
- *  LOCAL FUNCTIONS
-******************************************************************************************************************************************************/
-/******************************************************************************************************************************************************
-  IsRequestAuthorised()
-******************************************************************************************************************************************************/
 /*! \brief          Whether this request may be answered, and the 401 when it may not
  *
  *  \return         true when the handler may go on
@@ -125,7 +105,7 @@ void SendLineToClients(const char* line)
  *                  Every route goes through this, the web socket's handshake included - a
  *                  console that asked for a password and then took commands on an unchecked
  *                  socket would be a lock on the wrong door.
-******************************************************************************************************************************************************/
+ */
 bool IsRequestAuthorised(httpd_req_t* request)
 {
     if(!System::GetInstance().IsConsoleProtected()) { return true; }
@@ -151,10 +131,6 @@ bool IsRequestAuthorised(httpd_req_t* request)
     return false;
 }
 
-
-/******************************************************************************************************************************************************
-  HandleAsset()
-******************************************************************************************************************************************************/
 /*! \brief          Serves one of the files the clock hands out unchanged
  *
  *  \details        One handler for all five - the two pages, the manifest and the two icons -
@@ -166,7 +142,7 @@ bool IsRequestAuthorised(httpd_req_t* request)
  *                  is the whole of what the header does here, and the table says which.
  *
  *  \return         ESP_OK
-******************************************************************************************************************************************************/
+ */
 esp_err_t HandleAsset(httpd_req_t* request)
 {
     if(!IsRequestAuthorised(request)) { return ESP_OK; }
@@ -179,17 +155,13 @@ esp_err_t HandleAsset(httpd_req_t* request)
     return httpd_resp_send(request, reinterpret_cast<const char*>(asset.bytes), asset.size);
 }
 
-
-/******************************************************************************************************************************************************
-  SendUpdateResult()
-******************************************************************************************************************************************************/
 /*! \brief          Answers the update route, in the one shape the page reads
  *  \details        JSON like the other two routes that answer data, and the HTTP status set
  *                  with it - so the page can branch on the status and still have a sentence
  *                  to show. The reason travels as text on purpose: what goes wrong here is
  *                  a wrong file or a dropped connection, and a number for that would only
  *                  have to be translated back somewhere.
-******************************************************************************************************************************************************/
+ */
 esp_err_t SendUpdateResult(httpd_req_t* request, bool ok, const char* reason)
 {
     char body[192u];
@@ -211,10 +183,6 @@ esp_err_t SendUpdateResult(httpd_req_t* request, bool ok, const char* reason)
     return httpd_resp_send(request, body, HTTPD_RESP_USE_STRLEN);
 }
 
-
-/******************************************************************************************************************************************************
-  HandleUpdate()
-******************************************************************************************************************************************************/
 /*! \brief          Takes a new firmware image over HTTP and reboots into it
  *
  *  \return         ESP_OK once an answer has been sent, whichever answer that was
@@ -236,7 +204,7 @@ esp_err_t SendUpdateResult(httpd_req_t* request, bool ok, const char* reason)
  *                  the browser nothing at all - which reads as a failed update rather than
  *                  a finished one. System::Restart() already defers to the application's
  *                  tick for exactly this reason, so it is what carries it out.
-******************************************************************************************************************************************************/
+ */
 esp_err_t HandleUpdate(httpd_req_t* request)
 {
     if(!IsRequestAuthorised(request)) { return ESP_OK; }
@@ -292,12 +260,6 @@ esp_err_t HandleUpdate(httpd_req_t* request)
     return SendUpdateResult(request, true, "");
 }
 
-
-
-
-/******************************************************************************************************************************************************
-  HandleCommands() / HandleDisplay()
-******************************************************************************************************************************************************/
 /*! \brief          Serves the command catalog and the panel's letters
  *
  *  \details        Both documents are written by WebFrontend, shared with the RP2350 backend:
@@ -310,7 +272,7 @@ esp_err_t HandleUpdate(httpd_req_t* request)
  *                  content type, and a body to write into.
  *
  *  \return         ESP_OK
-******************************************************************************************************************************************************/
+ */
 esp_err_t HandleCommands(httpd_req_t* request)
 {
     if(!IsRequestAuthorised(request)) { return ESP_OK; }
@@ -331,10 +293,6 @@ esp_err_t HandleDisplay(httpd_req_t* request)
     return ESP_OK;
 }
 
-
-/******************************************************************************************************************************************************
-  HandleSocket()
-******************************************************************************************************************************************************/
 /*! \brief          Takes one web socket frame and injects it as typed characters
  *  \details        A GET is the handshake, and returning kEOk from it is what completes the
  *                  upgrade - the frame handling below only ever sees later requests.
@@ -345,7 +303,7 @@ esp_err_t HandleDisplay(httpd_req_t* request)
  *                  business.
  *
  *  \return         ESP_OK unless the frame could not be read
-******************************************************************************************************************************************************/
+ */
 esp_err_t HandleSocket(httpd_req_t* request)
 {
     /*
@@ -385,15 +343,11 @@ esp_err_t HandleSocket(httpd_req_t* request)
     return ESP_OK;
 }
 
-
-/******************************************************************************************************************************************************
-  OnSocketClosed()
-******************************************************************************************************************************************************/
 /*! \brief          Drops a client the server has finished with
  *  \details        Registered as the server's close hook rather than guessed from a failing
  *                  send: a browser that is simply gone never sends a close frame, and its
  *                  descriptor would otherwise be handed to send() for the rest of the run.
-******************************************************************************************************************************************************/
+ */
 void OnSocketClosed(httpd_handle_t, int descriptor)
 {
     WebInterface::GetInstance().OnClientClosed(descriptor);
@@ -401,10 +355,6 @@ void OnSocketClosed(httpd_handle_t, int descriptor)
 }
 
 } // namespace
-
-/******************************************************************************************************************************************************
- * P U B L I C   F U N C T I O N S
-******************************************************************************************************************************************************/
 
 /*
  * Instance methods, though some of them read no member: they are the interface the
@@ -414,13 +364,10 @@ void OnSocketClosed(httpd_handle_t, int descriptor)
  * that detail into the interface.
  */
 // NOLINTBEGIN(readability-convert-member-functions-to-static)
-/******************************************************************************************************************************************************
-  Begin()
-******************************************************************************************************************************************************/
 /*! \brief          Starts the server and takes over the output lines
  *
  *  \return         kEOk if the server is listening
-******************************************************************************************************************************************************/
+ */
 StdReturnType WebInterface::Begin()
 {
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
@@ -487,26 +434,18 @@ StdReturnType WebInterface::Begin()
     }
 
     return kEOk;
-} /* Begin */
+}
 
-
-/******************************************************************************************************************************************************
-  BroadcastLine()
-******************************************************************************************************************************************************/
 /*! \brief          Sends one finished line to every open socket
  *  \details        The widening to UTF-8 and the bound on it are WebFrontend's, shared with
  *                  the other backend; what is this file's is the walk over the descriptors,
  *                  in SendText() below.
-******************************************************************************************************************************************************/
+ */
 void WebInterface::BroadcastLine(const char* line)
 {
     WebFrontend::GetInstance().BroadcastLine(line);
-} /* BroadcastLine */
+}
 
-
-/******************************************************************************************************************************************************
-  BroadcastFrame()
-******************************************************************************************************************************************************/
 /*! \brief          Sends the pixel buffer to every open socket, when it changed
  *  \details        The rate limit, the gathering and the comparison against the last frame
  *                  are WebFrontend's, shared with the other backend - none of the three has
@@ -514,16 +453,12 @@ void WebInterface::BroadcastLine(const char* line)
  *                  SendBinary() below.
  *
  *  \return         -
-******************************************************************************************************************************************************/
+ */
 void WebInterface::BroadcastFrame()
 {
     WebFrontend::GetInstance().BroadcastFrame();
-} /* BroadcastFrame */
+}
 
-
-/******************************************************************************************************************************************************
- *  W E B   T R A N S P O R T
-******************************************************************************************************************************************************/
 /*
  * This backend's half of the contract WebFrontend.h states. Defined here rather than in a
  * source of its own because what it reads is this file's: the server handle above and the
@@ -561,10 +496,6 @@ void WebTransport::SendBinary(const byte* bytes, size_t length)
     SendToEveryClient(HTTPD_WS_TYPE_BINARY, const_cast<uint8_t*>(bytes), length);
 }
 
-
-/******************************************************************************************************************************************************
- *  W E B   R E S P O N S E   B O D Y
-******************************************************************************************************************************************************/
 // A chunked response, which is what this server offers: a chunk handed over is a chunk on the
 // wire, and the empty one at the end is what closes it.
 
@@ -584,15 +515,11 @@ void WebResponseBody::Finish()
     httpd_resp_send_chunk(request_, nullptr, 0);
 }
 
-
-/******************************************************************************************************************************************************
-  OnClientOpened()
-******************************************************************************************************************************************************/
 /*! \brief          Remembers a socket to broadcast to
  *  \details        A full table drops the newcomer rather than an established console, and
  *                  says so on the UART - silently serving a page whose socket then never
  *                  answers is the more confusing failure.
-******************************************************************************************************************************************************/
+ */
 void WebInterface::OnClientOpened(int descriptor)
 {
     /*
@@ -615,12 +542,8 @@ void WebInterface::OnClientOpened(int descriptor)
     }
 
     Serial.println(F("Web: too many consoles, this one gets no answers"));
-} /* OnClientOpened */
+}
 
-
-/******************************************************************************************************************************************************
-  OnClientClosed()
-******************************************************************************************************************************************************/
 void WebInterface::OnClientClosed(int descriptor)
 {
     for(size_t slot = 0u; slot < kMaxClients; slot++) {
@@ -629,9 +552,5 @@ void WebInterface::OnClientClosed(int descriptor)
             return;
         }
     }
-} /* OnClientClosed */
+}
 // NOLINTEND(readability-convert-member-functions-to-static)
-
-/******************************************************************************************************************************************************
- *  E N D   O F   F I L E
-******************************************************************************************************************************************************/

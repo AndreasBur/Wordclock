@@ -1,9 +1,4 @@
-/******************************************************************************************************************************************************
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       nightswitch_test.cpp
- *      \brief      The window, the midnight wrap, the strip's supply, and who wins between the timer and a hand
-******************************************************************************************************************************************************/
+// The window, the midnight wrap, the strip's supply, and who wins between the timer and a hand.
 
 #include "check.h"
 #include "cases.h"
@@ -16,7 +11,6 @@
 #include "RealTimeClock.h"
 
 namespace {
-
 // One tick of the night switch at a given time. Its own task rather than the scheduler's,
 // because what is being checked is the edge and not the cycle counting that reaches it.
 void TickAt(byte hour, byte minute)

@@ -1,71 +1,30 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
- *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       Display.cpp
- *      \brief
- *
- *      \details
- *
- *
-******************************************************************************************************************************************************/
+// Copyright 2017 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+/*!
+ * \file
+ * \brief What the display does itself: brightness, colour, current limit, words and pixels.
+ */
+
 #define _DISPLAY_SOURCE_
 
-/******************************************************************************************************************************************************
- * INCLUDES
-******************************************************************************************************************************************************/
 #include "Display.h"
 #include "Bit.h"
 
-/******************************************************************************************************************************************************
- *  LOCAL CONSTANT MACROS
-******************************************************************************************************************************************************/
-
-
-/******************************************************************************************************************************************************
- *  LOCAL FUNCTION MACROS
-******************************************************************************************************************************************************/
-
-
-/******************************************************************************************************************************************************
- *  LOCAL DATA TYPES AND STRUCTURES
-******************************************************************************************************************************************************/
-
-
-/******************************************************************************************************************************************************
- * P U B L I C   F U N C T I O N S
-******************************************************************************************************************************************************/
-
-/******************************************************************************************************************************************************
-  Init()
-******************************************************************************************************************************************************/
 void Display::Init()
 {
     Clear();
     pixel_stripe_.Init(DISPLAY_DATA_PIN);
     state_ = StateType::kInit;
-} /* Init */
+}
 
-/******************************************************************************************************************************************************
-  SetBrightness()
-******************************************************************************************************************************************************/
 void Display::SetBrightness(byte brightness)
 {
     /* only the wish is stored here, what reaches the LEDs is CalcBrightness() */
     brightness_.SetBrightness(brightness);
     ApplyBrightness();
-} /* SetBrightness */
+}
 
-
-/******************************************************************************************************************************************************
-  ApplyBrightness()
-******************************************************************************************************************************************************/
 void Display::ApplyBrightness()
 {
     /*
@@ -97,12 +56,8 @@ void Display::ApplyBrightness()
 #else
     ApplyColor();
 #endif
-} /* ApplyBrightness */
+}
 
-
-/******************************************************************************************************************************************************
-  ApplyColor()
-******************************************************************************************************************************************************/
 /*
  * The dimmed color is derived from the color and the brightness, and what the pixels carry
  * is the dimmed one - so a write to either invalidates both. ApplyBrightness() above has
@@ -124,12 +79,8 @@ void Display::ApplyColor()
     for(IndexType index = 0; index < DISPLAY_NUMBER_OF_PIXELS; index++) {
         if(GetPixel(index)) { SetPixel(index); }
     }
-} /* ApplyColor */
+}
 
-
-/******************************************************************************************************************************************************
-  ApplyColorAndCurrentLimit()
-*******************************************************************************************************************************************************/
 /*
  * The colour reaches the pixels, and then the cap is recomputed for it: white at the same
  * brightness draws three times what amber does, so a colour change moves the current as much
@@ -139,12 +90,8 @@ void Display::ApplyColorAndCurrentLimit()
 {
     ApplyColor();
     ApplyCurrentLimit();
-} /* ApplyColorAndCurrentLimit */
+}
 
-
-/******************************************************************************************************************************************************
-  GetNumberOfLitPixels()
-*******************************************************************************************************************************************************/
 /*
  * Counted from the strip's buffer rather than kept as a running total beside it. The
  * animations and SetPixel() write there directly, so a counter would be the copy that
@@ -160,12 +107,8 @@ byte Display::GetNumberOfLitPixels() const
         if(GetPixel(index)) { count++; }
     }
     return count;
-} /* GetNumberOfLitPixels */
+}
 
-
-/******************************************************************************************************************************************************
-  GetCurrentLimit()
-******************************************************************************************************************************************************/
 /*
  * Built from the colour and a count rather than from the pixel values, and that is not a
  * shortcut: which dimming path is compiled decides whether the buffer holds the dimmed colour
@@ -186,12 +129,8 @@ byte Display::GetCurrentLimit() const
     const uint16_t channel_sum = DisplayCurrentLimit::ToChannelSum(shown.GetRed(), shown.GetGreen(), shown.GetBlue());
 
     return DisplayCurrentLimit::ToBrightnessLimit(DISPLAY_NUMBER_OF_PIXELS, GetNumberOfLitPixels(), channel_sum);
-} /* GetCurrentLimit */
+}
 
-
-/******************************************************************************************************************************************************
-  ApplyCurrentLimit()
-******************************************************************************************************************************************************/
 /*
  * The cap rides on the strip's own master rather than on the colour written into the buffer,
  * and that placement is the whole reason this is cheap. The buffer keeps the colour somebody
@@ -213,12 +152,8 @@ void Display::ApplyCurrentLimit()
     if(limit == applied_current_limit_) { return; }
     applied_current_limit_ = limit;
     pixel_stripe_.SetBrightness(limit);
-} /* ApplyCurrentLimit */
+}
 
-
-/******************************************************************************************************************************************************
-  ResumeAtCurrentLimit()
-******************************************************************************************************************************************************/
 /*
  * What Enable() uses instead of EnablePixels(). The remembered value is set from the same
  * computation that is written, so the guard in ApplyCurrentLimit() agrees with the strip
@@ -228,11 +163,8 @@ void Display::ResumeAtCurrentLimit()
 {
     applied_current_limit_ = GetCurrentLimit();
     pixel_stripe_.SetBrightness(applied_current_limit_);
-} /* ResumeAtCurrentLimit */
+}
 
-/******************************************************************************************************************************************************
-  SetWord()
-******************************************************************************************************************************************************/
 StdReturnType Display::SetWord(WordIdType word_id, byte max_length)
 {
     StdReturnType return_value{kENotOk};
@@ -253,12 +185,8 @@ StdReturnType Display::SetWord(WordIdType word_id, byte max_length)
         return_value = kENotOk;
     }
     return return_value;
-} /* SetWord */
+}
 
-
-/******************************************************************************************************************************************************
-  ClearWord()
-******************************************************************************************************************************************************/
 StdReturnType Display::ClearWord(WordIdType word_id)
 {
     StdReturnType return_value{kENotOk};
@@ -274,12 +202,8 @@ StdReturnType Display::ClearWord(WordIdType word_id)
         return_value = kENotOk;
     }
     return return_value;
-} /* ClearWord */
+}
 
-
-/******************************************************************************************************************************************************
-  clearAllWords()
-******************************************************************************************************************************************************/
 StdReturnType Display::ClearWords()
 {
     StdReturnType return_value{kEOk};
@@ -288,46 +212,30 @@ StdReturnType Display::ClearWords()
         if(ClearWord(static_cast<WordIdType>(i)) == kENotOk) return_value = kENotOk;
     }
     return return_value;
-} /* clearAllWords */
+}
 
-
-/******************************************************************************************************************************************************
-  GetPixel()
-******************************************************************************************************************************************************/
 StdReturnType Display::GetPixel(IndexType index, PixelValueType& value) const
 {
     byte row, column;
     IndexToColumnAndRow(index, column, row);
     return GetPixel(column, row, value);
-} /* GetPixel */
+}
 
-
-/******************************************************************************************************************************************************
-  GetPixel()
-******************************************************************************************************************************************************/
 Display::PixelValueType Display::GetPixel(IndexType index) const
 {
     byte row, column;
     IndexToColumnAndRow(index, column, row);
     return GetPixel(column, row);
-} /* GetPixel */
+}
 
-
-/******************************************************************************************************************************************************
-  GetPixel()
-******************************************************************************************************************************************************/
 StdReturnType Display::GetPixel(byte column, byte row, PixelValueType& value)  const
 {
     if(!IsColumnAndRowValid(column, row)) { return kENotOk; }
 
     value = GetPixel(column, row);
     return kEOk;
-} /* GetPixel */
+}
 
-
-/******************************************************************************************************************************************************
-  GetPixel()
-******************************************************************************************************************************************************/
 Display::PixelValueType Display::GetPixel(byte column, byte row)  const
 {
     if(!IsColumnAndRowValid(column, row)) { return false; }
@@ -336,23 +244,15 @@ Display::PixelValueType Display::GetPixel(byte column, byte row)  const
 
     /* Pixel is only off when all colors are zero */
     return !(pixel.GetRed() == 0u && pixel.GetGreen() == 0u && pixel.GetBlue() == 0u);
-} /* GetPixel */
+}
 
-
-/******************************************************************************************************************************************************
-  SetPixel()
-******************************************************************************************************************************************************/
 StdReturnType Display::SetPixel(byte column, byte row)
 {
     if(!IsColumnAndRowValid(column, row)) { return kENotOk; }
 
     return pixel_stripe_.SetPixel(ToIndex(column, row), GetColorToWrite());
-} /* SetPixel */
+}
 
-
-/******************************************************************************************************************************************************
-  GetColorDimmed()
-******************************************************************************************************************************************************/
 Pixel Display::GetColorDimmed(byte brightness) const
 {
     // the display color stays the only color, the brightness just dimms it. It comes
@@ -361,56 +261,36 @@ Pixel Display::GetColorDimmed(byte brightness) const
     pixel_color.DimmPixel(brightness);
 
     return pixel_color;
-} /* GetColorDimmed */
+}
 
-
-/******************************************************************************************************************************************************
-  SetPixel()
-******************************************************************************************************************************************************/
 StdReturnType Display::SetPixel(byte column, byte row, byte brightness)
 {
     if(!IsColumnAndRowValid(column, row)) { return kENotOk; }
 
     return pixel_stripe_.SetPixel(ToIndex(column, row), GetColorDimmed(brightness));
-} /* SetPixel */
+}
 
-
-/******************************************************************************************************************************************************
-  SetPixel()
-******************************************************************************************************************************************************/
 StdReturnType Display::SetPixel(IndexType index)
 {
     byte row, column;
     IndexToColumnAndRow(index, column, row);
     return SetPixel(column,  row);
-} /* SetPixel */
+}
 
-
-/******************************************************************************************************************************************************
-  ClearPixel()
-******************************************************************************************************************************************************/
 StdReturnType Display::ClearPixel(byte column, byte row)
 {
     if(!IsColumnAndRowValid(column, row)) { return kENotOk; }
 
     return pixel_stripe_.ClearPixel(ToIndex(column, row));
-} /* ClearPixel */
+}
 
-
-/******************************************************************************************************************************************************
-  ClearPixel()
-******************************************************************************************************************************************************/
 StdReturnType Display::ClearPixel(IndexType index)
 {
     byte row, column;
     IndexToColumnAndRow(index, column, row);
     return ClearPixel(column,  row);
-} /* ClearPixel */
+}
 
-
-/******************************************************************************************************************************************************
-  TogglePixel()
-******************************************************************************************************************************************************/
 StdReturnType Display::TogglePixel(byte column, byte row)
 {
     if(!IsColumnAndRowValid(column, row)) { return kENotOk; }
@@ -425,23 +305,15 @@ StdReturnType Display::TogglePixel(byte column, byte row)
      */
     if(GetPixel(column, row)) { return ClearPixel(column, row); }
     else { return SetPixel(column, row); }
-} /* TogglePixel */
+}
 
-
-/******************************************************************************************************************************************************
-  TogglePixel()
-******************************************************************************************************************************************************/
 StdReturnType Display::TogglePixel(IndexType index)
 {
     byte row, column;
     IndexToColumnAndRow(index, column, row);
     return TogglePixel(column,  row);
-} /* TogglePixel */
+}
 
-
-/******************************************************************************************************************************************************
-  GetPixelRow()
-******************************************************************************************************************************************************/
 StdReturnType Display::GetPixelRow(byte row, PixelRowType& pixel_row) const
 {
     StdReturnType return_value{kEOk};
@@ -455,12 +327,8 @@ StdReturnType Display::GetPixelRow(byte row, PixelRowType& pixel_row) const
         }
     }
     return return_value;
-} /* GetPixelRow */
+}
 
-
-/******************************************************************************************************************************************************
-  GetPixelRow()
-******************************************************************************************************************************************************/
 Display::PixelRowType Display::GetPixelRow(byte row)  const
 {
     Bit<PixelRowType> pixel_row;
@@ -469,12 +337,8 @@ Display::PixelRowType Display::GetPixelRow(byte row)  const
         pixel_row[column] = GetPixel(column, row);
     }
     return pixel_row.GetValue();
-} /* GetPixelRow */
+}
 
-
-/******************************************************************************************************************************************************
-  GetPixelColumn()
-******************************************************************************************************************************************************/
 StdReturnType Display::GetPixelColumn(byte column, PixelRowType& pixel_column)  const
 {
     StdReturnType return_value{kEOk};
@@ -488,12 +352,8 @@ StdReturnType Display::GetPixelColumn(byte column, PixelRowType& pixel_column)  
         }
     }
     return return_value;
-} /* GetPixelColumn */
+}
 
-
-/******************************************************************************************************************************************************
-  GetPixelColumn()
-******************************************************************************************************************************************************/
 Display::PixelColumnType Display::GetPixelColumn(byte column)  const
 {
     Bit<PixelColumnType> pixel_column;
@@ -502,12 +362,8 @@ Display::PixelColumnType Display::GetPixelColumn(byte column)  const
         pixel_column[row] = GetPixel(column, row);
     }
     return pixel_column.GetValue();
-} /* GetPixelColumn */
+}
 
-
-/******************************************************************************************************************************************************
-  SetPixelRow()
-******************************************************************************************************************************************************/
 StdReturnType Display::SetPixelRow(byte row, PixelRowType pixel_row)
 {
     StdReturnType return_value{kEOk};
@@ -516,12 +372,8 @@ StdReturnType Display::SetPixelRow(byte row, PixelRowType pixel_row)
         if(WritePixel(column, row, Bit<PixelRowType>::ReadBit(pixel_row, column)) == kENotOk) return_value = kENotOk;
     }
     return return_value;
-} /* SetPixelRow */
+}
 
-
-/******************************************************************************************************************************************************
-  SetPixelColumn()
-******************************************************************************************************************************************************/
 StdReturnType Display::SetPixelColumn(byte column, PixelRowType pixel_column)
 {
     StdReturnType return_value{kEOk};
@@ -529,16 +381,8 @@ StdReturnType Display::SetPixelColumn(byte column, PixelRowType pixel_column)
         if(WritePixel(column, row, Bit<PixelRowType>::ReadBit(pixel_column, row)) == kENotOk) return_value = kENotOk;
     }
     return return_value;
-} /* SetPixelColumn */
+}
 
-
-/******************************************************************************************************************************************************
- * P R I V A T E   F U N C T I O N S
-******************************************************************************************************************************************************/
-
-/******************************************************************************************************************************************************
-  Constructor of Display
-******************************************************************************************************************************************************/
 Display::Display(Pixel color) : pixel_stripe_{Pixels::GetInstance()}
 #if (PIXELS_IS_SINGLETON == STD_OFF)
 : pixel_stripe_()
@@ -550,12 +394,8 @@ Display::Display(Pixel color) : pixel_stripe_{Pixels::GetInstance()}
 #if (DISPLAY_USE_PIXELS_DIMMING == STD_OFF)
     brightness_.SetBrightness(255u);
 #endif
-} /* Display */
+}
 
-
-/******************************************************************************************************************************************************
-  Constructor of Display
-******************************************************************************************************************************************************/
 Display::Display(ColorType red, ColorType green, ColorType blue) : pixel_stripe_{Pixels::GetInstance()}
 #if (PIXELS_IS_SINGLETON == STD_OFF)
 : pixel_stripe_()
@@ -569,20 +409,12 @@ Display::Display(ColorType red, ColorType green, ColorType blue) : pixel_stripe_
 #if (DISPLAY_USE_PIXELS_DIMMING == STD_OFF)
     brightness_.SetBrightness(255u);
 #endif
-} /* Display */
+}
 
-
-/******************************************************************************************************************************************************
-  Destructor of Display
-******************************************************************************************************************************************************/
 Display::~Display()
 {
+}
 
-} /* ~Display */
-
-/******************************************************************************************************************************************************
-  TransformToSerpentine()
-******************************************************************************************************************************************************/
 byte Display::TransformToSerpentine(byte column, byte row)
 {
     byte index;
@@ -591,21 +423,12 @@ byte Display::TransformToSerpentine(byte column, byte row)
     else index = (row * DISPLAY_NUMBER_OF_COLUMNS) + (DISPLAY_NUMBER_OF_COLUMNS - column - 1);
 
     return index;
-} /* TransformToSerpentine */
+}
 
-
-/******************************************************************************************************************************************************
-  TransformToSerpentine()
-******************************************************************************************************************************************************/
 byte Display::TransformToSerpentine(IndexType index)
 {
     byte column = IndexToColumn(index);
     byte row = IndexToRow(index);
 
     return TransformToSerpentine(column, row);
-} /* TransformToSerpentine */
-
-
-/******************************************************************************************************************************************************
- *  E N D   O F   F I L E
-******************************************************************************************************************************************************/
+}

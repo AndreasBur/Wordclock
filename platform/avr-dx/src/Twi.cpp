@@ -1,29 +1,16 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
- *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       Twi.cpp
- *      \brief      The I2C bus the clock chip and the light sensor share, see Twi.h
- *
-******************************************************************************************************************************************************/
+// Copyright 2017 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
 
-/******************************************************************************************************************************************************
- * I N C L U D E S
-******************************************************************************************************************************************************/
+/*!
+ * \file
+ * \brief The I2C bus the clock chip and the light sensor share, see Twi.h.
+ */
+
 #include <avr/io.h>
 
 #include "Arduino.h"
 #include "Twi.h"
 
-/******************************************************************************************************************************************************
- *  L O C A L   C O N S T A N T   M A C R O S
-******************************************************************************************************************************************************/
 /* The bus the strip left free, see Twi.h. */
 #define TWI_PERIPHERAL                  TWI1
 
@@ -43,17 +30,10 @@ static_assert((F_CPU / (2uL * TWI_FREQUENCY_HZ)) > TWI_BAUD_OVERHEAD_CYCLES,
 static_assert(TWI_BAUD_REGISTER <= 0xFFu, "Twi: F_CPU is too high for this bus frequency, the baud register does not fit");
 static_assert(TWI_TIMEOUT_LOOPS > 0u, "Twi: the timeout rounded down to zero, every transfer would fail immediately");
 
-/******************************************************************************************************************************************************
- *  P R I V A T E   F U N C T I O N S
-******************************************************************************************************************************************************/
-
-/******************************************************************************************************************************************************
-  WaitForWrite()
-******************************************************************************************************************************************************/
 /*! \brief          Waits for a written byte to have been acknowledged
  *  \return         kENotOk when the device did not answer, or when the bus never reported
  *                  the byte as sent at all
-******************************************************************************************************************************************************/
+ */
 StdReturnType Twi::WaitForWrite()
 {
     for(uint16_t loops = TWI_TIMEOUT_LOOPS; loops > 0u; loops--) {
@@ -69,12 +49,8 @@ StdReturnType Twi::WaitForWrite()
     }
 
     return kENotOk;
-} /* WaitForWrite */
+}
 
-
-/******************************************************************************************************************************************************
-  WaitForRead()
-******************************************************************************************************************************************************/
 StdReturnType Twi::WaitForRead()
 {
     for(uint16_t loops = TWI_TIMEOUT_LOOPS; loops > 0u; loops--) {
@@ -85,30 +61,18 @@ StdReturnType Twi::WaitForRead()
     }
 
     return kENotOk;
-} /* WaitForRead */
+}
 
-
-/******************************************************************************************************************************************************
-  Stop()
-******************************************************************************************************************************************************/
 /*! \brief          Releases the bus
  *  \details        Sent on every path out of a transfer, the failing ones included: a
  *                  transfer abandoned without a stop leaves the bus owned, and the next
  *                  reader - the other chip on it - would find it busy for good.
-******************************************************************************************************************************************************/
+ */
 void Twi::Stop()
 {
     TWI_PERIPHERAL.MCTRLB = TWI_MCMD_STOP_gc;
-} /* Stop */
+}
 
-
-/******************************************************************************************************************************************************
- *  P U B L I C   F U N C T I O N S
-******************************************************************************************************************************************************/
-
-/******************************************************************************************************************************************************
-  Init()
-******************************************************************************************************************************************************/
 void Twi::Init()
 {
     if(initialised_) { return; }
@@ -120,15 +84,11 @@ void Twi::Init()
     TWI_PERIPHERAL.MSTATUS = TWI_BUSSTATE_IDLE_gc;
 
     initialised_ = true;
-} /* Init */
-
+}
 
 // Not const, though nothing here writes a member: these drive the hardware, and a
 // const would say they change nothing.
 // NOLINTBEGIN(readability-make-member-function-const)
-/******************************************************************************************************************************************************
-  Write()
-******************************************************************************************************************************************************/
 StdReturnType Twi::Write(byte address, const byte* data, byte length)
 {
     if(!initialised_) { return kENotOk; }
@@ -151,17 +111,13 @@ StdReturnType Twi::Write(byte address, const byte* data, byte length)
 
     Stop();
     return kEOk;
-} /* Write */
+}
 
-
-/******************************************************************************************************************************************************
-  Read()
-******************************************************************************************************************************************************/
 /*! \brief          Reads a number of bytes from a device
  *  \details        Every byte but the last is acknowledged, the last one is not: that is how
  *                  the device is told to stop driving the bus, and acknowledging it too
  *                  would leave it sending into the stop condition.
-******************************************************************************************************************************************************/
+ */
 StdReturnType Twi::Read(byte address, byte* data, byte length)
 {
     if(!initialised_) { return kENotOk; }
@@ -184,37 +140,25 @@ StdReturnType Twi::Read(byte address, byte* data, byte length)
 
     TWI_PERIPHERAL.MCTRLB = TWI_ACKACT_NACK_gc | TWI_MCMD_STOP_gc;
     return kEOk;
-} /* Read */
+}
 // NOLINTEND(readability-make-member-function-const)
 
-
-/******************************************************************************************************************************************************
-  WriteRegister()
-******************************************************************************************************************************************************/
 StdReturnType Twi::WriteRegister(byte address, byte register_address, byte value)
 {
     const byte buffer[]{register_address, value};
 
     return Write(address, buffer, sizeof(buffer));
-} /* WriteRegister */
+}
 
-
-/******************************************************************************************************************************************************
-  ReadRegister()
-******************************************************************************************************************************************************/
 /*! \brief          Reads from a register of a device
  *  \details        Two transfers rather than a repeated start: the pointer write is stopped
  *                  before the read begins. Both chips here keep their register pointer across
  *                  the stop, and separating the transfers keeps this simple enough to have no
  *                  second waiting path to get wrong.
-******************************************************************************************************************************************************/
+ */
 StdReturnType Twi::ReadRegister(byte address, byte register_address, byte* data, byte length)
 {
     if(Write(address, &register_address, 1u) != kEOk) { return kENotOk; }
 
     return Read(address, data, length);
-} /* ReadRegister */
-
-/******************************************************************************************************************************************************
- *  E N D   O F   F I L E
-******************************************************************************************************************************************************/
+}

@@ -1,45 +1,31 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+/*!
+ * \file
+ * \brief 16-bit Timer/Counter type A as periodic interrupt and PWM source.
  *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       Timer.h
- *      \brief      16-bit Timer/Counter type A as periodic interrupt and PWM source
+ * The xmega E5's TC4/TC5 driver brought over to the Dx. One class for TCA0 and TCA1, picked by a
+ * traits struct, which is what the xmega version did for TCC4 and TCC5. There the two kinds
+ * differed in their register struct; here they do not - both are a TCA_SINGLE_t with three compare
+ * channels - so the traits carry what actually differs on this part: which instance, and which port
+ * its waveform outputs are routed to.
  *
- *      \details    The xmega E5's TC4/TC5 driver brought over to the Dx. One class for TCA0 and
- *                  TCA1, picked by a traits struct, which is what the xmega version did for TCC4
- *                  and TCC5. There the two kinds differed in their register struct; here they do
- *                  not - both are a TCA_SINGLE_t with three compare channels - so the traits carry
- *                  what actually differs on this part: which instance, and which port its waveform
- *                  outputs are routed to.
+ * The timer counts dual-slope and interrupts at BOTTOM, so a period spans 2 * PER timer cycles and
+ * PWM is phase-correct. That much is unchanged from the xmega.
  *
- *                  The timer counts dual-slope and interrupts at BOTTOM, so a period spans 2 * PER
- *                  timer cycles and PWM is phase-correct. That much is unchanged from the xmega.
- *
- *      \attention  Nothing in this backend calls this yet. The clock's tick is polled off millis()
- *                  in main.cpp, and the strip's timing belongs to TCB1/TCB2 and the CCL - see
- *                  WS2812.h. This is the driver, not a new time base.
- *
-******************************************************************************************************************************************************/
+ * \attention Nothing in this backend calls this yet. The clock's tick is polled off millis() in
+ * main.cpp, and the strip's timing belongs to TCB1/TCB2 and the CCL - see WS2812.h. This is the
+ * driver, not a new time base.
+ */
+
 #ifndef _TIMER_H_
 #define _TIMER_H_
 
-/******************************************************************************************************************************************************
- * I N C L U D E S
-******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include <avr/io.h>
 #include <stddef.h>
 
-
-/******************************************************************************************************************************************************
- *  G L O B A L   C O N S T A N T   M A C R O S
-******************************************************************************************************************************************************/
 /*
  * Timer configuration parameter: which timers get an instance and an overflow ISR.
  * Both are free here - unlike on the xmega, where the core owned TCD5 for millis() and drove
@@ -83,10 +69,6 @@
     #endif
 #endif
 
-
-/******************************************************************************************************************************************************
- *  G L O B A L   F U N C T I O N   M A C R O S
-******************************************************************************************************************************************************/
 /*
  * The letter above turned into the two names it stands for. Two steps each, because the letter is
  * itself a macro and has to be expanded before it is pasted rather than after.
@@ -103,10 +85,6 @@
 #define TIMER_ROUTE_TCA1(Letter)                TIMER_ROUTE_TCA1_PASTED(Letter)
 #define TIMER_ROUTE_TCA1_PASTED(Letter)         PORTMUX_TCA1_PORT##Letter##_gc
 
-
-/******************************************************************************************************************************************************
- *  T I M E R   T R A I T S
-******************************************************************************************************************************************************/
 #if (TIMER_USE_TCA0 == STD_ON)
 struct TimerA0
 {
@@ -142,16 +120,9 @@ struct TimerA1
 };
 #endif
 
-
-/******************************************************************************************************************************************************
- *  C L A S S   T I M E R
-******************************************************************************************************************************************************/
 template <typename TimerTraits>
 class Timer
 {
-/******************************************************************************************************************************************************
- *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
-******************************************************************************************************************************************************/
   public:
     /* Timer ISR callback function */
     typedef void (*TimerIsrCallbackFVoid)(void);
@@ -203,9 +174,6 @@ class Timer
     /* PWM duty resolution, the same 10 bit TimerOne offers */
     static constexpr uint16_t kPwmDutyMax{1023u};
 
-/******************************************************************************************************************************************************
- *  P R I V A T E   D A T A   A N D   F U N C T I O N S
-******************************************************************************************************************************************************/
   private:
     /*
      * The following are relied on by the shift and the pointer arithmetic further down,
@@ -285,9 +253,6 @@ class Timer
     StdReturnType DisablePwmChannel(TimerChannelType);
     StdReturnType SetPwmDutyChannel(TimerChannelType, uint16_t);
 
-/******************************************************************************************************************************************************
- *  P U B L I C   F U N C T I O N S
-******************************************************************************************************************************************************/
   public:
     // methods
     static Timer& GetInstance() {
@@ -321,7 +286,3 @@ class Timer
 };
 
 #endif
-
-/******************************************************************************************************************************************************
- *  E N D   O F   F I L E
-******************************************************************************************************************************************************/

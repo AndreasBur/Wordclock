@@ -1,42 +1,29 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+/*!
+ * \file
+ * \brief The port Serial is bound to: the UART plus an injected line source.
  *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       WordclockSerial.h
- *      \brief      The port Serial is bound to: the UART plus an injected line source
+ * Communication reads its commands one character at a time out of Serial, and every answer goes
+ * back out through the same object. A second front end - a web socket - therefore does not need a
+ * protocol of its own: it needs to reach this port. That is the same trick the simulator plays,
+ * where Serial is bound to a shim that writes into two text controls.
  *
- *      \details    Communication reads its commands one character at a time out of
- *                  Serial, and every answer goes back out through the same object. A
- *                  second front end - a web socket - therefore does not need a protocol
- *                  of its own: it needs to reach this port. That is the same trick the
- *                  simulator plays, where Serial is bound to a shim that writes into two
- *                  text controls.
+ * Reading takes the UART first and the injected characters second, so a console on the wire is
+ * never starved by a busy network client.
  *
- *                  Reading takes the UART first and the injected characters second, so a
- *                  console on the wire is never starved by a busy network client.
+ * Writing goes to the UART as it happens and is collected into a line at the same time. A whole
+ * line is what a web socket wants - one frame per answer rather than one per character - so the
+ * line sink is called from println(), not from print().
  *
- *                  Writing goes to the UART as it happens and is collected into a line at
- *                  the same time. A whole line is what a web socket wants - one frame per
- *                  answer rather than one per character - so the line sink is called from
- *                  println(), not from print().
- *
- *                  This header deliberately includes no Arduino header. Arduino.h next to
- *                  it includes the core's and then binds Serial to this class, so
- *                  including one from here would close that circle.
- *
-******************************************************************************************************************************************************/
+ * This header deliberately includes no Arduino header. Arduino.h next to it includes the core's and
+ * then binds Serial to this class, so including one from here would close that circle.
+ */
+
 #ifndef _WORDCLOCK_SERIAL_H_
 #define _WORDCLOCK_SERIAL_H_
 
-/******************************************************************************************************************************************************
- * I N C L U D E S
-******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 
 #include <atomic>
@@ -50,9 +37,6 @@
  */
 class __FlashStringHelper;
 
-/******************************************************************************************************************************************************
- *  G L O B A L   C O N S T A N T   M A C R O S
-******************************************************************************************************************************************************/
 /* WordclockSerial configuration parameter */
 // Room for one answer. Longer output is flushed early rather than truncated, which costs
 // a web socket client a split line and keeps the UART's output complete.
@@ -65,22 +49,13 @@ class __FlashStringHelper;
  */
 #define WORDCLOCK_SERIAL_INJECT_BUFFER_SIZE             256u
 
-/******************************************************************************************************************************************************
- *  C L A S S   W O R D C L O C K   S E R I A L
-******************************************************************************************************************************************************/
 class WordclockSerial
 {
-/******************************************************************************************************************************************************
- *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
-******************************************************************************************************************************************************/
   public:
     // A plain function pointer rather than std::function: this is called from the
     // firmware's task on every finished line, and nothing here allocates.
     using LineSinkType = void (*)(const char*);
 
-/******************************************************************************************************************************************************
- *  P R I V A T E   D A T A   A N D   F U N C T I O N S
-******************************************************************************************************************************************************/
   private:
     static constexpr size_t kLineLength{WORDCLOCK_SERIAL_LINE_LENGTH};
     static constexpr size_t kInjectBufferSize{WORDCLOCK_SERIAL_INJECT_BUFFER_SIZE};
@@ -115,9 +90,6 @@ class WordclockSerial
     WordclockSerial() { }
     ~WordclockSerial() { }
 
-/******************************************************************************************************************************************************
- *  P U B L I C   F U N C T I O N S
-******************************************************************************************************************************************************/
   public:
     static WordclockSerial& GetInstance() {
         static WordclockSerial singleton_instance;
@@ -165,7 +137,3 @@ class WordclockSerial
 };
 
 #endif // _WORDCLOCK_SERIAL_H_
-
-/******************************************************************************************************************************************************
- *  E N D   O F   F I L E
-******************************************************************************************************************************************************/

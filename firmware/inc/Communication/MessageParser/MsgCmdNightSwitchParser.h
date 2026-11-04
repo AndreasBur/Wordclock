@@ -1,49 +1,30 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+/*!
+ * \file
+ * \brief Configures when the clock takes the night off.
  *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       MsgCmdNightSwitchParser.h
- *      \brief      Configures when the clock takes the night off
+ * Five numbers and a switch: the two ends of the window, and how bright the display is inside it,
+ * where zero means off altogether.
  *
- *      \details    Five numbers and a switch: the two ends of the window, and how bright
- *                  the display is inside it, where zero means off altogether.
- *
- *                  Every option is optional, and what is not sent is left as it was - so
- *                  the end alone can be moved without repeating the start. The answer
- *                  reports the whole window whatever was sent, which is what makes a
- *                  half-remembered setting checkable in one line.
- *
-******************************************************************************************************************************************************/
+ * Every option is optional, and what is not sent is left as it was - so the end alone can be moved
+ * without repeating the start. The answer reports the whole window whatever was sent, which is what
+ * makes a half-remembered setting checkable in one line.
+ */
+
 #ifndef _MSG_CMD_NIGHT_SWITCH_PARSER_H_
 #define _MSG_CMD_NIGHT_SWITCH_PARSER_H_
 
-/******************************************************************************************************************************************************
- * I N C L U D E S
-******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Arduino.h"
 #include "MsgParameterParser.h"
 #include "NightSwitch.h"
 
-/******************************************************************************************************************************************************
- *  G L O B A L   C O N S T A N T   M A C R O S
-******************************************************************************************************************************************************/
 #define MSG_CMD_NIGHT_SWITCH_PARSER_PARAMETER_TABLE_SIZE        6u
 
-/******************************************************************************************************************************************************
- *  C L A S S   M S G   C M D   N I G H T   S W I T C H   P A R S E R
-******************************************************************************************************************************************************/
 class MsgCmdNightSwitchParser : public MsgParameterParser<MsgCmdNightSwitchParser, MSG_CMD_NIGHT_SWITCH_PARSER_PARAMETER_TABLE_SIZE>
 {
-/******************************************************************************************************************************************************
- *  P R I V A T E   D A T A   A N D   F U N C T I O N S
-******************************************************************************************************************************************************/
   private:
     friend class MsgParameterParser;
 
@@ -87,9 +68,6 @@ class MsgCmdNightSwitchParser : public MsgParameterParser<MsgCmdNightSwitchParse
         if(parameter_short_name == kBrightnessShortName)  { night_switch.SetNightBrightness(argument); }
     }
 
-/******************************************************************************************************************************************************
- *  P U B L I C   F U N C T I O N S
-******************************************************************************************************************************************************/
   public:
     constexpr MsgCmdNightSwitchParser(const char* parameter) : MsgParameterParser(kParameterTable, parameter) { }
     ~MsgCmdNightSwitchParser() { }
@@ -114,7 +92,3 @@ class MsgCmdNightSwitchParser : public MsgParameterParser<MsgCmdNightSwitchParse
 };
 
 #endif // _MSG_CMD_NIGHT_SWITCH_PARSER_H_
-
-/******************************************************************************************************************************************************
- *  E N D   O F   F I L E
-******************************************************************************************************************************************************/

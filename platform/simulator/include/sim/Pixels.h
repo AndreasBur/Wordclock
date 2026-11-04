@@ -1,41 +1,27 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
+// Copyright 2017 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+/*!
+ * \file
+ * \brief Simulator pixel strip (replaces the WS2812 driver).
  *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       Pixels.h
- *      \brief      Simulator pixel strip (replaces the WS2812 driver)
+ * Mirrors the public API of the hardware pixel driver - get/set/clear pixel, brightness, show -
+ * over a plain buffer, and nothing else.
  *
- *      \details    Mirrors the public API of the hardware pixel driver - get/set/clear
- *                  pixel, brightness, show - over a plain buffer, and nothing else.
+ * Deliberately free of wxWidgets: the window that renders this buffer is PixelsFrame. Nothing on
+ * the way from the firmware to a pixel constructs a window any more, which is what lets the tests
+ * in tests/ drive Display and DisplayManager without a display.
  *
- *                  Deliberately free of wxWidgets: the window that renders this buffer
- *                  is PixelsFrame. Nothing on the way from the firmware to a pixel
- *                  constructs a window any more, which is what lets the tests in tests/
- *                  drive Display and DisplayManager without a display.
- *
- *                  Serial still reaches wxWidgets through the Arduino shim, but
- *                  SerialShim holds null controls until it is attached and checks for
- *                  them, so printing headless is a no-op rather than a crash.
- *
-******************************************************************************************************************************************************/
+ * Serial still reaches wxWidgets through the Arduino shim, but SerialShim holds null controls until
+ * it is attached and checks for them, so printing headless is a no-op rather than a crash.
+ */
+
 #ifndef PIXELS_H
 #define PIXELS_H
 
-/******************************************************************************************************************************************************
- * I N C L U D E S
-******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Pixel.h"
 
-/******************************************************************************************************************************************************
- *  G L O B A L   C O N S T A N T   M A C R O S
-******************************************************************************************************************************************************/
 #define PIXELS_NUMBER_OF_LEDS                           110
 #define PIXELS_SUPPORT_DIMMING                          STD_ON
 #define PIXELS_IS_SINGLETON                             STD_ON
@@ -44,19 +30,8 @@
 #define PIXELS_DISPLAY_NUMBER_OF_COLUMNS                11u
 #define PIXELS_NUMBER_OF_PIXELS                         (PIXELS_DISPLAY_NUMBER_OF_ROWS * PIXELS_DISPLAY_NUMBER_OF_COLUMNS)
 
-/******************************************************************************************************************************************************
- *  G L O B A L   F U N C T I O N   M A C R O S
-******************************************************************************************************************************************************/
-
-
-/******************************************************************************************************************************************************
- *  C L A S S   P I X E L S
-******************************************************************************************************************************************************/
 class Pixels
 {
-/******************************************************************************************************************************************************
- *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
-******************************************************************************************************************************************************/
   public:
     using PixelType = Pixel;
 # if (PIXELS_NUMBER_OF_PIXELS < 255u)
@@ -65,9 +40,6 @@ class Pixels
     using IndexType = uint16_t;
 # endif
 
-/******************************************************************************************************************************************************
- *  P R I V A T E   D A T A   A N D   F U N C T I O N S
-******************************************************************************************************************************************************/
   private:
     // Zero-initialised, so the strip starts dark rather than at whatever the memory
     // held - the hardware driver starts from a defined state too.
@@ -98,9 +70,6 @@ class Pixels
     Pixels() { }
     ~Pixels() { }
 
-/******************************************************************************************************************************************************
- *  P U B L I C   F U N C T I O N S
-******************************************************************************************************************************************************/
   public:
     static Pixels& GetInstance() {
         static Pixels singleton_instance;
@@ -171,7 +140,3 @@ class Pixels
 };
 
 #endif // PIXELS_H
-
-/******************************************************************************************************************************************************
- *  E N D   O F   F I L E
-******************************************************************************************************************************************************/

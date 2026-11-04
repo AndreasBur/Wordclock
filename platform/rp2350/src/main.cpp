@@ -1,35 +1,23 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
- *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       main.cpp
- *      \brief      Entry point of the RP2350 application
- *
- *      \details    The counterpart of the simulator's WordclockApp: it starts the network
- *                  and the time synchronisation, then ticks the firmware at the scheduler's
- *                  interval and hands the finished frame to the strip.
- *
- *                  Nothing here blocks waiting for the network. The clock has to come up
- *                  and answer commands whether or not there is a WiFi to join, so the
- *                  connection and the first SNTP answer are simply awaited in the
- *                  background while the firmware already runs.
- *
- *                  The tick is kept against a running deadline rather than an RTOS's
- *                  absolute wake-up, because this core runs loop() on the bare metal. The
- *                  arithmetic below does what vTaskDelayUntil() does on the ESP32, and for
- *                  the same reason.
- *
-******************************************************************************************************************************************************/
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
 
-/******************************************************************************************************************************************************
- * I N C L U D E S
-******************************************************************************************************************************************************/
+/*!
+ * \file
+ * \brief Entry point of the RP2350 application.
+ *
+ * The counterpart of the simulator's WordclockApp: it starts the network and the time
+ * synchronisation, then ticks the firmware at the scheduler's interval and hands the finished frame
+ * to the strip.
+ *
+ * Nothing here blocks waiting for the network. The clock has to come up and answer commands whether
+ * or not there is a WiFi to join, so the connection and the first SNTP answer are simply awaited in
+ * the background while the firmware already runs.
+ *
+ * The tick is kept against a running deadline rather than an RTOS's absolute wake-up, because this
+ * core runs loop() on the bare metal. The arithmetic below does what vTaskDelayUntil() does on the
+ * ESP32, and for the same reason.
+ */
+
 // The framework headers come first, ahead of this platform's Arduino.h: that one binds
 // Serial to WordclockSerial, and the macro would otherwise reach into them.
 #include <WiFi.h>
@@ -45,11 +33,7 @@
 #include "WordclockConfiguration.h"
 #include "WordclockMain.h"
 
-/******************************************************************************************************************************************************
- *  LOCAL DATA
-******************************************************************************************************************************************************/
 namespace {
-
 WordclockMain wordclock;
 
 // The tick the whole firmware is timed against: every module's task cycle counts in this
@@ -57,9 +41,6 @@ WordclockMain wordclock;
 const uint32_t kTaskIntervalMs{Scheduler::GetTaskIntervalMs()};
 uint32_t next_tick_ms{0u};
 
-/******************************************************************************************************************************************************
- *  LOCAL FUNCTIONS
-******************************************************************************************************************************************************/
 /*
  * What the clock came up as, said once: the network it is joining, or the one it opened
  * because it has none. System does not print this itself - it also runs from the command
@@ -127,13 +108,6 @@ void WaitForNextTick()
 
 } // namespace
 
-/******************************************************************************************************************************************************
- * P U B L I C   F U N C T I O N S
-******************************************************************************************************************************************************/
-
-/******************************************************************************************************************************************************
-  setup()
-******************************************************************************************************************************************************/
 void setup()
 {
     Serial.begin(WORDCLOCK_SERIAL_BAUDRATE);
@@ -162,18 +136,14 @@ void setup()
     WebInterface::GetInstance().Begin();
 
     next_tick_ms = millis();
-} /* setup */
+}
 
-
-/******************************************************************************************************************************************************
-  loop()
-******************************************************************************************************************************************************/
 /*! \brief          Drives the firmware at the scheduler's interval
  *  \details        Timed against a running deadline rather than a delay of the interval,
  *                  so the work inside a tick does not stretch it: animation speeds, the
  *                  sensor's sampling rate and the serial poll rate all count in this
  *                  interval, and a drifting one silently rescales all three.
-******************************************************************************************************************************************************/
+ */
 void loop()
 {
     wordclock.Task();
@@ -193,8 +163,4 @@ void loop()
     System::GetInstance().PerformPendingRestart();
 
     WaitForNextTick();
-} /* loop */
-
-/******************************************************************************************************************************************************
- *  E N D   O F   F I L E
-******************************************************************************************************************************************************/
+}

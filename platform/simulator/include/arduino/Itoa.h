@@ -1,13 +1,17 @@
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+/*!
+ * \file
+ * \brief The Arduino function itoa(), which GCC and glibc do not provide.
+ *
+ * A minimal reimplementation of the Arduino signature (value, buffer, base), including base-10
+ * sign handling.
+ */
+
 #ifndef _ARDUINO_ITOA_H_
 #define _ARDUINO_ITOA_H_
 
-/* -------------------------------------------------------------------------- */
-/*  Itoa                                                                      */
-/* -------------------------------------------------------------------------- */
-/*  The Arduino core provides Itoa(); GCC/glibc does not. Minimal             */
-/*  reimplementation matching Arduino's signature (value, buffer, base),      */
-/*  including base-10 sign handling.                                          */
-/* -------------------------------------------------------------------------- */
 inline char* itoa(int value, char* buffer, int base) // NOLINT(readability-identifier-naming)
 {
     char* p = buffer;

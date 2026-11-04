@@ -1,32 +1,21 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+/*!
+ * \file
+ * \brief Puts a serial message together from a command and its options.
  *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       MessageBuilder.h
- *      \brief      Puts a serial message together from a command and its options
+ * Offers the commands the firmware understands by name, with an option row each, and writes the
+ * result into the pixel matrix window's input field. It does not send: that stays with the Send
+ * button there, so a built message can still be edited by hand first.
  *
- *      \details    Offers the commands the firmware understands by name, with an
- *                  option row each, and writes the result into the pixel matrix
- *                  window's input field. It does not send: that stays with the Send
- *                  button there, so a built message can still be edited by hand
- *                  first.
- *
- *                  Named MessageBuilder rather than Message, which the firmware
- *                  already uses for an incoming message.
- *
-******************************************************************************************************************************************************/
+ * Named MessageBuilder rather than Message, which the firmware already uses for an incoming
+ * message.
+ */
+
 #ifndef MESSAGE_BUILDER_H
 #define MESSAGE_BUILDER_H
 
-/******************************************************************************************************************************************************
- * I N C L U D E S
-******************************************************************************************************************************************************/
 #include <wx/wx.h>
 #include <wx/odcombo.h>
 #include <array>
@@ -34,26 +23,10 @@
 #include "PixelsFrame.h"
 #include "MessageCatalog.h"
 
-/******************************************************************************************************************************************************
- *  G L O B A L   C O N S T A N T   M A C R O S
-******************************************************************************************************************************************************/
-
-
-/******************************************************************************************************************************************************
- *  G L O B A L   F U N C T I O N   M A C R O S
-******************************************************************************************************************************************************/
-
-
-/******************************************************************************************************************************************************
- *  C L A S S   M E S S A G E   B U I L D E R
-******************************************************************************************************************************************************/
 // A dialog rather than a frame, so the compositor centres it over the main window.
 // Shown with Show(), not ShowModal(), so the input field it writes to stays reachable.
 class MessageBuilder : public wxDialog
 {
-/******************************************************************************************************************************************************
- *  P R I V A T E   D A T A   A N D   F U N C T I O N S
-******************************************************************************************************************************************************/
   private:
     // Own range, clear of the other windows'. The option rows get contiguous ranges of
     // their own, which is what lets one handler serve all of them.
@@ -137,9 +110,6 @@ class MessageBuilder : public wxDialog
     wxString BuildMessage() const;
     void UpdatePreview() { preview_->SetValue(BuildMessage()); }
 
-/******************************************************************************************************************************************************
- *  P U B L I C   F U N C T I O N S
-******************************************************************************************************************************************************/
   public:
     // Parented to the pixel matrix window, so closing that one takes this along and the
     // application can exit.
@@ -162,7 +132,3 @@ class MessageBuilder : public wxDialog
 };
 
 #endif // MESSAGE_BUILDER_H
-
-/******************************************************************************************************************************************************
- *  E N D   O F   F I L E
-******************************************************************************************************************************************************/

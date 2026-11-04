@@ -1,21 +1,11 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
- *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       WebHost.cpp
- *      \brief      Serves the clock's two pages from the simulator, on localhost
- *
-******************************************************************************************************************************************************/
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
 
-/******************************************************************************************************************************************************
- * I N C L U D E S
-******************************************************************************************************************************************************/
+/*!
+ * \file
+ * \brief Serves the clock's two pages from the simulator, on localhost.
+ */
+
 #include "sim/WebHost.h"
 
 #if (WEB_FRONTEND_SUPPORT == STD_ON)
@@ -48,24 +38,16 @@
 # define CLOSE_SOCKET close
 #endif
 
-/******************************************************************************************************************************************************
- * P U B L I C   F U N C T I O N S
-******************************************************************************************************************************************************/
-
-/******************************************************************************************************************************************************
-  CONSTRUCTOR OF WebHost
-******************************************************************************************************************************************************/
 /*! \brief          WebHost constructor
  *  \details        A host that listens nowhere until Begin(), and has no clients until then
  *                  either - which HasClients() may be asked before Begin() ever ran.
  *
  *  \return         -
-******************************************************************************************************************************************************/
+ */
 WebHost::WebHost()
 {
     for(size_t slot = 0u; slot < WEB_HOST_MAX_CLIENTS; slot++) { clients_[slot] = kInvalidSocket; }
-} /* WebHost */
-
+}
 
 WebHost& WebHost::GetInstance()
 {
@@ -73,10 +55,6 @@ WebHost& WebHost::GetInstance()
     return singleton_instance;
 }
 
-
-/******************************************************************************************************************************************************
-  Begin()
-******************************************************************************************************************************************************/
 /*! \brief          Opens the listening socket and takes over the output lines
  *
  *  \return         kEOk once the port is listening
@@ -85,7 +63,7 @@ WebHost& WebHost::GetInstance()
  *                  simulator open, and the second one is still a window worth having. It says
  *                  so and runs on, which is the same shape the ESP32 backend's server failure
  *                  has - fall back to what works rather than refuse to start.
-******************************************************************************************************************************************************/
+ */
 StdReturnType WebHost::Begin()
 {
 #ifdef _WIN32
@@ -101,12 +79,8 @@ StdReturnType WebHost::Begin()
     Serial.println("Web: http://localhost:8080/");
 
     return kEOk;
-} /* Begin */
+}
 
-
-/******************************************************************************************************************************************************
-  Task()
-******************************************************************************************************************************************************/
 /*! \brief          Accepts what has arrived and answers it
  *
  *  \details        Called from the firmware's tick, which is what makes every buffer here a
@@ -117,7 +91,7 @@ StdReturnType WebHost::Begin()
  *                  answer, so a browser opens a socket per file. That is a page load's worth
  *                  of connections on loopback and buys the whole of the keep-alive
  *                  bookkeeping not existing.
-******************************************************************************************************************************************************/
+ */
 void WebHost::Task()
 {
     if(listener_ == kInvalidSocket) { return; }
@@ -126,16 +100,12 @@ void WebHost::Task()
     for(size_t slot = 0u; slot < WEB_HOST_MAX_CLIENTS; slot++) {
         if(clients_[slot] != kInvalidSocket) { ReadClient(slot); }
     }
-} /* Task */
+}
 
-
-/******************************************************************************************************************************************************
-  End()
-******************************************************************************************************************************************************/
 /*! \brief          Closes every socket, for the way out
  *
  *  \return         -
-******************************************************************************************************************************************************/
+ */
 void WebHost::End()
 {
     for(size_t slot = 0u; slot < WEB_HOST_MAX_CLIENTS; slot++) { DropClient(slot); }
@@ -144,14 +114,12 @@ void WebHost::End()
         CLOSE_SOCKET(listener_);
         listener_ = kInvalidSocket;
     }
-} /* End */
-
+}
 
 bool WebHost::IsListening() const
 {
     return listener_ != kInvalidSocket;
 }
-
 
 bool WebHost::HasClients() const
 {
@@ -161,17 +129,13 @@ bool WebHost::HasClients() const
     return false;
 }
 
-
-/******************************************************************************************************************************************************
-  SendToEveryClient()
-******************************************************************************************************************************************************/
 /*! \brief          Sends one frame to every open web socket
  *
  *  \param[in]      is_binary       a binary frame rather than a text one
  *  \param[in]      payload         the bytes to send
  *  \param[in]      length          the number of bytes
  *  \return         -
-******************************************************************************************************************************************************/
+ */
 void WebHost::SendToEveryClient(bool is_binary, const char* payload, size_t length)
 {
     const std::string frame = WebSocket::EncodeFrame(is_binary, payload, length);
@@ -179,12 +143,8 @@ void WebHost::SendToEveryClient(bool is_binary, const char* payload, size_t leng
     for(size_t slot = 0u; slot < WEB_HOST_MAX_CLIENTS; slot++) {
         if(clients_[slot] != kInvalidSocket) { SendAll(clients_[slot], frame.data(), frame.size()); }
     }
-} /* SendToEveryClient */
+}
 
-
-/******************************************************************************************************************************************************
-  SendResponse()
-******************************************************************************************************************************************************/
 /*! \brief          Sends an HTTP response that closes the connection
  *  \details        Connection: close, because every connection but a web socket's is closed
  *                  after its answer - see Task().
@@ -196,7 +156,7 @@ void WebHost::SendToEveryClient(bool is_binary, const char* payload, size_t leng
  *  \param[in]      length          the length of the body
  *  \param[in]      is_gzipped      the body is gzip-compressed and says so
  *  \return         -
-******************************************************************************************************************************************************/
+ */
 void WebHost::SendResponse(SocketType socket, const char* status, const char* content_type,
                            const char* body, size_t length, bool is_gzipped)
 {
@@ -208,23 +168,15 @@ void WebHost::SendResponse(SocketType socket, const char* status, const char* co
 
     if(!SendAll(socket, header, static_cast<size_t>(written))) { return; }
     SendAll(socket, body, length);
-} /* SendResponse */
+}
 
-
-/******************************************************************************************************************************************************
- * P R I V A T E   F U N C T I O N S
-******************************************************************************************************************************************************/
-
-/******************************************************************************************************************************************************
-  AcceptClients()
-******************************************************************************************************************************************************/
 /*! \brief          Answers every new connection
  *  \details        Keeps a connection that became a web socket, as long as there is a free
  *                  slot for it, and closes every other one. A connection that arrives with
  *                  every slot taken is closed unread.
  *
  *  \return         -
-******************************************************************************************************************************************************/
+ */
 void WebHost::AcceptClients()
 {
     for(;;) {
@@ -240,19 +192,15 @@ void WebHost::AcceptClients()
             CLOSE_SOCKET(accepted);
         }
     }
-} /* AcceptClients */
+}
 
-
-/******************************************************************************************************************************************************
-  ReadClient()
-******************************************************************************************************************************************************/
 /*! \brief          Reads what a web socket has to say - commands, and the close that ends one
  *  \details        Collects the bytes until a frame is complete; a closed connection or a
  *                  close frame drops the client.
  *
  *  \param[in]      slot            the client's slot
  *  \return         -
-******************************************************************************************************************************************************/
+ */
 void WebHost::ReadClient(size_t slot)
 {
     char chunk[kFrameChunkLength];
@@ -267,35 +215,27 @@ void WebHost::ReadClient(size_t slot)
         if(opcode == WebSocket::kCloseOpcode) { DropClient(slot); return; }
         if(opcode == WebSocket::kTextOpcode)  { WebFrontend::InjectCommand(payload.data(), payload.size()); }
     }
-} /* ReadClient */
+}
 
-
-/******************************************************************************************************************************************************
-  FindFreeSlot()
-******************************************************************************************************************************************************/
 /*! \brief          Finds a slot for a new web socket
  *
  *  \return         the first slot without a client, or WEB_HOST_MAX_CLIENTS when all are taken
-******************************************************************************************************************************************************/
+ */
 size_t WebHost::FindFreeSlot() const
 {
     size_t slot{0u};
 
     while((slot < WEB_HOST_MAX_CLIENTS) && (clients_[slot] != kInvalidSocket)) { slot++; }
     return slot;
-} /* FindFreeSlot */
+}
 
-
-/******************************************************************************************************************************************************
-  DropClient()
-******************************************************************************************************************************************************/
 /*! \brief          Closes a web socket
  *  \details        Frees the slot and forgets what the client sent that was not yet a whole
  *                  frame. An empty slot is left alone, so that End() may call this on every one.
  *
  *  \param[in]      slot            the client's slot
  *  \return         -
-******************************************************************************************************************************************************/
+ */
 void WebHost::DropClient(size_t slot)
 {
     if(clients_[slot] == kInvalidSocket) { return; }
@@ -303,12 +243,8 @@ void WebHost::DropClient(size_t slot)
     CLOSE_SOCKET(clients_[slot]);
     clients_[slot] = kInvalidSocket;
     pending_[slot].clear();
-} /* DropClient */
+}
 
-
-/******************************************************************************************************************************************************
-  ServeConnection()
-******************************************************************************************************************************************************/
 /*! \brief          Answers one accepted connection
  *  \details        An image is the one body that arrives here, and it comes in many packets
  *                  rather than the one every other request fits in, so an update is drained
@@ -317,7 +253,7 @@ void WebHost::DropClient(size_t slot)
  *  \param[in]      socket          the new connection
  *  \return         true            the connection stays, which only a web socket does
  *                  false           the connection is done
-******************************************************************************************************************************************************/
+ */
 bool WebHost::ServeConnection(SocketType socket)
 {
     SetBlocking(socket);
@@ -332,12 +268,8 @@ bool WebHost::ServeConnection(SocketType socket)
         return false;
     }
     return AnswerRequest(socket, request);
-} /* ServeConnection */
+}
 
-
-/******************************************************************************************************************************************************
-  AnswerRequest()
-******************************************************************************************************************************************************/
 /*! \brief          Answers everything that is not an update
  *  \details        Opens a web socket on its path, writes the two JSON documents, serves the
  *                  assets, and gives every other path a 404.
@@ -346,7 +278,7 @@ bool WebHost::ServeConnection(SocketType socket)
  *  \param[in]      request         the whole request, headers included
  *  \return         true            the connection stays, which only a web socket does
  *                  false           the connection is done
-******************************************************************************************************************************************************/
+ */
 bool WebHost::AnswerRequest(SocketType socket, const std::string& request)
 {
     std::string path;
@@ -374,12 +306,8 @@ bool WebHost::AnswerRequest(SocketType socket, const std::string& request)
     static constexpr char kNotFound[]{"no such route on the simulator\n"};
     SendResponse(socket, "404 Not Found", "text/plain", kNotFound, sizeof(kNotFound) - 1u, false);
     return false;
-} /* AnswerRequest */
+}
 
-
-/******************************************************************************************************************************************************
-  AnswerUpdate()
-******************************************************************************************************************************************************/
 /*! \brief          Answers POST /update, in the two shapes the panel reads
  *
  *  \details        Nothing is installed and nothing is written, and that is not a shortcut
@@ -391,7 +319,7 @@ bool WebHost::AnswerRequest(SocketType socket, const std::string& request)
  *
  *                  Refused below a size no real image is, so both answers are reachable: pick
  *                  a small file to see the failing path, a release image to see the other.
-******************************************************************************************************************************************************/
+ */
 void WebHost::AnswerUpdate(SocketType socket, size_t received)
 {
     static constexpr size_t kSmallestPlausibleImage{size_t{64u} * 1024u};
@@ -412,19 +340,15 @@ void WebHost::AnswerUpdate(SocketType socket, size_t received)
                                  received);
 
     SendResponse(socket, "400 Bad Request", "application/json", refused, static_cast<size_t>(written), false);
-} /* AnswerUpdate */
+}
 
-
-/******************************************************************************************************************************************************
-  SendAsset()
-******************************************************************************************************************************************************/
 /*! \brief          Sends the embedded file served on a path
  *
  *  \param[in]      socket          the connection
  *  \param[in]      path            the path the browser asked for
  *  \return         kEOk
  *                  kENotOk        no asset is served on that path, and nothing was sent
-******************************************************************************************************************************************************/
+ */
 StdReturnType WebHost::SendAsset(SocketType socket, const std::string& path)
 {
     for(byte index = 0u; index < WebFrontend::GetNumberOfAssets(); index++) {
@@ -437,19 +361,15 @@ StdReturnType WebHost::SendAsset(SocketType socket, const std::string& path)
         }
     }
     return kENotOk;
-} /* SendAsset */
+}
 
-
-/******************************************************************************************************************************************************
-  OpenListener()
-******************************************************************************************************************************************************/
 /*! \brief          Opens a listening socket on loopback
  *  \details        Loopback only. This serves a firmware console with no password on it, and
  *                  the one on a clock is at least on somebody's own network; a desktop is not
  *                  the place to open that to a coffee shop.
  *
  *  \return         the socket, or kInvalidSocket when it could not be opened
-******************************************************************************************************************************************************/
+ */
 WebHost::SocketType WebHost::OpenListener()
 {
     const SocketType socket = ::socket(AF_INET, SOCK_STREAM, 0);
@@ -476,12 +396,8 @@ WebHost::SocketType WebHost::OpenListener()
     }
     SetNonBlocking(socket);
     return socket;
-} /* OpenListener */
+}
 
-
-/******************************************************************************************************************************************************
-  ReadRequest()
-******************************************************************************************************************************************************/
 /*! \brief          Reads an HTTP request up to the blank line after its headers
  *  \details        Read here and now, because it is one packet on loopback - but never waited
  *                  for without end. A connection that is opened and says nothing is not a
@@ -493,7 +409,7 @@ WebHost::SocketType WebHost::OpenListener()
  *
  *  \param[in]      socket          the new connection
  *  \return         the request, or what arrived of it before the connection closed
-******************************************************************************************************************************************************/
+ */
 std::string WebHost::ReadRequest(SocketType socket)
 {
     std::string request;
@@ -506,19 +422,15 @@ std::string WebHost::ReadRequest(SocketType socket)
         request.append(chunk, static_cast<size_t>(read));
     }
     return request;
-} /* ReadRequest */
+}
 
-
-/******************************************************************************************************************************************************
-  GetPath()
-******************************************************************************************************************************************************/
 /*! \brief          Finds the path in an HTTP request
  *
  *  \param[in]      request         the whole request
  *  \param[out]     path            what stands between the first two spaces of the request line
  *  \return         kEOk
  *                  kENotOk        the request line has no path
-******************************************************************************************************************************************************/
+ */
 StdReturnType WebHost::GetPath(const std::string& request, std::string& path)
 {
     const size_t start = request.find(' ');
@@ -528,28 +440,20 @@ StdReturnType WebHost::GetPath(const std::string& request, std::string& path)
 
     path = request.substr(start + 1u, end - start - 1u);
     return kEOk;
-} /* GetPath */
+}
 
-
-/******************************************************************************************************************************************************
-  IsUpdateRequest()
-******************************************************************************************************************************************************/
 /*! \brief          Tells an update from every other request
  *  \details        Asked of the route and not only of the header, so that a body on any other
  *                  request is not mistaken for an image.
  *
  *  \param[in]      request         the whole request
  *  \return         true            it is POST /update
-******************************************************************************************************************************************************/
+ */
 bool WebHost::IsUpdateRequest(const std::string& request)
 {
     return request.compare(0u, sizeof(kUpdateRequestLine) - 1u, kUpdateRequestLine) == 0;
-} /* IsUpdateRequest */
+}
 
-
-/******************************************************************************************************************************************************
-  GetAnnouncedLength()
-******************************************************************************************************************************************************/
 /*! \brief          What the request announced it would send
  *  \details        So a body can be read to its end rather than to whatever arrived in the
  *                  first packet.
@@ -557,7 +461,7 @@ bool WebHost::IsUpdateRequest(const std::string& request)
  *  \param[in]      request         the whole request, headers included
  *  \return         the Content-Length, or 0 without one: absent means nothing follows the
  *                  headers
-******************************************************************************************************************************************************/
+ */
 size_t WebHost::GetAnnouncedLength(const std::string& request)
 {
     std::string lowered(request);
@@ -567,27 +471,19 @@ size_t WebHost::GetAnnouncedLength(const std::string& request)
     if(found == std::string::npos) { return 0u; }
 
     return static_cast<size_t>(strtoul(&request[found + sizeof(kLengthHeader) - 1u], nullptr, 10));
-} /* GetAnnouncedLength */
+}
 
-
-/******************************************************************************************************************************************************
-  GetArrivedBodyLength()
-******************************************************************************************************************************************************/
 /*! \brief          How much of the body came along in the packets that carried the headers
  *
  *  \param[in]      request         what ReadRequest() read
  *  \return         the bytes past the blank line, or 0 when the headers never ended
-******************************************************************************************************************************************************/
+ */
 size_t WebHost::GetArrivedBodyLength(const std::string& request)
 {
     const size_t header_end = request.find("\r\n\r\n");
     return (header_end == std::string::npos) ? 0u : (request.size() - header_end - 4u);
-} /* GetArrivedBodyLength */
+}
 
-
-/******************************************************************************************************************************************************
-  DrainBody()
-******************************************************************************************************************************************************/
 /*! \brief          Reads the rest of a body and throws it away
  *  \details        Drained rather than parsed: what the panel needs answered is how much of it
  *                  turned up. Under its own, longer receive timeout than the request: an
@@ -600,7 +496,7 @@ size_t WebHost::GetArrivedBodyLength(const std::string& request)
  *  \param[in]      received        what has arrived of the body so far
  *  \param[in]      announced       what the request said would arrive
  *  \return         what arrived in all, short of Announced when the connection closed early
-******************************************************************************************************************************************************/
+ */
 size_t WebHost::DrainBody(SocketType socket, size_t received, size_t announced)
 {
     char chunk[kRequestChunkLength];
@@ -612,18 +508,14 @@ size_t WebHost::DrainBody(SocketType socket, size_t received, size_t announced)
         received += static_cast<size_t>(read);
     }
     return received;
-} /* DrainBody */
+}
 
-
-/******************************************************************************************************************************************************
-  SetNonBlocking()
-******************************************************************************************************************************************************/
 /*! \brief          Lets a socket return at once
  *  \details        So that polling it from the tick never stops the firmware.
  *
  *  \param[in]      socket          the socket
  *  \return         -
-******************************************************************************************************************************************************/
+ */
 void WebHost::SetNonBlocking(SocketType socket)
 {
 #ifdef _WIN32
@@ -632,12 +524,8 @@ void WebHost::SetNonBlocking(SocketType socket)
 #else
     fcntl(socket, F_SETFL, fcntl(socket, F_GETFL, 0) | O_NONBLOCK);
 #endif
-} /* SetNonBlocking */
+}
 
-
-/******************************************************************************************************************************************************
-  SetBlocking()
-******************************************************************************************************************************************************/
 /*! \brief          Lets a socket wait for its bytes
  *  \details        For a connection fresh from accept(), which on Windows has the listener's
  *                  properties - non-blocking among them - and on Linux has not. Left as it
@@ -648,7 +536,7 @@ void WebHost::SetNonBlocking(SocketType socket)
  *
  *  \param[in]      socket          the socket
  *  \return         -
-******************************************************************************************************************************************************/
+ */
 void WebHost::SetBlocking(SocketType socket)
 {
 #ifdef _WIN32
@@ -657,12 +545,8 @@ void WebHost::SetBlocking(SocketType socket)
 #else
     fcntl(socket, F_SETFL, fcntl(socket, F_GETFL, 0) & ~O_NONBLOCK);
 #endif
-} /* SetBlocking */
+}
 
-
-/******************************************************************************************************************************************************
-  SetReceiveTimeout()
-******************************************************************************************************************************************************/
 /*! \brief          Lets recv() on a blocking socket give up after a while
  *  \details        A timeout on the socket rather than a select() before every recv(): the
  *                  read loops already end on a recv() that returns nothing, so they need no
@@ -671,7 +555,7 @@ void WebHost::SetBlocking(SocketType socket)
  *  \param[in]      socket          the connection
  *  \param[in]      milliseconds    how long one recv() may wait for the next bytes
  *  \return         -
-******************************************************************************************************************************************************/
+ */
 void WebHost::SetReceiveTimeout(SocketType socket, unsigned milliseconds)
 {
 #ifdef _WIN32
@@ -682,12 +566,8 @@ void WebHost::SetReceiveTimeout(SocketType socket, unsigned milliseconds)
     timeout.tv_usec = static_cast<suseconds_t>((milliseconds % 1000u) * 1000u);
 #endif
     setsockopt(socket, SOL_SOCKET, SO_RCVTIMEO, reinterpret_cast<const char*>(&timeout), sizeof(timeout));
-} /* SetReceiveTimeout */
+}
 
-
-/******************************************************************************************************************************************************
-  SendAll()
-******************************************************************************************************************************************************/
 /*! \brief          Sends all of a buffer
  *  \details        Everything or nothing, because a half-written frame is a broken connection
  *                  rather than a short one. Loopback takes all of it in one call in every case
@@ -699,7 +579,7 @@ void WebHost::SetReceiveTimeout(SocketType socket, unsigned milliseconds)
  *  \param[in]      length          the number of bytes
  *  \return         true            all was sent
  *                  false           the connection is broken
-******************************************************************************************************************************************************/
+ */
 bool WebHost::SendAll(SocketType socket, const char* data, size_t length)
 {
     size_t sent{0u};
@@ -714,27 +594,19 @@ bool WebHost::SendAll(SocketType socket, const char* data, size_t length)
         return false;
     }
     return true;
-} /* SendAll */
+}
 
-
-/******************************************************************************************************************************************************
-  SendLineToClients()
-******************************************************************************************************************************************************/
 /*! \brief          Hands a finished output line to the pages
  *  \details        Static because SerialShim takes a plain function pointer.
  *
  *  \param[in]      line            the line, without its line end
  *  \return         -
-******************************************************************************************************************************************************/
+ */
 void WebHost::SendLineToClients(const char* line)
 {
     WebFrontend::GetInstance().BroadcastLine(line);
-} /* SendLineToClients */
+}
 
-
-/******************************************************************************************************************************************************
- *  W E B   T R A N S P O R T
-******************************************************************************************************************************************************/
 /* The simulator's half of the contract WebFrontend.h states, in terms of the host above. */
 
 WebTransport& WebTransport::GetInstance()
@@ -764,10 +636,6 @@ void WebTransport::SendBinary(const byte* bytes, size_t length)
 }
 // NOLINTEND(readability-convert-member-functions-to-static)
 
-
-/******************************************************************************************************************************************************
- *  W E B   R E S P O N S E   B O D Y
-******************************************************************************************************************************************************/
 /*
  * Collected and sent whole. The two documents this carries are a few kilobytes at most and
  * go to loopback, so a Content-Length up front is simpler than a chunked encoding - and it is
@@ -790,7 +658,3 @@ void WebResponseBody::Finish()
 }
 
 #endif // (WEB_FRONTEND_SUPPORT == STD_ON)
-
-/******************************************************************************************************************************************************
- *  E N D   O F   F I L E
-******************************************************************************************************************************************************/

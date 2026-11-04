@@ -1,33 +1,16 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
- *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       BH1750.cpp
- *      \brief      The ambient-light sensor the display dims itself by, see BH1750.h
- *
-******************************************************************************************************************************************************/
+// Copyright 2017 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
 
-/******************************************************************************************************************************************************
- * I N C L U D E S
-******************************************************************************************************************************************************/
+/*!
+ * \file
+ * \brief The ambient-light sensor the display dims itself by, see BH1750.h.
+ */
+
 #include "Arduino.h"
 #include "BH1750.h"
 #include "Bit.h"
 #include "Twi.h"
 
-/******************************************************************************************************************************************************
- *  P U B L I C   F U N C T I O N S
-******************************************************************************************************************************************************/
-
-/******************************************************************************************************************************************************
-  Init()
-******************************************************************************************************************************************************/
 StdReturnType BH1750::Init(ModeType mode)
 {
     if(StartBus() == kENotOk) { return kENotOk; }
@@ -40,12 +23,8 @@ StdReturnType BH1750::Init(ModeType mode)
     if(SendCommand(BH1750_CMD_POWER_ON) == kENotOk) { return kENotOk; }
 
     return SetMode(mode);
-} /* Init */
+}
 
-
-/******************************************************************************************************************************************************
-  SetMode()
-******************************************************************************************************************************************************/
 /*! \brief          Puts the sensor into a measurement mode
  *  \details        Mode is assigned only once the sensor has acknowledged, because it is
  *                  also what IsReady() reads to decide whether the sensor is set up.
@@ -53,7 +32,7 @@ StdReturnType BH1750::Init(ModeType mode)
  *                  the retry in Task() then never runs again - which leaves the sensor
  *                  powered on but converting nothing, and every later reading is the empty
  *                  data register.
-******************************************************************************************************************************************************/
+ */
 StdReturnType BH1750::SetMode(ModeType mode)
 {
     if(mode == ModeType::kNone) { return kENotOk; }
@@ -62,17 +41,13 @@ StdReturnType BH1750::SetMode(ModeType mode)
 
     mode_ = mode;
     return kEOk;
-} /* SetMode */
+}
 
-
-/******************************************************************************************************************************************************
-  ChangeMeasurementTime()
-******************************************************************************************************************************************************/
 /*! \brief          Changes the sensor's measurement time register
  *  \details        The register is split over two commands, and in both of them the value
  *                  bits sit below the opcode bits - so the value is ORed in rather than
  *                  shifted into place.
-******************************************************************************************************************************************************/
+ */
 StdReturnType BH1750::ChangeMeasurementTime(byte mt_reg_value)
 {
     if(!IsMtRegValueInRange(mt_reg_value)) { return kENotOk; }
@@ -96,18 +71,14 @@ StdReturnType BH1750::ChangeMeasurementTime(byte mt_reg_value)
      */
     measurement_time_ = mt_reg_value;
     return kEOk;
-} /* ChangeMeasurementTime */
+}
 
-
-/******************************************************************************************************************************************************
-  Task()
-******************************************************************************************************************************************************/
 /*! \brief          Reads the sensor, setting it up first if that has not worked yet
  *  \details        Set up from here rather than from an Init() call, and retried until it
  *                  works: the core keeps its sensor private and has no place to call Init()
  *                  from. The retry costs one failing transfer per cycle on a board with no
  *                  sensor, which the bounded timeouts keep short.
-******************************************************************************************************************************************************/
+ */
 void BH1750::Task()
 {
     /*
@@ -128,47 +99,31 @@ void BH1750::Task()
 
     read_failures_ = 0u;
     SendModeForOneTimeMode();
-} /* Task */
+}
 
-
-/******************************************************************************************************************************************************
- * P R I V A T E   F U N C T I O N S
-******************************************************************************************************************************************************/
-
-/******************************************************************************************************************************************************
-  StartBus()
-******************************************************************************************************************************************************/
 StdReturnType BH1750::StartBus()
 {
     Twi::GetInstance().Init();
     bus_started_ = true;
 
     return kEOk;
-} /* StartBus */
+}
 
-
-/******************************************************************************************************************************************************
-  SendCommand()
-******************************************************************************************************************************************************/
 /*! \brief          Sends one opcode to the sensor
  *  \details        The sensor has no register pointer: every command is a single byte, and
  *                  a measurement is read straight back without addressing anything.
-******************************************************************************************************************************************************/
+ */
 StdReturnType BH1750::SendCommand(byte command)
 {
     return Twi::GetInstance().Write(BH1750_I2C_ADDR, &command, 1u);
-} /* SendCommand */
+}
 
-
-/******************************************************************************************************************************************************
-  ReadIlluminance()
-******************************************************************************************************************************************************/
 /*! \brief          Reads the last measurement and converts it to lux
  *  \details        The reading is kept as it was when the sensor does not answer, rather
  *                  than falling to zero: the brightness automatic works on this value, so a
  *                  dropped reading would otherwise dim the display for a second. What bounds
  *                  that is the caller - see CountReadFailure().
-******************************************************************************************************************************************************/
+ */
 StdReturnType BH1750::ReadIlluminance()
 {
     byte raw_value[BH1750_ILLUMINANCE_RAW_VALUE_NUMBER_OF_BYTES]{};
@@ -178,27 +133,19 @@ StdReturnType BH1750::ReadIlluminance()
     illuminance_ = ConvertRawToLux(CombineRawValueParts(raw_value[0u], raw_value[1u]));
 
     return kEOk;
-} /* ReadIlluminance */
+}
 
-
-/******************************************************************************************************************************************************
-  SendModeForOneTimeMode()
-******************************************************************************************************************************************************/
 /*! \brief          Starts the next measurement when the sensor only makes one at a time
  *  \details        A one-time measurement leaves the sensor powered down, so the next task
  *                  would read the same value again unless the mode is sent afresh - and it
  *                  takes the power-on command before it listens to that mode, which is the
  *                  same departure from the xmega driver Init() makes and which the other two
  *                  backends make here.
-******************************************************************************************************************************************************/
+ */
 void BH1750::SendModeForOneTimeMode()
 {
     if(!IsOneTimeMode()) { return; }
 
     SendCommand(BH1750_CMD_POWER_ON);
     SendMode();
-} /* SendModeForOneTimeMode */
-
-/******************************************************************************************************************************************************
- *  E N D   O F   F I L E
-******************************************************************************************************************************************************/
+}

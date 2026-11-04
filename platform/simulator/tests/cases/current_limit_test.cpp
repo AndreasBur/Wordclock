@@ -1,23 +1,11 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
+/*
+ * That the supply's budget is what decides how bright the display may get.
  *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       current_limit_test.cpp
- *      \brief      That the supply's budget is what decides how bright the display may get
- *
- *      \details    Two halves. The arithmetic is checked over the whole range of lit counts,
- *                  because the property that matters is not one value but that no value
- *                  exceeds the budget. The rest is checked on the display, because where the
- *                  cap is applied decides whether a restored clock face comes back at the
- *                  brightness it had.
- *
-******************************************************************************************************************************************************/
+ * Two halves. The arithmetic is checked over the whole range of lit counts, because the property
+ * that matters is not one value but that no value exceeds the budget. The rest is checked on the
+ * display, because where the cap is applied decides whether a restored clock face comes back at the
+ * brightness it had.
+ */
 
 #include "check.h"
 #include "cases.h"
@@ -29,7 +17,6 @@
 #include "Pixels.h"
 
 namespace {
-
 constexpr uint32_t kBudgetMicroAmps{static_cast<uint32_t>(DISPLAY_CURRENT_LIMIT_BUDGET_MILLI_AMPS) * 1000u};
 constexpr uint16_t kWhiteChannelSum{DisplayCurrentLimit::ToChannelSum(255u, 255u, 255u)};
 constexpr uint16_t kRedChannelSum{DisplayCurrentLimit::ToChannelSum(255u, 0u, 0u)};
@@ -63,8 +50,7 @@ void StartFromWhiteClockFace()
     DisplayManager::GetInstance().Task();
 }
 
-} /* namespace */
-
+}
 
 /*
  * The property the class exists for, checked as a property rather than at one point: for every
@@ -88,7 +74,6 @@ void TestCurrentLimitFitsTheBudgetAtEveryLitCount()
         previous = limit;
     }
 }
-
 
 /*
  * The colour decides as much as the count does: red asks a third of what white asks at the
@@ -114,7 +99,6 @@ void TestCurrentLimitFollowsTheColour()
     StartFromWhiteClockFace();
 }
 
-
 /*
  * Where the cap is applied, checked by what a restored clock face looks like. The cap rides on
  * the strip's master, so the buffer keeps the colour it was written with and a face that comes
@@ -139,7 +123,6 @@ void TestCurrentLimitLeavesTheRestoredFaceAlone()
 
     StartFromWhiteClockFace();
 }
-
 
 // The master is also what Disable() uses, so the two must not fight over it: a task on a dark
 // display must leave it dark rather than write a cap into it.

@@ -1,41 +1,26 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+/*!
+ * \file
+ * \brief What the clock knows about the machine it runs on.
  *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       System.h
- *      \brief      What the clock knows about the machine it runs on
+ * The things that are neither display nor sensor: how long it has been running, what address it
+ * answers on, how much memory is left, and the three actions that only the platform can carry out -
+ * restarting, asking the network for the time again, and joining the network again.
  *
- *      \details    The things that are neither display nor sensor: how long it has been
- *                  running, what address it answers on, how much memory is left, and the
- *                  three actions that only the platform can carry out - restarting,
- *                  asking the network for the time again, and joining the network again.
- *
- *                  Every getter answers with a return code rather than a value alone,
- *                  because on every one of them "there is no answer" is a real state: a
- *                  clock with no network has no address and no link quality, and a
- *                  simulator has no heap worth reporting. A number that means "unknown"
- *                  would be a number a reader has to know about; a return code is one the
- *                  compiler makes them handle.
- *
-******************************************************************************************************************************************************/
+ * Every getter answers with a return code rather than a value alone, because on every one of them
+ * "there is no answer" is a real state: a clock with no network has no address and no link quality,
+ * and a simulator has no heap worth reporting. A number that means "unknown" would be a number a
+ * reader has to know about; a return code is one the compiler makes them handle.
+ */
+
 #ifndef _SYSTEM_H_
 #define _SYSTEM_H_
 
-/******************************************************************************************************************************************************
- * I N C L U D E S
-******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Arduino.h"
 
-/******************************************************************************************************************************************************
- *  G L O B A L   C O N S T A N T   M A C R O S
-******************************************************************************************************************************************************/
 /* System parameter */
 // "255.255.255.255" and its terminator. IPv6 does not fit and is not offered: the clock
 // joins a home network over IPv4, and the field says what to type into a browser.
@@ -57,23 +42,14 @@
  */
 #define SYSTEM_ACCESS_POINT_SSID                        "Wordclock"
 
-/******************************************************************************************************************************************************
- *  C L A S S   S Y S T E M
-******************************************************************************************************************************************************/
 class System
 {
-/******************************************************************************************************************************************************
- *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
-******************************************************************************************************************************************************/
   public:
     static constexpr byte kAddressStringLength{SYSTEM_ADDRESS_STRING_LENGTH};
     static constexpr byte kLinkQualityStringLength{SYSTEM_LINK_QUALITY_STRING_LENGTH};
     static constexpr byte kSsidStringLength{SYSTEM_SSID_STRING_LENGTH};
     static constexpr byte kPasswordStringLength{SYSTEM_PASSWORD_STRING_LENGTH};
 
-/******************************************************************************************************************************************************
- *  P R I V A T E   D A T A   A N D   F U N C T I O N S
-******************************************************************************************************************************************************/
   private:
     /*
      * A restart that was asked for and not carried out yet. The command that asks for one
@@ -85,9 +61,6 @@ class System
     System() { }
     ~System() { }
 
-/******************************************************************************************************************************************************
- *  P U B L I C   F U N C T I O N S
-******************************************************************************************************************************************************/
   public:
     static System& GetInstance() {
         static System singleton_instance;
@@ -157,7 +130,6 @@ class System
      */
     StdReturnType SetConsolePassword(const char*);
 
-
     // methods
     /*
      * Brings the network up as configured: the stored credentials, or the access point
@@ -187,7 +159,3 @@ class System
 };
 
 #endif // _SYSTEM_H_
-
-/******************************************************************************************************************************************************
- *  E N D   O F   F I L E
-******************************************************************************************************************************************************/

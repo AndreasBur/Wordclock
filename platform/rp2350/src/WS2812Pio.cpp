@@ -1,31 +1,19 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
- *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       WS2812Pio.cpp
- *      \brief      The four instructions that make the waveform, and the DMA that feeds them
- *
- *      \details    The program is written out as encoded instructions rather than
- *                  assembled from a .pio file. Two reasons, and the second is the one that
- *                  decided it: four instructions are short enough to read either way, and
- *                  the platform package installs a stand-in for pioasm rather than the
- *                  assembler itself, so a .pio source would build here and not on the next
- *                  machine.
- *
- *                  Each encoding is derived in the comment beside it, so the table can be
- *                  checked against the datasheet without reassembling anything.
- *
-******************************************************************************************************************************************************/
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
 
-/******************************************************************************************************************************************************
- * I N C L U D E S
-******************************************************************************************************************************************************/
+/*!
+ * \file
+ * \brief The four instructions that make the waveform, and the DMA that feeds them.
+ *
+ * The program is written out as encoded instructions rather than assembled from a .pio file. Two
+ * reasons, and the second is the one that decided it: four instructions are short enough to read
+ * either way, and the platform package installs a stand-in for pioasm rather than the assembler
+ * itself, so a .pio source would build here and not on the next machine.
+ *
+ * Each encoding is derived in the comment beside it, so the table can be checked against the
+ * datasheet without reassembling anything.
+ */
+
 /* Ahead of WS2812Pio.h, which reaches Arduino.h and its Serial macro. */
 #include <hardware/clocks.h>
 #include <hardware/dma.h>
@@ -34,11 +22,7 @@
 #include "Arduino.h"
 #include "WS2812Pio.h"
 
-/******************************************************************************************************************************************************
- *  LOCAL DATA
-******************************************************************************************************************************************************/
 namespace {
-
 /*
  * The program, one bit of the strip per pass.
  *
@@ -82,15 +66,8 @@ PIO Block() { return (WS2812_PIO_BLOCK_INDEX == 0u) ? pio0 : pio1; }
 
 } // namespace
 
-/******************************************************************************************************************************************************
- * P U B L I C   F U N C T I O N S
-******************************************************************************************************************************************************/
-
-/******************************************************************************************************************************************************
-  Init()
-******************************************************************************************************************************************************/
 /*! \brief          Claims a state machine and a DMA channel for the strip's data pin
-******************************************************************************************************************************************************/
+ */
 void WS2812Pio::Init(uint8_t pin)
 {
     if(is_ready_) { return; }
@@ -139,26 +116,18 @@ void WS2812Pio::Init(uint8_t pin)
     pio_sm_set_enabled(block, kStateMachine, true);
 
     is_ready_ = true;
-} /* Init */
+}
 
-
-/******************************************************************************************************************************************************
-  IsBusy()
-******************************************************************************************************************************************************/
 bool WS2812Pio::IsBusy() const
 {
     if(!is_ready_) { return false; }
 
     return dma_channel_is_busy(static_cast<uint>(dma_channel_));
-} /* IsBusy */
-
+}
 
 // Not const, though nothing here writes a member: it drives the hardware, and a const
 // would say it changes nothing.
 // NOLINTBEGIN(readability-make-member-function-const)
-/******************************************************************************************************************************************************
-  Transmit()
-******************************************************************************************************************************************************/
 /*! \brief          Hands one frame to DMA and returns
  *  \details        Refuses rather than waits while the previous frame is still going out.
  *                  The caller ticks every 10 ms and a frame takes 3.3 ms, so a refusal
@@ -166,7 +135,7 @@ bool WS2812Pio::IsBusy() const
  *                  waiting would spend a third of a tick doing nothing.
  *
  *  \return         kEOk if DMA took the frame
-******************************************************************************************************************************************************/
+ */
 StdReturnType WS2812Pio::Transmit(const WordType* frame, size_t count)
 {
     if(!is_ready_ || (frame == nullptr) || (count == 0u)) { return kENotOk; }
@@ -184,9 +153,5 @@ StdReturnType WS2812Pio::Transmit(const WordType* frame, size_t count)
                           &Block()->txf[kStateMachine], frame, count, true);
 
     return kEOk;
-} /* Transmit */
+}
 // NOLINTEND(readability-make-member-function-const)
-
-/******************************************************************************************************************************************************
- *  E N D   O F   F I L E
-******************************************************************************************************************************************************/

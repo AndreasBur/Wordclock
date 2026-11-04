@@ -1,10 +1,4 @@
-/******************************************************************************************************************************************************
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       display_test.cpp
- *      \brief      What reaches the pixels: the word-set latch, the fade, the colour channels and the letter table
-******************************************************************************************************************************************************/
-
+// What reaches the pixels: the word-set latch, the fade, the colour channels and the letter table.
 
 #include "check.h"
 #include "cases.h"

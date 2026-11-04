@@ -18,7 +18,6 @@
 #include <cstring>
 #include <vector>
 
-
 /* One temperature reading, handed over the way the chip would. */
 static void AnswerWith(uint8_t degrees, uint8_t fraction)
 {

@@ -1,40 +1,16 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
- *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       MessageBuilder.cpp
- *      \brief      Puts a serial message together from a command and its options
- *
- *      \details
- *
-******************************************************************************************************************************************************/
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+/*!
+ * \file
+ * \brief Puts a serial message together from a command and its options.
+ */
+
 #define _MESSAGE_BUILDER_SOURCE_
 
-/******************************************************************************************************************************************************
- * I N C L U D E S
-******************************************************************************************************************************************************/
 #include "sim/MessageBuilder.h"
 #include "sim/SerialShim.h"
 
-/******************************************************************************************************************************************************
- *  L O C A L   C O N S T A N T   M A C R O S
-******************************************************************************************************************************************************/
-
-
-/******************************************************************************************************************************************************
- *  L O C A L   F U N C T I O N   M A C R O S
-******************************************************************************************************************************************************/
-
-
-/******************************************************************************************************************************************************
- *  L O C A L   D A T A   T Y P E S   A N D   S T R U C T U R E S
-******************************************************************************************************************************************************/
 BEGIN_EVENT_TABLE(MessageBuilder, wxDialog)
     EVT_CLOSE(MessageBuilder::OnClose)
     EVT_COMBOBOX(kIdChoiceCommand, MessageBuilder::OnCommand)
@@ -45,14 +21,6 @@ BEGIN_EVENT_TABLE(MessageBuilder, wxDialog)
     EVT_COMMAND_RANGE(kIdChoiceOptionFirst, kIdChoiceOptionLast, wxEVT_COMBOBOX, MessageBuilder::OnOptionChanged)
 END_EVENT_TABLE()
 
-
-/******************************************************************************************************************************************************
- * P U B L I C   F U N C T I O N S
-******************************************************************************************************************************************************/
-
-/******************************************************************************************************************************************************
-  Constructor of MessageBuilder
-******************************************************************************************************************************************************/
 MessageBuilder::MessageBuilder(wxWindow* parent, const wxString &title) : wxDialog(parent, wxID_ANY, title)
 {
     /*
@@ -66,23 +34,10 @@ MessageBuilder::MessageBuilder(wxWindow* parent, const wxString &title) : wxDial
     CentreOnParent();
 }
 
-
-/******************************************************************************************************************************************************
-  Destructor of MessageBuilder
-******************************************************************************************************************************************************/
 MessageBuilder::~MessageBuilder()
 {
+}
 
-} /* ~MessageBuilder */
-
-
-/******************************************************************************************************************************************************
- * P R I V A T E   F U N C T I O N S
-******************************************************************************************************************************************************/
-
-/******************************************************************************************************************************************************
-  CreateSizerAll()
-******************************************************************************************************************************************************/
 wxBoxSizer* MessageBuilder::CreateSizerAll(wxWindow* parent)
 {
     wxStaticBox* static_box = new wxStaticBox(parent, kIdStaticBoxMessage, _T("Command"));
@@ -136,12 +91,8 @@ wxBoxSizer* MessageBuilder::CreateSizerAll(wxWindow* parent)
     sizer_all->Add(insert, 0, wxLEFT | wxRIGHT | wxBOTTOM | wxEXPAND, kBorder);
 
     return sizer_all;
-} /* CreateSizerAll */
+}
 
-
-/******************************************************************************************************************************************************
-  ShowOptionsOfSelectedCommand()
-******************************************************************************************************************************************************/
 /*! \brief          brings the option rows in line with the selected command
  *  \details        Rows beyond the command's option list are hidden. The ones in use are
  *                  reset rather than left as they were, so an argument typed for a
@@ -149,7 +100,7 @@ wxBoxSizer* MessageBuilder::CreateSizerAll(wxWindow* parent)
  *                  name that happens to sit at the same position.
  *
  *  \return         -
-******************************************************************************************************************************************************/
+ */
 void MessageBuilder::ShowOptionsOfSelectedCommand()
 {
     const MessageCatalog::CommandType& command = GetSelectedCommand();
@@ -211,19 +162,15 @@ void MessageBuilder::ShowOptionsOfSelectedCommand()
     Layout();
     GetSizer()->SetSizeHints(this);
     UpdatePreview();
-} /* ShowOptionsOfSelectedCommand */
+}
 
-
-/******************************************************************************************************************************************************
-  BuildMessage()
-******************************************************************************************************************************************************/
 /*! \brief          assembles the message from the selected command and its ticked options
  *  \details        Same shape the parsers expect: the command number, then one
  *                  "-<short name><argument>" per option. A command on its own is a
  *                  request for the current settings, so no option needs to be ticked.
  *
  *  \return         the message, without the newline the Serial shim adds when it is sent
-******************************************************************************************************************************************************/
+ */
 wxString MessageBuilder::BuildMessage() const
 {
     const MessageCatalog::CommandType& command = GetSelectedCommand();
@@ -247,50 +194,34 @@ wxString MessageBuilder::BuildMessage() const
     }
 
     return message;
-} /* BuildMessage */
+}
 
-
-/******************************************************************************************************************************************************
-  OnCommand()
-******************************************************************************************************************************************************/
 void MessageBuilder::OnCommand(wxCommandEvent &event)
 {
     ShowOptionsOfSelectedCommand();
     UNUSED(event);
-} /* OnCommand */
+}
 
-
-/******************************************************************************************************************************************************
-  OnOptionUsed()
-******************************************************************************************************************************************************/
 /*! \brief          follows a ticked or unticked option
  *  \details        The row is taken from the event's id, which is what the contiguous
  *                  ranges of the option widgets are for.
  *
  *  \return         -
-******************************************************************************************************************************************************/
+ */
 void MessageBuilder::OnOptionUsed(wxCommandEvent &event)
 {
     const byte index = static_cast<byte>(event.GetId() - kIdCheckboxOptionFirst);
 
     EnableOptionValue(index, option_rows_[index].use->IsChecked());
     UpdatePreview();
-} /* OnOptionUsed */
+}
 
-
-/******************************************************************************************************************************************************
-  OnOptionChanged()
-******************************************************************************************************************************************************/
 void MessageBuilder::OnOptionChanged(wxCommandEvent &event)
 {
     UpdatePreview();
     UNUSED(event);
-} /* OnOptionChanged */
+}
 
-
-/******************************************************************************************************************************************************
-  OnInsert()
-******************************************************************************************************************************************************/
 /*! \brief          hands the message to the input field, without sending it
  *  \details        Deliberately not sent: it can be corrected or extended by hand there
  *                  first, and Send stays the one place a message leaves for the firmware.
@@ -299,18 +230,14 @@ void MessageBuilder::OnOptionChanged(wxCommandEvent &event)
  *                  command that was selected.
  *
  *  \return         -
-******************************************************************************************************************************************************/
+ */
 void MessageBuilder::OnInsert(wxCommandEvent &event)
 {
     SerialShim::GetInstance().SetInput(BuildMessage());
     Hide();
     UNUSED(event);
-} /* OnInsert */
+}
 
-
-/******************************************************************************************************************************************************
-  OnClose()
-******************************************************************************************************************************************************/
 void MessageBuilder::OnClose(wxCloseEvent &event)
 {
     /*
@@ -320,9 +247,4 @@ void MessageBuilder::OnClose(wxCloseEvent &event)
      */
     Hide();
     UNUSED(event);
-} /* OnClose */
-
-
-/******************************************************************************************************************************************************
- *  E N D   O F   F I L E
-******************************************************************************************************************************************************/
+}

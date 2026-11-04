@@ -1,36 +1,25 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
+// Copyright 2017 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+/*!
+ * \file
+ * \brief What the clock can say about itself.
  *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       MsgCmdStatusParser.h
- *      \brief      What the clock can say about itself
+ * Everything a remote procedure call cannot answer. Its answer is "RpcId=<id> Error=<code>" and
+ * carries no value, so the readings that were reachable nowhere else - what the light sensor
+ * measures, what the clock chip measures, which firmware is running - are a command with the same
+ * query semantics as every other one instead.
  *
- *      \details    Everything a remote procedure call cannot answer. Its answer is
- *                  "RpcId=<id> Error=<code>" and carries no value, so the readings that
- *                  were reachable nowhere else - what the light sensor measures, what the
- *                  clock chip measures, which firmware is running - are a command with the
- *                  same query semantics as every other one instead.
- *
- *                  It is read-only, and its parameter table is empty rather than filled
- *                  with fields that are ignored: an option sent to it is answered with
- *                  ErrorType::kParameterUnknown by the base parser, which is what a caller
- *                  trying to set a reading should hear. The field names still exist - in
- *                  the message catalog, marked read-only - so a front end can read the
- *                  answer back through them without offering them as inputs.
- *
-******************************************************************************************************************************************************/
+ * It is read-only, and its parameter table is empty rather than filled with fields that are
+ * ignored: an option sent to it is answered with ErrorType::kParameterUnknown by the base parser,
+ * which is what a caller trying to set a reading should hear. The field names still exist - in the
+ * message catalog, marked read-only - so a front end can read the answer back through them without
+ * offering them as inputs.
+ */
+
 #ifndef _MSG_CMD_STATUS_PARSER_H_
 #define _MSG_CMD_STATUS_PARSER_H_
 
-/******************************************************************************************************************************************************
- * I N C L U D E S
-******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Arduino.h"
 #include "MsgParameterParser.h"
@@ -40,21 +29,12 @@
 #include "Uptime.h"
 #include "Version.h"
 
-/******************************************************************************************************************************************************
- *  G L O B A L   C O N S T A N T   M A C R O S
-******************************************************************************************************************************************************/
 /* MsgCmdStatusParser parameter */
 /* Empty: the command takes nothing, see the file header. */
 #define MSG_CMD_STATUS_PARSER_PARAMETER_TABLE_SIZE                  0u
 
-/******************************************************************************************************************************************************
- *  C L A S S   T E M P L A T E
-******************************************************************************************************************************************************/
 class MsgCmdStatusParser : public MsgParameterParser<MsgCmdStatusParser, MSG_CMD_STATUS_PARSER_PARAMETER_TABLE_SIZE>
 {
-/******************************************************************************************************************************************************
- *  P R I V A T E   D A T A   A N D   F U N C T I O N S
-******************************************************************************************************************************************************/
   private:
     friend class MsgParameterParser;
 
@@ -76,9 +56,6 @@ class MsgCmdStatusParser : public MsgParameterParser<MsgCmdStatusParser, MSG_CMD
     static void HandleParameter(char parameter_short_name, const char* argument, PositionType length) { UNUSED(parameter_short_name); UNUSED(argument); UNUSED(length); }
     static void HandleParameter(char parameter_short_name, byte argument) { UNUSED(parameter_short_name); UNUSED(argument); }
 
-/******************************************************************************************************************************************************
- *  P U B L I C   F U N C T I O N S
-******************************************************************************************************************************************************/
   public:
     constexpr MsgCmdStatusParser(const char* parameter) : MsgParameterParser(kParameterTable, parameter) { }
     ~MsgCmdStatusParser() { }
@@ -134,7 +111,3 @@ class MsgCmdStatusParser : public MsgParameterParser<MsgCmdStatusParser, MSG_CMD
 };
 
 #endif // _MSG_CMD_STATUS_PARSER_H_
-
-/******************************************************************************************************************************************************
- *  E N D   O F   F I L E
-******************************************************************************************************************************************************/

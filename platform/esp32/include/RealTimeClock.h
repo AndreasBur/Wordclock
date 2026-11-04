@@ -1,58 +1,36 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
+// Copyright 2017 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+/*!
+ * \file
+ * \brief ESP32 real-time clock, backed by the system clock.
  *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       RealTimeClock.h
- *      \brief      ESP32 real-time clock, backed by the system clock
+ * Mirrors the public API of the simulator's real-time clock, so the shared firmware core reads the
+ * time the same way on both.
  *
- *      \details    Mirrors the public API of the simulator's real-time clock, so the
- *                  shared firmware core reads the time the same way on both.
+ * There is no RTC chip behind this. The ESP32's system clock *is* the clock, kept right by SNTP in
+ * the background and converted to local time by the zone rule the application installs - which is
+ * also what makes daylight saving somebody else's problem. task() therefore only reads, and no
+ * seconds are counted here.
  *
- *                  There is no RTC chip behind this. The ESP32's system clock *is* the
- *                  clock, kept right by SNTP in the background and converted to local
- *                  time by the zone rule the application installs - which is also what
- *                  makes daylight saving somebody else's problem. task() therefore only
- *                  reads, and no seconds are counted here.
- *
- *                  Nothing survives a power cut: the system clock starts at the epoch
- *                  and stays there until the first SNTP answer arrives. IsSystemTimeSet()
- *                  is what tells the two states apart.
- *
-******************************************************************************************************************************************************/
+ * Nothing survives a power cut: the system clock starts at the epoch and stays there until the
+ * first SNTP answer arrives. IsSystemTimeSet() is what tells the two states apart.
+ */
+
 #ifndef _REAL_TIME_CLOCK_H_
 #define _REAL_TIME_CLOCK_H_
 
-/******************************************************************************************************************************************************
- * I N C L U D E S
-******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Arduino.h"
 #include "ClockDateTime.h"
 #include "DS3231.h"
 
-/******************************************************************************************************************************************************
- *  G L O B A L   C O N S T A N T   M A C R O S
-******************************************************************************************************************************************************/
 /* RealTimeClock configuration parameter */
-
 
 /* RealTimeClock parameter */
 
-
-/******************************************************************************************************************************************************
- *  C L A S S   R E A L   T I M E   C L O C K
-******************************************************************************************************************************************************/
 class RealTimeClock
 {
-/******************************************************************************************************************************************************
- *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
-******************************************************************************************************************************************************/
   public:
     using HourType = ClockDateTime::HourType;
     using MinuteType = ClockDateTime::MinuteType;
@@ -63,9 +41,6 @@ class RealTimeClock
     using DayType = ClockDateTime::DayType;
     using WeekdayType = ClockDateTime::WeekdayType;
 
-/******************************************************************************************************************************************************
- *  P R I V A T E   D A T A   A N D   F U N C T I O N S
-******************************************************************************************************************************************************/
   private:
     // No hour, so the first pass with a system time writes the chip. A byte the hours
     // cannot reach, rather than a second flag beside it.
@@ -103,9 +78,6 @@ class RealTimeClock
     StdReturnType ReadChip();
     void WriteChip();
 
-/******************************************************************************************************************************************************
- *  P U B L I C   F U N C T I O N S
-******************************************************************************************************************************************************/
   public:
     static RealTimeClock& GetInstance() {
         static RealTimeClock singleton_instance;
@@ -139,7 +111,3 @@ class RealTimeClock
 };
 
 #endif // _REAL_TIME_CLOCK_H_
-
-/******************************************************************************************************************************************************
- *  E N D   O F   F I L E
-******************************************************************************************************************************************************/

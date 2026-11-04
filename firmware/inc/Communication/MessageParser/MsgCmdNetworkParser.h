@@ -1,36 +1,26 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+/*!
+ * \file
+ * \brief Which network the clock joins.
  *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       MsgCmdNetworkParser.h
- *      \brief      Which network the clock joins
+ * The credentials used to be compiled in, which made every change of network a reflash. They are
+ * stored on the platform now and set through this command, over whichever console can reach the
+ * clock - the serial line, or the web console on the access point the clock opens when it has no
+ * network to join.
  *
- *      \details    The credentials used to be compiled in, which made every change of
- *                  network a reflash. They are stored on the platform now and set through
- *                  this command, over whichever console can reach the clock - the serial
- *                  line, or the web console on the access point the clock opens when it
- *                  has no network to join.
+ * The pass phrase goes in and never comes back out: the answer names the network and says whether
+ * one is configured at all. A console that echoed it would put it in the scrollback of every
+ * browser that watched.
  *
- *                  The pass phrase goes in and never comes back out: the answer names the
- *                  network and says whether one is configured at all. A console that
- *                  echoed it would put it in the scrollback of every browser that watched.
- *
- *                  Both are taken as they arrive and applied together, because half a pair
- *                  is a clock that cannot join anything.
- *
-******************************************************************************************************************************************************/
+ * Both are taken as they arrive and applied together, because half a pair is a clock that cannot
+ * join anything.
+ */
+
 #ifndef _MSG_CMD_NETWORK_PARSER_H_
 #define _MSG_CMD_NETWORK_PARSER_H_
 
-/******************************************************************************************************************************************************
- * I N C L U D E S
-******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Arduino.h"
 #include "MsgParameterParser.h"
@@ -39,20 +29,11 @@
 
 #include <string.h>
 
-/******************************************************************************************************************************************************
- *  G L O B A L   C O N S T A N T   M A C R O S
-******************************************************************************************************************************************************/
 /* MsgCmdNetworkParser parameter */
 #define MSG_CMD_NETWORK_PARSER_PARAMETER_TABLE_SIZE                 2u
 
-/******************************************************************************************************************************************************
- *  C L A S S   T E M P L A T E
-******************************************************************************************************************************************************/
 class MsgCmdNetworkParser : public MsgParameterParser<MsgCmdNetworkParser, MSG_CMD_NETWORK_PARSER_PARAMETER_TABLE_SIZE>
 {
-/******************************************************************************************************************************************************
- *  P R I V A T E   D A T A   A N D   F U N C T I O N S
-******************************************************************************************************************************************************/
   private:
     friend class MsgParameterParser;
 
@@ -101,9 +82,6 @@ class MsgCmdNetworkParser : public MsgParameterParser<MsgCmdNetworkParser, MSG_C
         }
     }
 
-/******************************************************************************************************************************************************
- *  P U B L I C   F U N C T I O N S
-******************************************************************************************************************************************************/
   public:
     constexpr MsgCmdNetworkParser(const char* parameter) : MsgParameterParser(kParameterTable, parameter) { }
     ~MsgCmdNetworkParser() { }
@@ -142,7 +120,3 @@ class MsgCmdNetworkParser : public MsgParameterParser<MsgCmdNetworkParser, MSG_C
 };
 
 #endif // _MSG_CMD_NETWORK_PARSER_H_
-
-/******************************************************************************************************************************************************
- *  E N D   O F   F I L E
-******************************************************************************************************************************************************/

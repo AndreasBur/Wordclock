@@ -9,7 +9,6 @@
 #ifndef _CASES_H_
 #define _CASES_H_
 
-
 /* display_test.cpp */
 void TestSingleBits();
 void TestBitGroups();

@@ -1,40 +1,26 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
+// Copyright 2017 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+/*!
+ * \file
+ * \brief BH1750 ambient light sensor driver over I2C.
  *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       BH1750.h
- *      \brief      BH1750 ambient light sensor driver over I2C
+ * Mirrors the public API of the simulator's stub, so the firmware's Illuminance module holds either
+ * one without knowing which. The register handling follows the xmega driver, which was written
+ * against the same datasheet.
  *
- *      \details    Mirrors the public API of the simulator's stub, so the firmware's
- *                  Illuminance module holds either one without knowing which. The
- *                  register handling follows the xmega driver, which was written
- *                  against the same datasheet.
- *
- *                  The sensor is set up from the first Task() rather than from an Init()
- *                  call, because the core keeps its BH1750 private and never calls one.
- *                  Setting up lazily also retries, which is what a sensor that is not
- *                  answering yet after power-on needs - and what a sensor that stops
- *                  answering later needs, see kReadFailuresBeforeReinit.
- *
-******************************************************************************************************************************************************/
+ * The sensor is set up from the first Task() rather than from an Init() call, because the core
+ * keeps its BH1750 private and never calls one. Setting up lazily also retries, which is what a
+ * sensor that is not answering yet after power-on needs - and what a sensor that stops answering
+ * later needs, see kReadFailuresBeforeReinit.
+ */
+
 #ifndef _BH1750_H_
 #define _BH1750_H_
 
-/******************************************************************************************************************************************************
- * I N C L U D E S
-******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Arduino.h"
 
-/******************************************************************************************************************************************************
- *  G L O B A L   C O N S T A N T   M A C R O S
-******************************************************************************************************************************************************/
 /* BH1750 configuration parameter */
 /*
  * The datasheet's two addresses, selected by the ADDR pin: low is 0x23, high is 0x5C.
@@ -105,19 +91,8 @@
 
 #define BH1750_ILLUMINANCE_RAW_VALUE_DIVIDER            1.2f
 
-/******************************************************************************************************************************************************
- *  G L O B A L   F U N C T I O N   M A C R O S
-******************************************************************************************************************************************************/
-
-
-/******************************************************************************************************************************************************
- *  C L A S S   B H 1 7 5 0
-******************************************************************************************************************************************************/
 class BH1750
 {
-/******************************************************************************************************************************************************
- *  P U B L I C   D A T A   T Y P E S   A N D   S T R U C T U R E S
-******************************************************************************************************************************************************/
   public:
     using IlluminanceType = uint16_t;
 
@@ -136,9 +111,6 @@ class BH1750
         IlluminanceType min_value;
     };
 
-/******************************************************************************************************************************************************
- *  P R I V A T E   D A T A   A N D   F U N C T I O N S
-******************************************************************************************************************************************************/
   private:
     static constexpr byte kTaskCycle{BH1750_TASK_CYCLE};
     /*
@@ -210,9 +182,6 @@ class BH1750
         mode_ = ModeType::kNone;
     }
 
-/******************************************************************************************************************************************************
- *  P U B L I C   F U N C T I O N   S
-******************************************************************************************************************************************************/
   public:
     constexpr BH1750() { }
     ~BH1750() { }
@@ -257,7 +226,3 @@ class BH1750
 };
 
 #endif
-
-/******************************************************************************************************************************************************
- *  E N D   O F   F I L E
-******************************************************************************************************************************************************/

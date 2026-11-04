@@ -1,10 +1,4 @@
-/******************************************************************************************************************************************************
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       text_test.cpp
- *      \brief      Which characters the text overlay can draw, through the entry point that refuses the rest
-******************************************************************************************************************************************************/
-
+// Which characters the text overlay can draw, through the entry point that refuses the rest.
 
 #include "check.h"
 #include "cases.h"
@@ -108,7 +102,6 @@ void TestCharacterToGlyphMapping()
 
     Display::GetInstance().Clear();
 }
-
 
 /*
  * The scrolling path draws every character, including the ones SetChar() refuses. It used

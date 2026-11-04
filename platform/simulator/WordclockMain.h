@@ -1,6 +1,13 @@
+// Copyright 2017 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+/*!
+ * \file
+ * \brief What the simulator runs the firmware with: the host's time and the scheduler.
+ */
+
 #ifndef WORDCLOCKMAIN_H
 #define WORDCLOCKMAIN_H
-
 
 #include "Scheduler.h"
 

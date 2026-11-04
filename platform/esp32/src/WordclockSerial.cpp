@@ -1,21 +1,11 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
- *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       WordclockSerial.cpp
- *      \brief      The port Serial is bound to: the UART plus an injected line source
- *
-******************************************************************************************************************************************************/
+// Copyright 2017 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
 
-/******************************************************************************************************************************************************
- * I N C L U D E S
-******************************************************************************************************************************************************/
+/*!
+ * \file
+ * \brief The port Serial is bound to: the UART plus an injected line source.
+ */
+
 #include "Arduino.h"
 
 #ifndef WORDCLOCK_ARDUINO_SHIM
@@ -25,10 +15,6 @@
 #include <stdio.h>
 #include <string.h>
 
-/******************************************************************************************************************************************************
- * P U B L I C   F U N C T I O N S
-******************************************************************************************************************************************************/
-
 /*
  * Instance methods, though some of them read no member: they are the interface the
  * firmware core calls through GetInstance(), and every backend - the simulator's
@@ -37,18 +23,11 @@
  * that detail into the interface.
  */
 // NOLINTBEGIN(readability-convert-member-functions-to-static)
-/******************************************************************************************************************************************************
-  Begin()
-******************************************************************************************************************************************************/
 void WordclockSerial::begin(unsigned long baud_rate)
 {
     wordclock_platform::HardwarePortBegin(baud_rate);
-} /* Begin */
+}
 
-
-/******************************************************************************************************************************************************
-  Inject()
-******************************************************************************************************************************************************/
 /*! \brief          Hands characters to the port from another task
  *  \details        Written by the producer only, which is what keeps this free of a lock -
  *                  see the note on the indices in the header.
@@ -58,7 +37,7 @@ void WordclockSerial::begin(unsigned long baud_rate)
  *                  two commands into one that parses as neither.
  *
  *  \return         kEOk if everything was taken
-******************************************************************************************************************************************************/
+ */
 StdReturnType WordclockSerial::Inject(const char* characters, size_t length)
 {
     if((characters == nullptr) || (length == 0u)) { return kENotOk; }
@@ -79,12 +58,8 @@ StdReturnType WordclockSerial::Inject(const char* characters, size_t length)
     }
 
     return kEOk;
-} /* Inject */
+}
 
-
-/******************************************************************************************************************************************************
-  available()
-******************************************************************************************************************************************************/
 int WordclockSerial::available() const
 {
     const int from_port = wordclock_platform::HardwarePort().available();
@@ -92,19 +67,15 @@ int WordclockSerial::available() const
     if(from_port > 0) { return from_port; }
 
     return IsInjectEmpty() ? 0 : 1;
-} /* available */
+}
 
-
-/******************************************************************************************************************************************************
-  Read()
-******************************************************************************************************************************************************/
 /*! \brief          Takes the next character, wire before network
  *  \details        The UART is served first so that a console on the wire keeps working
  *                  while a network client is busy - the wire is where one debugs a clock
  *                  whose network is the problem.
  *
  *  \return         the character, or -1 when there is none
-******************************************************************************************************************************************************/
+ */
 int WordclockSerial::read()
 {
     Stream& port = wordclock_platform::HardwarePort();
@@ -113,34 +84,22 @@ int WordclockSerial::read()
     if(!IsInjectEmpty()) { return static_cast<unsigned char>(ReadInjected()); }
 
     return -1;
-} /* Read */
+}
 
-
-/******************************************************************************************************************************************************
-  print()
-******************************************************************************************************************************************************/
 void WordclockSerial::print(const char* text)
 {
     if(text == nullptr) { return; }
 
     for(const char* character = text; *character != '\0'; character++) { print(*character); }
-} /* print */
+}
 
-
-/******************************************************************************************************************************************************
-  print()
-******************************************************************************************************************************************************/
 void WordclockSerial::print(const __FlashStringHelper* text)
 {
     // On this target flash is read through the same address space, so what F() wrapped can
     // be read as an ordinary string.
     print(reinterpret_cast<const char*>(text));
-} /* print */
+}
 
-
-/******************************************************************************************************************************************************
-  print()
-******************************************************************************************************************************************************/
 void WordclockSerial::print(int number)
 {
     char digits[12]{};
@@ -148,88 +107,56 @@ void WordclockSerial::print(int number)
     /* Ten digits and a sign are the most an int can print to; nothing to truncate. */
     (void)snprintf(digits, sizeof(digits), "%d", number);
     print(digits);
-} /* print */
+}
 
-
-/******************************************************************************************************************************************************
-  print()
-******************************************************************************************************************************************************/
 /*! \brief          Writes one character, to the wire and into the line being collected
  *  \details        A newline is treated as the end of the line rather than as content,
  *                  the same way the simulator's shim does it - the firmware ends some of
  *                  its output with print('\n') instead of println(), and a line sink that
  *                  did not notice would run two answers together.
-******************************************************************************************************************************************************/
+ */
 void WordclockSerial::print(char character)
 {
     if(character == '\n') { println(); return; }
 
     wordclock_platform::HardwarePort().write(static_cast<uint8_t>(character));
     AppendToLine(character);
-} /* print */
+}
 
-
-/******************************************************************************************************************************************************
-  println()
-******************************************************************************************************************************************************/
 void WordclockSerial::println()
 {
     wordclock_platform::HardwarePort().write(static_cast<uint8_t>('\r'));
     wordclock_platform::HardwarePort().write(static_cast<uint8_t>('\n'));
 
     FlushLine();
-} /* println */
+}
 
-
-/******************************************************************************************************************************************************
-  println()
-******************************************************************************************************************************************************/
 void WordclockSerial::println(const char* text)
 {
     print(text);
     println();
-} /* println */
+}
 
-
-/******************************************************************************************************************************************************
-  println()
-******************************************************************************************************************************************************/
 void WordclockSerial::println(int number)
 {
     print(number);
     println();
-} /* println */
+}
 
-
-/******************************************************************************************************************************************************
-  println()
-******************************************************************************************************************************************************/
 void WordclockSerial::println(const __FlashStringHelper* text)
 {
     print(text);
     println();
-} /* println */
+}
 
-
-/******************************************************************************************************************************************************
-  Flush()
-******************************************************************************************************************************************************/
 /*! \brief          Waits until the UART has sent what it was given
-******************************************************************************************************************************************************/
+ */
 void WordclockSerial::flush()
 {
     wordclock_platform::HardwarePort().flush();
-} /* Flush */
+}
 // NOLINTEND(readability-convert-member-functions-to-static)
 
-
-/******************************************************************************************************************************************************
- * P R I V A T E   F U N C T I O N S
-******************************************************************************************************************************************************/
-
-/******************************************************************************************************************************************************
-  ReadInjected()
-******************************************************************************************************************************************************/
 char WordclockSerial::ReadInjected()
 {
     const size_t tail = inject_tail_.load(std::memory_order_relaxed);
@@ -240,33 +167,25 @@ char WordclockSerial::ReadInjected()
     inject_tail_.store(NextIndex(tail), std::memory_order_release);
 
     return character;
-} /* ReadInjected */
+}
 
-
-/******************************************************************************************************************************************************
-  AppendToLine()
-******************************************************************************************************************************************************/
 /*! \brief          Collects the line the sink will be handed
  *  \details        A line that outgrows the buffer is flushed early rather than cut: the
  *                  client then sees the answer split over two frames, which is readable,
  *                  where a truncated line would silently lose its end.
-******************************************************************************************************************************************************/
+ */
 void WordclockSerial::AppendToLine(char character)
 {
     if(line_used_ >= (kLineLength - 1u)) { FlushLine(); }
 
     line_buffer_[line_used_++] = character;
-} /* AppendToLine */
+}
 
-
-/******************************************************************************************************************************************************
-  FlushLine()
-******************************************************************************************************************************************************/
 /*! \brief          Hands the collected line to whoever registered for it
  *  \details        An empty line is dropped, because println() is also used to terminate
  *                  output that print() already ended with a newline - passing that on
  *                  would send a blank frame after every answer.
-******************************************************************************************************************************************************/
+ */
 void WordclockSerial::FlushLine()
 {
     if(line_used_ == 0u) { return; }
@@ -275,8 +194,4 @@ void WordclockSerial::FlushLine()
     line_used_ = 0u;
 
     if(line_sink_ != nullptr) { line_sink_(line_buffer_); }
-} /* FlushLine */
-
-/******************************************************************************************************************************************************
- *  E N D   O F   F I L E
-******************************************************************************************************************************************************/
+}

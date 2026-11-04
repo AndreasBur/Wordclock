@@ -129,7 +129,6 @@ static void SendFrame(const std::string& payload, bool final = true)
                                  bytes.empty() ? nullptr : bytes.data(), bytes.size());
 }
 
-
 int main()
 {
     Check(WebInterface::GetInstance().Begin() == kEOk, "the server starts and registers its handlers");
@@ -416,7 +415,6 @@ int main()
     communication.Task();
     communication.Task();
     Check(webStubState().Text.empty(), "and so is a split one");
-
 
     /*
      * ---- the console password --------------------------------------------------------

@@ -1,33 +1,20 @@
-/******************************************************************************************************************************************************
- *  COPYRIGHT
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  \verbatim
- *  Copyright (c) Andreas Burnickl                                                                                                 All rights reserved.
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+/*!
+ * \file
+ * \brief What the supply behind the strip can deliver, as a ceiling on brightness.
  *
- *  \endverbatim
- *  ---------------------------------------------------------------------------------------------------------------------------------------------------
- *  FILE DESCRIPTION
- *  -------------------------------------------------------------------------------------------------------------------------------------------------*/
-/**     \file       DisplayCurrentLimit.h
- *      \brief      What the supply behind the strip can deliver, as a ceiling on brightness
- *
- *      \details    The firmware can ask for more current than the supply has. This turns the
- *                  budget into the largest brightness that still fits it.
- *
-******************************************************************************************************************************************************/
+ * The firmware can ask for more current than the supply has. This turns the budget into the largest
+ * brightness that still fits it.
+ */
+
 #ifndef _DISPLAY_CURRENT_LIMIT_H_
 #define _DISPLAY_CURRENT_LIMIT_H_
 
-/******************************************************************************************************************************************************
- * I N C L U D E S
-******************************************************************************************************************************************************/
 #include "StandardTypes.h"
 #include "Arduino.h"
 
-
-/******************************************************************************************************************************************************
- *  G   L   O   B   A   L       C   O   N   S   T   A   N   T       M   A   C   R   O   S
-******************************************************************************************************************************************************/
 /* DisplayCurrentLimit configuration parameter */
 /*
  * What the supply behind the strip can deliver, in milliamps, minus the margin it should keep.
@@ -43,18 +30,10 @@
 # define DISPLAY_CURRENT_LIMIT_BUDGET_MILLI_AMPS     2500u
 #endif
 
-
 /* DisplayCurrentLimit parameter */
 
-
-/******************************************************************************************************************************************************
- *  C   L   A   S   S       D   I   S   P   L   A   Y       C   U   R   R   E   N   T       L   I   M   I   T
-******************************************************************************************************************************************************/
 class DisplayCurrentLimit
 {
-/******************************************************************************************************************************************************
- *  P   U   B   L   I   C       D   A   T   A       T   Y   P   E   S       A   N   D       S   T   R   U   C   T   U   R   E   S
-******************************************************************************************************************************************************/
   public:
     using CurrentType = uint32_t;
 
@@ -62,9 +41,6 @@ class DisplayCurrentLimit
     // master carries when nothing is being held back.
     static constexpr byte kNoLimit{255u};
 
-/******************************************************************************************************************************************************
- *  P   R   I   V   A   T   E       D   A   T   A       A   N   D       F   U   N   C   T   I   O   N   S
-******************************************************************************************************************************************************/
   private:
     static constexpr CurrentType kBudgetMicroAmps{static_cast<CurrentType>(DISPLAY_CURRENT_LIMIT_BUDGET_MILLI_AMPS) * 1000u};
 
@@ -99,9 +75,6 @@ class DisplayCurrentLimit
         return (kBudgetMicroAmps > idle) ? (kBudgetMicroAmps - idle) : 0u;
     }
 
-/******************************************************************************************************************************************************
- *  P   U   B   L   I   C       F   U   N   C   T   I   O   N   S
-******************************************************************************************************************************************************/
   public:
     /* Nothing to construct: the budget is a constant and the rest are the caller's numbers. */
     DisplayCurrentLimit() = delete;

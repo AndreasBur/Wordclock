@@ -68,7 +68,6 @@ static byte Green(uint32_t word) { return static_cast<byte>((word >> 24u) & 0xFF
 static byte Red(uint32_t word)   { return static_cast<byte>((word >> 16u) & 0xFFu); }
 static byte Blue(uint32_t word)  { return static_cast<byte>((word >> 8u) & 0xFFu); }
 
-
 int main()
 {
     Pixels& p = Pixels::GetInstance();
