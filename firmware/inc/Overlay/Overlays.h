@@ -46,13 +46,13 @@
  * multiple of its period in minutes, minute 0 included, at second 30. Its month and day limit the
  * days it starts on. With neither set, it starts on every day; with a month alone, on every day of
  * that month; with a day alone, on that day of every month; and with both, on that day. With both
- * set, a valid-in-days adds the days up to that many after that day, and as many before it as lie
- * in the same month. The temperature overlay starts only while Temperature has a reading.
+ * set, a valid-in-days adds the days up to that many after that day, across the turn of the year as
+ * well. The temperature overlay starts only while Temperature has a reading.
  *
  * Once started, an overlay shifts its text across the display through Text, at its speed and in
  * its font, and starts the text again whenever it has gone through. It holds the display for its
- * endurance in seconds and goes back to idle on the second after that: an endurance of 3 started
- * at second 30 ends at second 34. ShowDateNow(), ShowTemperatureNow() and ShowTextNow() start an
+ * endurance in seconds and goes back to idle on the last second of it: an endurance of 3 started
+ * at second 30 ends at second 33. ShowDateNow(), ShowTemperatureNow() and ShowTextNow() start an
  * overlay at once instead of at its period, and Abort() ends the one that shows.
  *
  * Only one overlay holds the display at a time, as one show timer serves all three. When several
@@ -329,8 +329,8 @@ class Overlays
     void SetDateDay(DayType day) { date_.SetDay(day); }
 
     /*!
-     * \brief Sets the valid-in-days of the date overlay: the days around its day and month it
-     *        starts on as well, when both are set.
+     * \brief Sets the valid-in-days of the date overlay: the days after its day and month it starts
+     *        on as well, when both are set.
      *
      * \param[in] valid_in_days The number of days, 0 for the day alone.
      */
@@ -404,8 +404,8 @@ class Overlays
     void SetTemperatureDay(DayType day) { temperature_.SetDay(day); }
 
     /*!
-     * \brief Sets the valid-in-days of the temperature overlay: the days around its day and month
-     *        it starts on as well, when both are set.
+     * \brief Sets the valid-in-days of the temperature overlay: the days after its day and month it
+     *        starts on as well, when both are set.
      *
      * \param[in] valid_in_days The number of days, 0 for the day alone.
      */
@@ -479,8 +479,8 @@ class Overlays
     void SetTextDay(DayType day) { text_.SetDay(day); }
 
     /*!
-     * \brief Sets the valid-in-days of the text overlay: the days around its day and month it
-     *        starts on as well, when both are set.
+     * \brief Sets the valid-in-days of the text overlay: the days after its day and month it starts
+     *        on as well, when both are set.
      *
      * \param[in] valid_in_days The number of days, 0 for the day alone.
      */
@@ -562,9 +562,8 @@ class Overlays
      * It acts only when the second of RealTimeClock differs from the one it last acted on, so once
      * per second, however often the scheduler calls it. While an overlay shows, it counts the show
      * timer down and starts the overlay's text again whenever Text has gone through it; on the
-     * second after the timer has run out, it ends the overlay. While none shows, it starts the
-     * first one that is due, in the order date, temperature, text. It draws and shows nothing
-     * itself.
+     * second that runs the timer out, it ends the overlay. While none shows, it starts the first
+     * one that is due, in the order date, temperature, text. It draws and shows nothing itself.
      */
 	void Task();
 

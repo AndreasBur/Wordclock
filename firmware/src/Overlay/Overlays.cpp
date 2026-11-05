@@ -54,10 +54,9 @@ StdReturnType Overlays::Abort() {
 #endif
 
     /*
-     * The timer is cleared here rather than left to run out: it is what TaskIdle() reads
-     * to decide whether an overlay may start, and only TaskShow() counts it down, so a
-     * leftover value would keep every overlay from starting in its period until a "show
-     * now" call replaced it.
+     * Cleared here rather than left to Task(), which zeroes it on the first tick that finds
+     * nothing showing: that tick is up to a second away, and until it comes the timer says a
+     * show is running that this call has just ended.
      */
     show_timer_in_seconds_ = 0u;
     return kEOk;
