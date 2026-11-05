@@ -431,6 +431,22 @@ int main()
     Check(System::GetInstance().SetConsolePassword("hunter2") == kEOk, "a password can be stored");
     Check(System::GetInstance().IsConsoleProtected(), "which is what protected means");
 
+    /*
+     * A write that stops short used to leave its part as the password, one nobody had chosen;
+     * and a capacity of 0 used to write the terminator anyway and read without a bound.
+     */
+    littleFsWriteBudget() = 3u;
+    Check(System::GetInstance().SetConsolePassword("swordfish") == kENotOk,
+          "a password whose write stops short is refused");
+    littleFsWriteBudget() = static_cast<size_t>(-1);
+    char kept[16]{};
+    Check(System::GetInstance().GetConsolePassword(kept, sizeof(kept)) == kEOk && std::strcmp(kept, "hunter2") == 0,
+          "and the password before it stays");
+    Check(littleFsStore().count("/wc-network/console-pass.new") == 0u, "and nothing is left beside it");
+    char untouched[1]{'x'};
+    Check(System::GetInstance().GetConsolePassword(untouched, 0u) == kENotOk && untouched[0] == 'x',
+          "a capacity of 0 is refused, and the buffer left alone");
+
     for(const char* route : {"/", "/console", "/commands", "/display", "/manifest.webmanifest", "/icon-192.png", "/update"}) {
         authentication_was_requested = false;
         const std::string body = Fetch(route);

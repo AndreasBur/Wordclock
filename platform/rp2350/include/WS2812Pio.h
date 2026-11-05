@@ -35,8 +35,8 @@
 /*!
  * \brief The state machine of that block which sends the frames.
  *
- * WS2812Pio::Init() takes it as it is: it does not claim it from the SDK, so a library that asks
- * the SDK for an unused state machine of the block may be handed the same one.
+ * WS2812Pio::Init() claims it from the SDK, so a library that asks the SDK for an unused state
+ * machine of the block is handed another one, and one that claims this one first stops Init().
  */
 #define WS2812_PIO_STATE_MACHINE_INDEX                  0u
 
@@ -101,20 +101,21 @@ class WS2812Pio
     /*!
      * \brief Sets the transmitter up on the strip's data line `pin`.
      *
-     * It loads the program into PIO block WS2812_PIO_BLOCK_INDEX wherever the loader finds room,
-     * claims an unused DMA channel, and starts state machine WS2812_PIO_STATE_MACHINE_INDEX with
+     * It claims state machine WS2812_PIO_STATE_MACHINE_INDEX of PIO block WS2812_PIO_BLOCK_INDEX,
+     * loads the program into the block wherever the loader finds room, claims an unused DMA
+     * channel, and starts the state machine with
      * `pin` as its side-set pin, made an output. The state machine shifts each word out to the
      * left, most significant bit first, pulls the next word after 24 bits, and has both FIFOs
      * joined for transmitting. Its clock is divided down from the system clock to 20 MHz.
      *
-     * If the program does not fit into the block or no DMA channel is free, it prints that on the
-     * serial line and gives up, and IsReady() stays false. It reports and gives up rather than
+     * If the state machine is claimed already, the program does not fit into the block or no DMA
+     * channel is free, it prints that on the serial line, gives back what it had claimed and
+     * loaded, and gives up; IsReady() stays false. It reports and gives up rather than
      * retrying: the contract's Init() returns nothing, and a clock whose console still answers is
      * more useful for finding a miswired pin than one that reboots. Once it has succeeded, a
      * further call does nothing.
      *
      * \param[in] pin The GPIO of the strip's data line.
-     * \note A call that gives up for want of a DMA channel leaves the program loaded in the block.
      */
     void Init(uint8_t pin);
 

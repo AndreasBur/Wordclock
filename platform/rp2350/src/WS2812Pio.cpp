@@ -72,6 +72,13 @@ void WS2812Pio::Init(uint8_t pin)
 
     PIO block = Block();
 
+    // pio_sm_claim() panics on a state machine that is claimed already, so it is asked first.
+    if(pio_sm_is_claimed(block, kStateMachine)) {
+        Serial.println(F("Pixels: the PIO state machine is claimed already"));
+        return;
+    }
+    pio_sm_claim(block, kStateMachine);
+
     pio_program_t program{};
     program.instructions = kInstructions;
     program.length = kInstructionCount;
@@ -84,12 +91,16 @@ void WS2812Pio::Init(uint8_t pin)
 
     const int offset = pio_add_program(block, &program);
     if(offset < 0) {
+        pio_sm_unclaim(block, kStateMachine);
         Serial.println(F("Pixels: no room for the PIO program"));
         return;
     }
 
     dma_channel_ = dma_claim_unused_channel(false);
     if(dma_channel_ < 0) {
+        // Given back, so that a call that gave up holds nothing that another one would need.
+        pio_remove_program(block, &program, static_cast<uint>(offset));
+        pio_sm_unclaim(block, kStateMachine);
         Serial.println(F("Pixels: no free DMA channel"));
         return;
     }

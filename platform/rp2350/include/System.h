@@ -237,11 +237,10 @@ class System
      *
      * \param[out] password A buffer of `capacity` characters.
      * \param[in] capacity The length of `password`, its terminator included.
-     * \return kEOk, or kENotOk if `password` is null, the filesystem did not mount, or no password
-     *         is stored; `password` is then an empty string, unless it is null. A stored password
-     *         longer than `capacity` - 1 is cut short to that, and still answers kEOk.
-     * \warning A `capacity` of 0 is not checked: the terminator is then written to `password[0]`,
-     *          and the read into `password` is not bounded.
+     * \return kEOk, or kENotOk if `password` is null, `capacity` is 0, the filesystem did not
+     *         mount, or no password is stored; `password` is then an empty string, unless it is
+     *         null or `capacity` is 0, which leave it alone. A stored password longer than
+     *         `capacity` - 1 is cut short to that, and still answers kEOk.
      */
     StdReturnType GetConsolePassword(char* password, size_t capacity) const;
 
@@ -258,8 +257,8 @@ class System
      * \param[in] password The password, terminated; an empty one clears it.
      * \return kEOk, or kENotOk if it was not stored. For a null or too long `password`, a
      *         filesystem that did not mount, or a file that did not open, the console then asks for
-     *         what it asked for before; a write that stops part way leaves the part that was
-     *         written as the password, and an empty part as none.
+     *         what it asked for before. That holds for a write that stops part way too: the
+     *         password is written beside the old one and takes its place only once it is whole.
      */
     StdReturnType SetConsolePassword(const char* password);
 

@@ -23,18 +23,31 @@ namespace {
  * Its own directory, not the one the settings blob lives in: a settings reset must not
  * take the network with it, or a clock is left that nobody can reach without a cable.
  */
-constexpr const char* kNetworkNamespace{"wc-network"};
-constexpr const char* kSsidKey{"ssid"};
-constexpr const char* kPasswordKey{"password"};
+constexpr char kNetworkNamespace[]{"wc-network"};
+constexpr char kSsidKey[]{"ssid"};
+constexpr char kPasswordKey[]{"password"};
 /*
  * Beside the network's own keys and in the same directory: this is how the clock is reached
  * as well, which is what that namespace holds and what keeps it out of the settings blob the
  * core persists.
  */
-constexpr const char* kConsolePasswordKey{"console-pass"};
-// Two names, two separators and the terminator, which the longest of the pair fits in
-// several times over.
+constexpr char kConsolePasswordKey[]{"console-pass"};
+// Appended to a file's path while it is being written, see WriteStoredString().
+constexpr char kStagedSuffix[]{".new"};
+
+// The separator, the namespace, the separator, the key and the terminator.
+constexpr size_t CredentialPathLength(size_t key_size)
+{
+    return 1u + (sizeof(kNetworkNamespace) - 1u) + 1u + (key_size - 1u) + 1u;
+}
+
 constexpr size_t kCredentialPathLength{32u};
+static_assert(CredentialPathLength(sizeof(kSsidKey)) <= kCredentialPathLength &&
+              CredentialPathLength(sizeof(kPasswordKey)) <= kCredentialPathLength &&
+              CredentialPathLength(sizeof(kConsolePasswordKey)) <= kCredentialPathLength,
+              "System: a credential's path does not fit kCredentialPathLength");
+// A path with the staged suffix behind it.
+constexpr size_t kStagedPathLength{kCredentialPathLength + sizeof(kStagedSuffix) - 1u};
 
 constexpr uint32_t kBytesPerKibibyte{1024u};
 
@@ -61,8 +74,8 @@ bool IsCredentialStoreReady()
 
 void BuildCredentialPath(const char* key, char* path, size_t capacity)
 {
-    // The namespace and the keys are this file's own constants, and the longest pair fits
-    // kCredentialPathLength with room to spare.
+    // The namespace and the keys are this file's own constants, and the assertion beside
+    // kCredentialPathLength holds the longest pair to it.
     (void)snprintf(path, capacity, "/%s/%s", kNetworkNamespace, key);
 }
 
@@ -70,6 +83,9 @@ void BuildCredentialPath(const char* key, char* path, size_t capacity)
 // empty answer and a missing key are the same thing here: a network nobody entered.
 StdReturnType ReadStoredString(const char* key, char* string, size_t capacity)
 {
+    // No room even for the terminator, and capacity - 1 below would wrap.
+    if(capacity == 0u) { return kENotOk; }
+
     string[0u] = STD_NULL_CHARACTER;
 
     if(!IsCredentialStoreReady()) { return kENotOk; }
@@ -92,24 +108,33 @@ StdReturnType ReadStoredString(const char* key, char* string, size_t capacity)
     return kEOk;
 }
 
-// Replaces one stored string. Opened for writing rather than appended to, so a shorter
-// pass phrase cannot leave the tail of a longer one behind it.
+/*
+ * Replaces one stored string, whole or not at all. It is written beside the file and renamed over
+ * it only once every byte is written, which LittleFS does in one step: a write that stops part way
+ * used to leave the part as the value, a password nobody had chosen.
+ */
 bool WriteStoredString(const char* key, const char* string)
 {
     if(!IsCredentialStoreReady()) { return false; }
 
     char path[kCredentialPathLength]{};
+    char staged[kStagedPathLength]{};
     LittleFS.mkdir(kNetworkNamespace);
     BuildCredentialPath(key, path, sizeof(path));
+    (void)snprintf(staged, sizeof(staged), "%s%s", path, kStagedSuffix);
 
-    File stored = LittleFS.open(path, "w");
+    File stored = LittleFS.open(staged, "w");
     if(!stored) { return false; }
 
     const size_t length = strlen(string);
     const size_t written = stored.write(reinterpret_cast<const uint8_t*>(string), length);
     stored.close();
 
-    return written == length;
+    if((written != length) || !LittleFS.rename(staged, path)) {
+        LittleFS.remove(staged);
+        return false;
+    }
+    return true;
 }
 
 // What was compiled in, which is what a clock that was flashed with a WordclockSecrets.h
