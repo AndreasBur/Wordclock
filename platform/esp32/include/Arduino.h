@@ -38,7 +38,14 @@
 # error "Arduino.h: WORDCLOCK_CORE_ARDUINO_H is not set. scripts/firmware_includes.py defines it; a build that bypasses that script cannot find the Arduino core's own header."
 #endif
 
-#include WORDCLOCK_CORE_ARDUINO_H
+/*
+ * Re-exported, every one of them: this header is the backend's Arduino API, and what includes it
+ * wants - `byte` above all - is defined in them rather than here. Without the pragma an
+ * include-cleaner credits those symbols to the inner header, finds nothing of this one used
+ * directly, and offers to drop the include; taking that offer leaves the file resting on whatever
+ * neighbour happens to include this header too.
+ */
+#include WORDCLOCK_CORE_ARDUINO_H // IWYU pragma: export
 
 /*
  * Proof that the line above really brought the core in. Without it everything below still
@@ -47,7 +54,7 @@
  */
 static_assert(sizeof(byte) == 1u, "Arduino.h: the Arduino core's header did not come in through WORDCLOCK_CORE_ARDUINO_H");
 
-#include "WordclockSerial.h"
+#include "WordclockSerial.h" // IWYU pragma: export
 
 /*!
  * \brief Defined, as 1, where this platform's Arduino.h was included rather than the core's.
