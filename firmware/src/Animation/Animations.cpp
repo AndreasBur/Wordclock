@@ -540,7 +540,7 @@ void Animations::SelectAnimationOfMode()
 /*
  * The current animation is initialised before it is left rather than overwritten: Fade has
  * set the display's fade level and Flicker may have switched the display off, and only their
- * own Init() puts that back - an animation left half way through through SetAnimation() kept
+ * own Init() puts that back - an animation left half way through SetAnimation() kept
  * the display dimmed. The new one shares its memory with the previous one, so it is
  * initialised before it is used.
  */

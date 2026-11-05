@@ -58,8 +58,9 @@ class Animation
      * Every animation whose set phase places the letters itself ends through one of these two
      * instead of just going idle: drawing the target once more makes the last frame authoritative,
      * so a pixel the animation skipped or hit twice cannot leave a word of the previous time
-     * behind. AnimationFade is the one animation outside this, because its set phase only ramps
-     * the brightness of letters already in place.
+     * behind. AnimationFade ends through FinishWithTime() as well, although its set phase only
+     * ramps the brightness of letters already in place: a newer time that arrived while it was
+     * fading up is then on the display when it goes idle.
      *
      * Every pixel is turned off, the words are lit through Clock::SetTime(), and the state goes
      * to StateType::kIdle. Nothing is shown; Show() does that.

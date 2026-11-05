@@ -455,8 +455,8 @@ class Animations
      *
      * They step the selection, so they mean what `9 -A<id>` means and not what
      * `RpcIdType::kAnimationStart` means - the animation runs at the next word change, and in a
-     * mode that picks its own the selection is what ModeType::kFixed would return to. The warning
-     * of SetAnimation() holds for them too.
+     * mode that picks its own the selection is what ModeType::kFixed would return to. Like
+     * SetAnimation(), they end a running animation through its own `Init()` first.
      */
     void NextAnimation() { SetAnimation(ToNextAnimation(animation_id_)); }
 

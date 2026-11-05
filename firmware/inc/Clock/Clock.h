@@ -213,11 +213,11 @@ class Clock
      * \brief Switches to the next mode, from the last one back to the first.
      *
      * One wording further, wrapping at the last, for a control that cannot name a mode. It draws
-     * nothing: the words of the new wording differ from the ones DisplayManager has latched, so
-     * its next task finds the change and puts them up the way it does for every other one - with
-     * the selected animation, as after `8 -M<id>`. Where two wordings say the same thing
-     * at the current time there is nothing to redraw, and nothing happens, which is the right
-     * answer rather than a missed one.
+     * nothing: the words of the new wording differ from the ones DisplayManager has latched, so its
+     * next task finds the change and puts them up the way it does for every other one - with the
+     * animation the mode provides, as after `8 -M<id>`. Where two wordings say the same thing at
+     * the current time there is nothing to redraw, and nothing happens, which is the right answer
+     * rather than a missed one.
      */
     void NextMode() { SetMode(ToNextMode(mode_)); }
 

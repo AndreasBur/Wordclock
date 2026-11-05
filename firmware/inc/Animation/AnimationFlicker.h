@@ -22,13 +22,13 @@
 /*!
  * \brief The flicker animation: the display flickers a few times, then the new time is there.
  *
- * In the first half, while GetState() returns kClearTime, it switches the display off and on,
- * through Display::Disable() and Display::Enable(), while the display keeps the previous time.
- * The second half, while it returns kSetTime, is one step.
+ * In the first half, while GetState() returns kClearTime, it switches a display that was on when
+ * the run started off and on, through Display::Disable() and Display::Enable(), while the display
+ * keeps the previous time. The second half, while it returns kSetTime, is one step.
  *
  * SetTime() starts it from whatever the display shows, and each Task() takes one step of it. The
  * last step clears the display, lights the words of the new time whole and makes the animation
- * idle; it also enables the display.
+ * idle; it also switches the display back on if the flicker had switched it off.
  *
  * A display that is switched off when the run starts, by hand or by NightSwitch, is not
  * flickered and stays off: the run only counts its steps and then lights the words.
@@ -81,8 +81,9 @@ class AnimationFlicker : public Animation
     /*!
      * \brief Takes one step of the animation; does nothing while it is idle.
      *
-     * A step of the first half switches the display off or on, the first one off;
-     * ANIMATION_FLICKER_COUNTER_INIT_VALUE + 1 steps in all. The step after them ends it.
+     * A step of the first half switches the display off or on, the first one off, unless the
+     * display was already off when the run started; ANIMATION_FLICKER_COUNTER_INIT_VALUE + 1 steps
+     * in all. The step after them ends it.
      *
      * It writes the pixels of Display and leaves showing them to Show().
      */

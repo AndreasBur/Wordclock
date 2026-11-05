@@ -103,8 +103,8 @@ class MsgCmdRemoteProcedureCallParser : public MsgParameterParser<MsgCmdRemotePr
          */
         kClockRefresh,
         /*!
-         * \brief Runs the selected animation on the current time now; refused while an overlay
-         *        shows.
+         * \brief Runs the animation the mode provides on the current time now; refused while an
+         *        overlay shows.
          */
         kAnimationStart,
         /*!
@@ -373,9 +373,9 @@ class MsgCmdRemoteProcedureCallParser : public MsgParameterParser<MsgCmdRemotePr
              * These seven cannot be refused, which is why none of them takes a return
              * value: every one of them is a setting moved to its neighbour, and a setting
              * has no state it can be in that makes the next one unreachable. What they
-             * ask of the display is left to the display - the clock's wording redraws
-             * through DisplayManager's latch on the next task, and the selected animation
-             * runs at the next word change, the same as if a phone had sent the value.
+             * ask of the display is left to the display - the clock's wording redraws through
+             * DisplayManager's latch on the next task, and the animation the mode provides runs at
+             * the next word change, the same as if a phone had sent the value.
              */
             case RpcIdType::kAnimationNext :
                 Animations::GetInstance().NextAnimation();

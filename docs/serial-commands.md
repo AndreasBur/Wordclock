@@ -297,7 +297,7 @@ From
 | 18 / 19 | Gamma correction on / off |
 | 20 / 21 | Power on / off — switches the 5 V supply of the LED stripes, which is **not** ids 3 and 4: those darken a strip that stays powered and keeps drawing its quiescent current, about 110 mA for this display. Both are asks rather than acts, and take two ticks: switching off blanks the stripes over the data line, waits for that frame to be gone and only then drops the port, because data reaching DIN with the rail down pushes current into it through the LED's own protection diode. Switching on is that order backwards. **Answers `Error=9` on a clock whose switch was not built** — it is optional hardware, and only the simulator declares it fitted so far. Circuit in [the ESP32 backend's hardware notes](../platform/esp32/README.md#switching-the-strips-supply), sequence in [Power.h](../firmware/inc/Power/Power.h) |
 | 22 | Clock refresh — draw the current time again, right now and without an animation |
-| 23 | Animation start — run the selected animation on the current time |
+| 23 | Animation start — run the animation the mode provides on the current time |
 | 24 | Animation abort — end a running animation and put the time back |
 | 25 / 26 / 27 | Overlay date / temperature / text — show it now instead of at its next period |
 | 28 | Overlay abort — end the overlay that is showing |
@@ -307,7 +307,7 @@ From
 | 32 | Time resynchronise — ask the time server again, for the clock that came up while it was unreachable |
 | 33 | Network reconnect — join the network again |
 | 34 / 35 | Animation next / previous — one further through the list and one back, wrapping at both ends. They step the *selection*, so they mean what `9 -A<id>` means: the animation runs at the next word change, not now. "No animation" is part of the round rather than skipped, because a knob is the only way back to it for somebody with no phone |
-| 36 | Clock mode next — one wording further, wrapping after the fourth. It draws nothing itself: the new wording's words differ from the ones on the display, which is what the clock already redraws for, so the change arrives with the selected animation within a task. Where two wordings say the same thing at the current time, nothing happens — there is nothing different to show |
+| 36 | Clock mode next — one wording further, wrapping after the fourth. It draws nothing itself: the new wording's words differ from the ones on the display, which is what the clock already redraws for, so the change arrives with the animation the mode provides within a task. Where two wordings say the same thing at the current time, nothing happens — there is nothing different to show |
 | 37 | Display toggle — off if it is on, on if it is off. The same switch as ids 3 and 4, and it follows them: a display switched off from a phone is switched on by this |
 | 38 / 39 | Auto-brightness toggle / gamma correction toggle — the other way round from whatever the setting is now |
 | 40 | Colour reset — white again, the colour a clock starts with and the one `1 -P30` puts back |
