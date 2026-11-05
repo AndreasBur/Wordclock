@@ -74,10 +74,10 @@ void ToBase64(const char* plain, size_t length, char* target, size_t capacity)
 }
 
 /*
- * Reads one stored string into a buffer that has room for it, terminator included. An empty
- * answer and a missing key are meant to be the same thing here: a network nobody entered. The
- * framework's getString() counts the terminator, though, so only a missing key answers 0; an
- * empty value answers 1 and reads as stored - see the warning at System::StartNetwork().
+ * Reads one stored string into a buffer that has room for it, terminator included. Only a
+ * missing key, or one too long for the buffer, answers kENotOk: the framework's getString()
+ * counts the terminator, so an empty value answers 1 and reads as stored - an open network's
+ * empty pass phrase does. ReadStoredSsid() takes an empty name for none.
  */
 StdReturnType ReadStoredString(const char* key, char* string, size_t capacity)
 {
@@ -96,6 +96,19 @@ StdReturnType ReadStoredString(const char* key, char* string, size_t capacity)
 
 // What was compiled in, which is what a clock that was flashed with a WordclockSecrets.h
 // still comes up with. Stored credentials win over it: they are the later word.
+/*
+ * The stored name, if there is one that names a network. Empty counts as none: the framework's
+ * getString() answers an empty value with 1, as it counts the terminator, and a name stored
+ * empty by a firmware before SetNetworkCredentials() removed it would otherwise be joined.
+ */
+StdReturnType ReadStoredSsid(char* ssid)
+{
+    if(ReadStoredString(kSsidKey, ssid, System::kSsidStringLength) == kENotOk) { return kENotOk; }
+    if(ssid[0u] == STD_NULL_CHARACTER) { return kENotOk; }
+
+    return kEOk;
+}
+
 constexpr bool IsSsidCompiledIn()
 {
     return sizeof(WORDCLOCK_WIFI_SSID) > 1u;
@@ -152,7 +165,7 @@ StdReturnType System::GetLinkQuality(char* string) const
 
 StdReturnType System::GetNetworkSsid(char* ssid) const
 {
-    if(ReadStoredString(kSsidKey, ssid, kSsidStringLength) == kEOk) { return kEOk; }
+    if(ReadStoredSsid(ssid) == kEOk) { return kEOk; }
 
     if(IsSsidCompiledIn()) { return CopyIfItFits(WORDCLOCK_WIFI_SSID, ssid, kSsidStringLength); }
 
@@ -176,8 +189,20 @@ StdReturnType System::SetNetworkCredentials(const char* ssid, const char* passwo
     Preferences store;
     if(!store.begin(kNetworkNamespace, false)) { return kENotOk; }
 
-    const bool stored = (store.putString(kSsidKey, ssid) == strlen(ssid)) &&
-                        (store.putString(kPasswordKey, password) == strlen(password));
+    /*
+     * An empty name forgets the network: both keys go, as an empty value written would read
+     * back as stored, and 13 -S -P joined a network with no name instead of opening the access
+     * point. An empty pass phrase is kept, as it is an open network's.
+     */
+    bool stored;
+    if(ssid[0u] == STD_NULL_CHARACTER) {
+        store.remove(kSsidKey);
+        store.remove(kPasswordKey);
+        stored = !store.isKey(kSsidKey);
+    } else {
+        stored = (store.putString(kSsidKey, ssid) == strlen(ssid)) &&
+                 (store.putString(kPasswordKey, password) == strlen(password));
+    }
     store.end();
 
     if(!stored) { return kENotOk; }
@@ -196,15 +221,16 @@ void System::StartNetwork()
     char ssid[kSsidStringLength]{};
     char password[kPasswordStringLength]{};
 
-    if(GetNetworkSsid(ssid) == kENotOk) {
+    // The pass phrase from where the name came from: a stored one, which may be empty for an
+    // open network, beside a stored name; the compiled-in one beside the compiled-in name.
+    if(ReadStoredSsid(ssid) == kEOk) {
+        (void)ReadStoredString(kPasswordKey, password, kPasswordStringLength);
+    } else if(GetNetworkSsid(ssid) == kEOk) {
+        (void)CopyIfItFits(WORDCLOCK_WIFI_PASSWORD, password, kPasswordStringLength);
+    } else {
         WiFi.mode(WIFI_AP);
         WiFi.softAP(SYSTEM_ACCESS_POINT_SSID);
         return;
-    }
-
-    /* The stored pass phrase, or the compiled-in one when the name came from there. */
-    if(ReadStoredString(kPasswordKey, password, kPasswordStringLength) == kENotOk) {
-        CopyIfItFits(WORDCLOCK_WIFI_PASSWORD, password, kPasswordStringLength);
     }
 
     WiFi.mode(WIFI_STA);
@@ -243,9 +269,9 @@ StdReturnType System::ResynchroniseTime()
  */
 StdReturnType System::ReconnectNetwork()
 {
-    // Only the compiled-in SSID is asked for here; a network stored over the console is not
-    // seen. IsNetworkConfigured() would see both.
-    if(sizeof(WORDCLOCK_WIFI_SSID) <= 1u) { return kENotOk; }
+    // A stored network as well as a compiled-in one: asked for the compiled-in SSID alone, as
+    // this was, it refused a network entered with command 13.
+    if(!IsNetworkConfigured()) { return kENotOk; }
 
     if(!WiFi.reconnect()) { return kENotOk; }
 

@@ -28,6 +28,7 @@
 #include "StandardTypes.h"
 
 #include <atomic>
+#include <mutex>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -71,10 +72,9 @@ class __FlashStringHelper;
  * `Serial`, wordclock_platform::HardwarePort(): it reads that port first and the injected
  * characters second, and writes to that port as it goes while it collects each line for the sink.
  *
- * \warning The writers keep one line buffer and take no lock, so they are for one task at a time.
- *          WebInterface prints from the web server's task as well, when an update is refused and
- *          when a web socket client finds no room: a line printed there while the firmware's task
- *          prints can run the two together.
+ * The writers keep one line buffer and hold a lock while they print, as WebInterface prints from
+ * the web server's task as well as the firmware's, when an update is refused and when a web socket
+ * client finds no room. A line from the one is not run into a line from the other.
  */
 class WordclockSerial
 {
@@ -96,6 +96,13 @@ class WordclockSerial
 
     char line_buffer_[kLineLength]{};
     size_t line_used_{0u};
+    /*
+     * Held through every print and println, so that a line printed from the web server's task
+     * does not run into one printed from the firmware's: both share line_buffer_ and line_used_,
+     * and without it a line could run one byte past the buffer. Recursive, as print(const char*)
+     * prints each character through print(char).
+     */
+    std::recursive_mutex output_mutex_;
 
     char inject_buffer_[kInjectBufferSize]{};
     /*

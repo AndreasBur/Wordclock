@@ -8,12 +8,16 @@
 #include "System.h"
 #include "Update.h"
 #include "WebInterface.h"
+#include "WordclockSerial.h"
+#include <WiFi.h>
 #include "check.h"
 #include <algorithm>
 #include <cstdio>
 #include <cstring>
 #include <map>
+#include <mutex>
 #include <string>
+#include <thread>
 #include <vector>
 
 /*
@@ -567,6 +571,57 @@ int main()
     Check(!System::GetInstance().IsConsoleProtected(), "which unprotects the console");
     fetch_root(nullptr);
     Check(sent_status.empty(), "and answers everybody again");
+
+    /*
+     * The network, against a store that answers as the framework's: getString() counts the
+     * terminator, so an empty value reads as stored. An empty name stored as such made 13 -S -P
+     * join a network with no name; RPC 33 asked for a compiled-in network only.
+     */
+    {
+        System& system = System::GetInstance();
+        const int reconnects = WiFi.Reconnects;
+
+        Check(system.SetNetworkCredentials("Home", "homepass") == kEOk && WiFi.Mode == WIFI_STA &&
+              WiFi.Joined == "Home" && WiFi.JoinedWith == "homepass", "a stored network is joined");
+        Check(system.ReconnectNetwork() == kEOk && WiFi.Reconnects == reconnects + 1,
+              "and RPC 33 reconnects to a network entered with command 13");
+        Check(system.SetNetworkCredentials("OpenNet", "") == kEOk && WiFi.Joined == "OpenNet" &&
+              WiFi.JoinedWith.empty(), "an empty pass phrase joins an open network");
+
+        WiFi.AccessPoint.clear();
+        Check(system.SetNetworkCredentials("", "") == kEOk && !system.IsNetworkConfigured() &&
+              WiFi.Mode == WIFI_AP && WiFi.AccessPoint == SYSTEM_ACCESS_POINT_SSID,
+              "an empty name forgets the network and opens the access point");
+        Check(system.ReconnectNetwork() == kENotOk, "after which RPC 33 has nothing to join");
+    }
+
+    /*
+     * Two tasks printing at once, as the firmware's and the web server's do. Every line that
+     * reaches the sink is one task's line, whole: without the lock the two ran together.
+     */
+    {
+        static std::vector<std::string> sunk;
+        static std::mutex sunk_mutex;
+        WordclockSerial& port = WordclockSerial::GetInstance();
+        constexpr int kLines{200};
+
+        port.SetLineSink([](const char* line) {
+            const std::lock_guard<std::mutex> lock(sunk_mutex);
+            sunk.emplace_back(line);
+        });
+        const std::string as(40u, 'a');
+        const std::string bs(40u, 'b');
+        std::thread first([&] { for(int line = 0; line < kLines; line++) { port.println(as.c_str()); } });
+        std::thread second([&] { for(int line = 0; line < kLines; line++) { port.println(bs.c_str()); } });
+        first.join();
+        second.join();
+        port.SetLineSink(nullptr);
+
+        const bool whole = std::all_of(sunk.begin(), sunk.end(), [&](const std::string& line) {
+            return (line == as) || (line == bs);
+        });
+        Check((sunk.size() == 2u * kLines) && whole, "lines printed from two tasks at once stay whole");
+    }
 
     return Report();
 }
