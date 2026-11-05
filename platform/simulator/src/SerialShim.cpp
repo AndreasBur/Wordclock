@@ -58,7 +58,7 @@ void SerialShim::FinishOutputLine()
      * the other is the confusing half. AppendOutput() collects nothing before the controls
      * are attached, though, so until then the line handed over is empty.
      */
-    if(line_sink_ != nullptr) { line_sink_(output_line_.utf8_str()); }
+    if(line_sink_ != nullptr) { line_sink_(ToFirmware(output_line_).data()); }
 
     if(IsAttached()) {
         output_->AppendText(_T("\n"));

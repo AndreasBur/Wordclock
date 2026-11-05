@@ -53,6 +53,7 @@ int main()
     TestClockModeStepsThroughEveryWording();
     TestClockWordsComparison();
     TestWeekdayOfEveryDate();
+    TestSerialShimSpeaksLatin1();
     TestAnimationStepsThroughEveryOne();
     TestFixedModeRunsEveryTimeAsTheFirst();
     TestEveryAnimationReportsItsStart();

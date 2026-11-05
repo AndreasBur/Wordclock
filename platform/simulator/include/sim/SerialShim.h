@@ -115,12 +115,9 @@ class SerialShim
      * The text goes into the output field and into the line that println() ends. Before Attach(),
      * it is dropped.
      *
-     * \param[in] text The text, terminated.
-     * \warning `text` is converted into a wxString in the encoding of the current locale. A Latin-1
-     *          byte, such as an umlaut of the text overlay, does not convert under a UTF-8 locale,
-     *          and then the whole of `text` is lost, in the window and on the pages alike.
+     * \param[in] text The text, terminated, in the firmware's Latin-1; see FromFirmware().
      */
-    void print(const char* text) { AppendOutput(text); } // NOLINT(readability-identifier-naming)
+    void print(const char* text) { AppendOutput(FromFirmware(text)); } // NOLINT(readability-identifier-naming)
     /*!
      * \brief Prints `number` in decimal.
      *
@@ -146,13 +143,43 @@ class SerialShim
      * close the line the same way, otherwise the line an answer is read back from would run on
      * across it.
      *
-     * \param[in] character The character.
-     * \warning A byte above 0x7F does not convert under a UTF-8 locale and is printed as `?`.
+     * \param[in] character The character, a Latin-1 byte.
      */
     void print(char character) { // NOLINT(readability-identifier-naming)
         if(character == '\n') { println(); }
-        else { AppendOutput(wxString(character)); }
+        else { AppendOutput(FromFirmware(character)); }
     }
+
+    /*!
+     * \brief Returns `text`, as the firmware prints it, as a wxString.
+     *
+     * The firmware speaks Latin-1, as the font tables and the hardware's ports do. Converted in
+     * the encoding of the locale instead, an umlaut such as the text overlay's did not convert
+     * under a UTF-8 locale, and the whole of the text was lost, in the window and on the pages.
+     *
+     * \param[in] text The text, terminated, in Latin-1.
+     * \return The text.
+     */
+    static wxString FromFirmware(const char* text) { return wxString(text, wxConvISO8859_1); }
+
+    /*!
+     * \brief Returns `character`, a Latin-1 byte as the firmware prints it, as a wxString.
+     *
+     * \param[in] character The character.
+     * \return The character.
+     */
+    static wxString FromFirmware(char character) { return wxString(wxUniChar(static_cast<int>(static_cast<unsigned char>(character)))); }
+
+    /*!
+     * \brief Returns `text` in the firmware's Latin-1, as the line sink takes it.
+     *
+     * WebFrontend::BroadcastLine() reads the line as Latin-1 and encodes it in UTF-8 itself, as it
+     * does on the hardware. Handed UTF-8 instead, an umlaut reached the browser encoded twice.
+     *
+     * \param[in] text The text, which holds nothing beyond Latin-1.
+     * \return The text in Latin-1, terminated.
+     */
+    static wxCharBuffer ToFirmware(const wxString& text) { return text.mb_str(wxConvISO8859_1); }
 
     /*! \brief Returns whether a character is waiting to be read. */
     bool available() const { return !send_buffer_.IsEmpty(); } // NOLINT(readability-identifier-naming)
@@ -199,11 +226,10 @@ class SerialShim
      * not the controls are attached, but before Attach() the line it is handed is empty, as print()
      * collects nothing until then.
      *
+     * The line is handed over in the firmware's Latin-1, ToFirmware(), as the hardware's ports
+     * hand it to WebFrontend::BroadcastLine().
+     *
      * \param[in] line_sink The function, or nullptr for none.
-     * \warning The sink is handed the line as UTF-8. The one the web host installs passes it on to
-     *          WebFrontend::BroadcastLine(), which reads a line as Latin-1 and widens every byte
-     *          above 0x7F again, so a non-ASCII character that reaches the line arrives at a
-     *          browser encoded twice.
      */
     void SetLineSink(LineSinkType line_sink) { line_sink_ = line_sink; }
 

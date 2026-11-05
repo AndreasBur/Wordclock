@@ -216,7 +216,9 @@ void PixelsFrame::OnMessage(wxCommandEvent &event)
 
 void PixelsFrame::OnQuit(wxCommandEvent &event)
 {
-    Destroy();
+    // Through the close event, as the frame's close button goes, so that the application
+    // stops its timer first; Destroy() sends none.
+    Close();
     UNUSED(event);
 }
 
