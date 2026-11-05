@@ -71,7 +71,7 @@ void ReportProgress()
     static bool connection_reported{false};
     static bool time_reported{false};
 
-    if(!connection_reported && (WiFi.status() == WL_CONNECTED)) {
+    if(!connection_reported && System::GetInstance().IsNetworkJoined()) {
         connection_reported = true;
         // Here rather than in setup(): the server names are resolved when this is called,
         // so before the link there is nothing to resolve them over.
@@ -162,11 +162,8 @@ void setup()
  * count in this interval, and a drifting one silently rescales all three. A tick that overran is
  * not caught up on: the next one starts at once, and the deadline counts on from there.
  *
- * \warning The link counts as up when `WiFi.status()` answers `WL_CONNECTED`, which arduino-pico
- *          also answers while the access point is open. A clock that comes up with its access point
- *          therefore reports "WiFi: connected" on its first tick and starts the time servers then,
- *          with no link to reach them over, and never again: a network entered later is joined, but
- *          its time is not asked for until RPC 32 or the next start.
+ * The link counts as up when System::IsNetworkJoined() says so, which the access point does not
+ * count for: the time servers are started once a network is joined, an entered one included.
  */
 void loop()
 {

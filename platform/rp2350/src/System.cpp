@@ -38,11 +38,6 @@ constexpr size_t kCredentialPathLength{32u};
 
 constexpr uint32_t kBytesPerKibibyte{1024u};
 
-bool IsNetworkJoined()
-{
-    return WiFi.status() == WL_CONNECTED;
-}
-
 /*
  * One file per key under a directory named after the namespace, which is what this core
  * offers in place of the IDF's key-value store. The two names the ESP32 backend uses are
@@ -173,6 +168,11 @@ StdReturnType System::GetLinkQuality(char* string) const
     return kEOk;
 }
 
+bool System::IsNetworkJoined() const
+{
+    return !access_point_open_ && (WiFi.status() == WL_CONNECTED);
+}
+
 StdReturnType System::GetNetworkSsid(char* ssid) const
 {
     if(ReadStoredString(kSsidKey, ssid, kSsidStringLength) == kEOk) { return kEOk; }
@@ -219,20 +219,24 @@ void System::StartNetwork()
     char ssid[kSsidStringLength]{};
     char password[kPasswordStringLength]{};
 
-    if(GetNetworkSsid(ssid) == kENotOk) {
+    /*
+     * The pass phrase from where the name came from: beside a stored name the stored one, which
+     * ReadStoredString() leaves empty for an open network's empty file; beside the compiled-in
+     * name the compiled-in one. Taken for none stored, an open network's empty pass phrase used
+     * to be replaced by the compiled-in one.
+     */
+    if(ReadStoredString(kSsidKey, ssid, kSsidStringLength) == kEOk) {
+        (void)ReadStoredString(kPasswordKey, password, kPasswordStringLength);
+    } else if(GetNetworkSsid(ssid) == kEOk) {
+        (void)CopyIfItFits(WORDCLOCK_WIFI_PASSWORD, password, kPasswordStringLength);
+    } else {
+        access_point_open_ = true;
         WiFi.mode(WIFI_AP);
         WiFi.softAP(SYSTEM_ACCESS_POINT_SSID);
         return;
     }
 
-    /*
-     * The stored pass phrase, or the compiled-in one when none is stored - which includes one
-     * stored empty, for a stored name as well; the block in System.h warns of it.
-     */
-    if(ReadStoredString(kPasswordKey, password, kPasswordStringLength) == kENotOk) {
-        CopyIfItFits(WORDCLOCK_WIFI_PASSWORD, password, kPasswordStringLength);
-    }
-
+    access_point_open_ = false;
     WiFi.mode(WIFI_STA);
     /*
      * Power saving is a mode on this core rather than a flag: the default one is the modem

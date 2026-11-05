@@ -71,12 +71,9 @@ using arduino::__FlashStringHelper;
  * own `Serial`, wordclock_platform::HardwarePort(): it reads that port first and the injected
  * characters second, and writes to that port as it goes while it collects each line for the sink.
  *
- * \warning The writers keep one line buffer and take no lock, so they are for one context at a
- *          time. WebInterface prints from the web server's callbacks as well, when an update is
- *          refused. Those run from lwIP, which arduino-pico runs in a low-priority interrupt on the
- *          core that runs loop(), so they can interrupt the firmware in the middle of a line. The
- *          refusal is then appended to the firmware's half line and handed on with it, and the rest
- *          of the firmware's line goes out as a line of its own.
+ * The writers keep one line buffer and take no lock, so they are for one context at a time:
+ * loop()'s. WebInterface's callbacks, which run from lwIP's background interrupt, print nothing
+ * themselves; a refused update is printed from the next tick.
  */
 class WordclockSerial
 {

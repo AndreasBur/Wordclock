@@ -68,9 +68,8 @@
  * interrupt on the core that runs loop(). The application calls Begin() once, and
  * BroadcastFrame() from its tick; WordclockSerial's line sink calls BroadcastLine().
  *
- * \warning The web socket asks for no password. Its handshake and its frames are taken whether or
- *          not a password is stored, so a client that opens `/ws` directly sends commands to a
- *          protected console, the console command that clears the password included.
+ * The web socket asks for the password at its handshake, as every route does; a refused one is
+ * answered with 401 by the library.
  */
 class WebInterface
 {
