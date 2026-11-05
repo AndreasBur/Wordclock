@@ -11,6 +11,8 @@
 #include "Arduino.h"
 #include "Twi.h"
 
+// Local to this file, so Doxygen leaves it out.
+/*! \cond */
 /* The bus the strip left free, see Twi.h. */
 #define TWI_PERIPHERAL                  TWI1
 
@@ -18,6 +20,7 @@
 // the pull-ups this bus is built with. The five is the controller's own overhead per bit.
 #define TWI_BAUD_OVERHEAD_CYCLES        5uL
 #define TWI_BAUD_REGISTER               static_cast<uint8_t>((F_CPU / (2uL * TWI_FREQUENCY_HZ)) - TWI_BAUD_OVERHEAD_CYCLES)
+/*! \endcond */
 
 /*
  * Both figures below are derived from F_CPU, and both fail quietly rather than loudly if it
@@ -30,9 +33,9 @@ static_assert((F_CPU / (2uL * TWI_FREQUENCY_HZ)) > TWI_BAUD_OVERHEAD_CYCLES,
 static_assert(TWI_BAUD_REGISTER <= 0xFFu, "Twi: F_CPU is too high for this bus frequency, the baud register does not fit");
 static_assert(TWI_TIMEOUT_LOOPS > 0u, "Twi: the timeout rounded down to zero, every transfer would fail immediately");
 
-/*! \brief          Waits for a written byte to have been acknowledged
- *  \return         kENotOk when the device did not answer, or when the bus never reported
- *                  the byte as sent at all
+/*
+ * Waits for a written byte to have been acknowledged. kENotOk when the device did not answer, or
+ * when the bus never reported the byte as sent at all.
  */
 StdReturnType Twi::WaitForWrite()
 {
@@ -63,10 +66,10 @@ StdReturnType Twi::WaitForRead()
     return kENotOk;
 }
 
-/*! \brief          Releases the bus
- *  \details        Sent on every path out of a transfer, the failing ones included: a
- *                  transfer abandoned without a stop leaves the bus owned, and the next
- *                  reader - the other chip on it - would find it busy for good.
+/*
+ * Releases the bus. Sent on every path out of a transfer, the failing ones included: a transfer
+ * abandoned without a stop leaves the bus owned, and the next reader - the other chip on it -
+ * would find it busy for good.
  */
 void Twi::Stop()
 {
@@ -113,11 +116,6 @@ StdReturnType Twi::Write(byte address, const byte* data, byte length)
     return kEOk;
 }
 
-/*! \brief          Reads a number of bytes from a device
- *  \details        Every byte but the last is acknowledged, the last one is not: that is how
- *                  the device is told to stop driving the bus, and acknowledging it too
- *                  would leave it sending into the stop condition.
- */
 StdReturnType Twi::Read(byte address, byte* data, byte length)
 {
     if(!initialised_) { return kENotOk; }
@@ -150,12 +148,6 @@ StdReturnType Twi::WriteRegister(byte address, byte register_address, byte value
     return Write(address, buffer, sizeof(buffer));
 }
 
-/*! \brief          Reads from a register of a device
- *  \details        Two transfers rather than a repeated start: the pointer write is stopped
- *                  before the read begins. Both chips here keep their register pointer across
- *                  the stop, and separating the transfers keeps this simple enough to have no
- *                  second waiting path to get wrong.
- */
 StdReturnType Twi::ReadRegister(byte address, byte register_address, byte* data, byte length)
 {
     if(Write(address, &register_address, 1u) != kEOk) { return kENotOk; }

@@ -23,11 +23,11 @@ byte frame_buffer[kFrameSize]{};
 
 } // namespace
 
-/*! \brief          Lays the buffer out the way the strip reads it
- *  \details        Green, red, blue - the WS2812's own order, which is not the order the
- *                  colour is written or spoken in. Spelled out per component rather than
- *                  copied wholesale, so a change to the pixel's internal layout cannot
- *                  silently swap two colours on the wire.
+/*
+ * Lays the buffer out the way the strip reads it: green, red, blue - the WS2812's own
+ * order, which is not the order the colour is written or spoken in. Spelled out per
+ * component rather than copied wholesale, so a change to the pixel's internal layout cannot
+ * silently swap two colours on the wire.
  */
 void Pixels::FillFrameBuffer() const
 {
@@ -56,12 +56,6 @@ StdReturnType Pixels::TransmitFrame()
     return WS2812::GetInstance().Send(frame_buffer, kFrameSize);
 }
 
-/*! \brief          Claims the strip's data line
- *  \details        The pin the core passes is not used: the line is driven by the look-up
- *                  table's own output, which is fixed to one of two pads and selected in
- *                  WS2812.h. Taken as a parameter regardless, because that is the seam every
- *                  backend implements.
- */
 void Pixels::Init(byte pin)
 {
     pin_ = pin;
@@ -70,15 +64,6 @@ void Pixels::Init(byte pin)
     initialised_ = true;
 }
 
-/*! \brief          Puts the buffer on the strip, if the firmware asked for it
- *  \details        Called once per tick by the application, never by Show(). Several modules
- *                  ask for a frame within a single tick, and transmitting from each of them
- *                  would put frames back to back on the wire; the strip needs the line idle
- *                  between them or it latches a frame shifted by a pixel, which reads as a
- *                  wiring fault rather than as a software one.
- *
- *  \return         kEOk if a frame went out or none was due
- */
 StdReturnType Pixels::Render()
 {
     /*
@@ -107,12 +92,6 @@ StdReturnType Pixels::Render()
  * that detail into the interface.
  */
 // NOLINTBEGIN(readability-convert-member-functions-to-static)
-/*! \brief          Whether the previous frame is still being transmitted
- *  \details        The driver's own answer rather than a flag kept here: it knows both halves
- *                  of it, the queue and the byte still sitting in the shift register.
- *
- *  \return         true while a frame is still going out
- */
 bool Pixels::IsFrameOnTheWire() const
 {
     return WS2812::GetInstance().IsBusy();
@@ -157,10 +136,6 @@ void Pixels::SetPixels(PixelType pixel)
     }
 }
 
-/*! \brief          Sets what the buffer is dimmed by on its way out
- *  \details        The buffer itself is left alone, so the colour a command set can still be
- *                  read back after the light sensor has dimmed the display.
- */
 void Pixels::SetBrightness(byte brightness, bool)
 {
     brightness_ = brightness;

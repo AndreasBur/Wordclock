@@ -13,8 +13,11 @@
 #ifndef _WORDCLOCK_CONFIGURATION_H_
 #define _WORDCLOCK_CONFIGURATION_H_
 
-// The same rate the other backends' consoles run at, so one terminal setting fits all
-// three.
+/*!
+ * \brief The baud rate of the console on USART1.
+ *
+ * The same rate the other backends' consoles run at, so one terminal setting fits all three.
+ */
 #define WORDCLOCK_SERIAL_BAUDRATE                       115200uL
 
 #endif // _WORDCLOCK_CONFIGURATION_H_

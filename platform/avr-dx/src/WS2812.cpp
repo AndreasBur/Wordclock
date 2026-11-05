@@ -13,6 +13,8 @@
 #include "WS2812.h"
 #include "Bit.h"
 
+// Local to this file, so Doxygen leaves it out.
+/*! \cond */
 // The synchronous baud rate register: the host clock is the peripheral clock divided by
 // twice this, in units of a sixty-fourth.
 #define WS2812_BAUD_REGISTER            static_cast<uint16_t>((64uL * F_CPU) / (2uL * WS2812_BIT_RATE_HZ))
@@ -44,12 +46,11 @@ volatile uint16_t frame_position{0u};
 
 } // namespace
 
-/*! \brief          Feeds the next pixel byte to the strip
- *  \details        Raised to the elevated interrupt level in Init(), so it runs ahead of the
- *                  console's handlers. That is what keeps the gap between two bytes inside
- *                  the strip's reset time: the pulse widths themselves come from hardware and
- *                  do not care when this runs, but a byte held back longer than the reset
- *                  time makes the strip latch half a frame.
+/*
+ * Feeds the next pixel byte to the strip. Raised to the elevated interrupt level in Init(), so it
+ * runs ahead of the console's handlers. That is what keeps the gap between two bytes inside the
+ * strip's reset time: the pulse widths themselves come from hardware and do not care when this
+ * runs, but a byte held back longer than the reset time makes the strip latch half a frame.
  */
 ISR(USART0_DRE_vect)
 {
@@ -63,14 +64,14 @@ ISR(USART0_DRE_vect)
     USART0.TXDATAL = frame_data[frame_position];
     frame_position++;
 }
+/*! \endcond */
 
-/*! \brief          Puts USART0 into SPI host mode at the strip's bit rate
- *  \details        Master SPI mode rather than a plain USART because the strip needs a clock
- *                  edge per bit: that edge is what starts the one-shots, and it is the reason
- *                  the pulse widths need no software timing at all.
+/*
+ * Puts USART0 into SPI host mode at the strip's bit rate. Master SPI mode rather than a plain
+ * USART because the strip needs a clock edge per bit: that edge is what starts the one-shots, and
+ * it is the reason the pulse widths need no software timing at all.
  *
- *                  Most significant bit first, because that is the order the WS2812 expects
- *                  its colour bytes in.
+ * Most significant bit first, because that is the order the WS2812 expects its colour bytes in.
  */
 void WS2812::InitUsart()
 {
@@ -83,10 +84,10 @@ void WS2812::InitUsart()
     USART0.CTRLB = USART_TXEN_bm;
 }
 
-/*! \brief          Routes the SPI clock to both one-shots
- *  \details        One channel for both timers, so the two pulses start on the very same
- *                  edge. Started apart they would drift against each other and the look-up
- *                  table would mux between two pulses that no longer share a rising edge.
+/*
+ * Routes the SPI clock to both one-shots. One channel for both timers, so the two pulses start on
+ * the very same edge. Started apart they would drift against each other and the look-up table
+ * would mux between two pulses that no longer share a rising edge.
  */
 void WS2812::InitEventSystem()
 {
@@ -95,10 +96,10 @@ void WS2812::InitEventSystem()
     EVSYS.USERTCB2CAPT = EVSYS_USER_CHANNEL0_gc;
 }
 
-/*! \brief          Arms the two pulse widths
- *  \details        Single-shot mode: the event starts the counter, the output stays high for
- *                  the compare value and then falls. One timer per width is what replaces the
- *                  E5's single XCL, whose one-shot could carry both.
+/*
+ * Arms the two pulse widths. Single-shot mode: the event starts the counter, the output stays high
+ * for the compare value and then falls. One timer per width is what replaces the E5's single XCL,
+ * whose one-shot could carry both.
  */
 void WS2812::InitOneShotTimers()
 {
@@ -113,11 +114,11 @@ void WS2812::InitOneShotTimers()
     TCB2.CTRLA = TCB_CLKSEL_DIV1_gc | TCB_ENABLE_bm;
 }
 
-/*! \brief          Muxes the two pulses onto the data pin
- *  \details        The three inputs are peripherals rather than pins, which is why the port
- *                  around them stays free; the input positions are fixed by the device, and
- *                  a look-up table can only reach the USART and timers that carry its own
- *                  index or the neighbouring one.
+/*
+ * Muxes the two pulses onto the data pin. The three inputs are peripherals rather than pins, which
+ * is why the port around them stays free; the input positions are fixed by the device, and a
+ * look-up table can only reach the USART and timers that carry its own index or the neighbouring
+ * one.
  */
 void WS2812::InitLookUpTable()
 {
@@ -138,11 +139,6 @@ void WS2812::InitLookUpTable()
  * The ones it would make const drive the hardware, which a const would deny.
  */
 // NOLINTBEGIN(readability-convert-member-functions-to-static, readability-make-member-function-const)
-/*! \brief          Builds the transmitter out of USART, event system, timers and look-up table
- *  \details        The order matters in one place only: the look-up table is enabled last, so
- *                  that it never drives the strip from inputs whose timers are not yet
- *                  running.
- */
 void WS2812::Init()
 {
     InitUsart();
@@ -158,11 +154,6 @@ void WS2812::Init()
     CPUINT.LVL1VEC = USART0_DRE_vect_num;
 }
 
-/*! \brief          Whether a frame is still going out
- *  \details        Both halves are needed: the queue can be empty while the last byte is
- *                  still in the shift register, and starting a frame then would run the two
- *                  together without the reset gap between them.
- */
 bool WS2812::IsBusy() const
 {
     if(frame_position < frame_length) { return true; }
@@ -170,12 +161,6 @@ bool WS2812::IsBusy() const
     return (USART0.STATUS & USART_TXCIF_bm) == 0u;
 }
 
-/*! \brief          Starts one frame
- *  \details        Returns as soon as the first byte is on its way; the rest follows from the
- *                  interrupt, which takes about 3.3 ms for a full display. The caller is free
- *                  in the meantime, and has to be - the tick this runs in also has a clock to
- *                  keep.
- */
 StdReturnType WS2812::Send(const byte* frame, uint16_t length)
 {
     if((frame == nullptr) || (length == 0u)) { return kENotOk; }

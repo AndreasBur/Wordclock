@@ -21,10 +21,12 @@
 #include "Arduino.h"
 #include "Bit.h"
 
+// Local to this file, so Doxygen leaves it out.
+/*! \cond */
 /*
- * The asynchronous baud rate register, from the data sheet: 64 samples per bit over the
- * sixteen the receiver takes. Rounded rather than truncated, which keeps the error inside
- * the receiver's tolerance at the rates the console is used at.
+ * The asynchronous baud rate register, from the data sheet: the register counts in sixty-fourths,
+ * over the sixteen samples per bit the receiver takes. Rounded rather than truncated, which keeps
+ * the error inside the receiver's tolerance at the rates the console is used at.
  */
 #define ARDUINO_BAUD_REGISTER(Baudrate)     static_cast<uint16_t>(((64uL * F_CPU) + (8uL * (Baudrate))) / (16uL * (Baudrate)))
 
@@ -91,14 +93,8 @@ ISR(USART1_RXC_vect)
         receive_head = next_head;
     }
 }
+/*! \endcond */
 
-/*! \brief          Brings the clock and the millisecond time base up
- *  \details        The oscillator is set explicitly rather than left at its reset value:
- *                  the device comes up at 4 MHz, and every timing constant in this backend -
- *                  the baud rates, the time base, and above all the strip's pulse widths -
- *                  is computed from F_CPU. A mismatch between the two would not fail to
- *                  build, it would put wrong pulses on the wire.
- */
 void InitRuntime()
 {
     _PROTECTED_WRITE(CLKCTRL.OSCHFCTRLA, CLKCTRL_FRQSEL_24M_gc);
@@ -146,10 +142,10 @@ void SerialPort::begin(uint32_t baudrate)
     ARDUINO_SERIAL_USART.CTRLB = USART_RXEN_bm | USART_TXEN_bm;
 }
 
-/*! \brief          Queues one character for the wire
- *  \details        Waits only when the queue is full, and then only for as long as one
- *                  character takes. Printing from a task must not otherwise block: the tick
- *                  it runs in also feeds the LED strip.
+/*
+ * Queues one character for the wire. Waits only when the queue is full, and then only for as long
+ * as one character takes. Printing from a task must not otherwise block: the tick it runs in also
+ * feeds the LED strip.
  */
 void SerialPort::write(char character)
 {
@@ -176,11 +172,6 @@ void SerialPort::print(const char* text)
     }
 }
 
-/*! \brief          Prints a string that lives in flash
- *  \details        The whole point of F(): read byte by byte out of program memory, so the
- *                  literal never occupies RAM. Every fixed word the command answers are
- *                  built from goes through here.
- */
 void SerialPort::print(const __FlashStringHelper* text)
 {
     if(text == nullptr) { return; }
@@ -214,11 +205,6 @@ bool SerialPort::available() const
     return receive_head != receive_tail;
 }
 
-/*! \brief          Takes the next character out of the receive queue
- *  \details        Answers a null character when there is nothing queued, which is what the
- *                  core's reader treats as "nothing there" - it asks available() first, so
- *                  this only has to be defined, not meaningful.
- */
 char SerialPort::read()
 {
     if(receive_head == receive_tail) { return '\0'; }

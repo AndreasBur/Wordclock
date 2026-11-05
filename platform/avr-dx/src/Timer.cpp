@@ -16,19 +16,16 @@
 #include <avr/interrupt.h>
 #include <util/atomic.h>
 
+// Local to this file, so Doxygen leaves it out.
+/*! \cond */
 /* A type A timer counts 16 bit in the single-slope and dual-slope modes this driver uses */
 #define TIMER_NUMBER_OF_BITS                        16u
 #define TIMER_RESOLUTION                            (1uL << TIMER_NUMBER_OF_BITS)
 #define TIMER_MAX_PRESCALER                         1024u
 /* the longest period a 16-bit TOP reaches at the largest prescaler, counted up and down again */
 #define TIMER_MAX_PERIOD                            ((TIMER_RESOLUTION / (F_CPU / 1000000uL)) * TIMER_MAX_PRESCALER * 2u)
+/*! \endcond */
 
-/*! \brief          bring the timer up, stopped, with a period and optionally a callback
- *  \param[in]      microseconds                period of the timer overflow interrupt
- *  \param[in]      timer_overflow_callback      called from the overflow ISR, or nullptr for none
- *  \return         kEOk
- *                  kENotOk
- */
 template <typename TimerTraits>
 StdReturnType Timer<TimerTraits>::Init(uint32_t microseconds, TimerIsrCallbackFVoid timer_overflow_callback)
 {
@@ -40,9 +37,9 @@ StdReturnType Timer<TimerTraits>::Init(uint32_t microseconds, TimerIsrCallbackFV
 
         /*
          * The Dx hands this timer over at its reset values rather than running, the way the
-         * xmegaForArduino core used to - but RESET is kept anyway, so that a second Init() after a
-         * DetachInterrupt() starts from the same place the first one did. The command is only
-         * obeyed while the timer is disabled, hence the order.
+         * xmegaForArduino core used to - but RESET is kept anyway, so that Init() does not depend
+         * on what was written to the timer before it. The command is only obeyed while the timer
+         * is disabled, hence the order.
          */
         SetRunning(false);
         GetTimer().CTRLESET = TCA_SINGLE_CMD_RESET_gc;
@@ -62,12 +59,11 @@ StdReturnType Timer<TimerTraits>::Init(uint32_t microseconds, TimerIsrCallbackFV
     return return_value;
 }
 
-/*! \brief          The smallest prescaler that brings a period inside the counter
- *  \details        Smallest, because every step up halves the resolution of TOP and of the
- *                  compare values derived from it. Each test shifts the undivided count, so
- *                  no step depends on what the one before it did to it.
- *  \param[in]      timer_cycles                 the period in undivided timer cycles
- *  \return         the clock select bit group
+/*
+ * The smallest prescaler that brings the period, in undivided timer cycles, inside the counter.
+ * Smallest, because every step up halves the resolution of TOP and of the compare values derived
+ * from it. Each test shifts the undivided count, so no step depends on what the one before it did
+ * to it.
  */
 template <typename TimerTraits>
 typename Timer<TimerTraits>::TimerClockSelectType Timer<TimerTraits>::ToClockSelect(uint32_t timer_cycles)
@@ -83,13 +79,6 @@ typename Timer<TimerTraits>::TimerClockSelectType Timer<TimerTraits>::ToClockSel
     return TimerClockSelectType::kPrescale1024;
 }
 
-/*! \brief          set period of the timer overflow interrupt
- *  \details        this functions sets the period of the timer overflow interrupt therefore
- *                  prescaler and timer top value will be calculated
- *  \param[in]      microseconds                period of the timer overflow interrupt
- *  \return         kEOk
- *                  kENotOk
- */
 template <typename TimerTraits>
 StdReturnType Timer<TimerTraits>::SetPeriod(uint32_t microseconds)
 {
@@ -128,10 +117,6 @@ StdReturnType Timer<TimerTraits>::SetPeriod(uint32_t microseconds)
     return return_value;
 }
 
-/*! \brief          start the timer from zero
- *  \return         kEOk
- *                  kENotOk        timer was not initialized
- */
 template <typename TimerTraits>
 StdReturnType Timer<TimerTraits>::Start()
 {
@@ -160,10 +145,6 @@ void Timer<TimerTraits>::Stop()
     }
 }
 
-/*! \brief          continue a stopped timer where it stopped
- *  \return         kEOk
- *                  kENotOk        timer was not stopped
- */
 template <typename TimerTraits>
 StdReturnType Timer<TimerTraits>::Resume()
 {
@@ -177,17 +158,6 @@ StdReturnType Timer<TimerTraits>::Resume()
     return return_value;
 }
 
-/*! \brief          install the callback the overflow ISR calls
- *  \details        The xmega put this interrupt on the PMIC's low level so that the core's millis()
- *                  could interrupt the callback. The Dx has no such pair of levels - it has one
- *                  CPUINT.LVL1VEC, and WS2812::Init() has given it to USART0_DRE, which is what
- *                  keeps the strip's bytes flowing inside its reset gap. Taking it away for this
- *                  would corrupt a frame, so the overflow stays at level 0 and the callback runs
- *                  without being interruptible. Keep it short.
- *  \param[in]      timer_overflow_callback      called from the overflow ISR
- *  \return         kEOk
- *                  kENotOk                    no callback given
- */
 template <typename TimerTraits>
 StdReturnType Timer<TimerTraits>::AttachInterrupt(TimerIsrCallbackFVoid timer_overflow_callback)
 {
@@ -214,14 +184,6 @@ void Timer<TimerTraits>::DetachInterrupt()
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE) { timer_overflow_callback_ = nullptr; }
 }
 
-/*! \brief          read current timer value in microseconds
- *  \details        this function returns the time since the last overflow interrupt in microseconds
- *
- *  \param[out]     microseconds        current timer value
- *  \return         kEOk
- *                  kENotOk
- *  \pre            Timer has to be in RUNNING or STOPPED STATE
- */
 template <typename TimerTraits>
 StdReturnType Timer<TimerTraits>::Read(uint32_t& microseconds)
 {
@@ -248,11 +210,6 @@ StdReturnType Timer<TimerTraits>::Read(uint32_t& microseconds)
     return return_value;
 }
 
-/*! \brief          called from the overflow ISR of this timer
- *  \details        The flag is not cleared by the vector executing, on this part no more than on the
- *                  xmega's TC4/TC5; without the explicit clear the ISR is entered again at once.
- *                  Writing the bit is what clears it here.
- */
 template <typename TimerTraits>
 void Timer<TimerTraits>::HandleOverflowInterrupt()
 {
@@ -260,9 +217,10 @@ void Timer<TimerTraits>::HandleOverflowInterrupt()
     if(timer_overflow_callback_ != nullptr) { timer_overflow_callback_(); }
 }
 
-/*! \details        CTRLESET and CTRLECLR are one register seen twice: a write sets or clears the
- *                  bits it names, and a read of either gives the state. Reading the SET half keeps
- *                  this looking like the xmega's CTRLGSET.
+/*
+ * CTRLESET and CTRLECLR are one register seen twice: a write sets or clears the bits it names, and
+ * a read of either gives the state. Reading the SET half keeps this looking like the xmega's
+ * CTRLGSET.
  */
 template <typename TimerTraits>
 typename Timer<TimerTraits>::TimerCountDirection Timer<TimerTraits>::GetCountingDirection()
@@ -277,9 +235,8 @@ void Timer<TimerTraits>::SetClockSelect(TimerClockSelectType clock_select)
     Bit<uint8_t>::WriteBitGroup(GetTimer().CTRLA, TCA_SINGLE_CLKSEL_gm, static_cast<uint8_t>(clock_select));
 }
 
-/*! \details        Where the xmega stopped its timer by selecting no clock source, this one keeps
- *                  the prescaler and loses ENABLE: the Dx CLKSEL has no OFF to select.
- */
+// Where the xmega stopped its timer by selecting no clock source, this one keeps the prescaler
+// and loses ENABLE: the Dx CLKSEL has no OFF to select.
 template <typename TimerTraits>
 void Timer<TimerTraits>::SetRunning(bool running)
 {
@@ -287,8 +244,7 @@ void Timer<TimerTraits>::SetRunning(bool running)
     else        { Bit<uint8_t>::ClearBits(GetTimer().CTRLA, TCA_SINGLE_ENABLE_bm); }
 }
 
-/*! \pre            called with interrupts off, the write goes through the TEMP register
- */
+// Called with interrupts off, as the write goes through the TEMP register.
 template <typename TimerTraits>
 void Timer<TimerTraits>::SetCompareBuffer(TimerChannelType channel)
 {
@@ -297,13 +253,13 @@ void Timer<TimerTraits>::SetCompareBuffer(TimerChannelType channel)
     (&GetTimer().CMP0BUF)[ToUnderlying(channel)] = ToCompareValue(top_, pwm_duty_[ToUnderlying(channel)]);
 }
 
-/*! \details        Straight into PER and CMPn, past the buffers, which is only safe while the timer is
- *                  disabled. Without it the first period after Start() would run on whatever the
- *                  registers held: the buffers are taken over at BOTTOM, and the first BOTTOM after
- *                  RESTART is a whole period away - with CMPn at the 0 Init()'s RESET left there.
- *                  Not a forced UPDATE before the RESTART instead: both are written to CTRLESET,
- *                  and an UPDATE still pending there ORed with RESTART reads as RESET.
- *  \pre            timer disabled
+/*
+ * Straight into PER and CMPn, past the buffers, which is only safe while the timer is disabled -
+ * so it is called only then. Without it the first period after Start() would run on whatever the
+ * registers held: the buffers are taken over at BOTTOM, and the first BOTTOM after RESTART is a
+ * whole period away - with CMPn at the 0 Init()'s RESET left there.
+ * Not a forced UPDATE before the RESTART instead: both are written to CTRLESET, and an UPDATE
+ * still pending there ORed with RESTART reads as RESET.
  */
 template <typename TimerTraits>
 void Timer<TimerTraits>::LoadPeriodAndCompare()
@@ -337,9 +293,10 @@ StdReturnType Timer<TimerTraits>::DisablePwmChannel(TimerChannelType channel)
     return kEOk;
 }
 
-/*! \brief          set duty of one compare channel, 0 .. kPwmDutyMax
- *  \details        Written to the buffer register, so the new compare value takes effect at the next
- *                  BOTTOM and a running PWM never sees half a period of each.
+/*
+ * Sets the duty of one compare channel, 0 .. kPwmDutyMax. Written to the buffer register, so the
+ * new compare value takes effect at the next BOTTOM and a running PWM never sees half a period of
+ * each.
  */
 template <typename TimerTraits>
 StdReturnType Timer<TimerTraits>::SetPwmDutyChannel(TimerChannelType channel, uint16_t duty)
@@ -356,6 +313,8 @@ StdReturnType Timer<TimerTraits>::SetPwmDutyChannel(TimerChannelType channel, ui
     return return_value;
 }
 
+// The overflow ISRs are local to this file, so Doxygen leaves them out.
+/*! \cond */
 #if (TIMER_USE_TCA0 == STD_ON)
 template class Timer<TimerA0>;
 ISR(TCA0_OVF_vect) { Timer<TimerA0>::GetInstance().HandleOverflowInterrupt(); }
@@ -365,3 +324,4 @@ ISR(TCA0_OVF_vect) { Timer<TimerA0>::GetInstance().HandleOverflowInterrupt(); }
 template class Timer<TimerA1>;
 ISR(TCA1_OVF_vect) { Timer<TimerA1>::GetInstance().HandleOverflowInterrupt(); }
 #endif
+/*! \endcond */

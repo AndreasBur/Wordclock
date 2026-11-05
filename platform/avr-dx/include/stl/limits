@@ -31,43 +31,79 @@
  */
 // NOLINTBEGIN(cert-dcl58-cpp,readability-identifier-naming)
 namespace std {
-// The integral case, worked out from the type itself: everything the core measures against
-// is an integer of some width, and deriving the bound beats one specialisation per type.
+/*!
+ * \brief The limits of an integer type, as the standard's std::numeric_limits.
+ *
+ * The integral case, worked out from the type itself: everything the core measures against is an
+ * integer of some width, and deriving the bound beats one specialisation per type. A type is
+ * signed if `T(-1) < T(0)`, and has 8 bits to each byte of its size.
+ *
+ * It provides is_signed, max() and min(), and leaves out every other member of the standard's,
+ * lowest() included.
+ *
+ * \tparam T The integer type.
+ */
 template<class T> struct numeric_limits {
   private:
     static constexpr bool kIsSigned{T(-1) < T(0)};
     static constexpr unsigned kBits{sizeof(T) * 8u};
 
   public:
-    static constexpr bool is_signed{kIsSigned};
+    static constexpr bool is_signed{kIsSigned}; /*!< Whether `T` is signed. */
 
+    /*! \brief Returns the largest value of `T`. */
     static constexpr T max() {
         return kIsSigned ? static_cast<T>(~(static_cast<T>(1) << (kBits - 1u))) : static_cast<T>(~static_cast<T>(0));
     }
 
+    /*! \brief Returns the smallest value of `T`: the most negative one, or 0 if `T` is unsigned. */
     static constexpr T min() {
         return kIsSigned ? static_cast<T>(static_cast<T>(1) << (kBits - 1u)) : static_cast<T>(0);
     }
 };
 
+/*!
+ * \brief The limits of float, as the standard's: is_signed, max(), min() and lowest(), and none of
+ *        its other members.
+ */
 template<> struct numeric_limits<float> {
-    static constexpr bool is_signed{true};
+    static constexpr bool is_signed{true}; /*!< Whether float is signed, which it is. */
+    /*! \brief Returns the largest finite float, `__FLT_MAX__`. */
     static constexpr float max() { return __FLT_MAX__; }
+    /*! \brief Returns the smallest positive normal float, `__FLT_MIN__`, as the standard's does. */
     static constexpr float min() { return __FLT_MIN__; }
+    /*! \brief Returns the most negative finite float, `-__FLT_MAX__`. */
     static constexpr float lowest() { return -__FLT_MAX__; }
 };
 
+/*!
+ * \brief The limits of double, as the standard's: is_signed, max(), min() and lowest(), and none of
+ *        its other members.
+ */
 template<> struct numeric_limits<double> {
-    static constexpr bool is_signed{true};
+    static constexpr bool is_signed{true}; /*!< Whether double is signed, which it is. */
+    /*! \brief Returns the largest finite double, `__DBL_MAX__`. */
     static constexpr double max() { return __DBL_MAX__; }
+    /*! \brief Returns the smallest positive normal double, `__DBL_MIN__`, as the standard's. */
     static constexpr double min() { return __DBL_MIN__; }
+    /*! \brief Returns the most negative finite double, `-__DBL_MAX__`. */
     static constexpr double lowest() { return -__DBL_MAX__; }
 };
 
+/*!
+ * \brief The limits of long double, as the standard's: is_signed, max(), min() and lowest(), and
+ *        none of its other members.
+ */
 template<> struct numeric_limits<long double> {
-    static constexpr bool is_signed{true};
+    static constexpr bool is_signed{true}; /*!< Whether long double is signed, which it is. */
+    /*! \brief Returns the largest finite long double, `__LDBL_MAX__`. */
     static constexpr long double max() { return __LDBL_MAX__; }
+    /*!
+     * \brief Returns the smallest positive normal long double, `__LDBL_MIN__`, as the standard's
+     *        does.
+     */
     static constexpr long double min() { return __LDBL_MIN__; }
+    /*! \brief Returns the most negative finite long double, `-__LDBL_MAX__`. */
     static constexpr long double lowest() { return -__LDBL_MAX__; }
 };
 
