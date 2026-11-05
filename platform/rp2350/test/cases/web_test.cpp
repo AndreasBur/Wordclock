@@ -496,13 +496,15 @@ int main()
         Check(System::GetInstance().GetConsolePassword(password, sizeof(password)) == kEOk &&
               strcmp(password, "secret") == 0, "a password is taken up to the next option");
         run("16\n");
-        Check(!System::GetInstance().IsConsoleProtected(), "and command 16 alone clears it");
+        Check(System::GetInstance().IsConsoleProtected(), "and command 16 alone leaves it alone");
+        run("16 -P\n");
+        Check(!System::GetInstance().IsConsoleProtected(), "while an empty -P clears it");
     }
 
     /*
      * The password at the web socket's handshake, as at every route. Without it, a client that
-     * opened /ws directly sent any command, 16 among them, which clears the password. The check
-     * sends nothing of its own: the library answers a refusal with 401.
+     * opened /ws directly sent any command it liked - `16 -P` among them, which clears the
+     * password. The check sends nothing of its own: the library answers a refusal with 401.
      */
     {
         const AwsHandshakeHandler& handshake = webStubState().SocketHandshake;

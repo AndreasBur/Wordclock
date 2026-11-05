@@ -126,7 +126,7 @@ printed after every link rather than asked for, because the flash budget is the
 reason this part was chosen at all — currently, of 128 KiB flash and 16 KiB RAM:
 
 ```
-Program:   48586 bytes (37%)
+Program:   48552 bytes (37%)
 Data:       1701 bytes (10%)
 ```
 
