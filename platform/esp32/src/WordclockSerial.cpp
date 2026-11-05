@@ -73,6 +73,7 @@ int WordclockSerial::read()
 
 void WordclockSerial::print(const char* text)
 {
+    const std::lock_guard<std::recursive_mutex> lock(output_mutex_);
     if(text == nullptr) { return; }
 
     for(const char* character = text; *character != '\0'; character++) { print(*character); }
@@ -87,6 +88,7 @@ void WordclockSerial::print(const __FlashStringHelper* text)
 
 void WordclockSerial::print(int number)
 {
+    const std::lock_guard<std::recursive_mutex> lock(output_mutex_);
     char digits[12]{};
 
     /* Ten digits and a sign are the most an int can print to; nothing to truncate. */
@@ -96,6 +98,7 @@ void WordclockSerial::print(int number)
 
 void WordclockSerial::print(char character)
 {
+    const std::lock_guard<std::recursive_mutex> lock(output_mutex_);
     if(character == '\n') { println(); return; }
 
     wordclock_platform::HardwarePort().write(static_cast<uint8_t>(character));
@@ -104,6 +107,7 @@ void WordclockSerial::print(char character)
 
 void WordclockSerial::println()
 {
+    const std::lock_guard<std::recursive_mutex> lock(output_mutex_);
     wordclock_platform::HardwarePort().write(static_cast<uint8_t>('\r'));
     wordclock_platform::HardwarePort().write(static_cast<uint8_t>('\n'));
 
@@ -112,18 +116,21 @@ void WordclockSerial::println()
 
 void WordclockSerial::println(const char* text)
 {
+    const std::lock_guard<std::recursive_mutex> lock(output_mutex_);
     print(text);
     println();
 }
 
 void WordclockSerial::println(int number)
 {
+    const std::lock_guard<std::recursive_mutex> lock(output_mutex_);
     print(number);
     println();
 }
 
 void WordclockSerial::println(const __FlashStringHelper* text)
 {
+    const std::lock_guard<std::recursive_mutex> lock(output_mutex_);
     print(text);
     println();
 }

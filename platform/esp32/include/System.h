@@ -174,9 +174,10 @@ class System
      *
      * On the ESP32 it refuses a null or too long name or pass phrase before storing anything, then
      * writes the name and the pass phrase to the store, and calls StartNetwork() once both are
-     * written. An empty name is meant to take the stored network away, so that StartNetwork()
-     * joins the compiled-in network or opens the access point: the way out of a typo that cannot
-     * be corrected over the network it broke. It does not; see the warning at StartNetwork().
+     * written. An empty name removes the stored network instead, so that StartNetwork() joins the
+     * compiled-in network or opens the access point: the way out of a typo that cannot be
+     * corrected over the network it broke. An empty pass phrase is stored as it is, an open
+     * network's.
      *
      * Kept apart from the settings the core persists: those are what the clock shows, this is how
      * it is reached, and a settings reset that threw the network away would leave a clock nobody
@@ -248,8 +249,9 @@ class System
     /*!
      * \brief Brings the network up as configured.
      *
-     * On the ESP32 it joins the network GetNetworkSsid() names, with the stored pass phrase, or
-     * the compiled-in WORDCLOCK_WIFI_PASSWORD where none is stored: in station mode, with WiFi's
+     * On the ESP32 it joins the network GetNetworkSsid() names, with the pass phrase from the same
+     * place - the stored one, an empty one for an open network included, beside a stored name, and
+     * WORDCLOCK_WIFI_PASSWORD beside the compiled-in name: in station mode, with WiFi's
      * own reconnecting on and modem sleep as WORDCLOCK_WIFI_MODEM_SLEEP says. Where no network is
      * configured it opens the open access point SYSTEM_ACCESS_POINT_SSID instead, because the
      * console the clock is configured through is reachable over the network and nowhere else. It
@@ -258,13 +260,6 @@ class System
      * The application calls it at start, and SetNetworkCredentials() after storing. Nothing is
      * printed from here: a line printed in the middle of a command lands inside that command's
      * answer, which is how this was found. The application says what happened instead.
-     *
-     * \warning A name stored empty, as `13 -S -P` stores it to forget the network, reads as a
-     *          stored name: the framework's `Preferences::getString()` counts the terminator, so an
-     *          empty value comes back with the length 1. The clock then calls `WiFi.begin()` with
-     *          an empty name instead of opening the access point, and IsNetworkConfigured() answers
-     *          true. The `Preferences` stub of the host tests counts without the terminator, so
-     *          they cannot show it.
      */
     void StartNetwork();
 
@@ -308,14 +303,10 @@ class System
      * \brief Joins the network again.
      *
      * On the ESP32 it asks WiFi to reconnect with `WiFi.reconnect()`, for the clock whose access
-     * point was away longer than WiFi's own retries lasted. Refused unless WORDCLOCK_WIFI_SSID is
-     * compiled in, and when `WiFi.reconnect()` answers false.
+     * point was away longer than WiFi's own retries lasted. Refused while no network is configured,
+     * IsNetworkConfigured(), and when `WiFi.reconnect()` answers false.
      *
      * \return kEOk if an attempt to join was started, or kENotOk if none was.
-     * \warning Only a compiled-in network counts here, not one stored with SetNetworkCredentials().
-     *          A clock flashed without `WordclockSecrets.h`, whose network was entered with the
-     *          network command, has IsNetworkConfigured() true, and still this answers kENotOk and
-     *          does nothing.
      */
     StdReturnType ReconnectNetwork();
 };

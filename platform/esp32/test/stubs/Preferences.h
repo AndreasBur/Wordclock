@@ -23,12 +23,18 @@ struct Preferences {
         preferencesStore()[Namespace][Key] = Value;
         return strlen(Value);
     }
+    /*
+     * As the framework answers: the length nvs_get_str() reports, which counts the terminator,
+     * so an empty value answers 1 and only a missing key, or one too long for Capacity, answers
+     * 0. Counted without the terminator, as this stub did, an empty stored network name looked
+     * like none, and the tests passed for code that joined a network with no name.
+     */
     size_t getString(const char* Key, char* Value, size_t Capacity) {
         const auto& Keys = preferencesStore()[Namespace];
         const auto Found = Keys.find(Key);
-        if((Found == Keys.end()) || (Found->second.size() >= Capacity)) { Value[0] = '\0'; return 0u; }
+        if((Found == Keys.end()) || (Found->second.size() + 1u > Capacity)) { return 0u; }
         strcpy(Value, Found->second.c_str());
-        return Found->second.size();
+        return Found->second.size() + 1u;
     }
 
     bool begin(const char* Name, bool = false) { Namespace = Name; return true; }
@@ -42,7 +48,7 @@ struct Preferences {
      * protected one the same thing here.
      */
     bool remove(const char* Key) { return preferencesStore()[Namespace].erase(Key) > 0u; }
-    bool isKey(const char*) { return false; }
+    bool isKey(const char* Key) { return preferencesStore()[Namespace].count(Key) > 0u; }
 };
 // NOLINTEND(readability-identifier-naming)
 #endif
