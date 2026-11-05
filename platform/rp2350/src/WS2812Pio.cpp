@@ -66,8 +66,6 @@ PIO Block() { return (WS2812_PIO_BLOCK_INDEX == 0u) ? pio0 : pio1; }
 
 } // namespace
 
-/*! \brief          Claims a state machine and a DMA channel for the strip's data pin
- */
 void WS2812Pio::Init(uint8_t pin)
 {
     if(is_ready_) { return; }
@@ -128,14 +126,6 @@ bool WS2812Pio::IsBusy() const
 // Not const, though nothing here writes a member: it drives the hardware, and a const
 // would say it changes nothing.
 // NOLINTBEGIN(readability-make-member-function-const)
-/*! \brief          Hands one frame to DMA and returns
- *  \details        Refuses rather than waits while the previous frame is still going out.
- *                  The caller ticks every 10 ms and a frame takes 3.3 ms, so a refusal
- *                  here means something is wrong rather than that the strip is busy - and
- *                  waiting would spend a third of a tick doing nothing.
- *
- *  \return         kEOk if DMA took the frame
- */
 StdReturnType WS2812Pio::Transmit(const WordType* frame, size_t count)
 {
     if(!is_ready_ || (frame == nullptr) || (count == 0u)) { return kENotOk; }

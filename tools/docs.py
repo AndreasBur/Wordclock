@@ -5,11 +5,9 @@ Doxygen runs once per backend, over firmware/ and platform/<backend>: the backen
 Pixels, a System and a Storage of their own, which one run over all of them would merge into one
 class. What the firmware's warnings say is the same in every run, so each is reported once.
 
-Every warning fails but two kinds. A missing \\return: a one-line block whose \\brief says what
+Every warning fails but one kind, a missing \\return: a one-line block whose \\brief says what
 comes back, "Returns the width of the grid.", needs none, while every parameter needs its
-\\param. And a missing block in a module of PENDING: those still have the blocks of before
-docs/documentation.md, at the definitions in the .cpp, and are written anew one module at a time.
-A module comes off the list in the pull request that documents it.
+\\param.
 
 The reference is written into build/doxygen/<backend>/html, to be read there; it is not
 published.
@@ -26,14 +24,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 BACKENDS = ('simulator', 'avr-dx', 'esp32', 'rp2350')
 
-# Where a member may still be undocumented, until its module is written in the new style.
-PENDING = (
-    'platform/rp2350/',
-)
-
 WARNING = re.compile(r'^(?P<path>[^:\s]+):\d+: warning: (?P<text>.*)$')
-MISSING = re.compile(r'is not documented\.?$|^parameters of member .* are not documented$'
-                     r'|^The following parameters? of .* (is|are) not documented:$')
 RETURN = re.compile(r'^return type of member .* is not documented$')
 
 
@@ -59,11 +50,7 @@ def run(backend):
 
 def passes(warning):
     match = WARNING.match(warning.split('\n', 1)[0])
-    if not match:
-        return False
-    if RETURN.search(match['text']):
-        return True
-    return bool(MISSING.search(match['text'])) and match['path'].startswith(PENDING)
+    return bool(match) and bool(RETURN.search(match['text']))
 
 
 def main():
@@ -73,8 +60,7 @@ def main():
     failing = [warning for warning in seen if not passes(warning)]
     for warning in failing:
         print(warning)
-    print(f'docs.py: {len(failing)} warnings, {len(seen) - len(failing)} blocks still to be written'
-          ' or returns of one-line blocks')
+    print(f'docs.py: {len(failing)} warnings, {len(seen) - len(failing)} returns of one-line blocks')
     return 1 if failing else 0
 
 

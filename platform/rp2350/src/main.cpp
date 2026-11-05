@@ -108,6 +108,15 @@ void WaitForNextTick()
 
 } // namespace
 
+/*!
+ * \brief Brings the clock up: the serial port, the firmware, the network, the zone rule and the web
+ *        server, in that order.
+ *
+ * The Arduino core calls it once, before the first loop(). It waits for none of them: the network
+ * is joined, or the access point opened, in the background while the firmware already runs. It
+ * says on the console which network the clock is joining, or which access point it opened. The
+ * time servers are not started here but from loop(), once the link is up; see TimeSync.h.
+ */
 void setup()
 {
     Serial.begin(WORDCLOCK_SERIAL_BAUDRATE);
@@ -138,11 +147,26 @@ void setup()
     next_tick_ms = millis();
 }
 
-/*! \brief          Drives the firmware at the scheduler's interval
- *  \details        Timed against a running deadline rather than a delay of the interval,
- *                  so the work inside a tick does not stretch it: animation speeds, the
- *                  sensor's sampling rate and the serial poll rate all count in this
- *                  interval, and a drifting one silently rescales all three.
+/*!
+ * \brief Runs one tick and waits for the next, one tick every Scheduler::GetTaskIntervalMs()
+ *        milliseconds.
+ *
+ * The Arduino core calls it over and over. A tick runs the firmware's tasks, hands the buffer to
+ * the strip with Pixels::Render(), has WebInterface::BroadcastFrame() send the display to watching
+ * browsers, reports the network's and the time's progress on the console once each, and carries
+ * out a restart that was asked for, in that order. The first tick that finds the link up also
+ * starts the time servers with wordclock_time::StartTimeServers().
+ *
+ * Timed against a running deadline rather than a delay of the interval, so the work inside a tick
+ * does not stretch it: animation speeds, the sensor's sampling rate and the serial poll rate all
+ * count in this interval, and a drifting one silently rescales all three. A tick that overran is
+ * not caught up on: the next one starts at once, and the deadline counts on from there.
+ *
+ * \warning The link counts as up when `WiFi.status()` answers `WL_CONNECTED`, which arduino-pico
+ *          also answers while the access point is open. A clock that comes up with its access point
+ *          therefore reports "WiFi: connected" on its first tick and starts the time servers then,
+ *          with no link to reach them over, and never again: a network entered later is joined, but
+ *          its time is not asked for until RPC 32 or the next start.
  */
 void loop()
 {

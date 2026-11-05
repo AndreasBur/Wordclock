@@ -13,8 +13,7 @@ Without it, the files are only read, and a file in which a line is not so fails.
 have the same tool.
 
 The headers and sources of firmware/ and platform/ are read, but for the tests, which keep their
-// comments, and the modules of PENDING in tools/docs.py: those still have their blocks of before
-docs/documentation.md, whose lists of values in a \\return this would run together.
+// comments.
 
 Usage:
     tools/doc-indent.py [--fix]              every header and source of these git knows of
@@ -24,8 +23,6 @@ Usage:
 import re
 import subprocess
 import sys
-
-from docs import PENDING
 
 WIDTH = 100
 COMMAND = re.compile(r'^(\s*)\* (\\(?:param(?:\[[a-z,]+\])? +\S+|tparam +\S+|retval +\S+'
@@ -100,7 +97,7 @@ def main():
                     'platform/avr-dx/include/stl/*']
         files = [path for path in subprocess.run(['git', 'ls-files', *patterns], capture_output=True,
                                                  text=True, check=True).stdout.split()
-                 if not re.search(r'/tests?/', path) and not path.startswith(PENDING)]
+                 if not re.search(r'/tests?/', path)]
     failed = False
     for path in files:
         with open(path, encoding='utf-8') as source:

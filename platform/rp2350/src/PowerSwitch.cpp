@@ -15,20 +15,6 @@
 #include "Arduino.h"
 #include "PowerSwitch.h"
 
-/*! \brief          Makes the port an output and brings the supply up
- *  \details        Switched on rather than left where the reset found it, because the reset
- *                  found it off: the pull down at the gate holds the stage off while the port
- *                  is still an input. A clock whose strip never gets its 5 V shows nothing at
- *                  all, so coming up means asking for it.
- *
- *                  Has to run before the strip's data line is set up, which is why the
- *                  application calls it first: a frame reaching DIN before the supply is up
- *                  pushes current into a dead rail through the LED's own protection diode.
- *
- *                  Does nothing where the switch is not fitted. The pin then belongs to
- *                  whatever else the board put there, and driving it would be the one way this
- *                  can do damage rather than nothing.
- */
 void PowerSwitch::Init()
 {
     if(!IsFitted()) { return; }
@@ -38,9 +24,10 @@ void PowerSwitch::Init()
     SwitchSupplyOn();
 }
 
-/*! \brief          Puts the port high or low
- *  \details        Active high, so on is high - the level reaches the gate of the small-signal
- *                  MOSFET, not the high side one, which is why the sense is not inverted here.
+/*
+ * Puts the port high or low, and does nothing where the switch is not fitted. Active high,
+ * so on is high - the level reaches the gate of the small-signal MOSFET, not the high side
+ * one, which is why the sense is not inverted here.
  */
 void PowerSwitch::DriveSupply(bool on)
 {

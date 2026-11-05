@@ -25,19 +25,41 @@
 #include <stddef.h>
 #include <stdint.h>
 
-/* WS2812Pio configuration parameter */
-// One state machine of one block. The RP2350 has twelve of them across three blocks, so
-// claiming one costs nothing that anything else here wants.
+/*!
+ * \brief The PIO block the strip's state machine runs in: 0 selects `pio0`, any other value `pio1`.
+ *
+ * One state machine of one block. The RP2350 has twelve of them across three blocks, so claiming
+ * one costs nothing that anything else here wants.
+ */
 #define WS2812_PIO_BLOCK_INDEX                          0u
+/*!
+ * \brief The state machine of that block which sends the frames.
+ *
+ * WS2812Pio::Init() takes it as it is: it does not claim it from the SDK, so a library that asks
+ * the SDK for an unused state machine of the block may be handed the same one.
+ */
 #define WS2812_PIO_STATE_MACHINE_INDEX                  0u
 
+/*!
+ * \brief The strip's transmitter: a PIO state machine that makes the WS2812 waveform, fed a frame
+ *        by DMA.
+ *
+ * There is one instance, GetInstance(). Init() loads the program and starts the state machine,
+ * Transmit() starts a frame, and IsBusy() tells whether DMA is still feeding the last one. Pixels
+ * is what calls it.
+ *
+ * A bit is 25 cycles of the state machine at 20 MHz, 1250 ns: high for 400 ns for a zero and for
+ * 800 ns for a one.
+ */
 class WS2812Pio
 {
   public:
-    /*
-     * One LED per word rather than one colour per byte, because that is the shape the
-     * state machine reads: the three bytes sit in bits 31..8 and are shifted out from the
-     * top, which is the WS2812's most-significant-first order.
+    /*!
+     * \brief A word of a frame: one LED.
+     *
+     * One LED per word rather than one colour per byte, because that is the shape the state
+     * machine reads: the three bytes sit in bits 31..8 and are shifted out from the top, which is
+     * the WS2812's most-significant-first order.
      */
     using WordType = uint32_t;
 
@@ -70,30 +92,68 @@ class WS2812Pio
     int dma_channel_{-1};
 
   public:
+    /*! \brief Returns the one transmitter. */
     static WS2812Pio& GetInstance() {
         static WS2812Pio singleton_instance;
         return singleton_instance;
     }
 
-    /*
-     * Claims the state machine and a DMA channel for the strip's data pin. Reports and
-     * gives up rather than retrying: the contract's Init() returns nothing, and a clock
-     * whose console still answers is more useful for finding a miswired pin than one that
-     * reboots.
+    /*!
+     * \brief Sets the transmitter up on the strip's data line `pin`.
+     *
+     * It loads the program into PIO block WS2812_PIO_BLOCK_INDEX wherever the loader finds room,
+     * claims an unused DMA channel, and starts state machine WS2812_PIO_STATE_MACHINE_INDEX with
+     * `pin` as its side-set pin, made an output. The state machine shifts each word out to the
+     * left, most significant bit first, pulls the next word after 24 bits, and has both FIFOs
+     * joined for transmitting. Its clock is divided down from the system clock to 20 MHz.
+     *
+     * If the program does not fit into the block or no DMA channel is free, it prints that on the
+     * serial line and gives up, and IsReady() stays false. It reports and gives up rather than
+     * retrying: the contract's Init() returns nothing, and a clock whose console still answers is
+     * more useful for finding a miswired pin than one that reboots. Once it has succeeded, a
+     * further call does nothing.
+     *
+     * \param[in] pin The GPIO of the strip's data line.
+     * \note A call that gives up for want of a DMA channel leaves the program loaded in the block.
      */
     void Init(uint8_t pin);
 
+    /*! \brief Returns whether Init() has set the transmitter up; false at first. */
     bool IsReady() const { return is_ready_; }
 
-    /*
-     * True while DMA is still fetching the previous frame. The caller has to check this
-     * before handing over the next one - two frames back to back would lose the low gap
-     * the strip latches on.
+    /*!
+     * \brief Returns whether DMA is still feeding the previous frame to the state machine.
+     *
+     * The caller has to check this before handing over the next one - two frames back to back
+     * would lose the low gap the strip latches on. While the transmitter is not set up it answers
+     * false.
+     *
+     * \return True while the DMA channel is still busy with a frame.
+     * \note Not busy does not mean the frame has left the line: the DMA channel is done once it has
+     *       written the last word into the state machine's FIFO, and the words in the FIFO still go
+     *       out after that. A caller that sends at most one frame per tick, as Pixels does, keeps
+     *       the frames apart.
      */
     bool IsBusy() const;
 
-    // Hands one frame to DMA and returns. The buffer has to outlive the transfer, which
-    // is why Pixels keeps a frame of its own rather than passing its pixel buffer.
+    /*!
+     * \brief Starts sending one frame to the strip.
+     *
+     * Hands the frame to DMA and returns. DMA writes it into the state machine's FIFO a word at a
+     * time, as fast as the state machine takes the words.
+     *
+     * It refuses rather than waits while DMA is still feeding the previous frame. The caller ticks
+     * every 10 ms and a frame takes 3.3 ms, so a refusal here means something is wrong rather
+     * than that the strip is busy - and waiting would spend a third of a tick doing nothing.
+     *
+     * \param[in] frame The words, one per LED, each with its three colour bytes in bits 31..8, in
+     *                  the order the strip takes them.
+     * \param[in] count The number of words.
+     * \return kEOk, or kENotOk if the transmitter is not set up, `frame` is `nullptr`, `count` is 0
+     *         or IsBusy() is true; nothing is then sent, and a frame on the wire goes on.
+     * \pre `frame` outlives the transfer, which is why Pixels keeps a frame of its own rather than
+     *      passing its pixel buffer.
+     */
     StdReturnType Transmit(const WordType* frame, size_t count);
 };
 
