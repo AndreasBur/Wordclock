@@ -88,7 +88,7 @@ class MsgCmdParser
 
         while(IsDecimalDigit(*digit)) {
             number = static_cast<uint16_t>((number * 10u) + ToDigitValue(*digit));
-            if(number > ToUnderlying(CommandType::kConsole)) { return CommandType::kNone; }
+            if(number > static_cast<uint16_t>(ToUnderlying(CommandType::kConsole))) { return CommandType::kNone; }
             digit++;
         }
         // Not one digit read: a message that is not a number at all, which is the same
