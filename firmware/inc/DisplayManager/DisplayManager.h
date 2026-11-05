@@ -108,8 +108,8 @@ class DisplayManager
      *
      * While an overlay shows, the display is left to it. When the overlay has ended, the current
      * time is drawn at once, without an animation. Otherwise the time is drawn when its words
-     * change, and on the first call: through the animation the mode provides, or directly when
-     * the fixed mode has none selected.
+     * change, and on the first call: through the animation the mode provides, or directly when the
+     * fixed mode has none selected.
      */
     void Task();
 
@@ -136,8 +136,8 @@ class DisplayManager
     }
 
     /*!
-     * \brief Runs the animation the mode provides on the current time, without waiting for the
-     *        word change that would otherwise be the only trigger.
+     * \brief Runs the animation the mode provides on the current time, without waiting for the word
+     *        change that would otherwise be the only trigger.
      *
      * Selecting the animation again with `9 -A<id>` shows it too, but it also means something
      * else - it changes what runs from now on.
