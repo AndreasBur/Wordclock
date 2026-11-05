@@ -30,10 +30,10 @@ constexpr byte kWeekdayOffset{1u};
 
 } // namespace
 
-/*! \brief          Opens the bus this chip shares with the light sensor
- *  \details        Idempotent, so whichever driver runs first opens it and the other finds
- *                  it open. Neither owns the bus, and neither can be relied on to run at all
- *                  on a board where only one of the two is fitted.
+/*
+ * Opens the bus this chip shares with the light sensor. Idempotent, so whichever driver
+ * runs first opens it and the other finds it open. Neither owns the bus, and neither can be
+ * relied on to run at all on a board where only one of the two is fitted.
  */
 StdReturnType DS3231::StartBus()
 {
@@ -47,11 +47,11 @@ StdReturnType DS3231::ReadRegisters(byte register_address, byte* values, byte le
     return Twi::GetInstance().ReadRegister(DS3231_I2C_ADDR, register_address, values, length);
 }
 
-/*! \brief          Writes a block of registers starting at one address
- *  \details        The block goes out in a single transfer rather than register by register:
- *                  the chip counts on while it is written, and seven separate transfers
- *                  would let the seconds roll over between two of them and leave the chip
- *                  holding a time assembled from two different ones.
+/*
+ * Writes a block of registers starting at one address. The block goes out in a single
+ * transfer rather than register by register: the chip counts on while it is written, and
+ * seven separate transfers would let the seconds roll over between two of them and leave the
+ * chip holding a time assembled from two different ones.
  */
 StdReturnType DS3231::WriteRegisters(byte register_address, const byte* values, byte length)
 {
@@ -65,10 +65,10 @@ StdReturnType DS3231::WriteRegisters(byte register_address, const byte* values, 
     return Twi::GetInstance().Write(DS3231_I2C_ADDR, buffer, static_cast<byte>(length + 1u));
 }
 
-/*! \brief          Whether the chip admits it lost track of time
- *  \details        A chip that cannot be read is treated as stopped: both mean there is no
- *                  time to be had from it, and the caller has one case to handle instead of
- *                  two.
+/*
+ * Whether the chip admits it lost track of time. A chip that cannot be read is treated as
+ * stopped: both mean there is no time to be had from it, and the caller has one case to
+ * handle instead of two.
  */
 bool DS3231::HasOscillatorStopped()
 {
@@ -117,17 +117,6 @@ void DS3231::Task()
  * that detail into the interface.
  */
 // NOLINTBEGIN(readability-convert-member-functions-to-static)
-/*! \brief          Reads what the chip counted, in UTC
- *  \details        The stopped flag is asked first and not afterwards: a chip whose
- *                  oscillator stood still has registers that still read like a date, and
- *                  taking that date would set the clock to whenever the battery gave out.
- *
- *                  What the setters reject is what decides whether the block is a date at
- *                  all - a fresh chip reads 0x00 everywhere, which is month zero and day
- *                  zero, and a transfer that lost its way reads anything. Hence the value is
- *                  assembled through ClockDateTime's own setters and their return codes
- *                  rather than trusted.
- */
 StdReturnType DS3231::GetDateTime(ClockDateTime& date_time)
 {
     if(StartBus() == kENotOk) { return kENotOk; }

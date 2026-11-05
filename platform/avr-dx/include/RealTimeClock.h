@@ -22,24 +22,46 @@
 #include "ClockDateTime.h"
 #include "DS3231.h"
 
-/* RealTimeClock configuration parameter */
-/*
- * Application ticks between two reads of the chip, so once a second. A read is two
- * transfers on a bus the light sensor shares, and the display only ever shows minutes -
+/*!
+ * \brief The calls of RealTimeClock::Task() that pass without reading the chip between two that
+ *        read it.
+ *
+ * The application calls Task() once per tick, so the chip is read about once a second. A read is
+ * two register reads on a bus the light sensor shares, and the display only ever shows minutes -
  * asking a hundred times a second would buy nothing.
  */
 #define REAL_TIME_CLOCK_CHIP_READ_INTERVAL              100u
 
+/*!
+ * \brief The clock: the date and time the clock shows, kept up to date by Task().
+ *
+ * The core reads the time and the date wherever it shows or compares them, and sets them from the
+ * time and the date commands. The application calls Task() on every tick, outside the scheduler.
+ *
+ * On the AVR the DS3231 is the time source. Task() reads it on its first call, and from then on
+ * once in every REAL_TIME_CLOCK_CHIP_READ_INTERVAL + 1 calls; the setters write through to it.
+ * Nothing counts the time here: between two reads the date and time stand still.
+ *
+ * \note Without a chip that answers, the clock does not run: the date and time stay at what they
+ *       were made with, or at what a command last set them to.
+ */
 class RealTimeClock
 {
   public:
+    /*! \copydoc ClockDateTime::HourType */
     using HourType = ClockDateTime::HourType;
+    /*! \copydoc ClockDateTime::MinuteType */
     using MinuteType = ClockDateTime::MinuteType;
+    /*! \copydoc ClockDateTime::SecondType */
     using SecondType = ClockDateTime::SecondType;
 
+    /*! \copydoc ClockDateTime::YearType */
     using YearType = ClockDateTime::YearType;
+    /*! \copydoc ClockDateTime::MonthType */
     using MonthType = ClockDateTime::MonthType;
+    /*! \copydoc ClockDateTime::DayType */
     using DayType = ClockDateTime::DayType;
+    /*! \copydoc ClockDateTime::WeekdayType */
     using WeekdayType = ClockDateTime::WeekdayType;
 
   private:
@@ -56,7 +78,6 @@ class RealTimeClock
     // date for a second.
     byte chip_read_countdown_{0u};
 
-    // functions
     RealTimeClock() {}
     ~RealTimeClock() {}
 
@@ -64,22 +85,65 @@ class RealTimeClock
     void WriteChip();
 
   public:
+    /*! \brief Returns the one clock. */
     static RealTimeClock& GetInstance() {
         static RealTimeClock singleton_instance;
         return singleton_instance;
     }
 
-    // get methods
+    /*! \brief Returns the date and time. */
     ClockDateTime GetDateTime() const { return date_time_; }
+
+    /*! \brief Returns the time of day. */
     ClockTime GetTime() const { return date_time_.GetTime(); }
+
+    /*! \brief Returns the date. */
     ClockDate GetDate() const { return date_time_.GetDate(); }
 
-    // set methods
+    /*!
+     * \brief Sets the date and time.
+     *
+     * It keeps them at once and writes them to the chip, ignoring whether the chip took them.
+     * Task() then reads the chip again only after REAL_TIME_CLOCK_CHIP_READ_INTERVAL calls that do
+     * not.
+     *
+     * \param[in] date_time The date and time.
+     */
     void SetDateTime(ClockDateTime date_time);
+
+    /*!
+     * \brief Sets the time of day, and keeps the date.
+     *
+     * It keeps the time at once and writes the date and time to the chip, ignoring whether the
+     * chip took them. Task() then reads the chip again only after
+     * REAL_TIME_CLOCK_CHIP_READ_INTERVAL calls that do not.
+     *
+     * \param[in] time The time of day.
+     */
     void SetTime(ClockTime time);
+
+    /*!
+     * \brief Sets the date, and keeps the time of day.
+     *
+     * It keeps the date at once and writes the date and time to the chip, ignoring whether the
+     * chip took them. Task() then reads the chip again only after
+     * REAL_TIME_CLOCK_CHIP_READ_INTERVAL calls that do not.
+     *
+     * \param[in] date The date.
+     */
     void SetDate(ClockDate date);
 
-    // methods
+    /*!
+     * \brief Brings the date and time up to date.
+     *
+     * It reads the chip on its first call and then once in every
+     * REAL_TIME_CLOCK_CHIP_READ_INTERVAL + 1 calls, and does nothing else. A read the chip refuses
+     * leaves the date and time as they were.
+     *
+     * Called from the application's tick rather than through the scheduler, because the core
+     * reads the time within its own tasks and would otherwise see it change part way through a
+     * pass.
+     */
     void Task();
 };
 

@@ -26,10 +26,18 @@ WordclockMain wordclock;
 
 } // namespace
 
-/*! \brief          Brings the clock up and runs it
- *  \details        Timed against an absolute wake-up rather than a delay after the work, so
- *                  that what a tick costs does not stretch the interval. A frame takes about
- *                  3.3 ms of the ten, and adding the two would run the clock a third slow.
+/*!
+ * \brief Brings the clock up and runs it, one tick every Scheduler::GetTaskIntervalMs()
+ *        milliseconds.
+ *
+ * A tick runs the firmware's tasks, sends the buffer to the strip if it is marked, and carries
+ * out a restart a command asked for, in that order.
+ *
+ * Timed against an absolute wake-up rather than a delay after the work, so that what a tick costs
+ * does not stretch the interval. A frame takes about 3.3 ms of the ten, and adding the two would
+ * run the clock a third slow.
+ *
+ * \return Never: the loop runs until the controller is reset.
  */
 int main()
 {

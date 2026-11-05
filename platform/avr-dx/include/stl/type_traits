@@ -29,41 +29,97 @@
  */
 // NOLINTBEGIN(cert-dcl58-cpp,readability-identifier-naming)
 namespace std {
+/*!
+ * \brief A constant of a type, as the standard's std::integral_constant; the base of the traits
+ *        below.
+ *
+ * It leaves out operator(), which the standard's has had since C++14.
+ *
+ * \tparam T The type of the constant.
+ * \tparam v The constant.
+ */
 template<class T, T v> struct integral_constant {
-    static constexpr T value{v};
-    using value_type = T;
-    using type = integral_constant;
+    static constexpr T value{v}; /*!< The constant, `v`. */
+    using value_type = T; /*!< The type of the constant, `T`. */
+    using type = integral_constant; /*!< This integral_constant itself. */
+    /*! \brief Returns the constant. */
     constexpr operator value_type() const { return value; }
 };
 
-using true_type = integral_constant<bool, true>;
-using false_type = integral_constant<bool, false>;
+using true_type = integral_constant<bool, true>; /*!< The constant true, as the standard's. */
+using false_type = integral_constant<bool, false>; /*!< The constant false, as the standard's. */
 
+/*!
+ * \brief Has the member `type`, `T`, only if `B` is true, as the standard's std::enable_if.
+ *
+ * A template that names that member drops out of overload resolution where `B` is false.
+ *
+ * \tparam B The condition.
+ * \tparam T The type of the member, void unless given.
+ */
 template<bool B, class T = void> struct enable_if { };
-template<class T> struct enable_if<true, T> { using type = T; };
+/*! \brief The case of enable_if where `B` is true, which has the member `type`. */
+template<class T> struct enable_if<true, T> { using type = T; /*!< `T`. */ };
+/*!
+ * \brief The member `type` of enable_if, as the standard's std::enable_if_t.
+ *
+ * \tparam B The condition.
+ * \tparam T The type, void unless given.
+ */
 template<bool B, class T = void> using enable_if_t = typename enable_if<B, T>::type;
 
-template<class T> struct remove_cv { using type = T; };
-template<class T> struct remove_cv<const T> { using type = T; };
-template<class T> struct remove_cv<volatile T> { using type = T; };
-template<class T> struct remove_cv<const volatile T> { using type = T; };
+/*!
+ * \brief `T` without its top-level const and volatile, as the standard's std::remove_cv.
+ *
+ * \tparam T The type.
+ */
+template<class T> struct remove_cv { using type = T; /*!< `T` itself. */ };
+/*! \brief The case of remove_cv for a const `T`. */
+template<class T> struct remove_cv<const T> { using type = T; /*!< `T` without const. */ };
+/*! \brief The case of remove_cv for a volatile `T`. */
+template<class T> struct remove_cv<volatile T> { using type = T; /*!< `T` without volatile. */ };
+/*! \brief The case of remove_cv for a const volatile `T`. */
+template<class T> struct remove_cv<const volatile T> { using type = T; /*!< Bare `T`. */ };
+/*!
+ * \brief The member `type` of remove_cv, as the standard's std::remove_cv_t.
+ *
+ * \tparam T The type.
+ */
 template<class T> using remove_cv_t = typename remove_cv<T>::type;
 
+/*!
+ * \brief Whether `T` and `U` are the same type, as the standard's std::is_same.
+ *
+ * \tparam T The one type.
+ * \tparam U The other type.
+ */
 template<class T, class U> struct is_same : false_type { };
+/*! \brief The case of is_same where both types are the same, which is true. */
 template<class T> struct is_same<T, T> : true_type { };
 
-/*
- * __is_base_of rather than a hand-rolled conversion test: the built-in also answers
- * correctly for private and ambiguous bases, which is what the CRTP assertions are
- * guarding against in the first place.
+/*!
+ * \brief Whether `Base` is a base of `Derived`, or the same class, as the standard's
+ *        std::is_base_of.
+ *
+ * __is_base_of rather than a hand-rolled conversion test: the built-in also answers correctly for
+ * private and ambiguous bases, which is what the CRTP assertions are guarding against in the first
+ * place.
+ *
+ * \tparam Base The class that may be the base.
+ * \tparam Derived The class that may derive from it.
  */
 template<class Base, class Derived> struct is_base_of : integral_constant<bool, __is_base_of(Base, Derived)> { };
 
-/*
- * Listed out rather than asked of the compiler: GCC 14 has no __is_integral built-in for
- * this target, and enumerating the fundamental types is the portable answer. The list is
- * the language's, not the core's - a trait that only knew the types used today would
- * silently answer false for the next one.
+/*!
+ * \brief The test behind is_integral, for a type without const and volatile: true for bool, the
+ *        character types and the signed and unsigned integer types, false for any other.
+ *
+ * Listed out rather than asked of the compiler: GCC 14 has no __is_integral built-in for this
+ * target, and enumerating the fundamental types is the portable answer. The list is the
+ * language's, not the core's - a trait that only knew the types used today would silently answer
+ * false for the next one.
+ *
+ * \tparam T The type.
  */
 template<class T> struct is_integral_helper : false_type { };
 template<> struct is_integral_helper<bool> : true_type { };
@@ -81,25 +137,64 @@ template<> struct is_integral_helper<long> : true_type { };
 template<> struct is_integral_helper<unsigned long> : true_type { };
 template<> struct is_integral_helper<long long> : true_type { };
 template<> struct is_integral_helper<unsigned long long> : true_type { };
+/*!
+ * \brief Whether `T` is an integer type, bool and the character types included, as the standard's
+ *        std::is_integral.
+ *
+ * \tparam T The type, const and volatile ones included.
+ */
 template<class T> struct is_integral : is_integral_helper<remove_cv_t<T>> { };
 
+/*!
+ * \brief The test behind is_floating_point, for a type without const and volatile: true for float,
+ *        double and long double, false for any other.
+ *
+ * \tparam T The type.
+ */
 template<class T> struct is_floating_point_helper : false_type { };
 template<> struct is_floating_point_helper<float> : true_type { };
 template<> struct is_floating_point_helper<double> : true_type { };
 template<> struct is_floating_point_helper<long double> : true_type { };
+/*!
+ * \brief Whether `T` is a floating-point type, as the standard's std::is_floating_point.
+ *
+ * \tparam T The type, const and volatile ones included.
+ */
 template<class T> struct is_floating_point : is_floating_point_helper<remove_cv_t<T>> { };
 
-/*
- * Deliberately not __is_signed: that built-in answers true for floating-point types as
- * well, while the core pairs is_signed with is_integral to pick an integer conversion.
- * Comparing T(-1) against T(0) keeps the answer to what the parsers mean by it.
+/*!
+ * \brief Whether `T` is a signed integer type.
+ *
+ * Deliberately not __is_signed: that built-in answers true for floating-point types as well, while
+ * the core pairs is_signed with is_integral to pick an integer conversion. Comparing `T(-1)`
+ * against `T(0)` keeps the answer to what the parsers mean by it.
+ *
+ * \tparam T The type.
+ * \note Unlike the standard's std::is_signed, it is false for the floating-point types.
  */
 template<class T> struct is_signed : integral_constant<bool, is_integral<T>::value && (T(-1) < T(0))> { };
+/*!
+ * \brief Whether `T` is an unsigned integer type, bool included, as the standard's
+ *        std::is_unsigned.
+ *
+ * \tparam T The type.
+ */
 template<class T> struct is_unsigned : integral_constant<bool, is_integral<T>::value && (T(0) < T(-1))> { };
 
-// The built-in, as libstdc++ itself has it: what an enum is stored as is the compiler's
-// knowledge and cannot be worked out in the language.
-template<class T> struct underlying_type { using type = __underlying_type(T); };
+/*!
+ * \brief The integer type an enum is stored as, as the standard's std::underlying_type.
+ *
+ * The built-in, as libstdc++ itself has it: what an enum is stored as is the compiler's knowledge
+ * and cannot be worked out in the language.
+ *
+ * \tparam T The enum type.
+ */
+template<class T> struct underlying_type { using type = __underlying_type(T); /*!< The type. */ };
+/*!
+ * \brief The member `type` of underlying_type, as the standard's std::underlying_type_t.
+ *
+ * \tparam T The enum type.
+ */
 template<class T> using underlying_type_t = typename underlying_type<T>::type;
 
 } // namespace std

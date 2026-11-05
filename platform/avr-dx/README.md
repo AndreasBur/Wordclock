@@ -302,6 +302,21 @@ Before trusting a first board, check three things:
    data sheet does not say, and it is the one register decision here that was not
    derivable from it.
 
+Three faults were found by reading the code and fixed without a board, so a first board is also
+where they are confirmed:
+
+- `WS2812::IsBusy()` asked `TXCIF` before any frame had gone out. The flag is clear after
+  reset, so `Send()` refused every frame and the strip stayed dark. It is now asked only once
+  a frame has been sent.
+- `Pixels::Render()` dropped a frame that met the previous one still going out, and cleared the
+  mark; the frame now waits for the next tick.
+- `SerialPort::flush()` waited on a `TXCIF` nothing cleared, so it could return before a
+  restart's answer had left the USART. The transmit handler now clears it before every
+  character.
+
+On a first board, check that the strip lights at all, and that the answer to a restart, `1 -P31`,
+arrives whole.
+
 The timer above has not run on hardware either, and its registers were checked by reading the
 disassembly rather than by watching a pin. On paper the configuration agrees with Microchip's own:
 TB3217 runs TCA0 in `DSBOTTOM` too, documents its overflow at BOTTOM, and gets 1 kHz out of

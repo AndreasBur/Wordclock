@@ -37,12 +37,6 @@ byte* ToEepromAddress(uint16_t offset) { return reinterpret_cast<byte*>(offset);
  * that detail into the interface.
  */
 // NOLINTBEGIN(readability-convert-member-functions-to-static)
-/*! \brief          Hands back the stored blob, if it is the one the caller expects
- *  \details        A stored length that differs from the one asked for is a blob from an
- *                  older layout. Refused rather than handed over short: what is inside is
- *                  the core's structure, and giving it fewer bytes than it reads would let
- *                  it interpret whatever follows in memory.
- */
 StdReturnType Storage::Read(byte* data, size_t size) const
 {
     if(data == nullptr) { return kENotOk; }
@@ -57,12 +51,6 @@ StdReturnType Storage::Read(byte* data, size_t size) const
     return kEOk;
 }
 
-/*! \brief          Stores one blob
- *  \details        The length goes in last. Until it does, a restart part way through finds
- *                  the previous length in front of a half-written blob - which the core's
- *                  checksum rejects. Writing the length first would instead leave a blob
- *                  that announces itself as complete while it is not.
- */
 StdReturnType Storage::Write(const byte* data, size_t size)
 {
     if(data == nullptr) { return kENotOk; }
@@ -76,11 +64,6 @@ StdReturnType Storage::Write(const byte* data, size_t size)
     return kEOk;
 }
 
-/*! \brief          Forgets what was stored
- *  \details        Only the length is reset, not the blob behind it: the length is what
- *                  Read() consults, so the blob is unreachable either way, and erasing it
- *                  would spend a hundred and twenty-eight write cycles to no end.
- */
 StdReturnType Storage::Clear()
 {
     eeprom_update_byte(ToEepromAddress(kLengthAddress), kLengthEmpty);

@@ -25,13 +25,12 @@ StdReturnType BH1750::Init(ModeType mode)
     return SetMode(mode);
 }
 
-/*! \brief          Puts the sensor into a measurement mode
- *  \details        Mode is assigned only once the sensor has acknowledged, because it is
- *                  also what IsReady() reads to decide whether the sensor is set up.
- *                  Assigning first marks a sensor that never took the command as ready, and
- *                  the retry in Task() then never runs again - which leaves the sensor
- *                  powered on but converting nothing, and every later reading is the empty
- *                  data register.
+/*
+ * The mode is assigned only once the sensor has acknowledged, because it is also what
+ * IsReady() reads to decide whether the sensor is set up. Assigning first marks a sensor
+ * that never took the command as ready, and the retry in Task() then never runs again -
+ * which leaves the sensor powered on but converting nothing, and every later reading is the
+ * empty data register.
  */
 StdReturnType BH1750::SetMode(ModeType mode)
 {
@@ -43,10 +42,9 @@ StdReturnType BH1750::SetMode(ModeType mode)
     return kEOk;
 }
 
-/*! \brief          Changes the sensor's measurement time register
- *  \details        The register is split over two commands, and in both of them the value
- *                  bits sit below the opcode bits - so the value is ORed in rather than
- *                  shifted into place.
+/*
+ * The register is split over two commands, and in both of them the value bits sit below
+ * the opcode bits - so the value is ORed in rather than shifted into place.
  */
 StdReturnType BH1750::ChangeMeasurementTime(byte mt_reg_value)
 {
@@ -73,12 +71,6 @@ StdReturnType BH1750::ChangeMeasurementTime(byte mt_reg_value)
     return kEOk;
 }
 
-/*! \brief          Reads the sensor, setting it up first if that has not worked yet
- *  \details        Set up from here rather than from an Init() call, and retried until it
- *                  works: the core keeps its sensor private and has no place to call Init()
- *                  from. The retry costs one failing transfer per cycle on a board with no
- *                  sensor, which the bounded timeouts keep short.
- */
 void BH1750::Task()
 {
     /*
@@ -109,20 +101,20 @@ StdReturnType BH1750::StartBus()
     return kEOk;
 }
 
-/*! \brief          Sends one opcode to the sensor
- *  \details        The sensor has no register pointer: every command is a single byte, and
- *                  a measurement is read straight back without addressing anything.
+/*
+ * Sends one opcode. The sensor has no register pointer: every command is a single byte,
+ * and a measurement is read straight back without addressing anything.
  */
 StdReturnType BH1750::SendCommand(byte command)
 {
     return Twi::GetInstance().Write(BH1750_I2C_ADDR, &command, 1u);
 }
 
-/*! \brief          Reads the last measurement and converts it to lux
- *  \details        The reading is kept as it was when the sensor does not answer, rather
- *                  than falling to zero: the brightness automatic works on this value, so a
- *                  dropped reading would otherwise dim the display for a second. What bounds
- *                  that is the caller - see CountReadFailure().
+/*
+ * Reads the last measurement and converts it to lux. The reading is kept as it was when
+ * the sensor does not answer, rather than falling to zero: the brightness automatic works
+ * on this value, so a dropped reading would otherwise dim the display for a second. What
+ * bounds that is the caller - see CountReadFailure().
  */
 StdReturnType BH1750::ReadIlluminance()
 {
@@ -135,12 +127,12 @@ StdReturnType BH1750::ReadIlluminance()
     return kEOk;
 }
 
-/*! \brief          Starts the next measurement when the sensor only makes one at a time
- *  \details        A one-time measurement leaves the sensor powered down, so the next task
- *                  would read the same value again unless the mode is sent afresh - and it
- *                  takes the power-on command before it listens to that mode, which is the
- *                  same departure from the xmega driver Init() makes and which the other two
- *                  backends make here.
+/*
+ * Starts the next measurement when the sensor only makes one at a time. A one-time
+ * measurement leaves the sensor powered down, so the next task would read the same value
+ * again unless the mode is sent afresh - and it takes the power-on command before it listens
+ * to that mode, which is the same departure from the xmega driver Init() makes and which the
+ * other two backends make here.
  */
 void BH1750::SendModeForOneTimeMode()
 {

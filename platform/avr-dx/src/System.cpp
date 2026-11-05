@@ -33,16 +33,6 @@ constexpr uint16_t kBytesPerKibibyte{1024u};
  * The ones it would make const drive the hardware, which a const would deny.
  */
 // NOLINTBEGIN(readability-convert-member-functions-to-static, readability-make-member-function-const)
-/*! \brief          What is left between the stack and everything below it
- *  \details        The gap the stack still has to grow into, measured from a local variable
- *                  because that is where the stack currently is. Nothing here allocates, so
- *                  the lower edge is normally the end of the static data; __brkval is
- *                  consulted anyway, so that the figure stays honest if something ever does.
- *
- *                  Reported in kibibytes because that is the seam's unit, which on a part
- *                  with sixteen of them costs the last three digits - enough to see the
- *                  headroom, not enough to watch it move.
- */
 StdReturnType System::GetFreeMemoryInKibibytes(uint16_t& free_memory) const
 {
     char stack_mark;
@@ -61,12 +51,6 @@ StdReturnType System::GetFreeMemoryInKibibytes(uint16_t& free_memory) const
     return kEOk;
 }
 
-/*! \brief          Resets the controller, if a command asked for one
- *  \details        The console is drained first: the command that asked for this has already
- *                  printed its answer into the transmit queue, and resetting with the queue
- *                  still full would throw it away - the clock would come back up having
- *                  never confirmed what it was told to do.
- */
 void System::PerformPendingRestart()
 {
     if(!restart_pending_) { return; }

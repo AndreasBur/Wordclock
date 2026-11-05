@@ -9,11 +9,11 @@
 #include "Arduino.h"
 #include "RealTimeClock.h"
 
-/*! \brief          Takes the time from the chip, if it has one to give
- *  \details        What the chip refuses to answer is left alone rather than replaced: a
- *                  board with no chip fitted, or one whose battery ran out, keeps the
- *                  default date and shows an obviously wrong time - which is what tells a
- *                  first bring-up apart from a display that is simply dark.
+/*
+ * Takes the time from the chip, if it has one to give. What the chip refuses to answer is
+ * left alone rather than replaced: a board with no chip fitted, or one whose battery ran
+ * out, keeps the default date and shows an obviously wrong time - which is what tells a
+ * first bring-up apart from a display that is simply dark.
  */
 StdReturnType RealTimeClock::ReadChip()
 {
@@ -25,11 +25,11 @@ StdReturnType RealTimeClock::ReadChip()
     return kEOk;
 }
 
-/*! \brief          Puts what was just set into the chip
- *  \details        The return code is dropped on purpose: a clock with no chip has to keep
- *                  running on what a command set it to, and there is nobody here to report
- *                  a failure to - the command's own answer has already been decided by the
- *                  parser that called this.
+/*
+ * Puts what was just set into the chip. The return code is dropped on purpose: a clock with
+ * no chip has to keep what a command set it to, and there is nobody here to report a
+ * failure to - the command's own answer has already been decided by the parser that called
+ * this.
  */
 void RealTimeClock::WriteChip()
 {
@@ -43,11 +43,6 @@ void RealTimeClock::WriteChip()
     chip_read_countdown_ = kChipReadInterval;
 }
 
-/*! \brief          Keeps the time up to date from the chip
- *  \details        Called from the application's tick rather than through the scheduler,
- *                  because the core reads the time within its own tasks and would otherwise
- *                  see it change part way through a pass.
- */
 void RealTimeClock::Task()
 {
     if(chip_read_countdown_ > 0u) {

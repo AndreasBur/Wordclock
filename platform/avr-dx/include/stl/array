@@ -25,42 +25,98 @@
  */
 // NOLINTBEGIN(cert-dcl58-cpp,readability-identifier-naming)
 namespace std {
+/*!
+ * \brief A fixed-size array, as the standard's std::array: an aggregate holding one C array.
+ *
+ * It provides the member types value_type, size_type, iterator and const_iterator, the element
+ * access by [], data(), front() and back(), begin() and end(), size(), max_size(), empty() and
+ * fill(), and == and != beside it. It leaves out at(), the other member types, cbegin() and
+ * cend(), the reverse iterators, swap(), the comparisons by order and the tuple interface.
+ *
+ * \tparam T The type of the elements.
+ * \tparam N The number of elements.
+ */
 template<class T, size_t N>
 struct array {
-    // Public and named with the standard's underscore, because an aggregate has no other
-    // way to hold its storage - the brace initialisers in the core reach it directly.
+    /*!
+     * \brief The elements.
+     *
+     * Public and named with the standard's underscore, because an aggregate has no other way to
+     * hold its storage - the brace initialisers in the core reach it directly.
+     */
     T _M_elems[N];
 
-    using value_type = T;
-    using size_type = size_t;
-    using iterator = T*;
-    using const_iterator = const T*;
+    using value_type = T; /*!< The type of the elements. */
+    using size_type = size_t; /*!< The type of an index and of the number of elements. */
+    using iterator = T*; /*!< An iterator: a pointer to an element. */
+    using const_iterator = const T*; /*!< An iterator that cannot write: a pointer to const. */
 
+    /*!
+     * \brief Returns the element at `index`, which is not checked.
+     *
+     * \param[in] index The index, below N.
+     * \return The element.
+     */
     constexpr T& operator[](size_type index) { return _M_elems[index]; }
+    /*!
+     * \brief Returns the element at `index`, which is not checked, for reading.
+     *
+     * \param[in] index The index, below N.
+     * \return The element.
+     */
     constexpr const T& operator[](size_type index) const { return _M_elems[index]; }
 
+    /*! \brief Returns a pointer to the first element. */
     constexpr T* data() { return _M_elems; }
+    /*! \brief Returns a pointer to the first element, for reading. */
     constexpr const T* data() const { return _M_elems; }
 
+    /*! \brief Returns an iterator to the first element. */
     constexpr iterator begin() { return _M_elems; }
+    /*! \brief Returns an iterator to the first element, for reading. */
     constexpr const_iterator begin() const { return _M_elems; }
+    /*! \brief Returns an iterator past the last element. */
     constexpr iterator end() { return _M_elems + N; }
+    /*! \brief Returns an iterator past the last element, for reading. */
     constexpr const_iterator end() const { return _M_elems + N; }
 
+    /*! \brief Returns the first element. */
     constexpr T& front() { return _M_elems[0]; }
+    /*! \brief Returns the first element, for reading. */
     constexpr const T& front() const { return _M_elems[0]; }
+    /*! \brief Returns the last element. */
     constexpr T& back() { return _M_elems[N - 1u]; }
+    /*! \brief Returns the last element, for reading. */
     constexpr const T& back() const { return _M_elems[N - 1u]; }
 
+    /*! \brief Returns the number of elements, N. */
     constexpr size_type size() const { return N; }
+    /*! \brief Returns the largest number of elements, N, as size() does. */
     constexpr size_type max_size() const { return N; }
+    /*! \brief Returns whether the array has no elements, N being 0. */
     constexpr bool empty() const { return N == 0u; }
 
+    /*!
+     * \brief Assigns `value` to every element.
+     *
+     * \param[in] value The value.
+     */
     void fill(const T& value) {
         for(size_type index = 0u; index < N; index++) { _M_elems[index] = value; }
     }
 };
 
+/*!
+ * \brief Returns whether two arrays hold equal elements, compared one by one with ==.
+ *
+ * It stops at the first pair that is not equal.
+ *
+ * \tparam T The type of the elements.
+ * \tparam N The number of elements.
+ * \param[in] left The one array.
+ * \param[in] right The other array.
+ * \return True if every element of `left` equals the one of `right` at the same index.
+ */
 template<class T, size_t N>
 constexpr bool operator==(const array<T, N>& left, const array<T, N>& right)
 {
@@ -70,6 +126,15 @@ constexpr bool operator==(const array<T, N>& left, const array<T, N>& right)
     return true;
 }
 
+/*!
+ * \brief Returns whether two arrays differ in an element: the opposite of ==.
+ *
+ * \tparam T The type of the elements.
+ * \tparam N The number of elements.
+ * \param[in] left The one array.
+ * \param[in] right The other array.
+ * \return True if an element of `left` does not equal the one of `right` at the same index.
+ */
 template<class T, size_t N>
 constexpr bool operator!=(const array<T, N>& left, const array<T, N>& right)
 {
