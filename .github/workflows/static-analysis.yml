@@ -224,13 +224,12 @@ jobs:
           packages: doxygen
 
       # Once per backend, over firmware/ and that backend: a \param that names no parameter, a
-      # command Doxygen does not know, a block in a module already written in the new style
-      # that leaves something out. The modules not yet written are listed in the script, and
-      # docs/documentation.md says what a block holds. The runner's python3 is enough.
+      # command Doxygen does not know, an entity without a block or a block that leaves
+      # something out. docs/documentation.md says what a block holds. The runner's python3 is
+      # enough.
       - name: Check
         run: python3 tools/docs.py
 
-      # A line that continues a command of a block is indented under the command's text; the
-      # modules of PENDING are left out, as docs.py leaves them.
+      # A line that continues a command of a block is indented under the command's text.
       - name: Indented
         run: python3 tools/doc-indent.py

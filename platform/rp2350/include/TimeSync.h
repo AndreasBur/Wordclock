@@ -26,17 +26,31 @@
 #include <stdlib.h>
 #include <time.h>
 
+/*! \brief The two halves of the time synchronisation: the zone rule and the time servers. */
 namespace wordclock_time {
-// Safe before the link is up, and needed there: until this runs, localtime() is UTC and
-// the display would show the wrong hour for as long as that lasted.
+/*!
+ * \brief Installs the zone rule WORDCLOCK_TIMEZONE, so that the C library's local time follows it.
+ *
+ * It sets `TZ` and calls `tzset()`. Safe before the link is up, and needed there: until this runs,
+ * localtime() is UTC and the display would show the wrong hour for as long as that lasted. setup()
+ * calls it once.
+ */
 inline void ApplyTimeZone()
 {
     setenv("TZ", WORDCLOCK_TIMEZONE, 1);
     tzset();
 }
 
-// Only once there is a link. The core resolves the server names here rather than at the
-// first poll, so a call made too early returns having started nothing.
+/*!
+ * \brief Starts SNTP with the time servers WORDCLOCK_NTP_SERVER_PRIMARY and
+ *        WORDCLOCK_NTP_SERVER_SECONDARY.
+ *
+ * It calls `NTP.begin()` with the two. The application calls it once, on the first tick that
+ * finds the link up, and System::ResynchroniseTime() calls it again.
+ *
+ * \pre The link is up. The core resolves the server names here rather than at the first poll, so a
+ *      call made too early returns having started nothing.
+ */
 inline void StartTimeServers()
 {
     NTP.begin(WORDCLOCK_NTP_SERVER_PRIMARY, WORDCLOCK_NTP_SERVER_SECONDARY);

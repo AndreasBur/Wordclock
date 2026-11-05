@@ -34,12 +34,6 @@ constexpr byte kWeekdayOffset{1u};
 
 } // namespace
 
-/*! \brief          Takes one reading from the chip
- *  \details        Set up from here rather than from an Init() call, the same way the light
- *                  sensor is: there is no place in the core to call an Init() from, and
- *                  retrying from the task means a chip that is plugged in later, or a bus
- *                  that was busy at boot, still comes up.
- */
 void DS3231::Task()
 {
     if(StartBus() == kENotOk) { return; }
@@ -47,19 +41,6 @@ void DS3231::Task()
     ReadTemperature();
 }
 
-/*! \brief          Reads what the chip counted, in UTC
- *  \details        The stopped flag is asked first and not afterwards: a chip whose
- *                  oscillator stood still has registers that still read like a date, and
- *                  taking that date would set the clock to whenever the battery gave out.
- *
- *                  What the setters reject is what decides whether the block is a date at
- *                  all - a fresh chip reads 0x00 everywhere, which is month zero and day
- *                  zero, and a transfer that lost its way reads anything. Hence the value
- *                  is assembled through ClockDateTime's own setters and their return
- *                  codes rather than trusted.
- *
- *  \return         kEOk if the chip answered with a believable date and time
- */
 StdReturnType DS3231::GetDateTime(ClockDateTime& date_time)
 {
     if(StartBus() == kENotOk) { return kENotOk; }
@@ -84,17 +65,6 @@ StdReturnType DS3231::GetDateTime(ClockDateTime& date_time)
     return kEOk;
 }
 
-/*! \brief          Writes the time to the chip, in UTC
- *  \details        The seconds register goes out with the rest rather than being written
- *                  last: writing it is what restarts the chip's own second, so the value
- *                  lands as a whole.
- *
- *                  The weekday register is filled although nothing here reads it back -
- *                  the date carries the weekday anyway, and a register left at zero is one
- *                  that another reader of this chip would be misled by.
- *
- *  \return         kEOk if the chip took the whole block and the stopped flag is cleared
- */
 StdReturnType DS3231::SetDateTime(const ClockDateTime& date_time)
 {
     if(StartBus() == kENotOk) { return kENotOk; }
@@ -114,11 +84,10 @@ StdReturnType DS3231::SetDateTime(const ClockDateTime& date_time)
     return ClearOscillatorStopped();
 }
 
-/*! \brief          Opens the I2C bus, once
- *  \details        Shared with the light sensor, and opening it twice is what the Wire
- *                  library allows for - whichever of the two runs first does it.
- *
- *  \return         kEOk, which is all this core can tell us
+/*
+ * Opens the I2C bus, once; always kEOk, which is all this core can tell. Shared with the
+ * light sensor, and opening it twice is what the Wire library allows for - whichever of the
+ * two runs first does it.
  */
 StdReturnType DS3231::StartBus()
 {
@@ -141,13 +110,12 @@ StdReturnType DS3231::StartBus()
     return kEOk;
 }
 
-/*! \brief          Reads a block of registers, starting at one of them
- *  \details        Two transfers rather than one with a repeated start: the chip's address
- *                  pointer keeps what was written to it, so a write of the register number
- *                  followed by a plain read lands in the same place, and this way the code
- *                  does not depend on the Wire implementation's repeated-start support.
- *
- *  \return         kEOk if the chip acknowledged and handed over every byte
+/*
+ * Reads a block of registers, starting at one of them; kEOk if the chip acknowledged and
+ * handed over every byte. Two transfers rather than one with a repeated start: the chip's
+ * address pointer keeps what was written to it, so a write of the register number followed
+ * by a plain read lands in the same place, and this way the code does not depend on the
+ * Wire implementation's repeated-start support.
  */
 StdReturnType DS3231::ReadRegisters(byte register_address, byte* values, byte length)
 {
@@ -163,10 +131,8 @@ StdReturnType DS3231::ReadRegisters(byte register_address, byte* values, byte le
     return kEOk;
 }
 
-/*! \brief          Writes a block of registers, starting at one of them
- *
- *  \return         kEOk if the chip acknowledged the whole transfer
- */
+// Writes a block of registers, starting at one of them; kEOk if the chip acknowledged the
+// whole transfer.
 StdReturnType DS3231::WriteRegisters(byte register_address, const byte* values, byte length)
 {
     Wire.beginTransmission(static_cast<uint8_t>(DS3231_I2C_ADDR));
@@ -179,14 +145,12 @@ StdReturnType DS3231::WriteRegisters(byte register_address, const byte* values, 
     return kEOk;
 }
 
-/*! \brief          Tells whether the chip lost track of the time
- *  \details        The flag is set by the chip itself whenever its oscillator was not
- *                  running - a first power-up, or a battery that ran out - and it stays
- *                  set until somebody clears it. A chip that does not answer is treated
- *                  the same way, because a time that cannot be read is no better than one
- *                  that cannot be believed.
- *
- *  \return         true if what the chip counted is not to be used
+/*
+ * Tells whether the chip lost track of the time; true if what the chip counted is not to be
+ * used. The flag is set by the chip itself whenever its oscillator was not running - a first
+ * power-up, or a battery that ran out - and it stays set until somebody clears it. A chip
+ * that does not answer is treated the same way, because a time that cannot be read is no
+ * better than one that cannot be believed.
  */
 bool DS3231::HasOscillatorStopped()
 {
@@ -197,12 +161,11 @@ bool DS3231::HasOscillatorStopped()
     return (status & DS3231_STATUS_OSCILLATOR_STOPPED_MASK) != 0u;
 }
 
-/*! \brief          Declares what the chip counts believable again
- *  \details        Read, modify, write rather than a plain write: the register carries the
- *                  alarm flags and the square wave setting beside this bit, and a clock
- *                  that clobbered them would switch off somebody else's alarm.
- *
- *  \return         kEOk if the flag is cleared
+/*
+ * Declares what the chip counts believable again; kEOk if the flag is cleared. Read, modify,
+ * write rather than a plain write: the register carries the alarm flags and the square wave
+ * setting beside this bit, and a clock that clobbered them would switch off somebody else's
+ * alarm.
  */
 StdReturnType DS3231::ClearOscillatorStopped()
 {
@@ -215,14 +178,12 @@ StdReturnType DS3231::ClearOscillatorStopped()
     return WriteRegisters(DS3231_REG_STATUS, &status, 1u);
 }
 
-/*! \brief          Reads the temperature register pair
- *  \details        A chip that does not answer leaves the last reading in place, including
- *                  its validity: the overlay would otherwise disappear for one period
- *                  because of a single lost transfer, which is a worse answer than a
- *                  value that is a few minutes old on something that changes as slowly as
- *                  a room does.
- *
- *  \return         kEOk if both bytes arrived
+/*
+ * Reads the temperature register pair; kEOk if both bytes arrived. A chip that does not
+ * answer leaves the last reading in place, including its validity: the overlay would
+ * otherwise disappear for one period because of a single lost transfer, which is a worse
+ * answer than a value that is a few minutes old on something that changes as slowly as a
+ * room does.
  */
 StdReturnType DS3231::ReadTemperature()
 {

@@ -29,10 +29,16 @@
 class AsyncWebServerRequest;
 class AsyncResponseStream;
 
-/*
- * One route's answer, being written. This server is pulled from rather than pushed to: the
- * stream collects what is written and Finish() is what hands it to the request, after which
- * the library sends it.
+/*!
+ * \brief One route's answer, being written: the body of a response, which the core writes into and
+ *        finishes.
+ *
+ * A backend's route opens it and hands it to WebFrontend::WriteCommands() or
+ * WebFrontend::WriteDisplay(), which write the document into it and finish it.
+ *
+ * On the RP2350 it is an `AsyncResponseStream` of ESPAsyncWebServer. This server is pulled from
+ * rather than pushed to: the stream collects what is written and Finish() is what hands it to the
+ * request, after which the library sends it.
  */
 class WebResponseBody
 {
@@ -41,25 +47,77 @@ class WebResponseBody
     AsyncResponseStream* stream_;
 
   public:
+    /*!
+     * \brief Opens the answer to `request`, and sets its content type.
+     *
+     * It opens the stream with `beginResponseStream()`.
+     *
+     * \param[in] request The request of ESPAsyncWebServer the answer is for.
+     * \param[in] content_type The content type of the body, terminated.
+     */
     WebResponseBody(AsyncWebServerRequest* request, const char* content_type);
 
+    /*!
+     * \brief Adds `length` bytes of `data` to the body.
+     *
+     * On the RP2350, written into the stream, which holds it until Finish(); what the stream
+     * answers is not checked.
+     *
+     * \param[in] data The bytes; they need not be terminated.
+     * \param[in] length The number of bytes.
+     */
     void Write(const char* data, size_t length);
+
+    /*!
+     * \brief Ends the body, and has the answer sent.
+     *
+     * Called once, after the last Write(). On the RP2350 it hands the stream to the request with
+     * `send()`, and the library sends it.
+     */
     void Finish();
 };
 
-/*
- * Where a finished line or a display frame leaves for whoever is watching. AsyncWebSocket
- * owns its client list, counts it and broadcasts to it, so HasClients() is that count and
- * there is no table here that could disagree with it.
+/*!
+ * \brief Where a finished line or a display frame leaves for whoever is watching: every client of
+ *        the web socket.
+ *
+ * WebFrontend sends through it from the firmware's tick. It asks first whether the server is
+ * listening, and before a display frame whether a client is connected.
+ *
+ * On the RP2350 the clients are `AsyncWebSocket`'s own client list. The socket owns that list,
+ * counts it and broadcasts to it, so HasClients() is that count and there is no table here that
+ * could disagree with it. IsListening() is true from the end of WebInterface::Begin() on.
  */
 class WebTransport
 {
   public:
+    /*! \brief Returns the one transport. */
     static WebTransport& GetInstance();
 
+    /*! \brief Returns whether the server is listening for connections. */
     bool IsListening() const;
+
+    /*! \brief Returns whether a client is connected to the web socket. */
     bool HasClients() const;
+
+    /*!
+     * \brief Sends `length` bytes of `text` to every client of the web socket, as a text frame.
+     *
+     * On the RP2350, with `AsyncWebSocket::textAll()`, whose answer is not checked.
+     *
+     * \param[in] text The text, as UTF-8, which a text frame has to be; it need not be terminated.
+     * \param[in] length The number of bytes.
+     */
     void SendText(const char* text, size_t length);
+
+    /*!
+     * \brief Sends `length` bytes of `bytes` to every client of the web socket, as a binary frame.
+     *
+     * On the RP2350, with `AsyncWebSocket::binaryAll()`, whose answer is not checked.
+     *
+     * \param[in] bytes The bytes.
+     * \param[in] length The number of bytes.
+     */
     void SendBinary(const byte* bytes, size_t length);
 };
 

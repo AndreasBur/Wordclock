@@ -3,7 +3,7 @@
 
 /*!
  * \file
- * \brief The port Serial is bound to: the UART plus an injected line source.
+ * \brief The port Serial is bound to: the core's serial port plus an injected line source.
  */
 
 #include "Arduino.h"
@@ -28,16 +28,8 @@ void WordclockSerial::begin(unsigned long baud_rate)
     wordclock_platform::HardwarePortBegin(baud_rate);
 }
 
-/*! \brief          Hands characters to the port from another task
- *  \details        Written by the producer only, which is what keeps this free of a lock -
- *                  see the note on the indices in the header.
- *
- *                  A full buffer drops the remainder rather than overwriting what has not
- *                  been read yet: the reader is mid-command, and overwriting would splice
- *                  two commands into one that parses as neither.
- *
- *  \return         kEOk if everything was taken
- */
+// Written by the producer only, which is what keeps this free of a lock - see the note on
+// the indices in the header.
 StdReturnType WordclockSerial::Inject(const char* characters, size_t length)
 {
     if((characters == nullptr) || (length == 0u)) { return kENotOk; }
@@ -69,13 +61,6 @@ int WordclockSerial::available() const
     return IsInjectEmpty() ? 0 : 1;
 }
 
-/*! \brief          Takes the next character, wire before network
- *  \details        The UART is served first so that a console on the wire keeps working
- *                  while a network client is busy - the wire is where one debugs a clock
- *                  whose network is the problem.
- *
- *  \return         the character, or -1 when there is none
- */
 int WordclockSerial::read()
 {
     Stream& port = wordclock_platform::HardwarePort();
@@ -109,12 +94,6 @@ void WordclockSerial::print(int number)
     print(digits);
 }
 
-/*! \brief          Writes one character, to the wire and into the line being collected
- *  \details        A newline is treated as the end of the line rather than as content,
- *                  the same way the simulator's shim does it - the firmware ends some of
- *                  its output with print('\n') instead of println(), and a line sink that
- *                  did not notice would run two answers together.
- */
 void WordclockSerial::print(char character)
 {
     if(character == '\n') { println(); return; }
@@ -149,8 +128,6 @@ void WordclockSerial::println(const __FlashStringHelper* text)
     println();
 }
 
-/*! \brief          Waits until the UART has sent what it was given
- */
 void WordclockSerial::flush()
 {
     wordclock_platform::HardwarePort().flush();
@@ -169,10 +146,10 @@ char WordclockSerial::ReadInjected()
     return character;
 }
 
-/*! \brief          Collects the line the sink will be handed
- *  \details        A line that outgrows the buffer is flushed early rather than cut: the
- *                  client then sees the answer split over two frames, which is readable,
- *                  where a truncated line would silently lose its end.
+/*
+ * Collects the line the sink will be handed. A line that outgrows the buffer is flushed early
+ * rather than cut: the client then sees the answer split over two frames, which is readable,
+ * where a truncated line would silently lose its end.
  */
 void WordclockSerial::AppendToLine(char character)
 {
@@ -181,10 +158,10 @@ void WordclockSerial::AppendToLine(char character)
     line_buffer_[line_used_++] = character;
 }
 
-/*! \brief          Hands the collected line to whoever registered for it
- *  \details        An empty line is dropped, because println() is also used to terminate
- *                  output that print() already ended with a newline - passing that on
- *                  would send a blank frame after every answer.
+/*
+ * Hands the collected line to whoever registered for it. An empty line is dropped, because
+ * println() is also used to terminate output that print() already ended with a newline -
+ * passing that on would send a blank frame after every answer.
  */
 void WordclockSerial::FlushLine()
 {

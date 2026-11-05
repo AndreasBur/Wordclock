@@ -76,23 +76,21 @@ struct UploadType {
 };
 UploadType upload;
 
-/*! \brief          Whether this request may be answered, and the 401 when it may not
+/*
+ * Whether this request may be answered, and the 401 when it may not: true when the handler may
+ * go on.
  *
- *  \return         true when the handler may go on
+ * Basic authentication, and what it is worth saying plainly: the credential travels
+ * base64-encoded over plain http, which is not encryption. What this keeps out is a guest who
+ * opens the page and starts sending commands. It keeps out nobody who can watch the traffic,
+ * and that would need https, which a clock cannot offer credibly.
  *
- *  \details        Basic authentication, and what it is worth saying plainly: the credential
- *                  travels base64-encoded over plain http, which is not encryption. What this
- *                  keeps out is a guest who opens the page and starts sending commands. It
- *                  keeps out nobody who can watch the traffic, and that would need https,
- *                  which a clock cannot offer credibly.
+ * Off unless a password was stored, so an update locks nobody out of a clock that is already on
+ * a wall.
  *
- *                  Off unless a password was stored, so an update locks nobody out of a clock
- *                  that is already on a wall.
- *
- *                  The library compares for us here, which is why System hands over the
- *                  password rather than checking a blob the way the ESP32's does - that core
- *                  can encode base64 and not decode it, and this one has a server that needs
- *                  neither.
+ * The library compares for us here, which is why System hands over the password rather than
+ * checking a blob the way the ESP32's does - that core can encode base64 and not decode it, and
+ * this one has a server that needs neither.
  */
 bool IsRequestAuthorised(AsyncWebServerRequest* request)
 {
@@ -111,11 +109,12 @@ bool IsRequestAuthorised(AsyncWebServerRequest* request)
     return false;
 }
 
-/*! \brief          Gives up on the image being written, and takes it off the filesystem
+/*
+ * Gives up on the image being written, and takes it off the filesystem.
  *
- *  \details        Removed rather than left behind: what is on the filesystem after a failed
- *                  upload is a file the loader will not read, and the next attempt needs the
- *                  space more than anyone needs the wreckage.
+ * Removed rather than left behind: what is on the filesystem after a failed upload is a file
+ * the loader will not read, and the next attempt needs the space more than anyone needs the
+ * wreckage.
  */
 void AbortImage(const char* reason)
 {
@@ -125,15 +124,15 @@ void AbortImage(const char* reason)
     upload.failure = reason;
 }
 
-/*! \brief          Opens the file the image is written into, or says why it cannot be
+/*
+ * Opens the file the image is written into, or says why it cannot be.
  *
- *  \details        Announced rather than measured, and it has to be: the space is checked
- *                  before the first byte is written, and the only size available then is the
- *                  one the request declares. A body that then turns out shorter is caught at
- *                  the end, where the length is compared again.
+ * Announced rather than measured, and it has to be: the space is checked before the first byte
+ * is written, and the only size available then is the one the request declares. A body that
+ * then turns out shorter is caught at the end, where the length is compared again.
  *
- *                  The previous image is removed *before* the free space is measured, or a
- *                  second update would be refused for the space the first one still holds.
+ * The previous image is removed *before* the free space is measured, or a second update would
+ * be refused for the space the first one still holds.
  */
 void BeginImage(AsyncWebServerRequest* request, size_t announced)
 {
@@ -162,18 +161,18 @@ void BeginImage(AsyncWebServerRequest* request, size_t announced)
     upload.is_open = true;
 }
 
-/*! \brief          Closes the image and writes the loader's command page beside it
+/*
+ * Closes the image and writes the loader's command page beside it.
  *
- *  \details        The one irreversible step of an update, and the last: until this page is
- *                  written the clock is running what it was running and would go on doing so
- *                  after any number of interrupted uploads. Its own writing is guarded by a
- *                  checksum the loader verifies, so a page that is itself half-written is a
- *                  page the loader ignores.
+ * The one irreversible step of an update, and the last: until this page is written the clock is
+ * running what it was running and would go on doing so after any number of interrupted uploads.
+ * Its own writing is guarded by a checksum the loader verifies, so a page that is itself half-
+ * written is a page the loader ignores.
  *
- *                  The length is compared once more against what was announced. A connection
- *                  that stops mid-image ends without this call at all; one that stops between
- *                  the last chunk and here leaves a file that is short, and a short image
- *                  copied over the application is the one outcome this must not produce.
+ * The length is compared once more against what was announced. A connection that stops mid-
+ * image ends without this call at all; one that stops between the last chunk and here leaves a
+ * file that is short, and a short image copied over the application is the one outcome this
+ * must not produce.
  */
 void CommitImage(size_t announced)
 {
@@ -200,15 +199,15 @@ void CommitImage(size_t announced)
     upload.is_committed = true;
 }
 
-/*! \brief          Serves one of the files the clock hands out unchanged
+/*
+ * Serves one of the files the clock hands out unchanged.
  *
- *  \details        One handler for all five - the two pages, the manifest and the two icons -
- *                  because what separates them is data and the data is WebFrontend's table.
- *                  Where the IDF's server carries a user context per route, this library takes
- *                  a std::function, so the entry is captured instead.
+ * One handler for all five - the two pages, the manifest and the two icons - because what
+ * separates them is data and the data is WebFrontend's table. Where the IDF's server carries a
+ * user context per route, this library takes a std::function, so the entry is captured instead.
  *
- *                  A gzipped asset is sent as it is stored and the browser unpacks it; that
- *                  is the whole of what the header does here, and the table says which.
+ * A gzipped asset is sent as it is stored and the browser unpacks it; that is the whole of what
+ * the header does here, and the table says which.
  */
 void HandleAsset(AsyncWebServerRequest* request, const WebFrontend::AssetType& asset)
 {
@@ -220,15 +219,15 @@ void HandleAsset(AsyncWebServerRequest* request, const WebFrontend::AssetType& a
     request->send(response);
 }
 
-/*! \brief          Answers the update route, in the one shape the page reads
+/*
+ * Answers the update route, in the one shape the page reads.
  *
- *  \details        The same two-field JSON the ESP32 backend answers with, because the panel
- *                  reading it is one page serving both boards.
+ * The same two-field JSON the ESP32 backend answers with, because the panel reading it is one
+ * page serving both boards.
  *
- *                  Through beginResponse like every other route here, rather than the
- *                  library's send(code, type, text): one way of answering per file is worth
- *                  more than the shorter call, and it is the form the backend's stub already
- *                  stands in for.
+ * Through beginResponse like every other route here, rather than the library's send(code, type,
+ * text): one way of answering per file is worth more than the shorter call, and it is the form
+ * the backend's stub already stands in for.
  */
 void SendUpdateResult(AsyncWebServerRequest* request, bool ok, const char* reason)
 {
@@ -252,24 +251,23 @@ void SendUpdateResult(AsyncWebServerRequest* request, bool ok, const char* reaso
                                         reinterpret_cast<const uint8_t*>(answer), strlen(answer)));
 }
 
-/*! \brief          Takes the image out of the request body and into the filesystem
+/*
+ * Takes the image out of the request body and into the filesystem.
  *
- *  \details        This core has no second app partition, so an update here is not a write
- *                  into a spare slot but a *file*: the image goes into LittleFS, a command
- *                  page beside it names that file, and the OTA loader every image on this
- *                  board already carries - ten kilobytes at the front of flash, ahead of the
- *                  application - copies it into place on the next boot and clears the command
- *                  afterwards, so it is done once and not on every boot.
+ * This core has no second app partition, so an update here is not a write into a spare slot but
+ * a *file*: the image goes into LittleFS, a command page beside it names that file, and the OTA
+ * loader every image on this board already carries - ten kilobytes at the front of flash, ahead
+ * of the application - copies it into place on the next boot and clears the command afterwards,
+ * so it is done once and not on every boot.
  *
- *                  What that arrangement buys is the property the ESP32's second slot gives
- *                  for free: the firmware being written is never the one running. Which is why
- *                  the command page is written last, after the final chunk has arrived and the
- *                  file measures what was announced - no command page, no update, and a
- *                  half-written image is a file nobody reads.
+ * What that arrangement buys is the property the ESP32's second slot gives for free: the
+ * firmware being written is never the one running. Which is why the command page is written
+ * last, after the final chunk has arrived and the file measures what was announced - no command
+ * page, no update, and a half-written image is a file nobody reads.
  *
- *                  The body arrives *before* the request handler runs, so authorisation is
- *                  asked here as well and not only there: a check that happened after the
- *                  writing would have let an unauthorised upload fill the filesystem first.
+ * The body arrives *before* the request handler runs, so authorisation is asked here as well
+ * and not only there: a check that happened after the writing would have let an unauthorised
+ * upload fill the filesystem first.
  */
 void HandleUpdateBody(AsyncWebServerRequest* request, uint8_t* data, size_t length, size_t index, size_t total)
 {
@@ -285,15 +283,15 @@ void HandleUpdateBody(AsyncWebServerRequest* request, uint8_t* data, size_t leng
     if(upload.written >= total) { CommitImage(total); }
 }
 
-/*! \brief          Answers once the body has been taken, and asks for the restart
+/*
+ * Answers once the body has been taken, and asks for the restart.
  *
- *  \details        The restart is asked for rather than carried out, the same deferral RPC 31
- *                  uses: a controller restarting inside the handler sends the browser nothing,
- *                  which reads as a failed update. The application's tick does it, once this
- *                  answer has left.
+ * The restart is asked for rather than carried out, the same deferral RPC 31 uses: a controller
+ * restarting inside the handler sends the browser nothing, which reads as a failed update. The
+ * application's tick does it, once this answer has left.
  *
- *                  A POST with no body never reaches the body handler at all, so "nothing was
- *                  committed and nothing failed" is its own case and says so.
+ * A POST with no body never reaches the body handler at all, so "nothing was committed and
+ * nothing failed" is its own case and says so.
  */
 void HandleUpdate(AsyncWebServerRequest* request)
 {
@@ -315,16 +313,16 @@ void HandleUpdate(AsyncWebServerRequest* request)
     System::GetInstance().Restart();
 }
 
-/*! \brief          Serves the command catalog and the panel's letters
+/*
+ * Serves the command catalog and the panel's letters.
  *
- *  \details        Both documents are written by WebFrontend, shared with the ESP32 backend:
- *                  what a page is sent is a property of the catalog and the letter table, not
- *                  of a controller. They were generated here once, and identically in the
- *                  other backend - two functions that had to be kept the same by hand and
- *                  whose divergence would have surfaced in a browser rather than in a test.
+ * Both documents are written by WebFrontend, shared with the ESP32 backend: what a page is sent
+ * is a property of the catalog and the letter table, not of a controller. They were generated
+ * here once, and identically in the other backend - two functions that had to be kept the same
+ * by hand and whose divergence would have surfaced in a browser rather than in a test.
  *
- *                  What is left here is what is genuinely this server's: the password, the
- *                  content type, and a body to write into.
+ * What is left here is what is genuinely this server's: the password, the content type, and a
+ * body to write into.
  */
 void HandleCommands(AsyncWebServerRequest* request)
 {
@@ -342,23 +340,23 @@ void HandleDisplay(AsyncWebServerRequest* request)
     WebFrontend::WriteDisplay(body);
 }
 
-/*! \brief          Takes one web socket frame and injects it as typed characters
- *  \details        The library completes the handshake itself and reports the result as an
- *                  event, so unlike the ESP32 backend there is no GET to answer here.
+/*
+ * Takes one web socket frame and injects it as typed characters.
  *
- *                  Only a whole single-frame text message is taken. A split one is dropped
- *                  rather than reassembled, which keeps half a command from reaching the
- *                  parser - the same guarantee the IDF version gets by asking for the frame
- *                  with the buffer's size.
+ * The library completes the handshake itself and reports the result as an event, so unlike the
+ * ESP32 backend there is no GET to answer here.
  *
- *                  The command is injected followed by the end-of-message character, unless
- *                  the browser already sent one. That keeps the page free of protocol
- *                  bookkeeping: it sends the command text, the terminator is this side's
- *                  business.
+ * Only a whole single-frame text message is taken. A split one is dropped rather than
+ * reassembled, which keeps half a command from reaching the parser - the same guarantee the IDF
+ * version gets by asking for the frame with the buffer's size.
  *
- *                  A close needs no handling. Where the IDF hands out socket descriptors
- *                  this side has to keep, the socket owns its client list, so a client that
- *                  simply vanished stops being broadcast to without anything here noticing.
+ * The command is injected followed by the end-of-message character, unless the browser already
+ * sent one. That keeps the page free of protocol bookkeeping: it sends the command text, the
+ * terminator is this side's business.
+ *
+ * A close needs no handling. Where the IDF hands out socket descriptors this side has to keep,
+ * the socket owns its client list, so a client that simply vanished stops being broadcast to
+ * without anything here noticing.
  */
 void OnSocketEvent(AsyncWebSocket*, AsyncWebSocketClient*, AwsEventType type,
                    void* argument, uint8_t* payload, size_t length)
@@ -392,10 +390,6 @@ void OnSocketEvent(AsyncWebSocket*, AsyncWebSocketClient*, AwsEventType type,
  * that detail into the interface.
  */
 // NOLINTBEGIN(readability-convert-member-functions-to-static)
-/*! \brief          Starts the server and takes over the output lines
- *
- *  \return         kEOk if the server is listening
- */
 StdReturnType WebInterface::Begin()
 {
     socket.onEvent(OnSocketEvent);
@@ -449,22 +443,11 @@ StdReturnType WebInterface::Begin()
     return kEOk;
 }
 
-/*! \brief          Sends one finished line to every open socket
- *  \details        The widening to UTF-8 and the bound on it are WebFrontend's, shared with
- *                  the other backend; what is this file's is the one call in SendText()
- *                  below, where the IDF needs a walk over descriptors.
- */
 void WebInterface::BroadcastLine(const char* line)
 {
     WebFrontend::GetInstance().BroadcastLine(line);
 }
 
-/*! \brief          Sends the pixel buffer to every open socket, when it changed
- *  \details        The rate limit, the gathering and the comparison against the last frame
- *                  are WebFrontend's, shared with the other backend - none of the three has
- *                  anything to do with which server is underneath. What is this file's is
- *                  SendBinary() below.
- */
 void WebInterface::BroadcastFrame()
 {
     WebFrontend::GetInstance().BroadcastFrame();

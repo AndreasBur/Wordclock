@@ -22,10 +22,6 @@ constexpr uint8_t kWireTransmissionSuccess{0u};
 
 } // namespace
 
-/*! \brief          Opens the bus and puts the sensor into a measurement mode
- *
- *  \return         kEOk if the sensor acknowledged both commands
- */
 StdReturnType BH1750::Init(ModeType mode)
 {
     if(StartBus() == kENotOk) { return kENotOk; }
@@ -40,15 +36,12 @@ StdReturnType BH1750::Init(ModeType mode)
     return SetMode(mode);
 }
 
-/*! \brief          Puts the sensor into a measurement mode
- *  \details        Mode is assigned only once the sensor has acknowledged, because it is
- *                  also what IsReady() reads to decide whether the sensor is set up.
- *                  Assigning first marks a sensor that never took the command as ready,
- *                  and the retry in Task() then never runs again - which leaves the sensor
- *                  powered on but converting nothing, and every later reading is the empty
- *                  data register.
- *
- *  \return         kEOk if the sensor acknowledged the mode
+/*
+ * The mode is assigned only once the sensor has acknowledged, because it is also what
+ * IsReady() reads to decide whether the sensor is set up. Assigning first marks a sensor
+ * that never took the command as ready, and the retry in Task() then never runs again -
+ * which leaves the sensor powered on but converting nothing, and every later reading is the
+ * empty data register.
  */
 StdReturnType BH1750::SetMode(ModeType mode)
 {
@@ -60,12 +53,9 @@ StdReturnType BH1750::SetMode(ModeType mode)
     return kEOk;
 }
 
-/*! \brief          Changes the sensor's measurement time register
- *  \details        The register is split over two commands, and in both of them the
- *                  value bits sit below the opcode bits - so the value is ORed in rather
- *                  than shifted into place.
- *
- *  \return         kEOk if the value was in range and the sensor took all three commands
+/*
+ * The register is split over two commands, and in both of them the value bits sit below
+ * the opcode bits - so the value is ORed in rather than shifted into place.
  */
 StdReturnType BH1750::ChangeMeasurementTime(byte mt_reg_value)
 {
@@ -88,15 +78,9 @@ StdReturnType BH1750::ChangeMeasurementTime(byte mt_reg_value)
     return kEOk;
 }
 
-/*! \brief          Takes one reading from the sensor
- *  \details        Runs every BH1750_TASK_CYCLE ticks, so once a second. That is what
- *                  lets a one-time measurement be triggered at the end and collected on
- *                  the next run: the 120 ms it needs are long gone by then, and nothing
- *                  here has to wait for the conversion.
- *
- *                  In continuous mode the mode is not re-sent on every run, unlike in the
- *                  xmega driver - the sensor keeps converting on its own, and resending
- *                  restarts the integration for no gain.
+/*
+ * In continuous mode the mode is not re-sent on every run, unlike in the xmega driver - the
+ * sensor keeps converting on its own, and resending restarts the integration for no gain.
  */
 void BH1750::Task()
 {
@@ -122,22 +106,20 @@ void BH1750::Task()
     SendModeForOneTimeMode();
 }
 
-/*! \brief          Opens the I2C bus, once
- *  \details        Four calls where the ESP32 has one: this core's begin() takes no
- *                  arguments and returns nothing, and the clock rate is set afterwards
- *                  because begin() would otherwise put the default back over it.
+/*
+ * Opens the I2C bus, once; always kEOk, which is all this core can tell.
  *
- *                  The pin setters look like the check that replaces begin()'s return
- *                  value. They are not one: a pin they will not take ends in the SDK's
- *                  panic(), which is declared noreturn, so an kENotOk branch on them
- *                  cannot be reached and only reads as if the case were handled. What
- *                  makes the call safe instead is that both drivers on this bus name the
- *                  same two pins - the second one through hits setSDA()'s "already this
- *                  pin" case, and begin() returns early on a bus that is running. Giving
- *                  one driver another pin without the other therefore does not fail here,
- *                  it halts the chip, and see DS3231.cpp for the same note.
+ * Four calls where the ESP32 has one: this core's begin() takes no arguments and returns
+ * nothing, and the clock rate is set afterwards because begin() would otherwise put the
+ * default back over it.
  *
- *  \return         kEOk, which is all this core can tell us
+ * The pin setters look like the check that replaces begin()'s return value. They are not
+ * one: a pin they will not take ends in the SDK's panic(), which is declared noreturn, so an
+ * kENotOk branch on them cannot be reached and only reads as if the case were handled. What
+ * makes the call safe instead is that both drivers on this bus name the same two pins - the
+ * second one through hits setSDA()'s "already this pin" case, and begin() returns early on a
+ * bus that is running. Giving one driver another pin without the other therefore does not
+ * fail here, it halts the chip, and see DS3231.cpp for the same note.
  */
 StdReturnType BH1750::StartBus()
 {
@@ -153,13 +135,11 @@ StdReturnType BH1750::StartBus()
     return kEOk;
 }
 
-/*! \brief          Reads the last measurement and converts it to lux
- *  \details        The reading is kept as it was when the sensor does not answer, rather
- *                  than falling to zero: the brightness automatic works on this value, so
- *                  a dropped reading would otherwise dim the display for a second. What
- *                  bounds that is the caller - see CountReadFailure().
- *
- *  \return         kEOk if both bytes arrived
+/*
+ * Reads the last measurement and converts it to lux; kENotOk unless both bytes arrived. The
+ * reading is kept as it was when the sensor does not answer, rather than falling to zero:
+ * the brightness automatic works on this value, so a dropped reading would otherwise dim the
+ * display for a second. What bounds that is the caller - see CountReadFailure().
  */
 StdReturnType BH1750::ReadIlluminance()
 {
@@ -175,9 +155,10 @@ StdReturnType BH1750::ReadIlluminance()
     return kEOk;
 }
 
-/*! \brief          Starts the next conversion when the mode does not repeat by itself
- *  \details        A one-time measurement leaves the sensor powered down, so it takes the
- *                  power-on command again before it listens to the mode.
+/*
+ * Starts the next conversion when the mode does not repeat by itself. A one-time measurement
+ * leaves the sensor powered down, so it takes the power-on command again before it listens
+ * to the mode.
  */
 void BH1750::SendModeForOneTimeMode()
 {
@@ -187,10 +168,7 @@ void BH1750::SendModeForOneTimeMode()
     SendMode();
 }
 
-/*! \brief          Writes one command byte to the sensor
- *
- *  \return         kEOk if the sensor acknowledged
- */
+// Writes one command byte to the sensor; kEOk if the sensor acknowledged it.
 StdReturnType BH1750::SendCommand(byte command)
 {
     Wire.beginTransmission(static_cast<uint8_t>(BH1750_I2C_ADDR));

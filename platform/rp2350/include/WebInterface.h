@@ -5,14 +5,16 @@
  * \file
  * \brief Serves the console page and bridges its web socket to Serial.
  *
- * The page arrives as one gzipped blob out of flash, and its socket is wired straight to
- * WordclockSerial: what a browser sends is injected as characters, and every line the firmware
- * finishes is sent back as one frame. There is no protocol here beyond that - the commands are the
- * ones in docs/serial-commands.md, parsed by the same parser as the wire.
+ * The pages and the other files arrive out of flash, from WebFrontend's table, and the socket is
+ * wired to WordclockSerial: what a browser sends is injected as characters, and every line the
+ * firmware finishes is sent back as one frame. There is no protocol here beyond that - the commands
+ * are the ones in docs/serial-commands.md, parsed by the same parser as the wire.
  *
- * Nothing in this class ever touches the firmware. The HTTP server runs in its own task, and the
- * only thing that crosses over is the injected character stream, which WordclockSerial takes from
- * one producer without a lock. Answers travel the other way, sent from the firmware's own task.
+ * The HTTP server runs from lwIP's callbacks, never inside the firmware's tick: arduino-pico runs
+ * lwIP in a low-priority interrupt on the core that runs loop(). What crosses over between the two
+ * is the injected character stream, which WordclockSerial takes from one producer without a lock,
+ * the force flag of a client that arrived, a restart the update asks for, and the line of a refused
+ * update. Answers travel the other way, sent from the firmware's tick.
  */
 
 #ifndef _WEB_INTERFACE_H_
@@ -26,18 +28,50 @@
 
 #include <stddef.h>
 
-/* WebInterface configuration parameter */
 /*
  * There is no client limit here, and the one that used to stand in this place was never one:
  * it sized a constant nothing read, because AsyncWebSocket owns the list and enforces its own
  * ceiling. The ESP32 keeps its WEB_INTERFACE_MAX_CLIENTS because a table there really is that
  * long and its server is told the same number.
  */
+/*! \brief The TCP port the server listens on, and the one mDNS announces. */
 #define WEB_INTERFACE_PORT                              80u
 
-/* What the clock answers to on the local network, so no address has to be looked up. */
+/*!
+ * \brief The host name the clock announces over mDNS, reached as `wordclock.local`.
+ *
+ * What the clock answers to on the local network, so no address has to be looked up.
+ */
 #define WEB_INTERFACE_HOSTNAME                          "wordclock"
 
+/*!
+ * \brief The web server of the RP2350: the pages, the command catalog, the panel's letters, the
+ *        firmware update and the web socket, on ESPAsyncWebServer.
+ *
+ * Begin() starts the server, on port WEB_INTERFACE_PORT, with these routes:
+ * - every file of WebFrontend's table, at its own path, as it is stored;
+ * - `GET /commands` and `GET /display`, the JSON that WebFrontend::WriteCommands() and
+ *   WebFrontend::WriteDisplay() write;
+ * - `POST /update`, which takes a firmware image as the request body, writes it to LittleFS as
+ *   `/firmware.bin`, has PicoOTA write the loader's command beside it once the image is whole,
+ *   and asks for a restart with System::Restart();
+ * - `/ws`, the web socket: a text frame that is a whole message is a command for
+ *   WebFrontend::InjectCommand(), and the lines and the display frames go out through
+ *   WebTransport.
+ *
+ * Every route but the web socket asks for the console's password while
+ * System::IsConsoleProtected() is true, with Basic authentication over plain http for the user
+ * `wordclock`; the update asks before its body is written as well. That keeps out a guest who
+ * opens the page; it keeps out nobody who can watch the traffic.
+ *
+ * The server's handlers run from lwIP's callbacks, which arduino-pico runs in a low-priority
+ * interrupt on the core that runs loop(). The application calls Begin() once, and
+ * BroadcastFrame() from its tick; WordclockSerial's line sink calls BroadcastLine().
+ *
+ * \warning The web socket asks for no password. Its handshake and its frames are taken whether or
+ *          not a password is stored, so a client that opens `/ws` directly sends commands to a
+ *          protected console, the console command that clears the password included.
+ */
 class WebInterface
 {
   private:
@@ -51,40 +85,44 @@ class WebInterface
     ~WebInterface() { }
 
   public:
+    /*! \brief Returns the one web interface. */
     static WebInterface& GetInstance() {
         static WebInterface singleton_instance;
         return singleton_instance;
     }
 
-    // methods
-    /*
-     * Starts the server and registers itself as the sink for finished output lines. Safe to
-     * call before the network is up: the server listens on whatever address arrives later.
-     * Returns kENotOk when the server could not be started, which leaves the clock running
-     * on the UART alone rather than failing to boot.
+    /*!
+     * \brief Starts the server, registers its routes, and takes over the finished output lines.
+     *
+     * Safe to call before the network is up: the server listens on whatever address arrives later.
+     * The line sink is installed only once the server has begun, so a line printed during startup
+     * cannot reach a half-built server.
+     *
+     * It then announces WEB_INTERFACE_HOSTNAME over mDNS and prints the host name it is reached
+     * at, or prints that mDNS is unavailable; that is not a failure, as the address still works.
+     *
+     * \return Always kEOk on the RP2350: ESPAsyncWebServer's begin() answers nothing, so a server
+     *         that does not start shows up as a page that never answers rather than as kENotOk.
      */
     StdReturnType Begin();
 
-    /*
-     * Sends one finished line to every open socket. Called from the firmware's task through
-     * WordclockSerial's line sink, not from the server's. Both of these forward into
-     * WebFrontend, which is where the widening, the rate limit and the comparison live; they
-     * stay on this class because the application and the line sink call them by this name.
+    /*!
+     * \copydoc WebFrontend::BroadcastLine(const char*)
+     *
+     * \note On the RP2350 a line also comes through here from the web server's callbacks, which
+     *       print the reason when they refuse an update; it is then sent from lwIP's context.
      */
-    void BroadcastLine(const char*);
+    void BroadcastLine(const char* line);
 
-    /*
-     * Sends the pixel buffer as one binary frame, at most every
-     * WEB_FRONTEND_FRAME_INTERVAL_TICKS and only when it changed. Called from the
-     * application's tick, after the display has been handed to the strip.
-     */
+    /*! \copydoc WebFrontend::BroadcastFrame() */
     void BroadcastFrame();
 
-    /*
-     * For the socket callback, which runs in the network stack's context rather than the
-     * firmware's tick. Only the force flag is touched from there; who is connected is the
-     * socket's own business. An instance method like the rest of this interface, for the
-     * reason WebInterface.cpp gives.
+    // An instance method like the rest of this interface, for the reason WebInterface.cpp gives.
+    /*!
+     * \copydoc WebFrontend::OnClientOpened()
+     *
+     * On the RP2350 the socket's event handler calls it on a handshake, from lwIP's context. Only
+     * the force flag is touched from there; who is connected is the socket's own business.
      */
     // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
     void OnClientOpened() { WebFrontend::GetInstance().OnClientOpened(); }

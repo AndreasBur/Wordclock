@@ -3,9 +3,9 @@
 
 /*!
  * \file
- * \brief ESP32 WS2812 driver, driven by the RMT peripheral.
+ * \brief RP2350 WS2812 driver: the buffer, turned into frames for WS2812Pio's PIO state machine.
  *
- * The RMT peripheral generates the WS2812 pulses in hardware and fetches the bytes by DMA, so
+ * A PIO state machine generates the WS2812 pulses in hardware and DMA feeds it the frame, so
  * nothing here has to hit a timing with instruction cycles - which is what the xmega driver spent
  * most of its 800 lines on, and what only an oscilloscope can debug.
  */
@@ -37,12 +37,6 @@ WS2812Pio::WordType frame_buffer[kFrameSize]{};
 
 } // namespace
 
-/*! \brief          Hands the strip's data pin to the PIO driver
- *  \details        Failures are reported and left behind rather than thrown: the
- *                  contract's Init() returns nothing, and a clock whose serial console
- *                  still answers is more useful for finding a miswired pin than one
- *                  that reboots. render() then does nothing until the driver is ready.
- */
 void Pixels::Init(byte pin)
 {
     pin_ = pin;
@@ -50,19 +44,6 @@ void Pixels::Init(byte pin)
     WS2812Pio::GetInstance().Init(pin_);
 }
 
-/*! \brief          Puts the buffer on the strip, if the firmware asked for it
- *  \details        The application calls this once per tick, after the firmware's pass -
- *                  never Show() itself. Two reasons, and the second is the one that
- *                  bites: several modules call Display::Show() within a single tick
- *                  (DisplayManager, Animations, Text, Clock and the command parsers all
- *                  do), so transmitting from Show() would put frames back to back on the
- *                  wire. WS2812 needs the line low for longer than 280 us between
- *                  frames, and losing that gap does not blank the display - it shifts
- *                  the next frame by a pixel, which reads as a wiring fault.
- *                  Rendering once per 10 ms tick leaves milliseconds of idle line.
- *
- *  \return         kEOk if a frame went out or none was due
- */
 StdReturnType Pixels::Render()
 {
     /*
@@ -90,12 +71,6 @@ StdReturnType Pixels::Render()
  * that detail into the interface.
  */
 // NOLINTBEGIN(readability-convert-member-functions-to-static)
-/*! \brief          Whether the previous frame is still being transmitted
- *  \details        The driver's own answer rather than a flag kept here, and the same one
- *                  TransmitFrame() refuses on.
- *
- *  \return         true while a frame is still going out
- */
 bool Pixels::IsFrameOnTheWire() const
 {
     return WS2812Pio::GetInstance().IsBusy();
@@ -156,11 +131,11 @@ void Pixels::SetBrightness(byte brightness, bool gamma_correction)
     UNUSED(gamma_correction);
 }
 
-/*! \brief          Copies the pixel buffer into the frame the peripheral reads
- *  \details        Pixel already stores its colours in the WS2812 order (green, red,
- *                  blue - see the offsets in Pixel.h), so this is a scale and not a
- *                  reordering. The accessors are used anyway, so that changing those
- *                  offsets cannot silently swap the colours on the strip.
+/*
+ * Copies the pixel buffer into the frame the peripheral reads. Pixel already stores its
+ * colours in the WS2812 order (green, red, blue - see the offsets in Pixel.h), so this is a
+ * scale and not a reordering. The accessors are used anyway, so that changing those offsets
+ * cannot silently swap the colours on the strip.
  */
 void Pixels::FillFrameBuffer() const
 {
@@ -178,14 +153,12 @@ void Pixels::FillFrameBuffer() const
     }
 }
 
-/*! \brief          Hands one frame to the PIO driver
- *  \details        Refuses while the previous frame is still going out, because DMA is
- *                  still reading frame_buffer until it is done. Where the ESP32 backend
- *                  waits for its peripheral with a timeout, this one returns: a frame
- *                  takes 3.3 ms against a 10 ms tick, so finding DMA still busy means
- *                  something is wrong rather than that the strip needs a moment.
- *
- *  \return         kEOk if the frame was handed over
+/*
+ * Hands one frame to the PIO driver; kEOk if the frame was handed over. Refuses while the
+ * previous frame is still going out, because DMA is still reading frame_buffer until it is
+ * done. Where the ESP32 backend waits for its peripheral with a timeout, this one returns: a
+ * frame takes 3.3 ms against a 10 ms tick, so finding DMA still busy means something is wrong
+ * rather than that the strip needs a moment.
  */
 StdReturnType Pixels::TransmitFrame()
 {
