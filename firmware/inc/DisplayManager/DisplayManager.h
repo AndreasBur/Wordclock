@@ -139,8 +139,8 @@ class DisplayManager
      * \brief Runs the animation the mode provides on the current time, without waiting for the word
      *        change that would otherwise be the only trigger.
      *
-     * Selecting the animation again with `9 -A<id>` shows it too, but it also means something
-     * else - it changes what runs from now on.
+     * Selecting an animation with `9 -A<id>` does not show it: it only makes it the current one,
+     * and it runs on the next word change, which can be nearly five minutes away. This runs it now.
      *
      * \return kENotOk while an overlay shows, with nothing started; otherwise what
      *         Animations::SetTime() returns.
