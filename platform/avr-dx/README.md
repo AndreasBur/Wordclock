@@ -116,9 +116,11 @@ cmake -B build-avr -S . -DPLATFORM=avr-dx \
       -DAVR_MCU=avr64dd32 -DAVR_DFP=/path/to/Microchip.AVR-Dx_DFP
 ```
 
-`AVR_F_CPU` and `AVR_PROGRAMMER` are cache variables too. The size is printed after
-every link rather than asked for, because the flash budget is the reason this part
-was chosen at all — currently, of 128 KiB flash and 16 KiB RAM:
+`AVR_F_CPU` and `AVR_PROGRAMMER` are cache variables too. `AVR_F_CPU` is also what
+`InitRuntime()` sets the oscillator to, so it has to be a frequency the oscillator
+offers — 1, 2, 3, 4, 8, 12, 16, 20 or 24 MHz — or the build fails. The size is
+printed after every link rather than asked for, because the flash budget is the
+reason this part was chosen at all — currently, of 128 KiB flash and 16 KiB RAM:
 
 ```
 Program:   48090 bytes (37%)

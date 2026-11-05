@@ -42,6 +42,31 @@ static_assert((ARDUINO_SERIAL_TRANSMIT_BUFFER_SIZE & (ARDUINO_SERIAL_TRANSMIT_BU
 static_assert((ARDUINO_SERIAL_RECEIVE_BUFFER_SIZE & (ARDUINO_SERIAL_RECEIVE_BUFFER_SIZE - 1u)) == 0u,
               "Arduino: the receive buffer size has to be a power of two");
 
+/*
+ * The oscillator setting for F_CPU, so that the device runs at the clock every timing constant is
+ * computed from. 0xFF for a frequency the oscillator does not offer, which the assertion below
+ * turns into a build error rather than wrong pulses on the wire.
+ */
+constexpr uint8_t ToFrequencySelect(uint32_t frequency)
+{
+    switch(frequency) {
+        case 1000000uL: return CLKCTRL_FRQSEL_1M_gc;
+        case 2000000uL: return CLKCTRL_FRQSEL_2M_gc;
+        case 3000000uL: return CLKCTRL_FRQSEL_3M_gc;
+        case 4000000uL: return CLKCTRL_FRQSEL_4M_gc;
+        case 8000000uL: return CLKCTRL_FRQSEL_8M_gc;
+        case 12000000uL: return CLKCTRL_FRQSEL_12M_gc;
+        case 16000000uL: return CLKCTRL_FRQSEL_16M_gc;
+        case 20000000uL: return CLKCTRL_FRQSEL_20M_gc;
+        case 24000000uL: return CLKCTRL_FRQSEL_24M_gc;
+        default: return 0xFFu;
+    }
+}
+
+constexpr uint8_t kFrequencySelect{ToFrequencySelect(F_CPU)};
+static_assert(kFrequencySelect != 0xFFu,
+              "Arduino: F_CPU has to be a frequency of the oscillator: 1, 2, 3, 4, 8, 12, 16, 20 or 24 MHz");
+
 constexpr uint16_t kTransmitBufferMask{ARDUINO_SERIAL_TRANSMIT_BUFFER_SIZE - 1u};
 constexpr uint16_t kReceiveBufferMask{ARDUINO_SERIAL_RECEIVE_BUFFER_SIZE - 1u};
 
@@ -103,7 +128,7 @@ ISR(USART1_RXC_vect)
 
 void InitRuntime()
 {
-    _PROTECTED_WRITE(CLKCTRL.OSCHFCTRLA, CLKCTRL_FRQSEL_24M_gc);
+    _PROTECTED_WRITE(CLKCTRL.OSCHFCTRLA, kFrequencySelect);
     // No prescaler, so the peripheral clock is the oscillator and F_CPU means what the
     // pulse widths assume it means.
     _PROTECTED_WRITE(CLKCTRL.MCLKCTRLB, 0u);

@@ -99,7 +99,7 @@ using boolean = bool; // NOLINT(readability-identifier-naming)
 /*!
  * \brief Brings the clock and the millisecond time base up, and enables interrupts.
  *
- * It sets the oscillator to 24 MHz with no prescaler, so the peripheral clock is the oscillator,
+ * It sets the oscillator to F_CPU with no prescaler, so the peripheral clock is the oscillator,
  * and starts TCB0 as a periodic interrupt that counts millis() up once per millisecond. Has to run
  * before anything below is used, which is why main() calls it first. Arduino has no such function:
  * its core does this itself before the sketch runs.
@@ -107,10 +107,9 @@ using boolean = bool; // NOLINT(readability-identifier-naming)
  * The oscillator is set explicitly rather than left at its reset value: the device comes up at
  * 4 MHz, and every timing constant in this backend - the baud rates, the time base, and above all
  * the strip's pulse widths - is computed from F_CPU. A mismatch between the two would not fail to
- * build, it would put wrong pulses on the wire.
- *
- * \warning The oscillator is set to 24 MHz whatever F_CPU says. A build with another `AVR_F_CPU`
- *          computes every timing from a clock the device does not run at, and still builds.
+ * build, it would put wrong pulses on the wire. So the setting is derived from F_CPU, and an
+ * `AVR_F_CPU` the oscillator does not offer - it offers 1, 2, 3, 4, 8, 12, 16, 20 and 24 MHz -
+ * fails to build.
  */
 void InitRuntime();
 
