@@ -113,6 +113,14 @@ void TestWebSocketHandshake();
 void TestWebSocketEncodesBothLengths();
 void TestWebSocketDecodesWhatABrowserSends();
 
+/* stringtools_test.cpp */
+void TestItoaWritesEveryInt32();
+void TestStringReverseTakesAnyLength();
+void TestStringCopyIntoNoRoom();
+void TestSignedConversionKeepsToTheType();
+void TestUnsignedConversionRefusesANegativeNumber();
+void TestFloatConversionKeepsToTheType();
+
 /* webhost_test.cpp */
 void TestWebHostOutlastsAnIdleConnection();
 
