@@ -22,10 +22,19 @@
 #ifndef _ARDUINO_H_
 #define _ARDUINO_H_
 
+/*
+ * Re-exported, every one of them: this header is the backend's Arduino API, and what includes it
+ * wants - `byte` above all - is defined in them rather than here. Without the pragma an
+ * include-cleaner credits those symbols to the inner header, finds nothing of this one used
+ * directly, and offers to drop the include; taking that offer leaves the file resting on whatever
+ * neighbour happens to include this header too.
+ */
+// IWYU pragma: begin_exports
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 #include <avr/pgmspace.h>
+// IWYU pragma: end_exports
 
 /*!
  * \brief The USART of the console, USART1.

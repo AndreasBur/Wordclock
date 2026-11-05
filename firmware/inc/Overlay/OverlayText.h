@@ -10,7 +10,6 @@
 #define _OVERLAY_TEXT_H_
 
 #include "StandardTypes.h"
-#include "Arduino.h"
 #include "Overlay.h"
 
 /*!

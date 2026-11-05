@@ -10,7 +10,6 @@
 #define _CLOCK_DATE_TIME_H_
 
 #include "StandardTypes.h"
-#include "Arduino.h"
 #include "ClockDate.h"
 #include "ClockTime.h"
 

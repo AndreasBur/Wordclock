@@ -10,7 +10,6 @@
 #define _MSG_PARAMETER_H_
 
 #include "StandardTypes.h"
-#include "Arduino.h"
 
 /*!
  * \brief One option of a command: its short name, the character behind the `-`, and the type of its

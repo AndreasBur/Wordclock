@@ -10,7 +10,6 @@
 #define _STRING_TOOLS_H_
 
 #include "StandardTypes.h"
-#include "Arduino.h"
 #include "errno.h"
 #include <type_traits>
 
