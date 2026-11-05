@@ -22,6 +22,8 @@
 #include <cstdlib>
 #include <string>
 
+// Local to this file, so Doxygen leaves it out.
+/*! \cond */
 #ifdef _WIN32
 # include <winsock2.h>
 # include <ws2tcpip.h>
@@ -37,11 +39,8 @@
 # include <unistd.h>
 # define CLOSE_SOCKET close
 #endif
+/*! \endcond */
 
-/*! \brief          WebHost constructor
- *  \details        A host that listens nowhere until Begin(), and has no clients until then
- *                  either - which HasClients() may be asked before Begin() ever ran.
- */
 WebHost::WebHost()
 {
     for(size_t slot = 0u; slot < WEB_HOST_MAX_CLIENTS; slot++) { clients_[slot] = kInvalidSocket; }
@@ -53,15 +52,6 @@ WebHost& WebHost::GetInstance()
     return singleton_instance;
 }
 
-/*! \brief          Opens the listening socket and takes over the output lines
- *
- *  \return         kEOk once the port is listening
- *
- *  \details        A port that is taken is not fatal and must not be: somebody already has a
- *                  simulator open, and the second one is still a window worth having. It says
- *                  so and runs on, which is the same shape the ESP32 backend's server failure
- *                  has - fall back to what works rather than refuse to start.
- */
 StdReturnType WebHost::Begin()
 {
 #ifdef _WIN32
@@ -79,17 +69,6 @@ StdReturnType WebHost::Begin()
     return kEOk;
 }
 
-/*! \brief          Accepts what has arrived and answers it
- *
- *  \details        Called from the firmware's tick, which is what makes every buffer here a
- *                  plain one. A request is read, answered and finished within the call unless
- *                  it was a handshake, and a handshake becomes a client that stays.
- *
- *                  One request per accepted connection: Connection: close goes out with every
- *                  answer, so a browser opens a socket per file. That is a page load's worth
- *                  of connections on loopback and buys the whole of the keep-alive
- *                  bookkeeping not existing.
- */
 void WebHost::Task()
 {
     if(listener_ == kInvalidSocket) { return; }
@@ -100,8 +79,6 @@ void WebHost::Task()
     }
 }
 
-/*! \brief          Closes every socket, for the way out
- */
 void WebHost::End()
 {
     for(size_t slot = 0u; slot < WEB_HOST_MAX_CLIENTS; slot++) { DropClient(slot); }
@@ -125,12 +102,6 @@ bool WebHost::HasClients() const
     return false;
 }
 
-/*! \brief          Sends one frame to every open web socket
- *
- *  \param[in]      is_binary       a binary frame rather than a text one
- *  \param[in]      payload         the bytes to send
- *  \param[in]      length          the number of bytes
- */
 void WebHost::SendToEveryClient(bool is_binary, const char* payload, size_t length)
 {
     const std::string frame = WebSocket::EncodeFrame(is_binary, payload, length);
@@ -140,17 +111,6 @@ void WebHost::SendToEveryClient(bool is_binary, const char* payload, size_t leng
     }
 }
 
-/*! \brief          Sends an HTTP response that closes the connection
- *  \details        Connection: close, because every connection but a web socket's is closed
- *                  after its answer - see Task().
- *
- *  \param[in]      socket          the connection
- *  \param[in]      status          the status line's code and text, e.g. "200 OK"
- *  \param[in]      content_type    the type of the body
- *  \param[in]      body            the body
- *  \param[in]      length          the length of the body
- *  \param[in]      is_gzipped      the body is gzip-compressed and says so
- */
 void WebHost::SendResponse(SocketType socket, const char* status, const char* content_type,
                            const char* body, size_t length, bool is_gzipped)
 {
@@ -164,10 +124,10 @@ void WebHost::SendResponse(SocketType socket, const char* status, const char* co
     SendAll(socket, body, length);
 }
 
-/*! \brief          Answers every new connection
- *  \details        Keeps a connection that became a web socket, as long as there is a free
- *                  slot for it, and closes every other one. A connection that arrives with
- *                  every slot taken is closed unread.
+/*
+ * Answers every new connection. Keeps a connection that became a web socket, as long as there
+ * is a free slot for it, and closes every other one. A connection that arrives with every slot
+ * taken is closed unread.
  */
 void WebHost::AcceptClients()
 {
@@ -186,11 +146,10 @@ void WebHost::AcceptClients()
     }
 }
 
-/*! \brief          Reads what a web socket has to say - commands, and the close that ends one
- *  \details        Collects the bytes until a frame is complete; a closed connection or a
- *                  close frame drops the client.
- *
- *  \param[in]      slot            the client's slot
+/*
+ * Reads what a web socket has to say - commands, and the close that ends one. Collects the
+ * bytes until a frame is complete; a closed connection or a close frame drops the client. A
+ * recv() that fails, or would block, leaves the client as it is.
  */
 void WebHost::ReadClient(size_t slot)
 {
@@ -208,10 +167,7 @@ void WebHost::ReadClient(size_t slot)
     }
 }
 
-/*! \brief          Finds a slot for a new web socket
- *
- *  \return         the first slot without a client, or WEB_HOST_MAX_CLIENTS when all are taken
- */
+// Returns the first slot without a client, or WEB_HOST_MAX_CLIENTS when all are taken.
 size_t WebHost::FindFreeSlot() const
 {
     size_t slot{0u};
@@ -220,11 +176,9 @@ size_t WebHost::FindFreeSlot() const
     return slot;
 }
 
-/*! \brief          Closes a web socket
- *  \details        Frees the slot and forgets what the client sent that was not yet a whole
- *                  frame. An empty slot is left alone, so that End() may call this on every one.
- *
- *  \param[in]      slot            the client's slot
+/*
+ * Closes a web socket. Frees the slot and forgets what the client sent that was not yet a
+ * whole frame. An empty slot is left alone, so that End() may call this on every one.
  */
 void WebHost::DropClient(size_t slot)
 {
@@ -235,14 +189,11 @@ void WebHost::DropClient(size_t slot)
     pending_[slot].clear();
 }
 
-/*! \brief          Answers one accepted connection
- *  \details        An image is the one body that arrives here, and it comes in many packets
- *                  rather than the one every other request fits in, so an update is drained
- *                  before it is answered.
- *
- *  \param[in]      socket          the new connection
- *  \return         true            the connection stays, which only a web socket does
- *                  false           the connection is done
+/*
+ * Answers one accepted connection, and returns whether it stays, which only a web socket does.
+ * An image is the one body that arrives here, and it comes in many packets rather than the one
+ * every other request fits in, so an update is drained before it is answered. An update that
+ * announces no body is answered as any other request, and there is no route for it there.
  */
 bool WebHost::ServeConnection(SocketType socket)
 {
@@ -260,14 +211,11 @@ bool WebHost::ServeConnection(SocketType socket)
     return AnswerRequest(socket, request);
 }
 
-/*! \brief          Answers everything that is not an update
- *  \details        Opens a web socket on its path, writes the two JSON documents, serves the
- *                  assets, and gives every other path a 404.
- *
- *  \param[in]      socket          the connection
- *  \param[in]      request         the whole request, headers included
- *  \return         true            the connection stays, which only a web socket does
- *                  false           the connection is done
+/*
+ * Answers everything that is not an update, and returns whether the connection stays, which
+ * only a web socket does. Opens a web socket on its path, writes the two JSON documents,
+ * serves the assets, and gives every other path a 404. A request without a path, or a
+ * handshake without a key, is closed unanswered.
  */
 bool WebHost::AnswerRequest(SocketType socket, const std::string& request)
 {
@@ -298,17 +246,16 @@ bool WebHost::AnswerRequest(SocketType socket, const std::string& request)
     return false;
 }
 
-/*! \brief          Answers POST /update, in the two shapes the panel reads
+/*
+ * Answers POST /update, in the two shapes the panel reads. Nothing is installed and nothing is
+ * written, and that is not a shortcut being taken: there is no second partition here and no
+ * filesystem an image belongs in, so an honest answer is the most this can be. What it stands
+ * in for is the whole of what the panel does - the progress on the way up, the two outcomes and
+ * the shapes they arrive in - which is the one part of that card that cannot otherwise be tried
+ * without a board.
  *
- *  \details        Nothing is installed and nothing is written, and that is not a shortcut
- *                  being taken: there is no second partition here and no filesystem an image
- *                  belongs in, so an honest answer is the most this can be. What it stands in
- *                  for is the whole of what the panel does - the progress on the way up, the
- *                  two outcomes and the shapes they arrive in - which is the one part of that
- *                  card that cannot otherwise be tried without a board.
- *
- *                  Refused below a size no real image is, so both answers are reachable: pick
- *                  a small file to see the failing path, a release image to see the other.
+ * Refused below a size no real image is, so both answers are reachable: pick a small file to
+ * see the failing path, a release image to see the other.
  */
 void WebHost::AnswerUpdate(SocketType socket, size_t received)
 {
@@ -332,13 +279,8 @@ void WebHost::AnswerUpdate(SocketType socket, size_t received)
     SendResponse(socket, "400 Bad Request", "application/json", refused, static_cast<size_t>(written), false);
 }
 
-/*! \brief          Sends the embedded file served on a path
- *
- *  \param[in]      socket          the connection
- *  \param[in]      path            the path the browser asked for
- *  \return         kEOk
- *                  kENotOk        no asset is served on that path, and nothing was sent
- */
+// Sends the embedded file served on `path`; kENotOk, with nothing sent, if no file is served
+// there.
 StdReturnType WebHost::SendAsset(SocketType socket, const std::string& path)
 {
     for(byte index = 0u; index < WebFrontend::GetNumberOfAssets(); index++) {
@@ -353,13 +295,8 @@ StdReturnType WebHost::SendAsset(SocketType socket, const std::string& path)
     return kENotOk;
 }
 
-/*! \brief          Opens a listening socket on loopback
- *  \details        Loopback only. This serves a firmware console with no password on it, and
- *                  the one on a clock is at least on somebody's own network; a desktop is not
- *                  the place to open that to a coffee shop.
- *
- *  \return         the socket, or kInvalidSocket when it could not be opened
- */
+// Opens a listening socket on loopback, or returns kInvalidSocket. Loopback only, for the
+// reason Begin() gives.
 WebHost::SocketType WebHost::OpenListener()
 {
     const SocketType socket = ::socket(AF_INET, SOCK_STREAM, 0);
@@ -388,17 +325,16 @@ WebHost::SocketType WebHost::OpenListener()
     return socket;
 }
 
-/*! \brief          Reads an HTTP request up to the blank line after its headers
- *  \details        Read here and now, because it is one packet on loopback - but never waited
- *                  for without end. A connection that is opened and says nothing is not a
- *                  broken browser but an ordinary one opening a socket ahead of the request
- *                  it may never make, and every recv() here blocks the firmware's tick, so
- *                  such a socket used to stop the window and every other client until the
- *                  browser closed it. The receive timeout set before this call is what ends
- *                  the wait; what has arrived by then is all there is.
+/*
+ * Reads an HTTP request up to the blank line after its headers, and returns it, or what arrived
+ * of it before the connection closed or went quiet. There is no limit on its length.
  *
- *  \param[in]      socket          the new connection
- *  \return         the request, or what arrived of it before the connection closed
+ * Read here and now, because it is one packet on loopback - but never waited for without end.
+ * A connection that is opened and says nothing is not a broken browser but an ordinary one
+ * opening a socket ahead of the request it may never make, and every recv() here blocks the
+ * firmware's tick, so such a socket used to stop the window and every other client until the
+ * browser closed it. The receive timeout set before this call is what ends the wait; what has
+ * arrived by then is all there is.
  */
 std::string WebHost::ReadRequest(SocketType socket)
 {
@@ -414,12 +350,10 @@ std::string WebHost::ReadRequest(SocketType socket)
     return request;
 }
 
-/*! \brief          Finds the path in an HTTP request
- *
- *  \param[in]      request         the whole request
- *  \param[out]     path            what stands between the first two spaces of the request line
- *  \return         kEOk
- *                  kENotOk        the request line has no path
+/*
+ * Finds the path in an HTTP request: what stands between the first two spaces of the request
+ * line, a query string included. kENotOk if there are no two spaces; `path` is then left as
+ * it was.
  */
 StdReturnType WebHost::GetPath(const std::string& request, std::string& path)
 {
@@ -432,25 +366,17 @@ StdReturnType WebHost::GetPath(const std::string& request, std::string& path)
     return kEOk;
 }
 
-/*! \brief          Tells an update from every other request
- *  \details        Asked of the route and not only of the header, so that a body on any other
- *                  request is not mistaken for an image.
- *
- *  \param[in]      request         the whole request
- *  \return         true            it is POST /update
- */
+// Tells POST /update from every other request. Asked of the route and not only of the header,
+// so that a body on any other request is not mistaken for an image.
 bool WebHost::IsUpdateRequest(const std::string& request)
 {
     return request.compare(0u, sizeof(kUpdateRequestLine) - 1u, kUpdateRequestLine) == 0;
 }
 
-/*! \brief          What the request announced it would send
- *  \details        So a body can be read to its end rather than to whatever arrived in the
- *                  first packet.
- *
- *  \param[in]      request         the whole request, headers included
- *  \return         the Content-Length, or 0 without one: absent means nothing follows the
- *                  headers
+/*
+ * Returns the Content-Length the request announced, or 0 without one: absent means nothing
+ * follows the headers. So a body can be read to its end rather than to whatever arrived in the
+ * first packet.
  */
 size_t WebHost::GetAnnouncedLength(const std::string& request)
 {
@@ -463,29 +389,21 @@ size_t WebHost::GetAnnouncedLength(const std::string& request)
     return static_cast<size_t>(strtoul(&request[found + sizeof(kLengthHeader) - 1u], nullptr, 10));
 }
 
-/*! \brief          How much of the body came along in the packets that carried the headers
- *
- *  \param[in]      request         what ReadRequest() read
- *  \return         the bytes past the blank line, or 0 when the headers never ended
- */
+// Returns how much of the body came along in the packets that carried the headers: the bytes
+// past the blank line, or 0 when the headers never ended.
 size_t WebHost::GetArrivedBodyLength(const std::string& request)
 {
     const size_t header_end = request.find("\r\n\r\n");
     return (header_end == std::string::npos) ? 0u : (request.size() - header_end - 4u);
 }
 
-/*! \brief          Reads the rest of a body and throws it away
- *  \details        Drained rather than parsed: what the panel needs answered is how much of it
- *                  turned up. Under its own, longer receive timeout than the request: an
- *                  upload that has started may pause between packets on its way through a
- *                  forwarded port, and cutting it short answers "too small" for an image
- *                  that was not - while one that announced more than it sends must still
- *                  not hold the tick for good.
- *
- *  \param[in]      socket          the connection
- *  \param[in]      received        what has arrived of the body so far
- *  \param[in]      announced       what the request said would arrive
- *  \return         what arrived in all, short of Announced when the connection closed early
+/*
+ * Reads the rest of a body and throws it away, and returns what arrived in all, short of
+ * `announced` when the connection closed or went quiet early. Drained rather than parsed: what
+ * the panel needs answered is how much of it turned up. Under its own, longer receive timeout
+ * than the request: an upload that has started may pause between packets on its way through a
+ * forwarded port, and cutting it short answers "too small" for an image that was not - while
+ * one that announced more than it sends must still not hold the tick for good.
  */
 size_t WebHost::DrainBody(SocketType socket, size_t received, size_t announced)
 {
@@ -500,11 +418,7 @@ size_t WebHost::DrainBody(SocketType socket, size_t received, size_t announced)
     return received;
 }
 
-/*! \brief          Lets a socket return at once
- *  \details        So that polling it from the tick never stops the firmware.
- *
- *  \param[in]      socket          the socket
- */
+// Lets a socket return at once, so that polling it from the tick never stops the firmware.
 void WebHost::SetNonBlocking(SocketType socket)
 {
 #ifdef _WIN32
@@ -515,15 +429,13 @@ void WebHost::SetNonBlocking(SocketType socket)
 #endif
 }
 
-/*! \brief          Lets a socket wait for its bytes
- *  \details        For a connection fresh from accept(), which on Windows has the listener's
- *                  properties - non-blocking among them - and on Linux has not. Left as it
- *                  came, it made the first recv() on Windows fail at once whenever the request
- *                  was still on its way, and the connection was closed unanswered; and the
- *                  receive timeout, which only a blocking socket heeds, would not have applied
- *                  there at all. Said on both platforms, so that both read the same way.
- *
- *  \param[in]      socket          the socket
+/*
+ * Lets a socket wait for its bytes. For a connection fresh from accept(), which on Windows has
+ * the listener's properties - non-blocking among them - and on Linux has not. Left as it came,
+ * it made the first recv() on Windows fail at once whenever the request was still on its way,
+ * and the connection was closed unanswered; and the receive timeout, which only a blocking
+ * socket heeds, would not have applied there at all. Said on both platforms, so that both read
+ * the same way.
  */
 void WebHost::SetBlocking(SocketType socket)
 {
@@ -535,13 +447,10 @@ void WebHost::SetBlocking(SocketType socket)
 #endif
 }
 
-/*! \brief          Lets recv() on a blocking socket give up after a while
- *  \details        A timeout on the socket rather than a select() before every recv(): the
- *                  read loops already end on a recv() that returns nothing, so they need no
- *                  change to end on one that waited long enough.
- *
- *  \param[in]      socket          the connection
- *  \param[in]      milliseconds    how long one recv() may wait for the next bytes
+/*
+ * Lets recv() on a blocking socket give up after `milliseconds` without bytes. A timeout on the
+ * socket rather than a select() before every recv(): the read loops already end on a recv()
+ * that returns nothing, so they need no change to end on one that waited long enough.
  */
 void WebHost::SetReceiveTimeout(SocketType socket, unsigned milliseconds)
 {
@@ -555,17 +464,12 @@ void WebHost::SetReceiveTimeout(SocketType socket, unsigned milliseconds)
     setsockopt(socket, SOL_SOCKET, SO_RCVTIMEO, reinterpret_cast<const char*>(&timeout), sizeof(timeout));
 }
 
-/*! \brief          Sends all of a buffer
- *  \details        Everything or nothing, because a half-written frame is a broken connection
- *                  rather than a short one. Loopback takes all of it in one call in every case
- *                  this serves; the loop is what makes that an observation rather than an
- *                  assumption.
- *
- *  \param[in]      socket          the connection
- *  \param[in]      data            the bytes to send
- *  \param[in]      length          the number of bytes
- *  \return         true            all was sent
- *                  false           the connection is broken
+/*
+ * Sends all of a buffer, and returns false if the connection broke on the way. Everything or
+ * an error, because a half-written frame is a broken connection rather than a short one.
+ * Loopback takes all of it in one call in every case this serves; the loop is what makes that
+ * an observation rather than an assumption. A send that would block is retried, except on
+ * Windows, where it counts as broken and leaves what was already sent.
  */
 bool WebHost::SendAll(SocketType socket, const char* data, size_t length)
 {
@@ -583,11 +487,8 @@ bool WebHost::SendAll(SocketType socket, const char* data, size_t length)
     return true;
 }
 
-/*! \brief          Hands a finished output line to the pages
- *  \details        Static because SerialShim takes a plain function pointer.
- *
- *  \param[in]      line            the line, without its line end
- */
+// Hands a finished output line to the pages. Static because SerialShim takes a plain function
+// pointer.
 void WebHost::SendLineToClients(const char* line)
 {
     WebFrontend::GetInstance().BroadcastLine(line);

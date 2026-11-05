@@ -19,16 +19,18 @@
 
 #include "arduino/Progmem.h"    // PROGMEM, F, pgm_read_byte, memcpy_P
 #include "arduino/Bits.h"       // bitRead
-#include "arduino/Itoa.h"       // Itoa()
+#include "arduino/Itoa.h"       // itoa()
 
-/* -------------------------------------------------------------------------- */
-/*  Serial → simulator window                                                 */
-/* -------------------------------------------------------------------------- */
-/*  Serial I/O goes to SerialShim, which writes it into the text controls of  */
-/*  the Pixels window and hands typed lines back. Kept here rather than in a  */
-/*  sub-header because it is specific to this simulator, not to the Arduino   */
-/*  API.                                                                      */
-/* -------------------------------------------------------------------------- */
+/*!
+ * \brief The serial port, as Arduino's Serial: the one SerialShim, which writes into the window.
+ *
+ * Serial I/O goes to SerialShim, which writes it into the text controls of the PixelsFrame window
+ * and hands typed lines back. Kept here rather than in a sub-header because it is specific to this
+ * simulator, not to the Arduino API.
+ *
+ * On Arduino, Serial is an object of the core; here it is a macro for SerialShim::GetInstance(),
+ * and it has only the functions the firmware calls, without begin().
+ */
 #define Serial                  SerialShim::GetInstance() // NOLINT(readability-identifier-naming)
 
 #endif // _ARDUINO_H_

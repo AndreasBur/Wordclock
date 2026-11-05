@@ -11,8 +11,11 @@
 #include "sim/MessageDecoder.h"
 #include <wx/tokenzr.h>
 
+// Local to this file, so Doxygen leaves it out.
+/*! \cond */
 /* Counted rather than written out, so a value list and its length cannot drift apart. */
 #define NUMBER_OF(Array)                                static_cast<byte>(sizeof(Array) / sizeof((Array)[0]))
+/*! \endcond */
 
 const char* const MessageDecoder::kCommandIndent{"   "};
 const char* const MessageDecoder::kArgumentIndent{"      "};
@@ -47,12 +50,6 @@ const char* const MessageDecoder::kApiValueNames[] {
     "Animation set clock task cycle"
 };
 
-/*! \brief          reads a line from the firmware back into the names behind it
- *  \details        An answer first, an error line second; a line is never both, because
- *                  an answer starts with a number and an error with a name.
- *
- *  \return         the readable form, or an empty string if this is neither
- */
 wxString MessageDecoder::Describe(const wxString& line)
 {
     wxString answer = DescribeAnswer(line);
@@ -64,13 +61,11 @@ wxString MessageDecoder::Describe(const wxString& line)
     return DescribeError(line);
 }
 
-/*! \brief          reads an answer line back into the names behind it
- *  \details        Deliberately strict about the shape: the line has to start with the
- *                  number of a known command and carry at least one option, otherwise it
- *                  is reported as undecodable. Half-decoding whatever happens to look
- *                  similar would be worse than leaving it alone.
- *
- *  \return         the readable form, or an empty string if this is no answer
+/*
+ * Reads an answer line back into the names behind it, or returns an empty string if this is no
+ * answer. Deliberately strict about the shape: the line has to start with the number of a known
+ * command and carry at least one option, otherwise it is reported as undecodable. Half-decoding
+ * whatever happens to look similar would be worse than leaving it alone.
  */
 wxString MessageDecoder::DescribeAnswer(const wxString& line)
 {
@@ -98,12 +93,11 @@ wxString MessageDecoder::DescribeAnswer(const wxString& line)
     return kCommandIndent + wxString(command->label) + _T("\n") + arguments;
 }
 
-/*! \brief          reads one "<short name>=<value>" of an answer back into names
- *  \details        A short name the command does not have is kept as it is rather than
- *                  dropped: it means this table has fallen behind the parser, and hiding
- *                  that would be the wrong way round.
- *
- *  \return         the readable form, or an empty string if the token is not an argument
+/*
+ * Reads one "<short name>=<value>" of an answer back into names, or returns an empty string if
+ * the token is not an argument. A short name the command does not have is kept as it is rather
+ * than dropped: it means this table has fallen behind the parser, and hiding that would be the
+ * wrong way round.
  */
 wxString MessageDecoder::DescribeArgument(const MessageCatalog::CommandType& command, const wxString& token)
 {
@@ -118,16 +112,15 @@ wxString MessageDecoder::DescribeArgument(const MessageCatalog::CommandType& com
     return DescribeValue(option->label, value, option->value_names, option->number_of_value_names, option->minimum);
 }
 
-/*! \brief          reads the remote procedure call's answer back into names
- *  \details        It is the one answer that does not begin with its command number:
- *                  "RpcId=<number>" and then the error of carrying it out. Laid out like
- *                  any other answer, with the command as the heading, so the procedure and
- *                  the error read as what they are — two fields of one answer.
+/*
+ * Reads the remote procedure call's answer back into names, or returns an empty string if this
+ * is not that answer. It is the one answer that does not begin with its command number:
+ * "RpcId=<number>" and then the error of carrying it out. Laid out like any other answer, with
+ * the command as the heading, so the procedure and the error read as what they are - two fields
+ * of one answer.
  *
- *                  The procedure names are the ones the catalog already carries for the
- *                  command's option, rather than a second list.
- *
- *  \return         the readable form, or an empty string if this is not that answer
+ * The procedure names are the ones the catalog already carries for the command's option,
+ * rather than a second list.
  */
 wxString MessageDecoder::DescribeRemoteProcedureCall(const wxString& line)
 {
@@ -159,12 +152,10 @@ wxString MessageDecoder::DescribeRemoteProcedureCall(const wxString& line)
     return described;
 }
 
-/*! \brief          reads an error line back into the names behind it
- *  \details        ErrorMessage appends a space after each error, so one line can carry
- *                  several; each is read on its own and anything that is not one is
- *                  passed over.
- *
- *  \return         the readable form, or an empty string if this is no error line
+/*
+ * Reads an error line back into the names behind it, or returns an empty string if this is no
+ * error line. ErrorMessage appends a space after each error, so one line can carry several;
+ * each is read on its own and anything that is not one is passed over.
  */
 wxString MessageDecoder::DescribeError(const wxString& line)
 {
@@ -178,13 +169,11 @@ wxString MessageDecoder::DescribeError(const wxString& line)
     return described;
 }
 
-/*! \brief          reads one error of a line back into names
- *  \details        Three shapes come out of ErrorMessage: the error on its own, the error
- *                  with the option it belongs to appended, and the error behind the api
- *                  call that failed. The api form carries an error of its own after the
- *                  delimiter, which is why this reaches back into itself for it.
- *
- *  \return         the readable form, or an empty string if this is no error
+/*
+ * Reads one error of a line back into names, or returns an empty string if this is no error.
+ * Three shapes come out of ErrorMessage: the error on its own, the error with the option it
+ * belongs to appended, and the error behind the api call that failed. The api form carries an
+ * error of its own after the delimiter, which is why this reaches back into itself for it.
  */
 wxString MessageDecoder::DescribeErrorPart(const wxString& part, const char* indent)
 {
@@ -214,11 +203,10 @@ wxString MessageDecoder::DescribeErrorPart(const wxString& part, const char* ind
     return wxEmptyString;
 }
 
-/*! \brief          puts a label and its value together, spelling the value out if named
- *  \details        The number stays alongside the name: the name is what makes the line
- *                  readable, the number is what was actually on the wire.
- *
- *  \return         "<label> = <name> (<number>)", or "<label> = <value>" without a name
+/*
+ * Puts a label and its value together, spelling the value out if named: "<label> = <name>
+ * (<number>)", or "<label> = <value>" without a name. The number stays alongside the name: the
+ * name is what makes the line readable, the number is what was actually on the wire.
  */
 wxString MessageDecoder::DescribeValue(const char* label, const wxString& value,
                                        const char* const* names, byte number_of_names, uint16_t minimum)
@@ -240,12 +228,11 @@ wxString MessageDecoder::DescribeValue(const char* label, const wxString& value,
     return described;
 }
 
-/*! \brief          reads a number out of a token in the width the catalog uses
- *  \details        wxString only parses into unsigned long, which is why this exists: it
- *                  narrows once, in one place, and refuses a value that does not fit
- *                  instead of truncating it into a different one.
- *
- *  \return         true if the token is a number that fits
+/*
+ * Reads a number out of a token in the width the catalog uses, and returns whether the token is
+ * a number that fits. wxString only parses into unsigned long, which is why this exists: it
+ * narrows once, in one place, and refuses a value that does not fit instead of truncating it
+ * into a different one.
  */
 bool MessageDecoder::ToValue(const wxString& text, uint16_t& value)
 {

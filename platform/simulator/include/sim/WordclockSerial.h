@@ -19,14 +19,25 @@
 
 #include "sim/SerialShim.h"
 
-// Room for one answer, the same number the two networked backends use. What reads it is the
-// web front end, which sizes the buffer it widens a line into by it.
+/*!
+ * \brief The room for one answer line.
+ *
+ * Room for one answer, the same number the two networked backends use. What reads it is the web
+ * front end, which sizes the buffer it widens a line into by it.
+ */
 #define WORDCLOCK_SERIAL_LINE_LENGTH                    160u
 
-/*
- * The port under the name the firmware reaches it by. An alias rather than a wrapper: there
- * is one port in this backend, and a second object standing in front of it would only be
- * something to keep in step.
+/*!
+ * \brief The port the web front end reaches by this name: here SerialShim, the port Serial is bound
+ *        to.
+ *
+ * WebFrontend hands a browser's command to it with Inject(), as though it had been typed. The
+ * backend's server installs the sink every finished answer line goes to with SetLineSink(); here
+ * that is WebHost.
+ *
+ * The port under the name the firmware reaches it by. An alias rather than a wrapper: there is one
+ * port in this backend, and a second object standing in front of it would only be something to
+ * keep in step.
  */
 using WordclockSerial = SerialShim;
 

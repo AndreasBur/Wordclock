@@ -12,12 +12,16 @@
 
 #include "WebFrontend.h"
 
+// wxWidgets' macros for the entry point and the event table, which Doxygen would take for
+// functions of this file.
+/*! \cond */
 IMPLEMENT_APP(WordclockApp);
 
 wxBEGIN_EVENT_TABLE(WordclockApp, wxApp)
     EVT_CLOSE(WordclockApp::OnClose)
     EVT_TIMER(kTimerId, WordclockApp::OnTimer)
 wxEND_EVENT_TABLE()
+/*! \endcond */
 
 WordclockApp::WordclockApp() : timer_(this, kTimerId)
 {
@@ -27,8 +31,6 @@ WordclockApp::WordclockApp() : timer_(this, kTimerId)
 bool WordclockApp::OnInit()
 {
     PixelsFrame::GetInstance().Show();
-    // After the window, so the address it prints has somewhere to be printed. A port that is
-    // taken is not fatal - the window is still worth having, which is what Begin() answers.
     WebHost::GetInstance().Begin();
     return true;
 }

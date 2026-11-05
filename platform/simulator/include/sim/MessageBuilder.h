@@ -23,8 +23,19 @@
 #include "PixelsFrame.h"
 #include "MessageCatalog.h"
 
-// A dialog rather than a frame, so the compositor centres it over the main window.
-// Shown with Show(), not ShowModal(), so the input field it writes to stays reachable.
+/*!
+ * \brief The message builder: a window that puts a command together from MessageCatalog and writes
+ *        it into the input field of the serial port.
+ *
+ * It offers every command of the catalog by number and label, and a row per option the command
+ * can be sent with: a box that puts the option into the message, and its argument, picked by
+ * name where the catalog names the values and typed otherwise. An option that is only answered,
+ * never sent, gets no row. The message is shown as it is built, and Insert hands it to
+ * SerialShim::SetInput() and hides the window.
+ *
+ * A dialog rather than a frame, so the compositor centres it over the main window. Shown with
+ * Show(), not ShowModal(), so the input field it writes to stays reachable. Closing it hides it.
+ */
 class MessageBuilder : public wxDialog
 {
   private:
@@ -83,15 +94,14 @@ class MessageBuilder : public wxDialog
 
     DECLARE_EVENT_TABLE()
 
-    // functions
-    MessageBuilder(wxWindow*, const wxString&);
+    MessageBuilder(wxWindow* parent, const wxString& title);
     ~MessageBuilder();
 
-    void OnClose(wxCloseEvent&);
-    void OnCommand(wxCommandEvent&);
-    void OnOptionUsed(wxCommandEvent&);
-    void OnOptionChanged(wxCommandEvent&);
-    void OnInsert(wxCommandEvent&);
+    void OnClose(wxCloseEvent& event);
+    void OnCommand(wxCommandEvent& event);
+    void OnOptionUsed(wxCommandEvent& event);
+    void OnOptionChanged(wxCommandEvent& event);
+    void OnInsert(wxCommandEvent& event);
 
     // An option that is not ticked contributes nothing to the message, so its argument is
     // greyed out rather than left looking as though it did.
@@ -100,7 +110,7 @@ class MessageBuilder : public wxDialog
         option_rows_[index].choice->Enable(enabled);
     }
 
-    wxBoxSizer* CreateSizerAll(wxWindow*);
+    wxBoxSizer* CreateSizerAll(wxWindow* parent);
 
     const MessageCatalog::CommandType& GetSelectedCommand() const {
         return MessageCatalog::GetCommand(static_cast<byte>(command_choice_->GetSelection()));
@@ -111,14 +121,25 @@ class MessageBuilder : public wxDialog
     void UpdatePreview() { preview_->SetValue(BuildMessage()); }
 
   public:
-    // Parented to the pixel matrix window, so closing that one takes this along and the
-    // application can exit.
+    /*!
+     * \brief Returns the one message builder, which the first call creates, hidden and centred over
+     *        the window of PixelsFrame, with the first command of the catalog selected.
+     *
+     * Parented to the pixel matrix window, so closing that one takes this along and the
+     * application can exit.
+     *
+     * \return The message builder.
+     */
     static MessageBuilder& GetInstance() {
         static MessageBuilder* p_singleton_instance = new MessageBuilder(&PixelsFrame::GetInstance(), _("Wordclock Message"));
         return *p_singleton_instance;
     }
 
-    // methods
+    /*!
+     * \brief Brings the window up, whether it was never shown or only hidden.
+     *
+     * The command and the options stay as they were left.
+     */
     void Reveal() {
         Show();
         Raise();

@@ -26,6 +26,12 @@
 #include "StandardTypes.h"
 #include "MessageCatalog.h"
 
+/*!
+ * \brief Reads a line the firmware printed back into the names behind it, through MessageCatalog
+ *        and the names of ErrorMessage's errors and apis.
+ *
+ * No state of its own; Describe() is all it offers.
+ */
 class MessageDecoder
 {
   private:
@@ -65,31 +71,60 @@ class MessageDecoder
      * here: the value comes back in the width the catalog actually uses, and a number too
      * large to fit is refused rather than truncated into a different one.
      */
-    static bool ToValue(const wxString&, uint16_t&);
+    static bool ToValue(const wxString& text, uint16_t& value);
 
     /*
      * "<label> = <name> (<number>)" where the value is named, "<label> = <number>" where
      * it is not. Serves the options of an answer as well as an error and its api, which
      * differ only in where their names come from.
      */
-    static wxString DescribeValue(const char*, const wxString&, const char* const*, byte, uint16_t minimum = 0u);
+    static wxString DescribeValue(const char* label, const wxString& value,
+                                  const char* const* names, byte number_of_names,
+                                  uint16_t minimum = 0u);
 
-    static wxString DescribeAnswer(const wxString&);
-    static wxString DescribeArgument(const MessageCatalog::CommandType&, const wxString&);
-    static wxString DescribeRemoteProcedureCall(const wxString&);
-    static wxString DescribeError(const wxString&);
+    static wxString DescribeAnswer(const wxString& line);
+    static wxString DescribeArgument(const MessageCatalog::CommandType& command,
+                                     const wxString& token);
+    static wxString DescribeRemoteProcedureCall(const wxString& line);
+    static wxString DescribeError(const wxString& line);
     // The indent is a parameter because an error stands on its own on most lines, but sits
     // under a command heading in the remote procedure call's answer.
-    static wxString DescribeErrorPart(const wxString&, const char* indent);
+    static wxString DescribeErrorPart(const wxString& part, const char* indent);
 
   public:
-    // methods
-    /*
-     * Returns the indented block, newline-terminated and ready to be appended below the
-     * raw answer, or an empty string when the line is not an answer this can read — which
-     * is the caller's signal to leave it alone.
+    /*!
+     * \brief Returns the readable form of `line`, or an empty string if it is not a line this can
+     *        read.
+     *
+     * The readable form is an indented block, newline-terminated and ready to be appended below
+     * the raw answer; an empty string is the caller's signal to leave the line alone.
+     *
+     * An answer first, then the answer of the remote procedure call, then an error line; a line
+     * is never both an answer and an error, because an answer starts with a number and an error
+     * with a name.
+     *
+     * - An answer has to start with the number of a known command and carry at least one
+     *   `<short name>=<value>`; it is then read into the command's label and a line per option.
+     *   A token that is not an option is passed over, and a short name the command does not have
+     *   is kept as it is.
+     * - The remote procedure call's answer, `RpcId=<number>` and the errors behind it, is read
+     *   into the command's label, the procedure and the errors.
+     * - In an error line, every `Error=` and `Api=` is read, and every other token passed over.
+     *
+     * A value the catalog names reads `<label> = <name> (<number>)`, any other `<label> = <value>`.
+     *
+     * \code{.unparsed}
+     * 3 B=255 A=1 G=0
+     *    Display brightness
+     *       Brightness = 255
+     *       Automatic = on (1)
+     *       Gamma correction = off (0)
+     * \endcode
+     *
+     * \param[in] line The line, without its line end.
+     * \return The readable form, or an empty string.
      */
-    static wxString Describe(const wxString&);
+    static wxString Describe(const wxString& line);
 };
 
 #endif // MESSAGE_DECODER_H

@@ -12,6 +12,21 @@
 #ifndef _ARDUINO_ITOA_H_
 #define _ARDUINO_ITOA_H_
 
+/*!
+ * \brief Writes `value` into `buffer` in base `base`, as a terminated string, as Arduino's itoa()
+ *        does.
+ *
+ * Digits above 9 are lowercase letters. In base 10 a negative `value` gets a minus sign; in any
+ * other base its bits are written as those of an unsigned int. An int has 32 bits here and 16 on
+ * an AVR, so a negative value in another base has more digits here than on an AVR.
+ *
+ * \param[in] value The number.
+ * \param[out] buffer Where the string goes.
+ * \param[in] base The base.
+ * \return `buffer`.
+ * \pre `base` is from 2 to 36, and `buffer` holds every digit, a minus sign and the terminator;
+ *      neither is checked.
+ */
 inline char* itoa(int value, char* buffer, int base) // NOLINT(readability-identifier-naming)
 {
     char* p = buffer;
