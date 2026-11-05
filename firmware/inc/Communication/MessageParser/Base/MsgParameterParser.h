@@ -69,8 +69,8 @@
  * - `Error=3`, ErrorMessage::ErrorType::kParameterUnknown: the table has no entry for the short
  *   name.
  * - `Error=5`, ErrorMessage::ErrorType::kNoValueGiven: a number without a digit.
- * - `Error=4`, ErrorMessage::ErrorType::kValueOutOfBounds: a number above the largest value of
- *   its type, such as `-A256` for a `uint8_t`.
+ * - `Error=4`, ErrorMessage::ErrorType::kValueOutOfBounds: a number outside the range of its type,
+ *   such as `-A256` or `-A-1` for a `uint8_t`.
  *
  * Such an option is not handed on, so the setting it was to change is left as it was; the options
  * behind it are still read.

@@ -88,8 +88,8 @@ class OverlayText : public Overlay<OverlayText>
      * \param[in] length The number of characters to take, plus one.
      * \note While the overlay shows, its text scrolls out of the same buffer: a new text can change
      *       the characters still to come in the run under way, and the next run shows it whole.
-     * \warning `length` must lie from 1 to OVERLAY_TEXT_TEXT_SIZE, and is not checked. A larger one
-     *          writes behind the overlay's buffer, and 0 writes far beyond it.
+     * \warning `length` must not exceed OVERLAY_TEXT_TEXT_SIZE, which is not checked: a larger one
+     *          writes behind the overlay's buffer. A `length` of 0 leaves the text as it was.
      */
     void SetText(const char* text, LengthType length) { StringTools::StringCopy(text_, text, length); }
 

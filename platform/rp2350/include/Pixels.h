@@ -209,7 +209,7 @@ class Pixels
      * \brief Sets the strip up on the data line `pin`.
      *
      * It hands `pin` to WS2812Pio::Init(), which loads the program into a PIO block, claims a DMA
-     * channel and starts the state machine on `pin`. A failure is printed on the serial line, and
+     * channel, claims the state machine and starts it on `pin`. A failure is printed on the serial line, and
      * Render() then answers kENotOk.
      *
      * Failures are reported and left behind rather than thrown: the contract's Init() returns

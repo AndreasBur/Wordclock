@@ -118,13 +118,16 @@ cmake -B build-avr -S . -DPLATFORM=avr-dx \
 
 `AVR_F_CPU` and `AVR_PROGRAMMER` are cache variables too. `AVR_F_CPU` is also what
 `InitRuntime()` sets the oscillator to, so it has to be a frequency the oscillator
-offers — 1, 2, 3, 4, 8, 12, 16, 20 or 24 MHz — or the build fails. The size is
+offers — 1, 2, 3, 4, 8, 12, 16, 20 or 24 MHz. That is necessary and not sufficient:
+`Timer.h` asserts a multiple of 2 MHz and `WS2812.cpp` asserts that the two pulse
+widths still differ, so 1, 2 and 3 MHz stop the build on an assertion of their own.
+**4 MHz is the lowest that builds** — measured, by building each of them. The size is
 printed after every link rather than asked for, because the flash budget is the
 reason this part was chosen at all — currently, of 128 KiB flash and 16 KiB RAM:
 
 ```
-Program:   48090 bytes (37%)
-Data:       1700 bytes (10%)
+Program:   48586 bytes (37%)
+Data:       1701 bytes (10%)
 ```
 
 That is what the toolchain in the dev container prints, and it is a sample rather than a

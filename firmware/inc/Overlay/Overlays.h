@@ -526,8 +526,8 @@ class Overlays
      *
      * \param[in] text The text, terminated.
      * \param[in] length The size of the buffer to fill, its terminator included.
-     * \pre `length` lies from 1 to OVERLAY_TEXT_TEXT_SIZE; it is not checked, and a larger one
-     *      writes past the text of the overlay.
+     * \pre `length` is at most OVERLAY_TEXT_TEXT_SIZE; it is not checked, and a larger one writes
+     *      past the text of the overlay. A `length` of 0 leaves it as it was.
      */
     void SetTextText(const char* text, LengthType length) { text_.SetText(text, length); }
 #endif

@@ -109,7 +109,9 @@ using boolean = bool; // NOLINT(readability-identifier-naming)
  * the strip's pulse widths - is computed from F_CPU. A mismatch between the two would not fail to
  * build, it would put wrong pulses on the wire. So the setting is derived from F_CPU, and an
  * `AVR_F_CPU` the oscillator does not offer - it offers 1, 2, 3, 4, 8, 12, 16, 20 and 24 MHz -
- * fails to build.
+ * fails to build. Offering it is not enough, though: Timer.h wants a multiple of 2 MHz and
+ * WS2812.cpp wants two pulse widths that still differ, which rules out 1, 2 and 3 MHz as well. 4
+ * MHz is the lowest that builds.
  */
 void InitRuntime();
 
