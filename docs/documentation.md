@@ -101,8 +101,17 @@ the paragraphs after the brief.
 - **Everything a header offers**, documented whole: every class, every public and protected
   function, member and type, every enum value and every macro, the configuration macros
   included.
-- **A private member or a function local to a `.cpp`** has no Doxygen block. Where there is
-  something to say, a `//` or `/* */` comment says it at the definition.
+- **A private member, a private method or a function local to a `.cpp`** has no Doxygen block.
+  Where there is something to say, a `//` or `/* */` comment says it at the definition. Two
+  reasons, and both matter: a helper earns its own name precisely because that name carries the
+  meaning a comment would otherwise have to (see CLAUDE.md), so a `\brief` would only say it
+  again; and `EXTRACT_PRIVATE` is `NO` in the `Doxyfile`, so Doxygen never reads a block there -
+  `tools/docs.py` would not check it, and a `\param` naming a parameter that has since been
+  renamed would never be caught. An unchecked block is worse than a plain comment, because it
+  looks checked.
+- **A private type is the exception**, documented like a public one with its fields, as
+  `Clock::MinuteType` and `AnimationCube::BorderStateType` are. A name carries what a function
+  does; it does not carry what a field means or why a layout is that way.
 - **A function that only passes a call on** takes the block of the function it calls with
   `\copydoc`, rather than a second text that would drift from it. **Overloads** that differ only
   in their parameters share one text the same way.
