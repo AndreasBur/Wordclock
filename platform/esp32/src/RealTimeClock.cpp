@@ -5,8 +5,9 @@
  * \file
  * \brief ESP32 real-time clock, backed by the system clock.
  *
- * All conversions go through the C library's local time, so the zone and the daylight-saving rule
- * that the application installed with configTzTime() apply in both directions.
+ * The system clock's conversions go through the C library's local time, so the zone and the
+ * daylight-saving rule that the application installed with configTzTime() apply in both directions.
+ * The chip's go through UTC and leave the rule out.
  */
 
 #include "RealTimeClock.h"
@@ -114,13 +115,6 @@ void ToTm(const ClockDateTime& date_time, struct tm& local)
 
 } // namespace
 
-/*! \brief          Tells whether the system clock holds a real date yet
- *  \details        Asked as "is the year one ClockDate accepts" rather than by querying
- *                  SNTP: that answers the question the firmware actually has, and it
- *                  stays true for a time that arrived from a command instead of the net.
- *
- *  \return         true once the system clock has been set
- */
 bool RealTimeClock::IsSystemTimeSet()
 {
     ClockDateTime unused;
@@ -153,17 +147,6 @@ void RealTimeClock::SetDate(ClockDate date)
     SetDateTime(value);
 }
 
-/*! \brief          Takes the current local time from the system clock
- *  \details        Nothing is counted forward here, unlike on the simulator: SNTP keeps
- *                  the system clock right on its own, so counting would only add a
- *                  second source of truth that drifts away from it.
- *
- *                  The clock chip is the source of last resort rather than a second one:
- *                  it is read only while the system clock holds nothing, and written back
- *                  from the system clock afterwards. Which way round matters - the chip
- *                  drifts a few seconds a month and SNTP does not, so a chip that could
- *                  overwrite a synchronised clock would make the clock worse.
- */
 void RealTimeClock::Task()
 {
     ClockDateTime current;
@@ -182,10 +165,8 @@ void RealTimeClock::Task()
     WriteChip();
 }
 
-/*! \brief          Reads the system clock as local date and time
- *
- *  \return         true if the system clock holds a year ClockDate accepts
- */
+// Reads the system clock as local date and time. True if it holds a year ClockDate accepts;
+// `value` is then written, and otherwise left as it was.
 bool RealTimeClock::ReadSystemDateTime(ClockDateTime& value)
 {
     const time_t now = time(nullptr);
@@ -198,13 +179,13 @@ bool RealTimeClock::ReadSystemDateTime(ClockDateTime& value)
     return true;
 }
 
-/*! \brief          Puts what the clock chip kept into the system clock
- *  \details        Only ever called while the system clock holds nothing, so there is
- *                  nothing here that could overwrite a synchronised time. Retried once a
- *                  second until it works, which is what picks up a chip that answers late -
- *                  and what keeps the retry off a bus the light sensor shares.
+/*
+ * Puts what the clock chip kept into the system clock, and answers kEOk if the chip had a time
+ * and the system clock took it.
  *
- *  \return         kEOk if the chip had a time and the system clock took it
+ * Only ever called while the system clock holds nothing, so there is nothing here that could
+ * overwrite a synchronised time. Retried once a second until it works, which is what picks up
+ * a chip that answers late - and what keeps the retry off a bus the light sensor shares.
  */
 StdReturnType RealTimeClock::ReadChip()
 {
@@ -225,18 +206,16 @@ StdReturnType RealTimeClock::ReadChip()
     return kEOk;
 }
 
-/*! \brief          Keeps the clock chip in step with the system clock
- *  \details        Once an hour, and once more whenever the time was set by hand. Once an
- *                  hour because the chip is the more accurate of the two and needs no
- *                  correcting - what the write is for is the case where SNTP has moved the
- *                  system clock and the chip would otherwise keep an old time for the next
- *                  power cut. The hour is remembered rather than a countdown kept, so a
- *                  clock that was off for a while writes on its first hour and not a
- *                  whole period later.
+/*
+ * Keeps the clock chip in step with the system clock: once an hour, and once more whenever the
+ * time was set by hand. Once an hour because the chip is the more accurate of the two and needs
+ * no correcting - what the write is for is the case where SNTP has moved the system clock and
+ * the chip would otherwise keep an old time for the next power cut. The hour is remembered
+ * rather than a countdown kept, so a clock that was off for a while writes on its first hour
+ * and not a whole period later.
  *
- *                  A failed write is not retried within the hour: the next one comes
- *                  anyway, and a chip that is not answering would otherwise be talked to
- *                  on every single tick.
+ * A failed write is not retried within the hour: the next one comes anyway, and a chip that is
+ * not answering would otherwise be talked to on every single tick.
  */
 void RealTimeClock::WriteChip()
 {
@@ -249,10 +228,8 @@ void RealTimeClock::WriteChip()
     hour_written_to_chip_ = date_time_.GetTimeHour();
 }
 
-/*! \brief          Puts a date and time into the system clock
- *
- *  \return         kEOk if the system clock took the value
- */
+// Puts a date and time into the system clock, as local time; kEOk if the system clock took
+// the value.
 StdReturnType RealTimeClock::WriteSystemDateTime(const ClockDateTime& value)
 {
     struct tm local{};

@@ -5,9 +5,9 @@
  * \file
  * \brief ESP32 WS2812 driver, driven by the RMT peripheral.
  *
- * The RMT peripheral generates the WS2812 pulses in hardware and fetches the bytes by DMA, so
- * nothing here has to hit a timing with instruction cycles - which is what the xmega driver spent
- * most of its 800 lines on, and what only an oscilloscope can debug.
+ * The RMT peripheral generates the WS2812 pulses in hardware, and the driver refills its memory
+ * from an interrupt, so nothing here has to hit a timing with instruction cycles - which is what
+ * the xmega driver spent most of its 800 lines on, and what only an oscilloscope can debug.
  */
 
 /* The driver headers first, ahead of the Arduino.h that binds Serial to a macro. */
@@ -63,8 +63,8 @@ constexpr size_t kFrameSize{PIXELS_NUMBER_OF_LEDS * Pixel::GetNumberOfColors()};
 /*
  * The frame the peripheral reads from while it transmits. Separate from the firmware's
  * pixel buffer because the transmission outlives the call: the next tick may already be
- * writing new pixels while the DMA is still fetching the old frame, and sharing one
- * buffer would put half of each on the strip.
+ * writing new pixels while the driver's interrupt is still reading the old frame, and
+ * sharing one buffer would put half of each on the strip.
  */
 byte frame_buffer[kFrameSize]{};
 
@@ -73,12 +73,6 @@ rmt_encoder_handle_t rmt_encoder{nullptr};
 
 } // namespace
 
-/*! \brief          Claims an RMT channel for the strip's data pin
- *  \details        Failures are reported and left behind rather than thrown: the
- *                  contract's Init() returns nothing, and a clock whose serial console
- *                  still answers is more useful for finding a miswired pin than one
- *                  that reboots. render() then does nothing until a channel exists.
- */
 void Pixels::Init(byte pin)
 {
     pin_ = pin;
@@ -126,19 +120,6 @@ void Pixels::Init(byte pin)
     }
 }
 
-/*! \brief          Puts the buffer on the strip, if the firmware asked for it
- *  \details        The application calls this once per tick, after the firmware's pass -
- *                  never Show() itself. Two reasons, and the second is the one that
- *                  bites: several modules call Display::Show() within a single tick
- *                  (DisplayManager, Animations, Text, Clock and the command parsers all
- *                  do), so transmitting from Show() would put frames back to back on the
- *                  wire. WS2812 needs the line low for longer than 280 us between
- *                  frames, and losing that gap does not blank the display - it shifts
- *                  the next frame by a pixel, which reads as a wiring fault.
- *                  Rendering once per 10 ms tick leaves milliseconds of idle line.
- *
- *  \return         kEOk if a frame went out or none was due
- */
 StdReturnType Pixels::Render()
 {
     /*
@@ -166,18 +147,6 @@ StdReturnType Pixels::Render()
  * that detail into the interface.
  */
 // NOLINTBEGIN(readability-convert-member-functions-to-static)
-/*! \brief          Whether the previous frame is still being transmitted
- *  \details        The same call TransmitFrame() waits on, with a timeout of nothing: this is
- *                  a question and not a wait, and it is asked from a task that has a clock to
- *                  keep. ESP_ERR_TIMEOUT is therefore the ordinary "still busy" answer rather
- *                  than a fault.
- *
- *                  A channel that was never opened has nothing going out, which is not the
- *                  same as what the driver would answer for a null handle - and reporting a
- *                  frame that cannot exist would stall the switch-off for good.
- *
- *  \return         true while a frame is still going out
- */
 bool Pixels::IsFrameOnTheWire() const
 {
     if(rmt_channel == nullptr) { return false; }
@@ -240,11 +209,11 @@ void Pixels::SetBrightness(byte brightness, bool gamma_correction)
     UNUSED(gamma_correction);
 }
 
-/*! \brief          Copies the pixel buffer into the frame the peripheral reads
- *  \details        Pixel already stores its colours in the WS2812 order (green, red,
- *                  blue - see the offsets in Pixel.h), so this is a scale and not a
- *                  reordering. The accessors are used anyway, so that changing those
- *                  offsets cannot silently swap the colours on the strip.
+/*
+ * Copies the pixel buffer, dimmed, into the frame the peripheral reads. Pixel already
+ * stores its colours in the WS2812 order (green, red, blue - see the offsets in Pixel.h), so
+ * this is a scale and not a reordering. The accessors are used anyway, so that changing
+ * those offsets cannot silently swap the colours on the strip.
  */
 void Pixels::FillFrameBuffer() const
 {
@@ -259,11 +228,10 @@ void Pixels::FillFrameBuffer() const
     }
 }
 
-/*! \brief          Hands one frame to the RMT peripheral
- *  \details        Waits for the previous frame first, because the peripheral is still
- *                  reading frame_buffer until it is done.
- *
- *  \return         kEOk if the frame was queued
+/*
+ * Hands one frame to the RMT peripheral; kEOk if the frame was queued. Waits for the
+ * previous frame first, because the peripheral is still reading frame_buffer until it is
+ * done.
  */
 StdReturnType Pixels::TransmitFrame()
 {
