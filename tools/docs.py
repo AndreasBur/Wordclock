@@ -28,7 +28,6 @@ BACKENDS = ('simulator', 'avr-dx', 'esp32', 'rp2350')
 
 # Where a member may still be undocumented, until its module is written in the new style.
 PENDING = (
-    'platform/esp32/',
     'platform/rp2350/',
 )
 

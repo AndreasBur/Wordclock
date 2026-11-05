@@ -6,9 +6,9 @@
  * \brief The core's Arduino.h, with Serial bound to WordclockSerial.
  *
  * Everything the firmware uses of the Arduino API - byte, F(), PROGMEM, pgm_read_byte, bitRead,
- * itoa - comes from the real header, which this one pulls in through include_next. Only Serial is
- * replaced, so that a web socket can reach the same port Communication reads its commands from. The
- * simulator's Arduino.h does exactly this.
+ * itoa - comes from the real header, which this one pulls in through a path the build passes in.
+ * Only Serial is replaced, so that a web socket can reach the same port Communication reads its
+ * commands from. The simulator's Arduino.h does exactly this.
  *
  * Order matters twice over. The real header has to come first, because it declares the port this
  * file then hides. And the port has to be captured before it is hidden - HardwarePort() below -
@@ -49,16 +49,30 @@ static_assert(sizeof(byte) == 1u, "Arduino.h: the Arduino core's header did not 
 
 #include "WordclockSerial.h"
 
-/*
+/*!
+ * \brief Defined, as 1, where this platform's Arduino.h was included rather than the core's.
+ *
  * Proof that this file, and not the core's, was the one that got included. WordclockSerial.cpp
  * refuses to build without it: the alternative failure is silent - everything compiles, the
  * firmware talks to the UART as before, and only the web console stays mute.
  */
 #define WORDCLOCK_ARDUINO_SHIM                          1
 
+/*! \brief The core's own serial port, reached after `Serial` has been bound to WordclockSerial. */
 namespace wordclock_platform {
 /* Both of these have to be defined while Serial still means the core's port. */
+/*!
+ * \brief Returns the core's own `Serial`, the port WordclockSerial reads and writes.
+ *
+ * The UART, or, on a board that boots on USB CDC, the port the core aliases `Serial` to.
+ */
 inline Stream& HardwarePort() { return Serial; }
+
+/*!
+ * \brief Opens the core's own `Serial` at `baud_rate`.
+ *
+ * \param[in] baud_rate The baud rate.
+ */
 inline void HardwarePortBegin(unsigned long baud_rate) { Serial.begin(baud_rate); }
 
 } // namespace wordclock_platform
@@ -70,6 +84,10 @@ inline void HardwarePortBegin(unsigned long baud_rate) { Serial.begin(baud_rate)
  * port above is captured through a function rather than a reference.
  */
 #undef Serial
+/*!
+ * \brief The serial port as the firmware reaches it: the one WordclockSerial, in place of the
+ *        core's `Serial`.
+ */
 #define Serial                  WordclockSerial::GetInstance() // NOLINT(readability-identifier-naming)
 
 #endif // _WORDCLOCK_ARDUINO_H_

@@ -92,6 +92,15 @@ void ReportProgress()
 
 } // namespace
 
+/*!
+ * \brief Brings the clock up: the serial port, the firmware, the network, the time synchronisation
+ *        and the web server, in that order.
+ *
+ * The Arduino core calls it once, before the first loop(). It waits for none of them: the network
+ * is joined, or the access point opened, and the first SNTP answer awaited in the background while
+ * the firmware already runs. It says on the console which network the clock is joining, or which
+ * access point it opened.
+ */
 void setup()
 {
     Serial.begin(WORDCLOCK_SERIAL_BAUDRATE);
@@ -117,11 +126,18 @@ void setup()
     last_wake_time = xTaskGetTickCount();
 }
 
-/*! \brief          Drives the firmware at the scheduler's interval
- *  \details        Timed against an absolute wake-up rather than a delay, so the work
- *                  inside a tick does not stretch the interval: animation speeds, the
- *                  sensor's sampling rate and the serial poll rate all count in this
- *                  interval, and a drifting one silently rescales all three.
+/*!
+ * \brief Runs one tick and waits for the next, one tick every Scheduler::GetTaskIntervalMs()
+ *        milliseconds.
+ *
+ * The Arduino core calls it over and over. A tick runs the firmware's tasks, hands the buffer to
+ * the strip with Pixels::Render(), has WebInterface::BroadcastFrame() send the display to watching
+ * browsers, reports the network's and the time's progress on the console once each, and carries
+ * out a restart that was asked for, in that order.
+ *
+ * Timed against an absolute wake-up rather than a delay, so the work inside a tick does not
+ * stretch the interval: animation speeds, the sensor's sampling rate and the serial poll rate all
+ * count in this interval, and a drifting one silently rescales all three.
  */
 void loop()
 {

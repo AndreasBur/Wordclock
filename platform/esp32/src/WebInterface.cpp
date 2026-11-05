@@ -88,23 +88,21 @@ void SendLineToClients(const char* line)
     WebInterface::GetInstance().BroadcastLine(line);
 }
 
-/*! \brief          Whether this request may be answered, and the 401 when it may not
+/*
+ * Whether this request may be answered, and the 401 when it may not: true when the handler may
+ * go on.
  *
- *  \return         true when the handler may go on
+ * Basic authentication, and what it is worth saying plainly: the credential travels
+ * base64-encoded over plain http, which is not encryption. What this keeps out is a guest who
+ * opens the page and starts sending commands, or installing firmware. It keeps out nobody who
+ * can watch the traffic, and that would need https, which a clock cannot offer credibly.
  *
- *  \details        Basic authentication, and what it is worth saying plainly: the credential
- *                  travels base64-encoded over plain http, which is not encryption. What this
- *                  keeps out is a guest who opens the page and starts sending commands, or
- *                  installing firmware. It keeps out nobody who can watch the traffic, and
- *                  that would need https, which a clock cannot offer credibly.
+ * Off unless a password was stored, so an update locks nobody out of a clock that is already
+ * on a wall, and the access point of a first setup still answers.
  *
- *                  Off unless a password was stored, so an update locks nobody out of a clock
- *                  that is already on a wall, and the access point of a first setup still
- *                  answers.
- *
- *                  Every route goes through this, the web socket's handshake included - a
- *                  console that asked for a password and then took commands on an unchecked
- *                  socket would be a lock on the wrong door.
+ * Every route goes through this, the web socket's handshake included - a console that asked
+ * for a password and then took commands on an unchecked socket would be a lock on the wrong
+ * door.
  */
 bool IsRequestAuthorised(httpd_req_t* request)
 {
@@ -131,17 +129,15 @@ bool IsRequestAuthorised(httpd_req_t* request)
     return false;
 }
 
-/*! \brief          Serves one of the files the clock hands out unchanged
+/*
+ * Serves one of the files the clock hands out unchanged.
  *
- *  \details        One handler for all five - the two pages, the manifest and the two icons -
- *                  because what separates them is data and the data is WebFrontend's table.
- *                  Which entry this request is for arrives in the server's own user context,
- *                  which is what that field exists for.
+ * One handler for all five - the two pages, the manifest and the two icons - because what
+ * separates them is data and the data is WebFrontend's table. Which entry this request is for
+ * arrives in the server's own user context, which is what that field exists for.
  *
- *                  A gzipped asset is sent as it is stored and the browser unpacks it; that
- *                  is the whole of what the header does here, and the table says which.
- *
- *  \return         ESP_OK
+ * A gzipped asset is sent as it is stored and the browser unpacks it; that is the whole of what
+ * the header does here, and the table says which.
  */
 esp_err_t HandleAsset(httpd_req_t* request)
 {
@@ -155,12 +151,12 @@ esp_err_t HandleAsset(httpd_req_t* request)
     return httpd_resp_send(request, reinterpret_cast<const char*>(asset.bytes), asset.size);
 }
 
-/*! \brief          Answers the update route, in the one shape the page reads
- *  \details        JSON like the other two routes that answer data, and the HTTP status set
- *                  with it - so the page can branch on the status and still have a sentence
- *                  to show. The reason travels as text on purpose: what goes wrong here is
- *                  a wrong file or a dropped connection, and a number for that would only
- *                  have to be translated back somewhere.
+/*
+ * Answers the update route, in the one shape the page reads: JSON like the other two routes
+ * that answer data, and the HTTP status set with it - so the page can branch on the status and
+ * still have a sentence to show. The reason travels as text on purpose: what goes wrong here is
+ * a wrong file or a dropped connection, and a number for that would only have to be translated
+ * back somewhere.
  */
 esp_err_t SendUpdateResult(httpd_req_t* request, bool ok, const char* reason)
 {
@@ -183,27 +179,24 @@ esp_err_t SendUpdateResult(httpd_req_t* request, bool ok, const char* reason)
     return httpd_resp_send(request, body, HTTPD_RESP_USE_STRLEN);
 }
 
-/*! \brief          Takes a new firmware image over HTTP and reboots into it
+/*
+ * Takes a new firmware image over HTTP and reboots into it. Every way out sends an answer
+ * first, whichever answer that is.
  *
- *  \return         ESP_OK once an answer has been sent, whichever answer that was
+ * The body is the image itself, not a form: a multipart parser in flash would exist to undo
+ * something the browser only does because a <form> asked it to, and the page sends the file as
+ * the request body instead. That is also what makes `curl --data-binary` a first-class way in,
+ * which is the one that works when the page is the thing that broke.
  *
- *  \details        The body is the image itself, not a form: a multipart parser in flash
- *                  would exist to undo something the browser only does because a <form>
- *                  asked it to, and the page sends the file as the request body instead.
- *                  That is also what makes `curl --data-binary` a first-class way in, which
- *                  is the one that works when the page is the thing that broke.
+ * The image goes to the partition the running one is not in, and the bootloader is pointed at
+ * it only by end() - so an upload that stops halfway leaves the clock running what it was
+ * running. That is the whole safety argument for doing this at all, and it is the framework's
+ * rather than ours.
  *
- *                  The image goes to the partition the running one is not in, and the
- *                  bootloader is pointed at it only by end() - so an upload that stops
- *                  halfway leaves the clock running what it was running. That is the whole
- *                  safety argument for doing this at all, and it is the framework's rather
- *                  than ours.
- *
- *                  The reboot is asked for and not carried out: this handler's answer is
- *                  still in the server's buffer, and a controller that restarts here sends
- *                  the browser nothing at all - which reads as a failed update rather than
- *                  a finished one. System::Restart() already defers to the application's
- *                  tick for exactly this reason, so it is what carries it out.
+ * The reboot is asked for and not carried out: this handler's answer is still in the server's
+ * buffer, and a controller that restarts here sends the browser nothing at all - which reads as
+ * a failed update rather than a finished one. System::Restart() already defers to the
+ * application's tick for exactly this reason, so it is what carries it out.
  */
 esp_err_t HandleUpdate(httpd_req_t* request)
 {
@@ -260,18 +253,17 @@ esp_err_t HandleUpdate(httpd_req_t* request)
     return SendUpdateResult(request, true, "");
 }
 
-/*! \brief          Serves the command catalog and the panel's letters
+/*
+ * Serves the command catalog; HandleDisplay() below serves the panel's letters.
  *
- *  \details        Both documents are written by WebFrontend, shared with the RP2350 backend:
- *                  what a page is sent is a property of the catalog and the letter table, not
- *                  of a controller. They were generated here once, and identically in the
- *                  other backend - two functions that had to be kept the same by hand and
- *                  whose divergence would have surfaced in a browser rather than in a test.
+ * Both documents are written by WebFrontend, shared with the RP2350 backend: what a page is
+ * sent is a property of the catalog and the letter table, not of a controller. They were
+ * generated here once, and identically in the other backend - two functions that had to be
+ * kept the same by hand and whose divergence would have surfaced in a browser rather than in a
+ * test.
  *
- *                  What is left here is what is genuinely this server's: the password, the
- *                  content type, and a body to write into.
- *
- *  \return         ESP_OK
+ * What is left here is what is genuinely this server's: the password, the content type, and a
+ * body to write into.
  */
 esp_err_t HandleCommands(httpd_req_t* request)
 {
@@ -293,16 +285,16 @@ esp_err_t HandleDisplay(httpd_req_t* request)
     return ESP_OK;
 }
 
-/*! \brief          Takes one web socket frame and injects it as typed characters
- *  \details        A GET is the handshake, and returning kEOk from it is what completes the
- *                  upgrade - the frame handling below only ever sees later requests.
+/*
+ * Takes one web socket frame and injects it as typed characters; ESP_OK unless the frame could
+ * not be read.
  *
- *                  The command is injected followed by the end-of-message character, unless
- *                  the browser already sent one. That keeps the page free of protocol
- *                  bookkeeping: it sends the command text, the terminator is this side's
- *                  business.
+ * A GET is the handshake, and returning ESP_OK from it is what completes the upgrade - the
+ * frame handling below only ever sees later requests.
  *
- *  \return         ESP_OK unless the frame could not be read
+ * The command is injected followed by the end-of-message character, unless the browser already
+ * sent one. That keeps the page free of protocol bookkeeping: it sends the command text, the
+ * terminator is this side's business.
  */
 esp_err_t HandleSocket(httpd_req_t* request)
 {
@@ -343,10 +335,10 @@ esp_err_t HandleSocket(httpd_req_t* request)
     return ESP_OK;
 }
 
-/*! \brief          Drops a client the server has finished with
- *  \details        Registered as the server's close hook rather than guessed from a failing
- *                  send: a browser that is simply gone never sends a close frame, and its
- *                  descriptor would otherwise be handed to send() for the rest of the run.
+/*
+ * Drops a client the server has finished with. Registered as the server's close hook rather
+ * than guessed from a failing send: a browser that is simply gone never sends a close frame,
+ * and its descriptor would otherwise be handed to send() for the rest of the run.
  */
 void OnSocketClosed(httpd_handle_t, int descriptor)
 {
@@ -364,10 +356,6 @@ void OnSocketClosed(httpd_handle_t, int descriptor)
  * that detail into the interface.
  */
 // NOLINTBEGIN(readability-convert-member-functions-to-static)
-/*! \brief          Starts the server and takes over the output lines
- *
- *  \return         kEOk if the server is listening
- */
 StdReturnType WebInterface::Begin()
 {
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
@@ -436,21 +424,21 @@ StdReturnType WebInterface::Begin()
     return kEOk;
 }
 
-/*! \brief          Sends one finished line to every open socket
- *  \details        The widening to UTF-8 and the bound on it are WebFrontend's, shared with
- *                  the other backend; what is this file's is the walk over the descriptors,
- *                  in SendText() below.
+/*
+ * The widening to UTF-8 and the bound on it are WebFrontend's, shared with the other backend;
+ * what is this file's is the walk over the descriptors, in SendText() below. Both of these
+ * forward into WebFrontend and stay on this class because the application and the line sink
+ * call them by this name.
  */
 void WebInterface::BroadcastLine(const char* line)
 {
     WebFrontend::GetInstance().BroadcastLine(line);
 }
 
-/*! \brief          Sends the pixel buffer to every open socket, when it changed
- *  \details        The rate limit, the gathering and the comparison against the last frame
- *                  are WebFrontend's, shared with the other backend - none of the three has
- *                  anything to do with which server is underneath. What is this file's is
- *                  SendBinary() below.
+/*
+ * The rate limit, the gathering and the comparison against the last frame are WebFrontend's,
+ * shared with the other backend - none of the three has anything to do with which server is
+ * underneath. What is this file's is SendBinary() below.
  */
 void WebInterface::BroadcastFrame()
 {
@@ -459,8 +447,8 @@ void WebInterface::BroadcastFrame()
 
 /*
  * This backend's half of the contract WebFrontend.h states. Defined here rather than in a
- * source of its own because what it reads is this file's: the server handle above and the
- * descriptor table on WebInterface.
+ * source of its own because what it reads is this file's: the server handle and the descriptor
+ * table above.
  */
 
 WebTransport& WebTransport::GetInstance()
@@ -513,10 +501,10 @@ void WebResponseBody::Finish()
     httpd_resp_send_chunk(request_, nullptr, 0);
 }
 
-/*! \brief          Remembers a socket to broadcast to
- *  \details        A full table drops the newcomer rather than an established console, and
- *                  says so on the UART - silently serving a page whose socket then never
- *                  answers is the more confusing failure.
+/*
+ * A full table drops the newcomer rather than an established console, and says so on the
+ * console - silently serving a page whose socket then never answers is the more confusing
+ * failure.
  */
 void WebInterface::OnClientOpened(int descriptor)
 {

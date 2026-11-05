@@ -25,13 +25,6 @@
  * that detail into the interface.
  */
 // NOLINTBEGIN(readability-convert-member-functions-to-static)
-/*! \brief          Reads the stored blob
- *  \details        A blob of a different length is refused rather than read as far as it
- *                  goes: it belongs to another version of the settings, and Persistence
- *                  would have to reject it anyway.
- *
- *  \return         kEOk if exactly Size bytes were read
- */
 StdReturnType Storage::Read(byte* buffer, size_t size) const
 {
     if((buffer == nullptr) || (size == 0u) || (size > kCapacity)) { return kENotOk; }
@@ -53,10 +46,6 @@ StdReturnType Storage::Read(byte* buffer, size_t size) const
     return kEOk;
 }
 
-/*! \brief          Replaces the stored blob
- *
- *  \return         kEOk if the whole blob was stored
- */
 StdReturnType Storage::Write(const byte* buffer, size_t size)
 {
     if((buffer == nullptr) || (size == 0u) || (size > kCapacity)) { return kENotOk; }
@@ -72,12 +61,6 @@ StdReturnType Storage::Write(const byte* buffer, size_t size)
     return kEOk;
 }
 
-/*! \brief          Forgets the stored blob
- *  \details        A store that held nothing counts as cleared, so calling this twice is
- *                  not an error.
- *
- *  \return         kEOk if nothing is stored afterwards
- */
 StdReturnType Storage::Clear()
 {
     Preferences store;

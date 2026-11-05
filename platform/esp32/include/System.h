@@ -5,9 +5,10 @@
  * \file
  * \brief What the clock knows about the machine it runs on.
  *
- * The things that are neither display nor sensor: how long it has been running, what address it
- * answers on, how much memory is left, and the three actions that only the platform can carry out -
- * restarting, asking the network for the time again, and joining the network again.
+ * The things that are neither display nor sensor: what address it answers on, how much memory is
+ * left, the network it joins and the console's password, and the three actions that only the
+ * platform can carry out - restarting, asking the network for the time again, and joining the
+ * network again. The uptime is not asked of this class at all: the core counts it in Uptime.
  *
  * Every getter answers with a return code rather than a value alone, because on every one of them
  * "there is no answer" is a real state: a clock with no network has no address and no link quality,
@@ -21,33 +22,72 @@
 #include "StandardTypes.h"
 #include "Arduino.h"
 
-/* System parameter */
-// "255.255.255.255" and its terminator. IPv6 does not fit and is not offered: the clock
-// joins a home network over IPv4, and the field says what to type into a browser.
+/*!
+ * \brief The length of a buffer for the network address, its terminator included.
+ *
+ * "255.255.255.255" and its terminator. IPv6 does not fit and is not offered: the clock joins a
+ * home network over IPv4, and the field says what to type into a browser.
+ */
 #define SYSTEM_ADDRESS_STRING_LENGTH                    16u
 
-/* "-100" and its terminator. */
+/*!
+ * \brief The length of a buffer for the link quality, its terminator included.
+ *
+ * "-100" and its terminator.
+ */
 #define SYSTEM_LINK_QUALITY_STRING_LENGTH               5u
 
-// What 802.11 allows: 32 characters of network name, and 63 of a WPA2 pass phrase. Both
-// with room for the terminator, because they are handed over as strings.
+/*!
+ * \brief The length of a buffer for a network name, its terminator included.
+ *
+ * What 802.11 allows, 32 characters of network name, with room for the terminator, because the
+ * name is handed over as a string.
+ */
 #define SYSTEM_SSID_STRING_LENGTH                       33u
+/*!
+ * \brief The length of a buffer for a pass phrase or a password, its terminator included.
+ *
+ * What 802.11 allows, 63 characters of a WPA2 pass phrase, with room for the terminator, because
+ * the pass phrase is handed over as a string. The console's password is held to the same length.
+ */
 #define SYSTEM_PASSWORD_STRING_LENGTH                   64u
 
-/*
- * The network the clock opens when it has none to join, so that the console it is
- * configured through can be reached at all. Open, and only while there is nothing stored:
- * a pass phrase every clock of this firmware shares would protect nothing, and the window
- * closes as soon as the first network is entered.
+/*!
+ * \brief The name of the open access point the clock opens while no network is configured.
+ *
+ * The network the clock opens when it has none to join, so that the console it is configured
+ * through can be reached at all. Open, and only while there is nothing stored: a pass phrase every
+ * clock of this firmware shares would protect nothing, and the window closes as soon as the first
+ * network is entered.
  */
 #define SYSTEM_ACCESS_POINT_SSID                        "Wordclock"
 
+/*!
+ * \brief What the clock knows about the machine it runs on, and what it can ask of it: the free
+ *        memory, the network, the console's password and a restart.
+ *
+ * The status command, the network command, the console command and the procedures call it. Every
+ * function that answers a StdReturnType may answer kENotOk, and a backend that cannot do a thing
+ * has to: a clock with no network has no address, and the status command sends an empty field
+ * rather than a zero.
+ *
+ * On the ESP32 the free memory is the free heap, and the network is WiFi. The network's name, its
+ * pass phrase and the console's password are kept with Preferences in an NVS namespace of their
+ * own, `wc-network`, apart from the settings the core persists, so that a settings reset leaves
+ * them alone. While no network is configured, StartNetwork() opens the open access point
+ * SYSTEM_ACCESS_POINT_SSID instead. A restart is asked for and carried out by
+ * PerformPendingRestart() at the end of the application's tick.
+ */
 class System
 {
   public:
+    /*! \brief The length of the buffer GetNetworkAddress() writes to. */
     static constexpr byte kAddressStringLength{SYSTEM_ADDRESS_STRING_LENGTH};
+    /*! \brief The length of the buffer GetLinkQuality() writes to. */
     static constexpr byte kLinkQualityStringLength{SYSTEM_LINK_QUALITY_STRING_LENGTH};
+    /*! \brief The length of the buffer GetNetworkSsid() writes to. */
     static constexpr byte kSsidStringLength{SYSTEM_SSID_STRING_LENGTH};
+    /*! \brief The length of a buffer for a pass phrase or for the console's password. */
     static constexpr byte kPasswordStringLength{SYSTEM_PASSWORD_STRING_LENGTH};
 
   private:
@@ -62,100 +102,221 @@ class System
     ~System() { }
 
   public:
+    /*! \brief Returns the one system. */
     static System& GetInstance() {
         static System singleton_instance;
         return singleton_instance;
     }
 
-    // get methods
-    // Kibibytes of free heap. Says whether the clock is leaking, which is the one thing a
-    // device that runs for months has to be watched for.
-    StdReturnType GetFreeMemoryInKibibytes(uint16_t&) const;
+    /*!
+     * \brief Gives the memory that is still free, in kibibytes.
+     *
+     * On the ESP32, the free heap as `ESP.getFreeHeap()` reports it; never refused. It says whether
+     * the clock is leaking, which is the one thing a device that runs for months has to be watched
+     * for.
+     *
+     * \param[out] free_memory The free memory, in kibibytes, rounded down.
+     * \return kEOk, or kENotOk if the backend cannot tell; `free_memory` is then left as it was.
+     */
+    StdReturnType GetFreeMemoryInKibibytes(uint16_t& free_memory) const;
 
-    // The address to type into a browser, into a buffer of kAddressStringLength.
-    // kENotOk while the clock has not joined a network, which is when there is none.
-    StdReturnType GetNetworkAddress(char*) const;
+    /*!
+     * \brief Writes the address the clock answers on in its network.
+     *
+     * On the ESP32, the IPv4 address WiFi was given in the network it joined, the address to type
+     * into a browser. The clock is on a network only while WiFi reports it joined: while it joins,
+     * after it lost the network, and while the access point is open, this is refused. It is also
+     * refused if the address does not fit `string`.
+     *
+     * \param[out] string A buffer of kAddressStringLength.
+     * \return kEOk, or kENotOk while the clock is on no network; `string` is then an empty string.
+     */
+    StdReturnType GetNetworkAddress(char* string) const;
 
-    /*
-     * The received signal strength in dBm, into a buffer of kLinkQualityStringLength. A
-     * string rather than a number because it is negative, and the answer format carries
+    /*!
+     * \brief Writes the received signal strength, in dBm.
+     *
+     * On the ESP32, `WiFi.RSSI()` in decimal, refused while WiFi does not report the network
+     * joined. A string rather than a number because it is negative, and the answer format carries
      * unsigned values.
+     *
+     * \param[out] string A buffer of kLinkQualityStringLength.
+     * \return kEOk, or kENotOk while the clock is on no network; `string` is then an empty string.
      */
-    StdReturnType GetLinkQuality(char*) const;
+    StdReturnType GetLinkQuality(char* string) const;
 
-    /*
-     * The network the clock is configured for, into a buffer of kSsidStringLength.
-     * kENotOk when there is none, which is what a clock that was never told answers - and
-     * what the access point stands in for. The pass phrase is deliberately not readable:
-     * it goes in and is never handed back out.
+    /*!
+     * \brief Writes the name of the network the clock is configured for.
+     *
+     * On the ESP32, the name stored with SetNetworkCredentials(), or, where none is stored, the one
+     * compiled in as WORDCLOCK_WIFI_SSID - in that order, because the stored one is the later word.
+     * A compiled-in name too long for `ssid` is refused as well.
+     *
+     * The pass phrase is deliberately not readable: it goes in and is never handed back out.
+     *
+     * \param[out] ssid A buffer of kSsidStringLength.
+     * \return kEOk, or kENotOk if no network is configured; `ssid` is then an empty string.
      */
-    StdReturnType GetNetworkSsid(char*) const;
+    StdReturnType GetNetworkSsid(char* ssid) const;
+
+    /*!
+     * \brief Returns whether a network is configured for the clock to join.
+     *
+     * On the ESP32, whether GetNetworkSsid() names one: stored, or compiled in. It reads the store
+     * on every call.
+     *
+     * \return True if a network is configured.
+     */
     bool IsNetworkConfigured() const;
 
-    // set methods
-    /*
-     * Stores what the clock is to join, and joins it. Kept apart from the settings the
-     * core persists: those are what the clock shows, this is how it is reached, and a
-     * settings reset that threw the network away would leave a clock nobody can talk to
-     * without a cable.
-     */
-    StdReturnType SetNetworkCredentials(const char*, const char*);
-
-    /*
-     * Whether the console asks for a password before it answers, and whether a candidate
-     * matches. The password itself is never handed back out, the same way the WiFi pass
-     * phrase is not: what a caller may learn is yes or no.
+    /*!
+     * \brief Stores the network the clock is to join, and joins it.
      *
-     * The candidate is the base64 blob out of an Authorization header, not the password -
-     * and that is a decision about flash rather than about layering. Basic sends
-     * base64("user:password"), the ESP32 core can only *encode*, and encoding the expected
-     * value once to compare strings is a decoder's worth of code less than decoding what
-     * arrived. The user name is therefore fixed and is not a secret; the realm in the 401
-     * says which one to type.
+     * On the ESP32 it refuses a null or too long name or pass phrase before storing anything, then
+     * writes the name and the pass phrase to the store, and calls StartNetwork() once both are
+     * written. An empty name is meant to take the stored network away, so that StartNetwork()
+     * joins the compiled-in network or opens the access point: the way out of a typo that cannot
+     * be corrected over the network it broke. It does not; see the warning at StartNetwork().
+     *
+     * Kept apart from the settings the core persists: those are what the clock shows, this is how
+     * it is reached, and a settings reset that threw the network away would leave a clock nobody
+     * can talk to without a cable.
+     *
+     * \param[in] ssid The name of the network, terminated.
+     * \param[in] password The pass phrase, terminated.
+     * \return kEOk, or kENotOk if the pair was not stored; the clock then stays on the network it
+     *         was on.
+     * \warning The two are written one after the other. A store that fails after the name was
+     *          written, or a power cut between the two writes, can leave the new name beside the
+     *          old pass phrase.
+     */
+    StdReturnType SetNetworkCredentials(const char* ssid, const char* password);
+
+    /*!
+     * \brief Returns whether the web console asks for a password.
+     *
+     * On the ESP32, read from the store on every call rather than cached. A request is a network
+     * round trip and this is a flash read of one short string, so a copy that could fall behind is
+     * not worth having - and a password changed by command takes effect on the next request rather
+     * than on the next restart.
+     *
+     * The password itself is never handed back out, the same way the WiFi pass phrase is not: what
+     * a caller may learn is yes or no.
+     *
+     * \return True if a password is stored.
      */
     bool IsConsoleProtected() const;
 
-    /*
+    /*!
+     * \brief Returns whether `credential` is what a browser sends for the console's password.
+     *
+     * The candidate is the base64 text out of an Authorization header, after `Basic `, not the
+     * password - and that is a decision about flash rather than about layering. Basic sends
+     * base64("user:password"), the ESP32 core can only *encode*, and encoding the expected value
+     * once to compare strings is a decoder's worth of code less than decoding what arrived. The
+     * user name is therefore fixed, `wordclock`, and is not a secret; the realm in the 401 says
+     * which one to type. The stored password is read on every call.
+     *
      * Not in the platform contract, and deliberately: the core has no business checking a
-     * credential, it only needs to answer whether one is asked for. This is between System
-     * and this backend's own WebInterface, which is why the Pico's has a different shape -
-     * its server library does the comparison itself and wants the password, not a blob.
+     * credential, it only needs to answer whether one is asked for. This is between System and
+     * this backend's own WebInterface, which is why the RP2350's has a different shape - its
+     * server library does the comparison itself and wants the password, not a blob.
+     *
+     * \param[in] credential The base64 text, with its padding, terminated.
+     * \return True if it matches, or if no password is stored; false for a null `credential` or one
+     *         that does not match.
      */
-    bool IsConsoleCredentialValid(const char*) const;
+    bool IsConsoleCredentialValid(const char* credential) const;
 
-    /*
-     * Stores the password the console is to ask for, or clears it when given an empty
-     * string - which is the state a clock ships in, so an update introduces no lock and the
-     * access point of a first setup still answers. A password that is forgotten is undone
-     * from the serial line, which is the one way in that does not go through the console.
+    /*!
+     * \brief Stores the password the web console asks for, or clears it for an empty one.
+     *
+     * On the ESP32 it refuses a null or too long password before touching the store. A password is
+     * stored beside the network's name and pass phrase; an empty one removes it from the store.
+     * Without one the console asks for nothing, which is the state a clock ships in, so an update
+     * introduces no lock and the access point of a first setup still answers. A password that is
+     * forgotten is undone from the serial line, which is the one way in that does not go through
+     * the console.
+     *
+     * \param[in] password The password, terminated; an empty one clears it.
+     * \return kEOk, or kENotOk if it was not stored; the console then asks for what it asked for
+     *         before. On the ESP32 an empty `password` while none is stored answers kENotOk as
+     *         well, as there is nothing to remove.
      */
-    StdReturnType SetConsolePassword(const char*);
+    StdReturnType SetConsolePassword(const char* password);
 
-    // methods
-    /*
-     * Brings the network up as configured: the stored credentials, or the access point
-     * when there are none. Called once at start-up and again whenever the credentials
-     * change.
+    /*!
+     * \brief Brings the network up as configured.
+     *
+     * On the ESP32 it joins the network GetNetworkSsid() names, with the stored pass phrase, or
+     * the compiled-in WORDCLOCK_WIFI_PASSWORD where none is stored: in station mode, with WiFi's
+     * own reconnecting on and modem sleep as WORDCLOCK_WIFI_MODEM_SLEEP says. Where no network is
+     * configured it opens the open access point SYSTEM_ACCESS_POINT_SSID instead, because the
+     * console the clock is configured through is reachable over the network and nowhere else. It
+     * returns at once; joining goes on in the background.
+     *
+     * The application calls it at start, and SetNetworkCredentials() after storing. Nothing is
+     * printed from here: a line printed in the middle of a command lands inside that command's
+     * answer, which is how this was found. The application says what happened instead.
+     *
+     * \warning A name stored empty, as `13 -S -P` stores it to forget the network, reads as a
+     *          stored name: the framework's `Preferences::getString()` counts the terminator, so an
+     *          empty value comes back with the length 1. The clock then calls `WiFi.begin()` with
+     *          an empty name instead of opening the access point, and IsNetworkConfigured() answers
+     *          true. The `Preferences` stub of the host tests counts without the terminator, so
+     *          they cannot show it.
      */
     void StartNetwork();
 
-    /*
-     * Asks for a restart, which the application carries out on its next tick through
-     * PerformPendingRestart(). Deferred rather than done here so that the answer to the
-     * command that asked for it still goes out.
+    /*!
+     * \brief Asks for a restart of the controller.
+     *
+     * Only asks, and on the ESP32 always. PerformPendingRestart() carries it out at the end of the
+     * application's tick, so that the answer to the command that asked for it still goes out: a
+     * command asks within the tick, and the restart follows at its end; the firmware update asks
+     * from the web server's task, and the restart follows at the end of the next tick.
+     *
+     * \return kEOk if the restart was asked for, which the application carries out at the end of
+     *         its tick; or kENotOk if the backend cannot restart, and then nothing happens.
      */
     StdReturnType Restart() { restart_pending_ = true; return kEOk; }
 
-    // Called from the application's tick, after everything that had something to send has
-    // sent it. Does not return when a restart was asked for.
+    /*!
+     * \brief Restarts the controller, if Restart() asked for it.
+     *
+     * The application calls it at the end of every tick, after everything that had something to
+     * send has sent it. Serial is flushed first: the UART writes in the background, and a
+     * controller that restarts with bytes still in that buffer cuts its own answer in half. The
+     * restart is `ESP.restart()`, from which the call does not return.
+     */
     void PerformPendingRestart();
 
-    // Asks the network for the time again. What it is for is the clock that came up while
-    // the time server was unreachable and has been showing nothing since.
+    /*!
+     * \brief Asks the network for the time again.
+     *
+     * On the ESP32 it installs the zone rule and the time servers again with `configTzTime()`, the
+     * same call the application makes at start, which is what restarts the SNTP query. kEOk says
+     * the query was started, not that an answer arrived. What it is for is the clock that came up
+     * while the time server was unreachable.
+     *
+     * \return kEOk if the time was asked for, or kENotOk if there is no network to ask over; the
+     *         time is then left as it was.
+     */
     StdReturnType ResynchroniseTime();
 
-    // Joins the network again, for the clock whose access point was away longer than the
-    // core's own retries lasted.
+    /*!
+     * \brief Joins the network again.
+     *
+     * On the ESP32 it asks WiFi to reconnect with `WiFi.reconnect()`, for the clock whose access
+     * point was away longer than WiFi's own retries lasted. Refused unless WORDCLOCK_WIFI_SSID is
+     * compiled in, and when `WiFi.reconnect()` answers false.
+     *
+     * \return kEOk if an attempt to join was started, or kENotOk if none was.
+     * \warning Only a compiled-in network counts here, not one stored with SetNetworkCredentials().
+     *          A clock flashed without `WordclockSecrets.h`, whose network was entered with the
+     *          network command, has IsNetworkConfigured() true, and still this answers kENotOk and
+     *          does nothing.
+     */
     StdReturnType ReconnectNetwork();
 };
 

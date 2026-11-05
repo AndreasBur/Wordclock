@@ -42,8 +42,6 @@ bool IsNetworkJoined()
     return WiFi.status() == WL_CONNECTED;
 }
 
-// Reads one stored string into a buffer that has room for it, terminator included. An
-// empty answer and a missing key are the same thing here: a network nobody entered.
 /*
  * Base64, written here rather than taken from the core's own. Two reasons, and the second is
  * the better one: the core offers only an encoder anyway, and its encoder answers an Arduino
@@ -75,6 +73,12 @@ void ToBase64(const char* plain, size_t length, char* target, size_t capacity)
     target[out] = STD_NULL_CHARACTER;
 }
 
+/*
+ * Reads one stored string into a buffer that has room for it, terminator included. An empty
+ * answer and a missing key are meant to be the same thing here: a network nobody entered. The
+ * framework's getString() counts the terminator, though, so only a missing key answers 0; an
+ * empty value answers 1 and reads as stored - see the warning at System::StartNetwork().
+ */
 StdReturnType ReadStoredString(const char* key, char* string, size_t capacity)
 {
     string[0u] = STD_NULL_CHARACTER;
@@ -127,10 +131,6 @@ StdReturnType System::GetFreeMemoryInKibibytes(uint16_t& free_memory) const
     return kEOk;
 }
 
-/*! \brief          The address the clock answers on
- *
- *  \return         kEOk if the clock has joined a network and the address fits the buffer
- */
 StdReturnType System::GetNetworkAddress(char* string) const
 {
     string[0u] = STD_NULL_CHARACTER;
@@ -140,10 +140,6 @@ StdReturnType System::GetNetworkAddress(char* string) const
     return CopyIfItFits(WiFi.localIP().toString().c_str(), string, kAddressStringLength);
 }
 
-/*! \brief          The received signal strength in dBm
- *
- *  \return         kEOk if the clock has joined a network
- */
 StdReturnType System::GetLinkQuality(char* string) const
 {
     string[0u] = STD_NULL_CHARACTER;
@@ -154,12 +150,6 @@ StdReturnType System::GetLinkQuality(char* string) const
     return kEOk;
 }
 
-/*! \brief          The network the clock is configured for
- *  \details        What was stored, and what was compiled in when nothing was stored -
- *                  in that order, because the stored one is the later word.
- *
- *  \return         kEOk if there is a network to name
- */
 StdReturnType System::GetNetworkSsid(char* ssid) const
 {
     if(ReadStoredString(kSsidKey, ssid, kSsidStringLength) == kEOk) { return kEOk; }
@@ -177,17 +167,6 @@ bool System::IsNetworkConfigured() const
     return GetNetworkSsid(ssid) == kEOk;
 }
 
-/*! \brief          Stores what the clock is to join, and joins it
- *  \details        Both halves are written before anything is joined, so that a clock that
- *                  loses power in the middle of this comes back with either the old pair
- *                  or the new one rather than with one of each.
- *
- *                  An empty name is how a network is taken away again, which is what puts
- *                  the access point back and is the way out of a typo that cannot be
- *                  corrected over the network it broke.
- *
- *  \return         kEOk if the pair was stored
- */
 StdReturnType System::SetNetworkCredentials(const char* ssid, const char* password)
 {
     if((ssid == nullptr) || (password == nullptr)) { return kENotOk; }
@@ -207,20 +186,10 @@ StdReturnType System::SetNetworkCredentials(const char* ssid, const char* passwo
     return kEOk;
 }
 
-/*! \brief          Brings the network up as configured
- *  \details        A clock with credentials joins that network. A clock without opens one
- *                  of its own instead, because the console it is configured through is
- *                  reachable over the network and nowhere else - without the access point,
- *                  "configurable at runtime" would still mean a cable for the first time.
- *
- *                  The access point is open, and closes as soon as a network is entered.
- *                  A pass phrase shared by every clock of this firmware would protect
- *                  nothing, and one printed on the case is a support case of its own.
- *
- *                  Nothing is printed from here. This runs from the command that changes
- *                  the credentials as well as from start-up, and a line printed in the
- *                  middle of a command lands inside that command\'s answer - which is how
- *                  this was found. The application says what happened instead.
+/*
+ * Without the access point, "configurable at runtime" would still mean a cable for the first
+ * time. A pass phrase shared by every clock of this firmware would protect nothing, and one
+ * printed on the case is a support case of its own.
  */
 void System::StartNetwork()
 {
@@ -246,12 +215,6 @@ void System::StartNetwork()
     WiFi.begin(ssid, password);
 }
 
-/*! \brief          Carries out a restart that was asked for
- *  \details        From the application's tick, which is after the command's answer has
- *                  been printed and after the web interface has sent it on. Serial is
- *                  flushed first: the UART writes in the background, and a controller that
- *                  restarts with bytes still in that buffer cuts its own answer in half.
- */
 void System::PerformPendingRestart()
 {
     if(!restart_pending_) { return; }
@@ -260,13 +223,10 @@ void System::PerformPendingRestart()
     ESP.restart();
 }
 
-/*! \brief          Asks the network for the time again
- *  \details        The same call the application makes at start-up rather than a reach
- *                  into SNTP: installing the servers again is what restarts the query, and
- *                  it keeps the zone rule in one place - a second installation of the
- *                  servers alone would leave the rule to be repeated here.
- *
- *  \return         kEOk if there is a network to ask over
+/*
+ * The same call the application makes at start-up rather than a reach into SNTP: installing
+ * the servers again is what restarts the query, and it keeps the zone rule in one place - a
+ * second installation of the servers alone would leave the rule to be repeated here.
  */
 StdReturnType System::ResynchroniseTime()
 {
@@ -276,17 +236,15 @@ StdReturnType System::ResynchroniseTime()
     return kEOk;
 }
 
-/*! \brief          Joins the network again
- *  \details        Refused where no network was ever configured, which is a clock running
- *                  on the serial line alone - there is nothing to reconnect to, and
- *                  answering kEOk would say there was.
- *
- *  \return         kEOk if the attempt was started
+/*
+ * Meant to be refused where no network was ever configured, which is a clock running on the
+ * serial line alone - there is nothing to reconnect to, and answering kEOk would say there
+ * was. What it asks is narrower than that: see the warning in System.h.
  */
 StdReturnType System::ReconnectNetwork()
 {
-    // An unset SSID is a configuration that was never filled in, the same test the
-    // application makes before it joins at all.
+    // Only the compiled-in SSID is asked for here; a network stored over the console is not
+    // seen. IsNetworkConfigured() would see both.
     if(sizeof(WORDCLOCK_WIFI_SSID) <= 1u) { return kENotOk; }
 
     if(!WiFi.reconnect()) { return kENotOk; }
@@ -294,18 +252,6 @@ StdReturnType System::ReconnectNetwork()
     return kEOk;
 }
 
-/*! \brief          The password the console asks for, and whether what arrived matches
- *
- *  \details        Encoded once and compared as a string, because the core here can encode
- *                  base64 and not decode it - so the cheaper direction is to build the value
- *                  a browser would send and compare that, rather than to unpack what it did
- *                  send. The user name is fixed by the same decision and is not a secret.
- *
- *                  Read from the store on every request rather than cached. A request is a
- *                  network round trip and this is a flash read of sixty bytes, so the copy
- *                  that could fall behind is not worth having - and a password changed by
- *                  command takes effect on the next request rather than on the next restart.
- */
 bool System::IsConsoleProtected() const
 {
     char password[kPasswordStringLength]{};
@@ -313,6 +259,11 @@ bool System::IsConsoleProtected() const
     return ReadStoredString(kConsolePasswordKey, password, kPasswordStringLength) == kEOk;
 }
 
+/*
+ * Encoded once and compared as a string, because the core here can encode base64 and not
+ * decode it - so the cheaper direction is to build the value a browser would send and compare
+ * that, rather than to unpack what it did send.
+ */
 bool System::IsConsoleCredentialValid(const char* credential) const
 {
     if(credential == nullptr) { return false; }
