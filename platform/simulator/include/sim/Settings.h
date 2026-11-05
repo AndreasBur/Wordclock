@@ -18,10 +18,18 @@
 #include "StandardTypes.h"
 #include "PixelsFrame.h"
 
-/*
- * A dialog rather than a frame: that is what gets it centred over the main window
- * instead of dropped wherever the compositor pleases, see the constructor. Shown with
- * Show(), not ShowModal(), so it does not block the main window.
+/*!
+ * \brief The settings window: the controls that stand in for hardware the PC does not have, the
+ *        light sensor's illuminance and the clock chip's temperature.
+ *
+ * The illuminance slider sets the simulated reading of BH1750, as a percentage of
+ * BH1750_CALIBRATION_MAX_DEFAULT_LX_VALUE. The temperature slider and the Sensor connected box
+ * set the simulated reading of DS3231, or clear it while the box is not ticked, which it is not
+ * at first.
+ *
+ * A dialog rather than a frame: that is what gets it centred over the main window instead of
+ * dropped wherever the compositor pleases, see the constructor. Shown with Show(), not ShowModal(),
+ * so it does not block the main window. Closing it hides it.
  */
 class Settings : public wxDialog
 {
@@ -54,29 +62,33 @@ class Settings : public wxDialog
 
     DECLARE_EVENT_TABLE()
 
-    // functions
-    Settings(wxWindow*, const wxString&);
+    Settings(wxWindow* parent, const wxString& title);
     ~Settings();
 
-    void OnClose(wxCloseEvent&);
-    void OnIlluminance(wxCommandEvent&);
-    void OnTemperature(wxCommandEvent&);
-    void OnTemperatureConnected(wxCommandEvent&);
+    void OnClose(wxCloseEvent& event);
+    void OnIlluminance(wxCommandEvent& event);
+    void OnTemperature(wxCommandEvent& event);
+    void OnTemperatureConnected(wxCommandEvent& event);
 
     void ApplyTemperature();
 
-    wxBoxSizer* CreateSizerAll(wxWindow*);
-    wxBoxSizer* CreateSizerIlluminance(wxWindow*);
-    wxBoxSizer* CreateSizerTemperature(wxWindow*);
+    wxBoxSizer* CreateSizerAll(wxWindow* parent);
+    wxBoxSizer* CreateSizerIlluminance(wxWindow* parent);
+    wxBoxSizer* CreateSizerTemperature(wxWindow* parent);
 
   public:
+    /*!
+     * \brief Returns the one settings window, which the first call creates, hidden and centred over
+     *        the window of PixelsFrame, its parent.
+     *
+     * \return The settings window.
+     */
     static Settings& GetInstance() {
         static Settings* p_singleton_instance = new Settings(&PixelsFrame::GetInstance(), _("Wordclock Settings"));
         return *p_singleton_instance;
     }
 
-    // methods
-    /* Brings the window up, whether it was never shown or only hidden. */
+    /*! \brief Brings the window up, whether it was never shown or only hidden. */
     void Reveal() {
         Show();
         Raise();

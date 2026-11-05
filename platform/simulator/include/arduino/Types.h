@@ -14,7 +14,9 @@
 
 #include <stdint.h>
 
+/*! \brief An unsigned 8-bit number, as Arduino's byte. */
 typedef uint8_t byte; // NOLINT(readability-identifier-naming)
+/*! \brief A truth value, as Arduino's boolean. */
 typedef bool    boolean; // NOLINT(readability-identifier-naming)
 
 #endif // _ARDUINO_TYPES_H_

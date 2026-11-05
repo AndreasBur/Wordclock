@@ -71,12 +71,12 @@ wxBoxSizer* Settings::CreateSizerIlluminance(wxWindow* parent)
     return sizer_illuminance;
 }
 
-/*! \brief          Builds the group that stands in for the clock chip's thermometer
- *  \details        The check box is what the slider alone could not express: a clock built
- *                  without the chip, and every clock until the chip has answered once. The
- *                  temperature overlay stays away in that state, which is the behaviour
- *                  that has to be tryable here. It starts cleared for the same reason -
- *                  the simulator has no chip until somebody says it has.
+/*
+ * Builds the group that stands in for the clock chip's thermometer. The check box is what the
+ * slider alone could not express: a clock built without the chip, and every clock until the
+ * chip has answered once. The temperature overlay stays away in that state, which is the
+ * behaviour that has to be tryable here. It starts cleared for the same reason - the simulator
+ * has no chip until somebody says it has.
  */
 wxBoxSizer* Settings::CreateSizerTemperature(wxWindow* parent)
 {
@@ -134,12 +134,12 @@ void Settings::OnTemperatureConnected(wxCommandEvent &event)
     UNUSED(event);
 }
 
-/*! \brief          Hands the dialled-in reading to the simulated clock chip
- *  \details        Both controls end here, because between them they describe one state:
- *                  a chip that is there and reads this much, or no chip at all. Moving the
- *                  slider while the box is cleared therefore changes nothing yet, and
- *                  ticking the box afterwards puts that value in - which is the order
- *                  somebody trying the overlay out will use it in.
+/*
+ * Hands the dialled-in reading to the simulated clock chip. Both controls end here, because
+ * between them they describe one state: a chip that is there and reads this much, or no chip at
+ * all. Moving the slider while the box is cleared therefore changes nothing yet, and ticking the
+ * box afterwards puts that value in - which is the order somebody trying the overlay out will
+ * use it in.
  */
 void Settings::ApplyTemperature()
 {

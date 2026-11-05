@@ -262,11 +262,6 @@ void PixelsFrame::RenderAllPixels()
     }
 }
 
-/*
- * Called once per application tick rather than from inside every pixel write, so the
- * window is repainted at most once per pass over the firmware's tasks - and not at all
- * on the ticks where the firmware wrote nothing.
- */
 void PixelsFrame::Render()
 {
     Pixels& pixels = Pixels::GetInstance();

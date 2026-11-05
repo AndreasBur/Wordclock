@@ -12,12 +12,6 @@
 /* reads the firmware's answers back into readable lines */
 #include "sim/MessageDecoder.h"
 
-/*! \brief          hands the firmware the next character that was typed
- *  \details        Takes it off the front, the way a real port does, so a line arrives
- *                  over as many calls as it has characters.
- *
- *  \return         the character, or a space if there is nothing to read
- */
 char SerialShim::read()
 {
     char first_char{' '};
@@ -32,10 +26,6 @@ char SerialShim::read()
     return first_char;
 }
 
-/*! \brief          hands the line in the input field over to be read
- *  \details        Only while nothing is waiting: read() drains a line one character at a
- *                  time, and a second one written over it would be lost.
- */
 void SerialShim::SendInput()
 {
     if(!IsAttached()) { return; }
@@ -53,19 +43,20 @@ void SerialShim::AppendOutput(const wxString& text)
     output_line_ += text;
 }
 
-/*! \brief          closes the line the firmware has been printing and reads it back
- *  \details        An answer gets its readable form underneath, indented to show it
- *                  belongs to the line above; the decoder brings its own layout. The raw
- *                  line stays: it is what actually went over the wire, which is what
- *                  matters when the protocol itself is in doubt. Anything the decoder does
- *                  not recognise — an error line, or plain text — passes through untouched.
+/*
+ * Closes the line the firmware has been printing and reads it back. An answer gets its
+ * readable form underneath, indented to show it belongs to the line above; the decoder brings
+ * its own layout. The raw line stays: it is what actually went over the wire, which is what
+ * matters when the protocol itself is in doubt. Anything the decoder does not recognise, such
+ * as plain text, passes through untouched.
  */
 void SerialShim::FinishOutputLine()
 {
     /*
      * The browsers first, and outside the attached check: they are watching whether or not a
      * window has handed its controls over, and an answer that reached one front end and not
-     * the other is the confusing half.
+     * the other is the confusing half. AppendOutput() collects nothing before the controls
+     * are attached, though, so until then the line handed over is empty.
      */
     if(line_sink_ != nullptr) { line_sink_(output_line_.utf8_str()); }
 

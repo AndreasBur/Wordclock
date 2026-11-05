@@ -93,11 +93,11 @@ wxBoxSizer* MessageBuilder::CreateSizerAll(wxWindow* parent)
     return sizer_all;
 }
 
-/*! \brief          brings the option rows in line with the selected command
- *  \details        Rows beyond the command's option list are hidden. The ones in use are
- *                  reset rather than left as they were, so an argument typed for a
- *                  different command cannot be carried over into this one under a short
- *                  name that happens to sit at the same position.
+/*
+ * Brings the option rows in line with the selected command. Rows beyond the command's option
+ * list are hidden. The ones in use are reset rather than left as they were, so an argument
+ * typed for a different command cannot be carried over into this one under a short name that
+ * happens to sit at the same position.
  */
 void MessageBuilder::ShowOptionsOfSelectedCommand()
 {
@@ -162,12 +162,11 @@ void MessageBuilder::ShowOptionsOfSelectedCommand()
     UpdatePreview();
 }
 
-/*! \brief          assembles the message from the selected command and its ticked options
- *  \details        Same shape the parsers expect: the command number, then one
- *                  "-<short name><argument>" per option. A command on its own is a
- *                  request for the current settings, so no option needs to be ticked.
- *
- *  \return         the message, without the newline the Serial shim adds when it is sent
+/*
+ * Assembles the message from the selected command and its ticked options, without the newline
+ * the Serial shim adds when it is sent. Same shape the parsers expect: the command number, then
+ * one "-<short name><argument>" per option. A command on its own is a request for the current
+ * settings, so no option needs to be ticked.
  */
 wxString MessageBuilder::BuildMessage() const
 {
@@ -200,10 +199,8 @@ void MessageBuilder::OnCommand(wxCommandEvent &event)
     UNUSED(event);
 }
 
-/*! \brief          follows a ticked or unticked option
- *  \details        The row is taken from the event's id, which is what the contiguous
- *                  ranges of the option widgets are for.
- */
+// Follows a ticked or unticked option. The row is taken from the event's id, which is what the
+// contiguous ranges of the option widgets are for.
 void MessageBuilder::OnOptionUsed(wxCommandEvent &event)
 {
     const byte index = static_cast<byte>(event.GetId() - kIdCheckboxOptionFirst);
@@ -218,12 +215,11 @@ void MessageBuilder::OnOptionChanged(wxCommandEvent &event)
     UNUSED(event);
 }
 
-/*! \brief          hands the message to the input field, without sending it
- *  \details        Deliberately not sent: it can be corrected or extended by hand there
- *                  first, and Send stays the one place a message leaves for the firmware.
- *                  The window closes with it, since what there was to do here is done —
- *                  hidden rather than destroyed, so the next Create brings back the
- *                  command that was selected.
+/*
+ * Hands the message to the input field, without sending it. Deliberately not sent: it can be
+ * corrected or extended by hand there first, and Send stays the one place a message leaves for
+ * the firmware. The window closes with it, since what there was to do here is done - hidden
+ * rather than destroyed, so the next Create brings back the command that was selected.
  */
 void MessageBuilder::OnInsert(wxCommandEvent &event)
 {
