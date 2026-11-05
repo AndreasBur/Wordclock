@@ -18,7 +18,6 @@
 IMPLEMENT_APP(WordclockApp);
 
 wxBEGIN_EVENT_TABLE(WordclockApp, wxApp)
-    EVT_CLOSE(WordclockApp::OnClose)
     EVT_TIMER(kTimerId, WordclockApp::OnTimer)
 wxEND_EVENT_TABLE()
 /*! \endcond */
@@ -30,7 +29,15 @@ WordclockApp::WordclockApp() : timer_(this, kTimerId)
 
 bool WordclockApp::OnInit()
 {
-    PixelsFrame::GetInstance().Show();
+    PixelsFrame& frame = PixelsFrame::GetInstance();
+
+    /*
+     * Bound to the window rather than listed in the application's table, where it never ran:
+     * the window handles its close itself and does not pass it on, so the timer went on
+     * ticking into a window that was gone. A bound handler runs before the window's own.
+     */
+    frame.Bind(wxEVT_CLOSE_WINDOW, &WordclockApp::OnClose, this);
+    frame.Show();
     WebHost::GetInstance().Begin();
     return true;
 }
@@ -39,7 +46,8 @@ void WordclockApp::OnClose(wxCloseEvent &event)
 {
     timer_.Stop();
     WebHost::GetInstance().End();
-    UNUSED(event);
+    // On to the window's own handler, which destroys it.
+    event.Skip();
 }
 
 void WordclockApp::OnTimer(wxTimerEvent& event)

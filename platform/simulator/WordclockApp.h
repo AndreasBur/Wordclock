@@ -46,9 +46,10 @@ class WordclockApp : public wxApp
         /*!
          * \brief Stops the timer and closes the web host's sockets.
          *
-         * \param[in] event The close event; it is not read.
-         * \note The window's own close handler takes the close event and does not pass it on, so
-         *       closing the window does not reach this.
+         * Bound to the window's close event in OnInit(), it runs before the window's own handler,
+         * and passes the event on to it, which destroys the window.
+         *
+         * \param[in,out] event The close event, passed on.
          */
         void OnClose(wxCloseEvent& event);
 

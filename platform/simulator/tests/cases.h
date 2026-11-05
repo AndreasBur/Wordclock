@@ -67,6 +67,9 @@ void TestClockWordsComparison();
 /* date_test.cpp */
 void TestWeekdayOfEveryDate();
 
+/* serial_shim_test.cpp */
+void TestSerialShimSpeaksLatin1();
+
 /* scheduler_test.cpp */
 void TestSchedulerSpeedRoundTrip();
 void TestUptimeCountsWithoutWrapping();
