@@ -246,7 +246,7 @@ Which network the clock joins, and the reason it no longer has to be flashed in.
 ```
 13                              # -> 13 S=MyNetwork Error=0
 13 -SMyNetwork -Psecret         # store the pair and join
-13 -S -P                        # forget it, and open the access point again
+13 -S -P                        # forget it: the compiled-in network, or the access point
 ```
 
 Both halves or neither. A command carrying only one of them is refused with `Error=8`
@@ -303,7 +303,7 @@ From
 | 28 | Overlay abort — end the overlay that is showing |
 | 29 | Settings save — write the configuration to the store now instead of within the next two seconds |
 | 30 | Settings reset — every setting back to what a clock starts with, and the store emptied |
-| 31 | System restart — carried out on the next tick, so this command's answer still goes out |
+| 31 | System restart — carried out at the end of the tick, so this command's answer still goes out; the simulator refuses it |
 | 32 | Time resynchronise — ask the time server again, for the clock that came up while it was unreachable |
 | 33 | Network reconnect — join the network again |
 | 34 / 35 | Animation next / previous — one further through the list and one back, wrapping at both ends. They step the *selection*, so they mean what `9 -A<id>` means: the animation runs at the next word change, not now. "No animation" is part of the round rather than skipped, because a knob is the only way back to it for somebody with no phone |

@@ -115,8 +115,9 @@ file is git-ignored:
 #define WORDCLOCK_WIFI_PASSWORD "..."
 ```
 
-Without an SSID the clock still boots, says so on the console and runs without a
-network. The time then stays unset, because there is no other time source (see below).
+Without an SSID, and with none entered over the console, the clock still boots, says so on
+the console and opens its access point, `Wordclock`, to be configured from. The time then
+comes from the DS3231 where one is fitted, and stays unset where none is (see below).
 
 The LED data pin is **not** configured here. It comes from `DISPLAY_DATA_PIN` in
 [`../../firmware/inc/Display/Display.h`](../../firmware/inc/Display/Display.h), like
@@ -377,9 +378,9 @@ and why it takes two ticks, is in [`Power.h`](../../firmware/inc/Power/Power.h).
 ### The I²C devices
 
 - **I²C address.** `BH1750_I2C_ADDR` is 0x23 here, the datasheet's address for ADDR tied
-  low (0x5C when high). Both the simulator stub and the xmega driver carry 0x76, which is
-  neither — harmless in a stub that never opens a bus, but a sensor addressed that way
-  stays silent.
+  low (0x5C when high). The simulator's stub carries 0x76, as the xmega driver it came from
+  did, which is neither — harmless in a stub that never opens a bus, but a sensor addressed
+  that way stays silent.
 - **The clock chip shares that bus.** `DS3231_I2C_ADDR` is 0x68 and cannot be changed —
   the chip has no address pins. It keeps the time over a power cut and measures a
   temperature, and both need the backup cell in its holder: without one it comes up

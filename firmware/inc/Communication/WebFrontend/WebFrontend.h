@@ -223,7 +223,8 @@ class WebFrontend
     /*!
      * \brief Sends one finished line to whoever is connected, as a text frame.
      *
-     * Called from the firmware's task through WordclockSerial's line sink, not from a server's. A
+     * Called through WordclockSerial's line sink from whatever printed: the firmware's task, and on
+     * the ESP32 the web server's as well, which WordclockSerial's lock keeps apart. A
      * send that fails is not retried and the client is not dropped here - a backend's own close
      * hook owns that, and dropping a client from this side would race with it.
      *

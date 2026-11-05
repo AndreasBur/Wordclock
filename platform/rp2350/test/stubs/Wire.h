@@ -13,7 +13,8 @@
  * prepares nothing gets the silent bus the drivers have to cope with.
  *
  * The pin setters are separate calls here, unlike the ESP32's begin(sda, scl, freq), and
- * they are what the drivers check - so the stub records them and can be made to refuse.
+ * a pin they will not take ends in panic() on the target - so the stub records them and
+ * can be made to refuse.
  */
 struct TwoWire {
     std::vector<uint8_t> Response;
