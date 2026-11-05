@@ -267,12 +267,10 @@ class SerialPort
      *
      * Only for the paths that are about to stop the processor - a restart otherwise cuts its own
      * answer off mid-sentence. It waits for the queue to empty, then for the USART's transmit
-     * complete flag `TXCIF`.
+     * complete flag `TXCIF`, which the transmit handler clears before every character, so that it
+     * is set once the last one has left the shift register. With nothing sent yet, it returns at
+     * once.
      *
-     * \warning Nothing clears `TXCIF`, so once a transmission has completed the flag stays set, and
-     *          the second wait ends at once: the last characters can still be in the USART when
-     *          flush() returns. Called with the queue empty before anything has been sent, it never
-     *          returns: the flag is clear from reset, and nothing is left to set it.
      */
     void flush(); // NOLINT(readability-identifier-naming)
 };

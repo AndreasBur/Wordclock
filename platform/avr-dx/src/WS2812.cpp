@@ -157,6 +157,12 @@ void WS2812::Init()
 bool WS2812::IsBusy() const
 {
     if(frame_position < frame_length) { return true; }
+    /*
+     * Before the first frame there is no transmission to wait for. TXCIF is 0 after reset and
+     * only a finished transmission sets it, so asked from the start it held every Send() off,
+     * and the strip never got a frame.
+     */
+    if(frame_length == 0u) { return false; }
 
     return (USART0.STATUS & USART_TXCIF_bm) == 0u;
 }

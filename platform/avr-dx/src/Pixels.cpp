@@ -44,13 +44,6 @@ void Pixels::FillFrameBuffer() const
 
 StdReturnType Pixels::TransmitFrame()
 {
-    /*
-     * Not waited for: a frame still on the wire means the previous tick's is barely done,
-     * and the display is redrawn on the next one anyway. Blocking here would hold up the
-     * clock for a frame nobody would have seen.
-     */
-    if(WS2812::GetInstance().IsBusy()) { return kENotOk; }
-
     FillFrameBuffer();
 
     return WS2812::GetInstance().Send(frame_buffer, kFrameSize);
@@ -75,6 +68,13 @@ StdReturnType Pixels::Render()
 
     if(!dirty_) { return kEOk; }
     if(!initialised_) { return kENotOk; }
+    /*
+     * Not waited for, and the mark kept: a frame still on the wire means the previous tick's
+     * is barely done, and this one goes out on the next tick. Blocking here would hold up the
+     * clock; dropping it, as this did, left the strip on the frame before until something
+     * else was drawn - the last step of an animation, say, until the next word change.
+     */
+    if(WS2812::GetInstance().IsBusy()) { return kEOk; }
 
     const StdReturnType result = TransmitFrame();
     // Cleared even when the transmission failed, so a strip that does not take the frame

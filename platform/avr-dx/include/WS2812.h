@@ -116,15 +116,13 @@ class WS2812
      * this first. Both halves are needed: the queue can be empty while the last byte is still in
      * the shift register, and starting a frame then would run the two together without the reset
      * gap between them. So it is busy while bytes of the frame are left to feed, and until the
-     * USART's transmit complete flag `TXCIF`, which Send() clears, is set again.
+     * USART's transmit complete flag `TXCIF`, which Send() clears, is set again. Before the first
+     * frame it is not busy: `TXCIF` is clear after reset, and there is no transmission to wait for.
      *
      * \return True while a frame is going out.
      * \note Not busy does not mean the strip has latched the frame: nothing here waits
      *       WS2812_RESET_DURATION_US after the last byte. A caller that sends at most one frame per
      *       tick, as Pixels does, keeps the frames apart.
-     * \warning Nothing but a completed transmission sets `TXCIF`, and the data sheet gives it as
-     *          clear after reset. Before the first frame has gone out, IsBusy() is therefore true,
-     *          and Send() refuses every frame, the first one included.
      */
     bool IsBusy() const;
 
@@ -142,7 +140,6 @@ class WS2812
      *         is then sent, and a frame on the wire goes on.
      * \pre `frame` outlives the transmission, which is why the caller keeps it rather than passing
      *      a temporary, and does not change until IsBusy() is false.
-     * \warning Before the first frame has gone out, it refuses every frame; see IsBusy().
      */
     StdReturnType Send(const byte* frame, uint16_t length);
 };

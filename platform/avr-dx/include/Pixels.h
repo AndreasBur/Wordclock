@@ -238,7 +238,9 @@ class Pixels
      * \brief Returns whether the buffer is marked to be sent: from a write, Show() or
      *        ResumeOutput(), until the application's tick has sent it.
      *
-     * Render() clears it once Init() has run, even when the transmission failed. It starts marked,
+     * Render() clears it once it has handed the frame over, even when the driver refused it; a
+     * frame it could not hand over yet, before Init() or while the previous one is still going out,
+     * leaves it marked. It starts marked,
      * so the first render establishes the strip's state.
      *
      * \return True while the buffer is marked.
@@ -254,13 +256,13 @@ class Pixels
      * pixel, which reads as a wiring fault rather than as a software one.
      *
      * It hands the frame to WS2812 and returns: the driver's interrupt sends it after the call. A
-     * frame still going out is not waited for, and the new one is then not taken.
+     * frame still going out is not waited for: the mark stays, and the new frame goes out on the
+     * next tick.
      *
-     * \return kEOk if a frame went out or none was due (also while the output is suspended, which
-     *         leaves the mark), or kENotOk if Init() has not run, which leaves the mark too, or if
-     *         the driver did not take the frame, which clears it.
-     * \note A frame the driver did not take, as the previous one was still going out, is not sent
-     *       until something marks the buffer again.
+     * \return kEOk if a frame went out or none was due - also while the output is suspended or the
+     *         previous frame is still going out, which leave the mark - or kENotOk if Init() has
+     *         not run, which leaves the mark too, or if the driver refused the frame, which clears
+     *         it.
      */
     StdReturnType Render();
 

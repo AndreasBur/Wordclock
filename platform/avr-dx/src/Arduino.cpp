@@ -48,6 +48,8 @@ constexpr uint16_t kReceiveBufferMask{ARDUINO_SERIAL_RECEIVE_BUFFER_SIZE - 1u};
 volatile char transmit_buffer[ARDUINO_SERIAL_TRANSMIT_BUFFER_SIZE]{};
 volatile uint16_t transmit_head{0u};
 volatile uint16_t transmit_tail{0u};
+// Whether a character has been handed to the transmitter, so that flush() has one to wait for.
+volatile bool transmit_started{false};
 
 volatile char receive_buffer[ARDUINO_SERIAL_RECEIVE_BUFFER_SIZE]{};
 volatile uint16_t receive_head{0u};
@@ -74,8 +76,12 @@ ISR(USART1_DRE_vect)
         return;
     }
 
+    // Cleared before every character, so that TXCIF says the last one has left the shift
+    // register rather than that some character once did; flush() waits on it.
+    ARDUINO_SERIAL_USART.STATUS = USART_TXCIF_bm;
     ARDUINO_SERIAL_USART.TXDATAL = static_cast<uint8_t>(transmit_buffer[transmit_tail]);
     transmit_tail = (transmit_tail + 1u) & kTransmitBufferMask;
+    transmit_started = true;
 }
 
 /*
@@ -220,6 +226,8 @@ void SerialPort::flush()
     while(transmit_head != transmit_tail) {
         /* Waiting for the handler to empty the queue. */
     }
+    // Nothing sent yet, nothing to wait for: TXCIF is 0 after reset and would never come.
+    if(!transmit_started) { return; }
 
     while((ARDUINO_SERIAL_USART.STATUS & USART_TXCIF_bm) == 0u) {
         /* And for the last character to have left the shift register. */
