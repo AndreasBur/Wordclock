@@ -8,6 +8,10 @@ pio_hw pio0_hw{};
 pio_hw pio1_hw{};
 
 int pio_add_program(PIO, const pio_program_t*) { return 0; }
+void pio_remove_program(PIO, const pio_program_t*, uint) { }
+bool pio_sm_is_claimed(PIO, uint) { return false; }
+void pio_sm_claim(PIO, uint) { }
+void pio_sm_unclaim(PIO, uint) { }
 pio_sm_config pio_get_default_sm_config(void) { return {}; }
 void sm_config_set_wrap(pio_sm_config*, uint, uint) { }
 void sm_config_set_sideset(pio_sm_config*, uint, bool, bool) { }

@@ -13,6 +13,7 @@
 
 #include "Arduino.h"
 #include "Pixels.h"
+#include "WS2812Pio.h"
 #include "check.h"
 
 #include <cstdio>
@@ -29,7 +30,19 @@ static size_t captured_count = 0;
 pio_hw pio0_hw{};
 pio_hw pio1_hw{};
 
-int pio_add_program(PIO, const pio_program_t*) { return 0; }
+/*
+ * What the driver holds of the block and the DMA, so the case before the frame can see that a
+ * call which gives up gives back what it had taken.
+ */
+static bool state_machine_claimed = false;
+static int programs_loaded = 0;
+static bool dma_channel_free = true;
+
+int pio_add_program(PIO, const pio_program_t*) { programs_loaded++; return 0; }
+void pio_remove_program(PIO, const pio_program_t*, uint) { programs_loaded--; }
+bool pio_sm_is_claimed(PIO, uint) { return state_machine_claimed; }
+void pio_sm_claim(PIO, uint) { state_machine_claimed = true; }
+void pio_sm_unclaim(PIO, uint) { state_machine_claimed = false; }
 pio_sm_config pio_get_default_sm_config(void) { return {}; }
 void sm_config_set_wrap(pio_sm_config*, uint, uint) { }
 void sm_config_set_sideset(pio_sm_config*, uint, bool, bool) { }
@@ -44,7 +57,7 @@ void pio_sm_set_enabled(PIO, uint, bool) { }
 uint pio_get_dreq(PIO, uint, bool) { return 0u; }
 uint32_t clock_get_hz(clock_handle_t) { return 150u * 1000u * 1000u; }
 
-int dma_claim_unused_channel(bool) { return 0; }
+int dma_claim_unused_channel(bool) { return dma_channel_free ? 0 : -1; }
 dma_channel_config dma_channel_get_default_config(uint) { return {}; }
 void channel_config_set_transfer_data_size(dma_channel_config*, dma_channel_transfer_size) { }
 void channel_config_set_read_increment(dma_channel_config*, bool) { }
@@ -70,8 +83,28 @@ static byte Blue(uint32_t word)  { return static_cast<byte>((word >> 8u) & 0xFFu
 
 int main()
 {
+    /*
+     * Before the frame, because the transmitter is a singleton that, once ready, stays so. The
+     * state machine used to be taken without asking the SDK, so a library that had claimed it
+     * shared it with the strip; and a call that found no DMA channel left the program loaded.
+     */
+    WS2812Pio& transmitter = WS2812Pio::GetInstance();
+    state_machine_claimed = true;
+    transmitter.Init(10);
+    Check(!transmitter.IsReady() && programs_loaded == 0,
+          "a state machine claimed elsewhere is left alone, and nothing is loaded");
+
+    state_machine_claimed = false;
+    dma_channel_free = false;
+    transmitter.Init(10);
+    Check(!transmitter.IsReady() && programs_loaded == 0 && !state_machine_claimed,
+          "a call that finds no DMA channel gives back the program and the state machine");
+    dma_channel_free = true;
+
     Pixels& p = Pixels::GetInstance();
     p.Init(10);
+    Check(transmitter.IsReady() && programs_loaded == 1 && state_machine_claimed,
+          "a call that succeeds holds the state machine and the program");
 
     p.ClearPixels();
     p.SetPixel(0u, 10u, 20u, 30u);      // Red=10, Green=20, Blue=30

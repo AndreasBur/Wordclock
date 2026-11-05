@@ -20,6 +20,16 @@ inline std::map<std::string, std::string>& littleFsStore()
     return Store;
 }
 
+/*
+ * How many more bytes the filesystem takes before a write stops short, as a full or failing
+ * flash would make it. Unlimited unless a case sets it.
+ */
+inline size_t& littleFsWriteBudget()
+{
+    static size_t Budget = static_cast<size_t>(-1);
+    return Budget;
+}
+
 class File {
   private:
     std::string Path;
@@ -50,8 +60,10 @@ class File {
 
     size_t write(const uint8_t* Buffer, size_t Length) {
         if(!Writable) { return 0u; }
-        littleFsStore()[Path].append(reinterpret_cast<const char*>(Buffer), Length);
-        return Length;
+        const size_t Taken = (Length < littleFsWriteBudget()) ? Length : littleFsWriteBudget();
+        littleFsWriteBudget() -= Taken;
+        littleFsStore()[Path].append(reinterpret_cast<const char*>(Buffer), Taken);
+        return Taken;
     }
 
     void close() { Valid = false; }
@@ -84,6 +96,14 @@ struct LittleFSStub {
     bool mkdir(const char*) { return true; }
     bool exists(const char* Path) { return littleFsStore().count(Path) > 0u; }
     bool remove(const char* Path) { return littleFsStore().erase(Path) > 0u; }
+    // Over an existing file, as LittleFS's own rename does.
+    bool rename(const char* From, const char* To) {
+        const auto Found = littleFsStore().find(From);
+        if(Found == littleFsStore().end()) { return false; }
+        littleFsStore()[To] = Found->second;
+        littleFsStore().erase(From);
+        return true;
+    }
 
     File open(const char* Path, const char* Mode) {
         const bool Writable = (Mode[0] == 'w');
