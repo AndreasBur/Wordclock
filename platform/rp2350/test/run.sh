@@ -62,6 +62,10 @@ FLAGS=(-std=gnu++17 -Wall -Wextra -Werror)
 # compiled whole. This backend asks, the same way platformio.ini does for the real build.
 FLAGS+=(-DWEB_FRONTEND_SUPPORT=STD_ON)
 
+# A compiled-in pass phrase with no compiled-in network, so that a case can tell a stored open
+# network's empty pass phrase from this one: taken for none stored, the empty one was replaced.
+FLAGS+=('-DWORDCLOCK_WIFI_PASSWORD="compiled"')
+
 # WebInterface serves a header the build generates from web/ - the page, the manifest and
 # the two home screen icons. Produced by the same script PlatformIO calls, so the tests
 # compile against what the device would carry. Into the cache rather than into the temporary

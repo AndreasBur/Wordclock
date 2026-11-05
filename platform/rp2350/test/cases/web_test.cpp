@@ -19,6 +19,7 @@
 #include "Pixels.h"
 #include "System.h"
 #include "WebInterface.h"
+#include <WiFi.h>
 #include "WordclockSerial.h"
 #include "check.h"
 
@@ -480,6 +481,71 @@ int main()
               strcmp(password, "secret") == 0, "a password is taken up to the next option");
         run("16\n");
         Check(!System::GetInstance().IsConsoleProtected(), "and command 16 alone clears it");
+    }
+
+    /*
+     * The password at the web socket's handshake, as at every route. Without it, a client that
+     * opened /ws directly sent any command, 16 among them, which clears the password. The check
+     * sends nothing of its own: the library answers a refusal with 401.
+     */
+    {
+        const AwsHandshakeHandler& handshake = webStubState().SocketHandshake;
+        Check(static_cast<bool>(handshake), "the web socket checks its handshake");
+        Check(System::GetInstance().SetConsolePassword("secret") == kEOk, "a console password is set");
+
+        AsyncWebServerRequest refused;
+        refused.Authorised = false;
+        Check(handshake && !handshake(&refused) && !refused.AuthenticationRequested,
+              "a handshake without the password is refused, and the library left to answer it");
+        AsyncWebServerRequest accepted;
+        accepted.Authorised = true;
+        Check(handshake && handshake(&accepted), "and one with it is taken");
+
+        Check(System::GetInstance().SetConsolePassword("") == kEOk, "the password is cleared");
+        Check(handshake && handshake(&refused), "after which any handshake is taken");
+    }
+
+    /*
+     * The access point is not a joined network, though arduino-pico's WiFi.status() answers
+     * WL_CONNECTED for it: taken for one, a clock that came up in its access point never started
+     * the time servers once a network was entered.
+     */
+    {
+        System& system = System::GetInstance();
+        char address[64]{};
+
+        Check(system.SetNetworkCredentials("", "") == kEOk && WiFi.Mode == WIFI_AP, "with no network the access point opens");
+        WiFi.Status = WL_CONNECTED;
+        Check(!system.IsNetworkJoined() && system.GetNetworkAddress(address) == kENotOk,
+              "and the clock does not take it for a joined network");
+        Check(system.SetNetworkCredentials("Home", "homepass") == kEOk && WiFi.Mode == WIFI_STA &&
+              system.IsNetworkJoined(), "a network entered then is joined");
+
+        // A stored open network keeps its empty pass phrase; the compiled-in one replaced it.
+        Check(system.SetNetworkCredentials("Cafe", "") == kEOk && WiFi.Joined == "Cafe" && WiFi.JoinedWith.empty(),
+              "an open network is joined without the compiled-in pass phrase");
+        WiFi.Status = WL_IDLE_STATUS;
+        (void)system.SetNetworkCredentials("", "");
+    }
+
+    /*
+     * A refused update is printed from the tick, a line of its own: the server's callbacks run
+     * in an interrupt, and a line printed there landed inside the one loop() was printing.
+     */
+    {
+        static std::vector<std::string> lines;
+        lines.clear();
+        WordclockSerial::GetInstance().SetLineSink([](const char* line) { lines.emplace_back(line); });
+
+        littleFsStore().erase("/firmware.bin");
+        picoOTA = PicoOtaStub{};
+        request_authorised = true;
+        (void)Post("/update", image.substr(0u, 900u), image.size());
+        Check(lines.empty(), "a refused update prints nothing from the server's callback");
+        WebInterface::GetInstance().BroadcastFrame();
+        Check(lines.size() == 1u && lines[0].find("update refused") != std::string::npos,
+              "and its line comes on the next tick, whole");
+        WordclockSerial::GetInstance().SetLineSink(nullptr);
     }
 
     return Report();

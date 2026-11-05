@@ -38,10 +38,14 @@ using AwsEventHandler = std::function<void(AsyncWebSocket*, AsyncWebSocketClient
 
 enum { HTTP_GET = 1, HTTP_POST = 2 };
 
+// As the library has it: false refuses the handshake, which the library answers with 401.
+using AwsHandshakeHandler = std::function<bool(AsyncWebServerRequest*)>;
+
 struct WebStubStateType {
     std::map<std::string, ArRequestHandlerFunction> Routes;
     std::map<std::string, ArBodyHandlerFunction> BodyRoutes;
     AwsEventHandler SocketHandler;
+    AwsHandshakeHandler SocketHandshake;
     // What left as a text frame and what left as a binary one, kept apart because the
     // console sends answers as the first and the panel as the second.
     std::vector<std::string> Text;
@@ -119,6 +123,7 @@ class AsyncWebSocket {
     explicit AsyncWebSocket(const char*) { }
 
     void onEvent(AwsEventHandler Handler) { webStubState().SocketHandler = Handler; }
+    void handleHandshake(AwsHandshakeHandler Handler) { webStubState().SocketHandshake = Handler; }
     void textAll(const char* Message, size_t Length) { webStubState().Text.emplace_back(Message, Length); }
     void binaryAll(const char* Message, size_t Length) { webStubState().Binary.emplace_back(Message, Length); }
     size_t count() const { return webStubState().ClientCount; }

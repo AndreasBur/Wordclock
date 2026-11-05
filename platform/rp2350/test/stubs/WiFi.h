@@ -14,14 +14,20 @@ struct IPAddressStub { std::string toString() const { return ""; } };
 struct WiFiStub {
     void defaultLowPowerMode() { LowPower = true; }
     void noLowPowerMode() { LowPower = false; }
-    void begin(const char* Ssid, const char*) { Joined = (Ssid == nullptr) ? "" : Ssid; }
-    int status() { return WL_IDLE_STATUS; }
+    void begin(const char* Ssid, const char* Password) {
+        Joined = (Ssid == nullptr) ? "" : Ssid;
+        JoinedWith = (Password == nullptr) ? "" : Password;
+    }
+    // Set by the test: arduino-pico answers WL_CONNECTED while the access point is open, too.
+    int Status = WL_IDLE_STATUS;
+    int status() { return Status; }
     IPAddressStub localIP() { return {}; }
     int RSSI() { return 0; }
 
     /* What the test looks at to tell the two ways of coming up apart. */
     std::string AccessPoint;
     std::string Joined;
+    std::string JoinedWith;
     bool LowPower = false;
     int Mode = 0;
     void mode(int m) { Mode = m; }

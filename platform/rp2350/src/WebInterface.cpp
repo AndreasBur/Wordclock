@@ -23,6 +23,7 @@
 #include "WordclockSerial.h"
 
 #include <string.h>
+#include <atomic>
 
 namespace {
 // Named http_server rather than Server: the Arduino core has a class Server in the global
@@ -92,7 +93,7 @@ UploadType upload;
  * checking a blob the way the ESP32's does - that core can encode base64 and not decode it, and
  * this one has a server that needs neither.
  */
-bool IsRequestAuthorised(AsyncWebServerRequest* request)
+bool IsCredentialAccepted(AsyncWebServerRequest* request)
 {
     System& system = System::GetInstance();
 
@@ -103,10 +104,33 @@ bool IsRequestAuthorised(AsyncWebServerRequest* request)
 
     // Basic and not digest: what a browser sends for digest is a hash of a nonce this server
     // would have to keep, and over plain http the two are worth the same anyway.
-    if(request->authenticate(kConsoleUserName, password)) { return true; }
+    return request->authenticate(kConsoleUserName, password);
+}
+
+// The check, and the browser asked for the password where it fails.
+bool IsRequestAuthorised(AsyncWebServerRequest* request)
+{
+    if(IsCredentialAccepted(request)) { return true; }
 
     request->requestAuthentication(AsyncAuthType::AUTH_BASIC, kConsoleRealm);
     return false;
+}
+
+/*
+ * A refused update, for the next tick to print: the server's callbacks run in lwIP's background
+ * interrupt, and a line printed from there landed inside whatever line loop() was printing.
+ * Written only while no report is pending, so the tick never reads a reason being written.
+ */
+std::atomic<bool> update_refusal_pending{false};
+char update_refusal[101]{};
+
+void ReportUpdateRefusal(const char* reason)
+{
+    if(update_refusal_pending.load(std::memory_order_acquire)) { return; }
+
+    strncpy(update_refusal, reason, sizeof(update_refusal) - 1u);
+    update_refusal[sizeof(update_refusal) - 1u] = '\0';
+    update_refusal_pending.store(true, std::memory_order_release);
 }
 
 /*
@@ -242,8 +266,7 @@ void SendUpdateResult(AsyncWebServerRequest* request, bool ok, const char* reaso
          * what the buffer holds beside the frame.
          */
         (void)snprintf(answer, sizeof(answer), "{\"ok\":false,\"error\":\"%.100s\"}", reason);
-        Serial.print(F("Web: update refused - "));
-        Serial.println(reason);
+        ReportUpdateRefusal(reason);
     }
     answer[sizeof(answer) - 1u] = '\0';
 
@@ -393,6 +416,12 @@ void OnSocketEvent(AsyncWebSocket*, AsyncWebSocketClient*, AwsEventType type,
 StdReturnType WebInterface::Begin()
 {
     socket.onEvent(OnSocketEvent);
+    /*
+     * The password at the handshake, as every route asks for it: without this, a client that
+     * opened /ws directly sent any command, 16 among them, which clears the password. The
+     * library answers a refusal with 401 itself, so the check sends nothing of its own.
+     */
+    socket.handleHandshake(IsCredentialAccepted);
     http_server.addHandler(&socket);
 
     /*
@@ -450,6 +479,13 @@ void WebInterface::BroadcastLine(const char* line)
 
 void WebInterface::BroadcastFrame()
 {
+    // From the tick, so it is a line of its own; see ReportUpdateRefusal().
+    if(update_refusal_pending.load(std::memory_order_acquire)) {
+        Serial.print(F("Web: update refused - "));
+        Serial.println(update_refusal);
+        update_refusal_pending.store(false, std::memory_order_release);
+    }
+
     WebFrontend::GetInstance().BroadcastFrame();
 }
 

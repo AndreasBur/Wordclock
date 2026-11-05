@@ -99,6 +99,8 @@ class System
      * controller restarting inside the command would cut off mid-line.
      */
     bool restart_pending_{false};
+    // Whether StartNetwork() opened the access point rather than joining a network.
+    bool access_point_open_{false};
 
     System() { }
     ~System() { }
@@ -127,29 +129,25 @@ class System
      *
      * On the RP2350, the IPv4 address `WiFi.localIP()` gives, the address of the station
      * interface and the address to type into a browser. The clock counts as on a network while
-     * `WiFi.status()` answers `WL_CONNECTED`; otherwise this is refused. It is also refused if the
-     * address does not fit `string`.
+     * IsNetworkJoined() says so; otherwise this is refused. It is also refused if the address does
+     * not fit `string`.
      *
      * \param[out] string A buffer of kAddressStringLength.
      * \return kEOk, or kENotOk while the clock is on no network; `string` is then an empty string.
-     * \warning arduino-pico's `WiFi.status()` answers `WL_CONNECTED` also while the access point is
-     *          open. This then answers kEOk with the address of the station interface, which has
-     *          joined nothing, rather than refusing or naming the access point's address.
+     *         Refused while the access point is open, as IsNetworkJoined() is false then.
      */
     StdReturnType GetNetworkAddress(char* string) const;
 
     /*!
      * \brief Writes the received signal strength, in dBm.
      *
-     * On the RP2350, `WiFi.RSSI()` in decimal, refused while `WiFi.status()` does not answer
-     * `WL_CONNECTED`. A string rather than a number because it is negative, and the answer format
+     * On the RP2350, `WiFi.RSSI()` in decimal, refused while IsNetworkJoined() is false. A string
+     * rather than a number because it is negative, and the answer format
      * carries unsigned values.
      *
      * \param[out] string A buffer of kLinkQualityStringLength.
      * \return kEOk, or kENotOk while the clock is on no network; `string` is then an empty string.
-     * \warning While the access point is open, `WiFi.status()` answers `WL_CONNECTED` as well, so
-     *          this answers kEOk with what `WiFi.RSSI()` reports for a station that has joined
-     *          nothing.
+     *         Refused while the access point is open, as IsNetworkJoined() is false then.
      */
     StdReturnType GetLinkQuality(char* string) const;
 
@@ -177,6 +175,18 @@ class System
      * \return True if a network is configured.
      */
     bool IsNetworkConfigured() const;
+
+    /*!
+     * \brief Returns whether the clock has joined a network as a station.
+     *
+     * Not while the access point is open: arduino-pico's `WiFi.status()` answers `WL_CONNECTED`
+     * then as well, and taken for a joined network, it made a clock that came up in its access
+     * point report an address and start the time servers with no uplink - and, once a network
+     * was entered, never start them again.
+     *
+     * \return True while a network is joined.
+     */
+    bool IsNetworkJoined() const;
 
     /*!
      * \brief Stores the network the clock is to join, and joins it.
@@ -271,10 +281,9 @@ class System
      * instead.
      *
      * \note There is no automatic reconnect on this core. A clock whose network went away joins it
-     *       again only through ReconnectNetwork(), where the ESP32 recovers on its own.
-     * \warning A pass phrase stored empty, as for an open network, reads as none stored, so a clock
-     *          built with a WORDCLOCK_WIFI_PASSWORD joins the stored network with that compiled-in
-     *          pass phrase instead of with none.
+     *       again only through ReconnectNetwork(), where the ESP32 recovers on its own. The pass
+     *       phrase comes from where the name came from: a stored name takes the stored one, an open
+     *       network's empty one included, and the compiled-in name the compiled-in one.
      */
     void StartNetwork();
 
@@ -309,12 +318,11 @@ class System
      * same call the application makes once the link is up; the zone rule is already in place from
      * start. kEOk says the query was started, not that an answer arrived. What it is for is the
      * clock that came up while the time server was unreachable and has been showing nothing since.
-     * The clock counts as on a network while `WiFi.status()` answers `WL_CONNECTED`.
+     * The clock counts as on a network while IsNetworkJoined() says so.
      *
      * \return kEOk if the time was asked for, or kENotOk if there is no network to ask over; the
-     *         time is then left as it was.
-     * \warning While the access point is open, `WiFi.status()` answers `WL_CONNECTED` as well, so
-     *          this answers kEOk and starts the time servers with no link to reach them over.
+     *         time is then left as it was. Refused while the access point is open, as
+     *         IsNetworkJoined() is false then.
      */
     StdReturnType ResynchroniseTime();
 
