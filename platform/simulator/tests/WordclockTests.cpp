@@ -53,6 +53,12 @@ int main()
     TestClockModeStepsThroughEveryWording();
     TestClockWordsComparison();
     TestWeekdayOfEveryDate();
+    TestItoaWritesEveryInt32();
+    TestStringReverseTakesAnyLength();
+    TestStringCopyIntoNoRoom();
+    TestSignedConversionKeepsToTheType();
+    TestUnsignedConversionRefusesANegativeNumber();
+    TestFloatConversionKeepsToTheType();
     TestSerialShimSpeaksLatin1();
     TestAnimationStepsThroughEveryOne();
     TestFixedModeRunsEveryTimeAsTheFirst();

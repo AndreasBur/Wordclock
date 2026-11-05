@@ -64,12 +64,14 @@ class StringTools
      *
      * \param[out] destination The buffer, with room for `length` characters.
      * \param[in] source The string to copy, terminated.
-     * \param[in] length The size of `destination`, its terminator included.
-     * \pre `length` is at least 1. Below that, the copy runs far past `destination`.
+     * \param[in] length The size of `destination`, its terminator included. Below 1 there is no
+     *                   room even for the terminator, and `destination` is left as it was.
      */
     static void StringCopy(char* destination, const char* source, int length) {
-        strncpy(destination, source, length - 1u);
-        destination[length - 1u] = kNullCharacter;
+        if(length < 1) { return; }
+        const size_t size{static_cast<size_t>(length)};
+        strncpy(destination, source, size - 1u);
+        destination[size - 1u] = kNullCharacter;
     }
 
     /*!
@@ -80,43 +82,38 @@ class StringTools
      * \param[out] string The buffer, with room for the digits, the sign and the terminator: up to
      *                    11 characters and the terminator.
      * \return A pointer to the terminator in `string`.
-     * \warning `number` must not be `INT32_MIN`: it is made positive by negating it, which
-     *          overflows an `int32_t` for that one value.
      */
     static char* Itoa(int32_t number, char* string)
     {
-        int32_t i;
-        const int32_t sign = number;   /* record sign */
+        // The magnitude in an unsigned type, where negating INT32_MIN is defined; in an int32_t
+        // it overflows.
+        uint32_t magnitude{static_cast<uint32_t>(number)};
+        if(number < 0) { magnitude = 0u - magnitude; }
 
-        if (sign < 0) {
-            number = -number;          /* make n positive */
-        }
-        i = 0;
-        do {       /* generate digits in reverse order */
-            string[i++] = number % 10 + '0';   /* get next digit */
-        } while ((number /= 10) > 0);     /* delete it */
-        if (sign < 0)
-            string[i++] = '-';
-        string[i] = '\0';
+        size_t length{0u};
+        do {
+            string[length++] = static_cast<char>('0' + (magnitude % 10u));
+            magnitude /= 10u;
+        } while(magnitude > 0u);
+        if(number < 0) { string[length++] = '-'; }
+        string[length] = kNullCharacter;
+
+        // The digits came out last first.
         StringReverse(string);
-        return &string[i];
+        return &string[length];
     }
 
     /*!
      * \brief Reverses the characters of `string` in place, up to its terminator.
      *
-     * \param[in,out] string The string, terminated.
-     * \warning `string` must not be empty: one less than its length then wraps to the largest
-     *          `unsigned int`, and the characters swapped lie far past the string.
+     * \param[in,out] string The string, terminated; an empty one is left as it is.
      */
     static void StringReverse(char* string) {
-        unsigned int i, j;
-        char c;
-
-        for (i = 0, j = strlen(string)-1; i<j; i++, j--) {
-            c = string[i];
-            string[i] = string[j];
-            string[j] = c;
+        // `end` is one past the character swapped, so that an empty string needs no 0 - 1.
+        for(size_t begin = 0u, end = strlen(string); begin + 1u < end; begin++, end--) {
+            const char character{string[begin]};
+            string[begin] = string[end - 1u];
+            string[end - 1u] = character;
         }
     }
 
@@ -127,13 +124,11 @@ class StringTools
      * signed one. Both skip leading white space, take a plus or a minus sign, and stop at the
      * first character that is not a digit of `base`.
      *
-     * An unsigned `value` takes a number up to the largest its type holds. A larger one comes
-     * back as ResultType::kOverflow, with `value` set to that largest. A minus sign negates the
-     * number as an `unsigned long`, so `-1` is out of range for a `uint8_t` or a `uint16_t`.
-     *
-     * A signed `value` comes back as ResultType::kOverflow only for a number beyond the range of
-     * `long`. `value` is then set to the limit of its type on that side if the type is narrower
-     * than `long`, and left as it was otherwise.
+     * A number beyond the range of the type of `value` comes back as ResultType::kOverflow, with
+     * `value` set to the limit of the type on that side: 200 into an `int8_t` is 127, and a
+     * negative number into an unsigned type is 0. Only `-0` is taken by an unsigned type. The
+     * number is read as a `long` or an `unsigned long`, so for a type wider than that, as a
+     * 64-bit type on the AVR, a number beyond the `long` is out of range too.
      *
      * \param[in] string The string, with the number at its start.
      * \param[out] position The number of characters read, white space and sign included, or 0 if
@@ -143,9 +138,6 @@ class StringTools
      * \return ResultType::kOk if the number was stored in `value`, ResultType::kOverflow as above,
      *         or ResultType::kNoValue if `string` does not start with a number; `value` is then
      *         left as it was.
-     * \warning For a signed `value`, a number within the range of `long` but beyond that of the
-     *          type is cast to the type and comes back as ResultType::kOk: 200 into an `int8_t` is
-     *          -56.
      */
     template<typename Unsigned,
              std::enable_if_t<std::is_unsigned<Unsigned>::value>* = nullptr,
@@ -153,11 +145,17 @@ class StringTools
     static ResultType StringTo(const char* string, PositionType& position, Unsigned& value, uint8_t base = 10u) {
         char* end = nullptr;
         errno = 0;
-        uint64_t value_big = strtoul(string, &end, base);
+        const unsigned long value_big{strtoul(string, &end, base)};
         position = end - string;
 
         if(string == end) {
             return ResultType::kNoValue;
+        } else if((value_big != 0u) && (memchr(string, '-', static_cast<size_t>(end - string)) != nullptr)) {
+            // strtoul() takes a minus sign and negates the number as an unsigned long, which
+            // turns -1 into a number that fits a uint32_t on the AVR and none on the host. A minus
+            // among the characters read can only be that sign: no digit of any base is one.
+            value = 0u;
+            return ResultType::kOverflow;
         } else if(errno == ERANGE || value_big > std::numeric_limits<Unsigned>::max()) {
             value = std::numeric_limits<Unsigned>::max();
             return ResultType::kOverflow;
@@ -174,14 +172,15 @@ class StringTools
     static ResultType StringTo(const char* string, PositionType& position, Signed& value, uint8_t base = 10u) {
         char* end = nullptr;
         errno = 0;
-        int64_t value_big = strtol(string, &end, base);
+        const long value_big{strtol(string, &end, base)};
         position = end - string;
 
         if(string == end) {
             return ResultType::kNoValue;
-        } else if(errno == ERANGE) {
-            if(value_big > std::numeric_limits<Signed>::max()) { value = std::numeric_limits<Signed>::max(); }
-            if(value_big < std::numeric_limits<Signed>::min()) { value = std::numeric_limits<Signed>::min(); }
+        } else if(errno == ERANGE || value_big > std::numeric_limits<Signed>::max() ||
+                  value_big < std::numeric_limits<Signed>::min()) {
+            // On ERANGE strtol() returns LONG_MAX or LONG_MIN, so the sign still tells the side.
+            value = (value_big > 0) ? std::numeric_limits<Signed>::max() : std::numeric_limits<Signed>::min();
             return ResultType::kOverflow;
         } else {
             value = static_cast<Signed>(value_big);
@@ -196,10 +195,10 @@ class StringTools
      * fourth parameter is not used: it is there so that a call with a base compiles for every
      * type of `value`.
      *
-     * If strtod() reports the number out of range, ResultType::kOverflow comes back. `value` is
-     * then set to the largest value of its type if the number is above it, and otherwise to
-     * `std::numeric_limits<Float>::min()`, the smallest positive normalised value: for a negative
-     * number out of range and for one too close to zero.
+     * A number beyond the range of the type of `value` comes back as ResultType::kOverflow, with
+     * `value` set to the largest or the most negative finite value of the type, by its sign;
+     * `inf` counts as such a number. One too close to zero for strtod() comes back as
+     * ResultType::kOverflow as well, with `value` set to 0.
      *
      * \param[in] string The string, with the number at its start.
      * \param[out] position The number of characters read, white space and sign included, or 0 if
@@ -208,10 +207,6 @@ class StringTools
      * \return ResultType::kOk if the number was stored in `value`, ResultType::kOverflow as above,
      *         or ResultType::kNoValue if `string` does not start with a number; `value` is then
      *         left as it was.
-     * \warning A negative number out of range, such as `-1e999`, sets `value` to the smallest
-     *          positive value rather than the most negative one. And where `double` is wider than
-     *          the type of `value`, a number beyond the range of that type but within that of
-     *          `double` is cast to the type and comes back as ResultType::kOk.
      */
     template<typename Float,
              std::enable_if_t<std::is_floating_point<Float>::value>* = nullptr>
@@ -223,9 +218,15 @@ class StringTools
 
         if(string == end) {
             return ResultType::kNoValue;
+        } else if(value_big > std::numeric_limits<Float>::max()) {
+            value = std::numeric_limits<Float>::max();
+            return ResultType::kOverflow;
+        } else if(value_big < std::numeric_limits<Float>::lowest()) {
+            value = std::numeric_limits<Float>::lowest();
+            return ResultType::kOverflow;
         } else if(errno == ERANGE) {
-            if(value_big > std::numeric_limits<Float>::max()) { value = std::numeric_limits<Float>::max(); }
-            if(value_big < std::numeric_limits<Float>::min()) { value = std::numeric_limits<Float>::min(); }
+            // Within the range, so what strtod() reports is an underflow.
+            value = 0;
             return ResultType::kOverflow;
         } else {
             value = static_cast<Float>(value_big);
