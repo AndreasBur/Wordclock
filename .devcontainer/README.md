@@ -139,7 +139,7 @@ answered through the proxy, which is the thing a known host key prevents.
 
 ## Shared editor configuration
 
-VS Code extensions, CMake settings and the toolchain sanity check live in the
+VS Code extensions, CMake settings and the toolchain check live in the
 local dev container feature in `shared/`, which every configuration references:
 
 ```jsonc
@@ -148,6 +148,14 @@ local dev container feature in `shared/`, which every configuration references:
 
 Feature metadata is merged with the referencing `devcontainer.json`, so a
 variant can add its own extensions on top without repeating the shared list.
+
+`wordclock-toolchain-check` runs once, as the feature's `postCreateCommand`, and names
+every program `Dockerfile` installs that the container does not have. It fails rather
+than warns, because a missing one means the image is older than the line that installs
+it and a rebuild is the only answer. It was three `--version` calls before, which
+covered the simulator build and nothing else: a container built before `doxygen` was
+added went on passing them, and `tools/docs.py` then died with a `FileNotFoundError`
+traceback weeks later, on the first day someone edited a Doxygen block.
 
 The shared settings install `clangd` and configure it to read CMake's
 `build/compile_commands.json`; C/C++ Tools remains installed for debugging but
