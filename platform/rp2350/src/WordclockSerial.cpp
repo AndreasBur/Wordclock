@@ -9,7 +9,7 @@
 #include "Arduino.h"
 
 #ifndef WORDCLOCK_ARDUINO_SHIM
-# error "WordclockSerial: the core's Arduino.h was included instead of this platform's. Put platform/esp32/include ahead of the framework on the include path, or the web console will be silently mute."
+# error "WordclockSerial: the core's Arduino.h was included instead of this platform's. Put platform/rp2350/include ahead of the framework on the include path, or the web console will be silently mute."
 #endif
 
 #include <stdio.h>
