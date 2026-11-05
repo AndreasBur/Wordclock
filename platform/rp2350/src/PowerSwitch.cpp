@@ -5,9 +5,8 @@
  * \file
  * \brief The supply port, driven through the SDK's GPIO calls, see PowerSwitch.h.
  *
- * The SDK rather than the core's pinMode and digitalWrite, for the reason the strip's driver uses
- * it: this backend talks to the hardware directly everywhere else, and one pin reached through the
- * Arduino layer would be the odd one out.
+ * The SDK rather than the core's pinMode and digitalWrite, as the strip's driver reaches its pin
+ * through the SDK too.
  */
 
 #include <hardware/gpio.h>

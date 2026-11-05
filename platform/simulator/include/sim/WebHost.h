@@ -17,9 +17,9 @@
  * thread-safe - which is what lets the port stay a wxString.
  *
  * What that costs is honest to state: a write blocks the tick. Everything written here goes to
- * loopback, where the largest of them - a 70 KB page - fits in the socket buffer many times over,
- * so it returns at once. A client that stops reading entirely could still stall the window, which
- * is a price a development tool may pay and a clock on a wall may not.
+ * loopback, where the largest of them - a page, gzip-compressed - fits in the socket buffer many
+ * times over, so it returns at once. A client that stops reading entirely could still stall the
+ * window, which is a price a development tool may pay and a clock on a wall may not.
  */
 
 #ifndef _WEB_HOST_H_

@@ -72,8 +72,8 @@ first board, check these in order:
 The two are the same program above the peripherals. Five things underneath are not.
 
 - **`Wire` takes its pins separately.** `Wire.begin(sda, scl, freq)` is an ESP32 extension;
-  here it is `setSDA`, `setSCL`, `begin`, `setClock`. The pin setters are what can refuse,
-  so they carry the check that `Begin()`'s return value carries there.
+  here it is `setSDA`, `setSCL`, `begin`, `setClock`. Nothing reports a refusal: a pin the
+  setters will not take ends in `panic()`, so the two drivers have to name the same pins.
 - **`Storage` is a file, not a key-value pair.** LittleFS rather than the EEPROM emulation,
   because `Read()` has to refuse a blob of the wrong length and a file carries its own.
   `System`'s credentials go the same way, one file per key.
@@ -142,11 +142,11 @@ the CCL are to the AVR-Dx: the pulse widths come out of hardware and the process
 hands over a frame, by DMA, without waiting for it.
 
 The timing is derived rather than copied. At 20 MHz a cycle is 50 ns, and the three phases
-of 8, 9 and 8 make a 1250 ns bit in which a zero is high for 400 ns and a one for 800 —
-the datasheet's nominal figures. The Pico SDK's own example uses 250/875 instead, which
-also works but spends the whole tolerance on one side, and it is the far end of a long
-strip with a slow edge that eats into what is left. The ESP32 backend made the same
-decision against the IDF's example.
+of 8, 8 and 9 make a 1250 ns bit in which a zero is high for 400 ns and a one for 800 —
+the datasheet's nominal figures. The Pico SDK's own example uses 375/750 instead, and used
+250/875 before 2024. Both also work, but they sit away from the middle of the tolerance,
+and it is the far end of a long strip with a slow edge that eats into what is left. The
+ESP32 backend made the same decision against the IDF's example.
 
 The program is four encoded instructions rather than a `.pio` source. The platform package
 installs a stand-in for `pioasm` rather than the assembler, so an assembled program would

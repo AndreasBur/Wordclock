@@ -68,9 +68,9 @@ class WS2812Pio
      * The three phases of one bit, in state machine cycles. A zero is high for Phase1 and
      * low for the other two; a one is high for Phase1 + Phase2 and low for Phase3. At the
      * clock below that is 400 ns and 800 ns of high time against a 1250 ns period - the
-     * datasheet's nominal values, not the 300/900 the vendor examples use. Those also
-     * work, but they spend the whole tolerance on one side, and it is the far end of a
-     * long strip with a slow edge that eats into what is left.
+     * datasheet's nominal values, not the Pico SDK example's 375/750, or its 250/875 before
+     * 2024. Those also work, but they sit away from the middle of the tolerance, and it is the
+     * far end of a long strip with a slow edge that eats into what is left.
      */
     static constexpr uint32_t kPhase1Cycles{8u};
     static constexpr uint32_t kPhase2Cycles{8u};
