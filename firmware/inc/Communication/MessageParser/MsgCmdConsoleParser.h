@@ -9,10 +9,14 @@
  * read back, exactly as the WiFi pass phrase is not - what comes back is whether one is set at all,
  * which is the only thing somebody needs to know from the outside.
  *
- * Sent without a password, the command clears it so that the console answers everybody again.
- * That is the way back for a clock whose password was forgotten, and it is why this command is
- * worth having on the serial line rather than only in the console it locks: the console would ask
- * for the very password that is missing.
+ * Sent with an empty password, `16 -P`, the command clears it so that the console answers
+ * everybody again. That is the way back for a clock whose password was forgotten, and it is why
+ * this command is worth having on the serial line rather than only in the console it locks: the
+ * console would ask for the very password that is missing.
+ *
+ * `16` on its own asks and changes nothing, as every other command without options does. It used
+ * to clear as well, which made the shorthand a trap: the panel asks for every command it knows by
+ * its bare number when its socket opens, so opening the panel took the password off the clock.
  */
 
 #ifndef _MSG_CMD_CONSOLE_PARSER_H_
@@ -33,8 +37,8 @@
  * - `-P<password>`, string: the password, up to the next option, without trailing spaces, and cut
  *   to what System::kPasswordStringLength holds. An empty one, `16 -P`, clears it.
  *
- * Process() stores it through System::SetConsolePassword(), and without `-P` it stores an empty
- * one: `16` alone clears the password. It is stored on the ESP32 and the RP2350; the AVR and the
+ * Process() stores it through System::SetConsolePassword() when `-P` was given, and does nothing
+ * without it, so `16` alone is a query. It is stored on the ESP32 and the RP2350; the AVR and the
  * simulator refuse it, and keep no password. A refusal is not answered.
  *
  * The answer says whether a password is set, never which one.
@@ -59,8 +63,13 @@ class MsgCmdConsoleParser : public MsgParameterParser<MsgCmdConsoleParser, MSG_C
         ParameterTableElementType(kPasswordShortName, MsgParameter::ArgumentTypeType::kString)
     };
 
-    // Empty until -P fills it, so that a command without it stores the empty password.
     char password_[System::kPasswordStringLength]{0u};
+    /*
+     * Whether -P was given at all, which is not the same question as whether the password is
+     * empty: `16 -P` clears the password on purpose, and `16` alone must leave it alone. Without
+     * this the two cannot be told apart, and the bare number cleared - see the \file block.
+     */
+    bool password_given_{false};
 
     static void HandleParameter(char parameter_short_name, byte argument) {
         UNUSED(parameter_short_name); UNUSED(argument);
@@ -74,6 +83,7 @@ class MsgCmdConsoleParser : public MsgParameterParser<MsgCmdConsoleParser, MSG_C
         if(parameter_short_name == kPasswordShortName) {
             StringTools::StringCopy(password_, argument, Minimum(length, sizeof(password_)));
             TrimTrailingBlanks(password_);
+            password_given_ = true;
         }
     }
 
@@ -111,9 +121,12 @@ class MsgCmdConsoleParser : public MsgParameterParser<MsgCmdConsoleParser, MSG_C
     /*!
      * \brief Completes the command once Parse() has read its options.
      *
-     * It stores the password of `-P`, or the empty one without it, which clears the password.
+     * It stores the password of `-P`, the empty one of `16 -P` included, which clears it. Without
+     * `-P` nothing is stored, so `16` alone only asks.
      */
-    void Process() const { System::GetInstance().SetConsolePassword(password_); }
+    void Process() const {
+        if(password_given_) { System::GetInstance().SetConsolePassword(password_); }
+    }
 };
 
 #endif // _MSG_CMD_CONSOLE_PARSER_H_

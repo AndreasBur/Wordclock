@@ -169,13 +169,15 @@ int main()
     }
 
     /*
-     * Command 16 clears the console password without an option and with an empty one, the way
-     * back for a clock nobody can log into. Neither cleared it.
+     * Command 16 clears the console password with an empty -P, the way back for a clock nobody
+     * can log into, and only with it. The bare number asks: it cleared as well, and the panel
+     * asks for every command it knows by its bare number, so opening the panel took the password
+     * off the clock.
      */
     Check(answer_to("16 -Psecret\n") == "16 A=1", "a console password is set");
-    Check(answer_to("16\n") == "16 A=0", "and command 16 alone clears it");
-    Check(answer_to("16 -Psecret\n") == "16 A=1", "a console password is set again");
-    Check(answer_to("16 -P\n") == "16 A=0", "and an empty -P, which the panel sends, clears it as well");
+    Check(answer_to("16\n") == "16 A=1", "command 16 alone asks and leaves the password alone");
+    Check(answer_to("16 -P\n") == "16 A=0", "an empty -P clears it, which is the way back in");
+    Check(answer_to("16\n") == "16 A=0", "and the query says so afterwards");
 
     // A refused -I sets no pixel: the index stayed at 0, and -S lit pixel 0.
     answer_to("4 -I0 -S0\n");
