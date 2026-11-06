@@ -307,6 +307,64 @@ jobs:
           HOST_TESTS_CXXFLAGS="$SANITIZE" platform/esp32/test/run.sh
           HOST_TESTS_CXXFLAGS="$SANITIZE" platform/rp2350/test/run.sh
 
+  # The tests run what somebody thought of; this runs what nobody did. libFuzzer makes up
+  # inputs for the two ways data from outside reaches the firmware - a command line as a
+  # browser's web socket frame brings it, and a stored blob as Persistence::Load() reads it -
+  # under the same two sanitizers, steered by which branches of the core each input reaches.
+  # What the fuzzers are and how to run them is platform/simulator/tests/fuzz/run.sh.
+  #
+  # Three minutes each, side by side, on every pull request. Short for a fuzzer, which is why
+  # the corpus is cached: every run starts from the inputs all earlier runs found, so the
+  # minutes add up across pull requests rather than starting over. The key is new on every
+  # run, so every run saves, and restore-keys takes the newest. A missing line in a parser was
+  # put in on purpose to see the job do its work: it was found in one second.
+  fuzz:
+    name: Fuzzing
+    runs-on: ubuntu-26.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v7
+
+      # llvm for llvm-symbolizer, without which a finding is a stack of addresses; clang-tidy
+      # for the names below.
+      - name: Install the toolchain
+        uses: ./.github/actions/apt-install
+        with:
+          packages: cmake ninja-build libwxgtk3.2-dev clang libclang-rt-dev llvm clang-tidy
+
+      - name: Restore the corpus
+        uses: actions/cache@v6
+        with:
+          path: fuzz-work/*/corpus
+          key: fuzz-corpus-${{ github.run_id }}
+          restore-keys: fuzz-corpus-
+
+      - name: Build the fuzzers
+        run: |
+          cmake -S . -B build-fuzz -G Ninja -DPLATFORM=simulator \
+                -DCMAKE_CXX_COMPILER=clang++ -DWORDCLOCK_BUILD_FUZZERS=ON \
+                -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+          cmake --build build-fuzz --target FuzzCommand FuzzSettings
+
+      # The fuzzers are in no build the clang-tidy job reads, so their names are read here,
+      # through this build's own database.
+      - name: Names in the fuzzers
+        run: run-clang-tidy -p build-fuzz -quiet -j "$(nproc)" -checks='-*,readability-identifier-naming' 'platform/simulator/tests/fuzz'
+
+      - name: Fuzz
+        run: platform/simulator/tests/fuzz/run.sh build-fuzz 180 fuzz-work
+
+      # The input that failed, so it can be replayed: build-fuzz/bin/<fuzzer> crash-<hash>.
+      - name: Keep what was found
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: fuzz-findings
+          path: |
+            fuzz-work/*/crash-*
+            fuzz-work/*/log.txt
+          if-no-files-found: ignore
+
   docs:
     name: Doxygen blocks
     runs-on: ubuntu-26.04
