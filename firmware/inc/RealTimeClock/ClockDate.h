@@ -215,7 +215,7 @@ class ClockDate
      * \param[in] day The day of the month.
      * \return The day in the Rata Die count, 1 for 1 January of the year 1.
      */
-    static RataDieDayType GetRataDieDay(YearType year, MonthType month, DayType day) {
+    static constexpr RataDieDayType GetRataDieDay(YearType year, MonthType month, DayType day) {
         if (month < 3u) { year--, month += 12u; }
         return static_cast<RataDieDayType>(365u)*year+year/4u-year/100u+year/400u+(153u*month-457u)/5u+day-306u;
     }
@@ -247,7 +247,7 @@ class ClockDate
      * \param[in] year The year, in full.
      * \return 28 to 31, or 0 if `month` is not a month from 1 to 12.
      */
-    static DayType GetDaysOfMonth(MonthType month, YearType year) {
+    static constexpr DayType GetDaysOfMonth(MonthType month, YearType year) {
         switch (month) {
             case 4u:
             case 6u:
