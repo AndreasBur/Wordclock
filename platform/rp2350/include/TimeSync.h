@@ -19,6 +19,9 @@
 #ifndef _TIME_SYNC_H_
 #define _TIME_SYNC_H_
 
+// Ahead of WiFiNTP.h, which calls ::hostByName without including what declares it: the
+// framework's header compiles only behind a WiFi.h that its includer brought along.
+#include <WiFi.h>
 #include <WiFiNTP.h>
 
 #include "WordclockConfiguration.h"
