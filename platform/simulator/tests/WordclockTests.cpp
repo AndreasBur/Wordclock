@@ -103,6 +103,10 @@ int main()
     TestProceduresChangeTheDisplay();
     TestProcedureSelectionsWrapAround();
     TestUnknownProcedureRunsNothing();
+    TestDisplayBrightnessCommandSetsTheBrightness();
+    TestDisplayPixelCommandWritesOnePixel();
+    TestAnimationCommandSelectsAndTunes();
+    TestOverlayCommandsReachTheirOwnOverlay();
     TestSchedulerRunsATaskFirstThenEveryCycle();
     TestSchedulerTakesANewCycleOnTheNextRun();
     TestSchedulerCycleZeroSwitchesATaskOff();

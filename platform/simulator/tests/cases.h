@@ -117,6 +117,10 @@ void TestOverlayCommandSetsTheTemperatureOverlay();
 void TestProceduresChangeTheDisplay();
 void TestProcedureSelectionsWrapAround();
 void TestUnknownProcedureRunsNothing();
+void TestDisplayBrightnessCommandSetsTheBrightness();
+void TestDisplayPixelCommandWritesOnePixel();
+void TestAnimationCommandSelectsAndTunes();
+void TestOverlayCommandsReachTheirOwnOverlay();
 
 /* persistence_test.cpp */
 void TestPersistence();
