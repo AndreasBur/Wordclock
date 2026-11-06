@@ -103,6 +103,18 @@ void TestCurrentLimitFollowsTheColour();
 void TestCurrentLimitLeavesTheRestoredFaceAlone();
 void TestCurrentLimitDoesNotSwitchTheDisplayOn();
 
+/* command_test.cpp */
+void TestTimeCommandSetsTheClock();
+void TestDateCommandSetsTheCalendar();
+void TestClockModeCommandSetsTheWording();
+void TestDisplayColorCommandRecoloursTheWords();
+void TestColorCycleCommandStartsAndStops();
+void TestNightSwitchCommandSetsTheWindow();
+void TestOverlayCommandSetsTheTemperatureOverlay();
+void TestProceduresChangeTheDisplay();
+void TestProcedureSelectionsWrapAround();
+void TestUnknownProcedureRunsNothing();
+
 /* persistence_test.cpp */
 void TestPersistence();
 void TestPersistenceSaveAndReset();
