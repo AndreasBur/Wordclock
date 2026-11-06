@@ -257,8 +257,8 @@ void PixelsFrame::RenderPixel(byte row, byte column)
 
 void PixelsFrame::RenderAllPixels()
 {
-    for(unsigned int row = 0; row < PIXELS_DISPLAY_NUMBER_OF_ROWS; row++) {
-        for(unsigned int column = 0; column < PIXELS_DISPLAY_NUMBER_OF_COLUMNS; column++) {
+    for(byte row = 0u; row < PIXELS_DISPLAY_NUMBER_OF_ROWS; row++) {
+        for(byte column = 0u; column < PIXELS_DISPLAY_NUMBER_OF_COLUMNS; column++) {
             RenderPixel(row, column);
         }
     }

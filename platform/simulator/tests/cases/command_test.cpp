@@ -91,7 +91,7 @@ void Call(unsigned procedure)
 
 void Call(RpcIdType procedure)
 {
-    Call(ToUnderlying(procedure));
+    Call(static_cast<unsigned>(ToUnderlying(procedure)));
 }
 
 bool IsTime(byte hour, byte minute, byte second)
