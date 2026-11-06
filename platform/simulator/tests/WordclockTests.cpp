@@ -93,6 +93,16 @@ int main()
     TestCurrentLimitFollowsTheColour();
     TestCurrentLimitLeavesTheRestoredFaceAlone();
     TestCurrentLimitDoesNotSwitchTheDisplayOn();
+    TestTimeCommandSetsTheClock();
+    TestDateCommandSetsTheCalendar();
+    TestClockModeCommandSetsTheWording();
+    TestDisplayColorCommandRecoloursTheWords();
+    TestColorCycleCommandStartsAndStops();
+    TestNightSwitchCommandSetsTheWindow();
+    TestOverlayCommandSetsTheTemperatureOverlay();
+    TestProceduresChangeTheDisplay();
+    TestProcedureSelectionsWrapAround();
+    TestUnknownProcedureRunsNothing();
     TestPersistence();
     TestPersistenceSaveAndReset();
     TestWebSocketHashAndEncoding();
