@@ -36,8 +36,9 @@ void AnimationCursor::Task()
     if(state_ == StateType::kSetTime) {
         if(current_pixel_index_ < DISPLAY_NUMBER_OF_PIXELS) { Display::GetInstance().SetPixel(current_pixel_index_); }
         if(current_pixel_index_ > 0u) {
-            if(IsPixelPartOfClockWords(clock_words_table_, current_pixel_index_ - 1u) == false) {
-                Display::GetInstance().ClearPixel(current_pixel_index_ - 1u);
+            const Display::IndexType previous_index = static_cast<Display::IndexType>(current_pixel_index_ - 1u);
+            if(IsPixelPartOfClockWords(clock_words_table_, previous_index) == false) {
+                Display::GetInstance().ClearPixel(previous_index);
             }
         }
         if(current_pixel_index_ >= DISPLAY_NUMBER_OF_PIXELS) {

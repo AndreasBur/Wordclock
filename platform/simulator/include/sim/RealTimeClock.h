@@ -56,20 +56,33 @@ class RealTimeClock
     RealTimeClock() {}
     ~RealTimeClock() {}
 
-    void UpdateDateTime(const wxDateTime& value) {
-        date_time_.SetDateYear(value.GetYear());
-        date_time_.SetDateMonth(value.GetMonth() + 1u);
-        date_time_.SetDateDay(value.GetDay());
-        date_time_.SetTimeHour(value.GetHour());
-        date_time_.SetTimeMinute(value.GetMinute());
-        date_time_.SetTimeSecond(value.GetSecond());
-    }
+    void UpdateDateTime(const wxDateTime& value) { date_time_ = ToClockDateTime(value); }
 
   public:
     /*! \brief Returns the one clock. */
     static RealTimeClock& GetInstance() {
         static RealTimeClock singleton_instance;
         return singleton_instance;
+    }
+
+    /*!
+     * \brief Converts a wxWidgets date and time into the firmware's.
+     *
+     * wxDateTime answers in ints, and counts its months from 0. Every field it gives fits the
+     * one it goes into, a year up to 65535 included, which is what makes the casts exact.
+     *
+     * \param[in] value The date and time, as wxWidgets has it.
+     * \return The same date and time.
+     */
+    static ClockDateTime ToClockDateTime(const wxDateTime& value) {
+        ClockDateTime date_time;
+        date_time.SetDateYear(static_cast<ClockDateTime::YearType>(value.GetYear()));
+        date_time.SetDateMonth(static_cast<ClockDateTime::MonthType>(value.GetMonth() + 1));
+        date_time.SetDateDay(static_cast<ClockDateTime::DayType>(value.GetDay()));
+        date_time.SetTimeHour(static_cast<ClockDateTime::HourType>(value.GetHour()));
+        date_time.SetTimeMinute(static_cast<ClockDateTime::MinuteType>(value.GetMinute()));
+        date_time.SetTimeSecond(static_cast<ClockDateTime::SecondType>(value.GetSecond()));
+        return date_time;
     }
 
     /*! \brief Returns the date and time. */

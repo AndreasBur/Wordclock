@@ -125,6 +125,12 @@ else()
             target_compile_options(WordclockBuildSettings INTERFACE ${flag})
         endif()
     endforeach()
+    # wxWidgets' layout flags are two enumerations or'd together - wxALL | wxEXPAND - which is how
+    # that library is written, and clang's -Wconversion reports each of them. The same reason
+    # .clang-tidy gives for bugprone-suspicious-enum-usage. GCC has no such warning.
+    if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+        target_compile_options(WordclockBuildSettings INTERFACE -Wno-enum-enum-conversion)
+    endif()
 endif()
 
 target_compile_definitions(WordclockBuildSettings INTERFACE ${PIXELS_DEFINE})

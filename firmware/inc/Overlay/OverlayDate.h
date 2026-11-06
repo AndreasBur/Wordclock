@@ -63,7 +63,7 @@ class OverlayDate : public Overlay<OverlayDate>
         tmp = CheckDigitsAndAppendDot(current_date.GetDay(), tmp);
         itoa(current_date.GetMonth(), tmp, 10u);
         tmp = CheckDigitsAndAppendDot(current_date.GetMonth(), tmp);
-        itoa(current_date.GetYear(), tmp, 10u);
+        itoa(static_cast<int>(current_date.GetYear()), tmp, 10u);
     }
 
     static char* AppendDot(char* string) { string[0u] = '.'; return &string[1u]; }

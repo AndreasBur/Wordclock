@@ -77,10 +77,10 @@ bool AnimationCollapse::CollapseRow(byte row)
     if(direction_ == DirectionType::kToLeft) {
         for(byte column = 1u; column < DISPLAY_NUMBER_OF_COLUMNS; column++) {
             if(Display::GetInstance().GetPixel(column, row) &&
-               !Display::GetInstance().GetPixel(column - 1u, row))
+               !Display::GetInstance().GetPixel(static_cast<byte>(column - 1u), row))
             {
                 Display::GetInstance().ClearPixel(column, row);
-                Display::GetInstance().SetPixel(column - 1u, row);
+                Display::GetInstance().SetPixel(static_cast<byte>(column - 1u), row);
                 moved = true;
             }
         }

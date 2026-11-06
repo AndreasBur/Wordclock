@@ -212,7 +212,7 @@ template <typename Derived> class Overlay
 
     static bool IsShowTimerExpired(SecondType show_timer_in_seconds) { return show_timer_in_seconds == 0u; }
     static SecondType DecrementShowTimer(SecondType show_timer_in_seconds) {
-        if(show_timer_in_seconds > 0u) { return show_timer_in_seconds - 1u; }
+        if(show_timer_in_seconds > 0u) { return static_cast<SecondType>(show_timer_in_seconds - 1u); }
         else { return 0u; }
     }
 
