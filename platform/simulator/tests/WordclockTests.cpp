@@ -116,6 +116,7 @@ int main()
     TestDisplayPixelCommandWritesOnePixel();
     TestAnimationCommandSelectsAndTunes();
     TestOverlayCommandsReachTheirOwnOverlay();
+    TestProceduresReachTheirTargets();
     TestSchedulerRunsATaskFirstThenEveryCycle();
     TestSchedulerTakesANewCycleOnTheNextRun();
     TestSchedulerCycleZeroSwitchesATaskOff();

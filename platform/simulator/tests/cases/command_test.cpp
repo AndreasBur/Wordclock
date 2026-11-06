@@ -4,14 +4,21 @@
 #include "check.h"
 #include "cases.h"
 
+#include "Animations.h"
+#include "BH1750.h"
 #include "Clock.h"
 #include "ColorCycle.h"
 #include "Display.h"
+#include "DisplayManager.h"
+#include "Illuminance.h"
 #include "Message.h"
 #include "MsgCmdParser.h"
 #include "MsgCmdRemoteProcedureCallParser.h"
 #include "NightSwitch.h"
 #include "Overlays.h"
+#include "Persistence.h"
+#include "Pixels.h"
+#include "Power.h"
 #include "RealTimeClock.h"
 #include "Scheduler.h"
 #include "Text.h"
@@ -568,4 +575,109 @@ void TestOverlayCommandsReachTheirOwnOverlay()
     overlays.SetTemperaturePeriodInMinutes(temperature_period_before);
     overlays.SetTextText(text_before.c_str(), static_cast<Overlays::LengthType>(text_before.size()));
 #endif
+}
+
+/*
+ * The procedures whose targets have cases of their own - the overlays, the animations, the
+ * supply, the store - reached through the command line rather than called. What is checked is
+ * that each id runs its own procedure, so each is read by the effect that procedure has and no
+ * other one would. The restart is left out: the simulator refuses it, and a refusal is only
+ * answered.
+ */
+void TestProceduresReachTheirTargets()
+{
+    Display& display = Display::GetInstance();
+    Animations& animations = Animations::GetInstance();
+    Overlays& overlays = Overlays::GetInstance();
+    Illuminance& illuminance = Illuminance::GetInstance();
+
+    Clock::GetInstance().SetMode(Clock::ModeType::kWessi);
+    animations.SetMode(Animations::ModeType::kFixed);
+    animations.SetAnimation(Animations::AnimationIdType::kNone);
+    display.Enable();
+    SetTime(10u, 4u, 0u);
+    DisplayManager::GetInstance().Task();
+    const PixelBufferType clock_face = ReadPixels();
+
+    Call(RpcIdType::kDisplayTest);
+    bool every_pixel_lit = true;
+    for(byte index = 0u; index < DISPLAY_NUMBER_OF_PIXELS; index++) { every_pixel_lit = every_pixel_lit && display.GetPixel(index); }
+    Expect(every_pixel_lit, "the display test lights every pixel");
+    Call(RpcIdType::kDisplayClear);
+    Expect(display.IsCleared(), "the clear turns every pixel off");
+    Pixels::GetInstance().ClearDirty();
+    Call(RpcIdType::kDisplayShow);
+    Expect(Pixels::GetInstance().IsDirty(), "the show marks the buffer to be sent");
+
+    Call(RpcIdType::kClockRefresh);
+    animations.SetAnimation(FirstAnimation());
+    Call(RpcIdType::kAnimationStart);
+    Expect(animations.GetState() == Animations::StateType::kPending, "the animation start runs the selected animation");
+    Call(RpcIdType::kAnimationAbort);
+    Expect(animations.GetState() == Animations::StateType::kIdle && ArePixelsEqual(ReadPixels(), clock_face),
+           "and the abort ends it on the clock face");
+    animations.SetAnimation(Animations::AnimationIdType::kNone);
+
+#if (OVERLAYS_SUPPORT_DATE == STD_ON)
+    const bool date_active_before = overlays.GetDateIsActive();
+    overlays.SetDateIsActive(true);
+    Call(RpcIdType::kOverlayDateShow);
+    Expect(overlays.GetState() == Overlays::OverlayType::StateType::kShow, "the date overlay shows on demand");
+    Call(RpcIdType::kOverlayAbort);
+    overlays.SetDateIsActive(date_active_before);
+#endif
+#if (OVERLAYS_SUPPORT_TEXT == STD_ON)
+    const bool text_active_before = overlays.GetTextIsActive();
+    overlays.SetTextIsActive(true);
+    Call(RpcIdType::kOverlayTextShow);
+    Expect(overlays.GetState() == Overlays::OverlayType::StateType::kShow, "the text overlay shows on demand");
+    Call(RpcIdType::kOverlayAbort);
+    overlays.SetTextIsActive(text_active_before);
+#endif
+    // The temperature overlay is refused while the clock chip has no reading, which the
+    // simulator's never has; the case for that is in overlay_test.cpp.
+    Call(RpcIdType::kOverlayTemperatureShow);
+    Expect(overlays.GetState() != Overlays::OverlayType::StateType::kShow, "and the temperature overlay not without a reading");
+
+    // Each bound from what the sensor reads at the moment of the call.
+    const BH1750::IlluminanceType illuminance_before = BH1750::GetSimulatedIlluminance();
+    const auto calibration_before = illuminance.GetCalibrationValues();
+    BH1750::SetSimulatedIlluminance(321u);
+    Call(RpcIdType::kIlluminanceCalibrationMaxValue);
+    BH1750::SetSimulatedIlluminance(12u);
+    Call(RpcIdType::kIlluminanceCalibrationMinValue);
+    Expect(illuminance.GetCalibrationValuesMaxValue() == 321u, "the bright bound is what the sensor read then");
+    Expect(illuminance.GetCalibrationValuesMinValue() == 12u, "and the dark bound too");
+    illuminance.SetCalibrationValuesMaxValue(calibration_before.max_value);
+    illuminance.SetCalibrationValuesMinValue(calibration_before.min_value);
+    BH1750::SetSimulatedIlluminance(illuminance_before);
+
+    // The supply is asked for and switched over the ticks after, the order power_test.cpp
+    // checks; here the two asks only have to arrive.
+    if(Power::IsSwitchFitted()) {
+        Call(RpcIdType::kPowerOff);
+        Pixels::GetInstance().ClearDirty();
+        Power::GetInstance().Task();
+        Expect(!Power::IsSupplyOn(), "the power off cuts the supply");
+        Call(RpcIdType::kPowerOn);
+        Power::GetInstance().Task();
+        Expect(Power::IsSupplyOn(), "and the power on brings it back");
+        display.ResumeOutput();
+    }
+
+    /*
+     * The store last: it is a file in the working directory, written the way the persistence
+     * cases write it. A setting saved through the command line has to come back from the store,
+     * and the reset has to put the setting back and leave nothing in the store to load.
+     */
+    const byte brightness_before = display.GetBrightness();
+    display.SetBrightness(77u);
+    Call(RpcIdType::kSettingsSave);
+    display.SetBrightness(10u);
+    Expect(Persistence::Load() == kEOk && display.GetBrightness() == 77u, "the save writes the settings to the store");
+    Call(RpcIdType::kSettingsReset);
+    Expect(display.GetBrightness() == 255u, "the reset puts the settings back to a new clock's");
+    Expect(Persistence::Load() == kENotOk, "and empties the store");
+    display.SetBrightness(brightness_before);
+    display.Clear();
 }
