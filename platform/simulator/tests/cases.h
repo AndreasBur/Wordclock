@@ -87,6 +87,9 @@ void TestUptimeCountsWithoutWrapping();
 void TestSchedulerRunsATaskFirstThenEveryCycle();
 void TestSchedulerTakesANewCycleOnTheNextRun();
 void TestSchedulerCycleZeroSwitchesATaskOff();
+void TestSchedulerReadsTheSensorBeforeTheBrightness();
+void TestSchedulerLetsTheNightGoBeforeTheColourCycle();
+void TestSchedulerSavesWhatATickChanged();
 
 /* nightswitch_test.cpp */
 void TestNightWindowIncludesMidnight();

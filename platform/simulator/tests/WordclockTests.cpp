@@ -120,6 +120,9 @@ int main()
     TestSchedulerRunsATaskFirstThenEveryCycle();
     TestSchedulerTakesANewCycleOnTheNextRun();
     TestSchedulerCycleZeroSwitchesATaskOff();
+    TestSchedulerReadsTheSensorBeforeTheBrightness();
+    TestSchedulerLetsTheNightGoBeforeTheColourCycle();
+    TestSchedulerSavesWhatATickChanged();
     TestPersistence();
     TestPersistenceSaveAndReset();
     TestWebSocketHashAndEncoding();
