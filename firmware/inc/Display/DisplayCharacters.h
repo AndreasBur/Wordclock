@@ -185,7 +185,7 @@ class DisplayCharacters
     constexpr DisplayCharacters() { }
 
     /*! \brief Destroys the letters. */
-    ~DisplayCharacters() { }
+    ~DisplayCharacters() = default;
 
     /*!
      * \brief Returns the letter at `column` and `row`.

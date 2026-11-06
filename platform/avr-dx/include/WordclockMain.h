@@ -32,7 +32,7 @@ class WordclockMain
     /*! \brief Makes the firmware's runner; it brings nothing up until Init(). */
     WordclockMain() { }
     /*! \brief Destroys the firmware's runner. */
-    ~WordclockMain() { }
+    ~WordclockMain() = default;
 
     /*!
      * \brief Brings the supply and the display up, and restores the stored settings with

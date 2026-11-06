@@ -42,7 +42,7 @@ class MsgCmdOverlayTextParser : public MsgCmdOverlayParser<MsgCmdOverlayTextPars
     constexpr MsgCmdOverlayTextParser(const char* parameter) : MsgCmdOverlayParser(parameter) { }
 
     /*! \brief Destroys the parser. */
-    ~MsgCmdOverlayTextParser() { }
+    ~MsgCmdOverlayTextParser() = default;
 
     /*! \brief Returns the period of the text overlay, in minutes, for the `P` field. */
     static MinuteType GetPeriodInMinutes() { return Overlays::GetInstance().GetTextPeriodInMinutes(); }

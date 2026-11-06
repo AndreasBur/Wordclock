@@ -265,7 +265,7 @@ class BH1750
     constexpr BH1750() { }
 
     /*! \brief Destroys the sensor. */
-    ~BH1750() { }
+    ~BH1750() = default;
 
     /*! \brief Returns the scheduler ticks between two calls of Task(), BH1750_TASK_CYCLE. */
     static constexpr byte GetTaskCycle() { return kTaskCycle; }

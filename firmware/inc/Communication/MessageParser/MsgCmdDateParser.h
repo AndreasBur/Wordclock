@@ -109,7 +109,7 @@ class MsgCmdDateParser : public MsgParameterParser<MsgCmdDateParser, MSG_CMD_DAT
     }
 
     /*! \brief Destroys the parser. */
-    ~MsgCmdDateParser() { }
+    ~MsgCmdDateParser() = default;
 
     /*!
      * \brief Sends the answer: the fields that follow the command number.

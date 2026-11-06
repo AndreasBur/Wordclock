@@ -139,7 +139,7 @@ class DS3231
     constexpr DS3231() { }
 
     /*! \brief Destroys the chip. */
-    ~DS3231() { }
+    ~DS3231() = default;
 
     /*!
      * \brief Returns the temperature the chip's register pair holds, in tenths of a degree Celsius.

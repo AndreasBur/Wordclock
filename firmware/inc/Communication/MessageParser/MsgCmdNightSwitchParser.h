@@ -101,7 +101,7 @@ class MsgCmdNightSwitchParser : public MsgParameterParser<MsgCmdNightSwitchParse
     constexpr MsgCmdNightSwitchParser(const char* parameter) : MsgParameterParser(kParameterTable, parameter) { }
 
     /*! \brief Destroys the parser. */
-    ~MsgCmdNightSwitchParser() { }
+    ~MsgCmdNightSwitchParser() = default;
 
     /*!
      * \brief Sends the answer: the fields that follow the command number.

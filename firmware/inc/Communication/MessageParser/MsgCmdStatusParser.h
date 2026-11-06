@@ -79,7 +79,7 @@ class MsgCmdStatusParser : public MsgParameterParser<MsgCmdStatusParser, MSG_CMD
     constexpr MsgCmdStatusParser(const char* parameter) : MsgParameterParser(kParameterTable, parameter) { }
 
     /*! \brief Destroys the parser. */
-    ~MsgCmdStatusParser() { }
+    ~MsgCmdStatusParser() = default;
 
     /*!
      * \brief Sends a number field of the answer, or the field empty where there is no number.

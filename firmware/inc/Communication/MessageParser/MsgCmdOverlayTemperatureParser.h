@@ -43,7 +43,7 @@ class MsgCmdOverlayTemperatureParser : public MsgCmdOverlayParser<MsgCmdOverlayT
     constexpr MsgCmdOverlayTemperatureParser(const char* parameter) : MsgCmdOverlayParser(parameter) { }
 
     /*! \brief Destroys the parser. */
-    ~MsgCmdOverlayTemperatureParser() { }
+    ~MsgCmdOverlayTemperatureParser() = default;
 
     /*! \brief Returns the period of the temperature overlay, in minutes, for the `P` field. */
     static MinuteType GetPeriodInMinutes() { return Overlays::GetInstance().GetTemperaturePeriodInMinutes(); }

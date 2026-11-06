@@ -67,7 +67,7 @@ class PowerSwitch
     bool supply_on_{false};
 
     PowerSwitch() { }
-    ~PowerSwitch() { }
+    ~PowerSwitch() = default;
 
     static void DriveSupply(bool on);
 

@@ -38,7 +38,7 @@ class Illuminance
   
   private:
     constexpr Illuminance() { }
-    ~Illuminance() { }
+    ~Illuminance() = default;
     
     BH1750 sensor_;
   

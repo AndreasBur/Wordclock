@@ -80,7 +80,7 @@ class WS2812
 {
   private:
     WS2812() { }
-    ~WS2812() { }
+    ~WS2812() = default;
 
     static void InitUsart();
     static void InitEventSystem();

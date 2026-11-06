@@ -40,7 +40,7 @@ class Communication
 
   private:
     Communication() : error_(), incoming_message_(), state_(StateType::kMessageIncomplete), is_message_too_long_(false) { }
-    ~Communication() { }
+    ~Communication() = default;
 
     static constexpr byte kTaskCycle{COMMUNICATION_TASK_CYCLE};
     static constexpr char kEndOfMessageChar{'\n'};

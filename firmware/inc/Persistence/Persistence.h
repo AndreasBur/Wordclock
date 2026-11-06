@@ -54,7 +54,7 @@ class Persistence
     static constexpr byte kTaskCycle{PERSISTENCE_TASK_CYCLE};
 
     Persistence() { }
-    ~Persistence() { }
+    ~Persistence() = default;
 
   public:
     /*! \brief Returns the one persistence of the firmware. */

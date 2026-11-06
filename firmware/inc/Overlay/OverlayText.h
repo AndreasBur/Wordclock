@@ -73,7 +73,7 @@ class OverlayText : public Overlay<OverlayText>
     constexpr OverlayText() : text_{StringTools::kNullCharacter} { }
 
     /*! \brief Destroys the text overlay. */
-    ~OverlayText() { }
+    ~OverlayText() = default;
 
     /*! \brief Returns the text the overlay shows, ended by a null character. */
     const char* GetText() const { return text_; }

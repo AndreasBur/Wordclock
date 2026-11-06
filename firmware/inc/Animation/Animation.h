@@ -102,7 +102,7 @@ class Animation
     constexpr Animation() : state_{StateType::kNone} { }
 
     /*! \brief Destroys the animation. */
-    ~Animation() { }
+    ~Animation() = default;
 
     /*! \brief Returns the state the animation is in. */
     StateType GetState() const { return state_; }

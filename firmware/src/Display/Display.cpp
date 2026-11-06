@@ -413,10 +413,6 @@ Display::Display(ColorType red, ColorType green, ColorType blue) : pixel_stripe_
 #endif
 }
 
-Display::~Display()
-{
-}
-
 byte Display::TransformToSerpentine(byte column, byte row)
 {
     byte index;

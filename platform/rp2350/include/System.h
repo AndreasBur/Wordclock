@@ -103,7 +103,7 @@ class System
     bool access_point_open_{false};
 
     System() { }
-    ~System() { }
+    ~System() = default;
 
   public:
     /*! \brief Returns the one system. */

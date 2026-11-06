@@ -81,7 +81,7 @@ class WebInterface
      * a rate limit and a comparison being the same on any backend.
      */
     WebInterface() { }
-    ~WebInterface() { }
+    ~WebInterface() = default;
 
   public:
     /*! \brief Returns the one web interface. */

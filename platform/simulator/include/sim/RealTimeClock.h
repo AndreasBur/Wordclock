@@ -54,7 +54,7 @@ class RealTimeClock
     std::chrono::steady_clock::time_point last_update_{std::chrono::steady_clock::now()};
 
     RealTimeClock() {}
-    ~RealTimeClock() {}
+    ~RealTimeClock() = default;
 
     void UpdateDateTime(const wxDateTime& value) {
         date_time_.SetDateYear(value.GetYear());

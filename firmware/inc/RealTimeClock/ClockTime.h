@@ -62,7 +62,7 @@ class ClockTime
     }
 
     /*! \brief Destroys the time. */
-    ~ClockTime() {}
+    ~ClockTime() = default;
 
     /*! \brief Returns the hour, 0 to 23. */
     HourType GetHour() const { return hour_; }

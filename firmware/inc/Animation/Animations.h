@@ -238,7 +238,7 @@ class Animations
 # endif
 { }
         /*! \brief Destroys the memory without destroying the animation in it. */
-        ~AnimationsType() { }
+        ~AnimationsType() = default;
     };
 
   private:
@@ -277,7 +277,7 @@ class Animations
     AnimationsType animations_raw_;
 
     Animations() : animations_raw_() { task_cycles_.fill(kTaskCycleInitValue); }
-    ~Animations() { }
+    ~Animations() = default;
 
     Animation::StateType GetStateOfCurrentAnimation() const;
     void TaskOfCurrentAnimation();

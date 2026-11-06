@@ -56,7 +56,7 @@ class SerialShim
     // Not constexpr, unlike the firmware's singletons: wxString has no constexpr
     // constructor.
     SerialShim() { }
-    ~SerialShim() { }
+    ~SerialShim() = default;
 
     /*
      * Nothing to print into before the window has handed its controls over. Can only

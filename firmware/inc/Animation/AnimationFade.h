@@ -51,7 +51,7 @@ class AnimationFade : public Animation
     constexpr AnimationFade() { }
 
     /*! \brief Destroys the animation. */
-    ~AnimationFade() { }
+    ~AnimationFade() = default;
 
     /*!
      * \brief Makes the animation idle and resets its progress.

@@ -91,7 +91,7 @@ template <typename Derived> class Overlay
     }
 
     /*! \brief Destroys the overlay. */
-    ~Overlay() { }
+    ~Overlay() = default;
 
   private:
     static constexpr SecondType kSecondToStartShow{30u};

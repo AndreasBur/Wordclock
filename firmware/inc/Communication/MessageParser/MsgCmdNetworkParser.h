@@ -118,7 +118,7 @@ class MsgCmdNetworkParser : public MsgParameterParser<MsgCmdNetworkParser, MSG_C
     constexpr MsgCmdNetworkParser(const char* parameter) : MsgParameterParser(kParameterTable, parameter) { }
 
     /*! \brief Destroys the parser. */
-    ~MsgCmdNetworkParser() { }
+    ~MsgCmdNetworkParser() = default;
 
     /*!
      * \brief Sends the answer: the fields that follow the command number.

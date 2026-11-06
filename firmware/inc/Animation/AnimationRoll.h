@@ -70,7 +70,7 @@ class AnimationRoll : public Animation
     constexpr AnimationRoll() : wc_transformation_() { }
 
     /*! \brief Destroys the animation. */
-    ~AnimationRoll() { }
+    ~AnimationRoll() = default;
 
     /*! \brief Returns the direction of the roll that runs, or kRight while none runs. */
     DirectionType GetDirection() const { return direction_; }

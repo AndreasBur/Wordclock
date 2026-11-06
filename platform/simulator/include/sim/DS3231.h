@@ -57,7 +57,7 @@ class DS3231
     constexpr DS3231() { }
 
     /*! \brief Destroys the chip. */
-    ~DS3231() { }
+    ~DS3231() = default;
 
     /*! \brief Returns the scheduler ticks between two calls of Task(), DS3231_TASK_CYCLE. */
     static constexpr byte GetTaskCycle() { return kTaskCycle; }

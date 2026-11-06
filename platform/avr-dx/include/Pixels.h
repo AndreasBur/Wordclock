@@ -88,7 +88,7 @@ class Pixels
     void FillFrameBuffer() const;
 
     Pixels() { }
-    ~Pixels() { }
+    ~Pixels() = default;
 
   public:
     /*! \brief Returns the one strip. */

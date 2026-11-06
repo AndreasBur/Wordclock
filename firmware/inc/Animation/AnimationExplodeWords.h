@@ -89,7 +89,7 @@ class AnimationExplodeWords : public Animation
     constexpr AnimationExplodeWords() : words_() { }
 
     /*! \brief Destroys the animation. */
-    ~AnimationExplodeWords() { }
+    ~AnimationExplodeWords() = default;
 
     /*!
      * \brief Makes the animation idle and resets its progress.

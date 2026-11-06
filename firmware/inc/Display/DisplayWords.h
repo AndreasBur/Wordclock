@@ -80,7 +80,7 @@ class DisplayWords
     constexpr DisplayWords() { }
 
     /*! \brief Destroys the words. */
-    ~DisplayWords() { }
+    ~DisplayWords() = default;
 
     /*!
      * \brief Returns in `word` where the word `word_id` stands.

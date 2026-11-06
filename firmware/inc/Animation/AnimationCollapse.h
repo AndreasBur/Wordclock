@@ -74,7 +74,7 @@ class AnimationCollapse : public Animation
     constexpr AnimationCollapse() { }
 
     /*! \brief Destroys the animation. */
-    ~AnimationCollapse() { }
+    ~AnimationCollapse() = default;
 
     /*!
      * \brief Makes the animation idle and resets its progress.

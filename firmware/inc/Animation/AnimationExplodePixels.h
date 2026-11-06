@@ -91,7 +91,7 @@ class AnimationExplodePixels : public Animation
     constexpr AnimationExplodePixels() : words_() { }
 
     /*! \brief Destroys the animation. */
-    ~AnimationExplodePixels() { }
+    ~AnimationExplodePixels() = default;
 
     /*!
      * \brief Makes the animation idle and resets its progress.

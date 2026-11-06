@@ -25,8 +25,9 @@ Display& GetDisplay() { return Display::GetInstance(); }
  * multiplication by six before the shift is what keeps that division exact without a
  * remainder to carry, which a hue split into 43-wide segments would have had.
  *
- * Plain static rather than constexpr: Pixel declares a destructor, so it is not a
- * literal type and cannot be what a constexpr function returns.
+ * Plain static rather than constexpr. It could be one since Pixel's destructor is defaulted,
+ * but a constexpr function has to be in the header for its callers to see, and nothing needs
+ * this one before the clock runs.
  */
 Pixel ColorCycle::ToColour(HueType hue)
 {

@@ -89,7 +89,7 @@ class MsgCmdColorCycleParser : public MsgParameterParser<MsgCmdColorCycleParser,
     constexpr MsgCmdColorCycleParser(const char* parameter) : MsgParameterParser(kParameterTable, parameter) { }
 
     /*! \brief Destroys the parser. */
-    ~MsgCmdColorCycleParser() { }
+    ~MsgCmdColorCycleParser() = default;
 
     /*!
      * \brief Sends the answer: the fields that follow the command number.

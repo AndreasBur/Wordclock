@@ -43,7 +43,7 @@ class FontTahoma10x10 : public Font<FontCharHorizontal<uint16_t, FONT_TAHOMA_10X
     constexpr FontTahoma10x10() : Font(kFontTable) { }
 
     /*! \brief Destroys the font. */
-    ~FontTahoma10x10() { }
+    ~FontTahoma10x10() = default;
 
     /*! \brief Returns the width of the font in columns, FONT_TAHOMA_10X10_WIDTH. */
     static byte GetWidth() { return FONT_TAHOMA_10X10_WIDTH; }

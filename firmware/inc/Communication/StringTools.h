@@ -54,7 +54,7 @@ class StringTools
     /*! \brief Makes the string tools, which hold nothing. */
     constexpr StringTools() { }
     /*! \brief Destroys the string tools. */
-    ~StringTools() { }
+    ~StringTools() = default;
 
     /*!
      * \brief Copies at most `length` - 1 characters of `source` into `destination`, and terminates

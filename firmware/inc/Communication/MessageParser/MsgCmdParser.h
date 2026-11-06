@@ -124,7 +124,7 @@ class MsgCmdParser
     constexpr MsgCmdParser(const Message& message) : error_(), incoming_message_(message)  { }
 
     /*! \brief Destroys the parser. */
-    ~MsgCmdParser() { }
+    ~MsgCmdParser() = default;
 
     /*!
      * \brief Reads the command number of the message, runs the command's parser on the rest, and

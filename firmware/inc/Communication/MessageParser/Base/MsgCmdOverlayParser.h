@@ -99,7 +99,7 @@ template <typename Derived> class MsgCmdOverlayParser
     }
 
     /*! \brief Destroys the parser. */
-    ~MsgCmdOverlayParser() { }
+    ~MsgCmdOverlayParser() = default;
 
   private:
     friend class MsgParameterParser<MsgCmdOverlayParser<Derived>, MSG_CMD_BASE_OVERLAY_PARSER_PARAMETER_TABLE_SIZE>;

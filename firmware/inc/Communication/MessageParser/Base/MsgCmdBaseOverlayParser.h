@@ -71,7 +71,7 @@ class MsgCmdBaseOverlayParser
     constexpr MsgCmdBaseOverlayParser() { }
 
     /*! \brief Destroys the options of an overlay parser. */
-    ~MsgCmdBaseOverlayParser() { }
+    ~MsgCmdBaseOverlayParser() = default;
 
   private:
 

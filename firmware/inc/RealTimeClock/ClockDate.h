@@ -107,7 +107,7 @@ class ClockDate
     }
 
     /*! \brief Destroys the date. */
-    ~ClockDate() {}
+    ~ClockDate() = default;
 
     /*! \brief Returns the year, 2000 to 2099. */
     YearType GetYear() const { return year_; }

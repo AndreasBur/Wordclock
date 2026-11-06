@@ -80,7 +80,7 @@ class AnimationCube : public Animation
     constexpr AnimationCube() { }
 
     /*! \brief Destroys the animation. */
-    ~AnimationCube() { }
+    ~AnimationCube() = default;
 
     /*!
      * \brief Makes the animation idle and resets its progress.

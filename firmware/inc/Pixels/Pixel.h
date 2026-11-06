@@ -70,7 +70,7 @@ class Pixel
     }
 
     /*! \brief Destroys the pixel. */
-    ~Pixel() { }
+    ~Pixel() = default;
 
     /*! \brief Returns the number of colours of a pixel, three. */
     static constexpr byte GetNumberOfColors() { return kNumberOfColors; }

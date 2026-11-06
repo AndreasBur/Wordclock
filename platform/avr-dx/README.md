@@ -126,13 +126,13 @@ printed after every link rather than asked for, because the flash budget is the
 reason this part was chosen at all — currently, of 128 KiB flash and 16 KiB RAM:
 
 ```
-Program:   48552 bytes (37%)
-Data:       1701 bytes (10%)
+Program:   44794 bytes (34%)
+Data:       1645 bytes (10%)
 ```
 
 That is what the toolchain in the dev container prints, and it is a sample rather than a
 promise: CI's Debian one lands a couple of hundred bytes lower for the same source. So the
-sentence that is *checked* says **37 % of the flash and 10 % of the RAM**, because a byte
+sentence that is *checked* says **34 % of the flash and 10 % of the RAM**, because a byte
 count is a property of the compiler in front of you and not of this repository, where a
 percentage is what both agree on - and is also the question being asked of it, which is how
 close to the ceiling this part is. `tools/documented-sizes.py` enforces the percentages and

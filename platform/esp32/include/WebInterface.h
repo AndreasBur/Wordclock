@@ -79,7 +79,7 @@ class WebInterface
      * Arduino.h depends on.
      */
     WebInterface() { }
-    ~WebInterface() { }
+    ~WebInterface() = default;
 
   public:
     /*! \brief Returns the one web interface. */

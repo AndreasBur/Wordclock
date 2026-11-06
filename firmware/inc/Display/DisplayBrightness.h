@@ -100,7 +100,7 @@ class DisplayBrightness
     constexpr DisplayBrightness() { }
 
     /*! \brief Destroys the brightness. */
-    ~DisplayBrightness() { }
+    ~DisplayBrightness() = default;
 
     /*! \brief Returns the brightness set, 0 to 255, before anything is applied to it. */
     byte GetBrightness() const { return brightness_; }

@@ -202,7 +202,7 @@ class MsgCmdRemoteProcedureCallParser : public MsgParameterParser<MsgCmdRemotePr
     constexpr MsgCmdRemoteProcedureCallParser(const char* parameter) : MsgParameterParser(kParameterTable, parameter) { }
 
     /*! \brief Destroys the parser. */
-    ~MsgCmdRemoteProcedureCallParser() { }
+    ~MsgCmdRemoteProcedureCallParser() = default;
 
     /*!
      * \brief Sends the answer: the fields that follow the command number.

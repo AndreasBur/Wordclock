@@ -111,7 +111,7 @@ class Text
 #endif
 
     constexpr Text() : wc_transformation_(), shift_{nullptr, FontType::kFont10x10, STD_NULL_CHARACTER, 0, 0, ShiftStateType::kIdle} { }
-    ~Text() { }
+    ~Text() = default;
 
     /*
      * Each of these four had a twin that differed in nothing a reader sees - it dropped the
