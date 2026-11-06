@@ -303,7 +303,7 @@ class DisplayCharacters
      * \param[in] row The row, counted from 0.
      * \return `row` times DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS plus `column`.
      */
-    static byte ColumnAndRowToIndex(byte column, byte row) { return (row * DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS) + column; }
+    static byte ColumnAndRowToIndex(byte column, byte row) { return static_cast<byte>((row * DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS) + column); }
 
 };
 

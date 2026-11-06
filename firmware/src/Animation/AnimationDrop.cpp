@@ -44,7 +44,7 @@ void AnimationDrop::Reset()
     row_ = 0u;
     column_ = 0u;
     clock_words_table_.fill(DisplayWords::WordIdType::kNone);
-    current_word_index_ = clock_words_table_.size() - 1u;
+    current_word_index_ = static_cast<byte>(clock_words_table_.size() - 1u);
 }
 
 void AnimationDrop::ClearTimeTask()
@@ -65,10 +65,10 @@ void AnimationDrop::ClearTimeTask()
 void AnimationDrop::SetTimeTask()
 {
     DisplayWord current_word = words_.GetDisplayWord(clock_words_table_[current_word_index_]);
-    const byte max_column = words_.GetDisplayWordColumn(clock_words_table_[current_word_index_]) + current_word.GetLength() - 1u;
+    const byte max_column = static_cast<byte>(words_.GetDisplayWordColumn(clock_words_table_[current_word_index_]) + current_word.GetLength() - 1u);
 
     if(SetNextRow(current_word.GetRow()) == kEOk) {
-        Display::GetInstance().ClearPixel(column_, row_ - 1u);
+        Display::GetInstance().ClearPixel(column_, static_cast<byte>(row_ - 1u));
     } else {
         if(SetNextColumn(max_column) == kENotOk) {
             FinishWithClockWords(clock_words_table_);
@@ -82,8 +82,9 @@ void AnimationDrop::SetTimeTask()
 StdReturnType AnimationDrop::SetNextActivePixelIndex()
 {
     for(int16_t index = DISPLAY_NUMBER_OF_PIXELS - 1u; index >= 0; index--) {
-        if(Display::GetInstance().GetPixel(index)) {
-            Display::GetInstance().IndexToColumnAndRow(index, column_, row_);
+        const Display::IndexType pixel_index = static_cast<Display::IndexType>(index);
+        if(Display::GetInstance().GetPixel(pixel_index)) {
+            Display::GetInstance().IndexToColumnAndRow(pixel_index, column_, row_);
             return kEOk;
         }
     }
@@ -98,8 +99,9 @@ StdReturnType AnimationDrop::SetNextWordIndex()
      * an implementation-defined conversion rather than by arithmetic.
      */
     for(int index = static_cast<int>(current_word_index_) - 1; index >= 0; index--) {
-        if(clock_words_table_[index] != DisplayWords::WordIdType::kNone) {
-            current_word_index_ = index;
+        const byte word_index = static_cast<byte>(index);
+        if(clock_words_table_[word_index] != DisplayWords::WordIdType::kNone) {
+            current_word_index_ = word_index;
             return kEOk;
         }
     }

@@ -43,12 +43,15 @@ class StringTools
        * };
        */
 
-     static constexpr size_t npos = -1; /*!< The largest `size_t`, for no position. */
+     static constexpr size_t npos{static_cast<size_t>(-1)}; /*!< The largest `size_t`, for no position. */
      static constexpr char kNullCharacter{'\0'}; /*!< The character that ends a string. */
      using PositionType = uint8_t; /*!< A position in a string, counted from 0. */
      using LengthType = uint8_t; /*!< A length of a string, in characters. */
 
   private:
+    // A position is a byte because what is read here is one line of a command, which is far
+    // shorter than 256 characters; a longer string would have its position cut short here.
+    static PositionType ToPosition(const char* string, const char* end) { return static_cast<PositionType>(end - string); }
 
   public:
     /*! \brief Makes the string tools, which hold nothing. */
@@ -65,14 +68,13 @@ class StringTools
      *
      * \param[out] destination The buffer, with room for `length` characters.
      * \param[in] source The string to copy, terminated.
-     * \param[in] length The size of `destination`, its terminator included. Below 1 there is no
-     *                   room even for the terminator, and `destination` is left as it was.
+     * \param[in] length The size of `destination`, its terminator included. At 0 there is no room
+     *                   even for the terminator, and `destination` is left as it was.
      */
-    static void StringCopy(char* destination, const char* source, int length) {
-        if(length < 1) { return; }
-        const size_t size{static_cast<size_t>(length)};
-        strncpy(destination, source, size - 1u);
-        destination[size - 1u] = kNullCharacter;
+    static void StringCopy(char* destination, const char* source, size_t length) {
+        if(length == 0u) { return; }
+        strncpy(destination, source, length - 1u);
+        destination[length - 1u] = kNullCharacter;
     }
 
     /*!
@@ -147,7 +149,7 @@ class StringTools
         char* end = nullptr;
         errno = 0;
         const unsigned long value_big{strtoul(string, &end, base)};
-        position = end - string;
+        position = ToPosition(string, end);
 
         if(string == end) {
             return ResultType::kNoValue;
@@ -174,7 +176,7 @@ class StringTools
         char* end = nullptr;
         errno = 0;
         const long value_big{strtol(string, &end, base)};
-        position = end - string;
+        position = ToPosition(string, end);
 
         if(string == end) {
             return ResultType::kNoValue;
@@ -215,7 +217,7 @@ class StringTools
         char* end = nullptr;
         errno = 0;
         double value_big = strtod(string, &end);
-        position = end - string;
+        position = ToPosition(string, end);
 
         if(string == end) {
             return ResultType::kNoValue;

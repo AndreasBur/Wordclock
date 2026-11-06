@@ -79,10 +79,13 @@ class Text
         FontType font;             /*!< The font the shift draws in. */
         char character;            /*!< The character coming in. */
         byte char_width;           /*!< The width of its glyph in columns. */
-        byte counter : 7;          /*!< The columns of the glyph still to come in. */
-        // A one-bit field, which is why ShiftStateType is a uint8_t and not the default int:
-        // a signed type holds 0 and -1 here, and kBusy would read back as -1.
-        ShiftStateType state : 1;  /*!< Whether a character is coming in. */
+        /*
+         * Whole bytes, where the two used to share one as seven bits and one: GCC's -Wconversion
+         * reports every assignment to a bit field narrower than the value, a cast included, and
+         * what the field saved was one byte of the one Text object.
+         */
+        byte counter;              /*!< The columns of the glyph still to come in. */
+        ShiftStateType state;      /*!< Whether a character is coming in. */
     };
 
   private:

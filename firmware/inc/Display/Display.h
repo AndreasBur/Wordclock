@@ -928,7 +928,7 @@ class Display
      * \return row * DISPLAY_NUMBER_OF_COLUMNS + column. It is not checked: a column past the last
      *         one gives the index of a pixel in a later row.
      */
-    static byte ColumnAndRowToIndex(byte column, byte row) { return (row * DISPLAY_NUMBER_OF_COLUMNS) + column; }
+    static byte ColumnAndRowToIndex(byte column, byte row) { return static_cast<byte>((row * DISPLAY_NUMBER_OF_COLUMNS) + column); }
 
 };
 

@@ -102,7 +102,7 @@ void AnimationExplodePixels::ShiftQuadrantUpperLeft()
 {
     for(int8_t column = kColumnCenter; column >= 0; column--) {
         for(int8_t row = kRowCenter; row >= 0; row--) {
-            if(Display::GetInstance().GetPixel(column, row)) { ShiftDownRight(column, row); }
+            ShiftIfLit(ToCoordinate(column), ToCoordinate(row), ShiftDownRight);
         }
     }
 }
@@ -120,7 +120,7 @@ void AnimationExplodePixels::ShiftQuadrantUpperRight()
 {
     for(uint8_t column = kColumnCenter + 1u; column < DISPLAY_NUMBER_OF_COLUMNS; column++) {
         for(int8_t row = kRowCenter - 1u; row >= 0; row--) {
-            if(Display::GetInstance().GetPixel(column, row)) { ShiftDownLeft(column, row); }
+            ShiftIfLit(column, ToCoordinate(row), ShiftDownLeft);
         }
     }
 }
@@ -138,7 +138,7 @@ void AnimationExplodePixels::ShiftQuadrantLowerLeft()
 {
     for(int8_t column = kColumnCenter - 1u; column >= 0; column--) {
         for(int8_t row = kRowCenter + 1u; row < static_cast<int8_t>(DISPLAY_NUMBER_OF_ROWS); row++) {
-            if(Display::GetInstance().GetPixel(column, row)) { ShiftUpRight(column, row); }
+            ShiftIfLit(ToCoordinate(column), ToCoordinate(row), ShiftUpRight);
         }
     }
 }
@@ -156,7 +156,7 @@ void AnimationExplodePixels::ShiftQuadrantLowerRight()
 {
     for(uint8_t column = kColumnCenter; column < DISPLAY_NUMBER_OF_COLUMNS; column++) {
         for(int8_t row = kRowCenter; row < static_cast<int8_t>(DISPLAY_NUMBER_OF_ROWS); row++) {
-            if(Display::GetInstance().GetPixel(column, row)) { ShiftUpLeft(column, row); }
+            ShiftIfLit(column, ToCoordinate(row), ShiftUpLeft);
         }
     }
 }
@@ -168,6 +168,11 @@ void AnimationExplodePixels::ShiftUpLeft(byte column, byte row)
     if(column > kColumnCenter) column_next--;
     if(row > kRowCenter) row_next--;
     ClearOldAndSetNewPixel(column, row, column_next, row_next);
+}
+
+void AnimationExplodePixels::ShiftIfLit(byte column, byte row, void (*shift)(byte column, byte row))
+{
+    if(Display::GetInstance().GetPixel(column, row)) { shift(column, row); }
 }
 
 void AnimationExplodePixels::ClearOldAndSetNewPixel(byte column_old, byte row_old, byte column_new, byte row_new)

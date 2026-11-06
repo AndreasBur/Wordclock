@@ -60,8 +60,8 @@ byte AnimationSnake::TransformToSerpentine(byte column, byte row)
 {
     byte index;
 
-    if(!Bit<byte>::ReadBit(row, 0u)) index = (row * DISPLAY_NUMBER_OF_COLUMNS) + column;
-    else index = (row * DISPLAY_NUMBER_OF_COLUMNS) + (DISPLAY_NUMBER_OF_COLUMNS - column - 1u);
+    if(!Bit<byte>::ReadBit(row, 0u)) index = static_cast<byte>((row * DISPLAY_NUMBER_OF_COLUMNS) + column);
+    else index = static_cast<byte>((row * DISPLAY_NUMBER_OF_COLUMNS) + (DISPLAY_NUMBER_OF_COLUMNS - column - 1u));
 
     return index;
 }

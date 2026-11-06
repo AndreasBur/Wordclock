@@ -114,7 +114,7 @@ class DisplayCurrentLimit
      * \return The sum, 0 to 765.
      */
     static constexpr uint16_t ToChannelSum(byte red, byte green, byte blue) {
-        return static_cast<uint16_t>(red) + green + blue;
+        return static_cast<uint16_t>(red + green + blue);
     }
 
     /*!
