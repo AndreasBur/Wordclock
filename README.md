@@ -175,14 +175,15 @@ either of the others.
 
 [`.github/workflows/static-analysis.yml`](.github/workflows/static-analysis.yml)
 is what reads the code rather than building it — two analysers, because they are
-good at different things, a report of what the tests reach, and the tests run again
-under the sanitizers:
+good at different things, a report of what the tests reach, the tests run again
+under the sanitizers, and a fuzzer for what no test thought of:
 
 | Job | What it does |
 |-----|--------------|
 | clang-tidy | Over the firmware core and the simulator backend, seeing exactly what the compiler sees through `compile_commands.json`. Which checks and why the others are off is in [`.clang-tidy`](.clang-tidy). The names alone are also checked in every test: the simulator's, and the backends' host tests through the database their `run.sh compiledb` writes. Each of the four builds then compiles every header of the core and of its backend on its own, by its own compiler, through [`tools/self-contained-headers.py`](tools/self-contained-headers.py) |
 | coverage | Builds the core tests and both host suites with `--coverage`, runs them, and puts a table of which lines of `firmware/` none of them runs into the job's summary, through [`tools/coverage.py`](tools/coverage.py). A report rather than a check: there is no threshold, and the job fails only when a test does |
 | sanitizers | The same three suites built with AddressSanitizer and UndefinedBehaviorSanitizer, so that a test which passes only because the host did what undefined behaviour happened to do fails instead |
+| fuzz | libFuzzer, under the same two sanitizers, over the two ways data from outside reaches the firmware: a command line as a browser's web socket frame brings it, and a stored settings blob. Three minutes each per pull request, from a corpus the runs before left in the cache. The fuzzers and how to run them are in [`platform/simulator/tests/fuzz/`](platform/simulator/tests/fuzz/run.sh) |
 | cppcheck | Parses the tree by itself, which is what reaches the template instantiations and container bounds the clang checks do not follow. Its two suppressions and their reasons are in [`.cppcheck-suppressions`](.cppcheck-suppressions) |
 
 cppcheck reads `firmware/` only: without wxWidgets' own headers it stops at
@@ -215,6 +216,16 @@ cmake -S . -B build-san -G Ninja -DPLATFORM=simulator \
       -DCMAKE_CXX_FLAGS="$SANITIZE" -DCMAKE_EXE_LINKER_FLAGS="$SANITIZE"
 cmake --build build-san --target WordclockTests && ctest --test-dir build-san
 HOST_TESTS_CXXFLAGS="$SANITIZE" platform/esp32/test/run.sh    # and the same for rp2350
+```
+
+And the fuzzers, which need clang and a build of their own as well. The last number is how
+many seconds each runs; a second run goes on from the corpus the first left in `build-fuzz/work`:
+
+```bash
+cmake -S . -B build-fuzz -G Ninja -DPLATFORM=simulator \
+      -DCMAKE_CXX_COMPILER=clang++ -DWORDCLOCK_BUILD_FUZZERS=ON
+cmake --build build-fuzz --target FuzzCommand FuzzSettings
+platform/simulator/tests/fuzz/run.sh build-fuzz 300 build-fuzz/work
 ```
 
 ## License
