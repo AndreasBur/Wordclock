@@ -11,7 +11,7 @@
 
 #include "StandardTypes.h"
 #include "Arduino.h"
-#include "Clock.h"
+#include "ClockWords.h"
 
 /*!
  * \brief The base of every animation: its state, and the helpers the animations share.
@@ -68,11 +68,7 @@ class Animation
      * \param[in] clock_words_table The words of the new time, as Clock::GetClockWords() returns
      *                              them.
      */
-    void FinishWithClockWords(const ClockWords::WordsListType& clock_words_table) {
-        Display::GetInstance().Clear();
-        Clock::GetInstance().SetTime(clock_words_table);
-        state_ = StateType::kIdle;
-    }
+    void FinishWithClockWords(const ClockWords::WordsListType& clock_words_table);
 
     /*!
      * \brief Draws the words of `hour`:`minute` on a cleared display and ends the animation.
@@ -85,11 +81,7 @@ class Animation
      * \param[in] minute The minute, 0 to 59.
      * \note If `hour` or `minute` is out of range, nothing is lit and the display is left cleared.
      */
-    void FinishWithTime(byte hour, byte minute) {
-        Display::GetInstance().Clear();
-        Clock::GetInstance().SetTime(hour, minute);
-        state_ = StateType::kIdle;
-    }
+    void FinishWithTime(byte hour, byte minute);
 
     /*!
      * \brief Returns a value below `number_of_values` that depends on `hour` and `minute` only.
@@ -116,7 +108,7 @@ class Animation
     StateType GetState() const { return state_; }
 
     /*! \copydoc Display::Show() */
-    static StdReturnType Show() { return Display::GetInstance().Show(); }
+    static StdReturnType Show();
 
     /*!
      * \brief Returns whether the pixel at `column` and `row` belongs to a word of
