@@ -11,7 +11,6 @@
 
 #include "StandardTypes.h"
 #include "Arduino.h"
-#include "StringTools.h"
 #include "RealTimeClock.h"
 #include "Overlay.h"
 

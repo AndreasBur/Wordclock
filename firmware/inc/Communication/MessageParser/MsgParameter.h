@@ -9,7 +9,6 @@
 #ifndef _MSG_PARAMETER_H_
 #define _MSG_PARAMETER_H_
 
-#include "StandardTypes.h"
 
 /*!
  * \brief One option of a command: its short name, the character behind the `-`, and the type of its

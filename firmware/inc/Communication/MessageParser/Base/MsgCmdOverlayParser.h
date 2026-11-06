@@ -13,7 +13,8 @@
 #include "Arduino.h"
 #include "MsgParameterParser.h"
 #include "MsgCmdBaseOverlayParser.h"
-#include "Overlays.h"
+#include "ClockDateTime.h"
+#include "Text.h"
 
 /*!
  * \brief The parser the date, temperature and text overlay commands share: applies their options to

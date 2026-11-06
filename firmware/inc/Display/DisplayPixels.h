@@ -9,10 +9,8 @@
 #ifndef _DISPLAY_PIXELS_H_
 #define _DISPLAY_PIXELS_H_
 
-#include "StandardTypes.h"
 #include "Bit.h"
 #include "Arduino.h"
-#include "DisplayCharacters.h"
 #include "Display.h"
 
 /*!

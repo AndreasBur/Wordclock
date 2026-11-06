@@ -9,7 +9,6 @@
 #ifndef _MSG_CMD_BASE_OVERLAY_PARSER_H_
 #define _MSG_CMD_BASE_OVERLAY_PARSER_H_
 
-#include "StandardTypes.h"
 #include "Arduino.h"
 #include "MsgParameterParser.h"
 

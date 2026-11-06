@@ -11,11 +11,19 @@
 #ifndef _STANDARD_TYPES_H_
 #define _STANDARD_TYPES_H_
 
-#include "limits"
+/*
+ * Re-exported, every one of them, for the same reason as the backends' Arduino.h: what includes
+ * this header wants the fixed-width integers, `size_t`, `CHAR_BIT` or `std::numeric_limits` as
+ * much as anything defined here. Without the pragma an include-cleaner credits those to the inner
+ * header and offers to drop this one from a file that uses nothing else of it.
+ */
+// IWYU pragma: begin_exports
+#include <limits>
 #include <stdint.h>
 #include <limits.h>
 #include <stddef.h>
 #include <type_traits>
+// IWYU pragma: end_exports
 
 #define STD_ON                  1u /*!< A configuration switch that is on. */
 #define STD_OFF                 0u /*!< A configuration switch that is off. */

@@ -9,9 +9,8 @@
 #ifndef _CLOCK_WORDS_H_
 #define _CLOCK_WORDS_H_
 
-#include "StandardTypes.h"
 #include "Arduino.h"
-#include "array"
+#include <array>
 #include "DisplayWords.h"
 
 #define CLOCK_WORDS_MAX_NUMBER_OF_HOUR_WORDS          2u /*!< The places for hour words. */

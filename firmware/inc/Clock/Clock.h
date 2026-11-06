@@ -13,7 +13,6 @@
 #include "Arduino.h"
 #include "Display.h"
 #include "ClockWords.h"
-#include <array>
 
 /*!
  * \brief Whether a new clock shows ES IST at every time, STD_ON, or only at the full and the half

@@ -9,7 +9,6 @@
 #ifndef _FONT_SPRITE_5X8_H_
 #define _FONT_SPRITE_5X8_H_
 
-#include "StandardTypes.h"
 #include "Arduino.h"
 #include "Font.h"
 #include "FontChar.h"
