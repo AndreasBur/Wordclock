@@ -134,7 +134,7 @@ class BH1750
     using IlluminanceType = uint16_t;
 
     /*! \brief A measurement mode of the sensor; its value is the command that selects it. */
-    enum class ModeType {
+    enum class ModeType : byte {
         kNone, /*!< No mode: the sensor is not set up. */
         /*! \brief Measures again and again, at low resolution. */
         kContinuousLowResMode = BH1750_CMD_CONTINUOUS_LOW_RES_MODE,
@@ -207,7 +207,7 @@ class BH1750
         if(lux >= static_cast<float>(BH1750_ILLUMINANCE_MAX_LX_VALUE)) { return BH1750_ILLUMINANCE_MAX_LX_VALUE; }
         return static_cast<IlluminanceType>(lux);
     }
-    static constexpr IlluminanceType CombineRawValueParts(byte high_byte, byte low_byte) { return static_cast<uint16_t>(high_byte) << 8u | low_byte; }
+    static constexpr IlluminanceType CombineRawValueParts(byte high_byte, byte low_byte) { return static_cast<IlluminanceType>((high_byte << 8u) | low_byte); }
     static constexpr bool IsMtRegValueInRange(byte mt_reg_value) { return ((mt_reg_value <= BH1750_REG_MT_MAX_VALUE) && (mt_reg_value >= BH1750_REG_MT_MIN_VALUE)); }
     bool IsOneTimeMode() const {
         return (mode_ == ModeType::kOneTimeHighResMode) || (mode_ == ModeType::kOneTimeHighResMode2) || (mode_ == ModeType::kOneTimeLowResMode);

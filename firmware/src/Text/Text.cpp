@@ -204,7 +204,7 @@ void Text::CharShiftTask()
             if(state_ == StateType::kCharShift) state_ = StateType::kIdle;
         } else {
             shift_.counter--;
-            byte column = DISPLAY_NUMBER_OF_COLUMNS - shift_.char_width + shift_.counter;
+            byte column = static_cast<byte>(DISPLAY_NUMBER_OF_COLUMNS - shift_.char_width + shift_.counter);
             byte row = GetRowCenter(shift_.font);
             /*
              * A character SetChar refuses is shifted through as a space, which is the blank

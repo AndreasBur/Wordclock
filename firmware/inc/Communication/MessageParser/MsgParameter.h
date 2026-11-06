@@ -66,7 +66,7 @@ class MsgParameter
     /*! \brief Returns the short name, the character behind the `-`. */
     char GetOptionShortName() const { return option_short_name_; }
     /*! \brief Returns the type of the argument. */
-    ArgumentTypeType GetArgumentType() const { return argument_type_; }
+    constexpr ArgumentTypeType GetArgumentType() const { return argument_type_; }
 
     /*!
      * \brief Sets the short name.

@@ -107,7 +107,8 @@ static UploadOutcome Post(const char* route, const std::string& content, size_t 
 
     for(size_t index = 0u; index < content.size(); index += chunk_size) {
         const size_t length = std::min(chunk_size, content.size() - index);
-        std::vector<uint8_t> chunk(content.begin() + index, content.begin() + index + length);
+        const auto begin = content.begin() + static_cast<std::ptrdiff_t>(index);
+        std::vector<uint8_t> chunk(begin, begin + static_cast<std::ptrdiff_t>(length));
         body->second(&request, chunk.data(), length, index, announced);
     }
     handler->second(&request);

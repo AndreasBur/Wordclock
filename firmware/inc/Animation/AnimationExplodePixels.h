@@ -64,20 +64,25 @@ class AnimationExplodePixels : public Animation
     static void ShiftUpRight(byte column, byte row);
     static void ShiftUpLeft(byte column, byte row);
 
+    static void ShiftIfLit(byte column, byte row, void (*shift)(byte column, byte row));
     static void ClearOldAndSetNewPixel(byte column_old, byte row_old, byte column_new, byte row_new);
+
+    // The quadrant loops count down past 0 to end, so their variables are signed. Inside the
+    // loop they never are negative, which is what makes this exact.
+    static constexpr byte ToCoordinate(int8_t value) { return static_cast<byte>(value); }
     static void SetNewPixel(byte column_old, byte row_old, byte column_new, byte row_new);
 
     static byte ShiftLeft(byte column, byte number_of_shifts) {
-         return (static_cast<int16_t>(column) - number_of_shifts > kColumnCenter) ? (column - number_of_shifts) : kColumnCenter;
+         return (static_cast<int16_t>(column) - number_of_shifts > kColumnCenter) ? static_cast<byte>(column - number_of_shifts) : kColumnCenter;
     }
     static byte ShiftRight(byte column, byte number_of_shifts) {
-         return (static_cast<uint16_t>(column) + number_of_shifts < kColumnCenter) ? (column + number_of_shifts) : kColumnCenter;
+         return (static_cast<uint16_t>(column) + number_of_shifts < kColumnCenter) ? static_cast<byte>(column + number_of_shifts) : kColumnCenter;
     }
     static byte ShiftUp(byte row, byte number_of_shifts) {
-         return (static_cast<int16_t>(row) - number_of_shifts > kRowCenter) ? (row - number_of_shifts) : kRowCenter;
+         return (static_cast<int16_t>(row) - number_of_shifts > kRowCenter) ? static_cast<byte>(row - number_of_shifts) : kRowCenter;
     }
     static byte ShiftDown(byte row, byte number_of_shifts) {
-         return (static_cast<uint16_t>(row) + number_of_shifts < kRowCenter) ? (row + number_of_shifts) : kRowCenter;
+         return (static_cast<uint16_t>(row) + number_of_shifts < kRowCenter) ? static_cast<byte>(row + number_of_shifts) : kRowCenter;
     }
 
     void SetTime(DisplayPixels& pixels) {

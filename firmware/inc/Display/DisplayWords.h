@@ -28,7 +28,7 @@ class DisplayWords
 {
   public:
     /*! \brief The words of the clock, by id. */
-    enum class WordIdType {
+    enum class WordIdType : byte {
         kNone, /*!< No word: its length of 0 lights nothing. */
         kEs, /*!< The word ES. */
         kIst, /*!< The word IST. */

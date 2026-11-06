@@ -22,9 +22,10 @@ void TestColourDimmingAcrossByteRange()
     DisplayColor color;
     bool all_match = true;
     for(unsigned channel = 0u; channel <= 255u; ++channel) {
-        color.SetColor(Pixel(channel, channel, channel));
+        const byte level = static_cast<byte>(channel);
+        color.SetColor(Pixel(level, level, level));
         for(unsigned brightness = 0u; brightness <= 255u; ++brightness) {
-            color.DimmColors(brightness);
+            color.DimmColors(static_cast<byte>(brightness));
             const uint32_t scaled = (static_cast<uint32_t>(channel) * brightness) / 256u;
             const byte expected = (channel == 0u) ? 0u : ((scaled == 0u) ? 1u : static_cast<byte>(scaled));
             all_match = all_match && color.GetColorRedDimmed() == expected

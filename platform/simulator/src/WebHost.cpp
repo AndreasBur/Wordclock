@@ -28,6 +28,8 @@
 # include <winsock2.h>
 # include <ws2tcpip.h>
 # define CLOSE_SOCKET closesocket
+// What send() takes its length as: Winsock an int, POSIX a size_t.
+using SendLengthType = int;
 #else
 # include <arpa/inet.h>
 # include <fcntl.h>
@@ -38,6 +40,7 @@
 # include <sys/time.h>
 # include <unistd.h>
 # define CLOSE_SOCKET close
+using SendLengthType = size_t;
 #endif
 /*! \endcond */
 
@@ -476,7 +479,7 @@ bool WebHost::SendAll(SocketType socket, const char* data, size_t length)
     size_t sent{0u};
 
     while(sent < length) {
-        const int written = static_cast<int>(send(socket, &data[sent], static_cast<int>(length - sent), 0));
+        const int written = static_cast<int>(send(socket, &data[sent], static_cast<SendLengthType>(length - sent), 0));
 
         if(written > 0) { sent += static_cast<size_t>(written); continue; }
 #ifndef _WIN32

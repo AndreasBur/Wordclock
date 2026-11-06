@@ -17,6 +17,11 @@ using GridType = std::array<std::array<bool, DISPLAY_NUMBER_OF_COLUMNS>, DISPLAY
 constexpr byte kRows{DISPLAY_NUMBER_OF_ROWS};
 constexpr byte kColumns{DISPLAY_NUMBER_OF_COLUMNS};
 
+// The models below count in int, because a step can be negative; an index they reach is not.
+std::size_t ToIndex(int value) { return static_cast<std::size_t>(value); }
+bool& At(GridType& grid, int row, int column) { return grid[ToIndex(row)][ToIndex(column)]; }
+bool At(const GridType& grid, int row, int column) { return grid[ToIndex(row)][ToIndex(column)]; }
+
 // Whether each pixel is lit, which is all a shift moves: a pixel is written in the colour the
 // display writes now, so its colour says nothing about where it came from.
 GridType ReadGrid()
@@ -78,7 +83,7 @@ GridType Shifted(const GridType& grid, int row_step, int column_step, bool rotat
             if(!inside && !rotate) { continue; }
             from_row = (from_row + kRows) % kRows;
             from_column = (from_column + kColumns) % kColumns;
-            shifted[row][column] = grid[from_row][from_column];
+            At(shifted, row, column) = At(grid, from_row, from_column);
         }
     }
     return shifted;
@@ -90,9 +95,9 @@ GridType ShiftedLine(const GridType& grid, int row, int column, int row_step, in
     const GridType whole = Shifted(grid, row_step, column_step, rotate);
     GridType shifted = grid;
 
-    if(row >= 0) { shifted[row] = whole[row]; }
+    if(row >= 0) { shifted[ToIndex(row)] = whole[ToIndex(row)]; }
     if(column >= 0) {
-        for(byte line = 0u; line < kRows; line++) { shifted[line][column] = whole[line][column]; }
+        for(byte line = 0u; line < kRows; line++) { At(shifted, line, column) = At(whole, line, column); }
     }
     return shifted;
 }
@@ -111,20 +116,20 @@ GridType Rolled(const GridType& previous, const GridType& next, RollType roll, i
 
     for(int row = 0; row < kRows; row++) {
         for(int column = 0; column < kColumns; column++) {
-            bool& pixel = rolled[row][column];
+            bool& pixel = At(rolled, row, column);
 
             switch(roll) {
                 case RollType::kRight:
-                    pixel = (column < steps) ? next[row][kColumns - steps + column] : previous[row][column - steps];
+                    pixel = (column < steps) ? At(next, row, kColumns - steps + column) : At(previous, row, column - steps);
                     break;
                 case RollType::kLeft:
-                    pixel = (column >= kColumns - steps) ? next[row][column - (kColumns - steps)] : previous[row][column + steps];
+                    pixel = (column >= kColumns - steps) ? At(next, row, column - (kColumns - steps)) : At(previous, row, column + steps);
                     break;
                 case RollType::kDown:
-                    pixel = (row < steps) ? next[kRows - steps + row][column] : previous[row - steps][column];
+                    pixel = (row < steps) ? At(next, kRows - steps + row, column) : At(previous, row - steps, column);
                     break;
                 default:
-                    pixel = (row >= kRows - steps) ? next[row - (kRows - steps)][column] : previous[row + steps][column];
+                    pixel = (row >= kRows - steps) ? At(next, row - (kRows - steps), column) : At(previous, row + steps, column);
                     break;
             }
         }
@@ -228,7 +233,7 @@ void TestRollAnimationRollsEveryWay()
                 const auto type = static_cast<RollType>(roll);
                 bool possible = number_of_frames == static_cast<std::size_t>(NumberOfSteps(type)) + 1u;
                 for(int step = 1; possible && step <= NumberOfSteps(type); step++) {
-                    possible = frames[step - 1] == Rolled(previous, next, type, step);
+                    possible = frames[ToIndex(step - 1)] == Rolled(previous, next, type, step);
                 }
                 if(possible) { any = true; seen[roll] = true; }
             }

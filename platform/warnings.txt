@@ -38,6 +38,12 @@
 -Wnon-virtual-dtor
 -Woverloaded-virtual
 
+# A value that does not fit where it goes, or changes its sign there. The code targets an 8-bit
+# part whose int is 16 bit, so a conversion the host does without a loss can lose on the AVR.
+# Where a value provably fits, an explicit cast says so.
+-Wconversion
+-Wsign-conversion
+
 # Left out on purpose:
 #
 # -Wuseless-cast
@@ -48,7 +54,3 @@
 # -Wlogical-op
 #   Reports errno == EAGAIN || errno == EWOULDBLOCK, the portable spelling of "would block",
 #   because the two are the same number on Linux.
-#
-# -Wconversion, -Wsign-conversion
-#   About fifty findings in the core, nearly all a narrowing into byte. Worth going through -
-#   the int of the AVR is 16 bit - but one by one, not as a side effect of turning a flag on.

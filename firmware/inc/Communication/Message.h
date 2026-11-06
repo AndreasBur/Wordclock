@@ -25,7 +25,7 @@ class Message
 {
   public:
       static constexpr size_t kMessageLength{MESSAGE_LENGTH}; /*!< The size of the buffer. */
-      static constexpr size_t npos = -1; /*!< What Find() returns for no finding, SIZE_MAX. */
+      static constexpr size_t npos{static_cast<size_t>(-1)}; /*!< What Find() returns for no finding, SIZE_MAX. */
       static constexpr char kNullCharacter{STD_NULL_CHARACTER}; /*!< The terminator. */
 
   private:
@@ -64,7 +64,7 @@ class Message
     {
         const char* finding = strstr(&buffer_[position], string);
         if(finding == nullptr) { return npos; }
-        else { return finding - buffer_; }
+        else { return static_cast<size_t>(finding - buffer_); }
     }
 
     /*!
@@ -88,7 +88,7 @@ class Message
     {
         const char* finding = strchr(&buffer_[position], character);
         if(finding == nullptr) { return npos; }
-        else { return finding - buffer_; }
+        else { return static_cast<size_t>(finding - buffer_); }
     }
 
     /*!
@@ -102,7 +102,7 @@ class Message
      */
     StdReturnType AddChar(char character)
     {
-        byte message_length = strlen(buffer_);
+        const size_t message_length{strlen(buffer_)};
         // check for free space in message buffer
         if(message_length < (MESSAGE_LENGTH - 1u))
         {
