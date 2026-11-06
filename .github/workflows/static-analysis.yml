@@ -19,7 +19,8 @@
 # parameter. What a block holds is docs/documentation.md.
 #
 # And every header is compiled on its own, once per build, so that none of them compiles only
-# because of what its includers brought along.
+# because of what its includers brought along. The tests are read too: the coverage job reports
+# which lines of firmware/ none of them runs.
 # clang-tidy reads four builds, not one. The simulator's covers the firmware core as the
 # host compiler sees it; each hardware backend is only ever compiled by its own cross
 # compiler, so it is read through that build's database - rewritten by
@@ -229,6 +230,45 @@ jobs:
             -Iplatform/simulator/include/sim \
             -Iplatform/simulator/include \
             firmware/src firmware/inc
+
+  # Which lines of firmware/ the tests run, as a table in the job's summary - the least covered
+  # files first, because the gaps are what it is for. Read rather than enforced: there is no
+  # threshold, so a pull request is never held up by a number, and the job fails only when a
+  # test does. All three suites at once, because each alone reads as a gap where another
+  # covers it: the core tests never reach the command line, which the host suites drive through
+  # the web socket. Here rather than in ci.yml because it reads the tests and builds nothing a
+  # release would ship, and ci.yml is what release.yml runs.
+  #
+  # Cheap: the test binaries only - no simulator window, no PlatformIO, no cross compiler. How
+  # the instrumented builds are made, and why -O0, is in tools/coverage.py.
+  coverage:
+    name: Coverage report
+    runs-on: ubuntu-26.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install the toolchain
+        uses: ./.github/actions/apt-install
+        with:
+          packages: cmake ninja-build libwxgtk3.2-dev
+
+      - name: Build the core tests with --coverage
+        run: |
+          cmake -S . -B build-cov -G Ninja -DPLATFORM=simulator \
+                -DCMAKE_CXX_FLAGS="--coverage -O0" -DCMAKE_EXE_LINKER_FLAGS=--coverage
+          cmake --build build-cov --target WordclockTests
+
+      - name: Run the three suites
+        run: |
+          ctest --test-dir build-cov --output-on-failure
+          HOST_TESTS_CXXFLAGS="--coverage -O0" platform/esp32/test/run.sh
+          HOST_TESTS_CXXFLAGS="--coverage -O0" platform/rp2350/test/run.sh
+
+      - name: Report
+        run: |
+          python3 tools/coverage.py --summary "$GITHUB_STEP_SUMMARY" \
+              build-cov platform/esp32/.pio/host-tests platform/rp2350/.pio/host-tests
 
   docs:
     name: Doxygen blocks
