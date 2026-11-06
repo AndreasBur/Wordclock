@@ -62,6 +62,12 @@ FLAGS=(-std=gnu++17 -Wall -Wextra -Werror)
 # compiled whole. This backend asks, the same way platformio.ini does for the real build.
 FLAGS+=(-DWEB_FRONTEND_SUPPORT=STD_ON)
 
+# Whatever HOST_TESTS_CXXFLAGS holds is added as well. It is how the coverage job in ci.yml
+# builds these tests with --coverage; tools/coverage.py reads what the run leaves beside the
+# objects. Unquoted on purpose, so that it splits into its flags.
+# shellcheck disable=SC2206
+FLAGS+=(${HOST_TESTS_CXXFLAGS:-})
+
 # A compiled-in pass phrase with no compiled-in network, so that a case can tell a stored open
 # network's empty pass phrase from this one: taken for none stored, the empty one was replaced.
 FLAGS+=('-DWORDCLOCK_WIFI_PASSWORD="compiled"')
@@ -82,6 +88,9 @@ KEY="${FLAGS[*]} ${INCLUDES[*]}"
 if [ ! -f "$KEY_FILE" ] || [ "$(cat "$KEY_FILE")" != "$KEY" ]; then
     find "$CACHE" -name '*.o' -delete
     find "$CACHE" -name '*.d' -delete
+    # The coverage notes and counts belong to the objects they were written beside.
+    find "$CACHE" -name '*.gcno' -delete
+    find "$CACHE" -name '*.gcda' -delete
     printf '%s' "$KEY" > "$KEY_FILE"
 fi
 

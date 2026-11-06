@@ -66,7 +66,7 @@ spricht deutsch.
 | [platform/esp32/](platform/esp32/) | On-device backend: WS2812 over the RMT peripheral, time from NTP. Built with PlatformIO — see its [README](platform/esp32/README.md). |
 | [platform/rp2350/](platform/rp2350/) | On-device backend for the Raspberry Pi Pico 2 W, derived from the ESP32 one. Built with PlatformIO — see its [README](platform/rp2350/README.md). |
 | [platform/avr-dx/](platform/avr-dx/) | On-device backend for the AVR128DA48: WS2812 shaped by the CCL, time from a DS3231. Built with CMake and a cross toolchain file — see its [README](platform/avr-dx/README.md). |
-| [tools/](tools/) | [documented-sizes.py](tools/documented-sizes.py), which compares every size this repository claims against a build and fails the pull request that made one stale, and [self-contained-headers.py](tools/self-contained-headers.py), which compiles every header on its own so that none of them builds only on what its includers happened to include first. |
+| [tools/](tools/) | [documented-sizes.py](tools/documented-sizes.py), which compares every size this repository claims against a build and fails the pull request that made one stale; [self-contained-headers.py](tools/self-contained-headers.py), which compiles every header on its own so that none of them builds only on what its includers happened to include first, and [coverage.py](tools/coverage.py), which reports the lines of `firmware/` that no test runs. |
 
 The tool that generates the bitmap font tables lives in its own repository,
 [theAndreas/FontCreator](https://github.com/theAndreas/FontCreator) — see
@@ -175,11 +175,12 @@ either of the others.
 
 [`.github/workflows/static-analysis.yml`](.github/workflows/static-analysis.yml)
 is what reads the code rather than building it — two analysers, because they are
-good at different things:
+good at different things, and a report of what the tests reach:
 
 | Job | What it does |
 |-----|--------------|
 | clang-tidy | Over the firmware core and the simulator backend, seeing exactly what the compiler sees through `compile_commands.json`. Which checks and why the others are off is in [`.clang-tidy`](.clang-tidy). The names alone are also checked in every test: the simulator's, and the backends' host tests through the database their `run.sh compiledb` writes. Each of the four builds then compiles every header of the core and of its backend on its own, by its own compiler, through [`tools/self-contained-headers.py`](tools/self-contained-headers.py) |
+| coverage | Builds the core tests and both host suites with `--coverage`, runs them, and puts a table of which lines of `firmware/` none of them runs into the job's summary, through [`tools/coverage.py`](tools/coverage.py). A report rather than a check: there is no threshold, and the job fails only when a test does |
 | cppcheck | Parses the tree by itself, which is what reaches the template instantiations and container bounds the clang checks do not follow. Its two suppressions and their reasons are in [`.cppcheck-suppressions`](.cppcheck-suppressions) |
 
 cppcheck reads `firmware/` only: without wxWidgets' own headers it stops at
