@@ -55,7 +55,9 @@ while IFS= read -r directory; do INCLUDES+=(-I"$directory"); done < <(find "$ROO
 # build script finds it in the framework; here it is the stub.
 INCLUDES+=(-DWORDCLOCK_CORE_ARDUINO_H="\"$TEST_DIR/stubs/Arduino.h\"")
 
-FLAGS=(-std=gnu++17 -Wall -Wextra -Werror)
+# The warnings are the ones in platform/warnings.txt, which says why each is on.
+FLAGS=(-std=gnu++17 -Werror)
+while IFS= read -r flag; do FLAGS+=("$flag"); done < <(grep '^-' "$ROOT/platform/warnings.txt")
 
 # The firmware's web front end is compiled into every target that asks for it and out of the
 # ones that do not - the AVR-Dx has no radio to serve anything over, and firmware/src is
@@ -184,14 +186,16 @@ link() {   # name, then the sources that belong to it
 # compiles the host tests, so this is the only way clang-tidy can read them - the naming
 # check in static-analysis.yml does, through `run.sh compiledb`. Written on every run, as it
 # costs nothing, so that a local clang-tidy finds it too. Through python rather than printf:
-# the core's Arduino.h is named in a define that carries its own quotes.
+# the core's Arduino.h is named in a define that carries its own quotes. The database is read
+# by clang only, so it also tells clang to pass over the warnings only GCC knows - two of
+# platform/warnings.txt - which -Werror would otherwise turn into an error in every file.
 writeCompileCommands() {
     python3 - "$ROOT" "$CACHE/compile_commands.json" "${#FLAGS[@]}" "${FLAGS[@]}" "${INCLUDES[@]}" -- "$@" <<'PYTHON'
 import json, sys
 root, out, count, rest = sys.argv[1], sys.argv[2], int(sys.argv[3]), sys.argv[4:]
 split = rest.index('--')
 arguments, sources = rest[:split], rest[split + 1:]
-json.dump([{'directory': root, 'file': source, 'arguments': ['g++'] + arguments + ['-c', source]}
+json.dump([{'directory': root, 'file': source, 'arguments': ['g++'] + arguments + ['-Wno-unknown-warning-option', '-c', source]}
            for source in sources], open(out, 'w'), indent=1)
 PYTHON
 }

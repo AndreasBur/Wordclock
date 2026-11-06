@@ -68,7 +68,7 @@ set(AVR_OPTIONS_DEBUG -Og -g3)
 # -fno-exceptions / -fno-rtti: neither is used, and both cost flash whether used or not.
 target_compile_options(Wordclock PRIVATE
     -mmcu=${AVR_MCU}
-    -Wall -Wextra
+    ${WORDCLOCK_WARNINGS}
     -fno-exceptions -fno-rtti -fno-threadsafe-statics
     -ffunction-sections -fdata-sections
     "$<$<CONFIG:Debug>:${AVR_OPTIONS_DEBUG}>"

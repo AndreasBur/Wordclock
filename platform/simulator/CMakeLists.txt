@@ -114,7 +114,17 @@ target_include_directories(WordclockBuildSettings INTERFACE
 if(MSVC)
     target_compile_options(WordclockBuildSettings INTERFACE /W4)
 else()
-    target_compile_options(WordclockBuildSettings INTERFACE -Wall -Wextra)
+    # Each flag asked of the compiler first, because this is the one build that meets whatever
+    # compiler its host has - and an unknown -W is a warning of its own, which -Werror in CI
+    # would turn into a failed build on a clang.
+    include(CheckCXXCompilerFlag)
+    foreach(flag ${WORDCLOCK_WARNINGS})
+        string(MAKE_C_IDENTIFIER "HAS${flag}" known)
+        check_cxx_compiler_flag(${flag} ${known})
+        if(${known})
+            target_compile_options(WordclockBuildSettings INTERFACE ${flag})
+        endif()
+    endforeach()
 endif()
 
 target_compile_definitions(WordclockBuildSettings INTERFACE ${PIXELS_DEFINE})

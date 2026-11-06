@@ -16,6 +16,10 @@ option(WORDCLOCK_BUILD_TESTS "Build the platform test executable" ON)
 
 set(PLATFORM simulator CACHE STRING "Target platform: simulator | esp32 | avr-dx")
 
+# The warnings both backends built here are compiled with, read from the list the host tests'
+# run.sh read as well. Why each is on, and why some are not, is in that file.
+file(STRINGS "${CMAKE_SOURCE_DIR}/platform/warnings.txt" WORDCLOCK_WARNINGS REGEX "^-")
+
 if(PLATFORM STREQUAL "simulator")
     add_subdirectory(platform/simulator)
 elseif(PLATFORM STREQUAL "esp32")
