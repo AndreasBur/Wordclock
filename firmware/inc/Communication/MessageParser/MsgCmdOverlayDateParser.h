@@ -12,6 +12,7 @@
 #include "StandardTypes.h"
 #include "Arduino.h"
 #include "MsgCmdOverlayParser.h"
+#include "Overlays.h"
 
 /*!
  * \brief The parser of command 5, the date overlay command: sets when the date scrolls over the

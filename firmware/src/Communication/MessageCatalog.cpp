@@ -29,9 +29,9 @@
  * that test them are public and constexpr, so the range can be measured rather than
  * copied.
  */
-#include "Clock.h"
+#include "ClockDate.h"
+#include "ClockTime.h"
 #include "Display.h"
-#include "RealTimeClock.h"
 #include <limits>
 
 // Everything up to the member functions is local to this file, so Doxygen leaves it out.

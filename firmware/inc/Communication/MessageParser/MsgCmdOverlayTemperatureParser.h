@@ -12,6 +12,7 @@
 #include "StandardTypes.h"
 #include "Arduino.h"
 #include "MsgCmdOverlayParser.h"
+#include "Overlays.h"
 
 /*!
  * \brief The parser of command 6, the temperature overlay command: sets when the temperature

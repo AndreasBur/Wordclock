@@ -10,7 +10,9 @@
 #define _STRING_TOOLS_H_
 
 #include "StandardTypes.h"
-#include "errno.h"
+#include <errno.h>
+#include <stdlib.h>
+#include <string.h>
 #include <type_traits>
 
 /*!

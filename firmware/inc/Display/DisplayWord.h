@@ -9,7 +9,6 @@
 #ifndef _DISPLAY_WORD_H_
 #define _DISPLAY_WORD_H_
 
-#include "StandardTypes.h"
 #include "Arduino.h"
 
 /*!

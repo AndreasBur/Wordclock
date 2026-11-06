@@ -12,7 +12,6 @@
 #include "StandardTypes.h"
 #include "Bit.h"
 #include "Arduino.h"
-#include "Display.h"
 #include "Animation.h"
 #include "AnimationTeletype.h"
 #include "AnimationCursor.h"

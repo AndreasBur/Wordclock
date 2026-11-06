@@ -18,7 +18,7 @@
 
 #include "StandardTypes.h"
 #include "Arduino.h"
-#include "Clock.h"
+#include "ClockWords.h"
 #include "Animation.h"
 
 /*!

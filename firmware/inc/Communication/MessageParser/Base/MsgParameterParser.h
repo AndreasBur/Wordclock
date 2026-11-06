@@ -11,7 +11,6 @@
 
 #include "StandardTypes.h"
 #include "Arduino.h"
-#include "Message.h"
 #include "ErrorMessage.h"
 #include "MsgParameter.h"
 #include "StringTools.h"

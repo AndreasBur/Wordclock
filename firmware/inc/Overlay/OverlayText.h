@@ -11,6 +11,7 @@
 
 #include "StandardTypes.h"
 #include "Overlay.h"
+#include "StringTools.h"
 
 /*!
  * \brief The size of the text overlay's buffer, its terminator included: the longest text has one

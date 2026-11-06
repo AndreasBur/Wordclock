@@ -10,7 +10,6 @@
 #define _OVERLAY_TEMPERATURE_H_
 
 #include "StandardTypes.h"
-#include "Arduino.h"
 #include "Overlay.h"
 #include "Temperature.h"
 

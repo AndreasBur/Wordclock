@@ -11,7 +11,6 @@
 
 #include "StandardTypes.h"
 #include "Arduino.h"
-#include "Pixel.h"
 #include "Display.h"
 #include "MsgParameterParser.h"
 

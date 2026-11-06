@@ -20,6 +20,7 @@
 #include "Overlays.h"
 #include "Storage.h"
 #include "Bit.h"
+#include "StringTools.h"
 
 #include <string.h>
 

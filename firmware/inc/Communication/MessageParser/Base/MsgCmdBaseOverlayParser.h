@@ -9,8 +9,8 @@
 #ifndef _MSG_CMD_BASE_OVERLAY_PARSER_H_
 #define _MSG_CMD_BASE_OVERLAY_PARSER_H_
 
-#include "StandardTypes.h"
 #include "Arduino.h"
+#include "MsgParameterParser.h"
 
 /*! \brief The number of options in the parameter table of the overlay commands. */
 #define MSG_CMD_BASE_OVERLAY_PARSER_PARAMETER_TABLE_SIZE           9u

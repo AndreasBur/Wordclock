@@ -12,7 +12,7 @@
 #include "StandardTypes.h"
 #include "Arduino.h"
 #include "Animation.h"
-#include "Clock.h"
+#include "ClockWords.h"
 
 /*! \brief The left column of the smallest frame. */
 #define ANIMATION_CUBE_COLUMN_START_MAX_VALUE         4u
