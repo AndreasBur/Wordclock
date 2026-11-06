@@ -64,7 +64,9 @@ class AnimationExplodePixels : public Animation
     static void ShiftUpRight(byte column, byte row);
     static void ShiftUpLeft(byte column, byte row);
 
-    static void ShiftIfLit(byte column, byte row, void (*shift)(byte column, byte row));
+    // The shift as a template argument and not a function pointer: LTO kept a call through the
+    // pointer, and that is a call no analysis of the AVR's stack can follow.
+    template <void (*Shift)(byte column, byte row)> static void ShiftIfLit(byte column, byte row);
     static void ClearOldAndSetNewPixel(byte column_old, byte row_old, byte column_new, byte row_new);
 
     // The quadrant loops count down past 0 to end, so their variables are signed. Inside the
