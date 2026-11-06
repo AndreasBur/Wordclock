@@ -10,6 +10,8 @@
 
 #include "AnimationDrop.h"
 #include "Display.h"
+#include "DisplayWord.h"
+#include "DisplayWords.h"
 #include "Clock.h"
 
 void AnimationDrop::Init()

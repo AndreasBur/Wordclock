@@ -10,6 +10,7 @@
 
 #include "Clock.h"
 #include "Display.h"
+#include "DisplayWords.h"
 
 /*
  * The hour words: one row per HourModeType, and in it one element per hour of the face, from

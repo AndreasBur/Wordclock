@@ -10,6 +10,7 @@
 
 #include "AnimationCursor.h"
 #include "Display.h"
+#include "DisplayWords.h"
 #include "Clock.h"
 
 void AnimationCursor::Init()

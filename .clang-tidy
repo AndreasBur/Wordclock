@@ -103,6 +103,16 @@ Checks: >
 #   Reports the message catalog's two structs. Their field order is the order the tables
 #   are written in, and those tables are read far more often than the four bytes of
 #   padding are paid for - on the target they sit in flash.
+#
+# misc-include-cleaner, which is not in the list above at all
+#   Asks every source to include each header it uses a name from, its own header's
+#   includes not excepted - and a source leaning on its own header is what Google's rule
+#   allows and what this tree does, so almost everything it reports is that. And it asks
+#   for the header that happens to declare a name on the target being read: for PROGMEM
+#   and byte that is the simulator's arduino/Progmem.h and arduino/Types.h, where every
+#   target's sources mean Arduino.h.
+#   What it is there for, a header that compiles only because of what was included
+#   before it, is caught by tools/self-contained-headers.py instead.
 
 # A finding can be reported under several names at once - a bugprone- check and the CERT
 # rules that alias it - and which of them leads depends on the version. A NOLINT therefore

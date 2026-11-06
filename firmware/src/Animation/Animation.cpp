@@ -11,6 +11,8 @@
 #include "Animation.h"
 #include "Clock.h"
 #include "Display.h"
+#include "DisplayWord.h"
+#include "DisplayWords.h"
 
 bool Animation::IsPixelPartOfClockWords(const ClockWords::WordsListType clock_words_table, byte column, byte row)
 {

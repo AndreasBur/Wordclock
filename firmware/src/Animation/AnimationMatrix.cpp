@@ -10,6 +10,7 @@
 
 #include "AnimationMatrix.h"
 #include "Display.h"
+#include "DisplayWords.h"
 #include "Clock.h"
 
 void AnimationMatrix::Init()

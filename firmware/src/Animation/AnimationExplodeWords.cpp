@@ -10,6 +10,7 @@
 
 #include "AnimationExplodeWords.h"
 #include "Display.h"
+#include "DisplayWords.h"
 #include "Clock.h"
 
 void AnimationExplodeWords::Init()

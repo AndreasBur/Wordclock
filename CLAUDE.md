@@ -57,6 +57,11 @@ Moving a body moves its includes, and a file that leaned on one of them breaks o
 once that include is gone. `tools/self-contained-headers.py` compiles every header as
 the only include of an empty file, and the static-analysis jobs run it for each target.
 
+A source may lean on what its own header includes, as Google's rule allows, and includes
+everything else it names itself: an animation that walks `DisplayWords` includes
+`DisplayWords.h` rather than taking it through `Animation.h` and `Display.h`. That is
+also why `misc-include-cleaner` stays off; `.clang-tidy` says what it would report.
+
 ### Naming
 
 Google's names, the same as in MaxMatrix and Utl, and checked: `.clang-tidy` runs

@@ -9,6 +9,7 @@
 #define _SCHEDULER_SOURCE_
 
 #include "Scheduler.h"
+#include "StandardTypes.h"
 #include "Animations.h"
 #include "DisplayManager.h"
 #include "Illuminance.h"

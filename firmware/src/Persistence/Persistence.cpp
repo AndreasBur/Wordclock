@@ -18,6 +18,8 @@
 #include "ColorCycle.h"
 #include "NightSwitch.h"
 #include "Overlays.h"
+#include "OverlayText.h"
+#include "Text.h"
 #include "Storage.h"
 #include "Bit.h"
 #include "StringTools.h"

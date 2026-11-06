@@ -9,6 +9,7 @@
 #define _COMMUNICATION_SOURCE_
 
 #include "Communication.h"
+#include "StandardTypes.h"
 #include "MsgCmdParser.h"
 
 void Communication::Task()
