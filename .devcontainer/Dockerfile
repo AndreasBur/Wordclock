@@ -31,6 +31,10 @@ FROM ${BASE_IMAGE}
 # which walks the compile database in parallel, is part of the same package.
 # cppcheck is the second analyser of that same workflow, and is here for the same reason.
 # doxygen is what tools/docs.py reads the Doxygen blocks with, a job of that workflow as well.
+# clang, libclang-rt-dev and llvm build and read the fuzzers of that workflow's fuzz job. clang
+# alone is not enough, and fails late: it compiles a fuzzer and then cannot link it, because
+# libFuzzer and the sanitizers' runtimes are libclang-rt-dev. llvm brings llvm-symbolizer,
+# without which a finding is a stack of bare addresses.
 # CI uses the same Ubuntu release for both analysers; rebuild this image to pick up
 # package updates when a newer CI image reports a finding that is not reproducible locally.
 # gcc-avr and avr-libc cross-compile the AVR Dx backend, which nothing else here can build:
@@ -40,8 +44,11 @@ FROM ${BASE_IMAGE}
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && \
     apt-get install -y --no-install-recommends \
         cmake \
+        clang \
         clangd \
         clang-tidy \
+        libclang-rt-dev \
+        llvm \
         cppcheck \
         doxygen \
         gcc-avr \
