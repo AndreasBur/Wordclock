@@ -98,11 +98,17 @@ void AnimationExplodePixels::ShiftQuadrants(DisplayPixels& pixels, byte number_o
     }
 }
 
+template <void (*Shift)(byte column, byte row)>
+void AnimationExplodePixels::ShiftIfLit(byte column, byte row)
+{
+    if(Display::GetInstance().GetPixel(column, row)) { Shift(column, row); }
+}
+
 void AnimationExplodePixels::ShiftQuadrantUpperLeft()
 {
     for(int8_t column = kColumnCenter; column >= 0; column--) {
         for(int8_t row = kRowCenter; row >= 0; row--) {
-            ShiftIfLit(ToCoordinate(column), ToCoordinate(row), ShiftDownRight);
+            ShiftIfLit<ShiftDownRight>(ToCoordinate(column), ToCoordinate(row));
         }
     }
 }
@@ -120,7 +126,7 @@ void AnimationExplodePixels::ShiftQuadrantUpperRight()
 {
     for(uint8_t column = kColumnCenter + 1u; column < DISPLAY_NUMBER_OF_COLUMNS; column++) {
         for(int8_t row = kRowCenter - 1u; row >= 0; row--) {
-            ShiftIfLit(column, ToCoordinate(row), ShiftDownLeft);
+            ShiftIfLit<ShiftDownLeft>(column, ToCoordinate(row));
         }
     }
 }
@@ -138,7 +144,7 @@ void AnimationExplodePixels::ShiftQuadrantLowerLeft()
 {
     for(int8_t column = kColumnCenter - 1u; column >= 0; column--) {
         for(int8_t row = kRowCenter + 1u; row < static_cast<int8_t>(DISPLAY_NUMBER_OF_ROWS); row++) {
-            ShiftIfLit(ToCoordinate(column), ToCoordinate(row), ShiftUpRight);
+            ShiftIfLit<ShiftUpRight>(ToCoordinate(column), ToCoordinate(row));
         }
     }
 }
@@ -156,7 +162,7 @@ void AnimationExplodePixels::ShiftQuadrantLowerRight()
 {
     for(uint8_t column = kColumnCenter; column < DISPLAY_NUMBER_OF_COLUMNS; column++) {
         for(int8_t row = kRowCenter; row < static_cast<int8_t>(DISPLAY_NUMBER_OF_ROWS); row++) {
-            ShiftIfLit(column, ToCoordinate(row), ShiftUpLeft);
+            ShiftIfLit<ShiftUpLeft>(column, ToCoordinate(row));
         }
     }
 }
@@ -168,11 +174,6 @@ void AnimationExplodePixels::ShiftUpLeft(byte column, byte row)
     if(column > kColumnCenter) column_next--;
     if(row > kRowCenter) row_next--;
     ClearOldAndSetNewPixel(column, row, column_next, row_next);
-}
-
-void AnimationExplodePixels::ShiftIfLit(byte column, byte row, void (*shift)(byte column, byte row))
-{
-    if(Display::GetInstance().GetPixel(column, row)) { shift(column, row); }
 }
 
 void AnimationExplodePixels::ClearOldAndSetNewPixel(byte column_old, byte row_old, byte column_new, byte row_new)

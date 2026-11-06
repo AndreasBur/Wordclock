@@ -164,7 +164,7 @@ repository can be built, each of which breaks on its own:
 | RP2350 backend on the host | [`platform/rp2350/test/run.sh`](platform/rp2350/test/run.sh) — the same arrangement for the Pico's backend |
 | ESP32 firmware | `pio run` for the board it actually runs on |
 | RP2350 firmware | `pio run` for the Pico 2 W |
-| AVR Dx firmware | The cross build with `-Werror`, plus [`tools/documented-sizes.py`](tools/documented-sizes.py) against the image it just produced |
+| AVR Dx firmware | The cross build with `-Werror`, plus [`tools/documented-sizes.py`](tools/documented-sizes.py) against the image it just produced, and [`tools/avr-stack.py`](tools/avr-stack.py): the deepest stack against the RAM the image leaves free |
 
 A firmware job looks redundant next to its host tests and is not: those compile
 the same sources with the host's compiler and libc, so anything the target's
