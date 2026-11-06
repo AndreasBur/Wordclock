@@ -23,8 +23,8 @@ StdReturnType Transformation::ShiftLeft(bool rotate)
 
 StdReturnType Transformation::ShiftRowLeft(byte row, bool rotate)
 {
-    Display::PixelValueType first_pixel_value;
-    Display::PixelValueType pixel_value;
+    Display::PixelValueType first_pixel_value{};
+    Display::PixelValueType pixel_value{};
     StdReturnType return_value{kEOk};
 
     if(rotate) if(Display::GetInstance().GetPixel(0, row, first_pixel_value) == kENotOk) return_value = kENotOk;
@@ -51,8 +51,8 @@ StdReturnType Transformation::ShiftRight(bool rotate)
 
 StdReturnType Transformation::ShiftRowRight(byte row, bool rotate)
 {
-    Display::PixelValueType last_pixel_value;
-    Display::PixelValueType pixel_value;
+    Display::PixelValueType last_pixel_value{};
+    Display::PixelValueType pixel_value{};
     StdReturnType return_value{kEOk};
 
     if(rotate) if(Display::GetInstance().GetPixel(DISPLAY_NUMBER_OF_COLUMNS - 1u, row, last_pixel_value) == kENotOk) return_value = kENotOk;
@@ -79,8 +79,8 @@ StdReturnType Transformation::ShiftUp(bool rotate)
 
 StdReturnType Transformation::ShiftColumnUp(byte column, bool rotate)
 {
-    Display::PixelValueType first_pixel_value;
-    Display::PixelValueType pixel_value;
+    Display::PixelValueType first_pixel_value{};
+    Display::PixelValueType pixel_value{};
     StdReturnType return_value{kEOk};
 
     if(rotate) if(Display::GetInstance().GetPixel(column, 0u, first_pixel_value) == kENotOk) return_value = kENotOk;
@@ -107,8 +107,8 @@ StdReturnType Transformation::ShiftDown(bool rotate)
 
 StdReturnType Transformation::ShiftColumnDown(byte column, bool rotate)
 {
-    Display::PixelValueType last_pixel_value;
-    Display::PixelValueType pixel_value;
+    Display::PixelValueType last_pixel_value{};
+    Display::PixelValueType pixel_value{};
     StdReturnType return_value{kEOk};
 
     if(rotate) if(Display::GetInstance().GetPixel(column, DISPLAY_NUMBER_OF_ROWS - 1u, last_pixel_value) == kENotOk) return_value = kENotOk;
