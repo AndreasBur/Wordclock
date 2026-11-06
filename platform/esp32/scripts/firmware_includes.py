@@ -52,5 +52,5 @@ env.Append(CPPPATH=firmware_include_dirs(env.subst("$PROJECT_DIR")))  # noqa: F8
 # The escaped quotes are part of the value: `#include WORDCLOCK_CORE_ARDUINO_H` needs the
 # macro to expand to a quoted path, so they have to survive the shell into the compiler.
 env.Append(  # noqa: F821
-    CPPDEFINES=[("WORDCLOCK_CORE_ARDUINO_H", '\\"{}\\"'.format(core_arduino_header(env)))]
+    CPPDEFINES=[("WORDCLOCK_CORE_ARDUINO_H", '\\"{}\\"'.format(core_arduino_header(env)))]  # noqa: F821
 )
