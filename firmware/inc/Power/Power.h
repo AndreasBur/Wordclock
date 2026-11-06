@@ -35,7 +35,6 @@
 
 #include "StandardTypes.h"
 #include "Arduino.h"
-#include "Display.h"
 #include "PowerSwitch.h"
 
 /*!
@@ -84,38 +83,11 @@ class Power
     Power() { }
     ~Power() { }
 
-    static Display& GetDisplay() { return Display::GetInstance(); }
     static PowerSwitch& GetSwitch() { return PowerSwitch::GetInstance(); }
 
-    /*
-     * Both waits, as one question. A buffer still marked dirty means the blanked frame has
-     * not been handed to the strip yet; a frame on the wire means it has and is still going
-     * out. Only when neither holds is the strip dark and idle.
-     *
-     * Anything still drawing - an animation that is running out, the clock changing minute -
-     * marks the buffer again and makes this wait another tick. That is left as it is rather
-     * than cut short: the display is dark from the first step onwards, so what a longer wait
-     * postpones is the current the switch saves, not the darkness somebody asked for.
-     */
-    static bool IsStripDarkAndIdle() {
-        if(GetDisplay().IsDirty()) { return false; }
-
-        return !GetDisplay().IsFrameOnTheWire();
-    }
-
-    // The gate before the port, so that no tick can slip a frame in between the two.
-    void CutSupply() {
-        GetDisplay().SuspendOutput();
-        GetSwitch().SwitchSupplyOff();
-        state_ = StateType::kSupplyOff;
-    }
-
-    // The port before the gate, for the same reason read the other way round.
-    void ReleaseSupply() {
-        GetDisplay().ResumeOutput();
-        GetDisplay().Enable();
-        state_ = StateType::kSupplyOn;
-    }
+    static bool IsStripDarkAndIdle();
+    void CutSupply();
+    void ReleaseSupply();
 
   public:
     /*! \brief Returns the one supply. */
@@ -163,27 +135,7 @@ class Power
      *
      * \return kEOk, or kENotOk if no switch is fitted; nothing changes then.
      */
-    StdReturnType SwitchSupplyOn() {
-        if constexpr (!IsSwitchFitted()) { return kENotOk; }
-
-        switch(state_) {
-            case StateType::kSupplyOff :
-                // The port first; the data line follows on the next task.
-                GetSwitch().SwitchSupplyOn();
-                state_ = StateType::kSettling;
-                break;
-            // Never got as far as cutting it, so there is nothing to bring up and nothing
-            // to settle - only the darkness to undo.
-            case StateType::kBlanking :
-                ReleaseSupply();
-                break;
-            case StateType::kSupplyOn :
-            case StateType::kSettling :
-                break;
-        }
-
-        return kEOk;
-    }
+    StdReturnType SwitchSupplyOn();
 
     /*!
      * \brief Asks for the supply to go off.
@@ -197,29 +149,7 @@ class Power
      *
      * \return kEOk, or kENotOk if no switch is fitted; nothing changes then.
      */
-    StdReturnType SwitchSupplyOff() {
-        if constexpr (!IsSwitchFitted()) { return kENotOk; }
-
-        switch(state_) {
-            case StateType::kSupplyOn :
-                // Over the data line, not by cutting the supply: this is the frame the
-                // strip has to be holding when its rail goes.
-                GetDisplay().Disable();
-                state_ = StateType::kBlanking;
-                break;
-            // Asked while the supply is coming up. The data line is still gated, so the
-            // strip is dark already and the port can go straight back down.
-            case StateType::kSettling :
-                GetSwitch().SwitchSupplyOff();
-                state_ = StateType::kSupplyOff;
-                break;
-            case StateType::kBlanking :
-            case StateType::kSupplyOff :
-                break;
-        }
-
-        return kEOk;
-    }
+    StdReturnType SwitchSupplyOff();
 
     /*!
      * \brief Takes the sequence of switching one step further.
@@ -228,19 +158,7 @@ class Power
      * on the wire, then gates the data line and cuts the supply. While settling, it releases the
      * data line and enables the display. In the other two states it does nothing.
      */
-    void Task() {
-        switch(state_) {
-            case StateType::kBlanking :
-                if(IsStripDarkAndIdle()) { CutSupply(); }
-                break;
-            case StateType::kSettling :
-                ReleaseSupply();
-                break;
-            case StateType::kSupplyOn :
-            case StateType::kSupplyOff :
-                break;
-        }
-    }
+    void Task();
 };
 
 #endif // _POWER_H_
