@@ -48,6 +48,10 @@ does cost is every file that includes it: `DisplayManager.h` used to drag
 `Animations.h`, `Overlays.h` and the clock into every one of its includers for four
 private helpers.
 
+Moving a body moves its includes, and a file that leaned on one of them breaks only
+once that include is gone. `tools/self-contained-headers.py` compiles every header as
+the only include of an empty file, and the static-analysis jobs run it for each target.
+
 ### Naming
 
 Google's names, the same as in MaxMatrix and Utl, and checked: `.clang-tidy` runs

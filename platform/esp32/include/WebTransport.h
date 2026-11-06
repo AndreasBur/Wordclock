@@ -25,6 +25,7 @@
 #define _WEB_TRANSPORT_H_
 
 #include "StandardTypes.h"
+#include "Arduino.h"
 
 #include <stddef.h>
 
