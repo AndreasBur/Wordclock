@@ -264,6 +264,13 @@ jobs:
       - name: Check the documented sizes
         run: python3 tools/documented-sizes.py --elf build-avr/platform/avr-dx/Wordclock.elf
 
+      # And the stack against the RAM those sizes leave: the deepest path from main(), with the
+      # two deepest interrupt handlers on top, out of the call graph the link writes beside the
+      # image. Nothing on this part notices the stack running into .bss - there is no guard - so
+      # the pull request that makes it deeper is again the one moment it is cheap to find out.
+      - name: Check the stack fits
+        run: python3 tools/avr-stack.py build-avr --paths
+
       # The .hex is what pymcuprog and avrdude write; the .elf goes with it because it is
       # the only one of the two that still knows the symbols, and a report about a clock in
       # somebody's living room is worth little without the binary it ran.

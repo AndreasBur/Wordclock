@@ -144,6 +144,15 @@ stay true, and the one that is not built here is the one that would quietly go s
 It fits either way on this part, but that margin is the difference between fitting and
 not on a smaller one.
 
+The RAM figure is what `.data` and `.bss` take. The stack comes on top of it, from the other
+end, and nothing on this part stops the two from meeting. `tools/avr-stack.py build-avr` adds
+up the deepest call path from `main()` and the two deepest interrupt handlers - at most two
+can nest, one on each priority level - out of the call graph the link writes beside the
+image, and fails when that does not fit what is left; CI runs it after every build, and
+`--paths` prints the paths frame by frame. It refuses rather than guesses: recursion, a call
+through a pointer and a frame of dynamic size each stop it, and so does `malloc()` in the
+image, because a heap is the one use of that RAM no static analysis can bound.
+
 ## Debugging
 
 `-DCMAKE_BUILD_TYPE=Debug` builds with `-Og -g3` and without LTO — whole-program
