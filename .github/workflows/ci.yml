@@ -71,7 +71,7 @@ jobs:
         with:
           packages: cmake ninja-build libwxgtk3.2-dev
 
-      # -Werror only here, not in the CMakeLists: a warning should stop a change from
+      # -Werror in CI, not in the CMakeLists: a warning should stop a change from
       # being merged without stopping somebody in the middle of debugging one.
       - name: Configure
         run: cmake -S . -B build -G Ninja -DPLATFORM=simulator -DCMAKE_CXX_FLAGS=-Werror
@@ -243,10 +243,13 @@ jobs:
 
       # The toolchain has to be named when the build directory is created: a compiler cannot
       # be swapped after project() has run, which is why -DPLATFORM=avr-dx alone refuses.
+      # -Werror as in the simulator job, and for more reason: nothing else compiles a line of
+      # platform/avr-dx, so a warning there is seen here or nowhere.
       - name: Configure
         run: |
           cmake -B build-avr -S . -G Ninja -DPLATFORM=avr-dx \
-                -DCMAKE_TOOLCHAIN_FILE=platform/avr-dx/toolchain-avr.cmake
+                -DCMAKE_TOOLCHAIN_FILE=platform/avr-dx/toolchain-avr.cmake \
+                -DCMAKE_CXX_FLAGS=-Werror
 
       # The size is printed by the link rule itself. It is the reason this part was chosen,
       # so a change that stops fitting says so here rather than on somebody's bench.

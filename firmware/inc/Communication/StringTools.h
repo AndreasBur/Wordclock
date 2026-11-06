@@ -219,10 +219,10 @@ class StringTools
 
         if(string == end) {
             return ResultType::kNoValue;
-        } else if(value_big > std::numeric_limits<Float>::max()) {
+        } else if(value_big > static_cast<double>(std::numeric_limits<Float>::max())) {
             value = std::numeric_limits<Float>::max();
             return ResultType::kOverflow;
-        } else if(value_big < std::numeric_limits<Float>::lowest()) {
+        } else if(value_big < static_cast<double>(std::numeric_limits<Float>::lowest())) {
             value = std::numeric_limits<Float>::lowest();
             return ResultType::kOverflow;
         } else if(errno == ERANGE) {

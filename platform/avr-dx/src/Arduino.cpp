@@ -128,10 +128,16 @@ ISR(USART1_RXC_vect)
 
 void InitRuntime()
 {
+    /* avr-libc's _PROTECTED_WRITE casts its value with (uint8_t), and a value that is ours rather
+     * than one of its own macros puts that cast on this line - so -Wold-style-cast reports code
+     * that is not here. System.cpp's call passes RSTCTRL_SWRST_bm and is not reported. */
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wold-style-cast"
     _PROTECTED_WRITE(CLKCTRL.OSCHFCTRLA, kFrequencySelect);
     // No prescaler, so the peripheral clock is the oscillator and F_CPU means what the
     // pulse widths assume it means.
     _PROTECTED_WRITE(CLKCTRL.MCLKCTRLB, 0u);
+#pragma GCC diagnostic pop
 
     TCB0.CCMP = ARDUINO_TIMEBASE_COMPARE_VALUE;
     TCB0.CTRLB = TCB_CNTMODE_INT_gc;

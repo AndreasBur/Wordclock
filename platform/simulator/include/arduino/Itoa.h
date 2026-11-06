@@ -31,13 +31,13 @@ inline char* itoa(int value, char* buffer, int base) // NOLINT(readability-ident
 {
     char* p = buffer;
     bool negative = (base == 10 && value < 0);
-    unsigned int u = negative ? (unsigned int)(-value) : (unsigned int)value;
+    unsigned int u = negative ? static_cast<unsigned int>(-value) : static_cast<unsigned int>(value);
 
     char* start = p;
     do {
-        int digit = u % (unsigned int)base;
+        int digit = u % static_cast<unsigned int>(base);
         *p++ = (digit < 10) ? char('0' + digit) : char('a' + digit - 10);
-        u /= (unsigned int)base;
+        u /= static_cast<unsigned int>(base);
     } while(u);
     if(negative) *p++ = '-';
     *p = '\0';

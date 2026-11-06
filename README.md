@@ -164,7 +164,7 @@ repository can be built, each of which breaks on its own:
 | RP2350 backend on the host | [`platform/rp2350/test/run.sh`](platform/rp2350/test/run.sh) — the same arrangement for the Pico's backend |
 | ESP32 firmware | `pio run` for the board it actually runs on |
 | RP2350 firmware | `pio run` for the Pico 2 W |
-| AVR Dx firmware | The cross build, plus [`tools/documented-sizes.py`](tools/documented-sizes.py) against the image it just produced |
+| AVR Dx firmware | The cross build with `-Werror`, plus [`tools/documented-sizes.py`](tools/documented-sizes.py) against the image it just produced |
 
 A firmware job looks redundant next to its host tests and is not: those compile
 the same sources with the host's compiler and libc, so anything the target's
@@ -175,12 +175,14 @@ either of the others.
 
 [`.github/workflows/static-analysis.yml`](.github/workflows/static-analysis.yml)
 is what reads the code rather than building it — two analysers, because they are
-good at different things, and a report of what the tests reach:
+good at different things, a report of what the tests reach, and the tests run again
+under the sanitizers:
 
 | Job | What it does |
 |-----|--------------|
 | clang-tidy | Over the firmware core and the simulator backend, seeing exactly what the compiler sees through `compile_commands.json`. Which checks and why the others are off is in [`.clang-tidy`](.clang-tidy). The names alone are also checked in every test: the simulator's, and the backends' host tests through the database their `run.sh compiledb` writes. Each of the four builds then compiles every header of the core and of its backend on its own, by its own compiler, through [`tools/self-contained-headers.py`](tools/self-contained-headers.py) |
 | coverage | Builds the core tests and both host suites with `--coverage`, runs them, and puts a table of which lines of `firmware/` none of them runs into the job's summary, through [`tools/coverage.py`](tools/coverage.py). A report rather than a check: there is no threshold, and the job fails only when a test does |
+| sanitizers | The same three suites built with AddressSanitizer and UndefinedBehaviorSanitizer, so that a test which passes only because the host did what undefined behaviour happened to do fails instead |
 | cppcheck | Parses the tree by itself, which is what reaches the template instantiations and container bounds the clang checks do not follow. Its two suppressions and their reasons are in [`.cppcheck-suppressions`](.cppcheck-suppressions) |
 
 cppcheck reads `firmware/` only: without wxWidgets' own headers it stops at
@@ -203,6 +205,16 @@ cppcheck --enable=warning,portability --std=c++17 --inline-suppr \
     $(find firmware/inc -type d | sed 's/^/-I/') \
     -Iplatform/simulator/include/sim -Iplatform/simulator/include \
     firmware/src firmware/inc
+```
+
+The sanitizers need a build of their own, because every object is instrumented:
+
+```bash
+SANITIZE="-fsanitize=address,undefined -fno-sanitize-recover=all -fno-omit-frame-pointer"
+cmake -S . -B build-san -G Ninja -DPLATFORM=simulator \
+      -DCMAKE_CXX_FLAGS="$SANITIZE" -DCMAKE_EXE_LINKER_FLAGS="$SANITIZE"
+cmake --build build-san --target WordclockTests && ctest --test-dir build-san
+HOST_TESTS_CXXFLAGS="$SANITIZE" platform/esp32/test/run.sh    # and the same for rp2350
 ```
 
 ## License

@@ -1,0 +1,54 @@
+# The warnings every build of ours is compiled with: the simulator and the AVR Dx through
+# CMakeLists.txt, and both backends' host tests through their run.sh. A line starting with "-"
+# is a flag; everything else is ignored. One list rather than one per build, because four copies
+# of it would drift the way every other duplicated number in this repository has.
+#
+# The PlatformIO builds do not read it. They compile the framework's headers as -I rather than
+# -isystem, so these flags report a few hundred findings in code we do not own - 109 old-style
+# casts in arduino-pico alone - and our own code is already compiled with the list by the
+# simulator and by the host tests. They keep the -Wall -Wextra of their platformio.ini.
+#
+# The simulator compiles with whatever the host has, so it drops the flags its compiler does
+# not know rather than failing: clang has no -Wduplicated-cond.
+
+-Wall
+-Wextra
+
+# A local that hides a member or an outer variable is how a setter ends up assigning itself.
+-Wshadow
+
+# A C cast is a static_cast, a const_cast or a reinterpret_cast, whichever compiles, and does
+# not say which was meant.
+-Wold-style-cast
+-Wcast-qual
+
+# An if-else chain testing the same condition twice, or two branches doing the same thing, is a
+# copy that was not edited.
+-Wduplicated-cond
+-Wduplicated-branches
+
+# Only active where the optimiser runs (-Os on the AVR), because it relies on its analysis.
+-Wnull-dereference
+
+# A float that silently becomes a double costs a software double on the ESP32-S3, whose FPU
+# computes in single precision only. Where the double is wanted, the cast says so.
+-Wdouble-promotion
+
+-Wformat=2
+-Wnon-virtual-dtor
+-Woverloaded-virtual
+
+# Left out on purpose:
+#
+# -Wuseless-cast
+#   Is decided per target and this code is written for several. A cast to uint32_t is useless
+#   on the host, where int is 32 bit, and needed on the AVR, where it is 16 - five of its six
+#   findings were such casts.
+#
+# -Wlogical-op
+#   Reports errno == EAGAIN || errno == EWOULDBLOCK, the portable spelling of "would block",
+#   because the two are the same number on Linux.
+#
+# -Wconversion, -Wsign-conversion
+#   About fifty findings in the core, nearly all a narrowing into byte. Worth going through -
+#   the int of the AVR is 16 bit - but one by one, not as a side effect of turning a flag on.

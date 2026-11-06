@@ -40,7 +40,8 @@ answers on its bus, whether SNTP arrives.
 [`../../test/cases/ds3231_test.cpp`](../../test/cases/ds3231_test.cpp) | the clock chip in both directions: which register a read is aimed at, the temperature the overlay shows, the time block as BCD, and the two states — a stopped oscillator, a chip that was never written — that count as no time rather than as data |
 [`cases/web_test.cpp`](cases/web_test.cpp) | the handlers, reached through the same registration call the server makes: a frame in, an answer out, the page as a gzip stream, the catalog as valid JSON, an oversized frame refused |
 
-`run.sh` builds with `-Wall -Wextra -Werror`, so a warning fails the run.
+`run.sh` builds with the warnings of [`platform/warnings.txt`](../../warnings.txt) and `-Werror`,
+so a warning fails the run.
 
 ## Looking at the pages is not here any more
 

@@ -65,7 +65,7 @@ static std::string root_body;
 static std::string root_encoding;
 static std::string chunked;
 
-esp_err_t httpd_start(httpd_handle_t* h, const httpd_config_t*) { *h = (httpd_handle_t)1; return ESP_OK; }
+esp_err_t httpd_start(httpd_handle_t* h, const httpd_config_t*) { *h = reinterpret_cast<httpd_handle_t>(1); return ESP_OK; }
 
 esp_err_t httpd_register_uri_handler(httpd_handle_t, const httpd_uri_t* u)
 {

@@ -20,7 +20,8 @@
 #
 # And every header is compiled on its own, once per build, so that none of them compiles only
 # because of what its includers brought along. The tests are read too: the coverage job reports
-# which lines of firmware/ none of them runs.
+# which lines of firmware/ none of them runs, and the sanitizers job runs them all again under
+# AddressSanitizer and UndefinedBehaviorSanitizer.
 # clang-tidy reads four builds, not one. The simulator's covers the firmware core as the
 # host compiler sees it; each hardware backend is only ever compiled by its own cross
 # compiler, so it is read through that build's database - rewritten by
@@ -269,6 +270,42 @@ jobs:
         run: |
           python3 tools/coverage.py --summary "$GITHUB_STEP_SUMMARY" \
               build-cov platform/esp32/.pio/host-tests platform/rp2350/.pio/host-tests
+
+  # The same three suites, built with AddressSanitizer and UndefinedBehaviorSanitizer. A test
+  # whose code reads an uninitialised variable, runs past an array or shifts by more than the
+  # width passes as long as the host happens to do what was expected; this is what makes it
+  # fail. It found its first one before it was merged: shifting a row off the grid handed
+  # WritePixel() a bool that GetPixel() had refused to fill.
+  #
+  # -fno-sanitize-recover=all so that a finding ends the run instead of being a line in a log
+  # that passed. Leak checking is on as well, which is AddressSanitizer's default here. Beside
+  # coverage, and not in ci.yml, for the reason that job gives.
+  sanitizers:
+    name: Sanitizers
+    runs-on: ubuntu-26.04
+    timeout-minutes: 20
+    env:
+      SANITIZE: -fsanitize=address,undefined -fno-sanitize-recover=all -fno-omit-frame-pointer
+      UBSAN_OPTIONS: print_stacktrace=1
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install the toolchain
+        uses: ./.github/actions/apt-install
+        with:
+          packages: cmake ninja-build libwxgtk3.2-dev
+
+      - name: Build the core tests
+        run: |
+          cmake -S . -B build-san -G Ninja -DPLATFORM=simulator \
+                -DCMAKE_CXX_FLAGS="$SANITIZE" -DCMAKE_EXE_LINKER_FLAGS="$SANITIZE"
+          cmake --build build-san --target WordclockTests
+
+      - name: Run the three suites
+        run: |
+          ctest --test-dir build-san --output-on-failure
+          HOST_TESTS_CXXFLAGS="$SANITIZE" platform/esp32/test/run.sh
+          HOST_TESTS_CXXFLAGS="$SANITIZE" platform/rp2350/test/run.sh
 
   docs:
     name: Doxygen blocks
