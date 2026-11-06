@@ -93,7 +93,7 @@ class Pixels
     static constexpr byte ToColumn(byte index) { return index % PIXELS_DISPLAY_NUMBER_OF_COLUMNS; }
 
     Pixels() { }
-    ~Pixels() { }
+    ~Pixels() = default;
 
   public:
     /*! \brief Returns the one strip. */

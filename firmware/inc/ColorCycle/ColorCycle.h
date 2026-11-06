@@ -75,7 +75,7 @@ class ColorCycle
     HueType hue_{kHueInitValue};
 
     ColorCycle() { }
-    ~ColorCycle() { }
+    ~ColorCycle() = default;
 
     static Pixel ToColour(HueType hue);
     static bool IsDisplayShowingAnything();

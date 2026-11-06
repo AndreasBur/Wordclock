@@ -163,7 +163,7 @@ class SerialPort
     static constexpr byte kNumberStringLength{12u};
 
     SerialPort() { }
-    ~SerialPort() { }
+    ~SerialPort() = default;
 
     /*
      * Reads no member, and is still not static: made static it cost 72 bytes of flash, as

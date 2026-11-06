@@ -108,7 +108,7 @@ class NightSwitch
     bool supply_cut_for_night_{false};
 
     NightSwitch() { }
-    ~NightSwitch() { }
+    ~NightSwitch() = default;
 
     static constexpr TimeOfDayType ToTimeOfDay(HourType hour, MinuteType minute) {
         return static_cast<TimeOfDayType>((hour * kMinutesPerHour) + minute);

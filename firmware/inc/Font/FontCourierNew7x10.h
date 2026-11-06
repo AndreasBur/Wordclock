@@ -43,7 +43,7 @@ class FontCourierNew7x10 : public Font<FontCharHorizontal<byte, FONT_COURIER_NEW
     constexpr FontCourierNew7x10() : Font(kFontTable) { }
 
     /*! \brief Destroys the font. */
-    ~FontCourierNew7x10() { }
+    ~FontCourierNew7x10() = default;
 
     /*! \brief Returns the width of the font in columns, FONT_COURIER_NEW_7X10_WIDTH. */
     static byte GetWidth() { return FONT_COURIER_NEW_7X10_WIDTH; }

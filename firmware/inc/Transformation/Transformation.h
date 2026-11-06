@@ -29,7 +29,7 @@ class Transformation
     constexpr Transformation() { }
 
     /*! \brief Destroys the transformation. */
-    ~Transformation() { }
+    ~Transformation() = default;
 
     /*!
      * \brief Shifts the whole display one column to the left.

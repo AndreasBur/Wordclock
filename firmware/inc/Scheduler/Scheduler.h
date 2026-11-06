@@ -63,7 +63,7 @@ class Scheduler
     constexpr Scheduler() { }
 
     /*! \brief Destroys the scheduler. */
-    ~Scheduler() { }
+    ~Scheduler() = default;
 
     /*! \brief Returns the milliseconds between two Task() calls, SCHEDULER_TASK_INTERVAL_MS. */
     static constexpr byte GetTaskIntervalMs() { return kTaskIntervalMs; }

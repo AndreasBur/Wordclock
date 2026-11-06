@@ -49,7 +49,7 @@ class DisplayManager
     bool overlay_was_showing_{false};
 
     constexpr DisplayManager() { }
-    ~DisplayManager() { }
+    ~DisplayManager() = default;
 
     static bool IsOverlayShowing();
     static void ShowClock(HourType hour, MinuteType minute);

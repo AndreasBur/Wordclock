@@ -88,7 +88,7 @@ class ErrorMessage
     /*! \brief Makes an error answer, which holds nothing. */
     constexpr ErrorMessage() { }
     /*! \brief Destroys the error answer. */
-    ~ErrorMessage() { }
+    ~ErrorMessage() = default;
 
     /*!
      * \brief Sends `Error=CODE` for `error`.

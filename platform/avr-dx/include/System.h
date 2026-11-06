@@ -60,7 +60,7 @@ class System
     bool restart_pending_{false};
 
     System() { }
-    ~System() { }
+    ~System() = default;
 
   public:
     /*! \brief Returns the one system. */

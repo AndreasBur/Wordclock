@@ -41,7 +41,7 @@ class MsgCmdOverlayDateParser : public MsgCmdOverlayParser<MsgCmdOverlayDatePars
     constexpr MsgCmdOverlayDateParser(const char* parameter) : MsgCmdOverlayParser(parameter) { }
 
     /*! \brief Destroys the parser. */
-    ~MsgCmdOverlayDateParser() { }
+    ~MsgCmdOverlayDateParser() = default;
 
     /*! \brief Returns the period of the date overlay, in minutes, for the `P` field. */
     static MinuteType GetPeriodInMinutes() { return Overlays::GetInstance().GetDatePeriodInMinutes(); }

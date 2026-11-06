@@ -146,7 +146,7 @@ class MsgCmdDisplayPixelParser : public MsgParameterParser<MsgCmdDisplayPixelPar
     constexpr MsgCmdDisplayPixelParser(const char* parameter) : MsgParameterParser(kParameterTable, parameter) { }
 
     /*! \brief Destroys the parser. */
-    ~MsgCmdDisplayPixelParser() { }
+    ~MsgCmdDisplayPixelParser() = default;
 
     /*!
      * \brief Sends the answer: the fields that follow the command number.

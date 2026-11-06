@@ -59,7 +59,7 @@ template <typename FontCharType, size_t FontTableSize> class Font
     constexpr Font(const FontTableType& font_table) : font_table_(font_table) { }
 
     /*! \brief Destroys the font. */
-    ~Font() { }
+    ~Font() = default;
 
     /*
      * Two forms of every reader, and the argument list says which: the one taking a

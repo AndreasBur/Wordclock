@@ -79,7 +79,7 @@ class DisplayColor
     DisplayColor() { }
 
     /*! \brief Destroys the colour. */
-    ~DisplayColor() { }
+    ~DisplayColor() = default;
 
     /*! \brief Returns the colour set, also while the colour cycle shows another. */
     Pixel GetColor() const { return color_; }

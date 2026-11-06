@@ -45,7 +45,7 @@ class AnimationTeletype : public Animation
     constexpr AnimationTeletype() : words_() { }
 
     /*! \brief Destroys the animation. */
-    ~AnimationTeletype() { }
+    ~AnimationTeletype() = default;
 
     /*!
      * \brief Makes the animation idle and resets its progress.

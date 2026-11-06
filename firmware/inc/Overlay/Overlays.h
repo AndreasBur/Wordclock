@@ -127,7 +127,7 @@ class Overlays
 #endif
 
     constexpr Overlays() { }
-    ~Overlays() { }
+    ~Overlays() = default;
 
     bool IsShow() const;
     bool IsIdle() const;

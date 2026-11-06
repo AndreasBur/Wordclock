@@ -58,7 +58,7 @@ class System
 
   private:
     System() { }
-    ~System() { }
+    ~System() = default;
 
   public:
     /*! \brief Returns the one system. */

@@ -35,7 +35,7 @@ class Message
     /*! \brief Makes an empty line. */
     Message() { Clear(); }
     /*! \brief Destroys the line. */
-    ~Message() { }
+    ~Message() = default;
 
     /*! \brief Returns the line, a terminated string. */
     const char* GetMessage() const { return buffer_; }

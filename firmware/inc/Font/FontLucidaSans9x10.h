@@ -45,7 +45,7 @@ class FontLucidaSans9x10 : public Font<FontCharVertical<uint16_t, FONT_LUCIDA_SA
     constexpr FontLucidaSans9x10() : Font(kFontTable) { }
 
     /*! \brief Destroys the font. */
-    ~FontLucidaSans9x10() { }
+    ~FontLucidaSans9x10() = default;
 
     /*! \brief Returns the width of the font in columns, FONT_LUCIDA_SANS_9X10_WIDTH. */
     static byte GetWidth() { return FONT_LUCIDA_SANS_9X10_WIDTH; }

@@ -125,7 +125,7 @@ class WordclockSerial
     void FlushLine();
 
     WordclockSerial() { }
-    ~WordclockSerial() { }
+    ~WordclockSerial() = default;
 
   public:
     /*! \brief Returns the one port, which Serial names. */

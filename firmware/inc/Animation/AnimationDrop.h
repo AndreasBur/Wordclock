@@ -52,7 +52,7 @@ class AnimationDrop : public Animation
     constexpr AnimationDrop() : words_() { }
 
     /*! \brief Destroys the animation. */
-    ~AnimationDrop() { }
+    ~AnimationDrop() = default;
 
     /*!
      * \brief Makes the animation idle and resets its progress.

@@ -141,7 +141,7 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
     }
 
     /*! \brief Destroys the parser. */
-    ~MsgParameterParser() { }
+    ~MsgParameterParser() = default;
 
   private:
     enum class StateType {

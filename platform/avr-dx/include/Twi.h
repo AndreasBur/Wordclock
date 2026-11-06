@@ -59,7 +59,7 @@ class Twi
     bool initialised_{false};
 
     Twi() { }
-    ~Twi() { }
+    ~Twi() = default;
 
     static StdReturnType WaitForWrite();
     static StdReturnType WaitForRead();

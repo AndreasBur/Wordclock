@@ -105,7 +105,7 @@ class Clock
     static const MinuteType kMinutesTable[][CLOCK_NUMBER_OF_MINUTE_STEPS];
 
     constexpr Clock(ModeType mode) : mode_(mode) { }
-    ~Clock() { }
+    ~Clock() = default;
 
     MinuteTableElementType GetMinutesTableElement(byte minute) const {
         MinuteTableElementType minutes_table_element;

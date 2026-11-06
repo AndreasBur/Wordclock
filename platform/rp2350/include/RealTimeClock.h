@@ -85,7 +85,7 @@ class RealTimeClock
     byte chip_read_countdown_{0u};
 
     RealTimeClock() {}
-    ~RealTimeClock() {}
+    ~RealTimeClock() = default;
 
     static bool ReadSystemDateTime(ClockDateTime& value);
     static StdReturnType WriteSystemDateTime(const ClockDateTime& value);

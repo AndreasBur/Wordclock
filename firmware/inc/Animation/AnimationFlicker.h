@@ -54,7 +54,7 @@ class AnimationFlicker : public Animation
     constexpr AnimationFlicker() { }
 
     /*! \brief Destroys the animation. */
-    ~AnimationFlicker() { }
+    ~AnimationFlicker() = default;
 
     /*!
      * \brief Makes the animation idle and resets its progress.

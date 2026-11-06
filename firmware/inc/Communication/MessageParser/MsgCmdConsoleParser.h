@@ -105,7 +105,7 @@ class MsgCmdConsoleParser : public MsgParameterParser<MsgCmdConsoleParser, MSG_C
     constexpr MsgCmdConsoleParser(const char* parameter) : MsgParameterParser(kParameterTable, parameter) { }
 
     /*! \brief Destroys the parser. */
-    ~MsgCmdConsoleParser() { }
+    ~MsgCmdConsoleParser() = default;
 
     /*!
      * \brief Sends the answer: the fields that follow the command number.

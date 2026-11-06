@@ -72,7 +72,7 @@ class OverlayTemperature : public Overlay<OverlayTemperature>
     constexpr OverlayTemperature() { }
 
     /*! \brief Destroys the temperature overlay. */
-    ~OverlayTemperature() { }
+    ~OverlayTemperature() = default;
 
     /*!
      * \brief Returns the reading the overlay took at its last start.

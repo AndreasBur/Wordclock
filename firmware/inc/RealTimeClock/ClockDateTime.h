@@ -47,7 +47,7 @@ class ClockDateTime
     constexpr ClockDateTime() {}
 
     /*! \brief Destroys the date and time. */
-    ~ClockDateTime() {}
+    ~ClockDateTime() = default;
 
     /*! \brief Returns the time of day. */
     ClockTime GetTime() const { return time_; }

@@ -64,7 +64,7 @@ class Uptime
     uint16_t days_{0u};
 
     Uptime() { }
-    ~Uptime() { }
+    ~Uptime() = default;
 
     static bool Carry(byte& value, byte limit);
 

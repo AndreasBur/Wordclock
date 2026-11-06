@@ -42,7 +42,7 @@ class FontSprite5x8 : public Font<FontCharVertical<byte, FONT_SPRITE_5X8_WIDTH>,
     constexpr FontSprite5x8() : Font(kFontTable) { }
 
     /*! \brief Destroys the font. */
-    ~FontSprite5x8() { }
+    ~FontSprite5x8() = default;
 
     /*! \brief Returns the width of the font in columns, FONT_SPRITE_5X8_WIDTH. */
     static byte GetWidth() { return FONT_SPRITE_5X8_WIDTH; }

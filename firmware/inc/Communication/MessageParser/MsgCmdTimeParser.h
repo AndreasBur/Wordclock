@@ -114,7 +114,7 @@ class MsgCmdTimeParser : public MsgParameterParser<MsgCmdTimeParser, MSG_CMD_TIM
     }
 
     /*! \brief Destroys the parser. */
-    ~MsgCmdTimeParser() { }
+    ~MsgCmdTimeParser() = default;
 
     /*!
      * \brief Sends the answer: the fields that follow the command number.

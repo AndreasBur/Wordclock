@@ -63,7 +63,7 @@ class Temperature
     static constexpr char kDecimalPoint{'.'};
 
     constexpr Temperature() { }
-    ~Temperature() { }
+    ~Temperature() = default;
 
     DS3231 sensor_;
 

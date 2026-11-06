@@ -52,7 +52,7 @@ class DisplayPixels
     DisplayPixels() : pixels_buffer_{} {}
 
     /*! \brief Destroys the buffer. */
-    ~DisplayPixels() {}
+    ~DisplayPixels() = default;
 
     /*!
      * \brief Returns whether the pixel at `column` and `row` is lit.

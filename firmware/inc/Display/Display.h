@@ -174,7 +174,7 @@ class Display
 
     Display(Pixel color);
     Display(byte red, byte green, byte blue);
-    ~Display();
+    ~Display() = default;
 
     static byte TransformToSerpentine(byte column, byte row);
     static byte TransformToSerpentine(byte index);

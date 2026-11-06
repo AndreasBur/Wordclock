@@ -47,7 +47,7 @@ class PowerSwitch
     bool supply_on_{true};
 
     PowerSwitch() { }
-    ~PowerSwitch() { }
+    ~PowerSwitch() = default;
 
   public:
     /*! \brief Returns the one switch. */

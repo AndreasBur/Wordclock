@@ -55,7 +55,7 @@ class Storage
     static constexpr byte kLengthEmpty{0xFFu};
 
     Storage() { }
-    ~Storage() { }
+    ~Storage() = default;
 
   public:
     /*! \brief Returns the one store. */

@@ -67,7 +67,7 @@ class AnimationShift : public Animation
     constexpr AnimationShift() : wc_transformation_() { }
 
     /*! \brief Destroys the animation. */
-    ~AnimationShift() { }
+    ~AnimationShift() = default;
 
     /*!
      * \brief Makes the animation idle and resets its progress.

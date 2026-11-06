@@ -87,7 +87,7 @@ class MsgCmdDisplayBrightnessParser : public MsgParameterParser<MsgCmdDisplayBri
     constexpr MsgCmdDisplayBrightnessParser(const char* parameter) : MsgParameterParser(kParameterTable, parameter) { }
 
     /*! \brief Destroys the parser. */
-    ~MsgCmdDisplayBrightnessParser() { }
+    ~MsgCmdDisplayBrightnessParser() = default;
 
     /*!
      * \brief Sends the answer: the fields that follow the command number.

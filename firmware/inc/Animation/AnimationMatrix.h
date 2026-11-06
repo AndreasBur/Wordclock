@@ -83,7 +83,7 @@ class AnimationMatrix : public Animation
     constexpr AnimationMatrix() { }
 
     /*! \brief Destroys the animation. */
-    ~AnimationMatrix() { }
+    ~AnimationMatrix() = default;
 
     /*!
      * \brief Makes the animation idle and resets its progress.

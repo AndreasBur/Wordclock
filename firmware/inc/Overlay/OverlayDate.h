@@ -74,7 +74,7 @@ class OverlayDate : public Overlay<OverlayDate>
     constexpr OverlayDate() { }
 
     /*! \brief Destroys the date overlay. */
-    ~OverlayDate() { }
+    ~OverlayDate() = default;
 
     /*!
      * \brief Takes the overlay one second further, as Overlay::Task() does, and starts the date

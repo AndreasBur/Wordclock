@@ -132,7 +132,7 @@ class WebFrontend
     std::atomic<bool> force_frame_{false};
 
     WebFrontend() { }
-    ~WebFrontend() { }
+    ~WebFrontend() = default;
 
   public:
     /*! \brief Returns the one web front end. */

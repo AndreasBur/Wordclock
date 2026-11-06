@@ -81,7 +81,7 @@ class Power
     StateType state_{StateType::kSupplyOn};
 
     Power() { }
-    ~Power() { }
+    ~Power() = default;
 
     static PowerSwitch& GetSwitch() { return PowerSwitch::GetInstance(); }
 

@@ -88,7 +88,7 @@ class MsgCmdClockModeParser : public MsgParameterParser<MsgCmdClockModeParser, M
     constexpr MsgCmdClockModeParser(const char* parameter) : MsgParameterParser(kParameterTable, parameter) { }
 
     /*! \brief Destroys the parser. */
-    ~MsgCmdClockModeParser() { }
+    ~MsgCmdClockModeParser() = default;
 
     /*!
      * \brief Sends the answer: the fields that follow the command number.

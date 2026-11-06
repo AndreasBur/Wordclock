@@ -70,7 +70,7 @@ class AsyncWebServerResponse {
     std::string Body;
     std::map<std::string, std::string> Headers;
 
-    virtual ~AsyncWebServerResponse() { }
+    virtual ~AsyncWebServerResponse() = default;
     void addHeader(const char* Key, const char* Value) { Headers[Key] = Value; }
 };
 

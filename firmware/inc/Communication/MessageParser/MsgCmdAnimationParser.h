@@ -174,7 +174,7 @@ class MsgCmdAnimationParser : public MsgParameterParser<MsgCmdAnimationParser, M
     }
 
     /*! \brief Destroys the parser. */
-    ~MsgCmdAnimationParser() { }
+    ~MsgCmdAnimationParser() = default;
 
     /*!
      * \brief Sends the answer: the fields that follow the command number.

@@ -61,7 +61,7 @@ class Storage
 
   private:
     Storage() { }
-    ~Storage() { }
+    ~Storage() = default;
 
   public:
     /*! \brief Returns the one store. */

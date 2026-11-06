@@ -67,7 +67,7 @@ class AnimationSqueeze : public Animation
     constexpr AnimationSqueeze() : words_() { }
 
     /*! \brief Destroys the animation. */
-    ~AnimationSqueeze() { }
+    ~AnimationSqueeze() = default;
 
     /*!
      * \brief Makes the animation idle and resets its progress.

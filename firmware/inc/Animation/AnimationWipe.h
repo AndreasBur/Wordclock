@@ -54,7 +54,7 @@ class AnimationWipe : public Animation
     constexpr AnimationWipe() { }
 
     /*! \brief Destroys the animation. */
-    ~AnimationWipe() { }
+    ~AnimationWipe() = default;
 
     /*!
      * \brief Makes the animation idle and resets its progress.

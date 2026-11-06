@@ -41,7 +41,7 @@ class AnimationCursor : public Animation
     constexpr AnimationCursor() { }
 
     /*! \brief Destroys the animation. */
-    ~AnimationCursor() { }
+    ~AnimationCursor() = default;
 
     /*!
      * \brief Makes the animation idle and resets its progress.
