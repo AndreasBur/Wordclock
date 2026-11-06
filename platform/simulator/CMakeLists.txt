@@ -187,3 +187,31 @@ if(WORDCLOCK_BUILD_TESTS)
     target_link_libraries(WordclockTests PRIVATE WordclockCore WordclockShims)
     add_test(NAME WordclockTests COMMAND WordclockTests)
 endif()
+
+# --------------------------------------------------------------------------
+# Fuzzers
+# --------------------------------------------------------------------------
+# One executable per file in tests/fuzz, each linked against the same core and shims as the
+# tests. The core has to be instrumented as well, not only the fuzz target: libFuzzer steers by
+# the branches of the code it reaches, and those are in the core. So the flags go on
+# WordclockBuildSettings, which every object of this build compiles with.
+if(WORDCLOCK_BUILD_FUZZERS)
+    if(NOT CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+        message(FATAL_ERROR
+            "WORDCLOCK_BUILD_FUZZERS needs clang, which brings libFuzzer:\n"
+            "  cmake -S . -B build-fuzz -G Ninja -DPLATFORM=simulator "
+            "-DCMAKE_CXX_COMPILER=clang++ -DWORDCLOCK_BUILD_FUZZERS=ON")
+    endif()
+    set(FUZZ_SANITIZERS -fsanitize=address,undefined -fno-sanitize-recover=all)
+    target_compile_options(WordclockBuildSettings INTERFACE -fsanitize=fuzzer-no-link ${FUZZ_SANITIZERS})
+    target_link_options(WordclockBuildSettings INTERFACE ${FUZZ_SANITIZERS})
+
+    file(GLOB FUZZ_TARGETS CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/tests/fuzz/*.cpp)
+    foreach(source ${FUZZ_TARGETS})
+        get_filename_component(name ${source} NAME_WE)
+        add_executable(${name} ${source})
+        target_include_directories(${name} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/tests/fuzz)
+        target_link_libraries(${name} PRIVATE WordclockCore WordclockShims)
+        target_link_options(${name} PRIVATE -fsanitize=fuzzer)
+    endforeach()
+endif()
