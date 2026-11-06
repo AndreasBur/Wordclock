@@ -16,11 +16,8 @@
 
 #include "StandardTypes.h"
 #include "Arduino.h"
-#include "Display.h"
-#include "Clock.h"
-#include "Animations.h"
-#include "Overlays.h"
-#include "RealTimeClock.h"
+#include "ClockTime.h"
+#include "ClockWords.h"
 
 /*! \brief The cycle of the display manager's task, in scheduler ticks. */
 #define DISPLAY_MANAGER_TASK_CYCLE                  1u
@@ -54,43 +51,10 @@ class DisplayManager
     constexpr DisplayManager() { }
     ~DisplayManager() { }
 
-    static bool IsOverlayShowing() {
-        return Overlays::GetInstance().GetState() == Overlays::OverlayType::StateType::kShow;
-    }
-
-    static void ShowClock(HourType hour, MinuteType minute) {
-        Display::GetInstance().Clear();
-        Clock::GetInstance().SetTime(hour, minute);
-        Display::GetInstance().Show();
-    }
-
-    static void TaskClockWordsChange(HourType hour, MinuteType minute) {
-        Animations& animations = Animations::GetInstance();
-        // The mode first: a selecting mode animates whatever animation is selected; a selected
-        // 0 means "no animation" only in -M0.
-        const bool is_animated{animations.GetMode() != Animations::ModeType::kFixed
-                               || animations.GetAnimation() != Animations::AnimationIdType::kNone};
-        if(!is_animated) {
-            ShowClock(hour, minute);
-        } else {
-            animations.SetTime(hour, minute);
-        }
-    }
-
-    bool UpdateClockWords(HourType hour, MinuteType minute) {
-        ClockWords clock_words;
-        if(Clock::GetInstance().GetClockWords(hour, minute, clock_words) == kENotOk) {
-            return false;
-        }
-
-        if(clock_words_initialized_ && clock_words == last_clock_words_) {
-            return false;
-        }
-
-        last_clock_words_ = clock_words;
-        clock_words_initialized_ = true;
-        return true;
-    }
+    static bool IsOverlayShowing();
+    static void ShowClock(HourType hour, MinuteType minute);
+    static void TaskClockWordsChange(HourType hour, MinuteType minute);
+    bool UpdateClockWords(HourType hour, MinuteType minute);
 
   public:
     /*! \brief Returns the one display manager of the firmware. */
@@ -126,14 +90,7 @@ class DisplayManager
      *
      * \return kEOk, or kENotOk while an overlay shows; the display is then left as it was.
      */
-    StdReturnType RefreshClock() {
-        if(IsOverlayShowing()) { return kENotOk; }
-
-        const ClockTime time = RealTimeClock::GetInstance().GetTime();
-        UpdateClockWords(time.GetHour(), time.GetMinute());
-        ShowClock(time.GetHour(), time.GetMinute());
-        return kEOk;
-    }
+    StdReturnType RefreshClock();
 
     /*!
      * \brief Runs the animation the mode provides on the current time, without waiting for the word
@@ -145,12 +102,7 @@ class DisplayManager
      * \return kENotOk while an overlay shows, with nothing started; otherwise what
      *         Animations::SetTime() returns.
      */
-    static StdReturnType StartAnimation() {
-        if(IsOverlayShowing()) { return kENotOk; }
-
-        const ClockTime time = RealTimeClock::GetInstance().GetTime();
-        return Animations::GetInstance().SetTime(time.GetHour(), time.GetMinute());
-    }
+    static StdReturnType StartAnimation();
 
     /*!
      * \brief Ends a running animation and puts the time back on the display.
@@ -161,10 +113,7 @@ class DisplayManager
      * \return kEOk, or kENotOk while an overlay shows; the animation is ended all the same, but the
      *         time is not drawn.
      */
-    StdReturnType AbortAnimation() {
-        Animations::GetInstance().Abort();
-        return RefreshClock();
-    }
+    StdReturnType AbortAnimation();
 };
 
 #endif
