@@ -112,7 +112,7 @@ void AnimationExplodePixels::ShiftDownRight(byte column, byte row)
     byte column_next = column, row_next = row;
 
     if(column < kColumnCenter) column_next++;
-    if(row < kColumnCenter) row_next++;
+    if(row < kRowCenter) row_next++;
     ClearOldAndSetNewPixel(column, row, column_next, row_next);
 }
 
@@ -130,7 +130,7 @@ void AnimationExplodePixels::ShiftDownLeft(byte column, byte row)
     byte column_next = column, row_next = row;
 
     if(column > kColumnCenter) column_next--;
-    if(row < kColumnCenter) row_next++;
+    if(row < kRowCenter) row_next++;
     ClearOldAndSetNewPixel(column, row, column_next, row_next);
 }
 
@@ -148,7 +148,7 @@ void AnimationExplodePixels::ShiftUpRight(byte column, byte row)
     byte column_next = column, row_next = row;
 
     if(column < kColumnCenter) column_next++;
-    if(row > kColumnCenter) row_next--;
+    if(row > kRowCenter) row_next--;
     ClearOldAndSetNewPixel(column, row, column_next, row_next);
 }
 
@@ -166,7 +166,7 @@ void AnimationExplodePixels::ShiftUpLeft(byte column, byte row)
     byte column_next = column, row_next = row;
 
     if(column > kColumnCenter) column_next--;
-    if(row > kColumnCenter) row_next--;
+    if(row > kRowCenter) row_next--;
     ClearOldAndSetNewPixel(column, row, column_next, row_next);
 }
 
