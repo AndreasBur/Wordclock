@@ -43,6 +43,10 @@ devcontainer-lock.json
 # CPython leaves this behind whenever that happens.
 __pycache__/
 
+# Logs a run leaves in the working tree - the screenshot recipe in CLAUDE.md writes run.log, and
+# a clang-tidy log was once committed by accident.
+*.log
+
 # CLion writes a whole project directory here, and all of it but one file is derivable from
 # CMakeLists.txt and rewritten whenever the IDE feels like it. The exception is editor.xml,
 # which is where the three inspections this project switches off are actually switched off

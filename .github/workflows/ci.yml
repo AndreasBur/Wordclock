@@ -51,6 +51,11 @@ on:
   # version nobody pinned.
   workflow_call:
 
+# Read the repository and nothing else: no job here writes to it, and a token that could would
+# be handed to every action each job runs. release.yml asks for what publishing needs itself.
+permissions:
+  contents: read
+
 # A second push to the same branch makes the first answer worthless, so it is cancelled
 # rather than left to occupy a runner.
 concurrency:
