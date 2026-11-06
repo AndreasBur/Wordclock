@@ -83,6 +83,50 @@ the install can be tried. That also settles what not to add: a service worker ne
 same secure context, and offline is not what this page wants anyway, since a console
 whose clock is unreachable has nothing to show.
 
+## The repository's own tooling
+
+Nothing here changes what the clock does, which is why it stands apart from the list above:
+what it buys is that a change is checked the same way on every machine, today and next year.
+
+### One way in: uv, CMake presets and a Makefile
+
+The commands that build and check this repository are written out three times — in the
+workflows, in the [README](../README.md) and in the agent notes — and the Python tools they need
+are installed three ways: apt for the linters, a virtual environment for PlatformIO, another for
+Playwright. CI installs PlatformIO with `pip install --upgrade`, so every run takes whatever was
+released last; a PlatformIO update moved under this repository once already without anybody
+asking for it.
+
+The shape that fixes both: a `pyproject.toml` and its `uv.lock` pinning every Python tool by
+hash, PlatformIO included; `CMakePresets.json` with workflow presets for the CMake builds, so
+that `cmake --workflow --preset avr` configures, builds and checks in one call; and a
+`Makefile` that is nothing but the index over both, `make help` listing every action. `make` is
+on every machine already, and the logic stays in versioned files rather than in it. CI then
+calls the same targets a developer does, and the command lines exist once.
+
+Settled when `make check` runs locally what CI runs, and the workflows call nothing else.
+
+### actionlint for the workflows
+
+The workflows are the one part of the repository nothing reads before it runs. actionlint is
+not in the Ubuntu archive; the clean way to have it pinned is as a Python wheel under the
+lockfile above, which is why it waits for that item rather than coming in as a release binary
+of its own.
+
+### Lint the two web pages
+
+`web/app.html` and `web/index.html` are HTML with their scripts inline, and only a browser has
+ever read them. html-validate and eslint, its HTML plugin reading the inline scripts, would —
+but both are npm packages, which brings a third lockfile next to uv's and PlatformIO's. Worth it
+once the toolchain above is settled, so that the third one arrives the same way.
+
+### Let the pins update themselves
+
+Everything above trades drift for pins, and a pin left alone is drift of another kind: the
+version that was current when somebody last looked. Dependabot reads `uv.lock` and the
+workflows' action versions and opens a pull request per update, which CI then checks like any
+other. It only makes sense once there is a lockfile to read.
+
 ## An idea, not a plan
 
 **A second language in the word tables.** The mechanism is half here already: four
@@ -134,3 +178,6 @@ it happened in.
 | **The overlay configuration is stored**, all three slots, the text as a fixed field | [Persistence.h](../firmware/inc/Persistence/Persistence.h) |
 | **An installable console**, with the limit above as the more interesting half of the answer | [manifest.webmanifest](../web/manifest.webmanifest), [web/README.md](../web/README.md) |
 | **One accessor per operation, and both check** — the `*Fast` twins are gone | the [platform contract](../platform/avr-dx/README.md), measured in [decisions.md](decisions.md#the-fast-accessor-pair) |
+| **A coverage report** on every pull request, all three test suites together and no threshold | [coverage.py](../tools/coverage.py) |
+| **The sanitizers and one warning list** — ASan and UBSan over every suite; every build of ours compiles with the same warnings, `-Wconversion` among them | [warnings.txt](../platform/warnings.txt), the sanitizers job in [static-analysis.yml](../.github/workflows/static-analysis.yml) |
+| **Fuzzing** the two ways data from outside reaches the firmware: a command line and a stored settings blob | [the fuzzers](../platform/simulator/tests/fuzz/run.sh) |
