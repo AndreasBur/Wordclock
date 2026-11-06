@@ -365,6 +365,27 @@ jobs:
             fuzz-work/*/log.txt
           if-no-files-found: ignore
 
+  # The shell scripts and the Python ones, which build, test and check everything else and were
+  # read by nothing: shellcheck over every .sh, flake8 over every .py, with the checks .flake8
+  # names. Both from the archive, as in the dev container. Seconds, not minutes.
+  scripts:
+    name: Scripts
+    runs-on: ubuntu-26.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install the linters
+        uses: ./.github/actions/apt-install
+        with:
+          packages: shellcheck flake8
+
+      - name: shellcheck
+        run: git ls-files -z '*.sh' | xargs -0 shellcheck
+
+      - name: flake8
+        run: git ls-files -z '*.py' | xargs -0 flake8
+
   docs:
     name: Doxygen blocks
     runs-on: ubuntu-26.04

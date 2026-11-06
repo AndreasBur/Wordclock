@@ -132,6 +132,9 @@ isUpToDate() {
     [ -f "$object" ] && [ -f "$dependency" ] || return 1
 
     local file
+    # Read as words, where shellcheck would have lines: a dependency file lists its
+    # prerequisites the way make reads them, separated by blanks and continued with a backslash.
+    # shellcheck disable=SC2013
     for file in $(sed -e 's/^.*://' -e 's/\\//g' "$dependency"); do
         [ -e "$file" ] || return 1
         [ "$file" -nt "$object" ] && return 1

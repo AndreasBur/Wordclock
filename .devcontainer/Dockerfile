@@ -31,6 +31,7 @@ FROM ${BASE_IMAGE}
 # which walks the compile database in parallel, is part of the same package.
 # cppcheck is the second analyser of that same workflow, and is here for the same reason.
 # doxygen is what tools/docs.py reads the Doxygen blocks with, a job of that workflow as well.
+# shellcheck and flake8 read the shell and Python scripts, the "Scripts" job of that workflow.
 # clang, libclang-rt-dev and llvm build and read the fuzzers of that workflow's fuzz job. clang
 # alone is not enough, and fails late: it compiles a fuzzer and then cannot link it, because
 # libFuzzer and the sanitizers' runtimes are libclang-rt-dev. llvm brings llvm-symbolizer,
@@ -51,6 +52,8 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && \
         llvm \
         cppcheck \
         doxygen \
+        flake8 \
+        shellcheck \
         gcc-avr \
         avr-libc \
         ninja-build \

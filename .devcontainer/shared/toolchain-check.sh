@@ -23,7 +23,7 @@ set -e
 TOOLS='cmake ninja wx-config
        avr-gcc avr-objcopy
        pio
-       clang-tidy run-clang-tidy cppcheck doxygen
+       clang-tidy run-clang-tidy cppcheck doxygen shellcheck flake8
        clang++ llvm-symbolizer
        python3 gh
        xdotool xwininfo import rsvg-convert'

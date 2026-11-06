@@ -1,0 +1,13 @@
+# What flake8 is asked for in tools/ and the build scripts, read by the "Scripts" job of
+# static-analysis.yml and by a plain `flake8` here.
+#
+# The same rule as .clang-tidy: the checks that answer "is this wrong" and none that argue with
+# how the code is written. F is pyflakes - an undefined name, an import nobody uses, a variable
+# assigned and never read - and E9 is a file Python cannot parse. The pycodestyle checks are left
+# out: they would report the 100-column lines and the layout the scripts are written in, and a
+# check answered by "no, on purpose" a hundred times is a check nobody reads.
+#
+# A name SCons injects into a PlatformIO script - env, Import - is undefined to pyflakes and is
+# answered where it is used, with a `# noqa: F821`.
+[flake8]
+select = F,E9
