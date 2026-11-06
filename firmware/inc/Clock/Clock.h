@@ -11,7 +11,6 @@
 
 #include "StandardTypes.h"
 #include "Arduino.h"
-#include "Display.h"
 #include "ClockWords.h"
 
 /*!
@@ -120,15 +119,7 @@ class Clock
         return hours_table_element;
     }
 
-    static bool CalculateItIs(byte minute) {
-        byte minute_steps = minute / CLOCK_MINUTE_STEP_IN_MINUTES;
-        // show "it is" only to full and half hour
-        if(minute_steps == 0u || minute_steps == (CLOCK_NUMBER_OF_MINUTE_STEPS / 2u)) {
-            return true;
-        } else {
-            return false;
-        }
-    }
+    static bool CalculateItIs(byte minute);
 
     static byte Transform24hTo12hFormat(byte hour) {
         return hour % CLOCK_NUMBER_OF_HOURS;
@@ -198,15 +189,7 @@ class Clock
      * \return kEOk, or kENotOk if `mode` is not a mode, such as `kNumberOfModes`; the mode is then
      *         left as it was.
      */
-    StdReturnType SetMode(ModeType mode)
-    {
-        if(IsModeValid(mode)) {
-            mode_ = mode;
-            return kEOk;
-        } else {
-            return kENotOk;
-        }
-    }
+    StdReturnType SetMode(ModeType mode);
 
     /*!
      * \brief Switches to the next mode, from the last one back to the first.
@@ -279,18 +262,14 @@ class Clock
      * \param[in] max_length The letters to light of each word; 0, or a length the word does not
      *                       exceed, lights it whole.
      */
-    static void SetTime(ClockWords::WordsListType clock_words_table, byte max_length) {
-        for(byte index = 0u; index < clock_words_table.size(); index++) {
-            Display::GetInstance().SetWord(clock_words_table[index], max_length);
-        }
-    }
+    static void SetTime(ClockWords::WordsListType clock_words_table, byte max_length);
 
     /*!
      * \brief Asks the display to show what is lit, through Display::Show().
      *
      * \return What Display::Show() returns, kEOk on every backend.
      */
-    static StdReturnType Show() { return Display::GetInstance().Show(); }
+    static StdReturnType Show();
 
     /*!
      * \brief Lights the words that say `hour`:`minute` in the current mode, and has the display
@@ -301,12 +280,7 @@ class Clock
      * \return kEOk, or kENotOk if SetTime(byte, byte) or Show() returns it; Show() is called either
      *         way.
      */
-    StdReturnType Refresh(byte hour, byte minute) const {
-        StdReturnType return_value{kEOk};
-        if(SetTime(hour, minute) == kENotOk) { return_value = kENotOk; }
-        if(Show() == kENotOk) { return_value = kENotOk; }
-        return return_value;
-    }
+    StdReturnType Refresh(byte hour, byte minute) const;
 };
 
 #endif
