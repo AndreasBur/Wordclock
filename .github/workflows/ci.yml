@@ -1,7 +1,8 @@
-# What a pull request is checked with. Six jobs, because the project has six ways of
-# building and each of them can break on its own:
+# What a pull request is checked with. Seven jobs: the project has six ways of building, each
+# of which can break on its own, and the host builds are made a second time with clang:
 #
 #   simulator      the firmware core through the wxWidgets backend, plus its regression tests
+#   clang          the simulator and both backends' host tests again, compiled by clang
 #   host-tests     the ESP32 backend compiled against the stand-ins in platform/esp32/test
 #   rp2350-host    the same arrangement for the Pico's backend, stubs and all
 #   firmware       the ESP32 backend compiled for the board it actually runs on
@@ -83,6 +84,34 @@ jobs:
       # window that renders it is never constructed.
       - name: Test
         run: ctest --test-dir build --output-on-failure
+
+  # The simulator, its tests and both backends' host suites once more, compiled by clang instead
+  # of GCC. Two compilers disagree about what deserves a warning: clang reported a uint16_t made
+  # out of an int in the light sensor that GCC let pass, and the backends' own sources are read
+  # by no other compiler than GCC anywhere else. -Werror as in the simulator job.
+  clang:
+    name: Host builds with clang
+    runs-on: ubuntu-26.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install the toolchain
+        uses: ./.github/actions/apt-install
+        with:
+          packages: cmake ninja-build libwxgtk3.2-dev clang
+
+      - name: Simulator and core tests
+        run: |
+          cmake -S . -B build-clang -G Ninja -DPLATFORM=simulator \
+                -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_CXX_FLAGS=-Werror
+          cmake --build build-clang
+          ctest --test-dir build-clang --output-on-failure
+
+      - name: Both backends' host tests
+        run: |
+          CXX=clang++ platform/esp32/test/run.sh
+          CXX=clang++ platform/rp2350/test/run.sh
 
   host-tests:
     name: ESP32 backend on the host

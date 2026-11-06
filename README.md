@@ -155,11 +155,13 @@ Every pull request runs two workflows, and the two badges above say separately
 whether the code builds and whether it reads clean.
 
 [`.github/workflows/ci.yml`](.github/workflows/ci.yml) is the six ways this
-repository can be built, each of which breaks on its own:
+repository can be built, each of which breaks on its own, and the host builds once more
+with clang:
 
 | Job | What it does |
 |-----|--------------|
 | Simulator and core tests | Configures and builds the wxWidgets backend with `-Werror` and runs `ctest` |
+| Host builds with clang | The simulator, its tests and both backends' host suites again, compiled by clang with `-Werror` |
 | ESP32 backend on the host | [`platform/esp32/test/run.sh`](platform/esp32/test/run.sh) — the backend against the stand-ins in `test/stubs`, no board needed |
 | RP2350 backend on the host | [`platform/rp2350/test/run.sh`](platform/rp2350/test/run.sh) — the same arrangement for the Pico's backend |
 | ESP32 firmware | `pio run` for the board it actually runs on |
