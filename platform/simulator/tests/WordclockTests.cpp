@@ -40,6 +40,9 @@ int main()
     TestReadingPastTheEndIsEmpty();
     TestWritingPastTheEndIsRefused();
     TestGlyphAccessorsCheckBothWays();
+    TestWordAccessorsCheckBothWays();
+    TestGlyphWidthChecksBothWays();
+    TestGridRowsAndColumnsReadTheLitPixels();
     TestRegionalWordings();
     TestOverlayPeriodAndEndurance();
     TestOverlaySwitchedOffWhileItShows();

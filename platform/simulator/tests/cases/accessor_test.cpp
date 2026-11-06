@@ -7,6 +7,7 @@
 #include "DisplayCharacters.h"
 #include "DisplayWords.h"
 #include "FontChar.h"
+#include "FontSprite5x8.h"
 #include "Pixels.h"
 
 /*
@@ -110,4 +111,108 @@ void TestGlyphAccessorsCheckBothWays()
     Expect(columns.GetColumn(3u) == 0u, "and answered as empty where no code is asked for");
     Expect(columns.SetColumn(1u, 0b111u) == kEOk && columns.GetColumn(1u) == 0b111u, "a column must be writable");
     Expect(columns.SetColumn(3u, 0b111u) == kENotOk, "a column past the glyph must not be writable");
+}
+
+/*
+ * The readers whose form answering a code nothing in the firmware calls: the four of a word,
+ * the width of a glyph, and a row or a column of the grid, whose forms nothing calls at all.
+ * They are kept as the rest of the pairs are, so they are compiled and run here - over the
+ * whole table where there is one, so that a form reading the wrong field of one entry shows.
+ */
+void TestWordAccessorsCheckBothWays()
+{
+    const DisplayWords words;
+
+    for(byte id = 0u; id < DisplayWords::kNumberOfWords; id++) {
+        const auto word_id = static_cast<DisplayWords::WordIdType>(id);
+        const DisplayWord expected = words.GetDisplayWord(word_id);
+        DisplayWord word;
+        byte length{0xFFu};
+        byte column{0xFFu};
+        byte row{0xFFu};
+
+        Expect(words.GetDisplayWord(word_id, word) == kEOk && word.GetColumn() == expected.GetColumn() &&
+               word.GetRow() == expected.GetRow() && word.GetLength() == expected.GetLength(),
+               "both forms of a word must agree on every word of the table");
+        Expect(words.GetDisplayWordLength(word_id, length) == kEOk && length == words.GetDisplayWordLength(word_id),
+               "and so must both forms of its length");
+        Expect(words.GetDisplayWordColumn(word_id, column) == kEOk && column == words.GetDisplayWordColumn(word_id),
+               "of its column");
+        Expect(words.GetDisplayWordRow(word_id, row) == kEOk && row == words.GetDisplayWordRow(word_id),
+               "and of its row");
+    }
+
+    // One entry by hand, so that two forms reading the same wrong field cannot agree their way
+    // through: ES is the first word of the plate, two letters from its corner.
+    DisplayWord es;
+    Expect(words.GetDisplayWord(DisplayWords::WordIdType::kEs, es) == kEOk && es.GetColumn() == 0u &&
+           es.GetRow() == 0u && es.GetLength() == 2u, "ES must stand at the top left, two letters long");
+
+    constexpr DisplayWords::WordIdType kNotAWord{DisplayWords::WordIdType::kNumberOfWords};
+    byte value{0xA5u};
+    Expect(words.GetDisplayWordLength(kNotAWord, value) == kENotOk && value == 0xA5u,
+           "a word that is not in the table must be refused, the length left as it was");
+    Expect(words.GetDisplayWordColumn(kNotAWord, value) == kENotOk && value == 0xA5u, "and the column");
+    Expect(words.GetDisplayWordRow(kNotAWord, value) == kENotOk && value == 0xA5u, "and the row");
+    DisplayWord word(1u, 2u, 3u);
+    Expect(words.GetDisplayWord(kNotAWord, word) == kENotOk && word.GetLength() == 3u, "and the word");
+}
+
+void TestGlyphWidthChecksBothWays()
+{
+    const FontSprite5x8 font;
+    byte width{0xFFu};
+
+    for(byte index = 0u; index < FONT_SPRITE_5X8_FONT_TABLE_SIZE; index++) {
+        Expect(font.GetCharWidth(index, width) == kEOk && width == font.GetCharWidth(index),
+               "both forms of a glyph's width must agree on every glyph of the font");
+    }
+
+    width = 0xA5u;
+    Expect(font.GetCharWidth(FONT_SPRITE_5X8_FONT_TABLE_SIZE, width) == kENotOk && width == 0xA5u,
+           "a glyph past the table must be refused, the width left as it was");
+    Expect(font.GetCharWidth(FONT_SPRITE_5X8_FONT_TABLE_SIZE) == 0u, "and answered as no width at all");
+}
+
+void TestGridRowsAndColumnsReadTheLitPixels()
+{
+    Display& display = Display::GetInstance();
+    constexpr byte kLastColumn{DISPLAY_NUMBER_OF_COLUMNS - 1u};
+    constexpr byte kLastRow{DISPLAY_NUMBER_OF_ROWS - 1u};
+
+    // Three pixels of the top row, the corners among them, and the bottom of column 3: what
+    // both bit orders have to come out of.
+    display.Clear();
+    display.SetPixel(0u, 0u);
+    display.SetPixel(3u, 0u);
+    display.SetPixel(kLastColumn, 0u);
+    display.SetPixel(3u, kLastRow);
+
+    const Display::PixelRowType top_row = (1u << 0u) | (1u << 3u) | (1u << kLastColumn);
+    const Display::PixelColumnType column_3 = (1u << 0u) | (1u << kLastRow);
+
+    Expect(display.GetPixelRow(0u) == top_row, "a row must read bit n for column n");
+    Expect(display.GetPixelRow(1u) == 0u, "and an empty row as none");
+    Expect(display.GetPixelColumn(3u) == column_3, "a column must read bit n for row n");
+    Expect(display.GetPixelColumn(kLastColumn) == 1u, "and the last column its one pixel");
+
+    // The bits above the grid belong to the caller and are left as they were; the ones of the
+    // grid are written, the dark ones too.
+    Display::PixelRowType row = 0x8000u | (1u << 1u);
+    Expect(display.GetPixelRow(0u, row) == kEOk && row == (0x8000u | top_row),
+           "the form answering a code must write the row and nothing above it");
+    Display::PixelColumnType column = 0x8000u | (1u << 1u);
+    Expect(display.GetPixelColumn(3u, column) == kEOk && column == (0x8000u | column_3),
+           "and the column the same way");
+
+    row = 0xA5A5u;
+    Expect(display.GetPixelRow(DISPLAY_NUMBER_OF_ROWS, row) == kENotOk && row == 0xA5A5u,
+           "a row off the grid must be refused, the row left as it was");
+    Expect(display.GetPixelRow(DISPLAY_NUMBER_OF_ROWS) == 0u, "and answered as dark");
+    column = 0xA5A5u;
+    Expect(display.GetPixelColumn(DISPLAY_NUMBER_OF_COLUMNS, column) == kENotOk && column == 0xA5A5u,
+           "a column off the grid must be refused, the column left as it was");
+    Expect(display.GetPixelColumn(DISPLAY_NUMBER_OF_COLUMNS) == 0u, "and answered as dark");
+
+    display.Clear();
 }
