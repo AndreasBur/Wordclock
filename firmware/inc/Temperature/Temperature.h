@@ -89,24 +89,7 @@ class Temperature
         return AppendChar(kDegreeSign, string);
     }
 
-    // Both public forms come through here, so the digits cannot drift apart between what
-    // is shown and what is reported - only the degree sign differs.
-    StdReturnType AppendReading(char* string, bool with_degree_sign) const {
-        TemperatureType tenths{0};
-
-        string[0u] = STD_NULL_CHARACTER;
-        if(GetTemperature(tenths) == kENotOk) { return kENotOk; }
-
-        char* position = string;
-        position = AppendSign(tenths, position);
-        position = AppendNumber(WholeDegrees(tenths), position);
-        position = AppendChar(kDecimalPoint, position);
-        position = AppendNumber(TenthOfDegree(tenths), position);
-        position = AppendDegreeSign(with_degree_sign, position);
-        position = AppendChar(kDegreeUnit, position);
-        *position = STD_NULL_CHARACTER;
-        return kEOk;
-    }
+    StdReturnType AppendReading(char* string, bool with_degree_sign) const;
     static char* AppendNumber(TemperatureType value, char* string) {
         itoa(value, string, 10u);
         return &string[DigitsOfNumber(value)];
