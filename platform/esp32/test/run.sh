@@ -59,6 +59,13 @@ INCLUDES+=(-DWORDCLOCK_CORE_ARDUINO_H="\"$TEST_DIR/stubs/Arduino.h\"")
 FLAGS=(-std=gnu++17 -Werror)
 while IFS= read -r flag; do FLAGS+=("$flag"); done < <(grep '^-' "$ROOT/platform/warnings.txt")
 
+# The compiler: g++, unless CXX names another. The clang job in ci.yml runs these suites with
+# clang++, and it is the only build that reads this backend's own sources with a second
+# compiler. clang does not know two of the GCC warnings in the list, and -Werror would make
+# its "unknown warning option" an error in every file.
+COMPILER="${CXX:-g++}"
+if "$COMPILER" --version | grep -q clang; then FLAGS+=(-Wno-unknown-warning-option); fi
+
 # The firmware's web front end is compiled into every target that asks for it and out of the
 # ones that do not - the AVR-Dx has no radio to serve anything over, and firmware/src is
 # compiled whole. This backend asks, the same way platformio.ini does for the real build.
@@ -82,7 +89,7 @@ INCLUDES+=(-I"$CACHE")
 # What the objects were compiled with. Anything else means they cannot be reused, and the
 # cheapest correct answer to that is to throw them away.
 KEY_FILE="$CACHE/flags"
-KEY="${FLAGS[*]} ${INCLUDES[*]}"
+KEY="$COMPILER ${FLAGS[*]} ${INCLUDES[*]}"
 if [ ! -f "$KEY_FILE" ] || [ "$(cat "$KEY_FILE")" != "$KEY" ]; then
     find "$CACHE" -name '*.o' -delete
     find "$CACHE" -name '*.d' -delete
@@ -147,7 +154,7 @@ compile() {
     echo "compiling ${source#"$ROOT"/}"
     # A failure is recorded rather than raised: this runs as a background job, where a
     # non-zero exit would end the job and nothing else.
-    g++ "${FLAGS[@]}" "${INCLUDES[@]}" -MMD -MF "${object%.o}.d" -c "$source" -o "$object" \
+    "$COMPILER" "${FLAGS[@]}" "${INCLUDES[@]}" -MMD -MF "${object%.o}.d" -c "$source" -o "$object" \
         || touch "$CACHE/failed"
 }
 
@@ -179,7 +186,7 @@ link() {   # name, then the sources that belong to it
 
     for source in "$@" "${SHARED[@]}"; do objects+=("$(objectOf "$source")"); done
 
-    g++ "${FLAGS[@]}" -o "$WORK/$name" "${objects[@]}"
+    "$COMPILER" "${FLAGS[@]}" -o "$WORK/$name" "${objects[@]}"
 }
 
 # What every source is compiled with, written down as a compile database: no other build
