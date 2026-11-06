@@ -66,18 +66,7 @@ class Uptime
     Uptime() { }
     ~Uptime() { }
 
-    /*
-     * One place of the count: steps it and says whether it rolled into the next one. The
-     * carry is the whole of the arithmetic here, so it is worth its own name - Task() then
-     * reads as the three places it applies to.
-     */
-    static bool Carry(byte& value, byte limit) {
-        value++;
-        if(value < limit) { return false; }
-
-        value = 0u;
-        return true;
-    }
+    static bool Carry(byte& value, byte limit);
 
   public:
     /*! \brief Returns the one uptime of the firmware. */
@@ -104,13 +93,7 @@ class Uptime
      * The scheduler calls it every UPTIME_TASK_CYCLE ticks. Seconds carry into minutes, minutes
      * into hours and hours into days; the days stop at 65535 rather than rolling over.
      */
-    void Task() {
-        if(!Carry(seconds_, kSecondsPerMinute)) { return; }
-        if(!Carry(minutes_, kMinutesPerHour)) { return; }
-        if(!Carry(hours_, kHoursPerDay)) { return; }
-
-        if(days_ < kDaysMaximum) { days_++; }
-    }
+    void Task();
 };
 
 #endif // _UPTIME_H_
