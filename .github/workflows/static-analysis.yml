@@ -17,6 +17,9 @@
 # The comments are read as well: clang-tidy reads every Doxygen block with -Wdocumentation, and
 # the docs job has Doxygen read them, which is what notices a block that leaves out a
 # parameter. What a block holds is docs/documentation.md.
+#
+# And every header is compiled on its own, once per build, so that none of them compiles only
+# because of what its includers brought along.
 # clang-tidy reads four builds, not one. The simulator's covers the firmware core as the
 # host compiler sees it; each hardware backend is only ever compiled by its own cross
 # compiler, so it is read through that build's database - rewritten by
@@ -74,6 +77,14 @@ jobs:
       - name: Analyse
         run: run-clang-tidy -p build -quiet -j "$(nproc)" 'firmware/|platform/simulator/src'
 
+      # Every header compiled as the only include of an empty file, by the compiler and with
+      # the flags the database records. A header that leans on what its includers happen to
+      # include first builds everywhere until one of them stops - tools/self-contained-headers.py
+      # says why that is not a finding any analyser above can make. Each backend's job runs it
+      # again with its own compiler, because the #if branches a header takes are the target's.
+      - name: Headers on their own
+        run: python3 tools/self-contained-headers.py build firmware/inc platform/simulator/include
+
       # The names are the same everywhere, the tests and the window included, which the run
       # above leaves out: what the other checks would say about test scaffolding is not worth
       # answering, but a test written in the old names reads as the old code. Seconds, not
@@ -116,6 +127,10 @@ jobs:
 
       - name: Analyse
         run: python3 tools/cross-clang-tidy.py build-avr 'firmware/|platform/avr-dx/src'
+
+      # As in the clang-tidy job, by avr-g++, which this job installs for the tool above anyway.
+      - name: Headers on their own
+        run: python3 tools/self-contained-headers.py build-avr firmware/inc platform/avr-dx/include
 
   clang-tidy-platformio:
     name: clang-tidy (${{ matrix.backend }})
@@ -163,6 +178,10 @@ jobs:
 
       - name: Analyse
         run: python3 tools/cross-clang-tidy.py platform/${{ matrix.backend }} 'firmware/|platform/${{ matrix.backend }}/src'
+
+      # As in the clang-tidy job, by the board's own compiler out of the PlatformIO packages.
+      - name: Headers on their own
+        run: python3 tools/self-contained-headers.py platform/${{ matrix.backend }} firmware/inc platform/${{ matrix.backend }}/include
 
   cppcheck:
     name: cppcheck
