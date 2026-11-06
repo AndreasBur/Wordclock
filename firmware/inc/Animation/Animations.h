@@ -80,7 +80,7 @@ class Animations
      * An animation whose `ANIMATIONS_SUPPORT_*` switch is STD_OFF has no value here, and the ids
      * behind it move down by one.
      */
-    enum class AnimationIdType {
+    enum class AnimationIdType : byte {
         kNone, /*!< No animation: the time is drawn without a transition. */
 # if(ANIMATIONS_SUPPORT_CURSOR == STD_ON)
         kCursor, /*!< Cursor, AnimationCursor. */

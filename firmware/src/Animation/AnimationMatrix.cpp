@@ -77,8 +77,8 @@ void AnimationMatrix::DrawColumn(byte column, byte head)
      * time until the drop arrives.
      */
     for(byte row = 0u; row < head && row < DISPLAY_NUMBER_OF_ROWS; row++) {
-        const byte distance = head - row;
-        const byte fade_step = (distance + 1u) / 2u;
+        const byte distance = static_cast<byte>(head - row);
+        const byte fade_step = static_cast<byte>((distance + 1u) / 2u);
 
         if(IsPixelPartOfClockWords(clock_words_table_, column, row) && fade_step > kRevealFadeStep) {
             // letter of the new time, deep enough in the trail: it stays from now on

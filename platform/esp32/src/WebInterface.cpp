@@ -148,7 +148,7 @@ esp_err_t HandleAsset(httpd_req_t* request)
     httpd_resp_set_type(request, asset.content_type);
     if(asset.is_gzipped) { httpd_resp_set_hdr(request, "Content-Encoding", "gzip"); }
 
-    return httpd_resp_send(request, reinterpret_cast<const char*>(asset.bytes), asset.size);
+    return httpd_resp_send(request, reinterpret_cast<const char*>(asset.bytes), static_cast<ssize_t>(asset.size));
 }
 
 /*

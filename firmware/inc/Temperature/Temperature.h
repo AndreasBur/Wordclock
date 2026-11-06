@@ -78,8 +78,8 @@ class Temperature
 
         return AppendChar('-', string);
     }
-    static TemperatureType WholeDegrees(TemperatureType tenths) { return Absolute(tenths) / kTenthsPerDegree; }
-    static TemperatureType TenthOfDegree(TemperatureType tenths) { return Absolute(tenths) % kTenthsPerDegree; }
+    static TemperatureType WholeDegrees(TemperatureType tenths) { return static_cast<TemperatureType>(Absolute(tenths) / kTenthsPerDegree); }
+    static TemperatureType TenthOfDegree(TemperatureType tenths) { return static_cast<TemperatureType>(Absolute(tenths) % kTenthsPerDegree); }
     static constexpr TemperatureType Absolute(TemperatureType value) { return (value < 0) ? static_cast<TemperatureType>(-value) : value; }
 
     static char* AppendChar(char character, char* string) { string[0u] = character; return &string[1u]; }

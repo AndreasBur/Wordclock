@@ -106,7 +106,9 @@ void WS2812Pio::Init(uint8_t pin)
     }
 
     pio_sm_config config = pio_get_default_sm_config();
-    sm_config_set_wrap(&config, offset + kWrapTargetOffset, offset + kWrapOffset);
+    // Not negative any more: a negative offset returned above.
+    const uint program_offset{static_cast<uint>(offset)};
+    sm_config_set_wrap(&config, program_offset + kWrapTargetOffset, program_offset + kWrapOffset);
     // One bit, not optional and not a direction: every instruction carries it, which is
     // what lets the four of them above describe the whole waveform.
     sm_config_set_sideset(&config, 1, false, false);
@@ -121,7 +123,7 @@ void WS2812Pio::Init(uint8_t pin)
 
     pio_gpio_init(block, pin);
     pio_sm_set_consecutive_pindirs(block, kStateMachine, pin, 1, true);
-    pio_sm_init(block, kStateMachine, offset, &config);
+    pio_sm_init(block, kStateMachine, program_offset, &config);
     pio_sm_set_enabled(block, kStateMachine, true);
 
     is_ready_ = true;
@@ -151,7 +153,7 @@ StdReturnType WS2812Pio::Transmit(const WordType* frame, size_t count)
     channel_config_set_dreq(&configuration, pio_get_dreq(Block(), kStateMachine, true));
 
     dma_channel_configure(static_cast<uint>(dma_channel_), &configuration,
-                          &Block()->txf[kStateMachine], frame, count, true);
+                          &Block()->txf[kStateMachine], frame, static_cast<uint>(count), true);
 
     return kEOk;
 }

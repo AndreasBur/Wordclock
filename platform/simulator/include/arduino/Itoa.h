@@ -35,7 +35,7 @@ inline char* itoa(int value, char* buffer, int base) // NOLINT(readability-ident
 
     char* start = p;
     do {
-        int digit = u % static_cast<unsigned int>(base);
+        const unsigned int digit = u % static_cast<unsigned int>(base);
         *p++ = (digit < 10) ? char('0' + digit) : char('a' + digit - 10);
         u /= static_cast<unsigned int>(base);
     } while(u);

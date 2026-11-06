@@ -73,6 +73,8 @@ enum StdReturnType {
  * \param[in] number The number.
  * \param[in] base The base the digits are counted in.
  * \return The number of digits; 0 has one.
+ * \pre `number` is not negative. A minus sign is not a digit, so it is not counted - where itoa()
+ *      wrote one, the string is a character longer than this says.
  */
 template <typename T> uint8_t DigitsOfNumber(T number, unsigned base = 10);
 
@@ -95,10 +97,12 @@ constexpr std::underlying_type_t<EnumType> ToUnderlying(EnumType value)
 template <typename T>
 uint8_t DigitsOfNumber(T number, unsigned base)
 {
-    T number_of_digits = 0u;
+    uint8_t number_of_digits{0u};
 
-    do { number /= base; ++number_of_digits; }
-    while (number != 0u);
+    // Divided in T, not in the unsigned of `base`: a signed T would otherwise be converted to
+    // unsigned first.
+    do { number = static_cast<T>(number / static_cast<T>(base)); ++number_of_digits; }
+    while (number != T{0});
 
     return number_of_digits;
 }

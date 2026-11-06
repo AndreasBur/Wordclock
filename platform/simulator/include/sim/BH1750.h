@@ -106,7 +106,7 @@ class BH1750
     using IlluminanceType = uint16_t;
 
     /*! \brief A measurement mode of the sensor; its value is the command that selects it. */
-    enum class ModeType {
+    enum class ModeType : byte {
         kNone, /*!< No mode: the sensor is not set up. */
         /*! \brief Measures again and again, at low resolution. */
         kContinuousLowResMode = BH1750_CMD_CONTINUOUS_LOW_RES_MODE,
@@ -146,9 +146,13 @@ class BH1750
      * stands in for, which is the one property it exists to keep.
      */
     // NOLINTBEGIN(readability-convert-member-functions-to-static)
-    IlluminanceType ConvertRawToLux(IlluminanceType illuminance_raw) const { return illuminance_raw / BH1750_ILLUMINANCE_RAW_VALUE_DIVIDER; }
+    // Divided by 1.2 alone, so the result is smaller than the raw value and fits; the backends
+    // divide by as little as 0.54 and clamp for that.
+    IlluminanceType ConvertRawToLux(IlluminanceType illuminance_raw) const {
+        return static_cast<IlluminanceType>(static_cast<float>(illuminance_raw) / BH1750_ILLUMINANCE_RAW_VALUE_DIVIDER);
+    }
     // NOLINTEND(readability-convert-member-functions-to-static)
-    static constexpr IlluminanceType CombineRawValueParts(byte high_byte, byte low_byte) { return static_cast<uint16_t>(high_byte) << 8u | low_byte; }
+    static constexpr IlluminanceType CombineRawValueParts(byte high_byte, byte low_byte) { return static_cast<IlluminanceType>((high_byte << 8u) | low_byte); }
     static constexpr bool IsMtRegValueInRange(byte mt_reg_value) { return ((mt_reg_value <= BH1750_REG_MT_MAX_VALUE) && (mt_reg_value >= BH1750_REG_MT_MIN_VALUE)); }
 
   public:

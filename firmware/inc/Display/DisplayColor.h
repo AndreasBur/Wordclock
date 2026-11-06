@@ -68,7 +68,7 @@ class DisplayColor
 
         // One operand widened before the multiply: two bytes promote to a signed 16-bit
         // int on the AVR, and 255 * 255 does not fit in one.
-        const byte dimmed_color = (static_cast<uint16_t>(color) * brightness) >> 8u;
+        const byte dimmed_color = static_cast<byte>((static_cast<uint16_t>(color) * brightness) >> 8u);
         if(dimmed_color == 0u) { return 1u; }
         else { return dimmed_color; }
     }

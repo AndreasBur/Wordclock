@@ -130,7 +130,7 @@ StdReturnType Clock::GetClockWords(byte hour, byte minute, ClockWords& clock_wor
         MinuteTableElementType minutes_table_element = GetMinutesTableElement(minute);
         hour = Transform24hTo12hFormat(hour);
         // correct the hour offset from the minutes and take care of overflow
-        hour = (hour + minutes_table_element.hour_offset) % CLOCK_NUMBER_OF_HOURS;
+        hour = static_cast<byte>((hour + minutes_table_element.hour_offset) % CLOCK_NUMBER_OF_HOURS);
 
         clock_words.SetHourWords(GetHoursTableElement(minutes_table_element.hour_mode, hour));
         clock_words.SetMinuteWords(minutes_table_element.words);

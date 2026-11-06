@@ -30,7 +30,7 @@ class Scheduler
 {
   public:
     /*! \brief The tasks the scheduler drives, one per module, in the order it drives them. */
-    enum class TaskIdType {
+    enum class TaskIdType : byte {
         kIlluminance,    /*!< The task of Illuminance. */
         kTemperature,    /*!< The task of Temperature. */
         kDisplayManager, /*!< The task of DisplayManager. */

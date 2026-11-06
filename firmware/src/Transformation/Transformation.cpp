@@ -57,8 +57,8 @@ StdReturnType Transformation::ShiftRowRight(byte row, bool rotate)
 
     if(rotate) if(Display::GetInstance().GetPixel(DISPLAY_NUMBER_OF_COLUMNS - 1u, row, last_pixel_value) == kENotOk) return_value = kENotOk;
 
-    for(int8_t column = DISPLAY_NUMBER_OF_COLUMNS - 1u; column > 0; column--) {
-        if(Display::GetInstance().GetPixel(column - 1u, row, pixel_value) == kENotOk) return_value = kENotOk;
+    for(byte column = DISPLAY_NUMBER_OF_COLUMNS - 1u; column > 0u; column--) {
+        if(Display::GetInstance().GetPixel(static_cast<byte>(column - 1u), row, pixel_value) == kENotOk) return_value = kENotOk;
         if(Display::GetInstance().WritePixel(column, row, pixel_value) == kENotOk) return_value = kENotOk;
     }
     if(rotate) { if(Display::GetInstance().WritePixel(0u, row, last_pixel_value) == kENotOk) return_value = kENotOk; }
@@ -113,8 +113,8 @@ StdReturnType Transformation::ShiftColumnDown(byte column, bool rotate)
 
     if(rotate) if(Display::GetInstance().GetPixel(column, DISPLAY_NUMBER_OF_ROWS - 1u, last_pixel_value) == kENotOk) return_value = kENotOk;
 
-    for(int8_t row = DISPLAY_NUMBER_OF_ROWS - 1u; row > 0; row--) {
-        if(Display::GetInstance().GetPixel(column, row - 1u, pixel_value) == kENotOk) return_value = kENotOk;
+    for(byte row = DISPLAY_NUMBER_OF_ROWS - 1u; row > 0u; row--) {
+        if(Display::GetInstance().GetPixel(column, static_cast<byte>(row - 1u), pixel_value) == kENotOk) return_value = kENotOk;
         if(Display::GetInstance().WritePixel(column, row, pixel_value) == kENotOk) return_value = kENotOk;
     }
     if(rotate) { if(Display::GetInstance().WritePixel(column, 0u, last_pixel_value) == kENotOk) return_value = kENotOk; }

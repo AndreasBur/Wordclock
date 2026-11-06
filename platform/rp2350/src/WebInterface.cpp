@@ -301,7 +301,7 @@ void HandleUpdateBody(AsyncWebServerRequest* request, uint8_t* data, size_t leng
         AbortImage("the image could not be written to the filesystem");
         return;
     }
-    upload.written += length;
+    upload.written += static_cast<uint32_t>(length);
 
     if(upload.written >= total) { CommitImage(total); }
 }
