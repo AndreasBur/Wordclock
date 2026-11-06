@@ -9,6 +9,7 @@
 #include "DisplayCharacters.h"
 #include "DisplayColor.h"
 #include "DisplayManager.h"
+#include "DisplayWords.h"
 #include "GammaCorrection.h"
 #include "Pixels.h"
 #include "RealTimeClock.h"
@@ -384,4 +385,130 @@ void TestDisplayCharacterLookup()
            "a column past the last one must be rejected");
     Expect(characters.GetCharacter(DISPLAY_CHARACTERS_NUMBER_OF_CHARACTERS, character) == kENotOk,
            "an index past the last one must be rejected");
+}
+
+namespace {
+// Whether the pixel at `column` and `row` is a letter of some word, which is what ClearWords()
+// turns off and what it has to leave alone otherwise.
+bool IsPixelOfAWord(byte column, byte row)
+{
+    const DisplayWords words;
+
+    for(byte id = ToUnderlying(DisplayWords::WordIdType::kEs); id < DisplayWords::kNumberOfWords; id++) {
+        const DisplayWord word = words.GetDisplayWord(static_cast<DisplayWords::WordIdType>(id));
+        if(word.GetRow() == row && column >= word.GetColumn() && column < word.GetColumn() + word.GetLength()) { return true; }
+    }
+    return false;
+}
+
+// How many letters of the word are lit: all of them for a word that is shown, none for one
+// that is cleared, and anything in between for a clear that stopped half-way.
+byte LitLettersOf(DisplayWords::WordIdType word_id)
+{
+    const DisplayWord word = DisplayWords::GetDisplayWord(word_id);
+    byte lit = 0u;
+
+    for(byte letter = 0u; letter < word.GetLength(); letter++) {
+        if(Display::GetInstance().GetPixel(static_cast<byte>(word.GetColumn() + letter), word.GetRow())) { lit++; }
+    }
+    return lit;
+}
+}
+
+/*
+ * The writers and readers of the display that nothing in the firmware calls: they are kept, as
+ * the rest of its interface is, so they are run here.
+ */
+void TestWordsAreClearedOneOrAll()
+{
+    Display& display = Display::GetInstance();
+
+    // A letter that belongs to no word, the first one there is.
+    byte stray_column = 0u;
+    byte stray_row = 0u;
+    while(IsPixelOfAWord(stray_column, stray_row)) {
+        if(++stray_column == DISPLAY_NUMBER_OF_COLUMNS) { stray_column = 0u; stray_row++; }
+    }
+    Expect(stray_row < DISPLAY_NUMBER_OF_ROWS, "the plate must have a letter that is in no word");
+
+    display.Clear();
+    display.SetWord(DisplayWords::WordIdType::kEs);
+    display.SetWord(DisplayWords::WordIdType::kIst);
+    display.SetPixel(stray_column, stray_row);
+
+    Expect(display.ClearWord(DisplayWords::WordIdType::kEs) == kEOk, "a word must be cleared");
+    Expect(LitLettersOf(DisplayWords::WordIdType::kEs) == 0u, "every letter of it");
+    Expect(LitLettersOf(DisplayWords::WordIdType::kIst) == DisplayWords::GetDisplayWordLength(DisplayWords::WordIdType::kIst),
+           "and nothing of the word beside it");
+
+    const PixelBufferType before = ReadPixels();
+    Expect(display.ClearWord(DisplayWords::WordIdType::kNumberOfWords) == kENotOk, "a word not in the table must be refused");
+    Expect(display.ClearWord(DisplayWords::WordIdType::kNone) == kEOk, "and no word cleared as nothing");
+    Expect(ArePixelsEqual(before, ReadPixels()), "neither of them turning anything off");
+
+    Expect(display.ClearWords() == kEOk, "every word must be cleared at once");
+    Expect(LitLettersOf(DisplayWords::WordIdType::kIst) == 0u, "the one left among them");
+    Expect(display.GetPixel(stray_column, stray_row), "while a letter of no word stays lit");
+
+    display.Clear();
+}
+
+void TestPixelRowsAndColumnsAreWritten()
+{
+    Display& display = Display::GetInstance();
+    const Display::PixelRowType row_bits = (1u << 0u) | (1u << 5u) | (1u << (DISPLAY_NUMBER_OF_COLUMNS - 1u));
+    const Display::PixelColumnType column_bits = (1u << 1u) | (1u << (DISPLAY_NUMBER_OF_ROWS - 1u));
+
+    // A pixel lit in the row that the bits leave dark, and one in the row above that is no
+    // business of the write.
+    display.Clear();
+    display.SetPixel(2u, 3u);
+    display.SetPixel(2u, 2u);
+
+    Expect(display.SetPixelRow(3u, row_bits | 0xF800u) == kEOk, "a row must be written");
+    Expect(display.GetPixelRow(3u) == row_bits, "lit where its bits are set and dark elsewhere, the bits above the grid unread");
+    Expect(display.GetPixel(2u, 2u), "and the row above must be as it was");
+
+    display.Clear();
+    display.SetPixel(4u, 0u);
+    Expect(display.SetPixelColumn(4u, column_bits | 0xFC00u) == kEOk, "a column must be written");
+    Expect(display.GetPixelColumn(4u) == column_bits, "lit where its bits are set and dark elsewhere");
+    Expect(display.GetPixelColumn(3u) == 0u && display.GetPixelColumn(5u) == 0u, "and nothing beside it");
+
+    const PixelBufferType before = ReadPixels();
+    Expect(display.SetPixelRow(DISPLAY_NUMBER_OF_ROWS, 0xFFFFu) == kENotOk, "a row off the grid must be refused");
+    Expect(display.SetPixelColumn(DISPLAY_NUMBER_OF_COLUMNS, 0xFFFFu) == kENotOk, "and so must a column");
+    Expect(ArePixelsEqual(before, ReadPixels()), "with nothing written");
+
+    display.Clear();
+}
+
+void TestPixelByIndexTogglesAndReads()
+{
+    Display& display = Display::GetInstance();
+    // Row 2, column 1: the index counts row by row.
+    constexpr Display::IndexType kIndex{2u * DISPLAY_NUMBER_OF_COLUMNS + 1u};
+    Display::PixelValueType value{false};
+
+    display.Clear();
+    Expect(display.TogglePixel(kIndex) == kEOk && display.GetPixel(1u, 2u), "a dark pixel must toggle to lit");
+    Expect(display.GetPixel(kIndex, value) == kEOk && value, "and read back as lit by its index");
+    Expect(display.TogglePixel(kIndex) == kEOk && display.IsCleared(), "and toggle back to dark");
+    Expect(display.GetPixel(kIndex, value) == kEOk && !value, "reading back as dark");
+
+    value = true;
+    Expect(display.TogglePixel(DISPLAY_NUMBER_OF_PIXELS) == kENotOk && display.IsCleared(),
+           "a pixel past the last one must be refused, nothing toggled");
+    Expect(display.GetPixel(DISPLAY_NUMBER_OF_PIXELS, value) == kENotOk && value,
+           "and refused when read, the value left as it was");
+}
+
+void TestInitTurnsEveryPixelOff()
+{
+    Display& display = Display::GetInstance();
+
+    display.SetWord(DisplayWords::WordIdType::kEs);
+    display.Init();
+    Expect(display.IsCleared(), "the display must be dark after Init()");
+    Expect(display.GetState() == Display::StateType::kInit, "and initialised");
 }
