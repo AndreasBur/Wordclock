@@ -35,9 +35,11 @@
  *
  * Its options:
  * - `-I<index>`, uint8: the index of the pixel, row * DISPLAY_NUMBER_OF_COLUMNS + column; without
- *   `-I` it is 0. An index off the display is answered with `Error=4:I`, and nothing is written.
- * - `-S<0|1>`, uint8: with any value but 0, lights the pixel in the colour of the display; with 0,
- *   turns it off. Without `-S` the pixel is written as it is.
+ *   `-I` the answer is about pixel 0. An index off the display is answered with `Error=4:I`, and
+ *   nothing is written.
+ * - `-S<0|1>`, uint8: with any value but 0, lights the pixel of `-I` in the colour of the display;
+ *   with 0, turns it off. It writes only beside an `-I` that was taken: `4 -S1` alone writes
+ *   nothing, as `4 -I300 -S1` does not. Without `-S` the pixel is written as it is.
  *
  * The pixel stands until something draws over it. Process() marks the display's buffer to be sent
  * in any case.
