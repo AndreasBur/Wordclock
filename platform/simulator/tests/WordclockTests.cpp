@@ -103,6 +103,9 @@ int main()
     TestProceduresChangeTheDisplay();
     TestProcedureSelectionsWrapAround();
     TestUnknownProcedureRunsNothing();
+    TestSchedulerRunsATaskFirstThenEveryCycle();
+    TestSchedulerTakesANewCycleOnTheNextRun();
+    TestSchedulerCycleZeroSwitchesATaskOff();
     TestPersistence();
     TestPersistenceSaveAndReset();
     TestWebSocketHashAndEncoding();

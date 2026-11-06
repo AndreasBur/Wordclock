@@ -73,6 +73,9 @@ void TestSerialShimSpeaksLatin1();
 /* scheduler_test.cpp */
 void TestSchedulerSpeedRoundTrip();
 void TestUptimeCountsWithoutWrapping();
+void TestSchedulerRunsATaskFirstThenEveryCycle();
+void TestSchedulerTakesANewCycleOnTheNextRun();
+void TestSchedulerCycleZeroSwitchesATaskOff();
 
 /* nightswitch_test.cpp */
 void TestNightWindowIncludesMidnight();
