@@ -13,6 +13,7 @@
 #include "Clock.h"
 #include "Display.h"
 #include "DisplayManager.h"
+#include "ErrorMessage.h"
 #include "Illuminance.h"
 #include "Overlays.h"
 #include "Persistence.h"

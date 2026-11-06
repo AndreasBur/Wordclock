@@ -10,6 +10,7 @@
 
 #include "AnimationShift.h"
 #include "Display.h"
+#include "DisplayWords.h"
 #include "Clock.h"
 
 void AnimationShift::Init()

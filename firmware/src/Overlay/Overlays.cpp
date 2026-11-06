@@ -11,6 +11,8 @@
 #include "Overlays.h"
 #include "Animations.h"
 #include "RealTimeClock.h"
+#include "ClockDate.h"
+#include "ClockTime.h"
 
 // Disabled is what is left over when none of the overlays has anything to do, which is
 // why it needs no test of its own.

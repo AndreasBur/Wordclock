@@ -10,6 +10,7 @@
 
 #include "AnimationExplodePixels.h"
 #include "Display.h"
+#include "DisplayWords.h"
 #include "Clock.h"
 
 void AnimationExplodePixels::Init()

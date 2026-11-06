@@ -11,6 +11,7 @@
 #define _MESSAGE_CATALOG_SOURCE_
 
 #include "MessageCatalog.h"
+#include "StandardTypes.h"
 // The command numbers are taken from here rather than copied, so they cannot fall behind
 // the firmware. Its OVERLAYS_SUPPORT_* switches reach the entries below through it too.
 #include "MsgCmdParser.h"
