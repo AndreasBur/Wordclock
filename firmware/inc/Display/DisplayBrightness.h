@@ -60,22 +60,8 @@ class DisplayBrightness
     static constexpr byte kBrightnessMaxValue{255};
     static constexpr byte kBrightnessAutomaticMinValue{8u};
 
-    /*
-     * The room's brightness, spread between the two calibrated bounds rather than divided
-     * by the upper one alone. Dividing left the lower bound with no effect at all - the
-     * procedure that calibrates it answered, Persistence stored it, and nothing ever read
-     * it - and it put a living room at 100 lx a sixth of a percent up a scale that ends at
-     * the sensor's 65535, so the automatic held every indoor clock at its floor.
-     */
-    static byte CalcBrightnessAutomatic(byte brightness) {
-        const Illuminance& sensor = Illuminance::GetInstance();
+    static byte CalcBrightnessAutomatic(byte brightness);
 
-        if(brightness < kBrightnessAutomaticMinValue) { return brightness; }
-
-        return ToAutomaticLevel(brightness, ToIlluminanceFactor(sensor.GetIlluminance(),
-                                                                sensor.GetCalibrationValuesMinValue(),
-                                                                sensor.GetCalibrationValuesMaxValue()));
-    }
     /*
      * Where the reading sits between the bounds: 0 at the dark one, 1 at the bright one.
      * Bounds that are not in order are what a calibration in the wrong order stores, and
@@ -129,15 +115,7 @@ class DisplayBrightness
      *
      * \return The brightness, 0 to 255.
      */
-    byte CalcConfiguredBrightness() const {
-        if(use_gamma_correction_) {
-            if(use_automatic_) { return CalcBrightnessAutomaticCorrected(); }
-            else { return CalcBrightnessCorrected(); }
-        } else {
-            if(use_automatic_) { return CalcBrightnessAutomatic(); }
-            else { return brightness_; }
-        }
-    }
+    byte CalcConfiguredBrightness() const;
 
     /*! \brief Returns whether the automatic follows the light sensor. */
     bool GetUseAutomatic() const { return use_automatic_; }
@@ -172,12 +150,7 @@ class DisplayBrightness
      *
      * The fade level is left as it is; it belongs to a running fade, which clears it when it ends.
      */
-    void ResetToDefaults() {
-        brightness_ = kBrightnessInitValue;
-        use_automatic_ = kUseAutomaticInitValue;
-        use_gamma_correction_ = kUseGammaCorrectionInitValue;
-        night_level_ = kFadeLevelFull;
-    }
+    void ResetToDefaults();
 
     /*! \brief Switches the automatic on. */
     void EnableAutomatic() { use_automatic_ = true; }
@@ -210,14 +183,7 @@ class DisplayBrightness
      *
      * \return The brightness, 0 to 255.
      */
-    byte CalcBrightness() const {
-        byte value = CalcConfiguredBrightness();
-
-        if(night_level_ != kFadeLevelFull) { value = ScaleByLevel(value, night_level_); }
-        if(fade_level_ != kFadeLevelFull) { value = ScaleByLevel(value, fade_level_); }
-
-        return value;
-    }
+    byte CalcBrightness() const;
 
     /*! \brief Returns how dark a fade has made the display, 255 being not at all. */
     byte GetFadeLevel() const { return fade_level_; }
