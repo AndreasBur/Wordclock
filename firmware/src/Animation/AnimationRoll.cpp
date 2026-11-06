@@ -9,6 +9,8 @@
 #define _ANIMATION_ROLL_SOURCE_
 
 #include "AnimationRoll.h"
+#include "Display.h"
+#include "Clock.h"
 
 void AnimationRoll::Init()
 {

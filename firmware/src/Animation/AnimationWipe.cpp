@@ -9,6 +9,8 @@
 #define _ANIMATION_CLOCK_WIPE_SOURCE_
 
 #include "AnimationWipe.h"
+#include "Display.h"
+#include "Clock.h"
 
 void AnimationWipe::Init()
 {

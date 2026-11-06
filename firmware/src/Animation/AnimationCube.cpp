@@ -10,6 +10,8 @@
 
 #include "AnimationCube.h"
 #include "StandardTypes.h"
+#include "Display.h"
+#include "Clock.h"
 
 void AnimationCube::Init()
 {

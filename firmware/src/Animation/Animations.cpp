@@ -9,6 +9,8 @@
 #define _ANIMATIONS_SOURCE_
 
 #include "Animations.h"
+#include "Display.h"
+#include "Clock.h"
 
 Animations::StateType Animations::GetState() const
 {

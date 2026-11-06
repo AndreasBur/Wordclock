@@ -9,6 +9,8 @@
 #define _ANIMATION_MATRIX_SOURCE_
 
 #include "AnimationMatrix.h"
+#include "Display.h"
+#include "Clock.h"
 
 void AnimationMatrix::Init()
 {

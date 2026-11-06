@@ -9,6 +9,8 @@
 #define _ANIMATION_CLOCK_FLICKER_SOURCE_
 
 #include "AnimationFlicker.h"
+#include "Display.h"
+#include "Clock.h"
 
 void AnimationFlicker::Init()
 {

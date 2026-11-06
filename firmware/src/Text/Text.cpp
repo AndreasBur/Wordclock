@@ -9,6 +9,7 @@
 #define _TEXT_SOURCE_
 
 #include "Text.h"
+#include "Display.h"
 
 StdReturnType Text::SetChar(byte column, byte row, char character, FontType font)
 {

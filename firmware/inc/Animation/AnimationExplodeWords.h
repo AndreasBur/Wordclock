@@ -13,6 +13,7 @@
 #include "Arduino.h"
 #include "ClockWords.h"
 #include "Animation.h"
+#include "Display.h"
 
 /*!
  * \brief The explode-words animation: the two halves of AnimationExplodePixels, but word by word:

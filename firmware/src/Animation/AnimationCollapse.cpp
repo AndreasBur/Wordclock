@@ -9,6 +9,8 @@
 #define _ANIMATION_COLLAPSE_SOURCE_
 
 #include "AnimationCollapse.h"
+#include "Display.h"
+#include "Clock.h"
 
 void AnimationCollapse::Init()
 {
