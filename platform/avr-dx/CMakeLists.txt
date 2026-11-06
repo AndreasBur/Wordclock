@@ -74,9 +74,14 @@ target_compile_options(Wordclock PRIVATE
     "$<$<CONFIG:Debug>:${AVR_OPTIONS_DEBUG}>"
     "$<$<NOT:$<CONFIG:Debug>>:${AVR_OPTIONS_RELEASE}>")
 
+# -fstack-usage -fcallgraph-info=su -save-temps=obj: every function's frame and every call, as
+#   LTO left them, written beside the image for tools/avr-stack.py. At the link and not at the
+#   compile, because the compile's frames are those before inlining, and LTO inlines across
+#   sources. The image comes out byte for byte the same without them.
 target_link_options(Wordclock PRIVATE
     -mmcu=${AVR_MCU}
     -Wl,--gc-sections
+    -fstack-usage -fcallgraph-info=su -save-temps=obj
     "$<$<CONFIG:Debug>:${AVR_OPTIONS_DEBUG}>"
     "$<$<NOT:$<CONFIG:Debug>>:${AVR_OPTIONS_RELEASE}>")
 
