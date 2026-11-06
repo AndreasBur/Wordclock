@@ -48,6 +48,11 @@ does cost is every file that includes it: `DisplayManager.h` used to drag
 `Animations.h`, `Overlays.h` and the clock into every one of its includers for four
 private helpers.
 
+A header with one includer is the exception. The command parsers' headers are each
+included by `MsgCmdParser.cpp` and nothing else, so their bodies cost no other file an
+include, and a source per parser would only add files: such a header keeps its bodies,
+and gives them up when a second file includes it.
+
 Moving a body moves its includes, and a file that leaned on one of them breaks only
 once that include is gone. `tools/self-contained-headers.py` compiles every header as
 the only include of an empty file, and the static-analysis jobs run it for each target.
