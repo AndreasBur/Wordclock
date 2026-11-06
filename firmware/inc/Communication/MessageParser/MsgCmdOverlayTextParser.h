@@ -12,6 +12,7 @@
 #include "StandardTypes.h"
 #include "Arduino.h"
 #include "MsgCmdOverlayParser.h"
+#include "Overlays.h"
 
 /*!
  * \brief The parser of command 7, the text overlay command: sets the text that scrolls over the
