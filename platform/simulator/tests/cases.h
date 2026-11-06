@@ -55,6 +55,9 @@ void TestUndrawableCharacterShiftsAsASpace();
 void TestReadingPastTheEndIsEmpty();
 void TestWritingPastTheEndIsRefused();
 void TestGlyphAccessorsCheckBothWays();
+void TestWordAccessorsCheckBothWays();
+void TestGlyphWidthChecksBothWays();
+void TestGridRowsAndColumnsReadTheLitPixels();
 
 /* clock_test.cpp */
 void TestRegionalWordings();

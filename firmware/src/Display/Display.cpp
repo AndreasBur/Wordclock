@@ -341,14 +341,14 @@ Display::PixelRowType Display::GetPixelRow(byte row)  const
     return pixel_row.GetValue();
 }
 
-StdReturnType Display::GetPixelColumn(byte column, PixelRowType& pixel_column)  const
+StdReturnType Display::GetPixelColumn(byte column, PixelColumnType& pixel_column) const
 {
     StdReturnType return_value{kEOk};
     PixelValueType pixel_value;
 
     for(byte row = 0; row < DISPLAY_NUMBER_OF_ROWS; row++) {
         if(GetPixel(column, row, pixel_value) == kEOk) {
-            pixel_column = Bit<PixelRowType>::WriteBit(pixel_column, row, pixel_value);
+            pixel_column = Bit<PixelColumnType>::WriteBit(pixel_column, row, pixel_value);
         } else {
             return_value = kENotOk;
         }
