@@ -13,8 +13,10 @@
 #include "NightSwitch.h"
 #include "Overlays.h"
 #include "RealTimeClock.h"
+#include "Scheduler.h"
 #include "Text.h"
 
+#include <array>
 #include <string>
 
 /*
@@ -36,10 +38,17 @@ using RpcIdType = MsgCmdRemoteProcedureCallParser::RpcIdType;
 #if (OVERLAYS_SUPPORT_DATE == STD_ON) && (OVERLAYS_SUPPORT_TEMPERATURE == STD_ON) && (OVERLAYS_SUPPORT_TEXT == STD_ON)
 static_assert(ToUnderlying(CommandType::kRemoteProcedureCall) == 1u, "command 1 is the procedure call");
 static_assert(ToUnderlying(CommandType::kDisplayColor) == 2u, "command 2 is the display colour");
+static_assert(ToUnderlying(CommandType::kDisplayBrightness) == 3u, "command 3 is the display brightness");
+static_assert(ToUnderlying(CommandType::kDisplayPixel) == 4u, "command 4 is the display pixel");
+static_assert(ToUnderlying(CommandType::kOverlayDate) == 5u, "command 5 is the date overlay");
 static_assert(ToUnderlying(CommandType::kOverlayTemperature) == 6u, "command 6 is the temperature overlay");
+static_assert(ToUnderlying(CommandType::kOverlayText) == 7u, "command 7 is the text overlay");
 static_assert(ToUnderlying(CommandType::kClockMode) == 8u, "command 8 is the clock mode");
+static_assert(ToUnderlying(CommandType::kAnimation) == 9u, "command 9 is the animation");
 static_assert(ToUnderlying(CommandType::kTime) == 10u, "command 10 is the time");
 static_assert(ToUnderlying(CommandType::kDate) == 11u, "command 11 is the date");
+static_assert(ToUnderlying(CommandType::kStatus) == 12u, "command 12 is the status");
+static_assert(ToUnderlying(CommandType::kNetwork) == 13u, "command 13 is the network");
 static_assert(ToUnderlying(CommandType::kNightSwitch) == 14u, "command 14 is the night switch");
 static_assert(ToUnderlying(CommandType::kColorCycle) == 15u, "command 15 is the colour cycle");
 static_assert(ToUnderlying(CommandType::kConsole) == 16u, "command 16 is the console, the last");
@@ -404,4 +413,159 @@ void TestUnknownProcedureRunsNothing()
     Expect(IsColor(display.GetColor(), color_before.GetRed(), color_before.GetGreen(), color_before.GetBlue()) &&
            display.GetBrightness() == brightness_before && display.IsEnabled() == enabled_before,
            "an id that is no procedure changes nothing");
+}
+
+void TestDisplayBrightnessCommandSetsTheBrightness()
+{
+    Display& display = Display::GetInstance();
+    const byte brightness_before = display.GetBrightness();
+    const bool automatic_before = display.GetBrightnessUseAutomatic();
+    const bool gamma_before = display.GetBrightnessUseGammaCorrection();
+
+    display.SetBrightnessUseAutomatic(false);
+    display.SetBrightnessUseGammaCorrection(false);
+    Send(CommandType::kDisplayBrightness, "-B77");
+    Expect(display.GetBrightness() == 77u, "-B sets the brightness asked for");
+
+    Send(CommandType::kDisplayBrightness, "-A1 -G1");
+    Expect(display.GetBrightnessUseAutomatic(), "-A1 has it follow the light sensor");
+    Expect(display.GetBrightnessUseGammaCorrection(), "-G1 has it gamma corrected");
+    Expect(display.GetBrightness() == 77u, "neither touches the brightness asked for");
+
+    Send(CommandType::kDisplayBrightness, "-A0 -G0");
+    Expect(!display.GetBrightnessUseAutomatic() && !display.GetBrightnessUseGammaCorrection(),
+           "and 0 switches each of them off");
+
+    display.SetBrightness(brightness_before);
+    display.SetBrightnessUseAutomatic(automatic_before);
+    display.SetBrightnessUseGammaCorrection(gamma_before);
+}
+
+void TestDisplayPixelCommandWritesOnePixel()
+{
+    Display& display = Display::GetInstance();
+
+    display.Clear();
+    Send(CommandType::kDisplayPixel, "-I12 -S1");
+    Expect(display.GetPixel(Display::IndexType{12u}), "-I and -S1 light the pixel of the index");
+    Expect(!display.GetPixel(Display::IndexType{11u}) && !display.GetPixel(Display::IndexType{13u}),
+           "and that one alone");
+    Send(CommandType::kDisplayPixel, "-I12 -S0");
+    Expect(display.IsCleared(), "-S0 turns it off again");
+
+    // Without an -I that was taken, -S has no pixel to write: the one of a refused -I was
+    // pixel 0, which is how 4 -I300 -S1 came to light it.
+    Send(CommandType::kDisplayPixel, "-S1");
+    Expect(display.IsCleared(), "-S without -I writes nothing");
+    Send(CommandType::kDisplayPixel, "-I300 -S1");
+    Expect(display.IsCleared(), "and neither does -S behind an -I that was refused");
+
+    // One past the last pixel: refused, and nothing written - not the last pixel, not pixel 0.
+    Send(CommandType::kDisplayPixel, Option('I', DISPLAY_NUMBER_OF_PIXELS) + " -S1");
+    Expect(display.IsCleared(), "an index off the display writes nothing");
+}
+
+void TestAnimationCommandSelectsAndTunes()
+{
+    Animations& animations = Animations::GetInstance();
+    const Animations::AnimationIdType animation_before = animations.GetAnimation();
+    const Animations::ModeType mode_before = animations.GetMode();
+    std::array<byte, Animations::kNumberOfAnimations> cycles_before{};
+    std::array<bool, Animations::kNumberOfAnimations> favourites_before{};
+
+    for(byte id = 0u; id < Animations::kNumberOfAnimations; id++) {
+        cycles_before[id] = animations.GetTaskCycle(static_cast<Animations::AnimationIdType>(id));
+        favourites_before[id] = animations.IsFavourite(static_cast<Animations::AnimationIdType>(id));
+    }
+
+    const Animations::AnimationIdType first = FirstAnimation();
+    const auto last = static_cast<Animations::AnimationIdType>(Animations::kNumberOfAnimations - 1u);
+    const unsigned first_id = ToUnderlying(first);
+    const unsigned last_id = ToUnderlying(last);
+
+    Send(CommandType::kAnimation, Option('A', first_id));
+    Expect(animations.GetAnimation() == first, "-A selects the animation");
+    Send(CommandType::kAnimation, Option('A', Animations::kNumberOfAnimations));
+    Expect(animations.GetAnimation() == first, "an id past the last is refused");
+
+    Send(CommandType::kAnimation, Option('M', ToUnderlying(Animations::ModeType::kSequence)));
+    Expect(animations.GetMode() == Animations::ModeType::kSequence, "-M sets the mode");
+    Send(CommandType::kAnimation, Option('M', Animations::kNumberOfModes));
+    Expect(animations.GetMode() == Animations::ModeType::kSequence, "a mode past the last is refused");
+
+    // -S speaks speed, the scheduler cycles; 255 is the fastest, a cycle of one.
+    Send(CommandType::kAnimation, "-S255");
+    Expect(animations.GetTaskCycle(first) == 1u, "-S without -A sets the speed of the selected animation");
+    Send(CommandType::kAnimation, Option('A', last_id) + " -S1");
+    Expect(animations.GetAnimation() == last && animations.GetTaskCycle(last) == UINT8_MAX,
+           "-S with -A sets the speed of that one");
+    Expect(animations.GetTaskCycle(first) == 1u, "and leaves the one selected before alone");
+    Send(CommandType::kAnimation, Option('A', Animations::kNumberOfAnimations) + " -S255");
+    Expect(animations.GetTaskCycle(last) == UINT8_MAX, "-S behind a refused -A is refused with it");
+
+    Send(CommandType::kAnimation, Option('A', first_id) + " -F1");
+    Expect(animations.IsFavourite(first), "-F1 makes the animation a favourite");
+    Send(CommandType::kAnimation, "-A0 -F1");
+    Expect(!animations.IsFavourite(Animations::AnimationIdType::kNone), "id 0 cannot be a favourite");
+
+    // Down to the one favourite, which the modes that pick among them could not do without.
+    for(byte id = 0u; id < Animations::kNumberOfAnimations; id++) {
+        const auto animation = static_cast<Animations::AnimationIdType>(id);
+        if(animation != first) { animations.SetFavourite(animation, false); }
+    }
+    Send(CommandType::kAnimation, Option('A', first_id) + " -F0");
+    Expect(animations.IsFavourite(first), "the last favourite cannot be taken out");
+
+    // Every favourite on first, so that taking the extra ones out never meets the last.
+    for(byte id = 1u; id < Animations::kNumberOfAnimations; id++) {
+        animations.SetFavourite(static_cast<Animations::AnimationIdType>(id), true);
+    }
+    for(byte id = 0u; id < Animations::kNumberOfAnimations; id++) {
+        const auto animation = static_cast<Animations::AnimationIdType>(id);
+        if(!favourites_before[id]) { animations.SetFavourite(animation, false); }
+        animations.SetTaskCycle(animation, cycles_before[id]);
+    }
+    animations.SetMode(mode_before);
+    animations.SetAnimation(animation_before);
+}
+
+/*
+ * The options themselves are the temperature overlay's case. These two check that the date and
+ * the text command each reach their own overlay and leave the others alone - the three parsers
+ * share all of their code but the accessors, which is where a copy would go wrong.
+ */
+void TestOverlayCommandsReachTheirOwnOverlay()
+{
+#if (OVERLAYS_SUPPORT_DATE == STD_ON) && (OVERLAYS_SUPPORT_TEMPERATURE == STD_ON) && (OVERLAYS_SUPPORT_TEXT == STD_ON)
+    Overlays& overlays = Overlays::GetInstance();
+    const auto date_period_before = overlays.GetDatePeriodInMinutes();
+    const auto text_period_before = overlays.GetTextPeriodInMinutes();
+    const auto temperature_period_before = overlays.GetTemperaturePeriodInMinutes();
+    const auto date_endurance_before = overlays.GetDateEnduranceInSeconds();
+    const std::string text_before = overlays.GetTextText();
+
+    overlays.SetDatePeriodInMinutes(1u);
+    overlays.SetTextPeriodInMinutes(1u);
+    overlays.SetTemperaturePeriodInMinutes(1u);
+
+    Send(CommandType::kOverlayDate, "-P20 -E9");
+    Expect(overlays.GetDatePeriodInMinutes() == 20u && overlays.GetDateEnduranceInSeconds() == 9u,
+           "the date command sets the date overlay");
+    Expect(overlays.GetTextPeriodInMinutes() == 1u && overlays.GetTemperaturePeriodInMinutes() == 1u,
+           "and neither of the other two");
+
+    // The text runs to the end of the line here; before a further option it would keep the
+    // space in front of it.
+    Send(CommandType::kOverlayText, "-P30 -THallo Welt");
+    Expect(overlays.GetTextPeriodInMinutes() == 30u, "the text command sets the text overlay");
+    Expect(std::string(overlays.GetTextText()) == "Hallo Welt", "-T sets its text, spaces and all");
+    Expect(overlays.GetDatePeriodInMinutes() == 20u && overlays.GetTemperaturePeriodInMinutes() == 1u,
+           "and neither of the other two");
+
+    overlays.SetDatePeriodInMinutes(date_period_before);
+    overlays.SetDateEnduranceInSeconds(date_endurance_before);
+    overlays.SetTextPeriodInMinutes(text_period_before);
+    overlays.SetTemperaturePeriodInMinutes(temperature_period_before);
+    overlays.SetTextText(text_before.c_str(), static_cast<Overlays::LengthType>(text_before.size()));
+#endif
 }
