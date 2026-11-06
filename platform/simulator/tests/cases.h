@@ -128,6 +128,7 @@ void TestDisplayBrightnessCommandSetsTheBrightness();
 void TestDisplayPixelCommandWritesOnePixel();
 void TestAnimationCommandSelectsAndTunes();
 void TestOverlayCommandsReachTheirOwnOverlay();
+void TestProceduresReachTheirTargets();
 
 /* persistence_test.cpp */
 void TestPersistence();
