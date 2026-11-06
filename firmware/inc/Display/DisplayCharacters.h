@@ -36,7 +36,7 @@ class DisplayCharacters
 {
   public:
     /*! \brief The letters of the grid, by id: one per letter, in the order of their index. */
-    enum class CharacterIdType {
+    enum class CharacterIdType : byte {
         kE1, /*!< The E of ES, column 0 of row 0. */
         kS1, /*!< The S of ES, column 1 of row 0. */
         kK1, /*!< The filler K, column 2 of row 0. */

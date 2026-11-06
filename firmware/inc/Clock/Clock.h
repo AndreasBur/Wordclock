@@ -49,7 +49,7 @@ class Clock
      * They differ in how the quarters are said and in whether 20 and 40 minutes past are counted
      * from the hour or from the half hour; each value says 3:15 and 3:20 as an example.
      */
-    enum class ModeType {
+    enum class ModeType : byte {
         kWessi, /*!< Wessi, the default: VIERTEL NACH DREI at 3:15, ZEHN VOR HALB VIER at 3:20. */
         kOssi, /*!< Ossi: VIERTEL VIER at 3:15, ZEHN VOR HALB VIER at 3:20. */
         kRheinRuhr, /*!< Rhein-Ruhr: VIERTEL NACH DREI at 3:15, ZWANZIG NACH DREI at 3:20. */
