@@ -9,6 +9,7 @@
 #define _CLOCK_SOURCE_
 
 #include "Clock.h"
+#include "Display.h"
 
 /*
  * The hour words: one row per HourModeType, and in it one element per hour of the face, from
@@ -167,5 +168,46 @@ StdReturnType Clock::SetTime(byte hour, byte minute) const
     for(byte index = 0u; index < clock_words.GetMinuteWords().size() && clock_words.GetMinuteWord(index) != DisplayWords::WordIdType::kNone; index++) {
         if(Display::GetInstance().SetWord(clock_words.GetMinuteWord(index)) == kENotOk) return_value = kENotOk;
     }
+    return return_value;
+}
+
+bool Clock::CalculateItIs(byte minute)
+{
+    byte minute_steps = minute / CLOCK_MINUTE_STEP_IN_MINUTES;
+    // show "it is" only to full and half hour
+    if(minute_steps == 0u || minute_steps == (CLOCK_NUMBER_OF_MINUTE_STEPS / 2u)) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+StdReturnType Clock::SetMode(ModeType mode)
+{
+    if(IsModeValid(mode)) {
+        mode_ = mode;
+        return kEOk;
+    } else {
+        return kENotOk;
+    }
+}
+
+void Clock::SetTime(ClockWords::WordsListType clock_words_table, byte max_length)
+{
+    for(byte index = 0u; index < clock_words_table.size(); index++) {
+        Display::GetInstance().SetWord(clock_words_table[index], max_length);
+    }
+}
+
+StdReturnType Clock::Show()
+{
+    return Display::GetInstance().Show();
+}
+
+StdReturnType Clock::Refresh(byte hour, byte minute) const
+{
+    StdReturnType return_value{kEOk};
+    if(SetTime(hour, minute) == kENotOk) { return_value = kENotOk; }
+    if(Show() == kENotOk) { return_value = kENotOk; }
     return return_value;
 }

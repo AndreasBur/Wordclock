@@ -9,6 +9,8 @@
 #define _ANIMATION_SOURCE_
 
 #include "Animation.h"
+#include "Clock.h"
+#include "Display.h"
 
 bool Animation::IsPixelPartOfClockWords(const ClockWords::WordsListType clock_words_table, byte column, byte row)
 {
@@ -45,4 +47,23 @@ byte Animation::SelectByTime(byte hour, byte minute, byte number_of_values)
     // scaled by multiplication instead of a modulo, which would favour the lower
     // values because 256 is not a multiple of number_of_values
     return static_cast<byte>((static_cast<uint16_t>(hash) * number_of_values) >> 8u);
+}
+
+void Animation::FinishWithClockWords(const ClockWords::WordsListType& clock_words_table)
+{
+    Display::GetInstance().Clear();
+    Clock::GetInstance().SetTime(clock_words_table);
+    state_ = StateType::kIdle;
+}
+
+void Animation::FinishWithTime(byte hour, byte minute)
+{
+    Display::GetInstance().Clear();
+    Clock::GetInstance().SetTime(hour, minute);
+    state_ = StateType::kIdle;
+}
+
+StdReturnType Animation::Show()
+{
+    return Display::GetInstance().Show();
 }

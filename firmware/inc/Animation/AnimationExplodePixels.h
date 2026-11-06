@@ -14,6 +14,7 @@
 #include "ClockWords.h"
 #include "Animation.h"
 #include "DisplayPixels.h"
+#include "Display.h"
 
 /*!
  * \brief The explode-pixels animation: the previous time is pulled into the centre, all of its

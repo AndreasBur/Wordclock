@@ -9,6 +9,8 @@
 #define _ANIMATION_CLOCK_TELETYPE_SOURCE_
 
 #include "AnimationTeletype.h"
+#include "Display.h"
+#include "Clock.h"
 
 void AnimationTeletype::Init()
 {

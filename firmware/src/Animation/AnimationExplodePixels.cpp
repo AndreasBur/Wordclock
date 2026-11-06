@@ -9,6 +9,8 @@
 #define _ANIMATION_CLOCK_IMPLODE_SOURCE_
 
 #include "AnimationExplodePixels.h"
+#include "Display.h"
+#include "Clock.h"
 
 void AnimationExplodePixels::Init()
 {

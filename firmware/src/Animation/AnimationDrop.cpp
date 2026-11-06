@@ -9,6 +9,8 @@
 #define _ANIMATION_CLOCK_DROP_SOURCE_
 
 #include "AnimationDrop.h"
+#include "Display.h"
+#include "Clock.h"
 
 void AnimationDrop::Init()
 {

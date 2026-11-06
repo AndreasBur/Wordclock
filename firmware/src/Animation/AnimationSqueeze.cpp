@@ -9,6 +9,8 @@
 #define _ANIMATION_CLOCK_SQUEEZE_SOURCE_
 
 #include "AnimationSqueeze.h"
+#include "Display.h"
+#include "Clock.h"
 
 void AnimationSqueeze::Init()
 {

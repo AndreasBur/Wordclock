@@ -9,6 +9,8 @@
 #define _ANIMATION_SHIFT_SOURCE_
 
 #include "AnimationShift.h"
+#include "Display.h"
+#include "Clock.h"
 
 void AnimationShift::Init()
 {

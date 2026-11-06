@@ -9,6 +9,8 @@
 #define _ANIMATION_CLOCK_FADE_SOURCE_
 
 #include "AnimationFade.h"
+#include "Display.h"
+#include "Clock.h"
 
 void AnimationFade::Init()
 {

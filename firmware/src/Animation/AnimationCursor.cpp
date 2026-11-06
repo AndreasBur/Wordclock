@@ -9,6 +9,8 @@
 #define _ANIMATION_CLOCK_CURSOR_SOURCE_
 
 #include "AnimationCursor.h"
+#include "Display.h"
+#include "Clock.h"
 
 void AnimationCursor::Init()
 {

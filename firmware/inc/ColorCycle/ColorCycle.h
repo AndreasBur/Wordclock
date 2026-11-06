@@ -32,7 +32,7 @@
 
 #include "StandardTypes.h"
 #include "Arduino.h"
-#include "Display.h"
+#include "Pixel.h"
 
 /*!
  * \brief Scheduler ticks per step of hue, so 100 * 10 ms is a step a second and 256 of those are a
@@ -64,8 +64,8 @@ class ColorCycle
 
     /*
      * The six segments of the wheel, and the channel that is at full through each of them.
-     * Named because the conversion below is otherwise six lines of arithmetic that only
-     * says what it is if the reader already knows the wheel.
+     * Named because ToColour() is otherwise six lines of arithmetic that only says what it
+     * is if the reader already knows the wheel.
      */
     static constexpr byte kNumberOfSegments{6u};
     static constexpr byte kFullChannel{255u};
@@ -77,44 +77,8 @@ class ColorCycle
     ColorCycle() { }
     ~ColorCycle() { }
 
-    static Display& GetDisplay() { return Display::GetInstance(); }
-
-    /*
-     * One hue as a colour, at full saturation and full value - the outside edge of the
-     * wheel. Anything inside it is a colour the strip shows as a paler version of white,
-     * and a cycle whose hue cannot be seen is not what this is for.
-     *
-     * Integer throughout, six segments of 256/6 each: within a segment one channel rises
-     * while the third stays dark, and which channel does what is the segment number. The
-     * multiplication by six before the shift is what keeps that division exact without a
-     * remainder to carry, which a hue split into 43-wide segments would have had.
-     *
-     * Plain static rather than constexpr: Pixel declares a destructor, so it is not a
-     * literal type and cannot be what a constexpr function returns.
-     */
-    static Pixel ToColour(HueType hue) {
-        const uint16_t scaled = static_cast<uint16_t>(hue) * kNumberOfSegments;
-        const byte segment = static_cast<byte>(scaled >> 8u);
-        const byte rising = static_cast<byte>(scaled & 0xFFu);
-        const byte falling = static_cast<byte>(kFullChannel - rising);
-
-        switch(segment) {
-            case 0u  : return Pixel(kFullChannel, rising,      0u);
-            case 1u  : return Pixel(falling,     kFullChannel, 0u);
-            case 2u  : return Pixel(0u,          kFullChannel, rising);
-            case 3u  : return Pixel(0u,          falling,     kFullChannel);
-            case 4u  : return Pixel(rising,      0u,          kFullChannel);
-            default  : return Pixel(kFullChannel, 0u,          falling);
-        }
-    }
-
-    /*
-     * A display that is off has nothing to cycle, and stepping it anyway would cost more
-     * than the arithmetic: every step marks the pixel buffer, and the supply switch waits
-     * for a buffer that has settled before it drops the rail. A cycle running through the
-     * night would hold that wait open and spend the current the switch exists to save.
-     */
-    static bool IsDisplayShowingAnything() { return GetDisplay().IsEnabled(); }
+    static Pixel ToColour(HueType hue);
+    static bool IsDisplayShowingAnything();
 
   public:
     /*! \brief Returns the one colour cycle. */
@@ -155,12 +119,7 @@ class ColorCycle
      *
      * \param[in] is_active True to start the cycle, false to stop it.
      */
-    void SetIsActive(bool is_active) {
-        is_active_ = is_active;
-
-        if(is_active_) { GetDisplay().SetColorCycle(ToColour(hue_)); }
-        else         { GetDisplay().ClearColorCycle(); }
-    }
+    void SetIsActive(bool is_active);
 
     /*!
      * \brief Puts the cycle back to how a new clock has it: stopped, on the first hue, at
@@ -168,11 +127,7 @@ class ColorCycle
      *
      * Stopping puts the chosen colour back at once, as SetIsActive() does.
      */
-    void ResetToDefaults() {
-        SetTaskCycle(kTaskCycleInitValue);
-        hue_ = kHueInitValue;
-        SetIsActive(kIsActiveInitValue);
-    }
+    void ResetToDefaults();
 
     /*!
      * \brief Steps the hue one further round the wheel and sets the display to its colour.
@@ -180,13 +135,7 @@ class ColorCycle
      * Does nothing while the cycle is stopped or the display is disabled. After the last of the
      * 256 hues comes the first again.
      */
-    void Task() {
-        if(!is_active_) { return; }
-        if(!IsDisplayShowingAnything()) { return; }
-
-        hue_++;
-        GetDisplay().SetColorCycle(ToColour(hue_));
-    }
+    void Task();
 };
 
 #endif // _COLOR_CYCLE_H_

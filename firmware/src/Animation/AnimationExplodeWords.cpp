@@ -9,6 +9,8 @@
 #define _ANIMATION_CLOCK_EXPLODE_SOURCE_
 
 #include "AnimationExplodeWords.h"
+#include "Display.h"
+#include "Clock.h"
 
 void AnimationExplodeWords::Init()
 {

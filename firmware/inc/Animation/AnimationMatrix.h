@@ -23,6 +23,7 @@
 #include "Arduino.h"
 #include "ClockWords.h"
 #include "Animation.h"
+#include "Display.h"
 
 /*!
  * \brief The matrix animation: falling code rain in the display color; the new time stays behind as
