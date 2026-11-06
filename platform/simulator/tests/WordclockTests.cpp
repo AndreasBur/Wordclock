@@ -79,6 +79,10 @@ int main()
     TestColourChangesReachTheStrip();
     TestPixelColorChannels();
     TestDisplayCharacterLookup();
+    TestWordsAreClearedOneOrAll();
+    TestPixelRowsAndColumnsAreWritten();
+    TestPixelByIndexTogglesAndReads();
+    TestInitTurnsEveryPixelOff();
     TestNightWindowIncludesMidnight();
     TestNightSwitchDimsWithoutLosingTheSetting();
     TestNightSwitchActsOnTheCrossingOnly();

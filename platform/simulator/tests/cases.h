@@ -25,6 +25,10 @@ void TestBrightnessTogglesInvertTheSetting();
 void TestColourChangesReachTheStrip();
 void TestPixelColorChannels();
 void TestDisplayCharacterLookup();
+void TestWordsAreClearedOneOrAll();
+void TestPixelRowsAndColumnsAreWritten();
+void TestPixelByIndexTogglesAndReads();
+void TestInitTurnsEveryPixelOff();
 
 /* overlay_test.cpp */
 void TestShowNowProcedures();
