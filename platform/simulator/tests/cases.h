@@ -47,6 +47,10 @@ void TestLeavingAFadeUndimsTheDisplay();
 void TestAWordChangeRunsAFadeOrFlickerOn();
 void TestExplodeWordsLightsItsFirstWordOnADarkDisplay();
 
+/* transformation_test.cpp */
+void TestShiftsMoveEveryPixelByOne();
+void TestRollAnimationRollsEveryWay();
+
 /* text_test.cpp */
 void TestCharacterToGlyphMapping();
 void TestUndrawableCharacterShiftsAsASpace();

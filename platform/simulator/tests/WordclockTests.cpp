@@ -71,6 +71,8 @@ int main()
     TestLeavingAFadeUndimsTheDisplay();
     TestAWordChangeRunsAFadeOrFlickerOn();
     TestExplodeWordsLightsItsFirstWordOnADarkDisplay();
+    TestShiftsMoveEveryPixelByOne();
+    TestRollAnimationRollsEveryWay();
     TestDisplayOffAndOnAgain();
     TestDisplayToggleFollowsTheState();
     TestBrightnessTogglesInvertTheSetting();

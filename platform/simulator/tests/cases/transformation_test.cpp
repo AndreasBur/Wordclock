@@ -1,0 +1,249 @@
+// The shifts of the display, and the roll animation that is their one user in every direction.
+
+#include "check.h"
+#include "cases.h"
+
+#include "Animations.h"
+#include "Clock.h"
+#include "Display.h"
+#include "Transformation.h"
+
+#include <array>
+#include <cstddef>
+
+namespace {
+using GridType = std::array<std::array<bool, DISPLAY_NUMBER_OF_COLUMNS>, DISPLAY_NUMBER_OF_ROWS>;
+
+constexpr byte kRows{DISPLAY_NUMBER_OF_ROWS};
+constexpr byte kColumns{DISPLAY_NUMBER_OF_COLUMNS};
+
+// Whether each pixel is lit, which is all a shift moves: a pixel is written in the colour the
+// display writes now, so its colour says nothing about where it came from.
+GridType ReadGrid()
+{
+    GridType grid{};
+
+    for(byte row = 0u; row < kRows; row++) {
+        for(byte column = 0u; column < kColumns; column++) {
+            grid[row][column] = Display::GetInstance().GetPixel(column, row);
+        }
+    }
+    return grid;
+}
+
+void WriteGrid(const GridType& grid)
+{
+    Display& display = Display::GetInstance();
+
+    display.Clear();
+    for(byte row = 0u; row < kRows; row++) {
+        for(byte column = 0u; column < kColumns; column++) {
+            if(grid[row][column]) { display.SetPixel(column, row); }
+        }
+    }
+}
+
+/*
+ * A picture no shift maps onto itself: the four corners, a pixel off each edge's centre, and
+ * the diagonal of a corner. Rotation shows in the corners, a lost row or column in the edges.
+ */
+GridType Pattern()
+{
+    GridType grid{};
+
+    grid[0][0] = true;
+    grid[0][kColumns - 1u] = true;
+    grid[kRows - 1u][0] = true;
+    grid[kRows - 1u][kColumns - 1u] = true;
+    grid[0][3] = true;
+    grid[4][0] = true;
+    grid[kRows - 1u][6] = true;
+    grid[2][kColumns - 1u] = true;
+    for(byte step = 1u; step < 4u; step++) { grid[step][step] = true; }
+    return grid;
+}
+
+// The model each shift is checked against: a pixel taken from `step` rows and columns away,
+// and from the opposite edge when rotating, or dark when not.
+GridType Shifted(const GridType& grid, int row_step, int column_step, bool rotate)
+{
+    GridType shifted{};
+
+    for(int row = 0; row < kRows; row++) {
+        for(int column = 0; column < kColumns; column++) {
+            int from_row = row - row_step;
+            int from_column = column - column_step;
+            const bool inside = (from_row >= 0) && (from_row < kRows) && (from_column >= 0) && (from_column < kColumns);
+
+            if(!inside && !rotate) { continue; }
+            from_row = (from_row + kRows) % kRows;
+            from_column = (from_column + kColumns) % kColumns;
+            shifted[row][column] = grid[from_row][from_column];
+        }
+    }
+    return shifted;
+}
+
+// The same, for one row or one column only; the rest of the grid stays where it was.
+GridType ShiftedLine(const GridType& grid, int row, int column, int row_step, int column_step, bool rotate)
+{
+    const GridType whole = Shifted(grid, row_step, column_step, rotate);
+    GridType shifted = grid;
+
+    if(row >= 0) { shifted[row] = whole[row]; }
+    if(column >= 0) {
+        for(byte line = 0u; line < kRows; line++) { shifted[line][column] = whole[line][column]; }
+    }
+    return shifted;
+}
+
+enum class RollType { kRight, kLeft, kDown, kUp, kNumberOfRolls };
+constexpr byte kNumberOfRolls{static_cast<byte>(RollType::kNumberOfRolls)};
+
+/*
+ * What the display shows after `steps` steps of a roll in `roll`: the previous time moved on
+ * by that many rows or columns, and the edge it left filled with as much of the new time as
+ * has come in, the part of it that ends up furthest from that edge first.
+ */
+GridType Rolled(const GridType& previous, const GridType& next, RollType roll, int steps)
+{
+    GridType rolled{};
+
+    for(int row = 0; row < kRows; row++) {
+        for(int column = 0; column < kColumns; column++) {
+            bool& pixel = rolled[row][column];
+
+            switch(roll) {
+                case RollType::kRight:
+                    pixel = (column < steps) ? next[row][kColumns - steps + column] : previous[row][column - steps];
+                    break;
+                case RollType::kLeft:
+                    pixel = (column >= kColumns - steps) ? next[row][column - (kColumns - steps)] : previous[row][column + steps];
+                    break;
+                case RollType::kDown:
+                    pixel = (row < steps) ? next[kRows - steps + row][column] : previous[row - steps][column];
+                    break;
+                default:
+                    pixel = (row >= kRows - steps) ? next[row - (kRows - steps)][column] : previous[row + steps][column];
+                    break;
+            }
+        }
+    }
+    return rolled;
+}
+
+int NumberOfSteps(RollType roll)
+{
+    return (roll == RollType::kRight || roll == RollType::kLeft) ? kColumns : kRows;
+}
+}
+
+void TestShiftsMoveEveryPixelByOne()
+{
+    Transformation transformation;
+    const GridType pattern = Pattern();
+
+    for(const bool rotate : {false, true}) {
+        WriteGrid(pattern);
+        Expect(transformation.ShiftRight(rotate) == kEOk && ReadGrid() == Shifted(pattern, 0, 1, rotate),
+               "a shift to the right must move every pixel one column");
+        WriteGrid(pattern);
+        Expect(transformation.ShiftLeft(rotate) == kEOk && ReadGrid() == Shifted(pattern, 0, -1, rotate),
+               "a shift to the left must move every pixel one column");
+        WriteGrid(pattern);
+        Expect(transformation.ShiftDown(rotate) == kEOk && ReadGrid() == Shifted(pattern, 1, 0, rotate),
+               "a shift down must move every pixel one row");
+        WriteGrid(pattern);
+        Expect(transformation.ShiftUp(rotate) == kEOk && ReadGrid() == Shifted(pattern, -1, 0, rotate),
+               "a shift up must move every pixel one row");
+
+        // The first and the last line, where the edge is, and one in between.
+        for(const byte row : {byte{0u}, byte{4u}, byte{kRows - 1u}}) {
+            WriteGrid(pattern);
+            Expect(transformation.ShiftRowRight(row, rotate) == kEOk &&
+                   ReadGrid() == ShiftedLine(pattern, row, -1, 0, 1, rotate), "a row must shift right on its own");
+            WriteGrid(pattern);
+            Expect(transformation.ShiftRowLeft(row, rotate) == kEOk &&
+                   ReadGrid() == ShiftedLine(pattern, row, -1, 0, -1, rotate), "a row must shift left on its own");
+        }
+        for(const byte column : {byte{0u}, byte{3u}, byte{kColumns - 1u}}) {
+            WriteGrid(pattern);
+            Expect(transformation.ShiftColumnDown(column, rotate) == kEOk &&
+                   ReadGrid() == ShiftedLine(pattern, -1, column, 1, 0, rotate), "a column must shift down on its own");
+            WriteGrid(pattern);
+            Expect(transformation.ShiftColumnUp(column, rotate) == kEOk &&
+                   ReadGrid() == ShiftedLine(pattern, -1, column, -1, 0, rotate), "a column must shift up on its own");
+        }
+    }
+
+    WriteGrid(pattern);
+    Expect(transformation.ShiftRowRight(kRows) == kENotOk && transformation.ShiftRowLeft(kRows) == kENotOk,
+           "a row off the grid must be refused");
+    Expect(transformation.ShiftColumnDown(kColumns) == kENotOk && transformation.ShiftColumnUp(kColumns) == kENotOk,
+           "and so must a column");
+    Expect(ReadGrid() == pattern, "with nothing moved");
+
+    Display::GetInstance().Clear();
+}
+
+/*
+ * The roll animation is what reaches the vertical shifts in the firmware, and which of its four
+ * directions a word change takes is decided by the time. A single time - all the case for every
+ * animation uses - is a single direction, so this one goes through the five-minute steps of
+ * twelve hours and checks every step of every roll against the frame it should show. Which
+ * direction a roll took is read off the frames rather than computed: the case is about the
+ * rolling, and it should not break when the choice of direction is made differently.
+ */
+void TestRollAnimationRollsEveryWay()
+{
+#if (ANIMATIONS_SUPPORT_ROLL == STD_ON)
+    Animations& animations = Animations::GetInstance();
+    const Clock::ModeType clock_mode_before = Clock::GetInstance().GetMode();
+    std::array<bool, kNumberOfRolls> seen{};
+
+    Clock::GetInstance().SetMode(Clock::ModeType::kWessi);
+    animations.SetMode(Animations::ModeType::kFixed);
+
+    for(byte hour = 0u; hour < 12u; hour++) {
+        for(byte minute = 0u; minute < 60u; minute += 5u) {
+            DrawClockFace(hour, minute);
+            const GridType next = ReadGrid();
+            DrawClockFace(hour, static_cast<byte>((minute + 55u) % 60u));
+            const GridType previous = ReadGrid();
+
+            animations.SetAnimation(Animations::AnimationIdType::kRoll);
+            Expect(animations.SetTime(hour, minute) == kEOk, "the roll must start on a word change");
+
+            // One frame per task, the last of them the one that finishes: a roll of n steps
+            // takes n + 1 tasks. The bound is a runaway's, not a measurement.
+            std::array<GridType, kColumns + 2u> frames{};
+            std::size_t number_of_frames = 0u;
+            while(animations.GetState() == Animations::StateType::kPending && number_of_frames < frames.size()) {
+                animations.Task(true);
+                frames[number_of_frames++] = ReadGrid();
+            }
+
+            bool any = false;
+            for(byte roll = 0u; roll < kNumberOfRolls; roll++) {
+                const auto type = static_cast<RollType>(roll);
+                bool possible = number_of_frames == static_cast<std::size_t>(NumberOfSteps(type)) + 1u;
+                for(int step = 1; possible && step <= NumberOfSteps(type); step++) {
+                    possible = frames[step - 1] == Rolled(previous, next, type, step);
+                }
+                if(possible) { any = true; seen[roll] = true; }
+            }
+            Expect(any, "every frame of a roll must be the previous time rolled on and the new one rolled in");
+            Expect(ReadGrid() == next, "and the roll must end on the new time");
+        }
+    }
+
+    Expect(seen[static_cast<byte>(RollType::kRight)] && seen[static_cast<byte>(RollType::kLeft)],
+           "the roll must go right and left on some word change");
+    Expect(seen[static_cast<byte>(RollType::kDown)] && seen[static_cast<byte>(RollType::kUp)],
+           "and down and up on some other");
+
+    animations.SetAnimation(Animations::AnimationIdType::kNone);
+    Clock::GetInstance().SetMode(clock_mode_before);
+    Display::GetInstance().Clear();
+#endif
+}
