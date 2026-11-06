@@ -12,7 +12,7 @@ arithmetic. A step whose name explains it is worth a function even when it is
 called exactly once, and the name then carries the meaning that a comment would
 otherwise have to.
 
-Such helpers live in the class body in the header, so they inline:
+A helper of one expression lives in the class body in the header:
 
 ```cpp
 static constexpr ColorType DimmColor(ColorType color, byte brightness) {
@@ -27,6 +27,26 @@ stays plain `static`. The caller then reads as a pipeline:
 ```cpp
 const byte level = ToLevel(GetWeightedIntensity(GetIntensity(pixel)));
 ```
+
+### Header and source
+
+A header includes what its declarations need, not what its bodies need. A body that
+would pull a header in only for itself is defined in the `.cpp`, and so is anything
+with more to it than a line or two — a state machine, a `Task()`, an `#if` ladder.
+What stays in the class body:
+
+- a template, because every caller has to see it — unless it is private and only the
+  class's own `.cpp` instantiates it, as `Overlays::ShowNow`;
+- a `constexpr` function, such as the helper above;
+- the singleton's `GetInstance()`;
+- an accessor: one statement on what the header has to declare anyway.
+
+Inlining is not a reason to keep a body in the header. The AVR image is linked with
+`-flto` and inlines across sources as readily as within one, and what a body costs
+there is decided by the inliner, not by the file it is written in. What the header
+does cost is every file that includes it: `DisplayManager.h` used to drag
+`Animations.h`, `Overlays.h` and the clock into every one of its includers for four
+private helpers.
 
 ### Naming
 

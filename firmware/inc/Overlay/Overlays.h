@@ -11,7 +11,6 @@
 
 #include "StandardTypes.h"
 #include "Arduino.h"
-#include "RealTimeClock.h"
 #include "Overlay.h"
 
 #define OVERLAYS_SUPPORT_DATE               STD_ON /*!< Whether the date overlay is built in. */
@@ -130,58 +129,15 @@ class Overlays
     constexpr Overlays() { }
     ~Overlays() { }
 
-    bool IsShow() const {
-        bool show{false};
-#if (OVERLAYS_SUPPORT_DATE == STD_ON)
-        show = show || (date_.GetState() == OverlayDate::StateType::kShow);
-#endif
-#if (OVERLAYS_SUPPORT_TEMPERATURE == STD_ON)
-        show = show || (temperature_.GetState() == OverlayTemperature::StateType::kShow);
-#endif
-#if (OVERLAYS_SUPPORT_TEXT == STD_ON)
-        show = show || (text_.GetState() == OverlayText::StateType::kShow);
-#endif
-        return show;
-    }
-
-    bool IsIdle() const {
-        bool idle{false};
-#if (OVERLAYS_SUPPORT_DATE == STD_ON)
-        idle = idle || (date_.GetState() == OverlayDate::StateType::kIdle);
-#endif
-#if (OVERLAYS_SUPPORT_TEMPERATURE == STD_ON)
-        idle = idle || (temperature_.GetState() == OverlayTemperature::StateType::kIdle);
-#endif
-#if (OVERLAYS_SUPPORT_TEXT == STD_ON)
-        idle = idle || (text_.GetState() == OverlayText::StateType::kIdle);
-#endif
-        return idle;
-    }
+    bool IsShow() const;
+    bool IsIdle() const;
 
     void TaskIdle(ClockDate date, ClockTime time);
     void TaskShow(ClockDate date, ClockTime time);
     static void AbortAnimation();
 
-    /*
-     * Shared by the three "show now" entry points below, which differ in nothing but the
-     * overlay they name - a template rather than three copies of the three rules that
-     * decide whether an overlay may start at all.
-     *
-     * Switched off is a configuration and not a state to be talked out of, an overlay with
-     * nothing to show would hold the display for nothing, and only one overlay may hold the
-     * display, because there is one show timer for all of them.
-     */
     template <typename OverlayClassType>
-    StdReturnType ShowNow(OverlayClassType& overlay) {
-        if(!overlay.GetIsActive()) { return kENotOk; }
-        if(!overlay.CanShow()) { return kENotOk; }
-        if(IsShow()) { return kENotOk; }
-
-        show_timer_in_seconds_ = overlay.StartShow(RealTimeClock::GetInstance().GetDate(),
-                                               RealTimeClock::GetInstance().GetTime());
-        AbortAnimation();
-        return kEOk;
-    }
+    StdReturnType ShowNow(OverlayClassType& overlay);
 
   public:
     /*! \brief Returns the one overlays facade. */
@@ -542,17 +498,7 @@ class Overlays
      *
      * An overlay that shows ends its show first, as Abort() would end it.
      */
-    void ResetToDefaults() {
-#if (OVERLAYS_SUPPORT_DATE == STD_ON)
-        date_.ResetToDefaults();
-#endif
-#if (OVERLAYS_SUPPORT_TEMPERATURE == STD_ON)
-        temperature_.ResetToDefaults();
-#endif
-#if (OVERLAYS_SUPPORT_TEXT == STD_ON)
-        text_.ResetToDefaults();
-#endif
-    }
+    void ResetToDefaults();
 
     /*!
      * \brief Starts the overlays in their periods, keeps the one that shows going and ends it when
@@ -578,7 +524,7 @@ class Overlays
      * \return kEOk, or kENotOk if the date overlay is switched off or an overlay shows already,
      *         this one included; nothing is started then.
      */
-    StdReturnType ShowDateNow() { return ShowNow(date_); }
+    StdReturnType ShowDateNow();
 #endif
 #if (OVERLAYS_SUPPORT_TEMPERATURE == STD_ON)
     /*!
@@ -590,7 +536,7 @@ class Overlays
      * \return kEOk, or kENotOk if the temperature overlay is switched off, Temperature has no
      *         reading, or an overlay shows already, this one included; nothing is started then.
      */
-    StdReturnType ShowTemperatureNow() { return ShowNow(temperature_); }
+    StdReturnType ShowTemperatureNow();
 #endif
 #if (OVERLAYS_SUPPORT_TEXT == STD_ON)
     /*!
@@ -602,7 +548,7 @@ class Overlays
      * \return kEOk, or kENotOk if the text overlay is switched off or an overlay shows already,
      *         this one included; nothing is started then.
      */
-    StdReturnType ShowTextNow() { return ShowNow(text_); }
+    StdReturnType ShowTextNow();
 #endif
 
     /*!
