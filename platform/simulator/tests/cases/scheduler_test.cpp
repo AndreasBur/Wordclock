@@ -1,8 +1,11 @@
-// The speed/cycle round trip and the uptime counter.
+// The speed/cycle round trip, the uptime counter, and when the scheduler runs a task.
 
 #include "check.h"
 #include "cases.h"
 
+#include "ColorCycle.h"
+#include "Display.h"
+#include "NightSwitch.h"
 #include "Scheduler.h"
 #include "Uptime.h"
 
@@ -54,4 +57,110 @@ void TestUptimeCountsWithoutWrapping()
     for(unsigned int second = 0u; second < 24u * 60u * 60u; second++) { uptime.Task(); }
     Expect(uptime.GetDays() == 2u && uptime.GetHours() == 0u && uptime.GetMinutes() == 0u,
            "and the day after it must follow the same way");
+}
+
+namespace {
+/*
+ * How often the colour cycle's task ran since the hue was `from`: it steps the hue by one per
+ * run and does nothing else a case could count, which makes it the scheduler's tally here. The
+ * byte wraps with the hue, so the difference stays right across 255.
+ */
+byte RunsSince(byte from)
+{
+    return static_cast<byte>(ColorCycle::GetInstance().GetHue() - from);
+}
+
+void Tick(Scheduler& scheduler, unsigned ticks)
+{
+    for(unsigned tick = 0u; tick < ticks; tick++) { scheduler.Task(); }
+}
+
+/*
+ * A lit face, the night switch out of the way and the colour cycle running at `cycle`: the
+ * cycle stands still on a dark display, and a night starting in the middle of a case would
+ * darken it. Every module's task runs on these ticks, the persistence's included, which writes
+ * the store the way the persistence cases after these do.
+ */
+void StartColourCycle(byte cycle)
+{
+    NightSwitch::GetInstance().SetIsActive(false);
+    Display::GetInstance().Enable();
+    SetTime(10u, 0u, 0u);
+    DrawClockFace(10u, 0u);
+    ColorCycle::GetInstance().SetTaskCycle(cycle);
+    ColorCycle::GetInstance().SetIsActive(true);
+}
+
+void StopColourCycle(byte task_cycle_before)
+{
+    ColorCycle::GetInstance().SetIsActive(false);
+    ColorCycle::GetInstance().SetTaskCycle(task_cycle_before);
+    Display::GetInstance().Clear();
+}
+}
+
+void TestSchedulerRunsATaskFirstThenEveryCycle()
+{
+    const byte task_cycle_before = ColorCycle::GetInstance().GetTaskCycle();
+    Scheduler scheduler;
+
+    StartColourCycle(5u);
+    const byte hue = ColorCycle::GetInstance().GetHue();
+
+    Tick(scheduler, 1u);
+    Expect(RunsSince(hue) == 1u, "every task is due on the scheduler's first tick");
+    Tick(scheduler, 4u);
+    Expect(RunsSince(hue) == 1u, "and not again before its cycle has passed");
+    Tick(scheduler, 1u);
+    Expect(RunsSince(hue) == 2u, "but on the fifth tick after, with a cycle of five");
+    Tick(scheduler, 10u);
+    Expect(RunsSince(hue) == 4u, "and on every fifth after that");
+
+    StopColourCycle(task_cycle_before);
+}
+
+/*
+ * The cycle is read when the task runs, not on every tick, so a period already begun is
+ * finished at the old length - what the slider of a front end changes is the next period.
+ */
+void TestSchedulerTakesANewCycleOnTheNextRun()
+{
+    const byte task_cycle_before = ColorCycle::GetInstance().GetTaskCycle();
+    Scheduler scheduler;
+
+    StartColourCycle(5u);
+    const byte hue = ColorCycle::GetInstance().GetHue();
+    Tick(scheduler, 1u);
+
+    ColorCycle::GetInstance().SetTaskCycle(2u);
+    Tick(scheduler, 4u);
+    Expect(RunsSince(hue) == 1u, "a shorter cycle does not cut short the period already begun");
+    Tick(scheduler, 1u);
+    Expect(RunsSince(hue) == 2u, "which ends at its old length");
+    Tick(scheduler, 4u);
+    Expect(RunsSince(hue) == 4u, "and the new cycle counts from there");
+
+    StopColourCycle(task_cycle_before);
+}
+
+void TestSchedulerCycleZeroSwitchesATaskOff()
+{
+    const byte task_cycle_before = ColorCycle::GetInstance().GetTaskCycle();
+    Scheduler scheduler;
+
+    StartColourCycle(5u);
+    const byte hue = ColorCycle::GetInstance().GetHue();
+    Tick(scheduler, 1u);
+
+    ColorCycle::GetInstance().SetTaskCycle(0u);
+    Tick(scheduler, 20u);
+    Expect(RunsSince(hue) == 1u, "a cycle of zero does not run the task at all");
+
+    // Two ticks into the old period of five when it was switched off. Kept, the remainder
+    // would hold the task back three more ticks.
+    ColorCycle::GetInstance().SetTaskCycle(5u);
+    Tick(scheduler, 1u);
+    Expect(RunsSince(hue) == 2u, "and switched back on, the task runs on the very next tick");
+
+    StopColourCycle(task_cycle_before);
 }
