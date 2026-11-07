@@ -41,9 +41,8 @@
  * \brief The pin of the bus's data line, the board's `SDA`.
  *
  * \warning DS3231_I2C_PIN_SDA has to name the same pin, and DS3231_I2C_PIN_SCL the same as
- *          BH1750_I2C_PIN_SCL. Whichever driver opens the bus first sets its pins, and a pin the
- *          other one names differently on the running bus ends in the SDK's `panic()`, which halts
- *          the chip.
+ *          BH1750_I2C_PIN_SCL: there is one bus, and whichever driver opens it first sets its pins.
+ *          What a pin named differently does depends on the core; see I2cBus::Open().
  */
 #define BH1750_I2C_PIN_SDA                              SDA
 /*! \brief The pin of the bus's clock line, the board's `SCL`. */
@@ -153,9 +152,9 @@
  * The core owns one, inside Illuminance, and reaches it through Task(), the getters and the
  * calibration. It calls no Init(): the sensor has to be ready from its Task() alone.
  *
- * On the RP2350 the sensor is reached over I2C through `Wire`, on BH1750_I2C_PIN_SDA and
- * BH1750_I2C_PIN_SCL at BH1750_I2C_FREQUENCY_HZ, and it shares the bus with the DS3231. Task() sets
- * the sensor up while it is not, and sets it up again after kReadFailuresBeforeReinit failed
+ * The sensor is reached over I2C through `Wire`, opened by I2cBus::Open(), on BH1750_I2C_PIN_SDA
+ * and BH1750_I2C_PIN_SCL at BH1750_I2C_FREQUENCY_HZ, and it shares the bus with the DS3231. Task()
+ * sets the sensor up while it is not, and sets it up again after kReadFailuresBeforeReinit failed
  * readings in a row.
  */
 class BH1750
@@ -332,18 +331,13 @@ class BH1750
     /*!
      * \brief Sets the sensor up: opens the bus, powers the sensor on and puts it into `mode`.
      *
-     * Task() calls it with BH1750_DEFAULT_MODE. Unless an earlier call has, it opens the bus: it
-     * names the pins with `Wire.setSDA()` and `Wire.setSCL()`, calls `Wire.begin()`, and sets the
-     * clock with `Wire.setClock()` afterwards, because `begin()` would otherwise put its default
-     * back over it. None of these calls answers whether the bus opened, so the bus counts as open
-     * once they have run. With kNone the bus is opened and the sensor powered on before the mode
-     * is refused.
+     * Task() calls it with BH1750_DEFAULT_MODE. It opens the bus with I2cBus::Open() unless an
+     * earlier call has. With kNone the bus is opened and the sensor powered on before the mode is
+     * refused.
      *
      * \param[in] mode The measurement mode; kNone is refused.
-     * \return kEOk, or kENotOk if the sensor did not take a command or `mode` is kNone; the mode is
-     *         then left as it was.
-     * \warning A pin that `Wire.setSDA()` or `Wire.setSCL()` will not take ends in the SDK's
-     *          `panic()`, which halts the chip, rather than in kENotOk.
+     * \return kEOk, or kENotOk if the bus did not open, the sensor did not take a command or `mode`
+     *         is kNone; the mode is then left as it was.
      */
     StdReturnType Init(ModeType mode);
 

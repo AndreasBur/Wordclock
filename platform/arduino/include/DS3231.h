@@ -35,7 +35,7 @@
 #define DS3231_I2C_ADDR                                 0x68u
 
 // The same pins and speed as the light sensor, which is the point of putting both on one
-// bus. Wire.begin() is idempotent, so whichever driver runs first opens it.
+// bus. Whichever driver runs first opens it; see I2cBus::Open().
 /*!
  * \brief The pin of the bus's data line, the board's `SDA`.
  *
@@ -102,7 +102,7 @@
  * is no reading until the chip has answered once, which a clock built without the chip never
  * does.
  *
- * On the RP2350 the chip is reached over I2C through `Wire`, on DS3231_I2C_PIN_SDA and
+ * The chip is reached over I2C through `Wire`, opened by I2cBus::Open(), on DS3231_I2C_PIN_SDA and
  * DS3231_I2C_PIN_SCL at DS3231_I2C_FREQUENCY_HZ, the bus it shares with the BH1750. The same class
  * also reads and writes the time, with GetDateTime() and SetDateTime(), for RealTimeClock, which
  * keeps an instance of its own.
@@ -226,9 +226,9 @@ class DS3231
      * return codes rather than trusted. The weekday register is ignored.
      *
      * \param[out] date_time The date and time, in UTC.
-     * \return kEOk, or kENotOk if the chip does not answer, it reports that its oscillator stopped
-     *         (a battery that ran out, so what it counted since is nothing) or the registers do not
-     *         form a date; `date_time` is then left as it was.
+     * \return kEOk, or kENotOk if the bus did not open, the chip does not answer, it reports that
+     *         its oscillator stopped (a battery that ran out, so what it counted since is nothing)
+     *         or the registers do not form a date; `date_time` is then left as it was.
      */
     StdReturnType GetDateTime(ClockDateTime& date_time);
 
@@ -248,22 +248,21 @@ class DS3231
      * misled by.
      *
      * \param[in] date_time The date and time, in UTC.
-     * \return kEOk, or kENotOk if the chip did not take the date and time whole or its stopped flag
-     *         was not cleared; the chip may then hold the date and time or part of it, and its
-     *         stopped flag is left as it was.
+     * \return kEOk, or kENotOk if the bus did not open, the chip did not take the date and time
+     *         whole or its stopped flag was not cleared; the chip may then hold the date and time
+     *         or part of it, and its stopped flag is left as it was.
      */
     StdReturnType SetDateTime(const ClockDateTime& date_time);
 
     /*!
      * \brief Brings the temperature up to date.
      *
-     * It opens the bus if that has not been done, and reads the temperature registers. A failed
-     * read keeps the reading there was.
+     * It opens the bus if that has not been done, and reads the temperature registers. A run on
+     * which the bus does not open reads nothing, and a failed read keeps the reading there was.
      *
      * Set up from here rather than from an Init() call, the same way the light sensor is: there is
      * no place in the core to call an Init() from, and retrying from the task means a chip that is
-     * plugged in later still comes up. On this core the bus itself opens on the first run, as
-     * nothing in opening it can fail.
+     * plugged in later, or a bus that was busy at boot, still comes up.
      */
     void Task();
 };

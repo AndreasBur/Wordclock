@@ -15,6 +15,7 @@
 
 #include "BH1750.h"
 #include "Bit.h"
+#include "I2cBus.h"
 
 namespace {
 /* Wire reports zero from endTransmission() when the slave acknowledged. */
@@ -106,30 +107,12 @@ void BH1750::Task()
     SendModeForOneTimeMode();
 }
 
-/*
- * Opens the I2C bus, once; always kEOk, which is all this core can tell.
- *
- * Four calls where the ESP32 has one: this core's begin() takes no arguments and returns
- * nothing, and the clock rate is set afterwards because begin() would otherwise put the
- * default back over it.
- *
- * The pin setters look like the check that replaces begin()'s return value. They are not
- * one: a pin they will not take ends in the SDK's panic(), which is declared noreturn, so an
- * kENotOk branch on them cannot be reached and only reads as if the case were handled. What
- * makes the call safe instead is that both drivers on this bus name the same two pins - the
- * second one through hits setSDA()'s "already this pin" case, and begin() returns early on a
- * bus that is running. Giving one driver another pin without the other therefore does not
- * fail here, it halts the chip, and see DS3231.cpp for the same note.
- */
+// Opens the I2C bus, once; kENotOk while I2cBus::Open() refuses, which the next call retries.
 StdReturnType BH1750::StartBus()
 {
     if(bus_started_) { return kEOk; }
 
-    Wire.setSDA(BH1750_I2C_PIN_SDA);
-    Wire.setSCL(BH1750_I2C_PIN_SCL);
-
-    Wire.begin();
-    Wire.setClock(BH1750_I2C_FREQUENCY_HZ);
+    if(I2cBus::Open(BH1750_I2C_PIN_SDA, BH1750_I2C_PIN_SCL, BH1750_I2C_FREQUENCY_HZ) == kENotOk) { return kENotOk; }
 
     bus_started_ = true;
     return kEOk;

@@ -24,6 +24,8 @@ struct TwoWire {
     int Scl{-1};
     uint32_t Clock{0u};
     bool PinsAccepted{true};
+    // What the core's begin() sets the clock to, over whatever was set before it.
+    static constexpr uint32_t DefaultClock{100000u};
 
     void respondWith(std::vector<uint8_t> Bytes) { Response = Bytes; ReadPosition = 0u; }
     size_t remaining() const { return Response.size() - ReadPosition; }
@@ -31,7 +33,7 @@ struct TwoWire {
     bool setSDA(int Pin) { Sda = Pin; return PinsAccepted; }
     bool setSCL(int Pin) { Scl = Pin; return PinsAccepted; }
     void setClock(uint32_t Hz) { Clock = Hz; }
-    void begin() {}
+    void begin() { Clock = DefaultClock; }
 
     void beginTransmission(uint8_t Address) { Written.push_back(Address); }
     size_t write(uint8_t Value) { Written.push_back(Value); return 1; }

@@ -10,6 +10,7 @@
 #include <Wire.h>
 
 #include "DS3231.h"
+#include "I2cBus.h"
 
 namespace {
 /* Wire reports zero from endTransmission() when the slave acknowledged. */
@@ -86,14 +87,13 @@ StdReturnType DS3231::SetDateTime(const ClockDateTime& date_time)
 
 /*
  * Opens the I2C bus, once; kEOk if the bus is available. Shared with the light sensor, and
- * opening it twice is what the Wire library allows for - whichever of the two runs first
- * does it.
+ * whichever of the two runs first opens it.
  */
 StdReturnType DS3231::StartBus()
 {
     if(bus_started_) { return kEOk; }
 
-    if(!Wire.begin(DS3231_I2C_PIN_SDA, DS3231_I2C_PIN_SCL, DS3231_I2C_FREQUENCY_HZ)) { return kENotOk; }
+    if(I2cBus::Open(DS3231_I2C_PIN_SDA, DS3231_I2C_PIN_SCL, DS3231_I2C_FREQUENCY_HZ) == kENotOk) { return kENotOk; }
 
     bus_started_ = true;
     return kEOk;

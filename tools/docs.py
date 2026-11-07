@@ -23,6 +23,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 BACKENDS = ('simulator', 'avr-dx', 'esp32', 'rp2350')
+# What a backend builds from beyond firmware/ and its own directory: the drivers the two Arduino
+# backends share.
+SHARED = {'esp32': ('platform/arduino',), 'rp2350': ('platform/arduino',)}
 
 WARNING = re.compile(r'^(?P<path>[^:\s]+):\d+: warning: (?P<text>.*)$')
 RETURN = re.compile(r'^return type of member .* is not documented$')
@@ -34,7 +37,7 @@ def run(backend):
     out.mkdir(parents=True, exist_ok=True)
     log = out / 'warnings.log'
     config = (ROOT / 'Doxyfile').read_text() + (
-        f'\nINPUT = firmware platform/{backend}\n'
+        f'\nINPUT = firmware platform/{backend} {" ".join(SHARED.get(backend, ()))}\n'
         f'OUTPUT_DIRECTORY = {out}\n'
         f'WARN_LOGFILE = {log}\n')
     subprocess.run(['doxygen', '-'], input=config, text=True, cwd=ROOT, check=True)

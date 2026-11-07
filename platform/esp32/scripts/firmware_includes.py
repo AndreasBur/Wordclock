@@ -49,6 +49,9 @@ def core_arduino_header(env):
 
 
 env.Append(CPPPATH=firmware_include_dirs(env.subst("$PROJECT_DIR")))  # noqa: F821
+# The drivers this backend shares with the other Arduino one, in platform/arduino; their sources
+# come in through build_src_filter.
+env.Append(CPPPATH=[str(Path(env.subst("$PROJECT_DIR")).resolve().parent / "arduino" / "include")])  # noqa: F821
 # The escaped quotes are part of the value: `#include WORDCLOCK_CORE_ARDUINO_H` needs the
 # macro to expand to a quoted path, so they have to survive the shell into the compiler.
 env.Append(  # noqa: F821

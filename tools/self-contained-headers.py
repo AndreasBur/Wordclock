@@ -21,7 +21,7 @@ the backend's include directory beside firmware/inc:
 
     tools/self-contained-headers.py build firmware/inc platform/simulator/include
     tools/self-contained-headers.py build-avr firmware/inc platform/avr-dx/include
-    tools/self-contained-headers.py platform/esp32 firmware/inc platform/esp32/include
+    tools/self-contained-headers.py platform/esp32 firmware/inc platform/esp32/include platform/arduino/include
 """
 
 import argparse
