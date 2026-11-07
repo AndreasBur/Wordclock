@@ -3,8 +3,8 @@
 
 /*!
  * \file
- * \brief I2cBus on the ESP32's Arduino core, whose `Wire.begin()` takes the pins and the clock
- *        in one call and says whether the bus opened.
+ * \brief I2cBus on the ESP32's Arduino core, whose `Wire.begin()` takes the pins and the clock in
+ *        one call and says whether the bus opened.
  */
 
 #include "I2cBus.h"
