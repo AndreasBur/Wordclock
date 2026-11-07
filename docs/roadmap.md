@@ -88,44 +88,33 @@ whose clock is unreachable has nothing to show.
 Nothing here changes what the clock does, which is why it stands apart from the list above:
 what it buys is that a change is checked the same way on every machine, today and next year.
 
-### One way in: uv, CMake presets and a Makefile
+### One way in: CMake presets and a Makefile
 
 The commands that build and check this repository are written out three times — in the
-workflows, in the [README](../README.md) and in the agent notes — and the Python tools they need
-are installed three ways: apt for the linters, a virtual environment for PlatformIO, another for
-Playwright. CI installs PlatformIO with `pip install --upgrade`, so every run takes whatever was
-released last; a PlatformIO update moved under this repository once already without anybody
-asking for it.
+workflows, in the [README](../README.md) and in the agent notes. The tools they call are pinned
+now, in `uv.lock`; the command lines are not one place yet.
 
-The shape that fixes both: a `pyproject.toml` and its `uv.lock` pinning every Python tool by
-hash, PlatformIO included; `CMakePresets.json` with workflow presets for the CMake builds, so
+The shape that fixes it: `CMakePresets.json` with workflow presets for the CMake builds, so
 that `cmake --workflow --preset avr` configures, builds and checks in one call; and a
-`Makefile` that is nothing but the index over both, `make help` listing every action. `make` is
-on every machine already, and the logic stays in versioned files rather than in it. CI then
-calls the same targets a developer does, and the command lines exist once.
+`Makefile` that is nothing but the index over them and over `uv run`, `make help` listing every
+action. `make` is on every machine already, and the logic stays in versioned files rather than
+in it. CI then calls the same targets a developer does, and the command lines exist once.
 
 Settled when `make check` runs locally what CI runs, and the workflows call nothing else.
-
-### actionlint for the workflows
-
-The workflows are the one part of the repository nothing reads before it runs. actionlint is
-not in the Ubuntu archive; the clean way to have it pinned is as a Python wheel under the
-lockfile above, which is why it waits for that item rather than coming in as a release binary
-of its own.
 
 ### Lint the two web pages
 
 `web/app.html` and `web/index.html` are HTML with their scripts inline, and only a browser has
 ever read them. html-validate and eslint, its HTML plugin reading the inline scripts, would —
-but both are npm packages, which brings a third lockfile next to uv's and PlatformIO's. Worth it
-once the toolchain above is settled, so that the third one arrives the same way.
+but both are npm packages, which brings an npm lockfile next to `uv.lock`. Worth it once the
+item above has settled how a tool is called, so that these arrive the same way.
 
 ### Let the pins update themselves
 
 Everything above trades drift for pins, and a pin left alone is drift of another kind: the
 version that was current when somebody last looked. Dependabot reads `uv.lock` and the
 workflows' action versions and opens a pull request per update, which CI then checks like any
-other. It only makes sense once there is a lockfile to read.
+other. `uv.lock` is that lockfile now.
 
 ## An idea, not a plan
 
@@ -183,4 +172,5 @@ it happened in.
 | **Fuzzing** the two ways data from outside reaches the firmware: a command line and a stored settings blob | [the fuzzers](../platform/simulator/tests/fuzz/run.sh) |
 | **No heap on the AVR, and its stack is checked** against the RAM it has, on every build | [avr-stack.py](../tools/avr-stack.py), the [AVR notes](../platform/avr-dx/README.md) |
 | **The host builds again with clang**, the backends' host suites included | the clang job in [ci.yml](../.github/workflows/ci.yml) |
-| **The scripts are read**: shellcheck over the shell scripts, pyflakes over the Python ones | [.flake8](../.flake8), the scripts job in [static-analysis.yml](../.github/workflows/static-analysis.yml) |
+| **The scripts are read**: shellcheck over the shell scripts, pyflakes' checks over the Python ones, actionlint over the workflows | [pyproject.toml](../pyproject.toml), [.github/actionlint.yaml](../.github/actionlint.yaml), the scripts job in [static-analysis.yml](../.github/workflows/static-analysis.yml) |
+| **One pinned environment for the Python tools** — PlatformIO, Playwright, ruff, actionlint — the same in the dev container and in CI | [pyproject.toml](../pyproject.toml) and `uv.lock`, the [uv-sync action](../.github/actions/uv-sync/action.yml) |

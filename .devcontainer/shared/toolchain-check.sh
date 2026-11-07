@@ -16,24 +16,23 @@ set -e
 
 # One name per program, each the one a script or a CI job actually calls. avr-objcopy is
 # here next to avr-gcc because the AVR image is sized through it and a toolchain can carry
-# the compiler without the binutils; the Playwright environment is a path rather than a
-# name, as it is deliberately not on PATH. clang++ answers for libclang-rt-dev as well, which
-# is a library and no program: both arrive in the same install line, and an image older than
-# that line has clang-21 through clang-tidy but no clang++.
+# the compiler without the binutils; pio, ruff, actionlint and playwright are the tool
+# environment's, and missing all four means an image from before it. clang++ answers for
+# libclang-rt-dev as well, which is a library and no program: both arrive in the same install
+# line, and an image older than that line has clang-21 through clang-tidy but no clang++.
 TOOLS='cmake ninja wx-config
        avr-gcc avr-objcopy
        pio
-       clang-tidy run-clang-tidy cppcheck doxygen shellcheck flake8
+       clang-tidy run-clang-tidy cppcheck doxygen shellcheck
+       uv ruff actionlint playwright
        clang++ llvm-symbolizer
        python3 gh
        xdotool xwininfo import rsvg-convert xvfb-run'
-PLAYWRIGHT=/opt/playwright/bin/python
 
 missing=''
 for tool in $TOOLS; do
     command -v "$tool" >/dev/null 2>&1 || missing="$missing $tool"
 done
-[ -x "$PLAYWRIGHT" ] || missing="$missing $PLAYWRIGHT"
 
 if [ -n "$missing" ]; then
     echo "Wordclock toolchain check: missing$missing" >&2

@@ -1,6 +1,6 @@
 {
     "id": "shared",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "name": "Wordclock shared editor configuration",
     "description": "Extensions, CMake settings, the toolchain check and the PlatformIO package cache shared by every devcontainer.json variant.",
     "customizations": {
@@ -41,7 +41,7 @@
     "containerEnv": {
         "GH_HOST": "github.com"
     },
-    "postCreateCommand": "wordclock-toolchain-check",
+    "postCreateCommand": "wordclock-tool-env && wordclock-toolchain-check",
     "mounts": [
         {
             "source": "wordclock-platformio",

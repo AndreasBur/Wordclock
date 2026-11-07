@@ -26,8 +26,8 @@ pio device monitor -d platform/esp32      # serial console, 115200 baud
 
 ### PlatformIO in the dev container
 
-The image carries it, in a virtual environment under `/opt/platformio` that is already on
-the path, so `pio run -d platform/esp32` works in a fresh container with nothing installed
+The image carries it, in the tool environment under `/opt/wordclock-env` that is already on
+the path and at the version `uv.lock` pins, so `pio run -d platform/esp32` works in a fresh container with nothing installed
 by hand. The package cache is a named volume at `~/.platformio`: the roughly 1.5 GB of
 toolchain survives a rebuild, and only the first run pays for fetching it.
 

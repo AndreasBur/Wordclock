@@ -193,8 +193,8 @@ snap stub, which does not run in a container. It is headless, so none of the dis
 plumbing the next section works around applies here.
 
 ```bash
-# the browser the image provides; PLAYWRIGHT_BROWSERS_PATH is already set by the image
-/opt/playwright/bin/python shot.py
+# Playwright from the tool environment, at uv.lock's version; its browser is the image's
+uv run python shot.py
 ```
 
 They need the firmware behind them, and **the simulator is it**: `./build/bin/Wordclock`

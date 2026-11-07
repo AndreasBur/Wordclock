@@ -125,15 +125,13 @@ jobs:
   # nothing on it is wider than the window, and a command typed into the console comes back
   # answered. What tools/web-smoke.py checks, and why those, is in its docstring.
   #
-  # Playwright at the version the dev container pins, so that the browser cached here is the one
-  # that version wants. xvfb because the simulator is the wx application, and opens its window
-  # on whatever X server it is given.
+  # Playwright at the version uv.lock pins, and its browser cached under that version, which is
+  # the one that version wants. xvfb because the simulator is the wx application, and opens its
+  # window on whatever X server it is given.
   web:
     name: Web pages in a browser
     runs-on: ubuntu-26.04
     timeout-minutes: 20
-    env:
-      PLAYWRIGHT_VERSION: 1.64.1
     steps:
       - uses: actions/checkout@v7
 
@@ -142,20 +140,20 @@ jobs:
         with:
           packages: cmake ninja-build libwxgtk3.2-dev xvfb
 
-      - uses: actions/setup-python@v7
-        with:
-          python-version: '3.12'
+      - uses: ./.github/actions/uv-sync
+
+      - name: Read the Playwright version
+        id: playwright
+        run: echo "version=$(python -c 'from importlib.metadata import version; print(version("playwright"))')" >> "$GITHUB_OUTPUT"
 
       - name: Cache the browser
         uses: actions/cache@v6
         with:
           path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ env.PLAYWRIGHT_VERSION }}
+          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}
 
-      - name: Install Playwright and its Chromium
-        run: |
-          pip install "playwright==$PLAYWRIGHT_VERSION"
-          python -m playwright install --with-deps chromium
+      - name: Install Chromium
+        run: playwright install --with-deps chromium
 
       - name: Build the simulator
         run: |
@@ -185,24 +183,18 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - uses: actions/setup-python@v7
-        with:
-          python-version: '3.12'
-
       # The platform, the Xtensa toolchain and the Arduino core are about 1.5 GB and are
       # downloaded on first use. Restoring them costs a minute or two, which is still less
       # than fetching them, and the key changes only when the build configuration does.
       - name: Cache the PlatformIO packages
         uses: actions/cache@v6
         with:
-          path: |
-            ~/.platformio
-            ~/.cache/pip
+          path: ~/.platformio
           key: platformio-${{ runner.os }}-${{ hashFiles('platform/esp32/platformio.ini') }}
           restore-keys: platformio-${{ runner.os }}-
 
-      - name: Install PlatformIO
-        run: pip install --upgrade platformio
+      # PlatformIO at the version uv.lock pins, rather than whatever was released last.
+      - uses: ./.github/actions/uv-sync
 
       # WordclockSecrets.h is not in the repository, so this builds with the defaults in
       # WordclockConfiguration.h - an empty SSID, which is a clock that runs without a
@@ -253,10 +245,6 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - uses: actions/setup-python@v7
-        with:
-          python-version: '3.12'
-
       # Larger and slower to fetch than the ESP32's, because this platform clones
       # earlephilhower/arduino-pico recursively rather than downloading a package: around
       # 1.5 GB with the Pico SDK and its submodules, and several minutes. Its own cache key
@@ -265,14 +253,12 @@ jobs:
       - name: Cache the PlatformIO packages
         uses: actions/cache@v6
         with:
-          path: |
-            ~/.platformio
-            ~/.cache/pip
+          path: ~/.platformio
           key: platformio-rp2350-${{ runner.os }}-${{ hashFiles('platform/rp2350/platformio.ini') }}
           restore-keys: platformio-rp2350-${{ runner.os }}-
 
-      - name: Install PlatformIO
-        run: pip install --upgrade platformio
+      # PlatformIO at the version uv.lock pins, rather than whatever was released last.
+      - uses: ./.github/actions/uv-sync
 
       # As on the ESP32: no WordclockSecrets.h in the repository, so this builds with the
       # empty SSID that leaves a clock running without a network.
@@ -282,8 +268,8 @@ jobs:
       # And the two percentages this backend's notes claim are compared against the image that
       # was just built - the same arrangement the AVR job has, and for the same reason: the
       # number in the notes was 11.3 % of 4 MB long after the filesystem took a megabyte of it.
-      # python3 comes from setup-python above, and the size tool from the toolchain PlatformIO
-      # just fetched.
+      # python3 comes from the uv-sync action above, and the size tool from the toolchain
+      # PlatformIO just fetched.
       - name: Check the documented sizes
         run: python3 tools/documented-sizes.py --rp2350-elf platform/rp2350/.pio/build/wordclock/firmware.elf
 
