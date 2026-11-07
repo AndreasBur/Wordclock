@@ -96,13 +96,6 @@ but both are npm packages, which brings an npm lockfile next to `uv.lock`. They 
 the way every other tool has: pinned in a lockfile, called by a target of the
 [Makefile](../Makefile), and that target is what CI runs.
 
-### Let the pins update themselves
-
-Everything above trades drift for pins, and a pin left alone is drift of another kind: the
-version that was current when somebody last looked. Dependabot reads `uv.lock` and the
-workflows' action versions and opens a pull request per update, which CI then checks like any
-other. `uv.lock` is that lockfile now.
-
 ## An idea, not a plan
 
 **A second language in the word tables.** The mechanism is half here already: four
@@ -162,3 +155,4 @@ it happened in.
 | **The scripts are read**: shellcheck over the shell scripts, pyflakes' checks over the Python ones, actionlint over the workflows | [pyproject.toml](../pyproject.toml), [.github/actionlint.yaml](../.github/actionlint.yaml), the scripts job in [static-analysis.yml](../.github/workflows/static-analysis.yml) |
 | **One pinned environment for the Python tools** — PlatformIO, Playwright, ruff, actionlint — the same in the dev container and in CI | [pyproject.toml](../pyproject.toml) and `uv.lock`, the [uv-sync action](../.github/actions/uv-sync/action.yml) |
 | **One way in** — a preset for every CMake build, and a Makefile over them and everything else: `make check` is what CI runs, and the workflows call nothing but its targets | [Makefile](../Makefile), [CMakePresets.json](../CMakePresets.json) |
+| **The pins update themselves** — Dependabot for the actions and for `uv.lock`, weekly, a week after a release; what it cannot read is named there | [dependabot.yml](../.github/dependabot.yml) |

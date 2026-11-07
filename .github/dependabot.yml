@@ -1,0 +1,43 @@
+# Dependabot: a pull request whenever a pin of this repository falls behind, which CI then checks
+# like any other. Everything here is pinned rather than floating so that nothing changes under
+# the repository without anybody asking - and a pin left alone is drift of another kind, the
+# version that was current when somebody last looked.
+#
+# Weekly, and a week's cooldown before a new release is proposed at all: a release that is
+# withdrawn or followed by a quick fix is usually so within days, and nothing here is urgent
+# enough to want the first hour of a new version. Security updates are not held back by it.
+#
+# What this cannot read, and so stays a pin somebody bumps by hand:
+# - the dev container's ARGs in .devcontainer/Dockerfile - the base image, which FROM takes
+#   through an ARG, gh with its checksums, and UV_VERSION, which the uv-sync action reads too;
+# - the PlatformIO platforms, which platformio.ini names by URL.
+version: 2
+updates:
+  # The workflows and the composite actions under .github/actions, which call actions of their
+  # own - setup-python in uv-sync, cache in both - and which the default directory would miss.
+  # One pull request for all of them: an action update is a version number and rarely more.
+  - package-ecosystem: github-actions
+    directories:
+      - /
+      - /.github/actions/*
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    groups:
+      actions:
+        patterns: ["*"]
+
+  # pyproject.toml and uv.lock. PlatformIO and Playwright each come on their own, because each
+  # moves something a build depends on - the ESP32 and RP2350 toolchains, the Chromium the web
+  # job runs - and a failure should name which. The two linters together, since a new finding
+  # from either is answered the same way.
+  - package-ecosystem: uv
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    groups:
+      linters:
+        patterns: ["ruff", "actionlint-py"]
