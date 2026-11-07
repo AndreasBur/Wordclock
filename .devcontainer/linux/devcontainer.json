@@ -2,7 +2,7 @@
     "name": "Wordclock Simulator (Linux/X11)",
     "build": {
         "dockerfile": "../Dockerfile",
-        "context": ".."
+        "context": "../.."
     },
     // Extensions, CMake settings and the toolchain check live in ../shared.
     "features": {

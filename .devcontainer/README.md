@@ -214,7 +214,7 @@ be committed (internal base images, registry-hosted features, credentials). The
 ```jsonc
 "build": {
     "dockerfile": "../Dockerfile",
-    "context": "..",
+    "context": "../..",
     "args": { "BASE_IMAGE": "registry.example.internal/base:latest" }
 }
 ```
