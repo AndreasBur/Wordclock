@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <!--
   The web console. One self-contained file: no external stylesheet, script or font,
   because the clock serves it from its own flash and has nowhere to fetch anything from.
@@ -531,7 +532,7 @@
              where the colour and the brightness now live. Relative, because the clock answers
              on whatever address it was given. -->
         <a href="." id="app">Panel</a>
-        <button type="button" id="theme" title="Follow the system, or choose light or dark"></button>
+        <button type="button" id="theme" title="Follow the system, or choose light or dark">system</button>
     </div>
 </header>
 
@@ -570,7 +571,7 @@
                 <form id="entry">
                     <!-- A placeholder is not a name: it goes away as soon as anything is
                          typed, and some readers never announce it at all. -->
-                    <input id="command" aria-label="command to send" placeholder="command, e.g. 3 -B255" autocomplete="off" spellcheck="false">
+                    <input id="command" type="text" aria-label="command to send" placeholder="command, e.g. 3 -B255" autocomplete="off" spellcheck="false">
                     <button type="submit">Send</button>
                 </form>
             </div>
@@ -624,7 +625,7 @@
     function setTheme(name) {
         if (name === 'system') { delete document.documentElement.dataset.theme; }
         else { document.documentElement.dataset.theme = name; }
-        try { localStorage.setItem('wordclock-theme', name); } catch (ignored) { /* private window */ }
+        try { localStorage.setItem('wordclock-theme', name); } catch { /* private window */ }
         showTheme();
     }
 
@@ -637,7 +638,7 @@
     matchMedia('(prefers-color-scheme: dark)').addEventListener('change', showTheme);
 
     let storedTheme = null;
-    try { storedTheme = localStorage.getItem('wordclock-theme'); } catch (ignored) { /* private window */ }
+    try { storedTheme = localStorage.getItem('wordclock-theme'); } catch { /* private window */ }
     setTheme(THEMES.includes(storedTheme) ? storedTheme : 'system');
 
     function append(text, kind) {
@@ -1108,7 +1109,7 @@
         try {
             const answer = JSON.parse(request.responseText);
             if (answer.error) { return answer.error; }
-        } catch (ignored) {
+        } catch {
             return 'the answer was not from the clock (HTTP ' + request.status + ')';
         }
         return 'HTTP ' + request.status;

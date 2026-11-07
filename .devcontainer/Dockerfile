@@ -94,12 +94,14 @@ RUN ARCH="$(dpkg --print-architecture)" && \
 
 # python3 for the tool environment below and for what the scripts in tools/ and test/run.sh
 # need - the page embedding among them - and python3-venv for the environment uv is installed
-# into. node for the local web console.
+# into. node and npm for the web pages' linters, which `make web-lint` installs from
+# package-lock.json on first use: Ubuntu packages npm apart from nodejs.
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && \
     apt-get install -y --no-install-recommends \
         python3 \
         python3-venv \
-        nodejs && \
+        nodejs \
+        npm && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # uv, which makes the environment below from pyproject.toml and uv.lock. This ARG is the one

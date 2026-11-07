@@ -194,6 +194,7 @@ under the sanitizers, and a fuzzer for what no test thought of:
 | fuzz | `fuzz` | libFuzzer, under the same two sanitizers, over the two ways data from outside reaches the firmware: a command line as a browser's web socket frame brings it, and a stored settings blob. Three minutes each per pull request, from a corpus the runs before left in the cache. The fuzzers and how to run them are in [`platform/simulator/tests/fuzz/`](platform/simulator/tests/fuzz/run.sh) |
 | cppcheck | `cppcheck` | Parses the tree by itself, which is what reaches the template instantiations and container bounds the clang checks do not follow. Its two suppressions and their reasons are in [`.cppcheck-suppressions`](.cppcheck-suppressions) |
 | Scripts | `scripts` | shellcheck over every shell script, ruff over every Python one and actionlint over the workflows - what builds, tests and checks everything else. ruff runs pyflakes' checks only, for the reason [`pyproject.toml`](pyproject.toml) gives; actionlint learns the runner label from [`.github/actionlint.yaml`](.github/actionlint.yaml) |
+| Web page linters | `web-lint` | [html-validate](https://html-validate.org/) over both pages as whole documents and eslint over the scripts inline in them, at the versions [`package-lock.json`](package-lock.json) pins. What each checks and leaves out is in [`.htmlvalidate.mjs`](.htmlvalidate.mjs) and [`eslint.config.mjs`](eslint.config.mjs) |
 
 cppcheck reads `firmware/` only: without wxWidgets' own headers it stops at
 `DECLARE_EVENT_TABLE` in the simulator's window class, which is the half
@@ -205,7 +206,7 @@ or anything the dev container does not carry. The clang-tidy job of each cross-c
 is `tidy-avr`, `tidy-esp32` and `tidy-rp2350`, the Doxygen blocks are `docs`:
 
 ```bash
-make lint                     # scripts, docs and cppcheck: seconds, no build
+make lint                     # scripts, docs, cppcheck, web pages: seconds, no build
 make tidy                     # clang-tidy over the core and the simulator
 make check                    # every job of both workflows, warnings as errors
 make fuzz FUZZ_SECONDS=300    # longer than the three minutes a pull request gets

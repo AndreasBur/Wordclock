@@ -38,7 +38,7 @@ HOST_SUITES := platform/esp32/.pio/host-tests platform/rp2350/.pio/host-tests
 
 .PHONY: help check lint run clean \
         simulator clang avr esp32 rp2350 host-esp32 host-rp2350 web \
-        tidy tidy-avr tidy-esp32 tidy-rp2350 cppcheck scripts docs \
+        tidy tidy-avr tidy-esp32 tidy-rp2350 cppcheck scripts docs web-lint \
         sanitizers coverage fuzz
 
 help: ## This list
@@ -54,7 +54,7 @@ check: STRICT := 1
 check: ## What CI runs, all of it
 check: lint simulator clang avr host-esp32 host-rp2350 web tidy tidy-avr \
        sanitizers coverage esp32 rp2350 tidy-esp32 tidy-rp2350 fuzz
-lint: scripts docs cppcheck ## The checks that need no build: seconds
+lint: scripts docs cppcheck web-lint ## The checks that need no build: seconds
 
 ## Builds, each with its tests
 
@@ -194,6 +194,17 @@ scripts: ## shellcheck, ruff and actionlint over the scripts and the workflows
 docs: ## The Doxygen blocks, per backend, and their indentation
 	python3 tools/docs.py
 	python3 tools/doc-indent.py
+
+# html-validate over both pages as whole documents, and eslint over the scripts inline in them;
+# what each checks and leaves out is in .htmlvalidate.mjs and eslint.config.mjs. The packages
+# are the ones package-lock.json pins, installed by npm ci only when the lock has changed since:
+# node_modules/.package-lock.json is the last thing an install writes.
+web-lint: node_modules/.package-lock.json ## html-validate and eslint over the two web pages
+	node_modules/.bin/html-validate web/app.html web/index.html
+	node_modules/.bin/eslint web/
+
+node_modules/.package-lock.json: package.json package-lock.json
+	npm ci
 
 ## The three suites, instrumented
 

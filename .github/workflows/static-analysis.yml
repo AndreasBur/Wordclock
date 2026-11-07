@@ -262,6 +262,25 @@ jobs:
       - name: shellcheck, ruff and actionlint
         run: make scripts
 
+  # The two pages a clock serves, which only a browser had ever read: html-validate over each as
+  # a whole document, eslint over the scripts inline in them. Node at the major version the dev
+  # container's Ubuntu ships, the packages at the versions package-lock.json pins, npm's download
+  # cache keyed by that lock. Seconds, not minutes.
+  web-lint:
+    name: Web page linters
+    runs-on: ubuntu-26.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: html-validate and eslint
+        run: make web-lint
+
   docs:
     name: Doxygen blocks
     runs-on: ubuntu-26.04
