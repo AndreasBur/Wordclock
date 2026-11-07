@@ -181,3 +181,6 @@ it happened in.
 | **A coverage report** on every pull request, all three test suites together and no threshold | [coverage.py](../tools/coverage.py) |
 | **The sanitizers and one warning list** — ASan and UBSan over every suite; every build of ours compiles with the same warnings, `-Wconversion` among them | [warnings.txt](../platform/warnings.txt), the sanitizers job in [static-analysis.yml](../.github/workflows/static-analysis.yml) |
 | **Fuzzing** the two ways data from outside reaches the firmware: a command line and a stored settings blob | [the fuzzers](../platform/simulator/tests/fuzz/run.sh) |
+| **No heap on the AVR, and its stack is checked** against the RAM it has, on every build | [avr-stack.py](../tools/avr-stack.py), the [AVR notes](../platform/avr-dx/README.md) |
+| **The host builds again with clang**, the backends' host suites included | the clang job in [ci.yml](../.github/workflows/ci.yml) |
+| **The scripts are read**: shellcheck over the shell scripts, pyflakes over the Python ones | [.flake8](../.flake8), the scripts job in [static-analysis.yml](../.github/workflows/static-analysis.yml) |
