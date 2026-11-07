@@ -32,9 +32,30 @@ jobs:
     name: Checks
     uses: ./.github/workflows/ci.yml
 
+  # The firmware says its version itself - status command 12, the page's footer - and takes it
+  # from Version.h, not from the tag. So a tag v0.2.0 on a commit whose Version.h still says
+  # 0.1.0 would publish files named 0.2.0 that answer 0.1.0, and nothing would notice until
+  # somebody compared the two. Asked here instead, before anything is published.
+  version:
+    name: The tag matches Version.h
+    runs-on: ubuntu-26.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Compare
+        run: |
+          Tag="${GITHUB_REF_NAME#v}"
+          Firmware=$(sed -n 's/^# *define WORDCLOCK_VERSION *"\(.*\)"$/\1/p' firmware/inc/Version/Version.h)
+          if [ "$Tag" != "$Firmware" ]; then
+            echo "::error::The tag says $Tag, firmware/inc/Version/Version.h says ${Firmware:-nothing}"
+            exit 1
+          fi
+          echo "Version $Firmware"
+
   publish:
     name: Publish the release
-    needs: checks
+    needs: [version, checks]
     runs-on: ubuntu-26.04
     # For the reason ci.yml gives. This job only downloads the artifacts CI produced and
     # writes the release, so anything approaching this number is something stuck.
@@ -89,13 +110,14 @@ jobs:
           |-------|------|----------------|
           | ESP32-S3 | `…-ESP32-S3-*.factory.bin` | First install: `esptool.py write_flash 0x0 <file>`. Contains the bootloader and partition table. |
           | ESP32-S3 | `…-ESP32-S3-*.ota.bin` | Update over the network: the *Update the firmware* panel in the clock's own page, or `curl --data-binary @<file> http://wordclock.local/update`. No cable. |
-          | Raspberry Pi Pico 2 W | `…-RP2350-*.uf2` | Hold BOOTSEL while plugging in, then copy the file onto the drive that appears. **The first release carrying the network update resets the clock's settings once**, the filesystem having moved to make room for the image a network update is written as. |
+          | Raspberry Pi Pico 2 W | `…-RP2350-*.uf2` | Hold BOOTSEL while plugging in, then copy the file onto the drive that appears. |
           | Raspberry Pi Pico 2 W | `…-RP2350-*.ota.bin` | Update over the network: the *Update the firmware* panel in the clock's own page, or `curl --data-binary @<file> http://wordclock.local/update`. Also what `picotool load` takes over USB. |
           | AVR128DA48 | `…-AVR128DA48-*.hex` | `pymcuprog write -d avr128da48 -t uart -f <file> --erase --verify`, see [platform/avr-dx/README.md](platform/avr-dx/README.md). |
 
-          The firmware is built without WLAN credentials, so a clock flashed from these files
-          comes up without a network and is set up over the serial interface - see the
-          [serial command reference](docs/serial-commands.md).
+          The firmware is built without WLAN credentials. A clock flashed from these files opens
+          an access point named `Wordclock`: join it and open http://192.168.4.1 to enter your
+          network, which closes the access point. The AVR has no radio and is set up over its
+          serial interface - see the [serial command reference](docs/serial-commands.md).
           EOF
           )
           gh release create "$Version" \
